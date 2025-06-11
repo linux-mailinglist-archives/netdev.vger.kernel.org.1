@@ -1,137 +1,362 @@
-Return-Path: <netdev+bounces-196540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7974CAD5355
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:12:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982A5AD536F
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:14:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FC45164383
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:12:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21D303A4E27
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27052E611B;
-	Wed, 11 Jun 2025 11:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE342E6106;
+	Wed, 11 Jun 2025 11:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="rlhglbRt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iqQZEXKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B992E6106;
-	Wed, 11 Jun 2025 11:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477632E6111;
+	Wed, 11 Jun 2025 11:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749640359; cv=none; b=A2xwUOwgHKSWRy+DGUPS3UwDl19IvL6Q5Zq9KPM2R2c6JCnS58qIvbGpazxERVSRktkIfMj6bvtIDI+zRRQgGRW4ewArulBdgKfIEW9lI381+WrBZHZ0Vn/6j4VHbjfZi22DGtgmxvFxpjpb5gBaiU6ceZtbKe8RmCI+OtbnML8=
+	t=1749640429; cv=none; b=Or+Pba2WPH03kykklLVYQmJ70+dcq8etfmdmCWN3+0mAsw2PZ9ZnpmaDkjGJg3o4jqONTGvkU4s0vdt9iq3yanBVPqL6d9qlvzKqwpQ3jFTQEiVfP5MBUDa55w4WAuQtCfkXexcQ902sWLy4Mi+h3SKRI0xDmJRN8daLXjMigXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749640359; c=relaxed/simple;
-	bh=wOLHNC3mM1hvT6HYztFKZ2PDx4KcHzQ0D5Kk5tU14B4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QMrYtLGuqYL6Dh/wznWfwEwAqG55qOkyKSupuoh3REf9NAsaTWpCqBgOcPoO2xCjFGFIseHg2eARy5W1h5N9nnBFYKAMu6tfn7vlyuA+/mZSebiRI7WkovgD4KEclIDtlCzi4ljFJ0CGiYTbF9tvHrdn/3lzIZunSnGKR86qnbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=rlhglbRt; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1127)
-	id 9DA822115190; Wed, 11 Jun 2025 04:12:35 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9DA822115190
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1749640355;
-	bh=qWcwbrk1B9AwSLw+kibnueNoD1DZ6goIu7GiCM6Qlu0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rlhglbRtbt0Hbe+n51t1Jn72RUoWF3RpnwuZftUvtNku2mGleh3PsB7Ete2wnwVQX
-	 totONy0JEUXLVQ9Ik1KKGghpirw600tO8i8259mmKIVjMKnnA4WPgd/mExswV1pxYR
-	 18e7gfJe3yFADKmvYLOa41ksZ4zFzNef8IiwfWCA=
-Date: Wed, 11 Jun 2025 04:12:35 -0700
-From: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
-To: Naman Jain <namjain@linux.microsoft.com>
-Cc: "K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>, Long Li <longli@microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH 0/6] Fix warning for missing export.h in Hyper-V drivers
-Message-ID: <20250611111235.GB31913@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20250611100459.92900-1-namjain@linux.microsoft.com>
+	s=arc-20240116; t=1749640429; c=relaxed/simple;
+	bh=y9GGlsXxjBj48ApOolUX4b6+EXIItyfsLaqQPJBnoVo=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=GX4KB9+w4/Sqatk5qGA8JAXH04LXgp+xLmI1d73q65eac1NsI+TGoxtKb6QcVDYHFtbFcLvV0UysL7p9bH4hMps3j2fQGE3GDcZXZXsqm+S2NBjnMlBTZ1VE7830jpZ7wQyA0WgrfgJpCqortBsufnEWY5bTQez4xhI6KS+VNRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iqQZEXKO; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749640428; x=1781176428;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=y9GGlsXxjBj48ApOolUX4b6+EXIItyfsLaqQPJBnoVo=;
+  b=iqQZEXKO/sQePw7IXyLcAQJMTZHZBYW2JrxyX6GEG3bbm6jSMg47ROQO
+   KGm2DIz04aCBK8VrGQ1O67AVkbesIAaJJG4YbAJKoZFNK2cPkCxWRLv75
+   hxYr22QD5PNiakQVH27LDYU5UUYfZjndytkvYw/aHa0F1HQMmCQszj+du
+   MYJhryhcW7qHsdu++20QSPFrtznR31n8SH9cZ7rAqt+DycFlLT7D5DeLa
+   v807vy79zSOdCkbk9ip9Y4NqqxCqZmAoTfSZORt6zHdR7poUK/kKd6QFg
+   x0/TfqJvXHLSywmQfpyctqflc9/43sZ66GCztZbAgGlg+qZx4EHfJXgjP
+   g==;
+X-CSE-ConnectionGUID: srexPTHvQh2viwSsGlTGzg==
+X-CSE-MsgGUID: XgUSetpHTH+gbAWDY7dEhQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="55583759"
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="55583759"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 04:13:45 -0700
+X-CSE-ConnectionGUID: 71MhQGstSJKGgyIv3b1JpQ==
+X-CSE-MsgGUID: Qend955UQrqXqlwECABGaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="170341644"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.183])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 04:13:39 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Wed, 11 Jun 2025 14:13:35 +0300 (EEST)
+To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    linux-serial <linux-serial@vger.kernel.org>, 
+    LKML <linux-kernel@vger.kernel.org>, Karsten Keil <isdn@linux-pingi.de>, 
+    David Lin <dtwlin@gmail.com>, Johan Hovold <johan@kernel.org>, 
+    Alex Elder <elder@kernel.org>, Oliver Neukum <oneukum@suse.com>, 
+    Marcel Holtmann <marcel@holtmann.org>, 
+    Johan Hedberg <johan.hedberg@gmail.com>, 
+    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+    Netdev <netdev@vger.kernel.org>, greybus-dev@lists.linaro.org, 
+    linux-staging@lists.linux.dev, linux-usb@vger.kernel.org, 
+    linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 01/33] tty: introduce and use tty_port_tty_vhangup()
+ helper
+In-Reply-To: <20250611100319.186924-2-jirislaby@kernel.org>
+Message-ID: <b23d566c-09dc-7374-cc87-0ad4660e8b2e@linux.intel.com>
+References: <20250611100319.186924-1-jirislaby@kernel.org> <20250611100319.186924-2-jirislaby@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611100459.92900-1-namjain@linux.microsoft.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: multipart/mixed; boundary="8323328-1095312045-1749640415=:957"
 
-On Wed, Jun 11, 2025 at 03:34:53PM +0530, Naman Jain wrote:
-> When the kernel is compiled with W=1 option, a warning is reported
-> if a .c file exports a symbol but does not include export.h header
-> file. This warning was added in below patch, which merged recently:
-> commit a934a57a42f6 ("scripts/misc-check: check missing #include <linux/export.h> when W=1")
-> 
-> Fix this issue in Hyper-V drivers. This does not bring any
-> functional changes.
-> 
-> The one in drivers/hv/vmbus_drv.c is going to be fixed with 
-> https://lore.kernel.org/all/20250611072704.83199-2-namjain@linux.microsoft.com/
-> so it is not included in this series.
-> 
-> Naman Jain (6):
->   Drivers: hv: Fix warnings for missing export.h header inclusion
->   x86/hyperv: Fix warnings for missing export.h header inclusion
->   KVM: x86: hyper-v: Fix warnings for missing export.h header inclusion
->   clocksource: hyper-v: Fix warnings for missing export.h header
->     inclusion
->   PCI: hv: Fix warnings for missing export.h header inclusion
->   net: mana: Fix warnings for missing export.h header inclusion
-> 
->  arch/x86/hyperv/hv_init.c                       | 1 +
->  arch/x86/hyperv/irqdomain.c                     | 1 +
->  arch/x86/hyperv/ivm.c                           | 1 +
->  arch/x86/hyperv/nested.c                        | 1 +
->  arch/x86/kvm/hyperv.c                           | 1 +
->  arch/x86/kvm/kvm_onhyperv.c                     | 1 +
->  drivers/clocksource/hyperv_timer.c              | 1 +
->  drivers/hv/channel.c                            | 1 +
->  drivers/hv/channel_mgmt.c                       | 1 +
->  drivers/hv/hv_proc.c                            | 1 +
->  drivers/hv/mshv_common.c                        | 1 +
->  drivers/hv/mshv_root_hv_call.c                  | 1 +
->  drivers/hv/ring_buffer.c                        | 1 +
->  drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
->  drivers/net/ethernet/microsoft/mana/mana_en.c   | 1 +
->  drivers/pci/controller/pci-hyperv-intf.c        | 1 +
->  16 files changed, 16 insertions(+)
-> 
-> 
-> base-commit: 475c850a7fdd0915b856173186d5922899d65686
-> -- 
-> 2.34.1
->
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-For the series,
-Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com> 
+--8323328-1095312045-1749640415=:957
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+
+On Wed, 11 Jun 2025, Jiri Slaby (SUSE) wrote:
+
+> This code (tty_get -> vhangup -> tty_put) is repeated on few places.
+> Introduce a helper similar to tty_port_tty_hangup() (asynchronous) to
+> handle even vhangup (synchronous).
+>=20
+> And use it on those places.
+>=20
+> In fact, reuse the tty_port_tty_hangup()'s code and call tty_vhangup()
+> depending on a new bool parameter.
+>=20
+> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+> Cc: Karsten Keil <isdn@linux-pingi.de>
+> Cc: David Lin <dtwlin@gmail.com>
+> Cc: Johan Hovold <johan@kernel.org>
+> Cc: Alex Elder <elder@kernel.org>
+> Cc: Oliver Neukum <oneukum@suse.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+
+Nice cleanup. I'm not sure if it's important enough to be mentioned in
+Documentation/driver-api/tty/tty_port.rst .
+
+Reviewed-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
+
+--=20
+ i.
+
+> ---
+> Cc: netdev@vger.kernel.org
+> Cc: greybus-dev@lists.linaro.org
+> Cc: linux-staging@lists.linux.dev
+> Cc: linux-usb@vger.kernel.org
+> Cc: linux-bluetooth@vger.kernel.org
+
+> ---
+>  drivers/isdn/capi/capi.c         |  8 +-------
+>  drivers/staging/greybus/uart.c   |  7 +------
+>  drivers/tty/serial/serial_core.c |  7 +------
+>  drivers/tty/tty_port.c           | 12 ++++++++----
+>  drivers/usb/class/cdc-acm.c      |  7 +------
+>  drivers/usb/serial/usb-serial.c  |  7 +------
+>  include/linux/tty_port.h         | 12 +++++++++++-
+>  net/bluetooth/rfcomm/tty.c       |  7 +------
+>  8 files changed, 25 insertions(+), 42 deletions(-)
+>=20
+> diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
+> index 70dee9ad4bae..78e6e7748fb9 100644
+> --- a/drivers/isdn/capi/capi.c
+> +++ b/drivers/isdn/capi/capi.c
+> @@ -306,15 +306,9 @@ static void capincci_alloc_minor(struct capidev *cde=
+v, struct capincci *np)
+>  static void capincci_free_minor(struct capincci *np)
+>  {
+>  =09struct capiminor *mp =3D np->minorp;
+> -=09struct tty_struct *tty;
+> =20
+>  =09if (mp) {
+> -=09=09tty =3D tty_port_tty_get(&mp->port);
+> -=09=09if (tty) {
+> -=09=09=09tty_vhangup(tty);
+> -=09=09=09tty_kref_put(tty);
+> -=09=09}
+> -
+> +=09=09tty_port_tty_vhangup(&mp->port);
+>  =09=09capiminor_free(mp);
+>  =09}
+>  }
+> diff --git a/drivers/staging/greybus/uart.c b/drivers/staging/greybus/uar=
+t.c
+> index 308ed1ca9947..10df5c37c83e 100644
+> --- a/drivers/staging/greybus/uart.c
+> +++ b/drivers/staging/greybus/uart.c
+> @@ -916,7 +916,6 @@ static void gb_uart_remove(struct gbphy_device *gbphy=
+_dev)
+>  {
+>  =09struct gb_tty *gb_tty =3D gb_gbphy_get_data(gbphy_dev);
+>  =09struct gb_connection *connection =3D gb_tty->connection;
+> -=09struct tty_struct *tty;
+>  =09int ret;
+> =20
+>  =09ret =3D gbphy_runtime_get_sync(gbphy_dev);
+> @@ -929,11 +928,7 @@ static void gb_uart_remove(struct gbphy_device *gbph=
+y_dev)
+>  =09wake_up_all(&gb_tty->wioctl);
+>  =09mutex_unlock(&gb_tty->mutex);
+> =20
+> -=09tty =3D tty_port_tty_get(&gb_tty->port);
+> -=09if (tty) {
+> -=09=09tty_vhangup(tty);
+> -=09=09tty_kref_put(tty);
+> -=09}
+> +=09tty_port_tty_vhangup(&gb_tty->port);
+> =20
+>  =09gb_connection_disable_rx(connection);
+>  =09tty_unregister_device(gb_tty_driver, gb_tty->minor);
+> diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial=
+_core.c
+> index 1f7708a91fc6..d6485714eb0f 100644
+> --- a/drivers/tty/serial/serial_core.c
+> +++ b/drivers/tty/serial/serial_core.c
+> @@ -3209,7 +3209,6 @@ static void serial_core_remove_one_port(struct uart=
+_driver *drv,
+>  =09struct uart_state *state =3D drv->state + uport->line;
+>  =09struct tty_port *port =3D &state->port;
+>  =09struct uart_port *uart_port;
+> -=09struct tty_struct *tty;
+> =20
+>  =09mutex_lock(&port->mutex);
+>  =09uart_port =3D uart_port_check(state);
+> @@ -3228,11 +3227,7 @@ static void serial_core_remove_one_port(struct uar=
+t_driver *drv,
+>  =09 */
+>  =09tty_port_unregister_device(port, drv->tty_driver, uport->line);
+> =20
+> -=09tty =3D tty_port_tty_get(port);
+> -=09if (tty) {
+> -=09=09tty_vhangup(port->tty);
+> -=09=09tty_kref_put(tty);
+> -=09}
+> +=09tty_port_tty_vhangup(port);
+> =20
+>  =09/*
+>  =09 * If the port is used as a console, unregister it
+> diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
+> index 4af1fbf73f51..903eebdbe12d 100644
+> --- a/drivers/tty/tty_port.c
+> +++ b/drivers/tty/tty_port.c
+> @@ -396,15 +396,19 @@ EXPORT_SYMBOL(tty_port_hangup);
+>   * @port: tty port
+>   * @check_clocal: hang only ttys with %CLOCAL unset?
+>   */
+> -void tty_port_tty_hangup(struct tty_port *port, bool check_clocal)
+> +void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, boo=
+l async)
+>  {
+>  =09struct tty_struct *tty =3D tty_port_tty_get(port);
+> =20
+> -=09if (tty && (!check_clocal || !C_CLOCAL(tty)))
+> -=09=09tty_hangup(tty);
+> +=09if (tty && (!check_clocal || !C_CLOCAL(tty))) {
+> +=09=09if (async)
+> +=09=09=09tty_hangup(tty);
+> +=09=09else
+> +=09=09=09tty_vhangup(tty);
+> +=09}
+>  =09tty_kref_put(tty);
+>  }
+> -EXPORT_SYMBOL_GPL(tty_port_tty_hangup);
+> +EXPORT_SYMBOL_GPL(__tty_port_tty_hangup);
+> =20
+>  /**
+>   * tty_port_tty_wakeup - helper to wake up a tty
+> diff --git a/drivers/usb/class/cdc-acm.c b/drivers/usb/class/cdc-acm.c
+> index c2ecfa3c8349..f9171fbedf5c 100644
+> --- a/drivers/usb/class/cdc-acm.c
+> +++ b/drivers/usb/class/cdc-acm.c
+> @@ -1571,7 +1571,6 @@ static int acm_probe(struct usb_interface *intf,
+>  static void acm_disconnect(struct usb_interface *intf)
+>  {
+>  =09struct acm *acm =3D usb_get_intfdata(intf);
+> -=09struct tty_struct *tty;
+>  =09int i;
+> =20
+>  =09/* sibling interface is already cleaning up */
+> @@ -1598,11 +1597,7 @@ static void acm_disconnect(struct usb_interface *i=
+ntf)
+>  =09usb_set_intfdata(acm->data, NULL);
+>  =09mutex_unlock(&acm->mutex);
+> =20
+> -=09tty =3D tty_port_tty_get(&acm->port);
+> -=09if (tty) {
+> -=09=09tty_vhangup(tty);
+> -=09=09tty_kref_put(tty);
+> -=09}
+> +=09tty_port_tty_vhangup(&acm->port);
+> =20
+>  =09cancel_delayed_work_sync(&acm->dwork);
+> =20
+> diff --git a/drivers/usb/serial/usb-serial.c b/drivers/usb/serial/usb-ser=
+ial.c
+> index 7266558d823a..c78ff40b1e5f 100644
+> --- a/drivers/usb/serial/usb-serial.c
+> +++ b/drivers/usb/serial/usb-serial.c
+> @@ -1176,7 +1176,6 @@ static void usb_serial_disconnect(struct usb_interf=
+ace *interface)
+>  =09struct usb_serial *serial =3D usb_get_intfdata(interface);
+>  =09struct device *dev =3D &interface->dev;
+>  =09struct usb_serial_port *port;
+> -=09struct tty_struct *tty;
+> =20
+>  =09/* sibling interface is cleaning up */
+>  =09if (!serial)
+> @@ -1191,11 +1190,7 @@ static void usb_serial_disconnect(struct usb_inter=
+face *interface)
+> =20
+>  =09for (i =3D 0; i < serial->num_ports; ++i) {
+>  =09=09port =3D serial->port[i];
+> -=09=09tty =3D tty_port_tty_get(&port->port);
+> -=09=09if (tty) {
+> -=09=09=09tty_vhangup(tty);
+> -=09=09=09tty_kref_put(tty);
+> -=09=09}
+> +=09=09tty_port_tty_vhangup(&port->port);
+>  =09=09usb_serial_port_poison_urbs(port);
+>  =09=09wake_up_interruptible(&port->port.delta_msr_wait);
+>  =09=09cancel_work_sync(&port->work);
+> diff --git a/include/linux/tty_port.h b/include/linux/tty_port.h
+> index 08f89a598366..021f9a8415c0 100644
+> --- a/include/linux/tty_port.h
+> +++ b/include/linux/tty_port.h
+> @@ -232,7 +232,7 @@ bool tty_port_carrier_raised(struct tty_port *port);
+>  void tty_port_raise_dtr_rts(struct tty_port *port);
+>  void tty_port_lower_dtr_rts(struct tty_port *port);
+>  void tty_port_hangup(struct tty_port *port);
+> -void tty_port_tty_hangup(struct tty_port *port, bool check_clocal);
+> +void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, boo=
+l async);
+>  void tty_port_tty_wakeup(struct tty_port *port);
+>  int tty_port_block_til_ready(struct tty_port *port, struct tty_struct *t=
+ty,
+>  =09=09struct file *filp);
+> @@ -251,4 +251,14 @@ static inline int tty_port_users(struct tty_port *po=
+rt)
+>  =09return port->count + port->blocked_open;
+>  }
+> =20
+> +static inline void tty_port_tty_hangup(struct tty_port *port, bool check=
+_clocal)
+> +{
+> +=09__tty_port_tty_hangup(port, check_clocal, true);
+> +}
+> +
+> +static inline void tty_port_tty_vhangup(struct tty_port *port)
+> +{
+> +=09__tty_port_tty_hangup(port, false, false);
+> +}
+> +
+>  #endif
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index 21a5b5535ebc..827dfbe66085 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -438,7 +438,6 @@ static int __rfcomm_release_dev(void __user *arg)
+>  {
+>  =09struct rfcomm_dev_req req;
+>  =09struct rfcomm_dev *dev;
+> -=09struct tty_struct *tty;
+> =20
+>  =09if (copy_from_user(&req, arg, sizeof(req)))
+>  =09=09return -EFAULT;
+> @@ -464,11 +463,7 @@ static int __rfcomm_release_dev(void __user *arg)
+>  =09=09rfcomm_dlc_close(dev->dlc, 0);
+> =20
+>  =09/* Shut down TTY synchronously before freeing rfcomm_dev */
+> -=09tty =3D tty_port_tty_get(&dev->port);
+> -=09if (tty) {
+> -=09=09tty_vhangup(tty);
+> -=09=09tty_kref_put(tty);
+> -=09}
+> +=09tty_port_tty_vhangup(&dev->port);
+> =20
+>  =09if (!test_bit(RFCOMM_TTY_OWNED, &dev->status))
+>  =09=09tty_port_put(&dev->port);
+>=20
+--8323328-1095312045-1749640415=:957--
 
