@@ -1,185 +1,171 @@
-Return-Path: <netdev+bounces-196563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB2C7AD5522
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:12:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9A7AD5527
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:13:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 957923A8BB6
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 12:11:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E21031BC1296
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 12:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBF527BF95;
-	Wed, 11 Jun 2025 12:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b="KmYJVR/G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D182749E2;
+	Wed, 11 Jun 2025 12:13:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF26E27A12B;
-	Wed, 11 Jun 2025 12:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749643931; cv=pass; b=XEe0EavM6ILXJmKu+DCdXvqkFgu6IvggmIRHPZab1sCOeT1ENRJQWyBxLUKt8r8oGwNdX2xav/M6z1Mv1A9z2OXrnfzx4zbCfJQsVfw9lhvCZV20iuHBvq/d3E+vAbd3ZgeUJdzhYniLj7otRmHCuUpWLg+9ROwksotV9dpfcqU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749643931; c=relaxed/simple;
-	bh=MUQIuXRfDl4RcuDYVB8bOPsQcL3xPBAHH23OTMB03Dk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KJPDncCxvc4sWV6gS8wZFp0w1/NI3ISzzUMAT5UBSnibrWrcDux7iJY3EpIy31PIXP48vG8u0RbywAAaISlY5tdz4JSVsyPqcM9CaulwkqWfFzFFUkXVEmciBBwLL4tgKa56i980M1asMNaBGYkQmZQzrqouDymwO5fbiYUsSX4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me; spf=pass smtp.mailfrom=icenowy.me; dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b=KmYJVR/G; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icenowy.me
-ARC-Seal: i=1; a=rsa-sha256; t=1749643898; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=KAKS2d25mKM+c3gQJaSDpijQ6lBIC/PooR62+Nyt1sMtPknLcb8EpK69IMKmoxR7YGd3wyJpOhGYdy0RKTYakv3kVUfbYlz8RmHhFo8DKuN/xadwgBO1VFROvBrIc/IdyA7vtcnCtHnEkVm+MXr5LafKqPH/e3mpNf8Gw5mj+bQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1749643898; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=MUQIuXRfDl4RcuDYVB8bOPsQcL3xPBAHH23OTMB03Dk=; 
-	b=S3aqBXL9IkTTac9qExicp1WjO4c1sMQgwqedC3bKe6vVfHX8rryNO3ECeauVsIhxwdAqteoqTojGhDmdkaDf6jBuWNnx4RqdQu7sclawXopZ8z9kTKX1H5Va1b+yl8bulqP/cA9bqV+cqkW3r8LGz0LHF27cYLkfGpAfO++Jr9c=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=icenowy.me;
-	spf=pass  smtp.mailfrom=uwu@icenowy.me;
-	dmarc=pass header.from=<uwu@icenowy.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749643898;
-	s=zmail2; d=icenowy.me; i=uwu@icenowy.me;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=MUQIuXRfDl4RcuDYVB8bOPsQcL3xPBAHH23OTMB03Dk=;
-	b=KmYJVR/GJDNOAg3ysa/7iANuO/cg0bi2jebZA5pLshppm6DYT0igSpWfisx+iVaG
-	mUZRCch8ytO11vC/MYGYP4/RrzpsVkTI0Ls1o5Jdsvy+UmERPX/NU0o5gLN6gSIFnhp
-	B1/EMorJ8oZsOGh1PpuyvgCr+CEVkcAqSjpyeSCZT5/sTtVuAiYhYVq+kL8rpvIE15s
-	do9FTzOPn38QwLecjqj5ZvMw6+TTUrmUF5Ny/U2wjtc6DXiKZlHDIV0lAkzhqgzCZwi
-	Zbw87nZj7wE01xGJpjv1z6DLPA6xSw7C2EyDkwdGq8+x7PWBJ7xyUfmPsanUIN8vVou
-	S39YO26cgw==
-Received: by mx.zohomail.com with SMTPS id 1749643895949130.74543462284248;
-	Wed, 11 Jun 2025 05:11:35 -0700 (PDT)
-Message-ID: <fc7ad44b922ec931e935adb96dcc33b89e9293b0.camel@icenowy.me>
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-From: Icenowy Zheng <uwu@icenowy.me>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>, Chaoyi Chen <chaoyi.chen@rock-chips.com>,
- Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, Heiner Kallweit
- <hkallweit1@gmail.com>,  netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 11 Jun 2025 20:11:27 +0800
-In-Reply-To: <aElArNHIwm1--GUn@shell.armlinux.org.uk>
-References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
-	 <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
-	 <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
-	 <2e42f2f7985fb036bec6ab085432a49961c8dc42.camel@icenowy.me>
-	 <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
-	 <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
-	 <ba7b290d-0cd1-4809-822a-bfe902684d7e@lunn.ch>
-	 <9ebe16a8d33e00c39c142748a1ea6fff96b9565a.camel@icenowy.me>
-	 <aElArNHIwm1--GUn@shell.armlinux.org.uk>
-Organization: Anthon Open-Source Community
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A042E610F
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 12:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749644003; cv=none; b=ZaMLRzsj5MHydgDH2D9PDuvN5lmCkOz7jHbgIqKzeHxj/3sBR5OPIwS4hEVzqZAOVTMd3fhNs08VbVhAl/xBK4KFdMj024V36QnXnQ9K0St2tW1S7mRQIee/tD38G2eitGavzlzJy4oMBRnuspWhzARw+NX3f+bWlFBOYsdPPDw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749644003; c=relaxed/simple;
+	bh=sPM052dHaSMGLKDwax5eRx1wwGJo4Wnmy6GY6SYUQiU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pA2ctoMsoI5CmDaiYQh/enRz1CgzfdLwPlsWIexynNjjdchs31iTbXm6Wcesyv2zKYYJb0UOhIlcCD2CXLvFxlcHTMc3k5hHK9utjmvgM+e/y762w48RhxW+k56DadAtnI/HxgHStv/VVgx7q5O+C0HRfqdG2peI88JKYP+MjcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <fpf@pengutronix.de>)
+	id 1uPKKU-0003bJ-9w; Wed, 11 Jun 2025 14:13:18 +0200
+Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <fpf@pengutronix.de>)
+	id 1uPKKU-002wUH-05;
+	Wed, 11 Jun 2025 14:13:18 +0200
+Received: from fpf by dude05.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <fpf@pengutronix.de>)
+	id 1uPKKT-006yvY-35;
+	Wed, 11 Jun 2025 14:13:17 +0200
+From: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: dsahern@gmail.com,
+	idosch@nvidia.com,
+	bridge@lists.linux-foundation.org,
+	entwicklung@pengutronix.de,
+	razor@blackwall.org,
+	Fabian Pfitzner <f.pfitzner@pengutronix.de>
+Subject: [PATCH v2] bridge: dump mcast querier state per vlan
+Date: Wed, 11 Jun 2025 14:11:52 +0200
+Message-Id: <20250611121151.1660231-1-f.pfitzner@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: fpf@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-=E5=9C=A8 2025-06-11=E6=98=9F=E6=9C=9F=E4=B8=89=E7=9A=84 09:39 +0100=EF=BC=
-=8CRussell King (Oracle)=E5=86=99=E9=81=93=EF=BC=9A
-> On Wed, Jun 11, 2025 at 04:03:11PM +0800, Icenowy Zheng wrote:
-> > =E5=9C=A8 2025-06-05=E6=98=9F=E6=9C=9F=E5=9B=9B=E7=9A=84 15:48 +0200=EF=
-=BC=8CAndrew Lunn=E5=86=99=E9=81=93=EF=BC=9A
-> > > Which is theoretically fine. I've not looked at this driver in
-> > > particular, but there are some MACs were you cannot disable the
-> > > delay.
-> > > The MAC always imposes 2ns delay. That would mean a PCB which
-> > > also
-> > > has
-> > > extra long clock lines is simply FUBAR, cannot work, and 'rgmii'
-> > > is
-> > > invalid, so reject it.
-> >=20
-> > BTW I found that in some case the assumption of PHY-side delay
-> > being
-> > always better than MAC-side one is wrong -- modern MACs usually
-> > have
-> > adjustable delay line, but Realtek 8211-series PHYs have only
-> > on/off
-> > delay with a fixed 2ns value.
->=20
-> The only time that MACs may implement delays based on the
-> PHY_INTERFACE_MODE_RGMII* is if they also include code to pass
-> PHY_INTERFACE_MODE_RGMII (no suffixes) to phylink / phylib to ensure
-> that the PHY doesn't _also_ add delays. This isn't something we
-> encourage because it's more code, more review, and a different way
-> of implementing it - thus adding to maintainers workloads that are
-> already high enough.
+Dump the multicast querier state per vlan.
+This commit is almost identical to [1].
 
-Well in fact I have an additional question: when the MAC has any extra
-[tr]x-internal-delay-ps property, what's the threshold of MAC
-triggering patching phy mode? (The property might be only used for a
-slight a few hundred ps delay for tweak instead of the full 2ns one)
+The querier state can be seen with:
 
->=20
-> > > Just for a minute, consider your interpretation of the old text
-> > > is
-> > > wrong. Read the old text again and again, and see if you can find
-> > > an
-> > > interpretation which is the same as the new text. If you do:
-> > >=20
-> > > * It proves our point that describing what this means is hard,
-> > > and
-> > > =C2=A0 developers will get it wrong.
-> > >=20
-> > > * There is an interpretation of both the old and new where
-> > > nothing
-> > > =C2=A0 changed.
-> > >=20
-> > > * You have to be careful looking at drivers, because some percent
-> > > of
-> > > =C2=A0 developers also interpreted it wrongly, and have broken
-> > > =C2=A0 implementations as a result.=C2=A0 You cannot say the binding =
-means
-> > > X,
-> > > =C2=A0 not Y, because there is a driver using meaning X.
-> > >=20
-> > > My hope with the new text is that it focuses on hardware, which
-> > > is
-> > > what DT is about. You can look at the schematic, see if there is
-> > > extra
-> > > long clock lines or not, and then decided on 'rgmii-id' if there
-> > > are
-> > > not, and 'rgmii' is there are. The rest then follows from that.
-> >=20
-> > Well I think "rgmii-*" shouldn't exist at all, if focusing on
-> > hardware.
-> > I prefer only "rgmii" with properties describing the delay numbers.
->=20
-> Yes, I think we as phylib maintainers have also come to the same
-> conclusion with all the hassle this causes, but we can't get rid
-> of this without breaking the kernel and breaking device-tree
-> compatibility. So, we're stuck with it.
->=20
-> > > You are not reading it carefully enough. The binding describes
-> > > hardware, the board. phy.rst describes the phylib interface. They
-> > > are
-> > > different.
-> >=20
-> > Well I can't find the reason of phy-mode being so designed except
-> > for
-> > leaky abstraction from phylib.
->=20
-> I have no idea what that sentence means, sorry.
+bridge -d vlan global
 
-Well, I mean the existence of rgmii-* modes is coupled with the
-internal of phylib, did I get it right?
+The options for vlan filtering and vlan mcast snooping have to be enabled
+in order to see the output:
 
->=20
+ip link set [dev] type bridge mcast_vlan_snooping 1 vlan_filtering 1
+
+The querier state shows the following information for IPv4 and IPv6
+respectively:
+
+1) The ip address of the current querier in the network. This could be
+   ourselves or an external querier.
+2) The port on which the querier was seen
+3) Querier timeout in seconds
+
+[1] https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=16aa4494d7fc6543e5e92beb2ce01648b79f8fa2
+
+Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+---
+
+v1->v2
+	- refactor code
+	- link to v1: https://lore.kernel.org/netdev/20250604105322.1185872-1-f.pfitzner@pengutronix.de/
+
+ bridge/vlan.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/bridge/vlan.c b/bridge/vlan.c
+index ea4aff93..2afdc7c7 100644
+--- a/bridge/vlan.c
++++ b/bridge/vlan.c
+@@ -892,6 +892,61 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
+ 		print_uint(PRINT_ANY, "mcast_querier", "mcast_querier %u ",
+ 			   rta_getattr_u8(vattr));
+ 	}
++	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]) {
++		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
++		const char *querier_ip;
++		SPRINT_BUF(other_time);
++		__u64 tval;
++
++		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX,
++				    vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]);
++		memset(other_time, 0, sizeof(other_time));
++
++		open_json_object("mcast_querier_state_ipv4");
++		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
++			querier_ip = format_host_rta(AF_INET,
++						     bqtb[BRIDGE_QUERIER_IP_ADDRESS]);
++			print_string(PRINT_FP, NULL, "%s ",
++				     "mcast_querier_ipv4_addr");
++			print_color_string(PRINT_ANY, COLOR_INET,
++					   "mcast_querier_ipv4_addr", "%s ",
++					   querier_ip);
++		}
++		if (bqtb[BRIDGE_QUERIER_IP_PORT])
++			print_uint(PRINT_ANY, "mcast_querier_ipv4_port",
++				   "mcast_querier_ipv4_port %u ",
++				   rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
++		if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]) {
++			tval = rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]);
++			print_string(PRINT_ANY,
++				     "mcast_querier_ipv4_other_timer",
++				     "mcast_querier_ipv4_other_timer %s ",
++				     sprint_time64(tval, other_time));
++		}
++		close_json_object();
++		open_json_object("mcast_querier_state_ipv6");
++		if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
++			querier_ip = format_host_rta(AF_INET6,
++						     bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]);
++			print_string(PRINT_FP, NULL, "%s ",
++				     "mcast_querier_ipv6_addr");
++			print_color_string(PRINT_ANY, COLOR_INET6,
++					   "mcast_querier_ipv6_addr", "%s ",
++					   querier_ip);
++		}
++		if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
++			print_uint(PRINT_ANY, "mcast_querier_ipv6_port",
++				   "mcast_querier_ipv6_port %u ",
++				   rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
++		if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]) {
++			tval = rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]);
++			print_string(PRINT_ANY,
++				     "mcast_querier_ipv6_other_timer",
++				     "mcast_querier_ipv6_other_timer %s ",
++				     sprint_time64(tval, other_time));
++		}
++		close_json_object();
++	}
+ 	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION]) {
+ 		vattr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION];
+ 		print_uint(PRINT_ANY, "mcast_igmp_version",
+--
+2.39.5
 
 
