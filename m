@@ -1,102 +1,152 @@
-Return-Path: <netdev+bounces-196692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 914A0AD5F2D
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:40:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD2CAD5F94
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B51B91BC19B4
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:40:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3FD716E6D1
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C5A2BDC35;
-	Wed, 11 Jun 2025 19:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A86928853E;
+	Wed, 11 Jun 2025 19:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zm85XNkS"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Ej6iqr6w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5585628853E;
-	Wed, 11 Jun 2025 19:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3592BDC03;
+	Wed, 11 Jun 2025 19:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749670808; cv=none; b=CYbZ4RxALhdUFlDUMxuANx6/gEy60bt8YcXb/JomoZeaHA7pTxQLPThi+5i/RZ0EI6qrEywtGpcU2s7UIUoQ2HllOVNbwVD0EFSr3TPdBTM94GvUQ+XiGQ59l0Pq6O+k8YbSUw0vFfBMeLNJ5kSeb+tFB/PEoakhBbzdYMF5jjU=
+	t=1749671850; cv=none; b=XxPOwVvUL6sWQS5Egbn6K44V7joCiKWytT15bgr/0MTd1ykLV6169dLr10lVfHgBQMa9+cQ/+pqHSNYaRVQ2XO8QOlPNa0TpYg9kHxoqghhhNDLija9RWYJsq98edWEQReIEgi5qDduCeGV2HUDpWOj7yl0vIuyXELhyWlPGRDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749670808; c=relaxed/simple;
-	bh=P+77/chWEkT7CmAB48ybuVAEZkvc5wpADMBeS/stKf8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FKONSRGyzK/3/0AE3vI9wCChA3FDo/s1jQH+p3HvORFX+HHko9TmQRGNFl4XBIVewDcYyYsidpDKgN8Eo6Z8dXYcy/AFyOQkzRotYcg/WPsnLfPns3zqFDXC1p3pC1J1jYbPY9CnDdY2dKKSlcWQlgzo6Gep++1K4ZfamxW7noE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zm85XNkS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDEF7C4CEE3;
-	Wed, 11 Jun 2025 19:40:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749670807;
-	bh=P+77/chWEkT7CmAB48ybuVAEZkvc5wpADMBeS/stKf8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zm85XNkS7FdAfyj4Pz0aSQ5tUEtqSvr5wyZfp5OWjboW+BHrHtGWFfKJkcnW9B+uU
-	 b0Maq23yv+fssenODQNYpzy+VnoSrkCrT/U/KwkDNaXXmyvrjuCEGbRXvxs7Xp1Y1K
-	 HqZnGe+vnqEpP2nCyocuKUq2+Pi7atgw7L68KU8UlZHRq/J+N2wipGArkfSMhzMWd2
-	 QLwimXXf8vW8LY0UyEFliO3UOOUiQLTampm/oSYAvOqLf4ZZtLfrZzuipgGogm8Sy0
-	 lGJmnUO7uXbLb1j39cj4TsASWF5hLHPQ4zlyTsb8hhXsKS1XhwxYeY944mU+qCUI+Z
-	 ixngWT3uJDZYQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DE8380DBE9;
-	Wed, 11 Jun 2025 19:40:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1749671850; c=relaxed/simple;
+	bh=eeQeEYKaHhYr+Maa1kLsJ5dq174xCMqjaPKqjE8uStE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=a+M9CuqYrAs3iitF7wqGyVIl6q+spHKWdFp58QrfQ6sn2Hyhfxoe3qtg1fWxo7WSLGhBM6uUf1ccgW2D/z9jt9Wpu6HWKayT4xB9n6K+ShJX8AKY3Q8eMqw/L17vgLmMfJsfvp0nuaUSwSXZXlfI5f9BRoxXYAeLJI+24/cltCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Ej6iqr6w; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uPRZX-00BIDf-5o; Wed, 11 Jun 2025 21:57:19 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=a5J8eYpVuE7o2VJSMjWSJdlZvj2jMI+mcwHoJe+gsJc=; b=Ej6iqr6w0DXcnV/u6mIfzp/bYV
+	WAtWU9WTzRV3+x0wEEuW/bHoqyPLrIy5YEzS1OTkrpM+TPGPJE/nk4IbtUVM8VCmV2FDcEwAqYoag
+	JLmTkiUmpyuHABMnfz3U/1fn8LrFgVF4dzWtPaualNEIC99dCLuDFvyVC7sIEDPid1aygZGcCwUF2
+	9vISyA9lWzkfq73DElyNxY3TBReJ+eRjtdW18yx2gFeDDieeK53TPlQ3l6GAS2vmJW1kPeaxn12Ez
+	8JibnISN1VLXl0fmkzXmBoK50JlpOxZ392wOYndyWWfIMquoxuKHFrhBbl4+91QEZSZ3KEGszlIDi
+	BISpl6sw==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uPRZW-0005E8-R3; Wed, 11 Jun 2025 21:57:19 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uPRZH-00BycS-BQ; Wed, 11 Jun 2025 21:57:03 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Date: Wed, 11 Jun 2025 21:56:50 +0200
+Subject: [PATCH net-next v3 1/3] vsock/test: Introduce vsock_bind_try()
+ helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3] net: Fix RCU usage in task_cls_state() for
- BPF
- programs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174967083774.3454768.14388619349258228793.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Jun 2025 19:40:37 +0000
-References: <20250611-rcu-fix-task_cls_state-v3-1-3d30e1de753f@posteo.net>
-In-Reply-To: <20250611-rcu-fix-task_cls_state-v3-1-3d30e1de753f@posteo.net>
-To: Charalampos Mitrodimas <charmitro@posteo.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, martin.lau@linux.dev,
- daniel@iogearbox.net, john.fastabend@gmail.com, ast@kernel.org,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, yangfeng@kylinos.cn, tj@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250611-vsock-test-inc-cov-v3-1-5834060d9c20@rbox.co>
+References: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
+In-Reply-To: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-Hello:
+Create a socket and bind() it. If binding failed, gracefully return an
+error code while preserving `errno`.
 
-This patch was applied to bpf/bpf-next.git (net)
-by Daniel Borkmann <daniel@iogearbox.net>:
+Base vsock_bind() on top of it.
 
-On Wed, 11 Jun 2025 17:20:43 +0000 you wrote:
-> The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
-> types") made bpf_get_cgroup_classid_curr helper available to all BPF
-> program types, not just networking programs.
-> 
-> This helper calls __task_get_classid() which internally calls
-> task_cls_state() requiring rcu_read_lock_bh_held(). This works in
-> networking/tc context where RCU BH is held, but triggers an RCU
-> warning when called from other contexts like BPF syscall programs that
-> run under rcu_read_lock_trace():
-> 
-> [...]
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+ tools/testing/vsock/util.c | 24 +++++++++++++++++++++---
+ tools/testing/vsock/util.h |  1 +
+ 2 files changed, 22 insertions(+), 3 deletions(-)
 
-Here is the summary with links:
-  - [bpf-next,v3] net: Fix RCU usage in task_cls_state() for BPF programs
-    https://git.kernel.org/bpf/bpf-next/c/7f12c3385048
+diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+index 0c7e9cbcbc85cde9c8764fc3bb623cde2f6c77a6..b7b3fb2221c1682ecde58cf12e2f0b0ded1cff39 100644
+--- a/tools/testing/vsock/util.c
++++ b/tools/testing/vsock/util.c
+@@ -121,15 +121,17 @@ bool vsock_wait_sent(int fd)
+ 	return !ret;
+ }
+ 
+-/* Create socket <type>, bind to <cid, port> and return the file descriptor. */
+-int vsock_bind(unsigned int cid, unsigned int port, int type)
++/* Create socket <type>, bind to <cid, port>.
++ * Return the file descriptor, or -1 on error.
++ */
++int vsock_bind_try(unsigned int cid, unsigned int port, int type)
+ {
+ 	struct sockaddr_vm sa = {
+ 		.svm_family = AF_VSOCK,
+ 		.svm_cid = cid,
+ 		.svm_port = port,
+ 	};
+-	int fd;
++	int fd, saved_errno;
+ 
+ 	fd = socket(AF_VSOCK, type, 0);
+ 	if (fd < 0) {
+@@ -138,6 +140,22 @@ int vsock_bind(unsigned int cid, unsigned int port, int type)
+ 	}
+ 
+ 	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa))) {
++		saved_errno = errno;
++		close(fd);
++		errno = saved_errno;
++		fd = -1;
++	}
++
++	return fd;
++}
++
++/* Create socket <type>, bind to <cid, port> and return the file descriptor. */
++int vsock_bind(unsigned int cid, unsigned int port, int type)
++{
++	int fd;
++
++	fd = vsock_bind_try(cid, port, type);
++	if (fd < 0) {
+ 		perror("bind");
+ 		exit(EXIT_FAILURE);
+ 	}
+diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+index 5e2db67072d5053804a9bb93934b625ea78bcd7a..0afe7cbae12e5194172c639ccfbeb8b81f7c25ac 100644
+--- a/tools/testing/vsock/util.h
++++ b/tools/testing/vsock/util.h
+@@ -44,6 +44,7 @@ int vsock_connect(unsigned int cid, unsigned int port, int type);
+ int vsock_accept(unsigned int cid, unsigned int port,
+ 		 struct sockaddr_vm *clientaddrp, int type);
+ int vsock_stream_connect(unsigned int cid, unsigned int port);
++int vsock_bind_try(unsigned int cid, unsigned int port, int type);
+ int vsock_bind(unsigned int cid, unsigned int port, int type);
+ int vsock_bind_connect(unsigned int cid, unsigned int port,
+ 		       unsigned int bind_port, int type);
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0
 
 
