@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-196694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B7A4AD5F96
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:57:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2295AD600C
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:27:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82D977AD2C1
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:56:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E11A3A876B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A572BDC06;
-	Wed, 11 Jun 2025 19:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7FE235348;
+	Wed, 11 Jun 2025 20:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ant7PzNJ"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="KTGAP0oJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0EF2BD01E
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 19:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668E1210F44;
+	Wed, 11 Jun 2025 20:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749671850; cv=none; b=I8d7S6ffJGWA1hYk6KCpLCsTsd4WcsrIvuOJ9wh9Xz8vTY+rvYEGUN93GVhFwsKMb+t7AO5gCwaRRqOEE3kIjT9iT8WVhHKF1p59bss9RmxqHPrsWxPwdCV/Sz4BaM4F0w+2M424dv0E0BMyOV9Yo67nI/11JnF3c73TLDExWQ0=
+	t=1749673666; cv=none; b=VdhLCjlGZ96kY7r2BYjodCjAJp/Y5edAQPrMbJ1YUVa+1XzAoYm5qRhcCFfBWR+fqGIvrJmGR1kDELlAU/3TZ3ADhj/m7p3VbJlFU3yzuyypI3QrHkxLjQWEV0Cykan0jwSeCfXq5fmiJXgtXpwjg4aPIXarJudMaVGf5ftGdOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749671850; c=relaxed/simple;
-	bh=ZssVXgx8hnnbULRb36vOlgpHe97BLFLepJWPJ+kY1BE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SLGXN/4XzbNlyXeT1vAM39QM82Z1JDuKjP/hUno7HxGWfPF01OoX6GbYiN0OQiloA7myWW19EVKAnRcVsIvWutQnU6zIwxvTOR4aa5byiQk5UTypBECDNKLKXlQ8orJhrvUVGaJ8kyp2StXG5Liv8scR//2nefhR0GL0ecq4HJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ant7PzNJ; arc=none smtp.client-ip=185.226.149.37
+	s=arc-20240116; t=1749673666; c=relaxed/simple;
+	bh=MU8Zi+pntPYytdt49KNwDwq4ACCf3lHI4qQsBgK7E6g=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qd8o+onRBPh6GAu8RFql6jbvYWcKiU/BafGOJcF9bR1JR32k+K0cuUrx0pjz62cRaO+0PipPyattUWvFxS7kiP124eIg6444SRo+GLVhKjMx2bPsDxgo+Za8PObujsz9xIJ1uvjqxUkDsUuQ6xWasUa2A4eUdV+sfFIv2QgYJZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=KTGAP0oJ; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1uPRZU-00BIDS-Nw
-	for netdev@vger.kernel.org; Wed, 11 Jun 2025 21:57:16 +0200
+	id 1uPRZW-00BKls-1R; Wed, 11 Jun 2025 21:57:18 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=ewM7ow5NIDiWYLcRgpurn6xaYCHK+eeVvzpYtjNmuR8=; b=ant7PzNJleX8zqd5bFKA/t5+Pp
-	fJ2DOf2RQIoY4e26o2JpLwuwdzZLUbXObCKnBJovSAbO8KW2nQxOZwNYUDcYng6b+n5ZMs8MfQRuE
-	QTpImTsOiOCTz8fBbvyDAbgoRhzTJi8tZP3DXW4qHBFJSMka65YSpA6UwSUTVJtHLlJYZ5uYnLot+
-	/XnxzTrcVYyE925cePhq1EvKf+NyH0NYUL6V3//oY9UVBkbk/6eW9lahRKZ5M5o92v5vbJyMD3Grw
-	9I+z5Nnn4DFPUPNzcBz/Y4NMG+lDQBDcXLRnwohomdVymLwsFs7Kzu8VtZNqfVSLeEMidYZqY37YW
-	hUr15p3A==;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=d1QaSFHfEh3cM2Uv7I3zUqxXFc1eWwgg2qbFxn/xMxc=
+	; b=KTGAP0oJ7ZLO4T+XONPBBuZ8nO5acq803LvkagTvlFsHLizXcHUUNHkwSl4x+PGiPriobqTJk
+	u7/5LM2t7Zl5CEIFaelft39YuLdSwumZCY01r/tWC+BAHHYS+URDpJtzj/HtTIDwyFW7WPlV4DuCw
+	tPOvDs0TGlQfuKlKAT0WeYMGAJr20p7ETXT+X9AM8seNzlgFswC2upqvafnuOMRUD5MVjvDRQSQXC
+	XwEGj38a2lelMCjiMdrAjvju58mc60qkIdxrWcwwSgCHHsjmurFyx8trG98niAVYf4B1o9oO7ViPV
+	+mDGsjgI2VFjP7GN0mqQDw0b8KAAtHdJX4d1AA==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1uPRZU-0004Al-6E; Wed, 11 Jun 2025 21:57:16 +0200
+	id 1uPRZV-0005DR-G9; Wed, 11 Jun 2025 21:57:17 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1uPRZH-00BycS-WF; Wed, 11 Jun 2025 21:57:04 +0200
+	id 1uPRZH-00BycS-19; Wed, 11 Jun 2025 21:57:03 +0200
 From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 11 Jun 2025 21:56:52 +0200
-Subject: [PATCH net-next v3 3/3] vsock/test: Cover more CIDs in
- transport_uaf test
+Subject: [PATCH net-next v3 0/3] vsock/test: Improve transport_uaf test
+Date: Wed, 11 Jun 2025 21:56:49 +0200
+Message-Id: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,243 +62,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250611-vsock-test-inc-cov-v3-3-5834060d9c20@rbox.co>
-References: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
-In-Reply-To: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
+X-B4-Tracking: v=1; b=H4sIAIHfSWgC/23NTQ7CIBQE4Ks0rH0GHqVFV97DuCg/tcQEDBBS0
+ /TuEja66HIymW82kmx0NpFrt5Foi0su+Br4qSN6mfzTgjM1E6QoKMcBSgr6BdmmDM5r0KGAksg
+ lojJqlKQO39HObm3onXibwds1k0dtFpdyiJ/2VljrGyyQH8GFAYN54oKOl54pZW5RhfWsQ8MK/
+ gPyEECgIOdBCNVTI0b9A/Z9/wLGVSFF/QAAAA==
+X-Change-ID: 20250326-vsock-test-inc-cov-b823822bdb78
 To: Stefano Garzarella <sgarzare@redhat.com>
 Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-Increase the coverage of test for UAF due to socket unbinding, and losing
-transport in general. It's a follow up to commit 301a62dfb0d0 ("vsock/test:
-Add test for UAF due to socket unbinding") and discussion in [1].
+Increase the coverage of a test implemented in commit 301a62dfb0d0
+("vsock/test: Add test for UAF due to socket unbinding"). Take this
+opportunity to factor out some utility code, drop a redundant sync between
+client and server, and introduce a /proc/kallsyms harvesting logic for
+auto-detecting registered vsock transports.
 
-The idea remains the same: take an unconnected stream socket with a
-transport assigned and then attempt to switch the transport by trying (and
-failing) to connect to some other CID. Now do this iterating over all the
-well known CIDs (plus one).
-
-While at it, drop the redundant synchronization between client and server.
-
-Some single-transport setups can't be tested effectively; a warning is
-issued. Depending on transports available, a variety of splats are possible
-on unpatched machines. After reverting commit 78dafe1cf3af ("vsock: Orphan
-socket after transport release") and commit fcdd2242c023 ("vsock: Keep the
-binding until socket destruction"):
-
-BUG: KASAN: slab-use-after-free in __vsock_bind+0x61f/0x720
-Read of size 4 at addr ffff88811ff46b54 by task vsock_test/1475
-Call Trace:
- dump_stack_lvl+0x68/0x90
- print_report+0x170/0x53d
- kasan_report+0xc2/0x180
- __vsock_bind+0x61f/0x720
- vsock_connect+0x727/0xc40
- __sys_connect+0xe8/0x100
- __x64_sys_connect+0x6e/0xc0
- do_syscall_64+0x92/0x1c0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-WARNING: CPU: 0 PID: 1475 at net/vmw_vsock/virtio_transport_common.c:37 virtio_transport_send_pkt_info+0xb2b/0x1160
-Call Trace:
- virtio_transport_connect+0x90/0xb0
- vsock_connect+0x782/0xc40
- __sys_connect+0xe8/0x100
- __x64_sys_connect+0x6e/0xc0
- do_syscall_64+0x92/0x1c0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-RIP: 0010:sock_has_perm+0xa7/0x2a0
-Call Trace:
- selinux_socket_connect_helper.isra.0+0xbc/0x450
- selinux_socket_connect+0x3b/0x70
- security_socket_connect+0x31/0xd0
- __sys_connect_file+0x79/0x1f0
- __sys_connect+0xe8/0x100
- __x64_sys_connect+0x6e/0xc0
- do_syscall_64+0x92/0x1c0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 7 PID: 1518 at lib/refcount.c:25 refcount_warn_saturate+0xdd/0x140
-RIP: 0010:refcount_warn_saturate+0xdd/0x140
-Call Trace:
- __vsock_bind+0x65e/0x720
- vsock_connect+0x727/0xc40
- __sys_connect+0xe8/0x100
- __x64_sys_connect+0x6e/0xc0
- do_syscall_64+0x92/0x1c0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 0 PID: 1475 at lib/refcount.c:28 refcount_warn_saturate+0x12b/0x140
-RIP: 0010:refcount_warn_saturate+0x12b/0x140
-Call Trace:
- vsock_remove_bound+0x18f/0x280
- __vsock_release+0x371/0x480
- vsock_release+0x88/0x120
- __sock_release+0xaa/0x260
- sock_close+0x14/0x20
- __fput+0x35a/0xaa0
- task_work_run+0xff/0x1c0
- do_exit+0x849/0x24c0
- make_task_dead+0xf3/0x110
- rewind_stack_and_make_dead+0x16/0x20
-
-[1]: https://lore.kernel.org/netdev/CAGxU2F5zhfWymY8u0hrKksW8PumXAYz-9_qRmW==92oAx1BX3g@mail.gmail.com/
-
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
+Changes in v3:
+- Drop "RFC" prefix, rebase, amend commit logs
+- get_transports(): don't look for a symbol that was already found
+- Expand testcase comments, clean up the code [Stefano]
+- Streamline `enum transport` and `transport_ksyms` [Stefano]
+- Move KALLSYMS_* defines from utils.h to utils.c [Stefano]
+- Link to v2: https://lore.kernel.org/r/20250528-vsock-test-inc-cov-v2-0-8f655b40d57c@rbox.co
+
+Changes in v2:
+- Speed up: don't bother checking EINTR or respecting timeout on connect()s
+- Introduce get_transports(), warn on unsupported setup [Stefano]
+- Comment the code, drop the sync, introduce vsock_bind_try() [Stefano]
+- Link to v1: https://lore.kernel.org/r/20250523-vsock-test-inc-cov-v1-1-fa3507941bbd@rbox.co
+
+---
+Michal Luczaj (3):
+      vsock/test: Introduce vsock_bind_try() helper
+      vsock/test: Introduce get_transports()
+      vsock/test: Cover more CIDs in transport_uaf test
+
+ tools/testing/vsock/util.c       | 80 ++++++++++++++++++++++++++++++++--
+ tools/testing/vsock/util.h       | 30 +++++++++++++
  tools/testing/vsock/vsock_test.c | 93 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 74 insertions(+), 19 deletions(-)
+ 3 files changed, 181 insertions(+), 22 deletions(-)
+---
+base-commit: 0097c4195b1d0ca57d15979626c769c74747b5a0
+change-id: 20250326-vsock-test-inc-cov-b823822bdb78
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index f669baaa0dca3bebc678d00eafa80857d1f0fdd6..eb6f54378667ac7ed324f4823e988ec9846e41a3 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1718,16 +1718,27 @@ static void test_stream_msgzcopy_leak_zcskb_server(const struct test_opts *opts)
- 
- #define MAX_PORT_RETRIES	24	/* net/vmw_vsock/af_vsock.c */
- 
--/* Test attempts to trigger a transport release for an unbound socket. This can
-- * lead to a reference count mishandling.
-- */
--static void test_stream_transport_uaf_client(const struct test_opts *opts)
-+static bool test_stream_transport_uaf(int cid)
- {
- 	int sockets[MAX_PORT_RETRIES];
- 	struct sockaddr_vm addr;
--	int fd, i, alen;
-+	socklen_t alen;
-+	int fd, i, c;
-+	bool ret;
-+
-+	/* Probe for a transport by attempting a local CID bind. Unavailable
-+	 * transport (or more specifically: an unsupported transport/CID
-+	 * combination) results in EADDRNOTAVAIL, other errnos are fatal.
-+	 */
-+	fd = vsock_bind_try(cid, VMADDR_PORT_ANY, SOCK_STREAM);
-+	if (fd < 0) {
-+		if (errno != EADDRNOTAVAIL) {
-+			perror("Unexpected bind() errno");
-+			exit(EXIT_FAILURE);
-+		}
- 
--	fd = vsock_bind(VMADDR_CID_ANY, VMADDR_PORT_ANY, SOCK_STREAM);
-+		return false;
-+	}
- 
- 	alen = sizeof(addr);
- 	if (getsockname(fd, (struct sockaddr *)&addr, &alen)) {
-@@ -1735,38 +1746,83 @@ static void test_stream_transport_uaf_client(const struct test_opts *opts)
- 		exit(EXIT_FAILURE);
- 	}
- 
-+	/* Drain the autobind pool; see __vsock_bind_connectible(). */
- 	for (i = 0; i < MAX_PORT_RETRIES; ++i)
--		sockets[i] = vsock_bind(VMADDR_CID_ANY, ++addr.svm_port,
--					SOCK_STREAM);
-+		sockets[i] = vsock_bind(cid, ++addr.svm_port, SOCK_STREAM);
- 
- 	close(fd);
--	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
-+
-+	/* Setting SOCK_NONBLOCK makes connect() return soon after
-+	 * (re-)assigning the transport. We are not connecting to anything
-+	 * anyway, so there is no point entering the main loop in
-+	 * vsock_connect(); waiting for timeout, checking for signals, etc.
-+	 */
-+	fd = socket(AF_VSOCK, SOCK_STREAM | SOCK_NONBLOCK, 0);
- 	if (fd < 0) {
- 		perror("socket");
- 		exit(EXIT_FAILURE);
- 	}
- 
--	if (!vsock_connect_fd(fd, addr.svm_cid, addr.svm_port)) {
--		perror("Unexpected connect() #1 success");
-+	/* Assign transport, while failing to autobind. Autobind pool was
-+	 * drained, so EADDRNOTAVAIL coming from __vsock_bind_connectible() is
-+	 * expected.
-+	 *
-+	 * One exception is ENODEV which is thrown by vsock_assign_transport(),
-+	 * i.e. before vsock_auto_bind(), when the only transport loaded is
-+	 * vhost.
-+	 */
-+	if (!connect(fd, (struct sockaddr *)&addr, alen)) {
-+		fprintf(stderr, "Unexpected connect() success\n");
- 		exit(EXIT_FAILURE);
- 	}
--
--	/* Vulnerable system may crash now. */
--	if (!vsock_connect_fd(fd, VMADDR_CID_HOST, VMADDR_PORT_ANY)) {
--		perror("Unexpected connect() #2 success");
-+	if (errno == ENODEV && cid == VMADDR_CID_HOST) {
-+		ret = false;
-+		goto cleanup;
-+	}
-+	if (errno != EADDRNOTAVAIL) {
-+		perror("Unexpected connect() errno");
- 		exit(EXIT_FAILURE);
- 	}
- 
-+	/* Reassign transport, triggering old transport release and
-+	 * (potentially) unbinding of an unbound socket.
-+	 *
-+	 * Vulnerable system may crash now.
-+	 */
-+	for (c = VMADDR_CID_HYPERVISOR; c <= VMADDR_CID_HOST + 1; ++c) {
-+		if (c != cid) {
-+			addr.svm_cid = c;
-+			(void)connect(fd, (struct sockaddr *)&addr, alen);
-+		}
-+	}
-+
-+	ret = true;
-+cleanup:
- 	close(fd);
- 	while (i--)
- 		close(sockets[i]);
- 
--	control_writeln("DONE");
-+	return ret;
- }
- 
--static void test_stream_transport_uaf_server(const struct test_opts *opts)
-+/* Test attempts to trigger a transport release for an unbound socket. This can
-+ * lead to a reference count mishandling.
-+ */
-+static void test_stream_transport_uaf_client(const struct test_opts *opts)
- {
--	control_expectln("DONE");
-+	bool tested = false;
-+	int cid, tr;
-+
-+	for (cid = VMADDR_CID_HYPERVISOR; cid <= VMADDR_CID_HOST + 1; ++cid)
-+		tested |= test_stream_transport_uaf(cid);
-+
-+	tr = get_transports();
-+	if (!tr)
-+		fprintf(stderr, "No transports detected\n");
-+	else if (tr == TRANSPORT_VIRTIO)
-+		fprintf(stderr, "Setup unsupported: sole virtio transport\n");
-+	else if (!tested)
-+		fprintf(stderr, "No transports tested\n");
- }
- 
- static void test_stream_connect_retry_client(const struct test_opts *opts)
-@@ -2034,7 +2090,6 @@ static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM transport release use-after-free",
- 		.run_client = test_stream_transport_uaf_client,
--		.run_server = test_stream_transport_uaf_server,
- 	},
- 	{
- 		.name = "SOCK_STREAM retry failed connect()",
-
+Best regards,
 -- 
-2.49.0
+Michal Luczaj <mhal@rbox.co>
 
 
