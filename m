@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-196698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43699AD5FE7
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E447AD5FE8
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:11:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F33771BC2501
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:10:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD35E1796E6
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268702BD01E;
-	Wed, 11 Jun 2025 20:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC222BD01E;
+	Wed, 11 Jun 2025 20:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SeGtX8gD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeOSckus"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4432BE7B4
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 20:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0439B2222CA
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 20:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749672627; cv=none; b=QWjt1eIN9eEz7bRm2xjxjQ97NLJ5+bjKg36ZCWkNChk0+RLY1A2zil62GV9k3d5NO0jTBIbWzzgaO5W7vCYLQdyei2UNea+vAc5O6NvlDNxNNxSXz6ddVjXNSJCPZBIG5rFPXE4yEKRmNP+eGKpYZk19CLfBggGH0cRVNNg77CA=
+	t=1749672680; cv=none; b=SPISJ8eZlUj7AOUfAOHijoRx02kx54bVe2Rkr100s3UHFnyQE0wBGy77uO4/rRN52Fbs6R7G0nZK+W+uXj1vvfHEcsxdYKB8JJsV55f2EC0YQS+krGcYlKDRTeEQHkLppThcjEHPHnu+QmDK6iScXZK+GWxINrCdUzsaZX8ACXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749672627; c=relaxed/simple;
-	bh=9572XyqwTssUfYqUB5ewpKpN+KxyX1DoG9gt8+q/V8w=;
+	s=arc-20240116; t=1749672680; c=relaxed/simple;
+	bh=Amjk5kIE1xMiBDJvW719tIQr9JPNuya+sXUUd5aAZKY=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IltJ1GfqN7FEu9rU1AWaM5tihviVo7t6axcpCU5r7KggkkCcOqhg6/Md2IHgpvhGtoM/EyKgUtQrwGJ/uJ+oUKzhwLYajvbvFiFoKYoe8NcYpMtTZ6nsZh1ooCUk8GLbZcq5p9WbGlci6l3blPJTdP2Zr03cWQMhatrE05Kzpzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SeGtX8gD; arc=none smtp.client-ip=209.85.128.50
+	 In-Reply-To:Content-Type; b=OaRLM0RWKlhuB6wjPwKKzJ8JShA9xKpD7n5BUJP3356pYncfkMy2I0XSBz6VHxhmzM7qox1A3CD+QXc8OWkdadJNUnkDk0afxLEbk/wdjwmSgi1neS3HfTmhwYwBdl2ppSSLJ85vWoiL1xfI2FB8+oQYdd1ndoSbfN077Tdt27M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XeOSckus; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4530921461aso1495085e9.0
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 13:10:25 -0700 (PDT)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a531fcaa05so153276f8f.3
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 13:11:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749672624; x=1750277424; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749672677; x=1750277477; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7vJRVuJ8NxfhzvzzrhES1a72Q+DnoRrsQaXjhWkGzX8=;
-        b=SeGtX8gDKQour35KzKEs+Eh/CpgJ+5PogaTx+9W8QBOl80PLdmnzXCTclvhKC0EJUi
-         WF6NSN0vmX8r8xvjmDfwUYsLbrs5XGeh1vynr4nNDfTc0E4EJtQEwRSlSJv0fgvxjipN
-         3Gw8Rq3SJkJ5agBuWUhOy56PrAy18dWxa15g0P7zTzAMRFjHpWix1rx6dBk2FfltiXC1
-         kdoN/JxYW8sD1bE4RATmbfHV+YBHSsZCVvzv+TqP9Zd8DQ6e/LcgalSgzS4Yv1JDtsWp
-         2q5OXyXWS+0MPp1g8LF1LwKRzAKoJ5SeDx+O+QR4HfP6RGB88+fBcwKkBE6FwjWxLopg
-         HkLg==
+        bh=/Loo4DGKi2IZxX2RI+LHypN4Yrlt44s2v+c+f+gSRYk=;
+        b=XeOSckus6aV2oRQ1lqkasGdvdn5LVSQ7/QPzdUdNAcY6np6Ume3E32Ij/+HMcLtv/B
+         YEwIAbYAGVcrODX2zkwR0uLVKp0zSsHbYeazGZlzSA2qyK05NuvlzrqXpYup6zpnppuz
+         EdfKlCkMpDwWsHEy1ZSMvFW3SHjOv5Bs86XkpwEzzzgjLQ/92ogIPRVi7ABTORKClRAM
+         tg1f2F3CFci26LvFf9j7A8kfbA0ErOgJulZX4D6SePKdCN4loQ5cLicwmmUE7TccHoUf
+         Grm1i2uUdVfXmKSkrG0QMLjP7dy8sZr8Bo9nR23blm19pVomVQ/6SrhOtfXjIiqC7zsn
+         o/2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749672624; x=1750277424;
+        d=1e100.net; s=20230601; t=1749672677; x=1750277477;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7vJRVuJ8NxfhzvzzrhES1a72Q+DnoRrsQaXjhWkGzX8=;
-        b=Da0+as4TxxDNkEx/vgJsZMiZfm5JNcJYpiphkzE2hJ4z/TiYxvDtLHnJ4E9OcmMx8R
-         QdCepVdPUXEzuyBoowwGkGftE4LCyAXX5NmzpWbiJRaBZBL9NBkkbOx1h3H475LXLRNK
-         C+pBG6bvNn2Aa9IjvOWLjgCnw9ZYnBTq33Q8FQ2gbpt0ZgLGz8z09q65wSSgzfMVOy6b
-         nipQMeRsxSWnGYi4MaYo0/Gk8S8GmdwmeL9PitaG8FSy/6g7BKK5mdn6MkzRiP/3tEn/
-         2Lscr4Ds4sH0N2Kjm/9pjZ5kcH5Jj1ZEFbEBFBBfTvVOZja8NG6XXQudPhw13eCVAmRp
-         +1dA==
-X-Gm-Message-State: AOJu0Yw942DILSfD5qjqCd1JRd28+41TYO2tscz7xIcHHN81LE0QYlG+
-	U5VANxcoB4F8iMZut4qpBAEkH2jkN0EOAp37ej7nOf2U9mjRo0H3t9cu
-X-Gm-Gg: ASbGnctmyoyPyBJtmi6TLX+q4JZzUkCMc5TfVIzBfGlRxICWIEDlgrDi/rknZbucXuR
-	TD+AR4gC96s7lITrZzwj0x2Mhi2zP43vsP81AT1GSEuPt2lU2A7SfkrqMPMTgBIsvVv4ar9EkAu
-	EYPYyF5nTBYGGGyAGOzeqBArTmKUIlMIjNOReN1eT0FxpunuHiJhIPq98BPZgAi1aSXhk8fHvi4
-	bcjuC6xGAp69i8lYNL3KHfaufqfENX7smQS9fbXAIql3b0FT/cd9mrLSuZtUTW7qcPSoBOQBrVe
-	BinHp3hzv86gygwVadvEc9t/JAg6CEkkyx7z7ibo8P5X6Ov8l+/Y6iGax99UaR9ZiTPVn1mizLW
-	NEXqvYXTEd2aiOF/IJTNm8VXnDy3USWU/bQFujXnI9nDnmh/Z3kVzCCe0U3KgL0F1zP57+578oC
-	LV9O/jiC0ETRzshtEhZW7UmsMAAr/7/E0l8qrh
-X-Google-Smtp-Source: AGHT+IHsX5/HaHbp4d+r6TsgcwaNakaaZ0vf9H6rP99EHzfyUnkfjRoa2EC+c+jZxODArEbZoYF8zQ==
-X-Received: by 2002:a05:600c:348f:b0:453:7bd:2e30 with SMTP id 5b1f17b1804b1-4532492a793mr40490135e9.29.1749672623403;
-        Wed, 11 Jun 2025 13:10:23 -0700 (PDT)
+        bh=/Loo4DGKi2IZxX2RI+LHypN4Yrlt44s2v+c+f+gSRYk=;
+        b=fWx8ZDzlCbFoIsIAO51KEyN04eQashV90e5HQODyZb7SR0Zm4R1OEsLcVh8iwb+YX3
+         x3Yk0nyuTlULb7owWVnB74jEizAQ7Eq+c64bW9QUcYHaXuuoOOASq08Q6FOc081SrdQp
+         /h8Uy900+pD5o24vYnTsN3P3S1vzJEOvGcf+D+eZqygEagR86Pg5IlOogRZDxOEKxHNs
+         bcmdSQD/JHpVi3le43vVRGZW0UvpmSDtouwW7f8Ycr5gdcdlIQ1DSxdd7D2Td6mn48nU
+         Q5wGz2YdkBkMmKneOLQ+Ys4YYDNQtHAh+GrYz6/UmzuBF2mQbJ4kNfTHZtW/EsU8wYlg
+         Ef1Q==
+X-Gm-Message-State: AOJu0YwpdYUCd8EJfJR45JFpciMux0gQDmKHkQJvYKhpWAlg9uoBM07h
+	k1o96Y7tzW+ujEdaWUBNDxIkko/UY6iHyKBQMT6RapSNwmlP+cKvX2iy
+X-Gm-Gg: ASbGncsOjyCdFZ7DkWeyYuo66QBBmwhSnPKHDl/WYBR3PNMimK35dKWckQyKskRz2pM
+	iSvCF6uGDwF0dHNlsBvS0V4bLoyVZBhejvBIW0NimDEG4c/6eYbLEFD0mCvNYJTqoJqeNXpj3Ms
+	1QgqUrzVs+LmNnfTG90BI17dQGgv47E85Ghk5E8TNpcek89jyMiXAKy2QNZXWJbfa3U3lbbA6HK
+	/fUNsNQ+1uZ+1R8oelWz2QxyyxrwmAEjF0bHhg7gz93epO/IgbnOTdMpU8zzoORIwRB8O0S8Wbp
+	JUfbj9uzJxeFiGlenmrQln7fmry25WJojA1dkf26vkaUAGHu3FJc9qQbo4J7TSCmplcUWcgOEjY
+	UXAzQFLjGOw3SpNsYc7AcCcDOsbdfPwi2qXBS1NI8QVMKfCqu2Cok8e5vUhdKNFZU21OIYIsG4o
+	7tqWyfUUEAKrF36hBfKgsZS81hHQ==
+X-Google-Smtp-Source: AGHT+IEU7bJtA3FcHUoqQPdWTR8uzQA5OkYZ/yKQjMk1AT6xBdeFsYDlkwYe6e7LxpC42lux0q2FzQ==
+X-Received: by 2002:a5d:588d:0:b0:3a4:f6b7:8b07 with SMTP id ffacd0b85a97d-3a56075c5aamr598675f8f.48.1749672677213;
+        Wed, 11 Jun 2025 13:11:17 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f1d:5400:69f2:2062:82e9:fc02? (p200300ea8f1d540069f2206282e9fc02.dip0.t-ipconnect.de. [2003:ea:8f1d:5400:69f2:2062:82e9:fc02])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a532461211sm16005288f8f.86.2025.06.11.13.10.22
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a53244e0e3sm16553433f8f.68.2025.06.11.13.11.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jun 2025 13:10:23 -0700 (PDT)
-Message-ID: <0afe52d0-6fe6-434a-9881-3979661ff7b0@gmail.com>
-Date: Wed, 11 Jun 2025 22:10:27 +0200
+        Wed, 11 Jun 2025 13:11:16 -0700 (PDT)
+Message-ID: <86b7a1d6-9f9c-4d22-b3d8-5abdef0bb39a@gmail.com>
+Date: Wed, 11 Jun 2025 22:11:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/4] net: phy: move definition of struct
- mdio_board_entry to mdio-boardinfo.c
+Subject: [PATCH net-next 3/4] net: phy: improve mdio-boardinfo.h
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
@@ -141,47 +140,52 @@ In-Reply-To: <6ae7bda0-c093-468a-8ac0-50a2afa73c45@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Struct mdio_board_entry isn't used outside mdio-boardinfo.c, so remove
-the definition from the header file.
+There's no need to include phy.h and mutex.h in mdio-boardinfo.h.
+However mdio-boardinfo.c included phy.h indirectly this way so far,
+include it explicitly instead. Whilst at it, sort the included
+headers properly.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/mdio-boardinfo.c | 5 +++++
- drivers/net/phy/mdio-boardinfo.h | 5 -----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/phy/mdio-boardinfo.c | 7 ++++---
+ drivers/net/phy/mdio-boardinfo.h | 4 ++--
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/phy/mdio-boardinfo.c b/drivers/net/phy/mdio-boardinfo.c
-index 0360c0d08..2b2728b68 100644
+index 2b2728b68..b1e7a5920 100644
 --- a/drivers/net/phy/mdio-boardinfo.c
 +++ b/drivers/net/phy/mdio-boardinfo.c
-@@ -14,6 +14,11 @@
- static LIST_HEAD(mdio_board_list);
- static DEFINE_MUTEX(mdio_board_lock);
+@@ -3,11 +3,12 @@
+  * mdio-boardinfo - Collect pre-declarations for MDIO devices
+  */
  
-+struct mdio_board_entry {
-+	struct list_head	list;
-+	struct mdio_board_info	board_info;
-+};
-+
- /**
-  * mdiobus_setup_mdiodev_from_board_info - create and setup MDIO devices
-  * from pre-collected board specific MDIO information
+-#include <linux/kernel.h>
+-#include <linux/slab.h>
+ #include <linux/export.h>
+-#include <linux/mutex.h>
++#include <linux/kernel.h>
+ #include <linux/list.h>
++#include <linux/mutex.h>
++#include <linux/phy.h>
++#include <linux/slab.h>
+ 
+ #include "mdio-boardinfo.h"
+ 
 diff --git a/drivers/net/phy/mdio-boardinfo.h b/drivers/net/phy/mdio-boardinfo.h
-index 773bb5139..765c64713 100644
+index 765c64713..0878b7787 100644
 --- a/drivers/net/phy/mdio-boardinfo.h
 +++ b/drivers/net/phy/mdio-boardinfo.h
-@@ -10,11 +10,6 @@
- #include <linux/phy.h>
- #include <linux/mutex.h>
+@@ -7,8 +7,8 @@
+ #ifndef __MDIO_BOARD_INFO_H
+ #define __MDIO_BOARD_INFO_H
  
--struct mdio_board_entry {
--	struct list_head	list;
--	struct mdio_board_info	board_info;
--};
--
+-#include <linux/phy.h>
+-#include <linux/mutex.h>
++struct mii_bus;
++struct mdio_board_info;
+ 
  void mdiobus_setup_mdiodev_from_board_info(struct mii_bus *bus,
  					   int (*cb)
- 					   (struct mii_bus *bus,
 -- 
 2.49.0
 
