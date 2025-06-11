@@ -1,66 +1,47 @@
-Return-Path: <netdev+bounces-196664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9811AD5C89
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:44:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F549AD5CAD
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:50:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0AF3A2371
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:43:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CB271661E4
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC322040B0;
-	Wed, 11 Jun 2025 16:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750222036F3;
+	Wed, 11 Jun 2025 16:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=orange.com header.i=@orange.com header.b="jSJEWJQv"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="n5VnOf12"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.orange.com (smtp-out.orange.com [80.12.210.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA1C1F91C8
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 16:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.210.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45412E610F;
+	Wed, 11 Jun 2025 16:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749660242; cv=none; b=tdNdcMhZ7oYowNMZPYZbWVbjpmRvVkrn6bVd5SRzsQxtIWfiJnOQx4hNbZ9CKOP+BvpHePd6PsuMxdUHJLmtv2YMpt45RTZ342dlFHVwdq89grHvK37sSZwJfqXG0g65pMSJjhbjbHiMLotKVElVB6SUSP6W2NyYYGZIE8BTr5I=
+	t=1749660634; cv=none; b=YYQ04DlVtDDKYK/9oZBnlvc9gevSkTDZM1lO5/PmTOTyqqRIffaj5vRFUQRt1FpSOkxBe00NqD3rjY/TqWj/QGWho6DL0zjYRx3VZGZ9WLpOeUjn0rUHl8UxtEGaB7WfBVhRdE8KL6NrBbLuqiHSinTTCz2H1omr04FvWEpuVQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749660242; c=relaxed/simple;
-	bh=3YXr9wgXUsFSuhHPd9WI4VArCCJ5s6LzpzP2MmesTL4=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DP8W/tIPj7O4YmiJqUfGPsuaCP8Tv6Kb3oK0o729T4mYE8/evZ/rAkDUrGlDKBQEk3yc9/F1cQydZ2Y9GzvKJHj1MmD+4CzCY/6FE48A2EDVnwTxaqmhuM+cmTXjLaUqCW9CPKulwAyLPdUcSSWiNG135T6vFnRxmflT55hQExg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=orange.com; spf=pass smtp.mailfrom=orange.com; dkim=pass (2048-bit key) header.d=orange.com header.i=@orange.com header.b=jSJEWJQv; arc=none smtp.client-ip=80.12.210.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=orange.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orange.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=orange.com; i=@orange.com; q=dns/txt; s=orange002;
-  t=1749660240; x=1781196240;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   in-reply-to:content-transfer-encoding:from;
-  bh=3YXr9wgXUsFSuhHPd9WI4VArCCJ5s6LzpzP2MmesTL4=;
-  b=jSJEWJQvIqOq0f3I1hgNixPXAF4hxbVeGf4HmJLb+osfmLNTFwl8WYwL
-   JWxjNZDTMHw2ymoBeMOq/Vv5u9IBj0A1ywlZ83uZwl0Lkxafrj1EOdbh3
-   w1cKaRGUnAkkt++iR2eyouHjd+pbudz4g2cqBXg8ZFimGt1t2jtsXiIxQ
-   kjH4SH3HdZPEgxjLpoGnZlis/N3WlLnClcatpua6DtzjhNbDTOmaGrCuv
-   Auqrd3Qmu6gMJM8nnh8dcj2W+R0pKCvVb83WDM+pIB1BGbFjyCzInWhID
-   ioXKQKewvYTkBv0/ORToe3+B8SeY0DYNYWHqweIqeYqllQJnvj6KzX2l4
-   Q==;
-X-CSE-ConnectionGUID: Lg2HJaQNQsegeRWYMp/fEA==
-X-CSE-MsgGUID: 2giMQT11TziVjp7mbn7rYQ==
-Received: from unknown (HELO opfedv3rlp0e.nor.fr.ftgroup) ([x.x.x.x]) by
- smtp-out.orange.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 11 Jun 2025 18:42:50 +0200
-Received: from test-mailhost.rd.francetelecom.fr (HELO l-mail-int) ([x.x.x.x]) by
- opfedv3rlp0e.nor.fr.ftgroup with ESMTP; 11 Jun 2025 18:42:50 +0200
-Received: from lat6466.rd.francetelecom.fr ([x.x.x.x])	by l-mail-int with esmtp (Exim
- 4.94.2)	(envelope-from <alexandre.ferrieux@orange.com>)	id 1uPOXJ-00447l-5w;
- Wed, 11 Jun 2025 18:42:49 +0200
-From: alexandre.ferrieux@orange.com
-X-CSE-ConnectionGUID: 3CZ2UY5TRJud1TGXfX/YvQ==
-X-CSE-MsgGUID: q9C4VuaNQJaPctRHgA34JQ==
-X-IronPort-AV: E=Sophos;i="6.16,228,1744063200"; 
-   d="scan'208";a="299439109"
-Message-ID: <9119ef86-b274-4ab0-b67c-c798314fbd12@orange.com>
-Date: Wed, 11 Jun 2025 18:42:48 +0200
+	s=arc-20240116; t=1749660634; c=relaxed/simple;
+	bh=pKeHfuJCvibCVUEiijmqIbl2R3U0gwLuy7BlutemhL8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J0upvQa3pjZdK9cz1rA56qs+1sD8iFs51Rw3HzdYCHMT3zfpumF9RKNF/iOR1jzLoDVxZRstbAOqzkB9MMdgKO4BBeRFqDWAUd0B8e8ynipz6TaTzhDj0TbVf2S+7g4EGAAhd8y7VP2vcEk9y6VSLatvh/dU2TES0onTevlZRE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=n5VnOf12; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.65.208.185] (unknown [20.236.11.69])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 3DB1F21151A2;
+	Wed, 11 Jun 2025 09:50:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3DB1F21151A2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1749660632;
+	bh=FPPX7YYZ8XcYflcrWTpvoOffBT2d5LZYxQ3qxbCqh4s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=n5VnOf12XqDy1EJXmNidNMRRrGTiqAP2sCXq0CDii1u/gxSlrbHUUBZNbDVvNlzvG
+	 pC+FRSOjFzu21Z8Be5lz4e77cvw2ht+jbnG0a00v68Sx9350zHovrdMvXRywTy104j
+	 vnSsJY80Za2jPuW6uSY5Flm3KJYdI4MpQcqyg7fc=
+Message-ID: <789d1112-020f-402e-9fd2-aa6e061879ff@linux.microsoft.com>
+Date: Wed, 11 Jun 2025 09:50:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,66 +49,129 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG iproute2] Netkit unusable in batch mode
-To: Daniel Borkmann <daniel@iogearbox.net>,
- Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
- Nicolas Dichtel <nicolas.dichtel@6wind.com>,
- Nikolay Aleksandrov <razor@blackwall.org>
-References: <4c0389de-1e74-46f8-9ce8-4927241fd35c@orange.com>
- <1cfae3f3-d1cf-413e-8659-a6bd72b03a71@iogearbox.net>
-Content-Language: fr, en-US
-In-Reply-To: <1cfae3f3-d1cf-413e-8659-a6bd72b03a71@iogearbox.net>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Subject: Re: [PATCH 1/6] Drivers: hv: Fix warnings for missing export.h header
+ inclusion
+To: Naman Jain <namjain@linux.microsoft.com>,
+ "K . Y . Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H . Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Konstantin Taranov <kotaranov@microsoft.com>,
+ Leon Romanovsky <leon@kernel.org>, Long Li <longli@microsoft.com>,
+ Shiraz Saleem <shirazsaleem@microsoft.com>,
+ Shradha Gupta <shradhagupta@linux.microsoft.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+ Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20250611100459.92900-1-namjain@linux.microsoft.com>
+ <20250611100459.92900-2-namjain@linux.microsoft.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <20250611100459.92900-2-namjain@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGkgRGFuaWVsLAoKT24gNi8xMS8yNSAxNjowNywgRGFuaWVsIEJvcmttYW5uIHdyb3RlOgo+IAo+
-PiBJcyB0aGVyZSBhIHNjZW5hcmlvIHdoZXJlCj4+IG5ldGtpdF9wYXJzZV9vcHQoKSBpcyBjYWxs
-ZWQgc2V2ZXJhbCB0aW1lcyBpbiBhIHNpbmdsZSBjb21tYW5kLCBidXQgaW4gYQo+PiBzdGF0ZWZ1
-bCBtYW5uZXIgPwo+IAo+IFRoaXMgd2FzIGJhc2ljYWxseSBiZWNhdXNlIHdlIGNhbGwgaW50byBp
-cGxpbmtfcGFyc2UoKSBhZnRlciAicGVlciIgdG8gZ2F0aGVyIHNldHRpbmdzCj4gZm9yIHRoZSBw
-ZWVyIHNpbWlsYXIgdG8gbGlua192ZXRoLmMgbW9kdWxvIHRoYXQgbmV0a2l0IGhhcyBtb2RlL3Bv
-bGljeS9zY3J1YiBzZXR0aW5ncwo+IGFuZCB3ZSBvbmx5IHdhbnQgdGhlbSB0byBiZSBwcmVzZW50
-IG9uY2UgZm9yIGEgc2luZ2xlICdsaW5rIGFkZCcgY2FsbC4gTWlnaHQgYmUgYmV0dGVyCj4gdG8g
-anVzdCByZXNldCB0aGUgYWJvdmUgYmVmb3JlIHRoZSAnZ290byBvdXRfb2snIGFmdGVyIHBhcnNp
-bmcgcGVlci4gQ291bGQgeW91IGNvb2sgYQo+IHBhdGNoIGZvciB0aGF0IGluc3RlYWQ/CgpBaCwg
-SSBzZWUuLi4gUmVjdXJzaW9uIGluc3RlYWQgb2YgaXRlcmF0aW9uOyB0aGF0J3MgZWxlZ2FudCB1
-bnRpbCB5b3UgbmVlZApzdGF0ZWZ1bCBjb2RlIDp9IFRvIGJlIGhvbmVzdCwgdG8gbWUgaXQncyBy
-YXRoZXIgYW4gYW50aS1pZGlvbSAoY29taW5nIGZyb20KdmV0aCkgdG8gYmUgZml4ZWQgcmF0aGVy
-IHRoYW4gcmVwZWF0ZWQuLi4KCkFueXdheSwgSSBkaWQgYXMgeW91IHN1Z2dlc3QsIGJ1dCBteSBo
-YW5kIGlzIHVuc3RlYWR5IGFzIHRoZSBjb2RlIGxhY2tzIHN5bW1ldHJ5CmFuZCB0aG91Z2ggSSB0
-cmllZCB0byByZXNldCAiZGF0YSIgcHJvcGVybHksIEknbSBub3Qgc3VyZSBJIGRpZC4gUGxlYXNl
-IHJldmlldy4KCi0tLS0tCmRpZmYgLS1naXQgYS9pcC9pcGxpbmtfbmV0a2l0LmMgYi9pcC9pcGxp
-bmtfbmV0a2l0LmMKaW5kZXggODE4ZGExMTkuLjI1OTU3MzE2IDEwMDY0NAotLS0gYS9pcC9pcGxp
-bmtfbmV0a2l0LmMKKysrIGIvaXAvaXBsaW5rX25ldGtpdC5jCkBAIC0xMjUsNiArMTI1LDggQEAg
-c3RhdGljIGludCBuZXRraXRfcGFyc2Vfb3B0KHN0cnVjdCBsaW5rX3V0aWwgKmx1LCBpbnQgYXJn
-YywKY2hhciAqKmFyZ3YsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBy
-ZXR1cm4gZXJyOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmICh0eXBlKQogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZHVwYXJnKCJ0eXBlIiwgYXJndltl
-cnJdKTsKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZWVuX3BlZXIgPSBmYWxzZTsK
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZWVuX21vZGUgPSBmYWxzZTsKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIG91dF9vazsKICAgICAgICAgICAgICAgICAg
-ICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIiVzOiB1bmtu
-b3duIG9wdGlvbiBcIiVzXCI/XG4iLApAQCAtMTQ2LDYgKzE0OCw3IEBAIG91dF9vazoKICAgICAg
-ICBpZm0tPmlmaV9mbGFncyA9IGlmaV9mbGFnczsKICAgICAgICBpZm0tPmlmaV9jaGFuZ2UgPSBp
-ZmlfY2hhbmdlOwogICAgICAgIGlmbS0+aWZpX2luZGV4ID0gaWZpX2luZGV4OworICAgICAgIGRh
-dGEgPSBOVUxMOwogICAgICAgIHJldHVybiAwOwogfQoKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fDQpDZSBtZXNzYWdlIGV0IHNlcyBwaWVjZXMgam9p
-bnRlcyBwZXV2ZW50IGNvbnRlbmlyIGRlcyBpbmZvcm1hdGlvbnMgY29uZmlkZW50aWVsbGVzIG91
-IHByaXZpbGVnaWVlcyBldCBuZSBkb2l2ZW50IGRvbmMNCnBhcyBldHJlIGRpZmZ1c2VzLCBleHBs
-b2l0ZXMgb3UgY29waWVzIHNhbnMgYXV0b3Jpc2F0aW9uLiBTaSB2b3VzIGF2ZXogcmVjdSBjZSBt
-ZXNzYWdlIHBhciBlcnJldXIsIHZldWlsbGV6IGxlIHNpZ25hbGVyDQphIGwnZXhwZWRpdGV1ciBl
-dCBsZSBkZXRydWlyZSBhaW5zaSBxdWUgbGVzIHBpZWNlcyBqb2ludGVzLiBMZXMgbWVzc2FnZXMg
-ZWxlY3Ryb25pcXVlcyBldGFudCBzdXNjZXB0aWJsZXMgZCdhbHRlcmF0aW9uLA0KT3JhbmdlIGRl
-Y2xpbmUgdG91dGUgcmVzcG9uc2FiaWxpdGUgc2kgY2UgbWVzc2FnZSBhIGV0ZSBhbHRlcmUsIGRl
-Zm9ybWUgb3UgZmFsc2lmaWUuIE1lcmNpLg0KDQpUaGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2ht
-ZW50cyBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgb3IgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiB0
-aGF0IG1heSBiZSBwcm90ZWN0ZWQgYnkgbGF3Ow0KdGhleSBzaG91bGQgbm90IGJlIGRpc3RyaWJ1
-dGVkLCB1c2VkIG9yIGNvcGllZCB3aXRob3V0IGF1dGhvcmlzYXRpb24uDQpJZiB5b3UgaGF2ZSBy
-ZWNlaXZlZCB0aGlzIGVtYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgYW5k
-IGRlbGV0ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cy4NCkFzIGVtYWlscyBtYXkg
-YmUgYWx0ZXJlZCwgT3JhbmdlIGlzIG5vdCBsaWFibGUgZm9yIG1lc3NhZ2VzIHRoYXQgaGF2ZSBi
-ZWVuIG1vZGlmaWVkLCBjaGFuZ2VkIG9yIGZhbHNpZmllZC4NClRoYW5rIHlvdS4K
+On 6/11/2025 3:04 AM, Naman Jain wrote:
+> Fix below warning in Hyper-V drivers that comes when kernel is compiled
+> with W=1 option. Include export.h in driver files to fix it.
+> * warning: EXPORT_SYMBOL() is used, but #include <linux/export.h>
+> is missing
+> 
+> Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
+> ---
+>  drivers/hv/channel.c           | 1 +
+>  drivers/hv/channel_mgmt.c      | 1 +
+>  drivers/hv/hv_proc.c           | 1 +
+>  drivers/hv/mshv_common.c       | 1 +
+>  drivers/hv/mshv_root_hv_call.c | 1 +
+>  drivers/hv/ring_buffer.c       | 1 +
+>  6 files changed, 6 insertions(+)
+> 
+> diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
+> index 35f26fa1ffe7..7c7c66e0dc3f 100644
+> --- a/drivers/hv/channel.c
+> +++ b/drivers/hv/channel.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/uio.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/set_memory.h>
+> +#include <linux/export.h>
+>  #include <asm/page.h>
+>  #include <asm/mshyperv.h>
+>  
+> diff --git a/drivers/hv/channel_mgmt.c b/drivers/hv/channel_mgmt.c
+> index 6e084c207414..65dd299e2944 100644
+> --- a/drivers/hv/channel_mgmt.c
+> +++ b/drivers/hv/channel_mgmt.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/delay.h>
+>  #include <linux/cpu.h>
+>  #include <linux/hyperv.h>
+> +#include <linux/export.h>
+>  #include <asm/mshyperv.h>
+>  #include <linux/sched/isolation.h>
+>  
+> diff --git a/drivers/hv/hv_proc.c b/drivers/hv/hv_proc.c
+> index 7d7ecb6f6137..fbb4eb3901bb 100644
+> --- a/drivers/hv/hv_proc.c
+> +++ b/drivers/hv/hv_proc.c
+> @@ -6,6 +6,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/cpuhotplug.h>
+>  #include <linux/minmax.h>
+> +#include <linux/export.h>
+>  #include <asm/mshyperv.h>
+>  
+>  /*
+> diff --git a/drivers/hv/mshv_common.c b/drivers/hv/mshv_common.c
+> index 2575e6d7a71f..6f227a8a5af7 100644
+> --- a/drivers/hv/mshv_common.c
+> +++ b/drivers/hv/mshv_common.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/mm.h>
+>  #include <asm/mshyperv.h>
+>  #include <linux/resume_user_mode.h>
+> +#include <linux/export.h>
+>  
+>  #include "mshv.h"
+>  
+> diff --git a/drivers/hv/mshv_root_hv_call.c b/drivers/hv/mshv_root_hv_call.c
+> index a222a16107f6..c9c274f29c3c 100644
+> --- a/drivers/hv/mshv_root_hv_call.c
+> +++ b/drivers/hv/mshv_root_hv_call.c
+> @@ -9,6 +9,7 @@
+>  
+>  #include <linux/kernel.h>
+>  #include <linux/mm.h>
+> +#include <linux/export.h>
+>  #include <asm/mshyperv.h>
+>  
+>  #include "mshv_root.h"
+> diff --git a/drivers/hv/ring_buffer.c b/drivers/hv/ring_buffer.c
+> index 3c9b02471760..23ce1fb70de1 100644
+> --- a/drivers/hv/ring_buffer.c
+> +++ b/drivers/hv/ring_buffer.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/prefetch.h>
+>  #include <linux/io.h>
+> +#include <linux/export.h>
+>  #include <asm/mshyperv.h>
+>  
+>  #include "hyperv_vmbus.h"
 
+Reviewed-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
 
