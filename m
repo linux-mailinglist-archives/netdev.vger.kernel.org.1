@@ -1,187 +1,234 @@
-Return-Path: <netdev+bounces-196529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F39AD532F
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:09:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2BC8AD531F
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:07:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5AA51BC4CB5
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:04:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B0403AF754
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CE52E6125;
-	Wed, 11 Jun 2025 10:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BF5283141;
+	Wed, 11 Jun 2025 10:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="kFjYBxIb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RlbRBjYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9412E6101
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 10:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639124; cv=none; b=fgSXe37ZGBxFVMvBoNwbe2R7M9NJ+L/RnwhCqzT+McekrmgirissqhJ56b9uU4t0PoEFXaTu1Yj8jxuJtzsEfcPChdlY8LMbBkxLmjmFkNub45XwEg0TXZSlqkkePv+GxH+cE4wwiBibX+uo9W/+PMXV/FrWOuwKzYo1ESzTvfI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639124; c=relaxed/simple;
-	bh=wnJTpkDrEHyuY2PJfJL6HLytkyJMuXGvj1zDP7fepm8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nE8c5GSOb6cUwjlbPjpeoDUhOz0dbtojILmd56rTFZPNFKPcECxEbRikAAbHLozk02b8HrMFQZ1DIIs58DDH71l+JR9mXKKArj35TVgbwSHvnGyD3gtp0FT127rrWcIdkQSoBfuzOCvHJP+tnnzdsc1BFIAVMU2mjnwwSU94z64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=kFjYBxIb; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 4FB3C20728;
-	Wed, 11 Jun 2025 12:51:53 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AUgj3Ao6aaUo; Wed, 11 Jun 2025 12:51:52 +0200 (CEST)
-Received: from EXCH-04.secunet.de (unknown [10.32.0.244])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 98706201A7;
-	Wed, 11 Jun 2025 12:51:52 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 98706201A7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1749639112;
-	bh=JPBVWjB+LBMlBOqjg58gCWV0yyZ+MLnr20C0a7mxTMM=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=kFjYBxIbCQ3maXNhamJBO2k0U5T7PZ67HlhcpscySmhdFYV7tZ/hXXY3XIG42G//G
-	 kbvL7pEk4srelhmJGVj1EJAvFof3t8LeAdGLb8U9HeRswOhtbJbqt5XRUyPWV43KdP
-	 PwZkZq6iqKmi7wEDgycG2vWby1n8yxRInl7EsTUeR6yvlhM5xBV+9y4GMw8R76Bduz
-	 mFH9rxZCzJCjKSRwCvESeyXo/D5cDHkj0HibvuWqrVCt2x9zZv8SrwnfkPMlmG/WpH
-	 s554zEb/nGjK29UPvyck0ea1fYS3krE1pKAEiL2mYyvFKlhqgdasxkGtejB7uRhUcb
-	 1mXi5/vHBGFEg==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-04.secunet.de
- (10.32.0.184) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Wed, 11 Jun
- 2025 12:51:52 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 11 Jun
- 2025 12:51:51 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 697773182AC9; Wed, 11 Jun 2025 12:51:51 +0200 (CEST)
-Date: Wed, 11 Jun 2025 12:51:51 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Aakash Kumar S <saakashkumar@marvell.com>
-CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <akamaluddin@marvell.com>
-Subject: Re: [PATCH]    xfrm: Duplicate =?utf-8?Q?S?=
- =?utf-8?B?UEkgSGFuZGxpbmcg4oCT?= IPsec-v3 Compliance Concern
-Message-ID: <aElfx2P9VBN/q0A6@gauss3.secunet.de>
-References: <20250609065014.381215-1-saakashkumar@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710F52E6132;
+	Wed, 11 Jun 2025 10:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749639196; cv=fail; b=RCRXIpoGfyDYWpbkj6j6qtzemdf8qGyWSOalgDtM81oWV9MQAmdWGQ6Cokw4JioFBMvTDUgzR17Qs7cdHr0kDTfXaLnTKpRI20FZCEh5Wg5eWlEwHpix/444M/l8YL1xa8pQ4POsLuVC0tSCT+FoTky8CKaPMxGZpI+duCdichs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749639196; c=relaxed/simple;
+	bh=ENKxHrzGnbblJ7vkV1oXf5vnqxzYRz7IpP/TGRC2e6M=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TYH3illBLoumyAZTMjQVa43GfMnT7CFWkP1ZamY7qyrsZ4kHYu9lsVW0OQe0dcCMiQ6naYzB43JRrTLje5A+pb9jIZv03AqRzhsLSXWgnJoCm3tZ3mFpD0XT2pcB2+2n18gmi+RUy5ySt8hrIKiu2ki/nWn7lAIR1H4BFyUK3j4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RlbRBjYf; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749639195; x=1781175195;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ENKxHrzGnbblJ7vkV1oXf5vnqxzYRz7IpP/TGRC2e6M=;
+  b=RlbRBjYfgNBg9VvPpYU/mBdzJbYy86GtsBGiw6aAuRKB2v7nm8SCLWCp
+   VSOIKlC4VYSNSfPOIXxQNI1VPXuynah/I1nYsmKSUoh326wmvQCB9IT87
+   vqeuAWLCrLKS+V0pGNJXGBg9AGQhNAqs5DqPBuZZ75rEBUY2mJVCc85TM
+   pjRoXTcP74lhL/WhV5KfVciZP4hjkUbVsilYm0sFyBR/H8z6tc1IR2WcR
+   +tpb++wJ3hcl91RzhKyLYq0utHLJPdxbTJa0Q9Z2BlT9UxeZcOpkw0aWz
+   lyo7zeVGSifi+76FLldxcR8/F5HOaBNC+YnH4HDcuCgEldpfbYZenIU6K
+   Q==;
+X-CSE-ConnectionGUID: e7ioXjwXR3aSvBf0x5zGuA==
+X-CSE-MsgGUID: obNBWNM7Tvu8GZBcBA5l8g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="63186396"
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="63186396"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 03:53:13 -0700
+X-CSE-ConnectionGUID: o6+1R8IlTkShIfO34Arz0A==
+X-CSE-MsgGUID: HkQgyz+qSf+5S9PEhBeh5A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="147074701"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 03:53:14 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 03:53:12 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 03:53:12 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.74) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 03:53:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Eaj24CXuHomsPy1x/X27OYYUFk1ivzbZcOxQi76NT4tj1ABlsjS/dnzw28N/gj6kYwgt6WTspyGzWjafePCni0/z8k820wDHfUGgC4grllgpcdiJGHfUyjlK3Mf2qjJRcxyXqbttroxjjTqHnr+WHXaQJmo+RtFZenJrOVfQ07TVU71O7YwPsa0atYhlUzHzCr3YFVRe8m6kch268I9Q0zGjVGPasU+cOEmvWbChjiavxsfxvlDB+HfQSK6iUwolztfZsRrI2MWT9Kh/euRD9weAgVHgzOfDc80IgwIRqkJxCmFD4mAFSXR+Vlp4sQXmwKALBHEHkqPSbocqsXv0eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GFQ2sEyEqiHUdtQbxFFh8g2eXJyBmVU5zCjANesWdRQ=;
+ b=e/m4K4qCxphXc3ANIRWqY4QqH9Q4HA3UX4ye3Lc6tZExHML4pjSInay7KUnOAgem9ZZ0sdyccDI2I1+pie4cw0NncOsnBfADgl1HcU7jpLlIkDsK9DTBzx5NPN1RyH6QObjK4+v7RjPKWnqmG/yqssXBaDBDaQ42I7em3jeApu6orzVKiIgzCP87FYQAZiWgDZV/wpYdTZMUfmD25gCn0M7WxBNpBrk1FZ+ZYNp25TXcQVCUSuI2DNjXNuZx3+jQ9SqKvr1/8rBuU/U+gQYGt5fSjfF8YQ/fi/L1PbY5VRTZuhc3yA6OkEheNojntMK4g+Gax0oqABRqlziz/ueT6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5057.namprd11.prod.outlook.com (2603:10b6:303:6c::15)
+ by MN0PR11MB5986.namprd11.prod.outlook.com (2603:10b6:208:371::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.26; Wed, 11 Jun
+ 2025 10:52:49 +0000
+Received: from CO1PR11MB5057.namprd11.prod.outlook.com
+ ([fe80::4610:6d6c:9af6:2548]) by CO1PR11MB5057.namprd11.prod.outlook.com
+ ([fe80::4610:6d6c:9af6:2548%6]) with mapi id 15.20.8835.018; Wed, 11 Jun 2025
+ 10:52:49 +0000
+Date: Wed, 11 Jun 2025 10:52:36 +0000
+From: Krzysztof Karas <krzysztof.karas@intel.com>
+To: Jeff Layton <jlayton@kernel.org>
+CC: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Jani
+ Nikula" <jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<intel-gfx@lists.freedesktop.org>
+Subject: Re: [PATCH v14 5/9] ref_tracker: allow pr_ostream() to print
+ directly to a seq_file
+Message-ID: <ykondzwgaqboegfuv27en5r6nnnrk3q3s5eu47tz2zu3dnpslv@ciw32vfj2vwc>
+"Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173,
+ 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316"
+References: <20250610-reftrack-dbgfs-v14-0-efb532861428@kernel.org>
+ <20250610-reftrack-dbgfs-v14-5-efb532861428@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20250610-reftrack-dbgfs-v14-5-efb532861428@kernel.org>
+X-ClientProxiedBy: WA1P291CA0011.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::8) To CO1PR11MB5057.namprd11.prod.outlook.com
+ (2603:10b6:303:6c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250609065014.381215-1-saakashkumar@marvell.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5057:EE_|MN0PR11MB5986:EE_
+X-MS-Office365-Filtering-Correlation-Id: f6b31704-1dc4-40a4-7c30-08dda8d61b1c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?QWt0Uk1pK0dQRXMzdVR3b2c1QmJyZkdMazV6bnFaeGZOdnJwUnNNYXNkR2VE?=
+ =?utf-8?B?MzJLQUlMZkt1Q3RGQTJtWDk5eGQxOVUyd0t2M2lQNW92VHlGc3FWL3YwV3M0?=
+ =?utf-8?B?aGNBL2VGQytKaWJwV0lUL25VQ3R6REtSMWZSY1dmMUlyUGJWeGt3OThBVVV0?=
+ =?utf-8?B?emd5MXpTSzJSZ09WakFSek04S1puNHB5RWtWS202TEdQbVd3Q1VOSGE3K0JH?=
+ =?utf-8?B?dkIrclVLZ0NIOTdnbTY2YU05bk92YS8xTVVybitxMWp2WFRJaGplYWIxK2sw?=
+ =?utf-8?B?S01xMklGWC94TmlGSTFYdUI3WTBzOU92N240Z3ZScTF5Q010SnZnS3BnN3la?=
+ =?utf-8?B?V0hSeTBHc1RXOWZJZWFPSVlSK3VUVWV0QVRpWXduSmpjdWlpMnc0TTBrdW5L?=
+ =?utf-8?B?WG9JTTVYNnhEOUExU09uMVpNY1dXa0ttMzJLdkwyWFZzVStOUnUvRk1yLzJN?=
+ =?utf-8?B?RmpRUThSalhzT2hnam1xOUlHcFZGVHpsbDBrTCsvOVpiSXNLRnBpazRDNkJK?=
+ =?utf-8?B?eUxCZ3BMZ0padDlJY0UvUWEzZW1BUER5d3c2OCtLb2lDWXVQUU5TSVZTOUh2?=
+ =?utf-8?B?aWpCRVRLcWt6TDRZaGFEb3ZSMjc5NU1sZWlxY21zVDVEcmZCL0d2Z3ZXRkox?=
+ =?utf-8?B?SkFOTHhHYm1wQ05aVnlpS2pXTEtXa1Q0MGdKOWlSODdyakg1LytTZThjYnY5?=
+ =?utf-8?B?bVg1c0UxVUJTWFBoTGNWK0drbVJOTS9BWTMxSENOM2h6Uk91M2hYdXdFNkJx?=
+ =?utf-8?B?aUNGVGYyclR1aWw0RDhzLzdsNjhEYVkrdUVPNlgzakxyaGY3NllHWFhESXZ4?=
+ =?utf-8?B?M0QxWlZEVjRmVHVsaXVxQkgvVTNiVzJuRGZYM3Z3V09PaTVVQXROZ0tYMUxq?=
+ =?utf-8?B?K3FESmdDZ25IVjVNN0FtRlRuRkFEdTJpcSsvMEUxV3hHZU9zSlZBMEE0b3JI?=
+ =?utf-8?B?YkhJc2lYU3crTjFUWDJuUGJSY1hSYTJhVlh2UXlIR1RxcXlJd3YzSDdnZ01U?=
+ =?utf-8?B?eU9zMTJUU3BLZnhES3VWSkliZG1OZGxiYTFWbC82VG94RldPWFMrbXp5Mzd1?=
+ =?utf-8?B?NG11NVMxM0hEY1FTODJ6MUZ5eXpmNUNsU0V6YVFFdGkxSkpKYytoTjlwVWpM?=
+ =?utf-8?B?U0ZNVTZnMGUySU1ERzhHY0d0OFdUUURvc095ZG83QUdsRXBMdnpkWDFtNXJB?=
+ =?utf-8?B?UkFpU1g4Zy90ZkNJM3VSNWRsNmhFRW12Wlp0a0FSekJ6VVlib3ZjSUwwbTJW?=
+ =?utf-8?B?S1VWQjFNaWRCb3FOdmtDdVdrZ0Y4S1VRRDAxbjBXb0JwTHkvSVpIWlk5dlJF?=
+ =?utf-8?B?c1lDVXkyaUE0VHQwWWNMT0k3dXA3TFZjNHJTSjNqSnRTNWYyeWo4WnR3cUFh?=
+ =?utf-8?B?Q2diWXhiM2N6TTYvS3VNdndGY1g3RmtKNmY0TUNJMFR5MGNnUG81UHdST3VK?=
+ =?utf-8?B?bmFlQ0VqblNXRW44ZmYwOVV1SHlhYnpMV1VhYnJwSTdoYWswTllxSnE5UFNm?=
+ =?utf-8?B?YUsrdEVpVitERDd2c3RwZFFBU0FMeWF5YXZMTmQyVFdxditUZ2w3Qi9BRGI0?=
+ =?utf-8?B?Nnd2d2dBZXlNLzd5V2ZHcFBQTklvMnFZWC9CaGtmVGZOd0FZVTNVWVE2TnN2?=
+ =?utf-8?B?UGRBaXFrbUg4VHc3Mkt1b1VvZDFtd21uc1B6bytSMUZrVWxXd0ZLY2Z4dzJ0?=
+ =?utf-8?B?WjJkK1dSVUp2N0dJdzdjbmh3eGMwUldjdFR2OWpjNS9XMkVnaUtQejFtVGp5?=
+ =?utf-8?B?amFaQ3AyNXNZZUgzM3ZRb2liWG5zdy9xSW5ia3d6WEJ2Nm4yVDkyMEpHOU1v?=
+ =?utf-8?B?d2d3VXMzRWtsMUI0a0dkOWJaL0dKbWNpU2VBN3YrcVNVdG95K240Y3dRY3c1?=
+ =?utf-8?B?bk9GbWM5S0RJVWZteFFRWjk5L3FMUzBJYnBHQkhmSXF2TDNYZy9laW5NSzhY?=
+ =?utf-8?Q?8RaarIjXD9s=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5057.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?KzRVanAvWWJ3Z2JWVVo4aDdNWDdjR2tVeXphd2lGUCsxRGRoclpNaFZjS1hG?=
+ =?utf-8?B?R0V1enRDMHhMczY2NjIyNWpaaGM2dUE3cXFBSW1UUlpJYmZxSmJoTi9zWWZl?=
+ =?utf-8?B?T2pxZTV6YlcvWHlNb3ZDSmtCdkZrZjRPUVBCc0RKY0VxUm9wcEtaNXFrOXpP?=
+ =?utf-8?B?bi9hTTNvWGdtTGpPYkpuY0xvZ2pwNDRBL0FBejVvWUNheEJHOWEzbXF1bVdv?=
+ =?utf-8?B?TGxmTlhDQ1Y2V3NEbHZZOGh6aVFMMFRsL29SazM1NlJhM1plN0NZOXhMbWlx?=
+ =?utf-8?B?TERqN1RzUml5bjBoUUNDczViVDZabkg4SDJsTkFSS0puZTFQbEdzNDE4TFFu?=
+ =?utf-8?B?bEhQdzFmWmxSenpuQVhxa252MVliQXJvNkRvUUx5V3NMWlhkV0ZWaVF0UVkv?=
+ =?utf-8?B?dXk4cE54ejcvNmRCN2cwSnVKTCs1OGUzZlI1M3dCa2hIOVlXSjlkck5HbDRt?=
+ =?utf-8?B?eEdUdVdXQmNrZ0E0TUN4dGswT1NDVU5uZDl5ZVB4SlVxbW5IcHZ3eTlpMit2?=
+ =?utf-8?B?VTNzVHRKaU4zNlc4NWNZUzVoNnFVYjdxZ0JWaXlpbTNCTW5lL3NzUm5acEpr?=
+ =?utf-8?B?Rllnem90QnJhejRVRHFkSU5iSWgyNmpwQy9mK2JCM3pHMmp2VWJ5cU1vNXNs?=
+ =?utf-8?B?N2RGS29uWERBNGFFb25BczRJcHErS0NzT2tPMGJ6U0hiaGVKaHgycy9mNDhj?=
+ =?utf-8?B?cmlzcmI0OWlZc1BydUhDNDB6ZWZoOVZqVUlRQlRtVm9xL1ZtR2lQUFhLT3F2?=
+ =?utf-8?B?c1N0QnZuZmJwRkNkMW5IcmNYOWNPRUVDYitwNzlzd0E0SkY2OGU2VUVWSkFE?=
+ =?utf-8?B?N3BORTN2aFF2SmMwYVV0ejRIVG1oZVFmYlJ5ZC9ONHZOdzcycUJjY3FOOVUy?=
+ =?utf-8?B?UFNockNYVnRNaDhtZWR6RUFGbjh2ejlWL0ZiVEVlQmhydXJJVHFQeldWQlhT?=
+ =?utf-8?B?WWlTLzJ0RzErcGxiOVVlZ3NJUzQyekFNRXFoQld2NGZIbHNpdXBiV1NqUmYz?=
+ =?utf-8?B?MnhhWHBBOVlHeXJNajFnbXB3UkdJQ2ZDMU45NlVZTTJOajhpRTEyNGFGUjY2?=
+ =?utf-8?B?NGh4Nk1oZFVCMmlhMjlNQmE5WWx2dnhrUFhGSjVVYUdlVE1SZlNxdUg2bGdG?=
+ =?utf-8?B?Wm5FOEROUkl3QkZmYjFCM3pRODJ6bTQ4SGhwSWdsMUJRN1hGdkdzWlV1OW5S?=
+ =?utf-8?B?L3pzeW9XMzFtRGtKS09wUXE3L1I1UURrQnF1SEFjdWI4M3dWMTVmS1JGdk9j?=
+ =?utf-8?B?blNwaGV1azdGT0phK2J4aHN4K0o4TDEwcE9SNWdmUVVYNk9LUm9XWEVOdmk5?=
+ =?utf-8?B?YXNJbFdqcjhicUw5T0xEL3NGcDZqQ0dtc09jWWFmajRvc3l6bmNpTFdSVTl0?=
+ =?utf-8?B?Wkpkc3R4ZmpSa0pvVFVWMDBqdHI1SEF3eEhYT1grRC8xVDE2c1A0dzJROE9Q?=
+ =?utf-8?B?RmpwNHhqYUExUlFqc0FUdzg4YW9CZmFCdjhIekJUU1RaN3YyOGJFS2lNM3ZQ?=
+ =?utf-8?B?MTJDSkdVZys0cWZ5NU93VVZjWGxIVjlxRnZML3V2VlhEdGdKcEdjelFaREpW?=
+ =?utf-8?B?cHhkTVRFUEV4RzU4L3Y4V1lRbWFMNms0UTc2TXJqWnJrUjNjZzdpWkFVYVMv?=
+ =?utf-8?B?aXJmazJvUU9jKzIrVk4rRE8zc2JaZW9tQnV2MjBBSWwxenpWYWt2RGxmY05D?=
+ =?utf-8?B?TkZieFVmTUQ4N09SOGp4U2g5cmxMcUVjYzI5bnI2SkhTNTFyNnpMWmJBd3NQ?=
+ =?utf-8?B?UTRTMEVtTU5qTXBJc3JhZjErNHI0OUltaXVTeUdTNWxiTXljaitWTlh6TlFj?=
+ =?utf-8?B?TktXbkJNR1RKckMzNVp0Z3RXcVgxYk9YdEczU0ZBTFNjWnpGckp2MzZkVUtm?=
+ =?utf-8?B?UWtPb2tmN3hkRjJBTVJkb3M4MW9wQ1IzREZHOUNmNmFIakxtMnh2OGRlajNK?=
+ =?utf-8?B?UUtOa1FCbUlNWXIydXZKYWRnZDVyWkMzMzlLbTlZanV3UmNyYy92V3piUHBn?=
+ =?utf-8?B?Yk1CRmhBUFJYZmhBOXMzTlpoZHZjT3dKQWp1dkFySTZaYUVYRlR4ZTdQbEs3?=
+ =?utf-8?B?d2ZTd2lHRERTbWVNemtLeHlyMzBrUTFDWG4vcDRsY2Yrc2hsNWRCS1E4SGM0?=
+ =?utf-8?B?Zmc2b0k3TWxFN3pxZUNwaUFxZUUrQnlTQ0FHTUNpdEtJSUhJdzZHOEVQdU9w?=
+ =?utf-8?B?eFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6b31704-1dc4-40a4-7c30-08dda8d61b1c
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5057.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 10:52:49.0979
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N8sYtlu2LuA7H6+N3QHCONDEHbE/xP1wVnR5mirkhKaBrpiIWaVtKSkcy/F5pH9/Qo5rPO53W2QT8Vg+9oiVV7jxpRI3HpHTGV6ryz4EPbo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB5986
+X-OriginatorOrg: intel.com
 
-On Mon, Jun 09, 2025 at 12:20:14PM +0530, Aakash Kumar S wrote:
->         The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
->         Netlink message, which triggers the kernel function xfrm_alloc_spi().
->         This function is expected to ensure uniqueness of the Security Parameter
->         Index (SPI) for inbound Security Associations (SAs). However, it can
->         return success even when the requested SPI is already in use, leading
->         to duplicate SPIs assigned to multiple inbound SAs, differentiated
->         only by their destination addresses.
-> 
->         This behavior causes inconsistencies during SPI lookups for inbound packets.
->         Since the lookup may return an arbitrary SA among those with the same SPI,
->         packet processing can fail, resulting in packet drops.
-> 
->         According to RFC 6071, in IPsec-v3, a unicast SA is uniquely identified
->         by the SPI alone. Therefore, relying on additional fields
->         (such as destination addresses, proto) to disambiguate SPIs contradicts
->         the RFC and undermines protocol correctness.
+Hi Jeff,
 
-This is not quite right, RFC 4301 says:
-
-If the packet is addressed to the IPsec device and AH or ESP is
-specified as the protocol, the packet is looked up in the SAD.
-For unicast traffic, use only the SPI (or SPI plus protocol).
-
-So using the potocol as as lookup key is OK.
-
+> Allow pr_ostream to also output directly to a seq_file without an
+> intermediate buffer. The first caller of +ref_tracker_dir_seq_print()
+> will come in a later patch, so mark that __maybe_unused for now. That
+> designation will be removed once it is used.
 > 
->         Current implementation:
->         xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
->         So if two SAs have the same SPI but different destination addresses or protocols,
->         they will:
->            a. Hash into different buckets
->            b. Be stored in different linked lists (byspi + h)
->            c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
->         As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
-> 
->         Proposed Change:
->         xfrm_state_lookup_byspi() does a truly global search - across all states,
->         regardless of hash bucket and matches SPI for a specified family
-> 
->         Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 > ---
->  net/xfrm/xfrm_state.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 341d79ecb5c2..4a3d6fbb3fba 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -2550,7 +2550,6 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
->  	__be32 minspi = htonl(low);
->  	__be32 maxspi = htonl(high);
->  	__be32 newspi = 0;
-> -	u32 mark = x->mark.v & x->mark.m;
->  
->  	spin_lock_bh(&x->lock);
->  	if (x->km.state == XFRM_STATE_DEAD) {
-> @@ -2565,18 +2564,12 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
->  	err = -ENOENT;
->  
->  	if (minspi == maxspi) {
-> -		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
-> -		if (x0) {
-> -			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
-> -			xfrm_state_put(x0);
-> -			goto unlock;
-> -		}
->  		newspi = minspi;
->  	} else {
->  		u32 spi = 0;
->  		for (h = 0; h < high-low+1; h++) {
->  			spi = get_random_u32_inclusive(low, high);
-> -			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
-> +			x0 = xfrm_state_lookup_byspi(net, htonl(spi), x->props.family);
->  			if (x0 == NULL) {
->  				newspi = htonl(spi);
->  				break;
-> @@ -2587,6 +2580,14 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
->  	if (newspi) {
->  		spin_lock_bh(&net->xfrm.xfrm_state_lock);
->  		x->id.spi = newspi;
-> +
-> +		x0 = xfrm_state_lookup_byspi(net, newspi, x->props.family);
-> +		if (x0) {
-> +			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
-> +			xfrm_state_put(x0);
-> +			goto unlock;
-> +		}
-> +
 
-This looks wrong. xfrm_state_lookup_byspi takes the xfrm_state_lock as
-well. Also, now we do the lookup twice if minspi != maxspi and the
-extack message is wrong in that case. And the SPI is still not guaraneed
-to be unique because the lookup depends on the address family.
+Reviewed-by: Krzysztof Karas <krzysztof.karas@intel.com>
 
-Maybe it is better to create a new lookup function that does exactly
-what we need for this case.
-
+Best Regards,
+Krzysztof
 
