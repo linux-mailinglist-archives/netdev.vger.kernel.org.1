@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-196450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C5EAD4DFC
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:10:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 239A2AD4E6F
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8D4A1BC1563
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:10:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 601633A4FDC
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06532356D8;
-	Wed, 11 Jun 2025 08:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1573D2309B6;
+	Wed, 11 Jun 2025 08:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Fhy8LIVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCB82356B3;
-	Wed, 11 Jun 2025 08:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FB82367B0
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749629344; cv=none; b=lISXHNtI/Ftbwbwl4ZZ6e7telmBWf4SaaKIkuCd09v9XlyMTyyAi04vFU0Hvuho5d4Ei6RDmEySPk/fXprv1xXg1gmLJTtHz3H3B7D192wxNocurYOjGLAaIHwOoAC2ezaoM36UawmOImkVXHApWBJ65k6oqPxad2o94fPWPCao=
+	t=1749630681; cv=none; b=oT9UnAgvvWcUbhCs/VxJsWfQGv67dTWeAHp6lTLfw8nbVdtqygXEu7krksZy4jxO56sWGmippTFgkYC2u2kapPjVASKViiNpmHc/SMwAzU27gbCrq6KnF5bK6A4qC6k2sj5FK+g67B8hFdCmgmDJb9NxhLapN0bX8lPCjEmtb5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749629344; c=relaxed/simple;
-	bh=bb/gYoBGqnnv8Qs7r02fycV4dkWTGnthEecbIoM/PwQ=;
+	s=arc-20240116; t=1749630681; c=relaxed/simple;
+	bh=/vwDBjl9yEau2jcTEiQKyUboG2fbIwSob/pGFKRNf1M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QgsLcgSA7M/DYPeGA/isRNd/n04m6mASkrNkN+IFbIFVVd6t3M4sQKQfIVlBKx5wSTDoikKF6GBZPAnzpQ3QKXQ/QIE+Prh+oJJuA2jMywab1B5RkDuYCXB0cXTMzczgJBb5Pz7L+DFfrIy1v7ZtMMG4nWrFAmXaRxiMDhKPLzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-acb5ec407b1so1135165866b.1;
-        Wed, 11 Jun 2025 01:09:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749629341; x=1750234141;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xGRU+Kv08xe5NBWzNvaRaFDet3u9/sA86Kboke4WJ9A=;
-        b=kHS9Tn5+qJl99lehQqT16FVawKmtjMAY5bA3SIdSISW3hO87UQApHy6qAhU08EXKhd
-         JFFk0cVdHhJ8/ekRcOXoCRtuPggdze42W2/JFDE+MlnlqBc5S+dLIDpvfgaEdHtDPNNx
-         YIa2rWjAUaKe1c/K/wyKTeQ9qeWRLSHJbUYJBNNPeM2zYEpM2LopDjg5dqsQN8hGqIj5
-         dUycMoWe1ELeAyjyCwpUZ/HcieeUn/C6l4hXuPEZ+FtiP7x8xUq11e9VY3vk8Cunv8nX
-         ynmDi0iBMIKONY/5Ime6n19p5hSGPcd5hAwPmHjufy/ZOMNK7RO3ZK5uCea68INt+9Uw
-         Zumw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBmg9H1DlrD3/tJVVAXow+Ipz0fPupTIwW1BU7dI11KuAQ6YI59GTEuEd89fWMQDRji9W+13W2BWNHjYUZb0a4@vger.kernel.org, AJvYcCVf/YqmSEOKDFgKRX9bhWi+Fk672fi+L9aYUm7YCgiJQ7jVwrtwiNujDTGjn7CkbXSmElT5RU/cX8T47K4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC6SY2geJoSFfNwkt6e50JDi3egI7rZEzJl6QQ5NEjJrViWMoh
-	ukv2WNc0T9dzmmaTYSfY3mOoqGUBshc1DKuAARnlilMGoKqig93f0v8v
-X-Gm-Gg: ASbGncsqkDHTTiakaRAu4WUZnD4l/JYyvLKy2ei8/ehzG8+a+qB0k6lxP9cn/cGT+ic
-	eYJ7Q2KToHz4szMmzCdAQgZsaxP6v9lxsGpkIcDA0PT1ALRTegP3KDKw3X+qm0B9NrRyLsBGNmS
-	oy3s6uGM5nh6NwexP1UuvvtHJnK2FpfIZkubjR1tFcwRteCW+Fw6e3W3Khr3DgaeDpaQNC6CMBO
-	61/z7J+WVfjHs4IvghFybbZTzGQ8bMhJOIB1uICB3ma5MOwswkpb5YS0cc9UoGQzwFT4pfDEyWD
-	4FYQp5M0vid88BQHA1eplEsp160kCsl+AIq7sgm4XkTtL4LeZYIiXksmJK1ZzX+g
-X-Google-Smtp-Source: AGHT+IGbQu5qlFUouSqkJhPj8jhxnrJC0Olr7Zwa5gMMOkWdUeanOk7UUb5kvt1BxjCg3bkg0oosmw==
-X-Received: by 2002:a17:907:9449:b0:ad2:2fa8:c0a7 with SMTP id a640c23a62f3a-ade8c76b521mr172874366b.21.1749629341249;
-        Wed, 11 Jun 2025 01:09:01 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:72::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc1c5besm845927466b.87.2025.06.11.01.09.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 01:09:00 -0700 (PDT)
-Date: Wed, 11 Jun 2025 01:08:58 -0700
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next 0/7] netpoll: Untangle netconsole and netpoll
-Message-ID: <aEk5mv69Ha7xyvPV@gmail.com>
-References: <20250610-rework-v1-0-7cfde283f246@debian.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mQp0+S4QaSJpaIoHh5zhArUeBRnAm1ws+DuxwU31tg/5w723sjqLQt7KMQ1MEzhFlS6pr7iPgFWGKs/pLJYGg3eVCWdCNSLeZ43Nm2yQpCgA6c6nXJ2ePul0KjTZaUn2bdzvsOy8TzYz7gTIKbVBsV6hLDbnp8I7AD1bU6fz+yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Fhy8LIVi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=TGqx7JiEzOuIGW4c5ERhspoFoZOLiM85mcafwel2dOA=; b=Fhy8LIViRxY2CLPWKzOx50JjEu
+	CpNXR4SgpyVasp8QdjIc8rFCvczg04r6tyNS2qx2mBKW8x5LBCzjmcv0OVolKNbjvXOBqwheKa7sX
+	MtKUG+K4AJyrJl+ZmvD25OlacljTBPiT8eU8isxMEkA4ednoXgOMnKVSTCvn22nNLEGhlIQcU2OVg
+	t5WH760mCjJmA8s7L9oAMCSZHq/VKCcO3PHHjXf6ZlqmrTe0iFeEynuL1CAJsfwSQJ6jVS5llxLj0
+	vNwucqn50VpDdK+cepDiQfhbAw2mwuJ+Fdw1dev4U9Gnblg0vSS3rkV3Z0RmRfofll/LYhXpYsa7g
+	976Hr+Wg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34298)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uPGrY-0005rR-0A;
+	Wed, 11 Jun 2025 09:31:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uPGrV-00085H-10;
+	Wed, 11 Jun 2025 09:31:09 +0100
+Date: Wed, 11 Jun 2025 09:31:09 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chris Morgan <macromorgan@hotmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Chris Morgan <macroalpha82@gmail.com>,
+	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH V2] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
+Message-ID: <aEk-zY0gfGx-PPa6@shell.armlinux.org.uk>
+References: <20250606022203.479864-1-macroalpha82@gmail.com>
+ <ab987609-0cc7-4051-bc51-234e254cbec0@lunn.ch>
+ <SN6PR1901MB46541BA6488F73EB49EBCDDFA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
+ <eb99e702-5766-4af6-b527-660988ad9b54@lunn.ch>
+ <SN6PR1901MB465464D2B7D905F6CD076F3FA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
+ <aENb4YX4mkAUgfi2@shell.armlinux.org.uk>
+ <SN6PR1901MB46545250D870E79670E43E06A56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
+ <aENv5BI2Amtqui4v@shell.armlinux.org.uk>
+ <SN6PR1901MB4654B995FBAFAC7298C7C6A3A575A@SN6PR1901MB4654.namprd19.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,20 +78,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250610-rework-v1-0-7cfde283f246@debian.org>
+In-Reply-To: <SN6PR1901MB4654B995FBAFAC7298C7C6A3A575A@SN6PR1901MB4654.namprd19.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jun 10, 2025 at 08:18:12AM -0700, Breno Leitao wrote:
->  drivers/net/netconsole.c                           | 137 ++++++++++++++++++++-
->  include/linux/netpoll.h                            |  10 +-
->  net/core/netpoll.c                                 | 136 +-------------------
->  tools/testing/selftests/drivers/net/Makefile       |   1 +
->  .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  39 +++++-
->  .../selftests/drivers/net/netcons_cmdline.sh       |  52 ++++++++
->  6 files changed, 228 insertions(+), 147 deletions(-)
+On Tue, Jun 10, 2025 at 10:43:31PM -0500, Chris Morgan wrote:
+> On Fri, Jun 06, 2025 at 11:47:00PM +0100, Russell King (Oracle) wrote:
+> > On Fri, Jun 06, 2025 at 05:32:43PM -0500, Chris Morgan wrote:
+> > > On Fri, Jun 06, 2025 at 10:21:37PM +0100, Russell King (Oracle) wrote:
+> > > > On Fri, Jun 06, 2025 at 01:54:27PM -0500, Chris Morgan wrote:
+> > > > > 	Option values					: 0x00 0x00
+> > > > 
+> > > > This suggests that LOS is not supported, nor any of the other hardware
+> > > > signals. However, because early revisions of the SFP MSA didn't have
+> > > > an option byte, and thus was zero, but did have the hardware signals,
+> > > > we can't simply take this to mean the signals aren't implemented,
+> > > > except for RX_LOS.
+> > > > 
+> > > > > I'll send the bin dump in another message (privately). Since the OUI
+> > > > > is 00:00:00 and the serial number appears to be a datestamp, I'm not
+> > > > > seeing anything on here that's sensitive.
+> > > > 
+> > > > I have augmented tools which can parse the binary dump, so I get a
+> > > > bit more decode:
+> > > > 
+> > > >         Enhanced Options                          : soft TX_DISABLE
+> > > >         Enhanced Options                          : soft TX_FAULT
+> > > >         Enhanced Options                          : soft RX_LOS
+> > > > 
+> > > > So, this tells sfp.c that the status bits in the diagnostics address
+> > > > offset 110 (SFP_STATUS) are supported.
+> > > > 
+> > > > Digging into your binary dump, SFP_STATUS has the value 0x02, which
+> > > > indicates RX_LOS is set (signal lost), but TX_FAULT is clear (no
+> > > > transmit fault.)
+> > > > 
+> > > > I'm guessing the SFP didn't have link at the time you took this
+> > > > dump given that SFP_STATUS indicates RX_LOS was set?
+> > > > 
+> > > 
+> > > That is correct.
+> > 
+> > Are you able to confirm that SFP_STATUS RX_LOS clears when the
+> > module has link?
+> 
+> I believe this is the case. I've sent you a dump of my EEPROM when the
+> SFP+ is active (it's now powering my internet connection at home) in a
+> private message to confirm.
 
-I've just found that this current patchset didn't apply to
-net-next, thus, the NIPA tests didn't run. I will send a v2 soon. I do
-not plan to change anything, other than rebasing it.
+Yes, I can confirm this. The RX_LOS bit on SFP_STATUS appears to work
+correctly, so all we need to do is ignore the hardware signal(s).
 
---breno
+> > I'd prefer to have an additional couple of functions:
+> > 
+> > sfp_fixup_ignore_hw_tx_fault()
+> > sfp_fixup_ignore_hw_los()
+> > 
+> > or possibly:
+> > 
+> > sfp_fixup_ignore_hw(struct sfp *sfp, unsigned int mask)
+> > 
+> 
+> Which of these would you prefer? Do you want a function for each
+> scenario or just a generic sfp_fixup_ignore_hw_fault_signal()? I can 
+> create functions for each and then apply them to my device (and
+> probably update the sfp_fixup_halny_gsfp() too since it's identical to
+> what I'm trying to do plus the delay bits).
+
+I think the latter as it's more flexible and less code.
+
+Yes, please update sfp_fixup_halny_gsfp() as well.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
