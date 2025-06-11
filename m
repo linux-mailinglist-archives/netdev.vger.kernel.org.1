@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-196492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D491AD4FF9
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:35:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 063EDAD4FFC
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DC53A3479
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:34:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E9DD3A83E6
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A199F266565;
-	Wed, 11 Jun 2025 09:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BC1267F66;
+	Wed, 11 Jun 2025 09:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OR7Ccm7c"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OaYEbMNu"
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F3925F961;
-	Wed, 11 Jun 2025 09:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FC525F979;
+	Wed, 11 Jun 2025 09:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749634425; cv=none; b=Dy/8iXHU0VIhZkhQFux/xLmM42SV8ykogscPNzBRkeM2Z/ywVY4QSs66Wm14/RydQG5SPVie0YA3uaBAq/FM4LgbPiazSQ/IzBNi6mVVYvz/Olrcge38YCY7jZ4o29zO9/M/b4lGOy9qWNyFp+CaPVd8YakvHtex9JUYqt1nRx8=
+	t=1749634427; cv=none; b=YIjhzCtPCOghyHjzE1JEZpa27EJaltuU5xRdVptubqNDwJzh3HWdEqfPDswnGs3Ifygko2halgBhTY0m+i6VPAtpYXzGk+jdxzqQbdDy+5cngohKbn+BWskLGFoOPKIXCOtTZkbcVoHCSfE/AwmhA4T/ndnuYHUqJi7AUOBu0HA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749634425; c=relaxed/simple;
-	bh=34m+rAyPyibqJfcT7OFlHLh8GE8mK4kGKtxYmJ2ytc4=;
+	s=arc-20240116; t=1749634427; c=relaxed/simple;
+	bh=lAO7ICT8rPi2jW/yKmCQoIc5yJNSzG6H883GDZTA6Eg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kk6CeYv2yUAEPetvcp/5TpOI0GGXHIUNi9DuK4ypkV30Ka5yxCny65RO5ZaUJM7CAIg5oN7LXgp/DxL/9Ox9dsUX6mCZkydl+JHtpH5+Z9UHPWa+eBZ2nkdnSt07XxiKkjgGZTp1Zv8ax63Zq7YwqEGC9TQ1VoPA/cBrNjLl6FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OR7Ccm7c; arc=none smtp.client-ip=148.251.105.195
+	 In-Reply-To:Content-Type; b=j7BgtC3JppxyVNjtoBtc1y88awkQTOFUgBDyffwcNMKL5AiY6LVEveo1jdPCXjsYT6DYsqQuqKqs1OH7UbsNby4mMJfPdrM79Y3jh1bXx1j5Qv1oKAE15ZLlLYtdNzP5huhTtqpZ97hmryHxUvTOK3Gcx/ULDyyt4cKdPJdWd54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OaYEbMNu; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1749634422;
-	bh=34m+rAyPyibqJfcT7OFlHLh8GE8mK4kGKtxYmJ2ytc4=;
+	s=mail; t=1749634423;
+	bh=lAO7ICT8rPi2jW/yKmCQoIc5yJNSzG6H883GDZTA6Eg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OR7Ccm7c3ax4tuKRbAp81y0hcQ+3ZxXFk5XZj+eBT4QchyCoZO86EcMYfp994k2V1
-	 gje+tgrGZkFOInv7MQCFimbMgf26iAfWcvODLUzqtHLiy2fY306uGzH4P6SfCCrF6q
-	 RaviSGrsFldE1v20sn6YPF0mBGD375tUyIptIGnhr/WrDzGiXhPmb5UVfZAXY2EMZB
-	 rTLgCXPGc75Fle7udyYeiiBmjccGlcqX4mc5ehRavfCct1uvHIYOVLLL0GMJ7s6ZCY
-	 +omlL2cH3iVrHMzPvn/22aUY7VXOFMhIXDC62J8B2ACULR8Peri/E3X7Phm4DaGlYF
-	 nyPk+ak70EecQ==
+	b=OaYEbMNudDi8ORJRv5JVQtJGvVka/LQLBHfvrTI/7GMZbfUSONdbHLFx5Sud+94ZY
+	 K44xXTp7i6goU83CFlmdDpcFtQk6gvCc7vDWoSaLKCdoRZdBA4ulZppatpjbtcdtLG
+	 vrlX65aGJo8JUrl337gzmeXj5k0tN3kfes5aefLkRFgKchXgflY+Z0tB6qwh4yRcZx
+	 /jq8u0eqAH59fg0Gl8SwVR/NbKscxrT7QXwA9BDI8I4AVdaPNJ5jlk7Cjl5QjR+Y5O
+	 OXUlGjDVYSaYIsCwwbWJ6ybsOruAea2A3NXWy/5+9C4I9CxFXkuXRLtY3MFEwQHzV0
+	 7WUCcv0/qmdpQ==
 Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
 	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 65F8E17E1045;
-	Wed, 11 Jun 2025 11:33:40 +0200 (CEST)
-Message-ID: <85fc43ec-5d2a-4976-8343-ab348835145c@collabora.com>
-Date: Wed, 11 Jun 2025 11:33:39 +0200
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 253A617E3626;
+	Wed, 11 Jun 2025 11:33:42 +0200 (CEST)
+Message-ID: <12816e74-9708-4e83-939a-347e1f6f6f5c@collabora.com>
+Date: Wed, 11 Jun 2025 11:33:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,8 +57,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 11/13] arm64: dts: mediatek: mt7988a-bpi-r4: add aliase
- for ethernet
+Subject: Re: [PATCH v3 10/13] arm64: dts: mediatek: mt7988a-bpi-r4: add gpio
+ leds
 To: Frank Wunderlich <linux@fw-web.de>,
  MyungJoo Ham <myungjoo.ham@samsung.com>,
  Kyungmin Park <kyungmin.park@samsung.com>,
@@ -80,25 +80,33 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
  netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
 References: <20250608211452.72920-1-linux@fw-web.de>
- <20250608211452.72920-12-linux@fw-web.de>
+ <20250608211452.72920-11-linux@fw-web.de>
 From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Content-Language: en-US
-In-Reply-To: <20250608211452.72920-12-linux@fw-web.de>
+In-Reply-To: <20250608211452.72920-11-linux@fw-web.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Il 08/06/25 23:14, Frank Wunderlich ha scritto:
 > From: Frank Wunderlich <frank-w@public-files.de>
 > 
-> Add aliase for gmacs to allow bootloader setting mac-adresses.
+> Bananapi R4 has a green and a blue led which can be switched by gpio.
+> Green led is for running state so default on.
 > 
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> Green led also shares pin with eeprom writeprotect where led off allows
+> writing to eeprom.
 
-s/aliase/aliases/g
+This is extremely ugly from a hardware perspective and I'm sad to see such
+a thing here.
 
-after which
+Though, I don't see any other solution, so I can only give you an advice:
+don't ever write to the eeprom from the kernel. Things will eventually go
+south otherwise.
+
+I would also advise to add a read-only property to the eeprom node.
+
+Regardless (and sadly),
 
 Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-
 
 
