@@ -1,293 +1,236 @@
-Return-Path: <netdev+bounces-196500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D97AD506B
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:45:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665CDAD5062
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78A7D1BC2497
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:41:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DA567A623B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79853261399;
-	Wed, 11 Jun 2025 09:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C516325F97D;
+	Wed, 11 Jun 2025 09:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pT85o15H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QEZI/5jG"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FE2262FCB;
-	Wed, 11 Jun 2025 09:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749634879; cv=none; b=Qxp2ICvTOk8lvTwHWEEsjIzqnkbsR9M5NGpbJ6u8AF20aXqgml666Cq0VBHwaPxGsQEAi9Fi3ENkceTSwYxozh4+SN8DgcvHon/g2qbTzs/3LCaT4FLkVA9HR0JpFjpOVXTo2i05zZ71a09XqrRCPGggjPhQYhEXOxglxF+uZOc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749634879; c=relaxed/simple;
-	bh=TsHTys5p+kCpjkxZoTXlOVWR2jW1yNLCbU1XBZMBavo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=j5qaTNEyWj/TJJxo9EBAJazeOsgI4f2M7jgdlCmJvQ0g5aOZv/R6C2XoBHC/d1ApwZPel0+XjoeV9zh8eyxSBpSLxu/xaqYhVgZ2RJ41vqp9gKPVDH2RrXQ2HwyvM7emK9hNO4vX3mNhZfsCaydxdyhxf54Tmc+CisJJYe71iuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=pT85o15H; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55B9efh92551038;
-	Wed, 11 Jun 2025 04:40:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1749634841;
-	bh=ICMYgHUJn775s1HXZV50Y8Poxnt8AvE5dvw388PWPI8=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=pT85o15Hr4oz59yGeBfsMmFt92cujnTwoD1eitRxyiqKJEszp0HsM/zOsGnLPXZf+
-	 qtOetbW9WFgDBT8cVc/TpYz5+2Zpj+yJu9nSkB3i1XGpVM2zIfCK1pSutnISft2F0Z
-	 XsaFavfy8YiFiv8afdXxuzC2dXJrjIzggjyLRBKE=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55B9efpE1631823
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 11 Jun 2025 04:40:41 -0500
-Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 11
- Jun 2025 04:40:41 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 11 Jun 2025 04:40:41 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55B9eZCj137397;
-	Wed, 11 Jun 2025 04:40:36 -0500
-Message-ID: <10d1c003-fcac-4463-8bce-f40bda3047f0@ti.com>
-Date: Wed, 11 Jun 2025 15:10:35 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5F5136996;
+	Wed, 11 Jun 2025 09:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749634984; cv=fail; b=gQ/2DhQZs/qeWL989vyirO18R4Y5JYxR//ffAxJgrbjkJJ6am3Ew8jjV2wDXp+HSBrC3/WXqh0pvnvv4xRLvTPKslwCpmSW2JkfpUgK+SeadGVgvYd2AbHypQoTfA2LVoJm8HEgaQIV10ENYPr5FOqIvHXP6HNGYHEC2F+t5Z6Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749634984; c=relaxed/simple;
+	bh=nSlyPAMXGahfFM/XxklEy2w1uqRE26tNSG7V6uTIceE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=A3UlwfugtpJaynb/y0V14BqiVP7KJej9c8Eo1TDfdx6i/37++9KgBCOlSKir3I8+eIv3Lfa+Yh0LoquejpXCbTrzMX8Nxom3BjsT1a5fDBp0Guit+LCWsrjoLxJ9jVkCjJIxXsYiLwifWP0uTSwfFRrVKKVcUMI9HhiN1jWN6vo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QEZI/5jG; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749634983; x=1781170983;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=nSlyPAMXGahfFM/XxklEy2w1uqRE26tNSG7V6uTIceE=;
+  b=QEZI/5jGTAruSW4oC5eyOD9VVqFSleYW5Bs/enLnbICSk7ELrs0h7Me5
+   MgKbeGtc7+DCJCeHs9B8ActR7mj3nSdO4+Qx7ELz+NJdnEtVy22l9dMAp
+   oYflkGf0cJbhVq/5ASJI8HeFqlc+469RI2QUfsl9iJSX28GtPg9rac6Z7
+   1nz7DrJwVcczRJbvtPw18oP9knoiAzeUEWSwqoh6LId8IYMCHT7yj8cOP
+   /wP0iwEHXQcrvN30vufzIoLFYoSkMSo2Zrf2c+/5lwPewHi6tITCDvqNn
+   Ozx4CgS7A+4g/x3a4a7w4JsMWqb5EImU9u3Aey+KcquBcgP3o0C3W4j/Z
+   Q==;
+X-CSE-ConnectionGUID: owHNI48+SeKr7Z9O2aZmGA==
+X-CSE-MsgGUID: kOZO4K1oRZWUtKXvlRW2EA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="63118163"
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="63118163"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 02:43:02 -0700
+X-CSE-ConnectionGUID: Ph55nz5ETOy4t6eJ+4J/qQ==
+X-CSE-MsgGUID: jIgcawe/Q8GoQspotP8EWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="148060172"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 02:43:02 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 02:43:01 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 02:43:01 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.80) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 02:43:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ma2bZLFGTNPc3XE8U/fRbFVoeqY4nDv81Tx8i5q2vLpGs/QZZmXOCMBr1lN0tSRGhdK3Nojyc8xEBC8wkA7Ty1Q3nLNtZmwz0JbFAb3xv74SyYSHD3Ls5l0ez6Aef4zudkfmgNRI0DsvhjT7kdy1wgRd1fCN8qahyhx63YGEmAtu4WL7y68CMHUm2eRRjT3qECBVUxXXhXPn5/2mra4/rxsUBt2f4gz6Pd2Mj7/5YMPuDvy+DtGQIo6h/mTWJ8Y2v3CKI1hv39pe7fIeTSV3gDGrY3ga05kfNukgPqdCu5QOLA5v6XMjBKR2vIJ1YId0E0D44RTLAs+InrDkvzOEPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JgeCOKckQrTpRbb2e5h/CJ7lNqCGM2NVN1k4UnocWo8=;
+ b=hIlRVY39o1/aAPzfADE5qUtEmp/GvqaZs9HqTzBr0blKD959nt/Uv371YRHrYoxAjjciNru+ENhuW5+UGfsiZLnmrpd0VW8AuptyZ3BercJGn+O6a+MWfpw3jnjZDs/K5V4OlnuX0qf3X4Z5bQCRmMcvhtG0DWSCmta9Rplf0tWxKZosS04ZmvelTxc/9b+7x4m9D4lePHM9YwnJ57N0z0CZMhv1rlvwQCMu8w/CveweLWGknDc3uIOUkXj+n27oH6jpB85QXAru/8f9YOeM8r4NVBQCo0F+QjqRLC/pU7jRrMIYC+SkhMjY/FuKpogMjZTvDsLTxBSrW/ofAQw7hA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5057.namprd11.prod.outlook.com (2603:10b6:303:6c::15)
+ by PH8PR11MB6708.namprd11.prod.outlook.com (2603:10b6:510:1c7::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.30; Wed, 11 Jun
+ 2025 09:42:58 +0000
+Received: from CO1PR11MB5057.namprd11.prod.outlook.com
+ ([fe80::4610:6d6c:9af6:2548]) by CO1PR11MB5057.namprd11.prod.outlook.com
+ ([fe80::4610:6d6c:9af6:2548%6]) with mapi id 15.20.8835.018; Wed, 11 Jun 2025
+ 09:42:58 +0000
+Date: Wed, 11 Jun 2025 09:42:48 +0000
+From: Krzysztof Karas <krzysztof.karas@intel.com>
+To: Jeff Layton <jlayton@kernel.org>
+CC: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Jani
+ Nikula" <jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<intel-gfx@lists.freedesktop.org>
+Subject: Re: [PATCH v14 3/9] ref_tracker: have callers pass output function
+ to pr_ostream()
+Message-ID: <ktsjjdsvbyf6loaa5nnyotzdc4wenshcwwqnzm7txvv2n3dhgl@76qg4ynjzjuj>
+"Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173,
+ 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316"
+References: <20250610-reftrack-dbgfs-v14-0-efb532861428@kernel.org>
+ <20250610-reftrack-dbgfs-v14-3-efb532861428@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20250610-reftrack-dbgfs-v14-3-efb532861428@kernel.org>
+X-ClientProxiedBy: BE1P281CA0223.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:88::6) To CO1PR11MB5057.namprd11.prod.outlook.com
+ (2603:10b6:303:6c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10] net: ti: icssg-prueth: add TAPRIO offload
- support
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Meghana Malladi <m-malladi@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Simon Horman <horms@kernel.org>,
-        Guillaume La Roque <glaroque@baylibre.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Roger
- Quadros <rogerq@ti.com>
-References: <20250502104235.492896-1-danishanwar@ti.com>
- <20250506154631.gvzt75gl2saqdpqj@skbuf>
- <5e928ff0-e75b-4618-b84c-609138598801@ti.com>
- <b05cc264-44f1-42e9-ba38-d2ef587763f5@ti.com>
- <20250610085001.3upkj2wbmoasdcel@skbuf>
- <1cee4cab-c88f-4bd8-bd71-62cd06901b3b@ti.com>
- <20250610150254.w4gvmbsw6nrhb6k4@skbuf>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250610150254.w4gvmbsw6nrhb6k4@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5057:EE_|PH8PR11MB6708:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63904172-54b1-45bc-e391-08dda8cc5922
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?OGN0dENXd3U4bGJWemVSZVg0TWJ6aU1PVVdQRXZ1NkVKMHVNMmQwVEJ6dkJV?=
+ =?utf-8?B?bGtHMzBUUGNJbGowSWlvNEs1andCRDExNTZRUDFlSjhVcWhNMXlCQ1NGblUx?=
+ =?utf-8?B?OGxwdnBVcEd1cUpuUzZUSmpaSnlrVk4xYnhDMGsrU0JHVFVTSHQ4d1ZJZ0w3?=
+ =?utf-8?B?SnBSUEFGMTFGQ1NYL1ZmWmV5Z2d0bXhkVlZxRnJBNmxmT0dwM0NSWWVpcDdH?=
+ =?utf-8?B?a0IvSUFsRXhGdEpnOWZzcDNiUTVCVjRzSUNMRkhURmNhR3FjLzRsTVNBMWxo?=
+ =?utf-8?B?c2ZDZHc3aFdGUWlJZkgyREFvQ3A5NEFjZlUxZC9PLy9MOU84V1RPcXdxRHhr?=
+ =?utf-8?B?YThYcnpObHl6UjBBVm5Uck1NSUtXZ0JPUmlqR3JlNnFyeGh0c28zdVNUUlll?=
+ =?utf-8?B?aUNkOGZqU2J0ajIzUXNlOGh6V0hPTjlTa0RxVW83d05ZRVo3eHpWMU12cU5X?=
+ =?utf-8?B?YTZxUnhuU2hVT3N4V0dHbUc3RlV6d3pIaTRrM3Z4Z0pvMFdWY2k5bFFXVHo4?=
+ =?utf-8?B?bThZWnFBby9laUhCbXY5dmlybnlzME5lRVZpekM1SjRidUxsZkRJOVpyaXp0?=
+ =?utf-8?B?QWVjc0V3UGtYU0t1OWhyanZ4eDVybVVmdmgyUG56VjlsN2RvYUtuUGJKRDVO?=
+ =?utf-8?B?U3JMV3VISTZGcG13Y1FiT0FJcDdvOWdWUHhTSkRTT1FiOWRGbVRwdTg3UitC?=
+ =?utf-8?B?b2s0UFdENGR2czc2N3E1WVlIMHlKYU9IcUR0YmsxYnpEL1BLbGxTMnlOQlFR?=
+ =?utf-8?B?VFAyYzZ4ZWlQNFQvOEFGcytDb1FkcjBFZkY1YWpISTVMLzVuUFVJd2g5RmZK?=
+ =?utf-8?B?eWFFVmU3VStJK2JQbVRIeXNqb1UzbGxldVVRN09YbEZqa1kweFpSSzFnS0hn?=
+ =?utf-8?B?a0ZTLzNza0orU1JpRTUrN2MxblFWVlRPWHpmU1Nud1VVazFZRXUxZnQ5bk1o?=
+ =?utf-8?B?eHJ2OWlEaDFabmxhb0tySnFIYUhkRjY3bjNST2NOQ1phbWFETWxEbkhSZVlD?=
+ =?utf-8?B?L1plSllPMmRpMXNxcVhMeDNmdTM4VXp2djRncDB0d3R5SlZLcStkVW1PZHpW?=
+ =?utf-8?B?cWtZd1F3ck9UZ0hFK296L3NrNTRya21SbDZ6a2JMZUZFYy92N2txdDcvU1ha?=
+ =?utf-8?B?NThldldIRmF6Q1BJbjZCZ3FQbFJWKzR5U3gwaFlCY1EzRDJjdXJiSlZCNGVn?=
+ =?utf-8?B?YldIWkcvM2pjdWVGVkxITXZjMUxTT21PUjRlQ1NNMFNXZ2dHVWFpdjBZUGl5?=
+ =?utf-8?B?VldjbW14UWk4bGgrT2Y0dVh1N3hJK1dsaDQ4Ym5lVEdvSTNiRkVGNkovZExs?=
+ =?utf-8?B?dE1IMzFWM1NEV3ZWdGUxenZtRk5qUEZBTDlDeHBzNHMycFViSnFjcS9OY2pQ?=
+ =?utf-8?B?V0FDd1duTisrd0ppZ3Z5MmcrTXZqZ2piWFozM1JVWVhNbHBnTm9FOEYxSDdP?=
+ =?utf-8?B?RmhXRnVLNjNnWWEwMUw2bThsTnRpWDhwSmlXaEszL0J4L2ZJcFNHeDRiZmFS?=
+ =?utf-8?B?WE9OR2RNOEhOSHE5bk90Mkoycko2ekJaYW5FWXArb3o4T1JTVWpkbm1vaTh1?=
+ =?utf-8?B?ZTZ3dnBDNVZ6blhSRE5ZZm5JZHJ6STdkY0g4WFMrblRBRG5tQmp6LzRGS2J4?=
+ =?utf-8?B?VVVEOGo0d0F0Ni9uWVMxRGVoZzE3b3Y0dlhaYnZDT3luVWdjckdtTzIwUjZO?=
+ =?utf-8?B?U2RZVWJ5VTRFQ1kyQUM1RmcreWV4eEd4bVdETVpaOERYUmhkTmxIdFJOVUc5?=
+ =?utf-8?B?TFpCMzNvTnlQa1RvYkRaeCsvR2lyMHJ1SkN0VkcrN1FBUmNsWHA5eERxKzBw?=
+ =?utf-8?B?SE9GbFpTZG5Xem13emVBbEMwZG83dU1DZ1M2Um5lQnhrMy9pTE5uT1VnRFpu?=
+ =?utf-8?B?R2VLZFBpYVAyRFhCR2NsaVRuMk5HY3ZBcG1SRU13ZDVqQURsTWRvQld0di9C?=
+ =?utf-8?Q?K4wZSyFsI9M=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5057.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cVV0Ry9Sc0twWTYvRmNKU0dSNnROK2J2Q0dZbjBEV3M5TXp3V2JYcmJnNThn?=
+ =?utf-8?B?VDhLV1FmVmpQd2I5NVlsdGlQUEdnL3M3aktvQ2VPUW1ZYXAxTVV6RkFQL3Ev?=
+ =?utf-8?B?ckgrVzdCbFhZN2IyWmZPdkt4dXM1eVJNOHpZWlNuZ0IycWtZY1N4eGd0UmVM?=
+ =?utf-8?B?TVFERm0zUmJrdE1ja1Jab09lQ1R3K3JaWW5zWnpxcDczMmg1Um80TWNUaTZ1?=
+ =?utf-8?B?ak9oUFVvMStoZW03TTdwY0lqdjJYMStuSkZEWVJLVWNkVEdXTFhPd3AwbGty?=
+ =?utf-8?B?dlBrclBvWUFGekZTMVo2Qkgzd2V2SWppQ0VFL3Zoc2xMdFNKcVgzMWVsbm9Y?=
+ =?utf-8?B?K0NCNkdwejNGak1rZWNoLytkaWMxYVNHRldMNTJOTDdLNWZiYXVzN21hU3pR?=
+ =?utf-8?B?L01FN2NvOWpsNGx3bHF4Wko1QzhvQXZ5bWRZQ3oyR0dKUlRFdzNVUStPcjk1?=
+ =?utf-8?B?eHNGVFBMK29BMGkrUERwUHFPTXNRcm11RVFEQjBOdXJjdzNnZ1BabGEwSVRr?=
+ =?utf-8?B?ZjZMYnBZMDhyS0c1am4rSGZpNEkzOEJ1alM2QU81aWN4bGN2em1ST1J2dzRI?=
+ =?utf-8?B?cHVUd2FNdTFnVGFEbDRsWk1TTThLYmJPL3NEc2JqYWV1ZFpwMTNhSnFoTDN2?=
+ =?utf-8?B?NkwrOC9OYkU4NGR6emwwaGpYZE1ZTU5KVHM4ZzZIYnE3Mk1wV1d4K3dYMjcx?=
+ =?utf-8?B?TTNUQmRWOXlqMWFUYjVsbS8wT01sdFN2YVBiUWhSWC9NdXo2bEp3K2RDWWw3?=
+ =?utf-8?B?RVR5V3p5RXRNQi9HV0w5Nkk3LzE5TWJhdkFSN0NQN1ZhWk1ET2JxeTdoMFlz?=
+ =?utf-8?B?UkRJZmJEalBtOGRRUi9NT05WMzczT20rNHpORGZvVS9nbThnSzBzaURLSmNZ?=
+ =?utf-8?B?ZGlUalFiNk1MSlFRS2xGS1E5dGErT0xXQUJJcFN2VWlFeVRodWIvNUZ5MmUw?=
+ =?utf-8?B?c2pkQ2lZdkNWdWx5U09ITmU4YWNzcUN6ZEtxb0FpbEVINDczUVl2aHZabm1H?=
+ =?utf-8?B?Q1ZLZnhMbEpSR1RNVGszTmZvajF0QUlXSDRsMDFzcDRIYWhVZ1M3VEdSeUdF?=
+ =?utf-8?B?R3I5ZDI4bHhQZUhsTFJSMlY2ck8xZlQ0Y0hvSHBrUHVGRlN1ZnlVUVRacWVl?=
+ =?utf-8?B?RGVDT2NMd3BIeFJqWHZkWlNIOC9hWVRSbHFnMXplckUvTGxFN1pMZkpWUkhk?=
+ =?utf-8?B?bml1MjFkc3dCSlJndWI4ZUNDb3g3a3JXL3V1MExMaHZqMTJ4cHU1M25zaVNp?=
+ =?utf-8?B?d1BBeWVGYzFOdlpuZlNqZkZYc24rN3lxblFzak9pM2pFSUFxK2pTWDBEbHpZ?=
+ =?utf-8?B?MU11eHI1c2g4Qk90Q21MSmdMQmlseXJYb0x3eFcyd2p4Q2JUa2pBcEJTMGVI?=
+ =?utf-8?B?VWRGVmxzTzExYXhJUXY0czNQcEZiUlJVYUNjNVBhdDBxRlFDLzY2aXNwSnNQ?=
+ =?utf-8?B?KzR2eDJNWjBZNlg1QVNXVmFEVXNoeW45RzRRQ0NkdCs3NWlYWFNxbkN2bG9m?=
+ =?utf-8?B?TTQwcHNYNVRXMGc4RlZlRzdhUFJKOHV3UCt1TGNHdVcvOTNnbWRVTy9jQ2dB?=
+ =?utf-8?B?NEF1cEQ4YnZPRkErak84ai9HVEFicjc2cEw5aDJTc2RoZHVYOEcwZzRXU1J0?=
+ =?utf-8?B?MzJ4SUF5MnVVYS9RV1JBdHNtVmVjQ01hUmNMUlMzdWpIcjBPSU1DY3pWNC9k?=
+ =?utf-8?B?TEJaR21uUm4rSUtSQzdieWJZTjAzYk1sQy81UkJYSG45K1MvZSswM0RLZzZB?=
+ =?utf-8?B?TUN1L2dkdHNIYk8wdHV1RVFlZ3VJczhDZ2xIYkhDN2JQQ0lzL1N0dFp5THlz?=
+ =?utf-8?B?Nkh6RGtUK2dFU2trR0psQ2pUT0RpK3h4UVBwR0RDZWN0WFAzWVlzdEJJWXRp?=
+ =?utf-8?B?ZjFDWmpaOUJFVzNvQ254Z09CcGJ6TGRQVVRlcGFra21hUVg2azBkMHFLSWJY?=
+ =?utf-8?B?dTBxRWJhbzZUV0tHbHl2RElLU25UTUpSbTdIZW44aVU1bkhlKzRxUmhHMUta?=
+ =?utf-8?B?ZFB3aURmSisvVDFqREcvc0VlKytLV2dsT0dYRFNMOWt0dUxnZmVkQ2VKb2lZ?=
+ =?utf-8?B?cjUya29TbzBESmloTlFFeTJscExqd0Y1OXE4UFY0aHQ4a3I5RnR1a0lyb3Bl?=
+ =?utf-8?B?a1dYTGQrNkxFSU9kRlJJcjJFKzROWFUyKy9zR0JQeDFsWUkvU3VocGx3YVZR?=
+ =?utf-8?B?cGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63904172-54b1-45bc-e391-08dda8cc5922
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5057.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 09:42:58.1033
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2E8CfqCLMLwSojG/QVE2hns01SqclVDElQcZ8obcb6RNTeFM2NnjnrH+jTXkjbYViN2CaYD74/g7T7cj+8XeUQDqeBOws09J0yrHgQyn/qA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6708
+X-OriginatorOrg: intel.com
 
+Hi Jeff,
 
-
-On 10/06/25 8:32 pm, Vladimir Oltean wrote:
-> On Tue, Jun 10, 2025 at 04:14:29PM +0530, MD Danish Anwar wrote:
->>> 1. If there is no "existing" schedule, what does the "extend" variable
->>>    extend? The custom base-time mechanism has to work even for the first
->>>    taprio schedule. (this is an unanswered pre-existing question)
->>
->> The firmware has a cycle-time of 1ms even if there is no schedule. Every
->> 1ms, firmware updates a counter. The curr_time is calculated as
->> CounterValue * 1ms.
->>
->> Even if there are no schedule, the default cycle-time will remain 1ms.
->> Let's say the first schedule has a base-time of 20.5ms then the default
->> cycle will be extended by 0.5 ms and then the schedule will apply. This
->> is the reason, the extend feature is also impacting get/set_time
->> calculations.
+> In a later patch, we'll be adding a 3rd mechanism for outputting
+> ref_tracker info via seq_file. Instead of a conditional, have the caller
+> set a pointer to an output function in struct ostream. As part of this,
+> the log prefix must be explicitly passed in, as it's too late for the
+> pr_fmt macro.
 > 
-> So what is an ICSSG IEP cycle, then? I think this is another case where
-> the firmware calls something X, taprio (and 802.1Q) also calls something
-> X, and yet, they are talking about different things.
-> 
-> A schedule (in taprio terms) is an array of gate states and the
-> respective time intervals for which those states apply. The schedule is
-> periodic, and a cycle is the period of time after which the schedule
-> repeats itself. By default, the cycle time (the duration of the cycle)
-> is equal to the sum of the gate intervals, but it can also be longer or
-> shorter (extended or truncated schedule).
-> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
 
-Yes I understand that.
+Looks good:
+Reviewed-by: Krzysztof Karas <krzysztof.karas@intel.com>
 
-> Whereas in the case of ICSSG, based on a code search for
-> IEP_DEFAULT_CYCLE_TIME_NS, a cycle seems to be some elementary unit of
-> timekeeping, used by the firmware API to express other information in
-> terms of it, like packet timestamps and periodic output. Would that be a
-> correct description?
-> 
-> When you say that "even if there is no schedule, the default cycle time
-> will remain 1ms", you are talking about the cycle time in the ICSSG
-> sense, because in the taprio/802.1Q sense, it is absurd to talk about a
-
-Yes I am. By default cycle-time, I meant IEP_DEFAULT_CYCLE_TIME_NS.
-
-> cycle time in absense of a schedule. And implicitly, you are saying that
-> when the firmware extends the next-to-last cycle in order for unaligned
-> base times to work, this alters that timekeeping unit. Like stretching
-
-Yes. This is exactly what's happening. The IEP cycle and schedule cycle
-are related to each other in firmware implementation. I am not sure how,
-but that's what the firmware team confirmed with me. Due to this, a
-different cycle-time in scheduling impacts the IEP cycles and
-get/set_time APIs.
-
-> the ruler in order for a mouse and an elephant to measure the same.
-> 
-> I think it needs to be explicitly pointed out that the taprio schedule
-> is only supposed to affect packet scheduling at the egress of the port,
-> but taprio is only a reader of the timekeeping process (and PTP time)
-> and should not alter it. The timekeeping process should be independent
-> and the taprio portion of the firmware should keep track of its own
-> "cycles" which may not begin at the beginning of a timekeeping "cycle",
-> may not end at the end of one, and may span multiple timekeeping
-> "cycles", respectively.
-> 
-
-I understand that. But there are some dependency in firmware which
-results into taprio schedule impacting the IEP cycle.
-
-> What if you also have a Qci (tc-gate) schedule on the ingress of the
-> same port, and that is configured for a different cycle-time or a
-> different base-time (requiring a different "extend" value)? It will be
-> too inflexible to apply the restriction that the parameters have to be
-> the same.
-> 
->>>>> That's what our first approach was. If it's okay with you I can drop all
->>>>> these changes and add below check in driver
->>>>>
->>>>> if (taprio->base_time % taprio->cycle_time) {
->>>>> 	NL_SET_ERR_MSG_MOD(taprio->extack, "Base-time should be multiple of cycle-time");
->>>>> 	return -EOPNOTSUPP;
->>>>> }
->>>
->>> I don't want to make a definitive statement on this just yet, I don't
->>> fully understand what was implemented in the firmware and what was the
->>> thinking.
->>>
->>
->> The firmware always expects cycle-time of 1ms and base-time to multiple
->> of cycle-time i.e. base-time to be multiple of 1ms.
->>
->> This way all the schedules will be aligned and that's what current
->> implementation is.
->>
->> To add support for base-time that are not multiple of cycle-time we
->> added "extend". However that will also only work as long as cycle-time
->> is 1ms. cycle-time other than 1ms is not supported by firmware as of
->> now. This is something we discovered recently.
->>
->> We have a check for TAS_MIN_CYCLE_TIME and TAS_MAX_CYCLE_TIME and they
->> are defined as,
->>
->> /* Minimum cycle time supported by implementation (in ns) */
->> #define TAS_MIN_CYCLE_TIME  (1000000)
->>
->> /* Minimum cycle time supported by implementation (in ns) */
->> #define TAS_MAX_CYCLE_TIME  (4000000000)
->>
->> But it is wrong. As per current firmware implementation,
->> 	TAS_MIN_CYCLE_TIME = TAS_MAX_CYCLE_TIME = 1ms
->>
->>
->> The ideal use case will be to support,
->> 1. Different cycle times
->> 2. Different base times which may or may not be multiple of cycle-times.
->>
->> With the current implementation, we are able to support #2 however #1 is
->> still a limitation. Once support for #1 is added, the implementation
->> will need to be changed.
-> 
-> (...)
-> 
->>> As you can see, I still have trouble understanding the concepts proposed
->>> by the firmware.
->>
->> I understand that. I hope this makes it a bit more clear. Let me know
->> what needs to be done now.
-> 
-> Was the "extend" feature added to the ICSSG firmware as a result of the
-> previous taprio review feedback? Because if it was, it's unfortunate
-> that because of the lack of clarity of the firmware concepts, the way
-> this feature was implemented is essentially DOA and cannot be used.
-> 
-
-Yes, the extend feature was added based on the feedback on v9.
-
-> I am not very positive that even if adding the extra restrictions
-> discovered here (cycle-time cannot be != IEP_DEFAULT_CYCLE_TIME_NS),
-> the implementation will work as expected. I am not sure that our image
-> of "as expected" is the same.
-> 
-> Given that these don't seem to be hardware limitations, but constraints
-> imposed by the ICSSG firmware, I guess my suggestion would be to start
-> with the selftest I mentioned earlier (which may need to be adapted),
-
-Yes I am working on running the selftest on ICSSG driver however there
-are some setup issues that I am encountering. I will try to test this
-using the selftest.
-
-> and use it to get a better picture of the gaps. Then make a plan to fix
-> them in the firmware, and see what it takes. If it isn't going to be
-> sufficient to fix the bugs unless major API changes are introduced, then
-> maybe it doesn't make sense for Linux to support taprio offload on the
-> buggy firmware versions.
-> 
-> Or maybe it does (with the appropriate restrictions), but it would still
-> inspire more trust to see that the developer at least got some version
-> of the firmware to pass a selftest, and has a valid reference to follow.
-
-Sure. I think we can go back to v9 implementation (no extend feature)
-and add two additional restrictions in the driver.
-
-1. Cycle-time needs to be 1ms
-2. Base-time needs to be Multiple of 1ms
-
-With these two restrictions we can have the basic taprio support. Once
-the firmware is fixed and has support for both the above cases, I will
-modify the driver as needed.
-
-I know firmware is very buggy as of now. But we can still start the
-driver integration and fix these bugs with time.
-
-I will try to test the implementation with these two limitations using
-the selftest and share the logs if it's okay with you to go ahead with
-these limitations.
-
-> Not going to lie, it doesn't look great that we discover during v10 that
-> taprio offload only works with a cycle time of 1 ms. The schedule is
-
-I understand that. Even I got to know about this limitation after my
-last response to v10
-(https://lore.kernel.org/all/5e928ff0-e75b-4618-b84c-609138598801@ti.com/)
-
-> network-dependent and user-customizable, and maybe the users didn't get
-> the memo that only 1 ms was tested :-/
-
-Let me know if it'll be okay to go ahead with the two limitations
-mentioned above for now (with selftest done).
-
-If it's okay, I will try to send v11 with testing with selftest done as
-well. Thanks for the continuous feedback.
-
--- 
-Thanks and Regards,
-Danish
+Best Regards,
+Krzysztof
 
