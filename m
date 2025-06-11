@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-196443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7499AD4DCE
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:04:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56BAAD4DD4
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:05:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55BD57A9236
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:03:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA6F41BC0B4F
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B50238144;
-	Wed, 11 Jun 2025 08:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913B723ABB2;
+	Wed, 11 Jun 2025 08:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h2l8BlPN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fevznEIV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D0B2367B2;
-	Wed, 11 Jun 2025 08:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF79723A58E;
+	Wed, 11 Jun 2025 08:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749629034; cv=none; b=mbws1tYx8filsZgxQKryAhfowxi2VCxmfosl1MCL+ZS4NlnPnpd8a5O2tPJFzfSQDjp4ySLfMu/LOMqZAPLv/+sBt6C4tdmcWDBaBUWjUToiizGKfHfLCkDbM799/XAfJIzRon61mP+qkdr7db76bd0NZ0WF/20mU8KWeBq7ZI4=
+	t=1749629038; cv=none; b=VGLm0lbmP1ldmEA9jiQ3EszaK9KkKg0t3mU54lMwO9dR+hMrZxjgAmOzZXo6cS+adrEEiTpy5v50b1amLbVeokd8uo1mnMcdzt/N06dImTlTZ+tSUA5+W3fRS7b0L+37wV+dpQW+TzzEHorVI6NA/0Ce+iGEBqiJXBZbf/OAnuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749629034; c=relaxed/simple;
-	bh=aVABoyFzwx85oLCM7K97SuAwDlDMkxU4RoMkLM63GJE=;
+	s=arc-20240116; t=1749629038; c=relaxed/simple;
+	bh=EUI5QeL6eieWbEgVrm0C7erl4rUu/YZ5aTHVZ4tgyXE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lq2bXKXtgjSNm8cToW83UEKQqzucq3qhJL0BniyXNFjPORcghYrW+VDhoYz6nK1FvDZI8+9myeukKqWF04bbtYOhEULCL7+ybiFRhCIQsa6iuKrsykPyWnEtbdIE7LF7x5jO6RdpsN4EbST3ARwWCu4eZVAXz0sBWjGvWTHH3Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h2l8BlPN; arc=none smtp.client-ip=209.85.219.53
+	 MIME-Version; b=EAIPXjHtnFxANL6hv9m75daFT1aEx4jZlP6VF7etl4VhKMmlZlZuFeYffYMxIPHb37heT/wM8dWvVW+EnhDitVNNv0MIwWcbKZDvkYV3lMad5hwKSugLV47Mri1qX01PEXqBzMih5YVYOjD7rvPTi/4LJzc/WGQd7reCRTC94Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fevznEIV; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6f0ad744811so44641746d6.1;
-        Wed, 11 Jun 2025 01:03:52 -0700 (PDT)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6fada2dd785so73659126d6.2;
+        Wed, 11 Jun 2025 01:03:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749629031; x=1750233831; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749629035; x=1750233835; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kDPKzl/HokW1bKViSHJhhALGLh7FDXnYOeKnzw1e8Ss=;
-        b=h2l8BlPNhGQ7XCvhH4bXOM5SHJJ3OrN+W164p/StsJeYyPCTWvbnTMSbzVFYoQxikh
-         VQ7lorYnak17DT+rAO/ft1MBWsJL9twEtgJ6nL8GZJnNZb3D0r2WdUXaQp70t9xpVGp/
-         ejwscssHu8GRNFuEqZpYvRRyjTThYSHG71a+xJRkBk9bwmJiGsYo+2T8T1+9A2ictK+4
-         2pREfKV4AuihjcJ/KyRo0j2qEC5m5ejq7Coz+FJhXGvgec7ZU6wlFWqKcq4R4sVGqVX2
-         nDnQnPCOiyyJ4sOa49MazTxTi7I9WMihsIYmKAWJc6GVxVl8Uj1aFkaxhqcM0eo05Zds
-         /GOw==
+        bh=Jk7Khhw8gAKW9DoLENa1NeEo5OGSYSokoeVpM6P3AMw=;
+        b=fevznEIVj/ZUqdZZ2dg3j2+8eMwNF5QSwXgRM4SEQR9dKHr6W1DEXBaaL7BZD7D+mQ
+         BuONKeZTd89rHB32RndPnNM0zgxYMpxTQI9fg/boHih9tODAH206Qntlf4rxqpvgYI9z
+         CDUM+006TuaeAU4eVcPqNDIYUBwLlJTptl0/crOueZVr8IpXtRFwajsHeWYg5iKvW3X1
+         PCbCwK3kozabm0Z0z7z+U4a/d+OT3lK0CJNRuQwAXoRPVhxo/HOg6m6doy0ZXrRNnM9t
+         E0arMyuFj1jEIMsH4zhYfET/b5R4ngRBtMvaIwHhm7HxUgPnrjaN/BiOmcqXQzM9dTxA
+         Cn2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749629031; x=1750233831;
+        d=1e100.net; s=20230601; t=1749629035; x=1750233835;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kDPKzl/HokW1bKViSHJhhALGLh7FDXnYOeKnzw1e8Ss=;
-        b=oYzyuj7r9k/+WNITA3m5Tiwl8ApBuxaPP8jj9GYd4xNDNoFxLfzGItMsHw9PKjJM7n
-         WuBU8ZJUuAvokcsWOH1vcD4kQffe/vA83rRLRolIafXby8nouO+d1U0InPWLRe96Fd7I
-         7cLYJugK2sbRUofZAnvfuQd/4i819tVv3HXHG4o+DI11KMdOL/mePfpCJHg36Z+pIysC
-         y10jrSowARbPlTMnJ62H00aQU27DPML4s3KHbtOZ7o+IfPBK1vcK8k3HQ01qNK/D0yww
-         r+JEEMwWBPJaOEbKiG7DOd0nOAt1rYOkdNZHQaWX21ccRzHWLgpX2NY8XPJ4Q1WV08Jm
-         VR/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW9jQCusju2g/RTf/YLY8U9sqttyFkMg5JdC+8A+tMCG5eCz0G3A8H45Rz2xUjxbUP/WPCnKEBhtr80@vger.kernel.org, AJvYcCWHH3GmOS4fG9z8Q6LEJaO1ffJ7jClb1f3k3QOFodK59pVFSANQaErDau7I3kmCHCLDGfb+mZIWpOQFrYFh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt0JP/N9v/UWynPkPtEiyb23k0j0RIvRhkagAdNed/gxPEff9P
-	U0+Mj0nhPTCUyK1uNx5MjGM9+dgxbOgzvlIqcqZPUilQ1m9Vdf2C4I3A
-X-Gm-Gg: ASbGnctRUnNtRs/ciT2jqWKPUphm0y2SUITd00zuuyzBy98PIMYHe4MKiqBRSGJf7E9
-	uT3rnBgYn/VHWAA8zlXmJthjPTzxZgzSlMSCoaB1sOVaBS9YiGYgLV6TIpnF8MCP5nTIdgw8hcX
-	DeQToSCc8IclyiqOnmSeE8ZWK5l+FRL2HULGBaf6/MKSCSoLHG/jcWQhYYGXh3+az8xK6iMqSqV
-	sk8zhF0c1giP9w150QeLc6Bzp/QSOkI8dNw1C1rF08zDlX0hmJ4p+GzlNJcKEojWQ/1qcW6clkT
-	M9+R+jXz0s1VNG/HbYtN725PBjni+qp6DCGsFA==
-X-Google-Smtp-Source: AGHT+IGmp+EzAiX+KAE1F9bGl2MqzBQoWq5zi9NmJE6sYIlDWxZBH2JCYpju3CBjIhOcLVFq1e+owQ==
-X-Received: by 2002:ad4:5cab:0:b0:6fa:c46c:6fa6 with SMTP id 6a1803df08f44-6fb2c32a9bcmr35065916d6.12.1749629031132;
-        Wed, 11 Jun 2025 01:03:51 -0700 (PDT)
+        bh=Jk7Khhw8gAKW9DoLENa1NeEo5OGSYSokoeVpM6P3AMw=;
+        b=ljB+tn1vJyKQ3IHxZlVsxmSIqcKCAHj6k4Gj5WDL/6hhjDneXYtImE0XZp2P2oMBN8
+         bNN0wPK498nVz/JWL6b1Vwhiz+AWSjaV2yJOFDw1goWVcmgDuuWpZLqqPUdcYtAH6Ojm
+         cVCCQ7cxN3PntssKy47wiMI7Bd7JIz7NNnb2t7qfUVeABbrg/be7X95d1ibn/tIwTfmv
+         bGx5cfAUzKni/T2uNnY8Gu1gr0Z0BSteuPvOLzKjTM9DwXvTwCuTICDAVnhRCBo+LDXO
+         fJG4PIDmVa5dbGnP8xnZD58c85J8pJcyKEqRyHAE+6QQDhujTwlgOeND1hhSks/AUJrR
+         kZ/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ4rEzS4vVlW6msskSLw46884p8304xjXCm/d1ZPPcMwKtvx/mY1UFNL8GDG0Z/S0VAUnr0AKZzE6WNg7e@vger.kernel.org, AJvYcCXbEeTYY/SyHeaOAb7oWIY8KmiI4pYlTrpeoqr3bIAYzjSqmPa73MVd28Rw5dz+rCyunrw8NXuRs/8F@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr0kRHX3yKNxOiDE2pPZgpSdmY2cpglj5Yu+fWxiKjM0cwOql5
+	dcxAR1Lr2r8PY0INNIXxb6QY2yGtwPVhXHM1JDeTJ3cQdsB+bpO0G8NN
+X-Gm-Gg: ASbGncsdHWvo7wgp8n3iiwc05AVJUYBfhRZDmnrEUSnzZ5S68U81W7y4hKEIaPdaYgN
+	IhQkC944yjKogQaAn2UPpZXVSSE02uVPr9ekdll/fk/h+c4y4S+PGQlaeJ9UU5rImDxkcV2YbZp
+	6tI87MfgbSnto4qTXWDz7A1jZRn8Q2xMAWhW1geHfBIcLgQ4w7KOt+Pma0xwLMxGRJkk4tYk243
+	rezyVgakB373qcpI1ZOvm584kx0+TR/IP45FlDpBiCefH4JRQIAnSlXKDr1AGgnWQUsmt+lujHj
+	M116SYc0VUzW8MdZeDdE5MOmYmxprKzIQT8wkg==
+X-Google-Smtp-Source: AGHT+IH0eJcVpA3Axo1UhLVYk276iRhesKKZ51mNNdrlNRONtSi0+NgwJZgm5NkVtqY8aPkz01lwfQ==
+X-Received: by 2002:a05:6214:2a4f:b0:6fa:c246:c363 with SMTP id 6a1803df08f44-6fb2d1355b7mr30778916d6.13.1749629035565;
+        Wed, 11 Jun 2025 01:03:55 -0700 (PDT)
 Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6fb09b1ce86sm79639716d6.61.2025.06.11.01.03.49
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6fb09b36737sm79188206d6.115.2025.06.11.01.03.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 01:03:50 -0700 (PDT)
+        Wed, 11 Jun 2025 01:03:55 -0700 (PDT)
 From: Inochi Amaoto <inochiama@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -96,9 +96,9 @@ Cc: netdev@vger.kernel.org,
 	linux-riscv@lists.infradead.org,
 	Yixun Lan <dlan@gentoo.org>,
 	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH net-next 1/2] dt-bindings: net: Add Sophgo CV1800 MDIO multiplexer
-Date: Wed, 11 Jun 2025 16:01:59 +0800
-Message-ID: <20250611080228.1166090-2-inochiama@gmail.com>
+Subject: [PATCH net-next 2/2] net: mdio-mux: Add MDIO mux driver for Sophgo CV1800 SoCs
+Date: Wed, 11 Jun 2025 16:02:00 +0800
+Message-ID: <20250611080228.1166090-3-inochiama@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250611080228.1166090-1-inochiama@gmail.com>
 References: <20250611080228.1166090-1-inochiama@gmail.com>
@@ -110,73 +110,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Sophgo CV1800 uses an internal MDIO bus multiplexer to handle the
-internal phy and external phy. The internal phy is always on MDIO bus
-address 0, and the external bus can be configured with different MDIO
-address.
-
-Add documentation and compatible string for the MDIO multiplexer on
-CV1800 Series SoC.
+Add device driver for the mux driver for Sophgo CV18XX/SG200X
+series SoCs.
 
 Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
 ---
- .../bindings/net/sophgo,cv1800b-mdio-mux.yaml | 47 +++++++++++++++++++
- 1 file changed, 47 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/sophgo,cv1800b-mdio-mux.yaml
+ drivers/net/mdio/Kconfig            |  10 +++
+ drivers/net/mdio/Makefile           |   1 +
+ drivers/net/mdio/mdio-mux-cv1800b.c | 119 ++++++++++++++++++++++++++++
+ 3 files changed, 130 insertions(+)
+ create mode 100644 drivers/net/mdio/mdio-mux-cv1800b.c
 
-diff --git a/Documentation/devicetree/bindings/net/sophgo,cv1800b-mdio-mux.yaml b/Documentation/devicetree/bindings/net/sophgo,cv1800b-mdio-mux.yaml
+diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
+index 7db40aaa079d..fe553016b77d 100644
+--- a/drivers/net/mdio/Kconfig
++++ b/drivers/net/mdio/Kconfig
+@@ -278,5 +278,15 @@ config MDIO_BUS_MUX_MMIOREG
+ 
+ 	  Currently, only 8/16/32 bits registers are supported.
+ 
++config MDIO_BUS_MUX_SOPHGO_CV1800B
++	tristate "Sophgo CV1800 MDIO multiplexer driver"
++	depends on ARCH_SOPHGO || COMPILE_TEST
++	depends on OF_MDIO && HAS_IOMEM
++	select MDIO_BUS_MUX
++	default m if ARCH_SOPHGO
++	help
++	  This module provides a driver for the MDIO multiplexer/glue of
++	  the Sophgo CV1800 series SoC. The multiplexer connects either
++	  the external or the internal MDIO bus to the parent bus.
+ 
+ endif
+diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
+index c23778e73890..a67be2abc343 100644
+--- a/drivers/net/mdio/Makefile
++++ b/drivers/net/mdio/Makefile
+@@ -33,3 +33,4 @@ obj-$(CONFIG_MDIO_BUS_MUX_MESON_G12A)	+= mdio-mux-meson-g12a.o
+ obj-$(CONFIG_MDIO_BUS_MUX_MESON_GXL)	+= mdio-mux-meson-gxl.o
+ obj-$(CONFIG_MDIO_BUS_MUX_MMIOREG) 	+= mdio-mux-mmioreg.o
+ obj-$(CONFIG_MDIO_BUS_MUX_MULTIPLEXER) 	+= mdio-mux-multiplexer.o
++obj-$(CONFIG_MDIO_BUS_MUX_SOPHGO_CV1800B) += mdio-mux-cv1800b.o
+diff --git a/drivers/net/mdio/mdio-mux-cv1800b.c b/drivers/net/mdio/mdio-mux-cv1800b.c
 new file mode 100644
-index 000000000000..abe0004c8b6e
+index 000000000000..6c69e83c3dcd
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/net/sophgo,cv1800b-mdio-mux.yaml
-@@ -0,0 +1,47 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/sophgo,cv1800b-mdio-mux.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/drivers/net/mdio/mdio-mux-cv1800b.c
+@@ -0,0 +1,119 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Sophgo CV1800 MDIO multiplexer driver
++ *
++ * Copyright (C) 2025 Inochi Amaoto <inochiama@gmail.com>
++ */
 +
-+title: Sophgo CV1800B MDIO bus multiplexer
++#include <linux/bitfield.h>
++#include <linux/bits.h>
++#include <linux/delay.h>
++#include <linux/clk.h>
++#include <linux/io.h>
++#include <linux/mdio-mux.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
 +
-+maintainers:
-+  - Inochi Amaoto <inochiama@gmail.com>
++#define EPHY_PAGE_SELECT		0x07c
++#define EPHY_CTRL			0x800
++#define EPHY_REG_SELECT			0x804
 +
-+description:
-+  This MDIO bus multiplexer defines buses that could be internal as well as
-+  external to SoCs. The external mdio bus can be configured at different
-+  bus address.
++#define EPHY_PAGE_SELECT_SRC		GENMASK(12, 8)
 +
-+allOf:
-+  - $ref: mdio-mux.yaml#
++#define EPHY_CTRL_ANALOG_SHUTDOWN	BIT(0)
++#define EPHY_CTRL_USE_EXTPHY		BIT(7)
++#define EPHY_CTRL_PHYMODE		BIT(8)
++#define EPHY_CTRL_PHYMODE_SMI_RMII	1
++#define EPHY_CTRL_EXTPHY_ID		GENMASK(15, 11)
 +
-+properties:
-+  compatible:
-+    const: sophgo,cv1800b-mdio-mux
++#define EPHY_REG_SELECT_MDIO		0
++#define EPHY_REG_SELECT_APB		1
 +
-+  reg:
-+    maxItems: 1
++#define CV1800B_MDIO_INTERNAL_ID	1
++#define CV1800B_MDIO_EXTERNAL_ID	0
 +
-+required:
-+  - compatible
-+  - reg
++struct cv1800b_mdio_mux {
++	void __iomem *regs;
++	void *mux_handle;
++};
 +
-+unevaluatedProperties: false
++static int cv1800b_enable_mdio(struct cv1800b_mdio_mux *mdmux, bool internal_phy)
++{
++	u32 val;
 +
-+examples:
-+  - |
-+    mdio@3009000 {
-+      compatible = "sophgo,cv1800b-mdio-mux";
-+      reg = <0x3009000 0x1000>;
-+      #address-cells = <1>;
-+      #size-cells = <0>;
-+      mdio-parent-bus = <&gmac0_mdio>;
++	val = readl(mdmux->regs + EPHY_CTRL);
 +
-+      mdio@0 {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+        reg = <0>;
-+      };
-+    };
++	if (internal_phy)
++		val &= ~EPHY_CTRL_USE_EXTPHY;
++	else
++		val |= EPHY_CTRL_USE_EXTPHY;
++
++	writel(val, mdmux->regs + EPHY_CTRL);
++
++	writel(EPHY_REG_SELECT_MDIO, mdmux->regs + EPHY_REG_SELECT);
++
++	return 0;
++}
++
++static int cv1800b_mdio_switch_fn(int current_child, int desired_child,
++				  void *data)
++{
++	struct cv1800b_mdio_mux *mdmux = dev_get_drvdata(data);
++
++	if (current_child == desired_child)
++		return 0;
++
++	switch (desired_child) {
++	case CV1800B_MDIO_EXTERNAL_ID:
++		return cv1800b_enable_mdio(mdmux, false);
++	case CV1800B_MDIO_INTERNAL_ID:
++		return cv1800b_enable_mdio(mdmux, true);
++	default:
++		return -EINVAL;
++	}
++}
++
++static int cv1800b_mdio_mux_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct cv1800b_mdio_mux *mdmux;
++
++	mdmux = devm_kzalloc(dev, sizeof(*mdmux), GFP_KERNEL);
++	if (!mdmux)
++		return -ENOMEM;
++	platform_set_drvdata(pdev, mdmux);
++
++	mdmux->regs = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(mdmux->regs))
++		return PTR_ERR(mdmux->regs);
++
++	return mdio_mux_init(dev, dev->of_node, cv1800b_mdio_switch_fn,
++			     &mdmux->mux_handle, dev, NULL);
++}
++
++static void cv1800b_mdio_mux_remove(struct platform_device *pdev)
++{
++	struct cv1800b_mdio_mux *mdmux = platform_get_drvdata(pdev);
++
++	mdio_mux_uninit(mdmux->mux_handle);
++}
++
++static const struct of_device_id cv1800b_mdio_mux_match[] = {
++	{ .compatible = "sophgo,cv1800b-mdio-mux", },
++	{},
++};
++MODULE_DEVICE_TABLE(of, cv1800b_mdio_mux_match);
++
++static struct platform_driver cv1800b_mdio_mux_driver = {
++	.probe		= cv1800b_mdio_mux_probe,
++	.remove		= cv1800b_mdio_mux_remove,
++	.driver		= {
++		.name	= "cv1800b-mdio-mux",
++		.of_match_table = cv1800b_mdio_mux_match,
++	},
++};
++module_platform_driver(cv1800b_mdio_mux_driver);
++
++MODULE_DESCRIPTION("Sophgo CV1800 MDIO multiplexer driver");
++MODULE_AUTHOR("Inochi Amaoto <inochiama@gmail.com>");
++MODULE_LICENSE("GPL");
 -- 
 2.49.0
 
