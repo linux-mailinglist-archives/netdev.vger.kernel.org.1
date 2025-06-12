@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-197170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5BDAD7BA9
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:04:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9053AD7BB4
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7195F1881BA7
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:04:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BF73B5DDC
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDECA2D8772;
-	Thu, 12 Jun 2025 20:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021E92DFA2E;
+	Thu, 12 Jun 2025 20:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAUKAWAi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QR7svqkv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289862D876C
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FD52DECBE
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749758578; cv=none; b=bEuIut9vHXlwOe9XoWyiTcx9BRWZt/Pl0GGhB4eVMW0OXkJyEc+i3YIwekOVDPKXHNc0A19hK5ZBTVzEqRgX0j7yLWf9AgFYN5uJKZxZtMEAoDUFjp1+0dWpsamPKIM/jOuatqbtch8jqucDYYXESJ+Ts7tpK5lnzdTjh++MhYU=
+	t=1749758584; cv=none; b=bjzvA+D9NKK5ppfIMd7YbhNEGFlZCKFC9Zde5rU7iPzMBujerBML0HwFVBmwk41ecZfZlIzYeeFpMg/CiyZeYD2/Wy4S8yTu0R0XSFHoZwdMEvFaSHz8FKO+0TmRgetR0z3fHQrVAMlWgeOrpa3zW5PiEpo4Ts0MoEdfZg+RmnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749758578; c=relaxed/simple;
-	bh=xmePPptEt7NJI3Md9oPNPSn9WDpAC6aovDWhz+V9vxo=;
+	s=arc-20240116; t=1749758584; c=relaxed/simple;
+	bh=LMXyri+YKuStVyc5fg/UiyFaVTBrDpKRI7Mucqlx13g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IklqWcMGw8VHkE5cW2s3VA9tCsZd7dmYvpACuT+h8Z36q8VUWBbA4S8zff3jZZo/Q6466FxZLl+dMUp4+mHFpDJJkbgZVvMLFkB9ZfcIi9BrhIYIWJmIbYQGUui0Apc8kt4wa9XOxZ8X0obSef/Mvuz99HbHE+E+Rz9eFhCfk4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GAUKAWAi; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=mZKHBBWKVNg32uwRINymt4yB/q9X8hpkztqIN/REiAciGclUCC3ijEGcQO2fIsdZg3W2eLXwAniS8T2lMTsnceSVNIrG5tAjpWFnUqkXTRBhhAAfCCayh/AW2BJ4a/d/lHwY7eSHy0wV3pBLtUms8mYG0/OF48lfI4XnJhPFe3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QR7svqkv; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749758576;
+	s=mimecast20190719; t=1749758582;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=l/9V6hPz32RRYGDqTvd1VaGM9sza1xHAmqYvXn2RTBg=;
-	b=GAUKAWAiVgVgQEUm75bMjOVT9cR0gr1KavJQvd1qnjlCgMxovW/1yrYE74YapXwjYMNnGU
-	Atm3J6WwpHRWHnrDWvgWNn2sDBTRQzeMJc11eUT3Z8e5pC+COjyvqRAEOoN/BUYUwG0OqG
-	1Gxzu3iWnxEHNS4dEE7Dt1G5zWDkJCw=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=/s5o2N/AERYY3tiFEGTQAHE2rHnvYPfPJoTOkCe0zPE=;
+	b=QR7svqkvdtwT6fHPj+XrDgKA1bH5SRj2fc91efHngC9DYgbUea1bmxsKRrVOzhefIp7LL3
+	SJj6WQybU3niQx5NStS6DwidVJ06HDkiaRuysj+/Hv6/8PlC7Y+XMlnWsL2EDBim1KumV2
+	HPMnk9kwP4vZp40HembM6oxm9Zfxx38=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-324-8E1TSTiZPru4tcazbGuMHQ-1; Thu,
- 12 Jun 2025 16:02:52 -0400
-X-MC-Unique: 8E1TSTiZPru4tcazbGuMHQ-1
-X-Mimecast-MFC-AGG-ID: 8E1TSTiZPru4tcazbGuMHQ_1749758566
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-k5z473WoOh-mTyx9X9qhig-1; Thu,
+ 12 Jun 2025 16:02:56 -0400
+X-MC-Unique: k5z473WoOh-mTyx9X9qhig-1
+X-Mimecast-MFC-AGG-ID: k5z473WoOh-mTyx9X9qhig_1749758573
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6B2A51944B0C;
-	Thu, 12 Jun 2025 20:02:46 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 450EF19560BD;
+	Thu, 12 Jun 2025 20:02:53 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.45.224.169])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C28C918003FC;
-	Thu, 12 Jun 2025 20:02:39 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DAC7A18003FC;
+	Thu, 12 Jun 2025 20:02:46 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -81,9 +81,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-doc@vger.kernel.org,
 	Michal Schmidt <mschmidt@redhat.com>,
 	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next v9 07/14] dpll: zl3073x: Add clock_id field
-Date: Thu, 12 Jun 2025 22:01:38 +0200
-Message-ID: <20250612200145.774195-8-ivecera@redhat.com>
+Subject: [PATCH net-next v9 08/14] dpll: zl3073x: Read DPLL types and pin properties from system firmware
+Date: Thu, 12 Jun 2025 22:01:39 +0200
+Message-ID: <20250612200145.774195-9-ivecera@redhat.com>
 In-Reply-To: <20250612200145.774195-1-ivecera@redhat.com>
 References: <20250612200145.774195-1-ivecera@redhat.com>
 Precedence: bulk
@@ -95,113 +95,532 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add .clock_id to zl3073x_dev structure that will be used by later
-commits introducing DPLL feature. The clock ID is required for DPLL
-device registration.
+Add support for reading of DPLL types and optional pin properties from
+the system firmware (DT, ACPI...).
 
-To generate this ID, use chip ID read during device initialization.
-In case where multiple zl3073x based chips are present, the chip ID
-is shifted and lower bits are filled by an unique value - using
-the I2C device address for I2C connections and the chip-select value
-for SPI connections.
+The DPLL types are stored in property 'dpll-types' as string array and
+possible values 'pps' and 'eec' are mapped to DPLL enums DPLL_TYPE_PPS
+and DPLL_TYPE_EEC.
+
+The pin properties are stored under 'input-pins' and 'output-pins'
+sub-nodes and the following ones are supported:
+
+* reg
+    integer that specifies pin index
+* label
+    string that is used by driver as board label
+* connection-type
+    string that indicates pin connection type
+* supported-frequencies-hz
+    array of u64 values what frequencies are supported / allowed for
+    given pin with respect to hardware wiring
+
+Do not blindly trust system firmware and filter out frequencies that
+cannot be configured/represented in device (input frequencies have to
+be factorized by one of the base frequencies and output frequencies have
+to divide configured synthesizer frequency).
 
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/dpll/zl3073x/core.c | 6 +++++-
- drivers/dpll/zl3073x/core.h | 4 +++-
- drivers/dpll/zl3073x/i2c.c  | 4 +++-
- drivers/dpll/zl3073x/spi.c  | 4 +++-
- 4 files changed, 14 insertions(+), 4 deletions(-)
+ drivers/dpll/zl3073x/Makefile |   2 +-
+ drivers/dpll/zl3073x/core.c   |  41 ++++
+ drivers/dpll/zl3073x/core.h   |   7 +
+ drivers/dpll/zl3073x/prop.c   | 354 ++++++++++++++++++++++++++++++++++
+ drivers/dpll/zl3073x/prop.h   |  34 ++++
+ 5 files changed, 437 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/dpll/zl3073x/prop.c
+ create mode 100644 drivers/dpll/zl3073x/prop.h
 
+diff --git a/drivers/dpll/zl3073x/Makefile b/drivers/dpll/zl3073x/Makefile
+index 8760f358f5447..56d7d9feeaf0d 100644
+--- a/drivers/dpll/zl3073x/Makefile
++++ b/drivers/dpll/zl3073x/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ obj-$(CONFIG_ZL3073X)		+= zl3073x.o
+-zl3073x-objs			:= core.o
++zl3073x-objs			:= core.o prop.o
+ 
+ obj-$(CONFIG_ZL3073X_I2C)	+= zl3073x_i2c.o
+ zl3073x_i2c-objs		:= i2c.o
 diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index 3a57c85f902c4..b9809d21d2e52 100644
+index b9809d21d2e52..f2520c48fcf51 100644
 --- a/drivers/dpll/zl3073x/core.c
 +++ b/drivers/dpll/zl3073x/core.c
-@@ -736,13 +736,14 @@ static void zl3073x_devlink_unregister(void *ptr)
-  * zl3073x_dev_probe - initialize zl3073x device
-  * @zldev: pointer to zl3073x device
-  * @chip_info: chip info based on compatible
-+ * @dev_id: device ID to be used as part of clock ID
-  *
-  * Common initialization of zl3073x device structure.
-  *
-  * Returns: 0 on success, <0 on error
-  */
- int zl3073x_dev_probe(struct zl3073x_dev *zldev,
--		      const struct zl3073x_chip_info *chip_info)
-+		      const struct zl3073x_chip_info *chip_info, u8 dev_id)
- {
- 	u16 id, revision, fw_ver;
- 	struct devlink *devlink;
-@@ -786,6 +787,9 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
- 		FIELD_GET(GENMASK(15, 8), cfg_ver),
- 		FIELD_GET(GENMASK(7, 0), cfg_ver));
+@@ -120,6 +120,47 @@ const struct regmap_config zl3073x_regmap_config = {
+ };
+ EXPORT_SYMBOL_NS_GPL(zl3073x_regmap_config, "ZL3073X");
  
-+	/* Use chip ID and given dev ID as clock ID */
-+	zldev->clock_id = ((u64)id << 8) | dev_id;
++/**
++ * zl3073x_ref_freq_factorize - factorize given frequency
++ * @freq: input frequency
++ * @base: base frequency
++ * @mult: multiplier
++ *
++ * Checks if the given frequency can be factorized using one of the
++ * supported base frequencies. If so the base frequency and multiplier
++ * are stored into appropriate parameters if they are not NULL.
++ *
++ * Return: 0 on success, -EINVAL if the frequency cannot be factorized
++ */
++int
++zl3073x_ref_freq_factorize(u32 freq, u16 *base, u16 *mult)
++{
++	static const u16 base_freqs[] = {
++		1, 2, 4, 5, 8, 10, 16, 20, 25, 32, 40, 50, 64, 80, 100, 125,
++		128, 160, 200, 250, 256, 320, 400, 500, 625, 640, 800, 1000,
++		1250, 1280, 1600, 2000, 2500, 3125, 3200, 4000, 5000, 6250,
++		6400, 8000, 10000, 12500, 15625, 16000, 20000, 25000, 31250,
++		32000, 40000, 50000, 62500,
++	};
++	u32 div;
++	int i;
 +
- 	/* Initialize mutex for operations where multiple reads, writes
- 	 * and/or polls are required to be done atomically.
- 	 */
++	for (i = 0; i < ARRAY_SIZE(base_freqs); i++) {
++		div = freq / base_freqs[i];
++
++		if (div <= U16_MAX && (freq % base_freqs[i]) == 0) {
++			if (base)
++				*base = base_freqs[i];
++			if (mult)
++				*mult = div;
++
++			return 0;
++		}
++	}
++
++	return -EINVAL;
++}
++
+ static bool
+ zl3073x_check_reg(struct zl3073x_dev *zldev, unsigned int reg, size_t size)
+ {
 diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
-index 0d052c02065e5..fcf142f3f8cb6 100644
+index fcf142f3f8cb6..4fcce761fc5f2 100644
 --- a/drivers/dpll/zl3073x/core.h
 +++ b/drivers/dpll/zl3073x/core.h
-@@ -57,6 +57,7 @@ struct zl3073x_synth {
-  * @dev: pointer to device
-  * @regmap: regmap to access device registers
-  * @multiop_lock: to serialize multiple register operations
-+ * @clock_id: clock id of the device
-  * @ref: array of input references' invariants
-  * @out: array of outs' invariants
-  * @synth: array of synths' invariants
-@@ -65,6 +66,7 @@ struct zl3073x_dev {
- 	struct device		*dev;
- 	struct regmap		*regmap;
- 	struct mutex		multiop_lock;
-+	u64			clock_id;
+@@ -14,6 +14,7 @@ struct regmap;
+ /*
+  * Hardware limits for ZL3073x chip family
+  */
++#define ZL3073X_MAX_CHANNELS	5
+ #define ZL3073X_NUM_REFS	10
+ #define ZL3073X_NUM_OUTS	10
+ #define ZL3073X_NUM_SYNTHS	5
+@@ -111,6 +112,12 @@ int zl3073x_write_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 val);
+ int zl3073x_write_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 val);
+ int zl3073x_write_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 val);
  
- 	/* Invariants */
- 	struct zl3073x_ref	ref[ZL3073X_NUM_REFS];
-@@ -91,7 +93,7 @@ extern const struct regmap_config zl3073x_regmap_config;
- 
- struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev);
- int zl3073x_dev_probe(struct zl3073x_dev *zldev,
--		      const struct zl3073x_chip_info *chip_info);
-+		      const struct zl3073x_chip_info *chip_info, u8 dev_id);
- 
- /**********************
-  * Registers operations
-diff --git a/drivers/dpll/zl3073x/i2c.c b/drivers/dpll/zl3073x/i2c.c
-index bca1cd729895c..82cc929e543d7 100644
---- a/drivers/dpll/zl3073x/i2c.c
-+++ b/drivers/dpll/zl3073x/i2c.c
-@@ -24,7 +24,9 @@ static int zl3073x_i2c_probe(struct i2c_client *client)
- 		return PTR_ERR(zldev->regmap);
- 	}
- 
--	return zl3073x_dev_probe(zldev, i2c_get_match_data(client));
-+	/* Initialize device and use I2C address as dev ID */
-+	return zl3073x_dev_probe(zldev, i2c_get_match_data(client),
-+				 client->addr);
- }
- 
- static const struct i2c_device_id zl3073x_i2c_id[] = {
-diff --git a/drivers/dpll/zl3073x/spi.c b/drivers/dpll/zl3073x/spi.c
-index 219676da71b78..6327d4c9c8d94 100644
---- a/drivers/dpll/zl3073x/spi.c
-+++ b/drivers/dpll/zl3073x/spi.c
-@@ -24,7 +24,9 @@ static int zl3073x_spi_probe(struct spi_device *spi)
- 		return PTR_ERR(zldev->regmap);
- 	}
- 
--	return zl3073x_dev_probe(zldev, spi_get_device_match_data(spi));
-+	/* Initialize device and use SPI chip select value as dev ID */
-+	return zl3073x_dev_probe(zldev, spi_get_device_match_data(spi),
-+				 spi_get_chipselect(spi, 0));
- }
- 
- static const struct spi_device_id zl3073x_spi_id[] = {
++/*****************
++ * Misc operations
++ *****************/
++
++int zl3073x_ref_freq_factorize(u32 freq, u16 *base, u16 *mult);
++
+ static inline bool
+ zl3073x_is_n_pin(u8 id)
+ {
+diff --git a/drivers/dpll/zl3073x/prop.c b/drivers/dpll/zl3073x/prop.c
+new file mode 100644
+index 0000000000000..bc8b78cfb5ae0
+--- /dev/null
++++ b/drivers/dpll/zl3073x/prop.c
+@@ -0,0 +1,354 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <linux/array_size.h>
++#include <linux/dev_printk.h>
++#include <linux/err.h>
++#include <linux/errno.h>
++#include <linux/fwnode.h>
++#include <linux/property.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++
++#include "core.h"
++#include "prop.h"
++
++/**
++ * zl3073x_pin_check_freq - verify frequency for given pin
++ * @zldev: pointer to zl3073x device
++ * @dir: pin direction
++ * @id: pin index
++ * @freq: frequency to check
++ *
++ * The function checks the given frequency is valid for the device. For input
++ * pins it checks that the frequency can be factorized using supported base
++ * frequencies. For output pins it checks that the frequency divides connected
++ * synth frequency without remainder.
++ *
++ * Return: true if the frequency is valid, false if not.
++ */
++static bool
++zl3073x_pin_check_freq(struct zl3073x_dev *zldev, enum dpll_pin_direction dir,
++		       u8 id, u64 freq)
++{
++	if (freq > U32_MAX)
++		goto err_inv_freq;
++
++	if (dir == DPLL_PIN_DIRECTION_INPUT) {
++		int rc;
++
++		/* Check if the frequency can be factorized */
++		rc = zl3073x_ref_freq_factorize(freq, NULL, NULL);
++		if (rc)
++			goto err_inv_freq;
++	} else {
++		u32 synth_freq;
++		u8 out, synth;
++
++		/* Get output pin synthesizer */
++		out = zl3073x_output_pin_out_get(id);
++		synth = zl3073x_out_synth_get(zldev, out);
++
++		/* Get synth frequency */
++		synth_freq = zl3073x_synth_freq_get(zldev, synth);
++
++		/* Check the frequency divides synth frequency */
++		if (synth_freq % (u32)freq)
++			goto err_inv_freq;
++	}
++
++	return true;
++
++err_inv_freq:
++	dev_warn(zldev->dev,
++		 "Unsupported frequency %llu Hz in firmware node\n", freq);
++
++	return false;
++}
++
++/**
++ * zl3073x_prop_pin_package_label_set - get package label for the pin
++ * @zldev: pointer to zl3073x device
++ * @props: pointer to pin properties
++ * @dir: pin direction
++ * @id: pin index
++ *
++ * Generates package label string and stores it into pin properties structure.
++ *
++ * Possible formats:
++ * REF<n> - differential input reference
++ * REF<n>P & REF<n>N - single-ended input reference (P or N pin)
++ * OUT<n> - differential output
++ * OUT<n>P & OUT<n>N - single-ended output (P or N pin)
++ */
++static void
++zl3073x_prop_pin_package_label_set(struct zl3073x_dev *zldev,
++				   struct zl3073x_pin_props *props,
++				   enum dpll_pin_direction dir, u8 id)
++{
++	const char *prefix, *suffix;
++	bool is_diff;
++
++	if (dir == DPLL_PIN_DIRECTION_INPUT) {
++		u8 ref;
++
++		prefix = "REF";
++		ref = zl3073x_input_pin_ref_get(id);
++		is_diff = zl3073x_ref_is_diff(zldev, ref);
++	} else {
++		u8 out;
++
++		prefix = "OUT";
++		out = zl3073x_output_pin_out_get(id);
++		is_diff = zl3073x_out_is_diff(zldev, out);
++	}
++
++	if (!is_diff)
++		suffix = zl3073x_is_p_pin(id) ? "P" : "N";
++	else
++		suffix = ""; /* No suffix for differential one */
++
++	snprintf(props->package_label, sizeof(props->package_label), "%s%u%s",
++		 prefix, id / 2, suffix);
++
++	/* Set package_label pointer in DPLL core properties to generated
++	 * string.
++	 */
++	props->dpll_props.package_label = props->package_label;
++}
++
++/**
++ * zl3073x_prop_pin_fwnode_get - get fwnode for given pin
++ * @zldev: pointer to zl3073x device
++ * @props: pointer to pin properties
++ * @dir: pin direction
++ * @id: pin index
++ *
++ * Return: 0 on success, -ENOENT if the firmware node does not exist
++ */
++static int
++zl3073x_prop_pin_fwnode_get(struct zl3073x_dev *zldev,
++			    struct zl3073x_pin_props *props,
++			    enum dpll_pin_direction dir, u8 id)
++{
++	struct fwnode_handle *pins_node, *pin_node;
++	const char *node_name;
++
++	if (dir == DPLL_PIN_DIRECTION_INPUT)
++		node_name = "input-pins";
++	else
++		node_name = "output-pins";
++
++	/* Get node containing input or output pins */
++	pins_node = device_get_named_child_node(zldev->dev, node_name);
++	if (!pins_node) {
++		dev_dbg(zldev->dev, "'%s' sub-node is missing\n", node_name);
++		return -ENOENT;
++	}
++
++	/* Enumerate child pin nodes and find the requested one */
++	fwnode_for_each_child_node(pins_node, pin_node) {
++		u32 reg;
++
++		if (fwnode_property_read_u32(pin_node, "reg", &reg))
++			continue;
++
++		if (id == reg)
++			break;
++	}
++
++	/* Release pin parent node */
++	fwnode_handle_put(pins_node);
++
++	/* Save found node */
++	props->fwnode = pin_node;
++
++	dev_dbg(zldev->dev, "Firmware node for %s %sfound\n",
++		props->package_label, pin_node ? "" : "NOT ");
++
++	return pin_node ? 0 : -ENOENT;
++}
++
++/**
++ * zl3073x_pin_props_get - get pin properties
++ * @zldev: pointer to zl3073x device
++ * @dir: pin direction
++ * @index: pin index
++ *
++ * The function looks for firmware node for the given pin if it is provided
++ * by the system firmware (DT or ACPI), allocates pin properties structure,
++ * generates package label string according pin type and optionally fetches
++ * board label, connection type, supported frequencies and esync capability
++ * from the firmware node if it does exist.
++ *
++ * Pointer that is returned by this function should be freed using
++ * @zl3073x_pin_props_put().
++ *
++ * Return:
++ * * pointer to allocated pin properties structure on success
++ * * error pointer in case of error
++ */
++struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
++						enum dpll_pin_direction dir,
++						u8 index)
++{
++	struct dpll_pin_frequency *ranges;
++	struct zl3073x_pin_props *props;
++	int i, j, num_freqs, rc;
++	const char *type;
++	u64 *freqs;
++
++	props = kzalloc(sizeof(*props), GFP_KERNEL);
++	if (!props)
++		return ERR_PTR(-ENOMEM);
++
++	/* Set default pin type */
++	if (dir == DPLL_PIN_DIRECTION_INPUT)
++		props->dpll_props.type = DPLL_PIN_TYPE_EXT;
++	else
++		props->dpll_props.type = DPLL_PIN_TYPE_GNSS;
++
++	props->dpll_props.phase_range.min = S32_MIN;
++	props->dpll_props.phase_range.max = S32_MAX;
++
++	zl3073x_prop_pin_package_label_set(zldev, props, dir, index);
++
++	/* Get firmware node for the given pin */
++	rc = zl3073x_prop_pin_fwnode_get(zldev, props, dir, index);
++	if (rc)
++		return props; /* Return if it does not exist */
++
++	/* Look for label property and store the value as board label */
++	fwnode_property_read_string(props->fwnode, "label",
++				    &props->dpll_props.board_label);
++
++	/* Look for pin type property and translate its value to DPLL
++	 * pin type enum if it is present.
++	 */
++	if (!fwnode_property_read_string(props->fwnode, "connection-type",
++					 &type)) {
++		if (!strcmp(type, "ext"))
++			props->dpll_props.type = DPLL_PIN_TYPE_EXT;
++		else if (!strcmp(type, "gnss"))
++			props->dpll_props.type = DPLL_PIN_TYPE_GNSS;
++		else if (!strcmp(type, "int"))
++			props->dpll_props.type = DPLL_PIN_TYPE_INT_OSCILLATOR;
++		else if (!strcmp(type, "synce"))
++			props->dpll_props.type = DPLL_PIN_TYPE_SYNCE_ETH_PORT;
++		else
++			dev_warn(zldev->dev,
++				 "Unknown or unsupported pin type '%s'\n",
++				 type);
++	}
++
++	/* Check if the pin supports embedded sync control */
++	props->esync_control = fwnode_property_read_bool(props->fwnode,
++							 "esync-control");
++
++	/* Read supported frequencies property if it is specified */
++	num_freqs = fwnode_property_count_u64(props->fwnode,
++					      "supported-frequencies-hz");
++	if (num_freqs <= 0)
++		/* Return if the property does not exist or number is 0 */
++		return props;
++
++	/* The firmware node specifies list of supported frequencies while
++	 * DPLL core pin properties requires list of frequency ranges.
++	 * So read the frequency list into temporary array.
++	 */
++	freqs = kcalloc(num_freqs, sizeof(*freqs), GFP_KERNEL);
++	if (!freqs) {
++		rc = -ENOMEM;
++		goto err_alloc_freqs;
++	}
++
++	/* Read frequencies list from firmware node */
++	fwnode_property_read_u64_array(props->fwnode,
++				       "supported-frequencies-hz", freqs,
++				       num_freqs);
++
++	/* Allocate frequency ranges list and fill it */
++	ranges = kcalloc(num_freqs, sizeof(*ranges), GFP_KERNEL);
++	if (!ranges) {
++		rc = -ENOMEM;
++		goto err_alloc_ranges;
++	}
++
++	/* Convert list of frequencies to list of frequency ranges but
++	 * filter-out frequencies that are not representable by device
++	 */
++	for (i = 0, j = 0; i < num_freqs; i++) {
++		struct dpll_pin_frequency freq = DPLL_PIN_FREQUENCY(freqs[i]);
++
++		if (zl3073x_pin_check_freq(zldev, dir, index, freqs[i])) {
++			ranges[j] = freq;
++			j++;
++		}
++	}
++
++	/* Save number of freq ranges and pointer to them into pin properties */
++	props->dpll_props.freq_supported = ranges;
++	props->dpll_props.freq_supported_num = j;
++
++	/* Free temporary array */
++	kfree(freqs);
++
++	return props;
++
++err_alloc_ranges:
++	kfree(freqs);
++err_alloc_freqs:
++	fwnode_handle_put(props->fwnode);
++	kfree(props);
++
++	return ERR_PTR(rc);
++}
++
++/**
++ * zl3073x_pin_props_put - release pin properties
++ * @props: pin properties to free
++ *
++ * The function deallocates given pin properties structure.
++ */
++void zl3073x_pin_props_put(struct zl3073x_pin_props *props)
++{
++	/* Free supported frequency ranges list if it is present */
++	kfree(props->dpll_props.freq_supported);
++
++	/* Put firmware handle if it is present */
++	if (props->fwnode)
++		fwnode_handle_put(props->fwnode);
++
++	kfree(props);
++}
++
++/**
++ * zl3073x_prop_dpll_type_get - get DPLL channel type
++ * @zldev: pointer to zl3073x device
++ * @index: DPLL channel index
++ *
++ * Return: DPLL type for given DPLL channel
++ */
++enum dpll_type
++zl3073x_prop_dpll_type_get(struct zl3073x_dev *zldev, u8 index)
++{
++	const char *types[ZL3073X_MAX_CHANNELS];
++	int count;
++
++	/* Read dpll types property from firmware */
++	count = device_property_read_string_array(zldev->dev, "dpll-types",
++						  types, ARRAY_SIZE(types));
++
++	/* Return default if property or entry for given channel is missing */
++	if (index >= count)
++		return DPLL_TYPE_PPS;
++
++	if (!strcmp(types[index], "pps"))
++		return DPLL_TYPE_PPS;
++	else if (!strcmp(types[index], "eec"))
++		return DPLL_TYPE_EEC;
++
++	dev_info(zldev->dev, "Unknown DPLL type '%s', using default\n",
++		 types[index]);
++
++	return DPLL_TYPE_PPS; /* Default */
++}
+diff --git a/drivers/dpll/zl3073x/prop.h b/drivers/dpll/zl3073x/prop.h
+new file mode 100644
+index 0000000000000..721a18f05938b
+--- /dev/null
++++ b/drivers/dpll/zl3073x/prop.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef _ZL3073X_PROP_H
++#define _ZL3073X_PROP_H
++
++#include <linux/dpll.h>
++
++#include "core.h"
++
++struct fwnode_handle;
++
++/**
++ * struct zl3073x_pin_props - pin properties
++ * @fwnode: pin firmware node
++ * @dpll_props: DPLL core pin properties
++ * @package_label: pin package label
++ * @esync_control: embedded sync support
++ */
++struct zl3073x_pin_props {
++	struct fwnode_handle		*fwnode;
++	struct dpll_pin_properties	dpll_props;
++	char				package_label[8];
++	bool				esync_control;
++};
++
++enum dpll_type zl3073x_prop_dpll_type_get(struct zl3073x_dev *zldev, u8 index);
++
++struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
++						enum dpll_pin_direction dir,
++						u8 index);
++
++void zl3073x_pin_props_put(struct zl3073x_pin_props *props);
++
++#endif /* _ZL3073X_PROP_H */
 -- 
 2.49.0
 
