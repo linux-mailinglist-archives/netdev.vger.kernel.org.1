@@ -1,113 +1,146 @@
-Return-Path: <netdev+bounces-196808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67027AD672F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:17:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B7AAD6734
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:19:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33F69173925
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 05:17:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 704663A4FF2
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 05:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DCC199FAF;
-	Thu, 12 Jun 2025 05:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE591D7E57;
+	Thu, 12 Jun 2025 05:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l2+xx4lR"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PwN9NjQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28BC8F40
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 05:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326E48F40;
+	Thu, 12 Jun 2025 05:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749705470; cv=none; b=D9kbr17boKlVx63HNtFeIIth5rdaERX83FXMGJFvGo3ut8okOPpYsCLEBP5FSNLWMEnZPVRsGx92uh5AusYDxVqnpzTfx7ZomL2HbICt90wTBCIYiYIuA2y1815UzLiL1IbyXsSaunXIOdMJkpYp982hhxeKwCTNj7468LAeHE8=
+	t=1749705582; cv=none; b=vCrvsibBHJvqQ+6SLxI4hp4mMA9G666OhVrUHGiqkAwzqP8lchhryqlo5PobN0/m2E3GvRPk094f4UutwMqBjIUlugvXepMhTn/WnZUQHxdu+PHDm46utA/XS1hw51gWQQZ2XJrFcJ+njYLPctLugycghcRZVwp19S5oQPpA0Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749705470; c=relaxed/simple;
-	bh=2SCdJ/+4doAXDA1dugfcerrihJYg32knCvs3SFTaAHM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lTlO07wFJcLgb3ztSCjFGxAzINaYXJsjvixe8WGuOhRJJ7dqyjSLPrjt7lFZwqMt35J+WAy5bLpIC7HCpGmDzMo41FnBAik/VyOOrlTE/Lz6L7Eyj//wEOD60oIjlr011Zm46u2evChLVY3i1CUOcPaqVyD/sFNdYh8fm/vc6aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l2+xx4lR; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-235e389599fso126575ad.0
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 22:17:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749705468; x=1750310268; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2SCdJ/+4doAXDA1dugfcerrihJYg32knCvs3SFTaAHM=;
-        b=l2+xx4lRk9VZdvj+XODaAdpfsmHoNTAQiuoBm+Vxve0ddmNB/2OTz8EJY4erV7FZGD
-         6mhjNLpen8OIBrqasVtsOlcrBEVLpT/ZpMhjKJEZrINkvYjiRjvEKFcceRepBXWmUNEB
-         kdpnArPcasSr1FwZG+zzD0Dp2hhxE3yzF9Gi4V1dRR9PwBuJRORakl5YBRPHWhPtz5bU
-         /XBjGUoIuS+UdyiPkqG+8JolPkK8FQjKplfO1MMVLnJfJx7TtW9yTnBkt9bmFDlaXY/4
-         szjqy6+2cZjkGPZ2rMDDgNYm4GVhYXJXKPpnIbPREaHqUiOgxlTy3OOjkd7NxYx9a5Z7
-         o8Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749705468; x=1750310268;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2SCdJ/+4doAXDA1dugfcerrihJYg32knCvs3SFTaAHM=;
-        b=Ol6eFqLrL7nE1ls2lqNtcxGrTZBkicLNvbfK0x5ktHKivD+ULxSqyAztbQ1Qb4KC3z
-         JASF0ihXmX0VTFvcCGfiTf6LpZno0OKWha5RMhEjJTLvh6XYCeBlzoTjVgrS+cCHqUMO
-         8GnxUVdDTMn9vR85dZbDRL6NZEhG5y351/5umvnf166pTyS3KJbRfRplSxeNLcd+zrU6
-         k8BxLkKxhve6p+toaZnFiSfADtQLwl90fFfQ23CfNjQPJC0Jz19vvZTcn8RISx0W74rV
-         AlkanotMFibmrZZzQ3dbZ/FclI9BY60Z2rW38nWsK/jPq6s/HRYTMbWv4ZdpVBWISSoR
-         gi6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWOW3cub+vsn6rSKqS9PFn6TQUgc0FcGNN6vdptXkf5JSs2wCElUliHUfnlG/rBOfEL1k6RFdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6Mritt7Q1uvd61FPHefJ6679luHO3PMTg3iVydr1Wj0qKAIUg
-	W4/yf9O40Y3z7lv2wEC26HusHChRuSsbLaDPiPO64phedh9ITv0VsTX0CL60NgxrBlA8dsR+QOi
-	oyhoDTWrg41yddoWfifR0V7CAyhKJABVGguKYxtCo
-X-Gm-Gg: ASbGnctglJ6+NZtsFNQ/MzSx1GEle8mT/pHWzu5nh9yRbb+0HC2iK/+osafCdCxo957
-	pZSKJupuZ+8CgcA06xOHZqVNdgzN1zrIknCKCWWLSzxO/gEuxI69VWuOWp/T3NE8PAmALtUl2A7
-	N7d8XxxJGzUOHWghAJ4HWDBmkD+w9U/QqglTuczg7Nnnud
-X-Google-Smtp-Source: AGHT+IGYP9KzkXjDzsA4+41CLW5Waykb3HixIBnHVes8taLU5EpIH0GQEyzbO+4zVc94uZKbBXgXshRqTVavOIadoX8=
-X-Received: by 2002:a17:902:d2c6:b0:231:d0ef:e8fb with SMTP id
- d9443c01a7336-2364dc4e3b8mr1774665ad.10.1749705467691; Wed, 11 Jun 2025
- 22:17:47 -0700 (PDT)
+	s=arc-20240116; t=1749705582; c=relaxed/simple;
+	bh=Fgg60br5z8Xo62RVtcYOlSHFY8hDvcwBnLt/8Qgc8kw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pjo5c2p0nDBftrM4Twv5vXsNeCHx1HodM4Qk81FwGjR+mXxuBB0v6Mi7jeSV7evchSC/LUHRjnoPpZh4ST08XBkWVxyKs/CysVzI6OIbAM1LW+DmnAksj9gIglTKMLQ2yqnPEGWiM9Zlfc0NE5HyX0bxA/K7MnEr7DDliPFV3rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PwN9NjQq; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55C5JM1d2777716;
+	Thu, 12 Jun 2025 00:19:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1749705562;
+	bh=Z/t8lLUiFoXTd5zgRP+4OV8+E8OvgbBaVBJMzxkwCWI=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=PwN9NjQqcsSqDe2oXG6CwGyH1Mrjr65I8EpYBao1jJSoP+RHyQSQf+FbbH4Xra024
+	 RsAk1NH0SdfifAui2hIR5DrRmPke6zP2pxI/FSwboeX9KQ9Ynv6LprE7W15aXhaUbj
+	 tz4119hXwH/kIMn0EHkx9cO93VCjo7nFgL0cA/Fw=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55C5JM223383057
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Thu, 12 Jun 2025 00:19:22 -0500
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 12
+ Jun 2025 00:19:22 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 12 Jun 2025 00:19:22 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55C5JHui1457466;
+	Thu, 12 Jun 2025 00:19:18 -0500
+Message-ID: <03555d09-e506-4f48-a073-b06b63e1af4a@ti.com>
+Date: Thu, 12 Jun 2025 10:49:17 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250610150950.1094376-1-mbloch@nvidia.com> <20250610150950.1094376-12-mbloch@nvidia.com>
-In-Reply-To: <20250610150950.1094376-12-mbloch@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 11 Jun 2025 22:17:34 -0700
-X-Gm-Features: AX0GCFsQbpdJnxhJgwGMagCQgzHoP4omoeUSZWQdZ5DAkp2-7EHR6n8NXEpEZgY
-Message-ID: <CAHS8izMOcAYzcseZqud5xj_3ibaWKBUqEARgJd65S0_Wqs6haw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 11/11] net/mlx5e: Add TX support for netmems
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, saeedm@nvidia.com, gal@nvidia.com, 
-	leonro@nvidia.com, tariqt@nvidia.com, Leon Romanovsky <leon@kernel.org>, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Dragos Tatulea <dtatulea@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Read firmware-names from
+ device tree
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Meghana Malladi <m-malladi@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+References: <20250610052501.3444441-1-danishanwar@ti.com>
+ <20250611170211.7398b083@kernel.org>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20250611170211.7398b083@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Tue, Jun 10, 2025 at 8:21=E2=80=AFAM Mark Bloch <mbloch@nvidia.com> wrot=
-e:
->
-> From: Dragos Tatulea <dtatulea@nvidia.com>
->
-> Declare netmem TX support in netdev.
->
-> As required, use the netmem aware dma unmapping APIs
-> for unmapping netmems in tx completion path.
->
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Hi Jakub
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+On 12/06/25 5:32 am, Jakub Kicinski wrote:
+> On Tue, 10 Jun 2025 10:55:01 +0530 MD Danish Anwar wrote:
+>> Refactor the way firmware names are handled for the ICSSG PRUETH driver.
+>> Instead of using hardcoded firmware name arrays for different modes (EMAC,
+>> SWITCH, HSR), the driver now reads the firmware names from the device tree
+>> property "firmware-name". Only the EMAC firmware names are specified in the
+>> device tree property. The firmware names for all other supported modes are
+>> generated dynamically based on the EMAC firmware names by replacing
+>> substrings (e.g., "eth" with "sw" or "hsr") as appropriate.
+> 
+> Could you include an example?
 
---=20
-Thanks,
-Mina
+Sure. Below are the firmwares used currently for PRU0 core
+
+EMAC: ti-pruss/am65x-sr2-pru0-prueth-fw.elf
+SW  : ti-pruss/am65x-sr2-pru0-prusw-fw.elf
+HSR : ti-pruss/am65x-sr2-pru0-pruhsr-fw.elf
+
+If you look closely you'll see the names of all three firmwares are same
+except for the operating mode.
+
+In general for PRU0 core, firmware name is,
+
+	ti-pruss/am65x-sr2-pru0-pru<mode>-fw.elf
+
+Since the EMAC firmware names are defined in DT, I am reading those
+directly and for other modes just swapping mode name. i.e. eth -> sw or
+eth -> hsr.
+
+I will add this example in commit msg in next revision.
+
+> 
+>> This improves flexibility and allows firmware names to be customized via
+>> the device tree, reducing the need for code changes when firmware names
+>> change for different platforms.
+> 
+> You seem to be deleting the old constants. Is there no need to keep
+> backward compatibility with DT blobs which don't have the firmware-name
+> properties ?
+
+ICSSG-PRUETH driver is only supported by AM65x and AM64x and both the
+DTs have the firmware name property. So I don't think there is any need
+to maintain the older hard coded values.
+
+AM65x -
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/arch/arm64/boot/dts/ti/k3-am654-icssg2.dtso#n28:~:text=pru2_1%3E%2C%20%3C%26rtu2_1%3E%2C%20%3C%26tx_pru2_1%3E%3B-,firmware%2Dname,-%3D%20%22ti%2Dpruss/am65x
+
+AM64x -
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/arch/arm64/boot/dts/ti/k3-am642-evm.dts#:~:text=tx_pru1_1%3E%3B-,firmware%2Dname,-%3D%20%22ti%2Dpruss
+
+Let me know if this is okay.
+
+-- 
+Thanks and Regards,
+Danish
 
