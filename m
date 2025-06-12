@@ -1,98 +1,87 @@
-Return-Path: <netdev+bounces-196752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B56A9AD6418
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:00:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4498AAD6422
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A297E189E096
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:00:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CBA6189E1F8
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88CB2D8DDC;
-	Thu, 12 Jun 2025 00:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E499E3D69;
+	Thu, 12 Jun 2025 00:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VVEAAYbK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rjyn+Noh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC852D8DD6
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 00:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B853A11CA0;
+	Thu, 12 Jun 2025 00:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749686401; cv=none; b=OQ/9UDVcL7k+dHruy08mOhJCV7qKedOnPUWGdpMusdn5mEuonR6wGkTWMRWraSVkGqv3k83wC/RsY2AskS8GYvqftu67VBQazCSaD0HSeo9A3OjfUpwLI8IN/HNGwewAPc6IzDg9QyMC9Pl7w3q+Pw1WCHWoyr4dWeXxIFTdrk4=
+	t=1749686532; cv=none; b=k7r6T3ddH2yyaZS2f/fnxw7oumNB1Kaxm6X8MqNP06odIgEwOCqqmQWTheKw8wqkfhZNpccMzvmQyYykJwX9rSpk8hMIQvpNV79YD5EetlFUHd4+6wlhnQJzcjHKJOfJaeKoblp3iJ7wwchva5XN/e7bLRw0+/p2qZ6XTB6I7rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749686401; c=relaxed/simple;
-	bh=cBztdt+UZBFzTNtDwhhJ09/QXgMmlBk6kYpU2JzUUMs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Sb9cNtVeJzm3r3ed9BNBilVzQoBRunUO0UElTnHJHbQMZ0577/3uSNxqPs3adCwrrS7vaFM3WtzYlsOPm88i2Ui41gwurqloBNbXVnv3V/pPM3SRtqnK4GzrDOmGBo7nCUJTYCEvaMhiI2EC69y/8Ad/yzoQWbITUJ0l9j5T+Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VVEAAYbK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C3C8C4CEE3;
-	Thu, 12 Jun 2025 00:00:01 +0000 (UTC)
+	s=arc-20240116; t=1749686532; c=relaxed/simple;
+	bh=QZ/fn76hbIECH2SJNsLWkYeQQ/XFL72WxozjIyCrQXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R46Kx0iM2w7EwXGbryjiPqSa7r8/r0HSK3qptnBMWBOUpPUvD0EcdnHZiSm6X6ATQl2estHmqWcw1pKMxWrCbjTIg1LOxgb4Vr+TUVCdkiAGNpRkUCbzYx/jbsMeduRzKCRrgPp5MXg95pzjjMkRy4kTDcz5mbS0L8AImBLiNzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rjyn+Noh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7590C4CEE3;
+	Thu, 12 Jun 2025 00:02:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749686401;
-	bh=cBztdt+UZBFzTNtDwhhJ09/QXgMmlBk6kYpU2JzUUMs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VVEAAYbKaHXMOyRfk+LV/mJJiPt4BlbKxPmUbrfClGjUYk0T/WNdN7kmofGjhOofg
-	 lRqJMTPuGuGp7DrB71rBVWg0Eh2xWN6b/H/Yyjtaw3Mk6xfxHcIsavdhVg4U0nDWNE
-	 5SuwpHeG71QMOBnrBKcDrcfofXf2RJfVeWGD4T6QmhvdQmaXkcfKFBxNw+akObOZ+L
-	 ARTGR4ijTh/cH9LmJOAkMtUKXPJkumMrOyx/xHj6iLxYzS32NXKqiH1Nv/wnm6+QwO
-	 pq6NJ1ko9+wBUYeUuDS102WLFLSevgfJpBkPBccBHnfDYvoIjbYjDWY5g+LsEwaewL
-	 3dAxxBwYhea8Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE59C3822D1A;
-	Thu, 12 Jun 2025 00:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749686532;
+	bh=QZ/fn76hbIECH2SJNsLWkYeQQ/XFL72WxozjIyCrQXo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Rjyn+NohjKOQ7SiU6IF8v3IyU/H/Usnw4tSJgqG3xE+AjD1k7f0Ig2AYXS03qf5IR
+	 x/wXVykDQhY3YAWqcFMaGU299A+AcmYsxx9QMN0lTOeUvUiuys2jH8lkkBqu5uwmZQ
+	 zLmevpnwbcMgMAcyjDg0n3C2JQDsJ6JPL1YdX9UTdT9A6+x48iZCZHMn4wr9iEYzic
+	 ILxaXO2VhjID8LkGbQ+vrq3w3h8PRPhSK5WzzB2LGARMUkW4dE0uDnDRHQEay5942G
+	 BuRQa8Qmcc+2kqw1tPMiugEo4CavoFYgbcTYU/SZNfdZrBYwzsZCQKzQknHytUaE0V
+	 9pyQ3m1EF0kLA==
+Date: Wed, 11 Jun 2025 17:02:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Meghana Malladi <m-malladi@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Read firmware-names
+ from device tree
+Message-ID: <20250611170211.7398b083@kernel.org>
+In-Reply-To: <20250610052501.3444441-1-danishanwar@ti.com>
+References: <20250610052501.3444441-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] fbnic: Expand mac stats coverage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174968643158.3539505.12785231397217675717.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 00:00:31 +0000
-References: <20250610171109.1481229-1-mohsin.bashr@gmail.com>
-In-Reply-To: <20250610171109.1481229-1-mohsin.bashr@gmail.com>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
- sanman.p211993@gmail.com, jacob.e.keller@intel.com, lee@trager.us,
- suhui@nfschina.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 10 Jun 2025 10:55:01 +0530 MD Danish Anwar wrote:
+> Refactor the way firmware names are handled for the ICSSG PRUETH driver.
+> Instead of using hardcoded firmware name arrays for different modes (EMAC,
+> SWITCH, HSR), the driver now reads the firmware names from the device tree
+> property "firmware-name". Only the EMAC firmware names are specified in the
+> device tree property. The firmware names for all other supported modes are
+> generated dynamically based on the EMAC firmware names by replacing
+> substrings (e.g., "eth" with "sw" or "hsr") as appropriate.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Could you include an example?
 
-On Tue, 10 Jun 2025 10:11:07 -0700 you wrote:
-> This patch series expand the coverage of mac stats for fbnic. The first
-> patch increment the ETHTOOL_RMON_HIST_MAX by 1 to provide necessary
-> support for all the ranges of rmon histogram supported by fbnic. The
-> second patch add support for rmon and eth_ctrl stats.
-> 
-> Mohsin Bashir (2):
->   eth: Update rmon hist range
->   eth: fbnic: Expand coverage of mac stats
-> 
-> [...]
+> This improves flexibility and allows firmware names to be customized via
+> the device tree, reducing the need for code changes when firmware names
+> change for different platforms.
 
-Here is the summary with links:
-  - [net-next,1/2] eth: Update rmon hist range
-    https://git.kernel.org/netdev/net-next/c/e1f4b1f16758
-  - [net-next,2/2] eth: fbnic: Expand coverage of mac stats
-    https://git.kernel.org/netdev/net-next/c/6913e873e7b2
-
-You are awesome, thank you!
+You seem to be deleting the old constants. Is there no need to keep
+backward compatibility with DT blobs which don't have the firmware-name
+properties ?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
