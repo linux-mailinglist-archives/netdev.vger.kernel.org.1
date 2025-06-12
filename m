@@ -1,244 +1,157 @@
-Return-Path: <netdev+bounces-197187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AAFAAD7C14
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:13:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6FDAD7C22
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 540241882BB5
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:12:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37FE4167E8D
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28B2D6626;
-	Thu, 12 Jun 2025 20:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42822D8786;
+	Thu, 12 Jun 2025 20:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Db5mO92E"
+	dkim=pass (2048-bit key) header.d=frank.fyi header.i=@frank.fyi header.b="Khy+U95T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.frank.fyi (mx01.frank.fyi [5.189.178.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11DF2D6615;
-	Thu, 12 Jun 2025 20:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0412D878D;
+	Thu, 12 Jun 2025 20:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.189.178.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749759142; cv=none; b=tSdhqXWkxLUdkgyxA0EPmLkhDiSzhhDl92mI0GbjpJLN5s5yQp6DtRKwTolgEYQEqSTjvRiCpq8BXEZph0ZU4BVCznqSQv6K+/DLBrcEyPYk6oZV9O3SA+tqOsbByb80f3Pe8yVjACGsNTAxsTZvpz5OCd/g10vHQBDOyl0ZPKs=
+	t=1749759191; cv=none; b=XsyBIUJpuTjzVF6H51W/CZZHPYupeK9mMuNeL7swKZHwJ/+yu2CL6+70fcd2l5NPmGQAWD6dCXO0pZR7AbHhlRqrCcv5Ls4hUMvX9lCNhYN9F05BhMfEiVA1AyzRuy/7pNR+NN8ntpD5bZp2P01srfXoZLdnH2f1EAkxmn9aV0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749759142; c=relaxed/simple;
-	bh=8WUwrNIEifWHlDqkSgSAcyhQuIrjdbk3GhQhzH3A3BM=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=ggFGq5URxY/pCjrzbdfYUCWejo9Cr3bpXfmmSanA9eLsti3PJUbWmAnBekrYdetTf0nO5RUqbicocNIIqbTXrbzOlRry6azh79+QCGMw8r6qBfLZlZN57viC2k+lbHq5vz2o2Cyn0nae5Lt9UgagBYK+Cd5hoy73wnmZ2xDUYEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Db5mO92E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD49C4CEED;
-	Thu, 12 Jun 2025 20:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749759141;
-	bh=8WUwrNIEifWHlDqkSgSAcyhQuIrjdbk3GhQhzH3A3BM=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=Db5mO92EwgjRc+0a4g34hDnKxpwY9/yH2Xq0ikIN/VFJsq8jzFAJhn1Qfkr9Do7lo
-	 jqsLk0v8q7QYLpyDlubgBdh4res7Epbam5ET8pWcRbyEELg5GQglOrqf6D3v9KsHeC
-	 nM0U3ZWe0gRuISBJkxfpStqYkh4zAp/CLjAnnEmrpHtUME1GbZ+bQfmJBIjvBgjJ+Z
-	 ULXjfQekairzB9L25OT9e4YHkR+MWW6gmisciU9e8STjkNqh1x/zVozr8pofEz8wJx
-	 BG7N6wUL815HLJ5mcQnHVBlBhgLZG/clB25H896bQnr/74ONvVH03mV02cAwX6O5xO
-	 opJa1JiG/sRFw==
-Date: Thu, 12 Jun 2025 15:12:19 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1749759191; c=relaxed/simple;
+	bh=5AtADpZQklpovVZ+DTgV8PH6MVSn65vhBXtXjRzH4Do=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ajDTM0oeETEGcK+P5h3VnKI0HqJFonb4aeKg0aZ6ZinHhBRLpI6evWGSWiWwVotDL/ljYOR7XoiPgejKQPCDwk0T9z5ugDksRZl0alm7ZfGBLDlXZa4BzvfCOLOVYxZazls5ME26UcXiU+HExSgDVh4TTeuEuh2LZWGVlQoYH2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=frank.fyi; spf=pass smtp.mailfrom=frank.fyi; dkim=pass (2048-bit key) header.d=frank.fyi header.i=@frank.fyi header.b=Khy+U95T; arc=none smtp.client-ip=5.189.178.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=frank.fyi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=frank.fyi
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=frank.fyi; s=mail;
+	t=1749759182; bh=5AtADpZQklpovVZ+DTgV8PH6MVSn65vhBXtXjRzH4Do=;
+	h=Date:From:To:Subject:References:In-Reply-To:From;
+	b=Khy+U95TtI0DoWEA0BPAM2zehdAdBRUkv6IEDPOmJagNgpgHLLy6tI9+k1+mKhxOJ
+	 u7zWXJPs0OS/3/x30lIMgamACrg3+a9GdtNNReZqsOSYDHJziYqKLOP9exT2RiLcgJ
+	 kpB9nOHfVJf8XD/nLggcMHj628TlCsHf2+YY62kNTaQf/7FXbGLcVqMeUokCARQGxs
+	 i3TqSTWdAWjXOKqvTRR2ayWkW1ywGlwKkDbOtuBENDfl8PcfcBblOZw5Q2yf2XkZF4
+	 Hf6K4/3ChI8TdNJuE4UIpls/OY+BwctowkB+x7jYCJB4MpMdRXB8WHnbxCKUsVbk2X
+	 NiEpeQbyJ7kHQ==
+Received: by mx01.frank.fyi (Postfix, from userid 1001)
+	id A18791120181; Thu, 12 Jun 2025 22:13:02 +0200 (CEST)
+Date: Thu, 12 Jun 2025 20:13:02 +0000
+From: Klaus Frank <vger.kernel.org@frank.fyi>
+To: Phil Sutter <phil@nwl.cc>, 
+	Antonio Ojea <antonio.ojea.garcia@gmail.com>, Klaus Frank <vger.kernel.org@frank.fyi>, 
+	netfilter-devel@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>, netfilter@vger.kernel.org, 
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>, netdev@vger.kernel.org
+Subject: Re: Status of native NAT64/NAT46 in Netfilter?
+Message-ID: <cqrontvwxblejbnnfwmvpodsymjez6h34wtqpze7t6zzbejmtk@vgjlloqq2rgc>
+References: <w7bwjqyae36c6pqhqjmvjcrwtpny6jxjyvxzb2qzt7atjncxd2@gi4xhlyrz27b>
+ <aEqka3uX7tuFced5@orbyte.nwl.cc>
+ <CABhP=tZRP42Dgw9+_vyAx80uPg4V2YFLfbGhpA10WzM46JYTNg@mail.gmail.com>
+ <aErch2cFAJK_yd6M@orbyte.nwl.cc>
+ <CABhP=tbUuJKOq6gusxyfsP4H6b4WrajR_A1=7eFXxfbLg+4Q1w@mail.gmail.com>
+ <aEsuPMEkWHnJvLU9@orbyte.nwl.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: kuba@kernel.org, krzk+dt@kernel.org, john.madieu@gmail.com, 
- linux-kernel@vger.kernel.org, geert+renesas@glider.be, davem@davemloft.net, 
- pabeni@redhat.com, linux-renesas-soc@vger.kernel.org, 
- netdev@vger.kernel.org, prabhakar.mahadev-lad.rj@bp.renesas.com, 
- conor+dt@kernel.org, biju.das.jz@bp.renesas.com, magnus.damm@gmail.com, 
- edumazet@google.com, devicetree@vger.kernel.org, andrew+netdev@lunn.ch
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-In-Reply-To: <20250611061609.15527-1-john.madieu.xa@bp.renesas.com>
-References: <20250611061609.15527-1-john.madieu.xa@bp.renesas.com>
-Message-Id: <174975871363.2914832.8987482116722925693.robh@kernel.org>
-Subject: Re: [PATCH v2 0/3] Add support for GBETH IPs found on RZ/G3E SoCs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aEsuPMEkWHnJvLU9@orbyte.nwl.cc>
 
-
-On Wed, 11 Jun 2025 08:16:06 +0200, John Madieu wrote:
-> Hi all,
+On Thu, Jun 12, 2025 at 09:45:00PM +0200, Phil Sutter wrote:
+> On Thu, Jun 12, 2025 at 08:19:53PM +0200, Antonio Ojea wrote:
+> > On Thu, 12 Jun 2025 at 15:56, Phil Sutter <phil@nwl.cc> wrote:
+> > >
+> > > Hi,
+> > >
+> > > On Thu, Jun 12, 2025 at 03:34:08PM +0200, Antonio Ojea wrote:
+> > > > On Thu, 12 Jun 2025 at 11:57, Phil Sutter <phil@nwl.cc> wrote:
+> > > > > On Sun, Jun 08, 2025 at 08:37:10PM +0000, Klaus Frank wrote:
+> > > > > > I've been looking through the mailling list archives and couldn't find a clear anser.
+> > > > > > So I wanted to ask here what the status of native NAT64/NAT46 support in netfilter is?
+> > 
+> > > > we ended doing some "smart hack" , well, really a combination of them
+> > > > to provide a nat64 alternative for kubernetes
+> > > > https://github.com/kubernetes-sigs/nat64:
+> > > > - a virtual dummy interface to "attract" the nat64 traffic with the
+> > > > well known prefix
+> > > > - ebpf tc filters to do the family conversion using static nat for
+> > > > simplicity on the dummy interface
+> > > > - and reusing nftables masquerading to avoid to reimplement conntrack
+> > >
+> > > Oh, interesting! Would you benefit from a native implementation in
+> > > nftables?
+> > 
+> > Indeed we'll benefit a lot, see what we have to do :)
+> > 
+> > > > you can play with it using namespaces (without kubernetes), see
+> > > > https://github.com/kubernetes-sigs/nat64/blob/main/tests/integration/e2e.bats
+> > > > for kind of selftest environment
+> > >
+> > > Refusing to look at the code: You didn't take care of the typical NAT
+> > > helper users like FTP or SIP, did you?
+> > 
+> > The current approach does static NAT64 first, switching the IPv6 ips
+> > to IPv4 and adapting the IPv4 packet, the "real nat" is done by
+> > nftables on the ipv4 family after that, so ... it may work?
 > 
-> This series adds support for the two Gigabit Ethernet (GBETH) interfaces on the
-> Renesas RZ/G3E (R9A09G047) SoCs and their enablement on the SMARC-II EVK. This
-> is achieved by integrating the necessary clock/reset signals prior to defining
-> common DTS nodes, and enabling both GBETH ports at the board level.
+> That was my approach as well: The incoming IPv6 packet was translated to
+> IPv4 with an rfc1918 source address linked to the IPv6 source, then
+> MASQUERADE would translate to the external IP.
 > 
-> Here are pach dependencies:
+> In reverse direction, iptables would use the right IPv6 destination
+> address from given rfc1918 destination address.
 > 
->  - Patch 1/3 is based on renesas-drivers tree, on top of renesas-clk-for-v6.17
->  branch
->  - Patches [2,3]/3  are based on renesas-devel tree, on top of
->  renesas-dts-for-v6.17 branch
+> The above is a hack which limits the number of IPv6 clients to the size
+> of that IPv4 transfer net. Fixing it properly would probably require
+> conntrack integration, not sure if going that route is feasible (note
+> that I have no clue about conntrack internals).
+
+Well technically all that needs to be done is NAT66 instead of NAT44
+within that hack and that limitation vanishes.
 > 
-> V1 of this series is located here [1]. It originaly included a patch for binding
-> documentation, which, in response to Jakub [2], has been resubmited as a
-> standalone patch for net-next.
-> 
-> Changes in v2:
->  - Appart from resending the patches and some collected tags, there is no changes in V2.
->  - Separated binding patch send as standalone patch can be found here [3]
-> 
-> Below are some test logs, involving pings, then unbind/bind, then pings again:
-> 
-> ```
-> root@smarc-rzg3e:~# ping -I eth0 google.com
-> PING google.com (172.217.20.174) from 192.168.1.245 eth0: 56(84) bytes of data.
-> 64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=1 ttl=117 time=4.42 ms
-> 64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=2 ttl=117 time=3.87 ms
-> 64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=3 ttl=117 time=3.68 ms
-> 64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=4 ttl=117 time=3.83 ms
-> ^C
-> --- google.com ping statistics ---
-> 4 packets transmitted, 4 received, 0% packet loss, time 3005ms
-> rtt min/avg/max/mdev = 3.680/3.949/4.415/0.278 ms
-> root@smarc-rzg3e:~#
-> 
-> root@smarc-rzg3e:~# ping -I eth1 google.com
-> PING google.com (142.250.75.238) from 192.168.1.242 eth1: 56(84) bytes of data.
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=1 ttl=251 time=4.72 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=2 ttl=251 time=4.34 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=3 ttl=251 time=5.66 ms
-> ^C
-> --- google.com ping statistics ---
-> 3 packets transmitted, 3 received, 0% packet loss, time 2003ms
-> rtt min/avg/max/mdev = 4.338/4.904/5.659/0.555 ms
-> root@smarc-rzg3e:~#
-> root@smarc-rzg3e:~#
-> root@smarc-rzg3e:~#
-> root@smarc-rzg3e:~# echo "15c40000.ethernet" > /sys/bus/platform/drivers/renesas-gbeth/bind
-> [  413.422009] renesas-gbeth 15c40000.ethernet: IRQ sfty not found
-> [  413.429570] renesas-gbeth 15c40000.ethernet: User ID: 0x0, Synopsys ID: 0x52
-> [  413.436749] renesas-gbeth 15c40000.ethernet:         DWMAC4/5
-> [  413.441974] renesas-gbeth 15c40000.ethernet: DMA HW capability register supported
-> [  413.449536] renesas-gbeth 15c40000.ethernet: RX Checksum Offload Engine supported
-> [  413.457098] renesas-gbeth 15c40000.ethernet: Wake-Up On Lan supported
-> [  413.463617] renesas-gbeth 15c40000.ethernet: Enable RX Mitigation via HW Watchdog Timer
-> [  413.471807] renesas-gbeth 15c40000.ethernet: Enabled L3L4 Flow TC (entries=8)
-> [  413.478982] renesas-gbeth 15c40000.ethernet: Enabled RFS Flow TC (entries=10)
-> [  413.486148] renesas-gbeth 15c40000.ethernet: Using 32/32 bits DMA host/device width
-> [  413.523040] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> [  413.534875] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-1
-> [  413.546218] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-2
-> [  413.556666] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-3
-> [  413.633799] renesas-gbeth 15c40000.ethernet eth0: PHY [stmmac-1:07] driver [Microchip KSZ9131 Gigabit PHY] (irq=27)
-> [  413.659645] dwmac4: Master AXI performs fixed burst length
-> [  413.666549] renesas-gbeth 15c40000.ethernet eth0: No Safety Features support found
-> [  413.674263] renesas-gbeth 15c40000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
-> [  413.683733] renesas-gbeth 15c40000.ethernet eth0: registered PTP clock
-> [  413.695546] renesas-gbeth 15c40000.ethernet eth0: configuring for phy/rgmii-id link mode
-> [  416.576645] renesas-gbeth 15c40000.ethernet eth0: Link is Up - 1Gbps/Full - flow control off
-> root@smarc-rzg3e:~#
-> root@smarc-rzg3e:~# echo "15c30000.ethernet" > /sys/bus/platform/drivers/renesas-gbeth/bind
-> [  430.269771] renesas-gbeth 15c30000.ethernet: IRQ sfty not found
-> [  430.277347] renesas-gbeth 15c30000.ethernet: User ID: 0x1, Synopsys ID: 0x52
-> [  430.284525] renesas-gbeth 15c30000.ethernet:         DWMAC4/5
-> [  430.289753] renesas-gbeth 15c30000.ethernet: DMA HW capability register supported
-> [  430.297317] renesas-gbeth 15c30000.ethernet: RX Checksum Offload Engine supported
-> [  430.304880] renesas-gbeth 15c30000.ethernet: Wake-Up On Lan supported
-> [  430.311400] renesas-gbeth 15c30000.ethernet: Enable RX Mitigation via HW Watchdog Timer
-> [  430.319598] renesas-gbeth 15c30000.ethernet: Enabled L3L4 Flow TC (entries=8)
-> [  430.326774] renesas-gbeth 15c30000.ethernet: Enabled RFS Flow TC (entries=10)
-> [  430.333942] renesas-gbeth 15c30000.ethernet: Using 32/32 bits DMA host/device width
-> [  430.360549] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-0
-> [  432.366627] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-1
-> [  432.377218] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-2
-> [  432.386450] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-3
-> [  432.461470] renesas-gbeth 15c30000.ethernet eth1: PHY [stmmac-0:07] driver [Microchip KSZ9131 Gigabit PHY] (irq=23)
-> [  432.487523] dwmac4: Master AXI performs fixed burst length
-> [  432.494429] renesas-gbeth 15c30000.ethernet eth1: No Safety Features support found
-> [  432.502149] renesas-gbeth 15c30000.ethernet eth1: IEEE 1588-2008 Advanced Timestamp supported
-> [  432.511638] renesas-gbeth 15c30000.ethernet eth1: registered PTP clock
-> [  432.523033] renesas-gbeth 15c30000.ethernet eth1: configuring for phy/rgmii-id link mode
-> [  435.489601] renesas-gbeth 15c30000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
-> root@smarc-rzg3e:~#
-> root@smarc-rzg3e:~#
-> root@smarc-rzg3e:~# ping -I eth0 google.com
-> PING google.com (142.250.75.238) from 192.168.1.242 eth0: 56(84) bytes of data.
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=1 ttl=251 time=4.62 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=2 ttl=251 time=4.19 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=3 ttl=251 time=4.49 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=4 ttl=251 time=4.76 ms
-> ^C
-> --- google.com ping statistics ---
-> 4 packets transmitted, 4 received, 0% packet loss, time 3005ms
-> rtt min/avg/max/mdev = 4.189/4.514/4.758/0.210 ms
-> root@smarc-rzg3e:~# ping -I eth1 google.com
-> PING google.com (142.250.75.238) from 192.168.1.245 eth1: 56(84) bytes of data.
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=1 ttl=251 time=4.45 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=2 ttl=251 time=4.79 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=3 ttl=251 time=4.42 ms
-> 64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=4 ttl=251 time=4.47 ms
-> ^C
-> --- google.com ping statistics ---
-> 4 packets transmitted, 4 received, 0% packet loss, time 3005ms
-> rtt min/avg/max/mdev = 4.417/4.530/4.787/0.149 ms
-> root@smarc-rzg3e:~#
-> ```
-> 
-> [1] - https://lore.kernel.org/all/20250604065200.163778-1-john.madieu.xa@bp.renesas.com/
-> [2] - https://lore.kernel.org/all/20250609083008.0157fe47@kernel.org/
-> [3] - https://lore.kernel.org/all/20250611061204.15393-1-john.madieu.xa@bp.renesas.com/
-> 
-> Regards,
-> John Madieu
-> 
-> John Madieu (3):
->   clk: renesas: r9a09g047: Add clock and reset signals for the GBETH IPs
->   arm64: dts: renesas: r9a09g047: Add GBETH nodes
->   arm64: dts: renesas: rzg3e-smarc-som: Enable eth{0-1} (GBETH)
->     interfaces
-> 
->  arch/arm64/boot/dts/renesas/r9a09g047.dtsi    | 207 ++++++++++++++++++
->  .../boot/dts/renesas/rzg3e-smarc-som.dtsi     | 106 +++++++++
->  drivers/clk/renesas/r9a09g047-cpg.c           |  64 ++++++
->  3 files changed, 377 insertions(+)
-> 
-> --
-> 2.25.1
-> 
-> 
-> 
+> The actual issue though with protocols like FTP is that they embed IP
+> addresses in their headers. Therefore it is not sufficient to swap the
+> l3 header and recalculate the TCP checksum, you end up manipulating l7
+> headers to keep things going. At least there's prior work in conntrack
+> helpers, not sure if that code could be reused or not.
+
+If nat64 functionality was added within conntrac itself then it would be
+easy to reuse the l7 helpers. If it was anywhere else the l7 helpers
+within conntrack would have to be re-implemented as conntrack wouldn't
+know the mappings and therefor it probably would be quite hard to do the
+rewrites.
+Also in regards to FTP not just L7 headers but also payload needs to be
+edited on the fly. As it often uses differnt commands for IPv4 and IPv6
+(even though the IPv6 ones also support IPv4) and it embeds the IPs as
+strings.
+
+EPRT<space><d><net-prt><d><net-addr><d><tcp-port><d>
+
+where "net-prt" is either 1 for IPv4 or 2 for IPv6. and net-addr is the
+string representation.
+However a client may send the "PORT" command instead...
+Also RFC2428 may be helpful in this context.
+
+I think if it was possible to get the nat64 into conntrack it should
+also be possible to take care of this more easily as with external
+"hacks".
 
 
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
+Also in regards to the above code it looks like currently only tcp and
+udp are supported. All other traffic appears to just dropped at the
+moment instead of just passed through. Is there a particular reason for
+this?
 
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-This patch series was applied (using b4) to base:
- Base: attempting to guess base-commit...
- Base: tags/v6.16-rc1-15-gc3303e716218 (exact match)
-
-If this is not the correct base, please add 'base-commit' tag
-(or use b4 which does this automatically)
-
-New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/renesas/' for 20250611061609.15527-1-john.madieu.xa@bp.renesas.com:
-
-arch/arm64/boot/dts/renesas/r9a09g047e57-smarc.dtb: ethernet@15c30000 (renesas,r9a09g047-gbeth): compatible:0: 'renesas,r9a09g047-gbeth' is not one of ['renesas,r9a09g056-gbeth', 'renesas,r9a09g057-gbeth']
-	from schema $id: http://devicetree.org/schemas/net/renesas,r9a09g057-gbeth.yaml#
-arch/arm64/boot/dts/renesas/r9a09g047e57-smarc.dtb: ethernet@15c40000 (renesas,r9a09g047-gbeth): compatible:0: 'renesas,r9a09g047-gbeth' is not one of ['renesas,r9a09g056-gbeth', 'renesas,r9a09g057-gbeth']
-	from schema $id: http://devicetree.org/schemas/net/renesas,r9a09g057-gbeth.yaml#
-
-
-
-
-
+> 
+> Cheers, Phil
 
