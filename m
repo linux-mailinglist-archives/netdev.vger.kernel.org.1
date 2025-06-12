@@ -1,114 +1,143 @@
-Return-Path: <netdev+bounces-196990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3785EAD73D6
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:29:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B41AD73E4
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:31:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78CC1189282B
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:25:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98EF91899B90
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03165243379;
-	Thu, 12 Jun 2025 14:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECF9241686;
+	Thu, 12 Jun 2025 14:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ir4g4Omd"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="FQof/u5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC69230277;
-	Thu, 12 Jun 2025 14:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814B71AA1FF
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 14:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749738286; cv=none; b=ehkfyDCRx7sqg/OMxyVK4yTpZWgUOhRWKhxiptf2U0OqFmMedYge+r9kvpPtc4dZTT8Ux6fPQoB5uQkChLSQh950cByo3n881AmBWYKPVSlzXmeoDoKl/jp3vCCP1shP8gPGv+K7Wzh6qigA1MVRBeGmp/0tXkPfxlV5PwNDkkY=
+	t=1749738360; cv=none; b=mPt6HDQ831D17oUW6gUPjoMO2educVMRwzXdBjpe8jZuDOsvmI0UkI1rrOt/2gt+NGT+hgFO+InYBxKA4rreUhkXnc/FUCDzpOqkwe73Y4QdVJqZhECO1hzFjoqUQ0eI4F5ZByb+ZHVkXclx3LhBgVK4cPzBSs5cohz+60zG56g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749738286; c=relaxed/simple;
-	bh=UB9pPWSFelC2u7NTQ7zW5F438SFKXFk/yswKxPVbq8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZwT8gQSHsX2IAJ2qsNgjULx3qXUaZhLfLTgZpO14JtUQpOzfsu4vb3CALEz5f4uEdZ9oddco4YAtq9Wd1dC4eizDDUaD5Kx4qconrlQIo6UsJlBBZqowqULTKHey261WkUuKvo1cqvhdk6t39492havEAbQcfSEI5NLRAnN31Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ir4g4Omd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0C4EC4CEEA;
-	Thu, 12 Jun 2025 14:24:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749738286;
-	bh=UB9pPWSFelC2u7NTQ7zW5F438SFKXFk/yswKxPVbq8M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ir4g4OmdgZV29NnH05kdyoPyE5SQnR4sD6yVdz+YaWOeDgV5x5qXZ7iLriutwPYCw
-	 enkCPPQiXcWYEOUqVU0Mr7vRq78BLacpp0aTY0uF4fnWjWObFP4jp9Zq8f7b62iFWb
-	 ViAL3JscUTolhEyCMQydtMEcNV1nfEE2ZqjHZMQabtOFEt12tuk5U2yqW6CbOV8F1k
-	 JKmGKlPt+6S1NChEg9n3MmmsrUUzqNckBkHroFxymVR9BrBzCGlWnR+O6Y6eRk798T
-	 bZCTX8Z2QOAXYinZnA2j0DlhuMGYaav6cQmMo88W+S+ZKz/CMVtRs5s8ciPG48wWn6
-	 mMmNZcz7hye5Q==
-Date: Thu, 12 Jun 2025 16:24:38 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, Akira Yokosawa <akiyks@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Ignacio Encinas Rubio
- <ignacio@iencinas.com>, Marco Elver <elver@google.com>, Shuah Khan
- <skhan@linuxfoundation.org>, Donald Hunter <donald.hunter@gmail.com>, Eric
- Dumazet <edumazet@google.com>, Jan Stancek <jstancek@redhat.com>, Paolo
- Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
- stern@rowland.harvard.edu, Breno Leitao <leitao@debian.org>
-Subject: Re: [PATCH v2 0/2] Some extra patches for netlink doc generation
-Message-ID: <20250612162416.507c8a12@sal.lan>
-In-Reply-To: <cover.1749735022.git.mchehab+huawei@kernel.org>
-References: <cover.1749735022.git.mchehab+huawei@kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1749738360; c=relaxed/simple;
+	bh=ApF8vBWEk/Mxf+COrA4pHzNgYDC969mE44V8IPsB400=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nDXmQrK2I8ikr0h9pheuFc5IU3NQP+mjQmJIE5NScdkLM5nyrDKmRuTRB3LmE+QvLfa3Xic4YETlJaBT77VeHaR5JuPbVEPFvGn3Bw8G0RgthZHalZpdebNhW18g7fHTDvtj6x6DOxIDpsM+0ZsPcUBfggfk+UCye6xGScMlous=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=FQof/u5+; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4530921461aso9155265e9.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 07:25:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749738356; x=1750343156; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0dRuAS/zUdBPIbw/8bXhZ48yEMTP9V1WRvDJONrZWng=;
+        b=FQof/u5+XPWjd6NV2IFJb/4KDZU3/J7pgIEP2R1sm03mDbWsQ4WHEWrtxOQVcl4Ibv
+         rJnxh/tYt05LCn6V8Bm/IAag8/2NWnzyW1SlWlKnO75yTGINCuhKYdIQSD3Y/pngMnlq
+         tENBY5RAfxQxA0ZqJYMWat/DKSerPorUM5Dg0iHsDjt2+3gD29BAR/YzWDxbx1W3ivWs
+         OSUrDN540zZmnavTSsZKl8uBqycr4kinUPwXmBcMzMRYyqimR1C5pc2qBQrIDqofNwYT
+         KKnNLaV2ADfYozEk2iJmlVQXKfLffXPvz3w43joLsl84iurtthyLPnP2PigSqumFD3E0
+         aGug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749738356; x=1750343156;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0dRuAS/zUdBPIbw/8bXhZ48yEMTP9V1WRvDJONrZWng=;
+        b=H9oiggeCDaAlPjAyM2QudXwfLVXJEevSUzMCDfJvE8C0U5DIVDnPQrr4p9xBfdcEdT
+         WVFm90Nmx5teSdgqmIPiWkipxQDNcWDg/PyVt0APoUhzQ7LOI56CSEr0VQbNf80i7cCx
+         fSPwbpECgtquRfxoxM8TsSh30O33TC1Jpsv6KhjBJJeZ4uW2B6tyJ9M1HAYVpXDAEyUk
+         ugL3l9xJcqluiCOZ6zx/nhsD87lc64Hx+N0cCvAF1yK7lLDEXlvng1lIWDj7V1Fm/zfE
+         SogMTPSf3QCeE0+3n55wlC3n92R5grj8gmc99pHUWEHgnDsYBP5QKNimiwLnFHkZvG05
+         92kA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLD0z9R36gEC6wW61rfyJsRLLlsm6eJetATVWVAAZiECnB2dar4Ba6iAVcEOgj4a27fFbTTjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxThstJebrOzZpcgAIzrNyv/4eUQ/BA587EK+qHlIA4gdTYq/Rj
+	54OtClb1nla0MvYR25OHW6uDmlWg39DO2d6GcE2WV6l8JHs0N2fn8aS9l4DlYYRq1UQ=
+X-Gm-Gg: ASbGncsamb6Yg3I0kjZAjQ+oWu2cdwB2YYXduMf4+0ymOnf/nMVAffpYYcDRmWD5w9L
+	ujI5ZhmUiqvw7VMrMf40NwEcDIMgDjBRFrQCKej+2Vr5w/L0HRiVsoUudkuU7wZqaWqoIlNf+Hd
+	r7qL8yEOITXca1Zqk17wC6u016pcRj10LirO1fKRrvfRgm5Gnz4YqAW8kLIlx/S4Tp8riaL1B3n
+	fdGSoF2i/qSY3Giplo/1egcQHz0S7VQYZn7ZhSAqORwCozTw2hkdPk0SNgi85Z06UAyTecah4wB
+	JbyxrVN+gx9AyLXCjWoA95Y3Np4wSDlZU4idX7dGj36dnedOJuTdYhsdAQ4hCyfFvZlsXE++
+X-Google-Smtp-Source: AGHT+IFvlefm01oYPM1h9ExnmLfkUHYFh6gyuhvhlTFDJV5yDSLIyUvQ0kWkWHYwVMpiGkMEole17Q==
+X-Received: by 2002:a05:6000:1887:b0:3a4:e672:deef with SMTP id ffacd0b85a97d-3a5586dc42dmr6618337f8f.36.1749738355672;
+        Thu, 12 Jun 2025 07:25:55 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a56199a930sm2174154f8f.35.2025.06.12.07.25.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 07:25:55 -0700 (PDT)
+Date: Thu, 12 Jun 2025 17:25:52 +0300
+From: Joe Damato <joe@dama.to>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next 2/2] netdevsim: collect statistics at RX side
+Message-ID: <aErjcH3NPbdP7Usx@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-team@meta.com
+References: <20250611-netdevsim_stat-v1-0-c11b657d96bf@debian.org>
+ <20250611-netdevsim_stat-v1-2-c11b657d96bf@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611-netdevsim_stat-v1-2-c11b657d96bf@debian.org>
 
-Em Thu, 12 Jun 2025 15:41:29 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
-
-> This patch series comes after:
-> 	https://lore.kernel.org/linux-doc/cover.1749723671.git.mchehab+huawei@kernel.org/T/#t	
-> The first patch is meant to speedup glob time by not adding all yaml to the parser.
+On Wed, Jun 11, 2025 at 08:06:20AM -0700, Breno Leitao wrote:
+> When the RX side of netdevsim was added, the RX statistics were missing,
+> making the driver unusable for GenerateTraffic() test framework.
 > 
-> The second one adjusts the location of netlink/specs/index.rst.
+> This patch adds proper statistics tracking on RX side, complementing the
+> TX path.
 > 
-> With that, on my AMD Ryzen 9 7900 machine, the time to do a full build after a
-> cleanup is:
+> Signed-off-by: Breno Leitao <Leitao@debian.org>
+> ---
+>  drivers/net/netdevsim/netdev.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> real    7m29,196s
-> user    14m21,893s
-> sys     2m28,510s
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index 67871d31252fe..590cb5bb0d20b 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -39,12 +39,16 @@ MODULE_IMPORT_NS("NETDEV_INTERNAL");
+>  
+>  static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
+>  {
+> +	struct net_device *dev = rq->napi.dev;
+> +
+>  	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE) {
+>  		dev_kfree_skb_any(skb);
+> +		dev_dstats_rx_dropped(dev);
+>  		return NET_RX_DROP;
+>  	}
+>  
+>  	skb_queue_tail(&rq->skb_queue, skb);
+> +	dev_dstats_rx_add(dev, skb->len);
+>  	return NET_RX_SUCCESS;
+>  }
 
-Heh, funny enough, my laptop with i5-10210U CPU @ 1.60GHz builds it faster:
+Hm, I was wondering: is it maybe better to add the stats code to nsim_poll or
+nsim_rcv instead?
 
-real	6m2,075s
-user	18m47,334s
-sys	1m24,931s
-
-Both are running Sphinx version 8.1.3 with standard Fedora package. At my
-laptop, this is a bit slower than no using the extension:
-
-real	5m13,334s
-user	15m56,441s
-sys	1m4,072s
-
-but it is a lot cleaner, as, with the original way, there are several
-warnings after make cleandocs:
-
-	Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`rt-link<../../networking/netlink_spec/rt-link>`
-	Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-	Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-	Warning: Documentation/userspace-api/netlink/index.rst references a file that doesn't exist: Documentation/networking/netlink_spec/index.rst
-	Warning: Documentation/userspace-api/netlink/specs.rst references a file that doesn't exist: Documentation/networking/netlink_spec/index.rst
-
-Because they refer to the temp .rst source files generated inside
-the source directory by the yaml conversion script.
-
-Regards,
-Mauro
+It "feels" like other drivers would be bumping RX stats in their NAPI poll
+function (which is nsim_poll, the naming of the functions is a bit confusing
+here), so it seems like netdevsim maybe should too?
 
