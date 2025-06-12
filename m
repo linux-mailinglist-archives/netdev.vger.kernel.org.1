@@ -1,240 +1,127 @@
-Return-Path: <netdev+bounces-197105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA2EAD7800
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:20:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC077AD77E5
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:18:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD4A33A246F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:17:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A2F17B27C3
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C862C3240;
-	Thu, 12 Jun 2025 16:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8441E5B68;
+	Thu, 12 Jun 2025 16:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZdiOi0vT"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="bHHBK51l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B87B2C17A1;
-	Thu, 12 Jun 2025 16:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC95298CB2
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 16:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749744908; cv=none; b=UTVuCct0YdKIpewI3OeyBab3jO47/iw2BvA0LQK63Cq3enHZppEFGacM0XPTuX91EeAavy9rodheESd4E/CtVJAdVk0uZkj93ajJIZcTvj0CDhUNlO7gbeI2SkKsfg2HK19mfksqC7CyLIHZjjPmeiepGLdupgcqcoAYq8jt760=
+	t=1749745012; cv=none; b=JygiZORjNGnPZqnRpHOOqVB2B9yFYbA23gUKE2OeebucTtUQcUq540I/H7wbe8Wbms6UbEXpJtyWCuhpU+uUZeBFlm2LOqe9S/ycBXzOtYdOWTMw763IgoprG/UHUq327uHgi+sHoUFXJk/pRwu2TfDp9aCeQkOastPdYgcAYnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749744908; c=relaxed/simple;
-	bh=jb6yzjh0u56Lwu10yKswbPCFIuXJ7v0u16sEAa3CQTY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=E6C1mcLWuCoNb517hcbtAp18M09Y9gyVbPsCKe3ucGjjgIQpNQpOj/O9EWrAejBydbOQMyLky1pR8HdNpo01k8kmmkThcIUt50rCax1qqbTg9JK2IhHO7PMglD6WuJzbUFIo09/rOFKAB/cUZYay5ZXGVW+W/2DVIWVQO+Famx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZdiOi0vT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E2E4C4CEEA;
-	Thu, 12 Jun 2025 16:15:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749744907;
-	bh=jb6yzjh0u56Lwu10yKswbPCFIuXJ7v0u16sEAa3CQTY=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=ZdiOi0vTXYo1QnrxuOez2SH4Ahi2HlXa+BM7PFr5Y9duofzSpDDR5cNxpT2mZTMzj
-	 FpJwK0gUGTxammKnyPiR5pStd92oMCdzO7UHIZ2FTOCUA+fATULtteXIuapscQbSUF
-	 JrDwgECF/lHNlkAEr3kZfeeK6RrUXP44OZ33aWg+kCwal9zPhl5QRGfhAn/01psxfz
-	 dQUd36mx9e1Gw0Vm4P6VTJpT925yD+/lZCWDmOVPfGTgUc/DPEJYZY93CsoSn6alVw
-	 fZNAAeLZo9iGGtdZKu7mwSyBkD1+NzKzLvZz7DvcPm4RV/gKaB43g1kbFSoZOWEKqc
-	 mW/ZopK3TsDsQ==
-Message-ID: <1cd4d07f7afbd7322a1330a49a2cc24e8ff801cd.camel@kernel.org>
-Subject: Re: [PATCH 1/2] nfsd: use threads array as-is in netlink interface
-From: Jeff Layton <jlayton@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
- Talpey <tom@talpey.com>, Steven Rostedt	 <rostedt@goodmis.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker	 <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni	 <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Mike Snitzer <snitzer@kernel.org>, linux-nfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Date: Thu, 12 Jun 2025 12:15:05 -0400
-In-Reply-To: <ae18305b-167d-4f27-bc3b-3d2d5f216d85@oracle.com>
-References: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
-	 <20250527-rpc-numa-v1-1-fa1d98e9a900@kernel.org>
-	 <a8d4c4cffe1a35ea831110ce1c7beea649352238.camel@kernel.org>
-	 <ae18305b-167d-4f27-bc3b-3d2d5f216d85@oracle.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1749745012; c=relaxed/simple;
+	bh=3QY5lvQ8Vb+Zfl9VUBqY+1YhAz0cEuRfEBmfww8HNjo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WAe+Iki+6Q9PllJcvuH1yfiwJ+a8K7H6wGlaVLx3h5TAoaCVzQNeZpAGTO0p1EHpAR5i5lUls0FqRDjHPdOEd+B82ujnGtyUsdFLJFXqkrXJFYQlWCiCqJnlhtwoFN6/GZXAZtBwV93/WVrwkvhVRgBdYlS3TylOxxQLGGHbZh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=bHHBK51l; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1749745011; x=1781281011;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PwA1gK3ywNpEqJYR5IfEz0DnydqoK8nP+fxiaxpfICE=;
+  b=bHHBK51lSlU0OkRbiPuIK72Fg56Ex5ZGURy9fj1/MQNURXMVF6peZ0xN
+   +eqCMuWeQgYmF4lYTuW7ZP6BoaOe3IzCotaASOtwzoT62VvFE7luoixEt
+   sEgPzUlb3RTGUD9PDtslUHtFzQTGagoMMxsWXQBIYjAL4pn0nRPNddVvb
+   GluGUp5wDrEvrd2wTjtOZE10kho/N5I3gHLg0rpMaPl8bOC+kYXSejRLH
+   gno2i7/eV7VA/PVFEYXqJ7Alm6ldyrgucJBPsFqBWP4A/KAFNKFRPlITA
+   3U4ht1luxStao20Nx6FCEhvoVrkLh0YVvvdWopK97NYj917pFbEGsEzgQ
+   A==;
+X-IronPort-AV: E=Sophos;i="6.16,231,1744070400"; 
+   d="scan'208";a="103514933"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 16:16:48 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:11930]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.42:2525] with esmtp (Farcaster)
+ id e9fa0be0-c8a7-44d3-b95f-f3e7bfff92f5; Thu, 12 Jun 2025 16:16:46 +0000 (UTC)
+X-Farcaster-Flow-ID: e9fa0be0-c8a7-44d3-b95f-f3e7bfff92f5
+Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 12 Jun 2025 16:16:44 +0000
+Received: from b0be8375a521.amazon.com (10.37.245.11) by
+ EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 12 Jun 2025 16:16:40 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Kohei Enju <kohei.enju@gmail.com>, Kohei Enju
+	<enjuk@amazon.com>
+Subject: [PATCH iwl-next v1] igbvf: add tx_timeout_count to ethtool statistics
+Date: Fri, 13 Jun 2025 01:16:26 +0900
+Message-ID: <20250612161630.67851-2-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D003ANC003.ant.amazon.com (10.37.240.197)
 
-On Thu, 2025-06-12 at 12:05 -0400, Chuck Lever wrote:
-> On 6/12/25 11:57 AM, Jeff Layton wrote:
-> > On Tue, 2025-05-27 at 20:12 -0400, Jeff Layton wrote:
-> > > The old nfsdfs interface for starting a server with multiple pools
-> > > handles the special case of a single entry array passed down from
-> > > userland by distributing the threads over every NUMA node.
-> > >=20
-> > > The netlink control interface however constructs an array of length
-> > > nfsd_nrpools() and fills any unprovided slots with 0's. This behavior
-> > > defeats the special casing that the old interface relies on.
-> > >=20
-> > > Change nfsd_nl_threads_set_doit() to pass down the array from userlan=
-d
-> > > as-is.
-> > >=20
-> > > Fixes: 7f5c330b2620 ("nfsd: allow passing in array of thread counts v=
-ia netlink")
-> > > Reported-by: Mike Snitzer <snitzer@kernel.org>
-> > > Closes: https://lore.kernel.org/linux-nfs/aDC-ftnzhJAlwqwh@kernel.org=
-/
-> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > ---
-> > >  fs/nfsd/nfsctl.c | 5 ++---
-> > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> > > index ac265d6fde35df4e02b955050f5b0ef22e6e519c..22101e08c3e80350668e9=
-4c395058bc228b08e64 100644
-> > > --- a/fs/nfsd/nfsctl.c
-> > > +++ b/fs/nfsd/nfsctl.c
-> > > @@ -1611,7 +1611,7 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_buf=
-f *skb,
-> > >   */
-> > >  int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *=
-info)
-> > >  {
-> > > -	int *nthreads, count =3D 0, nrpools, i, ret =3D -EOPNOTSUPP, rem;
-> > > +	int *nthreads, nrpools =3D 0, i, ret =3D -EOPNOTSUPP, rem;
-> > >  	struct net *net =3D genl_info_net(info);
-> > >  	struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
-> > >  	const struct nlattr *attr;
-> > > @@ -1623,12 +1623,11 @@ int nfsd_nl_threads_set_doit(struct sk_buff *=
-skb, struct genl_info *info)
-> > >  	/* count number of SERVER_THREADS values */
-> > >  	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-> > >  		if (nla_type(attr) =3D=3D NFSD_A_SERVER_THREADS)
-> > > -			count++;
-> > > +			nrpools++;
-> > >  	}
-> > > =20
-> > >  	mutex_lock(&nfsd_mutex);
-> > > =20
-> > > -	nrpools =3D max(count, nfsd_nrpools(net));
-> > >  	nthreads =3D kcalloc(nrpools, sizeof(int), GFP_KERNEL);
-> > >  	if (!nthreads) {
-> > >  		ret =3D -ENOMEM;
-> >=20
-> > I noticed that this didn't go in to the recent merge window.
-> >=20
-> > This patch fixes a rather nasty regression when you try to start the
-> > server on a NUMA-capable box.
->=20
-> The NFSD netlink interface is not broadly used yet, is it?
->=20
+Add `tx_timeout_count` to ethtool statistics to provide visibility into
+transmit timeout events, bringing igbvf in line with other Intel
+ethernet drivers.
 
-It is. RHEL10 shipped with it, for instance and it's been in Fedora for
-a while.
+Currently `tx_timeout_count` is incremented in igbvf_watchdog_task() and
+igbvf_tx_timeout() but is not exposed to userspace nor used elsewhere in
+the driver.
 
-> Since this one came in late during the 6.16 dev cycle and the Fixes: tag
-> references a commit that is already in released kernels, I put in the
-> "next merge window" pile. On it's own it doesn't look urgent to me.
->=20
+Before:
+  # ethtool -S ens5 | grep tx
+       tx_packets: 43
+       tx_bytes: 4408
+       tx_restart_queue: 0
 
-I'd really like to see this go in soon and to stable. If you want me to
-respin the changelog, I can. It's not a crash, but it manifests as lost
-RPCs that just hang. It took me quite a while to figure out what was
-going on, and I'd prefer that we not put users through that.
+After:
+  # ethtool -S ens5 | grep tx
+       tx_packets: 41
+       tx_bytes: 4241
+       tx_restart_queue: 0
+       tx_timeout_count: 0
 
->=20
-> > It all looks like it works, but some RPCs
-> > get silently dropped on the floor (if they happen to be received into a
-> > node with no threads). It took me a while to track down the problem
-> > after Mike reported it.
-> >=20
-> > Can we go ahead and pull this in and send it to stable?
-> >=20
-> > Also, did this patch fix the problem for you, Mike?
->=20
-> I'll wait for confirmation.
+Tested-by: Kohei Enju <enjuk@amazon.com>
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+ drivers/net/ethernet/intel/igbvf/ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
 
---=20
-Jeff Layton <jlayton@kernel.org>
+diff --git a/drivers/net/ethernet/intel/igbvf/ethtool.c b/drivers/net/ethernet/intel/igbvf/ethtool.c
+index 83b97989a6bd..773895c663fd 100644
+--- a/drivers/net/ethernet/intel/igbvf/ethtool.c
++++ b/drivers/net/ethernet/intel/igbvf/ethtool.c
+@@ -33,6 +33,7 @@ static const struct igbvf_stats igbvf_gstrings_stats[] = {
+ 	{ "lbrx_bytes", IGBVF_STAT(stats.gorlbc, stats.base_gorlbc) },
+ 	{ "lbrx_packets", IGBVF_STAT(stats.gprlbc, stats.base_gprlbc) },
+ 	{ "tx_restart_queue", IGBVF_STAT(restart_queue, zero_base) },
++	{ "tx_timeout_count", IGBVF_STAT(tx_timeout_count, zero_base) },
+ 	{ "rx_long_byte_count", IGBVF_STAT(stats.gorc, stats.base_gorc) },
+ 	{ "rx_csum_offload_good", IGBVF_STAT(hw_csum_good, zero_base) },
+ 	{ "rx_csum_offload_errors", IGBVF_STAT(hw_csum_err, zero_base) },
+-- 
+2.49.0
+
 
