@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-196987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0D1AD73A3
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:22:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5224EAD73D0
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:29:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 019757A4573
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:21:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A0191885B68
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415C718C00B;
-	Thu, 12 Jun 2025 14:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF77518FC91;
+	Thu, 12 Jun 2025 14:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmXCOEmM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sO6sgXw3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D63F146593;
-	Thu, 12 Jun 2025 14:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2FF1F16B;
+	Thu, 12 Jun 2025 14:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749738142; cv=none; b=C6O5+aye5QgUj+DooZ9dXoYZ0p4jKwAb1GUjysvec/J+H/wkw2dnouFEe2Gb5V4LD3BYxnhCEmgPLOO6nrUWh5/kkOHmkSbE5HZ50Vemc1gpqtUnsZW496IQf0gkFdyxbSgelB93Lm9kDZ1HPZsWsU8FS8i4QTKJopkvc+8M0PA=
+	t=1749738264; cv=none; b=l8vTfBTF2z0ZqsLG3IkYMB6LkGIeWhNAXNJJ9Py0JxVNA2Q9cl82qkr6Xa0lNVJDEo7JxaxzJB6EBN4yTocXMquTD37uGXXZ/hA5Uq5B0VwHwmVCN968+xFtEwc4hVEp6HSD6FNpgt8XW/bigO1bzfhL1YB9PgMwcbDea50wiek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749738142; c=relaxed/simple;
-	bh=TKeuNZ9kN5+bA+xcCfKcZcGurNnPgj25mlIXAv5jxU8=;
+	s=arc-20240116; t=1749738264; c=relaxed/simple;
+	bh=nEsTlMah9gnHESH6LtPtgD7WWncfqtpDL9THG9p2xXQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t3N1QF1z38Mz6/cZuiVvGKxNTPMqo1YtrxnZPDok9re3gYbn43ijZW6J8mCtiXk0RodQ9FAJqB5ukh7pBgf/lDRH2xwQolAak8tlkYHYPXYeP40tEV0R9FYNkVjvxKLcJ6eKCMGZnsWy+SjbIPeIug56sS2vaK2tGT+Y14a8sxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmXCOEmM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FA48C4CEEA;
-	Thu, 12 Jun 2025 14:22:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=VcKAQjCgXEd62rLdP6kUohkaNe9SvJUGy7T6QsLNPOm6s6BEuFRAXZMLzUiFlG8hasx1gwqIVfXyJQQnnzIsEBXQBlEK+vWtHZvT6i5pt9RcFUOeqc7Vly7aduTGwKySnjFINrUskq1n0lUVQKGqLIXQFiOswOl5hDKtZ+qixx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sO6sgXw3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84867C4CEEA;
+	Thu, 12 Jun 2025 14:24:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749738139;
-	bh=TKeuNZ9kN5+bA+xcCfKcZcGurNnPgj25mlIXAv5jxU8=;
+	s=k20201202; t=1749738264;
+	bh=nEsTlMah9gnHESH6LtPtgD7WWncfqtpDL9THG9p2xXQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pmXCOEmMDFLNdrTN0LESQ7c+5TfJdSxWZGFysFgsfKKlf1QymLA4rdJsCHGOzcX7B
-	 0hkR0yUuu/2NVL3YgUyiuWwvXbzKvAc1Iua92HUQymO3+XmyvYvkFiks9kHWTvLo7V
-	 azIhcW3SBwQZBEpYb0nXs4BgBwpuQ/kdTb5u0Kfvc2DK7eTLfe/r5vbbB+0ZGpjxrm
-	 ECwDWuSQ2yb6WZXdYiMA5iULsGgoLPcxQn5n8KUhlDBsr2hjCM3DKHy+I/xM4+Yjg+
-	 sYEM93CzZqH8ONX7N9wdI5gOwnpYk0PwlJVbnsWfdZVsJYXAoQGyBvFP1kqHprY5zl
-	 QTCH/UEVdONEA==
-Date: Thu, 12 Jun 2025 07:22:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com,
- Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 7/9] net/mlx5e: Properly access RCU protected
- qdisc_sleeping variable
-Message-ID: <20250612072218.6be4547f@kernel.org>
-In-Reply-To: <bdfe62f4-8b70-4284-b06d-e50ea6ae2d88@nvidia.com>
-References: <20250610151514.1094735-1-mbloch@nvidia.com>
-	<20250610151514.1094735-8-mbloch@nvidia.com>
-	<20250611144013.300c79ea@kernel.org>
-	<bdfe62f4-8b70-4284-b06d-e50ea6ae2d88@nvidia.com>
+	b=sO6sgXw3fo/7aQQ2yyZVu1pNbu3CzmCpSKk4o9R9YUwGlzNMt4Grgr4pBj2bzwe0Z
+	 M/ZOpNw7C3yDcTW2qvXHaQtCTHQTQ7gam9dEsRITXK1LS1p9P/sCd5UQCC3QE35r5h
+	 QGLhf/GOcCZ6jYBaWz1xi2bVoR+53sSXD9YFP5jJ5h+yDHZMXML3kscumnXQ48aRyt
+	 8N3bXnDzvV8VkMDMCDHdMZoOugHZDhNfRzKE6A3qsKKQ4gluICBFoLgYdskdZ4+5yZ
+	 X43al6UXGDdNn++SvXQALgpqhykVaYeyAm5+qy45TV+76zszH9QnR2ADUvpy9xstd4
+	 uI+FcJ1FtXWeQ==
+Date: Thu, 12 Jun 2025 16:24:16 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>
+Cc: linux-kernel@vger.kernel.org, Akira Yokosawa <akiyks@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Ignacio Encinas Rubio
+ <ignacio@iencinas.com>, Marco Elver <elver@google.com>, Shuah Khan
+ <skhan@linuxfoundation.org>, Donald Hunter <donald.hunter@gmail.com>, Eric
+ Dumazet <edumazet@google.com>, Jan Stancek <jstancek@redhat.com>, Paolo
+ Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
+ joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
+ lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
+ stern@rowland.harvard.edu, Breno Leitao <leitao@debian.org>
+Subject: Re: [PATCH v2 0/2] Some extra patches for netlink doc generation
+Message-ID: <20250612162416.507c8a12@sal.lan>
+In-Reply-To: <cover.1749735022.git.mchehab+huawei@kernel.org>
+References: <cover.1749735022.git.mchehab+huawei@kernel.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +68,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Jun 2025 10:31:45 +0300 Mark Bloch wrote:
-> > I don't think this is a functional change? We don't treat silencing
-> > compiler warnings as fixes, not for sparse or W=1 warnings.  
-> 
-> Well Eric's commit: d636fc5dd692c8f4e00ae6e0359c0eceeb5d9bdb
-> that added this annotation was because of a syzbot report.
+Em Thu, 12 Jun 2025 15:41:29 +0200
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
 
-And your point is?
+> This patch series comes after:
+> 	https://lore.kernel.org/linux-doc/cover.1749723671.git.mchehab+huawei@kernel.org/T/#t	
+> The first patch is meant to speedup glob time by not adding all yaml to the parser.
+> 
+> The second one adjusts the location of netlink/specs/index.rst.
+> 
+> With that, on my AMD Ryzen 9 7900 machine, the time to do a full build after a
+> cleanup is:
+> 
+> real    7m29,196s
+> user    14m21,893s
+> sys     2m28,510s
+
+Heh, funny enough, my laptop with i5-10210U CPU @ 1.60GHz builds it faster:
+
+real	6m2,075s
+user	18m47,334s
+sys	1m24,931s
+
+Both are running Sphinx version 8.1.3 with standard Fedora package. At my
+laptop, this is a bit slower than no using the extension:
+
+real	5m13,334s
+user	15m56,441s
+sys	1m4,072s
+
+but it is a lot cleaner, as, with the original way, there are several
+warnings after make cleandocs:
+
+	Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`rt-link<../../networking/netlink_spec/rt-link>`
+	Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
+	Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
+	Warning: Documentation/userspace-api/netlink/index.rst references a file that doesn't exist: Documentation/networking/netlink_spec/index.rst
+	Warning: Documentation/userspace-api/netlink/specs.rst references a file that doesn't exist: Documentation/networking/netlink_spec/index.rst
+	Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/firmware/intel,stratix10-svc.txt
+
+Because they refer to the temp .rst source files generated inside
+the source directory by the yaml conversion script.
+
+Regards,
+Mauro
 
