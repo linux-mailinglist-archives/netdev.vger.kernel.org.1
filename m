@@ -1,195 +1,161 @@
-Return-Path: <netdev+bounces-197231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E534EAD7DF0
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 23:55:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D299AD7E00
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE0291888198
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 21:55:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 397161893238
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FE32D5419;
-	Thu, 12 Jun 2025 21:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6C22D8763;
+	Thu, 12 Jun 2025 22:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="lIDZPkAH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DFxyi2ax"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F04119AD8C;
-	Thu, 12 Jun 2025 21:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C81D2F4325;
+	Thu, 12 Jun 2025 22:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749765311; cv=none; b=gQYxblU8SNopHpz/zrsmdqLGXssQB2ppUdq2nx9ZzVCa7nq7JrIGa8YKmu99+zorNF8bLQTDOMcgbbaMXMl7E4CVwSDg1x0JrTySa71wkv8F/EsuQqg8uAcdeylsy8PnToCG/no7cDAQlLxE1BnmQlN0Swoib55Sg2vj8eei0Zk=
+	t=1749765620; cv=none; b=liKs4AhQJFuw9dSTWN66U3NFkVyotyKBQbDI3BhVFiKn7KJpCJ6sVH1ZILrTolIc67a7YKEvvNdMUpgztl/yqf/OpqzqI25Oq0IVzYTMYrWJSWhn9tJdZJks6mPA06Jv0p1PWq0VesqeRqLcwcWRqPdlMJgjcs5SMRGe+bfS/+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749765311; c=relaxed/simple;
-	bh=v0DXISM21CFJLwfDh6OfwaljM02dwnc9XkWcJR3V2+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EcKIQGHYvXKpu7/B7JGOonF+vz8p6woOuGwm+xducJzR9a8YK6Yen6K3fMh5RVmjgLKqrUspZOcGOAADMyCclObdjUedhSIFEUSB/NoDYeLy/KZjrdyiv3o1vSZ6HWhrsGyWut5M5XxQITVlqpr/XilfToP2ktvhJA7FHV3yn3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=lIDZPkAH; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=R2bboSf8u7dl0NbIg0T+ctZOIch+m0PyW+cFV/FzJ04=; b=lIDZPkAHbl8Q6UNr4W/Z8uIua0
-	p9zdTabagfx03BsGquH1Qcw97ln/gHDy7IvlnHa9VCyNwHx/Vryx+jrXDq3tjRmPCZuzCmAt9KRxR
-	E4yhKXaCXeAZO38sGIlYpm7b3bASycu5nvw2XeeFvNi6HpahF6vmQ0TegX7ML4XlliMNFJveCLqyy
-	pxhKfAxpZrnU78vabLjhuvSppj/4NUTvDmjVrXtYMNvoSusKQopSGfe4mpfFG3H/OTJ06lamP/ILA
-	zDKw0xGRcHJ4zOZ3sWccGVwTUX+IWl/SoDbpvqYyPSQdiy+mONajLpZHHZnJNbWjquED7TyeiBQ/I
-	DRbrcS8A==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1uPpt4-000000001yc-3T6l;
-	Thu, 12 Jun 2025 23:55:06 +0200
-Date: Thu, 12 Jun 2025 23:55:06 +0200
-From: Phil Sutter <phil@nwl.cc>
-To: Klaus Frank <vger.kernel.org@frank.fyi>
-Cc: Antonio Ojea <antonio.ojea.garcia@gmail.com>,
-	netfilter-devel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>,
-	netfilter@vger.kernel.org,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>,
-	netdev@vger.kernel.org
-Subject: Re: Status of native NAT64/NAT46 in Netfilter?
-Message-ID: <aEtMuuN9c6RkWQFo@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Klaus Frank <vger.kernel.org@frank.fyi>,
-	Antonio Ojea <antonio.ojea.garcia@gmail.com>,
-	netfilter-devel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>,
-	netfilter@vger.kernel.org,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>,
-	netdev@vger.kernel.org
-References: <w7bwjqyae36c6pqhqjmvjcrwtpny6jxjyvxzb2qzt7atjncxd2@gi4xhlyrz27b>
- <aEqka3uX7tuFced5@orbyte.nwl.cc>
- <CABhP=tZRP42Dgw9+_vyAx80uPg4V2YFLfbGhpA10WzM46JYTNg@mail.gmail.com>
- <aErch2cFAJK_yd6M@orbyte.nwl.cc>
- <CABhP=tbUuJKOq6gusxyfsP4H6b4WrajR_A1=7eFXxfbLg+4Q1w@mail.gmail.com>
- <aEsuPMEkWHnJvLU9@orbyte.nwl.cc>
- <cqrontvwxblejbnnfwmvpodsymjez6h34wtqpze7t6zzbejmtk@vgjlloqq2rgc>
+	s=arc-20240116; t=1749765620; c=relaxed/simple;
+	bh=Yn9phey9bqAiHFmyBz3Povli4APEk34jXJQdbpqV9lI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IgUDJUQxvDqwqJa+eqS0KhE9KV3925/Des/fN7SEpbDQRecGnGAnK6CjatW6kbhWj3EvYpiQbxDSlp0SrtTK9wmjprTGiUTfnBTI5QtE/H55gZg5LPdtLPA7uCMe9I+WIYrHsWFsdT+bwfA3xeszC+HCP3C0cxWdCmRZ7kDTWi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DFxyi2ax; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749765618; x=1781301618;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Yn9phey9bqAiHFmyBz3Povli4APEk34jXJQdbpqV9lI=;
+  b=DFxyi2axob3Q/gA7nR1U4pBZdH8vd1TRdRSrL+p0LRHwy4JdS23dzNpR
+   xkgmRBkeKSD43f1h0zqetIjaICrymBbmE8vPhMlT2OZHW+u5np8P6th3h
+   H2GqgUq9E/TjwNPcJ9oJAkZJlLVheGfbOwdEP8qQ8m9a/pK3ZNO1TfYbn
+   x+K/l2C4LKrf4Rig2VqbG9Hbu4hditD19+NkT4Vm/DzSwDSiCns++KZVs
+   zqHnTP/ZVAdIiYH3LRZDKwkq8SEP4VDNAoMHNakaPtMwojJAYgn8Jg6h0
+   OiXabcusQhBMv9nD2gFdSRiQzGt+L9Rm49hhmWTgqPR5BQwwggXSqUdhe
+   g==;
+X-CSE-ConnectionGUID: VyIQe9TdQaesZHqFweY5QA==
+X-CSE-MsgGUID: /cqkiSsrS6GQ1gwALKbMEw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="51078251"
+X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
+   d="scan'208";a="51078251"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 15:00:18 -0700
+X-CSE-ConnectionGUID: 8tBik7dNRJa+BRcL0p5WIA==
+X-CSE-MsgGUID: moOzaooKQvmuuFAUHnY+FA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
+   d="scan'208";a="148004195"
+Received: from pthorat-mobl.amr.corp.intel.com (HELO soc-PF51RAGT.clients.intel.com) ([10.246.116.180])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 15:00:17 -0700
+From: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: jgg@nvidia.com,
+	leon@kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+Subject: [iwl-next v2 0/6] Add RDMA support for Intel IPU E2000 in idpf
+Date: Thu, 12 Jun 2025 16:59:56 -0500
+Message-ID: <20250612220002.1120-1-tatyana.e.nikolova@intel.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cqrontvwxblejbnnfwmvpodsymjez6h34wtqpze7t6zzbejmtk@vgjlloqq2rgc>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 12, 2025 at 08:13:02PM +0000, Klaus Frank wrote:
-> On Thu, Jun 12, 2025 at 09:45:00PM +0200, Phil Sutter wrote:
-> > On Thu, Jun 12, 2025 at 08:19:53PM +0200, Antonio Ojea wrote:
-> > > On Thu, 12 Jun 2025 at 15:56, Phil Sutter <phil@nwl.cc> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > On Thu, Jun 12, 2025 at 03:34:08PM +0200, Antonio Ojea wrote:
-> > > > > On Thu, 12 Jun 2025 at 11:57, Phil Sutter <phil@nwl.cc> wrote:
-> > > > > > On Sun, Jun 08, 2025 at 08:37:10PM +0000, Klaus Frank wrote:
-> > > > > > > I've been looking through the mailling list archives and couldn't find a clear anser.
-> > > > > > > So I wanted to ask here what the status of native NAT64/NAT46 support in netfilter is?
-> > > 
-> > > > > we ended doing some "smart hack" , well, really a combination of them
-> > > > > to provide a nat64 alternative for kubernetes
-> > > > > https://github.com/kubernetes-sigs/nat64:
-> > > > > - a virtual dummy interface to "attract" the nat64 traffic with the
-> > > > > well known prefix
-> > > > > - ebpf tc filters to do the family conversion using static nat for
-> > > > > simplicity on the dummy interface
-> > > > > - and reusing nftables masquerading to avoid to reimplement conntrack
-> > > >
-> > > > Oh, interesting! Would you benefit from a native implementation in
-> > > > nftables?
-> > > 
-> > > Indeed we'll benefit a lot, see what we have to do :)
-> > > 
-> > > > > you can play with it using namespaces (without kubernetes), see
-> > > > > https://github.com/kubernetes-sigs/nat64/blob/main/tests/integration/e2e.bats
-> > > > > for kind of selftest environment
-> > > >
-> > > > Refusing to look at the code: You didn't take care of the typical NAT
-> > > > helper users like FTP or SIP, did you?
-> > > 
-> > > The current approach does static NAT64 first, switching the IPv6 ips
-> > > to IPv4 and adapting the IPv4 packet, the "real nat" is done by
-> > > nftables on the ipv4 family after that, so ... it may work?
-> > 
-> > That was my approach as well: The incoming IPv6 packet was translated to
-> > IPv4 with an rfc1918 source address linked to the IPv6 source, then
-> > MASQUERADE would translate to the external IP.
-> > 
-> > In reverse direction, iptables would use the right IPv6 destination
-> > address from given rfc1918 destination address.
-> > 
-> > The above is a hack which limits the number of IPv6 clients to the size
-> > of that IPv4 transfer net. Fixing it properly would probably require
-> > conntrack integration, not sure if going that route is feasible (note
-> > that I have no clue about conntrack internals).
-> 
-> Well technically all that needs to be done is NAT66 instead of NAT44
-> within that hack and that limitation vanishes.
+This idpf patch series is the second part of the staged submission
+for introducing RDMA RoCEv2 support for the IPU E2000 line of products,
+referred to as GEN3.
 
-I don't comprehend: I have to use an IPv4 transfer net because I need to
-set a source address in the generated IPv4 header. The destination IPv4
-address is extracted from the IPv6 destination address. Simple example:
+To support RDMA GEN3 devices, the idpf driver uses
+common definitions of the IIDC interface and implements
+specific device functionality in iidc_rdma_idpf.h.
 
-IPv6-only internal:     fec0::/64
-v6mapped:               cafe::/96
-external IPv4:          1.2.3.4
-internal transfer IPv4: 10.64.64.0/24
+The IPU model can host one or more logical network endpoints called
+vPorts per PCI function that are flexibly associated with a physical
+port or an internal communication port.
 
-Client sends:       IPv6(fec0::1, cafe::8.8.8.8)
-nat64 in fwd:       IPv4(10.64.64.1, 8.8.8.8)
-nat in postrouting: IPv4(1.2.3.4, 8.8.8.8)
+Other features as it pertains to GEN3 devices include:
+* MMIO learning
+* RDMA capability negotiation
+* RDMA vectors discovery between idpf and control plane
 
-Google replies:     IPv4(8.8.8.8, 1.2.3.4)
-nat in prerouting:  IPv4(8.8.8.8, 10.64.64.1)
-nat64 in fwd:       IPv6(cafe::8.8.8.8, fec0::1)
+These patches are split from the submission
+"Add RDMA support for Intel IPU E2000 (GEN3)" [1]
+and are based on 6.16-rc1. A shared pull request for net-next and
+rdma-next will be sent following review.
 
-> > The actual issue though with protocols like FTP is that they embed IP
-> > addresses in their headers. Therefore it is not sufficient to swap the
-> > l3 header and recalculate the TCP checksum, you end up manipulating l7
-> > headers to keep things going. At least there's prior work in conntrack
-> > helpers, not sure if that code could be reused or not.
-> 
-> If nat64 functionality was added within conntrac itself then it would be
-> easy to reuse the l7 helpers. If it was anywhere else the l7 helpers
-> within conntrack would have to be re-implemented as conntrack wouldn't
-> know the mappings and therefor it probably would be quite hard to do the
-> rewrites.
-> Also in regards to FTP not just L7 headers but also payload needs to be
-> edited on the fly. As it often uses differnt commands for IPv4 and IPv6
-> (even though the IPv6 ones also support IPv4) and it embeds the IPs as
-> strings.
-> 
-> EPRT<space><d><net-prt><d><net-addr><d><tcp-port><d>
-> 
-> where "net-prt" is either 1 for IPv4 or 2 for IPv6. and net-addr is the
-> string representation.
-> However a client may send the "PORT" command instead...
-> Also RFC2428 may be helpful in this context.
-> 
-> I think if it was possible to get the nat64 into conntrack it should
-> also be possible to take care of this more easily as with external
-> "hacks".
+Changelog:
 
-I agree it would probably be the cleanest solution.
+v2:
+* Minor improvements like variable rename, logging,
+remove a redundant variable, etc.
+* A couple of cdev_info fixes to properly free it in
+error path and not to dereference it before NULL check.
 
-> Also in regards to the above code it looks like currently only tcp and
-> udp are supported. All other traffic appears to just dropped at the
-> moment instead of just passed through. Is there a particular reason for
-> this?
+Changes since split (v1) at [4]:
+* Replace core dev_ops with exported symbols
+* Align with new header split scheme (iidc_rdma.h common header
+and iidc_rdma_idpf.h specific header)
+* Align with new naming scheme (idc_rdma -> iidc_rdma)
+* The idpf patches are submitted separately from the ice and
+irdma changes.
 
-I guess tcp and udp are simply sufficient in k8s.
+At [3]:
+* Reduce required minimum RDMA vectors to 2
 
-Cheers, Phil
+At [2]:
+* RDMA vector number adjustment
+* Fix unplugging vport auxiliary device twice
+* General cleanup and minor improvements
+
+[1] https://lore.kernel.org/all/20240724233917.704-1-tatyana.e.nikolova@intel.com/
+[2] https://lore.kernel.org/all/20240824031924.421-1-tatyana.e.nikolova@intel.com/
+[3] https://lore.kernel.org/all/20250207194931.1569-1-tatyana.e.nikolova@intel.com/
+[4] https://lore.kernel.org/all/20250523170435.668-1-tatyana.e.nikolova@intel.com/ 
+
+Joshua Hay (6):
+  idpf: use reserved RDMA vectors from control plane
+  idpf: implement core RDMA auxiliary dev create, init, and destroy
+  idpf: implement RDMA vport auxiliary dev create, init, and destroy
+  idpf: implement remaining IDC RDMA core callbacks and handlers
+  idpf: implement IDC vport aux driver MTU change handler
+  idpf: implement get LAN MMIO memory regions
+
+ drivers/net/ethernet/intel/idpf/Makefile      |   1 +
+ drivers/net/ethernet/intel/idpf/idpf.h        | 117 ++++-
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |  14 +-
+ .../net/ethernet/intel/idpf/idpf_controlq.h   |  19 +-
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  49 +-
+ drivers/net/ethernet/intel/idpf/idpf_idc.c    | 497 ++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 102 +++-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |  32 +-
+ drivers/net/ethernet/intel/idpf/idpf_mem.h    |   8 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  45 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 190 ++++++-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   3 +
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   |  42 +-
+ include/linux/net/intel/iidc_rdma_idpf.h      |  55 ++
+ 15 files changed, 1102 insertions(+), 73 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_idc.c
+ create mode 100644 include/linux/net/intel/iidc_rdma_idpf.h
+
+-- 
+2.31.1
+
 
