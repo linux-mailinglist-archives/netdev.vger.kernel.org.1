@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-196901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4543AD6DC9
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:32:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A932AD6DCC
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71E12174F5C
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:32:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF87617D8F9
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B3A2356CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E8823A58B;
 	Thu, 12 Jun 2025 10:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Frmjlb8d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BYqXdnut"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FE922FAC3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490D5238176;
 	Thu, 12 Jun 2025 10:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749724344; cv=none; b=T95w6O2JBYqMn/YajTtugrle7AAxK6Qst/zp5a4sZ//rcNU9/uH3lpQVpIXsNe5fvaHWQyyEhgP+ow2iyupwv4Kl05NSACID8nC+blAPIUThsCmEkKkzjDYR/e+U5Lp9eVPNvCJRCQpmrcwiDkAkiV9Zfwq/r5TypQzxNtaGjAk=
+	t=1749724344; cv=none; b=ktLpQYHGCddKM+PnBLcDZ4yKGQaaiijzscwssVd1/HSSoi1eqg5iQMuIrYhTVCGSjZgUIkZxekGEPiW7uWkV9I9p+lleVW5hx/fP9DuVAYJVtaJ7fhZ/MAFCry7JhHFtq/zbNdsnZ4f9TTJSupVRdkBejwdXJOeRb86VOBUWcQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749724344; c=relaxed/simple;
-	bh=nVMNn0VSngYDSLAUJezTR2b19OzJ86I1XkvSWoGjSbY=;
+	bh=zjfj2Tm7h9LKUnhgzAVTuVnT8YUaP6pYYIdRhxmKFAc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pirxhlxAC/a4lnpY40zq/PiWigU8HMe09RZP6vR0sqs7VpFQ4W7abdBpgzm0o2mqK8XGqZj8cj9jJ3v8QxidXfdraDmSOYfhzGvpPm2sjxeC7RYMTRekJX2ut61eObo+Bq7lCuCveM2d5xgeTjaPUsDAfdaf8G0a6ur+m1DzQ94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Frmjlb8d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5EB8C4CEF1;
-	Thu, 12 Jun 2025 10:32:23 +0000 (UTC)
+	 MIME-Version; b=tXA/l/xF1WP3KINNXYxXd2zHT3apIPDChoBzzPfYFDntqO1p5jfZi5M4WSdqnbn6Xq7Ha8/9kQr7BWmUMJ/UQMOt9mYTBJGYeUhE6s9SabaKKeVOuPVmt0+f/yheA7JoBRhFcRNa9FpTyqtNJX2wz47WJTNJgk0AvZsflsh0dwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BYqXdnut; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06061C4CEF3;
+	Thu, 12 Jun 2025 10:32:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1749724344;
-	bh=nVMNn0VSngYDSLAUJezTR2b19OzJ86I1XkvSWoGjSbY=;
+	bh=zjfj2Tm7h9LKUnhgzAVTuVnT8YUaP6pYYIdRhxmKFAc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Frmjlb8dtgO48XvFAdPuTxYhDYKcBFzGt7ZRjxuCJhF4OXj9hpXofqzOG5hb7cMBW
-	 q/J5fRL1xWnQwqkZGL5DhdoNQ/QqbowLv6NdDFqlQ2du9D6KyrmeoAt4dQsWBNL9m+
-	 7YtC2txWNucD27ir6klSf84OifHPrzB3//NGvC5jCxWgrlLohvLWBy9XILJMi/p2vI
-	 7toskAJFDyeA+amwI93kITiDd1A2/WK06bolb1Chq9WFI9noJ3noIgEAapuamHusIq
-	 wKww2EHwIAPIBR0hc7kt06Z+wqemMRhdVVg4X1W4Z7wiM4vLBSB1wPTVN7Au896bh9
-	 WBCk14dlxr1xA==
+	b=BYqXdnuthw7H9WVavgog7+Dtyu2zZjHtLXObVyu36oJiy8G0mt3sfoGgv4YjCLVsf
+	 Q2gfboOv1l9XEl9UTtxOSUZEQqDT8rWtS02ltHJi36t/wPjgZqTyqcYLK2iUY+5/kL
+	 6I87Po8QPA0YvrbXFaScpDWr8L/5swnRIiVS16Zr3i+NfeD2cfAtJyGoXTvcJ+mxnA
+	 WniBxdXLwUrEXZU5uIG4DCBENA+GlzUZdbo4q/acAAA7TUs4mjnHM9QacXDAqBfF/K
+	 OP8PwrpYotBK5U8/vv1e0ENlmL3EVuLRqnidmCKM/8LBqIPBjL9+FLSD4hCwfaH5L4
+	 gkXg4Qu53iz2w==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uPfEM-00000004yvE-0SLU;
+	id 1uPfEM-00000004yvI-0hdk;
 	Thu, 12 Jun 2025 12:32:22 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
@@ -70,9 +70,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v2 03/12] docs: netlink: don't ignore generated rst files
-Date: Thu, 12 Jun 2025 12:31:55 +0200
-Message-ID: <1cf12ab4c027cf27decf70a40aafdd0e2f669299.1749723671.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v2 04/12] tools: ynl_gen_rst.py: make the index parser more generic
+Date: Thu, 12 Jun 2025 12:31:56 +0200
+Message-ID: <3fb42a4aa79631d69041f6750dc0d55dd3067162.1749723671.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749723671.git.mchehab+huawei@kernel.org>
 References: <cover.1749723671.git.mchehab+huawei@kernel.org>
@@ -85,54 +85,78 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-Currently, the build system generates ReST files inside the
-source directory. This is not a good idea, specially when
-we have renames, as make clean won't get rid of them.
+It is not a good practice to store build-generated files
+inside $(srctree), as one may be using O=<BUILDDIR> and even
+have the Kernel on a read-only directory.
 
-As the first step to address the issue, stop ignoring those
-files. This way, we can see exactly what has been produced
-at build time inside $(srctree):
-
-        Documentation/networking/netlink_spec/conntrack.rst
-        Documentation/networking/netlink_spec/devlink.rst
-        Documentation/networking/netlink_spec/dpll.rst
-        Documentation/networking/netlink_spec/ethtool.rst
-        Documentation/networking/netlink_spec/fou.rst
-        Documentation/networking/netlink_spec/handshake.rst
-        Documentation/networking/netlink_spec/index.rst
-        Documentation/networking/netlink_spec/lockd.rst
-        Documentation/networking/netlink_spec/mptcp_pm.rst
-        Documentation/networking/netlink_spec/net_shaper.rst
-        Documentation/networking/netlink_spec/netdev.rst
-        Documentation/networking/netlink_spec/nfsd.rst
-        Documentation/networking/netlink_spec/nftables.rst
-        Documentation/networking/netlink_spec/nl80211.rst
-        Documentation/networking/netlink_spec/nlctrl.rst
-        Documentation/networking/netlink_spec/ovs_datapath.rst
-        Documentation/networking/netlink_spec/ovs_flow.rst
-        Documentation/networking/netlink_spec/ovs_vport.rst
-        Documentation/networking/netlink_spec/rt_addr.rst
-        Documentation/networking/netlink_spec/rt_link.rst
-        Documentation/networking/netlink_spec/rt_neigh.rst
-        Documentation/networking/netlink_spec/rt_route.rst
-        Documentation/networking/netlink_spec/rt_rule.rst
-        Documentation/networking/netlink_spec/tc.rst
-        Documentation/networking/netlink_spec/tcp_metrics.rst
-        Documentation/networking/netlink_spec/team.rst
+Change the YAML generation for netlink files to allow it
+to parse data based on the source or on the object tree.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/networking/netlink_spec/.gitignore | 1 -
- 1 file changed, 1 deletion(-)
- delete mode 100644 Documentation/networking/netlink_spec/.gitignore
+ tools/net/ynl/pyynl/ynl_gen_rst.py | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/networking/netlink_spec/.gitignore b/Documentation/networking/netlink_spec/.gitignore
-deleted file mode 100644
-index 30d85567b592..000000000000
---- a/Documentation/networking/netlink_spec/.gitignore
-+++ /dev/null
-@@ -1 +0,0 @@
--*.rst
+diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
+index 7bfb8ceeeefc..b1e5acafb998 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_rst.py
++++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
+@@ -365,6 +365,7 @@ def parse_arguments() -> argparse.Namespace:
+ 
+     parser.add_argument("-v", "--verbose", action="store_true")
+     parser.add_argument("-o", "--output", help="Output file name")
++    parser.add_argument("-d", "--input_dir", help="YAML input directory")
+ 
+     # Index and input are mutually exclusive
+     group = parser.add_mutually_exclusive_group()
+@@ -405,11 +406,14 @@ def write_to_rstfile(content: str, filename: str) -> None:
+     """Write the generated content into an RST file"""
+     logging.debug("Saving RST file to %s", filename)
+ 
++    dir = os.path.dirname(filename)
++    os.makedirs(dir, exist_ok=True)
++
+     with open(filename, "w", encoding="utf-8") as rst_file:
+         rst_file.write(content)
+ 
+ 
+-def generate_main_index_rst(output: str) -> None:
++def generate_main_index_rst(output: str, index_dir: str) -> None:
+     """Generate the `networking_spec/index` content and write to the file"""
+     lines = []
+ 
+@@ -418,12 +422,18 @@ def generate_main_index_rst(output: str) -> None:
+     lines.append(rst_title("Netlink Family Specifications"))
+     lines.append(rst_toctree(1))
+ 
+-    index_dir = os.path.dirname(output)
+-    logging.debug("Looking for .rst files in %s", index_dir)
++    index_fname = os.path.basename(output)
++    base, ext = os.path.splitext(index_fname)
++
++    if not index_dir:
++        index_dir = os.path.dirname(output)
++
++    logging.debug(f"Looking for {ext} files in %s", index_dir)
+     for filename in sorted(os.listdir(index_dir)):
+-        if not filename.endswith(".rst") or filename == "index.rst":
++        if not filename.endswith(ext) or filename == index_fname:
+             continue
+-        lines.append(f"   {filename.replace('.rst', '')}\n")
++        base, ext = os.path.splitext(filename)
++        lines.append(f"   {base}\n")
+ 
+     logging.debug("Writing an index file at %s", output)
+     write_to_rstfile("".join(lines), output)
+@@ -447,7 +457,7 @@ def main() -> None:
+ 
+     if args.index:
+         # Generate the index RST file
+-        generate_main_index_rst(args.output)
++        generate_main_index_rst(args.output, args.input_dir)
+ 
+ 
+ if __name__ == "__main__":
 -- 
 2.49.0
 
