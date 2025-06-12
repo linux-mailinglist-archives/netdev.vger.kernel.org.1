@@ -1,138 +1,164 @@
-Return-Path: <netdev+bounces-196838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C71AD6ADE
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:32:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 569B2AD6AFC
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:37:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 493801BC36DE
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:33:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 002E5170714
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D6322156F;
-	Thu, 12 Jun 2025 08:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C5522068B;
+	Thu, 12 Jun 2025 08:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MOsRMau9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQ/9ZLqn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD9422154A
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CADEC2;
+	Thu, 12 Jun 2025 08:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749717160; cv=none; b=Pkf0kNuL1nnW+MZmL0tlpZK3ebSrNLjoaiRcnmox9c3Gwi9lszjgX5Hpgy8NnslBr7bwpndodR3LXHlSGOIBNejTGLSQZhMFOAK7/91mEjpQRtLfmDGHOB6F4FNthYHSAbrBjTyMot8Y/idXc8ClG64zjfXHo0ljilaO0pQUjl4=
+	t=1749717471; cv=none; b=fTcqkHMfqGJafZxcIjmkP58TbLIPDwY2tFqNULt+memtyCi0ZucssrJkWdbTg1zzFZ5VaPe0L2oEtJjHCBLoFD7Uw7cqWU5fi2ldeeb6nueP7++VLmwZt30EvpPSsOFNBYTC3TGAe6C4Oue1oldTbv2ZLIq6952QXDyyV5uEf2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749717160; c=relaxed/simple;
-	bh=dRnpTqZOgxtCjtrEYPRyB19fZASY1zRRbygsfhWRtpA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rhHsjt9OuWD78/xjl77+f5pvv7gJ3Kk1DY26ykIkvsf+8JQ983sRF/Rrafx45kKQv27qVtl0p3J58fCJS5U0b0fD03d2pvy+2nFMK1njDVArwN6yobQK3DMj9/Sk6E8yH741q5ZK0O2JgL6A5yD3pSzfnGCBkj8sLW82Xjme5kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MOsRMau9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749717157;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WBc9H8Z/EQERaKXzDLp/qCNq6MVVbEZ78ho0JJh2JsQ=;
-	b=MOsRMau9/Ew9jsy2HztLtMoXr59hKzaT6zbYeK78KNnpNnLpROhliCbDEM8hrH6dLxeZxn
-	NxBfLqpSLEk9av0IJp3ocnBOKc+HfZKEOgPDl4Ci3VXDR9cWa6kqR77FrnA1bDuhAeGZLh
-	5tKR63elbsD+eodliztdHDJwMUzv5QY=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-616-qHPjq-GQPCy8ACNRN0g0hg-1; Thu,
- 12 Jun 2025 04:32:32 -0400
-X-MC-Unique: qHPjq-GQPCy8ACNRN0g0hg-1
-X-Mimecast-MFC-AGG-ID: qHPjq-GQPCy8ACNRN0g0hg_1749717150
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2D83019560B6;
-	Thu, 12 Jun 2025 08:32:30 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.72.112.165])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 72DFC19560A3;
-	Thu, 12 Jun 2025 08:32:24 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: eperezma@redhat.com,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
+	s=arc-20240116; t=1749717471; c=relaxed/simple;
+	bh=CEFLa9n+fPpj+wqGGKvvw/pmVw9z8+q8e0CLX4B/Ck4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=InjBUqzlBMqwC9mOuUr6IWTbMdE5IPkYPF8O+xqK/oqtVp0dMfNc+kC3ooaWhmquIXrQM7/5OV0OEVFiTDxqQdRIy4bIxbhITD4ge9znIm/E82VWGwLHiNZutum31OB1SNEDzLNV30QgehlU34yc1ELzANLfRuF8tArK1PWimag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQ/9ZLqn; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-450ccda1a6eso5595035e9.2;
+        Thu, 12 Jun 2025 01:37:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749717468; x=1750322268; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xzEGJKtT75RAQvXoSTk2Z9JRuW+7se7xW3FgO1AhOCE=;
+        b=SQ/9ZLqncvJ+qafB437DSOR3g1WA2N2/36v+kA4Q9KGpm20arFIxZy/10kKpgPWJGH
+         4dpp0xu0hEoIO94gkkamqKWoetbp/SbkybCcaIbTGjBuWrlQlX43eX91bnCvOUULsPBp
+         mDC5bFI+VHWqPYCHdTtXoHyCxK99nGBSuZcRDucsAtotRbonk+NmnooD1egCbFSOSv2t
+         UCVbvXzJzz+Ftmgl3eIRCRD/Sikl5TGhBWFf/WAWhslN2H/qXfgkDeN40AF6GzdGjqOL
+         FISo3JVQauAUTTpLO4+0fG2pQjtasZ2I3NPILQFgYduuBYBFFsDG67mmQJ2phjNGomzK
+         fhVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749717468; x=1750322268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xzEGJKtT75RAQvXoSTk2Z9JRuW+7se7xW3FgO1AhOCE=;
+        b=RlfZYNSDRMA3BRpKHfOdr8jcA1D79Pn5f80A/piP4T74PJjV7jnWp0wtXVRBcbvVpW
+         zDWSaGEcqo9mlc3bNHjw+/Fp7B5TfRSQ2iZ4OS1L1NtEG+X+7LvNye+gkbatnc+9tKCG
+         VwRpGwzB2qqU6HZe5gLi/IgFKqsoBx4zCwAnRsKRFm2osiOWE8BGpo59aM10MtrIfDV3
+         sprWa1RIWwP3XYvntoyfFtjr8RZ8vw6fUpIuWjRKCU8qiVQXgmq9maL2oDNNQbl4pth3
+         7yH0VEpLL2qLx4nUr6avfDKX2Wtr/lOLRzKa6oAydWvqUO1HVQMR5gYoIGxPlrIeuz+L
+         cLPg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+cIbFtZmeohlrfp/9CxKRks3eZGOHQlxqQ8dCKfGwNbdlYhKXxW2OtrHkBASte3sPwGaquGK/5Ug1nKo=@vger.kernel.org, AJvYcCWofSU59d43xfMrUF7u80XLdC3cQz7ziRhBK72Vcd/iBxeUs3+HYUYszo828OGbN0Zc3NU0Ktv6@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx8ztv4Qp/DHQ1+Tu89ElYgVvxKGwdP5lVFyt2GCA6gvoMRo5Y
+	wJfJyFTN1xCH4/WGC/HW3b8TO/liduMkyMiviFp5Dkkizto0gUgMsLbA
+X-Gm-Gg: ASbGncuJQ1BuXBpWeuDtaR1cwB1kPB9Jvu+gzLx6yibevYnXBt3ANCDc+gqWbjJJt0R
+	mDsV+rhw2SZ1pGw+ZkfPUK+gjUZc8PoewAdhiXrWyDPdWdQ11eKvq3cpMEUDtucc+XqGRvwlGkl
+	D7VjalvMbYnv8/eZlLJAVDr0Ui2UmpkvSCzWqhkNP/u59fyPdaYD9dmPRnhS0VeInJ+WkcKmH8+
+	TdDGTAtebQJItWJmE7hBc28fu8DX1rlAQfgnsIpGrc8NRGIQuG/FARTeDKUyj4wMp3rUhaFVeOn
+	4mMd8NZbOBGhcclYzmZkXUzuuZDBgDqvqf9Sj9WX3zafk6uz3zTVd6wKN/F8ZSRcGq6zDBFxNsb
+	Zsynr3d3S4vZk6SOGqcz08ztl3xZBIcpvWCYZ7NrwrLvaosAP0Aoyz0xX9MMnGm4mwuNtH2ScJs
+	dR4A==
+X-Google-Smtp-Source: AGHT+IGMlAnHdu7jqnEKPsR3T+CXTeX2ZPjabtwDjVejO1UoYgXS0fDYrY2pacXuIIMe0uiyZM8DiQ==
+X-Received: by 2002:a05:600c:5291:b0:44a:b7a3:b95f with SMTP id 5b1f17b1804b1-4532b966af9mr21379005e9.25.1749717468022;
+        Thu, 12 Jun 2025 01:37:48 -0700 (PDT)
+Received: from slimbook.localdomain (2a02-9142-4580-1900-0000-0000-0000-0011.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1900::11])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e224956sm13350975e9.4.2025.06.12.01.37.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 01:37:47 -0700 (PDT)
+From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
+To: jonas.gorski@gmail.com,
+	florian.fainelli@broadcom.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
 	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next 2/2] vhost-net: reduce one userspace copy when building XDP buff
-Date: Thu, 12 Jun 2025 16:32:13 +0800
-Message-ID: <20250612083213.2704-2-jasowang@redhat.com>
-In-Reply-To: <20250612083213.2704-1-jasowang@redhat.com>
-References: <20250612083213.2704-1-jasowang@redhat.com>
+	pabeni@redhat.com,
+	horms@kernel.org,
+	vivien.didelot@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dgcbueu@gmail.com
+Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
+Subject: [PATCH net-next v3 00/14] net: dsa: b53: fix BCM5325 support
+Date: Thu, 12 Jun 2025 10:37:33 +0200
+Message-Id: <20250612083747.26531-1-noltari@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-We used to do twice copy_from_iter() to copy virtio-net and packet
-separately. This introduce overheads for userspace access hardening as
-well as SMAP (for x86 it's stac/clac). So this patch tries to use one
-copy_from_iter() to copy them once and move the virtio-net header
-afterwards to reduce overheads.
+These patches get the BCM5325 switch working with b53.
 
-Testpmd + vhost_net shows 10% improvement from 5.45Mpps to 6.0Mpps.
+The existing brcm legacy tag only works with BCM63xx switches.
+We need to add a new legacy tag for BCM5325 and BCM5365 switches, which
+require including the FCS and length.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/net.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+I'm not really sure that everything here is correct since I don't work for
+Broadcom and all this is based on the public datasheet available for the
+BCM5325 and my own experiments with a Huawei HG556a (BCM6358).
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 777eb6193985..2845e0a473ea 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -690,13 +690,13 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 	if (unlikely(!buf))
- 		return -ENOMEM;
- 
--	copied = copy_from_iter(buf, sock_hlen, from);
--	if (copied != sock_hlen) {
-+	copied = copy_from_iter(buf + pad - sock_hlen, len, from);
-+	if (copied != len) {
- 		ret = -EFAULT;
- 		goto err;
- 	}
- 
--	gso = buf;
-+	gso = buf + pad - sock_hlen;
- 
- 	if (!sock_hlen)
- 		memset(buf, 0, pad);
-@@ -715,12 +715,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
- 		}
- 	}
- 
--	len -= sock_hlen;
--	copied = copy_from_iter(buf + pad, len, from);
--	if (copied != len) {
--		ret = -EFAULT;
--		goto err;
--	}
-+	memcpy(buf, buf + pad - sock_hlen, sock_hlen);
- 
- 	xdp_init_buff(xdp, buflen, NULL);
- 	xdp_prepare_buff(xdp, buf, pad, len, true);
+Both sets of patches have been merged due to the change requested by Jonas
+about BRCM_HDR register access depending on legacy tags.
+
+ v3: introduce changes requested by Florian, Jonas and Jakub:
+  - Improve brcm legacy tag Kconfig description, use __le32 and crc32_le().
+  - Detect BCM5325 variants as requested by Florian.
+  - B53_VLAN_ID_IDX exists in newer BCM5325E switches.
+  - Check for legacy tag protocols instead of is5325() for B53_BRCM_HDR.
+  - Use in_range() helper for B53_PD_MODE_CTRL_25.
+
+ v2: introduce changes requested by Jonas, Florian and Vladimir:
+  - Add b53_arl_to_entry_25 function.
+  - Add b53_arl_from_entry_25 function.
+  - Add b53_arl_read_25 function, fixing usage of ARLTBL_VALID_25 and
+    ARLTBL_VID_MASK_25.
+  - Change b53_set_forwarding function flow.
+  - Disallow BR_LEARNING on b53_br_flags_pre() for BCM5325.
+  - Drop rate control registers.
+  - Move B53_PD_MODE_CTRL_25 to b53_setup_port().
+  - Replace swab32() with cpu_to_le32().
+
+Florian Fainelli (1):
+  net: dsa: b53: add support for FDB operations on 5325/5365
+
+Álvaro Fernández Rojas (13):
+  net: dsa: tag_brcm: legacy: reorganize functions
+  net: dsa: tag_brcm: add support for legacy FCS tags
+  net: dsa: b53: support legacy FCS tags
+  net: dsa: b53: detect BCM5325 variants
+  net: dsa: b53: prevent FAST_AGE access on BCM5325
+  net: dsa: b53: prevent SWITCH_CTRL access on BCM5325
+  net: dsa: b53: fix IP_MULTICAST_CTRL on BCM5325
+  net: dsa: b53: prevent DIS_LEARNING access on BCM5325
+  net: dsa: b53: prevent BRCM_HDR access on older devices
+  net: dsa: b53: prevent GMII_PORT_OVERRIDE_CTRL access on BCM5325
+  net: dsa: b53: fix unicast/multicast flooding on BCM5325
+  net: dsa: b53: fix b53_imp_vlan_setup for BCM5325
+  net: dsa: b53: ensure BCM5325 PHYs are enabled
+
+ drivers/net/dsa/b53/Kconfig      |   1 +
+ drivers/net/dsa/b53/b53_common.c | 296 ++++++++++++++++++++++++-------
+ drivers/net/dsa/b53/b53_priv.h   |  45 ++++-
+ drivers/net/dsa/b53/b53_regs.h   |  24 ++-
+ include/net/dsa.h                |   2 +
+ net/dsa/Kconfig                  |  16 +-
+ net/dsa/tag_brcm.c               | 119 ++++++++++---
+ 7 files changed, 409 insertions(+), 94 deletions(-)
+
 -- 
-2.34.1
+2.39.5
 
 
