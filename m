@@ -1,148 +1,186 @@
-Return-Path: <netdev+bounces-196882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F57AD6C56
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:35:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFFEEAD6C71
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95997189E46E
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:35:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF2CC189F0D6
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D658F229B16;
-	Thu, 12 Jun 2025 09:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F7522AE76;
+	Thu, 12 Jun 2025 09:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aWCmocSx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nej5cZce"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE284229B36
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 09:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2D81CDA3F;
+	Thu, 12 Jun 2025 09:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749720896; cv=none; b=hmvViMZU3vctzYa4e7taO5ysBfEpZgsL7uiaK+qPmLWrSEU1BTkxnoaapPnylJa02lVYRCFYuMXfaV8mtkRhIS4XaR9PJe6axyUxsOnDTBD+12Kg/VOl8uY01PAKOp1YFvxNt+2eVOM/99H4JylFm10nHz0MqXI9y6w4n4y4wZQ=
+	t=1749721313; cv=none; b=UEVJWm761hqPBwYY/4VxW2VKaj9Ah0Irp1RuxjV0Ltnp1r7aQxKTUqiYppYlKXj6r13JeNyIMffdsuDqBhj3LaYO6UyE4GpdY5hQE0wuFvWxs+GTlOikAJHPvRmzngKVdBieM+Sydx/EU7L/YmsJeRH+/9EmF4ptQmglWzO1FH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749720896; c=relaxed/simple;
-	bh=DSyr8/6mo3/7JRB1XAiPDN2HSM+NqDTRh1iMBQd+3Bk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oeVweVVZwEf0L16mft+NVpo+HnFF8u6pIFSiVrd+JgGC5IlAFVxArtD6F9hwgBox1ZcbIOR2fOc34WDHsSsPZ1cSEw3PELUI34wio+ZWpgR4Iy3f+VqUOmq9GBdHluRt2aOWNpx37E4kkcec06SEuSwQU1+xbtC86KP3iGlaNkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aWCmocSx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749720893;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K5vTTBowN3xYnMLoi2pnSbr3ixJ6ZJA/32wV4sZG16M=;
-	b=aWCmocSxqkvRJ4LQcQka/ZkDMTuQXoFC5P9/LEMxEyiBQ/NUi2QRUUamDGQulsF5xKF+/v
-	uQqBceM040/haumA/ltq5W97fr/tHPOU5PZRpbB1V9DJtO0qNzy7S3/vCt/B1g49sdbxLq
-	iY7+sgYDRCGoXRKQ/1QCgsgE4l5mnlw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-225-Hx5hpDDtOXeh1ydI_Jwn_A-1; Thu, 12 Jun 2025 05:34:52 -0400
-X-MC-Unique: Hx5hpDDtOXeh1ydI_Jwn_A-1
-X-Mimecast-MFC-AGG-ID: Hx5hpDDtOXeh1ydI_Jwn_A_1749720891
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45311704d22so4213035e9.2
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 02:34:52 -0700 (PDT)
+	s=arc-20240116; t=1749721313; c=relaxed/simple;
+	bh=wIqzhSLqZqmNUrqt6/TJMr+XyjaayHa0yDpcM/EKvHM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fWowc39qhdnYIqPnPsXDfgiUUgJdxkdVKdDJYM/+ERmmaEGttVZKVHqDE84fnyZdLzXXmlttc8Hrl+NDaP1nN1bpSG2pVkdNHSQcY/zxpc3usyLodXuRq0/ItUe031P/iHqM4vNfz55Ut0THtYOD7FktBKzXVoM5MV0FCnWNp2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nej5cZce; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-313a001d781so697181a91.3;
+        Thu, 12 Jun 2025 02:41:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749721311; x=1750326111; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFnlATaSnU4bTRG+dvZXuOqxPOP4TFg9Eb3syeOUrz4=;
+        b=nej5cZceH6Z1RYuJDnZox4LwuoM047FG80tnEfqMrVaBfhiBMoi2WI+souFU2O8o9v
+         bK11LGRYGHvyB9vl1WDOahqq1+85bSV4glgGEuDj4b22jlP+GAlV0slaKS3qFsjNZDwv
+         JsmpMpz4m0aGZl4n+vanJUGhgjE6kN8S0Pxu5FnD+dj+Pj7FGgpdvB5O4NLAnCZ5K6XN
+         re4DUqvWoTEWrLp6QVR6oCMMe99hR4zEBgJqN7y45TYszO/K7OP+EfEqHbTt03TRDc63
+         19WaThlt6Kv9nAyBsj5mLtp7aXQkD8chTnOXY5oCehT6nZ1aj/c67+BFHBT1wCjxRDqH
+         JvDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749720891; x=1750325691;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K5vTTBowN3xYnMLoi2pnSbr3ixJ6ZJA/32wV4sZG16M=;
-        b=hDC9EN+BhnF2BjnAx68SmB42ElCHtQoTpyrCaDvt7XnPmgGVToL5GaFunM3aFyd5Vk
-         5TSqo0C25n7zLBOJYiDeKPRZIgJp0Kj2kXY/EUC+LckJHh8QN3NytktC4Mn889Mm4TJ4
-         0Dzpbya9P8dTDr6vJ5nKacN392D53lWogg7Q02kfgootvS7u+DSwQc824qz56PevP9Di
-         ahsAVJQZwxS0NEFdWGL51vJStZ3lfxKcvzFS1MP15nri4ZoeVzUyJlmZpLbjbtDXKHkB
-         HvnKSY1NvNmXOQDzML8ZF/s8fdfTBbJxgc+rrEzQZ/luarVx+AJCavH11N+n+rrODUDl
-         Aeiw==
-X-Gm-Message-State: AOJu0YzR7+DYa8xb5zR8KErPRcKJ9mMrKM6GAdUNEaGsfON9GtV00a0R
-	VkVRz1WIu0J7z/3o89Q23tab1ZO9y8L+tp7/YHbBhBME7PBkd1arT2PdDq5UdzyjT7lgMrJH9P6
-	oHnzpYOQ7n81MXjiHVQCmUzKxE9ceHO9rIB7G9/j8tuIavpzoz+V4YL4WLw==
-X-Gm-Gg: ASbGncviRKgI4akFHQZNVAob9CCly2Z3bofWRn/rrOTfk7hK3kKbjM8GfIYi3mW7Pzi
-	Hw48hAuLYFqNFGHjqxOiBF5LXQe++YJOz9YCxGxY2QAOPLOQ7h9QOI7IpOrJQR/MEsSi0Wg/H3l
-	/M+z2SN9uNQmp3PacHf/63QVzNwJ2Cw9i2THBT2tGBz0V41L20g/9w53ELid3xBfefHrzjk0BUC
-	AtTiB1xraVVzR1V4AhCjTkr70Jw5mbd49UlA8IB6D09zJnks3H8ZJ+ZrOLDiIWi9qUjvUMsE5R7
-	ZD5GKKyiq48OphyRXDFJAerhbL2S/8sut8ykOoewB9IqBN37W6jZjcii
-X-Received: by 2002:a05:600c:6092:b0:43e:afca:808f with SMTP id 5b1f17b1804b1-4532d328cd4mr22989545e9.31.1749720891315;
-        Thu, 12 Jun 2025 02:34:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFBBX41DDTE4Z+d/OBqPserycdkXjs1S1kS8LZ4oM3fygAIWKFhgLJdlTZmGZys8fhq6dcEEw==
-X-Received: by 2002:a05:600c:6092:b0:43e:afca:808f with SMTP id 5b1f17b1804b1-4532d328cd4mr22989215e9.31.1749720890933;
-        Thu, 12 Jun 2025 02:34:50 -0700 (PDT)
-Received: from ?IPV6:2001:67c:1220:8b4:8b:591b:3de:f160? ([2001:67c:1220:8b4:8b:591b:3de:f160])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8f2e0sm15032745e9.8.2025.06.12.02.34.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 02:34:50 -0700 (PDT)
-Message-ID: <d6d049b1-ab7a-4f68-9956-55c24de8e737@redhat.com>
-Date: Thu, 12 Jun 2025 11:34:39 +0200
+        d=1e100.net; s=20230601; t=1749721311; x=1750326111;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UFnlATaSnU4bTRG+dvZXuOqxPOP4TFg9Eb3syeOUrz4=;
+        b=VgClFaxbN1jyElAyypbX3X0ECWBbYxVCrlB29oEjPT7OWFAjuy/xYAp+VuLN0fqY8h
+         FiJznq4EcAzG4/xm+8Inb6bhMXDzYjSSb3zdJFM37vbsbTgyXEwu/QSVDSx/XW6NwNC8
+         Jv66y/S2MjoRqVtvCuCByF6kOiRJQ8s80h+6eU04NHA+M6RLC5/Ak9JqWZI3Ejo0V1IL
+         HKAmWrib/uacrzE9d7sGPep+Y8d2s3uzwMwHQuwIKtjBPaaELMXcGBxnnd3oX+khJyuY
+         5BF7zzHVO7ngAUqolpbbXyAQrU3Wy91pqoz978/Z/4SmlwiAeKu60GVEQ42iNQw2hYsr
+         0C1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUbJyo3UjqarcwcZPBLCNcDNsU+wk46Q8N9qodtM45Dqkg7q63gp1NxrFdPee4CX/rBGppa/BkL8bWMHIY=@vger.kernel.org, AJvYcCXV/5DPx2qjoE9Rp82LS1hHw1yA9FgZd/ygLeVfXYTtgYLdIzoGEuuQVli7j7gZ1R7blt/5veVT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi1RwlOpVv6oBQFHWKpld/H/1yGBz5IokRM1hP/gBlAlhTNSLZ
+	P/tjixfVnzrbxF2ZFKMYJpfZbfHmXuBjy45hcaixztq4J+rDUwsb6tPXehvtlBo6nEZOg/otRvO
+	cTFhz4RZxzLSsrDg7noiuabI5m/jSwyk=
+X-Gm-Gg: ASbGncst+lkBoUpZG5E+dapFnExd+fgn/6DW8+IECTtUNIhF2sLJlhXf4CCVMGFj/4O
+	2w1M6nFYY8gEpsEopqZ4iaJwZdUsC6OUfW70Cyj/NDZLK/ejRTSrZvs1mXQmxVIFwlyMXviR0A5
+	cK2YEWEhkibTVFy834fkzXIv/k4YOs70K5URWOsYR/X8Nrv2z/QsboN4DOUEUN8sjdXz9FG0fjc
+	5Poeg==
+X-Google-Smtp-Source: AGHT+IE+3ZzVw+FDJxwshN0/vGXnhLckf/AU7UBHspfRACjWWG09UyDSyS6J0tTuejiBsaVXPLXyYGEysAF/6F7c3CA=
+X-Received: by 2002:a17:90b:2892:b0:312:26d9:d5b6 with SMTP id
+ 98e67ed59e1d1-313bfba12a1mr3585564a91.3.1749721311459; Thu, 12 Jun 2025
+ 02:41:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 2/8] virtio_pci_modern: allow configuring extended
- features
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>
-References: <cover.1749210083.git.pabeni@redhat.com>
- <19ee74a1a46e9eb302fc742fb7c9913bcc6b7d86.1749210083.git.pabeni@redhat.com>
- <CACGkMEvH8cq+AdvJMO0eV0jps_-t1tUMc-cbdfReJdWFThOVuw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CACGkMEvH8cq+AdvJMO0eV0jps_-t1tUMc-cbdfReJdWFThOVuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250612083747.26531-1-noltari@gmail.com> <20250612083747.26531-15-noltari@gmail.com>
+ <CAOiHx=ne3Bbkeja=F0uPbHjrqp3Y24Zf460uAfK6OxjLBz7MAg@mail.gmail.com>
+In-Reply-To: <CAOiHx=ne3Bbkeja=F0uPbHjrqp3Y24Zf460uAfK6OxjLBz7MAg@mail.gmail.com>
+From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
+Date: Thu, 12 Jun 2025 11:41:18 +0200
+X-Gm-Features: AX0GCFssJXWppfkLiagaIosb0fH7TYSNaMTfDRt2F0snKFzFBZiuPl7NucsAkSQ
+Message-ID: <CAKR-sGf3kLphXKcmPsB0ZPFY1dQ-TpgDDFHEw9Fv8_vowD8dfg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 14/14] net: dsa: b53: ensure BCM5325 PHYs are enabled
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, vivien.didelot@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/12/25 2:57 AM, Jason Wang wrote:
-> On Fri, Jun 6, 2025 at 7:46 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> -u64 vp_modern_get_features(struct virtio_pci_modern_device *mdev);
->> -u64 vp_modern_get_driver_features(struct virtio_pci_modern_device *mdev);
->> -void vp_modern_set_features(struct virtio_pci_modern_device *mdev,
->> -                    u64 features);
->> +void
->> +vp_modern_get_driver_extended_features(struct virtio_pci_modern_device *mdev,
->> +                                      u64 *features);
->> +void vp_modern_get_extended_features(struct virtio_pci_modern_device *mdev,
->> +                                    u64 *features);
->> +void vp_modern_set_extended_features(struct virtio_pci_modern_device *mdev,
->> +                                    const u64 *features);
->> +
->> +static inline u64
->> +vp_modern_get_features(struct virtio_pci_modern_device *mdev)
->> +{
->> +       u64 features_array[VIRTIO_FEATURES_DWORDS];
->> +       int i;
->> +
->> +       vp_modern_get_extended_features(mdev, features_array);
->> +       for (i = 1; i < VIRTIO_FEATURES_DWORDS; ++i)
->> +               WARN_ON_ONCE(features_array[i]);
-> 
-> It looks to me it's sufficient and safe to just return
-> featuers_array[0] here. Or maybe we need some comment to explain why
-> we need WARN here.
+Hi Jonas,
 
-vp_modern_get_extended_features() can return a 'features' array
-including extended features. Callers of vp_modern_get_features() can
-deal with/expect features to be present only in the lower 64 bit range.
+El jue, 12 jun 2025 a las 11:19, Jonas Gorski
+(<jonas.gorski@gmail.com>) escribi=C3=B3:
+>
+> On Thu, Jun 12, 2025 at 10:38=E2=80=AFAM =C3=81lvaro Fern=C3=A1ndez Rojas
+> <noltari@gmail.com> wrote:
+> >
+> > According to the datasheet, BCM5325 uses B53_PD_MODE_CTRL_25 register t=
+o
+> > disable clocking to individual PHYs.
+> > Only ports 1-4 can be enabled or disabled and the datasheet is explicit
+> > about not toggling BIT(0) since it disables the PLL power and the switc=
+h.
+> >
+> > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+> > ---
+> >  drivers/net/dsa/b53/b53_common.c | 12 ++++++++++++
+> >  drivers/net/dsa/b53/b53_regs.h   |  2 ++
+> >  2 files changed, 14 insertions(+)
+> >
+> >  v3: add changes requested by Florian:
+> >   - Use in_range() helper.
+> >
+> >  v2: add changes requested by Florian:
+> >   - Move B53_PD_MODE_CTRL_25 to b53_setup_port().
+> >
+> > diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53=
+_common.c
+> > index 3503f363e2419..eac40e95c8c53 100644
+> > --- a/drivers/net/dsa/b53/b53_common.c
+> > +++ b/drivers/net/dsa/b53/b53_common.c
+> > @@ -660,6 +660,18 @@ int b53_setup_port(struct dsa_switch *ds, int port=
+)
+> >         if (dsa_is_user_port(ds, port))
+> >                 b53_set_eap_mode(dev, port, EAP_MODE_SIMPLIFIED);
+> >
+> > +       if (is5325(dev) &&
+> > +           in_range(port, B53_PD_MODE_PORT_MIN, B53_PD_MODE_PORT_MAX))=
+ {
+>
+> This happen to match, but the third argument of in_range() isn't the
+> maximum, but the range (max - start), so semantically this looks
+> wrong.
 
-This check is intended to catch early device bug/inconsistencies, but
-I'm unsure if e.g. syzkaller could hit with some fancy setup.
+I can change it in order to avoid confusion.
+Which one do you prefer?
 
-I can drop the check in the next revision.
+1. Change defines:
+#define B53_PD_MODE_PORT_START 1
+#define B53_PD_MODE_PORT_LEN 4
+in_range(port, B53_PD_MODE_PORT_START, B53_PD_MODE_PORT_LEN)
 
-/P
+2. Just use magic numbers and avoid adding defines:
+in_range(port, 1, 4)
 
+>
+> > +               u8 reg;
+> > +
+> > +               b53_read8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, &reg=
+);
+> > +               if (dsa_is_unused_port(ds, port))
+> > +                       reg |=3D BIT(port);
+> > +               else
+> > +                       reg &=3D ~BIT(port);
+> > +               b53_write8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, reg=
+);
+> > +       }
+> > +
+> >         return 0;
+> >  }
+> >  EXPORT_SYMBOL(b53_setup_port);
+> > diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_r=
+egs.h
+> > index d6849cf6b0a3a..880c67130a9fc 100644
+> > --- a/drivers/net/dsa/b53/b53_regs.h
+> > +++ b/drivers/net/dsa/b53/b53_regs.h
+> > @@ -105,6 +105,8 @@
+> >
+> >  /* Power-down mode control */
+> >  #define B53_PD_MODE_CTRL_25            0x0f
+> > +#define  B53_PD_MODE_PORT_MIN          1
+> > +#define  B53_PD_MODE_PORT_MAX          4
+> >
+> >  /* IP Multicast control (8 bit) */
+> >  #define B53_IP_MULTICAST_CTRL          0x21
+> > --
+> > 2.39.5
+> >
+>
+> Regards,
+> Jonas
 
