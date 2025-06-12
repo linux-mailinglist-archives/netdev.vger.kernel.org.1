@@ -1,145 +1,175 @@
-Return-Path: <netdev+bounces-196869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E85AD6BDA
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:12:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D474AD6B9C
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60D433A5B76
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:11:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07CD18967B4
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A273E22DA0A;
-	Thu, 12 Jun 2025 09:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67FE1221F3E;
+	Thu, 12 Jun 2025 09:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="C0C3zo2+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYp4N1M+"
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560D42253EA
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 09:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55C2156F45
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 09:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749719411; cv=none; b=j+Caa3duZYJqCwVbtf9Dk6EagiB0nX7aSFDAWUhIYSdQZ1JpkFfxdTJWfJDqFMweHPJBy0L26Teh3eTHweJkt6MoC6bMqlb5PAKH9/TqIsDp6bUSkSwsoGmXkvJ4oVRi/7Z7ImaIUjZmtHJCUp0uzr9CrH+pwOl7jWeVGJV5bOk=
+	t=1749719121; cv=none; b=J7uST/bW2y/OEvcKcsKRg9DPbBwkBBi2T/tibo/gJfAmlPevzCXw4bItJ59T2WP0qcAd8yikemvn7Yct7HylRSYFXm9e2YtG7DAAv7BtacI4ZiHzcfFQJ7rI88ZZrVreNBjeSsuo45wC8suMT1Zof4lVNRLOXL3q3j9ea0//jFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749719411; c=relaxed/simple;
-	bh=5d3jN3fn+I5Q7QYVsDdXTjPnMvpF2p/kdNCrBj08FiY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pn6JYetGDuMobjNXuPRbnhU4FkohJ4mTGPlIwrguAcRoA3+0sct4ESAFJv0UYLPVPWN7l6jBykTdKHHP6mOYdjgi30QqbADILAQ1Q4R3FhO8Rzw8p6ErCufeOr/a8s5w+BcnZRztrYnd0wLLXBZzxAYL8LCYXVJ795/6OsPBDmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=C0C3zo2+; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-transfer-encoding:content-disposition
-	:content-type:content-type:mime-version:references:message-id
-	:subject:subject:from:from:date:date:received; s=oak1; t=
-	1749718951; x=1750582952; bh=5d3jN3fn+I5Q7QYVsDdXTjPnMvpF2p/kdNC
-	rBj08FiY=; b=C0C3zo2+6pwSukA00NpMmz5OyP1ZI0U2/3Y4PhMTXFogHrXHNVZ
-	o+0PMbrTP0WAxF+Sf4LgX1R9KT4Qww3c0iXWQNOzqdyMLPzimoelzF7SUi7Z8Rzp
-	8WLyg5DJG/8WN+McyfHZ3R1rggB9e2AxFh2WYPNgQaSkwjczbXa5x4hiPoJNzAzJ
-	bRMSh0wCKwVDYm5mJjNy94iTQbCgeMLLrkqDpWWq9kvzqGtp0qJtW4nLf0mCeJ00
-	5jTfuiT+nXYh9Iat/AKE4ILvjoMnoj8j4P+BAjWiM3+0SI+XljWxtknNKQM4hHbW
-	ynwNZRXP4tEyDo8etwUMXeR1fmkWtJbUWPQ==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: from Antony2201.local (hal.connected.by.freedominter.net [91.132.42.103])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by oak.phenome.org (Postfix) with ESMTPSA;
-	Thu, 12 Jun 2025 11:02:30 +0200 (CEST)
-Date: Thu, 12 Jun 2025 11:02:28 +0200
-From: Antony Antony <antony@phenome.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Aakash Kumar S <saakashkumar@marvell.com>, netdev@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, akamaluddin@marvell.com, devel@linux-ipsec.org
-Subject: Re: [PATCH]   xfrm: Duplicate =?utf-8?Q?SP?=
- =?utf-8?Q?I_Handling_=E2=80=93?= IPsec-v3 Compliance Concern
-Message-ID: <aEqXpFSawrMOO25V@Antony2201.local>
-References: <20250609065014.381215-1-saakashkumar@marvell.com>
- <aElfx2P9VBN/q0A6@gauss3.secunet.de>
+	s=arc-20240116; t=1749719121; c=relaxed/simple;
+	bh=W3nifrGaJTVu11+37zh+htUyCWWe4+ouNiwekOr9E/U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e/UF24EvjnCLFyTbQVmLMVVVz7hjq8VkB4SmnTfd8HNyIsE0/nALwwlZm+Z5eFHvVo9nrCvSf2Vgq5owNIEjaXrFd9kZ1mlfl6oVlprU38wpHJo4qQKpW4K38mH2bE90MnpDSERJAOudTOwjfHP6WM4+zTiPA7UzEPlL0wVE2Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XYp4N1M+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749719118;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=la7I67fpYtKDvu65uRhLGaZkwWzuwESfAMSxd5HPN0g=;
+	b=XYp4N1M+2JPomMrZYkMNqOu3sMYFdSJElv0amWmHWpIE0Y5k4ZCcyiPj1NH+ACPqnozMIp
+	WLWF9wwlvDVpNL87RD81GmS2Jc9uvaHe1zTwnVB45+ihY539WUtuWnG9zHyJGUyn8ItPTm
+	ONKNjYB6/vJjsqjMUzgk5eNCkB3gtJM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-182-WW5odRNDNXuZHTcUWp2-5g-1; Thu, 12 Jun 2025 05:05:17 -0400
+X-MC-Unique: WW5odRNDNXuZHTcUWp2-5g-1
+X-Mimecast-MFC-AGG-ID: WW5odRNDNXuZHTcUWp2-5g_1749719116
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-607c91a207dso707797a12.2
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 02:05:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749719116; x=1750323916;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=la7I67fpYtKDvu65uRhLGaZkwWzuwESfAMSxd5HPN0g=;
+        b=J+MV/iXS0BbSys76KZoDEeeqP5Eywie3hdsAilpq3pLcnkl+dxAwDWMKBo9S6VgKQp
+         yjnWLNf7e5LvBc74bqXFEEgEj//6JNWu2/ZBXwSANyooiln3KeDM17E6uxOwnucY8t33
+         +/hqQTo0ljuBRRhpfHgmjttWsJNydbHDSGpGh8mVaFlfze/6b2KpgF4ZqLmPp9gGUwZr
+         w3mnEz2r8tP2jtsMIv3xNnbiXiy83pV82IBZd4CFA5MMscR38QoARYwctU6MP2NWCi/g
+         O3zGWtkRJsGDspJlOFrEugrK/TxhmqzZmoYHbyGIrGPWuY8yrGg3lqtnLzm+P3bHiX7R
+         ExxA==
+X-Gm-Message-State: AOJu0YyQzQaFK/3HsgpQ1ee2gITWQ1vmaGEvczxcZwelp8CEPGDgj2N3
+	WBtHIJoxrBFsEbjVzz5c5rVAxF+pG/AaPAJ6QCri22c5kkQVisrochHJxgC0tMBj1Ie+z+v2UBu
+	R80aPV30aCKxcFe2IRjQ8hQrKFS/3v40lb6f81HNufzxVYJ7LWEQZbR9j6w==
+X-Gm-Gg: ASbGnctEFqfwZOL/9UTocjynu24bnL7I3ENV82bixaWlOt2Ubb4AurssK34HyAMGvMJ
+	UY5ZETntngvMotMfk5uZIWfbWL4mPPmOW+Ne2uLPE2tszgoPP2zNllfvDj0LA+mjH1XBKcFBc51
+	aX/6w1J0NotwrU30k2LGUkHO3Nh4RuzPk6+7S5MLm9LpqmBTPqlSDYSI4hZ+JtOuGzvfn1Xks+4
+	PUV/OVuA0AzCQ8iLfFX2hN9j4nciIluDiXsOS3k002sdkZwsi2W38AfHPyr/HFhagWdViyTV+Oy
+	WmYjxB6Ga73ONy9+u8QaK7on
+X-Received: by 2002:a05:6402:34cd:b0:602:346b:1509 with SMTP id 4fb4d7f45d1cf-6086a6dcd1cmr1735292a12.9.1749719115896;
+        Thu, 12 Jun 2025 02:05:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQ079WoFey7SiJ2O0oyxhF2BYyBlVFY5e1GuBCQG3FcjnoOQn2hKmYw/P3wRFkmroBuQvdkg==
+X-Received: by 2002:a05:6402:34cd:b0:602:346b:1509 with SMTP id 4fb4d7f45d1cf-6086a6dcd1cmr1735268a12.9.1749719115470;
+        Thu, 12 Jun 2025 02:05:15 -0700 (PDT)
+Received: from [100.69.167.148] ([147.229.117.1])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6086a5d201csm841918a12.36.2025.06.12.02.05.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Jun 2025 02:05:15 -0700 (PDT)
+Message-ID: <29837ab4-3682-4f2f-b8f7-7d367195525d@redhat.com>
+Date: Thu, 12 Jun 2025 11:05:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 1/8] virtio: introduce extended features
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+References: <cover.1749210083.git.pabeni@redhat.com>
+ <47a89c6b568c3ab266ab351711f916d4a683ebdf.1749210083.git.pabeni@redhat.com>
+ <CACGkMEuNL+nLb2EvHWqSfKB6iiDScuKD6RJqxZ2-P9v5BDH1HA@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CACGkMEuNL+nLb2EvHWqSfKB6iiDScuKD6RJqxZ2-P9v5BDH1HA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aElfx2P9VBN/q0A6@gauss3.secunet.de>
-X-Mutt-References: <aElfx2P9VBN/q0A6@gauss3.secunet.de>
-X-Mutt-Fcc: ~/sent
 
-On Wed, Jun 11, 2025 at 12:51:51PM +0200, Steffen Klassert wrote:
-> On Mon, Jun 09, 2025 at 12:20:14PM +0530, Aakash Kumar S wrote:
-> >         The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
-> >         Netlink message, which triggers the kernel function xfrm_alloc_spi().
-> >         This function is expected to ensure uniqueness of the Security Parameter
-> >         Index (SPI) for inbound Security Associations (SAs). However, it can
-> >         return success even when the requested SPI is already in use, leading
-> >         to duplicate SPIs assigned to multiple inbound SAs, differentiated
-> >         only by their destination addresses.
-
-Is this an issue in xfrm stack without hardware offload? Does it affect packet
-flow? It seems SA install will allow non uniqe SPI for incoming, even
-after this. Which is the correct behaviour.
-
-I have a feeling this is an issue due to hardware implementer's choice
-of only support one option from RFC 4301 section 4.4.2?
-
-> > 
-> >         This behavior causes inconsistencies during SPI lookups for inbound packets.
-> >         Since the lookup may return an arbitrary SA among those with the same SPI,
-> >         packet processing can fail, resulting in packet drops.
-> > 
-> >         According to RFC 6071, in IPsec-v3, a unicast SA is uniquely identified
-> >         by the SPI alone. Therefore, relying on additional fields
-> >         (such as destination addresses, proto) to disambiguate SPIs contradicts
-> >         the RFC and undermines protocol correctness.
-
+On 6/12/25 2:50 AM, Jason Wang wrote:
+> On Fri, Jun 6, 2025 at 7:46 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>> @@ -272,22 +272,22 @@ static int virtio_dev_probe(struct device *_d)
+>>         int err, i;
+>>         struct virtio_device *dev = dev_to_virtio(_d);
+>>         struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+>> -       u64 device_features;
+>> -       u64 driver_features;
+>> +       u64 device_features[VIRTIO_FEATURES_DWORDS];
+>> +       u64 driver_features[VIRTIO_FEATURES_DWORDS];
+>>         u64 driver_features_legacy;
+>>
+>>         /* We have a driver! */
+>>         virtio_add_status(dev, VIRTIO_CONFIG_S_DRIVER);
+>>
+>>         /* Figure out what features the device supports. */
+>> -       device_features = dev->config->get_features(dev);
+>> +       virtio_get_features(dev, device_features);
+>>
+>>         /* Figure out what features the driver supports. */
+>> -       driver_features = 0;
+>> +       virtio_features_zero(driver_features);
+>>         for (i = 0; i < drv->feature_table_size; i++) {
+>>                 unsigned int f = drv->feature_table[i];
+>> -               BUG_ON(f >= 64);
+>> -               driver_features |= (1ULL << f);
+>> +               BUG_ON(f >= VIRTIO_FEATURES_MAX);
+>> +               virtio_features_set_bit(driver_features, f);
 > 
-> This is not quite right, RFC 4301 says:
+> Instead of doing BUG_ON here, could we just stop at 128 bits?
+
+I think it would be nice to have a sanity check to ensure the driver
+code is sync with the core. What about a WARN_ON_ONCE?
+
+>> @@ -121,6 +124,8 @@ struct virtio_config_ops {
+>>         void (*del_vqs)(struct virtio_device *);
+>>         void (*synchronize_cbs)(struct virtio_device *);
+>>         u64 (*get_features)(struct virtio_device *vdev);
+>> +       void (*get_extended_features)(struct virtio_device *vdev,
+>> +                                     u64 *features);
 > 
-> If the packet is addressed to the IPsec device and AH or ESP is
-> specified as the protocol, the packet is looked up in the SAD.
-> For unicast traffic, use only the SPI (or SPI plus protocol).
+> I think it would be better to add a size to simplify the future extension.
+
+Note that the array size is implied by the virtio-features definition.
+Future extensions will be obtained by increasing the
+VIRTIO_FEATURES_DWORD define, with no other change to the code.
+
+I think a length here would be redundant.
+
+>> +static inline bool virtio_features_equal(const u64 *f1, const u64 *f2)
+>> +{
+>> +       u64 diff = 0;
+>> +       int i;
+>> +
+>> +       for (i = 0; i < VIRTIO_FEATURES_DWORDS; ++i)
+>> +               diff |= f1[i] ^ f2[i];
+>> +       return !!diff;
 > 
-> So using the potocol as as lookup key is OK.
+> Nit: we can return false early here.
 
-That’s correct—the commit message should not reference RFC 6701. I would suggest instead referring to RFC 4301, specifically sections 4.1 and 4.4.2. These sections describe the three SPI uniqueness constraints allowed by the architecture for the incoming path.
+I can do in in the next revision.
 
-- Unique SPI
-- Unique (SPI + protocol (AH/ESP) + destination IP of the incoming SA)
-- Unique (SPI + protocol + destination IP + source IP)
+[same disclaimer here: I'm traveling for the whole week, my replies will
+be rare and delayed]
 
-The IPsec architecture RFC 4301 explicitly allows all three options for 
-incoming SAs, which is why I don’t believe anything is currently broken in 
-the data path.
+/P
 
-So it is not complaince issue. In my opinion, RFC 6071 is not standard RFC 
-to be complaint with. It looks like an odd RFC among IPsec standards, what 
-is IPsec-v3? IPsec IMHO should refer RFC 7296, 4303 and 4301 and related 
-RFCs. We can also take this on IETF mailing list, instead of netdev.
-
-As for SPI allocation, it is indeed permissible to be restrictive, as proposed by this patch.
-However, section 4.4.2 of RFC 4301—which indirectly governs SPI 
-allocation—is only applicable to unicast SAs.
-
-So I’m also supportive of the patch, provided the commit message offers a 
-clearer explanation and outlines what exactly is broken under the current 
-behavior. Ideally also how to re-produce it.  This is important. I would 
-love to see generic hardware supporting all 3 cases above, just like xfrm 
-implementation.
-
-PS: I am ccing more IPsec experts.
-latest version of the patch is at:
-https://lore.kernel.org/all/20250612055017.806273-1-saakashkumar@marvell.com/
-
--antony
 
