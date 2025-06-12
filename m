@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-197190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D108AD7C29
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:15:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3779AD7C21
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:14:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E861D1886746
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:14:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEDB23A3F2F
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0004B2D8776;
-	Thu, 12 Jun 2025 20:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38E42D8796;
+	Thu, 12 Jun 2025 20:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E0ebKv0u"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WFmwAhTU"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2049.outbound.protection.outlook.com [40.107.237.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C0E2D6634
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F922D878D
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749759178; cv=fail; b=n6K2SnaHQSc4eto+zG/mQ7Uku/S/VdGk57W+TUKrVxgbwDlDt++U2fjAFESMIyZrA6wQd9fq2Jb1VrlpG5ubpW53E9p0y7F4jCjjOQLRevySNj8bWueqAl6a3AxyUzs+U65N4o/8URI4JnOdUpRx4oSiTwKsG9A0jqPd+vQ2klU=
+	t=1749759183; cv=fail; b=ef+62aUpDZ0UfADA4gwZKtIPinF0/4XVwj9W6/pQfh5zNjd6eSz5/NapJ7a+P0rpczcKe9KfhI2FU9DsUATvKQJfq8tj1Z0qfYOGrHry2WMuXIU0y89KAkkdGS7Kb9XGU9/FXRwSG0hi4Zc6QB6sgLKBiNB7v4DTyYdWFQkNf/4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749759178; c=relaxed/simple;
-	bh=+5HoSsD8Woe4oXmdSPlmRnj4PS1m/DFdh/7fgcCIMBk=;
+	s=arc-20240116; t=1749759183; c=relaxed/simple;
+	bh=wBtpcAZJ2DdEs2xjHTojwDbBtZFQO72+shhw3nw1spo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PremJO1uEDSpHy4wbANV+n/8kil6UvHwa0Ac1jZ+Jdagezbm7tZtylG4NBjFvjOH1TdqM0F6SVMLrgdOfZx+28urdj0o8UOPw01eKSxSq3d9z9AUAKQgEWYF8wl/HsPjMpJRfvRJuGOd8Jqq3GfRloLhlyBJqjXNEzVbnvDGoMM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=E0ebKv0u; arc=fail smtp.client-ip=40.107.92.78
+	 MIME-Version:Content-Type; b=aTJyuV2B9k014FTmNqIQ1VQQVWn8hOwODfuQS26ftFQGpKbaodQFrY0YusnhCuHaDx+3MzZJx3zPaa4brjBEXW7mxepzSNqXO68n1/uISQCmUYj7/kpOCJSlZDEDuix++JGMHPhUh0SYIDridDWYkzW8phhFbPTYpCKjnTaf81A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WFmwAhTU; arc=fail smtp.client-ip=40.107.237.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lCaiKQA5id0IlGJ+I+V86a8B5DzZvqYBo1SHxxAHrdHapFRFPJwdQhVi59E+13yV4Ij9w5B5ceHyj4PKCjpN8dUfnUiIx6y1WQRwDCt4HVXmniM5NeY4EuOOUJ0WZj+OJqrtLgbi8cFzCWx2jtassaovt6V0/xH5AySfzHsmqec/McbpYSnCd8OnSFPJiGKxIyNID64cT3cg8wwA8XnwaOZiETJPRepvIC8zvC2i9siLVbA7fZPJxtyCEVQPjDJxxLtuoIDGqePsAFCLF3r1LlfIFuiBALGTr66fzEzIc/ruBONw9ximW67rUsH3npBLaGJ5jmfFKJXLoC3MZMRCKA==
+ b=iSBS/3UAOmLIvQFh5vOl1aBPLhik9bb+gl3SLpxIxStpfu9xOENlKxwLL7fBLcuW3+n++gHbHaFD49PVvoum2xjZQVhCYe7R2pjKS6pmV1G6PPN3O1Lt06cQeQBdpXHVmW3iHJi+Sd78I09QJgV8pYYMXl8APM65UqD3Pxs4xq6Rs4+amj1OICaAcNIYrV7pM2fPrxbaRyVzPNiDAyTaXj2EVXO6SFh9dnSTwDCRPpWslLZDV8m6xKRKv+gGDQkrEzqEdMm4fFAS6U7Ln+XyqGt4KfZ3TxH1ozB1Tc2ZMEDKolryOD5wC0xrip4bw7FTbMHgQD027AT8IiOVZlaCAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VfEZDoJr5CSckLwc8m5eyv/tuphKHxnXg3EHVEr69wI=;
- b=n+Y1YetQV2tDRnXXBEzUoKw5spmIj5JglbrIUfkXEPblhrowgozXpeUwSXcQlm/LMFCWfRutLyQFEtH5i+1xXURqKmrcrozabn7QcJNxwN2kU3vh48sk237y5KlWBN4Np+nNgqPi9STy8TVEhjvdxJdJlbRtol3w2AwSYgPjw43pao5+jCAoF6dFhNa+GN+N4+1D3avxX5ql+wHP09MDDZzyvQw1RXx89fWvsdlpxdjcfQYL0yaArGahhjKvd5E0PvmFA5vvHN7kWObWxDVEqoBUE46RRrCb4KQFuXrqu0shSAtJPNQXK6j5NWT84RwgU5+3IH1/UKoZhaycqHi4Tw==
+ bh=n+RoI8VeJCzBbOmvgwCZkx1yt3UKnkdOdqGaZ1i3aT8=;
+ b=jzXdf3LqDsH7u7JI+sfuakqnWxKXxYjqzFiWQxcWafP1PZVHpYCrsSwVkV6ORBmlDpQzaE80+lySfmMhut66m5cz108Px+IXUYrya/EG+5pwfAxmItxtmdYw7E9/vA8lDGLWRZfIIB0QImCGvbfYAoupx6SvEXNDfAeuP9pIswa04VL0SWq4j+pLaVNBzXiX+6WcObR7AQMTPrnvG4WzUOVCGLqftxYPzngqgc0NkFicjQqPZdziEykg2Ke2uNpGHRN6eYddAviNKsbdZg1ILgRse4hWRQiQOQf1PHJ2ueEZS9Igreb0U9gxWC1HyQfulsi0kgjQZMrcI0gasuwh4g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VfEZDoJr5CSckLwc8m5eyv/tuphKHxnXg3EHVEr69wI=;
- b=E0ebKv0uG/HfoZXR0pUrwQxmXb2datMxCYOaNqfadhsLxkS7n2WTNWkF/hM0QKq5MSmS9C/AMTwBSvCMKZnCFQedVJqfMhSWZXey9VNVETeKevr1jUs/f9Q3MAumS+CViiyrfLabgbbCx28FR6gKDH3oJs9CvCJrCMgxpDFi90ccpkPsjXId24vDC7/xzsYjaqIXf1bGnuWHstzSuS7g7hq9cbbiB9Xi6QEbhBN8G6mcL0p1sVJL24Cm6qRgp/UYQcqhAFkpmZ9kRjOTyUH1Z4+wzin1TpjuDkbCYMz8XxsFnzamGcz3sm2JPZMmT/FYdVNU5vGu5ZMxcxxP3PoQlw==
-Received: from CH0PR03CA0229.namprd03.prod.outlook.com (2603:10b6:610:e7::24)
- by IA1PR12MB6162.namprd12.prod.outlook.com (2603:10b6:208:3ea::19) with
+ bh=n+RoI8VeJCzBbOmvgwCZkx1yt3UKnkdOdqGaZ1i3aT8=;
+ b=WFmwAhTUySG+jMF51e8gkkAtbBzt4B66/FPEmgbvcB27FvfFovG0FUm3lhcuHHKfANeXxDZqlqX4AzExvnznJylboV7n+RrkfARvsvben/iW89Gn2vhoI7fdWpuy2zlFiJhuvFrdRORqMOdrGSAUJQBOIMZxe+dVrmck9rZn++BNyJS/+986mOY30yyAe5JBDQQhYWfGDsRQnEzorzoYZzZRHPWTUKvmFMJ4yxEQ7HxoDcJ9V09vEuPcX/TSlxByNaBNNMzO7p9RQPJBnn0lT/rtFfW9aOZDDI9swlW1JxnRtXvCwZ4ExEmo6cpbyMqlR6wNyrUImtUXixxOJTC39g==
+Received: from CH5P222CA0009.NAMP222.PROD.OUTLOOK.COM (2603:10b6:610:1ee::25)
+ by BL1PR12MB5921.namprd12.prod.outlook.com (2603:10b6:208:398::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.38; Thu, 12 Jun
- 2025 20:12:54 +0000
-Received: from CH1PEPF0000AD7D.namprd04.prod.outlook.com
- (2603:10b6:610:e7:cafe::7b) by CH0PR03CA0229.outlook.office365.com
- (2603:10b6:610:e7::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.40; Thu, 12 Jun
+ 2025 20:12:58 +0000
+Received: from CH1PEPF0000AD7F.namprd04.prod.outlook.com
+ (2603:10b6:610:1ee:cafe::6a) by CH5P222CA0009.outlook.office365.com
+ (2603:10b6:610:1ee::25) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Thu,
- 12 Jun 2025 20:12:54 +0000
+ 12 Jun 2025 20:12:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,17 +64,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD7D.mail.protection.outlook.com (10.167.244.86) with Microsoft
+ CH1PEPF0000AD7F.mail.protection.outlook.com (10.167.244.88) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 20:12:53 +0000
+ 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 20:12:58 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 12 Jun
- 2025 13:12:41 -0700
+ 2025 13:12:47 -0700
 Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 12 Jun
- 2025 13:12:35 -0700
+ 2025 13:12:41 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -83,9 +83,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Nikolay Aleksandrov
 	<razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
 	<petrm@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next v2 02/14] net: ipv4: ipmr: ipmr_queue_xmit(): Drop local variable `dev'
-Date: Thu, 12 Jun 2025 22:10:36 +0200
-Message-ID: <0fdb8e4ecc240a789b23dc73cc8bcab19e1dd155.1749757582.git.petrm@nvidia.com>
+Subject: [PATCH net-next v2 03/14] net: ipv4: ipmr: Split ipmr_queue_xmit() in two
+Date: Thu, 12 Jun 2025 22:10:37 +0200
+Message-ID: <a2d56fd243fb8c992515a3525af1af1aa16b09ee.1749757582.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749757582.git.petrm@nvidia.com>
 References: <cover.1749757582.git.petrm@nvidia.com>
@@ -101,107 +101,187 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7D:EE_|IA1PR12MB6162:EE_
-X-MS-Office365-Filtering-Correlation-Id: c19ea92f-a9f0-4e92-1141-08dda9ed836c
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7F:EE_|BL1PR12MB5921:EE_
+X-MS-Office365-Filtering-Correlation-Id: fbd590af-61aa-4f9e-d7d6-08dda9ed8647
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sHdNIGjSEJC9U4M1iz+Nun476qPDZ7smbzpoQoaNEngeRG/IReWtlff0JhR9?=
- =?us-ascii?Q?D+kyJXTeCBiDxFrBEC3MoxfVX4IhylFpS7ziOJRkKdJqkU34ZcWRwfIhkQx/?=
- =?us-ascii?Q?gVXfcBsYInLCdqj3T22kf8dNrnUfQNHvlDpLPOwkhy1Q5yeVipTpYvKUihNq?=
- =?us-ascii?Q?y1gGWYv4pNwVAgZmwRhL+a5gT+XrOiU77NQkp+79RXdv3UyzofK3Ei7z3gUD?=
- =?us-ascii?Q?DPXeYuufygrpHTioycEUuLr6Cwvlmma3g8WP3qXk4wdeq8MsDXNoKDSYDeY2?=
- =?us-ascii?Q?SNLIAH1s5Z80oz31Dvm/vHolSPmAIpcYF9ZzNTk5PpRqYkN/BRJCd1W/P8UU?=
- =?us-ascii?Q?3kQ5p3f184VGNVoFcK3HiN2paYJxEltpwcqOzekqFYWNJVKCqZFYBpBGo3Gm?=
- =?us-ascii?Q?onTxd3GGLIbQgOG15EEmbPgu8tqVtEjBJyXXGnMULNEWfx2idWdB//bjkHmH?=
- =?us-ascii?Q?nm3a4NTUBNESgjzNTHzGM0xhsyRo8JgDREt5hLzQ/RFMrzKRpfp7rud3eJTk?=
- =?us-ascii?Q?MAs3xvs8jtjVKledkigBbpMg1Trv6w6Jg2/R+xng4XGuoNIleFyi+yNQxQJO?=
- =?us-ascii?Q?o+1OzsONNXnGItbyVuXg0XfRIrJVIOZ3voilwcYBQPa3uu1uADsET5Y+Va/Z?=
- =?us-ascii?Q?5h9108eKt0pSqe7vCM6nE+vtRLyJpmnN6MMQigdfk1J265G4ts6EcBdTMpRL?=
- =?us-ascii?Q?5GwU3H/rvmriV6HQysWdoKngGA8c1YkiMsNlVUAjZgFhBXlyp1S3Z5AH6Siy?=
- =?us-ascii?Q?m/q8EiGw5k8DIYHeoZhCUIz8lsSv2o/gH4vMAdsJMdX6xDpnj3gVN0tzf1hZ?=
- =?us-ascii?Q?aMd1oeyJ5hcuiTRvuKq6JTD4UvRiWjaFDIyP2EVgG/atZgScgxEp/vJRqxy/?=
- =?us-ascii?Q?VEcdJZtz0Sek8lue76GOhVFv02sIkZVmuLIiHUucdIaN782vG3+bQZmJWNbl?=
- =?us-ascii?Q?oNlhykRHZrPOFdPfLAHrOKT5+Snfc3b8pf5YOkmrUnbPWWH9smNnmwrjranB?=
- =?us-ascii?Q?dtCBOpzPA6zje3Nq29nn+VwHKpEDc2wgCFj86GHh18wCHZ20PqYdhu5yXmhx?=
- =?us-ascii?Q?jQTeI8z/PZoIVsq0uuG/Jw65+XBBAg+Ma/Lldlp844oruK2EIMN22R/ItXEl?=
- =?us-ascii?Q?ISFiset9V/OscCcYNfF56JXhMQaTXkpZlQNgc3DKAHQJC/Cm3Ux3UMLyzUOv?=
- =?us-ascii?Q?Fr3F7lxyURvDoEd1nAqey4wyuFztz+9yNA+ot9SKh78KqgBWv0ozcAVdmZBn?=
- =?us-ascii?Q?FfKoHtjwodDXCfed7L5ZAKmbza+S9E6d//JuMS8btXI7enIwTakphKjk3NrV?=
- =?us-ascii?Q?w6cW91xSrmOXTc2OhooBY0pT/xaamNDDv8UViof1oS1l+63s0Vy+egAc5MAM?=
- =?us-ascii?Q?gxOer/8EaSQvdfrd0See9KNzjQj5FrQEqDiPMZAgWHBSghDVmRDbL3aGDzGD?=
- =?us-ascii?Q?GcEUd8nlr98ovIkrc2+jF1TdZX79mo+rG8yAq0E+7Tr6Je813qsdamUl726H?=
- =?us-ascii?Q?2TNbfBgHHvQ3dgl5rxP7Cj6TQri4hpYTPmaw?=
+	=?us-ascii?Q?Smcprnxn+ESXjRfwy8wtk1AQr0XrAybB86O9Un3+TUyT5GHp1mYBoFWwm0Uy?=
+ =?us-ascii?Q?WFEJbeXBW8jeySc632YblAy83axWT+KK/MKbZvns8uPaqd82q2fGlMH45OQW?=
+ =?us-ascii?Q?s4C0ia9B4nUtM5zVWf7IWwKpRrD50MO41X1RzXFjIP7L1NtXXqo9IqI3vdT1?=
+ =?us-ascii?Q?c7JX3Fixz7zYPmwH3tNcS5wmlslqRJ8Gg1Xgs6pds2Vrzn/QguFpjyMc89qm?=
+ =?us-ascii?Q?VZcYi0zJxUAnlpB9mWK0Pzw0J/7jERq25Q75cCRQOdbKQUTK7ouz8/owEC2O?=
+ =?us-ascii?Q?opVALoakh/Xs1Y1M88DYZjYlAVxOZOFvkOTh8bNNNKBGzUWvKQ610bfglKrD?=
+ =?us-ascii?Q?bQ0XzO4dqAKPsfyMho+GnffByayAH3c20UPEXDnT/zKiyLcwxGj2QTxbWcOC?=
+ =?us-ascii?Q?L7agyxJ4JZrVh9kuULLy2ENvvSZKV1blghoYPNf90PYIozAfvpBiEFsDHT81?=
+ =?us-ascii?Q?qghRzunZGws1M9eCBDCkOwwJpkuFW1kKYFoQYJsL9+OzoY1uQdrCyAMgsc+t?=
+ =?us-ascii?Q?DR3R3boc7QY4zsHsR0kiz9c0g8HHhMnmFDgX/bq3B8/S+LK67EjcM/D3MsYa?=
+ =?us-ascii?Q?diD7WVtiJNrbKReIOw3nB34uFy0UhUgjXnd697dvR5y+NG1aOyY9R5p9ZPsW?=
+ =?us-ascii?Q?xN+JMntJEN2NgLkqrfq4GdBQf+DYGCMjh0FBhoMuFdCGHo5zPEmMx269AVHb?=
+ =?us-ascii?Q?v1j7SJe3RacTFCh4ynawtLzqSiqq2kAMWByDBsmQeHsZV2v6GjUa3SaHQ8I9?=
+ =?us-ascii?Q?aUQpIeiL6+00BP1vydeg4wzkPbD45+I33BDLuESJi3T1cz4bbybLaCWDU0MD?=
+ =?us-ascii?Q?a61IZJE8TpdcBcRiX17ei1Myk5W0cPVYtDbpf+2SetgSGtJmXqex/R/7YnQN?=
+ =?us-ascii?Q?JYOIFpopgFMMCnSsPW2nzdUm1hwEZbYU95p+71BDvrPe4wN1bnxPSewSsjXW?=
+ =?us-ascii?Q?H/jVA2IdBgSJjb9RMCJWBA9k3k/HtjJ1iy0T/sK6FFVnxoUv/mHwgvXUp+3z?=
+ =?us-ascii?Q?qvASpUZrLsLJBsJNO/3+L9+J3znjdPlJTzHWy+hEdyFrOio41oewmjp967P6?=
+ =?us-ascii?Q?W/di4uLSUeDIadlh/I+Yks0LunqZBgCKv+YH87oQmN1UlRJvzIcQEEMZsuQO?=
+ =?us-ascii?Q?ls6f+YkI3vx61B7Ktm5WzAGVBsYpaYLNyCPRG0dUL7eYXEoPFE8ZK52LDanE?=
+ =?us-ascii?Q?wa7JTBkRCej2Xxp/BB65Xf3/Trw3iv4orgBVxNZbqPsAK6KTgo9/A6kLKFTZ?=
+ =?us-ascii?Q?fU2j0qF4Oq6yVR5U9AlrFo8geKXiaZ26Rj19L1O1FAY/vpulidLMSixDwYZu?=
+ =?us-ascii?Q?cszQ61tdojGWRFitZ4vgOeSaga9h/JHVc59mFvG7Q0nfa9mHpxAu8f0nLJua?=
+ =?us-ascii?Q?MHfITBQnpMiDaSpAfGvp4VPnAm0ZynDpAiahsH1T2y5MpFoFwe4F/vCfXbiH?=
+ =?us-ascii?Q?2L9Gpw4cqS5ANJausnRW0TNWxAaC0H76n2FSuIioIMMjOSbX8/TPi8Y96p7U?=
+ =?us-ascii?Q?wNvdF2gMpMcgYjB5wFIQUvqOLEErF835unCB?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 20:12:53.2221
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 20:12:58.0096
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c19ea92f-a9f0-4e92-1141-08dda9ed836c
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbd590af-61aa-4f9e-d7d6-08dda9ed8647
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD7D.namprd04.prod.outlook.com
+	CH1PEPF0000AD7F.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6162
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5921
 
-The variable is used for caching of rt->dst.dev. The netdevice referenced
-therein does not change during the scope of validity of that local. At the
-same time, the local is only used twice, and each of these uses will end up
-in a different function in the following patches, further eliminating any
-use the local could have had.
-
-Drop the local altogether and inline the uses.
+Some of the work of ipmr_queue_xmit() is specific to IPMR forwarding, and
+should not take place on the output path. In order to allow reuse of the
+common parts, split the function into two: the ipmr_prepare_xmit() helper
+that takes care of the common bits, and the ipmr_queue_fwd_xmit(), which
+invokes the former and encapsulates the whole forwarding algorithm.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- net/ipv4/ipmr.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ net/ipv4/ipmr.c | 45 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 29 insertions(+), 16 deletions(-)
 
 diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 2ff2f79c7351..1c5e6167cd76 100644
+index 1c5e6167cd76..7c1045d67ea8 100644
 --- a/net/ipv4/ipmr.c
 +++ b/net/ipv4/ipmr.c
-@@ -1859,7 +1859,6 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+@@ -1853,8 +1853,8 @@ static bool ipmr_forward_offloaded(struct sk_buff *skb, struct mr_table *mrt,
+ 
+ /* Processing handlers for ipmr_forward, under rcu_read_lock() */
+ 
+-static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+-			    int in_vifi, struct sk_buff *skb, int vifi)
++static int ipmr_prepare_xmit(struct net *net, struct mr_table *mrt,
++			     struct sk_buff *skb, int vifi)
+ {
  	const struct iphdr *iph = ip_hdr(skb);
  	struct vif_device *vif = &mrt->vif_table[vifi];
- 	struct net_device *vif_dev;
--	struct net_device *dev;
- 	struct rtable *rt;
- 	struct flowi4 fl4;
- 	int    encap = 0;
-@@ -1898,8 +1897,6 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
- 			goto out_free;
+@@ -1865,7 +1865,7 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+ 
+ 	vif_dev = vif_dev_read(vif);
+ 	if (!vif_dev)
+-		goto out_free;
++		return -1;
+ 
+ 	if (vif->flags & VIFF_REGISTER) {
+ 		WRITE_ONCE(vif->pkt_out, vif->pkt_out + 1);
+@@ -1873,12 +1873,9 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+ 		DEV_STATS_ADD(vif_dev, tx_bytes, skb->len);
+ 		DEV_STATS_INC(vif_dev, tx_packets);
+ 		ipmr_cache_report(mrt, skb, vifi, IGMPMSG_WHOLEPKT);
+-		goto out_free;
++		return -1;
  	}
  
--	dev = rt->dst.dev;
+-	if (ipmr_forward_offloaded(skb, mrt, in_vifi, vifi))
+-		goto out_free;
 -
- 	if (skb->len+encap > dst_mtu(&rt->dst) && (ntohs(iph->frag_off) & IP_DF)) {
- 		/* Do not fragment multicasts. Alas, IPv4 does not
- 		 * allow to send ICMP, so that packets will disappear
-@@ -1910,7 +1907,7 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
- 		goto out_free;
+ 	if (vif->flags & VIFF_TUNNEL) {
+ 		rt = ip_route_output_ports(net, &fl4, NULL,
+ 					   vif->remote, vif->local,
+@@ -1886,7 +1883,7 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+ 					   IPPROTO_IPIP,
+ 					   iph->tos & INET_DSCP_MASK, vif->link);
+ 		if (IS_ERR(rt))
+-			goto out_free;
++			return -1;
+ 		encap = sizeof(struct iphdr);
+ 	} else {
+ 		rt = ip_route_output_ports(net, &fl4, NULL, iph->daddr, 0,
+@@ -1894,7 +1891,7 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+ 					   IPPROTO_IPIP,
+ 					   iph->tos & INET_DSCP_MASK, vif->link);
+ 		if (IS_ERR(rt))
+-			goto out_free;
++			return -1;
  	}
  
--	encap += LL_RESERVED_SPACE(dev) + rt->dst.header_len;
-+	encap += LL_RESERVED_SPACE(rt->dst.dev) + rt->dst.header_len;
+ 	if (skb->len+encap > dst_mtu(&rt->dst) && (ntohs(iph->frag_off) & IP_DF)) {
+@@ -1904,14 +1901,14 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+ 		 */
+ 		IP_INC_STATS(net, IPSTATS_MIB_FRAGFAILS);
+ 		ip_rt_put(rt);
+-		goto out_free;
++		return -1;
+ 	}
+ 
+ 	encap += LL_RESERVED_SPACE(rt->dst.dev) + rt->dst.header_len;
  
  	if (skb_cow(skb, encap)) {
  		ip_rt_put(rt);
-@@ -1947,7 +1944,7 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
- 	 * result in receiving multiple packets.
- 	 */
- 	NF_HOOK(NFPROTO_IPV4, NF_INET_FORWARD,
--		net, NULL, skb, skb->dev, dev,
-+		net, NULL, skb, skb->dev, rt->dst.dev,
- 		ipmr_forward_finish);
- 	return;
+-		goto out_free;
++		return -1;
+ 	}
  
+ 	WRITE_ONCE(vif->pkt_out, vif->pkt_out + 1);
+@@ -1931,6 +1928,22 @@ static void ipmr_queue_xmit(struct net *net, struct mr_table *mrt,
+ 		DEV_STATS_ADD(vif_dev, tx_bytes, skb->len);
+ 	}
+ 
++	return 0;
++}
++
++static void ipmr_queue_fwd_xmit(struct net *net, struct mr_table *mrt,
++				int in_vifi, struct sk_buff *skb, int vifi)
++{
++	struct rtable *rt;
++
++	if (ipmr_forward_offloaded(skb, mrt, in_vifi, vifi))
++		goto out_free;
++
++	if (ipmr_prepare_xmit(net, mrt, skb, vifi))
++		goto out_free;
++
++	rt = skb_rtable(skb);
++
+ 	IPCB(skb)->flags |= IPSKB_FORWARDED;
+ 
+ 	/* RFC1584 teaches, that DVMRP/PIM router must deliver packets locally
+@@ -2062,8 +2075,8 @@ static void ip_mr_forward(struct net *net, struct mr_table *mrt,
+ 				struct sk_buff *skb2 = skb_clone(skb, GFP_ATOMIC);
+ 
+ 				if (skb2)
+-					ipmr_queue_xmit(net, mrt, true_vifi,
+-							skb2, psend);
++					ipmr_queue_fwd_xmit(net, mrt, true_vifi,
++							    skb2, psend);
+ 			}
+ 			psend = ct;
+ 		}
+@@ -2074,10 +2087,10 @@ static void ip_mr_forward(struct net *net, struct mr_table *mrt,
+ 			struct sk_buff *skb2 = skb_clone(skb, GFP_ATOMIC);
+ 
+ 			if (skb2)
+-				ipmr_queue_xmit(net, mrt, true_vifi, skb2,
+-						psend);
++				ipmr_queue_fwd_xmit(net, mrt, true_vifi, skb2,
++						    psend);
+ 		} else {
+-			ipmr_queue_xmit(net, mrt, true_vifi, skb, psend);
++			ipmr_queue_fwd_xmit(net, mrt, true_vifi, skb, psend);
+ 			return;
+ 		}
+ 	}
 -- 
 2.49.0
 
