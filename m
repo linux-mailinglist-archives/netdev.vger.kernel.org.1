@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-197188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE4DAD7C24
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:15:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA1B1AD7C1E
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE8F61884494
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:14:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E3F23A589B
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E39C2D8762;
-	Thu, 12 Jun 2025 20:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5C82D663F;
+	Thu, 12 Jun 2025 20:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="isiIDJUY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YmaWLax9"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2051.outbound.protection.outlook.com [40.107.92.51])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2084.outbound.protection.outlook.com [40.107.236.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E372D6611
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD89B2D6634;
+	Thu, 12 Jun 2025 20:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749759167; cv=fail; b=l+dw3JcM8qg+MgAXz8cwTEFtb+3FH+yFX3Be8felzF4qfFhYWcI1GNk3LU+ItEpziwyB1aPPBlXJS1u37Al/EcIrylw/5BOgaC1dJJowFc/b80RMyyRoxaZcZglcmaWa/9XCJDvpCMSnRZeFdi4OgIQp4qH6FpV9x2B07OfC4f4=
+	t=1749759174; cv=fail; b=r/9XcEty2YLAOVzwMR2VYh3U4yUbM5fNi2sazAqvYXLMCMTgacSrJ24FkvEZs7WpcNPLlVTnUrHvPvJzeCEg9zYaZLrp5IlggaYTa6Dr4bHYk0B+xp+lbdYD3dCwXLOGiTNKSm3R4G7pxbsAEkS171wQ9FOp5zxZs4CEEU2S+TY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749759167; c=relaxed/simple;
-	bh=AJPC7Ma3iy/L/kp1rQyTMsg4KVoqk6Zn6YiT2Go07pI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pktivsa8wWxvWjO5uL86XmnrhP6wkG0pVZnPTWUovnrvAhhkGutiHNqaRnHLFqOIl2+33F2eRPwUu4zuXPjFlz/b+Nr5zWosMuDPAbfDi6PRBy3vrkult9ugSLeIM7n2L4wHYrhGoiWJxXXArqXZJMEwQroU+lZgpW0a7wofXxM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=isiIDJUY; arc=fail smtp.client-ip=40.107.92.51
+	s=arc-20240116; t=1749759174; c=relaxed/simple;
+	bh=Gbx92xz9v7McEyEhFmZwuacaG2lgjs407vYpNXG7Yxc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TdedxYNN7OOE1+Bqp0x3AQ5Ew7v0YxT28T3GcZXyqSdNTFppgRHUAAge6bfnX+Qat8uQ52HFTQe1fPIENXHvmvAuhjkeDd8rB53wW91CWNijJ0xNxQS0ir4b5F6FXhV9P5tMKhNvZA9JXiGeaucNxnK0//DDs7EPihRCeEaRsNo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YmaWLax9; arc=fail smtp.client-ip=40.107.236.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dvFlBnxlPPCgDiS6N4JBhZNA78GDddaEX5mOvyAeS0rJ3FKjdoEJNnVcFT8JJIwwSlRl4KC2ajtDo65TnLAO8vTkYyzUApos/PL1MRGHa+LEYu3Lbxqs1vSJUttQk5n5fp7vWkiJR2ueCLFyVbGMGk26DjFn+0j8a9hNLBcZv2A81MJhhHJFfZA2KxaM2q5teZuM4seLdPdA/NMhG26iISnkanswvH1q9rFXEL9Dzc/1jHlaarW0ZCIxRN6VhYZQl54d37Op0ldlbfABpiAeyMtBHgNmjxp3W30sO8PoZKzmNi51ciNAdqOHZtBnvcF9UPPahEVv5shxL6qP3HGVwg==
+ b=ZMXgbRNWiCiUilmi999mHnjsvpZQjjGaMdY/jMWh+NtrHb9TKkvhBAEgM1NjdQ8iCize219/QvyQ2RYy/G6ZhRNfFfiPQNUjoJ5WebxDf2qOBMWeWRNIpjaCdTuYdBNoHYafOrNI8V1g7iyoxf3ktJAkG7GnEf5MKpVBaVH2uTEDAUvynxYuJP7xJoCRXA7h+R9z0hkmiShfOD8joLdoFDPGqojIarSadz2UNPXdTlV8BexIIF7GIomUMCiy/2IAWBy1ef0mP84rZhwfamTrLol5aGPkkIcLQpz/01PjrxMoq16sLIOb5SLgNvrsiiAiflyQbXRfYtuaOIFCmY2GwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tz7svfsxVdwJqfFOrzm4kZGqzRBS76caLvDfczOPmpQ=;
- b=tbAxFNHEhJSlWd2P6Vjzb8eXOc3oGa2JqdDbQEwemXED5jPtmUZ68gTm1HMcguvury72nabVNsd3Z1vLrrEHGgG9N3zNsbxT7aLQXRr5lThYpBtMeRx7tlkKWhJc2CN4qg4tDN6dqTkmpWWHdWTL8l7Ufav7ChD27pkxeEHdfuJoiyU+awlMbQVoMfUmekN++InIT1rwXucWn4VGJ/znuE1w9fTqQxiuaN8X0PZ/hCX3dO6uxkE6A2+zZgHWZIOlWLZFPMPziz6NQPvE7gljLXfjXqqPs0SZwoxFGoleQIiB3tLfkSRG4qUgogBmMvfiQKpwXlkDD91BDVUj2KCM1g==
+ bh=0rqVshfJn0nINHr9InWhwk8gEXi5cPmrL5gvbfObtUw=;
+ b=VB4XiGZQ/oOO/pXFZU6T20YmgEISMMQZyFJKBDJx9ItPPZF8FWrszXi7fT+3IWFzGSPjooVMPY9sZJfkCwtEO1UbYPxr6sNj9tSWfuwe//WVY7GaERfXPQpBwyBjb0mm2TvG2HJ+XbdyvhziHKcO2N36buUj+Wdu0P3EkDwbf68q3XARB7yWC4P4Fv6r57NQaKb33VDXFhakPQzVbQcOTQXjhNLJyT8hCImYZC/eXnWgaEsCl6EfFkzolMXQfp/xy8XeObu+QEWe7mwOVi9TbEMI/i8MePXWIJjRTIZTQBxNWU+9tQu3QUuldUZ54MSTkrI0NzsbG4w6Tqm6Pctk0w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tz7svfsxVdwJqfFOrzm4kZGqzRBS76caLvDfczOPmpQ=;
- b=isiIDJUYxoJQCxWCCntKmBdyb1EeRlgwJrEllFQpu/LB95xK31XR1gJiSxxdyh0QZfAAqfqcyep8EPzXN+wow+93+/NIzk6PX/N+AnBiKVvQjM6KK8/j5cL3wJxCKf+UEdl6XO4xyyBnhB3gzQz6kxNgwsUx1Gvz6xhRa0tnuy3S7ZltC/220c/U/x/XZxR6aLKbb4ZDznZhi7k5lxGd6c3xsEFRPsQzN/aEt3Da9SK6dqyII81fQQKTgp8rNfTbfOewAnRt4n8oPhnpj+XJe/ZGBWziXIQOUOmYGZhlpDH+89DJqDd7gjYDCx40O3CX+46t8ShbGreAggL5H8PtCA==
-Received: from BY3PR03CA0009.namprd03.prod.outlook.com (2603:10b6:a03:39a::14)
- by CY8PR12MB8299.namprd12.prod.outlook.com (2603:10b6:930:6c::21) with
+ bh=0rqVshfJn0nINHr9InWhwk8gEXi5cPmrL5gvbfObtUw=;
+ b=YmaWLax9RVDEoSkQ8fdD2w/eWSoQfi5FrITIkzKCm4S+ItHEQ3EijhN6k4rtBnSy57b3wEoo6kXAWWjDLMQw0U4gvuT49/MtvvwIgK833lTj1IuKlOwcJDD/WONeURn878N3sjiEW3HKxAqxEBWWgo7J6izzsTzYFZUT/bn6CCmeAiAi2CSvNtfX8n7eLITbxQrwsste0rQ5QOgFDJaDcb/f94kmQdmDpX0sJ4UCIIkPDj/XMRVbcUkKIM4i60i4H9B2yqCVAceE1Cdrr7OILag9CEji6g0VqvbT8PAbz0jCsTUWOE6ZhsgOx4qP8BQdLspSFFJUFU7Jphv5K5V4/Q==
+Received: from CH2PR10CA0015.namprd10.prod.outlook.com (2603:10b6:610:4c::25)
+ by SA1PR12MB8724.namprd12.prod.outlook.com (2603:10b6:806:38b::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Thu, 12 Jun
- 2025 20:12:40 +0000
-Received: from CO1PEPF000042AD.namprd03.prod.outlook.com
- (2603:10b6:a03:39a:cafe::6b) by BY3PR03CA0009.outlook.office365.com
- (2603:10b6:a03:39a::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.24 via Frontend Transport; Thu,
- 12 Jun 2025 20:12:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.36; Thu, 12 Jun
+ 2025 20:12:49 +0000
+Received: from CH1PEPF0000AD80.namprd04.prod.outlook.com
+ (2603:10b6:610:4c:cafe::ff) by CH2PR10CA0015.outlook.office365.com
+ (2603:10b6:610:4c::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Thu,
+ 12 Jun 2025 20:12:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000042AD.mail.protection.outlook.com (10.167.243.42) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH1PEPF0000AD80.mail.protection.outlook.com (10.167.244.90) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 20:12:39 +0000
+ 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 20:12:48 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 12 Jun
- 2025 13:12:24 -0700
+ 2025 13:12:35 -0700
 Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 12 Jun
- 2025 13:12:19 -0700
+ 2025 13:12:24 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -81,11 +82,19 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<netdev@vger.kernel.org>
 CC: Simon Horman <horms@kernel.org>, Nikolay Aleksandrov
 	<razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
-	<petrm@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next v2 00/14] ipmr, ip6mr: Allow MC-routing locally-generated MC packets
-Date: Thu, 12 Jun 2025 22:10:34 +0200
-Message-ID: <cover.1749757582.git.petrm@nvidia.com>
+	<petrm@nvidia.com>, <mlxsw@nvidia.com>, Antonio Quartulli
+	<antonio@openvpn.net>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	<osmocom-net-gprs@lists.osmocom.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Taehee Yoo <ap420073@gmail.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	<wireguard@lists.zx2c4.com>, Marcelo Ricardo Leitner
+	<marcelo.leitner@gmail.com>, <linux-sctp@vger.kernel.org>, Jon Maloy
+	<jmaloy@redhat.com>, <tipc-discussion@lists.sourceforge.net>
+Subject: [PATCH net-next v2 01/14] net: ipv4: Add a flags argument to iptunnel_xmit(), udp_tunnel_xmit_skb()
+Date: Thu, 12 Jun 2025 22:10:35 +0200
+Message-ID: <93258d0156bab6c2d8c7c6e1a43d23e13e9830ec.1749757582.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1749757582.git.petrm@nvidia.com>
+References: <cover.1749757582.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,180 +107,374 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AD:EE_|CY8PR12MB8299:EE_
-X-MS-Office365-Filtering-Correlation-Id: eea47f70-bb14-4b5d-a26e-08dda9ed7b26
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD80:EE_|SA1PR12MB8724:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f64a987-4a18-4a6f-0611-08dda9ed806a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026|13003099007;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?L+o+zYd2NZHqWYjkka7m+fKtZ+LMTrnbrlrWgIyyyQgWGRJXYhiIgi87MYgI?=
- =?us-ascii?Q?149fVhzi7XcX0XliJk1pkFVVGyTna4MiuNOxIDsXwlMu2fPCj3G05GswPPfm?=
- =?us-ascii?Q?8K/1eepGW/mgW8+nuFk2pP+OdwjPBrpebJmnRU+cJmj9+6qnI1yyI9+rON5v?=
- =?us-ascii?Q?z1vApx1GQ6vVASMHNeeDJ2WCVAJV9DIQBdalnQXIn/AyNFQ8/yh5EIRC/rDg?=
- =?us-ascii?Q?vwtIkS+ySducfLp9F8D9Qs1FwceqrwCHM/E1OoiyIQKHZh0grctxinZm79Q8?=
- =?us-ascii?Q?fH9d6aAhFr3BquzQNoS+/kYAHWGR875raUj4JeYqmO6gRC49PS0bmd1Whxbs?=
- =?us-ascii?Q?yB0soDzN1UHpvL52ngZvkP0EWAPCizALNaGg6+JxYkQGamNktcQrlbeuLcKU?=
- =?us-ascii?Q?6On7hqKNMdsqh+S0PUOmezGUcavVm7HL8EhoapmV4GA4ohRwpCBrDQgu3bDg?=
- =?us-ascii?Q?B+jgev2y5nManVfiotovOWTCptS5ZV4ITByoZd3J+DFTpIEswQP2vcMeVd8L?=
- =?us-ascii?Q?6ysueJ35gi94ez7rVowgY/cu+KcU/k9yoi8e2dLnFJcX8AGWsXafwQR5MWgo?=
- =?us-ascii?Q?/B44Gs4Ms5bkZlBxnAT2kNSsF7rEngMAOhI3aT7NhAg3nTfHZLIF08GuxAZk?=
- =?us-ascii?Q?lrQXXF7vOv18YL6CXNXM2wspjurmXHA162oPWms2GtVGUie3EYwe09ui6oWc?=
- =?us-ascii?Q?ySqN9sbGWKHQZmpgqP6KJ8u994r7bz33mGXxlP4NCDBZ8PxCqDgIq/P85Aon?=
- =?us-ascii?Q?G6GuopQSFZzIE+r09OVu22/gxqwSVMf/cb/lqbHUNWhhxcWJzdqutgqCFlET?=
- =?us-ascii?Q?cAJR8c+n4KbAYImpJSmDLwHVqXmlgJc6y7Ht/FOr4rGhCVMF3QcWP4/Nt/3/?=
- =?us-ascii?Q?lTddM7B2ndgPuBBaq998/hNNfQgb0hJTFEXc1yLDz7sIiH319b12g65Gq9FV?=
- =?us-ascii?Q?8MyEgCjjkpXcocd7F/V0HycfziIBrK/0xOg0HkZGZm/BZP0VmQbxmYQhPJgf?=
- =?us-ascii?Q?8RF2M06uqbycnFrJrh2pi5Bl7XGDRb0tBhsgSsziigNjyNvZr8Z5ld0wmT7p?=
- =?us-ascii?Q?RQwetR/nSi6P8E+R6/fj7e8+HtbGwRSSgmH2HCkABg8xkqm3YN6y0l9mv11B?=
- =?us-ascii?Q?xqcF0KwuqWns01xEQYqKCMgr+2NGiNc6BpL+D/CEM5eNawVkIXzActLvMnHN?=
- =?us-ascii?Q?XhcQos14Jbt3PBaLdlORUgBpEkplszQkz2JvLgIIJzg5lKrswI6cJAB9ve+2?=
- =?us-ascii?Q?RMMD5grApqkIobOEtf18M0IxJrYn/A1vpbaLGny7ad8Xxg0idIZBRXog/cX4?=
- =?us-ascii?Q?IyWFRp/yYgK199MAarbnCGI9BCHxa1Iwm5FkCOnpiMxClLxmvgxA1Tf9D09p?=
- =?us-ascii?Q?cUzCN0HoHuUHI4Y0dgvaJl8z+rKPZjrf3webNVigviauZBx2yMp8db/KHLmY?=
- =?us-ascii?Q?1qc5Ath47Q5ReuGj1OrAB3cvwGb5Kvqxeu5gUO124tOvAZogAs2ZGTG8NSTi?=
- =?us-ascii?Q?fn70KY++UjUSUFUyz1TaNnh1O0E+IuSOhRYP?=
+	=?us-ascii?Q?8PITHcsm6VIUI77OTN/frQJjyhd2Wvz+/+TiC/XlD//CQ6UrelcTaO0hIXyD?=
+ =?us-ascii?Q?y0G34Bd/mFo9jv47imqRITWZOL5vJ26u1wzpSVeUpZbEQzkIlKAja3xc5xpj?=
+ =?us-ascii?Q?AHgCUFPyIvS8iGsQl58/MLVR+Y7ZU064sfgZ75uqHFot+5Pnx0Bg1Qygyco5?=
+ =?us-ascii?Q?HTJNVQJDgCdEwoVyNcRN+v2C+TCoyyajPa038BaLDK1v8/yZjhzWJaWXZ+6v?=
+ =?us-ascii?Q?4MachjJdKR4T7IdqOLPGZ6a17IkI/Q+ap6K2e1mdLRHSsRiI8YpPP5nDEm6a?=
+ =?us-ascii?Q?ryzufbzZi5mdroh3CMmjBS4vk7jtOOPrSqWfn4jIQ+KN9aSU7xwdLTSt2dUb?=
+ =?us-ascii?Q?csy0dY+A0Opf55FTrrx4zUFE0unAMRuiMThct0tv3lyO2I46Gl31jK+cNeGS?=
+ =?us-ascii?Q?fykfOJSo8uDva/zRss1qeOUp3EjWUGy7tAr9JqINpWwT+LnxDJdzRg1FDKk3?=
+ =?us-ascii?Q?44JXc3vwtQyTI6q6FJnw9nwS5DBmHj+Ou0BdZ7JpZ7vUXeJShUffyd6BKR2x?=
+ =?us-ascii?Q?lYdXm38wGH0/+6ywNwWUcR0qQISxFI5sSuU7KZUyzF77YTfFRywdUEOlpE2U?=
+ =?us-ascii?Q?yxo6yVcM6SseEtc+IWvdkdn1Y/es/NTOFEeXuSrviUCQuVjxbM4tFcyvwsig?=
+ =?us-ascii?Q?mdZMLZnDSd7sKNkzaz2D0V1toYO4GwcIl0Q4ve4LS/iu3m9vjqZY77IxctUN?=
+ =?us-ascii?Q?STNPZIPrJbeSY6BZGsWvyGl/5Y0mUqycHAsKsQDNAucWvC9Q2P5Cd16lRxz8?=
+ =?us-ascii?Q?qOs4Rxmf11Bbeumobd7Ncd+kwi2D5mFk206m+p+osGjo8Zgq76GN3m+OS4Vz?=
+ =?us-ascii?Q?5PDpE5OiCd9D1WgAdSUVyttWFhXxqZZ2TCh9ycBBR7yZxxJ0PMuSYaCb9E0o?=
+ =?us-ascii?Q?4+MMRW0nAVih7L8de16/9gO5Q0gaHhNQ6uJ51pHMsbbIaIWI2lnNRgXtCeTL?=
+ =?us-ascii?Q?9JgZRPDH4x4VfPDi8xsf+b50PrTFhWfofM/8mQgB2ZU6xF5me/fYplzGFw6u?=
+ =?us-ascii?Q?REewRIYjjvgU4WksFArzBEZrz9BCKAgJJz4z41i9O0UgLcptIUeUITb6Nwej?=
+ =?us-ascii?Q?RsF0PUj78ndSuIRbLeeGXdHKoOWVHV5L0gCdw8d05cYX/vTM9QCBPWoTjfre?=
+ =?us-ascii?Q?ir+A2CnCnU/roDoKCXcNQWq83aNkg6Ch/rC5IzmlFuuChWZoHi80FhDG7PIj?=
+ =?us-ascii?Q?c9ANJgW2rV41QxDRdnBU+gGSSvfCiimXI3Y9XFgxPfQikGtu1QbiIaiHVqwL?=
+ =?us-ascii?Q?Vy7kTb/+lH6lblBwfc4rTX1CdvcVlK0Xd1qiAFwH48offhqJGdqJ9kucbfx6?=
+ =?us-ascii?Q?O9gQVN9di7QOWkL5fvQN6iLRKf/ypYLqXdiuUn2PN32olm6Le8YeiYmsOea5?=
+ =?us-ascii?Q?bd8VVrWnLdBgH3aVBYAVcZinFkwJinxIIaxu+YjUkX+JPYzXbNLgwjRLxjql?=
+ =?us-ascii?Q?bw7sUHNeElcyq8gUjvqCnii75up7ADjHoCkGKs6zrGByJbTIPMUfOboiZnAX?=
+ =?us-ascii?Q?jg1toXltRD4tXqb7HPy8qSY8O8agX/aegNH9?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 20:12:39.3962
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 20:12:48.1645
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: eea47f70-bb14-4b5d-a26e-08dda9ed7b26
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f64a987-4a18-4a6f-0611-08dda9ed806a
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000042AD.namprd03.prod.outlook.com
+	CH1PEPF0000AD80.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8299
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8724
 
-Multicast routing is today handled in the input path. Locally generated MC
-packets don't hit the IPMR code. Thus if a VXLAN remote address is
-multicast, the driver needs to set an OIF during route lookup. In practice
-that means that MC routing configuration needs to be kept in sync with the
-VXLAN FDB and MDB. Ideally, the VXLAN packets would be routed by the MC
-routing code instead.
+iptunnel_xmit() erases the contents of the SKB control block. In order to
+be able to set particular IPCB flags on the SKB, add a corresponding
+parameter, and propagate it to udp_tunnel_xmit_skb() as well.
 
-To that end, this patchset adds support to route locally generated
-multicast packets.
+In one of the following patches, VXLAN driver will use this facility to
+mark packets as subject to IP multicast routing.
 
-However, an installation that uses a VXLAN underlay netdevice for which it
-also has matching MC routes, would get a different routing with this patch.
-Previously, the MC packets would be delivered directly to the underlay
-port, whereas now they would be MC-routed. In order to avoid this change in
-behavior, introduce an IPCB/IP6CB flag. Unless the flag is set, the new
-MC-routing code is skipped.
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Acked-by: Antonio Quartulli <antonio@openvpn.net>
+---
 
-All this is keyed to a new VXLAN attribute, IFLA_VXLAN_MC_ROUTE. Only when
-it is set does any of the above engage.
+Notes:
+CC: Pablo Neira Ayuso <pablo@netfilter.org>
+CC: osmocom-net-gprs@lists.osmocom.org
+CC: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Taehee Yoo <ap420073@gmail.com>
+CC: Antonio Quartulli <antonio@openvpn.net>
+CC: "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC: wireguard@lists.zx2c4.com
+CC: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+CC: linux-sctp@vger.kernel.org
+CC: Jon Maloy <jmaloy@redhat.com>
+CC: tipc-discussion@lists.sourceforge.net
 
-In addition to that, and as is the case today with MC forwarding,
-IPV4_DEVCONF_MC_FORWARDING must be enabled for the netdevice that acts as a
-source of MC traffic (i.e. the VXLAN PHYS_DEV), so an MC daemon must be
-attached to the netdevice.
+ drivers/net/amt.c              |  9 ++++++---
+ drivers/net/bareudp.c          |  4 ++--
+ drivers/net/geneve.c           |  4 ++--
+ drivers/net/gtp.c              | 10 ++++++----
+ drivers/net/ovpn/udp.c         |  2 +-
+ drivers/net/vxlan/vxlan_core.c |  2 +-
+ drivers/net/wireguard/socket.c |  2 +-
+ include/net/ip_tunnels.h       |  2 +-
+ include/net/udp_tunnel.h       |  2 +-
+ net/ipv4/ip_tunnel.c           |  4 ++--
+ net/ipv4/ip_tunnel_core.c      |  4 +++-
+ net/ipv4/udp_tunnel_core.c     |  5 +++--
+ net/ipv6/sit.c                 |  2 +-
+ net/sctp/protocol.c            |  3 ++-
+ net/tipc/udp_media.c           |  2 +-
+ 15 files changed, 33 insertions(+), 24 deletions(-)
 
-When a VXLAN netdevice with a MC remote is brought up, the physical
-netdevice joins the indicated MC group. This is important for local
-delivery of MC packets, so it is still necessary to configure a physical
-netdevice -- the parameter cannot go away. The netdevice would however
-typically not be a front panel port, but a dummy. An MC daemon would then
-sit on top of that netdevice as well as any front panel ports that it needs
-to service, and have routes set up between the two.
-
-A way to configure the VXLAN netdevice to take advantage of the new MC
-routing would be:
-
- # ip link add name d up type dummy
- # ip link add name vx10 up type vxlan id 1000 dstport 4789 \
-	local 192.0.2.1 group 225.0.0.1 ttl 16 dev d mrcoute
- # ip link set dev vx10 master br # plus vlans etc.
-
-With the following MC routes:
-
- (192.0.2.1, 225.0.0.1) iif=d oil=swp1,swp2 # TX route
- (*, 225.0.0.1) iif=swp1 oil=d,swp2         # RX route
- (*, 225.0.0.1) iif=swp2 oil=d,swp1         # RX route
-
-The RX path has not changed, with the exception of an extra MC hop. Packets
-are delivered to the front panel port and MC-forwarded to the VXLAN
-physical port, here "d". Since the port has joined the multicast group, the
-packets are locally delivered, and end up being processed by the VXLAN
-netdevice.
-
-This patchset is based on earlier patches from Nikolay Aleksandrov and
-Roopa Prabhu, though it underwent significant changes. Roopa broadly
-presented the topic on LPC 2019 [0].
-
-Patchset progression:
-
-- Patches #1 to #4 add ip_mr_output()
-- Patches #5 to #9 add ip6_mr_output()
-- Patch #10 adds the VXLAN bits to enable MR engagement
-- Patches #11 to #13 prepare selftest libraries
-- Patch #14 includes a new test suite
-
-[0] https://www.youtube.com/watch?v=xlReECfi-uo
-
-v2:
-- Patches #11, #13 and #14:
-    - Adjust as per shellcheck citations
-    - Retain Nik's R-b at patch #13, the changes were very minor.
-
-Petr Machata (14):
-  net: ipv4: Add a flags argument to iptunnel_xmit(),
-    udp_tunnel_xmit_skb()
-  net: ipv4: ipmr: ipmr_queue_xmit(): Drop local variable `dev'
-  net: ipv4: ipmr: Split ipmr_queue_xmit() in two
-  net: ipv4: Add ip_mr_output()
-  net: ipv6: Make udp_tunnel6_xmit_skb() void
-  net: ipv6: Add a flags argument to ip6tunnel_xmit(),
-    udp_tunnel6_xmit_skb()
-  net: ipv6: ip6mr: Fix in/out netdev to pass to the FORWARD chain
-  net: ipv6: ip6mr: Extract a helper out of ip6mr_forward2()
-  net: ipv6: Add ip6_mr_output()
-  vxlan: Support MC routing in the underlay
-  selftests: forwarding: lib: Move smcrouted helpers here
-  selftests: net: lib: Add ip_link_has_flag()
-  selftests: forwarding: adf_mcd_start(): Allow configuring custom
-    interfaces
-  selftests: forwarding: Add a test for verifying VXLAN MC underlay
-
- drivers/net/amt.c                             |   9 +-
- drivers/net/bareudp.c                         |   7 +-
- drivers/net/geneve.c                          |   7 +-
- drivers/net/gtp.c                             |  12 +-
- drivers/net/ovpn/udp.c                        |   4 +-
- drivers/net/vxlan/vxlan_core.c                |  23 +-
- drivers/net/wireguard/socket.c                |   4 +-
- include/linux/ipv6.h                          |   1 +
- include/linux/mroute6.h                       |   7 +
- include/net/ip.h                              |   2 +
- include/net/ip6_tunnel.h                      |   3 +-
- include/net/ip_tunnels.h                      |   2 +-
- include/net/udp_tunnel.h                      |  17 +-
- include/net/vxlan.h                           |   5 +-
- include/uapi/linux/if_link.h                  |   1 +
- net/ipv4/ip_tunnel.c                          |   4 +-
- net/ipv4/ip_tunnel_core.c                     |   4 +-
- net/ipv4/ipmr.c                               | 169 +++-
- net/ipv4/route.c                              |   2 +-
- net/ipv4/udp_tunnel_core.c                    |   5 +-
- net/ipv6/ip6_tunnel.c                         |   2 +-
- net/ipv6/ip6_udp_tunnel.c                     |  18 +-
- net/ipv6/ip6mr.c                              | 137 +++-
- net/ipv6/route.c                              |   1 +
- net/ipv6/sit.c                                |   2 +-
- net/sctp/ipv6.c                               |   7 +-
- net/sctp/protocol.c                           |   3 +-
- net/tipc/udp_media.c                          |  12 +-
- .../testing/selftests/net/forwarding/Makefile |   1 +
- tools/testing/selftests/net/forwarding/lib.sh |  46 ++
- .../net/forwarding/router_multicast.sh        |  35 +-
- .../net/forwarding/vxlan_bridge_1q_mc_ul.sh   | 769 ++++++++++++++++++
- tools/testing/selftests/net/lib.sh            |  12 +-
- 33 files changed, 1216 insertions(+), 117 deletions(-)
- create mode 100755 tools/testing/selftests/net/forwarding/vxlan_bridge_1q_mc_ul.sh
-
+diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+index 734a0b3242a9..d0f719531499 100644
+--- a/drivers/net/amt.c
++++ b/drivers/net/amt.c
+@@ -1046,7 +1046,8 @@ static bool amt_send_membership_update(struct amt_dev *amt,
+ 			    amt->gw_port,
+ 			    amt->relay_port,
+ 			    false,
+-			    false);
++			    false,
++			    0);
+ 	amt_update_gw_status(amt, AMT_STATUS_SENT_UPDATE, true);
+ 	return false;
+ }
+@@ -1103,7 +1104,8 @@ static void amt_send_multicast_data(struct amt_dev *amt,
+ 			    amt->relay_port,
+ 			    tunnel->source_port,
+ 			    false,
+-			    false);
++			    false,
++			    0);
+ }
+ 
+ static bool amt_send_membership_query(struct amt_dev *amt,
+@@ -1161,7 +1163,8 @@ static bool amt_send_membership_query(struct amt_dev *amt,
+ 			    amt->relay_port,
+ 			    tunnel->source_port,
+ 			    false,
+-			    false);
++			    false,
++			    0);
+ 	amt_update_relay_status(tunnel, AMT_STATUS_SENT_QUERY, true);
+ 	return false;
+ }
+diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
+index a9dffdcac805..5e613080d3f8 100644
+--- a/drivers/net/bareudp.c
++++ b/drivers/net/bareudp.c
+@@ -362,8 +362,8 @@ static int bareudp_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	udp_tunnel_xmit_skb(rt, sock->sk, skb, saddr, info->key.u.ipv4.dst,
+ 			    tos, ttl, df, sport, bareudp->port,
+ 			    !net_eq(bareudp->net, dev_net(bareudp->dev)),
+-			    !test_bit(IP_TUNNEL_CSUM_BIT,
+-				      info->key.tun_flags));
++			    !test_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags),
++			    0);
+ 	return 0;
+ 
+ free_dst:
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index ffc15a432689..c668e8b00ed2 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -921,8 +921,8 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	udp_tunnel_xmit_skb(rt, gs4->sock->sk, skb, saddr, info->key.u.ipv4.dst,
+ 			    tos, ttl, df, sport, geneve->cfg.info.key.tp_dst,
+ 			    !net_eq(geneve->net, dev_net(geneve->dev)),
+-			    !test_bit(IP_TUNNEL_CSUM_BIT,
+-				      info->key.tun_flags));
++			    !test_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags),
++			    0);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+index d4dec741c7f4..14584793fe4e 100644
+--- a/drivers/net/gtp.c
++++ b/drivers/net/gtp.c
+@@ -446,7 +446,8 @@ static int gtp0_send_echo_resp_ip(struct gtp_dev *gtp, struct sk_buff *skb)
+ 			    htons(GTP0_PORT), htons(GTP0_PORT),
+ 			    !net_eq(sock_net(gtp->sk1u),
+ 				    dev_net(gtp->dev)),
+-			    false);
++			    false,
++			    0);
+ 
+ 	return 0;
+ }
+@@ -704,7 +705,8 @@ static int gtp1u_send_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 			    htons(GTP1U_PORT), htons(GTP1U_PORT),
+ 			    !net_eq(sock_net(gtp->sk1u),
+ 				    dev_net(gtp->dev)),
+-			    false);
++			    false,
++			    0);
+ 	return 0;
+ }
+ 
+@@ -1304,7 +1306,7 @@ static netdev_tx_t gtp_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 				    pktinfo.gtph_port, pktinfo.gtph_port,
+ 				    !net_eq(sock_net(pktinfo.pctx->sk),
+ 					    dev_net(dev)),
+-				    false);
++				    false, 0);
+ 		break;
+ 	case AF_INET6:
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -2405,7 +2407,7 @@ static int gtp_genl_send_echo_req(struct sk_buff *skb, struct genl_info *info)
+ 			    port, port,
+ 			    !net_eq(sock_net(sk),
+ 				    dev_net(gtp->dev)),
+-			    false);
++			    false, 0);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
+index bff00946eae2..d866e6bfda70 100644
+--- a/drivers/net/ovpn/udp.c
++++ b/drivers/net/ovpn/udp.c
+@@ -199,7 +199,7 @@ static int ovpn_udp4_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
+ transmit:
+ 	udp_tunnel_xmit_skb(rt, sk, skb, fl.saddr, fl.daddr, 0,
+ 			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
+-			    fl.fl4_dport, false, sk->sk_no_check_tx);
++			    fl.fl4_dport, false, sk->sk_no_check_tx, 0);
+ 	ret = 0;
+ err:
+ 	local_bh_enable();
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index a56d7239b127..d7a5d8873a1b 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2522,7 +2522,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 
+ 		udp_tunnel_xmit_skb(rt, sock4->sock->sk, skb, saddr,
+ 				    pkey->u.ipv4.dst, tos, ttl, df,
+-				    src_port, dst_port, xnet, !udp_sum);
++				    src_port, dst_port, xnet, !udp_sum, 0);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	} else {
+ 		struct vxlan_sock *sock6 = rcu_dereference(vxlan->vn6_sock);
+diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
+index 0414d7a6ce74..88e685667bc0 100644
+--- a/drivers/net/wireguard/socket.c
++++ b/drivers/net/wireguard/socket.c
+@@ -84,7 +84,7 @@ static int send4(struct wg_device *wg, struct sk_buff *skb,
+ 	skb->ignore_df = 1;
+ 	udp_tunnel_xmit_skb(rt, sock, skb, fl.saddr, fl.daddr, ds,
+ 			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
+-			    fl.fl4_dport, false, false);
++			    fl.fl4_dport, false, false, 0);
+ 	goto out;
+ 
+ err:
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 0c3d571a04a1..8cf1380f3656 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -603,7 +603,7 @@ static inline int iptunnel_pull_header(struct sk_buff *skb, int hdr_len,
+ 
+ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 		   __be32 src, __be32 dst, u8 proto,
+-		   u8 tos, u8 ttl, __be16 df, bool xnet);
++		   u8 tos, u8 ttl, __be16 df, bool xnet, u16 ipcb_flags);
+ struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
+ 					     gfp_t flags);
+ int skb_tunnel_check_pmtu(struct sk_buff *skb, struct dst_entry *encap_dst,
+diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+index 2df3b8344eb5..28102c8fd8a8 100644
+--- a/include/net/udp_tunnel.h
++++ b/include/net/udp_tunnel.h
+@@ -150,7 +150,7 @@ static inline void udp_tunnel_drop_rx_info(struct net_device *dev)
+ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb,
+ 			 __be32 src, __be32 dst, __u8 tos, __u8 ttl,
+ 			 __be16 df, __be16 src_port, __be16 dst_port,
+-			 bool xnet, bool nocheck);
++			 bool xnet, bool nocheck, u16 ipcb_flags);
+ 
+ int udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
+ 			 struct sk_buff *skb,
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index 678b8f96e3e9..aaeb5d16f0c9 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -668,7 +668,7 @@ void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 	ip_tunnel_adj_headroom(dev, headroom);
+ 
+ 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, proto, tos, ttl,
+-		      df, !net_eq(tunnel->net, dev_net(dev)));
++		      df, !net_eq(tunnel->net, dev_net(dev)), 0);
+ 	return;
+ tx_error:
+ 	DEV_STATS_INC(dev, tx_errors);
+@@ -857,7 +857,7 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 	ip_tunnel_adj_headroom(dev, max_headroom);
+ 
+ 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, protocol, tos, ttl,
+-		      df, !net_eq(tunnel->net, dev_net(dev)));
++		      df, !net_eq(tunnel->net, dev_net(dev)), 0);
+ 	return;
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index f65d2f727381..cc9915543637 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -49,7 +49,8 @@ EXPORT_SYMBOL(ip6tun_encaps);
+ 
+ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 		   __be32 src, __be32 dst, __u8 proto,
+-		   __u8 tos, __u8 ttl, __be16 df, bool xnet)
++		   __u8 tos, __u8 ttl, __be16 df, bool xnet,
++		   u16 ipcb_flags)
+ {
+ 	int pkt_len = skb->len - skb_inner_network_offset(skb);
+ 	struct net *net = dev_net(rt->dst.dev);
+@@ -62,6 +63,7 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 	skb_clear_hash_if_not_l4(skb);
+ 	skb_dst_set(skb, &rt->dst);
+ 	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
++	IPCB(skb)->flags = ipcb_flags;
+ 
+ 	/* Push down and install the IP header. */
+ 	skb_push(skb, sizeof(struct iphdr));
+diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
+index 2326548997d3..9efd62505916 100644
+--- a/net/ipv4/udp_tunnel_core.c
++++ b/net/ipv4/udp_tunnel_core.c
+@@ -169,7 +169,7 @@ EXPORT_SYMBOL_GPL(udp_tunnel_notify_del_rx_port);
+ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb,
+ 			 __be32 src, __be32 dst, __u8 tos, __u8 ttl,
+ 			 __be16 df, __be16 src_port, __be16 dst_port,
+-			 bool xnet, bool nocheck)
++			 bool xnet, bool nocheck, u16 ipcb_flags)
+ {
+ 	struct udphdr *uh;
+ 
+@@ -185,7 +185,8 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
+ 
+ 	udp_set_csum(nocheck, skb, src, dst, skb->len);
+ 
+-	iptunnel_xmit(sk, rt, skb, src, dst, IPPROTO_UDP, tos, ttl, df, xnet);
++	iptunnel_xmit(sk, rt, skb, src, dst, IPPROTO_UDP, tos, ttl, df, xnet,
++		      ipcb_flags);
+ }
+ EXPORT_SYMBOL_GPL(udp_tunnel_xmit_skb);
+ 
+diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
+index a72dbca9e8fc..12496ba1b7d4 100644
+--- a/net/ipv6/sit.c
++++ b/net/ipv6/sit.c
+@@ -1035,7 +1035,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
+ 	skb_set_inner_ipproto(skb, IPPROTO_IPV6);
+ 
+ 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, protocol, tos, ttl,
+-		      df, !net_eq(tunnel->net, dev_net(dev)));
++		      df, !net_eq(tunnel->net, dev_net(dev)), 0);
+ 	return NETDEV_TX_OK;
+ 
+ tx_error_icmp:
+diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
+index 8c3b80c4d40b..bfbb73e359f5 100644
+--- a/net/sctp/protocol.c
++++ b/net/sctp/protocol.c
+@@ -1103,7 +1103,8 @@ static inline int sctp_v4_xmit(struct sk_buff *skb, struct sctp_transport *t)
+ 	skb_set_inner_ipproto(skb, IPPROTO_SCTP);
+ 	udp_tunnel_xmit_skb(dst_rtable(dst), sk, skb, fl4->saddr,
+ 			    fl4->daddr, dscp, ip4_dst_hoplimit(dst), df,
+-			    sctp_sk(sk)->udp_port, t->encap_port, false, false);
++			    sctp_sk(sk)->udp_port, t->encap_port, false, false,
++			    0);
+ 	return 0;
+ }
+ 
+diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
+index 108a4cc2e001..87e8c1e6d550 100644
+--- a/net/tipc/udp_media.c
++++ b/net/tipc/udp_media.c
+@@ -197,7 +197,7 @@ static int tipc_udp_xmit(struct net *net, struct sk_buff *skb,
+ 		ttl = ip4_dst_hoplimit(&rt->dst);
+ 		udp_tunnel_xmit_skb(rt, ub->ubsock->sk, skb, src->ipv4.s_addr,
+ 				    dst->ipv4.s_addr, 0, ttl, 0, src->port,
+-				    dst->port, false, true);
++				    dst->port, false, true, 0);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	} else {
+ 		if (!ndst) {
 -- 
 2.49.0
 
