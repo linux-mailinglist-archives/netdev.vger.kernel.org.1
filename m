@@ -1,163 +1,147 @@
-Return-Path: <netdev+bounces-196853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7410AD6B18
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:42:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59969AD6B3A
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFEB33AF0C9
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:41:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F18831884263
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00FE244EA0;
-	Thu, 12 Jun 2025 08:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EFC1221DB1;
+	Thu, 12 Jun 2025 08:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/FmAibw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NFTMRgMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2B923D29A;
-	Thu, 12 Jun 2025 08:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD531B412A
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749717493; cv=none; b=rN9xF7JQw60CBnBcTddkda4yswIdieEsx6bSqz8JFSk+31E6wjh1a6XbFKojaUEOAtVc4AZ/Qli9Xhcdr0AZR/gJ/j0VIvvCdnPYypYf5iYBxyDSIF0d/Blvzvu0ttfDC8QiM/I0o+cINdT+Nab+V+93j1msdzO6PpSzk77MQvw=
+	t=1749717890; cv=none; b=eeueCLWRy7oBdn5x90HabbAZrPwC147TXdTxyGw1HFGrTmWkdPqaDxcA3ayYfhQNJHyc6HButqYwhv+gNl5FnjskSsOg7nP/FQG/oqm0sd2THQwQI11vAEf5RYWdEj308co131eTvEJQcGNMy65JkN1DyJHMPsJQM6dAnQ2FCKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749717493; c=relaxed/simple;
-	bh=kpj3AK5rs+N9TYEtbGrRUGGXrqhAbf8sJlWbuq0dU0Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gcj5GHn+CdJRObesuqcgmIcU/wLKRMMrr4tCdqpMqXUyYxnJLdJiJjhOXhPbGAm/mxMSCUuYGmsuO6vsH783CojDrIfMsbzjWsa44C++06QZi9MSIT6ncTnWjY5q5yYCDLyOhDXJi5I/Er+yz0+ZtGk9aKf441TUGSUHpkNVYGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/FmAibw; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a4f72cba73so1291035f8f.1;
-        Thu, 12 Jun 2025 01:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749717490; x=1750322290; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kjf4q87bTB3LUgZ001uanVcydc8/XjXZX0ocWOFGfQQ=;
-        b=W/FmAibwUbSq32whkUEUN7TuWI1Cw8O711oS+XiYLhdTDq2oK5nperBetIIGyLLopr
-         O18Q6Av0Mg0KyePYp4WSMm508fCHB9uQGfmA2jyp7KBelAwP/9YYeYQBqKQgczhws3Nh
-         ueFpzPwMKd7YeIDVonsdBcSHKR/cw8B16+A/b8vMX7uVrawJoVtniJXmFSX+Q3FNxyeN
-         lZEMsJXORFlE2Dg/hEntoRxJeYPoS3PO0xEzdg/k4zFfZxJx+V1iV+dX9xBaNzwD56gM
-         v2I5wMAwnIhoV29Sn9qlgZGoj7xDkYJv+VgfxLAYZi0TorlyWHzj6iqTrTIKTcElF9rO
-         +nKA==
+	s=arc-20240116; t=1749717890; c=relaxed/simple;
+	bh=rNTbSvQjmtm36dJjYb+8KYjVtBDjiIzJsQLY4I9jU7k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ETdU/nBgHEMOysdtUm6uLZrn/78wqJAfhORoTDOk14jFT8Dw6rrxa9mbppVPd3E6nQ4RjaD7MAHKkIRfQmAEzkWXqK0ighhsCykksO1XNru++agy8SHIqgrb4VlWA63IeRFz1ngtLLCRJXEFW8VoZ5uoN43Ti7o2wXQm1mUS+6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NFTMRgMX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749717887;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rNTbSvQjmtm36dJjYb+8KYjVtBDjiIzJsQLY4I9jU7k=;
+	b=NFTMRgMXm/X3gM2DQDMlGyTQaiBW5DtLRjLob7fTP9mSR2CZf1EdCNWzPwYU4mIQF/DT9m
+	JtdhV+uh4UtzMiCmI2QaLv9CSQJyMRUXdP6Hu2Y1MS+FrVGAQSI4uF2PR6zClioFy80InD
+	IczhfYE2Og1ON22uZEB1zXE8h6cMKS8=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-114-ti8nZtXbOKqVHyMLoJ825g-1; Thu, 12 Jun 2025 04:44:45 -0400
+X-MC-Unique: ti8nZtXbOKqVHyMLoJ825g-1
+X-Mimecast-MFC-AGG-ID: ti8nZtXbOKqVHyMLoJ825g_1749717885
+Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-e81733e4701so1088514276.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 01:44:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749717490; x=1750322290;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kjf4q87bTB3LUgZ001uanVcydc8/XjXZX0ocWOFGfQQ=;
-        b=AZXAS1qfpP5n3q2/unKv3lwcuJzOUhddG4DjdGGN9GBTGqNeSqFNuKJCf8twK69Alw
-         +NRsKiN9DuFgQJcMkymUGvOsceEkd1ItkVudNoS7Qab0GEQUJkkGAN1sFPWNi/rAWFGC
-         B32zk58O1QRuobrI/8Mo0CQ9ybVI6rFfyt6HZnPj0ZFMGafKUahpVSGGrMv0mfy5mGUA
-         bac71TTIrhbwkaOgoHHUF6XdWeYv4uaYad9nfhJZYlCuc0fcmYg4hm8HIKLTYFf2B2g2
-         kzkqSqFiLv/Kwq/MqynQJzXxB6ulDV9LtgBYk41BXizs3+yGdHUbnK9LpEbMgbxWZ/ds
-         asMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEePwg2q6zbVUZF9z5qvR7AA20r7Dhy7UdDB67e/csuECAHKGrb7zWq0gCuifMFbWsSYfsuapuzkpKImk=@vger.kernel.org, AJvYcCVCzy9M59JIOz/5mySOsZec+rdwlDFGH3sosaI2umvNx8UqjzXEglI5VZNngb1e8Ey8gBjVS6MR@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4s5iQBrLYgvnF+viMiptYafIKECi/W51VZLX56kV6lF9n0y1O
-	tq4539cqNoYIf8Rr0wA+6skp7fOp3THNbNAA7xWYTFZF+I4bc9lSRxDx
-X-Gm-Gg: ASbGnctMyojWDofCkCtQIRh4rwLcRn3n7N/rawLBMdFAxNxQHmBaIo4hQWRJHDsfsa5
-	yD0ddqk8qPx0KBZGg4cLzWZBNndfzKyxJRC9RX3G+8EphmugbkaMDtVHGPxhfdZU6ZSQSxjuhna
-	VCk6qTGiAWBWJM0VTKqobYRbc4AIrkbeKbmf3u4crBGSfrCwf1XMfzzOEl8x3ac5zH2fp5LeI2b
-	0aQU7gTjcByI4uR1zKoUxOSP+V21aFFBuzLfMb3di7pw41tjanZbTACHs6bgMpFoJpWp8fWzx3T
-	OCfuLt8LmA1xgfyN+GlSM+eiFiGqowMr8kX05ri3miqMU8lgVFaUVDbIOATVOYJcSZmqlYlb8Of
-	9Milf4bpYz3vQAYmD4TR33HeLRUxBsgnn+e6+PbqExOOubud/efbwJR1u1sWhJWeraxG6uyGNw0
-	XiyA==
-X-Google-Smtp-Source: AGHT+IGSTzOzf0ROryRS3ep5kgJSyB0a008xyqqyJ+bk19UPTMzotMcnP5PdEEqK6qqQJ6Wg07DMdQ==
-X-Received: by 2002:a05:6000:240d:b0:3a4:d685:3de7 with SMTP id ffacd0b85a97d-3a560778f99mr2248674f8f.8.1749717490349;
-        Thu, 12 Jun 2025 01:38:10 -0700 (PDT)
-Received: from slimbook.localdomain (2a02-9142-4580-1900-0000-0000-0000-0011.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1900::11])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e224956sm13350975e9.4.2025.06.12.01.38.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 01:38:09 -0700 (PDT)
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-To: jonas.gorski@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vivien.didelot@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dgcbueu@gmail.com
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [PATCH net-next v3 14/14] net: dsa: b53: ensure BCM5325 PHYs are enabled
-Date: Thu, 12 Jun 2025 10:37:47 +0200
-Message-Id: <20250612083747.26531-15-noltari@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250612083747.26531-1-noltari@gmail.com>
-References: <20250612083747.26531-1-noltari@gmail.com>
+        d=1e100.net; s=20230601; t=1749717885; x=1750322685;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rNTbSvQjmtm36dJjYb+8KYjVtBDjiIzJsQLY4I9jU7k=;
+        b=Z1Fw2esErh22p08G9eOqF3v7w2sQcVkEozWay/8MRCCJOYBwiPAdFOGNqds6gaizCw
+         Et+Oe6KpFtFsdVmsFjbZiDvPEJPVA4eHhzSsvjf1HAiS6kK5kBXz//ng/FM/ZSuWz4zN
+         m889BaFenUoxUaZjzUHbWabkqXMQ4QNp/W6haLzmiJptLAGmW3P9/AlAbGDxVYKxtFdM
+         tkbWMkHQ7WMCbAIB8h805+YIoGBFH7DTDBX6SvUVlBQZrtkCnon1s30WVv+SxhrNQalv
+         zS0/Zt1oGWu9TQ1XD6ctkNFmYlMe/1f6L9zdFDoL2rOy8ruQvNOET1Nv3I7HDA45qbW1
+         GfMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUr8X3MDqq086qEg/OYje6HFJDYAgobZcX/ROVomYkF1gokxLbfuRYPLLICaaai3h+Y7DgE8A0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzR1uUnAhmzO0mwjbRmjCq86F9canywpd6r7Z6qHxPhLc7kVEFr
+	V63KaXk6vBsHR24Tm3SVIx5Ixeq2kregGni1UuPMod0GB3t7vNeRKkp1O3m9H6y3CRu0XTyKlbO
+	5wVDA1XkREC3OIRMZnS02sMvXtbDlfLxUztW7SnDJknLR1iGW4EWuMItfbzlnoo58oI2w6es9mW
+	Rdh46JDHZEGNBQ9Ubikc8T9W7h3g2RVzwn
+X-Gm-Gg: ASbGnctGerlp/7X57+uZU6WFqDYDWCjxrIV1HYynvoNJfqVWmb22siP2s/RMJcxP9je
+	KSwkuncUdln6gcFPxZOQBMGrfenE5Z5vS6wmuU/0k1hbkyMzFDLPU56NUaGKOfNACgwA4dWXlE+
+	4zuMjN
+X-Received: by 2002:a05:6902:2611:b0:e81:4e9d:9e79 with SMTP id 3f1490d57ef6-e81fe6b8b7amr9216280276.40.1749717885019;
+        Thu, 12 Jun 2025 01:44:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHpO7imw7/y6hUBA3+X+9+644bvWl/2xN24NgD0/xASJ+Z1iQt0UZZ7qIi1/vJ8aGKQCfn0PwMZVX01PvmLRPE=
+X-Received: by 2002:a05:6902:2611:b0:e81:4e9d:9e79 with SMTP id
+ 3f1490d57ef6-e81fe6b8b7amr9216251276.40.1749717884673; Thu, 12 Jun 2025
+ 01:44:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CAGxU2F6c7=M-jbBRXkU-iUfzNbUYAr9QApDvRVOAU6Q0zDsFGQ@mail.gmail.com>
+ <20250612082102.995225-1-niuxuewei.nxw@antgroup.com>
+In-Reply-To: <20250612082102.995225-1-niuxuewei.nxw@antgroup.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 12 Jun 2025 10:44:33 +0200
+X-Gm-Features: AX0GCFs5PNoVhHhHZsKNXS6ADWJpjexmyZKqj4oyHShXjy9f_WC9YKjQLjFGOUk
+Message-ID: <CAGxU2F4JkO8zxDZg8nTYmCsg9DaaH58o5L+TBzZxo+3TnXbA9Q@mail.gmail.com>
+Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream sockets
+To: Xuewei Niu <niuxuewei97@gmail.com>
+Cc: Oxffffaa@gmail.com, avkrasnov@salutedevices.com, davem@davemloft.net, 
+	edumazet@google.com, eperezma@redhat.com, horms@kernel.org, 
+	jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	niuxuewei.nxw@antgroup.com, pabeni@redhat.com, stefanha@redhat.com, 
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
 
-According to the datasheet, BCM5325 uses B53_PD_MODE_CTRL_25 register to
-disable clocking to individual PHYs.
-Only ports 1-4 can be enabled or disabled and the datasheet is explicit
-about not toggling BIT(0) since it disables the PLL power and the switch.
+On Thu, 12 Jun 2025 at 10:21, Xuewei Niu <niuxuewei97@gmail.com> wrote:
+>
+> > On Thu, 12 Jun 2025 at 08:50, Xuewei Niu <niuxuewei97@gmail.com> wrote:
+> > >
+> > > > On Thu, Jun 12, 2025 at 01:32:01PM +0800, Xuewei Niu wrote:
+> > > > > No comments since last month.
+> > > > >
+> > > > > The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
+> > > > > patch. Could I get more eyes on this one?
+> > > > >
+> > > > > [1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
+> > > > >
+> > > > > Thanks,
+> > > > > Xuewei
+> > > >
+> > > > it's been in net for two weeks now, no?
+> > >
+> > > Umm sorry, I didn't check the date carefully, because there are several
+> > > ongoing patches. Next time I'll check it carefully. Sorry again.
+> > >
+> > > It looks like no one is paying attention to this patch. I am requesting
+> > > someone interested in vsock to review this. I'd appreciate that!
+> >
+> > Which patch do you mean?
+> >
+> > Thanks,
+> > Stefano
+>
+> I am saying your patch, "vsock/virtio: fix `rx_bytes` accounting for stream
+> sockets".
+>
+> Once this gets merged, I will send a new version of my patch to support
+> SIOCINQ ioctl. Thus, I can reuse `rx_bytes` to count unread bytes, as we
+> discussed.
 
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- drivers/net/dsa/b53/b53_common.c | 12 ++++++++++++
- drivers/net/dsa/b53/b53_regs.h   |  2 ++
- 2 files changed, 14 insertions(+)
+As Michael pointed out, it was merged several weeks ago in net tree,
+see https://lore.kernel.org/netdev/174827942876.985160.7017354014266756923.git-patchwork-notify@kernel.org/
+And it also landed in Linus tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=45ca7e9f0730ae36fc610e675b990e9cc9ca0714
 
- v3: add changes requested by Florian:
-  - Use in_range() helper.
+So, I think you can go head with your patch, right?
 
- v2: add changes requested by Florian:
-  - Move B53_PD_MODE_CTRL_25 to b53_setup_port().
+Please remember to target net-next, since it will be a new feature IIRC.
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 3503f363e2419..eac40e95c8c53 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -660,6 +660,18 @@ int b53_setup_port(struct dsa_switch *ds, int port)
- 	if (dsa_is_user_port(ds, port))
- 		b53_set_eap_mode(dev, port, EAP_MODE_SIMPLIFIED);
- 
-+	if (is5325(dev) &&
-+	    in_range(port, B53_PD_MODE_PORT_MIN, B53_PD_MODE_PORT_MAX)) {
-+		u8 reg;
-+
-+		b53_read8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, &reg);
-+		if (dsa_is_unused_port(ds, port))
-+			reg |= BIT(port);
-+		else
-+			reg &= ~BIT(port);
-+		b53_write8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, reg);
-+	}
-+
- 	return 0;
- }
- EXPORT_SYMBOL(b53_setup_port);
-diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_regs.h
-index d6849cf6b0a3a..880c67130a9fc 100644
---- a/drivers/net/dsa/b53/b53_regs.h
-+++ b/drivers/net/dsa/b53/b53_regs.h
-@@ -105,6 +105,8 @@
- 
- /* Power-down mode control */
- #define B53_PD_MODE_CTRL_25		0x0f
-+#define  B53_PD_MODE_PORT_MIN		1
-+#define  B53_PD_MODE_PORT_MAX		4
- 
- /* IP Multicast control (8 bit) */
- #define B53_IP_MULTICAST_CTRL		0x21
--- 
-2.39.5
+Thanks,
+Stefano
 
 
