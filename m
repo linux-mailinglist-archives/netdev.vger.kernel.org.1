@@ -1,96 +1,105 @@
-Return-Path: <netdev+bounces-197031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB1CAD765A
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:36:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD484AD767B
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:38:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D52B3A2686
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:34:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BF207B57E7
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC4A2BDC25;
-	Thu, 12 Jun 2025 15:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886082C325A;
+	Thu, 12 Jun 2025 15:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrtw9j97"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B2qosYu+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E951E376C;
-	Thu, 12 Jun 2025 15:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D657C2BF3F9;
+	Thu, 12 Jun 2025 15:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749742214; cv=none; b=FJTyPxkbJWZlEJzc7ZiXmOEIkJ5YefoaAvLfSHMb0mD10YGt1b2TmXVA7kCfFU890wsdHGdRFkRW90bIfCdslS24rvj0qXXsL2TL/1cyVX2AZ84lL5fci01Xi41V7P9wN/WYenH6qCLstPiuYiBjOfPhrKbNkNWGlUU2NWZ+VBc=
+	t=1749742331; cv=none; b=otj8bUlStZ5tCYBup/eF4Jxlh5hGtgf3OGOH5pOXq3SqRJu8FuXqYtXw/FHOXHI33vfvBzzLKJwKJM/sFqCGTZZ1CNEaPAzAHADbFs2wDjOrEBQIncQUPVZBHcFKtLf/zGJDIL7jAiqJ/omjw3ywdJNbya1QU2EYW3nGPKpGLbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749742214; c=relaxed/simple;
-	bh=x2aiVu2DBahRLk6YL26ZlTPWmmRNNDwU1Qjz2xLy/+M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gLU3NXyIJHXANNbjQong388rcZtHW9bjDYC16onPAWAwM/rzPNjHB1fJe5tms+9AudCDoHaf2LrUkuBp1x3JdRNSkVDBiu88pg3zgdmYRS9mDeNGI428YsCxmAUZWIfvxYXdVx1xT2X/Jeas+vKTFkHYYgck7KD0vHiqU2k/38k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrtw9j97; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CACC4CEEA;
-	Thu, 12 Jun 2025 15:30:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749742214;
-	bh=x2aiVu2DBahRLk6YL26ZlTPWmmRNNDwU1Qjz2xLy/+M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lrtw9j97S77rpx5hYBAubS/Loqbx3sEnQo6zRLQXydS3dcaK8y9lCus9rsOYphkK3
-	 uxcB/q9hEokwNR1cyL4mWJZTGaBub2/V16ro9tnF0XCcoy2wddWTC+NZVxIFUo2z3/
-	 hl4mhzjDbTQky/V+ket6qCizlOd5SugqyURtkAlyIQxo6sSZMUD/s2Mi2jgHL86rro
-	 FTmH17s7kStgU0p9SXhyywhUAf9LbH6GhYqhGRQZDWEvZ4U3aT/qfHPh+uR5Dsfs68
-	 LMvd22j6QyYMW16orOn237MJAirDGRrJVUvAg5ViSKvXx5GZhiNxJs64C2Ma17L8PI
-	 5pjDMvnhAqG1w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B4639EFFCF;
-	Thu, 12 Jun 2025 15:30:45 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1749742331; c=relaxed/simple;
+	bh=5PV+jOeEc6M5rMfrO2WVc1PW2rGtHnpqpCCs2fKhF4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fa9Hqm+L5M7X+ygGg3m0/hTiDb4ixvpX3RS8IpAyRDDbibwnAbM02uCMJAb/dCj55EAgpP0kXZ7qNGJfsLuWZwS6/arpUXQyrML+XKeZjF/AHFEVxZ4Mnh4Kr+HOrNYkn3TFyF3UwjWU3iP7IDA815HwT5P06qD+Rtxe3WsUvDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B2qosYu+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=STSk0/Pp53STkxsJ2uC08Ifb3MPW7vNpEjKmTxWJIX8=; b=B2qosYu+6KqYewsmy/RV+3y2TH
+	ZOd7C053W7apTgLKzCe3JOoKjw01irsa6bti8pJNU3c1NlVJWSEfH8X+wgAomC3AUrq8TuBZA8WFU
+	CY8E7Z38v8FNwpKjj8eLvCarMWGmQqUCMQ5BM/TUip1zoPnfvI9fNY/V4ULTbJ+lS5LM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uPju6-00FYla-CO; Thu, 12 Jun 2025 17:31:46 +0200
+Date: Thu, 12 Jun 2025 17:31:46 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND net-next v2] net: phy: Add c45_phy_ids sysfs
+ directory entry
+Message-ID: <737294c1-258f-4780-80f8-e7a72e887f8b@lunn.ch>
+References: <20250612143532.4689-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/2] Fix ntuple rules targeting default RSS
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174974224373.4184138.9026629793065246426.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 15:30:43 +0000
-References: <20250612071958.1696361-1-gal@nvidia.com>
-In-Reply-To: <20250612071958.1696361-1-gal@nvidia.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- andrew@lunn.ch, horms@kernel.org, shuah@kernel.org, jdamato@fastly.com,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250612143532.4689-1-yajun.deng@linux.dev>
 
-Hello:
+> +#define MMD_INDICES \
+> +	_(1) _(2) _(3) _(4) _(5) _(6) _(7) _(8) \
+> +	_(9) _(10) _(11) _(12) _(13) _(14) _(15) _(16) \
+> +	_(17) _(18) _(19) _(20) _(21) _(22) _(23) _(24) \
+> +	_(25) _(26) _(27) _(28) _(29) _(30) _(31)
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Is 0 not valid?
 
-On Thu, 12 Jun 2025 10:19:56 +0300 you wrote:
-> This series addresses a regression in ethtool flow steering where rules
-> targeting the default RSS context (context 0) were incorrectly rejected.
-> 
-> The default RSS context always exists but is not stored in the rss_ctx
-> xarray like additional contexts. The current validation logic was
-> checking for the existence of context 0 in this array, causing valid
-> flow steering rules to be rejected.
-> 
-> [...]
+> +#define MMD_DEVICE_ID_ATTR(n) \
+> +static ssize_t mmd##n##_device_id_show(struct device *dev, \
+> +				struct device_attribute *attr, char *buf) \
+> +{ \
+> +	struct phy_device *phydev = to_phy_device(dev); \
+> +	return sysfs_emit(buf, "0x%.8lx\n", \
+> +			 (unsigned long)phydev->c45_ids.device_ids[n]); \
+> +} \
+> +static DEVICE_ATTR_RO(mmd##n##_device_id)
 
-Here is the summary with links:
-  - [net,v3,1/2] net: ethtool: Don't check if RSS context exists in case of context 0
-    https://git.kernel.org/netdev/net/c/d78ebc772c7c
-  - [net,v3,2/2] selftests: drv-net: rss_ctx: Add test for ntuple rules targeting default RSS context
-    https://git.kernel.org/netdev/net/c/56c5d291e885
+This macro magic i can follow, you see this quite a bit in the kernel.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +
+> +#define _(x) MMD_DEVICE_ID_ATTR(x);
+> +MMD_INDICES
+> +#undef _
+> +
+> +static struct attribute *phy_mmd_attrs[] = {
+> +	#define _(x) &dev_attr_mmd##x##_device_id.attr,
+> +	MMD_INDICES
+> +	#undef _
+> +	NULL
+> +};
 
+If i squint at this enough, i can work it out, but generally a much
+more readable KISS approach is taken, of just invoking a macro 32
+times. See mdio_bus.c as an example.
 
+    Andrew
+
+---
+pw-bot: cr
 
