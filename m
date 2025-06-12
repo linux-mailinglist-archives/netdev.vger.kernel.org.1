@@ -1,159 +1,235 @@
-Return-Path: <netdev+bounces-196885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE87DAD6C83
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:46:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2581AD6C8A
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EABB3AF360
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:45:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B20F9189FF11
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B051A222561;
-	Thu, 12 Jun 2025 09:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D6322A7F9;
+	Thu, 12 Jun 2025 09:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="SBKpd59Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iV5cmDb5"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDCC1F92E;
-	Thu, 12 Jun 2025 09:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE651F92E;
+	Thu, 12 Jun 2025 09:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749721573; cv=none; b=qtVsP2w2h/ZdvcORkWO9WTUcYIoQUSUUaoyMAj83KwP3CyvWZF2fPp37Xh11iQ0hDGK6wWXp/rosB3TSYzVpBQUBpUwu6gIGiThBYQHU/qm9tCb1EW42PE0kRkI5FdUydbkf+VO6ITi/V4yZFZcSZSpsHAtmnNDryc03PJw5e6Q=
+	t=1749721658; cv=none; b=fHpWgLVpc+GRatHLEruMPZLhRZrcjGT3ASC7ggNI4oWTR10suWxpBvQcsdHOoVl53Bv+j1JTVWBmBMEzDVgcelJE0owl9OAGOStvNlYc2e6kS6/A4tvC4vlTpepGqpiITZgIx84QAbvb77oWiLlTnNngApodeofyOujXqKORAaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749721573; c=relaxed/simple;
-	bh=Dh0E6ChvgZtODSm2CyrhYN1/rcw1qbw6D7lUcqZQoPI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B9Ueg86MPA9q2FzX5t47mmYMDu8/Ln7aNYXnWy9qXqZRVljltXecJVGNUX8gJiaC0lNYNAhDxC6Eqd47bdqhIQd6ov8o+n9HqPNvlfFGsi384A1oFdaplb3OVwfzLHp/leLYYmrjHiT1qo1yWQ7IjJJwll14rqsixMp+nIgxarg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=SBKpd59Z; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55C9jRZX1635161;
-	Thu, 12 Jun 2025 04:45:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1749721527;
-	bh=1wGCQc0mcjPV9WgUkNTeUr3SyYHwhLuPypKWT3sxnDM=;
-	h=From:To:CC:Subject:Date;
-	b=SBKpd59ZfkK9r8jsdEr/Qis3VM6MSHyCwkYAyVVxxkHKaiYT263Q39aEo0HB8jbxL
-	 Xyp4KaI/iG+HKlysjnGrKMt0Znr+MLgkMUrJGVSe7CPLnGnD6Yo6OK+svo8aTbvtz8
-	 diFfqWDvjpAdBk1zeHlxnzBedKBTMiNlD56ACPrQ=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55C9jRrE1841138
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 12 Jun 2025 04:45:27 -0500
-Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 12
- Jun 2025 04:45:27 -0500
-Received: from fllvem-mr07.itg.ti.com (10.64.41.89) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 12 Jun 2025 04:45:27 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvem-mr07.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55C9jRVC490857;
-	Thu, 12 Jun 2025 04:45:27 -0500
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 55C9jP8J021791;
-	Thu, 12 Jun 2025 04:45:26 -0500
-From: Meghana Malladi <m-malladi@ti.com>
-To: <namcao@linutronix.de>, <m-malladi@ti.com>, <john.fastabend@gmail.com>,
-        <hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
-        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net] net: ti: icssg-prueth: Fix packet handling for XDP_TX
-Date: Thu, 12 Jun 2025 15:15:23 +0530
-Message-ID: <20250612094523.1615719-1-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1749721658; c=relaxed/simple;
+	bh=4RfTLzjwFzvRBVIbLwlDB8bIxZi8DpBfKPn88UHuL6o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D02CYJC8cs1nmiyz1sbM1Lq0nL3kLNtJMEdZRcWxStXYJNZcp54a/GYP/Ri6IwardD8Y/cRlfvVXVo8UgyLzbf0tIQf3lsOnxiAvH0lW0f2yJ3OHOygYR7Fyf4l7LSelLDxw5Bc5WJCK7lEkJl7Az6DwucbnUfFKl2wUbqhNiYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iV5cmDb5; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-236470b2dceso7454975ad.0;
+        Thu, 12 Jun 2025 02:47:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749721656; x=1750326456; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4anYW4XgKhWdrFwLZ/0tNA4p/6Y7eRGkWV12xDwi+ws=;
+        b=iV5cmDb55mzaixKMQ7JKf/HptcG3fqeC0c4GxUXmu+sGg4twWbv5px5ynPgFQiK1QE
+         SYKs+EbRuvtTgx8dsmBi1D3/QEHaR4TbHkqpqhfgyXyyK7OvgvF3UC5MW4HTkDYSYpHP
+         EdKtMpO8YP1L4u6UERgEe6SnNs4YfS/uZI0qexWL8W+XsMlCIbB5L3i0oo4Vo34T4irj
+         K3O6Q+GT4Rt6BGRwaqPbGZdMhQx6Zv/FnfChaPZqUH3fQ8hUHjNublt98GncIgzvT9ek
+         /JJiUSoroD0PswvPytNSI7tlCz9ESTWexmVWTAhb3D1GdqqMyY//1JfUO92ykqGQhsse
+         AUlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749721656; x=1750326456;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4anYW4XgKhWdrFwLZ/0tNA4p/6Y7eRGkWV12xDwi+ws=;
+        b=sJzl7fojVk3L+iQyFKG+ti9vf6iv5IHVNSlxQ+niWqe7es1cS96okuOD+Y0VMYYZCT
+         /h8HkswQMhZg3XW5WNC5kM6P2O+6J+IkmraIWnQDE6ar0xiV9GZotI6e7b8wd+N1dvjZ
+         nKvery7s32mj9gpWLsyhPjn5Wm1uNgFJng4TebveUanBA+a8OmqMeol0gv6atNV5jzUf
+         D0Na0Btrn2jTVW1jUBpc10dGnwoLv0UU0Bbia0yVcTnCfcGou0W4Qn/RQXaOjq+cdI/g
+         fa8axfctNm7hWOHfhKxSXaZHs3Akxflh/bQAWLZOluHl6diSl5GXUHuxeAahmhswNeTn
+         qylg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLsvjtaXQcM6DCU0DwsRk0fNsKWlqyms4Pk5tid4YKDscJJMkF0ebiw9OLXnupvmVCCttwfTAzq1HtpJk=@vger.kernel.org, AJvYcCVM7FP/49+uEeFYer2KnyV/FfZAvfDzeum2jI7jkz+6i5r8FWJAraGJKoe/HHU68iL+TEm4RKJW@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2FTnUEg6CWDTNHOW4KNIDmqLE7EBgDqZuHdg58rvLldMfAAs9
+	q7IYQg5K6jzoQIhcPyAFC+Oc3SIH/VSq2HphDEsjy6fD/c4sEv9ZqoDS8xe/BFnkSZ7hHS6/1Zg
+	SNhogJRMm1xgp5Eg69xKdeiEWPbaeU0Y=
+X-Gm-Gg: ASbGncsgxGRG/Zz0arxSqKsuWyPElQtxLZ0hjN9JehRe2IQLC5bjfxEcnZ0oh55TBw+
+	PFdQM4zvB04ThUu9my+obLwOkSUjVj94hIRE749UXTGgFqMjZQl0hZjPko8X14sqC12VhuzBp5y
+	8dUDpf4mMzthfa6ac8DrYB9ZylRhDmUJ7KqWVR14OJPOuzzkA+zitmYRri610S75Na/P/Rv++QP
+	kgHlQ==
+X-Google-Smtp-Source: AGHT+IEn/yEuL+ZT1F+q5GVdc8O0V6/puSbAUJHNnsnmlV8IC38r0eOnzkKfa3MMKLGaKZ+m3C9HsssmyMgcw1fuDvk=
+X-Received: by 2002:a17:902:ce81:b0:235:eb8d:800b with SMTP id
+ d9443c01a7336-2364d8b7ec8mr33520145ad.26.1749721656497; Thu, 12 Jun 2025
+ 02:47:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250612083747.26531-1-noltari@gmail.com> <20250612083747.26531-5-noltari@gmail.com>
+ <CAOiHx=kxcMNDrmzz5Bqd337YrZ23sYNWP0-nZrUynPJXdt4LLg@mail.gmail.com>
+In-Reply-To: <CAOiHx=kxcMNDrmzz5Bqd337YrZ23sYNWP0-nZrUynPJXdt4LLg@mail.gmail.com>
+From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
+Date: Thu, 12 Jun 2025 11:47:03 +0200
+X-Gm-Features: AX0GCFve23f_zwO-L2nFeZiFWzohYflBoyr99dafg6h7XIq29CrUZEHbnOB-Q1E
+Message-ID: <CAKR-sGeJ3FWM_0FyuSF=esuvrSDX5w9zwfs7Peof1XDx=sHSpA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 04/14] net: dsa: b53: detect BCM5325 variants
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, vivien.didelot@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-While transmitting XDP frames for XDP_TX, page_pool is
-used to get the DMA buffers (already mapped to the pages)
-and need to be freed/reycled once the transmission is complete.
-This need not be explicitly done by the driver as this is handled
-more gracefully by the xdp driver while returning the xdp frame.
-__xdp_return() frees the XDP memory based on its memory type,
-under which page_pool memory is also handled. This change fixes
-the transmit queue timeout while running XDP_TX.
+Hi Jonas,
 
-logs:
-[  309.069682] icssg-prueth icssg1-eth eth2: NETDEV WATCHDOG: CPU: 0: transmit queue 0 timed out 45860 ms
-[  313.933780] icssg-prueth icssg1-eth eth2: NETDEV WATCHDOG: CPU: 0: transmit queue 0 timed out 50724 ms
-[  319.053656] icssg-prueth icssg1-eth eth2: NETDEV WATCHDOG: CPU: 0: transmit queue 0 timed out 55844 ms
-...
+El jue, 12 jun 2025 a las 11:17, Jonas Gorski
+(<jonas.gorski@gmail.com>) escribi=C3=B3:
+>
+> On Thu, Jun 12, 2025 at 10:37=E2=80=AFAM =C3=81lvaro Fern=C3=A1ndez Rojas
+> <noltari@gmail.com> wrote:
+> >
+> > Older BCM5325M switches lack some registers that newer BCM5325E have, s=
+o
+> > we need to be able to differentiate them in order to check whether the
+> > registers are available or not.
+>
+> Did you test this with a BCM5325M?
 
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_common.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+Nope, I don't have any device with a BCM5325M.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index 5b8fdb882172..12f25cec6255 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -98,20 +98,11 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
- {
- 	struct cppi5_host_desc_t *first_desc, *next_desc;
- 	dma_addr_t buf_dma, next_desc_dma;
--	struct prueth_swdata *swdata;
--	struct page *page;
- 	u32 buf_dma_len;
- 
- 	first_desc = desc;
- 	next_desc = first_desc;
- 
--	swdata = cppi5_hdesc_get_swdata(desc);
--	if (swdata->type == PRUETH_SWDATA_PAGE) {
--		page = swdata->data.page;
--		page_pool_recycle_direct(page->pp, swdata->data.page);
--		goto free_desc;
--	}
--
- 	cppi5_hdesc_get_obuf(first_desc, &buf_dma, &buf_dma_len);
- 	k3_udma_glue_tx_cppi5_to_dma_addr(tx_chn->tx_chn, &buf_dma);
- 
-@@ -135,7 +126,6 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
- 		k3_cppi_desc_pool_free(tx_chn->desc_pool, next_desc);
- 	}
- 
--free_desc:
- 	k3_cppi_desc_pool_free(tx_chn->desc_pool, first_desc);
- }
- EXPORT_SYMBOL_GPL(prueth_xmit_free);
-@@ -612,13 +602,8 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
- 	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
- 	cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
- 	swdata = cppi5_hdesc_get_swdata(first_desc);
--	if (page) {
--		swdata->type = PRUETH_SWDATA_PAGE;
--		swdata->data.page = page;
--	} else {
--		swdata->type = PRUETH_SWDATA_XDPF;
--		swdata->data.xdpf = xdpf;
--	}
-+	swdata->type = PRUETH_SWDATA_XDPF;
-+	swdata->data.xdpf = xdpf;
- 
- 	/* Report BQL before sending the packet */
- 	netif_txq = netdev_get_tx_queue(ndev, tx_chn->id);
+>
+> > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+> > ---
+> >  drivers/net/dsa/b53/b53_common.c | 34 ++++++++++++++++++++++++++------
+> >  drivers/net/dsa/b53/b53_priv.h   | 16 +++++++++++++--
+> >  2 files changed, 42 insertions(+), 8 deletions(-)
+> >
+> >  v3: detect BCM5325 variants as requested by Florian.
+> >
+> > diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53=
+_common.c
+> > index 222107223d109..2975dab6ee0bb 100644
+> > --- a/drivers/net/dsa/b53/b53_common.c
+> > +++ b/drivers/net/dsa/b53/b53_common.c
+> > @@ -2490,8 +2490,18 @@ struct b53_chip_data {
+> >
+> >  static const struct b53_chip_data b53_switch_chips[] =3D {
+> >         {
+> > -               .chip_id =3D BCM5325_DEVICE_ID,
+> > -               .dev_name =3D "BCM5325",
+> > +               .chip_id =3D BCM5325M_DEVICE_ID,
+> > +               .dev_name =3D "BCM5325M",
+> > +               .vlans =3D 16,
+>
+> Are you sure about BCM5325M supporting VLANs at all? All the
+> documentation I can find implies it does not. And if it does not, not
+> sure if it makes sense to support it.
 
-base-commit: 5d6d67c4cb10a4b4d3ae35758d5eeed6239afdc8
--- 
-2.43.0
+Since Florian suggested that we should be able to differentiate them I
+assumed we were supporting it, but if it doesn't make sense to support
+it at all we can drop this patch entirely and not check for 5325m in
+B53_VLAN_ID_IDX access of the next patch (5/14).
 
+>
+> > +               .enabled_ports =3D 0x3f,
+> > +               .arl_bins =3D 2,
+> > +               .arl_buckets =3D 1024,
+> > +               .imp_port =3D 5,
+> > +               .duplex_reg =3D B53_DUPLEX_STAT_FE,
+> > +       },
+> > +       {
+> > +               .chip_id =3D BCM5325E_DEVICE_ID,
+> > +               .dev_name =3D "BCM5325E",
+> >                 .vlans =3D 16,
+> >                 .enabled_ports =3D 0x3f,
+> >                 .arl_bins =3D 2,
+> > @@ -2938,10 +2948,22 @@ int b53_switch_detect(struct b53_device *dev)
+> >                 b53_write16(dev, B53_VLAN_PAGE, B53_VLAN_TABLE_ACCESS_2=
+5, 0xf);
+> >                 b53_read16(dev, B53_VLAN_PAGE, B53_VLAN_TABLE_ACCESS_25=
+, &tmp);
+> >
+> > -               if (tmp =3D=3D 0xf)
+> > -                       dev->chip_id =3D BCM5325_DEVICE_ID;
+> > -               else
+> > +               if (tmp =3D=3D 0xf) {
+> > +                       u32 phy_id;
+> > +                       int val;
+> > +
+> > +                       val =3D b53_phy_read16(dev->ds, 0, MII_PHYSID1)=
+;
+> > +                       phy_id =3D (val & 0xffff) << 16;
+> > +                       val =3D b53_phy_read16(dev->ds, 0, MII_PHYSID2)=
+;
+> > +                       phy_id |=3D (val & 0xffff);
+>
+> You should ignore the least significant nibble, as it encodes the chip re=
+vision.
+
+So the correct would be:
+val =3D b53_phy_read16(dev->ds, 0, MII_PHYSID2);
+phy_id |=3D (val & 0xfff0);
+Right?
+
+>
+> > +
+> > +                       if (phy_id =3D=3D 0x0143bc30)
+> > +                               dev->chip_id =3D BCM5325E_DEVICE_ID;
+> > +                       else
+> > +                               dev->chip_id =3D BCM5325M_DEVICE_ID;
+> > +               } else {
+> >                         dev->chip_id =3D BCM5365_DEVICE_ID;
+> > +               }
+> >                 break;
+> >         case BCM5389_DEVICE_ID:
+> >         case BCM5395_DEVICE_ID:
+> > @@ -2975,7 +2997,7 @@ int b53_switch_detect(struct b53_device *dev)
+> >                 }
+> >         }
+> >
+> > -       if (dev->chip_id =3D=3D BCM5325_DEVICE_ID)
+> > +       if (is5325(dev))
+> >                 return b53_read8(dev, B53_STAT_PAGE, B53_REV_ID_25,
+> >                                  &dev->core_rev);
+> >         else
+> > diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_p=
+riv.h
+> > index a5ef7071ba07b..deea4d83f0e93 100644
+> > --- a/drivers/net/dsa/b53/b53_priv.h
+> > +++ b/drivers/net/dsa/b53/b53_priv.h
+> > @@ -60,7 +60,8 @@ struct b53_io_ops {
+> >
+> >  enum {
+> >         BCM4908_DEVICE_ID =3D 0x4908,
+> > -       BCM5325_DEVICE_ID =3D 0x25,
+> > +       BCM5325M_DEVICE_ID =3D 0x25,
+> > +       BCM5325E_DEVICE_ID =3D 0x25e,
+>
+> Maybe we should have a b53_priv::variant_id field or so. Other chips
+> also can have variants, so we might want to avoid polluting the chip
+> id space. We currently don't care about them, but might in the future
+> as they have different feature support (e.g. there are bcm531x5
+> variants with and without CFP support).
+
+That makes sense.
+I can rework this patch with a new variant field if differentiating
+the BCM5325M is finally needed.
+
+>
+> Regards,
+> Jonas
+
+Best regards,
+=C3=81lvaro.
 
