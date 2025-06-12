@@ -1,90 +1,146 @@
-Return-Path: <netdev+bounces-196946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5CB1AD706A
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:30:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70C5AD706D
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0D3D7ACEE1
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:29:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E5B73A4991
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07172E62C;
-	Thu, 12 Jun 2025 12:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FC026AF3;
+	Thu, 12 Jun 2025 12:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G27koCJN"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8BF222571;
-	Thu, 12 Jun 2025 12:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72C3A94A;
+	Thu, 12 Jun 2025 12:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749731417; cv=none; b=mmDL58nqxfe6DRtWhlIS54NoEPd1/kl2yoWrDk4dFe0erspcDs09U3j9n5aeCC0J1OXtBag9e+6z9STajEL8MTFplhR0nToLBfKwPOmP9ZcyABsAiFDs9FohXaLOofUwxvVgTE3YwQOhJM4OVRC3zzqUkCQa9pFKdUwD7mT42lk=
+	t=1749731437; cv=none; b=lOzHqteYB43DJTv4rsHRYosgxJpABhPdolxDUNSNnS3K2aVLrVQkCPRgYcBvD5Ws+7fqMnueupKU0Y1X2iMg8+MeYkUhB+6p/L2omRMpUbSGTCyR2q/WcKHzpxx/WidZk3LuGt1t0ZyqFWg3E9U9GAkwILyQNVGn8xoP0PS1sq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749731417; c=relaxed/simple;
-	bh=j69Dnf1y/6nSiAAiJLBB05fVyOzl17WJ50+9HmwlJbw=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=YJq7775wWxrzTM4y46H5lr4Ug2HXzyUlICVQNAtHnhB2AlDD3QwNNPmU8poGvKhy+fwa+YV+GiPknb+ENCJg/6H6tkE3R/pIGh3qcYl/XUKbA5ASKvNVtlQlRC9Ehy0THz0y1xNlCgY0yIUL61hsTep6KcCcA3+vugCAySjqEYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4bJ1yc2HDMz1GDmy;
-	Thu, 12 Jun 2025 20:28:08 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1F12D14020C;
-	Thu, 12 Jun 2025 20:30:12 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 12 Jun 2025 20:30:11 +0800
-Message-ID: <19e6f273-7bf1-489b-b1e7-c80e85d80641@huawei.com>
-Date: Thu, 12 Jun 2025 20:30:10 +0800
+	s=arc-20240116; t=1749731437; c=relaxed/simple;
+	bh=Yrz6TyOo8nKCEZiIQ2jpMEfnpmPAF/N/ryT203SG17c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q3v+lVk0KDmHG6ZqK9wFawiQu22WOeJTQTURp1/gUpKPtY0SucIaZsnPtuuV2xoBcATkBz2gh4DTS0XPjYbUyNa9Sd03yxMXKWv476PEvfB9/dLyltXSYqO+HPa/6WHoa34oFJrSkqoh2nmzddPJXOro5KsS/1DHP2C1Ce9BoFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G27koCJN; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2352e3db62cso8092685ad.2;
+        Thu, 12 Jun 2025 05:30:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749731435; x=1750336235; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cZIE9YmLXja9VZk1nQ6vkdefLSrYzZgXrGtKf4uYX2E=;
+        b=G27koCJNLRf6ytil/rbv6s/6bKb1n0DEAchTVvgMO5ZRsS31TvHXFs2owuLAjHlqnN
+         djM+AUKQ4AyYzotl1xz2/prpF7SmvU/NeWcKAlAbDJHErwkViZENVFBFy6UGRaeX1oHh
+         adFknlzpJ4Pvvr8Hxl8/CWS0nKzQHXlcL2v3Tz1h8yciyQUZGWApTUPLzxE5Mq2VMFYm
+         4iFuyCL8leseCy7k/1F52mlBvLpp+ZqwigbcN5jnf59T822P4aHgATKYh3dBMUO8V8OC
+         jajuBL5NmT7lvTkR+rtyG3rg2dc9ENILnt1xVzDAG57zwiN2HXCwXKq3PoTTXYQWYdcW
+         xeXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749731435; x=1750336235;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cZIE9YmLXja9VZk1nQ6vkdefLSrYzZgXrGtKf4uYX2E=;
+        b=dXe1DOMWBrg1U1hNz2w30fJRPveLx/9W+FgAgsVitoW2sciTWWOYpVEbs4Q4tucv0E
+         JkcvbKFtH7N3vasqsBJe1Wn/gqfT92vF6p5yxmsCty6fGHZbGMY5s++xh11AOGLOMn/G
+         287zMqoDXhck2UaDv2dAoFudQklPk/7ygXGbHYPk5y1FWuB6gtlhV9A0pFBZsQ5/16rq
+         xKEmqFsthhXXYuyzJG7f7UQN+WLZ7DbH3KHD7JqUNHDgl8c0h0kSC6coAzhGzouo7pQt
+         GDOsKn4Yz/1HRKo4p9SUrTYNWsCA78ZtkpSkb0xiWVbL4NyzxISXpvZdBmVQTKTRD2Fc
+         L0cg==
+X-Forwarded-Encrypted: i=1; AJvYcCWiXZXxtkMHyp0wBs41ROlxwrlmMHehDjcFz9fcMkeJGd9oh6sQZ1wB6uwiB2cUbf0uWcF2cPA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqP+LHAbOsmAuQ9r25N/MWxg6Bms1hODBtc2D+Fj4qkSNmbJKd
+	mJ6rMRPsuZBjWyMU573wurVebOcNe7MXjFXOD+zPakZPclR+6T0d9GkUF4O1RYms
+X-Gm-Gg: ASbGnctDswtpAzgTR14Mkm7xUsMPQOYrthbH5G9zwg8ElatwW2uoEjlNz65UoMvQnqK
+	FDAJD+OyXU/zyzN1Q/D6m7gRiie/5ig/ZmPpV6sFhnYFBvf+5P4HTs4p+CoQZYfXo3pZ/hpS9zv
+	wbIdomBnLVevTv4HS9KIkKKhrfA2Hi4tK1divhV1ur/YwfRpNvcPDXKpe3NAFDAY2mXrmkAXThu
+	FZh4PPr6SqhVIXuFhe1AhBqT9+qkZi/8S8KBeZKn/xWl6WINk9z9lT1zGulQaDaj5r8aD+mTeSE
+	n6Bs8TWemVyOwlIeM5j8iH/lvgjh/jEkso07onpIxpItXgLZQ+WA2W9+QuNc+YqqpraSGAVGN6l
+	+OPRHAg==
+X-Google-Smtp-Source: AGHT+IGSd6ofzhZ5EyBTRFdJodgLBNIXLN7aXIfSsUFdOKT4yHa29oFRUlcxAun81CydPhQpJsDEkA==
+X-Received: by 2002:a17:903:1b10:b0:234:d2fb:2d28 with SMTP id d9443c01a7336-23641aa2385mr97177435ad.2.1749731434861;
+        Thu, 12 Jun 2025 05:30:34 -0700 (PDT)
+Received: from localhost.localdomain ([187.61.150.61])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1bcbc9bsm1325684a91.9.2025.06.12.05.30.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 05:30:34 -0700 (PDT)
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	Ramon Fontes <ramonreisfontes@gmail.com>
+Subject: [PATCH] mac802154_hwsim: allow users to specify the number of simulated radios dynamically instead of the previously hardcoded value of 2
+Date: Thu, 12 Jun 2025 09:30:26 -0300
+Message-ID: <20250612123026.15386-1-ramonreisfontes@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/8] net: hns3: add the hns3_get_ops() helper
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-References: <20250612021317.1487943-1-shaojijie@huawei.com>
- <20250612021317.1487943-4-shaojijie@huawei.com>
- <aEq4Hvg4aaxnn7m0@mev-dev.igk.intel.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <aEq4Hvg4aaxnn7m0@mev-dev.igk.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Transfer-Encoding: 8bit
 
+Add a module parameter radios to allow users to configure the number
+of virtual radios created by mac802154_hwsim at module load time.
+This replaces the previously hardcoded value of 2.
 
-on 2025/6/12 19:21, Michal Swiatkowski wrote:
-> On Thu, Jun 12, 2025 at 10:13:12AM +0800, Jijie Shao wrote:
->> This patch introduces a hns3_get_ops() helper to reduce the unnecessary
->> middle layer conversion. Apply it to the whole HNS3 driver.
->> The former discusstion can be checked from the link.
->>
->> Link: https://patchwork.kernel.org/project/netdevbpf/patch/20230310081404.947-1-lanhao@huawei.com/
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> Like with previous patch, not introducing, but using. Still the linked
-> discussion is about sth else. If you can, please rephrase commit message
-> to reflect what it is really doing.
->
-> Thanks
->
-> [...]
+* Added a new module parameter radios
+* Modified the loop in hwsim_probe()
+* Updated log message in hwsim_probe()
 
-ok
+Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
->
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 1cab20b5a..113c8df78 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -27,6 +27,10 @@
+ MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac802154");
+ MODULE_LICENSE("GPL");
+ 
++static unsigned int radios = 2;
++module_param(radios, uint, 0444);
++MODULE_PARM_DESC(radios, "Number of simulated radios");
++
+ static LIST_HEAD(hwsim_phys);
+ static DEFINE_MUTEX(hwsim_phys_lock);
+ 
+@@ -1016,15 +1020,16 @@ static void hwsim_del(struct hwsim_phy *phy)
+ static int hwsim_probe(struct platform_device *pdev)
+ {
+ 	struct hwsim_phy *phy, *tmp;
+-	int err, i;
++	int err;
++	unsigned int i;
+ 
+-	for (i = 0; i < 2; i++) {
++	for (i = 0; i < radios; i++) {
+ 		err = hwsim_add_one(NULL, &pdev->dev, true);
+ 		if (err < 0)
+ 			goto err_slave;
+ 	}
+ 
+-	dev_info(&pdev->dev, "Added 2 mac802154 hwsim hardware radios\n");
++	dev_info(&pdev->dev, "Added %u mac802154 hwsim hardware radios\n", radios);
+ 	return 0;
+ 
+ err_slave:
+-- 
+2.43.0
+
 
