@@ -1,58 +1,76 @@
-Return-Path: <netdev+bounces-196836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22838AD6A9B
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:25:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A79AD6AE2
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA47A16AA18
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:25:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92FCA7ABA27
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D542040A7;
-	Thu, 12 Jun 2025 08:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EAA21B8F8;
+	Thu, 12 Jun 2025 08:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="uXHNAyk7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TIwv4eYP"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEAC189BB0;
-	Thu, 12 Jun 2025 08:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81186EC2
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749716741; cv=none; b=JKGGcigwCWEoSgTXUpwBUSRUROnbyReGl1m0e+fVYoGTf04RXg9/XYklKozgM3QphjmJlyHg+9/7uLbe0jiZScnSJx61tVcRq7GTAVEXu81ZqndDFKO+sEtIXyp+mDK5aK2KrSuTQzt+RKcUn9lUXQwF9wAUSLoR1Rl8tirW4X8=
+	t=1749717151; cv=none; b=COD/XAoqnL8eC+N5SmIKyquj1qP3Q+DaWfvgi+gaO0wnmJaG4V3EIrzaX2Nsdz1sPEcKz84XpSmumXMXp552Sv6cKeYx+iaQKiLm1fKPO3s6Ggq8mELbzf4ViqWkIRsB5LTvuaeX1ABadHkBuRBqwqlwaDUoTytlzOz+4y6NRMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749716741; c=relaxed/simple;
-	bh=NtyFz2v91XHDD4JVNQ/RmS8itnTzoEojen+Xb/p17wg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FzrMuF7XvnWVCd21oBb9HbgzlNWFCCE1Z7jTNPyzuFRbm1VNpa1a3ZU+avBBrOtB0aKjatYMqkq8ZICKiNBpYmbTN8efEQwMnZChI1R3VlH0fo4nS75xDv1OAck6ADxP/8zrzEa3nEmPTJ4RCuleibBGLgi8t4pYBq25hn5QRVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=uXHNAyk7; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=hU9TAPDtr6fHxQR1sgOHiFV13ms0iwUk0e/U/3LA88A=; t=1749716739; x=1750926339; 
-	b=uXHNAyk73/r4t4UgeUaz5ouT2reCiuXP6+3UVYFqc9TLWbvdsMZCrhl5Tj0V67NXjhXGlbeiWYg
-	9SijQnZ+z7Dqur+lKmdYxkkrYOUXXKkg4mh6378Q9+iArfd683TWEn830KaZRvM22Qpca5t/+UKbf
-	WoKGXbmxmVBwBk3DlTK4tmMu0irWzgz6Aql/3FvGxhFPmyxxIoJKXl6/kPNMuet3X+OXr9vxe9tHr
-	7+IhXo2K589ekYndkRDc56Pv+17KLjX5WcWKUbfZPQFMqgAPuKlEAj6QdSlg6SHy6tKMCnOukqNXm
-	TiTmajuVGrEXxSh0VT31L3rSoZuLdYs2TExg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uPdFX-00000003om0-27fp;
-	Thu, 12 Jun 2025 10:25:28 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2025-06-12
-Date: Thu, 12 Jun 2025 10:24:19 +0200
-Message-ID: <20250612082519.11447-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749717151; c=relaxed/simple;
+	bh=0H65YCBltM3mzM7cKC6Wde80q9ECLX3BrCRHdl1gq/A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tqZfzgWkGDW7UgO/a+B4weKTg0MliZogzDGhwZFJdc/qxLJH5mkJjcTGzeFRYi3k9715eFUi1EmII2XyamvNPu3/g9zi/mYFy+c+UEm//+yBZRByr7W/GJlj0ZfzskoyDeTIXx4jTvXJQG2SP9UfhXcNtxDVkwat7V3r94CPKZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TIwv4eYP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749717148;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YgJVMs0RGxMwkZXnXqV6sqGHx/KtJsdRvyJMHrklXlk=;
+	b=TIwv4eYPZbNHjpVHtM3W9Z8Na/h4BArET0uddRAO0HDOxoCOmRps3gWjXGueHSYsXwiFtV
+	6l9uxvNf4HadY0C+tSLiZTukbtDplzrx1ZSnFkiML/lUy812Qc4ckjQGsmSeUzFNFqz0JL
+	9KSMTAfpzD4N6lQz1tKYHJz1PGw2IJM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-626-3KqVGTcKP0mvvuQ604UXJA-1; Thu,
+ 12 Jun 2025 04:32:25 -0400
+X-MC-Unique: 3KqVGTcKP0mvvuQ604UXJA-1
+X-Mimecast-MFC-AGG-ID: 3KqVGTcKP0mvvuQ604UXJA_1749717144
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE4CC19560AD;
+	Thu, 12 Jun 2025 08:32:23 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.112.165])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0518C19560A3;
+	Thu, 12 Jun 2025 08:32:17 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com
+Cc: eperezma@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next 1/2] tun: remove unnecessary tun_xdp_hdr structure
+Date: Thu, 12 Jun 2025 16:32:12 +0800
+Message-ID: <20250612083213.2704-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,98 +78,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi,
+With f95f0f95cfb7("net, xdp: Introduce xdp_init_buff utility routine"),
+buffer length could be stored as frame size so there's no need to have
+a dedicated tun_xdp_hdr structure. We can simply store virtio net
+header instead.
 
-Just a quick couple of fixes as described below. Part of
-the reason to send them now is that Jeff wants to have
-them in -next to avoid conflicts later.
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/net/tap.c      | 5 ++---
+ drivers/net/tun.c      | 5 ++---
+ drivers/vhost/net.c    | 8 ++------
+ include/linux/if_tun.h | 5 -----
+ 4 files changed, 6 insertions(+), 17 deletions(-)
 
-Please pull and let us know if there's any problem.
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index bdf0788d8e66..d82eb7276a8b 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -1044,9 +1044,8 @@ static const struct file_operations tap_fops = {
+ 
+ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
+ {
+-	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
+-	struct virtio_net_hdr *gso = &hdr->gso;
+-	int buflen = hdr->buflen;
++	struct virtio_net_hdr *gso = xdp->data_hard_start;
++	int buflen = xdp->frame_sz;
+ 	int vnet_hdr_len = 0;
+ 	struct tap_dev *tap;
+ 	struct sk_buff *skb;
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 1207196cbbed..90055947a54b 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2356,13 +2356,12 @@ static int tun_xdp_one(struct tun_struct *tun,
+ 		       struct tun_page *tpage)
+ {
+ 	unsigned int datasize = xdp->data_end - xdp->data;
+-	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
+-	struct virtio_net_hdr *gso = &hdr->gso;
++	struct virtio_net_hdr *gso = xdp->data_hard_start;
+ 	struct bpf_prog *xdp_prog;
+ 	struct sk_buff *skb = NULL;
+ 	struct sk_buff_head *queue;
+ 	u32 rxhash = 0, act;
+-	int buflen = hdr->buflen;
++	int buflen = xdp->frame_sz;
+ 	int metasize = 0;
+ 	int ret = 0;
+ 	bool skb_xdp = false;
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 7cbfc7d718b3..777eb6193985 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -668,7 +668,6 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	struct socket *sock = vhost_vq_get_backend(vq);
+ 	struct virtio_net_hdr *gso;
+ 	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
+-	struct tun_xdp_hdr *hdr;
+ 	size_t len = iov_iter_count(from);
+ 	int headroom = vhost_sock_xdp(sock) ? XDP_PACKET_HEADROOM : 0;
+ 	int buflen = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+@@ -691,15 +690,13 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	if (unlikely(!buf))
+ 		return -ENOMEM;
+ 
+-	copied = copy_from_iter(buf + offsetof(struct tun_xdp_hdr, gso),
+-				sock_hlen, from);
++	copied = copy_from_iter(buf, sock_hlen, from);
+ 	if (copied != sock_hlen) {
+ 		ret = -EFAULT;
+ 		goto err;
+ 	}
+ 
+-	hdr = buf;
+-	gso = &hdr->gso;
++	gso = buf;
+ 
+ 	if (!sock_hlen)
+ 		memset(buf, 0, pad);
+@@ -727,7 +724,6 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 
+ 	xdp_init_buff(xdp, buflen, NULL);
+ 	xdp_prepare_buff(xdp, buf, pad, len, true);
+-	hdr->buflen = buflen;
+ 
+ 	++nvq->batched_xdp;
+ 
+diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
+index 043d442994b0..80166eb62f41 100644
+--- a/include/linux/if_tun.h
++++ b/include/linux/if_tun.h
+@@ -19,11 +19,6 @@ struct tun_msg_ctl {
+ 	void *ptr;
+ };
+ 
+-struct tun_xdp_hdr {
+-	int buflen;
+-	struct virtio_net_hdr gso;
+-};
+-
+ #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
+ struct socket *tun_get_socket(struct file *);
+ struct ptr_ring *tun_get_tx_ring(struct file *file);
+-- 
+2.34.1
 
-Thanks,
-johannes
-
-
-
-The following changes since commit 2c7e4a2663a1ab5a740c59c31991579b6b865a26:
-
-  Merge tag 'net-6.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-05 12:34:55 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-06-12
-
-for you to fetch changes up to f87586598fffac31afc1141471b789251b030a76:
-
-  wifi: cfg80211: use kfree_sensitive() for connkeys cleanup (2025-06-11 11:36:56 +0200)
-
-----------------------------------------------------------------
-Another quick round of updates:
- - revert mwifiex HT40 that was causing issues
- - many ath10k/ath11k/ath12k fixes
- - re-add some iwlwifi code I lost in a merge
- - use kfree_sensitive() on an error path in cfg80211
-
-----------------------------------------------------------------
-Baochen Qiang (8):
-      wifi: ath11k: avoid burning CPU in ath11k_debugfs_fw_stats_request()
-      wifi: ath11k: don't use static variables in ath11k_debugfs_fw_stats_process()
-      wifi: ath11k: don't wait when there is no vdev started
-      wifi: ath11k: move some firmware stats related functions outside of debugfs
-      wifi: ath11k: adjust unlock sequence in ath11k_update_stats_event()
-      wifi: ath11k: move locking outside of ath11k_mac_get_fw_stats()
-      wifi: ath11k: consistently use ath11k_mac_get_fw_stats()
-      wifi: ath12k: fix GCC_GCC_PCIE_HOT_RST definition for WCN7850
-
-Casey Connolly (1):
-      ath10k: snoc: fix unbalanced IRQ enable in crash recovery
-
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: fix merge damage related to iwl_pci_resume
-
-Francesco Dolcini (1):
-      Revert "wifi: mwifiex: Fix HT40 bandwidth issue."
-
-Jeff Johnson (1):
-      wifi: ath12k: Fix hal_reo_cmd_status kernel-doc
-
-Johannes Berg (1):
-      Merge tag 'ath-current-20250608' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Loic Poulain (1):
-      wifi: ath10k: Avoid vdev delete timeout when firmware is already down
-
-Miaoqing Pan (1):
-      wifi: ath12k: fix uaf in ath12k_core_init()
-
-Rodrigo Gobbi (1):
-      wifi: ath11k: validate ath11k_crypto_mode on top of ath11k_core_qmi_firmware_ready
-
-Sebastian Gottschall (1):
-      wil6210: fix support for sparrow chipsets
-
-Zilin Guan (1):
-      wifi: cfg80211: use kfree_sensitive() for connkeys cleanup
-
- drivers/net/wireless/ath/ath10k/mac.c         |  33 ++++--
- drivers/net/wireless/ath/ath10k/snoc.c        |   4 +-
- drivers/net/wireless/ath/ath11k/core.c        |  29 ++---
- drivers/net/wireless/ath/ath11k/core.h        |   4 +-
- drivers/net/wireless/ath/ath11k/debugfs.c     | 148 +++-----------------------
- drivers/net/wireless/ath/ath11k/debugfs.h     |  10 +-
- drivers/net/wireless/ath/ath11k/mac.c         | 127 ++++++++++++++--------
- drivers/net/wireless/ath/ath11k/mac.h         |   4 +-
- drivers/net/wireless/ath/ath11k/wmi.c         |  49 +++++++--
- drivers/net/wireless/ath/ath12k/core.c        |  10 +-
- drivers/net/wireless/ath/ath12k/hal.h         |   3 +-
- drivers/net/wireless/ath/ath12k/hw.c          |   6 ++
- drivers/net/wireless/ath/ath12k/hw.h          |   2 +
- drivers/net/wireless/ath/ath12k/pci.c         |   6 +-
- drivers/net/wireless/ath/ath12k/pci.h         |   4 +-
- drivers/net/wireless/ath/wil6210/interrupt.c  |  26 +++--
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c |  24 ++++-
- drivers/net/wireless/marvell/mwifiex/11n.c    |   6 +-
- net/wireless/nl80211.c                        |   2 +-
- 19 files changed, 251 insertions(+), 246 deletions(-)
 
