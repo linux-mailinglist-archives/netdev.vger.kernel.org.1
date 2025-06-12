@@ -1,165 +1,135 @@
-Return-Path: <netdev+bounces-196859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25FEEAD6B72
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:55:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82056AD6B80
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A16EE3AD9C1
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:55:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453CA16EF99
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE74A213E78;
-	Thu, 12 Jun 2025 08:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8395A221F3E;
+	Thu, 12 Jun 2025 08:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jRagvVIc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GQgIVbzA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E2B1E51EB;
-	Thu, 12 Jun 2025 08:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA70B21B918
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749718535; cv=none; b=ZduPvZdI2/PujJeue4FJ+lOxiTiTQM3QCgVhOx7u/N/JU6th/LB63B4IMjLL0tko/KHqFhKTVStiqlj+21eNX+s6cpk5BwDKBDcljZaG7thgQ34sbj6AWI9hwEe6DdJ7whlAdjd46vpKGGk0T5Fo6XuZqzTljpi+UE+FfRRJFEA=
+	t=1749718610; cv=none; b=rTFtxQSuRoADWVyN/1DrR/2RADD9+pH7AbJg/oNjMHlk46tVT4FVgyBGadkpB6YpZQze48AM37Gr0Hfbb//X0RPH8eS2Wl/Lqp/2dMwRetJf9jdaA938dDAaBQKFa6vzL4WlR2zOm5CEyI9URi2VeT9DhlSGktmrgs4L+ajXzd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749718535; c=relaxed/simple;
-	bh=VZXDJzKIiAsBEUC2cmW7v9IAJ9vLIMf0Brbum9EX6hU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lp2eRpETHZOzNIpwOrUZ5hJhrsmuqfUP3tXnJuJ+vMwvQWoQDhim8I5vUwOAOqIQMwMSedHf6V1NnK+xDz5IwvQCd9IUi9DZxyiow65vYIEP74pDh5Yci+FKKUEZz5Qk5n457tVZ7tJMU0MACrMOp6aL4eofs2rZlATtRtV/ZWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jRagvVIc; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b2c41acd479so388137a12.2;
-        Thu, 12 Jun 2025 01:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749718534; x=1750323334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r+jaW01Ram8J0CFjvnmO+DegLpwAOHm96vNJd5ZWYGc=;
-        b=jRagvVIcR5+oXJNjT3Oh14EY2N/Mj948PiPqQ7/HV5EsawcxPM1Xwo+duP0K/d6rCp
-         BdFgys6oQyI4Xb3B3RDLzaeWHfDheJKDur96TWcR6RNKxG3D1tHRnNDhUeGajZVIKwb1
-         XmqA5Ld62TONhF12k+yNI96qBVzDoubmBsg7vKTkgV1YRQ2oa1XjiTWyMhAtpPzFOrb9
-         hQ6ZYSRntzq+3hfZb3w3ji5xtuTEh89keT027F6sZIL3nTFgA4cOzusfOyK+mUaU3n+H
-         Fb2PzSi/v7pDw3BwG3zVgG6cNYgq0R32/jjecIqJU9emoiOde2eypqU0gCGDtafxLT6R
-         pLkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749718534; x=1750323334;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r+jaW01Ram8J0CFjvnmO+DegLpwAOHm96vNJd5ZWYGc=;
-        b=g/IdhZTU0q7V2GhopcBnZPklSLrqLjZvxbzNXfzP2uX5vrj3Re5sKuy73ouhyI+EK8
-         DeUPLD3I7HVekuASv9xLDdO9e1p2rmBtakgssA0rDYU5oXWexP05K96iDiloRirzZJOb
-         /v1O8+wbZ5SJXedMFvwBNOvorKJAY3K9FZcNIcJJtB1JvYtmGJpGfr2ztdWRU5A4y2qC
-         fjeqNUXU8G3dFFro5KNCGLrgRazCt130cUlH8zmZapJOsThKLlVqWTZczfSG9zjJ7mvD
-         XTpUwN4nmeTFJ9vvphIxHmx4kbcaliH18gj06ZrsJvu9mdgX9hE5lQQc2WQiD1hLkTQw
-         n5Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCUidBLNdsPauz786y0q/0Anmi9U9C7cx9Ak/qsKguhGpIE3RURSbgGly3ZpTdraz9gbJT1RUnwRlGviiyFz@vger.kernel.org, AJvYcCWodxONwVXbSKPKBKYh8QFYhAFE31fe8N7yviCfOXvOsG24/a9lRf5WTuQC3SJTCsP4osg=@vger.kernel.org, AJvYcCXG4ZZBQH3RDNCszpK2tDkq5vlyDvEp8f8tE2PD9CtuhfhYIwFB2xqsjvoP64aeVJmv8Z6Ur+Ok@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd1MXuGGlZk60qsHJGRBU9qoZEynwZeW5bJtEqo/qZqeQOYwF5
-	yr2bppfGPBYzPQeGcJapNEGkjc2Yr7dnmPNkZeieUtnTfFcJ0Dsteqxu
-X-Gm-Gg: ASbGncs3ri3I/3ds/nlbMHiPJTTaSQanX3J08NpF1URTIP27S3tmXyQeP7u2bwo09tP
-	m1mhJJxBLyWW9vPFdsa8nIXIGgJZGGtR9NkPVAnI0l4TqA6SQ+731RuCDPCHs5AtipoP2T9+5HO
-	8hqhze+GNi3IWDBQSogD8NbSZMsa0M+ThjUez4uEXOZ7jtu570vD0/THq/hWkkY6V4X/bbjN1mj
-	OTWPANyK35vs1HRUH8byTIxTQwrESnKwZQN0LgEvUR40lXMIcn+nXiGDzVt7UtR1nZ9u5p7zLNL
-	ebpM2f7yVjzm0kcQcx4INoWpAB4JIfO+ZMc4l1472mIiyZbafbJ62yBTUTiNbYpNHMMfncVpU0v
-	Z7QLGmVKZ
-X-Google-Smtp-Source: AGHT+IGjP2s+60vt5yfxvQLR/980gfc56krWjJoT6dyD3iyrJFgNwpVJkdwAlwAWklxXdUzbHas1Fg==
-X-Received: by 2002:a17:90b:2e07:b0:312:1ae9:153a with SMTP id 98e67ed59e1d1-313c08c7f55mr3402555a91.25.1749718533518;
-        Thu, 12 Jun 2025 01:55:33 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1c6ab91sm929480a91.48.2025.06.12.01.55.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 01:55:32 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: Oxffffaa@gmail.com,
-	avkrasnov@salutedevices.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	eperezma@redhat.com,
-	horms@kernel.org,
-	jasowang@redhat.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream sockets
-Date: Thu, 12 Jun 2025 16:55:14 +0800
-Message-Id: <20250612085514.996837-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAGxU2F4JkO8zxDZg8nTYmCsg9DaaH58o5L+TBzZxo+3TnXbA9Q@mail.gmail.com>
-References: <CAGxU2F4JkO8zxDZg8nTYmCsg9DaaH58o5L+TBzZxo+3TnXbA9Q@mail.gmail.com>
+	s=arc-20240116; t=1749718610; c=relaxed/simple;
+	bh=QUqmWhIOPeOaCfPk0J82P3o3C74RBvP6ZXmQgcB1aLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cr7GTkYGcVtlJSuJULZYzAC+ulcTsB4Jsh4gm+28Yk5IKrWcX1YDU7B0HCzEHpE6H06fKrNaOf5AgwE1oIz+OCA6ni1fO9h51r09+PKGA5pEr+PS46kLVueJzyYsENrPDqHjnSXECQfJ7jmgm8ibt0paooYkpX4GCCoLUt4YTU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GQgIVbzA; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749718609; x=1781254609;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QUqmWhIOPeOaCfPk0J82P3o3C74RBvP6ZXmQgcB1aLg=;
+  b=GQgIVbzALAZsB+qhexr1it0ZqZ+o4p3uVNjHl6OKjpxzBCHrAZkmEgkn
+   nVdhQ0IYCreDwUOMG2m2lvlh3gM7hl+oAQZQr7cCCnqQzi38fmiQGLWj8
+   2SkMtdWQUI/Ig+4/TxQ7cfAZpZG/0zGGItyeB4bdXqkUB2HWQ9KaaafPh
+   ndaHbhTSvHAWgDFpnLHDxK/1h9MnkPyA2Jx8XJYBMWoZXXSv8oAjtUISt
+   FeGjsm6wiGmM8MPZE0uci3QaoIGHw20mRWt+CzxACGMOLyeK58AqO+CjV
+   QueSYoBqm4yIaYId0RjjfLNqkX0lK3hHxmRGRxSxn9TnJ4z5HL1Knkx9g
+   w==;
+X-CSE-ConnectionGUID: 2+ZdponrRL67yqpk8KZtqA==
+X-CSE-MsgGUID: cQI4CQmiRbW2Or8Tl8Ui7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="50996354"
+X-IronPort-AV: E=Sophos;i="6.16,230,1744095600"; 
+   d="scan'208";a="50996354"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 01:56:48 -0700
+X-CSE-ConnectionGUID: hft+gJgKStipLfMBbHTDUg==
+X-CSE-MsgGUID: wpC+Oj5gRyeOKAUeuyN0/Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,230,1744095600"; 
+   d="scan'208";a="147442929"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 12 Jun 2025 01:56:46 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uPdjn-000BLK-1y;
+	Thu, 12 Jun 2025 08:56:43 +0000
+Date: Thu, 12 Jun 2025 16:56:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 13/13] net: mctp: test: Add tests for gateway
+ routes
+Message-ID: <202506121602.RLO9kgkY-lkp@intel.com>
+References: <20250611-dev-forwarding-v1-13-6b69b1feb37f@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611-dev-forwarding-v1-13-6b69b1feb37f@codeconstruct.com.au>
 
-> On Thu, 12 Jun 2025 at 10:21, Xuewei Niu <niuxuewei97@gmail.com> wrote:
-> >
-> > > On Thu, 12 Jun 2025 at 08:50, Xuewei Niu <niuxuewei97@gmail.com> wrote:
-> > > >
-> > > > > On Thu, Jun 12, 2025 at 01:32:01PM +0800, Xuewei Niu wrote:
-> > > > > > No comments since last month.
-> > > > > >
-> > > > > > The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
-> > > > > > patch. Could I get more eyes on this one?
-> > > > > >
-> > > > > > [1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
-> > > > > >
-> > > > > > Thanks,
-> > > > > > Xuewei
-> > > > >
-> > > > > it's been in net for two weeks now, no?
-> > > >
-> > > > Umm sorry, I didn't check the date carefully, because there are several
-> > > > ongoing patches. Next time I'll check it carefully. Sorry again.
-> > > >
-> > > > It looks like no one is paying attention to this patch. I am requesting
-> > > > someone interested in vsock to review this. I'd appreciate that!
-> > >
-> > > Which patch do you mean?
-> > >
-> > > Thanks,
-> > > Stefano
-> >
-> > I am saying your patch, "vsock/virtio: fix `rx_bytes` accounting for stream
-> > sockets".
-> >
-> > Once this gets merged, I will send a new version of my patch to support
-> > SIOCINQ ioctl. Thus, I can reuse `rx_bytes` to count unread bytes, as we
-> > discussed.
-> 
-> As Michael pointed out, it was merged several weeks ago in net tree,
-> see https://lore.kernel.org/netdev/174827942876.985160.7017354014266756923.git-patchwork-notify@kernel.org/
-> And it also landed in Linus tree:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=45ca7e9f0730ae36fc610e675b990e9cc9ca0714
+Hi Jeremy,
 
-I misunderstood Michael's point. I am new to this, and not familiar with
-the process. Sorry about that...
+kernel test robot noticed the following build warnings:
 
-> So, I think you can go head with your patch, right?
->
-> Please remember to target net-next, since it will be a new feature IIRC.
-> 
-> Thanks,
-> Stefano
+[auto build test WARNING on 0097c4195b1d0ca57d15979626c769c74747b5a0]
 
-Yes, I'll do it ASAP.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-don-t-use-source-cb-data-when-forwarding-ensure-pkt_type-is-set/20250611-143319
+base:   0097c4195b1d0ca57d15979626c769c74747b5a0
+patch link:    https://lore.kernel.org/r/20250611-dev-forwarding-v1-13-6b69b1feb37f%40codeconstruct.com.au
+patch subject: [PATCH net-next 13/13] net: mctp: test: Add tests for gateway routes
+config: hexagon-randconfig-r133-20250612 (https://download.01.org/0day-ci/archive/20250612/202506121602.RLO9kgkY-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce: (https://download.01.org/0day-ci/archive/20250612/202506121602.RLO9kgkY-lkp@intel.com/reproduce)
 
-Thanks,
-Xuewei
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506121602.RLO9kgkY-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+   net/mctp/route.c: note: in included file:
+>> net/mctp/test/route-test.c:1256:37: sparse: sparse: symbol 'mctp_route_gw_mtu_tests' was not declared. Should it be static?
+   net/mctp/route.c:162:9: sparse: sparse: context imbalance in 'mctp_lookup_key' - different lock contexts for basic block
+   net/mctp/route.c:554:39: sparse: sparse: context imbalance in 'mctp_dst_input' - unexpected unlock
+
+vim +/mctp_route_gw_mtu_tests +1256 net/mctp/test/route-test.c
+
+  1255	
+> 1256	const struct mctp_route_gw_mtu_test mctp_route_gw_mtu_tests[] = {
+  1257		/* no route-specific MTUs */
+  1258		{ 68, 0, 0, 0, 68 },
+  1259		{ 100, 0, 0, 0, 100 },
+  1260		/* one route MTU (smaller than dev mtu), others unrestricted */
+  1261		{ 100, 68, 0, 0, 68 },
+  1262		{ 100, 0, 68, 0, 68 },
+  1263		{ 100, 0, 0, 68, 68 },
+  1264		/* smallest applied, regardless of order */
+  1265		{ 100, 99, 98, 68, 68 },
+  1266		{ 99, 100, 98, 68, 68 },
+  1267		{ 98, 99, 100, 68, 68 },
+  1268		{ 68, 98, 99, 100, 68 },
+  1269	};
+  1270	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
