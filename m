@@ -1,119 +1,131 @@
-Return-Path: <netdev+bounces-196822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F68AD680F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:34:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E215AD681B
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07ED71BC0887
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 06:34:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11C141BC0F4E
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 06:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984911F3BA4;
-	Thu, 12 Jun 2025 06:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81EF1F4163;
+	Thu, 12 Jun 2025 06:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avg0BXW1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JaJ7SvjT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5F31F0E39
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 06:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F424A1E;
+	Thu, 12 Jun 2025 06:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749710039; cv=none; b=Xi6+AOa4sqtsi16o4O1ins38WA7B8eKA4mYqoVGvTkyabuPjzM82Dvq4kHfFgemybPYboR0591AjTuRrNrDZ8H2858TgGol01RdqYlCufPltf/6SMXmzkLBY9ZU3SaCFZj70speC3k5oKEh5p0FxL4HF6ORnvLqrFP0cycbEeKw=
+	t=1749710314; cv=none; b=ICm9nWus6CsQTPGgplAPPDWB5Jd26GslF5KIUGgFGponUZpb6iCUff3EspVn3Flt4RIRulLNuQJhpcAL/uDAgQLkomFBszqq8FxbibH+ahtgPk/V9vSiNgzK+BO//eIJwJDpdrr54RYmM8hVYEO27hyxy7QLT3bg+5HairgMHzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749710039; c=relaxed/simple;
-	bh=0RFsYK4/bVTOu8PeXbzz5JHWzOqZR66/rgr6E+bl00g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dIoZ01UYLhMBN32nKITJBiS0+NRpno4tCJcZtjFVaFtvgZzwDQKFneNIFIJ2OT5pSbOASJCnDe/1dKiwS/7Sty3/UQUjtvM5FgTSBiJcdQLW5cO6a5zphtfaOmuheTIEc57KBcL1sTuL7FGsQx3C6lzA5su40f9EUN9MafDSF38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=avg0BXW1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749710036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nm9TV6R7Y41QOfPJ6MP5oIIesRRVBP6gVfG7mX/j6mc=;
-	b=avg0BXW1Wj8YIj1/GYcqQiMPFmU0kil0TwY8JNZINeE8zdqJ2pGe3w6bKGFNYYs8VOD6S4
-	lPp4+Ap7wr3/KydRxE9fUNmSJ8rG0qfMWXtcRdEEVtpSA5C2ZOPk/84Li8NsiaaC4z7r09
-	tc+WqfSpF19sDren8aqyT31QXDInrCA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-vzX9WlngPFWxLBuMBW1OVg-1; Thu, 12 Jun 2025 02:33:54 -0400
-X-MC-Unique: vzX9WlngPFWxLBuMBW1OVg-1
-X-Mimecast-MFC-AGG-ID: vzX9WlngPFWxLBuMBW1OVg_1749710033
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-451d2037f1eso2929985e9.0
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 23:33:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749710033; x=1750314833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1749710314; c=relaxed/simple;
+	bh=DNaP2b18RLwC0dvD3DmJMp8aMZKCaBX+OyT9uu5maEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tZC53rpkHAUgttDzx7zOF7BYDfypw4Hk8ek4amS+49GTqHhG30hHtpG3bj9a+qpblNAUZ+JGzGYSSfnBdolUtTXk/nOhfrKx0gMe8YtOGUf0KuMCUX3RNJXBAwod+24s/grWzBZGdJsVbSdmla42dnS7W1r1FlGthd2T4TqtOD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JaJ7SvjT; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-453066fad06so3659655e9.2;
+        Wed, 11 Jun 2025 23:38:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749710311; x=1750315111; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nm9TV6R7Y41QOfPJ6MP5oIIesRRVBP6gVfG7mX/j6mc=;
-        b=Td+I7TO/mf3SVvgtJKK3HIaBmQZPN3sdbrI2KKQH5iSbn3XoN0u9LuRGT/Eci/cp+x
-         oYelsYVP0hIZ906/9gmmYxAVVVH7np2xHzpOmlh3id2YA1B6mJj4FblOC4v6gjzrT0wE
-         UlZ8J80bk3C5D/WQbxKNB+aJF2wHIWy17vux90LAoHVjNBUxXhWNna3y3nyHN/1uTjFP
-         YPGwsZgSl0Gm2ZjzFuv1rDWrECMtHN1psfGBYDcBAN2+NpuZmRzzFyR3uDzfl/QanCEC
-         pfraVmvaAwbqeNJJGzsSN50N7rAk7NvI86c00j5cWjRM1GnvMYYMvCCuNZAmhadH1GpP
-         HbjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWK1zoQ6UlJKv6wGRpkszyWxq88u3+oCi8PuCetpJKqRcuJXifUE30IqwUrBfFgEd0NKkDaKxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAgY3wuU1GxwZ3CIhQQ7L59cDEDq7y/JAulIy4a67HJ/fFnoFl
-	xVfFXOcbTASMDdypjo3YiDccaeQXU04UuLzR+kC/cX9lXuTqQNo73L3G+F0yS+5Oj4is1v5SIv5
-	GLTc6Dkr5ecejIFHRa9wL07Ab9Vh3kKhfcFVb2W1oDPBLdfUNwUGSxygCZw==
-X-Gm-Gg: ASbGncu91dJqxTlYJk/vt0UJ1Q9TBwZK/2JiW2NtbLUjETE/7STCbRcsuNSz3sKOhFt
-	WcmykUVvrZLnclz4sgDYP6ApFWy8FhCIxgMKHzJav7RxmXRpQmuVfXJDERyPdrXMu7djKbu3+mL
-	OIB5H+DdAhn8JrwSBeFt4S50sFyPrIJsJLfdZjYZb1n25EmPq6jnIs7V+IFVHPMCV9VcNXynavj
-	WKBly/r52yqqvT2lf2aJS0D4hsvde+xs4B/yz7SkRNSXuRc2vIOtJZ8sk9o9M30/Q/KMzz8COMs
-	UnXJ2Fwsw+s/JvAW
-X-Received: by 2002:a05:600c:c162:b0:43c:fffc:786c with SMTP id 5b1f17b1804b1-4532d2f7108mr14039425e9.19.1749710033344;
-        Wed, 11 Jun 2025 23:33:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUPXH7B83FgsgIbWOCFa8wLAry7d4eNcJALWMalXCx0ZQ4ODVUAv9DRXGbLvxZDae4zuYiyw==
-X-Received: by 2002:a05:600c:c162:b0:43c:fffc:786c with SMTP id 5b1f17b1804b1-4532d2f7108mr14039215e9.19.1749710032990;
-        Wed, 11 Jun 2025 23:33:52 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4531fe8526bsm43377245e9.0.2025.06.11.23.33.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 23:33:51 -0700 (PDT)
-Date: Thu, 12 Jun 2025 02:33:48 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: sgarzare@redhat.com, Oxffffaa@gmail.com, avkrasnov@salutedevices.com,
-	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, stefanha@redhat.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream
- sockets
-Message-ID: <20250612023334-mutt-send-email-mst@kernel.org>
-References: <20250521121705.196379-1-sgarzare@redhat.com>
- <20250612053201.959017-1-niuxuewei.nxw@antgroup.com>
+        bh=8bjTfFr32DnYdLike+eqAQTQ6LqadDrobLqw6eKXqjY=;
+        b=JaJ7SvjTRUhri5uZn47xxvQaLSCI2YsoFOLu27D1fSbVVjFnM85nLCTIqVGb2MJDKd
+         Lmob4JVhxozxgl3m7AbC99WvHDMtCB42tHrAZv+LfgMJEAnYAiF5S093B88w2dT8p3xK
+         koRm9q0nFYN/qZar2m90UzAzmTJZW1AeZ2gorwsi3tBTCNNx0BranfmFaXyJUcTfwIWI
+         c9FByyD1Vb+5uGONOvpIRKCnPOYrdluR1MMb/QZnx8S+/93RPFpyCpE61AFeLpC5AIlp
+         3do5385lsUaePtKjgr2Ydht3frq7QdEY+JmG48cYHFqaTZl4QIQtGOPBOyuU4vUWDM44
+         AslQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749710311; x=1750315111;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8bjTfFr32DnYdLike+eqAQTQ6LqadDrobLqw6eKXqjY=;
+        b=hXvLX9d0pn4UwRAjN7CEuJi7xjZ5JC2f/i6wJ36AKs5a809dVBDFKSmf3m9829U/fw
+         0PaPi8mhwuGMtlx4xqdHULHVpsn/zY9DCjzywH6BpYKDxsrgRXwyvyQ3zH6xVxPaFo/O
+         9Mom6Lz2LS9AufQ+LE9rQ6JCrZnMQiH+WzDZYXhuAw7PIJWu/AFlGrRCL68/FakSvjGR
+         U23AVXOBK+pg06aZzlRP396kWeU/iPxFO3ZwI6gO8xRc/5awSGbyKDOm3K8hai2AnnHh
+         ly6HnZ16ETzmjAWnywO6TM4OKp0Y9uawnIhuyQUtos8BfOlZqo1/alOn7/REzw7STS1+
+         /f9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWjFdMcJY+JOB7j81PeJpXWeUpXuo7f9oA+MDE7HR0PnV1fv1iHAnHu2hqcPKzigN+NuCftoePs@vger.kernel.org, AJvYcCX0GSfssMJY7gOV222m3/I4sJe9qvHqZ2pjgg233nvHZElUDQjxWrPJQeEwVzJQ7BoiCfX7Y1FqnD6zzjc=@vger.kernel.org, AJvYcCXFJA7q9HUM4gTO3FnWTtxhvh0HvLQhI5RPABQkJ0jZAtLX4zd9R/KzDFfTdTTHpMcXVjTUFbJe@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKXyxU452LnVDJA+5YXID3kkDKIK3oH1n4z1eaCNaJ5BYOKiUZ
+	vmtuE21mbO9kdgVs+zsKhKILA2Dih+kMOceWHMRlaNkjmlZWvkq74qeuUFL3vaczOlPsYZDaZaN
+	D4voERfRW71qVAxcH0H4ZfxXppb8Xe1o=
+X-Gm-Gg: ASbGncuWvpc1w8Z3Ne90CUf4UsNs39u+plJ/q3MpyWKSH7YB0aK1XTz/hvc9LNrJacG
+	A5VTeWMmjM0SAPi2Sdz9Eb3YCzP9tHxr5+9z2X+X7zg2WBvIyUzfjt3XZDE/86jti8mxlxkhkUb
+	ox2gtAMnh0ac+KNemJrwwmKa6OlCnlN0O/Wf8jDL3CTdOjAfpl+IZawWMIUef6rKJLTX4RWl4fU
+	lUCeTNir+mAcA==
+X-Google-Smtp-Source: AGHT+IEVN5HAlsP0HCxGv2neCTKzhKxQV6Oy9iItbZevlaTIZ4CvV3/m18xVAnQDvH5iWMWLeerSZclqCIXIsaTQDWY=
+X-Received: by 2002:a05:6000:1a88:b0:3a4:dd00:9af3 with SMTP id
+ ffacd0b85a97d-3a558800c9dmr4448166f8f.56.1749710311423; Wed, 11 Jun 2025
+ 23:38:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250612053201.959017-1-niuxuewei.nxw@antgroup.com>
+References: <20250610160612.268612-1-rubenkelevra@gmail.com>
+ <87cybbzbe3.fsf@posteo.net> <20250611145144.2bc0a7b7@kernel.org>
+In-Reply-To: <20250611145144.2bc0a7b7@kernel.org>
+From: Ruben Kelevra <rubenkelevra@gmail.com>
+Date: Thu, 12 Jun 2025 08:38:20 +0200
+X-Gm-Features: AX0GCFt6ZyFDkgwAI3QouTDoe0U-mXCGEmaKXT0wo2gsD9e3Y8ot9ocel2G7Sxk
+Message-ID: <CAGHX7-P5fgFCs3cJTYERu9dLne=UADPc-dHPZ6GYvkcdmTHXwA@mail.gmail.com>
+Subject: Re: [PATCH] net: pfcp: fix typo in message_priority field name
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Charalampos Mitrodimas <charmitro@posteo.net>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 12, 2025 at 01:32:01PM +0800, Xuewei Niu wrote:
-> No comments since last month.
-> 
-> The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
-> patch. Could I get more eyes on this one?
-> 
-> [1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
-> 
-> Thanks,
-> Xuewei
+Hi Jakub,
 
-it's been in net for two weeks now, no?
+I hit it while building an out-of-tree module that reads hdr->message_prior=
+ity.
+Cross-compiling for a big-endian target failed for me, because of it.
 
+That=E2=80=99s the only reason for the patch; net-next is fine, no need for=
+ stable.
+
+Cheers,
+Ruben
+
+On Wed, Jun 11, 2025 at 11:51=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Tue, 10 Jun 2025 18:42:28 +0000 Charalampos Mitrodimas wrote:
+> > > Fix 'message_priprity' typo to 'message_priority' in big endian
+> > > bitfield definition. This typo breaks compilation on big endian
+> > > architectures.
+> > >
+> > > Fixes: 6dd514f48110 ("pfcp: always set pfcp metadata")
+> > > Cc: stable@vger.kernel.org # commit 6dd514f48110 ("pfcp: always set p=
+fcp metadata")
+> > > Signed-off-by: RubenKelevra <rubenkelevra@gmail.com>
+> >
+> > I had the same issue today, happy there's a patch for this.
+>
+> Could y'all share more? What compilation does this break?
+> The field is never used.
+>
+> More info about how you found the problem would be useful.
+> And I believe this can go to net-next, without the CC stable
+> and without the Fixes tag. Unless my grep is lying to me:
+>
+> net-next$ git grep message_priority
+> include/net/pfcp.h:     u8      message_priority:4,
+> --
+> pw-bot: cr
 
