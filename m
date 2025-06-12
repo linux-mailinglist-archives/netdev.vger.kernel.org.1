@@ -1,193 +1,117 @@
-Return-Path: <netdev+bounces-197244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4CF9AD7E52
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:19:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28FDBAD7E62
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:30:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A516A3A1CD0
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:19:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33F6818980E0
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8241222F767;
-	Thu, 12 Jun 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB6822A7EF;
+	Thu, 12 Jun 2025 22:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=agowa338.de header.i=@agowa338.de header.b="eZP3Wcpd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLaeI0GY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.frank.fyi (mx01.frank.fyi [5.189.178.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4124B522F;
-	Thu, 12 Jun 2025 22:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.189.178.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7771F537F8
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 22:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749766790; cv=none; b=l/c0Hj5D4uk36evZhppk+iIZD04roo7GXpKlOrTRgztQxSh9gggaJw2AH+nFrrszjfggzOmBSvJlX6hydFyv73HIcm1aJkhANEJeTF8TL1KudiJn3W0Ce2hyaJ4+74DnaMXla8ea0+0+VX5DY9P1hMWDVPy1M1aBttIuGhinsRs=
+	t=1749767439; cv=none; b=SHncN3+Epn5IqhNfPJZ1W770aXZnl+yCUE2a9Tocgl9F9yWdu9cIgOXXSjAOncANjVIYQjql20HMfwouoZJgYUR4WzFfrwAP1d3JGRDjCoZ/TXO2Lg61Ad+c2J/xLNPrdwihSdg81x0AvGTLE5o6Us4Pw4yQ9L61EvAkFr4+ySU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749766790; c=relaxed/simple;
-	bh=UFEPYcgVTl7eCWfgckiypm0T0RMjyCjz8dzBImUdhvY=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gtgdEs9HfNkC+MMSbZ6kkcHo/LwR5BPaTgyKHd5Si3klRmMiBBxz3Ou8hn7JHXeaa4YSieBglXQi/ILyTg0wCoB+5i0GSozUp+6JQE/1vkcvsSbmKYWCLAxJuEDqYMUPaLobS5gfQ7WFxlLU8UCBaIHjLZl6IzTD+sHwDwv8zik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=agowa338.de; spf=pass smtp.mailfrom=agowa338.de; dkim=pass (2048-bit key) header.d=agowa338.de header.i=@agowa338.de header.b=eZP3Wcpd; arc=none smtp.client-ip=5.189.178.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=agowa338.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=agowa338.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=agowa338.de; s=mail;
-	t=1749766786; bh=UFEPYcgVTl7eCWfgckiypm0T0RMjyCjz8dzBImUdhvY=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=eZP3WcpdFwMHIcANpE9x2r9NM3FHumqM9tBDBr764SMhnpLGzvGDUd6MIlX/3B5UX
-	 XpCFcJVjDCfHYedhqI0EjFHzCxkV+e6cSIxVmaUpqyUvc50D5RFMiKTKUpDVklkCAY
-	 6jvNbG6saT67XdFxJ9HqmTdnzHL+2TjMrNwD8dpNWyfVizGb7MF6ktavjZzsFgNXub
-	 fb/8OlgzJ64s8hcSud3vEGNFa3GHyRD6UFLTHScud3DkNhIHAsRujKA0PUJUpL1TLE
-	 /sHY/9LG3R2/nXjJsu6lChYBiEcuEFFPLLh6ZwALytk/IIYnC24LLhLUj8Sx30klqt
-	 Lrjualbp5yLlg==
-Received: by mx01.frank.fyi (Postfix, from userid 1001)
-	id 278821120185; Fri, 13 Jun 2025 00:19:46 +0200 (CEST)
-Date: Thu, 12 Jun 2025 22:19:46 +0000
-From: webmaster@agowa338.de
-To: Phil Sutter <phil@nwl.cc>, Klaus Frank <vger.kernel.org@frank.fyi>, 
-	Antonio Ojea <antonio.ojea.garcia@gmail.com>, netfilter-devel@vger.kernel.org, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>, 
-	netfilter@vger.kernel.org, Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>, 
-	netdev@vger.kernel.org
-Subject: Re: Status of native NAT64/NAT46 in Netfilter?
-Message-ID: <s4ffjiihvgv6glpvd3rbqr3cedprmgqijxiz2dh6v5lq4doabd@gpis5xfdyea5>
-References: <w7bwjqyae36c6pqhqjmvjcrwtpny6jxjyvxzb2qzt7atjncxd2@gi4xhlyrz27b>
- <aEqka3uX7tuFced5@orbyte.nwl.cc>
- <CABhP=tZRP42Dgw9+_vyAx80uPg4V2YFLfbGhpA10WzM46JYTNg@mail.gmail.com>
- <aErch2cFAJK_yd6M@orbyte.nwl.cc>
- <CABhP=tbUuJKOq6gusxyfsP4H6b4WrajR_A1=7eFXxfbLg+4Q1w@mail.gmail.com>
- <aEsuPMEkWHnJvLU9@orbyte.nwl.cc>
- <cqrontvwxblejbnnfwmvpodsymjez6h34wtqpze7t6zzbejmtk@vgjlloqq2rgc>
- <aEtMuuN9c6RkWQFo@orbyte.nwl.cc>
+	s=arc-20240116; t=1749767439; c=relaxed/simple;
+	bh=z3JqDN0RurhEs11enwMifDFI8raS3dimrYvetn4orAU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=loVDW7Zm7RzzPTDEobo8eFPdpU4X2q76CqahxIAP1au1cp0e81MqcEskrmnovnD8BJBRuqagXx1kfpPnMnIYNnJhj+FrtdIoyv0Q+rnRAhcn08jOboxskNDXhMZ4NwLzZf8nDyAFGIFx82ujQwxW0q3GH1XDPENVSy58uE86Yuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLaeI0GY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E102C4CEEA;
+	Thu, 12 Jun 2025 22:30:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749767439;
+	bh=z3JqDN0RurhEs11enwMifDFI8raS3dimrYvetn4orAU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TLaeI0GYPWIQAHrfNlHxZ6uS1TPrmeEmFjCluE5KpodKsHNnrvaubjStl8Fn/f5MF
+	 nNI/jxkP/cWV4mAUDC3zJDZLHYxepY5eV6u9r19GNe0irvw58GR7BkNsYpMxQ1yHWA
+	 ZgQuIAd76eMYwzdFIltvVBUg9pA/aILEuTsT7t0u8JF4mX9stBJEU8kyg+8c+iIyH8
+	 7Xq6mVxyiij2kOv+FtGgN+k5Ww4N9DOMjBSsJvhyKlhD7BG3iPFu1nmxlFJAx5vBM7
+	 4sJVt/lYtFtZ7KMSQ+2BCh8B0fc47wMaRtZVYFx4x0I8aU4uGiqFF41Qy4blI9tS8C
+	 icHn5DxqCSqPw==
+Date: Thu, 12 Jun 2025 15:30:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
+ dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
+ jdamato@fastly.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 19/22] eth: bnxt: use queue op config validate
+Message-ID: <20250612153037.59335f8f@kernel.org>
+In-Reply-To: <vuv4k5wzq7463di2zgsfxikgordsmygzgns7ay2pt7lpkcnupl@jme7vozdrjaq>
+References: <20250421222827.283737-1-kuba@kernel.org>
+	<20250421222827.283737-20-kuba@kernel.org>
+	<5nar53qzx3oyphylkiv727rnny7cdu5qlvgyybl2smopa6krb4@jzdm3jr22zkc>
+	<20250612071028.4f7c5756@kernel.org>
+	<vuv4k5wzq7463di2zgsfxikgordsmygzgns7ay2pt7lpkcnupl@jme7vozdrjaq>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aEtMuuN9c6RkWQFo@orbyte.nwl.cc>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 12, 2025 at 11:55:06PM +0200, Phil Sutter wrote:
-> On Thu, Jun 12, 2025 at 08:13:02PM +0000, Klaus Frank wrote:
-> > On Thu, Jun 12, 2025 at 09:45:00PM +0200, Phil Sutter wrote:
-> > > On Thu, Jun 12, 2025 at 08:19:53PM +0200, Antonio Ojea wrote:
-> > > > On Thu, 12 Jun 2025 at 15:56, Phil Sutter <phil@nwl.cc> wrote:
-> > > > >
-> > > > > Hi,
-> > > > >
-> > > > > On Thu, Jun 12, 2025 at 03:34:08PM +0200, Antonio Ojea wrote:
-> > > > > > On Thu, 12 Jun 2025 at 11:57, Phil Sutter <phil@nwl.cc> wrote:
-> > > > > > > On Sun, Jun 08, 2025 at 08:37:10PM +0000, Klaus Frank wrote:
-> > > > > > > > I've been looking through the mailling list archives and couldn't find a clear anser.
-> > > > > > > > So I wanted to ask here what the status of native NAT64/NAT46 support in netfilter is?
-> > > > 
-> > > > > > we ended doing some "smart hack" , well, really a combination of them
-> > > > > > to provide a nat64 alternative for kubernetes
-> > > > > > https://github.com/kubernetes-sigs/nat64:
-> > > > > > - a virtual dummy interface to "attract" the nat64 traffic with the
-> > > > > > well known prefix
-> > > > > > - ebpf tc filters to do the family conversion using static nat for
-> > > > > > simplicity on the dummy interface
-> > > > > > - and reusing nftables masquerading to avoid to reimplement conntrack
-> > > > >
-> > > > > Oh, interesting! Would you benefit from a native implementation in
-> > > > > nftables?
-> > > > 
-> > > > Indeed we'll benefit a lot, see what we have to do :)
-> > > > 
-> > > > > > you can play with it using namespaces (without kubernetes), see
-> > > > > > https://github.com/kubernetes-sigs/nat64/blob/main/tests/integration/e2e.bats
-> > > > > > for kind of selftest environment
-> > > > >
-> > > > > Refusing to look at the code: You didn't take care of the typical NAT
-> > > > > helper users like FTP or SIP, did you?
-> > > > 
-> > > > The current approach does static NAT64 first, switching the IPv6 ips
-> > > > to IPv4 and adapting the IPv4 packet, the "real nat" is done by
-> > > > nftables on the ipv4 family after that, so ... it may work?
-> > > 
-> > > That was my approach as well: The incoming IPv6 packet was translated to
-> > > IPv4 with an rfc1918 source address linked to the IPv6 source, then
-> > > MASQUERADE would translate to the external IP.
-> > > 
-> > > In reverse direction, iptables would use the right IPv6 destination
-> > > address from given rfc1918 destination address.
-> > > 
-> > > The above is a hack which limits the number of IPv6 clients to the size
-> > > of that IPv4 transfer net. Fixing it properly would probably require
-> > > conntrack integration, not sure if going that route is feasible (note
-> > > that I have no clue about conntrack internals).
+On Thu, 12 Jun 2025 15:52:12 +0000 Dragos Tatulea wrote:
+> On Thu, Jun 12, 2025 at 07:10:28AM -0700, Jakub Kicinski wrote:
+> > On Thu, 12 Jun 2025 11:56:26 +0000 Dragos Tatulea wrote:  
+> > > For the hypothetical situation when the user configures a larger buffer
+> > > than the ring size * MTU. Should the check happen in validate or should
+> > > the max buffer size be dynamic depending on ring size and MTU?  
 > > 
-> > Well technically all that needs to be done is NAT66 instead of NAT44
-> > within that hack and that limitation vanishes.
+> > Hm, why does the ring size come into the calculation?
 > 
-> I don't comprehend: I have to use an IPv4 transfer net because I need to
-> set a source address in the generated IPv4 header. The destination IPv4
-> address is extracted from the IPv6 destination address. Simple example:
-> 
-> IPv6-only internal:     fec0::/64
-> v6mapped:               cafe::/96
-> external IPv4:          1.2.3.4
-> internal transfer IPv4: 10.64.64.0/24
-> 
-> Client sends:       IPv6(fec0::1, cafe::8.8.8.8)
-> nat64 in fwd:       IPv4(10.64.64.1, 8.8.8.8)
-> nat in postrouting: IPv4(1.2.3.4, 8.8.8.8)
-> 
-> Google replies:     IPv4(8.8.8.8, 1.2.3.4)
-> nat in prerouting:  IPv4(8.8.8.8, 10.64.64.1)
-> nat64 in fwd:       IPv6(cafe::8.8.8.8, fec0::1)
+> There is a relationship between ring size, MTU and how much memory a queue
+> would need for a full ring, right? Even if relationship is driver dependent.
 
-The IPv6 subnet has more IPs than the internal transfer IPv4 network.
-Therefore doing a NAT66 to condense all of them into one IPv6 address
-means you only need 1 IPv4 in the internal transfer net. Therefore the
-limitation stated above no longer applies. Admittedly if you do the
-nat44 within a dedicated network namespace while sharing an IPv4 with
-the host you'd still need to do NAT44 too.
+I see, yes, I think I did something along those lines in patch 16 here.
+But the range of values for bnxt is pretty limited so a lot fewer
+corner cases to deal with.
 
-> 
-> > > The actual issue though with protocols like FTP is that they embed IP
-> > > addresses in their headers. Therefore it is not sufficient to swap the
-> > > l3 header and recalculate the TCP checksum, you end up manipulating l7
-> > > headers to keep things going. At least there's prior work in conntrack
-> > > helpers, not sure if that code could be reused or not.
-> > 
-> > If nat64 functionality was added within conntrac itself then it would be
-> > easy to reuse the l7 helpers. If it was anywhere else the l7 helpers
-> > within conntrack would have to be re-implemented as conntrack wouldn't
-> > know the mappings and therefor it probably would be quite hard to do the
-> > rewrites.
-> > Also in regards to FTP not just L7 headers but also payload needs to be
-> > edited on the fly. As it often uses differnt commands for IPv4 and IPv6
-> > (even though the IPv6 ones also support IPv4) and it embeds the IPs as
-> > strings.
-> > 
-> > EPRT<space><d><net-prt><d><net-addr><d><tcp-port><d>
-> > 
-> > where "net-prt" is either 1 for IPv4 or 2 for IPv6. and net-addr is the
-> > string representation.
-> > However a client may send the "PORT" command instead...
-> > Also RFC2428 may be helpful in this context.
-> > 
-> > I think if it was possible to get the nat64 into conntrack it should
-> > also be possible to take care of this more easily as with external
-> > "hacks".
-> 
-> I agree it would probably be the cleanest solution.
-> 
-> > Also in regards to the above code it looks like currently only tcp and
-> > udp are supported. All other traffic appears to just dropped at the
-> > moment instead of just passed through. Is there a particular reason for
-> > this?
-> 
-> I guess tcp and udp are simply sufficient in k8s.
+Not sure about the calculation depending on MTU, tho. We're talking
+about HW-GRO enabled traffic, they should be tightly packed into the
+buffer, right? So MTU of chunks really doesn't matter from the buffer
+sizing perspective. If they are not packet using larger buffers is
+pointless.
 
-doesn't k8s also support sctp? Also still no need to just drop
-everything else, would have expected to just pass through it without
-special handling...
+> > I don't think it's a practical configuration, so it should be perfectly
+> > fine for the driver to reject it. But in principle if user wants to
+> > configure a 128 entry ring with 1MB buffers.. I guess they must have 
+> > a lot of DRAM to waste, but other than that I don't see a reason to
+> > stop them within the core?
+> >  
+> Ok, so config can be rejected. How about the driver changing the allowed
+> max based on the current ring size and MTU? This would allow larger
+> buffers on larger rings and MTUs.
 
-> 
-> Cheers, Phil
+Yes.
+
+> There is another interesting case where the user specifies some large
+> buffer size which amounts to roughly the max memory for the current ring
+> and MTU configuration. We'd end up with a page_pool with a size of one
+> which is not very useful...
+
+Right, we can probably save ourselves from the corner cases by capping
+the allowed configuration at the max TSO size so 512kB? Does that help?
+
+> > Documenting sounds good, just wanna make sure I understand the potential
+> > ambiguity.  
+> Is it clearer now? I was just thinking about how to add support for this
+> in mlx5 and stumbled into this grey area.
+
+Yes, thanks!
 
