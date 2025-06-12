@@ -1,120 +1,102 @@
-Return-Path: <netdev+bounces-196857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22802AD6B69
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:52:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 984D6AD6B6E
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA7E52C069D
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:52:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99313189BDA2
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617A11F4CAB;
-	Thu, 12 Jun 2025 08:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c6+a28KT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C097213E78;
+	Thu, 12 Jun 2025 08:53:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584231DF75A
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BD21E9B19
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749718329; cv=none; b=jYtEHMysGEPJwIFJWd+3cjSa2r0NLlqIHJR3k84P27uEH9Ix3kan0NAh/0kZ1GRxbDJl9Luf9io5/t/qUJ8FxdGD4CKw9SpmG7GMrlaxtQyk5PXTifnws5eJ+gX5uagCR0ny8mZnbMPWHev2RedHx68r6Njkm4ZOwVERSHR5zpE=
+	t=1749718401; cv=none; b=Rwe16VcuRkluPrKSE05USDuGSBfJ8zWAN4wDMZ0Nir/DPK4LzO3glA1khdicrjMsvjJ0OyhKOdUzsqjkMXmfFfuJtXFhjbToy7tJtReGrUA4rOLTJIWtWqFznpYLsnRFtJstv6ELg5BZjI+n5JF7iuaKgii032bgg2gLayzdVhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749718329; c=relaxed/simple;
-	bh=H0VCAnV+60G/axqZge8syCzBtfm8tXNe14T0UBegxF8=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=nfDl7m7OBK9oS07SSsID/+tfMy+b4iBpl9cHWxQ2KSDHKqOuyRHSZ5952VaAcs0NzhlGjTMv8b997/hodChMUFctRELTsSPS0nUV15TQ587nU3isrBYx5bxJ2HUW04sj7Pc23EEPpN5i0Ss1YAmubLsJv0Goo+x47xRwA+VGm28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c6+a28KT; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1749718401; c=relaxed/simple;
+	bh=WxKr+Z/QJuSBRjFCvUCizSaES/2hJrrojfpmhNwGEFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pwmpdk99GP5/U3mFWKK30uy3YtGQAj7qeJdG6f8Anbps5A+ObT+eGR0wojdYl0+Ip5bFoqm8MqvtgUhxY0BTJVSHgdHFwxbaKT8qig4ZkMIsMXXTCHDFwqmBqQd9qD50CBycfED5Cp/YuI3MNf9nKFu1aS1RZYDRBabxShbXkBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-60727e46168so1351382a12.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 01:53:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749718397; x=1750323197;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j9BRQ15OKOHKXtMKvoZZsftmymCF7lN8ZrgpGO4hGEM=;
+        b=hz3h4bpUPKYP30ys+ezNjHAhHP8KnS2xvBSjxDJSK/b0tG7VsAKN5fojsaFQ7e3iPU
+         hLQJYpGGXp9TKh9atbW4RFZdgHxdwCt2QYopKCKrkOCSfXEwhiHbbeYsyL6nCUnyyWhc
+         QGg0xqW2Wc9/r6VAqg9Oou9h5FAzz5jS3eFBsvNLLnHjlH6ZuzeBlvEIzYt50qO1gyWO
+         misPD6OHetJxVrKbJx+jNXIjKdarIfGhwee0zTrNAaUxneEYLHrR8MqW/1c3X4pjFIBY
+         VifzjcH9r6/NXk+WacNBWs3DWMa17ZYnHdgSSOuYoMcdJrllON2QwtGJLVXoGL72njj0
+         Xnbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUlhy9/zSEi7cy2ECoK+3xc5tLV47QNMNPb10V4E2l/ujKxRIHK3vRbSj7ksWnO6qyJAufYSqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzkn6VRjAVPhhcmOXrReymNS1/2UHkepGnGaPmj46ilGA9I0dpj
+	MSfs0foKPk6hoPTd9HcoZz1rl/JA4aFZ0FV+UBPOknfOD3dwc1xIDc7eh5XYcQ==
+X-Gm-Gg: ASbGnctlnaH7L5sl5tvkrKB2A/5OacsKkHOsLZc7wW2sWL8DDunxY4ukILwKiiwM1va
+	mnBLqA3R9dwLcbAAmmRXIsWgZAwObkTmZAK07lQkBoYecusFYQamTbooMbIBu8NS5gmEst11AP1
+	LItMyu5I+fQFD7kGqJaboMc/vmHPKMLk8T45zvQT3WScyHZ5+3E1Emt20O49oYc9UVlpvzZgiCT
+	Xvv/YYtuKIZQRbqVofJnraB8X6hu6DTSYmthMRPLzoPBxlPP3r518lr4rRd3KqqcL6reXrqHWlc
+	sisnwrB9nFDnxM1QapeOdjTf9PMx60bF7s2lhDsBx7lLjF1o6Wq+
+X-Google-Smtp-Source: AGHT+IF1E1bVNewhH+RFD0+fb5CPNLGeBooDCsz4uVeR7JxnCDwI55vapl2yzGpOaFQkOrb11zNo8g==
+X-Received: by 2002:a17:906:99c4:b0:ade:76d0:fd9c with SMTP id a640c23a62f3a-adea2e348b6mr268993166b.3.1749718396574;
+        Thu, 12 Jun 2025 01:53:16 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adeadb21656sm97767366b.108.2025.06.12.01.53.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 01:53:16 -0700 (PDT)
+Date: Thu, 12 Jun 2025 01:53:13 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	dw@davidwei.uk
+Subject: Re: [PATCH net] net: drv: netdevsim: don't napi_complete() from
+ netpoll
+Message-ID: <aEqVefLEgSz9AzHG@gmail.com>
+References: <20250611174643.2769263-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749718314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1fNjU9Jt2dl9a4ozW6RxgvUD+U87qbNB3Y48ndzwkqw=;
-	b=c6+a28KTWcxU/nQnzd1YNpZV62zUXn3MurB9aDU9I9dTDixL12OoyBdQNZuQ6v/nDhAyFf
-	XmWjDbK00zwdPaJQXNEV3Rznmk4RH9dE76l0gII6HetSWTr8F0SdMmW/6QowSHr1oMmedu
-	HV5hnmXCdaPhUZy+91ALLVuLzvVLFqE=
-Date: Thu, 12 Jun 2025 08:51:52 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Yajun Deng" <yajun.deng@linux.dev>
-Message-ID: <be52bdf3f1f4786f73b618369f63ce035ce8b955@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next v2] net: sysfs: Implement is_visible for
- phys_(port_id, port_name, switch_id)
-To: "Paolo Abeni" <pabeni@redhat.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <10a15ca4-ff93-4e62-9953-cbd3ba2c3f53@redhat.com>
-References: <20250521140824.3523-1-yajun.deng@linux.dev>
- <10a15ca4-ff93-4e62-9953-cbd3ba2c3f53@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611174643.2769263-1-kuba@kernel.org>
 
-May 27, 2025 at 2:08 PM, "Paolo Abeni" <pabeni@redhat.com> wrote:
+Hello Jakub,
 
+On Wed, Jun 11, 2025 at 10:46:43AM -0700, Jakub Kicinski wrote:
+> netdevsim supports netpoll. Make sure we don't call napi_complete()
+> from it, since it may not be scheduled. Breno reports hitting a
+> warning in napi_complete_done():
+> 
+> WARNING: CPU: 14 PID: 104 at net/core/dev.c:6592 napi_complete_done+0x2cc/0x560
+>   __napi_poll+0x2d8/0x3a0
+>   handle_softirqs+0x1fe/0x710
+> 
+> This is presumably after netpoll stole the SCHED bit prematurely.
+> 
+> Reported-by: Breno Leitao <leitao@debian.org>
+> Fixes: 3762ec05a9fb ("netdevsim: add NAPI support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
+Tested-by: Breno Leitao <leitao@debian.org>
 
->=20
->=20On 5/21/25 4:08 PM, Yajun Deng wrote:
->=20
->=20>=20
->=20> phys_port_id_show, phys_port_name_show and phys_switch_id_show woul=
-d
-> >=20
->=20>  return -EOPNOTSUPP if the netdev didn't implement the correspondin=
-g
-> >=20
->=20>  method.
-> >=20
->=20>=20=20
->=20>=20
->=20>  There is no point in creating these files if they are unsupported.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Put these attributes in netdev_phys_group and implement the is_vis=
-ible
-> >=20
->=20>  method. make phys_(port_id, port_name, switch_id) invisible if the=
- netdev
-> >=20
->=20>  dosen't implement the corresponding method.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-> >=20
->=20
-> I fear that some orchestration infra depends on the files existence -
->=20
->=20i.e. scripts don't tolerate the files absence, deal only with I/O err=
-ors
->=20
->=20after open.
->=20
->=20It feel a bit too dangerous to merge a change that could break
->=20
-> user-space this late. Let's defer it to the beginning of the next cycle=
-.
->=20
-
-Ping.
-
->=20Paolo
->
+Thanks for the quick fix,
+--breno
 
