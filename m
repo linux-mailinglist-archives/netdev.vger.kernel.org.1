@@ -1,156 +1,132 @@
-Return-Path: <netdev+bounces-196880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2119EAD6C36
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:31:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B748BAD6C44
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B26189BA23
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:30:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49FBD7A4E2A
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98D722AE76;
-	Thu, 12 Jun 2025 09:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C2F22424C;
+	Thu, 12 Jun 2025 09:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BtA1Y01P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XiIzTsNz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09671E5B62
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 09:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842C9217704;
+	Thu, 12 Jun 2025 09:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749720625; cv=none; b=LvMhwb7QFVGX3uHA0Y1qBlrqlqnEKVVoTh8xHsFrs9336oMWSanveVvbQ9h+A8Oo4+Q485IznZZsmzNdWs+xs1H0mPNLf0SVUGpeg5IAZx8o9EW0uQU2YsX5z8VBE5wlgiNAKm2ck+fO1rFgI2o2PIQyDJjA2ky5Zd7RztS9DGY=
+	t=1749720738; cv=none; b=CKeHjvd3jA2r8RlvLPbPS98LKjkrpktJVky18ijoCz77R3PRiFW7X8MXRA+gFb2zBzIwcUOdMZMDy3NuYGpFoCAzFFulNsar/dP5ez4YvSAmYN7YGgycpeKtQYwK6H5qdoDjLWZhoqcRSblycqzUNGiB+J3k8mMLHrJS83/c8ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749720625; c=relaxed/simple;
-	bh=4ygq9Ksz0EzPSaZG9OKYAVE1YdwDPmeAsjiGh8gvFqo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gys8p6qSkZ73Qpr6Q7VrPsVED6854Eu8vMsuo2Mna/rBdV4M+/ad6qfiTfLudREBEftj8NhJ8JNC9kAHG7Fg7hI4eU0yqMC73t4rE2QaH5Shpl5pfhzCGcyTCOTMmcWeVEirkowdmDovuztdpUp+kCwKjjPs8bepkljHioAG4IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BtA1Y01P; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749720622;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4ygq9Ksz0EzPSaZG9OKYAVE1YdwDPmeAsjiGh8gvFqo=;
-	b=BtA1Y01PE7MeB1UAU535WWh6fBVD13Ahwyi3/LS1WyNb/oV6F4wj/fNNTl6QDt21JDuSDn
-	JcoXsFbPZLAHCcPAHbb//4iA1KZexgQ4BcDSzKkTCsJn5GcGrsXK0u2+VCDr7rqnFvT/lk
-	eSEctaAdvOURFXisq3WzzJyz0xrZdmg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-6Ppl6z7TOZKs7qn5tRAhjA-1; Thu, 12 Jun 2025 05:30:21 -0400
-X-MC-Unique: 6Ppl6z7TOZKs7qn5tRAhjA-1
-X-Mimecast-MFC-AGG-ID: 6Ppl6z7TOZKs7qn5tRAhjA_1749720620
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ade5013e05cso61266266b.1
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 02:30:20 -0700 (PDT)
+	s=arc-20240116; t=1749720738; c=relaxed/simple;
+	bh=HbiV1Peyfi7DeLC4V8wHqXr9LxAEjt7zTAZbOl/yk4k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=shrrDSbW39Jql65Y45wVk+YtM4bk6+H33Ev2FV9ayfXCeCcMsSn/btjPtVsmWxUvj6/mBkeIrsLi+tGy2+S+0QulUjaT7P+txSow3dmdb42RBEDudoA8WF9X1/E9DKWvSzhSH2UCdSD5HWtyWvNIE8fHfUwLM7p2lMyI4TmsAHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XiIzTsNz; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-442e9c00bf4so5619385e9.3;
+        Thu, 12 Jun 2025 02:32:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749720735; x=1750325535; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sg1YUq+46gelWFKCWCbK7uj3DawqVLnvcZOeGb+PVOA=;
+        b=XiIzTsNzyiK1dH/n+3mH7PpoxAMpVGb8dy5hbx2uWDpMKdURNcFPMHUQeP0UPD8O2S
+         Y8f+UsaDmUzppDg4b1AwyDbgwtuDFO2qyp47sghpRpDLXJZnPtiyPClEY22QY502JqQ/
+         QqOxoA+00X6Q4TolpFDda3HYkuo9YEamNI/w6JsCO/ERagNPMMSNbD2At/wpSzei6hot
+         49UneBkF9Amn8EE5CUdzCRjMmQrxgnDZkP96/geSyS5iNYr5a02grL7XKY+y9+xEaGb/
+         1T46ypPep3f5GTWWNIY8JFAV1fOUEova/6jBRN+vYxd6VnkipNCtA1NOGRNi8dzVfEmo
+         EjtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749720620; x=1750325420;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ygq9Ksz0EzPSaZG9OKYAVE1YdwDPmeAsjiGh8gvFqo=;
-        b=Cdkcd13eAtUWeCHLRPa3ue96+Iz8wiZwFpjT1Kg8hEIeHdU8m3AEixeE17s5xBX3Re
-         X2grqg2yzGq/Io7MRXprnsua8mX+A7g1puyPSfqxAomBhhYuVdEUynICQFAbktOry5sI
-         sTOGmDA69hscFJkmLGqlTZU1/5H1DMA0UIcoWoZTQZqYCPmAsKh41YJbd8J7FneAk+H6
-         1qrUd8hIesrloff00l6kMFAmNaWdqwI50GkkYPN//1FO8HkZruofBaUEm6cnklKSJg39
-         F27FUVTJ328uOmMYS40WZrnd4rYgyGW3nRlJ4PPJ7cDvtbay99GcG5XS62ZoXP2gVo6q
-         Ae5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWzYPsHfb8IjcnEd7F9LfXEKZPvLAHOgdHoTmeDoxkAKZnEkku2Ba+rX1keqZshDJ6hBBd9ozs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtxldzLhh4H9s/Jb5khc4nfhx5uY06anWp3VebGY8+JnEbc35V
-	9wJw5DjubSTg2dyNujJNNMpO71TlwouakmGqlztmAcq4wZzy9axMEVKn1J7WM9DZVc95QPe22LH
-	PEePClYMHA+UX0Vl9QtlgIxTLaSeHtNhPYY3y6r7HH5cOkzh3t+Ep9FbQ7Q==
-X-Gm-Gg: ASbGncu0UHiBMSbPZwkDPtWgXM/09jm2UlnQStdy3469c60Olpl/Dxo3W9XZqVYippJ
-	MIJT2KMMhQTVCZj80dzdTbRr2ZHHMxSaPMLAaKoZMr68RAsCJZaa7eQjMnI2yF/fnhjvHsh6baY
-	+QjhuTudmrut5nNx34Enh54SUJWnG3N8e008cCE9cm++r1pxWzhhSb1pv3EY7cz+3e7trwOPiCs
-	e7ALIJTOl+GEFfTOBmTEDesnUVM9OuZ/rhQBrKYf1kzZ6dVLEBqSVQBEmG3IBSzNXXu3EeCIYWG
-	Pzt3WunDyKYOXAlgMexAjP6To40j
-X-Received: by 2002:a17:907:9404:b0:adb:14f3:234 with SMTP id a640c23a62f3a-adea8d2a7femr202985866b.8.1749720619716;
-        Thu, 12 Jun 2025 02:30:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFW/Lug4eBXscrw4Su9HuFYOFwJuHPtuXS+7rbCJ7Q+kF4SSqVkab1vunsa/YWLwUrWOIkfLw==
-X-Received: by 2002:a17:907:9404:b0:adb:14f3:234 with SMTP id a640c23a62f3a-adea8d2a7femr202981966b.8.1749720619118;
-        Thu, 12 Jun 2025 02:30:19 -0700 (PDT)
-Received: from sgarzare-redhat ([2001:67c:1220:8b4:edf4:d580:147e:ea8e])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adead4cde8asm102655966b.7.2025.06.12.02.30.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 02:30:18 -0700 (PDT)
-Date: Thu, 12 Jun 2025 11:30:16 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: Oxffffaa@gmail.com, avkrasnov@salutedevices.com, davem@davemloft.net, 
-	edumazet@google.com, eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com, 
-	kuba@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mst@redhat.com, netdev@vger.kernel.org, niuxuewei.nxw@antgroup.com, 
-	pabeni@redhat.com, stefanha@redhat.com, virtualization@lists.linux.dev, 
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream
- sockets
-Message-ID: <gqwp3mkdx3uaedmxx4kqvhvbgfvp3dtabm5ciejitk4x573oww@ek4agftt56np>
-References: <CAGxU2F4JkO8zxDZg8nTYmCsg9DaaH58o5L+TBzZxo+3TnXbA9Q@mail.gmail.com>
- <20250612085514.996837-1-niuxuewei.nxw@antgroup.com>
+        d=1e100.net; s=20230601; t=1749720735; x=1750325535;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sg1YUq+46gelWFKCWCbK7uj3DawqVLnvcZOeGb+PVOA=;
+        b=fhZxDKQPvsEZesRORTV2CDdk4B138ibOU68dIr3zxeaQbo/mbhRPo9KO5aEunhU5g2
+         131sCZUKQnfR4JNGL279+FteCdHvmPLlRMG8a0Hrz/XQB0ROrVhuS+/23ZEALIbGMhQM
+         1PG8ewzl1gS2/dzvkuihsBidQXlrRX5+oycMnh1pmFyEh80jZ8KGWJsMlOBqU3Q2+YTp
+         ZzG6s/3Y+/08qqkuv0P88GYC5LA1zQiOIimtdtPLOOMZtk1WM5D2JuUf8k8quAyuRG2Z
+         lFV5Ko/mxleE7fhx1ec5BpNBO5aeZTzdznMl8ThyfMfdwGJb1syUWgOK8ySKOI4uU5r8
+         6IWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWODpn4NE6ZaDChFKCLWhIuJXx2/8cLAFV0QRptw0Eo1CNmNHX9R5neXw9ks+qNTFP4NvAo+9k1@vger.kernel.org, AJvYcCXPjhYYCM/66M6PmifqkBmQpsGkO/Z3YumAi4PBmBp09bLMLvKQTjHrlDB4TwWa9FtByajoojTlNtlaVDa4vhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTf4RdlLNF9HtfqANjBzrBDwhjtcMtZBa2hlYNyephY9FU4lXN
+	NMLHF0fikbux8INxgiuLqNE1ncqurHsONy4LFM69bh0gY/42Riz+RoY9
+X-Gm-Gg: ASbGnctTwKr5ycHjN2danEFXtWbubR0uWKN//z7klwHc6+Ay1XP5YAI62gnuahsV7H+
+	fg3+Pnv4V0EjFWopz2euwIIwZrbgPUTp6TxFVWdkWoo+KL08ag9CWziANz5ts0ybjMdg/FsI6Mq
+	27lUS0GBwGY3Zob5dOnUSwv9+IuqNI0kZDa9XMTQ+u6FfvvE/2kcU9IpzuIREQey/jM3l9ovLlf
+	pmvDv3iNDlqlVwROpSpJvPPIYr/MaX/FVw2qz8U6a1ZK5WasXgcMwrSGWxTb3++r0UQuenZ4rXs
+	ui/WseIKCpoB1k5go97FoGcpKNJoSTFqAvbhb4IrEJYvQP+Jutx9+a1ZorezLywLD/UvGGyGlGq
+	fJJlynmToKnm1jlJDnonXBIPoizzD/PjA8FT0JDRpoHi2sDdpGg==
+X-Google-Smtp-Source: AGHT+IEB/Hlduf/FtNCdy88U194VqMOrJkKcasBBtJYh4OexQw3KdEgsmxQ5dH28Ka9KEU40wWAHiQ==
+X-Received: by 2002:a05:6000:1ac7:b0:3a4:d3ff:cef2 with SMTP id ffacd0b85a97d-3a56075a079mr2152038f8f.27.1749720734579;
+        Thu, 12 Jun 2025 02:32:14 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a561b65ab2sm1454514f8f.96.2025.06.12.02.32.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Jun 2025 02:32:14 -0700 (PDT)
+Message-ID: <75addb05-06c5-41ab-bede-4de79f3474c5@gmail.com>
+Date: Thu, 12 Jun 2025 10:32:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250612085514.996837-1-niuxuewei.nxw@antgroup.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/2] net: ethtool: Don't check if RSS context
+ exists in case of context 0
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Joe Damato <jdamato@fastly.com>,
+ linux-kselftest@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
+ Nimrod Oren <noren@nvidia.com>
+References: <20250612071958.1696361-1-gal@nvidia.com>
+ <20250612071958.1696361-2-gal@nvidia.com>
+Content-Language: en-GB
+From: Edward Cree <ecree.xilinx@gmail.com>
+In-Reply-To: <20250612071958.1696361-2-gal@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 12, 2025 at 04:55:14PM +0800, Xuewei Niu wrote:
->> On Thu, 12 Jun 2025 at 10:21, Xuewei Niu <niuxuewei97@gmail.com> wrote:
->> >
->> > > On Thu, 12 Jun 2025 at 08:50, Xuewei Niu <niuxuewei97@gmail.com> wrote:
->> > > >
->> > > > > On Thu, Jun 12, 2025 at 01:32:01PM +0800, Xuewei Niu wrote:
->> > > > > > No comments since last month.
->> > > > > >
->> > > > > > The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
->> > > > > > patch. Could I get more eyes on this one?
->> > > > > >
->> > > > > > [1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
->> > > > > >
->> > > > > > Thanks,
->> > > > > > Xuewei
->> > > > >
->> > > > > it's been in net for two weeks now, no?
->> > > >
->> > > > Umm sorry, I didn't check the date carefully, because there are several
->> > > > ongoing patches. Next time I'll check it carefully. Sorry again.
->> > > >
->> > > > It looks like no one is paying attention to this patch. I am requesting
->> > > > someone interested in vsock to review this. I'd appreciate that!
->> > >
->> > > Which patch do you mean?
->> > >
->> > > Thanks,
->> > > Stefano
->> >
->> > I am saying your patch, "vsock/virtio: fix `rx_bytes` accounting for stream
->> > sockets".
->> >
->> > Once this gets merged, I will send a new version of my patch to support
->> > SIOCINQ ioctl. Thus, I can reuse `rx_bytes` to count unread bytes, as we
->> > discussed.
->>
->> As Michael pointed out, it was merged several weeks ago in net tree,
->> see https://lore.kernel.org/netdev/174827942876.985160.7017354014266756923.git-patchwork-notify@kernel.org/
->> And it also landed in Linus tree:
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=45ca7e9f0730ae36fc610e675b990e9cc9ca0714
->
->I misunderstood Michael's point. I am new to this, and not familiar with
->the process. Sorry about that...
+On 12/06/2025 08:19, Gal Pressman wrote:
+> Context 0 (default context) always exists, there is no need to check
+> whether it exists or not when adding a flow steering rule.
+> 
+> The existing check fails when creating a flow steering rule for context
+> 0 as it is not stored in the rss_ctx xarray.
+> 
+> For example:
+> $ ethtool --config-ntuple eth2 flow-type tcp4 dst-ip 194.237.147.23 dst-port 19983 context 0 loc 618
+> rmgr: Cannot insert RX class rule: Invalid argument
+> Cannot insert classification rule
+> 
+> An example usecase for this could be:
+> - A high-priority rule (loc 0) directing specific port traffic to
+>   context 0.
+> - A low-priority rule (loc 1) directing all other TCP traffic to context
+>   1.
+> 
+> This is a user-visible regression that was caught in our testing
+> environment, it was not reported by a user yet.
+> 
+> Fixes: de7f7582dff2 ("net: ethtool: prevent flow steering to RSS contexts which don't exist")
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> Reviewed-by: Nimrod Oren <noren@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
 
-Don't worry ;-)
-
-Hope now it's clear!
-
-Thanks,
-Stefano
-
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
