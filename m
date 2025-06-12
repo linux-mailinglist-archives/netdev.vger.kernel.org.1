@@ -1,135 +1,144 @@
-Return-Path: <netdev+bounces-196860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82056AD6B80
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:57:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7F0AD6C02
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 11:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453CA16EF99
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:57:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8E53B0144
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8395A221F3E;
-	Thu, 12 Jun 2025 08:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GQgIVbzA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D1B223DD4;
+	Thu, 12 Jun 2025 09:18:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from relay-b03.edpnet.be (relay-b03.edpnet.be [212.71.1.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA70B21B918
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A8621C178
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 09:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.71.1.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749718610; cv=none; b=rTFtxQSuRoADWVyN/1DrR/2RADD9+pH7AbJg/oNjMHlk46tVT4FVgyBGadkpB6YpZQze48AM37Gr0Hfbb//X0RPH8eS2Wl/Lqp/2dMwRetJf9jdaA938dDAaBQKFa6vzL4WlR2zOm5CEyI9URi2VeT9DhlSGktmrgs4L+ajXzd8=
+	t=1749719888; cv=none; b=Pw240ePCcOXb+bp74RZR7vl0B+DUzVxQ5odMSoPfDCmcx45zqCIKm5gS6D57OY2bi8f1745BRk5XBPRLpOFynJHJOolTpghXaAH7h98AtJrHEqIRKUQnZHRemAiAP71hgEuAZOjWwiXGz1mzWIlfj4qjj/rzOXR0jsz54RHrzuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749718610; c=relaxed/simple;
-	bh=QUqmWhIOPeOaCfPk0J82P3o3C74RBvP6ZXmQgcB1aLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cr7GTkYGcVtlJSuJULZYzAC+ulcTsB4Jsh4gm+28Yk5IKrWcX1YDU7B0HCzEHpE6H06fKrNaOf5AgwE1oIz+OCA6ni1fO9h51r09+PKGA5pEr+PS46kLVueJzyYsENrPDqHjnSXECQfJ7jmgm8ibt0paooYkpX4GCCoLUt4YTU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GQgIVbzA; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749718609; x=1781254609;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QUqmWhIOPeOaCfPk0J82P3o3C74RBvP6ZXmQgcB1aLg=;
-  b=GQgIVbzALAZsB+qhexr1it0ZqZ+o4p3uVNjHl6OKjpxzBCHrAZkmEgkn
-   nVdhQ0IYCreDwUOMG2m2lvlh3gM7hl+oAQZQr7cCCnqQzi38fmiQGLWj8
-   2SkMtdWQUI/Ig+4/TxQ7cfAZpZG/0zGGItyeB4bdXqkUB2HWQ9KaaafPh
-   ndaHbhTSvHAWgDFpnLHDxK/1h9MnkPyA2Jx8XJYBMWoZXXSv8oAjtUISt
-   FeGjsm6wiGmM8MPZE0uci3QaoIGHw20mRWt+CzxACGMOLyeK58AqO+CjV
-   QueSYoBqm4yIaYId0RjjfLNqkX0lK3hHxmRGRxSxn9TnJ4z5HL1Knkx9g
-   w==;
-X-CSE-ConnectionGUID: 2+ZdponrRL67yqpk8KZtqA==
-X-CSE-MsgGUID: cQI4CQmiRbW2Or8Tl8Ui7A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="50996354"
-X-IronPort-AV: E=Sophos;i="6.16,230,1744095600"; 
-   d="scan'208";a="50996354"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 01:56:48 -0700
-X-CSE-ConnectionGUID: hft+gJgKStipLfMBbHTDUg==
-X-CSE-MsgGUID: wpC+Oj5gRyeOKAUeuyN0/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,230,1744095600"; 
-   d="scan'208";a="147442929"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 12 Jun 2025 01:56:46 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uPdjn-000BLK-1y;
-	Thu, 12 Jun 2025 08:56:43 +0000
-Date: Thu, 12 Jun 2025 16:56:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 13/13] net: mctp: test: Add tests for gateway
- routes
-Message-ID: <202506121602.RLO9kgkY-lkp@intel.com>
-References: <20250611-dev-forwarding-v1-13-6b69b1feb37f@codeconstruct.com.au>
+	s=arc-20240116; t=1749719888; c=relaxed/simple;
+	bh=9cS+uUngAmeL6lbAg4REFestb+sGw0xmGUWR2eX7qW0=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=eNR6WbJR+8asl1XNnCLak2qb1+RTdr4hZXhvFsFZgQyVvZuaVAWylDLaAiU7m/5zqbkDdwhrJdGiuRWTB9bqyu9E7OK0kO9R23wsvF11RojzxkxLvRpuZsFjW536qU16L+3Vzk97NEcEL90rsE6lpdFuXqkgh1YG2D09NNMMMjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kabelmail.de; spf=fail smtp.mailfrom=kabelmail.de; arc=none smtp.client-ip=212.71.1.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kabelmail.de
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kabelmail.de
+X-ASG-Debug-ID: 1749718720-24639c6c73f84d0001-BZBGGp
+Received: from [192.168.177.53] (213.219.166.145.adsl.dyn.edpnet.net [213.219.166.145]) by relay-b03.edpnet.be with ESMTP id 0NnkNEN4uDODX3oK for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 10:58:40 +0200 (CEST)
+X-Barracuda-Envelope-From: janpieter.sollie@kabelmail.de
+X-Barracuda-Effective-Source-IP: 213.219.166.145.adsl.dyn.edpnet.net[213.219.166.145]
+X-Barracuda-Apparent-Source-IP: 213.219.166.145
+Message-ID: <5568c38c-5c93-493a-96bd-b6537a4d1ad6@kabelmail.de>
+Date: Thu, 12 Jun 2025 10:58:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611-dev-forwarding-v1-13-6b69b1feb37f@codeconstruct.com.au>
+User-Agent: Mozilla Thunderbird
+To: netdev@vger.kernel.org
+Content-Language: nl
+From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
+Subject: [support request]: where should I register this (apparently not
+ supported yet) transceiver?
+Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
+ xsBNBFhRXM0BCADnifwYnfbhQtJso1eeT+fjEDJh8OY5rwfvAbOhHyy003MJ82svXPmM/hUS
+ C6hZjkE4kR7k2O2r+Ev6abRSlM6s6rJ/ZftmwOA7E8vdSkrFDNqRYL7P18+Iq/jM/t/6lsZv
+ O+YcjF/gGmzfOCZ5AByQyLGmh5ZI3vpqJarXskrfi1QiZFeCG4H5WpMInml6NzeTpwFMdJaM
+ JCr3BwnCyR+zeev7ROEWyVRcsj8ufW8ZLOrML9Q5QVjH7tkwzoedOc5UMv80uTaA5YaC1GcZ
+ 57dAna6S1KWy5zx8VaHwXBwbXhDHWvZP318um2BxeTZbl21yXJrUMbYpaoLJzA5ZaoCFABEB
+ AAHNMEphbnBpZXRlciBTb2xsaWUgPGphbnBpZXRlci5zb2xsaWVAa2FiZWxtYWlsLmRlPsLA
+ jgQTAQgAOAIbIwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBGBBYpsrUd7LDG6rUrFUjEUP
+ H5JbBQJoLGc9AAoJELFUjEUPH5Jb9qoIAKzdJWg5FNhGTDNevUvVEgfJLEbcL7tM97FL9qNK
+ WV6fwyoXUM4eTabSqcq2JVbqR4pNur2i7OSPvF3a/VRhl2I0qMcFz8/08hVgFG55iBI9Rdwl
+ sn3b37KzwdGR7RX5cRt83ST76riKVdEsB/EKeU88/i9utWmT7M8HaqvKw16qhcs2i2hAuM9T
+ wNmLt+l65sFMZcgY2+3pne8X1DRj6c9aQ3IBUcKMsB977P2aiss0xQrJ4CqSG3Tgjtzw0c7F
+ BuamFq8FIzAtTwRnjxHtqYVUnFLLMu7INfdcQuW2Q2eZHO6+X80QlL+uMDirXB+EbHKZcrU4
+ EN13bLOk6OG5ODLOwU0EaCxqtwEQAOfQzQMy61HqB1NL4rWCCI3fG131Da4iyMceOuMntmZx
+ 9EomthdZRiunLffjMcN7aBcgr4wCh2tNar0hpUkkPpnM/Lat+avTZBkaSmuSF52ukmkVZLEE
+ +jPy33hTWkc+k2pJ91XvLVU9axtd33XDBL6bP2oNmG+QF8hfN7QzukWzI52EdzF+DYgt08te
+ 875abopdtZa/csYO51uqGg5zBjixylZ48pB9o5lWM6h1HSlBoHGBHh3u2ptxyxqTGQYOX+MR
+ QEJElLV7ydJSWmm+3cSza3z2BtwyfjKUPzgHXQEBhPQdTalH4cZeJQGi3Zxhy4iQBGpvg1nW
+ msd2//x0FRSHkZtzTVaTCTuf0kHhqiQ8a50B6YDJiTC5koH0hp72Fz2SQoFBcDpUFkNzBWng
+ Ju9o1LBGd69c7AvOgMYZxDWwvDyb2sUfPJX0V4f+jJUjffO1K+PTrtnq2gpHKjBZHgGUvG4w
+ 36Juy5BFr7TDDRt5rZGN26Tcs4Nq4EZTjyE6QuJOtA5iyJQo3ZwqQ5d9apyStPBJC1CnBZCo
+ kCbRrIbLgqe+mCgXhQngj3QZUZn8qmDB2VHEDmSdkJ4A9qKyiof9uRhmAH287uQ/i342xuUM
+ 8raS/RGFQaNCV2bBGKqflpS9l1BKGyevk2MUw/IGKJOYfXYc6L5RoPLSlkseBdSpABEBAAHC
+ wHwEGAEIACYWIQRgQWKbK1Heywxuq1KxVIxFDx+SWwUCaCxqtwIbDAUJCWYBgAAKCRCxVIxF
+ Dx+SW62eB/0SdagAw65x1IEwtEbdo4qxTL/a2iShsMvFOZYt/UE8fDTMkyTJFlDnxHDJqiHR
+ 0yHpt41+CGxt5z8xhd+4HE+NdQJD2rjvvk5A2C8baOQYv8Mb5I4iDjSuYJWjrAwjCo25oHo7
+ CtoMd2jhn3+L1BO8/VY+AjdVXpGqPzor6Q/c5XAfUsgA2/2VEUpXLp8xKr7v/Gn08zUqaT+W
+ 90QjvK1gwYv7sQ4X0w7kzf3sgQvN64cjo0jVsC3EG1AfdLtc+213+3dzDLqomtWtqoxmnrqx
+ oMdve2PL2byHDAtzeWGGM38JB4H6A0VlvUyGqgAnRS/UyOLPpqNYbi1lPemVHZsk
+X-ASG-Orig-Subj: [support request]: where should I register this (apparently not
+ supported yet) transceiver?
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Barracuda-Connect: 213.219.166.145.adsl.dyn.edpnet.net[213.219.166.145]
+X-Barracuda-Start-Time: 1749718720
+X-Barracuda-URL: https://212.71.1.220:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at edpnet.be
+X-Barracuda-Scan-Msg-Size: 1630
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Spam-Score: 0.00
+X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=7.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.142749
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-Hi Jeremy,
+Hi Everyone,
 
-kernel test robot noticed the following build warnings:
+I'm looking for support to register my trainsceiver in the phy subsystem.
+This RJ45 transceiver (ZK-10G-TX) looks very weird in ethtool:
 
-[auto build test WARNING on 0097c4195b1d0ca57d15979626c769c74747b5a0]
+|> Identifier : 0x03 (SFP)
+> Extended identifier : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+ > Connector : 0x07 (LC)
+ > Transceiver codes : 0x10 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> Transceiver type : 10G Ethernet: 10G Base-SR
+ > Encoding : 0x06 (64B/66B) BR
+ > Nominal : 10300MBd
+> Rate identifier : 0x00 (unspecified)
+> Length (SMF) : 0km
+> Length (OM2) : 80m
+ > Length (OM1) : 20m
+ > Length (Copper or Active cable) : 0m
+ > Length (OM3) : 300m Laser
+ > wavelength : 850nm
+> Vendor name : OEM
+ > Vendor OUI : 00:1b:21
+ > Vendor PN : ZK-10G-TX
+ > Vendor rev : 1
+ > Option values : 0x00 0x1a
+> Option : TX_DISABLE implemented
+> BR margin max : 0%
+> BR margin min : 0%
+> Vendor SN : 2505010443
+ > Date code : 250412
+> Optical diagnostics support : Yes
+> Laser bias current : 6.000 mA
+> Laser output power : 0.5000 mW / -3.01 dBm
+> Receiver signal average optical power : 0.4000 mW / -3.98 dBm
+...
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-don-t-use-source-cb-data-when-forwarding-ensure-pkt_type-is-set/20250611-143319
-base:   0097c4195b1d0ca57d15979626c769c74747b5a0
-patch link:    https://lore.kernel.org/r/20250611-dev-forwarding-v1-13-6b69b1feb37f%40codeconstruct.com.au
-patch subject: [PATCH net-next 13/13] net: mctp: test: Add tests for gateway routes
-config: hexagon-randconfig-r133-20250612 (https://download.01.org/0day-ci/archive/20250612/202506121602.RLO9kgkY-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce: (https://download.01.org/0day-ci/archive/20250612/202506121602.RLO9kgkY-lkp@intel.com/reproduce)
+I cannot read its pages with i2c tools.
+It has a big "AQR113C" sticker on it,
+which is supported by Linux for a long time already.
+I'd say it needs some quirk to activate the driver.
+So, how do I verify the ZK-10G-TX has a AQR113C chip in the first place?
+Does it need extra firmware? can I link it in any way to a AQR113C driver?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506121602.RLO9kgkY-lkp@intel.com/
+I am not a netdev developer, but if everything turns out like it should,
+There should be a < 10line patch to let aquantia driver claim this one.
 
-sparse warnings: (new ones prefixed by >>)
-   net/mctp/route.c: note: in included file:
->> net/mctp/test/route-test.c:1256:37: sparse: sparse: symbol 'mctp_route_gw_mtu_tests' was not declared. Should it be static?
-   net/mctp/route.c:162:9: sparse: sparse: context imbalance in 'mctp_lookup_key' - different lock contexts for basic block
-   net/mctp/route.c:554:39: sparse: sparse: context imbalance in 'mctp_dst_input' - unexpected unlock
+Thank you for your help,
 
-vim +/mctp_route_gw_mtu_tests +1256 net/mctp/test/route-test.c
-
-  1255	
-> 1256	const struct mctp_route_gw_mtu_test mctp_route_gw_mtu_tests[] = {
-  1257		/* no route-specific MTUs */
-  1258		{ 68, 0, 0, 0, 68 },
-  1259		{ 100, 0, 0, 0, 100 },
-  1260		/* one route MTU (smaller than dev mtu), others unrestricted */
-  1261		{ 100, 68, 0, 0, 68 },
-  1262		{ 100, 0, 68, 0, 68 },
-  1263		{ 100, 0, 0, 68, 68 },
-  1264		/* smallest applied, regardless of order */
-  1265		{ 100, 99, 98, 68, 68 },
-  1266		{ 99, 100, 98, 68, 68 },
-  1267		{ 98, 99, 100, 68, 68 },
-  1268		{ 68, 98, 99, 100, 68 },
-  1269	};
-  1270	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Janpieter Sollie|
 
