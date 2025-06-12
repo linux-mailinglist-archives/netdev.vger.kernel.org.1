@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-197000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6CAAAD745D
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:45:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C32F4AD7436
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF57018851D7
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:40:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51F4E3B1656
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AA9257449;
-	Thu, 12 Jun 2025 14:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD98E25BF1F;
+	Thu, 12 Jun 2025 14:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+6CLNru"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HeWqqdY5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C884255E23;
-	Thu, 12 Jun 2025 14:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BF825BF02;
+	Thu, 12 Jun 2025 14:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749739154; cv=none; b=Fi7BtSt0DNT7zJGcz+C7BR8wBaJsCdpSTPFb43wv6IHU1AsIKVynsX4YAjZKcO6S8HC3mtmKUAkpsGauj3oo28BNoGPQmI6+OJPlzzdoGUcoH0CvpGeTcP0MRVUjjrcATGWSBFID9pFVHKG9aOhc383a460Rl2yYzKZABxEQf0E=
+	t=1749739171; cv=none; b=Pxepq7KvOdRS/5MVEI8+B07RbSCricvuuHbGfuog779wHZAwcOSI2Y5BWtSKWCcgtGoFim7XPs9NScBIC4wWnZ/8Kp2JmAHto6LxtVuQGxo4uOG8xe+F383GOhbNjIn7wqqsLH9/9nKsCVPL3ehXUOKeh+XphnMY7bnYiNtPX+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749739154; c=relaxed/simple;
-	bh=lywKl1oGAQhuP2oPqsrGxy4CcarRSsbmvioixo5Xv8s=;
+	s=arc-20240116; t=1749739171; c=relaxed/simple;
+	bh=oocYYW9XhNGhlIxt3VxA0yDbX+cvu/AYrEHlCDzEaEU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XB4I1KH5h+NV0rnFsolM4uVCPgqGSTzHeozUomVbIBsK//fhR5K/5FI8sIOR+sOinezfLZ4Jav+shK/lF7PwJydK9VEfbZpITgnoWPUzyKdkbj0qRUvdpBR9o6MxVKul3CMXjAYQEOz3RzRk3Px0+wRpjkTsHlQdH53fNoCarV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+6CLNru; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18B6AC4CEEB;
-	Thu, 12 Jun 2025 14:39:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=AwJi/vxYgZYtWZhR+vRFnsbxZJN8asC62tfZ5dJZgTbgj6A7btgjPC1owapw0pdCCM3ARfitKvoIMTXpJpdSN74J3cVBh9rk8hZ+q7gRaCe4qZKEJ7LwymL/2ujOgS4zY/EEB3s/pYzPf1gbWLORsLeA1x2Rj8epM7AD4L7fGAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HeWqqdY5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDB59C4CEF7;
+	Thu, 12 Jun 2025 14:39:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749739154;
-	bh=lywKl1oGAQhuP2oPqsrGxy4CcarRSsbmvioixo5Xv8s=;
+	s=k20201202; t=1749739171;
+	bh=oocYYW9XhNGhlIxt3VxA0yDbX+cvu/AYrEHlCDzEaEU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D+6CLNru1CM7/I3LoAcBvoEee6LwcN6Bo1ESeeg7TKlTFMDQH1J41f344ArnUcVyG
-	 A8jC5ReSiJVaM7oz1ugi9nlvNe03N+W1nra/l3jLPa1QDCUmK3u6dRo71NMRTz1szR
-	 s/b8YWMIVEWKmxj8BD4kJD/2+LlovDGU9gC+DvdaXMsuUxpcGFqsq5qO/XQDlAPhND
-	 khzmsm8oprDcH9M9Z0MrnT8keOcH9aK0O0Ohn6Cgorst0/oXsOSc60ZX4jzZrmABIV
-	 JAdnzzXpI0kzwyRo0caPosqwth1sak5jb7d77leDJ6LZS5/wQIlM+Kad5jsRF9/Teq
-	 yQHNHcNt2DNOQ==
-Date: Thu, 12 Jun 2025 16:39:05 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Linux Doc Mailing List
- <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Akira
- Yokosawa <akiyks@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Ignacio Encinas Rubio <ignacio@iencinas.com>, Marco Elver
- <elver@google.com>, Shuah Khan <skhan@linuxfoundation.org>, Donald Hunter
- <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, Jan Stancek
- <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Ruben Wauters
- <rubenru09@aol.com>, joel@joelfernandes.org,
- linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
- lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
- stern@rowland.harvard.edu
-Subject: Re: [PATCH 4/4] docs: netlink: store generated .rst files at
- Documentation/output
-Message-ID: <20250612163905.119c2b5e@sal.lan>
-In-Reply-To: <20250610140724.5f183759@kernel.org>
-References: <cover.1749551140.git.mchehab+huawei@kernel.org>
-	<5183ad8aacc1a56e2dce9cc125b62905b93e83ca.1749551140.git.mchehab+huawei@kernel.org>
-	<aEhSu56ePZ/QPHUW@gmail.com>
-	<20250610225911.09677024@foz.lan>
-	<20250610140724.5f183759@kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	b=HeWqqdY5vrpn0k5DQvBel2CHEGRBgQDN15MknA6s3IDn1q15iZRQdO9brvYgOw177
+	 3MORk3AUrQAElWBebC92T8aK8le5Ne9IOPe3m79od2/iZRTLPjTEACw4dAxWAq0LIl
+	 Nbfc58jHNiOieAz6Fsf/6ttOegsKnaYKDds6AVzzqhEAAxCA8xy3ZnwYQYmZ3fnJP8
+	 UTaPQwt7hGzhEJQ2KwkG9QfN172sCiD0hPzFBU6c/j1GfBge/+x7BevqT+tFj45XL5
+	 AReWpz5axKrG5sfnaHIuUxRCkUiPptVnl1sbtl9Glk15VhXxSu10ho7aSlzNxaa66x
+	 3k3A5hLKio1LA==
+Date: Thu, 12 Jun 2025 07:39:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, skalluru@marvell.com, manishc@marvell.com,
+ andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, ajit.khaparde@broadcom.com,
+ sriharsha.basavapatna@broadcom.com, somnath.kotur@broadcom.com,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ tariqt@nvidia.com, saeedm@nvidia.com, louis.peens@corigine.com,
+ shshaikh@marvell.com, GR-Linux-NIC-Dev@marvell.com, ecree.xilinx@gmail.com,
+ horms@kernel.org, dsahern@kernel.org, shuah@kernel.org,
+ ruanjinjie@huawei.com, mheib@redhat.com, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+ oss-drivers@corigine.com, linux-net-drivers@amd.com,
+ linux-kselftest@vger.kernel.org, leon@kernel.org, Cosmin Ratiu
+ <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next v3 1/4] udp_tunnel: remove rtnl_lock dependency
+Message-ID: <20250612073929.151fe6bf@kernel.org>
+In-Reply-To: <aEo_2hOn5kh6kBpk@mini-arch>
+References: <20250610171522.2119030-1-stfomichev@gmail.com>
+	<20250610171522.2119030-2-stfomichev@gmail.com>
+	<20250611184345.3b403ad0@kernel.org>
+	<aEo_2hOn5kh6kBpk@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,53 +74,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Em Tue, 10 Jun 2025 14:07:24 -0700
-Jakub Kicinski <kuba@kernel.org> escreveu:
-
-> On Tue, 10 Jun 2025 22:59:11 +0200 Mauro Carvalho Chehab wrote:
-> > > The question is, are we OK with the templates that need to be created
-> > > for netlink specs?!     
-> > 
-> > If there's no other way, one might have a tool for maintainers to use
-> > to update templates, but yeah, having one template per each yaml
-> > is not ideal. I think we need to investigate it better and seek for
-> > some alternatives to avoid it.  
+On Wed, 11 Jun 2025 19:47:54 -0700 Stanislav Fomichev wrote:
+> > There are multiple entry points to this code, basically each member of
+> > struct udp_tunnel_nic_ops and the netdev notifiers. In this patch only
+> > reset and work are locked. I'm a bit confused as to what is the new
+> > lock protecting :S  
 > 
-> FWIW we have tools/net/ynl/ynl-regen.sh, it regenerates the C code 
-> we have committed in the tree (uAPI headers mostly).
-> We could add it there. Which is not to distract from your main
-> point that not having the templates would be ideal.
+> I though that most of the callers are from do_setlink and there we have
+> rtnl and we grab rtnl+lock during the sync. But that doesn't
+> address the suspend/resume vs do_setlink race, that's true :-(
 
-With the new Sphinx extension for netlink specs I posted:
-
-	https://lore.kernel.org/linux-doc/cover.1749723671.git.mchehab+huawei@kernel.org/T/#t
-	https://lore.kernel.org/linux-doc/20250612142438.MED5SEN3C-3RDQI5I1ELC-u8QJEjH8W4vUQRBdyK1tI@z/T/#t
-
-There's no need for a template for each file, although it does require
-updating Documentation/netlink/specs/index.rst. There are a couple
-of reasons:
-
-	1. on my tests, I got some errors auto-generating it while
-	   using:
-		 make SPHINXDIRS="networking netlink" htmldocs
-
-	2. a dynamically-generated file will cause a extra
-	   warnings at the userspace files that contain the name of the
-           netlink spec index.html. Basically, kernel build runs a script
-	   which validates that all files under Documentation/ actually
-	   exist
-
-	3. adding/renaming files typically require changing
-	   MAINTAINERS and/or Makefiles. Updating index.rst
-	   accordingly is already expected for documentation.
-
-In any case, as I didn't drop the existing script, you could add a
-call inside tools/net/ynl/ynl-regen.sh to:
-
-	tools/net/ynl/pyynl/ynl_gen_rst.py -x  -v -o Documentation/netlink/specs/index.rst
-
-To ensure that nobody would forget updating it.
-
-Regards,
-Mauro
+It's the UDP tunnels that add and remove the ports usually.
 
