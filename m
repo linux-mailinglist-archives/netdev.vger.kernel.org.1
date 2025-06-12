@@ -1,166 +1,80 @@
-Return-Path: <netdev+bounces-196951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEFE8AD7122
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:07:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1548DAD7141
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F4993A8DBC
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 13:06:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 088B4189A3D8
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 13:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD2F23BF83;
-	Thu, 12 Jun 2025 13:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2F923BF91;
+	Thu, 12 Jun 2025 13:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j8qCSoTN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4hUTc74"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAC0286A9;
-	Thu, 12 Jun 2025 13:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E077B23BCF5;
+	Thu, 12 Jun 2025 13:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749733623; cv=none; b=LRZRx64Bzm0eaMvR1A2pT+Q2WU0wY6aHs9zRMmobSz7wK8Ivs5RwEq9mb/wW5Hwj0O0J+S8koMZT1ISjrmqniGMww4bVyKFPdSDZzDRGRG81tx/GPB5s2umlbc3OrE4YJUIM2IRi63KCgVJrlpECEe5u5ZXAGu83ysnpLs7ZqsQ=
+	t=1749733691; cv=none; b=XwmxcwLNRoeQ060Dhl2yRpqe0pEziS49Vt48CMkZZSN01sRqM8d32JStclNuNbc7xNcNIFFlJA3wPPpeEDRDeLtZv4cn19ta5HyLFGpGDQ8H8bKk3XkOJpw31TrcVoU+OacpbnyVle1YZhzkEg31qAESo9tEU6bm/08vjwreOdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749733623; c=relaxed/simple;
-	bh=nIP1KIkmxoz7t37R+vM8UOzEC9TBC8VT+7bu8mFXQBA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r+0bkXFSzT995gzN/e/Sv3Z2DJ42zktUaOBBbcsK7p1/c+377a3anxUJVTWyItqHN93dXeUEpZy6hCxwHtGyYrrWTsFDDXN6AIz5y8Nqg3W8psj/dbq+GMp/1VavZqmtL1nUN+M2LywJAgP1/CMSBlAOqtDLbM1ygHuWAASB29Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j8qCSoTN; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-70e2a7a2ce6so1313057b3.0;
-        Thu, 12 Jun 2025 06:07:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749733620; x=1750338420; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9YTCIHOoiA9wRuF/wA++te8rmMS3KK10f8exb80B8Zk=;
-        b=j8qCSoTNYEpYVfpo95pLWKyvxFiCvvODRUKU14sh15BiE15xzUbZDkA7035UESbzOk
-         41qHJ1ZK3ACRify4EatJBTzAKP+jc4POzJfo5sxc7LI64JVtW/GNO05LJMgf9UYHCZ5s
-         MOE8k7OEObkRQVVZWGarhHhjJUve/XdZcWqKH5iCxS+xaTikLcSu1VWlW5MLSQ0cNv4E
-         RCVCmYVIk7p+ih3mLWGucptj1JxjcBPV5QnCeDf3kp9SHLUXrZDOEAjN/7mmsMaRUrVf
-         SDg2n1BOzQAVbu11MSDfbZ9GyMD4sZNobUdKpg1uTPaeaKE7SPK9QhbRcLW6VeEAhmPs
-         OWrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749733620; x=1750338420;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9YTCIHOoiA9wRuF/wA++te8rmMS3KK10f8exb80B8Zk=;
-        b=uTqhvb1dPyWlQi/nU2zR4CpUfjkg2MkwfBG6TGXR/HewqNKGSkg97wbRJCOcVbHiFf
-         2UH9tBU5Bjr6zwJrTnFP+rShRNhbWyCaore3XRdVxWq9SWMZYIG3q1RQ1Ij/y741iij4
-         rC/xdiIOEa83q7jPKpNsLPTUJ470YSa4DTUs8k3/braMOwp/1RxBH+5eDPS6S/1hLNJe
-         KxmVaWFW60rFmIgz1zMaMhsRLLUS1rRsB2lA/uSc9rp1E0ubU9YPAch214WNHg0US+1R
-         /batTyAaArBPpYeit83s9+/JPTLORumrGWcI68OxH5Ubu+edsn/pBnoIPI5kGBMf2Xkv
-         h4Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCV2F3TaqyCv267oxeRQuAfk1ANDYolHUGOITror0c8AexKQ3gMxXxW7ZqvDIna/PXckXMhDm90ow6+7d80a@vger.kernel.org, AJvYcCWDlUoOMEfrJVNooR1ZIB99xnOSM9DVpxhaBRYYk26c7IE2gltrpXilsDvilJAAwsGYGaKfuaZT@vger.kernel.org, AJvYcCWu4oL4CM70sGI8Q/2DksL9ooG9FeAQva7Zl2PTWQnh7aCTih7tfKFcxTI8kr5nqwcwfnSwucOPxFs=@vger.kernel.org, AJvYcCXKwO0rKrqDMljOIX+B0I3oOQ0f9nl3QAcqYRGFRJqrs7su4Lylu8dmksjkqtASgUoSeEx57kAHJc4HkSXqhMmm@vger.kernel.org
-X-Gm-Message-State: AOJu0YySQjKzkbf7PRt3K186SugSO5p5NvW9SVpN9tPEvCNH9zTKIcVM
-	Hx7j+2Wo9cO5m20D7jToR7UD5J04GRH9Fjd6s9/AD+HyMLlxxsKA1wnBLRql+7ID2v8sgeJRg4D
-	1yOexl5NdQif4C5uMFR3WLu4yocvyFio=
-X-Gm-Gg: ASbGnctzHhCpyaEM2d90rk1Y80ryqPIP4Ys95rpkVFZQphdAds63SuBOKvSjYCPA8X9
-	OS42F142Rqx1t8HNqK9JyQ/bGuFa1Pvt7uCbN9/AVj8vveKuPtmsChYCb/INEewTVChzsYBSymY
-	JeXgEuDM+orfKiRPjNr8RxRTCQRs2ZUMKDnKwJWCIGIWGkpRcx/4EVeCiB1GU=
-X-Google-Smtp-Source: AGHT+IED2kJYub7iNi0oRog4IGfnH9hPbxnLWmdDYPS9CmCqxhHia+Ei+Yb2xOs3aB5jRFj+uweNWOPbidBRGHLDI3A=
-X-Received: by 2002:a05:690c:498c:b0:70e:614d:6446 with SMTP id
- 00721157ae682-71140ae0684mr46959417b3.7.1749733620418; Thu, 12 Jun 2025
- 06:07:00 -0700 (PDT)
+	s=arc-20240116; t=1749733691; c=relaxed/simple;
+	bh=8LqQ3WpulRQxv6yiLQBLvRK1gxzUm9ax3ppeC5xwnMQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J6fEjq3ndFz4xEcG3AFFoyWi/dwOi9Mi3b5w+k/foSlZjo/h/vq0MDPdfY0Vadz6dJGuTEYw73xFgq8Ctnnpw9LNlHM8fP0RPy7xl9HPEKQRCaZRejpgdNUWxgnKgrg1N7YGAdMit4DtqEyZR9PildMkDFul8VhzH25ECuSbgNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4hUTc74; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5927C4CEEA;
+	Thu, 12 Jun 2025 13:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749733690;
+	bh=8LqQ3WpulRQxv6yiLQBLvRK1gxzUm9ax3ppeC5xwnMQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n4hUTc74+foIl3XCre/7PHcphwJBhK/25PgzC+eLn2yX5qpddu6EDA6fzyn1F0b85
+	 zaXyHBSs+RpXiYhciySiAG+jirEgIe6BBdaSTNpVWDbgcWVE6QxzDj8zSrMqc7xITu
+	 kcYq3H07vSXygazUYpJrkebN6KqJUqUBjmEcJNzc+gJTnzpn9nONDuruseuq8sXcR0
+	 QGxfKjsegIs795txf9KNBjAZh8GaW7gbFnCo8co+RhRjIoYL6TkiCYZZMvSvexxeTQ
+	 zHQXGGcAepQ6SoXp+jsg654pY+pxkROgKLjAjh93Gifx06NXYI3iKRWE7CF0yBi+aK
+	 EnANXyGY2czlg==
+Date: Thu, 12 Jun 2025 14:08:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, brett.creeley@amd.com
+Subject: Re: [PATCH net] ionic: Prevent driver/fw getting out of sync on
+ devcmd(s)
+Message-ID: <20250612130806.GA414686@horms.kernel.org>
+References: <20250609212827.53842-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611-netconsole-msgid-v1-0-1784a51feb1e@gmail.com>
- <20250611-netconsole-msgid-v1-3-1784a51feb1e@gmail.com> <aEmhA0QoZy3LbAu+@gmail.com>
-In-Reply-To: <aEmhA0QoZy3LbAu+@gmail.com>
-From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Thu, 12 Jun 2025 14:06:48 +0100
-X-Gm-Features: AX0GCFvy6Zg8RCik0v6KsjOcOWhTWL4dg3oZ5AKee0pu47fXiiZYXGhJgvckdwQ
-Message-ID: <CAGSyskW0XHZGHsJ1R2e_Lgh1nG+SJ9Rwk_-nWfU6Xdw5VQTd8A@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/5] netconsole: append msgid to sysdata
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250609212827.53842-1-shannon.nelson@amd.com>
 
-On Wed, Jun 11, 2025 at 4:30=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> On Wed, Jun 11, 2025 at 07:36:05AM -0700, Gustavo Luiz Duarte wrote:
-> > Add msgcounter to the netconsole_target struct to generate message IDs.
-> > If the msgid_enabled attribute is true, increment msgcounter and append
-> > msgid=3D<msgcounter> to sysdata buffer before sending the message.
-> >
-> > Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
-> > ---
-> >  drivers/net/netconsole.c | 14 +++++++++++++-
-> >  1 file changed, 13 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> > index 813f50abaf9f..34b61e299eeb 100644
-> > --- a/drivers/net/netconsole.c
-> > +++ b/drivers/net/netconsole.c
-> > @@ -155,6 +155,8 @@ struct netconsole_target {
-> >       size_t                  userdata_length;
-> >       /* bit-wise with sysdata_feature bits */
-> >       u32                     sysdata_fields;
-> > +     /* protected by target_list_lock */
-> > +     u32                     msgcounter;
-> >  #endif
-> >       struct netconsole_target_stats stats;
-> >       bool                    enabled;
-> > @@ -1345,13 +1347,21 @@ static int sysdata_append_release(struct netcon=
-sole_target *nt, int offset)
-> >                        init_utsname()->release);
-> >  }
-> >
-> > +static int sysdata_append_msgid(struct netconsole_target *nt, int offs=
-et)
-> > +{
-> > +     nt->msgcounter++;
->
-> This will eventually wrap. I am wondering if you should use the
-> overflow.h helpers to avoid warnings in UBSAN and friends.
+On Mon, Jun 09, 2025 at 02:28:27PM -0700, Shannon Nelson wrote:
+> From: Brett Creeley <brett.creeley@amd.com>
+> 
+> Some stress/negative firmware testing around devcmd(s) returning
+> EAGAIN found that the done bit could get out of sync in the
+> firmware when it wasn't cleared in a retry case.
+> 
+> While here, change the type of the local done variable to a bool
+> to match the return type from ionic_dev_cmd_done().
+> 
+> Fixes: ec8ee714736e ("ionic: stretch heartbeat detection")
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
-Good point. I will send v2 using one of the overflow safe macros.
-Thanks for reviewing!
+Reviewed-by: Simon Horman <horms@kernel.org>
 
->
-> Quick glanced over that filed, I found:
->
->         /**
->         * wrapping_add() - Intentionally perform a wrapping addition
->         * @type: type for result of calculation
->         * @a: first addend
->         * @b: second addend
->         *
->         * Return the potentially wrapped-around addition without
->         * tripping any wrap-around sanitizers that may be enabled.
->         */
->
-> > +     return scnprintf(&nt->extradata_complete[offset],
-> > +                      MAX_EXTRADATA_ENTRY_LEN, " msgid=3D%u\n",
-> > +                      nt->msgcounter);
-> > +}
-> > +
-> >  /*
-> >   * prepare_extradata - append sysdata at extradata_complete in runtime
-> >   * @nt: target to send message to
-> >   */
-> >  static int prepare_extradata(struct netconsole_target *nt)
-> >  {
-> > -     u32 fields =3D SYSDATA_CPU_NR | SYSDATA_TASKNAME;
-> > +     u32 fields =3D SYSDATA_CPU_NR | SYSDATA_TASKNAME | SYSDATA_MSGID;
->
-> This might be gone now, according to your last patch.,
->
-> LGTM.
 
