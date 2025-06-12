@@ -1,110 +1,152 @@
-Return-Path: <netdev+bounces-197026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D58AD762D
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:32:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CBEDAD7626
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:31:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CFA518851D8
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF0A116A2E0
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85F72BEC3F;
-	Thu, 12 Jun 2025 15:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45E42C3244;
+	Thu, 12 Jun 2025 15:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="voQbuYRq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XBK70+8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A691B2BDC20
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B8D2BF3DF;
+	Thu, 12 Jun 2025 15:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741731; cv=none; b=ja60UqexsMWvsAQumLGEy4SAIrtdMuu9YaPvJ5VEYXpcZssOWpqmlnNcWwtOjjcGcaG35SflMErZRmzyaqBqNRtbXE8wkrZ2gCJsKXNJdC1CpAyds2CfNlqxvFdrSYvDevWscW+qzRzLR5jF/thHC62LmdKyOftc9F61zc5cOHk=
+	t=1749741801; cv=none; b=ubFsq8l3K9/SEBP/fqQvoC0QsSeKuX/nrLrT8XPTrNrxvfS0yJdt7XiwN6lMxMbKFICh9S17nx0przsl+U3wl8emRfCT7cGqmaYJBVJOIEQAXl+0nl4jqCDRBsf5yJePDPZdMidUT4wVhP+OsYgBkKV3nco5A4Zkex2VJvdhc2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741731; c=relaxed/simple;
-	bh=q+qzIUKyi2oftaz4Bsi1fcHA1qk2+IgJaheBq8hyh+M=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=Afe2NAgTESvz/pWHfTs6DrCTuQOBXPeHVr0BnrUolSo2xuwXn4NrEvtT/egWQYbhsG/WHC0eaf3VOwvI4Wo0F8M3rZ8BcOGDujj7aV9HpEqqRQuyMz7ukAufc1p0i8WTs1bFuX3StgEmJ/d/ijw1Q+Howu+tw4LnwJxjIpLGiBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=voQbuYRq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/wF+9Ix/fwH4D/k6aun5wQuB8ja0uch/p72DUM3MFBM=; b=voQbuYRqlPaJqX/FwxM/fkp+7R
-	hMhKVZSsMFUVlN3Zr+Cu0s5GByPE+NcxB1GCoctgc7gY+uoJ9CfNsQwXZVI28dT9iBhClE7lgTwnk
-	It/xsQd/s35I6/1wRLIe50yQ8SXGdtQaf6npVcOWE7E26uTnI3aIk9MqTpgbTGMnQ2YkJy/PrQe5f
-	mwa2DdSxNahrhVthWaStNC14QwiCw+vIjS3kgye/Yur67kpoK2y5Jtyt9fz6z/BfTjOFf0YyHgPhA
-	vNNHl7tkLx4s+Y73/N+Vu+1cKPOJPaElYnu5XP/msghik8tvCBG3XUfXT1+BybMSVLwcWyvtu87j/
-	OouAJA0Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33414 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uPjkb-00081Y-2V;
-	Thu, 12 Jun 2025 16:21:57 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uPjjx-0049r5-NN; Thu, 12 Jun 2025 16:21:17 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: improve .set_clk_tx_rate() method error
- message
+	s=arc-20240116; t=1749741801; c=relaxed/simple;
+	bh=7+POKnao7dJbjl1goCWSf3SOuai5TxMCVJI0eCvMhl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pNkO2JWjTzeqHm438qpva+KTCIUGy1joYCwlHdBWwYQXKIKxhGru2FUdgaC9J9jmTJ1J5m/+Eb9oaLMjw7rb8KunAoQzG9JiVUztZA4Wjn1mrwtyOdQH/5pKjFr/DCfwHLyJjwunRdFBkE/KoNYrjmFerj5JpAtgn9HFm6FaqhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XBK70+8m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7476AC4CEEA;
+	Thu, 12 Jun 2025 15:23:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749741801;
+	bh=7+POKnao7dJbjl1goCWSf3SOuai5TxMCVJI0eCvMhl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XBK70+8mAD6hUz34u1ynNTORuPkMNSYLirTEViOINENBZ5407zYk4HLRqeP17W/9B
+	 r2T/RngfGRyjBXFassi3AwAo//t5JSlaSdlpTbSuktY5YqTigeFGAe14UPRecFFGrZ
+	 h4ANsE8KM7zyJ+MYcjcoFhRZh1spF96TQOIJ6ll/bwZ63quYEUyuRF3RQZ0aFaWp5z
+	 B7wzht3/RTptjwaOhYWbWSbdiH1a41WZVhZ3YqtuyUzJgiZa6Xf8DoATPYsjAnkWyw
+	 GbRMD5Y3RQ3ktzKKHY9r4VFDpYLxoWpTAVt4wQDa4FF7eEXPjkrKK3xkJNquJNO65f
+	 rwCl5GmA+SldA==
+Date: Thu, 12 Jun 2025 16:23:13 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	linux@roeck-us.net, jdelvare@suse.com,
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250612152313.GP381401@google.com>
+References: <20250604041418.1188792-1-tmyu0@nuvoton.com>
+ <20250604041418.1188792-2-tmyu0@nuvoton.com>
+ <20250612140041.GF381401@google.com>
+ <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uPjjx-0049r5-NN@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 12 Jun 2025 16:21:17 +0100
+In-Reply-To: <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
 
-Improve the .set_clk_tx_rate() method error message to include the
-PHY interface mode along with the speed, which will be helpful to
-the RK implementations.
+On Thu, 12 Jun 2025, Ming Yu wrote:
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> Dear Lee,
+> 
+> Thank you for reviewing,
+> 
+> Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午10:00寫道：
+> >
+> ...
+> > > +static const struct mfd_cell nct6694_devs[] = {
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
+> > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
+> > > +
+> > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
+> > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
+> > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
+> > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
+> > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
+> > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
+> >
+> > Why have we gone back to this silly numbering scheme?
+> >
+> > What happened to using IDA in the child driver?
+> >
+> 
+> In a previous version, I tried to maintain a static IDA in each
+> sub-driver. However, I didn’t consider the case where multiple NCT6694
+> devices are bound to the same driver — in that case, the IDs are not
+> fixed and become unusable for my purpose.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 1369fa70bc58..24a4b82e934b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1062,8 +1062,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 						interface, speed);
- 		if (ret < 0)
- 			netdev_err(priv->dev,
--				   "failed to configure transmit clock for %dMbps: %pe\n",
--				   speed, ERR_PTR(ret));
-+				   "failed to configure %s transmit clock for %dMbps: %pe\n",
-+				   phy_modes(interface), speed, ERR_PTR(ret));
- 	}
- 
- 	stmmac_mac_set(priv, priv->ioaddr, true);
+Not sure I understand.
+
+> I’ve since realized that using pdev->id avoids the need for cell->id,
+> so I reverted to the earlier approach.
+> 
+> That said, do you think it would be a better solution to manage all
+> the IDAs centrally within the driver? For example:
+> in nct6694.c
+> struct nct6694 {
+>     struct device *dev;
+> 
+>     struct ida gpio_ida;
+>     struct ida i2c_ida;
+>     struct ida can_ida;
+>     struct ida wdt_ida;
+> };
+> 
+> static int nct6694_probe(struct platform_device *pdev)
+> {
+>     ida_init(&nct6694->gpio_ida);
+>     ...
+> }
+> 
+> in gpio-nct6694.c
+> static int nct6694_gpio_probe(struct platform_device *pdev)
+> {
+>     id = ida_alloc(&nct6694->gpio_ida, GFP_KERNEL);
+> }
+
+No that would be way worse.
+
 -- 
-2.30.2
-
+Lee Jones [李琼斯]
 
