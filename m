@@ -1,138 +1,260 @@
-Return-Path: <netdev+bounces-196893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F63AD6DB1
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:29:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D76AAD6DA7
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:27:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 985961BC58AD
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:27:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A026D16EA69
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBD3238C1D;
-	Thu, 12 Jun 2025 10:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53ED235364;
+	Thu, 12 Jun 2025 10:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="p7V5SeNY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcmHlKN1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F2A22DF84
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 10:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977F013C8E8;
+	Thu, 12 Jun 2025 10:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749724004; cv=none; b=uXQuf5HRTqPr9ho1LI8MDI+Wyl0cbRPJmGbIdpuAFKBWxGzQqrVUKrb0VGZ6bQHa8KsbV7E8S+F/l4u2GcATLz+D0hheRfVgVJrb8ZMI+dCqZ7E4zZt+85ZueIj40/aXmwdYkhFJ0rG6LfFj4ywb8uPc7nuiHbdLHdLf7NUZGeA=
+	t=1749724003; cv=none; b=hU6JNBWwehprPJy/4nmsvQEduBzvNe1M2PzW9YU2k6mHNQ4/n7D6CS9z/26T6wI9kd9FCgOW9ZrOlZv3t1sdLl2Zk0kgDnNHnA8GjxK4I0hSH89wUu/vnsizkzEv8xiaQ3Q9DnqRZsAPGNBLcn2b1RW8vjoJ1CBU6NL58shXmZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749724004; c=relaxed/simple;
-	bh=YyL/4hTpoTkSlenM97Vf9/4GwWZLKQyMjaPVATyQ104=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a607KgqV/aurVKe6A0UBQqDy5b4/LWzybsPHgKqF5UzI43aZXBpTPHSz8pAX2WMT2ldWAq8qm6tyPlXv5vT8HtXzCBJwUO1D1s+py5zCEUvrHhSz4lA2aga8dcEV3/AfFuEhUMkyUPDBm1pl2OqMhHtXwQvFnQ+u2clDKmbfLuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=p7V5SeNY; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-54afb5fcebaso763052e87.3
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 03:26:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1749724000; x=1750328800; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MdJDAjJnOGg9m+f2BO12DY9iSOByKl7mj3nYhv8dMh8=;
-        b=p7V5SeNYl6Cxxz0HwHl5fKqP3BtsxlVGmUDP8bXXiKDVGgSENdxjIfQ2DcEGYxw6fH
-         xP8lkVUn4L/nF9dvlNaK3x6MaaWzkwwXDoSXWYJeuWosqcRrvvewye6sld5VuUje41gY
-         KPKRRc04OvJChtvOHQkGUrwF+zin0fh8Jooh/mVmlzqht7mNk2NZZvPWXqQJNWv5rbDc
-         vVEax6KBFwWnrtniXnWR/3tMS54r2cgF3K6adFfUGxTTQ0wjzycCqpKYg0Kg/flJVstd
-         FOn46q2htbb9zcuQs0+c0uaWDDES/I3CRYaHo7k39bmmiy5tnODqjsMo5IFWpBBQZ66z
-         cMaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749724000; x=1750328800;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MdJDAjJnOGg9m+f2BO12DY9iSOByKl7mj3nYhv8dMh8=;
-        b=Ksu+K7sZ0zC8MGGRl02Olosg5XWmoFCWVN0YYAFzdhzYAjCQG7IBpJfSIuRz4ry/0p
-         OqbN/IGcYGoin5hUfRq1vs4KklIH2VT89pgBcs+72yoB/K66Jm4vBODgcCeRaqOSjZbv
-         Bm+0Q8oFfsIpuHx/tj94qppJLSzL+ZV+a9v9obajLCdicNB1MYwSz/2c2CcNfHAKoiKj
-         maS1A4MRbFNnD3u52qDAxqP57KbmTAGCTvY3o8pYazvG6vE7wyUkZ6A00cGwuKzvPyz7
-         cQYtpufwd8h111ZGneU1sIbQ/3WLdOqQRxs6Flnd+7aWFz2/ZtJt+EbCB/pzZxU7TBCE
-         WIGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUF6SNTgwFncvsaR4OTyDfj5TH2DmZ+Lp0Loo6cnWSKNjQCc8P2A8RTNc+DcMfCD0VMfNI3GYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiHWLcDLJJmgyhRSozB44G9+VcOhv+NLBeRqjkLeKKDMhgjeOq
-	BZAa0KLIavMys/ogFJoKkQzeRzFzi/cks4Y6Ybkp80oNU+Tq+VsOM9N2hyY9WpMMPaA=
-X-Gm-Gg: ASbGncu3rQFwRu1+DXDVyUT08iiEGPtKvmz+EdFyCaSZ3fjYn9UHsL3XpGrKDSFwB+w
-	MzheN32qc3HM3AWacOeQpNXwH75gUt42kTZDAK5tsVaxhUxl0twRNN0HZAE6loVpJ2lIDAJkl3r
-	GV2D9qHVwBu9nA28729vCLLwxtlLBBIzrSmitXlm15XvO0Ju3KIMHIxNGRGQWnFG4zckzVLO5hA
-	SHQ+fU3alFsAuleEbsdv3655Kw4Q1W9eJddyD1vAJLpOkpVoBUQikyFkzQ7OcNesQ9ghAdylblr
-	IQeiua1g7gWaRXdoMuvP5pxVDtWCliQaZIOrdIsU5ULAu0nxdeGVDtXzvMyeC+7cGKDdR7jaTgI
-	pS1iWCyQyf7jNswTZ2eyjjimhJMOM614=
-X-Google-Smtp-Source: AGHT+IHHqJ44Ct1FoYfnZLyIQMx7/aVtR1UCzN0V7itmwjRYgTqX7/tWU5uzWOsByUY8NL7s39OB9w==
-X-Received: by 2002:a05:6512:12ca:b0:549:8a44:493e with SMTP id 2adb3069b0e04-5539c0a32a6mr2136961e87.5.1749723999835;
-        Thu, 12 Jun 2025 03:26:39 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553ac116968sm66714e87.32.2025.06.12.03.26.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 03:26:39 -0700 (PDT)
-Message-ID: <985001ce-7610-4653-b13b-8d3976309e44@blackwall.org>
-Date: Thu, 12 Jun 2025 13:26:37 +0300
+	s=arc-20240116; t=1749724003; c=relaxed/simple;
+	bh=tAJKRWzg1rS1UnSrbY96N/b3j0qzmKDhJ4rD85IR0L0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lIYZMYiVnTFmGCJxcD9z/zP0bldZkoFiYy9ZUZF4z8Mc4JkL9wsTyc1PulpKZmX/8BJvSoBor6+Iu2fUahJTyVRz2UV+aa9R7MSpLBgiTM40tlhH0m3NZQ6enPhfd0AuGD1SwAtNIuH6rYH57ou4XCJYIdZNxWFM9T6/Ja8OIbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcmHlKN1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7FEEC4CEEA;
+	Thu, 12 Jun 2025 10:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749724003;
+	bh=tAJKRWzg1rS1UnSrbY96N/b3j0qzmKDhJ4rD85IR0L0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bcmHlKN1sWdp5SOzi3khF2Z6QvhFoAeVZA+h/UX6TLSmoT1h2tDPqMFuQxBscZKib
+	 arY6EXTTKqFRlDBaSg82lQGGUvyLMzcVwej8KyKEq5hZ760NMKCirkfp4ITSufl35m
+	 p/CpJCd5eBTsrRznHaNNO9mkRps+Gn8K5II+4QRuyrQerOX+3vl2IEfd+Cm19FkTvx
+	 KFVXODM/u2qjy6rvZj1062ktJQWxWT7w+fyqCqAVHSZnsfxKnaEcID+1Aeon8rbOs/
+	 EfwLxnGFFhhDt2Qza/kdcbEJfxgUFVGWJjsc6P/3onw3DudxGlieAWU7m30fHfE2e6
+	 Ri2uvuvYHHbiw==
+Date: Thu, 12 Jun 2025 11:26:37 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+Message-ID: <20250612102637.GB381401@google.com>
+References: <2e3eb9e3-151d-42ef-9043-998e762d3ba6@redhat.com>
+ <aBt1N6TcSckYj23A@smile.fi.intel.com>
+ <20250507152609.GK3865826@google.com>
+ <b095ffb9-c274-4520-a45e-96861268500b@redhat.com>
+ <20250513094126.GF2936510@google.com>
+ <6f693bb5-da3c-4363-895f-58a267e52a18@redhat.com>
+ <20250522073902.GC8794@google.com>
+ <7421647b-ae85-4f34-843c-02f1fb21d7f3@redhat.com>
+ <20250522104551.GD1199143@google.com>
+ <73eb151c-93cd-4617-b0e4-f7dccb20c4cb@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] selftests: net: Add a selftest for
- externally validated neighbor entries
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, horms@kernel.org, donald.hunter@gmail.com,
- petrm@nvidia.com, daniel@iogearbox.net
-References: <20250611141551.462569-1-idosch@nvidia.com>
- <20250611141551.462569-3-idosch@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250611141551.462569-3-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <73eb151c-93cd-4617-b0e4-f7dccb20c4cb@redhat.com>
 
-On 6/11/25 17:15, Ido Schimmel wrote:
-> Add test cases for externally validated neighbor entries, testing both
-> IPv4 and IPv6. Name the file "test_neigh.sh" so that it could be
-> possibly extended in the future with more neighbor test cases.
-> 
-> Example output:
-> 
->   # ./test_neigh.sh
->   TEST: IPv4 "extern_valid" flag: Add entry                           [ OK ]
->   TEST: IPv4 "extern_valid" flag: Add with an invalid state           [ OK ]
->   TEST: IPv4 "extern_valid" flag: Add with "use" flag                 [ OK ]
->   TEST: IPv4 "extern_valid" flag: Replace entry                       [ OK ]
->   TEST: IPv4 "extern_valid" flag: Replace entry with "managed" flag   [ OK ]
->   TEST: IPv4 "extern_valid" flag: Replace with an invalid state       [ OK ]
->   TEST: IPv4 "extern_valid" flag: Transition to "reachable" state     [ OK ]
->   TEST: IPv4 "extern_valid" flag: Transition back to "stale" state    [ OK ]
->   TEST: IPv4 "extern_valid" flag: Forced garbage collection           [ OK ]
->   TEST: IPv4 "extern_valid" flag: Periodic garbage collection         [ OK ]
->   TEST: IPv6 "extern_valid" flag: Add entry                           [ OK ]
->   TEST: IPv6 "extern_valid" flag: Add with an invalid state           [ OK ]
->   TEST: IPv6 "extern_valid" flag: Add with "use" flag                 [ OK ]
->   TEST: IPv6 "extern_valid" flag: Replace entry                       [ OK ]
->   TEST: IPv6 "extern_valid" flag: Replace entry with "managed" flag   [ OK ]
->   TEST: IPv6 "extern_valid" flag: Replace with an invalid state       [ OK ]
->   TEST: IPv6 "extern_valid" flag: Transition to "reachable" state     [ OK ]
->   TEST: IPv6 "extern_valid" flag: Transition back to "stale" state    [ OK ]
->   TEST: IPv6 "extern_valid" flag: Forced garbage collection           [ OK ]
->   TEST: IPv6 "extern_valid" flag: Periodic garbage collection         [ OK ]
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->   tools/testing/selftests/net/Makefile      |   1 +
->   tools/testing/selftests/net/test_neigh.sh | 337 ++++++++++++++++++++++
->   2 files changed, 338 insertions(+)
->   create mode 100755 tools/testing/selftests/net/test_neigh.sh
-> 
+On Thu, 22 May 2025, Ivan Vecera wrote:
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> On 22. 05. 25 12:45 odp., Lee Jones wrote:
+> > On Thu, 22 May 2025, Ivan Vecera wrote:
+> > 
+> > > 
+> > > 
+> > > On 22. 05. 25 9:39 dop., Lee Jones wrote:
+> > > > On Tue, 13 May 2025, Ivan Vecera wrote:
+> > > > 
+> > > > > On 13. 05. 25 11:41 dop., Lee Jones wrote:
+> > > > > > On Mon, 12 May 2025, Ivan Vecera wrote:
+> > > > > > 
+> > > > > > > On 07. 05. 25 5:26 odp., Lee Jones wrote:
+> > > > > > > > On Wed, 07 May 2025, Andy Shevchenko wrote:
+> > > > > > > > 
+> > > > > > > > > On Wed, May 07, 2025 at 03:56:37PM +0200, Ivan Vecera wrote:
+> > > > > > > > > > On 07. 05. 25 3:41 odp., Andy Shevchenko wrote:
+> > > > > > > > > > > On Wed, May 7, 2025 at 3:45 PM Ivan Vecera <ivecera@redhat.com> wrote:
+> > > > > > > > > 
+> > > > > > > > > ...
+> > > > > > > > > 
+> > > > > > > > > > > > +static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
+> > > > > > > > > > > > +       { .channel = 0, },
+> > > > > > > > > > > > +       { .channel = 1, },
+> > > > > > > > > > > > +       { .channel = 2, },
+> > > > > > > > > > > > +       { .channel = 3, },
+> > > > > > > > > > > > +       { .channel = 4, },
+> > > > > > > > > > > > +};
+> > > > > > > > > > > 
+> > > > > > > > > > > > +static const struct mfd_cell zl3073x_devs[] = {
+> > > > > > > > > > > > +       ZL3073X_CELL("zl3073x-dpll", 0),
+> > > > > > > > > > > > +       ZL3073X_CELL("zl3073x-dpll", 1),
+> > > > > > > > > > > > +       ZL3073X_CELL("zl3073x-dpll", 2),
+> > > > > > > > > > > > +       ZL3073X_CELL("zl3073x-dpll", 3),
+> > > > > > > > > > > > +       ZL3073X_CELL("zl3073x-dpll", 4),
+> > > > > > > > > > > > +};
+> > > > > > > > > > > 
+> > > > > > > > > > > > +#define ZL3073X_MAX_CHANNELS   5
+> > > > > > > > > > > 
+> > > > > > > > > > > Btw, wouldn't be better to keep the above lists synchronised like
+> > > > > > > > > > > 
+> > > > > > > > > > > 1. Make ZL3073X_CELL() to use indexed variant
+> > > > > > > > > > > 
+> > > > > > > > > > > [idx] = ...
+> > > > > > > > > > > 
+> > > > > > > > > > > 2. Define the channel numbers
+> > > > > > > > > > > 
+> > > > > > > > > > > and use them in both data structures.
+> > > > > > > > > > > 
+> > > > > > > > > > > ...
+> > > > > > > > > > 
+> > > > > > > > > > WDYM?
+> > > > > > > > > > 
+> > > > > > > > > > > OTOH, I'm not sure why we even need this. If this is going to be
+> > > > > > > > > > > sequential, can't we make a core to decide which cell will be given
+> > > > > > > > > > > which id?
+> > > > > > > > > > 
+> > > > > > > > > > Just a note that after introduction of PHC sub-driver the array will look
+> > > > > > > > > > like:
+> > > > > > > > > > static const struct mfd_cell zl3073x_devs[] = {
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-dpll", 0),  // DPLL sub-dev for chan 0
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-phc", 0),   // PHC sub-dev for chan 0
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-dpll", 1),  // ...
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-phc", 1),
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-dpll", 2),
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-phc", 2),
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-dpll", 3),
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-phc", 3),
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-dpll", 4),
+> > > > > > > > > >            ZL3073X_CELL("zl3073x-phc", 4),   // PHC sub-dev for chan 4
+> > > > > > > > > > };
+> > > > > > > > > 
+> > > > > > > > > Ah, this is very important piece. Then I mean only this kind of change
+> > > > > > > > > 
+> > > > > > > > > enum {
+> > > > > > > > > 	// this or whatever meaningful names
+> > > > > > > > > 	..._CH_0	0
+> > > > > > > > > 	..._CH_1	1
+> > > > > > > > > 	...
+> > > > > > > > > };
+> > > > > > > > > 
+> > > > > > > > > static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
+> > > > > > > > >            { .channel = ..._CH_0, },
+> > > > > > > > >            ...
+> > > > > > > > > };
+> > > > > > > > > 
+> > > > > > > > > static const struct mfd_cell zl3073x_devs[] = {
+> > > > > > > > >            ZL3073X_CELL("zl3073x-dpll", ..._CH_0),
+> > > > > > > > >            ZL3073X_CELL("zl3073x-phc", ..._CH_0),
+> > > > > > > > >            ...
+> > > > > > > > > };
+> > > > > > > > 
+> > > > > > > > This is getting hectic.  All for a sequential enumeration.  Seeing as
+> > > > > > > > there are no other differentiations, why not use IDA in the child
+> > > > > > > > instead?
+> > > > > > > 
+> > > > > > > For that, there have to be two IDAs, one for DPLLs and one for PHCs...
+> > > > > > 
+> > > > > > Sorry, can you explain a bit more.  Why is this a problem?
+> > > > > > 
+> > > > > > The IDA API is very simple.
+> > > > > > 
+> > > > > > Much better than building your own bespoke MACROs.
+> > > > > 
+> > > > > I will try to explain this in more detail... This MFD driver handles
+> > > > > chip family ZL3073x where the x == number of DPLL channels and can
+> > > > > be from <1, 5>.
+> > > > > 
+> > > > > The driver creates 'x' DPLL sub-devices during probe and has to pass
+> > > > > channel number that should this sub-device use. Here can be used IDA
+> > > > > in DPLL sub-driver:
+> > > > > e.g. ida_alloc_max(zldev->channels, zldev->max_channels, GFP_KERNEL);
+> > > > > 
+> > > > > This way the DPLL sub-device get its own unique channel ID to use.
+> > > > > 
+> > > > > The situation is getting more complicated with PHC sub-devices because
+> > > > > the chip can provide UP TO 'x' PHC sub-devices depending on HW
+> > > > > configuration. To handle this the MFD driver has to check this HW config
+> > > > > for particular channel if it is capable to provide PHC functionality.
+> > > > > 
+> > > > > E.g. ZL30735 chip has 5 channels, in this case the MFD driver should
+> > > > > create 5 DPLL sub-devices. And then lets say channel 0, 2 and 4 are
+> > > > > PHC capable. Then the MFD driver should create 3 PHC sub-devices and
+> > > > > pass 0, 2 resp. 4 for them.
+> > > > 
+> > > > Where is the code that determines which channels are PHC capable?
+> > > 
+> > > It is not included in this series and will be added once the PTP driver
+> > > will be added. But the code looks like:
+> > > 
+> > > for (i = 0; i < ZL3073X_MAX_CHANNELS; i++) {
+> > > 	if (channel_is_in_nco_mode(..., i)) {
+> > > 		struct mfd_cell phc_dev = ZL3073X_CELL("zl3073x-phc", i);
+> > > 		rc = devm_mfd_add_devices(zldev->dev,
+> > > 					  PLATFORM_DEVID_AUTO, &phc_dev,
+> > > 					  1, NULL, 0, NULL);
+> > > 		...
+> > > 	}
+> > > }
+> > 
+> > It's the channel_is_in_nco_mode() code I wanted to see.
+> 
+> The function is like this:
+> 
+> static bool zl3073x_chan_in_nco_mode(struct zl3073x_dev *zldev, u8 ch)
+> {
+> 	u8 mode, mode_refsel;
+> 	int rc;
+> 
+> 	rc = zl3073x_read_u8(zlptp->mfd,
+> 			     ZL_REG_DPLL_MODE_REFSEL(ch), &mode_refsel);
+> 	if (rc)
+> 		return false;
+> 
+> 	mode = FIELD_GET(ZL_DPLL_MODE_REFSEL_MODE, mode_refsel);
+> 
+> 	return (mode == ZL_DPLL_MODE_REFSEL_MODE_NCO);
+> }
+> 
+> > What if you register all PHC devices, then bomb out if
+> > !channel_is_in_nco_mode()?  Presumably this can / should also live in
+> > the PHC driver as well?
+> 
+> Yes, we can register PHC sub-dev for all channels disregard to channel
+> mode. The PHC driver checks for the mode and return -ENODEV when it is
+> different from NCO. But in this case the user will see PHC platform
+> devices under /sys/bus/platform/device and some of them won't have
+> driver bound (they will look like some kind of phantom devices).
+> I'm not sure if this is OK and not confusing.
 
+There will be plenty of devices which do not successfully probe for one
+reason or another.  This is all that these 'phantom devices' will
+indicate.
+
+-- 
+Lee Jones [李琼斯]
 
