@@ -1,127 +1,150 @@
-Return-Path: <netdev+bounces-197210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27A7AAD7C83
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:36:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EAD6AD7C99
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343A93A9D1C
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:36:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEDA31777D2
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6C62D6632;
-	Thu, 12 Jun 2025 20:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772072D876E;
+	Thu, 12 Jun 2025 20:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rg5WjKI4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I2iLAhFz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75152D3A85
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1172D661D
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749760601; cv=none; b=luTB7IlsFcXqlenNwS4COGd4A5VpN/BHdcCFXTNlVvakqGrtKAoIcPMnq6VheZbXXUIQVP489wYyLmsias45iH8c390c5WT7fmGVghaycY4VWQXdVk0hJMfwbLuOjUw+v4ozlb6zq8vtDR92fPK/PvRYeznI639GlIi9UM1uaII=
+	t=1749761099; cv=none; b=nyqtnXxUfoOpwRYU2ppQEWWK3IkH/J8iY4xkVU51yTWS6fETGNDAg6kDCaIH8dezd/V/wSDcyWlNISZNTWQ9+RJFokWPo/lAZHG9tRalvJ4tpGVxkL4+H6G8RlMwzKcwcpgVavxhDc5oKdlmGJ2HywO2siPGHnvOk6vI3gmBNMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749760601; c=relaxed/simple;
-	bh=SAU5o2DQ0CfgLin1S8tnE5huEGqu4f6AQhBXhQIQYLU=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=hNvBRBI9sNJgqem0seb7iHL/sU2FnHarNH3KY8wQ01ML5oshEooH6e1/KDaCz/gkHTPfgNaysYZVe3Mkl8wk3dBJSkF/IlOdr++C+TuVTB4o3BQkceCvmo28Ual776mBS/XIqY0F4axibHtIsNgIa63dJUsHW+Ch29n4ZSNsoDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rg5WjKI4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749760598;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gj8SQGLLh0rljui6jnNkQMA92RjfoZpiblWpalJC6vA=;
-	b=Rg5WjKI4qZC5T1frLTsrPAXilqvmhnWHGInmK+jk7DVIBEPEWlyhn82KH6ntZ/nR7aqb5Q
-	53hOh3+3Qf+ejGayyQx4bNReLdgDPFD1YebdPlDmloho/gShufugWCE0dXjNHjN6Wl3tHo
-	smG72wIlombDgjdTW6pVA/gL5yljs2Q=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-589-yC1TTY1fOoaf_k-updd0AA-1; Thu,
- 12 Jun 2025 16:36:35 -0400
-X-MC-Unique: yC1TTY1fOoaf_k-updd0AA-1
-X-Mimecast-MFC-AGG-ID: yC1TTY1fOoaf_k-updd0AA_1749760593
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E95CE180AB15;
-	Thu, 12 Jun 2025 20:36:29 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 84881195E340;
-	Thu, 12 Jun 2025 20:36:19 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <2dc7318d6c74b27a49b4c64b513f3da13d980473.camel@HansenPartnership.com>
-References: <2dc7318d6c74b27a49b4c64b513f3da13d980473.camel@HansenPartnership.com> <462886.1749731810@warthog.procyon.org.uk>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: dhowells@redhat.com, keyrings@vger.kernel.org,
-    Jarkko Sakkinen <jarkko@kernel.org>,
-    Steve French <sfrench@samba.org>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Mimi Zohar <zohar@linux.ibm.com>, Paulo Alcantara <pc@manguebit.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Jeffrey Altman <jaltman@auristor.com>, hch@infradead.org,
-    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-    linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] Keyrings: How to make them more useful
+	s=arc-20240116; t=1749761099; c=relaxed/simple;
+	bh=0shdeU3Nmns13gIvSpekGMtrKZaAuIpc2PTkyCP2Tbc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jRlNRXm5RX6dJ2LwP3i/gnq/XBoE0HMT7ynmhLJgP/gXWmcGdwCwNeLdYUOsnUFC2eNT3EdOVuRBhYhSHfhknZjou9Ow2U6mZQjea2osx9XTzyFr+u4a0dZ0bRFjass39Hct8hCyk2MBhHunApjmC8209zXEFAHYr0MT8ukP3iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I2iLAhFz; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2348ac8e0b4so18455ad.1
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 13:44:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749761097; x=1750365897; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0shdeU3Nmns13gIvSpekGMtrKZaAuIpc2PTkyCP2Tbc=;
+        b=I2iLAhFzijgdQ1YNvUeyvqvftSrEFW1ueLbsQMK8NMgetrYBJj7Fs12MvPJ7zbLifs
+         yq0SZMlQb66p/GwBtC96c2S/vj+n/byGC/IwccATCNzh3ECLtciyKj+5tVyn/TePniAb
+         R52oTb2kv0+g3xSj3bL1ANoWy1SFuhWqTi7ISqoArdOjj0I9pH8A+izFsDGdvhE6JEHn
+         9VbBRTuGnjqfK23IPzFhmuNgtxCyzw75erN4u18qqlrQraVBNIsnzFgTBYg6oke6I9lB
+         6hqiGgR8nCGG9NZU7zwDzKG4NDYaBt9nPoPJnwTCHEJ9Cry7Xe1VuDmfs4DW1a6Hf1zh
+         oB9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749761097; x=1750365897;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0shdeU3Nmns13gIvSpekGMtrKZaAuIpc2PTkyCP2Tbc=;
+        b=ZfuLuYGox7NVtY8x23IjbJLU8CJX+6NnzluC5/aZ9dHNOB3HidvYrqOYtRu3H58ilV
+         IGaS+5uh4/iHdix9XFkQMlcY1JzyOXb1hJCINq3uPuvBH1O/dglC8wfdPzLL3jwbSniL
+         xERTy0ZJUXpWhL7YylW1hFrDHVl/egBkE03iz9BlMVZponG1Zz6gjDB2oNEcjrILI6mP
+         Ik0tCa7ocT8ioNdxLD8UKOCXb1DgrCqjjhP7YLfh0HRhECdroFseDEl5a0wSoXhHnIz1
+         Y6RnSFJqRarqeJEeNkegQdzdS9Ei7Y45nRZ+TCwEaChg2953wcWcSOdmEOpNtFCgSFQe
+         7+YA==
+X-Forwarded-Encrypted: i=1; AJvYcCUgu80veFCr5n0wb/sldj9uMrSKF8U2J7SREKhBCEtu7KfNx3/KelAB4ByOyMbpznmnjE66NgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+OQ6eDcCBb1WLLhX9TEaCkNTr6xeRzgzKUdofzygX2/gpuk68
+	xk+aBSFrWCWKiyLP13R7lzW33CBKjP88Z+5773GYOMXfUZ/JuH5Ud3NCxXOFGGJDpkvEGQKmHYi
+	jnZZTxeLi0KCvU5f/gepScYsnJGOWV2IGZAq5ZoTD
+X-Gm-Gg: ASbGncu36Gpm36pk/pUr8Wzz8tnwph9DuF8MCn9vV0jI8CpCSt4xwnxwDVRpxfA8XwT
+	mneRB0UHy9q5F0DztzdTZqo4f+pyZiJXOFmKQt3ZjEu9zNP4g5f4/Gic7OYhk9CM3gZRhrrqQVW
+	SAl6UvF/kciYTsoV/c+vrWH8dZp/eCgEaub4ucF8wqUBLwDqwJATkflTDEe8sTJlmsAzgTl9cdY
+	w==
+X-Google-Smtp-Source: AGHT+IFQpp/hgcePI2xWrpQ53G9VWOawnMErUaqEJq2tPNn7M+/QfKB23VjAX85ytCeOgogiZvSGZYySA5m/hlCuyso=
+X-Received: by 2002:a17:902:d48d:b0:223:ff93:322f with SMTP id
+ d9443c01a7336-2365e8c8cf4mr545805ad.2.1749761096753; Thu, 12 Jun 2025
+ 13:44:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <473710.1749760578.1@warthog.procyon.org.uk>
-Date: Thu, 12 Jun 2025 21:36:18 +0100
-Message-ID: <473711.1749760578@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20250609145833.990793-1-mbloch@nvidia.com> <20250609145833.990793-11-mbloch@nvidia.com>
+ <CAHS8izOX8t-Xu+mseiRBvLDYmk6G+iH=tX6t4SWY2TKBau7r-Q@mail.gmail.com> <9107e96e488a741c79e0f5de33dd73261056c033.camel@nvidia.com>
+In-Reply-To: <9107e96e488a741c79e0f5de33dd73261056c033.camel@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 12 Jun 2025 13:44:44 -0700
+X-Gm-Features: AX0GCFsbgTfnHYCyryWuORz2W8YB0hxZo0nQDPNGkYposr4yQdjwdikAQJMpVe0
+Message-ID: <CAHS8izOG+LoJ-GvyRu6zSVCUvoW4VzYX5CEdDhCdVLimOSP0KQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 10/12] net/mlx5e: Implement queue mgmt ops and
+ single channel swap
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: Mark Bloch <mbloch@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "hawk@kernel.org" <hawk@kernel.org>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>, 
+	"leon@kernel.org" <leon@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"ast@kernel.org" <ast@kernel.org>, "richardcochran@gmail.com" <richardcochran@gmail.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, 
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>, 
+	"horms@kernel.org" <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, Tariq Toukan <tariqt@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Gal Pressman <gal@nvidia.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
+On Thu, Jun 12, 2025 at 2:05=E2=80=AFAM Cosmin Ratiu <cratiu@nvidia.com> wr=
+ote:
+>
+> On Wed, 2025-06-11 at 22:33 -0700, Mina Almasry wrote:
+> > Is this really better than maintaining uniformity of behavior between
+> > the drivers that support the queue mgmt api and just doing the
+> > mlx5e_deactivate_priv_channels and mlx5e_close_channel in the stop
+> > like core sorta expects?
+> >
+> > We currently use the ndos to restart a queue, but I'm imagining in
+> > the
+> > future we can expand it to create queues on behalf of the queues. The
+> > stop queue API may be reused in other contexts, like maybe to kill a
+> > dynamically created devmem queue or something, and this specific
+> > driver may stop working because stop actually doesn't do anything?
+> >
+>
+> The .ndo_queue_stop operation doesn't make sense by itself for mlx5,
+> because the current mlx5 architecture is to atomically swap in all of
+> the channels.
+> The scenario you are describing, with a hypothetical ndo_queue_stop for
+> dynamically created devmem queues would leave all of the queues stopped
+> and the old channel deallocated in the channel array. Worse problems
+> would happen in that state than with today's approach, which leaves the
+> driver in functional state.
+>
+> Perhaps Saeed can add more details to this?
 
-> One of the problems I keep tripping over is different special casing
-> for user keyrings (which are real struct key structures) and system
-> keyrings which are special values of the pointer in struct key *.
+I see, so essentially mlx5 supports restarting a queue but not
+necessarily stopping and starting a queue as separate actions?
 
-It's meant to be like that.  The trusted system keyrings are static within
-system_keyring.c and not so easily accessible by kernel modules for
-direct modification, bypassing the security checks.
+If so, can maybe the comment on the function be reworded to more
+strongly indicate that this is a limitation? Just asking because
+future driver authors interested in implementing the queue API will
+probably look at one of mlx5/gve/bnxt to see what an existing
+implementation looks like, and I would rather them follow bnxt/gve
+that is more in line with core's expectations if possible. But that's
+a minor concern; I'm fine with this patch.
 
-Obviously this is merely a bit of obscurity and enforcement isn't possible
-against kernel code that is determined to modify those keyrings or otherwise
-interfere in the verification process.
+FWIW this may break in the future if core decides to add code that
+actually uses the stop operation as a 'stop', not as a stepping stone
+to 'restart', but I'm not sure we can do anything about that if it's a
+driver limitation.
 
-> For examples of what this special handling does, just look at things
-> like bpf_trace.c:bpf_lookup_{user|system}_key
-> 
-> Since the serial allocation code has a hard coded not less than 3
-> (which looks for all the world like it was designed to mean the two
-> system keyring id's were never used as user serial numbers)
-
-That's just a coincidence.  The <3 thing predates the advent of those system
-keyring magic pointers.
-
-> I think we could simply allow the two system keyring ids to be passed into
-> lookup_user_key() (which now might be a bit misnamed) and special case not
-> freeing it in put_key().
-
-If you want to make lookup_user_key() provide access to specific keyrings like
-this, just use the next negative numbers - it's not like we're likely to run
-out soon.
-
-But I'd rather not let lookup_user_key() return pointers to these keyrings...
-
-David
-
+--=20
+Thanks,
+Mina
 
