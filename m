@@ -1,519 +1,302 @@
-Return-Path: <netdev+bounces-196803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11952AD66F8
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 06:55:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4460EAD6700
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 06:59:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BCB73ABD51
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 04:55:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AE961897986
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 04:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3D71EA91;
-	Thu, 12 Jun 2025 04:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3724143736;
+	Thu, 12 Jun 2025 04:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3cx4BRo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C2vaP1HC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE41C10957
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 04:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749704153; cv=none; b=QuP81DL5wg2lOFrWVAuNp9a+2A67ioASEdYkUo0gwWNoNDBj1izXvl4HaCl8jUAAAHphg5GlRMet7VJkMW+Vkppq+4a3ctCLpcsB2e+nBl4JEYb8KWIw9v/smpCeir6vvsX4QnwyWLHc7vmPsihJmdSf/PJIQAKRuGlF+cQMKQI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749704153; c=relaxed/simple;
-	bh=WdYAfD73hYfW7ocdQIIJQWX4UVF6pSMvZZT1qU9UQ1s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OvN6HJ47IUBECciJqdKQV9ZycQWxG3kg2aPceHwO6DU0nz5oi9ZSagLn3vKAndIktz1ithDdmTTLnlF3PIupsPdX6zo0IkWZoWpIKTirr7O7RsPzUUcXgJOHOhG6e3XPpAwKBktHD1HH1ct2oewD+siWL9bLxJZ53CLyJS0yheo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S3cx4BRo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749704149;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nglbH0Cq3+jZXnJQFhzZG1FiMUuPD2DQzfFyG1ZSb5U=;
-	b=S3cx4BRorVCQ5mix/U1mx0zooqQm6Uh0449+UNQ+y2PJLWq8ibK7XWPQ6HBc4FBPXunxFt
-	kKshLrVi8C9ilmpX0HFPfhdZGElte89gPRkvHOGaoVltARTT2whUNUgXSSOmacR7nryYtV
-	Dn1a2xsmXhLJBdb+NsCVtUzfoGbOqNA=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-rK2S7ICfNaSgRlq6BjmUcw-1; Thu, 12 Jun 2025 00:55:46 -0400
-X-MC-Unique: rK2S7ICfNaSgRlq6BjmUcw-1
-X-Mimecast-MFC-AGG-ID: rK2S7ICfNaSgRlq6BjmUcw_1749704146
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-311d067b3faso827326a91.1
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 21:55:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749704146; x=1750308946;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nglbH0Cq3+jZXnJQFhzZG1FiMUuPD2DQzfFyG1ZSb5U=;
-        b=Sly+vt+gtU6Yfx3K4WZb3JbLyc8O7d/TaIFU6Zz/qMB/CG1ou60g1r62HJnq4JIS4R
-         GbEmDVhUzkAkGid2cU7ZB/G5tyyazs6iSyl+sRFzomq2mX6OpfuAPZTRGUuwWax53mOL
-         ZAYUVr52VBN6KyeXh5CmluHm5matsqCjYz009wQxd4SqRpJaP+4J60NlBWauKne4uSpc
-         IAPSjR2ZCVpSo6zDLQbk1sX+WMr/I+uKNar8V0jXS17ucIWsagxOU7baK0nt+i7fid8Y
-         PFZkq3jsC3FmeuCFXVKaVuiYSwumCHYf8WHWszucSYDE1CLVrJgFD70PfEblQQm8seiM
-         gZKg==
-X-Gm-Message-State: AOJu0Yw+Ay51xNp4UeTrgUkNwP9PofwltmnaPIxVEbiIrkKcfTQl0cWi
-	ddZhScJhewmRBcYsH4xV8jgEx7JHIIoOtB33h1n05JF7MSIv28A/L+uvtL+3riLxysc7y3+Yfp6
-	Ke15Tlo1DQhk4VPYhSdu1jUYlBVDqBKo3J6VhTqME3DCoYa1nWaRx+wixFofPk69qQztWIJ1xMA
-	tGucS0nElCt7Z7HOTMuobig+fDspfMvn9z
-X-Gm-Gg: ASbGnctfPrOD07QPYahgO9026OqOsqSq9KToAA0PC7uBiCyhSe7BMAmtjqjjTnHCp6q
-	jnbaQgHvjh40jbXAJ+kWPkLZbvWhcZZvzuGlCWrlp4isgGwMMP8rrfUSjyzBWsGqpjfcN/DSHmK
-	LO
-X-Received: by 2002:a17:90b:4c44:b0:312:959:dc3f with SMTP id 98e67ed59e1d1-313af0fd27amr7470761a91.3.1749704145446;
-        Wed, 11 Jun 2025 21:55:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmGwoWfPG9hpWyEV1n/+fatiOKlS0BC/RcgXzs3ToB66m47lkqqY+NAnq+kN4NgFGWd9WmxkPpQwh58g+CUGI=
-X-Received: by 2002:a17:90b:4c44:b0:312:959:dc3f with SMTP id
- 98e67ed59e1d1-313af0fd27amr7470727a91.3.1749704144977; Wed, 11 Jun 2025
- 21:55:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65547FD
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 04:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749704355; cv=fail; b=lrw6wXuFoaFudctbN0iVI6sXgFWSatXopTFLVOsOhMQxtT1iRR0WADlTUO+/d99iwmLexK9jicksdwW/YmRHT1jfvwt7nOm3Zspz5cgzTb6sWO8OZ6UPzzJH0e7fKG/QBxFNAXwaLgGKf3Vpo5hbdnkv2QVWTnqH0ruu7ezJF24=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749704355; c=relaxed/simple;
+	bh=vopLNuoLxtZE1Xpqur4xqiNo0hfe0xwtU1xdTfpXaN4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iMH/j9mnU3eTs57RUKrJ7XVjOnYlHzzv2HgBFKhXdFeKcNSKDubm3daAkI3Bcn5NpaYRpd4cygQfElDEVil/gJrnX/NKZLeSnuD9mMpmd6e6nLjqJhwQvvxs9IVD80xKh6le1zpg8sMYG6zsyLBmo4BDH4DtaPOq9kbs9CwLOpA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C2vaP1HC; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749704354; x=1781240354;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vopLNuoLxtZE1Xpqur4xqiNo0hfe0xwtU1xdTfpXaN4=;
+  b=C2vaP1HCoAcSG2q9MPzC0Ho3BGhxcoD0hrOOxX6OEYayyvsvDZmMK/IL
+   PPWyCNdqz8hMKodWo3D+87kwQZ0XB666gosQ7LkVG/Ymjniuben0VqIVU
+   4SYT+EYGRU92Egpio7HDDlBXWAN1OH1l2vlooZvIg4fv5OEKraBRcQhki
+   tSD0RQ4hF4ODB0y83yP13I5coSl2GSXmccZMRMpZRSHTs8hdFQMOs7Vaj
+   8INMxLcDy3QVaTQ0SmK+mfLSuuc4KKWAUIqdjT2brGueskYmdYCexhBEX
+   g71toTaC+hoWS9X6FlKudLmaESeFeju9eLioAy5kkhl1HeKCGGO2CnLBI
+   Q==;
+X-CSE-ConnectionGUID: zPZUrn5xRNule4cwuuziXw==
+X-CSE-MsgGUID: hOXuEVO9TCOziHHMqk9phw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51965434"
+X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
+   d="scan'208";a="51965434"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 21:59:13 -0700
+X-CSE-ConnectionGUID: lurLBYO2RYK7S1GIsYpdBw==
+X-CSE-MsgGUID: Jfmb4vQsT0qm08rl7fI2rQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
+   d="scan'208";a="147275091"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 21:59:13 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 21:59:12 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 21:59:12 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.59)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 21:59:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uNmhr4OOmuaIz4jMz4Fxanx++Zc73Xoz/24VAATKUrltrblMOaAA4JnMi6dHqx23iHqaiN/gIfu2UL7RDTlXUrusAyHel0tJMVrKm9Vxy69vxz+EWPzC71GgiN6+xQpWPUngJRKoYWQQzEQEntorJ7ySBpW3O56qKDlNMZ4666NFSu9rdX19ml4/NANbxo6CqfDHH6ORIecGsbbSQSYZJXxqDceaYVQynm0gdkSbDnhm+kacbsunXU6qbl6vJghcMZzDA9cR7+Kp5Jc3vN+RMlovfsPaQVZcjA50pnTfEgAexnMZuf+q4namtGc0GZSHf7heJ0fM/StXRkKb3YgcJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dSXLaVzSUSdhm73TvkAaKsgrG1FDffvYY+OGTOROx/M=;
+ b=t74p4LMMIov9vVJ/JJvSh+Z3uUpe3x24o/W+fFbVHSPrWQujcDkpsEE1oY6dFBYS/Z87EEU9ZCVJnN6g/q8IrchQF9L/JgcDWpO5ISx6EeFUas1Uatyd12/MLc1H1L9VhpazxXfN5bysQO8PihDUp5JSwf3mpRaqRPW+2AswssSDdOcx/U9QZ56Ga1qXxsHHfvG/7Q/yo6K/UTW4BiPsSRyl9c/uNwDxXxdmMxFjIEzJxfINDWb4KFqIQL3rBcz115ElWBmsTnn/oOv/0BI/xL0eSPNCi46nH12jqHNyy5VzjVs6WUR2qaQHdFygtOxf9pvxmrjm2hw/OmJifQYbzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by IA1PR11MB6145.namprd11.prod.outlook.com (2603:10b6:208:3ef::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.30; Thu, 12 Jun
+ 2025 04:58:55 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae%4]) with mapi id 15.20.8813.024; Thu, 12 Jun 2025
+ 04:58:55 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Krishna Kumar <krikku@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "horms@kernel.org"
+	<horms@kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "edumazet@google.com"
+	<edumazet@google.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, "Zaki, Ahmed" <ahmed.zaki@intel.com>, "Kumar,
+ Krishna" <krishna.ku@flipkart.com>
+Subject: RE: [Intel-wired-lan] [PATCH v2 net] net: ice: Perform accurate aRFS
+ flow match
+Thread-Topic: [Intel-wired-lan] [PATCH v2 net] net: ice: Perform accurate aRFS
+ flow match
+Thread-Index: AQHbyamsBTL2ZahRFEeBBYg9S9//S7P/GOjg
+Date: Thu, 12 Jun 2025 04:58:55 +0000
+Message-ID: <IA1PR11MB6241A3B6BBE3E84287C6DA678B74A@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250520170656.2875753-1-krikku@gmail.com>
+In-Reply-To: <20250520170656.2875753-1-krikku@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|IA1PR11MB6145:EE_
+x-ms-office365-filtering-correlation-id: 216530f6-23c8-4577-9c48-08dda96dd550
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?QmOsnvFoar4sdftCn7/X9Sx8OtPCkUwnEEZzdffpY/V8m60UiI/PFXYHuO7Z?=
+ =?us-ascii?Q?/rN5zkPixNI+b717YQ2DzoofEWqxxwq+OM6Bcj8xqnVnjfMmIb2i/7sfdcqq?=
+ =?us-ascii?Q?BJ/wt70+tulEJqEw9sa2DlWmhaAgGaEDJI+k6HrTEMbkT0AVVGEYdLif4sxg?=
+ =?us-ascii?Q?g+6H0EWHKDCkQiNvQgRAhcNnzZzmkVdmgtYRxon5gzeFLpOlkEKfHx07Qc5y?=
+ =?us-ascii?Q?1yZALNRxZPC1GBjGql8Ejb1EWCyL0sJrw5bbu/ilcs6Piqi+Zm02N5qwYAde?=
+ =?us-ascii?Q?zHYYtBDqVHx59OX5D+u1TlOfryPo5aSwl7sKgnr8seqMBQ9FZ8Kr5SUU6FAq?=
+ =?us-ascii?Q?bdyC05EkRS9mckX7Z+Xplm/1EcI50Lotc1+1OlJQgeYF1MANnrhyD2HhTKZ/?=
+ =?us-ascii?Q?aBimq0Ypua5BzX3HLgr5BTYzkCZdYswlDGmECCv05NZD10rHA+7iu3GIjAbf?=
+ =?us-ascii?Q?BBvO24/ESnn+52F4nAgrXq8dvC5bCr4EWcPVMeV9fawbvMWHs9GybKPKnpbb?=
+ =?us-ascii?Q?Yqy6rjqyYb3bLaZEosBtoZt4bmFv03gZ3yB/a6lNeKV0znknVcyVTsc2iXMV?=
+ =?us-ascii?Q?bqMqCDWR72AP2enuB2sN/DtlYJjc05vHFeIKqRNlOISsNiWauSfbwMYnh+Bg?=
+ =?us-ascii?Q?YKk8t2v5bUKHhyK46Zg19EyC5AtBBXUYPQ+AOZcC4Aog7OosNV9NSjVv1ONV?=
+ =?us-ascii?Q?Ny83keO6axUlWpVKuANwD24mC2VhMtoXZTzVo+xUsNb1K7mcSbTTpfvI6nau?=
+ =?us-ascii?Q?Q3VcngXoua8PoEULANRiHuG8+OazBysBN8SS1cB2QaiYAPc0Bf1GlxTQ1cL1?=
+ =?us-ascii?Q?yp0i6I11TQWDywma5yPdEcagD3WucbxeP9SIXYzz510+1JVdri8zLZ9no7ml?=
+ =?us-ascii?Q?2PDR70QCLqh9D2VRmted5IzHg1rtjlpBT2rRgIeILBJegzJ+bAeehGdzDa5U?=
+ =?us-ascii?Q?BZp2CPxgvZwfk96pNz8gG+0LUh1Za+q7r2dmPmqjFZqS7nGuUFD/lvxPVNX/?=
+ =?us-ascii?Q?sUcYOiPTPtOTLH/xWYLk72+vpkZOQT6Nb866jJDV4V+Dmer1QKKhAMHMzPwp?=
+ =?us-ascii?Q?8QGx1w4tO8tLa826UUv70q+nUHWPszzGve6oCUz1K2yu8hXmi9JLCbI9VNn6?=
+ =?us-ascii?Q?DzKBJJZwRv0/8FSmAkZENb0v1mAzLJvmSIzg92XKKrLMHKMQKta9gtS8PAH5?=
+ =?us-ascii?Q?yyZ3oqLGmaJs5J++8dTxkJljN2WZUITwM6j7TEcidpUhWjYDJ5goYcZBZJf5?=
+ =?us-ascii?Q?dYwc5qeT8lVWwNRbab1V+Wd2pEHI3KiiLzRRLLP9Tdfux1/RBvrTgkrvVrQq?=
+ =?us-ascii?Q?5hHzUOYDWfrOOV9UXloIz+UMzp8vY7qcyh04TfpFRUHt7Iar9BTe0HDIHIe+?=
+ =?us-ascii?Q?jvaiCeZrvTpUhg1COj99hyLWxHawIezXsDILCc4mDz8KinYZvt8Soe5FPi4X?=
+ =?us-ascii?Q?ICEL1MOCppbJtWA0Sctt6nN/4LSvprSCkDjH46VzilqXpsKNIQezMg=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PBPxy/ijQk3myoXj1enQVtlRbmkHKTqYXwYF5gfg5LRpKX3hlMXRrAuJ8osW?=
+ =?us-ascii?Q?W09i802jglra85TIzxSusVD5aTQVmlq0/R4gzxG/haeVG9nvPe/xJuG39FX4?=
+ =?us-ascii?Q?99/8K0Fv4m6CHC130fAG+7oJkdqrP6rllyFzFxi92gi+smkdOqaFWMC8cCAk?=
+ =?us-ascii?Q?civA8nL7ci74xWTo4NUzte/TghJLKjrniprwIzEy4yZBt44G6R2/3fzwyJnY?=
+ =?us-ascii?Q?rkKeDYY4PVEsXwtAtDn7GJnlX7/WsLk0dRiUnIAFLpQG4CsgA9UgEqlBA8a0?=
+ =?us-ascii?Q?cld8g9C/L2gVoyRIde3FHPBJk/SDrvNNWqXPxclHENJN3HZRh66YHmJArdWG?=
+ =?us-ascii?Q?Amgg6ZGYeG91oQQ5Sj/2g+4IxdPYaDrSFmhbjQBj5dnyIXWe9A1pWRbm59IS?=
+ =?us-ascii?Q?BHIqtSKywoMmxORiXdxv2Beo321YijNCqqUb/QeYDr/Ga9Q9eJXxbN1tb8Gn?=
+ =?us-ascii?Q?SoV3HL/CIyRFHENGop8Gxrh2O/BjoyA0rjdS06Y0XmBPjf+XDlA4uXu5TeCw?=
+ =?us-ascii?Q?G6TKJdst+l8cADmcErAptbcVRO4IzusP4bfnbHQrbSkD+vzp4jiBcUj9TvAf?=
+ =?us-ascii?Q?7vJXlnim+NKJBjjcg9g5o3g6rqfmMEjV7Rry9MTVtmPIWzJCQK5Cs6XEU9Vz?=
+ =?us-ascii?Q?hCS4KLa3TWBDcDcV24JeqlkttAeTSJ7OatPLZ8qe5LVBVtlz8eyRA6IKQo9K?=
+ =?us-ascii?Q?wB55UVN2plRjxO2Vc58fTy+t4ziKqW9GCwVj8Khpsg/eNLOKnyk6+Fa2MZiK?=
+ =?us-ascii?Q?93ML5tgd/xxfHwC/gob+FOkB1Sl+C9tioVkzqPbkMdijZNTr6GkCdLymDNXh?=
+ =?us-ascii?Q?5DK+7AoYnq81jVH2s88USlKMkD+MTRB94SjSmWGlSy8jhJ8GQrtKI03qF1Sf?=
+ =?us-ascii?Q?JuuNUIhIEp9ASlDeFvdZJyjEgYxRdktDtenebWuzwSq2tLClOVJvn44YJ+qa?=
+ =?us-ascii?Q?gwv5tx2Q3DD37SUpuR/Zw7siBedna5g9vLe0jwwJLcfID3Au2d2/Q67TaGjU?=
+ =?us-ascii?Q?AjLi6Q2CIHFP9+725oFkFX2YKPD+JJosZ0N3mTKExZ7aK42RlKeytZMjnUvS?=
+ =?us-ascii?Q?ypEN9ZO0Ib/nLfNw2+XjizxjzvMXnM6l+qP5MtW2nfcEOxfwLuXIkr1JXeDk?=
+ =?us-ascii?Q?Jr799sVFSqwoBNKvJVKnj9kLxRqy9iPggtFftRNGdZ65J+HI9K5d9ibJETvE?=
+ =?us-ascii?Q?mSsyPv4HIpWuQwHJLq+/6g3Nwk1OGuMtNd8AZIM3O9AxN1C1+QW8a5KcFUCQ?=
+ =?us-ascii?Q?T5UIbtAALJIJpTjv7mouzdxOPVRKZnhpvXig1c5gnFhShdiqf4Mv5oIdmHDY?=
+ =?us-ascii?Q?S7WxDcrzzsOHu6O9SVOijOUGaKGrARnjehE2LxfnV/IT4es1By3WJ0idqCna?=
+ =?us-ascii?Q?TJWiDJ2VYRW2D6Usa/aGC3vgrKcu7SkHwxlzzMlV2j0g5MV9lPIaCzSBdAaU?=
+ =?us-ascii?Q?KBFeHkORQRl3CY015ev1dmcWnPNjfd3nyxBEGf1w9KF6d1JR7PbnHDPt8gOL?=
+ =?us-ascii?Q?yWf5QYakEWTZBqRIaAe9C8lcfqQ0fCxxdDN9yqdJkXH2Er3irsaAIBqSwFa6?=
+ =?us-ascii?Q?+eRUbFXfrvfrk8/lQC6MQeZG72kjueIms4liuU6T?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749210083.git.pabeni@redhat.com> <a38c6a4618962237dde1c4077120a3a9d231e2c0.1749210083.git.pabeni@redhat.com>
-In-Reply-To: <a38c6a4618962237dde1c4077120a3a9d231e2c0.1749210083.git.pabeni@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 12 Jun 2025 12:55:33 +0800
-X-Gm-Features: AX0GCFsnyc-CXoTSBLRKAIfMHUZXBAHSyRCQHSkdB-5bfSe5roHUautDfOH0Wko
-Message-ID: <CACGkMEtExmmfmtd0+6YwgjuiWR-T5RvfcnHEbmH=ewqNXHPHYA@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 7/8] tun: enable gso over UDP tunnel support.
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 216530f6-23c8-4577-9c48-08dda96dd550
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2025 04:58:55.1290
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 81O5wOZPuCEahSKLwetzylz6BE7Xpr08Os7hpYlZ1Y+dDZNySZVT2e6XWRGhGOz0QBXY6WgOYpIRSG4QH++AhA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6145
+X-OriginatorOrg: intel.com
 
-On Fri, Jun 6, 2025 at 7:46=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+rishna Kumar
+> Sent: 20 May 2025 22:37
+> To: netdev@vger.kernel.org
+> Cc: davem@davemloft.net; horms@kernel.org; Nguyen, Anthony L <anthony.l.n=
+guyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; eduma=
+zet@google.com; intel-wired-lan@lists.osuosl.org; andrew+netdev@lunn.ch; ku=
+ba@kernel.org; pabeni@redhat.com; Samudrala, Sridhar <sridhar.samudrala@int=
+el.com>; Zaki, Ahmed <ahmed.zaki@intel.com>; Kumar, Krishna <krishna.ku@fli=
+pkart.com>
+> Subject: [Intel-wired-lan] [PATCH v2 net] net: ice: Perform accurate aRFS=
+ flow match
 >
-> Add new tun features to represent the newly introduced virtio
-> GSO over UDP tunnel offload. Allows detection and selection of
-> such features via the existing TUNSETOFFLOAD ioctl, store the
-> tunnel offload configuration in the highest bit of the tun flags
-> and compute the expected virtio header size and tunnel header
-> offset using such bits, so that we can plug almost seamless the
-> the newly introduced virtio helpers to serialize the extended
-> virtio header.
+> This patch fixes an issue seen in a large-scale deployment under heavy in=
+coming pkts where the aRFS flow wrongly matches a flow and reprograms the N=
+IC with wrong settings. That mis-steering causes RX-path latency spikes and=
+ noisy neighbor effects when many connections collide on the same hash (som=
+e of our production servers have 20-30K connections).
 >
-> As the tun features and the virtio hdr size are configured
-> separately, the data path need to cope with (hopefully transient)
-> inconsistent values.
+> set_rps_cpu() calls ndo_rx_flow_steer() with flow_id that is calculated b=
+y hashing the skb sized by the per rx-queue table size. This results in mul=
+tiple connections (even across different rx-queues) getting the same hash v=
+alue. > The driver steer function modifies the wrong flow to use this rx-qu=
+eue, e.g.: Flow#1 is first added:
+>    Flow#1:  <ip1, port1, ip2, port2>, Hash 'h', q#10
 >
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Later when a new flow needs to be added:
+>	    Flow#2:  <ip3, port3, ip4, port4>, Hash 'h', q#20
+>
+> The driver finds the hash 'h' from Flow#1 and updates it to use q#20. Thi=
+s results in both flows getting un-optimized - packets for Flow#1 goes to q=
+#20, and then reprogrammed back to q#10 later and so on; and Flow #2 progra=
+mming is never done as Flow#1 is matched first for all misses. Many flows m=
+ay wrongly share the same hash and reprogram rules of the original flow eac=
+h with their own q#.
+>
+> Tested on two 144-core servers with 16K netperf sessions for 180s. Netper=
+f clients are pinned to cores 0-71 sequentially (so that wrong packets on q=
+#s
+72-143 can be measured). IRQs are set 1:1 for queues -> CPUs, enable XPS, e=
+nable aRFS (global value is 144 * rps_flow_cnt).
+>
+> Test notes about results from ice_rx_flow_steer():
+> ---------------------------------------------------
+> 1. "Skip:" counter increments here:
+>    if (fltr_info->q_index =3D=3D rxq_idx ||
+>	arfs_entry->fltr_state !=3D ICE_ARFS_ACTIVE)
+>	    goto out;
+> 2. "Add:" counter increments here:
+>    ret =3D arfs_entry->fltr_info.fltr_id;
+>    INIT_HLIST_NODE(&arfs_entry->list_entry);
+> 3. "Update:" counter increments here:
+>    /* update the queue to forward to on an already existing flow */
+>
+> Runtime comparison: original code vs with the patch for different rps_flo=
+w_cnt values.
+>
+> +-------------------------------+--------------+--------------+
+> | rps_flow_cnt                  |      512     |    2048      |
+> +-------------------------------+--------------+--------------+
+> | Ratio of Pkts on Good:Bad q's | 214 vs 822K  | 1.1M vs 980K |
+> | Avoid wrong aRFS programming  | 0 vs 310K    | 0 vs 30K     |
+> | CPU User                      | 216 vs 183   | 216 vs 206   |
+> | CPU System                    | 1441 vs 1171 | 1447 vs 1320 |
+> | CPU Softirq                   | 1245 vs 920  | 1238 vs 961  |
+> | CPU Total                     | 29 vs 22.7   | 29 vs 24.9   |
+> | aRFS Update                   | 533K vs 59   | 521K vs 32   |
+> | aRFS Skip                     | 82M vs 77M   | 7.2M vs 4.5M |
+> +-------------------------------+--------------+--------------+
+>
+> A separate TCP_STREAM and TCP_RR with 1,4,8,16,64,128,256,512 connections=
+ showed no performance degradation.
+>
+> Some points on the patch/aRFS behavior:
+> 1. Enabling full tuple matching ensures flows are always correctly matche=
+d,
+>   even with smaller hash sizes.
+> 2. 5-6% drop in CPU utilization as the packets arrive at the correct CPUs
+>   and fewer calls to driver for programming on misses.
+> 3. Larger hash tables reduces mis-steering due to more unique flow hashes=
+,
+>   but still has clashes. However, with larger per-device rps_flow_cnt, ol=
+d
+>   flows take more time to expire and new aRFS flows cannot be added if h/=
+w
+>  limits are reached (rps_may_expire_flow() succeeds when 10*rps_flow_cnt
+>   pkts have been processed by this cpu that are not part of the flow).
+>
+> Changes since v1:
+>  - Added "Fixes:" tag and documented return values.
+>  - Added @ for function parameters.
+>  - Updated subject line to denote target tree (net)
+>
+> Fixes: 28bf26724fdb0 ("ice: Implement aRFS")
+> Signed-off-by: Krishna Kumar <krikku@gmail.com>
 > ---
-> v2 -> v3:
->   - cleaned-up uAPI comments
->   - use explicit struct layout instead of raw buf.
-> ---
->  drivers/net/tun.c           | 77 ++++++++++++++++++++++++++++++++-----
->  drivers/net/tun_vnet.h      | 73 ++++++++++++++++++++++++++++-------
->  include/uapi/linux/if_tun.h |  9 +++++
->  3 files changed, 136 insertions(+), 23 deletions(-)
->
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 1207196cbbed..d326800dce9d 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -186,7 +186,8 @@ struct tun_struct {
->         struct net_device       *dev;
->         netdev_features_t       set_features;
->  #define TUN_USER_FEATURES (NETIF_F_HW_CSUM|NETIF_F_TSO_ECN|NETIF_F_TSO| =
-\
-> -                         NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4)
-> +                         NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4 | \
-> +                         NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL=
-_CSUM)
->
->         int                     align;
->         int                     vnet_hdr_sz;
-> @@ -925,6 +926,7 @@ static int tun_net_init(struct net_device *dev)
->         dev->hw_features =3D NETIF_F_SG | NETIF_F_FRAGLIST |
->                            TUN_USER_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
->                            NETIF_F_HW_VLAN_STAG_TX;
-> +       dev->hw_enc_features =3D dev->hw_features;
->         dev->features =3D dev->hw_features;
->         dev->vlan_features =3D dev->features &
->                              ~(NETIF_F_HW_VLAN_CTAG_TX |
-> @@ -1698,7 +1700,8 @@ static ssize_t tun_get_user(struct tun_struct *tun,=
- struct tun_file *tfile,
->         struct sk_buff *skb;
->         size_t total_len =3D iov_iter_count(from);
->         size_t len =3D total_len, align =3D tun->align, linear;
-> -       struct virtio_net_hdr gso =3D { 0 };
-> +       struct virtio_net_hdr_v1_tunnel full_hdr;
-> +       struct virtio_net_hdr *gso;
->         int good_linear;
->         int copylen;
->         int hdr_len =3D 0;
-> @@ -1708,6 +1711,15 @@ static ssize_t tun_get_user(struct tun_struct *tun=
-, struct tun_file *tfile,
->         int skb_xdp =3D 1;
->         bool frags =3D tun_napi_frags_enabled(tfile);
->         enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_NOT_SPECIFIE=
-D;
-> +       unsigned int flags =3D tun->flags & ~TUN_VNET_TNL_MASK;
-> +
-> +       /*
-> +        * Keep it easy and always zero the whole buffer, even if the
-> +        * tunnel-related field will be touched only when the feature
-> +        * is enabled and the hdr size id compatible.
-> +        */
-> +       memset(&full_hdr, 0, sizeof(full_hdr));
-> +       gso =3D (struct virtio_net_hdr *)&full_hdr.hdr;
->
->         if (!(tun->flags & IFF_NO_PI)) {
->                 if (len < sizeof(pi))
-> @@ -1720,8 +1732,16 @@ static ssize_t tun_get_user(struct tun_struct *tun=
-, struct tun_file *tfile,
->
->         if (tun->flags & IFF_VNET_HDR) {
->                 int vnet_hdr_sz =3D READ_ONCE(tun->vnet_hdr_sz);
-> +               int parsed_size;
->
-> -               hdr_len =3D tun_vnet_hdr_get(vnet_hdr_sz, tun->flags, fro=
-m, &gso);
-> +               if (vnet_hdr_sz < TUN_VNET_TNL_SIZE) {
-
-I still don't understand why we need to duplicate netdev features in
-flags, and it seems to introduce unnecessary complexities. Can we
-simply check dev->features instead?
-
-I think I've asked before, for example, we don't duplicate gso and
-csum for non tunnel packets.
-
-> +                       parsed_size =3D vnet_hdr_sz;
-> +               } else {
-> +                       parsed_size =3D TUN_VNET_TNL_SIZE;
-> +                       flags |=3D TUN_VNET_TNL_MASK;
-> +               }
-> +               hdr_len =3D __tun_vnet_hdr_get(vnet_hdr_sz, parsed_size,
-> +                                            flags, from, gso);
->                 if (hdr_len < 0)
->                         return hdr_len;
->
-> @@ -1755,7 +1775,7 @@ static ssize_t tun_get_user(struct tun_struct *tun,=
- struct tun_file *tfile,
->                  * (e.g gso or jumbo packet), we will do it at after
->                  * skb was created with generic XDP routine.
->                  */
-> -               skb =3D tun_build_skb(tun, tfile, from, &gso, len, &skb_x=
-dp);
-> +               skb =3D tun_build_skb(tun, tfile, from, gso, len, &skb_xd=
-p);
->                 err =3D PTR_ERR_OR_ZERO(skb);
->                 if (err)
->                         goto drop;
-> @@ -1799,7 +1819,7 @@ static ssize_t tun_get_user(struct tun_struct *tun,=
- struct tun_file *tfile,
->                 }
->         }
->
-> -       if (tun_vnet_hdr_to_skb(tun->flags, skb, &gso)) {
-> +       if (tun_vnet_hdr_to_skb(flags, skb, gso)) {
->                 atomic_long_inc(&tun->rx_frame_errors);
->                 err =3D -EINVAL;
->                 goto free_skb;
-> @@ -2050,13 +2070,26 @@ static ssize_t tun_put_user(struct tun_struct *tu=
-n,
->         }
->
->         if (vnet_hdr_sz) {
-> -               struct virtio_net_hdr gso;
-> +               struct virtio_net_hdr_v1_tunnel full_hdr;
-> +               struct virtio_net_hdr *gso;
-> +               int flags =3D tun->flags;
-> +               int parsed_size;
-> +
-> +               gso =3D (struct virtio_net_hdr *)&full_hdr.hdr;
-> +               parsed_size =3D tun_vnet_parse_size(tun->flags);
-> +               if (unlikely(vnet_hdr_sz < parsed_size)) {
-> +                       /* Inconsistent hdr size and (tunnel) offloads:
-> +                        * strips the latter
-> +                        */
-> +                       flags &=3D ~TUN_VNET_TNL_MASK;
-> +                       parsed_size =3D sizeof(struct virtio_net_hdr);
-> +               };
->
-> -               ret =3D tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, =
-&gso);
-> +               ret =3D tun_vnet_hdr_from_skb(flags, tun->dev, skb, gso);
->                 if (ret)
->                         return ret;
->
-> -               ret =3D tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
-> +               ret =3D __tun_vnet_hdr_put(vnet_hdr_sz, parsed_size, iter=
-, gso);
->                 if (ret)
->                         return ret;
->         }
-> @@ -2366,6 +2399,7 @@ static int tun_xdp_one(struct tun_struct *tun,
->         int metasize =3D 0;
->         int ret =3D 0;
->         bool skb_xdp =3D false;
-> +       unsigned int flags;
->         struct page *page;
->
->         if (unlikely(datasize < ETH_HLEN))
-> @@ -2426,7 +2460,16 @@ static int tun_xdp_one(struct tun_struct *tun,
->         if (metasize > 0)
->                 skb_metadata_set(skb, metasize);
->
-> -       if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
-> +       /* Assume tun offloads are enabled if the provided hdr is large
-> +        * enough.
-> +        */
-> +       if (READ_ONCE(tun->vnet_hdr_sz) >=3D TUN_VNET_TNL_SIZE &&
-> +           xdp->data - xdp->data_hard_start >=3D TUN_VNET_TNL_SIZE)
-> +               flags =3D tun->flags | TUN_VNET_TNL_MASK;
-> +       else
-> +               flags =3D tun->flags & ~TUN_VNET_TNL_MASK;
-
-I'm not sure I get the point that we need dynamics of
-TUN_VNET_TNL_MASK here. We know if tunnel gso and its csum or enabled
-or not, and we know the vnet_hdr_sz here, we can simply drop the
-packet with less header.
-
-> +
-> +       if (tun_vnet_hdr_to_skb(flags, skb, gso)) {
->                 atomic_long_inc(&tun->rx_frame_errors);
->                 kfree_skb(skb);
->                 ret =3D -EINVAL;
-> @@ -2812,6 +2855,8 @@ static void tun_get_iff(struct tun_struct *tun, str=
-uct ifreq *ifr)
->
->  }
->
-> +#define PLAIN_GSO (NETIF_F_GSO_UDP_L4 | NETIF_F_TSO | NETIF_F_TSO6)
-> +
->  /* This is like a cut-down ethtool ops, except done via tun fd so no
->   * privs required. */
->  static int set_offload(struct tun_struct *tun, unsigned long arg)
-> @@ -2841,6 +2886,17 @@ static int set_offload(struct tun_struct *tun, uns=
-igned long arg)
->                         features |=3D NETIF_F_GSO_UDP_L4;
->                         arg &=3D ~(TUN_F_USO4 | TUN_F_USO6);
->                 }
-> +
-> +               /* Tunnel offload is allowed only if some plain offload i=
-s
-> +                * available, too.
-> +                */
-> +               if (features & PLAIN_GSO && arg & TUN_F_UDP_TUNNEL_GSO) {
-> +                       features |=3D NETIF_F_GSO_UDP_TUNNEL;
-> +                       if (arg & TUN_F_UDP_TUNNEL_GSO_CSUM)
-> +                               features |=3D NETIF_F_GSO_UDP_TUNNEL_CSUM=
-;
-> +                       arg &=3D ~(TUN_F_UDP_TUNNEL_GSO |
-> +                                TUN_F_UDP_TUNNEL_GSO_CSUM);
-> +               }
->         }
->
->         /* This gives the user a way to test for new features in future b=
-y
-> @@ -2852,7 +2908,8 @@ static int set_offload(struct tun_struct *tun, unsi=
-gned long arg)
->         tun->dev->wanted_features &=3D ~TUN_USER_FEATURES;
->         tun->dev->wanted_features |=3D features;
->         netdev_update_features(tun->dev);
-> -
-> +       tun_set_vnet_tnl(&tun->flags, !!(features & NETIF_F_GSO_UDP_TUNNE=
-L),
-> +                        !!(features & NETIF_F_GSO_UDP_TUNNEL_CSUM));
->         return 0;
->  }
->
-> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-> index 58b9ac7a5fc4..c2374c26538b 100644
-> --- a/drivers/net/tun_vnet.h
-> +++ b/drivers/net/tun_vnet.h
-> @@ -5,6 +5,11 @@
->  /* High bits in flags field are unused. */
->  #define TUN_VNET_LE     0x80000000
->  #define TUN_VNET_BE     0x40000000
-> +#define TUN_VNET_TNL           0x20000000
-> +#define TUN_VNET_TNL_CSUM      0x10000000
-> +#define TUN_VNET_TNL_MASK      (TUN_VNET_TNL | TUN_VNET_TNL_CSUM)
-> +
-> +#define TUN_VNET_TNL_SIZE      sizeof(struct virtio_net_hdr_v1_tunnel)
->
->  static inline bool tun_vnet_legacy_is_little_endian(unsigned int flags)
->  {
-> @@ -45,6 +50,13 @@ static inline long tun_set_vnet_be(unsigned int *flags=
-, int __user *argp)
->         return 0;
->  }
->
-> +static inline void tun_set_vnet_tnl(unsigned int *flags, bool tnl, bool =
-tnl_csum)
-> +{
-> +       *flags =3D (*flags & ~TUN_VNET_TNL_MASK) |
-> +                tnl * TUN_VNET_TNL |
-> +                tnl_csum * TUN_VNET_TNL_CSUM;
-> +}
-> +
->  static inline bool tun_vnet_is_little_endian(unsigned int flags)
->  {
->         return flags & TUN_VNET_LE || tun_vnet_legacy_is_little_endian(fl=
-ags);
-> @@ -107,16 +119,33 @@ static inline long tun_vnet_ioctl(int *vnet_hdr_sz,=
- unsigned int *flags,
->         }
->  }
->
-> -static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
-> -                                  struct iov_iter *from,
-> -                                  struct virtio_net_hdr *hdr)
-> +static inline unsigned int tun_vnet_parse_size(unsigned int flags)
-> +{
-> +       if (!(flags & TUN_VNET_TNL))
-> +               return sizeof(struct virtio_net_hdr);
-> +
-> +       return TUN_VNET_TNL_SIZE;
-> +}
-> +
-> +static inline unsigned int tun_vnet_tnl_offset(unsigned int flags)
-> +{
-> +       if (!(flags & TUN_VNET_TNL))
-> +               return 0;
-> +
-> +       return sizeof(struct virtio_net_hdr_v1);
-> +}
-> +
-> +static inline int __tun_vnet_hdr_get(int sz, int parsed_size,
-> +                                    unsigned int flags,
-> +                                    struct iov_iter *from,
-> +                                    struct virtio_net_hdr *hdr)
->  {
->         u16 hdr_len;
->
->         if (iov_iter_count(from) < sz)
->                 return -EINVAL;
->
-> -       if (!copy_from_iter_full(hdr, sizeof(*hdr), from))
-> +       if (!copy_from_iter_full(hdr, parsed_size, from))
->                 return -EFAULT;
->
->         hdr_len =3D tun_vnet16_to_cpu(flags, hdr->hdr_len);
-> @@ -129,30 +158,47 @@ static inline int tun_vnet_hdr_get(int sz, unsigned=
- int flags,
->         if (hdr_len > iov_iter_count(from))
->                 return -EINVAL;
->
-> -       iov_iter_advance(from, sz - sizeof(*hdr));
-> +       iov_iter_advance(from, sz - parsed_size);
->
->         return hdr_len;
->  }
->
-> -static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> -                                  const struct virtio_net_hdr *hdr)
-> +static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
-> +                                  struct iov_iter *from,
-> +                                  struct virtio_net_hdr *hdr)
-> +{
-> +       return __tun_vnet_hdr_get(sz, sizeof(*hdr), flags, from, hdr);
-> +}
-> +
-> +static inline int __tun_vnet_hdr_put(int sz, int parsed_size,
-> +                                    struct iov_iter *iter,
-> +                                    const struct virtio_net_hdr *hdr)
->  {
->         if (unlikely(iov_iter_count(iter) < sz))
->                 return -EINVAL;
->
-> -       if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) !=3D sizeof(*h=
-dr)))
-> +       if (unlikely(copy_to_iter(hdr, parsed_size, iter) !=3D parsed_siz=
-e))
->                 return -EFAULT;
->
-> -       if (iov_iter_zero(sz - sizeof(*hdr), iter) !=3D sz - sizeof(*hdr)=
-)
-> +       if (iov_iter_zero(sz - parsed_size, iter) !=3D sz - parsed_size)
->                 return -EFAULT;
->
->         return 0;
->  }
->
-> +static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> +                                  const struct virtio_net_hdr *hdr)
-> +{
-> +       return __tun_vnet_hdr_put(sz, sizeof(*hdr), iter, hdr);
-> +}
-> +
->  static inline int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff=
- *skb,
->                                       const struct virtio_net_hdr *hdr)
->  {
-> -       return virtio_net_hdr_to_skb(skb, hdr, tun_vnet_is_little_endian(=
-flags));
-> +       return virtio_net_hdr_tnl_to_skb(skb, hdr,
-> +                                        tun_vnet_tnl_offset(flags),
-> +                                        !!(flags & TUN_VNET_TNL_CSUM),
-> +                                        tun_vnet_is_little_endian(flags)=
-);
->  }
->
->  static inline int tun_vnet_hdr_from_skb(unsigned int flags,
-> @@ -161,10 +207,11 @@ static inline int tun_vnet_hdr_from_skb(unsigned in=
-t flags,
->                                         struct virtio_net_hdr *hdr)
->  {
->         int vlan_hlen =3D skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
-> +       int tnl_offset =3D tun_vnet_tnl_offset(flags);
->
-> -       if (virtio_net_hdr_from_skb(skb, hdr,
-> -                                   tun_vnet_is_little_endian(flags), tru=
-e,
-> -                                   vlan_hlen)) {
-> +       if (virtio_net_hdr_tnl_from_skb(skb, hdr, tnl_offset,
-> +                                       tun_vnet_is_little_endian(flags),
-> +                                       vlan_hlen)) {
->                 struct skb_shared_info *sinfo =3D skb_shinfo(skb);
->
->                 if (net_ratelimit()) {
-> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
-> index 287cdc81c939..79d53c7a1ebd 100644
-> --- a/include/uapi/linux/if_tun.h
-> +++ b/include/uapi/linux/if_tun.h
-> @@ -93,6 +93,15 @@
->  #define TUN_F_USO4     0x20    /* I can handle USO for IPv4 packets */
->  #define TUN_F_USO6     0x40    /* I can handle USO for IPv6 packets */
->
-> +/* I can handle TSO/USO for UDP tunneled packets */
-> +#define TUN_F_UDP_TUNNEL_GSO           0x080
-> +
-> +/*
-> + * I can handle TSO/USO for UDP tunneled packets requiring csum offload =
-for
-> + * the outer header
-> + */
-> +#define TUN_F_UDP_TUNNEL_GSO_CSUM      0x100
-> +
-
-Any reason we don't choose to use 0x40 and 0x60?
-
->  /* Protocol info prepended to the packets (when IFF_NO_PI is not set) */
->  #define TUN_PKT_STRIP  0x0001
->  struct tun_pi {
-> --
-> 2.49.0
+> drivers/net/ethernet/intel/ice/ice_arfs.c | 49 +++++++++++++++++++++++
+> 1 file changed, 49 insertions(+)
 >
 
-Thanks
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
