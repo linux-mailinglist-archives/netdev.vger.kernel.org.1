@@ -1,160 +1,125 @@
-Return-Path: <netdev+bounces-197218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F0AAD7CEC
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 23:08:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8663CAD7CEF
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 23:09:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECD103B5F74
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 21:08:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28C093A34AD
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 21:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C77F23099F;
-	Thu, 12 Jun 2025 21:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36292D542F;
+	Thu, 12 Jun 2025 21:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="ukyhG9A1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600532DCBEA
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 21:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7522D6624
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 21:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749762514; cv=none; b=FkNJ594Mp9xSGd4S8rYUoCQZn42Ak0Lz7cErxw3wcwX3qeRZNSkpvp4Llvttfjg8Px05vIc1RgZDADR7gBl7/2EvZ66QofJp/Fw9bWcHUoAmx2EnRsDnXa8bhI4z4PJ9uRv4qihot6mSfm7W1orSV1yiU6OiqXmct0XiYbR3214=
+	t=1749762548; cv=none; b=rkHbvZcNDgIOGi7Zpy2n4Wk6+z0LK3nsDScWNjYxiEwyJ4t58gh/F9tw4hv7qqX5SdwBSy2d4nwMNWACd+FpPZgaMhNjFeTYGqB3W5pj/GnAO3ZhnpjPuj+bYzwppSC/vBbhWtUK9Kw7ZRuvqYCo3L85IoGyYEo4FmacvWzzlpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749762514; c=relaxed/simple;
-	bh=yuBTQ6WiTrDaU4CchSedx0qrGzFBNNBHaQ/8F3M6QTc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jKMaMxqii9Mw1yAZTzl51cwGj8ExtTgqK08JRYn/8Olx0N+nQ6poeu3IQuotPbO2UyWfL/kGVlSwz5Uiy0beeBhHBvWsUoGQdqG6cVzOgtJTArmsP7jtCwAU6wS4UWx8cVT/FiZ3BHWjJxYLjYYcIHpjjvCH/ZpYOSqS1JRiLE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddf66427f8so25677865ab.2
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 14:08:32 -0700 (PDT)
+	s=arc-20240116; t=1749762548; c=relaxed/simple;
+	bh=m7oou1dHujPBgqJuAwN9g9R2smh8qT/xltRdemukCJ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ofwaVlZu4XyE3y46jXjK8PbeaOR6nOGz3EcM0if73Z46DqLibIEjkE1/RKoFzFN/AXjvNQu3Ph6RQhEL+ZXOlNUR3nswR9MXT3Cefs9LvyEn3URm0odR9YG7A8D2RjDBMtHXPSQbVZ1t8rprJFhLCtdXadd5hbloxfeWeX2Au8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=ukyhG9A1; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3a4e742dc97so1725921f8f.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 14:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749762544; x=1750367344; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hq3+yK1phccQ3oaWkqHGXWvj3PMsQEpv/itLEx5vl2A=;
+        b=ukyhG9A1v3TBtjFyrRkK1yVVrZ5yx8Sv8TNvp7e5rfGB3UFSyuIrp/o/NMopv88QtQ
+         SbCkcrFscZaYymjZ8TVdUjz66eLoBv0zox5ha/lmqvgKag7cf1o327jh2yhPGvEExfGp
+         ESQX1IKzD0Z6gRxDekG5vjQ9Zu/alZM4l/gHOiQldcEmRZlbDbF3W700qehHxu2MLoc+
+         6Zg78v3OAw3+wTSo4dOJa1E6Skwxd1Z9FTEerl4VMap2m+phi3gUeWyid/wzGrCm2CW3
+         vbK123jXwx5nKh5imfEs+0iH+A30qIM5kSE+4oaf6RjBA+8m7XG5JvFuee0Ir55p8bIC
+         bNuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749762511; x=1750367311;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gk29RHFC4M3kIeA0h8yMNCoYnyK1cf68Px8okUDLfg8=;
-        b=Mmh86pmTzQ3pirtWN5AB/ASeqJ9xoSjYc4vslOF/ZEioFXW1L2xZ7zmz+DRvn0s5NL
-         rgVph60J9CPHc0u3vdk5I5w1sAjW6CSz8fDrU4cb6EiX07t/mi2CZoaPPWmB/WnptwU3
-         gyORi3PYxnByR6kJ9FgTCI62UUVvOG8PBmf3EvSXcdbWUVzfUb45HPkMSlpjkP+zh+qM
-         7nqJfZiHKsgmWofk+kXmwA5SPNru4mGeORjR+0+8UNmy2ISk+IdZ72u6VYzgU2Bci6rG
-         0HukxzG+mrbqHXds0NINUAbSdFzLKrhknHhvDRm3Nn3+jU8efnZz2Ia0bZX+UXy8+2XZ
-         kgJA==
-X-Forwarded-Encrypted: i=1; AJvYcCX178TubHREYWqOL6A8pq0JDeFrawKy8oq8p6sLYAyl85lOaDqRlPgVFcupFQg8+9+8DhQVlNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUyNEFVQhrIpF84ohoFgk2RBbYf9CkwCgwD/8w4UPEzjjE+7be
-	MMUgwrvV9kuLB/5K0A4tM/q2rv/IHdkDj9n+YYIqoN5BEn5VnFJkHAFTzO/PhQypLpT7qw8ohHN
-	hCh0REsi0IRBFw9fW1oGWLTsKbql2QkfkgkjBLEpYic7tBoTjWTMAnfkKYRU=
-X-Google-Smtp-Source: AGHT+IFpRSV+o0VdZ2ADjEv8JE9Vhcg9FBZTlorBv5/RMH8DkJw5J7xlEfMsvL2YQ9KhggeWJ6cmRI1zG7FfczeFGTz7wfOW7AZz
+        d=1e100.net; s=20230601; t=1749762544; x=1750367344;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hq3+yK1phccQ3oaWkqHGXWvj3PMsQEpv/itLEx5vl2A=;
+        b=fQF48RC/X1nb7+xNwb4TWotH91Xn+uU9XB6FYMUJMJ2niPLC4LQV7bydb2oIZuRU/m
+         AijqvZ/MzTs8PmaQu3V1zE7nYMcUSKErLO0ya22VAfK/U/xopcnan40p0X3gCYDLXye8
+         pdS/c6xBzV//nZtPxBu/NwEZ+f2Rf2mFcQzCiB1IK8i84OpQBcDyBsEdeHnV8mLomwJ5
+         4CZuMobLWhWE9Xex+4vCc1hEFZwpCTp8lmBma/fxe2Oi8txadNOG55glHsbiSlY1DxgJ
+         C1LpQ4IqLX74Nml3kSj564ippSz0SVfSFGofQn1qQVOEBwW/KYyrWQWuLGy6d9BeOklU
+         Ja4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXE2Qk4ZorYVGLT4tGFOn8zsrF2QzOQc7JiUQAEJDpkNJJuEao7x3jzRoATkxfiaDB+2DEx9eo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTGgYnpdyqS2LcSCwUM9Ve7WMg9BHx5Xb6GIeWZkAsziebVIXX
+	8Ek45GMiGLkimPn4hWyG985V/p9BfFwvzy/n63y3zW5MM+cbNUDEonD67AkFXi5Yr20=
+X-Gm-Gg: ASbGncu+OgKsipzkNIdImOgOp2yn+mt6VqhskEiQ+6h8X7Nt2BYHPQ7EqOZqcpnrx9O
+	MvbPKzkhkvTbPClLvmgG1iH3KuTBM0WD213F7RrW5LUhUGwnG2u0zp1HkkhpMfuHC5kE3IPm0xZ
+	iUpxE8Ff1FXTRk03oW35/5K/N5gxDXTH5G0cJEgFz3RaHPlpoXsTSqXBS7Es4a+5O3AeCWopm6r
+	G2AAJdUIWmazwd+Ly2BO6vDnrKqTeduQQ3RhDss9ZWsnnAJtxLF3/3dn1idhvTYlRrtT26+yF6m
+	CeMxV/rWOzj4ANcUgoweYNRUr2MX+ZtSFBzNaj9SGbhXOUKWQSlH/uBB01xmn3DXgF0=
+X-Google-Smtp-Source: AGHT+IHo3dXHz3hfp/oSpJOLVWdZC25HXQQCxbtTzIPWB8b8q5Ww8A/XoI2b0SmZY5SwEK+xrXw+fA==
+X-Received: by 2002:a05:6000:2dc5:b0:3a4:d9d3:b7cc with SMTP id ffacd0b85a97d-3a56a31ca98mr20121f8f.28.1749762544081;
+        Thu, 12 Jun 2025 14:09:04 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e25e89fsm30934285e9.33.2025.06.12.14.09.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 14:09:03 -0700 (PDT)
+Date: Fri, 13 Jun 2025 00:09:00 +0300
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	ecree.xilinx@gmail.com, saeedm@nvidia.com, tariqt@nvidia.com,
+	leon@kernel.org, linux-rdma@vger.kernel.org,
+	linux-net-drivers@amd.com
+Subject: Re: [PATCH net-next 3/9] net: ethtool: require drivers to opt into
+ the per-RSS ctx RXFH
+Message-ID: <aEtB7G5HVX2-jB9H@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, ecree.xilinx@gmail.com,
+	saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org,
+	linux-rdma@vger.kernel.org, linux-net-drivers@amd.com
+References: <20250611145949.2674086-1-kuba@kernel.org>
+ <20250611145949.2674086-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2782:b0:3dd:b7da:5256 with SMTP id
- e9e14a558f8ab-3de00bce3e1mr5539445ab.19.1749762511554; Thu, 12 Jun 2025
- 14:08:31 -0700 (PDT)
-Date: Thu, 12 Jun 2025 14:08:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <684b41cf.a00a0220.1eb5f5.0109.GAE@google.com>
-Subject: [syzbot] [net?] [nfs?] WARNING in remove_proc_entry (8)
-From: syzbot <syzbot+a4cc4ac22daa4a71b87c@syzkaller.appspotmail.com>
-To: Dai.Ngo@oracle.com, anna@kernel.org, chuck.lever@oracle.com, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jlayton@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, neil@brown.name, netdev@vger.kernel.org, 
-	okorniev@redhat.com, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tom@talpey.com, trondmy@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611145949.2674086-4-kuba@kernel.org>
 
-Hello,
+On Wed, Jun 11, 2025 at 07:59:43AM -0700, Jakub Kicinski wrote:
+> RX Flow Hashing supports using different configuration for different
+> RSS contexts. Only two drivers seem to support it. Make sure we
+> uniformly error out for drivers which don't.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: saeedm@nvidia.com
+> CC: tariqt@nvidia.com
+> CC: leon@kernel.org
+> CC: ecree.xilinx@gmail.com
+> CC: linux-rdma@vger.kernel.org
+> CC: linux-net-drivers@amd.com
+> ---
+>  include/linux/ethtool.h                              | 3 +++
+>  drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 1 +
+>  drivers/net/ethernet/sfc/ethtool.c                   | 1 +
+>  net/ethtool/ioctl.c                                  | 8 ++++++++
+>  4 files changed, 13 insertions(+)
 
-syzbot found the following issue on:
-
-HEAD commit:    2c4a1f3fe03e Merge tag 'bpf-fixes' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1432610c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c4c8362784bb7796
-dashboard link: https://syzkaller.appspot.com/bug?extid=a4cc4ac22daa4a71b87c
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1126ed70580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cd1ec81a3ab8/disk-2c4a1f3f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/992d9b6a25bf/vmlinux-2c4a1f3f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/85a9bf583faa/bzImage-2c4a1f3f.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a4cc4ac22daa4a71b87c@syzkaller.appspotmail.com
-
-WARNING: CPU: 0 PID: 6182 at fs/proc/generic.c:727 remove_proc_entry+0x45e/0x530 fs/proc/generic.c:727
-Modules linked in:
-CPU: 0 UID: 0 PID: 6182 Comm: syz.1.75 Not tainted 6.16.0-rc1-syzkaller-00010-g2c4a1f3fe03e #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:remove_proc_entry+0x45e/0x530 fs/proc/generic.c:727
-Code: 3c 02 00 0f 85 85 00 00 00 48 8b 93 d8 00 00 00 4d 89 f0 4c 89 e9 48 c7 c6 40 ba a2 8b 48 c7 c7 60 b9 a2 8b e8 33 81 1d ff 90 <0f> 0b 90 90 e9 5f fe ff ff e8 04 69 5e ff 90 48 b8 00 00 00 00 00
-RSP: 0018:ffffc90003e5fb08 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff88804e6568c0 RCX: ffffffff817a92c8
-RDX: ffff88803046da00 RSI: ffffffff817a92d5 RDI: 0000000000000001
-RBP: ffff8880353bde80 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff8880353bddc0
-R13: ffff8880353bdea4 R14: ffff88802556cae4 R15: dffffc0000000000
-FS:  0000555562486500(0000) GS:ffff888124962000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000c0024fb070 CR3: 000000006b39a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- sunrpc_exit_net+0x46/0x90 net/sunrpc/sunrpc_syms.c:76
- ops_exit_list net/core/net_namespace.c:200 [inline]
- ops_undo_list+0x2eb/0xab0 net/core/net_namespace.c:253
- setup_net+0x2e1/0x510 net/core/net_namespace.c:457
- copy_net_ns+0x2a6/0x5f0 net/core/net_namespace.c:574
- create_new_namespaces+0x3ea/0xa90 kernel/nsproxy.c:110
- unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:218
- ksys_unshare+0x45b/0xa40 kernel/fork.c:3121
- __do_sys_unshare kernel/fork.c:3192 [inline]
- __se_sys_unshare kernel/fork.c:3190 [inline]
- __x64_sys_unshare+0x31/0x40 kernel/fork.c:3190
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x490 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f239858e929
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd08ac9b18 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
-RAX: ffffffffffffffda RBX: 00007f23987b5fa0 RCX: 00007f239858e929
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000040000080
-RBP: 00007f2398610b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f23987b5fa0 R14: 00007f23987b5fa0 R15: 0000000000000001
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Reviewed-by: Joe Damato <joe@dama.to>
 
