@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20A9AD760D
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:29:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470C1AD763C
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:33:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEF5A3B051F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:27:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7A487AFFDD
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D6D2DCC08;
-	Thu, 12 Jun 2025 15:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F061C2DECA5;
+	Thu, 12 Jun 2025 15:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dzDUH7J5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CjqPN+kn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FF12DCC04
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB9D29B8EA
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741620; cv=none; b=bUm0LfZ1ppAfa8TtNmdMhcgGTXyLKt6+GJirSzCmG+qab8S8QgZO8ocmpvpEHwZwHkgnrdyaSu95vFy54h5nxDnhvSprSLSG8WhNXzhI1tggcmDLmEJTtocyjBQ7iNdYGS2fdRNvHOPp7xG3Y5nptbZl5SnYoInN1jozb7X7gC8=
+	t=1749741621; cv=none; b=LqYpBwWOcOnyhR1mCU+U+ZvCm+jzaRqWWNUnEaOVMiqgtGKXqcoCaWpzXNOvi7cfTa7aDF0d6d6cwA6gisENMBBE91PI+j72MY+o8oNaK2DNWLpQOOvDhj5MXTpsB45FOsJAxaBkGfNxWzgd1Cvut7nFkzt3wQKpbEEllSrg+SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741620; c=relaxed/simple;
-	bh=JcYMGJZDpp8EP5QbvvNYj5/u4QTJivgxJeuE9QB0Ls0=;
+	s=arc-20240116; t=1749741621; c=relaxed/simple;
+	bh=vn3lQBxpov3jjjOtqnE5Bqxi2sq3/h8ksyKc7go9wiM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NaHeIUV6mLQ42e0pxAn3+KvLp8TB17tc9+iRzZExGpShGFr5JaltcUcHmc1smK61AM/0TG4wazQEFacRbutMSIzb5JSUttP1DEJ7DaIEkkj/1foxgBjAChCxvbAzX8AS+T8oICeOIMZRJ4fNFPGCfj+lvFveSsqHd5UX11xL3po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dzDUH7J5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C040BC4CEEB;
-	Thu, 12 Jun 2025 15:20:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gLbk2zniMtNot0hmW371ZnH0oJdsfdZbk/1PaKHh328tB1DF1wEi2xizyhH6fpNTmg0+HT5mFObG6JmZpcnYeWiQP34gcjvKv2vI/rzJwQN5bgCULHmSPuwxAgT/w/DF2QoTkJgCizv0OrcTp0FIrz2/DA+5rHQ+uRQG+6E/Eb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CjqPN+kn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D06BC4CEEB;
+	Thu, 12 Jun 2025 15:20:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749741619;
-	bh=JcYMGJZDpp8EP5QbvvNYj5/u4QTJivgxJeuE9QB0Ls0=;
+	s=k20201202; t=1749741621;
+	bh=vn3lQBxpov3jjjOtqnE5Bqxi2sq3/h8ksyKc7go9wiM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dzDUH7J5z6Q5TJE7i0lCklP6ndwNre7XkIhpfG12nipXhHBJpL38KcQg1UVUPvc9D
-	 xLbwhLyNiHJPNarK2kXdEAq9SolZ79p7vnsEh8M1UfgTIwQa6iAQi6Z8R6SbmMM0Oo
-	 rlNjS4P38tsVboOlgjdrBINyyyPJYke9WwlG26Gt0QUqot/HJh0j9MLslLHdJWc7p8
-	 9EcAzUhGLGG4oc5eQWZl6Rurg14u0nUoJ+v+xX4shxnH1phrvNmDp169AeNUP4ZayM
-	 fUdBO2t0gIf4QIxZyVMwbhOPSdXajaoOG8tFH3jvgPHnepGFHSLEDZalL8eif09K2J
-	 ceiRMd4TwPTYA==
+	b=CjqPN+kni2Qaps7WYeaVI5YUhh3Db575D6RswvsINvO+vpNVezSPtrN53FGZpSAAF
+	 rF/dTuzWehrU6HklwzSUBlZIEcEpkMn4sV5qaFxnlYfrmzso1YSfFriMlacKXe3hmS
+	 IHGWNu2p3xAD20qDgOcwLC5jZM4HuinlyYff35E5iVhpAos+RhCbeTCn4cVFi53MEY
+	 eoh6PlfRX5jKQsY7hn4q+lueYMiBRN5kPKevtuac1iZbJlzv2/3Mf+tnFdB8UO+eJL
+	 /jSqjouyCpikbD5gQpOO/3jYIvdMklcFoIkDtSTF9MQp2na4+LVWGbhM5z2PnYaTZP
+	 8DER70qyp2SOQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD9A39EFFCF;
-	Thu, 12 Jun 2025 15:20:50 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C3839EFFCF;
+	Thu, 12 Jun 2025 15:20:52 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] ipv6: Move fib6_config_validate() to
- ip6_route_add().
+Subject: Re: [PATCH net] net: drv: netdevsim: don't napi_complete() from
+ netpoll
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174974164949.4177214.14871483094576808515.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 15:20:49 +0000
-References: <20250611193551.2999991-1-kuni1840@gmail.com>
-In-Reply-To: <20250611193551.2999991-1-kuni1840@gmail.com>
-To: Kuniyuki Iwashima <kuni1840@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@google.com,
- netdev@vger.kernel.org, syzbot+4c2358694722d304c44e@syzkaller.appspotmail.com
+ <174974165099.4177214.7214118561387768587.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Jun 2025 15:20:50 +0000
+References: <20250611174643.2769263-1-kuba@kernel.org>
+In-Reply-To: <20250611174643.2769263-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ leitao@debian.org, dw@davidwei.uk
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 11 Jun 2025 12:35:02 -0700 you wrote:
-> From: Kuniyuki Iwashima <kuniyu@google.com>
+On Wed, 11 Jun 2025 10:46:43 -0700 you wrote:
+> netdevsim supports netpoll. Make sure we don't call napi_complete()
+> from it, since it may not be scheduled. Breno reports hitting a
+> warning in napi_complete_done():
 > 
-> syzkaller created an IPv6 route from a malformed packet, which has
-> a prefix len > 128, triggering the splat below. [0]
-> 
-> This is a similar issue fixed by commit 586ceac9acb7 ("ipv6: Restore
-> fib6_config validation for SIOCADDRT.").
+> WARNING: CPU: 14 PID: 104 at net/core/dev.c:6592 napi_complete_done+0x2cc/0x560
+>   __napi_poll+0x2d8/0x3a0
+>   handle_softirqs+0x1fe/0x710
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1,net] ipv6: Move fib6_config_validate() to ip6_route_add().
-    https://git.kernel.org/netdev/net/c/b3979e3d2fc9
+  - [net] net: drv: netdevsim: don't napi_complete() from netpoll
+    https://git.kernel.org/netdev/net/c/1264971017b4
 
 You are awesome, thank you!
 -- 
