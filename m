@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD42DAD760F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:30:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827D3AD7614
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF023B2533
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:28:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E4EE3B3379
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD43A2DECD2;
-	Thu, 12 Jun 2025 15:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97662DFA3A;
+	Thu, 12 Jun 2025 15:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOEML57q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8Zatx+E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16252DECCE;
-	Thu, 12 Jun 2025 15:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A182DFA2F;
+	Thu, 12 Jun 2025 15:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741624; cv=none; b=KrNrGf2fyXGz2X8VlXadONpVhM8wVAjfw7hmu7OpwgTmUGXs976NY/AKcIhjo93osQZSO1icthl8GZWSUUWFrKXrC6w6VHdhPGH2M9J+IkAXuIyuE00p7qbTOmElFGgjuMsyjYRnTSU5GDDIUSrqH+b1IymjHz4EroUU+KE0AzQ=
+	t=1749741625; cv=none; b=q/hCh4S9dMzhDYCKUJx13XEPFwSVdeRbPmMg6ok+VEllRCyXKnSOnKD06qP3FHMwKYpfPxyxrUuGx1vurBAe3ExcjVhA3uVf9UDvoHP8TXBIZvPkjS2JiCAihKkLzAB9H9e0HQPeVnC7aUxEc2XB8Uwy4TYMhIe+0XDRImFPs0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741624; c=relaxed/simple;
-	bh=2tejiz5DVdOlRmvBqp9GHYQSovXdiM+qGs9S1837dMI=;
+	s=arc-20240116; t=1749741625; c=relaxed/simple;
+	bh=ohaM//YlfVRwFhoaU5seQ2zQya1SsMLpsL7jIG2uzMM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KVPl3oF3GvOtkN2iMXzzTeDTRdZRKByF2eY8aJEpQsX8zrSatXQSCZhykqabTNs0HCl8bghDna/35ALzwfPWfVFwv5TXIPvGrm0mXC2zCFug5E4KIosU7Nm2GuY3zQiJbTN1OP+4JWhZyUnlbOiD3QHCtzuuDGvv3qBzuyNe6KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOEML57q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DE40C4CEEA;
-	Thu, 12 Jun 2025 15:20:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=XByWcz81vtwRzZOZz2M2ViLZQm6BJgLANyY9swUMdeOxINUXzAHpgwyI+h58YGR8h7JTggWDxLRmXr9FVrcJpQpIOz3pLm3r+uZSxFoabHWFebdI2hwjdfTS3J968lYXKP5CTp6cYwMejHURtRg9F68ZG1AuMNlRGr6S9IWKF3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8Zatx+E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81A50C4CEEA;
+	Thu, 12 Jun 2025 15:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749741624;
-	bh=2tejiz5DVdOlRmvBqp9GHYQSovXdiM+qGs9S1837dMI=;
+	s=k20201202; t=1749741625;
+	bh=ohaM//YlfVRwFhoaU5seQ2zQya1SsMLpsL7jIG2uzMM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HOEML57qYbZDGVsIJ7Q4soNuwPBNQ7k35nOmoxMHE0By94Q6gPMVPiNSy4k9kLC3R
-	 UKZCjFi/inKphi8j61OAZcI+bZa0z3F08z141U91P0mqk9C9OwTkB1NPLwDeNh/F+7
-	 QnExAtg8E0ipxQ6xgoyLkUO5oVvY9sF9xx0Kc8jkwyUgCuads0smeVPnY3S9othBVA
-	 1PMYCsJW4xdQbASV/kIt0N9xIVKJjzkMxWuWL+a8mzo+/05Bw9Kq8khHGEtDroZ7E2
-	 X4NDW3aB65dxwOziE2fyduG7NqU8X4HENQBilHrz24FR2bC0MWRpnLknCuKypEsLvU
-	 jeiF4lnjEhRdg==
+	b=I8Zatx+E3gUhVhnMfLIlexkwthMcILemqJgU7RRCAf5wXXpWlQLUq9jlkjla9LJbE
+	 PGn6VD3+1H+Fz4H6cFCD/DObdJFze3u6XeQoentvcq2wUZ31UiVtQQKI2atiuZC492
+	 FCvWCk4bCEl2KH3RkxLtZ2svG2z7zq7oqmWUavi00pFnRKqOSihYv8Qh8YIqMgDYXv
+	 YfMeDAoSwLDhKjvy/NL7dk+FscV4Vz45ImFHUU74Z4FLUovLC47sZ0O1fGWyZU0SUd
+	 zSTGodEYFQnkSvSIM++3b/+NGK4jX/YmlJGQ/5DVhIBnLO2x/pW6KbASOkPm7ro82h
+	 8iOvrU88vPnwA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D4A39EFFCF;
-	Thu, 12 Jun 2025 15:20:55 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD8939EFFCF;
+	Thu, 12 Jun 2025 15:20:56 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V1] veth: prevent NULL pointer dereference in
- veth_xdp_rcv
+Subject: Re: [PATCH v2 net] net/mlx5: HWS, Add error checking to
+ hws_bwc_rule_complex_hash_node_get()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174974165399.4177214.6619707775306448053.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 15:20:53 +0000
-References: <174964557873.519608.10855046105237280978.stgit@firesoul>
-In-Reply-To: <174964557873.519608.10855046105237280978.stgit@firesoul>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, ihor.solodrai@linux.dev, eric.dumazet@gmail.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@cloudflare.com
+ <174974165549.4177214.8588898310621902880.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Jun 2025 15:20:55 +0000
+References: <aEmBONjyiF6z5yCV@stanley.mountain>
+In-Reply-To: <aEmBONjyiF6z5yCV@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: kliteyn@nvidia.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, cratiu@nvidia.com, mbloch@nvidia.com,
+ vdogaru@nvidia.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 11 Jun 2025 14:40:04 +0200 you wrote:
-> The veth peer device is RCU protected, but when the peer device gets
-> deleted (veth_dellink) then the pointer is assigned NULL (via
-> RCU_INIT_POINTER).
+On Wed, 11 Jun 2025 16:14:32 +0300 you wrote:
+> Check for if ida_alloc() or rhashtable_lookup_get_insert_fast() fails.
 > 
-> This patch adds a necessary NULL check in veth_xdp_rcv when accessing
-> the veth peer net_device.
+> Fixes: 17e0accac577 ("net/mlx5: HWS, support complex matchers")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+> v2: Add error checking for ida_alloc() and add cleanup.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V1] veth: prevent NULL pointer dereference in veth_xdp_rcv
-    https://git.kernel.org/netdev/net/c/9337c54401a5
+  - [v2,net] net/mlx5: HWS, Add error checking to hws_bwc_rule_complex_hash_node_get()
+    https://git.kernel.org/netdev/net/c/1619bdf4389c
 
 You are awesome, thank you!
 -- 
