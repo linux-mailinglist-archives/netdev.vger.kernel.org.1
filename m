@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92DAAD7553
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:10:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9550CAD755C
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83DA0171E3F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:10:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8C013B04C7
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0839C2980A5;
-	Thu, 12 Jun 2025 15:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB1329826D;
+	Thu, 12 Jun 2025 15:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQXGFcQG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFFmQTLf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D254B289369;
-	Thu, 12 Jun 2025 15:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53331298259;
+	Thu, 12 Jun 2025 15:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741010; cv=none; b=VHx9h/J0c+3MStSzmvOYv5lqH6fQA9+v2GWjVyhdqby0p/qF8aEfix70iOMB/XZrHrgSt3biDVY+f78AVPnZ/Mh1JdvyFLszBJOiVy/QxGc6nSqbnSVZ7SmgFc3l+AFhydS+fRogcfc56ACusmJ3ULrb9rL65TeJF4SgvXClyjw=
+	t=1749741012; cv=none; b=ndUUzKnJhAVslnMzBEYsC5wSzKBImKFMRmjdUz2Uepco532A6T3wUL1WN15QP6iCc4r/Bbn5SGW63wubzDJS13q1Bi0u1/aKT2gZLLkhuTQ1eV0qvGNpK4jUu9rgBVvRWD/96g5P0iYPWwF8AHJw1uM1t5g3RCCWNC9sovhxd0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741010; c=relaxed/simple;
-	bh=XvQTsKriWbqAu8Zx+Vc1Yg+icq6iSLtma+PD/pMLNnY=;
+	s=arc-20240116; t=1749741012; c=relaxed/simple;
+	bh=7HuZYlwdOAr+rTjcIyShMdg7t/se2aVwB8XWmzy6raM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Cu2HpBbfHx/6FHcIy478OjcUpq03ZFFnFkl961R0xM13upW6qZ9/s7ysoqyeiXyKLlIGufqg+xPSDlB5MMoKgpg3XV41SIWeXBfKSX0wFmjy2NWLPKIa9Yv1EBO5nyOWGR99iWc8o8tMoiIIUrA92NdUkzUKE92gSxsFHKIQbS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQXGFcQG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F91BC4CEEA;
-	Thu, 12 Jun 2025 15:10:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=eZ8l6WVzkx2U1BDfcWmL7f2pbqdnlpmdkN+SsF9KppA/0bENnsVkngsYm6XLdBBiivvabkOwr3l+1p78LhdX6Viq5xR1F/4SzWU1Jlg3oayTa6CSlvv6jnMpiLxKtSRkHYEQ6Mg9+yLZ7ywiBgoXQLXVBWkumk8vgWpu0M+mSTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFFmQTLf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAC1C4CEEE;
+	Thu, 12 Jun 2025 15:10:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749741010;
-	bh=XvQTsKriWbqAu8Zx+Vc1Yg+icq6iSLtma+PD/pMLNnY=;
+	s=k20201202; t=1749741011;
+	bh=7HuZYlwdOAr+rTjcIyShMdg7t/se2aVwB8XWmzy6raM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RQXGFcQGlF7Ilm2kXv3gCaTAz36u27B84AR6RX7Ekx3ig5wKokgx7d+C1qTffNA5P
-	 w55VKnVslQggIf0oWrehX+7bFmKvXB9R1xbZ/PiZj3M9YUaaHO5qukhRTcdbBXnQGv
-	 N0s90y7JSsT7DfRMlCPjZ4oT0iiIayEZB2AS+DffOoyrXV/YV7cpQm/sECrkhhDYtu
-	 J9y/FrREhYqgXEP0XXVO8c3Nm54XAp3TpWD0qr2wPOWBHBDcIOAtm5AJCjd/7rvGdH
-	 kHIL/o+2e/DGqrmMlu3tJc9gEk8V0/Pw1jKQKNG5V47MQHrKipa4Y9pmTpwvm5wKEp
-	 O1WLSYkPKtNYw==
+	b=jFFmQTLfiuky1+AeTBDsavyemv3j/aFMBH+59tw+4khhHWjQ3/O9uCwB9nksAUkku
+	 rLijjtXSrwAF6PmTCBBWudy0xFsV56gVHFi2UC/P6hCp9GgAfUq/pufRN42xFyQg+7
+	 bBg/9LOmf5vcqdPNzyrh1Iz2f/xq4NnruJHfjwhY0tIJdKM7uHMT2oiCTmxprjZFx/
+	 exAoDrkRY4CDXrZpUPPr9z2+FPDxrgTSZnbR9AQwUDsuOO28/ZgSWsFCrIwMaVGUB6
+	 6TuOJRRdis+pO5GDaNWv/VKrkv0mp3SY4Dw5W5Gncq5RMbT/8BQIUdFks4hU8pWSFf
+	 R47EgqmK74/7w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C3B39EFFCF;
-	Thu, 12 Jun 2025 15:10:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADB939EFFCF;
+	Thu, 12 Jun 2025 15:10:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net_sched: sch_sfq: reject invalid perturb period
+Subject: Re: [PATCH net v2] net: phy: phy_caps: Don't skip better duplex macth
+ on
+ non-exact match
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174974103999.4173578.3649013522414543337.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 15:10:39 +0000
-References: <20250611083501.1810459-1-edumazet@google.com>
-In-Reply-To: <20250611083501.1810459-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, gerrard.tai@starlabs.sg,
- stable@vger.kernel.org
+ <174974104149.4173578.17008792239635511741.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Jun 2025 15:10:41 +0000
+References: <20250606094321.483602-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20250606094321.483602-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, horms@kernel.org, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, christophe.leroy@csgroup.eu, herve.codina@bootlin.com,
+ romain.gantois@bootlin.com, shaojijie@huawei.com, larysa.zaremba@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 11 Jun 2025 08:35:01 +0000 you wrote:
-> Gerrard Tai reported that SFQ perturb_period has no range check yet,
-> and this can be used to trigger a race condition fixed in a separate patch.
+On Fri,  6 Jun 2025 11:43:20 +0200 you wrote:
+> When performing a non-exact phy_caps lookup, we are looking for a
+> supported mode that matches as closely as possible the passed speed/duplex.
 > 
-> We want to make sure ctl->perturb_period * HZ will not overflow
-> and is positive.
-> 
-> Tested:
+> Blamed patch broke that logic by returning a match too early in case
+> the caller asks for half-duplex, as a full-duplex linkmode may match
+> first, and returned as a non-exact match without even trying to mach on
+> half-duplex modes.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net_sched: sch_sfq: reject invalid perturb period
-    https://git.kernel.org/netdev/net/c/7ca52541c05c
+  - [net,v2] net: phy: phy_caps: Don't skip better duplex macth on non-exact match
+    https://git.kernel.org/netdev/net/c/d4e6cb324dcc
 
 You are awesome, thank you!
 -- 
