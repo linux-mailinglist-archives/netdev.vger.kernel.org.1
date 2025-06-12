@@ -1,572 +1,129 @@
-Return-Path: <netdev+bounces-197041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30BD9AD76BE
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:45:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8616AD7668
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A18CB3B6DF7
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:38:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3856188E81C
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577C42BDC3E;
-	Thu, 12 Jun 2025 15:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D709829DB77;
+	Thu, 12 Jun 2025 15:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dD9yO5dI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rAg/G+SW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246362D4B54;
-	Thu, 12 Jun 2025 15:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68BA29CB58
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749742495; cv=none; b=cfLlt1+LAAUePx/n3MfLhWzyZ29v5GhHt88DkkmUCM5z0Z4onT1gNJMxNweJXwgvpNF4HixUe23x9rh/HuXEWbJCKq1YxxWnbN5nJhJ04O7C7qzNYBeHoJKv175okVucgJaRwg+t3GQ71tF7qL4+skprAX7n1S3mQ1HBWHI5pp4=
+	t=1749742194; cv=none; b=qdu+/1QcwWei9SRpluMFdVlkxKuWAVlJUJ2wKyKBKdSm6O8X7nNVHaQx7898qlMDmPzR/pmUvTDlV5oVZpalJWaez0wn8sCyOEXT1/AV8GYbfUjYnIl0yXY132i6yBQImAxtZPslw3HGUlhtxysU+VcDCRBE0fGcYkC64VvD8Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749742495; c=relaxed/simple;
-	bh=cDoLk67rbESwtZ7DKWO/3huu3mG93G2fAtY1RItWTM8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RzGlf3RTeRVYWgEFlDcBFwBoIqGVoprEfoiKorxRqVXtypY5MwmgEwr8sBPgBeqf6XT/MwmrhcIZVmxar+a3S00ujjBH2rFY9b6wwMh4B1uSfIvpIdota64ohE86gqAU0Nm4hDQn+wwvRsUuD70swi8ixK6ubPTcW9zKGVaY0Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dD9yO5dI; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749742493; x=1781278493;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cDoLk67rbESwtZ7DKWO/3huu3mG93G2fAtY1RItWTM8=;
-  b=dD9yO5dIlZ8oxNr8TUsaW8S5Rof/gHPcZ4iWh5Sp5MQd7afmZtGrRvjY
-   0Wv9KcitRfBzE6z1eQikYo5B4H+ifqncf00w8qF5M4aHXvdLw0S1kki1r
-   HzD6ftCsN6fWgSiWSb5326zV20muaUeFRqfxFm0+63+eREb18zmZyKMOt
-   ofnz/B1zaf2Kw2fwQ7lErBSaL/rfnJTALibGvPxkl91jyMd+/bzetKuZb
-   kAsTTKjvVFgUPW7rlCMy9b6lt1oxYSSWkfAXrs460eEpTr0obA4q+nzxy
-   ECg8cKsxxN4nMhF3fBFnjPpZsKitqGdh2MOFpB6Hni/gx3CIQFI9t8YCT
-   A==;
-X-CSE-ConnectionGUID: j6BXPNNORKuPUBzLjrfDRw==
-X-CSE-MsgGUID: 9uT68XZCQ+eDfUufUabIsA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="51158679"
-X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
-   d="scan'208";a="51158679"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 08:34:52 -0700
-X-CSE-ConnectionGUID: sbtI03/MR4ugrDW4oW2khA==
-X-CSE-MsgGUID: 96FhL6UwQ5STajmWu0TPRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
-   d="scan'208";a="152546869"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orviesa004.jf.intel.com with ESMTP; 12 Jun 2025 08:34:48 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: donald.hunter@gmail.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	aleksandr.loktionov@intel.com,
-	milena.olech@intel.com,
-	corbet@lwn.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-doc@vger.kernel.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net-next v6 3/3] ice: add phase offset monitor for all PPS dpll inputs
-Date: Thu, 12 Jun 2025 17:28:35 +0200
-Message-Id: <20250612152835.1703397-4-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250612152835.1703397-1-arkadiusz.kubalewski@intel.com>
-References: <20250612152835.1703397-1-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1749742194; c=relaxed/simple;
+	bh=z0ar1hJos7ARhEgbjSSfr1bzntLG3QJmXsE49Omcdw8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=E8Bm8DeVKNuNwP3l6LfJjuFl7hqDctTEWrWK4nHrRroFht9HZwTMV358qWoriy6rq03k3wyZLStnsnz7+l1N1/ZiY2oUTi1M+foFDUOzz0VmkfdkRunAIFvTxw+OKzlv9ARrn1npFpPqHGnvmJmqeKycG+SsbQb3XcqPIU4FhpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rAg/G+SW; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-450d08e662fso1090645e9.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:29:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1749742191; x=1750346991; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DKvQ0kizkJd8CblYTjjvTx/DyqmBuLZOpwvQ/Oh9KYc=;
+        b=rAg/G+SW2txg0b7vzr6ipT/igZ8ZIsSUxWPPHeSBCfVOdSeb37vMFzo/tnXAwVYVDG
+         AjduHqrBXzcBgJQmivIkFdCh/UVcFd+Hi8xsj3ZPERGr76CSuHGbnxjF/6N0Y7D7JqRM
+         p0nSVJvXoGYwosAy4osuKRzZdwWJeoPMmT8SFkPvB5oiQx9xBg8rX4kRm94p0yGeF0vA
+         rCyWw+crKm2xq4MwJ9AtwYZ/cG4t9zn2JkCbD7AMtdqFdF+ZFm5l0mVAWt0tN57m+FVf
+         yKLkPof3O1Po4Ju08M4Qb4BVX6M67vubZmCeQmGbdDX3isCSsEAgqGNYS6JpbzOJXMlO
+         idAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749742191; x=1750346991;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DKvQ0kizkJd8CblYTjjvTx/DyqmBuLZOpwvQ/Oh9KYc=;
+        b=PlAO2jrM12wgdPj0cct+46mZgHzKEzB0YK+ZJ/P2XU78yUZ7F7EJu5eFCUw6FtbURT
+         yGO55FqQ9ZX0IBD6jFetkiGMTeZyalKZI8xZc37BJEPfyw/oHG1wjjyWwApTzKEFw2X4
+         /SkoV20T6dxw5vhfg4RH7P4O+kpsv0VrH/Fr+q3XorpjvEAKMq+QTUb9hAVrzQ/RgIcI
+         nZBfVX3p+ujIdsrXVJKnXUuuxvj0NoV/LvDLX/APJHV84PJvsgIbNL9Bc9y4jNpL21pU
+         OKjap21XV91dAMRgiSotlX6jShJ5chd4LjNsCnOmVF3yQ7Uq8qAT8aHM0i9MqFW5CDif
+         p3WA==
+X-Forwarded-Encrypted: i=1; AJvYcCXY3wfCQ4did5Luhh5qrq6edCLvjvkhB39wDoB/Q2iLHRUdUFa8ocaWdpY0f1UOaYbVrt5Dy10=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq1XyNQKZ8SFd0IkBErkJEZ8DF/Sj1qqP7j+O5LpRdSJLwvnsS
+	DXb9QH6AAgg1mlPVOnkzEveYbnG3o++HN30TyS9u80p2UNrv9p1wXNU8RVGzcKitqKQ=
+X-Gm-Gg: ASbGnctOlC7oC06yKIkFGtkRwlmxP2kW9m8Lyn1Iuw+aEiVv21DznBRhgygjN1S5JUO
+	d17ClIWvpWix0gHnFSb3a1hrGjoaP1qEnE+8p6WzmYgmLIHUfmNFanF8YSRa4w54irnkj5Eij9f
+	F8Tj32R3XwvjyM1z3hxgPaXnQ1ot3m7KFaA5xhsPjuyuFCYTyyopdtlDivlIW88AZokETCjioHF
+	nUEg+5HhR8QPWncbSl6lXyN5WAeOjVS2NNyybRD78VJiiNDnJaCuUDNCLcN2q6flPRwkgGgYV0M
+	cJXo98ZoxVW/mY/LwjTWYdAAhNbUkZY3ZWq//0CI3ptWb0pAUYys/zroNqNxwwZJSb3ukaoqjEn
+	JuqVugs4=
+X-Google-Smtp-Source: AGHT+IHcEf5K0JeoZyRffkMk2oZLKO8IT8ky+qUldOOWFDZEO8dRcFFzDiYHDmEiK60pzDMoVYDLyQ==
+X-Received: by 2002:a05:6000:26c1:b0:3a4:f8a9:ba02 with SMTP id ffacd0b85a97d-3a5586b8858mr2648512f8f.1.1749742191063;
+        Thu, 12 Jun 2025 08:29:51 -0700 (PDT)
+Received: from [192.168.1.29] ([178.197.223.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e232e4asm23557265e9.11.2025.06.12.08.29.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 08:29:49 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: krzk@kernel.org, s.nawrocki@samsung.com, cw00.choi@samsung.com, 
+ alim.akhtar@samsung.com, mturquette@baylibre.com, sboyd@kernel.org, 
+ robh@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com, 
+ sunyeal.hong@samsung.com, shin.son@samsung.com, 
+ Raghav Sharma <raghav.s@samsung.com>
+Cc: linux-samsung-soc@vger.kernel.org, linux-clk@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ chandan.vn@samsung.com, karthik.sun@samsung.com, dev.tailor@samsung.com
+In-Reply-To: <20250529112640.1646740-1-raghav.s@samsung.com>
+References: <CGME20250529111705epcas5p25e80695086d6dc0d37343082b7392be7@epcas5p2.samsung.com>
+ <20250529112640.1646740-1-raghav.s@samsung.com>
+Subject: Re: [PATCH v3 0/4] Add clock support for CMU_HSI2
+Message-Id: <174974218878.126240.878153774506566554.b4-ty@linaro.org>
+Date: Thu, 12 Jun 2025 17:29:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-Implement a new admin command and helper function to handle and obtain
-CGU measurements for input pins.
 
-Add new callback operations to control the dpll device-level feature
-"phase offset monitor," allowing it to be enabled or disabled. If the
-feature is enabled, provide users with measured phase offsets and
-notifications.
+On Thu, 29 May 2025 16:56:36 +0530, Raghav Sharma wrote:
+> This series sorts clock yaml and adds clock support for the CMU_HSI2 block.
+> 
+> Patch[1/4]: dt-bindings: clock: exynosautov920: sort clock definitions
+>         - Sorts the compatible strings for clocks
+> 
+> Patch[2/4]: dt-bindings: clock: exynosautov920: add hsi2 clock definitions
+>         - Adds DT binding for CMU_HSI2 and clock definitions
+> 
+> [...]
 
-Initialize PPS DPLL with new callback operations if the feature is
-supported by the firmware.
+Applied, thanks!
 
-Reviewed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v6:
-- rebase.
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  20 ++
- drivers/net/ethernet/intel/ice/ice_common.c   |  26 +++
- drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 193 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_dpll.h     |   8 +
- drivers/net/ethernet/intel/ice/ice_main.c     |   4 +
- 6 files changed, 252 insertions(+), 2 deletions(-)
+[1/4] dt-bindings: clock: exynosautov920: sort clock definitions
+      https://git.kernel.org/krzk/linux/c/3d6470990bfc8600609177962a53201cb0640daa
+[2/4] dt-bindings: clock: exynosautov920: add hsi2 clock definitions
+      https://git.kernel.org/krzk/linux/c/da5cb65d25f747236a003b82525eb6de5d49a2e6
+[3/4] clk: samsung: exynosautov920: add block hsi2 clock support
+      https://git.kernel.org/krzk/linux/c/2d539f31ab0eb3eb3bd9491b7dcd52dec7967e15
+[4/4] arm64: dts: exynosautov920: add CMU_HSI2 clock DT nodes
+      https://git.kernel.org/krzk/linux/c/e2016763590f571cdc3912d6a7ec848d2b61e6c2
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index bdee499f991a..0ae7387e0599 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -2272,6 +2272,22 @@ struct ice_aqc_get_pkg_info_resp {
- 	struct ice_aqc_get_pkg_info pkg_info[];
- };
- 
-+#define ICE_CGU_INPUT_PHASE_OFFSET_BYTES	6
-+
-+struct ice_cgu_input_measure {
-+	u8 phase_offset[ICE_CGU_INPUT_PHASE_OFFSET_BYTES];
-+	__le32 freq;
-+} __packed __aligned(sizeof(__le16));
-+
-+#define ICE_AQC_GET_CGU_IN_MEAS_DPLL_IDX_M	ICE_M(0xf, 0)
-+
-+/* Get CGU input measure command response data structure (indirect 0x0C59) */
-+struct ice_aqc_get_cgu_input_measure {
-+	u8 dpll_idx_opt;
-+	u8 length;
-+	u8 rsvd[6];
-+};
-+
- #define ICE_AQC_GET_CGU_MAX_PHASE_ADJ	GENMASK(30, 0)
- 
- /* Get CGU abilities command response data structure (indirect 0x0C61) */
-@@ -2721,6 +2737,7 @@ struct ice_aq_desc {
- 		struct ice_aqc_add_get_update_free_vsi vsi_cmd;
- 		struct ice_aqc_add_update_free_vsi_resp add_update_free_vsi_res;
- 		struct ice_aqc_download_pkg download_pkg;
-+		struct ice_aqc_get_cgu_input_measure get_cgu_input_measure;
- 		struct ice_aqc_set_cgu_input_config set_cgu_input_config;
- 		struct ice_aqc_get_cgu_input_config get_cgu_input_config;
- 		struct ice_aqc_set_cgu_output_config set_cgu_output_config;
-@@ -2772,6 +2789,8 @@ enum ice_aq_err {
- 	ICE_AQ_RC_OK		= 0,  /* Success */
- 	ICE_AQ_RC_EPERM		= 1,  /* Operation not permitted */
- 	ICE_AQ_RC_ENOENT	= 2,  /* No such element */
-+	ICE_AQ_RC_ESRCH		= 3,  /* Bad opcode */
-+	ICE_AQ_RC_EAGAIN	= 8,  /* Try again */
- 	ICE_AQ_RC_ENOMEM	= 9,  /* Out of memory */
- 	ICE_AQ_RC_EBUSY		= 12, /* Device or resource busy */
- 	ICE_AQ_RC_EEXIST	= 13, /* Object already exists */
-@@ -2927,6 +2946,7 @@ enum ice_adminq_opc {
- 	ice_aqc_opc_get_pkg_info_list			= 0x0C43,
- 
- 	/* 1588/SyncE commands/events */
-+	ice_aqc_opc_get_cgu_input_measure		= 0x0C59,
- 	ice_aqc_opc_get_cgu_abilities			= 0x0C61,
- 	ice_aqc_opc_set_cgu_input_config		= 0x0C62,
- 	ice_aqc_opc_get_cgu_input_config		= 0x0C63,
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 4fedf0181c4e..48ff515d7c61 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -4970,6 +4970,32 @@ ice_dis_vsi_rdma_qset(struct ice_port_info *pi, u16 count, u32 *qset_teid,
- 	return status;
- }
- 
-+/**
-+ * ice_aq_get_cgu_input_pin_measure - get input pin signal measurements
-+ * @hw: pointer to the HW struct
-+ * @dpll_idx: index of dpll to be measured
-+ * @meas: array to be filled with results
-+ * @meas_num: max number of results array can hold
-+ *
-+ * Get CGU measurements (0x0C59) of phase and frequency offsets for input
-+ * pins on given dpll.
-+ *
-+ * Return: 0 on success or negative value on failure.
-+ */
-+int ice_aq_get_cgu_input_pin_measure(struct ice_hw *hw, u8 dpll_idx,
-+				     struct ice_cgu_input_measure *meas,
-+				     u16 meas_num)
-+{
-+	struct ice_aqc_get_cgu_input_measure *cmd;
-+	struct ice_aq_desc desc;
-+
-+	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_input_measure);
-+	cmd = &desc.params.get_cgu_input_measure;
-+	cmd->dpll_idx_opt = dpll_idx & ICE_AQC_GET_CGU_IN_MEAS_DPLL_IDX_M;
-+
-+	return ice_aq_send_cmd(hw, &desc, meas, meas_num * sizeof(*meas), NULL);
-+}
-+
- /**
-  * ice_aq_get_cgu_abilities - get cgu abilities
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 64c530b39191..c70f56d897dc 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -229,6 +229,9 @@ void ice_replay_post(struct ice_hw *hw);
- struct ice_q_ctx *
- ice_get_lan_q_ctx(struct ice_hw *hw, u16 vsi_handle, u8 tc, u16 q_handle);
- int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flag);
-+int ice_aq_get_cgu_input_pin_measure(struct ice_hw *hw, u8 dpll_idx,
-+				     struct ice_cgu_input_measure *meas,
-+				     u16 meas_num);
- int
- ice_aq_get_cgu_abilities(struct ice_hw *hw,
- 			 struct ice_aqc_get_cgu_abilities *abilities);
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 9fc50bb3f35a..d6190d9e32ba 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -12,6 +12,8 @@
- #define ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT	25
- #define ICE_DPLL_PIN_GEN_RCLK_FREQ		1953125
- #define ICE_DPLL_PIN_PRIO_OUTPUT		0xff
-+#define ICE_DPLL_INPUT_REF_NUM			10
-+#define ICE_DPLL_PHASE_OFFSET_PERIOD		2
- #define ICE_DPLL_SW_PIN_INPUT_BASE_SFP		4
- #define ICE_DPLL_SW_PIN_INPUT_BASE_QSFP		6
- #define ICE_DPLL_SW_PIN_OUTPUT_BASE		0
-@@ -792,6 +794,67 @@ static int ice_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
- 	return 0;
- }
- 
-+/**
-+ * ice_dpll_phase_offset_monitor_set - set phase offset monitor state
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @state: feature state to be set
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Enable/disable phase offset monitor feature of dpll.
-+ *
-+ * Context: Acquires and releases pf->dplls.lock
-+ * Return: 0 - success
-+ */
-+static int ice_dpll_phase_offset_monitor_set(const struct dpll_device *dpll,
-+					     void *dpll_priv,
-+					     enum dpll_feature_state state,
-+					     struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll *d = dpll_priv;
-+	struct ice_pf *pf = d->pf;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	if (state == DPLL_FEATURE_STATE_ENABLE)
-+		d->phase_offset_monitor_period = ICE_DPLL_PHASE_OFFSET_PERIOD;
-+	else
-+		d->phase_offset_monitor_period = 0;
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_dpll_phase_offset_monitor_get - get phase offset monitor state
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @state: on success holds current state of phase offset monitor
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Provides current state of phase offset monitor
-+ * features on dpll device.
-+ *
-+ * Context: Acquires and releases pf->dplls.lock
-+ * Return: 0 - success
-+ */
-+static int ice_dpll_phase_offset_monitor_get(const struct dpll_device *dpll,
-+					     void *dpll_priv,
-+					     enum dpll_feature_state *state,
-+					     struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll *d = dpll_priv;
-+	struct ice_pf *pf = d->pf;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	if (d->phase_offset_monitor_period)
-+		*state = DPLL_FEATURE_STATE_ENABLE;
-+	else
-+		*state = DPLL_FEATURE_STATE_DISABLE;
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return 0;
-+}
-+
- /**
-  * ice_dpll_pin_state_set - set pin's state on dpll
-  * @pin: pointer to a pin
-@@ -1757,6 +1820,8 @@ ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
- 	if (d->active_input == pin || (p->input &&
- 				       d->active_input == p->input->pin))
- 		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
-+	else if (d->phase_offset_monitor_period)
-+		*phase_offset = p->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
- 	else
- 		*phase_offset = 0;
- 	mutex_unlock(&pf->dplls.lock);
-@@ -2216,6 +2281,13 @@ static const struct dpll_device_ops ice_dpll_ops = {
- 	.mode_get = ice_dpll_mode_get,
- };
- 
-+static const struct dpll_device_ops ice_dpll_pom_ops = {
-+	.lock_status_get = ice_dpll_lock_status_get,
-+	.mode_get = ice_dpll_mode_get,
-+	.phase_offset_monitor_set = ice_dpll_phase_offset_monitor_set,
-+	.phase_offset_monitor_get = ice_dpll_phase_offset_monitor_get,
-+};
-+
- /**
-  * ice_generate_clock_id - generates unique clock_id for registering dpll.
-  * @pf: board private structure
-@@ -2260,6 +2332,110 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
- 	}
- }
- 
-+/**
-+ * ice_dpll_is_pps_phase_monitor - check if dpll capable of phase offset monitor
-+ * @pf: pf private structure
-+ *
-+ * Check if firmware is capable of supporting admin command to provide
-+ * phase offset monitoring on all the input pins on PPS dpll.
-+ *
-+ * Returns:
-+ * * true - PPS dpll phase offset monitoring is supported
-+ * * false - PPS dpll phase offset monitoring is not supported
-+ */
-+static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
-+{
-+	struct ice_cgu_input_measure meas[ICE_DPLL_INPUT_REF_NUM];
-+	int ret = ice_aq_get_cgu_input_pin_measure(&pf->hw, DPLL_TYPE_PPS, meas,
-+						   ARRAY_SIZE(meas));
-+
-+	if (ret && pf->hw.adminq.sq_last_status == ICE_AQ_RC_ESRCH)
-+		return false;
-+
-+	return true;
-+}
-+
-+/**
-+ * ice_dpll_pins_notify_mask - notify dpll subsystem about bulk pin changes
-+ * @pins: array of ice_dpll_pin pointers registered within dpll subsystem
-+ * @pin_num: number of pins
-+ * @phase_offset_ntf_mask: bitmask of pin indexes to notify
-+ *
-+ * Iterate over array of pins and call dpll subsystem pin notify if
-+ * corresponding pin index within bitmask is set.
-+ *
-+ * Context: Must be called while pf->dplls.lock is released.
-+ */
-+static void ice_dpll_pins_notify_mask(struct ice_dpll_pin *pins,
-+				      u8 pin_num,
-+				      u32 phase_offset_ntf_mask)
-+{
-+	int i = 0;
-+
-+	for (i = 0; i < pin_num; i++)
-+		if (phase_offset_ntf_mask & (1 << i))
-+			dpll_pin_change_ntf(pins[i].pin);
-+}
-+
-+/**
-+ * ice_dpll_pps_update_phase_offsets - update phase offset measurements
-+ * @pf: pf private structure
-+ * @phase_offset_pins_updated: returns mask of updated input pin indexes
-+ *
-+ * Read phase offset measurements for PPS dpll device and store values in
-+ * input pins array. On success phase_offset_pins_updated - fills bitmask of
-+ * updated input pin indexes, pins shall be notified.
-+ *
-+ * Context: Shall be called with pf->dplls.lock being locked.
-+ * Returns:
-+ * * 0 - success or no data available
-+ * * negative - AQ failure
-+ */
-+static int ice_dpll_pps_update_phase_offsets(struct ice_pf *pf,
-+					     u32 *phase_offset_pins_updated)
-+{
-+	struct ice_cgu_input_measure meas[ICE_DPLL_INPUT_REF_NUM];
-+	struct ice_dpll_pin *p;
-+	s64 phase_offset, tmp;
-+	int i, j, ret;
-+
-+	*phase_offset_pins_updated = 0;
-+	ret = ice_aq_get_cgu_input_pin_measure(&pf->hw, DPLL_TYPE_PPS, meas,
-+					       ARRAY_SIZE(meas));
-+	if (ret && pf->hw.adminq.sq_last_status == ICE_AQ_RC_EAGAIN) {
-+		return 0;
-+	} else if (ret) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"failed to get input pin measurements dpll=%d, ret=%d %s\n",
-+			DPLL_TYPE_PPS, ret,
-+			ice_aq_str(pf->hw.adminq.sq_last_status));
-+		return ret;
-+	}
-+	for (i = 0; i < pf->dplls.num_inputs; i++) {
-+		p = &pf->dplls.inputs[i];
-+		phase_offset = 0;
-+		for (j = 0; j < ICE_CGU_INPUT_PHASE_OFFSET_BYTES; j++) {
-+			tmp = meas[i].phase_offset[j];
-+#ifdef __LITTLE_ENDIAN
-+			phase_offset += tmp << 8 * j;
-+#else
-+			phase_offset += tmp << 8 *
-+				(ICE_CGU_INPUT_PHASE_OFFSET_BYTES - 1 - j);
-+#endif
-+		}
-+		phase_offset = sign_extend64(phase_offset, 47);
-+		if (p->phase_offset != phase_offset) {
-+			dev_dbg(ice_pf_to_dev(pf),
-+				"phase offset changed for pin:%d old:%llx, new:%llx\n",
-+				p->idx, p->phase_offset, phase_offset);
-+			p->phase_offset = phase_offset;
-+			*phase_offset_pins_updated |= (1 << i);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_dpll_update_state - update dpll state
-  * @pf: pf private structure
-@@ -2346,14 +2522,19 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 	struct ice_pf *pf = container_of(d, struct ice_pf, dplls);
- 	struct ice_dpll *de = &pf->dplls.eec;
- 	struct ice_dpll *dp = &pf->dplls.pps;
-+	u32 phase_offset_ntf = 0;
- 	int ret = 0;
- 
- 	if (ice_is_reset_in_progress(pf->state))
- 		goto resched;
- 	mutex_lock(&pf->dplls.lock);
-+	d->periodic_counter++;
- 	ret = ice_dpll_update_state(pf, de, false);
- 	if (!ret)
- 		ret = ice_dpll_update_state(pf, dp, false);
-+	if (!ret && dp->phase_offset_monitor_period &&
-+	    d->periodic_counter % dp->phase_offset_monitor_period == 0)
-+		ret = ice_dpll_pps_update_phase_offsets(pf, &phase_offset_ntf);
- 	if (ret) {
- 		d->cgu_state_acq_err_num++;
- 		/* stop rescheduling this worker */
-@@ -2368,6 +2549,9 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 	mutex_unlock(&pf->dplls.lock);
- 	ice_dpll_notify_changes(de);
- 	ice_dpll_notify_changes(dp);
-+	if (phase_offset_ntf)
-+		ice_dpll_pins_notify_mask(d->inputs, d->num_inputs,
-+					  phase_offset_ntf);
- 
- resched:
- 	/* Run twice a second or reschedule if update failed */
-@@ -2782,7 +2966,7 @@ static void
- ice_dpll_deinit_dpll(struct ice_pf *pf, struct ice_dpll *d, bool cgu)
- {
- 	if (cgu)
--		dpll_device_unregister(d->dpll, &ice_dpll_ops, d);
-+		dpll_device_unregister(d->dpll, d->ops, d);
- 	dpll_device_put(d->dpll);
- }
- 
-@@ -2816,12 +3000,17 @@ ice_dpll_init_dpll(struct ice_pf *pf, struct ice_dpll *d, bool cgu,
- 	}
- 	d->pf = pf;
- 	if (cgu) {
-+		const struct dpll_device_ops *ops = &ice_dpll_ops;
-+
-+		if (type == DPLL_TYPE_PPS && ice_dpll_is_pps_phase_monitor(pf))
-+			ops =  &ice_dpll_pom_ops;
- 		ice_dpll_update_state(pf, d, true);
--		ret = dpll_device_register(d->dpll, type, &ice_dpll_ops, d);
-+		ret = dpll_device_register(d->dpll, type, ops, d);
- 		if (ret) {
- 			dpll_device_put(d->dpll);
- 			return ret;
- 		}
-+		d->ops = ops;
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-index 10cd12d70972..a5a5b61c5115 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-@@ -31,6 +31,7 @@ enum ice_dpll_pin_sw {
-  * @prop: pin properties
-  * @freq: current frequency of a pin
-  * @phase_adjust: current phase adjust value
-+ * @phase_offset: monitored phase offset value
-  */
- struct ice_dpll_pin {
- 	struct dpll_pin *pin;
-@@ -46,6 +47,7 @@ struct ice_dpll_pin {
- 	struct ice_dpll_pin *input;
- 	struct ice_dpll_pin *output;
- 	enum dpll_pin_direction direction;
-+	s64 phase_offset;
- 	u8 status;
- 	bool active;
- 	bool hidden;
-@@ -64,8 +66,10 @@ struct ice_dpll_pin {
-  * @input_prio: priorities of each input
-  * @dpll_state: current dpll sync state
-  * @prev_dpll_state: last dpll sync state
-+ * @phase_offset_monitor_period: period for phase offset monitor read frequency
-  * @active_input: pointer to active input pin
-  * @prev_input: pointer to previous active input pin
-+ * @ops: holds the registered ops
-  */
- struct ice_dpll {
- 	struct dpll_device *dpll;
-@@ -81,8 +85,10 @@ struct ice_dpll {
- 	enum dpll_lock_status dpll_state;
- 	enum dpll_lock_status prev_dpll_state;
- 	enum dpll_mode mode;
-+	u32 phase_offset_monitor_period;
- 	struct dpll_pin *active_input;
- 	struct dpll_pin *prev_input;
-+	const struct dpll_device_ops *ops;
- };
- 
- /** ice_dplls - store info required for CCU (clock controlling unit)
-@@ -101,6 +107,7 @@ struct ice_dpll {
-  * @clock_id: clock_id of dplls
-  * @input_phase_adj_max: max phase adjust value for an input pins
-  * @output_phase_adj_max: max phase adjust value for an output pins
-+ * @periodic_counter: counter of periodic work executions
-  */
- struct ice_dplls {
- 	struct kthread_worker *kworker;
-@@ -121,6 +128,7 @@ struct ice_dplls {
- 	u64 clock_id;
- 	s32 input_phase_adj_max;
- 	s32 output_phase_adj_max;
-+	u32 periodic_counter;
- 	bool generic;
- };
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 4e04721467bf..165e433a9bb8 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7936,6 +7936,10 @@ const char *ice_aq_str(enum ice_aq_err aq_err)
- 		return "ICE_AQ_RC_EPERM";
- 	case ICE_AQ_RC_ENOENT:
- 		return "ICE_AQ_RC_ENOENT";
-+	case ICE_AQ_RC_ESRCH:
-+		return "ICE_AQ_RC_ESRCH";
-+	case ICE_AQ_RC_EAGAIN:
-+		return "ICE_AQ_RC_EAGAIN";
- 	case ICE_AQ_RC_ENOMEM:
- 		return "ICE_AQ_RC_ENOMEM";
- 	case ICE_AQ_RC_EBUSY:
+Best regards,
 -- 
-2.38.1
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 
