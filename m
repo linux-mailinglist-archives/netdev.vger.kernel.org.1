@@ -1,135 +1,127 @@
-Return-Path: <netdev+bounces-197209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA26AD7C6B
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:33:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A7AAD7C83
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 495933A379B
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:33:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343A93A9D1C
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5E22D876C;
-	Thu, 12 Jun 2025 20:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6C62D6632;
+	Thu, 12 Jun 2025 20:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="GXmIa6Sj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rg5WjKI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F9C27C179
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75152D3A85
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749760402; cv=none; b=ppNlHZ37v9LwqgCJLfNudxtdt/FDZvOsyFUdogYsT0uZNn4pX8MFFMyopz7LY23ssYa6GgN5htEz1XnmrBAVjSc5JgVFLgGbCQoN4ysxss1e/sWDPNuALk8sLkbQkLZ56J5Fst+yZxj3aAr2QB3smh1M+CAAZlCBsfF4u/Y5e2M=
+	t=1749760601; cv=none; b=luTB7IlsFcXqlenNwS4COGd4A5VpN/BHdcCFXTNlVvakqGrtKAoIcPMnq6VheZbXXUIQVP489wYyLmsias45iH8c390c5WT7fmGVghaycY4VWQXdVk0hJMfwbLuOjUw+v4ozlb6zq8vtDR92fPK/PvRYeznI639GlIi9UM1uaII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749760402; c=relaxed/simple;
-	bh=EwOrQTkZkutxu162q/l63LznHvOwnjtJHI7xWRukVcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CEaheL7OEi7N1gADNPukxmRS8hijo7Wbnlu45T9yQvvUc9U1Oe3GDhoa3vzuTWgyQF6nYyjIxAQgfAwmQgeo2ZY4C50Lrjzx1B2aEGigEe0H2bXd0nvuooGOrRfbHqYzHwZ+J9Te+4uk3TSPH3uIQj1GFs0hXjfP5EkDinCKsAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=GXmIa6Sj; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a4f78ebec8so1032567f8f.0
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 13:33:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749760398; x=1750365198; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V8opH5cOcXkpOAfmUTo78hPrgHI3ldSmhpGD4e6tYOg=;
-        b=GXmIa6SjwyDkDTOeHf/Eyl6x+Xl3e8HpfpsqIvwwSf4dxlz9NRNbzsav3MWSLypcH8
-         YBc5YIEbUY7OXzwCMIn6qtSATh+bCXyNFa8uIXWb7BD4UgOqmj5bxsz78Ga4TJ+AYMPE
-         DynolVR3bpgpMTewOd1tBqTVlY8KndK9oit7I3c1F2y7e2QudL8KveW+LLnO1zgPaQHR
-         m4d9pRH3a0lU9nFGkueVy16wpEAgLpveY7MK2hJPvB9jTu9Q/haQrXCqrUU4WG6VXLla
-         fLbE/ECeI08d7eFaqm++liv0pmdbodwRV1EUMQzhgLG2ovfsNoaYGmgFlMZ9r/y3XKzh
-         o+2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749760398; x=1750365198;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V8opH5cOcXkpOAfmUTo78hPrgHI3ldSmhpGD4e6tYOg=;
-        b=ae+5KfG98KsPwwnfTgwD4nsyaY6d3m2hd808l1q9UQPsNZ/MRC05BrLjMMftRcYeIU
-         K52SrKLIaMVJr5PrniE1eVbOgLu9Yq+1ZybMxheJrp5ZSe7pfKtSh4y9dHcjE19CLPtL
-         i8ZE8cslRhN5iGEUnMG44qSwlXbFB2LfWK+a7HXlhXjP9nDRfVGb6v6bFFb1hQNovhfx
-         Mc2GmvgqcKVLOdVwoKqUcwHlH7BF2oTMT8hzQyU4PhwAqarJtQK/VrCDNimlVufl07Sq
-         hZ8sXFbrkmLqEnz8tKl+ou/+9l6uuMX5UUwyfPXIp4MrqDL9UXqpeHQFMyWtEsBboWqf
-         MEAw==
-X-Gm-Message-State: AOJu0YyGyD55G2Z44m+tFDJ12+tSGrOvjeMPl8endlQlGZel8qvNmhiM
-	ZDQvKy+nuE+4QXuKjlZe/3F2xj6fkai5M9O0r/O4TyB4Sc1QbtAx0jC3xCfBauRx0yE=
-X-Gm-Gg: ASbGncuyz4VmHbA+wv4Y/Yc92EZUqANkCU0/fRUXlZdvyLsu7QuGtk9ZbCtkcLEejuc
-	9ddjelCuByffmyK4Hzfrztm39juRtHCBQWK4nNEHjWS+i2CZvWbh7qKd0mHF6GTdlsDKQ0d5MAd
-	rzM/uFb+M5tspARlda+zV97RkNZjfORxIsDY9ZDYnSYYlcbARKCJhpEQvnQVJOMpspjXxs4Hzf1
-	qQoZR01cY+8jroaDqr/kgdPxqjuxMV860O+CzrhArp88KJVbdnu5l7tDN6MH6vvbez1n6LB0xgW
-	v2//XUHEToOEF/Ac2FQFBnu+DPoVRre7cf/dtq6bGojZSUVxM33y6xK9b7NdyHTxOFI=
-X-Google-Smtp-Source: AGHT+IGsBa+y+ILrsog9vLowcZ17BT4rMJvtC6HfDifefC4iKPz18rUtm3egumGH94wSHRTUbX+W5w==
-X-Received: by 2002:a05:6000:144e:b0:3a4:f6b7:8b07 with SMTP id ffacd0b85a97d-3a568717984mr544578f8f.48.1749760398129;
-        Thu, 12 Jun 2025 13:33:18 -0700 (PDT)
-Received: from MacBook-Air.local ([5.100.243.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a7cb65sm329695f8f.38.2025.06.12.13.33.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 13:33:17 -0700 (PDT)
-Date: Thu, 12 Jun 2025 23:33:14 +0300
-From: Joe Damato <joe@dama.to>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:BROADCOM ASP 2.0 ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] net: bcmasp: enable GRO software
- interrupt coalescing by default
-Message-ID: <aEs5isPs68JAyjZq@MacBook-Air.local>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:BROADCOM ASP 2.0 ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250611212730.252342-1-florian.fainelli@broadcom.com>
- <20250611212730.252342-3-florian.fainelli@broadcom.com>
+	s=arc-20240116; t=1749760601; c=relaxed/simple;
+	bh=SAU5o2DQ0CfgLin1S8tnE5huEGqu4f6AQhBXhQIQYLU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=hNvBRBI9sNJgqem0seb7iHL/sU2FnHarNH3KY8wQ01ML5oshEooH6e1/KDaCz/gkHTPfgNaysYZVe3Mkl8wk3dBJSkF/IlOdr++C+TuVTB4o3BQkceCvmo28Ual776mBS/XIqY0F4axibHtIsNgIa63dJUsHW+Ch29n4ZSNsoDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rg5WjKI4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749760598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gj8SQGLLh0rljui6jnNkQMA92RjfoZpiblWpalJC6vA=;
+	b=Rg5WjKI4qZC5T1frLTsrPAXilqvmhnWHGInmK+jk7DVIBEPEWlyhn82KH6ntZ/nR7aqb5Q
+	53hOh3+3Qf+ejGayyQx4bNReLdgDPFD1YebdPlDmloho/gShufugWCE0dXjNHjN6Wl3tHo
+	smG72wIlombDgjdTW6pVA/gL5yljs2Q=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-589-yC1TTY1fOoaf_k-updd0AA-1; Thu,
+ 12 Jun 2025 16:36:35 -0400
+X-MC-Unique: yC1TTY1fOoaf_k-updd0AA-1
+X-Mimecast-MFC-AGG-ID: yC1TTY1fOoaf_k-updd0AA_1749760593
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E95CE180AB15;
+	Thu, 12 Jun 2025 20:36:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 84881195E340;
+	Thu, 12 Jun 2025 20:36:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <2dc7318d6c74b27a49b4c64b513f3da13d980473.camel@HansenPartnership.com>
+References: <2dc7318d6c74b27a49b4c64b513f3da13d980473.camel@HansenPartnership.com> <462886.1749731810@warthog.procyon.org.uk>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: dhowells@redhat.com, keyrings@vger.kernel.org,
+    Jarkko Sakkinen <jarkko@kernel.org>,
+    Steve French <sfrench@samba.org>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Mimi Zohar <zohar@linux.ibm.com>, Paulo Alcantara <pc@manguebit.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Jeffrey Altman <jaltman@auristor.com>, hch@infradead.org,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC] Keyrings: How to make them more useful
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611212730.252342-3-florian.fainelli@broadcom.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <473710.1749760578.1@warthog.procyon.org.uk>
+Date: Thu, 12 Jun 2025 21:36:18 +0100
+Message-ID: <473711.1749760578@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Wed, Jun 11, 2025 at 02:27:30PM -0700, Florian Fainelli wrote:
-> Utilize netdev_sw_irq_coalesce_default_on() to provide conservative
-> default settings for GRO software interrupt coalescing.
+James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
+
+> One of the problems I keep tripping over is different special casing
+> for user keyrings (which are real struct key structures) and system
+> keyrings which are special values of the pointer in struct key *.
+
+It's meant to be like that.  The trusted system keyrings are static within
+system_keyring.c and not so easily accessible by kernel modules for
+direct modification, bypassing the security checks.
+
+Obviously this is merely a bit of obscurity and enforcement isn't possible
+against kernel code that is determined to modify those keyrings or otherwise
+interfere in the verification process.
+
+> For examples of what this special handling does, just look at things
+> like bpf_trace.c:bpf_lookup_{user|system}_key
 > 
-> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Reviewed-by: Justin Chen <justin.chen@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> index 7dc28166d337..a6ea477bce3c 100644
-> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-> @@ -1279,6 +1279,8 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
->  	ndev->hw_features |= ndev->features;
->  	ndev->needed_headroom += sizeof(struct bcmasp_pkt_offload);
->  
-> +	netdev_sw_irq_coalesce_default_on(ndev);
-> +
->  	return intf;
+> Since the serial allocation code has a hard coded not less than 3
+> (which looks for all the world like it was designed to mean the two
+> system keyring id's were never used as user serial numbers)
 
-Just to make it explicit to other readers: netdev_sw_irq_coalesce_default_on
-appears to be called before register_netdev, as the documentation for
-netdev_sw_irq_coalesce_default_on describes.
+That's just a coincidence.  The <3 thing predates the advent of those system
+keyring magic pointers.
 
-Reviewed-by: Joe Damato <joe@dama.to>
+> I think we could simply allow the two system keyring ids to be passed into
+> lookup_user_key() (which now might be a bit misnamed) and special case not
+> freeing it in put_key().
+
+If you want to make lookup_user_key() provide access to specific keyrings like
+this, just use the next negative numbers - it's not like we're likely to run
+out soon.
+
+But I'd rather not let lookup_user_key() return pointers to these keyrings...
+
+David
+
 
