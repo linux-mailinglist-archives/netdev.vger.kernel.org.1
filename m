@@ -1,155 +1,206 @@
-Return-Path: <netdev+bounces-196989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A99D9AD73B7
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:24:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEACDAD73CE
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AD713A47DB
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:24:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 558813B4D0F
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1A942048;
-	Thu, 12 Jun 2025 14:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C11246327;
+	Thu, 12 Jun 2025 14:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zd2e2tcu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BYYBoRRh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50EC14658D;
-	Thu, 12 Jun 2025 14:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1A024678E
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 14:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749738285; cv=none; b=ciG1m+ficOrqDcBM1fndu9u2BxJTOTK5ZSMZykif1oa7LEvs0GtKt7W2I9WDCyDY1+9/san/va3iDToBNMScvjtyeFGlnB7numNYJsKHt8qwnEpMEdiqZgFcGlq8qz6aIfQkUEUjgeUmpa/88x05fPjLjT+QH4gzGomufleTqX8=
+	t=1749738479; cv=none; b=eMTkRlhFgkm5hBdy41AkvuFcxbJiyrrf57AdTJGZoGLPLkPAAOsqj2wpRfswNXvBDRxfuxsFEosU97exghuPZzV6uDsL8FQvVNI3EF1EQg+ArZYNcx5osO2W6Q8D7CyzT+HTnzyjJtcqji8UKqLt9etvp6X8H4iVRo306XKjeos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749738285; c=relaxed/simple;
-	bh=a5Go237JGJhkg9cW40xT5owEjtImI6HiJOHTuqYUg44=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IRoLHf36p1QQLJJk91WDZxpiuvUBhfN4IIOpOwA+Mrlo1HNXYSQMH7Gi4LBcj+UzaKbtWS5h8GQTMbdRnmX152X1MmkCOZWBNOyTjQsnIXJuVTSvJxbokr525vEyx60RKJZT7yFEie6+hi4qjsht8jzTK/4vzbuZwVTb4gSzT+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zd2e2tcu; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-442f4a3a4d6so5839645e9.0;
-        Thu, 12 Jun 2025 07:24:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749738282; x=1750343082; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q6RPF4+ld+ouU/J4XLLUigKXhgXCWLk6NJomx5m2j7c=;
-        b=Zd2e2tcuDuqCTmZJRDB6dK8AbsurJl4FcRzlsv0IL5jhOWx0hsB79pmziHNormhr3u
-         JJWWUsENDD15vfO236JSCuh4QOXgQCp30RqVwjm5dWGml5Tq265h1Z0HvAnUcPRQUF4o
-         oL7z1lrY7Hm+be/WgpEgIO1SawmTXZeOsyfRvXW/UPI3rigAV7AgJpXMnLnUmLaOLUff
-         /OStFIOvu1wm/lNchuFWGX47C6Z7bosAyuXKEpwJ0e+pRJVMGSUuGzSL6+4ZO3vtGJiS
-         6JTb5SJf7YBKphCbLA5XAoD4WpjsH8v++HTUCxd21TwPCb32Ecp74WezZFU9t9BgopaV
-         jszQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749738282; x=1750343082;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q6RPF4+ld+ouU/J4XLLUigKXhgXCWLk6NJomx5m2j7c=;
-        b=uI9ttUVp4r27lydDdVwmtHQjii3QjyITjBFdZhOxBehd7oQkPjYZBBLmPgxnpJi9fZ
-         Tul2RodOViJCVGbY3aQ+34kRjR7E811Y4KgfRQgancPbjB4YqJ2sG/i4xv2YUJFkgJ4Q
-         NWlbTo6tjNTro6uBMLQwZBuALsKna6nGDjMoF/BrAKbt3aqcRckDjxXYD4EGuYYlADdx
-         BhnHLQKvJ7zQ/6e3QSJ5K2fmh5C5umo1Zfu0W9GYfKeEjnFDSNPNEQFMUKPd0M18e4Ck
-         fpyxoW7Csk2lfNW5/gsAe5sw3PnkX8Aq470gbbIophtC5l3Fx8iC3aU5vAk1EVXyNqnC
-         7lWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUFLh2BnN39bgfoOeV9ZSQfcEHoVUpDkKuZLnI8GpiglmERArJhjWAz3dkT6zIOZeD1EBxBXY9nPw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLHacL7pWKk70EdhU5ih6SUDZQ+yq5dkWwJINxUN/B+w07WJkr
-	CXZahp6b5ey27O3afRbi3u+ykab/0uDYaL1Yt16zqaOnpdPvJ7lIeWy5
-X-Gm-Gg: ASbGncvjij0SV5ejOlFCaAufLeRWk/IkLZi8CekLXSxhQFGWgaBe/O1SA7W5AhdEyrP
-	8cQRKdm5ezODhoga/Q9lmSDdKYaVZQkmOhRLNOWQv9jxnWtFFZOv34yJWEWcJQz+BlnfR6P8xr3
-	d6HIIoDcw1XBj3PC07EZMQCY1t5Iziy5QoeKh5MXIDD4anV1lenUjRxyVDqmUvC9KF7QcmCjtv0
-	P4pCVrkkTuTkbWJW8qL1g9McwkTnlAQH8gyb2XgvkXTekcGO+a4ywzUqzstRlM9elw2mSV9D7y9
-	vgXRhovd4nDvEIeYPakp+LkzBeace5ahOixsjnxjgwG4xLKWABpTh/FPy/G+EmlDQNIz/oza
-X-Google-Smtp-Source: AGHT+IEizYAGOeYsl5Zr68Nwfl5H58sy9EptYZCFrycW/KZVkB72PXvoKN50A8/zA7x7MYV/RYSRCw==
-X-Received: by 2002:a05:600c:1c90:b0:450:d3a1:95e2 with SMTP id 5b1f17b1804b1-4532dd97734mr29923395e9.9.1749738281781;
-        Thu, 12 Jun 2025 07:24:41 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.140.198])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a56198c9absm2112509f8f.27.2025.06.12.07.24.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 07:24:41 -0700 (PDT)
-Message-ID: <7bfe8094-17d7-47d0-bb13-eec0621d813d@gmail.com>
-Date: Thu, 12 Jun 2025 15:26:04 +0100
+	s=arc-20240116; t=1749738479; c=relaxed/simple;
+	bh=lR4rRyT8kEmeAFgFbTyrlgyEKk+f9LUnBbC9banrJsA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LQJ4rh/CbGQ576EgjDTPy1PGzSI4ZQzJ+PsS7ZERbkZ/HP8rvqMAgCUbqB83oevC8u5Q5Nycq/l62qr1AjqDwKgxE4FTnb0DPvd9hjpxj/tuPTmGGTD7h28WHZX03QZ4K+V0D3xBNUSAFwFZsBynuVC4M7jXPpqGHctaw+qmRRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BYYBoRRh; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749738464;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TPwDoP+jbnUa8bxVZg836/xmpXU4SXa+id2ZO0eScw4=;
+	b=BYYBoRRhyn3yzwB6sJ3KgEfbbn9MSqYPlWwxFGIib6wKVgDgzAHWo/gcqDmus3hZ9U68IK
+	kKwuzq3dOAz4MwpWzI7VoAYYmfB/9ZlRZoij3Of4DPisYZBoWPRwwx+qpDN4XBduR/A4B8
+	CG1PQPRwy10HjYZ2v+NgwfIKMNMDRbU=
+From: Yajun Deng <yajun.deng@linux.dev>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yajun Deng <yajun.deng@linux.dev>
+Subject: [PATCH RESEND net-next v2] net: sysfs: Implement is_visible for phys_(port_id, port_name, switch_id)
+Date: Thu, 12 Jun 2025 14:27:07 +0000
+Message-ID: <20250612142707.4644-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] io_uring/netcmd: add tx timestamping cmd support
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Jason Xing <kerneljasonxing@gmail.com>
-References: <cover.1749657325.git.asml.silence@gmail.com>
- <1e9c0e393d6d207ba438da3ad5bf7e4125b28cb7.1749657325.git.asml.silence@gmail.com>
- <2106a3b7-8536-47af-8c55-b95d30cc8739@kernel.dk>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <2106a3b7-8536-47af-8c55-b95d30cc8739@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 6/12/25 15:12, Jens Axboe wrote:
-> On 6/12/25 3:09 AM, Pavel Begunkov wrote:
->> Add a new socket command which returns tx time stamps to the user. It
->> provide an alternative to the existing error queue recvmsg interface.
->> The command works in a polled multishot mode, which means io_uring will
->> poll the socket and keep posting timestamps until the request is
->> cancelled or fails in any other way (e.g. with no space in the CQ). It
->> reuses the net infra and grabs timestamps from the socket's error queue.
->>
->> The command requires IORING_SETUP_CQE32. All non-final CQEs (marked with
->> IORING_CQE_F_MORE) have cqe->res set to the tskey, and the upper 16 bits
->> of cqe->flags keep tstype (i.e. offset by IORING_CQE_BUFFER_SHIFT). The
->> timevalue is store in the upper part of the extended CQE. The final
->> completion won't have IORING_CQR_F_MORE and will have cqe->res storing
->                          ^^^^^^^^^^^^^^^^^
-> 
-> Pointed this out before, but this typo is still there.
+phys_port_id_show, phys_port_name_show and phys_switch_id_show would
+return -EOPNOTSUPP if the netdev didn't implement the corresponding
+method.
 
-Forgot about that one
+There is no point in creating these files if they are unsupported.
 
-> 
->> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
->> index cfd17e382082..5c89e6f6d624 100644
->> --- a/include/uapi/linux/io_uring.h
->> +++ b/include/uapi/linux/io_uring.h
->> @@ -968,6 +968,15 @@ enum io_uring_socket_op {
->>   	SOCKET_URING_OP_SIOCOUTQ,
->>   	SOCKET_URING_OP_GETSOCKOPT,
->>   	SOCKET_URING_OP_SETSOCKOPT,
->> +	SOCKET_URING_OP_TX_TIMESTAMP,
->> +};
->> +
->> +#define IORING_CQE_F_TIMESTAMP_HW	((__u32)1 << IORING_CQE_BUFFER_SHIFT)
->> +#define IORING_TIMESTAMP_TSTYPE_SHIFT	(IORING_CQE_BUFFER_SHIFT + 1)
-> 
-> Don't completely follow this, would at the very least need a comment.
-> Whether it's a HW or SW timestamp is flagged in the upper 16 bits, just
-> like a provided buffer ID. But since we don't use buffer IDs here, then
-> it's up for grabs. Do we have other commands that use the upper flags
-> space for command private flags?
+Put these attributes in netdev_phys_group and implement the is_visible
+method. make phys_(port_id, port_name, switch_id) invisible if the netdev
+dosen't implement the corresponding method.
 
-Probably not, but the place is better than the lower half, which
-has common flags like F_MORE, especially since the patch is already
-using it to store the type.
+Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v2: Remove worthless comments.
+v1: https://lore.kernel.org/all/20250515130205.3274-1-yajun.deng@linux.dev/
+---
+ include/linux/netdevice.h |  2 +-
+ net/core/net-sysfs.c      | 59 +++++++++++++++++++++++----------------
+ 2 files changed, 36 insertions(+), 25 deletions(-)
 
-> The above makes sense, but then what is IORING_TIMESTAMP_TSTYPE_SHIFT?
-
-It's a shift for where the timestamp type is stored, HW vs SW is
-not a timestamp type. I don't get the question.
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index adb14db25798..9cbc4e54b7e4 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2388,7 +2388,7 @@ struct net_device {
+ 	struct dm_hw_stat_delta __rcu *dm_private;
+ #endif
+ 	struct device		dev;
+-	const struct attribute_group *sysfs_groups[4];
++	const struct attribute_group *sysfs_groups[5];
+ 	const struct attribute_group *sysfs_rx_queue_group;
+ 
+ 	const struct rtnl_link_ops *rtnl_link_ops;
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 1ace0cd01adc..c9b969386399 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -641,12 +641,6 @@ static ssize_t phys_port_id_show(struct device *dev,
+ 	struct netdev_phys_item_id ppid;
+ 	ssize_t ret;
+ 
+-	/* The check is also done in dev_get_phys_port_id; this helps returning
+-	 * early without hitting the locking section below.
+-	 */
+-	if (!netdev->netdev_ops->ndo_get_phys_port_id)
+-		return -EOPNOTSUPP;
+-
+ 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+ 	if (ret)
+ 		return ret;
+@@ -668,13 +662,6 @@ static ssize_t phys_port_name_show(struct device *dev,
+ 	char name[IFNAMSIZ];
+ 	ssize_t ret;
+ 
+-	/* The checks are also done in dev_get_phys_port_name; this helps
+-	 * returning early without hitting the locking section below.
+-	 */
+-	if (!netdev->netdev_ops->ndo_get_phys_port_name &&
+-	    !netdev->devlink_port)
+-		return -EOPNOTSUPP;
+-
+ 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+ 	if (ret)
+ 		return ret;
+@@ -696,14 +683,6 @@ static ssize_t phys_switch_id_show(struct device *dev,
+ 	struct netdev_phys_item_id ppid = { };
+ 	ssize_t ret;
+ 
+-	/* The checks are also done in dev_get_phys_port_name; this helps
+-	 * returning early without hitting the locking section below. This works
+-	 * because recurse is false when calling dev_get_port_parent_id.
+-	 */
+-	if (!netdev->netdev_ops->ndo_get_port_parent_id &&
+-	    !netdev->devlink_port)
+-		return -EOPNOTSUPP;
+-
+ 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+ 	if (ret)
+ 		return ret;
+@@ -718,6 +697,40 @@ static ssize_t phys_switch_id_show(struct device *dev,
+ }
+ static DEVICE_ATTR_RO(phys_switch_id);
+ 
++static struct attribute *netdev_phys_attrs[] __ro_after_init = {
++	&dev_attr_phys_port_id.attr,
++	&dev_attr_phys_port_name.attr,
++	&dev_attr_phys_switch_id.attr,
++	NULL,
++};
++
++static umode_t netdev_phys_is_visible(struct kobject *kobj,
++				      struct attribute *attr, int index)
++{
++	struct device *dev = kobj_to_dev(kobj);
++	struct net_device *netdev = to_net_dev(dev);
++
++	if (attr == &dev_attr_phys_port_id.attr) {
++		if (!netdev->netdev_ops->ndo_get_phys_port_id)
++			return 0;
++	} else if (attr == &dev_attr_phys_port_name.attr) {
++		if (!netdev->netdev_ops->ndo_get_phys_port_name &&
++		    !netdev->devlink_port)
++			return 0;
++	} else if (attr == &dev_attr_phys_switch_id.attr) {
++		if (!netdev->netdev_ops->ndo_get_port_parent_id &&
++		    !netdev->devlink_port)
++			return 0;
++	}
++
++	return attr->mode;
++}
++
++static const struct attribute_group netdev_phys_group = {
++	.attrs = netdev_phys_attrs,
++	.is_visible = netdev_phys_is_visible,
++};
++
+ static ssize_t threaded_show(struct device *dev,
+ 			     struct device_attribute *attr, char *buf)
+ {
+@@ -783,9 +796,6 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
+ 	&dev_attr_tx_queue_len.attr,
+ 	&dev_attr_gro_flush_timeout.attr,
+ 	&dev_attr_napi_defer_hard_irqs.attr,
+-	&dev_attr_phys_port_id.attr,
+-	&dev_attr_phys_port_name.attr,
+-	&dev_attr_phys_switch_id.attr,
+ 	&dev_attr_proto_down.attr,
+ 	&dev_attr_carrier_up_count.attr,
+ 	&dev_attr_carrier_down_count.attr,
+@@ -2328,6 +2338,7 @@ int netdev_register_kobject(struct net_device *ndev)
+ 		groups++;
+ 
+ 	*groups++ = &netstat_group;
++	*groups++ = &netdev_phys_group;
+ 
+ 	if (wireless_group_needed(ndev))
+ 		*groups++ = &wireless_group;
 -- 
-Pavel Begunkov
+2.25.1
 
 
