@@ -1,133 +1,120 @@
-Return-Path: <netdev+bounces-196810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24F9AD673F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:21:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3A9AD6759
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:32:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B81627AD343
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 05:19:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5091BC122A
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 05:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02C51A9B52;
-	Thu, 12 Jun 2025 05:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDA21A5BA4;
+	Thu, 12 Jun 2025 05:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ePPip87u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5u9UiMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99B91361;
-	Thu, 12 Jun 2025 05:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B838157A67;
+	Thu, 12 Jun 2025 05:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749705665; cv=none; b=lIL8R0SIGNoLrqm5mJO0utPz/M6uzm1/l63wTfXYmNHn/sizcQrt3dvh0Q0kE+ZN+IWpW95Ffsr17BRQ3jVf1aWIlDyNl9xv8+W6kzSY+Ltj0XrdC1el4DbfOnVyeCr07UgXTiKUhTJbnMW/EAL50/q1IKuZQTIymefLB3/pq4g=
+	t=1749706346; cv=none; b=GHS00sCbjSxyprXfFzf3hCBYBrPDGBwhWtHCMxPPh2s8htlxqrvGbGZ9Ax/E7faXLtuB0tcxCUb/EsUesN1HhtWFXpBW7ywhiHV7aWUobEQsm9YyrlzA3pI9QOVVqkzKrEy9sihKeiJs93mRVfcB03J7bskBMjr52SXH040ld64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749705665; c=relaxed/simple;
-	bh=9wQfzzj7t9uK2/u04vK/+hfHsgoZV4eWemmen29KTdE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=t4nCIPzxVUoNLvOvDdyXcs1JJCzCuCrif01CeZXPSGWZr1Pou2mDvU73YPZTxo4SBxVr6ie+J0xAvHbfA+ubPsgc9OTCK7dvyUvwlMfjVZ+CSHkJKb9cTopZa7UM8HsVrZ3FKtXALaaO7vgDI5GfMA+QW5CFsS9MD5Se2VQHfiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ePPip87u; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55C5KqE32777873;
-	Thu, 12 Jun 2025 00:20:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1749705652;
-	bh=f0hXMw8ptRoZo8p1kCUGMksKDyTuNXCp9RDEBkWxjOA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=ePPip87uWoVMAXtwg7UZuCmvzjYTFrqY4z0RyKdYQe047ftJS5HKh8iNxGQYadiBG
-	 GhLLq45++EdhLh1Rd9eTQSF6nB2lSj6n+J5Il4cmk6S7UrsCGB0Gd1GOWPJM0XMcNx
-	 dwqD3ruNjFI6L4b5YXEJ8Tbiuu3eXUKdQezzBbHg=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55C5KpNN2306843
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 12 Jun 2025 00:20:51 -0500
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 12
- Jun 2025 00:20:51 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 12 Jun 2025 00:20:50 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55C5KjFH1459677;
-	Thu, 12 Jun 2025 00:20:46 -0500
-Message-ID: <42ac0736-cb5a-4d99-a11c-6f861adbdb5f@ti.com>
-Date: Thu, 12 Jun 2025 10:50:45 +0530
+	s=arc-20240116; t=1749706346; c=relaxed/simple;
+	bh=vii4+vAE/cNdk6rrbsnHbx44XX91OlPcufm+uzCCWrs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Wdw7XfNGdiFBstYAuB2AbcOVPtyuxrQwWTfeBl/J3ryCd8MgYJc4MTbMgUtL6kvjOwQROuB4Yjnf/ar0byfnstpRcrwfilV+vkFhtKv0x4sOdREa8UjULaak87aQsc6iiYEuPyH5RqlD/NiqW/Ubbnt8dQ9IFEIkq/DxXXXU1C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5u9UiMx; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-234c5b57557so5192605ad.3;
+        Wed, 11 Jun 2025 22:32:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749706345; x=1750311145; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vii4+vAE/cNdk6rrbsnHbx44XX91OlPcufm+uzCCWrs=;
+        b=e5u9UiMxEG943ZQbKGJZlFqjcwIz8iDavmd7ShJKzZ3AJupsjjeqmXVq9OnlA5Y7+2
+         i5KES5YPX8LtFkVHGcxUF7E1nztZUpE7oYtCmYhAvZAcWqbCXJuvwUaYlu0c8yGf/FZv
+         QiHcpOIivzyfPvyAEMSoZQiOJPlhnH7HgP7bNoSCKcPZFKG/sG5UzYhN+GspVYQlB0Ka
+         u4TVRn5uS8fNT/xYl18G+2/kB4VEMNDbEx+QFJbUjuWCUdUPIGN24QvvwfZA+A9J1GGd
+         BegM/8GE8ACy9K9wZuPm+V7AKDlL2OYUPhzHXqySW6xtbEE5y2H+AUYVT4bHF6sZWoLh
+         VNpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749706345; x=1750311145;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vii4+vAE/cNdk6rrbsnHbx44XX91OlPcufm+uzCCWrs=;
+        b=FMH7S+S84L2ebwYiqix1kKuRNdGAXM97vcBDAAHdcADfct1LaDvqVHU7BZl7Dw5+XV
+         Ah11QsTptaOPLhf05m4mn/pHll3ByHfJwCMlv3TVBfMUZpmjJGigDJ4icOBLB26tP2Cq
+         24P+aAqsX/hJyggwpocoSgLr+ESy2AW6i2IMndVl77KdtrFOniJ63cFHD/C145qOiXn1
+         dSmF/ZA+xud2sGclHY5HY/qKyEmQrPLY8QPKH3QkLMzWsZuKFkouSgWnWGMI3PmRipKy
+         VbTfEGQCWUQcV1a29rwAle87Y4sdg5GV1lvpIqcbc9q8RzOsN/5bJhcBSmmDD2Qb4NUt
+         7+JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCViJN3iTRLrIteAOiQ4BYkav7r0V/m2rqC9ej95HS3Yu8AoeN9+877+sr83HC7AV+gZl8U=@vger.kernel.org, AJvYcCWlTezQ883iDQSM2XAbPc9vQ4niJMBbkq2kh3IAAwDT5qqHkQo9f97wDufNLyWRtgUWnMZk60jd@vger.kernel.org, AJvYcCXx8qb2VJDRLZhgM8lei8/iUH1HTmrX5SjxhSplumcwsQxEHw6lcEu9XSTwUof8+ICPWS9W8m/C9ziRrdUi@vger.kernel.org
+X-Gm-Message-State: AOJu0YytS4C0Gw6kWdbblTtzsoYYvtb2C517xnMWAgZx4Ly3ZGM0jUdJ
+	I0Hb3Qm0N4ldnW+vkdjTCbUjHS9GZFJ2W0mGWZaS7KdXk5rH0mPljM0d
+X-Gm-Gg: ASbGncscJE3URBYE95jm2RvCKQvRslXRN5uJ3LeXDOm4SNgpkvImYNljXGiJS2HdhVT
+	2h35/2jwZFLVlDDH8mBd/WMoCwVxXBrGwJXscYOf2qpSnZFeW01+J4/4uCdeVHyaaw/HoL9TFtb
+	TvBagdUcwZTWEuxrGL7bICHYnwMUb7y4tpX+Dj0KM5MEm5PN3h4xShswe+6B4X8xZTFL821rT6S
+	Nu7XoTbmUNyeltYXkBFm2WLeV26D426uUMyA+HIMmibM6XXV7w5vY0Dw7olOrPiJg+gZL50BaKs
+	z6XWvwuDbFSqBfwRAKorDiLdqnnQpJnKYUG7Nk9Kz+mxrI4vOabFy1PA3AVK3mVT4wbUykWIxpz
+	7WdsuExNj
+X-Google-Smtp-Source: AGHT+IHcqVGofAGhSc43EaW6uyTom42iW5fqDOibqA0yTFHdAqUwPEUt9Zalv0PruwPswO0c0C3b7g==
+X-Received: by 2002:a17:902:e5cb:b0:235:ed02:288b with SMTP id d9443c01a7336-2364ca4bbcdmr29724125ad.30.1749706344723;
+        Wed, 11 Jun 2025 22:32:24 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2364e6db2a6sm5243415ad.120.2025.06.11.22.32.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 22:32:24 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: Oxffffaa@gmail.com,
+	avkrasnov@salutedevices.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	horms@kernel.org,
+	jasowang@redhat.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com,
+	Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream sockets
+Date: Thu, 12 Jun 2025 13:32:01 +0800
+Message-Id: <20250612053201.959017-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250521121705.196379-1-sgarzare@redhat.com>
+References: <20250521121705.196379-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Add prp offload support
- to ICSSG driver
-To: Jakub Kicinski <kuba@kernel.org>, Himanshu Mittal <h-mittal1@ti.com>
-CC: <pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <m-malladi@ti.com>,
-        <pratheesh@ti.com>, <prajith@ti.com>
-References: <20250610061638.62822-1-h-mittal1@ti.com>
- <20250611170424.08e47f1a@kernel.org>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250611170424.08e47f1a@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
+No comments since last month.
 
+The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
+patch. Could I get more eyes on this one?
 
-On 12/06/25 5:34 am, Jakub Kicinski wrote:
-> On Tue, 10 Jun 2025 11:46:38 +0530 Himanshu Mittal wrote:
->> Add support for ICSSG PRP mode which supports offloading of:
->>  - Packet duplication and PRP trailer insertion
->>  - Packet duplicate discard and PRP trailer removal
->>
->> Signed-off-by: Himanshu Mittal <h-mittal1@ti.com>
->> ---
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 23 +++++++++++++++++++-
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  3 +++
->>  2 files changed, 25 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> index 86fc1278127c..65883c7851c5 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> @@ -138,6 +138,19 @@ static struct icssg_firmwares icssg_hsr_firmwares[] = {
->>  	}
->>  };
->>  
->> +static struct icssg_firmwares icssg_prp_firmwares[] = {
->> +	{
->> +		.pru = "ti-pruss/am65x-sr2-pru0-pruprp-fw.elf",
->> +		.rtu = "ti-pruss/am65x-sr2-rtu0-pruprp-fw.elf",
->> +		.txpru = "ti-pruss/am65x-sr2-txpru0-pruprp-fw.elf",
->> +	},
->> +	{
->> +		.pru = "ti-pruss/am65x-sr2-pru1-pruprp-fw.elf",
->> +		.rtu = "ti-pruss/am65x-sr2-rtu1-pruprp-fw.elf",
->> +		.txpru = "ti-pruss/am65x-sr2-txpru1-pruprp-fw.elf",
->> +	}
->> +};
-> 
-> AFAIU your coworker is removing the static names, please wait until 
-> the dust is settled on that:
-> 
-> https://lore.kernel.org/all/20250610052501.3444441-1-danishanwar@ti.com/
+[1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
 
-Yes, it's better to wait for that patch to get merged before we add new
-firmware.
-
--- 
-Thanks and Regards,
-Danish
+Thanks,
+Xuewei
 
