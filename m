@@ -1,128 +1,235 @@
-Return-Path: <netdev+bounces-196791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6731AD65D6
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 04:48:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48349AD65E1
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 04:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A50DA1BC0BAD
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:48:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDED27ACD73
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2272E1C860E;
-	Thu, 12 Jun 2025 02:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63541C8631;
+	Thu, 12 Jun 2025 02:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KI1QDunI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hMn6RkDB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B82028F1;
-	Thu, 12 Jun 2025 02:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B244A28F1;
+	Thu, 12 Jun 2025 02:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749696478; cv=none; b=aPrMTo8NJjqPuw5/JuQ+rWYUv/9XNpQEQ8vydzWTYgxqDQthxU36Lq3f/RERxqbAAXC1L5yeGJD5w8frRYiyopvEGENF7+eDyJ51cpgLWimf0n/8BxrtXkkduBQx4NhZsvlvmA4K3Csx2WGoL1Aptyn2vYDZiHP2wd9+7HdMdL0=
+	t=1749697042; cv=none; b=ARk6yJuqCmpmzCykFrqFcqYc6+DRBRQZi1dW1rudGRda2Xl5sUNh3T5ECrxK3/DHpjs9SS6EgvrVuN97djY1k4fu1OpN08QbZaC5c8eK1Yu6mFNXjYH7UNHexwGyWe6td1L5Dy9cDl1lqOAiX1or39yILu7JAPyUtkzj+f/XqC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749696478; c=relaxed/simple;
-	bh=V10y+YnoaiOhK9zGqmOgoWpQxvptlZXDaCPhJRexvHQ=;
+	s=arc-20240116; t=1749697042; c=relaxed/simple;
+	bh=fMhEhu1/yjPzJ03beow89CHuvunpI+dK0RfUI4ER5AU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kPn1oVjQLj4Ryfg5rmKzeVhktGU0h6SWuxHSteWijD7dX2tRkASD0+kETaMVObZyK3vimMuTCOyyUfrSyUB1TMG6XJ1YExE4IVRcnNZgdh8IBvdt1ckqbC460i8AR92WUQNDlqlemZu2bSpDO+TUxd127YojH/CfWVxMADET9dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KI1QDunI; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-747ef5996edso564771b3a.0;
-        Wed, 11 Jun 2025 19:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749696476; x=1750301276; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=70dF3f186VX/2MCLOuJcDzIuL4GikkKOnVgxPnn7hR4=;
-        b=KI1QDunIs8T6YzA8WQofRAXa96/I/4u1ape+ryA2pWF7AYrgC5PVkCd7f9zo9E/s4N
-         Vo5ajw9kfIg9ggAEq+bL/6ask/Cbu0IrhLJWcEHZ3sjT6m7xffg6etAYEJEyUwSW+7Mo
-         7wex3t+qzFSeQrEs57cStJoD8e2Or6IoQDCXhimn/ZG+4EFNwVbGUifg7WCpJDaleAAu
-         bk7CXLRptA1yWeePuond9l33lGhD46JPjkHfErFt/lWEAvQBgsje3HRWaV5CLAGPloFs
-         5AiHDFS7L/jV+AJ9gXpm/fRvLZrnTRry/SCd7mTBN4pGAzIUYVC2DeVH15s5F0qE+FWa
-         DH8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749696476; x=1750301276;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=70dF3f186VX/2MCLOuJcDzIuL4GikkKOnVgxPnn7hR4=;
-        b=hpJsgYxVStfY0fmlgKMsDg4dBpgTI0uI5VaP1h3+8ys5KFYnrW/HvXnVseL3btts5Z
-         JEd52lJC54pr1KNODeCAaKU15HLadCFiD3uGRu1EmRIyQhgyZX0gy3fXLYu9mUAaUs7W
-         xQhrHRHJ4hbtDBXGokssq2CMyY3wOcd+97Mhtx0T60odTxxcjm6wntizjTQdnYT+UcUO
-         Q79ReqCPSEstdbPgmy0KkUlN2VhynPJdPbWhMMquxlVeHsNjJH3I4UewT+6kbqExabqG
-         0iOlJUC/7dvjgrlqUzce4bjbTj3WACd/hnvP4NE/oNHTYG2EO9t/8m41ROFxTpuLQrSZ
-         XI1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVGEJY6/edg/sOWUUeLSD7N97rxGBlq48VN2rr5QS2OtRZ5SpDy0rYsyBa+eotwvs/PkFrWdCSxsaQL7vfpEqB0@vger.kernel.org, AJvYcCVlV+IBawa294HhqfkfNspirkIFDFXiOTr7pTBeyUE/WWr/j27e6dfxrCfsraZf7sAE4R89MuVbd+UmekA=@vger.kernel.org, AJvYcCVspWBRHWu2TCwbiODdUskYUQNg8hBbauPb/+tC83pqNCdTBKpkWBXAkoq4OtuD32ymhrh+rD86PcUjUQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr+mJDlc1aXeJzv2G0QCKI2wMGncdawjQv7F8ivlmgLj4qejom
-	y5RuOqkoR9hz89XftVm+F7049ZrImSp1C5WEB+tj3QWtofaIKuwyT3D9ECWL
-X-Gm-Gg: ASbGnctlrEicTsTcC/10yu3jJxARy2BZaKGylRGVZ4apOUJkenI7ukYz+zivjz9n5XO
-	q9hXNkHfuRd2l3srLbWpJFhrWSWcaLFLA5XWZrwtAcEpr75AcrTRSBcETNOMiazGNZwr6750OZ3
-	n0qxefNnCjgvWCBaDPXq3IYzpw9OBgjAI26p8pJom4ewM0o6YyQR7ZUvru47wd6WGJLQsiMAOfQ
-	q8ie4N3W1CpuRUp9wteGfXLQtV4J8jF6HIBuXvt/f0V3fPlIwfBPXVyYxJYyeRCrijQz9m+N3sf
-	nmhFjWrrUgC/dgGMKBiORalmrN9K7qAf1PX+OOvagE9qcjSddOHg9k6Xaf0tJheFm8SHOfJKGBS
-	USA+xSxX5GBeUunQmPk9HRwQ=
-X-Google-Smtp-Source: AGHT+IFRKiugap2uRP5iwvzv3ykxNxJY6sSKFAqSQYORKgyM6ljZEvpw3F28685FefjxRCqFHH0xZg==
-X-Received: by 2002:a05:6a21:48d:b0:206:aa42:8e7c with SMTP id adf61e73a8af0-21f97800f84mr3290374637.18.1749696475840;
-        Wed, 11 Jun 2025 19:47:55 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-748809d3066sm312312b3a.102.2025.06.11.19.47.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 19:47:55 -0700 (PDT)
-Date: Wed, 11 Jun 2025 19:47:54 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, skalluru@marvell.com, manishc@marvell.com,
-	andrew+netdev@lunn.ch, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, ajit.khaparde@broadcom.com,
-	sriharsha.basavapatna@broadcom.com, somnath.kotur@broadcom.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	tariqt@nvidia.com, saeedm@nvidia.com, louis.peens@corigine.com,
-	shshaikh@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-	ecree.xilinx@gmail.com, horms@kernel.org, dsahern@kernel.org,
-	shuah@kernel.org, ruanjinjie@huawei.com, mheib@redhat.com,
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org, oss-drivers@corigine.com,
-	linux-net-drivers@amd.com, linux-kselftest@vger.kernel.org,
-	leon@kernel.org, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next v3 1/4] udp_tunnel: remove rtnl_lock dependency
-Message-ID: <aEo_2hOn5kh6kBpk@mini-arch>
-References: <20250610171522.2119030-1-stfomichev@gmail.com>
- <20250610171522.2119030-2-stfomichev@gmail.com>
- <20250611184345.3b403ad0@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QJy5Q4cfGVeQfcvvP9sWCDn9nlUv3WL4Mkd7mPmPrV8IVIdkfnXvwATsJfkRr2XMo9RG0qGwR/cg8KohclrLjwo8CqlYZM0NDSIvuUINv2PeV4gColIVCNdGhceSD2IwE4kwxVNh6MZ6TRRHWobe1N2P+9MgfOwLcpWXA8pfKmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hMn6RkDB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YrPR7aNLenkb/rPbjtjgCOKJM1EhucRndbKS1dxSdOA=; b=hMn6RkDBQ13OFUEY+bLWzRemVy
+	7d7NI61206fR4aq+H95Ov+LF09HPgXZoaDEDL1RMJ57vGADeCvc8ncchBQIJ1AC1phwMghrwIYmDR
+	1hsJixUwDw19By2LQfyM9C8q++TAHFjob5rn6A2Xo+EwuV+pXu6xKd5BQIE74YwcEsmg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uPY7w-00FUGR-WF; Thu, 12 Jun 2025 04:57:17 +0200
+Date: Thu, 12 Jun 2025 04:57:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tobias Junghans <tobias.junghans@inhub.de>
+Cc: Lee Jones <lee@kernel.org>, linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] leds: trigger: netdev: refactor
+ netdev_event_requires_handling()
+Message-ID: <0bcb999e-f32c-499e-9a10-41334ffc2255@lunn.ch>
+References: <20250610114029.268938-1-tobias.junghans@inhub.de>
+ <20250610114029.268938-3-tobias.junghans@inhub.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250611184345.3b403ad0@kernel.org>
+In-Reply-To: <20250610114029.268938-3-tobias.junghans@inhub.de>
 
-On 06/11, Jakub Kicinski wrote:
-> On Tue, 10 Jun 2025 10:15:19 -0700 Stanislav Fomichev wrote:
-> > Drivers that are using ops lock and don't depend on RTNL lock
-> > still need to manage it because udp_tunnel's RTNL dependency.
-> > Introduce new udp_tunnel_nic_lock and use it instead of
-> > rtnl_lock. Drop non-UDP_TUNNEL_NIC_INFO_MAY_SLEEP mode from
-> > udp_tunnel infra (udp_tunnel_nic_device_sync_work needs to
-> > grab udp_tunnel_nic_lock mutex and might sleep).
+On Tue, Jun 10, 2025 at 01:40:20PM +0200, Tobias Junghans wrote:
+> If there are network devices with the same name in different
+> namespaces, ledtrig-netdev gets confused easily and switches between
+> these devices whenever there are NETDEV_CHANGENAME/NETDEV_REGISTER
+> notifications.  This happens since ledtrig-netdev only checks for
+> device name equality regardless of previous associations with another
+> network device with the same name.
 > 
-> There are multiple entry points to this code, basically each member of
-> struct udp_tunnel_nic_ops and the netdev notifiers. In this patch only
-> reset and work are locked. I'm a bit confused as to what is the new
-> lock protecting :S
+> Real world example: eth0 is the primary physical network interface and
+> ledltrig-netdev is associated with that interface. If now Docker creates
+> a virtual Ethernet interface (vethXXXX), moves it to the
+> container's net namespace and renames it to eth0, ledtrig-netdev
+> switches to this device and the LED no longer blinks for the original
+> (physical) network device.
+> 
+> Fix this by refactoring the conditions under which to handle netdev
+> events:
+> 
+> - For processing NETDEV_REGISTER events, the device name has to match
+>   and no association with a net_dev must exist.
 
-I though that most of the callers are from do_setlink and there we have
-rtnl and we grab rtnl+lock during the sync. But that doesn't
-address the suspend/resume vs do_setlink race, that's true :-(
+Sorry for taking a while to review this. It took me a while to think
+it through and produce a list of use cases. And might still be missing
+some.
 
-Did not look deep into the notifiers, assuming they are a way to push
-the info down to the devices (under rtnl) plus trigger the sync work,
-will take a closer look.
+Given the complexity here, i actually think we need verbose comments
+in the code.
+
+> - For processing NETDEV_CHANGENAME events, the associated and notified
+>   network device have to match. Alternatively the device name has to
+>   match and no association with a net_dev must exist.
+> 
+> - For all other events, the associated and notified network device have
+>   to match.
+> 
+> Signed-off-by: Tobias Junghans <tobias.junghans@inhub.de>
+> ---
+>  drivers/leds/trigger/ledtrig-netdev.c | 29 +++++++++++++++++++--------
+>  1 file changed, 21 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+> index 6e16619719fe..a3f30e6f74b4 100644
+> --- a/drivers/leds/trigger/ledtrig-netdev.c
+> +++ b/drivers/leds/trigger/ledtrig-netdev.c
+> @@ -578,15 +578,28 @@ static const struct attribute_group *netdev_trig_groups[] = {
+>  static bool netdev_event_requires_handling(unsigned long evt, struct net_device *dev,
+>  					   struct led_netdev_data *trigger_data)
+>  {
+> -	if (evt != NETDEV_UP && evt != NETDEV_DOWN && evt != NETDEV_CHANGE
+> -	    && evt != NETDEV_REGISTER && evt != NETDEV_UNREGISTER
+> -	    && evt != NETDEV_CHANGENAME)
+> -		return false;
+> -
+> -	if (!(dev == trigger_data->net_dev ||
+> -	     (evt == NETDEV_CHANGENAME && !strcmp(dev->name, trigger_data->device_name)) ||
+> -	     (evt == NETDEV_REGISTER && !strcmp(dev->name, trigger_data->device_name))))
+
+At the beginning of this function i would put some background.
+
+/* /sys/class/leds is unaware of network names spaces. All LEDs will
+   be visible in all network name spaces. However a network interface
+   is only in one network name space. Interface names are unique
+   within a network name space, but not across name spaces. The same
+   name can appear in multiple name spaces. However the interface dev
+   pointer is unique, and does not change when an interface moves
+   between namespaces.
+
+   LEDs can either support software blinking, hardware blinking for a
+   netdev, or both. When the trigger is activated on an LED which
+   supports hardware blinking for a netdev, a request will be made to
+   get the struct device it blinks for. This may not be available,
+   e.g. the PHY has not been associated to a MAC yet. However, if the
+   device is known, the trigger is associated to the device.
+*/
+
+Right, in the process of writing this, i found another issue:
+
+netdev_trig_activate() calls led_cdev->hw_control_get_device() to get
+the device this LED can hardware blink for. From the device it gets
+the name, and calls set_device_name(). set_device_name() then uses:
+dev_get_by_name(&init_net, trigger_data->device_name) to convert the
+name into a netdev. However, it is looking in the base network name
+space, and there is no guarantee that it is where the device actually
+is! We should actually use to_net_dev(dev) to get the struct
+net_device, and pass that to set_device_name(), or a variant of it.
+
+continuing...
+
+/* If a hardware blinking LED cannot be associated to a device, its
+   device name can be set the same as for a software blinking LED, via
+   /sys/class/led/<LED>/device_name, once the device actually exists.
+   An interface of that name will be found and associated to the
+   trigger.
+*/
+
+And here is the next issue. It looks for the device in init_net, the
+base network namespace. But if i've done something like:
+
+$ ip netns exec n42 bash
+$ echo eth24 > /sys/class/led/LED-wan/device_name
+
+we want it to find eth24 in network name space n42.
+device_name_store() has to be called in process context, and that
+process must have a network namespace associated to it. But i've no
+idea how you get to it, this is not something i've done before....
+
+But i think set_device_name() needs to change, and not be hard coded
+for init_net. We need to keep the netns in the trigger_data structure.
+
+> +	switch (evt) {
+> +	case NETDEV_REGISTER:
+
+So, register...
+
+	/* 1. The name and netns match to those set by
+              /sys/class/led/.../device_name. Associate the device to
+	      the trigger.
+
+           2. The device was previously associated to this
+	      trigger. The device has moved from one netns to another.
+	      Reassociate the device to the trigger. The netns in trigger_data
+	      needs updating, and the device might of changed name
+	*/
+
+> +		if (trigger_data->net_dev ||
+> +		    strcmp(dev->name, trigger_data->device_name))
+> +			return false;
+> +		break;
+> +	case NETDEV_CHANGENAME:
+
+	/* 1. The device is associated to this trigger_data. Update
+	      trigger_data->device_name with the new name.
+
+           2. The trigger has no device associated to it. The new name
+              of the device and its netns match those set via 
+              /sys/class/led/.../device_name. Associate the device to
+	      the trigger.
+        */
+
+> +		if (trigger_data->net_dev != dev &&
+> +		    (trigger_data->net_dev ||
+> +		     strcmp(dev->name, trigger_data->device_name)))
+> +			return false;
+> +		break;
+> +	case NETDEV_UNREGISTER:
+
+        /* Disconnect the device from the trigger. However, ensure it can be
+	   reassociated if the device appears in a different namespace.
+
+> +	case NETDEV_UP:
+        /* When the interface was registered, it might not of had a PHY 
+	   attached, so check if the PHYs LEDs support hardware blinking.
+        */
+> +	case NETDEV_DOWN:
+> +	case NETDEV_CHANGE:
+
+        /* Update LED state, including the link speed. */
+> +		if (trigger_data->net_dev != dev)
+> +			return false;
+> +		break;
+
+I'm not sure you can have a simple bool needs further
+processing/ignore this event. When you get into the details, i think
+you will find you will need to take actions depending on various
+conditions.
+
+Tomorrow i will look at the socket system calls and see how you get a
+processes network namespace.
+
+	Andrew
 
