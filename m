@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-196766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 589FCAD64C3
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:50:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982C0AD64C5
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C9C18830A3
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:50:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C835189591B
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CCB82AD02;
-	Thu, 12 Jun 2025 00:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD6243164;
+	Thu, 12 Jun 2025 00:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kz2ko++8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2egijkt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FE55258
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 00:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A742AD02;
+	Thu, 12 Jun 2025 00:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749689399; cv=none; b=qa9nEyFiwVoYmAw5G/wUJxKZuSjbYCjnss2+Ta8HnB6Yud7ArKdvMTMhntd0DykyDcLM7xnGeaF0eIdWaqPNhijaBYbBOtf/10M0/AOQZAzs6HmDsIb9we4KJUBSpi6NcGsEH22l9JUehmhcxaSJnUkmP2HL1aClkjdfu+ZBBrM=
+	t=1749689407; cv=none; b=uyXQrHbvQiXKC5K89txt0tY42ivj3bCtJ2ovQihPkY53nadM1qYnw2VokU88YVreCv/b26qoqOT1mBGLEzbnEh+hB5048G4u8R0Jq0QluMPpGO37oP/Ypu7TdC4qL4hIZ41qObZWtwvi9wFqkzwC5QKoRlQksQSbtPiPj9s312k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749689399; c=relaxed/simple;
-	bh=VMQbleK+QH86N2o3nZYuYur66iE6goe2YWh6U5lZ6X0=;
+	s=arc-20240116; t=1749689407; c=relaxed/simple;
+	bh=jQuca2ikcMezuKUhO7CCmQATPFR8UGh0rqCRGlqZ7Xs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t9+LEku0+pDXibsBzhlxZwoh5+OrN8CZ/5BfwDorPPBtL8YOm9OaqkskHrkDjZPHmsD5SlgQI2VAao7RVsg3JeMvewfx2kXuQK3AuE2j+D+jmU6XLIEQo/CLPFUZuouzDcwXxPeyidPA1J/LFFVUd5zA6feG9N+XxbEosLFg2q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kz2ko++8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 696FCC4CEE3;
-	Thu, 12 Jun 2025 00:49:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TFJosrDzHjPyBPrINqKS5/jTcdg4u+dhUDlmwtGeTnx/RGq1w3EtzSaBLr/P65X2+VM2C1Y6KKvnLtFDTHgl7C/IbscixFFgPEw+4ukO/4JEZE5hCLUDPARt1kckKo53HMJFeGBtciFmRBg3uk0F8S+4R8etNmqM6s9oaoKbOW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2egijkt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B439FC4CEE3;
+	Thu, 12 Jun 2025 00:50:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749689398;
-	bh=VMQbleK+QH86N2o3nZYuYur66iE6goe2YWh6U5lZ6X0=;
+	s=k20201202; t=1749689406;
+	bh=jQuca2ikcMezuKUhO7CCmQATPFR8UGh0rqCRGlqZ7Xs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Kz2ko++8kyasg7UOXPb+n4Phouyk/GCMmOpHb00r1mV0yQOtz4SHF+nq/lBk8r3O1
-	 MH9w1Gg7zA1Jnlx0buDt80hWaBwZqxd3AF121rQ3Cn3T2lMzmbnZV/NJBAdMGAZR0k
-	 vM5ZtkFfeQEfnqwSO0qm+CBIyMNi/gQztV8QR8swKwJ3LG5kg5fcBhTl8cm0/n6Ysl
-	 9x3JqAdXO25dntwcq+bm24aCMw4mE2V0DKCn/pqpBRiNxsNKFpU5VAeJydVapKJsNA
-	 vWEJ1xpAozJPASx7zzi+O5fyDsSZtHIiTwH2+tpgKWXkwZubHxhoOFDnhzoPYAq4PJ
-	 rmPa9J0YJDdVw==
+	b=M2egijktEiuaxPpL585YyXJnF0oVY6UJMf/kiYQwtcKyYuMjTWg4n6t0GYNRUtIh0
+	 NAsRxKLBroBfXv/zSqyNP1w6DXq5+Nn1rIk0CgUWdbSkFkThsF/peuiR2tb/TV4ZFg
+	 TkzA06dGhfPBFhymPmHHs0W2lttXahJHC23Esz+EY0nSZjllQI30hYoLN5+8KxXueg
+	 OjX942cqv+N5bHrgB72BsH5MGsvyvgylIcewOGDtKEOy7nh5Cu3LZdqRY3+i8XeU1Q
+	 7p0j3ahgD8YzN2epfB4iz63xGgEe+8cqEURWK351Vvvfr3SbM5ddkSLHeamtGY3vIs
+	 GDEiuqfb4R1WA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE0D3822D1A;
-	Thu, 12 Jun 2025 00:50:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD9B3822D1A;
+	Thu, 12 Jun 2025 00:50:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] MAINTAINERS: Update Kuniyuki Iwashima's email
- address.
+Subject: Re: [PATCH net-next 0/2] net: bcmgenet: add support for GRO software
+ interrupt coalescing
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174968942850.3552664.10610156407502774597.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 00:50:28 +0000
-References: <20250610235734.88540-1-kuniyu@google.com>
-In-Reply-To: <20250610235734.88540-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+ <174968943648.3552664.6839713720894047365.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Jun 2025 00:50:36 +0000
+References: <20250610220403.935-1-zakkemble@gmail.com>
+In-Reply-To: <20250610220403.935-1-zakkemble@gmail.com>
+To: Zak Kemble <zakkemble@gmail.com>
+Cc: opendmb@gmail.com, florian.fainelli@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 10 Jun 2025 23:56:58 +0000 you wrote:
-> I left Amazon and joined Google, so let's map the email
-> addresses accordingly.
+On Tue, 10 Jun 2025 23:04:01 +0100 you wrote:
+> Reposting as requested here https://lore.kernel.org/all/20250531224853.1339-1-zakkemble@gmail.com
 > 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->  .mailmap    | 3 +++
->  MAINTAINERS | 6 +++---
->  2 files changed, 6 insertions(+), 3 deletions(-)
+> Hey, these patches enable support for software IRQ coalescing and GRO
+> aggregation and applies conservative defaults which can help improve
+> system and network performance by reducing the number of hardware
+> interrupts and improving GRO aggregation ratio.
+> 
+> [...]
 
 Here is the summary with links:
-  - [v1,net] MAINTAINERS: Update Kuniyuki Iwashima's email address.
-    https://git.kernel.org/netdev/net/c/27cea0e419d2
+  - [net-next,1/2] net: bcmgenet: use napi_complete_done return value
+    https://git.kernel.org/netdev/net-next/c/28ed9bed5fb2
+  - [net-next,2/2] net: bcmgenet: enable GRO software interrupt coalescing by default
+    https://git.kernel.org/netdev/net-next/c/078bb22cfc65
 
 You are awesome, thank you!
 -- 
