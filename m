@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-197025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E45CAD762E
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:32:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D58AD762D
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D79A13AFEE3
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:29:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CFA518851D8
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD82A2BE7D7;
-	Thu, 12 Jun 2025 15:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85F72BEC3F;
+	Thu, 12 Jun 2025 15:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PL4Y6FU9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="voQbuYRq"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A015C2BDC20
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A691B2BDC20
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741710; cv=none; b=W7s+AFcMTh9nelBUFZJwpGwXRLwJ6gDO3vaIAQsy3Yz97qK1ZBMn55IdPPe2hCAQNkYurQ7Os+pgAEdVN0tYCKVbScXSmZVIg87lJI6EbiqwCbKEFiizMVv+MTpuTQi9HRzsl632uD2gYKnwcz4I7EeGPCnnACfavwft/d8w7cg=
+	t=1749741731; cv=none; b=ja60UqexsMWvsAQumLGEy4SAIrtdMuu9YaPvJ5VEYXpcZssOWpqmlnNcWwtOjjcGcaG35SflMErZRmzyaqBqNRtbXE8wkrZ2gCJsKXNJdC1CpAyds2CfNlqxvFdrSYvDevWscW+qzRzLR5jF/thHC62LmdKyOftc9F61zc5cOHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741710; c=relaxed/simple;
-	bh=C27uzBY/5giXLYc56htreVHxWtSgQcC7JXv5wcOo1S0=;
+	s=arc-20240116; t=1749741731; c=relaxed/simple;
+	bh=q+qzIUKyi2oftaz4Bsi1fcHA1qk2+IgJaheBq8hyh+M=;
 	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=kZlAkubg1tgsqHUlu1PvhF+MGDw61yZ1R8qBLkwGxjnua3Wsd23kGXyPniN8/Up1R68dQDW38cncUtLP20LopTIsSD6I0t0hTL8xRG9jADQmJ+I+emIfCI/5sT7wxBoVGEgDSDjGIHHAPJ2h1PgPfwenYO0OpOLsXFFGQfsiSqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PL4Y6FU9; arc=none smtp.client-ip=78.32.30.218
+	 Message-Id:Date; b=Afe2NAgTESvz/pWHfTs6DrCTuQOBXPeHVr0BnrUolSo2xuwXn4NrEvtT/egWQYbhsG/WHC0eaf3VOwvI4Wo0F8M3rZ8BcOGDujj7aV9HpEqqRQuyMz7ukAufc1p0i8WTs1bFuX3StgEmJ/d/ijw1Q+Howu+tw4LnwJxjIpLGiBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=voQbuYRq; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,26 +37,36 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
 	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZtPIHPS9HP/yCp2B/zsVNVJgXEBEjD1S4iWZWQchBiM=; b=PL4Y6FU9831PsMzgZ8a8oKcgJI
-	33MHejtb10Ggmi+ySUVACBHBzA0kcgaEDTlYIsbESRhpAw2N+aR3me85EWEKrZ7Hm9JPVc3VYW1QV
-	znkCrVxBy1uGSC1RORqwZFUuqUwx/4AXQtg9HiJSf7eVSwK5JOne8A87+4Bx50CzTsyKIFd7f+myU
-	2I8fCNJ+LzFNt+1AbNbypF8ugoa3ia9chmVaAF3pLsJVz6Eq0FRBKNyXrJMnKQwl/mihbkhBA8jby
-	0s4xBhFOPypliMZ+YFnfkIWHn1JHndyIDUGP8HP4U+K+lC5azrk1Iaz9uzwt83R/zIYXJNhRyOBCx
-	HASCZLRg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51128 helo=rmk-PC.armlinux.org.uk)
+	bh=/wF+9Ix/fwH4D/k6aun5wQuB8ja0uch/p72DUM3MFBM=; b=voQbuYRqlPaJqX/FwxM/fkp+7R
+	hMhKVZSsMFUVlN3Zr+Cu0s5GByPE+NcxB1GCoctgc7gY+uoJ9CfNsQwXZVI28dT9iBhClE7lgTwnk
+	It/xsQd/s35I6/1wRLIe50yQ8SXGdtQaf6npVcOWE7E26uTnI3aIk9MqTpgbTGMnQ2YkJy/PrQe5f
+	mwa2DdSxNahrhVthWaStNC14QwiCw+vIjS3kgye/Yur67kpoK2y5Jtyt9fz6z/BfTjOFf0YyHgPhA
+	vNNHl7tkLx4s+Y73/N+Vu+1cKPOJPaElYnu5XP/msghik8tvCBG3XUfXT1+BybMSVLwcWyvtu87j/
+	OouAJA0Q==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33414 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uPjkO-00081Q-2J;
-	Thu, 12 Jun 2025 16:21:44 +0100
+	id 1uPjkb-00081Y-2V;
+	Thu, 12 Jun 2025 16:21:57 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uPjjk-0049pI-MD; Thu, 12 Jun 2025 16:21:04 +0100
+	id 1uPjjx-0049r5-NN; Thu, 12 Jun 2025 16:21:17 +0100
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next] net: phy: improve rgmii_clock() documentation
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: stmmac: improve .set_clk_tx_rate() method error
+ message
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,37 +76,34 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uPjjk-0049pI-MD@rmk-PC.armlinux.org.uk>
+Message-Id: <E1uPjjx-0049r5-NN@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 12 Jun 2025 16:21:04 +0100
+Date: Thu, 12 Jun 2025 16:21:17 +0100
 
-Improve the rgmii_clock() documentation to indicate that it can also
-be used for MII, GMII and RMII modes as well as RGMII as the required
-clock rates are identical, but note that it won't error out for 1G
-speeds for MII and RMII.
+Improve the .set_clk_tx_rate() method error message to include the
+PHY interface mode along with the speed, which will be helpful to
+the RK implementations.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- include/linux/phy.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index e194dad1623d..802f3015f235 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -269,8 +269,10 @@ static inline const char *phy_modes(phy_interface_t interface)
-  * rgmii_clock - map link speed to the clock rate
-  * @speed: link speed value
-  *
-- * Description: maps RGMII supported link speeds
-- * into the clock rates.
-+ * Description: maps RGMII supported link speeds into the clock rates.
-+ * This can also be used for MII, GMII, and RMII interface modes as the
-+ * clock rates are indentical, but the caller must be aware that errors
-+ * for unsupported clock rates will not be signalled.
-  *
-  * Returns: clock rate or negative errno
-  */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 1369fa70bc58..24a4b82e934b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1062,8 +1062,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 						interface, speed);
+ 		if (ret < 0)
+ 			netdev_err(priv->dev,
+-				   "failed to configure transmit clock for %dMbps: %pe\n",
+-				   speed, ERR_PTR(ret));
++				   "failed to configure %s transmit clock for %dMbps: %pe\n",
++				   phy_modes(interface), speed, ERR_PTR(ret));
+ 	}
+ 
+ 	stmmac_mac_set(priv, priv->ioaddr, true);
 -- 
 2.30.2
 
