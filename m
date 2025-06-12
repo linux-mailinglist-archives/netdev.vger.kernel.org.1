@@ -1,100 +1,125 @@
-Return-Path: <netdev+bounces-197126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB31AD7996
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:04:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0A4AD79B7
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F17A7A83CF
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:03:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BA7E7A9D1A
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A39829C32B;
-	Thu, 12 Jun 2025 18:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864652C3770;
+	Thu, 12 Jun 2025 18:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jHQy8K8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C9D29B200;
-	Thu, 12 Jun 2025 18:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86CE2C0331;
+	Thu, 12 Jun 2025 18:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749751491; cv=none; b=FvuXqssZY1obFs1OTPOVNdLVuP+bUdp9lgLiaByHrxTpDZAjGyvxXc8zoYhKPzBdJNnHOXXmt/eNhk5mrrmkIsCX29ZfJJYOiqGc3Ee1Z6QSNePlKIzmUbYe7ii1oJP/u+0pPKm+9UxKIHRku2/hXfiJluu6kzHoJXCDouJxBUM=
+	t=1749752431; cv=none; b=ow/hDoamloYZRgdqO8FfLCMOneX7Cj2FcEMuBc9x4hy2SvrRkmWRDHHL8uHqQMcLLc6+RTiIVLMaWO/veXFBp1QxBaTSs43RomSqtgFN950ooqeSd49jCF+cBUpattXcGK8Vn5I6gxXuQ0P4ulGgqHxGvZZW+fmlXUK+Snfce8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749751491; c=relaxed/simple;
-	bh=w4nmA+td2ExYiaBNDnEm+Ltur33N4rnCwWlrsEz9qx4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UsYZSkaqKOhx0Q48Hb76KE70b+VBUBF13zoOuZEpu37UGuTocjRfd50TRclLlx0nA4gUZcaW6O/By1aGU1nODGQZ1WZ2c4JFeeiEJLZsZofaVsPWk6yRitsedsuc72Dt9GKHDsE7iU9wGlsRN9vDz6Fl2Yn1jfj22WghS1jE1TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1749752431; c=relaxed/simple;
+	bh=NVVgbxJGi4pV+scYO8y++JEJceNMmB7haFmfgb2j43w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=C3pTPaV2PZWhSm4JJO1qxgeV589m5Rnsu1AvD2gnwoHoPVMWwgqHPJLEbn9kB0acd70qsnfxQkLluyYRUmtKYSLjiq4QgoSEF1sPi9nqqAVhafqF8UmoQ0+cuApSkuE6PvXuQT1zSsuyc4vgIlqoj1jMFktbQbCF0wxdl4rdceU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jHQy8K8X; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-605b9488c28so2238425a12.2;
-        Thu, 12 Jun 2025 11:04:49 -0700 (PDT)
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3dddbdef7f0so10956415ab.0;
+        Thu, 12 Jun 2025 11:20:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749752429; x=1750357229; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NVVgbxJGi4pV+scYO8y++JEJceNMmB7haFmfgb2j43w=;
+        b=jHQy8K8XDXX1zFolW5buBOQ/u9JXNWGzCY8GdlyZLO5Imt2hyuGO+FYDTOJeWJ5m5+
+         ojfRCFDmnFMorHiQf+UwmMSQau79ylm8fiqjA6WEdWYNRu+7C0ipyniDIEEvv8TSxJHv
+         7HcmhlLtc0sYWWBhr4c5NSIqqogxnkV94eaQDaLDTzl1wsH61Ox8q8jU0cWG4RO3aIhC
+         RuUjCcLBXOwRb6C3bSVj4o2Q3zrYHbDysVTZi4Kq4TOaT/tiSwQTecH6NTHhhkt8BU1v
+         SFSWF8M5PwlYsC/hsOAVttS09oiw37lPhgvQ4P9fywefeRedaVuytNCBoF69qNzY5zm6
+         aqUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749751488; x=1750356288;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CNunZIgYlwEtLu9L7BQi2+QkqU/Yq8JzmhNXkx9O8/Y=;
-        b=Dw6lt2jnxHGjEUlG7fOi7W651HIGWtjT/X6sCAmSvrRqjNXhySc5shRTSSgqDQXNE7
-         +mSBf1vxzSo7pDkIeQzPJ9TYlsh268/nj/sWuqxyVDp9SMVbHptSZtIEfuvyHzkkFU2j
-         sjKAq+I2/kiYGojPJ6VJYTDicz0j0d/0Yrq09OWJF2qdLWe/vBSsjkNbdrSHf9x/hSIM
-         ZkL9xgMiTaDdicDEjEy+pA7xedD1x1JazfgflgfHvMl3PewdWRag4NCyJWgp5bx/oEgG
-         qVWGGEhfdTjgChYye8ZQFTSfFDcHu+RxNsLJBNfd4FKyiX0JwZ2QN+KfIBa7KfO4l0xb
-         vi4w==
-X-Forwarded-Encrypted: i=1; AJvYcCW4GKd1fHjglgBvo6FfvPB7tsGhJAlYMdL46EqgEz0TxSH0TqgY2Q369qUG5nlXuez2fFxvnYrB@vger.kernel.org, AJvYcCWNaE4dDe7yZ18maCLJK91LxbEwDLYLsYK23kMZrQYCCxR28jTArFtU/1h57AG+wtVbbhfgS7tauw3extA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwskjXqO+/ou/Wwz1a3BmuVc1sSivpJiwXlfuSTEusN3+OLyl2I
-	a7I0Lzm7wNtSP4GvJqh1kQiTO3gMCWxn7H5Ok4e33VW6UwspaTn+8gqL
-X-Gm-Gg: ASbGncvOsnvybrcHhpKN0iYjDgLfO6Jytwy6aHJEWvCY+9EQ8SyvaZfLfIRh7Yyrd82
-	nc96uvoi4MSVxHN1m31iZXHzlnGiFK9hSpiEmR+/D9Ulhw+M5Nr6zmdzUpW8JDQMtycdi41WTU/
-	pJgSjuvw9XjVQlEAQ7ZNHiaqW7of9kJv5qUCTW32FCPQ8g/pUW1tpoKZgSTS+LbT1SlluRliDq5
-	STRjvyRnUBUJqn09yd5IKnMVHChxJuxGLuuluohr+EssgA+cYp5zvJ1lA36mOU9yvWqAXvPeXA8
-	Rz0j+HSE+cFXS4fuWXf4dPKLe9k+lke514NNDG0Db+1rZmnW2A==
-X-Google-Smtp-Source: AGHT+IGc8l4XV7XaWNdsUBfEtSOZFeyD8ieAOH2P/GzmS2eLYMPjEoV7DIpAN6MPaRb5Fn6AFKwxmA==
-X-Received: by 2002:a17:907:6d1c:b0:ad8:8621:924f with SMTP id a640c23a62f3a-adec5d6b20dmr20554366b.56.1749751488133;
-        Thu, 12 Jun 2025 11:04:48 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adeadf3bb7asm171135166b.172.2025.06.12.11.04.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 11:04:47 -0700 (PDT)
-Date: Thu, 12 Jun 2025 11:04:45 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Damato <joe@dama.to>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next 2/2] netdevsim: collect statistics at RX side
-Message-ID: <aEsWvciIxKqlD2W8@gmail.com>
-References: <20250611-netdevsim_stat-v1-0-c11b657d96bf@debian.org>
- <20250611-netdevsim_stat-v1-2-c11b657d96bf@debian.org>
- <aErjcH3NPbdP7Usx@MacBook-Air.local>
- <20250612074503.1f80b816@kernel.org>
+        d=1e100.net; s=20230601; t=1749752429; x=1750357229;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NVVgbxJGi4pV+scYO8y++JEJceNMmB7haFmfgb2j43w=;
+        b=Oa/fHPEraDRVP7csq9hkkseOv7bBzBVpU0jQLvwf672kQY2p0o5mJxQ7UuSRrZwZhw
+         4DEbDsuThJh0CY+e0WKPwag0KQcqXCx2DRVlyARF9jXyzZokTFFTnBKkQvnoxpr8pGLm
+         9aUlY8VPyFMTcy3GluBVZNxJ5uyg7Y3yyMwplcOfy4FlTCrwZ8n3ZMJR+3HTn0yv2mYH
+         KnNPLkR89d5f3TOqDhVftcpl4NPoU96QmmJpkvrOv4aNlXTA1PuzufmDGNG7JdDQbY+2
+         8FG1WoKmAdPQz0KaMLSPlXqcrxIc0tRuUoyzja7EgDU9pHai+sWIUm6pZefzSRrQcyG2
+         dAoA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2CFP/h4sXKdU/nQkSee2yeqXABW+y/8YABiu3Jzi+VBeifg7L8hBNk6FMyAwYhKj7iSkZnRZlCM2p@vger.kernel.org, AJvYcCXIQ02crzTtqW3ImJFIShbsRLWXmlG6wb97Sn81UDvEVqxoeAnZ+foa2yn7wjG5auYp+4cVsgg=@vger.kernel.org, AJvYcCXeErqDBTNt54WJUeSUoJLiVmuUKZ6UvEkqzHCPsE76uHET2ImO66RhsIVHyW6t8r+aKz4E6f0ukM0eCFFaQBYN@vger.kernel.org
+X-Gm-Message-State: AOJu0YxR/WGerfz51JWYltF80YwLDeZAeCoG6CIYi4DZ9KAkN/zlwWc8
+	HGIDoRZdBKKkS5F0v6/U9sc5eMuTH8Om8gfwvHcA77p3avp6Eh5a7EF7p5UtzXThKaUn2m6ZQgF
+	VRpE/HJMR760RoSjL2OpPllsWrqNJacQ=
+X-Gm-Gg: ASbGncsn+CUROzJqmV+G8noSrQQ/u0EH88n4HmZZUwBrsa+wX8uC/lK0HaAP6wz85XQ
+	oEk+10PuCIKly9GuRgb+tFKFlgiaT6v8EbhVGkneUGPV0B34O1rTIYibMY8yi9STKAJTuRUwMHk
+	oEnr2M/yvtgRiiEG53jnIM0YnTUUBGbTqFlkTiQnr9
+X-Google-Smtp-Source: AGHT+IHb0wSEDeQHWHI2dMD634OfwFTGxe3ouDxHtVIZxIZbe7QBpbAbtVt0u3NdziLXU5NsgrmbUd/F3N1CZ33FqfA=
+X-Received: by 2002:a05:6e02:1a43:b0:3dc:8b2c:4bc7 with SMTP id
+ e9e14a558f8ab-3ddfa80be92mr59554815ab.1.1749752428993; Thu, 12 Jun 2025
+ 11:20:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250612074503.1f80b816@kernel.org>
+References: <w7bwjqyae36c6pqhqjmvjcrwtpny6jxjyvxzb2qzt7atjncxd2@gi4xhlyrz27b>
+ <aEqka3uX7tuFced5@orbyte.nwl.cc> <CABhP=tZRP42Dgw9+_vyAx80uPg4V2YFLfbGhpA10WzM46JYTNg@mail.gmail.com>
+ <aErch2cFAJK_yd6M@orbyte.nwl.cc>
+In-Reply-To: <aErch2cFAJK_yd6M@orbyte.nwl.cc>
+From: Antonio Ojea <antonio.ojea.garcia@gmail.com>
+Date: Thu, 12 Jun 2025 20:19:53 +0200
+X-Gm-Features: AX0GCFsYScf9H5vRg9wxsbe7jT3iDs2dBG-naVHm6oe0uV8s4W_cR65_YbTHDnI
+Message-ID: <CABhP=tbUuJKOq6gusxyfsP4H6b4WrajR_A1=7eFXxfbLg+4Q1w@mail.gmail.com>
+Subject: Re: Status of native NAT64/NAT46 in Netfilter?
+To: Phil Sutter <phil@nwl.cc>, Antonio Ojea <antonio.ojea.garcia@gmail.com>, 
+	Klaus Frank <vger.kernel.org@frank.fyi>, netfilter-devel@vger.kernel.org, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>, 
+	netfilter@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 12, 2025 at 07:45:03AM -0700, Jakub Kicinski wrote:
-> On Thu, 12 Jun 2025 17:25:52 +0300 Joe Damato wrote:
-> > It "feels" like other drivers would be bumping RX stats in their NAPI poll
-> > function (which is nsim_poll, the naming of the functions is a bit confusing
-> > here), so it seems like netdevsim maybe should too?
-> 
-> Good point, and then we should probably add the queue length to
-> rx_dropped in nsim_queue_free() before we call purge?
+On Thu, 12 Jun 2025 at 15:56, Phil Sutter <phil@nwl.cc> wrote:
+>
+> Hi,
+>
+> On Thu, Jun 12, 2025 at 03:34:08PM +0200, Antonio Ojea wrote:
+> > On Thu, 12 Jun 2025 at 11:57, Phil Sutter <phil@nwl.cc> wrote:
+> > > On Sun, Jun 08, 2025 at 08:37:10PM +0000, Klaus Frank wrote:
+> > > > I've been looking through the mailling list archives and couldn't find a clear anser.
+> > > > So I wanted to ask here what the status of native NAT64/NAT46 support in netfilter is?
 
-Thanks Joe and Jakub, and after a review, I agree it might be a better
-approach. I will update this patch with this new approach
-and send a v2 tomorrow.
+> > we ended doing some "smart hack" , well, really a combination of them
+> > to provide a nat64 alternative for kubernetes
+> > https://github.com/kubernetes-sigs/nat64:
+> > - a virtual dummy interface to "attract" the nat64 traffic with the
+> > well known prefix
+> > - ebpf tc filters to do the family conversion using static nat for
+> > simplicity on the dummy interface
+> > - and reusing nftables masquerading to avoid to reimplement conntrack
+>
+> Oh, interesting! Would you benefit from a native implementation in
+> nftables?
 
-Thanks for the review,
---breno
+Indeed we'll benefit a lot, see what we have to do :)
+
+> > you can play with it using namespaces (without kubernetes), see
+> > https://github.com/kubernetes-sigs/nat64/blob/main/tests/integration/e2e.bats
+> > for kind of selftest environment
+>
+> Refusing to look at the code: You didn't take care of the typical NAT
+> helper users like FTP or SIP, did you?
+
+The current approach does static NAT64 first, switching the IPv6 ips
+to IPv4 and adapting the IPv4 packet, the "real nat" is done by
+nftables on the ipv4 family after that, so ... it may work?
 
