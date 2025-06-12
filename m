@@ -1,254 +1,152 @@
-Return-Path: <netdev+bounces-196923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D63BAD6E13
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:43:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD830AD6E70
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 932AF3AE6FD
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:43:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DE621790E3
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108D72459CD;
-	Thu, 12 Jun 2025 10:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB41238172;
+	Thu, 12 Jun 2025 10:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="V1uWe0Pr"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D623C51C
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 10:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3E021B9F5;
+	Thu, 12 Jun 2025 10:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749724941; cv=none; b=EGWledKjaC01QqWXJb8FHFX1iabFYihlp2kRZcYF4Izx1ybHd99vgAyNtvG4ZVCR6F+qryJXdWXGc2W4yw6a09RXX0FeBrJ0UWZysWZREgj2Rxh2lwtnVzJ4d8NyRUurufxt7dfQmAEifPP8ku3ndcpmO1iMhjrESh9kwcxHiRY=
+	t=1749725895; cv=none; b=DzsMWwA4TBJGJhMAsQBzob1+7xwvjJHyHEB4WpbkIp8hsJawI1tTfa/pzs9l1mo3hbEA+nSRHQD+krWFPB6m5+zCf62tkASko1Ll1p/U3a7v5dfneMgXBRd/AmiiYaJLX+IaiMDJo+x/9Y7mTspAWXo0AM54jdCRYTm50iFB5bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749724941; c=relaxed/simple;
-	bh=ouu2cHZCiDwpO+QTY/I1XSm6jEuv/+YIdngIZFjwsBk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=evSiqHHnkhr8v+8bk6dMyHUlEI05yxnU5wSAmqZnkaTHDpbt33H1Dsh6SAHAtxyvz9sNQ/AzxbVTj4pi7r2c7Iw+p/C1nle5qiveXaGIw0xLzCMHllc58GV9FMrIw5jODJKlWBwa5kXNLqBJbcar1Pfld7ArN62TEKbC2AmCl4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uPfNg-00069J-GV; Thu, 12 Jun 2025 12:42:00 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uPfNf-0036k2-0Z;
-	Thu, 12 Jun 2025 12:41:59 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uPfNf-009UU6-0L;
-	Thu, 12 Jun 2025 12:41:59 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Jander <david@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] net: phy: dp83tg720: switch to adaptive polling and remove random delays
-Date: Thu, 12 Jun 2025 12:41:57 +0200
-Message-Id: <20250612104157.2262058-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250612104157.2262058-1-o.rempel@pengutronix.de>
-References: <20250612104157.2262058-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1749725895; c=relaxed/simple;
+	bh=H4OuaDf5StydheIM3OLEp7rVlhFLqCXAFgq/V1hQP6E=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qt83HBRlBMy1wwSLaOI0y+VNJgY//NJ9JKZH6SXpLoytZ9NTVA7wnW6BOnBo7tawe12utBrliUtWg4N3ap0SUQKZHHaGgwXqCH67300MfKe6UoCIUFl4JblIWMqZfBxZcqvsP1Vz4AtPP6E3FyZZFYIJ4eyUxB6wOKvmcsRsoDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=V1uWe0Pr; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55C8nOrH008416;
+	Thu, 12 Jun 2025 03:57:56 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=RzrmsF3U8d58TCrCiaBdRk3nm
+	+8EgVOFqwwqcZbva7c=; b=V1uWe0PrCfmDa/X6zFt+9GUnFC2/hqwnnNlmpX0IJ
+	mXM/uDEQrVjekqfTZD5d1yngRZONqPnfFQXygcP39FM1emvq7sWS03IVNQeco5eB
+	jB43PDno4RGxw2/iNOfUrt/Tu/9dMmtlDswNO72RBQUq/kpeSppyvWMbd/Lalzib
+	EmlZ1jo3epgUEz4HMUDGEton8+9lzUEy6q9OTyWlQtKAoAtTQ3XUIOIOZrdoX9oF
+	YGDP7FujsJdqi7cRLJU14qfowMvKLGxZe8eqm7kcexKFZfcdn3/5JmV5lN9EzRQ+
+	jH0C45yLcVk7+TZbN2LQRsnJ8aXy9HmjL3efAUscpiBvQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 477ttj8d8b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Jun 2025 03:57:56 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 12 Jun 2025 03:57:55 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 12 Jun 2025 03:57:55 -0700
+Received: from a5393a930297 (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id 75A1A3F7044;
+	Thu, 12 Jun 2025 03:57:51 -0700 (PDT)
+Date: Thu, 12 Jun 2025 10:57:49 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Jon Hunter <jonathanh@nvidia.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-tegra@vger.kernel.org>,
+        Alexis Lothorrr <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH] net: stmmac: Fix PTP ref clock for Tegra234
+Message-ID: <aEqyrWDPykceDM2x@a5393a930297>
+References: <20250612062032.293275-1-jonathanh@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250612062032.293275-1-jonathanh@nvidia.com>
+X-Authority-Analysis: v=2.4 cv=FssF/3rq c=1 sm=1 tr=0 ts=684ab2b4 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=Ikd4Dj_1AAAA:8 a=j1aDQpsCGRxs8slw8KsA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: uMA3pJ9d0Kjiajs8b8PSsUwxBvIcSg4W
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEyMDA4MyBTYWx0ZWRfXxq1/obkGJyr/ 1Bc/1xofZuyUO/2muYyZEqJYKDzcOmeUBvHiyniZ8Xex2cXo31moCqxdTqIcYXYNhpfBujIm0KU UEpbn8hrhwHeq+7o+im+sBLJiKNRpuUomo3/UyL7a8+9jA5NkLp5OWNf+NH0rJtTORPL96szvF3
+ 40jqF/i7AHRCF/5PC5MHqw24U8GvQjZ4RdsnsgQLIrDCqzEa/5Ywr995vJHfVEAivjhmxngojME TFAkVszAYcdJDsNvOywWna4m0gAR8oJOTY0W1mrZfPkrY+POZqVbuOsxWDWJly21AoWxH5XGDvT M5NWrwYoncz2tDU3QLp4yTBIBTNPP75vKMuTInlnZZZ885bniUjWtyQwaqPlYEIjWg1Iuh8D4Fz
+ paU12PE+2ZblYF+BQbvJuUK8EVUGr6IOqFQcfE7dUPgAeTP97Zf6K/Efz7b6z9N+GHvETVbd
+X-Proofpoint-GUID: uMA3pJ9d0Kjiajs8b8PSsUwxBvIcSg4W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-12_07,2025-06-10_01,2025-03-28_01
 
-From: David Jander <david@protonic.nl>
+Hi,
 
-Now that the PHY reset logic includes a role-specific asymmetric delay
-to avoid synchronized reset deadlocks, the previously used randomized
-polling intervals are no longer necessary.
+On 2025-06-12 at 06:20:32, Jon Hunter (jonathanh@nvidia.com) wrote:
+> Since commit 030ce919e114 ("net: stmmac: make sure that ptp_rate is not
+> 0 before configuring timestamping") was added the following error is
+> observed on Tegra234:
+> 
+>  ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
+>  WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
+> 
+> It turns out that the Tegra234 device-tree binding defines the PTP ref
+> clock name as 'ptp-ref' and not 'ptp_ref' and the above commit now
+> exposes this and that the PTP clock is not configured correctly.
+> 
+> Ideally, we would rename the PTP ref clock for Tegra234 to fix this but
+> this will break backward compatibility with existing device-tree blobs.
+> Therefore, fix this by using the name 'ptp-ref' for devices that are
+> compatible with 'nvidia,tegra234-mgbe'.
+AFAIU for Tegra234 device from the beginning, entry in dts is ptp-ref.
+Since driver is looking for ptp_ref it is getting 0 hence the crash
+and after the commit 030ce919e114 result is Invalid error instead of crash.
+For me PTP is not working for Tegra234 from day 1 so why to bother about
+backward compatibility and instead fix dts.
+Please help me understand it has been years I worked on dts.
 
-This patch removes the get_random_u32_below()-based logic and introduces
-an adaptive polling strategy:
-- Fast polling for a short time after link-down
-- Slow polling if the link remains down
-- Slower polling when the link is up
-
-This balances CPU usage and responsiveness while avoiding reset
-collisions. Additionally, the driver still relies on polling for
-all link state changes, as interrupt support is not implemented,
-and link-up events are not reliably signaled by the PHY.
-
-The polling parameters are now documented in the updated top-of-file
-comment.
-
-Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Signed-off-by: David Jander <david@protonic.nl>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- move by Sob to the end of commit message
----
- drivers/net/phy/dp83tg720.c | 94 ++++++++++++++++++++++---------------
- 1 file changed, 55 insertions(+), 39 deletions(-)
-
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 92597d12ecb9..391c1d868808 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -52,15 +52,37 @@
-  * The functions that implement this logic are:
-  * - dp83tg720_soft_reset()
-  * - dp83tg720_get_next_update_time()
-+ *
-+ * 2. Polling-Based Link Detection and IRQ Support
-+ * -----------------------------------------------
-+ * Due to the PHY-specific limitation described in section 1, link-up events
-+ * cannot be reliably detected via interrupts on the DP83TG720. Therefore,
-+ * polling is required to detect transitions from link-down to link-up.
-+ *
-+ * While link-down events *can* be detected via IRQs on this PHY, this driver
-+ * currently does **not** implement interrupt support. As a result, all link
-+ * state changes must be detected using polling.
-+ *
-+ * Polling behavior:
-+ * - When the link is up: slow polling (e.g. 1s).
-+ * - When the link just went down: fast polling for a short time.
-+ * - When the link stays down: fallback to slow polling.
-+ *
-+ * This design balances responsiveness and CPU usage. It sacrifices fast link-up
-+ * times in cases where the link is expected to remain down for extended periods,
-+ * assuming that such systems do not require immediate reactivity.
-  */
- 
- /*
-  * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
-  *				 is active.
-- * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
-- *				 the link is down.
-- * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
-- *				 the link is down.
-+ * DP83TG720S_POLL_NO_LINK     - Polling interval in milliseconds when the
-+ *				 link is down.
-+ * DP83TG720S_FAST_POLL_DURATION_MS - Timeout in milliseconds for no-link
-+ *				 polling after which polling interval is
-+ *				 increased.
-+ * DP83TG720S_POLL_SLOW	       - Slow polling interval when there is no
-+ *				 link for a prolongued period.
-  * DP83TG720S_RESET_DELAY_MS_MASTER - Delay after a reset before attempting
-  *				 to establish a link again for master phy.
-  * DP83TG720S_RESET_DELAY_MS_SLAVE  - Delay after a reset before attempting
-@@ -71,9 +93,10 @@
-  * minimizing the number of reset retries while ensuring reliable link recovery
-  * within a reasonable timeframe.
-  */
--#define DP83TG720S_POLL_ACTIVE_LINK		1000
--#define DP83TG720S_POLL_NO_LINK_MIN		100
--#define DP83TG720S_POLL_NO_LINK_MAX		1000
-+#define DP83TG720S_POLL_ACTIVE_LINK		421
-+#define DP83TG720S_POLL_NO_LINK			149
-+#define DP83TG720S_FAST_POLL_DURATION_MS	6000
-+#define DP83TG720S_POLL_SLOW			1117
- #define DP83TG720S_RESET_DELAY_MS_MASTER	97
- #define DP83TG720S_RESET_DELAY_MS_SLAVE		149
- 
-@@ -172,6 +195,7 @@ struct dp83tg720_stats {
- 
- struct dp83tg720_priv {
- 	struct dp83tg720_stats stats;
-+	unsigned long last_link_down_jiffies;
- };
- 
- /**
-@@ -575,50 +599,42 @@ static int dp83tg720_probe(struct phy_device *phydev)
- }
- 
- /**
-- * dp83tg720_get_next_update_time - Determine the next update time for PHY
-- *                                  state
-+ * dp83tg720_get_next_update_time - Return next polling interval for PHY state
-  * @phydev: Pointer to the phy_device structure
-  *
-- * This function addresses a limitation of the DP83TG720 PHY, which cannot
-- * reliably detect or report a stable link state. To recover from such
-- * scenarios, the PHY must be periodically reset when the link is down. However,
-- * if the link partner also runs Linux with the same driver, synchronized reset
-- * intervals can lead to a deadlock where the link never establishes due to
-- * simultaneous resets on both sides.
-- *
-- * To avoid this, the function implements randomized polling intervals when the
-- * link is down. It ensures that reset intervals are desynchronized by
-- * introducing a random delay between a configured minimum and maximum range.
-- * When the link is up, a fixed polling interval is used to minimize overhead.
-- *
-- * This mechanism guarantees that the link will reestablish within 10 seconds
-- * in the worst-case scenario.
-+ * Implements adaptive polling interval logic depending on link state and
-+ * downtime duration. See the "2. Polling-Based Link Detection and IRQ Support"
-+ * section at the top of this file for details.
-  *
-- * Return: Time (in jiffies) until the next update event for the PHY state
-- * machine.
-+ * Return: Time (in jiffies) until the next poll
-  */
- static unsigned int dp83tg720_get_next_update_time(struct phy_device *phydev)
- {
-+	struct dp83tg720_priv *priv = phydev->priv;
- 	unsigned int next_time_jiffies;
- 
- 	if (phydev->link) {
--		/* When the link is up, use a fixed 1000ms interval
--		 * (in jiffies)
--		 */
-+		priv->last_link_down_jiffies = 0;
-+
-+		/* When the link is up, use a slower interval (in jiffies) */
- 		next_time_jiffies =
- 			msecs_to_jiffies(DP83TG720S_POLL_ACTIVE_LINK);
- 	} else {
--		unsigned int min_jiffies, max_jiffies, rand_jiffies;
--
--		/* When the link is down, randomize interval between min/max
--		 * (in jiffies)
--		 */
--		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
--		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
--
--		rand_jiffies = min_jiffies +
--			get_random_u32_below(max_jiffies - min_jiffies + 1);
--		next_time_jiffies = rand_jiffies;
-+		unsigned long now = jiffies;
-+
-+		if (!priv->last_link_down_jiffies)
-+			priv->last_link_down_jiffies = now;
-+
-+		if (time_before(now, priv->last_link_down_jiffies +
-+			  msecs_to_jiffies(DP83TG720S_FAST_POLL_DURATION_MS))) {
-+			/* Link recently went down: fast polling */
-+			next_time_jiffies =
-+				msecs_to_jiffies(DP83TG720S_POLL_NO_LINK);
-+		} else {
-+			/* Link has been down for a while: slow polling */
-+			next_time_jiffies =
-+				msecs_to_jiffies(DP83TG720S_POLL_SLOW);
-+		}
- 	}
- 
- 	/* Ensure the polling time is at least one jiffy */
--- 
-2.39.5
-
+Thanks,
+Sundeep
+> 
+> Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
+> Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index b80c1efdb323..f82a7d55ea0a 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -635,8 +635,12 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+>  	}
+>  	clk_prepare_enable(plat->pclk);
+>  
+> +	if (of_device_is_compatible(np, "nvidia,tegra234-mgbe"))
+> +		plat->clk_ptp_ref = devm_clk_get(&pdev->dev, "ptp-ref");
+> +	else
+> +		plat->clk_ptp_ref = devm_clk_get(&pdev->dev, "ptp_ref");
+> +
+>  	/* Fall-back to main clock in case of no PTP ref is passed */
+> -	plat->clk_ptp_ref = devm_clk_get(&pdev->dev, "ptp_ref");
+>  	if (IS_ERR(plat->clk_ptp_ref)) {
+>  		plat->clk_ptp_rate = clk_get_rate(plat->stmmac_clk);
+>  		plat->clk_ptp_ref = NULL;
+> -- 
+> 2.43.0
+> 
 
