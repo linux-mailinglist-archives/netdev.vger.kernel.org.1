@@ -1,140 +1,99 @@
-Return-Path: <netdev+bounces-196830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98FCAD6955
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:42:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EEDEAD69C3
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 09:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 768FB7A4F01
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:41:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 277031890399
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF56421771F;
-	Thu, 12 Jun 2025 07:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="F3mQFInM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38D122156F;
+	Thu, 12 Jun 2025 07:58:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A982F213252;
-	Thu, 12 Jun 2025 07:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC1E221577
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 07:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749714158; cv=none; b=CQQ9zzEHPrH+XL+b1FjczL9tg8HPSBDniGFuD6ktuq0BJoYT+L8jm+m46/Ry2g8ro5xf48oPEw1dG03lwirwF98E81Ehoz4z3spWEZlNkpxwx+ft/FO5M++Fc+JbH7xKvj+7aB1pi9Hn22KkCqz95JJ7SioMpBboUhM0anXHr8g=
+	t=1749715118; cv=none; b=UgZHMvfqlUe52hjWoDTffJq+asxKoMkCd1ESESjsiJJ70tDWWshwq16CltJI3SShTvOp+lVogKpB4xolKm5f6j3VTw5RSMOS5Io/p/pZLiF3mBi4wBV15GXmmSGS0xB9ZKcCnF2+B35zK5wwgdEFVX6P5bcCVURj7mnGeU7mTLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749714158; c=relaxed/simple;
-	bh=Ejd1F3oztgT7GGOChLr0+rZvQgex8/guYbVeNSvcKcw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Pub72PX+lPlQyVjcj0wHvmF2vYJz8iXgkElZRC3o47tIr71JNbQbPNCra7GqbMVmbp3fKyIdxXOP5blx/aRs/jXjJ9+w3RmmKoLZHncaiy/baoCL/fjfwv2Vp3mM+r4YRzQpSTuvxyH17PzIeuK9TGYxCJambYbBhi/kqz59usw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=F3mQFInM; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 55C7g6v652108225, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1749714126; bh=tF8kdL/sLV4r3jnC1QAn5lYdwy8836T1xAuzL3QtTrE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=F3mQFInM32qRDJ2O1+CahVhBoRYTiAnZPqUadwinQWp+ZatrIb85CkuU9mIZddRAf
-	 Lu281peyb+iqR3JSGv50ANV/L1BXrZ0LYGIL0ZEwWvLeyUJxH66mdvwMbazXIpLWOp
-	 tbjZ6Fopfkq2epZLZoGhw6T5ULJGv5b/IoRLfuOiwFC8qoZuG94gDuhXHG7P+vlINc
-	 Qbm8h0CyYQMjJ63mQWduSA2BAUOT7e0H9Gpm/uDNn7xLXRapBkgyYSuyz0I8+hSaN/
-	 fS3Dz4Wt7F5rpii6/dMasToOZfGUcb+D+qdT5SNcqWHf+7jU0XvLszq5LIUplwfxY9
-	 8BDOwwPHhknQw==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 55C7g6v652108225
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Jun 2025 15:42:06 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 12 Jun 2025 15:42:06 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 12 Jun 2025 15:42:05 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Thu, 12 Jun 2025 15:42:05 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next] rtase: Refine the flexibility of Rx queue allocation
-Thread-Topic: [PATCH net-next] rtase: Refine the flexibility of Rx queue
- allocation
-Thread-Index: AQHb2e3LR3+Ghbehf0qGerDekzflKrP99LaAgAExx+A=
-Date: Thu, 12 Jun 2025 07:42:05 +0000
-Message-ID: <3553c84b61b24ebe99846136123062f5@realtek.com>
-References: <20250610095518.6585-1-justinlai0215@realtek.com>
- <20250611142523.67e7d984@kernel.org>
-In-Reply-To: <20250611142523.67e7d984@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1749715118; c=relaxed/simple;
+	bh=2sHopMgp7fJPjyCNLxV9Xv4S/OM+dTqXxsTzX0dRwUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KJrHwKp2f/+zI8q+rHm6m8LlnUWlBHl2d/9FXNyTejZt24tY97E9WeaWow0mFJaPr1GGeD6tMJLKOcrSMMIahovKCDctjGBnvqPH/kVXh3bQaMi15zdtnQU/A2Qi6VCk/vKw6rkl8whFTE5RzsiVes0nxafAj3zLYTBhJQJzkeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6070293103cso1266921a12.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 00:58:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749715115; x=1750319915;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7CcKH4dAxMiN65v89Cj1mYC4gizPmua1HwqmHo4LAIw=;
+        b=Vf51JlZ+A1WiFN5SnC8drHQIlWHx/1nzQ7Sj4DeFGm6hK/CK4SfoUGQTSbEl6he5Iz
+         mItp8x5VeaOR03ijcjCWPeEquTaWRwNcr5TvNw8WByeemZCuN3zvZaP8Rn2JcrCcs3EP
+         SgEAMC6KVjnAM3lmWbJjxzi7ow8iAhBwP2WLmuecB3fhWt20+gdL3WIC9yEar+6ZenrO
+         axL4erZluiFJP6z8NCNI5eCoYPJTGdFd6L77wvJ+qUbcYj+oQZazXCJaBt3XfFz4nHnp
+         02nbXqITOobDHfbLGwIX1WMBxersfgk3rbSjd0nKtnlwTGvX29Cva00LMmfpfbYuoO3H
+         0KTg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLfFPDqhT93eIId998LXaFIfr8Np8ekWIx1qhUi2rSG+sUGZRWx7Cn6eGo6E5Z5wcXnHa7V20=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCdrmctf97Ijjo51jT2hnDQ0rynpLmBjCZMaMIuo2dOp4xY63d
+	6QTM2qrcP2bMCAeC8KB9wS7sTV0SmdZgINBsYwNXnGETaXhxsFlOob2tUYpc6A==
+X-Gm-Gg: ASbGncusu/8YQKJliX15baae/gaLS2QrO4spQSpmJdnIimbZA7jsFJCzzO1Zpcz8utD
+	QgvcaCWCdZgTzDnvCtoZaSGboe+/pmDizUCQz0gbavC7wG1LG9q7CKN39bWep3KT0a/CAmTV1JC
+	LvaNIF6IUyx5jrJMPxHG8DXqJgBYT9Evi9k3/IXBWjGp4D068vAnURC47hgGVqKbQtZsQHFvB/P
+	bFPChyuyHC0pB33m3wToHK5HHxQadlfPIKbTVgOAeQfbCAwxtgvB8skC17739KSWvu98lHKfdPV
+	av+7Ji2o1J29JBqASH3MsUHhHXS21VY5N7//fHeQMrRuaO6RxLcRYQ==
+X-Google-Smtp-Source: AGHT+IE2y8FgAh5msMYs7R4zuH1Pu55csSBzj9w3vYxhY8jH0mTN7tIOLZ3odtLtyRoF295x2cRyCw==
+X-Received: by 2002:a05:6402:350b:b0:608:1670:efe6 with SMTP id 4fb4d7f45d1cf-60863b05170mr2736549a12.22.1749715114999;
+        Thu, 12 Jun 2025 00:58:34 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:71::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6086a5517easm771309a12.4.2025.06.12.00.58.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 00:58:34 -0700 (PDT)
+Date: Thu, 12 Jun 2025 00:58:32 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Dave Marquardt <davemarq@linux.ibm.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk
+Subject: Re: [PATCH net] net: drv: netdevsim: don't napi_complete() from
+ netpoll
+Message-ID: <aEqIqDwHUGcblXjT@gmail.com>
+References: <20250611174643.2769263-1-kuba@kernel.org>
+ <87a56dj4t6.fsf@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a56dj4t6.fsf@linux.ibm.com>
 
-> On Tue, 10 Jun 2025 17:55:18 +0800 Justin Lai wrote:
-> > Refine the flexibility of Rx queue allocation by using alloc_etherdev_m=
-qs.
-> >
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > ---
-> >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > index 4d37217e9a14..c22dd573418a 100644
-> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > @@ -2080,8 +2080,8 @@ static int rtase_init_board(struct pci_dev *pdev,
-> struct net_device **dev_out,
-> >       int ret =3D -ENOMEM;
-> >
-> >       /* dev zeroed in alloc_etherdev */
-> > -     dev =3D alloc_etherdev_mq(sizeof(struct rtase_private),
-> > -                             RTASE_FUNC_TXQ_NUM);
-> > +     dev =3D alloc_etherdev_mqs(sizeof(struct rtase_private),
-> > +                              RTASE_FUNC_TXQ_NUM,
-> RTASE_FUNC_RXQ_NUM);
-> >       if (!dev)
-> >               goto err_out;
-> >
->=20
-> $ git grep RTASE_FUNC_.XQ_NUM
-> drivers/net/ethernet/realtek/rtase/rtase.h:#define RTASE_FUNC_TXQ_NUM
-> 1
-> drivers/net/ethernet/realtek/rtase/rtase.h:#define RTASE_FUNC_RXQ_NUM
-> 1
->=20
-> This patch is a nop?
-> --
-> pw-bot: reject
+Hello Dave,
 
-Hi Jakub,
+On Wed, Jun 11, 2025 at 05:23:33PM -0500, Dave Marquardt wrote:
+> Jakub Kicinski <kuba@kernel.org> writes:
+> 
+> > netdevsim supports netpoll. Make sure we don't call napi_complete()
+> > from it, since it may not be scheduled. Breno reports hitting a
+> > warning in napi_complete_done():
+> 
+> I decided to go learn a bit more about netdevsim, and ran across a typo
+> in Documentation/networking/devlink/netdevsim.rst:
 
-Sorry about this, but this patch needs to be abandoned for now. It's
-currently non-functional, and we'll resubmit it in the future together
-with changes that support user-configurable queue numbers.
-=20
-Thanks,
-Justin
+I acknowledge the bug exists in the latest netnext/main repo. Would you
+like to send a patch and fix it, or, should we?
+
+Thanks for reporting it.
+--breno
 
