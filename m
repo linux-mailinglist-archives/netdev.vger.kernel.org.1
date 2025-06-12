@@ -1,62 +1,100 @@
-Return-Path: <netdev+bounces-197192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF6FDAD7C22
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:15:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D191EAD7C50
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 22:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37FE4167E8D
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:14:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86A707A9A3F
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42822D8786;
-	Thu, 12 Jun 2025 20:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84B22C3256;
+	Thu, 12 Jun 2025 20:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=frank.fyi header.i=@frank.fyi header.b="Khy+U95T"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="oETaLA86"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.frank.fyi (mx01.frank.fyi [5.189.178.148])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0412D878D;
-	Thu, 12 Jun 2025 20:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.189.178.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C847E1A265E
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749759191; cv=none; b=XsyBIUJpuTjzVF6H51W/CZZHPYupeK9mMuNeL7swKZHwJ/+yu2CL6+70fcd2l5NPmGQAWD6dCXO0pZR7AbHhlRqrCcv5Ls4hUMvX9lCNhYN9F05BhMfEiVA1AyzRuy/7pNR+NN8ntpD5bZp2P01srfXoZLdnH2f1EAkxmn9aV0c=
+	t=1749759775; cv=none; b=n7QH4a9FmGCA2lg6kSXuE2vU3JRRIAHWFhHcAPpYXsUtc2iA5GOSTagvvVRxPTJEFVNHbUcOLH+HmjZiqljfL6BS9yYlVCIXBvWJf8n7l/1pt8KbZ2xftvu+IMHu8w6yWIPOrr/PhuA32bRRK83sPmwIW0J3Cxsof2DuVvfCWD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749759191; c=relaxed/simple;
-	bh=5AtADpZQklpovVZ+DTgV8PH6MVSn65vhBXtXjRzH4Do=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ajDTM0oeETEGcK+P5h3VnKI0HqJFonb4aeKg0aZ6ZinHhBRLpI6evWGSWiWwVotDL/ljYOR7XoiPgejKQPCDwk0T9z5ugDksRZl0alm7ZfGBLDlXZa4BzvfCOLOVYxZazls5ME26UcXiU+HExSgDVh4TTeuEuh2LZWGVlQoYH2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=frank.fyi; spf=pass smtp.mailfrom=frank.fyi; dkim=pass (2048-bit key) header.d=frank.fyi header.i=@frank.fyi header.b=Khy+U95T; arc=none smtp.client-ip=5.189.178.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=frank.fyi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=frank.fyi
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=frank.fyi; s=mail;
-	t=1749759182; bh=5AtADpZQklpovVZ+DTgV8PH6MVSn65vhBXtXjRzH4Do=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=Khy+U95TtI0DoWEA0BPAM2zehdAdBRUkv6IEDPOmJagNgpgHLLy6tI9+k1+mKhxOJ
-	 u7zWXJPs0OS/3/x30lIMgamACrg3+a9GdtNNReZqsOSYDHJziYqKLOP9exT2RiLcgJ
-	 kpB9nOHfVJf8XD/nLggcMHj628TlCsHf2+YY62kNTaQf/7FXbGLcVqMeUokCARQGxs
-	 i3TqSTWdAWjXOKqvTRR2ayWkW1ywGlwKkDbOtuBENDfl8PcfcBblOZw5Q2yf2XkZF4
-	 Hf6K4/3ChI8TdNJuE4UIpls/OY+BwctowkB+x7jYCJB4MpMdRXB8WHnbxCKUsVbk2X
-	 NiEpeQbyJ7kHQ==
-Received: by mx01.frank.fyi (Postfix, from userid 1001)
-	id A18791120181; Thu, 12 Jun 2025 22:13:02 +0200 (CEST)
-Date: Thu, 12 Jun 2025 20:13:02 +0000
-From: Klaus Frank <vger.kernel.org@frank.fyi>
-To: Phil Sutter <phil@nwl.cc>, 
-	Antonio Ojea <antonio.ojea.garcia@gmail.com>, Klaus Frank <vger.kernel.org@frank.fyi>, 
-	netfilter-devel@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>, netfilter@vger.kernel.org, 
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>, netdev@vger.kernel.org
-Subject: Re: Status of native NAT64/NAT46 in Netfilter?
-Message-ID: <cqrontvwxblejbnnfwmvpodsymjez6h34wtqpze7t6zzbejmtk@vgjlloqq2rgc>
-References: <w7bwjqyae36c6pqhqjmvjcrwtpny6jxjyvxzb2qzt7atjncxd2@gi4xhlyrz27b>
- <aEqka3uX7tuFced5@orbyte.nwl.cc>
- <CABhP=tZRP42Dgw9+_vyAx80uPg4V2YFLfbGhpA10WzM46JYTNg@mail.gmail.com>
- <aErch2cFAJK_yd6M@orbyte.nwl.cc>
- <CABhP=tbUuJKOq6gusxyfsP4H6b4WrajR_A1=7eFXxfbLg+4Q1w@mail.gmail.com>
- <aEsuPMEkWHnJvLU9@orbyte.nwl.cc>
+	s=arc-20240116; t=1749759775; c=relaxed/simple;
+	bh=k+8qcqat19/l68bSpa8MpZylm2SaxNPNAiemLPlp424=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z7QKYedYbtGbzSdgVHSoqFL2lgJYUGli5+VuwNXu5Yu1TKCsfuFVSzRPUWWEcuMoucLNHof8eUCLBhyyyucweSQxPtI/ZOFQmhcd94nlRyW/nleSTdAzc7ZTcPof+FJyB5GtdWrFeZ+CV2jKo3UNmmpaiR8Vk3zYLzC2948rOJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=oETaLA86; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a50fc7ac4dso956717f8f.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 13:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749759772; x=1750364572; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hlTcxbxt8X33Mas2XcA4ZwTuUsj8P5XCjQiAPUa/TdY=;
+        b=oETaLA86YBtbSXxqW61JdxQyu9WHbqTArGNERt8WffopwxFakQO2j1YzMtCxYk7FN2
+         LF90K9wPrVx3T3V/BqBvmEcgp21dF/TjrpQoIOd34UfL/pAbZS1lj1KdZ4XJopMI6+E+
+         ex6xjYL1US2C9tYAinBo/Y9iiht8Y6axmCDGsRKtKiDWJRsegOxb3xYkPbs45OqCE+o1
+         g5Y828qX4sWt//GBAL2CcB9GbTL+rfecCfGMZLS44srgXUUwwd8aAG7MCuhpNkbYRWj5
+         bfDoSzVoGZ822/AyaFEkQjcEjAeEOWAdL2rjYUyvYZa2pHyjzPp/yFp0lIxBdxnS1YXn
+         eMVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749759772; x=1750364572;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hlTcxbxt8X33Mas2XcA4ZwTuUsj8P5XCjQiAPUa/TdY=;
+        b=griIkWyZ+jnaXEtY8yO4N2HjSZpTeCee7Y/ETW9IgMWgHSQbbhBTmxOmBy6v69qs2U
+         fE3+8WE50XeU3p3iKqLyqEHE60OxsrBgXPf6Uf2U8QDSG/L8p7Z6TERRaQGYiwomVitj
+         UDAmS68g0Fi66pQCpzPUB2ILDz+PMqlb2+p1nInDmzWkRsjR7pTAltSW5zr7E2ni1Fp0
+         XuqV365jPqGNku9a8G7FeyHr1VieFh2hfibV+SIRRzOUP86gmUTFndtweyaFdihHkmTA
+         VZuDnB7SaEdgsdAgflRK1qRbVvVJZb6sccgsiHBhmhjJRewffuKreVaTTUPkh1L2Z61J
+         jhsg==
+X-Gm-Message-State: AOJu0Yw/OvECtK50XTHVXa6sn1s9irHuMMW4ln90JEogzh0TNxljI9jX
+	D8qSiBcKBwMbofTX3Yacv5BWXqR/lZVjIhc2X0djlWcDFTVidIVorD/x0+C6wov9e90=
+X-Gm-Gg: ASbGncvA9nrp4TLfIuK1lEuG1+6Q21VPHAfaG03lu6mbq1V3EsFcU94g6WCG52XFfsd
+	nWt+yZYQ/+yJzwMNNI0iKqKqugIaN3E0q7vsoxM6ii8OirVwnc5qVYL+A1Z9I34ZVpUzqzYaVlf
+	Z+9e3xX6XQhKGxPTNMVv89fsu8lFUKBnmeDlpHFG471R436MOUUsXftKW0mwjdwX/5gStJUhW+F
+	6xnm1LN12mnG535Q7s4uF5a92R2v6iUcGMYhU3Bmu4vzAtvHFyZ++5d89yuZ8/AZ7md7TLjVUcV
+	sFEe5Sj7E2IIYqmor09SdlOY/DuPOQS9SkVJaIGeqFm1TCABho87f5PTXPs+ztNM5kA=
+X-Google-Smtp-Source: AGHT+IF+gq1H20mJU4eexJoIkhCAQCtqebZZXUexoV64aJkjI/XmvNM4sYHXfE4os5j9Dm6p65O13A==
+X-Received: by 2002:a05:6000:2507:b0:3a5:39bb:3d61 with SMTP id ffacd0b85a97d-3a5686f44b7mr504689f8f.27.1749759771298;
+        Thu, 12 Jun 2025 13:22:51 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a612d8sm307284f8f.24.2025.06.12.13.22.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 13:22:50 -0700 (PDT)
+Date: Thu, 12 Jun 2025 23:22:47 +0300
+From: Joe Damato <joe@dama.to>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:BROADCOM ASP 2.0 ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/2] net: bcmasp: Utilize
+ napi_complete_done() return value
+Message-ID: <aEs3F49J-WMQbary@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:BROADCOM ASP 2.0 ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250611212730.252342-1-florian.fainelli@broadcom.com>
+ <20250611212730.252342-2-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,93 +103,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aEsuPMEkWHnJvLU9@orbyte.nwl.cc>
+In-Reply-To: <20250611212730.252342-2-florian.fainelli@broadcom.com>
 
-On Thu, Jun 12, 2025 at 09:45:00PM +0200, Phil Sutter wrote:
-> On Thu, Jun 12, 2025 at 08:19:53PM +0200, Antonio Ojea wrote:
-> > On Thu, 12 Jun 2025 at 15:56, Phil Sutter <phil@nwl.cc> wrote:
-> > >
-> > > Hi,
-> > >
-> > > On Thu, Jun 12, 2025 at 03:34:08PM +0200, Antonio Ojea wrote:
-> > > > On Thu, 12 Jun 2025 at 11:57, Phil Sutter <phil@nwl.cc> wrote:
-> > > > > On Sun, Jun 08, 2025 at 08:37:10PM +0000, Klaus Frank wrote:
-> > > > > > I've been looking through the mailling list archives and couldn't find a clear anser.
-> > > > > > So I wanted to ask here what the status of native NAT64/NAT46 support in netfilter is?
-> > 
-> > > > we ended doing some "smart hack" , well, really a combination of them
-> > > > to provide a nat64 alternative for kubernetes
-> > > > https://github.com/kubernetes-sigs/nat64:
-> > > > - a virtual dummy interface to "attract" the nat64 traffic with the
-> > > > well known prefix
-> > > > - ebpf tc filters to do the family conversion using static nat for
-> > > > simplicity on the dummy interface
-> > > > - and reusing nftables masquerading to avoid to reimplement conntrack
-> > >
-> > > Oh, interesting! Would you benefit from a native implementation in
-> > > nftables?
-> > 
-> > Indeed we'll benefit a lot, see what we have to do :)
-> > 
-> > > > you can play with it using namespaces (without kubernetes), see
-> > > > https://github.com/kubernetes-sigs/nat64/blob/main/tests/integration/e2e.bats
-> > > > for kind of selftest environment
-> > >
-> > > Refusing to look at the code: You didn't take care of the typical NAT
-> > > helper users like FTP or SIP, did you?
-> > 
-> > The current approach does static NAT64 first, switching the IPv6 ips
-> > to IPv4 and adapting the IPv4 packet, the "real nat" is done by
-> > nftables on the ipv4 family after that, so ... it may work?
+On Wed, Jun 11, 2025 at 02:27:29PM -0700, Florian Fainelli wrote:
+> Make use of the return value from napi_complete_done(). This allows
+> users to use the gro_flush_timeout and napi_defer_hard_irqs sysfs
+> attributes for configuring software interrupt coalescing.
 > 
-> That was my approach as well: The incoming IPv6 packet was translated to
-> IPv4 with an rfc1918 source address linked to the IPv6 source, then
-> MASQUERADE would translate to the external IP.
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Reviewed-by: Justin Chen <justin.chen@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> In reverse direction, iptables would use the right IPv6 destination
-> address from given rfc1918 destination address.
-> 
-> The above is a hack which limits the number of IPv6 clients to the size
-> of that IPv4 transfer net. Fixing it properly would probably require
-> conntrack integration, not sure if going that route is feasible (note
-> that I have no clue about conntrack internals).
 
-Well technically all that needs to be done is NAT66 instead of NAT44
-within that hack and that limitation vanishes.
-> 
-> The actual issue though with protocols like FTP is that they embed IP
-> addresses in their headers. Therefore it is not sufficient to swap the
-> l3 header and recalculate the TCP checksum, you end up manipulating l7
-> headers to keep things going. At least there's prior work in conntrack
-> helpers, not sure if that code could be reused or not.
-
-If nat64 functionality was added within conntrac itself then it would be
-easy to reuse the l7 helpers. If it was anywhere else the l7 helpers
-within conntrack would have to be re-implemented as conntrack wouldn't
-know the mappings and therefor it probably would be quite hard to do the
-rewrites.
-Also in regards to FTP not just L7 headers but also payload needs to be
-edited on the fly. As it often uses differnt commands for IPv4 and IPv6
-(even though the IPv6 ones also support IPv4) and it embeds the IPs as
-strings.
-
-EPRT<space><d><net-prt><d><net-addr><d><tcp-port><d>
-
-where "net-prt" is either 1 for IPv4 or 2 for IPv6. and net-addr is the
-string representation.
-However a client may send the "PORT" command instead...
-Also RFC2428 may be helpful in this context.
-
-I think if it was possible to get the nat64 into conntrack it should
-also be possible to take care of this more easily as with external
-"hacks".
-
-
-Also in regards to the above code it looks like currently only tcp and
-udp are supported. All other traffic appears to just dropped at the
-moment instead of just passed through. Is there a particular reason for
-this?
-
-> 
-> Cheers, Phil
+Reviewed-by: Joe Damato <joe@dama.to>
 
