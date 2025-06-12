@@ -1,129 +1,128 @@
-Return-Path: <netdev+bounces-196790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE0C0AD65D1
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 04:40:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6731AD65D6
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 04:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67D3917EF9C
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:40:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A50DA1BC0BAD
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 02:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C12E1C3039;
-	Thu, 12 Jun 2025 02:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2272E1C860E;
+	Thu, 12 Jun 2025 02:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsgZ6rGJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KI1QDunI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFCF80BEC;
-	Thu, 12 Jun 2025 02:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B82028F1;
+	Thu, 12 Jun 2025 02:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749696029; cv=none; b=K64Gwyr9/oDlFvLnGZ79ElmAI+4VMKZbAIfvH2bM36lz9I1xfnKp5VEMzIugRWx8n6xmJUA4WUCi2n3ghtrXN1jHQd68krQu9VUmJeCZp9D124OE/4OWVXfdmuRARmDQix7lDKM4d8IOUiOmxF+IF7Q6fbcvrJTzjg9nPjffz10=
+	t=1749696478; cv=none; b=aPrMTo8NJjqPuw5/JuQ+rWYUv/9XNpQEQ8vydzWTYgxqDQthxU36Lq3f/RERxqbAAXC1L5yeGJD5w8frRYiyopvEGENF7+eDyJ51cpgLWimf0n/8BxrtXkkduBQx4NhZsvlvmA4K3Csx2WGoL1Aptyn2vYDZiHP2wd9+7HdMdL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749696029; c=relaxed/simple;
-	bh=TyXUoHWRblLyZxPzeqprpQxDUOMQRrRF9VVZTWs2yGY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ch+IU4u32ddq0I2lNY+0cu4pOBYcokLPWp+tk3s39rwCooY8Fj8ci5axN9Hy0pf7tt+NFLG/1nJBSzHzAhyn+8amnw0yHEXyXhSh7uOjr9SHRz2DxC/dZroKXXDU7zM0omrgtbTB3AJnIVJSeFjUrQtEPELR5JiUHuFhSJqNg90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsgZ6rGJ; arc=none smtp.client-ip=209.85.217.49
+	s=arc-20240116; t=1749696478; c=relaxed/simple;
+	bh=V10y+YnoaiOhK9zGqmOgoWpQxvptlZXDaCPhJRexvHQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kPn1oVjQLj4Ryfg5rmKzeVhktGU0h6SWuxHSteWijD7dX2tRkASD0+kETaMVObZyK3vimMuTCOyyUfrSyUB1TMG6XJ1YExE4IVRcnNZgdh8IBvdt1ckqbC460i8AR92WUQNDlqlemZu2bSpDO+TUxd127YojH/CfWVxMADET9dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KI1QDunI; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4c6cf5e4cd5so276073137.2;
-        Wed, 11 Jun 2025 19:40:27 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-747ef5996edso564771b3a.0;
+        Wed, 11 Jun 2025 19:47:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749696027; x=1750300827; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TyXUoHWRblLyZxPzeqprpQxDUOMQRrRF9VVZTWs2yGY=;
-        b=nsgZ6rGJ5yqMc/4O8voSKtUKF4dgcG115+RLg7OMFhXA5midJv2BeLOvFebZBwwC6U
-         bgHf/YraPiOOQPryy1WoM2V79QQX+dL92xljQPqa0XzZqT75wmNpBBAhoRy2DixaQXnk
-         VZgc3frcS7TM7IsFFS7RIQgPM6x3V4oX5Ajt8VgEmUslRFVd00lPK/4vL9ustS2kL1YH
-         TrPAOj0Idd0WItxT3XZx/fZyf4D6ssEFKhHH7JNuT6Kv1hripBt9rV5a53+DYhj7G4Wf
-         kEdsHtkQeZ/G5wOPrRWJddl81wy1H/Tlvvdb7xwAoqLxTtBLLB4swX2QokC/otrrSQLw
-         cuPg==
+        d=gmail.com; s=20230601; t=1749696476; x=1750301276; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=70dF3f186VX/2MCLOuJcDzIuL4GikkKOnVgxPnn7hR4=;
+        b=KI1QDunIs8T6YzA8WQofRAXa96/I/4u1ape+ryA2pWF7AYrgC5PVkCd7f9zo9E/s4N
+         Vo5ajw9kfIg9ggAEq+bL/6ask/Cbu0IrhLJWcEHZ3sjT6m7xffg6etAYEJEyUwSW+7Mo
+         7wex3t+qzFSeQrEs57cStJoD8e2Or6IoQDCXhimn/ZG+4EFNwVbGUifg7WCpJDaleAAu
+         bk7CXLRptA1yWeePuond9l33lGhD46JPjkHfErFt/lWEAvQBgsje3HRWaV5CLAGPloFs
+         5AiHDFS7L/jV+AJ9gXpm/fRvLZrnTRry/SCd7mTBN4pGAzIUYVC2DeVH15s5F0qE+FWa
+         DH8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749696027; x=1750300827;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TyXUoHWRblLyZxPzeqprpQxDUOMQRrRF9VVZTWs2yGY=;
-        b=SMbexOaPs6HpdlVem0FYbY8sLBCg3yc6ZhxH3uYfD6cI1YR96AApRAMw3spPbdmpLW
-         YFShv+ysc5IAmCjCtPU1VuRNDaunsQDNozihQ5gQOostJ3YUIqpy4bfFQWbMTJnPkKRv
-         MT5zXkbHGjm9QdHqJlV9h6WjUVZHVpMpAGAvLW4KkmIRQZE78+Ie4tZbbSKu2HDjo8YI
-         VlcBCh7QVlMxcFvQXlYBgr11DXCw6Q8BathjoTCey8HZveOoo1v0hucn4ZA83QPeZzjh
-         /OOAuOXkjTUYfdg3CHocKi86Pgm8ue4Vq9bMrGHgGnHLhbAKYWqxNO15k36cwk4eNiJA
-         mFIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQHzw+J2zALTdzBHA0EiN2Go7rOZ0wYJKUayUIgG2hBgLgJczJKltYvfbQiElCz4dzA57URf/Gtezamhg=@vger.kernel.org, AJvYcCV+XK6gg9BM3IlEm3CZbRuyH53D5Gu41qK5aI/PxOQ0d/HYyWbfWQ+cn4Q1rrDua8ijgyyPeJ12@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqQbHTzsz1fb21PK9ZE7ZWPXdWh0Z/pvVqg2BybB+6kXdHn0Lf
-	3lfXdG/vQApSY2YvWQSznCRhhoAkuyzOc0IyPHp3DphFDytc7gLQnDw3bSKV+f0cQG7p2BuMRmx
-	rolT88eLKPmRBOMTknM9ygNUOcHeotoc=
-X-Gm-Gg: ASbGncsBI8S1NP4inzvUYCYludHr8+Ll885QuXAWNc4UpDxTStb6web1ZQSmeeVIAxu
-	FA+0goA/ZameKiAHhEXgT+jisgT8qQspFoE+wZ0lIeUkjWZbeh411yoY3hgVlMbJOognpUTWjlN
-	sGVk63CJhdfhnBgfRgv5HkPCvOorBI/MjjJdIZgXN64kCk
-X-Google-Smtp-Source: AGHT+IFejaz2zqnpM2yJymPgysqoL6UoljVq0Q1NNvA7yQG6Tbtwl6NxO3p85yJLkwUNfooUosLCBSML4V6/FG2QVcM=
-X-Received: by 2002:a05:6102:149b:b0:4e2:82c3:661c with SMTP id
- ada2fe7eead31-4e7bae9c726mr6252618137.11.1749696026678; Wed, 11 Jun 2025
- 19:40:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749696476; x=1750301276;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=70dF3f186VX/2MCLOuJcDzIuL4GikkKOnVgxPnn7hR4=;
+        b=hpJsgYxVStfY0fmlgKMsDg4dBpgTI0uI5VaP1h3+8ys5KFYnrW/HvXnVseL3btts5Z
+         JEd52lJC54pr1KNODeCAaKU15HLadCFiD3uGRu1EmRIyQhgyZX0gy3fXLYu9mUAaUs7W
+         xQhrHRHJ4hbtDBXGokssq2CMyY3wOcd+97Mhtx0T60odTxxcjm6wntizjTQdnYT+UcUO
+         Q79ReqCPSEstdbPgmy0KkUlN2VhynPJdPbWhMMquxlVeHsNjJH3I4UewT+6kbqExabqG
+         0iOlJUC/7dvjgrlqUzce4bjbTj3WACd/hnvP4NE/oNHTYG2EO9t/8m41ROFxTpuLQrSZ
+         XI1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVGEJY6/edg/sOWUUeLSD7N97rxGBlq48VN2rr5QS2OtRZ5SpDy0rYsyBa+eotwvs/PkFrWdCSxsaQL7vfpEqB0@vger.kernel.org, AJvYcCVlV+IBawa294HhqfkfNspirkIFDFXiOTr7pTBeyUE/WWr/j27e6dfxrCfsraZf7sAE4R89MuVbd+UmekA=@vger.kernel.org, AJvYcCVspWBRHWu2TCwbiODdUskYUQNg8hBbauPb/+tC83pqNCdTBKpkWBXAkoq4OtuD32ymhrh+rD86PcUjUQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr+mJDlc1aXeJzv2G0QCKI2wMGncdawjQv7F8ivlmgLj4qejom
+	y5RuOqkoR9hz89XftVm+F7049ZrImSp1C5WEB+tj3QWtofaIKuwyT3D9ECWL
+X-Gm-Gg: ASbGnctlrEicTsTcC/10yu3jJxARy2BZaKGylRGVZ4apOUJkenI7ukYz+zivjz9n5XO
+	q9hXNkHfuRd2l3srLbWpJFhrWSWcaLFLA5XWZrwtAcEpr75AcrTRSBcETNOMiazGNZwr6750OZ3
+	n0qxefNnCjgvWCBaDPXq3IYzpw9OBgjAI26p8pJom4ewM0o6YyQR7ZUvru47wd6WGJLQsiMAOfQ
+	q8ie4N3W1CpuRUp9wteGfXLQtV4J8jF6HIBuXvt/f0V3fPlIwfBPXVyYxJYyeRCrijQz9m+N3sf
+	nmhFjWrrUgC/dgGMKBiORalmrN9K7qAf1PX+OOvagE9qcjSddOHg9k6Xaf0tJheFm8SHOfJKGBS
+	USA+xSxX5GBeUunQmPk9HRwQ=
+X-Google-Smtp-Source: AGHT+IFRKiugap2uRP5iwvzv3ykxNxJY6sSKFAqSQYORKgyM6ljZEvpw3F28685FefjxRCqFHH0xZg==
+X-Received: by 2002:a05:6a21:48d:b0:206:aa42:8e7c with SMTP id adf61e73a8af0-21f97800f84mr3290374637.18.1749696475840;
+        Wed, 11 Jun 2025 19:47:55 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-748809d3066sm312312b3a.102.2025.06.11.19.47.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 19:47:55 -0700 (PDT)
+Date: Wed, 11 Jun 2025 19:47:54 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, skalluru@marvell.com, manishc@marvell.com,
+	andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, ajit.khaparde@broadcom.com,
+	sriharsha.basavapatna@broadcom.com, somnath.kotur@broadcom.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	tariqt@nvidia.com, saeedm@nvidia.com, louis.peens@corigine.com,
+	shshaikh@marvell.com, GR-Linux-NIC-Dev@marvell.com,
+	ecree.xilinx@gmail.com, horms@kernel.org, dsahern@kernel.org,
+	shuah@kernel.org, ruanjinjie@huawei.com, mheib@redhat.com,
+	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org, oss-drivers@corigine.com,
+	linux-net-drivers@amd.com, linux-kselftest@vger.kernel.org,
+	leon@kernel.org, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next v3 1/4] udp_tunnel: remove rtnl_lock dependency
+Message-ID: <aEo_2hOn5kh6kBpk@mini-arch>
+References: <20250610171522.2119030-1-stfomichev@gmail.com>
+ <20250610171522.2119030-2-stfomichev@gmail.com>
+ <20250611184345.3b403ad0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Xianying Wang <wangxianying546@gmail.com>
-Date: Thu, 12 Jun 2025 10:40:11 +0800
-X-Gm-Features: AX0GCFtY_taNWQHaUe6h0nM9AD1in2faPz9H8AVrPVu0yswdZn9OP-PGtZLblI8
-Message-ID: <CAOU40uDOh7JY7nVmrS1Pr013zMP2Y=qLwiJeANvgEupNvuHnWw@mail.gmail.com>
-Subject: [BUG] BUG_Address_NUMNUMac1414bbbb_on_device_lo_is_missing_its_host_route
-To: dsahern@kernel.org
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250611184345.3b403ad0@kernel.org>
 
-Hi,
+On 06/11, Jakub Kicinski wrote:
+> On Tue, 10 Jun 2025 10:15:19 -0700 Stanislav Fomichev wrote:
+> > Drivers that are using ops lock and don't depend on RTNL lock
+> > still need to manage it because udp_tunnel's RTNL dependency.
+> > Introduce new udp_tunnel_nic_lock and use it instead of
+> > rtnl_lock. Drop non-UDP_TUNNEL_NIC_INFO_MAY_SLEEP mode from
+> > udp_tunnel infra (udp_tunnel_nic_device_sync_work needs to
+> > grab udp_tunnel_nic_lock mutex and might sleep).
+> 
+> There are multiple entry points to this code, basically each member of
+> struct udp_tunnel_nic_ops and the netdev notifiers. In this patch only
+> reset and work are locked. I'm a bit confused as to what is the new
+> lock protecting :S
 
-I discovered a kernel BUG described as
-"BUG_Address_NUMNUMac1414bbbb_on_device_lo_is_missing_its_host_route."
-This issue occurs in the IPv6 address configuration logic in the
-function addrconf_add_ifaddr() within net/ipv6/addrconf.c, where a
-BUG() assertion is triggered due to a missing host route for an IPv6
-address assigned to the loopback interface (lo).
+I though that most of the callers are from do_setlink and there we have
+rtnl and we grab rtnl+lock during the sync. But that doesn't
+address the suspend/resume vs do_setlink race, that's true :-(
 
-In the triggering sequence, the loopback interface is assigned a
-unicast IPv6 address (e.g., 200:0:ac14:14bb::bb) and subsequently used
-in a bind() or connect() system call by an IPv6 socket. During this
-process, the kernel attempts to create a host route for the newly
-assigned address using ipv6_generate_host_route(), but the route
-installation fails, triggering a fatal BUG().
-
-Suggested fix direction:
-
-Investigate the logic in ipv6_generate_host_route() and
-addrconf_add_ifaddr() to ensure that assigning an IPv6 address to lo
-always either installs the appropriate host route or gracefully fails.
-Consider special casing the loopback device to avoid invalid or
-unnecessary host route installations.
-Add error handling or a fallback to prevent fatal BUG() when
-ipv6_generate_host_route() fails.
-
-his can be reproduced on:
-
-HEAD commit:
-
-fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
-
-report: https://pastebin.com/raw/xe3fvj5Z
-
-console output : https://pastebin.com/raw/8XXmK7B8
-
-kernel config : https://pastebin.com/raw/6iC2wRBj
-
-C reproducer : https://pastebin.com/raw/SN7zKXeN
-
-Let me know if you need more details or testing.
-
-Best regards,
-
-Xianying
+Did not look deep into the notifiers, assuming they are a way to push
+the info down to the devices (under rtnl) plus trigger the sync work,
+will take a closer look.
 
