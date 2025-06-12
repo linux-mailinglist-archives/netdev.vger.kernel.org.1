@@ -1,214 +1,217 @@
-Return-Path: <netdev+bounces-196812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E7FAD6760
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:34:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9B3AD6781
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 07:50:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73F517AA913
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 05:32:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A66977A25E9
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 05:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0424B1D5ACE;
-	Thu, 12 Jun 2025 05:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4CD19B3CB;
+	Thu, 12 Jun 2025 05:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3rxnklgl"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fdqcJznN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4056615C158
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 05:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6912AE6D
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 05:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749706436; cv=none; b=DyQBR3IOKxGF31WYTT09EKxH8kZbnFt/vAq92/YMNrJJp4QfYi/YQqUiSlom2BgAg5+K/84mGXm2JgPiyXY0vJjLE1Hk8qcvysT6Bvf8EOFP47Sas9ks10oOy4xyGTck3VB6A2CFbIW9GTVRaXtqVoCuGUZQbvMDhkUUtl2+n1c=
+	t=1749707441; cv=none; b=A0uVXImw0k8uNnmoSE8wqlYvnFcb0PwQxJNkOrNWhNBDV/cFJ1vf1QFtN8/6F/cGRXU4Pv1EqyMc1zjrg0j7nnBBOcvVThXaR0H4hO+XWuFF8zlq8EvfSCl/0oSv379bOexcwmV4CH71/pkZRe34L/Ab3awy9/HZi9RHBr2V4fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749706436; c=relaxed/simple;
-	bh=Esu639NQ3h0pUolsE+L62kqRdItgxrjwHM5dB+O9x3E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XqAWMwx/v5AbAdKix/DcRU4zg7X/wAPGWdoneECA6zYacTogn8qVenhD1+0VwVYqrpvnn+RMFwHVLTkzdYNXxL/nUYCgi412vf1MnusblE26/GaflKUKZCiBKyl6MtzUplNWEPk4L9ns/rPqfqAoYWdhU6cmNlL6mNSZWMO1wS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3rxnklgl; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2348ac8e0b4so82315ad.1
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 22:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749706434; x=1750311234; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0MG8DHTvq/qRGMg3QrUciQGDqEK1excvKUOp84PPj3c=;
-        b=3rxnklgli8VZrJiIqyvzeFF3ekCi35NjXdlTzK5t1ap/H1dnt/DlbrtZQOeRgvUO/7
-         dZRGUNIr7gNxeGWoe5y+aAt/EJVbDpz+/Q00y3/GGaHwPCgpXQUa9eWb7odGB4vzerZN
-         zgzncDR/9mZ3o08dQX3U4eMUlZeaWiW/F0bEabvFRVebimCJYMGDte/qoY5J8mzb9EQR
-         30a5xgTmjBQGOJGKj0Fyi637Qmw43GpalD98aDQFJy8RvTvkozeSmh1TFY4AUPTF55+7
-         BBjvxqABbIyTFhRvvtJGCUE2rcnnpqQvncyompZwvLaWGZT5f5dCrp4VdOUa3SA6/alO
-         eM/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749706434; x=1750311234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0MG8DHTvq/qRGMg3QrUciQGDqEK1excvKUOp84PPj3c=;
-        b=jy3izHSJftmvQMhDgNY9JrZKBAesLB44uyVnp73RuIOim7bJ/CGRB0QrxWxxnuARH9
-         LSv+gh5h9WVhZgvV0k5AduELpbs1YJ4dtQTLpTmvMrgU07zDkt7sUWYis/zYOw9D+bq4
-         svLbCHPJ5WEbiXUdfsT9AKGylgYic/lrbUBD0uKHxTQUILP9lPvsTSsQA8sZbaYWcv7D
-         0kGYjF76XyPAEZQn0ogfz9n6yQSd3nRlL1XtXEw6bcb/yyQPdSxQLzTDEsKGSgEh+WoN
-         8Gvs1ECtiXnGK0q7A1xebAnuRzSma5JTlQ+y7tDnq1vrRYHfgGVgj4ah4bnXcjkuihM/
-         +FWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKgoDSX5CLahgmjY6AJA4gaDZPqlrglFhEn51jnVyhSM51GG3vZXwpwmqqCKpUcLTA7N1YF8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztNUMCRlf4PyLHSeFPssfkgJifw6pEpg6rJZwqLdUoP3CWwUIS
-	W77bQY5KIvhJyBP7S4MV8pKXdk7uXH2122yWTUpBZktE49mVQfcVSGPB5/VPS2HWG/1n4f9/VkL
-	49SZoCOi5dcon4HlL1z4X8XcALKn8NSApYf0e3itt
-X-Gm-Gg: ASbGncv7r4cXaE8YBHVjn7/rl0RwDEwlGrBq22uI+0l5vPjUu3UYc2EEGjcNdMef+s/
-	KjufR6axFPOiZv+98oqtlr2lY2FHWfDifjQ66qFF8GJSner0M2/9I2UkCEObyCf9voNf2CKx7/s
-	DFPyVWiQbZeXs4B4Ky5zQg3gEsrW0/K2axOf0v/vayWxfS
-X-Google-Smtp-Source: AGHT+IGXAg/B6LBkZbDCWSh7HnwG3gh9i4+QKa2dl2PrE4nN9ppued4dSt9P5QJ+xN+GLNCTbDB2L7Rfw46DFAwqD5E=
-X-Received: by 2002:a17:902:e545:b0:22c:3cda:df11 with SMTP id
- d9443c01a7336-2364dd812f0mr1702785ad.10.1749706434224; Wed, 11 Jun 2025
- 22:33:54 -0700 (PDT)
+	s=arc-20240116; t=1749707441; c=relaxed/simple;
+	bh=WzhZF+n0ftIhiUaWutuO1KfR54tlKHLOcLdH4pRRd94=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NjD1xHoZClQyNgJJdzQM5P0yZVJtwuW9RvqCzVjbTThwBFueWw6vP0DTsc0vIlYqA0k223idCSmUTPYGKJjNPrflWH8TB45i+JjQpmgCG4jN0/aRgznBIFuVir6Yut6CpwIQjSUwBJgz1bk3sa3vemtFliu3jZjGg/TJerUGEow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fdqcJznN; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55C5Fe3V024954;
+	Wed, 11 Jun 2025 22:50:27 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=ERMTXDW8LMQ+O/nXSKDQcxO
+	kTdXjenpZYMuyqGD06mY=; b=fdqcJznNott810Ph4jepTXao25uXY8l3Io9jZx0
+	0iB+E8PXyWoDotwdKzOOy0849uwswNZy+PKa/PO1h8q6rIgQxEPmSiY3c0IoZ/ec
+	ZP0rytNj32azO7c87ZJKUB2gNbYcR45s8LHmJ/lEMga4co2r3NhQ3SIcNPOn8OaZ
+	8oXiUthSwXPlSIgQQdzIlz4D4RjPlcVYc7XBXBvy5wddI/2S4s10SfZE8WVW9RDB
+	cRai+xws119EpzUtVI95TBBqtpkHJcUTENNsSYqoIvaqfeN+bONSZd4VLUu39Fez
+	AZZApIP7eCYgclRCPidvIGglwpOw2yLKDOXkRHpAiBpMpTg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 477rk101st-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Jun 2025 22:50:27 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 11 Jun 2025 22:50:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 11 Jun 2025 22:50:26 -0700
+Received: from cavium-System-i9-11 (unknown [10.28.38.183])
+	by maili.marvell.com (Postfix) with ESMTP id 9C5813F7064;
+	Wed, 11 Jun 2025 22:50:22 -0700 (PDT)
+From: Aakash Kumar S <saakashkumar@marvell.com>
+To: <netdev@vger.kernel.org>
+CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
+        <akamaluddin@marvell.com>
+Subject: [PATCH] =?UTF-8?q?=20=20=20xfrm:=20Duplicate=20SPI=20Handling=20?= =?UTF-8?q?=E2=80=93=20IPsec-v3=20Compliance=20Concern?=
+Date: Thu, 12 Jun 2025 11:20:17 +0530
+Message-ID: <20250612055017.806273-1-saakashkumar@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609145833.990793-1-mbloch@nvidia.com> <20250609145833.990793-11-mbloch@nvidia.com>
-In-Reply-To: <20250609145833.990793-11-mbloch@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 11 Jun 2025 22:33:41 -0700
-X-Gm-Features: AX0GCFsYSgx73nrC-SXHzv68aZPiBHRhi1b3Qjgt6e6IXA1Ei-CkUqpGNyxM2ik
-Message-ID: <CAHS8izOX8t-Xu+mseiRBvLDYmk6G+iH=tX6t4SWY2TKBau7r-Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/12] net/mlx5e: Implement queue mgmt ops and
- single channel swap
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, saeedm@nvidia.com, gal@nvidia.com, 
-	leonro@nvidia.com, tariqt@nvidia.com, Leon Romanovsky <leon@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Dragos Tatulea <dtatulea@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: QjlM0PVi9fQseISJ3LQqmpR6sopprUzk
+X-Authority-Analysis: v=2.4 cv=V4t90fni c=1 sm=1 tr=0 ts=684a6aa3 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=5KLPUuaC_9wA:10 a=M5GUcnROAAAA:8 a=3cPYwFQvcDpM_y1OWQkA:9 a=QEXdDO2ut3YA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEyMDA0MiBTYWx0ZWRfX+PvxC9t0gfGW 0IFfkNn6pdXg1DZFI9NaAfsMN19FdaJ+VYh9tCsT4aqDgvnfu/3z/iwA8WadroLnc9lZyYL2L5a 4AO4y/g7+zxZgQpBO2lvYrLvJyb9XNWpnkp9TO4XHy5OuUlCZS23hStbimzvrY+xo2Xr5plhxmo
+ cA1ZDRZpA4hsYQU++b2B+8QJAUbgQMErBrSUcvbaFvSQSwv+t20cjsTFkPbIc8Kii7bBRZzkHVe tZjQr9tNbEttRY4MLnFKJH5VLJYemW+AOos2XrbBvzn7CIHL7XorpYxuF7F4wjjGPXfnjeM7w+h ZjXnP6d6zGeT78pTpcMiQuAw+snct8ES4Bgpwhr8vp5zUSnufQGctRKrVGW+x6S0Tv5Hy2f8uSK
+ 0AmORZxvv+ZCH3McSpD16Wr6RZg5VgVRnderO/8XCytLSDggr5K0G8semu4x96/cu/chEk9F
+X-Proofpoint-GUID: QjlM0PVi9fQseISJ3LQqmpR6sopprUzk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-12_03,2025-06-10_01,2025-03-28_01
 
-On Mon, Jun 9, 2025 at 8:08=E2=80=AFAM Mark Bloch <mbloch@nvidia.com> wrote=
-:
->
-> From: Saeed Mahameed <saeedm@nvidia.com>
->
-> The bulk of the work is done in mlx5e_queue_mem_alloc, where we allocate
-> and create the new channel resources, similar to
-> mlx5e_safe_switch_params, but here we do it for a single channel using
-> existing params, sort of a clone channel.
-> To swap the old channel with the new one, we deactivate and close the
-> old channel then replace it with the new one, since the swap procedure
-> doesn't fail in mlx5, we do it all in one place (mlx5e_queue_start).
->
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/en_main.c | 97 +++++++++++++++++++
->  1 file changed, 97 insertions(+)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_main.c
-> index a51e204bd364..90687392545c 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -5494,6 +5494,102 @@ static const struct netdev_stat_ops mlx5e_stat_op=
-s =3D {
->         .get_base_stats      =3D mlx5e_get_base_stats,
->  };
->
-> +struct mlx5_qmgmt_data {
-> +       struct mlx5e_channel *c;
-> +       struct mlx5e_channel_param cparam;
-> +};
-> +
-> +static int mlx5e_queue_mem_alloc(struct net_device *dev, void *newq,
-> +                                int queue_index)
-> +{
-> +       struct mlx5_qmgmt_data *new =3D (struct mlx5_qmgmt_data *)newq;
-> +       struct mlx5e_priv *priv =3D netdev_priv(dev);
-> +       struct mlx5e_channels *chs =3D &priv->channels;
-> +       struct mlx5e_params params =3D chs->params;
-> +       struct mlx5_core_dev *mdev;
-> +       int err;
-> +
-> +       mutex_lock(&priv->state_lock);
-> +       if (!test_bit(MLX5E_STATE_OPENED, &priv->state)) {
-> +               err =3D -ENODEV;
-> +               goto unlock;
-> +       }
-> +
-> +       if (queue_index >=3D chs->num) {
-> +               err =3D -ERANGE;
-> +               goto unlock;
-> +       }
-> +
-> +       if (MLX5E_GET_PFLAG(&chs->params, MLX5E_PFLAG_TX_PORT_TS) ||
-> +           chs->params.ptp_rx   ||
-> +           chs->params.xdp_prog ||
-> +           priv->htb) {
-> +               netdev_err(priv->netdev,
-> +                          "Cloning channels with Port/rx PTP, XDP or HTB=
- is not supported\n");
-> +               err =3D -EOPNOTSUPP;
-> +               goto unlock;
-> +       }
-> +
-> +       mdev =3D mlx5_sd_ch_ix_get_dev(priv->mdev, queue_index);
-> +       err =3D mlx5e_build_channel_param(mdev, &params, &new->cparam);
-> +       if (err) {
-> +               return err;
-> +               goto unlock;
-> +       }
-> +
-> +       err =3D mlx5e_open_channel(priv, queue_index, &params, NULL, &new=
-->c);
-> +unlock:
-> +       mutex_unlock(&priv->state_lock);
-> +       return err;
-> +}
-> +
-> +static void mlx5e_queue_mem_free(struct net_device *dev, void *mem)
-> +{
-> +       struct mlx5_qmgmt_data *data =3D (struct mlx5_qmgmt_data *)mem;
-> +
-> +       /* not supposed to happen since mlx5e_queue_start never fails
-> +        * but this is how this should be implemented just in case
-> +        */
-> +       if (data->c)
-> +               mlx5e_close_channel(data->c);
-> +}
-> +
-> +static int mlx5e_queue_stop(struct net_device *dev, void *oldq, int queu=
-e_index)
-> +{
-> +       /* mlx5e_queue_start does not fail, we stop the old queue there *=
-/
-> +       return 0;
-> +}
+        The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
+        Netlink message, which triggers the kernel function xfrm_alloc_spi().
+        This function is expected to ensure uniqueness of the Security Parameter
+        Index (SPI) for inbound Security Associations (SAs). However, it can
+        return success even when the requested SPI is already in use, leading
+        to duplicate SPIs assigned to multiple inbound SAs, differentiated
+        only by their destination addresses.
 
-Is this really better than maintaining uniformity of behavior between
-the drivers that support the queue mgmt api and just doing the
-mlx5e_deactivate_priv_channels and mlx5e_close_channel in the stop
-like core sorta expects?
+        This behavior causes inconsistencies during SPI lookups for inbound packets.
+        Since the lookup may return an arbitrary SA among those with the same SPI,
+        packet processing can fail, resulting in packet drops.
 
-We currently use the ndos to restart a queue, but I'm imagining in the
-future we can expand it to create queues on behalf of the queues. The
-stop queue API may be reused in other contexts, like maybe to kill a
-dynamically created devmem queue or something, and this specific
-driver may stop working because stop actually doesn't do anything?
+        According to RFC 6071, in IPsec-v3, a unicast SA is uniquely identified
+        by the SPI and optionally protocol. Therefore, relying on additional fields
+        (such as destination addresses) to disambiguate SPIs contradicts
+        the RFC and undermines protocol correctness.
 
---=20
-Thanks,
-Mina
+        Current implementation:
+        xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
+        So if two SAs have the same SPI but different destination addresses, then
+        they will:
+           a. Hash into different buckets
+           b. Be stored in different linked lists (byspi + h)
+           c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
+        As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
+
+        Proposed Change:
+        xfrm_state_lookup_spi_proto() does a truly global search - across all states,
+        regardless of hash bucket and matches SPI and proto.
+
+        Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
+---
+ include/net/xfrm.h    |  3 +++
+ net/xfrm/xfrm_state.c | 39 +++++++++++++++++++++++++++++++--------
+ 2 files changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 39365fd2ea17..bd128980e8fd 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1693,6 +1693,9 @@ struct xfrm_state *xfrm_stateonly_find(struct net *net, u32 mark, u32 if_id,
+ 				       u8 mode, u8 proto, u32 reqid);
+ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
+ 					      unsigned short family);
++struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 spi,
++						u8 proto);
++
+ int xfrm_state_check_expire(struct xfrm_state *x);
+ void xfrm_state_update_stats(struct net *net);
+ #ifdef CONFIG_XFRM_OFFLOAD
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 341d79ecb5c2..9820025610ee 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -1714,6 +1714,29 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
+ }
+ EXPORT_SYMBOL(xfrm_state_lookup_byspi);
+ 
++struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 spi, u8 proto)
++{
++    struct xfrm_state *x;
++    unsigned int i;
++
++    rcu_read_lock();
++
++    for (i = 0; i <= net->xfrm.state_hmask; i++) {
++        hlist_for_each_entry_rcu(x, &net->xfrm.state_byspi[i], byspi) {
++            if (x->id.spi == spi && x->id.proto == proto) {
++                if (!xfrm_state_hold_rcu(x))
++                    continue;
++                rcu_read_unlock();
++                return x;
++            }
++        }
++    }
++
++    rcu_read_unlock();
++    return NULL;
++}
++EXPORT_SYMBOL(xfrm_state_lookup_spi_proto);
++
+ static void __xfrm_state_insert(struct xfrm_state *x)
+ {
+ 	struct net *net = xs_net(x);
+@@ -2550,7 +2573,6 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	__be32 minspi = htonl(low);
+ 	__be32 maxspi = htonl(high);
+ 	__be32 newspi = 0;
+-	u32 mark = x->mark.v & x->mark.m;
+ 
+ 	spin_lock_bh(&x->lock);
+ 	if (x->km.state == XFRM_STATE_DEAD) {
+@@ -2565,18 +2587,12 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	err = -ENOENT;
+ 
+ 	if (minspi == maxspi) {
+-		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
+-		if (x0) {
+-			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
+-			xfrm_state_put(x0);
+-			goto unlock;
+-		}
+ 		newspi = minspi;
+ 	} else {
+ 		u32 spi = 0;
+ 		for (h = 0; h < high-low+1; h++) {
+ 			spi = get_random_u32_inclusive(low, high);
+-			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
++			x0 = xfrm_state_lookup_spi_proto(net, htonl(spi), x->id.proto);
+ 			if (x0 == NULL) {
+ 				newspi = htonl(spi);
+ 				break;
+@@ -2586,6 +2602,13 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	}
+ 	if (newspi) {
+ 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
++		x0 = xfrm_state_lookup_spi_proto(net, newspi, x->id.proto);
++		if (x0) {
++			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
++			xfrm_state_put(x0);
++			goto unlock;
++		}
++
+ 		x->id.spi = newspi;
+ 		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
+ 		XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h,
+-- 
+2.43.0
+
 
