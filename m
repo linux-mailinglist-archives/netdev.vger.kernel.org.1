@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-197076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEEDEAD773C
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:59:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49121AD7744
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:00:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70B48169A77
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:54:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CCA8188B003
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D268824A06E;
-	Thu, 12 Jun 2025 15:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E23298CB5;
+	Thu, 12 Jun 2025 15:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jzPOPJI6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CSMzHpNG"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E30298CA6
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526D12989B5
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749743393; cv=none; b=BoKH2EWxP9OHUc8j+1CiURsOVwbZENtzOi5jXFWy4/ReOIifBrWTwfN9kI1mTpp3QTr52uybeI1/fjgSzSs/tcvLZHjmu4yIat/ll6BB6S5B8ODCjafePAHn85Yk8vjwoJwSlcXPEuyDPbbUCuAUECBYTK33rnCJqDiuzzfV5mk=
+	t=1749743489; cv=none; b=usPyHoRL9RURqVa/Tz9YN913iPLS32aBt2ydlI7KwLCSxGC0GrVUQLJZu2zkJGb9qYMbgSpY8EMZ5cgyWPnfGqFD+cKp09PnoCX+DHGQ+UKEG7Swt+tgdQy8aMc9GxAQBdC3AE384wh6ohr306cOa3XT8RzCg+4roC38jqlcPiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749743393; c=relaxed/simple;
-	bh=W08OGzDFEn031n7rXDk6AaOdxKK8iHLeLrOjSGJ40XM=;
+	s=arc-20240116; t=1749743489; c=relaxed/simple;
+	bh=+oLk89fYpVMmj5ox9RUgv+QlsXlann/uSQgQrxfcZC4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yk3FaqAbP8cOS+wWreF1+4zVJQcaZOxI7eTNKBS9/XKl565roKu/w1Na9DBK92nGzQqsPlCv5WvQbfcIH+qlkikxarwhB8vDQkScZoivVLqqLR+q7pjlntc45POO1PNoTS/QWgT0oMVjZpMIPQ88auE5lWGbVUazFh/HzF7TvgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jzPOPJI6; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=mTKvyKfLnAPpbUC0XH6StY4c+9DNHwrmAc6d2wGQnumJ66e9MfEUMJAEiLwCoSlI7BxhswSEe7+F5w3F9C5+1sTfhnISTEwGXjOZdo3LVv9kXigfqk2S86kbRh/pcnqFXyRKPQT30HRqbLHQY/4/vsTP4iU8QQs4VZlzbOPpDDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CSMzHpNG; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L+yLe+ZMSf3yk77UvKkyRGyzVGUmF0OKQ+1btIxnhOE=; b=jzPOPJI6MXqNn8Yg9oLmLM9hgl
-	yzAH1dQkji+RkHEuI4xGJBue/st4deUUhpkAYl65GhNEb1Bxt6HMLVpULKSOLKo0t7WfSzZTo8JmR
-	809l2akNLqVgMLuNyav5dZcktHoLn2TSjIyw9eX2ufb4IyCmDUnyvZ8PO6o9jZGaEfrU=;
+	bh=tkfjVEKFOzj0a7pCRXpz7lWWXfngyymyfaKG/KilTm4=; b=CSMzHpNGvshGmE6pFbWM7AxiAY
+	zz9nF5tji5P1lwNv1GmvSO0YaIU4HX8QOJrOKNEX2W8Rm9HxtzZ9jxks+4ggNyTmbiOrr6cwbeglh
+	lA1IpC0XjJz+imWdz1GR2agMfoQ+1TKMzOL87mn63Zsz+m2OoLj/GbmCMam0YgRLpNIs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uPkBT-00FZCi-NN; Thu, 12 Jun 2025 17:49:43 +0200
-Date: Thu, 12 Jun 2025 17:49:43 +0200
+	id 1uPkD1-00FZEt-UZ; Thu, 12 Jun 2025 17:51:19 +0200
+Date: Thu, 12 Jun 2025 17:51:19 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -55,11 +55,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 5/9] net: stmmac: rk: combine clk_mac_speed rate
- setting functions
-Message-ID: <65b9f847-7b94-406d-acc8-45e692beb507@lunn.ch>
+Subject: Re: [PATCH net-next 6/9] net: stmmac: rk: combine .set_*_speed()
+ methods
+Message-ID: <76cdb7b9-1c2c-4c0e-b948-4863dc1756db@lunn.ch>
 References: <aEr1BhIoC6-UM2XV@shell.armlinux.org.uk>
- <E1uPk34-004CFZ-3y@rmk-PC.armlinux.org.uk>
+ <E1uPk39-004CFf-7a@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,11 +68,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1uPk34-004CFZ-3y@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1uPk39-004CFf-7a@rmk-PC.armlinux.org.uk>
 
-On Thu, Jun 12, 2025 at 04:41:02PM +0100, Russell King (Oracle) wrote:
-> rk3568_set_gmac_speed() and rv1126_set_clk_mac_speed() are now
-> identical. Combine these so we have a single copy of this code.
+On Thu, Jun 12, 2025 at 04:41:07PM +0100, Russell King (Oracle) wrote:
+> As a result of the previous patches, many of the .set_rgmii_speed()
+> and .set_rmii_speed() implementations are identical apart from the
+> interface mode. Add a new .set_speed() function which takes the
+> interface mode in addition to the speed, and use it to combine the
+> separate implementations, calling the common rk_set_reg_speed()
+> function.
+> 
+> Also convert rk_set_clk_mac_speed() to be called by this new method
+> pointer, rather than having these implementations called from both
+> .set_*_speed() methods.
+> 
+> Remove all the error messages from the .set_speed() methods, as these
+> return an error code which is propagated up to stmmac_mac_link_up()
+> which will print the error.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
