@@ -1,102 +1,165 @@
-Return-Path: <netdev+bounces-196858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 984D6AD6B6E
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:53:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25FEEAD6B72
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99313189BDA2
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:53:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A16EE3AD9C1
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 08:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C097213E78;
-	Thu, 12 Jun 2025 08:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE74A213E78;
+	Thu, 12 Jun 2025 08:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jRagvVIc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BD21E9B19
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E2B1E51EB;
+	Thu, 12 Jun 2025 08:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749718401; cv=none; b=Rwe16VcuRkluPrKSE05USDuGSBfJ8zWAN4wDMZ0Nir/DPK4LzO3glA1khdicrjMsvjJ0OyhKOdUzsqjkMXmfFfuJtXFhjbToy7tJtReGrUA4rOLTJIWtWqFznpYLsnRFtJstv6ELg5BZjI+n5JF7iuaKgii032bgg2gLayzdVhA=
+	t=1749718535; cv=none; b=ZduPvZdI2/PujJeue4FJ+lOxiTiTQM3QCgVhOx7u/N/JU6th/LB63B4IMjLL0tko/KHqFhKTVStiqlj+21eNX+s6cpk5BwDKBDcljZaG7thgQ34sbj6AWI9hwEe6DdJ7whlAdjd46vpKGGk0T5Fo6XuZqzTljpi+UE+FfRRJFEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749718401; c=relaxed/simple;
-	bh=WxKr+Z/QJuSBRjFCvUCizSaES/2hJrrojfpmhNwGEFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pwmpdk99GP5/U3mFWKK30uy3YtGQAj7qeJdG6f8Anbps5A+ObT+eGR0wojdYl0+Ip5bFoqm8MqvtgUhxY0BTJVSHgdHFwxbaKT8qig4ZkMIsMXXTCHDFwqmBqQd9qD50CBycfED5Cp/YuI3MNf9nKFu1aS1RZYDRBabxShbXkBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1749718535; c=relaxed/simple;
+	bh=VZXDJzKIiAsBEUC2cmW7v9IAJ9vLIMf0Brbum9EX6hU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lp2eRpETHZOzNIpwOrUZ5hJhrsmuqfUP3tXnJuJ+vMwvQWoQDhim8I5vUwOAOqIQMwMSedHf6V1NnK+xDz5IwvQCd9IUi9DZxyiow65vYIEP74pDh5Yci+FKKUEZz5Qk5n457tVZ7tJMU0MACrMOp6aL4eofs2rZlATtRtV/ZWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jRagvVIc; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-60727e46168so1351382a12.0
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 01:53:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749718397; x=1750323197;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b2c41acd479so388137a12.2;
+        Thu, 12 Jun 2025 01:55:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749718534; x=1750323334; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j9BRQ15OKOHKXtMKvoZZsftmymCF7lN8ZrgpGO4hGEM=;
-        b=hz3h4bpUPKYP30ys+ezNjHAhHP8KnS2xvBSjxDJSK/b0tG7VsAKN5fojsaFQ7e3iPU
-         hLQJYpGGXp9TKh9atbW4RFZdgHxdwCt2QYopKCKrkOCSfXEwhiHbbeYsyL6nCUnyyWhc
-         QGg0xqW2Wc9/r6VAqg9Oou9h5FAzz5jS3eFBsvNLLnHjlH6ZuzeBlvEIzYt50qO1gyWO
-         misPD6OHetJxVrKbJx+jNXIjKdarIfGhwee0zTrNAaUxneEYLHrR8MqW/1c3X4pjFIBY
-         VifzjcH9r6/NXk+WacNBWs3DWMa17ZYnHdgSSOuYoMcdJrllON2QwtGJLVXoGL72njj0
-         Xnbg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlhy9/zSEi7cy2ECoK+3xc5tLV47QNMNPb10V4E2l/ujKxRIHK3vRbSj7ksWnO6qyJAufYSqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzkn6VRjAVPhhcmOXrReymNS1/2UHkepGnGaPmj46ilGA9I0dpj
-	MSfs0foKPk6hoPTd9HcoZz1rl/JA4aFZ0FV+UBPOknfOD3dwc1xIDc7eh5XYcQ==
-X-Gm-Gg: ASbGnctlnaH7L5sl5tvkrKB2A/5OacsKkHOsLZc7wW2sWL8DDunxY4ukILwKiiwM1va
-	mnBLqA3R9dwLcbAAmmRXIsWgZAwObkTmZAK07lQkBoYecusFYQamTbooMbIBu8NS5gmEst11AP1
-	LItMyu5I+fQFD7kGqJaboMc/vmHPKMLk8T45zvQT3WScyHZ5+3E1Emt20O49oYc9UVlpvzZgiCT
-	Xvv/YYtuKIZQRbqVofJnraB8X6hu6DTSYmthMRPLzoPBxlPP3r518lr4rRd3KqqcL6reXrqHWlc
-	sisnwrB9nFDnxM1QapeOdjTf9PMx60bF7s2lhDsBx7lLjF1o6Wq+
-X-Google-Smtp-Source: AGHT+IF1E1bVNewhH+RFD0+fb5CPNLGeBooDCsz4uVeR7JxnCDwI55vapl2yzGpOaFQkOrb11zNo8g==
-X-Received: by 2002:a17:906:99c4:b0:ade:76d0:fd9c with SMTP id a640c23a62f3a-adea2e348b6mr268993166b.3.1749718396574;
-        Thu, 12 Jun 2025 01:53:16 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adeadb21656sm97767366b.108.2025.06.12.01.53.15
+        bh=r+jaW01Ram8J0CFjvnmO+DegLpwAOHm96vNJd5ZWYGc=;
+        b=jRagvVIcR5+oXJNjT3Oh14EY2N/Mj948PiPqQ7/HV5EsawcxPM1Xwo+duP0K/d6rCp
+         BdFgys6oQyI4Xb3B3RDLzaeWHfDheJKDur96TWcR6RNKxG3D1tHRnNDhUeGajZVIKwb1
+         XmqA5Ld62TONhF12k+yNI96qBVzDoubmBsg7vKTkgV1YRQ2oa1XjiTWyMhAtpPzFOrb9
+         hQ6ZYSRntzq+3hfZb3w3ji5xtuTEh89keT027F6sZIL3nTFgA4cOzusfOyK+mUaU3n+H
+         Fb2PzSi/v7pDw3BwG3zVgG6cNYgq0R32/jjecIqJU9emoiOde2eypqU0gCGDtafxLT6R
+         pLkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749718534; x=1750323334;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r+jaW01Ram8J0CFjvnmO+DegLpwAOHm96vNJd5ZWYGc=;
+        b=g/IdhZTU0q7V2GhopcBnZPklSLrqLjZvxbzNXfzP2uX5vrj3Re5sKuy73ouhyI+EK8
+         DeUPLD3I7HVekuASv9xLDdO9e1p2rmBtakgssA0rDYU5oXWexP05K96iDiloRirzZJOb
+         /v1O8+wbZ5SJXedMFvwBNOvorKJAY3K9FZcNIcJJtB1JvYtmGJpGfr2ztdWRU5A4y2qC
+         fjeqNUXU8G3dFFro5KNCGLrgRazCt130cUlH8zmZapJOsThKLlVqWTZczfSG9zjJ7mvD
+         XTpUwN4nmeTFJ9vvphIxHmx4kbcaliH18gj06ZrsJvu9mdgX9hE5lQQc2WQiD1hLkTQw
+         n5Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCUidBLNdsPauz786y0q/0Anmi9U9C7cx9Ak/qsKguhGpIE3RURSbgGly3ZpTdraz9gbJT1RUnwRlGviiyFz@vger.kernel.org, AJvYcCWodxONwVXbSKPKBKYh8QFYhAFE31fe8N7yviCfOXvOsG24/a9lRf5WTuQC3SJTCsP4osg=@vger.kernel.org, AJvYcCXG4ZZBQH3RDNCszpK2tDkq5vlyDvEp8f8tE2PD9CtuhfhYIwFB2xqsjvoP64aeVJmv8Z6Ur+Ok@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd1MXuGGlZk60qsHJGRBU9qoZEynwZeW5bJtEqo/qZqeQOYwF5
+	yr2bppfGPBYzPQeGcJapNEGkjc2Yr7dnmPNkZeieUtnTfFcJ0Dsteqxu
+X-Gm-Gg: ASbGncs3ri3I/3ds/nlbMHiPJTTaSQanX3J08NpF1URTIP27S3tmXyQeP7u2bwo09tP
+	m1mhJJxBLyWW9vPFdsa8nIXIGgJZGGtR9NkPVAnI0l4TqA6SQ+731RuCDPCHs5AtipoP2T9+5HO
+	8hqhze+GNi3IWDBQSogD8NbSZMsa0M+ThjUez4uEXOZ7jtu570vD0/THq/hWkkY6V4X/bbjN1mj
+	OTWPANyK35vs1HRUH8byTIxTQwrESnKwZQN0LgEvUR40lXMIcn+nXiGDzVt7UtR1nZ9u5p7zLNL
+	ebpM2f7yVjzm0kcQcx4INoWpAB4JIfO+ZMc4l1472mIiyZbafbJ62yBTUTiNbYpNHMMfncVpU0v
+	Z7QLGmVKZ
+X-Google-Smtp-Source: AGHT+IGjP2s+60vt5yfxvQLR/980gfc56krWjJoT6dyD3iyrJFgNwpVJkdwAlwAWklxXdUzbHas1Fg==
+X-Received: by 2002:a17:90b:2e07:b0:312:1ae9:153a with SMTP id 98e67ed59e1d1-313c08c7f55mr3402555a91.25.1749718533518;
+        Thu, 12 Jun 2025 01:55:33 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1c6ab91sm929480a91.48.2025.06.12.01.55.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 01:53:16 -0700 (PDT)
-Date: Thu, 12 Jun 2025 01:53:13 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	dw@davidwei.uk
-Subject: Re: [PATCH net] net: drv: netdevsim: don't napi_complete() from
- netpoll
-Message-ID: <aEqVefLEgSz9AzHG@gmail.com>
-References: <20250611174643.2769263-1-kuba@kernel.org>
+        Thu, 12 Jun 2025 01:55:32 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: Oxffffaa@gmail.com,
+	avkrasnov@salutedevices.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	horms@kernel.org,
+	jasowang@redhat.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream sockets
+Date: Thu, 12 Jun 2025 16:55:14 +0800
+Message-Id: <20250612085514.996837-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAGxU2F4JkO8zxDZg8nTYmCsg9DaaH58o5L+TBzZxo+3TnXbA9Q@mail.gmail.com>
+References: <CAGxU2F4JkO8zxDZg8nTYmCsg9DaaH58o5L+TBzZxo+3TnXbA9Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611174643.2769263-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Hello Jakub,
-
-On Wed, Jun 11, 2025 at 10:46:43AM -0700, Jakub Kicinski wrote:
-> netdevsim supports netpoll. Make sure we don't call napi_complete()
-> from it, since it may not be scheduled. Breno reports hitting a
-> warning in napi_complete_done():
+> On Thu, 12 Jun 2025 at 10:21, Xuewei Niu <niuxuewei97@gmail.com> wrote:
+> >
+> > > On Thu, 12 Jun 2025 at 08:50, Xuewei Niu <niuxuewei97@gmail.com> wrote:
+> > > >
+> > > > > On Thu, Jun 12, 2025 at 01:32:01PM +0800, Xuewei Niu wrote:
+> > > > > > No comments since last month.
+> > > > > >
+> > > > > > The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
+> > > > > > patch. Could I get more eyes on this one?
+> > > > > >
+> > > > > > [1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
+> > > > > >
+> > > > > > Thanks,
+> > > > > > Xuewei
+> > > > >
+> > > > > it's been in net for two weeks now, no?
+> > > >
+> > > > Umm sorry, I didn't check the date carefully, because there are several
+> > > > ongoing patches. Next time I'll check it carefully. Sorry again.
+> > > >
+> > > > It looks like no one is paying attention to this patch. I am requesting
+> > > > someone interested in vsock to review this. I'd appreciate that!
+> > >
+> > > Which patch do you mean?
+> > >
+> > > Thanks,
+> > > Stefano
+> >
+> > I am saying your patch, "vsock/virtio: fix `rx_bytes` accounting for stream
+> > sockets".
+> >
+> > Once this gets merged, I will send a new version of my patch to support
+> > SIOCINQ ioctl. Thus, I can reuse `rx_bytes` to count unread bytes, as we
+> > discussed.
 > 
-> WARNING: CPU: 14 PID: 104 at net/core/dev.c:6592 napi_complete_done+0x2cc/0x560
->   __napi_poll+0x2d8/0x3a0
->   handle_softirqs+0x1fe/0x710
-> 
-> This is presumably after netpoll stole the SCHED bit prematurely.
-> 
-> Reported-by: Breno Leitao <leitao@debian.org>
-> Fixes: 3762ec05a9fb ("netdevsim: add NAPI support")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> As Michael pointed out, it was merged several weeks ago in net tree,
+> see https://lore.kernel.org/netdev/174827942876.985160.7017354014266756923.git-patchwork-notify@kernel.org/
+> And it also landed in Linus tree:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=45ca7e9f0730ae36fc610e675b990e9cc9ca0714
 
-Tested-by: Breno Leitao <leitao@debian.org>
+I misunderstood Michael's point. I am new to this, and not familiar with
+the process. Sorry about that...
 
-Thanks for the quick fix,
---breno
+> So, I think you can go head with your patch, right?
+>
+> Please remember to target net-next, since it will be a new feature IIRC.
+> 
+> Thanks,
+> Stefano
+
+Yes, I'll do it ASAP.
+
+Thanks,
+Xuewei
 
