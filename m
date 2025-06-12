@@ -1,83 +1,90 @@
-Return-Path: <netdev+bounces-197007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5511FAD7549
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:09:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB90AD754B
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 17:09:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFDCE3A2286
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:08:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DA2C1885EBC
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 15:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E7826D4C9;
-	Thu, 12 Jun 2025 15:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD3027991C;
+	Thu, 12 Jun 2025 15:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFNcNwDC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIT66+x6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50AA271454
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B79B26E719
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 15:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749740904; cv=none; b=SUIhdgmRgDrRNFSkOOmwqZZZ1Mbrvx2er5aA61F2WUmfbnqj7tpo5KLW8uZ+qPWBVyYs5FRH5Rvqe1c+h9DNRR4lpCmhs+UToGJkXnnvaevViTKZJQv6oGOVBsrX716RWJG9zFra4DbQfcs5ENNnMCqmQKcDNfujE9jbQGA46rc=
+	t=1749740912; cv=none; b=jThhDpqDN1Mp9C79eswON24YMy7h+ksNs+ojNkFTrahRKE8+q4GHYCwngO8BUHQv1XEVux1fO4uQVv+MqJpgAC6a1nWTqkqwZMpEMFhV6Q2kNoc3PjLJQsimzmOi8E3HgRB+aU3JI7W2h7ATIUYQPYA5fualq8NdNyaQkNgjr00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749740904; c=relaxed/simple;
-	bh=hAk3bttaDjaATfdUQqEjCAlzOSdynrc09wibh8X6SLQ=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=hI/CehwTniIMJ2rS5HjeaaenV7Mn4fYcxFEVRO5WMrUQPLAMjTXPFpHgh8nehjW2f6FCsPNpS49D57faGsDyxmg0kNn0h2GH1u5tTBCGqC8hsHXB6oZm0jx6DDtCpSEUkBH3R/Z+MTEQUiOh4/TtOL+QRHHaG3QbGMz8nAZyBB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFNcNwDC; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1749740912; c=relaxed/simple;
+	bh=hTyXegj7ybNw4T5GrqlmnUamJzLZsxOsxtLYYIWjVTE=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KYwY/i7RTftlhds4o0WnnfCsx6lfDuilkEMlpLHtdyns7DjHEauzQiFPQrVPbA+UKYK4GDqXfIyLPPLrv/K9WziyaUsazCiKaxF4MDR3JepVzQQG75xJEBpy05RcEd5sXXt2Rr6GgBFeSrLdDtxojzlABU4dDHVvgOngU0zB7ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CIT66+x6; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-afc857702d1so743146a12.3
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:08:22 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b2c384b2945so829095a12.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 08:08:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749740902; x=1750345702; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:message-id:date
-         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/jnAXiUl+X9dHh4nZhdh8lVReW+HG93D148+uTcn2g=;
-        b=RFNcNwDC9b7er8IJ/1BXlkDhuPtm8SSwYv0Agc1svTumiQ/muGY1ZiA9YGy+Pxx9Ow
-         sC04PFYIaKFHC7nwTEXhQNIFKQzCa2VI+SFkUMVzMmGeEyGo+CUxJJyJcEhg+dOXw1ee
-         SlvAWQmALyVs1KQhu6p+PlSw1mnQ955mw4StsiWZ8ym17ya1h6LhoXufYltWWDAXk7bJ
-         fdxDtH4VJ1YexZY/l2x8G64Mg1ImZvBmOSjMUpR5BLzuvej/orulZAgDgVleGcreK6ZA
-         gjF8tIxsMLm+HCq4N/U4YcAkHgG9AmD39lS8aokfEcgqo7V9pYKD4aY0L7nIspzPU2bf
-         1ekw==
+        d=gmail.com; s=20230601; t=1749740910; x=1750345710; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wo1SJR+OUxspHA8L6RCB8ukYutoibRen5VrN3hjoxjk=;
+        b=CIT66+x6f6B4IkHozlJK5otiWB9WTpO+0W1qo5JrKBr67XnOxOdbbzfOMjMrlWauXM
+         x+fS1uaEgVwO1xGSoY1l/nY0WNOBPW2XOBzYbP3WkHQG2vZ61vkBqvPGNISI5Us/lY0X
+         bZyJOJPabx0B/GSi/+lLRzqcU+kdgXjlIZgo7QLGOg8AZ9eZKnveHyqZzdSOaZxEwqTh
+         XE+Uz1aje9LBR/U+KRmIq2kB2W3Hb/Pa1yTkWAyPQoCXT7awm9anNLbH52OOv1NP5TF9
+         l3hkr31sJhZhJlTACqFteThgLQYWDQzIGugaxez6aOEeXEyvNIs1qcCdIa5i5iATT0X5
+         xUCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749740902; x=1750345702;
-        h=content-transfer-encoding:mime-version:user-agent:message-id:date
-         :cc:to:from:subject:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e/jnAXiUl+X9dHh4nZhdh8lVReW+HG93D148+uTcn2g=;
-        b=EPPC1lWVfffrCCvA/oLfRXOQGcB374CFKYGB3m8LDhXk8XsEirCop+y0g+GhOxjPap
-         26c+aEtDaqgPcsYYpzx8HfDahVN/YaTSm4Q57PjH//BFUnKHAoeoogM2yAyqXQ/93YmO
-         joJbm0H1pgUkBWg60QKZ1JNaD32MIfBw+4ocB6BGqXz9qhyNNIEk6jDv9mV0nenjRBvi
-         SGCsG8JQuS77YTMRIioiJzLHBEqevrQx2pnI9PrL8QIOQet/LtwGeOG/uIJVWhnQUcjc
-         UYK5eADK/YME44TPp8zglda5ADtKShGKKrTQmPxcfB/SHgInzqf0ioPH08Org/Tnp8rh
-         MWPA==
-X-Gm-Message-State: AOJu0YxkLivojIUVlx7vCl/KbD59GxsowvEwBsWyR/6/V+O5KFUpmqny
-	jVX6OB5W4j6/L1Xq83FJAGoZ+InMrUnzCGNBUg9+LVlAhgfS0hENxxDRxUuedA==
-X-Gm-Gg: ASbGncuPmUYgWZAbH0On2bUwJpAfbqQENzn9CfbEiLufOLBzU3DJmo79PBrTortpF2r
-	W9OpVSKBrKuy0wt8vItqUWp/ojfnKhJqzYorc+NNA1vpr1U+K0X0s+g3sXFd+2arV6v57U8nCR+
-	2Ew3oJqaUqIoAMXlOqzUKc82p1N5xlId7Io/fUhtOp4y9M4ljE4mooIOKWIqWdPd419eF3kaJaF
-	6D5jPaZM3my6/YvLYV4aoVtk7jU2TrIy9xN6ET1B7zM6ubYt8NMz0qqEFocL2LEOi89JXYZVop8
-	S4x7M+mPqzHaNrhV8aUV/WCOVZFprGlWSFEEEWNa5nU7b6neBDKCxe3Bz6Wys/l27Okocrou3Ah
-	Rb60+BZfuQG0FDjIyXXp2
-X-Google-Smtp-Source: AGHT+IH0uYshXuGUYg7k8Q0bX9mPuLSOlEFl3TijMeeWfHuqw8LwEoFajJTN+WkiG3VyZ1bzqk8xgA==
-X-Received: by 2002:a17:90b:5249:b0:312:e90b:419c with SMTP id 98e67ed59e1d1-313af209387mr8995036a91.26.1749740901960;
-        Thu, 12 Jun 2025 08:08:21 -0700 (PDT)
-Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fd613fee4sm1477694a12.26.2025.06.12.08.08.20
+        d=1e100.net; s=20230601; t=1749740910; x=1750345710;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wo1SJR+OUxspHA8L6RCB8ukYutoibRen5VrN3hjoxjk=;
+        b=vZwsUHvQlgjEKwgA7135dyDprf18rTJdiZl7pctc2TNETXodY5KeyZLfzTfaBL4NQy
+         KnMzja+X+DucgRbKPWLSyDJl4YEtxkIaYfSiLHHHRMzgj/G/E7/wKVoiT2enClKAC1KO
+         zQhbhOl7VwYzbzp/QMhUfF2jK6qTly6EWM/neI3ZTM4E/sfLaDzATz6iuS+jeAJH5QLS
+         fqHTl91MuTG0DhjY/Cxb+Hi1xBEGyJiIVb3UW6z5jvVhbpGVUzZopxOFKp0teUZGDOPl
+         mRPZHls4S+tq5TY/EE5TTcY0lh2CQpjZSPyhWC3tku/cb8P5SoA5ILZ0uPSpsmv4F/Xx
+         JkMQ==
+X-Gm-Message-State: AOJu0YzoL/Wia4ZWnk0BdbwhaS2dbuMPXABW1tWvrKmzagLcNJey0EL3
+	ZwXVff/IzFgZpZ1aqscQRr6y5K/1Lr3KrgUQjGtSAn7FlIpai243eV0b
+X-Gm-Gg: ASbGnctIsoCAibrgDSSDoxBqrR3M2ashqLen5bnq3FWUUgO08EedodUCwIa4pfXoOUa
+	dUlBEHImOZrL0qAcsxBkFDXvthu23UtuUH577Jon9+oXJ87br64Om/ya6Ux0r/8YPyfShU3yFfq
+	cK6Nq4odBDq+ebpAgP3Yt41T6EQCWRGVsZIDD8Cj8gyLxgxmiaWlNvakb1xkEtGdZm5cBTTUd+l
+	2en9fAiPshgfgBRLe0+0C22vhJDBXsSOK/ppVrX1pmA8bx3mUj0giqevm3gLAeOQeP9dM8Y2ysf
+	GNkWU0daKcYLkok/V2ebbtAskCiBfMV80whztkeR1aLF3gTunqQYMQvOd1FmZdVtGAYXmfX6N6Z
+	EmXPz00amj01C83w=
+X-Google-Smtp-Source: AGHT+IHi35oCIf4hY0+e8s95WStdObLKiHQ9+Tit7zPruqRhyQkEh2xrPplarOHLD9CpJpFt4L3Eiw==
+X-Received: by 2002:a17:90b:584b:b0:311:ae39:3dad with SMTP id 98e67ed59e1d1-313d7edd210mr309564a91.30.1749740908617;
+        Thu, 12 Jun 2025 08:08:28 -0700 (PDT)
+Received: from ahduyck-xeon-server.home.arpa ([98.97.39.160])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1c5e2ebsm1563125a91.33.2025.06.12.08.08.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 08:08:21 -0700 (PDT)
-Subject: [net-next PATCH v2 0/6] Add support for 25G, 50G, and 100G to fbnic
+        Thu, 12 Jun 2025 08:08:28 -0700 (PDT)
+Subject: [net-next PATCH v2 1/6] net: phy: Add interface types for 50G and
+ 100G
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux@armlinux.org.uk, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
  davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org,
  kernel-team@meta.com, edumazet@google.com
-Date: Thu, 12 Jun 2025 08:08:20 -0700
+Date: Thu, 12 Jun 2025 08:08:27 -0700
 Message-ID: 
+ <174974090714.3327565.13511253886768378274.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: 
+ <174974059576.3327565.11541374883434516600.stgit@ahduyck-xeon-server.home.arpa>
+References: 
  <174974059576.3327565.11541374883434516600.stgit@ahduyck-xeon-server.home.arpa>
 User-Agent: StGit/1.5
 Precedence: bulk
@@ -89,55 +96,197 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-The fbnic driver up till now had avoided actually reporting link as the
-phylink setup only supported up to 40G configurations. This changeset is
-meant to start addressing that by adding support for 50G and 100G interface
-types as well as the 200GBASE-CR4 media type which we can run them over.
+From: Alexander Duyck <alexanderduyck@fb.com>
 
-With that basic support added fbnic can then set those types based on the
-EEPROM configuration provided by the firmware and then report those speeds
-out using the information provided via the phylink call for getting the
-link ksettings. This provides the basic MAC support and enables supporting
-the speeds as well as configuring flow control.
+Add support for 802.3cd based interface types 50GBASE-R and 100GBASE-P.
+This choice in naming is based on section 135 of the 802.3-2022 IEEE
+Standard.
 
-After this I plan to add support for a PHY that will represent the SerDes
-PHY being used to manage the link as we need a way to indicate link
-training into phylink to prevent link flaps on the PCS while the SerDes is
-in training, and then after that I will look at rolling support for our
-PCS/PMA into the XPCS driver.
+In addition it is adding support for what I am referring to as LAUI
+which is based on annex 135C of the IEEE Standard, and shares many
+similarities with the 25/50G consortium. The main difference between the
+two is that IEEE spec refers to LAUI as the AUI before the RS(544/514) FEC,
+whereas the 25/50G use this lane and frequency combination after going
+through RS(528/514), Base-R or no FEC at all.
 
-v2:
-- Fixed issue with fbnic_mac_get_fw_settings changes being pulled forward
-  into patch 3 from patch 4.
-- Updated CC list to include full list from maintainers.
-
+Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
+ drivers/net/phy/phy-core.c |    3 +++
+ drivers/net/phy/phy_caps.c |    9 +++++++++
+ drivers/net/phy/phylink.c  |   13 +++++++++++++
+ drivers/net/phy/sfp-bus.c  |   22 ++++++++++++++++++++++
+ include/linux/phy.h        |   12 ++++++++++++
+ include/linux/sfp.h        |    1 +
+ 6 files changed, 60 insertions(+)
 
-Alexander Duyck (6):
-      net: phy: Add interface types for 50G and 100G
-      fbnic: Do not consider mailbox "initialized" until we have verified fw version
-      fbnic: Replace 'link_mode' with 'aui'
-      fbnic: Set correct supported modes and speeds based on FW setting
-      fbnic: Add support for reporting link config
-      fbnic: Add support for setting/getting pause configuration
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index e177037f9110..a8c1b60c46a4 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -142,6 +142,9 @@ int phy_interface_num_ports(phy_interface_t interface)
+ 	case PHY_INTERFACE_MODE_RXAUI:
+ 	case PHY_INTERFACE_MODE_XAUI:
+ 	case PHY_INTERFACE_MODE_1000BASEKX:
++	case PHY_INTERFACE_MODE_50GBASER:
++	case PHY_INTERFACE_MODE_LAUI:
++	case PHY_INTERFACE_MODE_100GBASEP:
+ 		return 1;
+ 	case PHY_INTERFACE_MODE_QSGMII:
+ 	case PHY_INTERFACE_MODE_QUSGMII:
+diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+index 703321689726..063e4a11614c 100644
+--- a/drivers/net/phy/phy_caps.c
++++ b/drivers/net/phy/phy_caps.c
+@@ -345,6 +345,15 @@ unsigned long phy_caps_from_interface(phy_interface_t interface)
+ 		link_caps |= BIT(LINK_CAPA_40000FD);
+ 		break;
+ 
++	case PHY_INTERFACE_MODE_50GBASER:
++	case PHY_INTERFACE_MODE_LAUI:
++		link_caps |= BIT(LINK_CAPA_50000FD);
++		break;
++
++	case PHY_INTERFACE_MODE_100GBASEP:
++		link_caps |= BIT(LINK_CAPA_100000FD);
++		break;
++
+ 	case PHY_INTERFACE_MODE_INTERNAL:
+ 		link_caps |= LINK_CAPA_ALL;
+ 		break;
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 0faa3d97e06b..67218d278ce6 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -127,6 +127,9 @@ do {									\
+ #endif
+ 
+ static const phy_interface_t phylink_sfp_interface_preference[] = {
++	PHY_INTERFACE_MODE_100GBASEP,
++	PHY_INTERFACE_MODE_50GBASER,
++	PHY_INTERFACE_MODE_LAUI,
+ 	PHY_INTERFACE_MODE_25GBASER,
+ 	PHY_INTERFACE_MODE_USXGMII,
+ 	PHY_INTERFACE_MODE_10GBASER,
+@@ -274,6 +277,13 @@ static int phylink_interface_max_speed(phy_interface_t interface)
+ 	case PHY_INTERFACE_MODE_XLGMII:
+ 		return SPEED_40000;
+ 
++	case PHY_INTERFACE_MODE_50GBASER:
++	case PHY_INTERFACE_MODE_LAUI:
++		return SPEED_50000;
++
++	case PHY_INTERFACE_MODE_100GBASEP:
++		return SPEED_100000;
++
+ 	case PHY_INTERFACE_MODE_INTERNAL:
+ 	case PHY_INTERFACE_MODE_NA:
+ 	case PHY_INTERFACE_MODE_MAX:
+@@ -798,6 +808,9 @@ static int phylink_parse_mode(struct phylink *pl,
+ 		case PHY_INTERFACE_MODE_10GKR:
+ 		case PHY_INTERFACE_MODE_10GBASER:
+ 		case PHY_INTERFACE_MODE_XLGMII:
++		case PHY_INTERFACE_MODE_50GBASER:
++		case PHY_INTERFACE_MODE_LAUI:
++		case PHY_INTERFACE_MODE_100GBASEP:
+ 			caps = ~(MAC_SYM_PAUSE | MAC_ASYM_PAUSE);
+ 			caps = phylink_get_capabilities(pl->link_config.interface, caps,
+ 							RATE_MATCH_NONE);
+diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
+index f13c00b5b449..949bf95db8df 100644
+--- a/drivers/net/phy/sfp-bus.c
++++ b/drivers/net/phy/sfp-bus.c
+@@ -275,6 +275,8 @@ void sfp_parse_support(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
+ 		break;
+ 	case SFF8024_ECC_100GBASE_CR4:
+ 		phylink_set(modes, 100000baseCR4_Full);
++		phylink_set(modes, 50000baseCR2_Full);
++		__set_bit(PHY_INTERFACE_MODE_LAUI, interfaces);
+ 		fallthrough;
+ 	case SFF8024_ECC_25GBASE_CR_S:
+ 	case SFF8024_ECC_25GBASE_CR_N:
+@@ -294,6 +296,12 @@ void sfp_parse_support(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
+ 		phylink_set(modes, 2500baseT_Full);
+ 		__set_bit(PHY_INTERFACE_MODE_2500BASEX, interfaces);
+ 		break;
++	case SFF8024_ECC_200GBASE_CR4:
++		phylink_set(modes, 100000baseCR2_Full);
++		__set_bit(PHY_INTERFACE_MODE_100GBASEP, interfaces);
++		phylink_set(modes, 50000baseCR_Full);
++		__set_bit(PHY_INTERFACE_MODE_50GBASER, interfaces);
++		break;
+ 	default:
+ 		dev_warn(bus->sfp_dev,
+ 			 "Unknown/unsupported extended compliance code: 0x%02x\n",
+@@ -357,6 +365,20 @@ EXPORT_SYMBOL_GPL(sfp_parse_support);
+ phy_interface_t sfp_select_interface(struct sfp_bus *bus,
+ 				     const unsigned long *link_modes)
+ {
++	if (phylink_test(link_modes, 100000baseCR2_Full) ||
++	    phylink_test(link_modes, 100000baseKR2_Full) ||
++	    phylink_test(link_modes, 100000baseSR2_Full))
++		return PHY_INTERFACE_MODE_100GBASEP;
++
++	if (phylink_test(link_modes, 50000baseCR_Full) ||
++	    phylink_test(link_modes, 50000baseKR_Full) ||
++	    phylink_test(link_modes, 50000baseSR_Full))
++		return PHY_INTERFACE_MODE_50GBASER;
++
++	if (phylink_test(link_modes, 50000baseCR2_Full) ||
++	    phylink_test(link_modes, 50000baseKR2_Full))
++		return PHY_INTERFACE_MODE_LAUI;
++
+ 	if (phylink_test(link_modes, 25000baseCR_Full) ||
+ 	    phylink_test(link_modes, 25000baseKR_Full) ||
+ 	    phylink_test(link_modes, 25000baseSR_Full))
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e194dad1623d..5095f89b01c6 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -103,6 +103,9 @@ extern const int phy_basic_ports_array[3];
+  * @PHY_INTERFACE_MODE_QUSGMII: Quad Universal SGMII
+  * @PHY_INTERFACE_MODE_1000BASEKX: 1000Base-KX - with Clause 73 AN
+  * @PHY_INTERFACE_MODE_10G_QXGMII: 10G-QXGMII - 4 ports over 10G USXGMII
++ * @PHY_INTERFACE_MODE_50GBASER: 50GBase-R - with Clause 134 FEC
++ * @PHY_INTERFACE_MODE_LAUI: 50 Gigabit Attachment Unit Interface
++ * @PHY_INTERFACE_MODE_100GBASEP: 100GBase-P - with Clause 134 FEC
+  * @PHY_INTERFACE_MODE_MAX: Book keeping
+  *
+  * Describes the interface between the MAC and PHY.
+@@ -144,6 +147,9 @@ typedef enum {
+ 	PHY_INTERFACE_MODE_QUSGMII,
+ 	PHY_INTERFACE_MODE_1000BASEKX,
+ 	PHY_INTERFACE_MODE_10G_QXGMII,
++	PHY_INTERFACE_MODE_50GBASER,
++	PHY_INTERFACE_MODE_LAUI,
++	PHY_INTERFACE_MODE_100GBASEP,
+ 	PHY_INTERFACE_MODE_MAX,
+ } phy_interface_t;
+ 
+@@ -260,6 +266,12 @@ static inline const char *phy_modes(phy_interface_t interface)
+ 		return "qusgmii";
+ 	case PHY_INTERFACE_MODE_10G_QXGMII:
+ 		return "10g-qxgmii";
++	case PHY_INTERFACE_MODE_50GBASER:
++		return "50gbase-r";
++	case PHY_INTERFACE_MODE_LAUI:
++		return "laui";
++	case PHY_INTERFACE_MODE_100GBASEP:
++		return "100gbase-p";
+ 	default:
+ 		return "unknown";
+ 	}
+diff --git a/include/linux/sfp.h b/include/linux/sfp.h
+index 60c65cea74f6..c2034a344e49 100644
+--- a/include/linux/sfp.h
++++ b/include/linux/sfp.h
+@@ -334,6 +334,7 @@ enum {
+ 	SFF8024_ECC_10GBASE_T_SR	= 0x1c,
+ 	SFF8024_ECC_5GBASE_T		= 0x1d,
+ 	SFF8024_ECC_2_5GBASE_T		= 0x1e,
++	SFF8024_ECC_200GBASE_CR4	= 0x40,
+ };
+ 
+ /* SFP EEPROM registers */
 
-
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   5 +
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c    |  23 +++-
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |   8 +-
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  89 +++++--------
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  21 +--
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   2 -
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  11 +-
- .../net/ethernet/meta/fbnic/fbnic_phylink.c   | 126 +++++++++++++++---
- drivers/net/phy/phy-core.c                    |   3 +
- drivers/net/phy/phy_caps.c                    |   9 ++
- drivers/net/phy/phylink.c                     |  13 ++
- drivers/net/phy/sfp-bus.c                     |  22 +++
- include/linux/phy.h                           |  12 ++
- include/linux/sfp.h                           |   1 +
- 14 files changed, 257 insertions(+), 88 deletions(-)
-
---
 
 
