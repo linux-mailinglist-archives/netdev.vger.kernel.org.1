@@ -1,208 +1,233 @@
-Return-Path: <netdev+bounces-197109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A7BAD7831
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:28:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66839AD77BD
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06C913A0561
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:25:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEA6E188D665
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F67C29AAEF;
-	Thu, 12 Jun 2025 16:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89230299A93;
+	Thu, 12 Jun 2025 16:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PrraZOCI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O++EaeRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E1A299A82
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 16:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749745551; cv=fail; b=C8iAoJVU1vXuyy891G5VBRCT0nbr6dSzNwDxxSSE1On8R4kfI8fGO1nOO+TKv/CzbthsSZEyw0IBXpH46pyKof91FGZl/jBOudypVLqXlnH2EmMKoyzeMFKNmE6uFlqvR4NPDYuxpWwuWRuk8OFTjChu+++kCOTPLe5X9VzJpS0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749745551; c=relaxed/simple;
-	bh=d0EU/AlCF64VGUgORTb2SwFJ6TXgsicWj7A3FVw1upM=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=WUHhAaacya2ChiZIClZdrdu5Sq7aHNmnwOevj1fzIQeRATMjAnlvSRe+jaCUXiA9tDm8wog0QgFiH0K3Ab4Afl1D/TuI6CJwLOuNKltEu7ydps+0wzQQlvO0ef8ueTPOHBhAMgSBLAEoLvTOullBSvdUQqleiqePfI08aNI8efE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PrraZOCI; arc=fail smtp.client-ip=40.107.243.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iAXcjRD0oOlf2UO5xtXWhlqGgroE72iixq4NwgTcjGAvVbcjogtwuSi5oUsUZT1w6OJB3ICpXBWTG6wwTVUfAbsbw2ymayIStxEaQacqEkWND/RzbqUq83mXLTFRlbZDyjCbbszUHf4BheW8dkGpDgWdwjjQFoZpsQqN4KmQAAzVbADHX7iRlv3Fn//s8Xrf8xH5F46506mROoql8BKJeBzZCyA7Z/2dmj5ht9uxcfJeM5bV62kCMSdYxpjAvdrifPx84kxyztP6BU9M8mNPMjmToqR4dEbE4wFLFLNIg0PcCrTY/htNd7W6eYRsLhk0AlpTfp2wuOEpTQv8LEDonA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BwivV10qq5lK+dlmQgjNTyes1HIxhk9v5tBhGmkwfoM=;
- b=Or3e813i9K4Du8jefE8f1WtTnP8HPuCcrUewUwCkBwBiJ2KvDD2eo5TSrN9YR2Nno6djZAQA12C+Noj8HqZKxpYYiGebJSiur+pNasxEjfYcujRTarJsUW6lHHDBqAqndWIBnq3o5IxRZkvXMFgFKZUbSmMZkIwtRb3y1k2r/xBliAXAGHBor0thfDOnZ84Z4TnwprDwhm/1zRM6LnGlZyJnSKBktiMKBI+i9MG7Bgzx/DZdPEFjZ26S5r6xIAwT1/A6nHX6rVx6CuPhiGJtwbVA9uvAvuFd3xu+KGWfWUC34CvJJ+Z12JbY9VDKuVdm34DCvTVKNKYrMhNKG65low==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BwivV10qq5lK+dlmQgjNTyes1HIxhk9v5tBhGmkwfoM=;
- b=PrraZOCIR22R8AEqPNF2dnc0gU32EbBfcs3GCVPkGp2SxoCDnGxLZOJeorzJTecL+nFj+xRBio02qyM7y4rKoRDWy+JRIP4Qxxt+8wBpg+SS77Q9TGUi8qBNl6ZqD8QU8P15Fu+UoXNlWWPIAPWglHXOT9ICAAAqVA0Ffid7+qr1i93Pvmq+JW5UDetYQLFuagxzEIE948bmkt8Hn4rnm9AcA9RGnQCVrg8MwCNftqjfu9X17pAMAg4KLV9ebOvcNbStx8FVvnZj+dXQC+afMiugq8VIrvHorzDfZXePjb8xlBLKfGm4CDAQ7WqZ4KH0+pENHIfFTPI0L29ul3VTjw==
-Received: from BL1P223CA0014.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::19)
- by MN0PR12MB6103.namprd12.prod.outlook.com (2603:10b6:208:3c9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.18; Thu, 12 Jun
- 2025 16:25:47 +0000
-Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
- (2603:10b6:208:2c4:cafe::35) by BL1P223CA0014.outlook.office365.com
- (2603:10b6:208:2c4::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.22 via Frontend Transport; Thu,
- 12 Jun 2025 16:25:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 16:25:46 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 12 Jun
- 2025 09:25:28 -0700
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 12 Jun
- 2025 09:25:23 -0700
-References: <cover.1749499963.git.petrm@nvidia.com>
- <20250610055856.5ca1558a@kernel.org> <87wm9jeo3n.fsf@nvidia.com>
- <87o6uui6f7.fsf@nvidia.com> <20250611132320.53c5bebc@kernel.org>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "David
- Ahern" <dsahern@gmail.com>, <netdev@vger.kernel.org>, Simon Horman
-	<horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel
-	<idosch@nvidia.com>, <mlxsw@nvidia.com>, Kuniyuki Iwashima
-	<kuniyu@google.com>
-Subject: Re: [PATCH net-next 00/14] ipmr, ip6mr: Allow MC-routing
- locally-generated MC packets
-Date: Thu, 12 Jun 2025 14:02:47 +0200
-In-Reply-To: <20250611132320.53c5bebc@kernel.org>
-Message-ID: <87jz5hhqqe.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AA5299A82;
+	Thu, 12 Jun 2025 16:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749744567; cv=none; b=DlZEZXg3yVNfzx+pPApOY186lX7PgxpUpAvkKmhpmPA3nfhr7+kE5rVYAe44ufpX0kWPQJXHjwUuAm6vYFHnL3BqodD3VNxMB+AFVMAactrBKXJqnnWqX+miUh9tQtQgx7j+nKuzieut+I4+MCR4H7c1livS8d7u8Kaec+X+WEk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749744567; c=relaxed/simple;
+	bh=mRJBEjdyFqLeU2gUyT1SNUyXBnsAnN3ymwO67KdRkEU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YRekw5KC9YKCNiCQ++qjC25DHY+LzGD4vI2LgN0px01Gkruk8gTKPXGLu1nzVViaBYrIsQQIujK4tN2LTmZTUZ4RhaK5AmPVMUPOPp/8iumXmtSUob94iNV82oLh434nILcINdAaQwVvxREaEQe/Rfs4oiD3BaHoQbwmQjywIW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O++EaeRD; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749744566; x=1781280566;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mRJBEjdyFqLeU2gUyT1SNUyXBnsAnN3ymwO67KdRkEU=;
+  b=O++EaeRD8XOpU5gQyLwqAawccG7s71chI/nVjSXyPmeA4xzxQbO0yzzN
+   ORb5TUB4vSJeFC8lWk8GtHdpK52Q0bSwsZRDoH7SFwBhttYtD7x5CKEWV
+   WVSj9kBGXM6wHSTlPwQhUz8rq73kLQoxxXYHAfYbo/tMlzzumesjVzyF4
+   0z6L4s2qJ12vic3AZMxzfcm2LWG100iY3uuO5hfOzgQ+azQcJtaM6YqIC
+   a0l9HvGI7GgENqT7fnAE+2u1i+FPq11euibjpJgaueljbkIOkGOU4NW1Q
+   F9XTCuiEj04ks4P2IeyrtG56H94cg5PipFWMdHgfnw+XGdo/ZpAkun4N0
+   A==;
+X-CSE-ConnectionGUID: gaeQM/lKTKKBePFwIlD7Qg==
+X-CSE-MsgGUID: RGaahSQvSR2TAyuBBUzxRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="55738792"
+X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
+   d="scan'208";a="55738792"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 09:09:25 -0700
+X-CSE-ConnectionGUID: KJXSB+u/SbKKoPdZqB9cBg==
+X-CSE-MsgGUID: PjxkmjfHRXWKEvdCVelvDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
+   d="scan'208";a="148468537"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa008.jf.intel.com with ESMTP; 12 Jun 2025 09:09:20 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next v2 00/17] libeth: add libeth_xdp helper lib
+Date: Thu, 12 Jun 2025 18:02:17 +0200
+Message-ID: <20250612160234.68682-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|MN0PR12MB6103:EE_
-X-MS-Office365-Filtering-Correlation-Id: ceaa7b7c-3a78-4a51-16a4-08dda9cdc97d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?hK1vnhdumzS89xvWOdVwtWIxiEXZiAF0GkMEIeDegjPhnx5PN9KXuQRTr35p?=
- =?us-ascii?Q?pZP+PGPgzddlIIchw50Hzggndfa3fgEv3fYQRkGGGGzwuQmrVbi7hmImPn8l?=
- =?us-ascii?Q?6HpqIRJI1cJrhN1CTKc+yFUSHk/D6YXZDM1UKUuJ5IfLDsvSvGObxTGdmIpQ?=
- =?us-ascii?Q?suafE5AXjoTLbRg91O9dxObwEpfFWz68Hi/U3tQenfToREM5lU1truPPqiH/?=
- =?us-ascii?Q?DudaHNGi017a81wUMeH1NWSu3B1UEK75+48KAZFrNAuBb24/j6kmFYKlXY1T?=
- =?us-ascii?Q?kZT/rrxylnYzoHdcusicLUPf7riK9upgGU/RxdAjMuULm1LCdozPFsDdAfHM?=
- =?us-ascii?Q?cU6gMevsdBbRKgDu7FqjplFDN2WoodXjPVzyQUGpEcp91hdkdTZTemW6BMru?=
- =?us-ascii?Q?RpCnO70f96DVwl68iO4+L3cZWCGEiwsSVYcMwEssbcmiU/n/bGMwUDdOogfO?=
- =?us-ascii?Q?azZiF7YEqAWDegHnnmdFcrbin9YYIPRUNXOe4q/BtBdW0zYeCkn6bWUYEdYL?=
- =?us-ascii?Q?9nIuBymrYhEaNvoRe9PsLdk4JlxPuSO8kDUURu5Wp4h8+ZCSff4yEz5GMsjt?=
- =?us-ascii?Q?ptL+RpzZQuIfWYMvEpXk4mqF7vYB3qCUDfytYHCrJbVKAmolR/2gG0zhW1u3?=
- =?us-ascii?Q?6vMxJlT1ukLjbk29I0jRxveqNSrNa/50Ppi5MdLgf6BrOhEna0mtigrGWYzg?=
- =?us-ascii?Q?KjiJj7jKoROzzBqNKXwyISRkDne/6L6/F9s0spXlasFLxA4WGKtSKVQJtlvE?=
- =?us-ascii?Q?YSicG47r4eFAf24pNB0TBVRCnBY3F5Ccn0xUPc+JTJS1kN17nNv9XJKnAFou?=
- =?us-ascii?Q?g/eln0lHalC/kGceGSCEYf0RLL5WkuNAq9wDbtyPSV/DTdMUA4/B02b/al2f?=
- =?us-ascii?Q?CxpFxrd9oPeJK6EYUVhcGtmdXyc3nTmOukVnYwsIpbXHbSgk07rIUhVDFsyb?=
- =?us-ascii?Q?iyytEx19ggYgpYvGErafiLRctrLPae38YRL6e98OHbX37Xh6GHpr8sGz605R?=
- =?us-ascii?Q?BDMedvUDWe+F4fAgFhGhpuaL/ZYC7eqb+MddxHqrBDgY6okeM2nyQyq7BAY8?=
- =?us-ascii?Q?AZXuIzGIp3Li1CALRA4qIAXFnTSMl7+dRvNNpc8rBibR9FEZWoMjghQTZ218?=
- =?us-ascii?Q?tDhqoTxe57cQOseO0fFDFfbWUMMLAfLe3Rt3LVNTwtkO0Pht43QyJY7srat+?=
- =?us-ascii?Q?3q88kAGNreWB1zWztQ+Rv7lLPnhGb1ZevRQsAem+SzlSDTc9QxQEoReHxt5M?=
- =?us-ascii?Q?4ZMBUJExek480oV/gFzXbws3EIn/ULXiwTrzbuIXHwX+SxBSaSp1E/GmMIOq?=
- =?us-ascii?Q?EN1VBUr277yzg712/FrlOlaAol9/jwHqOOTyhMsfLEJE4/USd8fQKtUiG2YE?=
- =?us-ascii?Q?Ihb2RJCnBoz5/pnmUG52x/fP2gIlP53F9SDAsIliFX6AzPjqCZLlTpPC2KXj?=
- =?us-ascii?Q?HDCtRhoWu3efvdMqWmVTWDyT4xmTKUpW8QkOVviZjMnUdW+4tgJfEKHKoZYb?=
- =?us-ascii?Q?Y5PqWJsrKzOgWNMZ7VUdAmd3MYKIAdT5x3xc?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 16:25:46.8267
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ceaa7b7c-3a78-4a51-16a4-08dda9cdc97d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD7.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6103
+Content-Transfer-Encoding: 8bit
 
+Time to add XDP helpers infra to libeth to greatly simplify adding
+XDP to idpf and iavf, as well as improve and extend XDP in ice and
+i40e. Any vendor is free to reuse helpers. If this happens, I'm fine
+with moving the folder of out intel/.
 
-Jakub Kicinski <kuba@kernel.org> writes:
+The helpers greatly simplify building xdp_buff, running a prog,
+handling the verdict, implement XDP_TX, .ndo_xdp_xmit, XDP buffer
+completion. Same applies to XSk (with XSk xmit instead of
+.ndo_xdp_xmit, plus stuff like XSk wakeup).
+They are entirely generic with no HW definitions or assumptions.
+HW-specific stuff like parsing Rx desc / filling Tx desc is passed
+from the driver as inline callbacks.
 
-> On Wed, 11 Jun 2025 17:30:15 +0200 Petr Machata wrote:
->> Could it actually have been caused by another test? The howto page
->> mentions that the CI is running the tests one at a time, so I don't
->> suppose that's a possibility.
->> 
->> I'll try to run a more fuller suite tomorrow and star at the code a bit
->> to see if I might be missing an error branch or something.
->
-> We also hit a crash in ipv6 fcnal.sh, too. Looks like this is either a
-> kmemleak false positive or possibly related to the rtnl changes in ipv6.
-> Either way I it's not related to you changes, sorry about that! :(
+For now, key assumptions that optimize performance / avoid code
+bloat, but might not fit every driver in driver/net/:
+ * netmem holding the buffers are always order-0;
+ * driver has separate XDP Tx queues, doesn't use stack queues for
+   that. For best efficiency, you may want to have nr_cpu_ids XDP
+   queues, but less (queue sharing) is also supported;
+ * XDP Tx queues are interrupt-less and use "lazy" cleaning only
+   when there are less than 1/4 free Tx descriptors of the queue
+   size;
+ * main target platforms are 64-bit, although 32-bit is also fully
+   supported, but the code might be not as optimized for them.
 
-No problem.
+Library code already supports multi-buffer for all kinds of Tx and
+both header split and no split for Rx and Tx. Frags can come from
+devmem/io_uring etc., direct `struct page *` is used only for header
+buffers for which it's always true.
+Drivers are free to pass their own Rx hints and XSK xmit hints ops.
 
-> [ 2900.792890] BUG: kernel NULL pointer dereference, address: 0000000000000108
-> [ 2900.792961] #PF: supervisor read access in kernel mode
-> [ 2900.793017] #PF: error_code(0x0000) - not-present page
-> [ 2900.793053] PGD 8fd6067 P4D 8fd6067 PUD 6402067 PMD 0 
-> [ 2900.793097] Oops: Oops: 0000 [#1] SMP NOPTI
-> [ 2900.793127] CPU: 0 UID: 0 PID: 15652 Comm: nettest Not tainted 6.15.0-virtme #1 PREEMPT(voluntary) 
-> [ 2900.793200] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> [ 2900.793245] RIP: 0010:ip6_pol_route+0x286/0x4a0
-> [ 2900.793290] Code: 0c 24 0f 85 fb 01 00 00 09 ca 0f 88 2f 01 00 00 e8 cf 11 43 ff 83 cb 08 48 8d 7c 24 18 e8 32 7b ff ff 0f b7 cb ba ff ff ff ff <4c> 8b 80 08 01 00 00 48 89 c6 49 89 c7 49 8d b8 80 06 00 00 4c 89
-> [ 2900.793422] RSP: 0018:ffffc08a0932f480 EFLAGS: 00010246
-> [ 2900.793460] RAX: 0000000000000000 RBX: 0000000000000008 RCX: 0000000000000008
-> [ 2900.793521] RDX: 00000000ffffffff RSI: ffffc08a0932f740 RDI: ffff9adac8c8f1a8
-> [ 2900.793580] RBP: ffff9adac87458c0 R08: 0000000000000000 R09: 0000000000000000
-> [ 2900.793635] R10: 0000000000000000 R11: 0000000000000040 R12: ffff9adac82e362c
-> [ 2900.793692] R13: ffff9adac82e3600 R14: 0000000000000080 R15: 0000000000000000
-> [ 2900.793752] FS:  00007f3418913740(0000) GS:ffff9adb7373a000(0000) knlGS:0000000000000000
-> [ 2900.793816] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 2900.793864] CR2: 0000000000000108 CR3: 0000000008007004 CR4: 0000000000772ef0
-> [ 2900.793920] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [ 2900.793977] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [ 2900.794031] PKRU: 55555554
-> [ 2900.794050] Call Trace:
-> [ 2900.794070]  <TASK>
-> [ 2900.794090]  ? __pfx_ip6_pol_route_output+0x10/0x10
-> [ 2900.794131]  fib6_rule_action+0xe3/0x310
-> [ 2900.794166]  fib_rules_lookup+0x1b2/0x2b0
-> [ 2900.794200]  ? __pfx_ip6_pol_route_output+0x10/0x10
-> [ 2900.794241]  fib6_rule_lookup+0xa9/0x270
-> [ 2900.794271]  ? __pfx_ip6_pol_route_output+0x10/0x10
-> [ 2900.794310]  ip6_route_output_flags+0xab/0x180
-> [ 2900.794353]  ip6_dst_lookup_tail.constprop.0+0x282/0x340
-> [ 2900.794394]  ip6_dst_lookup_flow+0x46/0xc0
-> [ 2900.794422]  vrf_xmit+0x100/0x4a0
-> [ 2900.794459]  dev_hard_start_xmit+0x8d/0x1c0
->
-> https://netdev-3.bots.linux.dev/vmksft-net/results/160541/vm-crash-thr0-0
+XDP_TX and ndo_xdp_xmit use onstack bulk for the frames to be sent
+and send them by batches of 16 buffers. This eats ~280 bytes on the
+stack, but gives good boosts and allow to greatly optimize the main
+sending function leaving it without any error/exception paths.
 
-Didn't see this issue either FWIW.
+XSk xmit fills Tx descriptors in the loop unrolled by 8. This was
+proven to improve perf on ice and i40e. XDP_TX and ndo_xdp_xmit
+doesn't use unrolling as I wasn't able to get any improvements in
+those scenenarios from this, while +1 Kb for their sending functions
+for nothing doesn't sound reasonable.
+
+XSk wakeup, instead of traditionally used "SW interrupts" provided
+by NICs, uses IPI to schedule NAPI on the CPU corresponding to the
+given queue pair. It gives better control over CPU distribution and
+in general performs way better than "SW interrupts", plus allows us
+to not pass any HW-specific callbacks there.
+
+The code is built the way that all callbacks passed from drivers
+get inlined; in general, most of hotpath gets inlined. Everything
+slow/exception lands to .c files in the libeth folder, doesn't
+create copies in the drivers themselves and doesn't overloat
+hotpath.
+Sure, inlining means that hotpath will be compiled into every driver
+that uses the lib, but the core code is written in one place, so no
+copying of bugs happens. Fixed once -- works everywhere.
+
+The last commit might look like sorta hack, but it gives really good
+boosts and decreases object code size, plus there are checks that
+all those wider accesses are fully safe, so I don't feel anything
+bad about it.
+
+An example of using libeth_xdp can be found either on my GitHub or
+on the mailing lists here ("XDP for idpf"). Macros for building
+driver XDP functions lead to that some implementations (XDP_TX,
+ndo_xdp_xmit etc.) consist of really only a few lines.
+
+Alexander Lobakin (17):
+  libeth, libie: clean symbol exports up a little
+  libeth: convert to netmem
+  libeth: support native XDP and register memory model
+  libeth: xdp: add XDP_TX buffers sending
+  libeth: xdp: add .ndo_xdp_xmit() helpers
+  libeth: xdp: add XDPSQE completion helpers
+  libeth: xdp: add XDPSQ locking helpers
+  libeth: xdp: add XDPSQ cleanup timers
+  libeth: xdp: add helpers for preparing/processing &libeth_xdp_buff
+  libeth: xdp: add XDP prog run and verdict result handling
+  libeth: xdp: add templates for building driver-side callbacks
+  libeth: xdp: add RSS hash hint and XDP features setup helpers
+  libeth: xsk: add XSk XDP_TX sending helpers
+  libeth: xsk: add XSk xmit functions
+  libeth: xsk: add XSk Rx processing support
+  libeth: xsk: add XSkFQ refill and XSk wakeup helpers
+  libeth: xdp, xsk: access adjacent u32s as u64 where applicable
+
+ drivers/net/ethernet/intel/libeth/Kconfig     |   10 +-
+ drivers/net/ethernet/intel/libeth/Makefile    |    8 +-
+ include/net/libeth/types.h                    |  106 +-
+ drivers/net/ethernet/intel/libeth/priv.h      |   37 +
+ include/net/libeth/rx.h                       |   28 +-
+ include/net/libeth/tx.h                       |   36 +-
+ include/net/libeth/xdp.h                      | 1879 +++++++++++++++++
+ include/net/libeth/xsk.h                      |  685 ++++++
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   14 +-
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |    2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |   36 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   42 +-
+ drivers/net/ethernet/intel/libeth/tx.c        |   41 +
+ drivers/net/ethernet/intel/libeth/xdp.c       |  451 ++++
+ drivers/net/ethernet/intel/libeth/xsk.c       |  271 +++
+ drivers/net/ethernet/intel/libie/rx.c         |    7 +-
+ 16 files changed, 3596 insertions(+), 57 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libeth/priv.h
+ create mode 100644 include/net/libeth/xdp.h
+ create mode 100644 include/net/libeth/xsk.h
+ create mode 100644 drivers/net/ethernet/intel/libeth/tx.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xdp.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xsk.c
+
+---
+Was a part of "XDP for idpf" series, now submitted separately with
+proper splitting into atomic commits. I hope 17 patches out of 15
+maximum allowed is not a problem.
+
+All checkpatch warnings are false-positives unless someone disagrees.
+Checked with `--strict --codespell`, a well as building with W=12
+and sparse/smatch.
+W=12 is clean, sparse only warns about "context imbalance", but it's
+intended that libeth_xdp_tx_init_bulk() takes rcu_read_lock() and
+libeth_xdp_rx_finalize() does rcu_read_unlock(). This is how Eth
+drivers with enabled XDP do: lock before the NAPI polling loop,
+unlock after the loop is done and the pending XDP_TX and
+XDP_REDIRECT frames/maps are flushed (both functions are always
+required to be called when using libeth_xdp helpers on Rx).
+
+From v1[0]:
+* move EXPORT_SYMBOL*() stuff to a separate (1st) commit;
+* annotate a couple big objects on the stack with `__uninitialized` to
+  mitigate performance loss with `CONFIG_INIT_STACK_ALL_*` (Kees);
+* 0001: idpf: drop invalid packets if header split workaround failed (Jakub);
+* 0003: don't support XDP + netmem for now until the core is ready for
+  this (Jakub);
+* 0009: use new __DEFINE_FLEX() after the changes from the hardening PR
+  (Kees).
+
+[0] https://lore.kernel.org/netdev/20250520205920.2134829-1-anthony.l.nguyen@intel.com
+-- 
+2.49.0
+
 
