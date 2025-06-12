@@ -1,191 +1,133 @@
-Return-Path: <netdev+bounces-196974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE9CCAD736D
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:17:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FADBAD735E
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 16:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7835B3A293F
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:12:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B99C162234
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E94721CC71;
-	Thu, 12 Jun 2025 14:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D38E22157F;
+	Thu, 12 Jun 2025 14:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZIdZbGxT"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="r08Pb8at"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5D32F4317
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 14:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EC718952C
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 14:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749737540; cv=none; b=dIAc0Hq1cIgJJ7JWy6Bw3tuvG14n0/PRXcmUL2qfw2QSizsABCbMTzr83N+kBoETXjT62e2lSyjMOFAmim/blvk+QHL6IFaX1EcV0UH1qxNEY1HcWlIWhRYAI0BKXwN3XWS/n4r/YGeAQbXfrQFiUtX3HYxaWifdl5an/cNE9IE=
+	t=1749737575; cv=none; b=Jz4G2ArhujCTf/soxvKbJTdcgNlzrh2YxugO7VK0oQyksxLupjkPqOOXL6HtSCGGl+a93OF87MCaoNV6tsFgySoh7my9kGgA64VHLJCddRm1eqm6fmylS02J4XmudrYal05/DRQ8zTUCaGFHcTe0Kkclca994ATsqhsfFCyK1Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749737540; c=relaxed/simple;
-	bh=k99wzjTvOf1U2zjNLqiW+o6SFcXv0jJXg3wT8lOY8v0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t4bApHkdG9N7lPldSlpmVgQK9Dns5MqMt0uZtrUfcpsFumZkNnZD19h+FHDF3wA9xozSYTxK9fuD6FkeE9Bllb0C9bgpWykNrr3o+BJ9m+nKnvumObQsVLtWurWPPhISUq00Gwr5LQwjIjoxTyPh7bmS7C0zyld3i6A+n8ovKeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZIdZbGxT; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-873501d2ca1so38701939f.2
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 07:12:18 -0700 (PDT)
+	s=arc-20240116; t=1749737575; c=relaxed/simple;
+	bh=LZbMld6BzHGILlIgf66HaC3NP9UK6TgOAVrYfhtRoh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vk3rgA8D5Io5M2HisVRKviDUSF+n/MDPxRKgbBz0kQ3zUxPEADxMv4/GIr6oT0H2TF1JO8cirdSip12uRQh3OOBC5WN+h0cxKbFplsPmZBU+cRl/KVGmYdHacChPvD2yExxwGaTfvbZqBB1tiZvpfBMYvFWda3NETPBnexCLuuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=r08Pb8at; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a4f72cba73so1574704f8f.1
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 07:12:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1749737538; x=1750342338; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V/cfkLw0d9+EIJ8STYopKR//ovMAHjH6I1Jg7cL9sLk=;
-        b=ZIdZbGxTsrulyr6uw+yrVg4oIuMsF3QZkV1R+J4GmrfWiFnQOi9n4zs35qDk3LM8lb
-         /Yih7lCcvjtXDMdGmxp6LdQVwl3K7EHmXOO+hv4rZtm5/9Sblx65zfjAG6LA0Crte4V7
-         uPw58FsdkOdx7mxUqaZOimZtvu9CvMwIJDjoREv9aZU3q+/OtFKc2UnVp39WqMboFZW7
-         K5qw3b0GnIoluRMVYDr16iSh/BLpuQuc/apA+wSH8uI2NmHo359rVFCcgVry/ZuV0fae
-         tMbhCsA56pHDPX9kV5j9djd9wediY4xv3BVxwVfCLH6gyjeLYhA6HSY21DCSeDr24Qbz
-         GMnw==
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749737572; x=1750342372; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5+m7vYBsU85tLjESg73MFdmLBCg20+wdtbP1Z8Mu9gw=;
+        b=r08Pb8at6TMubRhspo20s87DkBBMJqfSpJQ7KF8oaYst2wmc//XZzWWbc+cq9AUPC1
+         7XczUL9FMl+XytepYgwSJWBlZ6Kxzmsf+gYLXldQJX54BmULpuzTcdXBlgoH0JXwpKzy
+         MXtPYg+x1aG2l+G6wkQpvboIMRK+pvP5prusYp+XiLhEsVKeljFIgnTUdlB2E+pzwAh7
+         WnMl8VGtJP31K518n6Pxo2DxVxZPFvGZHFeD2JHY+3sU9ptVNDxDOF+5+Gg1vO+3Ei3A
+         uWrWuthUdOEqAvKx8iEciBbaCfxN2H/YNlZ2pR21csKDxJTgwXMGHkvs1NdIzrMwUddk
+         Z9eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749737538; x=1750342338;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1749737572; x=1750342372;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V/cfkLw0d9+EIJ8STYopKR//ovMAHjH6I1Jg7cL9sLk=;
-        b=DUYW7Mj8oamN+6kkirZ3+T1V9loMo4pjXNsuvhkeTQLgZC1ihSVFjz46Z+Pctka2TN
-         0Am4DVHvg+BXvrawVIFrlwPdRLnxXx7WbGl/CzCwp5nEUk+aizzu5aiBYN7xQbWIgJsP
-         fyuDek+PDYiaNw1QrwVeNxLKNMOJajsw7TPcesiCFobjwkttGDOq4JjqUdxwxy6GuHY5
-         Eex+GWwAyknTwV8fWBy4AA4yVQyOzmHK3jqZBI93Yac4kgtAODLMrsn2KGOhA8O/uJyy
-         tdapEItN/oBsoZgzW3YI2m2BSVnYJ3FZCL9yuPickK52NWjJxUBStFW+HOTENm/Gb9OW
-         3bww==
-X-Gm-Message-State: AOJu0Yx9cGV89n0KztpMEQOK+tBVm577bB4L76NWGEw+FH1ct20gf1lJ
-	TfafbvjJ1EVXWX0ujvc9XQN8eH4TSbn/QTloe92+FDJo3/7vAhdIOYniZzZlMbMzKJY=
-X-Gm-Gg: ASbGnctv3ZjGfzmppOzgE3h+/7tZcIsLuF4OdnqTrc2HNUpsKll0GbUeFvqPEPQY0qw
-	v/r4aXYO6BT+fmPnSQNnk4lQ6tVBHJeVQakpvJ6nGh1VLSD5YIbJw6EqeoAnB62a0X89JK74yZH
-	a95fLdwyXXWbq2HgxPPa4rkUJbJaHOKtKd7JmAaI465YyngulYKZGA5GHyi72gdPk8i6Tt5IZf0
-	/wRU8Gin3Dyk3p7uC3wCLjJG+BnzGfpMgHGWsKZKchvRDjFtKFlBvM/bpp9H/e4qMsy/eK3M65d
-	USHXnTe+ojGrnrcIfIuTqCLnbbf9yYzVvCIIW5PJLyUTqilIgdQXSOSXNnk=
-X-Google-Smtp-Source: AGHT+IGdUHa79HsCkHsowI3Wp6lXuo1RbogPsjoxKOPYbSIjiIiaA+n6psfcYhhUtobBCIIV1nFifw==
-X-Received: by 2002:a05:6602:4c02:b0:867:237f:381e with SMTP id ca18e2360f4ac-875c7ca9754mr318124239f.2.1749737537708;
-        Thu, 12 Jun 2025 07:12:17 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5013b89f623sm300172173.88.2025.06.12.07.12.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 07:12:17 -0700 (PDT)
-Message-ID: <2106a3b7-8536-47af-8c55-b95d30cc8739@kernel.dk>
-Date: Thu, 12 Jun 2025 08:12:16 -0600
+        bh=5+m7vYBsU85tLjESg73MFdmLBCg20+wdtbP1Z8Mu9gw=;
+        b=qHIw9B3GwHfWlXiIJLFZ8YoKS3fgFuYcqY9ok7k8YxYF4cDVpabyV3Uc+sjizwVtzT
+         edbSIghbgG6PQMlEmdxSpKvfexhSpwOkyXctslya+R4icQohwHh3xf/aAUFHoH0YaiJm
+         nOIwxPDTFtlfEJ2rCfOBPfhsED8VY+YnkeStlfl5WJj5gl84hPwBgDyRe+BmanIbZGSw
+         uUJYeT3Q+26y8Dqyu9vQ5XjCGZ9RFNceSSdx911dB2S3lGORs1WQLbLSrZdKYSBqhFXF
+         KCEkgyFc346Xif9ZwsfAafF3aJUkD15+je9ncQHS5ZErMEccEnh3DbECF1xVVfsy7sUg
+         +1TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVDFQ5N/gfFGT+oHe40e8UAtNEeCSpQGrzliCzDxS6zffA5gTdnC+d/mGhCBhgG4Xwy+qS2iM0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/1XIcaug7Q9C2ZNfU0OCtk7bCrkbeEBeK3ZfB/1KsQ8tgyKa3
+	oqGbBLaGn5sATHBeb+PkYIuraPF2Qu0bqVLjgozNFkigj1lLcgUysfraNLRIx0RlXRz7Owo9cyg
+	Qk9H+gaQ=
+X-Gm-Gg: ASbGncv2btBmlfrmlYK5h6yVkJuUz3X6c86drDdOcBbjeYB+hFB6MKQKk3iZPFIZgs7
+	lD6VgCscQrDgsEiAj3xPmf0gEU9VL62pAZboOb+zsa3rSNb0pcWmnyBqQ28LTzpDxsxCxx0diLo
+	27BeNRZrgTyfbWcNlrqGW9GqyHEu9C+BW9noqCa0cXEQujdXjKRAK6/5NpKqsb957PmWMha3raB
+	qyntJanzIiQyVnj9nPlOG4VHZ86kalj2va4+2KA3ogJszlUCemr9M2MWkx4BZKjX1Tot8PPZuR3
+	vyeVDB3oYevwGOs+8mswrzaCr7A8mLLu91NsmlIPW5KHPq4y/peMy8yt9n3kwVr13N8=
+X-Google-Smtp-Source: AGHT+IE6AmCf5V9oHfWOt9dYuSHqj1qzlXCkWSsFnnG7NUfV5Z5SKBuMKwud/rOH6HANsQ0sthmKhw==
+X-Received: by 2002:a05:6000:178d:b0:3a4:da0e:517a with SMTP id ffacd0b85a97d-3a5608135aemr3279107f8f.23.1749737571906;
+        Thu, 12 Jun 2025 07:12:51 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e2446b0sm21538585e9.21.2025.06.12.07.12.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 07:12:51 -0700 (PDT)
+Date: Thu, 12 Jun 2025 17:12:48 +0300
+From: Joe Damato <joe@dama.to>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next 1/2] netdevsim: migrate to dstats stats
+ collection
+Message-ID: <aErgYLGwLjoHxCLv@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-team@meta.com
+References: <20250611-netdevsim_stat-v1-0-c11b657d96bf@debian.org>
+ <20250611-netdevsim_stat-v1-1-c11b657d96bf@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] io_uring/netcmd: add tx timestamping cmd support
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Jason Xing <kerneljasonxing@gmail.com>
-References: <cover.1749657325.git.asml.silence@gmail.com>
- <1e9c0e393d6d207ba438da3ad5bf7e4125b28cb7.1749657325.git.asml.silence@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <1e9c0e393d6d207ba438da3ad5bf7e4125b28cb7.1749657325.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611-netdevsim_stat-v1-1-c11b657d96bf@debian.org>
 
-On 6/12/25 3:09 AM, Pavel Begunkov wrote:
-> Add a new socket command which returns tx time stamps to the user. It
-> provide an alternative to the existing error queue recvmsg interface.
-> The command works in a polled multishot mode, which means io_uring will
-> poll the socket and keep posting timestamps until the request is
-> cancelled or fails in any other way (e.g. with no space in the CQ). It
-> reuses the net infra and grabs timestamps from the socket's error queue.
+On Wed, Jun 11, 2025 at 08:06:19AM -0700, Breno Leitao wrote:
+> Replace custom statistics tracking with the kernel's dstats infrastructure
+> to simplify code and improve consistency with other network drivers.
 > 
-> The command requires IORING_SETUP_CQE32. All non-final CQEs (marked with
-> IORING_CQE_F_MORE) have cqe->res set to the tskey, and the upper 16 bits
-> of cqe->flags keep tstype (i.e. offset by IORING_CQE_BUFFER_SHIFT). The
-> timevalue is store in the upper part of the extended CQE. The final
-> completion won't have IORING_CQR_F_MORE and will have cqe->res storing
-                        ^^^^^^^^^^^^^^^^^
+> This change:
+> - Sets dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS for automatic
+>   automatic allocation and deallocation.
 
-Pointed this out before, but this typo is still there.
+Ignorable minor nits: "automatic" repeated twice in the list item above and the
+other items in the list below do not end with periods.
 
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index cfd17e382082..5c89e6f6d624 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -968,6 +968,15 @@ enum io_uring_socket_op {
->  	SOCKET_URING_OP_SIOCOUTQ,
->  	SOCKET_URING_OP_GETSOCKOPT,
->  	SOCKET_URING_OP_SETSOCKOPT,
-> +	SOCKET_URING_OP_TX_TIMESTAMP,
-> +};
-> +
-> +#define IORING_CQE_F_TIMESTAMP_HW	((__u32)1 << IORING_CQE_BUFFER_SHIFT)
-> +#define IORING_TIMESTAMP_TSTYPE_SHIFT	(IORING_CQE_BUFFER_SHIFT + 1)
+> - Removes manual stats fields and their update
+> - Replaces custom nsim_get_stats64() with dev_get_stats()
+> - Uses dev_dstats_tx_add() and dev_dstats_tx_dropped() helpers
+> - Eliminates the need for manual synchronization primitives
+> 
+> The dstats framework provides the same functionality with less code.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  drivers/net/netdevsim/netdev.c    | 33 ++++++---------------------------
+>  drivers/net/netdevsim/netdevsim.h |  5 -----
+>  2 files changed, 6 insertions(+), 32 deletions(-)
 
-Don't completely follow this, would at the very least need a comment.
-Whether it's a HW or SW timestamp is flagged in the upper 16 bits, just
-like a provided buffer ID. But since we don't use buffer IDs here, then
-it's up for grabs. Do we have other commands that use the upper flags
-space for command private flags?
 
-The above makes sense, but then what is IORING_TIMESTAMP_TSTYPE_SHIFT?
-
-> diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-> index e99170c7d41a..bc2d33ea2db3 100644
-> --- a/io_uring/cmd_net.c
-> +++ b/io_uring/cmd_net.c
-> @@ -1,5 +1,6 @@
->  #include <asm/ioctls.h>
->  #include <linux/io_uring/net.h>
-> +#include <linux/errqueue.h>
->  #include <net/sock.h>
->  
->  #include "uring_cmd.h"
-> @@ -51,6 +52,85 @@ static inline int io_uring_cmd_setsockopt(struct socket *sock,
->  				  optlen);
->  }
->  
-> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, struct sock *sk,
-> +				     struct sk_buff *skb, unsigned issue_flags)
-> +{
-> +	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
-> +	struct io_uring_cqe cqe[2];
-> +	struct io_timespec *iots;
-> +	struct timespec64 ts;
-> +	u32 tstype, tskey;
-> +	int ret;
-> +
-> +	BUILD_BUG_ON(sizeof(struct io_uring_cqe) != sizeof(struct io_timespec));
-> +
-> +	ret = skb_get_tx_timestamp(skb, sk, &ts);
-> +	if (ret < 0)
-> +		return false;
-> +
-> +	tskey = serr->ee.ee_data;
-> +	tstype = serr->ee.ee_info;
-> +
-> +	cqe->user_data = 0;
-> +	cqe->res = tskey;
-> +	cqe->flags = IORING_CQE_F_MORE;
-> +	cqe->flags |= tstype << IORING_TIMESTAMP_TSTYPE_SHIFT;
-> +	if (ret == NET_TIMESTAMP_ORIGIN_HW)
-> +		cqe->flags |= IORING_CQE_F_TIMESTAMP_HW;
-> +
-> +	iots = (struct io_timespec *)&cqe[1];
-> +	iots->tv_sec = ts.tv_sec;
-> +	iots->tv_nsec = ts.tv_nsec;
-> +	return io_uring_cmd_post_mshot_cqe32(cmd, issue_flags, cqe);
-> +}
-
-Might help if you just commented here too on the use of the
-TSTYPE_SHIFT.
-
--- 
-Jens Axboe
+Reviewed-by: Joe Damato <joe@dama.to>
 
