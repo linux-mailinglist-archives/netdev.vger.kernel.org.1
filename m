@@ -1,105 +1,221 @@
-Return-Path: <netdev+bounces-197130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD0D7AD79CA
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:29:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A47AAD7A23
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 20:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D41CF1893171
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4AD53AE654
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 18:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F6B2C325B;
-	Thu, 12 Jun 2025 18:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270C82D29DF;
+	Thu, 12 Jun 2025 18:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oShTmNPj"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="XzC/xsR7"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E15298CC7
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 18:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749752954; cv=none; b=upE9NczmLXTe8QvLIt2mawH51SAn/vxt3503VJSAcFkMHjHG0V15HGeP5SeXYxHOUTglssSXC0qPEJb5M+zZPAUsAn9QOK1C07ylMzgsi6KXkBIQywPmMJdUPYv+ZrvManz4vTJCtjH5l+4uRzI3Gv67bH+DOD6MOzLmchaO8CY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749752954; c=relaxed/simple;
-	bh=eHTuafaULvmIAe8SUoaFrFys5FVTmltrs6snx4C2yEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QoKWt8y7dYmGfcbXu7fwlXcH6W9ybkpaYaoJDkxxdU0CkZoT3HELysg4nLKkux8AsLaQyRn9MllTGJIzCGesM3rJxM+YqPDgiAX55Z0qPH/wecNOZgsaYTKrKkECJfxmPkVFouCN10ht3HsH/nk862PmjKAB6CQSflXvR/+2OYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oShTmNPj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jX0HjYsYo0Ch4qF951psrJIyp7cyzT8WoiqYSUYftLk=; b=oShTmNPj9V+1TJXwhYSuvRhpiY
-	cUXSCZMC8g8wskBS5K184Jjc16cMgsDzPajEnokLgjFCTGktAJmsN8B5uA5xll61qRUpW1bQ0CKax
-	jskooNjMNvaYhbL7J9qUapsoKnImulzBadmP0Dak3/22zsBCQYpFUanymw2Iyl3Ko7ms=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uPmfj-00FZyi-BR; Thu, 12 Jun 2025 20:29:07 +0200
-Date: Thu, 12 Jun 2025 20:29:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, hkallweit1@gmail.com, davem@davemloft.net,
-	pabeni@redhat.com, kuba@kernel.org, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [net-next PATCH 0/6] Add support for 25G, 50G, and 100G to fbnic
-Message-ID: <52be06d0-ad45-4e8c-9893-628ba8cebccb@lunn.ch>
-References: <174956639588.2686723.10994827055234129182.stgit@ahduyck-xeon-server.home.arpa>
- <20250612094234.GA436744@unreal>
- <daa8bb61-5b6c-49ab-8961-dc17ef2829bf@lunn.ch>
- <20250612173145.GB436744@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB893231848;
+	Thu, 12 Jun 2025 18:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749754666; cv=pass; b=saZF6HIrIwGFdnQXinIFCqkjJfWhukNwedONaTWMMhrABi5UrESNwIaxO0C9w322qdZaCIIEFTHMV456SdNiS3ri2M1M5E8ZCw/56jmkkb7u70sUNA5+o096Tcdgqbohblq/ARzIaYPVWFP6BLYVHzayfvOeiUkqVAd9twPimgY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749754666; c=relaxed/simple;
+	bh=b+dKmim5PkqdFHEDm8rDTlvaShKECyBfh9QBB4KITWs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=R7kpC8KLv0zUlC88q6FAbCR/QdN/UqxAHr4WJaQM6/HW3m1njSa6kCF1wfsdnOBHW5JVhJFfcz8Wy5+9t3mPSeAOOQzwEbrn7j4kZIcdS0O3j5JtzHJ8Z1kNOLb4xEl+4SOEamE6FLKmRhLxZqWD0aN/kbinlAUBiN/wjHa/s6s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=XzC/xsR7; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1749754584; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=EdJZfDxsprpXvjM+Msqvvl1RDspq+yjB9A4hg93KgWxptseH4FFSNtHttZfa1cgcz5kNlnLzyywmUD+Sgl2hH44HzK9gHBFlBm3asaHSydn4R+Ch3wwpnnc5tLDvWAbqFHjpoG6BnF/OF7/tky45/4LIwJ1NPCssaAeZnc/+bso=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1749754584; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=iOnbYnaE1YbBtaVTatR6PeV03EiI8qVZV78p6KFGMJk=; 
+	b=dD1ImpFvj4DitiIHZ6VirMaIkNElMH+Liqr6H3WikImv1JXhL5B3J/Lf2jb+3E+5ZtpDXMRQg79yx/njiAOLmn+Kqi9x3tNjTdD7M5LFSIp7SeTNfE+TwFYH6pXsMcF9LUmzDgrZP2QO4yG+zvllSyeXFPLnG5FrnaHuFvt7iac=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
+	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749754584;
+	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
+	h=From:From:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Type:Content-Transfer-Encoding:To:To:Cc:Cc:Reply-To;
+	bh=iOnbYnaE1YbBtaVTatR6PeV03EiI8qVZV78p6KFGMJk=;
+	b=XzC/xsR7Xr/DpJiXhQHzQo5ryxr5+gW5+MLUrocYGyhR0dLCFAp/BzFD1hLwpIkl
+	hvQMX1pm8vJpdtfxstY7gf9C0XQ5PLueP//xoPjWNN7aSX8Xfl2rdWZoa7VO7MmoC05
+	MSWjuK5+KIi3CAPTZlg7KtbtVH3YNmUUq3yBXeCM=
+Received: by mx.zohomail.com with SMTPS id 17497545829051009.0539110789078;
+	Thu, 12 Jun 2025 11:56:22 -0700 (PDT)
+From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: [PATCH 00/20] BYEWORD_UPDATE: unifying (most) HIWORD_UPDATE macros
+Date: Thu, 12 Jun 2025 20:56:02 +0200
+Message-Id: <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250612173145.GB436744@unreal>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMIiS2gC/yXMQQ6DIBCF4auQWXcaMIqJV2lcIEzbWSh2QFtjv
+ LukLr+XvH+HRMKUoFM7CK2cOE4F5qbAv930IuRQDJWuGm2NxmGjb5SAyxxcJqzrxmsi17YmQDn
+ NQk/+/YOP/rLQZyndfI0wuETo4zhy7tRq78aieAP9cZw6r1InjQAAAA==
+X-Change-ID: 20250610-byeword-update-445c0eea771d
+To: Yury Norov <yury.norov@gmail.com>, 
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+ Jaehoon Chung <jh80.chung@samsung.com>, 
+ Ulf Hansson <ulf.hansson@linaro.org>, Heiko Stuebner <heiko@sntech.de>, 
+ Shreeya Patel <shreeya.patel@collabora.com>, 
+ Mauro Carvalho Chehab <mchehab@kernel.org>, 
+ Sandy Huang <hjc@rock-chips.com>, Andy Yan <andy.yan@rock-chips.com>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+ Nicolas Frattaroli <frattaroli.nicolas@gmail.com>, 
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Shawn Lin <shawn.lin@rock-chips.com>, 
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>, 
+ MyungJoo Ham <myungjoo.ham@samsung.com>, 
+ Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: kernel@collabora.com, linux-kernel@vger.kernel.org, 
+ linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org, 
+ linux-sound@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org, 
+ linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev, 
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+X-Mailer: b4 0.14.2
 
-> > > when the fbnic was proposed for merge, the overall agreement was that
-> > > this driver is ok as long as no-core changes will be required for this
-> > > driver to work and now, year later, such changes are proposed here.
-> > 
-> > I would say these are natural extensions to support additional speeds
-> > in the 'core'. We always said fbnic would be pushing the edges of the
-> > linux core support for SFP, because all other vendors in this space
-> > reinvent the wheel and hide it away in firmware. fbnic is different
-> > and Linux is actually driving the hardware.
+This series was spawned by [1], where I was asked to move every instance
+of HIWORD_UPDATE et al that I could find to a common macro in the same
+series that I am introducing said common macro.
 
-> How exactly they can hide speed declarations in the FW and still support it?
- 
-You obviously did not spend time to look at the code and understand
-what it is doing. This is used to map the EEPROM contents of the SFP
-to how the PCS etc should be configured. So far, this has only been
-used for speeds up to 10Gbps. This code is mostly used by SoCs, and at
-the moment most SoCs inbuilt interfaces top out at 10G. fbnic is
-pushing this core code to higher speeds.
+The first patch of the series introduces the two new macros in
+bitfield.h, called HWORD_UPDATE and HWORD_UPDATE_CONST. The latter can
+be used in initializers.
 
-You can easily hide speed declarations in firmware and still support
-it because we are not talking about the ethtool API here. This is a
-lower level. A FW driven device will have its own code for parsing the
-SFP EEPROM and configuring the PCS etc, without needing anything from
-Linux.
+This macro definition checks that the mask fits, and that the value fits
+in the mask. Like FIELD_PREP, it also shifts the value up to the mask,
+so turning off a bit does not require using the mask as a value. Masks
+are also required to be contiguous, like with FIELD_PREP.
 
-> In addition, it is unclear what the last sentence means. FBNIC has FW like
-> any other device.
+For each definition of such a macro, the driver(s) that used it were
+evaluated for three different treatments:
+ - full conversion to the new macro, for cases where replacing the
+   implementation of the old macro wouldn't have worked, or where the
+   conversion was trivial. These are the most complex patches in this
+   series, as they sometimes have to pull apart definitions of masks
+   and values due to the new semantics, which require a contiguous
+   mask and shift the value for us.
+ - replacing the implementation of the old macro with an instance of the
+   new macro, done where I felt it made the patch much easier to review
+   because I didn't want to drop a big diff on people.
+ - skipping conversion entirely, usually because the mask is
+   non-constant and it's not trivial to make it constant. Sometimes an
+   added complication is that said non-constant mask is either used in a
+   path where runtime overhead may not be desirable, or in an
+   initializer.
 
-From what i have seen, it has a small amount of firmware. However,
-Linux is actually controlling most of the hardware. The PCS is
-controlled by linux, the SFP will be controlled by linux, the GPIOs
-and I2C bus for the SFP will be controlled by Linux, all very typical
-for SoC class devices, but untypical for data centre class devices. It
-is also not the only one, the wangxun txgbe is doing something
-similar, but at slower speeds. There is potential here for cross
-pollination between these two devices/drivers.
+Left out of conversion:
+ - drivers/mmc/host/sdhci-of-arasan.c: mask is non-constant.
+ - drivers/phy/rockchip/phy-rockchip-inno-csidphy.c: mask is
+   non-constant likely by way of runtime pointer dereferencing, even if
+   struct and members are made const.
+ - drivers/clk/rockchip/clk.h: way too many clock drivers use non-const
+   masks in the context of an initializer.
 
-	Andrew
+I will not be addressing these 3 remaining users in this series, as
+implementing a runtime checked version on top of this and verifying that
+it doesn't cause undue overhead just for 3 stragglers is a bit outside
+the scope of wanting to get my RK3576 PWM series unblocked. Please have
+mercy.
+
+In total, I count 19 different occurrences of such a macro fixed out of
+22 I found. The vast majority of these patches have either undergone
+static testing to ensure the values end up the same during development,
+or have been verified to not break the device the driver is for at
+runtime. Only a handful are just compile-tested, and the individual
+patches remark which ones those are.
+
+This took a lot of manual work as this wasn't really something that
+could be automated: code had to be refactored to ensure masks were
+contiguous, made sense to how the hardware actually works and to human
+readers, were constant, and that the code uses unshifted values.
+
+https://lore.kernel.org/all/aD8hB-qJ4Qm6IFuS@yury/ [1]
+
+Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+---
+Nicolas Frattaroli (20):
+      bitfield: introduce HWORD_UPDATE bitfield macros
+      mmc: dw_mmc-rockchip: switch to HWORD_UPDATE macro
+      soc: rockchip: grf: switch to HWORD_UPDATE_CONST macro
+      media: synopsys: hdmirx: replace macros with bitfield variants
+      drm/rockchip: lvds: switch to HWORD_UPDATE macro
+      phy: rockchip-emmc: switch to HWORD_UPDATE macro
+      drm/rockchip: dsi: switch to HWORD_UPDATE* macros
+      drm/rockchip: vop2: switch to HWORD_UPDATE macro
+      phy: rockchip-samsung-dcphy: switch to HWORD_UPDATE macro
+      drm/rockchip: dw_hdmi_qp: switch to HWORD_UPDATE macro
+      drm/rockchip: inno-hdmi: switch to HWORD_UPDATE macro
+      phy: rockchip-usb: switch to HWORD_UPDATE macro
+      drm/rockchip: dw_hdmi: switch to HWORD_UPDATE* macros
+      ASoC: rockchip: i2s-tdm: switch to HWORD_UPDATE_CONST macro
+      net: stmmac: dwmac-rk: switch to HWORD_UPDATE macro
+      PCI: rockchip: switch to HWORD_UPDATE* macros
+      PCI: dw-rockchip: switch to HWORD_UPDATE macro
+      PM / devfreq: rockchip-dfi: switch to HWORD_UPDATE macro
+      clk: sp7021: switch to HWORD_UPDATE macro
+      phy: rockchip-pcie: switch to HWORD_UPDATE macro
+
+ drivers/clk/clk-sp7021.c                           |  21 +--
+ drivers/devfreq/event/rockchip-dfi.c               |  26 ++--
+ drivers/gpu/drm/rockchip/dw-mipi-dsi-rockchip.c    | 142 ++++++++++-----------
+ drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c        |  80 ++++++------
+ drivers/gpu/drm/rockchip/dw_hdmi_qp-rockchip.c     |  68 +++++-----
+ drivers/gpu/drm/rockchip/inno_hdmi.c               |  11 +-
+ drivers/gpu/drm/rockchip/rockchip_drm_vop2.h       |   1 -
+ drivers/gpu/drm/rockchip/rockchip_lvds.h           |  21 +--
+ drivers/gpu/drm/rockchip/rockchip_vop2_reg.c       |  14 +-
+ .../media/platform/synopsys/hdmirx/snps_hdmirx.h   |   5 +-
+ drivers/mmc/host/dw_mmc-rockchip.c                 |   7 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     |   3 +-
+ drivers/pci/controller/dwc/pcie-dw-rockchip.c      |  39 +++---
+ drivers/pci/controller/pcie-rockchip.h             |  35 ++---
+ drivers/phy/rockchip/phy-rockchip-emmc.c           |   3 +-
+ drivers/phy/rockchip/phy-rockchip-pcie.c           |  72 +++--------
+ drivers/phy/rockchip/phy-rockchip-samsung-dcphy.c  |  10 +-
+ drivers/phy/rockchip/phy-rockchip-usb.c            |  51 +++-----
+ drivers/soc/rockchip/grf.c                         |  35 +++--
+ include/linux/bitfield.h                           |  47 +++++++
+ sound/soc/rockchip/rockchip_i2s_tdm.h              |   4 +-
+ 21 files changed, 342 insertions(+), 353 deletions(-)
+---
+base-commit: d9946fe286439c2aeaa7953b8c316efe5b83d515
+change-id: 20250610-byeword-update-445c0eea771d
+
+Best regards,
+-- 
+Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+
 
