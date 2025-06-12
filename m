@@ -1,170 +1,118 @@
-Return-Path: <netdev+bounces-196934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA70AD6FCC
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:12:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5216CAD6FE1
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 14:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DD3F17842C
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:12:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F766175D35
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4051521FF5B;
-	Thu, 12 Jun 2025 12:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93642367BC;
+	Thu, 12 Jun 2025 12:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZSBTD3T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LCnIB3NV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DFB2F432A
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 12:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44FDB227586
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 12:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749730317; cv=none; b=HMGhXAirwcwmcSw/6x4oVBgRKYy7JnOYFkVo0Wd8y5z/p228uiVWWlb4kaOpQ6h8uOujlJdvhw1RTmKbWmMjsOLl+qQHEK5Q6DFgs7+mDLAHtvlzXCBknUetJP84Xd6S8DWwWzaAeTSDxCNbpufe6mvQtBjiKztSD9+IHPZCZkM=
+	t=1749730404; cv=none; b=OFqYmiP01kY+cMEkUGDQJIDVjSh408WnXZ58ZYmKwN2wEa6p+yiycNqwC7R0GhU951KzTpuFl5w4JlAb1MOEj4AgD52IYWo+RckpZESFAngrcMYZwbNEipHPunt230JlidiQ2f7VgMb7OlktIC5HNO5Bdd8wMiE+WWNVVFbI5SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749730317; c=relaxed/simple;
-	bh=gy3ia7wHU+HGjiZJQrqlaD0GroCZVIID2YLPJxbPm7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fFs+hVIp/qk7Yvxwwg3DQC+1FSEu5cRbzI9/sQmKS/S9GPOqbmzQGxTC8xjjYnE3U+VYVMZQDZ75hQ4A2g2zejxpI2dtp7QNNdys7DORNjhy5mYJI5dk+RPDVK+h0Fr0NQuAygw9eAAoN+IC9vc4cLCvbJ27v7VG8LCmySpLFk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RZSBTD3T; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ade48b24c97so125322566b.2
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 05:11:55 -0700 (PDT)
+	s=arc-20240116; t=1749730404; c=relaxed/simple;
+	bh=3l4uyktLM7pniNhGKBmODjbwnTCHSWVkWZo3J/rPiKI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i8lYAzxdl8GsJP3IThAGqJdJmKEYluRhZqWWkqzINtN1+2Q8/L2aXb5+1Mq9PTG5fnGQSC8N4ibrEwJSqIK2tiLzy5u/JwA6eY+KjaZWWncJbTIrSd3VmmDEpt2Wf99VT591tBBWKD0AxOY0KiAAHi9w6AC5QHRjzUuxz3B6beA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LCnIB3NV; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a43d2d5569so12492841cf.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 05:13:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749730314; x=1750335114; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mPFgahJgaAGctrInOwx2SZrivmTOTen2pX9dBMq8Hd4=;
-        b=RZSBTD3TQntRUKz+XvkBlR1WjHj3Ey/iCxI+khF0yc2FWd4MKtSJ++5XeaJP7DcCfD
-         99kn4NV4x/zw4pNEwUPSBFR6j+BjEfU7eKy1MA+cKEI0fJTEB1gM2Z7+oKIN9K4h/0LW
-         PTOTnesbr40+2O21i/1rhFvt9t47SBEByQSODujICFfnT9iiB4mLyVOO2MZsl6vLVcYe
-         DJZQopt0lbVL2VwkGX9Yd/qygnZXeNzARNV3taH9p+1MFivRy5w4A3ZQZJuAAx/kG+CG
-         BdTI+/YetTNOV7f5v0iEa//5yWlhdzQsUBncyngEa4/9tQp+5ZPm1x2uETEbmAE7eK3b
-         PJnw==
+        d=google.com; s=20230601; t=1749730402; x=1750335202; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3l4uyktLM7pniNhGKBmODjbwnTCHSWVkWZo3J/rPiKI=;
+        b=LCnIB3NVT1MpElwKHd6LvXpZ0OJwzM1+0tAerpzxdGr+WT4qDVbxll3+KnjR6VFjPi
+         1dO7alAGBaZy2uCjNkuOjxplswRTTDnPoDB1kkvvIUAx/PGgFNES2+LHcVHb1/B4amGn
+         nnDQ+mwfYeOGATQO8lyRdku50fgrICAB1Mfwh0RyPicybB4GmlY924uW/8itFuv/rQpN
+         2heXUAfkxw1lb99OR51Arkys5OE+mumrk85m2ZsMYCRXDjRjPdqx7aagu8GF3vD3ZfoS
+         O9A5zr6NzdxPm3qQ9TRBDD2dZsOPBelpZkA+lfkWh3q1dFIHs8w1TScfX0OfwZi2/QEV
+         /C+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749730314; x=1750335114;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mPFgahJgaAGctrInOwx2SZrivmTOTen2pX9dBMq8Hd4=;
-        b=I8zT5nbjcKY9oHJ7V815Mg0oqIrmVUPam94KK384joYmjfSJEE5wGwHAxCl+DZHHfR
-         qHRZYK2ro6heIYFTFoOpVOMConDKwefAYIWuBNiufQnhW3TDTX3U/aEPBkIHv54UNf3o
-         dNcpvspD9I+9j0pTUDwswiv1R4BW/tc55MO8S3zZ2kR6+DtVTADYmq2i99k67r4dynhj
-         rHbz/nSHbxFEKSS4nWxBxlRg6BZADpW8dmqUx76zsWx97aJXvNrb4jUdTfWJL8Jp+Yul
-         bcemwDsFRpDUAIcNY4oA21FYOxaeha5K0FwkxRT+qsm/tRz3Neaojj9dkFIipLmf4ByE
-         FIwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUuqJySx5CUl9P1LgOg8IkOGeDIbdlRPGV3TFrM4oq9qrkai99RKgBvspxaZ7/Qxbo+7VIzOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfS6v17ZaJaAjoUQm4Vr5Exab6xm+mKq33VX4/DA9ywTPxB6rz
-	i4DTIED6AF/Oz6gCi6TthGLTP+JIK4aJqNxaKilPQ78bvjhwV8rvzfMw
-X-Gm-Gg: ASbGnctR3Q84Jg6r1dDmSDtRGSzRONHGA89WsIRzdgu0uvdzGyroRYtA5Sq0vPOy/Ec
-	DvpJN3xLNaF7kFkJwVLYEug6BfW6wmDPZ6gK2KVDPwBVWShPB8s47vZ3Kd/M6d6ZM81Meid/JC0
-	nVEMKt/hNaR5rpFPJvRDiK4zRgV3KNBcE2oby5djS2wJbWuEfoG1JO3kLJbOAKo0xxfN+oCGYis
-	T6O0oXcq2sZgVcvud2EUT+07+d8R579AA64yzDuumUvtur7c4w1XmV04l3rJN/a7l163H7ZXnOs
-	k2wXR9jPdXnOliRjoTQvt+bI1czZwVAkKIopX5iBcj1PMbsGCqUgGtETz5xfgej4MlOo5/D8xCC
-	k
-X-Google-Smtp-Source: AGHT+IF/i7HY0yBgWClFgmaoj7Q2zIAQcr8SkZQvtZh9pu49tVLxDtbEI5FSL18WXmyiV1TLtHkH0g==
-X-Received: by 2002:a17:907:d9e:b0:ad8:8efe:31fd with SMTP id a640c23a62f3a-adea9a54103mr265329666b.52.1749730313441;
-        Thu, 12 Jun 2025 05:11:53 -0700 (PDT)
-Received: from [192.168.100.182] ([185.72.185.83])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adead4cf274sm125210466b.31.2025.06.12.05.11.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 05:11:52 -0700 (PDT)
-Message-ID: <674de0c8-5d90-4850-a7c8-b3129a2f79ec@gmail.com>
-Date: Thu, 12 Jun 2025 14:11:50 +0200
+        d=1e100.net; s=20230601; t=1749730402; x=1750335202;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3l4uyktLM7pniNhGKBmODjbwnTCHSWVkWZo3J/rPiKI=;
+        b=qV0J52rPe5W3or8U5TSx36P+l/PdclgW2+nE7eAJSfpKDnmYNX/EbDn3pHD9Xo7jrg
+         2mPEyzMMMWhnghGjqywnLcmWiLdkItGVwzzyt0IFpLF3z4etHm8ZRR9ouYhbFnEK8fOZ
+         tUarDfJQ7W6EBQLFjALjZBmjkXLo178H9ljJi4N+ILfpWucpAeR0K7K8h/aSGj/8tW2k
+         plXPIz/B5O3d9Pa95OhBv+de7foLkcow8dD4gmx6qFeRHoaPRLlb8sU3SavfGdBCynog
+         b8Ncuk72SHysFiVNnzS4q5iSHubeKDF1WyJ4C1v+tIbzORMWt+mw1qtPqFYVfCwIUYxB
+         K+HA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcC42LkMk6veKLbFAgwFVKwUrKsLWQ+tIttDaRqizKl18kvaZSyFCX6YzuRP9cdl73X/iqaBs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlF2LdKpbzrLenuS6zthfB71bltsvrCPkY1j3qmMSQyKuxT6XV
+	hkjs6Wd4GPisiT9OK5qEDEDdPP0YEUvnmEdflFxlDFxiilDewjecp8/U7ZhhNSJUkZuh5fCrJRC
+	oz9zL2sQiHPK9xcVZ7RxnSlH7rfGuHmpwrmOGSEMK
+X-Gm-Gg: ASbGnctjIbJIHNQQzK/6U7KWRRqnDIPrR8PBTwfS0GPGhJ/757n4YnibLpDDryH8+ZP
+	PYrjktGs8keyrmW+H82xYOq8S2bU3q62Xd2ISXe1HWGd/fEfbAA8zseArM/o8jfU97bD97Xd09F
+	W22ECZ/PRqNEadc0b02UqL/zLgrkxoA9FtIP1Agh8IUluOoGgV61L3JQ==
+X-Google-Smtp-Source: AGHT+IFP27nE8Udgch0ukg1VB31gHT7n/EbcDgrssa5T0J+5/kwu/sy3Y1Wb/yMR5gUMQ/v0CYyVKWLzkHNWv7FKBeg=
+X-Received: by 2002:a05:622a:4d8e:b0:4a6:f9e1:a84d with SMTP id
+ d75a77b69052e-4a722919f4emr65018901cf.4.1749730401748; Thu, 12 Jun 2025
+ 05:13:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net] af_unix: Allow passing cred for embryo without
- SO_PASSCRED/SO_PASSPIDFD.
-To: Kuniyuki Iwashima <kuni1840@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Christian Heusel <christian@heusel.eu>,
- =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
- netdev@vger.kernel.org
-References: <20250611202758.3075858-1-kuni1840@gmail.com>
-Content-Language: en-US, pl
-From: =?UTF-8?Q?Jacek_=C5=81uczak?= <difrost.kernel@gmail.com>
-In-Reply-To: <20250611202758.3075858-1-kuni1840@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250611193551.2999991-1-kuni1840@gmail.com>
+In-Reply-To: <20250611193551.2999991-1-kuni1840@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 12 Jun 2025 05:13:10 -0700
+X-Gm-Features: AX0GCFuBUTrSFwmeF1yvh6kJ_Jl_dJKbnUIVsya8-yno6leYNkoIxjA-hsKKXtI
+Message-ID: <CANn89iLK5pzu6B1h16OphYfyH4yKQj1+DANRNVuzG11F+=s5dw@mail.gmail.com>
+Subject: Re: [PATCH v1 net] ipv6: Move fib6_config_validate() to ip6_route_add().
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	syzbot+4c2358694722d304c44e@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/11/25 10:27 PM, Kuniyuki Iwashima wrote:
+On Wed, Jun 11, 2025 at 12:36=E2=80=AFPM Kuniyuki Iwashima <kuni1840@gmail.=
+com> wrote:
+>
 > From: Kuniyuki Iwashima <kuniyu@google.com>
-> 
-> Before the cited commit, the kernel unconditionally embedded SCM
-> credentials to skb for embryo sockets even when both the sender
-> and listener disabled SO_PASSCRED and SO_PASSPIDFD.
-> 
-> Now, the credentials are added to skb only when configured by the
-> sender or the listener.
-> 
-> However, as reported in the link below, it caused a regression for
-> some programs that assume credentials are included in every skb,
-> but sometimes not now.
-> 
-> The only problematic scenario would be that a socket starts listening
-> before setting the option.  Then, there will be 2 types of non-small
-> race window, where a client can send skb without credentials, which
-> the peer receives as an "invalid" message (and aborts the connection
-> it seems ?):
-> 
->    Client                    Server
->    ------                    ------
->                              s1.listen()  <-- No SO_PASS{CRED,PIDFD}
->    s2.connect()
->    s2.send()  <-- w/o cred
->                              s1.setsockopt(SO_PASS{CRED,PIDFD})
->    s2.send()  <-- w/  cred
-> 
-> or
-> 
->    Client                    Server
->    ------                    ------
->                              s1.listen()  <-- No SO_PASS{CRED,PIDFD}
->    s2.connect()
->    s2.send()  <-- w/o cred
->                              s3, _ = s1.accept()  <-- Inherit cred options
->    s2.send()  <-- w/o cred                            but not set yet
-> 
->                              s3.setsockopt(SO_PASS{CRED,PIDFD})
->    s2.send()  <-- w/  cred
-> 
-> It's unfortunate that buggy programs depend on the behaviour,
-> but let's restore the previous behaviour.
-> 
-> Fixes: 3f84d577b79d ("af_unix: Inherit sk_flags at connect().")
-> Reported-by: Jacek Łuczak <difrost.kernel@gmail.com>
-> Closes: https://lore.kernel.org/all/68d38b0b-1666-4974-85d4-15575789c8d4@gmail.com/
+>
+> syzkaller created an IPv6 route from a malformed packet, which has
+> a prefix len > 128, triggering the splat below. [0]
+>
+> This is a similar issue fixed by commit 586ceac9acb7 ("ipv6: Restore
+> fib6_config validation for SIOCADDRT.").
+>
+> The cited commit removed fib6_config validation from some callers
+> of ip6_add_route().
+>
+> Let's move the validation back to ip6_route_add() and
+> ip6_route_multipath_add().
+>
+> [0]:
+> Fixes: fa76c1674f2e ("ipv6: Move some validation from ip6_route_info_crea=
+te() to rtm_to_fib6_config().")
+> Reported-by: syzbot+4c2358694722d304c44e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6849b8c3.a00a0220.1eb5f5.00f0.GAE@=
+google.com/
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->   net/unix/af_unix.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index fd6b5e17f6c4..87439d7f965d 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1971,7 +1971,8 @@ static void unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
->   	if (UNIXCB(skb).pid)
->   		return;
->   
-> -	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
-> +	if (unix_may_passcred(sk) || unix_may_passcred(other) ||
-> +	    !other->sk_socket) {
->   		UNIXCB(skb).pid = get_pid(task_tgid(current));
->   		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
->   	}
 
-Tested-by: Jacek Łuczak <difrost.kernel@gmail.com>
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
