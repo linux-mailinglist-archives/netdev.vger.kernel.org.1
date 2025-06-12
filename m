@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-196896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 573AAAD6DB2
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:29:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1031EAD6DBA
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 12:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E806B7A2F38
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:28:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9643A24FC
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 10:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932AD22423F;
-	Thu, 12 Jun 2025 10:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39389232369;
+	Thu, 12 Jun 2025 10:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="bQ3PZtPe"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="vUxJJVgb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75D713C8E8
-	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 10:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B27E238D52
+	for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 10:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749724163; cv=none; b=VmtdDIi8uLszSQ7ITceo80iOolmatuyTUWZjt8GWxNGS08sbKSkT6BYDPc8Zzp+ga/xgD3lBcyYUEqwtnk5ZLT6V+RFfp83Wy/3xotHVQHkuAAmj2+RbUaD5Mhow3NPYT54PZDxckZP4stp/RYo5T8QiswtpfocpD2GreGjK4XQ=
+	t=1749724195; cv=none; b=lsRUTGJRczhxcVP/yFax4aU48Uc5TUt3MIVA4PnwGLHgaeS76AXTCW5puoHkdnzhoe7guz8eH0q0DsTLB2fm+A6B7LF1qvf+xDrkecuJ9J8218W+5rcDO424BfEV8A6sq+xaW435r5FSxTM1UkhDJ9MwlajixBY7kJ0eHvEYu7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749724163; c=relaxed/simple;
-	bh=0zbMb3mFPp+ip+e4nKz08nM+1ytpVTZI84ga5mCht6o=;
+	s=arc-20240116; t=1749724195; c=relaxed/simple;
+	bh=sNOOV+9KbWG4OXOMCA38feIL9Po2xJyY6W5gxIy+2CE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MItuAp7noUx7e5VfgEK8vFT0j+C+hwY4zLhMmD9yaoN1YjH45XMhXTLAvlwuRCtpqqwIh/rHOdSipmj7vUenStRmOVMHbG694kTURfM2QF6eUCylBQJXiB2I578BVwzmCIRiYSlhnAoBSrxnuq3as7toAzFzTKn4oFA7fggxgP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=bQ3PZtPe; arc=none smtp.client-ip=209.85.167.44
+	 In-Reply-To:Content-Type; b=l3hhan3TexdQrLgjcyCWwvymXdfDc8XeA6OYFcq8OjvaXobN5Z/l+uKefaUfJO+oav/3I4mN8mC1nDq0k6hrcvwBINvzcrp/037t5KVz6AG48DRCYVXGPJK2GqtaOv/nGm/1lFwCwyYu8YJWrnSqoknyqrolSeCKhT6YOC4Rcjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=vUxJJVgb; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5534edc646dso837110e87.1
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 03:29:21 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-553246e975fso844789e87.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 03:29:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1749724160; x=1750328960; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1749724190; x=1750328990; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=78ceVZR5qaXY3MZm4XZpT6VKseBIJsVBY+CKmbmNT7U=;
-        b=bQ3PZtPe4XKfNA4stGhL/oDHgPggNd+TQdJk3vdrM+LZQlV9OpvWICXLMdFeVVoUxO
-         EPy3uwdU0Mx4ZzQYtH1zvA7cQBUFVPf1Lte7qzl8a8bqaMqyWcgfbM0jaYB8XiiXILNm
-         DJJV/pTVDuuuY6gVFDMDG79aYOnJwlxjgkCwW86LpN99JtTMfH39cmJ/Jp4xhShWijOn
-         xjvVoQUf1gKj1MCg6SD9sLNMZCcdd5ryisl+pqcpp+bBQHT3kra7aCkX9RiLM2Ybjuhu
-         IrKDFKZFe9Pkc3VvzIFklP9+OAGavaL9YEQQy4JYIi8jAis07PBTwLrHlVUSC+QIdhQ9
-         MRXg==
+        bh=CBgZC1ZKNoQszzI7uLPK/aOgW+pbDnzau2oBiF8iNu8=;
+        b=vUxJJVgbFB1M9qTlWCFBKpDLgJgl+JQVUlv/+/SP55sYZMUgKoSiiBBDQdeZKiBBjO
+         /A+4sQApDmTG6gzlTp4CcTGFvgSC4yaKiS/LF6PWYx/gqdNEOmUTuyIhDo9u1ZOVbxj1
+         gEMUwdHqfuQNN1L351CaWQTgt7GHAs4RQqYYlLQg9+Et6XdcNYdXeIVQcigEQ/ienuUT
+         AnGfYN3P+nSFg6IhdMj80IFDJOEwqZWxJOeB1LHquzjWCdjfMHYnVQ0z9hmfQt0a3sJa
+         8L+kOBdUqEnRXwct4XCQwh3g85irYzspOVuf0dFmaxRXGwB5dhH6HWPOVq14ANd18DVi
+         V9fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749724160; x=1750328960;
+        d=1e100.net; s=20230601; t=1749724190; x=1750328990;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=78ceVZR5qaXY3MZm4XZpT6VKseBIJsVBY+CKmbmNT7U=;
-        b=R8ayW1Rz2Ubk6/CPyxSjfjV21o4IPd0VwW2DXG29Z7/6mbymDjr7WH3SFuUQ3VbGO/
-         VmNAYlLnU5/Wi62wC9KBjlCB+mm+ZODvhRmqBJvtrBN/dtfyDFJ3d1WIwCUc7SBuD2cP
-         flYXQ7e4HGrXPLmQ1zR9W8xFzFQTUgTlYm6eemaWBgKyC56E5LwtKmxqOLG4XayLeAN4
-         3BC5v/gKBpWlt28WAiu7LSK/fkdLbW7I0xokCHrW75eeZDR2t4tdDA92mKhL0eda5q3f
-         tysii7q+xm51siLzZfSPsFiHHvcOYrWVHzmtZcPjHzuXiWdTJsx0Rr4gv0X1NP6+bi6S
-         uzjw==
-X-Forwarded-Encrypted: i=1; AJvYcCVIacahBSNbqpLr2DZUseZ9epBxQdqdAI+QBjKZCrroklesIH5VJd4MkNZPw1yaIWK/MF0WYb8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKkl1DpOwgyI6sdF6+a1ekdXIHoCmKR1Yuk0JzbuKdEx+jLpz3
-	o/xeU7ED6/AckhTpg1Tgk6OPCgKtdAYhUSI4BGSgTLWt6r73BGyUGwNq9UN1rt4/VMQ=
-X-Gm-Gg: ASbGnctZ2xpWzIqsj7yIiNn2UbzP3ADIGatRLB+5MdjFGRBs1NcZPZNxqKTZlN4LtIP
-	wPbXtT6OmFqta2CZigEI7ZTZzIisY5+v69q/qYWkmHFQNHcuE4c48AC4ObvKncBBGbC3jqcUFvb
-	6Xlfs7j9JoSw2+7yTZrXw+P22ww8vgJc9R9KVuPXusKI3BQd+nn6D8vIBv8G38yDgvjnK5iKH0K
-	/x336mkql9uUXFsIiA4UnaYt9TY6foGoCZzZvYzNKRWykmnJ56XnNt/YduQl5JLE22aGULi3w+0
-	pD0PxScK6v9JlGwd8KDi6VtEhFQ/wjaOU9F6uwTHlkWBNuyeC/mFewrtb6HUd5cGndntpAZ1ehK
-	oRaoi9NHvfNMykPbwh0rm75jCzKrRfsA=
-X-Google-Smtp-Source: AGHT+IFJ/9dux+ndVTq3aJpz16CRTCPiC1oUqRJ7BjCIgJGYT6DD5N2Sk4rAdRc0Ka1X4BQUMT1TTg==
-X-Received: by 2002:a05:6512:3a85:b0:553:3665:366d with SMTP id 2adb3069b0e04-553a54da132mr731269e87.21.1749724160010;
-        Thu, 12 Jun 2025 03:29:20 -0700 (PDT)
+        bh=CBgZC1ZKNoQszzI7uLPK/aOgW+pbDnzau2oBiF8iNu8=;
+        b=fxswY7GxnSGmoSN/HclwZIaR9pYgwAw+gLjF3OUytNQC6U91ARvPOCRt62ggd6HUgs
+         0ew8dSRx6yGib6+eVayVjnmYFDZSlSMqy+EyaJh2F7e+SKQyf73EadLhYnAUACAs4fhj
+         XxSW2qZhQhjXPc5YaOcyKtZANLn4l0aqpfrpnq9X4tcuDdqF8f21IfgITgIiUahY9KoF
+         buqEz7ykGU9bcK4Ax8scpqcVxlg0WjLpgIGRkHzQyR5DQwhwZvEaWWQzHluAPqIwN0//
+         nJkRkoVSD+bZHzjqMVUVW6TraDMEM1kvFnrlR8ahuwvGxG0NksimsISdhXtaCirCbwqQ
+         3nKg==
+X-Forwarded-Encrypted: i=1; AJvYcCV54ZlMAAUXvv9XwCFMzEnzdiCAirVhoYgY4moYU9FG5mMRcL7wS2eGsNU/ls0XfWZwY6YPKCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmrG1iepjOLsdeBSRL1XU/fuwtfBhg3fkbf9s/TJM7zckY29GN
+	ROUutozmwXs3sUxJ7PPPWJMsXF+ETied1liuG/g0rE7iZiOxX9yVNHuNVCwowxjj+EQXLfbfil9
+	7PdCQ
+X-Gm-Gg: ASbGncvfNSU3nzUK9hhoox8x5Hd4KU13Pv7iSapGNMFDhwA3JWbohqzR/5NtU8QhO07
+	54oWFbpcXtNb+hoVdfBDs01Gb8nt59S/VavxJlLIbc9A1Nilh8Tvj1FdxNAXr/0ZgwCyvTDYYoj
+	59NzuRjirvXwr87qXQDfd7Z6VHhh2LTofvoqg4wrJ7F9HIO9tk6X7lGi8OYOx4o6lIDsqdEdd7t
+	6nn2nvwDYLts42SJwDXp4fSqp342CUDp46c+rKlYjwT5aLIBM7CaVTbiIedQ08mWCIBGCUkvmIU
+	vYiyBSF8bGiYtLjjSubDc378qYTkqWDLNxBcXVhpVsqa0J65dCkoey7ewpyuu91pRsAxEmK1Iue
+	Dvhyv97QGqdmXjdrQm5lCikpfHreL8jA=
+X-Google-Smtp-Source: AGHT+IEIdyFP+saitKhmaHv2s5wN7JGPbFFGxeEZmaLzif+QZDiO9p8Iu77WjtfkY5X6YR2I21uERw==
+X-Received: by 2002:a05:6512:12c9:b0:553:2c92:a867 with SMTP id 2adb3069b0e04-553a559e831mr773144e87.55.1749724190270;
+        Thu, 12 Jun 2025 03:29:50 -0700 (PDT)
 Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553ac11687asm67813e87.30.2025.06.12.03.29.18
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553ac11686fsm68151e87.28.2025.06.12.03.29.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 03:29:19 -0700 (PDT)
-Message-ID: <3f6a736c-a8d0-4524-93fe-fde5162d76d6@blackwall.org>
-Date: Thu, 12 Jun 2025 13:29:18 +0300
+        Thu, 12 Jun 2025 03:29:49 -0700 (PDT)
+Message-ID: <edbb9a85-c392-4224-927e-6597c686a8bd@blackwall.org>
+Date: Thu, 12 Jun 2025 13:29:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,8 +83,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 03/14] net: ipv4: ipmr: Split ipmr_queue_xmit()
- in two
+Subject: Re: [PATCH net-next 05/14] net: ipv6: Make udp_tunnel6_xmit_skb()
+ void
 To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@gmail.com>,
@@ -91,25 +92,42 @@ To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
 Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
  mlxsw@nvidia.com
 References: <cover.1749499963.git.petrm@nvidia.com>
- <9667e583c46288b5dd1367ad5e1d75d1e438db81.1749499963.git.petrm@nvidia.com>
+ <e73fd6fb6ee4f4ee6c85823217d9fc3ccee49db6.1749499963.git.petrm@nvidia.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <9667e583c46288b5dd1367ad5e1d75d1e438db81.1749499963.git.petrm@nvidia.com>
+In-Reply-To: <e73fd6fb6ee4f4ee6c85823217d9fc3ccee49db6.1749499963.git.petrm@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 6/9/25 23:50, Petr Machata wrote:
-> Some of the work of ipmr_queue_xmit() is specific to IPMR forwarding, and
-> should not take place on the output path. In order to allow reuse of the
-> common parts, split the function into two: the ipmr_prepare_xmit() helper
-> that takes care of the common bits, and the ipmr_queue_fwd_xmit(), which
-> invokes the former and encapsulates the whole forwarding algorithm.
+> The function always returns zero, thus the return value does not carry any
+> signal. Just make it void.
+> 
+> Most callers already ignore the return value. However:
+> 
+> - Refold arguments of the call from sctp_v6_xmit() so that they fit into
+>    the 80-column limit.
+> 
+> - tipc_udp_xmit() initializes err from the return value, but that should
+>    already be always zero at that point. So there's no practical change, but
+>    elision of the assignment prompts a couple more tweaks to clean up the
+>    function.
 > 
 > Signed-off-by: Petr Machata <petrm@nvidia.com>
 > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 > ---
->   net/ipv4/ipmr.c | 45 +++++++++++++++++++++++++++++----------------
->   1 file changed, 29 insertions(+), 16 deletions(-)
+> 
+> Notes:
+> CC:Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> CC:linux-sctp@vger.kernel.org
+> CC:Jon Maloy <jmaloy@redhat.com>
+> CC:tipc-discussion@lists.sourceforge.net
+> 
+>   include/net/udp_tunnel.h  | 14 +++++++-------
+>   net/ipv6/ip6_udp_tunnel.c | 15 +++++++--------
+>   net/sctp/ipv6.c           |  7 ++++---
+>   net/tipc/udp_media.c      | 10 +++++-----
+>   4 files changed, 23 insertions(+), 23 deletions(-)
 > 
 
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
