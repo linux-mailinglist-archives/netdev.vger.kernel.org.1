@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E8E9AD8B10
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:46:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA54AD8B11
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:46:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAF801E4C48
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:45:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D766163BCA
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248E82EA493;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215CA2EA491;
 	Fri, 13 Jun 2025 11:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c3+2XmTX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZmGIdAIs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DB62E7F10;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5339A2E7F11;
 	Fri, 13 Jun 2025 11:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749814967; cv=none; b=NVCu/PmpYLbleC5XAKT1pwAmcjtnPPQn8M63xa7nsS2Ih4pZldCvKTX4hSstbwV62diTJntuwyOTPRc5//WfvYkBftqz2Zface8GeLmA6sueOo6EtbV2uGId85+i/uWmgtzBJPU3RJOty7shPc+reUP66TYzLVCjP5v7X0lt49o=
+	t=1749814967; cv=none; b=UoRywwoQleQ2e7slaSIqXhZr7YFSHHktmp8jTQSQLnpJFkjI8VtCGXf/ZM44LDn3bSYhtD0S9Wa/JhgmL2a+hMDsPnxWnfRceUJY0+4LNzaJ01vljqd9J6RRtxF36PTboYhg6x4gXhcbJC1fqUAyd5+S4Rtm2lYcfQ/agzye1jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749814967; c=relaxed/simple;
-	bh=BNiT6T73vSHdjoYinnCVLRiSA/MjExWs0t2+7SQv6UY=;
+	bh=RRdlkBDEmtJLl36U7brH9gBLYzEATksRx+v4nftXEzw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OgxDqwn/QzWmI1ykI5G62NknJA9KASkxI7/TNcuFXjPqaXY0ek+RQDCKcPF2aeIE7+D5waj5x8Qll0UpioUPB/DQw+okxBp1drmHKUNze0dIk4c9niIQ5Qb09J9+WCNzZivgYc8FPjUb8MR4yzbYwnU3mSaiDk6gYG9ZLYKIVUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3+2XmTX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFB42C4CEF5;
+	 MIME-Version; b=OYM1h6YwA+J//k0wi6OlRHSbr1j0FoB3GI+lrG0Rp3qyxO11PrEUCybvWE86nE2ngcDcxLZE7ee4jwJF9ErmMZmWsKPjNFBUdkxatbkl5/QVYOlMvOYDrgJU1Vj4S7wS20b5VI89Syw4/M3pvP5Os8ptltso0Oq1JwmvGA2s7O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZmGIdAIs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D376FC4CEFB;
 	Fri, 13 Jun 2025 11:42:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1749814966;
-	bh=BNiT6T73vSHdjoYinnCVLRiSA/MjExWs0t2+7SQv6UY=;
+	bh=RRdlkBDEmtJLl36U7brH9gBLYzEATksRx+v4nftXEzw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c3+2XmTXCVJ36/pQliRQt0xF7ms+HE7PHLWqU/8HSGglbZH72J4OC6dujS/rtrA+x
-	 q7UB0tUQPGe18OoMQdSY8LKqGEa+kG614p4CUiab1uU+RtfDp4vl/PbLunsDEc/fs8
-	 tKjMOh8tLj+de7BN5iHGGQFImFN6HbpWAhWDCORZLQEVTMi2WRFalFdrS4STeRSWbh
-	 LRW/xLy5yeqLYPsovewQ/AwURV3e37pDXrvFG3B8gHpx2+pY/kNPKF7W733mzvKh/y
-	 xIfXCuL3gqnRx93prBQWwS1c0CUSsax3u8BgAjR4K4c6LpnHawXoCpieyXaYHVBw2c
-	 0TZSwcIA8FUIg==
+	b=ZmGIdAIsF0j6fvs/aNpGs7XICMloa8BBj4qNnaJyZorcJMurW0D9UgxrAAkTS9/0v
+	 8SyEXLnnRagkMuh8G8DicDy8CXClaNLOu73Qyc25xezUaV7RkEh1k6b4t8KImyj7b7
+	 rkdIKn7Ko2x6qegq3cgYFn02kZ/2PnQoBzY0JWRnwbmjgprHDWxZF8vSdfnjv77LV9
+	 u8z3BPMS1m4YtSMzK5FwscoklNgc+D3VknGw2ud2mNCER6cBdHIjLZTjh2mdMA+4yL
+	 oBQedOA7OyLgaUqb0hChwXizST/9aaG/Sa/k0ZNHhzhP3+Ttp2uFd0WYIKLdkW/74p
+	 3WvLkzbJztGkw==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uQ2o1-00000005dFH-01S4;
+	id 1uQ2o1-00000005dFL-0H9X;
 	Fri, 13 Jun 2025 13:42:45 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
@@ -68,9 +68,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v3 09/16] docs: sphinx: add a parser template for yaml files
-Date: Fri, 13 Jun 2025 13:42:30 +0200
-Message-ID: <39789f17215178892544ffc408a4d0d9f4017f37.1749812870.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v3 10/16] docs: sphinx: parser_yaml.py: add Netlink specs parser
+Date: Fri, 13 Jun 2025 13:42:31 +0200
+Message-ID: <095fba5224a22b86a7604773ddaf9b5193157bc1.1749812870.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749812870.git.mchehab+huawei@kernel.org>
 References: <cover.1749812870.git.mchehab+huawei@kernel.org>
@@ -83,88 +83,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-Add a simple sphinx.Parser class meant to handle yaml files.
-
-For now, it just replaces a yaml file by a simple ReST
-code. I opted to do this way, as this patch can be used as
-basis for new file format parsers. We may use this as an
-example to parse other types of files.
+Place the code at parser_yaml.py to handle Netlink specs. All
+other yaml files are ignored.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/sphinx/parser_yaml.py | 63 +++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
- create mode 100755 Documentation/sphinx/parser_yaml.py
+ .pylintrc                           |  2 +-
+ Documentation/sphinx/parser_yaml.py | 39 +++++++++++++++++++++--------
+ 2 files changed, 29 insertions(+), 12 deletions(-)
 
+diff --git a/.pylintrc b/.pylintrc
+index 30b8ae1659f8..f1d21379254b 100644
+--- a/.pylintrc
++++ b/.pylintrc
+@@ -1,2 +1,2 @@
+ [MASTER]
+-init-hook='import sys; sys.path += ["scripts/lib/kdoc", "scripts/lib/abi"]'
++init-hook='import sys; sys.path += ["scripts/lib", "scripts/lib/kdoc", "scripts/lib/abi"]'
 diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/parser_yaml.py
-new file mode 100755
-index 000000000000..b3cde9cf7aac
---- /dev/null
+index b3cde9cf7aac..eb32e3249274 100755
+--- a/Documentation/sphinx/parser_yaml.py
 +++ b/Documentation/sphinx/parser_yaml.py
-@@ -0,0 +1,63 @@
-+"""
-+Sphinx extension for processing YAML files
-+"""
-+
-+import os
-+
-+from docutils.parsers.rst import Parser as RSTParser
-+from docutils.statemachine import ViewList
-+
-+from sphinx.util import logging
-+from sphinx.parsers import Parser
+@@ -3,6 +3,10 @@ Sphinx extension for processing YAML files
+ """
+ 
+ import os
++import re
++import sys
 +
 +from pprint import pformat
+ 
+ from docutils.parsers.rst import Parser as RSTParser
+ from docutils.statemachine import ViewList
+@@ -10,7 +14,10 @@ from docutils.statemachine import ViewList
+ from sphinx.util import logging
+ from sphinx.parsers import Parser
+ 
+-from pprint import pformat
++srctree = os.path.abspath(os.environ["srctree"])
++sys.path.insert(0, os.path.join(srctree, "scripts/lib"))
 +
-+logger = logging.getLogger(__name__)
++from netlink_yml_parser import NetlinkYamlParser      # pylint: disable=C0413
+ 
+ logger = logging.getLogger(__name__)
+ 
+@@ -19,8 +26,9 @@ class YamlParser(Parser):
+ 
+     supported = ('yaml', 'yml')
+ 
+-    # Overrides docutils.parsers.Parser. See sphinx.parsers.RSTParser
+-    def parse(self, inputstring, document):
++    netlink_parser = NetlinkYamlParser()
 +
-+class YamlParser(Parser):
-+    """Custom parser for YAML files."""
-+
-+    supported = ('yaml', 'yml')
-+
++    def do_parse(self, inputstring, document, msg):
+         """Parse YAML and generate a document tree."""
+ 
+         self.setup_parse(inputstring, document)
+@@ -28,14 +36,6 @@ class YamlParser(Parser):
+         result = ViewList()
+ 
+         try:
+-            # FIXME: Test logic to generate some ReST content
+-            basename = os.path.basename(document.current_source)
+-            title = os.path.splitext(basename)[0].replace('_', ' ').title()
+-
+-            msg = f"{title}\n"
+-            msg += "=" * len(title) + "\n\n"
+-            msg += "Something\n"
+-
+             # Parse message with RSTParser
+             for i, line in enumerate(msg.split('\n')):
+                 result.append(line, document.current_source, i)
+@@ -48,6 +48,23 @@ class YamlParser(Parser):
+ 
+         self.finish_parse()
+ 
 +    # Overrides docutils.parsers.Parser. See sphinx.parsers.RSTParser
 +    def parse(self, inputstring, document):
-+        """Parse YAML and generate a document tree."""
++        """Check if a YAML is meant to be parsed."""
 +
-+        self.setup_parse(inputstring, document)
++        fname = document.current_source
 +
-+        result = ViewList()
++        # Handle netlink yaml specs
++        if re.search("/netlink/specs/", fname):
++            if fname.endswith("index.yaml"):
++                msg = self.netlink_parser.generate_main_index_rst(fname, None)
++            else:
++                msg = self.netlink_parser.parse_yaml_file(fname)
 +
-+        try:
-+            # FIXME: Test logic to generate some ReST content
-+            basename = os.path.basename(document.current_source)
-+            title = os.path.splitext(basename)[0].replace('_', ' ').title()
++            self.do_parse(inputstring, document, msg)
 +
-+            msg = f"{title}\n"
-+            msg += "=" * len(title) + "\n\n"
-+            msg += "Something\n"
++        # All other yaml files are ignored
 +
-+            # Parse message with RSTParser
-+            for i, line in enumerate(msg.split('\n')):
-+                result.append(line, document.current_source, i)
-+
-+            rst_parser = RSTParser()
-+            rst_parser.parse('\n'.join(result), document)
-+
-+        except Exception as e:
-+            document.reporter.error("YAML parsing error: %s" % pformat(e))
-+
-+        self.finish_parse()
-+
-+def setup(app):
-+    """Setup function for the Sphinx extension."""
-+
-+    # Add YAML parser
-+    app.add_source_parser(YamlParser)
-+    app.add_source_suffix('.yaml', 'yaml')
-+    app.add_source_suffix('.yml', 'yaml')
-+
-+    return {
-+        'version': '1.0',
-+        'parallel_read_safe': True,
-+        'parallel_write_safe': True,
-+    }
+ def setup(app):
+     """Setup function for the Sphinx extension."""
+ 
 -- 
 2.49.0
 
