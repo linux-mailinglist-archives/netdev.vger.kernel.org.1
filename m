@@ -1,80 +1,98 @@
-Return-Path: <netdev+bounces-197296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DF8AD806A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:42:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA4FAAD807D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:50:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27A081E2CD5
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:42:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2904B7AE9B6
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB8C1D8E07;
-	Fri, 13 Jun 2025 01:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659991DEFC5;
+	Fri, 13 Jun 2025 01:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsJ5CgWD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1rhK76u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7E22F4317
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 01:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F68C1C4A10;
+	Fri, 13 Jun 2025 01:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749778922; cv=none; b=igD7LCwUrVvHzwckM/ufB2crRSvdVx9ikxok6UKn/cDoZxha7z4/Vm9HxfmwdAMPudzeD6HyR3ALuAid/98Ww0JfqQ737OejCWuzz7TUCL7kAAaNWuCpILPfMye+iiLKX0zB3px6lLqP2D/omJVNyOdZMI6wlQmK79cpywJwxhU=
+	t=1749779400; cv=none; b=QQEX0Bs3/JprkgvIoDll6PC7iI04F1W1Htxvz7u/VPNJ8eqju71Yjvv+x1w7FgTbTN6GD2D9ewCuvqZGTY232wohGbeNIhEMIK4MSqm1WMsPsrolkQlUdDqNf50Yhevq/IFVeVyrdPe1EUvitng0Cj2D0uCS7sJIuAoaXstjsD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749778922; c=relaxed/simple;
-	bh=mHiuV829d769C7JULdVDQ4FmBQu/bzFO9qLh4xyNQzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ArMRGcv+rCBnQy0Y/qIR4iZQoNfOFYR9CcowLEEOrj5Rz3UJksmGiknNgC99neTfBB7cyEFwbWiIg4ZYxgeAa6pvMQKbrZIPNufI0NzpES6QsT7whIgvT0r3fYQBgHay6qPDgFVYNy5QKhTPxoW5RobDr39VLwZCaFV68vhE7l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZsJ5CgWD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB183C4CEEA;
-	Fri, 13 Jun 2025 01:42:01 +0000 (UTC)
+	s=arc-20240116; t=1749779400; c=relaxed/simple;
+	bh=KvQpbekyf0KFJWKFpC0va1oh7HK6XoLcGPLoyuPICOE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=b6JiKJKeKkoAMDyIdRzcJ91TGuQRgILZ4Y6FhIR0AtAPjti8FNUFpBUq0DkpQATAvwRiUojHYCPVCygFP3uHfLgjvftw/X1tdY4WMCv0vXx/+r2GKDdoouRhxvlHf1iJz++wAQ1XVQwIVCJstCuN/5tPhqT4tVZAwQE+uL0u+ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1rhK76u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC018C4CEEA;
+	Fri, 13 Jun 2025 01:49:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749778922;
-	bh=mHiuV829d769C7JULdVDQ4FmBQu/bzFO9qLh4xyNQzU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZsJ5CgWDxTEbjrT3amWfWWI7/2LAymzCVCL3AsfEc4pITu8DSsoYBlJN/ybCFzPRD
-	 7JIW55pRnZI9mbfQ0XRpDX42ZFkG8g1Zdxe4jiOz+mOzefz5s9aAaH0xp+wka9ZeFv
-	 Eci9pJc8p7CvNWz+vmL+h9EApS4zLwHJNvjlGAY2YSGqvDeJxTDwwo9W2gvovsTSzv
-	 6GUtgcGYwYkC+DBivXoWrue0uecihliCe5owcqU7Plf2OMKexrKpWlHh7FQZtzRarn
-	 hiGmAe/RDxN/VEy8gcXa2ag6ElFvjt3v+f7ZSFrenyDP9i8C1frfdFK18KU+78a/M/
-	 IhLSpua1/gVgA==
-Date: Thu, 12 Jun 2025 18:42:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- faizal.abdul.rahim@linux.intel.com, faizal.abdul.rahim@intel.com,
- chwee.lin.choong@intel.com, vladimir.oltean@nxp.com, horms@kernel.org,
- vitaly.lifshits@intel.com, dima.ruinskiy@intel.com
-Subject: Re: [PATCH net-next 0/7][pull request] igc: harmonize queue
- priority and add preemptible queue support
-Message-ID: <20250612184200.5ac38d1b@kernel.org>
-In-Reply-To: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
-References: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
+	s=k20201202; t=1749779399;
+	bh=KvQpbekyf0KFJWKFpC0va1oh7HK6XoLcGPLoyuPICOE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=L1rhK76uFw5pFA95AqKZdJlBYNQr8MNwGTpKknRpIxCd4BCXGmw3COgzUe6dDDIa+
+	 7q6TO7wwYsXkSE3PrJYCRJY/cerKIv8a7gFh3QCfIpIX47Nlv3Iw5dHQxlgE7b4LkE
+	 rk5dIhapWMz01Mx3G820wVdjNl7ZgEKWBj6mqr4Fm9sJqQ4SoHXe8juk015s5fYlR/
+	 rhrHiIlsBvPy8yNy0zclSthAXMJEP4QBHkVoTwpcUjqTjhT/WN1I+NorAl6CWmHVy1
+	 6aDQ47dn3DuL+7wuAhhxcasj6K7x/ZyE1YJTeHygpja4tQywyipa9uuwOwYHZscghP
+	 bYDp0g38BvR5Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC5039EFFCF;
+	Fri, 13 Jun 2025 01:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas-gbeth: Add support for
+ RZ/G3E (R9A09G047) SoC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174977942950.184018.422586356896918128.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Jun 2025 01:50:29 +0000
+References: <20250611061204.15393-1-john.madieu.xa@bp.renesas.com>
+In-Reply-To: <20250611061204.15393-1-john.madieu.xa@bp.renesas.com>
+To: John Madieu <john.madieu.xa@bp.renesas.com>
+Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
+ edumazet@google.com, geert+renesas@glider.be, krzk+dt@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ robh@kernel.org, biju.das.jz@bp.renesas.com, devicetree@vger.kernel.org,
+ john.madieu@gmail.com, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, magnus.damm@gmail.com,
+ netdev@vger.kernel.org
 
-On Wed, 11 Jun 2025 11:03:02 -0700 Tony Nguyen wrote:
-> MAC Merge support for frame preemption was previously added for igc:
-> https://lore.kernel.org/netdev/20250418163822.3519810-1-anthony.l.nguyen@intel.com/
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 11 Jun 2025 08:12:04 +0200 you wrote:
+> Document support for the GBETH IP found on the Renesas RZ/G3E (R9A09G047) SoC.
+> The GBETH block on RZ/G3E is equivalent in functionality to the GBETH found on
+> RZ/V2H(P) (R9A09G057).
 > 
-> This series builds on that work and adds support for:
-> - Harmonizing taprio and mqprio queue priority behavior, based on past
->   discussions and suggestions:
->   https://lore.kernel.org/all/20250214102206.25dqgut5tbak2rkz@skbuf/
-> - Enabling preemptible queue support for both taprio and mqprio, with
->   priority harmonization as a prerequisite.
+> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Reviwed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
+> 
+> [...]
 
-I'd like to hold these in patchwork for a little longer, in case
-Vladimir finds the time to take a look. 
-So feel free to send another series for net-next while we wait.
+Here is the summary with links:
+  - [net-next] dt-bindings: net: renesas-gbeth: Add support for RZ/G3E (R9A09G047) SoC
+    https://git.kernel.org/netdev/net-next/c/31b928210df1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
