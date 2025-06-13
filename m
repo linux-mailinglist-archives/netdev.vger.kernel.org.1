@@ -1,192 +1,158 @@
-Return-Path: <netdev+bounces-197587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49FB5AD9440
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:15:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD2DFAD9448
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A35F83BC993
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:14:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 756601E3E9E
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCEE22DFB5;
-	Fri, 13 Jun 2025 18:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52119224B1E;
+	Fri, 13 Jun 2025 18:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rc/SufIb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UP4xH+Y1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DD42E11AE;
-	Fri, 13 Jun 2025 18:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46191BEF8C;
+	Fri, 13 Jun 2025 18:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749838496; cv=none; b=hZpy1UqtiNA9PbJnsQ5GbbY+nlDxcFGq+GkZpB64snhGt0JTaRoHTEzv+aZvcswDf7LDdzdYP+5WYZy8i35V3hLYrAnavNhb2jlIpQ8r37wakvT43V5O11/iOce/A8jVZlTEJ5+t/lqQylB3ASDhe0FqzVxPVY9NtO1zbR1tK48=
+	t=1749838655; cv=none; b=LaSHvJjOx0fJ92lBtZttE37G0zkSZ7Fq+blpaAkJ4fA2Gw0eMU+NczFKy03STKHyeJHLeVm3NNzjc/JbQRcagJi7RSaIrJ8uqYYz722D6vy/Qkcf3TGuUaSwpyWK75t6P6kGhEJmcEXFjXY19QceKDpjx5PF8d+5Q0ZaXgswph8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749838496; c=relaxed/simple;
-	bh=KjYY4bsTZUm05TpfR2l4YdrK8TqDiMRSIg8azQwn+r8=;
+	s=arc-20240116; t=1749838655; c=relaxed/simple;
+	bh=0KNFfV7fownHanKtx8R1SlNU8ay1zo8lxKLpV/jp8m8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r+0tKsyQuv/00ta0/2TInysyq5G2CgcwIj3etfFSF+IczCuuZ1H++h1oA9SWGTY9mrRu888y50JAomGCPGbJw3/VjGL7YVvLgAhhgU69guF1kJLLdQIH5ekqea8cORi3QjO4B/JFDLBgm0gMI5QUJed/zJu+x0n7hZjihbc39Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rc/SufIb; arc=none smtp.client-ip=209.85.214.174
+	 To:Cc:Content-Type; b=Y5Uf54yUFnFyZ2ZivBYCyyDCe4P/TjCJ1bhtdz2xGlAWqDA2B6pfQdEfmPX1yvHMZTNYHbovcW5nX6YOvItvtg3oZ5pEkXe2x1v4Ai6eJ8FB8pddatpYHawlXAoTaIBZ34Sbi6aaf0wQtn/A213Z8kq4uh1A6akqgKucbPoPyAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UP4xH+Y1; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-235a6b89dfaso3343005ad.3;
-        Fri, 13 Jun 2025 11:14:54 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-311a6236effso2160119a91.2;
+        Fri, 13 Jun 2025 11:17:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749838494; x=1750443294; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749838653; x=1750443453; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wF4gp/2m+krKdbuHM8VFo8aUcpegmRfbsaqd6bWd3zs=;
-        b=Rc/SufIbtuMmpD6Mno48+Skl8X3xzck1mg4EWxe6804WHz7pH+EKgPkswvbcEreSu5
-         55oqAjn/WPxKlODXvgqYjSkFBCqL1PKYy600xyIsvMHPH1REnw8Ojtr/BDShRpubjeJN
-         ChUiAy3pCMUuKVUJof1Md+byZ9whV3SJxm7JwR/1509jvdE1gjBNJHIdSLnFdoRJ9/LO
-         9gEr1lBKgiqaa9Jp+3R/RP+TjyjPzLG6jSJXMRfcZPUlO3V3d3vCyyDb5fRGHECh5BQj
-         8ItRs+1gNF+br83shz+NqLHQiRChLMODrK1bmne9LMXgfjFawxW454wsP6mutWOOOI86
-         XPpg==
+        bh=lj2XCdyseFAs5Xtxg2sKE50AyX6wcQu4qy75UBvv3Iw=;
+        b=UP4xH+Y187Thk7ah9avSmIHT0ZHlnOOmWG7aypCeBItjKzrM306KmmEcErAsMgTapN
+         T4q4R7e93EMeHNKfxGf8UCPnZdaKFTWd0qDY7dFfHXZNuX/I+sBlf9xQvOTkjDVENVl7
+         0RnJY4XlGT8ElKlF3JrsqJ5UefosSs5I2led7daw4SEbDjGeAfYJTW0oTWk+gYUylso7
+         GsU5+EUtFtvQVbu2dspuJqOmOxy7zul3yitkupzmgzJAygiDvuhH7kI2feR47MaQr0jx
+         maNN9Y3Emi1Bk5HjnwZHl4XnB8GpbCNylwhWcb6ooikq5rt/7zcBJxk0XKQd7DBIwg+/
+         SLLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749838494; x=1750443294;
+        d=1e100.net; s=20230601; t=1749838653; x=1750443453;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wF4gp/2m+krKdbuHM8VFo8aUcpegmRfbsaqd6bWd3zs=;
-        b=a1nh24khltTWa4mq05V0VzYI57drDu/r8guM0wAOrPkxvvSoLE69Rj4ChrKjmLdVyR
-         //hLa/Efx2F1Qmr1HIwOBV/5RxTD8bA7dHmGLiNs6D+Xld3gMC3iLkd0keR0f5wTchVP
-         damEV7SwcZhLOQPWvvq14wZyF4AolRuSx7nhOdElbEabZBs7yPGxJziNsa6Gwlng1Rzl
-         qBvTOkWOZFgZiuSQhgi1zpmvALOrXafvyxQME7CBzNNAY25Wrd9zRSNk7LpWDnxBOxxH
-         2gyTDSZ7GUpOXTib6lJfR7ScPsF1MOJM7Lkc5g/X5vzERBI5QkFO4UzV69GW+QYN/xgv
-         IldA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3LN9yfgUSWIJHmnl8PNaFAmvjXZk3bcW457RiAKzEBiQ68wmU5SzrBjQA73MBBbv4xgrlVXaSZMGe@vger.kernel.org, AJvYcCUHdPdao90MhiLwLKsAwfVqHpmXqGlgVTMFtmSNd+eL93lbVdR24OLce0dymDr3LqcjwNYcVLgO@vger.kernel.org, AJvYcCUPaoZiGpnoKO4M72G3wLUM28MVs/1Fnrbfduv+rnqymyOhIXeO5It7dUOHpWAp1D3jH68pxI16SfK5wZQ=@vger.kernel.org, AJvYcCUzM1y4jq8dbckYTzfQgVanNb98jKiF7T4PB9AAHhmpfalKuY6gsjeWD+a4RHXyplrZ7IW/yv2kW7MixE4S@vger.kernel.org, AJvYcCVhXaiv16f12Fl5+p9ZAuu/cBk/u2Ndk90zp6hmkclL09yM5xwTUwgKQVKQtsb/Cc7WXm/Jmh1cD6LPVEDJiSY=@vger.kernel.org, AJvYcCW/6sPwSn0aJXdOaSH9OOT5wp3BYbITyCZgVDn/VB3qQMOfe+STW3AyL99n2SraDQBNQeDok7v5rUl9Tjh0@vger.kernel.org, AJvYcCWb2K0JENWU1RB1FxUR/0SMZ9RfuULepOHJUw5IimNlklWCiR2eTZiAm3tjMQfgXnWtaShyimVgwshb@vger.kernel.org, AJvYcCXZhCj3LEzW4HlFMEEA3xlCJmf1p5VezLoZGJuwb6hZ5nInK7KF0MMlKoQ8NktyIO1jcC43gIUgSrHGLb67BwKv@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywqd+YBtiMxx7BsSJ/M5sHvCtilN4OrfwatALPNxn3Ygy5Efjz4
-	qIHmkoLMatb55QfBME9BxxU/x66CVXSxxPVYAQiqldGEq8ZAxZyZm1kWZeYhbT92R+NgFnKqG5q
-	aadVQaRdXX52b3AlwbnXma/9VwLbUJUY=
-X-Gm-Gg: ASbGnctTTRR7XYh0Ygs0sWzTsWBS55j+naRltlgMTgeBbp7l20bOQ972SXXRs15/tUv
-	Ib9FkNxMiUp+eOsk9vjFK8dZ7mLKHtVoaspcQyXqnzljU3tcovx7+DN9qSopHuRxK7BiSMGBP3T
-	5RTBQZwqOTHOs/LKZrSQcoOWQ6LcONv6QLdo8km5vUGxQ=
-X-Google-Smtp-Source: AGHT+IFYalb1OTW7qnfDKSlOci9VWDAXekpMbN5b2vtf3GW8ZUpuOTwRiHQFxL1wuWQtjgsw7eVkO7CajlLxN6YkM2A=
-X-Received: by 2002:a17:902:d48d:b0:234:d14c:50ff with SMTP id
- d9443c01a7336-2366b00ba59mr2634725ad.6.1749838494222; Fri, 13 Jun 2025
- 11:14:54 -0700 (PDT)
+        bh=lj2XCdyseFAs5Xtxg2sKE50AyX6wcQu4qy75UBvv3Iw=;
+        b=X3KIF2D0MgKQFnTS0am5xmUbAM9VAj6ZDQ5p5Fonay328J3ZwibdwcZ+uEsm15be4r
+         lidGLucCVTkge74yLS24fpOvV7kptPH4HIm7YPoDjm/esX/UzLQzi3XP1LXRiHobpXWJ
+         dJcbDfI9xpYPc2/oPLFCQ1bIWSnjsTVjqB+bxc6BIY7rcG+xuwfDXt3rAKHhwT1u2aKI
+         NEQof4dwJYumv+vTR9WyBzyr+VLK5msQ0r95pLomB1ZEVwI1yUMeA3OfVT13RCjM1SIH
+         rW7nHu2ClN1QLUU7HoOqDG3LbKM8gY81A1ZKq3knq/ppnrSGOWqQZHW1ExX8LjDH1F7Z
+         CCsA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEZx5YVRESNdTGfqrsZdxCshohBqsaVeJUl/h0mS+mXBWMHVBssI9EeJ7t/fm1edausBmtAkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1BD7WvZvQ2y654fcSkhkTzyfRBz7mhvfB7OFh6iihQWVRYbyy
+	wML4e4rQ+ePz4f9BQOs5OJ2dBM14OhG2glbHIEfwXORfVFKOA5RZnS7nYBU93HA641I+HJqAX8L
+	GCw4jruMyUN568BuCJf4XG6sPeL9EyqISmOVs
+X-Gm-Gg: ASbGncsyaOdqFfGbz+y2jVY04ZRvYw1mt4kTcljPZ5oRWjxm04gLlP/FRzCJ6is92Bo
+	kDXqGbEH6kALiQLIPoOQkdP14vejDH8yR+sYutzU0xbQKwsHtJhJHk59eycQIUDbEUkQWuuSZ/l
+	ayc+VY+oBCKPDQMWQ67My5LmUfX8vMNq0En/6v0VpbN/g=
+X-Google-Smtp-Source: AGHT+IGJdlProWwJLnEBtaN88nEOVeFAIbu9b07U+OTg3ZGmbz5sClL9jcB0J4MyuTo0cY21DWZkSm4ervUuXXMnOeo=
+X-Received: by 2002:a17:90b:3dd0:b0:311:ff02:3fcb with SMTP id
+ 98e67ed59e1d1-313f1dee9c6mr919334a91.28.1749838652912; Fri, 13 Jun 2025
+ 11:17:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611-ptr-as-ptr-v11-0-ce5b41c6e9c6@gmail.com>
-In-Reply-To: <20250611-ptr-as-ptr-v11-0-ce5b41c6e9c6@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 13 Jun 2025 20:14:41 +0200
-X-Gm-Features: AX0GCFtsUq0DPj-o5G6erQ-PfWcX7A0QtacSDQOlDe1Lx8EsxSkeObOaFNw6_Co
-Message-ID: <CANiq72m1ZWxPgCda1C-8X5XOvEq9Z9JfJZqhU4ZUzZ64=N+2fQ@mail.gmail.com>
-Subject: Re: [PATCH v11 0/6] rust: reduce `as` casts, enable related lints
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org
+References: <20250610172226.1470741-1-stephen.smalley.work@gmail.com>
+ <20250610172226.1470741-5-stephen.smalley.work@gmail.com> <20250613141447.GF414686@horms.kernel.org>
+In-Reply-To: <20250613141447.GF414686@horms.kernel.org>
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Fri, 13 Jun 2025 14:17:21 -0400
+X-Gm-Features: AX0GCFu1s6IIViKOqH_mdcKU485uUsEO_UsJ8ZCY7oT9tFC3tGq0RhVEzYQd0bo
+Message-ID: <CAEjxPJ5vWnRCMd85F2ycKNrkyJUPoumkugEJo1sq7rRuMKw2SQ@mail.gmail.com>
+Subject: Re: [PATCH v4 04/42] selinux: dynamically allocate selinux namespace
+To: Simon Horman <horms@kernel.org>
+Cc: selinux@vger.kernel.org, paul@paul-moore.com, omosnace@redhat.com, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 11, 2025 at 12:23=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
-> wrote:
+On Fri, Jun 13, 2025 at 10:14=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+ote:
 >
-> This series depends on "rust: retain pointer mut-ness in
-> `container_of!`"[1].
+> On Tue, Jun 10, 2025 at 01:21:35PM -0400, Stephen Smalley wrote:
+> > Move from static allocation of a single selinux namespace to
+> > dynamic allocation.  Include necessary support for lifecycle management
+> > of the selinux namespace, modeled after the user namespace support.
+> >
+> > Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+>
+> ...
+>
+> > diff --git a/security/selinux/ss/services.c b/security/selinux/ss/servi=
+ces.c
+> > index 112edf9b2106..c67965cbfcba 100644
+> > --- a/security/selinux/ss/services.c
+> > +++ b/security/selinux/ss/services.c
+> > @@ -2202,7 +2202,7 @@ static void security_load_policycaps(struct selin=
+ux_state *state,
+> >  static int security_preserve_bools(struct selinux_policy *oldpolicy,
+> >                               struct selinux_policy *newpolicy);
+> >
+> > -static void selinux_policy_free(struct selinux_policy *policy)
+> > +void selinux_policy_free(struct selinux_policy __rcu *policy)
+>
+> Hi Stephen,
+>
+> It looks like this __rcu annotation is insufficient, and further updates
+> are needed. I didn't look further, but Sparse says:
+>
+>   .../services.c:2212:27: warning: incorrect type in argument 1 (differen=
+t address spaces)
+>   .../services.c:2212:27:    expected struct policydb *p
+>   .../services.c:2212:27:    got struct policydb [noderef] __rcu *
+>   .../services.c:2214:15: warning: incorrect type in argument 1 (differen=
+t address spaces)
+>   .../services.c:2214:15:    expected void const *objp
+>   .../services.c:2214:15:    got struct selinux_policy [noderef] __rcu *p=
+olicy
+>   .../services.c:2232:39: warning: incorrect type in argument 1 (differen=
+t address spaces)
+>   .../services.c:2232:39:    expected struct selinux_policy [noderef] __r=
+cu *policy
+>   .../services.c:2232:39:    got struct selinux_policy *policy
+>   .../services.c:2297:29: warning: incorrect type in argument 1 (differen=
+t address spaces)
+>   .../services.c:2297:29:    expected struct selinux_policy [noderef] __r=
+cu *policy
+>   .../services.c:2297:29:    got struct selinux_policy *[assigned] oldpol=
+icy
+>   .../services.c:2210:24: warning: dereference of noderef expression
+>   .../services.c:2211:15: warning: dereference of noderef expression
+>   .../services.c:2213:15: warning: dereference of noderef expression
 
-Not anymore! :)
+Thank you, fixed via
+https://github.com/stephensmalley/selinux-kernel/commit/66c448df995fb8d6c5c=
+9a4875efc0ab56a5dd21d
+and will likely squash into this patch for next submission.
 
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-
-Thanks for rebasing, Tamir, I appreciate it.
-
-This has a bunch of hits in configfs, cpufreq and Nova [1]. I guess
-you built without those enabled.
-
-Could you please fix those? Since this affects other maintainers that
-we need to ask the Acked-by to, let's try to at least give them the
-final state.
-
-Thanks!
-
-Cheers,
-Miguel
-
-[1]
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:429:9
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:467:9
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:479:9
-
-warning: `as` casting between raw pointers without changing their constness
-   --> rust/kernel/configfs.rs:564:48
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:721:39
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:764:35
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:783:35
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:764:35
-
-warning: reference as raw pointer
-   --> rust/kernel/configfs.rs:783:35
-
-warning: using `as _` conversion
-   --> rust/kernel/cpufreq.rs:650:45
-
-warning: `as` casting between raw pointers without changing their constness
-   --> rust/kernel/cpufreq.rs:650:45
-
-warning: using `as _` conversion
-  --> drivers/gpu/nova-core/driver.rs:22:64
-
-warning: casts from `u8` to `u32` can be expressed infallibly using `From`
-   --> drivers/gpu/nova-core/regs/macros.rs:267:26
-
-warning: casts from `u8` to `u32` can be expressed infallibly using `From`
-   --> drivers/gpu/nova-core/regs/macros.rs:267:26
-
-warning: casts from `u8` to `u32` can be expressed infallibly using `From`
-   --> drivers/gpu/nova-core/regs/macros.rs:267:26
-
-warning: casts from `u8` to `u32` can be expressed infallibly using `From`
-   --> drivers/gpu/nova-core/regs/macros.rs:267:26
-
-warning: casts from `u8` to `u32` can be expressed infallibly using `From`
-   --> drivers/gpu/nova-core/regs/macros.rs:267:26
-
-warning: casts from `u8` to `u32` can be expressed infallibly using `From`
-  --> drivers/gpu/nova-core/regs.rs:35:65
+>
+>
+>
+> >  {
+> >       if (!policy)
+> >               return;
+>
+> ...
 
