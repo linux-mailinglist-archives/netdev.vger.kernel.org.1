@@ -1,188 +1,116 @@
-Return-Path: <netdev+bounces-197472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0CFAD8BB4
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:09:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6D3CAD8BCE
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7823B5644
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:09:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ABF217A451
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B3E2E0B7A;
-	Fri, 13 Jun 2025 12:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D24422DA0C;
+	Fri, 13 Jun 2025 12:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="iYPe6hd7"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="WCqkqO/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B66275AE6;
-	Fri, 13 Jun 2025 12:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749816576; cv=pass; b=Le78KBEX/aorHl+bjUZlYc9NG7Ou+vznzefU+/Iec9tujTi+ivo7WK8MS9MeBHDtJ03enlZNL5hdzW9XvX7kF+M5pr12V2YD0kAUmmwW8KxRb+I4BCUzkL6mm+dLqXWRDFAPRq77D2vNpwJPU+l5j6TuWzbQqnsT8Zb1vJWpgF0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749816576; c=relaxed/simple;
-	bh=tWxzlB7gvAwvQ4TxzPO+xifFWwtGtqkUHJoJ1LVl9CE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rUOsPQtDG30lH6TtGo3ThkGp1aYzhk0jMiHSC8Af6lapOC+jDWcHm+pdkQYFgEwXDkc6mlCTGDd+UiAwc+A34o3+5yUfa9aeR9tYwR+RgmVopcdMnj/si65SXM72YHizj6in1wnRVxfbPHZ7jdQ2RohtSHGNMxMukcZ6MueYHc0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=iYPe6hd7; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1749816504; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=HxsUUIkbJLHor7xQVOxFnKjQL2tcvAU/8U7uOGAT8YJ5SzkaPujbsMSqqr80mMJL7/C6qPJ5R72AJZZz4V+WGvRuhbDD8RcEdYVp0T3jFCWzPUWFNNQ68W3mkdPx/uRz9Q8CO9KUVnMiuh0wlCTVhHSoXI4LkoQwVLhFcDXTcHE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1749816504; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=oC6j4XXPtFnpNI59vFPxucp8Atnh3iWQ7iCtDWJTvGo=; 
-	b=A1ATiiZZKeXR51mKcGYEcu+ievsJrJBhXTLF5fKN6m6uGlmf+gN+qSW/4BgN2DXa3+ihmm5IDJ0LMQYccMcRuItr2vNHq1tFXK2h6DApxhwbIV2hxsLhxWB7MZeQnM9wPRrdMCbbUDX2/hY046rowLcFe6wBngVN1Vd+mah2Cyc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749816504;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-	bh=oC6j4XXPtFnpNI59vFPxucp8Atnh3iWQ7iCtDWJTvGo=;
-	b=iYPe6hd7lzD5NmEuVNlPJNUR1sBcQMTEzgFULW5ZE1tzhGuUUZmsrhquSUKDA+Cs
-	I90mwM0EoNm4PSiTntzA6phjzUyTdMpluFlcfHK8TNliE3+1AYflsiylQRbXHpwn2NL
-	nJ0riWRwAIxWd/I6yzJxEXtQHSBfMYaBpXVI3PVg=
-Received: by mx.zohomail.com with SMTPS id 1749816501559794.9356716993168;
-	Fri, 13 Jun 2025 05:08:21 -0700 (PDT)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-To: Niklas Cassel <cassel@kernel.org>
-Cc: Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
- Heiko Stuebner <heiko@sntech.de>,
- Shreeya Patel <shreeya.patel@collabora.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
- Andy Yan <andy.yan@rock-chips.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Shawn Lin <shawn.lin@rock-chips.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- kernel@collabora.com, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH 17/20] PCI: dw-rockchip: switch to HWORD_UPDATE macro
-Date: Fri, 13 Jun 2025 14:08:08 +0200
-Message-ID: <12129790.nUPlyArG6x@workhorse>
-In-Reply-To: <aEvzMnxgsjfryCOo@ryzen>
-References:
- <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
- <20250612-byeword-update-v1-17-f4afb8f6313f@collabora.com>
- <aEvzMnxgsjfryCOo@ryzen>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B72275AF7
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 12:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749816690; cv=none; b=iDV1nzXZ0NbnjXb3X6NHfF0yAvbXAs1MXODz944yK7uZDG4tIj9CxLjWO5IFdwo3oOu0tWmZtRTLoM2L0Bw1sngZL5Eu2UFC89X2LUcJpQgI7EthbWmek13RHlxk/0oOwKXSPEnQx9sQVPHsS6fpNIWHJmoDBw2b0JukpgNuDnI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749816690; c=relaxed/simple;
+	bh=IfISvLuMcxjZrVnRK88ix7qpKs0G89Wpm0+eZ0yuCZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SEJ3diTQiOS8I7sDbBohvH1Gteo4pI+zCuDx/TMAmQrYMFgMLAkBb3Pjingq2V8JFMr82vrVJAHVWE9N2v164yvbOwlp3qRzI1ovHSSxTfmPS3c5UgbwkmD0q3ob8n2WiYdSnnX3yaSh3Q2PYgIiczYT64677dfiWZC8tCHggT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=WCqkqO/l; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-451dbe494d6so26499975e9.1
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 05:11:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749816687; x=1750421487; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X123xpbb/jeKY4R9e6FB1cA1Gkq5lhAcYgbmcRglrII=;
+        b=WCqkqO/lC9CJNiunU02139HhCJQJbw5s01U8LvTfJQIBBFa4O8Mw3Y3G74wI3texws
+         mCS/oa0F7MnhwT+9gqXiquWyZ04e5jadEBcWlelW40h9SEm8X7H7BoGQ/8bM8UxjYoJQ
+         vrYMXNwAldBf82N3SVO0J91UtHZRvX5bT3etvljh2SHO/wClTb2Cw6/YRPoRDEStqHqL
+         MEoUDhcn7cvDT52n8XZ9kxpS6oc84fCNbAVx1Ves4/ZuAIgewk1pFft35YVtJIcX0zUI
+         8rhsSLj1QuIbUEO56uDhFrToUiJtFWY1ScyvOSPq1NmJ0YrbHKULqqduC6vSZRoiC4U8
+         8l8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749816687; x=1750421487;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X123xpbb/jeKY4R9e6FB1cA1Gkq5lhAcYgbmcRglrII=;
+        b=VdmQ2y0d24zpwOg5HnZeaTnBClCcNLrFx+Ws5d1jaAQKXXcreaY0cFHtB+06gMDnjK
+         TQZnshoRyDqcvVl4+uYnJaWoB6tPV9N7YUekwfrEzrH9lTPDm6ZhXbsFiIxkNqYt9Q2/
+         JnrjyQlSYBPplSj7Q6PAH+Zd2asXchJkWMyyZYT5TGdp9nwl3m4Kir3zACKei5cHp/Hm
+         d7My9lOdZh56YLj/0Bkw+u/okz8//Cfgl1EIm3/0Yt1HbS8p1gd4Yd+qdsDmWkruOXmO
+         46g/nwxvHxvptCFdxqyvBOCulGRJ6KSRO3b/i8zjksQpGMsBL64UQKQjD38pR93GVaHK
+         D5sA==
+X-Forwarded-Encrypted: i=1; AJvYcCWdrKhZblRG0/M7Bpd252KynN3bVAwkQ5NBFEfKMBdo1T1VzUHKw0W3yuV3JDueTWP8+CissTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5ovMREssCwAg3t+qMzbwdlQmcIsOKRvADqRf37kC24c5wA8Jv
+	lw2TPBuoXJjRE47u4x/NkPHoQ8Tpf+LqtM9CtcjVYu4+4DJMo8qCZEQMKExQF985jEbHW8kYCZh
+	O+biBA6k=
+X-Gm-Gg: ASbGncuAcBWMscHBAJg2J9lAAqY+NRX8CACT1Vn30w70rarurXna2i/7gkXOpD77COL
+	PwAUzsNUQxG6tHOegY76LLdSX0dQi7SWFguu/4muz95JGsrusbsH0mmmlJwFrQ5/2UgWuhEqpdr
+	NZu+l9wjIOGJuSmuzM5rGcWMJLyyot9IlwWlX9cA2DPy9rShLs3fNK/9szUOr9sUj5cMAnzYUx2
+	uCl7rZHMhMnTSejxhYgkOQHvBq3ydxO6St6u2lKD6AuFLsot6xY0eLHGhtmvQZbcKCj0DhTNSEy
+	FCPjP5Ucxs4b4b67lqddgWNPtq5CjLopOInJS/72rplRCuQiPxP9RN/qyrziSi0bi2SEIMATMzu
+	AcPokDAs=
+X-Google-Smtp-Source: AGHT+IGT6muk7KulGb8uoUJI0MLmt/NFsIJLiIY9WjvVeHJ+eUp+xu9OTUUSggvF1QY1GYh8bwc2Pg==
+X-Received: by 2002:a05:600c:3b98:b0:450:30e4:bdf6 with SMTP id 5b1f17b1804b1-45334b19559mr25871965e9.19.1749816686825;
+        Fri, 13 Jun 2025 05:11:26 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e24420csm49767325e9.20.2025.06.13.05.11.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 05:11:26 -0700 (PDT)
+Date: Fri, 13 Jun 2025 15:11:23 +0300
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, jacob.e.keller@intel.com,
+	michal.swiatkowski@linux.intel.com
+Subject: Re: [PATCH net-next 1/7] eth: igb: migrate to new RXFH callbacks
+Message-ID: <aEwVa9s_je4AKMEc@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org,
+	intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, jacob.e.keller@intel.com,
+	michal.swiatkowski@linux.intel.com
+References: <20250613010111.3548291-1-kuba@kernel.org>
+ <20250613010111.3548291-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250613010111.3548291-2-kuba@kernel.org>
 
-Hello,
+On Thu, Jun 12, 2025 at 06:01:05PM -0700, Jakub Kicinski wrote:
+> Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
+> add dedicated callbacks for getting and setting rxfh fields").
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/intel/igb/igb_ethtool.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 
-On Friday, 13 June 2025 11:45:22 Central European Summer Time Niklas Cassel wrote:
-> Hello Nicolas,
-> 
-> On Thu, Jun 12, 2025 at 08:56:19PM +0200, Nicolas Frattaroli wrote:
-> > 
-> > PCIE_CLIENT_RC_MODE/PCIE_CLIENT_EP_MODE was another field that wasn't
-> > super clear on what the bit field modification actually is. As far as I
-> > can tell, switching to RC mode doesn't actually write the correct value
-> > to the field if any of its bits have been set previously, as it only
-> > updates one bit of a 4 bit field.
-> > 
-> > Replace it by actually writing the full values to the field, using the
-> > new HWORD_UPDATE macro, which grants us the benefit of better
-> > compile-time error checking.
-> 
-> The current code looks like this:
-> #define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE_BIT(0x40)
-> #define  PCIE_CLIENT_EP_MODE            HIWORD_UPDATE(0xf0, 0x0)
-> 
-> The device_type field is defined like this:
-> 4'h0: PCI Express endpoint
-> 4'h1: Legacy PCI Express endpoint
-> 4'h4: Root port of PCI Express root complex
-> 
-> The reset value of the device_type field is 0x0 (EP mode).
-> 
-> So switching between RC mode / EP mode should be fine.
-> 
-> But I agree, theoretically there could be a bug if e.g. bootloader
-> has set the device_type to 0x1 (Legacy EP).
-> 
-> So if you want, you could send a patch:
-> -#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE_BIT(0x40)
-> +#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE(0xf0, 0x40)
-> 
-> With:
-> Fixes: 0e898eb8df4e ("PCI: rockchip-dwc: Add Rockchip RK356X host controller driver")
-> 
-> But I also think that your current patch is fine as-is.
-> 
-> I do however think that you can drop this line:
-> +#define  PCIE_CLIENT_MODE_LEGACY       0x1U
-> 
-> Since the define is never used.
-
-Will do
-
-> 
-> 
-> Also, is there any point in adding the U suffix?
-> 
-> Usually you see UL or ULL suffix, when that is needed, but there actually
-> seems to be extremely few hits of simply U suffix:
-> $ git grep 0x1U | grep -v UL
-
-Sort of. Literals without the U suffix are considered signed iirc, and
-operating with them and then left-shifting the result can run into issues
-if you shift their bits into the sign bit. In the patch at [1] I needed to
-quell a compiler warning about signed long overflows with a U suffix. This
-should only ever really be a problem for anything that gets shifted up to
-bit index 31 I believe, and maybe there's a better way to handle this in
-the macro itself with an explicit cast to unsigned, but explicit casts
-give me the ick. I'm also open to changing it to an UL, which will have
-the same effect, and has more precedent.
-
-> 
-> 
-> Kind regards,
-> Niklas
-> 
-
-Best Regards,
-Nicolas Frattaroli
-
-Link: https://lore.kernel.org/all/20250612-byeword-update-v1-7-f4afb8f6313f@collabora.com/ [1]
-
-
+Reviewed-by: Joe Damato <joe@dama.to>
 
