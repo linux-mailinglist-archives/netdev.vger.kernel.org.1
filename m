@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-197512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22437AD8FCC
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 16:41:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E026AD8FCF
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 16:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D67C3A436D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:41:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D5021892FC1
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFF419ABAC;
-	Fri, 13 Jun 2025 14:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A864B1993B9;
+	Fri, 13 Jun 2025 14:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vp13Egy1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NW1PPjVJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A0119995E
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 14:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A9C195811
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 14:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749825659; cv=none; b=TEGuTT7Ea/yFadKNITrkHPrHX2dc/gOO/TGkigugqtNmH6oKPwLnT944Se6jY+peS9JY+o0MgZZfNqoFygDqwdpNatAsWK1R6bPx6cqZuJf/4Cncs9u4UzfegcVwe6uM96vLQngKDR+B1nVU5yjuJCEPKUP9T8S4OBdIjDKg05c=
+	t=1749825697; cv=none; b=ZPSM+pdIJNCJm84/qir/YOA3Fc31n3mh9/tuDiEEdBO9PlYDkzV3bska7yZGrVthlWjNDshB3vaoGJmA2iAKVR/AcgGhvgJt8OUX3PM5t3KApOCBMF8Q4BZUgW8wsWxzm4OXIwG99hT0SXVtrF4vSRNJ8omzpdj9XMnH2zorvH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749825659; c=relaxed/simple;
-	bh=v41rUl0cVAHu9TQSSGtAQC6Vwh3oXlyQlmYuvKABbiI=;
+	s=arc-20240116; t=1749825697; c=relaxed/simple;
+	bh=39pyphlFFWkkvSkufeLVeIcTkES26vfA7Sl9AvE8q0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q7C5O2QXRXh6eiCFZZwscM3/S01a05PtQPU7IqudBLmbqaxRct4t/NLyKhHzIZ8YTIuEnfJx0WCGC9EdUhL/25W++lt9y0crci3Y0PoZMuk8UHWhFUJB2xmPwrp38QvdSA2ylwfDRKePoOGhp1U6cyYHUNfFvlRdLua6IQnlr0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vp13Egy1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C939C4CEE3;
-	Fri, 13 Jun 2025 14:40:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=BgjYBAbMW8ZIoNzy/Ez5eH4p2jANakmgN2sW3Td2GqarZyKYsOcyprl0aUuoD4t9zg+Rxb7ksZTC1EXiFhmpYQ+MFmi0SUKxIlBx3mR+asW6ZevC0gyV7+uVcVx2GPM8JkFvr/FW8NIc6+yiqxjdKzcc+/PgXGFXqCqM3UomQvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NW1PPjVJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB4E0C4CEE3;
+	Fri, 13 Jun 2025 14:41:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749825659;
-	bh=v41rUl0cVAHu9TQSSGtAQC6Vwh3oXlyQlmYuvKABbiI=;
+	s=k20201202; t=1749825697;
+	bh=39pyphlFFWkkvSkufeLVeIcTkES26vfA7Sl9AvE8q0o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Vp13Egy1tXc7BiB3S2DOan1cUF/Ewbvv54L9zikmq0mVOSEtE4oB18TiVsaLSfy+E
-	 8am35MR4p/8nWVmxtuv1HMVtq5pcdkqeMPsIyH/xzn5SFlWx0yi9LPRVZBU+8Ul8S7
-	 UDgwob352lEtxXA/PZmrUvyzrDpvcTHRRMfvnVaJd+LULpm0npVzmeG/ks7DBMKYdB
-	 jInhU54c6L7zF4C1YknJoylaTv+rf434WiyRByGT2G2EPj8wzq021WijmQPtJY5R5O
-	 BA30HprJD08oaee6+ZApy1zWyGq9Vmv2UfbtOfYFNFn32bOLgcqgtwCmlnueGK922S
-	 8buY71bjtIqZQ==
-Date: Fri, 13 Jun 2025 15:40:55 +0100
+	b=NW1PPjVJrSVph1HS+gmqKT+QXbRyTRK3mCCbBoShp9W2MrIcAvh7T0fRtuq+zR9Fs
+	 EU3k+nKdhSrP2tKGgfToBB0gJiwWAssq7T8c1YnLaauCWg0KJrGdHdEN8/ncTOLzAA
+	 Q/cVlOHo4BoujaQr1Xj2gf+c4PC71WLmnrpyknoD/i7uzWutGhx8dICv68PqAwZjuq
+	 k0+9dF44aLtT7XeI10Lb2rUdHJgDKrXLSquYlLaIqBHRimCRoZ9bL/poZaxpj30vwx
+	 /jIXUcn+EzyHhiEY2omZgseO6T2NYuJM4hGdKMw6D+dGyhUR+UTSDptnbGtDwPL92u
+	 86e0NCCeG2P+g==
+Date: Fri, 13 Jun 2025 15:41:33 +0100
 From: Simon Horman <horms@kernel.org>
 To: John Ousterhout <ouster@cs.stanford.edu>
 Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
 	kuba@kernel.org
-Subject: Re: [PATCH net-next v9 03/15] net: homa: create shared Homa header
- files
-Message-ID: <20250613144055.GI414686@horms.kernel.org>
+Subject: Re: [PATCH net-next v9 13/15] net: homa: create homa_timer.c
+Message-ID: <20250613144133.GJ414686@horms.kernel.org>
 References: <20250609154051.1319-1-ouster@cs.stanford.edu>
- <20250609154051.1319-4-ouster@cs.stanford.edu>
+ <20250609154051.1319-14-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,72 +58,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250609154051.1319-4-ouster@cs.stanford.edu>
+In-Reply-To: <20250609154051.1319-14-ouster@cs.stanford.edu>
 
-On Mon, Jun 09, 2025 at 08:40:36AM -0700, John Ousterhout wrote:
-> homa_impl.h defines "struct homa", which contains overall information
-> about the Homa transport, plus various odds and ends that are used
-> throughout the Homa implementation.
-> 
-> homa_stub.h is a temporary header file that provides stubs for
-> facilities that have omitted for this first patch series. This file
-> will go away once Home is fully upstreamed.
+On Mon, Jun 09, 2025 at 08:40:46AM -0700, John Ousterhout wrote:
+> This file contains code that wakes up periodically to check for
+> missing data, initiate retransmissions, and declare peer nodes
+> "dead".
 > 
 > Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-> 
-> ---
-> Changes for v9:
-> * Move information from sync.txt into comments in homa_impl.h
-> * Add limits on number of active peer structs
-> * Introduce homa_net objects; there is now a single global struct homa
->   shared by all network namespaces, with one homa_net per network namespace
->   with netns-specific information.
-> * Introduce homa_clock as an abstraction layer for the fine-grain clock.
-> * Various name improvements (e.g. use "alloc" instead of "new" for functions
->   that allocate memory)
-> * Eliminate sizeof32 definition
-> 
-> Changes for v8:
-> * Pull out pacer-related fields into separate struct homa_pacer in homa_pacer.h
-> 
-> Changes for v7:
-> * Make Homa a per-net subsystem
-> * Track tx buffer memory usage
-> * Refactor waiting mechanism for incoming packets: simplify wait
->   criteria and use standard Linux mechanisms for waiting
-> * Remove "lock_slow" functions, which don't add functionality in this
->   patch series
-> * Rename homa_rpc_free to homa_rpc_end
-> * Add homa_make_header_avl function
-> * Use u64 and __u64 properly
-> ---
->  net/homa/homa_impl.h | 603 +++++++++++++++++++++++++++++++++++++++++++
->  net/homa/homa_stub.h |  91 +++++++
->  2 files changed, 694 insertions(+)
->  create mode 100644 net/homa/homa_impl.h
->  create mode 100644 net/homa/homa_stub.h
-> 
-> diff --git a/net/homa/homa_impl.h b/net/homa/homa_impl.h
 
 ...
 
-> +#ifdef __CHECKER__
-> +#define __context__(x, y, z) __attribute__((context(x, y, z)))
-> +#else
-> +#define __context__(...)
-> +#endif /* __CHECKER__ */
-
-I am unclear on the intent of this. But it does seem to be an
-unusual approach within the Kernel (I couldn't find any other similar
-code in-tree. And, with other patches in this series, it does seem
-to lead to Sparse and Smatch flagging the following (and other similar
-warnings):
-
- .../rhashtable.h:411:9: error: macro "__context__" requires 3 arguments, but only 2 given
- .../rhashtable.h:411:27: error: Expected ( after __context__ statement
- .../rhashtable.h:411:27: error: got ;
-
-I suspect it's best to remove the above.
+> diff --git a/net/homa/homa_timer.c b/net/homa/homa_timer.c
 
 ...
+
+> +/**
+> + * homa_timer() - This function is invoked at regular intervals ("ticks")
+> + * to implement retries and aborts for Homa.
+> + * @homa:    Overall data about the Homa protocol implementation.
+> + */
+> +void homa_timer(struct homa *homa)
+> +{
+> +	struct homa_socktab_scan scan;
+> +	struct homa_sock *hsk;
+> +	struct homa_rpc *rpc;
+> +	int total_rpcs = 0;
+
+total_rpcs is set but otherwise unused in this function.
+It looks like it can be removed.
+
+Flagged by clang 20.1.4 as:
+
+  net/homa/homa_timer.c:107:6: warning: variable 'total_rpcs' set but not used [-Wunused-but-set-variable]
+    107 |         int total_rpcs = 0;
+        |             ^
+
+> +	int rpc_count = 0;
+> +
+> +	homa->timer_ticks++;
+> +
+> +	/* Scan all existing RPCs in all sockets. */
+> +	for (hsk = homa_socktab_start_scan(homa->socktab, &scan);
+> +			hsk; hsk = homa_socktab_next(&scan)) {
+> +		while (hsk->dead_skbs >= homa->dead_buffs_limit)
+> +			/* If we get here, it means that Homa isn't keeping
+> +			 * up with RPC reaping, so we'll help out.  See
+> +			 * "RPC Reaping Strategy" in homa_rpc_reap code for
+> +			 * details.
+> +			 */
+> +			if (homa_rpc_reap(hsk, false) == 0)
+> +				break;
+> +
+> +		if (list_empty(&hsk->active_rpcs) || hsk->shutdown)
+> +			continue;
+> +
+> +		if (!homa_protect_rpcs(hsk))
+> +			continue;
+> +		rcu_read_lock();
+> +		list_for_each_entry_rcu(rpc, &hsk->active_rpcs, active_links) {
+> +			total_rpcs++;
+> +			homa_rpc_lock(rpc);
+> +			if (rpc->state == RPC_IN_SERVICE) {
+> +				rpc->silent_ticks = 0;
+> +				homa_rpc_unlock(rpc);
+> +				continue;
+> +			}
+> +			rpc->silent_ticks++;
+> +			homa_timer_check_rpc(rpc);
+> +			homa_rpc_unlock(rpc);
+> +			rpc_count++;
+> +			if (rpc_count >= 10) {
+> +				/* Give other kernel threads a chance to run
+> +				 * on this core.
+> +				 */
+> +				rcu_read_unlock();
+> +				schedule();
+> +				rcu_read_lock();
+> +				rpc_count = 0;
+> +			}
+> +		}
+> +		rcu_read_unlock();
+> +		homa_unprotect_rpcs(hsk);
+> +	}
+> +	homa_socktab_end_scan(&scan);
+> +	homa_skb_release_pages(homa);
+> +	homa_peer_gc(homa->peertab);
+> +}
+> -- 
+> 2.43.0
+> 
 
