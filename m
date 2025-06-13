@@ -1,150 +1,177 @@
-Return-Path: <netdev+bounces-197555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3A2AD925E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1746FAD928A
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEA161888ED3
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 16:03:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95656188DBEA
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 16:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE2B1FC0FE;
-	Fri, 13 Jun 2025 16:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EBB1F4C8A;
+	Fri, 13 Jun 2025 16:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XyInHlu3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mU3EcCeQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A561ACED7;
-	Fri, 13 Jun 2025 16:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7170578F5E
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749830568; cv=none; b=pvxXLrQinWhQKR7U513DnpC3Yi3LXirDCrgN/zcpoQXDExfczM6HuHKs8VPlZXJSYOWswBy8wrYRJs5weFkbTnyVFbm1wQPrcpfzEfSC7JIUVV8uWupyvu5ANFziQxZa3XUEzZ/SZI+ZiKC5xTTPjPjbfcKVHjPu3shSoDKUaho=
+	t=1749830794; cv=none; b=GPIq7NmawiFHIbyTQq0WinUIvbuVKcaqPVohBOmVkjW0Cl1xoqTA77NzeKXKcgxId1jSNtkfdbplqCliu/fYciZytXEB+S4NXancm3n/8MDgHm3+WrxeGtY5V3e8ucRdL6XrleATq0YfAvnw+LzMupH3VDy27IRAsaHmEoS3SD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749830568; c=relaxed/simple;
-	bh=aDVEjclZHq3dM+hdgbvjUwy0ua5O04khGzKkRZzx15A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ikvtrc+jykGnM188iGp8lO9HJOCMB9U4F7gNzwWo+VQCuI+psiiByJA4FNcq2K/bz7aaeqUrxYsB99v7Qf7m1bGKyWdznT/2UGg1KwkFeD9Q0j9167WAwB3SnoZ9VW5tyu0q/Jteov1GFh2XydgF8zD0wx567yhMx2u2gr9PrV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XyInHlu3; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55DDVaUs015720;
-	Fri, 13 Jun 2025 16:02:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=/0DCRS7jNv98LWVt8rDe+WfVDZJk
-	1RBINBRtUHWV9ZI=; b=XyInHlu3ttSD6jbBlwY3UkaxuYfBX3zUw8dfuU+NHLo6
-	lPkrAPt10A08m93eB1L6kQSbt1Ck0xkHSM9jTsxLJQgPIlctHPM8+YpfCk4YphlG
-	OkgJaBbGfLx4TNeTfImXZ6zqZF53c7FANWHY0E4rn0MtSUQP3eQkZrwEngCAtmJi
-	pRz58njk6nFzBnKexvS/TkjD0ztVcel64A7x+3pA8oX3fGx+1tyklY+U6FD8urKA
-	L25wW15Ik/kzmjzGlCjZiDk+JAByHIuu/BNpdplzCsE9ywffdVR++grkqMViVXLA
-	Ms8oTvnsrb5m6SiqtPd1Rr0S7VwDkGpUncYDCRzZWg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 474x4mq41j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Jun 2025 16:02:39 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55DG2cfB004609;
-	Fri, 13 Jun 2025 16:02:38 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 474x4mq41e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Jun 2025 16:02:38 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55DF0Txr027957;
-	Fri, 13 Jun 2025 16:02:38 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47518mtpjf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Jun 2025 16:02:38 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55DG2bI533686194
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Jun 2025 16:02:37 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0801658043;
-	Fri, 13 Jun 2025 16:02:37 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 658B758053;
-	Fri, 13 Jun 2025 16:02:36 +0000 (GMT)
-Received: from d.ibm.com (unknown [9.61.41.78])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 13 Jun 2025 16:02:36 +0000 (GMT)
-From: Dave Marquardt <davemarq@linux.ibm.com>
-Date: Fri, 13 Jun 2025 11:02:23 -0500
-Subject: [PATCH net v2] Fixed typo in netdevsim documentation
+	s=arc-20240116; t=1749830794; c=relaxed/simple;
+	bh=/NeY+ngXyMi+qDIzTnS/XqlwdHQph8t9i32nDq+xGlc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=b/es/k87sSVEMGCrUTgG259m1Gzh0ixbCUvknfLhdqdmK9fLu6zBSegu+pDB6W7yCMjzfk1SiVuXOFrq2xYUlNA00WcmUC/j53JPXVEF7ogV+YYp5f/pNDUXAH25Ts+Cbytb3unka/UtLDUSqzhGHu/D/k2tFTBaXvI3aceBIHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mU3EcCeQ; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <24c4dfe9-ae3a-4126-b4ec-baac7754a669@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749830788;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I2N7u3LdY6tKY81X57d2CYxFMGFItj7ixzsiGoxXQJM=;
+	b=mU3EcCeQaLSTLm2rizFes01egO1u2Q33TnpqKl6SQT1ldDUf+cYna0OnlnEQ/aTt68Vszz
+	eabfq0djvZPbgjCkWLa1HRyfv/JItxfUbZ3gSrXoq+zT3fEvNCv+2cf3pFSgxNDmmA/SN+
+	CB83LX1kFsLv9EaXRnOE4rSyRq8UUtA=
+Date: Fri, 13 Jun 2025 12:06:23 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [RFC] comparing the propesed implementation for standalone PCS
+ drivers
+To: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
+ Kory Maincent <kory.maincent@bootlin.com>, Simon Horman <horms@kernel.org>,
+ Christian Marangi <ansuelsmth@gmail.com>, Lei Wei <quic_leiwei@quicinc.com>,
+ Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Robert Hancock <robert.hancock@calian.com>, John Crispin <john@phrozen.org>,
+ Felix Fietkau <nbd@nbd.name>, Robert Marko <robimarko@gmail.com>
+References: <aEwfME3dYisQtdCj@pidgin.makrotopia.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <aEwfME3dYisQtdCj@pidgin.makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250613-netdevsim-typo-fix-v2-1-d4e90aff3f2f@linux.ibm.com>
-X-B4-Tracking: v=1; b=H4sIAI5LTGgC/1WMQQ6CMBBFr0Jm7RCmFYmuvIdx0dJBJrEttkgwh
- LvbuHP5Xv77G2ROwhku1QaJF8kSQwF1qKAfTXgwiisMqlFtcyKFgWfHSxaP82eKOMiK1mrSTp8
- 7ZR2UcEpc9O/0BmUP9yKHFEsyJjZ/f9Tq7qhqIk0NEjqzsDfpdX1KeK+1WF/30cO+fwGD0Y4nq
- QAAAA==
-X-Change-ID: 20250612-netdevsim-typo-fix-bb313d3972bd
-To: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        Dave Marquardt <davemarq@linux.ibm.com>
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Y4X4sgeN c=1 sm=1 tr=0 ts=684c4b9f cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=CYWh4jdgKPvq9Fx5Vf4A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: 2XLPBnR0vTB3q8tv2mnj9EI3h-zE20TE
-X-Proofpoint-ORIG-GUID: 1AaA2ISEQQJ8NUth1v7qlmgTKT_UGeMf
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEzMDExNSBTYWx0ZWRfXy+u9k8mfdz2g 12mnEKj3oGRVHvNFRxfJZo1tOHtsHzfv5pIet1UYlUgJpLidJS+okPhCh8d8tAgaURGE21Jz159 28LKIRNei/qIpejgodUR46XXS+mthpArCR6Kjlz17dCHB7tHLcrXi6uKqvkjLa8zvSEgihI0T4H
- qBsDyJ7ELcJVMtoxIZdT+A262z2027WMBoStQ25EVe59b4Fc8ReQxQBtdsQqk8Mn/Ki8TrEFpsB PBSkvCVwyyTqPDxtG8BWKrn0YhjJl+acHRdEEb6A84tv50Am5p5fkUtCw6LQLP0Y9ys1iBoGg6b EEV8cLvlGgEG+gtQhGoXXX8GOHZo4sKpjrxTrmpjgesy7Y2yyhSBq58UPMbgXZZhtI2oERCQDNn
- m2CcI1Gt/5mlXMnTMnx/JcYIJweRNNEnvpAzyhnqxNomm4YSTpJ36AtwFbUlrsv4lSOOG+Hy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-13_01,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=976 spamscore=0
- clxscore=1011 lowpriorityscore=0 malwarescore=0 bulkscore=0 adultscore=0
- impostorscore=0 suspectscore=0 phishscore=0 mlxscore=0 priorityscore=1501
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506130115
+X-Migadu-Flow: FLOW_OUT
 
-Fixed a typographical error in "Rate objects" section
+On 6/13/25 08:55, Daniel Golle wrote:
+> Hi netdev folks,
+> 
+> there are currently 2 competing implementations for the groundworks to
+> support standalone PCS drivers.
+> 
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=970582&state=%2A&archive=both
+> 
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=961784&state=%2A&archive=both
+> 
+> They both kinda stalled due to a lack of feedback in the past 2 months
+> since they have been published.
+> 
+> Merging the 2 implementation is not a viable option due to rather large
+> architecture differences:
+> 
+> 				| Sean			| Ansuel
+> --------------------------------+-----------------------+-----------------------
+> Architecture			| Standalone subsystem	| Built into phylink
+> Need OPs wrapped		| Yes			| No
+> resource lifecycle		| New subsystem		| phylink
+> Supports hot remove		| Yes			| Yes
+> Supports hot add		| Yes (*)		| Yes
+> provides generic select_pcs	| No			| Yes
+> support for #pcs-cell-cells	| No			| Yes
+> allows migrating legacy drivers	| Yes			| Yes
+> comes with tested migrations	| Yes			| No
+> 
+> (*) requires MAC driver to also unload and subsequent re-probe for link
+> to work again
+> 
+> Obviously both architectures have pros and cons, here an incomplete and
+> certainly biased list (please help completing it and discussing all
+> details):
+> 
+> Standalone Subsystem (Sean)
+> 
+> pros
+> ====
+>  * phylink code (mostly) untouched
+>  * doesn't burden systems which don't use dedicated PCS drivers
+>  * series provides tested migrations for all Ethernet drivers currently
+>    using dedicated PCS drivers
+> 
+> cons
+> ====
+>  * needs wrapper for each PCS OP
+>  * more complex resource management (malloc/free) 
+>  * hot add and PCS showing up late (eg. due to deferred probe) are
+>    problematic
+>  * phylink is anyway the only user of that new subsystem
 
-Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
----
-- Fixed typographical error in "Rate objects" section
-- Spell checked netdevsim.rst and found no additional errors
--
----
- Documentation/networking/devlink/netdevsim.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I mean, if you want I can move the whole thing to live in phylink.c, but
+that just enlarges the kernel if PCSs are not being used. The reverse
+criticism can be made for Ansuel's series: most phylink users do not
+have "dynamic" PCSs but the code is imtimately integrated with phylink
+anyway.
 
-diff --git a/Documentation/networking/devlink/netdevsim.rst b/Documentation/networking/devlink/netdevsim.rst
-index 88482725422c2345adccc0f04d2566fb5ba5ef6f..3932004eae82ce125be7f8380975c43b7175422d 100644
---- a/Documentation/networking/devlink/netdevsim.rst
-+++ b/Documentation/networking/devlink/netdevsim.rst
-@@ -62,7 +62,7 @@ Rate objects
- 
- The ``netdevsim`` driver supports rate objects management, which includes:
- 
--- registerging/unregistering leaf rate objects per VF devlink port;
-+- registering/unregistering leaf rate objects per VF devlink port;
- - creation/deletion node rate objects;
- - setting tx_share and tx_max rate values for any rate object type;
- - setting parent node for any rate object type.
+> 
+> phylink-managed standalone PCS drivers (Ansuel)
+> 
+> pros
+> ====
+>  * trivial resource management
 
----
-base-commit: 27cea0e419d2f9dc6f51bbce5a44c70bc3774b9a
-change-id: 20250612-netdevsim-typo-fix-bb313d3972bd
+Actually, I would say the resource management is much more complex and
+difficult to follow due to being spread out over many different
+functions.
 
-Best regards,
--- 
-Dave Marquardt <davemarq@linux.ibm.com>
+>  * no wrappers needed
+>  * full support for hot-add and deferred probe
+>  * avoids code duplication by providing generic select_pcs
+>    implementation
+>  * supports devices which provide more than one PCS port per device
+>    ('#pcs-cell-cells')
+> 
+> cons
+> ====
+>  * inclusion in phylink means more (dead) code on platforms not using
+>    dedicated PCS
+>  * series does not provide migrations for existing drivers
+>    (but that can be done after)
+>  * probably a bit harder to review as one needs to know phylink very well
+> 
+> 
+> It would be great if more people can take a look and help deciding the
+> general direction to go.
 
+I also encourage netdev maintainers to have a look; Russell does not
+seem to have the time to review either system.
+
+> There are many drivers awaiting merge which require such
+> infrastructure (most are fine with either of the two), some for more
+> than a year by now.
+
+This is the major thing. PCS drivers should have been supported from the
+start of phylink, and the longer there is no solution the more legacy
+code there is to migrate.
+
+--Sean
 
