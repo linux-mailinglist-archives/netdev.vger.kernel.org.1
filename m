@@ -1,94 +1,83 @@
-Return-Path: <netdev+bounces-197284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB720AD8033
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:20:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34EC9AD8035
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:21:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 959611E1E2A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:20:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9EF01E0391
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92BF1DED5B;
-	Fri, 13 Jun 2025 01:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F023C1D61B7;
+	Fri, 13 Jun 2025 01:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pARyP37I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkxk6dB+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52DD1420DD
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 01:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DCF1420DD;
+	Fri, 13 Jun 2025 01:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749777603; cv=none; b=MROSFhLA2qkzwp99L0IoRCq1eVOd44JWbr3gyXjk0h1z587OYjZ3YEzYOexG+ykX1S7guqPpw3SYAegT1E6uUYqQlfhUY1yHdc4kooYbmW4jWQ1RwYrGqVESjFJtIgBSoNqO4OlqgP/GBR43R07oU7t3lpsOQ3qbyo2TaJIqHmE=
+	t=1749777705; cv=none; b=U/Ha37XdVIOnK5eY8r8EOhRgzsClXWTuwQIPLa0UhTWX2HqCKTQhOK7xGEkquxLmLCbPcZPsn3NCuDe8LWK72OA08HzKLkWk1ZE2DBMfk7gjtr6Z9V1pfcNXwrrTnJoR/I3NPr33wT1oR4MT0AD8OpLbY0UKBJZo6UhBN0WIKYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749777603; c=relaxed/simple;
-	bh=wIqBQL98xHp3rUbvmJ5U5fMsfAiTspFoqSSw8k+F4+k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VcRXo6jn/RmcIIsgfwO/e+/LbT86zoGw//wGiuArGuucHZXlPU8p5jUKWED6qEe+t1X9V1VoY0u9udmS4cz49T0IcmkbSChde1DJkX4FHESsnhAUTkxMNVhVElXN+IG5ZmavGTnHo0cxIJnqPSX4uA2qUMzihHT1NZVBXRcZXuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pARyP37I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E7AC4CEEA;
-	Fri, 13 Jun 2025 01:20:03 +0000 (UTC)
+	s=arc-20240116; t=1749777705; c=relaxed/simple;
+	bh=CkV7K9JkoZIX1EFm22k3RUVUrhM4a86eMgsQGHb5Sq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cPWnznb6HeueDMyqB+ZXTrIqwQJCqJsNh5XJ1e47SXj/IRWXJ887/k7op0FhKI101rf7rxATYmQewAH2FakwyGS74d0sY0Z8OyzS6B+0ohGCxL/uvM9xF3yYi9JorCz0sc9auNJqJMTaUQWiKJOVW2q+jb/RaL+8BzAaMHR5KyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkxk6dB+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0637AC4CEEA;
+	Fri, 13 Jun 2025 01:21:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749777603;
-	bh=wIqBQL98xHp3rUbvmJ5U5fMsfAiTspFoqSSw8k+F4+k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pARyP37Ilg4d+tVjkX9m0A4xzETDzHnRBAb3Qtm20lFBmcrN2UGg2/iJzOg7zXh6m
-	 ZpQ+oEAw499qOSCD2629gucc6SNmS/36dxOeJyrOv1YF9rswLjNdCitB2ddEqZbJLn
-	 1ZwDiRc8x8/9uulF52OJTFvWcoptGxiMdkU4IbzMeZVOAS74ogW9ZCnEiuseyXC0tV
-	 gptZ+zhDCKEf1lm/8nAaADsbRzcoPWQkDpw0KTFXxnZ3fY8UMAjTfsGoeimG2TOUcw
-	 rl4h8XsHhOoEiiMxT/FppCRnZdi+r5uKa4HDji9zZmCFVLmyW1TNFYEyDv0T0beOIC
-	 u5HpjlXpR81Zg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B5339EFFCF;
-	Fri, 13 Jun 2025 01:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749777705;
+	bh=CkV7K9JkoZIX1EFm22k3RUVUrhM4a86eMgsQGHb5Sq4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nkxk6dB+kugt2d9edQ/jopnXbnc2+S8g1W/kk6Xj40u5oVCDdK2Ac+7WHs3i+Ve7q
+	 UuO6fsjybG3L9lyaHQqYQCkQQzutMrsElQN5uPcqKbx8kRxP5jB0kE3Fr7GMSNisqF
+	 AAU2YkbkGz8bgusMc32CgIpMtekatIgwW6YwoGBynF4mqhzv3PlQJ8G4xEppMr+r3N
+	 IQBPUMP0XPjLM9IE4UknlL7N0GirnB1Z2t92soRx0HmgP/dPHwZipUxU/UzF65VDA4
+	 BW0E74mnrKNGez1eU0emtxVYIN6CylOphGMPvZ2dmxocKgV4RWGdXDpisMmfz1QHEp
+	 tRGR37QgESr2g==
+Date: Thu, 12 Jun 2025 18:21:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ haiyangz@microsoft.com, decui@microsoft.com, stephen@networkplumber.org,
+ kys@microsoft.com, paulros@microsoft.com, olaf@aepfle.de,
+ vkuznets@redhat.com, davem@davemloft.net, wei.liu@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, ssengar@linux.microsoft.com,
+ linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
+ kotaranov@microsoft.com, horms@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next,v7] net: mana: Add handler for hardware
+ servicing events
+Message-ID: <20250612182143.16f857a9@kernel.org>
+In-Reply-To: <1749580942-17671-1-git-send-email-haiyangz@linux.microsoft.com>
+References: <1749580942-17671-1-git-send-email-haiyangz@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESUBMIT net-next] net: phy: assign default match function
- for
- non-PHY MDIO devices
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174977763273.176894.12096002664354990915.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Jun 2025 01:20:32 +0000
-References: <6c94e3d3-bfb0-4ddc-a518-6fddbc64e1d0@gmail.com>
-In-Reply-To: <6c94e3d3-bfb0-4ddc-a518-6fddbc64e1d0@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, linux@armlinux.org.uk,
- kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 10 Jun 2025 11:42:22 -0700 Haiyang Zhang wrote:
+> v6:
+> Not acquiring module refcnt as suggested by Paolo Abeni.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+TBH I'm not 100% sure this is correct.
+If the service worker operations end up unbinding the driver from
+the device holding the device ref may not prevent the module from
+being unloaded.
 
-On Tue, 10 Jun 2025 08:03:43 +0200 you wrote:
-> Make mdio_device_bus_match() the default match function for non-PHY
-> MDIO devices. Benefit is that we don't have to export this function
-> any longer. As long as mdiodev->modalias isn't set, there's no change
-> in behavior. mdiobus_create_device() is the only place where
-> mdiodev->modalias gets set, but this function sets
-> mdio_device_bus_match() as match function anyway.
-> 
-> [...]
-
-Here is the summary with links:
-  - [RESUBMIT,net-next] net: phy: assign default match function for non-PHY MDIO devices
-    https://git.kernel.org/netdev/net-next/c/b1b36680107e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Could you try to trigger that condition? Make that msleep() in the work
+even longer and try to remove the module while the work is sleeping
+there?
 
