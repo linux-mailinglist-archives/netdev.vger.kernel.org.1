@@ -1,201 +1,165 @@
-Return-Path: <netdev+bounces-197466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2DF1AD8B67
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:56:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA8C1AD8A79
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA854188C89E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:56:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 623C43AA975
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FA32E339C;
-	Fri, 13 Jun 2025 11:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2LzMwsh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A662D2392;
+	Fri, 13 Jun 2025 11:31:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BF92E2F05;
-	Fri, 13 Jun 2025 11:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386471E0DE8;
+	Fri, 13 Jun 2025 11:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749815739; cv=none; b=LiVr577nFECPEUQYrNOd93y0gJKVyOhTQOytFgmBNFyKQ2JIetoyT9wkZRorA43WZFSW5eqZgMm+yMIiVHQ9r6RbKmSo7XlHey/HgTY1ZKsY3tKg3odrK+DfVH+AXeidQoQ34PGZkBGIWUHoRJ+4q0+wqmBf/u2fqrQ1DSto/Vw=
+	t=1749814315; cv=none; b=Wr28NaChQLL4D65PxxX2Rc+AubQr0JRIGpoMTCOVZ4c/kCnWkp4woxiaBLHthiHw27aPcExZX64DrvABYwG5+GlBVNHgEbXFAr3zYwlbqmrAtsSms0abc9/y1iCY4Ek05RFH+8P+OA8yiHpxtdJxN2TMHvbgBRjDucsUatj5lHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749815739; c=relaxed/simple;
-	bh=zXGq9qaDsbHQ+3z70oVdXVkvT7TLBW8Sq21vfokbjNc=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=HK4DaSalqa/iFvpJfO1QgDJ13YjfmFyLVqMl9+kqWjHDdy4Ee8LrF3r0yZ4jROGB4E2ouV8TwqpS9TeylYXJDaRam8cghHLA2Cg2bjYUSqj8klUF159cNWnWifBfmFKr7Gh5OkFI3/CMf0Fk6C5QzCyilplcSDwnWXmFer3tg2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D2LzMwsh; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1749814315; c=relaxed/simple;
+	bh=lgPBblrgv0M68GwCNU3VbSXeCXjyQfs5ViIdZ9bx198=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Umr9MdAqd7tl6aY5XtZ5Pqk27hgZleZXC1XmvR6NvwGdj7xy+tR+0p4vX52sh6xARJPbID4YEK+yvYMbPpjp8Er3MmyF3wlJl548URlJVeC8lsHQrXW5paavRT8ZPby0lg1rHl9uE/68dGJEmS+MIJH60/+FHiQ2oJ/RCmyWclU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-451e2f0d9c2so16359925e9.1;
-        Fri, 13 Jun 2025 04:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749815736; x=1750420536; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p7UTlJHoMHi1drH038eVgqSVLWynDfABQdhPWNCYmpg=;
-        b=D2LzMwsh12m8HP6xF7s/gdOD8pLfb9IrRMI13rFv9MCDjhZbBrk2JZihwJP1LXJEo6
-         Up2Eeu324uCHuXwuUy5NB9tF64O+b0743dB0kWRRujCRY0AFg0wvd2s5gSR8zU1lqIvN
-         je1k3PYiSS+EikuRji/eU9ZDO5oETOw/lIv3aLYy7C+rLIEugPKRuc3Bl1fYqDO4m59q
-         0U2WYWU2lP3uxAuVDn+tVNJwjnaGFOnZaPPmJiareiqyxOtASl/jy//IncJWUXRwq776
-         JYQ0LHK373YjB5chsy7ExBmyZfxW2q30ek/tYtneh0cP60df+94PjsHpHPGZWHZsmcMR
-         MlbA==
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-addda47ebeaso386219366b.1;
+        Fri, 13 Jun 2025 04:31:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749815736; x=1750420536;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p7UTlJHoMHi1drH038eVgqSVLWynDfABQdhPWNCYmpg=;
-        b=wkePYIVAj+iyHFmpTKLFUdKASmYrEFP+0qVyqAyLTRnzkT4d8eJXYP67a/T6QkSGVO
-         65tG1cA4ykQ9Pl34Lr1SXNtt3kceDAOE/YNS4woMurAzDizHLK753uArZiXa1vR5iudb
-         TjfdRXBKoaEB5OzwcU8BfAimBKrfJ8a9Z4c5hx15kMRva87E0Po5IgekKx0hNPi6Eo7I
-         Ij+a1TGl23g/hOZ+zN8kRwyrtT9VoAlwUPcWdBkzqPfrmiJexsIiCr5AOwIKh2zyz11v
-         ia8kGDavMqNxRoOjl0MRK1n4lJW40eh5OZxZb67hoXfYyNjznzqMO49nZmbQBI3fprRD
-         1c7w==
-X-Forwarded-Encrypted: i=1; AJvYcCViPSGRiA2DN1l+bOM0REKDYbVUptSfwgZMthES7ZxclQSnrNFcBtbM0gIb7oSC2M6QWhhDLi3wouAzV/I=@vger.kernel.org, AJvYcCX0Gn6gO5uTDo6d54YddL7oSLfz9ixGwNetX6i748T+9iLZ6lc6EMvNYPEYO2cj3izguCkaFkqz@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfGZs5ZLV+LdIhDD/TZI/NJWMZQgdQfbGJ8JWJ6F0AuWtrwKsf
-	tT83tMzJR6tb1Ta3w+UUHDh1Ze/4UUboa7Iblmc2qwFgrY62r545MJI2
-X-Gm-Gg: ASbGnctJnZ6vjv0eDFTdj+6T6RvBcIzX1QRd3yP8m0pffZiAYUY34pQScyQYahcI7Su
-	kOXosJLtdlWqltr8bO8qZFrAMzHmKHdyCrh0kvgRj6/wLwNFozI4tBJ0I37cKUkdLMXqwHeLJJv
-	LvAGYG5e7NY+M/lNExPcBbUKshCCqrrINohzQmx37XFIIuhzld9VkpSkqq5fHZreuau8o73tIeq
-	7yUCAOtGJQSiaaoJit7ncQnmqoSpuMc/+hwBrGVFRcP4lShCcP9cCIdQLS8wAnyF63e4GuBiTHI
-	BTrabMwOhvFRB01aLigfjmV351/7CTgUKqO7SH9kroavoZ9WNheGHy3vCML556k5ljlMSC2UJZj
-	HXufo5W4kRA==
-X-Google-Smtp-Source: AGHT+IFi/nbdK2tp24U0X9KzKkQTjtsKVXLh7U3co32ExcLSRr/fke5SRM8jwCxSx2RJEy/QxZQqHQ==
-X-Received: by 2002:a05:600c:5251:b0:453:92e:a459 with SMTP id 5b1f17b1804b1-4533b28a97emr5390165e9.16.1749815735625;
-        Fri, 13 Jun 2025 04:55:35 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:75e0:f7f7:dffa:561e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c4e8sm50104975e9.3.2025.06.13.04.55.34
+        d=1e100.net; s=20230601; t=1749814311; x=1750419111;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+DsHNuCTPZ33OCzYQersZU3liyxjgfm4XynZIaM+fP4=;
+        b=CdUKgk89z62UMuTSa2NYr+zCi3jc1Rs1jGRbLhc2DFGhKKUbdRNHEWqcLzp2FhMquK
+         KM79yXawDk8MNXg3Ei8bCqFHPvhFvYmZreVwj1C4H3UKWGmNk21zPnpH6LATbYJdqoXs
+         ptykjwDsoLr9QWUXficoF0jhPOirPFAR3paovKumu6KYt8c4ukVsYzEEy36stMjiFOXu
+         9tvq6+jqwusaHBitdR6BWBhu69RqaGiyqV2W76PLpDrcATba5kweBgzm1ixDG4b7Vjaz
+         yvREN2hHmMvAEvmuedZMUUATYWbul8bX1ZA4+/sEOHR6r//ICC/tKNl6t4t/v19FeXR/
+         8BMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXlUUN3ABtkdLpG5ItXgkdFI16aquFGPWkjtASuFULd6SdueQDcm3XGqRNSEbGKEvWTHkJOqYuTYArSx4=@vger.kernel.org, AJvYcCVsD5l270/RB9GTyJqSa7KcUPNpof+qEYZ3bW5So/TfxYv1FfYpXOVf+GPjUT5gtvL1Texx/SJQaCqNDp8IR5bw@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2DLs2wI1PzhLPmdTf1b1xx2Vi42WgHBIQ+mNLDIU9+pFzLsIy
+	5W0IkZM4QdNnV4ji+wc5KWpcnnZAOoBRZlMGzPfDdUaYuWi49tLrHgiD+QEXrA==
+X-Gm-Gg: ASbGncsP8qpol6SFH1RD+4Sgvbj5VBdYbNdVkRwBP+3aXFIx7EThlPiTQhLqQDs+orR
+	rDviu9UPH8DrUifEfOgxdXE1l4vRfZqX6bl5ek09g5X/KlyaJ4gMmKROY2om5ynkcCRyxyqy/4a
+	RD7FwjGCMG7uh4P9fW6EeVlb61XdUoIP0YvZDmSbzRftTrlEbB5C09U0l7jIy/UcSSVJyoG1dtR
+	Xx22AnzQqnGkn9tCWiV8PljGvGH7dPmCoXZL6sAxQg4gjAnMqPHCXMXQQYNUWs5h2fkKFEC0A1U
+	hOjGwRE008b7PGpPAQwMHh+1GuVAqKk0jkX4sf9xAlTOjibKeWYH
+X-Google-Smtp-Source: AGHT+IEbCs4FhoglbncFe9pZ+ja3OdFwimVMb1BhOCQsjRvvlZn6qGl3xavu+j1ctls1AsRlnwhjzg==
+X-Received: by 2002:a17:907:e8a:b0:add:f4ac:171f with SMTP id a640c23a62f3a-adec55958e1mr262728666b.5.1749814310950;
+        Fri, 13 Jun 2025 04:31:50 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec81c1f6asm115696666b.55.2025.06.13.04.31.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 04:55:34 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
- <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
- Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
- Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Ruben
- Wauters" <rubenru09@aol.com>,  "Shuah Khan" <skhan@linuxfoundation.org>,
-  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
-  linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
-  netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
-Subject: Re: [PATCH v2 09/12] docs: sphinx: add a parser template for yaml
- files
-In-Reply-To: <39789f17215178892544ffc408a4d0d9f4017f37.1749723671.git.mchehab+huawei@kernel.org>
-Date: Fri, 13 Jun 2025 12:29:34 +0100
-Message-ID: <m2tt4jnald.fsf@gmail.com>
-References: <cover.1749723671.git.mchehab+huawei@kernel.org>
-	<39789f17215178892544ffc408a4d0d9f4017f37.1749723671.git.mchehab+huawei@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Fri, 13 Jun 2025 04:31:50 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v3 0/8] netpoll: Untangle netconsole and netpoll
+Date: Fri, 13 Jun 2025 04:31:29 -0700
+Message-Id: <20250613-rework-v3-0-0752bf2e6912@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABEMTGgC/1XNywrCMBCF4VcJs+5IMr1Yu/I9xEWaTNsgpJKUW
+ Cl9dyGi6Prwf2eDyMFxhE5sEDi56GYPnSgLAWbSfmR0FjoBJKmWjSwx8GMONzTqWBttW0vEUAi
+ 4Bx7cmqELeF7Q87rAtRAwubjM4Zkfksr7G1PygyWFEo9msExtOVDVnC33TvvDHMZsJPrt1Lcjl
+ Kh7ZU/UV3Vr9F+37/sLzxLxAt8AAAA=
+X-Change-ID: 20250603-rework-c175cad8d22e
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ gustavold@gmail.com
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2779; i=leitao@debian.org;
+ h=from:subject:message-id; bh=lgPBblrgv0M68GwCNU3VbSXeCXjyQfs5ViIdZ9bx198=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoTAwlnyaH8jaRLCKHTntak/Jqr2iUAAuXZ5f7A
+ aujtNNz1+KJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaEwMJQAKCRA1o5Of/Hh3
+ baaPEACHQiX7kPFbVJLLzRVfQgjQ1p9ZsmEiSSXaj8TEKD5Ocph/L4h9C2Fzem5IBEs+R6bR0Oz
+ rMMuLmV847Hxj5HbpydiMzmggeLUkQGiToZL2O612l4HtmEAi1ukB+WSaHqwc4f7bedmxZk207q
+ avG4HcbC9djx1CjRl/ByIDBdomf0PEIrUwIZDWzh5usqFaDAIdhc/Lbj6z3ntCj3ldq5eTVtAss
+ WFgK5vvZk//9o9SaUp1Csl5iNYWbbuj2fUtyqh+pr+SjX/B5k1w9bKyWM+3MDT9ixFE1QzGYFM6
+ WRAkZDUJDcHAMjcMpmNAqIRwjwI1X7Vg7vMo5PRzO0kk6xR3DFnhU1zhkcciCi9uHpfH2hsd/hZ
+ 37UBUCYzYgeHo3yjpI+l5GCyJngavR5f+VhWDqdXyR5/WU6EblYXPhVdvIbp72+WmahXOkidkWr
+ jsslpJBOQ7DLM5SqnFajgxn9EarHYEYfOyyjwL4NQ8XEVumVFWh3gBI9W2WzKb9EXGHrh4ACPGi
+ ymd5+HcixxgxbukXkDdHBEpLiJ6WIpxE+CtpMfNySHTZJFkchj1/GkUmT/1lCinEV0x6f+ZXuHd
+ nBbPBcUk27vKJyJjzSSr4Vsm0aI1oUXmTnTr7F8VmuOTVC4JoXKpFFyTZ6qqJRTIRWxB7GvC7s1
+ LVC3BUeBOqIghjg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+Initially netpoll and netconsole were created together, and some
+functions are in the wrong file. Seperate netconsole-only functions
+in netconsole, avoiding exports.
 
-> Add a simple sphinx.Parser class meant to handle yaml files.
->
-> For now, it just replaces a yaml file by a simple ReST
-> code. I opted to do this way, as this patch can be used as
-> basis for new file format parsers. We may use this as an
-> example to parse other types of files.
->
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  Documentation/sphinx/parser_yaml.py | 63 +++++++++++++++++++++++++++++
->  1 file changed, 63 insertions(+)
->  create mode 100755 Documentation/sphinx/parser_yaml.py
+1. Expose netpoll logging macros in the public header to enable consistent
+   log formatting across netpoll consumers.
 
-It's not a generic yaml parser so the file should be
-netlink_doc_generator.py or something.
+2. Relocate netconsole-specific functions from netpoll to the netconsole
+   module where they are actually used, reducing unnecessary coupling.
 
->
-> diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/parser_yaml.py
-> new file mode 100755
-> index 000000000000..b3cde9cf7aac
-> --- /dev/null
-> +++ b/Documentation/sphinx/parser_yaml.py
-> @@ -0,0 +1,63 @@
-> +"""
-> +Sphinx extension for processing YAML files
-> +"""
-> +
-> +import os
-> +
-> +from docutils.parsers.rst import Parser as RSTParser
-> +from docutils.statemachine import ViewList
-> +
-> +from sphinx.util import logging
-> +from sphinx.parsers import Parser
-> +
-> +from pprint import pformat
-> +
-> +logger = logging.getLogger(__name__)
-> +
-> +class YamlParser(Parser):
-> +    """Custom parser for YAML files."""
+3. Remove unnecessary function exports
 
-The class is only intended to be a netlink doc generator so I sugget
-calling it NetlinkDocGenerator
+4. Rename netpoll parsing functions in netconsole to better reflect their
+   specific usage.
 
-> +
-> +    supported = ('yaml', 'yml')
+5. Create a test to check that cmdline works fine. This was in my todo
+   list since [1], this was a good time to add it here to make sure this
+   patchset doesn't regress.
 
-I don't think we need to support the .yml extension.
+PS: The code was split in a way that it is easy to review. When copying
+the functions from netpoll to netconsole, I do not change than other
+than adding `static`. This will make checkpatch unhappy, but, further
+patches will address the issues. It is done this way to make it easy for
+reviewers.
 
-> +
-> +    # Overrides docutils.parsers.Parser. See sphinx.parsers.RSTParser
-> +    def parse(self, inputstring, document):
-> +        """Parse YAML and generate a document tree."""
-> +
-> +        self.setup_parse(inputstring, document)
-> +
-> +        result = ViewList()
-> +
-> +        try:
-> +            # FIXME: Test logic to generate some ReST content
-> +            basename = os.path.basename(document.current_source)
-> +            title = os.path.splitext(basename)[0].replace('_', ' ').title()
-> +
-> +            msg = f"{title}\n"
-> +            msg += "=" * len(title) + "\n\n"
-> +            msg += "Something\n"
-> +
-> +            # Parse message with RSTParser
-> +            for i, line in enumerate(msg.split('\n')):
-> +                result.append(line, document.current_source, i)
-> +
-> +            rst_parser = RSTParser()
-> +            rst_parser.parse('\n'.join(result), document)
-> +
-> +        except Exception as e:
-> +            document.reporter.error("YAML parsing error: %s" % pformat(e))
-> +
-> +        self.finish_parse()
-> +
-> +def setup(app):
-> +    """Setup function for the Sphinx extension."""
-> +
-> +    # Add YAML parser
-> +    app.add_source_parser(YamlParser)
-> +    app.add_source_suffix('.yaml', 'yaml')
-> +    app.add_source_suffix('.yml', 'yaml')
+Link: https://lore.kernel.org/netdev/Z36TlACdNMwFD7wv@dev-ushankar.dev.purestorage.com/ [1]
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v3:
+- The cleanup on the netcons_cmdline.sh test was not cleaning the
+  netdevsim. Clean it at the end of the test. (Jakub)
+- Link to v2: https://lore.kernel.org/r/20250611-rework-v2-0-ab1d92b458ca@debian.org
 
-No need to support the .yml extension.
+Changes in v2:
+- No change in the code. Just rebased the patches onto netnext/main
+- Link to v1: https://lore.kernel.org/r/20250610-rework-v1-0-7cfde283f246@debian.org
 
-> +
-> +    return {
-> +        'version': '1.0',
-> +        'parallel_read_safe': True,
-> +        'parallel_write_safe': True,
-> +    }
+---
+Breno Leitao (8):
+      netpoll: remove __netpoll_cleanup from exported API
+      netpoll: expose netpoll logging macros in public header
+      netpoll: relocate netconsole-specific functions to netconsole module
+      netpoll: move netpoll_print_options to netconsole
+      netconsole: rename functions to better reflect their purpose
+      netconsole: improve code style in parser function
+      selftests: net: Refactor cleanup logic in lib_netcons.sh
+      selftests: net: add netconsole test for cmdline configuration
+
+ drivers/net/netconsole.c                           | 137 ++++++++++++++++++++-
+ include/linux/netpoll.h                            |  10 +-
+ net/core/netpoll.c                                 | 136 +-------------------
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  59 ++++++---
+ .../selftests/drivers/net/netcons_cmdline.sh       |  52 ++++++++
+ 6 files changed, 240 insertions(+), 155 deletions(-)
+---
+base-commit: 6d4e01d29d87356924f1521ca6df7a364e948f13
+change-id: 20250603-rework-c175cad8d22e
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
