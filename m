@@ -1,143 +1,117 @@
-Return-Path: <netdev+bounces-197426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D575DAD8A1B
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:13:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A52AD8B5D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA6C1688DD
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:13:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAEB9162C99
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75BA2DECD3;
-	Fri, 13 Jun 2025 11:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D442E0B56;
+	Fri, 13 Jun 2025 11:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g4kKdw9S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsx6/CLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0F72D5C63;
-	Fri, 13 Jun 2025 11:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B3C2D5C94;
+	Fri, 13 Jun 2025 11:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749813157; cv=none; b=SIE0oH12zaJNGQgTffdst6kxIlvMHSdHjKBEYy+I2T6tBLLm1saRCC7H6t+Oeby9jOEwmRYks9xmPIF8QrY9j0yTcZQ9MT4hLokl2PyDMnYrnU3AKhmYs+G+X3KWaJNG3W+rmJyX31Qq8VbqNmjvlQW1EWa7vNTy6dO7O9ssolU=
+	t=1749815735; cv=none; b=O6Pt/o77rzYqfQoiBFUT9ORMm88Ppgek7p2hUo9bns1yhYiNGMoBdEalQ8a0AP5rg86sQZVrNP1wdlpbRKUqSOY5KpraLcaMMP5bwwuLRPI35Td7Iny1V2hPiUneLJxQ4EDe2XEyujE3SsO6vWzgUl3ZteqLLj4uETvostullck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749813157; c=relaxed/simple;
-	bh=3JSffdcKG1BEdfLxDkvCLXE5WcpkgQe1rrYaCHuFNrw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gxwTZXmvmzlIjd4Wtz6vucKvPu0KgqWuIKw28WuizKOHJ7y3czPBm4Rur1Ps/ffXaM7s8DybRV8AjDdtHSSR0JHY6HSTPCpnO8/dVsa/60T+DKMWwm5bopFKdY+SEnPiwvXWy++8WUKPaPr290dXLifV2tuCDI/ePYyZOb/x6sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g4kKdw9S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE8AC4CEF1;
-	Fri, 13 Jun 2025 11:12:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749813156;
-	bh=3JSffdcKG1BEdfLxDkvCLXE5WcpkgQe1rrYaCHuFNrw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g4kKdw9SM2bno1fEAUiCi6mw5ZmG2oOwM9TdgZeIyT1IQbX7X77HcJ1LYqfuskboa
-	 JGRT3GgKJU7HfdKVHhEwM6RbZVBVlK/P5c4ZU4IqGpHDoM9jVWM/ytqZuhOEoKayrO
-	 xTsq76VB+ZzyRppRpOMFJJN6JOHbjdwagkrEFx3Ng0/lhqAyAceklyVmJaQug8641Q
-	 JSHHo90KaBC05xuTm1/zTU/9LwbDwYf8mzg7yZYfDEuuM89nlEVvUy9Ws3qrTN5xaj
-	 +W1kJlaU5hXI6P9GIWNe9FGwWwkVeh7uwqDhoiXxU9TaeL0RzbPSSxvPd6dZscVPeL
-	 2OG33FATjlbqg==
-Date: Fri, 13 Jun 2025 12:12:23 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaehoon Chung <jh80.chung@samsung.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Shreeya Patel <shreeya.patel@collabora.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Sandy Huang <hjc@rock-chips.com>,
-	Andy Yan <andy.yan@rock-chips.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Shawn Lin <shawn.lin@rock-chips.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Qin Jian <qinjian@cqplus1.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, kernel@collabora.com,
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
-	linux-sound@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH 14/20] ASoC: rockchip: i2s-tdm: switch to
- HWORD_UPDATE_CONST macro
-Message-ID: <f38ea320-8eaa-4eea-85c1-63d44c8d359a@sirena.org.uk>
-References: <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
- <20250612-byeword-update-v1-14-f4afb8f6313f@collabora.com>
+	s=arc-20240116; t=1749815735; c=relaxed/simple;
+	bh=39J8B/it+yKmHYIqv06bQIDCskhQbpop8t56XJh97As=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=NRws+Ma73F5zbhtWfq+xj0cpIhQKhsErDnuzkIcH2Dr3MWGSOIg4j2elpXjU4KDh4MbIR0KsLncpWSb0za0yHpnLlcMKNy93f8mMAmKF8sQPtYXAIS/lFtkf+WhBiV3jWigzyNRufN2Xosw/JroFitWx62JXCaQRTJ33HgeQMQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsx6/CLA; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a3798794d3so1954912f8f.1;
+        Fri, 13 Jun 2025 04:55:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749815731; x=1750420531; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1JJXFHi9ldlQPLqupON6xlA5LEI029g70pUzRWZNKyU=;
+        b=gsx6/CLA3wUh4qzsSFVoyYoJTzCGcaYqQX7jkLru6VrKrwFuIVBJNgy9wer/weqgjO
+         UJSBonkdhKsCiU9qtYmScIKS46+bfoEt1qaai3LU4B+RoWjYzSUguRyr9bshXU0Oh8aK
+         +mbzHO+cGbofk4F66W810o/Yy7WMnqAP76yQOiEpDBYofyIqJeQJ96kh+jEZ3LRyI0v4
+         gPd/67Q0O4m8opiWNY9oXPQlNOD+AJpiqyzBdoOq+/fFD9yKliTuqLFhMOC9BOAqXbXd
+         kZ74f+YfGfQkFY+XBWWqV0JibJlt07tq5RMVkQcdyg5oH9V0FvhtwXqy6+XWcJTdEO5U
+         SrZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749815731; x=1750420531;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1JJXFHi9ldlQPLqupON6xlA5LEI029g70pUzRWZNKyU=;
+        b=PLjBvaUolE4Zf+iOXO0Ta2a42h46Vmv9pye5DVpguGrHIzZ6GgmIebFjkhzq28VauC
+         gSNHb5zPdUXOuOQPDQVoqxGWzZ0IYMFQbCKsdJexUulx7/17iwkDzLs1F4xvLRoTEYQL
+         kfnIrxUMncyTuefKP6tG4nDAYRePelhwgN0wZ0A1EJuXHVrpOyxL0fD3bxaxggmsgFvi
+         7T76PsmxLOMubU+woEKqOaBQwBIy3615I3iFF+DRzS8gGNZ9pe8NpUaxb9xl00RVIOvB
+         qX6V4ft+vamEp46AvfFLm1VEmY1SQQuDBGwSLDCo1yIJNdouzoGpH8Sml1s/GKFjjKHc
+         pSEA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvBUuk/VYpRsadhpR6xztnjIJcNmR54PnNUxfFSc59BKbFtmfsCNxvgPWMZZYlpDvsp4cccWovDo/I+Ao=@vger.kernel.org, AJvYcCX19prqCcVQbPbBHB0dAFr71IpJ7JldTr5eFJk8N+6gmpPHo+x4dg37/sOnFKmf4mAFDOfCEKx0@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywoum3cXWHApPhaik693hZ794tQP6DQp9+l0NRvwBJPeBx84Q24
+	OOhWk7HrW3ERnVvZTE5rSKgPJtISKxOn4Lq0Bws3c+tWAXGlQvQbZXrt
+X-Gm-Gg: ASbGncus8lTJt4iqjTU9SJx4KnMC4ldrJpaUOpqdmep85JyZs7bQuwBPwYBNNO27a7B
+	IOBnwUehis9bJAxdf6o4ybFMwqfcW3JvNRykqMnkC3Y5JX+pqC+Gi8LjdYbzDhKzi368niBiTid
+	Je2DuJUxvZBretjvSI1zNa0ULPzc4/gyK6D/Gy54UdafD2cw3aV3wnDI+hMxc5xFBAVSDM5ucHo
+	1pgf7GMMHTtSHsFatOxYZ9NHFy/m8RColE1hVcYXWG4GV+IrerAgd6GJ7zyEu7BIDNPd6QWcEX+
+	ti5NkLw030cFqsmb4TfpH2ufh7xrnpAdHU/p5fUjxKbRqJHUqpKXyi3n+p5NAUgqFHCvY3/mDLE
+	=
+X-Google-Smtp-Source: AGHT+IH6ZxOKA+nk3cYFyy4sPdDCDQoX/fjJFz1gR0pdr5Ok5AHJOjXsI4WxV20/dTCer5v7vreBMQ==
+X-Received: by 2002:a05:6000:2c0c:b0:3a5:5fa4:a3f7 with SMTP id ffacd0b85a97d-3a5687603d1mr3028691f8f.58.1749815731307;
+        Fri, 13 Jun 2025 04:55:31 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:75e0:f7f7:dffa:561e])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b087f8sm2176397f8f.53.2025.06.13.04.55.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 04:55:30 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
+ <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
+ <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
+ Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
+ Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Ruben
+ Wauters" <rubenru09@aol.com>,  "Shuah Khan" <skhan@linuxfoundation.org>,
+  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
+  linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
+  netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
+Subject: Re: [PATCH v2 05/12] tools: ynl_gen_rst.py: Split library from
+ command line tool
+In-Reply-To: <440956b08faee14ed22575bea6c7b022666e5402.1749723671.git.mchehab+huawei@kernel.org>
+Date: Fri, 13 Jun 2025 12:13:28 +0100
+Message-ID: <m234c3opwn.fsf@gmail.com>
+References: <cover.1749723671.git.mchehab+huawei@kernel.org>
+	<440956b08faee14ed22575bea6c7b022666e5402.1749723671.git.mchehab+huawei@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="EoywhozqJ8iTP5HR"
-Content-Disposition: inline
-In-Reply-To: <20250612-byeword-update-v1-14-f4afb8f6313f@collabora.com>
-X-Cookie: Use extra care when cleaning on stairs.
+Content-Type: text/plain
 
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 
---EoywhozqJ8iTP5HR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> As we'll be using the Netlink specs parser inside a Sphinx
+> extension, move the library part from the command line parser.
+>
+> No functional changes.
+>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  scripts/lib/netlink_yml_parser.py  | 391 +++++++++++++++++++++++++++++
+>  tools/net/ynl/pyynl/ynl_gen_rst.py | 374 +--------------------------
 
-On Thu, Jun 12, 2025 at 08:56:16PM +0200, Nicolas Frattaroli wrote:
-> The era of hand-rolled HIWORD_UPDATE macros is over, at least for those
-> drivers that use constant masks.
->=20
-> Replace the implementation of this driver's HIWORD_UPDATE macro with an
-> instance of HWORD_UPDATE_CONST. The const variant is chosen here because
-> some of the header defines are then used in initializers.
-
-Acked-by: Mark Brown <broonie@kernel.org>
-
---EoywhozqJ8iTP5HR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmhMB5YACgkQJNaLcl1U
-h9Bobgf/dsPkAlIpLO/GS4oVRLlRiPIWa/agIoUuXFfDugqesR7MdX12gZHAzJ9s
-BnznMlPSuOjDnlFPdVpRCgVr4iPfs88ixFAuy/SjKEjvV8VYAUBEs1sg2JykJyMZ
-SkQ69/Iii/uButuWqecqljEHZvL7j67axT7KsEimeZ1zynLexrz7vtE6t4P8p+YE
-7qrc1oKA5kjXrIug8enyLvuLzI75M7MfzuRaooCPej44mc4bjqpuH6zXCxPzAWt9
-0LEzYDn7kdMZ5Yn0Vp35b8uKRqPdQs1heacEsmiHmKPfvnY/klYg1G9M71t9OVpm
-EE2sy3C4QrYbYl73/UBH9Z7zoN/X2A==
-=9PDr
------END PGP SIGNATURE-----
-
---EoywhozqJ8iTP5HR--
+I think the library code should be put in tools/net/ynl/pyynl/lib
+because it is YNL specific code. Maybe call it rst_generator.py
 
