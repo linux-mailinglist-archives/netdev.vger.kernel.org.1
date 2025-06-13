@@ -1,164 +1,213 @@
-Return-Path: <netdev+bounces-197355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D517AD83D5
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:12:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F911AD83F3
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D84B33A7A85
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 07:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B224D3A6124
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 07:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EF02749E7;
-	Fri, 13 Jun 2025 07:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC64D2C2ACE;
+	Fri, 13 Jun 2025 07:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cRur5C/X";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="r91IW4PC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E071DF268
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 07:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C692C1780;
+	Fri, 13 Jun 2025 07:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749798761; cv=none; b=BVHJVSUdV63f8wVsGvprtPj6Zd+E0/zuAvW5Hw0pEQrmOpRphxClNHFbiCkCIMOgGbPR3z6DJ1ztPM/Ca9yyr538NCD4Zt0TYVOTWO4H7SmaN+qtf/esajRMd8qA0jPyfYm9sNGIJGzxgg3cNJI7pG7dxRocRbg1TdlsauBhMhM=
+	t=1749799103; cv=none; b=YcSLp/b8IpHomyr9JyDn+JdURZ5FeOiDFkjq3kWMJKJYNGFc/rE68DvW8idHGbRviqVaqmZgbEAbkU3LK0cI5N1WraJEqmP7Yn7RtHmIMFdsfJoyy3JY6ulYaOK7s2erbPjVBfxOFqOclDUpVkwwvgUdZYfQpCvXnBoMO+AB44s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749798761; c=relaxed/simple;
-	bh=sWyWIfwI7kTzqivc7bTrOqy9Tj8LyGdscPOXHhGCi4s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rx0XYLc1tO/wvBBtQ2OJJdrNOrVgC1D5fcPIuIl0+9vrXTZkqlEe+52lxmTpSwQEzF/dYCdDxb7v455/bxtCDhbCaENG/lRLvh0JzwfA5JJDaN17rHkRqy5vHET0VP+1WanWJEEYyMglXyjzhcA8Fbf818S2rlgI3wUyYiMe8RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-86cfccca327so420351639f.2
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:12:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749798757; x=1750403557;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=juhYk1wKYKfUnaUV/pQ8ZEVYMZB94Oi+kC5HvDlYkTc=;
-        b=XVzDXk1BxXJmmWL4zRHAeQ4j007IUD+5X8rjs4SCMcAQ/IwSx2C9oajeVObaZmSH9H
-         ERQMF/STfEob97doPYgyu5lxcJWp7HwWncSjWy3IHHOL4pbNU/ANynmjZthJxMCuUfeN
-         kX1mX+uS5O+oX7TXTpp5ba86dXIeCXha2xKDY4x6oAiHACN95hiqAEhzfwlTUSCMAl4o
-         NRYP0sHeelalbTJdT8L7EM7bWuVSOCfaJEL3yeXnajQkkiNquBNU4ffE+yN1iCtLccpm
-         zEsiVmNm38ItemPuv/vC3xxAdyFz+dyXrRdeQS44tpFoa2CW05yyO2BmL6yzlCMEJRIy
-         LlWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVU9E4c6l/qBIn+anws6VhrKhmG/iNq2CBE2RaszEluQRlpkaT0yRXkap9LIGIaVr5WH6zreCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjcp+svzVBBxqfYPWsD5DKJwVO+ihZLibqj8wRraPpBxQhp42J
-	SrFMzapgvglq4Oo73yQ2cSU4A5jz8e/NYIIhBDBdgrPkNtJ858z7gWKMt0nLgofrosbJc8e2s+M
-	TcyiOZqTsPp7Weg2LoVCP6IcFs3s+Rc9QFLzFdQcPWekULm1WrU47NvhI6IU=
-X-Google-Smtp-Source: AGHT+IGBwD/2/C4kc9h6TIClenfR5iYoIenohZ5RomSbIQ0maGl/dTNKfi63zAkyRk+LR/aAQ38VdNauGcbMCQtdfWzn00FnCnPE
+	s=arc-20240116; t=1749799103; c=relaxed/simple;
+	bh=b1TH0pBAHA4l6ksFhPq0KMWofIveyzTRlJwcCJOHSgE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cAHi1ZIqHyUxoiLjhn+ZrZK/KRcytvsP9PRbP2OI6Z81SDjrxjWVXXtiiX0/ehr2uRAI1uPI7Ve/H+kzIC2kXGicuN2RoI+CNbCyAOrHNnem3xJnYti0r9ZfmWb61IYNI4/tAfHm8ZUT8MNXmECQX5/NmzXomWortijev0XgI6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cRur5C/X; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=r91IW4PC; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 13 Jun 2025 09:18:19 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1749799100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=01/G+GPT96bJOUWgFH1yRp4RIEAyJuEv6ZoK2XgM5wY=;
+	b=cRur5C/XrKB9u9N1MRoo0uxF4WypLzGNE8OEdpE4jSqQkhpqw7t35gb1uJqmjgdqPPey26
+	2zeqMAnqUx5HP5ZYwTglm0ZN7Dukv2UQPYkVp+IR9A28gU7g9808eqWlB/JF3Q31Y6D8lt
+	mIdyd4NMXzheXj05sKvRS5zA5bOyTnjlgGP0attu1OW9kv6m+24ESbz+tS1sNy4jUJL1X9
+	IoMa42qg4gdONcdizBKQNYsZ/7xgHNWPY8pDD/SFA5IAUmLzjZje11HAzE1UK5HQAPqAWV
+	dbV4Nz8RJAal6EFQPzOMKnENXJqltyg6m6LeLEIyKzTbayMryat05hU+5GbJlQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1749799100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=01/G+GPT96bJOUWgFH1yRp4RIEAyJuEv6ZoK2XgM5wY=;
+	b=r91IW4PCDs6KEdmf0Hk9AZ21bRcxqwcaIX5SBpsGtGVjlON+YrJIyzV7OdLWM8G0VAlPlG
+	H73NrPKtEMP7TRDA==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Richard Cochran <richardcochran@gmail.com>, Christopher Hall <christopher.s.hall@intel.com>, 
+	John Stultz <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, Miroslav Lichvar <mlichvar@redhat.com>, 
+	Werner Abt <werner.abt@meinberg-usa.com>, David Woodhouse <dwmw2@infradead.org>, 
+	Stephen Boyd <sboyd@kernel.org>, Kurt Kanzenbach <kurt@linutronix.de>, 
+	Nam Cao <namcao@linutronix.de>, Antoine Tenart <atenart@kernel.org>
+Subject: Re: [patch V2 26/26] timekeeping: Provide interface to control
+ auxiliary clocks
+Message-ID: <20250613083529-510f21e5-1c61-4320-afb0-863666b0f590@linutronix.de>
+References: <20250519082042.742926976@linutronix.de>
+ <20250519083027.209080298@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2196:b0:3dd:ecc8:9773 with SMTP id
- e9e14a558f8ab-3de00c0951fmr18522855ab.19.1749798757590; Fri, 13 Jun 2025
- 00:12:37 -0700 (PDT)
-Date: Fri, 13 Jun 2025 00:12:37 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <684bcf65.050a0220.be214.029b.GAE@google.com>
-Subject: [syzbot] [bpf?] WARNING in do_check
-From: syzbot <syzbot+a36aac327960ff474804@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250519083027.209080298@linutronix.de>
 
-Hello,
+On Mon, May 19, 2025 at 10:33:46AM +0200, Thomas Gleixner wrote:
+> Auxiliary clocks are disabled by default and attempts to access them
+> fail.
+> 
+> Provide an interface to enable/disable them at run-time.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>  Documentation/ABI/stable/sysfs-kernel-time-aux-clocks |    5 
+>  kernel/time/timekeeping.c                             |  125 ++++++++++++++++++
+>  2 files changed, 130 insertions(+)
 
-syzbot found the following issue on:
+<snip>
 
-HEAD commit:    1c66f4a3612c bpf: Fix state use-after-free on push_stack()..
-git tree:       bpf-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1346ed70580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=73696606574e3967
-dashboard link: https://syzkaller.appspot.com/bug?extid=a36aac327960ff474804
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1392610c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a9ee0c580000
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/sched/loadavg.h>
+>  #include <linux/sched/clock.h>
+>  #include <linux/syscore_ops.h>
+> +#include <linux/sysfs.h>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2ddb1df1c757/disk-1c66f4a3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6a318fc92af0/vmlinux-1c66f4a3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/76c58dddcb6c/bzImage-1c66f4a3.xz
+#include <linux/kobject.h>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a36aac327960ff474804@syzkaller.appspotmail.com
+>  #include <linux/clocksource.h>
+>  #include <linux/jiffies.h>
+>  #include <linux/time.h>
+> @@ -2900,6 +2901,130 @@ const struct k_clock clock_aux = {
+>  	.clock_adj		= aux_clock_adj,
+>  };
+>  
+> +static void aux_clock_enable(unsigned int id)
 
-------------[ cut here ]------------
-verifier bug: add backedge: no SCC in verification path, insn_idx 9(1)
-WARNING: CPU: 1 PID: 5838 at kernel/bpf/verifier.c:1970 add_scc_backedge kernel/bpf/verifier.c:1969 [inline]
-WARNING: CPU: 1 PID: 5838 at kernel/bpf/verifier.c:1970 is_state_visited kernel/bpf/verifier.c:19417 [inline]
-WARNING: CPU: 1 PID: 5838 at kernel/bpf/verifier.c:1970 do_check+0xda21/0xdba0 kernel/bpf/verifier.c:19861
-Modules linked in:
-CPU: 1 UID: 0 PID: 5838 Comm: syz-executor286 Not tainted 6.15.0-syzkaller-g1c66f4a3612c #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:add_scc_backedge kernel/bpf/verifier.c:1969 [inline]
-RIP: 0010:is_state_visited kernel/bpf/verifier.c:19417 [inline]
-RIP: 0010:do_check+0xda21/0xdba0 kernel/bpf/verifier.c:19861
-Code: 01 90 48 b8 00 00 00 00 00 fc ff df 41 0f b6 04 06 84 c0 0f 85 2b 01 00 00 41 8b 75 00 48 c7 c7 20 49 91 8b e8 d0 05 ad ff 90 <0f> 0b 90 90 e9 27 fe ff ff e8 11 5d e9 ff e8 3c 10 4d 00 ba 38 00
-RSP: 0018:ffffc900043eeec0 EFLAGS: 00010246
-RAX: 53f7659fb2f02200 RBX: ffffc900043ef180 RCX: ffff8880257d1e00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-RBP: ffffc900043ef2c8 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bfaa44 R12: ffff88801c7a4b00
-R13: ffff88801c7a4b54 R14: 1ffff110038f496a R15: 0000000000000000
-FS:  000055556bd6a380(0000) GS:ffff888125d54000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000ebea398 CR3: 00000000713fa000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- do_check_common+0x18fa/0x2460 kernel/bpf/verifier.c:23086
- do_check_main kernel/bpf/verifier.c:23177 [inline]
- bpf_check+0x110e2/0x1a240 kernel/bpf/verifier.c:24530
- bpf_prog_load+0x1318/0x1930 kernel/bpf/syscall.c:2972
- __sys_bpf+0x5f1/0x860 kernel/bpf/syscall.c:5978
- __do_sys_bpf kernel/bpf/syscall.c:6085 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6083 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6083
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f37a741f569
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe3011bf08 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007ffe3011c0d8 RCX: 00007f37a741f569
-RDX: 0000000000000094 RSI: 0000200000000840 RDI: 0000000000000005
-RBP: 00007f37a7492610 R08: 00007ffe3011c0d8 R09: 00007ffe3011c0d8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffe3011c0c8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+"clockid_t id".
+
+> +{
+> +	struct tk_read_base *tkr_raw = &tk_core.timekeeper.tkr_raw;
+> +	struct tk_data *tkd = aux_get_tk_data(id);
+> +	struct timekeeper *tks = &tkd->shadow_timekeeper;
+> +
+> +	/* Prevent the core timekeeper from changing. */
+> +	guard(raw_spinlock_irq)(&tk_core.lock);
+> +
+> +	/*
+> +	 * Setup the auxiliary clock assuming that the raw core timekeeper
+> +	 * clock frequency conversion is close enough. Userspace has to
+> +	 * adjust for the deviation via clock_adjtime(2).
+> +	 */
+> +	guard(raw_spinlock_nested)(&tkd->lock);
+> +
+> +	/* Remove leftovers of a previous registration */
+> +	memset(tks, 0, sizeof(*tks));
+> +	/* Restore the timekeeper id */
+> +	tks->id = tkd->timekeeper.id;
+> +	/* Setup the timekeeper based on the current system clocksource */
+> +	tk_setup_internals(tks, tkr_raw->clock);
+> +
+> +	/* Mark it valid and set it live */
+> +	tks->clock_valid = true;
+> +	timekeeping_update_from_shadow(tkd, TK_UPDATE_ALL);
+> +}
+
+<snip>
+
+> +static struct kobj_attribute aux_clock_enable_attr = __ATTR_RW(aux_clock_enable);
+> +
+> +static struct attribute *aux_clock_enable_attrs[] = {
+> +	&aux_clock_enable_attr.attr,
+> +	NULL,
+
+There should be no comma after sentinel values.
+
+> +};
+> +
+> +static const struct attribute_group aux_clock_enable_attr_group = {
+> +	.attrs = aux_clock_enable_attrs,
+> +};
+> +
+> +static int __init tk_aux_sysfs_init(void)
+> +{
+> +	struct kobject *auxo, *tko = kobject_create_and_add("time", kernel_kobj);
+> +
+> +	if (!tko) {
+> +		pr_warn("Unable to create /sys/kernel/time/. POSIX AUX clocks disabled.\n");
+
+The other timer code does not log details on failed initcalls.
+To me the strings look like wasted memory.
+If failure is really intended to be handled gracefully then some cleanup logic
+may be necessary, too.
+
+> +		return -ENOMEM;
+> +	}
+> +
+> +	auxo = kobject_create_and_add("aux_clocks", tko);
+> +	if (!auxo) {
+> +		pr_warn("Unable to create /sys/kernel/time/aux_clocks. POSIX AUX clocks disabled.\n");
+> +		kobject_put(tko);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	for (int i = TIMEKEEPER_AUX; i <= TIMEKEEPER_AUX_LAST; i++) {
+
+for (int i = 0; i < MAX_AUX_CLOCKS; i++)
+
+This avoids the need for the repeated calculations below and also better
+matches the actual semantics.
+
+> +		char id[2] = { [0] = '0' + (i - TIMEKEEPER_AUX), };
+> +		struct kobject *clk = kobject_create_and_add(id, auxo);
+> +
+> +		if (!clk) {
+> +			pr_warn("Unable to create /sys/kernel/time/aux_clocks/%d\n",
+> +				i - TIMEKEEPER_AUX);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		int ret = sysfs_create_group(clk, &aux_clock_enable_attr_group);
+> +
+> +		if (ret) {
+> +			pr_warn("Unable to create /sys/kernel/time/aux_clocks/%d/enable\n",
+> +				i - TIMEKEEPER_AUX);
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> +			return ret;
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +late_initcall(tk_aux_sysfs_init);
+> +
+>  static __init void tk_aux_setup(void)
+>  {
+>  	For (int i = TIMEKEEPER_AUX; i <= TIMEKEEPER_AUX_LAST; i++)
+> 
 
