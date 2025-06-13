@@ -1,101 +1,143 @@
-Return-Path: <netdev+bounces-197493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B1F6AD8CC8
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:08:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 162C6AD8CE2
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:11:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04E116DD01
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:08:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CB0E7A684F
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CB676410;
-	Fri, 13 Jun 2025 13:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6191487C3;
+	Fri, 13 Jun 2025 13:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E5znlyp1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p9CRFwTF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F3E3595A;
-	Fri, 13 Jun 2025 13:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE4E7263F;
+	Fri, 13 Jun 2025 13:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749820080; cv=none; b=okeBUGphRiRG2UpelZMd/ll9pNIv9h4hhfqhHjrYvebfh6p8sw/9A2U8GsisO+dM686b9++v5eQbPErH4eislCS9DcQWP6UBvw8anq+cbnuxmsKYaIU5zWNG66lcBWxj21JnOAZRjHOsayYcZ4ncQ8l7nkawx2UlOUGdITnc/5s=
+	t=1749820301; cv=none; b=KQOEW/xi6bqXvmfy+NNm9/oWteAPY1a8QMF6ady9NkvcXXGnlvmt2yChh5z8KuloKDU0TWcUkjNZ0YuFvPoYyUji+tyrG8rxx+H50EceT0WEIUJ1gjM0h4q7QTKHBMPPALKLdKuymr85JpnBt7dQhYbB0sfanjNi1Rd2/GsXpis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749820080; c=relaxed/simple;
-	bh=rtychsqz4b9aGmWoQ2Cv3JTMD17+FvibZTjfMu3M+nU=;
+	s=arc-20240116; t=1749820301; c=relaxed/simple;
+	bh=RbLt8//FrHv3yzSlHkAnJ39jGaCI5d6TuBafqw1Iais=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dz+nVq8xVbBJONuN3JhIJauMMyPHdDAUPnk82TkW/EegeBEtdMWuFxG7SCyzstM7kYuZJLBPykRzqq5V02BQA5+IF/hg5BhkwzUAfIdUymcet0vZfB9p6DFbCPCw4X9BtZi9t/oEXu2T2PcuZG7Hxd1UL6bKHmo8ON/aBW6f0yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E5znlyp1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C70BDC4CEE3;
-	Fri, 13 Jun 2025 13:07:55 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixhMjx6T0gge8SoUCrzD7+Wz00Nm2hPfvfHh2XHdqUcNDG8/vrppw/ZLfMDdUx7ZhBvKeFGsRj8V4qCm0cP0nsnI8kCyyssvmjzYqjYwCM1OHJX7VZo5VHTkdSKnayJSGSQMeQ1Trw1Kph8FgW/UUpGxPqTW9P/XaOCE8MBC/PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p9CRFwTF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39038C4CEE3;
+	Fri, 13 Jun 2025 13:11:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749820079;
-	bh=rtychsqz4b9aGmWoQ2Cv3JTMD17+FvibZTjfMu3M+nU=;
+	s=k20201202; t=1749820300;
+	bh=RbLt8//FrHv3yzSlHkAnJ39jGaCI5d6TuBafqw1Iais=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E5znlyp1oii/MKYWWT61lHFnq5WKaQ84AFRBmNuETuxIlvlhdSnbuhAxUZHhOIN00
-	 q+aJi6ojNyE+F3rPf9/l2l/OwutwrOelOpapnXQq8/FjchmMznLan/Dm3vZuXLGfM4
-	 MQG5tYSQ/OYit4aFAPuOUQzAxD6B4Qwy2vk85IXkDOA4udAEMFspCr69nS+nPR3thV
-	 VZGML054PAT/OYhM9ZQlD/TImxqHtHFrSc9PPlBAuJ/sv0XDedrBNO8g/p3waOPeh2
-	 J3d7jfoNuS+PcONakH2S3LvcixHLXQ/trfVJR/FOZ/ICucfWb5LIsEIp8AYp8MS0ga
-	 XQJ7yB71x8nnA==
-Date: Fri, 13 Jun 2025 14:07:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux GPIO <linux-gpio@vger.kernel.org>,
-	Linux MTD <linux-mtd@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux USB <linux-usb@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Weinberger <richard@nod.at>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>,
-	Felipe Balbi <balbi@kernel.org>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Subject: Re: [PATCH] Documentation: treewide: Replace remaining spinics links
- with lore
-Message-ID: <20250613130753.GE414686@horms.kernel.org>
-References: <20250611065254.36608-2-bagasdotme@gmail.com>
+	b=p9CRFwTFQB6b2MRLIiu64qe3eBQOQuybf4O9R2ndSQD5+AQW0G9ttxIY4zPnD8CIR
+	 PEgjQ6UJ9A02nWnYEZ4hdjuxmmKz6W9EADdVr1GVQ9lQW4/UCuMqUoNBuQ/te93Ads
+	 cupoMj4pmBj6bu8exL7TUN4N6fe3dwCeRUtCkKcrAaTyCPyrwDvvZGOM/cWMKITupY
+	 WkCpdeJQcDK/SPlMYkK5Q+JsHKtoHx/lUn4cW8iI9i1NkACjO9b4KBYGoCGY0bLYUd
+	 /EVAoP7PxxLSUHNVxHonbuFweNJhlAClNBBdHHSNUjgrkmZ3M5/m9a2Kqx1y+Katy8
+	 TgWiR9/xkyNpg==
+Date: Fri, 13 Jun 2025 14:11:33 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	linux@roeck-us.net, jdelvare@suse.com,
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250613131133.GR381401@google.com>
+References: <20250604041418.1188792-1-tmyu0@nuvoton.com>
+ <20250604041418.1188792-2-tmyu0@nuvoton.com>
+ <20250612140041.GF381401@google.com>
+ <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
+ <20250612152313.GP381401@google.com>
+ <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250611065254.36608-2-bagasdotme@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
 
-On Wed, Jun 11, 2025 at 01:52:55PM +0700, Bagas Sanjaya wrote:
-> Long before introduction of lore.kernel.org, people would link
-> to LKML threads on third-party archives (here spinics.net), which
-> in some cases can be unreliable (as these were outside of
-> kernel.org control). Replace links to them with lore counterparts
-> (if any).
+On Fri, 13 Jun 2025, Ming Yu wrote:
+
+> Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午11:23寫道：
+> >
+> > On Thu, 12 Jun 2025, Ming Yu wrote:
+> >
+> > > Dear Lee,
+> > >
+> > > Thank you for reviewing,
+> > >
+> > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午10:00寫道：
+> > > >
+> > > ...
+> > > > > +static const struct mfd_cell nct6694_devs[] = {
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
+> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
+> > > > > +
+> > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
+> > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
+> > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
+> > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
+> > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
+> > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
+> > > >
+> > > > Why have we gone back to this silly numbering scheme?
+> > > >
+> > > > What happened to using IDA in the child driver?
+> > > >
+> > >
+> > > In a previous version, I tried to maintain a static IDA in each
+> > > sub-driver. However, I didn’t consider the case where multiple NCT6694
+> > > devices are bound to the same driver — in that case, the IDs are not
+> > > fixed and become unusable for my purpose.
+> >
+> > Not sure I understand.
+> >
 > 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->  Documentation/driver-api/gpio/driver.rst                    | 2 +-
->  Documentation/filesystems/ubifs-authentication.rst          | 2 +-
->  .../networking/device_drivers/ethernet/ti/cpsw.rst          | 6 +++---
->  Documentation/usb/gadget-testing.rst                        | 2 +-
+> As far as I know, if I maintain the IDA in the sub-drivers and use
+> multiple MFD_CELL_NAME("nct6694-gpio") entries in the MFD, the first
+> NCT6694 device bound to the GPIO driver will receive IDs 0~15.
+> However, when a second NCT6694 device is connected to the system, it
+> will receive IDs 16~31.
+> Because of this behavior, I switched back to using platform_device->id.
 
-Thanks Bagas,
+Each of the devices will probe once.
 
-These changes look nice and correct to me.
+The first one will be given 0, the second will be given 1, etc.
 
-I am wondering if you considered also addressing
-the spinics.net links in gadget-testing.rst.
-They are the only other instances I see under Documentation.
+Why would you give multiple IDs to a single device bound to a driver?
+
+-- 
+Lee Jones [李琼斯]
 
