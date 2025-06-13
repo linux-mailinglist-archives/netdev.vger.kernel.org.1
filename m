@@ -1,180 +1,127 @@
-Return-Path: <netdev+bounces-197572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2BCCAD938A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 19:11:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F168AD9398
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 19:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02DC21BC29A3
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:12:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9BFF3A4981
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689DE221FBE;
-	Fri, 13 Jun 2025 17:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DE522330F;
+	Fri, 13 Jun 2025 17:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SIArIpM+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="DVipFYLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4010C221727
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 17:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A997F14BF89
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 17:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749834701; cv=none; b=kzPGHvN+uYq/Lt6UxQJ7U6WvoIyjIWQhsIJ8BT79sfBKAhnd/XAKiSSxrELKX+UB82ANUGwBmvmmzu6k93eDGFtxlLuQy4ueN86jn2YzWvSFFfiO7lrfHBzSw1SRvr5V+xdlspAgsThce35lFJx2QF0k2RB0TvRHv01SyxgGzeA=
+	t=1749834789; cv=none; b=RPyuebQAHc8iFtZWeh7+//N/kDMA12G8D00kOlubdqCRjvIjf02iJcVrpGmVurCpH09VfoWiIaeEJBUFSUPxZBzJq6g7I243rC2D0V3Ta7C6z6huRoB7mCMgcTzYnVQzqBRjLTofkZE29w+5n8+wAUXT9B2tjOTxottABxkDvwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749834701; c=relaxed/simple;
-	bh=2AGD9Ae/vSJEt9BhoOQK34+j0dU6umT3cC6voBrdlUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hWFrpB/RQl+0j4VvaNRKecUBQf3KVzr/UmEW8s5i0+DRpEMRYcEmsQpb4dpRI9bo8pSuIjqTRFNrXxn5eg8P07oHyHY+m9gztZikV7cnzkPP/m1DH8MSVPdtO1STc9IX2xuQjGph8gpiv+1UeJ96pFyXD/jS/HVKZThWN9gsh+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SIArIpM+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 481A3C4CEE3;
-	Fri, 13 Jun 2025 17:11:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749834700;
-	bh=2AGD9Ae/vSJEt9BhoOQK34+j0dU6umT3cC6voBrdlUw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SIArIpM+f0ueCTkSwci44alnaytY/XxT8pyOjl4BUEDaR6OeNrzwRrnO+BCdzE9U8
-	 Xb0eYgTFd1/xzDXmkXRFDmzcAJdhDNI06Vad6GeAjm/i+mTCuKgdzGjbZJ7CI3Ikmm
-	 QFzXCeU/5ieujJo0XKvz93T2WZ0NqwVVNHWtYDWjOR4HUpuIaaU1MXEaq6f5ORLR/Q
-	 iOE7of/RW2f+hecfBHpUfsmV8YQId6zL9Crv10+GU3+0J2BpMaJ3mLH1kzYzAM0Hke
-	 vyatL3ApGwZUksEufLZqwlmvpHtTlVk3kn9QschbhQWDRu2TF3TbrJ55phnZXj/sFw
-	 2Oz9BD1LCwjtg==
-Date: Fri, 13 Jun 2025 18:11:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 12/13] net: mctp: add gateway routing support
-Message-ID: <20250613171137.GM414686@horms.kernel.org>
-References: <20250611-dev-forwarding-v1-0-6b69b1feb37f@codeconstruct.com.au>
- <20250611-dev-forwarding-v1-12-6b69b1feb37f@codeconstruct.com.au>
+	s=arc-20240116; t=1749834789; c=relaxed/simple;
+	bh=ngRTd1HHf8LWYsX4y94CHvaAp57n31KnKKEhpt0tYEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hgo6s/K7Kqd5urUyMJ3JRqyQ60mEPc4TdpOVNeNtvYM2+yJILveKOiAzazEoCWiBRv941446CiN5loSuyKD0YiVWV+MOOzVXK0Y8d96IaezCHX4RhpN/ERi/ArtnGpOUbLLE0GNOSVYPwvGelY2OoUKsYX6GseH2kF6DwO/B8Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=DVipFYLh; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lNdz5I3U+tRLjxZfly53l4+x33pV0gdByCxXeIl9K00=; t=1749834787; x=1750698787; 
+	b=DVipFYLhNuNxcXjWbL3XQ/lq+q3N5Fn/N9NeLM30V/LFOvf6ZTtD/e28SfcEglvgpTv4R48l6WE
+	wq4msFah3kGb7nXTZLPooLexuz8OP3afRCcxzA+cDPNh4bAhpGjVLfdBRAPsfvZ/ypRhwX2gFiijp
+	cFhcuPzgQ1B5j5vDaMTjrmoLlRwP6y1pBsmfmYespYnl9achijWCPd/axTBGvxiCmJP8AEI0pG1pY
+	Ela5P+EbUg64mY5VSc6oYzcgCBqxr+2tnmDuKASLcCdq9p3X0/P74YARMhK+K8O/LqB7XL4/MxZoP
+	iT9xxsE+Pg0L8eWbjG7VbIBnG26LNPalkrGg==;
+Received: from mail-io1-f43.google.com ([209.85.166.43]:58778)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1uQ7xc-0001fb-Pz
+	for netdev@vger.kernel.org; Fri, 13 Jun 2025 10:13:01 -0700
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-86d0168616aso203180239f.1
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 10:13:00 -0700 (PDT)
+X-Gm-Message-State: AOJu0Ywm/bcOclkZ+YVQhKXRgI5FvZ4VrblGx7x8FgTyHwU0rP0/kXOW
+	vUzHG/gs/FGU52dsAR5GHLCZWStlAPTCPdvXR0cPTngZ5yE+sQiwPC5baNCcTShetwxLRFNy0at
+	4uNinwnLpBWoMZWdsaJ+C0XplOuFHmfY=
+X-Google-Smtp-Source: AGHT+IHNACIKuiaA4xZlctnYY3XCrWXj64ntfrJC7Ay02R0McXI8ZIeaXnzAwJwSSI3ki14yjmigWrgFnb5t3bKAtvs=
+X-Received: by 2002:a05:6871:440b:b0:2bc:7811:5bb8 with SMTP id
+ 586e51a60fabf-2eaf086cb61mr353583fac.18.1749834769239; Fri, 13 Jun 2025
+ 10:12:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611-dev-forwarding-v1-12-6b69b1feb37f@codeconstruct.com.au>
+References: <20250609154051.1319-1-ouster@cs.stanford.edu> <20250609154051.1319-6-ouster@cs.stanford.edu>
+ <20250613143958.GH414686@horms.kernel.org>
+In-Reply-To: <20250613143958.GH414686@horms.kernel.org>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Fri, 13 Jun 2025 10:12:11 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmxQn_iAqhOHwxEQ16n+MKjFyEbiUoBbGyDY+TLYooeJhQ@mail.gmail.com>
+X-Gm-Features: AX0GCFsj1lkNjRiSsxjr6k6V8u5ByRyRC3P69zqXrWX7Rp3-aUQyK53LGk7ydg8
+Message-ID: <CAGXJAmxQn_iAqhOHwxEQ16n+MKjFyEbiUoBbGyDY+TLYooeJhQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 05/15] net: homa: create homa_peer.h and homa_peer.c
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Scan-Signature: 6214ac49f2cb083a0c8190805312a710
 
-On Wed, Jun 11, 2025 at 02:30:39PM +0800, Jeremy Kerr wrote:
-> This change allows for gateway routing, where a route table entry
-> may reference a routable endpoint (by network and EID), instead of
-> routing directly to a netdevice.
-> 
-> We add support for a RTM_GATEWAY attribute for netlink route updates,
-> with an attribute format of:
-> 
->     struct mctp_fq_addr {
->         unsigned int net;
->         mctp_eid_t eid;
->     }
-> 
-> - we need the net here to uniquely identify the target EID, as we no
-> longer have the device reference directly (which would provide the net
-> id in the case of direct routes).
-> 
-> This makes route lookups recursive, as a route lookup that returns a
-> gateway route must be resolved into a direct route (ie, to a device)
-> eventually. We provide a limit to the route lookups, to prevent infinite
-> loop routing.
-> 
-> The route lookup populates a new 'nexthop' field in the dst structure,
-> which now specifies the key for the neighbour table lookup on device
-> output, rather than using the packet destination address directly.
-> 
-> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
+(I have implemented all of your suggestions for which there are no
+responses below)
 
-...
+On Fri, Jun 13, 2025 at 7:40=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+> > +/**
+> > + * homa_peer_hash() - Hash function used for @peertab->ht.
+> > + * @data:    Pointer to key for which a hash is desired. Must actually
+> > + *           be a struct homa_peer_key.
+> > + * @dummy:   Not used
+> > + * @seed:    Seed for the hash.
+> > + * Return:   A 32-bit hash value for the given key.
+> > + */
+> > +static inline u32 homa_peer_hash(const void *data, u32 dummy, u32 seed=
+)
+>
+> Sorry if this has already been asked but can homa reuse the code in
+> drivers/md/dm-vdo/murmurhash3.c:murmurhash3_128() (after moving it
+> somewhere else).
 
-> diff --git a/net/mctp/route.c b/net/mctp/route.c
+No problem; the question hasn't been asked before. I'd be happy to use
+an existing implementation of murmurhash3 but couldn't find one that
+was accessible. What do you mean by "moving it somewhere else"? Are
+you suggesting I add a new murmurhash3 implementation somewhere
+"public" in the kernel? I'm a little hesitant to do this because I'm
+not at all expert on murmurhash3: I'm not confident about getting this
+right. Also, I wouldn't feel comfortable taking on maintainer
+responsibility for this.
 
-...
+> > +     const struct homa_peer *peer =3D obj;
+> > +     const struct homa_peer_key *key =3D arg->key;
+>
+> nit: Reverse xmas tree here please.
+>      Likewise elsewhere in this patchset.
+>
+>      This tool can he useful here
+>      https://github.com/ecree-solarflare/xmastree/commits/master/
 
-> -/* base parsing; common to both _lookup and _populate variants */
-> +/* base parsing; common to both _lookup and _populate variants.
-> + *
-> + * For gateway routes (which have a RTA_GATEWAY, and no RTA_OIF), we populate
-> + * *gatweayp. for direct routes (RTA_OIF, no RTA_GATEWAY), we populate *mdev.
-> + */
->  static int mctp_route_nlparse_common(struct net *net, struct nlmsghdr *nlh,
->  				     struct netlink_ext_ack *extack,
->  				     struct nlattr **tb, struct rtmsg **rtm,
->  				     struct mctp_dev **mdev,
-> +				     struct mctp_fq_addr *gatewayp,
->  				     mctp_eid_t *daddr_start)
->  {
-> +	struct mctp_fq_addr *gateway;
-> +	unsigned int ifindex = 0;
->  	struct net_device *dev;
-> -	unsigned int ifindex;
->  	int rc;
->  
->  	rc = nlmsg_parse(nlh, sizeof(struct rtmsg), tb, RTA_MAX,
-> @@ -1321,11 +1372,44 @@ static int mctp_route_nlparse_common(struct net *net, struct nlmsghdr *nlh,
->  	}
->  	*daddr_start = nla_get_u8(tb[RTA_DST]);
->  
-> -	if (!tb[RTA_OIF]) {
-> -		NL_SET_ERR_MSG(extack, "ifindex missing");
-> +	if (tb[RTA_OIF])
-> +		ifindex = nla_get_u32(tb[RTA_OIF]);
-> +
-> +	if (tb[RTA_GATEWAY])
-> +		gateway = nla_data(tb[RTA_GATEWAY]);
-> +
-> +	if (ifindex && gateway) {
+Thanks for the pointer to xmastree.pl; I wasn't aware of it and it
+will be super-helpful. I've fixed all of the reverse xmas tree issues
+now.
 
-Hi Jeremy,
-
-gateway may be uninitialised here...
-
-> +		NL_SET_ERR_MSG(extack,
-> +			       "cannot specify both ifindex and gateway");
-> +		return -EINVAL;
-> +
-> +	} else if (ifindex) {
-> +		dev = __dev_get_by_index(net, ifindex);
-> +		if (!dev) {
-> +			NL_SET_ERR_MSG(extack, "bad ifindex");
-> +			return -ENODEV;
-> +		}
-> +		*mdev = mctp_dev_get_rtnl(dev);
-> +		if (!*mdev)
-> +			return -ENODEV;
-> +		gatewayp->eid = 0;
-> +
-> +	} else if (gateway) {
-
-... and here.
-
-Flagged by Smatch.
-
-> +		if (!mctp_address_unicast(gateway->eid)) {
-> +			NL_SET_ERR_MSG(extack, "bad gateway");
-> +			return -EINVAL;
-> +		}
-> +
-> +		gatewayp->eid = gateway->eid;
-> +		gatewayp->net = gateway->net != MCTP_NET_ANY ?
-> +			gateway->net :
-> +			READ_ONCE(net->mctp.default_net);
-> +		*mdev = NULL;
-> +
-> +	} else {
-> +		NL_SET_ERR_MSG(extack, "no route output provided");
->  		return -EINVAL;
->  	}
-> -	ifindex = nla_get_u32(tb[RTA_OIF]);
->  
->  	*rtm = nlmsg_data(nlh);
->  	if ((*rtm)->rtm_family != AF_MCTP) {
-
-...
+-John-
 
