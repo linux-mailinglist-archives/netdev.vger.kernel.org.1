@@ -1,165 +1,127 @@
-Return-Path: <netdev+bounces-197375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B7AFAD8532
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:03:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B801AAD87B6
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 649611889010
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 08:02:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107463B6EF3
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABD42DA76C;
-	Fri, 13 Jun 2025 08:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2C8291C31;
+	Fri, 13 Jun 2025 09:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b="rGsB++Qe"
+	dkim=pass (1024-bit key) header.d=hillstonenet.com header.i=@hillstonenet.com header.b="wwSatz74"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from mail-m1973182.qiye.163.com (mail-m1973182.qiye.163.com [220.197.31.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7522DA755;
-	Fri, 13 Jun 2025 08:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749801741; cv=pass; b=jSY5hl+kJoE/zVvsOtbr9jGBiCcXTf8Yi1STu/s/Y9d0wl1T4xnaLwOpYOHSWL3cDvnJn8tGMbhwglntYJLp54GDvYK8ZWDhCiGw8EOsI6FcByueH3TXERyoQ1a72xjqHQSO6KGDflVFXGya5NYOCfHEsWjDZm/AyZJ+72422uQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749801741; c=relaxed/simple;
-	bh=IriJbLd3oW21fvlp51YbALvpgoBSDDPr2ACz05AwQb8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qb8w4d9+Iev0SOyJ9LyLV1EjcMjZd7FVeetdELaNJqAGGnYchdj4RebMWWxH/LhprS9Pj989cYfeLpvclNha0VoU6X8CbWOqaLczlkduBC2XfjhesP60APN7qMG4sNmF8HY5aTCVyeJqihCQWqGq+vB06TJKWBjsYSVMIX5RCW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me; spf=pass smtp.mailfrom=icenowy.me; dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b=rGsB++Qe; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icenowy.me
-ARC-Seal: i=1; a=rsa-sha256; t=1749801707; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=BeYh0vqVWvMsZH2jhwqNWP0o2xljKxT0qmmEyR8a3x1dXIjsO6mau0NqMB8fs9S/XFOMfAOBWntFIwRmNhPDW6xvBJ/uC/bDc6jhp4DSsmSixTOVEnJUr3qDhF6qXhRaFzILbLnNeKjSypKQ3ztP+X9r8z7e3/FK9Ay9JELE2GQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1749801707; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=IriJbLd3oW21fvlp51YbALvpgoBSDDPr2ACz05AwQb8=; 
-	b=HPnZ1qGJ7DTdrwINps2F2lH8tIh2Vr+P59gp5y9Rmu4KewkXnvFyRdmc6X7K0bWaLtYqV+oB8O95rGVvihBiRinTvIzfD5/7SvFDglaiIeYrV6cIu44e78Y5ehLG08/x42zAJjUN8Wl1ned7T5LxXJsd6fqrWThYNSLf3xEaKpo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=icenowy.me;
-	spf=pass  smtp.mailfrom=uwu@icenowy.me;
-	dmarc=pass header.from=<uwu@icenowy.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749801707;
-	s=zmail2; d=icenowy.me; i=uwu@icenowy.me;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=IriJbLd3oW21fvlp51YbALvpgoBSDDPr2ACz05AwQb8=;
-	b=rGsB++Qe5OLSz6rEIGPzgSBLlPY4ps0FFHo3O2RKLHtaKsV85LeAOTh/twHZzFAo
-	wrH9bLSteSUHmLWWXgff6MoGXTBdRNXRUknrOWJBvU4BLx/qONmIF1aJO4OtO/SfzuN
-	P3JkEZrKMHG4Wzln0QSmYnk8qG3+2/56xTrJ4hHx2+ZBjrik/fNxcKaFknYG1xXcSoR
-	Hy9Be8CiGu4ICxCpqLRQG8PpNHiMaOyqiRPpM8f8y/8CkhD+RuZQQTdGFtzybJ5JOsp
-	saOrRj2LZLVndqi2kgs9GP82qfv29LD8vj1yZRZd00JALrvcpQY6vyCHkmlMP+NR4jw
-	kOD6/J9SJg==
-Received: by mx.zohomail.com with SMTPS id 1749801704443553.1069514426033;
-	Fri, 13 Jun 2025 01:01:44 -0700 (PDT)
-Message-ID: <40fc8f3fec4da0ed2b59e8d2612345fb42b1fdd3.camel@icenowy.me>
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-From: Icenowy Zheng <uwu@icenowy.me>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Rob Herring
- <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Chaoyi Chen
- <chaoyi.chen@rock-chips.com>, Matthias Schiffer
- <matthias.schiffer@ew.tq-group.com>, Heiner Kallweit
- <hkallweit1@gmail.com>,  netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 13 Jun 2025 16:01:37 +0800
-In-Reply-To: <f82a86d3-6e06-4f24-beb5-68231383e635@lunn.ch>
-References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
-	 <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
-	 <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
-	 <2e42f2f7985fb036bec6ab085432a49961c8dc42.camel@icenowy.me>
-	 <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
-	 <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
-	 <ba7b290d-0cd1-4809-822a-bfe902684d7e@lunn.ch>
-	 <9ebe16a8d33e00c39c142748a1ea6fff96b9565a.camel@icenowy.me>
-	 <aElArNHIwm1--GUn@shell.armlinux.org.uk>
-	 <fc7ad44b922ec931e935adb96dcc33b89e9293b0.camel@icenowy.me>
-	 <f82a86d3-6e06-4f24-beb5-68231383e635@lunn.ch>
-Organization: Anthon Open-Source Community
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2850424DD1A;
+	Fri, 13 Jun 2025 09:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.82
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749806704; cv=none; b=FWF9Rh1gez4KFsGkLjrAPo2kVXLbG7xbEtwEqj0CXc92QbfOLCAB2micIRStqctZsxRoww2lfKdckKp2DCoO3Ou9GHV9lDM5jq288yIc3ZQZtT2bgDpzHDzOOExBwZHRVsnpzVdaS3LWeYkcfif2ByM0QX+sG1htklO/PMte4v4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749806704; c=relaxed/simple;
+	bh=zfk3I70U/S1a7wWOZU0zLfDlYSHLaTIkBupmVtsOcQ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hxPMot9Z1SEYaOnD791mfmho6bdHl10H0HzTpf1p+gdeUeoJzHvk4gDvRIjibPqySKIW6ar6IpxoWXq3w4zkly4Q+fp1AehVndwt0KihQ14N/PrCDQncJ+Yy2oE3re31HmkLJkdpMdu75c4HvUj2eIxFmEDqcMRD5N/duuiN9nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hillstonenet.com; spf=pass smtp.mailfrom=hillstonenet.com; dkim=pass (1024-bit key) header.d=hillstonenet.com header.i=@hillstonenet.com header.b=wwSatz74; arc=none smtp.client-ip=220.197.31.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hillstonenet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hillstonenet.com
+Received: from localhost.localdomain (unknown [111.199.5.197])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 188a5f404;
+	Fri, 13 Jun 2025 13:55:48 +0800 (GMT+08:00)
+From: Haixia Qu <hxqu@hillstonenet.com>
+To: Jon Maloy <jmaloy@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Haixia Qu <hxqu@hillstonenet.com>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] tipc: fix panic in tipc_udp_nl_dump_remoteip() using bearer as udp without check
+Date: Fri, 13 Jun 2025 05:55:06 +0000
+Message-ID: <20250613055506.95836-1-hxqu@hillstonenet.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZSE8eVhgeGEwaQhoYGEtOGFYVFAkWGhdVEwETFh
+	oSFyQUDg9ZV1kYEgtZQVlKSkpVSkJCVU5VSkJMWVdZFhoPEhUdFFlBWU9LSFVKS0lPT09IVUpLS1
+	VKQktLWQY+
+X-HM-Tid: 0a9767dbcff609dakunm0183899d96fc76
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6KzI6PSo6DDE4VlFLHQ4sEDQf
+	PEgaFE5VSlVKTE9CTEJPSk9CT0JCVTMWGhIXVRMDCg47ExIXFwgPFBUeFR4PVRgUFkVZV1kSC1lB
+	WUpKSlVKQkJVTlVKQkxZV1kIAVlBSU9JQjcG
+DKIM-Signature:a=rsa-sha256;
+	b=wwSatz74OxiXnkMspGWlFdozbCPhPwIR2B1y8y9C8KbtZJTfLAdpjjNmzN8lI2IPy05DRiLM43KCzBTM40GsLBQuVDjkPhUh+QqW23Te/RmbyzyiHFbV6nbcS4E7zqNbag5AUWLEIfks7KZC4W+SySEgVcw4O9thyx7guHnjJzI=; s=default; c=relaxed/relaxed; d=hillstonenet.com; v=1;
+	bh=CZ6k5m8GOuN3if7SPQ1hTZoDDUTFYnMwwwYr/8JUHSA=;
+	h=date:mime-version:subject:message-id:from;
 
-=E5=9C=A8 2025-06-11=E6=98=9F=E6=9C=9F=E4=B8=89=E7=9A=84 17:28 +0200=EF=BC=
-=8CAndrew Lunn=E5=86=99=E9=81=93=EF=BC=9A
-> > Well in fact I have an additional question: when the MAC has any
-> > extra
-> > [tr]x-internal-delay-ps property, what's the threshold of MAC
-> > triggering patching phy mode? (The property might be only used for
-> > a
-> > slight a few hundred ps delay for tweak instead of the full 2ns
-> > one)
->=20
-> Maybe you should read the text.
->=20
-> The text says:
->=20
-> =C2=A0 In the MAC node, the Device Tree properties 'rx-internal-delay-ps'
-> =C2=A0 and 'tx-internal-delay-ps' should be used to indicate fine tuning
-> =C2=A0 performed by the MAC. The values expected here are small. A value
-> of
-> =C2=A0 2000ps, i.e 2ns, and a phy-mode of 'rgmii' will not be accepted by
-> =C2=A0 Reviewers.
->=20
-> So a few hundred ps delay is fine. The MAC is not providing the 2ns
-> delay, the PHY needs to do that, so you don't mask the value.
+When TIPC_NL_UDP_GET_REMOTEIP cmd calls tipc_udp_nl_dump_remoteip() 
+with media name set to a l2 name, kernel panics [1].
 
-Thus if the MAC delay is set to 1xxx ps (e.g. 1800ps), should the MAC
-do the masking?
+The reproduction steps:
+1. create a tun interface
+2. enable l2 bearer
+3. TIPC_NL_UDP_GET_REMOTEIP with media name set to tun
 
-What should be the threshold? 1ns?
+the ub was in fact a struct dev.
 
->=20
-> > > > Well I can't find the reason of phy-mode being so designed
-> > > > except
-> > > > for
-> > > > leaky abstraction from phylib.
-> > >=20
-> > > I have no idea what that sentence means, sorry.
-> >=20
-> > Well, I mean the existence of rgmii-* modes is coupled with the
-> > internal of phylib, did I get it right?
->=20
-> This is the external API of phylib, it has nothing to do with the
-> internals of phylib.
->=20
-> /**
-> =C2=A0* phy_attach - attach a network device to a particular PHY device
-> =C2=A0* @dev: network device to attach
-> =C2=A0* @bus_id: Bus ID of PHY device to attach
-> =C2=A0* @interface: PHY device's interface
-> =C2=A0*
-> =C2=A0* Description: Same as phy_attach_direct() except that a PHY bus_id
-> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0 string is passed instead of a pointer to =
-a struct phy_device.
-> =C2=A0*/
-> struct phy_device *phy_attach(struct net_device *dev, const char
-> *bus_id,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 phy_interface_t interface)
->=20
-> interface tells the PHY how it should configure its interface.
->=20
-> If you follow the guidelines, the PHY adds the delay if needed, you
-> get interface =3D=3D phy-mode. However, interface and phy-mode are
-> different things. phy-mode describes the hardware, the PCB. interface
-> tells the PHY what to do. There are legitimate cases where
-> interface !=3D phy-mode.
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Andrew
+when bid != 0 && skip_cnt != 0, bearer_list[bid] may be NULL or 
+other media when other thread changes it.
+
+fix this by checking media_id.
+
+[1]
+tipc: Started in network mode
+tipc: Node identity 8af312d38a21, cluster identity 4711
+tipc: Enabled bearer <eth:syz_tun>, priority 1
+Oops: general protection fault
+KASAN: null-ptr-deref in range 
+CPU: 1 UID: 1000 PID: 559 Comm: poc Not tainted 6.16.0-rc1+ #117 PREEMPT
+Hardware name: QEMU Ubuntu 24.04 PC
+RIP: 0010:tipc_udp_nl_dump_remoteip+0x4a4/0x8f0
+
+Signed-off-by: Haixia Qu <hxqu@hillstonenet.com>
+---
+ net/tipc/udp_media.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
+index 108a4cc2e001..258d6aa4f21a 100644
+--- a/net/tipc/udp_media.c
++++ b/net/tipc/udp_media.c
+@@ -489,7 +489,7 @@ int tipc_udp_nl_dump_remoteip(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 		rtnl_lock();
+ 		b = tipc_bearer_find(net, bname);
+-		if (!b) {
++		if (!b || b->bcast_addr.media_id != TIPC_MEDIA_TYPE_UDP) {
+ 			rtnl_unlock();
+ 			return -EINVAL;
+ 		}
+@@ -500,7 +500,7 @@ int tipc_udp_nl_dump_remoteip(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 		rtnl_lock();
+ 		b = rtnl_dereference(tn->bearer_list[bid]);
+-		if (!b) {
++		if (!b || b->bcast_addr.media_id != TIPC_MEDIA_TYPE_UDP) {
+ 			rtnl_unlock();
+ 			return -EINVAL;
+ 		}
+-- 
+2.43.0
 
 
