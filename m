@@ -1,138 +1,112 @@
-Return-Path: <netdev+bounces-197410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 296BBAD8918
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:15:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A91EBAD8957
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B72007AFD79
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:14:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F8B3A4691
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3009E2D23BA;
-	Fri, 13 Jun 2025 10:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98D82D1F5F;
+	Fri, 13 Jun 2025 10:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hPYQPpsa"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="FlyieHba"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95C92D2382;
-	Fri, 13 Jun 2025 10:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF52D25A320
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 10:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749809736; cv=none; b=NR00+fm32/N12qoD4XCO9Neq2GxyfIeCl1jZNoLyLZo0jCDjW/MMseDzwcV+JSS8k1XmNmH08wW/CdZfcLU0Q9IQ1l6zK+qBbl5ixBmuUQAVB6So8HfAB1B2iI0KBDYkSXKtj28UXpuL4OVN4eVTGCjsbfOzRgSo+66UJ5HQ7tQ=
+	t=1749810039; cv=none; b=uH4mZSDvpXerq7XoK3z0TRWDcUcHiFSBxQ+JHKd8lji4zqQRevT/UxbTEPZ7msDlxeBkr/Xjjle7/QJFj87ngLBsiyEqe/sY019QnfE6mdkRZj9dDX6Mj3YYjQV0TrfFMUJOnWfiJCf9NwRbKoO7cXTNMNzVS+Hi5ySdUju73Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749809736; c=relaxed/simple;
-	bh=CZqYmHg36RMSs1ABWyY6d1Bd8dHgzQog9KqyX+oH+Lk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a0fzXDBTbSbvWb6aJqdaGIHtHWiBOT4Lkt7HEfBZg1qcJXwau5daPy3eYPvflP2V02GECQNi+FML2RTG59O7klCbOJJYzGKcT2UK2dQuHDZpV6JRPNrzx1V9oW5L8Tflf4e0fK026h99fdtPuExGJZ7MpPKzkaI1zR4lY4sCaHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hPYQPpsa; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1749809732;
-	bh=CZqYmHg36RMSs1ABWyY6d1Bd8dHgzQog9KqyX+oH+Lk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hPYQPpsaE6puBxDXojLRDR1BTHvBiTT4DxSG2fp1VqTMJGRFbuJJG9mBWuT6S8Bhr
-	 GH0D+YbNoCyVr+h96i86944sAcuSmZLne4zxBO3F4kCdhNHKR+erVRWSOdpRz5lkDJ
-	 wY3NGcTphnUWlnonyAZlr/MmsZ1ZUm7B3a21XR6MEdqCyWPtw1eDSKQfxHqeiXE/r/
-	 hvmq1iQxB0FK7FYlrQJP97uQsqXPN0+n5N4IzzY0wwQPO40YQ1uuhdQnWhVLglsS+l
-	 +qENCeLTD07E8uz/NptSuuyh6+6BgDSlhteAfq4VUg8WXqdhlx+FW5AizQL6LAj3BC
-	 E0C8nbLHeNTdw==
-Received: from [192.168.1.90] (unknown [212.93.144.165])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2A22C17E00AC;
-	Fri, 13 Jun 2025 12:15:30 +0200 (CEST)
-Message-ID: <c8e3081f-cd0c-48c0-8934-bd81fd681943@collabora.com>
-Date: Fri, 13 Jun 2025 13:15:15 +0300
+	s=arc-20240116; t=1749810039; c=relaxed/simple;
+	bh=wTDvkTqqquDXKbIGU2O17oiLClKHNDwoOkXGQVDycvg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BhN7mqn68XG9DoH5ZEEwxYdjbS1UUwioAA8cGOhfp8pOpi2Vi4MeZVhSLvFRigb52sVEQrwd/PoFXCVDiayfsFtcaaVvUltkPoVJJosq0Lx9d0nSOFvHfFt4y/NDJhOnvjAsTXhYCNBINF0vcwRUgKPxHRpWoAd6oeBBowOT/Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=FlyieHba; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ad8990ad0a3so29472866b.0
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 03:20:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1749810036; x=1750414836; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2H8yA5klxG4PLqd7e+FG1lHucZWSI3//UG2RyPUekJk=;
+        b=FlyieHbaZuiN/1P/ut6o+/fbCC7CZ2d/KCVXhOChO3S2MvM8SL/iAb+Y4JAa+XGsYu
+         OWYjuHALRQDoYowUyTBryG9fJipfb+3UvOjMsfa1izCp2oC874qifcoCGgC0YKur6Su4
+         BNCfGTz/IJkT1jaNMD+/zea3Fl05Lfa4bejWlDaj/u31YWPdN3ixqEGM6H8WLeC9T15v
+         w3bVpgun4NsBEpo2iEG/zx13GmNXTU/NnxUGd4rEpBr+Fonm/Yw9qAoukYvkPZOYiVcq
+         Tan2xmQdeXcjT2WBIA2MDxCtUWCovOXeiXCW0u03Fr18lLz5j+HYMJ+52tii11R7akQ2
+         vJwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749810036; x=1750414836;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2H8yA5klxG4PLqd7e+FG1lHucZWSI3//UG2RyPUekJk=;
+        b=KA4gqapHd4tXqzNcQJiTAqtqCAhdPYtmEOxJqXI2Idzjet32uF6TtiIVTnin7uuEK0
+         2dZlyTX9EUtPaT5KpQk4lj1VbQA7eyhWqB585h+6o0Uq7i3dSPQv3QF1BN+wQfWYyJhu
+         mJSAmKDcsB3AcL3PLAZpLaCNUxE61mhrKGIdEfF1DAB6t6izBfSrHA4P0Km4N/ZUCsXP
+         aQuS+YRxE9/BcrsQ0307kLHh5x/XaNLbl6qsm6t0Bw17zPg8KETMqBxL7q/KkoXqv/09
+         IdHYphGoT7N4RCv7EKtVw3dlR88Zzx9HFIHACdotJaltfiXBRNP4WNkG9lh7pvi5ZIbL
+         tI0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXoVwzxJNWzPEY+uUFN9z8Bkm14zI98biI5zxCMFxVx1PMsZJ7pq/AarsQPyG17eO0wxtM5K4Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw06vSp6UrNJK/6bUzvv7QhFVzXRTHP5Cd92hlnZU3mUUIHuhOh
+	utn1IVU++CMyHhbZan7qXM53Sb626DYgqdVFg0yAyOgWzZRfK15V1HAxHFjxfFJ3pxM=
+X-Gm-Gg: ASbGncsWSdSiWJD0HU0LxOV7Ud2VnROgz8JaNf6liPMZ+o7MybbkeYCHfMNkizY1hxC
+	MvoPJtP8TzKC5TaX0mk4vXdEtWoHDMtxB+tl/rrsuyNDy6TftFyERpVHJbam5fvI4Rhm2rPHI+G
+	JVuqB4nIjSBoJ+lQVqQr4CzTiGfsxRpu/Qh5ElZnwrkmQtiYX2cDDQ/FQX9WtcM4B2DuQ/0uoGV
+	c+Fy4ooNXsHRFsbA96QBFJki17flwLZ3iMhAmR4u7UFV0x6CHfDjczuL9vvjyyQiP6PgvMBA3C0
+	gpmWbaibihspsGEhJCaM8T69vbzqlv7XENgMjFdOpbgWA+yankC3LNQM6B3KD25ZVyRsiheZPfD
+	5hy/uEnnmktfQyqFHEQF11D3azOR2Iw+u8Tn6gA1PkDsrU/6XPDFL
+X-Google-Smtp-Source: AGHT+IFtiBQ/X6ly+rGpLgdRP25eckbTqMqUzpUwaD9hI53mS3aM58ZgMPHaJfNcKCk2EZT+YK3ghw==
+X-Received: by 2002:a17:906:478f:b0:ad8:87d1:fec4 with SMTP id a640c23a62f3a-adec56870a6mr80663466b.7.1749810035936;
+        Fri, 13 Jun 2025 03:20:35 -0700 (PDT)
+Received: from localhost (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-adec892cd85sm103095866b.139.2025.06.13.03.20.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 03:20:35 -0700 (PDT)
+From: Petr Tesarik <ptesarik@suse.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	netdev@vger.kernel.org (open list:NETWORKING [TCP])
+Cc: David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list),
+	Petr Tesarik <ptesarik@suse.com>
+Subject: [PATCH net 0/2] tcp_metrics: fix hanlding of route options
+Date: Fri, 13 Jun 2025 12:20:10 +0200
+Message-ID: <20250613102012.724405-1-ptesarik@suse.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/20] drm/rockchip: dw_hdmi: switch to HWORD_UPDATE*
- macros
-To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>,
- Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson
- <ulf.hansson@linaro.org>, Heiko Stuebner <heiko@sntech.de>,
- Shreeya Patel <shreeya.patel@collabora.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang
- <hjc@rock-chips.com>, Andy Yan <andy.yan@rock-chips.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Shawn Lin <shawn.lin@rock-chips.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-Cc: kernel@collabora.com, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev
-References: <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
- <20250612-byeword-update-v1-13-f4afb8f6313f@collabora.com>
-Content-Language: en-US
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <20250612-byeword-update-v1-13-f4afb8f6313f@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Nicolas,
+I ran into a couple of issues while trying to tweak TCP congestion
+avoidance to analyze a potential performance regression. It turns out
+that overriding the parameters with ip-route(8) does not work as
+expected and appears to be buggy.
 
-On 6/12/25 9:56 PM, Nicolas Frattaroli wrote:
-> The era of hand-rolled HIWORD_UPDATE macros is over, at least for those
-> drivers that use constant masks.
-> 
-> Remove this driver's very own HIWORD_UPDATE macro, and replace all
-> instances of it with equivalent instantiations of HWORD_UPDATE or
-> HWORD_UPDATE_CONST, depending on whether it's in an initializer.
-> 
-> This gives us better error checking, and a centrally agreed upon
-> signature for this macro, to ease in code comprehension.
-> 
-> Because HWORD_UPDATE/HWORD_UPDATE_CONST shifts the value to the mask
-> (like FIELD_PREP et al do), a lot of macro instantiations get easier to
-> read.
-> 
-> This was tested on an RK3568 ODROID M1, as well as an RK3399 ROCKPro64.
-> 
-> Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Petr Tesarik (2):
+  tcp_metrics: set maximum cwnd from the dst entry
+  tcp_metrics: use ssthresh value from dst if there is no metrics
 
-This again LGTM and I could verify the RK3568 related bits on my Radxa
-ROCK 3A board.
+ net/ipv4/tcp_metrics.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-Reviewed-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-Tested-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-
-Cheers,
-Cristian
+-- 
+2.49.0
 
 
