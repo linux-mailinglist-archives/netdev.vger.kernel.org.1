@@ -1,105 +1,106 @@
-Return-Path: <netdev+bounces-197664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA9FEAD9887
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:15:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 417F8AD9888
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 026C21BC014A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:15:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EF031BC013E
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AFD28ECE3;
-	Fri, 13 Jun 2025 23:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C04A28D85A;
+	Fri, 13 Jun 2025 23:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="sXXpAIoK";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="CIHc7w4u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UCYcsPTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FFF28DEE7
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8132E11AE
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749856510; cv=none; b=A66+O/vTL6u/TH1LZN0ZPCd9CL9kqaEkR/OCcLOrVVbqEqJlv/0YcMPt5CKz0ETxU8xshhq42Gx0FS4WmrVFrsCeQX9UfV/K8sGI++eGc15Ff/pAkSpvktk7c4T/XpW0HoV4sX+NrSnxMM1uCL0kL4pMcMf7Mp1jdPthU+S0dag=
+	t=1749856600; cv=none; b=dolZOdc5l53GK4p8Y7IwC8A8ZZT5r2VzLE/AzFIZGPJXzpraVdl80UnJDmp8+fNn1jwS94mE5Tey2YBQLF/xXhsJW1ZbSy908bjQFbLziVizbY1dcaWJX7m2beoBX3vKES24wVG9WFB2cW37509btCPmPfUFIyIdRFqpsFdQ3jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749856510; c=relaxed/simple;
-	bh=XdeKZw2oyx+udjG0u5VMVGBoEZZgoahp8VunSNYP/sI=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ptJ5PpEP+Sj8bDuBCkcCRu0MEZYEi8N21qbdyb0vHHf+paRljhajdfmtZUuliurJHwt94pfvR7Yp3lIjkPS+D1Iq/2kfCQyH1WmZFWx+v+8DpmZ9kolEcEk8pLD+p2mHWr5LLMt1r8WbrWm1HphUeChms1K9Ju6NCKVZknIn4Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=sXXpAIoK; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=CIHc7w4u; arc=none smtp.client-ip=160.80.4.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 55DN9HDu032470;
-	Sat, 14 Jun 2025 01:09:22 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 4423B120589;
-	Sat, 14 Jun 2025 01:09:13 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1749856153; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w4+m4M05fZkVqQtddxtgrxNL+KHxs9OakD2mRu3imX4=;
-	b=sXXpAIoKJIeuuMx5Kk0zvsaJEqU1FOi39LeyVR/hW4LCjaJ/nna+2xpUjV3IagjtegfUSC
-	6U75Ns9eRbA7BGDw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1749856153; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w4+m4M05fZkVqQtddxtgrxNL+KHxs9OakD2mRu3imX4=;
-	b=CIHc7w4ug4oirI7twRCMXlIOKg7cpQLQifSaVry2j6rR932w4JLWHkKb5d28uw80Al+u+c
-	pzI+kBgcDBC5mqC00pKrDNZSoDrznJCf6XYmp8aCvweUabRHqusHfZoQEbybPsIPZ2liBu
-	zXnPRcJgKQDqrjrS5MjlhpFujiNf1Tbd63+LrKTBV41ZqE04nsvKu1YrdDT/mz/wHZGf8J
-	YrtwBhnCmWe6nxc0PFzX1sG3PLJNiYZp06PoFMpXjEQ7zxcejVfhJ9i7m7Dpyy56lu59b4
-	+8OePHVeiYvASh8+W8xEuTBMsuRBsnPEU3M9W1o1Mu8Rt+9hX5nz6rptCCiQAA==
-Date: Sat, 14 Jun 2025 01:09:12 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <edumazet@google.com>, <dsahern@kernel.org>,
-        <horms@kernel.org>, <petrm@nvidia.com>,
-        Andrea Mayer
- <andrea.mayer@uniroma2.it>, stefano.salsano@uniroma2.it,
-        paolo.lungaroni@uniroma2.it
-Subject: Re: [PATCH net-next 2/4] seg6: Call seg6_lookup_any_nexthop() from
- End.X behavior
-Message-Id: <20250614010912.efc93a4607de8d284fd4f0af@uniroma2.it>
-In-Reply-To: <20250612122323.584113-3-idosch@nvidia.com>
-References: <20250612122323.584113-1-idosch@nvidia.com>
-	<20250612122323.584113-3-idosch@nvidia.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1749856600; c=relaxed/simple;
+	bh=Ta6INm0qEY5/bEng2+yRJTVLuijpmUaksrrPY/2i7wI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kz4GnCukFletCs97IlKafRv2vh9NJ5S4VSHtfmC/2QL66GjYniaMp99Fn6altWnOoMypTY2g415L6srzcaMhnxP+Nje0g75UOEO6cW1ZNsTJIlygq9KZWN3NoBmjFfkwUcWu7b8EOZbOPc6RHL/G2lu1w2rnL0duj4OY9nR7Jpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UCYcsPTe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18B0BC4CEED;
+	Fri, 13 Jun 2025 23:16:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749856597;
+	bh=Ta6INm0qEY5/bEng2+yRJTVLuijpmUaksrrPY/2i7wI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UCYcsPTedRpatdvEvdspMMczTi5o4sU+cKyOCGbUO7A3Z6kUBInvo1z/XXzsnj1cP
+	 owOs8h1SU8lJ9NcPhVOyxU84lqnKfliGrEdCr91qTiQXJTbp0twknAXb9xQoxBAOya
+	 h2lxryUO+UFUo2v94jXur3mofhDbSNd5u2kNdr3sRbxPn7NEyQHJzyqqSXjkDehgtf
+	 89GfRZnvUIvfJiLKev/sBIRmbYijXwN+MjVTKsZw7c1Hs/EYOWMR9Qt4iw6o7HTthU
+	 q7rs2v9YaL596FjZeMmyq/ZIxn9n0PNx9WtI+c4FDZeHKS/YP31oOjYuLMh1CUzCmb
+	 8D8u3iI38rioA==
+Date: Fri, 13 Jun 2025 16:16:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
+ dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
+ jdamato@fastly.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 19/22] eth: bnxt: use queue op config validate
+Message-ID: <20250613161636.0626f4f3@kernel.org>
+In-Reply-To: <zkf45dswziidctwloy7wqlpcu2grdykpvmmmytksyjwal3wd42@f5cleyttlcob>
+References: <20250421222827.283737-1-kuba@kernel.org>
+	<20250421222827.283737-20-kuba@kernel.org>
+	<5nar53qzx3oyphylkiv727rnny7cdu5qlvgyybl2smopa6krb4@jzdm3jr22zkc>
+	<20250612071028.4f7c5756@kernel.org>
+	<vuv4k5wzq7463di2zgsfxikgordsmygzgns7ay2pt7lpkcnupl@jme7vozdrjaq>
+	<20250612153037.59335f8f@kernel.org>
+	<zkf45dswziidctwloy7wqlpcu2grdykpvmmmytksyjwal3wd42@f5cleyttlcob>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
 
-On Thu, 12 Jun 2025 15:23:21 +0300
-Ido Schimmel <idosch@nvidia.com> wrote:
+On Fri, 13 Jun 2025 19:02:53 +0000 Dragos Tatulea wrote:
+> > > There is a relationship between ring size, MTU and how much memory a queue
+> > > would need for a full ring, right? Even if relationship is driver dependent.  
+> > 
+> > I see, yes, I think I did something along those lines in patch 16 here.
+> > But the range of values for bnxt is pretty limited so a lot fewer
+> > corner cases to deal with.
+> 
+> Indeed.
+> 
+> > Not sure about the calculation depending on MTU, tho. We're talking
+> > about HW-GRO enabled traffic, they should be tightly packed into the
+> > buffer, right? So MTU of chunks really doesn't matter from the buffer
+> > sizing perspective. If they are not packet using larger buffers is
+> > pointless.
+> >  
+> But it matters from the perspective of total memory allocatable by the
+> queue (aka page pool size), right? A 1K ring size with 1500 MTU would
+> need less total memory than for a 1K queue x 9000 MTU to cover the full
+> queue.
 
-> seg6_lookup_nexthop() is a wrapper around seg6_lookup_any_nexthop().
-> Change End.X behavior to invoke seg6_lookup_any_nexthop() directly so
-> that we would not need to expose the new output interface argument
-> outside of the seg6local module.
-> 
-> No functional changes intended.
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  net/ipv6/seg6_local.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
- 
-Reviewed-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+True but that's only relevant to the "normal" buffers?
+IIUC for bnxt and fbnic the ring size for rx-jumbo-pending
+(which is where payloads go) is always in 4k buffer units.
+Whether the MTU is 1k or 9k we'd GRO the packets together
+into the 4k buffers. So I don't see why the MTU matters 
+for the amount of memory held on the aggregation ring.
+
+> Side note: We already have the disconnect between how much the driver
+> *thinks* it needs (based on ring size, MTU and other stuff) and how much
+> memory is given by a memory provider from the application side.
+
+True, tho, I think ideally the drivers would accept starting
+with a ring that's not completely filled. I think that's better
+user experience.
 
