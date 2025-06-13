@@ -1,383 +1,87 @@
-Return-Path: <netdev+bounces-197316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BDCAAD8103
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 04:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5901CAD811C
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 04:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4677B1E01D7
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 194A316B54D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D2023A562;
-	Fri, 13 Jun 2025 02:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="knBOJV76"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D0124677D;
+	Fri, 13 Jun 2025 02:40:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD39C1FDA6A;
-	Fri, 13 Jun 2025 02:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703F0242D98
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 02:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749782158; cv=none; b=AjTkvRDdzWJaSiLR+jX1o9N4XG7qq1DbzJcErwENfjvHnswwE6pfZxe63fxTuuj8UPQ/bP65gwdy1Hwe+ojlXKtT71gdIuGDjjjnNG6y9+pTbQRrGVU1tBlfPmiGbfv9Ogt88hIrQHCFEQAjR5UQBOGVs/UqQzgjLBVjVNmzI7M=
+	t=1749782406; cv=none; b=jDXuj6JguiYpmuWqgKvDgcvtJ+h44oCTJSK+7a1GQ3Je/aDQsJqke6hUWDTj6HmUdBoy5aUrIMbG3sYIohDpORM0VPxzv9RptUF46VvBx0qAN2uLzsMdDQDFbeGCSRH9pO/6Ghlnqc2OyX3GO02uBbehViZWS3Zkues3bQdOjsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749782158; c=relaxed/simple;
-	bh=XIWU2XDjW5+h5bArSTzpvYP6TB4r1wjjDsdWeKNO3uo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FV92EckpTCrRtKXze3kds/zt0MK+Np7bUysTt7HMvzv34yzV4xz8d6L9yh11yQ2F0tRCPPF2ssCz5BCDgZ7oS6SOk8igx4Xwi7bBzL1Pm9wDUQfwRjGb5/15pmkEC6YrN4NbL2BXveaMwGBOXnlKAU8Bi98QP6VNvoGtMBCtFm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=knBOJV76; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e817b40d6e7so1552417276.1;
-        Thu, 12 Jun 2025 19:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749782156; x=1750386956; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+9/RTvn6g2/NjL4CXoXWixdaLM44Q5nbltEazxhI+J8=;
-        b=knBOJV76uHQk0eVpI84e+VU9Sz7bKEVjiUCFjAp0KaJYRn1ZTetnmsHBXkXYAq7sEs
-         1YDO1j47cnUxiRNoIu+fJRl2a5r3cXrjeBwXFj3byW7xMeYAHQ/XOZ2NM3L45fIwjQac
-         nc2RcEtqxRc6dziuUOCtkwp7Yw/uiyhxegqx8pNiuuKtFMNOSVGrwQcLUF6ZA3qywn+o
-         SqmBI0sKVRKh1zNVyzb4m4t+1gh0Qx3ROB0PbZP3O5VFe2SHtH3Y9MfdNrgT1FVaYa2x
-         feItZNr+cck7tbO8+6ZHGUJepoDXU5/3Uhvl+3B+yI3pR0whvcoOuHlBKkomXeshFmst
-         nJcQ==
+	s=arc-20240116; t=1749782406; c=relaxed/simple;
+	bh=E97w1N1Bih5T6H7uKEn970LihNn6kp5QuVS56TtF2cw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=XuxeY+GXa8qD9xMxT06yu+n+W2yJ8reuPauh/BYydANHL15dSHwI7Rr1zF35UZFtuBWL1lPQM/7MNjUPmzUXbE5PU+Smx3xwa3Y2MQGZZhEn6Pl+bwMSbKMJ7NELqPlB88fO6/nZmmkXF4BXdOyMT+nNTwLUULB3FDfrx+zCnbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ddc1af1e5bso39587655ab.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 19:40:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749782156; x=1750386956;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+9/RTvn6g2/NjL4CXoXWixdaLM44Q5nbltEazxhI+J8=;
-        b=CfUfuaHjRIZXFcMCsfnjTeOVN/NQRd/fDLdJUd5KsrJseDGGCLVOzhCsrFhyQI+1jU
-         iMSCzkqaLr3guaeO8Jtuu64qq62E2JVrf3xMsKKxMkrrbWkPU2SvMgiXMtWsTqg3u2Q1
-         tZUY2MdGvD8tPpzmXq6jaJVSK4BlEKaRFBn4moTZo/fPSCPhR6xlvpWgGXn+60FFKFym
-         ST833H51UT4Cg0poyac+5/ACd2SHNhQS3ldwl2pAWtL1MXkDdrObpBu3FcIYmNskiUnf
-         7imO/ekgxF6PChO3gDw6qo3R323NSqCfz0c/9oRMIH6+KNgyH10qLq0D7duel3i8kyJn
-         rThQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+jc75kb3u38QvNBPhzBhH8SLgkbn0KI7Jf61OrFzt06lVFUblDn7u6Fml6odFEtlDm8CaeF8Wx91y/Z72omY=@vger.kernel.org, AJvYcCXM4YJefe5DEjwoBqJ7mLRCrWyo1g/HeklEOwSDVmSRUpsAHbwP4PJxE6YYVlMikrJl9QSpXvke@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqHaluIhq7S57iumB+budGc8LO1D9zjoO9ndV8b6dS57AlJ6F/
-	kLjSjHTY/8uoXXITkAX2FSEUb2et/fdQ4DRMqYTfSk3z9OIWfrSI0RKR
-X-Gm-Gg: ASbGncsiivV5f9oCARTkjruMNwRLcaqzdtCbXfMFqMAcrkGDzixt6lD4YTQKeFciIg3
-	7k6Snjs5aOFDWSWugFmiPxTtPSHs/ZmYErHB4/dO8C8Aic3hndMGls3eqNBxBWBkQVqFBsJycMN
-	TnSc1ymaLGuSADdeJOeIMZ8XifabvtskscFcuekTHzj3K4F31lfyse/iKzz73Obvb/cK/NiiG69
-	SZLvmcAbqxxEWJQUetHOA3nRcl8rdF7ssSRo6ZsHQ7u8qflBvdY/v8aSSlMcuNxNMIX6AI7Rmpv
-	M/tCRf5QMAJoIWqcHsdvro9hqwXAQFZ2cUHVZgusIit4QsKcFUSimhkujXErTBuKRgc/IxcA4lf
-	m9OxeiaTSBrY+anniGuUliqUHu49hcRhDYhC2wlMhxA==
-X-Google-Smtp-Source: AGHT+IFcpdxpKDi4ohUAFGf90rvNUqzkDTY/yd1ySZ3hH5mZRjLML/wRihyO8goObxVbYPQq91CJsA==
-X-Received: by 2002:a05:6902:140f:b0:e81:9a82:fcc0 with SMTP id 3f1490d57ef6-e821c049f41mr2037248276.13.1749782155719;
-        Thu, 12 Jun 2025 19:35:55 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e820e09d3ffsm821744276.23.2025.06.12.19.35.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 19:35:55 -0700 (PDT)
-Date: Thu, 12 Jun 2025 22:35:54 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Breno Leitao <leitao@debian.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- ast@kernel.org, 
- Breno Leitao <leitao@debian.org>
-Message-ID: <684b8e8abb874_dcc45294a5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250612-netpoll_test-v1-1-4774fd95933f@debian.org>
-References: <20250612-netpoll_test-v1-1-4774fd95933f@debian.org>
-Subject: Re: [PATCH net-next RFC] selftests: net: add netpoll basic
- functionality test
+        d=1e100.net; s=20230601; t=1749782403; x=1750387203;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oEQThB/QZWYATXEHZtIzkAUfqU170wP7qCTpelfegTg=;
+        b=aCnr7ozoin2LoMb7KFbMpiblnxJIhG4OfLHPCbfEatlzKw/dTA8hd0oDmryLUU7svA
+         CwTW6u+lJwiDQyhwc9GaP7kT3LYhaZbbFl5V7k1ahxI25ahsNlL0JFnwW4NW59d/UTyl
+         wm9vl53UQuPia9Vv6fh4Cd9M/K4XV70OSZXBWl2//H7Hwq/uZHWma6/K17WZCMd4UncJ
+         GGIAGVJAQiYSycW7oVK6HwrdWQSkkwgxHVPVxGRVM0nM6kd1KgoDLjXwMbik1lkf/37N
+         dCnVkKuUOzzV3aCyPBIfn/+1sUUEdfDYpCZIR1+m4iPHnsHiXNErNbkksMV8vou7WXqR
+         drfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUf0q7oMJLS/bvwFEOc21YYb7Lwk5los2s5X0ZkiFuWj/RJlrpNs0as2GJSq/R7KGaOy/Qjvjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZRUqs5zUW2BcQ62te/MLUzlUJ0zRC5GyO4XoHhYcIhT1kWsjl
+	02l96gYPuQXvzJrg/gysJqCjJc0umlf+sg2LL1LUvhdONENWX3fae46Gw+nBp17NuSNHvhPIFi/
+	QrjgDudygSVo0wQLymDbHlW4oVtw4qm02ImtGqq1qaHiFOmD1C61sI/j4Le4=
+X-Google-Smtp-Source: AGHT+IGGk2ews5bjEXEz9NVZoL8Fs9M4uT9iy4AWHWcnfKyIC4/gMozcjos4QyhO8bjyDSz8dc4tQ6gCWLOW6CvFJ8llBR+AiyF4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:b2b:b0:3dd:b808:be68 with SMTP id
+ e9e14a558f8ab-3de00b9f6b0mr13853405ab.16.1749782403616; Thu, 12 Jun 2025
+ 19:40:03 -0700 (PDT)
+Date: Thu, 12 Jun 2025 19:40:03 -0700
+In-Reply-To: <20250612234950.40595-1-kuni1840@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <684b8f83.a00a0220.279073.0008.GAE@google.com>
+Subject: Re: [syzbot] [atm?] KMSAN: uninit-value in atmtcp_c_send
+From: syzbot <syzbot+1d3c235276f62963e93a@syzkaller.appspotmail.com>
+To: 3chas3@gmail.com, kuni1840@gmail.com, kuniyu@google.com, 
+	linux-atm-general@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Breno Leitao wrote:
-> Add a basic selftest for the netpoll polling mechanism, specifically
-> targeting the netpoll poll() side.
-> 
-> The test creates a scenario where network transmission is running at
-> maximum sppend, and netpoll needs to poll the NIC. This is achieved by:
+Hello,
 
-minor type: sppend/speed
- 
->   1. Configuring a single RX/TX queue to create contention
->   2. Generating background traffic to saturate the interface
->   3. Sending netconsole messages to trigger netpoll polling
->   4. Using dynamic netconsole targets via configfs
-> 
-> The test validates a critical netpoll code path by monitoring traffic
-> flow and ensuring netpoll_poll_dev() is called when the normal TX path
-> is blocked. Perf probing confirms this test successfully triggers
-> netpoll_poll_dev() in typical test runs.
+syzbot tried to test the proposed patch but the build/boot failed:
 
-So the test needs profiling to make it a pass/fail regression test?
-Then perhaps add it to TEST_FILES rather than TEST_PROGS. Unless
-exercising the code on its own is valuable enough.
+drivers/atm/atmtcp.c:293:24: error: use of undeclared identifier 'atmtcp_hdr'; did you mean 'atm_tcp_ops'?
 
-Or is there another way that the packets could be observed, e.g.,
-counters.
-> This addresses a gap in netpoll test coverage for a path that is
-> tricky for the network stack.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
-> Sending as an RFC for your appreciation, but it dpends on [1] which is
-> stil under review. Once [1] lands, I will send this officially.
-> 
-> Link: https://lore.kernel.org/all/20250611-netdevsim_stat-v1-0-c11b657d96bf@debian.org/ [1]
-> ---
->  tools/testing/selftests/drivers/net/Makefile       |   1 +
->  .../testing/selftests/drivers/net/netpoll_basic.py | 201 +++++++++++++++++++++
->  2 files changed, 202 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-> index be780bcb73a3b..70d6e3a920b7f 100644
-> --- a/tools/testing/selftests/drivers/net/Makefile
-> +++ b/tools/testing/selftests/drivers/net/Makefile
-> @@ -15,6 +15,7 @@ TEST_PROGS := \
->  	netcons_fragmented_msg.sh \
->  	netcons_overflow.sh \
->  	netcons_sysdata.sh \
-> +	netpoll_basic.py \
->  	ping.py \
->  	queues.py \
->  	stats.py \
-> diff --git a/tools/testing/selftests/drivers/net/netpoll_basic.py b/tools/testing/selftests/drivers/net/netpoll_basic.py
-> new file mode 100755
-> index 0000000000000..8abdfb2b1eb6e
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/netpoll_basic.py
-> @@ -0,0 +1,201 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +# This test aims to evaluate the netpoll polling mechanism (as in netpoll_poll_dev()).
-> +# It presents a complex scenario where the network attempts to send a packet but fails,
-> +# prompting it to poll the NIC from within the netpoll TX side.
-> +#
-> +# This has been a crucial path in netpoll that was previously untested. Jakub
-> +# suggested using a single RX/TX queue, pushing traffic to the NIC, and then sending
-> +# netpoll messages (via netconsole) to trigger the poll. `perf` probing of netpoll_poll_dev()
-> +# showed that this test indeed triggers netpoll_poll_dev() once or twice in 10 iterations.
-> +
-> +# Author: Breno Leitao <leitao@debian.org>
-> +
-> +import errno
-> +import os
-> +import random
-> +import string
-> +import time
-> +
-> +from lib.py import (
-> +    ethtool,
-> +    GenerateTraffic,
-> +    ksft_exit,
-> +    ksft_pr,
-> +    ksft_run,
-> +    KsftFailEx,
-> +    KsftSkipEx,
-> +    NetdevFamily,
-> +    NetDrvEpEnv,
-> +)
-> +
-> +NETCONSOLE_CONFIGFS_PATH = "/sys/kernel/config/netconsole"
-> +REMOTE_PORT = 6666
-> +LOCAL_PORT = 1514
-> +# Number of netcons messages to send. I usually see netpoll_poll_dev()
-> +# being called at least once in 10 iterations.
-> +ITERATIONS = 10
 
-Is usually sufficient to avoid flakiness, or should this be cranked
-up?
+Tested on:
 
-> +DEBUG = False
-> +
-> +
-> +def generate_random_netcons_name() -> str:
-> +    """Generate a random name starting with 'netcons'"""
-> +    random_suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=8))
-> +    return f"netcons_{random_suffix}"
-> +
-> +
-> +def get_stats(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> dict[str, int]:
-> +    """Get the statistics for the interface"""
-> +    return netdevnl.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
-> +
-> +
-> +def set_single_rx_tx_queue(interface_name: str) -> None:
-> +    """Set the number of RX and TX queues to 1 using ethtool"""
-> +    try:
-> +        # This don't need to be reverted, since interfaces will be deleted after test
-> +        ethtool(f"-G {interface_name} rx 1 tx 1")
-> +    except Exception as e:
-> +        raise KsftSkipEx(
-> +            f"Failed to configure RX/TX queues: {e}. Ethtool not available?"
-> +        )
-> +
-> +
-> +def create_netconsole_target(
-> +    config_data: dict[str, str],
-> +    target_name: str,
-> +) -> None:
-> +    """Create a netconsole dynamic target against the interfaces"""
-> +    ksft_pr(f"Using netconsole name: {target_name}")
-> +    try:
-> +        ksft_pr(f"Created target directory: {NETCONSOLE_CONFIGFS_PATH}/{target_name}")
-> +        os.makedirs(f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}", exist_ok=True)
-> +    except OSError as e:
-> +        if e.errno != errno.EEXIST:
-> +            raise KsftFailEx(f"Failed to create netconsole target directory: {e}")
-> +
-> +    try:
-> +        for key, value in config_data.items():
-> +            if DEBUG:
-> +                ksft_pr(f"Setting {key} to {value}")
-> +            with open(
-> +                f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}/{key}",
-> +                "w",
-> +                encoding="utf-8",
-> +            ) as f:
-> +                # Always convert to string to write to file
-> +                f.write(str(value))
-> +                f.close()
-> +
-> +        if DEBUG:
-> +            # Read all configuration values for debugging
-> +            for debug_key in config_data.keys():
-> +                with open(
-> +                    f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}/{debug_key}",
-> +                    "r",
-> +                    encoding="utf-8",
-> +                ) as f:
-> +                    content = f.read()
-> +                    ksft_pr(
-> +                        f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}/{debug_key} {content}"
-> +                    )
-> +
-> +    except Exception as e:
-> +        raise KsftFailEx(f"Failed to configure netconsole target: {e}")
-> +
-> +
-> +def set_netconsole(cfg: NetDrvEpEnv, interface_name: str, target_name: str) -> None:
-> +    """Configure netconsole on the interface with the given target name"""
-> +    config_data = {
-> +        "extended": "1",
-> +        "dev_name": interface_name,
-> +        "local_port": LOCAL_PORT,
-> +        "remote_port": REMOTE_PORT,
-> +        "local_ip": cfg.addr_v["4"] if cfg.addr_ipver == "4" else cfg.addr_v["6"],
-> +        "remote_ip": (
-> +            cfg.remote_addr_v["4"] if cfg.addr_ipver == "4" else cfg.remote_addr_v["6"]
-> +        ),
-> +        "remote_mac": "00:00:00:00:00:00",  # Not important for this test
-> +        "enabled": "1",
-> +    }
-> +
-> +    create_netconsole_target(config_data, target_name)
-> +    ksft_pr(f"Created netconsole target: {target_name} on interface {interface_name}")
-> +
-> +
-> +def delete_netconsole_target(name: str) -> None:
-> +    """Delete a netconsole dynamic target"""
-> +    target_path = f"{NETCONSOLE_CONFIGFS_PATH}/{name}"
-> +    try:
-> +        if os.path.exists(target_path):
-> +            os.rmdir(target_path)
-> +    except OSError as e:
-> +        raise KsftFailEx(f"Failed to delete netconsole target: {e}")
-> +
-> +
-> +def check_traffic_flowing(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> int:
-> +    """Check if traffic is flowing on the interface"""
-> +    stat1 = get_stats(cfg, netdevnl)
-> +    time.sleep(1)
-
-Can the same be learned with sufficient precision when sleeping
-for only 100 msec? As tests are added, it's worth trying to keep
-their runtime short.
-
-> +    stat2 = get_stats(cfg, netdevnl)
-> +    pkts_per_sec = stat2["rx-packets"] - stat1["rx-packets"]
-> +    # Just make sure this will not fail even in slow/debug kernels
-> +    if pkts_per_sec < 10:
-> +        raise KsftFailEx(f"Traffic seems low: {pkts_per_sec}")
-> +    if DEBUG:
-> +        ksft_pr(f"Traffic per second {pkts_per_sec} ", pkts_per_sec)
-> +
-> +    return pkts_per_sec
-> +
-> +
-> +def do_netpoll_flush(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> None:
-> +    """Print messages to the console, trying to trigger a netpoll poll"""
-> +    for i in range(int(ITERATIONS)):
-> +        pkts_per_s = check_traffic_flowing(cfg, netdevnl)
-> +        with open("/dev/kmsg", "w", encoding="utf-8") as kmsg:
-> +            kmsg.write(f"netcons test #{i}: ({pkts_per_s} packets/s)\n")
-> +
-> +
-> +def test_netpoll(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> None:
-> +    """Test netpoll by sending traffic to the interface and then sending netconsole messages to trigger a poll"""
-> +    target_name = generate_random_netcons_name()
-> +    ifname = cfg.dev["ifname"]
-> +    traffic = None
-> +
-> +    try:
-> +        set_single_rx_tx_queue(ifname)
-> +        traffic = GenerateTraffic(cfg)
-> +        check_traffic_flowing(cfg, netdevnl)
-> +        set_netconsole(cfg, ifname, target_name)
-> +        do_netpoll_flush(cfg, netdevnl)
-> +    finally:
-> +        if traffic:
-> +            traffic.stop()
-> +        delete_netconsole_target(target_name)
-> +
-> +
-> +def check_dependencies() -> None:
-> +    """Check if the dependencies are met"""
-> +    if not os.path.exists(NETCONSOLE_CONFIGFS_PATH):
-> +        raise KsftSkipEx(
-> +            f"Directory {NETCONSOLE_CONFIGFS_PATH} does not exist. CONFIG_NETCONSOLE_DYNAMIC might not be set."
-> +        )
-> +
-> +
-> +def main() -> None:
-> +    """Main function to run the test"""
-> +    check_dependencies()
-> +    netdevnl = NetdevFamily()
-> +    with NetDrvEpEnv(__file__, nsim_test=True) as cfg:
-> +        ksft_run(
-> +            [test_netpoll],
-> +            args=(
-> +                cfg,
-> +                netdevnl,
-> +            ),
-> +        )
-> +    ksft_exit()
-> +
-> +
-> +if __name__ == "__main__":
-> +    main()
-> 
-> ---
-> base-commit: 5d6d67c4cb10a4b4d3ae35758d5eeed6239afdc8
-> change-id: 20250612-netpoll_test-a1324d2057c8
-> 
-> Best regards,
-> -- 
-> Breno Leitao <leitao@debian.org>
-> 
-
+commit:         27605c8c Merge tag 'net-6.16-rc2' of git://git.kernel...
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=42d51b7b9f9e61d
+dashboard link: https://syzkaller.appspot.com/bug?extid=1d3c235276f62963e93a
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1183ed70580000
 
 
