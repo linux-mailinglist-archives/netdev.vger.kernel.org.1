@@ -1,50 +1,70 @@
-Return-Path: <netdev+bounces-197263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D15AD7FBE
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:50:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A628AD7FCE
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A7B18879EC
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:50:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D44413B68C6
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FA68F66;
-	Fri, 13 Jun 2025 00:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285AE1BFE00;
+	Fri, 13 Jun 2025 00:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeiyCRat"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJs/tlbz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFA52AE97
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A0A191F8C;
+	Fri, 13 Jun 2025 00:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749775811; cv=none; b=ZTQZX3MGVLw9X7VWxkL/Vfg8ZO0UzgjpjXVItJKmjDvQax+Xo2LHA+GLku+lUJ7y+huFL3SQ/QoCRCldkrzHBXVz0ZqjFcSUGwXdZAgPrNOVEsNSxJoaGWIMjnI5vtELmzTLTwpShZWag6ibiBWk+m+PDexjOpOBAHmt3+x1DvQ=
+	t=1749776085; cv=none; b=O3tq9S6cXKUxxiYFDTLCMaFpe6hkz+UPfnSB4Icfievoey95oo3p7tikQ2HNSFb7Nco9Sd86q/e9JX4az3qCSl45Bir73sMEjB51oiibExs+ATQOhGHM0gSfsV4gUHmIyor4hGiQAYO+p+DgNx/57e/zWwPI2U9XXWtpk34uB74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749775811; c=relaxed/simple;
-	bh=ef4smiOC47x5NuXH+olcR5+Mps0Y7hrqd7rV4VLIZ2Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I+gU+ENjxJJMBfqaCY6OtfGbhlGfodtWVyFRiji2uaV7IewXaTI2wslhzwyxXr7R6aewLNj835Bqogfny4UC7PPJpAMycR51rhBxsRmSWKI4TfeZ8u1F0aW9bKy78sxuycuCSJbqe2qs3SRM3i64pkavjaSMEHly+kPM26gAJU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeiyCRat; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EEF5C4CEEA;
-	Fri, 13 Jun 2025 00:50:10 +0000 (UTC)
+	s=arc-20240116; t=1749776085; c=relaxed/simple;
+	bh=miidOCgNftdZhEwsnB1znqJxT7McGoipeBLAxIdGNME=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tVil1ZiHMnzpanuF9egTehzKVNU2KKuu7SGswVgPBB7XYcTihnlcJunG7HywlBp7yHQ/E8Q5JkbcJ7RkNwe+ybXpM4ei/h/YGu/uGH7fdCv5fgxGA7A1bNe5wc39vopJG3ZpNJRmdDy2G9TnzpDHFRQwI/yrR8xxaWFCEa7bw60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJs/tlbz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 951C9C4CEEA;
+	Fri, 13 Jun 2025 00:54:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749775810;
-	bh=ef4smiOC47x5NuXH+olcR5+Mps0Y7hrqd7rV4VLIZ2Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AeiyCRatGgZrHFNYfWL9XwMYOTfD2WvrmErGtOMqF9XnTd6lwYn6WrpqpjqxLOuM+
-	 gG3RVmwmociw4+DjM/QOfsyCwHf0Y16n1SQgH0bng18IPntXAWcsDSGWuw53RSFCwE
-	 7lDkiT9MvA12gE0nAt9ERl8swRyiS4hWDt8nqQPoQck7sIi4BLjGSBvOqnQt6gPxqz
-	 Vw8++ZCBl2Cmo02CFRLHlCHpDm6WLuP0izrQQMYQHrKRkjLLOw3yPYCHSzT9g3CexC
-	 Og71lWbvF9E1y82K01xkAb2Vd9n+M3xqtrkm10JMpJ50jld6znqn9cR1qKPgLiaRjh
-	 UhogEVrhVBZVA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D3439EFFCF;
-	Fri, 13 Jun 2025 00:50:41 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749776084;
+	bh=miidOCgNftdZhEwsnB1znqJxT7McGoipeBLAxIdGNME=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TJs/tlbz+hvIWLpeTL8b9c8ESSGj4MAUzINv7BqZdvllDr6UkbydMaCCMp4LkF3Sx
+	 RIxiEPlm0bxjqyfOqqrQQ3WEEwhbBed1TymDBL0zWaotiD5Tv0wq/Yup+a9ycT0ofL
+	 XnoRsQAPuv2OjQh8IBxa4W9zXsXyu5ahXoFNr8Ua0h8MuR0t29B93IqSNEPExmH9NZ
+	 5AitKXeeI+NuRhCdR9Y7wyY9N3eN0+Jg3GgY6FpIeHxRSzmS0T3WKzQJolVYzeIukQ
+	 zZnFtW4KuQQvg/GmKQvpBsUHkKgJyGdbLlljnomANPhoZ4lthO108RStwgGG5dsF8j
+	 ALLo5ig2wSN7w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	bharat@chelsio.com,
+	benve@cisco.com,
+	satishkh@cisco.com,
+	claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	wei.fang@nxp.com,
+	xiaoning.wang@nxp.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	bryan.whitehead@microchip.com,
+	ecree.xilinx@gmail.com,
+	rosenp@gmail.com,
+	imx@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/6] eth: migrate to new RXFH callbacks (get-only drivres)
+Date: Thu, 12 Jun 2025 17:54:03 -0700
+Message-ID: <20250613005409.3544529-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,58 +72,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/9] net: ethtool: add dedicated RXFH driver
- callbacks
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174977584001.169232.17739613101853165487.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Jun 2025 00:50:40 +0000
-References: <20250611145949.2674086-1-kuba@kernel.org>
-In-Reply-To: <20250611145949.2674086-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- ecree.xilinx@gmail.com
 
-Hello:
+Migrate the drivers which only implement ETHTOOL_GRXFH to
+the recently added dedicated .get_rxfh_fields ethtool callback.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Jakub Kicinski (6):
+  eth: cisco: migrate to new RXFH callbacks
+  eth: cxgb4: migrate to new RXFH callbacks
+  eth: lan743x: migrate to new RXFH callbacks
+  eth: e1000e: migrate to new RXFH callbacks
+  eth: enetc: migrate to new RXFH callbacks
+  eth: sfc: falcon: migrate to new RXFH callbacks
 
-On Wed, 11 Jun 2025 07:59:40 -0700 you wrote:
-> Andrew asked me to plumb the RXFH header fields configuration
-> thru to netlink. Before we do that we need to clean up the driver
-> facing API a little bit. Right now RXFH configuration shares the
-> callbacks with n-tuple filters. The future of n-tuple filters
-> is uncertain within netlink. Separate the two for clarity both
-> of the core code and the driver facing API.
-> 
-> [...]
+ .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    | 105 +++++++++---------
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |   8 +-
+ .../ethernet/freescale/enetc/enetc_ethtool.c  |  10 +-
+ drivers/net/ethernet/intel/e1000e/ethtool.c   |  77 ++++++-------
+ .../net/ethernet/microchip/lan743x_ethtool.c  |  31 ++++--
+ drivers/net/ethernet/sfc/falcon/ethtool.c     |  51 +++++----
+ 6 files changed, 145 insertions(+), 137 deletions(-)
 
-Here is the summary with links:
-  - [net-next,1/9] net: ethtool: copy the rxfh flow handling
-    https://git.kernel.org/netdev/net-next/c/f4f126535546
-  - [net-next,2/9] net: ethtool: remove the duplicated handling from rxfh and rxnfc
-    https://git.kernel.org/netdev/net-next/c/2a644c5cecc0
-  - [net-next,3/9] net: ethtool: require drivers to opt into the per-RSS ctx RXFH
-    https://git.kernel.org/netdev/net-next/c/fac4b41741b5
-  - [net-next,4/9] net: ethtool: add dedicated callbacks for getting and setting rxfh fields
-    https://git.kernel.org/netdev/net-next/c/9bb00786fc61
-  - [net-next,5/9] eth: remove empty RXFH handling from drivers
-    https://git.kernel.org/netdev/net-next/c/86b2315e7041
-  - [net-next,6/9] eth: fbnic: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/2a34007ba977
-  - [net-next,7/9] net: drv: vmxnet3: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/2f14765d6397
-  - [net-next,8/9] net: drv: virtio: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/63d474cfb596
-  - [net-next,9/9] net: drv: hyperv: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/6867fbe3a9f4
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0
 
 
