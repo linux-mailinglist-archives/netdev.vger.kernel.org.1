@@ -1,87 +1,192 @@
-Return-Path: <netdev+bounces-197500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A00B0AD8D48
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:40:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3973BAD8D6F
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:44:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8E87189FE03
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7A09168F15
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 413CA17A2F2;
-	Fri, 13 Jun 2025 13:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5404F17A30A;
+	Fri, 13 Jun 2025 13:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l3Nq5Uxc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/vlDZO0"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BDC156F5E
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 13:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982BD111BF;
+	Fri, 13 Jun 2025 13:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749821994; cv=none; b=hwH19q1dJXPo8ndpJkidEDwt5LqaY8y7MiNfWM0Mv+SVwIjMG7RNXKghtK6gLLrxW/nRqgikR9ijkeU5RULjaS2SkM818mnYrtrSiTkPJnnptI2u0qvry0rJS92drZV66+3D7QaQkjMM0TwVtLWFGjajdUqStY+DeBDojQ0DU68=
+	t=1749822219; cv=none; b=pQtVs7mcra3dJexSdqi54mBicaqjqb+X6SlbJfCF0DRugzrCGCnbmLLAYiuO92n3lqmP9KppWh0jAkoIajPY/1aRiV3SPRZuh8zVNEZqQgP0JQDlpkGaaCB573FWv7v9cuBinMu/xS2hj8KCkj/pW3Q6TMZd+9n7PUgetLRrYt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749821994; c=relaxed/simple;
-	bh=A3ISDuDGpv7xrA990LVx5fes7z9h1EyqhshsUSfLe78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cdGLfFMva81vIEuG86/WsvCEg22chOnVfpL01VP3JqucnTeWTnTPNNL37p8xLShNlIuy6bYjxLeGs99dHH7txrtv8mlgiWOP6gDtV1TOmNjyavIJ2XzFlg9M18p5GxORz4Z6ltTDZuzPXTRZGeBU25QV9ucK3av/781IN6xnIp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l3Nq5Uxc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=lWbYeIMxBXKH3hU+a/NJ4RKlW0M+OeIlJxO6OukjuJo=; b=l3
-	Nq5Uxc1owlqiHZEtCOYPN7m1pe8hev2QJVXxuq2kEJZkQ2HbeEnP14c3XSB5v5hKAhGu8yID3FOAl
-	Lakw1pqgSgFp00ywoe3uIAaGm1gT4w5raUrTtQBd7xx++SNOD3x3It5wzndiX+To5Hzxt7QDOzZE+
-	ZO2Z4i8jUMgzb8c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uQ4dK-00Fibg-Oq; Fri, 13 Jun 2025 15:39:50 +0200
-Date: Fri, 13 Jun 2025 15:39:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-Cc: netdev@vger.kernel.org
-Subject: Re: [support request]: where should I register this (apparently not
- supported yet) transceiver?
-Message-ID: <11c8694a-382c-4085-9e83-0a4fa4a362cb@lunn.ch>
-References: <5568c38c-5c93-493a-96bd-b6537a4d1ad6@kabelmail.de>
- <da8834aa-da77-4633-ac6f-d2b738a97337@lunn.ch>
- <b6a4604e-55bd-4ab7-9cf2-05fb94e72500@kabelmail.de>
+	s=arc-20240116; t=1749822219; c=relaxed/simple;
+	bh=KZ8V03W9AMSS/ZrJN6Tc1lj0hBTtN9vN9Uigrs3yZ3Y=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=s0aqjLnju5DwfEzaY0b6I2at+Ec/ZR4gAZ3RI40cBpkyfztE6ANt06jXj+jmZpVLGBVrjLeZn8EC0eYluTGOlw1m4mqkBDzSwymuuoJCMkf3hvT+mL2j9SQPEgYxHJA2LCNDzVan7J39w/VA0rFgRzDFhuciv/F4xDwSaG6Pwfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/vlDZO0; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-710f39f5cb9so20830027b3.3;
+        Fri, 13 Jun 2025 06:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749822216; x=1750427016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ox3E9dQ67FbqXqAnvQO795RQbhpNGDVUFih1Lflr29A=;
+        b=j/vlDZO0PdG6zIR8guhdW8Rnp5bHjcd2aMc9WYS8KNqRofX5NWVdlvV2rwMFrCP1YK
+         yVAchWUj0YBGhXf94mMxLBuyV5sNopV/vmv+L+gVn3Kco7AKcsiAuoEj5+zv/2DiqdN2
+         16sWE9y2V/12AwajlmTjFjOwH63/aC9f1dgYijlIFfmSYr0QiGvRJlxZ23k58+EYJeTy
+         3hI/Lhnih0dd4IrMmFdbwhKxg7SSi3iGUOA1QnmO+PUfEQK1Q4GGQdugbY2MLqIuWVt3
+         1/L3R9qCpjzBVCJtKZH+7X2rSrB6/6frBO4TEp5+QAwT7SA9YKx/DCKTcYAB4QRmREDL
+         WreQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749822216; x=1750427016;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ox3E9dQ67FbqXqAnvQO795RQbhpNGDVUFih1Lflr29A=;
+        b=MnytL88jU+EhZzwPsGjNFKMcNetkauhn2QiBji9m98o2BasGegR2ntNjMG95mkLJLE
+         ZRnLjb0FRPUJ/JglUyI8hb4FqOD0UIdVA2kZzG6x+K8CgwYWC8y7+gyvYHmiSWdTRLnT
+         njvp/PqVO4u1GwlHyTq4Zz4aSixmsSH1HYteoVXn+SVq21U25/gEcqG7FPjmRornA/ci
+         nGEGJsFqohtA8NyQ713lFzUo6dvSsV4zKT6+9DzhtkCDs6Ea24eoJ2doBK+V+oVvAPs7
+         KammVVUMEq2vfi7wE7ba9FRatBaI3X1AV0Bbvmc4Q4cap6Rlvvfs1ODass5Bqe+vStom
+         qNOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtxeNVOeLupAuzEe7cMLyQCo7Ur8mPWYp8CG0M/4hMDUPi3oVCVzyw9LINNHqadvSY0FG7OWlJ@vger.kernel.org, AJvYcCWrKAz3MQQIUmtKuSXkmfSg0nKQe4j88kON9YjKkAOIYz+tdRVteYRgqJ5Qp1r4pNrQdHOJAoh8fd2RgtwqAn5k@vger.kernel.org, AJvYcCXe9xY+ug6EoIwQ6wf8eXMEv9tGkY6mOPdChnF74W6+1eRMsYN+paKD/aQi6iDSdcs9Q9d4NRozqFzByoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuC1blLOjB4NhV4BN1upIiffRnBQcCEw+lcpUDB82Z+1ZznOfV
+	HfvbLy36VuiHNpzTzsusDxqnsP9ccA09HbtyLKoTiC5Sk6pJAJGMxql3
+X-Gm-Gg: ASbGncuKb03M1sZZtkqp4zm2MvptcisHIDgd0TBLuVoi/JuK73rZlxhtFlNueTLWpVP
+	gSAIJKCGfbDwesnfpcT4YqrqI+orYvdfCEg1YW2g07q7cwHj0a4QWRujSfQ9+IKe5EEdxKiYzvD
+	uvcnOLBsVrMHghtBzv/Go4ptkL//a9BCBWJzHQBamE89rPTGezt71KTLp6xiflsCDTZSzYx69Kw
+	ZX/8HL+/TZEZPnIaUUM5Ekz8E4gp4cQsu/FFUur5x8hWJdPSo8Nh3RkyaeQE7Smy67lOfD3eCvl
+	DUj1GQPOOXmC6onoVV1nnO+X3buja4AMPvffHTrJ+pdaoyXpEfMVomomCP6/Tn3lcpzkQasCVRr
+	zMdyO/MtCuu5ebZS9ORGFA3gYklfsVzbaVb8vjFSOVg==
+X-Google-Smtp-Source: AGHT+IEbD4QsQkLlqlVlhfEq0zqhzfDi3PWNPwwOqa42u0o9X1ZYKAWtGJroQ5rtRtkrC07DcFZxMw==
+X-Received: by 2002:a05:690c:9c13:b0:710:f025:4077 with SMTP id 00721157ae682-7116370c74amr48799327b3.2.1749822216318;
+        Fri, 13 Jun 2025 06:43:36 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71152091490sm6424747b3.48.2025.06.13.06.43.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 06:43:35 -0700 (PDT)
+Date: Fri, 13 Jun 2025 09:43:35 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ ast@kernel.org
+Message-ID: <684c2b0770919_10740f29412@willemb.c.googlers.com.notmuch>
+In-Reply-To: <aEwd9oLRnxna97JK@gmail.com>
+References: <20250612-netpoll_test-v1-1-4774fd95933f@debian.org>
+ <684b8e8abb874_dcc45294a5@willemb.c.googlers.com.notmuch>
+ <aEwd9oLRnxna97JK@gmail.com>
+Subject: Re: [PATCH net-next RFC] selftests: net: add netpoll basic
+ functionality test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b6a4604e-55bd-4ab7-9cf2-05fb94e72500@kabelmail.de>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-> Unfortunately, the result was not as I'd expect (on kernel 6.12.32):
+Breno Leitao wrote:
+> Hello Willem,
 > 
-> > ... (booting kernel 6.12.32 with quirk) ...
-> > [   37.832050] mtk_soc_eth 15100000.ethernet sfp-lan:
-> validation with support 00,00000000,00000000,00000000 failed: -EINVAL
-> > [   37.843056] sfp sfp2: sfp_add_phy failed: -EINVAL
-
-So it probably cannot find the PHY.
-
-> > ...
+> On Thu, Jun 12, 2025 at 10:35:54PM -0400, Willem de Bruijn wrote:
+> > Breno Leitao wrote:
+> > > Add a basic selftest for the netpoll polling mechanism, specifically
+> > > targeting the netpoll poll() side.
+> > > 
+> > > The test creates a scenario where network transmission is running at
+> > > maximum sppend, and netpoll needs to poll the NIC. This is achieved by:
+> > 
+> > minor type: sppend/speed
 > 
-> I tried the eepromfix of i2csfp:
+> Thanks! I will update.
+> 
+> > >   1. Configuring a single RX/TX queue to create contention
+> > >   2. Generating background traffic to saturate the interface
+> > >   3. Sending netconsole messages to trigger netpoll polling
+> > >   4. Using dynamic netconsole targets via configfs
+> > > 
+> > > The test validates a critical netpoll code path by monitoring traffic
+> > > flow and ensuring netpoll_poll_dev() is called when the normal TX path
+> > > is blocked. Perf probing confirms this test successfully triggers
+> > > netpoll_poll_dev() in typical test runs.
+> > 
+> > So the test needs profiling to make it a pass/fail regression test?
+> > Then perhaps add it to TEST_FILES rather than TEST_PROGS. Unless
+> > exercising the code on its own is valuable enough.
+> 
+> Sorry for not being clear. This test doesn't depend on any profiling
+> data. Basically I just run `perf probe` to guarantee that
+> netpoll_poll_dev() was being called (as that was the goal of the test).
+> 
+> This test is self contained and should run at `make run_test` targets.
+> 
+> > Or is there another way that the packets could be observed, e.g.,
+> > counters.
+> 
+> Unfortunately netpoll doesn't expose any data, thus, it is hard to get
+> it. 
+> 
+> I have plans to create a configfs for netpoll, so, we can check for
+> these numbers (as also configure some pre-defined values today, such as
+> USEC_PER_POLL, MAX_SKBS, ip6h->version = 6; ip6h->priority = 0, etc.
+> 
+> In fact, I've an private PoC for this, but, I am modernizing the code
+> first, and creating some selftests to help me with those changes later
+> (given we have very little test on netpoll, and I aim to improve this,
+> given how critical it is for some datacenter designs).
+> 
+> > > +NETCONSOLE_CONFIGFS_PATH = "/sys/kernel/config/netconsole"
+> > > +REMOTE_PORT = 6666
+> > > +LOCAL_PORT = 1514
+> > > +# Number of netcons messages to send. I usually see netpoll_poll_dev()
+> > > +# being called at least once in 10 iterations.
+> > > +ITERATIONS = 10
+> > 
+> > Is usually sufficient to avoid flakiness, or should this be cranked
+> > up?
+> 
+> 10 was the minimum number I was able to trigger it on my dev
+> environment, either with default configuration and a debug heavy
+> configuration, but, the higher the number, more change to trigger it.
+> I can crank up it a bit more. Maybe 20?
+> 
+> > > +def check_traffic_flowing(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> int:
+> > > +    """Check if traffic is flowing on the interface"""
+> > > +    stat1 = get_stats(cfg, netdevnl)
+> > > +    time.sleep(1)
+> > 
+> > Can the same be learned with sufficient precision when sleeping
+> > for only 100 msec? As tests are added, it's worth trying to keep
+> > their runtime short.
+> 
+> 100%. In fact, I don't need to wait for 1 seconds. In fact, we don't
+> even need to check for traffic flowing after the traffic started. I've
+> just added it to help me do develop the test.
+> 
+> We can either reduce it to 100ms or just remove it from the loop,
+> without prejudice to the test itself. Maybe reducing it to 100 ms might
+> help someone else that might debug this in the future, while just
+> slowing down ITERATIONS * 0.1 seconds !?
 
-Did you play with:
+That makes sense. Or only keep it in DEBUG mode?
 
-i2csfp I2CBUS rollball read|write DEVAD REGISTER [VALUE]
-
-Try reading devad = 1, register = 2 and 3.
-
-	Andrew
 
