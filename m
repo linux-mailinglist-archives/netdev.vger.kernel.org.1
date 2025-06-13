@@ -1,139 +1,162 @@
-Return-Path: <netdev+bounces-197646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE47AD97FC
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 00:03:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D1CAD9803
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 00:04:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573F6188D720
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:04:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501E317C921
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1742E28D8D1;
-	Fri, 13 Jun 2025 22:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E44528D8C4;
+	Fri, 13 Jun 2025 22:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOc1nIcb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="evcrr8fQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D696724BD0C;
-	Fri, 13 Jun 2025 22:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D83153BE8
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 22:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749852224; cv=none; b=beZa4gMEzYCN8M5ulcK5COBRatqDCtVFNEUnIjbhptHJdYtTnjIt9j+dHTbRHTiyUDoMuHoC1yinQBiTYtQURMbTGVIiF5O2aektuSpx86JeWGXhxtVem5MlXY9YBzkc8GNTG5Nut19Uv35Xtuj4FTDNxJUfVQ73+DwidqsDEvY=
+	t=1749852298; cv=none; b=K3+00XMhWfpc8+f08us8S2D4euoH4UYkJHDfAr3twPnh3OG1yFOlPQMi9Zfu4Yb8g8mYEgInG4w/H0WeYPwnnJblWxQmx+1vV1QedQVcdYDC3ETl0PK1Xg5sgdQyllTvs5iVimtTLTYZlnC+rWv3P+jrWszipsfs2/6ZKpZ7nLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749852224; c=relaxed/simple;
-	bh=plNoLDchHYVqta2q1kYAd9oobMIsKBI7Bo0/KNmnkno=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=BuMN3GSFVoh41VxJ3RuVGQ8KHFao0hFGZ8CI8k87tHXvNXnnoR+U/DSjZgHB7nF77Dt2BM4o/C4DDLFTCB2sAFqyZYUl+Q8zHuhj3dUN+kh5PxSkrG5gwH3axhHjcFJqcrmQ+XcrdUk6EpOJHBVBikmtsENjOFCbiyxBb5o9RYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOc1nIcb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 361EDC4CEE3;
-	Fri, 13 Jun 2025 22:03:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749852222;
-	bh=plNoLDchHYVqta2q1kYAd9oobMIsKBI7Bo0/KNmnkno=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=SOc1nIcb6nvOucwE3pr3QMwxCUti1b9SBGa0JjRrN4EWS/nsrD7X7nkuhru9BlUzs
-	 fLaSWmSm/eeT/DVi94n2hpnHvGDgjdPcc79g22b+w4/z60mlMbLbReImoSX0wWT/EE
-	 /Dbfjw1TWLC32Ak3RfqmsvCfLVYqNBiiJE+r/3s+FTYxNNBVEorEFYRsoXMUVWzzpf
-	 Ty+OIRSf0aLvjzhr2dttB7vcrF+56Zd1XNeC4NI/7nHakCNjYqLgsQbd6PzqYb+213
-	 6tOdjg8Ea7JCtVQgJWtRCLEAISa/Dfc/1mtaQpoXg2DPQmwx7QSBaiO/J+Sj62lATz
-	 inuL6G3NOLl8Q==
-Date: Fri, 13 Jun 2025 17:03:41 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof =?utf-8?Q?Wilczy=EF=BF=BD~Dski?= <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Michael Kelley <mhklinux@outlook.com>, linux-hyperv@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v6 2/5] PCI: hv: Allow dynamic MSI-X vector allocation
-Message-ID: <20250613220341.GA986823@bhelgaas>
+	s=arc-20240116; t=1749852298; c=relaxed/simple;
+	bh=+CfUmckp8DwKI8FR3wF+dG55ddSsPbC9M63ACx9BYNo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=DZDA+9uairkRbq/2Z+I+Gu/WNEnPM3HTjjnmMVwP46fZXTEmvryRIqdVpNk9rzeAOejPcbauYdENZSIErDKLG6JViEJCFx5+LdZOxIAWo7N04hS0TPcQUqUn7rm2A2iwH1NczgOT5Q5eplVwos8kIsAMWORRjQQmO1YLJK/JT0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=evcrr8fQ; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-450cea01b9cso12891465e9.0
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 15:04:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749852295; x=1750457095; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z5biD01ZrTkj4IneZX+TecWCxtz9sNR40VXakt4EDOQ=;
+        b=evcrr8fQIy+A7YTdJ764xYrykAKJ5SKwLD2W02w+ToN63L+qFSgabV43nHF4Hay8Fa
+         nzQI3WhYDgaWFnr78WzLnmGGf3sgFiyDRvsvjImZsrnA/h5hdT68ziLt++O5W8YgV0mJ
+         +hl4RUWVOcgF6/KrMUtt1PJ7PnsKZRglkI0Ez9aUGoty9i6/xxWOb5p435UowLFPbpNt
+         29wE701CmMAikLjGRQf0TQlfLL2w8SmQ8XTfS31aX1UEscHUHEm5xrE1VUmLwjX8CA5p
+         9FEGjGD8LZlMeUC+pzKWU/eBsE3QX/fpKxyge2XVgGOQ1w3qxUf6wTqRKZ2WQ55vmCuv
+         6lSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749852295; x=1750457095;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z5biD01ZrTkj4IneZX+TecWCxtz9sNR40VXakt4EDOQ=;
+        b=BuR2/Jhl3W6HJ+Ew3wwVI+F322IbkNNnXlb3IjS9ZT8ZlxZFmsqv2mRFqIN564k6Aq
+         ckJ5Aknppgb8YzD74fclomuD3eTSUPEPdaA6Blc4iz6Qartrr/HsrjheakRs4+REzFcj
+         jAmnvdLZzNkQedVx1xUYq/+0sR9JElZgcDZD74qlKREuRuyAzyFClQ8IKEsxeyvZwhwR
+         PFKHOOAiRjQvjnivBk0lKZKyuGz5dS1/6Q5hLTYX4XE2Qk06O4/BapuqCwBsgS/U/lc3
+         wKNbyHpZY/F9UxfB11CU4gavNT4Okf2igBiAqy/yiK2ZuRgg81S4m84IfJ5oWXysarLf
+         Lzfw==
+X-Gm-Message-State: AOJu0YxfIAsY3qZzryNPRC1fXJtvaLoChJ+V/zvYJ41AR8iMiLxPg5TG
+	GbKUmurKi6uxZppJxvulniQ7uLJZPdFLZRpbOkkUztTt2a2DfJRhPvG5
+X-Gm-Gg: ASbGnctmW416zRi1qOg/sbqSU8Hypr+RYapHqbCCBGzQvM4ISsDI2+oHSiEl8WSUJ+4
+	1SMGnhKTdO4GTPGmSVmODYlaGlv6IB8fe/2ZQiYInQMT65pfNmxu1n4bKFbSsrSuwTwQBDcQ8wV
+	uCOIkpvRQrhIdF+QrmxPWkxpd9CiQvu8aNBTDJW7BDkLO8RbV6RxEV6KiVjtyOwjjnt75CenJ1K
+	PUUfXWv8Gbr2OdwOkwraXciEMilsnwCT4d23/ny8zU5mpNIgiR2rSod+R9Rhn3qM/10uD6ar8HA
+	FXvnuAFcHdfC7XBDSAMhnUdsItrua8tjQAGOefbqAqrg5XBHVl0Q+IcwFaguPaLLUJQSK4JGBRJ
+	VFe4IItJ9T+4EpJ4ilcn6okt/1I523JLXPlCfg2F8DqQeR9QZCWMpEsL/YlAQD1dqyE4Bzfqzwi
+	LBwNsNmvEWaDN+Cwl8KO76pXyM9DRlSJlr9h5M
+X-Google-Smtp-Source: AGHT+IGcgzibbzLVLUKMjaZCXqzawuZ98tri0N+E2noAA1+EMWjPfQCsBvIeTibIUNcllf2jICQfXg==
+X-Received: by 2002:a05:600c:3e19:b0:439:9424:1b70 with SMTP id 5b1f17b1804b1-4533cadf928mr13301045e9.30.1749852294442;
+        Fri, 13 Jun 2025 15:04:54 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f1c:2700:11ba:d147:51f7:99fa? (p200300ea8f1c270011bad14751f799fa.dip0.t-ipconnect.de. [2003:ea:8f1c:2700:11ba:d147:51f7:99fa])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a568a54a36sm3527262f8f.15.2025.06.13.15.04.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Jun 2025 15:04:54 -0700 (PDT)
+Message-ID: <0011af1a-1c5c-4b70-a242-eab3d71e9c40@gmail.com>
+Date: Sat, 14 Jun 2025 00:05:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1749651015-9668-1-git-send-email-shradhagupta@linux.microsoft.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/3] r8169: remove phy_driver_is_genphy and
+ phy_driver_is_genphy_10g
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <8bcd626f-a219-43e8-a0c2-aa04148d046d@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <8bcd626f-a219-43e8-a0c2-aa04148d046d@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 11, 2025 at 07:10:15AM -0700, Shradha Gupta wrote:
-> Allow dynamic MSI-X vector allocation for pci_hyperv PCI controller
-> by adding support for the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN and using
-> pci_msix_prepare_desc() to prepare the MSI-X descriptors.
+On 13.06.2025 22:53, Heiner Kallweit wrote:
+> Replace phy_driver_is_genphy() and phy_driver_is_genphy_10g()
+> with a new flag in struct phy_device.
 > 
-> Feature support added for both x86 and ARM64
+> Heiner Kallweit (3):
+>   net: phy: add flag is_genphy_driven to struct phy_device
+>   net: phy: improve phy_driver_is_genphy
+>   net: phy: remove phy_driver_is_genphy_10g
 > 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com>
+>  drivers/net/phy/phy_device.c | 43 ++++++------------------------------
+>  include/linux/phy.h          | 15 ++++++++++---
+>  2 files changed, 19 insertions(+), 39 deletions(-)
+> 
 
-Again, if you need it:
+CI kdoc check complains about an undocumented return value in patch 2.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+---
+pw-bot: cr
 
-> ---
->  Changes in v4:
->  * use the same prepare_desc() callback for arm and x86
-> ---
->  Changes in v3:
->  * Add arm64 support
-> ---
->  Changes in v2:
->  * split the patch to keep changes in PCI and pci_hyperv controller
->    seperate
->  * replace strings "pci vectors" by "MSI-X vectors"
-> ---
->  drivers/pci/controller/pci-hyperv.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
-> index ef5d655a0052..86ca041bf74a 100644
-> --- a/drivers/pci/controller/pci-hyperv.c
-> +++ b/drivers/pci/controller/pci-hyperv.c
-> @@ -2119,6 +2119,7 @@ static struct irq_chip hv_msi_irq_chip = {
->  static struct msi_domain_ops hv_msi_ops = {
->  	.msi_prepare	= hv_msi_prepare,
->  	.msi_free	= hv_msi_free,
-> +	.prepare_desc	= pci_msix_prepare_desc,
->  };
->  
->  /**
-> @@ -2140,7 +2141,7 @@ static int hv_pcie_init_irq_domain(struct hv_pcibus_device *hbus)
->  	hbus->msi_info.ops = &hv_msi_ops;
->  	hbus->msi_info.flags = (MSI_FLAG_USE_DEF_DOM_OPS |
->  		MSI_FLAG_USE_DEF_CHIP_OPS | MSI_FLAG_MULTI_PCI_MSI |
-> -		MSI_FLAG_PCI_MSIX);
-> +		MSI_FLAG_PCI_MSIX | MSI_FLAG_PCI_MSIX_ALLOC_DYN);
->  	hbus->msi_info.handler = FLOW_HANDLER;
->  	hbus->msi_info.handler_name = FLOW_NAME;
->  	hbus->msi_info.data = hbus;
-> -- 
-> 2.34.1
-> 
 
