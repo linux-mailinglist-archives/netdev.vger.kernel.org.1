@@ -1,254 +1,255 @@
-Return-Path: <netdev+bounces-197482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E33AD8C16
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:28:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28196AD8C1F
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53EF93AA38A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:28:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E47F18970A1
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3145F2E2EE5;
-	Fri, 13 Jun 2025 12:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8383D76;
+	Fri, 13 Jun 2025 12:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PMscSHKJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reVKfuRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0B62DECAE;
-	Fri, 13 Jun 2025 12:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732C53C26;
+	Fri, 13 Jun 2025 12:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749817727; cv=none; b=iuJrJWFtRA/Yx3SAVFCqY8BEotKl7r4fy5UOsf5F4ccfj0/Ca1pZbEbwMeBhkL2e5co7fBR7cvXke7A53lHYvd/g4cIirxWxESKYXSGSbsXE3rij6hCFdYuiopaDxMnTGRAYvFTuL92q5zY6VJFTqQHba59jyGNH2fdvkMMeLdU=
+	t=1749817805; cv=none; b=FJYNSYc5YuAh+HiBd7mkj+MThGW6BQBrfsT0zxoycMkK5EXnvg3M7zpU+QCNi8ugPcD2PVzqeICVXFAQyKC3eEXmqFHV69dNu0ZyZuML4FISz9yjHyPb3/TZxQiKjmI1xEQ17P35zHGsV6F0zhHE6pQMj/VV1iHW4yNL7X0zDnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749817727; c=relaxed/simple;
-	bh=ZGX+7HT2TeOEyJhZBicdeJ7zo7lI8UGljjytma27f8E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XrCmxeL8VV+vhDEjpzV3k6PE1paaZi1VMmBbdk9hD8n5zGFbL5h2ePNMzI8cC2M/9ct003htKmKTdkhxAENKu2KbtVUwnzT6IA3YaKEJzsYMYJ4oGIXFLuwLISy72+heqzqiMcelq1XskyrKorAhDceiVQs2gUpE4JjAl1QoOZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PMscSHKJ; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b2f0faeb994so2267861a12.0;
-        Fri, 13 Jun 2025 05:28:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749817725; x=1750422525; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hUheJAvJ/QAI2j1ArBPoXkPiiSX0R8DUeLQ8vjaGCHc=;
-        b=PMscSHKJ6WfDZ0n6BGvboIkXgJgvt8v5lNduSdPNDeoiZejMkn3zbp0A4b9B32bEIl
-         NEiL3stjUWkY6CDCgHTxVDQtCHV0L9FzwwlcQHSbAFJD+D7yMOJln9sSmrQ90I6xOCFo
-         vI5b/BYTFslW5za5UnlGy66yJArYmPziv77WQn+XR87gScqtDgyRpP/+2UdBEwyWqKzo
-         sy5LubBirpX5koP6q6H7k+nbXvrc+WICQPuaDmNOItSsiEVyE89w4KAw9VZnG52Gc1OH
-         PBMcb3kaBCZG3+gl6ddWp9oGPM2m051bbc+0WSJ/dgx1OG88kPhMPlivVLJMJnYi9AU1
-         W4iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749817725; x=1750422525;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hUheJAvJ/QAI2j1ArBPoXkPiiSX0R8DUeLQ8vjaGCHc=;
-        b=dLgwC+2P2lUn02oQg/4OW9pd43Jpjj/u9L0A8f4XNa1MyCLF4Sc65S7JYjBf9Qk950
-         EdwVAKuxUCDEf3aeIFgf64NxCXaghdsGEaEDauweguRFnsD99f7cptD70jAhPF28Mcdj
-         GBol2A+kB4IJ2/lAnM7+slNA2p/z4f7EVielZrYn4Gx8hGAHmzpd8tkdk9IGytSBoxWK
-         y91G1zrYb3EX+Cg45X3wBavbcAZRgakcvpvhIUoBgo4LHIfrJ2EZSpnN9mteGBt3zHwI
-         3wVZYOi493o/j8muXP4wqDDozkldfLL4and+Tftr97p5BTauwcbfxUG1NwYpFifv7R7K
-         4lSA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2L0igrA1udgFRKPyiQprlymJQ+qnausq8L94P7Jq80E49VktCuq+WeiQ0wKQRdUguXa3SrtCAJZtyHG4=@vger.kernel.org, AJvYcCUWxiV7m8nEYO8WpiSg+p7fYsUgXDhEy5q3U3oZof0QGVlODOIxyqqNPK6qbr7rFCeJrINXU9/5@vger.kernel.org, AJvYcCUikTWrjNJpAZZsKhDQ3VRS6cxspb7ebOALkgooa9K43eDegAtNvDRGXsTg3R+K1CnO5zucD9gWWk4d4DXX@vger.kernel.org, AJvYcCWTaTv7wDYtd85kE2V0Ewh3EQuhuQeef0cHzUi1kSobA3Vab6uK7so6ru5wp9QQlg8UVgAJSpgamq/7@vger.kernel.org, AJvYcCWerjOM/bto2v9G1CuODbcSmSc18plfEhWK0qyWAuQ3jxBtw6sNKIuNSELDuiB5XOJQ/QfkdlCn3m0=@vger.kernel.org, AJvYcCWqTizQWP+mgWYhtvkJX19s610xXk3BKTAjIiAVHzzORSVq9wpc/B3hXfl68O6wdvWpAExQfS/sfLxt@vger.kernel.org, AJvYcCX7hjFBUf2nB2k7WDnfYc05rviOp2F8xSJjxB9gBGQsOJRSjgcNGnKelrKTOXDlxVC2K7gZxazx0uJOTts=@vger.kernel.org, AJvYcCXQMoKwLq5J3TR8A42ll0bN5CDdmo3nBuV71c86DBkd6AvuXQPYXGDaHMnXbaTQcsxg7FFE70H/svs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJMChjTBdQ5WiLjIsVi+B3haReL3PrBiNF3O1xL4hdEhBA+jvF
-	5gc0lOUqT5CnsgODPAyM2iOsNNPLlY8OEWOFZzkfcWXY0/Cgl2EMRBP7
-X-Gm-Gg: ASbGncsFY75gMkdIDssEqdgqJKzuqhbxEzB5SQq85YXsNtYDjQDoku2xC/8Iuwu7eDA
-	KXg3eSn2S0WIArderRknotHgGEEkXSoNNVceJuvw/E+HNPFdZSxD79InI/Y68qttwcMdTZ0U0jT
-	/yx12N7wEU7sy46nfd+pMbA3l3yOgDxvalpC3wgSdYHjDXJtYVBjO+4XL3ulNLKMlL3pnIbNGxa
-	Qc2GIWqDbwdv9XS6qmf8IFIj7Mzp6SJ3ydxexXlqnVMaVMB645iUYp69XWYuo7Q2ZzxZFhG1UXf
-	dkbTSLsKZyM8fgESoFs6ULQHkDvCj+7dA1mU5TfbxEdLYG1xUknslc7x5WFDdQ==
-X-Google-Smtp-Source: AGHT+IE+gcmD/PmavjTCsZJ5Ebw+bwtrBwmaH3AIBOuyUnFsBAjlI4hGAFjqzUYV1uUOPvmBym85Fw==
-X-Received: by 2002:a05:6a20:9151:b0:1fa:9819:c0a5 with SMTP id adf61e73a8af0-21facbb40c3mr4162006637.11.1749817724606;
-        Fri, 13 Jun 2025 05:28:44 -0700 (PDT)
-Received: from localhost ([216.228.127.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe1644c92sm1565073a12.32.2025.06.13.05.28.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 05:28:44 -0700 (PDT)
-Date: Fri, 13 Jun 2025 08:28:40 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Jaehoon Chung <jh80.chung@samsung.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Shreeya Patel <shreeya.patel@collabora.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Sandy Huang <hjc@rock-chips.com>,
-	Andy Yan <andy.yan@rock-chips.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Shawn Lin <shawn.lin@rock-chips.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Qin Jian <qinjian@cqplus1.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>, kernel@collabora.com,
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
-	linux-sound@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org,
-	llvm@lists.linux.dev, Tvrtko Ursulin <tursulin@igalia.com>
-Subject: Re: [PATCH 01/20] bitfield: introduce HWORD_UPDATE bitfield macros
-Message-ID: <aEwZcM_leVvB0Cju@yury>
-References: <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
- <20250612-byeword-update-v1-1-f4afb8f6313f@collabora.com>
- <5493fd6017de3f393f632125fad95945d1c4294c@intel.com>
- <3683577.irdbgypaU6@workhorse>
+	s=arc-20240116; t=1749817805; c=relaxed/simple;
+	bh=bvrBb7TJAzx9kC/eHHu6hVfqRao0Qn/rdOJhsxYrWBg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iE4PUCF1QED4kfH3xzivChr54WmUI+ad4Y+HfG/QQBaolDLBPGORxas+xXyO5nzvNxgwiOpd8DHlMxeSuAZV9XqqheRiOev8v/phtxtq95lXNuFLQULT05uOJOfgZg1c9RPS8/T+YQRZYb8WW7ZB2hwOtxpiMjt0O0gKuq8SpM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reVKfuRv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BACDC4CEEF;
+	Fri, 13 Jun 2025 12:30:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749817805;
+	bh=bvrBb7TJAzx9kC/eHHu6hVfqRao0Qn/rdOJhsxYrWBg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=reVKfuRvoLVC3JVyGbdMNMObhWSTDUy4lXEHsPTGK/zy5j9NjYnjDLzVf+XxgUeXq
+	 lJWQkCXG71U+z3R/ft+BlQFdT5/IzHBRC5ONX0ODg9WfKpN2N3by7tLirM7W6MULVB
+	 QyzVErlnaty0dSNNu1DvRkkmpsgdXFpWKRWsop9wDdTi0RJ42nVOiF70UWPLpc+IMx
+	 +2EXjIGuqfBZA2ivEYGI4iv+NbdgTm22vNeKMXCZY1CYjiPhLCV1v+k6Pn3xpI/E95
+	 B0K4jPV7568smddo2fpzTaghxxBupRX7pUIMHo0Xrds7ehsKQlW5W740wMb/jlzh6U
+	 4nBPrn054PXoQ==
+Date: Fri, 13 Jun 2025 14:29:58 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
+ <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
+ <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Ruben Wauters"
+ <rubenru09@aol.com>, "Shuah Khan" <skhan@linuxfoundation.org>,
+ joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
+ peterz@infradead.org, stern@rowland.harvard.edu
+Subject: Re: [PATCH v2 11/12] docs: use parser_yaml extension to handle
+ Netlink specs
+Message-ID: <20250613142958.5876fd27@foz.lan>
+In-Reply-To: <m2ldpvn9lz.fsf@gmail.com>
+References: <cover.1749723671.git.mchehab+huawei@kernel.org>
+	<931e46a6fdda4fa67df731b052c121b9094fbd8a.1749723671.git.mchehab+huawei@kernel.org>
+	<m2ldpvn9lz.fsf@gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3683577.irdbgypaU6@workhorse>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 13, 2025 at 01:55:54PM +0200, Nicolas Frattaroli wrote:
-> Hello,
+Em Fri, 13 Jun 2025 12:50:48 +0100
+Donald Hunter <donald.hunter@gmail.com> escreveu:
+
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 > 
-> On Friday, 13 June 2025 10:51:15 Central European Summer Time Jani Nikula wrote:
-> > On Thu, 12 Jun 2025, Nicolas Frattaroli <nicolas.frattaroli@collabora.com> wrote:
-> > > Hardware of various vendors, but very notably Rockchip, often uses
-> > > 32-bit registers where the upper 16-bit half of the register is a
-> > > write-enable mask for the lower half.
-> > >
-> > > This type of hardware setup allows for more granular concurrent register
-> > > write access.
-> > >
-> > > Over the years, many drivers have hand-rolled their own version of this
-> > > macro, usually without any checks, often called something like
-> > > HIWORD_UPDATE or FIELD_PREP_HIWORD, commonly with slightly different
-> > > semantics between them.
-> > >
-> > > Clearly there is a demand for such a macro, and thus the demand should
-> > > be satisfied in a common header file.
-> > >
-> > > Add two macros: HWORD_UPDATE, and HWORD_UPDATE_CONST. The latter is a
-> > > version that can be used in initializers, like FIELD_PREP_CONST. The
-> > > macro names are chosen to not clash with any potential other macros that
-> > > drivers may already have implemented themselves, while retaining a
-> > > familiar name.
-> > >
-> > > Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-> > > ---
-> > >  include/linux/bitfield.h | 47 +++++++++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 47 insertions(+)
-> > >
-> > > diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> > > index 6d9a53db54b66c0833973c880444bd289d9667b1..b90d88db7405f95b78cdd6f3426263086bab5aa6 100644
-> > > --- a/include/linux/bitfield.h
-> > > +++ b/include/linux/bitfield.h
-> > > @@ -8,6 +8,7 @@
-> > >  #define _LINUX_BITFIELD_H
-> > >  
-> > >  #include <linux/build_bug.h>
-> > > +#include <linux/limits.h>
-> > >  #include <linux/typecheck.h>
-> > >  #include <asm/byteorder.h>
-> > >  
-> > > @@ -142,6 +143,52 @@
-> > >  		(((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask))	\
-> > >  	)
-> > >  
-> > > +/**
-> > > + * HWORD_UPDATE() - prepare a bitfield element with a mask in the upper half
-> > > + * @_mask: shifted mask defining the field's length and position
-> > > + * @_val:  value to put in the field
-> > > + *
-> > > + * HWORD_UPDATE() masks and shifts up the value, as well as bitwise ORs the
-> > > + * result with the mask shifted up by 16.
-> > > + *
-> > > + * This is useful for a common design of hardware registers where the upper
-> > > + * 16-bit half of a 32-bit register is used as a write-enable mask. In such a
-> > > + * register, a bit in the lower half is only updated if the corresponding bit
-> > > + * in the upper half is high.
-> > > + */
-> > > +#define HWORD_UPDATE(_mask, _val)					 \
-> > > +	({								 \
-> > > +		__BF_FIELD_CHECK(_mask, ((u16) 0U), _val,		 \
-> > > +				 "HWORD_UPDATE: ");			 \
-> > > +		(((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask)) | \
-> > > +		((_mask) << 16);					 \
-> > > +	})
-> > 
-> > i915 uses something like this for a few registers too, with the name
-> > _MASKED_FIELD(). I think we could use it.
-> > 
-> > I do think this is clearly an extension of FIELD_PREP(), though, and
-> > should be be named similarly, instead of the completely deviating
-> > HWORD_UPDATE().
-> > 
-> > Also, we recently got GENMASK() versions with sizes, GENMASK_U16()
-> > etc. so I find it inconsistent to denote size here with HWORD.
-> > 
-> > FIELD_PREP_MASKED_U16? MASKED_FIELD_PREP_U16? Something along those
-> > lines?
+> > Instead of manually calling ynl_gen_rst.py, use a Sphinx extension.
+> > This way, no .rst files would be written to the Kernel source
+> > directories.
+> >
+> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> > ---
+> >  Documentation/Makefile                        | 17 ---------
+> >  Documentation/conf.py                         | 11 +++---
+> >  Documentation/netlink/specs/index.rst         | 38 +++++++++++++++++++
+> >  Documentation/networking/index.rst            |  2 +-
+> >  .../networking/netlink_spec/readme.txt        |  4 --
+> >  Documentation/sphinx/parser_yaml.py           |  2 +-
+> >  6 files changed, 46 insertions(+), 28 deletions(-)
+> >  create mode 100644 Documentation/netlink/specs/index.rst
+> >  delete mode 100644 Documentation/networking/netlink_spec/readme.txt
+> >
+> > diff --git a/Documentation/Makefile b/Documentation/Makefile
+> > index d30d66ddf1ad..9185680b1e86 100644
+> > --- a/Documentation/Makefile
+> > +++ b/Documentation/Makefile
+> > @@ -102,22 +102,6 @@ quiet_cmd_sphinx = SPHINX  $@ --> file://$(abspath $(BUILDDIR)/$3/$4)
+> >  		cp $(if $(patsubst /%,,$(DOCS_CSS)),$(abspath $(srctree)/$(DOCS_CSS)),$(DOCS_CSS)) $(BUILDDIR)/$3/_static/; \
+> >  	fi
+> >  
+> > -YNL_INDEX:=$(srctree)/Documentation/networking/netlink_spec/index.rst
+> > -YNL_RST_DIR:=$(srctree)/Documentation/networking/netlink_spec
+> > -YNL_YAML_DIR:=$(srctree)/Documentation/netlink/specs
+> > -YNL_TOOL:=$(srctree)/tools/net/ynl/pyynl/ynl_gen_rst.py
+> > -
+> > -YNL_RST_FILES_TMP := $(patsubst %.yaml,%.rst,$(wildcard $(YNL_YAML_DIR)/*.yaml))
+> > -YNL_RST_FILES := $(patsubst $(YNL_YAML_DIR)%,$(YNL_RST_DIR)%, $(YNL_RST_FILES_TMP))
+> > -
+> > -$(YNL_INDEX): $(YNL_RST_FILES)
+> > -	$(Q)$(YNL_TOOL) -o $@ -x
+> > -
+> > -$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
+> > -	$(Q)$(YNL_TOOL) -i $< -o $@
+> > -
+> > -htmldocs texinfodocs latexdocs epubdocs xmldocs: $(YNL_INDEX)
+> > -
+> >  htmldocs:
+> >  	@$(srctree)/scripts/sphinx-pre-install --version-check
+> >  	@+$(foreach var,$(SPHINXDIRS),$(call loop_cmd,sphinx,html,$(var),,$(var)))
+> > @@ -184,7 +168,6 @@ refcheckdocs:
+> >  	$(Q)cd $(srctree);scripts/documentation-file-ref-check
+> >  
+> >  cleandocs:
+> > -	$(Q)rm -f $(YNL_INDEX) $(YNL_RST_FILES)
+> >  	$(Q)rm -rf $(BUILDDIR)
+> >  	$(Q)$(MAKE) BUILDDIR=$(abspath $(BUILDDIR)) $(build)=Documentation/userspace-api/media clean
+> >  
+> > diff --git a/Documentation/conf.py b/Documentation/conf.py
+> > index 12de52a2b17e..add6ce78dd80 100644
+> > --- a/Documentation/conf.py
+> > +++ b/Documentation/conf.py
+> > @@ -45,7 +45,7 @@ needs_sphinx = '3.4.3'
+> >  extensions = ['kerneldoc', 'rstFlatTable', 'kernel_include',
+> >                'kfigure', 'sphinx.ext.ifconfig', 'automarkup',
+> >                'maintainers_include', 'sphinx.ext.autosectionlabel',
+> > -              'kernel_abi', 'kernel_feat', 'translations']
+> > +              'kernel_abi', 'kernel_feat', 'translations', 'parser_yaml']
+> >  
+> >  # Since Sphinx version 3, the C function parser is more pedantic with regards
+> >  # to type checking. Due to that, having macros at c:function cause problems.
+> > @@ -143,10 +143,11 @@ else:
+> >  # Add any paths that contain templates here, relative to this directory.
+> >  templates_path = ['sphinx/templates']
+> >  
+> > -# The suffix(es) of source filenames.
+> > -# You can specify multiple suffix as a list of string:
+> > -# source_suffix = ['.rst', '.md']
+> > -source_suffix = '.rst'
+> > +# The suffixes of source filenames that will be automatically parsed
+> > +source_suffix = {
+> > +        '.rst': 'restructuredtext',
+> > +        '.yaml': 'yaml',  
 > 
-> Yeah, I agree the name could be better. I used HWORD_UPDATE as Yury and
-> I couldn't come up with a name we liked either, and Yury suggested not
-> breaking from what's already there too much. I do think making the name
-> more field-adjacent would be good though, as well as somehow indicating
-> that it is 16 bits of data.
- 
-I suggested a wonderful name that explains everything. Didn't I? It
-has the only problem - it's 25 chars long. :)
+> The handler name should probably be netlink_yaml 
 
-So yeah, let's think once more about a better _short_ name, or just
-stick to the existing naming scheme.
+See my comments on earlier patches.
 
-> > And perhaps that (and more potential users) could persuade Jakub that
-> > this is not that weird after all?
 > 
-> I will operate under the assumption that Jakub's opinion will not change
-> as he ignored the commit message that talks about multiple vendors,
-> ignored the cover letter that talks about multiple vendors, and ignored
-> my e-mail where I once again made it clear to him that it's multiple
-> vendors, and still claims it's a Rockchip specific convention.
+> > +}
+> >  
+> >  # The encoding of source files.
+> >  #source_encoding = 'utf-8-sig'
+> > diff --git a/Documentation/netlink/specs/index.rst b/Documentation/netlink/specs/index.rst
+> > new file mode 100644
+> > index 000000000000..ca0bf816dc3f
+> > --- /dev/null
+> > +++ b/Documentation/netlink/specs/index.rst
+> > @@ -0,0 +1,38 @@
+> > +.. SPDX-License-Identifier: GPL-2.0
+> > +.. NOTE: This document was auto-generated.
+> > +
+> > +.. _specs:
+> > +
+> > +=============================
+> > +Netlink Family Specifications
+> > +=============================
+> > +
+> > +.. toctree::
+> > +   :maxdepth: 1
+> > +
+> > +   conntrack
+> > +   devlink
+> > +   dpll
+> > +   ethtool
+> > +   fou
+> > +   handshake
+> > +   lockd
+> > +   mptcp_pm
+> > +   net_shaper
+> > +   netdev
+> > +   nfsd
+> > +   nftables
+> > +   nl80211
+> > +   nlctrl
+> > +   ovpn
+> > +   ovs_datapath
+> > +   ovs_flow
+> > +   ovs_vport
+> > +   rt-addr
+> > +   rt-link
+> > +   rt-neigh
+> > +   rt-route
+> > +   rt-rule
+> > +   tc
+> > +   tcp_metrics
+> > +   team
+> > diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+> > index ac90b82f3ce9..b7a4969e9bc9 100644
+> > --- a/Documentation/networking/index.rst
+> > +++ b/Documentation/networking/index.rst
+> > @@ -57,7 +57,7 @@ Contents:
+> >     filter
+> >     generic-hdlc
+> >     generic_netlink
+> > -   netlink_spec/index
+> > +   ../netlink/specs/index
+> >     gen_stats
+> >     gtp
+> >     ila
+> > diff --git a/Documentation/networking/netlink_spec/readme.txt b/Documentation/networking/netlink_spec/readme.txt
+> > deleted file mode 100644
+> > index 030b44aca4e6..000000000000
+> > --- a/Documentation/networking/netlink_spec/readme.txt
+> > +++ /dev/null
+> > @@ -1,4 +0,0 @@
+> > -SPDX-License-Identifier: GPL-2.0
+> > -
+> > -This file is populated during the build of the documentation (htmldocs) by the
+> > -tools/net/ynl/pyynl/ynl_gen_rst.py script.
+> > diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/parser_yaml.py
+> > index eb32e3249274..cdcafe5b3937 100755
+> > --- a/Documentation/sphinx/parser_yaml.py
+> > +++ b/Documentation/sphinx/parser_yaml.py
+> > @@ -55,7 +55,7 @@ class YamlParser(Parser):
+> >          fname = document.current_source
+> >  
+> >          # Handle netlink yaml specs
+> > -        if re.search("/netlink/specs/", fname):
+> > +        if re.search("netlink/specs/", fname):  
+> 
+> Please combine this change into the earlier patch so that the series
+> doesn't have unnecessary changes.
 
-As far as I understood, he concerns not about number of drivers that
-opencode HIWORD_UPDATE(), but that this macro is not generic enough
-to live in bitfield.h. And it's a valid concern - I doubt it will
-be helpful somewhere in core and arch files.
+OK.
 
-I think that creating a separate header like hw_bitfield.h, or hw_bits.h
-aimed to absorb common helpers of that sort, would help to reach the
-strategic goal - decreasing the level of code duplication in the driver
-swamp.
+> 
+> >              if fname.endswith("index.yaml"):
+> >                  msg = self.netlink_parser.generate_main_index_rst(fname, None)
+> >              else:  
 
 Thanks,
-Yury
+Mauro
 
