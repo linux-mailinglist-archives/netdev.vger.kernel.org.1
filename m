@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-197269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF4BCAD7FD3
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:55:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E926AD7FD4
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:55:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C26DE1E1E97
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:55:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 499087AB659
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B171DDC15;
-	Fri, 13 Jun 2025 00:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7421DE4FC;
+	Fri, 13 Jun 2025 00:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leNv5Cbk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ezh/tMpF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6BB1DD88F;
-	Fri, 13 Jun 2025 00:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730091DE884;
+	Fri, 13 Jun 2025 00:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749776090; cv=none; b=WkNu9YeWn0Q9Wx0lH4Z7JzbYzuLll6ja/H9fcEVrnQ0LxcuPdsoNnBppHeEUa3yn1Pq938NTwH2DIrI2qzdrbJcmTmlwDgE63SvzWgV6L5/By+RvS7M88pMbPRru+v922069z6SXgn3b858Q4Z5cQPp4yqftnD6/femz+YWxa6w=
+	t=1749776091; cv=none; b=EjHgJwNc2ZYeyveh3+I9O7rjiC0fhtSR7LUdSw2oDPAdnWjtQ4qVgaxqJVtHk/mycKimOeE7zItAa87z4Y28SVg93KnPlT4m4/IKwoK56Z/+F+VEceB8gjNsxjQO88ebyu+UWHf7I8CMDqFx9YSaCzgML4qfJ6kwWQkAGQGSSbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749776090; c=relaxed/simple;
-	bh=SsO+MNe1Az5ByiLm8Bh5U58EJCIGRb6VA8Ycas7uXhQ=;
+	s=arc-20240116; t=1749776091; c=relaxed/simple;
+	bh=DxdKppymL/PIhFq67u/hOifSsa2/rVcZavandpvYWUo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TBIT+p85KxFB/wx2VrLNNPNFpdyRtZjHzq67uabX0PBdFYz4sOdVZyaiJyVDZGdJ0PR3sSLAIbTLZCxx+G0Z70ARsIgCohDbWMshGfcV9ZczuZAd6R7FqGC8AXa+TOkqnJyU+kx+As18TEDZDam1YwwdVKWBh0i1octcXxelcjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=leNv5Cbk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F271C4CEF0;
-	Fri, 13 Jun 2025 00:54:49 +0000 (UTC)
+	 MIME-Version; b=CzBDoqblg9qC0lw+8svu3mrYx1B3FA6Y7Wo9Q0oxzw0gmfrRky62Iyhz1KBPK089m49tPaHVqbBK13oE+KVRn5hFrKwCqd2P9aRg3ZI8K4dxUI2x6OJZ1NkuBBezk6PKxSBApTc9weScLjt1Lfn/av8xHdWq7a0i1ZiySV1FqL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ezh/tMpF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77FB1C4CEEA;
+	Fri, 13 Jun 2025 00:54:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749776090;
-	bh=SsO+MNe1Az5ByiLm8Bh5U58EJCIGRb6VA8Ycas7uXhQ=;
+	s=k20201202; t=1749776091;
+	bh=DxdKppymL/PIhFq67u/hOifSsa2/rVcZavandpvYWUo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=leNv5Cbk3cj+heEDRMCrkGm0O7oxoo+rXIsCxTYQPBEre+KUq0uf0/86iChosp3iz
-	 pjy6lxLQE1L1ae9kXuJodZ3qMHCohntjD9erblg/DBExJld1slfbt/Ot/MptIEx0sn
-	 ReT5bamvhH32pQqQYLcS82aUHvIRv9Hh+87qmUuAb2Cky+Z2ZGrz54haENwJ3sEzOa
-	 Ar8nNsP/cmPseE7k0Y8+Q9Hj1B7m1LpU5Z0DYRRBfvwkpcrWyBuvsMQhnGS4TFJ2Sv
-	 5IcTBsvHNm4nizE929sA4SoeES6z/rfdk51HVrgmc9ZrIpszWcSf8L+YeHIk9LdXDc
-	 DAZ/i+XsLUTig==
+	b=ezh/tMpFhng8jS9u/M3Rez6fkiQK2j2oAT6ZRIUBVHIXCMiPX5i4VKTpOzKMGAP5N
+	 /oUkvocGvF22bOColo0qyFv2zM2vs+jnBpAevkubiehFIeNaJM7pqf96jWbnPK3Zry
+	 REfhetxkvXsk8eYfNadlLp6cu2nVE8gU8QBRZQExFrZC7vpON6op1VbtkTxFv7CgCA
+	 ySHJ2ETOJJebnbRlHnxI6koMmmMGRe3qTJKe8+BtqNgw/FXojPiPmwKAe0cOW/qEh2
+	 RYBO1EqNDEPJWm5PO+aiUiAQG6s4gUQhUg71KjHJbYxX0LDXdBgeVbphHIMMeWlVgY
+	 4uUiaULEd3T/w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc: netdev@vger.kernel.org,
 	rosenp@gmail.com,
 	imx@lists.linux.dev,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 5/6] eth: enetc: migrate to new RXFH callbacks
-Date: Thu, 12 Jun 2025 17:54:08 -0700
-Message-ID: <20250613005409.3544529-6-kuba@kernel.org>
+Subject: [PATCH net-next 6/6] eth: sfc: falcon: migrate to new RXFH callbacks
+Date: Thu, 12 Jun 2025 17:54:09 -0700
+Message-ID: <20250613005409.3544529-7-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250613005409.3544529-1-kuba@kernel.org>
 References: <20250613005409.3544529-1-kuba@kernel.org>
@@ -79,62 +79,89 @@ Content-Transfer-Encoding: 8bit
 Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
 add dedicated callbacks for getting and setting rxfh fields").
 This driver's RXFH config is read only / fixed so the conversion
-is trivial.
+is purely factoring out the handling into a helper.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/freescale/enetc/enetc_ethtool.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/sfc/falcon/ethtool.c | 51 +++++++++++++----------
+ 1 file changed, 28 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-index d38cd36be4a6..bb0512d585c1 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-@@ -467,7 +467,8 @@ static void enetc_get_rmon_stats(struct net_device *ndev,
- #define ENETC_RSSHASH_L3 (RXH_L2DA | RXH_VLAN | RXH_L3_PROTO | RXH_IP_SRC | \
- 			  RXH_IP_DST)
- #define ENETC_RSSHASH_L4 (ENETC_RSSHASH_L3 | RXH_L4_B_0_1 | RXH_L4_B_2_3)
--static int enetc_get_rsshash(struct ethtool_rxnfc *rxnfc)
-+static int enetc_get_rxfh_fields(struct net_device *netdev,
-+				 struct ethtool_rxfh_fields *rxnfc)
- {
- 	static const u32 rsshash[] = {
- 			[TCP_V4_FLOW]    = ENETC_RSSHASH_L4,
-@@ -584,9 +585,6 @@ static int enetc_get_rxnfc(struct net_device *ndev, struct ethtool_rxnfc *rxnfc,
- 	case ETHTOOL_GRXRINGS:
- 		rxnfc->data = priv->num_rx_rings;
- 		break;
--	case ETHTOOL_GRXFH:
--		/* get RSS hash config */
--		return enetc_get_rsshash(rxnfc);
+diff --git a/drivers/net/ethernet/sfc/falcon/ethtool.c b/drivers/net/ethernet/sfc/falcon/ethtool.c
+index 04766448a545..6685e71ab13f 100644
+--- a/drivers/net/ethernet/sfc/falcon/ethtool.c
++++ b/drivers/net/ethernet/sfc/falcon/ethtool.c
+@@ -943,6 +943,33 @@ static int ef4_ethtool_get_class_rule(struct ef4_nic *efx,
+ 	return rc;
+ }
+ 
++static int
++ef4_ethtool_get_rxfh_fields(struct net_device *net_dev,
++			    struct ethtool_rxfh_fields *info)
++{
++	struct ef4_nic *efx = netdev_priv(net_dev);
++	unsigned int min_revision = 0;
++
++	info->data = 0;
++	switch (info->flow_type) {
++	case TCP_V4_FLOW:
++		info->data |= RXH_L4_B_0_1 | RXH_L4_B_2_3;
++		fallthrough;
++	case UDP_V4_FLOW:
++	case SCTP_V4_FLOW:
++	case AH_ESP_V4_FLOW:
++	case IPV4_FLOW:
++		info->data |= RXH_IP_SRC | RXH_IP_DST;
++		min_revision = EF4_REV_FALCON_B0;
++		break;
++	default:
++		break;
++	}
++	if (ef4_nic_rev(efx) < min_revision)
++		info->data = 0;
++	return 0;
++}
++
+ static int
+ ef4_ethtool_get_rxnfc(struct net_device *net_dev,
+ 		      struct ethtool_rxnfc *info, u32 *rule_locs)
+@@ -954,29 +981,6 @@ ef4_ethtool_get_rxnfc(struct net_device *net_dev,
+ 		info->data = efx->n_rx_channels;
+ 		return 0;
+ 
+-	case ETHTOOL_GRXFH: {
+-		unsigned min_revision = 0;
+-
+-		info->data = 0;
+-		switch (info->flow_type) {
+-		case TCP_V4_FLOW:
+-			info->data |= RXH_L4_B_0_1 | RXH_L4_B_2_3;
+-			fallthrough;
+-		case UDP_V4_FLOW:
+-		case SCTP_V4_FLOW:
+-		case AH_ESP_V4_FLOW:
+-		case IPV4_FLOW:
+-			info->data |= RXH_IP_SRC | RXH_IP_DST;
+-			min_revision = EF4_REV_FALCON_B0;
+-			break;
+-		default:
+-			break;
+-		}
+-		if (ef4_nic_rev(efx) < min_revision)
+-			info->data = 0;
+-		return 0;
+-	}
+-
  	case ETHTOOL_GRXCLSRLCNT:
- 		/* total number of entries */
- 		rxnfc->data = priv->si->num_fs_entries;
-@@ -639,8 +637,6 @@ static int enetc4_get_rxnfc(struct net_device *ndev, struct ethtool_rxnfc *rxnfc
- 	case ETHTOOL_GRXRINGS:
- 		rxnfc->data = priv->num_rx_rings;
- 		break;
--	case ETHTOOL_GRXFH:
--		return enetc_get_rsshash(rxnfc);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -1228,6 +1224,7 @@ const struct ethtool_ops enetc_pf_ethtool_ops = {
- 	.get_rxfh_indir_size = enetc_get_rxfh_indir_size,
- 	.get_rxfh = enetc_get_rxfh,
- 	.set_rxfh = enetc_set_rxfh,
-+	.get_rxfh_fields = enetc_get_rxfh_fields,
- 	.get_ringparam = enetc_get_ringparam,
- 	.get_coalesce = enetc_get_coalesce,
- 	.set_coalesce = enetc_set_coalesce,
-@@ -1258,6 +1255,7 @@ const struct ethtool_ops enetc_vf_ethtool_ops = {
- 	.get_rxfh_indir_size = enetc_get_rxfh_indir_size,
- 	.get_rxfh = enetc_get_rxfh,
- 	.set_rxfh = enetc_set_rxfh,
-+	.get_rxfh_fields = enetc_get_rxfh_fields,
- 	.get_ringparam = enetc_get_ringparam,
- 	.get_coalesce = enetc_get_coalesce,
- 	.set_coalesce = enetc_set_coalesce,
+ 		info->data = ef4_filter_get_rx_id_limit(efx);
+ 		if (info->data == 0)
+@@ -1343,6 +1347,7 @@ const struct ethtool_ops ef4_ethtool_ops = {
+ 	.get_rxfh_indir_size	= ef4_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh		= ef4_ethtool_get_rxfh,
+ 	.set_rxfh		= ef4_ethtool_set_rxfh,
++	.get_rxfh_fields	= ef4_ethtool_get_rxfh_fields,
+ 	.get_module_info	= ef4_ethtool_get_module_info,
+ 	.get_module_eeprom	= ef4_ethtool_get_module_eeprom,
+ 	.get_link_ksettings	= ef4_ethtool_get_link_ksettings,
 -- 
 2.49.0
 
