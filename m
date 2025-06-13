@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-197591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D01EAD9452
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2AAAAD9454
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D56B1E479F
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:21:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7667D1E47AC
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DD822A4E9;
-	Fri, 13 Jun 2025 18:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AA422DA17;
+	Fri, 13 Jun 2025 18:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZN1elzUs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u3yL3rS2"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5241BEF8C;
-	Fri, 13 Jun 2025 18:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4181E22A4FC;
+	Fri, 13 Jun 2025 18:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749838906; cv=none; b=PO9wj5GsexH2QHH7IhSchCUsZxQKgH7RHIfrFSI1ZBjiDHuH2GRt7H4F1WFNykM+OIABxy0ozn8FbsJNwVh4MeiolUJQpHGi6If995i4K5mCsKwPUgKcYQkCny+XuV6Uz6QTr0gJAGATxyPJXs+9ELPa+4uVcqxFbye4BHWCBZY=
+	t=1749838938; cv=none; b=BsywMsGQcEPWlM8iG0LSheIF9yzcg61IHRB8dVOV1MYy0e7zBcJnvaZthdtfunWJV5ElW8aS8m6+IQUKp/sfYslLvcm/EHp1QmQrKCvHQCwmHgvA0DhsHyxNchxW3c6n+zPZafKPwFwcz5bVukWCB24WttxhKmtDAmX7bLa8sVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749838906; c=relaxed/simple;
-	bh=vAtV7ikW5tcJZwdm/Cb1YO8EYEej+nCVNSEfvVwc+lc=;
+	s=arc-20240116; t=1749838938; c=relaxed/simple;
+	bh=clWfoyF/mtSbm1/X/8TvydgfywTH2e4h7wUD5Hf6mqM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y7lS0SC00MA3wDU9hvc9ylJclzsa/edz+0L/19p+t/Edj7pD+suhDLKVik6ZVIZVIkQro3NMyBUTu5vpkDEQwjcLuxrSy8vcK0ylIzN4RM+9Eak6Cw91TXtJFRvRM8jPWq17zuj8cOYwRL54RFBojB8eJJZkKulDXnlTCAhlLvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZN1elzUs; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=nVPI+Rvp5gUeORh2RuGBe8RQ5OR/IQJLXgWu05VM1Pg/Ad5LLccfmKYDpAkM10/00sNqGZVEjT4ooVrNraTmRXqkf367Ol4jQ8qNA49cMbaw2qfYWNDqixIvq5ij4bfaao9iqWRWmLh9ZruSOYweKPYzZ5nhaJI9POu4VXF25M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u3yL3rS2; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RHytfg0Q7NhA5XEV7W+it0U6RvqSCKp78LX18G8sBoQ=; b=ZN1elzUsRvQKhRL066iraF6S1C
-	iCQ5JuSXeCh6nVmVK3tu/Ayiz2+nyK90yh3CC0cYfkP8713yVE1PJ36Fm2VUq4v7eGtGW5FcvrI8w
-	rYUWvMjCNddJ8olJ0hZ0WQ5RoEmFFfiprfRisBSPvDYqNrX844V2Pa5CciN2jZZXw7j0=;
+	bh=e+2ZgGgXqIukAKtz0KxvZTdIj9TTKcQVcejoF6HxVpE=; b=u3yL3rS2JcR5UYCXC0rHTxGyH7
+	ct6l+QphsNU8mqJkRP4Ivw8uIeuAyq/uHhUH53oZHQa/0q7MmperxkjYvBrnm8pAkbUPzEEQm3Xab
+	xFDRtb1eZAuR+9iYT+9fPLpleRaw8xShNWU5o3hX6MV79fTTxR84k6Es7jxxgUuxu4LI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uQ922-00FkpP-54; Fri, 13 Jun 2025 20:21:38 +0200
-Date: Fri, 13 Jun 2025 20:21:38 +0200
+	id 1uQ92X-00FkqH-09; Fri, 13 Jun 2025 20:22:09 +0200
+Date: Fri, 13 Jun 2025 20:22:08 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Marc Kleine-Budde <mkl@pengutronix.de>
 Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
@@ -54,11 +54,10 @@ Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>, imx@lists.linux.dev,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	kernel@pengutronix.de, Frank Li <Frank.Li@nxp.com>
-Subject: Re: [PATCH net-next v2 02/10] net: fec: struct fec_enet_private:
- remove obsolete comment
-Message-ID: <fc595d0a-619b-4121-b61f-25f6abee98fe@lunn.ch>
+Subject: Re: [PATCH net-next v2 03/10] net: fec: add missing header files
+Message-ID: <0822e05f-16a3-4077-a046-1519f9f0ad98@lunn.ch>
 References: <20250612-fec-cleanups-v2-0-ae7c36df185e@pengutronix.de>
- <20250612-fec-cleanups-v2-2-ae7c36df185e@pengutronix.de>
+ <20250612-fec-cleanups-v2-3-ae7c36df185e@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +66,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250612-fec-cleanups-v2-2-ae7c36df185e@pengutronix.de>
+In-Reply-To: <20250612-fec-cleanups-v2-3-ae7c36df185e@pengutronix.de>
 
-On Thu, Jun 12, 2025 at 04:15:55PM +0200, Marc Kleine-Budde wrote:
-> In commit 4d494cdc92b3 ("net: fec: change data structure to support
-> multiqueue") the data structures were changed, so that the comment about
-> the sent-in-place skb doesn't apply any more. Remove it.
+On Thu, Jun 12, 2025 at 04:15:56PM +0200, Marc Kleine-Budde wrote:
+> The fec.h isn't self contained. Add missing header files, so that it can be
+> parsed by language servers without errors.
 > 
 > Reviewed-by: Wei Fang <wei.fang@nxp.com>
 > Reviewed-by: Frank Li <Frank.Li@nxp.com>
