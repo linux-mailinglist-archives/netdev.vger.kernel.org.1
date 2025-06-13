@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-197254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8D0AD7F5A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:03:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051E8AD7F64
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1645A167437
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:03:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 050391890BF7
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8780E1805A;
-	Fri, 13 Jun 2025 00:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DED22770B;
+	Fri, 13 Jun 2025 00:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R3ohBsyk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J5Jp7sia"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E5DA926
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E6D3FE7
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749773025; cv=none; b=kIlHlN9ZYuM0g6n0JXx7jag+hbu5owknY2rAI73zmU/TwjJonoP6qYN85yqLsbiIk7RE20TNGjxo6l5l3mLJfQc53crOqfWQ6sTVEzXoijhhK+didMzeA9xHkMp/HI/6MV1yqMwxMoGZboa4VL1WOp3lNn1+pv9VlU6KkDblz50=
+	t=1749773197; cv=none; b=ECse9P5S0gBbXJDP32t2rRl5K0gFpFzcC0kNeecWuHXBOCF1ou758ghYK6hJGesGanlAbCEdMEyz+SSi0n6FxlR9AYCzPSw/oBRorM7uhaURlSE9IupKRNDAyIZPFgM3Omn3jWEFOwRQrMYI2f8mSHUxdU82pTWgU9avuvmW5HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749773025; c=relaxed/simple;
-	bh=pzH8pMXUcalp6pDfuzsK2/D2VK/1SBdaD4K20Qy+vNk=;
+	s=arc-20240116; t=1749773197; c=relaxed/simple;
+	bh=ZLUVLq6ZMae4ILViuvnXnlaNGnyYVL5EvQU2zGv7KHU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YPgMo1pL8dlN1dSocvfVH7rQdDxvXOMkdWmkwDFy09BnNLiKd+o5+TKmledGAG9R7QcVIeX01yDq2MN09k5w6RTr3ysR3R0aTcLz8+qcGRSLpixrEBVlm73gKNxhC6W0MijRtnx1f0HkRQZJuqQv0nF6qlRG24PYFA9y9AUSvN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R3ohBsyk; arc=none smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=oRP5sJ+XguH8ZfJXT+C8tDPi1/pN6wKriXcqFZ7UNNRRfz0bUTkHU2lIz7BHWo+rKn+XiJYNLwhkgwL6ShC940GOXGork3yZOORKbWczKwRLt0t3qinVd9YsWLjDvmE59MrkbVS8pNLfoGk5eTxo2qGWifp+YG9KmRQt63atia0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J5Jp7sia; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-55350d0eedeso1433194e87.2
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 17:03:43 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-55220699ba8so1708136e87.2
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 17:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749773022; x=1750377822; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749773193; x=1750377993; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pzH8pMXUcalp6pDfuzsK2/D2VK/1SBdaD4K20Qy+vNk=;
-        b=R3ohBsykmXpeEX//EHoia/Cbn50mv2FL2fOoz4wLFsdblAa9Eqvp5ziDxdL9DYvjMd
-         xQWB3GTSQnua7MxxuE/jjj00t3vSmJfXuCVCVIWWP3ogWm2tTC76XdrUURU2jJlNEHpf
-         qMPz4zb2BI93nMi3QJFvv/kQ47HXeyiyVyZ8htiztBbge62bLni/GqNwUqvrjjooa7HS
-         5LZDQXZbARhvYOUPL1nV+cVVL5GjV6jYPXnDfuzZVoLmfTDEWUiIdTWsBJMzx+cPejH3
-         o6X0ium5r7HAuVatROrOLRTgt+hs5tBguGP2mGSolteWzApQrVHBYFX504C4l3g8HfYv
-         tFuQ==
+        bh=ZLUVLq6ZMae4ILViuvnXnlaNGnyYVL5EvQU2zGv7KHU=;
+        b=J5Jp7sia5WTG2/LVu3RsY5FnuGoJDgKrN2rYWPZk4U6/BkobOxpCTEQwtL3Wfq2/ns
+         AtQZJWtbDLpYxDyEhNErKQ3gwAS0Y2HlnkTjDft1FDZHwHSehX2vkRv+vecZxNVc44sg
+         bMi8A3M7mpvKU+FC2upKtAyf4Qw+6Qxhdn2JTqFZl7WQiSI+BmwYPwDmW2w+Np8JUv86
+         +4YiR4aGZqqA1qIFHZhQSRU4lxlRUAJQXRy5TrPerFJ4aFLegoFkYl8rZ1FuC7jRKfne
+         EBayOBtymFCQlcJcBeFpKKkf1XkPIV8FQ4DUcQ65awBQ3tVD01T0fLlsnbpqqG4jWC5H
+         Y43A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749773022; x=1750377822;
+        d=1e100.net; s=20230601; t=1749773193; x=1750377993;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pzH8pMXUcalp6pDfuzsK2/D2VK/1SBdaD4K20Qy+vNk=;
-        b=gulBW/fYnRJKFua8X5kQRQ46PqhVdjC6pXMWZ3i57s3RH0swqnSfVtvNPjNYJhU2Yx
-         13tKA/x6zc2HZYQ6uqVPFFgCVMdCdAAxZAKbV294TEVoZmqR3rCADN8iL44FrDr73STg
-         WoCw2XU3sbBo12gx+FrpmZlslpl6etfp373hkQyukW7RDWg1abGhXJMVJ/ymiioG7p47
-         4mP6PTXCay6vCz5Cw+vluurKWC4VCDRSY8BspimpeI8dFwexFOuJlDyT9fagsSsrZNLc
-         RhBA7oI2lzt8urJQYa8giIQ2UCDkE3pbW89D4ciPdcIwraFFHnoVAnkFGoRk1aA38Scw
-         fGhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2sNdJToIR/BbOU0nNMqh16vpzrIF0dx3kDregR+yphm9Y9/ckWg/SztIuigZqyJDUtPQff14=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGtFZWCAnpT8V/XPGhK+Uqdi2+njKgsaKhtZTv+8CiBRTZxByu
-	DXAX3Oi/AmnXoR2caomB0Q70FQv/6WnpkgMsaFhNPcT3roiGZjru7vf0uibb/ci5pi09V85v3y9
-	Te6XYEW3a563YmiI5R9Xr493nO4qjD/ci7MV2tD5vRPukaZAwhM3ZWtE=
-X-Gm-Gg: ASbGnctDg+zfrNefUHyX0k7w4BLb0Nvgpk8MO0uaEz49EgzbyILEB/+qhWkCFIMpA+6
-	rCYVlokp5PX5Pavoq9Lg/PSSpisM8JaSZ1R4kOYocyxVrUuVYvI+zIP7P95m/FhOPMnZLw60zz2
-	RNjKx2rqxzWe3pBgWKeREesJEm7BkEK//bJzBKrPx26GqcVBcdUQ0P9AxXZ26rmWQaz8iXTZU1b
-	kpLkZVY2wY=
-X-Google-Smtp-Source: AGHT+IHCryRchnM7kCKhNYJZSBNu7zRh8pUHzqHQ0apcweZpI5BCqRoJWSeLJsU3qoa5bR5qdbcwHv+BrtrUbRsXMC4=
-X-Received: by 2002:a05:6512:1381:b0:553:35f5:7aac with SMTP id
- 2adb3069b0e04-553af9bbf01mr179570e87.48.1749773021612; Thu, 12 Jun 2025
- 17:03:41 -0700 (PDT)
+        bh=ZLUVLq6ZMae4ILViuvnXnlaNGnyYVL5EvQU2zGv7KHU=;
+        b=YO14NNzMRj5/LEKuTfIAuOAl6idDZGYPBnODMN0CpU/JEVpJCWtt1rICWIfAQNJ5DT
+         Aj4Lk27KXSDLIRoh0U2tehQ7sI3Ikxcc4SVU1lwNHEF3vBLKO+ujNYgjhMGxzbPZUV8O
+         qHUdCR2v1n2aa8vKlxbBWT30bli9jy61ApGpJGfE5LigyTzJqMfIElxaT7E7dUDQhfUb
+         qepcodQ59dHEl80iFhU7tCkwmtsmc27o57hlkuQykdc3EWpNA2LnQHhPId762E4QNyfB
+         F80QMsYIwd4QrvbXobPhTAMKFufXiupOhar+eCvjhBUaXTW0msm7xL93uD54NsDg2xIM
+         5r/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXGCDDAJXBn/TWM4hZOyaIa7RNuHp+yotE5+Y7SacTn/OfBweUBJOs1VlvtplGwWWnteIATDhE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwsXhb5KqVgsvZhLs9ypkXC28ufb7wTO8fxJbus3AEkP7Ta3d4
+	E4sK8zq/tj/5EH50V/kpBSMv4rO5wWPlxc38pxCNugyz0GAdjxZaRj5pm9PzZKCrTNKkBHx6kfo
+	or3quX6IPX6P5EhJUOyAfgETf/DrjikfmKQqU+DA=
+X-Gm-Gg: ASbGncu7N2ytY1l+v1ezzYvP6siwXHwp4234mezn0GBAtG9EPR8E0hnHGGcOzyHzxXU
+	3LUwJ0dpTqIhPE4ooPWsPt0jFWfNYLrpuXI9Y2cxQf/TscktARGtBvv3qjDc2x0Fa0qDvHgw8wu
+	5vef1YWFG+JYVK2F6WgoY4bhU3w8Vozaz5pnEfL15qNLLBMHnu9yVbvgf4K+/gxcdIhrRhB1S4
+X-Google-Smtp-Source: AGHT+IHrEg+ybJdcpWZWIVUBLy8G0/MTjrY27t22H91RsC9IYefq0lqnA7Sz5zwnWvTkvn7s+HRj380Nj1zbba7qjA4=
+X-Received: by 2002:a05:6512:3d8d:b0:553:28f1:66ec with SMTP id
+ 2adb3069b0e04-553af990214mr235784e87.31.1749773193289; Thu, 12 Jun 2025
+ 17:06:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250519082042.742926976@linutronix.de> <20250519083025.842476378@linutronix.de>
-In-Reply-To: <20250519083025.842476378@linutronix.de>
+References: <20250519082042.742926976@linutronix.de> <20250519083025.905800695@linutronix.de>
+In-Reply-To: <20250519083025.905800695@linutronix.de>
 From: John Stultz <jstultz@google.com>
-Date: Thu, 12 Jun 2025 17:03:30 -0700
-X-Gm-Features: AX0GCFvdBUhjhbTIICZQJsoZZ6tQWm4NpoXbd06TKsPSSSZ0mvn1EVyJNHREOXY
-Message-ID: <CANDhNCoqYhFNfuyArrt0Sj7sWoLNsVJUn7YCUuxEL8nFrZPHog@mail.gmail.com>
-Subject: Re: [patch V2 04/26] timekeeping: Introduce timekeeper ID
+Date: Thu, 12 Jun 2025 17:06:21 -0700
+X-Gm-Features: AX0GCFt5aLTih3d6dZUnHL1BbMpxOZ5rYd3fDRpWeoi6bk5px2yuSvTUdeBo7Uo
+Message-ID: <CANDhNCqSbz39AN5Pp_1+YzW4jgO-089=L5WzgBrb077KTz4LYw@mail.gmail.com>
+Subject: Re: [patch V2 05/26] time: Introduce auxiliary POSIX clocks
 To: Thomas Gleixner <tglx@linutronix.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
 	Richard Cochran <richardcochran@gmail.com>, Christopher Hall <christopher.s.hall@intel.com>, 
@@ -99,20 +98,22 @@ On Mon, May 19, 2025 at 1:33=E2=80=AFAM Thomas Gleixner <tglx@linutronix.de=
 >
 > From: Anna-Maria Behnsen <anna-maria@linutronix.de>
 >
-> As long as there is only a single timekeeper, there is no need to clarify
-> which timekeeper is used. But with the upcoming reusage of the timekeeper
-> infrastructure for auxiliary clock timekeepers, an ID is required to
-> differentiate.
+> To support auxiliary timekeeping and the related user space interfaces,
+> it's required to define a clock ID range for them.
 >
-> Introduce an enum for timekeeper IDs, introduce a field in struct tk_data
-> to store this timekeeper id and add also initialization. The id struct
-> field is added at the end of the second cachline, as there is a 4 byte ho=
-le
-> anyway.
+> Reserve 8 auxiliary clock IDs after the regular timekeeping clock ID spac=
+e.
+>
+> This is the maximum number of auxiliary clocks the kernel can support. Th=
+e actual
+> number of supported clocks depends obviously on the presence of related d=
+evices
+> and might be constraint by the available VDSO space.
+>
+> Add the corresponding timekeeper IDs as well.
 >
 > Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
->
 
 Acked-by: John Stultz <jstultz@google.com>
 
