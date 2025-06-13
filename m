@@ -1,169 +1,81 @@
-Return-Path: <netdev+bounces-197589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4D5FAD944A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:19:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E163AAD9450
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 397533BDEB2
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:18:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 122041BC2C27
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B904C226533;
-	Fri, 13 Jun 2025 18:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656B522CBFE;
+	Fri, 13 Jun 2025 18:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ca42t5v3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MIcFN5Qh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7211BEF8C;
-	Fri, 13 Jun 2025 18:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8B11BEF8C;
+	Fri, 13 Jun 2025 18:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749838748; cv=none; b=PEDxHg4zQMUF3cYej8B7BvNTYrFGCmzcU+32uWTIE1gLQiHeQFZwjtquxWQX+lJbtGrMP4bYytkiAFXicvIdc0iPxfuT+B6RJkexpqH/kYY6EO3w2IqtWo091W2VHcI0r4vcDGd5mmzkYe2g2lfo8oA+Y3IVNP2xNUVWjj3EP7I=
+	t=1749838849; cv=none; b=lM5VlzJYs56A9YevqAKgar0aleOFVKy5tSmlXRA6TteTlban7X5uqoXEjpMHyGE3A+QLXsDftAvYhiNMjdorrvMepJSU4ulzmnuMnHTTqPpCO2/9nhqe0yhvlmXLlYRPs/JcxOE+NGh/kY/kvIeZEXDatD8HaYogWuQJKdMIw+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749838748; c=relaxed/simple;
-	bh=ZeQcBbGTeFDIAQPmT+9xTxaEnvVae+Mt7VSBZoiYyuM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eqZJ7hwwm3Xhp5Goqtn9xp3ux/Q9wek8MSOSBAlM6Y+0tCop+qfayrkiIQLPTN8ByP5NdnvffuLhm6fg4sj5YG2m4gcklDgqYcTPhcfcNQXUt1QJpoLQiNHbgupEJQgXJ5208lfrB5aLEneRic39eLpI8dFvLZZYLP4ydUlgVaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ca42t5v3; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235e1d710d8so31212855ad.1;
-        Fri, 13 Jun 2025 11:19:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749838746; x=1750443546; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y7tkrgz83yLxxWDVBammUj3el4Pcyp+zXqZfIY/vHZ4=;
-        b=Ca42t5v3jPSwIchEvoVMnqAA4rAxKgguO8Vl0o0fFmJYwKv7+vO06o8WH4Zwj84mI7
-         ZPdQy9VJ6pijTInnNiQyonkXl2EX8hqsGT07yZjbzNuuY3YJa4y4VDMf0YpUPHAazcG3
-         M5sjhCU6dqJiCElaUR1q70tLyJpwC70LWBUstp7tf0oI328msDCBgfYKlOclRCHL6Lid
-         ZkAN7ZHEGXkyTLKTCLN8cg37ppEYObNkzYWrO9WQRTs3VORs4TSJnb9bjnDiUss2KADJ
-         bPwhmaV3zHV9hjIWAn1XEBJWnJ8MiWdkWU3eB6BmNmOG0M48ZcHWRzOg0cWf0fhoqNH5
-         NxVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749838746; x=1750443546;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y7tkrgz83yLxxWDVBammUj3el4Pcyp+zXqZfIY/vHZ4=;
-        b=mwRI6s6y54+qYXJrJeGBjDuAmv4GFEU1ixD8AHMJKb3KSCuVHe+3aGd5jnVT+fjMtT
-         l0Lj+sptAYkaKmmyeY3ewI7GLzfWTkGU4VqNqHmpBosfA3QUeCB47Tw/jzI/UTI/alY5
-         HbktzQ7y95j+dBefrSChag6N5GHZHVIPlYK0WOJownd9I2ULzKxHwUpy4HvZmA7tt+Cp
-         5n/7ktHX2HlELPfsBQAf21V6e8uOYPUT3xI1XFp9WLEKGq5eosI0HkNkQ4xsZH35jCWe
-         CsXgWRcNN1glEF3xSZDkjxRZSxnTF04QSMkql3H60rdhGBCdg4tRka6zeYtfn24H3JUr
-         hUmw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3x2iAqzbImxlsu1W8B/TexCKUHZL+cA/oNtzDd+vO5IacjnxOHKYQH4qo+34DzwVMvOPFwYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3wy7SePYW/HuiIjGoi2PTkUDsDYolvhEsp1zZLrz99/nrH2Gu
-	YiKr4O6K6j1DyOD+C+eoKzxn/5mKNoD2HqhHKuCUfzk7zq9MZDq00cSqP+EN9FH3zt8lLw1ebuZ
-	gXd2aXsuI2wAMOEZfHb4XbLWxh57HZTiU+FxZ
-X-Gm-Gg: ASbGnctp+mhWAAO205rqnZ6d9P1Urb+wt0A9wKlriYqAnHnum4xNV7o0L3XVTb9jFXn
-	Tf6Ub7sffJkvcAzx/8TF8HFE7uF9XxBbVFenof0RdxJv5ey3H+Pb45OvvXRp+65Lf+/MoosdFuR
-	hFRJeUxC1FBjLuJHk4/fWIEmrS3vO5nfLPO9bxy5DVI3Y=
-X-Google-Smtp-Source: AGHT+IG1iqj4pzgcoJGopWthu7HG5sxsfF+GXWIyCZwRa2DfMSLMzI0p5bnC+CeHVz0lg5RrCvxiZLjwsYsi686yD9I=
-X-Received: by 2002:a17:902:fc4f:b0:235:f459:69c7 with SMTP id
- d9443c01a7336-2366b40b7ddmr6349005ad.52.1749838746323; Fri, 13 Jun 2025
- 11:19:06 -0700 (PDT)
+	s=arc-20240116; t=1749838849; c=relaxed/simple;
+	bh=/aRcQHvCDeXy5ITDLTeAMIMFQZLyhCB4RFViN1tqojI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VFyw5SCgM9QxbcFuNWx08EmqMbEMveveqyYe04ZzYe4bJvT1aX54TIo1B7fTDunzBSAbHmfjC1BCLATVtb3VNxNTIc3y1NKevrNPisHCu27/hkq0/YPpQG8CHulbJE4LPNdHsuQQ5a9my8z4dX6HTbk2n8Ll/ghedkapPis/M4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MIcFN5Qh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yXuJm80wk0zdthKYpOIbl/aCp7aaEporSjZhZbrM6vY=; b=MIcFN5QhLUSQKLTfBlaQJMJwss
+	0P/f8RRbEc0d+sxDVt9PA0jmfhi3jysbZiYEysetVLc00/ECa9Jx04HvsKn9U2z+rl4sERuArs6Zk
+	OJzQuQ/NVwTYi1ftrond7PDMtpAt2B+agO0eAIPqg/pcR3RgD3aLHeMemqCxYEFwOpe4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uQ90t-00FkoI-R3; Fri, 13 Jun 2025 20:20:27 +0200
+Date: Fri, 13 Jun 2025 20:20:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, Frank Li <Frank.Li@nxp.com>
+Subject: Re: [PATCH net-next v2 01/10] net: fec: fix typos found by codespell
+Message-ID: <fe2bfd09-fa7e-40f3-84e1-c7bc88df466f@lunn.ch>
+References: <20250612-fec-cleanups-v2-0-ae7c36df185e@pengutronix.de>
+ <20250612-fec-cleanups-v2-1-ae7c36df185e@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250610172226.1470741-1-stephen.smalley.work@gmail.com>
- <20250610172226.1470741-28-stephen.smalley.work@gmail.com> <20250613141525.GG414686@horms.kernel.org>
-In-Reply-To: <20250613141525.GG414686@horms.kernel.org>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Fri, 13 Jun 2025 14:18:54 -0400
-X-Gm-Features: AX0GCFtU9Bqi-dgV9nr1_lSZ9Eb2ka_01arQqBDbHwkdU7QtouYZvFVVodljpLo
-Message-ID: <CAEjxPJ5cZB1zz3dCUz7ix-WW4P6Q7QaeE02TjcU6zg+SOg8KLA@mail.gmail.com>
-Subject: Re: [PATCH v4 27/42] selinux: introduce task_obj_perm()
-To: Simon Horman <horms@kernel.org>
-Cc: selinux@vger.kernel.org, paul@paul-moore.com, omosnace@redhat.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250612-fec-cleanups-v2-1-ae7c36df185e@pengutronix.de>
 
-On Fri, Jun 13, 2025 at 10:15=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Tue, Jun 10, 2025 at 01:21:58PM -0400, Stephen Smalley wrote:
-> > Introduce task_obj_perm() for namespace-aware permission checking
-> > between two tasks using the objective SID for both tasks and
-> > without assuming that either task is current.
-> >
-> > Convert the permission checks of this form in the hook functions
-> > to use this new helper.
-> >
-> > Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
->
-> ...
->
-> > +int task_obj_has_perm(const struct task_struct *s,
-> > +                   const struct task_struct *t,
-> > +                   u16 tclass, u32 requested,
-> > +                   struct common_audit_data *ad)
-> > +{
-> > +     const struct cred *cred;
-> > +     const struct task_security_struct *tsec;
-> > +     struct selinux_state *state;
-> > +     u32 ssid;
-> > +     u32 tsid;
-> > +     int rc;
-> > +
-> > +     state =3D current_selinux_state;
-> > +     rcu_read_lock();
-> > +     tsec =3D task_security(s);
-> > +     if (tsec)
-> > +             ssid =3D tsec->sid;
-> > +     else
-> > +             ssid =3D SECINITSID_UNLABELED;
->
-> Hi Stephen,
->
-> Above it is assumed that tsec may be NULL...
->
-> > +     rcu_read_unlock();
-> > +
-> > +     do {
-> > +             tsid =3D task_sid_obj_for_state(t, state);
-> > +
-> > +             rc =3D avc_has_perm(state, ssid, tsid, tclass, requested,=
- ad);
-> > +             if (rc)
-> > +                     return rc;
-> > +
-> > +             cred =3D tsec->parent_cred;
->
-> ... but here tsec is dereferenced without explicitly checking if it is no=
-t
-> NULL. I'm wondering if this is safe, e.g. due to the call to avc_has_perm=
-().
+On Thu, Jun 12, 2025 at 04:15:54PM +0200, Marc Kleine-Budde wrote:
+> codespell has found some typos in the comments, fix them.
+> 
+> Reviewed-by: Wei Fang <wei.fang@nxp.com>
+> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-No, you are correct - this is a bug. Thank you, fixed via
-https://github.com/stephensmalley/selinux-kernel/commit/85e72ed549d01a2da40=
-7feef6493cbdeca324f82
-and will likely squash into this patch on next submission.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
->
-> Flagged by Smatch.
->
-> > +             if (!cred)
-> > +                     break;
-> > +
-> > +             rcu_read_lock();
-> > +             tsec =3D selinux_cred(cred);
-> > +             ssid =3D tsec->sid;
-> > +             state =3D tsec->state;
-> > +             rcu_read_unlock();
-> > +     } while (cred);
-> > +
-> > +     return 0;
-> > +}
->
-> ...
+    Andrew
 
