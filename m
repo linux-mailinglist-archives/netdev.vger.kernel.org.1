@@ -1,48 +1,63 @@
-Return-Path: <netdev+bounces-197423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B540AD89C4
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:44:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C78AD89E9
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B584173F9B
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:44:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78C03189A152
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF662D23A6;
-	Fri, 13 Jun 2025 10:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724DC2D4B67;
+	Fri, 13 Jun 2025 10:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gU0uRFkV"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="hY6aifoZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0896D1E0DE8;
-	Fri, 13 Jun 2025 10:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4682D5421;
+	Fri, 13 Jun 2025 10:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749811440; cv=none; b=FlUky1+ont/29Yeifr7E4iSeF5xr1FIM18zPLQSkPJ7o75kmuWFIVxT9D+3twJx6Per3gav/ElfT5ME575z2BH04r0XLve9Xb6iNSHQ6H7gSVcjbsXIxYFnoZ6udcoUPWEfNM7veEVu7vqSw22bS60oyzCUB9o7KTGS1QyI0k4s=
+	t=1749812393; cv=none; b=E39XaPOn7PBIpBum99ZZtkGjCIvvvGaMDG9Uc6t7V8vkm7qYjrP+ey3iRaJlZUPc6sJH6jN1QIMBfmyeCYgNfzJ2tJQeMm6/OLdiW5h+5JJs394Je7OpAd6RIRJN721zOebhLbFVIOlHjA1zjyp2outTg/ogkI6M7AszEYQTcOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749811440; c=relaxed/simple;
-	bh=mnbw6A0mNVYyInMDA9EbKUPtqVXfTwi9C7mfH7beIQQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gZR+hRfpXdSzade/5K1hG0uIQaKfmgpBcXvOMbTxr0HitsG5n2fjeyWV9Fntmkj51oxnjJbkl3xtKmqyehsRV/zXy83jXM+wylCfqhp4P6DYwqQ2+VGUpEQg4URarBxEWYJcMrJ7XQrkjyEWVB8U/aiQ6n9sEklTzIwdB/9+WYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gU0uRFkV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD306C4CEE3;
-	Fri, 13 Jun 2025 10:43:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749811439;
-	bh=mnbw6A0mNVYyInMDA9EbKUPtqVXfTwi9C7mfH7beIQQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gU0uRFkVCP3yxRwUtFbnMhRQdsKCOZoM/nzYLTQN7tkZlScexuLQ0L+q7JGcJeK2A
-	 3VAsyyRyInGzeylTmqtJGqIjxLJuv/ts3Afu7vNPiZxyvvOIasA/KAk2onqqtLPNjz
-	 0e6GuEIj2vcTxBqEYHokMug56dvF8YaRCEvSLY2BZBxpFAwnT4ckrG3Dc/Fsg4MJGQ
-	 KxDM+ttltbj3Y/X+EShpvMXDylbvNfZPow47cooj4pnKkoEjzJoOeCiyj0NckKtzEz
-	 RDBfKa4YSGSE6Vz5KyjwR2FDZ5unY3yXTXx5tOOm/7iERiXMlR8X7e1eq+vTooBai8
-	 ZJ8zd7ghroI9w==
-Message-ID: <27ca7dfa-9dee-43f5-9e97-78de5e964f6e@kernel.org>
-Date: Fri, 13 Jun 2025 12:43:50 +0200
+	s=arc-20240116; t=1749812393; c=relaxed/simple;
+	bh=lNlHr4fN+kW1hphV1mf8s//XHzAcGEu6x4XIaFIdJVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=T13nfgnCl2iQJTd+szGsE8Ubo3njMUfr9B+7VxcGzr0TXI4Q92TvIEJibQMySgVvP1RDKiq0EYtMItG4oO62IoL+P0TcAK9zXHKyI43wQ8VbOX8ccQhwu5a5Fzt9wpVcmDE0sRHKP+sgo4UY1IYE816LvoVlm50Qubg97W8caCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=hY6aifoZ; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55DAxHoL1961667;
+	Fri, 13 Jun 2025 05:59:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1749812357;
+	bh=ECNdaOgprCZ21ffz0S0ElddSmNcpxaOPXvRqQLB08fs=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=hY6aifoZtXHMKs15wOkCqYOJWD+HDjcuOyx2WlKxO1qshiV17P0bGLtYjWCINj4vJ
+	 FRoQoGS8OauWjIiC7dQZl1PUwHupCluhYFVRyqvYvUrbwtC+vwtMzQl5Z7nijEhXcU
+	 tgh1tFNqYEAyTZLPQ6wctoH2X1aOT/jX9s7ZGt0M=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55DAxH6O2682137
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Fri, 13 Jun 2025 05:59:17 -0500
+Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Fri, 13
+ Jun 2025 05:59:17 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Fri, 13 Jun 2025 05:59:17 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55DAxBK73455305;
+	Fri, 13 Jun 2025 05:59:12 -0500
+Message-ID: <65bf4f83-43c2-4640-9858-afb96fa1cfc7@ti.com>
+Date: Fri, 13 Jun 2025 16:29:11 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,96 +65,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/9] arm64: dts: imx93: move i.MX93 specific part from
- imx91_93_common.dtsi to imx93.dtsi
-To: Joy Zou <joy.zou@nxp.com>, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
- catalin.marinas@arm.com, will@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- ulf.hansson@linaro.org, richardcochran@gmail.com, kernel@pengutronix.de,
- festevam@gmail.com
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-pm@vger.kernel.org, frank.li@nxp.com, ye.li@nxp.com, ping.bai@nxp.com,
- peng.fan@nxp.com, aisheng.dong@nxp.com, xiaoning.wang@nxp.com
-References: <20250613100255.2131800-1-joy.zou@nxp.com>
- <20250613100255.2131800-5-joy.zou@nxp.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next v10] net: ti: icssg-prueth: add TAPRIO offload
+ support
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Meghana Malladi <m-malladi@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Simon Horman <horms@kernel.org>,
+        Guillaume La Roque <glaroque@baylibre.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        Roger
+ Quadros <rogerq@ti.com>
+References: <20250502104235.492896-1-danishanwar@ti.com>
+ <20250506154631.gvzt75gl2saqdpqj@skbuf>
+ <5e928ff0-e75b-4618-b84c-609138598801@ti.com>
+ <b05cc264-44f1-42e9-ba38-d2ef587763f5@ti.com>
+ <20250610085001.3upkj2wbmoasdcel@skbuf>
+ <1cee4cab-c88f-4bd8-bd71-62cd06901b3b@ti.com>
+ <20250610150254.w4gvmbsw6nrhb6k4@skbuf>
+ <10d1c003-fcac-4463-8bce-f40bda3047f0@ti.com>
+ <20250612151043.6wfefe42pzeeazvg@skbuf>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250613100255.2131800-5-joy.zou@nxp.com>
-Content-Type: text/plain; charset=UTF-8
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20250612151043.6wfefe42pzeeazvg@skbuf>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 13/06/2025 12:02, Joy Zou wrote:
-> Move i.MX93 specific part from imx91_93_common.dtsi to imx93.dtsi.
 
-You just moved them to the common file. Why are you moving the same line
-again?
+
+On 12/06/25 8:40 pm, Vladimir Oltean wrote:
+> On Wed, Jun 11, 2025 at 03:10:35PM +0530, MD Danish Anwar wrote:
+>>> I am not very positive that even if adding the extra restrictions
+>>> discovered here (cycle-time cannot be != IEP_DEFAULT_CYCLE_TIME_NS),
+>>> the implementation will work as expected. I am not sure that our image
+>>> of "as expected" is the same.
+>>>
+>>> Given that these don't seem to be hardware limitations, but constraints
+>>> imposed by the ICSSG firmware, I guess my suggestion would be to start
+>>> with the selftest I mentioned earlier (which may need to be adapted),
+>>
+>> Yes I am working on running the selftest on ICSSG driver however there
+>> are some setup issues that I am encountering. I will try to test this
+>> using the selftest.
+>>
+>>> and use it to get a better picture of the gaps. Then make a plan to fix
+>>> them in the firmware, and see what it takes. If it isn't going to be
+>>> sufficient to fix the bugs unless major API changes are introduced, then
+>>> maybe it doesn't make sense for Linux to support taprio offload on the
+>>> buggy firmware versions.
+>>>
+>>> Or maybe it does (with the appropriate restrictions), but it would still
+>>> inspire more trust to see that the developer at least got some version
+>>> of the firmware to pass a selftest, and has a valid reference to follow.
+>>
+>> Sure. I think we can go back to v9 implementation (no extend feature)
+>> and add two additional restrictions in the driver.
+>>
+>> 1. Cycle-time needs to be 1ms
+>> 2. Base-time needs to be Multiple of 1ms
+>>
+>> With these two restrictions we can have the basic taprio support. Once
+>> the firmware is fixed and has support for both the above cases, I will
+>> modify the driver as needed.
+>>
+>> I know firmware is very buggy as of now. But we can still start the
+>> driver integration and fix these bugs with time.
+>>
+>> I will try to test the implementation with these two limitations using
+>> the selftest and share the logs if it's okay with you to go ahead with
+>> these limitations.
+>>
+>>> Not going to lie, it doesn't look great that we discover during v10 that
+>>> taprio offload only works with a cycle time of 1 ms. The schedule is
+>>
+>> I understand that. Even I got to know about this limitation after my
+>> last response to v10
+>> (https://lore.kernel.org/all/5e928ff0-e75b-4618-b84c-609138598801@ti.com/)
+>>
+>>> network-dependent and user-customizable, and maybe the users didn't get
+>>> the memo that only 1 ms was tested :-/
+>>
+>> Let me know if it'll be okay to go ahead with the two limitations
+>> mentioned above for now (with selftest done).
+>>
+>> If it's okay, I will try to send v11 with testing with selftest done as
+>> well. Thanks for the continuous feedback.
+> 
+> I don't want to gate your upstreaming efforts, but a new version with
+> just these extra restrictions, and no concrete plan to lift them, will
+> be seen with scepticism from reviewers. You can alleviate some of that
+> by showing results from a selftest.
+
+We will make a complete plan for fixing these restrictions and I will
+update the community.
 
 > 
-> Signed-off-by: Joy Zou <joy.zou@nxp.com>
-> ---
->  .../boot/dts/freescale/imx91_93_common.dtsi   | 140 +---------------
->  arch/arm64/boot/dts/freescale/imx93.dtsi      | 155 ++++++++++++++++++
->  2 files changed, 157 insertions(+), 138 deletions(-)>
-> diff --git a/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi b/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> index 64cd0776b43d..da4c1c0699b3 100644
-> --- a/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
->  /*
-> - * Copyright 2022 NXP
-> + * Copyright 2025 NXP
+> The existing selftest uses a 2 ms schedule and a 10 ms schedule. Neither
+> of those is supported by your current proposal. You can modify the
+> schedules to be compatible with your current firmware, and the selftest
+> may pass that way, but I will not be in favor of accepting that change
+> upstream, because the cycle time is something that needs to be highly
+> adaptive to the network requirements.
+> 
 
-Why?
+I can tweak the script to use 1ms cycle time. I tried to run the script
+however I am not able to run the script due to multiple package
+dependencies which I am currently trying to resolve.
 
+I checked your commit [1] where you have introduced the tc_taprio.sh
+script. You have mentioned,
+	"This is specifically intended for NICs with an offloaded data path
+(switchdev/DSA) and requires taprio 'flags 2'. Also, $h1 and $h2 must
+support hardware timestamping, and $h1 tc-etf offload, for isochron to
+work."
 
-Best regards,
-Krzysztof
+My NIC does support offloaded data path (switchdev), taprio 'flags 2'
+and hardware timestamping. However we don't support tc-etf offload.
+
+Will it be possible to use this script without the support of tc-etf
+offload?
+
+> So to summarize, you can try to move forward with a restricted version
+> of this feature, but you will have to be very transparent as to what
+> works and what are the next steps, as well as give assurance that you
+> intend to keep supporting the current firmware and its API when an
+> improved firmware will become available that lifts these restrictions.
+
+We are working on a plan to get full taprio support and I will update
+the community accordingly. I want the driver to get upstreamed with
+whatever support we have right now and add things later on. If I am able
+to verify the `tc_taprio.sh` script then I would share results from
+there. If I am not able to verify the script, I will at least try to
+mention what we are supporting now and what are the limitations and when
+do we plan on addressing those limitations.
+
+[1]
+https://lore.kernel.org/all/20250426144859.3128352-5-vladimir.oltean@nxp.com/#r
+
+-- 
+Thanks and Regards,
+Danish
 
