@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA4FAAD807D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:50:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B18CAD807F
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2904B7AE9B6
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:48:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F45B3A5A05
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659991DEFC5;
-	Fri, 13 Jun 2025 01:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89A21E32D7;
+	Fri, 13 Jun 2025 01:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1rhK76u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIYSbhH3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F68C1C4A10;
-	Fri, 13 Jun 2025 01:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFADC1E1DE7;
+	Fri, 13 Jun 2025 01:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749779400; cv=none; b=QQEX0Bs3/JprkgvIoDll6PC7iI04F1W1Htxvz7u/VPNJ8eqju71Yjvv+x1w7FgTbTN6GD2D9ewCuvqZGTY232wohGbeNIhEMIK4MSqm1WMsPsrolkQlUdDqNf50Yhevq/IFVeVyrdPe1EUvitng0Cj2D0uCS7sJIuAoaXstjsD0=
+	t=1749779401; cv=none; b=SeDWN6xRzM6ykqMd5qa36Q3OuKSm9TKQCgnHT5T+mCF65QCC2CtVcaS6kDxkKfkTbgNJtCiD9OOKhOYLVb7UOa1U8msjTT+5LOg9HmcQXxIcGWQh3S5CDAFar+a5y/Sr1iiMuBBlMcKSmKmrGDUwIeSIQYnzjti47RKaLHd2Nt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749779400; c=relaxed/simple;
-	bh=KvQpbekyf0KFJWKFpC0va1oh7HK6XoLcGPLoyuPICOE=;
+	s=arc-20240116; t=1749779401; c=relaxed/simple;
+	bh=UcydmQa51vACTBdzRyC4Efyxmq9tVi4S+GDuV6XI0BM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b6JiKJKeKkoAMDyIdRzcJ91TGuQRgILZ4Y6FhIR0AtAPjti8FNUFpBUq0DkpQATAvwRiUojHYCPVCygFP3uHfLgjvftw/X1tdY4WMCv0vXx/+r2GKDdoouRhxvlHf1iJz++wAQ1XVQwIVCJstCuN/5tPhqT4tVZAwQE+uL0u+ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1rhK76u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC018C4CEEA;
-	Fri, 13 Jun 2025 01:49:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BMpSrgyez7V9gxrsy2h/7iBet0qecMcmpAGLQbBN1Wn/t9bRlvPyKSM7lLBQy+w5UaHOdPpxUDjrqphrAdHYFvt12d7Tcy7qPH0eGqi4QnPFNrEAxET5kFtPV9G8l5YJ7bCOhCwJ96beKmpSG4g6XhLeWrkFAqDMxHADMqonSPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIYSbhH3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3917EC4CEF0;
+	Fri, 13 Jun 2025 01:50:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749779399;
-	bh=KvQpbekyf0KFJWKFpC0va1oh7HK6XoLcGPLoyuPICOE=;
+	s=k20201202; t=1749779401;
+	bh=UcydmQa51vACTBdzRyC4Efyxmq9tVi4S+GDuV6XI0BM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=L1rhK76uFw5pFA95AqKZdJlBYNQr8MNwGTpKknRpIxCd4BCXGmw3COgzUe6dDDIa+
-	 7q6TO7wwYsXkSE3PrJYCRJY/cerKIv8a7gFh3QCfIpIX47Nlv3Iw5dHQxlgE7b4LkE
-	 rk5dIhapWMz01Mx3G820wVdjNl7ZgEKWBj6mqr4Fm9sJqQ4SoHXe8juk015s5fYlR/
-	 rhrHiIlsBvPy8yNy0zclSthAXMJEP4QBHkVoTwpcUjqTjhT/WN1I+NorAl6CWmHVy1
-	 6aDQ47dn3DuL+7wuAhhxcasj6K7x/ZyE1YJTeHygpja4tQywyipa9uuwOwYHZscghP
-	 bYDp0g38BvR5Q==
+	b=QIYSbhH3xVPLGne8IW3nV0YPBeO5gWQtq0lWZlSFDSBVMUCc41i/8BFnoOEE6g5XU
+	 ifJ7zPzJzJY3V5O/2WWdXa9iWFbwVsp1BtRxaoBkJ7660cK2VSO8zE9cjH4rkHh322
+	 eBG0akwkKG2lJFpU7d9fZxlMCqeZbHaTb7IMGnnTT57pwN7Tlt+IQA71azu6M10Ezo
+	 7z4e2JVzaXfuV5tZHBW4MFMEb4LaIVzJJrMcRPgWrg2wkrJYDbr4qdqO5jQyF71B9t
+	 nZ14aomoFAJz/ne5KXFcXwVZB9TcS7IPA3eCrdUGGObwVA+Iy1HFYNrlEydYbNC6je
+	 DFSo+EmJ6RURQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC5039EFFCF;
-	Fri, 13 Jun 2025 01:50:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BA839EFFCF;
+	Fri, 13 Jun 2025 01:50:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dt-bindings: net: renesas-gbeth: Add support for
- RZ/G3E (R9A09G047) SoC
+Subject: Re: [PATCH RESEND] net: mdio: mux-gpio: use
+ gpiod_multi_set_value_cansleep
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174977942950.184018.422586356896918128.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Jun 2025 01:50:29 +0000
-References: <20250611061204.15393-1-john.madieu.xa@bp.renesas.com>
-In-Reply-To: <20250611061204.15393-1-john.madieu.xa@bp.renesas.com>
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
- edumazet@google.com, geert+renesas@glider.be, krzk+dt@kernel.org,
- kuba@kernel.org, pabeni@redhat.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
- robh@kernel.org, biju.das.jz@bp.renesas.com, devicetree@vger.kernel.org,
- john.madieu@gmail.com, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, magnus.damm@gmail.com,
- netdev@vger.kernel.org
+ <174977943074.184018.17302036184025742769.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Jun 2025 01:50:30 +0000
+References: 
+ <20250611-net-mdio-mux-gpio-use-gpiod_multi_set_value_cansleep-v1-1-6eb5281f1b41@baylibre.com>
+In-Reply-To: 
+ <20250611-net-mdio-mux-gpio-use-gpiod_multi_set_value_cansleep-v1-1-6eb5281f1b41@baylibre.com>
+To: David Lechner <dlechner@baylibre.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linus.walleij@linaro.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 11 Jun 2025 08:12:04 +0200 you wrote:
-> Document support for the GBETH IP found on the Renesas RZ/G3E (R9A09G047) SoC.
-> The GBETH block on RZ/G3E is equivalent in functionality to the GBETH found on
-> RZ/V2H(P) (R9A09G057).
+On Wed, 11 Jun 2025 13:11:36 -0500 you wrote:
+> Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
+> gpiod_set_array_value_cansleep().
 > 
-> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Reviwed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: David Lechner <dlechner@baylibre.com>
+> ---
+> This is a resend of a patch from the series "[PATCH v3 00/15] gpiolib:
+> add gpiod_multi_set_value_cansleep" [1].
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] dt-bindings: net: renesas-gbeth: Add support for RZ/G3E (R9A09G047) SoC
-    https://git.kernel.org/netdev/net-next/c/31b928210df1
+  - [RESEND] net: mdio: mux-gpio: use gpiod_multi_set_value_cansleep
+    https://git.kernel.org/netdev/net-next/c/ed2cfae6b845
 
 You are awesome, thank you!
 -- 
