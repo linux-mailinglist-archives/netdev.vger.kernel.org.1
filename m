@@ -1,79 +1,86 @@
-Return-Path: <netdev+bounces-197498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1FBCAD8D1A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:29:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D024AD8D1E
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:31:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C28251897E35
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:29:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20B2F169DD0
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9849115530C;
-	Fri, 13 Jun 2025 13:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752E64437C;
+	Fri, 13 Jun 2025 13:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tgdjHMFj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/VPNTzU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A462B149C51;
-	Fri, 13 Jun 2025 13:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4088A4409;
+	Fri, 13 Jun 2025 13:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749821360; cv=none; b=ngu316nguDEdUC+ccC8khBmZG2hLhyrp8mMqkWk0+lF2rcX4ggqvC/mt/ozlnnRam0FQFcIIiHLimzaegCp/gavMqRLhmFof7H4Exumw0uN4Btgt41Jnmk9P1Wc4pXI+C6Mb6ZClaLu0uKvnSl49h2wB1mYlzWv9cJo+gZYO4h0=
+	t=1749821507; cv=none; b=QpwcGIKa8tqamKZB1NQyLNQoqAjegJBYtfPvHnqtvKTx5fFbzc0UxFddE67gZnOnvCk//XcZCE/kzX08hGz0ClqGjXiPBtMu+T/FRYRMSCJCN5eq6aaipgFmaZjz1sOBUHPRw5KgGOU/v+isCpOI1XknbO9+y+rWTP36q49o37w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749821360; c=relaxed/simple;
-	bh=O/NebmeZGGg2IhdH1S9R3TNHKkIt5wu+2/SmcUFoMkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XK2xdvuQTIJ4yeS08ljhOKPLt5F2mWqtMc0oHOs718Qcmb1QOxCMmM/m1hWP8+wTOD+xw5bXM9pTegM3Ws9bZUv+AiBozz7Rdx3P6/q7lJvNO7pxvT1D+koXI1+XurMWkm3xbkMhp31jd1YkFel7X70QmFKa46+z7UsGogWTmSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tgdjHMFj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tl4tRNDuCjGmIDAuKrhHz1taKxx3ofiUm1DQcYgp0LQ=; b=tgdjHMFjEALwjHYPllcXe90dMY
-	/dHuNSnOfY8S9RiTQDzLX4q08nphOh0RRzPAfK7+2gWG4jBWiqr1gygjlsE5FIE8GvIiZAMLNlFdq
-	9q6LqliG8J4AxwAUWnSfyi/yzsApx0OXoKJ92sUvR0g8HZ10+pahbAfgGExPMrsgNbxE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uQ4Sv-00FiWb-Do; Fri, 13 Jun 2025 15:29:05 +0200
-Date: Fri, 13 Jun 2025 15:29:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: phy: Add c45_phy_ids sysfs directory
- entry
-Message-ID: <e2c55a28-a247-4184-8708-1e325d4e9706@lunn.ch>
-References: <20250613131903.2961-1-yajun.deng@linux.dev>
+	s=arc-20240116; t=1749821507; c=relaxed/simple;
+	bh=MkEOfV0i8W8Lzd3l73+lQlM1om1xg080yIUMBBKWzQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u+qwTDDwbdx1cLSvQEJAtbgiIodaHNpJEtbmEUpGYfm+VLRfXDTqeTUmcAw5lXu+aWIOU/LlyTCGZJmnzSrvOTsPqzdoMhxaatLIWS3OG8nsCi5o2JtVqn7tPEOznHDZIo1U1OC8Et+vZ1ZbvZ7LCv8nbdQFEviFjo7kMpULsFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O/VPNTzU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D37C4CEE3;
+	Fri, 13 Jun 2025 13:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749821506;
+	bh=MkEOfV0i8W8Lzd3l73+lQlM1om1xg080yIUMBBKWzQ4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O/VPNTzUz05NC3yjAiux2hvUTE/Ka6AwFOVYrWp6ZFWiu4VJ+IgLHUlOBs4Jl0OKl
+	 MNDujlBTFjcz2gII6bn14jE28wbxEB/BDoHFBRXPLTH/TlkClG4dV/0IZRs3DO7uT2
+	 xp17cInINFkYJ+Ied5DPAOnBnOOr4x129XlGI/S1dyQEaKdwFa4z5XRdYA+MVJWdVK
+	 UJAJJ90dwdseQJ9jytb5XAypir0dPpjXGMPLwsjQtLbFAPudlFXY1/hmAaYJoCooP4
+	 ULDcQEeOBWLKVKx8lESCsQtDCdNEfaBm6oQd0VFH5ZDOJkWO8+HwuXNWYGeu5i99TM
+	 9i5tmtAqtt4cQ==
+Date: Fri, 13 Jun 2025 06:31:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan
+ <dlan@gentoo.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
+ <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Russell King <linux@armlinux.org.uk>, Vivian Wang
+ <uwu@dram.page>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250613063145.62871999@kernel.org>
+In-Reply-To: <20250613-net-k1-emac-v1-2-cc6f9e510667@iscas.ac.cn>
+References: <20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn>
+	<20250613-net-k1-emac-v1-2-cc6f9e510667@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613131903.2961-1-yajun.deng@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 13, 2025 at 09:19:03PM +0800, Yajun Deng wrote:
-> The phy_id field only shows the PHY ID of the C22 device, and the C45
-> device did not store its PHY ID in this field.
-> 
-> Add a new phy_mmd_group, and export the mmd<n>_device_id for the C45
-> device. These files are invisible to the C22 device.
-> 
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+On Fri, 13 Jun 2025 10:15:08 +0800 Vivian Wang wrote:
+> +	rx_ring->desc_addr = dma_alloc_coherent(&pdev->dev, rx_ring->total_size,
+> +						&rx_ring->desc_dma_addr,
+> +						GFP_KERNEL);
+> +	if (!rx_ring->desc_addr) {
+> +		kfree(rx_ring->rx_desc_buf);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	memset(rx_ring->desc_addr, 0, rx_ring->total_size);
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
-
-
+dma_alloc_coherent() already clears memory.
+-- 
+pw-bot: cr
 
