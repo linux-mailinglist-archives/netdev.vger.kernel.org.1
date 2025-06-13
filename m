@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-197662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6363AD9883
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:09:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D477AD9884
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFC9D4A24E2
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:09:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E109A1BC50A6
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9978D28F508;
-	Fri, 13 Jun 2025 23:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A82B28D8ED;
+	Fri, 13 Jun 2025 23:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V7wYellm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UCGNrQeB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0C628ECCB
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AD128F518
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749856156; cv=none; b=fgUr/DQSDx92CLBMPLMxFgB8/1+pcGBjQcF6N+lVEPXbe4hTm+STy2by0cRSrwvaVj5VfbzeVTQjhEuCR0mAhCRZiY8JRvbq8RGLqLBd/iyxwNMosSYIxvJ1mUeipWrNlMcsoFNHiLjG5XqxLbFGacI6yDOkAeGo0bj+O12zBDw=
+	t=1749856159; cv=none; b=q/I1CLdawId9XAGFMtPj4UDEgOZTK5psiRXS0Way3L+oxP+dtfxjpQZpMqBBlg9cPuwT2oDSLUmditXojKJbw5sHjgobwikVYLMUYaJyFKyXrtnWGFZrCN2eDqW88h8BSLkL9yUi8S5R+Y5/wNoz2g+jP5ZtpTPCPtRiRjg/Epo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749856156; c=relaxed/simple;
-	bh=tOSlEGlQgW7mc9bHyAZvGvEVvhPfpkxVmDqpWZmLw7c=;
+	s=arc-20240116; t=1749856159; c=relaxed/simple;
+	bh=IUa6tmFLmY0mgwivBdMOgtmnwT4XmSdvMv51BeFjye4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s8nTiuM0UR5ZcQ27oTRLVgyXbwtVCR8TIjrduwqcGJgTtBQfBfEpwdLHfx2KItiFUfaXx/G9Iyk3k8raubqz/n06W503PW2tE7A7D0siJko71QKKXiUzogW2s+kXk51WaNB/EXdySQZgWcazFZZpMyqfZ2Lvxhsss165rbUQxDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V7wYellm; arc=none smtp.client-ip=209.85.222.178
+	 MIME-Version; b=mootpJ83fIZO/CyM/Mdd/rghvnfxp9DcwKTF66cjIA2Jn719cIKDdFsB6ptbgaEnLVmlV0z4JPTd5yrDydAvDsJgz0IOocKH1PAEBWmfJ6WG4Xo4Q06g0d7pn5ZD0vjxJ/y9Cmr0BIj/QHqyhCwc1YHfWijqXnc3JC0UPngFmFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UCGNrQeB; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d094f67777so45432785a.1
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:09:14 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7d0a659e236so24209385a.0
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749856153; x=1750460953; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749856155; x=1750460955; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jztvNaA6dzVjNXbRcCmdP8E8tqNYo036LR3mUZlrfvA=;
-        b=V7wYellmKvKoIRW5j2sMAmxbCtdcXxRneTvYL7lCprmWqET6x9I4F4YYy3PFzQK3gq
-         iQTTBWt8sylZ7Rc1r5RYeVtsy7f4kJph78SobpRPrrEreuC6SAiVj/ma9rtUnlR9WhHD
-         psXeGSPxzUq0y8jypHYzNT3jdEd2BK25J2RMxDf28HLGYNYbm+QtTqQXaFTX6mWPNOly
-         th7ZHdjZ4N1Bl2qp6icI0PL9itqAu1jn0oiYoGajxJbs+r174p4zg9ylhpEV/8I12w0M
-         nBKQ7He9RqUCCL6+2P/gwvW/qRmAwV0LtMMR72wGrT/8zqVCBhEcRg9nXeVhv0GirhXK
-         RQrQ==
+        bh=w2/NUSu+2Hf6jQdQYjeltFUxOb3rhGhCC0PzDNb12eE=;
+        b=UCGNrQeBR8dLanIcuqERjJh8O5doYTDzGPu47p1NFz3ml7d//ZxRrsg3T0pf3kg5UT
+         y3V/2589QTkQEi7gc9/ToqMpcm7is6iiMc9Q/F5A4BbgkxVVF44q1NEwWGWddulzfser
+         Oq1QqdY+ms6T6sTUvkqKFMUmKNEI3w9DIn2TuMQVFMP4KX5rJKiC2qDO7t1j4DYJXnPc
+         h/n2kt/yw5A8oHDQk9ht4blf6k3003quaIml+xO4nQkIZcXNAwwe1EtobCUbWlNSdpOl
+         goOfdjZqJVUdhnTL7vtK43pvr9ksrG/29UA4/Ae0ytrEhRRIOEOH2cmGrIIikvDtkYAN
+         OZ8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749856153; x=1750460953;
+        d=1e100.net; s=20230601; t=1749856155; x=1750460955;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jztvNaA6dzVjNXbRcCmdP8E8tqNYo036LR3mUZlrfvA=;
-        b=UwU9HbcrYsBexwwuo42RWeYWpgQutMtv1NrS3TlZ+lqlYe74Ke4mTV0OpL+MqkTc8b
-         tfeVl73k91HpW+pWv5dC6sTnCwr+FHw9PACPR/k3+gpuu6jaIE3S5yuGdq2TDKbsbwTz
-         ecuUIT9sVgZWm3C0DHG0UOAiwGOHuBmA23tqoiv0zm2GE71UaIeltyRldTMhlmohX33k
-         9aKpH+wVQxqsZ2/hdUP7zAstxDvIuIxAMBW0fB4YbEGWKHDAEqG6cpM6HudXO0853mpt
-         00loQtEyubf7yuM0IIZxuUyuEZJXkwRTzPea4VF3lM0lC/sjf/xpgszuCqZo75b0WVp/
-         SQcA==
-X-Gm-Message-State: AOJu0Yz4Ts8l63so0mmKMpVUPih/OwvuxpRgfdGcfr1SinJE5rTuPUhu
-	0rse7sjht1SrXcE09irQ4RmBGlRUazIdtPmGXjgUXQuPDWGIp9NWAIDu2TIEbg==
-X-Gm-Gg: ASbGnctKSP/bqdrbBi88kiWVUNW7ATEAJddHPhwQ9LvkO3SlUPWDqPfkxM2I7cSn+WQ
-	CoiPIpSDmV+xWQqmHFwGy1RdduNBTrzQIfEErFkkSYoQZVYSBxJWpgA/lkhFewIndPurMH2WdVK
-	wM6PQqC9Zn8wTIkNlv+GbEtKfHeBHZtUkIeqdZhRpfqMWOtkb3IPEpmtlfGrNjnfgqzdF0QTFc5
-	x9VKlvyKq11RcISmzWq7d0bjNuP7glM8wg7FzxCQ6wSC8FLeQ+PxCZ427ljOpwhMb05yDhPD3BH
-	P7XQcnORNVoMPvVUNm4eKs65XYqSS7CZc5H2bO63sXgVIg4268F8iaku9kfEWV/9iI8tyY9CXMZ
-	rUYQa
-X-Google-Smtp-Source: AGHT+IELZnnapLKOT8dUAtIcmvcOpbMZoHNLMJeqp4Go0BuvswxlYaUl37LDvK9Y8bqzUosWnz9JPg==
-X-Received: by 2002:a05:622a:38d:b0:476:addb:c452 with SMTP id d75a77b69052e-4a73c568d5emr5699301cf.6.1749856153468;
-        Fri, 13 Jun 2025 16:09:13 -0700 (PDT)
+        bh=w2/NUSu+2Hf6jQdQYjeltFUxOb3rhGhCC0PzDNb12eE=;
+        b=gyK7dQ0ZUKfoZ+JLjfHGHUeYUcmX1oQRSuuFZupm1LsozefvTTGGxE+fXCPnsms1U8
+         gzdBzay7XssPcb7uZoAI/wdCnDfy8iVcisayZu6mNtHCvsBJlMIHfmkVWNuikrPAYnYN
+         BJHF3ytoNMtFzwOHFgGbkJaL4R0aT0XXnP54Za23rblLJMWmu96pzcdvoX905cC/Ou3G
+         acdcJnahhA3PimR0ANl9ke5cOz5RyW2Og05DxcN7E2KwBuCIj6mhIdlOExOAggeZslKM
+         X76HuC6OnLknHqI2SSHlU1IUZMYA8eH3T874kLb94lLGj5IhNS5o0l1hVaereh6BaaFY
+         2A+Q==
+X-Gm-Message-State: AOJu0YzvmcJB2vNT/2JGsyItT4TUN8fZ+8H29DsSxr1JxUCvq7rE0Zia
+	l4+E5D6ebH8+T7YorxEyhlJa3dKUIITcbJqUXarb0KH04/2cL4gGxxF8/p1GIg==
+X-Gm-Gg: ASbGncsb3xVT5WrqqNw7RrOFJ7MgnyPWNZJb1+U9F+fZsT1UFmxKspWwmdBbAWI3XkX
+	QPrmVoGd3JCWk2RpykNu1Y/kGM2Xvl7slsfBozxJGmGhsg0Xx5gmV2ozq+ggdBrbiqJmh/WXQOw
+	/Pki+3yA2rbPt49VK7dVrkH6zlA2M4FBjIUxjItmQEBSltr1KR5/ZkL/n10FVBB91Co1g/tvz70
+	bjfc8IGZ66wc6ALWVj4qwUosqELj1nnZiKfvlgXlMCxh2EAalf8BK7c86QE5oEc5E1rwc/lFI+3
+	Ww6+v7i073G6fVjpLTNn0x4VQqls5waTvyx8R6MlkH/Wh17Gxk2S6I4bCCui3dJREdM/eTbMuAn
+	xlFKm
+X-Google-Smtp-Source: AGHT+IHCOl2ShWFxQV1PtJlplbUFQBoqV5xL2DrMVZz3eWOesrYfgNc7r+v7fAhgUviD1SetodyoKg==
+X-Received: by 2002:a05:622a:316:b0:47a:ecc3:296c with SMTP id d75a77b69052e-4a73c394653mr7292341cf.0.1749856155239;
+        Fri, 13 Jun 2025 16:09:15 -0700 (PDT)
 Received: from soy.nyc.corp.google.com ([2620:0:1003:315:8d12:28c7:afe9:8851])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a2f4fc5sm23122651cf.26.2025.06.13.16.09.12
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a2f4fc5sm23122651cf.26.2025.06.13.16.09.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 16:09:13 -0700 (PDT)
+        Fri, 13 Jun 2025 16:09:14 -0700 (PDT)
 From: Neal Cardwell <ncardwell.sw@gmail.com>
 To: David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -79,9 +79,9 @@ To: David Miller <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	Neal Cardwell <ncardwell@google.com>,
 	Yuchung Cheng <ycheng@google.com>
-Subject: [PATCH net-next 2/3] tcp: remove RFC3517/RFC6675 hint state: lost_skb_hint, lost_cnt_hint
-Date: Fri, 13 Jun 2025 19:09:05 -0400
-Message-ID: <20250613230907.1702265-3-ncardwell.sw@gmail.com>
+Subject: [PATCH net-next 3/3] tcp: remove RFC3517/RFC6675 tcp_clear_retrans_hints_partial()
+Date: Fri, 13 Jun 2025 19:09:06 -0400
+Message-ID: <20250613230907.1702265-4-ncardwell.sw@gmail.com>
 X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
 In-Reply-To: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
 References: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
@@ -95,164 +95,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Neal Cardwell <ncardwell@google.com>
 
-Now that obsolete RFC3517/RFC6675 TCP loss detection has been removed,
-we can remove the somewhat complex and intrusive code to maintain its
-hint state: lost_skb_hint and lost_cnt_hint.
-
-This commit makes tcp_clear_retrans_hints_partial() empty. We will
-remove tcp_clear_retrans_hints_partial() and its call sites in the
-next commit.
+Now that we have removed the RFC3517/RFC6675 hints,
+tcp_clear_retrans_hints_partial() is empty, and can be removed.
 
 Suggested-by: Yuchung Cheng <ycheng@google.com>
 Signed-off-by: Neal Cardwell <ncardwell@google.com>
 Reviewed-by: Yuchung Cheng <ycheng@google.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
- .../networking/net_cachelines/tcp_sock.rst        |  2 --
- include/linux/tcp.h                               |  3 ---
- include/net/tcp.h                                 |  1 -
- net/ipv4/tcp.c                                    |  3 +--
- net/ipv4/tcp_input.c                              | 15 ---------------
- net/ipv4/tcp_output.c                             |  5 -----
- 6 files changed, 1 insertion(+), 28 deletions(-)
+ include/net/tcp.h     | 5 -----
+ net/ipv4/tcp_input.c  | 2 --
+ net/ipv4/tcp_output.c | 1 -
+ 3 files changed, 8 deletions(-)
 
-diff --git a/Documentation/networking/net_cachelines/tcp_sock.rst b/Documentation/networking/net_cachelines/tcp_sock.rst
-index bc9b2131bf7ac..7bbda5944ee2f 100644
---- a/Documentation/networking/net_cachelines/tcp_sock.rst
-+++ b/Documentation/networking/net_cachelines/tcp_sock.rst
-@@ -115,7 +115,6 @@ u32                           lost_out                read_mostly         read_m
- u32                           sacked_out              read_mostly         read_mostly         tcp_left_out(tx);tcp_packets_in_flight(tx/rx);tcp_clean_rtx_queue(rx)
- struct hrtimer                pacing_timer
- struct hrtimer                compressed_ack_timer
--struct sk_buff*               lost_skb_hint           read_mostly                             tcp_clean_rtx_queue
- struct sk_buff*               retransmit_skb_hint     read_mostly                             tcp_clean_rtx_queue
- struct rb_root                out_of_order_queue                          read_mostly         tcp_data_queue,tcp_fast_path_check
- struct sk_buff*               ooo_last_skb
-@@ -123,7 +122,6 @@ struct tcp_sack_block[1]      duplicate_sack
- struct tcp_sack_block[4]      selective_acks
- struct tcp_sack_block[4]      recv_sack_cache
- struct sk_buff*               highest_sack            read_write                              tcp_event_new_data_sent
--int                           lost_cnt_hint
- u32                           prior_ssthresh
- u32                           high_seq
- u32                           retrans_stamp
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 29f59d50dc73f..1a5737b3753d0 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -208,7 +208,6 @@ struct tcp_sock {
- 	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
- 	u16	gso_segs;	/* Max number of segs per GSO packet	*/
- 	/* from STCP, retrans queue hinting */
--	struct sk_buff *lost_skb_hint;
- 	struct sk_buff *retransmit_skb_hint;
- 	__cacheline_group_end(tcp_sock_read_tx);
- 
-@@ -419,8 +418,6 @@ struct tcp_sock {
- 
- 	struct tcp_sack_block recv_sack_cache[4];
- 
--	int     lost_cnt_hint;
--
- 	u32	prior_ssthresh; /* ssthresh saved at recovery start	*/
- 	u32	high_seq;	/* snd_nxt at onset of congestion	*/
- 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 5078ad868feef..f57d121837949 100644
+index f57d121837949..9f852f5f8b95e 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -1813,7 +1813,6 @@ static inline void tcp_mib_init(struct net *net)
- /* from STCP */
- static inline void tcp_clear_retrans_hints_partial(struct tcp_sock *tp)
- {
--	tp->lost_skb_hint = NULL;
+@@ -1811,13 +1811,8 @@ static inline void tcp_mib_init(struct net *net)
  }
  
+ /* from STCP */
+-static inline void tcp_clear_retrans_hints_partial(struct tcp_sock *tp)
+-{
+-}
+-
  static inline void tcp_clear_all_retrans_hints(struct tcp_sock *tp)
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index f64f8276a73cd..27d3ef83ce7b2 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -5053,9 +5053,8 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, reordering);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, notsent_lowat);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, gso_segs);
--	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, lost_skb_hint);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, retransmit_skb_hint);
--	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_tx, 40);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_tx, 32);
+ {
+-	tcp_clear_retrans_hints_partial(tp);
+ 	tp->retransmit_skb_hint = NULL;
+ }
  
- 	/* TXRX read-mostly hotpath cache lines */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, tsoffset);
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index b52eaa45e652f..9ded9b371d98a 100644
+index 9ded9b371d98a..937a0085598e5 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -1451,11 +1451,6 @@ static u8 tcp_sacktag_one(struct sock *sk,
- 		tp->sacked_out += pcount;
- 		/* Out-of-order packets delivered */
- 		state->sack_delivered += pcount;
--
--		/* Lost marker hint past SACKed? Tweak RFC3517 cnt */
--		if (tp->lost_skb_hint &&
--		    before(start_seq, TCP_SKB_CB(tp->lost_skb_hint)->seq))
--			tp->lost_cnt_hint += pcount;
+@@ -2769,8 +2769,6 @@ void tcp_simple_retransmit(struct sock *sk)
+ 			tcp_mark_skb_lost(sk, skb);
  	}
  
- 	/* D-SACK. We can detect redundant retransmission in S|R and plain R
-@@ -1496,9 +1491,6 @@ static bool tcp_shifted_skb(struct sock *sk, struct sk_buff *prev,
- 			tcp_skb_timestamp_us(skb));
- 	tcp_rate_skb_delivered(sk, skb, state->rate);
- 
--	if (skb == tp->lost_skb_hint)
--		tp->lost_cnt_hint += pcount;
+-	tcp_clear_retrans_hints_partial(tp);
 -
- 	TCP_SKB_CB(prev)->end_seq += shifted;
- 	TCP_SKB_CB(skb)->seq += shifted;
+ 	if (!tp->lost_out)
+ 		return;
  
-@@ -1531,10 +1523,6 @@ static bool tcp_shifted_skb(struct sock *sk, struct sk_buff *prev,
- 
- 	if (skb == tp->retransmit_skb_hint)
- 		tp->retransmit_skb_hint = prev;
--	if (skb == tp->lost_skb_hint) {
--		tp->lost_skb_hint = prev;
--		tp->lost_cnt_hint -= tcp_skb_pcount(prev);
--	}
- 
- 	TCP_SKB_CB(prev)->tcp_flags |= TCP_SKB_CB(skb)->tcp_flags;
- 	TCP_SKB_CB(prev)->eor = TCP_SKB_CB(skb)->eor;
-@@ -3319,8 +3307,6 @@ static int tcp_clean_rtx_queue(struct sock *sk, const struct sk_buff *ack_skb,
- 		next = skb_rb_next(skb);
- 		if (unlikely(skb == tp->retransmit_skb_hint))
- 			tp->retransmit_skb_hint = NULL;
--		if (unlikely(skb == tp->lost_skb_hint))
--			tp->lost_skb_hint = NULL;
- 		tcp_highest_sack_replace(sk, skb, next);
- 		tcp_rtx_queue_unlink_and_free(skb, sk);
- 	}
-@@ -3385,7 +3371,6 @@ static int tcp_clean_rtx_queue(struct sock *sk, const struct sk_buff *ack_skb,
- 				tcp_check_sack_reordering(sk, reord, 0);
- 
- 			delta = prior_sacked - tp->sacked_out;
--			tp->lost_cnt_hint -= min(tp->lost_cnt_hint, delta);
- 		}
- 	} else if (skb && rtt_update && sack_rtt_us >= 0 &&
- 		   sack_rtt_us > tcp_stamp_us_delta(tp->tcp_mstamp,
 diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 3ac8d2d17e1ff..b0ffefe604b4c 100644
+index b0ffefe604b4c..eb50746dc4820 100644
 --- a/net/ipv4/tcp_output.c
 +++ b/net/ipv4/tcp_output.c
-@@ -1554,11 +1554,6 @@ static void tcp_adjust_pcount(struct sock *sk, const struct sk_buff *skb, int de
- 	if (tcp_is_reno(tp) && decr > 0)
- 		tp->sacked_out -= min_t(u32, tp->sacked_out, decr);
+@@ -3247,7 +3247,6 @@ static bool tcp_collapse_retrans(struct sock *sk, struct sk_buff *skb)
+ 	TCP_SKB_CB(skb)->eor = TCP_SKB_CB(next_skb)->eor;
  
--	if (tp->lost_skb_hint &&
--	    before(TCP_SKB_CB(skb)->seq, TCP_SKB_CB(tp->lost_skb_hint)->seq) &&
--	    (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED))
--		tp->lost_cnt_hint -= decr;
--
- 	tcp_verify_left_out(tp);
- }
+ 	/* changed transmit queue under us so clear hints */
+-	tcp_clear_retrans_hints_partial(tp);
+ 	if (next_skb == tp->retransmit_skb_hint)
+ 		tp->retransmit_skb_hint = skb;
  
 -- 
 2.50.0.rc1.591.g9c95f17f64-goog
