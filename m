@@ -1,103 +1,192 @@
-Return-Path: <netdev+bounces-197586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F297AD941A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:03:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FB5AD9440
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EE797A260E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A35F83BC993
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 18:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C781BEF8C;
-	Fri, 13 Jun 2025 18:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCEE22DFB5;
+	Fri, 13 Jun 2025 18:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="uRcIUKU/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rc/SufIb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A792E11AE
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 18:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DD42E11AE;
+	Fri, 13 Jun 2025 18:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749837799; cv=none; b=pT8sYTZ3XdpuVHsFlk8HWuQNme4r7kCt+mXtxKk4UaxeNABTHjwED3bbcSVFh15X7nXDNBmr2G7npu98QmTsaJyACw3T/CPT2rc+QSpk7Kz0NS8kVf7dwShwErWtkvYYji0AZy0Pc6DD2lmyclvN6QIkukPn1eamTIS1rDXjrXQ=
+	t=1749838496; cv=none; b=hZpy1UqtiNA9PbJnsQ5GbbY+nlDxcFGq+GkZpB64snhGt0JTaRoHTEzv+aZvcswDf7LDdzdYP+5WYZy8i35V3hLYrAnavNhb2jlIpQ8r37wakvT43V5O11/iOce/A8jVZlTEJ5+t/lqQylB3ASDhe0FqzVxPVY9NtO1zbR1tK48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749837799; c=relaxed/simple;
-	bh=DPGGQAWvw49wh0IVggbiR7ccXkRXC3cr12d7nWb+Mow=;
+	s=arc-20240116; t=1749838496; c=relaxed/simple;
+	bh=KjYY4bsTZUm05TpfR2l4YdrK8TqDiMRSIg8azQwn+r8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HLxongxg9zbE9n7j2bIi/qV5f8pWXDJrFdWpUPqxFHrCkFYCjV1Aojum94cyjD332FnowlOeGG65fb3dI1BU7bEOWE2LSe6tTFyH2XmEhsE5j0oGyodLbO1GupW+36HpQ296Yp5V7uXOAL/1tZl7cxTLtDpRqQBGTXufPn2GKhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=uRcIUKU/; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DPGGQAWvw49wh0IVggbiR7ccXkRXC3cr12d7nWb+Mow=; t=1749837797; x=1750701797; 
-	b=uRcIUKU/sd0QK6T7rzQCth4CmnS7ll5nQL9rvbx0s+cays7QXARJYk6wJyeS+plQVZP2zvFTJEq
-	s1QC8NkwzQR01dYvBmWRG6yIpo1r7aY3L3jN+ZeIntBCwCHHSDuf5i5hlwJkO+F/Drww4o6zJ/MBp
-	0a4bhfU4ty31msc5+yVgKWgqrMrdncIBbroL0cYTOrhprLKlbv4/o3nw7L8Ckpth1ruEPn/M966sQ
-	O+URDzPKmebW5wOS91OZzQhEl4ECsDa62V60ohiFdwTup8TQNU04iXdVflz7Rq1IJQIIq4lo+k1da
-	t/geVBOE030RO3Tktvgwh0pVQWJ+BiMgwgmg==;
-Received: from mail-oo1-f53.google.com ([209.85.161.53]:47196)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uQ8kG-000618-JM
-	for netdev@vger.kernel.org; Fri, 13 Jun 2025 11:03:17 -0700
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-60be58376c9so420113eaf.2
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 11:03:16 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwQiLR+WJLkz6QUEYc9Sog9YzndcPXcf9cJy9TgljseQ10fp6d4
-	I1oJBGOplmhwZoUa5Rm8luIzPBVoAoeRtt1y5wTupyyHZgb7u4pKxME2FqFn3PGIla1QYYnCRX/
-	uwVuiFPmmGN/zPoJZ2HsC0rFSZwQ9uUA=
-X-Google-Smtp-Source: AGHT+IG6VtnwrdkIZNP65g5SRDTKe/uXMAxLn86uuIXEiWVrrTjL72YRkyFcEAZJXR++FHQx2W8YIck8fqFSF8cGs5A=
-X-Received: by 2002:a05:6870:17a2:b0:2bc:7007:5145 with SMTP id
- 586e51a60fabf-2eaf089fa4emr421620fac.9.1749837795943; Fri, 13 Jun 2025
- 11:03:15 -0700 (PDT)
+	 To:Cc:Content-Type; b=r+0tKsyQuv/00ta0/2TInysyq5G2CgcwIj3etfFSF+IczCuuZ1H++h1oA9SWGTY9mrRu888y50JAomGCPGbJw3/VjGL7YVvLgAhhgU69guF1kJLLdQIH5ekqea8cORi3QjO4B/JFDLBgm0gMI5QUJed/zJu+x0n7hZjihbc39Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rc/SufIb; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-235a6b89dfaso3343005ad.3;
+        Fri, 13 Jun 2025 11:14:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749838494; x=1750443294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wF4gp/2m+krKdbuHM8VFo8aUcpegmRfbsaqd6bWd3zs=;
+        b=Rc/SufIbtuMmpD6Mno48+Skl8X3xzck1mg4EWxe6804WHz7pH+EKgPkswvbcEreSu5
+         55oqAjn/WPxKlODXvgqYjSkFBCqL1PKYy600xyIsvMHPH1REnw8Ojtr/BDShRpubjeJN
+         ChUiAy3pCMUuKVUJof1Md+byZ9whV3SJxm7JwR/1509jvdE1gjBNJHIdSLnFdoRJ9/LO
+         9gEr1lBKgiqaa9Jp+3R/RP+TjyjPzLG6jSJXMRfcZPUlO3V3d3vCyyDb5fRGHECh5BQj
+         8ItRs+1gNF+br83shz+NqLHQiRChLMODrK1bmne9LMXgfjFawxW454wsP6mutWOOOI86
+         XPpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749838494; x=1750443294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wF4gp/2m+krKdbuHM8VFo8aUcpegmRfbsaqd6bWd3zs=;
+        b=a1nh24khltTWa4mq05V0VzYI57drDu/r8guM0wAOrPkxvvSoLE69Rj4ChrKjmLdVyR
+         //hLa/Efx2F1Qmr1HIwOBV/5RxTD8bA7dHmGLiNs6D+Xld3gMC3iLkd0keR0f5wTchVP
+         damEV7SwcZhLOQPWvvq14wZyF4AolRuSx7nhOdElbEabZBs7yPGxJziNsa6Gwlng1Rzl
+         qBvTOkWOZFgZiuSQhgi1zpmvALOrXafvyxQME7CBzNNAY25Wrd9zRSNk7LpWDnxBOxxH
+         2gyTDSZ7GUpOXTib6lJfR7ScPsF1MOJM7Lkc5g/X5vzERBI5QkFO4UzV69GW+QYN/xgv
+         IldA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3LN9yfgUSWIJHmnl8PNaFAmvjXZk3bcW457RiAKzEBiQ68wmU5SzrBjQA73MBBbv4xgrlVXaSZMGe@vger.kernel.org, AJvYcCUHdPdao90MhiLwLKsAwfVqHpmXqGlgVTMFtmSNd+eL93lbVdR24OLce0dymDr3LqcjwNYcVLgO@vger.kernel.org, AJvYcCUPaoZiGpnoKO4M72G3wLUM28MVs/1Fnrbfduv+rnqymyOhIXeO5It7dUOHpWAp1D3jH68pxI16SfK5wZQ=@vger.kernel.org, AJvYcCUzM1y4jq8dbckYTzfQgVanNb98jKiF7T4PB9AAHhmpfalKuY6gsjeWD+a4RHXyplrZ7IW/yv2kW7MixE4S@vger.kernel.org, AJvYcCVhXaiv16f12Fl5+p9ZAuu/cBk/u2Ndk90zp6hmkclL09yM5xwTUwgKQVKQtsb/Cc7WXm/Jmh1cD6LPVEDJiSY=@vger.kernel.org, AJvYcCW/6sPwSn0aJXdOaSH9OOT5wp3BYbITyCZgVDn/VB3qQMOfe+STW3AyL99n2SraDQBNQeDok7v5rUl9Tjh0@vger.kernel.org, AJvYcCWb2K0JENWU1RB1FxUR/0SMZ9RfuULepOHJUw5IimNlklWCiR2eTZiAm3tjMQfgXnWtaShyimVgwshb@vger.kernel.org, AJvYcCXZhCj3LEzW4HlFMEEA3xlCJmf1p5VezLoZGJuwb6hZ5nInK7KF0MMlKoQ8NktyIO1jcC43gIUgSrHGLb67BwKv@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqd+YBtiMxx7BsSJ/M5sHvCtilN4OrfwatALPNxn3Ygy5Efjz4
+	qIHmkoLMatb55QfBME9BxxU/x66CVXSxxPVYAQiqldGEq8ZAxZyZm1kWZeYhbT92R+NgFnKqG5q
+	aadVQaRdXX52b3AlwbnXma/9VwLbUJUY=
+X-Gm-Gg: ASbGnctTTRR7XYh0Ygs0sWzTsWBS55j+naRltlgMTgeBbp7l20bOQ972SXXRs15/tUv
+	Ib9FkNxMiUp+eOsk9vjFK8dZ7mLKHtVoaspcQyXqnzljU3tcovx7+DN9qSopHuRxK7BiSMGBP3T
+	5RTBQZwqOTHOs/LKZrSQcoOWQ6LcONv6QLdo8km5vUGxQ=
+X-Google-Smtp-Source: AGHT+IFYalb1OTW7qnfDKSlOci9VWDAXekpMbN5b2vtf3GW8ZUpuOTwRiHQFxL1wuWQtjgsw7eVkO7CajlLxN6YkM2A=
+X-Received: by 2002:a17:902:d48d:b0:234:d14c:50ff with SMTP id
+ d9443c01a7336-2366b00ba59mr2634725ad.6.1749838494222; Fri, 13 Jun 2025
+ 11:14:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609154051.1319-1-ouster@cs.stanford.edu> <20250609154051.1319-6-ouster@cs.stanford.edu>
- <20250613143958.GH414686@horms.kernel.org> <CAGXJAmxQn_iAqhOHwxEQ16n+MKjFyEbiUoBbGyDY+TLYooeJhQ@mail.gmail.com>
- <20250613171833.GN414686@horms.kernel.org>
-In-Reply-To: <20250613171833.GN414686@horms.kernel.org>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Fri, 13 Jun 2025 11:02:27 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmySuyiB3+c0_Rj=1X9wZwG7H0qhRtuvowfHke392vEpAg@mail.gmail.com>
-X-Gm-Features: AX0GCFtf_NxJbBhChjWYhKtRbKv2qPAJqzhRySeh1v97j636f-4dc6HIg8L5VhE
-Message-ID: <CAGXJAmySuyiB3+c0_Rj=1X9wZwG7H0qhRtuvowfHke392vEpAg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 05/15] net: homa: create homa_peer.h and homa_peer.c
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
-	kuba@kernel.org
+References: <20250611-ptr-as-ptr-v11-0-ce5b41c6e9c6@gmail.com>
+In-Reply-To: <20250611-ptr-as-ptr-v11-0-ce5b41c6e9c6@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 13 Jun 2025 20:14:41 +0200
+X-Gm-Features: AX0GCFtsUq0DPj-o5G6erQ-PfWcX7A0QtacSDQOlDe1Lx8EsxSkeObOaFNw6_Co
+Message-ID: <CANiq72m1ZWxPgCda1C-8X5XOvEq9Z9JfJZqhU4ZUzZ64=N+2fQ@mail.gmail.com>
+Subject: Re: [PATCH v11 0/6] rust: reduce `as` casts, enable related lints
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Scan-Signature: 9c8d7c79e82d9ccd3af9a51b4d3246f3
 
-On Fri, Jun 13, 2025 at 10:18=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
-ote:
+On Wed, Jun 11, 2025 at 12:23=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
+> wrote:
 >
-> I'm suggesting moving murmurhash3_128(), say to lib/ at the top
-> of the Kernel tree. And I'm happy to assist with this.
->
-> Aside from being accessible, does murmurhash3_128() meet your
-> needs in it's current form?
+> This series depends on "rust: retain pointer mut-ness in
+> `container_of!`"[1].
 
-I think so. I'm currently using a 32-bit version of murmurhash3. I
-assume that the 128-bit version will be fine functionally, but I'm
-wondering about performance. The keys I'm hashing are small (24 bytes)
-so the 128-bit version will spend most of its time in the tail code;
-will that end up being significantly slower than the 32-bit version
-(where there is no tail code because the keys are multiples of 32
-bits)?
+Not anymore! :)
 
--John-
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+
+Thanks for rebasing, Tamir, I appreciate it.
+
+This has a bunch of hits in configfs, cpufreq and Nova [1]. I guess
+you built without those enabled.
+
+Could you please fix those? Since this affects other maintainers that
+we need to ask the Acked-by to, let's try to at least give them the
+final state.
+
+Thanks!
+
+Cheers,
+Miguel
+
+[1]
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:429:9
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:467:9
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:479:9
+
+warning: `as` casting between raw pointers without changing their constness
+   --> rust/kernel/configfs.rs:564:48
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:721:39
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:764:35
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:783:35
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:764:35
+
+warning: reference as raw pointer
+   --> rust/kernel/configfs.rs:783:35
+
+warning: using `as _` conversion
+   --> rust/kernel/cpufreq.rs:650:45
+
+warning: `as` casting between raw pointers without changing their constness
+   --> rust/kernel/cpufreq.rs:650:45
+
+warning: using `as _` conversion
+  --> drivers/gpu/nova-core/driver.rs:22:64
+
+warning: casts from `u8` to `u32` can be expressed infallibly using `From`
+   --> drivers/gpu/nova-core/regs/macros.rs:267:26
+
+warning: casts from `u8` to `u32` can be expressed infallibly using `From`
+   --> drivers/gpu/nova-core/regs/macros.rs:267:26
+
+warning: casts from `u8` to `u32` can be expressed infallibly using `From`
+   --> drivers/gpu/nova-core/regs/macros.rs:267:26
+
+warning: casts from `u8` to `u32` can be expressed infallibly using `From`
+   --> drivers/gpu/nova-core/regs/macros.rs:267:26
+
+warning: casts from `u8` to `u32` can be expressed infallibly using `From`
+   --> drivers/gpu/nova-core/regs/macros.rs:267:26
+
+warning: casts from `u8` to `u32` can be expressed infallibly using `From`
+  --> drivers/gpu/nova-core/regs.rs:35:65
 
