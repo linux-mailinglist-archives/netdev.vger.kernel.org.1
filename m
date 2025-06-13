@@ -1,132 +1,119 @@
-Return-Path: <netdev+bounces-197575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E70AD939E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 19:16:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 378A6AD93AA
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 19:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0C8D16E9DF
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:16:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2F543B3A4B
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FA4221D94;
-	Fri, 13 Jun 2025 17:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB03D224AE0;
+	Fri, 13 Jun 2025 17:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SaV7VmZa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1E3202F8D;
-	Fri, 13 Jun 2025 17:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89893223DF6
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 17:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749834960; cv=none; b=GaNEwcdwfSxykmMwJfZJ/CsWkZ8tuvikqwqGbc3CkuSezkp6t2M/JXH1dJL4OBv8TrNnhb65aa7fGRl+5YPWfGzxs99NZia98WoMr/LsldrDAHtXBdjn7G1xUaJMzhmYBjYrAO5+I1GSt31nmBaq0VtWw1xABiYN1B64p5QoGAs=
+	t=1749835119; cv=none; b=CT1EHJ5bGxWv8a7ZOtdNhHqeNsTeESxIU5Vlh0giQrfwZcnTQbQvJCr2Msuy96WF09u9lTJ2NXRM578cDTxEr5hhbrNRVdyJqk3Jhca8hbpAb4WuN73l6dehP0zlz5ygEd+/p/pcctBF/Gr+RyA34UciZHrd4LvRvRcybSKROyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749834960; c=relaxed/simple;
-	bh=1ZH2b6ZUlZPaBRuBt/hNdxgZCldvvpeb2gvA1spBNtA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MPqK1hCBJxVwaIZNW7Zb3haHcwyjdKMoJlZOLMH7XAuj2wMuFMXNQ7Kxo9TpPdEpDnUlNokjtlZdr7LfQnYKsJ8u6AO2HoeOq50vqXIBptK2r4cRIuz5bnttyaFPlLwQWFj0mr+PbHxJ5CDoDIWsgZOKHn+mNgEVYpM4SHXiDJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ad88eb71eb5so311771566b.0;
-        Fri, 13 Jun 2025 10:15:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749834957; x=1750439757;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UGxEYwfOd0Ujd5Hw1wX1Gnw78aFNFWkj5mQx5XWTxjY=;
-        b=kLesICXRV7BDN20iWe/vEq4MERVO+s+HEedgXVvbkUCqhhDvoiFxdGw94MV+uoPl1u
-         0z0jO3/NHp7wGxK+pFQno1gtQK9qobIS5UBABan0xEMbLXFhHV6n6MlYHlBrshPEg8Q4
-         iRhTUWJgRGMZz8UpxbAn13aXdOYAc28kTjBSF2CKkf213VPC7HNK3djZhR3Ku/oUrj+K
-         2y5BRWnnBO/WtqN5N8xSZ5ZXsdE+9HihNIBlRsnmwt87PJoP1GAY7EVdfyKlfEHgs4uR
-         o5MP7ZrZmGErFYXs+ijaGwGmYYqrkmxj0Qg4rmgVdTY82k3L2HzcUcsNsv12BVlA3Bjw
-         NRvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV00uSrO83dq6uFC/EuKyhenGYI1rTtZZ7sM96JA9n6Oc1hD+6WEiuhEfmNGQsNEdJJjZslzt74UTeDcpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf+6t0QO5bUZd8dhQHGScFhdSS9GATcSGgwcNqy5bM0uvzHMIQ
-	ylxC11kwzJNEJmlR3JsfmxQhuAAtpxq/sJuMaM95HlKhbT2IvRL5/q0j
-X-Gm-Gg: ASbGncuPfoiezWnqMMlZYzcE6dAoYYI7+YyrAh/W4X+CXywkQl/M6v+elKMLQGz2Gfb
-	Im1wD/LG9lbc4kfZjdLtzBo1aRkEd8seJaBE5/7Q20BfhMRUe3rmaiThVkSLfSyTWXm8WNNkHJm
-	goTD+D5PKTbFeR8vqWMlP7aF1gjW/kdqRhmDzkPW3Rw9OlaPjiE/tVi/ZoaConuv5mSyYAuurdj
-	ZWwcGiZNBOoANPOh5fd3xV4AA8f0suc1z8DqNtjxzZ3bOAEDzEZT1rfOZ5ymGxxk6nOZZ1zVU2W
-	tDSa4T5iZwgL3ov5QdXHdidDpr0mAY7kmdGB+AczarzjA2GW6TiJug==
-X-Google-Smtp-Source: AGHT+IH+FY+sXP60bK/pav/b5kHtQnQtXciM39phg3rbYnFxvYvjqOmz/uO/j+iPDOYwnei2I4q8eQ==
-X-Received: by 2002:a17:907:7b8b:b0:ad2:15c4:e23f with SMTP id a640c23a62f3a-adfad327357mr2598466b.13.1749834957036;
-        Fri, 13 Jun 2025 10:15:57 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec8153529sm156155666b.23.2025.06.13.10.15.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 10:15:56 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 13 Jun 2025 10:15:46 -0700
-Subject: [PATCH net-next] ptp: Use ratelimite for freerun error message
+	s=arc-20240116; t=1749835119; c=relaxed/simple;
+	bh=2zYTssG6g5pp5PrZu6ZcoczYQpJEQlrjjNFYRG6yupE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IzaSTHAa1X2ZRi6DjowwviAROalOoqrXMbwz6o2edbRveNLSmgOmF3MSccLVenA23Lf/PQd47rpnxKHksxqxpVL4WZwjZPWGP/nY/NhPGUAlomIJXlIhrwzJiLi6pkNI/dbd2abMCKQ5hJlUtmc13UWr1LnEOPI+X2aT5l65UsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SaV7VmZa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E904DC4CEE3;
+	Fri, 13 Jun 2025 17:18:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749835117;
+	bh=2zYTssG6g5pp5PrZu6ZcoczYQpJEQlrjjNFYRG6yupE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SaV7VmZaQSHjmnVoq0m2QAhb4Z3hHJWFyA7HTFRFNJvQZ9YBbU7W34d6sbNGFKWWu
+	 kTtHx31aF4x2nxQCHn889BQQCtDQC6jEma/H01PNVirDG4nEYA5jbaUyvLkJaCKRnC
+	 XKYG603hwftSiZwiMxSeCoeCTPVHvTeDNtsE9k4tDREKt5jPx54ONhYexcTqVtkxz/
+	 b1ze6ppJuyxCe68Br3q8wnG8o0yy3mnLMG5oP5DSjtgZ8IesCc31EPra2P6l5v/8nR
+	 aU1wOSuLCFjmlf0g3RzEPA8KREUSjMt4ptUV4DgHDQuF5zeWaucYQuryApTMy/mw8Z
+	 r9xStUmqIpVwA==
+Date: Fri, 13 Jun 2025 18:18:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	kuba@kernel.org
+Subject: Re: [PATCH net-next v9 05/15] net: homa: create homa_peer.h and
+ homa_peer.c
+Message-ID: <20250613171833.GN414686@horms.kernel.org>
+References: <20250609154051.1319-1-ouster@cs.stanford.edu>
+ <20250609154051.1319-6-ouster@cs.stanford.edu>
+ <20250613143958.GH414686@horms.kernel.org>
+ <CAGXJAmxQn_iAqhOHwxEQ16n+MKjFyEbiUoBbGyDY+TLYooeJhQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250613-ptp-v1-1-ee44260ce9e2@debian.org>
-X-B4-Tracking: v=1; b=H4sIAMJcTGgC/x3MQQqAIBAF0KsMf51glhVeJVpITTUbE5UQorsHv
- QO8B5mTcIajB4lvyXIFOGobwnr6cLCSDY5gtLF6aDsVS1R2Wv1u7Oj10KMhxMS71H+ZEbiowLV
- ged8Pusl9OV8AAAA=
-X-Change-ID: 20250613-ptp-58caf257a064
-To: Richard Cochran <richardcochran@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1067; i=leitao@debian.org;
- h=from:subject:message-id; bh=1ZH2b6ZUlZPaBRuBt/hNdxgZCldvvpeb2gvA1spBNtA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoTFzLWTOEeoS8B5ihZOT6Y31FFXEtnxOdn+KDa
- IPJfMiYbOmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaExcywAKCRA1o5Of/Hh3
- bcsTEACj7l/UGxvz6U1UkdstkVxhcZtyUS41h5ofTjNKIDkqY93hHqEJByPXrruvhPydigVU79J
- YezarOTuk6udAZCeTPpPJlP9NgsbMR/KWwlyP6RpuiP18dCAlzq8VuuhqBYnw67YZyP+f3CeC6G
- 8QcvhCHIQZcYmTrCCq3D6Cwr/hYTu95qxUoUQOiNmxkN/3cRwQcV3leVp5EuiPS3y/TsoS+oVVK
- S+cGLiPL9U4B269RitLlYPRw8fSztZd7qJzeur5FkyG/t6iZsC0Md+Xk8UEiY11dHsVnBK+g1QA
- TbmAhNyjAbfBdkF4wQp8ye4oFd+76jTFlyywbkoVzjb7rkiuI6aUkKTN8FrJE62r7PLt5OnW1Ca
- 4nvgEHa8Tm7F86G7JOpK64gD+WlZmsloBbfWSAmC289ZClbTCOD6b21ax1nBp4h1DTwMC253wY5
- 8yCJz38caLsCcDstNrYbroBbD+oJbBxNyKwEWjXSQVvdYcvrlwQHbiay5Lbtocbr2831qI09NwV
- 1TkRpF/HIzjkip47v6ok5UKW83ZzME3JL1iCx+05GKWenbXPb83BkxVWoizt4u3YFN372+O0exJ
- 8Rq5spxtv2R7mwtSQfiQs8wuJvQC1ucaf1/03ma1CsD/dt19CoDz+OBtJDlYEcjUDoJ2IunlDTB
- T9vbpw+sYJppdpA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGXJAmxQn_iAqhOHwxEQ16n+MKjFyEbiUoBbGyDY+TLYooeJhQ@mail.gmail.com>
 
-Replace pr_err() with pr_err_ratelimited() in ptp_clock_settime() to
-prevent log flooding when the physical clock is free running, which
-happens on some of my hosts. This ensures error messages are
-rate-limited and improves kernel log readability.
+On Fri, Jun 13, 2025 at 10:12:11AM -0700, John Ousterhout wrote:
+> (I have implemented all of your suggestions for which there are no
+> responses below)
+> 
+> On Fri, Jun 13, 2025 at 7:40 AM Simon Horman <horms@kernel.org> wrote:
+> > > +/**
+> > > + * homa_peer_hash() - Hash function used for @peertab->ht.
+> > > + * @data:    Pointer to key for which a hash is desired. Must actually
+> > > + *           be a struct homa_peer_key.
+> > > + * @dummy:   Not used
+> > > + * @seed:    Seed for the hash.
+> > > + * Return:   A 32-bit hash value for the given key.
+> > > + */
+> > > +static inline u32 homa_peer_hash(const void *data, u32 dummy, u32 seed)
+> >
+> > Sorry if this has already been asked but can homa reuse the code in
+> > drivers/md/dm-vdo/murmurhash3.c:murmurhash3_128() (after moving it
+> > somewhere else).
+> 
+> No problem; the question hasn't been asked before. I'd be happy to use
+> an existing implementation of murmurhash3 but couldn't find one that
+> was accessible. What do you mean by "moving it somewhere else"? Are
+> you suggesting I add a new murmurhash3 implementation somewhere
+> "public" in the kernel? I'm a little hesitant to do this because I'm
+> not at all expert on murmurhash3: I'm not confident about getting this
+> right. Also, I wouldn't feel comfortable taking on maintainer
+> responsibility for this.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/ptp/ptp_clock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi John,
 
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 35a5994bf64f6..335e88d3ebdff 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -96,7 +96,7 @@ static int ptp_clock_settime(struct posix_clock *pc, const struct timespec64 *tp
- 	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
- 
- 	if (ptp_clock_freerun(ptp)) {
--		pr_err("ptp: physical clock is free running\n");
-+		pr_err_ratelimited("ptp: physical clock is free running\n");
- 		return -EBUSY;
- 	}
- 
+I'm suggesting moving murmurhash3_128(), say to lib/ at the top
+of the Kernel tree. And I'm happy to assist with this.
 
----
-base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
-change-id: 20250613-ptp-58caf257a064
+Aside from being accessible, does murmurhash3_128() meet your
+needs in it's current form?
 
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
-
+> 
+> > > +     const struct homa_peer *peer = obj;
+> > > +     const struct homa_peer_key *key = arg->key;
+> >
+> > nit: Reverse xmas tree here please.
+> >      Likewise elsewhere in this patchset.
+> >
+> >      This tool can he useful here
+> >      https://github.com/ecree-solarflare/xmastree/commits/master/
+> 
+> Thanks for the pointer to xmastree.pl; I wasn't aware of it and it
+> will be super-helpful. I've fixed all of the reverse xmas tree issues
+> now.
+> 
+> -John-
+> 
 
