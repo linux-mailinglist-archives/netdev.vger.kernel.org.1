@@ -1,79 +1,95 @@
-Return-Path: <netdev+bounces-197286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA93AD8047
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:30:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1458BAD804B
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11073B15B5
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:29:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 198A617C925
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78681DDA1E;
-	Fri, 13 Jun 2025 01:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E041DDC00;
+	Fri, 13 Jun 2025 01:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q94CNsO3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuITyTqQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7E172636;
-	Fri, 13 Jun 2025 01:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEF31D61BB;
+	Fri, 13 Jun 2025 01:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749778200; cv=none; b=jrDOwB0mN0sY+SMiz3OJbkSSnDGJSZs1YoybAdbqvlxXkPevHsdjwNmrduquGsLBq94XxePqUqcetQTkN6Dw+9yjrXFTYIhzlA4B1hzOPx2gRVQS5l9JqZdvAox29tCqaz5BXrUwygiUzNIs7jE1h/1NqEuZzUNLFERxorSi2G0=
+	t=1749778209; cv=none; b=AKMWvJjVLPDWlb/dfXvBbT8mx8gjWVLBw8Mfj34IHesvrmYlrq+cNPd5do23ukyZ+Xin0CFUUD18z6edapu8vsyYO7P3EBnVPHooJLysc3nXD2NEV2DXLi58MVYXaGTUbvRG6t+oJFYtn8Ic3DjPxQfMIT9oTnOnApqhFQQ8BZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749778200; c=relaxed/simple;
-	bh=RqMcqn0JWcgiJ7EPq03fKjRRCEN6dTdTUjbtUhbkVY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GWPu9RAEwjO2kHHTJs4VKAF7q3xC8pk1dXZQkMsOtuEQfM58BxRQdWgSoAPsWh20TDTT20rUtrHcT1W6VZDmgzncStTq/mbsqG7OmPLOkI9HfdK6YPin6eR8EN0OTfGZQ0qJJEfoPMD3l3sHnP9IAyTxkLoDPEjD6av2XEVyQyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q94CNsO3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39684C4CEEA;
-	Fri, 13 Jun 2025 01:29:59 +0000 (UTC)
+	s=arc-20240116; t=1749778209; c=relaxed/simple;
+	bh=LGozbvg8wuN0oUN5ZIjdqt3AjKmMD5qfTZM/TgcpT4s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I1OwuN8Br8gYzQeLV+tQG3TipsHjHJunPYP2gM0l1kmuRW3Fwt/XixylnLxP/85Z1JBimdYjOSOEBFmN9BL50sZvqf3LcEPwpDvWBmlw8cDkcC9nPkPaRgyP75Ztf1ZjCwmYst1r5Q3lHeQa+s8rNxiC8G8pHXZgtk91Qr5r46w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuITyTqQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C33C4CEEA;
+	Fri, 13 Jun 2025 01:30:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749778200;
-	bh=RqMcqn0JWcgiJ7EPq03fKjRRCEN6dTdTUjbtUhbkVY8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q94CNsO3znQfKi0xRGCXB/Fk3qrKKSZAAz74XJRYRyiJN8bEkUArl86tJ9bVMcKVl
-	 FhTHXgtbQ9LkNYdUrYyRhX/F+WGnGaj0T9fPBADf6Ltzqz7sq4GgiD3oASo5FlxXpN
-	 mB9ZxENtk92E8T69NZbg3uupmmfF0gVDd1OVBSoiE3uD7m7ez07yRIz1GbpgSQW+cf
-	 1Mku5nql8dRmwIxfFwPameDsRS6hY1H2rExcEDzMiyaWNMOdZd4lapVSsJ72YmJnxc
-	 GN7uicZrXfIRBGx0DmFihnbp/aqu5hPFFX/Irqs9PYWIIbKa3hV0qvXkkNZoiW76xs
-	 rmpiCizfQ4J3Q==
-Date: Thu, 12 Jun 2025 18:29:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: George Moussalem <george.moussalem@outlook.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, Michael Turquette
- <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Philipp
- Zabel <p.zabel@pengutronix.de>, Konrad Dybcio <konradybcio@kernel.org>,
- linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH net-next v5 0/5] Add support for the IPQ5018 Internal GE
- PHY
-Message-ID: <20250612182958.7e8c5bf0@kernel.org>
-In-Reply-To: <DS7PR19MB8883E05490D6A0BD48DE11909D74A@DS7PR19MB8883.namprd19.prod.outlook.com>
-References: <DS7PR19MB8883E05490D6A0BD48DE11909D74A@DS7PR19MB8883.namprd19.prod.outlook.com>
+	s=k20201202; t=1749778208;
+	bh=LGozbvg8wuN0oUN5ZIjdqt3AjKmMD5qfTZM/TgcpT4s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KuITyTqQ96SNY9NwvSEKX477bvRluNEF1+hXIzDcbNbwvnt6kcGuZJOjUmRtBcUJ0
+	 O6uWcoZTPPSpCHts/TRyek6/rvtUSoYlikli3J64IrPSkrJkJoxolGS2MgVDzpsaZP
+	 I6ACd5gLwDpZa6NLW9tgBDXo+arfHXRx6vKhg1vu7rQGG7EodXqsSnhKxzZR0y6IyR
+	 L5fxbaHf0wfeDke+WRKCsOzL3RhEGZUx2ER6k/FezQelCEU0jxn24BTgCkEEo1rMvB
+	 OfnRRgcS9+4cAYaW9+jfgeq2iDZr/OK6qpdE+P4Kq8OBrYQ7K6g/8oeKkQJaTFcEWn
+	 DUelvTK9SmZfw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC8939EFFCF;
+	Fri, 13 Jun 2025 01:30:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ncsi: Fix buffer overflow in fetching
+ version
+ id
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174977823850.179245.13765419017605151253.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Jun 2025 01:30:38 +0000
+References: <20250610193338.1368-1-kalavakunta.hari.prasad@gmail.com>
+In-Reply-To: <20250610193338.1368-1-kalavakunta.hari.prasad@gmail.com>
+To: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+Cc: sam@mendozajonas.com, fercerpav@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, npeacock@meta.com,
+ hkalavakunta@meta.com
 
-On Thu, 12 Jun 2025 17:10:24 +0400 George Moussalem wrote:
->  [PATCH net-next v5 0/5] 
+Hello:
 
-I guess my explanation wasn't good enough :)
-This is not a correctly formatted series. It looks like a series with 5
-patches where patches 1 4 5 where lost. We need the cover letter to say
-0/2 and patches to say 1/2 and 2/2.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 10 Jun 2025 12:33:38 -0700 you wrote:
+> From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+> 
+> In NC-SI spec v1.2 section 8.4.44.2, the firmware name doesn't
+> need to be null terminated while its size occupies the full size
+> of the field. Fix the buffer overflow issue by adding one
+> additional byte for null terminator.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: ncsi: Fix buffer overflow in fetching version id
+    https://git.kernel.org/netdev/net-next/c/8e16170ae972
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
