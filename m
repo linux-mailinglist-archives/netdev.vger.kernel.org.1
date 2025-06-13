@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-197638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B34AD96B1
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:55:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC7DAD96B3
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85B783B618D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0914C3B0D88
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EBB24BD03;
-	Fri, 13 Jun 2025 20:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450BD24BD1F;
+	Fri, 13 Jun 2025 20:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CkKpxNJL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kvA1iFRT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6087F2397A4
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 20:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8275A2397A4
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 20:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749848149; cv=none; b=rgwrm4sjlZOdSxse4fD3wzXzapaYZUYlb7/S8COrv+LBe/feft7XdfBhLr/VHNjRjoVD7xY3B4M/l6XHCSU89LQL3R0uuloZy7Co9JngqKH7pdIqvl8rDMfVYyR8rzEqCDQKiyAe+MpGTKwSlHkR6CSTMnav63Wfh5JJ8pKWjUQ=
+	t=1749848228; cv=none; b=pLfqidmpPJkz4ln0B89x7QjdGkBDFDtGepDi1k6sVyCm4Eh2sE4wGt+WWN8qrrg/l5PzjNjigpx3GQnPMn9qbCPSgj31XAJ8OckuYYagsFFm5iD9I6CwrDvnHXCZM7hj0cUWJTfTP5ki1qL7uhdECS1qfX1oc9LLuZzy+XKe53U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749848149; c=relaxed/simple;
-	bh=3Cd6E+x48vTJ/Di806kw8GWF0zFvVlSVPhElv2kiwG0=;
+	s=arc-20240116; t=1749848228; c=relaxed/simple;
+	bh=XAE7d/8nPl3zmGyaps5cm8X7/4uCTIDiGo1Mhm+a0lA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=mIhgDQVAzBk/z7CyrFBfPphdTBljhW4KECwuXEFZoRaa0YbzMbCkm4k6srFRneH5s1fiY5NGY79GngDo78xrZauecKVq8e5TFpY47j/v7wYYPzpc5+fwMc7J6Ff9mG6KS9KdoOhIcQo8AH7DXIkb2qBKxiZ06iYxog/TfyKajO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CkKpxNJL; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=U8WDSuz5iGt5/nhQhUuMFt7ElWEEM9PRkoX28jf7I+bncIdeKtPxuyYx3LxEoMSzEfb4HYiRd6KjXAY2Piqils4pYstGQtRZlYjFANL0JoA1iquzAtHKgk5PKYYTgpr2dUt8S6o5AErdmcZMO+DgJJsOp1ToKQdAFTIc3pEKEC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kvA1iFRT; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4530921461aso22603185e9.0
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 13:55:47 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3a3798794d3so2358572f8f.1
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 13:57:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749848146; x=1750452946; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749848225; x=1750453025; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TMWtQZst4tyrdwntHwwl/96FUI4XNLUxqIS3adhLrlI=;
-        b=CkKpxNJLk4+91kV5OPlaz7a467pO/Io1Aj94r+pGOwmvTh4celt524wfJdocQ3R4h9
-         RBLbehfykC5Eqq04ArvinjaNim4316bSZjSEga3bbCPiyuBewMFbCCtIfzIcrcV067T/
-         erZdvUy7SJXwgCNfGeKeP+x2bk8oq3Rf4TUsiM+B1BVLtkj5V7MAAdo/6A77yvN80CxJ
-         3+CywXFdJn1di91ARcMOXKWjbhAkhsLboTncLCJJaE0xve6doX/tRSA+UlQVuo3NvMjT
-         CXgn/Ftv0U4gicRIcvhAyJjuC5mPxt66otDfED41yzE83kGlzsa3c9y8GHyhNOUQUFgq
-         t00w==
+        bh=ZUJEZhlsD8LdoJMMWMDckTyTxlFwpMwiOd0RVNvWzrg=;
+        b=kvA1iFRTCRF3gYjEZosPwOqYQCfqTjvLrMQtq6b6VX1stOVnptEKHvfgGJnXXGHyqp
+         QvbdqUgxs6W18pI/UXNNC47az1163Kbger9at69hfDClKrPR5NDlrdbtmhNrKbYcpc2w
+         oTT6JM9KOxGcB8RHbDd9wn0Nk0HpvX+ei1ul3MJxgfA0iLtXg4ufWN23/HOrHtWLSaNq
+         PBIbN+bXriHCl+aZMbBsTj26+WI7HLTWp+PKqClhtY0z6oKv966X0sHXw+7DbuXZMjdX
+         4t0OnJhUWQYP2wPStgUcsTcs7Pq6JHO6bnqFmDH9ruCmnqlYlV/ICwB+G/DAEuMoDUXn
+         Kv3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749848146; x=1750452946;
+        d=1e100.net; s=20230601; t=1749848225; x=1750453025;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TMWtQZst4tyrdwntHwwl/96FUI4XNLUxqIS3adhLrlI=;
-        b=ZAFhuWcQ2D5CsgB/o0VUndoXSaoDywJJ9TsPY5xfDBZnprLag2bn1ABgmyqYKsLJtn
-         JAuTQ7SwJjT5SCVa7qwmDPwqGkjCdNPkw5KIXLw7a1FK4xMWk2gIDhR/vDnsKLdqsQG/
-         eobgA8A79M9RXLhSNasfRIfv48NVJbGS3pwfW3c6g8FXPS46qJFMB7zbdWCq9BPxhnOI
-         ou3s4x35H8Vqa/02/3+JzkKARuwgWSy1GlzxiY7+yoOpARBylO9uLj6FS2iCA5SGZBDM
-         n0lKzPbIAJhByITIHpnbNAmMi3mnoXo5QVHEjZDgmWMxN8jVz8H6NVdH/ZerHyRKq+fJ
-         MHLQ==
-X-Gm-Message-State: AOJu0YyL+a5UcatXpLYEl7hJG3ouzpr2cHSqlIJDJpo+5QBLQefTRKPi
-	zVNipmVfGPZrRX1oLdGPmP1ds2Xnl9nMtKH2qBwwEwts6ACS/1RONS2x
-X-Gm-Gg: ASbGnct8LXOSZdWpouHbiTVYNjd6t9+1ENt4o8XkGYigxYxwuR5DmIIs2ZC9eputEEd
-	7w4A/XGw0gryqCP07PCLqINB3FpTJ9ozrnZqVOyC+J9Z2Zb9i53pj7GRNvnuupDykS280lMC+KF
-	WqYoijjPL+uOddN8Lup91DfhjanGFTswkKMhaJm8xUER8NGYsImcLTCb6oOR29oqlem7v8zynYB
-	wJ5iRQv6Z4KjFVFU6P/vQBhFU6OE4w+aiyrJ1eOzV26kvcGGwxaCJqMJNgxkfJMSdPg28QtSeVQ
-	LvwDkBeP7IT4mo9uNHTY64gJ7pdy2wd1D9U24KatqrzxIO/P7o7h9x1rc7mtgy5Bk/kd9n00SXd
-	n0QkqXVWw57VcmVKsGlcig6+VNTWw+hX6B+SOvVL+9Eg1PzlGkArn2hYSsHwRk7wUuW+tO85Bl7
-	sGaToy2UxvnnGHsppzqtBzdXOtGvZSWB0dHI1H
-X-Google-Smtp-Source: AGHT+IHqPCSzvCYrHIVkXckeuqhZ3SEcMYdhBO7TNrIViM1vsp3412R8WSoJMydVuaIlmWphIHoEBw==
-X-Received: by 2002:a05:600c:c16b:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-4533ca4f7a8mr13833875e9.10.1749848145629;
-        Fri, 13 Jun 2025 13:55:45 -0700 (PDT)
+        bh=ZUJEZhlsD8LdoJMMWMDckTyTxlFwpMwiOd0RVNvWzrg=;
+        b=pmgDjpdfjw+1r1r1grK9+ULYY+zXYxKoZi8nix/K27sly4HKd7iP7lrAZt/8qIRVCo
+         lLZoX9Fhuk6X+Y7V+Rr06aeyBUNhQnj5/tvk/SvxcnPXTgsqp25NMf+Rir3t+ieeQfCr
+         guezfU67ND/bRMbmUOxegsfFKYbIZ5IrdZDDIv81mrJHqArC5PUsSr6xwVbbyM+3uOpt
+         vO3kao81By01VfxNN2K6OToUPOyfdXhHEPoTzsB7LTMaNVZm/CVjcjxI9CdtlptvC/Qs
+         +VGZ7B3I4bR82+xflWMRXW8MQmT+mT46B79thZtp7Q/yQCAzxe1T5G0qINzd1x906MWU
+         2tTw==
+X-Gm-Message-State: AOJu0YyKUEK6WxGd9bmZiXDonqawjgJ+c0ACKU9wdCkNB5JzsajGiO3L
+	VPoaKdKqzh+GTJ1im0TpYAIQfuLrikJrGf7NjEIQj7nMym5s1M1NSEGg
+X-Gm-Gg: ASbGncuhZoSo2UJO80boHbsV9bw+rUAtkA6tb9EiDyO6KLvzgb16X27dQufwwc3qMFZ
+	DW9mihHC//m18XYypJl2lUotNciQgnJBWGq1DGIeHv0a7bbvsG79smwsi9IXOJRscG2rxIuHkbh
+	pZiogHHDTNEK96pT2Tn0B3u6/UvkjCz6m7HbSgkDs+9HBBDJ325/NaUZCk+Y/+HGR3Wmhk5873m
+	2ugEoj2Md/00kXY1nYg7kZMBnAXiYV4XuJtRns2AR9n0fBX2YI3YqdJZtaJqVN8vSCmB1gArLkF
+	sNpx9BkAJnfF5zQvPiyPHCXnlOPC7hJfT4OWSqTAg5liOtbIG64v71GQ+PuAkaLF2ogU9nWB8R0
+	k0F5vnRk2+uNOCdxkic5QqKF1gJYqzOSITB6S/qIezj2wWfG4YrIV69vX6+l2gSJui9KTTE35JH
+	5bKEFjNq9eO+ESxtd4D6LxINI1PQ==
+X-Google-Smtp-Source: AGHT+IFQepgeY8kBD0/DctJUwPh87+RnkqocRbkhDbZLU7wYZLgoG52nKcv9kIlsKVeG5VNwg6960g==
+X-Received: by 2002:a5d:5888:0:b0:3a5:2e9c:ef0 with SMTP id ffacd0b85a97d-3a572e7973emr1269742f8f.46.1749848224717;
+        Fri, 13 Jun 2025 13:57:04 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f1c:2700:11ba:d147:51f7:99fa? (p200300ea8f1c270011bad14751f799fa.dip0.t-ipconnect.de. [2003:ea:8f1c:2700:11ba:d147:51f7:99fa])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4532e224617sm63577175e9.2.2025.06.13.13.55.44
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a568a5405asm3481863f8f.13.2025.06.13.13.57.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jun 2025 13:55:45 -0700 (PDT)
-Message-ID: <95375cb2-e887-458b-b87e-3f6603ca9a36@gmail.com>
-Date: Fri, 13 Jun 2025 22:55:54 +0200
+        Fri, 13 Jun 2025 13:57:04 -0700 (PDT)
+Message-ID: <e43a6ede-3654-4e6a-821b-d300948f48a3@gmail.com>
+Date: Fri, 13 Jun 2025 22:57:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/3] net: phy: improve phy_driver_is_genphy
+Subject: [PATCH net-next 3/3] net: phy: remove phy_driver_is_genphy_10g
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
@@ -139,66 +139,58 @@ In-Reply-To: <8bcd626f-a219-43e8-a0c2-aa04148d046d@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Use new flag phydev->is_genphy_driven to simplify this function.
-Note that this includes a minor functional change:
-Now this function returns true if ANY of the genphy drivers
-is bound to the PHY device.
-
-We have only one user in DSA driver mt7530, and there the
-functional change doesn't matter.
+Remove now unused function phy_driver_is_genphy_10g().
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/phy_device.c |  7 -------
- include/linux/phy.h          | 11 ++++++++++-
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ drivers/net/phy/phy_device.c | 23 -----------------------
+ include/linux/phy.h          |  2 --
+ 2 files changed, 25 deletions(-)
 
 diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index bbd8e3710..c132ae977 100644
+index c132ae977..e2b5d9016 100644
 --- a/drivers/net/phy/phy_device.c
 +++ b/drivers/net/phy/phy_device.c
-@@ -1722,13 +1722,6 @@ static bool phy_driver_is_genphy_kind(struct phy_device *phydev,
- 	return ret;
+@@ -1706,29 +1706,6 @@ struct phy_device *phy_attach(struct net_device *dev, const char *bus_id,
  }
+ EXPORT_SYMBOL(phy_attach);
  
--bool phy_driver_is_genphy(struct phy_device *phydev)
+-static bool phy_driver_is_genphy_kind(struct phy_device *phydev,
+-				      struct device_driver *driver)
+-{
+-	struct device *d = &phydev->mdio.dev;
+-	bool ret = false;
+-
+-	if (!phydev->drv)
+-		return ret;
+-
+-	get_device(d);
+-	ret = d->driver == driver;
+-	put_device(d);
+-
+-	return ret;
+-}
+-
+-bool phy_driver_is_genphy_10g(struct phy_device *phydev)
 -{
 -	return phy_driver_is_genphy_kind(phydev,
--					 &genphy_driver.mdiodrv.driver);
+-					 &genphy_c45_driver.mdiodrv.driver);
 -}
--EXPORT_SYMBOL_GPL(phy_driver_is_genphy);
+-EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
 -
- bool phy_driver_is_genphy_10g(struct phy_device *phydev)
- {
- 	return phy_driver_is_genphy_kind(phydev,
+ /**
+  * phy_detach - detach a PHY device from its network device
+  * @phydev: target phy_device struct
 diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 5b02b4319..4daf6d69f 100644
+index 4daf6d69f..42ef1aae0 100644
 --- a/include/linux/phy.h
 +++ b/include/linux/phy.h
-@@ -1293,6 +1293,16 @@ static inline bool phy_is_started(struct phy_device *phydev)
- 	return phydev->state >= PHY_UP;
- }
- 
-+/**
-+ * phy_driver_is_genphy - Convenience function to check whether PHY is driven
-+ *                        by one of the generic PHY drivers
-+ * @phydev: The phy_device struct
-+ */
-+static inline bool phy_driver_is_genphy(struct phy_device *phydev)
-+{
-+	return phydev->is_genphy_driven;
-+}
-+
- /**
-  * phy_disable_eee_mode - Don't advertise an EEE mode.
-  * @phydev: The phy_device struct
-@@ -2098,7 +2108,6 @@ module_exit(phy_module_exit)
+@@ -2108,6 +2108,4 @@ module_exit(phy_module_exit)
  #define module_phy_driver(__phy_drivers)				\
  	phy_module_driver(__phy_drivers, ARRAY_SIZE(__phy_drivers))
  
--bool phy_driver_is_genphy(struct phy_device *phydev);
- bool phy_driver_is_genphy_10g(struct phy_device *phydev);
- 
+-bool phy_driver_is_genphy_10g(struct phy_device *phydev);
+-
  #endif /* __PHY_H */
 -- 
 2.49.0
