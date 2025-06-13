@@ -1,253 +1,89 @@
-Return-Path: <netdev+bounces-197470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F84AD8B75
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:58:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77E20AD8BBD
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:10:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE627188E439
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A41571891CEB
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD9F275B08;
-	Fri, 13 Jun 2025 11:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="aH4jxm+h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D31F275AE2;
+	Fri, 13 Jun 2025 12:09:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from joooj.vinc17.net (joooj.vinc17.net [155.133.131.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCF6275AE8;
-	Fri, 13 Jun 2025 11:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749815861; cv=pass; b=roTyQf8MW6jnc8gBJTTDqcEUJgZ7K6iLx1YTna8VuKEc9DvAiiSjzbEWAubJ8HyN17ynIq6doIEEITUgwYGpwRbWGTRGCrH0el5b/Y10N2wDFzIpN+uz8MMA1CXUnoxLTCPYP7/LWn2I4URHAtM+8qSe0wUpb47oecjOKA4BFGw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749815861; c=relaxed/simple;
-	bh=J/LiGYx2pI+X/zWJVR8t0tx0UfTlWAN5Rtqlhb88tSk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e1RiBMLhO9mmGQP7DEidD1pNvO+YN1cUMUyTo4MtySGq8I8BqIPRQnz6TPhvKw3clT7atFZwiIwfNEO5Yh8chf0Ry+uRwHDV13tTRCYvmvKvF0eOXS5ubtQ9OTsIuBQXEHbPaoD0GxPh/YgrWO4QAgXmTPEnlnoJO5DhU/PMnAQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=aH4jxm+h; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1749815771; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Qv1KDSKHQdZ6+3yO0tCwx580stgqRhgdR1eWghXJTDZtyiGx7RQHmg1L90+x7dHKNUwKDNqx+eFdgx6RYh/AYMp9Hd6/27pdWg7IqAuYs0lzyer337Y71hFqHuHVoFnlqP34W+pf1C9z0iI+k+cvv6NHKnyWGS0qSKZPhBQZw+0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1749815771; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=VUFg/+2IDq4vwt7epwImt1imkzKgQYu7+Au2agn49Og=; 
-	b=eh3ccSCAwV97vjQ2Wejl6j0pAhdgnsSOVWSzjjy8ZrEXHKeNc2M5mwWWm9BIkwTb5cz/Oi6q9Pt2S/anS803yiwhmEvgBmc77wb+1bjaXFq9+vjYPiEdzk0l/AXNschpDBX4uZS71aQEx2bv7U3DuiycX8ICe4WjcYYKdPlDekg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749815771;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-	bh=VUFg/+2IDq4vwt7epwImt1imkzKgQYu7+Au2agn49Og=;
-	b=aH4jxm+h9P4jRdgkpNEEWbu91bORykVFmBm30jloQNEwnbBe+tfx0YNts1xmU4nB
-	yyLgKbYaNvsMh1bnLG0PRSriWUHXbglLceLmIP0DzHvvGJol854KtjsGEMC/EmaeY+t
-	zTbOAUKSO1OhthZ6RZXzgJskty9CPr9w578WrOX8=
-Received: by mx.zohomail.com with SMTPS id 17498157689161004.7727496495353;
-	Fri, 13 Jun 2025 04:56:08 -0700 (PDT)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-To: Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
- Heiko Stuebner <heiko@sntech.de>,
- Shreeya Patel <shreeya.patel@collabora.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
- Andy Yan <andy.yan@rock-chips.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Shawn Lin <shawn.lin@rock-chips.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Jani Nikula <jani.nikula@linux.intel.com>
-Cc: kernel@collabora.com, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev,
- Tvrtko Ursulin <tursulin@igalia.com>
-Subject: Re: [PATCH 01/20] bitfield: introduce HWORD_UPDATE bitfield macros
-Date: Fri, 13 Jun 2025 13:55:54 +0200
-Message-ID: <3683577.irdbgypaU6@workhorse>
-In-Reply-To: <5493fd6017de3f393f632125fad95945d1c4294c@intel.com>
-References:
- <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
- <20250612-byeword-update-v1-1-f4afb8f6313f@collabora.com>
- <5493fd6017de3f393f632125fad95945d1c4294c@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A832D8DD9
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 12:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=155.133.131.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749816591; cv=none; b=g/iWjMtFd44oN302TFmvjAv0Jvtt97Vx/qmrKbFaG2yo+Tn2aWJzPG6xk8KoryU1dy44U4J29cmTDKYIL/nDC2Y3nCbaSp3AxzoC2SrbA4Q09usm2g1qB0bPVcX6VqfW3zo0RydYqJzjpCVbCY6JFb/v4DlPpn1R8tdnl6MZ07E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749816591; c=relaxed/simple;
+	bh=pk0lQdv43C/rZv579FMX5Hagj+NuYzOwntCyzfrP9rM=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=JKET1eIlKRV3waDv4L7bgG5neaXU8xA5v/JEXNbTxDJkXHPa+Kms+tzOZtQi/CKWQC9GDcVcZDmwbrPD2P4ljD69wQ3YvL3gQKFe0eH5aAymZg/eCoxYpjpmAgXjj8t8x3p7Zn0Eu2gFxKV/k5AZeMIUv9LsROpHD2Z5RELMquw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vinc17.net; spf=pass smtp.mailfrom=vinc17.net; arc=none smtp.client-ip=155.133.131.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vinc17.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vinc17.net
+Received: from smtp-qaa.vinc17.net (2a02-8428-1b1d-4d01-96a9-491d-7b48-ba31.rev.sfr.net [IPv6:2a02:8428:1b1d:4d01:96a9:491d:7b48:ba31])
+	by joooj.vinc17.net (Postfix) with ESMTPSA id 2CDB236F;
+	Fri, 13 Jun 2025 14:07:12 +0200 (CEST)
+Received: by qaa.vinc17.org (Postfix, from userid 1000)
+	id 01772CA0114; Fri, 13 Jun 2025 14:07:11 +0200 (CEST)
+Date: Fri, 13 Jun 2025 14:07:11 +0200
+From: Vincent Lefevre <vincent@vinc17.net>
+To: netdev@vger.kernel.org
+Subject: [BUG] ip-route(8) man page: incorrect "ip route delete" documentation
+Message-ID: <20250613120711.GA237002@qaa.vinc17.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mailer-Info: https://www.vinc17.net/mutt/
+User-Agent: Mutt/2.2.13+86 (bb2064ae) vl-169878 (2025-02-08)
 
-Hello,
+Hi,
 
-On Friday, 13 June 2025 10:51:15 Central European Summer Time Jani Nikula wrote:
-> On Thu, 12 Jun 2025, Nicolas Frattaroli <nicolas.frattaroli@collabora.com> wrote:
-> > Hardware of various vendors, but very notably Rockchip, often uses
-> > 32-bit registers where the upper 16-bit half of the register is a
-> > write-enable mask for the lower half.
-> >
-> > This type of hardware setup allows for more granular concurrent register
-> > write access.
-> >
-> > Over the years, many drivers have hand-rolled their own version of this
-> > macro, usually without any checks, often called something like
-> > HIWORD_UPDATE or FIELD_PREP_HIWORD, commonly with slightly different
-> > semantics between them.
-> >
-> > Clearly there is a demand for such a macro, and thus the demand should
-> > be satisfied in a common header file.
-> >
-> > Add two macros: HWORD_UPDATE, and HWORD_UPDATE_CONST. The latter is a
-> > version that can be used in initializers, like FIELD_PREP_CONST. The
-> > macro names are chosen to not clash with any potential other macros that
-> > drivers may already have implemented themselves, while retaining a
-> > familiar name.
-> >
-> > Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-> > ---
-> >  include/linux/bitfield.h | 47 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 47 insertions(+)
-> >
-> > diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> > index 6d9a53db54b66c0833973c880444bd289d9667b1..b90d88db7405f95b78cdd6f3426263086bab5aa6 100644
-> > --- a/include/linux/bitfield.h
-> > +++ b/include/linux/bitfield.h
-> > @@ -8,6 +8,7 @@
-> >  #define _LINUX_BITFIELD_H
-> >  
-> >  #include <linux/build_bug.h>
-> > +#include <linux/limits.h>
-> >  #include <linux/typecheck.h>
-> >  #include <asm/byteorder.h>
-> >  
-> > @@ -142,6 +143,52 @@
-> >  		(((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask))	\
-> >  	)
-> >  
-> > +/**
-> > + * HWORD_UPDATE() - prepare a bitfield element with a mask in the upper half
-> > + * @_mask: shifted mask defining the field's length and position
-> > + * @_val:  value to put in the field
-> > + *
-> > + * HWORD_UPDATE() masks and shifts up the value, as well as bitwise ORs the
-> > + * result with the mask shifted up by 16.
-> > + *
-> > + * This is useful for a common design of hardware registers where the upper
-> > + * 16-bit half of a 32-bit register is used as a write-enable mask. In such a
-> > + * register, a bit in the lower half is only updated if the corresponding bit
-> > + * in the upper half is high.
-> > + */
-> > +#define HWORD_UPDATE(_mask, _val)					 \
-> > +	({								 \
-> > +		__BF_FIELD_CHECK(_mask, ((u16) 0U), _val,		 \
-> > +				 "HWORD_UPDATE: ");			 \
-> > +		(((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask)) | \
-> > +		((_mask) << 16);					 \
-> > +	})
-> 
-> i915 uses something like this for a few registers too, with the name
-> _MASKED_FIELD(). I think we could use it.
-> 
-> I do think this is clearly an extension of FIELD_PREP(), though, and
-> should be be named similarly, instead of the completely deviating
-> HWORD_UPDATE().
-> 
-> Also, we recently got GENMASK() versions with sizes, GENMASK_U16()
-> etc. so I find it inconsistent to denote size here with HWORD.
-> 
-> FIELD_PREP_MASKED_U16? MASKED_FIELD_PREP_U16? Something along those
-> lines?
+The documentation of "ip route delete" in the ip-route(8) man page is
+incorrect. The man page says:
 
-Yeah, I agree the name could be better. I used HWORD_UPDATE as Yury and
-I couldn't come up with a name we liked either, and Yury suggested not
-breaking from what's already there too much. I do think making the name
-more field-adjacent would be good though, as well as somehow indicating
-that it is 16 bits of data.
+  ip route delete
+    delete route
+    ip  route  del  has the same arguments as ip route add, but their
+    semantics are a bit different.
 
-> 
-> And perhaps that (and more potential users) could persuade Jakub that
-> this is not that weird after all?
+    Key values (to, tos, preference and table) select  the  route  to
+    delete. If optional attributes are present, ip verifies that they
+    coincide with the attributes of the route to delete.  If no route
+    with the given key and attributes was found, ip route del fails.
 
-I will operate under the assumption that Jakub's opinion will not change
-as he ignored the commit message that talks about multiple vendors,
-ignored the cover letter that talks about multiple vendors, and ignored
-my e-mail where I once again made it clear to him that it's multiple
-vendors, and still claims it's a Rockchip specific convention.
+But the behavior is unclear when several routes match the argument.
+Above, the singular is used, so I assume that a single route will
+be deleted (this is what I can observe). However, in such a case,
+it should say "a route", not "the route", because the route is not
+completely identified. Or better, say which route will be deleted
+(it seems to be the first one in the list).
 
-> 
-> 
-> BR,
-> Jani.
-> 
+I'm also wondering whether the current behavior is actually the
+expected one.
 
-Best Regards,
-Nicolas Frattaroli
+Note that the vpnc-script script of vpnc-scripts for VPNC and
+OpenConnect assumes that "ip route del ..." will delete all the
+matching routes:
 
-> 
-> 
-> 
-> > +
-> > +/**
-> > + * HWORD_UPDATE_CONST() - prepare a constant bitfield element with a mask in
-> > + *                        the upper half
-> > + * @_mask: shifted mask defining the field's length and position
-> > + * @_val:  value to put in the field
-> > + *
-> > + * HWORD_UPDATE_CONST() masks and shifts up the value, as well as bitwise ORs
-> > + * the result with the mask shifted up by 16.
-> > + *
-> > + * This is useful for a common design of hardware registers where the upper
-> > + * 16-bit half of a 32-bit register is used as a write-enable mask. In such a
-> > + * register, a bit in the lower half is only updated if the corresponding bit
-> > + * in the upper half is high.
-> > + *
-> > + * Unlike HWORD_UPDATE(), this is a constant expression and can therefore
-> > + * be used in initializers. Error checking is less comfortable for this
-> > + * version.
-> > + */
-> > +#define HWORD_UPDATE_CONST(_mask, _val)					  \
-> > +	(								  \
-> > +		FIELD_PREP_CONST(_mask, _val) |				  \
-> > +		(BUILD_BUG_ON_ZERO(const_true((u64) (_mask) > U16_MAX)) + \
-> > +		 ((_mask) << 16))					  \
-> > +	)
-> > +
-> >  /**
-> >   * FIELD_GET() - extract a bitfield element
-> >   * @_mask: shifted mask defining the field's length and position
-> 
-> 
+  https://gitlab.com/openconnect/vpnc-scripts/-/issues/65
 
-
-
-
+-- 
+Vincent Lefèvre <vincent@vinc17.net> - Web: <https://www.vinc17.net/>
+100% accessible validated (X)HTML - Blog: <https://www.vinc17.net/blog/>
+Work: CR INRIA - computer arithmetic / Pascaline project (LIP, ENS-Lyon)
 
