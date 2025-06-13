@@ -1,89 +1,141 @@
-Return-Path: <netdev+bounces-197335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FAAAD8255
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 07:11:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627BCAD8295
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 07:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8007C7ABC6F
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 05:09:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCC3A3AB7C3
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 05:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B19D24DCF1;
-	Fri, 13 Jun 2025 05:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8541EB5E5;
+	Fri, 13 Jun 2025 05:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="uLQwQN+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3BD7082A
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 05:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA402AD04
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 05:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749791470; cv=none; b=aRLtbVCrVPFbgU8036DjjTchjaOne9NQDJsyzQNBr9AIDDKeNF+1LQ58CJBD5A+554No7CXA8fjkA3sc6ew8di+7rwvmDgUB/m/a6t+KF2LS4qzFnE+0qEgtVjbHcREYupRpvxPxSBBy1v8UQncPRJnuBAw9cWveqM9ckzbIRMQ=
+	t=1749792983; cv=none; b=atcSAf59IClhuWN39WpS7L7PFnWVr9BQK/utDsDR10QLYbFrtHLcZM7U9b6MJp6WZG5XZEiJh1Jm0WLO+GOjLdrt60UyQrv8iH+lvFQYnpy7n9sOJc1/1iUZs3nbFjX/FoUD08l8K8/hOUN+kWMnCwuGF0Vb4a4fh4Yd374M7Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749791470; c=relaxed/simple;
-	bh=cUvwOLl3mEuX6bXFhiRV8ofP3klCN+cY8uC/h346d/U=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Z83ExODtEvTSjbgVWkOPwCu8Bno+lBrAP4p0TYA4r5w9nX2gX/R0EI+caCsr8BOmdbvucy6rNhBJ7sF7urAA4gZ5ifdaa9qWTOLQQ+kt4qqPcFPjHhn4giOPNeqlaj45sHQS3wexFARu9IwKyvkeX5KfMQZbn10IGNMr6m8ACH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-8754cf2d6e2so177003339f.3
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 22:11:08 -0700 (PDT)
+	s=arc-20240116; t=1749792983; c=relaxed/simple;
+	bh=Sreh95GnWPx5S1O+Ccf9rLfdKxeQnMz2/J4KaGm2UDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GMmdx1bf1PD/FbJVM2ThHR9LaLBanjpPOndo7PT0JHaH/uIGppFLeQgHT8j2Ch43MuMWh2uHjzKohbHk/B7S9P0PENyefqS93d4KZLPuThisiOYh7iURESQXzYoQIP9atcuLHIJr/BkJ1wIzRhbXxKCcYaIt27QfglG5eKlzBG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=uLQwQN+E; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a525eee2e3so1374237f8f.2
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 22:36:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749792980; x=1750397780; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b8OWkMSHVpf4NY1pa+MskWGO8xitHM0Bo5Pv0/xdrb4=;
+        b=uLQwQN+EI48pUNctXWqSuSY6/6VuOepzSQ7SN0SXIHtTgS9VFc+dmSEJJ+2nurU4kI
+         NpM8mAake69fzByeeGtrfyL5ov0+XPFqQqgGdl9EANKha2Posd1BNMB7tEL7SJ7mVQTu
+         bpvnhluBs6ZPAJkoaSv0xn+3HrLNTKnC9uozJUSt2QR7ps2oQYeBM6SqrGJMzWxQjVUN
+         Qbc1AgniE9hqavyqHZ5qLeBatV/EGD7tBeXRnD90hup/8553H7wR/Gm7kKazt+lNFLq1
+         o3P51M7TY464RxboPt8a60Q8ZPewtAQMCFc34bv5Lbr5zbl/tzRIpnlGWhrrojFtzu0m
+         dGYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749791468; x=1750396268;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1749792980; x=1750397780;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nw77KWnxaR6xG40zkWU1KSH5QZlyIGcQ1pTP4BctBbA=;
-        b=i+MjrYueKLSPAZskdpKGLdKOrPWTq0kis+9VRT5jOm2HrGCvqEMbbXe05zsHY7toIQ
-         //Rg0lI3UfRnxURopMAhX2WouCaCQtEdW66OAwDvB9hVTsWzEly1HGTVAC28T+UOyEDq
-         SnbPtYC1qJ2n7/3lR9iLzCjjnpcOwdMS4D6WDmBqktiyLBfVKhvv/ZvcMkcLRQ4vId/e
-         WYTJpJpvoLiOaCcI/tn0qoYW9SIP7UGsSDLff6Y21X8n8egN9WYZplWo4HP/oyL4s8if
-         tPjLtTIKn5mbzFYEfYU89SJNE0B4LzkxrYCpd7CorWlvgHgZKGEyRLz/VFKrS5+RvXdu
-         bxaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjIUfA6UmSyvelTD9HBE9Y1xW+NWCq0psnR/LYX2oZ7vUFNzzMBCtvn+2Xkrr+w5Hzz1N1zyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww62E2UzdamS8vgQnRQdxjNuSgfa6wxA+YHiKFMlPScJqEPefS
-	NjlSArwZmzy1cppwYMBnYFTb7as+ICwaWp943OILc2bkEcu4ZhppAbr3z/PMY5Sy5ajOEYx3jCm
-	6zCfd14SKhH8aqS4gbtb09TV6Zv07jx1prUQsQo+QJA9NkgBUEVzfyg4TxdI=
-X-Google-Smtp-Source: AGHT+IHWVnmkvnP7OgPlPOI+KaqLRcddj988eaBzrh6EYBlD2YrWLZz76gr7ACyFRtgGWaQChipknEfOkKvAlLNMuQktm8BzzHvh
+        bh=b8OWkMSHVpf4NY1pa+MskWGO8xitHM0Bo5Pv0/xdrb4=;
+        b=RH2vF6EGI584YzNkU7HJ9OP6QyXARE39ZdOupCfFaZaPzO1rdsdIVgwEKBifx7tCAJ
+         PgY5jcumJosMIMtmX5HMyPKNNOP+ez5g8d1CIb6wYagu4QgPCS0uMqESiQCzWyVGIAI0
+         44MmHWLsfTy2pEvXqDATgsghSvR2AML02nqMEsCXsCxHWMBHvHleNGCm6EwhK0Z96UW6
+         zqkmqEBAHgqROBBuGC58VtIpu7bI42OYOApOQCi0RIjUXUik6wk3SB4Bnu1ar6kz9hse
+         Re9wflUvuKO4ngQRsTV4otPX5uRSOFAmPMdRc0wSpg1iVqnGqifcjCPSinTQaR635Bqr
+         AXpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfvC4apfUCvXT9iOvzOHZGXROfBOUZA6TxZ8XF2s1zjQJfT/hzst4Ez+Zpo6X0b/pxz1NPRow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyUqm4Iuqa8m6pLiAz6kzEjsmcq02IfLDQCCaIwmJA8iXE6odB
+	SJF1D8lLOnjA9lOjJuXgknNl+Cm6WKC//6Jfg+IuMV4CmCes1MxrE4pYt8mgbDWEFsA=
+X-Gm-Gg: ASbGnctv2zReYVZmDcadxIum93LVz8eZWXL31uuJBNVcgAzJ/uo2lis5IGSbqfuPvid
+	ew3JYQ/QpBTTl2w5U7/o0oVeesWpv1Wz8U0RU2EdOMZV5RIc8cvqH7oUTi8XrS1+RYIrzYDl7QK
+	pyUjPStfIPjit6RnO09iTvHsKrf0zqnSWKhgujpu7y6L0UYF2F80c2KlFvcVMvbY+ipf9bt6qfg
+	9LEp/JR8uXftmPC8JgErwFUKnxI+rnh8oqvVcBSCkE8RlYRivi0yg+RRxmAGwxyfSD2RkahVkNR
+	U6cj5gF4Cb+Noq5Waaeg3ndiuhP7q5JrDP98Q58ECuuiyCr/brjdmu4UnvSI9pXyq4A=
+X-Google-Smtp-Source: AGHT+IELB9+pNcDTkVOHPL/gOGh/dFD5vIeXRtZ4EcHs9SW1wTIVbahz2V1SNST0dxBLQTNMDjnyYw==
+X-Received: by 2002:a05:6000:2308:b0:3a4:d3ff:cef2 with SMTP id ffacd0b85a97d-3a56876b2f9mr1366057f8f.27.1749792979547;
+        Thu, 12 Jun 2025 22:36:19 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b79f45sm1207245f8f.101.2025.06.12.22.36.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 22:36:19 -0700 (PDT)
+Date: Fri, 13 Jun 2025 08:36:15 +0300
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	ecree.xilinx@gmail.com, andrew@lunn.ch
+Subject: Re: [PATCH net-next 4/9] net: ethtool: add dedicated callbacks for
+ getting and setting rxfh fields
+Message-ID: <aEu4zx_dsc2FCdpu@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, ecree.xilinx@gmail.com,
+	andrew@lunn.ch
+References: <20250611145949.2674086-1-kuba@kernel.org>
+ <20250611145949.2674086-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2593:b0:3dd:d995:5a97 with SMTP id
- e9e14a558f8ab-3de00bea30dmr16390805ab.12.1749791467999; Thu, 12 Jun 2025
- 22:11:07 -0700 (PDT)
-Date: Thu, 12 Jun 2025 22:11:07 -0700
-In-Reply-To: <20250613042412.328342-1-kuni1840@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <684bb2eb.050a0220.be214.029a.GAE@google.com>
-Subject: Re: [syzbot] [atm?] KMSAN: uninit-value in atmtcp_c_send
-From: syzbot <syzbot+1d3c235276f62963e93a@syzkaller.appspotmail.com>
-To: 3chas3@gmail.com, kuni1840@gmail.com, kuniyu@google.com, 
-	linux-atm-general@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611145949.2674086-5-kuba@kernel.org>
 
-Hello,
+On Wed, Jun 11, 2025 at 07:59:44AM -0700, Jakub Kicinski wrote:
+> We mux multiple calls to the drivers via the .get_nfc and .set_nfc
+> callbacks. This is slightly inconvenient to the drivers as they
+> have to de-mux them back. It will also be awkward for netlink code
+> to construct struct ethtool_rxnfc when it wants to get info about
+> RX Flow Hash, from the RSS module.
+> 
+> Add dedicated driver callbacks. Create struct ethtool_rxfh_fields
+> which contains only data relevant to RXFH. Maintain the names of
+> the fields to avoid having to heavily modify the drivers.
+> 
+> For now support both callbacks, once all drivers are converted
+> ethtool_*et_rxfh_fields() will stop using the rxnfc callbacks.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: andrew@lunn.ch
+> CC: ecree.xilinx@gmail.com
+> ---
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+[...]
 
-Reported-by: syzbot+1d3c235276f62963e93a@syzkaller.appspotmail.com
-Tested-by: syzbot+1d3c235276f62963e93a@syzkaller.appspotmail.com
+> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+> index bd9fd95bb82f..f4d4d60275f8 100644
+> --- a/net/ethtool/ioctl.c
+> +++ b/net/ethtool/ioctl.c
 
-Tested on:
+[...]
 
-commit:         27605c8c Merge tag 'net-6.16-rc2' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c21e0c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=42d51b7b9f9e61d
-dashboard link: https://syzkaller.appspot.com/bug?extid=1d3c235276f62963e93a
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=10c0d10c580000
+> @@ -1492,7 +1527,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+>  	u8 *rss_config;
+>  	int ret;
+>  
+> -	if (!ops->get_rxnfc || !ops->set_rxfh)
+> +	if ((!ops->get_rxnfc && !ops->get_rxfh_fields) || !ops->set_rxfh)
+>  		return -EOPNOTSUPP;
 
-Note: testing is done by a robot and is best-effort only.
+I realize I am late to the thread, but is this part above correct? It seems
+like ethtool_set_rxfh calls ops->get_rxnfc but not ops->get_rxfh_fields,
+unless I missed something in an earlier patch?
 
