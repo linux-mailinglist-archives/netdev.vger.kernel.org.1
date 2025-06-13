@@ -1,119 +1,109 @@
-Return-Path: <netdev+bounces-197262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BAE0AD7FAF
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:42:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D15AD7FBE
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 02:50:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A525F7AEF7B
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:41:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A7B18879EC
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 00:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2DB1C5D62;
-	Fri, 13 Jun 2025 00:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FA68F66;
+	Fri, 13 Jun 2025 00:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMFcvSjZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeiyCRat"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7415EEBA
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFA52AE97
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749775351; cv=none; b=D4w/Cciey1lDYYbSfY/qSBqV6bKPvmPUB1oTUOOw0wWoCPAJsQ6ihOMxpOv6p+q29Jsgs2wGK9RnyjW/qkUiUWJ1iwT70MQcSzdMJD9fPSKAm9lBcUX3TLNiizP2Ny26b9dNdQXYoCZtMO1prqbnQOSWIqktzDUZBbXMCPM4Lkw=
+	t=1749775811; cv=none; b=ZTQZX3MGVLw9X7VWxkL/Vfg8ZO0UzgjpjXVItJKmjDvQax+Xo2LHA+GLku+lUJ7y+huFL3SQ/QoCRCldkrzHBXVz0ZqjFcSUGwXdZAgPrNOVEsNSxJoaGWIMjnI5vtELmzTLTwpShZWag6ibiBWk+m+PDexjOpOBAHmt3+x1DvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749775351; c=relaxed/simple;
-	bh=maylzhN3R1kW/ohhBSyd7HqzpVdN7/AKHxThCz98Pi8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DmDXiVKPvegeCykhc40HfSYjOsa4gd0fch1Htf5PbtN5K8ENsTjKsTUI0NSfD9HXvin4/wJ+os5CmhpAZLHwLNxSs+gnsbACrbGm8y3Pws8VgsdawHdcIfRm3tjUjqwVKB09za0iKbzfH7tlASZiqlnBztqxSvB/FdTHZ2kiFuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RMFcvSjZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749775348;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=maylzhN3R1kW/ohhBSyd7HqzpVdN7/AKHxThCz98Pi8=;
-	b=RMFcvSjZMZyoBnBCXTyNfeAZ/2Ztg3WaXkS2KnM/M7GRet83s3Yx1rksg/IPPpjbB8Av6y
-	hZ9fGQGS8R8BkqsxhBIAaAxXWK4Tm7IkDvArLWW3fApISI2NQDK29AmLItGTmWXZMmNXjW
-	Z5kC12o8deNi/h/5Jr8vDHw2OgeVVrE=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-tUMjRWTRPTeYQsFUuE0YFg-1; Thu, 12 Jun 2025 20:42:27 -0400
-X-MC-Unique: tUMjRWTRPTeYQsFUuE0YFg-1
-X-Mimecast-MFC-AGG-ID: tUMjRWTRPTeYQsFUuE0YFg_1749775346
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2350804a43eso23528795ad.0
-        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 17:42:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749775346; x=1750380146;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=maylzhN3R1kW/ohhBSyd7HqzpVdN7/AKHxThCz98Pi8=;
-        b=hx23B7cMh/hj9PwCHV5/eFNgL/OLoh0ELNTFvlko2iaEg6l4MF3R8Ot8qNegVKWgVt
-         ZEbHS2hu/nyz4ZWVCaHRhmMAZEayosjP8ubmGBSCUlubk8plTOn3G7KmNbReL0Rjnjlb
-         3vuVP8Hksy8uiE5ZY843E6ZZfPVGaKfpkeep/UrcvytjBb+2Z3ndwKKC52wCgHvgKPnA
-         0MwWcvLc87GDh5Qt/vjoH7TubaKUFpCf+zT1E2NyNOcLViJyCwlY6/DkA2O3OUY7TLfT
-         RICfQYQZ06fYUlaitRh1wkMcqSZ7hDdMVCeSln4noL2u2dCxasdkqcO9GljHdKQKNNVQ
-         bIgA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2jEQ99kmx5yFPBubnCTF7uz+HZJ0WlI1cesC9d0C1RhehbknLux5Lki/CWOLHux+JUfRxHns=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxYBQUGH7kOC3uxpmDet7K/s7BUAA0bDG3yRbtftBbFHgCnAos
-	4D02gRO6KImRiGg/g0DVgfW1SysyLs5PWbfpoku2SC3lYXqZUg1QABCT/ABGjZ3DCkkg0wQ2j1o
-	UpEsJpaV69bnD3f2eMvS1gIArM75x1l3TtbgtIeFWNnXKcObipTBxjLhgs+/paR2U6MU8UJaOWy
-	mFWAW1bbtzeTyOsSm/KBfJjZF8nE4yELxr
-X-Gm-Gg: ASbGncslzDow24thiFrR7oqklA0g2zbjJzhlG1Tu2+HyWxYeokMvlA01qpSPFKG5uoT
-	XA6G7snG2Tr0azb/DIq4nvnbMrOUSlwskpo/VsW5HVTnxr+Jwio1T7uZUBSHprMpVs/KhBu8IyJ
-	ri
-X-Received: by 2002:a17:902:ecc1:b0:234:8ec1:4aea with SMTP id d9443c01a7336-2365de3ffebmr15643985ad.52.1749775346552;
-        Thu, 12 Jun 2025 17:42:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFyAdb9tOchMbc5VNkQkyQSUnXYNZ2kaRcZWI02WcZBsf9KTCg9tOz9NPCpeq9Fvd5gqgpmYLmy0vfEXIRGarw=
-X-Received: by 2002:a17:902:ecc1:b0:234:8ec1:4aea with SMTP id
- d9443c01a7336-2365de3ffebmr15643675ad.52.1749775346178; Thu, 12 Jun 2025
- 17:42:26 -0700 (PDT)
+	s=arc-20240116; t=1749775811; c=relaxed/simple;
+	bh=ef4smiOC47x5NuXH+olcR5+Mps0Y7hrqd7rV4VLIZ2Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I+gU+ENjxJJMBfqaCY6OtfGbhlGfodtWVyFRiji2uaV7IewXaTI2wslhzwyxXr7R6aewLNj835Bqogfny4UC7PPJpAMycR51rhBxsRmSWKI4TfeZ8u1F0aW9bKy78sxuycuCSJbqe2qs3SRM3i64pkavjaSMEHly+kPM26gAJU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeiyCRat; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EEF5C4CEEA;
+	Fri, 13 Jun 2025 00:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749775810;
+	bh=ef4smiOC47x5NuXH+olcR5+Mps0Y7hrqd7rV4VLIZ2Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AeiyCRatGgZrHFNYfWL9XwMYOTfD2WvrmErGtOMqF9XnTd6lwYn6WrpqpjqxLOuM+
+	 gG3RVmwmociw4+DjM/QOfsyCwHf0Y16n1SQgH0bng18IPntXAWcsDSGWuw53RSFCwE
+	 7lDkiT9MvA12gE0nAt9ERl8swRyiS4hWDt8nqQPoQck7sIi4BLjGSBvOqnQt6gPxqz
+	 Vw8++ZCBl2Cmo02CFRLHlCHpDm6WLuP0izrQQMYQHrKRkjLLOw3yPYCHSzT9g3CexC
+	 Og71lWbvF9E1y82K01xkAb2Vd9n+M3xqtrkm10JMpJ50jld6znqn9cR1qKPgLiaRjh
+	 UhogEVrhVBZVA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D3439EFFCF;
+	Fri, 13 Jun 2025 00:50:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611145949.2674086-1-kuba@kernel.org> <20250611145949.2674086-9-kuba@kernel.org>
-In-Reply-To: <20250611145949.2674086-9-kuba@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 13 Jun 2025 08:42:15 +0800
-X-Gm-Features: AX0GCFtduX1ZN2Z9MpNLZYiPSNj2kJDaR7Qwn7qrUaaQEilxwRPmYc-DFKEweUg
-Message-ID: <CACGkMEsDmQc-zcSpKSC=ezfTfVQNayZDHC2VTxRvrz7qZ_+kgw@mail.gmail.com>
-Subject: Re: [PATCH net-next 8/9] net: drv: virtio: migrate to new RXFH callbacks
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/9] net: ethtool: add dedicated RXFH driver
+ callbacks
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174977584001.169232.17739613101853165487.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Jun 2025 00:50:40 +0000
+References: <20250611145949.2674086-1-kuba@kernel.org>
+In-Reply-To: <20250611145949.2674086-1-kuba@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	ecree.xilinx@gmail.com, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ ecree.xilinx@gmail.com
 
-On Wed, Jun 11, 2025 at 11:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> Add support for the new rxfh_fields callbacks, instead of de-muxing
-> the rxnfc calls. This driver does not support flow filtering so
-> the set_rxnfc callback is completely removed.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: mst@redhat.com
-> CC: jasowang@redhat.com
-> CC: xuanzhuo@linux.alibaba.com
-> CC: eperezma@redhat.com
-> CC: virtualization@lists.linux.dev
-> ---
+Hello:
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks
+On Wed, 11 Jun 2025 07:59:40 -0700 you wrote:
+> Andrew asked me to plumb the RXFH header fields configuration
+> thru to netlink. Before we do that we need to clean up the driver
+> facing API a little bit. Right now RXFH configuration shares the
+> callbacks with n-tuple filters. The future of n-tuple filters
+> is uncertain within netlink. Separate the two for clarity both
+> of the core code and the driver facing API.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/9] net: ethtool: copy the rxfh flow handling
+    https://git.kernel.org/netdev/net-next/c/f4f126535546
+  - [net-next,2/9] net: ethtool: remove the duplicated handling from rxfh and rxnfc
+    https://git.kernel.org/netdev/net-next/c/2a644c5cecc0
+  - [net-next,3/9] net: ethtool: require drivers to opt into the per-RSS ctx RXFH
+    https://git.kernel.org/netdev/net-next/c/fac4b41741b5
+  - [net-next,4/9] net: ethtool: add dedicated callbacks for getting and setting rxfh fields
+    https://git.kernel.org/netdev/net-next/c/9bb00786fc61
+  - [net-next,5/9] eth: remove empty RXFH handling from drivers
+    https://git.kernel.org/netdev/net-next/c/86b2315e7041
+  - [net-next,6/9] eth: fbnic: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/2a34007ba977
+  - [net-next,7/9] net: drv: vmxnet3: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/2f14765d6397
+  - [net-next,8/9] net: drv: virtio: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/63d474cfb596
+  - [net-next,9/9] net: drv: hyperv: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/6867fbe3a9f4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
