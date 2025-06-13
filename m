@@ -1,121 +1,117 @@
-Return-Path: <netdev+bounces-197465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E462DAD8B61
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:56:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 447AFAD8A62
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06688162C2F
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:56:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CCA5165577
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295DF2E2EED;
-	Fri, 13 Jun 2025 11:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMrA+9bE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404252D5C99;
+	Fri, 13 Jun 2025 11:23:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513D92E0B5B;
-	Fri, 13 Jun 2025 11:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FB62D5C95;
+	Fri, 13 Jun 2025 11:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749815737; cv=none; b=awc8o4apGSrHZwgLvbFAKJ4bE6PPg/TLUOnT33FSi0B9EugACj8f53Pe5ZAY0NYNAfvEa65tQGBOQexrwObUHdT8X4m3kF6epWBhrnQ+/2maRKUoHLY33XQ366cHDk65ySrkSRcPrHk1pC+FUhdZFuq6UwIE6QrVM6qysmHrN7o=
+	t=1749813803; cv=none; b=TUapeCrsyR57YUt1vEyyXguEOo6iAmdJlQzkmj8CUihrz8rl0HkGCYKeByJzWUJ9Pp7U9yvHgKCDjBZP8eTp6d4rKuQ2tVtNovveiOKhYHnDH0Hc5mN/7Tb5hO36TZmfhpkVJkGhHTDhxIbBO8GGdl8ABUGVOXKoF3mcUrwSOC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749815737; c=relaxed/simple;
-	bh=Ci7710RjJSELOL+1/2aPBQoHM+FZu2LTyHSsddj27FE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=ke77fxshc2L49XDm3dqgeVG6iXkU8DxJLipM+NFDAnuMblHHgfgXDqC521VSl4Fop9gBjUZfBrXMKy6xHD+nmJFZ4CR1CfGjwjh/a9arH+1FsZKRn+sLcHDF28mM3NJUCVv7dHbBjCKsBHjol4Eh808UbMqt7j9ptZ9q7PTL4Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GMrA+9bE; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1749813803; c=relaxed/simple;
+	bh=lPy9K4tp84sS9dzBKaLxxe+yj2bFe4m1LYpoaKFyl8Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bXIF8DX+QKh3XPc5zwEIq2+mqkcN9BoKQO4MHLlTimJR56t0N05LJbujAlvXhtv9eTSSVStLssFd93Oa55su7X0zZK9wNczA8+yAdpdl60WVN1W80IiITXMlolH+tdqeqPEMNiJZsqYbjrRD4rzjY4JxJNi3QJB7q08OM9kfxRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-451d3f72391so26536115e9.3;
-        Fri, 13 Jun 2025 04:55:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749815734; x=1750420534; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uL5y/ewTTMQ7/ta7feOWe7CZOUk7g4FBbNi0PxftJG0=;
-        b=GMrA+9bEWblntAdDLO/iRvlH4v0xDnbd0mfNh5/zC1NZKkWBQmjO0/QeHFnWiUsxm7
-         hpyIqLXFT28+ZjhxEdP9sPI9Cbq/DuUSazSlzYO1xm5Sz0V6qy2+6omT6h+aPaC7Pu0+
-         6gJW92Ny4bPhVJ18r+kBViYzGjJZyA/TikHv6n0kyFVF1Gps9eB/J3y2nSuFOIQ5UHL2
-         7cLfU26vpSEyzNVojFg6oHS2yXe1ZnO+dyajo5asC6EhofIgQXXIis2o2g/Gm91IaW+h
-         G3T/b3XfCLsbYJKzCTwux1xsoSm0wsPexTGZ3lP7xiIuJQG6mRZK7C8ejlx7pF3G/hJS
-         0Q+g==
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-adb5cb6d8f1so348652566b.3;
+        Fri, 13 Jun 2025 04:23:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749815734; x=1750420534;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1749813800; x=1750418600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uL5y/ewTTMQ7/ta7feOWe7CZOUk7g4FBbNi0PxftJG0=;
-        b=H5GOFwK6nk0yx7GYNCElA+riSxSLveFjQlbfwoeiS9vMDOxzQ+vuDnY6m1B4tiwV4o
-         yTL/kyqBlESeaE4IV64CWo1szVmvQPfT2mYbHoRdIuIdYGqzZpSBuK1oUYCEkU3ZLxIO
-         pK+3RB32UjHbkByUfq5huwQEIoLZtKdn6kshr05I7/mLb3kRhEmQGqYTNiTTc8cU1E9Q
-         zoP9XqisOJoxMnnNDDJ3hNf/Ofx3NkH7Mm9n3ReTkTEl0csuO0PkTMkmkOyfhRepTl6a
-         7BYnlaqfeOHQ2oGQiYGEi0fELFO2J81JHG5D137U8X6oa1rinbDwpfQ62YY0nrY2VTDw
-         pSiw==
-X-Forwarded-Encrypted: i=1; AJvYcCVawf1p4AqFP52U1gZVaWLxxZU05SpAXzL3NVYNrkujIMuESbkgDHjjyQJ4NaAHCvwfzM4Bw2oUMlIBsdQ=@vger.kernel.org, AJvYcCXD4mWqPuagF3vl1Edy2cbxAzoT3AVqEi+qXA0oAywvSQKBUe4ZxIxNDjwVJx7qf0rOyU4P4kmD@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhE/W30Fch57bYJuHV0winEstw4AJb3Jzc4VB3LvygKQPhS0MO
-	6gridwCe9lxIW5eGE0Mj3OAkOnx2SXbKiQ4AHMNbBL/AMcdiJDJcJvDp
-X-Gm-Gg: ASbGnctDKXlGAGZBbwkgmVqJUTlBge6rq4D9H67cZk6DCSAfQGEEXoKy1ggB8MSFsq0
-	CFPgAu5kkkhItzKhenxbo/6wO4moQyAtdmfCK8rWWLvbj4LosFnaO5asjz6TMslrrbakvKmj1FZ
-	LXwhHtAHfhcO+A4wiejzMxHLkJh7x0rXYaDNJ1nAeRsPQSRqWvAwQXDwNheT6Hvsfsc81fL10gY
-	oas1dJ9T2lrxM0UHaL6DrsNz6tsTc2ytfL4vYzXsWFUaZEwfnzNQlfEZ01/31Z90nJyCnur3fcx
-	nimeUOjMAfREy2B2bUNcjyYd1AFbou5/8yJNIOydvLu9R8T/vKS5ZwY8vHghMOvs/qz2d+x0CF8
-	=
-X-Google-Smtp-Source: AGHT+IGMtOD0UDTm67fkmitVK21heePsVMtSrnMkraeiIzLg5EK6P4byBT359avt25zMBKAJPT5CUA==
-X-Received: by 2002:a05:600c:34c7:b0:442:f8e7:25ef with SMTP id 5b1f17b1804b1-45334ad3f41mr27165075e9.11.1749815733431;
-        Fri, 13 Jun 2025 04:55:33 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:75e0:f7f7:dffa:561e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e261ebdsm52187085e9.39.2025.06.13.04.55.32
+        bh=HZw7odpK1VFuzX1+DMI95ImEufa1i/SGG5I6XZiF9i8=;
+        b=pAEn+xYx3YUMLP98ncfFCxgejoHU/ovypxfM/G+oxXBdvBuwpMW5MKB15iRHEOvH/W
+         HAdFoEk3PSTk54t09B3jwVorJsyuM81whjdQcd4arwUhMc1AKb5gJr31pSPiTo5E3Jdo
+         fCay7d6relciLczW//3bIrIyljqmziVbHDuRZlP5BlwC+r0YEbtg3AHpWjYF8+k3oxru
+         GWzsvN4XdyewOTWYWRxrXCnIqnm0f3rS1ojwFNFTGT+660ajKQFVE8F1TWpik7Seet8H
+         hwWZwDHU3nqE8YldAHWjGxAaaaoEGCY76TKwUmWTsxT6wVLtzu5CHaycwnziLdzTRxIV
+         8oUw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2Xj+4CsXqXpMudocPUsShRAQeODtFWpatay1FFSKUDkatuOyOTCQUjxXfmtsqFb+tU97nLruboyxDpgY=@vger.kernel.org, AJvYcCW5YLGQqC+7JPYx27yFmC2bwGwtVrFVBKtQByOYmOgg048ra27i8Hf+Otmcmy4BBRKhER2voaUHcIc5AA7n3tKq@vger.kernel.org, AJvYcCXW7U5ZE7cd7QX4eOLiMYyBt0QpXepqBXxtJ524RkEegQtcXpeoZ+I3zQZch3F0BvicJBIQJcB1@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdmSF09FINSju7ZZwdIxBEO4G/quZblynUiM9Wczn3j16XcKPw
+	wWPoGfCb+jBRadGtrJEp5WH/7MQJ5eBrxuSG+Pin8sXA151jEfihiUGV7hEC9w==
+X-Gm-Gg: ASbGncuc4DQNh79ZaIFHF/4i1gt739Frjx+jYR3G45nVWSmKIA29E30imVBl4Deg1tt
+	ZtSd3vVGc0y8Xkr39H5LVt3uYVfwvYeGizHYnl49oiCwkQwspzI2Wmu2pPWxHkK+Ng2bUVNzdlZ
+	FR3hzfHPD5gFPqlqIUTtlEqP7XCNLK2AQdhlG9tg1UUgzCS6ytnq12lbgePwRBktG0569wTAOWS
+	oOESFVj/0zS3QWH6tl7flELH8NExYNs53ttqAz2PiZzARFCOJtqpO3BQveSJym0uPmNfpwov9at
+	6w6jqOIjDe+pUyDKSFta7coj5o2w8eZ3LRkQcuWl49Snyu2oCK1b
+X-Google-Smtp-Source: AGHT+IEE2BXLcFQbqzB4y7qNrNGQCWdHF6OzFtsL4qnH4BOAgnAXpYdY7O5wf1roVuCh9PHLr9zhzQ==
+X-Received: by 2002:a17:907:70b:b0:add:deb1:d84d with SMTP id a640c23a62f3a-adec5583fe7mr271589066b.1.1749813799632;
+        Fri, 13 Jun 2025 04:23:19 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec88ff425sm111655666b.87.2025.06.13.04.23.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 04:55:32 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
- <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
- Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
- Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Ruben
- Wauters" <rubenru09@aol.com>,  "Shuah Khan" <skhan@linuxfoundation.org>,
-  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
-  linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
-  netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
-Subject: Re: [PATCH v2 06/12] scripts: lib: netlink_yml_parser.py: use classes
-In-Reply-To: <08ac4b3457b99037c7ec91d7a2589d4c820fd63a.1749723671.git.mchehab+huawei@kernel.org>
-Date: Fri, 13 Jun 2025 12:20:33 +0100
-Message-ID: <m2y0tvnb0e.fsf@gmail.com>
-References: <cover.1749723671.git.mchehab+huawei@kernel.org>
-	<08ac4b3457b99037c7ec91d7a2589d4c820fd63a.1749723671.git.mchehab+huawei@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Fri, 13 Jun 2025 04:23:19 -0700 (PDT)
+Date: Fri, 13 Jun 2025 04:22:31 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next v2 7/7] selftest: netconsole: add test for
+ cmdline configuration
+Message-ID: <aEwJ95gqNkNYMk14@gmail.com>
+References: <20250611-rework-v2-0-ab1d92b458ca@debian.org>
+ <20250611-rework-v2-7-ab1d92b458ca@debian.org>
+ <20250612150542.0b4a7d71@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250612150542.0b4a7d71@kernel.org>
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+On Thu, Jun 12, 2025 at 03:05:42PM -0700, Jakub Kicinski wrote:
+> On Wed, 11 Jun 2025 07:18:56 -0700 Breno Leitao wrote:
+> > Add a new selftest to verify netconsole module loading with command
+> > line arguments. This test exercises the init_netconsole() path and
+> > validates proper parsing of the netconsole= parameter format.
+> > 
+> > The test:
+> > - Loads netconsole module with cmdline configuration instead of
+> >   dynamic reconfiguration
+> > - Validates message transmission through the configured target
+> > - Adds helper functions for cmdline string generation and module
+> >   validation
+> > 
+> > This complements existing netconsole selftests by covering the
+> > module initialization code path that processes boot-time parameters.
+> > This test is useful to test issues like the one described in [1].
+> 
+> I think this leaks the IP address, because if netcons_overflow.sh
+> runs afterwards it skips with:
+> 
+> #     inet 192.0.2.1/24 scope global eni370np1
+> # SKIP: IPs already in use. Skipping it
+> 
+> if netcons_overflow.sh runs first everything is fine.
 
-> As we'll be importing netlink parser into a Sphinx extension,
-> move all functions and global variables inside two classes:
->
-> - RstFormatters, containing ReST formatter logic, which are
->   YAML independent;
-> - NetlinkYamlParser: contains the actual parser classes. That's
->   the only class that needs to be imported by the script or by
->   a Sphinx extension.
+Thanks for the report. I acknowledge there is a bug in the cleanup part
+of the code. Basically `trap cleanup_all_ns EXIT` is not enought because
+it was not removing the local netdevsim interface, which must be removed
+as well. I will update and resend. Good catch, again.
 
-I suggest a third class for the doc generator that is separate from the
-yaml parsing. The yaml parsing should really be refactored to reuse
-tools/net/ynl/pyynl/lib/nlspec.py at some point.
-
-> With that, we won't pollute Sphinx namespace, avoiding any
-> potential clashes.
->
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+--breno
 
