@@ -1,195 +1,181 @@
-Return-Path: <netdev+bounces-197301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F27AD809A
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:55:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF99FAD80A4
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FC37189961E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C3B61E2F99
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBEA31E00B4;
-	Fri, 13 Jun 2025 01:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7900E1E0DB0;
+	Fri, 13 Jun 2025 01:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LkuHUGsn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XGnWSRQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B8C13C9D4;
-	Fri, 13 Jun 2025 01:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438C413C9D4;
+	Fri, 13 Jun 2025 01:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749779711; cv=none; b=A0guletBgi5stjs8Goz+l/NeEMcFHH2fQf1WcUbSfPYs2iqeUL0fJDbv+Yj0//60B3smOfL+vLwJ8JLVkrcUlfV6/+qZCVh1YCq5yUD0CSFRNe/LcB5T5hksG6Gee2iU1G1bGlkuNLXKlvuQNILHCTV9mE6vzjq+UopInIrWJMM=
+	t=1749779723; cv=none; b=AUEPWLJ4VFViJ5tscJIhZaEgovaQ4UAPriYMQQ9wnu5ti+Bh7v3A4jSYt2cJlW3mG2ospkixnDfUuqJET7nDYz98LqSj/7xOt0LuKDSn0XL9G53Wxa0a1jf/7fYWscnUwq+bbjQLypnszoTJ7zcyjcBSlkM244+AsT4Sa7qRSeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749779711; c=relaxed/simple;
-	bh=rCdKrK6gJ/e8YxnkxVovavsWLwaBZejD5B7IvnTP7CU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZzSpJQrQEIksb2KuqkcFpdcGaQ8fYC3JcjARSX9Kx9uZgAtSQGInPYe61Bpfx0ZH+/0gI9YO2kaFF7KyP19LeDFscoAs2C7uD9veGSIh/XFEUXRVW2sDv8vpEmHdcCivGFSQRAavsZIZAP37Ejj2hAobnMl4aK1wjE6qPsiKt5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LkuHUGsn; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e75668006b9so1667178276.3;
-        Thu, 12 Jun 2025 18:55:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749779709; x=1750384509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=06ajxX2TNlIzX7ObIwY55/RYqge10Y8dd0yMk2LIygM=;
-        b=LkuHUGsnuNNbElpKo5hjZtJ0ywzkBHQl/V+Xu5rHft9zp5lYDtTTRR2tR416zgfUJq
-         AengLFH0aqLj6XMqnHtKtFub1W6eoVztl6XaK9xxieUMC5Jel5d8BsFSGldgzUHlDy0x
-         tgM3EF2mf6nMWEUQYhfWxRV0ZAgu0UH0+8XqhUBoWopdegmwRoigc4kX+Gaity7UGk0Q
-         NI/AuTs4Aq+nTbvE08ExLIWFVDmkTRlRkvI+kWWOK1nBJiT5rtWrH8vOuVUgDvlMGiJ3
-         G9cZtqoQ7DN9zWjIwno5Gzb/0qE48/xPw2lDS7AcEofGG1ZpG5X4EnKcGFxpZ+zoHjdT
-         1IyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749779709; x=1750384509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=06ajxX2TNlIzX7ObIwY55/RYqge10Y8dd0yMk2LIygM=;
-        b=g5TJboYpoBFdTNjdvOlg6D9BEosDZa+kMGk+0weh3m8KBFfjgbRDexrseTSrq/YJuP
-         bVqGzw/Ccm6TnHdrW6jIIlOBL3FEt7fHDTpsT//ZDJxXlnKUx85J5TnsmklFQex9O5Nl
-         ygskgExRlSCPCud6fi1NHX/y27LIba7TShJ0AIWlWz7Zuzx4RfeOmiTaq7bGPXlOY2W5
-         YjIcPSypEAliJF6IDhfe2XDKGQnrHWeLA6kSaNaqzVTYDrPDwsqbNBRbvxO27H9Wkjyq
-         gc+aeLxhYofvyOdK0qrJLCoNFNwsKjbe4CVEkuaj0cPhBEOM5MfE7lW0NKTXLuZXS7T8
-         JOzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQLOmqQKHJ+9EI1kF97L2e5WCYd7inSlAYclvTnk+sYcaIFg75raKhBDaS3weVttoBc4M/6qyFjU7ieSFjsbA=@vger.kernel.org, AJvYcCUmGn23m1MuHcZcufJzQ+GozG5rDttA9VqTNdlGQwx9792ZlqDJ/XbDH+MVmr5eUkOgsJ2pwNgDUZZMEw==@vger.kernel.org, AJvYcCUq2c4nnt7c9h118ZPGgupSlt53cMNlGfnrEbQ8vJD5waTWp7BkwQ76AYFbkTHk2kM8tTMPHE6rPAPAXBE=@vger.kernel.org, AJvYcCVxotwpZxkFfJ52KVR47F6nMPxhgBW2I97fGDlrgyT+b9EhkVVcM+avoLX313ymiqlHkJ57PlQNrT8Z@vger.kernel.org, AJvYcCWULLaczJWmQ0VGuvSrmTURl1L6FpuTNVVfSAex+yHElLO66MuGuo0dr9KvMdmHM2yYuLhHl8uAKcdU@vger.kernel.org, AJvYcCWXICN2lZsX8GemsEGbRPIyXNHHKCH97hoCcB/bXJrrmQOs1V4RzrQ/ZuPpIl346V5ozUTjWMPmshbA@vger.kernel.org, AJvYcCWlRqmos7XvSnA/mXHQP1Bh9THEX4udSl6hcQhlg4GUVEysVYW9vYJQ3AEIdQ7RHJJZyzuS5rCSPYM=@vger.kernel.org, AJvYcCXRsnx3cgt0XLdUFIiTinzCj02kQxIuYwGUfSX5anMwCiYKlh0+77GB0rtTSvOGFxZnyXhaERMRKHH1/MEC@vger.kernel.org, AJvYcCXnmKu9YS2FSD+AJHKS/eBBT/bV4Vl9ia+Jff0x6No2IuFWg6kg/BtuW/38z+P4HwXjtD6brRAE@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBx/nR8qIp4wX7vRxcElysYkZJgIfGL20Ym6mXj1RRSOOF2+wq
-	DjdNfAjE0NMbo7TnQxrlTnSQo634ifChBWbUFUHEq0oGJZVx7gH4/acNotxCw9wDlTD55d1j+nZ
-	vHAENsqcw1+T7slFOGCSyl8alHiZd5+c=
-X-Gm-Gg: ASbGncvDtYIbonx1lW0WFv4PEKsOHMcm1Y15yTx58OooEwhBbCLFLuE3H3qbHX6qtF4
-	WQ6fJCq/pqH4t8UDu32yQc3EQnsnjjCB1oiTqbCJDa2odvKQ4gyvx/Wl82UpQobt5ZgPPD9QuBx
-	cMIhJJZsOP00B3hR3EpBBTikML+9waoDSanTSa+IY8YNoiaoOjJXwqXRrdJgFA4NZ/3UxTt8uRJ
-	a9p
-X-Google-Smtp-Source: AGHT+IEwtTMIgnW9cREhPY1t6TwmH5URxj0k01buMuGSLF64DQ1cKYYmL5ADjjBfdKxhOg26PxHaWRdo1T9o8K3ogLo=
-X-Received: by 2002:a05:6902:2846:b0:e80:cff4:5d1f with SMTP id
- 3f1490d57ef6-e821c3260admr1744635276.33.1749779708953; Thu, 12 Jun 2025
- 18:55:08 -0700 (PDT)
+	s=arc-20240116; t=1749779723; c=relaxed/simple;
+	bh=Ntn9IiFPx8N6O+ViIz67FABe2gTeLIkgTCgnOwwHOGE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WxOiEB49sDD84sFIULXFrYUOKjR66lOIlhQqw12RXZRLqWLAx1bKilDIje/Q3I3LKwAusaMecmUrq3AP4RfbrXYFMo6sy7D6ejiDy7bQ97WlWC4nT7PjGX9qFDrlNuaK5sTSPBA/vLwHMNG54JbA7+oyfjcdjp+0l/NW5oxLvpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XGnWSRQ+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C3319C4CEEA;
+	Fri, 13 Jun 2025 01:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749779722;
+	bh=Ntn9IiFPx8N6O+ViIz67FABe2gTeLIkgTCgnOwwHOGE=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=XGnWSRQ+RmTdUH1HwxU0YrDe+698fAKCLW5XN39C1G84hz5VrRlfkPVsfZ2m1+rCB
+	 cQtz7KrBkK9PGtGSC4HTOuafQFZOFRBjIwdzodBUoAO5OJm1aA/PSk8ugLYISC/V31
+	 niR819TWdiDrWTPzO/NXkmjCucIab+7rTf3iZUTxWxpZ/3LO/MhSjOSic+e0T7oLz7
+	 EGDkyNQ3xsD7NU33+hlJ35kow7exIfMfxcoOipVWLn2A0mS62FBDKMutsFMtPles37
+	 ZXrJkj8K4mFqKcDQ2mIIGEMaeQGEWzGx5hMh4kSznMC8BlzSS2zk0p2rBAwsD7D6Y+
+	 B8GxmIYx1rtYA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDBFC61CE8;
+	Fri, 13 Jun 2025 01:55:22 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Subject: [PATCH RESEND net-next v5 0/2] Add support for the IPQ5018
+ Internal GE PHY
+Date: Fri, 13 Jun 2025 05:55:06 +0400
+Message-Id: <20250613-ipq5018-ge-phy-v5-0-9af06e34ea6b@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250604041418.1188792-1-tmyu0@nuvoton.com> <20250604041418.1188792-2-tmyu0@nuvoton.com>
- <20250612140041.GF381401@google.com> <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
- <20250612152313.GP381401@google.com>
-In-Reply-To: <20250612152313.GP381401@google.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 13 Jun 2025 09:54:56 +0800
-X-Gm-Features: AX0GCFuXplAsq4dFkQn8MRsErKaATzN_Jh0hZNplX5q_WEulmLSOivK-kFfFh9w
-Message-ID: <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
-Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
-To: Lee Jones <lee@kernel.org>
-Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	Ming Yu <tmyu0@nuvoton.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPqES2gC/2XPsXLCMAwG4FfhPNecLdlJytQBVgY69hgcWzQ+S
+ hySkIPj8u4YL+Xw+MvSJ/nOBuo9DWy1uLOeJj/40MagPxbMNqb9Je5dzAwEaKFQcN+dtZAVjy9
+ dc+OuLrQyB6MsORaHup4O/prAH7bbfG+262e5pZG3dB3ZPobGD2Pob2nnJFNn4jXod36SXHDnT
+ F1VWhFo/AqX8S+E49KGU8ImeAWqDIAEiAKLUtlS2hzAf6AQkAEYAQUSsTQCZQ05oF6BzwxQEZA
+ OjYR4H9i3L8zz/ACbxrHYhQEAAA==
+X-Change-ID: 20250430-ipq5018-ge-phy-db654afa4ced
+To: Bjorn Andersson <andersson@kernel.org>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, 
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, George Moussalem <george.moussalem@outlook.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1749779719; l=4379;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=Ntn9IiFPx8N6O+ViIz67FABe2gTeLIkgTCgnOwwHOGE=;
+ b=YV16xTbHfHIVmbf+WUVNtN/N2G1iWu1uFOXAw4O3t48z06uRKuaTrA8n8OG4pIvPFJWKcVS1n
+ 0cSBkwwFXKSCapU1/eFjCIwB6QK4qmoz1tNh7BNyy4IOfqw9iJYZetZ
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8812=E6=97=A5 =E9=
-=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:23=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> On Thu, 12 Jun 2025, Ming Yu wrote:
->
-> > Dear Lee,
-> >
-> > Thank you for reviewing,
-> >
-> > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8812=E6=97=A5=
- =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8810:00=E5=AF=AB=E9=81=93=EF=BC=9A
-> > >
-> > ...
-> > > > +static const struct mfd_cell nct6694_devs[] =3D {
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
-> > > > +
-> > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
-> > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
-> > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
-> > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
-> > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
-> > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
-> > >
-> > > Why have we gone back to this silly numbering scheme?
-> > >
-> > > What happened to using IDA in the child driver?
-> > >
-> >
-> > In a previous version, I tried to maintain a static IDA in each
-> > sub-driver. However, I didn=E2=80=99t consider the case where multiple =
-NCT6694
-> > devices are bound to the same driver =E2=80=94 in that case, the IDs ar=
-e not
-> > fixed and become unusable for my purpose.
->
-> Not sure I understand.
->
+The IPQ5018 SoC contains an internal Gigabit Ethernet PHY with its
+output pins that provide an MDI interface to either an external switch
+in a PHY to PHY link architecture or directly to an attached RJ45
+connector.
 
-As far as I know, if I maintain the IDA in the sub-drivers and use
-multiple MFD_CELL_NAME("nct6694-gpio") entries in the MFD, the first
-NCT6694 device bound to the GPIO driver will receive IDs 0~15.
-However, when a second NCT6694 device is connected to the system, it
-will receive IDs 16~31.
-Because of this behavior, I switched back to using platform_device->id.
+The PHY supports 10BASE-T/100BASE-TX/1000BASE-T link modes in SGMII
+interface mode, CDT, auto-negotiation and 802.3az EEE.
 
-> > I=E2=80=99ve since realized that using pdev->id avoids the need for cel=
-l->id,
-> > so I reverted to the earlier approach.
-> >
-> > That said, do you think it would be a better solution to manage all
-> > the IDAs centrally within the driver? For example:
-> > in nct6694.c
-> > struct nct6694 {
-> >     struct device *dev;
-> >
-> >     struct ida gpio_ida;
-> >     struct ida i2c_ida;
-> >     struct ida can_ida;
-> >     struct ida wdt_ida;
-> > };
-> >
-> > static int nct6694_probe(struct platform_device *pdev)
-> > {
-> >     ida_init(&nct6694->gpio_ida);
-> >     ...
-> > }
-> >
-> > in gpio-nct6694.c
-> > static int nct6694_gpio_probe(struct platform_device *pdev)
-> > {
-> >     id =3D ida_alloc(&nct6694->gpio_ida, GFP_KERNEL);
-> > }
->
-> No that would be way worse.
->
+The LDO controller found in the IPQ5018 SoC needs to be enabled to drive
+power to the CMN Ethernet Block (CMN BLK) which the GE PHY depends on.
+The LDO must be enabled in TCSR by writing to a specific register.
+
+In a phy to phy architecture, DAC values need to be set to accommodate
+for the short cable length.
+
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+Changes in v5:
+- No changes to code, but this version contains 2 out of 5 patches for
+  merge into net-next specifically as requested by Jakub
+- Picked by Andrew's RB tag on patch ("net: phy: qcom: at803x: Add Qualcomm IPQ5018 Internal PHY support")
+- Removed unused macro definition (IPQ5018_TCSR_ETH_LDO_READY)
+- Reverted sorting of header files for which a separate patch can be
+  submitted
+- Added a comment to explain why the FIFO buffer needs to be reset
+- Do not initialize local variable as caught by Russell
+- Updated macro definition names to more accurately describe the PHY
+  registers and their functions
+- Include SGMII as supported interface mode in driver commit message
+- Changed error handling of acquirement of PHY reset to use IR_ERR
+  instead of IS_ERR_OR_NULL
+- Link to v4: https://lore.kernel.org/r/20250609-ipq5018-ge-phy-v4-0-1d3a125282c3@outlook.com
+
+Changes in v4:
+- Updated description of qcom,dac-preset-short-cable property in
+  accordance with Andrew's recommendation to indicate that if the
+  property is not set, no DAC values will be modified.
+- Added newlines between properties
+- Added PHY ID as compatible in DT bindings for conditional check to
+  evaluate correctly. Did a 'git grep' on all other PHY IDs defined in
+  the driver but none are explicitly referenced so I haven't added them
+- Link to v3: https://lore.kernel.org/r/20250602-ipq5018-ge-phy-v3-0-421337a031b2@outlook.com
+
+Changes in v3:
+- Replace bitmask of GEPHY_MISC_ARES with GENMASK as suggested by Konrad
+- Removed references to RX and TX clocks as the driver need not
+  explicitly enable them. The GCC gatecontrols and routes the PHY's
+  output clocks, registered in the DT as fixed clocks, back to the PHY.
+  The bindings file has been updated accordingly.
+- Removed acquisition and enablement of RX and TX clocks from the driver
+- Link to v2: https://lore.kernel.org/r/20250528-ipq5018-ge-phy-v2-0-dd063674c71c@outlook.com
+
+Changes in v2:
+- Moved values for MDAC and EDAC into the driver and converted DT
+  property qca,dac to a new boolean: qcom,dac-preset-short-cable as per
+  discussion.
+- Added compatible string along with a condition with a description of
+  properties including clocks, resets, and qcom,dac-preset-short-cable
+  in the bindings to address bindings issues reported by Rob and to
+  bypass restrictions on nr of clocks and resets in ethernet-phy.yaml
+- Added example to bindings file
+- Renamed all instances of IPQ5018_PHY_MMD3* macros to IPQ5018_PHY_PCS*
+- Removed qca,eth-ldo-ready property and moved the TCSR register to the
+  mdio bus the phy is on as there's already support for setting this reg
+  property in the mdio-ipq4019 driver as per commit:
+  23a890d493e3ec1e957bc925fabb120962ae90a7
+- Explicitly probe on PHY ID as otherwise the PHY wouldn't come up and
+  initialize as found during further testing when the kernel is flashed
+  to NAND
+- Link to v1: https://lore.kernel.org/r/20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com
+
+---
+George Moussalem (2):
+      dt-bindings: net: qca,ar803x: Add IPQ5018 Internal GE PHY support
+      net: phy: qcom: at803x: Add Qualcomm IPQ5018 Internal PHY support
+
+ .../devicetree/bindings/net/qca,ar803x.yaml        |  43 ++++++
+ drivers/net/phy/qcom/Kconfig                       |   2 +-
+ drivers/net/phy/qcom/at803x.c                      | 167 +++++++++++++++++++++
+ 3 files changed, 211 insertions(+), 1 deletion(-)
+---
+base-commit: 5d6d67c4cb10a4b4d3ae35758d5eeed6239afdc8
+change-id: 20250430-ipq5018-ge-phy-db654afa4ced
+
+Best regards,
+-- 
+George Moussalem <george.moussalem@outlook.com>
 
 
-Thanks,
-Ming
 
