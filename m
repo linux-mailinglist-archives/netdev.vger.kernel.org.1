@@ -1,115 +1,262 @@
-Return-Path: <netdev+bounces-197487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6EDEAD8C45
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:40:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2E7CAD8C51
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDAF33B4D8E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:40:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBD6F189AE02
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55E74C92;
-	Fri, 13 Jun 2025 12:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958624C92;
+	Fri, 13 Jun 2025 12:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uK6jGYiF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OlEp+BOn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0934A1E;
-	Fri, 13 Jun 2025 12:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E824C62;
+	Fri, 13 Jun 2025 12:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749818421; cv=none; b=i4VQmkriYMS1pmnsd/Kro+xy83g9TYMk3YIKp+JInyJBj6pPJ8QBdq7j7cXFvgOCoSwug3Focp+yAFSGh1A9dSq4qSs0d0qFL4DgK5rHCRbvhlyfEwMr5179msCifGfPbztHj8ySO16zLjJG+WW4TeoSiTGU1Z4IbYgxPXLN5iU=
+	t=1749818502; cv=none; b=TDwmU2GqYp9TgmYS905Z3DzH8dn1OM98akOeg3ildABfKubl5eEwwp26hzsZvFCJJwu6pWtnXZqgBpxGbtpJU5tXIKRds48MRM0aPyEJheeaUrEmB+yrugVMO+mk7rsbNb0mwehvsJnJX9sBrA6hwaSDAH/HdRTXyK8H7z2vfwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749818421; c=relaxed/simple;
-	bh=n8uww8W98ephJQVBitTMkEpar+EJEaBk8t8Zr/77i8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=klyYXU7tIYBh8Xhcm08F/zIW5v8ntxqV7IHXZPkChiDjqMwPHO8yiwHNY51Et4ApGCnCmIrSRBf1x7in3YqbppvdNmXjIxwgpHZl/0YVGL9RnhJY0VdyEBHC5P/fVJO9/pwCE0fkjqa1akrR51dWNg0zatmYuklv5/Hyfk572o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uK6jGYiF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C8F9C4CEE3;
-	Fri, 13 Jun 2025 12:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749818421;
-	bh=n8uww8W98ephJQVBitTMkEpar+EJEaBk8t8Zr/77i8g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uK6jGYiFnRly4K4X48Oi04xh14YvBbkf7irMkqzx1nR9HVAM7ubnr970iwwaIScRU
-	 D+7M9+lyIZm0QyW8Dc+m/NmMDRXwrYRCaSS/O9B13hlpK5C9eeZm6bGAmwQwZzuf44
-	 mWrF5BjbxHhp5LgCrqaenA2lJNtJbg5ySW+15BwZ6iBBZDfz3s1Zlr5sMzsnRvrEW6
-	 Yq3UwBPCeIQw1qBM1J7LL8ga4PmkegKh5ncehT18chKIfQ9BD+7dJq7BSQuOrAOaNT
-	 EDeTcb/WMmRGqm6ts0aZqu4KO8696yEWrg8aOBS5DPqzB0uiTPNFaGFYCdAHM+NE1s
-	 pH3UHMZfbBPSw==
-Date: Fri, 13 Jun 2025 14:40:14 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
- <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
- <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Ruben Wauters"
- <rubenru09@aol.com>, "Shuah Khan" <skhan@linuxfoundation.org>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
- peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH v2 06/12] scripts: lib: netlink_yml_parser.py: use
- classes
-Message-ID: <20250613144014.5ae14ae0@foz.lan>
-In-Reply-To: <m2y0tvnb0e.fsf@gmail.com>
-References: <cover.1749723671.git.mchehab+huawei@kernel.org>
-	<08ac4b3457b99037c7ec91d7a2589d4c820fd63a.1749723671.git.mchehab+huawei@kernel.org>
-	<m2y0tvnb0e.fsf@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1749818502; c=relaxed/simple;
+	bh=giTLJ+/2RucH/mkRA5+WDxp59D+0mIMggRIn0VNkEv4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hsMMaYX+mch9y1goVgn8W8q/TyJTCMBH11iHtv8VCh1Qdm6Bgri9y/sMKCg1R9TyZLxHBf4ayamLDspXVJpPD4EyttpIxYMWYqTophSbb2wTLhYa4IxxCCMglDWzlE0GM6McKZzpNG78GWUL6VJ5rVrYdUTSeWioMqFDQLeDGZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OlEp+BOn; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749818501; x=1781354501;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=giTLJ+/2RucH/mkRA5+WDxp59D+0mIMggRIn0VNkEv4=;
+  b=OlEp+BOnaww7ekBQzluPItDcrZxD/CKKRnqx3XZsI+n0nk5Ehsz4+XGP
+   5Q5PY03qY6kS+d3j49XpagSaXiaFT//VT8huFdg/cpUgIJdT/T5I9IB6M
+   HEINZ9sflBIs6CmaTN7r/o0BjC5Ho/IsYNx8B0dSYo4TYDNp52Bx5QdCk
+   c+rVO/8PGeUMD8aWPo8giWMZL/4YRtY4YW11cUl9gwT2YZ89HA8Ga+z+E
+   1o1DhHJtDkmQ4E6OhWJzLTj+IMr/rSz0oPZNS83A9NqGGzucsXG0vspT1
+   Qf+5Ux+R8icAJIL3otOm02oiey/UDp1b/l74xw5rGyOHmmTLyNTfRtPNT
+   Q==;
+X-CSE-ConnectionGUID: azB1cd1PQ5KugktCkPM7AQ==
+X-CSE-MsgGUID: eRyoq8J0TYGz2WzekQsN5w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11463"; a="51950724"
+X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
+   d="scan'208";a="51950724"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 05:41:40 -0700
+X-CSE-ConnectionGUID: n8tF8Yz0QwiCWknZ06KL+g==
+X-CSE-MsgGUID: vMnjFekSRBC0d5y9HQttIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
+   d="scan'208";a="153110069"
+Received: from ubuntu.bj.intel.com ([10.238.156.109])
+  by orviesa005.jf.intel.com with ESMTP; 13 Jun 2025 05:41:37 -0700
+From: Jun Miao <jun.miao@intel.com>
+To: kuba@kernel.org,
+	oneukum@suse.com,
+	sbhatta@marvell.com
+Cc: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jun.miao@intel.com,
+	qiang.zhang@linux.dev
+Subject: [PATCH v1] net: usb: Convert tasklet API to new bottom half workqueue mechanism
+Date: Fri, 13 Jun 2025 20:43:18 +0800
+Message-Id: <20250613124318.2451947-1-jun.miao@intel.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Em Fri, 13 Jun 2025 12:20:33 +0100
-Donald Hunter <donald.hunter@gmail.com> escreveu:
+Migrate tasklet APIs to the new bottom half workqueue mechanism. It
+replaces all occurrences of tasklet usage with the appropriate workqueue
+APIs throughout the usbnet driver. This transition ensures compatibility
+with the latest design and enhances performance.
 
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
-> 
-> > As we'll be importing netlink parser into a Sphinx extension,
-> > move all functions and global variables inside two classes:
-> >
-> > - RstFormatters, containing ReST formatter logic, which are
-> >   YAML independent;
-> > - NetlinkYamlParser: contains the actual parser classes. That's
-> >   the only class that needs to be imported by the script or by
-> >   a Sphinx extension.  
-> 
-> I suggest a third class for the doc generator that is separate from the
-> yaml parsing.
+Signed-off-by: Jun Miao <jun.miao@intel.com>
+---
+ drivers/net/usb/usbnet.c   | 36 ++++++++++++++++++------------------
+ include/linux/usb/usbnet.h |  2 +-
+ 2 files changed, 19 insertions(+), 19 deletions(-)
 
-Do you mean moving those two (or three? [*]) methods to a new class?
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index c04e715a4c2a..566127b4e0ba 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -461,7 +461,7 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
+ 
+ 	__skb_queue_tail(&dev->done, skb);
+ 	if (dev->done.qlen == 1)
+-		tasklet_schedule(&dev->bh);
++		queue_work(system_bh_wq, &dev->bh_work);
+ 	spin_unlock(&dev->done.lock);
+ 	spin_unlock_irqrestore(&list->lock, flags);
+ 	return old_state;
+@@ -549,7 +549,7 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
+ 		default:
+ 			netif_dbg(dev, rx_err, dev->net,
+ 				  "rx submit, %d\n", retval);
+-			tasklet_schedule (&dev->bh);
++			queue_work(system_bh_wq, &dev->bh_work);
+ 			break;
+ 		case 0:
+ 			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
+@@ -709,7 +709,7 @@ void usbnet_resume_rx(struct usbnet *dev)
+ 		num++;
+ 	}
+ 
+-	tasklet_schedule(&dev->bh);
++	queue_work(system_bh_wq, &dev->bh_work);
+ 
+ 	netif_dbg(dev, rx_status, dev->net,
+ 		  "paused rx queue disabled, %d skbs requeued\n", num);
+@@ -778,7 +778,7 @@ void usbnet_unlink_rx_urbs(struct usbnet *dev)
+ {
+ 	if (netif_running(dev->net)) {
+ 		(void) unlink_urbs (dev, &dev->rxq);
+-		tasklet_schedule(&dev->bh);
++		queue_work(system_bh_wq, &dev->bh_work);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(usbnet_unlink_rx_urbs);
+@@ -861,14 +861,14 @@ int usbnet_stop (struct net_device *net)
+ 	/* deferred work (timer, softirq, task) must also stop */
+ 	dev->flags = 0;
+ 	timer_delete_sync(&dev->delay);
+-	tasklet_kill(&dev->bh);
++	disable_work_sync(&dev->bh_work);
+ 	cancel_work_sync(&dev->kevent);
+ 
+ 	/* We have cyclic dependencies. Those calls are needed
+ 	 * to break a cycle. We cannot fall into the gaps because
+ 	 * we have a flag
+ 	 */
+-	tasklet_kill(&dev->bh);
++	disable_work_sync(&dev->bh_work);
+ 	timer_delete_sync(&dev->delay);
+ 	cancel_work_sync(&dev->kevent);
+ 
+@@ -955,7 +955,7 @@ int usbnet_open (struct net_device *net)
+ 	clear_bit(EVENT_RX_KILL, &dev->flags);
+ 
+ 	// delay posting reads until we're fully open
+-	tasklet_schedule (&dev->bh);
++	queue_work(system_bh_wq, &dev->bh_work);
+ 	if (info->manage_power) {
+ 		retval = info->manage_power(dev, 1);
+ 		if (retval < 0) {
+@@ -1123,7 +1123,7 @@ static void __handle_link_change(struct usbnet *dev)
+ 		 */
+ 	} else {
+ 		/* submitting URBs for reading packets */
+-		tasklet_schedule(&dev->bh);
++		queue_work(system_bh_wq, &dev->bh_work);
+ 	}
+ 
+ 	/* hard_mtu or rx_urb_size may change during link change */
+@@ -1198,11 +1198,11 @@ usbnet_deferred_kevent (struct work_struct *work)
+ 		} else {
+ 			clear_bit (EVENT_RX_HALT, &dev->flags);
+ 			if (!usbnet_going_away(dev))
+-				tasklet_schedule(&dev->bh);
++				queue_work(system_bh_wq, &dev->bh_work);
+ 		}
+ 	}
+ 
+-	/* tasklet could resubmit itself forever if memory is tight */
++	/* workqueue could resubmit itself forever if memory is tight */
+ 	if (test_bit (EVENT_RX_MEMORY, &dev->flags)) {
+ 		struct urb	*urb = NULL;
+ 		int resched = 1;
+@@ -1224,7 +1224,7 @@ usbnet_deferred_kevent (struct work_struct *work)
+ fail_lowmem:
+ 			if (resched)
+ 				if (!usbnet_going_away(dev))
+-					tasklet_schedule(&dev->bh);
++					queue_work(system_bh_wq, &dev->bh_work);
+ 		}
+ 	}
+ 
+@@ -1325,7 +1325,7 @@ void usbnet_tx_timeout (struct net_device *net, unsigned int txqueue)
+ 	struct usbnet		*dev = netdev_priv(net);
+ 
+ 	unlink_urbs (dev, &dev->txq);
+-	tasklet_schedule (&dev->bh);
++	queue_work(system_bh_wq, &dev->bh_work);
+ 	/* this needs to be handled individually because the generic layer
+ 	 * doesn't know what is sufficient and could not restore private
+ 	 * information if a remedy of an unconditional reset were used.
+@@ -1547,7 +1547,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
+ 
+ /*-------------------------------------------------------------------------*/
+ 
+-// tasklet (work deferred from completions, in_irq) or timer
++// workqueue (work deferred from completions, in_irq) or timer
+ 
+ static void usbnet_bh (struct timer_list *t)
+ {
+@@ -1601,16 +1601,16 @@ static void usbnet_bh (struct timer_list *t)
+ 					  "rxqlen %d --> %d\n",
+ 					  temp, dev->rxq.qlen);
+ 			if (dev->rxq.qlen < RX_QLEN(dev))
+-				tasklet_schedule (&dev->bh);
++				queue_work(system_bh_wq, &dev->bh_work);
+ 		}
+ 		if (dev->txq.qlen < TX_QLEN (dev))
+ 			netif_wake_queue (dev->net);
+ 	}
+ }
+ 
+-static void usbnet_bh_tasklet(struct tasklet_struct *t)
++static void usbnet_bh_workqueue(struct work_struct *work)
+ {
+-	struct usbnet *dev = from_tasklet(dev, t, bh);
++	struct usbnet *dev = from_work(dev, work, bh_work);
+ 
+ 	usbnet_bh(&dev->delay);
+ }
+@@ -1742,7 +1742,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+ 	skb_queue_head_init (&dev->txq);
+ 	skb_queue_head_init (&dev->done);
+ 	skb_queue_head_init(&dev->rxq_pause);
+-	tasklet_setup(&dev->bh, usbnet_bh_tasklet);
++	INIT_WORK (&dev->bh_work, usbnet_bh_workqueue);
+ 	INIT_WORK (&dev->kevent, usbnet_deferred_kevent);
+ 	init_usb_anchor(&dev->deferred);
+ 	timer_setup(&dev->delay, usbnet_bh, 0);
+@@ -1971,7 +1971,7 @@ int usbnet_resume (struct usb_interface *intf)
+ 
+ 			if (!(dev->txq.qlen >= TX_QLEN(dev)))
+ 				netif_tx_wake_all_queues(dev->net);
+-			tasklet_schedule (&dev->bh);
++			queue_work(system_bh_wq, &dev->bh_work);
+ 		}
+ 	}
+ 
+diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
+index 0b9f1e598e3a..208682f77179 100644
+--- a/include/linux/usb/usbnet.h
++++ b/include/linux/usb/usbnet.h
+@@ -58,7 +58,7 @@ struct usbnet {
+ 	unsigned		interrupt_count;
+ 	struct mutex		interrupt_mutex;
+ 	struct usb_anchor	deferred;
+-	struct tasklet_struct	bh;
++	struct work_struct	bh_work;
+ 
+ 	struct work_struct	kevent;
+ 	unsigned long		flags;
+-- 
+2.32.0
 
-    def parse_yaml(self, obj: Dict[str, Any]) -> str:
-    def parse_yaml_file(self, filename: str) -> str:
-    def generate_main_index_rst(self, output: str, index_dir: str) -> None:
-
-Also, how should I name it to avoid confusion with NetlinkYamlParser? 
-Maybe YnlParser?
-
-[*] generate_main_index_rst is probably deprecated. eventually
-    we may drop it or keep it just at the command line stript.
-
-> The yaml parsing should really be refactored to reuse
-> tools/net/ynl/pyynl/lib/nlspec.py at some point.
-
-Makes sense, but such change is out of the scope of this series.
-
-> > With that, we won't pollute Sphinx namespace, avoiding any
-> > potential clashes.
-> >
-> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>  
-
-Thanks,
-Mauro
 
