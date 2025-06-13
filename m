@@ -1,205 +1,210 @@
-Return-Path: <netdev+bounces-197445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBA8AD8A9D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:35:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0089AD8AF7
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CD9C3BD619
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:34:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78FF31E3ECC
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DE12E175D;
-	Fri, 13 Jun 2025 11:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7E82E7F0D;
+	Fri, 13 Jun 2025 11:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GoGT+eoL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cqUHB8bq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86AD52D8784
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 11:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46EA2E2F04;
+	Fri, 13 Jun 2025 11:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749814420; cv=none; b=am7ZjGYgCxHHdFYoz4ivY05/cDGxY+MvNlTdwnbq9RGCj6teK/lM6rsGhgdP2bhbFpT7AhagLVtv/kACxy8fbwtmlbZ5FZTAxdNCW0CzrD2AC6KYwEkUeMNu0ID2W9swm4voRUCun3Y8YuIweNI6v2me14Av+iM9iO1RL+SPkVY=
+	t=1749814967; cv=none; b=Z/UcePKcJwDljXMNJtSjMdqAZgm4CuH78zUTN2Fg8HLLP/GT+jDuFLR3kgCF52pgOq5VmYMYNITujIDMWI5bvgR3vsYMsGZr35b2il+ZP4Oc935crlKsGaVowR1MnJnNj/rVtT1zJz9Rf/xuFv4j9csLdvL0eXnmcufRjAa5EdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749814420; c=relaxed/simple;
-	bh=lfynEmycBcTUhYS2//mGCt+9+hiekxvpfMXULeOUjqs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=heH11z3t4oCztCI/J0Zd4n/vGZSycV8jQNiWEe3lEP8yZvvem6veBl5Cp9ZjkrFeCaNMVj4EKc9jeaNIbcO7jgElre73H+mjEw4RyPopyn/pVZnUe39YeUQQ7APVWFQed9Ua6uck0FmWvv5cp3ErA5uOszbJ/8Q3Kv3jnIVF+D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GoGT+eoL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749814417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4I9CYam3FITVcfvZRQPJD4i6p9XAy84R0dLNBapStE=;
-	b=GoGT+eoLp9n9ptFhEl9azcYHjvm5Uu8dEhZw77xZ4zPWEDbvJHkIc8hFKuFrxMWhEP5MFo
-	A0pbo9kRMG3OpkQTTlWs0i+DkKYkRcVY18PJSiLuYJtQh5SXHjkUCJJOHy9pDeuI4ZG9o5
-	7/SdiSQ5fCpkSjRsqwKSn3QciSnpV+k=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-163-s700-o_5NmuVtHYdjSzeJQ-1; Fri,
- 13 Jun 2025 07:33:35 -0400
-X-MC-Unique: s700-o_5NmuVtHYdjSzeJQ-1
-X-Mimecast-MFC-AGG-ID: s700-o_5NmuVtHYdjSzeJQ_1749814410
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 847B21800281;
-	Fri, 13 Jun 2025 11:33:29 +0000 (UTC)
-Received: from [192.168.37.1] (unknown [10.22.58.9])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9651230044CC;
-	Fri, 13 Jun 2025 11:33:24 +0000 (UTC)
-From: Benjamin Coddington <bcodding@redhat.com>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Mike Snitzer <snitzer@kernel.org>,
- linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] nfsd: use threads array as-is in netlink interface
-Date: Fri, 13 Jun 2025 07:33:22 -0400
-Message-ID: <7DCDEBE1-1416-4A93-B994-49A6D21DC065@redhat.com>
-In-Reply-To: <38f1974c-f487-49b0-9447-74ed2db6ca7e@oracle.com>
-References: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
- <20250527-rpc-numa-v1-1-fa1d98e9a900@kernel.org>
- <a8d4c4cffe1a35ea831110ce1c7beea649352238.camel@kernel.org>
- <ae18305b-167d-4f27-bc3b-3d2d5f216d85@oracle.com>
- <1cd4d07f7afbd7322a1330a49a2cc24e8ff801cd.camel@kernel.org>
- <38f1974c-f487-49b0-9447-74ed2db6ca7e@oracle.com>
+	s=arc-20240116; t=1749814967; c=relaxed/simple;
+	bh=YJOiv9Fg+7StoSeQOc/lTArM4eisD34MNRqSXkmMMkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tIUcLz740Qd0ebaPpPjIYS1kqqJrnu1+wW1QQrGzOmUKcPwZ9ZcDYejlsHbEJsKRNlRGdnHT8G0BUFdNKUd2BR1X5yFyLOPRWYXRBF0JyoCs1WD0h1srrSeMN1Vyt9qGb+f4W1gYJKDlujqls96MXRSe/a+HtZcFBfDq+FR72UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cqUHB8bq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85D96C4CEF0;
+	Fri, 13 Jun 2025 11:42:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749814966;
+	bh=YJOiv9Fg+7StoSeQOc/lTArM4eisD34MNRqSXkmMMkU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cqUHB8bqw4DK2f/8OGIXHCCCSWdMpwS6cPAggdH2sFYFQMtFIIDL/uwng7RKVrZrO
+	 TDoFFHH5SBm2BnuP5rAy4sCsW7oePO2sEH9a6fhggs2eQxuRdO+ilImaPw1JTjnZPc
+	 AyIEDBnM1Eo3RaxPAFCWmFf0lCfiZNJu+LPwCe8b13CoV1dx+3SuiRVNCT+vzFBBW0
+	 SdLvMKeP724cJphj2nKQV5f+EJmqO7sTtmCjktSRS+yv+dn1jjFCB4cy10rei62MRe
+	 GopmR3guFRJW4hKrpQ74c1CxL5cyEGKe4S8z2Q+SUwV984SlLFL9J1G3XSh6rl2zKr
+	 hx2M3RAUnMHNA==
+Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1uQ2o0-00000005dEh-1q1E;
+	Fri, 13 Jun 2025 13:42:44 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Akira Yokosawa <akiyks@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ignacio Encinas Rubio <ignacio@iencinas.com>,
+	Marco Elver <elver@google.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jan Stancek <jstancek@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ruben Wauters <rubenru09@aol.com>,
+	joel@joelfernandes.org,
+	linux-kernel-mentees@lists.linux.dev,
+	lkmm@lists.linux.dev,
+	netdev@vger.kernel.org,
+	peterz@infradead.org,
+	stern@rowland.harvard.edu,
+	Breno Leitao <leitao@debian.org>
+Subject: [PATCH v3 00/16] Don't generate netlink .rst files inside $(srctree)
+Date: Fri, 13 Jun 2025 13:42:21 +0200
+Message-ID: <cover.1749812870.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-On 12 Jun 2025, at 12:42, Chuck Lever wrote:
+As discussed at:
+   https://lore.kernel.org/all/20250610101331.62ba466f@foz.lan/
 
-> On 6/12/25 12:15 PM, Jeff Layton wrote:
->> On Thu, 2025-06-12 at 12:05 -0400, Chuck Lever wrote:
->>> On 6/12/25 11:57 AM, Jeff Layton wrote:
->>>> On Tue, 2025-05-27 at 20:12 -0400, Jeff Layton wrote:
->>>>> The old nfsdfs interface for starting a server with multiple pools
->>>>> handles the special case of a single entry array passed down from
->>>>> userland by distributing the threads over every NUMA node.
->>>>>
->>>>> The netlink control interface however constructs an array of length=
+changeset f061c9f7d058 ("Documentation: Document each netlink family")
+added a logic which generates *.rst files inside $(srctree). This is bad
+when O=<BUILDDIR> is used.
 
->>>>> nfsd_nrpools() and fills any unprovided slots with 0's. This behavi=
-or
->>>>> defeats the special casing that the old interface relies on.
->>>>>
->>>>> Change nfsd_nl_threads_set_doit() to pass down the array from userl=
-and
->>>>> as-is.
->>>>>
->>>>> Fixes: 7f5c330b2620 ("nfsd: allow passing in array of thread counts=
- via netlink")
->>>>> Reported-by: Mike Snitzer <snitzer@kernel.org>
->>>>> Closes: https://lore.kernel.org/linux-nfs/aDC-ftnzhJAlwqwh@kernel.o=
-rg/
->>>>> Signed-off-by: Jeff Layton <jlayton@kernel.org>
->>>>> ---
->>>>>  fs/nfsd/nfsctl.c | 5 ++---
->>>>>  1 file changed, 2 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
->>>>> index ac265d6fde35df4e02b955050f5b0ef22e6e519c..22101e08c3e80350668=
-e94c395058bc228b08e64 100644
->>>>> --- a/fs/nfsd/nfsctl.c
->>>>> +++ b/fs/nfsd/nfsctl.c
->>>>> @@ -1611,7 +1611,7 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_b=
-uff *skb,
->>>>>   */
->>>>>  int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info=
- *info)
->>>>>  {
->>>>> -	int *nthreads, count =3D 0, nrpools, i, ret =3D -EOPNOTSUPP, rem;=
+A recent change renamed the yaml files used by Netlink, revealing a bad
+side effect: as "make cleandocs" don't clean the produced files and symbols
+appear duplicated for people that don't build the kernel from scratch.
 
->>>>> +	int *nthreads, nrpools =3D 0, i, ret =3D -EOPNOTSUPP, rem;
->>>>>  	struct net *net =3D genl_info_net(info);
->>>>>  	struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
->>>>>  	const struct nlattr *attr;
->>>>> @@ -1623,12 +1623,11 @@ int nfsd_nl_threads_set_doit(struct sk_buff=
- *skb, struct genl_info *info)
->>>>>  	/* count number of SERVER_THREADS values */
->>>>>  	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
->>>>>  		if (nla_type(attr) =3D=3D NFSD_A_SERVER_THREADS)
->>>>> -			count++;
->>>>> +			nrpools++;
->>>>>  	}
->>>>>
->>>>>  	mutex_lock(&nfsd_mutex);
->>>>>
->>>>> -	nrpools =3D max(count, nfsd_nrpools(net));
->>>>>  	nthreads =3D kcalloc(nrpools, sizeof(int), GFP_KERNEL);
->>>>>  	if (!nthreads) {
->>>>>  		ret =3D -ENOMEM;
->>>>
->>>> I noticed that this didn't go in to the recent merge window.
->>>>
->>>> This patch fixes a rather nasty regression when you try to start the=
+There are some possible solutions for that. The simplest one is to places
+the build files inside Documentation/output. The changes to do that are
+simple enough, but has one drawback, as it requires a (simple) template file
+for every netlink family file from netlink/specs. This was done on version
+1 of this series.
 
->>>> server on a NUMA-capable box.
->>>
->>> The NFSD netlink interface is not broadly used yet, is it?
->>>
->>
->> It is. RHEL10 shipped with it, for instance and it's been in Fedora fo=
-r
->> a while.
->
-> RHEL 10 is shiny and new, and Fedora is bleeding edge. It's not likely
-> either of these are deployed in production environments yet. Just sayin=
+Since version 2, we're addressing it the right Sphinx way: adding an
+yaml parser extension. We opted to write such extension in a way that no
+actual yaml conversion code is inside it. This makes it flexible enough
+to handle other types of yaml files in the future. The actual yaml
+conversion logic were placed at scripts/lib/netlink_yml_parser.py. The
+existing command line tool was also modified to use the library ther.
 
-> that in this case, the Bayesian filter leans towards waiting a full dev=
+With this version, there's no need to add any template file per netlink/spec
+file. Yet, the Documentation/netlink/specs/index.rst require updates as
+spec files are added/renamed/removed. The already-existing script can
+update running:
 
-> cycle.
+            tools/net/ynl/pyynl/ynl_gen_rst.py -x  -v -o Documentation/netlink/specs/index.rst
 
-We don't consider it acceptable to allow known defects to persist in our
-products just because they are bleeding edge.
+Alternatively, someone could manually update the file. I tried to do the
+index generation at build time, but it didn't work properly (at least
+when using SPHINXDOCS).
 
->>> Since this one came in late during the 6.16 dev cycle and the Fixes: =
-tag
->>> references a commit that is already in released kernels, I put in the=
+-
 
->>> "next merge window" pile. On it's own it doesn't look urgent to me.
->>>
->>
->> I'd really like to see this go in soon and to stable. If you want me t=
-o
->> respin the changelog, I can. It's not a crash, but it manifests as los=
-t
->> RPCs that just hang. It took me quite a while to figure out what was
->> going on, and I'd prefer that we not put users through that.
->
-> If someone can confirm that it is effective, I'll add it to nfsd-fixes.=
+I took some time to check Sphinx performance. On a Ryzen 9 7900 machine
+(24 CPU threads), building with default "-j auto" mode is about
+30% slower than using "-j8". The time to build with "-j8" there is similar
+to the time of building with "-jauto" on a notebook with 8 CPU threads.
 
+Maybe we should change the default at Documentation/sphinx/parallel-wrapper.sh
+to use a better default than "auto".
 
-I'm sure it is if Jeff spent time on it.
+On my machine, running it on python3.13t (thread-free) takes 5:35 minutes:
 
-We're going to try to get this into RHEL-10 ASAP, because dropped RPCs
-manifest as datacenter-wide problems that are very hard to diagnose.  Its=
- a
-real pain that we won't have an upstream commit assigned for it.
+	$ time make -j8 htmldocs
+	...
+	<frozen importlib._bootstrap>:488: RuntimeWarning: The global interpreter lock (GIL) has been enabled to load module 'yaml._yaml', which has not declared that it can run safely without the GIL. To override this behavior and keep the GIL disabled (at your own risk), run with PYTHON_GIL=0 or -Xgil=0.
+	...
+	real    5m35,125s
+	user    12m21,973s
+	sys     2m29,956s
 
-Ben
+The non-thread-free version is a little bit slower:
+
+	real    6m21,788s
+	user    12m44,493s
+	sys     1m48,337s
+
+But it is still taking about the same time as before this change.
+
+Both tests were done with Sphinx 8.2.3.
+
+---
+
+v3:
+- Two series got merged altogether:
+  - https://lore.kernel.org/linux-doc/cover.1749723671.git.mchehab+huawei@kernel.org/T/#t
+  - https://lore.kernel.org/linux-doc/cover.1749735022.git.mchehab+huawei@kernel.org
+
+- Added an extra patch to update MAINTAINERS to point to YNL library
+- Added a (somewhat unrelated) patch that remove warnings check when
+  running "make cleandocs".
+
+---
+
+v2:
+- Use a Sphinx extension to handle netlink files.
+
+v1:
+- Statically add template files to as networking/netlink_spec/<family>.rst
+
+Mauro Carvalho Chehab (16):
+  tools: ynl_gen_rst.py: create a top-level reference
+  docs: netlink: netlink-raw.rst: use :ref: instead of :doc:
+  docs: netlink: don't ignore generated rst files
+  tools: ynl_gen_rst.py: make the index parser more generic
+  tools: ynl_gen_rst.py: Split library from command line tool
+  scripts: lib: netlink_yml_parser.py: use classes
+  tools: ynl_gen_rst.py: do some coding style cleanups
+  scripts: netlink_yml_parser.py: improve index.rst generation
+  docs: sphinx: add a parser template for yaml files
+  docs: sphinx: parser_yaml.py: add Netlink specs parser
+  docs: use parser_yaml extension to handle Netlink specs
+  docs: conf.py: don't handle yaml files outside Netlink specs
+  docs: conf.py: add include_pattern to speedup
+  docs: uapi: netlink: update netlink specs link
+  MAINTAINERS: add maintainers for netlink_yml_parser.py
+  docs: Makefile: disable check rules on make cleandocs
+
+ .pylintrc                                     |   2 +-
+ Documentation/Makefile                        |  19 +-
+ Documentation/conf.py                         |  20 +-
+ Documentation/netlink/specs/index.rst         |  38 ++
+ Documentation/networking/index.rst            |   2 +-
+ .../networking/netlink_spec/.gitignore        |   1 -
+ .../networking/netlink_spec/readme.txt        |   4 -
+ Documentation/sphinx/parser_yaml.py           |  80 ++++
+ Documentation/userspace-api/netlink/index.rst |   2 +-
+ .../userspace-api/netlink/netlink-raw.rst     |   6 +-
+ Documentation/userspace-api/netlink/specs.rst |   2 +-
+ MAINTAINERS                                   |   2 +
+ scripts/lib/netlink_yml_parser.py             | 394 ++++++++++++++++++
+ tools/net/ynl/pyynl/ynl_gen_rst.py            | 378 +----------------
+ 14 files changed, 553 insertions(+), 397 deletions(-)
+ create mode 100644 Documentation/netlink/specs/index.rst
+ delete mode 100644 Documentation/networking/netlink_spec/.gitignore
+ delete mode 100644 Documentation/networking/netlink_spec/readme.txt
+ create mode 100755 Documentation/sphinx/parser_yaml.py
+ create mode 100755 scripts/lib/netlink_yml_parser.py
+
+-- 
+2.49.0
 
 
