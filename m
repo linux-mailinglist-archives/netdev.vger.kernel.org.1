@@ -1,203 +1,234 @@
-Return-Path: <netdev+bounces-197537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80FF9AD9132
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:23:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F366AD9182
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E89153BA032
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:23:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E985A1BC4197
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E4C18A6DF;
-	Fri, 13 Jun 2025 15:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AC11F1921;
+	Fri, 13 Jun 2025 15:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdVSl1sY"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="ZnVqPrGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013054.outbound.protection.outlook.com [40.107.159.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C0B1E3775
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 15:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749828205; cv=none; b=LAMuPGQQ5lfhCFbtsP7ZUv8GIeT2CpuqdWq/+wr3KjdYVfbw0Ju6BgmawidSTg5f5NJbFUGYkuLeRJNl4rjb1rmRIxy/UZ41kLp8AEYevojBh6yGfKDEKyDC8GqyHXMLIsU5cRNATuDKSa480koQv4FWLvuD2jm/3p0x0C+pxEg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749828205; c=relaxed/simple;
-	bh=/hXfFYfBfbotrpQpMR/vgWRHOpzAwTsszsgRbICb1ss=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R84jYb7N60DvhPuC3iorWH8hnCBgxXr8lygclrYMlmpL61DD2gLIfK2Nsh3E4f+2fKpMewHhU2l95r15kCPbvnRQyVLq8nHLtXIMDKHrxDnVKk5jMft2szYGffagW73cd6sMkvfoHPlrPyJwqbWUBP95hqalo+158ljCgDP9hYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cdVSl1sY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749828202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1p5HdA5CaRZpyjsJJugbtkVKQTEXEDNVElJiBH9/rEM=;
-	b=cdVSl1sYWST5Aox4DYgP7yyzAEbm9uD6R1CwO0ckafg3ann2mEdWvYl0Jd9PTFPiuJx/Zg
-	mF8hnRjgTr7zuC2EhWoAkMs5Lt42f6wrByYVAubIEFmLJK3+8ICtExgLCCTCBLl/kQOHdQ
-	1TJt4htz3nA57wOWNTjRPzBLXPSyqZA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-251-C0We3tJzMne5spLZueix3g-1; Fri,
- 13 Jun 2025 11:23:17 -0400
-X-MC-Unique: C0We3tJzMne5spLZueix3g-1
-X-Mimecast-MFC-AGG-ID: C0We3tJzMne5spLZueix3g_1749828195
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 71891195609F;
-	Fri, 13 Jun 2025 15:23:14 +0000 (UTC)
-Received: from [192.168.37.1] (unknown [10.22.58.9])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6EEA180045C;
-	Fri, 13 Jun 2025 15:23:09 +0000 (UTC)
-From: Benjamin Coddington <bcodding@redhat.com>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Mike Snitzer <snitzer@kernel.org>,
- linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] nfsd: use threads array as-is in netlink interface
-Date: Fri, 13 Jun 2025 11:23:07 -0400
-Message-ID: <6D3B09C4-0E35-4A98-8C29-C2EDDBD17163@redhat.com>
-In-Reply-To: <df0a6fc5-6ef9-44b6-b6c2-e3cb4a2d1512@oracle.com>
-References: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
- <20250527-rpc-numa-v1-1-fa1d98e9a900@kernel.org>
- <a8d4c4cffe1a35ea831110ce1c7beea649352238.camel@kernel.org>
- <ae18305b-167d-4f27-bc3b-3d2d5f216d85@oracle.com>
- <1cd4d07f7afbd7322a1330a49a2cc24e8ff801cd.camel@kernel.org>
- <38f1974c-f487-49b0-9447-74ed2db6ca7e@oracle.com>
- <7DCDEBE1-1416-4A93-B994-49A6D21DC065@redhat.com>
- <df0a6fc5-6ef9-44b6-b6c2-e3cb4a2d1512@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D581F1F0E24;
+	Fri, 13 Jun 2025 15:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749828999; cv=fail; b=d8C2ktgfPnK/xCAu3JEK5tQ4rwp85cBet814lcjpoEoHGS5ZDevaRW1GPFLES37IB2mRN2duqTquY9Zw/VVjD6vnbSDa9s+Te0mQD2lV2fMDS0qMmVXIrsAR4oQx4yxXI4ixMXbsqv7iQrYMySJjKASE/PW1sV1SSukhjsDscAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749828999; c=relaxed/simple;
+	bh=AhB+Kv8Nj+mHoy9hs2J+/aqBxmb5vM2pBufGOc7wNIY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=gRi0RGxMqTlGuvkBpC8NqGQ69/ZtWKxmnxr6LuC4L2RAVcyyGsaZBC/UHXBmZvHpJDx9I2VfOqEoloiUGUOVunkW5q2GD+dOMi/tNNKxu4ZHGJumsQGdASD11tYUwtRXXYHEyMH/BbLSbRIoJf7VyI1oWbFJwLQF60KLhhtx5Qc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=ZnVqPrGw; arc=fail smtp.client-ip=40.107.159.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M7n6fmmM2p4zM13+Ek3ZC1E2/N8LrhR6oDv8H5ok/+AdygHQkogVuqfwub4VhJHKnNQK3aG0LjvzvqarJKIGzTLQbCMxfFJWnudsYfMXGkxGnV/PuT6KmvL8Rr9lBLwO+kjMzcAKSIsRRG2SVsXmnKISxxa1h0GQjGAbiAvVbV5ioNrcR1ivSt+TITU28G4Dudw+wvRUvbHgcSBesjOEwidZ/B9s82QVr50OK7pBflPAi5XSOQsQFQfJbguhrBl8+AQZbCfDuzW3P9xWt5WV/rFAVRKHw2ZA7wdCjX93Mwer4rRb9tYUdrdQVVcGpF7Q5dxE22UrpUB6LPNbKBaftw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NuHv1FXOgLnYZKvDSnWzZ/qOpgSSMX0EEAAbBDmlXrs=;
+ b=mHle57uLBCm9C1XFAa1XrZ8gi009ekVJx2mSguCSCs+nRukQRxdYvIX9h3tcsHHT6JoZC9XAath/jrV91SVbiAWjr/V+S+rwIYApc6j5XlLOwCi0pGLa9iU4RPAb/bkdTA6WnDens1wl92sjrYibn8e5DCrCfGw2ITxvRis2Rs4NLMqqESqwWi2M0oIp3+jrxQXvVn8FAqq2oz3k2diq9fYuAF7MbhAjk1qbEsUstAKjk4usbs7o+fRoJywdWbsU/QloqTGiKB3NcIfxHgjBfPUI85vhotCD7OET/2DkKxE/NXXhNdM+Wg+twLb3IDDYhUFH0A3TSDLxOh24pqzreg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 131.228.2.241) smtp.rcpttodomain=apple.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=temperror action=none
+ header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NuHv1FXOgLnYZKvDSnWzZ/qOpgSSMX0EEAAbBDmlXrs=;
+ b=ZnVqPrGwcyEaHDC/844bXoik/34hikYy4FQp4iumM//63f1ht7T8+a4Zz4mdyFLtwLIvsNEvNs1dYMYZaGmNoG6y9EUEIE16PduHQb0gfcnjvrA9VWYz1DHyHT/kTzseuSBKxTabLdv+o2VJjRe9NN4fsLvcxlpqcoduhYvjkPjFk0CTO8lZBelQRcyjgBM37sU3Q1h/i/EtNO+AVZGz8AdNvFQfJoK3nyLoK5OPNTrB8Vnjs/J/SJ5//ehOmGQQ/kUXRhXnxpJ1oID0IXNgZVbqJoHfZL5xOd8ybGZv9ME7LWvJubB6zomK0W8HsnDxIdbvCpzFdHu6XLSijkQieQ==
+Received: from DB9PR02CA0022.eurprd02.prod.outlook.com (2603:10a6:10:1d9::27)
+ by DB9PR07MB7065.eurprd07.prod.outlook.com (2603:10a6:10:1fa::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Fri, 13 Jun
+ 2025 15:36:33 +0000
+Received: from DU6PEPF00009523.eurprd02.prod.outlook.com
+ (2603:10a6:10:1d9:cafe::8a) by DB9PR02CA0022.outlook.office365.com
+ (2603:10a6:10:1d9::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.17 via Frontend Transport; Fri,
+ 13 Jun 2025 15:36:33 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 131.228.2.241) smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not
+ signed) header.d=none;dmarc=temperror action=none
+ header.from=nokia-bell-labs.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of nokia-bell-labs.com: DNS Timeout)
+Received: from fihe3nok0734.emea.nsn-net.net (131.228.2.241) by
+ DU6PEPF00009523.mail.protection.outlook.com (10.167.8.4) with Microsoft SMTP
+ Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.15 via
+ Frontend Transport; Fri, 13 Jun 2025 15:36:32 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fihe3nok0734.emea.nsn-net.net (Postfix) with ESMTP id 14B8B20176;
+	Fri, 13 Jun 2025 18:36:31 +0300 (EEST)
+From: chia-yu.chang@nokia-bell-labs.com
+To: alok.a.tiwari@oracle.com,
+	donald.hunter@gmail.com,
+	xandfury@gmail.com,
+	netdev@vger.kernel.org,
+	dave.taht@gmail.com,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	kuba@kernel.org,
+	stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	andrew+netdev@lunn.ch,
+	ast@fiberby.net,
+	liuhangbin@gmail.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	ij@kernel.org,
+	ncardwell@google.com,
+	koen.de_schepper@nokia-bell-labs.com,
+	g.white@cablelabs.com,
+	ingemar.s.johansson@ericsson.com,
+	mirja.kuehlewind@ericsson.com,
+	cheshire@apple.com,
+	rs.ietf@gmx.at,
+	Jason_Livingood@comcast.com,
+	vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v9 iproute2-next 0/1] DUALPI2 iproute2 patch
+Date: Fri, 13 Jun 2025 17:36:28 +0200
+Message-Id: <20250613153629.7965-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU6PEPF00009523:EE_|DB9PR07MB7065:EE_
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-MS-Office365-Filtering-Correlation-Id: 9e7d59fa-9fd8-486b-1baf-08ddaa9012ef
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|7416014|376014|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?K3R4IvAaa/hluJhdxrj4tPXDfxEtU7n+b30a6K4dC5Bfd1aDBF9WpHpTkKmg?=
+ =?us-ascii?Q?Lg+VYfbYiWZRiwMtRMb6Q5FX47zbHEk1kMHaBlRx57YJM+tSUyimcCNjlecO?=
+ =?us-ascii?Q?J3aJUaRoSPXJWMJEaqvsNf+umoKAfL6LFn/+iAuATJtenB+ZSBzRUmppBuIu?=
+ =?us-ascii?Q?Fzl/Oya/9Q40NQRtFC9fDcRT99bJefIeKxBwXChz0A0/m62nK76NnEs5CLuD?=
+ =?us-ascii?Q?8CU+hLyQkIHfAYjWhQVr5GR3rfl87MFRRTmhj2sHg2kZ7pfBYkwbqbjwhRgH?=
+ =?us-ascii?Q?WuPNZuQLVpmgsG98IXVgKh2ZXEgFQfAxGyzUUk5xRI3OAkeSrbG4P9UWWKVe?=
+ =?us-ascii?Q?KtlhByNTJUvm0nhtZY04D+kLYY9o6zvmg9iC3+PHkZ+V7cTOVXJ2LvWeH/Nj?=
+ =?us-ascii?Q?XzREcKOOkqFO6WsNcf/FXFawr2gjAAhzudxyh/zZK7EEBvG7Pt1rb7tElyaT?=
+ =?us-ascii?Q?hh/CUlcv3xGWzhS3uelrLHoUI9HOBhClmjsk1R+Z1x9L3ZH+/fORUcFW5eu6?=
+ =?us-ascii?Q?UglxZPcyxGp/GRndhyihYhPWFpz0rLiMkS3pvyPGiWwOk5aOi2y+8dbwTmDM?=
+ =?us-ascii?Q?5PBMx0m/Zd1SaIgky5GVX1gfaa4M+DIBO34qIbFlM7orpV3Q8StvkdanY3ur?=
+ =?us-ascii?Q?HO1yybvt94Z0UisxpszAkv0rDQJJAs8tFc/+pDoMHRs7dMVCVcNhBSm3eKel?=
+ =?us-ascii?Q?N2XFOrJ7k1iShVc/bPTCHHPmtzKQVHK7aQHFCIQbOVEd++yUHop85bxBjINC?=
+ =?us-ascii?Q?Xqd1mrAmImU2Y2lyqJ36Ur2WwKA/oNW3cqEDlj6uS1VVbvfWu7mN8n6xHsmp?=
+ =?us-ascii?Q?vNPf/1yVI6GxZSzHpltRxrVi1M53HNg/tYARORukSpQo0iYVIFacbf0gDRX5?=
+ =?us-ascii?Q?6AFB52OIDWQ38jlTMTz4YYfs7snCU0bIc6Lj57y3DO6gjU8NxirA/3SVUlhB?=
+ =?us-ascii?Q?kRx3mvUOZvUTLXqocDmQX2nIEUbyAK+8ZFpuhXSN12WoMjeiMT/bdE2m7K36?=
+ =?us-ascii?Q?w6Mx6xKXABGYlMQK3Yo37Hiqr4jG0527vhM8g3K+9/oadFtJLQToFFrNcETs?=
+ =?us-ascii?Q?97+Pd4MfmveyReCPZF/6B+9Pf1krjyNLRipeg+4mTVMyzkInLPQP2047Damm?=
+ =?us-ascii?Q?pjVXcj3TWcIrJF+kf3WPk0J3htCfJJkxaEvIfg6BpTLB/E4nzYAULjVbI1nn?=
+ =?us-ascii?Q?einNlE3bcm7IqXg/SyTGHcCfv/G+5HIK5ILLiGBSK9pZln6X5tSjwwUpMmZK?=
+ =?us-ascii?Q?mCRPtusWw8V+4vy/f2LTcSIOHnRrQen4SJ3chaIdx9Fh5bUFJi/6sqGwMXlv?=
+ =?us-ascii?Q?1wgo/P65oDmCh3Eu3ZON4P6K40d08QIToTolQYOdW6eaVzMtS2kzB7PGU/aJ?=
+ =?us-ascii?Q?B3zhNxkOq5XfANyksnHMRVs504XSfEXqaz91A/Zq4d/xhsP5KBlClgN16JB3?=
+ =?us-ascii?Q?638sRGN3VtRv1bLcAOgmtGVH5DWD9LtpBLo/kxPbCzuCLZ9HPxMHfzRGRmhb?=
+ =?us-ascii?Q?PTiGvvPHrKAmUd5OSzNPQhlTcAm1dvYsu8ui/QZXFOJkCSw6nW/a4OHDRQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:131.228.2.241;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe3nok0734.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(7416014)(376014)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2025 15:36:32.5096
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e7d59fa-9fd8-486b-1baf-08ddaa9012ef
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.241];Helo=[fihe3nok0734.emea.nsn-net.net]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU6PEPF00009523.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR07MB7065
 
-On 13 Jun 2025, at 10:56, Chuck Lever wrote:
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-> On 6/13/25 7:33 AM, Benjamin Coddington wrote:
->> We don't consider it acceptable to allow known defects to persist in our
->> products just because they are bleeding edge.
->
-> I'm not letting this issue persist. Proper testing takes time.
->
-> The patch description and discussion around this change did not include
-> any information about its pervasiveness and only a little about its
-> severity. I used my best judgement and followed my usual rules, which
-> are:
->
-> 1. Crashers, data corrupters, and security bugs with public bug reports
->    and confirmed fix effectiveness go in as quickly as we can test.
->    Note well that we have to balance the risk of introducing regressions
->    in this case, since going in quickly means the fix lacks significant
->    test experience.
->
-> 1a. Rashes and bug bites require application of topical hydrocortisone.
+Hello,
 
-:) no rash here, this response is very soothing.
+  Please find DUALPI2 iproute2 patch v9.
 
-> 2. Patches sit in nfsd-testing for at least two weeks; better if they
->    are there for four. I have CI running daily on that branch, and
->    sometimes it takes a while for a problem to surface and be noticed.
->
-> 3. Patches should sit in nfsd-next or nfsd-fixes for at least as long
->    as it takes for them to matriculate into linux-next and fs-next.
->
-> 4. If the patch fixes an issue that was introduced in the most recent
->    merge window, it goes in -fixes .
->
-> 5. If the patch fixes an issue that is already in released kernels
->    (and we are at rule 5 because the patch does not fix an immediate
->    issue) then it goes in -next .
->
-> These evidence-oriented guidelines are in place to ensure that we don't
-> panic and rush commits into the kernel without careful review and
-> testing. There have been plenty of times when a fix that was pushed
-> urgently was not complete or even made things worse. It's a long
-> pipeline on purpose.
+  For more details of DualPI2, please refer IETF RFC9332
+(https://datatracker.ietf.org/doc/html/rfc9332).
 
-I totally understand, thanks very much for having a set of rules and
-guidelines and even more for taking the time to spell them out here.
+Best Regards,
+Chia-Yu
 
-I wanted to express that Red Hat does consider all of its releases to be
-important to fix and maintain. I'd like to speak against arguments about fix
-urgency based on distro versions.  I think in this case we innocently crept
-into these arguments as Jeff presented evidence that the problem exists in
-the wild.
+---
+v9 (13-Jun-25)
+- Fix space issue and typos (ALOK TIWARI <alok.a.tiwari@oracle.com>)
+- Change 'rtt_typical' to 'typical_rtt' in tc/q_dualpi2.c (ALOK TIWARI <alok.a.tiwari@oracle.com>)
+- Add the num of enum used by DualPI2 in pkt_sched.h 
 
-> The issues with this patch were:
->
-> - It was posted very late in the dev cycle for v6.16. (Jeff's urgent
->   fixes always seem to happen during -rc7 ;-)
->
-> - The Fixes: tag refers to a commit that was several releases ago, and
->   I am not aware of specific reports of anyone hitting a similar issue.
->
-> - IME, the adoption of enterprise distributions is slow. RHEL 10 is
->   still only on its GA release. Therefore my estimation is that the
->   number of potentially impacted customers will be small for some time,
->   enough time for us to test Jeff's fix appropriately.
+v8 (09-May-25)
+- Update pkt_sched.h with the one in nex-next
+- Correct a typo in the comment within pkt_sched.h (ALOK TIWARI <alok.a.tiwari@oracle.com>)
+- Update manual content in man/man8/tc-dualpi2.8 (ALOK TIWARI <alok.a.tiwari@oracle.com>)
+- Update tc/q_dualpi2.c to fix missing blank lines and add missing case (ALOK TIWARI <alok.a.tiwari@oracle.com>)
 
-While this is true, I hope we can still treat every release version equally
-/if/ we make any arguments about urgency based on what's currently released
-in a particular distro.  Your point is a good counter-arguement to Jeff's
-assertion that the problem has been widely distributed - but it does start
-to creep into a space which feels like we're treating certain early versions
-of a specific distro differently and didn't sit well for me.  I'd rather not
-have our upstream work or decisions appear to favor a particular distro.
+v7 (05-May-25)
+- Align pkt_sched.h with the v14 version of net-next due to spec modification in tc.yaml
+- Reorganize dualpi2_print_opt() to match the order in tc.yaml
+- Remove credit-queue in PRINT_JSON
 
-> - The issue did not appear to me to be severe, but maybe I didn't read
->   the patch description carefully enough.
->
-> - Although I respect, admire, and greatly appreciate the effort Jeff
->   made to nail this one, that does not mean it is a pervasive problem.
->   Jeff is quite capable of applying his own work to the kernels he and
->   his employer care about.
->
-<snip>
->
-> It sounds like Red Hat also does not have clear evidence that links this
-> patch to a specific failure experienced by your customers. This affirms
-> my understanding that this fix is defensive rather than urgent.
+v6 (26-Apr-25)
+- Update JSON file output due to spec modification in tc.yaml of net-next
 
-Also true - not yet, but there's a significant lag between customers
-discovering a problem and our engineers knowing about it, and during that
-lag all sorts of time, money, and reputation points are lost.
+v5 (25-Mar-25)
+- Use matches() to replace current strcmp() (Stephen Hemminger <stephen@networkplumber.org>)
+- Use general parse_percent() for handling scaled percentage values (Stephen Hemminger <stephen@networkplumber.org>)
+- Add print function for JSON of dualpi2 stats (Stephen Hemminger <stephen@networkplumber.org>)
 
-> As a rule, defensive fixes go in during merge windows.
->
->> Its a real pain that we won't have an upstream commit assigned for it.
->
-> It's not reasonable for any upstream maintainer not employed by Red Hat
-> to know about or cleave to Red Hat's internal processes. But, if an
-> issue is on Red Hat's radar, then you are welcome to make its priority
-> known to me so I can schedule fixes appropriately.
+v4 (16-Mar-25)
+- Add min_qlen_step to the dualpi2 attribute as the minimum queue length in number of packets in the L-queue to start step marking.
 
-Thanks!  I realize that, which is why I spoke up.
+v3 (21-Feb-25)
+- Add memlimit to the dualpi2 attribute, and add memory_used, max_memory_used, and memory_limit in dualpi2 stats (Dave Taht <dave.taht@gmail.com>)
+- Update the manual to align with the latest implementation and clarify the queue naming and default unit
+- Use common "get_scaled_alpha_beta" and clean print_opt for Dualpi2
 
-> All that said, I've promoted the fix to nfsd-fixes, since it's narrow
-> and has several weeks of test experience now.
+v2 (23-Oct-24)
+- Rename get_float in dualpi2 to get_float_min_max in utils.c
+- Move get_float from iplink_can.c in utils.c (Stephen Hemminger <stephen@networkplumber.org>)
+- Add print function for JSON of dualpi2 (Stephen Hemminger <stephen@networkplumber.org>)
 
-Again, thanks!  We greatly appreciate the work you're doing.
+---
+Chia-Yu Chang (1):
+  tc: add dualpi2 scheduler module
 
-Best,
-Ben
+ bash-completion/tc             |  11 +-
+ include/uapi/linux/pkt_sched.h |  70 ++++-
+ include/utils.h                |   2 +
+ ip/iplink_can.c                |  14 -
+ lib/utils.c                    |  30 ++
+ man/man8/tc-dualpi2.8          | 249 +++++++++++++++
+ tc/Makefile                    |   1 +
+ tc/q_dualpi2.c                 | 534 +++++++++++++++++++++++++++++++++
+ 8 files changed, 895 insertions(+), 16 deletions(-)
+ create mode 100644 man/man8/tc-dualpi2.8
+ create mode 100644 tc/q_dualpi2.c
+
+-- 
+2.34.1
 
 
