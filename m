@@ -1,267 +1,205 @@
-Return-Path: <netdev+bounces-197444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73482AD8A93
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:34:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFBA8AD8A9D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1707D1E3F56
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:34:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CD9C3BD619
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD8C2E765A;
-	Fri, 13 Jun 2025 11:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DE12E175D;
+	Fri, 13 Jun 2025 11:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GoGT+eoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52A62E7625;
-	Fri, 13 Jun 2025 11:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86AD52D8784
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 11:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749814326; cv=none; b=HlRDCT581ALV5+Bmh5bPKZsEiuc/wmLu4IXlsxAKxgVTECLu0VRpc3r55dmAxelqguTPgIpypyAN9x9XGAicEHk/hHsfClWKrVK1rmSHMwMlwHQPCJ85PkU3jxR/x40F4+2IioUDMS3ThVDOt1jtgR292TY4+e8vBC8rqcGokZY=
+	t=1749814420; cv=none; b=am7ZjGYgCxHHdFYoz4ivY05/cDGxY+MvNlTdwnbq9RGCj6teK/lM6rsGhgdP2bhbFpT7AhagLVtv/kACxy8fbwtmlbZ5FZTAxdNCW0CzrD2AC6KYwEkUeMNu0ID2W9swm4voRUCun3Y8YuIweNI6v2me14Av+iM9iO1RL+SPkVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749814326; c=relaxed/simple;
-	bh=5v/1hL/ALMXFWvwHghT7FERfuc6HtTVh0PFSKcLiZac=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XmIOJ2lCFgK51olmTdEGv9TFwh+aRt+LCmArx3YGheC0NETQUa8LQ7qDkCNMFQwNNaCG1jGSg2kKg2cIgak29MEI6yWAE594GTncIQyBDqTfMxSGvzH339juDZMwI0MdPzEFLH+X+SL6ZynFSGHmvmQ+0cEjYA8xt86LEPKTU9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-acb5ec407b1so328390866b.1;
-        Fri, 13 Jun 2025 04:32:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749814323; x=1750419123;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AFyrorJHtIadhR2WZLtoMNadK7UpAA+1kioSAElIigY=;
-        b=WRnIjvB3Nv1R7Up6O3NhJxPrZigKvM2BS5L/oY5DH/2p6i4tlOzmTFRy0QkjPFpPzx
-         Jgc5q+sfaBIFX3tgfXUA/xedYFu8nRG/ZncqZLZnGO7J1Khccf34W2m3CrVHEj9ge/gf
-         ViHpMJU8iM6YyLH+G29v/OgROvrNJhij4nJxxtP65m5CDtkZSHTHLOOJzfh6Dr2rGWmf
-         2MgRczmAJ8T7nbdV2RGaviZgP3M7AT81w50ZME3sIywd7w2tqzvLjLJgG0DKNAcLeGiY
-         lnAZ2jNmXAeTUC5XdeDd8HUMWi4N54j4rpa4eBNh49LkF3dF8x3YZi7k8p5wuSBuJDTb
-         Y/Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5UDWFRmxD/7HlAjwDcB0XuRvlipkDraz0HPdUsLalD98jhzK6iP5YQkM4UukkTCES7RKAUjYZCvCfNhk=@vger.kernel.org, AJvYcCXIifHh4fyNx9FaZRZ5wwwyCcOsfSFRHXQhuVfKaAaJfRhMnOaLMK7KSI+gc4IzEZnXs6+P4i7ibWTXSTU1Fs+Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YznfkqO8qkNEjSWw8pQ11qcVgEkBYbDQl/916ZryjXXwYDmTmyW
-	86jrHMJeTThNBwD8n0aKsUXybjl4hkwT+6I4A1rn5Z9cvvtMnre8u8HsInlK5A==
-X-Gm-Gg: ASbGncvVXq4HB9+4h0Pgqa21mVV4BGE61H3vEU/bfsdQrXO7x5BJ3R5tINJUEXJK9z0
-	fcLNmhVtUTL/Q6MFcR1Aj6/RU0two6NBYEAC0amwBWw6DxyTEGOPUMFgYcsZGmGKykOI/FXguXc
-	jG2crlKfEW67bIDR9F2+JiUz8b0JQ0OaLhyqqDUtzueGJvIE4ODy93YWKCgxrBMGIS9YKBeU170
-	P9GN/sxMw+Eu5AjtN8V5DRgR9cYhl+ChIp6yc6zryD3VGn813BiW6VdClh4LaeW9Q1VKw9Hjjw7
-	+ByiHnptLumWmYqVUAbqfSxKnoxc5L2LZY2VTjVQGxZ2RrXr7EnC4QHreJowuvwq
-X-Google-Smtp-Source: AGHT+IE86EKMksqdrSTrjdwcwtxQBLt3kKhK3FPtOHFNpO6HlR6OunsYgQr09TKPN0G8jkm2FfYzRQ==
-X-Received: by 2002:a17:907:60d6:b0:ade:7512:d9ba with SMTP id a640c23a62f3a-adec56499bdmr274510066b.26.1749814322614;
-        Fri, 13 Jun 2025 04:32:02 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec815992bsm116199566b.13.2025.06.13.04.32.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 04:32:02 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 13 Jun 2025 04:31:37 -0700
-Subject: [PATCH net-next v3 8/8] selftests: net: add netconsole test for
- cmdline configuration
+	s=arc-20240116; t=1749814420; c=relaxed/simple;
+	bh=lfynEmycBcTUhYS2//mGCt+9+hiekxvpfMXULeOUjqs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=heH11z3t4oCztCI/J0Zd4n/vGZSycV8jQNiWEe3lEP8yZvvem6veBl5Cp9ZjkrFeCaNMVj4EKc9jeaNIbcO7jgElre73H+mjEw4RyPopyn/pVZnUe39YeUQQ7APVWFQed9Ua6uck0FmWvv5cp3ErA5uOszbJ/8Q3Kv3jnIVF+D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GoGT+eoL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749814417;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J4I9CYam3FITVcfvZRQPJD4i6p9XAy84R0dLNBapStE=;
+	b=GoGT+eoLp9n9ptFhEl9azcYHjvm5Uu8dEhZw77xZ4zPWEDbvJHkIc8hFKuFrxMWhEP5MFo
+	A0pbo9kRMG3OpkQTTlWs0i+DkKYkRcVY18PJSiLuYJtQh5SXHjkUCJJOHy9pDeuI4ZG9o5
+	7/SdiSQ5fCpkSjRsqwKSn3QciSnpV+k=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-163-s700-o_5NmuVtHYdjSzeJQ-1; Fri,
+ 13 Jun 2025 07:33:35 -0400
+X-MC-Unique: s700-o_5NmuVtHYdjSzeJQ-1
+X-Mimecast-MFC-AGG-ID: s700-o_5NmuVtHYdjSzeJQ_1749814410
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 847B21800281;
+	Fri, 13 Jun 2025 11:33:29 +0000 (UTC)
+Received: from [192.168.37.1] (unknown [10.22.58.9])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9651230044CC;
+	Fri, 13 Jun 2025 11:33:24 +0000 (UTC)
+From: Benjamin Coddington <bcodding@redhat.com>
+To: Chuck Lever <chuck.lever@oracle.com>
+Cc: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Mike Snitzer <snitzer@kernel.org>,
+ linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] nfsd: use threads array as-is in netlink interface
+Date: Fri, 13 Jun 2025 07:33:22 -0400
+Message-ID: <7DCDEBE1-1416-4A93-B994-49A6D21DC065@redhat.com>
+In-Reply-To: <38f1974c-f487-49b0-9447-74ed2db6ca7e@oracle.com>
+References: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
+ <20250527-rpc-numa-v1-1-fa1d98e9a900@kernel.org>
+ <a8d4c4cffe1a35ea831110ce1c7beea649352238.camel@kernel.org>
+ <ae18305b-167d-4f27-bc3b-3d2d5f216d85@oracle.com>
+ <1cd4d07f7afbd7322a1330a49a2cc24e8ff801cd.camel@kernel.org>
+ <38f1974c-f487-49b0-9447-74ed2db6ca7e@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250613-rework-v3-8-0752bf2e6912@debian.org>
-References: <20250613-rework-v3-0-0752bf2e6912@debian.org>
-In-Reply-To: <20250613-rework-v3-0-0752bf2e6912@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
- gustavold@gmail.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5920; i=leitao@debian.org;
- h=from:subject:message-id; bh=5v/1hL/ALMXFWvwHghT7FERfuc6HtTVh0PFSKcLiZac=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoTAwl9aFDYw33vVuP4gISRyabn1e94uoNoqrLK
- mHPhWbPNQ6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaEwMJQAKCRA1o5Of/Hh3
- bZgAD/9vTsG+hAxU5w8AYPcmQleIqYKpT8hxQWBTTMlYIP5YkqTKI5qF+6wX3a912fK/RG9F4rS
- nNnVItg8wauR6g1ryk/juX1MaD87Yj7QSTZ5JN34Bep23rR2KCwbRDQUpI1t8cZ98d4TbQnLyRo
- fIUakeG+tJs8MaDBEQaGEsMIk4B5EHE2CoCtJQbPIfOrf684V9G3uWhHuxnPxGZwFWOt8esC5OF
- 5GXdXdHS+yn2Wv0pKYHG5MV/9KHWbhuvdJx+RRp6+V0p4JaK3MTHh5A3KyWr/NjFn36h/rpjloc
- kKw6mWJGoIUtkF8OlO9fGROrMtcWV9gJ7yw4VQu0qR0b4MlYQXecsNmLRtyVpj5tNwzJuurvjeG
- dwfhTiASM2tlzllOawlCEYMs3modrThP4T3JjDZ/RLqIvt+WWIuevKilIj2RHl5kmCzOYQCioGb
- haW2PUZXinGnhTHnESt5cDB4fh4Dwnge2mME7xV3peBkRuJxckJkTCAnbeUCtEJEK45VdY3BWJ9
- qhbJzel0eOQ5NZ8e6AYXCrbdjGE3CYlDrpbO6khjVLANi459/a/Slt+6tmdg0JYmGcDAmdkRm16
- gJVcXFedLBXGcCu9NwtSOSbbDxtHelBnSdhrnUV9A7bweUGqZqBWkjc7FINRS5XWr6DlZPFsFY/
- jUry8x3ymSymRhg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Add a new selftest to verify netconsole module loading with command
-line arguments. This test exercises the init_netconsole() path and
-validates proper parsing of the netconsole= parameter format.
+On 12 Jun 2025, at 12:42, Chuck Lever wrote:
 
-The test:
-- Loads netconsole module with cmdline configuration instead of
-  dynamic reconfiguration
-- Validates message transmission through the configured target
-- Adds helper functions for cmdline string generation and module
-  validation
+> On 6/12/25 12:15 PM, Jeff Layton wrote:
+>> On Thu, 2025-06-12 at 12:05 -0400, Chuck Lever wrote:
+>>> On 6/12/25 11:57 AM, Jeff Layton wrote:
+>>>> On Tue, 2025-05-27 at 20:12 -0400, Jeff Layton wrote:
+>>>>> The old nfsdfs interface for starting a server with multiple pools
+>>>>> handles the special case of a single entry array passed down from
+>>>>> userland by distributing the threads over every NUMA node.
+>>>>>
+>>>>> The netlink control interface however constructs an array of length=
 
-This complements existing netconsole selftests by covering the
-module initialization code path that processes boot-time parameters.
-This test is useful to test issues like the one described in [1].
+>>>>> nfsd_nrpools() and fills any unprovided slots with 0's. This behavi=
+or
+>>>>> defeats the special casing that the old interface relies on.
+>>>>>
+>>>>> Change nfsd_nl_threads_set_doit() to pass down the array from userl=
+and
+>>>>> as-is.
+>>>>>
+>>>>> Fixes: 7f5c330b2620 ("nfsd: allow passing in array of thread counts=
+ via netlink")
+>>>>> Reported-by: Mike Snitzer <snitzer@kernel.org>
+>>>>> Closes: https://lore.kernel.org/linux-nfs/aDC-ftnzhJAlwqwh@kernel.o=
+rg/
+>>>>> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+>>>>> ---
+>>>>>  fs/nfsd/nfsctl.c | 5 ++---
+>>>>>  1 file changed, 2 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+>>>>> index ac265d6fde35df4e02b955050f5b0ef22e6e519c..22101e08c3e80350668=
+e94c395058bc228b08e64 100644
+>>>>> --- a/fs/nfsd/nfsctl.c
+>>>>> +++ b/fs/nfsd/nfsctl.c
+>>>>> @@ -1611,7 +1611,7 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_b=
+uff *skb,
+>>>>>   */
+>>>>>  int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info=
+ *info)
+>>>>>  {
+>>>>> -	int *nthreads, count =3D 0, nrpools, i, ret =3D -EOPNOTSUPP, rem;=
 
-Link: https://lore.kernel.org/netdev/Z36TlACdNMwFD7wv@dev-ushankar.dev.purestorage.com/ [1]
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/Makefile       |  1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 39 +++++++++++++---
- .../selftests/drivers/net/netcons_cmdline.sh       | 52 ++++++++++++++++++++++
- 3 files changed, 86 insertions(+), 6 deletions(-)
+>>>>> +	int *nthreads, nrpools =3D 0, i, ret =3D -EOPNOTSUPP, rem;
+>>>>>  	struct net *net =3D genl_info_net(info);
+>>>>>  	struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
+>>>>>  	const struct nlattr *attr;
+>>>>> @@ -1623,12 +1623,11 @@ int nfsd_nl_threads_set_doit(struct sk_buff=
+ *skb, struct genl_info *info)
+>>>>>  	/* count number of SERVER_THREADS values */
+>>>>>  	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
+>>>>>  		if (nla_type(attr) =3D=3D NFSD_A_SERVER_THREADS)
+>>>>> -			count++;
+>>>>> +			nrpools++;
+>>>>>  	}
+>>>>>
+>>>>>  	mutex_lock(&nfsd_mutex);
+>>>>>
+>>>>> -	nrpools =3D max(count, nfsd_nrpools(net));
+>>>>>  	nthreads =3D kcalloc(nrpools, sizeof(int), GFP_KERNEL);
+>>>>>  	if (!nthreads) {
+>>>>>  		ret =3D -ENOMEM;
+>>>>
+>>>> I noticed that this didn't go in to the recent merge window.
+>>>>
+>>>> This patch fixes a rather nasty regression when you try to start the=
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index be780bcb73a3b..bd309b2d39095 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -12,6 +12,7 @@ TEST_GEN_FILES := \
- TEST_PROGS := \
- 	napi_id.py \
- 	netcons_basic.sh \
-+	netcons_cmdline.sh \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
- 	netcons_sysdata.sh \
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index 598279139a6e5..3fcf85a345969 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -121,6 +121,17 @@ function create_dynamic_target() {
- 	echo 1 > "${NETCONS_PATH}"/enabled
- }
- 
-+# Generate the command line argument for netconsole following:
-+#  netconsole=[+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
-+function create_cmdline_str() {
-+	DSTMAC=$(ip netns exec "${NAMESPACE}" \
-+		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
-+	SRCPORT="1514"
-+	TGTPORT="6666"
-+
-+	echo "netconsole=\"+${SRCPORT}@${SRCIP}/${SRCIF},${TGTPORT}@${DSTIP}/${DSTMAC}\""
-+}
-+
- # Do not append the release to the header of the message
- function disable_release_append() {
- 	echo 0 > "${NETCONS_PATH}"/enabled
-@@ -173,13 +184,9 @@ function listen_port_and_save_to() {
- 		socat UDP-LISTEN:"${PORT}",fork "${OUTPUT}"
- }
- 
--function validate_result() {
-+# Only validate that the message arrived properly
-+function validate_msg() {
- 	local TMPFILENAME="$1"
--	local FORMAT=${2:-"extended"}
--
--	# TMPFILENAME will contain something like:
--	# 6.11.1-0_fbk0_rc13_509_g30d75cea12f7,13,1822,115075213798,-;netconsole selftest: netcons_gtJHM
--	#  key=value
- 
- 	# Check if the file exists
- 	if [ ! -f "$TMPFILENAME" ]; then
-@@ -192,6 +199,17 @@ function validate_result() {
- 		cat "${TMPFILENAME}" >&2
- 		exit "${ksft_fail}"
- 	fi
-+}
-+
-+# Validate the message and userdata
-+function validate_result() {
-+	local TMPFILENAME="$1"
-+
-+	# TMPFILENAME will contain something like:
-+	# 6.11.1-0_fbk0_rc13_509_g30d75cea12f7,13,1822,115075213798,-;netconsole selftest: netcons_gtJHM
-+	#  key=value
-+
-+	validate_msg "${TMPFILENAME}"
- 
- 	# userdata is not supported on basic format target,
- 	# thus, do not validate it.
-@@ -267,3 +285,12 @@ function pkill_socat() {
- 	pkill -f "${PROCESS_NAME}"
- 	set -e
- }
-+
-+# Check if netconsole was compiled as a module, otherwise exit
-+function check_netconsole_module() {
-+	if modinfo netconsole | grep filename: | grep -q builtin
-+	then
-+		echo "SKIP: netconsole should be compiled as a module" >&2
-+		exit "${ksft_skip}"
-+	fi
-+}
-diff --git a/tools/testing/selftests/drivers/net/netcons_cmdline.sh b/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-new file mode 100755
-index 0000000000000..ad2fb8b1c4632
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-@@ -0,0 +1,52 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This is a selftest to test cmdline arguments on netconsole.
-+# It exercises loading of netconsole from cmdline instead of the dynamic
-+# reconfiguration. This includes parsing the long netconsole= line and all the
-+# flow through init_netconsole().
-+#
-+# Author: Breno Leitao <leitao@debian.org>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+check_netconsole_module
-+
-+modprobe netdevsim 2> /dev/null || true
-+rmmod netconsole 2> /dev/null || true
-+
-+# The content of kmsg will be save to the following file
-+OUTPUT_FILE="/tmp/${TARGET}"
-+
-+# Check for basic system dependency and exit if not found
-+# check_for_dependencies
-+# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+echo "6 5" > /proc/sys/kernel/printk
-+# Remove the namespace and network interfaces
-+trap do_cleanup EXIT
-+# Create one namespace and two interfaces
-+set_network
-+# Create the command line for netconsole, with the configuration from the
-+# function above
-+CMDLINE="$(create_cmdline_str)"
-+
-+# Load the module, with the cmdline set
-+modprobe netconsole "${CMDLINE}"
-+
-+# Listed for netconsole port inside the namespace and destination interface
-+listen_port_and_save_to "${OUTPUT_FILE}" &
-+# Wait for socat to start and listen to the port.
-+wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+# Send the message
-+echo "${MSG}: ${TARGET}" > /dev/kmsg
-+# Wait until socat saves the file to disk
-+busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+# Make sure the message was received in the dst part
-+# and exit
-+validate_msg "${OUTPUT_FILE}"
-+
-+exit "${ksft_pass}"
+>>>> server on a NUMA-capable box.
+>>>
+>>> The NFSD netlink interface is not broadly used yet, is it?
+>>>
+>>
+>> It is. RHEL10 shipped with it, for instance and it's been in Fedora fo=
+r
+>> a while.
+>
+> RHEL 10 is shiny and new, and Fedora is bleeding edge. It's not likely
+> either of these are deployed in production environments yet. Just sayin=
 
--- 
-2.47.1
+> that in this case, the Bayesian filter leans towards waiting a full dev=
+
+> cycle.
+
+We don't consider it acceptable to allow known defects to persist in our
+products just because they are bleeding edge.
+
+>>> Since this one came in late during the 6.16 dev cycle and the Fixes: =
+tag
+>>> references a commit that is already in released kernels, I put in the=
+
+>>> "next merge window" pile. On it's own it doesn't look urgent to me.
+>>>
+>>
+>> I'd really like to see this go in soon and to stable. If you want me t=
+o
+>> respin the changelog, I can. It's not a crash, but it manifests as los=
+t
+>> RPCs that just hang. It took me quite a while to figure out what was
+>> going on, and I'd prefer that we not put users through that.
+>
+> If someone can confirm that it is effective, I'll add it to nfsd-fixes.=
+
+
+I'm sure it is if Jeff spent time on it.
+
+We're going to try to get this into RHEL-10 ASAP, because dropped RPCs
+manifest as datacenter-wide problems that are very hard to diagnose.  Its=
+ a
+real pain that we won't have an upstream commit assigned for it.
+
+Ben
 
 
