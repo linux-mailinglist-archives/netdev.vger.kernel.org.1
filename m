@@ -1,262 +1,170 @@
-Return-Path: <netdev+bounces-197488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E7CAD8C51
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:41:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B92AAD8C74
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBD6F189AE02
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:42:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 995B5175F60
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958624C92;
-	Fri, 13 Jun 2025 12:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OlEp+BOn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFC8846C;
+	Fri, 13 Jun 2025 12:47:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E824C62;
-	Fri, 13 Jun 2025 12:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4854B1862A;
+	Fri, 13 Jun 2025 12:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749818502; cv=none; b=TDwmU2GqYp9TgmYS905Z3DzH8dn1OM98akOeg3ildABfKubl5eEwwp26hzsZvFCJJwu6pWtnXZqgBpxGbtpJU5tXIKRds48MRM0aPyEJheeaUrEmB+yrugVMO+mk7rsbNb0mwehvsJnJX9sBrA6hwaSDAH/HdRTXyK8H7z2vfwg=
+	t=1749818877; cv=none; b=L+EJ8CLObN0Dh+9zJWNFmxrBA5E3Hu3sYVms/EzPEuXRN5IgWgwXkNnu+sX7i1FOj27JaUKQGVmYYs/CqVYzAy6BxcHG7InNy3IOV5mv8lW3KHur1Vn6/+O7coACAEhIQjhxX++jOih0Le6EIZwWmPmcX8MDK2YqdOYMEjopFXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749818502; c=relaxed/simple;
-	bh=giTLJ+/2RucH/mkRA5+WDxp59D+0mIMggRIn0VNkEv4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hsMMaYX+mch9y1goVgn8W8q/TyJTCMBH11iHtv8VCh1Qdm6Bgri9y/sMKCg1R9TyZLxHBf4ayamLDspXVJpPD4EyttpIxYMWYqTophSbb2wTLhYa4IxxCCMglDWzlE0GM6McKZzpNG78GWUL6VJ5rVrYdUTSeWioMqFDQLeDGZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OlEp+BOn; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749818501; x=1781354501;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=giTLJ+/2RucH/mkRA5+WDxp59D+0mIMggRIn0VNkEv4=;
-  b=OlEp+BOnaww7ekBQzluPItDcrZxD/CKKRnqx3XZsI+n0nk5Ehsz4+XGP
-   5Q5PY03qY6kS+d3j49XpagSaXiaFT//VT8huFdg/cpUgIJdT/T5I9IB6M
-   HEINZ9sflBIs6CmaTN7r/o0BjC5Ho/IsYNx8B0dSYo4TYDNp52Bx5QdCk
-   c+rVO/8PGeUMD8aWPo8giWMZL/4YRtY4YW11cUl9gwT2YZ89HA8Ga+z+E
-   1o1DhHJtDkmQ4E6OhWJzLTj+IMr/rSz0oPZNS83A9NqGGzucsXG0vspT1
-   Qf+5Ux+R8icAJIL3otOm02oiey/UDp1b/l74xw5rGyOHmmTLyNTfRtPNT
-   Q==;
-X-CSE-ConnectionGUID: azB1cd1PQ5KugktCkPM7AQ==
-X-CSE-MsgGUID: eRyoq8J0TYGz2WzekQsN5w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11463"; a="51950724"
-X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
-   d="scan'208";a="51950724"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 05:41:40 -0700
-X-CSE-ConnectionGUID: n8tF8Yz0QwiCWknZ06KL+g==
-X-CSE-MsgGUID: vMnjFekSRBC0d5y9HQttIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
-   d="scan'208";a="153110069"
-Received: from ubuntu.bj.intel.com ([10.238.156.109])
-  by orviesa005.jf.intel.com with ESMTP; 13 Jun 2025 05:41:37 -0700
-From: Jun Miao <jun.miao@intel.com>
-To: kuba@kernel.org,
-	oneukum@suse.com,
-	sbhatta@marvell.com
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jun.miao@intel.com,
-	qiang.zhang@linux.dev
-Subject: [PATCH v1] net: usb: Convert tasklet API to new bottom half workqueue mechanism
-Date: Fri, 13 Jun 2025 20:43:18 +0800
-Message-Id: <20250613124318.2451947-1-jun.miao@intel.com>
-X-Mailer: git-send-email 2.32.0
+	s=arc-20240116; t=1749818877; c=relaxed/simple;
+	bh=ezXY3qXnquNhyaHYxBN/76XTuscB/Svb9cb+gsY3Hzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EjUYsct0aUc85Z9BoBlLKa5SSOV5H8NTbE4+ZCNDmSlXQ0esKm9IH9+1M8cg1HtsdqO8DtgPx/PDw3ztP7ObjL9anFSxvtVnI1nHnicf8GPTqR+m/zWkz8UnJx+U1OrRnG1HJuIO88vZZD+BlafbyN1EIRwmpR+CBKRKbPe4xfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-60768f080d8so4081962a12.1;
+        Fri, 13 Jun 2025 05:47:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749818873; x=1750423673;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+wHh4AEKR+VQShRFBc7WiyNVG6FHWDiPyckjUrWvfps=;
+        b=cwoXK8FqNYC1FFtRwnQdALPKxgvrMBcSAn7OrLchhvd2ReoHaWpxzA2v3rSeugdCCZ
+         KuXOpECDlt3GDWtYRe5ZEPpJAw1wAnllFeD9zQ6i3ZKEfbv/0rO+2A9eRzd66sZnhIr4
+         hT8NF4Se5ndk8VTEVVU36ewuYkO445rBsE+Qtv4x0GbK7mDImJPh3zXiJn+vnZoF/zvi
+         wijYB3Jwxs32t1RaCM/jvARFGQybz3Lwzf6i4iKpGGG8FbSdHD5YQS6pIEsljihbvexh
+         VXsjXofrxIyekkmaCgdfE4F1ooVcenulR5hjxxZWxOazpM7jMwemb4BGqxwyvJir/nYQ
+         53/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUSsrZP/uXoi/JCHbHTlVWGWYT9r7lqvrBLhLVtlKtuXeKX0T9fr5VD65HEq5Zt7XbWqcHvC0UtmTtH+YFCXb7/@vger.kernel.org, AJvYcCW8q6TSBH8ugZxA6bLrM7gYPvk5NnRsFgu2wWVzk1EGeER3kAAw7g4upTHOTpFHkfLehfK/lycX@vger.kernel.org, AJvYcCXCjBEnzFJVKnPu7rnfEDTR2yKIr/nTazctAK9KKqCl4vbNV9sCBmtCT1sEXExcbxrKMAb1yZUOGFiuRYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRVI1fdj6QKYdX0c53Vsd5Nr3U7JMu897AplfYpV76vH/yvCOI
+	opwqVQXDw/Wn++R3eFS0YX6eYm62OmSlzrGS9NLD7Vq1sL8V/hJFjjCy
+X-Gm-Gg: ASbGncs/kJKPKzCnHBHDOlVB1XMeq4UOhZ8FVbC/F4w4qh0O4ZZPeazYHxnP48LYeJb
+	Z5xpRbgKRaBqJ+Z6DiVz7VG7NxiyazLuRW8B2qAFwsJB8tWUU1YYS/HL8ao3VCYf5vJy5qF6W82
+	pc2JMTPS3RdTbOzTyq5ipHAbVd/1ADUpzKRoMJTA/6jHiAy04hGhxcliAJ5wK8LyWQ2wl3l/aH0
+	Dy8tQjFL1SudRZqBv8hN6I1WLd7gIGvvRRUo6ji0xBoQwKF+Cw2FU0FkTuj8835CB8Q/YLJXAZ/
+	nbFxBqxaK08aNnJvu2H/AdRDaK2cdV19Ux2blrpaHQqtblMFWQZR
+X-Google-Smtp-Source: AGHT+IEq4rp5HuD75TmcVUsHuvmf88w/CqhBoW1iucFaZkCbfjFQ5I2ZG/geivWvMnTr6dTh72+hCA==
+X-Received: by 2002:a05:6402:40d2:b0:601:f3f1:f10e with SMTP id 4fb4d7f45d1cf-608b48c74b6mr2557695a12.5.1749818873294;
+        Fri, 13 Jun 2025 05:47:53 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:5::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-608b48a876asm1151392a12.4.2025.06.13.05.47.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 05:47:52 -0700 (PDT)
+Date: Fri, 13 Jun 2025 05:47:50 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	ast@kernel.org
+Subject: Re: [PATCH net-next RFC] selftests: net: add netpoll basic
+ functionality test
+Message-ID: <aEwd9oLRnxna97JK@gmail.com>
+References: <20250612-netpoll_test-v1-1-4774fd95933f@debian.org>
+ <684b8e8abb874_dcc45294a5@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <684b8e8abb874_dcc45294a5@willemb.c.googlers.com.notmuch>
 
-Migrate tasklet APIs to the new bottom half workqueue mechanism. It
-replaces all occurrences of tasklet usage with the appropriate workqueue
-APIs throughout the usbnet driver. This transition ensures compatibility
-with the latest design and enhances performance.
+Hello Willem,
 
-Signed-off-by: Jun Miao <jun.miao@intel.com>
----
- drivers/net/usb/usbnet.c   | 36 ++++++++++++++++++------------------
- include/linux/usb/usbnet.h |  2 +-
- 2 files changed, 19 insertions(+), 19 deletions(-)
+On Thu, Jun 12, 2025 at 10:35:54PM -0400, Willem de Bruijn wrote:
+> Breno Leitao wrote:
+> > Add a basic selftest for the netpoll polling mechanism, specifically
+> > targeting the netpoll poll() side.
+> > 
+> > The test creates a scenario where network transmission is running at
+> > maximum sppend, and netpoll needs to poll the NIC. This is achieved by:
+> 
+> minor type: sppend/speed
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index c04e715a4c2a..566127b4e0ba 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -461,7 +461,7 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
- 
- 	__skb_queue_tail(&dev->done, skb);
- 	if (dev->done.qlen == 1)
--		tasklet_schedule(&dev->bh);
-+		queue_work(system_bh_wq, &dev->bh_work);
- 	spin_unlock(&dev->done.lock);
- 	spin_unlock_irqrestore(&list->lock, flags);
- 	return old_state;
-@@ -549,7 +549,7 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
- 		default:
- 			netif_dbg(dev, rx_err, dev->net,
- 				  "rx submit, %d\n", retval);
--			tasklet_schedule (&dev->bh);
-+			queue_work(system_bh_wq, &dev->bh_work);
- 			break;
- 		case 0:
- 			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
-@@ -709,7 +709,7 @@ void usbnet_resume_rx(struct usbnet *dev)
- 		num++;
- 	}
- 
--	tasklet_schedule(&dev->bh);
-+	queue_work(system_bh_wq, &dev->bh_work);
- 
- 	netif_dbg(dev, rx_status, dev->net,
- 		  "paused rx queue disabled, %d skbs requeued\n", num);
-@@ -778,7 +778,7 @@ void usbnet_unlink_rx_urbs(struct usbnet *dev)
- {
- 	if (netif_running(dev->net)) {
- 		(void) unlink_urbs (dev, &dev->rxq);
--		tasklet_schedule(&dev->bh);
-+		queue_work(system_bh_wq, &dev->bh_work);
- 	}
- }
- EXPORT_SYMBOL_GPL(usbnet_unlink_rx_urbs);
-@@ -861,14 +861,14 @@ int usbnet_stop (struct net_device *net)
- 	/* deferred work (timer, softirq, task) must also stop */
- 	dev->flags = 0;
- 	timer_delete_sync(&dev->delay);
--	tasklet_kill(&dev->bh);
-+	disable_work_sync(&dev->bh_work);
- 	cancel_work_sync(&dev->kevent);
- 
- 	/* We have cyclic dependencies. Those calls are needed
- 	 * to break a cycle. We cannot fall into the gaps because
- 	 * we have a flag
- 	 */
--	tasklet_kill(&dev->bh);
-+	disable_work_sync(&dev->bh_work);
- 	timer_delete_sync(&dev->delay);
- 	cancel_work_sync(&dev->kevent);
- 
-@@ -955,7 +955,7 @@ int usbnet_open (struct net_device *net)
- 	clear_bit(EVENT_RX_KILL, &dev->flags);
- 
- 	// delay posting reads until we're fully open
--	tasklet_schedule (&dev->bh);
-+	queue_work(system_bh_wq, &dev->bh_work);
- 	if (info->manage_power) {
- 		retval = info->manage_power(dev, 1);
- 		if (retval < 0) {
-@@ -1123,7 +1123,7 @@ static void __handle_link_change(struct usbnet *dev)
- 		 */
- 	} else {
- 		/* submitting URBs for reading packets */
--		tasklet_schedule(&dev->bh);
-+		queue_work(system_bh_wq, &dev->bh_work);
- 	}
- 
- 	/* hard_mtu or rx_urb_size may change during link change */
-@@ -1198,11 +1198,11 @@ usbnet_deferred_kevent (struct work_struct *work)
- 		} else {
- 			clear_bit (EVENT_RX_HALT, &dev->flags);
- 			if (!usbnet_going_away(dev))
--				tasklet_schedule(&dev->bh);
-+				queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
--	/* tasklet could resubmit itself forever if memory is tight */
-+	/* workqueue could resubmit itself forever if memory is tight */
- 	if (test_bit (EVENT_RX_MEMORY, &dev->flags)) {
- 		struct urb	*urb = NULL;
- 		int resched = 1;
-@@ -1224,7 +1224,7 @@ usbnet_deferred_kevent (struct work_struct *work)
- fail_lowmem:
- 			if (resched)
- 				if (!usbnet_going_away(dev))
--					tasklet_schedule(&dev->bh);
-+					queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
-@@ -1325,7 +1325,7 @@ void usbnet_tx_timeout (struct net_device *net, unsigned int txqueue)
- 	struct usbnet		*dev = netdev_priv(net);
- 
- 	unlink_urbs (dev, &dev->txq);
--	tasklet_schedule (&dev->bh);
-+	queue_work(system_bh_wq, &dev->bh_work);
- 	/* this needs to be handled individually because the generic layer
- 	 * doesn't know what is sufficient and could not restore private
- 	 * information if a remedy of an unconditional reset were used.
-@@ -1547,7 +1547,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
- 
- /*-------------------------------------------------------------------------*/
- 
--// tasklet (work deferred from completions, in_irq) or timer
-+// workqueue (work deferred from completions, in_irq) or timer
- 
- static void usbnet_bh (struct timer_list *t)
- {
-@@ -1601,16 +1601,16 @@ static void usbnet_bh (struct timer_list *t)
- 					  "rxqlen %d --> %d\n",
- 					  temp, dev->rxq.qlen);
- 			if (dev->rxq.qlen < RX_QLEN(dev))
--				tasklet_schedule (&dev->bh);
-+				queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 		if (dev->txq.qlen < TX_QLEN (dev))
- 			netif_wake_queue (dev->net);
- 	}
- }
- 
--static void usbnet_bh_tasklet(struct tasklet_struct *t)
-+static void usbnet_bh_workqueue(struct work_struct *work)
- {
--	struct usbnet *dev = from_tasklet(dev, t, bh);
-+	struct usbnet *dev = from_work(dev, work, bh_work);
- 
- 	usbnet_bh(&dev->delay);
- }
-@@ -1742,7 +1742,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
- 	skb_queue_head_init (&dev->txq);
- 	skb_queue_head_init (&dev->done);
- 	skb_queue_head_init(&dev->rxq_pause);
--	tasklet_setup(&dev->bh, usbnet_bh_tasklet);
-+	INIT_WORK (&dev->bh_work, usbnet_bh_workqueue);
- 	INIT_WORK (&dev->kevent, usbnet_deferred_kevent);
- 	init_usb_anchor(&dev->deferred);
- 	timer_setup(&dev->delay, usbnet_bh, 0);
-@@ -1971,7 +1971,7 @@ int usbnet_resume (struct usb_interface *intf)
- 
- 			if (!(dev->txq.qlen >= TX_QLEN(dev)))
- 				netif_tx_wake_all_queues(dev->net);
--			tasklet_schedule (&dev->bh);
-+			queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
-diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
-index 0b9f1e598e3a..208682f77179 100644
---- a/include/linux/usb/usbnet.h
-+++ b/include/linux/usb/usbnet.h
-@@ -58,7 +58,7 @@ struct usbnet {
- 	unsigned		interrupt_count;
- 	struct mutex		interrupt_mutex;
- 	struct usb_anchor	deferred;
--	struct tasklet_struct	bh;
-+	struct work_struct	bh_work;
- 
- 	struct work_struct	kevent;
- 	unsigned long		flags;
--- 
-2.32.0
+Thanks! I will update.
 
+> >   1. Configuring a single RX/TX queue to create contention
+> >   2. Generating background traffic to saturate the interface
+> >   3. Sending netconsole messages to trigger netpoll polling
+> >   4. Using dynamic netconsole targets via configfs
+> > 
+> > The test validates a critical netpoll code path by monitoring traffic
+> > flow and ensuring netpoll_poll_dev() is called when the normal TX path
+> > is blocked. Perf probing confirms this test successfully triggers
+> > netpoll_poll_dev() in typical test runs.
+> 
+> So the test needs profiling to make it a pass/fail regression test?
+> Then perhaps add it to TEST_FILES rather than TEST_PROGS. Unless
+> exercising the code on its own is valuable enough.
+
+Sorry for not being clear. This test doesn't depend on any profiling
+data. Basically I just run `perf probe` to guarantee that
+netpoll_poll_dev() was being called (as that was the goal of the test).
+
+This test is self contained and should run at `make run_test` targets.
+
+> Or is there another way that the packets could be observed, e.g.,
+> counters.
+
+Unfortunately netpoll doesn't expose any data, thus, it is hard to get
+it. 
+
+I have plans to create a configfs for netpoll, so, we can check for
+these numbers (as also configure some pre-defined values today, such as
+USEC_PER_POLL, MAX_SKBS, ip6h->version = 6; ip6h->priority = 0, etc.
+
+In fact, I've an private PoC for this, but, I am modernizing the code
+first, and creating some selftests to help me with those changes later
+(given we have very little test on netpoll, and I aim to improve this,
+given how critical it is for some datacenter designs).
+
+> > +NETCONSOLE_CONFIGFS_PATH = "/sys/kernel/config/netconsole"
+> > +REMOTE_PORT = 6666
+> > +LOCAL_PORT = 1514
+> > +# Number of netcons messages to send. I usually see netpoll_poll_dev()
+> > +# being called at least once in 10 iterations.
+> > +ITERATIONS = 10
+> 
+> Is usually sufficient to avoid flakiness, or should this be cranked
+> up?
+
+10 was the minimum number I was able to trigger it on my dev
+environment, either with default configuration and a debug heavy
+configuration, but, the higher the number, more change to trigger it.
+I can crank up it a bit more. Maybe 20?
+
+> > +def check_traffic_flowing(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> int:
+> > +    """Check if traffic is flowing on the interface"""
+> > +    stat1 = get_stats(cfg, netdevnl)
+> > +    time.sleep(1)
+> 
+> Can the same be learned with sufficient precision when sleeping
+> for only 100 msec? As tests are added, it's worth trying to keep
+> their runtime short.
+
+100%. In fact, I don't need to wait for 1 seconds. In fact, we don't
+even need to check for traffic flowing after the traffic started. I've
+just added it to help me do develop the test.
+
+We can either reduce it to 100ms or just remove it from the loop,
+without prejudice to the test itself. Maybe reducing it to 100 ms might
+help someone else that might debug this in the future, while just
+slowing down ITERATIONS * 0.1 seconds !?
+
+Thanks for the review!
+--breno
 
