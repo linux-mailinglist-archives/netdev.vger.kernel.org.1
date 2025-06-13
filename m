@@ -1,58 +1,89 @@
-Return-Path: <netdev+bounces-197324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C77A5AD81C0
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 05:34:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C96CAD81C6
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 05:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 456733AECA2
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:33:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4AB3A2D2D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191CC1C5F2C;
-	Fri, 13 Jun 2025 03:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584761EF387;
+	Fri, 13 Jun 2025 03:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="h5GB1l8u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yw7jLQAu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFD131A60
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 03:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71531C5F2C
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 03:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749785656; cv=none; b=i/6oF3FANCbD2evYxgMdRiYTlJ1kdkn1W0zGhcPxF8E9j4zm4PKTlFoHwqN50L61mOJjH7z5k/TLMqiLW4Wi/Ynh3wwfK4ulaRWF85rzZvCVKmW+uGn7gjVhgGFupRYbnwWrlghc6UUdpyX7zTpl0+Pdez5mBRoIaSVRiw+1XfQ=
+	t=1749785783; cv=none; b=QN4vmUmYx83LYtXVRzjbnUK6Ng2gLJ67BEBhoHVsRNsD+34FNfd2M/bsjndXRjvEITzw39GVP5z1RTJ2kZcvt2feW92hqOZGCvgz3bIAFC4CzsK6yCG/sA9/QxjBD75DEqBnuD6RG9EElX44pCqWx9oLekZBVj6ijCYhD2Vl9PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749785656; c=relaxed/simple;
-	bh=G3r4e6zd2ORCdx6wup1APEeztwdOp6t+75H+Uh3f0AE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sk+yPrR/mG/VGCIOp1ooueeL4nWvgNhCUi3KeNaZvTq2iRXZ4+0YW1QFfiG2+RktqQVB1EgNcdcyIl98rNR3E+zJQFeOw0S1v/l1YMRmIIC8QC1wvRGnA4YJFPsSDGjP/+4L/gDV+XZPGeek+fOGd6h6F8zDd9ap+yKOkHuPbOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=h5GB1l8u; arc=none smtp.client-ip=79.135.106.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1749785644; x=1750044844;
-	bh=XpKGQ+BbJpijZsqxA1JKl6PwR6Fow/I9dfELAWZyIzU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=h5GB1l8uQ/9YFC0655NTvl0ajbN5id1ecyr+4Y/dDqfYL0xge5IcnKJlCzo84OFSc
-	 MXEtgD1Zlf9mBCv1JsGFK97b4mU5gG5Gho3RK8qgwzoI8KEmS2AwUrBITdwQPkdqaT
-	 5fPwlFmy+riX5bdljg6YfAXBBFEkIx3uIaRLwINd7SsDVHYfwEABgTe7CMD0rGEcej
-	 IWpnkXSuBRUMoSbXaCFMYH+71ZSAKZUJ7cdK17aG6Cs4S1wX1qqrmwK4mxKmEQVmVz
-	 pbqmHXWZUDQRDdNIcGigcAbOEE0Z+Ypx8BgxllGVIemuRh+AWGIsVxQtRC1DYroT4x
-	 /zG0Q1IdWUEgg==
-Date: Fri, 13 Jun 2025 03:33:59 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: Savy <savy@syst3mfailure.io>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-Message-ID: <yA-qROHJ2pCMLiRG8Au4YMe_V2R27OhaXkkjkImGzbhdlyHUs5nCkbbJYGkNLM4Rt5812LGXHathpDmqSYTGv1D4YF-zeJdWbCnNIAezEdg=@willsroot.io>
-In-Reply-To: <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com>
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <CAM0EoMk--+xXTf9ZG9M=r+gkRn2hczjqSTJRMV0dcgouJ4zw6g@mail.gmail.com> <CAM0EoMk4dxOFoN_=3yOy+XrtU=yvjJXAw3fVTmN9=M=R=vtbxA@mail.gmail.com> <lVH_UKrQzWPCHJS7_1Cj0gmEV0x4KI3VB_4auivP0fDokTBbmWuDV455wXrf6eQzakVFoK6wUxlDuMw_Lo0p4P9ByPLSjklsIkQiNcd_hvQ=@willsroot.io> <CAM0EoMkoFJJQD_ZVSMb7DUo1mafevgujx+WA=1ecTeYBcpB1Lw@mail.gmail.com> <A2nutOWbLBIdLRrnsUdavOagBEebp4YBFx0DdL23njEFVAySZul2pDRK1xf76_g6dLb82YXCRb1Ry9btDkZqeY9Btib0KgViSIIfsi4BDfU=@willsroot.io> <CAM0EoMmhP_9UsF18M=6B6AbY_am8cEnaqggpnVb9fkmBB4vjtA@mail.gmail.com> <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io> <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 5556f9eff2f421e734467ece4854181c67914120
+	s=arc-20240116; t=1749785783; c=relaxed/simple;
+	bh=kYHRLLAJxe7Vh7BJ8jSmEFtV5ROZliDqqeDFNBYS2uU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k8CuCwI80yXhKMdj5M1kJqe2MqyJtvxWokiJK0OJNW1hbX/+cNnY5m+Qmzvpgh4H3pesY9kpjOgLPjf78hyAvT8laQqo6aTS25Ugw0lpRLx9aaoDPYoX+MIRzfBP3Lq9R3nqSnor0HZOmkCY4ffcEuglJkFkGgQHhs7+WwHCE6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yw7jLQAu; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-742c27df0daso1371320b3a.1
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 20:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749785778; x=1750390578; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vtNEkxBQCH6v59Ewg9tTHLjferurgBX8JW8JNspBDxQ=;
+        b=Yw7jLQAu/IdJrMZr3YVs+8b1I1gtrqgUaUQhEkuItuVbCrODvqw7lS54Yc/wVaiQhR
+         vJZwzZl7bp1Q6DN8FBcbgkD7UZi8FAWasERb0ysL9ogAkM5l08Gpfft74PppYJat2sph
+         obpfTO+BjwrT/3qcOZuToLwcrj5HIR6gm+xX9f6xEaoBtr0hE57tCzfnEtDJAl4r3rXg
+         MIPrHNq/nIl6EKH3rVKgaGKjgjJKlT6GQzF0oR+3M2qI7jS5fk6hnt+VZzoCyxEVNRFC
+         VCrVCN6OuYiXVCtSp5IiZxR4JVVBeZVJ9n+EekBofa59i0/Ozyn3m2uljxGKp64Xlhfu
+         IWAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749785778; x=1750390578;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vtNEkxBQCH6v59Ewg9tTHLjferurgBX8JW8JNspBDxQ=;
+        b=Ex7rIE9hNUujR5jvqwb3AHdEOb3wRjHfb7mAoTVGHWhiMc+pCCACToyPekf525NBPy
+         e0DIyNOYGTWVBvUti8SU2iltNjP3s635eSB1aT+SFAEKWG645XVKTYnQGnnYEMy3jaNu
+         7YdCixDqdTvZHUP6Ov7KHbA9SNYmPrLROg/lr72FU3cjwbZKIXfE0m8x+NxW2gcoYAFy
+         ziWgiW77LqvyakVKshgwTviJggzlIWDrm/rnmR1k1TtM/HHcUkydB6W/Bz9AhwDhXy2w
+         ZHQ8jKqhRFDLwewjIDwLrNMkuzSj2AHxw6ZdkeygJdclhbdPOiNUHwSdHEbXDc9TGYBS
+         Tt7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXzr4mNDUcs9A4WJtQcK4/sY7kwzIU2XvmBg2o0wCdvojHiCPpJ8MHyMdzKPal7pRbq8sbftZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwazotgMF9rnM0aAivjkm7BZjqjfWkpvq4Kpv3mUiW87Trbo552
+	RZ349g+DgBNbT8flTl6PREn3V6YMrTfFR09NXrbM8+SflknABwenkBK5
+X-Gm-Gg: ASbGnctT4lWdPG3xGZQSRXhg9ZNzOpF/4/AR5LT1nyMBm4Ipo5vpbzKxK7xfmv8deFw
+	g/ZzxsTLZ6GsW4KwJD7UQvWr32/fx1JZCvlLEwmCMG84AdzFCmIKoo/g/s1tx63cKx8QZqLTLNF
+	Y0oAslv2a3rEfSDqtKlknFLsCKwd8FBUCE+GfR6iGGSuVtXS/CPSwKZSUkqA1ZsJyujyiOCOgGt
+	XVbVxAM4sAvncK/TnfMN91rgsQsDLJZquwpkZRSmCbvkXm5SBDdd/VG2BS+lJ4PIHmV34j0ZHaw
+	zMic2GiaMGcx1UWYjirRHDd1t8+euo6QQrb7cbxqWzCY581fCEu2Fn9ylF96UH7ZrjpJCgFYyKm
+	HiA==
+X-Google-Smtp-Source: AGHT+IFpHP1bs7FC/lUBSmbjohlLQ7WvCpFXntX4XU5Lgqz71ecrUn/wRMmuCyJ0o3ktm67Kp2J1xg==
+X-Received: by 2002:a05:6a00:3c95:b0:748:3964:6177 with SMTP id d2e1a72fcca58-7488f71eb8dmr2493036b3a.19.1749785778006;
+        Thu, 12 Jun 2025 20:36:18 -0700 (PDT)
+Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748900b28b7sm564465b3a.136.2025.06.12.20.36.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 20:36:17 -0700 (PDT)
+Date: Thu, 12 Jun 2025 23:36:12 -0400
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: vinicius.gomes@intel.com, jhs@mojatatu.com, jiri@resnulli.us,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, vladimir.oltean@nxp.com,
+	netdev@vger.kernel.org, v4bel@theori.io, imv4bel@gmail.com
+Subject: Re: [PATCH v2] net/sched: fix use-after-free in taprio_dev_notifier
+Message-ID: <aEucrIuj7yxTX58y@v4bel-B760M-AORUS-ELITE-AX>
+References: <aEq3J4ODxH7x+neT@v4bel-B760M-AORUS-ELITE-AX>
+ <aEs3Sotbf81FShq3@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,138 +91,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aEs3Sotbf81FShq3@pop-os.localdomain>
 
-On Thursday, June 12th, 2025 at 10:08 PM, Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
+On Thu, Jun 12, 2025 at 01:23:38PM -0700, Cong Wang wrote:
+> On Thu, Jun 12, 2025 at 07:16:55AM -0400, Hyunwoo Kim wrote:
+> > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+> > index 14021b812329..bd2b02d1dc63 100644
+> > --- a/net/sched/sch_taprio.c
+> > +++ b/net/sched/sch_taprio.c
+> > @@ -1320,6 +1320,7 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
+> >  	if (event != NETDEV_UP && event != NETDEV_CHANGE)
+> >  		return NOTIFY_DONE;
+> >  
+> > +	rcu_read_lock();
+> >  	list_for_each_entry(q, &taprio_list, taprio_list) {
+> >  		if (dev != qdisc_dev(q->root))
+> >  			continue;
+> > @@ -1328,16 +1329,17 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
+> 
+> There is a taprio_set_picos_per_byte() call here, it calls
+> __ethtool_get_link_ksettings() which could be blocking.
+> 
+> For instance, gve_get_link_ksettings() calls
+> gve_adminq_report_link_speed() which is a blocking function.
+> 
+> So I am afraid we can't enforce an atomic context here.
 
->=20
->=20
-> Hi William,
-> Apologies again for the latency.
->=20
-> On Mon, Jun 9, 2025 at 11:31=E2=80=AFAM William Liu will@willsroot.io wro=
-te:
->=20
-> > On Monday, June 9th, 2025 at 12:27 PM, Jamal Hadi Salim jhs@mojatatu.co=
-m wrote:
->=20
-> > > I didnt finish my thought on that: I meant just dont allow a second
-> > > netem to be added to a specific tree if one already exists. Dont
-> > > bother checking for duplication.
-> > >=20
-> > > cheers,
-> > > jamal
-> > >=20
-> > > > > [1] see "loopy fun" in https://lwn.net/Articles/719297/
-> >=20
-> > Hi Jamal,
-> >=20
-> > I came up with the following fix last night to disallow adding a netem =
-qdisc if one of its ancestral qdiscs is a netem. It's just a draft -I will =
-clean it up, move qdisc_match_from_root to sch_generic, add test cases, and=
- submit a formal patchset for review if it looks good to you. Please let us=
- know if you catch any edge cases or correctness issues we might be missing=
-.
->=20
->=20
-> It is a reasonable approach for fixing the obvious case you are
-> facing. But I am still concerned.
-> Potentially if you had another netem on a different branch of the tree
-> it may still be problematic.
-> Consider a prio qdisc with 3 bands each with a netem child with duplicati=
-on on.
-> Your solution will solve it for each branch if one tries to add a
-> netem child to any of these netems.
->=20
-> But consider you have a filter on the root qdisc or some intermediate
-> qdisc and an associated action that changes skb->prio; when it hits
->=20
-> netem and gets duplicated then when it goes back to the root it may be
-> classified by prio to a different netem which will duplicate and on
-> and on..
-> BTW: I gave the example of skb->prio but this could be skb->mark.
->=20
+In that case, how about moving the lock as follows so that 
+taprio_set_picos_per_byte() isn’t included within it?
 
-Ah, good catch. I attached the modified patch below then.=20
+```
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 14021b812329..2b14c81a87e5 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -1328,13 +1328,15 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
 
->=20
-> Perhaps we should only allow one netem per tree or allow more but
-> check for duplication and only allow one per tree...
->=20
+                stab = rtnl_dereference(q->root->stab);
 
-I believe we have to keep it at one netem per tree. The OOM loop can still =
-trigger if a netem without duplication has a netem child with duplication. =
-Consider the following setup:
+-               oper = rtnl_dereference(q->oper_sched);
++               rcu_read_lock();
++               oper = rcu_dereference(q->oper_sched);
+                if (oper)
+                        taprio_update_queue_max_sdu(q, oper, stab);
 
-tc qdisc add dev lo root handle 1: netem limit 1
-tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100% =
-delay 1us reorder 100%
+-               admin = rtnl_dereference(q->admin_sched);
++               admin = rcu_dereference(q->admin_sched);
+                if (admin)
+                        taprio_update_queue_max_sdu(q, admin, stab);
++               rcu_read_unlock();
 
-The first netem will store everything in the tfifo queue on netem_enqueue. =
-Since netem_dequeue calls enqueue on the child, and the child will duplicat=
-e every packet back to the root, the first netem's netem_dequeue will never=
- exit the tfifo_loop.
+                break;
+        }
+```
 
-Best,
-William
+This change still prevents the race condition with advance_sched().
 
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fdd79d3ccd8c..4db5df202403 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -1085,6 +1085,36 @@ static int netem_change(struct Qdisc *sch, struct nl=
-attr *opt,
-        return ret;
- }
-=20
-+static const struct Qdisc_class_ops netem_class_ops;
-+
-+static bool has_netem_in_tree(struct Qdisc *sch) {
-+       struct Qdisc *root, *q;
-+       unsigned int i;
-+       bool ret =3D false;
-+
-+       sch_tree_lock(sch);
-+       root =3D qdisc_root_sleeping(sch);
-+
-+       if (root->ops->cl_ops =3D=3D &netem_class_ops) {
-+               ret =3D true;
-+               goto unlock;
-+       }
-+
-+       hash_for_each_rcu(qdisc_dev(root)->qdisc_hash, i, q, hash) {
-+               if (q->ops->cl_ops =3D=3D &netem_class_ops) {
-+                       ret =3D true;
-+                       goto unlock;
-+               }
-+       }
-+
-+unlock:
-+       if (ret)
-+               pr_warn("Cannot have multiple netems in tree\n");
-+
-+       sch_tree_unlock(sch);
-+       return ret;
-+}
-+
- static int netem_init(struct Qdisc *sch, struct nlattr *opt,
-                      struct netlink_ext_ack *extack)
- {
-@@ -1093,6 +1123,9 @@ static int netem_init(struct Qdisc *sch, struct nlatt=
-r *opt,
-=20
-        qdisc_watchdog_init(&q->watchdog, sch);
-=20
-+       if (has_netem_in_tree(sch))
-+               return -EINVAL;
-+
-        if (!opt)
-                return -EINVAL;
-=20
-@@ -1330,3 +1363,4 @@ module_init(netem_module_init)
- module_exit(netem_module_exit)
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Network characteristics emulator qdisc");
-
+> 
+> Sorry.
+> Cong
 
