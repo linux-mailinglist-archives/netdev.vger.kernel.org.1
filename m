@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-197274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A30AD7FF1
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 487ADAD7FF2
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 568B81E2B46
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:01:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0497C1E2AB5
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DE01DACA7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D8A1DE2BC;
 	Fri, 13 Jun 2025 01:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9LVt8oE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZDbs6cM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58101D7E54
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 01:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B93A1DD88F
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 01:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749776496; cv=none; b=DlTv0EVVIFYfoRrQn05iNVJCxlNyzRGIpy7eMfaGFzaChEg023+NciAJhD0Ix+z9hxGZdu1ubX+onfENmtfav2ewbwTztxAvpXC7wI0l3GFoICLeUBjdLL8vvib7WAC3zk7RBpupqbT28HHSnYHVGxcjkiSDE2oUv04cWxRz8L0=
+	t=1749776497; cv=none; b=iM3QQnF+WBWFP0616g9vsVYiTWqPks0mOrfqNf9SjL9BhqJZFoeGeMJ4Cw7s5IdjC04ipBu51dwL2TLh0de2N/pN0M6gIAEPEdxJwfQx6iTyicAsl0XdNpAXN//3MLosF45TLzbb5n5QAwk5AP8c9/SvLh7J1KKq8CiQBfegihE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749776496; c=relaxed/simple;
-	bh=d2+I9YrQ6+9TmowGEFVu3ZWD3zNPnAHlGJF1Pf4TYAw=;
+	s=arc-20240116; t=1749776497; c=relaxed/simple;
+	bh=4vTctUvLzZHjpEQ8qUyBMlR0X/R225oRCDjhoV808a4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TCSMizYN+enSmdn4SuTre3I9Qv4ICDvFDKCo/1jJ+o8GVl2UWesYbL+cFJvnqm1m2M1HZu8mwkLVTgyESCzEWgCLiUTgQCTSn4OwpE/hnrWBhmsRjDGC4HHERWn61B0w1LEVB/CoVowZLfxyQDVxxRpJYsR0Z9683Ow5F00thRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9LVt8oE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED06EC4CEF2;
-	Fri, 13 Jun 2025 01:01:35 +0000 (UTC)
+	 MIME-Version; b=ZVrHk2sd7Qe9TftwCCm+i9ALqkcZBfSmU3ohJdU3mmduRATSGholBgB2CDmYs2Bo9BvVNsTS9ZgXaR8+nxV4Zj4BZAO7DavmgtuPvoCgjuNuA1Y74NmtbZHt96ZTSWjPUjJZAMXpXNZLy3XNjgoMXyMV9cHVsJti2UDf6kp+SZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZDbs6cM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9528CC4CEEA;
+	Fri, 13 Jun 2025 01:01:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749776496;
-	bh=d2+I9YrQ6+9TmowGEFVu3ZWD3zNPnAHlGJF1Pf4TYAw=;
+	s=k20201202; t=1749776497;
+	bh=4vTctUvLzZHjpEQ8qUyBMlR0X/R225oRCDjhoV808a4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=k9LVt8oEGDAnyEfChvF+i5kE2mtmN2rBQHRz0XKP49lfglPB8IhEx5QocqsBJOmrr
-	 PwBWBmGOpBhBSy2JbRGJRYdcHpmO2TMH75oHtQY7oFyDANqxldKRZmtEqID/C15pbG
-	 WoWP0B9OZsHPH4+MvV0hUJu+nkyMr7Qd+ga2aGsyHOox4vl7gCOaAM4pmDNHQ+UF2N
-	 qbaWIdCJz0CN3+KrH4ZI/wyPOGVs/q43ozGaSxwM1XN1aaog8eT1uVldOSF8Fhzngm
-	 bi9IuOxL42+qQVwwrhHNfXKXuj8G16JpsJlcR7WdVGiMyf7q+tQnvxLKTjhMflVJOD
-	 A41KNAtR3m7+w==
+	b=eZDbs6cMU1fob0ZdzcQA/ZeuGyNFLJeFyo6xt/6eRY9ekn0gCyan5w1zQjcJMDija
+	 F5sBc63f+3X0B6GCtnVQ0y7KDdyIOqAdsguIVbX8C+NvllX2LQQheSnCX2wAep5P3Z
+	 nLhyvuqIxDs4AU3ObbtrwAVTkrGfXSgSDgB2Og1YhjdQfViTlRLytmC7hUakQhVuSP
+	 +ufNN1lgPKK3Jl16zes9ugwyTYfSKkrxDibXpVLVnClFGetKNl+FkjUadllA8bv6mm
+	 z3xFOtuvD4aLGKz3ySp7Uw91ov7Biudhn9SdQejSTjpfqY0mtTOLeldkQV+09Bt8OI
+	 sUez5a2ijDtgw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jacob.e.keller@intel.com,
 	michal.swiatkowski@linux.intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 3/7] eth: ixgbe: migrate to new RXFH callbacks
-Date: Thu, 12 Jun 2025 18:01:07 -0700
-Message-ID: <20250613010111.3548291-4-kuba@kernel.org>
+Subject: [PATCH net-next 4/7] eth: fm10k: migrate to new RXFH callbacks
+Date: Thu, 12 Jun 2025 18:01:08 -0700
+Message-ID: <20250613010111.3548291-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250613010111.3548291-1-kuba@kernel.org>
 References: <20250613010111.3548291-1-kuba@kernel.org>
@@ -70,73 +70,96 @@ Content-Transfer-Encoding: 8bit
 
 Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
 add dedicated callbacks for getting and setting rxfh fields").
+.get callback moves out of the switch and set_rxnfc disappears
+as ETHTOOL_SRXFH as the only functionality.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 20 +++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ .../net/ethernet/intel/fm10k/fm10k_ethtool.c  | 34 ++++++-------------
+ 1 file changed, 10 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 1dc1c6e611a4..8aac6b1ae1c7 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -2753,9 +2753,11 @@ static int ixgbe_get_ethtool_fdir_all(struct ixgbe_adapter *adapter,
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
+index 1bc5b6c0b897..1954a04460d1 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
+@@ -691,9 +691,11 @@ static int fm10k_set_coalesce(struct net_device *dev,
  	return 0;
  }
  
--static int ixgbe_get_rss_hash_opts(struct ixgbe_adapter *adapter,
+-static int fm10k_get_rss_hash_opts(struct fm10k_intfc *interface,
 -				   struct ethtool_rxnfc *cmd)
-+static int ixgbe_get_rxfh_fields(struct net_device *dev,
++static int fm10k_get_rssh_fields(struct net_device *dev,
 +				 struct ethtool_rxfh_fields *cmd)
  {
-+	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
++	struct fm10k_intfc *interface = netdev_priv(dev);
 +
  	cmd->data = 0;
  
- 	/* Report default options for RSS on ixgbe */
-@@ -2825,9 +2827,6 @@ static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
- 	case ETHTOOL_GRXCLSRLALL:
- 		ret = ixgbe_get_ethtool_fdir_all(adapter, cmd, rule_locs);
+ 	/* Report default options for RSS on fm10k */
+@@ -743,9 +745,6 @@ static int fm10k_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 		cmd->data = interface->num_rx_queues;
+ 		ret = 0;
  		break;
 -	case ETHTOOL_GRXFH:
--		ret = ixgbe_get_rss_hash_opts(adapter, cmd);
+-		ret = fm10k_get_rss_hash_opts(interface, cmd);
 -		break;
  	default:
  		break;
  	}
-@@ -3079,9 +3078,11 @@ static int ixgbe_del_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
+@@ -753,9 +752,11 @@ static int fm10k_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 	return ret;
+ }
  
- #define UDP_RSS_FLAGS (IXGBE_FLAG2_RSS_FIELD_IPV4_UDP | \
- 		       IXGBE_FLAG2_RSS_FIELD_IPV6_UDP)
--static int ixgbe_set_rss_hash_opt(struct ixgbe_adapter *adapter,
+-static int fm10k_set_rss_hash_opt(struct fm10k_intfc *interface,
 -				  struct ethtool_rxnfc *nfc)
-+static int ixgbe_set_rxfh_fields(struct net_device *dev,
++static int fm10k_set_rssh_fields(struct net_device *dev,
 +				 const struct ethtool_rxfh_fields *nfc,
 +				 struct netlink_ext_ack *extack)
  {
-+	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
- 	u32 flags2 = adapter->flags2;
++	struct fm10k_intfc *interface = netdev_priv(dev);
+ 	int rss_ipv4_udp = test_bit(FM10K_FLAG_RSS_FIELD_IPV4_UDP,
+ 				    interface->flags);
+ 	int rss_ipv6_udp = test_bit(FM10K_FLAG_RSS_FIELD_IPV6_UDP,
+@@ -871,22 +872,6 @@ static int fm10k_set_rss_hash_opt(struct fm10k_intfc *interface,
+ 	return 0;
+ }
  
- 	/*
-@@ -3204,9 +3205,6 @@ static int ixgbe_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 	case ETHTOOL_SRXCLSRLDEL:
- 		ret = ixgbe_del_ethtool_fdir_entry(adapter, cmd);
- 		break;
+-static int fm10k_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
+-{
+-	struct fm10k_intfc *interface = netdev_priv(dev);
+-	int ret = -EOPNOTSUPP;
+-
+-	switch (cmd->cmd) {
 -	case ETHTOOL_SRXFH:
--		ret = ixgbe_set_rss_hash_opt(adapter, cmd);
+-		ret = fm10k_set_rss_hash_opt(interface, cmd);
 -		break;
- 	default:
- 		break;
- 	}
-@@ -3797,6 +3795,8 @@ static const struct ethtool_ops ixgbe_ethtool_ops_e610 = {
- 	.get_rxfh_key_size	= ixgbe_get_rxfh_key_size,
- 	.get_rxfh		= ixgbe_get_rxfh,
- 	.set_rxfh		= ixgbe_set_rxfh,
-+	.get_rxfh_fields	= ixgbe_get_rxfh_fields,
-+	.set_rxfh_fields	= ixgbe_set_rxfh_fields,
- 	.get_eee		= ixgbe_get_eee,
- 	.set_eee		= ixgbe_set_eee,
- 	.get_channels		= ixgbe_get_channels,
+-	default:
+-		break;
+-	}
+-
+-	return ret;
+-}
+-
+ static int fm10k_mbx_test(struct fm10k_intfc *interface, u64 *data)
+ {
+ 	struct fm10k_hw *hw = &interface->hw;
+@@ -1176,7 +1161,6 @@ static const struct ethtool_ops fm10k_ethtool_ops = {
+ 	.get_coalesce		= fm10k_get_coalesce,
+ 	.set_coalesce		= fm10k_set_coalesce,
+ 	.get_rxnfc		= fm10k_get_rxnfc,
+-	.set_rxnfc		= fm10k_set_rxnfc,
+ 	.get_regs               = fm10k_get_regs,
+ 	.get_regs_len           = fm10k_get_regs_len,
+ 	.self_test		= fm10k_self_test,
+@@ -1186,6 +1170,8 @@ static const struct ethtool_ops fm10k_ethtool_ops = {
+ 	.get_rxfh_key_size	= fm10k_get_rssrk_size,
+ 	.get_rxfh		= fm10k_get_rssh,
+ 	.set_rxfh		= fm10k_set_rssh,
++	.get_rxfh_fields	= fm10k_get_rssh_fields,
++	.set_rxfh_fields	= fm10k_set_rssh_fields,
+ 	.get_channels		= fm10k_get_channels,
+ 	.set_channels		= fm10k_set_channels,
+ 	.get_ts_info		= ethtool_op_get_ts_info,
 -- 
 2.49.0
 
