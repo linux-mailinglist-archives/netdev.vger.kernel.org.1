@@ -1,164 +1,121 @@
-Return-Path: <netdev+bounces-197433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE610AD8A48
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:21:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E462DAD8B61
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0F28189C1E8
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:21:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06688162C2F
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96D42E2EF2;
-	Fri, 13 Jun 2025 11:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295DF2E2EED;
+	Fri, 13 Jun 2025 11:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="OMRX2svp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMrA+9bE"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CE72DECC7;
-	Fri, 13 Jun 2025 11:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513D92E0B5B;
+	Fri, 13 Jun 2025 11:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749813634; cv=none; b=jFBPlbUD5uy/UlPiuXXKh8xHg4icuIm6qEW2bF0XT1o+bBu9s3ygxDgkLxMXqWFrIylswsfXGlNGGfiY90xmrz236KeTUc0CR7MnwSbV3qqxcX2C6TgALv+hg9tuwetjXsm8nsNMSVBARRxvQeNhT9NtieK+NI6mTY5ClhnkTJw=
+	t=1749815737; cv=none; b=awc8o4apGSrHZwgLvbFAKJ4bE6PPg/TLUOnT33FSi0B9EugACj8f53Pe5ZAY0NYNAfvEa65tQGBOQexrwObUHdT8X4m3kF6epWBhrnQ+/2maRKUoHLY33XQ366cHDk65ySrkSRcPrHk1pC+FUhdZFuq6UwIE6QrVM6qysmHrN7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749813634; c=relaxed/simple;
-	bh=5+dUxXBeTxzT+dImx+nunp7dvhoq71qj4IUSAoqj+nM=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References; b=ZxYoxLtwDdhDHgFw9PRrR+kTwOzxi8xnxd8WexwIQE9d20k+sk6Q6/a1FFPg/dk80Ui0RjYlIyzSnXrmGcVQD7EauzkN+0lCBfV2iSiEC4U6QcVFK0O2bd+vqNqc1sWS5lPjGrN1M8QkvH6/i5V9l54YeK/wazDVI9T82ENhxNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=OMRX2svp; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 111862113A74; Fri, 13 Jun 2025 04:20:33 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 111862113A74
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1749813633;
-	bh=dWbk6Wcgu9Mw3tIUfMKWsdLrsOL+GBBGHi3425QsaNo=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=OMRX2svpuWY/iIIpOLi4mukGMq6zZVj0PJvpcP2yySV7IR1uirDTUOmdeahw4FzFe
-	 P0cTdNNE4T6pED87k5jwJ5GWjgECasSyi4x8dGO2IQ628qMDwuDum9TNaq/FuiMJny
-	 NZC5/DB+liN+l6U9Vp7cdxAn+ZWs3oN1WOXZr/xM=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shirazsaleem@microsoft.com,
-	leon@kernel.org,
-	ernis@linux.microsoft.com,
-	shradhagupta@linux.microsoft.com,
-	schakrabarti@linux.microsoft.com,
-	gerhard@engleder-embedded.com,
-	rosenp@gmail.com,
-	sdf@fomichev.me,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] net: mana: Handle unsupported HWC commands
-Date: Fri, 13 Jun 2025 04:20:27 -0700
-Message-Id: <1749813627-8377-5-git-send-email-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1749813627-8377-1-git-send-email-ernis@linux.microsoft.com>
-References: <1749813627-8377-1-git-send-email-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1749815737; c=relaxed/simple;
+	bh=Ci7710RjJSELOL+1/2aPBQoHM+FZu2LTyHSsddj27FE=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ke77fxshc2L49XDm3dqgeVG6iXkU8DxJLipM+NFDAnuMblHHgfgXDqC521VSl4Fop9gBjUZfBrXMKy6xHD+nmJFZ4CR1CfGjwjh/a9arH+1FsZKRn+sLcHDF28mM3NJUCVv7dHbBjCKsBHjol4Eh808UbMqt7j9ptZ9q7PTL4Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GMrA+9bE; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-451d3f72391so26536115e9.3;
+        Fri, 13 Jun 2025 04:55:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749815734; x=1750420534; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uL5y/ewTTMQ7/ta7feOWe7CZOUk7g4FBbNi0PxftJG0=;
+        b=GMrA+9bEWblntAdDLO/iRvlH4v0xDnbd0mfNh5/zC1NZKkWBQmjO0/QeHFnWiUsxm7
+         hpyIqLXFT28+ZjhxEdP9sPI9Cbq/DuUSazSlzYO1xm5Sz0V6qy2+6omT6h+aPaC7Pu0+
+         6gJW92Ny4bPhVJ18r+kBViYzGjJZyA/TikHv6n0kyFVF1Gps9eB/J3y2nSuFOIQ5UHL2
+         7cLfU26vpSEyzNVojFg6oHS2yXe1ZnO+dyajo5asC6EhofIgQXXIis2o2g/Gm91IaW+h
+         G3T/b3XfCLsbYJKzCTwux1xsoSm0wsPexTGZ3lP7xiIuJQG6mRZK7C8ejlx7pF3G/hJS
+         0Q+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749815734; x=1750420534;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uL5y/ewTTMQ7/ta7feOWe7CZOUk7g4FBbNi0PxftJG0=;
+        b=H5GOFwK6nk0yx7GYNCElA+riSxSLveFjQlbfwoeiS9vMDOxzQ+vuDnY6m1B4tiwV4o
+         yTL/kyqBlESeaE4IV64CWo1szVmvQPfT2mYbHoRdIuIdYGqzZpSBuK1oUYCEkU3ZLxIO
+         pK+3RB32UjHbkByUfq5huwQEIoLZtKdn6kshr05I7/mLb3kRhEmQGqYTNiTTc8cU1E9Q
+         zoP9XqisOJoxMnnNDDJ3hNf/Ofx3NkH7Mm9n3ReTkTEl0csuO0PkTMkmkOyfhRepTl6a
+         7BYnlaqfeOHQ2oGQiYGEi0fELFO2J81JHG5D137U8X6oa1rinbDwpfQ62YY0nrY2VTDw
+         pSiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVawf1p4AqFP52U1gZVaWLxxZU05SpAXzL3NVYNrkujIMuESbkgDHjjyQJ4NaAHCvwfzM4Bw2oUMlIBsdQ=@vger.kernel.org, AJvYcCXD4mWqPuagF3vl1Edy2cbxAzoT3AVqEi+qXA0oAywvSQKBUe4ZxIxNDjwVJx7qf0rOyU4P4kmD@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhE/W30Fch57bYJuHV0winEstw4AJb3Jzc4VB3LvygKQPhS0MO
+	6gridwCe9lxIW5eGE0Mj3OAkOnx2SXbKiQ4AHMNbBL/AMcdiJDJcJvDp
+X-Gm-Gg: ASbGnctDKXlGAGZBbwkgmVqJUTlBge6rq4D9H67cZk6DCSAfQGEEXoKy1ggB8MSFsq0
+	CFPgAu5kkkhItzKhenxbo/6wO4moQyAtdmfCK8rWWLvbj4LosFnaO5asjz6TMslrrbakvKmj1FZ
+	LXwhHtAHfhcO+A4wiejzMxHLkJh7x0rXYaDNJ1nAeRsPQSRqWvAwQXDwNheT6Hvsfsc81fL10gY
+	oas1dJ9T2lrxM0UHaL6DrsNz6tsTc2ytfL4vYzXsWFUaZEwfnzNQlfEZ01/31Z90nJyCnur3fcx
+	nimeUOjMAfREy2B2bUNcjyYd1AFbou5/8yJNIOydvLu9R8T/vKS5ZwY8vHghMOvs/qz2d+x0CF8
+	=
+X-Google-Smtp-Source: AGHT+IGMtOD0UDTm67fkmitVK21heePsVMtSrnMkraeiIzLg5EK6P4byBT359avt25zMBKAJPT5CUA==
+X-Received: by 2002:a05:600c:34c7:b0:442:f8e7:25ef with SMTP id 5b1f17b1804b1-45334ad3f41mr27165075e9.11.1749815733431;
+        Fri, 13 Jun 2025 04:55:33 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:75e0:f7f7:dffa:561e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e261ebdsm52187085e9.39.2025.06.13.04.55.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 04:55:32 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
+ <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
+ <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
+ Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
+ Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Ruben
+ Wauters" <rubenru09@aol.com>,  "Shuah Khan" <skhan@linuxfoundation.org>,
+  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
+  linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
+  netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
+Subject: Re: [PATCH v2 06/12] scripts: lib: netlink_yml_parser.py: use classes
+In-Reply-To: <08ac4b3457b99037c7ec91d7a2589d4c820fd63a.1749723671.git.mchehab+huawei@kernel.org>
+Date: Fri, 13 Jun 2025 12:20:33 +0100
+Message-ID: <m2y0tvnb0e.fsf@gmail.com>
+References: <cover.1749723671.git.mchehab+huawei@kernel.org>
+	<08ac4b3457b99037c7ec91d7a2589d4c820fd63a.1749723671.git.mchehab+huawei@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-If any of the HWC commands are not recognized by the
-underlying hardware, the hardware returns the response
-header status of -1. Log the information using
-netdev_info_once to avoid multiple error logs in dmesg.
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Reviewed-by: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
-Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
-Changes in v2:
-* Define GDMA_STATUS_CMD_UNSUPPORTED for unsupported HWC status code
-  instead of using -1.
----
- drivers/net/ethernet/microsoft/mana/hw_channel.c |  4 ++++
- drivers/net/ethernet/microsoft/mana/mana_en.c    | 11 +++++++++++
- include/net/mana/gdma.h                          |  1 +
- 3 files changed, 16 insertions(+)
+> As we'll be importing netlink parser into a Sphinx extension,
+> move all functions and global variables inside two classes:
+>
+> - RstFormatters, containing ReST formatter logic, which are
+>   YAML independent;
+> - NetlinkYamlParser: contains the actual parser classes. That's
+>   the only class that needs to be imported by the script or by
+>   a Sphinx extension.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 3d3677c0d014..650d22654d49 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -891,6 +891,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 	}
- 
- 	if (ctx->status_code && ctx->status_code != GDMA_STATUS_MORE_ENTRIES) {
-+		if (ctx->status_code == GDMA_STATUS_CMD_UNSUPPORTED) {
-+			err = -EOPNOTSUPP;
-+			goto out;
-+		}
- 		if (req_msg->req.msg_type != MANA_QUERY_PHY_STAT)
- 			dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
- 				ctx->status_code);
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 54a86c233948..50a947859bd0 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -847,6 +847,9 @@ static int mana_send_request(struct mana_context *ac, void *in_buf,
- 	err = mana_gd_send_request(gc, in_len, in_buf, out_len,
- 				   out_buf);
- 	if (err || resp->status) {
-+		if (err == -EOPNOTSUPP)
-+			return err;
-+
- 		if (req->req.msg_type != MANA_QUERY_PHY_STAT)
- 			dev_err(dev, "Failed to send mana message: %d, 0x%x\n",
- 				err, resp->status);
-@@ -1252,6 +1255,10 @@ int mana_query_link_cfg(struct mana_port_context *apc)
- 				sizeof(resp));
- 
- 	if (err) {
-+		if (err == -EOPNOTSUPP) {
-+			netdev_info_once(ndev, "MANA_QUERY_LINK_CONFIG not supported\n");
-+			return err;
-+		}
- 		netdev_err(ndev, "Failed to query link config: %d\n", err);
- 		return err;
- 	}
-@@ -1294,6 +1301,10 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
- 				sizeof(resp));
- 
- 	if (err) {
-+		if (err == -EOPNOTSUPP) {
-+			netdev_info_once(ndev, "MANA_SET_BW_CLAMP not supported\n");
-+			return err;
-+		}
- 		netdev_err(ndev, "Failed to set bandwidth clamp for speed %u, err = %d",
- 			   speed, err);
- 		return err;
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 3ce56a816425..7752ab0a55cf 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -10,6 +10,7 @@
- #include "shm_channel.h"
- 
- #define GDMA_STATUS_MORE_ENTRIES	0x00000105
-+#define GDMA_STATUS_CMD_UNSUPPORTED	0xffffffff
- 
- /* Structures labeled with "HW DATA" are exchanged with the hardware. All of
-  * them are naturally aligned and hence don't need __packed.
--- 
-2.34.1
+I suggest a third class for the doc generator that is separate from the
+yaml parsing. The yaml parsing should really be refactored to reuse
+tools/net/ynl/pyynl/lib/nlspec.py at some point.
 
+> With that, we won't pollute Sphinx namespace, avoiding any
+> potential clashes.
+>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
