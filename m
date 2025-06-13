@@ -1,65 +1,85 @@
-Return-Path: <netdev+bounces-197658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41179AD9875
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:08:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 317B8AD9881
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5654C1BC0894
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:08:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C50924A09C5
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B0828F524;
-	Fri, 13 Jun 2025 23:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA7028DEF9;
+	Fri, 13 Jun 2025 23:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="WQrD3AGd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0yO8Df7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0902798EF;
-	Fri, 13 Jun 2025 23:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31BF28E594
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749856062; cv=none; b=d9asnONznc0dyht4pP7jHLr5XiQdnAQj3EV4rgTrCxM25j/AMm/U/P8xDwSUYaYGgXC0sOVAuDafcSsgNGnIsyCvCEeZq5bT/urnIPE57gr/wNSpi6u4VaonvyZR749LxpPvk8FIuhDB2bIEdg6abPZbGAdiRAUPIs2EjKd3HXU=
+	t=1749856153; cv=none; b=tFts9wTney3W7jq0M215fRY1swt14smE0QkfkBWULh6a1DfAf59WMCLVeFLqDv3yq7ZoQFkvXcdbPHmEbi3EHl+r9dh8cnIKKoK3zu0wID6feABAmf3dScqLk/38lJC6mSr+d/Rcd8E04pdIo0vUDYlXq71EgG/8XBLz25JTPwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749856062; c=relaxed/simple;
-	bh=5LBmNvxGQVphTBm+dhvh3993X6dnlRF+TMf6MHhy5xI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S1UV5PdmhU6EJlHqRfw0uEjxj/ukV8NoErX86ghwFht0/alIJCjzJ4prbt2QLCjgnIb1EFIj9lzbLgh0WvsZhcE3V4nKd/tVGIpPt5tmT8D6J9L/+R6N8RcJckSa3TY75wwC6O0zEz2kfyKAit6r/cMI2QzThcUxoJXK/AYufd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=WQrD3AGd; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=waQo5q91jU8Ji7flII4J5+MFXZhCzcoj/TS8hqA7oVQ=; b=WQrD3AGd8Ew03Pa6
-	GjvTc8x4Y+t+pUy1C2N1njppwCWMEBFmRE+zmRqQArYR4JS3JF/6i0mXBznS6Gv0C6XdR29EA1pHx
-	42NwtvJpSSLgR3Fd4XP0+OSIZpZKnqgImYpSM/bcaOoYPEnNzIdzBGvQmBTQG0L5MtZwCNbUgQC2z
-	DC7vmIfpMWHYxKmNIwoKTKu9GMdLjo+/Uu9goVvBVlBgJlRTMsihvXo3U7Nxq0miyx1uaDfN33XME
-	L62K8QnbUtZhCzrmfPglJDFLtB9OQShfqf2gn9OGZ6ABa0TIOBB7a5oX8SYYXph1KQWKqTtjvycPT
-	XhyqWqe2F2/q5d3/ZA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1uQDUj-009ZoB-08;
-	Fri, 13 Jun 2025 23:07:33 +0000
-From: linux@treblig.org
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH 2/2] vhost: vringh: Remove unused functions
-Date: Sat, 14 Jun 2025 00:07:31 +0100
-Message-ID: <20250613230731.573512-3-linux@treblig.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250613230731.573512-1-linux@treblig.org>
-References: <20250613230731.573512-1-linux@treblig.org>
+	s=arc-20240116; t=1749856153; c=relaxed/simple;
+	bh=J0LKIHEIdojKyxZbmiNTd76CxGw5pJ5EghHsawREc1w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DmSiReLuhjhIpYXOgLzxLYOwwiLQP+CadsQQIRiZj5lQ+CnTkjGejk9AdBk6nEw6hLE9pppxhYqTVF90uBChObQvfj8O6JPGxiBLIMonIDK5Lr65UPgwJzxtZ5gvfnFb8PNClPO5hI3ISH02tmD/G/LCKPel76W+86av3K2Z+9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0yO8Df7; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c921ec37e5so34378685a.2
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:09:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749856150; x=1750460950; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3fFRlNjl9GKzfq0vtzMG+m4QiwvBHWFCmSbIidDRRnA=;
+        b=Y0yO8Df7kGk/tFR+0eAN4ywoxAP33RY8vHCnUgCEPzq97EKzBtwuCMRXTt5T/fS0Ao
+         Hhkv42/oh6KwOgqlVwk18iV5+A78e5Ff2peWplnR9BDIhzacIXZaR1z6qe1lmBcZMvUh
+         NSvyrmjm3t51S6M01WdijqOARWDmrNFyrnReqsd9ol5AgadarxHIHM+fFX9TK9qCjDow
+         PbfZqcJnIxJRMCT42myZ/JDhXue/mAmkgDnIC/AqISUwOSKc1a+AJsiDTbk38ul3Zdwp
+         +c/hkDAx0MoMqeiPoPwQSmRlYMLEu9AtzKGNd4mRMebqypIzjB0WXi8b9EgCaO8Zn7EZ
+         jhUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749856150; x=1750460950;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3fFRlNjl9GKzfq0vtzMG+m4QiwvBHWFCmSbIidDRRnA=;
+        b=j7WXibch+WEX2rS+kRlf80YwxWTt05rB7lU1O44foun8nMQwU3vhKFV/SvFiEeyr0x
+         u1rN30izkbZzjc9nF9nDCq/x2VyCAYW/1bwxaFo8gyS4cyQyXviiGKWuW6RnODoixnfZ
+         cm8GwTYcKvDPzzZvcoGsZpmUGNHfRS5H8X+m8j6T2gUpKebFph1aM+/sg0cXAdDUjngy
+         cRinzC8ZnjI57w2Wy6UeLxkXyxFflhkbkkwOv4TQhlDmgZfIJOJqYIfqJuRdzmxhAkd5
+         TsURAUDu2mUekhyR2ihbI1TGk36TaJ/cpGuenVzdqlBFmYYycvsnVhVqEqzvmV27Es+e
+         3DbQ==
+X-Gm-Message-State: AOJu0YxGJ9rNKY7SHwW0FPjmMQvKP7HWMUscHQ2TBOy6/20FVYT0fpJZ
+	c4Nr+nJkbzUILjwc8UqzBe9JizAAS5zxJmXnvSoqQcv06jdlspAeszPVPHXHzA==
+X-Gm-Gg: ASbGncswrhqHzN78be+DnZboOT6YafLA3QpLQmLuY16MY540/d5Ll8EcszJfgpOVSSl
+	olQKoo/T26kERwRbBrqZ4dPrHmrV044p82PMA4y4m734Xbw6sO4zVaSIwZcgxn/kk7u9DM0aGrF
+	cenvN47XzFtzEDyB5mOvYgckE3nu5+uvyJzRu2xHzl22T56e97Wx9qOw1DVBVKA2ADOEgzsijqk
+	mA3ZUQqLnzUMkUMXVROiPAY2iaGbwE+qxwGi9PRmEELHxFfX7s9LNRtlpenTmaeBNA+P8pItTw5
+	tnvGTYa1r9Sv0olSR32Wpn25A/225/nY31baxbmng/ZA9hhHFk83LJMbqo/JXzDElhW9Vssa9n9
+	0m1XD
+X-Google-Smtp-Source: AGHT+IG0bSUqSjW7EyaYj/mtjr4Zlj5j/RLI7xOavwbgnwVaLdccfytUGGbDt4CoYAZBkpD2FAdEfw==
+X-Received: by 2002:ac8:5d47:0:b0:4a4:2f40:d720 with SMTP id d75a77b69052e-4a73c527a20mr6862461cf.8.1749856150447;
+        Fri, 13 Jun 2025 16:09:10 -0700 (PDT)
+Received: from soy.nyc.corp.google.com ([2620:0:1003:315:8d12:28c7:afe9:8851])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a2f4fc5sm23122651cf.26.2025.06.13.16.09.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 16:09:10 -0700 (PDT)
+From: Neal Cardwell <ncardwell.sw@gmail.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,
+	Neal Cardwell <ncardwell@google.com>
+Subject: [PATCH net-next 0/3] tcp: remove obsolete RFC3517/RFC6675 code
+Date: Fri, 13 Jun 2025 19:09:03 -0400
+Message-ID: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
+X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,130 +88,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+From: Neal Cardwell <ncardwell@google.com>
 
-The functions:
-  vringh_abandon_kern()
-  vringh_abandon_user()
-  vringh_iov_pull_kern() and
-  vringh_iov_push_kern()
-were all added in 2013 by
-commit f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
-but have remained unused.
+RACK-TLP loss detection has been enabled as the default loss detection
+algorithm for Linux TCP since 2018, in:
 
-Remove them.
+ commit b38a51fec1c1 ("tcp: disable RFC6675 loss detection")
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- drivers/vhost/vringh.c | 61 ------------------------------------------
- include/linux/vringh.h |  7 -----
- 2 files changed, 68 deletions(-)
+In case users ran into unexpected bugs or performance regressions,
+that commit allowed Linux system administrators to revert to using
+RFC3517/RFC6675 loss recovery by setting net.ipv4.tcp_recovery to 0.
 
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 67a028d6fb5f..c99070da39a6 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -779,22 +779,6 @@ ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
- }
- EXPORT_SYMBOL(vringh_iov_push_user);
- 
--/**
-- * vringh_abandon_user - we've decided not to handle the descriptor(s).
-- * @vrh: the vring.
-- * @num: the number of descriptors to put back (ie. num
-- *	 vringh_get_user() to undo).
-- *
-- * The next vringh_get_user() will return the old descriptor(s) again.
-- */
--void vringh_abandon_user(struct vringh *vrh, unsigned int num)
--{
--	/* We only update vring_avail_event(vr) when we want to be notified,
--	 * so we haven't changed that yet. */
--	vrh->last_avail_idx -= num;
--}
--EXPORT_SYMBOL(vringh_abandon_user);
--
- /**
-  * vringh_complete_user - we've finished with descriptor, publish it.
-  * @vrh: the vring.
-@@ -998,51 +982,6 @@ int vringh_getdesc_kern(struct vringh *vrh,
- }
- EXPORT_SYMBOL(vringh_getdesc_kern);
- 
--/**
-- * vringh_iov_pull_kern - copy bytes from vring_iov.
-- * @riov: the riov as passed to vringh_getdesc_kern() (updated as we consume)
-- * @dst: the place to copy.
-- * @len: the maximum length to copy.
-- *
-- * Returns the bytes copied <= len or a negative errno.
-- */
--ssize_t vringh_iov_pull_kern(struct vringh_kiov *riov, void *dst, size_t len)
--{
--	return vringh_iov_xfer(NULL, riov, dst, len, xfer_kern);
--}
--EXPORT_SYMBOL(vringh_iov_pull_kern);
--
--/**
-- * vringh_iov_push_kern - copy bytes into vring_iov.
-- * @wiov: the wiov as passed to vringh_getdesc_kern() (updated as we consume)
-- * @src: the place to copy from.
-- * @len: the maximum length to copy.
-- *
-- * Returns the bytes copied <= len or a negative errno.
-- */
--ssize_t vringh_iov_push_kern(struct vringh_kiov *wiov,
--			     const void *src, size_t len)
--{
--	return vringh_iov_xfer(NULL, wiov, (void *)src, len, kern_xfer);
--}
--EXPORT_SYMBOL(vringh_iov_push_kern);
--
--/**
-- * vringh_abandon_kern - we've decided not to handle the descriptor(s).
-- * @vrh: the vring.
-- * @num: the number of descriptors to put back (ie. num
-- *	 vringh_get_kern() to undo).
-- *
-- * The next vringh_get_kern() will return the old descriptor(s) again.
-- */
--void vringh_abandon_kern(struct vringh *vrh, unsigned int num)
--{
--	/* We only update vring_avail_event(vr) when we want to be notified,
--	 * so we haven't changed that yet. */
--	vrh->last_avail_idx -= num;
--}
--EXPORT_SYMBOL(vringh_abandon_kern);
--
- /**
-  * vringh_complete_kern - we've finished with descriptor, publish it.
-  * @vrh: the vring.
-diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-index af8bd2695a7b..49e7cbc9697a 100644
---- a/include/linux/vringh.h
-+++ b/include/linux/vringh.h
-@@ -175,9 +175,6 @@ int vringh_complete_multi_user(struct vringh *vrh,
- 			       const struct vring_used_elem used[],
- 			       unsigned num_used);
- 
--/* Pretend we've never seen descriptor (for easy error handling). */
--void vringh_abandon_user(struct vringh *vrh, unsigned int num);
--
- /* Do we need to fire the eventfd to notify the other side? */
- int vringh_need_notify_user(struct vringh *vrh);
- 
-@@ -235,10 +232,6 @@ int vringh_getdesc_kern(struct vringh *vrh,
- 			u16 *head,
- 			gfp_t gfp);
- 
--ssize_t vringh_iov_pull_kern(struct vringh_kiov *riov, void *dst, size_t len);
--ssize_t vringh_iov_push_kern(struct vringh_kiov *wiov,
--			     const void *src, size_t len);
--void vringh_abandon_kern(struct vringh *vrh, unsigned int num);
- int vringh_complete_kern(struct vringh *vrh, u16 head, u32 len);
- 
- bool vringh_notify_enable_kern(struct vringh *vrh);
+In the seven years since 2018, our team has not heard reports of
+anyone reverting Linux TCP to use RFC3517/RFC6675 loss recovery, and
+we can't find any record in web searches of such a revert.
+
+RACK-TLP was published as a standards-track RFC, RFC8985, in February
+2021.
+
+Several other major TCP implementations have default-enabled RACK-TLP
+at this point as well.
+
+RACK-TLP offers several significant performance advantages over
+RFC3517/RFC6675 loss recovery, including much better performance in
+the common cases of tail drops, lost retransmissions, and reordering.
+
+It is now time to remove the obsolete and unused RFC3517/RFC6675 loss
+recovery code. This will allow a substantial simplification of the
+Linux TCP code base, and removes 12 bytes of state in every tcp_sock
+for 64-bit machines (8 bytes on 32-bit machines).
+
+To arrange the commits in reasonable sizes, this patch series is split
+into 3 commits:
+
+(1) Removes the core RFC3517/RFC6675 logic.
+
+(2) Removes the RFC3517/RFC6675 hint state and the first layer of logic that
+    updates that state.
+
+(3) Removes the emptied-out tcp_clear_retrans_hints_partial() helper function
+    and all of its call sites.
+
+Neal Cardwell (3):
+  tcp: remove obsolete and unused RFC3517/RFC6675 loss recovery code
+  tcp: remove RFC3517/RFC6675 hint state: lost_skb_hint, lost_cnt_hint
+  tcp: remove RFC3517/RFC6675 tcp_clear_retrans_hints_partial()
+
+ Documentation/networking/ip-sysctl.rst        |   8 +-
+ .../networking/net_cachelines/tcp_sock.rst    |   2 -
+ include/linux/tcp.h                           |   3 -
+ include/net/tcp.h                             |   6 -
+ net/ipv4/tcp.c                                |   3 +-
+ net/ipv4/tcp_input.c                          | 151 ++----------------
+ net/ipv4/tcp_output.c                         |   6 -
+ 7 files changed, 15 insertions(+), 164 deletions(-)
+
 -- 
-2.49.0
+2.50.0.rc1.591.g9c95f17f64-goog
 
 
