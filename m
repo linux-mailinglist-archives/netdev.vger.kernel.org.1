@@ -1,415 +1,211 @@
-Return-Path: <netdev+bounces-197652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 760D6AD982E
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 00:25:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 482EDAD9842
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 00:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 734A71BC4E83
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:25:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E20A1BC4221
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651B128F524;
-	Fri, 13 Jun 2025 22:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E8428DEEE;
+	Fri, 13 Jun 2025 22:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtNRUVqz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V0MMfQ9L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955C628D8C0;
-	Fri, 13 Jun 2025 22:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A9223814C;
+	Fri, 13 Jun 2025 22:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749853464; cv=none; b=FFgCwJ6nyueEZJr6tf0tGuZVLMyTIqrH4zPBxa5a3UkOQgpiC8XNFrh0LlCMAD2YJU3UhcJI/sckGyvs4+T39V4aHbi1aM7ImjwgwLFYrUuo5aCVbGOziwgBJLPN7rl/X3zkg8K7T40PDVy+IYuCPAnt1UZzX+J5Zm58BGobCYo=
+	t=1749854172; cv=none; b=tbwGRjLunBM+irSwTSWAtqUzhJfvjVlUD9qIkY189vZ/I2P079zW5jaYic7HWs1d+B0xkNxUG4Nfw7a9kjSJ3b7cFZk3xMSzxOAsAEjgtlJHrHNqEvxozu07FAV3CxNP1KuNXbfEDO+yrOMDzmmKxsoCyqHs5k7g1rReKdHUqE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749853464; c=relaxed/simple;
-	bh=pJpq6WgJAI482SHpifEvr0r2FDOrpAjOI+DwqUg2LPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GxnGXgmebmXiSt95xqzdkhRGy+1ctVmdir3fN26yH5/S+aAo5nOsEP9bM5B2Ba/txrrX+GIaZ1PrhVTT/JVqMxnqryZ+urylrW/dRrDxKse/aTNOriRzx2zmPakIAcfASRf8kcFCk16BwPfsgPrjVWwp8BTVrPwnjf4buNRxxvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtNRUVqz; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1749854172; c=relaxed/simple;
+	bh=ZDhN0PQzQ9wgEHlw7OXTzGjuQH3XOnQA5xq1WBIqnek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K/sp72YL0BJbPMytT+pI1ho62UuE4i9Do923g1q7FvJW9gbIOPwG/c9mh3nTpUiwCTpkonNtBEyejikBLd+s3vw13gC4LIJF6EB/LpBx6M+wM5q8Nci/vfLJofi7dY2ly5lOR9iS7GRB0kXk6m4rGcY0xobBRVuwM8MfyhqRjWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V0MMfQ9L; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-23508d30142so29449985ad.0;
-        Fri, 13 Jun 2025 15:24:22 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a503d9ef59so2243830f8f.3;
+        Fri, 13 Jun 2025 15:36:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749853462; x=1750458262; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1749854169; x=1750458969; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lt3U6y/+JmxHzUN7uoxunMQEvFXVS9EFkG69c+eLzTQ=;
-        b=ZtNRUVqzVRUR/koRe3xrTm36fQBAUAYWJ0mXKB6KNVsjmDO6iWpIRxW4/kHNZ65rut
-         vDPUePvP8lDwjb0ZrT0TWNoPozrYyEffT1bYJX7D96KfkMk2MZeRh91zwiOeySBKXnaZ
-         llIMv1bSMjKpd+Kke31oyrrDqYvTj6aRPrCwiYaYdY1RVIPHj5x9qJoMTMjkrPL0E32N
-         aKsl0uOuYYPoNVJ+sHGAIFdGBoG2lmsPSBQdpO/7TkPBG7ZfZn++ZaxtqcVcLSQ9AyL5
-         dnxJK9IHDTpeCQYqiBaTfXf/YP+0mhVeIR5soEr93pDocSikFyPYfxWp8EpAgGNC39bW
-         dizA==
+        bh=ZDhN0PQzQ9wgEHlw7OXTzGjuQH3XOnQA5xq1WBIqnek=;
+        b=V0MMfQ9LnVFjKTXF/j9wodh39meUoxLTRuYmqR6UlVLco4MCSPFkyZ3TVgdbc03eYA
+         3yLlwoGSG8T4HnLNgLKGfhQmKhx/l8jvCN44pZddh1c66IhJH1mpigG5C2Rl2vYo3SkP
+         naMo0QZn/e4SHNMPnJmhf8taujDmwIM6EAJU6rMmOH1NsbjUVuf1dexFHDZvksmOrXf6
+         T9hBS2h32S+1atZsl91SDUhqF3R93ohXZkld4EjaIxb4gTaTfbLMBK/IoBLUJpRMCGJo
+         RL3uZXsh7n7njkZyWbpNqa7Kk/bdp1R655+0koEKH6yziNKQMpoiBKcfha2Apt23VLTA
+         FtPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749853462; x=1750458262;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1749854169; x=1750458969;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Lt3U6y/+JmxHzUN7uoxunMQEvFXVS9EFkG69c+eLzTQ=;
-        b=kwFvh/Rnc4fhxL+T6IK6uQU51XGbdRg1Daq7Ugi7erCAO0JXUyyVXnG6RoU4eipYo7
-         cRHaXuLFAUgmVoWlsiWtyl/MiECznC4lv5+zJGJxtmhycPEkjrUk7/axBLk3C+TZKwB5
-         Q48wLoKDqooy6pS2ztNwPZpMuDtCdpZt6ju1TBY8rZFuhZSl/M8/417Lf+fcg6Pu6CYB
-         8oYr14jHUqBrlmGpw3tmB3hjcmU4gJj8syKr5owyVXJUOcE6i5o/jpKa/fVAv7FC2K7L
-         GIUaLY30gSXegDKlBi7YAkZnjPUu5cO2EuJ65YayoLZNG/qVQdn+cDSUNzCUdAH4SfNE
-         A3iA==
-X-Forwarded-Encrypted: i=1; AJvYcCU67q9yTZc8UbqnsbEifJynjmT3GFKQLdxJ6c2M25ASMuFFsIbOaUfRWJexkYOlSSyel+4=@vger.kernel.org, AJvYcCVH/BiUhe3+lJ26uv0QzT6D7O7CXsBmpRPrdRk/SqSQS/jud47abfqLbiWJdiksMxZ9I5nB1t4G@vger.kernel.org, AJvYcCX84vu9md6whvkPO9g2ubjRUf/m+UwK8ebjgw2XyQEfip2TrotGluKIl286tOqifGW6CDmh+t+vkaeRM69q6ggHXuGmfVF0@vger.kernel.org, AJvYcCXGbttlndG0rUulp3EvkLiddvW7LAXTan8JbCM8b/Mi33weWXzCI2xFzfNgW9i++xJFBBmabHTnqw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YylaPR2PV9LKpV74OB+NGQNZhHrooYZm3uXRCDom1jfmaCATSE5
-	TVHce39HQKRLYjWovd1qkZ+ruqZhLy2eGznwwen+Yh9115CVfvPkNAo=
-X-Gm-Gg: ASbGnctYaUyBxip9C9M9DF1HFv4i+Z75RfBhyBSqTZfHfw1meqB4R9pU9tYZu0VHIJ4
-	6NpKjGF7OAb8kzA1zVorTxrbJVk20X1yR9gUHkdGVMCE5Q2PPn1Ct4C/riImG4nk36RrTR7dYl/
-	hPo4v+Ps1xVAs5nC15ycYjfkrLAZylzA2Sq4dCXOOiqlr7BCrtwG28ipQ21ctj5nwGrCf4OeGxN
-	OfST8kXS57FyJJxsJ8HBhc3CXsC+JM4qn+pFsKLYIa2767jyKRG7DDgaT2BYiCNuiarbqn9GshX
-	vieQU85I7i0MONe75oFdPmYdXvt1iVfQ5euhULg6tjXTk8bY8g==
-X-Google-Smtp-Source: AGHT+IHIhACHw0LhVygNM9iTKkSxUTpqQXQGvorcToKKulBQayFZgCYRh+4G3kEhRaIxFXUBokliXA==
-X-Received: by 2002:a17:903:40cc:b0:235:ea29:28da with SMTP id d9443c01a7336-2366affb408mr13925635ad.17.1749853461858;
-        Fri, 13 Jun 2025 15:24:21 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365dfdb9a0sm19840615ad.239.2025.06.13.15.24.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 15:24:21 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>,
-	bpf@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 bpf-next 4/4] selftest: bpf: Add test for BPF LSM on unix_may_send().
-Date: Fri, 13 Jun 2025 15:22:16 -0700
-Message-ID: <20250613222411.1216170-5-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250613222411.1216170-1-kuni1840@gmail.com>
-References: <20250613222411.1216170-1-kuni1840@gmail.com>
+        bh=ZDhN0PQzQ9wgEHlw7OXTzGjuQH3XOnQA5xq1WBIqnek=;
+        b=DP4LeCxipuEqfRH/A2U6e54gykEjP3H8WEMNZ2815004YhU+gJAM75Ep86mc6cwu0U
+         sU0lWog3PIuRrhr87ACxCbJu7XbTX2LBbY4voVmOssDG5FOI4w6VINVtXwyTFBv3Kj5v
+         68MbKplggEERqahkd5FDqvUvjyjurLaJrkrQs8bI3Ncwcv65x8A8wlSrknk+tjYXzy95
+         o6H4I54gLkz2BJRvbBElZpQmog6M9fgU7OD5TfQGoBl8hDmJWCXV8Y1CEp/tCtqTOWE3
+         DPpZH0WyhmNp80DpS9/yw/eq2nIAlSc39UAiju6m2uYHUPJGOUjNCtwwxlUAX2OFf5i3
+         ee+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUoYtPXQA1uonZ073rI2MQTnx7vh8vbs0CZCRSym1QzwDQuv6NwLIXJ0+NeznFNyNSH1+50HKyNLXsQfKs8@vger.kernel.org, AJvYcCVjXZP1T8WApTDB6z5tsMrbFQK12GdZtuo4tF1USUF5uaYuXR2eAKSRCFplpm43sH0Xqz7FFrSh@vger.kernel.org, AJvYcCVvlhQTmGOtxaZxoUYXhwk+c+TEffvp7aCFl3iix3+LUllcrwP/LyWhXfdwAg6fqLDx6b6w1Vo/TNxhbg==@vger.kernel.org, AJvYcCW3aYg3AI9cYfEnKrLIjIa4yyUWU8gi3edaUgLhE+ZyKNzma1VxhqXyt2J6oLyQkokz4pnutWegtkcPiswZSOPV@vger.kernel.org, AJvYcCXujocvSLLDKiMDLrc+W8B812qxkbpNvwDvihIZpAXdUL6+MoYyRv1ApO9qe+KFQ2hLtv8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeBjcDMLiKMO1E2tsO4XxqMmBq8cy2hRZqk9/D8n8ENQ6nHbp2
+	tMBJ2GlIYAB4j6mYC5V+xcZTAID5mBkkV3ZElSkKV8xouQ8Vg2hXJkZE7sFdIj/9a4cKURft0HI
+	nlXc/yCSSeQNS2chc7tmRzkuIoAKmPC0=
+X-Gm-Gg: ASbGncvQSz/Iq49Vxr/l0p1voHBV7BElZxSaGoeGsxsXfe4RwBsu5iI/OnOZ9Q1f/Vw
+	+OoJABUOAz43h3Ow0Hnutijz3BbX8PzfCduLtMxZupYAeLY3vmEUTY5cqvdMlWD4OZA5JYaf3Bx
+	V15Ez1gewM9qaYhaTTbkZatLJ7ukp6Ac/XZSBrNLRVOntN6oWqJOzHP3fSwhqNGe8apV5nJ05y
+X-Google-Smtp-Source: AGHT+IGvAZU4d5tXw0nhgWlSwGRKFbuaQhR8GZiHa22TV57O0MRl7T0f9v9YaYzOJredMJW3TgBMxueem5pPB3YsBNg=
+X-Received: by 2002:a05:6000:40dd:b0:3a5:2694:d75f with SMTP id
+ ffacd0b85a97d-3a572e895fbmr1535518f8f.52.1749854168416; Fri, 13 Jun 2025
+ 15:36:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250613-deny_trampoline_structs_on_stack-v1-0-5be9211768c3@bootlin.com>
+ <20250613-deny_trampoline_structs_on_stack-v1-2-5be9211768c3@bootlin.com>
+ <20250613081150.GJ2273038@noisy.programming.kicks-ass.net>
+ <DAL9GRMH74F4.2IV0HN0NGU65X@bootlin.com> <20250613083232.GL2273038@noisy.programming.kicks-ass.net>
+ <DALA5WYA04OG.1283TZDOVLBPS@bootlin.com>
+In-Reply-To: <DALA5WYA04OG.1283TZDOVLBPS@bootlin.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 13 Jun 2025 15:35:57 -0700
+X-Gm-Features: AX0GCFvxnM-s8AungljiWEt_LCtzKmPe0DGMu2VqQrNsxFmjrZ6Pec_NoZEOn-E
+Message-ID: <CAADnVQ+sj9XhscN9PdmTzjVa7Eif21noAUH3y1K6x5bWcL-5pg@mail.gmail.com>
+Subject: Re: [PATCH bpf 2/7] bpf/x86: prevent trampoline attachment when args
+ location on stack is uncertain
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Menglong Dong <imagedong@tencent.com>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Pu Lehui <pulehui@huawei.com>, Puranjay Mohan <puranjay@kernel.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Hari Bathini <hbathini@linux.ibm.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	ebpf@linuxfoundation.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
+	ppc-dev <linuxppc-dev@lists.ozlabs.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+On Fri, Jun 13, 2025 at 1:59=E2=80=AFAM Alexis Lothor=C3=A9
+<alexis.lothore@bootlin.com> wrote:
+>
+> On Fri Jun 13, 2025 at 10:32 AM CEST, Peter Zijlstra wrote:
+> > On Fri, Jun 13, 2025 at 10:26:37AM +0200, Alexis Lothor=C3=A9 wrote:
+> >> Hi Peter,
+> >>
+> >> On Fri Jun 13, 2025 at 10:11 AM CEST, Peter Zijlstra wrote:
+> >> > On Fri, Jun 13, 2025 at 09:37:11AM +0200, Alexis Lothor=C3=A9 (eBPF =
+Foundation) wrote:
+>
+> [...]
+>
+> >> Maybe my commit wording is not precise enough, but indeed, there's not
+> >> doubt about whether the struct value is passed on the stack or through=
+ a
+> >> register/a pair of registers. The doubt is rather about the struct loc=
+ation
+> >> when it is passed _by value_ and _on the stack_: the ABI indeed clearl=
+y
+> >> states that "Structures and unions assume the alignment of their most
+> >> strictly aligned component" (p.13), but this rule is "silently broken"=
+ when
+> >> a struct has an __attribute__((packed)) or and __attribute__((aligned(=
+X))),
+> >> and AFAICT this case can not be detected at runtime with current BTF i=
+nfo.
+> >
+> > Ah, okay. So it is a failure of BTF. That was indeed not clear.
+>
+> If I need to respin, I'll rewrite the commit message to include the detai=
+ls
+> above.
 
-This test performs the following for all AF_UNIX socket types to
-demonstrate how we can inspect each struct file passed via SCM_RIGHTS.
+No need to respin. The cover letter is quite detailed already.
 
-  1. Create a socket pair (sender and receiver)
-  2. Send the receiver's fd from the sender to the receiver
-  3. Receive the fd
-  4. Attach a BPF LSM prog that forbids self-reference SCM_RIGHTS
-  5. Send the receiver's fd from the sender to the receiver
-  6. Check if sendmsg() fails with -EPERM
-  7. Detach the LSM prog
+But looking at the patch and this thread I think we need to agree
+on the long term approach to BTF, since people assume that
+it's a more compact dwarf and any missing information
+should be added to it.
+Like in this case special alignment case and packed attributes
+are not expressed in BTF and I believe they should not be.
+BTF is not a debug format and not a substitute for dwarf.
+There is no goal to express everything possible in C.
+It's minimal, because BTF is _practical_ description of
+types and data present in the kernel.
+I don't think the special case of packing and alignment exists
+in the kernel today, so the current format is sufficient.
+It doesn't miss anything.
+I think we made arm64 JIT unnecessary restrictive and now considering
+to make all other JITs restrictive too for hypothetical case
+of some future kernel functions.
+I feel we're going in the wrong direction.
+Instead we should teach pahole to sanitize BTF where functions
+are using this fancy alignment and packed structs.
+pahole can see it in dwarf and can skip emitting BTF for such
+functions. Then the kernel JITs on all architectures won't even
+see such cases.
 
-How to run:
-
-  # make -C tools/testing/selftests/bpf/
-  # ./tools/testing/selftests/bpf/test_progs -t lsm_unix_may_send
-  ...
-  #182/1   lsm_unix_may_send/SOCK_STREAM:OK
-  #182/2   lsm_unix_may_send/SOCK_DGRAM:OK
-  #182/3   lsm_unix_may_send/SOCK_SEQPACKET:OK
-  #182     lsm_unix_may_send:OK
-  Summary: 1/3 PASSED, 0 SKIPPED, 0 FAILED
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- .../bpf/prog_tests/lsm_unix_may_send.c        | 168 ++++++++++++++++++
- .../selftests/bpf/progs/lsm_unix_may_send.c   |  83 +++++++++
- 2 files changed, 251 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/lsm_unix_may_send.c
- create mode 100644 tools/testing/selftests/bpf/progs/lsm_unix_may_send.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/lsm_unix_may_send.c b/tools/testing/selftests/bpf/prog_tests/lsm_unix_may_send.c
-new file mode 100644
-index 000000000000..60217e5c4ed4
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/lsm_unix_may_send.c
-@@ -0,0 +1,168 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include "test_progs.h"
-+#include "lsm_unix_may_send.skel.h"
-+
-+#define MSG_HELLO "Hello"
-+#define MSG_WORLD "World"
-+#define MSG_LEN 5
-+
-+struct scm_rights {
-+	struct cmsghdr cmsghdr;
-+	int fd;
+The issue was initially discovered by a selftest:
+https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-3-0a32fe72339e@boot=
+lin.com/
+that attempted to support these two types:
++struct bpf_testmod_struct_arg_4 {
++ __u64 a;
++ __u64 b;
 +};
 +
-+static int send_fd(int sender_fd, int receiver_fd, bool lsm_attached)
-+{
-+	struct scm_rights cmsg = {};
-+	struct msghdr msg = {};
-+	struct iovec iov = {};
-+	int ret;
-+
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = &cmsg;
-+	msg.msg_controllen = CMSG_SPACE(sizeof(cmsg.fd));
-+
-+	iov.iov_base = MSG_HELLO;
-+	iov.iov_len = MSG_LEN;
-+
-+	cmsg.cmsghdr.cmsg_len = CMSG_LEN(sizeof(cmsg.fd));
-+	cmsg.cmsghdr.cmsg_level = SOL_SOCKET;
-+	cmsg.cmsghdr.cmsg_type = SCM_RIGHTS;
-+	cmsg.fd = receiver_fd;
-+
-+	/* sending "Hello" with the receiver's fd. */
-+	ret = sendmsg(sender_fd, &msg, 0);
-+
-+	if (lsm_attached) {
-+		if (!ASSERT_EQ(ret, -1, "sendmsg(Hello)") ||
-+		    !ASSERT_EQ(errno, EPERM, "sendmsg(Hello) errno"))
-+			return -EINVAL;
-+	} else {
-+		if (!ASSERT_EQ(ret, MSG_LEN, "sendmsg(Hello)"))
-+			return -EINVAL;
-+	}
-+
-+	/* sending "World" without SCM_RIGHTS. */
-+	ret = send(sender_fd, MSG_WORLD, MSG_LEN, 0);
-+	if (!ASSERT_EQ(ret, MSG_LEN, "sendmsg(World)"))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int recv_fd(int receiver_fd, bool lsm_attached)
-+{
-+	struct scm_rights cmsg = {};
-+	struct msghdr msg = {};
-+	char buf[MSG_LEN] = {};
-+	struct iovec iov = {};
-+	int ret;
-+
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = &cmsg;
-+	msg.msg_controllen = CMSG_SPACE(sizeof(cmsg.fd));
-+
-+	iov.iov_base = buf;
-+	iov.iov_len = sizeof(buf);
-+
-+	/* LSM is expected to drop "Hello" with the receiver's fd */
-+	if (lsm_attached)
-+		goto no_hello;
-+
-+	ret = recvmsg(receiver_fd, &msg, 0);
-+	if (!ASSERT_EQ(ret, MSG_LEN, "recvmsg(Hello) length") ||
-+	    !ASSERT_STRNEQ(buf, MSG_HELLO, MSG_LEN, "recvmsg(Hello) data"))
-+		return -EINVAL;
-+
-+	if (!ASSERT_OK_PTR(CMSG_FIRSTHDR(&msg), "cmsg sent") ||
-+	    !ASSERT_EQ(cmsg.cmsghdr.cmsg_len, CMSG_LEN(sizeof(cmsg.fd)), "cmsg_len") ||
-+	    !ASSERT_EQ(cmsg.cmsghdr.cmsg_level, SOL_SOCKET, "cmsg_level") ||
-+	    !ASSERT_EQ(cmsg.cmsghdr.cmsg_type, SCM_RIGHTS, "cmsg_type"))
-+		return -EINVAL;
-+
-+	/* Double-check if the fd is of the receiver itself. */
-+	receiver_fd = cmsg.fd;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+no_hello:
-+	ret = recv(receiver_fd, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(ret, MSG_LEN, "recvmsg(World) length") ||
-+	    !ASSERT_STRNEQ(buf, MSG_WORLD, MSG_LEN, "recvmsg(World) data"))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static void test_scm_rights(struct lsm_unix_may_send *skel, int type)
-+{
-+	struct bpf_link *link;
-+	int socket_fds[2];
-+	int err;
-+
-+	err = socketpair(AF_UNIX, type, 0, socket_fds);
-+	if (!ASSERT_EQ(err, 0, "socketpair"))
-+		return;
-+
-+	err = send_fd(socket_fds[0], socket_fds[1], false);
-+	if (err)
-+		goto close;
-+
-+	err = recv_fd(socket_fds[1], false);
-+	if (err)
-+		goto close;
-+
-+	link = bpf_program__attach_lsm(skel->progs.unix_may_send_filter);
-+	if (!ASSERT_OK_PTR(link, "attach lsm"))
-+		goto close;
-+
-+	err = send_fd(socket_fds[0], socket_fds[1], true);
-+	if (err)
-+		goto detach;
-+
-+	recv_fd(socket_fds[1], true);
-+detach:
-+	err = bpf_link__destroy(link);
-+	ASSERT_EQ(err, 0, "detach lsm");
-+close:
-+	close(socket_fds[0]);
-+	close(socket_fds[1]);
-+}
-+
-+struct sk_type {
-+	char name[16];
-+	int type;
-+} sk_types[] = {
-+	{
-+		.name = "SOCK_STREAM",
-+		.type = SOCK_STREAM,
-+	},
-+	{
-+		.name = "SOCK_DGRAM",
-+		.type = SOCK_DGRAM,
-+	},
-+	{
-+		.name = "SOCK_SEQPACKET",
-+		.type = SOCK_SEQPACKET,
-+	},
++struct bpf_testmod_struct_arg_5 {
++ __int128 a;
 +};
-+
-+void test_lsm_unix_may_send(void)
-+{
-+	struct lsm_unix_may_send *skel;
-+	int i;
-+
-+	skel = lsm_unix_may_send__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "load skel"))
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(sk_types); i++)
-+		if (test__start_subtest(sk_types[i].name))
-+			test_scm_rights(skel, sk_types[i].type);
-+
-+	lsm_unix_may_send__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/lsm_unix_may_send.c b/tools/testing/selftests/bpf/progs/lsm_unix_may_send.c
-new file mode 100644
-index 000000000000..8eb2c9532a7d
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/lsm_unix_may_send.c
-@@ -0,0 +1,83 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include <vmlinux.h>
-+#include <bpf/bpf_core_read.h>
-+#include <bpf/bpf_tracing.h>
-+
-+#include "bpf_misc.h"
-+
-+#define EPERM 1
-+
-+#define FMODE_PATH	(1 << 14)
-+#define S_IFMT		00170000
-+#define S_IFSOCK	0140000
-+#define S_ISSOCK(mode)	(((mode) & S_IFMT) == S_IFSOCK)
-+
-+#define AF_UNIX		1
-+
-+static struct inode *file_inode(struct file *filp)
-+{
-+	return bpf_core_cast(filp->f_inode, struct inode);
-+}
-+
-+static struct socket *SOCKET_I(struct inode *inode)
-+{
-+	return bpf_core_cast(&container_of(inode, struct socket_alloc, vfs_inode)->socket,
-+			     struct socket);
-+}
-+
-+/* mostly same with unix_get_socket() in net/unix/garbage.c */
-+static struct sock *unix_get_socket(struct file *filp)
-+{
-+	struct socket *sock;
-+	struct inode *inode;
-+
-+	if (filp->f_mode & FMODE_PATH)
-+		return NULL;
-+
-+	inode = file_inode(filp);
-+	if (!inode)
-+		return NULL;
-+
-+	if (!S_ISSOCK(inode->i_mode))
-+		return NULL;
-+
-+	sock = SOCKET_I(inode);
-+	if (!sock || !sock->ops || sock->ops->family != AF_UNIX)
-+		return NULL;
-+
-+	return sock->sk;
-+}
-+
-+SEC("lsm/unix_may_send")
-+int BPF_PROG(unix_may_send_filter,
-+	     struct sock *sk, struct sock *other, struct sk_buff *skb)
-+{
-+	struct unix_skb_parms *cb;
-+	struct scm_fp_list *fpl;
-+	int i;
-+
-+	if (!skb)
-+		return 0;
-+
-+	cb = bpf_core_cast(skb->cb, struct unix_skb_parms);
-+	if (!cb->fp)
-+		return 0;
-+
-+	fpl = bpf_core_cast(cb->fp, struct scm_fp_list);
-+
-+	for (i = 0; i < fpl->count && i < ARRAY_SIZE(fpl->fp); i++) {
-+		struct file *filp;
-+
-+		filp = bpf_core_cast(fpl->fp[i], struct file);
-+
-+		/* self-reference is the simplest case that requires GC */
-+		if (unix_get_socket(filp) == other)
-+			return -EPERM;
-+	}
-+
-+	return 0;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.49.0
 
+The former is present in the kernel. It's more or less sockptr_t,
+and people want to access it for observability in tracing.
+The latter doesn't exist in the kernel and we cannot represent
+it properly in BTF without losing alignment.
+
+So I think we should go back to that series:
+https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-0-0a32fe72339e@boot=
+lin.com/
+
+remove __int128 selftest, but also teach pahole
+to recognize types that cannot be represented in BTF and
+don't emit them either into vmlinux or in kernel module
+(like in this case it was bpf_testmod.ko)
+I think that would be a better path forward aligned
+with the long term goal of BTF.
+
+And before people ask... pahole is a trusted component of the build
+system. We trust it just as we trust gcc, clang, linker, objtool.
 
