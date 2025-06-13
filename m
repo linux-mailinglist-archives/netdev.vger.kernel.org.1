@@ -1,131 +1,180 @@
-Return-Path: <netdev+bounces-197626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1374EAD9647
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:30:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B74AD9651
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9372168E84
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:30:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80A4B3BAB12
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B0F24676D;
-	Fri, 13 Jun 2025 20:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F62248F59;
+	Fri, 13 Jun 2025 20:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9rLcgov"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1392021C176
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 20:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0441D21C176;
+	Fri, 13 Jun 2025 20:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749846626; cv=none; b=qCWrgtXJMeqdz7ysb8L1SOjRBGpTNtCnlAtvdBzNWPlS6hV/a9gUx4PBYoWjmbU7I42Din4tBqrLeQI7eTnuoKCoTvLAJbgBYsvvICFyF1tM1/ul3x78vIqTLAvN9KPeJDIZTuivFuWcq9174at9nlMxin9pNnWzFiqtcRDq6PE=
+	t=1749846809; cv=none; b=mQtjbQ9ZNRGJErRQlu4s/zBkfSVW1psjgHxjsD0bYB2yOG5PyhL6f0lyrrDVQ0q5/+hlGYDx5+i5hNP+JMP4fJRg2RwkiYzSJ34FSV0JccC2+45M/y3d2K42wyHaQgozo9xqiNja2bVeQEZPR1pNwOfAkLDWlcSCY1ivgRiB6sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749846626; c=relaxed/simple;
-	bh=Wx/w9AjdgBdua0CCLxzqzAIuSi/xSMUXyBDVY4umg5k=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=T9hL+nZOhhxRVymrKG+h5R8GKqRtrQwnPLf54e1jHgXU6k6dSq+DDHLxTuXmfmV78ph8VDUjS8ILqWn6wjs6dP7pKG5IlGGbVe2igSHxobODiybf6tK3UC7b+a7mXajZfdo1UFEl7E/LQzICTYvGWbdx3LAyIRnSRNbSamsCvyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-875bd5522e9so259212139f.2
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 13:30:24 -0700 (PDT)
+	s=arc-20240116; t=1749846809; c=relaxed/simple;
+	bh=UovT/ZB9FyESr0A8ZCouEz1hivRGNty4iTls1N5CnYY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TgBEwJyEZ/yetTUxu4XMU1Gr4br/U/LnE4DP3Yh5JpddPsmn/LukfhrfSCwztm0JtFOdbaTUOSkA/ilCyZJ33lFW3XbR5y0pRbiXvnM8kXaYkZJs86qJhtMyeKjNqyv54SFrdEmfM71RojYjslF23mHmSqvWlV60danLEERLtQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9rLcgov; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b2c4476d381so2307025a12.0;
+        Fri, 13 Jun 2025 13:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749846807; x=1750451607; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pwRAnCMRMy4NI04BUJ5xATTCrVm8zFet775Y9+JU/To=;
+        b=Q9rLcgovjWMiyH3hvqvLsJH9iLk3EzGnne8DV8ZXEZL0JUsjwUqCitE5h1XoOB8Lp+
+         H8GHC9rUfBjXhhj5lQX/9bLpIyJ77/MAehO2q6ggMR+QQx9JGzk5Zcoe8TGUIk8m5/G0
+         H6tmU7xtO6A0sZT/Or6PL08wvoFYr63jSbqpmIFbeyBi5LLDu/+pFsWx92/0joE/CPD6
+         8B8k64HvhhgZ129JGOkUvDMaTF19oi8I58gJeIn0X1BK5gDywAYumwBp8b2h5KqSpU6N
+         xkhO5CpDEY000vQLRAi8juhiSrhCZ/G5yEnCqRuQ7YbXa+GWKFI2ArV+iyjfgTy6k1R1
+         w3gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749846624; x=1750451424;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lAT0xlzsFKpAKX7I55g+k6KWgGcGGE+bWGUyodsvEb4=;
-        b=Ckmwy6aLZBKlxI4z7UvDDgkYdzBLTdDVYGg7B+5zL4rbxjS5bg5cUFSvWrO1/oZHur
-         i4VpDM8DabuSbzYxh/OIgKYspAV8oewEanepQvJ6+BBuscQnziS2gjGGx3O+c2QQYjMA
-         Yi+Y1SOGvMGoID0q+WdPMWZi6BRibJaN4tYntGVui1w7uiJ6esZokJzfnnC56xwzpfgZ
-         ZlD0R2IwrYK4FUpPj5EUjvyJlxzoTbcH8JgbGOG7DZztent09MXjPT2YNhLZSgS+iMMO
-         63mURWb5mFPEe+2HdyLewk8iN4sf98zXp4fJWxGRp84B2ykQ81OcB65ZeY5XXuBwujuE
-         9jsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV54q7+WiiIlHCs5EWVZi80cJWYCjBGpM8hCJ5JtHRx3HebFJVOQLr5adxtuM+Vkg0NUWcyruY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdOyKowj+yP70F67wBt3RJBwXlo7vx25kHPYe1XgKXju8Ct2ba
-	Vesp+T4iBSEnDaPTcZqKCEbIkHP+xZbWQGCKciWXstNZgt0eV38IHPtv2JC+EHKZ2INZ+JBdVbX
-	vqXIwVTLxe/qyLFbHjtSMOP9pj/qkv+zDRqU5cGWQtcGjX5+9fhkgIkC+E4k=
-X-Google-Smtp-Source: AGHT+IEEp/FkkUlE3BJWKdHjmhqu+GIVyYccKy1r1UGJ5mapdlfUpC9Npsm7E4bKOHXqi+3bXnHv+Y85/Y9SbdNtDlyuHyaZ3aUs
+        d=1e100.net; s=20230601; t=1749846807; x=1750451607;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pwRAnCMRMy4NI04BUJ5xATTCrVm8zFet775Y9+JU/To=;
+        b=v53sdNRCw8VI71i2abX8vmXxaLENTgohvN/sZx7P4Ns5mq5CfWIoppeODKYB8FDNvm
+         oK+iO+WiFTQFvEwUcoWL9lWFTr3+AHZHXv3X8WmS5LcxacJxO6okPJOP4/na5aaDTcWS
+         PX6PUAPekx9S0R6X7MiWfUB9jqQa+lyokjIvpCAHhu+C1hXcGfo3lnV+V+OmC/iJK0KZ
+         xIXyYrWGEbTHKhuhrueGiq3ovJBgtD+VOhUgZ/MRRItf8PKSRkPhnqMhzyL9gPdzH6pu
+         uiGKX9oF0/HorhNQ8Y8BNC5lfRpSp6o21bUdE2HwNTudSMgrmAC0xNVFpZvIYUxTNxEj
+         O/8A==
+X-Forwarded-Encrypted: i=1; AJvYcCV65bNMh5U2wXESK7ARiP27P7AnlHNboiWB2j8wZnpAARVysWUOMdfYJWP7pyknhFkacONMDIVL4YSTDg==@vger.kernel.org, AJvYcCVCtWproQYl2ER1V9baeMGfIK5+throSH+A4C14Ae3f3neCtIilKgnW54voVpJ8lVoO72mfunY2+HvqnmDyb82j@vger.kernel.org, AJvYcCWph8sgZFVd2xhy5qqKHoxXy3RwojHLQ2nDgawvM5WodyaHOHeP+mFnm41cc6a1E6oepK4k7tlWrRry2Xs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywoi5t6qUuqthERfsvJabQh2DIHLyzmqsO9NUdTKLFG5gxe952A
+	z9A39D5MaMLs1S0leuJxd/bx4hwfFNtCZICFV0isHyeGFHV0KSVUgcICWm38
+X-Gm-Gg: ASbGncsjGS3F7RLDZf8o4NB0OIrZWHKSHu2kAPE2TeKkpjVaHgpVKhZyaflv3dKgk//
+	ZmwEIbqf9I2FIfkKsblPklQY4B0hTT5NUzUQdLsu7MuJrlkaHm+MaIp0/wVdE7t3ZIT6zBsEsXT
+	9e/GxvFT49Mji2LltVnWqHwdPav6CVDTAhQEXrZL3bMrdKL+agnMq64jCZ+UH/ihOm6UZLpE9JQ
+	eyr5N+C2ciONVQWdKYjnHOoYkz6/mE4BRKfFdd+BLyelqDlKLgLipaSqrx7FOeouRV/xxU+jCzC
+	NBiTZC1TSa9mDGhLRC846l9qDspS/DEvwaYMBi/UxuffhQZniGuu2x3aDMLNrOhWQ8o7ZS7b4pM
+	zhIG0ktv4nQc5oID9/wKylPQ=
+X-Google-Smtp-Source: AGHT+IFofoxaBBjnJtXHhezT3t2Miq2Uz35b+y2fjwYckYFssZ1+zOwtoBfHJPoJcIM6hLG+m6recw==
+X-Received: by 2002:a05:6a20:7346:b0:21f:54e0:b0a3 with SMTP id adf61e73a8af0-21fbc62cb6bmr1432515637.2.1749846806751;
+        Fri, 13 Jun 2025 13:33:26 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74890084af3sm2135347b3a.97.2025.06.13.13.33.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 13:33:26 -0700 (PDT)
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	skalluru@marvell.com,
+	manishc@marvell.com,
+	andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	sriharsha.basavapatna@broadcom.com,
+	somnath.kotur@broadcom.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	tariqt@nvidia.com,
+	saeedm@nvidia.com,
+	louis.peens@corigine.com,
+	shshaikh@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com,
+	ecree.xilinx@gmail.com,
+	horms@kernel.org,
+	dsahern@kernel.org,
+	shuah@kernel.org,
+	tglx@linutronix.de,
+	mingo@kernel.org,
+	ruanjinjie@huawei.com,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	petrm@nvidia.com,
+	kuniyu@google.com,
+	sdf@fomichev.me,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	oss-drivers@corigine.com,
+	linux-net-drivers@amd.com,
+	linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+Subject: [PATCH net-next v4 0/6] udp_tunnel: remove rtnl_lock dependency
+Date: Fri, 13 Jun 2025 13:33:19 -0700
+Message-ID: <20250613203325.1127217-1-stfomichev@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3a03:b0:3dc:76ad:7990 with SMTP id
- e9e14a558f8ab-3de07cd0417mr14484135ab.15.1749846624287; Fri, 13 Jun 2025
- 13:30:24 -0700 (PDT)
-Date: Fri, 13 Jun 2025 13:30:24 -0700
-In-Reply-To: <684a39aa.a00a0220.1eb5f5.00fa.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <684c8a60.050a0220.be214.02a6.GAE@google.com>
-Subject: Re: [syzbot] [net?] WARNING in __linkwatch_sync_dev (2)
-From: syzbot <syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stfomichev@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+Recently bnxt had to grow back a bunch of rtnl dependencies because
+of udp_tunnel's infra. Add separate (global) mutext to protect
+udp_tunnel state.
 
-HEAD commit:    27605c8c0f69 Merge tag 'net-6.16-rc2' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17bb9d70580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8e5a54165d499a9
-dashboard link: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a7b9d4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1421310c580000
+v4:
+- grab lock in more places, specifically netlink and notifiers (Jakub)
+- convert geneve and vxlan notifiers to (sleepable) rtnl lock
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-27605c8c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ab939a8a93b4/vmlinux-27605c8c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e90d45016aac/bzImage-27605c8c.xz
+v3:
+- fix 2 test failures (Jakub NIPA)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
+v2:
+- move the lock into udp_tunnel_nic (Jakub)
+- reorder the lock ordering (Jakub)
+- move udp_ports_sleep removal into separate patch and update the test
+(Jakub)
 
-------------[ cut here ]------------
-RTNL: assertion failed at ./include/net/netdev_lock.h (72)
-WARNING: CPU: 2 PID: 60 at ./include/net/netdev_lock.h:72 netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
-WARNING: CPU: 2 PID: 60 at ./include/net/netdev_lock.h:72 __linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
-Modules linked in:
-CPU: 2 UID: 0 PID: 60 Comm: kworker/u32:3 Not tainted 6.16.0-rc1-syzkaller-00101-g27605c8c0f69 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: bond0 bond_mii_monitor
-RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
-RIP: 0010:__linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
-Code: 05 ff ff ff e8 94 b6 59 f8 c6 05 e9 0f 2e 07 01 90 ba 48 00 00 00 48 c7 c6 c0 8c e3 8c 48 c7 c7 60 8c e3 8c e8 94 7b 18 f8 90 <0f> 0b 90 90 e9 d6 fe ff ff 48 c7 c7 44 3b a8 90 e8 ae 86 c0 f8 e9
-RSP: 0018:ffffc90000ce79f0 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff8880363a2000 RCX: ffffffff817ae368
-RDX: ffff888022148000 RSI: ffffffff817ae375 RDI: 0000000000000001
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: 1ffff9200019cf48
-R13: ffff8880363a2cc5 R14: ffffffff8c5909c0 R15: ffffffff899ba310
-FS:  0000000000000000(0000) GS:ffff8880d6954000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd4122af9c CR3: 000000000e382000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
- bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
- bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
- bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3321 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+Cc: Michael Chan <michael.chan@broadcom.com>
 
+Stanislav Fomichev (6):
+  geneve: rely on rtnl lock in geneve_offload_rx_ports
+  vxlan: drop sock_lock
+  udp_tunnel: remove rtnl_lock dependency
+  net: remove redundant ASSERT_RTNL() in queue setup functions
+  netdevsim: remove udp_ports_sleep
+  Revert "bnxt_en: bring back rtnl_lock() in the bnxt_open() path"
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  3 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 42 ++-------
+ drivers/net/ethernet/emulex/benet/be_main.c   |  3 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  1 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |  1 -
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  3 +-
+ .../ethernet/netronome/nfp/nfp_net_common.c   |  3 +-
+ .../net/ethernet/qlogic/qede/qede_filter.c    |  3 -
+ .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |  1 -
+ drivers/net/ethernet/sfc/ef10.c               |  1 -
+ drivers/net/geneve.c                          |  7 +-
+ drivers/net/netdevsim/netdevsim.h             |  2 -
+ drivers/net/netdevsim/udp_tunnels.c           | 12 ---
+ drivers/net/vxlan/vxlan_core.c                | 34 ++++----
+ drivers/net/vxlan/vxlan_private.h             |  2 +-
+ drivers/net/vxlan/vxlan_vnifilter.c           | 18 ++--
+ include/net/udp_tunnel.h                      | 87 ++++++++++++++-----
+ net/core/dev.c                                |  4 +-
+ net/ipv4/udp_tunnel_core.c                    | 16 ++--
+ net/ipv4/udp_tunnel_nic.c                     | 78 +++++++++++++----
+ .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 23 +----
+ 22 files changed, 177 insertions(+), 170 deletions(-)
+
+-- 
+2.49.0
+
 
