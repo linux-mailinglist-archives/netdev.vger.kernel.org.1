@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-197285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34EC9AD8035
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:21:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA93AD8047
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9EF01E0391
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:21:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11073B15B5
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F023C1D61B7;
-	Fri, 13 Jun 2025 01:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78681DDA1E;
+	Fri, 13 Jun 2025 01:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkxk6dB+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q94CNsO3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DCF1420DD;
-	Fri, 13 Jun 2025 01:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7E172636;
+	Fri, 13 Jun 2025 01:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749777705; cv=none; b=U/Ha37XdVIOnK5eY8r8EOhRgzsClXWTuwQIPLa0UhTWX2HqCKTQhOK7xGEkquxLmLCbPcZPsn3NCuDe8LWK72OA08HzKLkWk1ZE2DBMfk7gjtr6Z9V1pfcNXwrrTnJoR/I3NPr33wT1oR4MT0AD8OpLbY0UKBJZo6UhBN0WIKYg=
+	t=1749778200; cv=none; b=jrDOwB0mN0sY+SMiz3OJbkSSnDGJSZs1YoybAdbqvlxXkPevHsdjwNmrduquGsLBq94XxePqUqcetQTkN6Dw+9yjrXFTYIhzlA4B1hzOPx2gRVQS5l9JqZdvAox29tCqaz5BXrUwygiUzNIs7jE1h/1NqEuZzUNLFERxorSi2G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749777705; c=relaxed/simple;
-	bh=CkV7K9JkoZIX1EFm22k3RUVUrhM4a86eMgsQGHb5Sq4=;
+	s=arc-20240116; t=1749778200; c=relaxed/simple;
+	bh=RqMcqn0JWcgiJ7EPq03fKjRRCEN6dTdTUjbtUhbkVY8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cPWnznb6HeueDMyqB+ZXTrIqwQJCqJsNh5XJ1e47SXj/IRWXJ887/k7op0FhKI101rf7rxATYmQewAH2FakwyGS74d0sY0Z8OyzS6B+0ohGCxL/uvM9xF3yYi9JorCz0sc9auNJqJMTaUQWiKJOVW2q+jb/RaL+8BzAaMHR5KyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkxk6dB+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0637AC4CEEA;
-	Fri, 13 Jun 2025 01:21:43 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GWPu9RAEwjO2kHHTJs4VKAF7q3xC8pk1dXZQkMsOtuEQfM58BxRQdWgSoAPsWh20TDTT20rUtrHcT1W6VZDmgzncStTq/mbsqG7OmPLOkI9HfdK6YPin6eR8EN0OTfGZQ0qJJEfoPMD3l3sHnP9IAyTxkLoDPEjD6av2XEVyQyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q94CNsO3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39684C4CEEA;
+	Fri, 13 Jun 2025 01:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749777705;
-	bh=CkV7K9JkoZIX1EFm22k3RUVUrhM4a86eMgsQGHb5Sq4=;
+	s=k20201202; t=1749778200;
+	bh=RqMcqn0JWcgiJ7EPq03fKjRRCEN6dTdTUjbtUhbkVY8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nkxk6dB+kugt2d9edQ/jopnXbnc2+S8g1W/kk6Xj40u5oVCDdK2Ac+7WHs3i+Ve7q
-	 UuO6fsjybG3L9lyaHQqYQCkQQzutMrsElQN5uPcqKbx8kRxP5jB0kE3Fr7GMSNisqF
-	 AAU2YkbkGz8bgusMc32CgIpMtekatIgwW6YwoGBynF4mqhzv3PlQJ8G4xEppMr+r3N
-	 IQBPUMP0XPjLM9IE4UknlL7N0GirnB1Z2t92soRx0HmgP/dPHwZipUxU/UzF65VDA4
-	 BW0E74mnrKNGez1eU0emtxVYIN6CylOphGMPvZ2dmxocKgV4RWGdXDpisMmfz1QHEp
-	 tRGR37QgESr2g==
-Date: Thu, 12 Jun 2025 18:21:43 -0700
+	b=Q94CNsO3znQfKi0xRGCXB/Fk3qrKKSZAAz74XJRYRyiJN8bEkUArl86tJ9bVMcKVl
+	 FhTHXgtbQ9LkNYdUrYyRhX/F+WGnGaj0T9fPBADf6Ltzqz7sq4GgiD3oASo5FlxXpN
+	 mB9ZxENtk92E8T69NZbg3uupmmfF0gVDd1OVBSoiE3uD7m7ez07yRIz1GbpgSQW+cf
+	 1Mku5nql8dRmwIxfFwPameDsRS6hY1H2rExcEDzMiyaWNMOdZd4lapVSsJ72YmJnxc
+	 GN7uicZrXfIRBGx0DmFihnbp/aqu5hPFFX/Irqs9PYWIIbKa3hV0qvXkkNZoiW76xs
+	 rmpiCizfQ4J3Q==
+Date: Thu, 12 Jun 2025 18:29:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- haiyangz@microsoft.com, decui@microsoft.com, stephen@networkplumber.org,
- kys@microsoft.com, paulros@microsoft.com, olaf@aepfle.de,
- vkuznets@redhat.com, davem@davemloft.net, wei.liu@kernel.org,
- edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
- longli@microsoft.com, ssengar@linux.microsoft.com,
- linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- bpf@vger.kernel.org, ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
- shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
- kotaranov@microsoft.com, horms@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next,v7] net: mana: Add handler for hardware
- servicing events
-Message-ID: <20250612182143.16f857a9@kernel.org>
-In-Reply-To: <1749580942-17671-1-git-send-email-haiyangz@linux.microsoft.com>
-References: <1749580942-17671-1-git-send-email-haiyangz@linux.microsoft.com>
+To: George Moussalem <george.moussalem@outlook.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, Michael Turquette
+ <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Philipp
+ Zabel <p.zabel@pengutronix.de>, Konrad Dybcio <konradybcio@kernel.org>,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Subject: Re: [PATCH net-next v5 0/5] Add support for the IPQ5018 Internal GE
+ PHY
+Message-ID: <20250612182958.7e8c5bf0@kernel.org>
+In-Reply-To: <DS7PR19MB8883E05490D6A0BD48DE11909D74A@DS7PR19MB8883.namprd19.prod.outlook.com>
+References: <DS7PR19MB8883E05490D6A0BD48DE11909D74A@DS7PR19MB8883.namprd19.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,16 +69,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Jun 2025 11:42:22 -0700 Haiyang Zhang wrote:
-> v6:
-> Not acquiring module refcnt as suggested by Paolo Abeni.
+On Thu, 12 Jun 2025 17:10:24 +0400 George Moussalem wrote:
+>  [PATCH net-next v5 0/5] 
 
-TBH I'm not 100% sure this is correct.
-If the service worker operations end up unbinding the driver from
-the device holding the device ref may not prevent the module from
-being unloaded.
-
-Could you try to trigger that condition? Make that msleep() in the work
-even longer and try to remove the module while the work is sleeping
-there?
+I guess my explanation wasn't good enough :)
+This is not a correctly formatted series. It looks like a series with 5
+patches where patches 1 4 5 where lost. We need the cover letter to say
+0/2 and patches to say 1/2 and 2/2.
 
