@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-197272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0EBAD7FE9
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:01:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5109AD7FEF
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F35C3B4078
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:01:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05BF61897FAE
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 01:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B858D1C6FF9;
-	Fri, 13 Jun 2025 01:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E4F1D5CED;
+	Fri, 13 Jun 2025 01:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPPaMzV0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sk5UkXX0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F041A0711
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEF71D5175
 	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 01:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749776495; cv=none; b=NUrk8oYAjzdHoFw8wgkeOhIBGyWkfd3W9KoeUUh+6zpAZoaePXWj5J9SlNUorGGZ+MXopWWG7Yt2I9uMk4LqnsqDu0B+lLs0GzyDi1FwUfiTPsdVFgdN7hoWIiQoZ8pt9RYlAaBVflpyBIKIWsKX/WLqWuvMyX3Br89u3Z/31SY=
+	t=1749776496; cv=none; b=Lt4Lf1kQQFt/B+Y7o3Tvp9r7HkNV5Me7BhuQQ/VVW/9QPu7DX7b68KXnbR3TQqzGlv6z8d9tkLWDhUaqvpHlE7O6iTAeVOEaQZuHLZKnmOM0TzOaNOymw2rVMcL62A4W3AZC46Rm4rUk5sFd1AhlOZ/5BAETI44MYMas0RFxQSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749776495; c=relaxed/simple;
-	bh=NTwPvUsk4QNe1ETRBmwqN7Lcoqw2Xz3GU5c8UpRSfAc=;
+	s=arc-20240116; t=1749776496; c=relaxed/simple;
+	bh=aXp64FVZ8vBC59bZdDKbUAFWuUawl6rAwfae83yygCo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i7Ma7DA129TUnytk98hYxnb9SNv4t+L+rvWrHMGUjhYqCxGOfDdqBcfZwl/N/eAvBbWfPkRNIzvWyIb83BIJJe9DkWpHO4TCq6cwDRGhlNiH9sTs9WKuK/FBhzuUo1ncngExTwiJ2ZG+NriWSxaN9A2roBnk14mOdFCh5ChGZ+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPPaMzV0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C12C4CEF0;
-	Fri, 13 Jun 2025 01:01:34 +0000 (UTC)
+	 MIME-Version; b=Ne5gMtXbOLltxRJqV0CYreo/KLylEBQ3pc3WDLiQZ+zNdjF3hKpP/Y65Ls5dW4SUiPCLzk3TMcqic6wiw7hDe6r4NcF8N1I15WW61PVrp2g0ZosQ8hfQ9eQGcOCP+7WbP6/bsDB96/2HjGuaLHEVdgXSNmKnAJFAMgGKNcSb7dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sk5UkXX0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EEF9C4CEF4;
+	Fri, 13 Jun 2025 01:01:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1749776495;
-	bh=NTwPvUsk4QNe1ETRBmwqN7Lcoqw2Xz3GU5c8UpRSfAc=;
+	bh=aXp64FVZ8vBC59bZdDKbUAFWuUawl6rAwfae83yygCo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IPPaMzV0OF4RumM2C5y4qSCdI8opH1+MlZzImntQVmAhBpkpVQi1V7P5aWCcU5OND
-	 tIyuwjPlO5P/F4x20ZqsgdnkmeIgS+8+iD+/9IMo6dQB8NLBESS2tz8Vv0YdrQLN2/
-	 g8j1gc78t8d2TwSswRnP1XRNPfE2gsdGwJ4TkLUxSxUPoMmvmt8mEcJmVzAH/lX/ao
-	 sapj2IsGnX5/F83xvwutxX+r92TBdFvzmadvf/CKgnO2wj8gBT5RKr1NdKcZX35wiM
-	 sr2+PyRVJnlMTjt1PNlY4tG1iuqau+rGUIHzH7G7PNFmHgFr14/fX1Znnz77OZMWIJ
-	 X21ty+UDtfzaQ==
+	b=sk5UkXX0JWyh+fdmw6aNtCdpnwUFGXbHKUPRCtfVTkuhvt2cVfUbm13zQuTokL0AY
+	 +HewobJ/679t7p4sOb89+yThXjjnoAN6YUK7TzuWWBWabqHqMxKA42wTCGfPkczfev
+	 Ij9H9/B1O87m3Kb2bdFl/QKzNcfQzr1wVY6xZW5J0tX2hRbmzrDhbPaOOqG9xthJe9
+	 DjyIvP5fr4mEufG5FPPzAEdcC8pwYaFIhRsajCT8HNjsNu4igdvs1I4p3CtnSTRZn5
+	 TBIxdZFvK8g/YWDuVRxmmLrScpMaMh6Fq3XpgI0yQ4PWGJ6gUrLIU1H1u+6clvheCM
+	 MEMtjE17x2gEQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jacob.e.keller@intel.com,
 	michal.swiatkowski@linux.intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/7] eth: igb: migrate to new RXFH callbacks
-Date: Thu, 12 Jun 2025 18:01:05 -0700
-Message-ID: <20250613010111.3548291-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/7] eth: igc: migrate to new RXFH callbacks
+Date: Thu, 12 Jun 2025 18:01:06 -0700
+Message-ID: <20250613010111.3548291-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250613010111.3548291-1-kuba@kernel.org>
 References: <20250613010111.3548291-1-kuba@kernel.org>
@@ -73,70 +73,68 @@ add dedicated callbacks for getting and setting rxfh fields").
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/intel/igb/igb_ethtool.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index ca6ccbc13954..92ef33459aec 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -2500,9 +2500,11 @@ static int igb_get_ethtool_nfc_all(struct igb_adapter *adapter,
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index 3fc1eded9605..e6cac8d4b862 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -1045,9 +1045,11 @@ static int igc_ethtool_get_nfc_rules(struct igc_adapter *adapter,
  	return 0;
  }
  
--static int igb_get_rss_hash_opts(struct igb_adapter *adapter,
--				 struct ethtool_rxnfc *cmd)
-+static int igb_get_rxfh_fields(struct net_device *dev,
-+			       struct ethtool_rxfh_fields *cmd)
+-static int igc_ethtool_get_rss_hash_opts(struct igc_adapter *adapter,
+-					 struct ethtool_rxnfc *cmd)
++static int igc_ethtool_get_rxfh_fields(struct net_device *dev,
++				       struct ethtool_rxfh_fields *cmd)
  {
-+	struct igb_adapter *adapter = netdev_priv(dev);
++	struct igc_adapter *adapter = netdev_priv(dev);
 +
  	cmd->data = 0;
  
- 	/* Report default options for RSS on igb */
-@@ -2563,9 +2565,6 @@ static int igb_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 	/* Report default options for RSS on igc */
+@@ -1103,8 +1105,6 @@ static int igc_ethtool_get_rxnfc(struct net_device *dev,
+ 		return igc_ethtool_get_nfc_rule(adapter, cmd);
  	case ETHTOOL_GRXCLSRLALL:
- 		ret = igb_get_ethtool_nfc_all(adapter, cmd, rule_locs);
- 		break;
+ 		return igc_ethtool_get_nfc_rules(adapter, cmd, rule_locs);
 -	case ETHTOOL_GRXFH:
--		ret = igb_get_rss_hash_opts(adapter, cmd);
--		break;
+-		return igc_ethtool_get_rss_hash_opts(adapter, cmd);
  	default:
- 		break;
+ 		return -EOPNOTSUPP;
  	}
-@@ -2575,9 +2574,11 @@ static int igb_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+@@ -1112,9 +1112,11 @@ static int igc_ethtool_get_rxnfc(struct net_device *dev,
  
- #define UDP_RSS_FLAGS (IGB_FLAG_RSS_FIELD_IPV4_UDP | \
- 		       IGB_FLAG_RSS_FIELD_IPV6_UDP)
--static int igb_set_rss_hash_opt(struct igb_adapter *adapter,
--				struct ethtool_rxnfc *nfc)
-+static int igb_set_rxfh_fields(struct net_device *dev,
-+			       const struct ethtool_rxfh_fields *nfc,
-+			       struct netlink_ext_ack *extack)
+ #define UDP_RSS_FLAGS (IGC_FLAG_RSS_FIELD_IPV4_UDP | \
+ 		       IGC_FLAG_RSS_FIELD_IPV6_UDP)
+-static int igc_ethtool_set_rss_hash_opt(struct igc_adapter *adapter,
+-					struct ethtool_rxnfc *nfc)
++static int igc_ethtool_set_rxfh_fields(struct net_device *dev,
++				       const struct ethtool_rxfh_fields *nfc,
++				       struct netlink_ext_ack *extack)
  {
-+	struct igb_adapter *adapter = netdev_priv(dev);
++	struct igc_adapter *adapter = netdev_priv(dev);
  	u32 flags = adapter->flags;
  
  	/* RSS does not support anything other than hashing
-@@ -3005,9 +3006,6 @@ static int igb_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 	int ret = -EOPNOTSUPP;
+@@ -1425,8 +1427,6 @@ static int igc_ethtool_set_rxnfc(struct net_device *dev,
+ 	struct igc_adapter *adapter = netdev_priv(dev);
  
  	switch (cmd->cmd) {
 -	case ETHTOOL_SRXFH:
--		ret = igb_set_rss_hash_opt(adapter, cmd);
--		break;
+-		return igc_ethtool_set_rss_hash_opt(adapter, cmd);
  	case ETHTOOL_SRXCLSRLINS:
- 		ret = igb_add_ethtool_nfc_entry(adapter, cmd);
- 		break;
-@@ -3485,6 +3483,8 @@ static const struct ethtool_ops igb_ethtool_ops = {
- 	.get_rxfh_indir_size	= igb_get_rxfh_indir_size,
- 	.get_rxfh		= igb_get_rxfh,
- 	.set_rxfh		= igb_set_rxfh,
-+	.get_rxfh_fields	= igb_get_rxfh_fields,
-+	.set_rxfh_fields	= igb_set_rxfh_fields,
- 	.get_channels		= igb_get_channels,
- 	.set_channels		= igb_set_channels,
- 	.get_priv_flags		= igb_get_priv_flags,
+ 		return igc_ethtool_add_nfc_rule(adapter, cmd);
+ 	case ETHTOOL_SRXCLSRLDEL:
+@@ -2144,6 +2144,8 @@ static const struct ethtool_ops igc_ethtool_ops = {
+ 	.get_rxfh_indir_size	= igc_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh		= igc_ethtool_get_rxfh,
+ 	.set_rxfh		= igc_ethtool_set_rxfh,
++	.get_rxfh_fields	= igc_ethtool_get_rxfh_fields,
++	.set_rxfh_fields	= igc_ethtool_set_rxfh_fields,
+ 	.get_ts_info		= igc_ethtool_get_ts_info,
+ 	.get_channels		= igc_ethtool_get_channels,
+ 	.set_channels		= igc_ethtool_set_channels,
 -- 
 2.49.0
 
