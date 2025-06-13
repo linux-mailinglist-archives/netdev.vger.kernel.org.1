@@ -1,149 +1,101 @@
-Return-Path: <netdev+bounces-197495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F801AD8CDA
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:11:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1F6AD8CC8
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCBE27AB7E6
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:09:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04E116DD01
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 13:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E551A1624D5;
-	Fri, 13 Jun 2025 13:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CB676410;
+	Fri, 13 Jun 2025 13:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kBOEsTq6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E5znlyp1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE6A15A87C;
-	Fri, 13 Jun 2025 13:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F3E3595A;
+	Fri, 13 Jun 2025 13:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749820255; cv=none; b=Hda4jzw+Cc1bOgZVmHdLC6lZepIrp0t+Z8xEu4wakYrHWP/eefizHtiGPErNvdP7ndpk5M3BgdZ21wSvTCktsMEsmVKsNGIfWBE+5lyv2w65qsbI9bdlnPuWdPsu23Xa2NUARSVbPalTuhbWCSWzX+7E67FhZK5As4vqriLBcUU=
+	t=1749820080; cv=none; b=okeBUGphRiRG2UpelZMd/ll9pNIv9h4hhfqhHjrYvebfh6p8sw/9A2U8GsisO+dM686b9++v5eQbPErH4eislCS9DcQWP6UBvw8anq+cbnuxmsKYaIU5zWNG66lcBWxj21JnOAZRjHOsayYcZ4ncQ8l7nkawx2UlOUGdITnc/5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749820255; c=relaxed/simple;
-	bh=6rp7eAnv7jydJiNj1mOqYkTX3fDMNGW8f61mmdX4yIM=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=vCS6iMYLeLNu3gtqj3wRiXaYwufJPFjlSo5NnYO0/9ttmKrIfHMYnjMJcYvbgRKOxHCTj7Phj3w/Y8JxDYUwemf6dzPlA3YnGowrF7WSt1XZHQVPr4RNfZK0VzOGlt1/WiqnehuNIUxzzfYpLCggqNWPTpsKZx5+emZ0L1JBzcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kBOEsTq6; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-450cb2ddd46so11739175e9.2;
-        Fri, 13 Jun 2025 06:10:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749820252; x=1750425052; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qkrgZn1Te7Sj9IIaDIwy8pfNXIJhrotxZavh7kLndew=;
-        b=kBOEsTq6T2E2knzEjuLXNC0Iq43S1zO7Qnr7YO9S2rFmM9Gh5XEK69OCyuNFc9q6rh
-         xGyhq0h047TIK4HGo+I3jWs0BNnSFcu+x+7IiZRVPGWKGatu60vLFz/mqNI59xetsamb
-         EI3y9VSEGleGPv/7CxA0yzp9uEVjA6VZMRZhueg0UHAbao3UJarNGNirIFSZpMAgL/lT
-         WLOP01OQFV5jCee+P0sjLIu654VFGlObu/M6iaMrI6Ry1N5yMITOr7quzheJuVNMJ71m
-         AoZ7A8zLm35uh0r2Mj338f5iJeKiLHgZWmTkdLnRE2CyuW/oGfO98z3SpzWdX+daCXWb
-         8+wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749820252; x=1750425052;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qkrgZn1Te7Sj9IIaDIwy8pfNXIJhrotxZavh7kLndew=;
-        b=i0yIlRTL/JcVny3Fjb2fhcM2oR2VPnyjDmY6KjdRvcz3xqhXNcTp32xRQHw8bozQYx
-         bGLSnDlX+XJb21YZauKHYiFNMAlaeqetdkDvPiT0M0NZG5w9q0TOChZbKcf72DytKR2D
-         XJI985L5jUkrO9PNtIt3jRW9aIACElHTevXWTqoCyXzpJckvRtT1XVZSQW/x9lyxIwlT
-         agFdQ0QLL98CMPglgyaLGxubNIBnIB4chDvZG5cXqLKBwZOKzVsDbZsuhs3PNAFBnMX2
-         zervQin2VlQomZl5RBoKvrXBTLi5bdHVUK7ZeQLPoABR94VyVzjO1CkUxbRSlkN2BpVC
-         GwAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlloFFuubMbxwNvaH/1cA14BA6Nu483rJUoOG6DLxuakm2nwrA62e5o5KUsDniASpMxW2WDBkAmCKLj/Y=@vger.kernel.org, AJvYcCXMpHP5mN5v1rbBqF8AWL26mw4QjtOK8+O9kviDFYJ79EU6d/nxem4UDEM27RBhq3/LVeOnBAFV@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwoWrG718zScAyNcQnky1Z0P+/GjeCuEgBug/uu9AVN7qiYATV
-	cYwTyt0u9Aoog0ednK4MTcdzJZmjfDchrFE+EmiGFXdL280KRpoDwWxq
-X-Gm-Gg: ASbGncv4jtbImgA5e9lv2QLWfhUWp/6s4KAizMmsO2UKUCfyGMqPA7MxM1xub/jxDfL
-	ovQNizY3juWqpzXYLyGfauHjideNj73evTGPOdz6qOtG4oUf4QOABgzUr/T/LjSENRqK37xjhg2
-	O23r0WcstFhqVPtu+irA9fWAiNaZ2C8wLQoi6G+a6NOUd4//4dYuoHgltI+i7uN+VyYxyOJjDrp
-	+lEyferrjkvLt5WZ9EN4BtB2MUbEmmc8R/Zn5DHCQApBnnWqeHzxS56ro1ILMWOIb+72Sgl6qss
-	xGV5NKWpWg0ObHT3oFLRPTZ/+NCy3g07hOSZDmxeTU+uvBD+pr1R4pKqRr/Pcq2/PK1nTzCR7cK
-	sZKzIfu1Szg==
-X-Google-Smtp-Source: AGHT+IHgXB8AXL/nBv92iI8+cZmWTMu3M9SVVTLKyCQOyvG2PJJtoDlsBbfj+n5MGh8yOcyLVZGdKg==
-X-Received: by 2002:a05:600c:8b2d:b0:442:d9f2:ded8 with SMTP id 5b1f17b1804b1-45334b19469mr33212305e9.15.1749820252233;
-        Fri, 13 Jun 2025 06:10:52 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:75e0:f7f7:dffa:561e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c4e8sm51884785e9.3.2025.06.13.06.10.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 06:10:50 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
- <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
- Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
- Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Ruben
- Wauters" <rubenru09@aol.com>,  "Shuah Khan" <skhan@linuxfoundation.org>,
-  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
-  linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
-  netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
-Subject: Re: [PATCH v3 12/16] docs: conf.py: don't handle yaml files outside
- Netlink specs
-In-Reply-To: <d4b8d090ce728fce9ff06557565409539a8b936b.1749812870.git.mchehab+huawei@kernel.org>
-Date: Fri, 13 Jun 2025 14:06:24 +0100
-Message-ID: <m2ecvnlrjj.fsf@gmail.com>
-References: <cover.1749812870.git.mchehab+huawei@kernel.org>
-	<d4b8d090ce728fce9ff06557565409539a8b936b.1749812870.git.mchehab+huawei@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1749820080; c=relaxed/simple;
+	bh=rtychsqz4b9aGmWoQ2Cv3JTMD17+FvibZTjfMu3M+nU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dz+nVq8xVbBJONuN3JhIJauMMyPHdDAUPnk82TkW/EegeBEtdMWuFxG7SCyzstM7kYuZJLBPykRzqq5V02BQA5+IF/hg5BhkwzUAfIdUymcet0vZfB9p6DFbCPCw4X9BtZi9t/oEXu2T2PcuZG7Hxd1UL6bKHmo8ON/aBW6f0yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E5znlyp1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C70BDC4CEE3;
+	Fri, 13 Jun 2025 13:07:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749820079;
+	bh=rtychsqz4b9aGmWoQ2Cv3JTMD17+FvibZTjfMu3M+nU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E5znlyp1oii/MKYWWT61lHFnq5WKaQ84AFRBmNuETuxIlvlhdSnbuhAxUZHhOIN00
+	 q+aJi6ojNyE+F3rPf9/l2l/OwutwrOelOpapnXQq8/FjchmMznLan/Dm3vZuXLGfM4
+	 MQG5tYSQ/OYit4aFAPuOUQzAxD6B4Qwy2vk85IXkDOA4udAEMFspCr69nS+nPR3thV
+	 VZGML054PAT/OYhM9ZQlD/TImxqHtHFrSc9PPlBAuJ/sv0XDedrBNO8g/p3waOPeh2
+	 J3d7jfoNuS+PcONakH2S3LvcixHLXQ/trfVJR/FOZ/ICucfWb5LIsEIp8AYp8MS0ga
+	 XQJ7yB71x8nnA==
+Date: Fri, 13 Jun 2025 14:07:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux GPIO <linux-gpio@vger.kernel.org>,
+	Linux MTD <linux-mtd@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux USB <linux-usb@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>,
+	Felipe Balbi <balbi@kernel.org>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Subject: Re: [PATCH] Documentation: treewide: Replace remaining spinics links
+ with lore
+Message-ID: <20250613130753.GE414686@horms.kernel.org>
+References: <20250611065254.36608-2-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611065254.36608-2-bagasdotme@gmail.com>
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
-
-> The parser_yaml extension already has a logic to prevent
-> handing all yaml documents. However, if we don't also exclude
-> the patterns at conf.py, the build time would increase a lot,
-> and warnings like those would be generated:
->
->     Documentation/netlink/genetlink.yaml: WARNING: o documento n=C3=A3o e=
-st=C3=A1 inclu=C3=ADdo em nenhum toctree
->     Documentation/netlink/genetlink-c.yaml: WARNING: o documento n=C3=A3o=
- est=C3=A1 inclu=C3=ADdo em nenhum toctree
->     Documentation/netlink/genetlink-legacy.yaml: WARNING: o documento n=
-=C3=A3o est=C3=A1 inclu=C3=ADdo em nenhum toctree
->     Documentation/netlink/index.rst: WARNING: o documento n=C3=A3o est=C3=
-=A1 inclu=C3=ADdo em nenhum toctree
->     Documentation/netlink/netlink-raw.yaml: WARNING: o documento n=C3=A3o=
- est=C3=A1 inclu=C3=ADdo em nenhum toctree
->
-> Add some exclusion rules to prevent that.
->
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+On Wed, Jun 11, 2025 at 01:52:55PM +0700, Bagas Sanjaya wrote:
+> Long before introduction of lore.kernel.org, people would link
+> to LKML threads on third-party archives (here spinics.net), which
+> in some cases can be unreliable (as these were outside of
+> kernel.org control). Replace links to them with lore counterparts
+> (if any).
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 > ---
->  Documentation/conf.py | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/conf.py b/Documentation/conf.py
-> index add6ce78dd80..b8668bcaf090 100644
-> --- a/Documentation/conf.py
-> +++ b/Documentation/conf.py
-> @@ -222,7 +222,11 @@ language =3D 'en'
->=20=20
->  # List of patterns, relative to source directory, that match files and
->  # directories to ignore when looking for source files.
-> -exclude_patterns =3D ['output']
-> +exclude_patterns =3D [
-> +	'output',
-> +	'devicetree/bindings/**.yaml',
-> +	'netlink/*.yaml',
-> +]
+>  Documentation/driver-api/gpio/driver.rst                    | 2 +-
+>  Documentation/filesystems/ubifs-authentication.rst          | 2 +-
+>  .../networking/device_drivers/ethernet/ti/cpsw.rst          | 6 +++---
+>  Documentation/usb/gadget-testing.rst                        | 2 +-
 
-Please drop this patch from the series.
+Thanks Bagas,
 
->  # The reST default role (used for this markup: `text`) to use for all
->  # documents.
+These changes look nice and correct to me.
+
+I am wondering if you considered also addressing
+the spinics.net links in gadget-testing.rst.
+They are the only other instances I see under Documentation.
 
