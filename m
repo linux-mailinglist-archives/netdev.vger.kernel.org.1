@@ -1,140 +1,188 @@
-Return-Path: <netdev+bounces-197471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2239CAD8B9E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:07:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C0CFAD8BB4
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:09:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 042D516605E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7823B5644
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD1023E338;
-	Fri, 13 Jun 2025 12:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B3E2E0B7A;
+	Fri, 13 Jun 2025 12:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="RvMTR4n1"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="iYPe6hd7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9F422688C
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 12:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749816463; cv=none; b=qC1gsKw5PQAtPizH9hYYjeAOyFpYuxck4XLh31MzdHAFmm+eMv1mEch7DbuqAK6AuDok4o3Hw3tzdXBa1dqSuNlwijXj9Xv6qmgYQrDoeZI+Gc8W24iqNTT4LM+QOAsXnQpulTt7/f5bzPDuKLrVYDu4v1NA0+CTq6ztOy2NZ2g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749816463; c=relaxed/simple;
-	bh=dw+/2d23CWYaflUCx8yRKTMFvgtfvTK0Uw26ZiXjycM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sR3IYPxKCVzva4KRAzg/DZ9sQcbUrGcYASVjYA5iOfdbdl5B20yDo+yE/xejJ+MdNOXFbxQxmHK7gJOgkz/H3WM/VBi0nUxuePpj1bKQiYPO2A4VRXpZDTyqju2mNHMlnM01mhjNjYvovV4McecYeJCmIBb8JnsxUGSjDI45USM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=RvMTR4n1; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a5123c1533so1310669f8f.2
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 05:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749816459; x=1750421259; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=acAtLseFdOzXV3/vSQyIZE2n086nZk8lcarjj4fTGN8=;
-        b=RvMTR4n1UrjRqNKwmHuENPKn3T8acwu52R5cI/RHsYQtkRaLUgVl+P87T1VUcVOjKR
-         gcVXVzHJoSsJSItZmZ9sT21h2goqykeHpxvo06Ze5NoZa6O84wCx//IGw0c0imGWWaqU
-         7MJWfDQsDEHj40yAFsi0rTowJeYKcDHeyTfq+ZN000xjXCP1EJ29XYuFFg4lK6TFdzmm
-         gsW03rzUREo+ISUB1IgX4j2B5krOwn+rj389KJ7Ystg0cxZ02vEii+3tkmeWQTPE6gcd
-         IfpZqhdjg5oDp66R8na1Nu9D3ZZd9XwYW/Omqh+gyxuJZupufcOZZWO98fAEjYH7k6cA
-         BnDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749816459; x=1750421259;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=acAtLseFdOzXV3/vSQyIZE2n086nZk8lcarjj4fTGN8=;
-        b=CW7C6Mok0kT3qhoMyj7HHIjhiagii6DR86WZvOWH+1Z2PiUjE1fKlDrdBa4rP1x6qM
-         /JrQBFRph7264Ia1DsaFWl78rFoSP+D5ve/P6oFCSE0D5Ff3PYV1UX37oEgcsJ5ZdGlu
-         OZPGgiv+WT455eWaFI4XkogIkdkcS54FMHe+86jY65nY87WvE5R6xhXNKyN2GRosft+K
-         gR9r0PI4EX6AUAR384nosRmIC8kVMQtopEmmbAFcot21E+gxLsfxrm6LQ77HDE624z0t
-         FVBHSenIDr5nkEyuGhWJKJo5mVlLBIoE6gqyIjAEd0SNfv7A0k0oZczHzBLsu453c3lR
-         xBwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxRyAZy7TbAG74Q/rMEO7ubtS7XgxW42sSzaUTEZhl/aquxIgP73MTzS3CON7KtlM9MvUWbLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyclGr2OESKSAlFV0ULGPHt5YM1qy8vthaPOBmS073OIUyrxSWv
-	gF+/N8jkiYCAUT22rryfGERhCki7+wr/amqpoCK0cVZAX/gfM6Eo8FOkJfm24WUG6KU=
-X-Gm-Gg: ASbGnct4yXTpT2xZM/iY6jXbG98Sa9Mx+BeB0N5vaIrwXqHXyJddWcntkS4MrycRLuh
-	T5hZlSLWZIAVHx1ZavIgdJxtd9mCOc1v33sJVb6WKgK0MYkbdUYRG27owAJ0Q4y++nYdfnY2KjD
-	BAPF0aF1lFHYat69KbEq7xnFFFVGtDQd0SiE4nxj+NMmx+XSvA0o0mNqkHthT9QseDVibW5B78r
-	OfxjlBQOgdHPTr+hK03jfKJ3Nkqzeyv22wPLVs/e6f8IDv5q9UAzTSMuY1uyzAFZtvq6wjcTdPC
-	BPpZSmw+cuPN3UDzIeyhxDsUwzeBDRaifJLe58XNC4YVTCGLhdvSoao0JZJ4bAXpTMxBJ3Hl
-X-Google-Smtp-Source: AGHT+IFwnfrbQNhYn+RKjvnvWq1fAt1wi2tjoULYiVKtV8KdDn2x97sSGXlAbKnPKoBdZNwQjgkRXA==
-X-Received: by 2002:a05:6000:1ace:b0:3a4:f723:3e73 with SMTP id ffacd0b85a97d-3a5686709d3mr2590339f8f.16.1749816459324;
-        Fri, 13 Jun 2025 05:07:39 -0700 (PDT)
-Received: from MacBook-Air.local ([5.100.243.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532dea15b0sm51167755e9.11.2025.06.13.05.07.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 05:07:38 -0700 (PDT)
-Date: Fri, 13 Jun 2025 15:07:35 +0300
-From: Joe Damato <joe@dama.to>
-To: Yuesong Li <liyuesong@vivo.com>
-Cc: Taehee Yoo <ap420073@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-Subject: Re: [PATCH net-next v1] net: amt: convert to use secs_to_jiffies
-Message-ID: <aEwUh3A3gvj64v0a@MacBook-Air.local>
-Mail-Followup-To: Joe Damato <joe@dama.to>, Yuesong Li <liyuesong@vivo.com>,
-	Taehee Yoo <ap420073@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-References: <20250613102014.3070898-1-liyuesong@vivo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B66275AE6;
+	Fri, 13 Jun 2025 12:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749816576; cv=pass; b=Le78KBEX/aorHl+bjUZlYc9NG7Ou+vznzefU+/Iec9tujTi+ivo7WK8MS9MeBHDtJ03enlZNL5hdzW9XvX7kF+M5pr12V2YD0kAUmmwW8KxRb+I4BCUzkL6mm+dLqXWRDFAPRq77D2vNpwJPU+l5j6TuWzbQqnsT8Zb1vJWpgF0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749816576; c=relaxed/simple;
+	bh=tWxzlB7gvAwvQ4TxzPO+xifFWwtGtqkUHJoJ1LVl9CE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rUOsPQtDG30lH6TtGo3ThkGp1aYzhk0jMiHSC8Af6lapOC+jDWcHm+pdkQYFgEwXDkc6mlCTGDd+UiAwc+A34o3+5yUfa9aeR9tYwR+RgmVopcdMnj/si65SXM72YHizj6in1wnRVxfbPHZ7jdQ2RohtSHGNMxMukcZ6MueYHc0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=iYPe6hd7; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1749816504; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=HxsUUIkbJLHor7xQVOxFnKjQL2tcvAU/8U7uOGAT8YJ5SzkaPujbsMSqqr80mMJL7/C6qPJ5R72AJZZz4V+WGvRuhbDD8RcEdYVp0T3jFCWzPUWFNNQ68W3mkdPx/uRz9Q8CO9KUVnMiuh0wlCTVhHSoXI4LkoQwVLhFcDXTcHE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1749816504; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=oC6j4XXPtFnpNI59vFPxucp8Atnh3iWQ7iCtDWJTvGo=; 
+	b=A1ATiiZZKeXR51mKcGYEcu+ievsJrJBhXTLF5fKN6m6uGlmf+gN+qSW/4BgN2DXa3+ihmm5IDJ0LMQYccMcRuItr2vNHq1tFXK2h6DApxhwbIV2hxsLhxWB7MZeQnM9wPRrdMCbbUDX2/hY046rowLcFe6wBngVN1Vd+mah2Cyc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
+	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749816504;
+	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
+	bh=oC6j4XXPtFnpNI59vFPxucp8Atnh3iWQ7iCtDWJTvGo=;
+	b=iYPe6hd7lzD5NmEuVNlPJNUR1sBcQMTEzgFULW5ZE1tzhGuUUZmsrhquSUKDA+Cs
+	I90mwM0EoNm4PSiTntzA6phjzUyTdMpluFlcfHK8TNliE3+1AYflsiylQRbXHpwn2NL
+	nJ0riWRwAIxWd/I6yzJxEXtQHSBfMYaBpXVI3PVg=
+Received: by mx.zohomail.com with SMTPS id 1749816501559794.9356716993168;
+	Fri, 13 Jun 2025 05:08:21 -0700 (PDT)
+From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+To: Niklas Cassel <cassel@kernel.org>
+Cc: Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Heiko Stuebner <heiko@sntech.de>,
+ Shreeya Patel <shreeya.patel@collabora.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
+ Andy Yan <andy.yan@rock-chips.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Shawn Lin <shawn.lin@rock-chips.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ kernel@collabora.com, linux-kernel@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
+ linux-sound@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH 17/20] PCI: dw-rockchip: switch to HWORD_UPDATE macro
+Date: Fri, 13 Jun 2025 14:08:08 +0200
+Message-ID: <12129790.nUPlyArG6x@workhorse>
+In-Reply-To: <aEvzMnxgsjfryCOo@ryzen>
+References:
+ <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
+ <20250612-byeword-update-v1-17-f4afb8f6313f@collabora.com>
+ <aEvzMnxgsjfryCOo@ryzen>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613102014.3070898-1-liyuesong@vivo.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 
-On Fri, Jun 13, 2025 at 06:20:12PM +0800, Yuesong Li wrote:
-> Since secs_to_jiffies()(commit:b35108a51cf7) has been introduced, we can
-> use it to avoid scaling the time to msec.
+Hello,
+
+On Friday, 13 June 2025 11:45:22 Central European Summer Time Niklas Cassel wrote:
+> Hello Nicolas,
 > 
-> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
-> ---
->  drivers/net/amt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On Thu, Jun 12, 2025 at 08:56:19PM +0200, Nicolas Frattaroli wrote:
+> > 
+> > PCIE_CLIENT_RC_MODE/PCIE_CLIENT_EP_MODE was another field that wasn't
+> > super clear on what the bit field modification actually is. As far as I
+> > can tell, switching to RC mode doesn't actually write the correct value
+> > to the field if any of its bits have been set previously, as it only
+> > updates one bit of a 4 bit field.
+> > 
+> > Replace it by actually writing the full values to the field, using the
+> > new HWORD_UPDATE macro, which grants us the benefit of better
+> > compile-time error checking.
 > 
-> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> index 734a0b3242a9..fb130fde68c0 100644
-> --- a/drivers/net/amt.c
-> +++ b/drivers/net/amt.c
-> @@ -979,7 +979,7 @@ static void amt_event_send_request(struct amt_dev *amt)
->  	amt->req_cnt++;
->  out:
->  	exp = min_t(u32, (1 * (1 << amt->req_cnt)), AMT_MAX_REQ_TIMEOUT);
-> -	mod_delayed_work(amt_wq, &amt->req_wq, msecs_to_jiffies(exp * 1000));
-> +	mod_delayed_work(amt_wq, &amt->req_wq, secs_to_jiffies(exp));
->  }
->  
->  static void amt_req_work(struct work_struct *work)
+> The current code looks like this:
+> #define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE_BIT(0x40)
+> #define  PCIE_CLIENT_EP_MODE            HIWORD_UPDATE(0xf0, 0x0)
+> 
+> The device_type field is defined like this:
+> 4'h0: PCI Express endpoint
+> 4'h1: Legacy PCI Express endpoint
+> 4'h4: Root port of PCI Express root complex
+> 
+> The reset value of the device_type field is 0x0 (EP mode).
+> 
+> So switching between RC mode / EP mode should be fine.
+> 
+> But I agree, theoretically there could be a bug if e.g. bootloader
+> has set the device_type to 0x1 (Legacy EP).
+> 
+> So if you want, you could send a patch:
+> -#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE_BIT(0x40)
+> +#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE(0xf0, 0x40)
+> 
+> With:
+> Fixes: 0e898eb8df4e ("PCI: rockchip-dwc: Add Rockchip RK356X host controller driver")
+> 
+> But I also think that your current patch is fine as-is.
+> 
+> I do however think that you can drop this line:
+> +#define  PCIE_CLIENT_MODE_LEGACY       0x1U
+> 
+> Since the define is never used.
 
-Seems fine, but minor nit on the commit message -- when referring to commit
-you should include the one-liner as per the documentation [1].
+Will do
 
-For example, maybe something like:
+> 
+> 
+> Also, is there any point in adding the U suffix?
+> 
+> Usually you see UL or ULL suffix, when that is needed, but there actually
+> seems to be extremely few hits of simply U suffix:
+> $ git grep 0x1U | grep -v UL
 
-  Since commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()"), ...
+Sort of. Literals without the U suffix are considered signed iirc, and
+operating with them and then left-shifting the result can run into issues
+if you shift their bits into the sign bit. In the patch at [1] I needed to
+quell a compiler warning about signed long overflows with a U suffix. This
+should only ever really be a problem for anything that gets shifted up to
+bit index 31 I believe, and maybe there's a better way to handle this in
+the macro itself with an explicit cast to unsigned, but explicit casts
+give me the ick. I'm also open to changing it to an UL, which will have
+the same effect, and has more precedent.
 
-Otherwise:
+> 
+> 
+> Kind regards,
+> Niklas
+> 
 
-Reviewed-by: Joe Damato <joe@dama.to>
+Best Regards,
+Nicolas Frattaroli
 
-[1]: https://www.kernel.org/doc/html/v6.15/process/submitting-patches.html
+Link: https://lore.kernel.org/all/20250612-byeword-update-v1-7-f4afb8f6313f@collabora.com/ [1]
+
+
 
