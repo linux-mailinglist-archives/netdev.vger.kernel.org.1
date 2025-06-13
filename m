@@ -1,182 +1,111 @@
-Return-Path: <netdev+bounces-197386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96540AD8708
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:06:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE2CBAD877D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CB2417E410
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:06:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E68B418869E4
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA35291C2E;
-	Fri, 13 Jun 2025 09:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197E4256C73;
+	Fri, 13 Jun 2025 09:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HhFno71t"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lMifu4a6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E557263C;
-	Fri, 13 Jun 2025 09:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747322DA753;
+	Fri, 13 Jun 2025 09:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749805542; cv=none; b=eDEGAf7IzzMvswpcdBN+fx2KeilN7eaVA8Z/ElCg9Tx1Gi6PursIJJDPCYFt8ypG+jBoxh6wXCs+cYJ1yR9g2AzVMC7arIOfW9xNfDNEiRYjedrfBe17RnW6ws1tyJtzFV2qnXen/EoYtvIoBJxlhc/IvqnErWjsALwNgdHniNU=
+	t=1749806209; cv=none; b=V4bU+qs+PBt5o4FxiEpzSk9oW83ywpDaLqj01e1Rg3/GVjW3K/8YQeL3qCCqfQ6hdieD6/rI+PEk6PiGSghRKavx08OmOxKvhIneTmLpgqhvemkexWe3YxpTTsfeRnN5kpsskxHbpIGLdJwadXMLX8wOE9EJEe2oANJKZteH/KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749805542; c=relaxed/simple;
-	bh=8FvV1SciI0lOYrVif+0+YROqsYbPPO/U7ZW0LQOwq4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwGXpzJoXivtDLt8o+C6M2cWOlNKBWl2+CF9a7fpupYQ02NzyRXfuO/me1IQe9qkFJ/P/lHxUAh7YPBeqkagqE0wd/tIkIxfwI4AQ9OWnROya/fK1/+BrNhn1QPjT9+YpFYj2Y2EKC1hfb6PY5MSm0pA16OMqLwhD4/k4G9YBF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HhFno71t; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0ft0fSiF67mpk/bqWwyG78k/NSeUXV83RntIl505nZ8=; b=HhFno71tY6laiYHIebx8aooC/C
-	k8u9+Ahb6Zsw5wwOMmwYjB7f9u7qxC53lo6igl2YfouCukeiwhieToj1Bn+Abw96R/6IniwPqHqdu
-	9RL2BGvbCdtpjMRM5+xGCuBfp3EWJhGH9Lb8mpmxldx8pmnN9k4teTxOkWrJ5vYZIpN55WN7d2W0a
-	buLJ7fPlHTenPbf78hLj3tOt5Gdm1d/1gxqjggukmXKotwyoN8FRLo1iDuDGPDMn/WqBt11b0ncFp
-	rsr2D+KeJopg2q28biYZ3/Ki1t6LbRea+t12AWthWDDOJgz0AzdsKg8Py8fvW0cjWFmmST232jzAi
-	KKV2uyCg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45694)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uQ0Lm-0000av-24;
-	Fri, 13 Jun 2025 10:05:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uQ0Lj-0001fm-1F;
-	Fri, 13 Jun 2025 10:05:23 +0100
-Date: Fri, 13 Jun 2025 10:05:23 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Icenowy Zheng <uwu@icenowy.me>
-Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-Message-ID: <aEvp01pIuK-LUdjR@shell.armlinux.org.uk>
-References: <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
- <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
- <ba7b290d-0cd1-4809-822a-bfe902684d7e@lunn.ch>
- <9ebe16a8d33e00c39c142748a1ea6fff96b9565a.camel@icenowy.me>
- <aElArNHIwm1--GUn@shell.armlinux.org.uk>
- <fc7ad44b922ec931e935adb96dcc33b89e9293b0.camel@icenowy.me>
- <f82a86d3-6e06-4f24-beb5-68231383e635@lunn.ch>
- <40fc8f3fec4da0ed2b59e8d2612345fb42b1fdd3.camel@icenowy.me>
- <aEvi5DTBj-cltE5w@shell.armlinux.org.uk>
- <9922727607de39da7ed75d1edaf1873147e26336.camel@icenowy.me>
+	s=arc-20240116; t=1749806209; c=relaxed/simple;
+	bh=JvXRxWo86OXDBk2ZyHGvr7t32N/IGnu9bOmgh+9I2HE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kv7//7NVfHNxgBiMsTdUPU99DoRA0Zt/aQTO3Ifb94+eD0qmFnW1kPUTW2RuRu8Cs9eIBxsCVAkyeCxcM3GUaN5CP8IAGjSTlrDeXF4iGrRcjlxydxWc2Qooq9jSpzWmbZS8/BR9kds2x9TTlZUQHcVdS6Oq78AGhf//1+ay7Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lMifu4a6; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55D8IOEk002141;
+	Fri, 13 Jun 2025 02:16:30 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=G5KoRAnZUPZZQGP0oxC9d6JUk
+	CUEKSK8pPBaJhC/9yA=; b=lMifu4a6QraFdztb7W57zpDyAvrttgxaecBBXc5qh
+	PDeDg7729rjVlG/BmmUiaKsCUT92oTk9YFjl/4PgJRzjLLWdDvv4o4zMcjnwul3q
+	M17NEHEEJ/YQb1ZigcZYR8gib0hO/nV+B1YIcQ0UwXt0RSO7NALZx0g2/hP7Fxrm
+	hHhL4ugSdbQgyF69IeRd7G/QczxVcSDj32d5s5oDFJS357tTQfFVbbfNUok+qP5L
+	tv+XIlQSSTzYKrcFDD8By4rHSZqBXYT6I4MCcJOshEznwHV0KGxA5P6diC3poXh8
+	hreX31TmFp1w+pi097O0tj7ZeAT3j94Jm1Az+REijMz+g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 478gbt83xy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Jun 2025 02:16:30 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 13 Jun 2025 02:16:29 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Fri, 13 Jun 2025 02:16:29 -0700
+Received: from b9e1f7b84bd3 (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id BD9E25B6926;
+	Fri, 13 Jun 2025 02:16:27 -0700 (PDT)
+Date: Fri, 13 Jun 2025 09:16:25 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Jun Miao <jun.miao@intel.com>, <oneukum@suse.com>,
+        <netdev@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2] net: usb: Convert tasklet API to new bottom half
+ workqueue mechanism
+Message-ID: <aEvsaUrhXgFzvtzZ@b9e1f7b84bd3>
+References: <20250610145403.2289375-1-jun.miao@intel.com>
+ <20250612185131.2dc7218a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9922727607de39da7ed75d1edaf1873147e26336.camel@icenowy.me>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250612185131.2dc7218a@kernel.org>
+X-Authority-Analysis: v=2.4 cv=X9tSKHTe c=1 sm=1 tr=0 ts=684bec6e cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=07d9gI8wAAAA:8 a=VwQbUJbxAAAA:8 a=5NWDvjWUo4JBtSxIGnEA:9 a=CjuIK1q_8ugA:10
+ a=e2CUPOnPG4QKp8I52DXD:22 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-ORIG-GUID: LWkoPQ7xeq6PzxOuIVZ-dsBOhUfy6FQF
+X-Proofpoint-GUID: LWkoPQ7xeq6PzxOuIVZ-dsBOhUfy6FQF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEzMDA2OCBTYWx0ZWRfX9O52cA8d0gLt jwI6NM+BEHy2GNmUzRtWzASRP4pA7qZtBOaX3CdwuP+UT+zfjoZZWppD5MJmXYeufY2UbhHonT8 4gj+OdqvjLMNiiXyILwZelgYC2vjI+FrmlvCxP0nS/F2J5Z0yxDcKpoEG3PdmvGJeOHLvIUraZS
+ I1OJRQ/C/dQyRrOe14oQLf7/NgNFhqgPIpOj+dIMIYc8Cdt6RRVH7y5GbKIrVw+YL16ZZJ9cLpf dRNdwirfAWgWG37VBgDHV48PnHWu1AMGqxkUdsn6WPa2j1834VrEQaFu8sj+xOJQpAhEeTsz8/6 sGXET778dtuXsX0136LIjmRQmt2FVsa43S9E1e8uVOPS0T8UNtFRxe7iWUzu55KyNi/Yb2VSt/w
+ jykZc2Gj2xfyW+CXf97O7J0vOSsllHjyu928TtK+4jYIj5W+Cn4XGpN8H+xL7s9QraxpAwhQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-12_10,2025-06-12_02,2025-03-28_01
 
-On Fri, Jun 13, 2025 at 04:43:14PM +0800, Icenowy Zheng wrote:
-> 在 2025-06-13星期五的 09:35 +0100，Russell King (Oracle)写道：
-> > On Fri, Jun 13, 2025 at 04:01:37PM +0800, Icenowy Zheng wrote:
-> > > 在 2025-06-11星期三的 17:28 +0200，Andrew Lunn写道：
-> > > > > Well in fact I have an additional question: when the MAC has
-> > > > > any
-> > > > > extra
-> > > > > [tr]x-internal-delay-ps property, what's the threshold of MAC
-> > > > > triggering patching phy mode? (The property might be only used
-> > > > > for
-> > > > > a
-> > > > > slight a few hundred ps delay for tweak instead of the full 2ns
-> > > > > one)
-> > > > 
-> > > > Maybe you should read the text.
-> > > > 
-> > > > The text says:
-> > > > 
-> > > >   In the MAC node, the Device Tree properties 'rx-internal-delay-
-> > > > ps'
-> > > >   and 'tx-internal-delay-ps' should be used to indicate fine
-> > > > tuning
-> > > >   performed by the MAC. The values expected here are small. A
-> > > > value
-> > > > of
-> > > >   2000ps, i.e 2ns, and a phy-mode of 'rgmii' will not be accepted
-> > > > by
-> > > >   Reviewers.
-> > > > 
-> > > > So a few hundred ps delay is fine. The MAC is not providing the
-> > > > 2ns
-> > > > delay, the PHY needs to do that, so you don't mask the value.
-> > > 
-> > > Thus if the MAC delay is set to 1xxx ps (e.g. 1800ps), should the
-> > > MAC
-> > > do the masking?
-> > > 
-> > > What should be the threshold? 1ns?
-> > 
-> > Why should there be a "threshold" ? It's really a case by case issue
-> > where the capabilities of the hardware need to be provided and
-> > considered before a decision can be made.
-> > 
-> > In order to first understand this, one needs to understand the
-> > requirements of RGMII. RGMII v1.3 states:
-> > 
-> > Symbol  Parameter               Min     Typ     Max     Units
-> > TskewT  Data to Clock output    -500    0       500     ps
-> >         skew at clock tx
-> > TskewR  Data to Clock input     1               2.6     ns
-> >         skew at clock rx
-> > 
-> > The RGMII specification is written based upon the clock transmitter
-> > and receiver having no built-in delays, and the delay is achieved
-> > purely by trace routing. So, where delays are provided by the
-> > transmitter or receiver (whether that's the MAC or the PHY depends
-> > on whether TXC or RXC is being examined) these figures need to be
-> > thought about.
-> > 
-> > However, the range for the delay at the receiver is -1ns to +0.6ns.
-> > 
-> > In your example, you're talking about needing a 1800ps delay. I
-> > would suggest that, *assuming the PCB tracks introduce a 200ps skew
-> > between the data and clock*, then using the PHY's built-in 2ns delay
-> > is perfectly within the requirements of the RGMII specification.
-> > 
-> > That bit "assuming" is where the discussion needs to happen, and why
-> > it would be case by case. If the skew due to trace routing were
-> > 800ps, then enabling the PHY's built-in 2ns delay would take the
-> > delay out of spec.
-> > 
-> > Thrown into this would also be temperature effects, so trying to get
-> > to as near as the 2ns delay as possible is probably a good idea.
-> > 
-> > Lastly, there's the question whether the software engineer even
-> > knows what the skew provided by the hardware actually is.
+On 2025-06-13 at 01:51:31, Jakub Kicinski (kuba@kernel.org) wrote:
+> On Tue, 10 Jun 2025 22:54:03 +0800 Jun Miao wrote:
+> > -			if (rx_alloc_submit(dev, GFP_ATOMIC) == -ENOLINK)
+> > +			if (rx_alloc_submit(dev, GFP_NOIO) == -ENOLINK)
 > 
-> Sigh, my experience is that the only thing I can get is some magic
-> numbers from HW vendor... *facepalm*
+> Sorry, I think Subbaraya mislead you. v1 was fine.
+> If we want to change the flags (which Im not sure is correct) it should
+> be a separate commit. Could you repost v1? There is no need to attribute
+Yeah hence asked to correct me if wrong.
+GFP_ATOMIC has to be there - "this patchset implements BH workqueues
+which are like regular workqueues but executes work items in the BH
+(softirq) context" from:
+https://lwn.net/Articles/960020/
 
-I may have missed it if you've given the details, but tell us what
-information you have, what the capabilities of the hardware is, and
-we should be able to make suggestions.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Sundeep
+> reviewers with Suggested-by tags. They can send their review tags if
+> they so wish.
+> -- 
+> pw-bot: cr
 
