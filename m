@@ -1,317 +1,197 @@
-Return-Path: <netdev+bounces-197323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA2F3AD8178
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 05:13:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77A5AD81C0
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 05:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63B3D3B5FE3
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:13:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 456733AECA2
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 03:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627242690D4;
-	Fri, 13 Jun 2025 03:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191CC1C5F2C;
+	Fri, 13 Jun 2025 03:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GnoUClZu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="h5GB1l8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B3E267703;
-	Fri, 13 Jun 2025 03:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFD131A60
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 03:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749784340; cv=none; b=nyfKuXnDeOSUDhXEx+Onqr7JszrseewFm56Sxqp1odxQR9ljQ6P4fMqvgZXZnrnxaDEQV1/apGatxXasuSOLK8Ft/N6vWSi42fAvCem/0AhkbyxWoNYNWsM+ZZQqf/J0lO+hKN1pwrMkSKjlNXLjHhsVRYH3fxhPqIAIKYV5q7E=
+	t=1749785656; cv=none; b=i/6oF3FANCbD2evYxgMdRiYTlJ1kdkn1W0zGhcPxF8E9j4zm4PKTlFoHwqN50L61mOJjH7z5k/TLMqiLW4Wi/Ynh3wwfK4ulaRWF85rzZvCVKmW+uGn7gjVhgGFupRYbnwWrlghc6UUdpyX7zTpl0+Pdez5mBRoIaSVRiw+1XfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749784340; c=relaxed/simple;
-	bh=su6tHM+gBupVdKThuHji8wFuKEgAR/ATOFmWdUd/Zb4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CzE1nA1Og00egI26FCrReAX18uV/Hg1lKK/k3gR0B8JuvmoCQ183nIcDRrz8aB4A7dnmfTTFcivsfjYK+K+x6ttCAp00OXPq4o2XtVJKBJjjjyWBDrRAI4vkOLuUO0ICo1VLjC91FKXrf08nga1bLu++8F+H3xDIFlRdVydkZK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GnoUClZu; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b2c3c689d20so1132859a12.3;
-        Thu, 12 Jun 2025 20:12:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749784338; x=1750389138; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PFjmyN0nuW0ybI1fW+EqrHnDVCIapf1qjyihsbGmNzw=;
-        b=GnoUClZujXxVisjcqCvl1tE6moOBHulITserFICCFDbNsP9N7uUZ+c3K29mgTpe+1f
-         qtu+oT+l+fdx83IRyFIpYmZ7o4t7cgpAV41a9LJUmGKeqx/pY7Si1StQXDImiy5J0GFi
-         aWGmFq+jx7QEKXArv8Iv1PbkZd5+PwcTEr1s4x9TwrU1bWTVBszMbLgWUW1/3cVgyN1B
-         GvrIJpaU4dSc0+D/c4taRqQUP45oHZ4JMccWDbvOA/xv3W5NgIIWzRQ0rxrcJKQR5Ffw
-         LULkrG0OGE3YgTVudtNYrI9ayxheMkpN0vgUXTkX83D2y54+n1MX8UPn3E6/lqRqg59H
-         af4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749784338; x=1750389138;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PFjmyN0nuW0ybI1fW+EqrHnDVCIapf1qjyihsbGmNzw=;
-        b=UDjZv0heDdiHBPJUMAIUemkrVETFZop6W76NfW4FMMnAje8q45UWe8RGTbR8zCNcit
-         cs3H4yybo1XR4sUZvNM3Hw0IV63fijg2bN9lfwjoSCIVbk+pFA/M8or3PjhL1UU6Nl4q
-         kxlsmbkDao8XZuJW2mVi8P1CsnjSHwF5o/TrQoOwLqifogbB8f88lVMpwwPaY+h9OJRU
-         yK1bBYBakKXqkb1MzM21DzzAq0lzTRO/VKDuhuTLp1CMbkEMsjPUOJgC3mUXuQ6gyNKI
-         8JUqyAW/VCS4l8LtWf6M7cNG6oDPV5OwbN97USUHwqOAkrEcadEAhOGHFtc9hsSjNF30
-         aoXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4QSpnAnkUxGyML+bOwJh4wYWs+/slL5y3CthQo9MGSFv0NokfifLQR+3fbJ7fXwMy6vCicu9DSJJAfmMK@vger.kernel.org, AJvYcCUBGYrRk/YNdmwTmNIyYOiAQrRerFHNPJTiTbnVJrRrl39uHz017OM74UvrlCvegaUWX5Q0j34w@vger.kernel.org, AJvYcCWep96Iwp92E0HvIwOkSNHLAR3qpFZ/acxIwiIqHmvqiHoTvS6ZX5x4LqoPpM7PzKIGJqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFh05lGDPyEN2Ist7bXW0PJZaH7mAja9OShwdknxK1F6a694k9
-	dcBwhoBq+9IKAkCPm3Wrkrmoyl3x1ftV2n6YxxT0R8A6JfQaBeGeMpaZ
-X-Gm-Gg: ASbGncspDUiJCadl57Ozewou8QYvRXiPIvdZOfo9zioVsG8sbCB19L9ySltL/P1F/9b
-	JCaQ+ij4zYU2ELviTZFn4QFyqfl5jaR/PzfkIPw8inkzErHb7fr4u9WegOyx39RqjpRnn+tgdPB
-	p9IoZ65or4o6YCXUueBRDHPvJzQ0G04NmL2CMKZSOMlqmP2JHaX3F0KP8buczozz9ZypQhtGxlv
-	MtvU6DT192imvfsbxFKEgExcVTVPR3koxJI1hqx7JxHzDxatL9agfnSyXNxv42XaPz1dAL/wD+e
-	fGoNaQIvqqppC2Fb5cNjQ6dFTNz1G6jZZzUff0EEILoE5YuNKtDA5m/lgKxQHZzPCrs1isvHd5l
-	7uAzJrDF6
-X-Google-Smtp-Source: AGHT+IEtZMzdxeZQg4GE8Orm9l745D/m8tiDw0531kmrlxupMhY5YUGLIK8RXAuqIQTNrU42XiYbPQ==
-X-Received: by 2002:a17:90a:d2ce:b0:312:959:dc42 with SMTP id 98e67ed59e1d1-313d9c6719dmr2428070a91.11.1749784337613;
-        Thu, 12 Jun 2025 20:12:17 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1bcbb39sm2291801a91.8.2025.06.12.20.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 20:12:17 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com,
-	mst@redhat.com,
-	pabeni@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	stefanha@redhat.com
-Cc: virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	fupan.lfp@antgroup.com,
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: [PATCH net-next v2 3/3] test/vsock: Add ioctl SIOCINQ tests
-Date: Fri, 13 Jun 2025 11:11:52 +0800
-Message-Id: <20250613031152.1076725-4-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250613031152.1076725-1-niuxuewei.nxw@antgroup.com>
-References: <20250613031152.1076725-1-niuxuewei.nxw@antgroup.com>
+	s=arc-20240116; t=1749785656; c=relaxed/simple;
+	bh=G3r4e6zd2ORCdx6wup1APEeztwdOp6t+75H+Uh3f0AE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Sk+yPrR/mG/VGCIOp1ooueeL4nWvgNhCUi3KeNaZvTq2iRXZ4+0YW1QFfiG2+RktqQVB1EgNcdcyIl98rNR3E+zJQFeOw0S1v/l1YMRmIIC8QC1wvRGnA4YJFPsSDGjP/+4L/gDV+XZPGeek+fOGd6h6F8zDd9ap+yKOkHuPbOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=h5GB1l8u; arc=none smtp.client-ip=79.135.106.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1749785644; x=1750044844;
+	bh=XpKGQ+BbJpijZsqxA1JKl6PwR6Fow/I9dfELAWZyIzU=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=h5GB1l8uQ/9YFC0655NTvl0ajbN5id1ecyr+4Y/dDqfYL0xge5IcnKJlCzo84OFSc
+	 MXEtgD1Zlf9mBCv1JsGFK97b4mU5gG5Gho3RK8qgwzoI8KEmS2AwUrBITdwQPkdqaT
+	 5fPwlFmy+riX5bdljg6YfAXBBFEkIx3uIaRLwINd7SsDVHYfwEABgTe7CMD0rGEcej
+	 IWpnkXSuBRUMoSbXaCFMYH+71ZSAKZUJ7cdK17aG6Cs4S1wX1qqrmwK4mxKmEQVmVz
+	 pbqmHXWZUDQRDdNIcGigcAbOEE0Z+Ypx8BgxllGVIemuRh+AWGIsVxQtRC1DYroT4x
+	 /zG0Q1IdWUEgg==
+Date: Fri, 13 Jun 2025 03:33:59 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: William Liu <will@willsroot.io>
+Cc: Savy <savy@syst3mfailure.io>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+Message-ID: <yA-qROHJ2pCMLiRG8Au4YMe_V2R27OhaXkkjkImGzbhdlyHUs5nCkbbJYGkNLM4Rt5812LGXHathpDmqSYTGv1D4YF-zeJdWbCnNIAezEdg=@willsroot.io>
+In-Reply-To: <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com>
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <CAM0EoMk--+xXTf9ZG9M=r+gkRn2hczjqSTJRMV0dcgouJ4zw6g@mail.gmail.com> <CAM0EoMk4dxOFoN_=3yOy+XrtU=yvjJXAw3fVTmN9=M=R=vtbxA@mail.gmail.com> <lVH_UKrQzWPCHJS7_1Cj0gmEV0x4KI3VB_4auivP0fDokTBbmWuDV455wXrf6eQzakVFoK6wUxlDuMw_Lo0p4P9ByPLSjklsIkQiNcd_hvQ=@willsroot.io> <CAM0EoMkoFJJQD_ZVSMb7DUo1mafevgujx+WA=1ecTeYBcpB1Lw@mail.gmail.com> <A2nutOWbLBIdLRrnsUdavOagBEebp4YBFx0DdL23njEFVAySZul2pDRK1xf76_g6dLb82YXCRb1Ry9btDkZqeY9Btib0KgViSIIfsi4BDfU=@willsroot.io> <CAM0EoMmhP_9UsF18M=6B6AbY_am8cEnaqggpnVb9fkmBB4vjtA@mail.gmail.com> <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io> <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 5556f9eff2f421e734467ece4854181c67914120
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds SIOCINQ ioctl tests for both SOCK_STREAM and
-SOCK_SEQPACKET.
+On Thursday, June 12th, 2025 at 10:08 PM, Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
 
-The client waits for the server to send data, and checks if the SIOCINQ
-ioctl value matches the data size. After consuming the data, the client
-checks if the SIOCINQ value is 0.
+>=20
+>=20
+> Hi William,
+> Apologies again for the latency.
+>=20
+> On Mon, Jun 9, 2025 at 11:31=E2=80=AFAM William Liu will@willsroot.io wro=
+te:
+>=20
+> > On Monday, June 9th, 2025 at 12:27 PM, Jamal Hadi Salim jhs@mojatatu.co=
+m wrote:
+>=20
+> > > I didnt finish my thought on that: I meant just dont allow a second
+> > > netem to be added to a specific tree if one already exists. Dont
+> > > bother checking for duplication.
+> > >=20
+> > > cheers,
+> > > jamal
+> > >=20
+> > > > > [1] see "loopy fun" in https://lwn.net/Articles/719297/
+> >=20
+> > Hi Jamal,
+> >=20
+> > I came up with the following fix last night to disallow adding a netem =
+qdisc if one of its ancestral qdiscs is a netem. It's just a draft -I will =
+clean it up, move qdisc_match_from_root to sch_generic, add test cases, and=
+ submit a formal patchset for review if it looks good to you. Please let us=
+ know if you catch any edge cases or correctness issues we might be missing=
+.
+>=20
+>=20
+> It is a reasonable approach for fixing the obvious case you are
+> facing. But I am still concerned.
+> Potentially if you had another netem on a different branch of the tree
+> it may still be problematic.
+> Consider a prio qdisc with 3 bands each with a netem child with duplicati=
+on on.
+> Your solution will solve it for each branch if one tries to add a
+> netem child to any of these netems.
+>=20
+> But consider you have a filter on the root qdisc or some intermediate
+> qdisc and an associated action that changes skb->prio; when it hits
+>=20
+> netem and gets duplicated then when it goes back to the root it may be
+> classified by prio to a different netem which will duplicate and on
+> and on..
+> BTW: I gave the example of skb->prio but this could be skb->mark.
+>=20
 
-Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
----
- tools/testing/vsock/util.c       | 36 ++++++++++----
- tools/testing/vsock/util.h       |  2 +
- tools/testing/vsock/vsock_test.c | 83 +++++++++++++++++++++++++++++++-
- 3 files changed, 111 insertions(+), 10 deletions(-)
+Ah, good catch. I attached the modified patch below then.=20
 
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index 0c7e9cbcbc85..472246198966 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -97,28 +97,46 @@ void vsock_wait_remote_close(int fd)
- 	close(epollfd);
+>=20
+> Perhaps we should only allow one netem per tree or allow more but
+> check for duplication and only allow one per tree...
+>=20
+
+I believe we have to keep it at one netem per tree. The OOM loop can still =
+trigger if a netem without duplication has a netem child with duplication. =
+Consider the following setup:
+
+tc qdisc add dev lo root handle 1: netem limit 1
+tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100% =
+delay 1us reorder 100%
+
+The first netem will store everything in the tfifo queue on netem_enqueue. =
+Since netem_dequeue calls enqueue on the child, and the child will duplicat=
+e every packet back to the root, the first netem's netem_dequeue will never=
+ exit the tfifo_loop.
+
+Best,
+William
+
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index fdd79d3ccd8c..4db5df202403 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -1085,6 +1085,36 @@ static int netem_change(struct Qdisc *sch, struct nl=
+attr *opt,
+        return ret;
  }
- 
--/* Wait until transport reports no data left to be sent.
-- * Return false if transport does not implement the unsent_bytes() callback.
-+/* Wait until ioctl gives an expected int value.
-+ * Return a negative value if the op is not supported.
-  */
--bool vsock_wait_sent(int fd)
-+int ioctl_int(int fd, unsigned long op, int *actual, int expected)
+=20
++static const struct Qdisc_class_ops netem_class_ops;
++
++static bool has_netem_in_tree(struct Qdisc *sch) {
++       struct Qdisc *root, *q;
++       unsigned int i;
++       bool ret =3D false;
++
++       sch_tree_lock(sch);
++       root =3D qdisc_root_sleeping(sch);
++
++       if (root->ops->cl_ops =3D=3D &netem_class_ops) {
++               ret =3D true;
++               goto unlock;
++       }
++
++       hash_for_each_rcu(qdisc_dev(root)->qdisc_hash, i, q, hash) {
++               if (q->ops->cl_ops =3D=3D &netem_class_ops) {
++                       ret =3D true;
++                       goto unlock;
++               }
++       }
++
++unlock:
++       if (ret)
++               pr_warn("Cannot have multiple netems in tree\n");
++
++       sch_tree_unlock(sch);
++       return ret;
++}
++
+ static int netem_init(struct Qdisc *sch, struct nlattr *opt,
+                      struct netlink_ext_ack *extack)
  {
--	int ret, sock_bytes_unsent;
-+	int ret;
-+	char name[32];
+@@ -1093,6 +1123,9 @@ static int netem_init(struct Qdisc *sch, struct nlatt=
+r *opt,
+=20
+        qdisc_watchdog_init(&q->watchdog, sch);
+=20
++       if (has_netem_in_tree(sch))
++               return -EINVAL;
 +
-+	if (!actual) {
-+		fprintf(stderr, "%s requires a non-null pointer\n", __func__);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
- 
- 	timeout_begin(TIMEOUT);
- 	do {
--		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-+		ret = ioctl(fd, op, actual);
- 		if (ret < 0) {
- 			if (errno == EOPNOTSUPP)
- 				break;
- 
--			perror("ioctl(SIOCOUTQ)");
-+			perror(name);
- 			exit(EXIT_FAILURE);
- 		}
--		timeout_check("SIOCOUTQ");
--	} while (sock_bytes_unsent != 0);
-+		timeout_check(name);
-+	} while (*actual != expected);
- 	timeout_end();
- 
--	return !ret;
-+	return ret;
-+}
-+
-+/* Wait until transport reports no data left to be sent.
-+ * Return false if transport does not implement the unsent_bytes() callback.
-+ */
-+bool vsock_wait_sent(int fd)
-+{
-+	int sock_bytes_unsent;
-+
-+	return !(ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0));
- }
- 
- /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index 5e2db67072d5..945c85ff8d22 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -3,6 +3,7 @@
- #define UTIL_H
- 
- #include <sys/socket.h>
-+#include <sys/ioctl.h>
- #include <linux/vm_sockets.h>
- 
- /* Tests can either run as the client or the server */
-@@ -54,6 +55,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
- int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
- 			   struct sockaddr_vm *clientaddrp);
- void vsock_wait_remote_close(int fd);
-+int ioctl_int(int fd, unsigned long op, int *actual, int expected);
- bool vsock_wait_sent(int fd);
- void send_buf(int fd, const void *buf, size_t len, int flags,
- 	      ssize_t expected_ret);
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index f669baaa0dca..43996447f9a2 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -20,7 +20,6 @@
- #include <sys/mman.h>
- #include <poll.h>
- #include <signal.h>
--#include <sys/ioctl.h>
- #include <linux/time64.h>
- 
- #include "vsock_test_zerocopy.h"
-@@ -1305,6 +1304,58 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
- 	close(fd);
- }
- 
-+static void test_unread_bytes_server(const struct test_opts *opts, int type)
-+{
-+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-+	int client_fd;
-+
-+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
-+	if (client_fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	for (int i = 0; i < sizeof(buf); i++)
-+		buf[i] = rand() & 0xFF;
-+
-+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
-+	control_writeln("SENT");
-+	control_expectln("RECEIVED");
-+
-+	close(client_fd);
-+}
-+
-+static void test_unread_bytes_client(const struct test_opts *opts, int type)
-+{
-+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-+	int ret, fd;
-+	int sock_bytes_unread;
-+
-+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("SENT");
-+	/* The data has arrived but has not been read. The expected is
-+	 * MSG_BUF_IOCTL_LEN.
-+	 */
-+	ret = ioctl_int(fd, TIOCINQ, &sock_bytes_unread, MSG_BUF_IOCTL_LEN);
-+	if (ret) {
-+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
-+		goto out;
-+	}
-+
-+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-+	// All date has been consumed, so the expected is 0.
-+	ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
-+	control_writeln("RECEIVED");
-+
-+out:
-+	close(fd);
-+}
-+
- static void test_stream_unsent_bytes_client(const struct test_opts *opts)
- {
- 	test_unsent_bytes_client(opts, SOCK_STREAM);
-@@ -1325,6 +1376,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
- 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
- }
- 
-+static void test_stream_unread_bytes_client(const struct test_opts *opts)
-+{
-+	test_unread_bytes_client(opts, SOCK_STREAM);
-+}
-+
-+static void test_stream_unread_bytes_server(const struct test_opts *opts)
-+{
-+	test_unread_bytes_server(opts, SOCK_STREAM);
-+}
-+
-+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
-+{
-+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
-+}
-+
-+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
-+{
-+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
-+}
-+
- #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
- /* This define is the same as in 'include/linux/virtio_vsock.h':
-  * it is used to decide when to send credit update message during
-@@ -2016,6 +2087,16 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_unsent_bytes_client,
- 		.run_server = test_seqpacket_unsent_bytes_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
-+		.run_client = test_stream_unread_bytes_client,
-+		.run_server = test_stream_unread_bytes_server,
-+	},
-+	{
-+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
-+		.run_client = test_seqpacket_unread_bytes_client,
-+		.run_server = test_seqpacket_unread_bytes_server,
-+	},
- 	{
- 		.name = "SOCK_STREAM leak accept queue",
- 		.run_client = test_stream_leak_acceptq_client,
--- 
-2.34.1
+        if (!opt)
+                return -EINVAL;
+=20
+@@ -1330,3 +1363,4 @@ module_init(netem_module_init)
+ module_exit(netem_module_exit)
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Network characteristics emulator qdisc");
 
 
