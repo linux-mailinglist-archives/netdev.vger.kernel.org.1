@@ -1,264 +1,164 @@
-Return-Path: <netdev+bounces-197354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F813AD839F
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:05:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D517AD83D5
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E03C33B29DE
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 07:04:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D84B33A7A85
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 07:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E531424DD1A;
-	Fri, 13 Jun 2025 07:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LLGSEuhO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EF02749E7;
+	Fri, 13 Jun 2025 07:12:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CF31EE7C6;
-	Fri, 13 Jun 2025 07:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E071DF268
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 07:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749798307; cv=none; b=KcunoDYB/zqjcka2o23V9xncy+n9+WDDBpoO9g1siqXm6FyJom42yCt9pSNuV9qHAqFfI6TUz94fE/184c0gLgUjzWJoErKp1V8Y9iXwDLoSGWCMqY2DP8qv2hTnZVsHGhtY8y/tghH+oabDWiTaDHQtGe/Bi1O34uvOzIOn9IY=
+	t=1749798761; cv=none; b=BVHJVSUdV63f8wVsGvprtPj6Zd+E0/zuAvW5Hw0pEQrmOpRphxClNHFbiCkCIMOgGbPR3z6DJ1ztPM/Ca9yyr538NCD4Zt0TYVOTWO4H7SmaN+qtf/esajRMd8qA0jPyfYm9sNGIJGzxgg3cNJI7pG7dxRocRbg1TdlsauBhMhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749798307; c=relaxed/simple;
-	bh=YPhirRC/fqgXNZyCmveCpTKVmiZA7ueG5zIrOKWu6sI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b6wQxLDmYgQoh2ByCg0HdTu9h5r/h94ieFntzTemsfBktlNsvCX2RbVbpX+4zI4fsyZwVaDx1f75mBvRAQFHdNF9gXbD0WZK2oMjHtxQhgAxYI8oOg2sXO9HORZPMYESNXBhAOv89oEgBWhTanwriEwTH9/KnOfsmKuvTUgnO54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LLGSEuhO; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749798306; x=1781334306;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YPhirRC/fqgXNZyCmveCpTKVmiZA7ueG5zIrOKWu6sI=;
-  b=LLGSEuhOZQkOb9loS/sqDV6u+2gsn9+KmQEloOyHyYkrFCNwtYRpwemm
-   k2NisS9UWEX7DCiE7BlduUa70ZPdLaBY4glT31f+S3Xn9ToEbde5osfmn
-   qNwjyFxcM3ePrEj9pdbR4KKwBAnpOc6hgwxrkUapiViHLC9tixCLjNaQX
-   +EGTrdL5SS6sQ6vAXMMpZrPEL8/w6JCj94RwCB93P+da6AwZZULR2cz3h
-   fY8FecLQby5njqLNkrbCAEZsQksNqU9wKWIVdvuliKJPYjwj05AFHlVfA
-   50wOwJm57gUHYaU0zQVYpBPCGsStPYhwkDuXFH94pwYCPcIp0Jl4Hqs2t
-   Q==;
-X-CSE-ConnectionGUID: 5epJTmOwRuiZ3IfrVJ8Zog==
-X-CSE-MsgGUID: FA3JHCVFShK0YF3Wf3VKNQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="51878656"
-X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
-   d="scan'208";a="51878656"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 00:04:53 -0700
-X-CSE-ConnectionGUID: S+YzazeVS0qcM0G9gtFmGQ==
-X-CSE-MsgGUID: ZaxUnIRhSNWmOJKg/4rtLg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,233,1744095600"; 
-   d="scan'208";a="170929459"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 13 Jun 2025 00:04:50 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uPyT2-000CJ4-0W;
-	Fri, 13 Jun 2025 07:04:48 +0000
-Date: Fri, 13 Jun 2025 15:04:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Thomas Fourier <fourier.thomas@gmail.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] (drivers/ethernet/atheros/atl1) test DMA mapping for
- error code
-Message-ID: <202506131458.MnU50xNO-lkp@intel.com>
-References: <20250612150542.85239-2-fourier.thomas@gmail.com>
+	s=arc-20240116; t=1749798761; c=relaxed/simple;
+	bh=sWyWIfwI7kTzqivc7bTrOqy9Tj8LyGdscPOXHhGCi4s=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rx0XYLc1tO/wvBBtQ2OJJdrNOrVgC1D5fcPIuIl0+9vrXTZkqlEe+52lxmTpSwQEzF/dYCdDxb7v455/bxtCDhbCaENG/lRLvh0JzwfA5JJDaN17rHkRqy5vHET0VP+1WanWJEEYyMglXyjzhcA8Fbf818S2rlgI3wUyYiMe8RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-86cfccca327so420351639f.2
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 00:12:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749798757; x=1750403557;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=juhYk1wKYKfUnaUV/pQ8ZEVYMZB94Oi+kC5HvDlYkTc=;
+        b=XVzDXk1BxXJmmWL4zRHAeQ4j007IUD+5X8rjs4SCMcAQ/IwSx2C9oajeVObaZmSH9H
+         ERQMF/STfEob97doPYgyu5lxcJWp7HwWncSjWy3IHHOL4pbNU/ANynmjZthJxMCuUfeN
+         kX1mX+uS5O+oX7TXTpp5ba86dXIeCXha2xKDY4x6oAiHACN95hiqAEhzfwlTUSCMAl4o
+         NRYP0sHeelalbTJdT8L7EM7bWuVSOCfaJEL3yeXnajQkkiNquBNU4ffE+yN1iCtLccpm
+         zEsiVmNm38ItemPuv/vC3xxAdyFz+dyXrRdeQS44tpFoa2CW05yyO2BmL6yzlCMEJRIy
+         LlWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVU9E4c6l/qBIn+anws6VhrKhmG/iNq2CBE2RaszEluQRlpkaT0yRXkap9LIGIaVr5WH6zreCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyjcp+svzVBBxqfYPWsD5DKJwVO+ihZLibqj8wRraPpBxQhp42J
+	SrFMzapgvglq4Oo73yQ2cSU4A5jz8e/NYIIhBDBdgrPkNtJ858z7gWKMt0nLgofrosbJc8e2s+M
+	TcyiOZqTsPp7Weg2LoVCP6IcFs3s+Rc9QFLzFdQcPWekULm1WrU47NvhI6IU=
+X-Google-Smtp-Source: AGHT+IGBwD/2/C4kc9h6TIClenfR5iYoIenohZ5RomSbIQ0maGl/dTNKfi63zAkyRk+LR/aAQ38VdNauGcbMCQtdfWzn00FnCnPE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250612150542.85239-2-fourier.thomas@gmail.com>
+X-Received: by 2002:a05:6e02:2196:b0:3dd:ecc8:9773 with SMTP id
+ e9e14a558f8ab-3de00c0951fmr18522855ab.19.1749798757590; Fri, 13 Jun 2025
+ 00:12:37 -0700 (PDT)
+Date: Fri, 13 Jun 2025 00:12:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <684bcf65.050a0220.be214.029b.GAE@google.com>
+Subject: [syzbot] [bpf?] WARNING in do_check
+From: syzbot <syzbot+a36aac327960ff474804@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Thomas,
+Hello,
 
-kernel test robot noticed the following build errors:
+syzbot found the following issue on:
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.16-rc1 next-20250612]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+HEAD commit:    1c66f4a3612c bpf: Fix state use-after-free on push_stack()..
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1346ed70580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=73696606574e3967
+dashboard link: https://syzkaller.appspot.com/bug?extid=a36aac327960ff474804
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1392610c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a9ee0c580000
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Thomas-Fourier/drivers-ethernet-atheros-atl1-test-DMA-mapping-for-error-code/20250612-231733
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20250612150542.85239-2-fourier.thomas%40gmail.com
-patch subject: [PATCH] (drivers/ethernet/atheros/atl1) test DMA mapping for error code
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20250613/202506131458.MnU50xNO-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250613/202506131458.MnU50xNO-lkp@intel.com/reproduce)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2ddb1df1c757/disk-1c66f4a3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6a318fc92af0/vmlinux-1c66f4a3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/76c58dddcb6c/bzImage-1c66f4a3.xz
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506131458.MnU50xNO-lkp@intel.com/
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a36aac327960ff474804@syzkaller.appspotmail.com
 
-All error/warnings (new ones prefixed by >>):
+------------[ cut here ]------------
+verifier bug: add backedge: no SCC in verification path, insn_idx 9(1)
+WARNING: CPU: 1 PID: 5838 at kernel/bpf/verifier.c:1970 add_scc_backedge kernel/bpf/verifier.c:1969 [inline]
+WARNING: CPU: 1 PID: 5838 at kernel/bpf/verifier.c:1970 is_state_visited kernel/bpf/verifier.c:19417 [inline]
+WARNING: CPU: 1 PID: 5838 at kernel/bpf/verifier.c:1970 do_check+0xda21/0xdba0 kernel/bpf/verifier.c:19861
+Modules linked in:
+CPU: 1 UID: 0 PID: 5838 Comm: syz-executor286 Not tainted 6.15.0-syzkaller-g1c66f4a3612c #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:add_scc_backedge kernel/bpf/verifier.c:1969 [inline]
+RIP: 0010:is_state_visited kernel/bpf/verifier.c:19417 [inline]
+RIP: 0010:do_check+0xda21/0xdba0 kernel/bpf/verifier.c:19861
+Code: 01 90 48 b8 00 00 00 00 00 fc ff df 41 0f b6 04 06 84 c0 0f 85 2b 01 00 00 41 8b 75 00 48 c7 c7 20 49 91 8b e8 d0 05 ad ff 90 <0f> 0b 90 90 e9 27 fe ff ff e8 11 5d e9 ff e8 3c 10 4d 00 ba 38 00
+RSP: 0018:ffffc900043eeec0 EFLAGS: 00010246
+RAX: 53f7659fb2f02200 RBX: ffffc900043ef180 RCX: ffff8880257d1e00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: ffffc900043ef2c8 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bfaa44 R12: ffff88801c7a4b00
+R13: ffff88801c7a4b54 R14: 1ffff110038f496a R15: 0000000000000000
+FS:  000055556bd6a380(0000) GS:ffff888125d54000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000ebea398 CR3: 00000000713fa000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ do_check_common+0x18fa/0x2460 kernel/bpf/verifier.c:23086
+ do_check_main kernel/bpf/verifier.c:23177 [inline]
+ bpf_check+0x110e2/0x1a240 kernel/bpf/verifier.c:24530
+ bpf_prog_load+0x1318/0x1930 kernel/bpf/syscall.c:2972
+ __sys_bpf+0x5f1/0x860 kernel/bpf/syscall.c:5978
+ __do_sys_bpf kernel/bpf/syscall.c:6085 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6083 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6083
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f37a741f569
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe3011bf08 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007ffe3011c0d8 RCX: 00007f37a741f569
+RDX: 0000000000000094 RSI: 0000200000000840 RDI: 0000000000000005
+RBP: 00007f37a7492610 R08: 00007ffe3011c0d8 R09: 00007ffe3011c0d8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffe3011c0c8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-   drivers/net/ethernet/atheros/atlx/atl1.c: In function 'atl1_tx_map':
->> drivers/net/ethernet/atheros/atlx/atl1.c:2315:34: warning: assignment to 'dma_addr_t' {aka 'long long unsigned int'} from 'void *' makes integer from pointer without a cast [-Wint-conversion]
-    2315 |                 buffer_info->dma = NULL;
-         |                                  ^
->> drivers/net/ethernet/atheros/atlx/atl1.c:2317:39: error: 'tdp_ring' undeclared (first use in this function); did you mean 'tpd_ring'?
-    2317 |                 if (++first_mapped == tdp_ring->count)
-         |                                       ^~~~~~~~
-         |                                       tpd_ring
-   drivers/net/ethernet/atheros/atlx/atl1.c:2317:39: note: each undeclared identifier is reported only once for each function it appears in
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-vim +2317 drivers/net/ethernet/atheros/atlx/atl1.c
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-  2192	
-  2193	static int atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
-  2194		struct tx_packet_desc *ptpd)
-  2195	{
-  2196		struct atl1_tpd_ring *tpd_ring = &adapter->tpd_ring;
-  2197		struct atl1_buffer *buffer_info;
-  2198		u16 buf_len = skb->len;
-  2199		struct page *page;
-  2200		unsigned long offset;
-  2201		unsigned int nr_frags;
-  2202		unsigned int f;
-  2203		int retval;
-  2204		u16 next_to_use;
-  2205		u16 first_mapped;
-  2206		u16 data_len;
-  2207		u8 hdr_len;
-  2208	
-  2209		buf_len -= skb->data_len;
-  2210		nr_frags = skb_shinfo(skb)->nr_frags;
-  2211		next_to_use = atomic_read(&tpd_ring->next_to_use);
-  2212		first_mapped = next_to_use;
-  2213		buffer_info = &tpd_ring->buffer_info[next_to_use];
-  2214		BUG_ON(buffer_info->skb);
-  2215		/* put skb in last TPD */
-  2216		buffer_info->skb = NULL;
-  2217	
-  2218		retval = (ptpd->word3 >> TPD_SEGMENT_EN_SHIFT) & TPD_SEGMENT_EN_MASK;
-  2219		if (retval) {
-  2220			/* TSO */
-  2221			hdr_len = skb_tcp_all_headers(skb);
-  2222			buffer_info->length = hdr_len;
-  2223			page = virt_to_page(skb->data);
-  2224			offset = offset_in_page(skb->data);
-  2225			buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
-  2226							offset, hdr_len,
-  2227							DMA_TO_DEVICE);
-  2228			if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
-  2229				goto dma_err;
-  2230	
-  2231			if (++next_to_use == tpd_ring->count)
-  2232				next_to_use = 0;
-  2233	
-  2234			if (buf_len > hdr_len) {
-  2235				int i, nseg;
-  2236	
-  2237				data_len = buf_len - hdr_len;
-  2238				nseg = (data_len + ATL1_MAX_TX_BUF_LEN - 1) /
-  2239					ATL1_MAX_TX_BUF_LEN;
-  2240				for (i = 0; i < nseg; i++) {
-  2241					buffer_info =
-  2242					    &tpd_ring->buffer_info[next_to_use];
-  2243					buffer_info->skb = NULL;
-  2244					buffer_info->length =
-  2245					    (ATL1_MAX_TX_BUF_LEN >=
-  2246					     data_len) ? ATL1_MAX_TX_BUF_LEN : data_len;
-  2247					data_len -= buffer_info->length;
-  2248					page = virt_to_page(skb->data +
-  2249						(hdr_len + i * ATL1_MAX_TX_BUF_LEN));
-  2250					offset = offset_in_page(skb->data +
-  2251						(hdr_len + i * ATL1_MAX_TX_BUF_LEN));
-  2252					buffer_info->dma = dma_map_page(&adapter->pdev->dev,
-  2253									page, offset,
-  2254									buffer_info->length,
-  2255									DMA_TO_DEVICE);
-  2256					if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
-  2257						goto dma_err;
-  2258					if (++next_to_use == tpd_ring->count)
-  2259						next_to_use = 0;
-  2260				}
-  2261			}
-  2262		} else {
-  2263			/* not TSO */
-  2264			buffer_info->length = buf_len;
-  2265			page = virt_to_page(skb->data);
-  2266			offset = offset_in_page(skb->data);
-  2267			buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
-  2268							offset, buf_len,
-  2269							DMA_TO_DEVICE);
-  2270			if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
-  2271				goto dma_err;
-  2272			if (++next_to_use == tpd_ring->count)
-  2273				next_to_use = 0;
-  2274		}
-  2275	
-  2276		for (f = 0; f < nr_frags; f++) {
-  2277			const skb_frag_t *frag = &skb_shinfo(skb)->frags[f];
-  2278			u16 i, nseg;
-  2279	
-  2280			buf_len = skb_frag_size(frag);
-  2281	
-  2282			nseg = (buf_len + ATL1_MAX_TX_BUF_LEN - 1) /
-  2283				ATL1_MAX_TX_BUF_LEN;
-  2284			for (i = 0; i < nseg; i++) {
-  2285				buffer_info = &tpd_ring->buffer_info[next_to_use];
-  2286				BUG_ON(buffer_info->skb);
-  2287	
-  2288				buffer_info->skb = NULL;
-  2289				buffer_info->length = (buf_len > ATL1_MAX_TX_BUF_LEN) ?
-  2290					ATL1_MAX_TX_BUF_LEN : buf_len;
-  2291				buf_len -= buffer_info->length;
-  2292				buffer_info->dma = skb_frag_dma_map(&adapter->pdev->dev,
-  2293					frag, i * ATL1_MAX_TX_BUF_LEN,
-  2294					buffer_info->length, DMA_TO_DEVICE);
-  2295				if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
-  2296					goto dma_err;
-  2297	
-  2298				if (++next_to_use == tpd_ring->count)
-  2299					next_to_use = 0;
-  2300			}
-  2301		}
-  2302	
-  2303		/* last tpd's buffer-info */
-  2304		buffer_info->skb = skb;
-  2305	
-  2306		return 0;
-  2307	
-  2308	 dma_err:
-  2309		while (first_mapped != next_to_use) {
-  2310			buffer_info = &tpd_ring->buffer_info[first_mapped];
-  2311			dma_unmap_page(&adapter->pdev->dev,
-  2312				       buffer_info->dma,
-  2313				       buffer_info->length,
-  2314				       DMA_TO_DEVICE);
-> 2315			buffer_info->dma = NULL;
-  2316	
-> 2317			if (++first_mapped == tdp_ring->count)
-  2318				first_mapped = 0;
-  2319		}
-  2320		return -ENOMEM;
-  2321	}
-  2322	
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
