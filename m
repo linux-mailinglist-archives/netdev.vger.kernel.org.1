@@ -1,85 +1,90 @@
-Return-Path: <netdev+bounces-197660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317B8AD9881
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5343AD9882
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C50924A09C5
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:09:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10B164A289E
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA7028DEF9;
-	Fri, 13 Jun 2025 23:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C9328E594;
+	Fri, 13 Jun 2025 23:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0yO8Df7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kL3jVx/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31BF28E594
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475B828D8F5
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749856153; cv=none; b=tFts9wTney3W7jq0M215fRY1swt14smE0QkfkBWULh6a1DfAf59WMCLVeFLqDv3yq7ZoQFkvXcdbPHmEbi3EHl+r9dh8cnIKKoK3zu0wID6feABAmf3dScqLk/38lJC6mSr+d/Rcd8E04pdIo0vUDYlXq71EgG/8XBLz25JTPwg=
+	t=1749856155; cv=none; b=mrK3LKtjwcDnUzUaT128nL/RMK7QllzjowPnpbdF6Htz9XooE2GNKonzu7fa0BNyvFG/940EXwbFsFghzz6voTEqFpzwYqK0VJjal7aY/42428EKbFtBR0jT24ZsTh6Kt3MhhEloddSgImnmP1IMNeS6uGOp9J9OoLd/iugyWFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749856153; c=relaxed/simple;
-	bh=J0LKIHEIdojKyxZbmiNTd76CxGw5pJ5EghHsawREc1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DmSiReLuhjhIpYXOgLzxLYOwwiLQP+CadsQQIRiZj5lQ+CnTkjGejk9AdBk6nEw6hLE9pppxhYqTVF90uBChObQvfj8O6JPGxiBLIMonIDK5Lr65UPgwJzxtZ5gvfnFb8PNClPO5hI3ISH02tmD/G/LCKPel76W+86av3K2Z+9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0yO8Df7; arc=none smtp.client-ip=209.85.222.176
+	s=arc-20240116; t=1749856155; c=relaxed/simple;
+	bh=PGX9jXZrmfMAPI6nGRFeJAZwC7sZHZ55+VMOQc/5gYM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Mbw95wqBG6IO+LdggRo/5DLpm1qaE4d10RCze1i8lCd7vaHY25OgUjrr5YqmEcuU4EcK0hXv+m1Dnlo+PtQL0jK3rdCesaOAGsyXLmuFk1ViFevUMmNRZeMTN8XreTlRTKISuK1UY9p+skXqHvFtpo0crGxSHFQ/dyqDpDYkEX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kL3jVx/C; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c921ec37e5so34378685a.2
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:09:11 -0700 (PDT)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7d20ff236c5so48741985a.2
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:09:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749856150; x=1750460950; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3fFRlNjl9GKzfq0vtzMG+m4QiwvBHWFCmSbIidDRRnA=;
-        b=Y0yO8Df7kGk/tFR+0eAN4ywoxAP33RY8vHCnUgCEPzq97EKzBtwuCMRXTt5T/fS0Ao
-         Hhkv42/oh6KwOgqlVwk18iV5+A78e5Ff2peWplnR9BDIhzacIXZaR1z6qe1lmBcZMvUh
-         NSvyrmjm3t51S6M01WdijqOARWDmrNFyrnReqsd9ol5AgadarxHIHM+fFX9TK9qCjDow
-         PbfZqcJnIxJRMCT42myZ/JDhXue/mAmkgDnIC/AqISUwOSKc1a+AJsiDTbk38ul3Zdwp
-         +c/hkDAx0MoMqeiPoPwQSmRlYMLEu9AtzKGNd4mRMebqypIzjB0WXi8b9EgCaO8Zn7EZ
-         jhUg==
+        d=gmail.com; s=20230601; t=1749856152; x=1750460952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dGdJXq9mQTORn6nLzBRl53at3AtwionT3hotMAFScpU=;
+        b=kL3jVx/CxC7a7T/DYLtptrpujmT8rey2ZgqW+dIWMw1CdCjIJrwwj9N3Xw1K69Z7S/
+         H33iS7Y72XhKWRtLrebVsNyUWy/n0K8+dFqTjwlRPC9ewRGOFrivKapbGpWXYP5t6PRI
+         /qmd+3JpuTZjmWWXYlzazGx9SDPx/HYkCbb41bkHOxDIrz8ezCp8cITz/jlMoXO4W48A
+         XWRy+EC2Ve/3CfKcdI1a1TupQ4HjgNeay1rpJwLpq9HkLiHGgDTzX4IyXS1SJrdxsR8V
+         cdyWZAUY2UjxNLwdGbm827OHjiHL6vr6+ogdEssAyALMcsAbJV78xJbojTmCqQenjSjc
+         w9Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749856150; x=1750460950;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3fFRlNjl9GKzfq0vtzMG+m4QiwvBHWFCmSbIidDRRnA=;
-        b=j7WXibch+WEX2rS+kRlf80YwxWTt05rB7lU1O44foun8nMQwU3vhKFV/SvFiEeyr0x
-         u1rN30izkbZzjc9nF9nDCq/x2VyCAYW/1bwxaFo8gyS4cyQyXviiGKWuW6RnODoixnfZ
-         cm8GwTYcKvDPzzZvcoGsZpmUGNHfRS5H8X+m8j6T2gUpKebFph1aM+/sg0cXAdDUjngy
-         cRinzC8ZnjI57w2Wy6UeLxkXyxFflhkbkkwOv4TQhlDmgZfIJOJqYIfqJuRdzmxhAkd5
-         TsURAUDu2mUekhyR2ihbI1TGk36TaJ/cpGuenVzdqlBFmYYycvsnVhVqEqzvmV27Es+e
-         3DbQ==
-X-Gm-Message-State: AOJu0YxGJ9rNKY7SHwW0FPjmMQvKP7HWMUscHQ2TBOy6/20FVYT0fpJZ
-	c4Nr+nJkbzUILjwc8UqzBe9JizAAS5zxJmXnvSoqQcv06jdlspAeszPVPHXHzA==
-X-Gm-Gg: ASbGncswrhqHzN78be+DnZboOT6YafLA3QpLQmLuY16MY540/d5Ll8EcszJfgpOVSSl
-	olQKoo/T26kERwRbBrqZ4dPrHmrV044p82PMA4y4m734Xbw6sO4zVaSIwZcgxn/kk7u9DM0aGrF
-	cenvN47XzFtzEDyB5mOvYgckE3nu5+uvyJzRu2xHzl22T56e97Wx9qOw1DVBVKA2ADOEgzsijqk
-	mA3ZUQqLnzUMkUMXVROiPAY2iaGbwE+qxwGi9PRmEELHxFfX7s9LNRtlpenTmaeBNA+P8pItTw5
-	tnvGTYa1r9Sv0olSR32Wpn25A/225/nY31baxbmng/ZA9hhHFk83LJMbqo/JXzDElhW9Vssa9n9
-	0m1XD
-X-Google-Smtp-Source: AGHT+IG0bSUqSjW7EyaYj/mtjr4Zlj5j/RLI7xOavwbgnwVaLdccfytUGGbDt4CoYAZBkpD2FAdEfw==
-X-Received: by 2002:ac8:5d47:0:b0:4a4:2f40:d720 with SMTP id d75a77b69052e-4a73c527a20mr6862461cf.8.1749856150447;
-        Fri, 13 Jun 2025 16:09:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749856152; x=1750460952;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dGdJXq9mQTORn6nLzBRl53at3AtwionT3hotMAFScpU=;
+        b=PVBLJ/8NN08AfvexVGHyuXwGktAM3sKw9M6RSm5pIVmXpqL6OdYMMYzbQp73LXWZbF
+         fFvvWbDtDWVVficrWC0rifwquYN56oq2f1df0rkdBMJued1H5hUJN+ZgmW4TiYvWCdDN
+         pw8pZtTCV7SglRDnaCvpkNASoxqNPugb2UMZUrOBXI5Sskup0HtAy5U0LsJBKw92uhgf
+         V8EaCfWbVGac3RUXlhkFMmmZtMCeYXbhaL9OdVIeEWAa88XGFvUCnaRc1JdtOs/vhYng
+         lOBHb2Ir9UIdpgOs5Ud49gYulSaqMNLusUDjPxBTU4FKbqxU4fUJQbD3v7MOMr1ZijAr
+         B8Mg==
+X-Gm-Message-State: AOJu0Yw2RCDHjNtkBeTjzT6TLiyz/5TrlwoPftdt8GiUYCQeyfJrcT1u
+	+1D9ftE4Rm7K/cM/8hIEhjjRAoAO+MAYOhgFGsUdLfr8HPWwowpQDz42KPQPeQ==
+X-Gm-Gg: ASbGncusDgNdclb9ws1Kz/qBFRqCmGRG5qRj6weDPPplA4YIWs5sHm7tLCpY2gJed2p
+	wlJLmPXLqzBEnGAwDwlR/OmIDLRVKshvqAgvTuKy/XAUdj9wi08ci4/bRrfrCqvXt9sGXiSbu6w
+	EP20FtrZIrXDSyeAg7BJQ/Z0AdIC+gzuEKg/sut5oTyoYXiA/l88jFMSMKD07sRkSYQhkJA1r4l
+	5Y/c8FJ6Vmw2+iFFdls1w2S2vVfSzNJQd0kMMFEylAAHKHDnFXX4csyvc6VVCuddeJJ9bKaQg9c
+	31bn6egqXeB+LIdJF69ADm5I2UHZlP6LtK4IeBzkEfPbPhiWOPHRRU6avoyOvhqGrBt52CjlGOo
+	vXZUO
+X-Google-Smtp-Source: AGHT+IHhKAHE4dz52xtnysMKL4OW494QzGpJ7VXEIGollMyKJNWqVg420cJI9To0cQ0FLEPOpbHb8w==
+X-Received: by 2002:a05:622a:1649:b0:47a:e6e1:c071 with SMTP id d75a77b69052e-4a73c5881d9mr7016591cf.7.1749856151964;
+        Fri, 13 Jun 2025 16:09:11 -0700 (PDT)
 Received: from soy.nyc.corp.google.com ([2620:0:1003:315:8d12:28c7:afe9:8851])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a2f4fc5sm23122651cf.26.2025.06.13.16.09.09
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a2f4fc5sm23122651cf.26.2025.06.13.16.09.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 16:09:10 -0700 (PDT)
+        Fri, 13 Jun 2025 16:09:11 -0700 (PDT)
 From: Neal Cardwell <ncardwell.sw@gmail.com>
 To: David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org,
-	Neal Cardwell <ncardwell@google.com>
-Subject: [PATCH net-next 0/3] tcp: remove obsolete RFC3517/RFC6675 code
-Date: Fri, 13 Jun 2025 19:09:03 -0400
-Message-ID: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
+	Neal Cardwell <ncardwell@google.com>,
+	Yuchung Cheng <ycheng@google.com>
+Subject: [PATCH net-next 1/3] tcp: remove obsolete and unused RFC3517/RFC6675 loss recovery code
+Date: Fri, 13 Jun 2025 19:09:04 -0400
+Message-ID: <20250613230907.1702265-2-ncardwell.sw@gmail.com>
 X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
+In-Reply-To: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
+References: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,30 +124,261 @@ Linux TCP code base, and removes 12 bytes of state in every tcp_sock
 for 64-bit machines (8 bytes on 32-bit machines).
 
 To arrange the commits in reasonable sizes, this patch series is split
-into 3 commits:
+into 3 commits. The following 2 commits remove bookkeeping state and
+code that is no longer needed after this removal of RFC3517/RFC6675
+loss recovery.
 
-(1) Removes the core RFC3517/RFC6675 logic.
+Suggested-by: Yuchung Cheng <ycheng@google.com>
+Signed-off-by: Neal Cardwell <ncardwell@google.com>
+Reviewed-by: Yuchung Cheng <ycheng@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+---
+ Documentation/networking/ip-sysctl.rst |   8 +-
+ net/ipv4/tcp_input.c                   | 134 ++-----------------------
+ 2 files changed, 14 insertions(+), 128 deletions(-)
 
-(2) Removes the RFC3517/RFC6675 hint state and the first layer of logic that
-    updates that state.
-
-(3) Removes the emptied-out tcp_clear_retrans_hints_partial() helper function
-    and all of its call sites.
-
-Neal Cardwell (3):
-  tcp: remove obsolete and unused RFC3517/RFC6675 loss recovery code
-  tcp: remove RFC3517/RFC6675 hint state: lost_skb_hint, lost_cnt_hint
-  tcp: remove RFC3517/RFC6675 tcp_clear_retrans_hints_partial()
-
- Documentation/networking/ip-sysctl.rst        |   8 +-
- .../networking/net_cachelines/tcp_sock.rst    |   2 -
- include/linux/tcp.h                           |   3 -
- include/net/tcp.h                             |   6 -
- net/ipv4/tcp.c                                |   3 +-
- net/ipv4/tcp_input.c                          | 151 ++----------------
- net/ipv4/tcp_output.c                         |   6 -
- 7 files changed, 15 insertions(+), 164 deletions(-)
-
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 0f1251cce3149..b31c055f576fa 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -645,9 +645,11 @@ tcp_recovery - INTEGER
+ 	features.
+ 
+ 	=========   =============================================================
+-	RACK: 0x1   enables the RACK loss detection for fast detection of lost
+-		    retransmissions and tail drops. It also subsumes and disables
+-		    RFC6675 recovery for SACK connections.
++	RACK: 0x1   enables RACK loss detection, for fast detection of lost
++		    retransmissions and tail drops, and resilience to
++		    reordering. currrently, setting this bit to 0 has no
++		    effect, since RACK is the only supported loss detection
++		    algorithm.
+ 
+ 	RACK: 0x2   makes RACK's reordering window static (min_rtt/4).
+ 
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 8ec92dec321a9..b52eaa45e652f 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -2151,12 +2151,6 @@ static inline void tcp_init_undo(struct tcp_sock *tp)
+ 		tp->undo_retrans = -1;
+ }
+ 
+-static bool tcp_is_rack(const struct sock *sk)
+-{
+-	return READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_recovery) &
+-		TCP_RACK_LOSS_DETECTION;
+-}
+-
+ /* If we detect SACK reneging, forget all SACK information
+  * and reset tags completely, otherwise preserve SACKs. If receiver
+  * dropped its ofo queue, we will know this due to reneging detection.
+@@ -2182,8 +2176,7 @@ static void tcp_timeout_mark_lost(struct sock *sk)
+ 	skb_rbtree_walk_from(skb) {
+ 		if (is_reneg)
+ 			TCP_SKB_CB(skb)->sacked &= ~TCPCB_SACKED_ACKED;
+-		else if (tcp_is_rack(sk) && skb != head &&
+-			 tcp_rack_skb_timeout(tp, skb, 0) > 0)
++		else if (skb != head && tcp_rack_skb_timeout(tp, skb, 0) > 0)
+ 			continue; /* Don't mark recently sent ones lost yet */
+ 		tcp_mark_skb_lost(sk, skb);
+ 	}
+@@ -2264,22 +2257,6 @@ static bool tcp_check_sack_reneging(struct sock *sk, int *ack_flag)
+ 	return false;
+ }
+ 
+-/* Heurestics to calculate number of duplicate ACKs. There's no dupACKs
+- * counter when SACK is enabled (without SACK, sacked_out is used for
+- * that purpose).
+- *
+- * With reordering, holes may still be in flight, so RFC3517 recovery
+- * uses pure sacked_out (total number of SACKed segments) even though
+- * it violates the RFC that uses duplicate ACKs, often these are equal
+- * but when e.g. out-of-window ACKs or packet duplication occurs,
+- * they differ. Since neither occurs due to loss, TCP should really
+- * ignore them.
+- */
+-static inline int tcp_dupack_heuristics(const struct tcp_sock *tp)
+-{
+-	return tp->sacked_out + 1;
+-}
+-
+ /* Linux NewReno/SACK/ECN state machine.
+  * --------------------------------------
+  *
+@@ -2332,13 +2309,7 @@ static inline int tcp_dupack_heuristics(const struct tcp_sock *tp)
+  *
+  *		If the receiver supports SACK:
+  *
+- *		RFC6675/3517: It is the conventional algorithm. A packet is
+- *		considered lost if the number of higher sequence packets
+- *		SACKed is greater than or equal the DUPACK thoreshold
+- *		(reordering). This is implemented in tcp_mark_head_lost and
+- *		tcp_update_scoreboard.
+- *
+- *		RACK (draft-ietf-tcpm-rack-01): it is a newer algorithm
++ *		RACK (RFC8985): RACK is a newer loss detection algorithm
+  *		(2017-) that checks timing instead of counting DUPACKs.
+  *		Essentially a packet is considered lost if it's not S/ACKed
+  *		after RTT + reordering_window, where both metrics are
+@@ -2353,8 +2324,8 @@ static inline int tcp_dupack_heuristics(const struct tcp_sock *tp)
+  *		is lost (NewReno). This heuristics are the same in NewReno
+  *		and SACK.
+  *
+- * Really tricky (and requiring careful tuning) part of algorithm
+- * is hidden in functions tcp_time_to_recover() and tcp_xmit_retransmit_queue().
++ * The really tricky (and requiring careful tuning) part of the algorithm
++ * is hidden in the RACK code in tcp_recovery.c and tcp_xmit_retransmit_queue().
+  * The first determines the moment _when_ we should reduce CWND and,
+  * hence, slow down forward transmission. In fact, it determines the moment
+  * when we decide that hole is caused by loss, rather than by a reorder.
+@@ -2381,79 +2352,8 @@ static bool tcp_time_to_recover(struct sock *sk, int flag)
+ {
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 
+-	/* Trick#1: The loss is proven. */
+-	if (tp->lost_out)
+-		return true;
+-
+-	/* Not-A-Trick#2 : Classic rule... */
+-	if (!tcp_is_rack(sk) && tcp_dupack_heuristics(tp) > tp->reordering)
+-		return true;
+-
+-	return false;
+-}
+-
+-/* Detect loss in event "A" above by marking head of queue up as lost.
+- * For RFC3517 SACK, a segment is considered lost if it
+- * has at least tp->reordering SACKed seqments above it; "packets" refers to
+- * the maximum SACKed segments to pass before reaching this limit.
+- */
+-static void tcp_mark_head_lost(struct sock *sk, int packets, int mark_head)
+-{
+-	struct tcp_sock *tp = tcp_sk(sk);
+-	struct sk_buff *skb;
+-	int cnt;
+-	/* Use SACK to deduce losses of new sequences sent during recovery */
+-	const u32 loss_high = tp->snd_nxt;
+-
+-	WARN_ON(packets > tp->packets_out);
+-	skb = tp->lost_skb_hint;
+-	if (skb) {
+-		/* Head already handled? */
+-		if (mark_head && after(TCP_SKB_CB(skb)->seq, tp->snd_una))
+-			return;
+-		cnt = tp->lost_cnt_hint;
+-	} else {
+-		skb = tcp_rtx_queue_head(sk);
+-		cnt = 0;
+-	}
+-
+-	skb_rbtree_walk_from(skb) {
+-		/* TODO: do this better */
+-		/* this is not the most efficient way to do this... */
+-		tp->lost_skb_hint = skb;
+-		tp->lost_cnt_hint = cnt;
+-
+-		if (after(TCP_SKB_CB(skb)->end_seq, loss_high))
+-			break;
+-
+-		if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED)
+-			cnt += tcp_skb_pcount(skb);
+-
+-		if (cnt > packets)
+-			break;
+-
+-		if (!(TCP_SKB_CB(skb)->sacked & TCPCB_LOST))
+-			tcp_mark_skb_lost(sk, skb);
+-
+-		if (mark_head)
+-			break;
+-	}
+-	tcp_verify_left_out(tp);
+-}
+-
+-/* Account newly detected lost packet(s) */
+-
+-static void tcp_update_scoreboard(struct sock *sk, int fast_rexmit)
+-{
+-	struct tcp_sock *tp = tcp_sk(sk);
+-
+-	if (tcp_is_sack(tp)) {
+-		int sacked_upto = tp->sacked_out - tp->reordering;
+-		if (sacked_upto >= 0)
+-			tcp_mark_head_lost(sk, sacked_upto, 0);
+-		else if (fast_rexmit)
+-			tcp_mark_head_lost(sk, 1, 1);
+-	}
++	/* Has loss detection marked at least one packet lost? */
++	return tp->lost_out != 0;
+ }
+ 
+ static bool tcp_tsopt_ecr_before(const struct tcp_sock *tp, u32 when)
+@@ -2990,17 +2890,8 @@ static void tcp_process_loss(struct sock *sk, int flag, int num_dupack,
+ 	*rexmit = REXMIT_LOST;
+ }
+ 
+-static bool tcp_force_fast_retransmit(struct sock *sk)
+-{
+-	struct tcp_sock *tp = tcp_sk(sk);
+-
+-	return after(tcp_highest_sack_seq(tp),
+-		     tp->snd_una + tp->reordering * tp->mss_cache);
+-}
+-
+ /* Undo during fast recovery after partial ACK. */
+-static bool tcp_try_undo_partial(struct sock *sk, u32 prior_snd_una,
+-				 bool *do_lost)
++static bool tcp_try_undo_partial(struct sock *sk, u32 prior_snd_una)
+ {
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 
+@@ -3025,9 +2916,6 @@ static bool tcp_try_undo_partial(struct sock *sk, u32 prior_snd_una,
+ 		tcp_undo_cwnd_reduction(sk, true);
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPPARTIALUNDO);
+ 		tcp_try_keep_open(sk);
+-	} else {
+-		/* Partial ACK arrived. Force fast retransmit. */
+-		*do_lost = tcp_force_fast_retransmit(sk);
+ 	}
+ 	return false;
+ }
+@@ -3041,7 +2929,7 @@ static void tcp_identify_packet_loss(struct sock *sk, int *ack_flag)
+ 
+ 	if (unlikely(tcp_is_reno(tp))) {
+ 		tcp_newreno_mark_lost(sk, *ack_flag & FLAG_SND_UNA_ADVANCED);
+-	} else if (tcp_is_rack(sk)) {
++	} else {
+ 		u32 prior_retrans = tp->retrans_out;
+ 
+ 		if (tcp_rack_mark_lost(sk))
+@@ -3070,8 +2958,6 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	int fast_rexmit = 0, flag = *ack_flag;
+ 	bool ece_ack = flag & FLAG_ECE;
+-	bool do_lost = num_dupack || ((flag & FLAG_DATA_SACKED) &&
+-				      tcp_force_fast_retransmit(sk));
+ 
+ 	if (!tp->packets_out && tp->sacked_out)
+ 		tp->sacked_out = 0;
+@@ -3120,7 +3006,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
+ 		if (!(flag & FLAG_SND_UNA_ADVANCED)) {
+ 			if (tcp_is_reno(tp))
+ 				tcp_add_reno_sack(sk, num_dupack, ece_ack);
+-		} else if (tcp_try_undo_partial(sk, prior_snd_una, &do_lost))
++		} else if (tcp_try_undo_partial(sk, prior_snd_una))
+ 			return;
+ 
+ 		if (tcp_try_undo_dsack(sk))
+@@ -3178,8 +3064,6 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
+ 		fast_rexmit = 1;
+ 	}
+ 
+-	if (!tcp_is_rack(sk) && do_lost)
+-		tcp_update_scoreboard(sk, fast_rexmit);
+ 	*rexmit = REXMIT_LOST;
+ }
+ 
 -- 
 2.50.0.rc1.591.g9c95f17f64-goog
 
