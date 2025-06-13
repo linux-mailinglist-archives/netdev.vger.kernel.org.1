@@ -1,148 +1,108 @@
-Return-Path: <netdev+bounces-197550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E39AD9201
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:53:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2427AD9228
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 17:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 718EB16E5FB
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:53:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27BE4A20005
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 15:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A801FDE1E;
-	Fri, 13 Jun 2025 15:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hZXefQ1z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758D220A5E1;
+	Fri, 13 Jun 2025 15:55:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06DF1FC7D9
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 15:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942D6202C4E;
+	Fri, 13 Jun 2025 15:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749829941; cv=none; b=N3zBp79j575rgOGvXzHM1CvWDoUuS5MhSaG/ClglHMlF/E4faLc5KQxe/YPdt5Uo2Zpk0UkAGguDr4lRpcIc7nR70etJKgSlBXQN948kPqoFyKiRXbZkzEIsAthBb5W15Vcrj6fSS4Rih+FUIfIo+KXVKTB0S9e0JkC7F7Xdsgo=
+	t=1749830158; cv=none; b=OKn6gFLjQSy/vlStNCO2k9JiUBU1sSOVOBb3Mzw4f0acCdNinZeTaEIkvaypzPXOdAPxHVKBzNNBpFtPs93wjqriSaXNncVmohEKLESON+t/00+8ZyUeDGnD423onUadf0SkTZ5xkaGUMUfZMEac/QcxzCbgPzbdELW9JCTKioI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749829941; c=relaxed/simple;
-	bh=Kev/MH7b3XzfIbzkgR1o2iu55NK3f5nafOrGO/KhEwE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qYqoGCLPXjYaA01mamI9oKIvwJATo11Tx57zFTpILc2+Ict0Iqyt8w5yCM76ti6mxIqJ03eUh8KTINpI1egcyYDsH8yTT+A6plGO+HM0BiY33VyyHAIpmumuaORHH7ugo0kYoz8j7tj7t+MKwWlOo2UHdaFtPYxcZledxVy8eFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hZXefQ1z; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2ac62524-e45f-4ef6-a8b4-01adfd1391c2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749829927;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yV1sWZeZVf/FIQXque4O5JP0sG577Rz8Lj6jjxTnW8c=;
-	b=hZXefQ1zsdCjt1DrWrZaHhu7+CM+Ie5JgTIalZx7nqY2js+eUhbVLFm+cSahtcLnRIBMtM
-	6Sz8pXb9SRPlAlw2wYYU4/SHhLiAkOSjhVDfP9VYIdDUZ9PPtKK+y8h7nhiqz3VPpTXXrV
-	dwMnBcwhhkVjWndrPKIgkldwS4zTTlA=
-Date: Fri, 13 Jun 2025 16:52:01 +0100
+	s=arc-20240116; t=1749830158; c=relaxed/simple;
+	bh=8L2z4739RHjaRoJpohe/Bhxsg8DT+gCJ7gSEEvxTp74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDvqd1/DMfT5EBz+1M83VXZDsM5izRuClTDdwT/tCybkGve+GMItLlk8Q0zeOEqS4Uz9DSK8dE7VuVU2QxZX8wkoZBbU9f+NTKUC/1PZqn6XRukGtrQQ+RSSNiDpBu2MGasFiBwZCVtzqG2wRq4s1PAIUy2ix5MqtJ2HjFjnVVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ade48b24c97so338185866b.2;
+        Fri, 13 Jun 2025 08:55:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749830155; x=1750434955;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fKXlTaD3M0r62w1mi9jV25qZkxT133cf8Hl+KW9P6fs=;
+        b=KkvFOE2DUepFvJY8znlkGyGdhoA6P78+wDy+SwyEPE4II+cscS2v0aGKSyubDraa61
+         AvBG7+reanuGqKfdWIf3PZy7s4i6Dpx0/Mqwa7iZze3C10DwNSxAvsxJ1yZWuRO1YuIp
+         ssmiRamZwc0g1jQbh33f7EJ5eAFr9P714ft0dPslwR/u48ILUPqeUQCKq6q9sGBgCfBx
+         QvEfibXaSNBmIi/e8KPi24xBA39quoj7L9SfSWp0Nziva84nuVTGhdTXn3OZ496zRegm
+         g+itucQ4Jp/pVxIPTR1TEOa/AElunqZ20wNDvx9qPzCtpB2vGXpS3am13C0NIjlrC5vd
+         BLlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUquF3FOy1nasaX1eUC9m/ZsFqfdUsESgz9bHsrXxZuaPn9VIAjhG4VtU4PVsOu8pnqnOIRPyON@vger.kernel.org, AJvYcCV2ndKdod16ddCyDIryKB8dydIx1ESIOk0Yk+jzOOojRwiDfjShZi+/UXSh3YoMEJ7VMPzHmxnjVpkqb2PK+Yex@vger.kernel.org, AJvYcCVSv7z0RL0lld02rkrrmYh94fU8v+PRamZ1h1QAl1Fa4+HlTU7A33wmLvymwVZvxJ3G5NsSfM0KLbKsRU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoqQvDiuF0dg4S0w5vIlWkMe8GzBzIv6LUGaISjhKLHYInYad2
+	4dUH00CucuEbLPrtYnP5XKad9Iyj50wcBPoYssKSqLFMD3VUlDn7SAEt
+X-Gm-Gg: ASbGncuoO79QLOQGYVxjzNufbd7JB2Etth9xAGs6sovjeoNPsc8B9Ps2nGSZDOvxMXl
+	0fJ6BqE3NQ7+g0dExXyYAMg9/mtMBSaCYAFcB8Ggc14JCMdw9MaDFAvHNUT2NqzVvUjCDT1Eknw
+	FgDpy1HofhoyaKzG5/CFWvoR1Ul/3giV7oVeKkjPUAfCgyUiOApCosFQG7BQOblI6wuFnPLr8PV
+	qVuxL80/ZqF77Fgse/tipOBkgw8CNXuwmXI4X5Xp22ofFvVlpqYeqrh/hsHs3Y5MQ+y0lS58epg
+	Y9VszL0GePkRfb/BtMHnBfmPiGS9Ok2mHX2y//YjDhxmDA0l5CXUqyqDJSYorwk=
+X-Google-Smtp-Source: AGHT+IED168YgdZ6ChAOGCYrIy+tjPXzyGNF+en6Tv4Mzzs1Jkpfmk+mA53ktu5RHoF63IkhjvTPZQ==
+X-Received: by 2002:a17:906:9f8c:b0:ad8:9041:7724 with SMTP id a640c23a62f3a-adec5cd770fmr316366766b.61.1749830154753;
+        Fri, 13 Jun 2025 08:55:54 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec892b92asm147813266b.133.2025.06.13.08.55.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 08:55:54 -0700 (PDT)
+Date: Fri, 13 Jun 2025 08:55:52 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Wei <dw@davidwei.uk>, Shuah Khan <shuah@kernel.org>,
+	Simon Horman <horms@kernel.org>, joe@dama.to,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next v2 4/4] netdevsim: account dropped packet length
+ in stats on queue free
+Message-ID: <aExKCMX4SLM772xi@gmail.com>
+References: <20250613-netdevsim_stat-v2-0-98fa38836c48@debian.org>
+ <20250613-netdevsim_stat-v2-4-98fa38836c48@debian.org>
+ <aEw579mm+3aiXti+@gmail.com>
+ <20250613075507.2b857743@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v6 0/3] dpll: add all inputs phase offset monitor
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, aleksandr.loktionov@intel.com,
- milena.olech@intel.com, corbet@lwn.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org
-References: <20250612152835.1703397-1-arkadiusz.kubalewski@intel.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250612152835.1703397-1-arkadiusz.kubalewski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250613075507.2b857743@kernel.org>
 
-On 12/06/2025 16:28, Arkadiusz Kubalewski wrote:
-> Add dpll device level feature: phase offset monitor.
+On Fri, Jun 13, 2025 at 07:55:07AM -0700, Jakub Kicinski wrote:
+> On Fri, 13 Jun 2025 07:47:11 -0700 Breno Leitao wrote:
+> > >  static void nsim_queue_free(struct nsim_rq *rq)
+> > >  {
+> > > +	struct net_device *dev = rq->napi.dev;
+> > > +
+> > >  	hrtimer_cancel(&rq->napi_timer);
+> > > +	dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);  
+> > 
+> > This is wrong and it will cause the kernel to crash in some cases, given
+> > we can get here with dev == NULL, in the following path:
 > 
-> Phase offset measurement is typically performed against the current active
-> source. However, some DPLL (Digital Phase-Locked Loop) devices may offer
-> the capability to monitor phase offsets across all available inputs.
-> The attribute and current feature state shall be included in the response
-> message of the ``DPLL_CMD_DEVICE_GET`` command for supported DPLL devices.
-> In such cases, users can also control the feature using the
-> ``DPLL_CMD_DEVICE_SET`` command by setting the ``enum dpll_feature_state``
-> values for the attribute.
-> Once enabled the phase offset measurements for the input shall be returned
-> in the ``DPLL_A_PIN_PHASE_OFFSET`` attribute.
-> 
-> Implement feature support in ice driver for dpll-enabled devices.
-> 
-> Verify capability:
-> $ ./tools/net/ynl/pyynl/cli.py \
->   --spec Documentation/netlink/specs/dpll.yaml \
->   --dump device-get
-> [{'clock-id': 4658613174691613800,
->    'id': 0,
->    'lock-status': 'locked-ho-acq',
->    'mode': 'automatic',
->    'mode-supported': ['automatic'],
->    'module-name': 'ice',
->    'type': 'eec'},
->   {'clock-id': 4658613174691613800,
->    'id': 1,
->    'lock-status': 'locked-ho-acq',
->    'mode': 'automatic',
->    'mode-supported': ['automatic'],
->    'module-name': 'ice',
->    'phase-offset-monitor': 'disable',
->    'type': 'pps'}]
-> 
-> Enable the feature:
-> $ ./tools/net/ynl/pyynl/cli.py \
->   --spec Documentation/netlink/specs/dpll.yaml \
->   --do device-set --json '{"id":1, "phase-offset-monitor":"enable"}'
-> 
-> Verify feature is enabled:
-> $ ./tools/net/ynl/pyynl/cli.py \
->   --spec Documentation/netlink/specs/dpll.yaml \
->   --dump device-get
-> [
->   [...]
->   {'capabilities': {'all-inputs-phase-offset-monitor'},
->    'clock-id': 4658613174691613800,
->    'id': 1,
->   [...]
->    'phase-offset-monitor': 'enable',
->   [...]]
-> 
-> v6:
-> - rebase.
-> 
-> Arkadiusz Kubalewski (3):
->    dpll: add phase-offset-monitor feature to netlink spec
->    dpll: add phase_offset_monitor_get/set callback ops
->    ice: add phase offset monitor for all PPS dpll inputs
-> 
->   Documentation/driver-api/dpll.rst             |  18 ++
->   Documentation/netlink/specs/dpll.yaml         |  24 +++
->   drivers/dpll/dpll_netlink.c                   |  69 ++++++-
->   drivers/dpll/dpll_nl.c                        |   5 +-
->   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  20 ++
->   drivers/net/ethernet/intel/ice/ice_common.c   |  26 +++
->   drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
->   drivers/net/ethernet/intel/ice/ice_dpll.c     | 193 +++++++++++++++++-
->   drivers/net/ethernet/intel/ice/ice_dpll.h     |   8 +
->   drivers/net/ethernet/intel/ice/ice_main.c     |   4 +
->   include/linux/dpll.h                          |   8 +
->   include/uapi/linux/dpll.h                     |  12 ++
->   12 files changed, 384 insertions(+), 6 deletions(-)
-> 
+> It's probably because NAPI wasn't registered yet in some paths.
+> You can pass dev in from the callers, it always exists, and all 
+> callers have it.
 
-Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Right, that is a better approach.
+
+I will update and send another version soon,
+--breno
 
