@@ -1,241 +1,131 @@
-Return-Path: <netdev+bounces-197625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51E75AD961E
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:17:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1374EAD9647
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 22:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B78A1885D0D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:17:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9372168E84
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 20:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AF925291F;
-	Fri, 13 Jun 2025 20:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F0DAI7tp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B0F24676D;
+	Fri, 13 Jun 2025 20:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EBA24C664;
-	Fri, 13 Jun 2025 20:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749845795; cv=fail; b=giA7b6tcolfEiU7Qdwreb9dFICrE9t774RbbWV/Y+HAmkD9w16xB3zJSXfDayl/+ANH1rscSw7iV7fJCtJt8gLzMfJeDROS6eKYDSwABFLzd0RJe2WWgID7/7XbKpvhyXCfcwzZ2XJy2TFNdA76nyJJKy3UnUHG4Y9jP9tDX/BY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749845795; c=relaxed/simple;
-	bh=jxHCwGeVSk4nQTsdHesYiaMIcIfuoJ/B1/VVmfARJMM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rwhMDIOlfP2JNHQEclikduhGPHhdxhe8YuoUh73hg7TmTEDlOzsvU0Xns0nchXSg2Uxh/hu80khkcIlj0mxeiHBq+efk4e1XQgDmRL+wk97+7JJlJ85zRX4ByjFiG5KHRFNGHPUQir7l+VabXAuC+xbXcDEQzimhCIzlJDc14WE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F0DAI7tp; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749845795; x=1781381795;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jxHCwGeVSk4nQTsdHesYiaMIcIfuoJ/B1/VVmfARJMM=;
-  b=F0DAI7tpNUQvWiMT/NeiuoQAvuCMxPQAnOYz6r/EkorpzXJAvyW0f83o
-   Pce4OF/4zjffSfAghDcW9oWFjeW75SqBBbc+ZCIgDb2Ut4h56CPLs2/0b
-   3W5KjxOinr1+On7R6O4tzbyUheSO42SgdbQwm0bWgPvFCCNRJ5jJabeH6
-   XIu75C6dr8zKzIAJ/ln72mEEM4OackvNzcwatrRt/igfxGYv+c4jfArT4
-   0N8vGVt+q3rR/biGw/7u/ZUVxbb8jcdrTrMOIsX2ib8IQRrzLBPTygD3f
-   Z+qU9iyqhjcvGvDOqCLkLXCMkGHh7GTV0zepwtuFA4POS4/U7KQhvzd4K
-   g==;
-X-CSE-ConnectionGUID: 8jofuABWSQCh8FmmToyYEw==
-X-CSE-MsgGUID: 4tvYi3GeR9WTtpDmURoksA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11463"; a="55872984"
-X-IronPort-AV: E=Sophos;i="6.16,234,1744095600"; 
-   d="scan'208";a="55872984"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 13:16:33 -0700
-X-CSE-ConnectionGUID: iMn1E5pfSNaK6gZenh9FFg==
-X-CSE-MsgGUID: h98L+H69Sui6GCL5JcRaWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,234,1744095600"; 
-   d="scan'208";a="148285591"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 13:16:32 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 13 Jun 2025 13:16:31 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Fri, 13 Jun 2025 13:16:31 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.77) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 13 Jun 2025 13:16:31 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sHyeV+2ICGfcardSv+fLzP+t+5sG9CAtmbnIXib+uR3eGeQu6S3rewi6+pXcq9ETXcdK9qW8quQ/Of+RXRPd8gqezA2b/wNkw4A01mqSC4wd/9pA9ByCv7lTNaUobpSh9TN6zPqJaAG9z5LOlbhY/tdQsDpYgBXDZZs6avfPw1UGi/B7EheNJD9ZVfntfUKy0xmU+r+quhd7Xa+YrtJ0BPm2nkTCh6Rd/UHF5ocUjYGWAgasows0xwTn67zVrSn7awyZEEHqI3R0mZXxgYyJ5bEXkVbViSnkKb/tRXyCxhrCOEy2TCWnUiV8pVH71MI9gO2I/854Bqs/65yPFQdbcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o7KQOzWNBm7kyaeXORcURoMc6bt3EkUlwwIkZQIl4jw=;
- b=BBnPaQC2ndV3423/VVgBCeFfhglQrNEee1ABSCFomT5ZXHVpa7xiBmwru5JmmT/c8ALQTPmjOeJ4SseXK8zn9Zp8ysDXRp7x/0uEIzPmJsLb3gMhJ+gLWmwjFqYezObUrvaOEH9c9bpUZBcRu2WGfqtG4z9GUQasJVHk+bbnSWx+kjlTe4M1zMPCE2SpnXf+wDW5ZoTHZuMf88KbgJdVtb/PAP+i24TjyzUx3z0r4rmvKtL9jRvZ8jtO1+cBwHR/VHyzKvthvFoD7jR+7fmU5N7Cgivl2g98t9zcgrZq7JitJdm6bRU5foWQXvxbGeRh9ng6b791J2aVV8QrwhQeNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
- by PH8PR11MB6830.namprd11.prod.outlook.com (2603:10b6:510:22e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.23; Fri, 13 Jun
- 2025 20:16:00 +0000
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38%6]) with mapi id 15.20.8835.018; Fri, 13 Jun 2025
- 20:16:00 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "donald.hunter@gmail.com" <donald.hunter@gmail.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
-	<horms@kernel.org>, "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "corbet@lwn.net" <corbet@lwn.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "Olech, Milena"
-	<milena.olech@intel.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: RE: [PATCH net-next v5 1/3] dpll: add reference-sync netlink
- attribute
-Thread-Topic: [PATCH net-next v5 1/3] dpll: add reference-sync netlink
- attribute
-Thread-Index: AQHb2b2jm8j7Gad43k+QVUg5vsXf0bP+pMqAgALnAAA=
-Date: Fri, 13 Jun 2025 20:16:00 +0000
-Message-ID: <SJ2PR11MB845226B24E9E3B33A5DE39009B77A@SJ2PR11MB8452.namprd11.prod.outlook.com>
-References: <20250610040436.1669826-1-arkadiusz.kubalewski@intel.com>
-	<20250610040436.1669826-2-arkadiusz.kubalewski@intel.com>
- <20250611165415.3c9ed314@kernel.org>
-In-Reply-To: <20250611165415.3c9ed314@kernel.org>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|PH8PR11MB6830:EE_
-x-ms-office365-filtering-correlation-id: 48ad1249-b40a-48be-830a-08ddaab71d41
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?626c6T8crWV5zWacljI+mE6zEwwu6V92d2AK5/rHG6hJL1XK3VbFRQDmfWzO?=
- =?us-ascii?Q?AF105rfhAHzjEcwJwqCD8xQvnDPIckufnUmd5+buhD4nRjTtSQnxjv+BsXDQ?=
- =?us-ascii?Q?hMDgNyQtt9DqQ/KfLQZapixs1HwQwS283/RwJQ/jdptAV2hJ3/sd1JaQuxDR?=
- =?us-ascii?Q?0TmVG34TBW6w4XVA6n98Z3GMUP0j/NrMBH+H8fbDCU8gfGfSyRhFIniHc+Qb?=
- =?us-ascii?Q?BY0LhE2xx6NLiOXzFd62PJgZuZs3D8oM5nuCqDlw384GqX5IzQ7TZRQIJOdr?=
- =?us-ascii?Q?DSOT3rFKXCyGtpaZB1O3sHxnG2Hq67SQi959I9aInjo7GAU4n5Hpug7GMtNO?=
- =?us-ascii?Q?TMUgvHeCA5gC8YhN/usfXW24xZLABDdQe0L+E4AG3viC/lqA+DQ8B4ksRnjU?=
- =?us-ascii?Q?QVAaNnXQ7Ic8UwCHV+3R12C1tJvwDGif0kmiQRwN6KB1qHi8tTRdFNFEwI4b?=
- =?us-ascii?Q?P2GrIiD5Jcz0xBwphCWgTAUoroUZi9el0g5/AZQY+A65+qtpiX26lcdANbBg?=
- =?us-ascii?Q?i6VN21fD+VERdqQGe6d/WrXib9x/YEY/dNaoX+IBd/eWPkP24o+iewDkUWcT?=
- =?us-ascii?Q?1L6J6S6AgaY646jIZTelE4iORdPN1hEZ0rQSVnwjJkoDBmcKgkrsO9bbTizm?=
- =?us-ascii?Q?bsNEkkKaQXlaRKDV+qkUCCWq3j3ye0ymU4SNSd9eyFt54y8KCkgj54fhryeS?=
- =?us-ascii?Q?l8pf+vFnLCyttbndzQrkT4A81hC56vTU5ua/+y9xmfoMCek86XjaI40eVJ9T?=
- =?us-ascii?Q?wela8ONH8zu1jNBdgUHPrWv7FWEjT9Yfnjoh9SMuKOeoBnC5AtJiIYQBHCXP?=
- =?us-ascii?Q?BHph1V24OfWr3JdANvA3d84Ic185YKsfuOdXFbq/UHxKlgACM4MxxxYYnIN1?=
- =?us-ascii?Q?uH8RZw8VyGftJi4aYwdgXIu/2pb6aluQ5OWmjE4rXPmm/3nTPxOp9trm6FbH?=
- =?us-ascii?Q?I5KoPA5NWEygmH6XMEGC+qGb0d4czSG9vuxFeWC8CMW2qIT52oex9n/2qf8P?=
- =?us-ascii?Q?7tq0C52OWNkqsRQ5E1S+qFZdBWRyccdVYuOICo5hoM09iJaUi8AO18Jv0RuW?=
- =?us-ascii?Q?qo4jyc7oWTOO0BnQwKvbq6hQyK/33bTa/RDpJuIg8zeC7AZJvrX/potmsJXW?=
- =?us-ascii?Q?0+5BgUkz//tFbbvw2zAanOWnzjbRJZF/y9GAP7km8L74/UMb/GGUU8K4bMlA?=
- =?us-ascii?Q?9bYq+lzC4u6anpD15+XHCVaPugjN32LL7YfyswJKcXvcX+w3WL0Gb1ujo9PS?=
- =?us-ascii?Q?9tDDbjOfySMveM45UqJj2xT+uRjDqQRHLy/YVCFlSHyNAWCH4dxApznsgukW?=
- =?us-ascii?Q?7SQPmm5H2TbNeSJk879n/G9qIalV9OJYhSITYrTKjNobheMnI1wgkZFHkl5z?=
- =?us-ascii?Q?cSwBKvtxjZuogAduBeN9V4AN0Kobq71Rud5+G2jBKq3VCicM4A5KeeWntxY+?=
- =?us-ascii?Q?SoopVXSIJB6HRRRj6xlRlnGuJMbJH2dKLzFpvqTkgkA8KIl4qc/AFF9HwY0q?=
- =?us-ascii?Q?ruHdsd84iYQJ2+I=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OFfnj3WC4m/M561OHSGFXIgxCdpDW7jXp+PQCi40U34h9HsTx9EJsQIOunsy?=
- =?us-ascii?Q?2O7eSHD5l6h+ZZQ5CY+uf75BwS9G0xqjPDFGIocLJUOmmiTTfA4SxuFV8KfM?=
- =?us-ascii?Q?WjwRrvNT1Z/R4NU9xN+R8yhuDOHYpbhuD/gGrHR8YF55O5vnWq29P/5dqFo2?=
- =?us-ascii?Q?GcG9fjRP8ULals3ACAbaXbO2nUhF8vKz2R89zrr2/o0aTn4dVlKff3kvzx/9?=
- =?us-ascii?Q?hyKvy4Wayz3yFjotrTkzY/IpyzyVccM3uReXV4MqQJTQdHnCvGfudZWDrOMn?=
- =?us-ascii?Q?W7zYK1wyDg9AxjJApk5nKnjVqGlyNs6mwELxPF2NhzBGh5JUfefq5aXFwXXs?=
- =?us-ascii?Q?BZfO9FObkbmO8tjS2wVIQkuyTVP+EIGXGzf2NlV7l1gaNg9GkS3crtRg9O5X?=
- =?us-ascii?Q?AzsdDTh1q6IPPt45eRCG1PqmBS+GdDtHci+vqVVFEI9R9JD+mqheGajjF+/x?=
- =?us-ascii?Q?xRE4kifYsPcPCQFENdXXi/K4vXo/HIMeU0JY9Sp0+TANsJDRBrLrEh5+9J/K?=
- =?us-ascii?Q?aiopgwLG1+y9NuWaaeUmVRbnnqNeyLNTlI3K0mvV9Q85gflr9e9fdhA1u4IU?=
- =?us-ascii?Q?GcJr56BX7QfLuGggCozgY3Vlg7Mkxa9/fmYSFrMGeyT3uvDPpjNsAA5Mguw3?=
- =?us-ascii?Q?cHm71kpATaKPy/8MnPkWRcxvCcnjcFAMzxq5cQBllixGgdA/32wUErEsTu97?=
- =?us-ascii?Q?S3LbQxXM9U9BFD4csh4YKzhdN+mDP4Vlag7+hB8jwG0QswKqqcrp+CS9tw9p?=
- =?us-ascii?Q?TK/Bb90S0XI0K00eQlwjiE22vKr6gPTo/PmJ+ae0RFYQxr5OunMNiZe+ctxS?=
- =?us-ascii?Q?ern8JpyDfYU8YMeI98oKxZOxKXSzGOtmm58XUYDzDCpfnVSEzLaGh/O8UWXF?=
- =?us-ascii?Q?kUyAyQmLKp0zRDP6Ck3PNkENGliKrApuGJjWB5vM6d/hyzyJ9MTovP30oH8Z?=
- =?us-ascii?Q?WhYiAsHC9SczYlRaNjHHfekN+zE3d49YY1suz7m/ZRb/6N+N8Nx796On920M?=
- =?us-ascii?Q?ixoT6scu+kaP3Bf+RzvrG/gVcGHRBx3uPYrzhZLi+bTkEBLz3tvcCXlnoB7H?=
- =?us-ascii?Q?JXh/sez+fhzpznMv0dtMNqgmsd7gTQ6rzC7lxtMyIk9htlpy9ix1isbSjEot?=
- =?us-ascii?Q?yLUErWn2LQkUsbAnRPey6Poucnf6FMrKunG81EP5iljo/mgxtAXm5YMFg198?=
- =?us-ascii?Q?SEfDgvZNaGZy4d/NdqEor5wNeKgIQTBR7UQCOibM5hVbrJyV/PrEoHOSGGMI?=
- =?us-ascii?Q?ijy1Ct0G/E9o1LsBlhdteRXXWbD/EBJ+oopnCmnitJdAkFTk6+xrw7s0ODen?=
- =?us-ascii?Q?37veSRwUj4GHE2FA6b11+jfBw1wsEpt1PmOjClULeFHxfxLIaGmGPkN2eQTP?=
- =?us-ascii?Q?ShBJuOp33ic3nRFh+dUoSkUptzVUZ+e7nxAsU8yBvKZgNSmsnNklwXuKSIeM?=
- =?us-ascii?Q?S6oLPkQAARk6wpoT53gIXiZiqE7OjpRx3va7Zur0AUaUoL5hvKY4VdSuWDOe?=
- =?us-ascii?Q?RJTrK2LSh6x0YXq48Ti507IZGigbL6jOak1dB6Elih1AexB8829nExE9umFW?=
- =?us-ascii?Q?NKNTHOyVf9REx4SD6E7HKUh6230le4d7n5KkvyhnxE80qTfsfzu9WaGXNXt7?=
- =?us-ascii?Q?EA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1392021C176
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 20:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749846626; cv=none; b=qCWrgtXJMeqdz7ysb8L1SOjRBGpTNtCnlAtvdBzNWPlS6hV/a9gUx4PBYoWjmbU7I42Din4tBqrLeQI7eTnuoKCoTvLAJbgBYsvvICFyF1tM1/ul3x78vIqTLAvN9KPeJDIZTuivFuWcq9174at9nlMxin9pNnWzFiqtcRDq6PE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749846626; c=relaxed/simple;
+	bh=Wx/w9AjdgBdua0CCLxzqzAIuSi/xSMUXyBDVY4umg5k=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=T9hL+nZOhhxRVymrKG+h5R8GKqRtrQwnPLf54e1jHgXU6k6dSq+DDHLxTuXmfmV78ph8VDUjS8ILqWn6wjs6dP7pKG5IlGGbVe2igSHxobODiybf6tK3UC7b+a7mXajZfdo1UFEl7E/LQzICTYvGWbdx3LAyIRnSRNbSamsCvyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-875bd5522e9so259212139f.2
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 13:30:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749846624; x=1750451424;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lAT0xlzsFKpAKX7I55g+k6KWgGcGGE+bWGUyodsvEb4=;
+        b=Ckmwy6aLZBKlxI4z7UvDDgkYdzBLTdDVYGg7B+5zL4rbxjS5bg5cUFSvWrO1/oZHur
+         i4VpDM8DabuSbzYxh/OIgKYspAV8oewEanepQvJ6+BBuscQnziS2gjGGx3O+c2QQYjMA
+         Yi+Y1SOGvMGoID0q+WdPMWZi6BRibJaN4tYntGVui1w7uiJ6esZokJzfnnC56xwzpfgZ
+         ZlD0R2IwrYK4FUpPj5EUjvyJlxzoTbcH8JgbGOG7DZztent09MXjPT2YNhLZSgS+iMMO
+         63mURWb5mFPEe+2HdyLewk8iN4sf98zXp4fJWxGRp84B2ykQ81OcB65ZeY5XXuBwujuE
+         9jsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV54q7+WiiIlHCs5EWVZi80cJWYCjBGpM8hCJ5JtHRx3HebFJVOQLr5adxtuM+Vkg0NUWcyruY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdOyKowj+yP70F67wBt3RJBwXlo7vx25kHPYe1XgKXju8Ct2ba
+	Vesp+T4iBSEnDaPTcZqKCEbIkHP+xZbWQGCKciWXstNZgt0eV38IHPtv2JC+EHKZ2INZ+JBdVbX
+	vqXIwVTLxe/qyLFbHjtSMOP9pj/qkv+zDRqU5cGWQtcGjX5+9fhkgIkC+E4k=
+X-Google-Smtp-Source: AGHT+IEEp/FkkUlE3BJWKdHjmhqu+GIVyYccKy1r1UGJ5mapdlfUpC9Npsm7E4bKOHXqi+3bXnHv+Y85/Y9SbdNtDlyuHyaZ3aUs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48ad1249-b40a-48be-830a-08ddaab71d41
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2025 20:16:00.2512
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tJTh9V0MSKXzsuXWvyYfUQO8jXuyGNbaFM+BWzHo/TNxueT6jpIDSLlPfNsLqD4Esunq3Rj8+zzfjxXcNZxRLCLJS5bzbvFX+A6YCDOnSdM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6830
-X-OriginatorOrg: intel.com
+X-Received: by 2002:a05:6e02:3a03:b0:3dc:76ad:7990 with SMTP id
+ e9e14a558f8ab-3de07cd0417mr14484135ab.15.1749846624287; Fri, 13 Jun 2025
+ 13:30:24 -0700 (PDT)
+Date: Fri, 13 Jun 2025 13:30:24 -0700
+In-Reply-To: <684a39aa.a00a0220.1eb5f5.00fa.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <684c8a60.050a0220.be214.02a6.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in __linkwatch_sync_dev (2)
+From: syzbot <syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stfomichev@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
->From: Jakub Kicinski <kuba@kernel.org>
->Sent: Thursday, June 12, 2025 1:54 AM
->
->On Tue, 10 Jun 2025 06:04:34 +0200 Arkadiusz Kubalewski wrote:
->> +The device may support the Reference SYNC feature, which allows the
->>combination
->> +of two inputs into a input pair. In this configuration, clock signals
->> +from both inputs are used to synchronize the dpll device. The higher
->>frequency
->                                                ^^^^
->                                                DPLL ?
->
+syzbot has found a reproducer for the following issue on:
 
-Sure, fixed in v6.
+HEAD commit:    27605c8c0f69 Merge tag 'net-6.16-rc2' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17bb9d70580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8e5a54165d499a9
+dashboard link: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a7b9d4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1421310c580000
 
->> +signal is utilized for the loop bandwidth of the DPLL, while the lower
->>frequency
->> +signal is used to syntonize the output signal of the DPLL device. This
->>feature
->> +enables the provision of a high-quality loop bandwidth signal from an
->>external
->> +source.
->
->Looks like there is a conflict between this series and patches sent
->by Tony the day before. You'll have to rebase.
->--
->pw-bot: cr
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-27605c8c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ab939a8a93b4/vmlinux-27605c8c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e90d45016aac/bzImage-27605c8c.xz
 
-Also rebased
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
 
-Thank you!
-Arkadiusz
+------------[ cut here ]------------
+RTNL: assertion failed at ./include/net/netdev_lock.h (72)
+WARNING: CPU: 2 PID: 60 at ./include/net/netdev_lock.h:72 netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
+WARNING: CPU: 2 PID: 60 at ./include/net/netdev_lock.h:72 __linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
+Modules linked in:
+CPU: 2 UID: 0 PID: 60 Comm: kworker/u32:3 Not tainted 6.16.0-rc1-syzkaller-00101-g27605c8c0f69 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: bond0 bond_mii_monitor
+RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
+RIP: 0010:__linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
+Code: 05 ff ff ff e8 94 b6 59 f8 c6 05 e9 0f 2e 07 01 90 ba 48 00 00 00 48 c7 c6 c0 8c e3 8c 48 c7 c7 60 8c e3 8c e8 94 7b 18 f8 90 <0f> 0b 90 90 e9 d6 fe ff ff 48 c7 c7 44 3b a8 90 e8 ae 86 c0 f8 e9
+RSP: 0018:ffffc90000ce79f0 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ffff8880363a2000 RCX: ffffffff817ae368
+RDX: ffff888022148000 RSI: ffffffff817ae375 RDI: 0000000000000001
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 1ffff9200019cf48
+R13: ffff8880363a2cc5 R14: ffffffff8c5909c0 R15: ffffffff899ba310
+FS:  0000000000000000(0000) GS:ffff8880d6954000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffd4122af9c CR3: 000000000e382000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
+ bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
+ bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
+ bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3321 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
+ kthread+0x3c5/0x780 kernel/kthread.c:464
+ ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
