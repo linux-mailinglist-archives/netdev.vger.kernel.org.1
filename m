@@ -1,206 +1,186 @@
-Return-Path: <netdev+bounces-197382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E1CCAD85DA
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:43:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C0CAD85DC
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 161921793E1
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 08:43:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AED6317A689
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 08:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F7E2727E5;
-	Fri, 13 Jun 2025 08:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BAB2727EF;
+	Fri, 13 Jun 2025 08:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEyhiyEF"
+	dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b="W8P3e+jC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAF91E7C2E;
-	Fri, 13 Jun 2025 08:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749804195; cv=none; b=W3M+5B2zbmCJ9EJW8fVb0xbR5GbRvA5SCgv0vW+aZ41Ud6tvAaW+LTc7X61SHwYfZ99VlHl9k+HYjMVjr9pc9l6M8ykXzvifLMbz9m/e9IqCNvBirNz6MFzY9Wdey7XQGiDNbvfDTWEI5l3Wd12VR3Q1b1gwJyW7hVA02MMjm2c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749804195; c=relaxed/simple;
-	bh=TQgcPkkH2EvSX8VHh/RHCX+HKmJkLMLX8iTuebAbBPI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=noaShGEgqCohsBsCaNgYhTFUWkxsrFMxauD9YHIVSH7KJd3anWc4cZqqt/DdZU+wi/vvu8o8EDir8Fp5VmcotCU9Iksv+bSoyqGc5c272uzNY7cmmviyFCbowuMnEe/fRvIPCqxqUGXzi0Tpq/JdEJlKK0tvSB0dvh84skrOOnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEyhiyEF; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3d817bc6eb0so9648535ab.1;
-        Fri, 13 Jun 2025 01:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749804193; x=1750408993; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TQgcPkkH2EvSX8VHh/RHCX+HKmJkLMLX8iTuebAbBPI=;
-        b=CEyhiyEFW2y0D3272xXtUmA5Ob0RhPl7o5URFUPyJWcGZdEvS6kas16oHsigbz8QQA
-         L2Ps7uXjoVHCNbvDLl8P9BVMboCcBk5lJLN4wFk0Vkm22mDLglH5C2Gc8nDn6j6fas8L
-         oo7TYocQRU6E2sla+ZzKwBUBodXBDPN8z9+PW5r0g10DH7/rdnlC/g2dyd5scp+YBDQw
-         /dLOYgMwYavlYe80+pGgbjjHX//iGCuuZiWXgv/OwYtdHET8//6FSOpjlDNrB+JKgvp9
-         xkaseb9Zhr29I1wtWw6ZgL4orQ7hIwi4xWQV7ZEwGrevTqrzPeVPzN5n9cl+UP17HMjx
-         HK5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749804193; x=1750408993;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TQgcPkkH2EvSX8VHh/RHCX+HKmJkLMLX8iTuebAbBPI=;
-        b=wlnv+FBCgm+LHBOImJHWdnF3qNIFFRj4A6uokWHcWPmq2akuTezoXujaneayIzWMYW
-         Fn71apJ7T4Ij85G/85d9UMY0BoSj/O5WIJMr8+3M5eG6NvmLE38PTWd5jcXSuKFuk/QN
-         DO2HmucauU414RUfQH81jUI4GN9aP8iUNc+J0xzAxInHoK1g4dKKpNfJhRRE45FpI2Ud
-         E09/DG1GZVoFAxaXYQ2+1HMk5X5LwvjY4BkoecX6AUP6hreOkxhbeMKF0fSBw3uZVrLW
-         9OpQx+v+DskqK1VTajV792b+4CLRAZuZHyh/7FS+s5jz91eRguH5FfMddd8eBWXVdGGG
-         ZiKw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6dIhdK4PR7vkh8t2kq+qAQ5JjpdwzY8l4Q2witm7IC20YvKbgWvs7mkOtYtVapdYVed+JbYg=@vger.kernel.org, AJvYcCWgqXyQWtPe82MIOuf0OtehGTljZ9Kuz21g/yNj2OwIMFk5UV5YBeZ2GdG4pd+euJ0qt7i8Sx2AlHov@vger.kernel.org, AJvYcCXXSFHIL/Kcew2jepMKgkVEHnhn9jYliLsq+9pt5VVSsJHoJBTLEHrNAs6HKl0EOLOSOCjy4rbfdeacwXupdNlj@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMWB6E9QlR5cVLwSqcBj00aFj6GmUJxCxNLenQcX0B8GlVt9EC
-	XMGIgo19s+zbsDHSYdc2wOoCuyjrEZrQZSasAQeggqLSUlY/0hTN/jAe9qMkycNYfYVOgplWl4B
-	MNYn7SvKfsdMPa0MqGHwxwZsmCyZ8Oss=
-X-Gm-Gg: ASbGnct+8UtrOVRmgk2qgljBcGC8RuJf6ie9/wyF2yMrBcisR5qGAT/IlJZz5eq0wGr
-	yTUP1RGwioG+R+p9LYB3bt2byymjZcSo+ejw9kROM4f8LEu1OnfkwLQ9XAaXuSsoJx+b8d4Qhza
-	gq41qRr6lxQfkF/Jl36JMAI+e0YqRgKY+gZS3fatt5HQ==
-X-Google-Smtp-Source: AGHT+IEfMK1xZf/b+j76ns8CxYTETEivsifS7tniKz+qeKzwhGUNbTP0yo/NztCGXpqTU/SAcwyCGfsiwpsLVUgGy3Y=
-X-Received: by 2002:a05:6e02:194d:b0:3dd:c4ed:39c0 with SMTP id
- e9e14a558f8ab-3de00b2d666mr22522525ab.1.1749804193094; Fri, 13 Jun 2025
- 01:43:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC052DA740;
+	Fri, 13 Jun 2025 08:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749804234; cv=pass; b=OeC4Bppq0CU1iCX/vZmGY+iRyoVBMwoxMrwx0nIjezWIUoNybHokdYnhAH2PMfjLqJOrK1OJkPdlNsr5rmlXR4B0rlWs1ywLnk+pdNGKnryLVFQjPXEcZCJFUB/Y6y5avv1nAqH81Vn8L7Gh4eSRqYfGXPqTn9jHijkm9aSqGLg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749804234; c=relaxed/simple;
+	bh=OR/hPjmN0Ys4mjQUpexypW3uwSBPrm+kW5FAAGN94mY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pUeo7fDj2Y5xflDC6cqv1hCfFbC7OUJsOdQPdAOERhUZ4SsLkmo1K2tgdUEyYc05vx0eN6fGrWfdK3DPw8wW+rwL602ZZlWPKh6NDnvjoPMduEavKDAuNqDQHTBc/7SAUBsa8KrCLBQqW9iHUT0dGPdpYBtBZO9U2apGOSiX758=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me; spf=pass smtp.mailfrom=icenowy.me; dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b=W8P3e+jC; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icenowy.me
+ARC-Seal: i=1; a=rsa-sha256; t=1749804204; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=ZOWJtLM+GrjPSVMu7bHfGBqfS9LbaFHmkwnvA3HZ5XGkUDeKMbHvLmdSVJ73eoq/kpOnoWXJ7RxI/r6Bv+IUcX6ukeurLUKICpX+hlOk2ZYzalbprK7k5vBtHjyfr0pKVh+EvarVxLd6BvTjz81GLSpIDX4OLHM1487c/guL+dg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1749804204; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=OR/hPjmN0Ys4mjQUpexypW3uwSBPrm+kW5FAAGN94mY=; 
+	b=NE7wJBvn5ofuxvXb66F5mpcTTZH975QQDsPXpTZRz/9on7tdRGWzaIGweg3ZoNqvcZ/wkh49x3e9+9hcQUtMvuYtUWoeQOoKs5nw3apIMhIrULMq23uA9Ob+n8MNUUpYdpjBFvdJLg8Xjqs4L9wRlTOBSx0htE2kIooZLQxwZ80=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=icenowy.me;
+	spf=pass  smtp.mailfrom=uwu@icenowy.me;
+	dmarc=pass header.from=<uwu@icenowy.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749804204;
+	s=zmail2; d=icenowy.me; i=uwu@icenowy.me;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=OR/hPjmN0Ys4mjQUpexypW3uwSBPrm+kW5FAAGN94mY=;
+	b=W8P3e+jCFRL+ZPrEd/jhER2tjTY98xHCvdHS9t6zUUzUKxpq5URA6vt2If8LiOxb
+	F7O9in+VOz7XTjY7MhLkzIFiTGxOtWNFOFOVOMk3C96vHoGhHUEecwkx2QPGaVkZudT
+	Ur0xfwx0liabFEVXCHoaQceMD90mKZC5lpHPxo5bm5zOjMh3in3xZAPT/KOtDNgyAAM
+	mJ02p7HpEklNG3/NHRPNsJ+ZDmwPFJWzBI797y/7YVbjfb+2+nmHZoYihVaRNH20+Qz
+	7DRH+nYhsttn2wb9kZ3nq3rBb1ak1+9fBgtKOI51PtBk8zzROl1stRz9eGuzcVZI6CB
+	cXR0D04UGQ==
+Received: by mx.zohomail.com with SMTPS id 1749804202336885.2970551790019;
+	Fri, 13 Jun 2025 01:43:22 -0700 (PDT)
+Message-ID: <9922727607de39da7ed75d1edaf1873147e26336.camel@icenowy.me>
+Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
+ informative text about RGMII delays
+From: Icenowy Zheng <uwu@icenowy.me>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Chaoyi Chen <chaoyi.chen@rock-chips.com>,
+ Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>,  netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 13 Jun 2025 16:43:14 +0800
+In-Reply-To: <aEvi5DTBj-cltE5w@shell.armlinux.org.uk>
+References: <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
+	 <2e42f2f7985fb036bec6ab085432a49961c8dc42.camel@icenowy.me>
+	 <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
+	 <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
+	 <ba7b290d-0cd1-4809-822a-bfe902684d7e@lunn.ch>
+	 <9ebe16a8d33e00c39c142748a1ea6fff96b9565a.camel@icenowy.me>
+	 <aElArNHIwm1--GUn@shell.armlinux.org.uk>
+	 <fc7ad44b922ec931e935adb96dcc33b89e9293b0.camel@icenowy.me>
+	 <f82a86d3-6e06-4f24-beb5-68231383e635@lunn.ch>
+	 <40fc8f3fec4da0ed2b59e8d2612345fb42b1fdd3.camel@icenowy.me>
+	 <aEvi5DTBj-cltE5w@shell.armlinux.org.uk>
+Organization: Anthon Open-Source Community
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <w7bwjqyae36c6pqhqjmvjcrwtpny6jxjyvxzb2qzt7atjncxd2@gi4xhlyrz27b>
- <aEqka3uX7tuFced5@orbyte.nwl.cc> <CABhP=tZRP42Dgw9+_vyAx80uPg4V2YFLfbGhpA10WzM46JYTNg@mail.gmail.com>
- <aErch2cFAJK_yd6M@orbyte.nwl.cc> <CABhP=tbUuJKOq6gusxyfsP4H6b4WrajR_A1=7eFXxfbLg+4Q1w@mail.gmail.com>
- <aEsuPMEkWHnJvLU9@orbyte.nwl.cc> <cqrontvwxblejbnnfwmvpodsymjez6h34wtqpze7t6zzbejmtk@vgjlloqq2rgc>
- <aEtMuuN9c6RkWQFo@orbyte.nwl.cc> <s4ffjiihvgv6glpvd3rbqr3cedprmgqijxiz2dh6v5lq4doabd@gpis5xfdyea5>
-In-Reply-To: <s4ffjiihvgv6glpvd3rbqr3cedprmgqijxiz2dh6v5lq4doabd@gpis5xfdyea5>
-From: Antonio Ojea <antonio.ojea.garcia@gmail.com>
-Date: Fri, 13 Jun 2025 10:42:37 +0200
-X-Gm-Features: AX0GCFuMcnrqL4pjQ0tem2TqFCQdMglEvTyI_uVIKFil4JtU04vwqEeNjlh2Hq4
-Message-ID: <CABhP=tYZYC-U1eAp9j8sdnaTUAMQXVSw78XHMkjcyXOdbxRi8Q@mail.gmail.com>
-Subject: Re: Status of native NAT64/NAT46 in Netfilter?
-To: webmaster@agowa338.de
-Cc: Phil Sutter <phil@nwl.cc>, Klaus Frank <vger.kernel.org@frank.fyi>, 
-	netfilter-devel@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Lukas Wunner <lukas@wunner.de>, netfilter@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-ZohoMailClient: External
 
-On Fri, 13 Jun 2025 at 00:19, <webmaster@agowa338.de> wrote:
->
-> On Thu, Jun 12, 2025 at 11:55:06PM +0200, Phil Sutter wrote:
-> > On Thu, Jun 12, 2025 at 08:13:02PM +0000, Klaus Frank wrote:
-> > > On Thu, Jun 12, 2025 at 09:45:00PM +0200, Phil Sutter wrote:
-> > > > On Thu, Jun 12, 2025 at 08:19:53PM +0200, Antonio Ojea wrote:
-> > > > > On Thu, 12 Jun 2025 at 15:56, Phil Sutter <phil@nwl.cc> wrote:
-> > > > > >
-> > > > > > Hi,
-> > > > > >
-> > > > > > On Thu, Jun 12, 2025 at 03:34:08PM +0200, Antonio Ojea wrote:
-> > > > > > > On Thu, 12 Jun 2025 at 11:57, Phil Sutter <phil@nwl.cc> wrote:
-> > > > > > > > On Sun, Jun 08, 2025 at 08:37:10PM +0000, Klaus Frank wrote:
-> > > > > > > > > I've been looking through the mailling list archives and couldn't find a clear anser.
-> > > > > > > > > So I wanted to ask here what the status of native NAT64/NAT46 support in netfilter is?
-> > > > >
-> > > > > > > we ended doing some "smart hack" , well, really a combination of them
-> > > > > > > to provide a nat64 alternative for kubernetes
-> > > > > > > https://github.com/kubernetes-sigs/nat64:
-> > > > > > > - a virtual dummy interface to "attract" the nat64 traffic with the
-> > > > > > > well known prefix
-> > > > > > > - ebpf tc filters to do the family conversion using static nat for
-> > > > > > > simplicity on the dummy interface
-> > > > > > > - and reusing nftables masquerading to avoid to reimplement conntrack
-> > > > > >
-> > > > > > Oh, interesting! Would you benefit from a native implementation in
-> > > > > > nftables?
-> > > > >
-> > > > > Indeed we'll benefit a lot, see what we have to do :)
-> > > > >
-> > > > > > > you can play with it using namespaces (without kubernetes), see
-> > > > > > > https://github.com/kubernetes-sigs/nat64/blob/main/tests/integration/e2e.bats
-> > > > > > > for kind of selftest environment
-> > > > > >
-> > > > > > Refusing to look at the code: You didn't take care of the typical NAT
-> > > > > > helper users like FTP or SIP, did you?
-> > > > >
-> > > > > The current approach does static NAT64 first, switching the IPv6 ips
-> > > > > to IPv4 and adapting the IPv4 packet, the "real nat" is done by
-> > > > > nftables on the ipv4 family after that, so ... it may work?
-> > > >
-> > > > That was my approach as well: The incoming IPv6 packet was translated to
-> > > > IPv4 with an rfc1918 source address linked to the IPv6 source, then
-> > > > MASQUERADE would translate to the external IP.
-> > > >
-> > > > In reverse direction, iptables would use the right IPv6 destination
-> > > > address from given rfc1918 destination address.
-> > > >
-> > > > The above is a hack which limits the number of IPv6 clients to the size
-> > > > of that IPv4 transfer net. Fixing it properly would probably require
-> > > > conntrack integration, not sure if going that route is feasible (note
-> > > > that I have no clue about conntrack internals).
-> > >
-> > > Well technically all that needs to be done is NAT66 instead of NAT44
-> > > within that hack and that limitation vanishes.
-> >
-> > I don't comprehend: I have to use an IPv4 transfer net because I need to
-> > set a source address in the generated IPv4 header. The destination IPv4
-> > address is extracted from the IPv6 destination address. Simple example:
-> >
+=E5=9C=A8 2025-06-13=E6=98=9F=E6=9C=9F=E4=BA=94=E7=9A=84 09:35 +0100=EF=BC=
+=8CRussell King (Oracle)=E5=86=99=E9=81=93=EF=BC=9A
+> On Fri, Jun 13, 2025 at 04:01:37PM +0800, Icenowy Zheng wrote:
+> > =E5=9C=A8 2025-06-11=E6=98=9F=E6=9C=9F=E4=B8=89=E7=9A=84 17:28 +0200=EF=
+=BC=8CAndrew Lunn=E5=86=99=E9=81=93=EF=BC=9A
+> > > > Well in fact I have an additional question: when the MAC has
+> > > > any
+> > > > extra
+> > > > [tr]x-internal-delay-ps property, what's the threshold of MAC
+> > > > triggering patching phy mode? (The property might be only used
+> > > > for
+> > > > a
+> > > > slight a few hundred ps delay for tweak instead of the full 2ns
+> > > > one)
+> > >=20
+> > > Maybe you should read the text.
+> > >=20
+> > > The text says:
+> > >=20
+> > > =C2=A0 In the MAC node, the Device Tree properties 'rx-internal-delay=
+-
+> > > ps'
+> > > =C2=A0 and 'tx-internal-delay-ps' should be used to indicate fine
+> > > tuning
+> > > =C2=A0 performed by the MAC. The values expected here are small. A
+> > > value
+> > > of
+> > > =C2=A0 2000ps, i.e 2ns, and a phy-mode of 'rgmii' will not be accepte=
+d
+> > > by
+> > > =C2=A0 Reviewers.
+> > >=20
+> > > So a few hundred ps delay is fine. The MAC is not providing the
+> > > 2ns
+> > > delay, the PHY needs to do that, so you don't mask the value.
+> >=20
+> > Thus if the MAC delay is set to 1xxx ps (e.g. 1800ps), should the
+> > MAC
+> > do the masking?
+> >=20
+> > What should be the threshold? 1ns?
+>=20
+> Why should there be a "threshold" ? It's really a case by case issue
+> where the capabilities of the hardware need to be provided and
+> considered before a decision can be made.
+>=20
+> In order to first understand this, one needs to understand the
+> requirements of RGMII. RGMII v1.3 states:
+>=20
+> Symbol=C2=A0=C2=A0Parameter=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Min=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0Typ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Max=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Units
+> TskewT=C2=A0=C2=A0Data to Clock output=C2=A0=C2=A0=C2=A0=C2=A0-500=C2=A0=
+=C2=A0=C2=A0=C2=A00=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0500=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0ps
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0skew at clock tx
+> TskewR=C2=A0=C2=A0Data to Clock input=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A02.6=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ns
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0skew at clock rx
+>=20
+> The RGMII specification is written based upon the clock transmitter
+> and receiver having no built-in delays, and the delay is achieved
+> purely by trace routing. So, where delays are provided by the
+> transmitter or receiver (whether that's the MAC or the PHY depends
+> on whether TXC or RXC is being examined) these figures need to be
+> thought about.
+>=20
+> However, the range for the delay at the receiver is -1ns to +0.6ns.
+>=20
+> In your example, you're talking about needing a 1800ps delay. I
+> would suggest that, *assuming the PCB tracks introduce a 200ps skew
+> between the data and clock*, then using the PHY's built-in 2ns delay
+> is perfectly within the requirements of the RGMII specification.
+>=20
+> That bit "assuming" is where the discussion needs to happen, and why
+> it would be case by case. If the skew due to trace routing were
+> 800ps, then enabling the PHY's built-in 2ns delay would take the
+> delay out of spec.
+>=20
+> Thrown into this would also be temperature effects, so trying to get
+> to as near as the 2ns delay as possible is probably a good idea.
+>=20
+> Lastly, there's the question whether the software engineer even
+> knows what the skew provided by the hardware actually is.
 
-Yeah, my bad, I was thinking about the Service implementation and the
-need to track multiple connections for the same DNAT, and this is
-about embedded IPs.
+Sigh, my experience is that the only thing I can get is some magic
+numbers from HW vendor... *facepalm*
 
-> >
-> > > Also in regards to the above code it looks like currently only tcp and
-> > > udp are supported. All other traffic appears to just dropped at the
-> > > moment instead of just passed through. Is there a particular reason for
-> > > this?
-> >
-> > I guess tcp and udp are simply sufficient in k8s.
->
-> doesn't k8s also support sctp? Also still no need to just drop
-> everything else, would have expected to just pass through it without
-> special handling...
->
+>=20
 
-Ok, k8s support, here by dragons, taking some licenses for keeping the
-explanation simple:
-k8s orchestrate containers with a flat network as model, as every
-container needs to talk to other containers in the cluster without
-NAT, there is nothing kubernetes mandates about protocols here, only
-about how the network in the cluster should look like, this end to end
-principle makes networking "simple" to think about and put the
-complexity on the endpoints.
-
-k8s also offers a mechanism for service discovery, the famous
-kube-proxy that basically does DNAT to some virtual ip and Port
-configured by the user, that is the thing that users can configure to
-expose their containers, and this API only allow users to set TCP ,
-UDP or SCTP protocols, this is what people traditional mean as
-"kubernetes supports SCTP", although the use cases for this are very
-niche.
-
-The need for NAT64 in k8s is because unfortunately the world is not
-IPv6 ready, so people deploy containers that pull images from
-registries that are not reachable via IPv6 or use some git repository
-that is IPv4 only, this traffic "from container to Internet" is the
-traffic that needs a translation mechanism and is what this project
-tries to solve, is a stopgap solution, just that.
-
-The "mixing IP families inside the same cluster", so I have some
-containers IPv4 and others IPv6 is something I heard people trying to
-do, but that basically breaks the networking model of k8s, since means
-some containers will only be able to reach other containers through
-NAT, I really do not recommend that, as I do not see the benefit, is
-something cool to work with, but not something I will use if I have my
-company business on that cluster, you better use multiple clusters
-with different network domains and ip families and communicate through
-the "external to cluster" mechanisms
 
