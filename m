@@ -1,147 +1,206 @@
-Return-Path: <netdev+bounces-197490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DED5AD8C96
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:54:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9E6AD8C99
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 14:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5835189CAF0
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:54:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90B241E27C3
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 12:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C12685C5E;
-	Fri, 13 Jun 2025 12:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC3CC1CFBC;
+	Fri, 13 Jun 2025 12:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeLqN/GS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="es8djR6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC9A347DD;
-	Fri, 13 Jun 2025 12:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E7328691;
+	Fri, 13 Jun 2025 12:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749819234; cv=none; b=Q4v2tvKWOG2Ilvn3XK3DJT/581+IRIsSORmLnsqIjgWE3F/5ptu02lTCyVIHWeLDqYmbCkiwL8PlDhUx0L/IBFUIRkyOXD9YmtcSv7FM6GAZaaKcldazBnJIZYKlS/FbQvdqC2r3g0rL+DTnFTmrS/YARHBvVFuz44dWcVx5QH8=
+	t=1749819259; cv=none; b=hwE7ApmuRcn1bqBHNLR3EOCQlsYj3D3gyFQ0SjoNdfeT3QbFw5Rd/omC32mY56vccrNX1/ID/zSFltrxOVgFzw8sJmOwz12y8q8xH0r2iLyD15C9jR0beQvKX+P4gzlJfIORW+oSI90xgkzScQAbaFlI5TTtO5bKpv3RqJ/YCIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749819234; c=relaxed/simple;
-	bh=xsyK3DDIp1rgLxrUI+jVN6D+Sh2hh46tvv4RC/83r74=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FBNIqPkccJQf55a4MsJMzbwO8nYgO26h8e/Hc7Lb/DMHOndqLOZoTgMQeDndn0GOlSrRRUECsYonAh7VX8ECHO2MpNBF2pgD8a/ThLWQjHU7qdrwBCVIoi4pgyhBBkKKfMu7K6INihmzxp0ZoCPKwAlY4LYo5xFrEtDI2M9+Bs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeLqN/GS; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-407a6c6a6d4so662619b6e.1;
-        Fri, 13 Jun 2025 05:53:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749819232; x=1750424032; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9uK7NfXjMZE9zyAnGAVVRnIGOP/qUCD+jt4heNuFuQs=;
-        b=FeLqN/GS2KD26DEN+Vt45XA4RqnQxDOxHo3/3vi1jaa3HClIXhOXgW/TMgQE/yTRwA
-         vyADfkfJl9ePvVZTEYNhLw7xLpz+SUl9ifZ6BUST5yrPp0nVRn47p2qlb0gzj4y0RRce
-         /qwgYznWGVOTdC07kFbcKWTAz26lK/61ictgbrteDDfNr1D/Znt8MWx4ti5WxBe50AYg
-         jgInfiy4jhKfMOXEveEAd8Rr5JJUrtMrUEgdboDc9mUDiNWhhGQUBOXXqUVSA7uTRYo7
-         /WtalYvTuds64RrAw++oxhM4UNjklODYlW3+0HtSf5gMn7b6C+aGJiDDIsUNuWdE3bYw
-         sRRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749819232; x=1750424032;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9uK7NfXjMZE9zyAnGAVVRnIGOP/qUCD+jt4heNuFuQs=;
-        b=GHnv9WfCdBpeE2gtEBPhs1NeiYJ9ily+4EThHb2i9I8NitzEDEKo+qNecyk3FMjtAn
-         f/+T10RtS0cG4uNsWHdM5ppHUdVtUpaSsjmP3jgVl95uXtq38NvV0qGwgPc47bUu38hI
-         eiwIIOyrdQZS5KTd/3NI9GTjFgVKJbI4Dmg4cU4qOoW5W4XeTQqVTJx3FNTI1NnSoxxs
-         dDPqqLh+2AVY7bsIPApoM1CC6Hfocz7H9kmicPQeQGeTNhdMBmkQjP4faVaJB4gJ7ZFm
-         M3ZGZST7YzVUPSaSp8ohRsU7y5QBtr71YWg5Nb0PGr836AwgNIsIqmEJYf5QkW7APmhW
-         pX6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUd7h0FT+t6Y0ldHEl7tXiQYorjr1YF59hm8jHYm9RbEemD836CMxKiKdEpUHzNIQQHikaxnjPEgF1MK58=@vger.kernel.org, AJvYcCWZfoGtjHuGcIvzGymiNEBujgt+REPRRZnmylMC+O2ak7gG5bS/bgHgOGcvAF2dHJZA2tgSUqHA@vger.kernel.org
-X-Gm-Message-State: AOJu0YxReKGjMDaRetfyMxZj6k6LTDu4m3gYEBs1A0dTPCbO1YyCP+N0
-	sHakQxAiGvYxNLpWpXtUdTtsPq7lKyIMO101V8H0gXLg4zvkti9BA4yL0HiWuES4gBuqkIBMLdK
-	EsuW55LrjAXQtmSxnMm4Ofn4TQwGyb8Q=
-X-Gm-Gg: ASbGncsKqwT88ql9sruHK+mOf8P8B/GuxUaexwF78AGub4czwNa8bzbbE548TX80I+T
-	1qL77QRTbF4oYsxfzi6FLOB93jfhNC5vWvXEu09x5pf6E/Lp36ERN2bFh4mS7vGk7ct47oy1uX9
-	opGZiXIQaEec/urBQ7JWlPF3zSM8nKxF0odmx6f/9Q3y5zui+pNVUfnfNQMrDBg1Q+MavPjbocv
-	g==
-X-Google-Smtp-Source: AGHT+IG4oeSmNbFar9MLWvDxuCLCzS1cvjPlujNGI66zalqzF9G7WhJe/7gNkuUgdZQZqQaDPQKfIQiwXIfWMIU4QXY=
-X-Received: by 2002:a05:6808:4fe9:b0:404:dd07:9703 with SMTP id
- 5614622812f47-40a723a0827mr2330242b6e.26.1749819231675; Fri, 13 Jun 2025
- 05:53:51 -0700 (PDT)
+	s=arc-20240116; t=1749819259; c=relaxed/simple;
+	bh=rTFIi2usA4Iknjpjancsasj407AUD6ipJNUXYjs3KBQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=ljD1HOZLx3OjiTJNmfBt9o4OqjdEkdotfOTxGcAHsESBf7FZO2RwBLzfnXugC5ps9V01X8LmoCXPH2yH2VFEn7gTEE1iWzu5Ma3vvNuap5FiviDZBD4MQbZlnYtHzGRpuz/m/O2WCqZ6Xj0ZCojI+xkBchxY80EhlFj2yF5HyLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=es8djR6v; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=twkhsV1zF0hL+QCGl5QNOY+ykroDooxraR5ZCGY5fWM=; b=es8djR6vmm6TqtJIf58kZsllKp
+	TzJmAZ2/GXq/4luB7VASVqpOdTNjmUPkZPjYIo/46HunuURSwxzibLkvBHzA2N04pV4VoNgxw7tEz
+	OI4eiivibzdE0CYnkl7EDz57A2S9ANJUUPUf0+fAvvlfdIdqNVR5c9jVzwpzZqAQW+By7viRsMlaN
+	JlH4U6dDN0c9ppdK0lZWJjHlkUu4GhkKE/3U3K0J7xDUtvjetOUG03C0QYigVF+yznKZPGVpNcUh7
+	Ov4XQ+082tULqHZDQBDRXrGp/uiXZwj2YV0xBKWhlKyWNNhXjKmOY8WyNiQTocNk1DBm1k6RTAAIv
+	sJCo7lHw==;
+Received: from [122.175.9.182] (port=23246 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1uQ3uu-0000000DXDE-3J6J;
+	Fri, 13 Jun 2025 08:53:57 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 079A91781C8F;
+	Fri, 13 Jun 2025 18:23:43 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id DB65117882B2;
+	Fri, 13 Jun 2025 18:23:42 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id tfKVzeSMqLXe; Fri, 13 Jun 2025 18:23:42 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 8286E1781C8F;
+	Fri, 13 Jun 2025 18:23:42 +0530 (IST)
+Date: Fri, 13 Jun 2025 18:23:42 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	s hauer <s.hauer@pengutronix.de>, m-karicheri2 <m-karicheri2@ti.com>, 
+	glaroque <glaroque@baylibre.com>, afd <afd@ti.com>, 
+	saikrishnag@marvell.com, m-malladi <m-malladi@ti.com>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	horms <horms@kernel.org>, s-anna <s-anna@ti.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <909024001.1496409.1749819222224.JavaMail.zimbra@couthit.local>
+In-Reply-To: <cdcd54ff-ff67-4ad8-8aa7-baa711928242@linux.dev>
+References: <20250610105721.3063503-1-parvathi@couthit.com> <20250610123245.3063659-7-parvathi@couthit.com> <cdcd54ff-ff67-4ad8-8aa7-baa711928242@linux.dev>
+Subject: Re: [PATCH net-next v8 06/11] net: ti: prueth: Adds HW timestamping
+ support for PTP using PRU-ICSS IEP module
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749723671.git.mchehab+huawei@kernel.org>
- <08ac4b3457b99037c7ec91d7a2589d4c820fd63a.1749723671.git.mchehab+huawei@kernel.org>
- <m2y0tvnb0e.fsf@gmail.com> <20250613144014.5ae14ae0@foz.lan>
-In-Reply-To: <20250613144014.5ae14ae0@foz.lan>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Fri, 13 Jun 2025 13:53:40 +0100
-X-Gm-Features: AX0GCFueKdzQLScURrrCaq--58okmj1NFh4Gy-SFqVk9_ecMKypyt0JhaFhZIuE
-Message-ID: <CAD4GDZwLW0yogWitN5vbfkDhpZZ=0YCnDh+taRzwnv_CY9Miag@mail.gmail.com>
-Subject: Re: [PATCH v2 06/12] scripts: lib: netlink_yml_parser.py: use classes
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Akira Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Ignacio Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>, 
-	Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, joel@joelfernandes.org, 
-	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org, 
-	stern@rowland.harvard.edu
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds HW timestamping support for PTP using PRU-ICSS IEP module
+Thread-Index: 8LzCZ2vNfRRRUg8kt8zc1YlyHE5Drg==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Fri, 13 Jun 2025 at 13:40, Mauro Carvalho Chehab
-<mchehab+huawei@kernel.org> wrote:
->
-> Em Fri, 13 Jun 2025 12:20:33 +0100
-> Donald Hunter <donald.hunter@gmail.com> escreveu:
->
-> > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
-> >
-> > > As we'll be importing netlink parser into a Sphinx extension,
-> > > move all functions and global variables inside two classes:
-> > >
-> > > - RstFormatters, containing ReST formatter logic, which are
-> > >   YAML independent;
-> > > - NetlinkYamlParser: contains the actual parser classes. That's
-> > >   the only class that needs to be imported by the script or by
-> > >   a Sphinx extension.
-> >
-> > I suggest a third class for the doc generator that is separate from the
-> > yaml parsing.
->
-> Do you mean moving those two (or three? [*]) methods to a new class?
->
->     def parse_yaml(self, obj: Dict[str, Any]) -> str:
->     def parse_yaml_file(self, filename: str) -> str:
->     def generate_main_index_rst(self, output: str, index_dir: str) -> None:
->
-> Also, how should I name it to avoid confusion with NetlinkYamlParser?
-> Maybe YnlParser?
+Hi,
 
-On second thoughts, I see that the rst generation is actually spread
-through all the parse_* methods so they are all related to doc generation.
+> On 10/06/2025 13:32, Parvathi Pudi wrote:
+>> From: Roger Quadros <rogerq@ti.com>
+>> 
+>> PRU-ICSS IEP module, which is capable of timestamping RX and
+>> TX packets at HW level, is used for time synchronization by PTP4L.
+>> 
+>> This change includes interaction between firmware and user space
+>> application (ptp4l) with required packet timestamps. The driver
+>> initializes the PRU firmware with appropriate mode and configuration
+>> flags. Firmware updates local registers with the flags set by driver
+>> and uses for further operation. RX SOF timestamp comes along with
+>> packet and firmware will rise interrupt with TX SOF timestamp after
+>> pushing the packet on to the wire.
+>> 
+>> IEP driver is available in upstream and we are reusing for hardware
+>> configuration for ICSSM as well. On top of that we have extended it
+>> with the changes for AM57xx SoC.
+>> 
+>> Extended ethtool for reading HW timestamping capability of the PRU
+>> interfaces.
+>> 
+>> Currently ordinary clock (OC) configuration has been validated with
+>> Linux ptp4l.
+>> 
+>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>> ---
+>>   drivers/net/ethernet/ti/icssg/icss_iep.c      |  42 ++
+>>   drivers/net/ethernet/ti/icssm/icssm_ethtool.c |  23 +
+>>   drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 443 +++++++++++++++++-
+>>   drivers/net/ethernet/ti/icssm/icssm_prueth.h  |  11 +
+>>   .../net/ethernet/ti/icssm/icssm_prueth_ptp.h  |  85 ++++
+>>   5 files changed, 602 insertions(+), 2 deletions(-)
+>>   create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ptp.h
+> 
+> [...]
+> 
+>> @@ -732,9 +949,22 @@ int icssm_emac_rx_packet(struct prueth_emac *emac, u16
+>> *bd_rd_ptr,
+>>   		src_addr += actual_pkt_len;
+>>   	}
+>>   
+>> +	if (pkt_info->timestamp) {
+>> +		src_addr = (void *)PTR_ALIGN((uintptr_t)src_addr,
+>> +					   ICSS_BLOCK_SIZE);
+>> +		dst_addr = &ts;
+>> +		memcpy(dst_addr, src_addr, sizeof(ts));
+>> +	}
+>> +
+>>   	if (!pkt_info->sv_frame) {
+>>   		skb_put(skb, actual_pkt_len);
+>>   
+>> +		if (icssm_prueth_ptp_rx_ts_is_enabled(emac) &&
+>> +		    pkt_info->timestamp) {
+>> +			ssh = skb_hwtstamps(skb);
+>> +			memset(ssh, 0, sizeof(*ssh));
+>> +			ssh->hwtstamp = ns_to_ktime(ts);
+>> +		}
+>>   		/* send packet up the stack */
+>>   		skb->protocol = eth_type_trans(skb, ndev);
+>>   		netif_receive_skb(skb);
+> 
+> Could you please explain why do you need to copy timestamp to a
+> temporary variable if you won't use it in some cases? I believe these
+> 2 blocks should be placed under the last if condition and simplified a
+> bit, like
+> 
+> +		if (icssm_prueth_ptp_rx_ts_is_enabled(emac) &&
+> +		    pkt_info->timestamp) {
+> +			src_addr = (void*)PTR_ALIGN((uintptr_t)src_addr,
+> +					   ICSS_BLOCK_SIZE);
+> +			memcpy(&ts, src_addr, sizeof(ts));
+> +			ssh = skb_hwtstamps(skb);
+> +			ssh->hwtstamp = ns_to_ktime(ts);
+> +		}
+> 
+> This will avoid useless copy when the packet will be dropped anyway, WDYT?
 
-I suggest putting all the parse_* methods into a class called
-YnlDocGenerator, so just the 2 classes.
+Yes, we can merge both the if conditions to make it simple.
 
-And I'm hoping that generate_main_index_rst can be removed.
+We will address this in the next version.
 
-> [*] generate_main_index_rst is probably deprecated. eventually
->     we may drop it or keep it just at the command line stript.
->
-> > The yaml parsing should really be refactored to reuse
-> > tools/net/ynl/pyynl/lib/nlspec.py at some point.
->
-> Makes sense, but such change is out of the scope of this series.
-
-Agreed
-
-Thanks,
-Donald.
+Thanks and Regards,
+Parvathi.
 
