@@ -1,107 +1,138 @@
-Return-Path: <netdev+bounces-197390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64FAAD87BC
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:27:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4549AD859D
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 10:30:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45DCA3A75AA
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:26:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9E6B3A6FDD
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 08:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D434F28135D;
-	Fri, 13 Jun 2025 09:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14FD279DDB;
+	Fri, 13 Jun 2025 08:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b8I/jcG7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BnJGbMk/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225A1256C73;
-	Fri, 13 Jun 2025 09:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCF9279DCA;
+	Fri, 13 Jun 2025 08:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749806817; cv=none; b=sdV7vfde+Qv0RipDZ4WgD0Q+0HYH8XOsd/WbOD2PNZ+Gj6m9/p6JRPhoUFEprCtLu3WZHFDatVoC0bqgymA+VvWxprYvPc5GQN6e5jbkqRkiMrcdo9Uk+71aGr2xmaIqP6SlmtBI4Rsum1FH6F+SMr6YuHpDXD8ExpuJIkXu31o=
+	t=1749803209; cv=none; b=bPC7d23Qz0eHuBJ1QECQA2lKlBLyPloN2PkqZmbRwxT5Swzgy4aJhDIwpofWFCV+9oZvN84q2v1ycdyi9l+d5o7ndYlzqWe961pK/QLDRV8/PyU5afT/j6o06dTejq95umD0iycTHnn9WGQipCiVqDxQ6QL7mIWU9eN0jqyyfyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749806817; c=relaxed/simple;
-	bh=Q5BhcgYpE35Y8AxcdDXKZviSULn7xDLW+iYnDJ09n7Y=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Cvu2xcf1OwctF/68W21TmGNW5snNkc6q5GKLhZUbPyucXU13pfjqvkd9JrdH+YdYPMhGcAQM4VI54VLb/01UDyKLDaV0Av2A1BfZNM9RxwWEUi8IGmxAhLnU9Oj1l+eP3jtMb3jwbMaGKDaLRGpgcTlLNQ8Zlr2MjuF6s632oS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b8I/jcG7; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-451d3f72391so25058495e9.3;
-        Fri, 13 Jun 2025 02:26:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749806814; x=1750411614; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Itja5tG6Qc2KiSi1iAZTXe7H2ni0UGVq2sw+wpmt+pc=;
-        b=b8I/jcG7pVixJfDnTkSOJZQMIHjZ0y0rIeieVDjWnYBTBsq98bxy3a6NEdTHzW6BNT
-         9onF45FJmkCKtFS2hI+lkQpo+ALf6ooEVhmQ/DY4CNMfdjqORr1HxZKO3rTc9XrCDkbr
-         6BIAungUXFlJQqYq2RXsHfU75xSndEUBbZn3aVBSNEVXpLGI9ULNS1qGih8Sg1kkj28e
-         kNTm9rZeXOUA4Wwy3BAm7sUxQ7hDGX1t+Dde1CSPQZCZ7HXrlVzfFQhEJ1fLi9HRsCNt
-         uXqKjuupN71gCQqjs9+A6mxQsuKPyiscOWbkVTkrxVKDkVdNOzNh62pDVRDINQn+strY
-         Uf4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749806814; x=1750411614;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Itja5tG6Qc2KiSi1iAZTXe7H2ni0UGVq2sw+wpmt+pc=;
-        b=IPR5W9ZA0alpdRQJclgU0HluDiBJtxKqLUo/6RKWY52+3O3w311ydy99fVbZKc3qAj
-         SuwKUXMF+DYAA+YE4x8FKyhxIJ9fLWyHZq/71B+QgacQMrQj+gfr7S4avceHrZ9sHwiJ
-         XyEePYSLWYUkjUE2gVwzBZRU6xPRAt4NrK1MXvVjjEYnIZeJlpaRayu0R+yMdPitgIx4
-         7hssZFK0qQpz/c+rry/CWDqkwY9ZIj5lUSgTTN0mIp64lff1Lo0lcHHYqHnCca7s5rRR
-         g/bipGvpidXAzNfi3DkWMZeJwnntBR1K+6Aq328lYD3I4q8SExIwU52E637jkjHfmnXW
-         L8zA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhYAiQaU0W5sGUbpDZfWOWCcbVLz3/WjyhraScX4Q7T+pftr45m11cwebO9AWJ/yvucww3OCp3@vger.kernel.org, AJvYcCXIMke6S966bMhv/jyPPrnP2lMU4Sg2K3KQmofz+0ZMFL+a9vn54WltiFicbyrRjmm9l68NUZa7vVBhSUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOiFDbP49YcpE5MENnVmKmwJbif78i71XLpJrHcHgwcaK66dlv
-	8wTikIevzqJddWM2+sym8jnrPizdwPtadVhchu+S7Yv4GEAPOU7lSv1C
-X-Gm-Gg: ASbGncsptgGactUSyDibv4fT9rjOQEuAfXIE1NXPMldbf+WKepqPrgbpPCIL59EkqSd
-	M6G2Bhtfsgxj8QyW+H4bqzTcudW+BumON/F1LexXRixgPnZ95zTceqNZgySeC7uD1z5a5Ot7FM8
-	oymloKQt48eEtBVU/kun/v5QWr2Pb90RXmiCLqp/o9lk/wGsn5VGkBLR8ddtSp7kYj/QpfDqikr
-	Xbq13OnfOsU9ZYE9A2ncVGo01vZRA/1MTgLhZHpzEdwkLrlMsug6wZAe/xVHpz1QWXm4mLPRa8p
-	7rIJYk/RPPQ0Phtyw2Mc0Qv8porV/xX16D/vvX3+8YFqxtnuxp+4lju++fbR9c5DsBj3wLCqy34
-	=
-X-Google-Smtp-Source: AGHT+IEBTo7kIZ4DJ8graOHN/KQaV05qSrUjoSPXsongpILB30NWUheQhDMVK1PCPCF5Qi8PHQzzXQ==
-X-Received: by 2002:a05:600c:4f16:b0:44d:a244:4983 with SMTP id 5b1f17b1804b1-45335582b9dmr20908865e9.3.1749806814082;
-        Fri, 13 Jun 2025 02:26:54 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:75e0:f7f7:dffa:561e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b2c957sm1747795f8f.76.2025.06.13.02.26.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 02:26:53 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  linux-kernel@vger.kernel.org,  Akira Yokosawa
- <akiyks@gmail.com>,  "David S. Miller" <davem@davemloft.net>,  Ignacio
- Encinas Rubio <ignacio@iencinas.com>,  Marco Elver <elver@google.com>,
-  Shuah Khan <skhan@linuxfoundation.org>,  Eric Dumazet
- <edumazet@google.com>,  Jan Stancek <jstancek@redhat.com>,  Paolo Abeni
- <pabeni@redhat.com>,  Ruben Wauters <rubenru09@aol.com>,
-  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
-  lkmm@lists.linux.dev,  netdev@vger.kernel.org,  peterz@infradead.org,
-  stern@rowland.harvard.edu,  Breno Leitao <leitao@debian.org>
-Subject: Re: [PATCH v2 0/2] Some extra patches for netlink doc generation
-In-Reply-To: <cover.1749735022.git.mchehab+huawei@kernel.org>
-Date: Fri, 13 Jun 2025 09:24:43 +0100
-Message-ID: <m2ldpwnj5g.fsf@gmail.com>
-References: <cover.1749735022.git.mchehab+huawei@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1749803209; c=relaxed/simple;
+	bh=oy7cnpuIfUbxnBIHzSxSzs3wF3pN160eEFEtn1XrHHA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=PGjcvFLqwwHFY7Wvxpv8rNgBQzvR8EAtgx5Io/C9T2cNTKGlVikOWVQLHWaMdS/YQae6FUbnv+rHqNJDYeOE8Po+TweENGgpLf2UyhS4a8mgqfgFC6xhoFkxQRGZmwUm5ttDGSOg8lGTiKLVbRct9KUf3LQexZKVe53Ol82WLNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BnJGbMk/; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B142A41C06;
+	Fri, 13 Jun 2025 08:26:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749803203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oy7cnpuIfUbxnBIHzSxSzs3wF3pN160eEFEtn1XrHHA=;
+	b=BnJGbMk/e7fYDOccAaKbhkPl6Zkb+CJk54xIzM7oGJ/68LdgKmC814rIU32t6tdn2RLttv
+	x15WZiOubSuud24F243NbAQNPG2k3Dui7U5bdWbzo6Lo7AjeJ+KSplTU5N9Z/cTjXj0Rr9
+	AtxWE42xFJSR7fqyJtvD37GTtg2rovAwTR+VAfdN1C4ZXMlk7rhOwNdTxFQnBalxqPz9tm
+	e/OD8ENjC+yzoBhzLvEBBNcwIj7ZN9YK2gi89xBilq+iVetQOvwYaFKA3l+J6erZ08hSMo
+	zVQuK+p9cI9MOofvRUYJC5RnI8Wf/o3bDNy4BjM6rT5BKMfG/sqEM22GLR1tVQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 13 Jun 2025 10:26:37 +0200
+Message-Id: <DAL9GRMH74F4.2IV0HN0NGU65X@bootlin.com>
+Cc: "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
+ <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Martin
+ KaFai Lau" <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>,
+ "Song Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>,
+ "John Fastabend" <john.fastabend@gmail.com>, "KP Singh"
+ <kpsingh@kernel.org>, "Stanislav Fomichev" <sdf@fomichev.me>, "Hao Luo"
+ <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>, "Thomas
+ Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
+ Petkov" <bp@alien8.de>, "Dave Hansen" <dave.hansen@linux.intel.com>,
+ <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, "Menglong Dong"
+ <imagedong@tencent.com>, =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?=
+ <bjorn@kernel.org>, "Pu Lehui" <pulehui@huawei.com>, "Puranjay Mohan"
+ <puranjay@kernel.org>, "Paul Walmsley" <paul.walmsley@sifive.com>, "Palmer
+ Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Ilya Leoshkevich" <iii@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger"
+ <borntraeger@linux.ibm.com>, "Sven Schnelle" <svens@linux.ibm.com>, "Hari
+ Bathini" <hbathini@linux.ibm.com>, "Christophe Leroy"
+ <christophe.leroy@csgroup.eu>, "Naveen N Rao" <naveen@kernel.org>,
+ "Madhavan Srinivasan" <maddy@linux.ibm.com>, "Michael Ellerman"
+ <mpe@ellerman.id.au>, "Nicholas Piggin" <npiggin@gmail.com>, "Mykola
+ Lysenko" <mykolal@fb.com>, "Shuah Khan" <shuah@kernel.org>, "Maxime
+ Coquelin" <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
+ <alexandre.torgue@foss.st.com>, <ebpf@linuxfoundation.org>, "Thomas
+ Petazzoni" <thomas.petazzoni@bootlin.com>, "Bastien Curutchet"
+ <bastien.curutchet@bootlin.com>, <netdev@vger.kernel.org>,
+ <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@rivosinc.com>,
+ <linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+ <linuxppc-dev@lists.ozlabs.org>, <linux-kselftest@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH bpf 2/7] bpf/x86: prevent trampoline attachment when
+ args location on stack is uncertain
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Peter Zijlstra" <peterz@infradead.org>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a
+References: <20250613-deny_trampoline_structs_on_stack-v1-0-5be9211768c3@bootlin.com> <20250613-deny_trampoline_structs_on_stack-v1-2-5be9211768c3@bootlin.com> <20250613081150.GJ2273038@noisy.programming.kicks-ass.net>
+In-Reply-To: <20250613081150.GJ2273038@noisy.programming.kicks-ass.net>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddujeegiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepggfgtgffkfevuffhvffofhgjsehtqhertdertdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvdfftdejhefhieelvefhgeffvddulefhfeegleegkefgffejgeffjeeigfdtveeinecuffhomhgrihhnpehlihhnuhigsggrshgvrdhorhhgpdgsohhothhlihhnrdgtohhmnecukfhppedvrgdtvdemkeegvdekmehfleegtgemvgdttdemmehfkeehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddvmeekgedvkeemfhelgegtmegvtddtmeemfhekhedphhgvlhhopehlohgtrghlhhhoshhtpdhmrghilhhfrhhomheprghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeehkedprhgtphhtthhopehpvghtvghriiesihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopegrnhgurhhiihesk
+ hgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtohepvgguugihiiekjeesghhmrghilhdrtghomhdprhgtphhtthhopehsohhngheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephihonhhghhhonhhgrdhsohhngheslhhinhhugidruggvvh
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+Hi Peter,
 
-> This patch series comes after:
-> 	https://lore.kernel.org/linux-doc/cover.1749723671.git.mchehab+huawei@kernel.org/T/#t
+On Fri Jun 13, 2025 at 10:11 AM CEST, Peter Zijlstra wrote:
+> On Fri, Jun 13, 2025 at 09:37:11AM +0200, Alexis Lothor=C3=A9 (eBPF Found=
+ation) wrote:
+>> When the target function receives more arguments than available
+>> registers, the additional arguments are passed on stack, and so the
+>> generated trampoline needs to read those to prepare the bpf context,
+>> but also to prepare the target function stack when it is in charge of
+>> calling it. This works well for scalar types, but if the value is a
+>> struct, we can not know for sure the exact struct location, as it may
+>> have been packed or manually aligned to a greater value.
+>
+> https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf
+>
+> Has fairly clear rules on how arguments are encoded. Broadly speaking
+> for the kernel, if the structure exceeds 2 registers in size, it is
+> passed as a reference, otherwise it is passed as two registers.
 
-Can you please incorporate this series into a v3 of the other patch set.
+Maybe my commit wording is not precise enough, but indeed, there's not
+doubt about whether the struct value is passed on the stack or through a
+register/a pair of registers. The doubt is rather about the struct location
+when it is passed _by value_ and _on the stack_: the ABI indeed clearly
+states that "Structures and unions assume the alignment of their most
+strictly aligned component" (p.13), but this rule is "silently broken" when
+a struct has an __attribute__((packed)) or and __attribute__((aligned(X))),
+and AFAICT this case can not be detected at runtime with current BTF info.
+
+--=20
+Alexis Lothor=C3=A9, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
