@@ -1,97 +1,162 @@
-Return-Path: <netdev+bounces-197392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC03AAD881D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:40:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7572AD8858
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 11:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A91C3B9865
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:39:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94681189E532
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 09:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9D329B77B;
-	Fri, 13 Jun 2025 09:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AC72E0B5B;
+	Fri, 13 Jun 2025 09:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KADZTM+/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aCQ+ArOM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877BE291C3F;
-	Fri, 13 Jun 2025 09:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCF12DECBE;
+	Fri, 13 Jun 2025 09:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749807603; cv=none; b=Kr3w076cIeBQHbB9t7q/L2D87yxHT4SVqErnzBywQqQTA343rLxMULYf9Ig6T0oWM1eRgjYC4fxM63nMlks1rJ8krKXb9sdMh9gSjInFDz2tVq1dSNei9MG//nZTePpQZ/5WX2XpRNdXSSNh241qWnPYvqsDMoIPKj2H/VKKmYA=
+	t=1749807936; cv=none; b=DEpJ3CUEJJxeFkVAdvEX2EDEHPzVgy1Xpdb0k5FtVVm+KBX6hEiGp+ig73z5T05XFJDSVCu344+3/BlFF0oyfT667F2uBVUwlsdIGWAqJJggpG34i1pwjKgPD8e6AYdPy+wwjVFSNzHPEEWMUxHcqGd4yqNEO1JxbZsO/zN9NcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749807603; c=relaxed/simple;
-	bh=za8/vpwkReY5XqUs1welIaOGqWewUieTwjva2NznrQ8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Zn7usJTPV7SmxJ0C8cfyDqLWBKphCuHUGz73CWj4OoSIm+KSsIwvVm93/fhAn0jKwUw/DHhuQpPUysB14KhjNDO3nXx7o2/AOWggd0mmoUemMySoxrQdkgShyAOi83QO9+Z3fjFShLBjaMdI8rBM0WEGsMcgfqL5PEwW88T7sEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KADZTM+/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE67C4CEEB;
-	Fri, 13 Jun 2025 09:40:03 +0000 (UTC)
+	s=arc-20240116; t=1749807936; c=relaxed/simple;
+	bh=KZ0BWcWO/Nnu1q5NglmWAod4+nGJ2WWcd5CNjfdsUO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9EoiobhyFhlJHavrBmsG1n+E6i3WdZmYFHOznN4EK5SPkXrYWe2NMjFT40hEIOxrFOoVlfGVl2pzfj5BMW6Gk/oEb7Qmc6rpJjsZOgtRzjDCBhO27CRVCaPJ/tKePnxZAtQLRgi8I7+/lN6ecOXCKPM9qlOSk2AI7QpeBOkCcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aCQ+ArOM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7727C4CEEB;
+	Fri, 13 Jun 2025 09:45:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749807603;
-	bh=za8/vpwkReY5XqUs1welIaOGqWewUieTwjva2NznrQ8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KADZTM+/gfCOnhk0JqBuzr6sMlXwXX9kxWx/dwf++iUX1ioznGGUxmrjjL9j55KBm
-	 jC4axalDiomZwO1tJa4TOtTXnaOYOxpN/Uagx24voUw+J0A81cqp8mImkfO6X9cm2q
-	 F59skeKEZQHi3rPQIG9coGShvTleb95OtacwPGuu7AC2EsUULYKf/0Fw+Dm+cxRDd6
-	 KubDwm61mneOlMtdRsGGJB9E8xDu+RddupMvBElStFlMQhtLFaeMTFexXMH9ZEcBaA
-	 OmQhERXuzD1NcXpHE56TEPVX+3Yb6SMJ2LeHSPlHeXs7diU0CgGaEuSpIBXu+4mvj3
-	 EvIcN04lnWlOA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE0139EFFD0;
-	Fri, 13 Jun 2025 09:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749807936;
+	bh=KZ0BWcWO/Nnu1q5NglmWAod4+nGJ2WWcd5CNjfdsUO4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aCQ+ArOMfZ8sj9/trk2RN4zzQmNDRm57UcCwHqzSNmBb3apdfrSNyzaknWyYLRPjh
+	 6E3L22twogCDgusyUyZzDGlDING27CHkfgVwL7Qfe5BDfSkbBp55e6vFTCsUCYhfWa
+	 iFB8yIknypSzugsOXAz7FH6q/xY/0xFIUp7GlroH+Qbv1fuibs4wDOAL+dnSd7SmBh
+	 PUekiEcVEkwP6WVmzgXHMenCSFCR5E17+KZjgA7/phOXpz9JEn4cTHyKgpHeTYwm+V
+	 Fhc+PM/4QdvEhSmY2I4S88xQ+fYARMAcOlJnmoU94LA5kiKThUq2MTXDYd0v0NZdZI
+	 bcsXM5H49D58w==
+Date: Fri, 13 Jun 2025 11:45:22 +0200
+From: Niklas Cassel <cassel@kernel.org>
+To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jaehoon Chung <jh80.chung@samsung.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Shreeya Patel <shreeya.patel@collabora.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Sandy Huang <hjc@rock-chips.com>,
+	Andy Yan <andy.yan@rock-chips.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Shawn Lin <shawn.lin@rock-chips.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	MyungJoo Ham <myungjoo.ham@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Qin Jian <qinjian@cqplus1.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, kernel@collabora.com,
+	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
+	linux-sound@vger.kernel.org, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH 17/20] PCI: dw-rockchip: switch to HWORD_UPDATE macro
+Message-ID: <aEvzMnxgsjfryCOo@ryzen>
+References: <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
+ <20250612-byeword-update-v1-17-f4afb8f6313f@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] ionic: three little changes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174980763275.655581.9383760132126182573.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Jun 2025 09:40:32 +0000
-References: <20250609214644.64851-1-shannon.nelson@amd.com>
-In-Reply-To: <20250609214644.64851-1-shannon.nelson@amd.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, brett.creeley@amd.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250612-byeword-update-v1-17-f4afb8f6313f@collabora.com>
 
-Hello:
+Hello Nicolas,
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 9 Jun 2025 14:46:41 -0700 you wrote:
-> These are three little changes for the code from inspection
-> and testing.
+On Thu, Jun 12, 2025 at 08:56:19PM +0200, Nicolas Frattaroli wrote:
 > 
-> Shannon Nelson (3):
->   ionic: print firmware heartbeat as unsigned
->   ionic: clean dbpage in de-init
->   ionic: cancel delayed work earlier in remove
+> PCIE_CLIENT_RC_MODE/PCIE_CLIENT_EP_MODE was another field that wasn't
+> super clear on what the bit field modification actually is. As far as I
+> can tell, switching to RC mode doesn't actually write the correct value
+> to the field if any of its bits have been set previously, as it only
+> updates one bit of a 4 bit field.
 > 
-> [...]
+> Replace it by actually writing the full values to the field, using the
+> new HWORD_UPDATE macro, which grants us the benefit of better
+> compile-time error checking.
 
-Here is the summary with links:
-  - [net-next,1/3] ionic: print firmware heartbeat as unsigned
-    https://git.kernel.org/netdev/net-next/c/696158ff4dcd
-  - [net-next,2/3] ionic: clean dbpage in de-init
-    https://git.kernel.org/netdev/net-next/c/c9080abea1e6
-  - [net-next,3/3] ionic: cancel delayed work earlier in remove
-    https://git.kernel.org/netdev/net-next/c/52fdba899e6f
+The current code looks like this:
+#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE_BIT(0x40)
+#define  PCIE_CLIENT_EP_MODE            HIWORD_UPDATE(0xf0, 0x0)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The device_type field is defined like this:
+4'h0: PCI Express endpoint
+4'h1: Legacy PCI Express endpoint
+4'h4: Root port of PCI Express root complex
+
+The reset value of the device_type field is 0x0 (EP mode).
+
+So switching between RC mode / EP mode should be fine.
+
+But I agree, theoretically there could be a bug if e.g. bootloader
+has set the device_type to 0x1 (Legacy EP).
+
+So if you want, you could send a patch:
+-#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE_BIT(0x40)
++#define  PCIE_CLIENT_RC_MODE            HIWORD_UPDATE(0xf0, 0x40)
+
+With:
+Fixes: 0e898eb8df4e ("PCI: rockchip-dwc: Add Rockchip RK356X host controller driver")
+
+But I also think that your current patch is fine as-is.
+
+I do however think that you can drop this line:
++#define  PCIE_CLIENT_MODE_LEGACY       0x1U
+
+Since the define is never used.
 
 
+Also, is there any point in adding the U suffix?
+
+Usually you see UL or ULL suffix, when that is needed, but there actually
+seems to be extremely few hits of simply U suffix:
+$ git grep 0x1U | grep -v UL
+
+
+Kind regards,
+Niklas
 
