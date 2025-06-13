@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-197668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF24AD9895
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:20:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9F9AD9896
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:20:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6100E3B327D
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:19:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2387F3BCF38
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 23:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB29328ECF5;
-	Fri, 13 Jun 2025 23:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2005228F53F;
+	Fri, 13 Jun 2025 23:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="g6tmtOmB"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BHxuyeFP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3760828EA70
-	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2EF28ECF1
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749856790; cv=none; b=TuP/+d4+DBTPv0IxZhaOVpDnFrVwJx5O4g7hB5GPUpW5FaRaUPCT6Je6lobRtMBrfFhPlQ8qgqZqPWRlzgeRu2oHBQ1dDM9MX4gQrttVN504GMdNGPp0yBq8bCRfQSTWCsxnZlXLzzQGfFHg0fyJWwMuAF3MVj0mLxDZtKsHYEI=
+	t=1749856792; cv=none; b=faBb/CmkdyX2rVSpa5xtX9T9HVgoryTcg9KU0cB0i8HTLsDNtI85HzCKAWafvxX9R+pM1srF7oxt98KJ6pY3galjGT561E1RwL4BIw04A/7y0YypLaPBUC1zhmncYfv+h1fh5CJdLUwmqWhAmmltqhRUJd0zEj7Lzi7iKYgHef0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749856790; c=relaxed/simple;
-	bh=f97uSdPuIUpH/JHA5+3InRCGD5Y3M66SpKbTRU4aNIY=;
+	s=arc-20240116; t=1749856792; c=relaxed/simple;
+	bh=m5oYX3vbTzUQ3Ht6+BVE6GOrth/Ag+qECMeBixWesgM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lb4Q9DHMAdWaHTFPj/Tf9zOQDDnX27Qt09NqLXoMWGAjW+d7LqJjIc07jB65h87rRvvOLih4P+agscdKhfyKwnevLPofCqEdAKohW0Y5fyv4AtbUvhs+XdIirhFNTRHHYalPQepR6M2xqQ/TZWmxGgBGHIn63M/CRPE8iBFkzI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=g6tmtOmB; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version; b=dWcRs2F9sJ74Kd1mHYf/jsUZ7WCQKp5Y7H+Hx9NzXpSF7oa+Lovz2VqNq2OxJ2dhNW055mwzZleO/xTijIc2ettAXt6UCSYugsWtxcczeghtXYzBcebIPitmYeprsOxOePpZLEA/giAufnFUYozlKwEIsOlyDeuSrC/ggq93Dao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BHxuyeFP; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23602481460so26127125ad.0
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:19:49 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b3182c6d03bso431351a12.0
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 16:19:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1749856788; x=1750461588; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1749856790; x=1750461590; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zawp7laAFSiGVcnf04IiwkuedZ7uaAlNM2L+G0Uod1I=;
-        b=g6tmtOmBDZmuR74gyQ53ZLn40aB512mJZ9uqZQprkjY0uLpPJR6hCJIJUCZpu4OYXf
-         kxok/lt5S4jiDNqVA2JvIP1JE/Laj9LpM4GwIQ6MHQlQGmovZArpmp/Y/Yw0zx50fwJw
-         GscAS6nTKvSGGmHm9g/ccgJncNOdw5JcnSB2o=
+        bh=uVJFf6Tk8f/73lfuF7ShZFKGZgbpogEA9SEqPZaBvXY=;
+        b=BHxuyeFP+dn2ZsZak4s3MZ/qcLCYIzJm2oLvClCl7VD/TtVoV6MumUek+uI916Bnkl
+         Oo1LMnOumcB2GQHm79qftDQANF/G26GRM2v8JCilTvRaLWgnueenyBR/lj3r6aEf8dVL
+         V+x/prr7lVk46pIssarjx2jkXMt1Odn1Kiwps=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749856788; x=1750461588;
+        d=1e100.net; s=20230601; t=1749856790; x=1750461590;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zawp7laAFSiGVcnf04IiwkuedZ7uaAlNM2L+G0Uod1I=;
-        b=kp1rV+qACEn7yYXzN4bFf2qGGzt/n+fOnV+k4Zw3igg482S3VtKIKPM9iofHZGUQmB
-         qiJLT6OAyxXIK4zuPyg0cbwfs9K6e+gTvHFKhza/UqMdUad5FKvbnOUudtjrP+uEfyty
-         KF9HMctVaJlto6t41XzjJJ3L7fV3+O+u6i0bs0hz98LjPrHB6rONYY9qxTQuKyvXs22u
-         Abu+5SOnWWQaDf+JDv1YuNYe5s9Nm4vg3Q7unTmI1us72rwybxREnABnsUP5lKIi05SR
-         Pw0J7oJhc+AQVEqJJfijAFbFbfngjcFPG3AInkrtOhw5SWWVMCPOzjrvUifvVob+ENd2
-         hnaQ==
-X-Gm-Message-State: AOJu0YwUac5eo7u5fAR5TSr5Qpi8BhWQpFVBdyFJ4BWSh3oDIM+AQzmn
-	XhkHnF6aiw184pAQNLF9/s9UoaexAG0hTlCloHBaP6y9vdSDJu2FA9vpRCsZpuoZPA==
-X-Gm-Gg: ASbGncstfAP2oT56ewLu0eHQOAdXIAo6YhqexXsb9pZSmUa9fOUnsUxTylPOFz2MngP
-	dVAhrkvel5qhQHx/1mgb28vbMOSvY7qGo7tBU5SsnIvFJ7GkRb4+Im8RePL4TTRoC9+FeNPo4ti
-	TtnlIIwlN+fxy8WNAYuKuVAWEKEe/Xfyx9AZP247Rpqtf9G6+Ejjt5C9lgYJctajGJtBeKlbrQi
-	PCnii8cY4spMOCgr+xbEdRV2nzjpVZ0aZTTJ7R+P4E4K5GviLwdjHXMLhVHfD6YZiqWvhJGWNov
-	EOmznO4T1Be17ST30qQIAcfy7BQu4VCOOUB5Q9psPb/dgOxPWPZx+ss4ftf8XE64Gs+vDyITzJE
-	sSAKN7e3XIdHh+u8QyV42CPcnbueuQza06c8amA==
-X-Google-Smtp-Source: AGHT+IGoHBiYVGC12QpDKU7MehRp9GPPcGFWxGMg+1dYExJDyLdkzeFZ28TmXQ28wTssdNHtgW1ZVA==
-X-Received: by 2002:a17:902:da85:b0:235:ea0d:ae23 with SMTP id d9443c01a7336-2366afc48f3mr15504215ad.6.1749856788592;
-        Fri, 13 Jun 2025 16:19:48 -0700 (PDT)
+        bh=uVJFf6Tk8f/73lfuF7ShZFKGZgbpogEA9SEqPZaBvXY=;
+        b=Xz7qmKnCNnyFlooeBxyU7qbabJwn0bUWIoXxUrfvSR+oQ9e8FWx9In4cC5uJdKAbjX
+         k3VTbatcKWTtE+/GSgP7uLWYMA3vmvZCRZouyISqjAJDWnd7rYohNV+MATd2tnujrTJK
+         xtpgkXolR7EhDMod65eLtPr6pdfL/JDnP9sOiwMAuIoUv+hl77/e5KRxgLY4ShLvj2oV
+         Vdn848XRn1PTcU/L7XTGfxIb9OME2gG1Nx0pBefoGY+MwqIDxrBAue1cyVbjFMGY3X/p
+         1nbAeSLYKnG6FyubwV7dTQms79UOP+XEu0XqWUAt9WUFc9AMQyDZG1PdtBAoRiwua7oI
+         /BGA==
+X-Gm-Message-State: AOJu0Yxc8g2yuySLmMZDnh/FKWL8uGbrkz+IQSiGYHF0D6Q2UD3jJHcA
+	+o/XL+eEdcNNNO8chrjzEj7AIU43YZ1ruxiWOYg7dzrDxQCQwrze3FGA7Xoa166Yeg==
+X-Gm-Gg: ASbGncuNa7okfzdvSPOPCCswdZKnDFcDluoy4unlPy1OtDpca78g6xhqYy/uFREP7wT
+	4GiwlgCWi5ZLjZ2SFwa4OwZ50Q3hZAQy1Oc0Ut4/adKVpCfFFBYDIVqCq+wE2pSNFYphfUCjKoe
+	JVZOvgIXaMVTGEYUlQd+EhG30QvmB3O5rczPS3OB4yc9cZydGp1mC1GtRJazkCWghLmsXPWE2Lv
+	d3XsCDF3rV3ozJx78uWsiGPRpPfvl+J6i9NhK5ifnSNM6D0BPf2FKyWpelGdKiNeBEX8voiM992
+	0CzTOyyROuEI97lf1SfNYL1lxrjCsdfGvla5MeSDIgwv9iFOrlj3e3zi+HTgOS1UwA8Bv9WtdQ6
+	bnE6G4DCg19uB2zW5ZH9ZMh7sAZqZx3KJeI96Gw==
+X-Google-Smtp-Source: AGHT+IE3HhRcNUnxLm4J28IeCCXBvkSftDPILp/8HnVRr08qGmKxJylGGUHD+2tuWvs352bgH1uaIg==
+X-Received: by 2002:a17:90a:dfc4:b0:313:1e60:584d with SMTP id 98e67ed59e1d1-313f1c0bcbbmr2264196a91.11.1749856789699;
+        Fri, 13 Jun 2025 16:19:49 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de7832asm20165105ad.140.2025.06.13.16.19.47
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de7832asm20165105ad.140.2025.06.13.16.19.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 16:19:47 -0700 (PDT)
+        Fri, 13 Jun 2025 16:19:49 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -78,11 +78,10 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Simon Horman <horms@kernel.org>,
 	David Wei <dw@davidwei.uk>
-Subject: [PATCH net 2/3] bnxt_en: Add a helper function to configure MRU and RSS
-Date: Fri, 13 Jun 2025 16:18:40 -0700
-Message-ID: <20250613231841.377988-3-michael.chan@broadcom.com>
+Subject: [PATCH net 3/3] bnxt_en: Update MRU and RSS table of RSS contexts on queue reset
+Date: Fri, 13 Jun 2025 16:18:41 -0700
+Message-ID: <20250613231841.377988-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20250613231841.377988-1-michael.chan@broadcom.com>
 References: <20250613231841.377988-1-michael.chan@broadcom.com>
@@ -96,49 +95,101 @@ Content-Transfer-Encoding: 8bit
 
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Add a new helper function that will configure MRU and RSS table
-of a VNIC. This will be useful when we configure both on a VNIC
-when resetting an RX ring.  This function will be used again in
-the next bug fix patch where we have to reconfigure VNICs for RSS
-contexts.
+The commit under the Fixes tag below which updates the VNICs' RSS
+and MRU during .ndo_queue_start(), needs to be extended to cover any
+non-default RSS contexts which have their own VNICs.  Without this
+step, packets that are destined to a non-default RSS context may be
+dropped after .ndo_queue_start().
 
-Suggested-by: Michael Chan <michael.chan@broadcom.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: David Wei <dw@davidwei.uk>
+We further optimize this scheme by updating the VNIC only if the
+RX ring being restarted is in the RSS table of the VNIC.  Updating
+the VNIC (in particular setting the MRU to 0) will momentarily stop
+all traffic to all rings in the RSS table.  Any VNIC that has the
+RX ring excluded from the RSS table can skip this step and avoid the
+traffic disruption.
+
+Note that this scheme is just an improvement.  A VNIC with multiple
+rings in the RSS table will still see traffic disruptions to all rings
+in the RSS table when one of the rings is being restarted.  We are
+working on a FW scheme that will improve upon this further.
+
+Fixes: 5ac066b7b062 ("bnxt_en: Fix queue start to update vnic RSS table")
+Reported-by: David Wei <dw@davidwei.uk>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
 Cc: David Wei <dw@davidwei.uk>
 
-v1: https://lore.kernel.org/netdev/20250519204130.3097027-3-michael.chan@broadcom.com/
+v2: Reduce scope of traffic disruptions.
+
+v1: https://lore.kernel.org/netdev/20250519204130.3097027-4-michael.chan@broadcom.com/
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 37 ++++++++++++++++-------
- 1 file changed, 26 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 56 +++++++++++++++++++++--
+ 1 file changed, 51 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 869580b6f70d..dfd2366d4c8c 100644
+index dfd2366d4c8c..2cb3185c442c 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10780,6 +10780,26 @@ void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
+@@ -10780,11 +10780,39 @@ void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
  	bp->num_rss_ctx--;
  }
  
-+static int bnxt_set_vnic_mru_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic,
-+				u16 mru)
++static bool bnxt_vnic_has_rx_ring(struct bnxt *bp, struct bnxt_vnic_info *vnic,
++				  int rxr_id)
 +{
++	u16 tbl_size = bnxt_get_rxfh_indir_size(bp->dev);
++	int i, vnic_rx;
++
++	/* Ntuple VNIC always has all the rx rings. Any change of ring id
++	 * must be updated because a future filter may use it.
++	 */
++	if (vnic->flags & BNXT_VNIC_NTUPLE_FLAG)
++		return true;
++
++	for (i = 0; i < tbl_size; i++) {
++		if (vnic->flags & BNXT_VNIC_RSSCTX_FLAG)
++			vnic_rx = ethtool_rxfh_context_indir(vnic->rss_ctx)[i];
++		else
++			vnic_rx = bp->rss_indir_tbl[i];
++
++		if (rxr_id == vnic_rx)
++			return true;
++	}
++
++	return false;
++}
++
+ static int bnxt_set_vnic_mru_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic,
+-				u16 mru)
++				u16 mru, int rxr_id)
+ {
+ 	int rc;
+ 
++	if (!bnxt_vnic_has_rx_ring(bp, vnic, rxr_id))
++		return 0;
++
+ 	if (mru) {
+ 		rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
+ 		if (rc) {
+@@ -10800,6 +10828,24 @@ static int bnxt_set_vnic_mru_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic,
+ 	return 0;
+ }
+ 
++static int bnxt_set_rss_ctx_vnic_mru(struct bnxt *bp, u16 mru, int rxr_id)
++{
++	struct ethtool_rxfh_context *ctx;
++	unsigned long context;
 +	int rc;
 +
-+	if (mru) {
-+		rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
-+		if (rc) {
-+			netdev_err(bp->dev, "hwrm vnic %d set rss failure rc: %d\n",
-+				   vnic->vnic_id, rc);
++	xa_for_each(&bp->dev->ethtool->rss_ctx, context, ctx) {
++		struct bnxt_rss_ctx *rss_ctx = ethtool_rxfh_context_priv(ctx);
++		struct bnxt_vnic_info *vnic = &rss_ctx->vnic;
++
++		rc = bnxt_set_vnic_mru_p5(bp, vnic, mru, rxr_id);
++		if (rc)
 +			return rc;
-+		}
 +	}
-+	vnic->mru = mru;
-+	bnxt_hwrm_vnic_update(bp, vnic,
-+			      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
 +
 +	return 0;
 +}
@@ -146,48 +197,32 @@ index 869580b6f70d..dfd2366d4c8c 100644
  static void bnxt_hwrm_realloc_rss_ctx_vnic(struct bnxt *bp)
  {
  	bool set_tpa = !!(bp->flags & BNXT_FLAG_TPA);
-@@ -15927,6 +15947,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 	struct bnxt_vnic_info *vnic;
- 	struct bnxt_napi *bnapi;
- 	int i, rc;
-+	u16 mru;
- 
- 	rxr = &bp->rx_ring[idx];
- 	clone = qmem;
-@@ -15977,18 +15998,13 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 	napi_enable_locked(&bnapi->napi);
- 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
- 
-+	mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
+@@ -16002,12 +16048,11 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
  	for (i = 0; i < bp->nr_vnics; i++) {
  		vnic = &bp->vnic_info[i];
  
--		rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
--		if (rc) {
--			netdev_err(bp->dev, "hwrm vnic %d set rss failure rc: %d\n",
--				   vnic->vnic_id, rc);
-+		rc = bnxt_set_vnic_mru_p5(bp, vnic, mru);
-+		if (rc)
+-		rc = bnxt_set_vnic_mru_p5(bp, vnic, mru);
++		rc = bnxt_set_vnic_mru_p5(bp, vnic, mru, idx);
+ 		if (rc)
  			return rc;
--		}
--		vnic->mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
--		bnxt_hwrm_vnic_update(bp, vnic,
--				      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
  	}
+-
+-	return 0;
++	return bnxt_set_rss_ctx_vnic_mru(bp, mru, idx);
  
- 	return 0;
-@@ -16013,9 +16029,8 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
- 
+ err_reset:
+ 	netdev_err(bp->dev, "Unexpected HWRM error during queue start rc: %d\n",
+@@ -16030,8 +16075,9 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
  	for (i = 0; i < bp->nr_vnics; i++) {
  		vnic = &bp->vnic_info[i];
--		vnic->mru = 0;
--		bnxt_hwrm_vnic_update(bp, vnic,
--				      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
-+
-+		bnxt_set_vnic_mru_p5(bp, vnic, 0);
+ 
+-		bnxt_set_vnic_mru_p5(bp, vnic, 0);
++		bnxt_set_vnic_mru_p5(bp, vnic, 0, idx);
  	}
++	bnxt_set_rss_ctx_vnic_mru(bp, 0, idx);
  	/* Make sure NAPI sees that the VNIC is disabled */
  	synchronize_net();
+ 	rxr = &bp->rx_ring[idx];
 -- 
 2.30.1
 
