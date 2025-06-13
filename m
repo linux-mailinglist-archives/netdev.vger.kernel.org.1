@@ -1,119 +1,118 @@
-Return-Path: <netdev+bounces-197330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F528AD8215
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 06:27:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C90AD821A
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 06:28:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37F73189905B
-	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 04:27:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D287176A63
+	for <lists+netdev@lfdr.de>; Fri, 13 Jun 2025 04:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1857202963;
-	Fri, 13 Jun 2025 04:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006B623D2AE;
+	Fri, 13 Jun 2025 04:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="K61t750I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LuVENKno"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE59272605;
-	Fri, 13 Jun 2025 04:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC7020B804
+	for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 04:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749788853; cv=none; b=G1xYK2Mil6n+T/zMaxOQBuEIh1jN1wbB1HFGOj+BRuCaIVjmSL2lD3YDYw1EUx5sU1eEUpXDFjl5jiiIPj5LN54v4hq8AJdhdCBmFsubUqBvsBocBeoVhqiiyJeWRxz2ZZ65OjeJjA7csM6v+ZAQ446moqLI3JZH3G9ceOmsiyY=
+	t=1749788904; cv=none; b=hUXApQpWogwlbdNIyRFXWtgL5arL5PP2dArrNSY/Fdsdkn4GyORHEvcmiMjBj+bOQNdPw44+HZEzOb2IvaLvggR0dnxf9G4nqKBaDOB902pPj5WiCDcmrmLjv1oaUenAghlVEVTLfQgIbCvnKXZnquztsOgj5qb6pFLEXumgoKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749788853; c=relaxed/simple;
-	bh=GR//q8gjUIpqkRswYNl3pFV1eKpDj4qn1tocucHPedM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=glfSwZFsI2TPDcRZ9UFdYvfH/ojd0B0E6NZ6Njbs839mPHePPJkqTqJG3+QvPaR2lvtWof2PnwL+Sw4aYgA3G68Xn4LnFFDCEjEAbseONcS02uwyZb0BUBYajOJ11cMKRS0WJThyV7m07K3ubj833R2WMJeY/JoBGdj+8/wCyHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=K61t750I; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55D4RGGb1874765;
-	Thu, 12 Jun 2025 23:27:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1749788836;
-	bh=d1d38w1Imrmh3Pi3ni2I/umfUi6bMxTp9ma4T10tvRI=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=K61t750IEZD5XZ6kBse6w2Sw8IqkvwHHQQXNxndVgo2ZH25TKXNixas4EfJLlk4ga
-	 MpF8jIOniPO7EhKOSY/zez6J6c4FCKL7NfkYSHDDfv0GUwT9tSnSvYYDM8qjppALgV
-	 lVFIOdZcCyM4cjxzj+zSp+zXymMm/Ph30+3MKvug=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55D4RG7i3153743
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 12 Jun 2025 23:27:16 -0500
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 12
- Jun 2025 23:27:16 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 12 Jun 2025 23:27:16 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55D4RBk53185800;
-	Thu, 12 Jun 2025 23:27:12 -0500
-Message-ID: <5cb496cc-7b0e-471b-8698-10d26f973cc5@ti.com>
-Date: Fri, 13 Jun 2025 09:57:11 +0530
+	s=arc-20240116; t=1749788904; c=relaxed/simple;
+	bh=ajuHnnSRgwwpumvdXLZB+CCnOw6RWfwS4TirYIkFOco=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jKeKzblMYvUrnwmmbuUSnf5bghDhUG31MdjJgMQWWo+47B4M5VhObnLhRK+NTnXLSWUyCo+v+jJ1ypQAFtF5qj1rHesnj/c3Jnjt93wDDvygTol7XYMH0giCH1t5qdh0dLN78lb92ZSnUIXa8jFCgUZYJmWdzPUU2GEq2aXaoUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LuVENKno; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31332dc2b59so1477133a91.0
+        for <netdev@vger.kernel.org>; Thu, 12 Jun 2025 21:28:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749788903; x=1750393703; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OMs4el2zdME0U5Bh0u38RmmxtHkZW7DUfeo5MQZot3o=;
+        b=LuVENKnonGHeos7U0m4y+eucCFMWSlYbACDFv35ANzZnhpoLQhFOWnqKD2geeJXeab
+         Tg+FezyNbOpncNO9xWFFWPab65YbdKvL3VN47FNthJv5aHIqn7OU7LMkr1n7fbg/R00H
+         K4lxAD/DmDXbZPhIj4Oj5C3dPof+XqhW8wTHmUH0R6KRPi8N/MoiQ7A/75WSQEyLH7TS
+         6ASem8JTYuXlFKj05WIvqg1fxrhzKiCFZbzqel8KFiKFSDBrMG/5oQ5T3HxrWrWkD8J8
+         kPoTM4KAHrEt5pAhYJauIMln3H8rhlEzNfV4Ca6mLqs4zCt/mb2yofmIYC6Uf8fyAer+
+         tBtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749788903; x=1750393703;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OMs4el2zdME0U5Bh0u38RmmxtHkZW7DUfeo5MQZot3o=;
+        b=rHoHyNq1NZpAr15Z81P9xg9JhVjzdlCdYqleeQLZFXJco/wBpESsW3XH6gYctnCR2Y
+         FvDPELbuV7gdmeJokN3SQJMLEpLq9xtr7AHVHcRSgHoz1crjXPM1DfSr0XVjj9VusK4U
+         BQr4lblsBBOe93N/zu0c6aK7OGnb4X2w80YS1wU7C8LjDI8mxa2krP9MgOIpVxopBvJH
+         itZKeGLgTXZ69k/cDVmlPRxgNULIU08/ZgNzo/sDxl725xPkC6bByc8YiupmpLbNydWa
+         RqvOiBMA1b5CkbaMi/SWlFS/QkJbnC/2LS19MqaUt/uIFg5yU6ufsGM6YaW6oFobYuz+
+         iFFw==
+X-Gm-Message-State: AOJu0Yye6o7nzzNKU0EVg8tWX8vy5wTByhlDhdhAyUHZPMsPeaf206qK
+	C2E/kGnGLb2bSbotxRLt7Fp4QZel9tPawqxzbh3s8zK3sJgIQusIQPmhh8bEfk19WIJgZPLVU/j
+	lyNTne1+k1a+iCeSX4ybj3xyUaNvJFGTHezG4hPihmX9p3UyrYifxHRnf4AsfELLbFZCdQhFfxA
+	yrejGSDgsZ+bEkgo62/Kr/JMFwNng8m9gusAZtp2vV74Uz0PeCvLnXXjjvJEByuEI=
+X-Google-Smtp-Source: AGHT+IEokZ+VFPB53+gBJoGAUqzmEK3QBv1KmzWNzDUXYog11k26C5cCePG3sYOEDR3ejCqBCKhLhSef9kk2MmSKqQ==
+X-Received: from pjbta16.prod.google.com ([2002:a17:90b:4ed0:b0:30e:6bb2:6855])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:17c4:b0:311:ffe8:20ee with SMTP id 98e67ed59e1d1-313d9c306aamr2594977a91.11.1749788902651;
+ Thu, 12 Jun 2025 21:28:22 -0700 (PDT)
+Date: Fri, 13 Jun 2025 04:28:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Read firmware-names from
- device tree
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Meghana Malladi <m-malladi@ti.com>, Paolo Abeni <pabeni@redhat.com>,
-        Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>
-References: <20250610052501.3444441-1-danishanwar@ti.com>
- <20250611170211.7398b083@kernel.org>
- <03555d09-e506-4f48-a073-b06b63e1af4a@ti.com>
- <20250612073708.69902ffc@kernel.org>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250612073708.69902ffc@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
+Message-ID: <20250613042804.3259045-1-almasrymina@google.com>
+Subject: [PATCH net-next v1 1/4] net: netmem: fix skb_ensure_writable with
+ unreadable skbs
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
+skb_ensure_writable actually makes sure that the header of the skb is
+writable, and doesn't touch the payload. It doesn't need an
+skb_frags_readable check.
 
+Removing this check restores DSCP functionality with unreadable skbs as
+it's called from dscp_tg.
 
-On 12/06/25 8:07 pm, Jakub Kicinski wrote:
-> On Thu, 12 Jun 2025 10:49:17 +0530 MD Danish Anwar wrote:
->>> You seem to be deleting the old constants. Is there no need to keep
->>> backward compatibility with DT blobs which don't have the firmware-name
->>> properties ?  
->>
->> ICSSG-PRUETH driver is only supported by AM65x and AM64x and both the
->> DTs have the firmware name property. So I don't think there is any need
->> to maintain the older hard coded values.
->>
->> AM65x -
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/arch/arm64/boot/dts/ti/k3-am654-icssg2.dtso#n28:~:text=pru2_1%3E%2C%20%3C%26rtu2_1%3E%2C%20%3C%26tx_pru2_1%3E%3B-,firmware%2Dname,-%3D%20%22ti%2Dpruss/am65x
->>
->> AM64x -
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/arch/arm64/boot/dts/ti/k3-am642-evm.dts#:~:text=tx_pru1_1%3E%3B-,firmware%2Dname,-%3D%20%22ti%2Dpruss
->>
->> Let me know if this is okay.
-> 
-> IDK much about embedded but what you say sounds convincing to me :)
-> Just also add that paragraph to the commit msg? (without the links)
+Fixes: 65249feb6b3d ("net: add support for skbs with unreadable frags")
 
-Sure. Will send out v2 soon with these changes to commit msg.
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+---
+ net/core/skbuff.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 85fc82f72d26..d6420b74ea9c 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6261,9 +6261,6 @@ int skb_ensure_writable(struct sk_buff *skb, unsigned int write_len)
+ 	if (!pskb_may_pull(skb, write_len))
+ 		return -ENOMEM;
+ 
+-	if (!skb_frags_readable(skb))
+-		return -EFAULT;
+-
+ 	if (!skb_cloned(skb) || skb_clone_writable(skb, write_len))
+ 		return 0;
+ 
+
+base-commit: 6d4e01d29d87356924f1521ca6df7a364e948f13
 -- 
-Thanks and Regards,
-Danish
+2.50.0.rc1.591.g9c95f17f64-goog
+
 
