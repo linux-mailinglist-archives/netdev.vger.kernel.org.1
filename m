@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-197803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B11AD9E9E
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:07:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E7EBAD9E9F
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:07:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5380E7AB4C4
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:05:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D28F27AB7FD
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31E32E62D3;
-	Sat, 14 Jun 2025 18:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5BF2E6D09;
+	Sat, 14 Jun 2025 18:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nAh6V9Gk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UN5ZCjP+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1B62E62C0;
-	Sat, 14 Jun 2025 18:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B912E62DD;
+	Sat, 14 Jun 2025 18:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749924408; cv=none; b=lqWnen2P76Kjv08qmljXVp+LpVg98yHIuT6wchd+ejQ9gaP0hU1+nZ/Co1Cr7j6YAschpNrLkbrf4w9ID/WdoIvJXFcrhMxpvV0QW+mbP+uRqQAIAcXjDa6XHs/HpZ521dwArRc/FybDCB3Yb2dG6eNsgBKkvtAGia/6KXJgnWA=
+	t=1749924409; cv=none; b=lUz0/92UcPnarFqIz3JiQV/YFuPbPkZn6Wf52T2JUedo3ruflAeGJ89ClrGl7S6J34RsLD1GfKP9DfFaKTdNkCm9asmj1LGcrsAxgGlIjXsgx/Z29Le0SLpatpoV6fN6gtN697G8cYVvEfhzFbofDKgPy/cw7BOcnjfW2XdFAow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749924408; c=relaxed/simple;
-	bh=8MMBkeLPXK5fH47jmlzmKbWMt9Wv7fENTj3CmaU2WNk=;
+	s=arc-20240116; t=1749924409; c=relaxed/simple;
+	bh=q7vrO+Z+re6UJM0frQTU3/pr0lsT93gCohEGzwowpPY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WcYN3YG5eiTgLBbZl48K+5P7PMCQcP8w0SmS7aCGOOPjTuz/5MRHL64KJTzQe6x2D6gMfcBcvHQ9Bw+yOuczPy3/K6s3St3dg6fp2KqG14VdGrIVpO50j1vdhdG3C94yxcQ72Sh+KCky40Ho5Y+TJ/ShEUykbC4WC+PvWMUNv0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nAh6V9Gk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 986FDC4CEF2;
-	Sat, 14 Jun 2025 18:06:47 +0000 (UTC)
+	 MIME-Version; b=YMhDgBcuoUr9mScQCHgAPYRVqZrJa8a+te+7cnufX9pMy6tPcGKOkm5QoJNdo1SdIJSpmuij7S4aGUuNg0MAOZA/jTT1PQ8A68gkUEcONDXUYTuhS26xmf6f3vIgBxMoWAn264TZJ//7rdPw6y87fkYJYJwy3+FAVP87MI6KbGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UN5ZCjP+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C0A3C4CEF4;
+	Sat, 14 Jun 2025 18:06:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749924408;
-	bh=8MMBkeLPXK5fH47jmlzmKbWMt9Wv7fENTj3CmaU2WNk=;
+	s=k20201202; t=1749924409;
+	bh=q7vrO+Z+re6UJM0frQTU3/pr0lsT93gCohEGzwowpPY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nAh6V9Gk6DW31S07OKuX2E3tcVb0LhudBDazFPp5YCbT3096hMqycrKXXYdz8QHHZ
-	 XkpMgedU9sUFmdtVG7KMk1x0k7pz+X1D3HygiJtbaglMwI5x0IzXJAgnfOHg0jBEsP
-	 0SWFX7WepuiTaVr0jnNHWXUi27xxeQre/vKqj8QXo87N5iugbKeXIvbIqh0H1yp69k
-	 14Ec6WG0fH0PV0vs1z94TxaosZ0jG/rCUU3iADuATOwl+yuratYgS6AGSW2gyVrAAA
-	 IAmxfX4WyHE4+IOjL71Kn/mCIptvzEILjbIt9ehFy17G4mxsgdmtss9gG8NtpzJDV6
-	 MQzqalwNzRkDw==
+	b=UN5ZCjP+c9Xfhz+wFgg+B8H7jVi8MOu2ikUwn0lRwjsHJddVE0mgc0j7AJwCCA0/B
+	 rZo5OnPsCFCrNF+vqvLYfqi4lQL1E2RMaFqUyY0v/uS1efM1UVppo+cx0CqdKA8kiG
+	 EGV4CrwLffMqhigEt0FY69uqhirGfmujvBQmIuKAkiWNR/ZoT+0Zs63VsUoaBHu1CM
+	 bZqPUwvTZXYzmkvHaN3ipAeI0XJQYWDDhX7A6zk4Y0s52EY/v081LaLTswRxu1ZeIu
+	 MrYAbBqwLgBizAgH4PW9XvcwHzSrQySxs+AfWCih5JWjZ5xvo9j3+It0JWeWH+HMD+
+	 NZ0q1cTSZtBDA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -63,9 +63,9 @@ Cc: netdev@vger.kernel.org,
 	imx@lists.linux.dev,
 	Jakub Kicinski <kuba@kernel.org>,
 	Joe Damato <joe@dama.to>
-Subject: [PATCH net-next v2 2/5] eth: cxgb4: migrate to new RXFH callbacks
-Date: Sat, 14 Jun 2025 11:06:35 -0700
-Message-ID: <20250614180638.4166766-3-kuba@kernel.org>
+Subject: [PATCH net-next v2 3/5] eth: lan743x: migrate to new RXFH callbacks
+Date: Sat, 14 Jun 2025 11:06:36 -0700
+Message-ID: <20250614180638.4166766-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250614180638.4166766-1-kuba@kernel.org>
 References: <20250614180638.4166766-1-kuba@kernel.org>
@@ -85,139 +85,63 @@ is purely factoring out the handling into a helper.
 Reviewed-by: Joe Damato <joe@dama.to>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    | 105 +++++++++---------
- 1 file changed, 55 insertions(+), 50 deletions(-)
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 31 ++++++++++++-------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
-index 1546c3db08f0..23326235d4ab 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
-@@ -1730,6 +1730,60 @@ static int cxgb4_ntuple_get_filter(struct net_device *dev,
- 	return 0;
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 64a3b953cc17..40002d9fe274 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -913,23 +913,29 @@ static int lan743x_ethtool_get_sset_count(struct net_device *netdev, int sset)
+ 	}
  }
  
-+static int cxgb4_get_rxfh_fields(struct net_device *dev,
-+				 struct ethtool_rxfh_fields *info)
++static int lan743x_ethtool_get_rxfh_fields(struct net_device *netdev,
++					   struct ethtool_rxfh_fields *fields)
 +{
-+	const struct port_info *pi = netdev_priv(dev);
-+	unsigned int v = pi->rss_mode;
++	fields->data = 0;
 +
-+	info->data = 0;
-+	switch (info->flow_type) {
-+	case TCP_V4_FLOW:
-+		if (v & FW_RSS_VI_CONFIG_CMD_IP4FOURTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST |
-+				RXH_L4_B_0_1 | RXH_L4_B_2_3;
-+		else if (v & FW_RSS_VI_CONFIG_CMD_IP4TWOTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST;
-+		break;
-+	case UDP_V4_FLOW:
-+		if ((v & FW_RSS_VI_CONFIG_CMD_IP4FOURTUPEN_F) &&
-+		    (v & FW_RSS_VI_CONFIG_CMD_UDPEN_F))
-+			info->data = RXH_IP_SRC | RXH_IP_DST |
-+				RXH_L4_B_0_1 | RXH_L4_B_2_3;
-+		else if (v & FW_RSS_VI_CONFIG_CMD_IP4TWOTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST;
-+		break;
-+	case SCTP_V4_FLOW:
-+	case AH_ESP_V4_FLOW:
-+	case IPV4_FLOW:
-+		if (v & FW_RSS_VI_CONFIG_CMD_IP4TWOTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST;
-+		break;
-+	case TCP_V6_FLOW:
-+		if (v & FW_RSS_VI_CONFIG_CMD_IP6FOURTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST |
-+				RXH_L4_B_0_1 | RXH_L4_B_2_3;
-+		else if (v & FW_RSS_VI_CONFIG_CMD_IP6TWOTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST;
-+		break;
-+	case UDP_V6_FLOW:
-+		if ((v & FW_RSS_VI_CONFIG_CMD_IP6FOURTUPEN_F) &&
-+		    (v & FW_RSS_VI_CONFIG_CMD_UDPEN_F))
-+			info->data = RXH_IP_SRC | RXH_IP_DST |
-+				RXH_L4_B_0_1 | RXH_L4_B_2_3;
-+		else if (v & FW_RSS_VI_CONFIG_CMD_IP6TWOTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST;
-+		break;
-+	case SCTP_V6_FLOW:
-+	case AH_ESP_V6_FLOW:
-+	case IPV6_FLOW:
-+		if (v & FW_RSS_VI_CONFIG_CMD_IP6TWOTUPEN_F)
-+			info->data = RXH_IP_SRC | RXH_IP_DST;
-+		break;
++	switch (fields->flow_type) {
++	case TCP_V4_FLOW:case UDP_V4_FLOW:
++	case TCP_V6_FLOW:case UDP_V6_FLOW:
++		fields->data |= RXH_L4_B_0_1 | RXH_L4_B_2_3;
++		fallthrough;
++	case IPV4_FLOW: case IPV6_FLOW:
++		fields->data |= RXH_IP_SRC | RXH_IP_DST;
++		return 0;
 +	}
++
 +	return 0;
 +}
 +
- static int get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
- 		     u32 *rules)
+ static int lan743x_ethtool_get_rxnfc(struct net_device *netdev,
+ 				     struct ethtool_rxnfc *rxnfc,
+ 				     u32 *rule_locs)
  {
-@@ -1739,56 +1793,6 @@ static int get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
- 	int ret = 0;
- 
- 	switch (info->cmd) {
--	case ETHTOOL_GRXFH: {
--		unsigned int v = pi->rss_mode;
--
--		info->data = 0;
--		switch (info->flow_type) {
--		case TCP_V4_FLOW:
--			if (v & FW_RSS_VI_CONFIG_CMD_IP4FOURTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST |
--					     RXH_L4_B_0_1 | RXH_L4_B_2_3;
--			else if (v & FW_RSS_VI_CONFIG_CMD_IP4TWOTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST;
--			break;
--		case UDP_V4_FLOW:
--			if ((v & FW_RSS_VI_CONFIG_CMD_IP4FOURTUPEN_F) &&
--			    (v & FW_RSS_VI_CONFIG_CMD_UDPEN_F))
--				info->data = RXH_IP_SRC | RXH_IP_DST |
--					     RXH_L4_B_0_1 | RXH_L4_B_2_3;
--			else if (v & FW_RSS_VI_CONFIG_CMD_IP4TWOTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST;
--			break;
--		case SCTP_V4_FLOW:
--		case AH_ESP_V4_FLOW:
--		case IPV4_FLOW:
--			if (v & FW_RSS_VI_CONFIG_CMD_IP4TWOTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST;
--			break;
--		case TCP_V6_FLOW:
--			if (v & FW_RSS_VI_CONFIG_CMD_IP6FOURTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST |
--					     RXH_L4_B_0_1 | RXH_L4_B_2_3;
--			else if (v & FW_RSS_VI_CONFIG_CMD_IP6TWOTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST;
--			break;
--		case UDP_V6_FLOW:
--			if ((v & FW_RSS_VI_CONFIG_CMD_IP6FOURTUPEN_F) &&
--			    (v & FW_RSS_VI_CONFIG_CMD_UDPEN_F))
--				info->data = RXH_IP_SRC | RXH_IP_DST |
--					     RXH_L4_B_0_1 | RXH_L4_B_2_3;
--			else if (v & FW_RSS_VI_CONFIG_CMD_IP6TWOTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST;
--			break;
--		case SCTP_V6_FLOW:
--		case AH_ESP_V6_FLOW:
--		case IPV6_FLOW:
--			if (v & FW_RSS_VI_CONFIG_CMD_IP6TWOTUPEN_F)
--				info->data = RXH_IP_SRC | RXH_IP_DST;
--			break;
+ 	switch (rxnfc->cmd) {
+-	case ETHTOOL_GRXFH:
+-		rxnfc->data = 0;
+-		switch (rxnfc->flow_type) {
+-		case TCP_V4_FLOW:case UDP_V4_FLOW:
+-		case TCP_V6_FLOW:case UDP_V6_FLOW:
+-			rxnfc->data |= RXH_L4_B_0_1 | RXH_L4_B_2_3;
+-			fallthrough;
+-		case IPV4_FLOW: case IPV6_FLOW:
+-			rxnfc->data |= RXH_IP_SRC | RXH_IP_DST;
+-			return 0;
 -		}
--		return 0;
--	}
+-		break;
  	case ETHTOOL_GRXRINGS:
- 		info->data = pi->nqsets;
+ 		rxnfc->data = LAN743X_USED_RX_CHANNELS;
  		return 0;
-@@ -2199,6 +2203,7 @@ static const struct ethtool_ops cxgb_ethtool_ops = {
- 	.get_rxfh_indir_size = get_rss_table_size,
- 	.get_rxfh	   = get_rss_table,
- 	.set_rxfh	   = set_rss_table,
-+	.get_rxfh_fields   = cxgb4_get_rxfh_fields,
- 	.self_test	   = cxgb4_self_test,
- 	.flash_device      = set_flash,
- 	.get_ts_info       = get_ts_info,
+@@ -1368,6 +1374,7 @@ const struct ethtool_ops lan743x_ethtool_ops = {
+ 	.get_rxfh_indir_size = lan743x_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh = lan743x_ethtool_get_rxfh,
+ 	.set_rxfh = lan743x_ethtool_set_rxfh,
++	.get_rxfh_fields = lan743x_ethtool_get_rxfh_fields,
+ 	.get_ts_info = lan743x_ethtool_get_ts_info,
+ 	.get_eee = lan743x_ethtool_get_eee,
+ 	.set_eee = lan743x_ethtool_set_eee,
 -- 
 2.49.0
 
