@@ -1,92 +1,154 @@
-Return-Path: <netdev+bounces-197830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03493AD9FA5
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 22:10:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE377AD9FB8
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 22:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E63E23B4C77
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:09:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ED6C174C12
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBC02E62DA;
-	Sat, 14 Jun 2025 20:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3061DE2D8;
+	Sat, 14 Jun 2025 20:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NL/8QLgu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xfg5MUJ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182FB8615A
-	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 20:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA99F1F3FC8
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 20:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749931820; cv=none; b=UOfXeJaGmaBUvoZEGZq2dSOtwrlHLkjCG0dRXEi/Gbul5Ejg3OVEE2LyDMndXNilQXbTsmuqrED+GUjEFH7B9FnmlJ+Wu+RAC8F2uh4owgUCqq0B3UQm/WSHetpdPQCEacnF9rcnZJT2lNYp+r/3lWvH2w0WH9x/fs86LaPTJU4=
+	t=1749932909; cv=none; b=nCjcFeIYomAZt7lMr79tJLmZVOG2NSPf7N6Jv6dJNg1q1WaCP0WEXvJVHBTHrXwMXpN2AY/UiejP/xv5OW1WRrN1JoT79A9TiC0LhxqK0brbpM3qAMJgCc95P6a/FG2zNWuWtLS28BJ4hZ+dO+6cvHfJZnZ8EVn3tg0X72+cVoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749931820; c=relaxed/simple;
-	bh=fqtSjiPKYZf9FAR+/Aac/hlzXqK+ezbesxU2kquqDR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O575t8GQAjj8WY9f8We+tXWh0Jq/G4Rat6N60R2pUJsEg1h5lyelLSBGFki9SOYKTPzIQ6eEDXoajVluWpzRns6xOMycGEpEJbOybbPYC6NFfxQ+lgoYvyPGIS9FbQjshuxdRPAJzzfX5JGMbPfaq0EC/HwVTP2yzrqEX8XX+CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NL/8QLgu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 346FEC4CEEF;
-	Sat, 14 Jun 2025 20:10:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749931819;
-	bh=fqtSjiPKYZf9FAR+/Aac/hlzXqK+ezbesxU2kquqDR4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NL/8QLguQ62XQZx2W1qyi4DuvSXilS4C3qATqOYqG0hJIScIRIyF6jwM2sY2ejZ8H
-	 sZBpAHoz4O42DFSJB2+pYr0/of7NmfgZLWltDlN+WyIrWuVWlr4Wp3WZ/L/q1rJjpU
-	 ZaFWt1LqVxf5sBsXBxV+97PbE3dHqadqcbLSnZJtgPVTkuvBrwPABLfXpgSSC8Me8g
-	 ufz3twaGdnoJ18xbZ8WtVrGa5+vktQbGUVLeT+E+HCXrtj6q1G4R6StP2+BYAgcQNQ
-	 FwOkzS6YlOv0sdMeS6hGAPKm9FO4JewQxD9mTXAbXpBS/G7e46/AtoEIxWicuODXOA
-	 0nnts/OgrkaRw==
-Date: Sat, 14 Jun 2025 13:10:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: "David S . Miller " <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- almasrymina@google.com, willemb@google.com, jdamato@fastly.com,
- mkarsten@uwaterloo.ca, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7] Add support to set napi threaded for
- individual napi
-Message-ID: <20250614131018.6d760d19@kernel.org>
-In-Reply-To: <20250613191646.3693841-1-skhawaja@google.com>
-References: <20250613191646.3693841-1-skhawaja@google.com>
+	s=arc-20240116; t=1749932909; c=relaxed/simple;
+	bh=47q61lKdvzeB0OCiL5ikWL06nyrB8ueZWni9pYQOHmM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DZCBny9XzYe/1kTSz85f76aH9RtF5/X8A7JmCrd8VRapr1+/S4YuLyfpBVfwsL5WeCXXpNnnrZy/5VIMD/iSjEJE+SDxS5J5+rpY2IxTLo+TBhd/NiWYeesYF3tDeuFsBCqhwdUtqykQe8o+ffMPQF9owHQ86IxWTBXScAI0QQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xfg5MUJ1; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3109f106867so4607652a91.1
+        for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 13:28:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749932907; x=1750537707; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l+s3O4uQZLG9NWqJYlo9sNvL4EDsg2lkIIcHNEbeL8Y=;
+        b=Xfg5MUJ1lIuIoHNUN+VL11JeNGVnX0S2M7bYqdze4fuUAHP8J/Eo2GaqFIb00q4Di0
+         ky1DzGEmRkgM2XY1bQLCCX7DzvErmft4fOy82LZD02uzGrjM2SeatmMVvUHuRRHjJNNB
+         qOKqfLrDNU98VNj6M1JrZzOm2pkTaRSqCuiduixPjYq4NOXEsJSbPWJEi6T7UC+wFqq1
+         AeVrOk606a3Pj0Kr4wiyEBD1rMJHGpi/OeZBO+1bSQNrUJeG/JXYLU32Cn6zN0IsGcC0
+         Ci1P8Gl1NEnryCcRk7xebOVb4ioCWkFZ4nIcW8jr9W4wS947i+siSq46w5IoUhFU7njf
+         2KQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749932907; x=1750537707;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l+s3O4uQZLG9NWqJYlo9sNvL4EDsg2lkIIcHNEbeL8Y=;
+        b=SGZ/G/1l/PQS+aXQxKYINZd/xAllaXIWXpIt3x8op1yLCT9ixq3oNMkn5OD40F+JJF
+         /B6p1tzzol4Z7lk4+Eb+EC3O9VbUTjJPMKRhLwI6MroQOUiYiiIDznd2y7mkKdiLP1Qs
+         MOJWEwdw/amzj/dnWTVJy6RepEw2CtwURNJlBfUwqROcx4TrpOMsJU2AVBP7XaRmnEZS
+         YD/GjzcS87GFPShOnyvXsY4q+3TvnymGNCQsMCmZEL1YAQ/xR1rniV8N1CNIrglFpNlG
+         wL5z0A3ZCkcbmvhZf6XnXcgiY73CNNv1QzFsARuUOCuXSLya/16PnfGK59nJr3ryva0n
+         xZdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWMQbhYcvEADYh3t9A0Wue3lqe1obNDAXTINtBhrDWGBM7KLoMPOcmky2zSaJytOg0hgeKMUJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3y3J6wmFmZMIA/5j5cYlhmZqWtSWSrGDf7bSmE+0KfHSn3IaY
+	3RGDo3XRxEy/nBFeA1cs1cl1/CbaxtyMUk2QOOdldC25Z0PGG/frrX4=
+X-Gm-Gg: ASbGncu+wdgYejBQC69Tk7sleg5NryhdTN3+R3Z1tG3szstYLOo9kjGSUp//Qg/QZLx
+	1L4JchZx/ZdJwN7M2JgNWLJhPb869WSE0TJPu6xef6U+PipumvFhPkt1SaIO9QHxb16XzSUkFPv
+	mpKIiIjgkWVr7qI4UdD47CrD6g3mZPwxcY0fB7n/fJNrd5CxIVxTNUsfPdCZwqtQNMdwwTuAaYo
+	ewiO0rVPJb9MBpWxYmD3HSvHD35BA49SSrGM1cr+thPSWpOgHRAozWjNbwhINicuELWxwCxDK5H
+	vBlPblAR52/OeRprjJxirATiCKcNYDU4a0DeelA=
+X-Google-Smtp-Source: AGHT+IHNTop6zEUCCyOb4+Ru2r5J2scu0mGDW4Zw003BXYpkdU/PadWptG+0GGnwj58FL/EoHkYdIw==
+X-Received: by 2002:a17:90a:dfc8:b0:311:f05b:86a5 with SMTP id 98e67ed59e1d1-313f19d2977mr7421401a91.0.1749932906987;
+        Sat, 14 Jun 2025 13:28:26 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1b49843sm6186097a91.31.2025.06.14.13.28.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Jun 2025 13:28:26 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: horms@kernel.org
+Cc: 3chas3@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kuni1840@gmail.com,
+	kuniyu@google.com,
+	linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+1d3c235276f62963e93a@syzkaller.appspotmail.com
+Subject: Re: [PATCH v1 net-next] atm: atmtcp: Free invalid length skb in atmtcp_c_send().
+Date: Sat, 14 Jun 2025 13:28:03 -0700
+Message-ID: <20250614202824.2182751-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250614161959.GR414686@horms.kernel.org>
+References: <20250614161959.GR414686@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 13 Jun 2025 19:16:46 +0000 Samiullah Khawaja wrote:
-> +/**
-> + * napi_get_threaded - get the napi threaded state
-> + * @n: napi struct to get the threaded state from
-> + *
-> + * Return: the per-NAPI threaded state.
-> + */
-> +static inline bool napi_get_threaded(struct napi_struct *n)
-> +{
-> +	return test_bit(NAPI_STATE_THREADED, &n->state);
-> +}
-> +
-> +/**
-> + * napi_set_threaded - set napi threaded state
-> + * @n: napi struct to set the threaded state on
-> + * @threaded: whether this napi does threaded polling
-> + *
-> + * Return 0 on success and negative errno on failure.
-> + */
-> +int napi_set_threaded(struct napi_struct *n, bool threaded);
+From: Simon Horman <horms@kernel.org>
+Date: Sat, 14 Jun 2025 17:19:59 +0100
+> On Thu, Jun 12, 2025 at 10:56:55PM -0700, Kuniyuki Iwashima wrote:
+> > From: Kuniyuki Iwashima <kuniyu@google.com>
+> > 
+> > syzbot reported the splat below. [0]
+> > 
+> > vcc_sendmsg() copies data passed from userspace to skb and passes
+> > it to vcc->dev->ops->send().
+> > 
+> > atmtcp_c_send() accesses skb->data as struct atmtcp_hdr after
+> > checking if skb->len is 0, but it's not enough.
+> > 
+> > Also, when skb->len == 0, skb and sk (vcc) were leaked because
+> > dev_kfree_skb() is not called and atm_return() is missing to
+> > revert atm_account_tx() in vcc_sendmsg().
+> 
+> Hi Iwashima-san,
+> 
+> I agree with the above and your patch.
+> But I am wondering if atm_return() also needs to be called when:
 
-nit: missing : after Return
+Oh, I noticed atm_return() was for rmem_alloc, so I had to adjust
+wmem_alloc manually here.
 
-but really, I don't think we need kdoc for functions this obvious and
-trivial.
--- 
+
+> 
+> * atmtcp_c_send returns -ENOBUFS because atm_alloc_charge() fails.
+
+In this case, I guess vcc->pop is atm_pop_raw() that handles wmem
+accounting.
+
+        if (vcc->pop) vcc->pop(vcc,skb);
+        else dev_kfree_skb(skb);
+
+If it's NULL, we need to adjust it here, but this pattern can be
+seen other ATM drivers..
+
+Okay, sendmsg() requires SS_CONNECTED, and __vcc_connect() must go
+through one of atm_init_aal{0,34,5}, which sets ->pop to atm_pop_raw().
+
+So, it seems !vcc->pop() is defensive unlikely path.
+
+In v2, I'll change the invalid length handling to goto done;
+
+
+> * copy_from_iter_full returns false in vcc_sendmsg.
+
+I agree.  I can send a followup.
+
+Thank you!
+
 pw-bot: cr
 
