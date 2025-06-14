@@ -1,86 +1,115 @@
-Return-Path: <netdev+bounces-197764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88197AD9D51
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 16:11:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15531AD9D52
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 16:11:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC5007AA254
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 14:10:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 352CC1899FAD
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 14:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA3E22F774;
-	Sat, 14 Jun 2025 14:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B463D2D8799;
+	Sat, 14 Jun 2025 14:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Lm6bpPTN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X8KVy+wB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3B01E4A9
-	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 14:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB2722F774;
+	Sat, 14 Jun 2025 14:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749910276; cv=none; b=eRo2XvwPdn0Jn2mpc9guLFRf21WVhbbEW617MYV7+GBAOLbh/GQA0trISnWbhPgQRfR9I+ByrpYXQng1B4dhkHkjPg64d/Z9shrCrAI+JpP5AIKV16ObhexzMZhv3xbCiCBKWKiz31AJvC2HMujsrW1sdfiwibkiZj75UpCPsj8=
+	t=1749910286; cv=none; b=LaqtnmcsumGxqQGd3BtdrtXL3yGq+D4b4nnKAZ4LRNY0hE7Pyymfu3c/c/tK84JTQyHHQOVRmGbwSkmJUGaL60L1CTdEV2REY6bEXEmBeNTaEhzrcsKtZ1ZMoXpC8SgsVQqf0v9bxXi6vsPplDYXobQk/JcO+mVsUIDV2DGlT1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749910276; c=relaxed/simple;
-	bh=uISQTv0V1v84wdrn5pNP27Y/2WCJcOUMmgMRTyOgxz0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hXoF0JHjvPBYZS8R1ViLLEkxPuFyi8wnoGIWrG87PWNzdM2J0k6eATLdvLS2FfODeFkWM8Whbo1RW5OkaKo7SdRp4BU3ky0E+m5arPqC4L8x6atxNbSwIIm/m374OovboL3wyoEt5LM5DGpL3qiQV0tZLSKlvxcgT/9GQIbRses=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Lm6bpPTN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lhMpoOIsO/1OYbCKHIiEdUS4vIbPl/mLr0OH4FNE1xk=; b=Lm6bpPTNZF4Ju5sIkptdp9QSqy
-	1axD+TuDBlvEriMnkKNIJj9uJUJKAK+YXujdqiAKZjy3io+e8gNKMRqg6Wmo7Ll3ivgV6VRXrIVdL
-	euphB8prWGBNiIknrYV0avb3Ln93yFXgTmNiH8wl8VFJw0RhnDkBkWRb44skXGFvLP54=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uQRb4-00FqM3-HZ; Sat, 14 Jun 2025 16:11:02 +0200
-Date: Sat, 14 Jun 2025 16:11:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ricard Bejarano <ricard@bejarano.io>
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
-	netdev@vger.kernel.org, michael.jamet@intel.com,
-	YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-Message-ID: <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
-References: <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
- <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
- <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
- <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
- <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
- <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
- <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
- <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
- <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
- <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
+	s=arc-20240116; t=1749910286; c=relaxed/simple;
+	bh=POxwkq0O0GbjEOLATg9Cms4ibuGIWc/rbmDVdyXvrOA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a6vlC9Se6sOAw2anJNKTqG3iqueCBCe/DzU7NZIAaqvDgWbz/6GD8ACFAcUuG6tQ+ch2GG77bAoOuEs4tN8L/2bYHnwEmNB2TjbHWeMA4G1ffXCRSwrhuIKUQjI8XuSaGY+sVC8/pXxqkbJn3xv0AIi9FS62HZtjNLUlQPV2NlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X8KVy+wB; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-610cbca60cdso2211518eaf.0;
+        Sat, 14 Jun 2025 07:11:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749910284; x=1750515084; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=eiB96bAhSJ6/e3F5OHXMtztFQ+Tpw8+eBOtaWFUgd08=;
+        b=X8KVy+wBzSEkmRHrr1aq9eYs22hJGdfGV9lNXVhSOxofqvF7dOUhTxVlO54bAKIGc3
+         6KkQGDFKoukXOsFjFvFHJXcfvxduPy6651mjZATfyBkm5Qo9OKk5wd1YMlScJZnPlaGR
+         8xWkPqvMVAa+2dcRzkuAGZNzrvhe8alQofHy/AtEU4+5Kc6rbozqgesrox9bG0+kVkRK
+         JgbZN7Fsq0Ue+HA8/wxdKPJCGxUS/j3l0YHIFg2HTO8QFMI+HVbmlTXqEg6f7MZdGsFw
+         7/ijywAcGoZ6J3rqt9dHHAVEuRxfRf93dk3jDNiRxGKIM2i4PjJZNPbINr6Of5ToNlcD
+         g8WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749910284; x=1750515084;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eiB96bAhSJ6/e3F5OHXMtztFQ+Tpw8+eBOtaWFUgd08=;
+        b=Jc/AjEppAtpDCa3ehj0GXU/qZ9t+3rTY8fxQT5Er8nom/O1XxjQIVt2qk/9FgfGwMs
+         imrPc5SE5+9wpymdGyTWV5y/B+qGM4cdPBuRBCvInjpCLrXnPLSuOXtmzJSuQeRsP3fd
+         /NeXtiHO9zPUsvrPZ8xKZFDexxgJHKlgg4C2fJh++zIRabLHvvZhpGcgLE5fw1r83aM7
+         5EUAH3+rrDbzCHerRern1QOpX7mNE7wYEReFq/uKguvjin4T4dlCGygxA61CzpOoJpg/
+         +PpBK9HNFIbzT0hluYOVFZx2lMOvF+6nHJFjZEuo4Bl1nYorCwSNvVT49yFYWui8sSIP
+         ygcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDVzj7tGeVS/shEjCUSI01XzVlhRGcKl/JsPTN+xZSO5TSp4Dru2BZ1dUu0/07jtPDCtD8BPbk3vkoAQw=@vger.kernel.org, AJvYcCWFWjQKp+PTsLQDpX4N561ZxWSw2OFgI/fZInTqjsaoaPEhKvEyUb5X5a62ewBdhZz0bq1mIQDy@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOirqL+CgIUeKiXeJtQshQf2M5PkitXJ/oJG1k//JuPxi774y/
+	uZHBwX/HWKW9lVy9ea8I9mUAdAZBGos7JmbH8SO4RKXUAJY2vi4Hwydt4bGwjGMip2xMt78Q6k1
+	YJsa0CXrStHaE+bSCQg6VhZHBRJ4RjwU=
+X-Gm-Gg: ASbGncu0KxNM2AspCDTnWVAk/C8zeFxsRCAH1ghKhadkgdU+R1JHRoO/xs6Zw9C0E0W
+	iXS+PqmPR4F5sHc/4fc5gnTQhC3SbjVn3h1+NToMoYH0kFOi7NWc55qB6xNkERHc0oUKQrxKYXJ
+	RS2yphUi1eBHsRA2XEB7JxLuRNf9P2puU9HtMmVPo2zw//QHGWdo+btgyciJ4fEPIrjFLGARJpW
+	MXDPO8rqyZ3
+X-Google-Smtp-Source: AGHT+IHL7vBY1W2DXQlT9x8BW0qpd0hTAvVSmZdjIqU45TpVWU75wLX2Cpkv4JMTdfmuBXHS0Fns4/kCOE/Hp9HqVZY=
+X-Received: by 2002:a05:6871:4318:b0:2c2:260:d77b with SMTP id
+ 586e51a60fabf-2eaf07f4bfdmr2374938fac.5.1749910284303; Sat, 14 Jun 2025
+ 07:11:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
+References: <cover.1749891128.git.mchehab+huawei@kernel.org> <9b22975b17bf42210f8432cf0832323c03b1c567.1749891128.git.mchehab+huawei@kernel.org>
+In-Reply-To: <9b22975b17bf42210f8432cf0832323c03b1c567.1749891128.git.mchehab+huawei@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Sat, 14 Jun 2025 15:11:13 +0100
+X-Gm-Features: AX0GCFsfuit4DJaOo6O24z_9KMPmudpwemZmcUivmVYluqb8vmkzFkeOZF2nLLs
+Message-ID: <CAD4GDZxj0YXKdmZiWiLhn==Krg8_EjoUWjLn5Mz5Q=JHNC86_Q@mail.gmail.com>
+Subject: Re: [PATCH v4 06/14] scripts: lib: netlink_yml_parser.py: use classes
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Akira Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Ignacio Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>, 
+	Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, joel@joelfernandes.org, 
+	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org, 
+	stern@rowland.harvard.edu
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Jun 14, 2025 at 11:13:53AM +0200, Ricard Bejarano wrote:
-> Any ideas?
-> 
-> I've rebuilt the lab with 6.15.2 and I still see that ~12-15% receiver loss.
+On Sat, 14 Jun 2025 at 09:56, Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
+>
+> As we'll be importing netlink parser into a Sphinx extension,
+> move all functions and global variables inside two classes:
+>
+> - RstFormatters, containing ReST formatter logic, which are
+>   YAML independent;
+> - NetlinkYamlParser: contains the actual parser classes. That's
 
-Sorry, i lost track of where we were.
+Please update the commit description to match the code.
 
-Did you manage to prove it is skbuf with fragments which are the
-problem? As i said, adding the skb_linearize was just a debug tool,
-not a fix.
-
-	Andrew
+>   the only class that needs to be imported by the script or by
+>   a Sphinx extension.
+>
+> With that, we won't pollute Sphinx namespace, avoiding any
+> potential clashes.
+>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
