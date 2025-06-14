@@ -1,96 +1,90 @@
-Return-Path: <netdev+bounces-197817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15FB5AD9EFC
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:30:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03BC6AD9F0E
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:37:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A32AD1898BF4
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:30:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 438513AD7CA
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B8E2E62A7;
-	Sat, 14 Jun 2025 18:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05C72D9EEB;
+	Sat, 14 Jun 2025 18:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KWPn6g7e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d63Zb6Jd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214EA2E763D;
-	Sat, 14 Jun 2025 18:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE0F13AA3E;
+	Sat, 14 Jun 2025 18:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749925804; cv=none; b=LxNBDZoSg/lXNVu3GmkuKP9niGb2YB+9x3RI5RVGBtV66aKprtWQDJpjrURsab7wcxtneT+tYM+w7FgM9rRnhHKu6Si4j5d/A4bkRlL0R3ef3wiZtt6r76NzhIzcn5KgrQduSL5mCdt0pMSDFFmqV1sSNPavEjzs2yIRXy1kVJU=
+	t=1749926235; cv=none; b=qS5r5PEgsNig0y1LvM/HegSkix7hLjQ0IZwgnAoFf2VpX/+Lc9hq0StVL5WtCaC3CGCT438t3SS8eQYB1Xi7tO5NEmhiM/neKCpAJImhHuhsRyW72gHWb4S5s0ULmRRSfmLVpu1H/pEvfYN5bJJ3ZMwF8BVE2fJVZZ+cejWxdMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749925804; c=relaxed/simple;
-	bh=gu0e+p4eb+oX+aP2FAx21feQ2rKQw2GjfLJjZ/kU1EU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jl3W5WLe335ofJ1A6fq1gA6lxzDvUaCKIm1wdg5U/r0PYJUuWcVzBMhrBfdKjkDabrHg4P2349esvfHjkknmU8bocH7AMnzoW/TpLQLXauo4icyXQlmyRVVubev1wwjHnu1pqUxN3sryi0/4YZL2XJ39HPKfd3AsijXcKGMVHTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KWPn6g7e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 900F9C4CEEF;
-	Sat, 14 Jun 2025 18:30:03 +0000 (UTC)
+	s=arc-20240116; t=1749926235; c=relaxed/simple;
+	bh=G+P66hoOSUSIwWlKroYcgaEw3Vouu378clFj4f1qjW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lZSMoAZ6p5BANlnc6GdOlvrUqP1VllDleyiHwcmqplcFkvTgOBjq47W/Vwy7tr8w1kWOSw0HyqX5CcFs26Uz8URa0nPwxBOj3bq8zABWKRl7XeZBT0F/trA8n4DaykeLEuW27tlS8Lt/koZNcBIu1jXqbvGvH/gt+bAb/JF++JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d63Zb6Jd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B516AC4CEEB;
+	Sat, 14 Jun 2025 18:37:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749925803;
-	bh=gu0e+p4eb+oX+aP2FAx21feQ2rKQw2GjfLJjZ/kU1EU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KWPn6g7eBs5Sqxau7XJCPrrXmIF8AooWqPumMjRra17ckn7zIyG5quFnMcpm1wICS
-	 UJwWT8bwGsnmYeyunX1jOTZmEsOKQZQmqZVM6tVNSsxtI4IfKMOoLBqtinqcOWpCP7
-	 pB4RGWdOSIWX9GVnXVz/fxSZAdLdic3/+AVRK5qamgf8sbfEIZWSO2AdR0e7wzg3QL
-	 zsrp8qNqY44DuY9fjKc2zOROuSt5N/fEMdES3E3f5VpVgYecmcdb5ze/fm/4/JXux9
-	 QHLWumz43fXoCo+Qu0mGnSsxExik6Hl1B1t1oyYM+H44XTif4UBMiyFpucm4zogWs+
-	 p63w9K9LFFqOg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FC9380AAD0;
-	Sat, 14 Jun 2025 18:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749926235;
+	bh=G+P66hoOSUSIwWlKroYcgaEw3Vouu378clFj4f1qjW8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d63Zb6JdkP/EPZFsk18bYDpcx3yR7oGSkzJ5wV2n5hr7vBl7bULiQFCojNen4GEqs
+	 qtT6/b0xfrqryPNaN+4sJoCsUM479aZrH8glgeeTXasWdYQVszFHIXv8xs+B/ePF31
+	 dpy6NFRIxoYLoV/Q/imCrIJv1U7a+HZXN8sVp0vTKjf+t24XrquAcyxF9MzLg9dvjX
+	 9JI+FbcTHD8f3hwKD6Ycpq5FsmPVB3pnDBDNewNraPav8/cPZkMs7PoNWTiLxyPmT2
+	 LFYNsHWDJ7uzYY+B/kbIZfYlnSYerdQtWY5y8OOj20gRKbPKrobwEEpzmsu1MlDdI4
+	 ZxhWdCnfxwXzg==
+Date: Sat, 14 Jun 2025 11:37:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan
+ <shuah@kernel.org>
+Subject: Re: [PATCH net-next v1 1/4] net: netmem: fix skb_ensure_writable
+ with unreadable skbs
+Message-ID: <20250614113713.46b69771@kernel.org>
+In-Reply-To: <20250613042804.3259045-1-almasrymina@google.com>
+References: <20250613042804.3259045-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Read firmware-names
- from
- device tree
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174992583274.1145273.14132783904581639503.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Jun 2025 18:30:32 +0000
-References: <20250613064547.44394-1-danishanwar@ti.com>
-In-Reply-To: <20250613064547.44394-1-danishanwar@ti.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, m-malladi@ti.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, srk@ti.com, vigneshr@ti.com, rogerq@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 13 Jun 2025 04:28:01 +0000 Mina Almasry wrote:
+> skb_ensure_writable actually makes sure that the header of the skb is
+> writable, and doesn't touch the payload. It doesn't need an
+> skb_frags_readable check.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+"doesn't touch the payload" is a bit misleading.
+What I'd say instead is that the pskb_may_pull() call about ensures that
+write_len is within the head, and will already fail if write_len would
+dip into unreadable frags.
 
-On Fri, 13 Jun 2025 12:15:47 +0530 you wrote:
-> Refactor the way firmware names are handled for the ICSSG PRUETH driver.
-> Instead of using hardcoded firmware name arrays for different modes (EMAC,
-> SWITCH, HSR), the driver now reads the firmware names from the device tree
-> property "firmware-name". Only the EMAC firmware names are specified in the
-> device tree property. The firmware names for all other supported modes are
-> generated dynamically based on the EMAC firmware names by replacing
-> substrings (e.g., "eth" with "sw" or "hsr") as appropriate.
+> Removing this check restores DSCP functionality with unreadable skbs as
+> it's called from dscp_tg.
 > 
-> [...]
+> Fixes: 65249feb6b3d ("net: add support for skbs with unreadable frags")
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-Here is the summary with links:
-  - [net-next,v2] net: ti: icssg-prueth: Read firmware-names from device tree
-    https://git.kernel.org/netdev/net-next/c/ffe8a4909176
+Either no Fixes tag or send it to net. I think net is fine, this is
+clearly incorrect. By definition devmem should not prevent header
+modifications, so net?
 
-You are awesome, thank you!
+nit: no empty lines between tags
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
