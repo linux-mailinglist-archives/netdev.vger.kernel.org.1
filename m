@@ -1,129 +1,93 @@
-Return-Path: <netdev+bounces-197797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9845AD9E85
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:33:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93EAFAD9E8C
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EF3917528C
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 17:33:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D363AE323
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 17:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25772E2F00;
-	Sat, 14 Jun 2025 17:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8D32E338E;
+	Sat, 14 Jun 2025 17:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="du/NcX7b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RupatiqN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0C51C6FF3;
-	Sat, 14 Jun 2025 17:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2411C54AF;
+	Sat, 14 Jun 2025 17:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749922400; cv=none; b=pnjsnBaphJzExbtA3HEPMtojCVpbuNpG3cgLtl9N8lMGQ7DQkufrlkdhCeNS2u1mxOUEvIO1gJjdHLLh9Ue2mopGVPfHSjDrRvMJemH4SoCI7siNDLIZ1BRJDaiWS5IcA9Twb7uEEkj2ka9jGj9Kqa5Ht6Kyo/Cikgig5HlmGHY=
+	t=1749922622; cv=none; b=geXOOY7lGYSSpEqVimtgvaQ4XC6vN7HAB+Y5HgNoAD7kPqU9uLKQCR1AoB1vaOYk3vWzDQIbjjt0uEXFxNyuGWuIOU+2uoGtorSLiP0juc869987KQpiBFaPjHIuTbcal1WqhRglugIHmXwYSLXpcmXLzUokMyuxzdXkrhXaz3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749922400; c=relaxed/simple;
-	bh=sYzhyuOMJlxaNLvwtjvQFPSqgL1EZJfEM0k8Hyk2zmE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HL4pN8WQ067L7Q0vF+74LoVPkb1U8NAetSoPPB2NzkNrWe1vE+ax25n8WsenkFfmJIkL3R15D4Ywv/KYkg3fX2mvRzQ+BPIyGAz/mDmEqeznN+xc1GYBaMRgPqF+4WTf6lwDS4TzUR+rudAUTaNq6Z8Mrdx9a3+v2G2mbQRDPRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=du/NcX7b; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749922399; x=1781458399;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sYzhyuOMJlxaNLvwtjvQFPSqgL1EZJfEM0k8Hyk2zmE=;
-  b=du/NcX7bkNCz0oZ88U/JQ1x8ykVt0wktUtoNKlqz0PmRahCnToC7jXog
-   TNc+nctyKq3CJBqvPyjgRygDmbQegbiCDCcsRhJofNWrwA9Kz1K11zh+F
-   Iw9Ej1gwBcFrpCKQCQX97aewktbArK8GNLZ2/T4jtdnLE8nIYR0VnuqjJ
-   n5SdHcS9WS1M/I0OfV6jX+CoG83N45+vBpBtcW40Tu2Z02/qOnm0zKZwB
-   IbspEFcpM9mirUrwJeHxp2ReLeJBsrE0Gn65ytOka3jubU7XI3oUjBQXL
-   qjart1mEqd3SW9apSUftGci6vxAqN4FNKovbP4IwtUbt8RfYUtrNiXEER
-   g==;
-X-CSE-ConnectionGUID: JnxcsrzgS3W9XcsCqpRKBg==
-X-CSE-MsgGUID: +eLu2qJsSEO155J5jDAMMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11464"; a="77510505"
-X-IronPort-AV: E=Sophos;i="6.16,237,1744095600"; 
-   d="scan'208";a="77510505"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2025 10:33:18 -0700
-X-CSE-ConnectionGUID: nRDaa7ccShCXOkP3q+4CNw==
-X-CSE-MsgGUID: nIM2ZCBoSemDGezcKbJKPg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,237,1744095600"; 
-   d="scan'208";a="147953425"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 14 Jun 2025 10:33:12 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uQUkg-000Dj2-1v;
-	Sat, 14 Jun 2025 17:33:10 +0000
-Date: Sun, 15 Jun 2025 01:32:53 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuni1840@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, bpf@vger.kernel.org,
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 bpf-next 1/4] af_unix: Don't pass struct socket to
- security_unix_may_send().
-Message-ID: <202506150111.BYSccpdo-lkp@intel.com>
-References: <20250613222411.1216170-2-kuni1840@gmail.com>
+	s=arc-20240116; t=1749922622; c=relaxed/simple;
+	bh=giWEbQVGPDAUjjSTlftLxeH1yHeLxWW9myogm0Xe15s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QLx9ISpNZm6B5Q4xGMj/bPsouk9bDZYoGgG2t+/N1vbeyhaXGRo2+Zrtr7XgB6kfbIjESPX56jckuUwb7aoOlY619WFxrsIRayd5qh6Pag4QkFrlpjSG9HKpHEQ2QvLX++n1Nopd+SeML+ALMn/jcCncxgfXtrKCV/L6revuZDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RupatiqN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D0D8C4CEEB;
+	Sat, 14 Jun 2025 17:37:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749922622;
+	bh=giWEbQVGPDAUjjSTlftLxeH1yHeLxWW9myogm0Xe15s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RupatiqNGmEi2ttyLukWxybZN5O3W1zwp6BtLXJErrSUf/aF+OwYPT+DmBkH2WNGY
+	 Lckjf/Mi90RsO60JeKaj6VH/N25cSKoKwpOSNWNJgrt0ClDjk0o/FppvRnFY8MtaC5
+	 4uFiDGcwKekZ7Izxs7rgw1fRUzMFunNs8olLbSVCDGKyKILtdfgZsbnLTPiMh38ABR
+	 Fl5yy0ssRFatLI7JqqekkHJc49wIy7RkElzhhf6U6Xke90wfuzUvUV/OAVLwZmnSHC
+	 yHyNRiHsDRNXT9AtQLcDmHVGznYmFgI6cQyj0GkblAvE2iSq+Xwq3YYAd1IfHb4nHT
+	 BNmnvdce2DDEA==
+Date: Sat, 14 Jun 2025 10:37:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Akira
+ Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Ignacio
+ Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>,
+ Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben
+ Wauters <rubenru09@aol.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
+ peterz@infradead.org, stern@rowland.harvard.edu
+Subject: Re: [PATCH v4 12/14] MAINTAINERS: add maintainers for
+ netlink_yml_parser.py
+Message-ID: <20250614103700.0be60115@kernel.org>
+In-Reply-To: <20250614173235.7374027a@foz.lan>
+References: <cover.1749891128.git.mchehab+huawei@kernel.org>
+	<ba75692b90bf7aa512772ca775fde4c4688d7e03.1749891128.git.mchehab+huawei@kernel.org>
+	<CAD4GDZzA5Dj84vobSdxqXdPjskBjuFm7imFkZoSmgjidbCtSYQ@mail.gmail.com>
+	<20250614173235.7374027a@foz.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613222411.1216170-2-kuni1840@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Kuniyuki,
+On Sat, 14 Jun 2025 17:32:35 +0200 Mauro Carvalho Chehab wrote:
+> > > @@ -27314,6 +27315,7 @@ M:      Jakub Kicinski <kuba@kernel.org>
+> > >  F:     Documentation/netlink/
+> > >  F:     Documentation/userspace-api/netlink/intro-specs.rst
+> > >  F:     Documentation/userspace-api/netlink/specs.rst
+> > > +F:     scripts/lib/netlink_yml_parser.py
+> > >  F:     tools/net/ynl/  
+> 
+> With regards to the location itself, as I said earlier, it is up to
+> Jon and you to decide.
+> 
+> My preference is to have all Python libraries at the entire Kernel
+> inside scripts/lib (or at some other common location), no matter where
+> the caller Python command or in-kernel Sphinx extensions are located.
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on bpf-next/master]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/af_unix-Don-t-pass-struct-socket-to-security_unix_may_send/20250614-062956
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20250613222411.1216170-2-kuni1840%40gmail.com
-patch subject: [PATCH v2 bpf-next 1/4] af_unix: Don't pass struct socket to security_unix_may_send().
-config: arm-randconfig-001-20250614 (https://download.01.org/0day-ci/archive/20250615/202506150111.BYSccpdo-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250615/202506150111.BYSccpdo-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506150111.BYSccpdo-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Warning: security/smack/smack_lsm.c:3892 function parameter 'sk' not described in 'smack_unix_may_send'
->> Warning: security/smack/smack_lsm.c:3892 Excess function parameter 'sock' description in 'smack_unix_may_send'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I understand that from the PoV of ease of maintenance of the docs.
+Is it fair to say there is a trade off here between ease of maintenance
+for docs maintainers and encouraging people to integrate with kernel
+docs in novel ways?
 
