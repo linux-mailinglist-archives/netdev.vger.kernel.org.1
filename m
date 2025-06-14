@@ -1,146 +1,123 @@
-Return-Path: <netdev+bounces-197753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F14EAD9C15
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 12:22:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401C6AD9C2D
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 12:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03B6B3AE848
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:21:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAF071782B9
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E201A01B9;
-	Sat, 14 Jun 2025 10:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F081C84CD;
+	Sat, 14 Jun 2025 10:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZViLs5x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gz/eh5B7"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5928916F841
-	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 10:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBC31D5173
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 10:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749896519; cv=none; b=M9LY9uHxANZuxr1bNpVwFu5L5/FQ3Pemg1puqlgtRSe8GaiaOKEVaZKKSQ+Kr8S2B/Sh/BONFCWmb78jZPDlz//VNfh/m8IIo6RFt/8Fi9XmxDRevlfm9w8wJlo3vew+3mhspCHjBhMvOkDF1ejq4zpL5y49yTkuA9nWO3TE1hs=
+	t=1749897566; cv=none; b=R28RK/AVpl/4C98EXBhYEz+b0D+yatHkj+OnL8ePAu600EMehE0WNF93XWsMVNwWL8ycbMxMLDU4M/039zEX3q6OSPycVrayO7MWAPE6Un82pPYuFPB3oDA4hAnUEO/nndCNA+TUrb02RuSiAqPxzfLE6sHSYpzNA7nfFuoBiws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749896519; c=relaxed/simple;
-	bh=FtNy7STuv9GtELdi+n2fuP2s8khETAknE9arw1EHBkM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C0d78sLt/MFuk1ubzrAJuvP/VuNVuSxwIKLbmkbxUhdc3sYaEIoVTfs7NGHuUVzqQtnIx9ameU/2cdFJMmxxaJBDCwJlaFDPAjPZ5eDO1UBKPib62vBORv1VV3SWXn4hU4v0iGUXu0endqfvX4xLbyq2Q6PbNGla64B2BCMEHb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iZViLs5x; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1749897566; c=relaxed/simple;
+	bh=ljuppTqyX9qOD/vtLwotTaA9fqBjfssPGpbLtG8Pjsk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GIhzyIntWuB6guKmO52SPAJ9WYoziv/J4rghmS362842BaxnzqN1dLg2N+kn12XXg98VW2bIrsZdgKxWg4CzOZEE67vGpIg58opqHJwE1OGwTONu0y3lC404gSDhYuptEGR232zN1Ss7+5v7uWd/Pneqj0JKfycpNzjXUgET/yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gz/eh5B7; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749896516;
+	s=mimecast20190719; t=1749897563;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UafiXuMqi4LdfGj4sc+D7nsu7kRmyiXaHQorT8Cfz14=;
-	b=iZViLs5xkvesftM8FFmiH8AHfWzxtKCFpD11TJr1CDSAkF8oBlge/pCYq46kBRA/vBFqLp
-	aSfQG7oVeKXIzCL2CNIWLJNtW6uZaMtAAJji+ciwhqac9srFh3+R90p6xpEhLHHr5j+DG+
-	xENHkSXDOybFD7uf/A80Mqq/vmJftxk=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-0jQ1aLS_OfKVocY6QeOupQ-1; Sat, 14 Jun 2025 06:21:54 -0400
-X-MC-Unique: 0jQ1aLS_OfKVocY6QeOupQ-1
-X-Mimecast-MFC-AGG-ID: 0jQ1aLS_OfKVocY6QeOupQ_1749896514
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-7111d608131so42903997b3.1
-        for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 03:21:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749896514; x=1750501314;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UafiXuMqi4LdfGj4sc+D7nsu7kRmyiXaHQorT8Cfz14=;
-        b=n/tvdzMwKGibPuxy2djqryNflBYuACa2xApllp5xOSEmt7phBclNVjq/vF9uioH3W2
-         fvEIhv9kTXaI9dhIQ6kVyhFvOkZisONzqNHmYWiZuB+OrJ1jPs/ntBjVvMijK/SxNi4A
-         YvEWt/0NoyA3Fsgnu/bN4D5Ng1cZBjd4py+C8/4K0ieNRu6WXufR3xDM6l1FJM9zOJiO
-         kkQb9FXNMmN4TnsqgnM4RN8Nj7uBOXsFKF0z5OZ7ZnHstTb7O0cZXLOH7/VpAORCH7Bq
-         XSouK7l5//H/Tjk2WB5rU94ulekXraueFvV9Z67s5N15V6zRzo3y8/TSKSNnok3bUwcM
-         khjQ==
-X-Gm-Message-State: AOJu0YxOPTnndd+UFymxJCkbEu2ecPjMzA5j4h2ivx5B9Jo+nlkLcsF1
-	+xOkU0LN+VTvPLGRdQ1Bq+EaLX/sRlipZwgdToJ56KzdM9U4NpYBdjpdfek5HWn8d9wgFdXCQ2v
-	p1HrICZ9yAvORUpdYkEsoh2LODm+OAgH/e69CI17vnAG3VYVjT8ERw9NQJQqWiwQj9icy34qTHi
-	YAaFsQyxAK8JH1URvXPqYHKRos/GHsHTLk
-X-Gm-Gg: ASbGnctlO+J2ffc0ull9LojG+LRRzE62MGhlp0c3/cHJ/k93fwDukycfer7gGo/vh9F
-	eHYnBqjl8Vy1jxDIKZpqfk4R9AbLq00/8zJEBEjIoCSMJaFNa1BPdfnAQJX70BfN7ygkdZ2O+N1
-	JADVw=
-X-Received: by 2002:a05:690c:6f91:b0:70f:84c8:311a with SMTP id 00721157ae682-7117537b4d0mr32036877b3.5.1749896514215;
-        Sat, 14 Jun 2025 03:21:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsDio91UnA2Ova7tInCmKQ4BSCk38Pqzj/ai2/tPIxdj25CZvTMa1s7cKkJYaV6+/1IyNpviVdCRll9qlMots=
-X-Received: by 2002:a05:690c:6f91:b0:70f:84c8:311a with SMTP id
- 00721157ae682-7117537b4d0mr32036637b3.5.1749896513872; Sat, 14 Jun 2025
- 03:21:53 -0700 (PDT)
+	bh=mfJRAujRjuGi7KQbNecOBzzOmJkqRWWoAoZaJP2IUfQ=;
+	b=Gz/eh5B7zlvxoAtjSoDylV91S2giKqR3z5FSKEdXAhCbjPqmHxjME+O4KgBAJP5yqEG7kj
+	jcJ+Z4aDt1xFFb0zfOt1YZ0ShIKAE3XPk4lTq/GGh0A914HpDctJ0Iz8KneKhsNQlYs3cj
+	zsxC2E3Db/UNLPpO1Xc03rylnvYGtas=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-161-G2aoBe6gMUuwFE-f18DMzQ-1; Sat,
+ 14 Jun 2025 06:39:22 -0400
+X-MC-Unique: G2aoBe6gMUuwFE-f18DMzQ-1
+X-Mimecast-MFC-AGG-ID: G2aoBe6gMUuwFE-f18DMzQ_1749897560
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4BA721800289;
+	Sat, 14 Jun 2025 10:39:19 +0000 (UTC)
+Received: from [10.45.224.53] (unknown [10.45.224.53])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 51270180045B;
+	Sat, 14 Jun 2025 10:39:10 +0000 (UTC)
+Message-ID: <00780331-37cb-48ae-bb87-06d21a9ec4d1@redhat.com>
+Date: Sat, 14 Jun 2025 12:39:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749210083.git.pabeni@redhat.com> <a38c6a4618962237dde1c4077120a3a9d231e2c0.1749210083.git.pabeni@redhat.com>
- <CACGkMEtExmmfmtd0+6YwgjuiWR-T5RvfcnHEbmH=ewqNXHPHYA@mail.gmail.com> <b7099b02-f0d4-492c-a15b-2a93a097d3f5@redhat.com>
-In-Reply-To: <b7099b02-f0d4-492c-a15b-2a93a097d3f5@redhat.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Sat, 14 Jun 2025 12:21:42 +0200
-X-Gm-Features: AX0GCFsKmXxLyWjTg10wGCqtgMIVSqr3wy_FKKadD4Q_peMisig0qvJsYw2Xq60
-Message-ID: <CAF6piCLcGbjjgmx_0O374giv3Yvc+qo_km2YLqyHrhsYcphGJQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 7/8] tun: enable gso over UDP tunnel support.
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 06/14] dpll: zl3073x: Fetch invariants during
+ probe
+To: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250612200145.774195-7-ivecera@redhat.com>
+ <202506140541.KcP4ErN5-lkp@intel.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <202506140541.KcP4ErN5-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, Jun 12, 2025 at 1:03=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
-> On 6/12/25 6:55 AM, Jason Wang wrote:
-> > On Fri, Jun 6, 2025 at 7:46=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >> @@ -1720,8 +1732,16 @@ static ssize_t tun_get_user(struct tun_struct *=
-tun, struct tun_file *tfile,
-> >>
-> >>         if (tun->flags & IFF_VNET_HDR) {
-> >>                 int vnet_hdr_sz =3D READ_ONCE(tun->vnet_hdr_sz);
-> >> +               int parsed_size;
-> >>
-> >> -               hdr_len =3D tun_vnet_hdr_get(vnet_hdr_sz, tun->flags, =
-from, &gso);
-> >> +               if (vnet_hdr_sz < TUN_VNET_TNL_SIZE) {
-> >
-> > I still don't understand why we need to duplicate netdev features in
-> > flags, and it seems to introduce unnecessary complexities. Can we
-> > simply check dev->features instead?
-> >
-> > I think I've asked before, for example, we don't duplicate gso and
-> > csum for non tunnel packets.
 
-[...]
 
-> Still the additional complexity is ~5 lines and makes all the needed
-> information available on a single int, which is quite nice performance
-> wise. Do you have strong feeling against it?
+On 13. 06. 25 11:46 odp., kernel test robot wrote:
+> Hi Ivan,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on net-next/main]
+> 
+> url:https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings- 
+> dpll-Add-DPLL-device-and-pin/20250613-041005
+> base:   net-next/main
+> patch link:https://lore.kernel.org/r/20250612200145.774195-7-ivecera%40redhat.com
+> patch subject: [PATCH net-next v9 06/14] dpll: zl3073x: Fetch invariants during probe
+> config: alpha-randconfig-r061-20250614 (https://download.01.org/0day-ci/archive/20250614/202506140541.KcP4ErN5- 
+> lkp@intel.com/config)
+> compiler: alpha-linux-gcc (GCC) 10.5.0
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot<lkp@intel.com>
+> | Closes:https://lore.kernel.org/oe-kbuild-all/202506140541.KcP4ErN5-lkp@intel.com/
 
-I forgot to mention a couple of relevant points: the tun_vnet_*
-helpers are used also by tap devices, so we can't pass the tun struct
-as an argument, and we will need to add a new argument to pass the
-dev->features or dev pointer, which is IMHO not nice. Also we should
-provide backward compatible variants for all the helpers to avoid
-touching the tap driver. Overall using the 'dev->features' will
-require a comparable code churn, likely even greater.
+Jakub, Dave, Paolo,
+should I fix this in v10 or in a follow-up in the part 2?
 
-For plain GSO offload, currently the code validation is quite liberal
-and doesn't check the actual offloaded features. We  can't change the
-existing behaviour for backward compatibility, but we want to be more
-conservative with the new code, when possible - so we want the
-information available to the helpers.
-
-/P
+Thanks,
+Ivan
 
 
