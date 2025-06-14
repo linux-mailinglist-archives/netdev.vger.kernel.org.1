@@ -1,178 +1,114 @@
-Return-Path: <netdev+bounces-197767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0071AD9D58
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 16:16:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75127AD9D55
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 16:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67775178864
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 14:16:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F280189A473
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 14:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E012D8DB1;
-	Sat, 14 Jun 2025 14:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C8A70808;
+	Sat, 14 Jun 2025 14:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KRvTsOBW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4BdxzNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18822741A6;
-	Sat, 14 Jun 2025 14:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDBFBA2D;
+	Sat, 14 Jun 2025 14:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749910561; cv=none; b=f66ZuZ3SQ8UcGK5sS8cHIPILJZ2QtD1okGNhH5JU7HLsgLtOrSO/3opJJgY+iYK0stYzvhKfzGnwYYoK+OAgzZM1Ev3mHs2ldjaZaMgbLOiP8ZkOKORT2KFcBYvaMIkYqq0kYQ2JvM2H+kP9vXc+gPuGS+7ZtYwjJRcXr4WOEAo=
+	t=1749910538; cv=none; b=TDXtrhYWkVT4FmC9Kqi4IjNj4eRh2O8u25rw/QG+M+k5w98NBUYxchcxOUPpYx+N4Hr1UWpA+6hCq1M6iFB60JVUx7gxGrgYtoZPqmjDLpFpJOr2TXSImB7QcUsRBi8ECdYtprqAy7plT0YsYR22TRWz9iv2lpp6BnppQDy42mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749910561; c=relaxed/simple;
-	bh=GC9tpkFfno9ZmAS5i81de4jLhUq5fwK+uGips45OJ5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O+Ij2nsYRLLPnfWr1psMtOzHU/3C+BZQa5gAmfiFIgx8UR7lvH0aKjcLzV1MUGr6Xs7oSQV8XLxtQ5ORui6lSA/ruk1dBpLpVe9XkzblDfhx/SR1SfNhCKXmb34NgBE/vZmGW/4Ie0vqhpAd4OidtPpuaKhbCSZzWY5ohenan5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KRvTsOBW; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749910559; x=1781446559;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GC9tpkFfno9ZmAS5i81de4jLhUq5fwK+uGips45OJ5o=;
-  b=KRvTsOBWG+dUyLMJ9PdTY6LjSvNwN/ZUunDc9UOaF25h6ZLOobOyW5Fy
-   UbfSFaK48/oo6BM7de7ytG4LEWsdhhheTP0HX5pzkYIhAeZpTNCVIcKhI
-   Q80KrHJPF1CeHRYN8Ix4ztJtS9OayKpfRLDGyGAk9ggqLIiTZeelbPl6F
-   xHai1ETscCDf3dv5Vs3dbR/rl/pm1BufJjti7OYZemzNIBiJFuC5bkTeU
-   Pnz1NkFPCoRwG1QeZrTNMZ5kviiDTC6+vg3uoSj8C0EpN2ZOxog9aNmBx
-   Mq8IiSOD6mK6V0bk7EtVd8x2txqS84g2EkkzyNYhzw1veMIzBI3SRurfb
-   g==;
-X-CSE-ConnectionGUID: KWo4rfgRSq2p/C6lxJ9jTA==
-X-CSE-MsgGUID: VbFYmJuXT+W7EVpZr+0snQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11464"; a="69688554"
-X-IronPort-AV: E=Sophos;i="6.16,236,1744095600"; 
-   d="scan'208";a="69688554"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2025 07:15:58 -0700
-X-CSE-ConnectionGUID: 8LEP3H+cTOytWMQIGoZRJg==
-X-CSE-MsgGUID: 0Js0oOpcTFqf1Z8IG88u5g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,236,1744095600"; 
-   d="scan'208";a="147964324"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 14 Jun 2025 07:15:55 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uQRfl-000DZW-03;
-	Sat, 14 Jun 2025 14:15:53 +0000
-Date: Sat, 14 Jun 2025 22:15:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jun Miao <jun.miao@intel.com>, sbhatta@marvell.com, kuba@kernel.org,
-	oneukum@suse.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
-	qiang.zhang@linux.dev, jun.miao@intel.com
-Subject: Re: [PATCH v2] net: usb: Convert tasklet API to new bottom half
- workqueue mechanism
-Message-ID: <202506142111.KG4EupOI-lkp@intel.com>
-References: <20250614111414.2502195-1-jun.miao@intel.com>
+	s=arc-20240116; t=1749910538; c=relaxed/simple;
+	bh=DCmUzencsMsnMaFx/4U/i7fCe25jewj1ptzTPHuZXrg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NQrJ47HpAqaHEUHfFtS7FZL5CEaUFrI3UWYiOB2Un0QcvWDxykJAsCqeCQmdRBWjHmNChotsAJGxdpQ+i+gBXfrEmcvtgSdRiuYN8MIrQd4qCf7h13HqjSVrWhDNTECS/dh/0+wQpKGefbAT/5WNj1cBlD+Zepvt0qx09/cZRYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4BdxzNZ; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-40a6692b75cso2162702b6e.1;
+        Sat, 14 Jun 2025 07:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749910536; x=1750515336; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=V212NBLelySDp+6/CyeJaC/8PZkKsYoStFWQx4jyJv0=;
+        b=P4BdxzNZvQYl0LFplGrz7lFcCyH2VDRiV1wAtlTS2LZ4sHh2IZMsfefZkT55swTr1/
+         UDL5duafN7cBRAbNFB0v9i4vtluyJO+jxHrbr6DvA2uNQnlRdjhzWBc1cEtjRQaVBWHA
+         0Wts33em6zLAFZYqofs5jSaXvaR3802MNc7lN7XHIk350kHVDd1reS64HSy36nm/QFC5
+         cNYlHtaSvnSFKdkde7X4G1KZ0ZnqD61jIbggZnelwcxk0dL5gXIKOJp+RuHcf7Hf9TPU
+         SUDLUzzDo10MYhYCVzRc31K4EzQlPb4eJqGv9JgZlkciC7oNnb5P3uzU068Vrmg1Emro
+         6CKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749910536; x=1750515336;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V212NBLelySDp+6/CyeJaC/8PZkKsYoStFWQx4jyJv0=;
+        b=ol7yqg+J7bit8kA5vebqJQm4XjN0iZygrDZ5w+SGZPILiKdpGieGa/RDVPsc4zcQ0o
+         o9qKl67JvFnTxcX29OmC0kq//LDy0gjJ98IEdSR26u3YrKNjf1HTeCTgtK5iNLrKg3Di
+         H5etER1dAUUmsbz4zS2J65YSt/SVIx+GUTzjfmPMbvTRImEr5dWjpe1yC4PfFVd7KgYw
+         n5efEypfsQiUtmhrm/xTP4WGf8+brTUgRxQbWXgVqDinkcGnw8ZI3uUwt487wAUbXoAq
+         FSrmAj6iqPspqOJ2VtKby0runOkOa5QeIVfVHYdpX46IxoaLPmX45kobuhWpZwqj9KnU
+         9SUw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWpvMQG0WToEXlVpXpvbG79Q/AcUDaxMKgbniz//L4UHUhlM7CKnvEckwbKI+prxNp9shCZkBc+Dy+D0I=@vger.kernel.org, AJvYcCWrFymQ9CLiQ3u2R2+Cg0Ue4PvqizJ/LMl7eL24Jj71a0wgnRvf8SLvXxvD/PAk1u57s6Y8cNhv@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIKhnTGQue7mdpehwq9Tuxa30nkb2jBYTomqRSLXGET+WkHKHj
+	VX42VsCy8ani3sOYD1Pp3a2HtLfF00ybXDgweZr35ZU9DX5dNW9c79jQyxY+9/wNUkdaVnkaBSn
+	N3zQJ8ouPLPH/v0a7Cy8IhkfrHbDCpfw=
+X-Gm-Gg: ASbGncsxtgPAwi0dNDtlggoIaTpH97w72EZ5i70WMU8BwRUCQDa9nXSiCwifbsTYA80
+	Xu727TUBp/sqV0zHg4XdmcdHwA7KMmxmAIWfHMkTU8ZAAxdKeNoi5s/0r7dcJTZ1sMUTh0bLdA8
+	d7gLdO2aKjXmzL9AeUB514MzFMQND8YkhDhuiu+UrgUOnT/rPTMFI2j3yhdWv138xd1KEwFdsFj
+	Q32nSNxeWWX
+X-Google-Smtp-Source: AGHT+IE7Id5T+q892mpAZrQTdRJVM/iBsvIslk9IkOAbJoYWxBoUYMFvgoYdDkNU0o3h51zEcveta5gNqzJQn1eG0z4=
+X-Received: by 2002:a05:6808:211a:b0:404:1898:1a0b with SMTP id
+ 5614622812f47-40a7c19e067mr2049349b6e.31.1749910536255; Sat, 14 Jun 2025
+ 07:15:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250614111414.2502195-1-jun.miao@intel.com>
+References: <cover.1749891128.git.mchehab+huawei@kernel.org> <31466ece9905956c2e1a3d3fc744cfc272df5d88.1749891128.git.mchehab+huawei@kernel.org>
+In-Reply-To: <31466ece9905956c2e1a3d3fc744cfc272df5d88.1749891128.git.mchehab+huawei@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Sat, 14 Jun 2025 15:15:25 +0100
+X-Gm-Features: AX0GCFu7jgqlSlj61VjuypZSCCHHVOKVJwT6Cqt0Oc5ACuVVfK8OEx-nZWS3V3c
+Message-ID: <CAD4GDZxPTFmKeNqRZBxW1ij6Gy0L3hrbB6q9G6WdFb8h6Zhr=g@mail.gmail.com>
+Subject: Re: [PATCH v4 07/14] tools: ynl_gen_rst.py: move index.rst generator
+ to the script
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Akira Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Ignacio Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>, 
+	Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, joel@joelfernandes.org, 
+	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org, 
+	stern@rowland.harvard.edu
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jun,
+On Sat, 14 Jun 2025 at 09:56, Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
+>
+> The index.rst generator doesn't really belong to the parsing
+> function. Move it to the command line tool, as it won't be
+> used elsewhere.
+>
+> While here, make it more generic, allowing it to handle either
+> .yaml or .rst as input files.
 
-kernel test robot noticed the following build errors:
+I think this patch can be dropped from the series, if instead you
+remove the index generation code before refactoring into a library.
 
-[auto build test ERROR on usb/usb-testing]
-[also build test ERROR on usb/usb-next usb/usb-linus net/main net-next/main linus/master v6.16-rc1 next-20250613]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Jun-Miao/net-usb-Convert-tasklet-API-to-new-bottom-half-workqueue-mechanism/20250614-191339
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-patch link:    https://lore.kernel.org/r/20250614111414.2502195-1-jun.miao%40intel.com
-patch subject: [PATCH v2] net: usb: Convert tasklet API to new bottom half workqueue mechanism
-config: nios2-randconfig-001-20250614 (https://download.01.org/0day-ci/archive/20250614/202506142111.KG4EupOI-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250614/202506142111.KG4EupOI-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506142111.KG4EupOI-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/usb/usbnet.c: In function 'usbnet_resume':
->> drivers/net/usb/usbnet.c:1974:47: error: 'struct usbnet' has no member named 'bh'
-    1974 |                         tasklet_schedule (&dev->bh);
-         |                                               ^~
-
-
-vim +1974 drivers/net/usb/usbnet.c
-
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1931  
-38bde1d4699af4 drivers/usb/net/usbnet.c David Brownell   2005-08-31  1932  int usbnet_resume (struct usb_interface *intf)
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1933  {
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1934  	struct usbnet		*dev = usb_get_intfdata(intf);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1935  	struct sk_buff          *skb;
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1936  	struct urb              *res;
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1937  	int                     retval;
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1938  
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1939  	if (!--dev->suspend_count) {
-6eecdc5f95a393 drivers/net/usb/usbnet.c Dan Williams     2013-05-06  1940  		/* resume interrupt URB if it was previously submitted */
-6eecdc5f95a393 drivers/net/usb/usbnet.c Dan Williams     2013-05-06  1941  		__usbnet_status_start_force(dev, GFP_NOIO);
-68972efa657040 drivers/net/usb/usbnet.c Paul Stewart     2011-04-28  1942  
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1943  		spin_lock_irq(&dev->txq.lock);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1944  		while ((res = usb_get_from_anchor(&dev->deferred))) {
-a11a6544c0bf6c drivers/net/usb/usbnet.c Oliver Neukum    2007-08-03  1945  
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1946  			skb = (struct sk_buff *)res->context;
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1947  			retval = usb_submit_urb(res, GFP_ATOMIC);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1948  			if (retval < 0) {
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1949  				dev_kfree_skb_any(skb);
-638c5115a79498 drivers/net/usb/usbnet.c Ming Lei         2013-08-08  1950  				kfree(res->sg);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1951  				usb_free_urb(res);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1952  				usb_autopm_put_interface_async(dev->intf);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1953  			} else {
-860e9538a9482b drivers/net/usb/usbnet.c Florian Westphal 2016-05-03  1954  				netif_trans_update(dev->net);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1955  				__skb_queue_tail(&dev->txq, skb);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1956  			}
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1957  		}
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1958  
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1959  		smp_mb();
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1960  		clear_bit(EVENT_DEV_ASLEEP, &dev->flags);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1961  		spin_unlock_irq(&dev->txq.lock);
-75bd0cbdc21d80 drivers/net/usb/usbnet.c Ming Lei         2011-04-28  1962  
-75bd0cbdc21d80 drivers/net/usb/usbnet.c Ming Lei         2011-04-28  1963  		if (test_bit(EVENT_DEV_OPEN, &dev->flags)) {
-14a0d635d18d0f drivers/net/usb/usbnet.c Oliver Neukum    2014-03-26  1964  			/* handle remote wakeup ASAP
-14a0d635d18d0f drivers/net/usb/usbnet.c Oliver Neukum    2014-03-26  1965  			 * we cannot race against stop
-14a0d635d18d0f drivers/net/usb/usbnet.c Oliver Neukum    2014-03-26  1966  			 */
-14a0d635d18d0f drivers/net/usb/usbnet.c Oliver Neukum    2014-03-26  1967  			if (netif_device_present(dev->net) &&
-65841fd5132c39 drivers/net/usb/usbnet.c Ming Lei         2012-06-19  1968  				!timer_pending(&dev->delay) &&
-65841fd5132c39 drivers/net/usb/usbnet.c Ming Lei         2012-06-19  1969  				!test_bit(EVENT_RX_HALT, &dev->flags))
-ab6f148de28261 drivers/net/usb/usbnet.c Oliver Neukum    2012-08-26  1970  					rx_alloc_submit(dev, GFP_NOIO);
-65841fd5132c39 drivers/net/usb/usbnet.c Ming Lei         2012-06-19  1971  
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1972  			if (!(dev->txq.qlen >= TX_QLEN(dev)))
-1aa9bc5b2f4cf8 drivers/net/usb/usbnet.c Alexey Orishko   2012-03-14  1973  				netif_tx_wake_all_queues(dev->net);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03 @1974  			tasklet_schedule (&dev->bh);
-69ee472f270637 drivers/net/usb/usbnet.c Oliver Neukum    2009-12-03  1975  		}
-75bd0cbdc21d80 drivers/net/usb/usbnet.c Ming Lei         2011-04-28  1976  	}
-5d9d01a30204c9 drivers/net/usb/usbnet.c Oliver Neukum    2012-10-11  1977  
-5d9d01a30204c9 drivers/net/usb/usbnet.c Oliver Neukum    2012-10-11  1978  	if (test_and_clear_bit(EVENT_DEVICE_REPORT_IDLE, &dev->flags))
-5d9d01a30204c9 drivers/net/usb/usbnet.c Oliver Neukum    2012-10-11  1979  		usb_autopm_get_interface_no_resume(intf);
-5d9d01a30204c9 drivers/net/usb/usbnet.c Oliver Neukum    2012-10-11  1980  
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1981  	return 0;
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1982  }
-38bde1d4699af4 drivers/usb/net/usbnet.c David Brownell   2005-08-31  1983  EXPORT_SYMBOL_GPL(usbnet_resume);
-^1da177e4c3f41 drivers/usb/net/usbnet.c Linus Torvalds   2005-04-16  1984  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  scripts/lib/netlink_yml_parser.py  | 101 ++++++++---------------------
+>  tools/net/ynl/pyynl/ynl_gen_rst.py |  28 +++++++-
 
