@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73E0AD9F30
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 21:00:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A92DAD9F32
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 21:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14A307A8D64
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:58:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A04D3B8924
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98521DFD86;
-	Sat, 14 Jun 2025 19:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0072E62A6;
+	Sat, 14 Jun 2025 19:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qnlc372Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iVhPZXuF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1751A2545;
-	Sat, 14 Jun 2025 19:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D922D9EEB;
+	Sat, 14 Jun 2025 19:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749927600; cv=none; b=gFO+U606arO6n4i89zP2ApanTdW5dZT6ojJXE1Ett1MUF4J9liQw2+h4eP0tCEs7X6IoXV1RHoIe32GvPH9PHn6yJPtRl4zmVeX4onSYRFkGsBITREGW/9bua/CuT+clAlrs+fbIDh3w4SO9mdhmTFrC6A11WMYKhEkNHYk84wo=
+	t=1749927601; cv=none; b=FdyK/w+CBLrb0Z9uJjubie7qahvCFOo9znMm0qsnjdHgxy/23LmZD3wzntm7YHHE/V9yEZTLFXXyV+/ZBVZch8f6WyNkK+LXN7F9Iu7MKKS/48w8hpZ4mUthqXev/6shHwjzOvEHdx0e2zYWbe/LJcHh196VTCai856GqrP89p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749927600; c=relaxed/simple;
-	bh=F7RYQQPryT0sa7wJgAyW69unFWlPTHeaut9xJUVW0wM=;
+	s=arc-20240116; t=1749927601; c=relaxed/simple;
+	bh=fq4DvLoofZqWBzB6DCIk7+wpoW0fii4MRbpBebm9/gs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HKU3y9MPPaIq2KVPj3TBbOeJWRwopjCEtADsBh+rYphS9P4AB8j5D+e11R4i3/crhG+v25acZbxKEtutQWGREzIeUlDHzEHbSJIvEpjHGadUYnPKwql/xkHTokoC71KFoIC6bS5vSrjYpMiLI6ehMfceQixqqDYAf1P0vKQTmh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qnlc372Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 200AFC4CEEB;
-	Sat, 14 Jun 2025 19:00:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pv0Q/QT41C1D4iy6VwSmGal9bwm8RZ3R2Y1ubClzlqZvj0zH6R/eu8vs1bQY7HfxsC5ntNguMZhbuShXiyb1DB3SIqYH2epM2GjZ7CS2KS6DEbbIuSC1ZJbMN29GvJtpo1ABkcTy2AEXNCE78p82pXfNmAOioArUMk2CdCdBhIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iVhPZXuF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB6CC4CEEB;
+	Sat, 14 Jun 2025 19:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749927600;
-	bh=F7RYQQPryT0sa7wJgAyW69unFWlPTHeaut9xJUVW0wM=;
+	s=k20201202; t=1749927601;
+	bh=fq4DvLoofZqWBzB6DCIk7+wpoW0fii4MRbpBebm9/gs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qnlc372Z6yk1pMCbnqRBUd4RD6u5uW8MWJwHtHtdqFEDB7NVXIHMvFzql4S+JrQQU
-	 Z+RH5eEVTCfhiB/Il2PUiggLYnORmrTJLj1TjucJsu0Tg/PIAasC7fF1EA29avMJu6
-	 4DFrMBE/pLz4MPlqY1DvD9ewXj2UaF7T+S/Cr27kTHJhS3atzryHDx8MBACANxJQlj
-	 c7EZ3n79AIHSfmsNTFK0gsWzOasdjJNmLMM4Nemi154EJdsKv6StYECkIU8xemmvOM
-	 ZtEuyX/KBP5f19IeXQ5M98Kd7DD/QYC+22ZLNSsOOgDU55L8Z+mi/7VwZnGAQozUzS
-	 tg0cNNkZUmzvw==
+	b=iVhPZXuFFPiOWfWCuPbHX7nb+0vMd4FqLV48HWoAQzG466CWosfzfn95PQ+ao2Wrb
+	 BKWb/4bV37U1sS1nq/fObwf08uBMVHDCckvddiFj4SdIntWpf3USujpfB5B2GK74LW
+	 7rWIL5mLd6duGM4dL9rsozBH5edc5MFVM4rmt5CCutUYv/gekhX6yyij1AbxNvGk9s
+	 l75mbw26mk/pXiKo4Hhfm4f/s5lmlGG8D6JR9KkxCEesuFp3ioT7KRxxY1y99HMYBz
+	 JOEur9BsQ4pxJk8PQhcSjzKOrN24qdvY2+rfJuOX6sGMymftKmX5/IoW3rbr7u126C
+	 JhDoS2cTA8boQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD64380AAD0;
-	Sat, 14 Jun 2025 19:00:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DBE380AAD0;
+	Sat, 14 Jun 2025 19:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: add
- ethqos_pcs_set_inband()
+Subject: Re: [PATCH RESEND net-next v2] net: sysfs: Implement is_visible for
+ phys_(port_id, port_name, switch_id)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174992762950.1151198.11331620801417396933.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Jun 2025 19:00:29 +0000
-References: <E1uPkbO-004EyA-EU@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1uPkbO-004EyA-EU@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
- vkoul@kernel.org
+ <174992763074.1151198.12926690918861173112.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Jun 2025 19:00:30 +0000
+References: <20250612142707.4644-1-yajun.deng@linux.dev>
+In-Reply-To: <20250612142707.4644-1-yajun.deng@linux.dev>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Jun 2025 17:16:30 +0100 you wrote:
-> Add ethqos_pcs_set_inband() to improve readability, and to allow future
-> changes when phylink PCS support is properly merged.
+On Thu, 12 Jun 2025 14:27:07 +0000 you wrote:
+> phys_port_id_show, phys_port_name_show and phys_switch_id_show would
+> return -EOPNOTSUPP if the netdev didn't implement the corresponding
+> method.
 > 
-> Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
-> Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org> # sa8775p-ride-r3
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> There is no point in creating these files if they are unsupported.
+> 
+> Put these attributes in netdev_phys_group and implement the is_visible
+> method. make phys_(port_id, port_name, switch_id) invisible if the netdev
+> dosen't implement the corresponding method.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: stmmac: qcom-ethqos: add ethqos_pcs_set_inband()
-    https://git.kernel.org/netdev/net-next/c/8909f5f4ecd5
+  - [RESEND,net-next,v2] net: sysfs: Implement is_visible for phys_(port_id, port_name, switch_id)
+    https://git.kernel.org/netdev/net-next/c/0c17270f9b92
 
 You are awesome, thank you!
 -- 
