@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-197729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9792AD9B2B
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:04:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06C97AD9B2C
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:04:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3702A189F63E
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:03:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03D8A1BC11AD
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D8721A435;
-	Sat, 14 Jun 2025 08:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E27220F41;
+	Sat, 14 Jun 2025 08:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="femSWKet"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCUlt3NX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEF12153D4;
-	Sat, 14 Jun 2025 08:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156771F5849;
+	Sat, 14 Jun 2025 08:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749888023; cv=none; b=nZ56sBBZjou+F1e6C54UdEeOdvf/WePJkGFMWKP+uyNjp+NshWQUiiC5S+X/gn7VfVI/VccqzjvGlFaXyK5qOPm2aZyFAsmQuoobc1PW4uobVlHVkDMjS4AdUL6lgCz0K4YhDSDI6+67Wzw0XyjDUqDbAO4DdXUJgip+7zsdcYQ=
+	t=1749888024; cv=none; b=Cbru8Ie5dN3WPwwu7C+onpwHDEDWzGBZAVQobVkZQW8yJWcucbB1WmDb6bTNER9/KgkM5RryTr8HAoEBSqdM8uDWfX455fvsjppxdp6qcEIiN7//DrWycAOrapfRVueSFiez9NxWB7amDFnvMroZKpN5RfnwbeZ/31cRsJHBRAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749888023; c=relaxed/simple;
-	bh=cxvip1yaT62CM+//fUwMVTiGeWcLHBVTmroF7OvOZ9A=;
+	s=arc-20240116; t=1749888024; c=relaxed/simple;
+	bh=Mv6g6TqRLNW7IwtjztJXy3aVpVK4bDlV6PSv29TrdPc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KrllxNBWdP+w9qsFE7LyvZUlduuBo82cgARpzfChJM+pVf0Qui5brUn7CSmBKOV2zpa4O9MQnjnYjjd2FHEJ1w+htyndwx84iPR4xLUP13znF67VPXvVW56vBX+BbVLY7cVv1b/dKlGNlGzg2cDCZMH5Q1QG1GTlVEV1UVbs+2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=femSWKet; arc=none smtp.client-ip=209.85.221.50
+	 MIME-Version:Content-Type; b=CEu+dlOT5ekeLz6d7b+OLrMUOFGMcIgKJiEM+CpAHdOAA9ZjtBxFLWK7exaNInqNoN1T+fGhho2HvqOMpfWDO7OQiJWqwyI3t6LnMvbTCCoIIa5he0j0tPlO2sjCEmY1XGNfWpHGutf3blr7n/hGbuztsVrS0JajYvQt3aRwtvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCUlt3NX; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a5096158dcso2498173f8f.1;
-        Sat, 14 Jun 2025 01:00:21 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-450cfb6a794so16492475e9.1;
+        Sat, 14 Jun 2025 01:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749888020; x=1750492820; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749888021; x=1750492821; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RkDKhWADOeV+BLdp7lg/EAzlBGEzVLIjr5l/oooXOXs=;
-        b=femSWKetkOX22GD/N0Qihin8PCwShkQBohrHtx2Xy9f/AsXlEaT+3YXCJZ9LBzpal7
-         HHEmi8Sl8HJrCyQtmjibadCn3Md8ZMew7B6j5jNZSoAkGfawC3zTSnWHCteiTnfl2ta3
-         A0nMiojTS326Hv645yKQpeNSGHPme9Qtc+qso2dMcP6OQIhIRgzdd17Rt9Mc1qlO7NkR
-         JvoH8XtkKF/sD4xJdIIVh0Qw85aS0afV5Uf7y2K8X4vpGQCRzsFxScCZFox/Fz+FYHC4
-         7ZUXR9rRk5lKW/3+iGxSWz5HxRhBd2HJqkxIRY0i+s9M1YD+STs4iPAXx6O+qoqSyWnu
-         ZjNA==
+        bh=7MDXKYAJLJXTLaUVqxsoo9KWgHVtsh4pL8lt56oK4Pk=;
+        b=QCUlt3NXJKLr7vc6wEvXXtb7veLgfybnzXrwx2TSe1f8BsnGCyT9ZhU8BvXVw+b6SJ
+         ZfaxtFgotIw+9j3EDu4Kh+iCLKbBLY3wiqpyBIegKeoNUEypvEK1uHzymiBIYWgekwG0
+         HFfCSqX6uYSVaY2Yfj4LYh76/lWIrMB3uskGkX2UOs74Wu65NMhukxI+IHUqVT29y4YG
+         7EEecgkg9UiSf4j5PZYvmt6JIoz+00g1NxGxB/9mWO3w3OoCSI021oq791hQ4AiXvkCZ
+         N3w2UGD5Ho+25HsJThSG4xANzA5eyoPT6lHbTIGpVwDINHA2BDk9nfzl4A964JWtn5hg
+         eB7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749888020; x=1750492820;
+        d=1e100.net; s=20230601; t=1749888021; x=1750492821;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RkDKhWADOeV+BLdp7lg/EAzlBGEzVLIjr5l/oooXOXs=;
-        b=oH4Rc00vX2acE5HcnxH/m4UZcJ9aoGwaOaCVGkMt/Y+bwmDuSFP2SgGL+9QZcXlPRv
-         IEK39eF6X8gpn0Piqi6r82fGhduKWSnptuHlaOqzXCOXdXddsexWvp9zYBic3NMo4dPj
-         2e7JbGwdhlp26WpzP2sKaYiaB2W+YZJuclrmb33kpxmWczhIwHPUfnorMuV6l0P7tdDK
-         ftjj7iRcybmn5i/g4ZqZvCQlh7R5+9tFZemHUPhUiPNpck78eRwWeT78ozFKoLR6ItHR
-         mJdbx9Bqk/NROVA9orX54gQFenbiX6KQNn1v1amxUQ839X77+yexOKcFigpsd7nqkFdy
-         73Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5X7chVcaVp4qSLBHoOnK6jdxPi3dDfagKAmkclI+ho/c8W6w04nvt/DwQZTwZCB/bEVPAWsQBpWkCTt0=@vger.kernel.org, AJvYcCWojjbVetDHA2F2Kj6xmSsiAdiqTyOJQhUh6eYgkYtVanz+1wdpypT60QQes1yXD8M+XyI7l38u@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr0V9AVvhF08AHCQjaXZGuwQH/Aod6hHytt1zmDgi75K/FOXLj
-	P4ApcTPQwongzJzWtr9mWWqqubBqkrgLO1Oxrxmc+Bsz1dGMG5P6roh+
-X-Gm-Gg: ASbGncu41dWpdViGbCL2QTwnb7ww6KU58todQ4dpvFJhFAiEONGOlXFSy61skw1Thha
-	ZKqQBL6JEGrn86VIzxAbqH1Ssum6e7+LXyR1D7Ul6rqS8qqK4wYBMQsuyWFAOj4Ma7Uot487mmF
-	tasR4y4Nf/Yq11yeAamWeRcwntpCAKOnSdwB/PLYDTnKb7sB863EjHS0zNDvieiRjD5qTcv5twi
-	qgL5WOr251vlX4bwFurCRdryTpiGzr6cdXs2pfCV6t1/KMXLOiXPMrbunJypqaKLPr7rVmQC0H3
-	/Jt7pSpoNcqIotMtcMDEhC4qNaAlyQig0eGrqt5vSkKg8UHKmEBRCkE6+ML8ecHRzQ++eoe+gDB
-	Zo5Ft84YfWKpHqqTg8i4cnWKmWVBppSy61fC3tEsb/IzIrQyyNprbyo/Y3nqBNLI=
-X-Google-Smtp-Source: AGHT+IEeQkLUl4X4SlZsIGu8Rf3Vu/Mw6OJ+R1Nyy2AYpff2MZa0YgxoBQEAiEyb++TId1vdc3PsZg==
-X-Received: by 2002:a05:6000:71a:b0:3a5:27ba:47c7 with SMTP id ffacd0b85a97d-3a572e2df96mr2150810f8f.48.1749888020226;
-        Sat, 14 Jun 2025 01:00:20 -0700 (PDT)
+        bh=7MDXKYAJLJXTLaUVqxsoo9KWgHVtsh4pL8lt56oK4Pk=;
+        b=clrIJ8/IRJqhq1Min5ZHVjm5e929aqy6tYfB+U+NGPshlaTPIF64yncC2cv033oZZo
+         IHjpClDvBq+l2KG8wev3UakJ5EQBvnHFfeloBeT3CEFYj8MMGcZJdb3PztS6fNuuNFjL
+         o8sj2djxwsKsdtLrxnmOZJVcyzOm/nY+N7vcEh8LMSH5p/+mFL13Yc9fauMWZwYXfV94
+         vr1gG1z2zu1EqTuSgKb8p6uY6WbXwkf/6GEOr/i/DVHeD10QVhzXt06tNkM85yrEnrFm
+         ItIHsnKmLbpzh48ob3djuonPu0Azy90iSSUGJhcD5fKwhUfz6Y47qj3Cv03XXkQQFEE8
+         +3Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCVK37oQcvFX1MfEb0UyZXqiLJEpJmtv5qVi0cI7XWcjbwpYGdGFxD3BaWi5n0Shhui3APVbXv3l@vger.kernel.org, AJvYcCWdogdQVHHDXEIMFM6K4seAPVbcOZoEV9MTTngzBL8B+atisyg270/VLnQgvmvgLnVhkyIjfpnXte8nLV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl+3spBCr2uc3PeYji2QvThSMMEw5pifr5J7EKyJ0lRelsYdgL
+	rCiRDyK8ylwbZjQjbqA+EslPKKUpLZI5ETLIsfA3EaL4aTPpdQtkBZgl
+X-Gm-Gg: ASbGncsOZ05pcPWcVIwXhjLpXsePMFf1xLJsWPMnM5T4SjNq2UmAosZWqjuTW+7Uzjo
+	qAqP519O4Imrnfv1WydoaUudtpCTjwZESungHdTAgow77fi8VVkIGammoLX4ggJGKJ6wDYPMzUl
+	Lw971b5r/0WzLKW6GgLGPSwCKzpNFh7cQ/ReqbxqsAz1EuFwhL6aj8k9taQ2QCxblufGnmJxZTj
+	qC+4D70JROCItSo6+XAgEn51Wz6hyebWBSRYXSEPpDbI7El2QAiyvU95dRmaqWIdJOG5pHL48qc
+	nZpzjLCx/TEh4W20b1laXrf95Z9BFKd7kWPxoHlpjWW9eaPHqDwlPOsyF5PLukqj9PGgC2/8Tv5
+	efXgtru0kyTnN5lux/C0unj4ZQRFOnoBvQQaaXEYqUwv3T5cxe9gWkb8nkFVyRYE=
+X-Google-Smtp-Source: AGHT+IF/kAWmcubIrzJUlbfKoUrB4ad6zjuqAbzVMto7JjdG0ILB6dBICai5prB1d4NZz9pQczgjyA==
+X-Received: by 2002:a05:600c:3f07:b0:43d:fa58:700e with SMTP id 5b1f17b1804b1-4533cacc591mr22027615e9.33.1749888021335;
+        Sat, 14 Jun 2025 01:00:21 -0700 (PDT)
 Received: from skynet.lan (2a02-9142-4580-2300-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:2300::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c50esm75443535e9.4.2025.06.14.01.00.18
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c50esm75443535e9.4.2025.06.14.01.00.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Jun 2025 01:00:19 -0700 (PDT)
+        Sat, 14 Jun 2025 01:00:20 -0700 (PDT)
 From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
 To: jonas.gorski@gmail.com,
 	florian.fainelli@broadcom.com,
@@ -88,9 +88,9 @@ To: jonas.gorski@gmail.com,
 	linux-kernel@vger.kernel.org,
 	dgcbueu@gmail.com
 Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [PATCH net-next v4 11/14] net: dsa: b53: prevent GMII_PORT_OVERRIDE_CTRL access on BCM5325
-Date: Sat, 14 Jun 2025 09:59:57 +0200
-Message-Id: <20250614080000.1884236-12-noltari@gmail.com>
+Subject: [PATCH net-next v4 12/14] net: dsa: b53: fix unicast/multicast flooding on BCM5325
+Date: Sat, 14 Jun 2025 09:59:58 +0200
+Message-Id: <20250614080000.1884236-13-noltari@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250614080000.1884236-1-noltari@gmail.com>
 References: <20250614080000.1884236-1-noltari@gmail.com>
@@ -103,83 +103,134 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-BCM5325 doesn't implement GMII_PORT_OVERRIDE_CTRL register so we should
-avoid reading or writing it.
-PORT_OVERRIDE_RX_FLOW and PORT_OVERRIDE_TX_FLOW aren't defined on BCM5325
-and we should use PORT_OVERRIDE_LP_FLOW_25 instead.
+BCM5325 doesn't implement UC_FLOOD_MASK, MC_FLOOD_MASK and IPMC_FLOOD_MASK
+registers.
+This has to be handled differently with other pages and registers.
 
-Fixes: 5e004460f874 ("net: dsa: b53: Add helper to set link parameters")
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Fixes: a8b659e7ff75 ("net: dsa: act as passthrough for bridge port flags")
 Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 ---
- drivers/net/dsa/b53/b53_common.c | 21 +++++++++++++++++----
- drivers/net/dsa/b53/b53_regs.h   |  1 +
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ drivers/net/dsa/b53/b53_common.c | 60 ++++++++++++++++++++++----------
+ drivers/net/dsa/b53/b53_regs.h   | 13 +++++++
+ 2 files changed, 55 insertions(+), 18 deletions(-)
 
  v4: no changes
 
  v3: no changes
 
- v2: no changes
+ v2: add changes proposed by Jonas:
+  - Drop rate control registers.
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 2bcbb003b1fd..034e36b351c9 100644
+index 034e36b351c9..6aaa81af5367 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -1279,6 +1279,8 @@ static void b53_force_link(struct b53_device *dev, int port, int link)
- 	if (port == dev->imp_port) {
- 		off = B53_PORT_OVERRIDE_CTRL;
- 		val = PORT_OVERRIDE_EN;
-+	} else if (is5325(dev)) {
-+		return;
- 	} else {
- 		off = B53_GMII_PORT_OVERRIDE_CTRL(port);
- 		val = GMII_PO_EN;
-@@ -1303,6 +1305,8 @@ static void b53_force_port_config(struct b53_device *dev, int port,
- 	if (port == dev->imp_port) {
- 		off = B53_PORT_OVERRIDE_CTRL;
- 		val = PORT_OVERRIDE_EN;
-+	} else if (is5325(dev)) {
-+		return;
- 	} else {
- 		off = B53_GMII_PORT_OVERRIDE_CTRL(port);
- 		val = GMII_PO_EN;
-@@ -1333,10 +1337,19 @@ static void b53_force_port_config(struct b53_device *dev, int port,
- 		return;
- 	}
+@@ -560,12 +560,24 @@ static void b53_port_set_ucast_flood(struct b53_device *dev, int port,
+ {
+ 	u16 uc;
  
--	if (rx_pause)
--		reg |= PORT_OVERRIDE_RX_FLOW;
--	if (tx_pause)
--		reg |= PORT_OVERRIDE_TX_FLOW;
-+	if (rx_pause) {
-+		if (is5325(dev))
-+			reg |= PORT_OVERRIDE_LP_FLOW_25;
-+		else
-+			reg |= PORT_OVERRIDE_RX_FLOW;
-+	}
+-	b53_read16(dev, B53_CTRL_PAGE, B53_UC_FLOOD_MASK, &uc);
+-	if (unicast)
+-		uc |= BIT(port);
+-	else
+-		uc &= ~BIT(port);
+-	b53_write16(dev, B53_CTRL_PAGE, B53_UC_FLOOD_MASK, uc);
++	if (is5325(dev)) {
++		if (port == B53_CPU_PORT_25)
++			port = B53_CPU_PORT;
 +
-+	if (tx_pause) {
-+		if (is5325(dev))
-+			reg |= PORT_OVERRIDE_LP_FLOW_25;
++		b53_read16(dev, B53_IEEE_PAGE, B53_IEEE_UCAST_DLF, &uc);
++		if (unicast)
++			uc |= BIT(port) | B53_IEEE_UCAST_DROP_EN;
 +		else
-+			reg |= PORT_OVERRIDE_TX_FLOW;
++			uc &= ~BIT(port);
++		b53_write16(dev, B53_IEEE_PAGE, B53_IEEE_UCAST_DLF, uc);
++	} else {
++		b53_read16(dev, B53_CTRL_PAGE, B53_UC_FLOOD_MASK, &uc);
++		if (unicast)
++			uc |= BIT(port);
++		else
++			uc &= ~BIT(port);
++		b53_write16(dev, B53_CTRL_PAGE, B53_UC_FLOOD_MASK, uc);
 +	}
- 
- 	b53_write8(dev, B53_CTRL_PAGE, off, reg);
  }
+ 
+ static void b53_port_set_mcast_flood(struct b53_device *dev, int port,
+@@ -573,19 +585,31 @@ static void b53_port_set_mcast_flood(struct b53_device *dev, int port,
+ {
+ 	u16 mc;
+ 
+-	b53_read16(dev, B53_CTRL_PAGE, B53_MC_FLOOD_MASK, &mc);
+-	if (multicast)
+-		mc |= BIT(port);
+-	else
+-		mc &= ~BIT(port);
+-	b53_write16(dev, B53_CTRL_PAGE, B53_MC_FLOOD_MASK, mc);
++	if (is5325(dev)) {
++		if (port == B53_CPU_PORT_25)
++			port = B53_CPU_PORT;
+ 
+-	b53_read16(dev, B53_CTRL_PAGE, B53_IPMC_FLOOD_MASK, &mc);
+-	if (multicast)
+-		mc |= BIT(port);
+-	else
+-		mc &= ~BIT(port);
+-	b53_write16(dev, B53_CTRL_PAGE, B53_IPMC_FLOOD_MASK, mc);
++		b53_read16(dev, B53_IEEE_PAGE, B53_IEEE_MCAST_DLF, &mc);
++		if (multicast)
++			mc |= BIT(port) | B53_IEEE_MCAST_DROP_EN;
++		else
++			mc &= ~BIT(port);
++		b53_write16(dev, B53_IEEE_PAGE, B53_IEEE_MCAST_DLF, mc);
++	} else {
++		b53_read16(dev, B53_CTRL_PAGE, B53_MC_FLOOD_MASK, &mc);
++		if (multicast)
++			mc |= BIT(port);
++		else
++			mc &= ~BIT(port);
++		b53_write16(dev, B53_CTRL_PAGE, B53_MC_FLOOD_MASK, mc);
++
++		b53_read16(dev, B53_CTRL_PAGE, B53_IPMC_FLOOD_MASK, &mc);
++		if (multicast)
++			mc |= BIT(port);
++		else
++			mc &= ~BIT(port);
++		b53_write16(dev, B53_CTRL_PAGE, B53_IPMC_FLOOD_MASK, mc);
++	}
+ }
+ 
+ static void b53_port_set_learning(struct b53_device *dev, int port,
 diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_regs.h
-index 896684d7f594..ab15f36a135a 100644
+index ab15f36a135a..d6849cf6b0a3 100644
 --- a/drivers/net/dsa/b53/b53_regs.h
 +++ b/drivers/net/dsa/b53/b53_regs.h
-@@ -95,6 +95,7 @@
- #define   PORT_OVERRIDE_SPEED_10M	(0 << PORT_OVERRIDE_SPEED_S)
- #define   PORT_OVERRIDE_SPEED_100M	(1 << PORT_OVERRIDE_SPEED_S)
- #define   PORT_OVERRIDE_SPEED_1000M	(2 << PORT_OVERRIDE_SPEED_S)
-+#define   PORT_OVERRIDE_LP_FLOW_25	BIT(3) /* BCM5325 only */
- #define   PORT_OVERRIDE_RV_MII_25	BIT(4) /* BCM5325 only */
- #define   PORT_OVERRIDE_RX_FLOW		BIT(4)
- #define   PORT_OVERRIDE_TX_FLOW		BIT(5)
+@@ -29,6 +29,7 @@
+ #define B53_ARLIO_PAGE			0x05 /* ARL Access */
+ #define B53_FRAMEBUF_PAGE		0x06 /* Management frame access */
+ #define B53_MEM_ACCESS_PAGE		0x08 /* Memory access */
++#define B53_IEEE_PAGE			0x0a /* IEEE 802.1X */
+ 
+ /* PHY Registers */
+ #define B53_PORT_MII_PAGE(i)		(0x10 + (i)) /* Port i MII Registers */
+@@ -368,6 +369,18 @@
+ #define B53_ARL_SRCH_RSTL_MACVID(x)	(B53_ARL_SRCH_RSTL_0_MACVID + ((x) * 0x10))
+ #define B53_ARL_SRCH_RSTL(x)		(B53_ARL_SRCH_RSTL_0 + ((x) * 0x10))
+ 
++/*************************************************************************
++ * IEEE 802.1X Registers
++ *************************************************************************/
++
++/* Multicast DLF Drop Control register (16 bit) */
++#define B53_IEEE_MCAST_DLF		0x94
++#define B53_IEEE_MCAST_DROP_EN		BIT(11)
++
++/* Unicast DLF Drop Control register (16 bit) */
++#define B53_IEEE_UCAST_DLF		0x96
++#define B53_IEEE_UCAST_DROP_EN		BIT(11)
++
+ /*************************************************************************
+  * Port VLAN Registers
+  *************************************************************************/
 -- 
 2.39.5
 
