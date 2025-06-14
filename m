@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1BF1AD9974
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 03:30:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B49BAD9976
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 03:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC33B7ADABB
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:29:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84ACF189F5FD
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F65A4D599;
-	Sat, 14 Jun 2025 01:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B5684D13;
+	Sat, 14 Jun 2025 01:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EL1piyIM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OutCLZFA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211BD40855;
-	Sat, 14 Jun 2025 01:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9D17E792
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 01:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749864619; cv=none; b=YkkyqBYRvszlL0azOclf1N8pVdMqOS68AMW3HjHg+AVaALUulVg7qsXEUamKyFhm+HaJHYic57Vp1ezB9Jn+5A8s2FaxgaTLKThisBrC+qo2TC/M1WCy/lCBNH1o6jj/0zza/0vP5hUaXnSBezJuAABGzUWZVPHUapzpn15SB0I=
+	t=1749864620; cv=none; b=pIql2f8p0/UJFgiE6bo5EAXupNygUTYzYVBPXFVkK3Rv5P3e/xmHVAVEHNCgY7fiEpUC5WQHUkrITe7hbJrV0ktMEbfhENQRd6LJtc/USgv58mVm2UA+V4OZGDEkYYXX5v8w1j0bMnsNxpDilJWI8+8IsVpjVRde7VQyr89Sw7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749864619; c=relaxed/simple;
-	bh=BOUQQm7YC/kdLqzLOm9kVlopGQIxbesBZW/qKm13bNM=;
+	s=arc-20240116; t=1749864620; c=relaxed/simple;
+	bh=RUubw4X8nuXzSGrx3hliAXeBFn3vuufywq3+oM5AWCY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NI8adTcqL+UzJRHEt3engD4mu6+EhdiAH90u55xWAN3FQMzLWfFvFAsdzGrHjXpf+zQ/SQzolWIxAxtn/ijSLOVw+94aVM2YwFNSvk+vwtPd37y5g05A36HoCDXBU7gJTnChE0s5UKTIXrsz0rmfhaLFMYcDdetQpLObPyoBUkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EL1piyIM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1359C4CEE3;
-	Sat, 14 Jun 2025 01:30:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=s/iRgRgT4YT1SnokhfTt8sFPHNJF0Uc5R+/aFsGylxT0g2KcCUBTRxcIRnZj3S1oB6qzLq0uQR4XK5bXvFns0xXU+ghzs8jvUYxDAlEkt3owvK61LcXrOg0pA9fQNGP50ibXZryAbQG7jkWFpiaMd9D4acPrqwZNhztZxcT2F9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OutCLZFA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C711C4CEF1;
+	Sat, 14 Jun 2025 01:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749864618;
-	bh=BOUQQm7YC/kdLqzLOm9kVlopGQIxbesBZW/qKm13bNM=;
+	s=k20201202; t=1749864620;
+	bh=RUubw4X8nuXzSGrx3hliAXeBFn3vuufywq3+oM5AWCY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EL1piyIMN0gmQW8PIlwyk8n47hfqlQdRkpWECjz2k5I0WjcOs3LRaEPxI3aqFngBD
-	 lT6LAJ+4oxSCCGT2lxwT+MfAWw9rk5W3NYR7f/lDoGxQ3+oaAmreiVA3v9UKol23ZC
-	 wzgF7Mx2ee4ddsI7ciQ0O3SU1Orgf5ef2P22Mvix2FpIAIOl+/ZmAE9qGMi3ff3KCO
-	 ezsXUs4nRb7Ngl4WDhv1miP2uql/j6zHciR5zh+jKpMILCJH7kn3Q3FPa1z6sv7Iqe
-	 psia8ChZoOAxbgkPPo6kDgu0OS0v/SKc7EDT7S0rNWOGpljON0z5/CFXo5hVP8rCPv
-	 iE6xppgOxMN2g==
+	b=OutCLZFAL3EGCv2zpvVeyWm1gdKjTWkLytHfFlyFWpYZwaORQjvkhKsqs3QP1u93N
+	 f7V1ALb9btnAq3WJvHTMKeEQ9qh8zGzDy7W09Ony+XEFj5qMCHJHdh5OQ+8AryEGzv
+	 rwxnObgKd8UVxzdOoonVYakrXWlJNXRPCuj4KWDGnsa3e+PBIthIKsn9Tr8AujWDIr
+	 XlhZIRzK1BhvsR/Np3f2cxj8LyESTJJ4ib3N4g11JmpekidiURyxjHuo1qx/ImUPZn
+	 +J+pW0Ee1MU9etAvYl5lo7fK2qtvU6zbHDkG8rPMK6cv7SdFytWOrM52HxIqW8xB0j
+	 OwJQgiwfejxbg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CBA380AAD0;
-	Sat, 14 Jun 2025 01:30:49 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACFF380AAD0;
+	Sat, 14 Jun 2025 01:30:50 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,52 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/3]  dpll: add all inputs phase offset
- monitor
+Subject: Re: [PATCH net-next] net: phy: improve rgmii_clock() documentation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174986464799.950968.5025787246516730195.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Jun 2025 01:30:47 +0000
-References: <20250612152835.1703397-1-arkadiusz.kubalewski@intel.com>
-In-Reply-To: <20250612152835.1703397-1-arkadiusz.kubalewski@intel.com>
-To: Kubalewski@codeaurora.org,
-	Arkadiusz <arkadiusz.kubalewski@intel.com>
-Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- vadim.fedorenko@linux.dev, jiri@resnulli.us, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
- aleksandr.loktionov@intel.com, milena.olech@intel.com, corbet@lwn.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org
+ <174986464949.950968.11468172383174661837.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Jun 2025 01:30:49 +0000
+References: <E1uPjjk-0049pI-MD@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1uPjjk-0049pI-MD@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Jun 2025 17:28:32 +0200 you wrote:
-> Add dpll device level feature: phase offset monitor.
+On Thu, 12 Jun 2025 16:21:04 +0100 you wrote:
+> Improve the rgmii_clock() documentation to indicate that it can also
+> be used for MII, GMII and RMII modes as well as RGMII as the required
+> clock rates are identical, but note that it won't error out for 1G
+> speeds for MII and RMII.
 > 
-> Phase offset measurement is typically performed against the current active
-> source. However, some DPLL (Digital Phase-Locked Loop) devices may offer
-> the capability to monitor phase offsets across all available inputs.
-> The attribute and current feature state shall be included in the response
-> message of the ``DPLL_CMD_DEVICE_GET`` command for supported DPLL devices.
-> In such cases, users can also control the feature using the
-> ``DPLL_CMD_DEVICE_SET`` command by setting the ``enum dpll_feature_state``
-> values for the attribute.
-> Once enabled the phase offset measurements for the input shall be returned
-> in the ``DPLL_A_PIN_PHASE_OFFSET`` attribute.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v6,1/3] dpll: add phase-offset-monitor feature to netlink spec
-    https://git.kernel.org/netdev/net-next/c/c035e7360380
-  - [net-next,v6,2/3] dpll: add phase_offset_monitor_get/set callback ops
-    https://git.kernel.org/netdev/net-next/c/2952daf44a84
-  - [net-next,v6,3/3] ice: add phase offset monitor for all PPS dpll inputs
-    https://git.kernel.org/netdev/net-next/c/863c7e505936
+  - [net-next] net: phy: improve rgmii_clock() documentation
+    https://git.kernel.org/netdev/net-next/c/91695b859263
 
 You are awesome, thank you!
 -- 
