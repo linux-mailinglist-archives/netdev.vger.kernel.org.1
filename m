@@ -1,129 +1,97 @@
-Return-Path: <netdev+bounces-197684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F25AD9909
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 02:29:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3DDAD9918
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 02:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A628517AC05
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 00:29:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C4B4A1090
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 00:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584F0A945;
-	Sat, 14 Jun 2025 00:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9F6BA49;
+	Sat, 14 Jun 2025 00:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mccHB8x8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldcH9Sm4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253E53C30;
-	Sat, 14 Jun 2025 00:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A11BA33
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 00:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749860984; cv=none; b=kNAEDTpXvjU4khXvRu2VOJcEBQywW0fNDSo+gL4kDlrdvxp8yO7HxU/PbSJyDr4VmnnS84PIPWicbP7kyMxeWAbCpaiBa6MXpPrE2CqxRoQZEWlhkfsDBp3OdnN+mYabsNLw4p3650b9FEVErQ/lv+do8hSeqyKxLHVO1YM1rM8=
+	t=1749861600; cv=none; b=lntMlC5WJpXkyBreyJeXaVvkwjWfMUGz+LjMQDbBwFGZTEq5HCQsr823bm0sCfLb3zevfb1MMScIdV5SSoC4v+a0NH7mOQWgJ/ncYh4fiZGPZGnMpEErmWgHQksXAwBIHTWYkavfhiCyDDxaw4jsnPzAwwbbhbrcgYhyvoE7qYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749860984; c=relaxed/simple;
-	bh=TPpjFuTtZzouHnsGkFKuZ0GBTt3L4cV2yzplCeIHMLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qsSvo7Z7gdwRvY94haO37ROvjV8whZM7lXCFKBHHpiGB/7kU+TCJ2ZLYghsNRqFUEqYrN7+rcO/PIdLP6FebhXEvT4x7rN3qq4K8vV3I+KFwgD7XeM0f9xtNShshdF5a+Rag9sbmcUDiCho92FX/NqLo7E9Rxf3Yd1taRLqUVfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mccHB8x8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 343A5C4CEE3;
-	Sat, 14 Jun 2025 00:29:42 +0000 (UTC)
+	s=arc-20240116; t=1749861600; c=relaxed/simple;
+	bh=IV0TnFWw18hB5vUNbKUPbrBZQUfOR8lOHXqZE1girgs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=l2nzculby36+xoIOjZoQs649x8IRTWmMTHUwbu8t1xFX1DL60MSXmUed+I3Y+tXgpVaZci5eTbRLFTe8gWFP9cQpXMQxkOxu/J0l6LJKGEotwuUhK5r6g+pz8m0EOeMHOCEwEvOPRFwuucp6BbRsicM9XhI20zx+nbPodTnEpdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldcH9Sm4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC999C4CEE3;
+	Sat, 14 Jun 2025 00:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749860982;
-	bh=TPpjFuTtZzouHnsGkFKuZ0GBTt3L4cV2yzplCeIHMLo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mccHB8x8gq2a6uydJHE6l3cBEURNLYJsVkF+ZHr0IjuBm/SOKrGQ2a0QZp+IGUwSD
-	 q+zRAykv5knWCRvDuWPI13dySiJcfdEZQMn5YLp73UZ7/JuJc1Wzcg+VPLekvP0efQ
-	 X9aS1xfm3C7lm2VmabT0ATRsuyGx+RT6g4wEqGq+EgYCLkEYmN/IgBa0938cGYQjE4
-	 1P1A1YBlN5VKo7bCvTDShBc6zsn00MhBdDwLiJOeYV7TdmcVg1d1SHof9yTQ/Ta3wh
-	 F4M8F/m6TPu6oOqoY3ub2fVNXekIQowYbkEIs8Dxw4UxkhDstONNs/RDgx4AOTlmJZ
-	 j21mzSDGMET/w==
-Date: Fri, 13 Jun 2025 17:29:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, "Maciej
- =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?=" <maze@google.com>, Lorenzo Colitti
- <lorenzo@google.com>
-Subject: Re: [PATCH net-next, v3] selftest: Add selftest for multicast
- address notifications
-Message-ID: <20250613172941.6c454992@kernel.org>
-In-Reply-To: <20250612020514.2542424-1-yuyanghuang@google.com>
-References: <20250612020514.2542424-1-yuyanghuang@google.com>
+	s=k20201202; t=1749861599;
+	bh=IV0TnFWw18hB5vUNbKUPbrBZQUfOR8lOHXqZE1girgs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ldcH9Sm4n32Jita6nKNS1SknDI5QySj0pwyDmlQxvviX/EZ7NFRLm/APgPP6THJJ7
+	 Y+gHauqZadz6XClgegUmJhGeJIwIOCBdCCsOPi57Cf1syQ7WjD+DpTbCUi9n42I462
+	 ttrH3PHtec5V3V7kr3qDVhujwpFfkgpQMesIMcijMyaC57tF42IOmE3U5FUXI0GDdW
+	 JjyY4BRx/3H4fK0ehEXyKhF0D9i8Jn5rXKrZAVSLlf5gXySg7C2X0DdFHyUs8YHjuF
+	 4WdmhEHPoALtMVnprKWcs50J7ZSt/6DZDTjAV79d6aQHFYmlduamKTdHGjJWNe1Hge
+	 V/2oDOMZkZFOA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8F380AAD0;
+	Sat, 14 Jun 2025 00:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re:
+ =?utf-8?q?=5BPATCH_net-next_v3=5D_net=3A_arp=3A_use_kfree=5Fskb=5Fr?=
+	=?utf-8?q?eason=28=29_in_arp=5Frcv=28=29?=
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174986162925.939579.11054094175885073949.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Jun 2025 00:40:29 +0000
+References: <20250612110259698Q2KNNOPQhnIApRskKN3Hi@zte.com.cn>
+In-Reply-To: <20250612110259698Q2KNNOPQhnIApRskKN3Hi@zte.com.cn>
+To:  <jiang.kun2@zte.com.cn>
+Cc: davem@davemloft.net, kuba@kernel.org, dsahern@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, xu.xin16@zte.com.cn, yang.yang29@zte.com.cn,
+ wang.yaxin@zte.com.cn, fan.yu9@zte.com.cn, he.peilin@zte.com.cn,
+ tu.qiang35@zte.com.cn, qiu.yutan@zte.com.cn, zhang.yunkai@zte.com.cn,
+ ye.xingchen@zte.com.cn
 
-On Thu, 12 Jun 2025 11:05:14 +0900 Yuyang Huang wrote:
-> +VERBOSE=0
-> +PAUSE=no
-> +PAUSE_ON_FAIL=no
-> +
-> +source lib.sh
-> +
-> +# set global exit status, but never reset nonzero one.
-> +check_err()
-> +{
-> +	if [ $ret -eq 0 ]; then
-> +		ret=$1
-> +	fi
-> +	[ -n "$2" ] && echo "$2"
-> +}
-> +
-> +run_cmd_common()
-> +{
-> +	local cmd="$*"
-> +	local out
-> +	if [ "$VERBOSE" = "1" ]; then
-> +		echo "COMMAND: ${cmd}"
-> +	fi
-> +	out=$($cmd 2>&1)
-> +	rc=$?
-> +	if [ "$VERBOSE" = "1" -a -n "$out" ]; then
-> +		echo "    $out"
-> +	fi
-> +	return $rc
-> +}
-> +
-> +run_cmd() {
-> +	run_cmd_common "$@"
-> +	rc=$?
-> +	check_err $rc
-> +	return $rc
-> +}
-> +
-> +end_test()
-> +{
-> +	echo "$*"
-> +	[ "${VERBOSE}" = "1" ] && echo
-> +
-> +	if [[ $ret -ne 0 ]] && [[ "${PAUSE_ON_FAIL}" = "yes" ]]; then
-> +		echo "Hit enter to continue"
-> +		read a
-> +	fi;
-> +
-> +	if [ "${PAUSE}" = "yes" ]; then
-> +		echo "Hit enter to continue"
-> +		read a
-> +	fi
-> +
-> +}
+Hello:
 
-Perhaps move these to lib.sh as a separate commit?
-They seem generic.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Please fix the shellcheck warnings. The "info"-level messages 
-are up you, SC2317 can be ignored.
+On Thu, 12 Jun 2025 11:02:59 +0800 (CST) you wrote:
+> From: Qiu Yutan <qiu.yutan@zte.com.cn>
+> 
+> Replace kfree_skb() with kfree_skb_reason() in arp_rcv().
+> 
+> Signed-off-by: Qiu Yutan <qiu.yutan@zte.com.cn>
+> Signed-off-by: Jiang Kun <jiang.kun2@zte.com.cn>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] net: arp: use kfree_skb_reason() in arp_rcv()
+    https://git.kernel.org/netdev/net-next/c/0051ea4aca67
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
