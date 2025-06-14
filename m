@@ -1,112 +1,86 @@
-Return-Path: <netdev+bounces-197828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E944AD9F9A
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 22:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A5BAD9FA4
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 22:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80D071893F24
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:04:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 807851894ADC
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBB81F1906;
-	Sat, 14 Jun 2025 20:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCFA2DA767;
+	Sat, 14 Jun 2025 20:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qm5OZsH8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dp4GTHXy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7781BD9C1;
-	Sat, 14 Jun 2025 20:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4EA1BD9C1
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 20:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749931437; cv=none; b=RTS1y44Z9h602TuX+Ti5amuacrgHA48F12zayx674QfjJOjM+3zuHnIQo1Dp+u4Upm34/8jN5RQzJD/PN6wafowdwP8eMnbKyYZjmGkgyjJmNNWRGIXB0xpwzfqtHx32elLLm+quBkR/KAvh5UoiunDttVLkcEH/RJu0rpQozrY=
+	t=1749931640; cv=none; b=LLUvHbom9Pwa9MDRxSwQoBAh8c5nkF8yImaLwtiSgkce3SNSi5XkdQhqzccvbZMZSkj0QG/IopzQwXmNvJVXCqM7P3kZYg1Iq1g0VIwBOda/jR8XknCItNGf96xlBlg9EJhs0KcRme4eP9yjRBo2tB2ou+FygHon667P9NhKssw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749931437; c=relaxed/simple;
-	bh=GY6P7k8VV8sKiyvFkCJ3MKhvnmt5LFjeYWjC+1yHv8g=;
+	s=arc-20240116; t=1749931640; c=relaxed/simple;
+	bh=VrTlknlqtPODRHZVYCwVAC+FY2zebRAMTKS2R8HmGLk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UWBhy/d9C2y1Oj57/Hrd1aCMb7ARCOOAr1fZTSI9pd/HBNIcDq0ym5yjqCeL0EDHxoB9Yg7U0xku2ahywVLdVskrxsqtMft3frygiW6hFa07MZ+oSYSywN1xxX41oBzhhI0L1rBnDKD5ykCe76hDD1qjxDyNbBnReUv2o9MqgJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qm5OZsH8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 116F9C4CEEB;
-	Sat, 14 Jun 2025 20:03:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=AfXEPFNucUln0iGvMNP9nEO46zmtDNcmilNXky2wJm8tA4xfo5Mwr9vmI7NZiTfPokwae8ytE9HXci0rOPheuffOyI0NtyUZ1V4R5LPt2wmtkYBSlljHaj0er78J52wiwAEaIBOwCbtNxNwWTBG85vRt0fG2VMrhn8peIfdkK9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dp4GTHXy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CBB8C4CEEB;
+	Sat, 14 Jun 2025 20:07:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749931436;
-	bh=GY6P7k8VV8sKiyvFkCJ3MKhvnmt5LFjeYWjC+1yHv8g=;
+	s=k20201202; t=1749931638;
+	bh=VrTlknlqtPODRHZVYCwVAC+FY2zebRAMTKS2R8HmGLk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qm5OZsH8s0jsEfRN5uVRuCXGjnpau1FUAQmhyucQC+DFTmHQqr8/YF4ptrGjelMDA
-	 /EE2G7srKOlnK+wnbVccHikGz6V5zTlpTfk0pBSDhZuifFL9lVh03K2lmInSPdFK3U
-	 7/CiK9qg3x4CiGF9n0QVkl3HRJWbEJvay7fB+2Qy3qUe8fjGhfEuFi5cu3AUUkE3Dt
-	 urm79lUmDlhMnTqIqcca3iG1v9q7trzzxm8zsaAHjKiRj2z1S5nqyscDQUkQqFlwO0
-	 ohQlYDzfE0td0gHvLO+D/OKGjsqWFU6CGoox5zHbSJOvEYCV34FaEoI/IYKr5URJoF
-	 obqhc8l07Tc6A==
-Date: Sat, 14 Jun 2025 13:03:54 -0700
+	b=Dp4GTHXyVAj/ukZFQ7rxDxGlHbHsvyxk9rQwJdmeLYU2JFIccM75CIcb18AEHa5Bx
+	 fWeAFcLwQ/BkQTDXHgVZfquMhHWO9lxFbNxsHEe08kADyrLUFeyP/fHOPbg/6S73tl
+	 I6Hdh4fliyuFiPCfvNte2GoItEuriT6OhsLKz3Q6x0uQ9q/wMwUOnCxv1DwjG/br11
+	 8O2KyE204ziHtmPlmWHq88bIGpVCtxp3/62nF+ToFOJ3zmoz8E+wdoattSYKeVhb4d
+	 4tCTIaMws+YBkKV0aBs7x6nbamYRj8kUlK+HBeBFFBzcXQmjLwDGAzDzNLiAeJZs10
+	 IYIb66hBkStOQ==
+Date: Sat, 14 Jun 2025 13:07:17 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org, shirazsaleem@microsoft.com,
- leon@kernel.org, shradhagupta@linux.microsoft.com,
- schakrabarti@linux.microsoft.com, gerhard@engleder-embedded.com,
- rosenp@gmail.com, sdf@fomichev.me, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/4] Support bandwidth clamping in mana
- using net shapers
-Message-ID: <20250614130354.0a53214e@kernel.org>
-In-Reply-To: <1749813627-8377-1-git-send-email-ernis@linux.microsoft.com>
-References: <1749813627-8377-1-git-send-email-ernis@linux.microsoft.com>
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, Yuchung Cheng
+ <ycheng@google.com>
+Subject: Re: [PATCH net-next 1/3] tcp: remove obsolete and unused
+ RFC3517/RFC6675 loss recovery code
+Message-ID: <20250614130717.40a42cce@kernel.org>
+In-Reply-To: <20250613230907.1702265-2-ncardwell.sw@gmail.com>
+References: <20250613230907.1702265-1-ncardwell.sw@gmail.com>
+	<20250613230907.1702265-2-ncardwell.sw@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 13 Jun 2025 04:20:23 -0700 Erni Sri Satya Vennela wrote:
-> This patchset introduces hardware-backed bandwidth rate limiting
-> for MANA NICs via the net_shaper_ops interface, enabling efficient and
-> fine-grained traffic shaping directly on the device.
-> 
-> Previously, MANA lacked a mechanism for user-configurable bandwidth
-> control. With this addition, users can now configure shaping parameters,
-> allowing better traffic management and performance isolation.
-> 
-> The implementation includes the net_shaper_ops callbacks in the MANA
-> driver and supports one shaper per vport. Add shaping support via
-> mana_set_bw_clamp(), allowing the configuration of bandwidth rates
-> in 100 Mbps increments (minimum 100 Mbps). The driver validates input
-> and rejects unsupported values. On failure, it restores the previous
-> configuration which is queried using mana_query_link_cfg() or
-> retains the current state.
-> 
-> To prevent potential deadlocks introduced by net_shaper_ops, switch to
-> _locked variants of NAPI APIs when netdevops_lock is held during
-> VF setup and teardown.
-> 
-> Also, Add support for ethtool get_link_ksettings to report the maximum
-> link speed supported by the SKU in mbps.
-> 
-> These APIs when invoked on hardware that are older or that do
-> not support these APIs, the speed would be reported as UNKNOWN and
-> the net-shaper calls to set speed would fail.
+On Fri, 13 Jun 2025 19:09:04 -0400 Neal Cardwell wrote:
+> RACK-TLP loss detection has been enabled as the default loss detection
+> algorithm for Linux TCP since 2018, in:
+>=20
+>  commit b38a51fec1c1 ("tcp: disable RFC6675 loss detection")
 
-Failed to apply patch:
-Applying: net: mana: Fix potential deadlocks in mana napi ops
-error: patch fragment without header at line 23: @@ -2102,9 +2108,11 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
-error: could not build fake ancestor
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-Patch failed at 0001 net: mana: Fix potential deadlocks in mana napi ops
+Hi! There is a warning here:
 
-please rebase
--- 
+net/ipv4/tcp_input.c:2959:6: warning: variable 'fast_rexmit' set but not us=
+ed [-Wunused-but-set-variable]
+ 2959 |         int fast_rexmit =3D 0, flag =3D *ack_flag;
+      |             ^
+
+and another one in patch 2:
+
+net/ipv4/tcp_input.c:3367:29: warning: variable =E2=80=98delta=E2=80=99 set=
+ but not used [-Wunused-but-set-variable]
+ 3367 |                         int delta;
+      |                             ^~~~~
+--=20
 pw-bot: cr
 
