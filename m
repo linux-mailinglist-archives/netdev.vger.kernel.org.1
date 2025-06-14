@@ -1,217 +1,141 @@
-Return-Path: <netdev+bounces-197712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818A0AD9A42
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 07:35:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99693AD9A56
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C28A27A9129
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 05:34:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92E1C189D281
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 06:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080801DE8AF;
-	Sat, 14 Jun 2025 05:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D821D63F2;
+	Sat, 14 Jun 2025 06:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uV4lmPt9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NmMoI7d5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F861CF5C6
-	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 05:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241283594E
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 06:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749879328; cv=none; b=cERalhfIhd3SqTWWNDE2FiB29Tw0KpL9k7F56Ku407iqAzcSpqF+rzQyBxgu9RL+AWxPJR7uJJMPutgqMc070XNKh8n/7DyiYALZQyWxo9vxsl2E3yk5lnC0qohcdVMsp2KVnpNluMnPdjB0NqYl5/thtlK9wPi+3DbuG9jnr4E=
+	t=1749881885; cv=none; b=rSXp4gcvPiSdmNznY4LB+akvMVSeh8VR0ze3f2Krcn7gs83iK2OCU1B4lBBRMrZG2UIiJH05NqqjLBxnNa3UZDpzJSz8n7nDBZkk6v23aKCwZvG6hrCQ+gUV+mf62oVZwgRmZEG7WCykZ48XQ5kCIbZgrvmJBX212F00jQvp5pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749879328; c=relaxed/simple;
-	bh=Idyjm9PAvbAZs2Y85gPvsVywGKyYTgsgfoHFBDmwdd8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HI8YsMEwZsCDDH5zrvxF75NNBn3Ro8MFeHVNT314sTK2Obvf6YK6qt5aoLnLgs9VNQ7bim+E+pOAaqzTCfDg03GNcAtveZejrjNyvXQXza69mSeCC5S/bcT5OZguGCcss+uY0+/ueiPTlgjx0UaL4q7dIFI7HcWWjLt/0uwVYEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uV4lmPt9; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1749881885; c=relaxed/simple;
+	bh=NoMhAH2FgHzUlmF94BRTu04p9+hoVCS7I9TNhFd0qAg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=atjBSyon8qHy03gjorl+e1zPDZlgIObvoFGozF7iubVd6ktCZjCpKToHwRqNUS7O1z0KOUZ/oR/duaHPdZK4VBLNE62nzZY6gEPSu/wJlUqcZM/poTx5AoFgixsL0ZT1tvhiHJczb4JBgwmurFo31MCbjCqBdELVBLjxkDkoK3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NmMoI7d5; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2c36d3f884so1907453a12.2
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 22:35:27 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4a4323fe8caso21155991cf.2
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 23:18:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749879327; x=1750484127; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iABuUUOZvcSitzU5/7yzeqemM2WhK22/QQ6XRhuLRhM=;
-        b=uV4lmPt9MHuZMvi27TkimycH5KePGnVjUyI4NeK/V0obWxZ38OPON0kpCMQa3QdNdN
-         U7K1mknyTY+gvpLI11p/GRkg+E6/hOoa2OnFATTRoTsbjba1h0pLuwKJhyOwoVIy1A6T
-         1QEupXh8zq9Y3YYDhCgVEsYhIPUbm+0+JjK8tssHLlfUuTNXS7t1Dwkz0BwaRjcsxvP0
-         Kig/BPVHkqR2nhbxQTKZpajVnznXqiXoogSREOXg5pOrQr9EHjz/1H7sp1Wjn3DBUlL7
-         99BgtVDo5cACSDfnUCqI569vftrABmVDWMSZkTxthr3QTHizmUoBMHvKeG7gCgjgbOa/
-         qoSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749879327; x=1750484127;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1749881883; x=1750486683; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iABuUUOZvcSitzU5/7yzeqemM2WhK22/QQ6XRhuLRhM=;
-        b=DodU35hH9Idf7pvwDNPmZMyWgZvPHibSEDkKBA3PIOZXvL6lRdOZbuQkeMIIuuBI//
-         Y/iAtp4MYZKglB8edRiTSHy+YUWJRuyRIMdRBWoyU8oDi3JdfzypJH1LPK2iEU3jDOty
-         2eWq745zDU2eWrYg/e31dN0OFvIN3dne9rjpQ0mgrH0sOfiJSSRksKtc0569wrK9xr0m
-         qEDxKSmNIjWtCAiXHE4UlLBbVQKcER6ZxlGgMtxtoIYEeN+79wFIIfFcKpMpxlkosq4f
-         nlgI0/dl7C9UEmI4+Kw7djlvJgprCT1u0Wf1PYt6tXrBzF27ueLnhAJKX/U5WK86BFNb
-         Upwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOUj3ii2WiGzUwhoj+M7imKVNk/PdQpQe9yFXgvOQz+hYlyIzucNbtcKymJbFUXZUlvCbP+Lk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN2U6xYFrmikUsghjikz+IthzKUNg3hjSVXMXEdzv4PsrSDWcu
-	gXOvNNGNoOyuenwdv8S+gLWE2uK0VehZ2PEgf+tMRpIPZnByD0wyzlI4et95u5/TcHfV+d88OSJ
-	O4EnUAoOexrh6z4+NZ/jGA8mNJw==
-X-Google-Smtp-Source: AGHT+IHZdjEKlVYu6FtY/GN86g3BZXJasIvErPJCytIMKyDnWUQaijewP82m/tZHk7FzU+2ABgm22Sj7Pw/O1Kz9qg==
-X-Received: from pfbfu24.prod.google.com ([2002:a05:6a00:6118:b0:746:1fcb:a9cc])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:e545:b0:201:8a13:f392 with SMTP id adf61e73a8af0-21fbd55a60emr2559978637.20.1749879326787;
- Fri, 13 Jun 2025 22:35:26 -0700 (PDT)
-Date: Sat, 14 Jun 2025 14:35:22 +0900
+        bh=7c2joS0GB6217KwOLu/ZECbOg7xeoRqJmZnYVLmbhOk=;
+        b=NmMoI7d5DE7touWiZshc+08wWCK1S7IX5PpNw7IZuz2SDsWI9Zx9yFlYltsjLWvtHZ
+         odiu2cgAAfm/YjfXdSilZbHlY/2eiXp4u/DCxoH4zTLQsgMhxaD+h7ktkrhtUTQSMCfP
+         r0mZ935GZ0QVR8Xgr4GEebzZm1CQjmGW7kq7f2Ty8CUydsWTeKGEEGU8zmqEVfSJTKT/
+         QlTRp+/0Iyigcg/xC+pZhZrVGN1e7OWZdWtbPoW1DHL4yi0w/hNRCe/oHX/Jq0pW7Ehd
+         ofF1xGtMEbDq3wIG3Ya5ES45lXYEBkkzgALp5av2Jdxt3SkzGwjL6NaNd1pqNtTfjWJ5
+         z+tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749881883; x=1750486683;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7c2joS0GB6217KwOLu/ZECbOg7xeoRqJmZnYVLmbhOk=;
+        b=MdaSIANondnovFhtPqI53I5i5avgHuJ1r70QKLHByTxymdCOc4+WTiHG5Zj0ZY6JET
+         Iq7bNylDN6jEwApJ5jdG1EF13Lz+AbsindErtqwAQhbqmxrRD6WkPpQ8PFO5u5kOLiGx
+         6hrfiY044kTW9zUmZ5LbgHQ08sWv4SNgAUplnN9MN5QjusV1Zh4YCCm2hk030ww3Z1Fg
+         0JhYQSOJ9qczOL0Xilz9QJ9U9VC1Tf5GjXLy+5knjgaY2hbRickNRGmAL4jfdNmfrkMX
+         krrDdCG7isiA3+GPXRNiJS+4BGVBZ5gqBFEB4OzxdVSG05uRvPZo2b36EbveVDCK4yfm
+         Af5g==
+X-Forwarded-Encrypted: i=1; AJvYcCXi8E7bQHUKFzvJVMgWXV4qWBUvubH3/tEYyNodGRcHyg8ZyHBvX52IpsRhNrdOQ6t+OLfFIDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgr4URBK0GXUXUc52bY8FcIwBtMIvwsDOUlkHN+CNafnYWK4J8
+	8EP9+maNJKMLow5uzvGRrBz8C78LBWSlywbeXavNEmRwupnGwzSEJGdri5kYNgaLeDI/Kq1PBJg
+	m+IgAQxhvr0dIxFALCTWbMgbn3gSX2UgaBE+d/FuE
+X-Gm-Gg: ASbGncsWwa4TDg0yAbagh3MVBnn8m1+PKr8Ha2Tc2KtCtMK8chWP6/ux606yQjTxe4J
+	6UyWRq6M67PGSZQGfmMihkE4DF4JJxkzQgZTCB5YobRA7vBhB9lUM1PRtK8pLjfdAGPr/rN6rMB
+	IGg/vnu+0HDWN+C6Huql6h9pANcCq0ZczvzQmPOBtQLWA6
+X-Google-Smtp-Source: AGHT+IFO1Q0P5SdpHcJT0igDcvgJniTq8k8Fm0etjyTcmT0ty8gLNEJ6536ziXHCrf++VO+han5z3oqIhPnwoHa/jPc=
+X-Received: by 2002:a05:622a:488:b0:4a4:3e89:d5c0 with SMTP id
+ d75a77b69052e-4a73c4bec58mr26492321cf.12.1749881882614; Fri, 13 Jun 2025
+ 23:18:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
-Message-ID: <20250614053522.623820-1-yuyanghuang@google.com>
-Subject: [PATCH net-next, v4] selftest: Add selftest for multicast address notifications
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+MIME-Version: 1.0
+References: <20250613193056.1585351-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20250613193056.1585351-1-ncardwell.sw@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 13 Jun 2025 23:17:51 -0700
+X-Gm-Features: AX0GCFtqgwdN0d8yM-nHgkzG9-icb2hWbpZ-eiXEnTUhmgnzcMVj3aYGiYnHk8Y
+Message-ID: <CANn89iLFNDh1gbAXgS5XVUhjRz8NX9Gsrymcnv7A-SB1s2wpqg@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: fix tcp_packet_delayed() for tcp_is_non_sack_preventing_reopen()
+ behavior
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Eric Wheeler <netdev@lists.ewheeler.net>, 
+	Yuchung Cheng <ycheng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-This commit adds a new kernel selftest to verify RTNLGRP_IPV4_MCADDR
-and RTNLGRP_IPV6_MCADDR notifications. The test works by adding and
-removing a dummy interface and then confirming that the system
-correctly receives join and removal notifications for the 224.0.0.1
-and ff02::1 multicast addresses.
+On Fri, Jun 13, 2025 at 12:31=E2=80=AFPM Neal Cardwell <ncardwell.sw@gmail.=
+com> wrote:
+>
+> From: Neal Cardwell <ncardwell@google.com>
+>
+> After the following commit from 2024:
+>
+> commit e37ab7373696 ("tcp: fix to allow timestamp undo if no retransmits =
+were sent")
+>
+> ...there was buggy behavior where TCP connections without SACK support
+> could easily see erroneous undo events at the end of fast recovery or
+> RTO recovery episodes. The erroneous undo events could cause those
+> connections to suffer repeated loss recovery episodes and high
+> retransmit rates.
+>
+> The problem was an interaction between the non-SACK behavior on these
+> connections and the undo logic. The problem is that, for non-SACK
+> connections at the end of a loss recovery episode, if snd_una =3D=3D
+> high_seq, then tcp_is_non_sack_preventing_reopen() holds steady in
+> CA_Recovery or CA_Loss, but clears tp->retrans_stamp to 0. Then upon
+> the next ACK the "tcp: fix to allow timestamp undo if no retransmits
+> were sent" logic saw the tp->retrans_stamp at 0 and erroneously
+> concluded that no data was retransmitted, and erroneously performed an
+> undo of the cwnd reduction, restoring cwnd immediately to the value it
+> had before loss recovery.  This caused an immediate burst of traffic
+> and build-up of queues and likely another immediate loss recovery
+> episode.
+>
+> This commit fixes tcp_packet_delayed() to ignore zero retrans_stamp
+> values for non-SACK connections when snd_una is at or above high_seq,
+> because tcp_is_non_sack_preventing_reopen() clears retrans_stamp in
+> this case, so it's not a valid signal that we can undo.
+>
+> Note that the commit named in the Fixes footer restored long-present
+> behavior from roughly 2005-2019, so apparently this bug was present
+> for a while during that era, and this was simply not caught.
+>
+> Fixes: e37ab7373696 ("tcp: fix to allow timestamp undo if no retransmits =
+were sent")
+> Reported-by: Eric Wheeler <netdev@lists.ewheeler.net>
+> Closes: https://lore.kernel.org/netdev/64ea9333-e7f9-0df-b0f2-8d566143aca=
+b@ewheeler.net/
+> Signed-off-by: Neal Cardwell <ncardwell@google.com>
+> Co-developed-by: Yuchung Cheng <ycheng@google.com>
+> Signed-off-by: Yuchung Cheng <ycheng@google.com>
+> ---
 
-The test relies on the iproute2 version to be 6.13+.
-
-Tested by the following command:
-$ vng -v --user root --cpus 16 -- \
-make -C tools/testing/selftests TARGETS=3Dnet
-TEST_PROGS=3Drtnetlink_notification.sh \
-TEST_GEN_PROGS=3D"" run_tests
-
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
-
-Changelog since v3:
-- Refactor the test to use utilities provided by lib.h.
-- Fix shellcheck warnings.
-
-Changelog since v2:
-- Move the test case to a separate file.
-
-Changelog since v1:
-- Skip the test if the iproute2 is too old.
-
- tools/testing/selftests/net/Makefile          |  1 +
- .../selftests/net/rtnetlink_notification.sh   | 70 +++++++++++++++++++
- 2 files changed, 71 insertions(+)
- create mode 100755 tools/testing/selftests/net/rtnetlink_notification.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests=
-/net/Makefile
-index ab996bd22a5f..3abb74d563a7 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -41,6 +41,7 @@ TEST_PROGS +=3D netns-name.sh
- TEST_PROGS +=3D link_netns.py
- TEST_PROGS +=3D nl_netdev.py
- TEST_PROGS +=3D rtnetlink.py
-+TEST_PROGS +=3D rtnetlink_notification.sh
- TEST_PROGS +=3D srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS +=3D srv6_end_dt4_l3vpn_test.sh
- TEST_PROGS +=3D srv6_end_dt6_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/rtnetlink_notification.sh b/tools/=
-testing/selftests/net/rtnetlink_notification.sh
-new file mode 100755
-index 000000000000..39c1b815bbe4
---- /dev/null
-+++ b/tools/testing/selftests/net/rtnetlink_notification.sh
-@@ -0,0 +1,70 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# This test is for checking rtnetlink notification callpaths, and get as m=
-uch
-+# coverage as possible.
-+#
-+# set -e
-+
-+ALL_TESTS=3D"
-+	kci_test_mcast_addr_notification
-+"
-+
-+source lib.sh
-+
-+kci_test_mcast_addr_notification()
-+{
-+	RET=3D0
-+	local tmpfile
-+	local monitor_pid
-+	local match_result
-+	local test_dev=3D"test-dummy1"
-+
-+	tmpfile=3D$(mktemp)
-+	defer rm "$tmpfile"
-+
-+	ip monitor maddr > $tmpfile &
-+	monitor_pid=3D$!
-+	defer kill_process "$monitor_pid"
-+
-+	sleep 1
-+
-+	if [ ! -e "/proc/$monitor_pid" ]; then
-+		RET=3D$ksft_skip
-+		log_test "mcast addr notification: iproute2 too old"
-+		return $RET
-+	fi
-+
-+	ip link add name "$test_dev" type dummy
-+	check_err $? "failed to add dummy interface"
-+	ip link set "$test_dev" up
-+	check_err $? "failed to set dummy interface up"
-+	ip link del dev "$test_dev"
-+	check_err $? "Failed to delete dummy interface"
-+	sleep 1
-+
-+	# There should be 4 line matches as follows.
-+	# 13: test-dummy1=C2=A0 =C2=A0 inet6 mcast ff02::1 scope global=C2=A0
-+	# 13: test-dummy1=C2=A0 =C2=A0 inet mcast 224.0.0.1 scope global=C2=A0
-+	# Deleted 13: test-dummy1=C2=A0 =C2=A0 inet mcast 224.0.0.1 scope global=
-=C2=A0
-+	# Deleted 13: test-dummy1=C2=A0 =C2=A0 inet6 mcast ff02::1 scope global=
-=C2=A0
-+	match_result=3D$(grep -cE "$test_dev.*(224.0.0.1|ff02::1)" "$tmpfile")
-+	if [ "$match_result" -ne 4 ]; then
-+		RET=3D$ksft_fail
-+	fi
-+	log_test "mcast addr notification: Expected 4 matches, got $match_result"
-+	return $RET
-+}
-+
-+#check for needed privileges
-+if [ "$(id -u)" -ne 0 ];then
-+	RET=3D$ksft_skip
-+	log_test "need root privileges"
-+	exit $RET
-+fi
-+
-+require_command ip
-+
-+tests_run
-+
-+exit $EXIT_STATUS
---=20
-2.50.0.rc1.591.g9c95f17f64-goog
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
