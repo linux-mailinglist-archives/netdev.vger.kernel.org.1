@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-197735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7B4AD9B75
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:56:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEA58AD9B76
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA433189BCE2
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B9AB17BD85
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB92298248;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46CF298261;
 	Sat, 14 Jun 2025 08:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FSKpp81l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dVjE2+p6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634181E5B9E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634731E991B;
 	Sat, 14 Jun 2025 08:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749891378; cv=none; b=JLL2CP3XoqUUij2d3mzi/hLKugkmbGK85weoIaBX/qG7jeMYRL7In17NH69LT2dIK8R+EhbaERDj+jnJE2AnRFL/0t+aETxx7xyTKvlou3LZPE3mEiMcm/2/O/WftZhEBNn5gnBmkHvDlSeBis9OOXNJgJbPhJ0WXxuR89GX+5k=
+	t=1749891378; cv=none; b=EN9SnkiHKDs7aJQ63AT5BrmyXEzqaZNfrB+6zZGcCUfq/Ybo0pPNn7bKokvT3+8l5hdbiQ32s3dUXKI0Aqv4pIi6Tj/5iVY4ZMIQh/83eboYdrj1QlkMeYWyyURnrD7Gpe+8Un05V8soJN/LAqRdl7v9I5+DWzul/PtitfV397s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749891378; c=relaxed/simple;
-	bh=5GdVV6A8bXN64ovkNLx7Xdx5aR1iPXnV/yeu24lgmqI=;
+	bh=nVMNn0VSngYDSLAUJezTR2b19OzJ86I1XkvSWoGjSbY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CtTRnhzzx+kZS9ULlsCZCrf3NnxcHgvV1SGcImUXwg1L5fxaTGY54yPPRchoRNIxBoMFH9lDQcdSWYnjSrlWjDdvkek9aloH8OKBQaLDFTBdZx2NMxooElB1+l740w9RfA9ZlPKKr7Aus1RPLB0m7wWsnLqqlQ7XIgJI81ROxdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FSKpp81l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBFBC4CEED;
+	 MIME-Version; b=ATgnxt1+Qz4CYs9vMj0eZmCnzG7v28Q470sf9rYATzacCxKyYFH9MkHGHP1aWLl7lOwG1/tQkgrHuDBWEDFTTkoUkEjvbHsDZCZ8fU5Eb1aDvHZPgXrwBlqGNAu/qyrMOI+gFIfoeUikNhwYY0WeQGEQaDn8gcB8aKSGOhWq4vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dVjE2+p6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E23C8C4CEF0;
 	Sat, 14 Jun 2025 08:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749891377;
-	bh=5GdVV6A8bXN64ovkNLx7Xdx5aR1iPXnV/yeu24lgmqI=;
+	s=k20201202; t=1749891378;
+	bh=nVMNn0VSngYDSLAUJezTR2b19OzJ86I1XkvSWoGjSbY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FSKpp81lQ0MUsTOKq4LT3MWqv+ebKW7/olXbn6+7/BhJwyga0wPYoUQv9GDecCoWC
-	 bR4tFN043An72M8yE8pqrHkgyRcaK2lC92xapRoRNoFJlMHpXdcJSnBPkMTbaGMH62
-	 cM9kHuJTp2RilU5XMZxgXgDYJyUrYhN3NLDuPsfGHOTNN8XCb5R3ZwsWTv+v10DmsF
-	 v5WHZQaZGvR5Wxcol4g1SmDhRzo7yNA/ZjnPkVacbURdMVJP6WOyYGoWqqAGY62BUc
-	 uspLo1bhL8x+s3QixbXcnrC+l2vC5KOk9vj1178/JYcXUPH0OMuCh7lle4K1HfdM6c
-	 MJuHzjjIYiHpA==
+	b=dVjE2+p6DMNi0/6HW/eClvFnJuABscnX65t/MQFmNMtpkuKkOnjin6f2iw9AQTLke
+	 xPqX+NBm6gUv6VohevhM87xaVRsLKE7Gg6sT+SHkMRhDXDEBG/AnPn3ucar2PQ9ME2
+	 6SOfJXWMNP4XY2FMbt0HB3Xavt6hlp5uYmdJTtA6Vp/KEUHshiKBBmIBFO/Gzj1mmm
+	 aMsluO/2zFcQAcFBC3bWmp4FxCr9VfgwuEzEqCny1oivUnAh8a+kkWtRol6Xq1nf7r
+	 +XBIVis1Bo0y5LqDT4H7xPtMt88FEyIVyl+Z67TF2CRSyHVlA+YmGQIBf4UkEdVy0s
+	 jwjc9bEKamQxA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uQMgR-000000064al-49Nk;
-	Sat, 14 Jun 2025 10:56:15 +0200
+	id 1uQMgS-000000064ap-0CB8;
+	Sat, 14 Jun 2025 10:56:16 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
 	Jonathan Corbet <corbet@lwn.net>
@@ -70,9 +70,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v4 02/14] docs: netlink: netlink-raw.rst: use :ref: instead of :doc:
-Date: Sat, 14 Jun 2025 10:55:56 +0200
-Message-ID: <4d46b08e43e37403afc09412692cb5eb295019b6.1749891128.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v4 03/14] docs: netlink: don't ignore generated rst files
+Date: Sat, 14 Jun 2025 10:55:57 +0200
+Message-ID: <1cf12ab4c027cf27decf70a40aafdd0e2f669299.1749891128.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749891128.git.mchehab+huawei@kernel.org>
 References: <cover.1749891128.git.mchehab+huawei@kernel.org>
@@ -85,39 +85,54 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-Having :doc: references with relative paths doesn't always work,
-as it may have troubles when O= is used. So, replace them by
-Sphinx cross-reference tag that are now created by ynl_gen_rst.py.
+Currently, the build system generates ReST files inside the
+source directory. This is not a good idea, specially when
+we have renames, as make clean won't get rid of them.
+
+As the first step to address the issue, stop ignoring those
+files. This way, we can see exactly what has been produced
+at build time inside $(srctree):
+
+        Documentation/networking/netlink_spec/conntrack.rst
+        Documentation/networking/netlink_spec/devlink.rst
+        Documentation/networking/netlink_spec/dpll.rst
+        Documentation/networking/netlink_spec/ethtool.rst
+        Documentation/networking/netlink_spec/fou.rst
+        Documentation/networking/netlink_spec/handshake.rst
+        Documentation/networking/netlink_spec/index.rst
+        Documentation/networking/netlink_spec/lockd.rst
+        Documentation/networking/netlink_spec/mptcp_pm.rst
+        Documentation/networking/netlink_spec/net_shaper.rst
+        Documentation/networking/netlink_spec/netdev.rst
+        Documentation/networking/netlink_spec/nfsd.rst
+        Documentation/networking/netlink_spec/nftables.rst
+        Documentation/networking/netlink_spec/nl80211.rst
+        Documentation/networking/netlink_spec/nlctrl.rst
+        Documentation/networking/netlink_spec/ovs_datapath.rst
+        Documentation/networking/netlink_spec/ovs_flow.rst
+        Documentation/networking/netlink_spec/ovs_vport.rst
+        Documentation/networking/netlink_spec/rt_addr.rst
+        Documentation/networking/netlink_spec/rt_link.rst
+        Documentation/networking/netlink_spec/rt_neigh.rst
+        Documentation/networking/netlink_spec/rt_route.rst
+        Documentation/networking/netlink_spec/rt_rule.rst
+        Documentation/networking/netlink_spec/tc.rst
+        Documentation/networking/netlink_spec/tcp_metrics.rst
+        Documentation/networking/netlink_spec/team.rst
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/userspace-api/netlink/netlink-raw.rst | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Documentation/networking/netlink_spec/.gitignore | 1 -
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 Documentation/networking/netlink_spec/.gitignore
 
-diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
-index 31fc91020eb3..aae296c170c5 100644
---- a/Documentation/userspace-api/netlink/netlink-raw.rst
-+++ b/Documentation/userspace-api/netlink/netlink-raw.rst
-@@ -62,8 +62,8 @@ Sub-messages
- ------------
- 
- Several raw netlink families such as
--:doc:`rt-link<../../networking/netlink_spec/rt-link>` and
--:doc:`tc<../../networking/netlink_spec/tc>` use attribute nesting as an
-+:ref:`rt-link<netlink-rt-link>` and
-+:ref:`tc<netlink-tc>` use attribute nesting as an
- abstraction to carry module specific information.
- 
- Conceptually it looks as follows::
-@@ -162,7 +162,7 @@ then this is an error.
- Nested struct definitions
- -------------------------
- 
--Many raw netlink families such as :doc:`tc<../../networking/netlink_spec/tc>`
-+Many raw netlink families such as :ref:`tc<netlink-tc>`
- make use of nested struct definitions. The ``netlink-raw`` schema makes it
- possible to embed a struct within a struct definition using the ``struct``
- property. For example, the following struct definition embeds the
+diff --git a/Documentation/networking/netlink_spec/.gitignore b/Documentation/networking/netlink_spec/.gitignore
+deleted file mode 100644
+index 30d85567b592..000000000000
+--- a/Documentation/networking/netlink_spec/.gitignore
++++ /dev/null
+@@ -1 +0,0 @@
+-*.rst
 -- 
 2.49.0
 
