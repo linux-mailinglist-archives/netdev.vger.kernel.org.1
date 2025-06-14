@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-197720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1366AD9B17
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:00:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C14AD9B1C
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:01:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AA797AE8C9
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 07:59:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B672189F69E
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118DD1FBCB5;
-	Sat, 14 Jun 2025 08:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3D51FCFFB;
+	Sat, 14 Jun 2025 08:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2MFunfp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNO6vPYy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E621F6667;
-	Sat, 14 Jun 2025 08:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1648A1F91D6;
+	Sat, 14 Jun 2025 08:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749888011; cv=none; b=bXH+t6WHrdYfhegpka60WCS8jVmEAcnmNWs6ocXalrnbbhw6YkYMNYhXRlqBteWwUrLXVoJcCjmcSN0CBSUGIdCqNtdLwjV118+B0ff0qo6JOGe9WcoN0arMHek03mjbu8JcN8AVPmJOer03edD5mxDiEMor3BTmkdpJZMDZ0oA=
+	t=1749888012; cv=none; b=FjZawOcx/xVPQmmfo0jGMdW8VU6/PKmrJ8eLkhgtoM9jm2RKsHVIallo2Mvitaa4hzSC/iMyS2bUZnzvDszZ2rjqGlaLE43x2n/kIEFv4OEPcnpb7m47YtS+Olf0IQwzG+B9RzooLr7n1lSdbqV4wAFrvErF7hxvXolKSL1wE5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749888011; c=relaxed/simple;
-	bh=hBIC7ibZJprFVGAbStn9nVa6o5lngPlDH7dJWIaSKoI=;
+	s=arc-20240116; t=1749888012; c=relaxed/simple;
+	bh=AvDSrMYOB+62sI2ATZ8euwTxBDYD8jeVulP2FTqyL5E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i7x3qkotsgA4EJUQXNl9olnZO+ghmsZfsLWx6Tg9ERGu43ADBE79oLkhDHp2j0I/4Nr5AXLsyby81vsWwVRTHJfzQgKHC5oD4d3PCXC3ZECdLIgeWOS4329tCmZOAk5jRole4UxPc0ITD4ekQNlR5i1Nt32x71zPzAwXjm7MlIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2MFunfp; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version:Content-Type; b=rPer7RhzD+9oHB1IW6mYSTso9yKxK3W3cJa+DWwVYYx5Zwg+Uunh/bd02AasXFSkVHUYyneNy9IFE4POrm3LHDg1Xg0cDOBkdTOaNZmVnh5NRnrfD5u93MsmaGeZKY1HjcljDTnIqYtohoeFSUb7zUn2HPArKs0DKw4KhV2vzEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNO6vPYy; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-450cfb79177so17324695e9.0;
-        Sat, 14 Jun 2025 01:00:08 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43edecbfb46so21038815e9.0;
+        Sat, 14 Jun 2025 01:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749888007; x=1750492807; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749888008; x=1750492808; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=saBAdVrgLoJUYxuzwdl958AD6BoFHw9mf+Va4ZiZ2S8=;
-        b=F2MFunfpnM7tZwaNvCdsD3ltLG1BXHTY486LmiXBYPWgIkqXAy9UgV55IzwdtzHSwE
-         GNLEVpoT8GX2sBSiVHmKlqpL0qERq4RkdqUtCXOoF89mvN0Fs1kjCe1G5ud96IyDRrvx
-         rcAm6vrrafFXbhjQemkAp6gvn7icwKeocfe+yaaERpD82Vtc/+vpFFu4CKObuAfc7rGc
-         sodfN65+/4KF4AlzB+7NjKNN2gw/lJDy79tc23pAtJhRqMhPZ9D/z3bfMblgR81NN4wC
-         HYJXBBemea0YuJ8NWvzehvtCjabACxpbrLKJBkHSTR4f1fWUS2xD3AQ73PuiRhBEL+Jj
-         EPOw==
+        bh=mrO15ejqLeiAShTFCbp2Axq2Bd3inxDFGZkqqeBV+/8=;
+        b=TNO6vPYyR4fWTBugwEJOK9Jeu7tD6AsiHWEBUXbHo8NaxANzzdlg83fAkdTLIESopE
+         p7yNxq3VA5iZK01uE+RfKzwuQfRe0Ji+I82PLylkj0SmhSM0Xtz4lOmwiNRBvOqTTHZU
+         9YCUn5ASg5Q3btmE9XlC3GJN4VfgcYDd+QNlHwPL7SY3nKnWd3s73VsZcAQrt4fOkJTV
+         HM0Q2ZwDsdUHNGzYlzVq35iMaFhSkeq3iVXqdaWUIKZ6cpIKDNNPOE0k5KJJQyW0yi6w
+         Jh20aINYERJKEbJCAZ+L0ipWBbF90yO82GtHfSVnzv6+/7R87OjvfMkEtqARi7eI1/FO
+         SnZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749888007; x=1750492807;
+        d=1e100.net; s=20230601; t=1749888008; x=1750492808;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=saBAdVrgLoJUYxuzwdl958AD6BoFHw9mf+Va4ZiZ2S8=;
-        b=kg572iOiQxw48rsTk1IaUl2uyZpoSngx2NClRuqPq7+eYqfghNFY73F6JcSHwAuUug
-         hnUINHxu5A8989zFZHZ/nO8afPYkmVq8Xs51eL+2e+KmWq4C2+aH6etXAp7Isseyh1Pz
-         WDayV9LBEHwd0w2boipHUif9dFsFStvxhucndZN6GghFOabqxBalK6SrEpQCEFimAa3O
-         wVKlaFKrofO0xx0Kuvb6srqMSiJeD+yjfA/WnZ77qxdaIzMsC1/kxDyitqzwLvUEm+6K
-         fFS+YA1MTxwmNA9xUOi3REj82y/dfC92FeOUWSbdGBXfYr8Xc/DtvFlrWdNeZMmVghdE
-         IX6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVAdEJ6nk6LB6EGBllkP6lOcS3K2u0JSHhafRpSzy5U77mQMvCyPK9NAIUzeLqa9qnIfkwceSSRCug+RII=@vger.kernel.org, AJvYcCVtY8kNhYZmiVYc6HxGYO9AiPARfYQsucs6dQlHY6l+1VbJwB/LbH6jjwAcQ6vhMCekQek6c9+J@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSJQc7QdQkiHvMVfdquVOcrAinfJ0ul/sITRlprTfZBkXVK5Ha
-	ER0M8NoYFr+wa8iGcJicPIywgqXKQqy50CNPa5zF8zCSrDzgf42lyq51
-X-Gm-Gg: ASbGncuAO8HyMFCXZZQew4Z9YZqJ1EePv3cm3tqGBtl/fpphvsIbA7VjI86CH+U3yHx
-	2JoeoDs4t4PegLmJ8coBKpGFCT5f0kesY+y0HGePV0uTvkR3oh8Tn2Ssh/7DBpWo7/D+GztYxrQ
-	4fh+c2XPZv/wlLfAIH2l0s7Kq+i/gyMHgCcPGPo0zNZB+7SL0Fk5CfU944NlcyYmGWhcsG2mCfT
-	z8PrcWNwMMrVLVmX8avdRbER04DeW7VUVHW5evtsghSVFNnFA3PQFguRM3bJt8jTTIn+Cl6xt35
-	ugsbcpMla68Cx2lvlnbv5yvpupYTcZk6uSICNSJtyhaEEmuYHvm9Sle3ezv4zd7kvftLDVvajbj
-	6F4O3Q2PtIhmH187/B9/gb5zHDCRWMcx6jIGtGsvk7SKT408PbXW/wUHvLAx64iWSmHhPcCMXUA
-	==
-X-Google-Smtp-Source: AGHT+IH5+fBJtfNrQ1pa+00DSZ6P+qfFQvM+MNRZnXi49bNexZSo+L0uOFotlkimSwmvZVn6bJph9w==
-X-Received: by 2002:a05:600c:524b:b0:44a:b793:9e4f with SMTP id 5b1f17b1804b1-4533cad6e4emr24017135e9.19.1749888006906;
-        Sat, 14 Jun 2025 01:00:06 -0700 (PDT)
+        bh=mrO15ejqLeiAShTFCbp2Axq2Bd3inxDFGZkqqeBV+/8=;
+        b=SkDDzrfjIvtDVhNIonHqOzfrEgWIw5QYhRtucnN9OJP+KFm91JGCVX9PCaYE8gKkVa
+         VekvSFpbM3FE3xARMQOX16U60+9yURROl8q16dWBpY6dlqDkCAqBI7qLpFWeAOwOZ0Mi
+         BehtKzx9FaN0NSbhNih7y4LmQZsI9PXvWI7QsaLljbYttv6YoQJNEy5fwu5v08RxWVyK
+         YNPUKC0lpYNKtdOYKDxfwtsPgWxHselahw9xPyKOFSIf8TR7eCZGOPzqW6W84Zg0O6ml
+         LpXC3CKbZZdHAgiOyt1WrYbo9ckHD5Yh39qgbQ2gVODvZE7Tep1476p7QVnc6uXSciKH
+         FphQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIgWxefrXhNI1MNrFgD+bHukO2UR4FhtYQORFMuPuhx87cqwqiwjrv9csF5dYxywpkS553MzpK@vger.kernel.org, AJvYcCVy8x7YAeLedsHkpk7fmE7yrk1XYXvpVqJWa2ugWERBDNyLXd5gZBGt6Ueod68lgNT5Pp1aVI4/6oHc+G8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAGt4O2yZGOROFzTHnEmcGS0Bwdy698uV0WrGnHC+sB5IzCmeW
+	SM70tQGLBkYjOVTUSzj97WPGMg9tLix38Qegoz7XJnz3LWGuOHRdo7wr
+X-Gm-Gg: ASbGnctWCKWUAOeDfG2BocF2HsCwM+gg3ktZq35RmeW70RGA2JjFpWRGpBahAShbqca
+	PJBi2q3O+hkm/ZUc41HQ77nwUlc7Eu1Lup0LM+Xud6CO9sdfVjksT4GiW71SBf8Qhqx8RnYRAkc
+	mQyuCnyQLKEp4dA8skIxRCbiignjCrGr1u8M2W5tnCiSGGf9PRNEldU0R9jJmibY0Oqve1GxGsq
+	sl1f1727gDYoealwMfiLrGuwXGMMIc6F2W5SrYAgm00bJIwXXU1L0URldsw7KFHlSsbxampKn4U
+	p0M8KyZj+4If7oR6hRquXkp3YsfccHffjADqF6fGY3nNDa8iauHidWn8UvEYw6KNeYEBGAd7WxA
+	UHAPxoVGgWGQrfSrTwZnFOOHQSmrvVgar6WcH6cXI96fcgbUxQ6d9HYXZ3IENfcE=
+X-Google-Smtp-Source: AGHT+IFDxe1RO0oStKqmI4O5/PkufOYYRhxuHZgaGzGLIVDOrZFAQmaXBwfMM0Qy1Uba7dFQcgDSBA==
+X-Received: by 2002:a05:600c:3f0c:b0:450:d07e:ee14 with SMTP id 5b1f17b1804b1-4533cb3be4bmr25596685e9.17.1749888008154;
+        Sat, 14 Jun 2025 01:00:08 -0700 (PDT)
 Received: from skynet.lan (2a02-9142-4580-2300-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:2300::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c50esm75443535e9.4.2025.06.14.01.00.04
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c50esm75443535e9.4.2025.06.14.01.00.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Jun 2025 01:00:05 -0700 (PDT)
+        Sat, 14 Jun 2025 01:00:07 -0700 (PDT)
 From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
 To: jonas.gorski@gmail.com,
 	florian.fainelli@broadcom.com,
@@ -89,9 +88,9 @@ To: jonas.gorski@gmail.com,
 	linux-kernel@vger.kernel.org,
 	dgcbueu@gmail.com
 Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [PATCH net-next v4 02/14] net: dsa: tag_brcm: add support for legacy FCS tags
-Date: Sat, 14 Jun 2025 09:59:48 +0200
-Message-Id: <20250614080000.1884236-3-noltari@gmail.com>
+Subject: [PATCH net-next v4 03/14] net: dsa: b53: support legacy FCS tags
+Date: Sat, 14 Jun 2025 09:59:49 +0200
+Message-Id: <20250614080000.1884236-4-noltari@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250614080000.1884236-1-noltari@gmail.com>
 References: <20250614080000.1884236-1-noltari@gmail.com>
@@ -104,198 +103,55 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add support for legacy Broadcom FCS tags, which are similar to
-DSA_TAG_PROTO_BRCM_LEGACY.
-BCM5325 and BCM5365 switches require including the original FCS value and
-length, as opposed to BCM63xx switches.
-Adding the original FCS value and length to DSA_TAG_PROTO_BRCM_LEGACY would
-impact performance of BCM63xx switches, so it's better to create a new tag.
+Commit 46c5176c586c ("net: dsa: b53: support legacy tags") introduced
+support for legacy tags, but it turns out that BCM5325 and BCM5365
+switches require the original FCS value and length, so they have to be
+treated differently.
 
+Fixes: 46c5176c586c ("net: dsa: b53: support legacy tags")
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 ---
- include/net/dsa.h  |  2 ++
- net/dsa/Kconfig    | 16 ++++++++--
- net/dsa/tag_brcm.c | 73 +++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 88 insertions(+), 3 deletions(-)
+ drivers/net/dsa/b53/Kconfig      | 1 +
+ drivers/net/dsa/b53/b53_common.c | 7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
- v4: fix line length warning.
+ v4: no changes
 
- v3: fix warnings:
-  - Improve Kconfig description.
-  - Use __le32 type.
-  - Use crc32_le() instead of crc32().
+ v3: no changes
 
- v2: replace swab32 with cpu_to_le32.
+ v2: no changes
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 55e2d97f247e..d73ea0880066 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -54,11 +54,13 @@ struct tc_action;
- #define DSA_TAG_PROTO_RZN1_A5PSW_VALUE		26
- #define DSA_TAG_PROTO_LAN937X_VALUE		27
- #define DSA_TAG_PROTO_VSC73XX_8021Q_VALUE	28
-+#define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
- 
- enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
- 	DSA_TAG_PROTO_BRCM		= DSA_TAG_PROTO_BRCM_VALUE,
- 	DSA_TAG_PROTO_BRCM_LEGACY	= DSA_TAG_PROTO_BRCM_LEGACY_VALUE,
-+	DSA_TAG_PROTO_BRCM_LEGACY_FCS	= DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE,
- 	DSA_TAG_PROTO_BRCM_PREPEND	= DSA_TAG_PROTO_BRCM_PREPEND_VALUE,
- 	DSA_TAG_PROTO_DSA		= DSA_TAG_PROTO_DSA_VALUE,
- 	DSA_TAG_PROTO_EDSA		= DSA_TAG_PROTO_EDSA_VALUE,
-diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-index 2dfe9063613f..869cbe57162f 100644
---- a/net/dsa/Kconfig
-+++ b/net/dsa/Kconfig
-@@ -42,12 +42,24 @@ config NET_DSA_TAG_BRCM
- 	  Broadcom switches which place the tag after the MAC source address.
- 
- config NET_DSA_TAG_BRCM_LEGACY
--	tristate "Tag driver for Broadcom legacy switches using in-frame headers"
-+	tristate "Tag driver for BCM63xx legacy switches using in-frame headers"
- 	select NET_DSA_TAG_BRCM_COMMON
+diff --git a/drivers/net/dsa/b53/Kconfig b/drivers/net/dsa/b53/Kconfig
+index ebaa4a80d544..915008e8eff5 100644
+--- a/drivers/net/dsa/b53/Kconfig
++++ b/drivers/net/dsa/b53/Kconfig
+@@ -5,6 +5,7 @@ menuconfig B53
+ 	select NET_DSA_TAG_NONE
+ 	select NET_DSA_TAG_BRCM
+ 	select NET_DSA_TAG_BRCM_LEGACY
++	select NET_DSA_TAG_BRCM_LEGACY_FCS
+ 	select NET_DSA_TAG_BRCM_PREPEND
  	help
- 	  Say Y if you want to enable support for tagging frames for the
--	  Broadcom legacy switches which place the tag after the MAC source
-+	  BCM63xx legacy switches which place the tag after the MAC source
- 	  address.
-+	  This tag is used in BCM63xx legacy switches which work without the
-+	  original FCS and length before the tag insertion.
-+
-+config NET_DSA_TAG_BRCM_LEGACY_FCS
-+	tristate "Tag driver for BCM53xx legacy switches using in-frame headers"
-+	select NET_DSA_TAG_BRCM_COMMON
-+	help
-+	  Say Y if you want to enable support for tagging frames for the
-+	  BCM53xx legacy switches which place the tag after the MAC source
-+	  address.
-+	  This tag is used in BCM53xx legacy switches which expect original
-+	  FCS and length before the tag insertion to be present.
+ 	  This driver adds support for Broadcom managed switch chips. It supports
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index dc2f4adac9bc..9a038992f043 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -2241,8 +2241,11 @@ enum dsa_tag_protocol b53_get_tag_protocol(struct dsa_switch *ds, int port,
+ 		goto out;
+ 	}
  
- config NET_DSA_TAG_BRCM_PREPEND
- 	tristate "Tag driver for Broadcom switches using prepended headers"
-diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
-index 9f4b0bcd95cd..26bb657ceac3 100644
---- a/net/dsa/tag_brcm.c
-+++ b/net/dsa/tag_brcm.c
-@@ -15,6 +15,7 @@
- 
- #define BRCM_NAME		"brcm"
- #define BRCM_LEGACY_NAME	"brcm-legacy"
-+#define BRCM_LEGACY_FCS_NAME	"brcm-legacy-fcs"
- #define BRCM_PREPEND_NAME	"brcm-prepend"
- 
- /* Legacy Broadcom tag (6 bytes) */
-@@ -32,6 +33,10 @@
- #define BRCM_LEG_MULTICAST	(1 << 5)
- #define BRCM_LEG_EGRESS		(2 << 5)
- #define BRCM_LEG_INGRESS	(3 << 5)
-+#define BRCM_LEG_LEN_HI(x)	(((x) >> 8) & 0x7)
-+
-+/* 4th byte in the tag */
-+#define BRCM_LEG_LEN_LO(x)	((x) & 0xff)
- 
- /* 6th byte in the tag */
- #define BRCM_LEG_PORT_ID	(0xf)
-@@ -212,7 +217,8 @@ DSA_TAG_DRIVER(brcm_netdev_ops);
- MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_BRCM, BRCM_NAME);
- #endif
- 
--#if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY)
-+#if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY) || \
-+	IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY_FCS)
- static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
- 					struct net_device *dev)
- {
-@@ -244,7 +250,9 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
- 
- 	return skb;
- }
-+#endif /* CONFIG_NET_DSA_TAG_BRCM_LEGACY || CONFIG_NET_DSA_TAG_BRCM_LEGACY_FCS */
- 
-+#if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY)
- static struct sk_buff *brcm_leg_tag_xmit(struct sk_buff *skb,
- 					 struct net_device *dev)
- {
-@@ -294,6 +302,66 @@ DSA_TAG_DRIVER(brcm_legacy_netdev_ops);
- MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_BRCM_LEGACY, BRCM_LEGACY_NAME);
- #endif /* CONFIG_NET_DSA_TAG_BRCM_LEGACY */
- 
-+#if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY_FCS)
-+static struct sk_buff *brcm_leg_fcs_tag_xmit(struct sk_buff *skb,
-+					     struct net_device *dev)
-+{
-+	struct dsa_port *dp = dsa_user_to_port(dev);
-+	unsigned int fcs_len;
-+	__le32 fcs_val;
-+	u8 *brcm_tag;
-+
-+	/* The Ethernet switch we are interfaced with needs packets to be at
-+	 * least 64 bytes (including FCS) otherwise they will be discarded when
-+	 * they enter the switch port logic. When Broadcom tags are enabled, we
-+	 * need to make sure that packets are at least 70 bytes (including FCS
-+	 * and tag) because the length verification is done after the Broadcom
-+	 * tag is stripped off the ingress packet.
-+	 *
-+	 * Let dsa_user_xmit() free the SKB.
-+	 */
-+	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_LEG_TAG_LEN, false))
-+		return NULL;
-+
-+	fcs_len = skb->len;
-+	fcs_val = cpu_to_le32(crc32_le(~0, skb->data, fcs_len) ^ ~0);
-+
-+	skb_push(skb, BRCM_LEG_TAG_LEN);
-+
-+	dsa_alloc_etype_header(skb, BRCM_LEG_TAG_LEN);
-+
-+	brcm_tag = skb->data + 2 * ETH_ALEN;
-+
-+	/* Broadcom tag type */
-+	brcm_tag[0] = BRCM_LEG_TYPE_HI;
-+	brcm_tag[1] = BRCM_LEG_TYPE_LO;
-+
-+	/* Broadcom tag value */
-+	brcm_tag[2] = BRCM_LEG_EGRESS | BRCM_LEG_LEN_HI(fcs_len);
-+	brcm_tag[3] = BRCM_LEG_LEN_LO(fcs_len);
-+	brcm_tag[4] = 0;
-+	brcm_tag[5] = dp->index & BRCM_LEG_PORT_ID;
-+
-+	/* Original FCS value */
-+	if (__skb_pad(skb, ETH_FCS_LEN, false))
-+		return NULL;
-+	skb_put_data(skb, &fcs_val, ETH_FCS_LEN);
-+
-+	return skb;
-+}
-+
-+static const struct dsa_device_ops brcm_legacy_fcs_netdev_ops = {
-+	.name = BRCM_LEGACY_FCS_NAME,
-+	.proto = DSA_TAG_PROTO_BRCM_LEGACY_FCS,
-+	.xmit = brcm_leg_fcs_tag_xmit,
-+	.rcv = brcm_leg_tag_rcv,
-+	.needed_headroom = BRCM_LEG_TAG_LEN,
-+};
-+
-+DSA_TAG_DRIVER(brcm_legacy_fcs_netdev_ops);
-+MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_BRCM_LEGACY_FCS, BRCM_LEGACY_FCS_NAME);
-+#endif /* CONFIG_NET_DSA_TAG_BRCM_LEGACY_FCS */
-+
- #if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_PREPEND)
- static struct sk_buff *brcm_tag_xmit_prepend(struct sk_buff *skb,
- 					     struct net_device *dev)
-@@ -328,6 +396,9 @@ static struct dsa_tag_driver *dsa_tag_driver_array[] =	{
- #if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY)
- 	&DSA_TAG_DRIVER_NAME(brcm_legacy_netdev_ops),
- #endif
-+#if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_LEGACY_FCS)
-+	&DSA_TAG_DRIVER_NAME(brcm_legacy_fcs_netdev_ops),
-+#endif
- #if IS_ENABLED(CONFIG_NET_DSA_TAG_BRCM_PREPEND)
- 	&DSA_TAG_DRIVER_NAME(brcm_prepend_netdev_ops),
- #endif
+-	/* Older models require a different 6 byte tag */
+-	if (is5325(dev) || is5365(dev) || is63xx(dev)) {
++	/* Older models require different 6 byte tags */
++	if (is5325(dev) || is5365(dev)) {
++		dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
++		goto out;
++	} else if (is63xx(dev)) {
+ 		dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY;
+ 		goto out;
+ 	}
 -- 
 2.39.5
 
