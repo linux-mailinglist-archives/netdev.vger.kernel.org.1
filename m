@@ -1,108 +1,129 @@
-Return-Path: <netdev+bounces-197704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFDB4AD99A6
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 04:27:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472C1AD99B2
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 04:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2E69189D5B0
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 02:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E340C4A038A
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 02:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075877DA6A;
-	Sat, 14 Jun 2025 02:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4648754654;
+	Sat, 14 Jun 2025 02:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vif7yLdZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dJKDG5Se"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA43BA42;
-	Sat, 14 Jun 2025 02:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2D76D17
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 02:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749868060; cv=none; b=Mn3XNmyphX43Ubtpcf65WVXv/0gQcIibxVKn7ClScqKVdpu1sMt2o0po+KyhDX++8+ZN4JCtjx7BtDY4befvfAjCY5sNw5F51SE09IjLKa8JaDxnPpL3OJLwAn3cjwcFwJ4VZgdL2xudUL51ATes8AhK5hWQoZziY+/trxe2pvM=
+	t=1749868903; cv=none; b=EEXMay2CMC66hhhKJx7So8CFWQlXoBnUHyAV74iDxasnj2fPLmMyxyBetf9wutopFfXI4jcSFophLQDeCRJiHP3ACGfdv1upHYVLUFxgbxt/MYaPBrqFhD/F0Gid5HgU3jslcWPn6FzwW8bUA2GjuM1ffNgQh3aKKj7YTRIQpEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749868060; c=relaxed/simple;
-	bh=6MPxcrzvl/j0c311UlB0dF6QX2mG0TJI28/AbWapSRE=;
+	s=arc-20240116; t=1749868903; c=relaxed/simple;
+	bh=pjpmAaFla2SFS9mrocaF+iweTLQPPrgLhxPktz4zL+M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XZU7Y5rO7Kr9vyJuvZv38hUbX2hFdz1mqMwMcjzaCMC0YkVJxU2skSLlzMfRDfeo08rff6UFkAsc9C7DU+FN1xqIfdnrq16TIAfOOdE7hpUmgiEGUwBMjm4qlOwok610n5C/J7rrx5gh3KJhRiZ0CquCQKouOMv45QerbjcwDB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vif7yLdZ; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ad89333d603so531494366b.2;
-        Fri, 13 Jun 2025 19:27:37 -0700 (PDT)
+	 To:Cc:Content-Type; b=XI7Cg8kEeR9wgIl3hRk+gJMAhhjbdO7l37j/P+AZC/W+mT37ZP6ovbMre+xhDwIElC+YdKwYZ5d63WV8rWS0currmRcuKVxKXNgy7yJjOy+n+XiZ7UF1ZdkkSEiW3gwTFIL+CMdUjuYSNHaf7IJpxvmipeskgSUjLIkCu0W+BqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dJKDG5Se; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-553b51f5218so971069e87.0
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 19:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749868056; x=1750472856; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749868899; x=1750473699; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6MPxcrzvl/j0c311UlB0dF6QX2mG0TJI28/AbWapSRE=;
-        b=Vif7yLdZsXnpbjgsosJOC8F84+o5jsRkGgyZJrr4bMc9IqEHMaz3zt4zMQDwX+gxSA
-         UznaJqh9ggXE2r9X4CAjBmHMhup9+m2+iI95CACjNSsOCTYvM4kFW7LBvTL4t/pfR1Rv
-         +gvP0t3XI57Tk/UDU+U13NAzXrfJrZzviuYC3EMppxMpylIkB1Q2evFweUofFLjMZ5wR
-         0GmyQgZB5fDMZM9nF+M1pbnnfZnc+hcOt4afjmYxGHqLO5OX/Ajy+hgSwOsq3Cg6eEnn
-         fD7JzkH10cKDHKpDKFp2Mq/goxr2bG7wlMqbR7tkusldcjH72NjwgjTDihlL8dGWuA7X
-         9Ygw==
+        bh=doPzRJPVP3/xe4/aMYowFwbSzXC9NI8C9CEdrJvNyeE=;
+        b=dJKDG5SeW7gNTOrA+S5bXuJTaNb5egWFA7u/qJUAPwYwgw656wmZE73vMJX6q6DZd8
+         WhVC3zX15TrbLqwAE5tHimxdXYasPxAZEI9AkCxgFF080gM0yKmIBNte0x0fZ/toori/
+         7KGKADA402TzHlisLhJ7wnr2IYRB3VpIsh3mGR586OMvMUBFbPszJvDnUyGTYE9uNzbJ
+         UWl4IZVtCI0NwSsSb6Yg2qv9pLRlz4kfBbY3S1vyCajBOoOH13JvGhMjYBmKLnoYyUV9
+         uIw2TFd+6guJHSdXzYgW/2Syh3iJF9QpiYmI3dEP6W3cgTBmThSd9pg8RiZlXNK95P97
+         GXSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749868056; x=1750472856;
+        d=1e100.net; s=20230601; t=1749868899; x=1750473699;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6MPxcrzvl/j0c311UlB0dF6QX2mG0TJI28/AbWapSRE=;
-        b=O0YWxP08rIIdVxt/V3IojzQTgnmb2K0uls+n65P/Iwyzxx+HO/jmk44K0suxWdGL9t
-         hXLfOYoxUgTBY4ohNpAXxwNs2amxl/aK+FAMZFCxTac9/nGJcvk8QyY0TWKuaj/6T9aR
-         h0e/SJWREa9FUxNBChCd0hBywCf0ynWazFEAUK6WGViBHQfvdT8KIY5ccv/R9T5HVQmu
-         +M9qgdc2f9ZmSczmKaTZXfMKALgtoTWELeMRyqhGV+6YVdDWj6oZ7+Ix0BqcEoClO7LB
-         w8Mtsy5qiybKyKmuXa7NnbcAhRU7opbJ4Qfq/bcpBBkjzbKfGDHSNzB9kM8kHNCtupIQ
-         3ldQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkMZ+10xejADmpWSwI1578Fg3vWNELEnlpR7GjR841qHwoTHeEP3ZgM6+5lY4Z+OJOMR72hq3tvYUw4Kg=@vger.kernel.org, AJvYcCXTO3GE/vz4fwHlT1HRzQo7WGROfOyDQlP43w45PCv0l4KR6OobiACwp7ryJhHIA31eiPmOAwLa@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKgDczgHFDxRK+oW16zOAf0p8gkH7QlZ21lZRioLdML6aO7LLc
-	72tXaMiCUem9/zqPK3SDoByem0QnxkEIElMI3pHDq9SFMd3F84O/fw+RCc70CXIwmuCpTBgOlH9
-	FUsiBdZKL5AMkQa3YkTs2yhG6qaD3NL0=
-X-Gm-Gg: ASbGncu2JCN2pbIex7oVdDta0whiTr5gTCs+3fviaomkVbCSNSk6A6Yc2LcyOMSYpkQ
-	NVJnXN4tEtcmd6rwmBZF7HCwM5ENBxwH490ZcQspfpV2VfZ3SeW82eteHSg2PxPzalMMT7WB8Ay
-	e1v37j5nToAYah6mKXgnjxVSxJFlViVnfqnzMu6WrzihU3
-X-Google-Smtp-Source: AGHT+IHSDZgUvD0qwZNlq4ENrrlQE2VqR4K9CtjsGABFFoir+MEGYeLA5t/HLsmifXnXBAbqLV5m/cTF91+KCmvaLiI=
-X-Received: by 2002:a17:906:7956:b0:ad8:9428:6a35 with SMTP id
- a640c23a62f3a-adfad367d90mr116753966b.7.1749868056224; Fri, 13 Jun 2025
- 19:27:36 -0700 (PDT)
+        bh=doPzRJPVP3/xe4/aMYowFwbSzXC9NI8C9CEdrJvNyeE=;
+        b=jHYVgrJW8woI/PQIKr9FPPN1TdXL4S5O1u28C3OHlNSgq5i3dfPWXkFU4P/Jqyg2yG
+         rbeIMMV7sUOZ5FdmmctTZvddpJsL1xFSV+9HCy+LMn1y+n8VXUz5SDUS15SCCwnQ9fA7
+         MStlLJ8Z5DCtrnuVRdtHlapSEEVGfASeMkon+QrU9a3obTjqN0QddbbnWeHpDclnjav/
+         bsijtJuUfU793v5xeJczFSH0ylJEw9Mj07y2A3pekXEUEYesFWJNwgArf4hhqI0YElkN
+         YCw64HdwjnWJETv+ybHib0Oujusj+B61WesZDsYXdu2wcF7dMR2fTh3IOhw2J9t8PWjU
+         L5PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuSsswyu/5tig8CPgWt6MMjzQrOyL7P0FAOIyDTthKP9/jcQoayG2Hpv6DrItoWU9aUnJg1og=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNMfRKdXggTNOVzuuMADreNiz+weIAI81HkVBBW5UpcEu0Krss
+	i8ejJOxoTSw5D8KPNebJxdc0SP8OhIYCNtVf8fBr1ZrI/tr2gaKpMXL//yyqhK7446acl98VZ4q
+	frmpkD9+gQu8vx5FEHFfr9j0krFI82rap+EjVmtw=
+X-Gm-Gg: ASbGncvz5t2ZZtxGdpza3VlbyGEM0MODZbXgf83yKIr2fAwlFwU6do/23JJPNrKJERg
+	q9jWtGwBemv8bxSpAVpHCTK7XlhS6+Ft4ie2FGCH+Hx0MRDRXdVIBu46dXVGCnkI47TelARPnZE
+	MPzgScHZzFFMK2RH0Cg7dkBu8BPspuUx/8sCQzE+HvMEGFEtIut8HpThCAGgQiYwK1eg1wZr0=
+X-Google-Smtp-Source: AGHT+IGyKmLcxos7EcwvVgM6x3f7yo/MjLs4DGE0QOIk/6EfA/xQL0wbg2vDDJZFztxwGG7zsTTPyp1k4n3wV6k8L+Y=
+X-Received: by 2002:a05:6512:3191:b0:553:ad28:210a with SMTP id
+ 2adb3069b0e04-553b6f43b84mr330715e87.51.1749868899145; Fri, 13 Jun 2025
+ 19:41:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250613102014.3070898-1-liyuesong@vivo.com>
-In-Reply-To: <20250613102014.3070898-1-liyuesong@vivo.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sat, 14 Jun 2025 11:27:24 +0900
-X-Gm-Features: AX0GCFtO7HPk3CZD3Wtlzh_X41p29PyqpaFeYaRdgJ7FwzPXJATvNm7kwiBt7gE
-Message-ID: <CAMArcTUJBWKftYQsVwqHQRR-cS87hMcMOOU3u2_83oa9TjzEaw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] net: amt: convert to use secs_to_jiffies
-To: Yuesong Li <liyuesong@vivo.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	opensource.kernel@vivo.com
+References: <20250519082042.742926976@linutronix.de> <20250519083026.350061049@linutronix.de>
+In-Reply-To: <20250519083026.350061049@linutronix.de>
+From: John Stultz <jstultz@google.com>
+Date: Fri, 13 Jun 2025 19:41:27 -0700
+X-Gm-Features: AX0GCFvDzGMYapzpRturPw50nvQKFTA7BYWBgXb8VydIajUfsXGekrmW0-EEmG4
+Message-ID: <CANDhNCqXMnEOC58PN03M+9-=DSty2FoZpJDz+OUuzd08uQdoEw@mail.gmail.com>
+Subject: Re: [patch V2 12/26] timekeeping: Introduce auxiliary timekeepers
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Richard Cochran <richardcochran@gmail.com>, Christopher Hall <christopher.s.hall@intel.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Miroslav Lichvar <mlichvar@redhat.com>, Werner Abt <werner.abt@meinberg-usa.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	Kurt Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>, 
+	Antoine Tenart <atenart@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 13, 2025 at 7:20=E2=80=AFPM Yuesong Li <liyuesong@vivo.com> wro=
-te:
+On Mon, May 19, 2025 at 1:33=E2=80=AFAM Thomas Gleixner <tglx@linutronix.de=
+> wrote:
 >
-
-Hi Yuesong,
-Thanks a lot for your work!
-
-> Since secs_to_jiffies()(commit:b35108a51cf7) has been introduced, we can
-> use it to avoid scaling the time to msec.
+> From: Anna-Maria Behnsen <anna-maria@linutronix.de>
 >
-> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
+> Provide timekeepers for auxiliary clocks and initialize them during
+> boot.
+>
+> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+>
+> ---
+>  kernel/time/timekeeping.c |   22 ++++++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
+> ---
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -2630,3 +2640,11 @@ void hardpps(const struct timespec64 *ph
+>  }
+>  EXPORT_SYMBOL(hardpps);
+>  #endif /* CONFIG_NTP_PPS */
+> +
+> +#ifdef CONFIG_POSIX_AUX_CLOCKS
+> +static __init void tk_aux_setup(void)
+> +{
+> +       for (int i =3D TIMEKEEPER_AUX; i <=3D TIMEKEEPER_AUX_LAST; i++)
 
-Reviewed-by: Taehee Yoo <ap420073@gmail.com>
+My only thought here, seeing its use,  would it be better if
+TIMEKEEPER_AUX was TIMEKEEPER_AUX_FIRST?
 
-Thanks,
-Taehee Yoo
+Acked-by: John Stultz <jstultz@google.com>
+thanks
+-john
 
