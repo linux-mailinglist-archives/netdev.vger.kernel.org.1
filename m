@@ -1,318 +1,177 @@
-Return-Path: <netdev+bounces-197792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 143B2AD9E63
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:09:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBBDAD9E66
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2A201787E0
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 17:09:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 701691787D3
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 17:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8764B1C6FF5;
-	Sat, 14 Jun 2025 17:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D341D63C0;
+	Sat, 14 Jun 2025 17:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aESQ9WaQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPOjPIOC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59161192D87;
-	Sat, 14 Jun 2025 17:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD841C68A6
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 17:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749920940; cv=none; b=unu8eNhr4vWlKPCAk+g0yqRJoWo5FH8VtK+2mZwsCS92Uzw1TC8zwNKdcQyiyuHIF3Goud1XjtchgeYm+Axa3hB3V01e4k327p3+OgmRd8LKYlEs2Tl0ggB6yGUYBAPJcv6i1qhTqilSB6mflp2QtV8N4eVVdktj2OEcZ0IunGw=
+	t=1749921094; cv=none; b=MMBiKMMJP1xQwadjKTwPSWIOgsqxHLaLxATyEzSkxqUnMlBFrac5nPanuexLeb422JoxTmZ+HnE/SF103lxEidX+aGsMVJqixrA/+PnhhWYkU3Qnx3l+GgMFhxT3Ti0+rm1dpZIYs00rMksca/b2ivgLXawINGNi5u+J546v3n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749920940; c=relaxed/simple;
-	bh=QqmB2XOqS0gn474jgB0ddFBNckL0U6p5fwOxoQfHEuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FsuAn2/bvVpOO0HBO/jgIjLt1CoI7IMu2NsBW9Bgk5vphiXY7Vv0FQCaA2wzOORXQUBB2XKzm0GrfpbqX6ltuhJ3NuKnur74r+qmfdG0qJeiqrgEX9fUf+DYWIiBUZkZtamXFx4Ni7IRvU6XfHAwU00yORoWdpqHga/OdV6cRDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aESQ9WaQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63568C4CEEB;
-	Sat, 14 Jun 2025 17:08:59 +0000 (UTC)
+	s=arc-20240116; t=1749921094; c=relaxed/simple;
+	bh=TmT0YVfoSuR4QGDRW1J1zcN4ZnpXw15MM4Vk/fX+3dQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KWKoxzDefEPC97F+1h+PCDSTveo+eegrfWIHAYhTt7EQ0w2WzYDkBJgkeKcNyHQ83enWEVxM5bjzNrvB3t1CD8c8nMvwqsBVNuz/4qhoRZnTxOBqygE/vcvcY6n+3AOB7GBV6OjUbSNxzdb2tnIWvaQn6HgvWqLTdmrOZJS2Umc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aPOjPIOC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE685C4CEEB;
+	Sat, 14 Jun 2025 17:11:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749920939;
-	bh=QqmB2XOqS0gn474jgB0ddFBNckL0U6p5fwOxoQfHEuI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aESQ9WaQz1Cwb8dCYpUl7Sk+a39B6iR6H+kjkEEenqngynvwvR2Z2Yg4Gk0+Jmvdq
-	 8p4HcjtOjLSXbPpQzzUD/SVHYg3iBVqKDNGSyiy+jgPZnVN0LkrEJ2StlKDdc4Ug/6
-	 VupwBlOmjSN20+R9fCD+erQfXTZPoSOo0rqjRPc5xhu/MtDwhLyI/0F+bL9oCDTBl/
-	 jZYwRCLjKoyPVjsQBDm6EKV9/NY5n/3As+XMSsHfMSFiyMXo6wj531+KP3fVG+6rNW
-	 6wOyObZDMROBJPVor7P/GYnc8qrUJKk/1KKhkpv7yFNk7bzOl2f2+TenzXz6bGeye1
-	 DMD71PyuWN3DA==
-Date: Sat, 14 Jun 2025 10:08:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, "Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNl?=
- =?UTF-8?B?bg==?=" <toke@toke.dk>
-Subject: Re: [PATCH net-next v3] page_pool: import Jesper's page_pool
- benchmark
-Message-ID: <20250614100853.3f2372f2@kernel.org>
-In-Reply-To: <20250613234420.1613060-1-almasrymina@google.com>
-References: <20250613234420.1613060-1-almasrymina@google.com>
+	s=k20201202; t=1749921093;
+	bh=TmT0YVfoSuR4QGDRW1J1zcN4ZnpXw15MM4Vk/fX+3dQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aPOjPIOCU8DUDfRCxK2takm5vvZtab8VnCwTJn3uIuL29GChaArT7zjDCsG+PPOaT
+	 mnjWmzj49DaFyAFT8qeESF3iBJa+RUNMNhT93W9nKcJXJjuVjkaznqSgzOj4PaRy1S
+	 eCLs7Qk9HTkGSBvqZTaT+Kjkxq4gvsiXd9G57aDPmrb5ePahldxCyvcsQTuxSXKvEF
+	 5Z2WzfxtQsm2NBDrkVex5LoP9ckqFl7TJDBObhioYMGTXOWFQpinMt2x9eyuxChwp+
+	 kueG3GoKB7ylCxyEEdvJY3B3R0sVhaOC6gSMuPy6WSF0VoQdp2cyUmqpROLMqgfmIJ
+	 p3bTOPLAHdwuQ==
+Date: Sat, 14 Jun 2025 18:11:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, donald.hunter@gmail.com,
+	petrm@nvidia.com, razor@blackwall.org, daniel@iogearbox.net
+Subject: Re: [PATCH net-next 2/2] selftests: net: Add a selftest for
+ externally validated neighbor entries
+Message-ID: <20250614171130.GA861417@horms.kernel.org>
+References: <20250611141551.462569-1-idosch@nvidia.com>
+ <20250611141551.462569-3-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611141551.462569-3-idosch@nvidia.com>
 
-On Fri, 13 Jun 2025 23:44:20 +0000 Mina Almasry wrote:
-> From: Jesper Dangaard Brouer <hawk@kernel.org>
->=20
-> We frequently consult with Jesper's out-of-tree page_pool benchmark to
-> evaluate page_pool changes.
->=20
-> Import the benchmark into the upstream linux kernel tree so that (a)
-> we're all running the same version, (b) pave the way for shared
-> improvements, and (c) maybe one day integrate it with nipa, if possible.
->=20
-> Import bench_page_pool_simple from commit 35b1716d0c30 ("Add
-> page_bench06_walk_all"), from this repository:
-> https://github.com/netoptimizer/prototype-kernel.git
->=20
-> Changes done during upstreaming:
-> - Fix checkpatch issues.
+On Wed, Jun 11, 2025 at 05:15:51PM +0300, Ido Schimmel wrote:
+> Add test cases for externally validated neighbor entries, testing both
+> IPv4 and IPv6. Name the file "test_neigh.sh" so that it could be
+> possibly extended in the future with more neighbor test cases.
+> 
+> Example output:
+> 
+>  # ./test_neigh.sh
+>  TEST: IPv4 "extern_valid" flag: Add entry                           [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Add with an invalid state           [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Add with "use" flag                 [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Replace entry                       [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Replace entry with "managed" flag   [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Replace with an invalid state       [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Transition to "reachable" state     [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Transition back to "stale" state    [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Forced garbage collection           [ OK ]
+>  TEST: IPv4 "extern_valid" flag: Periodic garbage collection         [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Add entry                           [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Add with an invalid state           [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Add with "use" flag                 [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Replace entry                       [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Replace entry with "managed" flag   [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Replace with an invalid state       [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Transition to "reachable" state     [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Transition back to "stale" state    [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Forced garbage collection           [ OK ]
+>  TEST: IPv6 "extern_valid" flag: Periodic garbage collection         [ OK ]
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 
-There is more:
+...
 
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#81:=20
-new file mode 100644
+> diff --git a/tools/testing/selftests/net/test_neigh.sh b/tools/testing/selftests/net/test_neigh.sh
 
-WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
-#122: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:1:
-+/*
+...
 
-CHECK: Please use a blank line after function/struct/union/enum declarations
-#163: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:42:
-+};
-+#define bit(b)		(1 << (b))
+> +################################################################################
+> +# Utilities
+> +
+> +run_cmd()
+> +{
+> +	local cmd="$1"
+> +	local out
+> +	local stderr="2>/dev/null"
+> +
+> +	if [ "$VERBOSE" = "1" ]; then
+> +		printf "COMMAND: $cmd\n"
+> +		stderr=
+> +	fi
 
-WARNING: Block comments use a trailing */ on a separate line
-#172: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:51:
-+ * introduced by the for loop itself */
+Hi Ido,
 
-WARNING: Prefer kcalloc over kzalloc with multiply
-#238: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:117:
-+	array =3D kzalloc(sizeof(struct page *) * elems, gfp_mask);
+shellcheck was recently added to NIPA and it warns about the above as follows.
+Could you consider addressing this?
 
-WARNING: braces {} are not necessary for single statement blocks
-#240: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:119:
-+	for (i =3D 0; i < elems; i++) {
-+		array[i] =3D page_pool_alloc_pages(pp, gfp_mask);
-+	}
+In tools/testing/selftests/net/test_neigh.sh line 21:
+ 		printf "COMMAND: $cmd\n"
+                        ^---------------^ SC2059 (info): Don't use variables in the printf format string. Use printf '..%s..' "$foo".
 
-WARNING: braces {} are not necessary for single statement blocks
-#243: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:122:
-+	for (i =3D 0; i < elems; i++) {
-+		_page_pool_put_page(pp, array[i], false);
-+	}
+> +
+> +	out=$(eval $cmd $stderr)
+> +	rc=$?
+> +	if [ "$VERBOSE" -eq 1 ] && [ -n "$out" ]; then
+> +		echo "    $out"
+> +	fi
+> +
+> +	return $rc
+> +}
 
-WARNING: line length of 81 exceeds 80 columns
-#288: FILE: tools/testing/selftests/net/bench/page_pool/bench_page_pool_sim=
-ple.c:167:
-+		/* Common fast-path alloc, that depend on in_serving_softirq() */
+...
 
-WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
-#402: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:1:
-+/*
+> +################################################################################
+> +# Main
+> +
+> +while getopts ":t:pvh" opt; do
+> +	case $opt in
+> +		t) TESTS=$OPTARG;;
+> +		p) PAUSE_ON_FAIL=yes;;
+> +		v) VERBOSE=$(($VERBOSE + 1));;
+> +		h) usage; exit 0;;
+> +		*) usage; exit 1;;
+> +	esac
+> +done
 
-WARNING: line length of 81 exceeds 80 columns
-#451: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:50:
-+ * Architectures Software Developer=E2=80=99s Manual Volume 3: System Prog=
-ramming Guide
+Likewise, shellcheck has the following to say about the above.
 
-CHECK: Alignment should match open parenthesis
-#491: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:90:
-+		perf_event =3D perf_event_create_kernel_counter(&perf_conf, cpu,
-+						 NULL /* task */,
+In tools/testing/selftests/net/test_neigh.sh line 318:
+		v) VERBOSE=$(($VERBOSE + 1));;
+                              ^------^ SC2004 (style): $/${} is unnecessary on arithmetic variables.
 
-CHECK: spaces preferred around that '|' (ctx:VxV)
-#626: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:225:
-+	rec.flags       =3D (TIME_BENCH_LOOP|TIME_BENCH_TSC|TIME_BENCH_WALLCLOCK);
- 	                                  ^
+> +
+> +require_command jq
+> +
+> +ip neigh help 2>&1 | grep -q "extern_valid"
+> +if [ $? -ne 0 ]; then
+> +   echo "SKIP: iproute2 ip too old, missing \"extern_valid\" support"
+> +   exit $ksft_skip
+> +fi
+> +
+> +trap exit_cleanup_all EXIT
+> +
+> +for t in $TESTS
+> +do
+> +	setup; $t; cleanup_all_ns;
+> +done
+> -- 
+> 2.49.0
+> 
 
-CHECK: spaces preferred around that '|' (ctx:VxV)
-#626: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:225:
-+	rec.flags       =3D (TIME_BENCH_LOOP|TIME_BENCH_TSC|TIME_BENCH_WALLCLOCK);
- 	                                                 ^
-
-CHECK: Lines should not end with a '('
-#743: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:342:
-+void time_bench_run_concurrent(
-
-CHECK: spaces preferred around that '|' (ctx:VxV)
-#772: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:371:
-+		c->rec.flags       =3D (TIME_BENCH_LOOP|TIME_BENCH_TSC|
- 		                                     ^
-
-CHECK: space preferred before that '|' (ctx:VxE)
-#772: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:371:
-+		c->rec.flags       =3D (TIME_BENCH_LOOP|TIME_BENCH_TSC|
- 		                                                    ^
-
-WARNING: Missing a blank line after declarations
-#801: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.c:400:
-+		struct time_bench_cpu *c =3D &cpu_tasks[cpu];
-+		kthread_stop(c->task);
-
-WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
-#814: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:1:
-+/*
-
-WARNING: please, no space before tabs
-#829: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:16:
-+^Iuint32_t flags; ^I/* Measurements types enabled */$
-
-CHECK: spaces preferred around that '<<' (ctx:VxV)
-#830: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:17:
-+#define TIME_BENCH_LOOP		(1<<0)
-                        		  ^
-
-CHECK: Prefer using the BIT macro
-#830: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:17:
-+#define TIME_BENCH_LOOP		(1<<0)
-
-CHECK: spaces preferred around that '<<' (ctx:VxV)
-#831: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:18:
-+#define TIME_BENCH_TSC		(1<<1)
-                       		  ^
-
-CHECK: Prefer using the BIT macro
-#831: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:18:
-+#define TIME_BENCH_TSC		(1<<1)
-
-CHECK: spaces preferred around that '<<' (ctx:VxV)
-#832: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:19:
-+#define TIME_BENCH_WALLCLOCK	(1<<2)
-                             	  ^
-
-CHECK: Prefer using the BIT macro
-#832: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:19:
-+#define TIME_BENCH_WALLCLOCK	(1<<2)
-
-CHECK: spaces preferred around that '<<' (ctx:VxV)
-#833: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:20:
-+#define TIME_BENCH_PMU		(1<<3)
-                       		  ^
-
-CHECK: Prefer using the BIT macro
-#833: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:20:
-+#define TIME_BENCH_PMU		(1<<3)
-
-WARNING: please, no space before tabs
-#838: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:25:
-+^Iuint64_t invoked_cnt; ^I/* Returned actual invocations */$
-
-WARNING: Block comments use a trailing */ on a separate line
-#844: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:31:
-+	 * instructions counter including pipelined instructions */
-
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-#917: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:104:
-+	unsigned hi, lo;
-
-WARNING: Missing a blank line after declarations
-#918: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:105:
-+	unsigned hi, lo;
-+	asm volatile("CPUID\n\t"
-
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-#930: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:117:
-+	unsigned hi, lo;
-
-WARNING: Missing a blank line after declarations
-#931: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:118:
-+	unsigned hi, lo;
-+	asm volatile("RDTSCP\n\t"
-
-WARNING: Block comments use * on subsequent lines
-#955: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:142:
-+/*
-+inline uint64_t rdtsc(void)
-
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-#997: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:184:
-+static __always_inline unsigned long long p_rdpmc(unsigned in)
-
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-#999: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:186:
-+	unsigned d, a;
-
-CHECK: Lines should not end with a '('
-#1038: FILE: tools/testing/selftests/net/bench/page_pool/time_bench.h:225:
-+void time_bench_run_concurrent(
-
-WARNING: line length of 113 exceeds 80 columns
-#1097: FILE: tools/testing/selftests/net/bench/test_bench_page_pool.sh:19:
-+	echo ${result} | grep -o -E "no-softirq-page_pool01 Per elem: ([0-9]+) cy=
-cles\(tsc\) ([0-9]+\.[0-9]+) ns"
-
-WARNING: line length of 113 exceeds 80 columns
-#1101: FILE: tools/testing/selftests/net/bench/test_bench_page_pool.sh:23:
-+	echo ${result} | grep -o -E "no-softirq-page_pool02 Per elem: ([0-9]+) cy=
-cles\(tsc\) ([0-9]+\.[0-9]+) ns"
-
-WARNING: line length of 113 exceeds 80 columns
-#1105: FILE: tools/testing/selftests/net/bench/test_bench_page_pool.sh:27:
-+	echo ${result} | grep -o -E "no-softirq-page_pool03 Per elem: ([0-9]+) cy=
-cles\(tsc\) ([0-9]+\.[0-9]+) ns"
-
-total: 0 errors, 33 warnings, 17 checks, 995 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplac=
-e.
-
-Commit 12b4bc1bc38a ("page_pool: import Jesper's page_pool benchmark") has =
-style problems, please review.
-
-NOTE: Ignored message types: ALLOC_SIZEOF_STRUCT BAD_REPORTED_BY_LINK CAMEL=
-CASE COMMIT_LOG_LONG_LINE GIT_COMMIT_ID MACRO_ARG_REUSE NO_AUTHOR_SIGN_OFF
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-total: 0 errors, 33 warnings, 17 checks, 995 lines checked
-
-> diff --git a/tools/testing/selftests/net/bench/page_pool/time_bench.c b/t=
-ools/testing/selftests/net/bench/page_pool/time_bench.c
-> new file mode 100644
-> index 000000000000..257b1515c64e
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/bench/page_pool/time_bench.c
-> @@ -0,0 +1,406 @@
-> +/*
-> + * Benchmarking code execution time inside the kernel
-> + *
-> + * Copyright (C) 2014, Red Hat, Inc., Jesper Dangaard Brouer
-> + *  for licensing details see kernel-base/COPYING
-
-don't think kernel-base/COPYING exists
-
-coccicheck also says:
-
-testing/tools/testing/selftests/net/bench/page_pool/time_bench.c:57:36-37: =
-WARNING: Use ARRAY_SIZE
-testing/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.=
-c:223:5-17: Unneeded variable: "passed_count". Return "0" on line 245
-
-IIUC the former is in user space code, but maybe we can add a define
-for ARRAY_SIZE and use it? It's pretty trivial.
---=20
+-- 
 pw-bot: cr
 
