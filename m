@@ -1,173 +1,137 @@
-Return-Path: <netdev+bounces-197732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B91AD9B31
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:05:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ABB8AD9B2E
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17BAF168F54
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:03:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C64E87AD24B
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706B022D4C8;
-	Sat, 14 Jun 2025 08:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7761C1A2622;
+	Sat, 14 Jun 2025 08:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k5L8Q1uN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJmyjqOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9454D213E74;
-	Sat, 14 Jun 2025 08:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814CF17D7
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 08:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749888027; cv=none; b=nhdqZ/wI0B0ETkV17v+LVgk4Yj/lzawum77285TFAcbTFdSLkEKzjKcK9+ugL622HNR8ugknETNpHrs9Wm5QdkrQf1gpYF8NFOEueHQkASQgbvpwFtZzwvuWkjXKLZQ4Y2p3d4xpQyL9evaG4HRBtftfrZy6+AeJ2gzlc9YhSQY=
+	t=1749888271; cv=none; b=csQSlk8ughJiAQSAjiAoCcTdv8iZ+mx4JTh9uIEM0IO7zOh7dRAZuCMmXvwwLolsaDAgRUDaxvWgz2j/NucOcaMt9zi222I+fdoU2M9jgGysorzK3ZNjT4DepVWCzWOpSlim6FehGUCA/5smbYLl/+Kw84UrhQxAPN4tyfcSWMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749888027; c=relaxed/simple;
-	bh=7a28u0sKXG3vFOdz3Lc+cqRQFxQheFOFMjSL4DZVfWg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EIoz2ZqgrhK7PNgQLlTtefPzIjoPfPHK5PEOL/PxSsEg7VFo87bRAbMBohuhBYn2Lf+1nuEeQ13yfjDpKaLAtY7lgE3AGRdzOQcuNrIc9kWoiTNkj+7Im/JQOBQfMD5K+1dAm/8PifSQRjd4x5b0V/GWmYpx2V/FZ408hR7VXxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k5L8Q1uN; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-451d41e1ad1so24620445e9.1;
-        Sat, 14 Jun 2025 01:00:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749888024; x=1750492824; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mPmrqGXQSm3KfbZ3QMibfb2/1EkzzyHSibvqUxxDwrQ=;
-        b=k5L8Q1uNgcoZxNro0v2aq3/At8YlL7+cRx76RYssOFBox5xXax5tkgUdgf0e9n4ek0
-         0gxPgoEm3Zy0g9AvxWPp2r6XdcMKdQFUNtvS7G8K0rBs4hLdNU0oz9rFSY8nyebuuMsK
-         AqGG/kD+yguhjziDQZKopYTvZrq0Zh5Q4CqXdwU9jDnRCcjn8OTWiPQS6SFztU9HQC5t
-         YyO+aypjeJpeUeRWe0xI695PoMU21xOvwzQqF45MgY8g87QHwm706Tk8yEsMZhj4dyw9
-         qariL36hrV+aoew0ePGtnWckar3CEeEahmV9TO9i4GW0pPGCq+A8rh5jx3wCc0GLj28r
-         jfuA==
+	s=arc-20240116; t=1749888271; c=relaxed/simple;
+	bh=zzmibGdCsxOa4m/m56xM8PSnA7HSBEtfuDqFI+ShFBo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ry/JMwPTwncyIcfHjtYu85L8DGufoMHxJ+KetjvN4ARReMSCQ0doOmz4a3dNANZCdCFe3iSbMd9oiJ5AxKqg4KwCTCgK4/RrOcwpd/fTxzc49nuu6PMrGcOTb8GPaVBd86RryLfo0ulQjWc95sfnmJAiQNRVN2umyy2nJcScqqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jJmyjqOP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749888268;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HVokNRqP6aO5yLUSRdwJYksPy+B5cEflV2xVFSxRaiE=;
+	b=jJmyjqOPlZu1FeeCqudVTfcSweO6OP3WHZ2OznUA7VSw1u8AS3pv9+R8P+DmAQHBNTw86b
+	fdrkOb0+cjQ0BLlhZGwmamTuwV6AI9KYpM3az5wESWn2RbLB8fKcnHWN0oYhH6NWJTWseC
+	uEiitc4KjqkXmNUa4CJ5vusW8ineP/g=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-458-vO-ul-BdNl6GVeECzJo8DQ-1; Sat, 14 Jun 2025 04:04:26 -0400
+X-MC-Unique: vO-ul-BdNl6GVeECzJo8DQ-1
+X-Mimecast-MFC-AGG-ID: vO-ul-BdNl6GVeECzJo8DQ_1749888265
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450de98b28eso21268535e9.0
+        for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 01:04:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749888024; x=1750492824;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mPmrqGXQSm3KfbZ3QMibfb2/1EkzzyHSibvqUxxDwrQ=;
-        b=nyt7exy2qrj4Qv/Gy6iwGjZfJWGKB8xKuTz9kY1822Ydmuznv0IFj5qPRDBNk8HzIu
-         fC4ucAyjSNu6HMrCJqECKn7AZEB6owul+xI/5PfC5Rvtn9z2/FM663r6QApSe90hdR1q
-         YH7otK8y18tU9RIk7ELl/iy1r2pDNyPvVwSa2p5IGbMq+TWNz/Y0xXzVgqqvwzZxsQuJ
-         llPXU4e1mwIZ0UnHBfH0V2PSJzaNpSm7ReszasdSZoXKAtifAtot8Nu/9/ab24mDMo8B
-         f+L2yE+nLlRN8OU2oyc8hhrQVc5jAyLdcN8bG00Jr5qMUp+ubDtKUpMp5ISunq/OOIx8
-         J3fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUeyBWo8xoYwpCZqDgegeeuiVr+QEUIgCeo0e/jvq+E5NX7cx3WJRx6N2G9erva28mYmFjNoUsU@vger.kernel.org, AJvYcCWVkuWZo8+nfciG7BXa1CCetCKuU4tvo8Z4X8rsOG4oAqN8kF+8VudXBbEMkUpJXexqOlMcvGmCeRhQsqo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRs1eEk5b+wphCi6+ZQNTlMXtp2dqb+0EowOXU86AUBs1sQEwQ
-	ZM04ZVMkwRKXF1rdZdWYWkq33cAHzCYhhlYHZWs3B+u2HC/DFA5XgiV6
-X-Gm-Gg: ASbGncsMYpniYIwH+nC1nocjpsXEDQ+TWplGydtVJ9yJE0Vksf5Wbvkv5KmOOJDagTk
-	OswqWK9hc4hyIMU7+Czt3iEdhYWfDtfZqynx8xW9GZcRaz+X8J1HKNDm8ppRTBGhNFV0jr26avL
-	qZV071P4O6tvU0QM9pRtZhQTTOFuCw0/NQdxHtRItbSeiQ2I/kXIWWe216K2szwaHPK18tjHh7s
-	7c2bjtmwLQXkMggg0c1NZPORZMsdE2dD1Zs2WhyYKFHPgaeOK+P57w0kYaVOib9J92yJP2QGrSe
-	Wnms2VUaPMOaMJo0M1VKkBwHru0/OvaOjHQ3qxS6k9sPLM2mJS3t7pYJBV8RxeEI8tPsavzXRvP
-	TKZydmPf6YbjQbjBmBxWNoLvNUxCavn5PMGAKFCA0pNBRyVMJNo34hSyNB3VeBejKpD6Nd1je1w
-	==
-X-Google-Smtp-Source: AGHT+IEhfGlHP+zql732Tqtn/wDmxZs4K4d5mAMoyJ+oqHAOC0ufQkaosT+ghLdgpzXRaYCMBT9F3A==
-X-Received: by 2002:a05:600c:35cc:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-4533ca43db6mr23361945e9.7.1749888023794;
-        Sat, 14 Jun 2025 01:00:23 -0700 (PDT)
-Received: from skynet.lan (2a02-9142-4580-2300-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:2300::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c50esm75443535e9.4.2025.06.14.01.00.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Jun 2025 01:00:23 -0700 (PDT)
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-To: jonas.gorski@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vivien.didelot@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dgcbueu@gmail.com
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [PATCH net-next v4 14/14] net: dsa: b53: ensure BCM5325 PHYs are enabled
-Date: Sat, 14 Jun 2025 10:00:00 +0200
-Message-Id: <20250614080000.1884236-15-noltari@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250614080000.1884236-1-noltari@gmail.com>
-References: <20250614080000.1884236-1-noltari@gmail.com>
+        d=1e100.net; s=20230601; t=1749888265; x=1750493065;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HVokNRqP6aO5yLUSRdwJYksPy+B5cEflV2xVFSxRaiE=;
+        b=i1EcUoYmHkCJd2SMuSumP44yVzO0FjVTnE6jn7ZbkZdaHlQ/OkiWK0RdsvRK9kCyky
+         WzeIMALVaZv1Ym8QeO5PZQU3dQRwS2/2FVrCNnb3Jly+7i66CWBmtFOZZLUmsSF9zji2
+         zQUMH7jARx6TxhS31YwTvyO1clZBVIo6n2qDqno6OwaQyggHaiL1y+LTem/NvbO65N2e
+         eAMe/QOe+j8pWQymGKuvFQ97YXkuUoFHKLCceYTTQk5Hp9RhRHuw7jMWKw6Jm457ZKbr
+         K4B1AUwRO7wxbE8M7scPNNZ6jQkHx5Fd2kRCqtQj3HxeicGMJ4hn5sHRVj7rY7fFaegU
+         +Uqw==
+X-Gm-Message-State: AOJu0YyI90UFD+FDgwNbXWpqtYWbQWIAA61vhW3T7zsPjJBRZUCw2UvU
+	RJKlWqPwBU3aBkNtmvvwqbyXytuG7zoBvXshoXmFFwUDzoRxTMl9ePLldeC2ea9ZFFt20zPP5sT
+	rR9wJJowWXaR1tAww2kBhTrGtPkiok+8Td5IGhzxmslx+gt1P96UVx6EwHQ==
+X-Gm-Gg: ASbGncvZ1++2cSigVDeXetkRAwsnKNtRU5EEitLDyPUwvx8y2iSlImAkiRRFhO+7rjA
+	phPRu5F7WJSisoyrzaXSbTCDZXbDPgjfRPKliDuVWjHyqz5IV9MrYKHItUTd9xBg7F0cVsQswEk
+	WVnhXkUmdslPfXh7XEtlY7YSHBI7odQwyqv6sv5VzDwj7WySyB0dpu4yLtb4hXlXfZJHt82m8NO
+	JH2XCDTAVfuGGir2xX1nHW+4P8hJEpOAgTPjfHVliKyFWcZZX3UdfcWRMtacR0xtK3Tw32o1mAE
+	5Xf+iTVBpgYjWJsXO/cfXX+BDX8D2IubKhL3Sydh4BBy/gFMuQltcE76
+X-Received: by 2002:a05:600c:8b45:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-4533c92e57bmr25131085e9.10.1749888265502;
+        Sat, 14 Jun 2025 01:04:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+OZEVUNr0txXx5dctnsYMYWB7E4o4jwUdJ1BSHiLUl0SyZhTJWLJRWE7WiuMog3UHOLxz2A==
+X-Received: by 2002:a05:600c:8b45:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-4533c92e57bmr25130685e9.10.1749888265088;
+        Sat, 14 Jun 2025 01:04:25 -0700 (PDT)
+Received: from ?IPV6:2001:67c:1220:8b4:8b:591b:3de:f160? ([2001:67c:1220:8b4:8b:591b:3de:f160])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e13cfbesm76415655e9.22.2025.06.14.01.04.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 14 Jun 2025 01:04:24 -0700 (PDT)
+Message-ID: <3da348e2-9404-4c6f-8b94-1c831ff7e6f9@redhat.com>
+Date: Sat, 14 Jun 2025 10:04:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 7/8] tun: enable gso over UDP tunnel support.
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+References: <cover.1749210083.git.pabeni@redhat.com>
+ <a38c6a4618962237dde1c4077120a3a9d231e2c0.1749210083.git.pabeni@redhat.com>
+ <CACGkMEtExmmfmtd0+6YwgjuiWR-T5RvfcnHEbmH=ewqNXHPHYA@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CACGkMEtExmmfmtd0+6YwgjuiWR-T5RvfcnHEbmH=ewqNXHPHYA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-According to the datasheet, BCM5325 uses B53_PD_MODE_CTRL_25 register to
-disable clocking to individual PHYs.
-Only ports 1-4 can be enabled or disabled and the datasheet is explicit
-about not toggling BIT(0) since it disables the PLL power and the switch.
+On 6/12/25 6:55 AM, Jason Wang wrote:
+> On Fri, Jun 6, 2025 at 7:46 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+>> index 287cdc81c939..79d53c7a1ebd 100644
+>> --- a/include/uapi/linux/if_tun.h
+>> +++ b/include/uapi/linux/if_tun.h
+>> @@ -93,6 +93,15 @@
+>>  #define TUN_F_USO4     0x20    /* I can handle USO for IPv4 packets */
+>>  #define TUN_F_USO6     0x40    /* I can handle USO for IPv6 packets */
+>>
+>> +/* I can handle TSO/USO for UDP tunneled packets */
+>> +#define TUN_F_UDP_TUNNEL_GSO           0x080
+>> +
+>> +/*
+>> + * I can handle TSO/USO for UDP tunneled packets requiring csum offload for
+>> + * the outer header
+>> + */
+>> +#define TUN_F_UDP_TUNNEL_GSO_CSUM      0x100
+>> +
+> 
+> Any reason we don't choose to use 0x40 and 0x60?
 
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- drivers/net/dsa/b53/b53_common.c | 13 +++++++++++++
- drivers/net/dsa/b53/b53_regs.h   |  5 ++++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+I just noticed I forgot to answer this one, I'm sorry.
 
- v4: add changes requested by Jonas:
-  - Avoid in_range() confusion.
-  - Ensure PD_MODE_POWER_DOWN_PORT(0) is cleared.
-  - Improve B53_PD_MODE_CTRL_25 register defines.
+0x40 is already in use (for TUN_F_USO6, as you can see above), and 0x60
+is a bitmask, not a single bit. I used the lowest available free bits.
 
- v3: add changes requested by Florian:
-  - Use in_range() helper.
-
- v2: add changes requested by Florian:
-  - Move B53_PD_MODE_CTRL_25 to b53_setup_port().
-
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 29f207a69b9c..46978757c972 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -660,6 +660,19 @@ int b53_setup_port(struct dsa_switch *ds, int port)
- 	if (dsa_is_user_port(ds, port))
- 		b53_set_eap_mode(dev, port, EAP_MODE_SIMPLIFIED);
- 
-+	if (is5325(dev) &&
-+	    in_range(port, 1, 4)) {
-+		u8 reg;
-+
-+		b53_read8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, &reg);
-+		reg &= ~PD_MODE_POWER_DOWN_PORT(0);
-+		if (dsa_is_unused_port(ds, port))
-+			reg |= PD_MODE_POWER_DOWN_PORT(port);
-+		else
-+			reg &= ~PD_MODE_POWER_DOWN_PORT(port);
-+		b53_write8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, reg);
-+	}
-+
- 	return 0;
- }
- EXPORT_SYMBOL(b53_setup_port);
-diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_regs.h
-index d6849cf6b0a3..309fe0e46dad 100644
---- a/drivers/net/dsa/b53/b53_regs.h
-+++ b/drivers/net/dsa/b53/b53_regs.h
-@@ -103,8 +103,11 @@
- #define   PORT_OVERRIDE_SPEED_2000M	BIT(6) /* BCM5301X only, requires setting 1000M */
- #define   PORT_OVERRIDE_EN		BIT(7) /* Use the register contents */
- 
--/* Power-down mode control */
-+/* Power-down mode control (8 bit) */
- #define B53_PD_MODE_CTRL_25		0x0f
-+#define  PD_MODE_PORT_MASK		0x1f
-+/* Bit 0 also powers down the switch. */
-+#define  PD_MODE_POWER_DOWN_PORT(i)	BIT(i)
- 
- /* IP Multicast control (8 bit) */
- #define B53_IP_MULTICAST_CTRL		0x21
--- 
-2.39.5
+/P
 
 
