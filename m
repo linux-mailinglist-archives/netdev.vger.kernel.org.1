@@ -1,134 +1,92 @@
-Return-Path: <netdev+bounces-197815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0B3AD9EF7
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2430CAD9EFA
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A202C3AE6F2
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:22:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BE1F3AC068
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BCB1E3DEB;
-	Sat, 14 Jun 2025 18:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15BC2E3385;
+	Sat, 14 Jun 2025 18:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AFnGMw0U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFfk+w5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C7A148830;
-	Sat, 14 Jun 2025 18:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B162E62A2;
+	Sat, 14 Jun 2025 18:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749925343; cv=none; b=BgTqvKUvkUkW89ihLVje7j98CXYkwSitqizkcI6sblB2cdiowas6V0VIFHqfV0bvbWbF+OkpxKV+Mt8/nRG8OsiyM1Fxi8CfUUmT/mn70cIksMBTCg29GKY9gICA/yglcBziiZgloIQef4f6r/0c/uOQD8axUrlf519/MV2iUWE=
+	t=1749925802; cv=none; b=GKNaRKIAUSOAEEggVxGOC0252gq5UIo1V1PsQKcsnSVRH9jgA6IDKyf3mOFRCZjm6x2QARCeLGkug9zHzgTQJ1YtYbcEfpNXiq2nb53nTaYFUw8ELdpMgNKCnlrySl95Bv6bRR+/outDpXgYq4riwAkmpaFqs5H9GC2CaDm9R5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749925343; c=relaxed/simple;
-	bh=p4/tmhc4G9lT9+ZXS9UuWgSCRJc/+DG2T209fM/S2bU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NEZRQIN7ZZkrfGCmRQ4zSFx+VkGGB6Vuy/rKLhWAGbvATNWKpo01aXinqwJnJa6Q6XZuxOqmkqrnJx4bivvoKcFvZYvGN7mn666ZTo+9xMOnd1j3lzgBnSRqPbx0ZGkuZ67xvmBBwu3TarBJ7+OJQvBHx5IG+xNcIs4W5eLqplI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=AFnGMw0U; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LWVGJpxfZxK5NWqKsMehk6v+OXAVVCcYoYUm9xSLX/c=; b=AFnGMw0U82bkfJeUm1qa6MToAQ
-	4DNM7+9jW6wRrHGrILCc1akHMwLWpcAODcTO4kRMTR8zKDpDDaMZACfuNkd8LMyjCxKq1f7SREwEg
-	+59raP3R8l8vsFX4S0BUsQR9lpfnZgJ0EgZX+jCpxIzPe8vdoex1+W2CxPlyxTvU/1Sp2hYBbm00p
-	hO6lLM/+m0qcJk1Irc5h5sXSvF3V33IotOT/w33bOwIRfEb+JmW00/eC6+48RLFHz3Wjl1aQkz9HY
-	Sbp3rzOaw1HwVyg10QT6TpP/81H8WWkoVYRumO9m3jiyBFhQ2t6Gywb2pPDmUlAwjdtoeFgu1eBfB
-	Drupz9fw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43052)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uQVW4-00027I-1a;
-	Sat, 14 Jun 2025 19:22:08 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uQVW0-00031F-1O;
-	Sat, 14 Jun 2025 19:22:04 +0100
-Date: Sat, 14 Jun 2025 19:22:04 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: add
- ethqos_pcs_set_inband()
-Message-ID: <aE29zFKp5PLAM5pP@shell.armlinux.org.uk>
-References: <E1uPkbO-004EyA-EU@rmk-PC.armlinux.org.uk>
- <20250614153512.GQ414686@horms.kernel.org>
+	s=arc-20240116; t=1749925802; c=relaxed/simple;
+	bh=ZOWX7BWpub6OqdK+2qdgNdaLd3Y1ksfzS7MpICVwCEw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=afgw7ZOe6WAPADsPE1nPV0f74JeLWL6fhjrm1uXSpCghhzxY+1Kq5etJCO7I+sfw+liaTp/pFK0vrfrHODNPOcPlITNfZRySaC3q+EvmMJdtoxW5MmucI5TfqGSD/Xd+XHSdpO3JVTzaZ3ZmkjpNH8VwExAt95nLVrxP9tIrSDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFfk+w5i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E179C4CEEB;
+	Sat, 14 Jun 2025 18:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749925802;
+	bh=ZOWX7BWpub6OqdK+2qdgNdaLd3Y1ksfzS7MpICVwCEw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kFfk+w5iSMt6D2lX4Hzhd9HRVt3vSdqRin5fWxHjTTsQuigt5EIhuS/hLAWowzqlG
+	 wKSaYEFSpLW+jq7Lp8lg2NanE4zBZpKdva7yWD4qwTi4KSZkQ2rS1t1lYITXj+e3PI
+	 oErcfZT0B8cjuahfAPo2Rgqq+NJeHpw5+uBehdknoLNcoYzKO/vpo/Q2OWWoKaTEaF
+	 rea0f4cCd8z5Vjq7qHxponCCj+X/LxANLNZYCXNWsD8b0n3I1Pd4nXo+uRkHofnv5C
+	 WHyKxEcuChumy/+tOGc8itaMWAkRh8rm3bbawaV1KzjieSW2GOPJWhgqPRgMU1nbtw
+	 HTku+0HLw68NA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD57380AAD0;
+	Sat, 14 Jun 2025 18:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250614153512.GQ414686@horms.kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1] net: amt: convert to use secs_to_jiffies
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174992583150.1145273.16478965870565918025.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Jun 2025 18:30:31 +0000
+References: <20250613102014.3070898-1-liyuesong@vivo.com>
+In-Reply-To: <20250613102014.3070898-1-liyuesong@vivo.com>
+To: Yuesong Li <liyuesong@vivo.com>
+Cc: ap420073@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ opensource.kernel@vivo.com
 
-On Sat, Jun 14, 2025 at 04:35:12PM +0100, Simon Horman wrote:
-> On Thu, Jun 12, 2025 at 05:16:30PM +0100, Russell King (Oracle) wrote:
-> > Add ethqos_pcs_set_inband() to improve readability, and to allow future
-> > changes when phylink PCS support is properly merged.
-> > 
-> > Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
-> > Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org> # sa8775p-ride-r3
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Thanks Russell,
-> 
-> The nit below notwithstanding this looks good to me.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> > ---
-> >  .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 13 +++++++++----
-> >  1 file changed, 9 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > index e30bdf72331a..2e398574c7a7 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > @@ -622,6 +622,11 @@ static void ethqos_set_serdes_speed(struct qcom_ethqos *ethqos, int speed)
-> >  	}
-> >  }
-> >  
-> > +static void ethqos_pcs_set_inband(struct stmmac_priv *priv, bool enable)
-> > +{
-> > +	stmmac_pcs_ctrl_ane(priv, priv->ioaddr, enable, 0, 0);
-> 
-> FWIIW, I would have gone for the following, as all the type of
-> three of the trailing parameters is bool.
-> 
-> 	stmmac_pcs_ctrl_ane(priv, priv->ioaddr, enable, false, false);
+Hello:
 
-So the original code:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-            stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 0, 0, 0);
-            stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
-            stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
-            stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+On Fri, 13 Jun 2025 18:20:12 +0800 you wrote:
+> Since secs_to_jiffies()(commit:b35108a51cf7) has been introduced, we can
+> use it to avoid scaling the time to msec.
+> 
+> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
+> ---
+>  drivers/net/amt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-While one could convert the last two arguments to true/false, I'd prefer
-leaving them as is, as less change means less chance to introduce a bug.
+Here is the summary with links:
+  - [net-next,v1] net: amt: convert to use secs_to_jiffies
+    https://git.kernel.org/netdev/net-next/c/c969149bafbe
 
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
