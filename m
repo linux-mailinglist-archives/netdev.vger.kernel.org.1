@@ -1,96 +1,111 @@
-Return-Path: <netdev+bounces-197822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A92DAD9F32
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 21:00:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB37AD9F59
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 21:13:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A04D3B8924
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 18:59:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD1F77A5B4C
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0072E62A6;
-	Sat, 14 Jun 2025 19:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D50E2D23A0;
+	Sat, 14 Jun 2025 19:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iVhPZXuF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KnyxLXUf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D922D9EEB;
-	Sat, 14 Jun 2025 19:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0880D1E8320;
+	Sat, 14 Jun 2025 19:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749927601; cv=none; b=FdyK/w+CBLrb0Z9uJjubie7qahvCFOo9znMm0qsnjdHgxy/23LmZD3wzntm7YHHE/V9yEZTLFXXyV+/ZBVZch8f6WyNkK+LXN7F9Iu7MKKS/48w8hpZ4mUthqXev/6shHwjzOvEHdx0e2zYWbe/LJcHh196VTCai856GqrP89p0=
+	t=1749928412; cv=none; b=DJJc/Vjxv4+F6irdd0oF5JaWIP43rFxMJvGHMrDtNjFtSJua3JibWD8V2rdJVaH7CSSqPhTXU9NJzDQK2Lybt/WTy1B5vailiVDpidzVm2alCGQC39j6/jstkPaWtA9Z4aPzLi73wIyd1YOoBd64F+u0L3UOiJiTcgrv77Fp04c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749927601; c=relaxed/simple;
-	bh=fq4DvLoofZqWBzB6DCIk7+wpoW0fii4MRbpBebm9/gs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pv0Q/QT41C1D4iy6VwSmGal9bwm8RZ3R2Y1ubClzlqZvj0zH6R/eu8vs1bQY7HfxsC5ntNguMZhbuShXiyb1DB3SIqYH2epM2GjZ7CS2KS6DEbbIuSC1ZJbMN29GvJtpo1ABkcTy2AEXNCE78p82pXfNmAOioArUMk2CdCdBhIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iVhPZXuF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB6CC4CEEB;
-	Sat, 14 Jun 2025 19:00:01 +0000 (UTC)
+	s=arc-20240116; t=1749928412; c=relaxed/simple;
+	bh=QcqBRvfJQvc5pYZiDg3HscRZqlrgHExx7Nb5GFswF3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MNsoQXlc8RFg4kDUi+xb17bQLH/YjVeYgGWMsgZl/yO/CqiYIZEc3T8TIwf63p8PcvDqDxxV+wWQiKhgDYtkD9mVkF12IEnNkva46+E8SpJQeFLkNkTofU6O42chBkF+kEyU43m08FQEOsz9bpQjZxUe7qSG+FWCDU8xRwZlMKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KnyxLXUf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A57C4CEEB;
+	Sat, 14 Jun 2025 19:13:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749927601;
-	bh=fq4DvLoofZqWBzB6DCIk7+wpoW0fii4MRbpBebm9/gs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iVhPZXuFFPiOWfWCuPbHX7nb+0vMd4FqLV48HWoAQzG466CWosfzfn95PQ+ao2Wrb
-	 BKWb/4bV37U1sS1nq/fObwf08uBMVHDCckvddiFj4SdIntWpf3USujpfB5B2GK74LW
-	 7rWIL5mLd6duGM4dL9rsozBH5edc5MFVM4rmt5CCutUYv/gekhX6yyij1AbxNvGk9s
-	 l75mbw26mk/pXiKo4Hhfm4f/s5lmlGG8D6JR9KkxCEesuFp3ioT7KRxxY1y99HMYBz
-	 JOEur9BsQ4pxJk8PQhcSjzKOrN24qdvY2+rfJuOX6sGMymftKmX5/IoW3rbr7u126C
-	 JhDoS2cTA8boQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DBE380AAD0;
-	Sat, 14 Jun 2025 19:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749928411;
+	bh=QcqBRvfJQvc5pYZiDg3HscRZqlrgHExx7Nb5GFswF3o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KnyxLXUfl1AnHsgjB2TzBn9DyyEqxXLUxmGeVkU9mv+wrKp8bwnlGDUxdriOpYwQj
+	 vIR5YWEaBwEa+9TnkcMfvImyNNO1S5XE91jB3WyhAZmGIzs2kIQ+2YTPGdbGdg/EkJ
+	 mjMlzfsjuPEH5Nt0scCrqob716ABX3gyBKjnh8lIVDAmAKHxOebiZiW2H5Z5Rnn36K
+	 rO0GOXqXouJKkCdT1MrQNN/gqa8rmrLPgLcacFpahFw+6p65+ubu2qI4LRjkd1Nd+i
+	 KeiWfYu5kS3gjeU67TQwA99wAbaVAsD6P9sw7nikEcgXJCnE92HD43dYuOhb5aAw3Z
+	 rlh0Px/ih05oQ==
+Date: Sat, 14 Jun 2025 12:13:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
+ <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
+ <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark
+ Brown <broonie@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v13 04/13] net: pse-pd: Add support for PSE
+ power domains
+Message-ID: <20250614121329.7720ff33@kernel.org>
+In-Reply-To: <20250610-feature_poe_port_prio-v13-4-c5edc16b9ee2@bootlin.com>
+References: <20250610-feature_poe_port_prio-v13-0-c5edc16b9ee2@bootlin.com>
+	<20250610-feature_poe_port_prio-v13-4-c5edc16b9ee2@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND net-next v2] net: sysfs: Implement is_visible for
- phys_(port_id, port_name, switch_id)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174992763074.1151198.12926690918861173112.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Jun 2025 19:00:30 +0000
-References: <20250612142707.4644-1-yajun.deng@linux.dev>
-In-Reply-To: <20250612142707.4644-1-yajun.deng@linux.dev>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 10 Jun 2025 10:11:38 +0200 Kory Maincent wrote:
+> +static void __pse_pw_d_release(struct kref *kref)
+> +{
+> +	struct pse_power_domain *pw_d = container_of(kref,
+> +						     struct pse_power_domain,
+> +						     refcnt);
+> +
+> +	regulator_put(pw_d->supply);
+> +	xa_erase(&pse_pw_d_map, pw_d->id);
+> +}
+> +
+> +/**
+> + * pse_flush_pw_ds - flush all PSE power domains of a PSE
+> + * @pcdev: a pointer to the initialized PSE controller device
+> + */
+> +static void pse_flush_pw_ds(struct pse_controller_dev *pcdev)
+> +{
+> +	struct pse_power_domain *pw_d;
+> +	int i;
+> +
+> +	for (i = 0; i < pcdev->nr_lines; i++) {
+> +		if (!pcdev->pi[i].pw_d)
+> +			continue;
+> +
+> +		pw_d = xa_load(&pse_pw_d_map, pcdev->pi[i].pw_d->id);
+> +		if (!pw_d)
+> +			continue;
+> +
+> +		kref_put_mutex(&pw_d->refcnt, __pse_pw_d_release,
+> +			       &pse_pw_d_mutex);
+> +	}
+> +}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 12 Jun 2025 14:27:07 +0000 you wrote:
-> phys_port_id_show, phys_port_name_show and phys_switch_id_show would
-> return -EOPNOTSUPP if the netdev didn't implement the corresponding
-> method.
-> 
-> There is no point in creating these files if they are unsupported.
-> 
-> Put these attributes in netdev_phys_group and implement the is_visible
-> method. make phys_(port_id, port_name, switch_id) invisible if the netdev
-> dosen't implement the corresponding method.
-> 
-> [...]
-
-Here is the summary with links:
-  - [RESEND,net-next,v2] net: sysfs: Implement is_visible for phys_(port_id, port_name, switch_id)
-    https://git.kernel.org/netdev/net-next/c/0c17270f9b92
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+AFAIU the release function (__pse_pw_d_release) is supposed to release
+the mutex. 
 
