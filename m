@@ -1,148 +1,198 @@
-Return-Path: <netdev+bounces-197755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42264AD9C37
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 12:44:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0224AD9C46
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 12:56:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA013B9E9D
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:44:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0DA0189B1F0
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9706E22F774;
-	Sat, 14 Jun 2025 10:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B8B24BD03;
+	Sat, 14 Jun 2025 10:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fg5k5+m+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsSREzGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016251F30BB
-	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 10:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA21247DF9
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 10:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749897874; cv=none; b=s5DagPTEoIoyhHqj2XCJ5apctzPybFgI8qC1cAuO1ASTgNWQ0NWALAh96Z+5jQ1uk9rJcjZSZHo4zaiHJcp5OwpLhnra7IPOah6myibIPxDrUMWORLgbbd0pVMrdZT98rAh7u3+OrUPtowboGM/sC9ZUCgR8fRFAaVy9D8d0r5U=
+	t=1749898564; cv=none; b=KFs67YGdzpFx0+nMBcdjZibsEOaH23OOw9F/zV4iVng9l7AqzC921SZ7SxRujCfZpYI6PziI55+9Wtwv8PDIWjJdr64b+UOn92TsvuSgoEt/jRFlU9AVWovbgocv9OoaiYP18fwu5TOBcS54lkw13djCv5Mr5XfHmdFBz0U+Raw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749897874; c=relaxed/simple;
-	bh=xeIs7XHD5JO+zs4tJNJpqL3nFDdUzb/RuvGcgio0oHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NZzNyL0yEP8scX7P6gcO1uO5CYmMrVVr6PLACUT3B1z/xaCkpp9fC9v0hJN7VTGeM2ifV5sAqWEr5UU+edzGrrHAzg1EQh+jWOqpmmaB2PTDNenw22YgQBY+G4jYTLzivPHpt9vRPITMZ6c6D9x1Uw9XLTTwXdM8cF19kZ4yAtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fg5k5+m+; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749897873; x=1781433873;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xeIs7XHD5JO+zs4tJNJpqL3nFDdUzb/RuvGcgio0oHw=;
-  b=Fg5k5+m++Ze3dk//cImlkpx0u3iba6vy7YgP4WT2qmpS6ECERm2anoFl
-   nuJXF/gVSqal6QZXUYLQkYJpgFRzxalDJhb8QvwinCeQX4SymdpQTzAz3
-   F2HvLGge3SwFZMhLh/8u1giIEIcDV4sxUdre78sAtKu30lUKJBKbECTU/
-   ER8nxrbbBWORR3pQ9oq99I1bPHGURt8jlJ7wIZgC/uiDI8vl0BtpuVV1z
-   RAlkpQJv1fC3451Isp4lZIni9uRMjmXoA5yD7BtwTOdyfHlbzJz4r23bs
-   A9ByatcTiFgX2GGF7sCJfKCxQcWJeKV0vaDLQZtykjefbFBxVp1pdfPK+
-   w==;
-X-CSE-ConnectionGUID: nnheye0ZRPGGWZ4OUU/ODg==
-X-CSE-MsgGUID: ZmgREhRcS2G2P1RBBOuAFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11463"; a="62755769"
-X-IronPort-AV: E=Sophos;i="6.16,236,1744095600"; 
-   d="scan'208";a="62755769"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2025 03:44:32 -0700
-X-CSE-ConnectionGUID: 5XooLxEFRSCG+h28fYmEGw==
-X-CSE-MsgGUID: DF9SiP9gQeSVatZystItVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,236,1744095600"; 
-   d="scan'208";a="148418494"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 14 Jun 2025 03:44:25 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uQON5-000DSQ-1r;
-	Sat, 14 Jun 2025 10:44:23 +0000
-Date: Sat, 14 Jun 2025 18:43:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, skalluru@marvell.com,
-	manishc@marvell.com, andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
-	somnath.kotur@broadcom.com, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, tariqt@nvidia.com, saeedm@nvidia.com,
-	louis.peens@corigine.com, shshaikh@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com, ecree.xilinx@gmail.com,
-	horms@kernel.org, dsahern@kernel.org, shuah@kernel.org,
-	tglx@linutronix.de, mingo@kernel.org, ruanjinjie@huawei.com,
-	idosch@nvidia.com, razor@blackwall.org, petrm@nvidia.com
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 2/6] vxlan: drop sock_lock
-Message-ID: <202506141822.kFKjPah5-lkp@intel.com>
-References: <20250613203325.1127217-3-stfomichev@gmail.com>
+	s=arc-20240116; t=1749898564; c=relaxed/simple;
+	bh=v9JAZMbAlGj+PI2KBTAH+4c6GQ22Vu0QZw0EvB4pGcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KqdofU6YJCoohE26BnFPs0bZo0TLzg74sPcPWcZEyYF7CSA9SNzv0+B7evrMJA+RynwjNCA1kFKqk/kvJhsz0IB7ihttMhsI5cZ6TNwC41XwJztPq1pkhQBdUCWt7dUgG3K9kXtO0ul6RlQNCoSQjCdRcYrwNOWa8kJKEbmQxPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fsSREzGo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749898561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q3cUmQ0MyZkdcrlxR7yc+f3znrveTY8lEdfw/tNRmdE=;
+	b=fsSREzGoYyCdfS9Rb/nHczoBb/GxJCE7TWPKxoqXc13uLdiLtcaKiuEW2qU9yfZAeLd/6U
+	Uba6GbFwB/qmT+rNS9lcnqbPCGH83v6JuV2Aqhy1Y1VdOP8IhfLCRB1QiaoQeTtsAmSsQG
+	+rXB4SOeDLfBz02Wt2H7v/OTI1549v8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-ypRNLI9eP0mJlHcLtYRiCA-1; Sat,
+ 14 Jun 2025 06:55:57 -0400
+X-MC-Unique: ypRNLI9eP0mJlHcLtYRiCA-1
+X-Mimecast-MFC-AGG-ID: ypRNLI9eP0mJlHcLtYRiCA_1749898555
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 21A86195608B;
+	Sat, 14 Jun 2025 10:55:54 +0000 (UTC)
+Received: from [10.45.224.53] (unknown [10.45.224.53])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 247F81956094;
+	Sat, 14 Jun 2025 10:55:45 +0000 (UTC)
+Message-ID: <a129e92b-6f01-4345-979f-e57e1829e506@redhat.com>
+Date: Sat, 14 Jun 2025 12:55:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613203325.1127217-3-stfomichev@gmail.com>
-
-Hi Stanislav,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/geneve-rely-on-rtnl-lock-in-geneve_offload_rx_ports/20250614-043457
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250613203325.1127217-3-stfomichev%40gmail.com
-patch subject: [Intel-wired-lan] [PATCH net-next v4 2/6] vxlan: drop sock_lock
-config: m68k-atari_defconfig (https://download.01.org/0day-ci/archive/20250614/202506141822.kFKjPah5-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250614/202506141822.kFKjPah5-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506141822.kFKjPah5-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/vxlan/vxlan_core.c: In function '__vxlan_sock_release_prep':
->> drivers/net/vxlan/vxlan_core.c:1488:27: warning: variable 'vn' set but not used [-Wunused-but-set-variable]
-    1488 |         struct vxlan_net *vn;
-         |                           ^~
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 06/14] dpll: zl3073x: Fetch invariants during
+ probe
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson <shannon.nelson@amd.com>,
+ Dave Jiang <dave.jiang@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250612200145.774195-1-ivecera@redhat.com>
+ <20250612200145.774195-7-ivecera@redhat.com>
+ <c3400787-7279-4a50-a61a-92a100b3b4b9@linux.dev>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <c3400787-7279-4a50-a61a-92a100b3b4b9@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
 
-vim +/vn +1488 drivers/net/vxlan/vxlan_core.c
 
-d342894c5d2f8c drivers/net/vxlan.c            stephen hemminger    2012-10-01  1485  
-544a773a01828e drivers/net/vxlan.c            Hannes Frederic Sowa 2016-04-09  1486  static bool __vxlan_sock_release_prep(struct vxlan_sock *vs)
-7c47cedf43a8b3 drivers/net/vxlan.c            Stephen Hemminger    2013-06-17  1487  {
-b1be00a6c39fda drivers/net/vxlan.c            Jiri Benc            2015-09-24 @1488  	struct vxlan_net *vn;
-012a5729ff933e drivers/net/vxlan.c            Pravin B Shelar      2013-08-19  1489  
-dc248376cdc061 drivers/net/vxlan/vxlan_core.c Stanislav Fomichev   2025-06-13  1490  	ASSERT_RTNL();
-dc248376cdc061 drivers/net/vxlan/vxlan_core.c Stanislav Fomichev   2025-06-13  1491  
-b1be00a6c39fda drivers/net/vxlan.c            Jiri Benc            2015-09-24  1492  	if (!vs)
-544a773a01828e drivers/net/vxlan.c            Hannes Frederic Sowa 2016-04-09  1493  		return false;
-66af846fe54b78 drivers/net/vxlan.c            Reshetova, Elena     2017-07-04  1494  	if (!refcount_dec_and_test(&vs->refcnt))
-544a773a01828e drivers/net/vxlan.c            Hannes Frederic Sowa 2016-04-09  1495  		return false;
-d342894c5d2f8c drivers/net/vxlan.c            stephen hemminger    2012-10-01  1496  
-b1be00a6c39fda drivers/net/vxlan.c            Jiri Benc            2015-09-24  1497  	vn = net_generic(sock_net(vs->sock->sk), vxlan_net_id);
-7c47cedf43a8b3 drivers/net/vxlan.c            Stephen Hemminger    2013-06-17  1498  	hlist_del_rcu(&vs->hlist);
-e7b3db5e60e8f4 drivers/net/vxlan.c            Alexander Duyck      2016-06-16  1499  	udp_tunnel_notify_del_rx_port(vs->sock,
-b9adcd69bd7b41 drivers/net/vxlan.c            Alexander Duyck      2016-06-16  1500  				      (vs->flags & VXLAN_F_GPE) ?
-b9adcd69bd7b41 drivers/net/vxlan.c            Alexander Duyck      2016-06-16  1501  				      UDP_TUNNEL_TYPE_VXLAN_GPE :
-e7b3db5e60e8f4 drivers/net/vxlan.c            Alexander Duyck      2016-06-16  1502  				      UDP_TUNNEL_TYPE_VXLAN);
-1c51a9159ddefa drivers/net/vxlan.c            Stephen Hemminger    2013-06-17  1503  
-544a773a01828e drivers/net/vxlan.c            Hannes Frederic Sowa 2016-04-09  1504  	return true;
-d342894c5d2f8c drivers/net/vxlan.c            stephen hemminger    2012-10-01  1505  }
-d342894c5d2f8c drivers/net/vxlan.c            stephen hemminger    2012-10-01  1506  
+On 13. 06. 25 9:13 odp., Vadim Fedorenko wrote:
+>> +    synth->enabled = FIELD_GET(ZL_SYNTH_CTRL_EN, synth_ctrl);
+>> +    synth->dpll = FIELD_GET(ZL_SYNTH_CTRL_DPLL_SEL, synth_ctrl);
+>> +
+>> +    dev_dbg(zldev->dev, "SYNTH%u is %s and driven by DPLL%u\n", index,
+>> +        synth->enabled ? "enabled" : "disabled", synth->dpll);
+>> +
+>> +    guard(mutex)(&zldev->multiop_lock);
+> 
+> Not a strong suggestion, but it would be good to follow netdev style
+> (same for some previous functions):
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Hi Vadim,
+
+I'm using guard() on places (functions) where it is necessary to hold
+the lock from that place to the end of the function. Due to this
+scoped_guard() does not give any advantage. Using classic mutex_lock()
+and mutex_unlock() would only increases the risks of locking-related
+bugs. Also manual locking enforces to use mutex_unlock() or goto in
+all error paths after taking lock.
+
+> https://docs.kernel.org/process/maintainer-netdev.html#using-device- 
+> managed-and-cleanup-h-constructs
+> 
+> "Use of guard() is discouraged within any function longer than 20 lines,
+> scoped_guard() is considered more readable. Using normal lock/unlock is 
+> still (weakly) preferred."
+> 
+>> +
+>> +    /* Read synth configuration */
+>> +    rc = zl3073x_mb_op(zldev, ZL_REG_SYNTH_MB_SEM, ZL_SYNTH_MB_SEM_RD,
+>> +               ZL_REG_SYNTH_MB_MASK, BIT(index));
+>> +    if (rc)
+>> +        return rc;
+>> +
+>> +    /* The output frequency is determined by the following formula:
+>> +     * base * multiplier * numerator / denominator
+>> +     *
+>> +     * Read registers with these values
+>> +     */
+>> +    rc = zl3073x_read_u16(zldev, ZL_REG_SYNTH_FREQ_BASE, &base);
+>> +    if (rc)
+>> +        return rc;
+>> +
+>> +    rc = zl3073x_read_u32(zldev, ZL_REG_SYNTH_FREQ_MULT, &mult);
+>> +    if (rc)
+>> +        return rc;
+>> +
+>> +    rc = zl3073x_read_u16(zldev, ZL_REG_SYNTH_FREQ_M, &m);
+>> +    if (rc)
+>> +        return rc;
+>> +
+>> +    rc = zl3073x_read_u16(zldev, ZL_REG_SYNTH_FREQ_N, &n);
+>> +    if (rc)
+>> +        return rc;
+>> +
+
+---> You have to keep the lock to here.
+
+>> +    /* Check denominator for zero to avoid div by 0 */
+>> +    if (!n) {
+>> +        dev_err(zldev->dev,
+>> +            "Zero divisor for SYNTH%u retrieved from device\n",
+>> +            index);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    /* Compute and store synth frequency */
+>> +    zldev->synth[index].freq = div_u64(mul_u32_u32(base * m, mult), n);
+>> +
+>> +    dev_dbg(zldev->dev, "SYNTH%u frequency: %u Hz\n", index,
+>> +        zldev->synth[index].freq);
+>> +
+>> +    return rc;
+>> +} 
+
+This kind of function (above) is mailbox-read:
+1. Take lock
+2. Ask firmware to fill mailbox latch registers
+3. Read latch1
+4. ...
+5. Unlock
+
+But in later commits there are mailbox-write functions that:
+1. Take lock
+2. Ask firmware to fill mailbox latch registers
+3. Write or read-update-write latch registers
+4. ...
+5. Ask firmware to update HW from the latch registers (commit)
+6. Unlock
+
+Step 5 here is usually represented by:
+
+return zl3073x_mb_op(zldev, ZL_REG_*_MB_SEM, ZL_*_MB_SEM_RD,
+                      ZL_REG_*_MB_MASK, BIT(index));
+
+and here is an advantage of guard() that unlocks the mutex automatically
+after zl3073x_mb_op() and prior returning its return value.
+
+Thanks,
+Ivan
+
 
