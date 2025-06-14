@@ -1,173 +1,108 @@
-Return-Path: <netdev+bounces-197703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24FE4AD999D
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 04:19:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFDB4AD99A6
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 04:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBBC71782F5
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 02:19:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2E69189D5B0
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 02:28:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C91D7082D;
-	Sat, 14 Jun 2025 02:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075877DA6A;
+	Sat, 14 Jun 2025 02:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xo7VZeOu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vif7yLdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA195200A3
-	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 02:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA43BA42;
+	Sat, 14 Jun 2025 02:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749867563; cv=none; b=gaq/O8mGxaGcKUTlcUxlG2uVyFLe6u8jIWmgqBpB8uXinK6LO+V6Y1oHeItnLMv2BTyVh/QssQgWqoyO5LPnawSQM/xS2J+mLTFovW5s3ETnj+0aQDcT/L213jfGxPgziCUZyn6gYWylhQDy4OyY3QGGHQVs8LLsvEcKhR0Usrg=
+	t=1749868060; cv=none; b=Mn3XNmyphX43Ubtpcf65WVXv/0gQcIibxVKn7ClScqKVdpu1sMt2o0po+KyhDX++8+ZN4JCtjx7BtDY4befvfAjCY5sNw5F51SE09IjLKa8JaDxnPpL3OJLwAn3cjwcFwJ4VZgdL2xudUL51ATes8AhK5hWQoZziY+/trxe2pvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749867563; c=relaxed/simple;
-	bh=AJuRSop8QkkGDZ8RIYWjeGO7mDVPmBvjRxvlq1diPXk=;
+	s=arc-20240116; t=1749868060; c=relaxed/simple;
+	bh=6MPxcrzvl/j0c311UlB0dF6QX2mG0TJI28/AbWapSRE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IQMt4qzLryGUd7i9AstJJ/rHeNTzRL2O6/LqNVNAFjIwPHgbNeAqlowu0hylsZLIhL9QR59kt0UGV2IRmMVzprvy12OHcmIDTuYz1h+pFSaZsQujLWudtXbw/05kBtpXj8UgoRZImhY3Vhe61Sxe+EP4kJjV85jYjYBsAvvjBiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xo7VZeOu; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235e389599fso89245ad.0
-        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 19:19:21 -0700 (PDT)
+	 To:Cc:Content-Type; b=XZU7Y5rO7Kr9vyJuvZv38hUbX2hFdz1mqMwMcjzaCMC0YkVJxU2skSLlzMfRDfeo08rff6UFkAsc9C7DU+FN1xqIfdnrq16TIAfOOdE7hpUmgiEGUwBMjm4qlOwok610n5C/J7rrx5gh3KJhRiZ0CquCQKouOMv45QerbjcwDB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vif7yLdZ; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ad89333d603so531494366b.2;
+        Fri, 13 Jun 2025 19:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749867561; x=1750472361; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749868056; x=1750472856; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gn7hQ4tKQxqRQgt1sWefNjIs0nazm1nLsrkpL0FkOCs=;
-        b=xo7VZeOudDM4r+wd5+/fzdH81NYY+LWRalknQIWQvKTM/W341oJaoA/bbu6P6K4053
-         Q4V/4RpKLufIV03VXq4YzjwetNrswpvBFfOmqRTe2n/mlx6gfb/B9p9fUNe1CyOR5O49
-         nesQD97Lqz8rhPiCNX+XV2jvIIX/QBLXSNyYkZ31GOTQInKtxEI1KBRor02j6FTw1lmz
-         BvPBdREaNo/ZR6mPr96/cAv8yCl3t7ZJkK/VbIerCDtjZ0ogPS8mZWnFsxZxahi1e7zp
-         Ir/3NV+BK9rfbPXR5UE8rrEYKtQ5Op5Qi8CeQlUKoPRJZR5Ffalufbzrh/Q7SS+x7b+f
-         73OQ==
+        bh=6MPxcrzvl/j0c311UlB0dF6QX2mG0TJI28/AbWapSRE=;
+        b=Vif7yLdZsXnpbjgsosJOC8F84+o5jsRkGgyZJrr4bMc9IqEHMaz3zt4zMQDwX+gxSA
+         UznaJqh9ggXE2r9X4CAjBmHMhup9+m2+iI95CACjNSsOCTYvM4kFW7LBvTL4t/pfR1Rv
+         +gvP0t3XI57Tk/UDU+U13NAzXrfJrZzviuYC3EMppxMpylIkB1Q2evFweUofFLjMZ5wR
+         0GmyQgZB5fDMZM9nF+M1pbnnfZnc+hcOt4afjmYxGHqLO5OX/Ajy+hgSwOsq3Cg6eEnn
+         fD7JzkH10cKDHKpDKFp2Mq/goxr2bG7wlMqbR7tkusldcjH72NjwgjTDihlL8dGWuA7X
+         9Ygw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749867561; x=1750472361;
+        d=1e100.net; s=20230601; t=1749868056; x=1750472856;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gn7hQ4tKQxqRQgt1sWefNjIs0nazm1nLsrkpL0FkOCs=;
-        b=HZpGJlYLL0lQETlNs0rwN/tUyan1Hp9E+Ant+4qp1erGwKBeeBwXOuwQDnpMPI4Gb5
-         qlPl2bMpjHa0gLVLQwPCm5/tBh+CGIuBU1SLJonRo3LJTagorlhY1PEf0LsH8P+CvLOW
-         zHi2LN6nlCxZOFGQbvTZ41VJsex2+XFt8+763eAnG3G/+2oNaJEjWIcL5QLy+FXdQFVC
-         GDIQ2wU0T2ayD7pnVBTWPmdGYSVxB1Bvf2/XJiw2oWVnDiQe/Rij9IWoVv5nMZRUVCaW
-         wdiODXqpUpCCOZrV32hIUz+g4Rh6sxLUnicli3u6oOLrH+PeO9Xv+hfLL/g2sIDbi9Yp
-         Cnrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWzFdCng6BGv6XeBYDFIEYk5MaPN+clH1VGCdcTEFyDNbIecA07QkYIdiS3wStCgGbJaxkk/EE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMDJ4dVdrmkAG/JGDov3AzrPeYJ1SyEW/8jn0ztXCxyqm5l0V9
-	LTEyyd5z/HZeAOBfmGePh2ajI6jvCCU/C/w8oiHYCEh2ABhuUCrIssyfcPRAX8y8WuntmIInifA
-	2Jx8gEHBMHrvVu/l7ZCYFZrCcMCm7rWzmZe/IPwSu
-X-Gm-Gg: ASbGncu+lndVem3T7teobdCRRUSckMFzRxxByYe72vlwdQqxY1gpWUT7RJWMHYelVyH
-	4jcIE2CLcTWYWZ6xbwPJnchL/C8oO1haL+JHWJpH+Ad3aPUfvFkxMS1ePJyblnF33hg9HN62+Ki
-	51552WC/h3ejNDv9RrTUT7u5OlItVyYNW/oiqph84N9cmK
-X-Google-Smtp-Source: AGHT+IGYdXYi+poo/RbTJj3aTyp+thNZAzJ5yQqSIcmi+S8nbDQIjlrXV7TRD/xqSf9eS1uYlnMXOLt+1LwilFumYxA=
-X-Received: by 2002:a17:902:ef08:b0:215:65f3:27ef with SMTP id
- d9443c01a7336-2366c5a25dfmr1048025ad.12.1749867560457; Fri, 13 Jun 2025
- 19:19:20 -0700 (PDT)
+        bh=6MPxcrzvl/j0c311UlB0dF6QX2mG0TJI28/AbWapSRE=;
+        b=O0YWxP08rIIdVxt/V3IojzQTgnmb2K0uls+n65P/Iwyzxx+HO/jmk44K0suxWdGL9t
+         hXLfOYoxUgTBY4ohNpAXxwNs2amxl/aK+FAMZFCxTac9/nGJcvk8QyY0TWKuaj/6T9aR
+         h0e/SJWREa9FUxNBChCd0hBywCf0ynWazFEAUK6WGViBHQfvdT8KIY5ccv/R9T5HVQmu
+         +M9qgdc2f9ZmSczmKaTZXfMKALgtoTWELeMRyqhGV+6YVdDWj6oZ7+Ix0BqcEoClO7LB
+         w8Mtsy5qiybKyKmuXa7NnbcAhRU7opbJ4Qfq/bcpBBkjzbKfGDHSNzB9kM8kHNCtupIQ
+         3ldQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkMZ+10xejADmpWSwI1578Fg3vWNELEnlpR7GjR841qHwoTHeEP3ZgM6+5lY4Z+OJOMR72hq3tvYUw4Kg=@vger.kernel.org, AJvYcCXTO3GE/vz4fwHlT1HRzQo7WGROfOyDQlP43w45PCv0l4KR6OobiACwp7ryJhHIA31eiPmOAwLa@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKgDczgHFDxRK+oW16zOAf0p8gkH7QlZ21lZRioLdML6aO7LLc
+	72tXaMiCUem9/zqPK3SDoByem0QnxkEIElMI3pHDq9SFMd3F84O/fw+RCc70CXIwmuCpTBgOlH9
+	FUsiBdZKL5AMkQa3YkTs2yhG6qaD3NL0=
+X-Gm-Gg: ASbGncu2JCN2pbIex7oVdDta0whiTr5gTCs+3fviaomkVbCSNSk6A6Yc2LcyOMSYpkQ
+	NVJnXN4tEtcmd6rwmBZF7HCwM5ENBxwH490ZcQspfpV2VfZ3SeW82eteHSg2PxPzalMMT7WB8Ay
+	e1v37j5nToAYah6mKXgnjxVSxJFlViVnfqnzMu6WrzihU3
+X-Google-Smtp-Source: AGHT+IHSDZgUvD0qwZNlq4ENrrlQE2VqR4K9CtjsGABFFoir+MEGYeLA5t/HLsmifXnXBAbqLV5m/cTF91+KCmvaLiI=
+X-Received: by 2002:a17:906:7956:b0:ad8:9428:6a35 with SMTP id
+ a640c23a62f3a-adfad367d90mr116753966b.7.1749868056224; Fri, 13 Jun 2025
+ 19:27:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609043225.77229-1-byungchul@sk.com> <20250609043225.77229-2-byungchul@sk.com>
- <20250609123255.18f14000@kernel.org> <20250610013001.GA65598@system.software.com>
- <20250611185542.118230c1@kernel.org> <20250613011305.GA18998@system.software.com>
-In-Reply-To: <20250613011305.GA18998@system.software.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 13 Jun 2025 19:19:07 -0700
-X-Gm-Features: AX0GCFuFHl8rGE_NSTG6eYqMKv1bvWBwteyyrelqyPJ0hyn_uDtWnwn8gbn2YYg
-Message-ID: <CAHS8izMsKaP66A1peCHEMxaqf0SV-O6uRQ9Q6MDNpnMbJ+XLUA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/9] netmem: introduce struct netmem_desc
- mirroring struct page
-To: Byungchul Park <byungchul@sk.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, willy@infradead.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com, 
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
-	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
-	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+References: <20250613102014.3070898-1-liyuesong@vivo.com>
+In-Reply-To: <20250613102014.3070898-1-liyuesong@vivo.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 14 Jun 2025 11:27:24 +0900
+X-Gm-Features: AX0GCFtO7HPk3CZD3Wtlzh_X41p29PyqpaFeYaRdgJ7FwzPXJATvNm7kwiBt7gE
+Message-ID: <CAMArcTUJBWKftYQsVwqHQRR-cS87hMcMOOU3u2_83oa9TjzEaw@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] net: amt: convert to use secs_to_jiffies
+To: Yuesong Li <liyuesong@vivo.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	opensource.kernel@vivo.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 12, 2025 at 6:13=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
-rote:
->
-> On Wed, Jun 11, 2025 at 06:55:42PM -0700, Jakub Kicinski wrote:
-> > On Tue, 10 Jun 2025 10:30:01 +0900 Byungchul Park wrote:
-> > > > What's the intended relation between the types?
-> > >
-> > > One thing I'm trying to achieve is to remove pp fields from struct pa=
-ge,
-> > > and make network code use struct netmem_desc { pp fields; } instead o=
-f
-> > > sturc page for that purpose.
-> > >
-> > > The reason why I union'ed it with the existing pp fields in struct
-> > > net_iov *temporarily* for now is, to fade out the existing pp fields
-> > > from struct net_iov so as to make the final form like:
-> >
-> > I see, I may have mixed up the complaints there. I thought the effort
-> > was also about removing the need for the ref count. And Rx is
-> > relatively light on use of ref counting.
-> >
-> > > > netmem_ref exists to clearly indicate that memory may not be readab=
-le.
-> > > > Majority of memory we expect to allocate from page pool must be
-> > > > kernel-readable. What's the plan for reading the "single pointer"
-> > > > memory within the kernel?
-> > > >
-> > > > I think you're approaching this problem from the easiest and least
-> > >
-> > > No, I've never looked for the easiest way.  My bad if there are a bet=
-ter
-> > > way to achieve it.  What would you recommend?
-> >
-> > Sorry, I don't mean that the approach you took is the easiest way out.
-> > I meant that between Rx and Tx handling Rx is the easier part because
-> > we already have the suitable abstraction. It's true that we use more
-> > fields in page struct on Rx, but I thought Tx is also more urgent
-> > as there are open reports for networking taking references on slab
-> > pages.
-> >
-> > In any case, please make sure you maintain clear separation between
-> > readable and unreadable memory in the code you produce.
->
-> Do you mean the current patches do not?  If yes, please point out one
-> as example, which would be helpful to extract action items.
+On Fri, Jun 13, 2025 at 7:20=E2=80=AFPM Yuesong Li <liyuesong@vivo.com> wro=
+te:
 >
 
-I think one thing we could do to improve separation between readable
-(pages/netmem_desc) and unreadable (net_iov) is to remove the struct
-netmem_desc field inside the net_iov, and instead just duplicate the
-pp/pp_ref_count/etc fields. The current code gives off the impression
-that net_iov may be a container of netmem_desc which is not really
-accurate.
+Hi Yuesong,
+Thanks a lot for your work!
 
-But I don't think that's a major blocker. I think maybe the real issue
-is that there are no reviews from any mm maintainers? So I'm not 100%
-sure this is in line with their memdesc plans. I think probably
-patches 2->8 are generic netmem-ifications that are good to merge
-anyway, but I would say patch 1 and 9 need a reviewed by from someone
-on the mm side. Just my 2 cents.
+> Since secs_to_jiffies()(commit:b35108a51cf7) has been introduced, we can
+> use it to avoid scaling the time to msec.
+>
+> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
 
-Btw, this series has been marked as changes requested on patchwork, so
-it is in need of a respin one way or another:
+Reviewed-by: Taehee Yoo <ap420073@gmail.com>
 
-https://patchwork.kernel.org/project/netdevbpf/list/?series=3D&submitter=3D=
-byungchul&state=3D*&q=3D&archive=3D&delegate=3D
-
-https://docs.kernel.org/process/maintainer-netdev.html#patch-status
-
---=20
 Thanks,
-Mina
+Taehee Yoo
 
