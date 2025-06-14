@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-197739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE529AD9B7D
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:56:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7B4AD9B75
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 10:56:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00E75189BD68
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:56:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA433189BCE2
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 08:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E65298998;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB92298248;
 	Sat, 14 Jun 2025 08:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="umeedEFn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FSKpp81l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FFA1F4631;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634181E5B9E;
 	Sat, 14 Jun 2025 08:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749891378; cv=none; b=WVeYR4bC/zNy5Qpmk9TiEr9udnp4hitpDphpdmeRlK1kSCw5Naeqbi7tl8mgusM1pIJ90l6HLH7hDB9/rEC25+Di6Y4ozYlKTlRyvdBf8aVEzBT38NHiMTjiwdcU9SCt4SrfNlrvMcAz6eF2SM0E7mVYBUagmJWBC3PAwBMDZws=
+	t=1749891378; cv=none; b=JLL2CP3XoqUUij2d3mzi/hLKugkmbGK85weoIaBX/qG7jeMYRL7In17NH69LT2dIK8R+EhbaERDj+jnJE2AnRFL/0t+aETxx7xyTKvlou3LZPE3mEiMcm/2/O/WftZhEBNn5gnBmkHvDlSeBis9OOXNJgJbPhJ0WXxuR89GX+5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749891378; c=relaxed/simple;
-	bh=8JLj251EiGtS/E11n5n+267zLGC8qyxQhPvEcm7GqEQ=;
+	bh=5GdVV6A8bXN64ovkNLx7Xdx5aR1iPXnV/yeu24lgmqI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jrv7LaPSrfSZmzcv5iZnus+OaTChVkbDxFVNhNOpwIinEkm9J/wNJaLfZPnUmqWgEgNbyyeWCQaJODFOb1fMvjfDA+WLP38zQ0407jkVr3MhoFeJDKmVnGIkoECBLoZG48jL5/2n5+A6yy2VK0vFREbInC05i2kCFDOz3JXnRug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=umeedEFn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8901C4CEF2;
+	 MIME-Version; b=CtTRnhzzx+kZS9ULlsCZCrf3NnxcHgvV1SGcImUXwg1L5fxaTGY54yPPRchoRNIxBoMFH9lDQcdSWYnjSrlWjDdvkek9aloH8OKBQaLDFTBdZx2NMxooElB1+l740w9RfA9ZlPKKr7Aus1RPLB0m7wWsnLqqlQ7XIgJI81ROxdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FSKpp81l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBFBC4CEED;
 	Sat, 14 Jun 2025 08:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749891378;
-	bh=8JLj251EiGtS/E11n5n+267zLGC8qyxQhPvEcm7GqEQ=;
+	s=k20201202; t=1749891377;
+	bh=5GdVV6A8bXN64ovkNLx7Xdx5aR1iPXnV/yeu24lgmqI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=umeedEFnlci600SipXlsi0H6C/9NbbdgnZQ+uUcYKUUcOwhDRHylvby3pkc6uxuUj
-	 gUpz0wA7vicDAg7GMtCsGBJ9LGa/T5Z/a5Q8Lo6DynAT53+IFEMv3lulVXJSBYByTo
-	 0hq4Wcco5yoa1OMPIoCEKVxl7MdAJsIjoUWG1CWKASL2t35GzKCVb5RB+RKcghXsv1
-	 EssBfDGOQij865I4tnSb4ZQqBMwRsCeQk+lsqM/JMKZDGToJ5zcXmrOLzk6LHTIkyr
-	 nPfaL+VU/L0+rZBf16bfLYnPo/fZWecRgnxxUI63PFYplWOUpxlUCFP8mz5rf65eSq
-	 KxFkI3aO5YlKA==
+	b=FSKpp81lQ0MUsTOKq4LT3MWqv+ebKW7/olXbn6+7/BhJwyga0wPYoUQv9GDecCoWC
+	 bR4tFN043An72M8yE8pqrHkgyRcaK2lC92xapRoRNoFJlMHpXdcJSnBPkMTbaGMH62
+	 cM9kHuJTp2RilU5XMZxgXgDYJyUrYhN3NLDuPsfGHOTNN8XCb5R3ZwsWTv+v10DmsF
+	 v5WHZQaZGvR5Wxcol4g1SmDhRzo7yNA/ZjnPkVacbURdMVJP6WOyYGoWqqAGY62BUc
+	 uspLo1bhL8x+s3QixbXcnrC+l2vC5KOk9vj1178/JYcXUPH0OMuCh7lle4K1HfdM6c
+	 MJuHzjjIYiHpA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uQMgR-000000064ah-3uBS;
+	id 1uQMgR-000000064al-49Nk;
 	Sat, 14 Jun 2025 10:56:15 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
@@ -70,9 +70,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v4 01/14] tools: ynl_gen_rst.py: create a top-level reference
-Date: Sat, 14 Jun 2025 10:55:55 +0200
-Message-ID: <ed66166bec8051df75465f9821671b21011fbda4.1749891128.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v4 02/14] docs: netlink: netlink-raw.rst: use :ref: instead of :doc:
+Date: Sat, 14 Jun 2025 10:55:56 +0200
+Message-ID: <4d46b08e43e37403afc09412692cb5eb295019b6.1749891128.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749891128.git.mchehab+huawei@kernel.org>
 References: <cover.1749891128.git.mchehab+huawei@kernel.org>
@@ -85,41 +85,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-Currently, rt documents are referred with:
-
-Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`rt-link<../../networking/netlink_spec/rt-link>`
-Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-
-that's hard to maintain, and may break if we change the way
-rst files are generated from yaml. Better to use instead a
-reference for the netlink family.
-
-So, add a netlink-<foo> reference to all generated docs.
+Having :doc: references with relative paths doesn't always work,
+as it may have troubles when O= is used. So, replace them by
+Sphinx cross-reference tag that are now created by ynl_gen_rst.py.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_rst.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ Documentation/userspace-api/netlink/netlink-raw.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
-index 0cb6348e28d3..7bfb8ceeeefc 100755
---- a/tools/net/ynl/pyynl/ynl_gen_rst.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
-@@ -314,10 +314,11 @@ def parse_yaml(obj: Dict[str, Any]) -> str:
+diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
+index 31fc91020eb3..aae296c170c5 100644
+--- a/Documentation/userspace-api/netlink/netlink-raw.rst
++++ b/Documentation/userspace-api/netlink/netlink-raw.rst
+@@ -62,8 +62,8 @@ Sub-messages
+ ------------
  
-     # Main header
+ Several raw netlink families such as
+-:doc:`rt-link<../../networking/netlink_spec/rt-link>` and
+-:doc:`tc<../../networking/netlink_spec/tc>` use attribute nesting as an
++:ref:`rt-link<netlink-rt-link>` and
++:ref:`tc<netlink-tc>` use attribute nesting as an
+ abstraction to carry module specific information.
  
--    lines.append(rst_header())
--
-     family = obj['name']
+ Conceptually it looks as follows::
+@@ -162,7 +162,7 @@ then this is an error.
+ Nested struct definitions
+ -------------------------
  
-+    lines.append(rst_header())
-+    lines.append(rst_label("netlink-" + family))
-+
-     title = f"Family ``{family}`` netlink specification"
-     lines.append(rst_title(title))
-     lines.append(rst_paragraph(".. contents:: :depth: 3\n"))
+-Many raw netlink families such as :doc:`tc<../../networking/netlink_spec/tc>`
++Many raw netlink families such as :ref:`tc<netlink-tc>`
+ make use of nested struct definitions. The ``netlink-raw`` schema makes it
+ possible to embed a struct within a struct definition using the ``struct``
+ property. For example, the following struct definition embeds the
 -- 
 2.49.0
 
