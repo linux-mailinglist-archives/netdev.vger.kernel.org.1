@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-197690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9242CAD9959
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 03:09:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C41E2AD995D
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 03:16:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A66531895128
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:09:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C9F317C909
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 01:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F980C13B;
-	Sat, 14 Jun 2025 01:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5436079D0;
+	Sat, 14 Jun 2025 01:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bz/vwUnT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXpdVQOg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55788836;
-	Sat, 14 Jun 2025 01:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FD72E11AE;
+	Sat, 14 Jun 2025 01:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749863357; cv=none; b=Q3nh6LI7e2Lsyf7xgL78ETx0/t9IavXrHIBCYEOVRUKFx95jCD9PaKGpEO9BGji06jtTWs7n28gSO0fAzQFDpzCQ8B1JMptb1RTI1+nuNKagOYrnROiZ9dVbzs6Ka4Sd5OwwWvAN86G1sdv/Lz8NoQWmk/l/gUt7hArhQwGyWrs=
+	t=1749863786; cv=none; b=s5yLUKGWI0LfCaj4aLzhxj/kuJQ+KRZdBmrTifD3V/Kl8hLWfBYVHAHHqbcVO1kW2c70YSWnpocpZrQAVnX4lb9ntqj7MwoTGUsEkP+iXyS29omh4yuFuLuFeSoVWX1aeGt5jhTGHz0+QyaVzYxIzhaoiOCk8KeKaqBb/GMRTM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749863357; c=relaxed/simple;
-	bh=bhtNPk++UTQ57VyxrddQMBBkJ5x/UxyRvLf25/kjd70=;
+	s=arc-20240116; t=1749863786; c=relaxed/simple;
+	bh=AaF8N7xPt/4+gyAd6e71qc7Xjriu4g8VE4OQmpPUhm8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JCyZGW2v8RirFF4qEji1nIcOmRB+NnOAeacftIWH7gHiZCdBtTsNFZ0NzBDSTfB3iHA/RqMQY2pjyi4POc5fqCKEGh0eF+q3gVbn9Hs5VbF17dT64tHy+bElHszazgRKZ8UKzOGCsQCds3Z7N0JhLJzyYpSsYHz7wxhIwh7I9nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bz/vwUnT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89251C4CEE3;
-	Sat, 14 Jun 2025 01:09:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qx/O/bSysFI/Ok+ka2R1tY36f49i6Z/Eqp8tM9faEva83jU/7HoWOZW9lo8ne2yjv1Y+ra2tv6QsE2wfT6GHV6h8p+9QMmLAE6SEU/CStajXN82Tyqr6dk5gDhPp55yIw3YNzfsMezQbcOr0U6u9YtRQkRL3wgFZWGvwxtzfPek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qXpdVQOg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39BCDC4CEE3;
+	Sat, 14 Jun 2025 01:16:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749863355;
-	bh=bhtNPk++UTQ57VyxrddQMBBkJ5x/UxyRvLf25/kjd70=;
+	s=k20201202; t=1749863785;
+	bh=AaF8N7xPt/4+gyAd6e71qc7Xjriu4g8VE4OQmpPUhm8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bz/vwUnTuREj01l1K5Yg4O5PrHNSbSGqSUZ/j2791RYV5RdQqzU7jtKPMqT5T/LsJ
-	 MPYwhXrRvnxink30KLqMS3u6ntB6hn9292WO+o1ftk99LBzHCWUzA/T4+hQ+zg4ZVK
-	 iML4jVb6MtRh+gY4DTsePsy3IkKtNwaxTE321Rm8YvQiPGsXbFMNA1LCKPH/LUdmE0
-	 qnBQhbTouiDveKhMPVknuBk64c/PZjv9XJ06gUNrKhHKjPxLshSrqnRj7j9qKxem1O
-	 tqk8mPG8OuhooASwcPgvpjokVhX+eUxaS6mzMLhGF6iUU1z9qCGOpLeqaReSCv1oki
-	 1fd7zmF96gZow==
-Date: Fri, 13 Jun 2025 18:09:13 -0700
+	b=qXpdVQOgzZBok1z2w5NjwFVivBAn1919p4GFR9bSYe7dbVSqOKc1yFG38alcBdE0D
+	 Vs4LXSahIJHyK0O1NDXXRxyCZovbbN+Yc88OBVVve1lfhO9JvPAW8N3fSCdsMGf6FV
+	 v5xm/B53pm84Gre20WWX/kUlQAoPo3INAI01DH5lPxq3+qyAeXfLsSIAu5aTYoVPV8
+	 H/JeC2HS3+M8nxLN5E1Mw1mM2m7JKviuXyICNaNj6hBLw9eVKk/nZNx7UxCavNPfkr
+	 fiV7FUVB+l2hibEjOvK/Vhxb8aHJlL/LChUu3IQDgY0y1/9Xsg1b4vjexN2J/1FJj7
+	 UDqQaTbBMDgjQ==
+Date: Fri, 13 Jun 2025 18:16:24 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: <namcao@linutronix.de>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
- <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
- <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
- <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros
- <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix packet handling for
- XDP_TX
-Message-ID: <20250613180913.5e164263@kernel.org>
-In-Reply-To: <20250612094523.1615719-1-m-malladi@ti.com>
-References: <20250612094523.1615719-1-m-malladi@ti.com>
+To: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, skhan@linuxfoundation.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linux.dev
+Subject: Re: [PATCH v2 net-next] net: ipconfig: replace strncpy with strscpy
+Message-ID: <20250613181624.5684fc0b@kernel.org>
+In-Reply-To: <20250612114859.2163-1-pranav.tyagi03@gmail.com>
+References: <20250612114859.2163-1-pranav.tyagi03@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,18 +61,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Jun 2025 15:15:23 +0530 Meghana Malladi wrote:
-> While transmitting XDP frames for XDP_TX, page_pool is
-> used to get the DMA buffers (already mapped to the pages)
-> and need to be freed/reycled once the transmission is complete.
-> This need not be explicitly done by the driver as this is handled
-> more gracefully by the xdp driver while returning the xdp frame.
-> __xdp_return() frees the XDP memory based on its memory type,
-> under which page_pool memory is also handled. This change fixes
-> the transmit queue timeout while running XDP_TX.
+On Thu, 12 Jun 2025 17:18:59 +0530 Pranav Tyagi wrote:
+> Replace the deprecated strncpy() with strscpy() as the destination
+> buffer is NUL-terminated and does not require any
+> trailing NUL-padding. Also increase the length to 252
+> as NUL-termination is guaranteed.
 
-Makes sense, but since this is a fix it needs a Fixes tag.
-Please add one and repost.
+Petr is making functional changes to this code:
+https://lore.kernel.org/all/20250610143504.731114-1-petr.zejdl@cern.ch/
+Please repost once his work is merged to avoid unnecessary conflicts
 -- 
-pw-bot: cr
+pw-bot: defer
 
