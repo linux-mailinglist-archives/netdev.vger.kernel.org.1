@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-197798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93EAFAD9E8C
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:37:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035D8AD9E90
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D363AE323
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 17:36:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0744F189661C
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 17:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8D32E338E;
-	Sat, 14 Jun 2025 17:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392082E62A1;
+	Sat, 14 Jun 2025 17:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RupatiqN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CiN9nziZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2411C54AF;
-	Sat, 14 Jun 2025 17:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0F62E6100;
+	Sat, 14 Jun 2025 17:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749922622; cv=none; b=geXOOY7lGYSSpEqVimtgvaQ4XC6vN7HAB+Y5HgNoAD7kPqU9uLKQCR1AoB1vaOYk3vWzDQIbjjt0uEXFxNyuGWuIOU+2uoGtorSLiP0juc869987KQpiBFaPjHIuTbcal1WqhRglugIHmXwYSLXpcmXLzUokMyuxzdXkrhXaz3Q=
+	t=1749923102; cv=none; b=atAvSqzKOLXZ+PbkUW3FbF3u75GdhsqOmP7h4SFY39oCXVOV0FWuQJJ2HNcI65zBXtEBC1MdD2UCkMpZbl1BwmHKETRgwolQXVKUnXigBn6138MKNyfyLrVjwZRPA6FT6mUq1Oj6JmVOUfN2yjtMZa5Kg2ch6ZpSg7c4UTgm6zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749922622; c=relaxed/simple;
-	bh=giWEbQVGPDAUjjSTlftLxeH1yHeLxWW9myogm0Xe15s=;
+	s=arc-20240116; t=1749923102; c=relaxed/simple;
+	bh=ob6J8ah842UQUR2Ib9MQThUSNdQz5fBho16ro9ePGaM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QLx9ISpNZm6B5Q4xGMj/bPsouk9bDZYoGgG2t+/N1vbeyhaXGRo2+Zrtr7XgB6kfbIjESPX56jckuUwb7aoOlY619WFxrsIRayd5qh6Pag4QkFrlpjSG9HKpHEQ2QvLX++n1Nopd+SeML+ALMn/jcCncxgfXtrKCV/L6revuZDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RupatiqN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D0D8C4CEEB;
-	Sat, 14 Jun 2025 17:37:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=i566Ze53hODIlK0QMV/nFxlK2fkwOBT1aNTwTts373PuFMIlfVea0eQc7TQWwCoAD0/jhIdkfbRu1rn4rfyJrWwRzWIpsF+wHoWpJGhhtw5XQ5U/9sR/btVWRb647YE3/MEsYF70DH4cepX6pZ575akQW4L0pChGiLpLLrCR3h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CiN9nziZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36F5C4CEEB;
+	Sat, 14 Jun 2025 17:45:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749922622;
-	bh=giWEbQVGPDAUjjSTlftLxeH1yHeLxWW9myogm0Xe15s=;
+	s=k20201202; t=1749923101;
+	bh=ob6J8ah842UQUR2Ib9MQThUSNdQz5fBho16ro9ePGaM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RupatiqNGmEi2ttyLukWxybZN5O3W1zwp6BtLXJErrSUf/aF+OwYPT+DmBkH2WNGY
-	 Lckjf/Mi90RsO60JeKaj6VH/N25cSKoKwpOSNWNJgrt0ClDjk0o/FppvRnFY8MtaC5
-	 4uFiDGcwKekZ7Izxs7rgw1fRUzMFunNs8olLbSVCDGKyKILtdfgZsbnLTPiMh38ABR
-	 Fl5yy0ssRFatLI7JqqekkHJc49wIy7RkElzhhf6U6Xke90wfuzUvUV/OAVLwZmnSHC
-	 yHyNRiHsDRNXT9AtQLcDmHVGznYmFgI6cQyj0GkblAvE2iSq+Xwq3YYAd1IfHb4nHT
-	 BNmnvdce2DDEA==
-Date: Sat, 14 Jun 2025 10:37:00 -0700
+	b=CiN9nziZccbRfQZKUBjIxIkHkt8dvgrIAe3WbNiWaoIVNBMLUiLIwTp+iuQBDF50q
+	 WP7CoIsyq51p+45w5raZHYDqtoykfNHBiiVyMT727v19vtt3lPD138mTFoOHxxivsX
+	 j7SQHI0bujBAKzmgXyzA3eDH2uneKWBmA0sw1bngR8Z0KWVoWi/DmJDXP0vDeHwOfB
+	 1Nj+z1LmYhjF/s+hwxhyoKGma1BYUJ9yNeE5MHe8j2f5IsfBWv6VHWzpVKBj4IzX71
+	 hY68hJeqpLz14OTHyw2rsTDDBJr9X0ryudWbvtctvteNdnA3U7EphRXyCAPWjpWsJY
+	 PJBUf8ih65VtQ==
+Date: Sat, 14 Jun 2025 10:44:54 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Akira
- Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Ignacio
- Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>,
- Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben
- Wauters <rubenru09@aol.com>, Shuah Khan <skhan@linuxfoundation.org>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
- peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH v4 12/14] MAINTAINERS: add maintainers for
- netlink_yml_parser.py
-Message-ID: <20250614103700.0be60115@kernel.org>
-In-Reply-To: <20250614173235.7374027a@foz.lan>
-References: <cover.1749891128.git.mchehab+huawei@kernel.org>
-	<ba75692b90bf7aa512772ca775fde4c4688d7e03.1749891128.git.mchehab+huawei@kernel.org>
-	<CAD4GDZzA5Dj84vobSdxqXdPjskBjuFm7imFkZoSmgjidbCtSYQ@mail.gmail.com>
-	<20250614173235.7374027a@foz.lan>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org,
+ oe-kbuild-all@lists.linux.dev, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Prathosh Satish
+ <Prathosh.Satish@microchip.com>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson
+ <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>, Jonathan
+ Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Michal Schmidt
+ <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+Subject: Re: [PATCH net-next v9 06/14] dpll: zl3073x: Fetch invariants
+ during probe
+Message-ID: <20250614104454.444672fc@kernel.org>
+In-Reply-To: <00780331-37cb-48ae-bb87-06d21a9ec4d1@redhat.com>
+References: <20250612200145.774195-7-ivecera@redhat.com>
+	<202506140541.KcP4ErN5-lkp@intel.com>
+	<00780331-37cb-48ae-bb87-06d21a9ec4d1@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,23 +72,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 14 Jun 2025 17:32:35 +0200 Mauro Carvalho Chehab wrote:
-> > > @@ -27314,6 +27315,7 @@ M:      Jakub Kicinski <kuba@kernel.org>
-> > >  F:     Documentation/netlink/
-> > >  F:     Documentation/userspace-api/netlink/intro-specs.rst
-> > >  F:     Documentation/userspace-api/netlink/specs.rst
-> > > +F:     scripts/lib/netlink_yml_parser.py
-> > >  F:     tools/net/ynl/  
-> 
-> With regards to the location itself, as I said earlier, it is up to
-> Jon and you to decide.
-> 
-> My preference is to have all Python libraries at the entire Kernel
-> inside scripts/lib (or at some other common location), no matter where
-> the caller Python command or in-kernel Sphinx extensions are located.
+On Sat, 14 Jun 2025 12:39:08 +0200 Ivan Vecera wrote:
+> should I fix this in v10 or in a follow-up in the part 2?
 
-I understand that from the PoV of ease of maintenance of the docs.
-Is it fair to say there is a trade off here between ease of maintenance
-for docs maintainers and encouraging people to integrate with kernel
-docs in novel ways?
+I don't love this but yes, please fix and respin. We auto-discard
+series that get a build bot reply.
 
