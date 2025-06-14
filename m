@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-197827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84DF0AD9F8D
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 21:51:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E944AD9F9A
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 22:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4C503A9472
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 19:51:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80D071893F24
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 20:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B292E62DA;
-	Sat, 14 Jun 2025 19:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBB81F1906;
+	Sat, 14 Jun 2025 20:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIYRgYUK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qm5OZsH8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533C31C4A20;
-	Sat, 14 Jun 2025 19:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7781BD9C1;
+	Sat, 14 Jun 2025 20:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749930711; cv=none; b=TfC+BS45aQtdc4XLYuSEuX0DZXALJI6MAGHGxCJPEqUn47DuOqusxwWOuIev8WzhUwgw31/nRex6XHkc47Xatm9fDmMK2ZiVwlt2IPRSKVqzpDp6TTNWf+M0ckPv/nAq8Sc9hQO+ksezTB3Re0WR3qDy/9TTtO0w4ZoHotxHhOQ=
+	t=1749931437; cv=none; b=RTS1y44Z9h602TuX+Ti5amuacrgHA48F12zayx674QfjJOjM+3zuHnIQo1Dp+u4Upm34/8jN5RQzJD/PN6wafowdwP8eMnbKyYZjmGkgyjJmNNWRGIXB0xpwzfqtHx32elLLm+quBkR/KAvh5UoiunDttVLkcEH/RJu0rpQozrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749930711; c=relaxed/simple;
-	bh=MpxMa/I6gxllKAnbeDXs7r46YEtoqLfQN5rcAbxlQBQ=;
+	s=arc-20240116; t=1749931437; c=relaxed/simple;
+	bh=GY6P7k8VV8sKiyvFkCJ3MKhvnmt5LFjeYWjC+1yHv8g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SXxlPXabPZ8Yf0I/9NH/qx+VVnJftGNr4h3ulnDTd4UnmsGahy0CiLiIzVYp8SZM7C7z2yRF6gHBjjkMRKZZsF0Z41H4Nkplwsfmfbs6snNIVH7gaDGO13Ag6oNUZTFfaY/oJS756vNNT+MMw11oVAEJkriiDQTXUntC94+dEmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIYRgYUK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D3BEC4CEEB;
-	Sat, 14 Jun 2025 19:51:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UWBhy/d9C2y1Oj57/Hrd1aCMb7ARCOOAr1fZTSI9pd/HBNIcDq0ym5yjqCeL0EDHxoB9Yg7U0xku2ahywVLdVskrxsqtMft3frygiW6hFa07MZ+oSYSywN1xxX41oBzhhI0L1rBnDKD5ykCe76hDD1qjxDyNbBnReUv2o9MqgJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qm5OZsH8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 116F9C4CEEB;
+	Sat, 14 Jun 2025 20:03:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749930710;
-	bh=MpxMa/I6gxllKAnbeDXs7r46YEtoqLfQN5rcAbxlQBQ=;
+	s=k20201202; t=1749931436;
+	bh=GY6P7k8VV8sKiyvFkCJ3MKhvnmt5LFjeYWjC+1yHv8g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dIYRgYUKLnGks8Ce8K3QK252RYhr6anc4mPYD2mF+78g7ZQ48wZxHXS5QqXjwr5Ls
-	 Qdex4soQPhvOr8rW/96ska5IgfKOgmLsLCI+5D1eT8WdSN0hx08MrTxCnCnVSB9UZ4
-	 evJduORDbcERl810G3N7ZhVJ9s8D/Bsl8bPVBmZb+NNK2S0I3boTxvgzXag5TQ1x+1
-	 I1MVmXTRd2LQd6w0NhqXQX5GN75VzVnIW3Ye0F9g0Hv8gjqxvf481HzikJpZnNj8Cf
-	 P52ZFf1N3RB0Hy+tYPxpxaBXVnYBNOszG+UobE02d9o0UKDmJV006yC60X4hzwNeDX
-	 qLju9b5amlxHA==
-Date: Sat, 14 Jun 2025 12:51:49 -0700
+	b=qm5OZsH8s0jsEfRN5uVRuCXGjnpau1FUAQmhyucQC+DFTmHQqr8/YF4ptrGjelMDA
+	 /EE2G7srKOlnK+wnbVccHikGz6V5zTlpTfk0pBSDhZuifFL9lVh03K2lmInSPdFK3U
+	 7/CiK9qg3x4CiGF9n0QVkl3HRJWbEJvay7fB+2Qy3qUe8fjGhfEuFi5cu3AUUkE3Dt
+	 urm79lUmDlhMnTqIqcca3iG1v9q7trzzxm8zsaAHjKiRj2z1S5nqyscDQUkQqFlwO0
+	 ohQlYDzfE0td0gHvLO+D/OKGjsqWFU6CGoox5zHbSJOvEYCV34FaEoI/IYKr5URJoF
+	 obqhc8l07Tc6A==
+Date: Sat, 14 Jun 2025 13:03:54 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gustavo Luiz Duarte <gustavold@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/5] netconsole: append msgid to sysdata
-Message-ID: <20250614125149.55a8bc1f@kernel.org>
-In-Reply-To: <20250612-netconsole-msgid-v2-3-d4c1abc84bac@gmail.com>
-References: <20250612-netconsole-msgid-v2-0-d4c1abc84bac@gmail.com>
-	<20250612-netconsole-msgid-v2-3-d4c1abc84bac@gmail.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, shirazsaleem@microsoft.com,
+ leon@kernel.org, shradhagupta@linux.microsoft.com,
+ schakrabarti@linux.microsoft.com, gerhard@engleder-embedded.com,
+ rosenp@gmail.com, sdf@fomichev.me, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/4] Support bandwidth clamping in mana
+ using net shapers
+Message-ID: <20250614130354.0a53214e@kernel.org>
+In-Reply-To: <1749813627-8377-1-git-send-email-ernis@linux.microsoft.com>
+References: <1749813627-8377-1-git-send-email-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,22 +67,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Jun 2025 13:02:16 -0700 Gustavo Luiz Duarte wrote:
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 3bf8777fcd01..baa9862c1bc3 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -155,6 +155,8 @@ struct netconsole_target {
->  	size_t			userdata_length;
->  	/* bit-wise with sysdata_feature bits */
->  	u32			sysdata_fields;
-> +	/* protected by target_list_lock */
-> +	u32			msgcounter;
->  #endif
+On Fri, 13 Jun 2025 04:20:23 -0700 Erni Sri Satya Vennela wrote:
+> This patchset introduces hardware-backed bandwidth rate limiting
+> for MANA NICs via the net_shaper_ops interface, enabling efficient and
+> fine-grained traffic shaping directly on the device.
+> 
+> Previously, MANA lacked a mechanism for user-configurable bandwidth
+> control. With this addition, users can now configure shaping parameters,
+> allowing better traffic management and performance isolation.
+> 
+> The implementation includes the net_shaper_ops callbacks in the MANA
+> driver and supports one shaper per vport. Add shaping support via
+> mana_set_bw_clamp(), allowing the configuration of bandwidth rates
+> in 100 Mbps increments (minimum 100 Mbps). The driver validates input
+> and rejects unsupported values. On failure, it restores the previous
+> configuration which is queried using mana_query_link_cfg() or
+> retains the current state.
+> 
+> To prevent potential deadlocks introduced by net_shaper_ops, switch to
+> _locked variants of NAPI APIs when netdevops_lock is held during
+> VF setup and teardown.
+> 
+> Also, Add support for ethtool get_link_ksettings to report the maximum
+> link speed supported by the SKU in mbps.
+> 
+> These APIs when invoked on hardware that are older or that do
+> not support these APIs, the speed would be reported as UNKNOWN and
+> the net-shaper calls to set speed would fail.
 
-kdoc is complaining that:
+Failed to apply patch:
+Applying: net: mana: Fix potential deadlocks in mana napi ops
+error: patch fragment without header at line 23: @@ -2102,9 +2108,11 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
+error: could not build fake ancestor
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+Patch failed at 0001 net: mana: Fix potential deadlocks in mana napi ops
 
-drivers/net/netconsole.c:167 struct member 'msgcounter' not described in 'netconsole_target'
+please rebase
 -- 
 pw-bot: cr
 
