@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-197766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75127AD9D55
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 16:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B65B9AD9D7D
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 16:22:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F280189A473
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 14:15:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0C1C189BC09
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 14:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C8A70808;
-	Sat, 14 Jun 2025 14:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D052DA741;
+	Sat, 14 Jun 2025 14:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4BdxzNZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHGI1h5a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDBFBA2D;
-	Sat, 14 Jun 2025 14:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B032D9EFD;
+	Sat, 14 Jun 2025 14:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749910538; cv=none; b=TDXtrhYWkVT4FmC9Kqi4IjNj4eRh2O8u25rw/QG+M+k5w98NBUYxchcxOUPpYx+N4Hr1UWpA+6hCq1M6iFB60JVUx7gxGrgYtoZPqmjDLpFpJOr2TXSImB7QcUsRBi8ECdYtprqAy7plT0YsYR22TRWz9iv2lpp6BnppQDy42mo=
+	t=1749910950; cv=none; b=bjPPP9Zv/0H1Ep7gV4s9J8Ith2KOcHHYRPeff384610bm63bk1JpxveF4ojQfaSSuGHMAOmkAe6IA+oZSzdp5WbJRJjMN/iFTalTRHBmk8OlMpOdylN9tu/0Z0z5Xyj3D398O9KKok3IimvxRgV5YSXJJJmoZvIj6ME5kx+xWTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749910538; c=relaxed/simple;
-	bh=DCmUzencsMsnMaFx/4U/i7fCe25jewj1ptzTPHuZXrg=;
+	s=arc-20240116; t=1749910950; c=relaxed/simple;
+	bh=Rg+fgZCwsIUrfRiu8mTCYByi4MeRpBOzpFg5lYgvIBc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NQrJ47HpAqaHEUHfFtS7FZL5CEaUFrI3UWYiOB2Un0QcvWDxykJAsCqeCQmdRBWjHmNChotsAJGxdpQ+i+gBXfrEmcvtgSdRiuYN8MIrQd4qCf7h13HqjSVrWhDNTECS/dh/0+wQpKGefbAT/5WNj1cBlD+Zepvt0qx09/cZRYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4BdxzNZ; arc=none smtp.client-ip=209.85.167.180
+	 To:Cc:Content-Type; b=KrrqLhFSryPwK+fOsYKvray3aAIVl6LZu/NyA24HdZpUZXycbFdewqaZdWNhFSDdeXoXjzWt53/bsoGn+TvfsREcKvRvaNYUlSBarIGxJTe2/orzvqjLDK+Ltw5ZTImM7kGmZs5Lok9BJw7yduTouhrzmCTiZIrNZSmAfqk656M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHGI1h5a; arc=none smtp.client-ip=209.85.210.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-40a6692b75cso2162702b6e.1;
-        Sat, 14 Jun 2025 07:15:36 -0700 (PDT)
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-73a44512c8aso4502a34.0;
+        Sat, 14 Jun 2025 07:22:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749910536; x=1750515336; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749910947; x=1750515747; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=V212NBLelySDp+6/CyeJaC/8PZkKsYoStFWQx4jyJv0=;
-        b=P4BdxzNZvQYl0LFplGrz7lFcCyH2VDRiV1wAtlTS2LZ4sHh2IZMsfefZkT55swTr1/
-         UDL5duafN7cBRAbNFB0v9i4vtluyJO+jxHrbr6DvA2uNQnlRdjhzWBc1cEtjRQaVBWHA
-         0Wts33em6zLAFZYqofs5jSaXvaR3802MNc7lN7XHIk350kHVDd1reS64HSy36nm/QFC5
-         cNYlHtaSvnSFKdkde7X4G1KZ0ZnqD61jIbggZnelwcxk0dL5gXIKOJp+RuHcf7Hf9TPU
-         SUDLUzzDo10MYhYCVzRc31K4EzQlPb4eJqGv9JgZlkciC7oNnb5P3uzU068Vrmg1Emro
-         6CKA==
+        bh=X3hWngazZR49X9JH2w9golPTcAudBQyhGLqPPLoGo5c=;
+        b=iHGI1h5aj6vf1CP667ZR8LV4/Wi7F6f0WMlsj5ta++n7L8n5kvkbYi7KO9E1Kwcwc9
+         INSExVOJKUxAHGReLZuSxm/YYBQPL28we/oIs9Q88iC7STeA9oevgF7tb+933rNDB/+V
+         0yH0/JMWqfLTMcF4PvxFOtwCCzKzTo35RHwHyTR0q9V5OBFuh86/dRaMrERNksl38EYG
+         ot+oyQx8ak3IxD5H+A4ie8wMv2fVZTv6XiIKoiSnPpDeDhc2FwuWS0TOCEAtM5l+9YEN
+         L92nQs17oONPSGOk6WKWTeFYqG5/xVhiqwyw0W04LS9rAxgCznXYehln85zDKWuIP7jH
+         mVQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749910536; x=1750515336;
+        d=1e100.net; s=20230601; t=1749910947; x=1750515747;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=V212NBLelySDp+6/CyeJaC/8PZkKsYoStFWQx4jyJv0=;
-        b=ol7yqg+J7bit8kA5vebqJQm4XjN0iZygrDZ5w+SGZPILiKdpGieGa/RDVPsc4zcQ0o
-         o9qKl67JvFnTxcX29OmC0kq//LDy0gjJ98IEdSR26u3YrKNjf1HTeCTgtK5iNLrKg3Di
-         H5etER1dAUUmsbz4zS2J65YSt/SVIx+GUTzjfmPMbvTRImEr5dWjpe1yC4PfFVd7KgYw
-         n5efEypfsQiUtmhrm/xTP4WGf8+brTUgRxQbWXgVqDinkcGnw8ZI3uUwt487wAUbXoAq
-         FSrmAj6iqPspqOJ2VtKby0runOkOa5QeIVfVHYdpX46IxoaLPmX45kobuhWpZwqj9KnU
-         9SUw==
-X-Forwarded-Encrypted: i=1; AJvYcCWWpvMQG0WToEXlVpXpvbG79Q/AcUDaxMKgbniz//L4UHUhlM7CKnvEckwbKI+prxNp9shCZkBc+Dy+D0I=@vger.kernel.org, AJvYcCWrFymQ9CLiQ3u2R2+Cg0Ue4PvqizJ/LMl7eL24Jj71a0wgnRvf8SLvXxvD/PAk1u57s6Y8cNhv@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIKhnTGQue7mdpehwq9Tuxa30nkb2jBYTomqRSLXGET+WkHKHj
-	VX42VsCy8ani3sOYD1Pp3a2HtLfF00ybXDgweZr35ZU9DX5dNW9c79jQyxY+9/wNUkdaVnkaBSn
-	N3zQJ8ouPLPH/v0a7Cy8IhkfrHbDCpfw=
-X-Gm-Gg: ASbGncsxtgPAwi0dNDtlggoIaTpH97w72EZ5i70WMU8BwRUCQDa9nXSiCwifbsTYA80
-	Xu727TUBp/sqV0zHg4XdmcdHwA7KMmxmAIWfHMkTU8ZAAxdKeNoi5s/0r7dcJTZ1sMUTh0bLdA8
-	d7gLdO2aKjXmzL9AeUB514MzFMQND8YkhDhuiu+UrgUOnT/rPTMFI2j3yhdWv138xd1KEwFdsFj
-	Q32nSNxeWWX
-X-Google-Smtp-Source: AGHT+IE7Id5T+q892mpAZrQTdRJVM/iBsvIslk9IkOAbJoYWxBoUYMFvgoYdDkNU0o3h51zEcveta5gNqzJQn1eG0z4=
-X-Received: by 2002:a05:6808:211a:b0:404:1898:1a0b with SMTP id
- 5614622812f47-40a7c19e067mr2049349b6e.31.1749910536255; Sat, 14 Jun 2025
- 07:15:36 -0700 (PDT)
+        bh=X3hWngazZR49X9JH2w9golPTcAudBQyhGLqPPLoGo5c=;
+        b=YqjuhAZm7oI91iUcW0dndSk12oJRmaIUMPeUypK0AbYa4FKS3mlAQ5iwf6afY0VDAX
+         CESaucZvqHgRUkuOfHz/0d6tTacxkEndb8AGtVRQopOVIofWmI+3WETdCLLG6tZ+nksw
+         YAdFS0nq+V0z++TrUS5H9RwUVxWCnYjyRzmJ8HRSUaYX3BMOanwGgk8RxsqpMAooymcQ
+         U0GTtEt1KUEN9p7BRdliP+0l4PHrIb5G3daGMqN8EIZptl2x9MOmPpJwyrIikvr0tpu/
+         0AbsFJqI1uxBgXajrkHS0zrZBam+fPgjaea6UAzxGA6z5r5Gxoa3BdFRIme4dzvg1ZqJ
+         HBOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVN69Ekrjxw8gWOR3K0zhNwG+4GxZFmHWRHzFuHTJvwhqjy+otrMOaob45gax0wBK0M3fifsEHhDzvPRCE=@vger.kernel.org, AJvYcCXeUgzVRgOyPUkvC3RKq24KHX/gphzLdjK23Fr7bSvaKVs45Upki5NU/7CMg6spikyC28mSQmvQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDth2doHwFwP0VJLFHFTPYTUlsdUFxk/8xfIAn4Yi4PXUxYXwY
+	Q2r1aR4D6BdDZQk61mLdMNinuUv+JJEFlxNseqvR5DRG6y2Kt1zOMnnpafyYs/drPImCAs/vxOs
+	HCae3BWiM0e28TBQzJGNR+0AV3IfxT+s=
+X-Gm-Gg: ASbGncud5oUKlucbMi2rI7YtAwQZl/OZqRGNTYNi5857U3vLBLQO5rUTMuU+wMiBhYt
+	Tzb8dqcJrPYASxS5rb1VgFd05eHapUg3f1jgyC22Si8WG5Woien10YHHhopQcsqFYg/RK+lMYrY
+	D8r2/fNXhhjRfIUmdPBDujimKzDszPG+TfPl9JKUOuSYRJsWgTjBszOYKTjbcI6kwZyGTzjEuWQ
+	w==
+X-Google-Smtp-Source: AGHT+IEZSMKfIhF5Wtgl7BPD+RHoz/6+X0THEcMGujucKXpF3oqL7pzaETbvgouujlQgGh81A5s/QdODg0dTieqaME8=
+X-Received: by 2002:a05:6870:3925:b0:2d4:e420:926c with SMTP id
+ 586e51a60fabf-2eaf02c9159mr2147858fac.0.1749910947449; Sat, 14 Jun 2025
+ 07:22:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749891128.git.mchehab+huawei@kernel.org> <31466ece9905956c2e1a3d3fc744cfc272df5d88.1749891128.git.mchehab+huawei@kernel.org>
-In-Reply-To: <31466ece9905956c2e1a3d3fc744cfc272df5d88.1749891128.git.mchehab+huawei@kernel.org>
+References: <cover.1749891128.git.mchehab+huawei@kernel.org> <ba75692b90bf7aa512772ca775fde4c4688d7e03.1749891128.git.mchehab+huawei@kernel.org>
+In-Reply-To: <ba75692b90bf7aa512772ca775fde4c4688d7e03.1749891128.git.mchehab+huawei@kernel.org>
 From: Donald Hunter <donald.hunter@gmail.com>
-Date: Sat, 14 Jun 2025 15:15:25 +0100
-X-Gm-Features: AX0GCFu7jgqlSlj61VjuypZSCCHHVOKVJwT6Cqt0Oc5ACuVVfK8OEx-nZWS3V3c
-Message-ID: <CAD4GDZxPTFmKeNqRZBxW1ij6Gy0L3hrbB6q9G6WdFb8h6Zhr=g@mail.gmail.com>
-Subject: Re: [PATCH v4 07/14] tools: ynl_gen_rst.py: move index.rst generator
- to the script
+Date: Sat, 14 Jun 2025 15:22:16 +0100
+X-Gm-Features: AX0GCFtp1S-v0cvoFkINvtULliHiL3lSbK0RuVnxFH7wmNXiGSQZkNSI3JO8tjs
+Message-ID: <CAD4GDZzA5Dj84vobSdxqXdPjskBjuFm7imFkZoSmgjidbCtSYQ@mail.gmail.com>
+Subject: Re: [PATCH v4 12/14] MAINTAINERS: add maintainers for netlink_yml_parser.py
 To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
 	Akira Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, 
@@ -97,18 +96,42 @@ Content-Type: text/plain; charset="UTF-8"
 On Sat, 14 Jun 2025 at 09:56, Mauro Carvalho Chehab
 <mchehab+huawei@kernel.org> wrote:
 >
-> The index.rst generator doesn't really belong to the parsing
-> function. Move it to the command line tool, as it won't be
-> used elsewhere.
->
-> While here, make it more generic, allowing it to handle either
-> .yaml or .rst as input files.
+> The parsing code from tools/net/ynl/pyynl/ynl_gen_rst.py was moved
+> to scripts/lib/netlink_yml_parser.py. Its maintainership
+> is done by Netlink maintainers. Yet, as it is used by Sphinx
+> build system, add it also to linux-doc maintainers, as changes
+> there might affect documentation builds. So, linux-docs ML
+> should ideally be C/C on changes to it.
 
-I think this patch can be dropped from the series, if instead you
-remove the index generation code before refactoring into a library.
+This patch can be dropped from the series when you move the library
+code to tools/net/ynl/pyynl/lib.
 
 > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 > ---
->  scripts/lib/netlink_yml_parser.py  | 101 ++++++++---------------------
->  tools/net/ynl/pyynl/ynl_gen_rst.py |  28 +++++++-
+>  MAINTAINERS | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a92290fffa16..2c0b13e5d8fc 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -7202,6 +7202,7 @@ F:        scripts/get_abi.py
+>  F:     scripts/kernel-doc*
+>  F:     scripts/lib/abi/*
+>  F:     scripts/lib/kdoc/*
+> +F:     scripts/lib/netlink_yml_parser.py
+>  F:     scripts/sphinx-pre-install
+>  X:     Documentation/ABI/
+>  X:     Documentation/admin-guide/media/
+> @@ -27314,6 +27315,7 @@ M:      Jakub Kicinski <kuba@kernel.org>
+>  F:     Documentation/netlink/
+>  F:     Documentation/userspace-api/netlink/intro-specs.rst
+>  F:     Documentation/userspace-api/netlink/specs.rst
+> +F:     scripts/lib/netlink_yml_parser.py
+>  F:     tools/net/ynl/
+>
+>  YEALINK PHONE DRIVER
+> --
+> 2.49.0
+>
 
