@@ -1,154 +1,178 @@
-Return-Path: <netdev+bounces-197710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D19AD99E1
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 05:08:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2353AD99ED
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 05:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F884188F23F
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 03:09:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A4C93BB4F3
+	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 03:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762321A2622;
-	Sat, 14 Jun 2025 03:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1A01B87D9;
+	Sat, 14 Jun 2025 03:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ui1+g3uh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M9YfK+Jl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACB61C28E;
-	Sat, 14 Jun 2025 03:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7026F2F2
+	for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 03:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749870522; cv=none; b=M7BJIIcY+p2PAmZqXS+HQ/6vzUnXkA4Z2sB3CoKDoJvwgh02Qmqmuc2ChEP9mlDfPcIuUAVmqhqch/zi92K8JYNfson+LjSH5WQOfZE4nZok8bjtwZHWztYEJItT3D4scTQ7c2tjIdlLvcbV+b4z2+gUO52NJQPp0UJ+QkmFbVc=
+	t=1749871424; cv=none; b=NAtnmHN9HfGsXJHj6KubHFcc+xZ577lPVHlSYRy4qp25dFJS+Z5x6+ONtbnkmF1zcxTF5oIfRqUTOvy0jZOmuLpetCtItf38eCVk0bRWf+PMoqN1jGwiLisHkGmi1SxxYpWL+ofhIcub2s8NLV0oruOAwbPmt0AYIMcFj8j4VFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749870522; c=relaxed/simple;
-	bh=slU5/gRGZ+X+AdD9Jx/KursslTeI+BhugpMonKjI2tA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ph2PSe8mXEvE65JDflSMB/uhCNUwYpxXT5J86ONIvM9EdU53mWcmeXGMRtC6CaXF41ba+ijq+pPeynZTJrfWbqZMAZf3iSkmj5hrt8e+04+Yq3nYESZK/GUn5gGhRlzUCQSbmVwB7z3K2S1bGtoXpq4PmpkhsfiEafbcy3dpHJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ui1+g3uh; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b2c4331c50eso2254775a12.3;
-        Fri, 13 Jun 2025 20:08:37 -0700 (PDT)
+	s=arc-20240116; t=1749871424; c=relaxed/simple;
+	bh=ks+qgcinxfP2t0Ff5arUdhpbKGhmd/HNmuw7bvh83zw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GMrjHbBt7s8Q5QUH1RycKpT9xwYe8nchT8ltVYXfjPQmBIf29CbkAZc6AVIQZbvCV3LElPWyuw3tf05u0qYQNpL6qPwCqcolnHMomm+KhzxbJfqdueQK+e+Jib+dYaLQyitq5V6J/UQ1JtBvtfSEV5GBiPJt/VaSMqm+rWRGo0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M9YfK+Jl; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3ddc7905075so05ab.0
+        for <netdev@vger.kernel.org>; Fri, 13 Jun 2025 20:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749870517; x=1750475317; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=slU5/gRGZ+X+AdD9Jx/KursslTeI+BhugpMonKjI2tA=;
-        b=Ui1+g3uhj+wkRTRD0EhNPCq0mkod8DZX8dzJYapp3AQSGrrWkcksSYBMSflc6hBxtX
-         Uw+eEcnwVFe5j+Vfdq0BG+boK/FdmB8e0oGY1SpKITAGzBccLb40CEYUzaQ9JBa+gCK7
-         tivzcy8kzgtkImPIgVwQ8nAsW8mSK+uZK5VmPZhi24xPY81pLhpquXs9D0yReATtjArd
-         0vyAGQHSWQTRVcI6pwbIWtEBrpQ0aj5ugupHJxzNJgdE45GSNQFeKFNBbtbZ/IXwx8En
-         kHipCMG19p3RX4zITSHw+A7pRL03zxh+kST4mc40/D2x7fbp61litvEkbP0ZxKcAOEJ2
-         ojvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749870517; x=1750475317;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1749871421; x=1750476221; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=slU5/gRGZ+X+AdD9Jx/KursslTeI+BhugpMonKjI2tA=;
-        b=mELYatinwJKhWL36RF3A9mpzaX1GEJJjAmKTdrctpq9qb9ex5nLmAQYECjqbtVWZUB
-         TlKV+NL7uX/FYC7gJyK4AsejAkGuvj6qHSunh3yJrLjdWeOZKWA8rly9ooeaWNZmIkHL
-         p/gzrImNK0FtOFEchdnc8qMtqOwyT107/5niqpbWIC6y9UN2pqyXVBcepJsy3mg/xIpl
-         W6MflpXLkUeVO4jrgm63AsfMp4vt8LpHKTkyt+cbECWpxwtoMRG8Y/1/XxcMkYuTvDSZ
-         qOsTRmitOqYoxJo0yhm1TZBJnvlNxykWeCzueI4WWdZBGNKS8cOP86qYOcWea0pAR/KK
-         s6JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2FXVQQJWfHK6/h1hbKYJCYC5lhAQ7x2gj17/QXSAwDEFkpypAZ+KQnpAWR6BH3PB7Rg5tZpGa0WU=@vger.kernel.org, AJvYcCUuGVXNRBsaYjHfBPsyhFl8+qS7zUp/Xbj7sFk601fDFE5KDo8Y3JT3SPlXzc71RPMHbQObptLf@vger.kernel.org, AJvYcCVFeCFHmb2EPnBKLAO0Xw2Dq9zL9rQV/AQALmunElpd81o1/nXSdFZttuIHHF9fPtjxG9g2oxYLJHeAjw==@vger.kernel.org, AJvYcCVUGwP8ikxoeggWR5tG3Pgc2HmhPHXsQKMrs58N/TrSF6SR6WGpUb5AhOOnVrsiDeQsRW5cMfQjwCxq@vger.kernel.org, AJvYcCXZ5uWTBXxZaa42X096vGEwO+xdU3U/yt158uLqJ5SEOR1fMUXrHWLAYHW0I9+Y1LgUQh5veWW3y9ib@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb+uTpXARfBAauKJ6HCire6V6520geMtezaB9ix+ve3V8IhHjN
-	dqV7FOgUF8lCVZjxWTmzvTyDVWvu18tHTzL9U7z687wiH71eg5ULUSmE
-X-Gm-Gg: ASbGncsSDYeTD8yyyod1gXZFrjNOQ7jDgHUSl2JkZdL7EJjQOH2REaLVZbHY/D1JVqM
-	YzTM8fqrdZHhtTKdwhPUa93A4Uaj66iT96B/gdsaY6iM1sEUZEDAGL+yIziOVexoe8+jjQHbDLz
-	TuedGumZmUYRuvhJC1DUdOsk19ART8gwRrZO2OrNZQ2Rf7ZCCXp//bEaP27rTm5cM2KcoXb9CYD
-	fnr2sHDd97bzs0Gz931ZSZeIjoOKsW+nv96iOZxWf0gAcKEFkY01MKXd1AaBtt/B3FcwGEtqz9u
-	cCo7uSWDRklzgYAQbr1zJ0tH6p5lynD/DwcRsbzS++DsEZKvgYLQ4hY2vYR0JA==
-X-Google-Smtp-Source: AGHT+IGNdmkR+4nBshMH2dcC/WUsJgI6udsfA1wK5+AWZ7uxqXLAyPWbVmTGd4AoyOxlg6NwRnO3dg==
-X-Received: by 2002:a05:6a21:69b:b0:1ee:e655:97ea with SMTP id adf61e73a8af0-21fbd68e749mr2351293637.41.1749870517124;
-        Fri, 13 Jun 2025 20:08:37 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe1639eb8sm2147060a12.10.2025.06.13.20.08.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 20:08:35 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 90EDE4241807; Sat, 14 Jun 2025 10:08:29 +0700 (WIB)
-Date: Sat, 14 Jun 2025 10:08:29 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux GPIO <linux-gpio@vger.kernel.org>,
-	Linux MTD <linux-mtd@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux USB <linux-usb@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Weinberger <richard@nod.at>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>,
-	Felipe Balbi <balbi@kernel.org>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH] Documentation: treewide: Replace remaining spinics links
- with lore
-Message-ID: <aEznrV9XoXNpYKwa@archie.me>
-References: <20250611065254.36608-2-bagasdotme@gmail.com>
- <20250613130753.GE414686@horms.kernel.org>
+        bh=yMC1RgubSI8jxz91HSzJ6Iomy1CrrH+KUaf8/z5C7uM=;
+        b=M9YfK+JluehVwcqaR7x5IvlFJiuEsbFNnux4limO89c4+tdeohTFk14wbPMMlS110w
+         J3xhKPwFlpaIc0ppy1jgLv+hJK1lP9sgh6z0Cgfju7Wsrn41/MeyzERwLoWB1HhRwCCl
+         g/KJnc7yr+Rq8HXDZ2EAYcuZBV5OcRGkMhqo4UBF5sw6APyiBmCMETFC0vGpWNgco0Wf
+         B4814TIi8sAvf57Bl0cAx41wtsfokeh1lD7IvrxW0R9Hx85v+b26gw414I2REXLYEuon
+         QNSs65LWghJEl8IeyaYyiDKoclGQJQ0jogPHDKAJz+vjv/Sz5WpaFKvvMC0WPGolFWpH
+         Am+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749871421; x=1750476221;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yMC1RgubSI8jxz91HSzJ6Iomy1CrrH+KUaf8/z5C7uM=;
+        b=d6Y/f62bSwODQ6Cbapdz4ZjZC+m7RVtfVOJvRHdg1C1i3sgUATdVOSHN3e0zGQznhW
+         5uSwA0DFO+ibRm2HDI21o+MBI8xGTYM0UU8XgJrf1Gdp27em8HoFTcHKfnIZtX8Sb3LQ
+         4SQp3cPCEmMyW3Km4doK9L32P6yTCIHhvU43zEXiXkpfHo8+ekpeTJ3TDJu0im2G4rQz
+         +geTl9Un+48Ijd6l22LlwxQffqRXuYrQ7g63/gBB0GehTxSRCJSuOxl5goM9ZvpIJ7KY
+         ncYFxKWVWsl5tQPw/iwq8JRYUtqNgP35jh3l+dEepttdOQg8oJKjqo5LqBVu+a8rBlWJ
+         vP+g==
+X-Forwarded-Encrypted: i=1; AJvYcCW/s9euw3/jLUCgINB08NpCRQnypoSxyd7B/IlTXj8WWp1lzVs10HznU4KokqxlZREYAO+c3PM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKxgQHM06HbvEbOe63Ml/UvpNUJi6cxJNK1iWwQoYGXBe7t2/9
+	7nx+ZPxEDlynp5kWhMoVfCKcEqOXnJ9bxoa/8Jxvslr3CZNATjpaus127IiD+vOpuEe9tkLkNjq
+	Y6UChMQdCOfMpMWdqZsU+CcpIN6yS4ZvJhrT2igeL
+X-Gm-Gg: ASbGnctewBMcx2+dK9v8euqiq9zCRl++XuJYuMGlkw33CoQU0T2ntlYhvY7fSDAgrlL
+	A3s0lMN5ZqAomPJFDRBk+hQ4NI6qqrnbsfhq8TvlidGMtvZzahSqMbZzzXiP72LbV96JGUHf/hA
+	6IVYwYwGCk5YfdOusr4mllB0y1MvU21PQaVaShsypWT0HrRb0kB2f1gLHmyohzMuOs+AbQDLLgE
+	H4D
+X-Google-Smtp-Source: AGHT+IGlo6uYJF3Gn+pJN5jxgxVqy47hoLKB0YLDiznhdZSCh4GpZSc2oGthgnIZd8sYwsSUIl4f1nc2rSzZ3zzdsK4=
+X-Received: by 2002:a05:6e02:2506:b0:3d9:3ee7:a75b with SMTP id
+ e9e14a558f8ab-3de0817db53mr1219875ab.1.1749871420405; Fri, 13 Jun 2025
+ 20:23:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GUjbLh60lsjawVfy"
-Content-Disposition: inline
-In-Reply-To: <20250613130753.GE414686@horms.kernel.org>
-
-
---GUjbLh60lsjawVfy
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20250612020514.2542424-1-yuyanghuang@google.com> <20250613172941.6c454992@kernel.org>
+In-Reply-To: <20250613172941.6c454992@kernel.org>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Sat, 14 Jun 2025 12:23:03 +0900
+X-Gm-Features: Ac12FXxi5jeP--oHy4Yft2q1FN2un7YHLfDbIUoTs8jLrWX9Uvhk2nC5jLxyXBc
+Message-ID: <CADXeF1HJ7dyw5gp7sKZvRgf_WLuEJatqfKmfxzpWtLibB=e9rg@mail.gmail.com>
+Subject: Re: [PATCH net-next, v3] selftest: Add selftest for multicast address notifications
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 13, 2025 at 02:07:53PM +0100, Simon Horman wrote:
-> I am wondering if you considered also addressing
-> the spinics.net links in gadget-testing.rst.
-> They are the only other instances I see under Documentation.
+Thanks for the suggestion.
 
-I can't find on lore remaing spinics threads ([1], [2], [3]). These are all
-=66rom 2012-2013 and somehow lore doesn't have linux-usb archive on that ye=
-ar.
+>Perhaps move these to lib.sh as a separate commit?
+>They seem generic.
 
-Andrzej, Sebastian, what do you think?
+I am looking at the existing test cases, and it seems that each case
+is doing its own way of handling the end_test()/run_cmd(). It's
+non-trivial to unify everything into lib.sh, and it seems to be a huge
+refactor if we want to do it this way. I can also imagine each test
+case might want to customize the behavior a little bit differently.
 
-Thanks.
+On the other hand, it seems some of the helper functions I copied over
+can be simplified. I will refactor the code a little bit to reduce the
+duplication.
 
-[1]: https://lore.kernel.org/all/?q=3Ds%3A%22f_phonet+with+SOCK_DGRAM%22
-[2]: https://lore.kernel.org/all/?q=3Ds%3A%22pnxmit.c%2C+test+program%22
-[3]: https://lore.kernel.org/all/?q=3Ds%3A%22usb%2Fgadget%3A+the+start+of+t=
-he+configfs+interface%22
+Thanks,
+Yuyang
 
---=20
-An old man doll... just what I always wanted! - Clara
 
---GUjbLh60lsjawVfy
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaEznqAAKCRD2uYlJVVFO
-ozmUAP9e7U+IepwBR1/uxeix0k9gN0MnJUuM0zLK08IHd/ZQIwD/fznXO/qTwDWY
-XqpwyY9Zte61Q4ES2LZvcwCIW8VqzQk=
-=szxl
------END PGP SIGNATURE-----
-
---GUjbLh60lsjawVfy--
+On Sat, Jun 14, 2025 at 9:29=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 12 Jun 2025 11:05:14 +0900 Yuyang Huang wrote:
+> > +VERBOSE=3D0
+> > +PAUSE=3Dno
+> > +PAUSE_ON_FAIL=3Dno
+> > +
+> > +source lib.sh
+> > +
+> > +# set global exit status, but never reset nonzero one.
+> > +check_err()
+> > +{
+> > +     if [ $ret -eq 0 ]; then
+> > +             ret=3D$1
+> > +     fi
+> > +     [ -n "$2" ] && echo "$2"
+> > +}
+> > +
+> > +run_cmd_common()
+> > +{
+> > +     local cmd=3D"$*"
+> > +     local out
+> > +     if [ "$VERBOSE" =3D "1" ]; then
+> > +             echo "COMMAND: ${cmd}"
+> > +     fi
+> > +     out=3D$($cmd 2>&1)
+> > +     rc=3D$?
+> > +     if [ "$VERBOSE" =3D "1" -a -n "$out" ]; then
+> > +             echo "    $out"
+> > +     fi
+> > +     return $rc
+> > +}
+> > +
+> > +run_cmd() {
+> > +     run_cmd_common "$@"
+> > +     rc=3D$?
+> > +     check_err $rc
+> > +     return $rc
+> > +}
+> > +
+> > +end_test()
+> > +{
+> > +     echo "$*"
+> > +     [ "${VERBOSE}" =3D "1" ] && echo
+> > +
+> > +     if [[ $ret -ne 0 ]] && [[ "${PAUSE_ON_FAIL}" =3D "yes" ]]; then
+> > +             echo "Hit enter to continue"
+> > +             read a
+> > +     fi;
+> > +
+> > +     if [ "${PAUSE}" =3D "yes" ]; then
+> > +             echo "Hit enter to continue"
+> > +             read a
+> > +     fi
+> > +
+> > +}
+>
+> Perhaps move these to lib.sh as a separate commit?
+> They seem generic.
+>
+> Please fix the shellcheck warnings. The "info"-level messages
+> are up you, SC2317 can be ignored.
+> --
+> pw-bot: cr
 
