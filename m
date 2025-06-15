@@ -1,72 +1,74 @@
-Return-Path: <netdev+bounces-197864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C7AADA152
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 10:46:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E280EADA155
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 10:48:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05B6F3B319C
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 08:46:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F412E188C4A4
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 08:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E34B8615A;
-	Sun, 15 Jun 2025 08:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982C52638A2;
+	Sun, 15 Jun 2025 08:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="imNgtVcC"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bFN6H3KJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD1ED530;
-	Sun, 15 Jun 2025 08:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C564A1BC3F;
+	Sun, 15 Jun 2025 08:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749977186; cv=none; b=C2jtKXQW+V5khkR6omuIIqzV/2ICmCdZ0ou0WaT7VN2lo/vsu6xwyi7ouA0bZwcUywzMBWxXf1E+uunElLhxEelFkUb3ykPIkNHt1zVeUd08sLmcLg6DlDF+RqvuizOWXzDBLgeGDWLpS8Kr6MXE4QeujTVU0jz2aSiyPLtuik8=
+	t=1749977330; cv=none; b=g7Wo0VpCAlwKolGcDUpwWKUIU1aipOnK2nxqEFZdi7J1bRHtAmKOfAlF+unLFasunGyeQdgr4xX184VISdhwnuvMALgO3TN2d7ee7TN7Q3yhR7oWL6LMCreI5+O+RTA2dyt22zRTEA0XHvlfSM1bpvN6sAurfiQcfqAPQcPaCis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749977186; c=relaxed/simple;
-	bh=AftlQEL6Khk/DC4qbPUaIfYSZ4Qv4tGnW7qwvZaILKc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YjUQyvqefFhBgP0uREGZUN9x4VqGGfwWyK1peyGtCMGr6Z4j+NdYSG6UonUaFILdHAQFAyHDylClxI9U0di5BUwT6M8RH7wQAjZxsRJD0WHwCsPiOpzowmMAoI+8E9uDBZy72MwJNJSaqufP28T/UryNeIohCMUusy92yXVRZCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=imNgtVcC; arc=none smtp.client-ip=134.0.28.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout4.routing.net (Postfix) with ESMTP id B7DF910075B;
-	Sun, 15 Jun 2025 08:46:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1749977174;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=O65L2t9W8ZXWygRCA4KnSeEpTHiZlvT4O3mUer1lJck=;
-	b=imNgtVcCO4Vp3y3WVt/v3OiKo0YQxYEuqOKRxNtOhTHIOLUPCoANNKaLdPJI0L7zlXnbt0
-	gAD0C5S5iLdnKXnsoVBnS2O1/8XR657NZhREwQ+foJURHJrKir4TbK5lAQFHU4sNu82qtY
-	lZ534FVtYZdVs9GuLROpILnABI0YeUs=
-Received: from frank-u24.. (fttx-pool-217.61.157.124.bambit.de [217.61.157.124])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 772AF1226B2;
-	Sun, 15 Jun 2025 08:46:14 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH v2] net: ethernet: mtk_eth_soc: support named IRQs
-Date: Sun, 15 Jun 2025 10:45:19 +0200
-Message-ID: <20250615084521.32329-1-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1749977330; c=relaxed/simple;
+	bh=/COxccsWVBzdJxzmwc97AIX8XiROPX0ALkZZ4v+t7Os=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZgGEV45vaZXVS2wQzrieRuGXrj2NtalHnGaFDK1OVNWvVjaHzbA0YmPrFeT5cge0JJaYWae7pVYCARSY5uVX3mcdGtRJhtRgDjZIAXEl7APgTk0UKtJE6MXVntPJStGjPhBZ2KvZ155LByz+SvoNmg7hSpzB1Y5XO0QBnb2AVws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=bFN6H3KJ; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55F6XYvn013505;
+	Sun, 15 Jun 2025 08:48:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=kRzPo9BfSat22K7EbkWSZRQfJUqlD
+	XqFsAlOoFuVsCw=; b=bFN6H3KJ99V6oOIHV19vYf9FC9OaG3MVbhs0pSwAdUiKN
+	yrQAADFA3cmD5LFN4qW4pGo2GcISmhYxQbssOdIL9Zhkz8/CtmP6EozWToYx4197
+	5OVuhjARvzIC9mtRqhJMwii+iqUlRBSJwSGGRxjJAgPmVMyifIkgxZGmpcDaTXCJ
+	gEFaPfuR2/CjuF4p2RE46pqF0AlG9FXsjLcp7zWyuwoSgzW93X4e9Hi6Zt35ra7N
+	Irj/AHgWh6kGBmMg62fQw8GSoa8bM/sqhuqq/WutIb+ulh2Vw2+hIw4WJWNpRVfh
+	zLAolb/S3JdWqv4B3rX5o3AvDobZf1WNPG862AeVQ==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4790yd103e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 15 Jun 2025 08:48:29 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55F60Dar032783;
+	Sun, 15 Jun 2025 08:48:28 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 478yh6y6vr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 15 Jun 2025 08:48:28 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55F8mR6i022800;
+	Sun, 15 Jun 2025 08:48:27 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 478yh6y6vk-1;
+	Sun, 15 Jun 2025 08:48:27 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org,
+        darren.kenny@oracle.com
+Subject: [PATCH v2] selftests: nettest: Fix typo in log and error messages for clarity
+Date: Sun, 15 Jun 2025 01:48:12 -0700
+Message-ID: <20250615084822.1344759-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,83 +76,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-15_04,2025-06-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506150064
+X-Proofpoint-GUID: GHNco0k6xPDRIbBuknuglYQ0WW3FzgH-
+X-Proofpoint-ORIG-GUID: GHNco0k6xPDRIbBuknuglYQ0WW3FzgH-
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE1MDA2NCBTYWx0ZWRfX1xyvzJ3qW1xD g2Xqldec6ulzmy7IJU9yMZQisoCGubtYrVuB2mGKyRE9ER/AYZx+C3cQDSL1F0G6lq1zd7FpUda gBxUsRNZm0PED7B+mj7593EYx17S4S8y2koSplIdHVdBiaKhGTnks/AIt0+6+n0eUApZCiljsGZ
+ av9f2pmoHyOnYLT7gzX2gowYp8zhXipTFL4EYu5IENWKSB1/Z9D/V77F8e74c4uh16HGNRsY8O4 3gmxjwGxxKLGnkP9hflQ/Hf1+lZ2Lza/FxQW+/3YrGsxQ28L/Nqb5D+0yGx4Hxb/0APl+Hy0+q+ ZtkrVGmbYqRsec5DbRrhM3LPnHZQBQuaID5XHLwU9YhIIuo7rQrjeWLbed4lsxIE44vx29z6s4n
+ 81mSQkEStMyn0T436Ft7fgyNvvh8oASQ8pMTNUIxp8GX9XZbPd+c9AiBkqrpYrJI0IxBrC7l
+X-Authority-Analysis: v=2.4 cv=XZGJzJ55 c=1 sm=1 tr=0 ts=684e88dd b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=yiuC5uV9oDzSQypOcXUA:9
 
-From: Frank Wunderlich <frank-w@public-files.de>
+This patch corrects several logging and error message in nettest.c:
+- Corrects function name in log messages "setsockopt" -> "getsockopt".
+- Closes missing parentheses in "setsockopt(IPV6_FREEBIND)".
+- Replaces misleading error text ("Invalid port") with the correct
+  description ("Invalid prefix length").
+- remove Redundant wording like "status from status" and clarifies
+  context in IPC error messages.
 
-Add named interrupts and keep index based fallback for exiting devicetrees.
+These changes improve readability and aid in debugging test output.
 
-Currently only rx and tx IRQs are defined to be used with mt7988, but
-later extended with RSS/LRO support.
-
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
-v2:
-- move irqs loading part into own helper function
-- reduce indentation
-- place mtk_get_irqs helper before the irq_handler (note for simon)
+v1 ->v2
+remove extra space
 ---
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 39 +++++++++++++++------
- 1 file changed, 28 insertions(+), 11 deletions(-)
+ tools/testing/selftests/net/nettest.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index b76d35069887..81ae8a6fe838 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -3337,6 +3337,30 @@ static void mtk_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 	schedule_work(&eth->pending_work);
- }
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index cd8a58097448..1f5227f3d64d 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -385,7 +385,7 @@ static int get_bind_to_device(int sd, char *name, size_t len)
+ 	name[0] = '\0';
+ 	rc = getsockopt(sd, SOL_SOCKET, SO_BINDTODEVICE, name, &optlen);
+ 	if (rc < 0)
+-		log_err_errno("setsockopt(SO_BINDTODEVICE)");
++		log_err_errno("getsockopt(SO_BINDTODEVICE)");
  
-+static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
-+{
-+	int i;
-+
-+	eth->irq[1] = platform_get_irq_byname(pdev, "tx");
-+	eth->irq[2] = platform_get_irq_byname(pdev, "rx");
-+	if (eth->irq[1] >= 0 && eth->irq[2] >= 0)
-+		return 0;
-+
-+	for (i = 0; i < 3; i++) {
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
-+			eth->irq[i] = eth->irq[0];
-+		else
-+			eth->irq[i] = platform_get_irq(pdev, i);
-+
-+		if (eth->irq[i] < 0) {
-+			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
-+			return -ENXIO;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static irqreturn_t mtk_handle_irq_rx(int irq, void *_eth)
- {
- 	struct mtk_eth *eth = _eth;
-@@ -5106,17 +5130,10 @@ static int mtk_probe(struct platform_device *pdev)
+ 	return rc;
+ }
+@@ -535,7 +535,7 @@ static int set_freebind(int sd, int version)
+ 		break;
+ 	case AF_INET6:
+ 		if (setsockopt(sd, SOL_IPV6, IPV6_FREEBIND, &one, sizeof(one))) {
+-			log_err_errno("setsockopt(IPV6_FREEBIND");
++			log_err_errno("setsockopt(IPV6_FREEBIND)");
+ 			rc = -1;
+ 		}
+ 		break;
+@@ -812,7 +812,7 @@ static int convert_addr(struct sock_args *args, const char *_str,
+ 			sep++;
+ 			if (str_to_uint(sep, 1, pfx_len_max,
+ 					&args->prefix_len) != 0) {
+-				fprintf(stderr, "Invalid port\n");
++				fprintf(stderr, "Invalid prefix length\n");
+ 				return 1;
+ 			}
+ 		} else {
+@@ -1272,7 +1272,7 @@ static int msg_loop(int client, int sd, void *addr, socklen_t alen,
  		}
  	}
  
--	for (i = 0; i < 3; i++) {
--		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
--			eth->irq[i] = eth->irq[0];
--		else
--			eth->irq[i] = platform_get_irq(pdev, i);
--		if (eth->irq[i] < 0) {
--			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
--			err = -ENXIO;
--			goto err_wed_exit;
--		}
--	}
-+	err = mtk_get_irqs(pdev, eth);
-+	if (err)
-+		goto err_wed_exit;
-+
- 	for (i = 0; i < ARRAY_SIZE(eth->clks); i++) {
- 		eth->clks[i] = devm_clk_get(eth->dev,
- 					    mtk_clks_source_name[i]);
+-	nfds = interactive ? MAX(fileno(stdin), sd)  + 1 : sd + 1;
++	nfds = interactive ? MAX(fileno(stdin), sd) + 1 : sd + 1;
+ 	while (1) {
+ 		FD_ZERO(&rfds);
+ 		FD_SET(sd, &rfds);
+@@ -1492,7 +1492,7 @@ static int lsock_init(struct sock_args *args)
+ 	sd = socket(args->version, args->type, args->protocol);
+ 	if (sd < 0) {
+ 		log_err_errno("Error opening socket");
+-		return  -1;
++		return -1;
+ 	}
+ 
+ 	if (set_reuseaddr(sd) != 0)
+@@ -1912,7 +1912,7 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
+ 	 * waiting to be told when to continue
+ 	 */
+ 	if (read(fd, &buf, sizeof(buf)) <= 0) {
+-		log_err_errno("Failed to read IPC status from status");
++		log_err_errno("Failed to read IPC status from pipe");
+ 		return 1;
+ 	}
+ 	if (!buf) {
 -- 
-2.43.0
+2.47.1
 
 
