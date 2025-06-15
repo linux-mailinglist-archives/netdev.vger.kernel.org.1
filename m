@@ -1,126 +1,156 @@
-Return-Path: <netdev+bounces-197863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75FC4ADA150
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 10:37:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C7AADA152
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 10:46:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A48C9188FAD6
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 08:37:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05B6F3B319C
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 08:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645AC2641E3;
-	Sun, 15 Jun 2025 08:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E34B8615A;
+	Sun, 15 Jun 2025 08:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIGHNTHa"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="imNgtVcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1C42641E2
-	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 08:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD1ED530;
+	Sun, 15 Jun 2025 08:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749976644; cv=none; b=NtNcWVmgZAyBZgxuuolY4sUT4ENMtkLgsiuB0ryltuQkSLeMxwAkSah75f8J45nczXuVH7Hi0wP9vdcpl+qrdH+9qjdQMluQILQyoY7FzUa6AMKWwipdXbHQCdVOAMLVPtIftmOg9ymxW/QW9sLKSNcUFMSOYEuwCuYzaVuGi0M=
+	t=1749977186; cv=none; b=C2jtKXQW+V5khkR6omuIIqzV/2ICmCdZ0ou0WaT7VN2lo/vsu6xwyi7ouA0bZwcUywzMBWxXf1E+uunElLhxEelFkUb3ykPIkNHt1zVeUd08sLmcLg6DlDF+RqvuizOWXzDBLgeGDWLpS8Kr6MXE4QeujTVU0jz2aSiyPLtuik8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749976644; c=relaxed/simple;
-	bh=elF098D0OS/wcuBbtA4frD9WsTW9bNNyp+TTzihxrvs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HEjz5f/u8s97gB9wDRPD7uDOFA3HSaL/OHaNKi2YFIaZbgJO6hthl4d+5pvfvjwsxWKXWeJApk3jVnsn1k5nFL5aVZ1UQ82vy3YTe+Viwb9JQ0VCsWfjVBI+Mycbkp6YbdRVN8cl4CbN+ddST5U53+OBXMrRYWQTyrcdVw/lGsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIGHNTHa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80CDDC4CEE3;
-	Sun, 15 Jun 2025 08:37:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749976643;
-	bh=elF098D0OS/wcuBbtA4frD9WsTW9bNNyp+TTzihxrvs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=aIGHNTHa64cn/6DQZsXe1A13+teT+YB5TmgjvQJ7ckj+cP1VrVZ4Lw1DH+Kvu2N7r
-	 quuDndtYPwl/VI80MikDQPflkH0xBgK+zmi4ArO05Va9kdcSsEN5t1/UPKJu8xgGa3
-	 edHNOocu2c2HUJ+7o2nPA/grsqgoHccHS5liaNROcBMgON94DCDFppsK3iJnc1EWoV
-	 jawroQ0OYWpzzUTM3IpX5jmdxvyaRsp4UCqA2vKn3hh+JqR9OLL60f7HUe4RItw4RP
-	 TV3ZbcmBwCeC1NOuq5VOSAX+huuOmx5kBIJqd7UcPTBdy13F/WREriIOxy3nEP1mWd
-	 PlPfCeaqqCD7w==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 15 Jun 2025 10:36:19 +0200
-Subject: [PATCH net-next 2/2] net: airoha: Differentiate hwfd buffer size
- for QDMA0 and QDMA1
+	s=arc-20240116; t=1749977186; c=relaxed/simple;
+	bh=AftlQEL6Khk/DC4qbPUaIfYSZ4Qv4tGnW7qwvZaILKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YjUQyvqefFhBgP0uREGZUN9x4VqGGfwWyK1peyGtCMGr6Z4j+NdYSG6UonUaFILdHAQFAyHDylClxI9U0di5BUwT6M8RH7wQAjZxsRJD0WHwCsPiOpzowmMAoI+8E9uDBZy72MwJNJSaqufP28T/UryNeIohCMUusy92yXVRZCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=imNgtVcC; arc=none smtp.client-ip=134.0.28.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
+	by mxout4.routing.net (Postfix) with ESMTP id B7DF910075B;
+	Sun, 15 Jun 2025 08:46:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1749977174;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=O65L2t9W8ZXWygRCA4KnSeEpTHiZlvT4O3mUer1lJck=;
+	b=imNgtVcCO4Vp3y3WVt/v3OiKo0YQxYEuqOKRxNtOhTHIOLUPCoANNKaLdPJI0L7zlXnbt0
+	gAD0C5S5iLdnKXnsoVBnS2O1/8XR657NZhREwQ+foJURHJrKir4TbK5lAQFHU4sNu82qtY
+	lZ534FVtYZdVs9GuLROpILnABI0YeUs=
+Received: from frank-u24.. (fttx-pool-217.61.157.124.bambit.de [217.61.157.124])
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 772AF1226B2;
+	Sun, 15 Jun 2025 08:46:14 +0000 (UTC)
+From: Frank Wunderlich <linux@fw-web.de>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: [PATCH v2] net: ethernet: mtk_eth_soc: support named IRQs
+Date: Sun, 15 Jun 2025 10:45:19 +0200
+Message-ID: <20250615084521.32329-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250615-airoha-hw-num-desc-v1-2-8f88daa4abd7@kernel.org>
-References: <20250615-airoha-hw-num-desc-v1-0-8f88daa4abd7@kernel.org>
-In-Reply-To: <20250615-airoha-hw-num-desc-v1-0-8f88daa4abd7@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-In oreder to reduce the required hwfd buffers queue size for QDMA1,
-differentiate hwfd buffer size for QDMA0 and QDMA1 and use 2KB for QDMA0
-and 1KB for QDMA1.
+From: Frank Wunderlich <frank-w@public-files.de>
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Add named interrupts and keep index based fallback for exiting devicetrees.
+
+Currently only rx and tx IRQs are defined to be used with mt7988, but
+later extended with RSS/LRO support.
+
+Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+v2:
+- move irqs loading part into own helper function
+- reduce indentation
+- place mtk_get_irqs helper before the irq_handler (note for simon)
+---
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 39 +++++++++++++++------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 1b7fd7ee0cbf3e1f7717110c70e9c5183fdd93d4..bf8eec1c96ebf642150befaa9c12ca02e82a29bb 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1068,14 +1068,15 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 	int size, index, num_desc = HW_DSCP_NUM;
- 	struct airoha_eth *eth = qdma->eth;
- 	int id = qdma - &eth->qdma[0];
-+	u32 status, buf_size;
- 	dma_addr_t dma_addr;
- 	const char *name;
--	u32 status;
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index b76d35069887..81ae8a6fe838 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -3337,6 +3337,30 @@ static void mtk_tx_timeout(struct net_device *dev, unsigned int txqueue)
+ 	schedule_work(&eth->pending_work);
+ }
  
- 	name = devm_kasprintf(eth->dev, GFP_KERNEL, "qdma%d-buf", id);
- 	if (!name)
- 		return -ENOMEM;
++static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
++{
++	int i;
++
++	eth->irq[1] = platform_get_irq_byname(pdev, "tx");
++	eth->irq[2] = platform_get_irq_byname(pdev, "rx");
++	if (eth->irq[1] >= 0 && eth->irq[2] >= 0)
++		return 0;
++
++	for (i = 0; i < 3; i++) {
++		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
++			eth->irq[i] = eth->irq[0];
++		else
++			eth->irq[i] = platform_get_irq(pdev, i);
++
++		if (eth->irq[i] < 0) {
++			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
++			return -ENXIO;
++		}
++	}
++
++	return 0;
++}
++
+ static irqreturn_t mtk_handle_irq_rx(int irq, void *_eth)
+ {
+ 	struct mtk_eth *eth = _eth;
+@@ -5106,17 +5130,10 @@ static int mtk_probe(struct platform_device *pdev)
+ 		}
+ 	}
  
-+	buf_size = id ? AIROHA_MAX_PACKET_SIZE / 2 : AIROHA_MAX_PACKET_SIZE;
- 	index = of_property_match_string(eth->dev->of_node,
- 					 "memory-region-names", name);
- 	if (index >= 0) {
-@@ -1096,9 +1097,9 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 		/* Compute the number of hw descriptors according to the
- 		 * reserved memory size and the payload buffer size
- 		 */
--		num_desc = rmem->size / AIROHA_MAX_PACKET_SIZE;
-+		num_desc = rmem->size / buf_size;
- 	} else {
--		size = AIROHA_MAX_PACKET_SIZE * num_desc;
-+		size = buf_size * num_desc;
- 		if (!dmam_alloc_coherent(eth->dev, size, &dma_addr,
- 					 GFP_KERNEL))
- 			return -ENOMEM;
-@@ -1111,9 +1112,10 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 		return -ENOMEM;
- 
- 	airoha_qdma_wr(qdma, REG_FWD_DSCP_BASE, dma_addr);
-+	/* QDMA0: 2KB. QDMA1: 1KB */
- 	airoha_qdma_rmw(qdma, REG_HW_FWD_DSCP_CFG,
- 			HW_FWD_DSCP_PAYLOAD_SIZE_MASK,
--			FIELD_PREP(HW_FWD_DSCP_PAYLOAD_SIZE_MASK, 0));
-+			FIELD_PREP(HW_FWD_DSCP_PAYLOAD_SIZE_MASK, !!id));
- 	airoha_qdma_rmw(qdma, REG_FWD_DSCP_LOW_THR, FWD_DSCP_LOW_THR_MASK,
- 			FIELD_PREP(FWD_DSCP_LOW_THR_MASK, 128));
- 	airoha_qdma_rmw(qdma, REG_LMGR_INIT_CFG,
-
+-	for (i = 0; i < 3; i++) {
+-		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
+-			eth->irq[i] = eth->irq[0];
+-		else
+-			eth->irq[i] = platform_get_irq(pdev, i);
+-		if (eth->irq[i] < 0) {
+-			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
+-			err = -ENXIO;
+-			goto err_wed_exit;
+-		}
+-	}
++	err = mtk_get_irqs(pdev, eth);
++	if (err)
++		goto err_wed_exit;
++
+ 	for (i = 0; i < ARRAY_SIZE(eth->clks); i++) {
+ 		eth->clks[i] = devm_clk_get(eth->dev,
+ 					    mtk_clks_source_name[i]);
 -- 
-2.49.0
+2.43.0
 
 
