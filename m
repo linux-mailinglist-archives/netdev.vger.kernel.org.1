@@ -1,151 +1,145 @@
-Return-Path: <netdev+bounces-197892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51AEADA33E
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 22:02:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17430ADA342
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 22:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D4F13AB21B
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 20:01:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C2097A4881
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 20:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B0D27E7FC;
-	Sun, 15 Jun 2025 20:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="SnQIebM+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF1926057B;
+	Sun, 15 Jun 2025 20:06:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB426193077;
-	Sun, 15 Jun 2025 20:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A002F189F56
+	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750017735; cv=none; b=t9qZyFqZm55ih2ObyqgOBuJ6WReJAbma8uxobf1CDTBjbKjACURlTvbhl0I1UrVzYoiGwyxM/L2be3+JrdMSOyqwscLAq5R+JqakMj2pmnco7X/FwLDMLXWJaJtHymV2ohbfbmlm35XhLlKS/63qZySboxDB0OgMqdVmI41j10Y=
+	t=1750017977; cv=none; b=ZP3IkMTd5968QOLmLtM+5Jn+SQLK9KorNJvuMS8X8vOeqeaUDf8CUC50pGlDAyo11rfWFlL3FV0hCCXmkeyc3zg2u03tVjvREddt6WnETNcACeVIvWGGUDMi5OzmowfPMnXQdpiUPZqiKYXnVm6QoGw66i4ZgX18KEaTEfn8Kjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750017735; c=relaxed/simple;
-	bh=vs8jb1PU/vxkiHvNerIZ+GtkHQLrmz7zneV497xt+aA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=L9a/DftrJNw2GleVupBQQEfY29FqrXEHcbBdcGXq4hlICqRd4vSMzwsh3xbrKMJh6H8WDFgWARks8SJZcGUlNyHTwycUek1fpBGhK1+e4eR02s7E1s9qFos33/cpaMaK+ov+jRYMSpGM0Mz6fcUOEH4iLDLN0NubysLtdIqvfdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=SnQIebM+; arc=none smtp.client-ip=134.0.28.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox4.masterlogin.de (unknown [192.168.10.79])
-	by mxout3.routing.net (Postfix) with ESMTP id 6324E6022C;
-	Sun, 15 Jun 2025 20:02:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1750017729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D+pAFU9AytArnIwqdWcPlCccdu0jBWh6uQ/wP44N9Jo=;
-	b=SnQIebM+9MKdNtdv9x3At12yoE/FHiYKjhbH68HfMwBOlmVkpOuzTKRvB1Z24RYj+BPSef
-	HI+Riy+dj13SXZnMnoiCOcJHPXyn7WeqyA0HQpENSV3rHU2e/aTFyDa/Yiza/xi8bAPU+V
-	5kLMeS8lrn3noh0JkNEIu+18Og2Hv2o=
-Received: from [127.0.0.1] (fttx-pool-217.61.157.124.bambit.de [217.61.157.124])
-	by mxbox4.masterlogin.de (Postfix) with ESMTPSA id 84A6C8034B;
-	Sun, 15 Jun 2025 20:02:08 +0000 (UTC)
-Date: Sun, 15 Jun 2025 22:02:08 +0200
-From: Frank Wunderlich <linux@fw-web.de>
-To: Daniel Golle <daniel@makrotopia.org>
-CC: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, Simon Horman <horms@kernel.org>
-Subject: =?US-ASCII?Q?Re=3A_=5Bnet-next_v3_3/3=5D_net=3A_ethernet=3A_mtk=5Feth=5F?=
- =?US-ASCII?Q?soc=3A_change_code_to_skip_first_IRQ_completely?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <aE8ja1fbAtvWx2GN@pidgin.makrotopia.org>
-References: <20250615150333.166202-1-linux@fw-web.de> <20250615150333.166202-4-linux@fw-web.de> <aE8ja1fbAtvWx2GN@pidgin.makrotopia.org>
-Message-ID: <B8138460-D6EA-4142-B0D9-14C93B15D5B8@fw-web.de>
+	s=arc-20240116; t=1750017977; c=relaxed/simple;
+	bh=zeAJ25YDks9MdjPScwT5YU3TjSQqzTzZRE9qybtsQLk=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=L6//7e1BfFWRLjFLCpJfCZEsbIThLVxHYROEojKnBLwtC32QBhuBYZ+1GSVFswibnUPMBI95D7jymH9TQrxTGPC7svZZBHtdJlwwvt4YeH+lf1Yyf4Xr5XySaZs18qrcCu3Rg9f9oxr1r20dNMSYDzvbZ4kiRxOQMixeHhylrFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id DF1AC41;
+	Sun, 15 Jun 2025 13:00:46 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id L1_huhcQxvLK; Sun, 15 Jun 2025 13:00:45 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 6927784;
+	Sun, 15 Jun 2025 13:00:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 6927784
+Date: Sun, 15 Jun 2025 13:00:44 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
+To: Neal Cardwell <ncardwell@google.com>
+cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
+    stable@kernel.org
+Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
+ retransmits were sent
+In-Reply-To: <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
+Message-ID: <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
+References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
+ <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com>
+ <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mail-ID: 9b720d70-be23-44b8-94ac-4f9468184a23
+Content-Type: multipart/mixed; boundary="8323328-1509259382-1750017645=:21862"
 
-Am 15=2E Juni 2025 21:49:43 MESZ schrieb Daniel Golle <daniel@makrotopia=2E=
-org>:
->On Sun, Jun 15, 2025 at 05:03:18PM +0200, Frank Wunderlich wrote:
->> From: Frank Wunderlich <frank-w@public-files=2Ede>
->>=20
->> On SoCs without MTK_SHARED_INT capability (mt7621 + mt7628) the first
->> IRQ (eth->irq[0]) was read but never used=2E Skip reading it now too=2E
->>=20
->> Signed-off-by: Frank Wunderlich <frank-w@public-files=2Ede>
->> ---
->>  drivers/net/ethernet/mediatek/mtk_eth_soc=2Ec | 11 ++++++++---
->>  drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh |  4 ++--
->>  2 files changed, 10 insertions(+), 5 deletions(-)
->>=20
->> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc=2Ec b/drivers/ne=
-t/ethernet/mediatek/mtk_eth_soc=2Ec
->> index 9aec67c9c6d7=2E=2E4d7de282b940 100644
->> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc=2Ec
->> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc=2Ec
->> @@ -3346,10 +3346,15 @@ static int mtk_get_irqs(struct platform_device =
-*pdev, struct mtk_eth *eth)
->>  		return 0;
->> =20
->>  	for (i =3D 0; i < MTK_ETH_IRQ_MAX; i++) {
->> -		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
->> -			eth->irq[i] =3D eth->irq[MTK_ETH_IRQ_SHARED];
->> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
->> +			if (i =3D=3D 0)
->> +				eth->irq[MTK_ETH_IRQ_SHARED] =3D platform_get_irq(pdev, i);
->> +			else
->> +				eth->irq[i] =3D eth->irq[MTK_ETH_IRQ_SHARED];
->> +		} else if (i < 2)  //skip the 1st and 4th IRQ on !MTK_SHARED_INT
->
->Please use conformant comment style, ie=2E do not use '//' but always use
->'/* =2E=2E=2E */' instead, on a dedicated line=2E
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Ok,not sure if the comment should stay :)
-It was a comment for me and i forgot to remove it=2E
+--8323328-1509259382-1750017645=:21862
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
->> +			eth->irq[i] =3D platform_get_irq(pdev, i + 1);
->>  		else
->> -			eth->irq[i] =3D platform_get_irq(pdev, i);
->> +			continue;
->> =20
->>  		if (eth->irq[i] < 0) {
->>  			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
->> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh b/drivers/ne=
-t/ethernet/mediatek/mtk_eth_soc=2Eh
->> index 6b1208d05f79=2E=2Eff2ae3c80179 100644
->> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh
->> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh
->> @@ -643,8 +643,8 @@
->>  #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
->> =20
->>  #define MTK_ETH_IRQ_SHARED	0
->> -#define MTK_ETH_IRQ_TX		1
->> -#define MTK_ETH_IRQ_RX		2
->> +#define MTK_ETH_IRQ_TX		0
->> +#define MTK_ETH_IRQ_RX		1
->>  #define MTK_ETH_IRQ_MAX		3
->
->Shouldn't MAX be 1 now?
+On Tue, 10 Jun 2025, Neal Cardwell wrote:
+> On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
+> >
+> > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > >
+> > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > >
+> > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > >
+> > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > >
+> > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
+> > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > >
+> > > > > > > > Hello Neal,
+> > > > > > > >
+> > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
+> > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
+> > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
+> > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
+> > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
+> > > > > > > >
+> > > > > > > > Interestingly, the problem only presents itself when transmitting
+> > > > > > > > from Linux; receive traffic (to Linux) performs just fine:
+> > > > > > > >         ~60Mbit: Linux v6.6.85 =TX=> 10GbE -> switch -> 1GbE  -> device
+> > > > > > > >          ~1Gbit: device        =TX=>  1GbE -> switch -> 10GbE -> Linux v6.6.85
+> > > > > > > >
+> > > > > > > > Through bisection, we found this first-bad commit:
+> > > > > > > >
+> > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
+> > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
+> > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
+> 
+> Hi Eric,
+> 
+> Do you have cycles to test a proposed fix patch developed by our team?
 
-No as we still need to loop over the first 3 irqs
-on the older devicetrees=2E Or was the MAX
-intented for anything else (e=2Eg=2E array size for
-storing the sw irqs - not changed this yet,but
-imho thi should be 2 now if SHARED_INT does
-not need 3 entries)?
+Sorry for the radio silence, I just got back in town so I can do that 
+later this week.  
 
+> The attached patch should apply (with "git am") for any recent kernel
+> that has the "tcp: fix to allow timestamp undo if no retransmits were
+> sent" patch it is fixing. So you should be able to test it on top of
+> the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
+> easier.
 
-regards Frank
+I can tested on top of 6.6-stable but I have to put a production system 
+into standby in order to do that, so I will report back when I can, 
+possibly as late as Friday 6/20 because the office is closed that day and 
+I can work on it.
+ 
+> If you have cycles to rerun your iperf test, with  tcpdump, nstat, and
+> ss instrumentation, that would be fantastic!
+
+will do 
+ 
+> The patch passes our internal packetdrill test suite, including new
+> tests for this issue (based on the packetdrill scripts posted earlier
+> in this thread.
+
+Awesome thank you for all of the effort to fix this!
+
+-Eric
+
+> 
+> But it would be fantastic to directly confirm that this fixes your issue.
+> 
+> Thanks!
+> neal
+> 
+--8323328-1509259382-1750017645=:21862--
 
