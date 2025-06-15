@@ -1,358 +1,170 @@
-Return-Path: <netdev+bounces-197885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A50BCADA258
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:35:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F59ADA26F
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C91C53B0A3F
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:34:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4674D3B0C3F
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08821448D5;
-	Sun, 15 Jun 2025 15:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5269D27A448;
+	Sun, 15 Jun 2025 15:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjgdM7MV"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R3Gilx35"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0851E1E89C
-	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 15:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89298189F56;
+	Sun, 15 Jun 2025 15:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750001714; cv=none; b=H549nfypakxdTzpR0GIhAaOyO+MrH0ih2Y3hoXiyg0QKBH/phu20ORmSqkKMOPuAOZwAcj63QVC7aB+h6vHW9VA0o5AHHtRibXPvfKo3VidAnrMDgtXHF+ZhjHMcESuyNGQ7v/94onVv3GHTGVYPYIaAzYjQ/Z3trXE7O7mkGSs=
+	t=1750002069; cv=none; b=iqc9Wvhn1GA4mvBUe9vGAOG+3NJ2nmV0i9Lpg76Sxr4EwhPZHXDPBw/Xre4r9nXKcId8JzkPKhqGtq5pBk7+H2tXh0M+c1H7nmIWeFFh2Gq8Ol+peHtMc6AdnMtqFKlaRUoVi3XVqdGpCFnytXUmPS3zCR+Ma/MgP/B6JXuubdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750001714; c=relaxed/simple;
-	bh=60VIZdmWMGbBZu9/wWgCZjuRKLzWC7kYmfzvz3zPGsc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QSWNCwY2xG6qMmNlB1P3AxQhAHEdGdMv+7YBxvogbNS9LNLTCVMU/xzM9gNiRAfIGXT0XmrsThLD3/irTMMoAy/4ybRsohKXeaLm+hspZbWZlFP8GHdyjDYD+FUVgZ2lcEOqqLx0V2tqf+9HFX0Jx3bn7/fsw4qcDijiqMrJqCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjgdM7MV; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313154270bbso4042455a91.2
-        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 08:35:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750001712; x=1750606512; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PL6h4Ao0Egb3Sd1+0ixyAMgWP2wygfHs5bQbM6+WaV0=;
-        b=mjgdM7MVS4x7JcSAxNVVvcc+ph9LOYe7KD/bofFPhnnH9pSyyLbGQcrp0dmNVZ1JwW
-         BzRbap7bbTvOpVX36HckboumX3gc5d27lMmE+Shwg3JqVjiCbRCXjUu/2mvP3+ArdC1i
-         g2Hw826QlaeoGUHb2b45lY24aujh7Mh29sBVuBkFjLPoinHbrk6kxB6w540Dym2MkZTB
-         3HLdsh7YOCLm6zRb4cjyycCfVtMUJ/JSoUkDCFAdJdjER7/QQEBbIwt+/R64MXJI4V6x
-         DENBCjehSGnfljasurgMV+AObjcMLSA17lLxqXSg0vc/sQPLqjdIfjp/LmpVDEalR8vy
-         UGHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750001712; x=1750606512;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PL6h4Ao0Egb3Sd1+0ixyAMgWP2wygfHs5bQbM6+WaV0=;
-        b=NiYAsFj9SH4h96aUHf4JNob/8eKTOYwkHiUrRMsRwoEQwi1IdVD7gczhrTOemAbbMJ
-         CtGZoSoqbGaiTvcYOIBFijkzrjFZj9TlHz/PXEOnkTxLlVP7cQyipgYUgtiTPVe2t/VH
-         bCv9AYKMWihjl2RcWfn9BxSZflSOfxteHRFcq/CZgePxH9Hxqibi8kxNrxUj77Xt8ZgO
-         HsUdIGUNQeShTF9/7R7ny4inyIiAyZ9kVxpSwDpuHMSfTyHMx4Q48IiIKMSwf0cBL5hX
-         VrZCS7iD1ylnl07kS+MZ1n/+diLDUqAq8jKBQw8bvEgSLGHfuOCoAnOckGPOWLiyDVbM
-         5Tyw==
-X-Gm-Message-State: AOJu0YxcDOMTtoNgjqsXjFX7Pz6Dh+5z9Es3OKomqQMkwcEwplHAVP+1
-	RJpmXHMGmbJC+SNN6QSuFyAwa5C4QnT8RmwOwAuBCtRLILijb4aavE1PQ+QStdfCPA8fYFHAo6B
-	RKQBsxGMXHgD0d5KJNhUbJ02DJh4OOWw=
-X-Gm-Gg: ASbGncv2jrm5gGE3r6udkkVUpI4CXJPJNYTQIgPuZv/rX1Q4Jm4tIkkWaoMp80KM+84
-	cqH05i3NNbMfNBjnwFaOBey1HRlvNjPkY/DoZhzL1Eu3ALJI5n/JXjS25oX7EKoYXBVAOUlh5wb
-	VxJE97NLkH37RRLZ5pN3qHGB4TigC+HKu00vzJotns9pQbdA==
-X-Google-Smtp-Source: AGHT+IH8G/qo2f+SIfJQEwtDvY2bJgkHESriRc0KgexdcGLbGm74wDD0iB2HZgltoG/mPrfyPNJ8+XDwX8QS6260haQ=
-X-Received: by 2002:a17:90b:48cc:b0:311:a4d6:30f8 with SMTP id
- 98e67ed59e1d1-313f1c098b9mr9191679a91.13.1750001712112; Sun, 15 Jun 2025
- 08:35:12 -0700 (PDT)
+	s=arc-20240116; t=1750002069; c=relaxed/simple;
+	bh=ACD2c5XiMTl1/8iV/BJSYXEzFUIUhxeP9UcdzQGkmlY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=afAVjyeYyJuPJBkfYyoLbXQu3az8+mBGv1dtTjDuks9IjrbnlkRJ2mEodLNhs9nd2JVXx/VIsNKNmxNvGLjOwQcjiKS4o2fBm6NIvnds6AiRY9ApwqCiQGX+zVx8WFb5LKumsODOWL+vsznB4JJWO4C5yvFuiWGtzNE60ckjpos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=R3Gilx35; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55FFVssV015280;
+	Sun, 15 Jun 2025 15:40:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=FD71qapWxgJ5exCy9LbY8g0+dUBto
+	c+BFfSsKBmZ3DI=; b=R3Gilx35vzMgmM75fbGusgR41/GnI2ziMxdbUTtbCiCm6
+	8x7dELZFaAarA0OUOm+9v2UYFxpmSBBx41TuhaxAjSJ9ypLh7ncuJJOX+PJYOvY2
+	apnk2G8QVPTjBHPyjV5jQvEhNsfEjw6fnM9GWbvJGMpETTSOYpUpWLN+0Un9ZfcS
+	sjWX3qkjxAwVcTnPDAQ1aKoe7VjD1ItU6bcjzGQJ74Q+BpqORzMCNS8GH8aJYTCX
+	Ew5WQcC9hRUddsZp9727ZSXPJbDGjHRJ73WMS9SXw4djhng+sEX8FWe9o2qnY2Xa
+	6Eo9uVMv4NWyki/SRbyZtFDmim7DFGSP/06b6K67Q==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 479q8r0ddt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 15 Jun 2025 15:40:56 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55FBS88w000818;
+	Sun, 15 Jun 2025 15:40:56 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 478yh73wwk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 15 Jun 2025 15:40:56 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55FFetgA028210;
+	Sun, 15 Jun 2025 15:40:55 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 478yh73ww6-1;
+	Sun, 15 Jun 2025 15:40:55 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: netdev@vger.kernel.org, michael.chan@broadcom.com,
+        pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: alok.a.tiwari@oracle.com, darren.kenny@oracle.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] bnxt_en: Improve comment wording and error return code
+Date: Sun, 15 Jun 2025 08:40:40 -0700
+Message-ID: <20250615154051.1365631-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250613174749.406826-1-vladimir.oltean@nxp.com> <20250613174749.406826-2-vladimir.oltean@nxp.com>
-In-Reply-To: <20250613174749.406826-2-vladimir.oltean@nxp.com>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Mon, 16 Jun 2025 00:34:59 +0900
-X-Gm-Features: AX0GCFvHv_huLNviUfsx3qhPGqpfH-b3fR4kg7lXccvx5ndQuCbnoUIorOrllQ0
-Message-ID: <CAO9qdTE0jt5U_dN09kPEzu-NUCds2VY1Ch2up9RoLazsc1j49w@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] ptp: fix breakage after ptp_vclock_in_use() rework
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Yangbo Lu <yangbo.lu@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-15_07,2025-06-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
+ mlxlogscore=999 mlxscore=0 bulkscore=0 spamscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2506150115
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE1MDExNSBTYWx0ZWRfX74AnHnA6vFYi KlXrZwTASZWnCMEJy5bNsobfK0yAfE3pLENFa6ZRaYmTipPQpC7hC/fc/BEUpIeqppNNsYEx+Qd QG8xaM4yhy2wM6cHh5IODwFdaOOGOfvWtILp53u1da977g0bKZwf7nZhNcSm53hbOSTs25M4mvC
+ Vvtzu0q+wTv+TPBwCV9kSJqfofu2cCWZxwkef5oLLDADM9DR3PJqip17aut4nvnRcda8xG8cssw 7JhHhs7Xh8qf6DsfzBxzjIeyWBHbP9GHMMwCf/ZvUr5xGUEFvHqLdkKzH0+uyfnN2QfdP6Oz2da wy+yoIqBIDlaPjOlHUgRuZwFj1I8MjAvuMVrvsO6IIPhq/M8ilD6oA9woz2F1iCEVsbslo9eRYO
+ 69Yd3ptMS4jnB1C1qMGTYc4O/ZVNgoHJpGuuG1iMP5b6qAE+EDN9mE9QB4vx96NQXPN4S0NI
+X-Proofpoint-GUID: 1txj7uUi4vwW8BOU4C_S-2Cp62koCfOT
+X-Proofpoint-ORIG-GUID: 1txj7uUi4vwW8BOU4C_S-2Cp62koCfOT
+X-Authority-Analysis: v=2.4 cv=dvLbC0g4 c=1 sm=1 tr=0 ts=684ee989 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=I_VNuqamIqGh25PhsTgA:9 cc=ntf awl=host:13206
 
-Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
->
-> What is broken
-> --------------
->
-> ptp4l, and any other application which calls clock_adjtime() on a
-> physical clock, is greeted with error -EBUSY after commit 87f7ce260a3c
-> ("ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()").
->
-> Explanation for the breakage
-> ----------------------------
->
-> The blamed commit was based on the false assumption that
-> ptp_vclock_in_use() callers already test for n_vclocks prior to calling
-> this function.
->
-> This is notably incorrect for the code path below, in which there is, in
-> fact, no n_vclocks test:
->
-> ptp_clock_adjtime()
-> -> ptp_clock_freerun()
->    -> ptp_vclock_in_use()
->
-> The result is that any clock adjustment on any physical clock is now
-> impossible. This is _despite_ there not being any vclock over this
-> physical clock.
->
-> $ ptp4l -i eno0 -2 -P -m
-> ptp4l[58.425]: selected /dev/ptp0 as PTP clock
-> [   58.429749] ptp: physical clock is free running
-> ptp4l[58.431]: Failed to open /dev/ptp0: Device or resource busy
-> failed to create a clock
-> $ cat /sys/class/ptp/ptp0/n_vclocks
-> 0
->
-> The patch makes the ptp_vclock_in_use() function say "if it's not a
-> virtual clock, then this physical clock does have virtual clocks on
-> top".
->
-> Then ptp_clock_freerun() uses this information to say "this physical
-> clock has virtual clocks on top, so it must stay free-running".
->
-> Then ptp_clock_adjtime() uses this information to say "well, if this
-> physical clock has to be free-running, I can't do it, return -EBUSY".
->
-> Simply put, ptp_vclock_in_use() cannot be simplified so as to remove the
-> test whether vclocks are in use.
->
-> What did the blamed commit intend to fix
-> ----------------------------------------
->
-> The blamed commit presents a lockdep warning stating "possible recursive
-> locking detected", with the n_vclocks_store() and ptp_clock_unregister()
-> functions involved.
->
-> The recursive locking seems this:
-> n_vclocks_store()
-> -> mutex_lock_interruptible(&ptp->n_vclocks_mux) // 1
-> -> device_for_each_child_reverse(..., unregister_vclock)
->    -> unregister_vclock()
->       -> ptp_vclock_unregister()
->          -> ptp_clock_unregister()
->             -> ptp_vclock_in_use()
->                -> mutex_lock_interruptible(&ptp->n_vclocks_mux) // 2
->
-> The issue can be triggered by creating and then deleting vclocks:
-> $ echo 2 > /sys/class/ptp/ptp0/n_vclocks
-> $ echo 0 > /sys/class/ptp/ptp0/n_vclocks
->
-> But note that in the original stack trace, the address of the first lock
-> is different from the address of the second lock. This is because at
-> step 1 marked above, &ptp->n_vclocks_mux is the lock of the parent
-> (physical) PTP clock, and at step 2, the lock is of the child (virtual)
-> PTP clock. They are different locks of different devices.
->
-> In this situation there is no real deadlock, the lockdep warning is
-> caused by the fact that the mutexes have the same lock class on both the
-> parent and the child. Functionally it is fine.
->
-> Proposed alternative solution
-> -----------------------------
->
-> We must reintroduce the body of ptp_vclock_in_use() mostly as it was
-> structured prior to the blamed commit, but avoid the lockdep warning.
->
-> Based on the fact that vclocks cannot be nested on top of one another
-> (ptp_is_attribute_visible() hides n_vclocks for virtual clocks), we
-> already know that ptp->n_vclocks is zero for a virtual clock. And
-> ptp->is_virtual_clock is a runtime invariant, established at
-> ptp_clock_register() time and never changed. There is no need to
-> serialize on any mutex in order to read ptp->is_virtual_clock, and we
-> take advantage of that by moving it outside the lock.
->
-> Thus, virtual clocks do not need to acquire &ptp->n_vclocks_mux at
-> all, and step 2 in the code walkthrough above can simply go away.
-> We can simply return false to the question "ptp_vclock_in_use(a virtual
-> clock)".
->
-> Other notes
-> -----------
->
-> Releasing &ptp->n_vclocks_mux before ptp_vclock_in_use() returns
-> execution seems racy, because the returned value can become stale as
-> soon as the function returns and before the return value is used (i.e.
-> n_vclocks_store() can run any time). The locking requirement should
-> somehow be transferred to the caller, to ensure a longer life time for
-> the returned value, but this seems out of scope for this severe bug fix.
->
-> Because we are also fixing up the logic from the original commit, there
-> is another Fixes: tag for that.
->
+Improved wording and grammar in several comments for clarity.
+  "the must belongs" -> "it must belong"
+  "mininum" -> "minimum"
+  "fileds" -> "fields"
 
-Thanks for quickly finding the part I missed!
+Replaced return -1 with -EINVAL in hwrm_ring_alloc_send_msg()
+to return a proper error code.
 
-As you said, I confirmed that adjtime and settime functions do not work
-properly due to this commit.
+These changes enhance code readability and consistent error handling.
 
-However, I don't think it is appropriate to fix ptp_vclock_in_use().
-I agree that ptp->n_vclocks should be checked in the path where
-ptp_clock_freerun() is called, but there are many drivers that do not
-have any contact with ptp->n_vclocks in the path where
-ptp_clock_unregister() is called.
-
-The reason I removed the ptp->n_vclocks check logic from the
-ptp_vclock_in_use() function is to prevent false positives from lockdep,
-but also to prevent the performance overhead caused by locking
-ptp->n_vclocks_mux and checking ptp->n_vclocks when calling
-ptp_vclock_in_use() from a driver that has nothing to do with
-ptp->n_vclocks.
-
-Therefore, I think it would be appropriate to modify ptp_clock_freerun()
-like this instead of ptp_vclock_in_use():
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
- drivers/ptp/ptp_private.h | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c       | 4 ++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c    | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index 528d86a33f37..abd99087f0ca 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -104,10 +104,20 @@ static inline bool ptp_vclock_in_use(struct
-ptp_clock *ptp)
- /* Check if ptp clock shall be free running */
- static inline bool ptp_clock_freerun(struct ptp_clock *ptp)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 869580b6f70d..00a60b2b90c4 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -1810,7 +1810,7 @@ static struct net_device *bnxt_get_pkt_dev(struct bnxt *bp, u16 cfa_code)
  {
-+   bool ret = false;
-+
-    if (ptp->has_cycles)
--       return false;
-+       return ret;
-+
-+   if (mutex_lock_interruptible(&ptp->n_vclocks_mux))
-+       return true;
-+
-+   if (ptp_vclock_in_use(ptp) && ptp->n_vclocks)
-+       ret = true;
-+
-+   mutex_unlock(&ptp->n_vclocks_mux);
-
--   return ptp_vclock_in_use(ptp);
-+   return ret;
+ 	struct net_device *dev = bnxt_get_vf_rep(bp, cfa_code);
+ 
+-	/* if vf-rep dev is NULL, the must belongs to the PF */
++	/* if vf-rep dev is NULL, it must belong to the PF */
+ 	return dev ? dev : bp->dev;
  }
-
- extern const struct class ptp_class;
+ 
+@@ -7116,7 +7116,7 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
+ 	default:
+ 		netdev_err(bp->dev, "hwrm alloc invalid ring type %d\n",
+ 			   ring_type);
+-		return -1;
++		return -EINVAL;
+ 	}
+ 
+ 	resp = hwrm_req_hold(bp, req);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+index 5ddddd89052f..bc0d80356568 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+@@ -823,7 +823,7 @@ static int bnxt_sriov_enable(struct bnxt *bp, int *num_vfs)
+ 	int tx_ok = 0, rx_ok = 0, rss_ok = 0;
+ 	int avail_cp, avail_stat;
+ 
+-	/* Check if we can enable requested num of vf's. At a mininum
++	/* Check if we can enable requested num of vf's. At a minimum
+ 	 * we require 1 RX 1 TX rings for each VF. In this minimum conf
+ 	 * features like TPA will not be available.
+ 	 */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+index d2ca90407cce..0599d3016224 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+@@ -1316,7 +1316,7 @@ static int bnxt_tc_get_decap_handle(struct bnxt *bp, struct bnxt_tc_flow *flow,
+ 
+ 	/* Check if there's another flow using the same tunnel decap.
+ 	 * If not, add this tunnel to the table and resolve the other
+-	 * tunnel header fileds. Ignore src_port in the tunnel_key,
++	 * tunnel header fields. Ignore src_port in the tunnel_key,
+ 	 * since it is not required for decap filters.
+ 	 */
+ 	decap_key->tp_src = 0;
+@@ -1410,7 +1410,7 @@ static int bnxt_tc_get_encap_handle(struct bnxt *bp, struct bnxt_tc_flow *flow,
+ 
+ 	/* Check if there's another flow using the same tunnel encap.
+ 	 * If not, add this tunnel to the table and resolve the other
+-	 * tunnel header fileds
++	 * tunnel header fields
+ 	 */
+ 	encap_node = bnxt_tc_get_tunnel_node(bp, &tc_info->encap_table,
+ 					     &tc_info->encap_ht_params,
 -- 
+2.47.1
 
-I tested this patch with test.c and confirmed that
-ptp_clock_{adj,set}time() works correctly again after applying this patch.
-
-test.c:
-```c
-// gcc -o test test.c -lrt
-
-#define _GNU_SOURCE
-#include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
-#include <math.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/timex.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <linux/ptp_clock.h>
-
-static clockid_t get_clockid(int fd)
-{
-#define CLOCKFD 3
-#define FD_TO_CLOCKID(fd)   ((~(clockid_t) (fd) << 3) | CLOCKFD)
-    return FD_TO_CLOCKID(fd);
-}
-
-int main() {
-    int fd = open("/dev/ptp0", O_RDWR);
-    clockid_t clockid = get_clockid(fd);
-    struct timex tx;
-    struct timespec ts;
-
-    memset(&tx, 0, sizeof(tx));
-    tx.modes = ADJ_OFFSET;
-    tx.time.tv_sec = 0;
-    tx.time.tv_usec = 0;
-
-    clock_adjtime(clockid, &tx);
-
-    ts.tv_sec = 0;
-    ts.tv_nsec = 0;
-
-    clock_settime(clockid, &ts);
-
-    return 0;
-}
-```
-
-> Fixes: 87f7ce260a3c ("ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()")
-> Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  drivers/ptp/ptp_private.h | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-> index 528d86a33f37..a6aad743c282 100644
-> --- a/drivers/ptp/ptp_private.h
-> +++ b/drivers/ptp/ptp_private.h
-> @@ -98,7 +98,27 @@ static inline int queue_cnt(const struct timestamp_event_queue *q)
->  /* Check if ptp virtual clock is in use */
->  static inline bool ptp_vclock_in_use(struct ptp_clock *ptp)
->  {
-> -       return !ptp->is_virtual_clock;
-> +       bool in_use = false;
-> +
-> +       /* Virtual clocks can't be stacked on top of virtual clocks.
-> +        * Avoid acquiring the n_vclocks_mux on virtual clocks, to allow this
-> +        * function to be called from code paths where the n_vclocks_mux of the
-> +        * parent physical clock is already held. Functionally that's not an
-> +        * issue, but lockdep would complain, because they have the same lock
-> +        * class.
-> +        */
-> +       if (ptp->is_virtual_clock)
-> +               return false;
-> +
-> +       if (mutex_lock_interruptible(&ptp->n_vclocks_mux))
-> +               return true;
-> +
-> +       if (ptp->n_vclocks)
-> +               in_use = true;
-> +
-> +       mutex_unlock(&ptp->n_vclocks_mux);
-> +
-> +       return in_use;
->  }
->
->  /* Check if ptp clock shall be free running */
-> --
-> 2.43.0
->
-
-Regards,
-
-Jeongjun Park
 
