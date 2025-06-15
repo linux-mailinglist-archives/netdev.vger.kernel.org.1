@@ -1,145 +1,121 @@
-Return-Path: <netdev+bounces-197893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17430ADA342
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 22:06:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 471C6ADA343
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 22:08:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C2097A4881
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 20:05:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 640EA3ADC18
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 20:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF1926057B;
-	Sun, 15 Jun 2025 20:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2C3262FD4;
+	Sun, 15 Jun 2025 20:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r00YtgYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A002F189F56
-	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0050E189F56
+	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750017977; cv=none; b=ZP3IkMTd5968QOLmLtM+5Jn+SQLK9KorNJvuMS8X8vOeqeaUDf8CUC50pGlDAyo11rfWFlL3FV0hCCXmkeyc3zg2u03tVjvREddt6WnETNcACeVIvWGGUDMi5OzmowfPMnXQdpiUPZqiKYXnVm6QoGw66i4ZgX18KEaTEfn8Kjs=
+	t=1750018093; cv=none; b=EOG+weS4HblW01mTOYTYOPFCwwiBOClldm5CwhyNFv/hdRlAUX06gXnxYot5Y5YtK/8E5/NzL5cAoCfN+kqzpclbLMMalOt8kz+Qei3PFrxUUEsrGSZqA1ccQ7NW2xKcFct4r8qndhm3+DhHPDGYZcbqJbDj/mfSYOk0q6HYI3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750017977; c=relaxed/simple;
-	bh=zeAJ25YDks9MdjPScwT5YU3TjSQqzTzZRE9qybtsQLk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=L6//7e1BfFWRLjFLCpJfCZEsbIThLVxHYROEojKnBLwtC32QBhuBYZ+1GSVFswibnUPMBI95D7jymH9TQrxTGPC7svZZBHtdJlwwvt4YeH+lf1Yyf4Xr5XySaZs18qrcCu3Rg9f9oxr1r20dNMSYDzvbZ4kiRxOQMixeHhylrFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
-Received: from localhost (localhost [127.0.0.1])
-	by mx.ewheeler.net (Postfix) with ESMTP id DF1AC41;
-	Sun, 15 Jun 2025 13:00:46 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id L1_huhcQxvLK; Sun, 15 Jun 2025 13:00:45 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx.ewheeler.net (Postfix) with ESMTPSA id 6927784;
-	Sun, 15 Jun 2025 13:00:45 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 6927784
-Date: Sun, 15 Jun 2025 13:00:44 -0700 (PDT)
-From: Eric Wheeler <netdev@lists.ewheeler.net>
-To: Neal Cardwell <ncardwell@google.com>
-cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
-    stable@kernel.org
-Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
- retransmits were sent
-In-Reply-To: <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
-Message-ID: <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
-References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
- <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com>
- <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
+	s=arc-20240116; t=1750018093; c=relaxed/simple;
+	bh=uMOPMEFm6zkUEwkTzRTS07bcGtVy0E9xLhozA2iAlG8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ik71vtOEaS+IjH9QL5E/LAxO68u6jsBfHTIRm9YBhThgXOpC+CEhYQpU+bsTKYCHV+/40VsaNZVxk98cmr1pOS9TiwcHh3Zl6lFyLKKzSq0CZw41o8xOhDoYd3upfm2n25pX3B+u5lPfnUo6hCOFzzNyptc83XjNNo5LVDrH0oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r00YtgYa; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74868e73f4fso2853330b3a.3
+        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 13:08:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750018091; x=1750622891; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/A+Xw7FOtOaP2Wv05uKtCUa//XsXy8YvXBf7/4De0I4=;
+        b=r00YtgYa/O4OWV7QmEG2L+PU9WgnC8BmKVurGH9XYUkx5YP4q72NZk3n/mqbRBW+yN
+         Fvlzf4CjBSuPeFx9M40vZNmfYT5pQ7mvDTBSjfcekIIBZxZfAH5GKPAOjNOn0mvcKnGk
+         ErNYzN/jAH0sYOLD6Ob0Pt3UGLS/73PKWWaItIytvXeQ2bXfrgs/plCG4VsJDmZ2qLTH
+         Tkt1tsYgniYym/y80WswPSgv8rXoZgX3fZ0ov54c/gQCAhkmVIPXrZK1QT6xhe6SYwrU
+         YFTwOXeG05k7payRYEJKTtTKeQFmtGo+FcmWTaL9OFS2Yp+iWqwFxlYXcd1delysI1Zh
+         Zjew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750018091; x=1750622891;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/A+Xw7FOtOaP2Wv05uKtCUa//XsXy8YvXBf7/4De0I4=;
+        b=bWNB69iGmxRF0qWubhF62xxtliCRf5Sk65CQmhzU77vuCRo77W/EBQfQIOWrqNgAEH
+         nQHk0Y0sAwIHowfOdAZJa15NaaBdIGgiqSXB2wX+93UIJINBPgXFWrdXsXBglFwXAZZL
+         7VUR4f3YnArtSlOF5DpYMb36mJnzWEIcZ/F4gODFZ+rNr2PvnqFwvj4aljI80ntLO9Fe
+         2d9y+CDAwvMLMJNmW52KDw/qmz1WguYhSupToa6vNvVBkE3zvVD43oTceb/XmvFqVPn9
+         ko/OkUPBF+gaEc+a7mQnydSgepiF2T36OZoG1u6T0qNzBrpGZBDoIZ2w3rWJwZRG7NmP
+         0+dw==
+X-Gm-Message-State: AOJu0YyqXqABnkeRXp9LRRFYBCnUN1VLHBawE1VRHGNQyWnNjltWjakb
+	3tQvYToIhiGsmhagy5A52TKbs38DTBVvfOBdhhpz4Pldk3BWNNxu/SG8qPBycW+KMJkoeQGp1iM
+	I0SmxqYPD8Gjmg8YZ0i9+x+SFf9z/u65SqCSYSiXvyxjRP6sw/RZr3LBsLnHd/ugRBzHiyDFSOH
+	iuWOTfynNojrR+jPfe/siS1DH/0VBzMEYmpbYyyv/4T3yLSTzxNPhxGKbqTSYmj5w=
+X-Google-Smtp-Source: AGHT+IF23fHiZFDqsUkUJTe5Jy6SuSLB12ZzYWCujHdrS7T08CwiXfZM3+F+UZSGHgkckhnF3DgNgir4mq+nA4nJCA==
+X-Received: from pgg12.prod.google.com ([2002:a05:6a02:4d8c:b0:b1f:dd75:de2a])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:258e:b0:21f:a6c9:34d with SMTP id adf61e73a8af0-21fbd473bcemr10025937637.1.1750018091208;
+ Sun, 15 Jun 2025 13:08:11 -0700 (PDT)
+Date: Sun, 15 Jun 2025 20:07:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-1509259382-1750017645=:21862"
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
+Message-ID: <20250615200733.520113-1-almasrymina@google.com>
+Subject: [PATCH net v1] net: netmem: fix skb_ensure_writable with unreadable skbs
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, willemb@google.com, sdf@fomichev.me, 
+	asml.silence@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+skb_ensure_writable should succeed when it's trying to write to the
+header of the unreadable skbs, so it doesn't need an unconditional
+skb_frags_readable check. The preceding pskb_may_pull() call will
+succeed if write_len is within the head and fail if we're trying to
+write to the unreadable payload, so we don't need an additional check.
 
---8323328-1509259382-1750017645=:21862
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Removing this check restores DSCP functionality with unreadable skbs as
+it's called from dscp_tg.
 
-On Tue, 10 Jun 2025, Neal Cardwell wrote:
-> On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
-> >
-> > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > >
-> > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > >
-> > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > >
-> > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> > > > > >
-> > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
-> > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> > > > > > > >
-> > > > > > > > Hello Neal,
-> > > > > > > >
-> > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
-> > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
-> > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
-> > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
-> > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
-> > > > > > > >
-> > > > > > > > Interestingly, the problem only presents itself when transmitting
-> > > > > > > > from Linux; receive traffic (to Linux) performs just fine:
-> > > > > > > >         ~60Mbit: Linux v6.6.85 =TX=> 10GbE -> switch -> 1GbE  -> device
-> > > > > > > >          ~1Gbit: device        =TX=>  1GbE -> switch -> 10GbE -> Linux v6.6.85
-> > > > > > > >
-> > > > > > > > Through bisection, we found this first-bad commit:
-> > > > > > > >
-> > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
-> > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
-> > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
-> 
-> Hi Eric,
-> 
-> Do you have cycles to test a proposed fix patch developed by our team?
+Cc: willemb@google.com
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Fixes: 65249feb6b3d ("net: add support for skbs with unreadable frags")
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+---
+ net/core/skbuff.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Sorry for the radio silence, I just got back in town so I can do that 
-later this week.  
-
-> The attached patch should apply (with "git am") for any recent kernel
-> that has the "tcp: fix to allow timestamp undo if no retransmits were
-> sent" patch it is fixing. So you should be able to test it on top of
-> the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
-> easier.
-
-I can tested on top of 6.6-stable but I have to put a production system 
-into standby in order to do that, so I will report back when I can, 
-possibly as late as Friday 6/20 because the office is closed that day and 
-I can work on it.
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 85fc82f72d26..d6420b74ea9c 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6261,9 +6261,6 @@ int skb_ensure_writable(struct sk_buff *skb, unsigned int write_len)
+ 	if (!pskb_may_pull(skb, write_len))
+ 		return -ENOMEM;
  
-> If you have cycles to rerun your iperf test, with  tcpdump, nstat, and
-> ss instrumentation, that would be fantastic!
-
-will do 
+-	if (!skb_frags_readable(skb))
+-		return -EFAULT;
+-
+ 	if (!skb_cloned(skb) || skb_clone_writable(skb, write_len))
+ 		return 0;
  
-> The patch passes our internal packetdrill test suite, including new
-> tests for this issue (based on the packetdrill scripts posted earlier
-> in this thread.
 
-Awesome thank you for all of the effort to fix this!
+base-commit: 5466491c9e3309ed5c7adbb8fad6e93fcc9a8fe9
+-- 
+2.50.0.rc1.591.g9c95f17f64-goog
 
--Eric
-
-> 
-> But it would be fantastic to directly confirm that this fixes your issue.
-> 
-> Thanks!
-> neal
-> 
---8323328-1509259382-1750017645=:21862--
 
