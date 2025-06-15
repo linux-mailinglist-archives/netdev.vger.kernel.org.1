@@ -1,170 +1,226 @@
-Return-Path: <netdev+bounces-197886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F59ADA26F
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:41:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8B4ADA274
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:44:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4674D3B0C3F
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39D9F188E6C6
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5269D27A448;
-	Sun, 15 Jun 2025 15:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E310B27A93B;
+	Sun, 15 Jun 2025 15:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R3Gilx35"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dA10Xkxz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89298189F56;
-	Sun, 15 Jun 2025 15:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE6917BCE;
+	Sun, 15 Jun 2025 15:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750002069; cv=none; b=iqc9Wvhn1GA4mvBUe9vGAOG+3NJ2nmV0i9Lpg76Sxr4EwhPZHXDPBw/Xre4r9nXKcId8JzkPKhqGtq5pBk7+H2tXh0M+c1H7nmIWeFFh2Gq8Ol+peHtMc6AdnMtqFKlaRUoVi3XVqdGpCFnytXUmPS3zCR+Ma/MgP/B6JXuubdU=
+	t=1750002281; cv=none; b=jdinFbuTZpfmAm137QtlK65dtnUYbRcIiwstV2+fPmh6EAWRaR98ae7myZtdFzukjqoQ0R6YElPNwK8b9Kw00gLgtFklZHEXdLf7jBrOGcOowcWTGHDdrMN2rY4y9+PABKfgV/nWeSalud3cgi4B9n5c58EeSwD1yNAeWC/PsV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750002069; c=relaxed/simple;
-	bh=ACD2c5XiMTl1/8iV/BJSYXEzFUIUhxeP9UcdzQGkmlY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=afAVjyeYyJuPJBkfYyoLbXQu3az8+mBGv1dtTjDuks9IjrbnlkRJ2mEodLNhs9nd2JVXx/VIsNKNmxNvGLjOwQcjiKS4o2fBm6NIvnds6AiRY9ApwqCiQGX+zVx8WFb5LKumsODOWL+vsznB4JJWO4C5yvFuiWGtzNE60ckjpos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=R3Gilx35; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55FFVssV015280;
-	Sun, 15 Jun 2025 15:40:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=FD71qapWxgJ5exCy9LbY8g0+dUBto
-	c+BFfSsKBmZ3DI=; b=R3Gilx35vzMgmM75fbGusgR41/GnI2ziMxdbUTtbCiCm6
-	8x7dELZFaAarA0OUOm+9v2UYFxpmSBBx41TuhaxAjSJ9ypLh7ncuJJOX+PJYOvY2
-	apnk2G8QVPTjBHPyjV5jQvEhNsfEjw6fnM9GWbvJGMpETTSOYpUpWLN+0Un9ZfcS
-	sjWX3qkjxAwVcTnPDAQ1aKoe7VjD1ItU6bcjzGQJ74Q+BpqORzMCNS8GH8aJYTCX
-	Ew5WQcC9hRUddsZp9727ZSXPJbDGjHRJ73WMS9SXw4djhng+sEX8FWe9o2qnY2Xa
-	6Eo9uVMv4NWyki/SRbyZtFDmim7DFGSP/06b6K67Q==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 479q8r0ddt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 15 Jun 2025 15:40:56 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55FBS88w000818;
-	Sun, 15 Jun 2025 15:40:56 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 478yh73wwk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 15 Jun 2025 15:40:56 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55FFetgA028210;
-	Sun, 15 Jun 2025 15:40:55 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 478yh73ww6-1;
-	Sun, 15 Jun 2025 15:40:55 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: netdev@vger.kernel.org, michael.chan@broadcom.com,
-        pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alok.a.tiwari@oracle.com, darren.kenny@oracle.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] bnxt_en: Improve comment wording and error return code
-Date: Sun, 15 Jun 2025 08:40:40 -0700
-Message-ID: <20250615154051.1365631-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1750002281; c=relaxed/simple;
+	bh=pWRdTeTn/1OegzG4ltWn5U5SgZqMCMMLHaPU9vAtyKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ibYPepd5YRBXbIcTWpFIMClurkbJao5ZfAm/ZvbziOeH5JlIe4a7azICptpuwFUx9ya0lmmgAcrc6i7Wv78ueSda9gA2kksXbCZi/uMyEeGLp9p5Cu202/BWzN8JKevZuUzKctibGizBuNOE2r0lpPybvSI/cD8+iefcf6g8ma8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dA10Xkxz; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a53359dea5so2437508f8f.0;
+        Sun, 15 Jun 2025 08:44:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750002275; x=1750607075; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q24V+OwPQTKaIgjR+NjdUiOeSoG4NNmYTDA2NhEIjAI=;
+        b=dA10XkxzSI/fHK2luyIGGkG5SXbzX3TwJIiqgInP3v9mHgZxVn12OUeGPFaUBgvJr2
+         OyNOGYYh6JofO1+9Sevl/6F/vmn4RetkQG0F88RTgImmPcCMN/EYPyxX2opJN3HMUbhM
+         5LFmqqckPGtBtIB/a9bvjEGEAOP90OjrcM0/HeIZk6x/BxxVtZ3XuPJ5pwXGhgl/P1c1
+         ofxhNqIN5xBmGOE5LhYHa9z2w1MTyF4o2JX+7ucQVa00wvvMtHOzO/U7lIYESLfBeiAI
+         jkuoLniSOEcDjhQgeu7u8dynaKXxf4ovotMb1bzZzTbUycbGmUXv+cQzB/iH686UAK9U
+         v95w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750002275; x=1750607075;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q24V+OwPQTKaIgjR+NjdUiOeSoG4NNmYTDA2NhEIjAI=;
+        b=nxOElu68sjHS40dc0nmGHT7fzU4U5wY0Ye5M9KPtsSBAkueENBCVbRhYkr3QDyM6gF
+         ADWgUa22R1xAhxvT8Dxk+NFVIycme30ECD52v7BmZeRXLbKSRgpTdr37pFS5q/4/D9Q0
+         Iit5KjRBbI3MVvvDK8VbgGbfL3zD2TEA6RTybM41ty7k5T8JfmLMVd2/w3m7DY6CNzXM
+         FzMMIbDy4bUV+nJGIe/pQ+NncrCWGxBH4Mjkpd6GD2qVBNxcjwlUFSWiLScvEzfcXrqC
+         +0rzSWqiAkhg+Vl52mOaFVkzul+1+6nAVqCZAYjSbGnR2pFWwYuGUf0UYqoM71ts88fN
+         DQ9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUqF+sH0BVxoSz1a3XFrl7qQL4akjOoZbMWdGX/Ddq4j5LDUoM+PzuQKWayyfGC0T0I2S3OYRZci8r4TxXC9rGK@vger.kernel.org, AJvYcCUqTjPyRE+TK/FFK3GKhL344S/4sVWMkUmxSYAvlD3GSg0MZ475BaEVtqIauLFWyW4zk8M=@vger.kernel.org, AJvYcCVSX+jCxW2UyvH4mz3DNSDOFe2W/GhcncI+1b1LWaI2oRrsbhiomGHFHeomsYOW9tmebjO0rEyrIqZbTn6U@vger.kernel.org, AJvYcCWGDN9btWAiDc5xwf1tmQCFkCnnX8osaIN/5FecQvSrdJslsmQgXNI9Tewfx5/croosdz25RBxj@vger.kernel.org, AJvYcCX51SRTh1eye9qHU7BL16tUYjXHfIqix8+IrbPmtvEoP3Ckq1oEsj3kR+TJ8EDhP1wGsPUzmLrjV1wo4A==@vger.kernel.org, AJvYcCXeNAne4/qEsjvjCFZ9+iR959uOeP2EHJ98nAdoJ4vKuv5ny3y1xdHu4aZY7efxyQnb8Rb2Ujx/vg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0/I+xzvokvfS1a2EgdZAcsURvXoH7dylCRxL9wVaQNd1Ma2Ta
+	fOTO0dQQWzGmoUCcXQBAqQQpC5Ut6cF/SMsNcOP98LvmDN1O0lXPFSezanFYHJGM66xmoeg5vBn
+	sOjj5cscxFpQ9eTvpJzm3XeDrJsjVYng=
+X-Gm-Gg: ASbGncvJxNgTmeazZsqW/ffCmJ/xCW32eyB1/lstN3sq5HKdIZLyIPSRQ4CCtfxiV3w
+	TIyBjWD2nhstLSyccafZk/4zCbXzAT7/6k0odhzwp1OGE1NjW9jvPAZRlvDvJSHn9sVP9QlKtZi
+	bPthxsaoAp5qYHhtDrv9dEmAW+PM2bj7VgFPWXxtFkRgypmtrbKyGb4A==
+X-Google-Smtp-Source: AGHT+IEVMqrf36wFDwIu+Qav+T1hxhMtiOfYIpsqMlJITLohO7pPVX7dQmL5OFhL7NsYv2qBiULo8wqoJRikRf0wek4=
+X-Received: by 2002:a05:6000:718:b0:3a5:3b63:58f0 with SMTP id
+ ffacd0b85a97d-3a57237178dmr4884718f8f.18.1750002274959; Sun, 15 Jun 2025
+ 08:44:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-15_07,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 bulkscore=0 spamscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2506150115
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE1MDExNSBTYWx0ZWRfX74AnHnA6vFYi KlXrZwTASZWnCMEJy5bNsobfK0yAfE3pLENFa6ZRaYmTipPQpC7hC/fc/BEUpIeqppNNsYEx+Qd QG8xaM4yhy2wM6cHh5IODwFdaOOGOfvWtILp53u1da977g0bKZwf7nZhNcSm53hbOSTs25M4mvC
- Vvtzu0q+wTv+TPBwCV9kSJqfofu2cCWZxwkef5oLLDADM9DR3PJqip17aut4nvnRcda8xG8cssw 7JhHhs7Xh8qf6DsfzBxzjIeyWBHbP9GHMMwCf/ZvUr5xGUEFvHqLdkKzH0+uyfnN2QfdP6Oz2da wy+yoIqBIDlaPjOlHUgRuZwFj1I8MjAvuMVrvsO6IIPhq/M8ilD6oA9woz2F1iCEVsbslo9eRYO
- 69Yd3ptMS4jnB1C1qMGTYc4O/ZVNgoHJpGuuG1iMP5b6qAE+EDN9mE9QB4vx96NQXPN4S0NI
-X-Proofpoint-GUID: 1txj7uUi4vwW8BOU4C_S-2Cp62koCfOT
-X-Proofpoint-ORIG-GUID: 1txj7uUi4vwW8BOU4C_S-2Cp62koCfOT
-X-Authority-Analysis: v=2.4 cv=dvLbC0g4 c=1 sm=1 tr=0 ts=684ee989 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=I_VNuqamIqGh25PhsTgA:9 cc=ntf awl=host:13206
+References: <20250613-deny_trampoline_structs_on_stack-v1-0-5be9211768c3@bootlin.com>
+ <20250613-deny_trampoline_structs_on_stack-v1-2-5be9211768c3@bootlin.com>
+ <20250613081150.GJ2273038@noisy.programming.kicks-ass.net>
+ <DAL9GRMH74F4.2IV0HN0NGU65X@bootlin.com> <20250613083232.GL2273038@noisy.programming.kicks-ass.net>
+ <DALA5WYA04OG.1283TZDOVLBPS@bootlin.com> <CAADnVQ+sj9XhscN9PdmTzjVa7Eif21noAUH3y1K6x5bWcL-5pg@mail.gmail.com>
+ <DAN5THWRO6KS.XXZ00IOTQZH9@bootlin.com>
+In-Reply-To: <DAN5THWRO6KS.XXZ00IOTQZH9@bootlin.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 15 Jun 2025 08:44:23 -0700
+X-Gm-Features: AX0GCFum0GptEjJNe1zyPyz2oALA4PaNl_E8ueRtmTM4_c9kw_4GcQiqb2A1p90
+Message-ID: <CAADnVQJPQNC5VaybR_GZry5YZhNcJmWSSouuTSsU1XKhDfXYwQ@mail.gmail.com>
+Subject: Re: [PATCH bpf 2/7] bpf/x86: prevent trampoline attachment when args
+ location on stack is uncertain
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Menglong Dong <imagedong@tencent.com>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Pu Lehui <pulehui@huawei.com>, Puranjay Mohan <puranjay@kernel.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Hari Bathini <hbathini@linux.ibm.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	ebpf@linuxfoundation.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
+	ppc-dev <linuxppc-dev@lists.ozlabs.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, dwarves <dwarves@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Improved wording and grammar in several comments for clarity.
-  "the must belongs" -> "it must belong"
-  "mininum" -> "minimum"
-  "fileds" -> "fields"
+On Sun, Jun 15, 2025 at 7:00=E2=80=AFAM Alexis Lothor=C3=A9
+<alexis.lothore@bootlin.com> wrote:
+>
+> On Sat Jun 14, 2025 at 12:35 AM CEST, Alexei Starovoitov wrote:
+> > On Fri, Jun 13, 2025 at 1:59=E2=80=AFAM Alexis Lothor=C3=A9
+> > <alexis.lothore@bootlin.com> wrote:
+> >>
+> >> On Fri Jun 13, 2025 at 10:32 AM CEST, Peter Zijlstra wrote:
+> >> > On Fri, Jun 13, 2025 at 10:26:37AM +0200, Alexis Lothor=C3=A9 wrote:
+>
+> [...]
+>
+> >> If I need to respin, I'll rewrite the commit message to include the de=
+tails
+> >> above.
+> >
+> > No need to respin. The cover letter is quite detailed already.
+> >
+> > But looking at the patch and this thread I think we need to agree
+> > on the long term approach to BTF, since people assume that
+> > it's a more compact dwarf and any missing information
+> > should be added to it.
+> > Like in this case special alignment case and packed attributes
+> > are not expressed in BTF and I believe they should not be.
+> > BTF is not a debug format and not a substitute for dwarf.
+> > There is no goal to express everything possible in C.
+> > It's minimal, because BTF is _practical_ description of
+> > types and data present in the kernel.
+> > I don't think the special case of packing and alignment exists
+> > in the kernel today, so the current format is sufficient.
+> > It doesn't miss anything.
+> > I think we made arm64 JIT unnecessary restrictive and now considering
+> > to make all other JITs restrictive too for hypothetical case
+> > of some future kernel functions.
+> > I feel we're going in the wrong direction.
+> > Instead we should teach pahole to sanitize BTF where functions
+> > are using this fancy alignment and packed structs.
+> > pahole can see it in dwarf and can skip emitting BTF for such
+> > functions. Then the kernel JITs on all architectures won't even
+> > see such cases.
+> >
+> > The issue was initially discovered by a selftest:
+> > https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-3-0a32fe72339e@=
+bootlin.com/
+> > that attempted to support these two types:
+> > +struct bpf_testmod_struct_arg_4 {
+> > + __u64 a;
+> > + __u64 b;
+> > +};
+> > +
+> > +struct bpf_testmod_struct_arg_5 {
+> > + __int128 a;
+> > +};
+> >
+> > The former is present in the kernel. It's more or less sockptr_t,
+> > and people want to access it for observability in tracing.
+> > The latter doesn't exist in the kernel and we cannot represent
+> > it properly in BTF without losing alignment.
+> >
+> > So I think we should go back to that series:
+> > https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-0-0a32fe72339e@=
+bootlin.com/
+> >
+> > remove __int128 selftest, but also teach pahole
+> > to recognize types that cannot be represented in BTF and
+> > don't emit them either into vmlinux or in kernel module
+> > (like in this case it was bpf_testmod.ko)
+> > I think that would be a better path forward aligned
+> > with the long term goal of BTF.
+> >
+> > And before people ask... pahole is a trusted component of the build
+> > system. We trust it just as we trust gcc, clang, linker, objtool.
+>
+> So if I understand correctly your point, it would be better to just move =
+out
+> those constraints from the JIT compilers, and just not represent those sp=
+ecial
+> cases in BTF, so that it becomes impossible to hook programs on those fun=
+ctions,
+> since they are not event present in BTF info.
+> And so:
+> - cancel this series
+> - revert the small ARM64 check about struct passed on stack
+> - update pahole to make sure that it does not encode info about this spec=
+ific
+>   kind of functions.
 
-Replaced return -1 with -EINVAL in hwrm_ring_alloc_send_msg()
-to return a proper error code.
+yes
 
-These changes enhance code readability and consistent error handling.
+> I still expect some challenges with this. AFAIU pahole uses DWARF to gene=
+rate
+> BTF, and discussions in [1] highlighted the fact that the attributes alte=
+ring
+> the structs alignment are not reliably encoded in DWARF. Maybe pahole can
+> "guess" if a struct has been altered, by doing something like
+> btf_is_struct_packed in libbpf ? As Andrii mentioned in [2], it may not b=
+e
+> able to cover all cases, but that could  be a start. If that's indeed the
+> desired direction, I can take a further look at this.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c       | 4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c    | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 869580b6f70d..00a60b2b90c4 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -1810,7 +1810,7 @@ static struct net_device *bnxt_get_pkt_dev(struct bnxt *bp, u16 cfa_code)
- {
- 	struct net_device *dev = bnxt_get_vf_rep(bp, cfa_code);
- 
--	/* if vf-rep dev is NULL, the must belongs to the PF */
-+	/* if vf-rep dev is NULL, it must belong to the PF */
- 	return dev ? dev : bp->dev;
- }
- 
-@@ -7116,7 +7116,7 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
- 	default:
- 		netdev_err(bp->dev, "hwrm alloc invalid ring type %d\n",
- 			   ring_type);
--		return -1;
-+		return -EINVAL;
- 	}
- 
- 	resp = hwrm_req_hold(bp, req);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index 5ddddd89052f..bc0d80356568 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -823,7 +823,7 @@ static int bnxt_sriov_enable(struct bnxt *bp, int *num_vfs)
- 	int tx_ok = 0, rx_ok = 0, rss_ok = 0;
- 	int avail_cp, avail_stat;
- 
--	/* Check if we can enable requested num of vf's. At a mininum
-+	/* Check if we can enable requested num of vf's. At a minimum
- 	 * we require 1 RX 1 TX rings for each VF. In this minimum conf
- 	 * features like TPA will not be available.
- 	 */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-index d2ca90407cce..0599d3016224 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-@@ -1316,7 +1316,7 @@ static int bnxt_tc_get_decap_handle(struct bnxt *bp, struct bnxt_tc_flow *flow,
- 
- 	/* Check if there's another flow using the same tunnel decap.
- 	 * If not, add this tunnel to the table and resolve the other
--	 * tunnel header fileds. Ignore src_port in the tunnel_key,
-+	 * tunnel header fields. Ignore src_port in the tunnel_key,
- 	 * since it is not required for decap filters.
- 	 */
- 	decap_key->tp_src = 0;
-@@ -1410,7 +1410,7 @@ static int bnxt_tc_get_encap_handle(struct bnxt *bp, struct bnxt_tc_flow *flow,
- 
- 	/* Check if there's another flow using the same tunnel encap.
- 	 * If not, add this tunnel to the table and resolve the other
--	 * tunnel header fileds
-+	 * tunnel header fields
- 	 */
- 	encap_node = bnxt_tc_get_tunnel_node(bp, &tc_info->encap_table,
- 					     &tc_info->encap_ht_params,
--- 
-2.47.1
-
+so be it. If syzbot was taught to fuzz dwarf I'm sure it would
+have exposed hundreds of bugs in the format itself and compilers,
+but since such convoluted constructs are not present in the kernel
+source code it's not a concern.
 
