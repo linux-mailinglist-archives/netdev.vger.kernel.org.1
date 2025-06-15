@@ -1,49 +1,51 @@
-Return-Path: <netdev+bounces-197878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01EB8ADA231
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:04:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D8EADA232
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA91216DCA2
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:03:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0181216DC67
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FD38633A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DD3195FE8;
 	Sun, 15 Jun 2025 15:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="rD/4WxGJ"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="J8Yqe5gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
+Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D738629A1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BEB1DFCE;
 	Sun, 15 Jun 2025 15:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749999832; cv=none; b=uF960+U6JUoOHRK35BXaWWgNE2H5hAwglDGZzKUl1rLfAqYtsmknyhUg3krNFZd15icPfmJi7FMc+jEZrptQDboXLsr+7bfRBjvJ6+v2VKwBpqFa6SNz0UR8bKFqyK3zF2g1TBcG+ZPKC6YapL0J5tg7J/qafJvRmFeNqT5D6+Q=
+	t=1749999833; cv=none; b=Xv20A1blMxQnulGIMefVXVDHiTRJkCM2sFgloRpJVtjAUY54sPSQq0IuuzKTMzmkBneCtIpZMRck/xF3gM7fJwqfRFfyoypiIJ6lZ7rk6kcxmZUNaUAHcaxwg2dyOTh+dCM/wX2RtUHae59Bl1rrg/HciBHxgCX72+U7R9fHKy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749999832; c=relaxed/simple;
-	bh=1mXX8LN1g+EmMlTpG2st0pc6s7pghy57appvz+tt4io=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SqhchDd+ZJe+3vZRfP5LFtq5nM7GNeVMDxwoNqpnnaMFnN48Tm2DNoAW9MvOb4RZQdVrh+b4mBr3VZeAFGTzwUK3OtaWEY+X/eenFcLelfYZe5gQ4wKWrByxDoE7CNGI9XXNy1ymg8SSFQl5upCh8UYvj/nak6lc4LxZ+3ZWASU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=rD/4WxGJ; arc=none smtp.client-ip=134.0.28.9
+	s=arc-20240116; t=1749999833; c=relaxed/simple;
+	bh=ZFr4QXz7uBQKE0XCTjQ03VCU73ORvAP4grrovwS4gDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FZGHJXL2jJFXcC23/IO3ZeKuID2PazyxplJ4BKdoNXFWNjYIKsa5qWJ2kPaeStrn+q6fIDL0sHgKYRD8Z07W2W4HRQk9qDfFBKSxvaera4oJqdRiywVIuFbHsqsrEdKE6QrxV3EbCc0NLWgWgRlC1lS6Os6hWdte6h3nNJAXzzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=J8Yqe5gw; arc=none smtp.client-ip=134.0.28.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
 Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout4.routing.net (Postfix) with ESMTP id A183F1005F6;
+	by mxout3.routing.net (Postfix) with ESMTP id D94FD601A6;
 	Sun, 15 Jun 2025 15:03:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1749999828;
+	s=20200217; t=1749999829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dEj5v7dm6ltMlbxpUVJFd0IqvlQNf25lGrkWUdekOWc=;
-	b=rD/4WxGJjG8Nxlm6Abii5nf4oHv828cFU2QyXiqmgQ/hN95IXcTjdthUNVp/LAF1jf2PCT
-	/YVSeRpsfzGAAitOCJ0QDewA4ILE1uzqo45jI53r0tSv3wXU7E4iAnCtOT+Gdet9sg+fOG
-	DCkY6FZFf68MckDhqCivbmhYjGW/rEg=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aixnyQqpwBBGhHOV75XTz3/geaACNpR9Nv0eB+S8FK0=;
+	b=J8Yqe5gwIPPcjzAuk6Glt67DYlSm3Akx7NALxfTtUJ3av+yOpI8e9+oiW+8cUnhmb2Wm8A
+	RYEy2ZBEupAiQVhN+P/TA5F/5S9xF67C+Mk1cKeIYc3a/w1qEjYUW+q1VsQk1TiEUGimU0
+	0FbU8dlJ9qnkYHRXCmWhcVb4Drg8trc=
 Received: from frank-u24.. (fttx-pool-217.61.157.124.bambit.de [217.61.157.124])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 57EDA1226A7;
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id A0566122704;
 	Sun, 15 Jun 2025 15:03:48 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
 To: Felix Fietkau <nbd@nbd.name>,
@@ -63,10 +65,12 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-mediatek@lists.infradead.org,
 	Simon Horman <horms@kernel.org>,
 	Daniel Golle <daniel@makrotopia.org>
-Subject: [net-next v3 0/3] rework IRQ handling in mtk_eth_soc
-Date: Sun, 15 Jun 2025 17:03:15 +0200
-Message-ID: <20250615150333.166202-1-linux@fw-web.de>
+Subject: [net-next v3 1/3] net: ethernet: mtk_eth_soc: support named IRQs
+Date: Sun, 15 Jun 2025 17:03:16 +0200
+Message-ID: <20250615150333.166202-2-linux@fw-web.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250615150333.166202-1-linux@fw-web.de>
+References: <20250615150333.166202-1-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,20 +81,79 @@ Content-Transfer-Encoding: 8bit
 
 From: Frank Wunderlich <frank-w@public-files.de>
 
-This series introduces named IRQs while keeping the index based way
-for older dts.
-Further it makes some cleanup like adding consts for index access and
-avoids loading first IRQ which was not used on non SHARED_INT SoCs.
+Add named interrupts and keep index based fallback for exiting devicetrees.
 
-Frank Wunderlich (3):
-  net: ethernet: mtk_eth_soc: support named IRQs
-  net: ethernet: mtk_eth_soc: add consts for irq index
-  net: ethernet: mtk_eth_soc: change code to skip first IRQ completely
+Currently only rx and tx IRQs are defined to be used with mt7988, but
+later extended with RSS/LRO support.
 
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 56 ++++++++++++++-------
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  5 ++
- 2 files changed, 44 insertions(+), 17 deletions(-)
+Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v2:
+- move irqs loading part into own helper function
+- reduce indentation
+- place mtk_get_irqs helper before the irq_handler (note for simon)
+---
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 39 +++++++++++++++------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index b38e4f2de674..f91ea87d2f72 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -3336,6 +3336,30 @@ static void mtk_tx_timeout(struct net_device *dev, unsigned int txqueue)
+ 	schedule_work(&eth->pending_work);
+ }
+ 
++static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
++{
++	int i;
++
++	eth->irq[1] = platform_get_irq_byname(pdev, "tx");
++	eth->irq[2] = platform_get_irq_byname(pdev, "rx");
++	if (eth->irq[1] >= 0 && eth->irq[2] >= 0)
++		return 0;
++
++	for (i = 0; i < 3; i++) {
++		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
++			eth->irq[i] = eth->irq[0];
++		else
++			eth->irq[i] = platform_get_irq(pdev, i);
++
++		if (eth->irq[i] < 0) {
++			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
++			return -ENXIO;
++		}
++	}
++
++	return 0;
++}
++
+ static irqreturn_t mtk_handle_irq_rx(int irq, void *_eth)
+ {
+ 	struct mtk_eth *eth = _eth;
+@@ -5105,17 +5129,10 @@ static int mtk_probe(struct platform_device *pdev)
+ 		}
+ 	}
+ 
+-	for (i = 0; i < 3; i++) {
+-		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
+-			eth->irq[i] = eth->irq[0];
+-		else
+-			eth->irq[i] = platform_get_irq(pdev, i);
+-		if (eth->irq[i] < 0) {
+-			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
+-			err = -ENXIO;
+-			goto err_wed_exit;
+-		}
+-	}
++	err = mtk_get_irqs(pdev, eth);
++	if (err)
++		goto err_wed_exit;
++
+ 	for (i = 0; i < ARRAY_SIZE(eth->clks); i++) {
+ 		eth->clks[i] = devm_clk_get(eth->dev,
+ 					    mtk_clks_source_name[i]);
 -- 
 2.43.0
 
