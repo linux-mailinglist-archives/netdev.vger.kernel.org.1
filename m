@@ -1,76 +1,99 @@
-Return-Path: <netdev+bounces-197881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C409ADA236
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:04:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 333B4ADA240
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 17:14:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DAD13B25C8
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:04:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C3A3AFFB6
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:14:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509BF1C2335;
-	Sun, 15 Jun 2025 15:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2524425F960;
+	Sun, 15 Jun 2025 15:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="U6K+sQPA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WT3biLzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout1.routing.net (mxout1.routing.net [134.0.28.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE431B423C;
-	Sun, 15 Jun 2025 15:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AA17262B;
+	Sun, 15 Jun 2025 15:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749999839; cv=none; b=Cm3RC8TPTWU4c06lOACxk8EUUwZbNdYJzlavJuAkkVPxLkZV8q6Z2lC0ha4VvYXWYroPyX9+/QPdGq1OXpU8pUcc2qdaqVuJ+O6u5g4MJU8B4FeTbrsG5YJiWC4mqzbORUH9DZvGMMyDvIb/ZptqGThM59arSmu2xt6i3sLttNM=
+	t=1750000467; cv=none; b=Llfpxi/JreApK6ILyK2/N761SXju2bd1nmKOJcw+UnYk/yBiEQIXZb7Np1RPweolrGau/6wZo0WcV/DqU2TG5YkslrjvNs6OgAECWReJ4lQ5/wy54g1L7WdxKdju/ClYADVMG5Z6RJKOzNKa6MRx9RT487D3UVEljxi+P7U2dy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749999839; c=relaxed/simple;
-	bh=zNruei/Wq6DKudfKhgOlK/LAw0QNeY727tGMxqK5EFA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hCrPj6CLiJpyQhH6hOrh5R0z1DvV5gbWvRb7hJSRsgFpi2Whcu9RHQElmdyu811AamN6qcJBoASAMVuqmx0yG0r92lppfq82YHsrytXvswVrEcV7jhfZ5372trrNiF4HKxnprh2F/NYfE+UkMFPzFiJhv5Ilr/H4gUhjH3+eWGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=U6K+sQPA; arc=none smtp.client-ip=134.0.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout1.routing.net (Postfix) with ESMTP id 693CA3FF6D;
-	Sun, 15 Jun 2025 15:03:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1749999829;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EMCo+VFbKtuUjRwVkhv/z0zUgSXTtEAWBF4/x1hCKa8=;
-	b=U6K+sQPA5/Dakm2sC94GpFCh+jFoVm5cqODuYLmxyarK2SX5IitN5I997cJETNty7qAZBB
-	y7bO8ywAeRW2z2TI+hiVhu3mqDPAZFlTn3p3KZ/ODOXwUaJdA1Mtox/0z+Z/uaa5hNTUbN
-	v2/z7RhKKDPOLvjmt2N5ouJXXUsxF7o=
-Received: from frank-u24.. (fttx-pool-217.61.157.124.bambit.de [217.61.157.124])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 2E55C122704;
-	Sun, 15 Jun 2025 15:03:49 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
+	s=arc-20240116; t=1750000467; c=relaxed/simple;
+	bh=JXYf5ZbXaxd+pTT//xI/FT14s6VC8aqe+LnXcuWiUc8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nSwlayA00mc3Kose2LTIaeEsoRBrYYuPd33H8r6CAU7C5TOhasv11dnQyDg+6AsKtkTyGX6zHaIO4LV6K53dx8WEnxp1zd4vWv+ZcOzuuTEM8EkGqJ1Txks35dYa6DT/EM0yawQRCUEzHMWKWmCFk8evKriw5+1ScKzhpQQKB4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WT3biLzZ; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-748a42f718aso726370b3a.2;
+        Sun, 15 Jun 2025 08:14:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750000464; x=1750605264; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xeCjzQfkB1+ovbUpzeze8a4duFJQQau/6t5f8myV+mM=;
+        b=WT3biLzZBHjsz4XtrpLVfdBX1Mobe27zr7KLcY/ICguNfgYfle8+xebywq0gX6C+IW
+         XR6zwW7HjaktOjcGHpYEF1gUKc2E6mMM6Rh9Ta+Cs65/6IjcHMpBoX6oisZP8Cw5UXcS
+         JEL4czQsN8VwEpMa4oXnxP4fIQNB1wPQ32gdneZQjHMOhyzrx5xj6xlEjS+NnIGqUIu/
+         Jj3dLYUpjIFe29c+GOKM7IX7i50HfljQNzxgfUKpcTBl7JRPuRXM1f2GUqinnzG3+tcb
+         57+P6Ox5SQCxiQ98uv5coVND5Vx5NJYuPQ/OTmwYW3AkyumVChm3QE4o26PU5sln4p8Q
+         bxLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750000464; x=1750605264;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xeCjzQfkB1+ovbUpzeze8a4duFJQQau/6t5f8myV+mM=;
+        b=RnoyVk2cwxh4RffTNT7AUe899vkzR4+c9CmJDGQWBs6eqQTYcw/YtsMC0K5tKWTbUz
+         vIzbak1CthZuAN7OxIGfv/1DryAm3vTHJo2IDkrzoW6cpVW2/3kHjoTxLW4llH7sw5VZ
+         5+fZM6aWI5IPkl/x5/GFXm2Kl1eImrbKfHX8A1d4l4iFb7J7xg4bweVskzL4UwP56eaU
+         TnujexDFavi1PjOzXRX2WXwa9e2XNm9xG/ccn/ge5IIbFg78Zq4EpmfYhubu30REF/z2
+         YiWDVe4/E5C+Cp66bnl6hdqlgrc8M5OyS5KmGus3eUDroYyrN+1DQ2hmbL6KsXKWvg6T
+         RrLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCm2nLgEY1Af4tAs1JyRwFZMzX1OoAnyacF4RgOOAN7mDZVDaV2FjY6WJ/KqWd8vPE7nA=@vger.kernel.org, AJvYcCWpni1/lA+s5HQ6SCDo33Poyc96Wm/6YOL+pHrFTxeyPnhjw2KcnbHDdoV/aNj7W9KlGq2UEYEyRivMEPWE@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwRW8NgYa3d1FGWOeD1xt9qN+cnlFFxIOghNaWVYcX2z5IM91n
+	FO9XqfKDNgK+vydokPVU56r/JEUczJse9gxtTli2Lcbkz6KlpuliHCJ28Q3e/g==
+X-Gm-Gg: ASbGncvNt+ZZlPRRna1GxSjs7/XyjZ0gPoMeSKcwdKEAZJSufewsjxNWUeQj9QPrU8+
+	pz72qIyrew1Vg1tKvJumSMDsCVx6i5M7Uh7B0ufO7R6dxMQYXfa3SY0FfHb9bnWu9ZEXlz25md7
+	WoFdftwlbuBUEXbApNG6Yhq9T+/mOhnI/CLOX8t/hz8CJq+DQpG+2eqZv5rxnuU/JGXoaRJWsJr
+	M17Hc0gKJeGfhcnD1QEvRY6whvsgbqjNDYo0CIR1BDYG/lkh4Xn4rBRuZK+0Krkf5JVP1StF2Th
+	bInpeHYngRUjj8Deqi362StvzroM07mwOexBVsL6iBxttQbqcGSUCYJcqIdqPxYz/OuPNbxlhNu
+	Saw==
+X-Google-Smtp-Source: AGHT+IE+Dh7qkuSto2XPVBxAku93xQd1vexdTf/BYTpDRoQLi3HYEYrUq311ENiBH5Hu3V/gp727VQ==
+X-Received: by 2002:a05:6a00:99c:b0:73d:b1ff:c758 with SMTP id d2e1a72fcca58-7489d02e3bfmr8658913b3a.18.1750000463919;
+        Sun, 15 Jun 2025 08:14:23 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:482b:a929:1381:df12])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-748900b219csm4950022b3a.129.2025.06.15.08.14.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Jun 2025 08:14:23 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	netdev@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [net-next v3 3/3] net: ethernet: mtk_eth_soc: change code to skip first IRQ completely
-Date: Sun, 15 Jun 2025 17:03:18 +0200
-Message-ID: <20250615150333.166202-4-linux@fw-web.de>
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH net 0/2] virtio-net: xsk: rx: fix the frame's length check
+Date: Sun, 15 Jun 2025 22:13:31 +0700
+Message-ID: <20250615151333.10644-1-minhquangbui99@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250615150333.166202-1-linux@fw-web.de>
-References: <20250615150333.166202-1-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,55 +102,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Frank Wunderlich <frank-w@public-files.de>
+Hi everyone,
 
-On SoCs without MTK_SHARED_INT capability (mt7621 + mt7628) the first
-IRQ (eth->irq[0]) was read but never used. Skip reading it now too.
+This series contains 2 patches for the zerocopy XDP receive path in virtio
+net
+- Patch 1: there is a difference between first buffer and the following
+buffers in this receive path. While the first buffer contains virtio
+header, the following ones do not. So the length of the remaining region
+for frame data is also different in 2 cases. The current maximum frame's
+length check is only correct for the following buffers not the first one.
+- Patch 2: no functional change. The tricky xdp->data adjustment due to
+the above difference is moved to buf_to_xdp() so that this helper contains
+all logic to build xdp_buff and the tricky adjustment does not scatter
+over different functions.
 
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 11 ++++++++---
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  4 ++--
- 2 files changed, 10 insertions(+), 5 deletions(-)
+Thanks,
+Quang Minh.
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 9aec67c9c6d7..4d7de282b940 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -3346,10 +3346,15 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
- 		return 0;
- 
- 	for (i = 0; i < MTK_ETH_IRQ_MAX; i++) {
--		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
--			eth->irq[i] = eth->irq[MTK_ETH_IRQ_SHARED];
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
-+			if (i == 0)
-+				eth->irq[MTK_ETH_IRQ_SHARED] = platform_get_irq(pdev, i);
-+			else
-+				eth->irq[i] = eth->irq[MTK_ETH_IRQ_SHARED];
-+		} else if (i < 2)  //skip the 1st and 4th IRQ on !MTK_SHARED_INT
-+			eth->irq[i] = platform_get_irq(pdev, i + 1);
- 		else
--			eth->irq[i] = platform_get_irq(pdev, i);
-+			continue;
- 
- 		if (eth->irq[i] < 0) {
- 			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 6b1208d05f79..ff2ae3c80179 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -643,8 +643,8 @@
- #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
- 
- #define MTK_ETH_IRQ_SHARED	0
--#define MTK_ETH_IRQ_TX		1
--#define MTK_ETH_IRQ_RX		2
-+#define MTK_ETH_IRQ_TX		0
-+#define MTK_ETH_IRQ_RX		1
- #define MTK_ETH_IRQ_MAX		3
- 
- struct mtk_rx_dma {
+Bui Quang Minh (2):
+  virtio-net: xsk: rx: fix the frame's length check
+  virtio-net: xsk: rx: move the xdp->data adjustment to buf_to_xdp()
+
+ drivers/net/virtio_net.c | 46 ++++++++++++++++++++++++++++++++++------
+ 1 file changed, 40 insertions(+), 6 deletions(-)
+
 -- 
 2.43.0
 
