@@ -1,211 +1,322 @@
-Return-Path: <netdev+bounces-197874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 778CCADA200
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 16:00:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F36ADA204
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 16:07:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 179AD16CECE
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 14:00:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EABF916E8C9
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 14:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9B826AA8F;
-	Sun, 15 Jun 2025 14:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C702426A1B9;
+	Sun, 15 Jun 2025 14:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="A7TiUfOZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhF6m3C5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801A33A1BA;
-	Sun, 15 Jun 2025 14:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1CC1E3762
+	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 14:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749996050; cv=none; b=RwXPbOBOndyo1bOT6Gx6Rdrd/Lx5lxwb1DQCae+A7KIqa/deBIrfw6HEn/10iYuN5YQZE4I1aa+UNdRmxr9puVh8RGMJEctZbTOazfhxYPlchC3NVpyuNXJ+kqy3pQUdTHcpCjuTa22DcT2MpsCPQXJZF0wBxilpXmIpOLKn46Q=
+	t=1749996455; cv=none; b=M6xADbSul1XRPiccDS1PSaQTUhZrGaQPfiq9zgOmM2nX4QgkQox4/cMC0rbMAULpbiEcYaXkSf3y21u0rzApz7pTBlBKnZMs9AJI5PsxC2v52MQyYcd3wjFPzTCnufFEvfZGZnywGJWCYhO2n2CJ9BcPjfTtyH3P8EEfBiRpDqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749996050; c=relaxed/simple;
-	bh=tzBgEfNbszZFjneQrhgK2sYcgixJ885U9DAEQALxusE=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=kSzcFHteaYoeGMavDklN0+PjIXX1jeftU40ZsklZ7btepxqWgq13OV/JUahTXFq2asRrWbRLMXxCsLFTj8U5ZdC7cfNN/GKiLKQdguoj0heH0eYSSjGoW6yWz5b8CAoBl/BNvszvnlcS4mqHfMD1BU7jruJMFZUDDs1CR+GiQPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=A7TiUfOZ; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D7A6B205B1;
-	Sun, 15 Jun 2025 14:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1749996037;
+	s=arc-20240116; t=1749996455; c=relaxed/simple;
+	bh=jepLbbOJGxCtAqyma/HZzE4xJ9rkrsv4QZicL7bfPcw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GaUBQraNnDwcEoL7OWay8JKSOQ6LeDpo/1dNYw8DLv4rkmi+UiDK97IcWO3+dwsUXeeQS/bH8Wda9pVm8yfLloHDdE8f2eUEw1To2qhlM6qup/lntN1DSciDA5qfBc9zugXKGuiCnVMaD0kJj41IgJqTr4MdwVnljrXeJCRpXG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YhF6m3C5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749996452;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YxXS5lj0DrF49L/g0V9R5FkVyXH9S7gR1QjB4hu3uuE=;
-	b=A7TiUfOZSoNCNlpd3feyEIMq7JweNSA26Ki+asH1Rd/WvFZi6wU8mGFvLOiyagoFjwL8JL
-	xo9M58/kDnjnSORKMzRqxzrCLgPAGB8Bu5MzN3EMIYoY6aN+6oHKGrYFTIO3qN/Pw67h/B
-	IMc2jyqqF5WnGXYgwIPTBVuwK7QfL9I9ZUJ6sI7veC8g4rtStWZ/IVP4WS757EaSs2cq3B
-	2xNCG4rBNC84HJC/1B3ddFVbvd1E5riocXBoJdq4moXdkt4MuVYmrwo0+OjTp/wdmH6h4R
-	eSQhByt4F2xarijNXWHhMAAbmtcVLzvls0lGIxnTZz73uWzR5oqhqzM6rTospw==
+	bh=cpvfPquWEoPv1qftMnP3EaVgh/vM8Dl1IeS2VTYnWq8=;
+	b=YhF6m3C5LCxTojFawOqIP9vqmojxriV9LhA/4RHgOeh+mjGqeHkqYERrQxfk6V4jdLOrUL
+	YeKjrY0gxiHhHeQIZ1XMLkTeDdH/VrRNuEci7HdxtzhdWmafrAID65Gf7km1kERdpGlXDz
+	bdPPBr78cbjzE1lu80adBJt00oID05U=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-433-8e_2ghoYN0mX_KGyjZaDjA-1; Sun, 15 Jun 2025 10:07:29 -0400
+X-MC-Unique: 8e_2ghoYN0mX_KGyjZaDjA-1
+X-Mimecast-MFC-AGG-ID: 8e_2ghoYN0mX_KGyjZaDjA_1749996449
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7d0aa9cdecdso302257485a.3
+        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 07:07:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749996449; x=1750601249;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cpvfPquWEoPv1qftMnP3EaVgh/vM8Dl1IeS2VTYnWq8=;
+        b=sjjQu7Nr8ymbLKQCRJXM2/W0k2PnojVl9756xjcB6X15SE/dxY6ZzR4Qu0K6aV6K3B
+         SiUOoQoVlHTM6KYAa7yixNjLibpV0nyj1iKocB4PjtJRa8/A0zOCxvoGDvJrPQdYzveq
+         NtlW2IVsBCx8Hu+HE0cQgPho+03jKNAT+tMCNdfHTLJ6s1DI8wacB6MHmuCH1PowrH9e
+         lKkTr4aqXD3S9iCyAumkXLKZxk21aepyTxyRQnn3+9EikmrDu+iaLjYVLvKsUG+kNlDv
+         A7+lcdQ7knJvvYJO0zeutK0nlLOB+0cHTqLx7xaH71+4/bjRJFoRjCOYowMWvFTafA+k
+         G1Dw==
+X-Forwarded-Encrypted: i=1; AJvYcCXdBr2S4wcMGqXeMUdX6DXX0VxRBUICj5CeptdH3bj2cU7wLoXAXNpzZ4Xsn2QEhT6TPBpaHvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzox3oHnWysPn8srbYAzmdib+2asdKb1m+94QdueMGYvud1iULW
+	KzT1t08DHxFM21Io9RMMpSWtEOu2RafLgBfHyLvOifDu+pxKGZvQMYW3TWVF/KhQmqZKLO8lQrn
+	F139HUcvtZbE++ekHARs9EhjP4zO9T6WwIqWIcVd1bNwVyuqX888XxXGlYm5g8hPqumgfhCxTHO
+	fsg5Pe6uCoIiiQ+SUgnKaCzx8q8vraLxO2
+X-Gm-Gg: ASbGncsHqJNsvFf64LxMxieHOzHxnGeZRlGXmTvHJKK4id18kPkOq3PzbTa41B2wDAr
+	2fcLHW/WFQn581/De/mWW6EgApqOaScOBgLNaimv9CWGAr+vsNJPXVtrUQoU/5K9UeUMLFLH6dU
+	Otdy9Z
+X-Received: by 2002:a05:620a:370f:b0:7c5:6678:ab18 with SMTP id af79cd13be357-7d3c6cf11efmr684337485a.42.1749996448799;
+        Sun, 15 Jun 2025 07:07:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGQfd3Jg+za2A2otcwQoRQPivaXBv48NJhSap+53dPBVNEvIqD8CTtK5u8X5NDCCMNb0CRWiye3EoWlyPRqsDE=
+X-Received: by 2002:a05:620a:370f:b0:7c5:6678:ab18 with SMTP id
+ af79cd13be357-7d3c6cf11efmr684333885a.42.1749996448345; Sun, 15 Jun 2025
+ 07:07:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20250609073430.442159-1-lulu@redhat.com> <20250609073430.442159-4-lulu@redhat.com>
+ <20250612022053-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250612022053-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Sun, 15 Jun 2025 22:06:51 +0800
+X-Gm-Features: AX0GCFuavf4F9QSSduL1i-CbZH_0D6GbiTWvUTGYMpPvjCVBJlOzCw6TvLbCB5c
+Message-ID: <CACLfguVUnpxCczJ5NdtWdiDVSsYDNG6XPFGdjqdgwncX4y74UA@mail.gmail.com>
+Subject: Re: [PATCH v11 3/3] vhost: Add configuration controls for vhost
+ worker's mode
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 15 Jun 2025 16:00:30 +0200
-Message-Id: <DAN5THWRO6KS.XXZ00IOTQZH9@bootlin.com>
-Cc: "Peter Zijlstra" <peterz@infradead.org>, "Alexei Starovoitov"
- <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii
- Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>,
- "Eduard Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
- "Yonghong Song" <yonghong.song@linux.dev>, "John Fastabend"
- <john.fastabend@gmail.com>, "KP Singh" <kpsingh@kernel.org>, "Stanislav
- Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
- <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, "David Ahern"
- <dsahern@kernel.org>, "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar"
- <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen"
- <dave.hansen@linux.intel.com>, "X86 ML" <x86@kernel.org>, "H. Peter Anvin"
- <hpa@zytor.com>, "Menglong Dong" <imagedong@tencent.com>,
- =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>, "Pu Lehui"
- <pulehui@huawei.com>, "Puranjay Mohan" <puranjay@kernel.org>, "Paul
- Walmsley" <paul.walmsley@sifive.com>, "Palmer Dabbelt"
- <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre
- Ghiti" <alex@ghiti.fr>, "Ilya Leoshkevich" <iii@linux.ibm.com>, "Heiko
- Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>,
- "Alexander Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger"
- <borntraeger@linux.ibm.com>, "Sven Schnelle" <svens@linux.ibm.com>, "Hari
- Bathini" <hbathini@linux.ibm.com>, "Christophe Leroy"
- <christophe.leroy@csgroup.eu>, "Naveen N Rao" <naveen@kernel.org>,
- "Madhavan Srinivasan" <maddy@linux.ibm.com>, "Michael Ellerman"
- <mpe@ellerman.id.au>, "Nicholas Piggin" <npiggin@gmail.com>, "Mykola
- Lysenko" <mykolal@fb.com>, "Shuah Khan" <shuah@kernel.org>, "Maxime
- Coquelin" <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
- <alexandre.torgue@foss.st.com>, <ebpf@linuxfoundation.org>, "Thomas
- Petazzoni" <thomas.petazzoni@bootlin.com>, "Bastien Curutchet"
- <bastien.curutchet@bootlin.com>, "Network Development"
- <netdev@vger.kernel.org>, "bpf" <bpf@vger.kernel.org>, "LKML"
- <linux-kernel@vger.kernel.org>, =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?=
- <bjorn@rivosinc.com>, "linux-riscv" <linux-riscv@lists.infradead.org>,
- "linux-s390" <linux-s390@vger.kernel.org>, "ppc-dev"
- <linuxppc-dev@lists.ozlabs.org>, "open list:KERNEL SELFTEST FRAMEWORK"
- <linux-kselftest@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>, "linux-arm-kernel"
- <linux-arm-kernel@lists.infradead.org>, "dwarves" <dwarves@vger.kernel.org>
-Subject: Re: [PATCH bpf 2/7] bpf/x86: prevent trampoline attachment when
- args location on stack is uncertain
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-To: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a
-References: <20250613-deny_trampoline_structs_on_stack-v1-0-5be9211768c3@bootlin.com> <20250613-deny_trampoline_structs_on_stack-v1-2-5be9211768c3@bootlin.com> <20250613081150.GJ2273038@noisy.programming.kicks-ass.net> <DAL9GRMH74F4.2IV0HN0NGU65X@bootlin.com> <20250613083232.GL2273038@noisy.programming.kicks-ass.net> <DALA5WYA04OG.1283TZDOVLBPS@bootlin.com> <CAADnVQ+sj9XhscN9PdmTzjVa7Eif21noAUH3y1K6x5bWcL-5pg@mail.gmail.com>
-In-Reply-To: <CAADnVQ+sj9XhscN9PdmTzjVa7Eif21noAUH3y1K6x5bWcL-5pg@mail.gmail.com>
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvfeekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepggfgtgffkfevuffhvffofhgjsehtqhertdertdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepteekleehffevvedvudfhueelffeugfdtveefvdfguefgffehtdekleetheelleffnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddvmeekgedvkeemfhelgegtmegvtddtmeemsgehvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtvdemkeegvdekmehfleegtgemvgdttdemmegshegvpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepiedtpdhrtghpthhtoheprghlvgigvghirdhsthgrrhhovhhoihhtohhvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgvthgvrhiisehinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgso
- higrdhnvghtpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrthhinhdrlhgruheslhhinhhugidruggvvhdprhgtphhtthhopegvugguhiiikeejsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhonhhgsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Sat Jun 14, 2025 at 12:35 AM CEST, Alexei Starovoitov wrote:
-> On Fri, Jun 13, 2025 at 1:59=E2=80=AFAM Alexis Lothor=C3=A9
-> <alexis.lothore@bootlin.com> wrote:
->>
->> On Fri Jun 13, 2025 at 10:32 AM CEST, Peter Zijlstra wrote:
->> > On Fri, Jun 13, 2025 at 10:26:37AM +0200, Alexis Lothor=C3=A9 wrote:
-
-[...]
-
->> If I need to respin, I'll rewrite the commit message to include the deta=
-ils
->> above.
+On Thu, Jun 12, 2025 at 2:31=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-> No need to respin. The cover letter is quite detailed already.
+> On Mon, Jun 09, 2025 at 03:33:09PM +0800, Cindy Lu wrote:
+> > This patch introduces functionality to control the vhost worker mode:
+> >
+> > - Add two new IOCTLs:
+> >   * VHOST_SET_FORK_FROM_OWNER: Allows userspace to select between
+> >     task mode (fork_owner=3D1) and kthread mode (fork_owner=3D0)
+> >   * VHOST_GET_FORK_FROM_OWNER: Retrieves the current thread mode
+> >     setting
+> >
+> > - Expose module parameter 'fork_from_owner_default' to allow system
+> >   administrators to configure the default mode for vhost workers
+> >
+> > - Add KConfig option CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL to
+> >   control the availability of these IOCTLs and parameter, allowing
+> >   distributions to disable them if not needed
+> >
+> > - The VHOST_NEW_WORKER functionality requires fork_owner to be set
+> >   to true, with validation added to ensure proper configuration
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
 >
-> But looking at the patch and this thread I think we need to agree
-> on the long term approach to BTF, since people assume that
-> it's a more compact dwarf and any missing information
-> should be added to it.
-> Like in this case special alignment case and packed attributes
-> are not expressed in BTF and I believe they should not be.
-> BTF is not a debug format and not a substitute for dwarf.
-> There is no goal to express everything possible in C.
-> It's minimal, because BTF is _practical_ description of
-> types and data present in the kernel.
-> I don't think the special case of packing and alignment exists
-> in the kernel today, so the current format is sufficient.
-> It doesn't miss anything.
-> I think we made arm64 JIT unnecessary restrictive and now considering
-> to make all other JITs restrictive too for hypothetical case
-> of some future kernel functions.
-> I feel we're going in the wrong direction.
-> Instead we should teach pahole to sanitize BTF where functions
-> are using this fancy alignment and packed structs.
-> pahole can see it in dwarf and can skip emitting BTF for such
-> functions. Then the kernel JITs on all architectures won't even
-> see such cases.
 >
-> The issue was initially discovered by a selftest:
-> https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-3-0a32fe72339e@bo=
-otlin.com/
-> that attempted to support these two types:
-> +struct bpf_testmod_struct_arg_4 {
-> + __u64 a;
-> + __u64 b;
-> +};
-> +
-> +struct bpf_testmod_struct_arg_5 {
-> + __int128 a;
-> +};
+> getting there. yet something to improve.
 >
-> The former is present in the kernel. It's more or less sockptr_t,
-> and people want to access it for observability in tracing.
-> The latter doesn't exist in the kernel and we cannot represent
-> it properly in BTF without losing alignment.
+> > ---
+> >  drivers/vhost/Kconfig      | 17 +++++++++++++++
+> >  drivers/vhost/vhost.c      | 44 ++++++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/vhost.h | 25 ++++++++++++++++++++++
+> >  3 files changed, 86 insertions(+)
+> >
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index 020d4fbb947c..49e1d9dc92b7 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -96,3 +96,20 @@ config VHOST_CROSS_ENDIAN_LEGACY
+> >         If unsure, say "N".
+> >
+> >  endif
+> > +
+> > +config CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL
+> > +     bool "Enable CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL"
+> > +     default n
+> > +     help
+> > +       This option enables two IOCTLs: VHOST_SET_FORK_FROM_OWNER and
+> > +       VHOST_GET_FORK_FROM_OWNER. These allow userspace applications
+> > +       to modify the vhost worker mode for vhost devices.
+> > +
+> > +       Also expose module parameter 'fork_from_owner_default' to allow=
+ users
+> > +       to configure the default mode for vhost workers.
+> > +
+> > +       By default, `CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL` is set to =
+`n`,
+> > +       which disables the IOCTLs and parameter.
+> > +       When enabled (y), users can change the worker thread mode as ne=
+eded.
+> > +
+> > +       If unsure, say "N".
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 37d3ed8be822..903d9c3f6784 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -43,6 +43,11 @@ module_param(max_iotlb_entries, int, 0444);
+> >  MODULE_PARM_DESC(max_iotlb_entries,
+> >       "Maximum number of iotlb entries. (default: 2048)");
+> >  static bool fork_from_owner_default =3D true;
 >
-> So I think we should go back to that series:
-> https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-0-0a32fe72339e@bo=
-otlin.com/
+> Add empty lines around ifdef to make it clear what code do they
+> delimit.
 >
-> remove __int128 selftest, but also teach pahole
-> to recognize types that cannot be represented in BTF and
-> don't emit them either into vmlinux or in kernel module
-> (like in this case it was bpf_testmod.ko)
-> I think that would be a better path forward aligned
-> with the long term goal of BTF.
 >
-> And before people ask... pahole is a trusted component of the build
-> system. We trust it just as we trust gcc, clang, linker, objtool.
-
-So if I understand correctly your point, it would be better to just move ou=
-t
-those constraints from the JIT compilers, and just not represent those spec=
-ial
-cases in BTF, so that it becomes impossible to hook programs on those funct=
-ions,
-since they are not event present in BTF info.
-And so:
-- cancel this series
-- revert the small ARM64 check about struct passed on stack
-- update pahole to make sure that it does not encode info about this specif=
-ic
-  kind of functions.
-
-I still expect some challenges with this. AFAIU pahole uses DWARF to genera=
-te
-BTF, and discussions in [1] highlighted the fact that the attributes alteri=
-ng
-the structs alignment are not reliably encoded in DWARF. Maybe pahole can
-"guess" if a struct has been altered, by doing something like
-btf_is_struct_packed in libbpf ? As Andrii mentioned in [2], it may not be
-able to cover all cases, but that could  be a start. If that's indeed the
-desired direction, I can take a further look at this.
-
-+ CC dwarves ML
-
-Alexis
-
-[1] https://lore.kernel.org/bpf/9a2ba0ad-b34d-42f8-89a6-d9a44f007bdc@linux.=
-dev/
-[2] https://lore.kernel.org/bpf/CAEf4BzZHMYyGDZ4c4eNXG7Fm=3DecxCCbKhKbQTbCj=
-vWmKtdwvBw@mail.gmail.com/
+> > +#ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL
+> > +module_param(fork_from_owner_default, bool, 0444);
+> > +MODULE_PARM_DESC(fork_from_owner_default,
+> > +              "Set task mode as the default(default: Y)");
+> > +#endif
+> >
+> >  enum {
+> >       VHOST_MEMORY_F_LOG =3D 0x1,
+> > @@ -1019,6 +1024,13 @@ long vhost_worker_ioctl(struct vhost_dev *dev, u=
+nsigned int ioctl,
+> >       switch (ioctl) {
+> >       /* dev worker ioctls */
+> >       case VHOST_NEW_WORKER:
+> > +             /*
+> > +              * vhost_tasks will account for worker threads under the =
+parent's
+> > +              * NPROC value but kthreads do not. To avoid userspace ov=
+erflowing
+> > +              * the system with worker threads fork_owner must be true=
+.
+> > +              */
+> > +             if (!dev->fork_owner)
+> > +                     return -EFAULT;
+>
+> An empty line here would make the code clearer.
+>
+> >               ret =3D vhost_new_worker(dev, &state);
+> >               if (!ret && copy_to_user(argp, &state, sizeof(state)))
+> >                       ret =3D -EFAULT;
+> > @@ -1136,6 +1148,7 @@ void vhost_dev_reset_owner(struct vhost_dev *dev,=
+ struct vhost_iotlb *umem)
+> >
+> >       vhost_dev_cleanup(dev);
+> >
+> > +     dev->fork_owner =3D fork_from_owner_default;
+> >       dev->umem =3D umem;
+> >       /* We don't need VQ locks below since vhost_dev_cleanup makes sur=
+e
+> >        * VQs aren't running.
+> > @@ -2289,6 +2302,37 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsign=
+ed int ioctl, void __user *argp)
+> >               goto done;
+> >       }
+> >
+> > +#ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL
+> > +     u8 fork_owner;
+>
+> Do not declare variables in the middle of a scope please.
+> This one is not needed in this scope, so just move it down
+> to within if (yes you will repeat the declaration twice then).
+>
+>
+>
+> > +
+> > +     if (ioctl =3D=3D VHOST_SET_FORK_FROM_OWNER) {
+> > +             /*fork_owner can only be modified before owner is set*/
+>
+> bad comment style.
+>
+> > +             if (vhost_dev_has_owner(d)) {
+> > +                     r =3D -EBUSY;
+> > +                     goto done;
+> > +             }
+> > +             if (copy_from_user(&fork_owner, argp, sizeof(u8))) {
+>
+> get_user is a better fit for this. In particular, typesafe.
+>
+>
+> > +                     r =3D -EFAULT;
+> > +                     goto done;
+> > +             }
+> > +             if (fork_owner > 1) {
+>
+> so 0 and 1 are the only legal values?
+> maybe add an enum or defines in the header then.
+>
+>
+> > +                     r =3D -EINVAL;
+> > +                     goto done;
+> > +             }
+> > +             d->fork_owner =3D (bool)fork_owner;
+>
+>                 !!fork_owner is shorter and idiomatic.
+>
+> > +             r =3D 0;
+> > +             goto done;
+> > +     }
+> > +     if (ioctl =3D=3D VHOST_GET_FORK_FROM_OWNER) {
+> > +             fork_owner =3D d->fork_owner;
+> > +             if (copy_to_user(argp, &fork_owner, sizeof(u8))) {
+>
+> put_user
+>
+Thanks, Micheal. I'll address all above comments and send a revised version=
+.
+Thanks
+cindy
+> > +                     r =3D -EFAULT;
+> > +                     goto done;
+> > +             }
+> > +             r =3D 0;
+> > +             goto done;
+> > +     }
+> > +#endif
+> >       /* You must be the owner to do anything else */
+> >       r =3D vhost_dev_check_owner(d);
+> >       if (r)
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index d4b3e2ae1314..e51d6a347607 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -235,4 +235,29 @@
+> >   */
+> >  #define VHOST_VDPA_GET_VRING_SIZE    _IOWR(VHOST_VIRTIO, 0x82,       \
+> >                                             struct vhost_vring_state)
+> > +
+> > +/**
+> > + * VHOST_SET_FORK_FROM_OWNER - Set the fork_owner flag for the vhost d=
+evice,
+> > + * This ioctl must called before VHOST_SET_OWNER.
+> > + * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=3Dy
+> > + *
+> > + * @param fork_owner: An 8-bit value that determines the vhost thread =
+mode
+> > + *
+> > + * When fork_owner is set to 1(default value):
+> > + *   - Vhost will create vhost worker as tasks forked from the owner,
+> > + *     inheriting all of the owner's attributes.
+> > + *
+> > + * When fork_owner is set to 0:
+> > + *   - Vhost will create vhost workers as kernel threads.
+> > + */
+> > +#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
+> > +
+> > +/**
+> > + * VHOST_GET_FORK_OWNER - Get the current fork_owner flag for the vhos=
+t device.
+> > + * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=3Dy
+> > + *
+> > + * @return: An 8-bit value indicating the current thread mode.
+> > + */
+> > +#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x84, __u8)
+> > +
+> >  #endif
+> > --
+> > 2.45.0
+>
 
 
