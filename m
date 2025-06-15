@@ -1,134 +1,211 @@
-Return-Path: <netdev+bounces-197873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9DCADA1F7
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 15:56:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 778CCADA200
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 16:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 041181890714
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 13:56:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 179AD16CECE
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 14:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E25017C224;
-	Sun, 15 Jun 2025 13:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9B826AA8F;
+	Sun, 15 Jun 2025 14:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="jwlyPSv7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="chKQPRpc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="A7TiUfOZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48306BA53
-	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 13:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801A33A1BA;
+	Sun, 15 Jun 2025 14:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749995791; cv=none; b=dc1DHp6+IVnrWR0XsD3YfuOVPFXP2zvR5Fgoi6RNOZ8HRaijk0NJ0JwMN0sTH2pjvZCDpmzKnG1DFkUpAyW8Gb6wC459Hx+oTlVEJ+qmykNSLUzdBj0tLZHl97a1bskuW8f7EW0ckh/3dBaWxy7PJjJ96ndBcsH/2LAQlCi3CDc=
+	t=1749996050; cv=none; b=RwXPbOBOndyo1bOT6Gx6Rdrd/Lx5lxwb1DQCae+A7KIqa/deBIrfw6HEn/10iYuN5YQZE4I1aa+UNdRmxr9puVh8RGMJEctZbTOazfhxYPlchC3NVpyuNXJ+kqy3pQUdTHcpCjuTa22DcT2MpsCPQXJZF0wBxilpXmIpOLKn46Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749995791; c=relaxed/simple;
-	bh=Vr0tSugC0pIf11BMt76w//f+Y/4OWhDMzHAtEaFLSf8=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=CkExtvK12Fv3aZ1U9TNwRTaTRW7l2cwaeAC2qXCEE9JdDQgBKiLhkEfEv+dFt0um+k77+SnoO3qGNEjoktvnzJU85+dM6F8TJdxVZ9fSTo650pCceYxXKG22FmyMTPHWdozpFkRCJ7tlSic1/yMWidJFPi8dprED0J1k4wTn0PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=jwlyPSv7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=chKQPRpc; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 674A31380323;
-	Sun, 15 Jun 2025 09:56:29 -0400 (EDT)
-Received: from phl-imap-16 ([10.202.2.88])
-  by phl-compute-02.internal (MEProxy); Sun, 15 Jun 2025 09:56:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1749995789;
-	 x=1750082189; bh=Vr0tSugC0pIf11BMt76w//f+Y/4OWhDMzHAtEaFLSf8=; b=
-	jwlyPSv73UxoCFFuCKIZWzgtH8ca0qV09vPUQhp+w5QUJEGQlf8KEdkv44AxLxtY
-	tlYgMUbXD24myIjEdfSyktSqo92kmoLOt7jthtDhp4mtqGeRC1H7dogP7sXyAK7I
-	xzSxq0vmnQeGenlMwfuBTefobv2h+IciDRxGRJ27s4Ogi7NnGFXiRAfu4+OnU06M
-	LhPmrckEQqWJEg297qBnLYTyFUW45eLbLgu1S+PsFvP3WvttPhyGFcUlKRPb9fDV
-	Aw2hqlXIIgwRUzbWEy+tUJzwi9JR9e5XTzOC2LSa3XDXoeNwQ8sXf0LblpD4MeH8
-	iHe+QOHIlAdFKmj49IR63A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1749995789; x=
-	1750082189; bh=Vr0tSugC0pIf11BMt76w//f+Y/4OWhDMzHAtEaFLSf8=; b=c
-	hKQPRpcB7XIn6uMxpugMGlzao1aXRr4SbNT0fvKqSoSKq39XSa3waletHDkM9agR
-	LR2swFTXok4J5LnNlahy+RgYOYpJy864qEh0kihk4t/Aq0C3kW2LTlwL4F1TfGWf
-	gj+3p5+FihN010PDkNL7PThl5IZcbFFHIDhwG1RjpxJ0pw8atmmRWCXvcCk6u2bE
-	j4SzmfD34WWG1eU1CCyBp6wbe8QicL0b92pJQM/3iziZUIgzMbTtWHeFKhm+RLFl
-	zW7p2uJQM2rguto/kbEXLIpJXQXQD9IyT9G17qVjIZ13FtfZ8zqPBr5Z2YCzzIy6
-	oFa/LcDZR5r6zHp1XSwwQ==
-X-ME-Sender: <xms:DNFOaA_xMwlyVC9jRh4GCzGVG9VZwznmQp6DfR0CD8sytDKxLsENMw>
-    <xme:DNFOaIs5exm108LwZGztP_cevZqox2WMaoQ0k32nvI_O2uaY7QH2Co1H2OrQpBNUm
-    VQVrapGaQbA-ZbTyIE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvfeekjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
-    tdenucfhrhhomhepfdftihgtrghrugcuuegvjhgrrhgrnhhofdcuoehrihgtrghrugessg
-    gvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnhepkeehveefffefffdutefhteeu
-    udelgfehheffledtteekgeeigeelgefgveevteeunecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegsvghjrghrrghnohdrihho
-    pdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepug
-    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopeihvghhvgiikhgvlhhs
-    hhgssehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvg
-    drtghomhdprhgtphhtthhopehmihgthhgrvghlrdhjrghmvghtsehinhhtvghlrdgtohhm
-    pdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihhkrg
-    drfigvshhtvghrsggvrhhgsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtohep
-    rghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegrnhgurhgvfi
-    eslhhunhhnrdgthhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:DNFOaGC6rhx4Vxvyq6YVgIAqKaQMaAIzICIho6-ySZpjpNF8_jDucw>
-    <xmx:DNFOaAcHO4disyl6qPY9Wip63U_Xy4Vh-NhO-ULaYNqKXzqyCujQlQ>
-    <xmx:DNFOaFMMKmXiGPVz17O0WDPP5-2r3gXd9wwNK-HUJx9D6VQyOqfN_A>
-    <xmx:DNFOaKltZLGodU9T9ZVepDZoJ7G9VTAd5vdKn-Wuj2OR6DdBz8x4lQ>
-    <xmx:DdFOaC-6f6lfet3dwnEVzLnoZeA6QDyJbyw-sqxCZ2v_A6nsyCarv5bf>
-Feedback-ID: i583147b9:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 141122CC0081; Sun, 15 Jun 2025 09:56:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1749996050; c=relaxed/simple;
+	bh=tzBgEfNbszZFjneQrhgK2sYcgixJ885U9DAEQALxusE=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=kSzcFHteaYoeGMavDklN0+PjIXX1jeftU40ZsklZ7btepxqWgq13OV/JUahTXFq2asRrWbRLMXxCsLFTj8U5ZdC7cfNN/GKiLKQdguoj0heH0eYSSjGoW6yWz5b8CAoBl/BNvszvnlcS4mqHfMD1BU7jruJMFZUDDs1CR+GiQPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=A7TiUfOZ; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D7A6B205B1;
+	Sun, 15 Jun 2025 14:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749996037;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YxXS5lj0DrF49L/g0V9R5FkVyXH9S7gR1QjB4hu3uuE=;
+	b=A7TiUfOZSoNCNlpd3feyEIMq7JweNSA26Ki+asH1Rd/WvFZi6wU8mGFvLOiyagoFjwL8JL
+	xo9M58/kDnjnSORKMzRqxzrCLgPAGB8Bu5MzN3EMIYoY6aN+6oHKGrYFTIO3qN/Pw67h/B
+	IMc2jyqqF5WnGXYgwIPTBVuwK7QfL9I9ZUJ6sI7veC8g4rtStWZ/IVP4WS757EaSs2cq3B
+	2xNCG4rBNC84HJC/1B3ddFVbvd1E5riocXBoJdq4moXdkt4MuVYmrwo0+OjTp/wdmH6h4R
+	eSQhByt4F2xarijNXWHhMAAbmtcVLzvls0lGIxnTZz73uWzR5oqhqzM6rTospw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ThreadId: T9bfb5a61a13769a7
-Date: Sun, 15 Jun 2025 15:56:26 +0200
-From: "Ricard Bejarano" <ricard@bejarano.io>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: "Mika Westerberg" <mika.westerberg@linux.intel.com>,
- netdev@vger.kernel.org, michael.jamet@intel.com, YehezkelShB@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Message-Id: <e48cc5fe-d741-4260-b561-f33c1c995cb2@app.fastmail.com>
-In-Reply-To: <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
-References: <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
- <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
- <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
- <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
- <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
- <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
- <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
- <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
- <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
- <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
- <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sun, 15 Jun 2025 16:00:30 +0200
+Message-Id: <DAN5THWRO6KS.XXZ00IOTQZH9@bootlin.com>
+Cc: "Peter Zijlstra" <peterz@infradead.org>, "Alexei Starovoitov"
+ <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii
+ Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>, "John Fastabend"
+ <john.fastabend@gmail.com>, "KP Singh" <kpsingh@kernel.org>, "Stanislav
+ Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
+ <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, "David Ahern"
+ <dsahern@kernel.org>, "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar"
+ <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen"
+ <dave.hansen@linux.intel.com>, "X86 ML" <x86@kernel.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, "Menglong Dong" <imagedong@tencent.com>,
+ =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>, "Pu Lehui"
+ <pulehui@huawei.com>, "Puranjay Mohan" <puranjay@kernel.org>, "Paul
+ Walmsley" <paul.walmsley@sifive.com>, "Palmer Dabbelt"
+ <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre
+ Ghiti" <alex@ghiti.fr>, "Ilya Leoshkevich" <iii@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger"
+ <borntraeger@linux.ibm.com>, "Sven Schnelle" <svens@linux.ibm.com>, "Hari
+ Bathini" <hbathini@linux.ibm.com>, "Christophe Leroy"
+ <christophe.leroy@csgroup.eu>, "Naveen N Rao" <naveen@kernel.org>,
+ "Madhavan Srinivasan" <maddy@linux.ibm.com>, "Michael Ellerman"
+ <mpe@ellerman.id.au>, "Nicholas Piggin" <npiggin@gmail.com>, "Mykola
+ Lysenko" <mykolal@fb.com>, "Shuah Khan" <shuah@kernel.org>, "Maxime
+ Coquelin" <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
+ <alexandre.torgue@foss.st.com>, <ebpf@linuxfoundation.org>, "Thomas
+ Petazzoni" <thomas.petazzoni@bootlin.com>, "Bastien Curutchet"
+ <bastien.curutchet@bootlin.com>, "Network Development"
+ <netdev@vger.kernel.org>, "bpf" <bpf@vger.kernel.org>, "LKML"
+ <linux-kernel@vger.kernel.org>, =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?=
+ <bjorn@rivosinc.com>, "linux-riscv" <linux-riscv@lists.infradead.org>,
+ "linux-s390" <linux-s390@vger.kernel.org>, "ppc-dev"
+ <linuxppc-dev@lists.ozlabs.org>, "open list:KERNEL SELFTEST FRAMEWORK"
+ <linux-kselftest@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>, "linux-arm-kernel"
+ <linux-arm-kernel@lists.infradead.org>, "dwarves" <dwarves@vger.kernel.org>
+Subject: Re: [PATCH bpf 2/7] bpf/x86: prevent trampoline attachment when
+ args location on stack is uncertain
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a
+References: <20250613-deny_trampoline_structs_on_stack-v1-0-5be9211768c3@bootlin.com> <20250613-deny_trampoline_structs_on_stack-v1-2-5be9211768c3@bootlin.com> <20250613081150.GJ2273038@noisy.programming.kicks-ass.net> <DAL9GRMH74F4.2IV0HN0NGU65X@bootlin.com> <20250613083232.GL2273038@noisy.programming.kicks-ass.net> <DALA5WYA04OG.1283TZDOVLBPS@bootlin.com> <CAADnVQ+sj9XhscN9PdmTzjVa7Eif21noAUH3y1K6x5bWcL-5pg@mail.gmail.com>
+In-Reply-To: <CAADnVQ+sj9XhscN9PdmTzjVa7Eif21noAUH3y1K6x5bWcL-5pg@mail.gmail.com>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvfeekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepggfgtgffkfevuffhvffofhgjsehtqhertdertdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepteekleehffevvedvudfhueelffeugfdtveefvdfguefgffehtdekleetheelleffnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddvmeekgedvkeemfhelgegtmegvtddtmeemsgehvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtvdemkeegvdekmehfleegtgemvgdttdemmegshegvpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepiedtpdhrtghpthhtoheprghlvgigvghirdhsthgrrhhovhhoihhtohhvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgvthgvrhiisehinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgso
+ higrdhnvghtpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrthhinhdrlhgruheslhhinhhugidruggvvhdprhgtphhtthhopegvugguhiiikeejsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhonhhgsehkvghrnhgvlhdrohhrgh
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-> Did you manage to prove it is skbuf with fragments which are the
-> problem? As i said, adding the skb_linearize was just a debug tool,
-> not a fix.
+On Sat Jun 14, 2025 at 12:35 AM CEST, Alexei Starovoitov wrote:
+> On Fri, Jun 13, 2025 at 1:59=E2=80=AFAM Alexis Lothor=C3=A9
+> <alexis.lothore@bootlin.com> wrote:
+>>
+>> On Fri Jun 13, 2025 at 10:32 AM CEST, Peter Zijlstra wrote:
+>> > On Fri, Jun 13, 2025 at 10:26:37AM +0200, Alexis Lothor=C3=A9 wrote:
 
-I did not, all my tests with skb_linearize made iperf3 fail. I did
-manage, however, to prove that all UDP SKBs we transmit are linear,
-thus all non-linear (if any) SKBs we see are TCP.
-Thus, I could not test loss with skb_linearize vs. loss without.
+[...]
 
-Thanks,
-RB
+>> If I need to respin, I'll rewrite the commit message to include the deta=
+ils
+>> above.
+>
+> No need to respin. The cover letter is quite detailed already.
+>
+> But looking at the patch and this thread I think we need to agree
+> on the long term approach to BTF, since people assume that
+> it's a more compact dwarf and any missing information
+> should be added to it.
+> Like in this case special alignment case and packed attributes
+> are not expressed in BTF and I believe they should not be.
+> BTF is not a debug format and not a substitute for dwarf.
+> There is no goal to express everything possible in C.
+> It's minimal, because BTF is _practical_ description of
+> types and data present in the kernel.
+> I don't think the special case of packing and alignment exists
+> in the kernel today, so the current format is sufficient.
+> It doesn't miss anything.
+> I think we made arm64 JIT unnecessary restrictive and now considering
+> to make all other JITs restrictive too for hypothetical case
+> of some future kernel functions.
+> I feel we're going in the wrong direction.
+> Instead we should teach pahole to sanitize BTF where functions
+> are using this fancy alignment and packed structs.
+> pahole can see it in dwarf and can skip emitting BTF for such
+> functions. Then the kernel JITs on all architectures won't even
+> see such cases.
+>
+> The issue was initially discovered by a selftest:
+> https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-3-0a32fe72339e@bo=
+otlin.com/
+> that attempted to support these two types:
+> +struct bpf_testmod_struct_arg_4 {
+> + __u64 a;
+> + __u64 b;
+> +};
+> +
+> +struct bpf_testmod_struct_arg_5 {
+> + __int128 a;
+> +};
+>
+> The former is present in the kernel. It's more or less sockptr_t,
+> and people want to access it for observability in tracing.
+> The latter doesn't exist in the kernel and we cannot represent
+> it properly in BTF without losing alignment.
+>
+> So I think we should go back to that series:
+> https://lore.kernel.org/bpf/20250411-many_args_arm64-v1-0-0a32fe72339e@bo=
+otlin.com/
+>
+> remove __int128 selftest, but also teach pahole
+> to recognize types that cannot be represented in BTF and
+> don't emit them either into vmlinux or in kernel module
+> (like in this case it was bpf_testmod.ko)
+> I think that would be a better path forward aligned
+> with the long term goal of BTF.
+>
+> And before people ask... pahole is a trusted component of the build
+> system. We trust it just as we trust gcc, clang, linker, objtool.
+
+So if I understand correctly your point, it would be better to just move ou=
+t
+those constraints from the JIT compilers, and just not represent those spec=
+ial
+cases in BTF, so that it becomes impossible to hook programs on those funct=
+ions,
+since they are not event present in BTF info.
+And so:
+- cancel this series
+- revert the small ARM64 check about struct passed on stack
+- update pahole to make sure that it does not encode info about this specif=
+ic
+  kind of functions.
+
+I still expect some challenges with this. AFAIU pahole uses DWARF to genera=
+te
+BTF, and discussions in [1] highlighted the fact that the attributes alteri=
+ng
+the structs alignment are not reliably encoded in DWARF. Maybe pahole can
+"guess" if a struct has been altered, by doing something like
+btf_is_struct_packed in libbpf ? As Andrii mentioned in [2], it may not be
+able to cover all cases, but that could  be a start. If that's indeed the
+desired direction, I can take a further look at this.
+
++ CC dwarves ML
+
+Alexis
+
+[1] https://lore.kernel.org/bpf/9a2ba0ad-b34d-42f8-89a6-d9a44f007bdc@linux.=
+dev/
+[2] https://lore.kernel.org/bpf/CAEf4BzZHMYyGDZ4c4eNXG7Fm=3DecxCCbKhKbQTbCj=
+vWmKtdwvBw@mail.gmail.com/
+
 
