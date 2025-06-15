@@ -1,62 +1,85 @@
-Return-Path: <netdev+bounces-197848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD91AADA053
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 01:49:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9911ADA05B
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 02:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D144C1893D7A
-	for <lists+netdev@lfdr.de>; Sat, 14 Jun 2025 23:50:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 905DC171F5C
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 00:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C225569;
-	Sat, 14 Jun 2025 23:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276C3367;
+	Sun, 15 Jun 2025 00:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="SNMlDHAf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FG5fiqar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6580A2F5B;
-	Sat, 14 Jun 2025 23:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781E31FB3
+	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 00:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749944991; cv=none; b=JZAyxZCmx31jXzLxFL9AflMMpWvfFmNtexC6EwfTarU6K6rHoukxrQbtCv5Kpj2mmj/QmdVCLmilIyKi6UezP9wkaBmWezu5ZRGxpJf+y1ecDU26Wwo3hxQNCWenZxHhoJxzqaHzvPWrxzUwwt89qNcXEvvisaz0658FKa58SMA=
+	t=1749946483; cv=none; b=o8X5WiEXKTCKroUv+x7LcwmKVD4st8wiNoIqz6hNa61g27tb3zNQYoxjCsxm5NdMKocSdZI6vQmFEYGlT15seXOe4Ri6jEfT2qw/Rbf4yXgEBTIh32amL2t1fEB1fCWakvAX2TiYVOs7Brlw+GYNaDJPIxgB85SUUtv8qwWVGUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749944991; c=relaxed/simple;
-	bh=Qm2J2jSa2eE6T5pH/tb4qGXQe4ZNdC1SvphaBpY0xLA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MtwWl2hg/uGmbcsnUIZIYUoZZIYdbyL3dvOVjxX0FQKG5ZVHwSKYlWr/8H2u4F0276zEL+5A0CFxUC2pnD1lOk/4ujaDXflzMHI3t01iRv792yCAcazSo2dZ2mGdPpMHHXxED+lWt+tn4yzR7fRq00eGF1D7WtqroywjJ9nvcfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=SNMlDHAf; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=+P2lzINHq2/y6xN0ioG5pTpOH3ZgUkHK3MgajHPs5wA=; b=SNMlDHAfZnJHrZ0m
-	dPZd9fT+6jY6XCjOYUQUdPCaJ4r9hvgYHRjzyV+9pvTyijtabpuw2KR0qFiLzvsdpVCtk0YkngfSN
-	m+xTF5cm3mCDem2BowDutYbQ/gFxm4U+Y/s1vDI9r7e04PRsz3nhU01sQbUbEkKyZnQoZHQB08cKN
-	XpsZtYr34u+Nd4pfz/5/7aN4IpHSIheUQjlYZD7F4sMNWTyzOP5pvNhziF+87U5B1dvD3dN6nrUAZ
-	QK3Tco6LEHBlUbqELPTvET6zQETggZ/rMuYy+ZoGOK2GHT0H6q8KszCus3ICc2PfhISfs5+QLXxcb
-	NR985iYX3ZQ4h0UJmA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1uQad3-009g1d-2j;
-	Sat, 14 Jun 2025 23:49:41 +0000
-From: linux@treblig.org
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
+	s=arc-20240116; t=1749946483; c=relaxed/simple;
+	bh=+tCQ3P9TPoRlf/tTzfAtKlVXyOipTKj2QVEP9BL3cBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pt9k4Q0qMGCgA8zNARhTeosj553o5l3BuTXc/zEi+jGMxklMrSDVId35WicFzSChNp/wCP66z1lHNz6BnKa8zrsA8iU31962f1ob4QFbyeA6otXjjzI/et9kZA89jOAfXuBN7Zn/xNXx5Q8bcYkBQeaSA1rUO+IxsWNDVxcJEkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FG5fiqar; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c5528c98bdso75241385a.1
+        for <netdev@vger.kernel.org>; Sat, 14 Jun 2025 17:14:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749946480; x=1750551280; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LTu6AnQCVjbQ9CcUMHopei2i+aiRYuv0cBQ7uuUnmcI=;
+        b=FG5fiqar94h6B7XOOkKwA2o8uB2ptva6KIVTAtAilX95kVHlkn0joE3/HL6KC+2F3H
+         wgLeEOrRblGnF3+o+kLmUhz5C75Rmv9p4Hq83gcDeGYx7gupFtfpH493/9f5DjClPOax
+         Y2d6vPN53qWRR/4DXIEyEoBBj8TkfQjsZAg0D361PfgNjZeE9lhPiN1QaRyBRkTcxhmr
+         +lQhdZUI8WlM9UKm8hyDmgiImnfmgVWsQH5w7pyUZdFF64WI0BE2VbNtIvY5DLqANB4O
+         aNBGltcW2sOBA+LFc+uELLfjMGJJgU/K1jDaID9X/hO9qVsf2zShFBDFnvgyLXvxvWg/
+         SGag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749946480; x=1750551280;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LTu6AnQCVjbQ9CcUMHopei2i+aiRYuv0cBQ7uuUnmcI=;
+        b=n+NhyXP6TxQ7Z8VYCz9uxC64nE/vzXo5zw+5tzZyzkZ9U5z0IIYKi8LzHJY5tMs3h9
+         M7BTetdKl4ryl8pLju39kC64o4AWkWnf6i0cfThjOMVSpVwwu6WhfWWMoMEWjZr0+IA+
+         dIjWY9zvNm9F7AxxPP8pIyCcXVvSDskjQpjB4mrrkPVrGdHSWmgSxzrwKTP8v4rm/6Le
+         V62v8Kwj601x1m2r5ICO+KO+ZBFR3UBJn91JrRsBT8UkqHyCbYB27gjFwBR3ciBwFEUK
+         o9I/lUe2MZn6zh9KMSQipmDpmAQSwklpcU9ucjjvYtZ999U6gR8O34h835ifwhqtz0SN
+         wOKQ==
+X-Gm-Message-State: AOJu0YzZhlbPU4+Y86kyS0gEzUMNkuXtDpsF9qYp/rEIKTFI++TrDmpn
+	cIExhAfJz6FPe53+dD4CDol/1DuOTg0RetmUdw1z9dIOsdI4K590S2T6
+X-Gm-Gg: ASbGncszd+w+8zxUVfJy/fjkpZsHFY4UzkV2Kv8cWqrSUskusOGGbFi6MfurFphYvLN
+	6ma/YIUpVYJrLO2dXZTxnSKU/CpV78SSmJZRALAhhUdXgA21VCVd2XhQpMY0tXY5+70hd41CDEe
+	UFkSLmEkyWeqmjsVPCUEu4tOZoNGbhR0lgxM7yAnPPtrnqCVXLQVK9F20bRkWW/5L3x1SiTeVbZ
+	bQE+z2WMh6K+n/yQJCMJB424qb37T365qj7XnhgDixlMzEjpIS6PZ2fcu22rxR2rl/koNLEyGzL
+	dSwR0V3dlGS54cW6sXQazkC4xWSlLNpufKoAUExDQFtX0RqqV83o5f/KHwAqUcfJJy9QABETn9N
+	nLj623u4Nwzaaug==
+X-Google-Smtp-Source: AGHT+IHLfqZLnbTMGkjCbyDDg3CgnLvZXDq8qp9X0b1i1LqkH5knTG5PhIuIGi8b9hoTvjE+sesh0w==
+X-Received: by 2002:a05:6214:319d:b0:6fa:b83f:2f2a with SMTP id 6a1803df08f44-6fb477a5f17mr27990526d6.9.1749946480235;
+        Sat, 14 Jun 2025 17:14:40 -0700 (PDT)
+Received: from soy.nyc.corp.google.com ([2620:0:1003:315:5a93:3ace:2771:a40])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb35c322c0sm36194686d6.76.2025.06.14.17.14.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Jun 2025 17:14:38 -0700 (PDT)
+From: Neal Cardwell <ncardwell.sw@gmail.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] net: liquidio: Remove unused validate_cn23xx_pf_config_info()
-Date: Sun, 15 Jun 2025 00:49:41 +0100
-Message-ID: <20250614234941.61769-1-linux@treblig.org>
-X-Mailer: git-send-email 2.49.0
+	Neal Cardwell <ncardwell@google.com>
+Subject: [PATCH net-next v2 0/3] tcp: remove obsolete RFC3517/RFC6675 code
+Date: Sat, 14 Jun 2025 20:14:32 -0400
+Message-ID: <20250615001435.2390793-1-ncardwell.sw@gmail.com>
+X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,88 +88,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+From: Neal Cardwell <ncardwell@google.com>
 
-[Note, I'm wondering if actually this is a case of a missing call;
-the other similar function is called in __verify_octeon_config_info(),
-but I don't have or know the hardware.]
+RACK-TLP loss detection has been enabled as the default loss detection
+algorithm for Linux TCP since 2018, in:
 
-validate_cn23xx_pf_config_info() was added in 2016 by
-commit 72c0091293c0 ("liquidio: CN23XX device init and sriov config")
+ commit b38a51fec1c1 ("tcp: disable RFC6675 loss detection")
 
-Remove it.
+In case users ran into unexpected bugs or performance regressions,
+that commit allowed Linux system administrators to revert to using
+RFC3517/RFC6675 loss recovery by setting net.ipv4.tcp_recovery to 0.
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- .../cavium/liquidio/cn23xx_pf_device.c        | 39 -------------------
- .../cavium/liquidio/cn23xx_pf_device.h        |  3 --
- 2 files changed, 42 deletions(-)
+In the seven years since 2018, our team has not heard reports of
+anyone reverting Linux TCP to use RFC3517/RFC6675 loss recovery, and
+we can't find any record in web searches of such a revert.
 
-diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
-index ff8f2f9f9cae..75f22f74774c 100644
---- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
-+++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
-@@ -1208,45 +1208,6 @@ int setup_cn23xx_octeon_pf_device(struct octeon_device *oct)
- }
- EXPORT_SYMBOL_GPL(setup_cn23xx_octeon_pf_device);
- 
--int validate_cn23xx_pf_config_info(struct octeon_device *oct,
--				   struct octeon_config *conf23xx)
--{
--	if (CFG_GET_IQ_MAX_Q(conf23xx) > CN23XX_MAX_INPUT_QUEUES) {
--		dev_err(&oct->pci_dev->dev, "%s: Num IQ (%d) exceeds Max (%d)\n",
--			__func__, CFG_GET_IQ_MAX_Q(conf23xx),
--			CN23XX_MAX_INPUT_QUEUES);
--		return 1;
--	}
--
--	if (CFG_GET_OQ_MAX_Q(conf23xx) > CN23XX_MAX_OUTPUT_QUEUES) {
--		dev_err(&oct->pci_dev->dev, "%s: Num OQ (%d) exceeds Max (%d)\n",
--			__func__, CFG_GET_OQ_MAX_Q(conf23xx),
--			CN23XX_MAX_OUTPUT_QUEUES);
--		return 1;
--	}
--
--	if (CFG_GET_IQ_INSTR_TYPE(conf23xx) != OCTEON_32BYTE_INSTR &&
--	    CFG_GET_IQ_INSTR_TYPE(conf23xx) != OCTEON_64BYTE_INSTR) {
--		dev_err(&oct->pci_dev->dev, "%s: Invalid instr type for IQ\n",
--			__func__);
--		return 1;
--	}
--
--	if (!CFG_GET_OQ_REFILL_THRESHOLD(conf23xx)) {
--		dev_err(&oct->pci_dev->dev, "%s: Invalid parameter for OQ\n",
--			__func__);
--		return 1;
--	}
--
--	if (!(CFG_GET_OQ_INTR_TIME(conf23xx))) {
--		dev_err(&oct->pci_dev->dev, "%s: Invalid parameter for OQ\n",
--			__func__);
--		return 1;
--	}
--
--	return 0;
--}
--
- int cn23xx_fw_loaded(struct octeon_device *oct)
- {
- 	u64 val;
-diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
-index 234b96b4f488..bbe9f3133b07 100644
---- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
-+++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
-@@ -54,9 +54,6 @@ struct oct_vf_stats {
- 
- int setup_cn23xx_octeon_pf_device(struct octeon_device *oct);
- 
--int validate_cn23xx_pf_config_info(struct octeon_device *oct,
--				   struct octeon_config *conf23xx);
--
- u32 cn23xx_pf_get_oq_ticks(struct octeon_device *oct, u32 time_intr_in_us);
- 
- int cn23xx_sriov_config(struct octeon_device *oct);
+RACK-TLP was published as a standards-track RFC, RFC8985, in February
+2021.
+
+Several other major TCP implementations have default-enabled RACK-TLP
+at this point as well.
+
+RACK-TLP offers several significant performance advantages over
+RFC3517/RFC6675 loss recovery, including much better performance in
+the common cases of tail drops, lost retransmissions, and reordering.
+
+It is now time to remove the obsolete and unused RFC3517/RFC6675 loss
+recovery code. This will allow a substantial simplification of the
+Linux TCP code base, and removes 12 bytes of state in every tcp_sock
+for 64-bit machines (8 bytes on 32-bit machines).
+
+To arrange the commits in reasonable sizes, this patch series is split
+into 3 commits:
+
+(1) Removes the core RFC3517/RFC6675 logic.
+
+(2) Removes the RFC3517/RFC6675 hint state and the first layer of logic that
+    updates that state.
+
+(3) Removes the emptied-out tcp_clear_retrans_hints_partial() helper function
+    and all of its call sites.
+
+v2: fix compiler warnings from unused variables
+
+Neal Cardwell (3):
+  tcp: remove obsolete and unused RFC3517/RFC6675 loss recovery code
+  tcp: remove RFC3517/RFC6675 hint state: lost_skb_hint, lost_cnt_hint
+  tcp: remove RFC3517/RFC6675 tcp_clear_retrans_hints_partial()
+
+ Documentation/networking/ip-sysctl.rst        |   8 +-
+ .../networking/net_cachelines/tcp_sock.rst    |   2 -
+ include/linux/tcp.h                           |   3 -
+ include/net/tcp.h                             |   6 -
+ net/ipv4/tcp.c                                |   3 +-
+ net/ipv4/tcp_input.c                          | 158 ++----------------
+ net/ipv4/tcp_output.c                         |   6 -
+ 7 files changed, 16 insertions(+), 170 deletions(-)
+
 -- 
-2.49.0
+2.50.0.rc1.591.g9c95f17f64-goog
 
 
