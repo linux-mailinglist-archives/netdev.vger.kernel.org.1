@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-197899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72434ADA357
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 22:14:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9ACADA360
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 22:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC5701887642
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 20:14:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AF737A816A
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 20:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45762280CCD;
-	Sun, 15 Jun 2025 20:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C962820DB;
+	Sun, 15 Jun 2025 20:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3IDKAVV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E/haabXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4842727FB3B
-	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC3F2820AC
+	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750018401; cv=none; b=JWcZCYffS/oNQT5M+fNJbEN0xSrGtSgeLEUzKRu126jIjeXljR1ce10hqRVRq7RcSFXz/gSUaZfcOvmqfawrBKFZtJWqvDRbwxbBGCQ8/pYIr3fWqXEmzmwgOk/0DhNGwq1dammZtDOAuVyfUwOdRJTpREy2tE83ijz0Lqom0x8=
+	t=1750018409; cv=none; b=KJIbt+4ezKVjX1zEpxlTO2IxrVckG697C1dhkzvfUWiQeodyy2JcphcyQ8rFBqJqRQOm+myroelWiPdfpIG8eD3n/G8XI+WJpUYg3Q/6QE+OR1dKAaQERlq+OKb6REEDi0ZZosWmBksHnol9nRsUDbHtkNgWx2u7efTRSW/D/ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750018401; c=relaxed/simple;
-	bh=grPZsGPRnaQZuRkBbYpaLj/wYfwgSv7l5Z9xBBJX+Zo=;
+	s=arc-20240116; t=1750018409; c=relaxed/simple;
+	bh=4KUzpSMWG3g9IuCPuhaljwtDZbmm+RMgcvIPQFtfMUw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pw9r3K9HlCCBL5P1GyfyzU+29szhHhlyYaWSY7rIInOhpBnLeqsdVoeNFMr30QIkmau/y36zYI2B8QvtSf8iHMsVow/tSpB4jiVTaQyHt39w48VeU8bW5SXWUy05V4xPHp0yi01H99yr1yvj7XfhK0tJy4DoDqYDbW9KnriY4X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3IDKAVV; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Cy5o6WhnKh9+Q2UBrH7JEbTBZFyVYwuNO22oS2w9E3+0dukpHM9M0379rycWcEWZMbcLu9aYLqsb8iu4YgL5MIId8CQVd0A6YdmVqLPQe8uovapHhvvPA2C2iO5X2F6qhMoew+Mv45RE2wEo9PcGAtnj1Lb7mX+zbdPKSJpNFgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E/haabXd; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750018398;
+	s=mimecast20190719; t=1750018405;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hUL+h7O8Iu0fC5YKYEbNKqxo6BXzcFC+2VpUj/LFr9Y=;
-	b=O3IDKAVVp2/kDWP4PzuBnC4BTlYuvmpFQOu3t/sIKJuSvWVk1TwFQCAKTAnvVwwMU3u0Zi
-	Ul7Ua2gK3vwc+kXIfdM4khOpDTHkD4ul+BSSo/f88CVuZCJiN3AT/ZeNpIjj/E49ubsLiJ
-	SU09V2tKlnxIKM/ylcuOOVt80nyYdc4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=EMnYd1npq1nHTWpIVvhBB0Ev585m/kdvaOzQpI3Jbqs=;
+	b=E/haabXd1HADw244OV1xhPUMsYMa8mS/kyT2QjdJyFFT96TpYFToYxo0ls+cRnY/TeF0CU
+	MeiKqI30HMyn8CkLr2mhwsylJBa0VTZb2wK14g+eGlO1IpFvrHmFfU1LyQFYFk+qB1mcTr
+	mVwKza2R9GGnG4TGnWoak4fXV+NQCB4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-600-6kB77x_LMBK6hFUYt44EcA-1; Sun,
- 15 Jun 2025 16:13:14 -0400
-X-MC-Unique: 6kB77x_LMBK6hFUYt44EcA-1
-X-Mimecast-MFC-AGG-ID: 6kB77x_LMBK6hFUYt44EcA_1750018392
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-373-4k_Mk2X7PHq0zEuX87BJhA-1; Sun,
+ 15 Jun 2025 16:13:22 -0400
+X-MC-Unique: 4k_Mk2X7PHq0zEuX87BJhA-1
+X-Mimecast-MFC-AGG-ID: 4k_Mk2X7PHq0zEuX87BJhA_1750018400
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 804F8195608B;
-	Sun, 15 Jun 2025 20:13:11 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E45A118089B7;
+	Sun, 15 Jun 2025 20:13:19 +0000 (UTC)
 Received: from p16v.luc.cera.cz (unknown [10.45.224.53])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 31E2F180045C;
-	Sun, 15 Jun 2025 20:13:02 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1C02C180035E;
+	Sun, 15 Jun 2025 20:13:11 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -81,9 +81,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-doc@vger.kernel.org,
 	Michal Schmidt <mschmidt@redhat.com>,
 	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next v10 04/14] dpll: zl3073x: Add support for devlink device info
-Date: Sun, 15 Jun 2025 22:12:13 +0200
-Message-ID: <20250615201223.1209235-5-ivecera@redhat.com>
+Subject: [PATCH net-next v10 05/14] dpll: zl3073x: Protect operations requiring multiple register accesses
+Date: Sun, 15 Jun 2025 22:12:14 +0200
+Message-ID: <20250615201223.1209235-6-ivecera@redhat.com>
 In-Reply-To: <20250615201223.1209235-1-ivecera@redhat.com>
 References: <20250615201223.1209235-1-ivecera@redhat.com>
 Precedence: bulk
@@ -95,255 +95,89 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Use devlink_alloc() to allocate zl3073x_dev structure, register
-the device as a devlink device, and add devlink callback to provide
-device info.
+Registers located on page 10 and above are called mailbox-type
+registers. Each page represents a mailbox and is used to read from
+and write to configuration of a specific object (DPLL, output,
+reference or synth).
 
-Sample output:
- # devlink dev info
- i2c/1-0070:
-   driver zl3073x-i2c
-   versions:
-       fixed:
-         asic.id 1E94
-         asic.rev 300
-       running:
-         fw 7006
+Each mailbox page contains a mask register, which selects an index of
+the target object to interact with and a semaphore register, which
+indicates the requested operation.
+
+The remaining registers within the page are latch registers, which are
+populated by the firmware during read operations or by the driver prior
+to write operations.
+
+Operations with these registers requires multiple register reads, writes
+and polls and all of them need to be done atomically.
+
+So add multiop_lock mutex to protect such operations and check the mutex
+is held by the caller when it's accessing registers from page 10 and
+above.
 
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- Documentation/networking/devlink/index.rst   |   1 +
- Documentation/networking/devlink/zl3073x.rst |  37 +++++++
- drivers/dpll/zl3073x/Kconfig                 |   2 +
- drivers/dpll/zl3073x/core.c                  | 108 ++++++++++++++++++-
- 4 files changed, 146 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/networking/devlink/zl3073x.rst
+ drivers/dpll/zl3073x/core.c | 14 ++++++++++++++
+ drivers/dpll/zl3073x/core.h |  3 +++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index 8319f43b5933d..250ae71f40236 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -98,3 +98,4 @@ parameters, info versions, and other features it supports.
-    iosm
-    octeontx2
-    sfc
-+   zl3073x
-diff --git a/Documentation/networking/devlink/zl3073x.rst b/Documentation/networking/devlink/zl3073x.rst
-new file mode 100644
-index 0000000000000..9a6744fb2e866
---- /dev/null
-+++ b/Documentation/networking/devlink/zl3073x.rst
-@@ -0,0 +1,37 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=======================
-+zl3073x devlink support
-+=======================
-+
-+This document describes the devlink features implemented by the ``zl3073x``
-+device driver.
-+
-+Info versions
-+=============
-+
-+The ``zl3073x`` driver reports the following versions
-+
-+.. list-table:: devlink info versions implemented
-+    :widths: 5 5 5 90
-+
-+    * - Name
-+      - Type
-+      - Example
-+      - Description
-+    * - ``asic.id``
-+      - fixed
-+      - 1E94
-+      - Chip identification number
-+    * - ``asic.rev``
-+      - fixed
-+      - 300
-+      - Chip revision number
-+    * - ``fw``
-+      - running
-+      - 7006
-+      - Firmware version number
-+    * - ``cfg.custom_ver``
-+      - running
-+      - 1.3.0.1
-+      - Device configuration version customized by OEM
-diff --git a/drivers/dpll/zl3073x/Kconfig b/drivers/dpll/zl3073x/Kconfig
-index 217160df0f49a..8f3056b727aa0 100644
---- a/drivers/dpll/zl3073x/Kconfig
-+++ b/drivers/dpll/zl3073x/Kconfig
-@@ -2,7 +2,9 @@
- 
- config ZL3073X
- 	tristate "Microchip Azurite DPLL/PTP/SyncE devices"
-+	depends on NET
- 	select DPLL
-+	select NET_DEVLINK
- 	help
- 	  This driver supports Microchip Azurite DPLL/PTP/SyncE devices.
- 
 diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index 5af053d3e199d..3269cea8b4073 100644
+index 3269cea8b4073..60344761545d8 100644
 --- a/drivers/dpll/zl3073x/core.c
 +++ b/drivers/dpll/zl3073x/core.c
-@@ -7,8 +7,11 @@
- #include <linux/device.h>
- #include <linux/export.h>
- #include <linux/module.h>
-+#include <linux/netlink.h>
- #include <linux/regmap.h>
-+#include <linux/sprintf.h>
- #include <linux/unaligned.h>
-+#include <net/devlink.h>
- 
- #include "core.h"
- #include "regs.h"
-@@ -367,6 +370,83 @@ int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask)
- 					ZL_POLL_SLEEP_US, ZL_POLL_TIMEOUT_US);
- }
- 
-+/**
-+ * zl3073x_devlink_info_get - Devlink device info callback
-+ * @devlink: devlink structure pointer
-+ * @req: devlink request pointer to store information
-+ * @extack: netlink extack pointer to report errors
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int zl3073x_devlink_info_get(struct devlink *devlink,
-+				    struct devlink_info_req *req,
-+				    struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dev *zldev = devlink_priv(devlink);
-+	u16 id, revision, fw_ver;
-+	char buf[16];
-+	u32 cfg_ver;
-+	int rc;
-+
-+	rc = zl3073x_read_u16(zldev, ZL_REG_ID, &id);
-+	if (rc)
-+		return rc;
-+
-+	snprintf(buf, sizeof(buf), "%X", id);
-+	rc = devlink_info_version_fixed_put(req,
-+					    DEVLINK_INFO_VERSION_GENERIC_ASIC_ID,
-+					    buf);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_read_u16(zldev, ZL_REG_REVISION, &revision);
-+	if (rc)
-+		return rc;
-+
-+	snprintf(buf, sizeof(buf), "%X", revision);
-+	rc = devlink_info_version_fixed_put(req,
-+					    DEVLINK_INFO_VERSION_GENERIC_ASIC_REV,
-+					    buf);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_read_u16(zldev, ZL_REG_FW_VER, &fw_ver);
-+	if (rc)
-+		return rc;
-+
-+	snprintf(buf, sizeof(buf), "%u", fw_ver);
-+	rc = devlink_info_version_running_put(req,
-+					      DEVLINK_INFO_VERSION_GENERIC_FW,
-+					      buf);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_read_u32(zldev, ZL_REG_CUSTOM_CONFIG_VER, &cfg_ver);
-+	if (rc)
-+		return rc;
-+
-+	/* No custom config version */
-+	if (cfg_ver == U32_MAX)
-+		return 0;
-+
-+	snprintf(buf, sizeof(buf), "%lu.%lu.%lu.%lu",
-+		 FIELD_GET(GENMASK(31, 24), cfg_ver),
-+		 FIELD_GET(GENMASK(23, 16), cfg_ver),
-+		 FIELD_GET(GENMASK(15, 8), cfg_ver),
-+		 FIELD_GET(GENMASK(7, 0), cfg_ver));
-+
-+	return devlink_info_version_running_put(req, "cfg.custom_ver", buf);
-+}
-+
-+static const struct devlink_ops zl3073x_devlink_ops = {
-+	.info_get = zl3073x_devlink_info_get,
-+};
-+
-+static void zl3073x_devlink_free(void *ptr)
-+{
-+	devlink_free(ptr);
-+}
-+
- /**
-  * zl3073x_devm_alloc - allocates zl3073x device structure
-  * @dev: pointer to device structure
-@@ -378,11 +458,19 @@ int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask)
- struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev)
+@@ -122,6 +122,12 @@ EXPORT_SYMBOL_NS_GPL(zl3073x_regmap_config, "ZL3073X");
+ static bool
+ zl3073x_check_reg(struct zl3073x_dev *zldev, unsigned int reg, size_t size)
  {
- 	struct zl3073x_dev *zldev;
-+	struct devlink *devlink;
-+	int rc;
- 
--	zldev = devm_kzalloc(dev, sizeof(*zldev), GFP_KERNEL);
--	if (!zldev)
-+	devlink = devlink_alloc(&zl3073x_devlink_ops, sizeof(*zldev), dev);
-+	if (!devlink)
- 		return ERR_PTR(-ENOMEM);
- 
-+	/* Add devres action to free devlink device */
-+	rc = devm_add_action_or_reset(dev, zl3073x_devlink_free, devlink);
-+	if (rc)
-+		return ERR_PTR(rc);
++	/* Check that multiop lock is held when accessing registers
++	 * from page 10 and above.
++	 */
++	if (ZL_REG_PAGE(reg) >= 10)
++		lockdep_assert_held(&zldev->multiop_lock);
 +
-+	zldev = devlink_priv(devlink);
- 	zldev->dev = dev;
- 	dev_set_drvdata(zldev->dev, zldev);
- 
-@@ -390,6 +478,11 @@ struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev)
- }
- EXPORT_SYMBOL_NS_GPL(zl3073x_devm_alloc, "ZL3073X");
- 
-+static void zl3073x_devlink_unregister(void *ptr)
-+{
-+	devlink_unregister(ptr);
-+}
-+
- /**
-  * zl3073x_dev_probe - initialize zl3073x device
-  * @zldev: pointer to zl3073x device
-@@ -403,6 +496,7 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
- 		      const struct zl3073x_chip_info *chip_info)
- {
- 	u16 id, revision, fw_ver;
-+	struct devlink *devlink;
- 	unsigned int i;
- 	u32 cfg_ver;
- 	int rc;
-@@ -443,6 +537,16 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
+ 	/* Check the index is in valid range for indexed register */
+ 	if (ZL_REG_OFFSET(reg) > ZL_REG_MAX_OFFSET(reg)) {
+ 		dev_err(zldev->dev, "Index out of range for reg 0x%04lx\n",
+@@ -537,6 +543,14 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
  		FIELD_GET(GENMASK(15, 8), cfg_ver),
  		FIELD_GET(GENMASK(7, 0), cfg_ver));
  
-+	/* Register the device as devlink device */
-+	devlink = priv_to_devlink(zldev);
-+	devlink_register(devlink);
-+
-+	/* Add devres action to unregister devlink device */
-+	rc = devm_add_action_or_reset(zldev->dev, zl3073x_devlink_unregister,
-+				      devlink);
++	/* Initialize mutex for operations where multiple reads, writes
++	 * and/or polls are required to be done atomically.
++	 */
++	rc = devm_mutex_init(zldev->dev, &zldev->multiop_lock);
 +	if (rc)
-+		return rc;
++		return dev_err_probe(zldev->dev, rc,
++				     "Failed to initialize mutex\n");
 +
- 	return 0;
- }
- EXPORT_SYMBOL_NS_GPL(zl3073x_dev_probe, "ZL3073X");
+ 	/* Register the device as devlink device */
+ 	devlink = priv_to_devlink(zldev);
+ 	devlink_register(devlink);
+diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
+index 75f68bc9a52ee..1a77a69f85a26 100644
+--- a/drivers/dpll/zl3073x/core.h
++++ b/drivers/dpll/zl3073x/core.h
+@@ -3,6 +3,7 @@
+ #ifndef _ZL3073X_H
+ #define _ZL3073X_H
+ 
++#include <linux/mutex.h>
+ #include <linux/types.h>
+ 
+ struct device;
+@@ -12,10 +13,12 @@ struct regmap;
+  * struct zl3073x_dev - zl3073x device
+  * @dev: pointer to device
+  * @regmap: regmap to access device registers
++ * @multiop_lock: to serialize multiple register operations
+  */
+ struct zl3073x_dev {
+ 	struct device		*dev;
+ 	struct regmap		*regmap;
++	struct mutex		multiop_lock;
+ };
+ 
+ enum zl3073x_chip_type {
 -- 
 2.49.0
 
