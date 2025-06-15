@@ -1,90 +1,100 @@
-Return-Path: <netdev+bounces-197859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E42ADA138
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 09:37:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 866D5ADA13A
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 09:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60B8C1709B3
-	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 07:37:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFCBA3B30C9
+	for <lists+netdev@lfdr.de>; Sun, 15 Jun 2025 07:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0A3261588;
-	Sun, 15 Jun 2025 07:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263B726158D;
+	Sun, 15 Jun 2025 07:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="xnMDdUIK"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="zILTqGCg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7E61922FB
-	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 07:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833BB1FF1BF
+	for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 07:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749973040; cv=none; b=Q6OqyMpkSGt83SwUDFdvFkSB2FKBPJi2kTo1fXmxMaKvDs5BBhdZlS+ooERsfB/7lP5+qX8MX3uc/utAsraw1K/SAJ3KzVPbwd/PH3J+dsr+5VmoPBAB5JDwy4KCox+ApA5xdp1zJ1qobGfemvF8N+IJsaaZh3/cmD5pQjLD0XQ=
+	t=1749973289; cv=none; b=f9g0fm/EnSktP9zBc0EM3fFFsnGMkDCwAXI76ij9vTC8EVhfee7IYiRuwcntW4urdB/fyUUqTFeLsHWEWcLC4eMRVkDDL6FqZdrT0ZdhrGNkp7ODW7+43N+MJIW46RQE/1n18xW3Sb0lZSb0K7+GrQS7QrDinvXiwSOLX7She2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749973040; c=relaxed/simple;
-	bh=gmI+OB18/aEFLmeG+0NzWDalnJ1KU2lcY+ijh5E8H5M=;
+	s=arc-20240116; t=1749973289; c=relaxed/simple;
+	bh=w49Ia7nLZK5BATZbhja7+FbxaKXzLeK7IEP4zr/0bu4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pT46IiJLpSNY+fkup+3vuVOg1Pk+Kj0LO21UUyYL/eMkt08flFfsjfANwMUXOcRKDnWVpG18saBypW1xCGq3JmxtenmiXICjgcAqJXd6BYgASdPtpDQkFtiPI+ue3rWOBfyPDoJN3r5FmfhOjbqxCnVRwo56AlFOjmhI5NJuvW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=xnMDdUIK; arc=none smtp.client-ip=209.85.128.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=cGcn3vGLR1JxZx/umIHVBECyJp5BBNFaN0dMYSSjNqd7BolFIOw4xRNu/drLzA30IGRdZWwlAKl7ZAdYfC1vsqsDLEh6enQhnksZGNg2huA6s8/ssp6P4s6G/aBqBjgjy0o/G25HoeR0Ykhn8GtVcziHkgWAgleqwpxDubsT3UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=zILTqGCg; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-453398e90e9so14048825e9.1
-        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 00:37:17 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-450cf214200so29210645e9.1
+        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 00:41:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749973036; x=1750577836; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1749973286; x=1750578086; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FZe8uQenlqylTmWqNC2hIY8BhxwJwY3Ls343kx6UWFQ=;
-        b=xnMDdUIKJPMVG2IugNAPrWYQpsfUuBz+NiDCwuiKaSd17T15lDcS4VLBHX8j9aA/gX
-         qxTXl23somu9+2UCHe0xD0GFAnc5JeETz+/n0OH12B72Dee+1Cx2TVhMPxzUuWYO58c/
-         0Af6K+4yK0+RhgVFLJX6DTwv9PdymbFhWSeRwBSyNbsFbXp2rQjc/86T3SHgYJxx6hvr
-         jtXz6zux1pH7G1bGva/2RR79eyJQOyaNOlsG3ApxSWKhLGzZTkRPZqrXIVAB2zqIqppQ
-         S3CxE19XQJNUraberPbxmN7Ko3Z9dcxkn4lF5YxQSiDSBDgsgkwHYbyMwg0j1xkhXz+n
-         R1Bg==
+        bh=15crHfYFg0c3yN9UDEf5GY+yILB0/x4l44MtFuPKz6c=;
+        b=zILTqGCgqRw72N05mTHPtvYjeRZexe7Ba03+M28yyRBav5pMp24FvAv6KYNoT3GhoW
+         +qFic/XRiaGQbcNWbPum1OqZ15bhrGe/VeEbjIk086eGdVTQUf/boJYS39L2z/QSM6pN
+         4Nx5S2MaUmL/ozaUTugQ8bDB8Lroe47qO/UaaRbux8tHk2qU0rINOOtfsP4oHZlNmmhs
+         19GSWtwwmbsijAcAuDV8TnQYq12Lje5h5fmlbOePZRry+r8ZRunchCNJhV7sx+uK1g1p
+         jWjzmjsbVwOw1ri1kayfBDOetQ4iio5YeSjsh9Rcu2kT05JfXin4Be+3rbPKJK70xNv8
+         zwvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749973036; x=1750577836;
+        d=1e100.net; s=20230601; t=1749973286; x=1750578086;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FZe8uQenlqylTmWqNC2hIY8BhxwJwY3Ls343kx6UWFQ=;
-        b=QtDNeUo29CDlf7aSzpDbGkY7z0/pr2ix3q6CJzEMIZ7LelNgYI2DmUWArs6l/jXb4p
-         8Qj586kxnIA6I0kSMxRViaUoSUcBY7+OMolgbhuEMeLTTYJrz88ae44PmrW2aepBZNH2
-         TIMTmMGIVHhD39HlE+m2ba5iH4CDO1BOSGB50gp5R17k8OcSbQQb2A9n/PX5gGPuPhO+
-         uEhX3Mz7lv13AS/g6Bkk7ST0IGbNeBYrPwdwXb3lL3ruCeH1XC1QoIzwdlJ4XeWhe7lO
-         UfgRxB1US6+18ok/k++BfPmV24NcF48UTnmxR0Q9QONyhz824nt2r179bITSEaSmWfWY
-         lgdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtp+uLdKDDrLsnhqq7V1s8/+elJ2ioxpcmvYf6JFNMNcigu1tIEunpUVPnhOXVgWzy60BZqd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAy9MxPs4eTHOuiel57w03gPh9VgvNU2L3my/gMVfZ/2CPRpuQ
-	aJqlEKCho7hmxd+Y4vQejFuM1ZdO6dSgIWJNqglnNP6h9OvE23dZ8R7JaXMJ5kQA84lMEMQvCYK
-	X3ekz3bE=
-X-Gm-Gg: ASbGncssyHP4wqlV1JgGNsurW5gqcj4IHLmYm1wYSi/o1txLXGl05jti7v9LrylpzrN
-	Zjxb2NWN8iMtjvVKek0orZA/jYLJq9Jp3uUr+Q1mjg0kPI32ApEa+hK/U5N5hWDAE682Eq76QML
-	IomfovRNQYzGSS8D3RCCGY0rb8TdK9dZS7uLAL7xBfsQr7FW4O1+4SX9QmJausYrSIpBFipY5L1
-	EQIJvxdR69NocO9Wl+dnHNyR+5i/1BrX7uISEtpTxGpDXQwqbm9+5uIKP/rQmP2tu4ygMSTbI8j
-	Oa0/bApQwIvxhpZAm4nCwMiizB29hZMubbfYiKVtm5EPIKthO0l+jM3c/UQLnAtEV7k=
-X-Google-Smtp-Source: AGHT+IGT3aOKYj3HxP/dNJ5wrtCJCS4jvbys/KYqEQvAxfZyw3IyNpDmpHTFfLaisw6FIEWMgIolQQ==
-X-Received: by 2002:a05:600c:83cf:b0:442:f4a3:9388 with SMTP id 5b1f17b1804b1-4533cb3bd51mr47139255e9.19.1749973036451;
-        Sun, 15 Jun 2025 00:37:16 -0700 (PDT)
+        bh=15crHfYFg0c3yN9UDEf5GY+yILB0/x4l44MtFuPKz6c=;
+        b=XeKmdbU7BZrCqBL9IpZbfxMcddc+AKSxm5tWtn3dkHd8tsD96OoVsguzcEnTCkvuqE
+         qXVbX69mCi24MlXMKHAoQqPrCOClNOiCKrxn6LD0dEiBYBojZZAe68zp+ot7kzVOV4Fq
+         BwxSYdp5zSTYA8KdajqxMrbenk5zo3E4RUq6JgHIqWVQolvHGs10K8IoncQrkmE/SB2A
+         zBjWfdvDzviLCgWFE+XSndHis4ajJB9gv9xd5k8Ju9G0hy6zgro+dRPxzUK63ffyXo+J
+         MIhO2BjI0GRSwT+2KWfTjv4+PDpXPLEqv2XME1RL1QG8tK10bsiEGBqEgc5QT+wNn3Fo
+         FaLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkKPFG6JDkRNf2vRmi59CE+gZrQuBvmBRoiShbUHRzOX2YGDGFhooDK5M3th6Nqe5Qip/rd9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgFFxQkeCaGzGb1dKJ1OWUR+TZvNFcWnBsM0XezY/pIkEZGVyd
+	PGyYnHJCdgO699f7wasmbx8l25JCEv3kNH52B40zDUjlCt70aJyVe5baU46DuuLf2FE=
+X-Gm-Gg: ASbGncueMy0wuTGk9Pg/NOYISSYNG1M7Vh0qlyBBotLjrLoxFDEiiFUN2gpkJrF/JmN
+	DGflBIWJ849/kSt1L6MACDD8G6obHFc8kO6pHWnPwlEFBUWHJE1JGps393YJWK4cmGwautyfOUu
+	Al0qSD14LtSQtA8PbXUVQ+VY8YsHuLP7/awf2XP0xqJITMvDAKHk9+XK31ulKuVcvdtRCWhZHRL
+	O8Sv/ehUtRZuMWWJUTD+/C8D9ccVrqozur3IiZQKBqygc7pMrHlHuTHvdGOrqfbcE6tJC1ieVqf
+	GBqw4tyyyZlBFFTn+GU0Rm8/Zr+3fn7G13J7Sglno5V7MDr7sam2XsUfbkshzhv4xyk=
+X-Google-Smtp-Source: AGHT+IFkqUoRixLle1xv+ipidpI8Wlfsv3yhb3f0P7DkHWCnYQQa64tQfvQew1w3Lcmx1RZCZ782Yg==
+X-Received: by 2002:a05:6000:178a:b0:3a4:dfa9:ce28 with SMTP id ffacd0b85a97d-3a572366767mr4802586f8f.5.1749973285894;
+        Sun, 15 Jun 2025 00:41:25 -0700 (PDT)
 Received: from MacBook-Air.local ([5.100.243.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e253f64sm101318935e9.27.2025.06.15.00.37.15
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a734b5sm7289017f8f.33.2025.06.15.00.41.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Jun 2025 00:37:15 -0700 (PDT)
-Date: Sun, 15 Jun 2025 10:37:13 +0300
+        Sun, 15 Jun 2025 00:41:25 -0700 (PDT)
+Date: Sun, 15 Jun 2025 10:41:22 +0300
 From: Joe Damato <joe@dama.to>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: corbet@lwn.net, workflows@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] docs: process: discourage pointless boilerplate kdoc
-Message-ID: <aE54KSsCaTY5cxri@MacBook-Air.local>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	bharat@chelsio.com, benve@cisco.com, satishkh@cisco.com,
+	claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
+	xiaoning.wang@nxp.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, bryan.whitehead@microchip.com,
+	ecree.xilinx@gmail.com, rosenp@gmail.com, imx@lists.linux.dev
+Subject: Re: [PATCH net-next v2 5/5] eth: enetc: migrate to new RXFH callbacks
+Message-ID: <aE55Iulol5QTZMMQ@MacBook-Air.local>
 Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, corbet@lwn.net,
-	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org
-References: <20250614204258.61449-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, bharat@chelsio.com,
+	benve@cisco.com, satishkh@cisco.com, claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	bryan.whitehead@microchip.com, ecree.xilinx@gmail.com,
+	rosenp@gmail.com, imx@lists.linux.dev
+References: <20250614180638.4166766-1-kuba@kernel.org>
+ <20250614180638.4166766-6-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,26 +103,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250614204258.61449-1-kuba@kernel.org>
+In-Reply-To: <20250614180638.4166766-6-kuba@kernel.org>
 
-On Sat, Jun 14, 2025 at 01:42:57PM -0700, Jakub Kicinski wrote:
-> It appears that folks "less versed in kernel coding" think that its
-> good style to document every function, even if they have no useful
-> information to pass to the future readers of the code. This used
-> to be just a waste of space, but with increased kdoc format linting
-> it's also a burden when refactoring the code.
+On Sat, Jun 14, 2025 at 11:06:38AM -0700, Jakub Kicinski wrote:
+> Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
+> add dedicated callbacks for getting and setting rxfh fields").
+> This driver's RXFH config is read only / fixed so the conversion
+> is trivial.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> CC: corbet@lwn.net
-> CC: workflows@vger.kernel.org
-> CC: linux-doc@vger.kernel.org
+> v2:
+>  - add get_rxfh_fields to enetc4_pf_ethtool_ops
+> v1: https://lore.kernel.org/20250613005409.3544529-6-kuba@kernel.org
 > ---
->  Documentation/process/coding-style.rst | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/freescale/enetc/enetc_ethtool.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
 > 
-
-I suppose I am guilty of this ;)
 
 Reviewed-by: Joe Damato <joe@dama.to>
 
