@@ -1,180 +1,118 @@
-Return-Path: <netdev+bounces-198099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB04ADB3D6
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 218FEADB3E0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EBA91637C8
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:30:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8000B171CF1
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866771F8AD3;
-	Mon, 16 Jun 2025 14:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8B31F91E3;
+	Mon, 16 Jun 2025 14:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wua/PTRD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w4+qi0TK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80511C2324
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 14:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465B71C2324
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 14:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750084241; cv=none; b=qPNlbvVM0mp4Uslms2ELAcUFpBKUYd+3WkE+wnOyc8nIqCTGj5vbmuy6GzsOxYED1YcCsneHfgI1M09a7R4CzYjls/vsv58z3Y8Rzjt9NCaeClMMV/2Fp5D9eM5qXuyrkhJj7CuHJusVvYOQPaYUOkdF0xiEFViSV3wUBBz5ADY=
+	t=1750084290; cv=none; b=GMw0sKklT2bIPV0/GZQWOmSzr062w0jUf6FLFHOE9Zmvi3qTzznPtwEzKSjb+0+c4CH8/G5K/3nre6vkxefdcnwZ9auh0UM1zz3oGUfv/kaJwMCwa8J/jxR7trdkWZ3LJn1FG7/PZSQAww+QgvCAKChA1dTBBrT0lkap8q19bL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750084241; c=relaxed/simple;
-	bh=cBkQGq+aQh2WGhSROw87npSAa+GCGQe8VqIRgDN9+3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BhdqgK4HKz5j0txpactifOSBQ/555Rmu/WCuiCIU3fZuske/fG6cj3BcUbjIvI6slzaHTU8sfkese8jPJXYh8FEl03hdWnNG1KrXXE3RVpuDSaquLdggUuWI4V9v12CS1e4ItzxkVhKf8MLtbUpACUtUmNJ2UhJ9N2MtJQ4OrJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wua/PTRD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750084238;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b122cq18cIxKAeDyocwvAGBr6eAjHnsn2f9gGHRU4ls=;
-	b=Wua/PTRDjjuAOORQ40afoLUneOBVk3cIap72nEkS3tbSooRXPCHeHNZ9VR/VaCKMXWGOXv
-	3hmAziYQMAOiF3UwS6rmsLlIFmP3HPCg9qhRdxLVZ5y84YwN8Fz6pgH/JSCRA++4vGuqBT
-	KI1KGL2M6TB2zNOFmLjkGTrUSR4M/QA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-QpoDkx7WPOqnUvnhw5emfw-1; Mon, 16 Jun 2025 10:30:37 -0400
-X-MC-Unique: QpoDkx7WPOqnUvnhw5emfw-1
-X-Mimecast-MFC-AGG-ID: QpoDkx7WPOqnUvnhw5emfw_1750084236
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4f6ba526eso2764286f8f.1
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 07:30:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750084236; x=1750689036;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1750084290; c=relaxed/simple;
+	bh=hG4zWYaPLLNSSEJiY2zLAt2zRRS0DqTQ5jzGwi6QQVQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lfn60Q4VQzeTSWoesoTtMJRKXyuxOQZBFipdBNIphlIERyyoHtjKjVJpxttA7EmHc1+wcMHTcianAoURU9q2FIcOLDYgYkrUMJDL5+flrTt0n6EPejVR+3fEqzhyvE1oB5b7G2HsH2pa+uLvcTd7m6ftKBgcfacG4taXjHLd1vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w4+qi0TK; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a442a3a2bfso85849161cf.1
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 07:31:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750084288; x=1750689088; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b122cq18cIxKAeDyocwvAGBr6eAjHnsn2f9gGHRU4ls=;
-        b=SqhCdgC4uCzKjeT2brGkYZO/84rV/ll+kvNRZBkjyDsHjAEL0G9tNGNk036+kCh0o9
-         yiztwwCYNEefKNRA/1XjsxGQ4S0My4SYbYFn/gSY3vBH1ZJAwYlilTX1zKfSl8kxFB/V
-         PV+rFfyjLkyICI5K5DgQLO1L24k90Ak9F/VpO3KWGoE0GyO00g+Xp8hhUqzLwE+PHJaR
-         AOtWXX4AvBgFs+CGf74GYIm+yM7s5EbjKrUWJ2pDXYQlHY5tXk4u1jvIdqigoNRyB8J+
-         Oiq/I3DgoDM1QqQvNyiaegrNZPB4Kqex2f++oBDRUUHqJL0buA9wSpN9XrVisrvM0It9
-         sfhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHXh/bP7yQ0uWio9ZeAwVElN1Ww6YB4KfcgOhNfbKTABBxw5qazZpGE1uw7cbdD1ZFTdGDLNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1aykT67Gf3gt5Q3HxvkeITntIQCz2akaxWesmqSCjD6SLrhbv
-	W95yF8SMmxs+aeVtinau7IVxHPwY2+IypvaDFzyUL6KN1dLEtOt0YceL/ai8ZqgrxGIyX98w1+f
-	txlAMY5vv9Y6N3lyPn+kvm+4A4+aoCh/eP10YO1UptbJEyUj0wjtUvXJ75w==
-X-Gm-Gg: ASbGncuFx7lPPsBRW8w7whJhhBAJiMQr0u9zMWck8n2YAPrFLz9vM4fval9V/V9pv+G
-	ASe6g4TRCl9EwI6+ZUv9ZClKLxfJOf02h+XRZrFz91XmkCLhIMm+nIIk75cc/qf2ajfgK+SKdWF
-	WF8qqPmZmWFxxe/9fcwIvb+z4lRAlsbAmizRXJuUeJfpolIdYmyMuszDw+2J3aqVWck4/d2rWP4
-	W/z9Mzeo0JgwlSrk9o9Y00HWslWAGZsOJCr8I+09ePd7AoVj952kavfkylljCf52XktEYl/VNid
-	AHw5eHwORqmUMsAoSFVhUHap6xU=
-X-Received: by 2002:a05:6000:4211:b0:3a4:dc42:a0ac with SMTP id ffacd0b85a97d-3a572e4b6eemr8077940f8f.49.1750084235903;
-        Mon, 16 Jun 2025 07:30:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGsnkYIGAr+qs47yOUuIjHINelBcn/kxEeTN9OXZQ0z3+Yj1yvrInii/mr9eol6osEokceKog==
-X-Received: by 2002:a05:6000:4211:b0:3a4:dc42:a0ac with SMTP id ffacd0b85a97d-3a572e4b6eemr8077892f8f.49.1750084235405;
-        Mon, 16 Jun 2025 07:30:35 -0700 (PDT)
-Received: from leonardi-redhat ([176.206.17.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b2371bsm11346666f8f.70.2025.06.16.07.30.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 07:30:35 -0700 (PDT)
-Date: Mon, 16 Jun 2025 16:30:32 +0200
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: sgarzare@redhat.com, mst@redhat.com, pabeni@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
-	netdev@vger.kernel.org, stefanha@redhat.com, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, fupan.lfp@antgroup.com, 
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [PATCH net-next v2 1/3] vsock: Add support for SIOCINQ ioctl
-Message-ID: <mrib74zhrw47v4juifp67phnm6tffb7qgfm3xmtcuw5maminlv@4i7z36hg3554>
-References: <20250613031152.1076725-1-niuxuewei.nxw@antgroup.com>
- <20250613031152.1076725-2-niuxuewei.nxw@antgroup.com>
- <2bsvomi4vmkfn3w6ej4x3lafueergftigs32gdn7letgroffsf@huncf2veibjy>
+        bh=hG4zWYaPLLNSSEJiY2zLAt2zRRS0DqTQ5jzGwi6QQVQ=;
+        b=w4+qi0TKXxF4k8FS/kty37NZeUk2D3yTFuNSbpGwIPimgEy/PxbBDWtmzflvUmYR9Z
+         TaGQ9teoA6oL4vvX3Hl4qg6V1+jG53+2C0SBxZKGKsCZj/dQP36d4y+YmBKjjEKP1Icv
+         wLf4UwSxr4GGiYF4jgzSzYdsSGONuHieRG96ibLoi2DleuaKS9V9vBbCN6HOreA8aTIt
+         aeYO2UwNdTY+o0XeBWijqjCgx43YQvkZS1nGozV2aGWct7+sGl2+ON77u03K5CzEzGB1
+         QUcJtqqwx5/HQjvi31F/wcSYtnrUvnTYvwsceX2V4v8qTfLNxwT5ptrh33Xct0AnDqRH
+         bflQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750084288; x=1750689088;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hG4zWYaPLLNSSEJiY2zLAt2zRRS0DqTQ5jzGwi6QQVQ=;
+        b=jQucKSsVdU3nWapOXi5UZlGEEQ9rRH0xgstuEohS8bOYcNNQD3L13Mfb5Nb0IgMT0Z
+         gmb3+HOmhC8oBkKPpzDiQadT+aX1VdhmH2/ExPmRpna+dro/FyFx2a8PvkGJxpdmMiNS
+         OCaJPqKTM5EM00sMvhkdyW+3a4jK0ATqL8/tlUHBHUlXgBgSHqEQl3fhQNOXPfupMLTX
+         4YzqmI5Q19bk9+i9yCrPYU8nbCNeFBTeDSrefDQvCoN+04bsdmSVgfAGCMZMdUkZsAH+
+         kJYQiThcg6KlKgmD718sQvQe4W6XNtkrKD1RnJ341A5DIm0FkFcwngTPCWhojiNTGJWn
+         HFtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQqZB6l+PxYAEYGU4NWUJHAUgTZOtCQkKiLssVYVewZSCCh5rAGQUkt17zbahtYBCqn+0a1RE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHk20tDtaRDx/QfuuJYuIHkopNVZNva6zEFZpq5p441KVombvf
+	MgWhkAXMduJyaiRCfnZTSmV1aF54yixT6LEaGTaZWoTFqoZUeLN+dBA0D4GSDnCX0wIkfK+HRJC
+	RpP2EL3gYYDS7xIZ6ihny55bJ3e/Vx8QLgF2vc1jq
+X-Gm-Gg: ASbGncuNgt5jszm3LsVpxf1Vx5ZE0Q2laN8Dd0/Hs6TeDmDhVeDIo1RjvUdGW/CSl3S
+	POME6/6QvqCp0ZtYwZ6kQ9wDEMPg6bafs3fuzGW0nr5fdfDgjdDz1PvVHQAki7tAtxEN+dnNKLQ
+	5Igacy1XNJ5lyWAMqjzj0Gdjhl4809hNHozPGy3LlhQLCJvQtDowNenSbN5Ls5ACj0SvZ4F8F3d
+	15A
+X-Google-Smtp-Source: AGHT+IHCXay6zp4uxhdFgzMHeaKDxRu9Jx6wAWBDQvLHFz8z4Ll1wUGUZa4nhEZmhB+gEWzZWChI7OTSBOMkenkPzFs=
+X-Received: by 2002:a05:622a:c8:b0:477:4df:9a58 with SMTP id
+ d75a77b69052e-4a73c5936bamr154928561cf.18.1750084287744; Mon, 16 Jun 2025
+ 07:31:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <2bsvomi4vmkfn3w6ej4x3lafueergftigs32gdn7letgroffsf@huncf2veibjy>
+References: <20250616072134.1649136-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250616072134.1649136-1-alok.a.tiwari@oracle.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 16 Jun 2025 07:31:16 -0700
+X-Gm-Features: AX0GCFuESG55Eq6siZMh55BPaOCSjihuUmr0dKV5S8eb_NYAkSei40pkyINoRSI
+Message-ID: <CANn89iLQdB5Qmd2U=mk6SsG0=GZqVYYP1YdoXqKxit4uRdPC=w@mail.gmail.com>
+Subject: Re: [QUERY] tcp: remove dubious FIN exception from tcp_cwnd_test()
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: ncardwell@google.com, kuniyu@amazon.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, darren.kenny@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 16, 2025 at 03:42:53PM +0200, Luigi Leonardi wrote:
->On Fri, Jun 13, 2025 at 11:11:50AM +0800, Xuewei Niu wrote:
->>This patch adds support for SIOCINQ ioctl, which returns the number of
->>bytes unread in the socket.
->>
->>Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->>---
->>include/net/af_vsock.h   |  2 ++
->>net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++++++++
->>2 files changed, 24 insertions(+)
->>
->>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->>index d56e6e135158..723a886253ba 100644
->>--- a/include/net/af_vsock.h
->>+++ b/include/net/af_vsock.h
->>@@ -171,6 +171,8 @@ struct vsock_transport {
->>
->>	/* SIOCOUTQ ioctl */
->>	ssize_t (*unsent_bytes)(struct vsock_sock *vsk);
->>+	/* SIOCINQ ioctl */
->>+	ssize_t (*unread_bytes)(struct vsock_sock *vsk);
->>
->>	/* Shutdown. */
->>	int (*shutdown)(struct vsock_sock *, int);
->>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>index 2e7a3034e965..466b1ebadbbc 100644
->>--- a/net/vmw_vsock/af_vsock.c
->>+++ b/net/vmw_vsock/af_vsock.c
->>@@ -1389,6 +1389,28 @@ static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
->>	vsk = vsock_sk(sk);
->>
->>	switch (cmd) {
->>+	case SIOCINQ: {
->>+		ssize_t n_bytes;
->>+
->>+		if (!vsk->transport || !vsk->transport->unread_bytes) {
->>+			ret = -EOPNOTSUPP;
->>+			break;
->>+		}
->>+
->>+		if (sock_type_connectible(sk->sk_type) &&
->>+		    sk->sk_state == TCP_LISTEN) {
->>+			ret = -EINVAL;
->>+			break;
->>+		}
->>+
->>+		n_bytes = vsk->transport->unread_bytes(vsk);
->>+		if (n_bytes < 0) {
->>+			ret = n_bytes;
->>+			break;
->>+		}
->>+		ret = put_user(n_bytes, arg);
->>+		break;
->>+	}
->>	case SIOCOUTQ: {
->>		ssize_t n_bytes;
->>
->>-- 
->>2.34.1
->>
+On Mon, Jun 16, 2025 at 12:21=E2=80=AFAM Alok Tiwari <alok.a.tiwari@oracle.=
+com> wrote:
 >
->Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+> Hi Eric,
+>
+> Thanks for the cleanup and RFC conformance improvements.
+>
+> However, we've observed a performance regression in our testing with
+> Apachebench at higher concurrency levels. Specifically, throughput
+> and HTTP tail latency in workloads.
+> It seems the previous exception for FIN packets allowed graceful
+> tear-down even when CWND was full, which is now delayed or stalled.
+>
+> We understand the motivation for the cleanup, but the change introduces
+> practical impact for real-world workloads relying on timely
+> FIN transmission.
+>
+> Would you be open to discussing potential mitigations?( not sure like
+> selective FIN override, other approaches.)
 
-Stefano is totally right, reusing `virtio_transport_unread_bytes` is a 
-good idea.
+Anything relying on being able to send more than the allowed budget
+will break when rules are enforced.
 
-nit: commit message should use 'imperative' language [1]. "This patch 
-adds" should be avoided.
-
-Sorry for the confusion.
-
-Thanks,
-Luigi
-
-[1]https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
-
+You could try to add an opt-in feature inflating CWND at
+shutdown(SHUT_WR) time, anything not in the fast path might be
+considered.
 
