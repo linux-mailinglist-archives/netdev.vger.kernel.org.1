@@ -1,148 +1,103 @@
-Return-Path: <netdev+bounces-198035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB9AADAEC7
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:38:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6405ADAEF1
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 976A33AD9D1
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:38:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AB2016CB79
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC57D27E059;
-	Mon, 16 Jun 2025 11:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AE92E92A1;
+	Mon, 16 Jun 2025 11:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b="r9tvtFS2"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="HumLTvy1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368F82E3367
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 11:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750074305; cv=none; b=j3HDLD2Iv/MpBd9H+32Dkk40eMnvSw1GOASc50HYPpT278OHluj/hIgqEm6jQ+l0zYDNJYZbrcy1ZkKoSdmtJtPOuIT6D+bUeSJdIaxwM4YEzx48zW2aRRPb2tALIVJIe0JznQJfLkKawLP79PryXPvxG/IRSuBsFgn2ZEJAJM0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750074305; c=relaxed/simple;
+	bh=Sshlv3G42dDhB35r9a7RpshJNAbwT+Li3MD2hsB/AYU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bz+5/fBI+vNMM5pvcYuLjKd2I+kQLcNC/cH2cSQe/fuTEy7v5yKEW/AYTl/mX+RHROitXaf+h2mMdkpAVh81qoTDfpaTac96OR91xwAXT1iwpR0N66uRQudJlrkcDUtsdwGVyhwx4DsBBnLb1CIvBwXKmPZNj9GOk1gjhKHN9GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=HumLTvy1; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 8E76F206B1;
+	Mon, 16 Jun 2025 13:44:55 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CvELbfG6Jw13; Mon, 16 Jun 2025 13:44:54 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845C9261570
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 11:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750073913; cv=none; b=dQeQtJddb7Z4C5S1pqQs0Suej+BHa8PudwamF5geH/eLNTLX4XlVaB5zxAbZmABX9j6ZRTOt31i5fgDVGOgQj6S2exghJqhSFzQQE5cnVewICkF4yBKuc4lABFFgR7Nxp+EnlUGppuOCOml5inK1P93acAtACge/9s7a6+sW1JQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750073913; c=relaxed/simple;
-	bh=QkoFrlyru+g9n/PbGtj0A9V1wfret8+u5o+LjOwYGUA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SmoxqN1Ycn14j7ex3lRD9gI0hf1n588avBkK3OAKDFvLPEgSkIeo0Ac2YcNCJfSPh0KtK7wEknPul9IdvHOEZh02LJHShxT0cvnvRic3/yFR5SuFWsgLuh93xl8Kr1bQT/MtSXCVivXcchYxxQV9DBh3+0PeRn5b+o1ePPW24JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com; spf=pass smtp.mailfrom=bell-sw.com; dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b=r9tvtFS2; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bell-sw.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32ae3e94e57so38912871fa.1
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 04:38:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bell-sw-com.20230601.gappssmtp.com; s=20230601; t=1750073909; x=1750678709; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K7zZnAwLI+hKyxt1AxwHgQMzbSPV04vShS9w0c+zcCg=;
-        b=r9tvtFS2bi7zgEDkdXNmTIVKdjTdjM+Hfh+WCvGiLKPvjPaI+8MRLqjupkfs69ayAk
-         Js1zdvQu3Z5pEFwLrm90lg86mLbVGN5v4IW0rj1Qi6T2ToyqzyhZv4hozvZC+bJx9FaS
-         RwUL1d2+4MrEy+EECnOZY7vzEH5Q+vETXYBJfyogzZu3YgvMJ/F99b9HcoyNlgIE8odr
-         X5331e3i6HF9x+VyvOoLJFKTyMIGPw2zmoXju9xV02nXtMparYiQSdUOkKz0vkmvcjWM
-         ONpL6Gq+AsRLE3kgciSgw9k5qvtd3UzgGdmrm+D2zPj+FLsOTuUktiWrHr8c07rPDiCu
-         FBHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750073909; x=1750678709;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K7zZnAwLI+hKyxt1AxwHgQMzbSPV04vShS9w0c+zcCg=;
-        b=JvzLaN2q0kvne9h184l90If037EJPMbgpoJICH7O9krPhBIT6LDKJYXc1bFmxYCKE1
-         XWtiM76Lkf7D500OzR7mspE7J8l5sXKIDZtlNXpIW3suG/H7bNV/Oe12/8KLZXEy6PZT
-         qZPS8rb8soyuAaAfOMLMmFZ7VmQJlVEZ0jyCLl8vMMfx+kIVOuOaRJ9XzDEmL99GTeWM
-         oggb4RoNy8jvH2QeLayupACTJfsEj9oeQZ96tM608qxmLPh0E/j18V/gPRpk+pSk9Znm
-         0E/ucIDU7BpvapZa+d2+Jfp7/ttD3laTfeF+PHP3+MeeqF2xRTyNJdoFZMX1ux/ZAZnl
-         wzAw==
-X-Gm-Message-State: AOJu0YyWFTyz26wCB9uKYoPpP4I+Gcl+3SQnrxLuiGHjWCo6TcgSoYwr
-	HnLJyZXTRNcsCuOc+TqZDOuOYN0g5Ol+T7Byoh2+wNbERMpz9CFkFu2fxdRTEVXfvD7vEgBwCx2
-	yjIdqS5nk
-X-Gm-Gg: ASbGncvFW2l/agA3IqtMYXQtQlnZS57Ac3oNRdPkW5pNU5/tPQDfdUfoDb05YdyFC3A
-	qGDUvwqfJjAE2p/yzIUNKdi3SHmAf/fyG+YOAxgmaM2MzKOv67L52hFAraBE37qstsk5Eq5cIOL
-	AlSp0K5aJAzXJ3nOA8JV3w6AhZzxA255m+cDzW76mF+frafMRLuIM1zZBU/zQ7VDxpPjp59QwM2
-	XlqGTvmZuocLf8EWql5tdTBQcyB1Yt7/u8NLTAgSD8lgTgEqzxUM+yEJjYhwP7O3f2ckJ3MzUpS
-	hb3QpdeOyz282z6cfSXVdnriauWAVBzN0UGZMCv1HBieR2W7sip6je0dWgGhVMAJ+11VTpQ1Fsy
-	I9ZHXnA==
-X-Google-Smtp-Source: AGHT+IHsboukhaSQaS5SdpCRwPx3Fj9uCfUgw7Nm1Gw32BmYsHWyKPjuOlERB9sfGnTKxBC7ihx0Hg==
-X-Received: by 2002:a05:651c:1423:b0:32b:47be:e1a5 with SMTP id 38308e7fff4ca-32b4a7030d3mr16468111fa.39.1750073908479;
-        Mon, 16 Jun 2025 04:38:28 -0700 (PDT)
-Received: from localhost.localdomain ([185.119.2.99])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32b331ca981sm15012781fa.100.2025.06.16.04.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 04:38:28 -0700 (PDT)
-From: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-To: netdev@vger.kernel.org
-Cc: Rengarajan.S@microchip.com,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-Subject: [PATCH net-next v2] net: lan743x: fix potential out-of-bounds write in lan743x_ptp_io_event_clock_get()
-Date: Mon, 16 Jun 2025 11:37:43 +0000
-Message-Id: <20250616113743.36284-1-aleksei.kodanev@bell-sw.com>
-X-Mailer: git-send-email 2.25.1
+	by mx1.secunet.com (Postfix) with ESMTPS id C2113205ED;
+	Mon, 16 Jun 2025 13:44:54 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com C2113205ED
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1750074294;
+	bh=b0L6oH1MwP79DStYmlbTBiSW83Vq0WSCzxebAGg9NkE=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=HumLTvy1zYL3DYdy6wPp9/HEBemVclGuSK9wsJ/ZbhUxqSdSmK/Dhz39dNKWi+8bb
+	 dJQSRI83s00VAVcuO/F9Qp2uiQ22GCpZ6WjUKVndCuDJ5GYypUWeW6FEfyFNcq9ed6
+	 YjpFN+scVR8D19wVMLLPLtMaIVs1KkZTPhpC+obGyKqd77kZWLTyadKjZ6r+7cU/cE
+	 GD8QXYrUxf3bu945jrtS9zkAT05tLixl4hRLCElXdUoqLSbKr9c6ztV+MJ6w1nHELX
+	 pWUBMKjQRJ2xB4D9N1KjndKehYej0UY8jRspSL4eqgvwufjHr7uDbPlOnZ/uwbROJY
+	 ccRatihmpuhkw==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 16 Jun 2025 13:44:54 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 16 Jun
+ 2025 13:44:54 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id CAD333182AEC; Mon, 16 Jun 2025 13:44:53 +0200 (CEST)
+Date: Mon, 16 Jun 2025 13:44:53 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Leon Romanovsky <leonro@nvidia.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca
+	<sd@queasysnail.net>
+Subject: Re: [PATCH ipsec-rc] xfrm: always initialize offload path
+Message-ID: <aFADtXIv7iDuhVO4@gauss3.secunet.de>
+References: <1adfa8a9af9426b34b2fbeefc64fd41c4f4aa1ab.1749368489.git.leonro@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1adfa8a9af9426b34b2fbeefc64fd41c4f4aa1ab.1749368489.git.leonro@nvidia.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Before calling lan743x_ptp_io_event_clock_get(), the 'channel' value
-is checked against the maximum value of PCI11X1X_PTP_IO_MAX_CHANNELS(8).
-This seems correct and aligns with the PTP interrupt status register
-(PTP_INT_STS) specifications.
+On Sun, Jun 08, 2025 at 10:42:53AM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> Offload path is used for GRO with SW IPsec, and not just for HW
+> offload. So initialize it anyway.
+> 
+> Fixes: 585b64f5a620 ("xfrm: delay initialization of offload path till its actually requested")
+> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+> Closes: https://lore.kernel.org/all/aEGW_5HfPqU1rFjl@krikkit
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 
-However, lan743x_ptp_io_event_clock_get() writes to ptp->extts[] with
-only LAN743X_PTP_N_EXTTS(4) elements, using channel as an index:
-
-    lan743x_ptp_io_event_clock_get(..., u8 channel,...)
-    {
-        ...
-        /* Update Local timestamp */
-        extts = &ptp->extts[channel];
-        extts->ts.tv_sec = sec;
-        ...
-    }
-
-To avoid an out-of-bounds write and utilize all the supported GPIO
-inputs, set LAN743X_PTP_N_EXTTS to 8.
-
-Detected using the static analysis tool - Svace.
-Fixes: 60942c397af6 ("net: lan743x: Add support for PTP-IO Event Input External Timestamp (extts)")
-Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
----
-
-v2: Increase LAN743X_PTP_N_EXTTS to 8
-
- drivers/net/ethernet/microchip/lan743x_ptp.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.h b/drivers/net/ethernet/microchip/lan743x_ptp.h
-index e8d073bfa2ca..f33dc83c5700 100644
---- a/drivers/net/ethernet/microchip/lan743x_ptp.h
-+++ b/drivers/net/ethernet/microchip/lan743x_ptp.h
-@@ -18,9 +18,9 @@
-  */
- #define LAN743X_PTP_N_EVENT_CHAN	2
- #define LAN743X_PTP_N_PEROUT		LAN743X_PTP_N_EVENT_CHAN
--#define LAN743X_PTP_N_EXTTS		4
--#define LAN743X_PTP_N_PPS		0
- #define PCI11X1X_PTP_IO_MAX_CHANNELS	8
-+#define LAN743X_PTP_N_EXTTS		PCI11X1X_PTP_IO_MAX_CHANNELS
-+#define LAN743X_PTP_N_PPS		0
- #define PTP_CMD_CTL_TIMEOUT_CNT		50
- 
- struct lan743x_adapter;
--- 
-2.25.1
-
+Applied, thanks a lot Leon!
 
