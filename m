@@ -1,205 +1,267 @@
-Return-Path: <netdev+bounces-198096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D6BADB381
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:21:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B4E1ADB3CB
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4F7B1725F1
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:20:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C4C41884285
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0268200B99;
-	Mon, 16 Jun 2025 14:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEBE1EA7E1;
+	Mon, 16 Jun 2025 14:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gUJlA+dk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DANrcQj7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2055.outbound.protection.outlook.com [40.107.92.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B3317A2FA;
-	Mon, 16 Jun 2025 14:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750083398; cv=fail; b=ToHnCxOD1iKetQk7VMHfB/lq84S4lF2HBhTU+Pfp+H6yhb+zZmt38avuaQR/MSnfEECZEMqgLZ1c0O7xfuV/Momko4nwqhKIDcK1khr+ojFgA1mO36bLna3vnaY41Lk2VuBRluhkujWMa9V7jqs4XrFKAP5wQrIe6RJ6077VEgE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750083398; c=relaxed/simple;
-	bh=NRNIwdtX0mxErnQIT/tmosLeBDWShrgDNz5WJCaiAAw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F2NZ1BKartg/f8aMSruNKrqQL2B28GXbudgSVG75QEzHlLUJ66E6sM9Rluxmo/WFBXEBHD0rSTTaIuGD9bzgcBz8NeY9RhnIooYIGLhGv/4R0JBYt9p/VLfStgsJSYAIK2ZR1BZnJEuoTI8A9X3Jw1WYxfobq4GUvBTx5USvwqM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gUJlA+dk; arc=fail smtp.client-ip=40.107.92.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bYV6FrNEEtWaY9ZCGv427blQHTZQJIwJDfmbOzkh5jvB2azyPRPGEnXE7mExU/i6Plkw+Pq5aMq/MOlPSOiwlrpBxXd8eGuJoZTn+nyHCtvyRf36uSVbNz1cIGYihq8mVraVa1tHBgJkPQdDbt4T9cgICKUwAwT6LFuowRbdeLiLXPCxIozyq6+/lI+h2QPjJn0EIEnY3gQ0FLNqbnAmXozn8Q9iKbxb3BXhFGeazQu3EI/vKVmKjF8rVuta8+v/+zk2/PYV7C8IgQlRaL72IouQxm5ZtimhS+eL+w9DrltQ/H52+AMQqgBot0CfhnC7MeYBUE6GDjAFT8iqvIt+xA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LmkB3/PEgvL2PBTLIqqFkB6YldetutnkLe8oZE10M9U=;
- b=GCtL0K4gxVfa81GL0BWcMIl02xX2KoSWaSjJmLIi8knA8iI+PecaRP10y1nQuG3TqJ1Q9AAjk7kLYZFgX8l73EKFVINvgAXy8mXFRdp2MhqBSjHs/x58Fpv/2fb44NLckcEiDUg8rvmrtqWhj6CElMdqSRtgGOPepymPHbqSuAbPEgNjwj4ixPVqnrfm4xAeCaIXPVgn+wSA1lW875Ee0qpt0+Oe49kQEaY56wy2TUnplGDqoNamvoKZNJPtt0EkeG+jztHw5jyKv9HEXznB8+l0wVnmrRlfNIpwGoiagSeLQ0sV9VALTgfv6ovdfacMPiYf0dhouFyqWjUukBMuyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LmkB3/PEgvL2PBTLIqqFkB6YldetutnkLe8oZE10M9U=;
- b=gUJlA+dk1vm2bC054KlvfkpDK3sNCPyJ2SYweAg60+U0VkQIIksN+Z14CHKk4exm968OamBbaRJADdCUFHhNd769WoKqtFKuZYjIP20F28CF500m1hfyEO9Dd0HcWkSqDxXltiJp4wIXmMFbcRiVqnDJosSDvx48kfmqGbyjzUt+R7bPeQoAEbn0psEJwdj2CoekHx4QcHPHwLix8gH05552CpwAfScAicArgiRsGiwnRGD1wogiB+3n7XoKq5mdCV3uk/vE3NIyN5Q3k4iu6/AkDMIP/v0w4ZY1zRROH2qC4jE+qQGIPL999UJ7xP1B9jcPjK+OyFEGacrO7F5zxg==
-Received: from CH2PR11CA0003.namprd11.prod.outlook.com (2603:10b6:610:54::13)
- by DS4PR12MB9747.namprd12.prod.outlook.com (2603:10b6:8:2a5::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Mon, 16 Jun
- 2025 14:16:33 +0000
-Received: from CH3PEPF0000000A.namprd04.prod.outlook.com
- (2603:10b6:610:54:cafe::32) by CH2PR11CA0003.outlook.office365.com
- (2603:10b6:610:54::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.23 via Frontend Transport; Mon,
- 16 Jun 2025 14:16:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CH3PEPF0000000A.mail.protection.outlook.com (10.167.244.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Mon, 16 Jun 2025 14:16:33 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 16 Jun
- 2025 07:16:19 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 16 Jun 2025 07:16:18 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Mon, 16 Jun 2025 07:16:13 -0700
-From: Mark Bloch <mbloch@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
-CC: <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
-	<tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, "Jesper Dangaard
- Brouer" <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Richard Cochran <richardcochran@gmail.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, Dragos Tatulea
-	<dtatulea@nvidia.com>, Mina Almasry <almasrymina@google.com>, Mark Bloch
-	<mbloch@nvidia.com>
-Subject: [PATCH net-next v6 12/12] net/mlx5e: Add TX support for netmems
-Date: Mon, 16 Jun 2025 17:14:41 +0300
-Message-ID: <20250616141441.1243044-13-mbloch@nvidia.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250616141441.1243044-1-mbloch@nvidia.com>
-References: <20250616141441.1243044-1-mbloch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697AF1E32CF
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 14:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750083830; cv=none; b=ZzVVWPzqDiPJvlLKci02uMRlMZGs/qR9AnPdGfxjtTtah/XKVCvCSOq48xwTb1roTKhP908oafFMbqfLC7WG5j3Tx8lI0ulfDj0h5JHP1oP6urC9tSNZLVXVLoquDfeac6vtXsPPmJ983M7wAyLbkC1KB0xPNfEux7lpkS2XCGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750083830; c=relaxed/simple;
+	bh=v8tipBw1Rg8uUUI8WgiokNzRTX+JlMQF/S8IRZIRHs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qGerkrtqIlBXTN3sIqug0OOYdgAXiDqTwj3WCXd77Hlv3jRadCI1N1cvubd3FU9uhizBtXsmefdFA1zUQl72o+hdpPadI2TIByGBx5CvH58nd88q2+nYFbyeJfAqgvRa64FYQsd4l76ZBn3oylbFMUYdf3kLy1mviltSo7hzSBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DANrcQj7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750083827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U+2gsbjGMfxgj+GtSEJhJLLfivzU+vrOQd2XrrPgUqI=;
+	b=DANrcQj7cPIkIJw0VOCj2o5UbdZ16JaSYlWqw3ejrcbIbeTCx8+ulthYjwglZrqOmswORW
+	g711h5gGUQYJP9YeFpP2w0Xw6gZUdaZmSno3cTCmXuXuL1Y6gGEXWiCMFTmhUyvULBDzPG
+	Q4Hnt1T7Km+/HecIDVCTCZHoiasgO0c=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-rEXKxMEGNgyHKboidp1b1A-1; Mon, 16 Jun 2025 10:23:45 -0400
+X-MC-Unique: rEXKxMEGNgyHKboidp1b1A-1
+X-Mimecast-MFC-AGG-ID: rEXKxMEGNgyHKboidp1b1A_1750083824
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-452ff9e054eso24138795e9.2
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 07:23:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750083824; x=1750688624;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U+2gsbjGMfxgj+GtSEJhJLLfivzU+vrOQd2XrrPgUqI=;
+        b=t8iY7qW/UOZQ8EM6h9v8h0rVHuGXi1r4Pcf8IM9/cLGNV1u2sVDPfQ2RgoeGqWDFvG
+         GI1JYvm6z2+WMbrxMn8pTmDVrOVk8bCwx1dROOyJuc5rU8T61WJcnt0Eagqu9+kSfl8S
+         0TphUG4GJFCZZyaB3uIam9H1Arf3vFAiTkCsfVd8iyMK2r2txF9M0bpsJnBXRpOPUdvg
+         wJkz0LjoALdmlR+l9lwxNBayFhkGR8//gbjB9NEE3RTj8VaMHG3CBdydm7W5hj25Ae0t
+         TrRmeIYfbjaa3/ZzZhGRdhdzMfVxLq/c6kbTe2WtbJsrjzRNlaLGLaheRxPAzs+YQiMk
+         izjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXC9Z1SDrA7w2jVUkLlSAZQ6IDy+q6m4T95n1XRqdaZan5QiyNfUk0olJaX0VIG7IeONnKQmm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEGEkJ7ujrxpsubawg6Ujy+bFghuTviiABT/Zig37P55leRQkn
+	gstbeRTmKBANrGipQkI7u7tQIBm9THdAXfXZ4vpH5EmoM/mxL5Ztp+ZkKN3/1RrdRbzq9vqIq3S
+	Cu/aK9/DPqP/2JSib1shfwlM5hgy3TYRNVoYk2pmtqwezPqi61e+xPFrt1g==
+X-Gm-Gg: ASbGnct+pAuyK3k56LobGZvwZOGnELwtxOkPFcEkiJUtLH5a6GGQff3h5B15D4Gbzcb
+	FsujwkLQe2DwEH7ZN1ob8Boa5gfR4glEM+MU7U3iNXj69TgnJ4ThkilY2CU+LnaaeEEv1BsQWCo
+	A/Fk57pCxop3kJpXLyXONgAHMv6Rw1Cumem76P9/a1AvHi+76ZNecvOYW1emap9cqjL4vg+unPy
+	ox6sICOp74cSTqAz+hMKYqVaJi9mG6r++PrtM5LoEKKw/HbGS7m0SM30EboMU6mg3xASgPibyRE
+	d9CEv9FdtcEh3Rd+b9fPYIplW84=
+X-Received: by 2002:a05:600c:8b21:b0:445:1984:2479 with SMTP id 5b1f17b1804b1-4533ca4291fmr82823355e9.5.1750083824364;
+        Mon, 16 Jun 2025 07:23:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1RMolTO9eDEe9qR38ZhX3HK9hH9v80M70WdDnGgFJKvA6JD25WeKSon+jf5NTkGxpDWO43A==
+X-Received: by 2002:a05:600c:8b21:b0:445:1984:2479 with SMTP id 5b1f17b1804b1-4533ca4291fmr82823115e9.5.1750083823852;
+        Mon, 16 Jun 2025 07:23:43 -0700 (PDT)
+Received: from leonardi-redhat ([176.206.17.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e25f207sm145671275e9.35.2025.06.16.07.23.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 07:23:43 -0700 (PDT)
+Date: Mon, 16 Jun 2025 16:23:40 +0200
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Michal Luczaj <mhal@rbox.co>, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Hyunwoo Kim <v4bel@theori.io>
+Subject: Re: [PATCH net-next v3] vsock/test: Add test for null ptr deref when
+ transport changes
+Message-ID: <pjwrj4pnl3jheypjbkcopjv7uilcdiog3pxb3m57zyeq47sc22@7sl6otxuims2>
+References: <20250611-test_vsock-v3-1-8414a2d4df62@redhat.com>
+ <zpc6pbabs5m5snrsfubtl3wp4eb64w4qwqosywp7tsmrfnba3j@ybkgg2cnhqec>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF0000000A:EE_|DS4PR12MB9747:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ea35797-476e-45fd-d7b8-08ddace06588
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uqJjo/0xgkneHVF6c7GOatwakpaLtVaYe5b7y7msxVI0yV3wk1zUBbxR/Qum?=
- =?us-ascii?Q?U9dnNlzHTqIPHfa4lj9WqhNxvHGqsBIWI7gIU2ixrphALMV4Z4W6PUZbaSDF?=
- =?us-ascii?Q?Zo4HrH9jPLwk9XCU7xjCdu7dRdVf5640tIdQlXxO6vXSdmktBkjCl7GluEz5?=
- =?us-ascii?Q?ia7TQinb7FDw5yqadLbqMAJo/CwGU+EMGpr1RDaZiXPbvuUCzXk7i+nBTFsd?=
- =?us-ascii?Q?8wCqWoQ+BtOywpwkuNDHQQrPP8boJRhldRq0eCf4+u+ShbSz8O96MALQ4dxJ?=
- =?us-ascii?Q?v7hzBzmF7b4VOEVKwjRJnhiv6F8q7i9J3GjwMR/liT8kYdpa24MrSbymYDtH?=
- =?us-ascii?Q?jkJrz61ZZkOkeB6FcKPszZBvJEavE+yQMdTCEPO6jvuoxwHqL0/OfhSlVnK1?=
- =?us-ascii?Q?2NZRnzNRO36VqkjXXMkdvpNTMgF2RXjv1KPa1VohXZkFdb9MQRcR+8t72Ten?=
- =?us-ascii?Q?teJVIm8oqz3o3wjehVZKdlDHq1Qo84Adrr9l5Qdjr+jf02x9MtoNtj1Dwf4x?=
- =?us-ascii?Q?Go9zB9s9on/hUFZC0Y9Sq+i1PdbnMAK3pFDUK9jPgbNhHgg0B6+J0NaqZ/ie?=
- =?us-ascii?Q?eGki4k+tf2zqsPzwVRgmx62ALZHWJiWIrk1MihEl9G1DTuNPVHidPwBbBMsC?=
- =?us-ascii?Q?cAkQp6nW1d4/wdExCb6/XzRZ8565urcQOjQJFlEfToNIc0cZe+jJxLkgDwEu?=
- =?us-ascii?Q?ZCWmwadlxM85ekwOf6yu3YnZGBoX5DwZ+yaj/bffFWS4smGO2ItN3DRigb1n?=
- =?us-ascii?Q?FemHYmcG9W0Zb7TxZoRelWpP0VmeFuFt0YBDwN9AmaNf7LzgiuaPYG8TXNb2?=
- =?us-ascii?Q?LRBc5KS9cLc78ishZ2VD8qxcot0/awcszOwlyew2I/sogsRIqAQBeI9cP/4J?=
- =?us-ascii?Q?XVwRY6Vt4H3g4sMwnvPnL/w/S0EeRXr5ToYuMuw1r+Z46ztA+ef/3hZ0GEat?=
- =?us-ascii?Q?XUo87Qxp/jTXEbv9keYbzFuRNwe7vuaE6FDPcSukVh8Vo7iIJlth9nfvF4pb?=
- =?us-ascii?Q?MgpC8WCg0rF1cZoKhw7lNkNszT8HBsgKNoSNzA1eOguuqj4vMJ45HS1lRTKM?=
- =?us-ascii?Q?WDxoHYsMMHYTiOczjIK0+jXcn2AISehfXK1mkGXB1MUfFgYxLiKt5GjX5A50?=
- =?us-ascii?Q?HI9n/IXyF5rxbCGHbaOXIkj+oV+PqieJET7auMN0kdnxABIqAftvNveMdsYn?=
- =?us-ascii?Q?CzObIL5/8+gVBWqnNFgNK5ry+LYjCjgCXpKMbDqCI/JaRPzoicyF6RapsQmL?=
- =?us-ascii?Q?9sjsVA+WTeGf0owJ/fo2+Stuyuuy08Evl7p4Tw/HQU133UP8XfSpok7KcD8b?=
- =?us-ascii?Q?oZa1VKdp3GOPZzEBugl7TLAUc3A/TxMBHs1p9AfQPblnp2KtCcLLN0ENyddV?=
- =?us-ascii?Q?I0vNjX7tqVF/fOiv7MW7dPsU2jWDnS01SoT/rM36qXzD2S4/0tv2gjha8Stl?=
- =?us-ascii?Q?KIKeZbQJEJ7olVsrfwOLdZPgUPABFQBWZ96YLwP1tXyPXxNW8j/GxR/GqMKl?=
- =?us-ascii?Q?NUkPcvFSkkW+hOyDcduMvmEduLGl/3VWiYCJ?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2025 14:16:33.0850
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ea35797-476e-45fd-d7b8-08ddace06588
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF0000000A.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9747
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <zpc6pbabs5m5snrsfubtl3wp4eb64w4qwqosywp7tsmrfnba3j@ybkgg2cnhqec>
 
-From: Dragos Tatulea <dtatulea@nvidia.com>
+Hi Stefano,
 
-Declare netmem TX support in netdev.
+On Wed, Jun 11, 2025 at 04:53:11PM +0200, Stefano Garzarella wrote:
+>On Wed, Jun 11, 2025 at 04:07:25PM +0200, Luigi Leonardi wrote:
+>>Add a new test to ensure that when the transport changes a null pointer
+>>dereference does not occur. The bug was reported upstream [1] and fixed
+>>with commit 2cb7c756f605 ("vsock/virtio: discard packets if the
+>>transport changes").
+>>
+>>KASAN: null-ptr-deref in range [0x0000000000000060-0x0000000000000067]
+>>CPU: 2 UID: 0 PID: 463 Comm: kworker/2:3 Not tainted
+>>Workqueue: vsock-loopback vsock_loopback_work
+>>RIP: 0010:vsock_stream_has_data+0x44/0x70
+>>Call Trace:
+>>virtio_transport_do_close+0x68/0x1a0
+>>virtio_transport_recv_pkt+0x1045/0x2ae4
+>>vsock_loopback_work+0x27d/0x3f0
+>>process_one_work+0x846/0x1420
+>>worker_thread+0x5b3/0xf80
+>>kthread+0x35a/0x700
+>>ret_from_fork+0x2d/0x70
+>>ret_from_fork_asm+0x1a/0x30
+>>
+>>Note that this test may not fail in a kernel without the fix, but it may
+>>hang on the client side if it triggers a kernel oops.
+>>
+>>This works by creating a socket, trying to connect to a server, and then
+>>executing a second connect operation on the same socket but to a
+>>different CID (0). This triggers a transport change. If the connect
+>>operation is interrupted by a signal, this could cause a null-ptr-deref.
+>>
+>>Since this bug is non-deterministic, we need to try several times. It
+>>is reasonable to assume that the bug will show up within the timeout
+>>period.
+>>
+>>If there is a G2H transport loaded in the system, the bug is not
+>>triggered and this test will always pass.
+>
+>Should we re-use what Michal is doing in https://lore.kernel.org/virtualization/20250528-vsock-test-inc-cov-v2-0-8f655b40d57c@rbox.co/
+>to print a warning?
 
-As required, use the netmem aware dma unmapping APIs
-for unmapping netmems in tx completion path.
+Yes, good idea! IMHO we can skip the test if a G2H transport is loaded.  
+I'll wait for Michal's patch to be merged before sending v4.
+>
+>>
+>>[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+>>
+>>Suggested-by: Hyunwoo Kim <v4bel@theori.io>
+>>
+>>#include "vsock_test_zerocopy.h"
+>>#include "timeout.h"
+>>@@ -1811,6 +1813,168 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
+>>	close(fd);
+>>+		/* Set CID to 0 cause a transport change. */
+>>+		sa.svm_cid = 0;
+>>+		/* This connect must fail. No-one listening on CID 0
+>>+		 * This connect can also be interrupted, ignore this error.
+>>+		 */
+>>+		ret = connect(s, (struct sockaddr *)&sa, sizeof(sa));
+>>+		if (ret != -1 && errno != EINTR) {
+>
+>Should this condition be `ret != -1 || errno != EINTR` ?
+>
+Right, good catch.
+>
+>>+			fprintf(stderr,
+>>+				"connect: expected a failure because of unused CID: %d\n", errno);
+>>+			exit(EXIT_FAILURE);
+>>+		}
+>>+
+>>+		close(s);
+>>+
+>>+		control_writeulong(CONTROL_CONTINUE);
+>>+
+>>+	} while (current_nsec() < tout);
+>>+
+>>+	control_writeulong(CONTROL_DONE);
+>>+
+>>+	ret = pthread_cancel(thread_id);
+>>+	if (ret) {
+>>+		fprintf(stderr, "pthread_cancel: %d\n", ret);
+>>+		exit(EXIT_FAILURE);
+>>+	}
+>>+
+>>+	/* Wait for the thread to terminate */
+>>+	ret = pthread_join(thread_id, NULL);
+>>+	if (ret) {
+>>+		fprintf(stderr, "pthread_join: %d\n", ret);
+>>+		exit(EXIT_FAILURE);
+>>+	}
+>>+
+>>+	/* Restore the old handler */
+>>+	if (signal(SIGUSR1, old_handler) == SIG_ERR) {
+>>+		perror("signal");
+>>+		exit(EXIT_FAILURE);
+>>+	}
+>>+}
+>>+
+>>+static void test_stream_transport_change_server(const struct test_opts *opts)
+>>+{
+>>+	int ret, s;
+>>+
+>>+	s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
+>>+
+>>+	/* Set the socket to be nonblocking because connects that have been interrupted
+>>+	 * (EINTR) can fill the receiver's accept queue anyway, leading to connect failure.
+>>+	 * As of today (6.15) in such situation there is no way to understand, from the
+>>+	 * client side, if the connection has been queued in the server or not.
+>>+	 */
+>>+	ret = fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
+>>+	if (ret < 0) {
+>
+>nit: If you need to resend, I'd remove `ret` and check fcntl directly:
+>	if (fcntl(...) < 0) {
+Ok!
+>
+>>+		perror("fcntl");
+>>+		exit(EXIT_FAILURE);
+>>+	}
+>>+	control_writeln("LISTENING");
+>>+
+>>+	while (control_readulong() == CONTROL_CONTINUE) {
+>>+		struct sockaddr_vm sa_client;
+>>+		socklen_t socklen_client = sizeof(sa_client);
+>>+
+>>+		/* Must accept the connection, otherwise the `listen`
+>>+		 * queue will fill up and new connections will fail.
+>>+		 * There can be more than one queued connection,
+>>+		 * clear them all.
+>>+		 */
+>>+		while (true) {
+>>+			int client = accept(s, (struct sockaddr *)&sa_client, &socklen_client);
+>>+
+>>+			if (client < 0 && errno != EAGAIN) {
+>>+				perror("accept");
+>>+				exit(EXIT_FAILURE);
+>>+			} else if (client > 0) {
+>
+>0 in theory is a valid fd, so here we should check `client >= 0`.
+Right!
+>
+>>+				close(client);
+>>+			}
+>>+
+>>+			if (errno == EAGAIN)
+>>+				break;
+>
+>I think you can refactor in this way:
+>			if (client < 0) {
+>				if (errno == EAGAIN)
+>					break;
+>
+>				perror("accept");
+>				exit(EXIT_FAILURE);
+>			}
+>
+>			close(client);
+>
+Will do.
+>Thanks,
+>Stefano
+>
 
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Mark Bloch <mbloch@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h | 3 ++-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-index e837c21d3d21..6501252359b0 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-@@ -362,7 +362,8 @@ mlx5e_tx_dma_unmap(struct device *pdev, struct mlx5e_sq_dma *dma)
- 		dma_unmap_single(pdev, dma->addr, dma->size, DMA_TO_DEVICE);
- 		break;
- 	case MLX5E_DMA_MAP_PAGE:
--		dma_unmap_page(pdev, dma->addr, dma->size, DMA_TO_DEVICE);
-+		netmem_dma_unmap_page_attrs(pdev, dma->addr, dma->size,
-+					    DMA_TO_DEVICE, 0);
- 		break;
- 	default:
- 		WARN_ONCE(true, "mlx5e_tx_dma_unmap unknown DMA type!\n");
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index b4df62b58292..24559cbcbfc2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5741,6 +5741,8 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 
- 	netdev->priv_flags       |= IFF_UNICAST_FLT;
- 
-+	netdev->netmem_tx = true;
-+
- 	netif_set_tso_max_size(netdev, GSO_MAX_SIZE);
- 	mlx5e_set_xdp_feature(netdev);
- 	mlx5e_set_netdev_dev_addr(netdev);
--- 
-2.34.1
+Thanks for the review.
+Luigi
 
 
