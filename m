@@ -1,158 +1,211 @@
-Return-Path: <netdev+bounces-198174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9103DADB7A1
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:11:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D48ADB7B0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37EA5172441
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17EAD188D94B
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB70D288C87;
-	Mon, 16 Jun 2025 17:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81D02877C3;
+	Mon, 16 Jun 2025 17:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ims2SCYu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQNzei1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D06D2BF016;
-	Mon, 16 Jun 2025 17:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B192BF017;
+	Mon, 16 Jun 2025 17:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750093821; cv=none; b=AgiEXP2OYCUg2WiP5PbuDRi78/WSxuSATDIsv1b//Dz+r+U+Ws07c+VE33CPHbZE8LdCXeiz7kdMbz1CkN8q0IChhkp0yhuFXN8LmY+F0jC1AGa9BP0IyncXSOpRnJqqPLzo7rGyQ9GnKWkXQwqVbTfefeeJDaMoJGyvjcAOdYY=
+	t=1750094537; cv=none; b=eWQhUh7V7kBXVlgh7XRoUUmI879dgpOx1gXcI3V84AHDpXW1nuokyGhK7CEX1buepHjd8jdmdGL2bmWkjaqOAZdDWQWxn+mGWvQVrTpPLyKlOq0ZFcneTvwUMxSiHRMfOQcmrp1Ab6reqPueePHj6NUAHI2fkgZ99GnrBmcdbT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750093821; c=relaxed/simple;
-	bh=1fykyusYVro73+SkCEdouTI5VeesZrBsX99TGTggxRY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EHA3RuQfpUvREYZZapmnC7VODeKLmQcQbJ/YR7tCtEDtlK2XCL2DvqJ0dBfOjAuqdnWFeZhe5wZzrYfRfugw8Z0IvYIvpsHyU3HpuKcwyTpcXY0sLGpZOorGKek0J1sgKKbll1Tr7fdZj5m7T321LdAikN34WMHCc5eTI0Usu80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ims2SCYu; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1750094537; c=relaxed/simple;
+	bh=P+SSue73N4lAs0qB3b4VM8Xkfxno5zBJHyIJqBse+wo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cgXjpp0tmnNc9RpaSx61o52e07GcrgAhTCdCgxMY43riMj2WL05Is8PoqY8KUklZhp0Fskr8DPE86RjPQjfJZ81SlisZGJno3jfwhO5kysLOB5ZCY2MRBa38og3SYHpuJ0MtvqZML7o/sCLKkQLDQsorK1K9kT1+mgZk2td59G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQNzei1N; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d20ff236c5so103280985a.2;
-        Mon, 16 Jun 2025 10:10:16 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-234b440afa7so47977345ad.0;
+        Mon, 16 Jun 2025 10:22:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750093815; x=1750698615; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZnKjnGPQVsYruwW26IKQXjP4KtQDe+H/2EepWEDvdH4=;
-        b=ims2SCYuni7gGXtPV4Gv3S8d6ijEGdPb6Eu91dihf7+zWnhmAcg/dVHfHkc1dXH7Gz
-         EJeGlTBq7Uh+X8bkOzwP/7wL97O8wQV4cGmUu0jwfMutpAwMTaCnBka8WDViywmoRL0A
-         ur8OGCxSDfmcGRC4v1MQ/5gFQcAq8knYZvZRPv3hrEmeSqwnfOqi7J8ykvuS0aZURpW6
-         azpgK27KqH9FM2KLBXNk4MIEkjLAskhDWEl2nkqEThjkeZC6i7p4OWSuM2U/GW7+lYEy
-         9vOVgwPJT2QCgVaJW+IJ7Z6/Mxs1gBRqqTBu7oofDTqnWPE003urkdJi5vKNHbj9sGuQ
-         72Cw==
+        d=gmail.com; s=20230601; t=1750094535; x=1750699335; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G1485tA8GgfFcfzz2MsCdOclvlrLtL+++u0j91aiOZ8=;
+        b=ZQNzei1Nt8RE5kmpAXy6fZgwgX1jwcieizIdyNnvyLi5h4eGCNmswD18CZvfPLR/ZJ
+         w+FJ6RhkbmncQUvN18hKVIEqdnx0mbNSLM12eXbT2kwJbJMeYd/jw5iFjI8TCRjewXYg
+         Xd/9971GQJ/Oif3DhYTDF4n2oOaYnbfI+yAQIYwMLzriygNSeNSPNJlbVl8kJ9abOjj9
+         C0CP4pjTZ0e+pucKucmFgdLbq2C2OF97luFXqjzo5RCsi0tq3kK2SPwF9QROJRXtyhHq
+         XPiSsDbmZQGRVtpLRawLEfI4o1OZmJ7iERTrRvekRwO87tm13knP94tsvbgtsjfZcNL5
+         vnEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750093815; x=1750698615;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZnKjnGPQVsYruwW26IKQXjP4KtQDe+H/2EepWEDvdH4=;
-        b=M4GtTmKjWCGO/T6mar73xjIgvSyvhW2Bp2XeiQS9UMZXaSgu8yXw6UXEfdLzu7CVXY
-         mB6tcM7FZ2XbDFJM9mDq0zmNRqVggcjx2GDhtpfNuMkb2gek+hVmunjFQZxvB3CaZCgt
-         6YM+COgp+3doZwOZ6TSh2rh8tJ52wtLz0d77nHhkFTEvIhVWCuaMKSBKwhkk+Y6tWue3
-         XyyyYYfFA82Uav/xActQceuA2LIVweGH+3rhSdrICTZ65mQ6/Cam2kdyHuFoJdndfxYp
-         oU1yAIevKccorhaYiCPJaYsMPpg6K1GrpiphpMLmqIRA5AHGz9RF9nlv34g/Vy/X1S9J
-         YY4A==
-X-Forwarded-Encrypted: i=1; AJvYcCU3paDD3YEjfD/q/+jey1LosMwoXIBrNX6eiWbMkWgvVaMYfeYJhpYLiul8nUHUrKrMUqccnM7uh7I=@vger.kernel.org, AJvYcCUjsm8dXB2g1gKXOXSyZuKSSBj1NmAVJS1/Rx8ViEycI29JF2L++Y6JbxRnCsSpZd7eWnvC4AZ2AFMjkFq+mWUk@vger.kernel.org, AJvYcCWbe5F9zeZ/yVfTYLDPfo4+163nYuQ0IobkfchxoqCwAwXQozsk5m4rcTpk1mKf6D+ee+1tGWN6HgMkAe0H@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6DwBD1G1nj1YxCRxGRIVYlnXAHPKjwCIUnH4G70z34YwUNsNk
-	FXs7ABGhvo+/kiemXOGJYbaAeoF6Vw6IA8nJU11O/xubXVC6i9GSfSQ1
-X-Gm-Gg: ASbGncuJ2k5WQv7gOWSpMKIZ73gDWXTXNL7PeJVetry9MfjmxFO0dGHd4pSMUeWEJ6R
-	kiWGaFiuywuXrxUV7dOQnx1fZHyjuvZwWhtXJyC/7/f2Od0uwgVYdBh2DjRC/N/dE9Y4HWh50u9
-	o5Dl4sd88E11GeuQYKDiH1pgg2wW1lL3TjlOxzqnOq4LnztRyHiRgNpykQPY6soFUhCOLPz/SoL
-	GdRR7s3kF6xqSiO+1EF0JFHE4FIPrI9IjaVWM+3jgojwoHYU9sswLt2ERxMZBuqvIBGfI0/g/yv
-	vFapvbAnLWiblHfySGoTyulvZyk+7zszCHB07QIUwzFLeidg0HPCDHDd
-X-Google-Smtp-Source: AGHT+IHsQ9BByXp5pGeWBYEn81TAB7iyvrQOQoiCKdS5unwxLUFClfS9eLO2YORgalJfCQUKj/cW6g==
-X-Received: by 2002:a05:620a:414a:b0:7cd:4a08:ea12 with SMTP id af79cd13be357-7d3dddd3dcamr28146185a.0.1750093814938;
-        Mon, 16 Jun 2025 10:10:14 -0700 (PDT)
-Received: from localhost ([2a03:2880:20ff:73::])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3b8e1cf5esm546463585a.49.2025.06.16.10.10.14
+        d=1e100.net; s=20230601; t=1750094535; x=1750699335;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G1485tA8GgfFcfzz2MsCdOclvlrLtL+++u0j91aiOZ8=;
+        b=LaLCKqTglI2mLjMaQ60kniw8SIAUvHzKXYaNnAJg+DGNgjj3cNPhltf5na349L/+S2
+         RP9iSe9U+psABG8AB1kEbS7KPchRwzWCuGbeV0Cc+QUuJ/7u6w2G+OGq8RJz+V4F8kBF
+         fYdawS2rTV7HdxWKhkpo82L/AnY0gH7hAXzvZEsAiytgTM2tZYsKFlipHkCbO5nbdu2F
+         Famcp5Bk5B8frIrKtdQ+7UelOx60rx5slKJTJEPQOBBiqLpWNves4Rn1lNaZYsNbWRL9
+         8EszLvu73WcyssjxaLTO7jULk5+wO2GMb45ZgmfYqjBtWHUrTOqPpUeUkqrzyjNpUkiz
+         n7mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5mM1+BwAwMnIXZr9rxlVTe0IoCWf1OLJy8sSSdH5kaMqxMJvmWFMVUHZEpkfmVpgWaE3amJULz03byWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywk//KiCSL9LwgPKD1beodak6+sXmsbk3cWxWHlSxVlIgxuebZp
+	/Qpd2eCw/xLKClmJK0uIyesgUsf3Z0LlncvuOqgTK4stucmX7aDOy9r1nLb+
+X-Gm-Gg: ASbGncsOrQqr+L9nszWU/3Pp7D4mLGN+NR3cB70XgnKsQrHX4QFAjvo6Ii3is0+CH5Q
+	ajxJhp+5F5PLAZ6Vk6d0poN0YqFp1y/bhecr9n/kmacgt8nh2jae4Z2vI1/MiuVtYdlwYLtUVqI
+	tThGydArV0g+8OUJ2p+INxA1MudlLHCN80ImfxgehgaFpjU3yA2K6UJ4lXu6GD4gDTi0SxFmSn4
+	6SyKcsqHT3gKZ4IBrLXZe59lqjGdz5NIeHuhg3sgedLa1UpIsHxwNSZsYywskj949eQBaFh4Pzn
+	jORY2YNNFJMLCwXHp2pMfMyK/pJtjE2EzWjv6MP+5aQSr43PQoMtteJdsNM1Dgl1UdkC55S1zqk
+	U9K0BEzWjcmXNLlsaktA7bhQ=
+X-Google-Smtp-Source: AGHT+IEwHn9PP+yunLgpuZIxZZXjUSR/YE46VZUktC0AKteUOAbi6+3q4leQnmNqSCrmFYUiSvfS0g==
+X-Received: by 2002:a17:902:c404:b0:235:c9ef:c9e1 with SMTP id d9443c01a7336-2366b337dfbmr150977425ad.5.1750094534981;
+        Mon, 16 Jun 2025 10:22:14 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2365dfc56a7sm64049785ad.233.2025.06.16.10.22.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 10:10:14 -0700 (PDT)
-From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Mon, 16 Jun 2025 10:08:39 -0700
-Subject: [PATCH net-next v3 5/5] docs: netconsole: document msgid feature
+        Mon, 16 Jun 2025 10:22:14 -0700 (PDT)
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jv@jvosburgh.net,
+	andrew+netdev@lunn.ch,
+	sdf@fomichev.me,
+	liuhangbin@gmail.com,
+	linux-kernel@vger.kernel.org,
+	syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
+Subject: [PATCH net] bonding: switch bond_miimon_inspect to rtnl lock
+Date: Mon, 16 Jun 2025 10:22:13 -0700
+Message-ID: <20250616172213.475764-1-stfomichev@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250616-netconsole-msgid-v3-5-4d2610577571@gmail.com>
-References: <20250616-netconsole-msgid-v3-0-4d2610577571@gmail.com>
-In-Reply-To: <20250616-netconsole-msgid-v3-0-4d2610577571@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
- Gustavo Luiz Duarte <gustavold@gmail.com>
-X-Mailer: b4 0.13.0
+Content-Transfer-Encoding: 8bit
 
-Add documentation explaining the msgid feature in netconsole.
+Syzkaller reports the following issue:
 
-This feature appends unique id to the userdata dictionary. The message
-ID is populated from a per-target 32 bit counter which is incremented
-for each message sent to the target. This allows a target to detect if
-messages are dropped before reaching the target.
+ RTNL: assertion failed at ./include/net/netdev_lock.h (72)
+ WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
+ WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 __linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
 
-Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
+ ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
+ bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
+ bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
+ bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3321 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
+ kthread+0x3c5/0x780 kernel/kthread.c:464
+ ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+As discussed in [0], the report is a bit bogus, but it exposes
+the fact that bond_miimon_inspect might sleep while its being
+called under RCU read lock. Convert bond_miimon_inspect callers
+(bond_mii_monitor) to rtnl lock.
+
+Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
+Link: http://lore.kernel.org/netdev/aEt6LvBMwUMxmUyx@mini-arch [0]
+Fixes: f7a11cba0ed7 ("bonding: hold ops lock around get_link")
+Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
 ---
- Documentation/networking/netconsole.rst | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ drivers/net/bonding/bond_main.c | 34 +++++++++++++--------------------
+ 1 file changed, 13 insertions(+), 21 deletions(-)
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index a0076b542e9c..59cb9982afe6 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -340,6 +340,38 @@ In this example, the message was sent by CPU 42.
-       cpu=42    # kernel-populated value
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index c4d53e8e7c15..ab40f0828680 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2720,7 +2720,6 @@ static int bond_slave_info_query(struct net_device *bond_dev, struct ifslave *in
  
+ /*-------------------------------- Monitoring -------------------------------*/
  
-+Message ID auto population in userdata
-+--------------------------------------
-+
-+Within the netconsole configfs hierarchy, there is a file named `msgid_enabled`
-+located in the `userdata` directory. This file controls the message ID
-+auto-population feature, which assigns a numeric id to each message sent to a
-+given target and appends the ID to userdata dictionary in every message sent.
-+
-+The message ID is generated using a per-target 32 bit counter that is
-+incremented for every message sent to the target. Note that this counter will
-+eventually wrap around after reaching uint32_t max value, so the message ID is
-+not globally unique over time. However, it can still be used by the target to
-+detect if messages were dropped before reaching the target by identifying gaps
-+in the sequence of IDs.
-+
-+It is important to distinguish message IDs from the message <sequnum> field.
-+Some kernel messages may never reach netconsole (for example, due to printk
-+rate limiting). Thus, a gap in <sequnum> cannot be solely relied upon to
-+indicate that a message was dropped during transmission, as it may never have
-+been sent via netconsole. The message ID, on the other hand, is only assigned
-+to messages that are actually transmitted via netconsole.
-+
-+Example::
-+
-+  echo "This is message #1" > /dev/kmsg
-+  echo "This is message #2" > /dev/kmsg
-+  13,434,54928466,-;This is message #1
-+   msgid=1
-+  13,435,54934019,-;This is message #2
-+   msgid=2
-+
-+
- Extended console:
- =================
+-/* called with rcu_read_lock() */
+ static int bond_miimon_inspect(struct bonding *bond)
+ {
+ 	bool ignore_updelay = false;
+@@ -2729,17 +2728,17 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 	struct slave *slave;
  
-
+ 	if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP) {
+-		ignore_updelay = !rcu_dereference(bond->curr_active_slave);
++		ignore_updelay = !rtnl_dereference(bond->curr_active_slave);
+ 	} else {
+ 		struct bond_up_slave *usable_slaves;
+ 
+-		usable_slaves = rcu_dereference(bond->usable_slaves);
++		usable_slaves = rtnl_dereference(bond->usable_slaves);
+ 
+ 		if (usable_slaves && usable_slaves->count == 0)
+ 			ignore_updelay = true;
+ 	}
+ 
+-	bond_for_each_slave_rcu(bond, slave, iter) {
++	bond_for_each_slave(bond, slave, iter) {
+ 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
+ 
+ 		link_state = bond_check_dev_link(bond, slave->dev, 0);
+@@ -2962,35 +2961,28 @@ static void bond_mii_monitor(struct work_struct *work)
+ 	if (!bond_has_slaves(bond))
+ 		goto re_arm;
+ 
+-	rcu_read_lock();
++	/* Race avoidance with bond_close cancel of workqueue */
++	if (!rtnl_trylock()) {
++		delay = 1;
++		should_notify_peers = false;
++		goto re_arm;
++	}
++
+ 	should_notify_peers = bond_should_notify_peers(bond);
+ 	commit = !!bond_miimon_inspect(bond);
+ 	if (bond->send_peer_notif) {
+-		rcu_read_unlock();
+-		if (rtnl_trylock()) {
+-			bond->send_peer_notif--;
+-			rtnl_unlock();
+-		}
+-	} else {
+-		rcu_read_unlock();
++		bond->send_peer_notif--;
+ 	}
+ 
+ 	if (commit) {
+-		/* Race avoidance with bond_close cancel of workqueue */
+-		if (!rtnl_trylock()) {
+-			delay = 1;
+-			should_notify_peers = false;
+-			goto re_arm;
+-		}
+-
+ 		bond_for_each_slave(bond, slave, iter) {
+ 			bond_commit_link_state(slave, BOND_SLAVE_NOTIFY_LATER);
+ 		}
+ 		bond_miimon_commit(bond);
+-
+-		rtnl_unlock();	/* might sleep, hold no other locks */
+ 	}
+ 
++	rtnl_unlock();	/* might sleep, hold no other locks */
++
+ re_arm:
+ 	if (bond->params.miimon)
+ 		queue_delayed_work(bond->wq, &bond->mii_work, delay);
 -- 
-2.47.1
+2.49.0
 
 
