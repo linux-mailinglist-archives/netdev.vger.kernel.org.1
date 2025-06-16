@@ -1,283 +1,246 @@
-Return-Path: <netdev+bounces-198177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAFCADB7BE
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:26:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D079EADB7DE
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE611188DA85
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:26:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2B3F188F746
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1EF28751D;
-	Mon, 16 Jun 2025 17:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D6C285CBC;
+	Mon, 16 Jun 2025 17:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="koBOAfB8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KgH6od2x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B2F72607;
-	Mon, 16 Jun 2025 17:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750094779; cv=none; b=blMa2mwD8nIf/vCpeBMy7EYdW2TxPyLXWuEMijZJtQi2SiDQMiWjmqr4cn0HXieYKazf1KxQ2yHegr9kS8H4RewNl3xlrB5xI7axJM2i6n+57cp9gJUVl+BsMDnixfgPM8lmbbJ+zflTaSXfg4JrXlLIwQhNw1AOdJNe9DL5WAw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750094779; c=relaxed/simple;
-	bh=qcjYbV5/soyaoRHOIZqwLJEW9marfpVFY3IiTWa/K+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lty+huMlZfolfLJJYfe23YgWmhC0gdAS0Vp2rcixXTsZtj9GX+6AkgisxIlZbRLRAzj52e0y8SU425EVBBygRe5E5q2zYsxCA2k8RwqEOCbokC+91ZF8TXkcidlFJcaAQ13WlmrHWeqTSg5Ma5Tx1+KS3m7zO/LyxzyfDmk0SEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=koBOAfB8; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso5391231a91.0;
-        Mon, 16 Jun 2025 10:26:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750094777; x=1750699577; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y6ymH5qU0Npj727Li0g+FCfZy9IP5/b70hORw/Ticsc=;
-        b=koBOAfB8+saEp3jbUdsHpKxpebLu7+Kl5mIkym8Eam6Z3i+Z3ysTB82gTAbjtz1755
-         Ff8oQ6dlKUjovfxlAxO/FocCjGQUwvkIOk5Uyno7VAKCzlz9UQxX52oSimC+ewSNbxIN
-         lQl38buR8CqU59WhebWBqnjKOJsq5Nd03SyZysS0Qm0CPclTvYnC/lwVA1o3BcPY47xu
-         LSfXFYulF143O4idDq/kMlPd8Peouan7afU6G6CGiRsCdTs2xYTcTzI3li/lfWdX80KK
-         feb8wGhI1jonwVjgXU92BW7WLsTm0W54UzPY45nxlUstti8kvov6cyjtaSRyR6Ve9KzR
-         SVSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750094777; x=1750699577;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y6ymH5qU0Npj727Li0g+FCfZy9IP5/b70hORw/Ticsc=;
-        b=wlvt4TxoDZjFaaS3SgVC1HLmny0R8XRb9YCMQKL3lHnPeoU8zv8K6Sfr+Gs855wS2j
-         dDw1rMCwTlR0AyNldfo2pdKMo5UYe9HjYIwFPDT9oTnuqUGa5K48qCbB17Jnado5NCmu
-         PZGneJHiRp6YxzUT1W9BraZhb/KSMGX6J4Fy7CykdiTVrlUyDCFvHJc3//aQV8NLrn7F
-         mswZ1r9THVI7oQD7KTHvwkxS9GB9TnU/WIU1dkGMtPcfQU3BCjRcxi8Sru2UgQ6++7j+
-         dJm9pRW8JN4e9vBw+EYCXpLA6RQ4lE5UhANn/VLJ3/ed5v9WfL3a1P0TiaSR47dCEQa7
-         jjvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXcc8vCV52FY7i94tZjWjQ8+I7ZOHeSrdenw3jsI9CnQhSQlRJIBtYRsS3fujzUFKUN5xNu9KOQxMBqouwsHhvJfUdPF8=@vger.kernel.org, AJvYcCWJgfx1tCsw+UqEvylIaoncJk97fhpRbZHgNIp7/M+zR1lyX+K1f6NGQ6otBh69YEZNHew4oJgs@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGGKp3purfH1Jk8KcGM7297tQvCyQBZHNz0a9iuxc28YaN6xHG
-	bAKz75pRgCNYYbN4FFn7T/c/9RuMvQ1b56EFOmvNWJkJ7vo2Kb0BiGU=
-X-Gm-Gg: ASbGncvxDOvRd0FBUS4mBsgCZ1z/oJZL/NohOK5clfb9vg6lrmcU0Z6jBrkhCjkMvuL
-	a+4sYZubJhAZWBAtI3iYhLlhQSt1Y+0zLmAmvX1vouOkDyO0Rt26Gune8iyiuyBZ+EpSTAfKodk
-	nhIsR2SzEReuaj2EiHJyqMCKgdrHTYY9M/Xx6E8MtNWbs0H/ru9A5LzlTu27d9M+EJWp0XdR7H4
-	9d46LxRmxHgMCC1wd15Rx/qHbQLd2JEefwMjbeS8pSTvzINyA60mc3uAzinnHojWhZiTDin75wJ
-	ElIIPB1PfQi96ogIhuDRCb8WjI1dTu7sAfudUXo=
-X-Google-Smtp-Source: AGHT+IHGBo0/kdy2VhBGbLdz6PaiMpuWM0oTL/6ID+4AcpsVw0ilDJtlGhdAwc/tkYhM978QQryvsg==
-X-Received: by 2002:a17:90b:37c5:b0:311:ad7f:329f with SMTP id 98e67ed59e1d1-313f1d30751mr16725448a91.31.1750094777285;
-        Mon, 16 Jun 2025 10:26:17 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de76e1asm64268635ad.112.2025.06.16.10.26.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 10:26:16 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: Paul Moore <paul@paul-moore.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Huw Davies <huw@codeweavers.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	syzkaller <syzkaller@googlegroups.com>,
-	John Cheung <john.cs.hey@gmail.com>
-Subject: [PATCH v1 net] calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
-Date: Mon, 16 Jun 2025 10:25:55 -0700
-Message-ID: <20250616172612.920438-1-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4214E8488
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 17:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750095641; cv=fail; b=lVCZJGgMECxbZndoMiPdmu1hRlpScwES9bMx5rqAxoH0I0bn8hKbRX1eQcGcFUqOtsDObbQ/QM4egd09XBr+1xxpBajdAyOVfexw9bktn0owE/Dj+yLBLEjYJjtSQ/7TLxK2VeQFYxq5n6mKQYRrjZ4pk99HqujtAsaCl/zkDI0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750095641; c=relaxed/simple;
+	bh=MzNda0R6KwVjJpI0wHjZGGvZIRUxdHRqwXriu88m3XI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=usR9FSGST5wxbXDg0uvYgVql1vq/gg/zYNI5R7a4APqnXcums1hFAcXOY+StTCv1epZFShQNaTwSaoXDGmPRmmppg/QywPLYPFbXBh7nmaQMQA/hohDN0kQx/unWnCbytkx1sVUJGWh0M1u2YxfZiBZ1g6Q7WarFbkgpcHs6e7k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KgH6od2x; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750095640; x=1781631640;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MzNda0R6KwVjJpI0wHjZGGvZIRUxdHRqwXriu88m3XI=;
+  b=KgH6od2x8WacxLkanc4cByYuj8nX888gE+ok/lOypECDX44QNa2tkEkg
+   ma/940DzVVz7iSJSV94XrAXV2pWA8/0voG0pm2Mye1nJlYzHVTjxK2QR8
+   4RZqMvT6Bvv5cHUgXP5ocAa0Tl0xcFTs6hkfxuOg5w/FzqpFeyLwegJeO
+   91BFJqOI+mjWi396N0jiJzu8FEGAYZhvQM32BLrnnwcJvX7s+ujLo5NTd
+   IozOL71X5JhKsuXlAJl7HvH1FKcrwKbJFXSkSrKqsotbOwTk0Li456aJF
+   /MBAfhXcecYVjdhYd6nRmLS7P9RafaHrWn93/MR9uN7NWu+gjoq+L7YKL
+   Q==;
+X-CSE-ConnectionGUID: JDO960I4QrqrLF8qWh8Lww==
+X-CSE-MsgGUID: /y0RzhhQSESUba0sxtkyoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11465"; a="74783938"
+X-IronPort-AV: E=Sophos;i="6.16,241,1744095600"; 
+   d="scan'208";a="74783938"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 10:40:39 -0700
+X-CSE-ConnectionGUID: Eh9TowCmRiGjlYrmacPOgA==
+X-CSE-MsgGUID: JuJNll3eTc6Ulc74op4jbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,241,1744095600"; 
+   d="scan'208";a="153833549"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 10:40:39 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 16 Jun 2025 10:40:38 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 16 Jun 2025 10:40:38 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.48) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 16 Jun 2025 10:40:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xS0FqT8Y0y5C1A73GhW5/0RQAPgZSDR9eSH9Ji4c75FCw+MI/pQnNhUEgCP53ejuMjnJ0Zs6fQllPjSs6Lgh0tDJV8Ug9Sj9hgUz+KPkA87HMMDvOg356MI8NMLFdd/X4SqIOl0KQv0nWGwY37i9MNvadkSPtFqpzgR3NlTql5eoFt1WaDnLfYDSgDqF6sMtws+dIxfF4AOyGVomDI9yqe5gBbiEaMdRDf/XtmSmuQrti/Xi1W3ibhpTCG1V1hYRRtKLzNYKptp8NU4oez/9+uA5H5dFH7Y3t4T4QjeU4yHnZvAqVVYFkDBxvJ4piGnHPBkf+ZJyEZyayhnccd+G8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7VIIqwrWvlL2LNcotKGm6eMrNPXtz2kJQy02GUK9i54=;
+ b=OHFJr6gM/jZeokKSMPmdjDAkUZbooTVX3Q5O2CrVWIA/Y3V8t0HhB/1XjFOt1+oXMHWylkC+heVwee9izS8l0pzhtoeVKhLZRzXDveRDdfDH78sY3Eyo2cZ8M9T/oeZnHcWEixvcPZUCdlyFf1HYzZ0A2bdctJEfC5iDfqp0bGtWCR/XXsSU5oYuMNZTQXvz6YMwBnUhVcNb03ynpo43r5SBBR2gaQLbfyZVNcTfJLf4ydNiy6s0bh9uje8gNrVO2VrI1inZEpKwK08CnwCorNkG1TpT3In/+YjL2LwwCGTsAI3ldvsaiJ2k3T0316aNxqtMGuBa+2Qh1e7fCAmWng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by SA3PR11MB8046.namprd11.prod.outlook.com (2603:10b6:806:2fb::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Mon, 16 Jun
+ 2025 17:40:22 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::23a7:1661:19d4:c1ab%3]) with mapi id 15.20.8835.023; Mon, 16 Jun 2025
+ 17:40:22 +0000
+Message-ID: <3c8f1154-91cd-4b25-b517-30c4cb97f40b@intel.com>
+Date: Mon, 16 Jun 2025 10:40:18 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/7] eth: intel: migrate to new RXFH callbacks
+To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <przemyslaw.kitszel@intel.com>,
+	<jacob.e.keller@intel.com>, <michal.swiatkowski@linux.intel.com>,
+	<joe@dama.to>
+References: <20250614180907.4167714-1-kuba@kernel.org>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20250614180907.4167714-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0009.namprd03.prod.outlook.com
+ (2603:10b6:303:8f::14) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|SA3PR11MB8046:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87492797-0f80-4d6a-9c20-08ddacfcde7c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?ei85MkFLVmFUeElwWkpNWmQ5Nm0wZ2hCUzBObmh1TUl0RjY3eFB6V3BSUkJa?=
+ =?utf-8?B?R3dVSzJNTXU1YlNRVmtTS1M0c2dsMUo0blpkVWZHTzhhNjRUNksreWx1MWhy?=
+ =?utf-8?B?NDhLQnJQSVJvSDlUS2dqY2VHVFBFV1MrdWNEazhiYkJvdEJrQTNxdEFuSmhu?=
+ =?utf-8?B?QkVPS1krV081K2NkdGl2YnZkY3M4azkrY2FGMFZPZjB2bmhKRmZjVlRQd3Bi?=
+ =?utf-8?B?L0Y3SjQ4SDErTUVEN1JYamZ6QkduQXpQemlOZGtGNEZGVjM4OUJwd3lFQnVI?=
+ =?utf-8?B?UGIrWGZIc2hxTzNVT3dGZXVyY0c5UFNScE16ajZQRzBvNUplTGVxWGNoRFVY?=
+ =?utf-8?B?TkJ5T1FHN1dwY1g0NC9IbFZVZWw3eGw2VDVNRWRxT0VnR24wdVNURlZ0UHBs?=
+ =?utf-8?B?NU9YY01JaW9NZWd3VDFXUlR6ZDNTT3I1TGgwdlR1cjl2V0RhQXNlVGJtb3ow?=
+ =?utf-8?B?dzBFQVdoVzdPeDFoeVZDZWlvM24zcUhwODhmOFBwWGo2TE9mdDJwaHpoZGJD?=
+ =?utf-8?B?a3I1WkRSK3NkQ3g2ZTJ5a1pPT2VGZ3g3RnZjZ3NDNjBTbXRSV09HRldIVkdG?=
+ =?utf-8?B?bTZvb0s4L1dnbjcvQ1BjLzNuVmYwalI1Qi81NCtlSEd0ZThGUmpuekl3bEVO?=
+ =?utf-8?B?akp1eHVFNGRZeERSS2Y3U1E5MDBWemtkdDlWT2xLcEJMZEwrVUFJWFBYZ0dO?=
+ =?utf-8?B?bm5nanhTeXNSUlpmaVRrZURPY0dPR3VsWnJWTG5YbFd1MFJ0emRldVFOZHk1?=
+ =?utf-8?B?MjQra2k0SmJQN2lJZFZvWitZYXpESEt4MGc0V2FJQnhUM2Mrby9OeFZ0WXgr?=
+ =?utf-8?B?WVE0dVlJWnlwa0gwbmxVUkRPUHhra2FkQXF5NHZaSjFYc3NSbC84SFAwRldH?=
+ =?utf-8?B?MmN3SjB6YUc5N0p1eUZRUms2Z1RKN3ZTTzQ5OWFjbjErWEUrMjhwU1I1NEZP?=
+ =?utf-8?B?SUEwQW51RE5xWmVzMWlTbWx3dmxCRHNvR2JmVzI4bFAzbEliK0IvcEpUMXp3?=
+ =?utf-8?B?a2g4bkl2ZVlkN2pHejVVUUFqOHJkVERQK0JZZkZNRUg2d0tVbmFqUFJaMVFQ?=
+ =?utf-8?B?UnFzRmVCRXJHWWo1YkZIc0FZV3JKaWwwZTFaeUpNRTN2R21OY0dCS1ZOcCti?=
+ =?utf-8?B?R29OTnJ1MkdZQTFaRnZLa2NuWVpuUll3d2ZxZEVCbk9FQlJtUUZEaVVuZmlp?=
+ =?utf-8?B?NExnMC9LYm83eDA4a3I4VVJGYXZET2tFRkdScUZsSXNJalcya1NLeEsxUG1M?=
+ =?utf-8?B?dkl5OHNNU2tTczdWQXdyTHBpajNhL2dkYjFXdUtqT25ydElRYXk5NU85LzRK?=
+ =?utf-8?B?QzBNNHFWWlJJb1lGM0x3ZVg1Z25BRTExUE0wWi95UGFIL2VETFZkSzFIQzZ1?=
+ =?utf-8?B?RVVUODlwSVAxTGRZaDhNcGp0a0xBd3ZKZG5aRDNwZWFrV3hHeWFBWFB5cnlj?=
+ =?utf-8?B?eUJLNFU1QzJmdTNQSit2R1VqcDZIWi8zb2FPeXcyU3NPakpSTWh2KzFNWTMv?=
+ =?utf-8?B?MWJCcHJBd0NQQ0thekJkQjcwWTJ5Z3RWcjVoVkRkU3cwMzEycTN0STlSeGNS?=
+ =?utf-8?B?Z3k0SHU2bFFGOWYzY1ZsWmtzZzRhb3pMaFRLUUxYWGpjd3dUYjF2Z0liTjQ4?=
+ =?utf-8?B?V1FoQktxUmJaT3dPNW00czJtNUFkbXVGQ21LdjNVczE5aVFRVHVUQkVLeW5a?=
+ =?utf-8?B?N0VGNjZSUElLMGM3OTVpRzN6R0pxZzJaWWFBMlFnd3ZXVzVVRXd5Q0pBK2Vm?=
+ =?utf-8?B?WUZSc0N5Y1BHMUE5QlhsMDVPdlRrSEZ2bTJzTGtqZ29IYUE0aEJpVjZZN0lF?=
+ =?utf-8?B?L2ZTWlNTRHk3VEhvTEd4TnY0bGI4L1c3MGlLUndvWU5ybmYraTRCKy9XamhF?=
+ =?utf-8?B?UjA5WFcxOVJnMEtKOFFNbnA2MWxxSDRueDVPajlONWRBemJnMnFCUTIwOTRF?=
+ =?utf-8?Q?YfsTEFLCndY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NWNuczcwb3hYRk11QkpvWVdacjJQRzBteFUrNHVpMTVSMCtEV09JcjBKclYw?=
+ =?utf-8?B?Zmtud0VJY0ZyNlJMRWNOTW1DeWhhaHFYTXhNZlpzTCt6cEhhdDg4ODBBWXQv?=
+ =?utf-8?B?cmIxK0hRM2NlcWorMG5qQ2FRZEMxVFB3L0cwSGUwUERpd1dycXZvaVJ3MW9l?=
+ =?utf-8?B?RE5GTmQwMkZOTk8wSm0wMkVnY0w4VTU0SlJFbTZmTVVOYnlRbXJGU1l1M2Q2?=
+ =?utf-8?B?bS81b3ZPOG1CQlNsdUpJdzVDWS9CZDAxMzNwZERvR3F2YUljQVRlKyszNjN0?=
+ =?utf-8?B?VzZNenNveDFpWWh0WU90R3FyMlV2M3NkOGQvUndtNmE2bVZKalg2VXFkb0gx?=
+ =?utf-8?B?ZW13OGJ3NUt0Qm1WOGhNcUtXbEk1cVNQT0lTL3BSbU9mNFhVd2hJcVE5RkJk?=
+ =?utf-8?B?VG1RVHdBejAyNjZUb1FTYjNyWEZEUktmKzJnUDdCeVVFdXdhUkdydlQxQm1I?=
+ =?utf-8?B?VXY0Q1JMMGlSL01BdzZsZkpUdE50NGZUb0Y2Y2RobTVsekY0UXE5NnR1cXlm?=
+ =?utf-8?B?c0pTMFpsOVZlVkRueTU2bE5rQnloQ2FTUHB5TGsrdGlpSDlDWjZQaWhGelRp?=
+ =?utf-8?B?L3JNbUhaV3Z4UzUvSmJTV0xjVS9kNXlvamZJRHdqNEpLdFhSbmVYTDlaZ3FN?=
+ =?utf-8?B?R0ptbEZ5RTBYZnFRVkJvUFBVTk1CZ0tLMlB1VUxndmZiUEtvMEpkL1VtZ1ZI?=
+ =?utf-8?B?dXZlTVNtYWNnL09MY200bnVQNnJUZm10L284Ymt2VDE5VmQxVTVFUFFNYThP?=
+ =?utf-8?B?TUVqUm02WndYT3d2MXQrNEZsUUlXdElPNlVBZ2hVVm00NEE1c1ZKSnZ1K2M2?=
+ =?utf-8?B?NnZqa3VDWjFxaytvSGRUNHlsLzdyVzNBSmk1ZWxYcHltQjBXL2Ric2Y2V1h6?=
+ =?utf-8?B?QXhoNFVJWXdEem9MaWVoTXlzM0VUdnJ0YkZBS0tQMG44RDZ2VFp6V3lZUkZP?=
+ =?utf-8?B?VXliWFNKSklBZHZEZ1ZsR1Q2citlcTN1UktIUE9GdWwyZXRIRU5XNTduYjkw?=
+ =?utf-8?B?dHowN3U1L1dUOWt2R1VtZnlId3pUL0JTdSsvRlNPTnAyWm9JcUhWcXZLcFli?=
+ =?utf-8?B?c0dTbWxxZzMxVjZQTnByeDdSUmxSSUJBTW5KajFpUVZ4Y3ZBNUt3bFlEYUhV?=
+ =?utf-8?B?a0Zab0taYXhkT3IyTHJWZ0RHYlZRY0VBSXZjQ1l1b050aUZqeDBsWXFIRGxw?=
+ =?utf-8?B?TEp3c0ZZYXcwY0p1Zk1RS2hadTJwVVFBRDN5ODNsbW1FamtkSmxpQ0R6Y1RB?=
+ =?utf-8?B?NEtvajZQVFZxTjRpTSs4VEpFS1pCa2ppc2RidE5UbWNzR2Erc1hqYmdOZ3RL?=
+ =?utf-8?B?UFVhWC9mcGl6ejVkbDN2UVFsMEkrUTdsZFltZUQ4a1Zhd0VYOGFRSGtRQ2U3?=
+ =?utf-8?B?bEF0V3RsdmNpMndiem1MZXhJTzFCYkl5VnhEdGZWd3YyU3hETmIzaER3cUFs?=
+ =?utf-8?B?dE1RY1EyMnVzTlR2M1ptK0NuVE1NT3V1STZFeXNtUERRNHdPeXNxMUpSOE5D?=
+ =?utf-8?B?MFhpNEI2MDBxdm5PenErMmxLcUFxWG1OT2dDUXB4QWxvM1RzbHpHRWkwWjlP?=
+ =?utf-8?B?ZFEvTi9NZXRIbk8xREtQVHR4enNMZk1XU2Y1Vjl2OWZFbjZCRjlRNTk1WFF2?=
+ =?utf-8?B?TlJ5VjZ1blFEaUxxazVZRk9jeURVdWZ6ajJMVER0aGFNdWZUbGs2L0VyU05w?=
+ =?utf-8?B?WWIyZGVFakQrYjVEM1BTM2pWK1kyNFVlcjNrMXZscDRCVEM0aVJWN1ZseVVY?=
+ =?utf-8?B?OC9RMVo1SndKSHR0V005aGVHT1VzU1loc2ZCMTRPb2p6SisvdFVOVDRrWlRI?=
+ =?utf-8?B?cVB3Ty9majE2dTBkeDcyMjFpR3ZuTnFYTjNTTTB6MkhVYWRQSmxnNUZsckEy?=
+ =?utf-8?B?YTdRNGEwQnM0K1M1VmIyaUIzRjAwZUVPMjZzODBYbXhtaXpFVERpcmdHdVRh?=
+ =?utf-8?B?Zm1zdDVzUTliekdBK2w5T1duRUZ2QVBSb2dXT2ZRYk5HS3pqdlZkSllJbUpQ?=
+ =?utf-8?B?UEdCYmkwY1BOamxOVVlYdWxzVU9Pa01oVFV3OE1DY2lFOUtyWHh0OWlVVDB3?=
+ =?utf-8?B?RFRXNU1OZGVoakk3Nnl5b0lSU2QwbE94bGhaQ2k5T2FuaDdwUGo3YjJyWU43?=
+ =?utf-8?B?U0VWajNRdDVod3BVbEZRd2VtQm5ZUFRUMTR4ZStLNThUQ3JjbHRhalNqVGFL?=
+ =?utf-8?B?MVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87492797-0f80-4d6a-9c20-08ddacfcde7c
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2025 17:40:22.5940
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mg2PJb8tLx2SIALEyMeK2JtmtLx1qRoXc/SliHS194u4V1ji0yi3oI+urlcs8vdsaxDoWmVqiNYLWC0HnaPwcwK6fD/ggicydWhslaROHsA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB8046
+X-OriginatorOrg: intel.com
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
 
-syzkaller reported a null-ptr-deref in sock_omalloc() while allocating
-a CALIPSO option.  [0]
 
-The NULL is of struct sock, which was fetched by sk_to_full_sk() in
-calipso_req_setattr().
+On 6/14/2025 11:09 AM, Jakub Kicinski wrote:
+> Migrate Intel drivers to the recently added dedicated .get_rxfh_fields
+> and .set_rxfh_fields ethtool callbacks.
+> 
+> Note that I'm deleting all the boilerplate kdoc from the affected
+> functions in the more recent drivers. If the maintainers feel strongly
+> I can respin and add it back, but it really feels useless and undue
+> burden for refactoring. No other vendor does this.
+> 
+> v2:
+>   - fix missing change to ops struct in ixgbe
+> v1: https://lore.kernel.org/20250613010111.3548291-1-kuba@kernel.org
+> 
+> Jakub Kicinski (7):
+>    eth: igb: migrate to new RXFH callbacks
+>    eth: igc: migrate to new RXFH callbacks
+>    eth: ixgbe: migrate to new RXFH callbacks
+>    eth: fm10k: migrate to new RXFH callbacks
+>    eth: i40e: migrate to new RXFH callbacks
+>    eth: ice: migrate to new RXFH callbacks
+>    eth: iavf: migrate to new RXFH callbacks
 
-Since commit a1a5344ddbe8 ("tcp: avoid two atomic ops for syncookies"),
-reqsk->rsk_listener could be NULL when SYN Cookie is returned to its
-client, as hinted by the leading SYN Cookie log.
+For the series:
+Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 
-Here are 3 options to fix the bug:
-
-  1) Return 0 in calipso_req_setattr()
-  2) Return an error in calipso_req_setattr()
-  3) Alaways set rsk_listener
-
-1) is no go as it bypasses LSM, but 2) effectively disables SYN Cookie
-for CALIPSO.  3) is also no go as there have been many efforts to reduce
-atomic ops and make TCP robust against DDoS.  See also commit 3b24d854cb35
-("tcp/dccp: do not touch listener sk_refcnt under synflood").
-
-As of the blamed commit, SYN Cookie already did not need refcounting,
-and no one has stumbled on the bug for 9 years, so no CALIPSO user will
-care about SYN Cookie.
-
-Let's return an error in calipso_req_setattr() and calipso_req_delattr()
-in the SYN Cookie case.
-
-This can be reproduced by [1] on Fedora and now connect() of nc times out.
-
-[0]:
-TCP: request_sock_TCPv6: Possible SYN flooding on port [::]:20002. Sending cookies.
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-CPU: 3 UID: 0 PID: 12262 Comm: syz.1.2611 Not tainted 6.14.0 #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-RIP: 0010:read_pnet include/net/net_namespace.h:406 [inline]
-RIP: 0010:sock_net include/net/sock.h:655 [inline]
-RIP: 0010:sock_kmalloc+0x35/0x170 net/core/sock.c:2806
-Code: 89 d5 41 54 55 89 f5 53 48 89 fb e8 25 e3 c6 fd e8 f0 91 e3 00 48 8d 7b 30 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 26 01 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b
-RSP: 0018:ffff88811af89038 EFLAGS: 00010216
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff888105266400
-RDX: 0000000000000006 RSI: ffff88800c890000 RDI: 0000000000000030
-RBP: 0000000000000050 R08: 0000000000000000 R09: ffff88810526640e
-R10: ffffed1020a4cc81 R11: ffff88810526640f R12: 0000000000000000
-R13: 0000000000000820 R14: ffff888105266400 R15: 0000000000000050
-FS:  00007f0653a07640(0000) GS:ffff88811af80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f863ba096f4 CR3: 00000000163c0005 CR4: 0000000000770ef0
-PKRU: 80000000
-Call Trace:
- <IRQ>
- ipv6_renew_options+0x279/0x950 net/ipv6/exthdrs.c:1288
- calipso_req_setattr+0x181/0x340 net/ipv6/calipso.c:1204
- calipso_req_setattr+0x56/0x80 net/netlabel/netlabel_calipso.c:597
- netlbl_req_setattr+0x18a/0x440 net/netlabel/netlabel_kapi.c:1249
- selinux_netlbl_inet_conn_request+0x1fb/0x320 security/selinux/netlabel.c:342
- selinux_inet_conn_request+0x1eb/0x2c0 security/selinux/hooks.c:5551
- security_inet_conn_request+0x50/0xa0 security/security.c:4945
- tcp_v6_route_req+0x22c/0x550 net/ipv6/tcp_ipv6.c:825
- tcp_conn_request+0xec8/0x2b70 net/ipv4/tcp_input.c:7275
- tcp_v6_conn_request+0x1e3/0x440 net/ipv6/tcp_ipv6.c:1328
- tcp_rcv_state_process+0xafa/0x52b0 net/ipv4/tcp_input.c:6781
- tcp_v6_do_rcv+0x8a6/0x1a40 net/ipv6/tcp_ipv6.c:1667
- tcp_v6_rcv+0x505e/0x5b50 net/ipv6/tcp_ipv6.c:1904
- ip6_protocol_deliver_rcu+0x17c/0x1da0 net/ipv6/ip6_input.c:436
- ip6_input_finish+0x103/0x180 net/ipv6/ip6_input.c:480
- NF_HOOK include/linux/netfilter.h:314 [inline]
- NF_HOOK include/linux/netfilter.h:308 [inline]
- ip6_input+0x13c/0x6b0 net/ipv6/ip6_input.c:491
- dst_input include/net/dst.h:469 [inline]
- ip6_rcv_finish net/ipv6/ip6_input.c:79 [inline]
- ip6_rcv_finish+0xb6/0x490 net/ipv6/ip6_input.c:69
- NF_HOOK include/linux/netfilter.h:314 [inline]
- NF_HOOK include/linux/netfilter.h:308 [inline]
- ipv6_rcv+0xf9/0x490 net/ipv6/ip6_input.c:309
- __netif_receive_skb_one_core+0x12e/0x1f0 net/core/dev.c:5896
- __netif_receive_skb+0x1d/0x170 net/core/dev.c:6009
- process_backlog+0x41e/0x13b0 net/core/dev.c:6357
- __napi_poll+0xbd/0x710 net/core/dev.c:7191
- napi_poll net/core/dev.c:7260 [inline]
- net_rx_action+0x9de/0xde0 net/core/dev.c:7382
- handle_softirqs+0x19a/0x770 kernel/softirq.c:561
- do_softirq.part.0+0x36/0x70 kernel/softirq.c:462
- </IRQ>
- <TASK>
- do_softirq arch/x86/include/asm/preempt.h:26 [inline]
- __local_bh_enable_ip+0xf1/0x110 kernel/softirq.c:389
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
- __dev_queue_xmit+0xc2a/0x3c40 net/core/dev.c:4679
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip6_finish_output2+0xd69/0x1f80 net/ipv6/ip6_output.c:141
- __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
- ip6_finish_output+0x5dc/0xd60 net/ipv6/ip6_output.c:226
- NF_HOOK_COND include/linux/netfilter.h:303 [inline]
- ip6_output+0x24b/0x8d0 net/ipv6/ip6_output.c:247
- dst_output include/net/dst.h:459 [inline]
- NF_HOOK include/linux/netfilter.h:314 [inline]
- NF_HOOK include/linux/netfilter.h:308 [inline]
- ip6_xmit+0xbbc/0x20d0 net/ipv6/ip6_output.c:366
- inet6_csk_xmit+0x39a/0x720 net/ipv6/inet6_connection_sock.c:135
- __tcp_transmit_skb+0x1a7b/0x3b40 net/ipv4/tcp_output.c:1471
- tcp_transmit_skb net/ipv4/tcp_output.c:1489 [inline]
- tcp_send_syn_data net/ipv4/tcp_output.c:4059 [inline]
- tcp_connect+0x1c0c/0x4510 net/ipv4/tcp_output.c:4148
- tcp_v6_connect+0x156c/0x2080 net/ipv6/tcp_ipv6.c:333
- __inet_stream_connect+0x3a7/0xed0 net/ipv4/af_inet.c:677
- tcp_sendmsg_fastopen+0x3e2/0x710 net/ipv4/tcp.c:1039
- tcp_sendmsg_locked+0x1e82/0x3570 net/ipv4/tcp.c:1091
- tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1358
- inet6_sendmsg+0xb9/0x150 net/ipv6/af_inet6.c:659
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0xf4/0x2a0 net/socket.c:733
- __sys_sendto+0x29a/0x390 net/socket.c:2187
- __do_sys_sendto net/socket.c:2194 [inline]
- __se_sys_sendto net/socket.c:2190 [inline]
- __x64_sys_sendto+0xe1/0x1c0 net/socket.c:2190
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xc3/0x1d0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f06553c47ed
-Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0653a06fc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f0655605fa0 RCX: 00007f06553c47ed
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000000000b
-RBP: 00007f065545db38 R08: 0000200000000140 R09: 000000000000001c
-R10: f7384d4ea84b01bd R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f0655605fac R14: 00007f0655606038 R15: 00007f06539e7000
- </TASK>
-Modules linked in:
-
-[1]:
-dnf install -y selinux-policy-targeted policycoreutils netlabel_tools procps-ng nmap-ncat
-mount -t selinuxfs none /sys/fs/selinux
-load_policy
-netlabelctl calipso add pass doi:1
-netlabelctl map del default
-netlabelctl map add default address:::1 protocol:calipso,1
-sysctl net.ipv4.tcp_syncookies=2
-nc -l ::1 80 &
-nc ::1 80
-
-Fixes: e1adea927080 ("calipso: Allow request sockets to be relabelled by the lsm.")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Reported-by: John Cheung <john.cs.hey@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAP=Rh=MvfhrGADy+-WJiftV2_WzMH4VEhEFmeT28qY+4yxNu4w@mail.gmail.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/ipv6/calipso.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
-index 62618a058b8f..e25ed02a54bf 100644
---- a/net/ipv6/calipso.c
-+++ b/net/ipv6/calipso.c
-@@ -1207,6 +1207,9 @@ static int calipso_req_setattr(struct request_sock *req,
- 	struct ipv6_opt_hdr *old, *new;
- 	struct sock *sk = sk_to_full_sk(req_to_sk(req));
- 
-+	if (!sk)
-+		return -ENOMEM;
-+
- 	if (req_inet->ipv6_opt && req_inet->ipv6_opt->hopopt)
- 		old = req_inet->ipv6_opt->hopopt;
- 	else
-@@ -1247,6 +1250,9 @@ static void calipso_req_delattr(struct request_sock *req)
- 	struct ipv6_txoptions *txopts;
- 	struct sock *sk = sk_to_full_sk(req_to_sk(req));
- 
-+	if (!sk)
-+		return;
-+
- 	if (!req_inet->ipv6_opt || !req_inet->ipv6_opt->hopopt)
- 		return;
- 
--- 
-2.49.0
+>   .../net/ethernet/intel/fm10k/fm10k_ethtool.c  | 34 ++++-------
+>   .../net/ethernet/intel/i40e/i40e_ethtool.c    | 38 +++++-------
+>   .../net/ethernet/intel/iavf/iavf_ethtool.c    | 52 ++++------------
+>   drivers/net/ethernet/intel/ice/ice_ethtool.c  | 59 ++++++-------------
+>   drivers/net/ethernet/intel/igb/igb_ethtool.c  | 20 +++----
+>   drivers/net/ethernet/intel/igc/igc_ethtool.c  | 18 +++---
+>   .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 22 +++----
+>   7 files changed, 85 insertions(+), 158 deletions(-)
+> 
 
 
