@@ -1,261 +1,220 @@
-Return-Path: <netdev+bounces-197987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C1FADAC3E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:46:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B33ADAC53
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B261D1719C1
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:46:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBF1E188BBC7
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196322749EA;
-	Mon, 16 Jun 2025 09:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927741FDA;
+	Mon, 16 Jun 2025 09:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMuhq/zo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L63JiDBO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDDC26E153;
-	Mon, 16 Jun 2025 09:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23EE1DDC33
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750067136; cv=none; b=JEqh4KswtbKHnp01d9pYbzEy4IyNn2OvNsZTpOvhq0hmPQo8HoEZV9Xu+0E2Rt/m5xW7UJOEGhRLtagggZFOJrmxyUPfHxHXCmYK/gTsnjj72LhqZpBAHNuW/PGRhNaemZXZbpXgnk2wDEVL9uKIv/CIS/jbajp0lB41aWu7xJo=
+	t=1750067393; cv=none; b=rF5mRpRZEUVe1xBC/oug5FGAbUwYxhkcY4yOSyn3dJcZm8jF10gJ+5epWwYQjhChKNBm+O3oaKge1L395GS9p/7zerCp61bd3oIChzdrzEOf3WcSYxNp6UmxyLTVFqCrhUJaFIjWHHw/BgTj+FAMzgrpakCV/ZVo20Ca8JebJ6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750067136; c=relaxed/simple;
-	bh=9pRR7o5GYsbFeOJ3joJsOxaJTn5+Svn+cL9X+lfJkgg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=igff3HYVIYUdidOZS33MM4KnjgcqWij8urrMcvof3WlsJ/YemLkk79O9L3cX98oL1nkrcq52Ll4+vvmQDRko8IfyLA0KngPSgoQdbS/yB+3uFPnxY+M81XP9+J3TamRGfdi7Pb0SNJwOvOO2heWdbr9Uhc2HamHuMJwcVqLiFDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AMuhq/zo; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6071ac9dc3eso7518732a12.1;
-        Mon, 16 Jun 2025 02:45:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750067132; x=1750671932; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dsrQVZ5sveNAKuUap0eBiKfTgG64PECrNDedHgR/X80=;
-        b=AMuhq/zoeL97A5spycEqAd+QhDM4dhJ0qtcyZyY4fKSZ6KEGfdSbco4xdtgyxwsriP
-         xOSBF/0irNwGOMtw9RvIuxnRByUBoTJkdtADFrkjd/dm7e/kaKNoWEQjPx9OYq/c53OQ
-         +3589sZ8RyT5EyVXHhJruMJ7PwLj2Gy2qN0ce5cbQ8Pqzd/4cAvjDiKt+W6Fv+JfqI3f
-         z177BKLyF/K1Q8dBNcwbEB1M15FTLmQOyFe7+VH/Uw85YFo+sbWcQbU1PtmoqodbbQ6+
-         6TG8LBqwMt0Kc55n1bwW1QKfN3sn3RxOxbFozBiktUgQE+6O17huNwzv17e0bb+R0bOr
-         KkHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750067132; x=1750671932;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dsrQVZ5sveNAKuUap0eBiKfTgG64PECrNDedHgR/X80=;
-        b=xK6SlJDUq9JD7ztv639Duo4AiqNWXYOWfdLz01ED5/Ls2HDQcbPa9HuvwrOipHdYe6
-         kUsZjXVA2z/mvF8ai+Y5khVqSNrWAxT2/vS983bvILBuNtcnGFEs5OKtJDJtAmKdORxK
-         EGywZ9sxh8CB0DFAHloXNRwfhE/BW5XNgXlxL/2tSQbRhXdrxxLctdazRejpt7MPzJx8
-         6sdcbd0ChO5cSNzAELfaSwy1Tuoy+M8zHFwC+pofls5AHBizKNZV3onSPcBEnWaSSvl2
-         dSBQlTj6eum6fEI+aquWsjYBMFnYxOtV+MhX0xZvjmKyWYjFcRV8fQW7mgQ70ZzIvTSv
-         vmgg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOXKiKmEAflySssUSyfPaTVTAgUuxw9IMW9M5BXwikePdJduPpCPYvdXFhuIJCIcD/2UIOSDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwclqcfX0EZr2YZ/aRAaBYi3/RyLSdMGjTe5XjalOZhJxWvstcO
-	O0bNVAWbJL2IZrAl2OM+pMFe/LbaPAVjN46RXux7OKwJuxmQgEFiCV4tsP/01Q==
-X-Gm-Gg: ASbGncvjAo4OvGG8Ny2uar7ofgq9ABii5s12qeY8uiy1USAYq+lAkjdIBJkKnsY9Clz
-	RZMw7K8l1/ZB+H6mIfAK0oJQf7yQzLDVZnKGrjEWdN6UgEyvVvvCKYIepg1g9P8JwXWc1N60gCD
-	UB4Omx1B08o+iYlbsJuaigzMvCokg6Y1wzr5PjoUZh4sCsfRiDaWic5YUHdbMv+pdTdfvi2nB6/
-	xvOoVdazV6XvvkpOKgpUxEGDJGl7Rgi2mAwA2LQthxGYvK0oq+x2TyFXFHQleiBLYqNTxFSF1UD
-	XIOWnaBqzkUTA6kl80zKMTsBSh7cYbNSrvYqvTIX8sFBoA==
-X-Google-Smtp-Source: AGHT+IGMuUEcRc7M1qMsgFb2ZOgc8xNfB1lCzTII3Hbv2ySHbkb0YoJjBpbBL0e1/D8mzwlgBC3CLg==
-X-Received: by 2002:a17:907:7f27:b0:ad8:8621:924f with SMTP id a640c23a62f3a-adfad4f510emr843420966b.56.1750067131958;
-        Mon, 16 Jun 2025 02:45:31 -0700 (PDT)
-Received: from 127.com ([2620:10d:c092:600::1:a3c1])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec8159393sm629363266b.15.2025.06.16.02.45.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 02:45:30 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: asml.silence@gmail.com,
-	netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH v5 5/5] io_uring/netcmd: add tx timestamping cmd support
-Date: Mon, 16 Jun 2025 10:46:29 +0100
-Message-ID: <92ee66e6b33b8de062a977843d825f58f21ecd37.1750065793.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1750065793.git.asml.silence@gmail.com>
-References: <cover.1750065793.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1750067393; c=relaxed/simple;
+	bh=zPdJ7hP5RJ3sJC1ntSPtfmKw/MM6tkymw4tWQs4ZOE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HyS1xAyRAoKIKixDY7NqIi5Y2X9UUPInZQWrHS/VuOGBIrbWTuAVMm0J2FeTnKCR22mKP/cLOxteG8HS5lkWyn0iMMjD1k43Y7wwcf/b7r/pohMoKwjS4yN7FOOB4anQE06sIsain0mzi9INcWXrlgv9EM7bUfgSzMFOtkN+hMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L63JiDBO; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=z05fUkDWa1ajyCUb62sZzATM48OTZQrruWi99fREf78=; b=L63JiDBOwISLrdfwxbIXV/acyA
+	VsbDsKqXpZQFBAIaB24NX4WezvmMVBm1gsCYJ9x97cqpgas5jmFroE3dQsBQxlg+WMi0qun/6HZFG
+	I3At+uxeXHiWkJMyrcWh7kxE+QdLYdOkMjgjy8oq0sGAwgL1J9Ft8C6kU6xUMnP+nC2r70lfWImKr
+	fK+y9H52rN0+KolsBLt15GZ0c2E2MKRqQt8D51qooLXYSwB/mIksuHzBGXsO+GcrPupb8Kej4QhH5
+	MIKqtohd8QL0iF04rt/ckWp5F8/o+6bc1eynHT9rIOPdw1+n4RN5dVeln+Thd37nY1j565H3G8to4
+	HUIa1bCQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51744)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uR6TL-0003XG-0f;
+	Mon, 16 Jun 2025 10:49:47 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uR6TJ-0004iM-2C;
+	Mon, 16 Jun 2025 10:49:45 +0100
+Date: Mon, 16 Jun 2025 10:49:45 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
+	pabeni@redhat.com, kuba@kernel.org, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [net-next PATCH 0/6] Add support for 25G, 50G, and 100G to fbnic
+Message-ID: <aE_oue0q4QhoYggH@shell.armlinux.org.uk>
+References: <174956639588.2686723.10994827055234129182.stgit@ahduyck-xeon-server.home.arpa>
+ <20250612094234.GA436744@unreal>
+ <daa8bb61-5b6c-49ab-8961-dc17ef2829bf@lunn.ch>
+ <20250612173145.GB436744@unreal>
+ <52be06d0-ad45-4e8c-9893-628ba8cebccb@lunn.ch>
+ <20250613160024.GC436744@unreal>
+ <aEyprg21XsgmJoOR@shell.armlinux.org.uk>
+ <CAKgT0UdkGK7L6jYWW9iy_RnZV8+FofSGV+HTMvC3-fBtCBoGyQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKgT0UdkGK7L6jYWW9iy_RnZV8+FofSGV+HTMvC3-fBtCBoGyQ@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Add a new socket command which returns tx time stamps to the user. It
-provide an alternative to the existing error queue recvmsg interface.
-The command works in a polled multishot mode, which means io_uring will
-poll the socket and keep posting timestamps until the request is
-cancelled or fails in any other way (e.g. with no space in the CQ). It
-reuses the net infra and grabs timestamps from the socket's error queue.
+On Sat, Jun 14, 2025 at 09:26:00AM -0700, Alexander Duyck wrote:
+> On Fri, Jun 13, 2025 at 3:44 PM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > On Fri, Jun 13, 2025 at 07:00:24PM +0300, Leon Romanovsky wrote:
+> > > Excellent, like you said, no one needs this code except fbnic, which is
+> > > exactly as was agreed - no core in/out API changes special for fbnic.
+> >
+> > Rather than getting all religious about this, I'd prefer to ask a
+> > different question.
+> >
+> > Is it useful to add 50GBASER, LAUI and 100GBASEP PHY interface modes,
+> > and would anyone else use them? That's the real question here, and
+> > *not* whomever is submitting the patches or who is the first user.
+> >
+> > So, let's look into this. According to the proposed code and comments,
+> > PHY_INTERFACE_MODE_50GBASER is a single lane for 50G with clause 134
+> > FEC.
+> >
+> > LAUI seems to also be a single lane 50G, no mention about FEC (so one
+> > assumes it has none) and the comment states it's an attachment unit
+> > interface. It doesn't mention anything else about it.
+> >
+> > Lastly, we have PHY_INTERFACE_MDOE_100GBASEP, which is again a single
+> > lane running at 100G with clause 134 FEC.
+> >
+> > I assume these are *all* IEEE 802.3 defined protocols, sadly my 2018
+> > version of 802.3 doesn't cover them. If they are, then someday, it is
+> > probable that someone will want these definitions.
+> 
+> Yes, they are all 802.3 protocols. The definition for these all start
+> with clause 131-140 in the IEEE spec.
 
-The command requires IORING_SETUP_CQE32. All non-final CQEs (marked with
-IORING_CQE_F_MORE) have cqe->res set to the tskey, and the upper 16 bits
-of cqe->flags keep tstype (i.e. offset by IORING_CQE_BUFFER_SHIFT). The
-timevalue is store in the upper part of the extended CQE. The final
-completion won't have IORING_CQE_F_MORE and will have cqe->res storing
-0/error.
+Good.
 
-Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Acked-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- include/uapi/linux/io_uring.h | 16 +++++++
- io_uring/cmd_net.c            | 82 +++++++++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
+> > Now, looking at the SFP code:
+> > - We already have SFF8024_ECC_100GBASE_CR4 which is value 0x0b.
+> >   SFF-8024 says that this is "100GBASE-CR4, 25GBASE-CR, CA-25G-L,
+> >   50GBASE-CR2 with RS (Clause 91) FEC".
+> >
+> >   We have a linkmode for 100GBASE-CR4 which we already use, and the
+> >   code adds the LAUI interface.
+> 
+> The LAUI interface is based on the definition in clause 135 of the
+> IEEE spec. Basically the spec calls it out as LAUI-2 which is used for
+> cases where the FEC is either not present or implemented past the PCS
+> PMA.
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index cfd17e382082..dcadf709bfc4 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -968,6 +968,22 @@ enum io_uring_socket_op {
- 	SOCKET_URING_OP_SIOCOUTQ,
- 	SOCKET_URING_OP_GETSOCKOPT,
- 	SOCKET_URING_OP_SETSOCKOPT,
-+	SOCKET_URING_OP_TX_TIMESTAMP,
-+};
-+
-+/*
-+ * SOCKET_URING_OP_TX_TIMESTAMP definitions
-+ */
-+
-+#define IORING_TIMESTAMP_HW_SHIFT	16
-+/* The cqe->flags bit from which the timestamp type is stored */
-+#define IORING_TIMESTAMP_TYPE_SHIFT	(IORING_TIMESTAMP_HW_SHIFT + 1)
-+/* The cqe->flags flag signifying whether it's a hardware timestamp */
-+#define IORING_CQE_F_TSTAMP_HW		((__u32)1 << IORING_TIMESTAMP_HW_SHIFT);
-+
-+struct io_timespec {
-+	__u64		tv_sec;
-+	__u64		tv_nsec;
- };
- 
- /* Zero copy receive refill queue entry */
-diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-index e99170c7d41a..3866fe6ff541 100644
---- a/io_uring/cmd_net.c
-+++ b/io_uring/cmd_net.c
-@@ -1,5 +1,6 @@
- #include <asm/ioctls.h>
- #include <linux/io_uring/net.h>
-+#include <linux/errqueue.h>
- #include <net/sock.h>
- 
- #include "uring_cmd.h"
-@@ -51,6 +52,85 @@ static inline int io_uring_cmd_setsockopt(struct socket *sock,
- 				  optlen);
- }
- 
-+static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, struct sock *sk,
-+				     struct sk_buff *skb, unsigned issue_flags)
-+{
-+	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
-+	struct io_uring_cqe cqe[2];
-+	struct io_timespec *iots;
-+	struct timespec64 ts;
-+	u32 tstype, tskey;
-+	int ret;
-+
-+	BUILD_BUG_ON(sizeof(struct io_uring_cqe) != sizeof(struct io_timespec));
-+
-+	ret = skb_get_tx_timestamp(skb, sk, &ts);
-+	if (ret < 0)
-+		return false;
-+
-+	tskey = serr->ee.ee_data;
-+	tstype = serr->ee.ee_info;
-+
-+	cqe->user_data = 0;
-+	cqe->res = tskey;
-+	cqe->flags = IORING_CQE_F_MORE;
-+	cqe->flags |= tstype << IORING_TIMESTAMP_TYPE_SHIFT;
-+	if (ret == SOF_TIMESTAMPING_TX_HARDWARE)
-+		cqe->flags |= IORING_CQE_F_TSTAMP_HW;
-+
-+	iots = (struct io_timespec *)&cqe[1];
-+	iots->tv_sec = ts.tv_sec;
-+	iots->tv_nsec = ts.tv_nsec;
-+	return io_uring_cmd_post_mshot_cqe32(cmd, issue_flags, cqe);
-+}
-+
-+static int io_uring_cmd_timestamp(struct socket *sock,
-+				  struct io_uring_cmd *cmd,
-+				  unsigned int issue_flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct sk_buff_head *q = &sk->sk_error_queue;
-+	struct sk_buff *skb, *tmp;
-+	struct sk_buff_head list;
-+	int ret;
-+
-+	if (!(issue_flags & IO_URING_F_CQE32))
-+		return -EINVAL;
-+	ret = io_cmd_poll_multishot(cmd, issue_flags, EPOLLERR);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	if (skb_queue_empty_lockless(q))
-+		return -EAGAIN;
-+	__skb_queue_head_init(&list);
-+
-+	scoped_guard(spinlock_irq, &q->lock) {
-+		skb_queue_walk_safe(q, skb, tmp) {
-+			/* don't support skbs with payload */
-+			if (!skb_has_tx_timestamp(skb, sk) || skb->len)
-+				continue;
-+			__skb_unlink(skb, q);
-+			__skb_queue_tail(&list, skb);
-+		}
-+	}
-+
-+	while (1) {
-+		skb = skb_peek(&list);
-+		if (!skb)
-+			break;
-+		if (!io_process_timestamp_skb(cmd, sk, skb, issue_flags))
-+			break;
-+		__skb_dequeue(&list);
-+		consume_skb(skb);
-+	}
-+
-+	if (!unlikely(skb_queue_empty(&list))) {
-+		scoped_guard(spinlock_irqsave, &q->lock)
-+			skb_queue_splice(q, &list);
-+	}
-+	return -EAGAIN;
-+}
-+
- int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
- 	struct socket *sock = cmd->file->private_data;
-@@ -76,6 +156,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		return io_uring_cmd_getsockopt(sock, cmd, issue_flags);
- 	case SOCKET_URING_OP_SETSOCKOPT:
- 		return io_uring_cmd_setsockopt(sock, cmd, issue_flags);
-+	case SOCKET_URING_OP_TX_TIMESTAMP:
-+		return io_uring_cmd_timestamp(sock, cmd, issue_flags);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
+Please name things as per the 802.3 spec, although "based on" suggests
+it isn't strictly to the 802.3 spec... I don't have a recent enough spec
+to be able to check yet.
+
+> >   Well, "50GBASE-CR2" is 50GBASE-R over two lanes over a copper cable.
+> >   So, this doesn't fit as LAUI is as per the definition above
+> >   extracted from the code.
+> 
+> In the 50G spec LAUI is a 2 lane setup that is running over NRZ, the
+> PAM4 variant is 50GAUI and can run over 2 lanes or 1.
+
+I guess what you're saying here is that 802.3 LAUI-2 is NRZ, whereas
+your LAUI is PAM4 ? Please nail this down properly, is your LAUI
+specific to your implementation, or is it defined by 802.3?
+
+> > - Adding SFF8024_ECC_200GBASE_CR4 which has value 0x40. SFF-8024
+> >   says this is "50GBASE-CR, 100GBASE-CR2, 200GBASE-CR4". No other
+> >   information, e.g. whether FEC is supported or not.
+> 
+> Yeah, it makes it about as clear as mud. Especially since they use "R"
+> in the naming, but then in the IEEE spec they explain that the
+> 100GbaseP is essentially the R form for 2 lanes or less but they
+> rename it with "P" to indicate PAM4 instead of NRZ.
+
+So, 100GBASE-R is four lanes, 100GBASE-P is two or one lane using PAM4,
+right?
+
+> >   We do have ETHTOOL_LINK_MODE_50000baseCR_Full_BIT, which is added.
+> >   This is added with PHY_INTERFACE_MODE_50GBASER
+> >
+> >   Similar for ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT, but with
+> >   PHY_INTERFACE_MDOE_100GBASEP. BASE-P doesn't sound like it's
+> >   compatible with BASE-R, but I have no information on this.
+> >
+> >   Finally, we have ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT which
+> >   has not been added.
+> 
+> I was only adding what I could test. Basically in our case we have the
+> CR4 cable that is running 2 links at CR2 based on the division of the
+> cable.
+
+Much of these translations are based on documentation rather than
+testing, especially for speeds >10G. Adding the faster speeds helps
+avoid a stream of patches as people test other modules, unless the
+spec is actually wrong.
+
+> > So, it looks to me like some of these additions could be useful one
+> > day, but I'm not convinced that their use with SFPs is correct.
+> 
+> Arguably this isn't SPF, this QSFP which is divisible. For QSFP and
+> QSFP+ they didn't do as good a job of explaining it as they did with
+> QSFP-DD where the CMIS provides an explanation on how to advertise the
+> ability to split up the connection into mulitple links.
+
+
+
+> 
+> > Now, the next question is whether we have anyone else who could
+> > possibly use this.
+> >
+> > Well, we have the LX2160A SoC in mainline, used on SolidRun boards
+> > that are available. These support 25GBASE-R, what could be called
+> > 50GBASE-R2 (CAUI-2), and what could be called 100GBASE-R4 (CAUI-4).
+> >
+> > This is currently as far as my analysis has gone, and I'm starting
+> > to fall asleep, so it's time to stop trying to comment further on
+> > this right now. Some of what I've written may not be entirely
+> > accurate either. I'm unlikely to have time to provide any further
+> > comment until after the weekend.
+> >
+> > However, I think a summary would be... the additions could be useful
+> > but currently seem to me wrongly used.
+> 
+> If needed I can probably drop the 200G QSFP support for now until we
+> can get around to actually adding QSFP support instead of just 200G
+> support. I am pretty sure only the 50G could be supported by a SFP as
+> it would be a single lane setup, I don't know if SFP can support
+> multiple lanes anyway.
+
+Electrically, a SFP cage only has a fixed number of pins, and only has
+sufficient to support one lane. As such, I'm not sure it makes sense to
+add the >1 lane protocols to phylink_sfp_interfaces. I think if we want
+to do that, we need to include the number of lanes that the cage has at
+the use sites.
+
 -- 
-2.49.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
