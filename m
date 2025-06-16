@@ -1,173 +1,187 @@
-Return-Path: <netdev+bounces-197997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD76ADAC9E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:59:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14B7BADAC94
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:58:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE54172765
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 217F13B0E17
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B032C274FEF;
-	Mon, 16 Jun 2025 09:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66ED22749DC;
+	Mon, 16 Jun 2025 09:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gt8MozBb"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="RwJKJIiQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mxout1.routing.net (mxout1.routing.net [134.0.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E24D20CCC9;
-	Mon, 16 Jun 2025 09:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E034274652;
+	Mon, 16 Jun 2025 09:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750067926; cv=none; b=bZYaOMNqViD4hYspobFkhVA8L+prysNZPQqVsniIB9Wk8s6Ro8BjP3Esd77w5YrDG3sgZB0ehGxHPPQNSNLW5TMbG6OR32YosKxwc95+ND/ZWVFt6dbq+pYsjv/uuLAKKovBAa45D8PSEmOA3oU7hutZ/BRWoeGq+j2G+PxZ+BE=
+	t=1750067925; cv=none; b=b+QQzB8DPG8vOr+pcDul/Audsh0OPYzO2ds8NpPSmK2lfWgNE6IaXwwEwz46W6VJMmGA++RHoRjlX/U4HySazRnqGZusEyvfAxpUUtdetkYF3bcccSEzkMcykKEveUxusHhAChy+FcH5sgcnDvelM6b46HUjNFp173RO6T0UzD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750067926; c=relaxed/simple;
-	bh=+Csrh8Kfzn8kd4FJmLF8SymNL20EH5htPPZSRg0AMZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q7psyREqp4ACVg4h4Z7W9MiCaPfzC9srix+U1MFPDncCxBQkn10nnKrUnUUB7L0B3y1qse0xS3lGpIU3Nox9erKco6pujnaxsQDzhgmgHYEyTE7z3vE/i/ViCmJ9B2RbKOCwK3a+C0CmCfmYywES59cjV2QAC2dUNNO+iyDiK/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt8MozBb; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750067925; x=1781603925;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+Csrh8Kfzn8kd4FJmLF8SymNL20EH5htPPZSRg0AMZg=;
-  b=Gt8MozBb5C4drUWjPF1HQiBGV7JjlvLds9chHJey9K2m+6SU49ozwLaz
-   jqdQkHbRwvggIMeuHZUiNGIK9vzTMSNR99Fa6uPiQXjaUYux7b5VEnNCK
-   LiVL1PPweBqUR/1bYyEPXTGe+NwI/VmiNWKVOs1WBK18DVxJdx7jqkb2Y
-   Sck0+P5YKdQiB5/W3BQrUpX5fGhNw67PSMGkoGvg57AaL215LFBdnlyXj
-   nYxHbhjNefyijoHaxwtcIJvWn4xH/EISazdmRBnpeTTYws7MhPYTrA+HH
-   lf2klPUyYvd6TBarslLVWYgS7rG6llGV0xxybXP69e1jzBNY/sRAoIMx0
-   g==;
-X-CSE-ConnectionGUID: 9ugAcghVS+acWaCvijYahA==
-X-CSE-MsgGUID: F7ksmCk2QWCn7ymIsI8+Mw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11465"; a="55881259"
-X-IronPort-AV: E=Sophos;i="6.16,240,1744095600"; 
-   d="scan'208";a="55881259"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 02:58:44 -0700
-X-CSE-ConnectionGUID: KUOhbcipS3u5b+RKIrlUvw==
-X-CSE-MsgGUID: pcYx1Yo8TNWJwQll4VsULg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,240,1744095600"; 
-   d="scan'208";a="148418811"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 02:58:42 -0700
-Date: Mon, 16 Jun 2025 11:57:53 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: linux@treblig.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: liquidio: Remove unused
- validate_cn23xx_pf_config_info()
-Message-ID: <aE/qoenmfq00npVJ@mev-dev.igk.intel.com>
-References: <20250614234941.61769-1-linux@treblig.org>
+	s=arc-20240116; t=1750067925; c=relaxed/simple;
+	bh=tlgL48I7/TYG/q/B1zUn6HDvHEKOHNp6X1V2o3Sv0A0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P1xq7WxyoVdXrKbzEdDxnC2t1NpUi5fOTiRTHqUQZuo0P3DXSgfm0s8zEk9xJvZ/rcVtqyL+YeitoX7plwqwCDXhYFFRPEgmJGiE5B7IuJJdnVKDnA3aJFT9pKWhnUyFWj+7Gn5JH2WEISDHVcKgwZGfI+PtNAOAS5sSnP8BttY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=RwJKJIiQ; arc=none smtp.client-ip=134.0.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
+	by mxout1.routing.net (Postfix) with ESMTP id D0B2541ACB;
+	Mon, 16 Jun 2025 09:58:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1750067920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sKNrJpeGsrwkC38zDGJR08n+rDpEEs6AmLxRCw9vAYY=;
+	b=RwJKJIiQT88D3B/81u8TiLk/VLaBLC9uget+oeOk3fp/eAbo0Jvx79aZQKTtO/iENwYho2
+	D9KeDEET8ZamhXxKXMiOQZlHJh8qk8JXKLrsEn5E1dqNXiEmFfCuOtwGpa/ENF3AguuXlf
+	YNKzpfgOmnv9A0RZfREeRAfrHEbE224=
+Received: from frank-u24.. (fttx-pool-194.15.87.210.bambit.de [194.15.87.210])
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 6D17A122677;
+	Mon, 16 Jun 2025 09:58:39 +0000 (UTC)
+From: Frank Wunderlich <linux@fw-web.de>
+To: MyungJoo Ham <myungjoo.ham@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	Georgi Djakov <djakov@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+	Jia-Wei Chang <jia-wei.chang@mediatek.com>,
+	Johnson Wang <johnson.wang@mediatek.com>,
+	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>,
+	linux-pm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v4 00/13] further mt7988 devicetree work
+Date: Mon, 16 Jun 2025 11:58:10 +0200
+Message-ID: <20250616095828.160900-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250614234941.61769-1-linux@treblig.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jun 15, 2025 at 12:49:41AM +0100, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> [Note, I'm wondering if actually this is a case of a missing call;
-> the other similar function is called in __verify_octeon_config_info(),
-> but I don't have or know the hardware.]
-> 
-> validate_cn23xx_pf_config_info() was added in 2016 by
-> commit 72c0091293c0 ("liquidio: CN23XX device init and sriov config")
-> 
-> Remove it.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> ---
->  .../cavium/liquidio/cn23xx_pf_device.c        | 39 -------------------
->  .../cavium/liquidio/cn23xx_pf_device.h        |  3 --
->  2 files changed, 42 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
-> index ff8f2f9f9cae..75f22f74774c 100644
-> --- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
-> +++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
-> @@ -1208,45 +1208,6 @@ int setup_cn23xx_octeon_pf_device(struct octeon_device *oct)
->  }
->  EXPORT_SYMBOL_GPL(setup_cn23xx_octeon_pf_device);
->  
-> -int validate_cn23xx_pf_config_info(struct octeon_device *oct,
-> -				   struct octeon_config *conf23xx)
-> -{
-> -	if (CFG_GET_IQ_MAX_Q(conf23xx) > CN23XX_MAX_INPUT_QUEUES) {
-> -		dev_err(&oct->pci_dev->dev, "%s: Num IQ (%d) exceeds Max (%d)\n",
-> -			__func__, CFG_GET_IQ_MAX_Q(conf23xx),
-> -			CN23XX_MAX_INPUT_QUEUES);
-> -		return 1;
-> -	}
-> -
-> -	if (CFG_GET_OQ_MAX_Q(conf23xx) > CN23XX_MAX_OUTPUT_QUEUES) {
-> -		dev_err(&oct->pci_dev->dev, "%s: Num OQ (%d) exceeds Max (%d)\n",
-> -			__func__, CFG_GET_OQ_MAX_Q(conf23xx),
-> -			CN23XX_MAX_OUTPUT_QUEUES);
-> -		return 1;
-> -	}
-> -
-> -	if (CFG_GET_IQ_INSTR_TYPE(conf23xx) != OCTEON_32BYTE_INSTR &&
-> -	    CFG_GET_IQ_INSTR_TYPE(conf23xx) != OCTEON_64BYTE_INSTR) {
-> -		dev_err(&oct->pci_dev->dev, "%s: Invalid instr type for IQ\n",
-> -			__func__);
-> -		return 1;
-> -	}
-> -
-> -	if (!CFG_GET_OQ_REFILL_THRESHOLD(conf23xx)) {
-> -		dev_err(&oct->pci_dev->dev, "%s: Invalid parameter for OQ\n",
-> -			__func__);
-> -		return 1;
-> -	}
-> -
-> -	if (!(CFG_GET_OQ_INTR_TIME(conf23xx))) {
-> -		dev_err(&oct->pci_dev->dev, "%s: Invalid parameter for OQ\n",
-> -			__func__);
-> -		return 1;
-> -	}
-> -
-> -	return 0;
-> -}
-> -
->  int cn23xx_fw_loaded(struct octeon_device *oct)
->  {
->  	u64 val;
-> diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
-> index 234b96b4f488..bbe9f3133b07 100644
-> --- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
-> +++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
-> @@ -54,9 +54,6 @@ struct oct_vf_stats {
->  
->  int setup_cn23xx_octeon_pf_device(struct octeon_device *oct);
->  
-> -int validate_cn23xx_pf_config_info(struct octeon_device *oct,
-> -				   struct octeon_config *conf23xx);
-> -
+From: Frank Wunderlich <frank-w@public-files.de>
 
-Looks like it was never used, even in the patch when it was introduced.
-I wonder if it shouldn't go to __verify_octeon_config_info() for
-OCTEON_CN23XX_PF_VID, but if it works for such long time, I think it is
-fine to drop.
+This series continues mt7988 devicetree work
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+- Extend cpu frequency scaling with CCI
+- GPIO leds
+- Basic network-support (ethernet controller + builtin switch + SFP Cages)
 
->  u32 cn23xx_pf_get_oq_ticks(struct octeon_device *oct, u32 time_intr_in_us);
->  
->  int cn23xx_sriov_config(struct octeon_device *oct);
-> -- 
-> 2.49.0
+depencies (i hope this list is complete and latest patches/series linked):
+
+support interrupt-names because reserved IRQs are now dropped, so index based access is now wrong
+https://patchwork.kernel.org/project/netdevbpf/patch/20250616080738.117993-2-linux@fw-web.de/
+
+for SFP-Function (macs currently disabled):
+
+PCS clearance which is a 1.5 year discussion currently ongoing
+
+e.g. something like this (one of):
+* https://patchwork.kernel.org/project/netdevbpf/patch/20250610233134.3588011-4-sean.anderson@linux.dev/ (v6)
+* https://patchwork.kernel.org/project/netdevbpf/patch/20250511201250.3789083-4-ansuelsmth@gmail.com/ (v4)
+* https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
+
+full usxgmii driver:
+https://patchwork.kernel.org/project/netdevbpf/patch/07845ec900ba41ff992875dce12c622277592c32.1702352117.git.daniel@makrotopia.org/
+
+first PCS-discussion is here:
+https://patchwork.kernel.org/project/netdevbpf/patch/8aa905080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org/
+
+and then dts nodes for sgmiisys+usxgmii+2g5 firmware
+
+when above depencies are solved the mac1/2 can be enabled and 2.5G phy/SFP slots will work.
+
+changes:
+v4:
+  net-binding:
+    - allow interrupt names and increase max interrupts to 6 because of RSS/LRO interrupts
+      (dropped Robs RB due to this change)
+
+  dts-patches:
+  - add interrupts for RSS/LRO and interrupt-names for ethernet node
+  - eth-reg and clock whitespace-fix
+  - comment for fixed-link on gmac0
+  - drop phy-mode properties as suggested by andrew
+  - drop phy-connection-type on 2g5 board
+  - reorder some properties
+  - update 2g5 phy node
+    - unit-name dec instead of hex to match reg property
+    - move compatible before reg
+    - drop phy-mode
+
+v3:
+  - dropped patches already applied (SPI+thermal)
+  - added soc specific cci compatible (new binding patch + changed dts)
+  - enable 2g5 phy because driver is now merged
+  - add patch for cleaning up unnecessary pins
+  - add patch for gpio-leds
+  - add patch for adding ethernet aliases
+
+v2:
+  - change reg to list of items in eth binding
+  - changed mt7530 binding:
+    - unevaluatedProperties=false
+    - mediatek,pio subproperty
+    - from patternProperty to property
+  - board specific properties like led function and labels moved to bpi-r4 dtsi
+
+
+Frank Wunderlich (13):
+  dt-bindings: net: mediatek,net: update for mt7988
+  dt-bindings: net: dsa: mediatek,mt7530: add dsa-port definition for
+    mt7988
+  dt-bindings: net: dsa: mediatek,mt7530: add internal mdio bus
+  dt-bindings: interconnect: add mt7988-cci compatible
+  arm64: dts: mediatek: mt7988: add cci node
+  arm64: dts: mediatek: mt7988: add basic ethernet-nodes
+  arm64: dts: mediatek: mt7988: add switch node
+  arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
+  arm64: dts: mediatek: mt7988a-bpi-r4: drop unused pins
+  arm64: dts: mediatek: mt7988a-bpi-r4: add gpio leds
+  arm64: dts: mediatek: mt7988a-bpi-r4: add aliases for ethernet
+  arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and link to gmac
+  arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
+
+ .../bindings/interconnect/mediatek,cci.yaml   |  11 +-
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |  24 +-
+ .../devicetree/bindings/net/mediatek,net.yaml |  28 +-
+ .../mediatek/mt7988a-bananapi-bpi-r4-2g5.dts  |  11 +
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dts  |  19 ++
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 198 ++++++-----
+ arch/arm64/boot/dts/mediatek/mt7988a.dtsi     | 307 +++++++++++++++++-
+ 7 files changed, 498 insertions(+), 100 deletions(-)
+
+-- 
+2.43.0
+
 
