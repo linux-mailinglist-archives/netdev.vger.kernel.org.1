@@ -1,59 +1,66 @@
-Return-Path: <netdev+bounces-198181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B36E7ADB7EF
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:46:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDDEADB82D
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6293416E66E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:46:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61FE03A6A46
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E91287513;
-	Mon, 16 Jun 2025 17:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F549289E2B;
+	Mon, 16 Jun 2025 17:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSmYzZvx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUtQz+D5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02BD20AF67;
-	Mon, 16 Jun 2025 17:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3251288CB1;
+	Mon, 16 Jun 2025 17:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750095980; cv=none; b=AA3IvIsmB2Z3x2hlmuXIJGY8HUnY4nYxfMhztmT5qEi6BP7HgmGOy4A/ORqnixLDlRKxgU3OlIOKFSVdl0VH7bHuWh/Go4tRrI20zfLQxcU8d4XWMKepwpdYDXGwWKlhVr3egBfhnSdukGnMq2wyC6eTPC97tSp+mNja6oiiuX8=
+	t=1750096381; cv=none; b=fRVyRfrMA6QH96RY1P4LTmkHeZ4mPr42RRvmeiDt8OnrlxOYtQT7Z4fCeUXEMv+rleah8VvFycss8CTPOH1e3/FK/LdYRP3BatvdQu1BHSIxAghdjeyFXiNemCty1noPNOSfGKdQqJtIypcUcLN+2oKpBd5un4+L8t5tylQbZFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750095980; c=relaxed/simple;
-	bh=kWGrpLZraXC7+p6qSKRiuX7ZjGyPfYPnOwIuMV15KTg=;
+	s=arc-20240116; t=1750096381; c=relaxed/simple;
+	bh=MA6AoeE17e3tBiZfeH94+bR+Eh8c1BHZnFVFWm/rYVY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r+YCOugVg+Xvot16PZ7kw2j2wMfZ3xoOS9VsgNIPCCO5mxXVVJ9ZtZV274/P7KCrw/DPqlYN8F6kgkc6at0eQ1dp9Xpx6vqbYPyMZftctrWAC9umdmZgo7xnHki9eZd+bfKcXzvdXJqs024J67t+2GED4fWcEjIqd/Fje8Zglc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSmYzZvx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD464C4CEEA;
-	Mon, 16 Jun 2025 17:46:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dIMu9rm4zBdVmycK+W+wmelxexVrd9wCxRpEZ6lsC8wDbh6BU8y5zT2EJ6C/nXBzpxdxQVRnkE+q3MTRnlrIbscSHpzGIywDeO6M1WquNSDM6t6SdFDnsbC//ZNBSr4dj/mYNbIwHqGs4tKRKhdiordd4xlIFDZlVAdi4sSVnPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUtQz+D5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3777C4CEF0;
+	Mon, 16 Jun 2025 17:52:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750095980;
-	bh=kWGrpLZraXC7+p6qSKRiuX7ZjGyPfYPnOwIuMV15KTg=;
+	s=k20201202; t=1750096380;
+	bh=MA6AoeE17e3tBiZfeH94+bR+Eh8c1BHZnFVFWm/rYVY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hSmYzZvxoxkW16yhO57cY15DqUkNZeu2LDg7sP1R8zblMqzAIt7hv1GH3iI1iK37J
-	 4+Il2YKncOlhoBQxX9iEArgY49dMXgaHzpUx/I3aIhhagbKtf97pvKlPRujUM+LJ+K
-	 76Ys8nTssjpUvvwKJenqBtoVSLTaZQvfKX6Lvd4Bum+uWUWRtviaLjc7IMwhm7JA0J
-	 pOXxGMdO66JRlA4d4P+PxQeX0gbwIzAFvyJzDiaRSgVbi9xOVmyI42eKLUdaPYEb+W
-	 9bWKk71rfH+oCAIs84FRmQrBG4MyiWoDaO5tPXPV2N+KmckZmEwnom0EWBI9K5rWas
-	 XXUZwCCn8qVuQ==
-Date: Mon, 16 Jun 2025 10:46:19 -0700
+	b=fUtQz+D5eAsN7DWPsso0r0H6QTyOrqmKu47cgt91sM4Pp0YjIeX4WZQsMkcKgwt4X
+	 XMUxWKKZgfGl9gMRisNDuFMmdUXOFntbGtc1Vx9OAvg9A8RBmjrv2UcVPVmErto2fm
+	 r8vE9M3SyiY41OZShe3HRdbCh+GqY5fe4fd1Agu+aFiwYN7PF0nPn7+5hF0OyqlIYE
+	 KTQ3vZVlA10B6tFRvFV4YEuAn8F7FEEkMM9CeQWt2cADQl3SqQ63DTLAHjwhc2USBJ
+	 KhJdF0GaDpBAMXkbRAS6KeVuox4uNwQUAq+RyxW9AiFzWoFwDX82LWRyDAZUOl+KyO
+	 bQdKc6burG38g==
+Date: Mon, 16 Jun 2025 10:52:59 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: Chris Snook <chris.snook@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ingo Molnar
- <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jeff Garzik
- <jeff@garzik.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] ethernet: alt1: Fix missing DMA mapping tests
-Message-ID: <20250616104619.75f4fd74@kernel.org>
-In-Reply-To: <20250616140246.612740-2-fourier.thomas@gmail.com>
-References: <20250613074356.210332b1@kernel.org>
-	<20250616140246.612740-2-fourier.thomas@gmail.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, David Ahern <dsahern@gmail.com>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ mlxsw@nvidia.com, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 14/14] selftests: forwarding: Add a test for
+ verifying VXLAN MC underlay
+Message-ID: <20250616105259.2f09ce96@kernel.org>
+In-Reply-To: <426a2c83-38ca-4fa2-9270-b3e600e30d19@kernel.org>
+References: <cover.1749757582.git.petrm@nvidia.com>
+	<78edac89730a346e957b69d4107fcd8f1c5c6266.1749757582.git.petrm@nvidia.com>
+	<20250613095755.54381628@kernel.org>
+	<ccaf0784-d7a3-41e2-b3e0-65b9022f15a6@kernel.org>
+	<87wm9bu13q.fsf@nvidia.com>
+	<426a2c83-38ca-4fa2-9270-b3e600e30d19@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,10 +70,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 16 Jun 2025 15:59:55 +0200 Thomas Fourier wrote:
-> According to Shuah Khan[1]
+On Mon, 16 Jun 2025 18:18:18 +0200 Matthieu Baerts wrote:
+> > The ALL_TESTS issue is not the end of it either. We use helpers that
+> > call stuff indirectly all over the place. defer, in_ns... It would make
+> > sense to me to just disable SC2317 in NIPA runs. Or maybe even put it in
+> > net/forwarding/.shellcheckrc. Pretty much all those tests are written in
+> > a style that will hit these issues.  
+> 
+> In this case, I think it would be better to add this .shellcheckrc file
+> in net/forwarding. If you modify NIPA, I don't think people will know
+> what is allowed or not, or what command line to use, no?
 
-Sorry for a non-technical question -- are you part of some outreach /
-training program? The presentation you linked is from 2013, I wonder
-what made you pick up this particular task.
+Let's do both? I disabled it to NIPA over the weekend.
 
