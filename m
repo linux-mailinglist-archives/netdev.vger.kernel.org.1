@@ -1,162 +1,167 @@
-Return-Path: <netdev+bounces-198065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598E8ADB22D
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:38:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 185E9ADB28D
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54DEA175B04
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:37:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECB697A38BC
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BEF2DF3C7;
-	Mon, 16 Jun 2025 13:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBC32DBF4E;
+	Mon, 16 Jun 2025 13:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gJbY9KT2"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE992DBF72
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828932980B0
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750080900; cv=none; b=Wv2wrrujQ4GMdJwcxbzW9qM8+zljTbJxZFbswd9PLVO1apKhP5FdQt1jQfTOW3qwd39BP4eR3wpIOo7OxGDsLITA/hpDCHswk/WkuBvE+dxHOLHEwH3zkkZt2lm4OYE6pR8T0C3lGBPltPlzB4TFC1cBmW3Ch9m4QDgP3MmX8e0=
+	t=1750081953; cv=none; b=rbk0bscGGno+0EgiCeRqq2kp/+W/rXnkloCYvKqh2fvK21oU0SWHSV4NcFMJ8sAaLv4rckOSaESj3fTeC5JISRqBwrTeljEAoTuos0EzQsCYzyC5dNamj26FI/pBgnDk6cjzGH4fiGs4LTbS1cjHaYyrMi68wIxbRL9qRd3XNHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750080900; c=relaxed/simple;
-	bh=A9wFcAqQwmUZpiuDblwurVpuPc0+SJEASs4pwtKduTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E5m+WCioClCO1JDDcnCJz0jJufIUA/weKb4a2+Ceqr+Wlg9g/6xBfqOIjCehrq5a679PfHIxlJQSn8/WVKvqO+52nquzi9VBNcv4c3h2e5QhjnKP7+ZBYruQ51YlWQ5AD9h3DqOT62pJbl2tT8p5ZgCpKyegJscrAG5U2PItYdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uR9z2-0001e3-42; Mon, 16 Jun 2025 15:34:44 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uR9z0-003ocA-2t;
-	Mon, 16 Jun 2025 15:34:42 +0200
-Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 66E1F42893E;
-	Mon, 16 Jun 2025 13:34:42 +0000 (UTC)
-Date: Mon, 16 Jun 2025 15:34:40 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "imx@lists.linux.dev" <imx@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kernel@pengutronix.de" <kernel@pengutronix.de>, Frank Li <frank.li@nxp.com>
-Subject: Re: [PATCH net-next v2 07/10] net: fec: fec_enet_rx_queue(): replace
- manual VLAN header calculation with skb_vlan_eth_hdr()
-Message-ID: <20250616-positive-vicugna-of-felicity-9239d9-mkl@pengutronix.de>
-References: <20250612-fec-cleanups-v2-0-ae7c36df185e@pengutronix.de>
- <20250612-fec-cleanups-v2-7-ae7c36df185e@pengutronix.de>
- <729dfa8c-6eca-42c6-b9fd-5333208a0a69@lunn.ch>
- <PAXPR04MB8510A1946372F37B5F97E9F28870A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <4877c76a-d0c1-41d7-95c6-553542e2d9b1@lunn.ch>
+	s=arc-20240116; t=1750081953; c=relaxed/simple;
+	bh=tmGIZrqUdKwsTfypfMjWY4BiQcvZrniX9b2OdyQnEfA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CqntqvY+uM6LIkgn2HuXntmieDhBSJAHEsLey2JzAQJDyK9uR8OGzAHD0VUv7P7cjTCwXEVokFpOtVxxztlOBdbL4woushyjRmB35Wdv7D8ECnYjDCUl7q1m2h7i7JA1OnKMXPKkx9Y4xowDDGSwLOTtdc4RBcf+myQSk9SnP4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gJbY9KT2; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750081951; x=1781617951;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tmGIZrqUdKwsTfypfMjWY4BiQcvZrniX9b2OdyQnEfA=;
+  b=gJbY9KT24iHdEXqLc+PabsElrPi+YSzXEdzVLaR3eixnnNW7lncfCINg
+   ins8yAWX0UyU//vSLrv0MLNPcxGjaE3luSU7c/tzPJHYi4xccrQ5qfxi9
+   esm9tyiQaM9jHiWYDH1X9uI6R+fRyJFBlZMAgj1b7JrJND8/2bSniGD23
+   DAOtbf59caD9JeOFMj83OVdtBoiSNW2DrPtxfgVLf3JCzwZ23iIasK9Ds
+   P+bYQO1JUr9ypuUvoP7yFjKk6nHdgZ1X29/6rGpKqtql8IUrUEaB2cItt
+   /nUO8znuF8ifVQmWL0NLS4tSw1I0Ss3Y4th/77JAccCW7pZNi3uHw92Si
+   Q==;
+X-CSE-ConnectionGUID: COXOoyrSRomlR6eejYKTgg==
+X-CSE-MsgGUID: JM+TChmlTumE/LdrVGk+yw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11465"; a="74758751"
+X-IronPort-AV: E=Sophos;i="6.16,241,1744095600"; 
+   d="scan'208";a="74758751"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 06:52:26 -0700
+X-CSE-ConnectionGUID: ZBlJptONQkaeR5d+jI1KUg==
+X-CSE-MsgGUID: VJnSZJrpSKeMAIz1gubSjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,241,1744095600"; 
+   d="scan'208";a="148382406"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by fmviesa007.fm.intel.com with ESMTP; 16 Jun 2025 06:52:24 -0700
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v1] ixgbe: initialize aci.lock before it's used
+Date: Mon, 16 Jun 2025 15:36:36 +0200
+Message-Id: <20250616133636.1304288-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6rzuiur3eqbcevt4"
-Content-Disposition: inline
-In-Reply-To: <4877c76a-d0c1-41d7-95c6-553542e2d9b1@lunn.ch>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
+Currently aci.lock is initialized too late. A bunch of ACI callbacks
+using the lock are called prior it's initialized.
 
---6rzuiur3eqbcevt4
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v2 07/10] net: fec: fec_enet_rx_queue(): replace
- manual VLAN header calculation with skb_vlan_eth_hdr()
-MIME-Version: 1.0
+Commit 337369f8ce9e ("locking/mutex: Add MUTEX_WARN_ON() into fast path")
+highlights that issue what results in call trace.
 
-On 16.06.2025 15:12:37, Andrew Lunn wrote:
-> On Mon, Jun 16, 2025 at 01:42:08AM +0000, Wei Fang wrote:
-> > > >  drivers/net/ethernet/freescale/fec_main.c | 3 +--
-> > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/ethernet/freescale/fec_main.c
-> > > > b/drivers/net/ethernet/freescale/fec_main.c
-> > > > index 6b456372de9a..f238cb60aa65 100644
-> > > > --- a/drivers/net/ethernet/freescale/fec_main.c
-> > > > +++ b/drivers/net/ethernet/freescale/fec_main.c
-> > > > @@ -1860,8 +1860,7 @@ fec_enet_rx_queue(struct net_device *ndev, u16
-> > > queue_id, int budget)
-> > > >  		    fep->bufdesc_ex &&
-> > > >  		    (ebdp->cbd_esc & cpu_to_fec32(BD_ENET_RX_VLAN))) {
-> > > >  			/* Push and remove the vlan tag */
-> > > > -			struct vlan_hdr *vlan_header =3D
-> > > > -					(struct vlan_hdr *) (data + ETH_HLEN);
-> > > > +			struct vlan_ethhdr *vlan_header =3D skb_vlan_eth_hdr(skb);
-> > >=20
-> > > This is not 'obviously correct', so probably the commit message needs=
- expanding.
-> > >=20
-> > > static inline struct vlan_ethhdr *skb_vlan_eth_hdr(const struct sk_bu=
-ff *skb) {
-> > > 	return (struct vlan_ethhdr *)skb->data; }
-> > >=20
-> > > I can see a few lines early:
-> > >=20
-> > > 		data =3D skb->data;
-> > >=20
-> > > but what about the + ETH_HLEN?
-> > >=20
-> >=20
-> > The type of vlan_header has been changed from "struct vlan_hdr *" to
-> > "struct vlan_ethhdr *", so it is correct to use skb->data directly.
->=20
-> Doh! I missed that, sorry. Maybe extend the commit message, you
-> mention skb_vlan_eth_hdr() but you could add something like
->=20
-> ... and change the type of vlan_header to struct vlan_ethhdr to take
-> into account the ethernet header plus vlan header is returned.
->=20
-> With that, please add: Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+[    4.092899] DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+[    4.092910] WARNING: CPU: 0 PID: 578 at kernel/locking/mutex.c:154 mutex_lock+0x6d/0x80
+[    4.098757] Call Trace:
+[    4.098847]  <TASK>
+[    4.098922]  ixgbe_aci_send_cmd+0x8c/0x1e0 [ixgbe]
+[    4.099108]  ? hrtimer_try_to_cancel+0x18/0x110
+[    4.099277]  ixgbe_aci_get_fw_ver+0x52/0xa0 [ixgbe]
+[    4.099460]  ixgbe_check_fw_error+0x1fc/0x2f0 [ixgbe]
+[    4.099650]  ? usleep_range_state+0x69/0xd0
+[    4.099811]  ? usleep_range_state+0x8c/0xd0
+[    4.099964]  ixgbe_probe+0x3b0/0x12d0 [ixgbe]
+[    4.100132]  local_pci_probe+0x43/0xa0
+[    4.100267]  work_for_cpu_fn+0x13/0x20
+[    4.101647]  </TASK>
 
-Will do, thanks!
+Move aci.lock mutex initialization to ixgbe_sw_init() before any ACI
+command is sent. Along with that move also related SWFW semaphore in
+order to reduce size of ixgbe_probe() and that way all locks are
+initialized in ixgbe_sw_init().
 
-Marc
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Fixes: 4600cdf9f5ac ("ixgbe: Enable link management in E610 device")
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 03d31e5b131d..18cae81dc794 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -6801,6 +6801,13 @@ static int ixgbe_sw_init(struct ixgbe_adapter *adapter,
+ 		break;
+ 	}
+ 
++	/* Make sure the SWFW semaphore is in a valid state */
++	if (hw->mac.ops.init_swfw_sync)
++		hw->mac.ops.init_swfw_sync(hw);
++
++	if (hw->mac.type == ixgbe_mac_e610)
++		mutex_init(&hw->aci.lock);
++
+ #ifdef IXGBE_FCOE
+ 	/* FCoE support exists, always init the FCoE lock */
+ 	spin_lock_init(&adapter->fcoe.lock);
+@@ -11473,10 +11480,6 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (err)
+ 		goto err_sw_init;
+ 
+-	/* Make sure the SWFW semaphore is in a valid state */
+-	if (hw->mac.ops.init_swfw_sync)
+-		hw->mac.ops.init_swfw_sync(hw);
+-
+ 	if (ixgbe_check_fw_error(adapter))
+ 		return ixgbe_recovery_probe(adapter);
+ 
+@@ -11680,8 +11683,6 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	ether_addr_copy(hw->mac.addr, hw->mac.perm_addr);
+ 	ixgbe_mac_set_default_filter(adapter);
+ 
+-	if (hw->mac.type == ixgbe_mac_e610)
+-		mutex_init(&hw->aci.lock);
+ 	timer_setup(&adapter->service_timer, ixgbe_service_timer, 0);
+ 
+ 	if (ixgbe_removed(hw->hw_addr)) {
+@@ -11837,9 +11838,9 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	devl_unlock(adapter->devlink);
+ 	ixgbe_release_hw_control(adapter);
+ 	ixgbe_clear_interrupt_scheme(adapter);
++err_sw_init:
+ 	if (hw->mac.type == ixgbe_mac_e610)
+ 		mutex_destroy(&adapter->hw.aci.lock);
+-err_sw_init:
+ 	ixgbe_disable_sriov(adapter);
+ 	adapter->flags2 &= ~IXGBE_FLAG2_SEARCH_FOR_SFP;
+ 	iounmap(adapter->io_addr);
 
---6rzuiur3eqbcevt4
-Content-Type: application/pgp-signature; name="signature.asc"
+base-commit: a76bd1156de9fd1d4be4502cbb5160a709ff4cd7
+-- 
+2.31.1
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmhQHW0ACgkQDHRl3/mQ
-kZzv3QgAj3kbtMjU741HDJh5zzIvnio+zZLg4NbUzRfer3lx2Y4qLI8tWZQFyZZt
-cOUm/G+zu5zKm6UxIHQ+XmPHonj/sz+dRi+Qj1wDuYBdbhZWOTIqYd7S3T61h4SP
-lxwZyhE/j03tE/KeMeSs853eZRvdyCXW4+GYNLN28wR/URs88KdHQZuzwe1pCWYI
-0qT8v3SSU/bDaybETJ+e3BHOgbBBG0QURONMRXlUbCI7FScz/5Sc3FJMABUTkn/S
-N3KXzyFfQpsh7ePqUm8glFEeStublciZgVPN3Wn1Jeogqp+p1hYWBLbyq+hZjS0P
-C8CSppSsEVOLs1HX19284euOGaJtOw==
-=UOCy
------END PGP SIGNATURE-----
-
---6rzuiur3eqbcevt4--
 
