@@ -1,113 +1,162 @@
-Return-Path: <netdev+bounces-197955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B165EADA93C
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 565DCADA946
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:24:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C66C93A35B3
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 07:21:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 669A73A92B0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 07:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B4B1E493C;
-	Mon, 16 Jun 2025 07:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E591F428C;
+	Mon, 16 Jun 2025 07:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Zt65agB/"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="3HNRZZF6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3D5EAFA
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 07:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF06FEAFA
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 07:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750058510; cv=none; b=EspY4pmnpatch6ZYtU0/4Ri1nJRbx6L4Z8vG61XdtcwiLcc4uBkQpqtxDLkRzn7xRlaaTczFTi6nfOVRNxvFnVjzUpUyd6K7iKfkSyHG/VOcMh26lonNLYXkgqIxQR1NKQ38gn9wZR/THm6htlQ8UZGKPZ44SjZLz6Uj+wAE90o=
+	t=1750058654; cv=none; b=d1kNKsh9i+kC3Go2V7YoQTeAoQp8YJ7VGiMtgSmksRt4LhmOOMT1q8m3Dk18YX0LwEHGHl8D+R0Vh20Zg1PqmfIhFr+ROc3ny367Hv7mew39L0ymD4SogVYpUYjcY3rsaaE7EDR7PWbcYU2jfVZ+UCGOJbtg1DCMKHAx7OOz9Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750058510; c=relaxed/simple;
-	bh=lLR1rlU7/ZfTYuRcmuDQ+Q+sSPdhN9PyCuxrNS9n6bw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XmkF0PLpLUNqv+HuecE3nr3xclWjoY6YYuwqJh118YoEbg6pt5zeINzZ1yeoZqmHm8PFaEMpTLTLx3ciS5DMs3B/H0jOGGM9KqVqtXN6Ifl4XoKsQobZgmYLKaRSs4wy7jVu0SlFLTZaYfsbyoyQHLtaVEaJ8z9jrNO9bGH87yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Zt65agB/; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55G7Ber6030576;
-	Mon, 16 Jun 2025 07:21:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=fHJGOjr17s3sfZmzjOfhOLp3KhzQj
-	M09anIGx3lAsQw=; b=Zt65agB/0T9TaxO4I//PTjYeqJXiemYMg2jcYK7vzMHyq
-	rZnCJ6o+kYaOb2FEnCj3cEil/F1p5kGIka4SZtgzltMwd1pNyuwFy7kdTKjcTKXK
-	jvigHb5Yw8MmwP7Q85UFRuswh8AE55Eut9ekpY2c/pcBKALG3/bEWf2g3vB+zUwd
-	75Yox2HA/23ostoH5bwl+H3rIImRQ4TrKH1UAMypt0Br8SAaFyDWlvmE3IrNcirG
-	T7EngRjG9mL4g6DK+LibCK5c9E/FyDL/VPGdsbW/NZLkq2GCdf35tLqjJ03HvZ4/
-	2vP3oLWyURS/lyjPU+C2cq8FXUXQrMyR0hXcmzlwg==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 479q8r11b1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Jun 2025 07:21:38 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55G6fFB6034454;
-	Mon, 16 Jun 2025 07:21:37 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 478yh7anjt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Jun 2025 07:21:37 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55G7Lbd6007621;
-	Mon, 16 Jun 2025 07:21:37 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 478yh7anjc-1;
-	Mon, 16 Jun 2025 07:21:37 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: edumazet@google.com, ncardwell@google.com, kuniyu@amazon.com,
-        davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org
-Cc: alok.a.tiwari@oracle.com, netdev@vger.kernel.org, darren.kenny@oracle.com
-Subject: [QUERY] tcp: remove dubious FIN exception from tcp_cwnd_test()
-Date: Mon, 16 Jun 2025 00:21:23 -0700
-Message-ID: <20250616072134.1649136-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1750058654; c=relaxed/simple;
+	bh=uR2GGIFJoNUWja26+eqtvHQqGtdircsCPqOzrEceufw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ptQ+Xg9MM4xtbCQCZFGwnj3GFQKWKW81L1fcq/AO6uOuXDQMLWdmv3AIDfOHw9JCaAP6g90raVwIIm8+E7PoNe6WssjTmP2eWoKZsep0ySF6/0XN+8xZ3/MtPvYxEdVfyaGFWdcuvItmJXDyk3IrHkHzAWQ9Nkkyb/tBQgLLgFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=3HNRZZF6; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a503d9ef59so3620905f8f.3
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 00:24:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1750058651; x=1750663451; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vFu6VBmeq/w4W0+U2cqQ9ftqsZ6qKfNlKR84sMlRxPs=;
+        b=3HNRZZF63Ni+q8LKEYBqpEnIv0wvPsIoqmZNEx8xvkDwavyGY+kJ/170Dq3QiRj4zO
+         a7n8zHFqOvXrggBUaFaAMZe77CQ1lc2PDceLIl6yOpZV71V6TT+MiElBJ/0o+BbcMVTb
+         0f8EIojqGA2m0ILx8gRit3q3KSkCVO4ri3xaZK9s+DxgJlx+JN99QMGpC2vL8rAnwH7Y
+         nZo4FK8jipnqq/MaTWYnNZCo3SFbYN17TnaVe7+XZZAPhI37vFCIuTa5KbssqL6429TD
+         AQd9FSnoIoZQhC3c7akx3AJumZcpF6gWuX3mIMqjTRwUk1NPqtgH779Y9lGzu7nEv8L+
+         Ph6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750058651; x=1750663451;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vFu6VBmeq/w4W0+U2cqQ9ftqsZ6qKfNlKR84sMlRxPs=;
+        b=ibl/m4dv5nPSvC5YXrEemBGaGWPxcbqahCaoMbdE4NG0zTBfwxzYdmM/DdNUmmTrr5
+         C/GennreTyJc6yK6Ksz1bDOzwzhA1LMPLp4LDoQrNIXk+P1N0y8p4YeTXDitd72AxQe2
+         U0yMcZLNuZmwifcLOtE/cSEh3fvUVe6jLb4OL/Domlv+m0Yz8OSO8/Af6Q0Tg0XlIUd/
+         lyY78bnRPR3P8+S4yGH4gMYLLdwvaOqmqbcDccxPF2mk7SXExHEOAnf/W8fSAabHbbSB
+         NV66/uiyZnDokTBfIvjGzm9B9ezNwEePXOF6XQu8W72qznHwAtP5Cvqw+paPP+j+umvZ
+         L3MQ==
+X-Gm-Message-State: AOJu0YyG9AwOxQBS65i1UGn0ogx+DCK7S7+rOql8WEB1AD/ur6SzJytb
+	v10YpkcKR1vwzRiDSh2TorD8GPr/a2epaRjlEv70hDsANndtYAyGrnwET/xgUPpR6gg=
+X-Gm-Gg: ASbGncsls72MLPvJF7n62oMVFKdTBWdQSVDd/f61I+Zf23GZ0f9LQ94tVnXRY99Vrq/
+	MFHrg6HMoGsJwJQHDs/Ig33Ov2kO48lMRS3ZCuBEume/Vqam5lDKrzrYEeEr19qHIh3nohEptNb
+	SBcMYxj1wDc29+4XRkKFOmOvVzuJ4yZVWZROB3gJbsbAkEokF31urPwJdFDs+57sMYYpQzNi+A4
+	ybnH6/VOE9/Ww63BgH/ijdb60D4ajOpfDun2RAKd9j8IBTaplkSm90uzwZKXeSTjbNCNu+oHHcx
+	SZDiz+nyxIvvlc6P1yxgq+rga1N66lhuob6TSX9kozMfTi0ZA+mg0XMBef265L54g5Q=
+X-Google-Smtp-Source: AGHT+IGOQ/05R6rCvIZwn3dIA2Nugc/IsmfEl2HAgh9BK3DzCi3R0HMyStiSUVCIGzVyM4FshOI6yQ==
+X-Received: by 2002:a05:6000:2507:b0:3a4:efc0:c90b with SMTP id ffacd0b85a97d-3a5723974e2mr7184735f8f.15.1750058651143;
+        Mon, 16 Jun 2025 00:24:11 -0700 (PDT)
+Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:4238:f8a4:c034:8590])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b08c99sm10312334f8f.63.2025.06.16.00.24.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 00:24:10 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: [PATCH v2 0/5] net: use new GPIO line value setter callbacks
+Date: Mon, 16 Jun 2025 09:24:03 +0200
+Message-Id: <20250616-gpiochip-set-rv-net-v2-0-cae0b182a552@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-16_03,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=667 spamscore=0
- malwarescore=0 adultscore=0 phishscore=0 suspectscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2506160047
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE2MDA0NyBTYWx0ZWRfX4PdpUs+V9tVc dHBrMUfbXyyjjukv12/Nx2mOxXBulBenUTxhLceBgj2vroLWrjQL5c3Lj5KV4+MLk/gsBPpgnH5 f69EX1KpbAxH2rbpFkeUelFeUzxnFMQAlWJjkY9hJS1dvFyLTLrW81WpdTtEygB2FgM+Bj6qyLR
- bwhQ4G6ctiy8Vz/262rLkXemus6D3jFymqJWVAGu5DO4sCM45U+oa/0OiUNwmIrupe6t34yZuNx QYyFih2Qa1CpppJ4ujl93hFqld0lFwao272yo9ZADSPwzGSG/ASBLSNartIxhsnm36L/syz4KOe zEwgI/Dvp5NDmyWKenAwqjv8aGcQ2Uo1wDDSaw1hb3zyaJdRsdAGqyck8AgUcWsa0JfFwSOXrhA
- HsjPLxRx0HIkfv8rhh5vdB1un2EDKWxjvC+32MsEP1yRWDx1ah418bKFAa6mlgM1ZVNNBevM
-X-Proofpoint-GUID: YbYrEcEfx1MrLajJIW8QybNoJgzrc5UP
-X-Proofpoint-ORIG-GUID: YbYrEcEfx1MrLajJIW8QybNoJgzrc5UP
-X-Authority-Analysis: v=2.4 cv=dvLbC0g4 c=1 sm=1 tr=0 ts=684fc602 cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=6IFa9wvqVegA:10 a=Da0N1cG-_SoSr0OD1DEA:9 a=zY0JdQc1-4EAyPf5TuXT:22
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJPGT2gC/22NwQrCMBBEf6Xs2ZUk2sR68j+kh5pu2wVJyqYEp
+ fTfjfXqaXgD82aFRMKU4FqtIJQ5cQwFzKECP3VhJOS+MBhlalUbh+PM0U88Y6IFJWMo0ZB7NLo
+ 7m8F5KMtZaODXbr23hSdOS5T3fpL1t/35rFZ/fVmjwlNt7aXvtXd2uD05dBKPUUZot237AKUyb
+ PG3AAAA
+X-Change-ID: 20250527-gpiochip-set-rv-net-9e7b91a42f7c
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, 
+ "Chester A. Unal" <chester.a.unal@arinc9.com>, 
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-can@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1610;
+ i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
+ bh=uR2GGIFJoNUWja26+eqtvHQqGtdircsCPqOzrEceufw=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBoT8aYW4MUwvKOocqHKQFcXvihCO599Xx46HuuP
+ BdHcdXSED+JAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCaE/GmAAKCRARpy6gFHHX
+ cvZBD/0aIizVMfAcrRGn+eGFgxroefc64UEncpO5XRYZr4fpLreEOW/l/6kJdsUC3ln+H5m7qyd
+ afXzJbi7dzgzaaakQc0F1Yl+Xk3ybyaO9jL9EijyiRnrThzoYCuJEn2/uLHV+NK8n+mMWa6/vmU
+ 4iKlPXYrPpKMMp4vF5r6UBKlFKQd68CXKBqaUvLQlq5NK4K8hFyMVxGngeVomNZJEOs8Xb/RNae
+ CY2grMseA4NDMv0+JNPAEoFFPvYDyhLjm9jSZdwXItdJJJ9Hxs4SoAo+hrS9mI1nFETaXK95JII
+ K5lzvRb8Gaciin93TS4nnmpboRPiyKHjjNjG3f6G9bMD9N4O1ZhsJdidluXfoYINmbuECVCmhBo
+ oI8F4ba9fca7wCeBSvTpopmVe055GxvDiUoX1Pf4BrEEqXdIU1O3d2yadpQcrNqc8M2NJmnuVwe
+ HcEjM/EZiESaur6u6pva7RjUNFK0AyVWHaRy1BQO66SK7Z867KEhTyFW4Ktc05qPpzXJY+nUvV/
+ 8RMUio65JmAVSUOsG1GzV48Zh1dlS46nqyItSAiEje8/saGqMuCqVyyMK1jZT/wYP576NtkqcXf
+ +iiCZPwC1n6roZHDTuirFnU5fInYX3zemFdlV9BGW4VaG3RuwHRHuDuP0FlLi4HraM9oJSfXHh8
+ Ez87K2sH4EmaVOQ==
+X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
+ fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
-Hi Eric,
+Commit 98ce1eb1fd87e ("gpiolib: introduce gpio_chip setters that return
+values") added new line setter callbacks to struct gpio_chip. They allow
+to indicate failures to callers. We're in the process of converting all
+GPIO controllers to using them before removing the old ones. This series
+converts all GPIO chips implemented under drivers/net/.
 
-Thanks for the cleanup and RFC conformance improvements.
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+Changes in v2:
+- propagate the return value of mcp251x_spi_write() in the mcp251x
+  driver up to the new GPIO callbacks (and the old request() too)
+- check the return value of phy_read_mmd() as well in qca807x
+- Link to v1: https://lore.kernel.org/r/20250610-gpiochip-set-rv-net-v1-0-35668dd1c76f@linaro.org
 
-However, we've observed a performance regression in our testing with 
-Apachebench at higher concurrency levels. Specifically, throughput
-and HTTP tail latency in workloads.
-It seems the previous exception for FIN packets allowed graceful
-tear-down even when CWND was full, which is now delayed or stalled.
+---
+Bartosz Golaszewski (5):
+      net: dsa: vsc73xx: use new GPIO line value setter callbacks
+      net: dsa: mt7530: use new GPIO line value setter callbacks
+      net: can: mcp251x: propagate the return value of mcp251x_spi_write()
+      net: can: mcp251x: use new GPIO line value setter callbacks
+      net: phy: qca807x: use new GPIO line value setter callbacks
 
-We understand the motivation for the cleanup, but the change introduces
-practical impact for real-world workloads relying on timely
-FIN transmission.
+ drivers/net/can/spi/mcp251x.c          | 37 +++++++++++++++++++++++-----------
+ drivers/net/dsa/mt7530.c               |  6 ++++--
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 10 ++++-----
+ drivers/net/phy/qcom/qca807x.c         | 13 ++++++------
+ 4 files changed, 41 insertions(+), 25 deletions(-)
+---
+base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
+change-id: 20250527-gpiochip-set-rv-net-9e7b91a42f7c
 
-Would you be open to discussing potential mitigations?( not sure like
-selective FIN override, other approaches.)
+Best regards,
+-- 
+Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Thanks again for your work on this.
-
-Thanks,
-Alok
 
