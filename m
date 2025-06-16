@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-198343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CEC6ADBDC2
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:37:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C6AADBDCB
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DDE63A65D2
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:36:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49D4E189052E
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5479B2264DB;
-	Mon, 16 Jun 2025 23:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F6F229B28;
+	Mon, 16 Jun 2025 23:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E31EaIDT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tqzZzy69"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986ED2163B2
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2360B40856
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750117018; cv=none; b=H8RsyI6qaa987GWZ3+MlAYu2+aBgd7Pgnv0yrTXlu/o6BJYSY+M0RHmL1PkKZpMDqrbgiI4lzodEYOA1WBamXETdcbIGNV41JNN8dGjviOzDYHB5gWsCWUV9xc5a9OXe1zGP46GNoJHILafp01m2EDKLvKDkRPPTDz+bleQygt8=
+	t=1750117466; cv=none; b=TSq4dc8ARF1jtwVhZ+pAUuUHnk2W2jhqb4wtngO/aUs/v/10AbCDj+NdVFF8GVGqCTn+gw4zIJsoMELsAkHcbcbg7idkx1oxCe/ya88gvrDEGEnhoaeOXZ/ePtauEhDfSyVhIsITL86vssFlyKr3piPIp0W0Oqnv6J7hWDC6TMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750117018; c=relaxed/simple;
-	bh=EjuNgF/vVO+K65YPYw5vfwGSWtBvVncO7MAJJWGEkco=;
+	s=arc-20240116; t=1750117466; c=relaxed/simple;
+	bh=TyCKZKGOAAPyR31zGJZMO38/BuApKNtVZReI//LPOeM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWNxD3y3vj0VdQHm/aG2oRW++sYyqsuxiafw2uEwxQiaZPD8sq6SgxJZpR/HiR4VP8ZkuBE4uJ2hvJBNFU5tsrF3S4YCl4a7VCcnRQE13yQoas4QjI0s9TgqcmXUeatZTa2/kTgwSRVXgQ9mW55e0EZpdoZj8Xux5dGUdLn+7cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E31EaIDT; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=N4ZuYS43zbBrgLRrIvpE8dP2dcviT+dBZIdHzft+PztXm3cnUb6ETGI5mn7+RfaQr4+SM7WimYBFmdDefQ/SQoiQ2mlk4WP3ClOBlIJgQZ5/FURilPfwwj4xpXF1dLwFOtFOzJKJ3gYEus+789rCvgd6+/53kR0fLomMsKpSB2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tqzZzy69; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,31 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7U66mXwcbciGnG8InnXr7UU0BGV3gljAYw3gTyUi1vE=; b=E31EaIDTvDlv1TkwMeGCVb9Nkb
-	V4ra4rjueNOjW03xxRxzHsIIldKw1n858GPIlkDa9wxvZ3fpik88aDiTmkJl7IPlWK/y/iwVArkVq
-	7MtgBF9EvvGfKOqyDd7hpcdD4AcpJoZjy6ej6OaFooKahhh12vjDmcbLTSPAWqDisH3k=;
+	bh=E1MZF6qJ4kR4/xO2ag9oWgv0qmKN1SifNEp7nDneWJI=; b=tqzZzy69zkTYAVEJjjhpDX/o7O
+	T2Cem5IHWwYJDak/HKqK7V0GVQTjv5gx1NBDIwOLgEfUyng0PkhiZSdSKZTBwUC3S7W0e1Tct1a2s
+	7T2pHNKj97HdVUkwzvLNvCWPLJ/egIYUQf+P7ZTOPYuFZZKzc3dDbtGILNFiZulX5rc4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uRJNe-00G6Xm-SP; Tue, 17 Jun 2025 01:36:46 +0200
-Date: Tue, 17 Jun 2025 01:36:46 +0200
+	id 1uRJUr-00G6Zd-IF; Tue, 17 Jun 2025 01:44:13 +0200
+Date: Tue, 17 Jun 2025 01:44:13 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Jacob Keller <jacob.e.keller@intel.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 4/4] net: stmmac: visconti: make phy_intf_sel
- local
-Message-ID: <cb36aa9a-a9ab-48b4-8259-5e31b69deb35@lunn.ch>
-References: <aFCHJWXSLbUoogi6@shell.armlinux.org.uk>
- <E1uRH2G-004UyY-GD@rmk-PC.armlinux.org.uk>
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Joakim Tjernlund <joakim.tjernlund@infinera.com>
+Subject: Re: [PATCH net-next] dpaa_eth: don't use fixed_phy_change_carrier
+Message-ID: <c93dacff-eb7f-4552-9a1d-839b416fb500@lunn.ch>
+References: <7eb189b3-d5fd-4be6-8517-a66671a4e4e3@gmail.com>
+ <8020ee44-e7b1-4bae-ba34-b0e2a98a0fbd@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,21 +66,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1uRH2G-004UyY-GD@rmk-PC.armlinux.org.uk>
+In-Reply-To: <8020ee44-e7b1-4bae-ba34-b0e2a98a0fbd@intel.com>
 
-On Mon, Jun 16, 2025 at 10:06:32PM +0100, Russell King (Oracle) wrote:
-> There is little need to have phy_intf_sel as a member of struct
-> visconti_eth when we have the PHY interface mode available from
-> phylink in visconti_eth_set_clk_tx_rate(). Without multiple
-> interface support, phylink is fixed to supporting only
-> plat->phy_interface, so we can be sure that "interface" passed
-> into this function is the same as plat->phy_interface.
+On Mon, Jun 16, 2025 at 03:47:57PM -0700, Jacob Keller wrote:
 > 
-> Make phy_intf_sel local to visconti_eth_init_hw() and clean up.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> On 6/16/2025 2:24 PM, Heiner Kallweit wrote:
+> > This effectively reverts 6e8b0ff1ba4c ("dpaa_eth: Add change_carrier()
+> > for Fixed PHYs"). Usage of fixed_phy_change_carrier() requires that
+> > fixed_phy_register() has been called before, directly or indirectly.
+> > And that's not the case in this driver.
+> > 
+> > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> > ---
+> 
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> Is this harmful to leave set if fixed_phy_register() is not called? If
+> so then this could be net + a fixes tag instead of net-next.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+It appears to be used if you echo something to
+/sys/class/net/eth42/carrier. It will return EINVAL.
 
-    Andrew
+The same will happen if you use do_set_proto_down() via rtnetlink.
+
+Apart from the EINVAL returned to userspace, nothing bad will happen.
+So i don't think this needs a Fixes: tag.
+
+	Andrew
 
