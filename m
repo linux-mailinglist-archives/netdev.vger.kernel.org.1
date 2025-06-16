@@ -1,97 +1,101 @@
-Return-Path: <netdev+bounces-198211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D322ADBA5D
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:55:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584ADADBA82
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 767707A3FFC
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:54:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FF633AE09B
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457EF1FAC50;
-	Mon, 16 Jun 2025 19:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B29A1E9B2F;
+	Mon, 16 Jun 2025 20:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frT9NA0L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+zXodZV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC141DDC28
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 19:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712A82E40E;
+	Mon, 16 Jun 2025 20:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750103730; cv=none; b=fKYl2iMkHasbrAl9r7SX4dD/mnTAGBTPugK1B5sVrrPj2o/KJPYFHLuN4F0DJLArS8TCI5hvDjOYKFr41tXyy8+lVq26Td+exemEQk0JDB/Q/+bfiniQfNF1QfkLCfaKvG4l6XteFkBbKf80za0XHJh5VOFCnj48J8JbvZ175GQ=
+	t=1750104271; cv=none; b=HJyYwcvgTV1RXqnkWmWlDRdWylCYzSdJP2xe2Yp1RhCj0S4sOkJCc+djO7/P8SNU0XZkiK8MUNnVl1sFqtp7rmMFYr+ldaTd2Am0pfC8Lk7HIrQjXCN64ZjDxVaYAc+ncwtA4FstiYjKEp+WSD9+gyLgWHi/JDyv1/h8oLVhMaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750103730; c=relaxed/simple;
-	bh=+Wg+woV9xGAfvb417/hijkpcw5BPjg7y+cazlNkarmE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eUsMEhrEC4gC5EJf6tBDLXTIBov8rx3+Sz8yHDPn+IAYoyIzRp+72P7GuXC2vcm4FJEViLyTJna7Pjd8+JmncwcCfA4g+Wc+foy0rtq0GrhM6RShfump715hW49YMdzVjrKmg9lZD7VFzuXpXTC3p1sLysnsgUi24GNHfu6d2uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frT9NA0L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55368C4CEEA;
-	Mon, 16 Jun 2025 19:55:29 +0000 (UTC)
+	s=arc-20240116; t=1750104271; c=relaxed/simple;
+	bh=Et21XFiupMhtztsIix5XoNNyWOX94OGDV/Hx4l9I1UA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dXc4q5xb0NZ5BRkZ6D7g1qbIC9jmfDrFiAt0E37G/JH1zbv0IfgWMOdlBFMt2Z+nQpHxhO17yMeRV5Fm/LNiSlqZIHJuyhtsMNd7F2ZgrQVsEXAbWCfYFn+xgeFx7soOeh+a5bmEx2HEs6ggOZQuUcm9NPAR5P/ctaCsM+Sdj0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+zXodZV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EAC1C4CEEA;
+	Mon, 16 Jun 2025 20:04:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750103729;
-	bh=+Wg+woV9xGAfvb417/hijkpcw5BPjg7y+cazlNkarmE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=frT9NA0LRjK6Eaor39Gy2nxrc4T+7xUiZP0+JvL2hcq8Kd8hkSpG+jOBiPyQtpyh5
-	 A0UFOTNxJ1TR1aGp8qQ/54Pj9xbpbwk2iZ7/sebtNhP1sloHgIS4YuroDaEPp3Agr1
-	 OVJj4Mbd/2gGVBRcpPrPfcEOZ36WolPFnFPF8mX3VIi7Leo7drgtjsQ2jUDt1W9ZZs
-	 1fQC5xIt3kMixPCWg3ymlQmYsLfFJczGc4ikdDWtev53elzkIy0q861DLhAiqk0Mtf
-	 nk4j9dEN53cHqDhFJPUH2VVLdcSHiPWaMn2sFU0Y79j59in5bMXPCT/4h90diiUTO6
-	 hTHAbFrnT349g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	lee@trager.us,
-	jacob.e.keller@intel.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>
-Subject: [PATCH net] eth: fbnic: avoid double free when failing to DMA-map FW msg
-Date: Mon, 16 Jun 2025 12:55:10 -0700
-Message-ID: <20250616195510.225819-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1750104271;
+	bh=Et21XFiupMhtztsIix5XoNNyWOX94OGDV/Hx4l9I1UA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I+zXodZVJH4kHho9Ufv8FbtQvgUgfCH4AfNHCPLYPw002zjOYi4Tp+k2QA7qpdc80
+	 3klgaouwg3LLarOktqriyrb/lrrsv+xQgfgF4npfu95Qej8/M6FdMCjZPwdGLXpfyF
+	 nFJnXeRxLGeqaE3OuvGQKfhUqKPQotW9tecd9LS2rV5Fu9MIv3mQeU3CLa/nOLlatB
+	 7AtMiXDLo6QCX1Y9ADWe+KbnFfNWQlsPEhu5z7fIoGkNfuSERTP2gvrvfXpnAqdGYD
+	 +23REHbx2HniHUeB0gw9m0b4QIHzz8sTAzFo3WGLROPxzhb7EKngcGURVRYFr5nuwf
+	 4I0uZKvdg9nvw==
+Date: Mon, 16 Jun 2025 21:04:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Mark Zhang <markzhang@nvidia.com>,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net] net/mlx4e: Remove redundant definition of IB_MTU_XXX
+Message-ID: <20250616200427.GC5000@horms.kernel.org>
+References: <aca9b2c482b4bea91e3750b15b2b00a33ee0265a.1750062150.git.leon@kernel.org>
+ <20250616163602.GA4794@horms.kernel.org>
+ <20250616183305.GF750234@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250616183305.GF750234@unreal>
 
-The semantics are that caller of fbnic_mbx_map_msg() retains
-the ownership of the message on error. All existing callers
-dutifully free the page.
+On Mon, Jun 16, 2025 at 09:33:05PM +0300, Leon Romanovsky wrote:
+> On Mon, Jun 16, 2025 at 05:36:02PM +0100, Simon Horman wrote:
+> > On Mon, Jun 16, 2025 at 11:24:23AM +0300, Leon Romanovsky wrote:
+> > > From: Mark Zhang <markzhang@nvidia.com>
+> > > 
+> > > Remove them to avoid "redeclaration of enumerator" build error, as they
+> > > are already defined in ib_verbs.h. This is needed for the following
+> > > patch, which need to include the ib_verbs.h.
+> > > 
+> > > Fixes: 096335b3f983 ("mlx4_core: Allow dynamic MTU configuration for IB ports")
+> > > Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+> > > Signed-off-by: Mark Zhang <markzhang@nvidia.com>
+> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Hi Mark, Leon, all,
+> > 
+> > If I understand things correctly, without this patch the driver
+> > compiles and functions correctly. But if it is modified to
+> > include rdma/ib_verbs.h, which is required for some other forthcoming
+> > change, then the other parts of this patch are needed to avoid a build
+> > failure.
+> 
+> Yes, the inclusion of rdma/ib_verbs.h was needed for series, which at
+> the end doesn't need it. I can drop Fixes line if it is important.
+> 
+> There is no following patches for this. It is standalone change.
 
-Fixes: da3cde08209e ("eth: fbnic: Add FW communication mechanism")
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Sure, that is fine by me.
+But please drop the Fixes tag and resubmit for net-next.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index edd4adad954a..72c688b17c5b 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -127,11 +127,8 @@ static int fbnic_mbx_map_msg(struct fbnic_dev *fbd, int mbx_idx,
- 		return -EBUSY;
- 
- 	addr = dma_map_single(fbd->dev, msg, PAGE_SIZE, direction);
--	if (dma_mapping_error(fbd->dev, addr)) {
--		free_page((unsigned long)msg);
--
-+	if (dma_mapping_error(fbd->dev, addr))
- 		return -ENOSPC;
--	}
- 
- 	mbx->buf_info[tail].msg = msg;
- 	mbx->buf_info[tail].addr = addr;
--- 
-2.49.0
-
+Thanks
 
