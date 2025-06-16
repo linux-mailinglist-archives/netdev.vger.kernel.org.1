@@ -1,134 +1,171 @@
-Return-Path: <netdev+bounces-198043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C8B9ADB05A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:37:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8050ADB05F
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A751D16827C
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:37:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 348B718927FE
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6B6292B22;
-	Mon, 16 Jun 2025 12:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A56292B39;
+	Mon, 16 Jun 2025 12:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mQZcCmKq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WS5IU3x+"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33071285C88;
-	Mon, 16 Jun 2025 12:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80502292B2E;
+	Mon, 16 Jun 2025 12:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750077433; cv=none; b=CAsNOKNqikIpwkgMyqhHbZOmwuCIjiFIDxHFpIq/q9MEcamze5aTiWKLw02z1WKA/h6Ott/lZN8kf7MsKmCoJSeY0AQSoFwh2wDV6++bfwMJJ7ni4M3XtAxhmitkx1MSS7VvCBo6I/a79eTuLkrCML9hDfwjWghoICuOycpx+a4=
+	t=1750077479; cv=none; b=L1SBgoUKJpCQGXqtVEqnO8RPluP9i5ONizyQ2RFpswqnqv5tmscaoocpH8f9Lk3XG7WsXyC4IXae1LJ3mMNCtv2JW/Ys7DJ50T6vFjHyrqBmAmuhnch+lE3+eXn8rgKyNRLJSlbupyTLDnGfs9OtaFLjl2uJe4+t7rg8fVCInVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750077433; c=relaxed/simple;
-	bh=ZeP7tjC/ZhNCZ3i6ehT8hX7C0+VGcUECL26rGy8Kgm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=umXIfXGaSPPLlZBRP2G4yBw2YMrwxpWD1y93KzXvajW5vIdNXVm29PbOxeOQ0jIEqUrmqyPfm4TYk5HQxTyuqAe51QNnTIkXNYjWHDy1hi01dqFI/bJ3ppi+Kfg8ZO/nao08DcN8CkNCxnjQElJpmCm335pmEt+rdxo/tD2l8jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mQZcCmKq; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6114F443D2;
-	Mon, 16 Jun 2025 12:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1750077423;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kG3QipumXVsgRC4HVgkiBiGQuTdDWQuhKnssOVQC3/Y=;
-	b=mQZcCmKq8vupYDAfa3gPiIL9kiqYFRpFCvdRUHZ/B+32xQJa/gwrTMGv8oSnkwr3k86MPC
-	XkGEapMDGYuj+hMt2t4YusO7Xx2llW+Ct3eHDvGylDNPjT5kcTLk42bM+lbfY70arP8Z92
-	l1jxM1yfdrYqvEW9p8hfXVNCpvK26hG3dA1gREmUae9II6ug2VAhykDTB0toYrXcoGhWcr
-	Tm86JSNlKIprxGN2pWxxCypMxRvmkrLYucTfzaT1fm1ilBjWun7XsI2IGhaCyRdRB4MEeY
-	j+06koYoplIyAQNXGOAuj/WXq9UC6V3EYaQNstnlWsiRb5pSoe6zGNRnRHaVzw==
-Date: Mon, 16 Jun 2025 14:37:00 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
- <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark
- Brown <broonie@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v13 04/13] net: pse-pd: Add support for PSE
- power domains
-Message-ID: <20250616143700.6740fa59@kmaincent-XPS-13-7390>
-In-Reply-To: <20250614121329.7720ff33@kernel.org>
-References: <20250610-feature_poe_port_prio-v13-0-c5edc16b9ee2@bootlin.com>
-	<20250610-feature_poe_port_prio-v13-4-c5edc16b9ee2@bootlin.com>
-	<20250614121329.7720ff33@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1750077479; c=relaxed/simple;
+	bh=JEPCADCrq2LrIHlVTuB+oCD1W34hSnP5MMMpgsVOuKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H9Pnukv5oqrYvsUxCAynMlrBQe4hmqmSFrCqCJpfK90xLed9/57IQu3T032HaPPlRSaSlHksxEyVJlITByOX2uA6Iu9KHiKee0gpK/m+dxF8tcVaFa3pSXoEKjIkVdvLuk2S12ysXRXpGNcqFYTOeLaZTuhwTk1idlxz7sLnS54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WS5IU3x+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8BAC4CEF1;
+	Mon, 16 Jun 2025 12:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750077479;
+	bh=JEPCADCrq2LrIHlVTuB+oCD1W34hSnP5MMMpgsVOuKA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WS5IU3x+XWWg1hmoTFlnpT1Z8p1Z6y/0Gbf107QHyL2Nb9C9uXW+NHqAmSLb3cyiz
+	 5ES1r/yqw3KFf6JspBh+fA3XvOX5H+FZK83cvjH4Zkrq7NxKGjPUNS4H12SDlk/7Gj
+	 HGyHTnZqqZHrXSRjvlYJOTSan1MUs2r32HbYvfEoMBsAPYY9VmjkMo0SXv5MT9DTh8
+	 XqxwgIWlThLhXpobS6Qq2vH9ke+RsaF3iX7Zg9pgHEAx8RZZ4xNn4A9j471piG1OgU
+	 zKi+zkgVmFtHZw25ARaTka3YtEy/wrQN5HsjebiFUVyH1I1+pFkYq8kc4D20SXtAes
+	 ksOGhLOPTC5Qg==
+Date: Mon, 16 Jun 2025 14:37:56 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <borkmann@iogearbox.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+	kernel-team@cloudflare.com, arthur@arthurfabre.com,
+	jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
+ xdp-rx-metadata.rst
+Message-ID: <aFAQJKQ5wM-htTWN@lore-desk>
+References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
+ <174897279518.1677018.5982630277641723936.stgit@firesoul>
+ <aEJWTPdaVmlIYyKC@mini-arch>
+ <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
+ <87plfbcq4m.fsf@toke.dk>
+ <aEixEV-nZxb1yjyk@lore-rh-laptop>
+ <aEj6nqH85uBe2IlW@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="VywHLU06xENyqKzr"
+Content-Disposition: inline
+In-Reply-To: <aEj6nqH85uBe2IlW@mini-arch>
+
+
+--VywHLU06xENyqKzr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvieeitdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
- ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
 
-Le Sat, 14 Jun 2025 12:13:29 -0700,
-Jakub Kicinski <kuba@kernel.org> a =C3=A9crit :
-
-> On Tue, 10 Jun 2025 10:11:38 +0200 Kory Maincent wrote:
-> > +static void __pse_pw_d_release(struct kref *kref)
-> > +{
-> > +	struct pse_power_domain *pw_d =3D container_of(kref,
-> > +						     struct
-> > pse_power_domain,
-> > +						     refcnt);
-> > +
-> > +	regulator_put(pw_d->supply);
-> > +	xa_erase(&pse_pw_d_map, pw_d->id);
-> > +}
-> > +
-> > +/**
-> > + * pse_flush_pw_ds - flush all PSE power domains of a PSE
-> > + * @pcdev: a pointer to the initialized PSE controller device
-> > + */
-> > +static void pse_flush_pw_ds(struct pse_controller_dev *pcdev)
-> > +{
-> > +	struct pse_power_domain *pw_d;
-> > +	int i;
-> > +
-> > +	for (i =3D 0; i < pcdev->nr_lines; i++) {
-> > +		if (!pcdev->pi[i].pw_d)
-> > +			continue;
-> > +
-> > +		pw_d =3D xa_load(&pse_pw_d_map, pcdev->pi[i].pw_d->id);
-> > +		if (!pw_d)
-> > +			continue;
-> > +
-> > +		kref_put_mutex(&pw_d->refcnt, __pse_pw_d_release,
-> > +			       &pse_pw_d_mutex);
-> > +	}
-> > +} =20
+On Jun 10, Stanislav Fomichev wrote:
+> On 06/11, Lorenzo Bianconi wrote:
+> > > Daniel Borkmann <daniel@iogearbox.net> writes:
+> > >=20
+> > [...]
+> > > >>=20
+> > > >> Why not have a new flag for bpf_redirect that transparently stores=
+ all
+> > > >> available metadata? If you care only about the redirect -> skb cas=
+e.
+> > > >> Might give us more wiggle room in the future to make it work with
+> > > >> traits.
+> > > >
+> > > > Also q from my side: If I understand the proposal correctly, in ord=
+er to fully
+> > > > populate an skb at some point, you have to call all the bpf_xdp_met=
+adata_* kfuncs
+> > > > to collect the data from the driver descriptors (indirect call), an=
+d then yet
+> > > > again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the data=
+ in struct
+> > > > xdp_rx_meta again. This seems rather costly and once you add more k=
+funcs with
+> > > > meta data aren't you better off switching to tc(x) directly so the =
+driver can
+> > > > do all this natively? :/
+> > >=20
+> > > I agree that the "one kfunc per metadata item" scales poorly. IIRC, t=
+he
+> > > hope was (back when we added the initial HW metadata support) that we
+> > > would be able to inline them to avoid the function call overhead.
+> > >=20
+> > > That being said, even with half a dozen function calls, that's still a
+> > > lot less overhead from going all the way to TC(x). The goal of the use
+> > > case here is to do as little work as possible on the CPU that initial=
+ly
+> > > receives the packet, instead moving the network stack processing (and
+> > > skb allocation) to a different CPU with cpumap.
+> > >=20
+> > > So even if the *total* amount of work being done is a bit higher beca=
+use
+> > > of the kfunc overhead, that can still be beneficial because it's split
+> > > between two (or more) CPUs.
+> > >=20
+> > > I'm sure Jesper has some concrete benchmarks for this lying around
+> > > somewhere, hopefully he can share those :)
+> >=20
+> > Another possible approach would be to have some utility functions (not =
+kfuncs)
+> > used to 'store' the hw metadata in the xdp_frame that are executed in e=
+ach
+> > driver codebase before performing XDP_REDIRECT. The downside of this ap=
+proach
+> > is we need to parse the hw metadata twice if the eBPF program that is b=
+ounded
+> > to the NIC is consuming these info. What do you think?
 >=20
-> AFAIU the release function (__pse_pw_d_release) is supposed to release
-> the mutex.=20
+> That's the option I was asking about. I'm assuming we should be able
+> to reuse existing xmo metadata callbacks for this. We should be able
+> to hide it from the drivers also hopefully.
 
-Yes indeed thanks!
+If we move the hw metadata 'store' operations to the driver codebase (runni=
+ng
+xmo metadata callbacks before performing XDP_REDIRECT), we will parse the hw
+metadata twice if we attach to the NIC an AF_XDP program consuming the hw
+metadata, right? One parsing is done by the AF_XDP hw metadata kfunc, and t=
+he
+second one would be performed by the native driver codebase.  Moreover, this
+approach seems less flexible. What do you think?
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Regards,
+Lorenzo
+
+--VywHLU06xENyqKzr
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFAQJAAKCRA6cBh0uS2t
+rKclAQCvfdnSjaqfL2sEVEPBTg9ms7jItZe4mgSn6ex5xtWOiwD+Lx/hyzIw/HoR
+RuExYSMdd4VZH0G/erckZ9r5j0ByWAI=
+=BJjO
+-----END PGP SIGNATURE-----
+
+--VywHLU06xENyqKzr--
 
