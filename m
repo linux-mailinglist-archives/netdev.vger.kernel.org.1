@@ -1,178 +1,250 @@
-Return-Path: <netdev+bounces-198257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C712FADBB4E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:41:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C85ADBB54
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C51713B5EFD
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:40:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9D9A1760D0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767AC20B7FC;
-	Mon, 16 Jun 2025 20:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FBD20F088;
+	Mon, 16 Jun 2025 20:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQUxhmKS"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Ea8s5MhM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B730136349;
-	Mon, 16 Jun 2025 20:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAEE1DF24F
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750106456; cv=none; b=D5/sVC3AnO2syrKk9gJTQWnwqibUYD81liXOoOLMyMty4AKlTBEDeKu/JxgqdQaVXvATB1Ikcg0qx8o0XEtDss/wmY7ytZvR1F7BszlwlBZK4zjyMlaqGfng0qK3Vrw/7TiGG0qkKwKxX5xB+OaOOxmAVsrKKAceHLtkYnZX2eQ=
+	t=1750106482; cv=none; b=TvREimks5iiNRnvmgmjt0wCSlGuU3mHeSLvJqs+EJ2brcVbsW3McfsJNpC06i/uSuxFf+65R71oOxoYp70pHCHRkH7ZM+5AbikOI/rvrY3o0jA192Z691H9ZK687SnMJiHWNUpuyv0dATOycyWne+NmaGEfXZqV7s95gI6aal+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750106456; c=relaxed/simple;
-	bh=VToacuz5C68jjScMIwa6jMdcPhRPipW0PWEYVkfbBp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PnY8AWNrPD3Q2cu/a1Ovmp2yG1WrRS2bits64m9AlnOtwLYYYN1Ub6i8GBMnRLRHnr1gpGGAT0S0AB9p1LlcTLIB/NyxClLUoremkanam+qqtnnOBfWBKURIMyCANW5u58nSIYY29fnd8m+vyLAmqkC0MVdEAb+WoOBGyzKtQk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQUxhmKS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 319D3C4CEEA;
-	Mon, 16 Jun 2025 20:40:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750106455;
-	bh=VToacuz5C68jjScMIwa6jMdcPhRPipW0PWEYVkfbBp8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KQUxhmKST1yTP9+9MXKhvuAd9dMbhfFbLMwSgtfBTG/VHiSDA8BclseOyJN0yNPqW
-	 B9VQk5WyNmanImzwfw/u79o+MWjtzn5tNgXtE6D9XyMnHF/cnAKDnVwoE8WOliJCwE
-	 btcGPz+mpoaXJJhyxv/WWFZkkldBmVKq1GZveM+UI6yduqIe9Ej/Jc988uNUYvPcMS
-	 GHZXTmUOoanYqZHMmfHFWiCwfsSYbLDPo+Ws60JzzG9D6Vo7gDcc8nlSSE3lRQLTS+
-	 HRtj5zbq+mby6xyduOAIHPw7T2BqzlHJD5gaqlUqSS+7qKI1v22KCjphJ37AIQA57q
-	 mVlEu5/xaqROw==
-Message-ID: <be7149b5-0286-4b39-b6ce-809618354b13@kernel.org>
-Date: Mon, 16 Jun 2025 22:40:49 +0200
+	s=arc-20240116; t=1750106482; c=relaxed/simple;
+	bh=WBK4jVZAfIJE9JPJ+wwLXAr24cVlEWiGniL+TW+izz0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dk8neDZPO/P6K9Za43hDdjpy0srRJhuozpilLSCQoztUp5tR4YLudvB6BsM8SZ8cJSdDzMh/OJU4Y7SlFH/BnDcrBVkbEYUzJTHUw7IO7+ubyPNLuCRYT+kK0NoSFjOaRcHZ1LUAp6XIF2KRfDsQGNAslkmKYyHzvS+uuH8QSUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Ea8s5MhM; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-74849e33349so4328421b3a.3
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:41:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1750106480; x=1750711280; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4CQV9saWq/5nZZ9Xga3PC3J1oLbOOE7/ttYEb2kqOQE=;
+        b=Ea8s5MhMZt2qAX8btH0JM4Kb/VUKEzjTnIZg3K0TtQRrtqTzvWhgS7PX+uGKYWVo5x
+         CkNJJvhMYa373bgBlXm0MZ7mJD/D7uEsaNcC12ffzt27ICQmMa4I3nn1TpcJ08e4IbZj
+         W5mIv2h2tFF7m25E1e1kgRbSHty/7Z846ZdmF19HBf5dIGSXfp9Yta01yp81O2TxarKU
+         2037+at7kCDddg00DcBFjssA8VWSYvVh/KCY9zJHlfmI1xb/qEPQdkUtNe3WQWIJkxhQ
+         pS6caqUROfnUBQgeianJWPRraYZ+/cILtha5gxoWYesaI3wLQU+5DHUgNMqzSDzA2PBp
+         nI0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750106480; x=1750711280;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4CQV9saWq/5nZZ9Xga3PC3J1oLbOOE7/ttYEb2kqOQE=;
+        b=q1M46rKrBeDb6yVpNJrR6mD4S7arJncQPqh6AFm5gQdBDe4rwzvHutxPKhCJs0I7w1
+         xx5BFcxD57+T+M2u0pwaZY+NxhBk3b/BWE8TntmAkde4N6fwuHsEBTygv0d8sLdb3YH8
+         537ccwoNXTFhsfMqsKbEt/juQA5jtN+DQgYkRIa8VWZRIBY52rvL45AsEVuMeonn5LHB
+         x9fb9VWAPFuncRdLupj745cB2UFVIkSWCG8CWmFvsv4lpHEdIsCHb6OhYWUp2qbwBKto
+         EGtm/R+Ybz68/nb9D8gw9J23S79UCE6ZCBYoe2gMer29PNMsR4hX3YzJh+mV20RqUnXy
+         vTjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDpVIUXkaeVqEno72NJfWPP0PxE/z3C31/miJ9U3pwShTdAzlmsBfOu3Ji8kHdl4pQGibcg0U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8165FAb7rvPBKXC/PNdcBB4m3WraAFoOnfcjOmHDwmC1+uyXz
+	uiqeakKhVcgDrQIlm8iJh8dYPSst9EBZkvcyIiHBnEdbEtrMuuYhuLRvbgd6IFHbXgE/rqeOHmT
+	/sou6FV0qgRxDVwP0UrSIzd/A04E3KuXZoJgB3BxC
+X-Gm-Gg: ASbGncsL+7ZMYv2n3mdHhBqUeabHC9N82W3LnOmHmuJvt+MvTioK4eH3PP61RJ/eg7Q
+	D0X+BUmVo9BZKGijKvvuKKZGjcCs/Sfav1Opl7NoWgwOzgwiIVTEq3M39CZUMSHMf99RNKLnEkv
+	h2LWO3RcMEFbVBx5P0QBfOgpA67WjI+9yl3Eg/5qrFEw==
+X-Google-Smtp-Source: AGHT+IFPX/4SrnGX0McGyEO7okXweb3IWH5fwnD/1vMqhTxDDIpgenRS0ZhJ4AeN8WP7cq9ug6gmnfU6+b7sPSqpUj8=
+X-Received: by 2002:a05:6a00:a85:b0:736:43d6:f008 with SMTP id
+ d2e1a72fcca58-7489cffbb1emr15694805b3a.12.1750106480230; Mon, 16 Jun 2025
+ 13:41:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v2 14/14] selftests: forwarding: Add a test for
- verifying VXLAN MC underlay
-Content-Language: en-GB, fr-BE
-To: Petr Machata <petrm@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@gmail.com>,
- netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- mlxsw@nvidia.com, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org
-References: <cover.1749757582.git.petrm@nvidia.com>
- <78edac89730a346e957b69d4107fcd8f1c5c6266.1749757582.git.petrm@nvidia.com>
- <20250613095755.54381628@kernel.org>
- <ccaf0784-d7a3-41e2-b3e0-65b9022f15a6@kernel.org> <87wm9bu13q.fsf@nvidia.com>
- <426a2c83-38ca-4fa2-9270-b3e600e30d19@kernel.org> <87sejztpvj.fsf@nvidia.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <87sejztpvj.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
+ <CAM0EoMk--+xXTf9ZG9M=r+gkRn2hczjqSTJRMV0dcgouJ4zw6g@mail.gmail.com>
+ <CAM0EoMk4dxOFoN_=3yOy+XrtU=yvjJXAw3fVTmN9=M=R=vtbxA@mail.gmail.com>
+ <lVH_UKrQzWPCHJS7_1Cj0gmEV0x4KI3VB_4auivP0fDokTBbmWuDV455wXrf6eQzakVFoK6wUxlDuMw_Lo0p4P9ByPLSjklsIkQiNcd_hvQ=@willsroot.io>
+ <CAM0EoMkoFJJQD_ZVSMb7DUo1mafevgujx+WA=1ecTeYBcpB1Lw@mail.gmail.com>
+ <A2nutOWbLBIdLRrnsUdavOagBEebp4YBFx0DdL23njEFVAySZul2pDRK1xf76_g6dLb82YXCRb1Ry9btDkZqeY9Btib0KgViSIIfsi4BDfU=@willsroot.io>
+ <CAM0EoMmhP_9UsF18M=6B6AbY_am8cEnaqggpnVb9fkmBB4vjtA@mail.gmail.com>
+ <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io>
+ <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com> <yA-qROHJ2pCMLiRG8Au4YMe_V2R27OhaXkkjkImGzbhdlyHUs5nCkbbJYGkNLM4Rt5812LGXHathpDmqSYTGv1D4YF-zeJdWbCnNIAezEdg=@willsroot.io>
+In-Reply-To: <yA-qROHJ2pCMLiRG8Au4YMe_V2R27OhaXkkjkImGzbhdlyHUs5nCkbbJYGkNLM4Rt5812LGXHathpDmqSYTGv1D4YF-zeJdWbCnNIAezEdg=@willsroot.io>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 16 Jun 2025 16:41:09 -0400
+X-Gm-Features: AX0GCFuRmjEvcV5YmOZ0xiVaNcrdPHoMHcS_jV9H13pOVPn5IlnxVdklqLdYsbo
+Message-ID: <CAM0EoM=QxAJS4ZK68mup55O7wQFqkQds-p2Us3R0U-W6FK6krw@mail.gmail.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+To: William Liu <will@willsroot.io>
+Cc: Savy <savy@syst3mfailure.io>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16/06/2025 21:53, Petr Machata wrote:
-> 
-> Matthieu Baerts <matttbe@kernel.org> writes:
-> 
->> Hi Petr,
->>
->> On 16/06/2025 17:06, Petr Machata wrote:
->>>
->>> Matthieu Baerts <matttbe@kernel.org> writes:
-> 
->>>> That what we did with MPTCP, see the top of the mptcp_join.sh file for
->>>> example [2], where we have:
->>>>
->>>>> # ShellCheck incorrectly believes that most of the code here is unreachable
->>>>> # because it's invoked by variable name, see how the "tests" array is used
->>>>> #shellcheck disable=SC2317
->>>>
->>>> If you add this at the top of your new file, followed by an empty line,
->>>> shellcheck will ignore this issue for the whole file.
->>>
->>> The ALL_TESTS issue is not the end of it either. We use helpers that
->>> call stuff indirectly all over the place. defer, in_ns... It would make
->>> sense to me to just disable SC2317 in NIPA runs. Or maybe even put it in
->>> net/forwarding/.shellcheckrc. Pretty much all those tests are written in
->>> a style that will hit these issues.
->>
->> In this case, I think it would be better to add this .shellcheckrc file
->> in net/forwarding. If you modify NIPA, I don't think people will know
->> what is allowed or not, or what command line to use, no?
-> 
-> Good point. The question then is whether to put it to forwarding/ or
-> directly net/, which is has seen more use of lib.sh and therefore the
-> same sort of coding style. I'll experiment with it and should be able to
-> send it later in the week. I don't want to add it to the MC patchset.
+On Thu, Jun 12, 2025 at 11:34=E2=80=AFPM William Liu <will@willsroot.io> wr=
+ote:
+>
+> On Thursday, June 12th, 2025 at 10:08 PM, Jamal Hadi Salim <jhs@mojatatu.=
+com> wrote:
+>
+> >
+> >
+> > Hi William,
+> > Apologies again for the latency.
+> >
+> > On Mon, Jun 9, 2025 at 11:31=E2=80=AFAM William Liu will@willsroot.io w=
+rote:
+> >
+> > > On Monday, June 9th, 2025 at 12:27 PM, Jamal Hadi Salim jhs@mojatatu.=
+com wrote:
+> >
+> > > > I didnt finish my thought on that: I meant just dont allow a second
+> > > > netem to be added to a specific tree if one already exists. Dont
+> > > > bother checking for duplication.
+> > > >
+> > > > cheers,
+> > > > jamal
+> > > >
+> > > > > > [1] see "loopy fun" in https://lwn.net/Articles/719297/
+> > >
+> > > Hi Jamal,
+> > >
+> > > I came up with the following fix last night to disallow adding a nete=
+m qdisc if one of its ancestral qdiscs is a netem. It's just a draft -I wil=
+l clean it up, move qdisc_match_from_root to sch_generic, add test cases, a=
+nd submit a formal patchset for review if it looks good to you. Please let =
+us know if you catch any edge cases or correctness issues we might be missi=
+ng.
+> >
+> >
+> > It is a reasonable approach for fixing the obvious case you are
+> > facing. But I am still concerned.
+> > Potentially if you had another netem on a different branch of the tree
+> > it may still be problematic.
+> > Consider a prio qdisc with 3 bands each with a netem child with duplica=
+tion on.
+> > Your solution will solve it for each branch if one tries to add a
+> > netem child to any of these netems.
+> >
+> > But consider you have a filter on the root qdisc or some intermediate
+> > qdisc and an associated action that changes skb->prio; when it hits
+> >
+> > netem and gets duplicated then when it goes back to the root it may be
+> > classified by prio to a different netem which will duplicate and on
+> > and on..
+> > BTW: I gave the example of skb->prio but this could be skb->mark.
+> >
+>
+> Ah, good catch. I attached the modified patch below then.
+>
+> >
+> > Perhaps we should only allow one netem per tree or allow more but
+> > check for duplication and only allow one per tree...
+> >
+>
+> I believe we have to keep it at one netem per tree. The OOM loop can stil=
+l trigger if a netem without duplication has a netem child with duplication=
+. Consider the following setup:
+>
+> tc qdisc add dev lo root handle 1: netem limit 1
+> tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100=
+% delay 1us reorder 100%
+>
 
-Since Jakub disabled SC2317 in NIPA [1], then I guess we can put this
-.shellcheckrc file in net/, no?
+I didnt explain it clearly - I meant if you have a netem that has
+duplication then dont allow another netem within the tree. Your patch
+is in the right direction but does not check for duplication.
 
->> Note that NIPA's shellcheck reports are currently ignoring all "info"
->> and "style" severities -- so including SC2317 -- except for new files or
->> the ones that were previously shellcheck compliant.
-> 
-> Yeah, I know, but the result is still very noisy, if you want to verify
-> it prior to sending the patchset. It's a bit annoying to have to scroll
-> through the report trying to find relevant stuff. I could add
-> .shellcheckrc in my own clone, but everybody is going to hit these.
+> The first netem will store everything in the tfifo queue on netem_enqueue=
+. Since netem_dequeue calls enqueue on the child, and the child will duplic=
+ate every packet back to the root, the first netem's netem_dequeue will nev=
+er exit the tfifo_loop.
+>
+> Best,
+> William
+>
+> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> index fdd79d3ccd8c..4db5df202403 100644
+> --- a/net/sched/sch_netem.c
+> +++ b/net/sched/sch_netem.c
+> @@ -1085,6 +1085,36 @@ static int netem_change(struct Qdisc *sch, struct =
+nlattr *opt,
+>         return ret;
+>  }
+>
+> +static const struct Qdisc_class_ops netem_class_ops;
+> +
+> +static bool has_netem_in_tree(struct Qdisc *sch) {
+> +       struct Qdisc *root, *q;
+> +       unsigned int i;
+> +       bool ret =3D false;
+> +
+> +       sch_tree_lock(sch);
+> +       root =3D qdisc_root_sleeping(sch);
 
-When Shellcheck got introduced, there were some discussions about SC2317
-and SC2086 [2]. I don't think they are useless -- maybe a function is
-not used by mistake, maybe double quotes are really needed for some
-cases, etc. -- but I agree with you: they create a lot of noise.
+Hrm. starting with qdisc_root_sleeping() seems quarky. Take a look at
+dump() - and dig into something (off top of my head) like
+hash_for_each(qdisc_dev(root)->qdisc_hash, b, q, hash)
 
-[1] https://github.com/linux-netdev/nipa/commit/23b74dd
-[2] https://github.com/linux-netdev/nipa/pull/51#issuecomment-2939556291
+> +
+> +       if (root->ops->cl_ops =3D=3D &netem_class_ops) {
+> +               ret =3D true;
+> +               goto unlock;
+> +       }
+> +
+> +       hash_for_each_rcu(qdisc_dev(root)->qdisc_hash, i, q, hash) {
+> +               if (q->ops->cl_ops =3D=3D &netem_class_ops) {
+> +                       ret =3D true;
+> +                       goto unlock;
+> +               }
+> +       }
+> +
+> +unlock:
+> +       if (ret)
+> +               pr_warn("Cannot have multiple netems in tree\n");
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+No point to the pr_warn()
 
+> +
+> +       sch_tree_unlock(sch);
+> +       return ret;
+> +}
+> +
+>  static int netem_init(struct Qdisc *sch, struct nlattr *opt,
+>                       struct netlink_ext_ack *extack)
+>  {
+> @@ -1093,6 +1123,9 @@ static int netem_init(struct Qdisc *sch, struct nla=
+ttr *opt,
+>
+>         qdisc_watchdog_init(&q->watchdog, sch);
+>
+> +       if (has_netem_in_tree(sch))
+> +               return -EINVAL;
+
+set ext_ack to contain the string you had earlier ("Cannot have
+multiple netems in tree") and user space will be able to see it.
+
+It will be easy to check the existing qdisc for netem_sched_data->duplicate
+Also, please dont forget to run tdc tests and contribute one or more
+testcase that captures the essence of what you are pushing here.
+
+cheers,
+jamal
 
