@@ -1,135 +1,151 @@
-Return-Path: <netdev+bounces-198203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135ECADB93E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:01:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B4F7ADB941
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62C4D1886317
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:01:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1015B1885745
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7931CAA62;
-	Mon, 16 Jun 2025 19:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A606B289368;
+	Mon, 16 Jun 2025 19:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yxhmWNlz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jB+0zJbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E992BEFF8;
-	Mon, 16 Jun 2025 19:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331DF2BEFF8;
+	Mon, 16 Jun 2025 19:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750100480; cv=none; b=ss21ntOsBbdCZxlO1qdRq/B5YHZepNd53PzwTzoP8//AXSC4lDFQ/EwDJ+kzG45h1lbdV1uBa3QL0MGcBCMhpZ0sICs3tvu5frzDx8HNuRx6u2ONWDOczZzMDrhw5xucNkLV+/Oh4WZ/veLkrLeU12zdiGRyWqrSOYO1BI7Cybk=
+	t=1750100483; cv=none; b=tOqd5GODyNlo2LDcpFhEKe2zkR/7a1AcjS2r5tI6z+3px+7tXnPs51K018xBV4AAFV++kgAgXdInaLsdcPl6hlbwjqHUkNEZjo03I2IM7lExDkJs4blumRMcs+yZABTpV0P2Ez0w9Gx3kNJkYmX6DN8hZ7P4aULYeOrkZ9EpTi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750100480; c=relaxed/simple;
-	bh=USxgzpl7+hY7G+QKeg4JLcc5y4PD6NU5jyW03ggM+7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RvLuwhU7H680bM5In8RRBYsKpxLwY3BnfjjuUJv6eDG1LO4JEknZOc/zDUiwMrDuGr4LbBz7m/iAXbwnVQOEUTRwV4qnVBOQElxYYoSkeB2Yooit9a5C+p0HLn/asEHkFzAxkUaHF3wRpX6QQH4w5ULiQ4dErVZjAaq9KUgCVAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yxhmWNlz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NAvcocV1hx7+8hA+DnXfce45O70Tw2fyTGzwBQS2idY=; b=yxhmWNlz1LbYftvFFhwws/TBf2
-	Rdei/1IW/XI/M1GrLUkW5WdXD0e4+fD0VA4iD3AVWN84ydajb/qY9SRwMgwsUPGJuL+X2kphrLaoD
-	036DlptDRiyTQbvrLdd5NdT3cztXWgAOtRIaXoxVsSjEnqSsb03AVJgbm2mQaO3ZZEmU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uRF4w-00G4wb-Q5; Mon, 16 Jun 2025 21:01:10 +0200
-Date: Mon, 16 Jun 2025 21:01:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: allison.henderson@oracle.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
-	hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org
-Subject: Re: [PATCH v2] rds: Expose feature parameters via sysfs
-Message-ID: <b71efc64-89b7-4f4b-af0e-9bf081cc9518@lunn.ch>
-References: <20250611224020.318684-1-konrad.wilk@oracle.com>
- <20250611224020.318684-2-konrad.wilk@oracle.com>
- <05ac7bdf-999c-487c-beb2-74153d03f6b1@lunn.ch>
- <aFBlHiguQpdB1e86@char.us.oracle.com>
+	s=arc-20240116; t=1750100483; c=relaxed/simple;
+	bh=8Najg4tKQDsS9h2EkDVSFDjNH5y1uQdsDakDwvA5AnA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q57VUcLGLOxyRRFwsmJgencdgHuht5Z7DqRkMyT9yYwTy5YmYycDoTRfArL4/5ab9fpYtazGH1h0UbskUOKht+Bseegde/yLe/1bBBObcmd09CNAvjT4tzsZvxtU27AGAf9MtBSsUsbReHFWuJYjiXk8mu61365mvYCcKBcx2Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jB+0zJbI; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so3759053b3a.0;
+        Mon, 16 Jun 2025 12:01:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750100481; x=1750705281; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qP0MJeKCfnc+z8UUqm5xWvyGsPsKt0xCuAfIUgmUlC0=;
+        b=jB+0zJbIfEOSCegiS5521LsMGFX7y/SsdPW92p1dfhVbUQbwVycaFF+YfgKkcXuc+t
+         EMinbDZyTZDC5A5+5R8FaIyj/hnTnuHyXoFDHdsa84Hs8qV5MPRdA1wz5e6BCupLpLI2
+         bPvjGzGJkPsky2624b6UlFlCVW6i4BQ3P9UfbVTqpz2F78PP9d8e7IEXOyEblqAYjDz2
+         ugAZz45B8GktfFUbZi0dUxOhhMl+HG/iZx64v3hnEMMJIzc8x6U+OBp43iqLIk5OYy6Y
+         Bo5pyOBPoavyQR84wKSuwOaHM6z9LvsvDWFqxb+y+V58O4bvpznbn3cM9Qz3y+4J2Vdw
+         zggg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750100481; x=1750705281;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qP0MJeKCfnc+z8UUqm5xWvyGsPsKt0xCuAfIUgmUlC0=;
+        b=UJPuq20HqtOl0xQSsyl0aeM/fC5Frr6Cg2hPyRS3E3h/HPWqDM7q0Tg0/OTBHapl0o
+         BswHG6mc1kixdrQy4muAiN1Gm3sPftYRJw88CNphC3SZUHlEW7ZzjxHhfQA6UB0wR74g
+         McP0zf2op8JvUKmZvQSQocS0uyzYQx4Aj/8LFWLj5ZO1f59Ifi7IINbyDUZhmM6Bvdwx
+         hsr67/FVrxn18QEl9VoXhS/l7DKkG74eQyTo8g9ykH6CoeIof95eePDPMZFWL7lYUf+i
+         5UMGIUQBva3YGcoH+XicSKDnfZPlimqHZvbnpXv0+wW3igYMnSobnwCqBbXhtyNO6/Ez
+         QcdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwM2aoWaKlkpZr4x87w/qdY1kT8+3AX829kHqRskZb20zFrOSeFxsyaUM+muooFRSfbc9ts0U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGvUXB26eaewjAIqZQp4lzlM7nOXILD+wpv7/moKjxCVe832ke
+	8Ae2SoUM4u57R6qGtzO861CQKdInXKYpTEK4e0YVfxeVopXl2vzN37c0EP2G1l1H
+X-Gm-Gg: ASbGncvPG9wewGd4xvZpSnwGMvzhbTi5iOhHTLCsR3+vxX39KxbUMzm9WLfMrsKh3dF
+	AYHasYQL7P3BsJHBWgDljGFtrfU32Ngb82N5qOJqOu0DH73MVZlecGRqS3RD89tVdDJqkXimPvy
+	2v60kwKA4ljwwttuJiQHDiUaWd3rVi8UY+5r2N6OmDzdPRb1uZTenQGoCPwzsZffJxJwASGKOUV
+	GLscEk9nqVsk43hPzt8ohXLK0mwMi08yshzJlL30n5kWUkbe1WmIXwgXIXRGQJMwl3fu4G8NN8c
+	3A1Av+UdfwpquUwTbWA5QqXmcKrtyQElPdDSxlTafOzILogYtvcVqTWiUA9qeQxxw95UEr8Pay4
+	Rrx2/oIHvMjUpPg==
+X-Google-Smtp-Source: AGHT+IEDqw3PCa/dTNp6WKCgM0/H9W0uWXjW2E7ypDl1vD+Zi7CC7PHG3+B+KY277pQ7odyZij4GGQ==
+X-Received: by 2002:a05:6a00:14c2:b0:748:2e1a:84e3 with SMTP id d2e1a72fcca58-7489ce0c6bbmr17257763b3a.8.1750100481093;
+        Mon, 16 Jun 2025 12:01:21 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7488ffecd29sm7212400b3a.31.2025.06.16.12.01.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Jun 2025 12:01:15 -0700 (PDT)
+Message-ID: <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
+Date: Mon, 16 Jun 2025 12:01:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aFBlHiguQpdB1e86@char.us.oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Tulip 21142 panic on physical link disconnect
+To: Greg Chandler <chandleg@wizardsworks.org>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
+ <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+ <385f2469f504dd293775d3c39affa979@wizardsworks.org>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ WlfRzlpjIPmdjgoicA==
+In-Reply-To: <385f2469f504dd293775d3c39affa979@wizardsworks.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> I could not for the life of me get the kernel to compile without
-> CONFIG_SYSFS, but here is the patch with the modifications you
-> enumerated:
+On 6/10/25 11:53, Greg Chandler wrote:
+> 
+> 
+> I decided to test this again before I got sidetracked on my bigger issue.
+> The kernel I repored this on was 6.12.12 on alpha, this is also that 
+> same version, but with a make distclean, and just about every single 
+> debug option turned on.
+> 
+> I left the last line of the kernel boot in this output as well, showing 
+> "link beat good"
+> 
+> I pulled the plug and it happened again immediately.
+> I waited 10 sec, and plugged it back in, and I do not get a "link up" 
+> type message that I would expect to see.
 
-Please take a read of:
-
-https://docs.kernel.org/process/submitting-patches.html
-
-and
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-You need a new thread for every version of the patch. You should also
-put the tree into the Subject: line, etc.
-
-> diff --git a/Documentation/ABI/stable/sysfs-driver-rds b/Documentation/ABI/stable/sysfs-driver-rds
-
-I could be bike shedding too much, but RDS is not a driver. It is a
-socket protocol, which you can layer on top of a few different
-transport protocols. So i don't think it should have -driver- in the
-filename.
-
-> new file mode 100644
-> index 000000000000..d0b4fe0d3ce4
-> --- /dev/null
-> +++ b/Documentation/ABI/stable/sysfs-driver-rds
-> @@ -0,0 +1,10 @@
-> +What:          /sys/kernel/rds/features
-> +Date:          June 2025
-> +KernelVersion: 6.17
-> +Contact:       rds-devel@oss.oracle.com 
-> +Description:   This file will contain the features that correspond
-> +               to the include/uapi/linux/rds.h in a string format.
-> +
-> +	       The intent is for applications compiled against rds.h
-> +	       to be able to query and find out what features the
-> +	       driver supports.
-
-Is that enough Documentation for somebody to make use of this file
-without having to do a deep dive into the kernel sources? If i need to
-do a deep dive, i might just as well handle the EOPNOTSUPP return
-values.
-
-> +static ssize_t features_show(struct kobject *kobj, struct kobj_attribute *attr,
-> +			     char *buf)
-> +{
-> +	return snprintf(buf, PAGE_SIZE, "get_tos\n"
-> +			"set_tos\n"
-> +			"socket_cancel_sent_to\n"
-> +			"socket_get_mr\n"
-> +			"socket_free_mr\n"
-> +			"socket_recverr\n"
-> +			"socket_cong_monitor\n"
-> +			"socket_get_mr_for_dest\n"
-> +			"socket_so_transport\n"
-> +			"socket_so_rxpath_latency\n");
-
-This is ABI. User space is going to start parsing this. Maybe we
-should add both here, and in the documentation, something like:
-
-  New lines will be added at random places within the file as new
-  features are added.
-
-This makes it clear that any code which tests line 4 for
-"socket_free_mr" could break in the future. The whole file needs to be
-searched for a feature.
-
-	Andrew
+I was not able to reproduce this on my Cobalt Qube2 with the link being 
+UP and then pulling the cable unfortunately, I could try other things if 
+you want me to.
+-- 
+Florian
 
