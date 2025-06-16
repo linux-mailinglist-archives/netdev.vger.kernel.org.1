@@ -1,110 +1,299 @@
-Return-Path: <netdev+bounces-198102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 630EAADB40A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:39:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37C1ADB411
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:40:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B2103AAD3B
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:38:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11A3171607
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C6E207DE2;
-	Mon, 16 Jun 2025 14:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A9F202F87;
+	Mon, 16 Jun 2025 14:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeXQ1Ez3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1UZhpBd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C65C1FDE31;
-	Mon, 16 Jun 2025 14:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF481EF09D;
+	Mon, 16 Jun 2025 14:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750084682; cv=none; b=HykOL5aRcFb+m3pcgcBj2S5mXccawh11qTxd+9bnXPrS9wLYE1Ry8/yhhzwLuudjbHLRdyYQ61LNcMZmzXWUWrSx7s+CztqimK61CFhQF1Nz+R/5kzrrX1VjAttqktTz4thzzAQrMZC8Eq1sQ3BNYsC/BOImhleP5nqY5N8Z/qc=
+	t=1750084744; cv=none; b=CrOhIUZ8xPrhxDZ4lvoNCH5uzVS9MVMemMlvBEmj5PP8WV8Ar/Vp42ToQjx/D2r9mHRxk/zGQOZMMW+GixL5HigaxuXRH1wnH7ZtuaHaiX5aXlkhp8qkYF0sH1yutDn8pWL4IKvAfblUs9h7McijVnUA0UaYwSOA9dS0huRaMw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750084682; c=relaxed/simple;
-	bh=cLzVKcuo2jGM7owptZLbLhdR+MJzD8H9+3/gONLBy2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sum3i54vSmCJfZSmEgjziKbu8FmWiJ+8f83GMgBy3c6sdsxapojiZ81QlrTA7h3BQgzE9tjHY4WO6Eu8Nq3jJNaRqv4WC6vv4/n91UEiv6qecCBuV5FZcYxQgwlorAlLyPfqYmOLyAd2uolWHlod7w7Wq7KwPI+hv3o4kTmOhbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NeXQ1Ez3; arc=none smtp.client-ip=209.85.216.53
+	s=arc-20240116; t=1750084744; c=relaxed/simple;
+	bh=/kkrYX7r+qW0Hw4xaL48DO0/DGQE48/qyyCrBfXD1Qs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kdN3/F7Pw9edUTmODG7AZ+C1yBVvlJ6Vyt+IoXPbU8cAglE3WOjn2QNqslQ/OW+U0tt+pgsuTLfC/FWAIqwNaStFVdmoIZziBm1TKNXnplxZ9MXyMiRLbubde3HCv/2WF9jPBo5yu0rotq/046MgEYe3l2Kbn172rIh3fOFAva4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y1UZhpBd; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3135f3511bcso4600879a91.0;
-        Mon, 16 Jun 2025 07:38:01 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-71101668dedso38508517b3.1;
+        Mon, 16 Jun 2025 07:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750084681; x=1750689481; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8+ACrTU05OqY1Muf5ZfOUtQOxY2AQbFMjqsvwqLrJNk=;
-        b=NeXQ1Ez3ral+erasIIi32P9ziLW9QP1Pbnii8XVoH+QnEv4KMlOmyTB/zuDLVrxkZh
-         EsAuIEG82h/yrhUK4xf9Fk/h5ZqbNnv67I7CKtpwgGPC3wbpQn8flod+RMfk+LSdcIIj
-         7mz9e6mAAFXT/gof/ZTMzwYsv9ULQ4EWQ84RvpsdRxvygO8nsrrfaMHFOZc485bPaSws
-         55jFKYo003cDfS4M4AuzHUHtzMt3k8er2jTYZABWQKcm3xezoGOuZD6/t9cgc012VVLA
-         18R6WiS4PWFUN68bfgyEU0k+L4zyOzfai8qUFaTs1/Vd6q+Bqh9ZLdOcF8cx0W4ZA3Z9
-         Ln/w==
+        d=gmail.com; s=20230601; t=1750084741; x=1750689541; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rB8goAWp1em9/W2902mkORSKW2uX2N5v9ygA6Nz1q8g=;
+        b=Y1UZhpBdXHYwwbAJDzFbTXX+OZmlmqQt0PDx+eum+xgLhOjG+9h7mE5ppxpOC1Hsb3
+         e+ud4J/Yh3MuOVnOYbIkr1IoKkPGhAVaKTKJbYqvOsOIGzLDAmhFyO/s/8H3Mg2CHScF
+         2awfR6NbxA34DDvjIqCBFtQD0RQgw84+I9YnQFt2DzFanuZzgL5DjDBIm9VG90aWtpDK
+         MnNOBjyDi0J+6cKBRwZALqC230M5CRna4rqvpcXpMboCwP8PPcF9pF1oX2zOjbVciLRW
+         YyS54pf2nHYl3r9qiiYfR7fwgcDsaLjDVmjCH7r7uX3yzIZnYQspX7uEO88D75MHPm64
+         9bcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750084681; x=1750689481;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8+ACrTU05OqY1Muf5ZfOUtQOxY2AQbFMjqsvwqLrJNk=;
-        b=uZTO/9mnMkBZo3ZWx8eZliU+m77qN7oX8ty7ex2Mmy607P8XT9CZIMsQJcIAIZ391R
-         pUBvYVoQadhKJvzptu+LYFcPP41Pg2KhMLJqL2DA8Nl95KruQG6nmEQLj4a5joAJdqAU
-         bjANs3PdDMYRgDZacd9z6FZLovako9H7mJR2QFbHyN2lderbnAlIhRfeu6xzVzR13M7m
-         uMwOyXiLT08zlHlGrPsmPoF1ZGroHrqkht0ENxG+inBxdSMtd7bhOnk3MViQhm6oMfzI
-         Vwslyg5GZV83z9wnGS3tCNXg2ySe1FNeCWonUI3sCuIyrwhcMr6CS3/ImTnM/bSTj5CF
-         JCVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRnJUCgxG67bD68pq5zoeD2XPuFF27yPmaRu7kaux1NZYRj6j8G3sU92FtWZEFda/HDV5gDvQUvVZSmCQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq+0JhT/KlBFxVOp9P2ggZKjd77n1YWBtfFrHPj3bqWjJ22Dxn
-	NZjpapb4bGdy/bS1xr5RRUx6YH1MTKS/YPe+jbuDSLZ+V3K3GHAPP5c=
-X-Gm-Gg: ASbGncuT8oYdF0Gr4/6BSsTzC8vpEIPW4icgykgMJtPIg5AI7/z5ze/2CnowzEalofE
-	/+nAjLtpYtmaXfZy/yTOAsdwmOJhz4wsqCxMrnTqnPp1MixckWCFVl8BzVdtAzE3T2wJwDSXVPj
-	O7Zk9n/bY53Gw/G9jkaptE7B6Anxu8ofYyjDc2Qws5SbUfTF4kz3bGsdWC5MND+jCLwLj5+4SBt
-	u6mjK6iNUDwBs/sHgJ7oKtsGL9w3MCLFyiSEpaQ4TFuaxpjl+vW1DAlsVAOiG9vbXTztuLPxsyH
-	z8Dd3pyxaieggl0MOZHtUWC/8uh3IoyzWaw3mvTitwFxEgbgt1r74zPn76BmSYWT9frMLqbEoCR
-	PrYLUGFxRnlDA2UNOAynUH+w=
-X-Google-Smtp-Source: AGHT+IHD865TyBBXAhjmeTN3ICmhFosIa32e5E62uOAC6CLnTLRm1L4sgw9QtI+h7yL8wpjDdzoEaw==
-X-Received: by 2002:a17:90b:3f44:b0:311:df4b:4b94 with SMTP id 98e67ed59e1d1-313f1be8a89mr15233629a91.4.1750084680589;
-        Mon, 16 Jun 2025 07:38:00 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2365deca379sm61824765ad.210.2025.06.16.07.37.59
+        d=1e100.net; s=20230601; t=1750084741; x=1750689541;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rB8goAWp1em9/W2902mkORSKW2uX2N5v9ygA6Nz1q8g=;
+        b=rYCjUfQuQLGeSCOt/eojwOS208qSn8svpb7ZqWtNB0ctwcioS7UlUkgIYUcmt7TnWr
+         vDbjB4ibK7hGD0NKO2NFL9LVKfGoKy/H2jv/e8dICzeWrC3NaWvlv/Q5cFLTvsRNYphG
+         tjK5fGH7827eqyOb6WwIvGxamehEy+W0kgZquQsbOOvGxhFiZRTSNg1H4ExVrQWxEHq/
+         W7a4aC6sDaLfzkQByHgjOmm798+62flZvyNOG91ZVK3E3MkIPGCG2OPYuyonH6G4nWHs
+         AbM5brOe+Ay1wn8jQTN00BuNNxk5JhQ9oSZRsJK/dTSymyB/0abvesSnJqaBOvHwgS3v
+         AM2g==
+X-Gm-Message-State: AOJu0YwFb8TjDiCgPiSx61mAxXHwQcc8eVB2Zs2XTOspKLAQ2lDwfGjh
+	vCnN/BhMzeBpoKMqqC3X4oMYdp4Km3bx9ahj9nWrfjama6H+33ZHDR74UA8LsQ==
+X-Gm-Gg: ASbGncs2ZNICfTRDuaxJXrRpyIrRAm0kPiAMaKOXyblmEoIGeG/d2ShK0VZB0rh2C/o
+	xsVDFb4HT9JuVAajZnM/4u2dEvvRmaP4IxmMYAgo8NcThBwfSZBPpGE4JNK8/P+veFyKiCZtY1n
+	IdsuSHSXs7G00O2hoxWUWIbKuezTcVaHrsPEPyhhFPtwSg8qv+oarrH8rCLTHuf6r6blCOIPFgh
+	LDjrUDIQpYjQ+z+Mo2oDftWiAlnmtu9BFegeWwljoLsUspfJ0AEDlrb1bOpEcLwzUhHgKETeFBn
+	rTFwnb9pWYjMJXmS+1/CvVjydnt4SPYn92AwNa9amUvRUCzjDOFVXGMUTSojXOHi04zr2U70yLP
+	ZOdm2oFh34TcSbz7JZtfD/xeh4GM5a/tdVt3NVPUGsD4bShZhascZXrZemetFK+PF
+X-Google-Smtp-Source: AGHT+IFZbCIPbbie27zsppwO/yodd/rb4EXgNbH3dMGkj1TkeyJECYDb+FUw9lWwWlg916dZoNvlvA==
+X-Received: by 2002:a05:690c:708e:b0:70d:ee83:3733 with SMTP id 00721157ae682-7117520fc05mr139266887b3.0.1750084741143;
+        Mon, 16 Jun 2025 07:39:01 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-71152792fbfsm17741197b3.65.2025.06.16.07.39.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 07:38:00 -0700 (PDT)
-Date: Mon, 16 Jun 2025 07:37:59 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, willemb@google.com,
-	sdf@fomichev.me, asml.silence@gmail.com
-Subject: Re: [PATCH net v1] net: netmem: fix skb_ensure_writable with
- unreadable skbs
-Message-ID: <aFAsRzbS1vTyB_uO@mini-arch>
-References: <20250615200733.520113-1-almasrymina@google.com>
+        Mon, 16 Jun 2025 07:39:00 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	martin.lau@linux.dev,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH bpf-next] bpf: lru: adjust free target to avoid global table starvation
+Date: Mon, 16 Jun 2025 10:38:34 -0400
+Message-ID: <20250616143846.2154727-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250615200733.520113-1-almasrymina@google.com>
+Content-Transfer-Encoding: 8bit
 
-On 06/15, Mina Almasry wrote:
-> skb_ensure_writable should succeed when it's trying to write to the
-> header of the unreadable skbs, so it doesn't need an unconditional
-> skb_frags_readable check. The preceding pskb_may_pull() call will
-> succeed if write_len is within the head and fail if we're trying to
-> write to the unreadable payload, so we don't need an additional check.
-> 
-> Removing this check restores DSCP functionality with unreadable skbs as
-> it's called from dscp_tg.
+From: Willem de Bruijn <willemb@google.com>
 
-Can you share more info on which use-case (or which call sites) you're
-trying to fix?
+BPF_MAP_TYPE_LRU_HASH can recycle most recent elements well before the
+map is full, due to percpu reservations and force shrink before
+neighbor stealing. Once a CPU is unable to borrow from the global map,
+it will once steal one elem from a neighbor and after that each time
+flush this one element to the global list and immediately recycle it.
+
+Batch value LOCAL_FREE_TARGET (128) will exhaust a 10K element map
+with 79 CPUs. CPU 79 will observe this behavior even while its
+neighbors hold 78 * 127 + 1 * 15 == 9921 free elements (99%).
+
+CPUs need not be active concurrently. The issue can appear with
+affinity migration, e.g., irqbalance. Each CPU can reserve and then
+hold onto its 128 elements indefinitely.
+
+Avoid global list exhaustion by limiting aggregate percpu caches to
+half of map size, by adjusting LOCAL_FREE_TARGET based on cpu count.
+This change has no effect on sufficiently large tables.
+
+Similar to LOCAL_NR_SCANS and lru->nr_scans, introduce a map variable
+lru->free_target. The extra field fits in a hole in struct bpf_lru.
+The cacheline is already warm where read in the hot path. The field is
+only accessed with the lru lock held.
+
+The tests are updated to pass. Test comments are extensive: updating
+those is left for a v2 if the approach is considered ok.
+
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+
+---
+
+This suggested approach is a small patch, easy to understand, and
+easy to verity to have no effect on sufficiently sized maps.
+
+Global table exhaustion can be mitigated in other ways besides or
+alongside this approach:
+
+Grow the map.
+  The most obvious approach, but increases memory use. And requires
+  users to know map implementation details to choose a right size.
+
+Round up map size.
+  As htab_map_alloc does for the PERCPU variant of this list.
+  Increases memory use, and a conservative strategy still leaves one
+  element per CPU, and thus MRU behavior.
+
+Steal from neighbors before force shrink.
+  May increase lock contention.
+
+Steal more than 1 element from neighbor when stealing.
+  For instance, half its list. Requires traversing the entire list.
+
+Steal from least recently active neighbors.
+  Needs inactive CPU tracking.
+
+Dynamic target_free: high and low watermarks to double/halve size.
+   I also implemented this. Adjusts to the active CPU count, which may
+   be << NR_CPUS. But it is hard to reason whether or at what level
+   target_free will stabilize.
+---
+ kernel/bpf/bpf_lru_list.c                  |  9 ++++---
+ kernel/bpf/bpf_lru_list.h                  |  1 +
+ tools/testing/selftests/bpf/test_lru_map.c | 28 ++++++++++++++--------
+ 3 files changed, 25 insertions(+), 13 deletions(-)
+
+diff --git a/kernel/bpf/bpf_lru_list.c b/kernel/bpf/bpf_lru_list.c
+index 3dabdd137d10..2d6e1c98d8ad 100644
+--- a/kernel/bpf/bpf_lru_list.c
++++ b/kernel/bpf/bpf_lru_list.c
+@@ -337,12 +337,12 @@ static void bpf_lru_list_pop_free_to_local(struct bpf_lru *lru,
+ 				 list) {
+ 		__bpf_lru_node_move_to_free(l, node, local_free_list(loc_l),
+ 					    BPF_LRU_LOCAL_LIST_T_FREE);
+-		if (++nfree == LOCAL_FREE_TARGET)
++		if (++nfree == lru->target_free)
+ 			break;
+ 	}
+ 
+-	if (nfree < LOCAL_FREE_TARGET)
+-		__bpf_lru_list_shrink(lru, l, LOCAL_FREE_TARGET - nfree,
++	if (nfree < lru->target_free)
++		__bpf_lru_list_shrink(lru, l, lru->target_free - nfree,
+ 				      local_free_list(loc_l),
+ 				      BPF_LRU_LOCAL_LIST_T_FREE);
+ 
+@@ -577,6 +577,9 @@ static void bpf_common_lru_populate(struct bpf_lru *lru, void *buf,
+ 		list_add(&node->list, &l->lists[BPF_LRU_LIST_T_FREE]);
+ 		buf += elem_size;
+ 	}
++
++	lru->target_free = clamp((nr_elems / num_possible_cpus()) / 2,
++				 1, LOCAL_FREE_TARGET);
+ }
+ 
+ static void bpf_percpu_lru_populate(struct bpf_lru *lru, void *buf,
+diff --git a/kernel/bpf/bpf_lru_list.h b/kernel/bpf/bpf_lru_list.h
+index cbd8d3720c2b..fe2661a58ea9 100644
+--- a/kernel/bpf/bpf_lru_list.h
++++ b/kernel/bpf/bpf_lru_list.h
+@@ -58,6 +58,7 @@ struct bpf_lru {
+ 	del_from_htab_func del_from_htab;
+ 	void *del_arg;
+ 	unsigned int hash_offset;
++	unsigned int target_free;
+ 	unsigned int nr_scans;
+ 	bool percpu;
+ };
+diff --git a/tools/testing/selftests/bpf/test_lru_map.c b/tools/testing/selftests/bpf/test_lru_map.c
+index fda7589c5023..abb592553394 100644
+--- a/tools/testing/selftests/bpf/test_lru_map.c
++++ b/tools/testing/selftests/bpf/test_lru_map.c
+@@ -138,6 +138,12 @@ static int sched_next_online(int pid, int *next_to_try)
+ 	return ret;
+ }
+ 
++/* inverse of how bpf_common_lru_populate derives target_free from map_size. */
++static unsigned int __map_size(unsigned int tgt_free)
++{
++	return tgt_free * nr_cpus * 2;
++}
++
+ /* Size of the LRU map is 2
+  * Add key=1 (+1 key)
+  * Add key=2 (+1 key)
+@@ -257,7 +263,7 @@ static void test_lru_sanity1(int map_type, int map_flags, unsigned int tgt_free)
+ 	batch_size = tgt_free / 2;
+ 	assert(batch_size * 2 == tgt_free);
+ 
+-	map_size = tgt_free + batch_size;
++	map_size = __map_size(tgt_free) + batch_size;
+ 	lru_map_fd = create_map(map_type, map_flags, map_size);
+ 	assert(lru_map_fd != -1);
+ 
+@@ -267,7 +273,7 @@ static void test_lru_sanity1(int map_type, int map_flags, unsigned int tgt_free)
+ 	value[0] = 1234;
+ 
+ 	/* Insert 1 to tgt_free (+tgt_free keys) */
+-	end_key = 1 + tgt_free;
++	end_key = 1 + __map_size(tgt_free);
+ 	for (key = 1; key < end_key; key++)
+ 		assert(!bpf_map_update_elem(lru_map_fd, &key, value,
+ 					    BPF_NOEXIST));
+@@ -284,8 +290,8 @@ static void test_lru_sanity1(int map_type, int map_flags, unsigned int tgt_free)
+ 	 * => 1+tgt_free/2 to LOCALFREE_TARGET will be
+ 	 * removed by LRU
+ 	 */
+-	key = 1 + tgt_free;
+-	end_key = key + tgt_free;
++	key = 1 + __map_size(tgt_free);
++	end_key = key + __map_size(tgt_free);
+ 	for (; key < end_key; key++) {
+ 		assert(!bpf_map_update_elem(lru_map_fd, &key, value,
+ 					    BPF_NOEXIST));
+@@ -334,7 +340,7 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
+ 	batch_size = tgt_free / 2;
+ 	assert(batch_size * 2 == tgt_free);
+ 
+-	map_size = tgt_free + batch_size;
++	map_size = __map_size(tgt_free) + batch_size;
+ 	lru_map_fd = create_map(map_type, map_flags, map_size);
+ 	assert(lru_map_fd != -1);
+ 
+@@ -344,7 +350,7 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
+ 	value[0] = 1234;
+ 
+ 	/* Insert 1 to tgt_free (+tgt_free keys) */
+-	end_key = 1 + tgt_free;
++	end_key = 1 + __map_size(tgt_free);
+ 	for (key = 1; key < end_key; key++)
+ 		assert(!bpf_map_update_elem(lru_map_fd, &key, value,
+ 					    BPF_NOEXIST));
+@@ -388,8 +394,9 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
+ 	value[0] = 1234;
+ 
+ 	/* Insert 1+tgt_free to tgt_free*3/2 */
+-	end_key = 1 + tgt_free + batch_size;
+-	for (key = 1 + tgt_free; key < end_key; key++)
++	key = 1 + __map_size(tgt_free);
++	end_key = key + batch_size;
++	for (; key < end_key; key++)
+ 		/* These newly added but not referenced keys will be
+ 		 * gone during the next LRU shrink.
+ 		 */
+@@ -397,7 +404,7 @@ static void test_lru_sanity2(int map_type, int map_flags, unsigned int tgt_free)
+ 					    BPF_NOEXIST));
+ 
+ 	/* Insert 1+tgt_free*3/2 to  tgt_free*5/2 */
+-	end_key = key + tgt_free;
++	end_key += __map_size(tgt_free);
+ 	for (; key < end_key; key++) {
+ 		assert(!bpf_map_update_elem(lru_map_fd, &key, value,
+ 					    BPF_NOEXIST));
+@@ -500,7 +507,8 @@ static void test_lru_sanity4(int map_type, int map_flags, unsigned int tgt_free)
+ 		lru_map_fd = create_map(map_type, map_flags,
+ 					3 * tgt_free * nr_cpus);
+ 	else
+-		lru_map_fd = create_map(map_type, map_flags, 3 * tgt_free);
++		lru_map_fd = create_map(map_type, map_flags,
++					3 * __map_size(tgt_free));
+ 	assert(lru_map_fd != -1);
+ 
+ 	expected_map_fd = create_map(BPF_MAP_TYPE_HASH, 0,
+-- 
+2.50.0.rc1.591.g9c95f17f64-goog
+
 
