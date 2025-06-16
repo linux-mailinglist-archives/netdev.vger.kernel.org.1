@@ -1,229 +1,147 @@
-Return-Path: <netdev+bounces-198209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A98ADBA49
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:43:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 673D4ADBA4C
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4954A3A15EA
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:42:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A21C71890351
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8881EDA0E;
-	Mon, 16 Jun 2025 19:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3AB288C0E;
+	Mon, 16 Jun 2025 19:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JT50t8yY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OP8SAiWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2082.outbound.protection.outlook.com [40.107.220.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACBE1E51EE
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 19:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750102949; cv=fail; b=ECfuit62lptpYgTY7IuHYNGDJDINc8KG8aIr980FcnW9jwtm3kand4uPuhpZ4HCFygObcyephWFTA5DnPEP9SSQHFCHayAFU2DKUAL9g117+KyzcuAeLavOFUt8pGEsYk3bL7Yuz2NFwlXn2lfC2oGNQyjx/Q2yGksuAvVLU46A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750102949; c=relaxed/simple;
-	bh=0UEiDCcZ7SZZ1vyEZvPjY7ezFnOwaE8o8W00I1xAPso=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=hSfZ/Vf1G+xF3fLzoAiNVucD07Qlzxiug1mUhxR7GQ1qC7cN7zN2l+oo/JAUeqoTGPHVBhGKOFa6dQv3wsQIjZiRHuR21DKxm7HzlyVH3wz2UaGnaoOSIBLhZ3sWpsxF5Tv9S0OORTv7MYJ3gdYZ424uZ8xN70iQ+ZVU51WRDy0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JT50t8yY; arc=fail smtp.client-ip=40.107.220.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eBY7f34JBVOG9cAW4eviROXT+fUk46pNnupZyEobrRLe/SAZo4m7tix3DaU1O1Xfx/J6ivm9Hd2tsJtR34rhTJqayO+AbtCaK50/y4+Fqw9Fq81wRY9h4xxp7s7qGeWfzWXLWmnuUEtXnNFBv8SLDE/gUymUyEYd3QmR4+lJfohpen9iM5EcW6EN98JKhy7ClXYftTbXbGK2bzbXhpwCckvLtKd0RdLrFkE/IGDZdNWErA35ui48SGK9tTfY4AEiWgswqiVwg1nGxxV7h3lj3TnCPA/lEN4DmpFfInATPvYlIPIH6ZIrz6c9xl3Rf7k59MF6yzntJ+zzdLdoC8Pn0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lGBkF7xcb8K5NDjM28plqkfjmFG+bfPhPRWoql95XZM=;
- b=cbcG5Z91avRro3iQzcXQJKXY+DtPgEZE9qpArAdXQrTGu2civAL2DbI0SrLfsESe0JWg8MvEUvhleD23nfc3GQRhetTG4hNA2pYzr9Afc5ZH+rUXyS7xIC+QCRvAdXQCl+IVugZDq9aqetRZ4nQTkHlVYa1MPE8Fs9TYa9wdGqgzFGwOP/ggeJgLLmNwI4KrV7KmqSuvfxFtNyfXulCbyBhVFPAgMIOjiMb3dtMVBhPWW49kttuUnGTQfxzKUCI9aR575QEP978CnQ0ZwCOpgA/XG4zAH9aZ0Y2bmZwgwGgSR6JZ6eruC+IREYSKUBRPG6K2ea1nEqpCPGb2AXiz9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lGBkF7xcb8K5NDjM28plqkfjmFG+bfPhPRWoql95XZM=;
- b=JT50t8yYOATjP4RHF0qQIK+99SbfEtjYeJ6AZbgkjmUNIcz78XPZ7eKHGZNm+3ppXW92G3Zth6chGjiw/XNvobf2G5u2BQMyLKIA4SpGcf39l+Cu+5Awqo8p5fCT95BZ7p+fKPi0qWfQCh6FE7CDcefAUCOI3WBtT4k8s+SV38U=
-Received: from LV3PR12MB9265.namprd12.prod.outlook.com (2603:10b6:408:215::14)
- by CH3PR12MB8402.namprd12.prod.outlook.com (2603:10b6:610:132::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.30; Mon, 16 Jun
- 2025 19:42:23 +0000
-Received: from LV3PR12MB9265.namprd12.prod.outlook.com
- ([fe80::cf78:fbc:4475:b427]) by LV3PR12MB9265.namprd12.prod.outlook.com
- ([fe80::cf78:fbc:4475:b427%3]) with mapi id 15.20.8835.027; Mon, 16 Jun 2025
- 19:42:23 +0000
-From: "Kaplan, David" <David.Kaplan@amd.com>
-To: "jedrzej.jagielski@intel.com" <jedrzej.jagielski@intel.com>
-CC: "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"horms@kernel.org" <horms@kernel.org>, Jedrzej Jagielski
-	<jedrzej.jagielski@intel.com>, Mateusz Polchlopek
-	<mateusz.polchlopek@intel.com>, Bharath R <bharath.r@intel.com>,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Subject: [REGRESSION] ixgbe broken after devlink support patch
-Thread-Topic: [REGRESSION] ixgbe broken after devlink support patch
-Thread-Index: Adve9gZxdo+gRUk1T32Pw8JoiNgJPA==
-Date: Mon, 16 Jun 2025 19:42:23 +0000
-Message-ID:
- <LV3PR12MB92658474624CCF60220157199470A@LV3PR12MB9265.namprd12.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=True;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2025-06-16T19:33:39.0000000Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
- Internal Distribution
- Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=3;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9265:EE_|CH3PR12MB8402:EE_
-x-ms-office365-filtering-correlation-id: aa8aba91-b049-4d4a-65fb-08ddad0dea35
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?kvreuoBmN8P6vWqhxbpijWlqoA/UrMeYP+Pysa4Jndhc8ldxyeAVpbU/Cgf7?=
- =?us-ascii?Q?B8gtelkN+JDVWJ3D5od7ZHYkqrKy5xE5yACbDqVScikvqsAioKq0L/WJ82eT?=
- =?us-ascii?Q?aPEUVbrXX1OFIk+K9pWvOIEjSd3qMuWMEhv/e0IFbOKyVmlYEiGMQ6g7R3rD?=
- =?us-ascii?Q?gemT7fTQ6mr7zDooXCgIQ/an5fHjs2QramJ4RaRvdx5VmKh3vPac8mkYHDWV?=
- =?us-ascii?Q?z7Ndjwcw24BXWKudl37KjQnW1ie/ogHTj589P17QqWY1s9F6fM00MfXguxPI?=
- =?us-ascii?Q?lLHceMiEfT5m/Pp8OjMswNawsPcPbL+ZA8iS/WU0IHG2IwWSzLc7sxrC/FIe?=
- =?us-ascii?Q?0cQYSJvTMJu173hsNndrNZPjXyga+iCf3Ul0EOp7xWzzuqDv1FI962EPU5go?=
- =?us-ascii?Q?bglDvUcMQvY6I8Vd/RUfdt2sqWYmQsq9+Z6OpqDeLHgGStteIHdRStia6Udt?=
- =?us-ascii?Q?zQfOYU202rmxQIabOSLHumgnXarX1NbVHNB0rIJ8t2/dCw53NgmrhwkYL6JX?=
- =?us-ascii?Q?li6kD2yRKLY/yID4rrwFOsSio9qoe8Ok+QtLvpi+M8FCGJNJUHIzcTe5F0pz?=
- =?us-ascii?Q?pNh06x0DWURYPt42+5awTktI7+HoFtblt1MOEKe2PKeiTKuqjy8JW6HJ0SbW?=
- =?us-ascii?Q?IgrQbzfEquT3Yi7o49I7rwUgRdU2FGf6967VAZVchf0qXBnr16S/YBH7/lTi?=
- =?us-ascii?Q?rMtuYeCG7krDOU67brcL0d7m1iFxAwi3lgjHzDv5DHQ8buyDniQp3wXJeeed?=
- =?us-ascii?Q?Lh1oYVQ7yODfuoHJiFI0lluWHOlrrYFcSsY/xbFPBJKHcxAcmq4JPZnZFygI?=
- =?us-ascii?Q?PVX8+kj6Ngs7eG5KwZgDysx50XgnVT+TmqJ3UKhbY5tYza1bFxOPiQK3C1PA?=
- =?us-ascii?Q?dfeuPHgcc23q4VSQC/7HnNIZnY7A5M6gy0I6lqLwkCsRTfxh1jlu/bS3M5dC?=
- =?us-ascii?Q?Roh53xPQ84yEKsOqdyf+cdodAEV/agbhdnK1K+dyQQy+vozLx9BQJle67gOn?=
- =?us-ascii?Q?D5qGqbhkBQSDeDVJeZum8xrQ4kiYpGd3DrheVt4lozLu0/DFXOnf50bTJbgv?=
- =?us-ascii?Q?b9EoihtWbgMDDjwBF1VHTHtteNWvt1Akn88Fbs7V5TAYehGAgOWeDIJikr0h?=
- =?us-ascii?Q?TPu7noYg50bUWUkhrmic+dqLDU1JEdnB3au7d7IngzdRLmj5A37G8xCAsUM8?=
- =?us-ascii?Q?m5vha9a+kfC097uTGUenkY22FwxaNFa2cIinnBlCe4sdqBdKp0KxneQZrjwx?=
- =?us-ascii?Q?uPJMDLVS3n5YkftV5aAfTJTHwT6t5XS+Qi0G7LapXvYQHp0EUtE+EYQlvklc?=
- =?us-ascii?Q?+o6bqeaDrKc4llZYuw0eUeE+hiOVqq7nzNwVtfEnNj6uaEeEjM3zJVjgIi48?=
- =?us-ascii?Q?5+ukr3Sxgz98umeyUFLqnylKvrCyKcgAHcMxAW7MRmJ/N6k2vrq2kALXlZoZ?=
- =?us-ascii?Q?6TqFDGoCnzCzuN6o1JxBuq2gislsUFLM03v9ye3Gut/YeK02LJcSN+6SVYlv?=
- =?us-ascii?Q?U3rVy/sHeAbrt34=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9265.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?UF5mQE2QpAFv//JZzIgtwCxEolPaAZVXcYxtf6ADJoSWJAM4cFpYR8xybkKP?=
- =?us-ascii?Q?2/Kw5QAsdM8yYBnMmgBHD4yj+JrgO0r2ERtigjqqNHa2wk6uTfUV122s+xzM?=
- =?us-ascii?Q?m62gDC2VZWsjDbwtr/A5sca3nqH0ICys7+6/pAsjjhR7kBzjy+Xw+RPJ58SQ?=
- =?us-ascii?Q?PEV2xzxhzsPWlivdq5wU4wRsubcGLOdtXvyAyYkUMLBT8HVP9VuUIgWG/PUX?=
- =?us-ascii?Q?CtfoFtf19ysYlW53L+ATKbadFkHbbtpydCB4z8Y4Vrkwv7jg/p3XfwPaRklb?=
- =?us-ascii?Q?TZA3GdQxw9nW58B3GXU9WkqMuB/G5t+fQWyOw2tO1gJJnrOIzKa2Ivkueh+1?=
- =?us-ascii?Q?WQIXCtwkUdEUIQHsgef+vorFvDRne7fRXGVVB84QmMwbGfxdfB/1esZXjDaA?=
- =?us-ascii?Q?M+4aVRsruYQHYkLlGmRUVxVEe/+8jOAHVhTY+ai7VvKp6rcvfLFwEaR7tm/A?=
- =?us-ascii?Q?RcpPW5YxF0NLS5uiezdhTvvW4G3GktzTFrY9C+qY4tfk+jrXXI/vKH/h7QxX?=
- =?us-ascii?Q?9m1dXfY0WUQSCtoAMenT2CSZ2SSjqCLzHK5FqW6PaU4/NY8r524ST8VJqJiz?=
- =?us-ascii?Q?WlGkuaKu4YyvYIlG3IrjptzjOZqnNj7dFhgK5mLoh6n36dPecOrlv9cZcSLF?=
- =?us-ascii?Q?xHyb90YzExaPk/P1dJRo3OQcM3eExWUibF56YuZ7T9WM4mKW5VJwEQstXGlF?=
- =?us-ascii?Q?kbM7B7QxehS0uTQq4J/p0sNCGqMPyDZowCjgBK86TGflGL/o40eFvJRxZ8C/?=
- =?us-ascii?Q?dXnRkRuyDGdqaz54F1olgdZKuNjintlegawzbBeeebbxnL2vTunwU+wiiz2h?=
- =?us-ascii?Q?qzYWjqgNX+1MlLcJjiRgL8ob6pjJQKRM1llW0esEbEPRM61aS3vERAeUonvq?=
- =?us-ascii?Q?b6vd20Q0fVewKEYwjdXla4x77k4FKW9zXszmUKPWk7Qr2hpuyJnc5A1YPcHL?=
- =?us-ascii?Q?tGUFswm5oPIireqNs2ln+YaUuD+PPpzXGCs4QeFhudA3dldFQp3YK5CO952F?=
- =?us-ascii?Q?X1XMmq7udn6b2Fq9o9j2B+guJ00SYNCs1bfRTgtZMmwSoRCwS3dOJipIARyw?=
- =?us-ascii?Q?m2aq/ivitdYzdGe05h4G3bTSKveVhj75wXQEyvgtTCb+V8M1MDxI4IXbmGZY?=
- =?us-ascii?Q?nvV6j+cSiqLdmtsgjFG3vKiZlPU1ipuLgt77d05gygLvjnWtDceE51ritrJt?=
- =?us-ascii?Q?7WqssWYoaxtwIP1RrNCW62VjZgQt2ULD5zDs5QC4DVo4focRFV1iTTdAwuEa?=
- =?us-ascii?Q?Zpyg6BHCmXvdYUF0+F+/JDllIR6pvpwnwASopU2IyCzVQv8j8FwwQnde4d8p?=
- =?us-ascii?Q?bLB/MrhBw4AqxL9En0yfnPSqQH3uDZTL1n9bBqz4sl+KBYnZrFVBwQ3VecIW?=
- =?us-ascii?Q?d6DjqYpYD+hKagVQvaOK3osSIURyRLtOqNcj0YagCmgdAxcF7QsGVrcgL3K1?=
- =?us-ascii?Q?zWQ8ehLF8rECaLYVXz6qa+swGCyxyMUaC4yBz/cgkoBsdep8iZ9mAGmi1gOa?=
- =?us-ascii?Q?Sm55GG+7jvATC90C5/skc+Y1q19Sh834fLbPQMhciNliID5BJBkfzAipX82L?=
- =?us-ascii?Q?f2qoaIKI4Z2C+ilikaw=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBDE136347
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 19:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750103082; cv=none; b=EwVuQQjAYWn7SyrYrTC7c4sdEieEmcjYV/+0xikVN/I9xCGoJj9fWMQxfGcgooIbDQ/9H1t7MV4DpnAOq6LWZwRNbM0FoBQXdtDH2NC3kqtiZOaZADf0tvdW2LqlDYXgQTQh7lANtCwVcg27kjhpOHhz4xd14YLbP2zYbkkY8H8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750103082; c=relaxed/simple;
+	bh=xL+2PjRQFVByGkyoBnq9GjT7WCYlz93y2EiY1b3ggPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=N2gVQFXl/LaB72MdVFkjCphmwloumGa4FwWb0vz92GWOxPPkMvuh05HFhPMkMifWOnaF5UteqWxs+rwtleEe1hPVxZq50y8hs9xxU1Uko5o3t07+xfzF60ejsz3bbVzfHLlTFo3VfnjbgybyYQwLaL21omFbdVNmxj0GvYIZR7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OP8SAiWV; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-234b440afa7so49461465ad.0
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 12:44:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750103080; x=1750707880; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6UAmIHgQwXzJ/qZVS5iJNNAHTJXQ5DtUTs2VyAV8aSQ=;
+        b=OP8SAiWVpcOHQ0MYAF33VkTMXXGqpeudXww59l/pG2WPw20/HYYWxVuVbfcXgHRg6W
+         4M47E8rYq7vftlJWZkPzplB26hPddsgbQ9SaJ/BzfqgMZ/NOUmZ/a1bIeS1OXG8PcHfB
+         5CG1y/2oczv9Pz+YgVq6rpnNtGJ9QriLDCA2/FohezkuUKj6gtLJ7uzbl4h5ha+x37FL
+         usvbYDGLbb3s1fxTKIvR++wV+Oq6CX3Nlmqks1GobTjQwwa503VO/wCju4BCE5MxbZC7
+         hJ7WGzvWvkeatluNLFEpvQFvJHaqdkht0Fand5s1kGaXfemdwfpjdqjoRQ4TvnS9M+aQ
+         P6sQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750103080; x=1750707880;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6UAmIHgQwXzJ/qZVS5iJNNAHTJXQ5DtUTs2VyAV8aSQ=;
+        b=LISL1b8AyDAxERtYTfu3989v0QJqpFEWKAV3NqVN6ZZhl/bFHjNcC5gSeAyUAVR/a/
+         SRJMJL+EE5eUE8UBhHsmTMEkbZx1a9xRdfj64U9y5XYi5Hh9RnfBwI+MIu3Co3VQIgI1
+         sKuhMueIZMjJGFyO7vwpRr47+7IBVUoWDGaeyJUCabLdPDYRzboyTT+FhRFwGNMmf1Is
+         G24pZ3MlbHJm/LRuKDfpj5qbSOTSIj+UEbIzEjXL6kIUzAt1eXU7psqFopaqRb3eeJZT
+         24MgjxsPJmxvpMI6V2yqeuhJc5skBapWafr4qy8RJukiocwE1TvdhH4K+/FV++9KYv/g
+         XcdA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ2cVWMnKBFN0EVZK9fHuxPSUWpKAESdLlXemYIYdIyt3KMaL29DF4E4qtLUwQCOymbhQ8mog=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygWGdfuaDTOxtsRq5IFDEYSGSYKBsSWZJh56UYXsIqw5O6smmV
+	plFjJIiyz43FNECWLy6+Ct6fJ6alkCrjGO4L+6/k4kQxqwHC5/wBtsA5pd1oGrAMmaYV
+X-Gm-Gg: ASbGncuObydr7+s1JngdUonFntWtGXoCQB9fjZT/hKoKGAGPxDk26yBKJrsPVTK5Zrz
+	c7Gv6nkTBuRBtR4LYVKTnssac/MkeDuadx8dIOsQAiBskM+dBd7dnPfHvNPLh1XO102yrwNEegd
+	eoUBAH0rlIJWmGiYvuoEUDRBO4AYTJyQ+v1NTdHCPZg05O5yjXgBZ9t+Ds4D1+DGD6C48mUlxxN
+	CszngB/QqQ+IE9CldSjPZXpThkJq+ZWpFS3BzAuk4MiZKCRdIP/dqcIytaruUDYrnjxLBm5+nPx
+	Xn/25XHQFQoWVgwfO5xzhVz2QWWQ84Vs4r87Wno=
+X-Google-Smtp-Source: AGHT+IFKMwj5EbVNH2hrYf74WGgSzjJzAQbYl8C+boLjtgr0qpsuLm7EhSUPCNxHp1NUs1AkghbIsA==
+X-Received: by 2002:a17:902:708a:b0:236:6f43:7051 with SMTP id d9443c01a7336-2366f4372d9mr109287785ad.23.1750103080240;
+        Mon, 16 Jun 2025 12:44:40 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de7836dsm65444915ad.136.2025.06.16.12.44.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 12:44:39 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: dw@davidwei.uk
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	ncardwell@google.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Subject: Re: [PATCH net v1 4/4] tcp: fix passive TFO socket having invalid NAPI ID
+Date: Mon, 16 Jun 2025 12:44:29 -0700
+Message-ID: <20250616194437.1017381-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250616185456.2644238-5-dw@davidwei.uk>
+References: <20250616185456.2644238-5-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9265.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa8aba91-b049-4d4a-65fb-08ddad0dea35
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2025 19:42:23.1776
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3xpqoX5F4X55K4aCvT7VXPcaN9gzsZDfXQFNW6koqFhnSY+Q4lxTTApI8Q96s1u4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8402
+Content-Transfer-Encoding: 8bit
 
-[AMD Official Use Only - AMD Internal Distribution Only]
+From: David Wei <dw@davidwei.uk>
+Date: Mon, 16 Jun 2025 11:54:56 -0700
+> There is a bug with passive TFO sockets returning an invalid NAPI ID 0
+> from SO_INCOMING_NAPI_ID. Normally this is not an issue, but zero copy
+> receive relies on a correct NAPI ID to process sockets on the right
+> queue.
+> 
+> Fix by adding a skb_mark_napi_id().
+>
 
-Hi,
+Please add Fixes: tag.
 
-My "Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (r=
-ev 01)" device stopped working on recent kernel builds (fails to show up in=
- 'ifconfig' or to get an IP address).  I bisected the failure down to the f=
-ollowing commit:
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  net/ipv4/tcp_fastopen.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+> index 9b83d639b5ac..d0ed1779861b 100644
+> --- a/net/ipv4/tcp_fastopen.c
+> +++ b/net/ipv4/tcp_fastopen.c
+> @@ -3,6 +3,7 @@
+>  #include <linux/tcp.h>
+>  #include <linux/rcupdate.h>
+>  #include <net/tcp.h>
+> +#include <net/busy_poll.h>
+>  
+>  void tcp_fastopen_init_key_once(struct net *net)
+>  {
+> @@ -279,6 +280,8 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
+>  
+>  	refcount_set(&req->rsk_refcnt, 2);
+>  
+> +	sk_mark_napi_id(child, skb);
 
-commit a0285236ab93fdfdd1008afaa04561d142d6c276 (HEAD, refs/bisect/bad)
-Author: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Date:   Thu Apr 10 14:59:56 2025 +0200
+I think sk_mark_napi_id_set() is better here.
 
-    ixgbe: add initial devlink support
 
-    Add an initial support for devlink interface to ixgbe driver.
-
-    Similarly to i40e driver the implementation doesn't enable
-    devlink to manage device-wide configuration. Devlink instance
-    is created for each physical function of PCIe device.
-
-    Create separate directory for devlink related ixgbe files
-    and use naming scheme similar to the one used in the ice driver.
-
-    Add a stub for Documentation, to be extended by further patches.
-
-    Change struct ixgbe_adapter allocation to be done by devlink (Przemek),
-    as suggested by Jiri.
-
-    Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-    Co-developed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-    Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-    Tested-by: Bharath R <bharath.r@intel.com>
-    Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-
-Normally, the device is given a name like enp194s0f0 and connects to the wi=
-red network.  Starting with this patch, it fails to do so.  I'm not familia=
-r with how to debug this particular device, so please let me know what othe=
-r information would be of assistance.
-
-lspci -vv information (on a working build):
-
-c2:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550=
-T (rev 01)
-        Subsystem: ASRock Incorporation Ethernet Controller 10G X550T
-        Physical Slot: 0-1
-        Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-=
- Stepping- SERR- FastB2B- DisINTx+
-        Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- <T=
-Abort- <MAbort- >SERR- <PERR- INTx-
-        Latency: 0
-        Interrupt: pin A routed to IRQ 77
-        IOMMU group: 12
-        Region 0: Memory at 18020800000 (64-bit, prefetchable) [size=3D4M]
-        Region 4: Memory at 18020c04000 (64-bit, prefetchable) [size=3D16K]
-        Expansion ROM at b6000000 [disabled] [size=3D512K]
-        Capabilities: <access denied>
-        Kernel driver in use: ixgbe
-        Kernel modules: ixgbe
-
-Thanks --David Kaplan
-
+> +
+>  	/* Now finish processing the fastopen child socket. */
+>  	tcp_init_transfer(child, BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB, skb);
+>  
+> -- 
+> 2.47.1
+> 
 
