@@ -1,129 +1,165 @@
-Return-Path: <netdev+bounces-198164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BD6ADB74D
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:48:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03013ADB753
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:48:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CE6D1887467
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:48:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66941188AD54
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408FC280309;
-	Mon, 16 Jun 2025 16:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MrLy4Y78"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128A8288522;
+	Mon, 16 Jun 2025 16:48:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A4B2BEFE1;
-	Mon, 16 Jun 2025 16:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B1B2206B8
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750092487; cv=none; b=b7rl6Fl0SKgCGFEY/arudogtSQqthkR6OYZZ6qAT8ua9e35Uv4v9PSCpxeTgSxGZ8M0e/mHc8JedwK1hO4hFyJnHLemTN9ecHtYwXgPizn+Y5wZzcDo0yA6fpNgdh/NoqqJa2xZk+0xcTSJvnkW6a6Y0X4z27Csv1bmgThfwKiI=
+	t=1750092512; cv=none; b=IKrqRHdsbctco+3mbBwJcyNxr7romZnK57w4hOB82bx2O6csxmMa+ZCNeyRD65N5PmTdMC2vaPQBTon2btDKQ1gKEczBDXNa3kZqzDiJmHIqzh3ffNmEAlPaA2ZBpR/RZIPa48bQw1gX3sd3iQ7wR4zJCSXPQ3wGouEKYkqZ7Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750092487; c=relaxed/simple;
-	bh=vhZVzII3CTfFCsNaHspYbWSGDD/REfUZxPruFgTiNbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qc1Sy3Ny0+qwBx9MTmha0ja5pr7wyF8mgSS2DOEqqJP3tqDLC2Ce1foYU4nFD7qgwQs3ytvHE5b9I79EWpzhtmbtYuEz2VVcTx6S7XAO5NO2jXUTAobiBdiYgxbQNMBq8MQOZzSM+2cRZqDL49AiGXJ7oeni6MnNBuNgVlIf8gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MrLy4Y78; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E51EAC4CEEA;
-	Mon, 16 Jun 2025 16:47:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750092485;
-	bh=vhZVzII3CTfFCsNaHspYbWSGDD/REfUZxPruFgTiNbk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MrLy4Y78WdF45DgIA04d6GzEjtLBdJOuzQzc8TS3cPBYJrqvdD4dQFjmAu31g9sjj
-	 LElKFh4qj5gs6zQLqeNtg/LZNM8xpZZMDosfM3a/0yzIL+oPRsoyhb51Jn/kFadBXX
-	 Bebo2KAm91G1jlgy63aDMYFC8qn4J4+lj8Rw/0rr4SZqB1mLQOI/Cjvg57bIK0ElAz
-	 utaZ2+o6sCFUK+2HW2G7xhAxJ9FTDFKl/7sYwyO/Z/6YYo4+Mab1V7tfmjwSIoRHh8
-	 XfinTPBQZknPAJK0LIOHLuUnwUWEku8xay8HtSK4Je5aDfJXhT5Twr+elRYzkKM8lL
-	 bkKOrjBzNPQxg==
-Date: Mon, 16 Jun 2025 17:47:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Joy Zou <joy.zou@nxp.com>
-Cc: "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"shawnguo@kernel.org" <shawnguo@kernel.org>,
-	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>,
-	"festevam@gmail.com" <festevam@gmail.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	Frank Li <frank.li@nxp.com>, Ye Li <ye.li@nxp.com>,
-	Jacky Bai <ping.bai@nxp.com>, Peng Fan <peng.fan@nxp.com>,
-	Aisheng Dong <aisheng.dong@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>
-Subject: Re: Re: [PATCH v5 1/9] dt-bindings: arm: fsl: add i.MX91 11x11 evk
- board
-Message-ID: <20250616164757.GC4794@horms.kernel.org>
-References: <20250613100255.2131800-1-joy.zou@nxp.com>
- <20250613100255.2131800-2-joy.zou@nxp.com>
- <20250614171642.GU414686@horms.kernel.org>
- <AS4PR04MB93869345F739436917920F59E170A@AS4PR04MB9386.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1750092512; c=relaxed/simple;
+	bh=e5V81vJTsurH16HupVU30ELi7Vbxcb5PLOKsR0X5FmY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KG2G0TO3++Hr9fcxyY6uNKB8ZXO3dKbW93o0x3zsqyFUOQHPiKZaajHv2Uaz31Px8nSXkAN7jeFHeWhpe+VLFBzXLx3Yqq19f0td0K6RTPWxQ6XblYREv/MRV8U9uKY0cqEaFyO/uCUSmsFqwUJ77xocwDg9XRutUR20JiAUdNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddbec809acso56149265ab.2
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:48:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750092509; x=1750697309;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DGi86GqHzCIrMHCxrqrf3ZFJEnPb6WF6Ee0Udc8mJag=;
+        b=OfSyqaVOw5bTYUQ/fRIwJnfouvtu9zb7EmIefW/WinIYAt4q6DYWaLMzByRgpwk4Ss
+         xf4SYOwhO7MP1UaPogB61Q4IgcI+wmOlbEEwJCPe8Wn6NbQi+VkautzsXOllLRnGjAC7
+         IEc+9kloOjkVAcjzR0A0KWVGSuWvdhUCwDyRJxsGRHzrn06dy0gi1nYcNOyJBi9xKqHK
+         rDdexojz/2JS8YRSerUfncyneqRHNwJp9/C1OUK4xSOy5HiQKwVG8tSEI0m1jyXEd9Wc
+         KGCbk2YD/6e9nn59KsTSz4GndIh9Qakx/uwity2zh7S/To8VOLXf1GAjmUK9V7TnliFT
+         i/Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3dnr7IaZ+l6m5tsj1D1rNATHo8tVnwNJfNaHQ1He4MFyGMqLZGkEGp6C4+QIjhSgP6iCYmp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjeXLxYDh7gTZvarlHxp+pGd8UV6oxS6jnKKP5rXupIF9Q1AtR
+	yUEczAKBRclk/bmVve1Q7WkYt3dZEjM8lqmz6Ph70ng7EheH1nM8GZHCVyyu5hqroSPsfQqOl4N
+	/S6/gl2Xu8dP8ghHTDtOFuP6BDWLKsFzph3fAjX5X+/CYCNYSnmmQSSyZFrM=
+X-Google-Smtp-Source: AGHT+IE5Hf5iXTuGWP6aI8KYGocSFkY8smikigrdkhwypO33dMqeNxfGi5hezPLgrQpJJAxjwEIfSBRDunDqCFjHYfFZZj2e4MpP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <AS4PR04MB93869345F739436917920F59E170A@AS4PR04MB9386.eurprd04.prod.outlook.com>
+X-Received: by 2002:a05:6e02:5e81:b0:3de:1583:dc2d with SMTP id
+ e9e14a558f8ab-3de1583df07mr33235175ab.11.1750092509506; Mon, 16 Jun 2025
+ 09:48:29 -0700 (PDT)
+Date: Mon, 16 Jun 2025 09:48:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68504add.a70a0220.395abc.01e7.GAE@google.com>
+Subject: [syzbot] [wireless?] UBSAN: array-index-out-of-bounds in ieee80211_rx_mgmt_beacon
+From: syzbot <syzbot+6554b492c7008bcd3385@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jun 16, 2025 at 07:42:39AM +0000, Joy Zou wrote:
-> 
-> > -----Original Message-----
-> > From: Simon Horman <horms@kernel.org>
-> > Sent: 2025年6月15日 1:17
-> > To: Joy Zou <joy.zou@nxp.com>
-> > Cc: robh@kernel.org; krzk+dt@kernel.org; conor+dt@kernel.org;
-> > shawnguo@kernel.org; s.hauer@pengutronix.de; catalin.marinas@arm.com;
-> > will@kernel.org; andrew+netdev@lunn.ch; davem@davemloft.net;
-> > edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> > mcoquelin.stm32@gmail.com; alexandre.torgue@foss.st.com;
-> > ulf.hansson@linaro.org; richardcochran@gmail.com; kernel@pengutronix.de;
-> > festevam@gmail.com; devicetree@vger.kernel.org;
-> > linux-kernel@vger.kernel.org; imx@lists.linux.dev;
-> > linux-arm-kernel@lists.infradead.org; netdev@vger.kernel.org;
-> > linux-stm32@st-md-mailman.stormreply.com; linux-pm@vger.kernel.org;
-> > Frank Li <frank.li@nxp.com>; Ye Li <ye.li@nxp.com>; Jacky Bai
-> > <ping.bai@nxp.com>; Peng Fan <peng.fan@nxp.com>; Aisheng Dong
-> > <aisheng.dong@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>
-> > Subject: Re: [PATCH v5 1/9] dt-bindings: arm: fsl: add i.MX91 11x11 evk
-> > board
-> > 
-> > On Fri, Jun 13, 2025 at 06:02:47PM +0800, Joy Zou wrote:
-> > > From: Pengfei Li <pengfei.li_1@nxp.com>
-> > >
-> > > Add the board imx91-11x11-evk in the binding docuemnt.
-> > 
-> > nit: document
-> Thanks for your comments!
-> Will correct it!
-> Will use codespell check the patchset.
+Hello,
 
-Good plan. The --codespell option to checkpatch should work well here.
+syzbot found the following issue on:
 
-...
+HEAD commit:    18531f4d1c8c Merge tag 'acpi-6.16-rc2' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=100fc5d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3a936e3316f9e2dc
+dashboard link: https://syzkaller.appspot.com/bug?extid=6554b492c7008bcd3385
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17c8710c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e24e82580000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-18531f4d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/aa1e5854fc49/vmlinux-18531f4d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ca38347f64b2/bzImage-18531f4d.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6554b492c7008bcd3385@syzkaller.appspotmail.com
+
+wlan0: Creating new IBSS network, BSSID 50:50:50:50:50:50
+wlan1: Created IBSS using preconfigured BSSID 50:50:50:50:50:50
+wlan1: Creating new IBSS network, BSSID 50:50:50:50:50:50
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in net/mac80211/mlme.c:7224:41
+index 4 is out of range for type 'u8[0]' (aka 'unsigned char[0]')
+CPU: 0 UID: 0 PID: 38 Comm: kworker/u4:3 Not tainted 6.16.0-rc1-syzkaller-00182-g18531f4d1c8c #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ ubsan_epilogue+0xa/0x40 lib/ubsan.c:233
+ __ubsan_handle_out_of_bounds+0xe9/0xf0 lib/ubsan.c:455
+ ieee80211_rx_mgmt_beacon+0x21fd/0x2c10 net/mac80211/mlme.c:7224
+ ieee80211_iface_process_skb net/mac80211/iface.c:1630 [inline]
+ ieee80211_iface_work+0x49c/0xfe0 net/mac80211/iface.c:1722
+ cfg80211_wiphy_work+0x2df/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+---[ end trace ]---
+Kernel panic - not syncing: UBSAN: panic_on_warn set ...
+CPU: 0 UID: 0 PID: 38 Comm: kworker/u4:3 Not tainted 6.16.0-rc1-syzkaller-00182-g18531f4d1c8c #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x99/0x250 lib/dump_stack.c:120
+ panic+0x2db/0x790 kernel/panic.c:382
+ check_panic_on_warn+0x89/0xb0 kernel/panic.c:273
+ __ubsan_handle_out_of_bounds+0xe9/0xf0 lib/ubsan.c:455
+ ieee80211_rx_mgmt_beacon+0x21fd/0x2c10 net/mac80211/mlme.c:7224
+ ieee80211_iface_process_skb net/mac80211/iface.c:1630 [inline]
+ ieee80211_iface_work+0x49c/0xfe0 net/mac80211/iface.c:1722
+ cfg80211_wiphy_work+0x2df/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
