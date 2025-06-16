@@ -1,519 +1,154 @@
-Return-Path: <netdev+bounces-198168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB7A1ADB771
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:57:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0A4ADB78F
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A1413AF9C4
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:56:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 406C63B1FB3
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F40A28851B;
-	Mon, 16 Jun 2025 16:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A44928751D;
+	Mon, 16 Jun 2025 17:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tWkfsPXW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtigiTAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41145266B50
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B350028750B;
+	Mon, 16 Jun 2025 17:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750093031; cv=none; b=mKL3fHb3LmBtG/IcAQB4DLrNOvYfp1QbyqigLAkjxhMI4vixLan4JMcCKECMo+WbTx2Lf1zpO0Xwszzm42w6PEITE1C7CIRIXjO7CQ71/V4m9LWcx1qEY70DXdAZGMryuLAkNolvt1Wf9ykdTeWhBPK9GsGP7eWak6j7QrB8q2Y=
+	t=1750093795; cv=none; b=KPeMJwI/9jSQ8/YJx6Vn5UXb5Yr9HsXSJU7kpvfv0A4GGZ5A/FLpzAN1Vfw/hCWoxjlYpIN2NLeiY5eVL711eucVX/zkPHbxD5IUZZW1VSbKlKrxG2fxIZHlCGnHeVvJe8MBaI5GP0Oq8IeSZfqm98IUphZ+0/OgNvR+H5fLq1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750093031; c=relaxed/simple;
-	bh=QafhIc+hliA0ZIwAKOXdX5bN4N5MuZHU+8V3ilVcB4U=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bkufckORcvqsdqX+BCuzHrVsx3vrdeESevomWRBaBRQ+ZQDiP9oaECAr/I/BQyC3AyV31VkRJ8mmozmyGjjyoSSygqxIk2RpyqzLJfzRuSq0UoMErloiUkk9UUlw4eX8H9Wk4LDg3yHVoGd3kZihwL9yQFX8H161lo8HTYeCsKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tWkfsPXW; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2fcbd76b61so4752738a12.3
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:57:08 -0700 (PDT)
+	s=arc-20240116; t=1750093795; c=relaxed/simple;
+	bh=snCdIYgJY/Gbrh8KSW/7Yf7EmPtoKnw/JLZpyosYBMw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RivSF4LzjOiMuFi1dN44TU6yOecVhqZAgmZJ+sT1mvooHoIZngkIgDWlIz4Q8wmvqE98H27saNJRFY8q60d4DrUsA2The/mvIO05It0c1Mgmf/fbkbpPyu5k+eAfmhvqIgWgPUCPYmg16W5kaRpqriUU+5vGA65UuWtJWkB3/8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtigiTAG; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a5901854e3so6733711cf.3;
+        Mon, 16 Jun 2025 10:09:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750093028; x=1750697828; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JKrWRTE3V6FzhktCsYTUZOYdl/hUWxU2cmg3ggFyOPs=;
-        b=tWkfsPXWxdCqSCJqBmNqWzZB1xEnLK21kfmI6DVs7Jb1B6mcTsigJ5uqSFS7GCNlS/
-         YwEMbIbfVFeH1lVtgaI81/ymtqtk/aonUzfqBbwsKwJheZ3cjIR1mRkB0TYx80mRDuvT
-         1+1QW2aKDs0HYADf2hUamdeXw7IWRuFGRlrS8de9E4sKJzKyrjIz/KHJctjmk9GEYz4G
-         g2emJndlWWD5xfQ5BkTrY4Ed1a6jpqvpFE9RQXenvBe3oOIMm3n0v65AB4hBu0WWdCKc
-         PRpLfN1Y4I80ANwmowbpWNCQXtMxbDdGPSEx33lZoGJBdfQGS88rXdxaz/nwNcj00g4B
-         Z1TA==
+        d=gmail.com; s=20230601; t=1750093790; x=1750698590; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OALMEOmmOpixaGW3XVaHA/qsUtEIHB6pfWcetx0wYBI=;
+        b=RtigiTAG1C+x217cFfbh2LT1wyznLxUJvUY6kugXE0Ht1pQ5bSh9gf6QyRJOm4gQZR
+         NBHKplh+OM+lL9k5IlKU+GV1c7CUat0MtNy+juYl6Gm59620GbBWg9oyUOf7q7bq1atB
+         qBmaabOw1jTuOPKM/fyeh4lkcJW+Q+0MkJ0/FjriS7dzLL5JSbzXJ7UdH9hTsL/MSJ92
+         BlTIfXA+vY4m5gSvKetmeII55UurJ63EWnviETMz/OEpn1RfGI1QUz4Iv84TS+8DT9jP
+         X6KgBKLBb8rZ8y1o3aJBQpB6vPdCF5DEFfISZltzSfWD/3YvJ//MtOw3DcxKGGnlSUs7
+         9Xvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750093028; x=1750697828;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JKrWRTE3V6FzhktCsYTUZOYdl/hUWxU2cmg3ggFyOPs=;
-        b=QNPN3FRZuklvh1zymjT4gY6w99zuwM9vli7/JJ/XNECUIUJQjAlYnO1O2jusDsydDu
-         OkFGdkTyfpjtJl448VmdpeSN2QJgAYlHzvxphC39FbgpNW9NRX9rm9SRR/3z0u+Wk28E
-         otQHq98XPwxIX3H0dqajfMUbqo36OxZjVzGfxX9Yx90tyFMEBiYaU9Sjtr3VGMOhaKy6
-         Jd/2yElPmn86agOZ38l09DIAJIUvBlGvxbXd+ur1b3GG6MOgjdmAuPFY/BUqmocvzhk6
-         5JTniZb69cjn8bn39s62OMunzJ8G00xUlkDSkO9wgTkknqBzgooGoXtpcj2P9rBdEIN0
-         1oFA==
-X-Gm-Message-State: AOJu0Yxp50zmoW34s4myo/2WRK8RD3mkmvjo/1zY35IXmH3A6UWNgVYT
-	FPIuKQZdKKO5Ab/9qLK7/EkCKE/WkfPgCR1/8Ke61bh9AL1yh3AgVk2FXvPsEZhJuAYqGdyRXJo
-	bGfSxoPmjWk+/gQ==
-X-Google-Smtp-Source: AGHT+IFbWnjZiOkAXxWDSyK97krwkSfUeYqekcG/rdNFqk31sBxDukDkdyzYSzwFa5Tmlf8mP+VFf9fmUF+rvA==
-X-Received: from pfbfb10.prod.google.com ([2002:a05:6a00:2d8a:b0:742:a99a:ec52])
- (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:a343:b0:21f:62e7:cd2d with SMTP id adf61e73a8af0-21fbd68b922mr16024114637.34.1750093028468;
- Mon, 16 Jun 2025 09:57:08 -0700 (PDT)
-Date: Mon, 16 Jun 2025 16:57:06 +0000
+        d=1e100.net; s=20230601; t=1750093790; x=1750698590;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OALMEOmmOpixaGW3XVaHA/qsUtEIHB6pfWcetx0wYBI=;
+        b=IMFvQaOhHcb4STPsdYycBq9QkarWL5slzOGutvu72bchbV1QuZ05IrMXwWZY37A2MB
+         q9wksIpp4GX5bMNs27D+1dTChinHeV6zrWdfa/9YNd0nUyE5qFzSMoAZPisvTjVFx82z
+         pONEoLNUURnumYqiM6+J0msHFY+ofHehiFNtTJviuPnvWNcAG+hB3+38SxoGe26K3Zzw
+         ItQHoMwrykmzRz1YdAyeJ3oXgD3Wl+PImMDUokIMJmlVMieNcyqdZx4g1WetmhEXUP9m
+         CXn24cZZIGt2iCmZyWqeIVpCBzxINd6Gf0misuYGZ5xkTKmNPbWM7WT5PTCQYDQ/hkAO
+         sMZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdGedhy5X5YvRikwSLUMl4qxCgFM6EdTSj+KhIu0XLU9XsK6dqeglkPJkTe78DCYrJrDKVA9h9b5yaiSxvm1ve@vger.kernel.org, AJvYcCVWFu2v8sXXikTXSjt7KkkUERvl2or1EEe1YhU5N9uluLH+NydLltp/rc8shAAAq1ZzwZH8DKmqM9nQKQ/5@vger.kernel.org, AJvYcCW3htfPOfUC0CHhR//b5IDEIbI1zKbvqkzdcSxyirVU3KdrN4NH3+70YERHJBrSScSWyh+/e+zidak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcQ+VHN+lKIpqUbxiuGL183erqoTFkI67IX0/o04eqa4F0B0g1
+	nP03/ya7MSJ+aHBy8HwkmYRIeYQQ/NV2T7n62ktWBO6Lpji2wXL39eWh
+X-Gm-Gg: ASbGncvF+3a5ls4jY2+iibcwTQU+m6YVHJk/Wg9HAROxYMtYSHRNGSFbIj0hfbaO4gV
+	wNHKAG2kh39I3c+nmUVsa6xE46a6XZ0i40GYRMTMrtzw69qmt4WG4xccG/p4g1i9XejbHrRaeAz
+	sZlhxwSDsBv6xx/ncM5/0MdBCQAkmrNJsST1JRpHjQ817jpyXrnMzA4p6NMv9gAjrYdQhcOYOeS
+	zVdwyWqPzkqiLaqydUe3fmt0xtVmJFlZjkQ/3GxkvXmNUlwTFjWlpcyA4an+09Gm4f93kZACabA
+	enRfAT7Hv73cY5cDGmI/9n88zjgYdPJcrDpIBACYsNouW1ftM/8gfTlA04ZMKR3Mtw==
+X-Google-Smtp-Source: AGHT+IG4F/SKra4kDBY1mPCktsz6zBpNw1ox5hr7Trsf+8D+LFwgE6p+83sUUeGbBLJPIl0Gg/unCg==
+X-Received: by 2002:ac8:57c1:0:b0:4a4:3cac:2c7a with SMTP id d75a77b69052e-4a73c5f4049mr51963041cf.11.1750093790247;
+        Mon, 16 Jun 2025 10:09:50 -0700 (PDT)
+Received: from localhost ([2a03:2880:20ff:6::])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a3112b8sm51333551cf.31.2025.06.16.10.09.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 10:09:49 -0700 (PDT)
+From: Gustavo Luiz Duarte <gustavold@gmail.com>
+Subject: [PATCH net-next v3 0/5] netconsole: Add support for msgid in
+ sysdata
+Date: Mon, 16 Jun 2025 10:08:34 -0700
+Message-Id: <20250616-netconsole-msgid-v3-0-4d2610577571@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.rc2.692.g299adb8693-goog
-Message-ID: <20250616165706.994319-1-skhawaja@google.com>
-Subject: [PATCH net-next v8] Add support to set napi threaded for individual napi
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, jdamato@fastly.com, mkarsten@uwaterloo.ca
-Cc: netdev@vger.kernel.org, skhawaja@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJJPUGgC/23NTQrDIBAF4KuEWdei5qdJV71H6ULNJBlotGiQl
+ JC7V+wm0C4fb943GwT0hAGuxQYeIwVyNoXyVICZlB2RUZ8ySC5r3vCOWVyMs8E9kc1hpJ7prjT
+ N0GJnGg5p9vI40JrJO6TrtFgXeKRmorA4/86/osj9lxXil42CcSYubaVqMaAWeBtnRc+zcXPGo
+ jwC8g8gE9BXRiht2korcwT2ff8AgDaplvsAAAA=
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Gustavo Luiz Duarte <gustavold@gmail.com>
+X-Mailer: b4 0.13.0
 
-A net device has a threaded sysctl that can be used to enable threaded
-napi polling on all of the NAPI contexts under that device. Allow
-enabling threaded napi polling at individual napi level using netlink.
+This patch series introduces a new feature to netconsole which allows
+appending a message ID to the userdata dictionary.
 
-Extend the netlink operation `napi-set` and allow setting the threaded
-attribute of a NAPI. This will enable the threaded polling on a napi
-context.
+If the msgid feature is enabled, the message ID is built from a per-target 32
+bit counter that is incremented and appended to every message sent to the target.
 
-Add a test in `nl_netdev.py` that verifies various cases of threaded
-napi being set at napi and at device level.
+Example::
+  echo 1 > "/sys/kernel/config/netconsole/cmdline0/userdata/msgid_enabled"
+  echo "This is message #1" > /dev/kmsg
+  echo "This is message #2" > /dev/kmsg
+  13,434,54928466,-;This is message #1
+   msgid=1
+  13,435,54934019,-;This is message #2
+   msgid=2
 
-Tested
- ./tools/testing/selftests/net/nl_netdev.py
- TAP version 13
- 1..7
- ok 1 nl_netdev.empty_check
- ok 2 nl_netdev.lo_check
- ok 3 nl_netdev.page_pool_check
- ok 4 nl_netdev.napi_list_check
- ok 5 nl_netdev.dev_set_threaded
- ok 6 nl_netdev.napi_set_threaded
- ok 7 nl_netdev.nsim_rxq_reset_down
- # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+This feature can be used by the target to detect if messages were dropped or
+reordered before reaching the target. This allows system administrators to
+assess the reliability of their netconsole pipeline and detect loss of messages
+due to network contention or temporary unavailability.
 
-Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+Suggested-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
+
 ---
+Changes in v3:
+- Add kdoc documentation for msgcounter.
+- Link to v2: https://lore.kernel.org/r/20250612-netconsole-msgid-v2-0-d4c1abc84bac@gmail.com
 
-v8:
- - Fix napi_set_threaded kdoc in net/core/dev.h.
+Changes in v2:
+- Use wrapping_assign_add() to avoid warnings in UBSAN and friends.
+- Improve documentation to clarify wrapping and distinguish msgid from sequnum.
+- Rebase and fix conflict in prepare_extradata().
+- Link to v1: https://lore.kernel.org/r/20250611-netconsole-msgid-v1-0-1784a51feb1e@gmail.com
 
-v7:
- - rebase
- - stop kthread when napi threaded is unset at napi level.
- - Update selftest to verify that kthread PID is not set when threaded
-   is disabled at napi level.
+---
+Gustavo Luiz Duarte (5):
+      netconsole: introduce 'msgid' as a new sysdata field
+      netconsole: implement configfs for msgid_enabled
+      netconsole: append msgid to sysdata
+      selftests: netconsole: Add tests for 'msgid' feature in sysdata
+      docs: netconsole: document msgid feature
 
-v6:
- - Set the threaded property at device level even if the currently set
-   value is same. This is to override any per napi settings. Update
-   selftest to verify this scenario.
- - Use u8 instead of uint in netdev_nl_napi_set_config implementation.
- - Extend the selftest to verify the existing behaviour that the PID
-   stays valid once threaded napi is enabled. It stays valid even after
-   disabling the threaded napi. Also verify that the same kthread(PID)
-   is reused when threaded napi is enabled again. Will keep this
-   behaviour as based on the discussion on v5.
+ Documentation/networking/netconsole.rst            | 32 +++++++++++
+ drivers/net/netconsole.c                           | 66 ++++++++++++++++++++++
+ .../selftests/drivers/net/netcons_sysdata.sh       | 30 ++++++++++
+ 3 files changed, 128 insertions(+)
+---
+base-commit: 08207f42d3ffee43c97f16baf03d7426a3c353ca
+change-id: 20250609-netconsole-msgid-b93c6f8e9c60
 
-v5:
- - This patch was part of:
- https://lore.kernel.org/netdev/Z92e2kCYXQ_RsrJh@LQ3V64L9R2/T/
- It is being sent separately for the first time.
- - Change threaded attribute type to uint
- - Set napi threaded state when set at napi level. When set at device
-   level overwrite the state of each napi. This is the `write all`
-   symantics that is also followed by other configurations.
- - Add a test to verify `write all` symantics.
-
- Documentation/netlink/specs/netdev.yaml  | 10 +++
- Documentation/networking/napi.rst        | 13 +++-
- include/linux/netdevice.h                |  1 +
- include/uapi/linux/netdev.h              |  1 +
- net/core/dev.c                           | 30 +++++++-
- net/core/dev.h                           | 20 ++++++
- net/core/netdev-genl-gen.c               |  5 +-
- net/core/netdev-genl.c                   | 10 +++
- tools/include/uapi/linux/netdev.h        |  1 +
- tools/testing/selftests/net/nl_netdev.py | 91 +++++++++++++++++++++++-
- 10 files changed, 175 insertions(+), 7 deletions(-)
-
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index ce4cfec82100..ec2c9d66519b 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -283,6 +283,14 @@ attribute-sets:
-         doc: The timeout, in nanoseconds, of how long to suspend irq
-              processing, if event polling finds events
-         type: uint
-+      -
-+        name: threaded
-+        doc: Whether the napi is configured to operate in threaded polling
-+             mode. If this is set to `1` then the NAPI context operates
-+             in threaded polling mode.
-+        type: uint
-+        checks:
-+          max: 1
-   -
-     name: xsk-info
-     attributes: []
-@@ -694,6 +702,7 @@ operations:
-             - defer-hard-irqs
-             - gro-flush-timeout
-             - irq-suspend-timeout
-+            - threaded
-       dump:
-         request:
-           attributes:
-@@ -746,6 +755,7 @@ operations:
-             - defer-hard-irqs
-             - gro-flush-timeout
-             - irq-suspend-timeout
-+            - threaded
-     -
-       name: bind-tx
-       doc: Bind dmabuf to netdev for TX
-diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
-index d0e3953cae6a..63f98c05860f 100644
---- a/Documentation/networking/napi.rst
-+++ b/Documentation/networking/napi.rst
-@@ -444,7 +444,18 @@ dependent). The NAPI instance IDs will be assigned in the opposite
- order than the process IDs of the kernel threads.
- 
- Threaded NAPI is controlled by writing 0/1 to the ``threaded`` file in
--netdev's sysfs directory.
-+netdev's sysfs directory. It can also be enabled for a specific napi using
-+netlink interface.
-+
-+For example, using the script:
-+
-+.. code-block:: bash
-+
-+  $ kernel-source/tools/net/ynl/pyynl/cli.py \
-+            --spec Documentation/netlink/specs/netdev.yaml \
-+            --do napi-set \
-+            --json='{"id": 66,
-+                     "threaded": 1}'
- 
- .. rubric:: Footnotes
- 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index adb14db25798..35947d3e5f93 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -369,6 +369,7 @@ struct napi_config {
- 	u64 irq_suspend_timeout;
- 	u32 defer_hard_irqs;
- 	cpumask_t affinity_mask;
-+	bool threaded;
- 	unsigned int napi_id;
- };
- 
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 7eb9571786b8..1f3719a9a0eb 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -134,6 +134,7 @@ enum {
- 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
- 	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
- 	NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-+	NETDEV_A_NAPI_THREADED,
- 
- 	__NETDEV_A_NAPI_MAX,
- 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 5baa4691074f..78b0f005fffd 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6963,6 +6963,31 @@ static void napi_stop_kthread(struct napi_struct *napi)
- 	napi->thread = NULL;
- }
- 
-+int napi_set_threaded(struct napi_struct *napi, bool threaded)
-+{
-+	if (threaded) {
-+		if (!napi->thread) {
-+			int err = napi_kthread_create(napi);
-+
-+			if (err)
-+				return err;
-+		}
-+	}
-+
-+	if (napi->config)
-+		napi->config->threaded = threaded;
-+
-+	if (!threaded && napi->thread) {
-+		napi_stop_kthread(napi);
-+	} else {
-+		/* Make sure kthread is created before THREADED bit is set. */
-+		smp_mb__before_atomic();
-+		assign_bit(NAPI_STATE_THREADED, &napi->state, threaded);
-+	}
-+
-+	return 0;
-+}
-+
- int dev_set_threaded(struct net_device *dev, bool threaded)
- {
- 	struct napi_struct *napi;
-@@ -6970,9 +6995,6 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
- 
- 	netdev_assert_locked_or_invisible(dev);
- 
--	if (dev->threaded == threaded)
--		return 0;
--
- 	if (threaded) {
- 		list_for_each_entry(napi, &dev->napi_list, dev_list) {
- 			if (!napi->thread) {
-@@ -7223,6 +7245,8 @@ static void napi_restore_config(struct napi_struct *n)
- 		napi_hash_add(n);
- 		n->config->napi_id = n->napi_id;
- 	}
-+
-+	napi_set_threaded(n, n->config->threaded);
- }
- 
- static void napi_save_config(struct napi_struct *n)
-diff --git a/net/core/dev.h b/net/core/dev.h
-index e93f36b7ddf3..e7b8571256b9 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -315,6 +315,26 @@ static inline void napi_set_irq_suspend_timeout(struct napi_struct *n,
- 	WRITE_ONCE(n->irq_suspend_timeout, timeout);
- }
- 
-+/**
-+ * napi_get_threaded - get the napi threaded state
-+ * @n: napi struct to get the threaded state from
-+ *
-+ * Return: the per-NAPI threaded state.
-+ */
-+static inline bool napi_get_threaded(struct napi_struct *n)
-+{
-+	return test_bit(NAPI_STATE_THREADED, &n->state);
-+}
-+
-+/**
-+ * napi_set_threaded - set napi threaded state
-+ * @n: napi struct to set the threaded state on
-+ * @threaded: whether this napi does threaded polling
-+ *
-+ * Return: 0 on success and negative errno on failure.
-+ */
-+int napi_set_threaded(struct napi_struct *n, bool threaded);
-+
- int rps_cpumask_housekeeping(struct cpumask *mask);
- 
- #if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 4fc44587f493..0994bd68a7e6 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -92,11 +92,12 @@ static const struct nla_policy netdev_bind_rx_nl_policy[NETDEV_A_DMABUF_FD + 1]
- };
- 
- /* NETDEV_CMD_NAPI_SET - do */
--static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT + 1] = {
-+static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_THREADED + 1] = {
- 	[NETDEV_A_NAPI_ID] = { .type = NLA_U32, },
- 	[NETDEV_A_NAPI_DEFER_HARD_IRQS] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_napi_defer_hard_irqs_range),
- 	[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] = { .type = NLA_UINT, },
- 	[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .type = NLA_UINT, },
-+	[NETDEV_A_NAPI_THREADED] = NLA_POLICY_MAX(NLA_UINT, 1),
- };
- 
- /* NETDEV_CMD_BIND_TX - do */
-@@ -193,7 +194,7 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 		.cmd		= NETDEV_CMD_NAPI_SET,
- 		.doit		= netdev_nl_napi_set_doit,
- 		.policy		= netdev_napi_set_nl_policy,
--		.maxattr	= NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-+		.maxattr	= NETDEV_A_NAPI_THREADED,
- 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	},
- 	{
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 2afa7b2141aa..754f1ffba3e2 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -184,6 +184,10 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 	if (napi->irq >= 0 && nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq))
- 		goto nla_put_failure;
- 
-+	if (nla_put_uint(rsp, NETDEV_A_NAPI_THREADED,
-+			 napi_get_threaded(napi)))
-+		goto nla_put_failure;
-+
- 	if (napi->thread) {
- 		pid = task_pid_nr(napi->thread);
- 		if (nla_put_u32(rsp, NETDEV_A_NAPI_PID, pid))
-@@ -322,8 +326,14 @@ netdev_nl_napi_set_config(struct napi_struct *napi, struct genl_info *info)
- {
- 	u64 irq_suspend_timeout = 0;
- 	u64 gro_flush_timeout = 0;
-+	u8 threaded = 0;
- 	u32 defer = 0;
- 
-+	if (info->attrs[NETDEV_A_NAPI_THREADED]) {
-+		threaded = nla_get_u8(info->attrs[NETDEV_A_NAPI_THREADED]);
-+		napi_set_threaded(napi, !!threaded);
-+	}
-+
- 	if (info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]) {
- 		defer = nla_get_u32(info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]);
- 		napi_set_defer_hard_irqs(napi, defer);
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 7eb9571786b8..1f3719a9a0eb 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -134,6 +134,7 @@ enum {
- 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
- 	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
- 	NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-+	NETDEV_A_NAPI_THREADED,
- 
- 	__NETDEV_A_NAPI_MAX,
- 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
-index c9109627a741..c8ffade79a52 100755
---- a/tools/testing/selftests/net/nl_netdev.py
-+++ b/tools/testing/selftests/net/nl_netdev.py
-@@ -35,6 +35,91 @@ def napi_list_check(nf) -> None:
-                 ksft_eq(len(napis), 100,
-                         comment=f"queue count after reset queue {q} mode {i}")
- 
-+def napi_set_threaded(nf) -> None:
-+    """
-+    Test that verifies various cases of napi threaded
-+    set and unset at napi and device level.
-+    """
-+    with NetdevSimDev(queue_count=2) as nsimdev:
-+        nsim = nsimdev.nsims[0]
-+
-+        ip(f"link set dev {nsim.ifname} up")
-+
-+        napis = nf.napi_get({'ifindex': nsim.ifindex}, dump=True)
-+        ksft_eq(len(napis), 2)
-+
-+        napi0_id = napis[0]['id']
-+        napi1_id = napis[1]['id']
-+
-+        # set napi threaded and verify
-+        nf.napi_set({'id': napi0_id, 'threaded': 1})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        ksft_ne(napi0.get('pid'), None)
-+
-+        # check it is not set for napi1
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1.get('pid'), None)
-+
-+        ip(f"link set dev {nsim.ifname} down")
-+        ip(f"link set dev {nsim.ifname} up")
-+
-+        # verify if napi threaded is still set
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        ksft_ne(napi0.get('pid'), None)
-+
-+        # check it is still not set for napi1
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1.get('pid'), None)
-+
-+        # unset napi threaded and verify
-+        nf.napi_set({'id': napi0_id, 'threaded': 0})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-+        ksft_eq(napi0.get('pid'), None)
-+
-+        # set threaded at device level
-+        system(f"echo 1 > /sys/class/net/{nsim.ifname}/threaded")
-+
-+        # check napi threaded is set for both napis
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        ksft_ne(napi0.get('pid'), None)
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 1)
-+        ksft_ne(napi1.get('pid'), None)
-+
-+        # unset threaded at device level
-+        system(f"echo 0 > /sys/class/net/{nsim.ifname}/threaded")
-+
-+        # check napi threaded is unset for both napis
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-+        ksft_eq(napi0.get('pid'), None)
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1.get('pid'), None)
-+
-+        # set napi threaded for napi0
-+        nf.napi_set({'id': napi0_id, 'threaded': 1})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        ksft_ne(napi0.get('pid'), None)
-+
-+        # unset threaded at device level
-+        system(f"echo 0 > /sys/class/net/{nsim.ifname}/threaded")
-+
-+        # check napi threaded is unset for both napis
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-+        ksft_eq(napi0.get('pid'), None)
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1.get('pid'), None)
-+
- def dev_set_threaded(nf) -> None:
-     """
-     Test that verifies various cases of napi threaded
-@@ -56,8 +141,10 @@ def dev_set_threaded(nf) -> None:
- 
-         # check napi threaded is set for both napis
-         napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-         ksft_ne(napi0.get('pid'), None)
-         napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 1)
-         ksft_ne(napi1.get('pid'), None)
- 
-         # unset threaded
-@@ -65,8 +152,10 @@ def dev_set_threaded(nf) -> None:
- 
-         # check napi threaded is unset for both napis
-         napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-         ksft_eq(napi0.get('pid'), None)
-         napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-         ksft_eq(napi1.get('pid'), None)
- 
- def nsim_rxq_reset_down(nf) -> None:
-@@ -156,7 +245,7 @@ def page_pool_check(nf) -> None:
- def main() -> None:
-     nf = NetdevFamily()
-     ksft_run([empty_check, lo_check, page_pool_check, napi_list_check,
--              dev_set_threaded, nsim_rxq_reset_down],
-+              dev_set_threaded, napi_set_threaded, nsim_rxq_reset_down],
-              args=(nf, ))
-     ksft_exit()
- 
+Best regards,
 -- 
-2.50.0.rc2.692.g299adb8693-goog
+Gustavo Luiz Duarte <gustavold@gmail.com>
 
 
