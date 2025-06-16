@@ -1,1375 +1,209 @@
-Return-Path: <netdev+bounces-198228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABFCBADBACD
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:17:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE930ADBAA8
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0B3B1890CE2
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:17:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63735174A76
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A994628B503;
-	Mon, 16 Jun 2025 20:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmgcOA6t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8926A288C13;
+	Mon, 16 Jun 2025 20:14:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381E828D8E4
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9102BEFF0
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750104930; cv=none; b=XfabnFUm8Alx3bOrU9t8xF6DFtYzAPaH2QVTo0+C2N2HQ0c78emngh58BWL/djvRhHje1adN2aJbo++dNH4UcGGwP++BGIqpVO16rw4QTcWo+IafEU49juVeZM0MMAOBbDcdtnPdoo6qPDs2f6tlldRWcUBqt4FqWnhzSpaHZFE=
+	t=1750104870; cv=none; b=OAJeUM0p9Yhlhb+cdKnBLmB5v99rLwuU90HuWtdK6YZBVf8PegGgVVXvVYyabhQI29RdVPjDLon1xOuhRwczOQos8HdEh0GTdKSzP7LSvgEXOAcrFda41lwx2hwBII0VkbVHC+geFhZUo2y+1aHvftrrO79bKFmIE8Zl8y/PYV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750104930; c=relaxed/simple;
-	bh=bYlsr6V0iz4gTzm02/UH5mUW1kllxT/E992WHQhZTPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KcO9+dSBQ8dm+xbzIYwZFCxHxJEiaozOlgs4NyYTkVNZnVv/A47VSDLXwQl9yiUPBEOqTkPfkva0XtDMMk5XpiyfiGBAZGfvJpwVNw5tvRVqkb7C/siyuBuOXqmSj9UiTd1e++Ie5P2zBK7cvrGoFog6k/xFw/Szs6CGjlNDEdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NmgcOA6t; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750104926;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pNkEgvoEBRIEi9E++HDP2VW2hGixTmbhM9Sbr/cR2xA=;
-	b=NmgcOA6tjfzsB+xHQIJ3421h6a+fulcTJS61RHUtnNSTRWxTfy/CT4cbGmlHZ4+4LHBdqq
-	4rWAi5bHv6fPMFxgQz8PmZ6cfXuEEr8Mft7jymWFHqCEf1WfSLnH8iOo0xe4wz6oC1ilVw
-	ZTDlc79WF5hqFzqhrXepK6XrR3MTdf0=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-PlfX_G6jOEeIQHlkQnWPJQ-1; Mon,
- 16 Jun 2025 16:15:22 -0400
-X-MC-Unique: PlfX_G6jOEeIQHlkQnWPJQ-1
-X-Mimecast-MFC-AGG-ID: PlfX_G6jOEeIQHlkQnWPJQ_1750104920
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1750104870; c=relaxed/simple;
+	bh=V9e+eLsV51hESvlS9FPGF9+JtzTpMCVKCdPxLku5XQ0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=CWaJDnrXOXy+AGbAAncx0cLpy7J+jovW/NW43RLWMCkkSFSmDWHkm+6TfO7ImW1wz/Nwudikd4FNWRDn2uMnA6/DHTfXrY4ij4fHrBhyvr8RzUcN3kPEyu9pvL0HiaW2xpCexpaHHrzy7KHjb+9+bxN1D0CEKWdgOXAzP5jzEO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id E73308A;
+	Mon, 16 Jun 2025 13:14:21 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id HmQgDA-inrHY; Mon, 16 Jun 2025 13:14:20 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D4FD718011CD;
-	Mon, 16 Jun 2025 20:15:19 +0000 (UTC)
-Received: from p16v.luc.cera.cz (unknown [10.45.224.53])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1392830001B1;
-	Mon, 16 Jun 2025 20:15:12 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next v11 09/14] dpll: zl3073x: Register DPLL devices and pins
-Date: Mon, 16 Jun 2025 22:13:59 +0200
-Message-ID: <20250616201404.1412341-10-ivecera@redhat.com>
-In-Reply-To: <20250616201404.1412341-1-ivecera@redhat.com>
-References: <20250616201404.1412341-1-ivecera@redhat.com>
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 5100045;
+	Mon, 16 Jun 2025 13:14:20 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 5100045
+Date: Mon, 16 Jun 2025 13:13:59 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
+To: Neal Cardwell <ncardwell@google.com>
+cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
+    stable@kernel.org
+Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
+ retransmits were sent
+In-Reply-To: <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
+Message-ID: <a8579544-a9de-63ae-61ed-283c872289a@ewheeler.net>
+References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
+ <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com> <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
+ <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: multipart/mixed; boundary="8323328-1713979476-1750104860=:30465"
 
-Enumerate all available DPLL channels and registers a DPLL device for
-each of them. Check all input references and outputs and register
-DPLL pins for them.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Number of registered DPLL pins depends on configuration of references
-and outputs. If the reference or output is configured as differential
-one then only one DPLL pin is registered. Both references and outputs
-can be also disabled from firmware configuration and in this case
-no DPLL pins are registered.
+--8323328-1713979476-1750104860=:30465
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-All registrable references are registered to all available DPLL devices
-with exception of DPLLs that are configured in NCO (numerically
-controlled oscillator) mode. In this mode DPLL channel acts as PHC and
-cannot be locked to any reference.
+On Sun, 15 Jun 2025, Eric Wheeler wrote:
+> On Tue, 10 Jun 2025, Neal Cardwell wrote:
+> > On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > >
+> > > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > >
+> > > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > >
+> > > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > >
+> > > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > >
+> > > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
+> > > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > >
+> > > > > > > > > Hello Neal,
+> > > > > > > > >
+> > > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
+> > > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
+> > > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
+> > > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
+> > > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
+> > > > > > > > >
+> > > > > > > > > Interestingly, the problem only presents itself when transmitting
+> > > > > > > > > from Linux; receive traffic (to Linux) performs just fine:
+> > > > > > > > >         ~60Mbit: Linux v6.6.85 =TX=> 10GbE -> switch -> 1GbE  -> device
+> > > > > > > > >          ~1Gbit: device        =TX=>  1GbE -> switch -> 10GbE -> Linux v6.6.85
+> > > > > > > > >
+> > > > > > > > > Through bisection, we found this first-bad commit:
+> > > > > > > > >
+> > > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
+> > > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
+> > > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
+> > 
+> 
+> > The attached patch should apply (with "git am") for any recent kernel
+> > that has the "tcp: fix to allow timestamp undo if no retransmits were
+> > sent" patch it is fixing. So you should be able to test it on top of
+> > the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
+> > easier.
 
-Device outputs are connected to one of synthesizers and each synthesizer
-is driven by some DPLL channel. So output pins belonging to given output
-are registered to DPLL device that drives associated synthesizer.
+Definitely better, but performance is ~15% slower vs reverting, and the
+retransmit counts are still higher than the other.  In the two sections
+below you can see the difference between after the fix and after the
+revert.  
 
-Finally add kworker task to monitor async changes on all DPLL channels
-and input pins and to notify about them DPLL core. Output pins are not
-monitored as their parameters are not changed asynchronously by the
-device.
+Here is the output:
 
-Co-developed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
-v11:
-* fixed uninitialized 'rc' in error-path
-v10:
-* fixed comparisons to NULL
----
- drivers/dpll/zl3073x/Makefile |   2 +-
- drivers/dpll/zl3073x/core.c   | 104 ++++
- drivers/dpll/zl3073x/core.h   |  17 +
- drivers/dpll/zl3073x/dpll.c   | 898 ++++++++++++++++++++++++++++++++++
- drivers/dpll/zl3073x/dpll.h   |  42 ++
- drivers/dpll/zl3073x/regs.h   |  56 +++
- 6 files changed, 1118 insertions(+), 1 deletion(-)
- create mode 100644 drivers/dpll/zl3073x/dpll.c
- create mode 100644 drivers/dpll/zl3073x/dpll.h
+## After fixing with your patch:
+	https://www.linuxglobal.com/out/for-neal/after-fix.tar.gz
 
-diff --git a/drivers/dpll/zl3073x/Makefile b/drivers/dpll/zl3073x/Makefile
-index 56d7d9feeaf0d..5ccddb6194878 100644
---- a/drivers/dpll/zl3073x/Makefile
-+++ b/drivers/dpll/zl3073x/Makefile
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- obj-$(CONFIG_ZL3073X)		+= zl3073x.o
--zl3073x-objs			:= core.o prop.o
-+zl3073x-objs			:= core.o dpll.o prop.o
- 
- obj-$(CONFIG_ZL3073X_I2C)	+= zl3073x_i2c.o
- zl3073x_i2c-objs		:= i2c.o
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index 3fd7257221338..bd05e40c3984b 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -16,6 +16,7 @@
- #include <net/devlink.h>
- 
- #include "core.h"
-+#include "dpll.h"
- #include "regs.h"
- 
- /* Chip IDs for zl30731 */
-@@ -769,6 +770,104 @@ zl3073x_dev_state_fetch(struct zl3073x_dev *zldev)
- 	return rc;
- }
- 
-+static void
-+zl3073x_dev_periodic_work(struct kthread_work *work)
-+{
-+	struct zl3073x_dev *zldev = container_of(work, struct zl3073x_dev,
-+						 work.work);
-+	struct zl3073x_dpll *zldpll;
-+
-+	list_for_each_entry(zldpll, &zldev->dplls, list)
-+		zl3073x_dpll_changes_check(zldpll);
-+
-+	/* Run twice a second */
-+	kthread_queue_delayed_work(zldev->kworker, &zldev->work,
-+				   msecs_to_jiffies(500));
-+}
-+
-+static void zl3073x_dev_dpll_fini(void *ptr)
-+{
-+	struct zl3073x_dpll *zldpll, *next;
-+	struct zl3073x_dev *zldev = ptr;
-+
-+	/* Stop monitoring thread */
-+	if (zldev->kworker) {
-+		kthread_cancel_delayed_work_sync(&zldev->work);
-+		kthread_destroy_worker(zldev->kworker);
-+		zldev->kworker = NULL;
-+	}
-+
-+	/* Release DPLLs */
-+	list_for_each_entry_safe(zldpll, next, &zldev->dplls, list) {
-+		zl3073x_dpll_unregister(zldpll);
-+		list_del(&zldpll->list);
-+		zl3073x_dpll_free(zldpll);
-+	}
-+}
-+
-+static int
-+zl3073x_devm_dpll_init(struct zl3073x_dev *zldev, u8 num_dplls)
-+{
-+	struct kthread_worker *kworker;
-+	struct zl3073x_dpll *zldpll;
-+	unsigned int i;
-+	int rc;
-+
-+	INIT_LIST_HEAD(&zldev->dplls);
-+
-+	/* Initialize all DPLLs */
-+	for (i = 0; i < num_dplls; i++) {
-+		zldpll = zl3073x_dpll_alloc(zldev, i);
-+		if (IS_ERR(zldpll)) {
-+			dev_err_probe(zldev->dev, PTR_ERR(zldpll),
-+				      "Failed to alloc DPLL%u\n", i);
-+			rc = PTR_ERR(zldpll);
-+			goto error;
-+		}
-+
-+		rc = zl3073x_dpll_register(zldpll);
-+		if (rc) {
-+			dev_err_probe(zldev->dev, rc,
-+				      "Failed to register DPLL%u\n", i);
-+			zl3073x_dpll_free(zldpll);
-+			goto error;
-+		}
-+
-+		list_add(&zldpll->list, &zldev->dplls);
-+	}
-+
-+	/* Perform initial firmware fine phase correction */
-+	rc = zl3073x_dpll_init_fine_phase_adjust(zldev);
-+	if (rc) {
-+		dev_err_probe(zldev->dev, rc,
-+			      "Failed to init fine phase correction\n");
-+		goto error;
-+	}
-+
-+	/* Initialize monitoring thread */
-+	kthread_init_delayed_work(&zldev->work, zl3073x_dev_periodic_work);
-+	kworker = kthread_run_worker(0, "zl3073x-%s", dev_name(zldev->dev));
-+	if (IS_ERR(kworker)) {
-+		rc = PTR_ERR(kworker);
-+		goto error;
-+	}
-+
-+	zldev->kworker = kworker;
-+	kthread_queue_delayed_work(zldev->kworker, &zldev->work, 0);
-+
-+	/* Add devres action to release DPLL related resources */
-+	rc = devm_add_action_or_reset(zldev->dev, zl3073x_dev_dpll_fini, zldev);
-+	if (rc)
-+		goto error;
-+
-+	return 0;
-+
-+error:
-+	zl3073x_dev_dpll_fini(zldev);
-+
-+	return rc;
-+}
-+
- static void zl3073x_devlink_unregister(void *ptr)
- {
- 	devlink_unregister(ptr);
-@@ -845,6 +944,11 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
- 	if (rc)
- 		return rc;
- 
-+	/* Register DPLL channels */
-+	rc = zl3073x_devm_dpll_init(zldev, chip_info->num_channels);
-+	if (rc)
-+		return rc;
-+
- 	/* Register the device as devlink device */
- 	devlink = priv_to_devlink(zldev);
- 	devlink_register(devlink);
-diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
-index 4fcce761fc5f2..adae94944376a 100644
---- a/drivers/dpll/zl3073x/core.h
-+++ b/drivers/dpll/zl3073x/core.h
-@@ -3,6 +3,8 @@
- #ifndef _ZL3073X_H
- #define _ZL3073X_H
- 
-+#include <linux/kthread.h>
-+#include <linux/list.h>
- #include <linux/mutex.h>
- #include <linux/types.h>
- 
-@@ -10,6 +12,7 @@
- 
- struct device;
- struct regmap;
-+struct zl3073x_dpll;
- 
- /*
-  * Hardware limits for ZL3073x chip family
-@@ -18,6 +21,10 @@ struct regmap;
- #define ZL3073X_NUM_REFS	10
- #define ZL3073X_NUM_OUTS	10
- #define ZL3073X_NUM_SYNTHS	5
-+#define ZL3073X_NUM_INPUT_PINS	ZL3073X_NUM_REFS
-+#define ZL3073X_NUM_OUTPUT_PINS	(ZL3073X_NUM_OUTS * 2)
-+#define ZL3073X_NUM_PINS	(ZL3073X_NUM_INPUT_PINS + \
-+				 ZL3073X_NUM_OUTPUT_PINS)
- 
- /**
-  * struct zl3073x_ref - input reference invariant info
-@@ -62,6 +69,9 @@ struct zl3073x_synth {
-  * @ref: array of input references' invariants
-  * @out: array of outs' invariants
-  * @synth: array of synths' invariants
-+ * @dplls: list of DPLLs
-+ * @kworker: thread for periodic work
-+ * @work: periodic work
-  */
- struct zl3073x_dev {
- 	struct device		*dev;
-@@ -73,6 +83,13 @@ struct zl3073x_dev {
- 	struct zl3073x_ref	ref[ZL3073X_NUM_REFS];
- 	struct zl3073x_out	out[ZL3073X_NUM_OUTS];
- 	struct zl3073x_synth	synth[ZL3073X_NUM_SYNTHS];
-+
-+	/* DPLL channels */
-+	struct list_head	dplls;
-+
-+	/* Monitor */
-+	struct kthread_worker		*kworker;
-+	struct kthread_delayed_work	work;
- };
- 
- enum zl3073x_chip_type {
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-new file mode 100644
-index 0000000000000..56ca5c8dd9155
---- /dev/null
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -0,0 +1,898 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/bits.h>
-+#include <linux/bitfield.h>
-+#include <linux/bug.h>
-+#include <linux/container_of.h>
-+#include <linux/dev_printk.h>
-+#include <linux/dpll.h>
-+#include <linux/err.h>
-+#include <linux/kthread.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/netlink.h>
-+#include <linux/platform_device.h>
-+#include <linux/slab.h>
-+#include <linux/sprintf.h>
-+
-+#include "core.h"
-+#include "dpll.h"
-+#include "prop.h"
-+#include "regs.h"
-+
-+#define ZL3073X_DPLL_REF_NONE		ZL3073X_NUM_REFS
-+#define ZL3073X_DPLL_REF_IS_VALID(_ref)	((_ref) != ZL3073X_DPLL_REF_NONE)
-+
-+/**
-+ * struct zl3073x_dpll_pin - DPLL pin
-+ * @list: this DPLL pin list entry
-+ * @dpll: DPLL the pin is registered to
-+ * @dpll_pin: pointer to registered dpll_pin
-+ * @label: package label
-+ * @dir: pin direction
-+ * @id: pin id
-+ * @prio: pin priority <0, 14>
-+ * @selectable: pin is selectable in automatic mode
-+ * @pin_state: last saved pin state
-+ */
-+struct zl3073x_dpll_pin {
-+	struct list_head	list;
-+	struct zl3073x_dpll	*dpll;
-+	struct dpll_pin		*dpll_pin;
-+	char			label[8];
-+	enum dpll_pin_direction	dir;
-+	u8			id;
-+	u8			prio;
-+	bool			selectable;
-+	enum dpll_pin_state	pin_state;
-+};
-+
-+/**
-+ * zl3073x_dpll_is_input_pin - check if the pin is input one
-+ * @pin: pin to check
-+ *
-+ * Return: true if pin is input, false if pin is output.
-+ */
-+static bool
-+zl3073x_dpll_is_input_pin(struct zl3073x_dpll_pin *pin)
-+{
-+	return pin->dir == DPLL_PIN_DIRECTION_INPUT;
-+}
-+
-+/**
-+ * zl3073x_dpll_is_p_pin - check if the pin is P-pin
-+ * @pin: pin to check
-+ *
-+ * Return: true if the pin is P-pin, false if it is N-pin
-+ */
-+static bool
-+zl3073x_dpll_is_p_pin(struct zl3073x_dpll_pin *pin)
-+{
-+	return zl3073x_is_p_pin(pin->id);
-+}
-+
-+static int
-+zl3073x_dpll_pin_direction_get(const struct dpll_pin *dpll_pin, void *pin_priv,
-+			       const struct dpll_device *dpll, void *dpll_priv,
-+			       enum dpll_pin_direction *direction,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+
-+	*direction = pin->dir;
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_dpll_selected_ref_get - get currently selected reference
-+ * @zldpll: pointer to zl3073x_dpll
-+ * @ref: place to store selected reference
-+ *
-+ * Check for currently selected reference the DPLL should be locked to
-+ * and stores its index to given @ref.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_selected_ref_get(struct zl3073x_dpll *zldpll, u8 *ref)
-+{
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 state, value;
-+	int rc;
-+
-+	switch (zldpll->refsel_mode) {
-+	case ZL_DPLL_MODE_REFSEL_MODE_AUTO:
-+		/* For automatic mode read refsel_status register */
-+		rc = zl3073x_read_u8(zldev,
-+				     ZL_REG_DPLL_REFSEL_STATUS(zldpll->id),
-+				     &value);
-+		if (rc)
-+			return rc;
-+
-+		/* Extract reference state */
-+		state = FIELD_GET(ZL_DPLL_REFSEL_STATUS_STATE, value);
-+
-+		/* Return the reference only if the DPLL is locked to it */
-+		if (state == ZL_DPLL_REFSEL_STATUS_STATE_LOCK)
-+			*ref = FIELD_GET(ZL_DPLL_REFSEL_STATUS_REFSEL, value);
-+		else
-+			*ref = ZL3073X_DPLL_REF_NONE;
-+		break;
-+	case ZL_DPLL_MODE_REFSEL_MODE_REFLOCK:
-+		/* For manual mode return stored value */
-+		*ref = zldpll->forced_ref;
-+		break;
-+	default:
-+		/* For other modes like NCO, freerun... there is no input ref */
-+		*ref = ZL3073X_DPLL_REF_NONE;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_dpll_connected_ref_get - get currently connected reference
-+ * @zldpll: pointer to zl3073x_dpll
-+ * @ref: place to store selected reference
-+ *
-+ * Looks for currently connected the DPLL is locked to and stores its index
-+ * to given @ref.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_connected_ref_get(struct zl3073x_dpll *zldpll, u8 *ref)
-+{
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	int rc;
-+
-+	/* Get currently selected input reference */
-+	rc = zl3073x_dpll_selected_ref_get(zldpll, ref);
-+	if (rc)
-+		return rc;
-+
-+	if (ZL3073X_DPLL_REF_IS_VALID(*ref)) {
-+		u8 ref_status;
-+
-+		/* Read the reference monitor status */
-+		rc = zl3073x_read_u8(zldev, ZL_REG_REF_MON_STATUS(*ref),
-+				     &ref_status);
-+		if (rc)
-+			return rc;
-+
-+		/* If the monitor indicates an error nothing is connected */
-+		if (ref_status != ZL_REF_MON_STATUS_OK)
-+			*ref = ZL3073X_DPLL_REF_NONE;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_dpll_ref_prio_get - get priority for given input pin
-+ * @pin: pointer to pin
-+ * @prio: place to store priority
-+ *
-+ * Reads current priority for the given input pin and stores the value
-+ * to @prio.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_ref_prio_get(struct zl3073x_dpll_pin *pin, u8 *prio)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 ref, ref_prio;
-+	int rc;
-+
-+	guard(mutex)(&zldev->multiop_lock);
-+
-+	/* Read DPLL configuration */
-+	rc = zl3073x_mb_op(zldev, ZL_REG_DPLL_MB_SEM, ZL_DPLL_MB_SEM_RD,
-+			   ZL_REG_DPLL_MB_MASK, BIT(zldpll->id));
-+	if (rc)
-+		return rc;
-+
-+	/* Read reference priority - one value for P&N pins (4 bits/pin) */
-+	ref = zl3073x_input_pin_ref_get(pin->id);
-+	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_REF_PRIO(ref / 2),
-+			     &ref_prio);
-+	if (rc)
-+		return rc;
-+
-+	/* Select nibble according pin type */
-+	if (zl3073x_dpll_is_p_pin(pin))
-+		*prio = FIELD_GET(ZL_DPLL_REF_PRIO_REF_P, ref_prio);
-+	else
-+		*prio = FIELD_GET(ZL_DPLL_REF_PRIO_REF_N, ref_prio);
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_dpll_ref_state_get - get status for given input pin
-+ * @pin: pointer to pin
-+ * @state: place to store status
-+ *
-+ * Checks current status for the given input pin and stores the value
-+ * to @state.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_ref_state_get(struct zl3073x_dpll_pin *pin,
-+			   enum dpll_pin_state *state)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 ref, ref_conn, status;
-+	int rc;
-+
-+	ref = zl3073x_input_pin_ref_get(pin->id);
-+
-+	/* Get currently connected reference */
-+	rc = zl3073x_dpll_connected_ref_get(zldpll, &ref_conn);
-+	if (rc)
-+		return rc;
-+
-+	if (ref == ref_conn) {
-+		*state = DPLL_PIN_STATE_CONNECTED;
-+		return 0;
-+	}
-+
-+	/* If the DPLL is running in automatic mode and the reference is
-+	 * selectable and its monitor does not report any error then report
-+	 * pin as selectable.
-+	 */
-+	if (zldpll->refsel_mode == ZL_DPLL_MODE_REFSEL_MODE_AUTO &&
-+	    pin->selectable) {
-+		/* Read reference monitor status */
-+		rc = zl3073x_read_u8(zldev, ZL_REG_REF_MON_STATUS(ref),
-+				     &status);
-+		if (rc)
-+			return rc;
-+
-+		/* If the monitor indicates errors report the reference
-+		 * as disconnected
-+		 */
-+		if (status == ZL_REF_MON_STATUS_OK) {
-+			*state = DPLL_PIN_STATE_SELECTABLE;
-+			return 0;
-+		}
-+	}
-+
-+	/* Otherwise report the pin as disconnected */
-+	*state = DPLL_PIN_STATE_DISCONNECTED;
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_dpll_input_pin_state_on_dpll_get(const struct dpll_pin *dpll_pin,
-+					 void *pin_priv,
-+					 const struct dpll_device *dpll,
-+					 void *dpll_priv,
-+					 enum dpll_pin_state *state,
-+					 struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+
-+	return zl3073x_dpll_ref_state_get(pin, state);
-+}
-+
-+static int
-+zl3073x_dpll_output_pin_state_on_dpll_get(const struct dpll_pin *dpll_pin,
-+					  void *pin_priv,
-+					  const struct dpll_device *dpll,
-+					  void *dpll_priv,
-+					  enum dpll_pin_state *state,
-+					  struct netlink_ext_ack *extack)
-+{
-+	/* If the output pin is registered then it is always connected */
-+	*state = DPLL_PIN_STATE_CONNECTED;
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_dpll_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
-+			     enum dpll_lock_status *status,
-+			     enum dpll_lock_status_error *status_error,
-+			     struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 mon_status;
-+	int rc;
-+
-+	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MON_STATUS(zldpll->id),
-+			     &mon_status);
-+
-+	if (rc)
-+		return rc;
-+
-+	if (FIELD_GET(ZL_DPLL_MON_STATUS_LOCK, mon_status)) {
-+		if (FIELD_GET(ZL_DPLL_MON_STATUS_HO_READY, mon_status))
-+			*status = DPLL_LOCK_STATUS_LOCKED_HO_ACQ;
-+		else
-+			*status = DPLL_LOCK_STATUS_LOCKED;
-+	} else if (FIELD_GET(ZL_DPLL_MON_STATUS_HO, mon_status)) {
-+		*status = DPLL_LOCK_STATUS_HOLDOVER;
-+	} else {
-+		*status = DPLL_LOCK_STATUS_UNLOCKED;
-+	}
-+
-+	return rc;
-+}
-+
-+static int
-+zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
-+		      enum dpll_mode *mode, struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+
-+	switch (zldpll->refsel_mode) {
-+	case ZL_DPLL_MODE_REFSEL_MODE_FREERUN:
-+	case ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER:
-+	case ZL_DPLL_MODE_REFSEL_MODE_NCO:
-+	case ZL_DPLL_MODE_REFSEL_MODE_REFLOCK:
-+		/* Use MANUAL for device FREERUN, HOLDOVER, NCO and
-+		 * REFLOCK modes
-+		 */
-+		*mode = DPLL_MODE_MANUAL;
-+		break;
-+	case ZL_DPLL_MODE_REFSEL_MODE_AUTO:
-+		/* Use AUTO for device AUTO mode */
-+		*mode = DPLL_MODE_AUTOMATIC;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
-+	.direction_get = zl3073x_dpll_pin_direction_get,
-+	.state_on_dpll_get = zl3073x_dpll_input_pin_state_on_dpll_get,
-+};
-+
-+static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops = {
-+	.direction_get = zl3073x_dpll_pin_direction_get,
-+	.state_on_dpll_get = zl3073x_dpll_output_pin_state_on_dpll_get,
-+};
-+
-+static const struct dpll_device_ops zl3073x_dpll_device_ops = {
-+	.lock_status_get = zl3073x_dpll_lock_status_get,
-+	.mode_get = zl3073x_dpll_mode_get,
-+};
-+
-+/**
-+ * zl3073x_dpll_pin_alloc - allocate DPLL pin
-+ * @zldpll: pointer to zl3073x_dpll
-+ * @dir: pin direction
-+ * @id: pin id
-+ *
-+ * Allocates and initializes zl3073x_dpll_pin structure for given
-+ * pin id and direction.
-+ *
-+ * Return: pointer to allocated structure on success, error pointer on error
-+ */
-+static struct zl3073x_dpll_pin *
-+zl3073x_dpll_pin_alloc(struct zl3073x_dpll *zldpll, enum dpll_pin_direction dir,
-+		       u8 id)
-+{
-+	struct zl3073x_dpll_pin *pin;
-+
-+	pin = kzalloc(sizeof(*pin), GFP_KERNEL);
-+	if (!pin)
-+		return ERR_PTR(-ENOMEM);
-+
-+	pin->dpll = zldpll;
-+	pin->dir = dir;
-+	pin->id = id;
-+
-+	return pin;
-+}
-+
-+/**
-+ * zl3073x_dpll_pin_free - deallocate DPLL pin
-+ * @pin: pin to free
-+ *
-+ * Deallocates DPLL pin previously allocated by @zl3073x_dpll_pin_alloc.
-+ */
-+static void
-+zl3073x_dpll_pin_free(struct zl3073x_dpll_pin *pin)
-+{
-+	WARN(pin->dpll_pin, "DPLL pin is still registered\n");
-+
-+	kfree(pin);
-+}
-+
-+/**
-+ * zl3073x_dpll_pin_register - register DPLL pin
-+ * @pin: pointer to DPLL pin
-+ * @index: absolute pin index for registration
-+ *
-+ * Registers given DPLL pin into DPLL sub-system.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pin, u32 index)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_pin_props *props;
-+	const struct dpll_pin_ops *ops;
-+	int rc;
-+
-+	/* Get pin properties */
-+	props = zl3073x_pin_props_get(zldpll->dev, pin->dir, pin->id);
-+	if (IS_ERR(props))
-+		return PTR_ERR(props);
-+
-+	/* Save package label */
-+	strscpy(pin->label, props->package_label);
-+
-+	if (zl3073x_dpll_is_input_pin(pin)) {
-+		rc = zl3073x_dpll_ref_prio_get(pin, &pin->prio);
-+		if (rc)
-+			goto err_prio_get;
-+
-+		if (pin->prio == ZL_DPLL_REF_PRIO_NONE) {
-+			/* Clamp prio to max value & mark pin non-selectable */
-+			pin->prio = ZL_DPLL_REF_PRIO_MAX;
-+			pin->selectable = false;
-+		} else {
-+			/* Mark pin as selectable */
-+			pin->selectable = true;
-+		}
-+	}
-+
-+	/* Create or get existing DPLL pin */
-+	pin->dpll_pin = dpll_pin_get(zldpll->dev->clock_id, index, THIS_MODULE,
-+				     &props->dpll_props);
-+	if (IS_ERR(pin->dpll_pin)) {
-+		rc = PTR_ERR(pin->dpll_pin);
-+		goto err_pin_get;
-+	}
-+
-+	if (zl3073x_dpll_is_input_pin(pin))
-+		ops = &zl3073x_dpll_input_pin_ops;
-+	else
-+		ops = &zl3073x_dpll_output_pin_ops;
-+
-+	/* Register the pin */
-+	rc = dpll_pin_register(zldpll->dpll_dev, pin->dpll_pin, ops, pin);
-+	if (rc)
-+		goto err_register;
-+
-+	/* Free pin properties */
-+	zl3073x_pin_props_put(props);
-+
-+	return 0;
-+
-+err_register:
-+	dpll_pin_put(pin->dpll_pin);
-+err_prio_get:
-+	pin->dpll_pin = NULL;
-+err_pin_get:
-+	zl3073x_pin_props_put(props);
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_dpll_pin_unregister - unregister DPLL pin
-+ * @pin: pointer to DPLL pin
-+ *
-+ * Unregisters pin previously registered by @zl3073x_dpll_pin_register.
-+ */
-+static void
-+zl3073x_dpll_pin_unregister(struct zl3073x_dpll_pin *pin)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	const struct dpll_pin_ops *ops;
-+
-+	WARN(!pin->dpll_pin, "DPLL pin is not registered\n");
-+
-+	if (zl3073x_dpll_is_input_pin(pin))
-+		ops = &zl3073x_dpll_input_pin_ops;
-+	else
-+		ops = &zl3073x_dpll_output_pin_ops;
-+
-+	/* Unregister the pin */
-+	dpll_pin_unregister(zldpll->dpll_dev, pin->dpll_pin, ops, pin);
-+
-+	dpll_pin_put(pin->dpll_pin);
-+	pin->dpll_pin = NULL;
-+}
-+
-+/**
-+ * zl3073x_dpll_pins_unregister - unregister all registered DPLL pins
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Enumerates all DPLL pins registered to given DPLL device and
-+ * unregisters them.
-+ */
-+static void
-+zl3073x_dpll_pins_unregister(struct zl3073x_dpll *zldpll)
-+{
-+	struct zl3073x_dpll_pin *pin, *next;
-+
-+	list_for_each_entry_safe(pin, next, &zldpll->pins, list) {
-+		zl3073x_dpll_pin_unregister(pin);
-+		list_del(&pin->list);
-+		zl3073x_dpll_pin_free(pin);
-+	}
-+}
-+
-+/**
-+ * zl3073x_dpll_pin_is_registrable - check if the pin is registrable
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ * @dir: pin direction
-+ * @index: pin index
-+ *
-+ * Checks if the given pin can be registered to given DPLL. For both
-+ * directions the pin can be registered if it is enabled. In case of
-+ * differential signal type only P-pin is reported as registrable.
-+ * And additionally for the output pin, the pin can be registered only
-+ * if it is connected to synthesizer that is driven by given DPLL.
-+ *
-+ * Return: true if the pin is registrable, false if not
-+ */
-+static bool
-+zl3073x_dpll_pin_is_registrable(struct zl3073x_dpll *zldpll,
-+				enum dpll_pin_direction dir, u8 index)
-+{
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	bool is_diff, is_enabled;
-+	const char *name;
-+
-+	if (dir == DPLL_PIN_DIRECTION_INPUT) {
-+		u8 ref = zl3073x_input_pin_ref_get(index);
-+
-+		name = "REF";
-+
-+		/* Skip the pin if the DPLL is running in NCO mode */
-+		if (zldpll->refsel_mode == ZL_DPLL_MODE_REFSEL_MODE_NCO)
-+			return false;
-+
-+		is_diff = zl3073x_ref_is_diff(zldev, ref);
-+		is_enabled = zl3073x_ref_is_enabled(zldev, ref);
-+	} else {
-+		/* Output P&N pair shares single HW output */
-+		u8 out = zl3073x_output_pin_out_get(index);
-+
-+		name = "OUT";
-+
-+		/* Skip the pin if it is connected to different DPLL channel */
-+		if (zl3073x_out_dpll_get(zldev, out) != zldpll->id) {
-+			dev_dbg(zldev->dev,
-+				"%s%u is driven by different DPLL\n", name,
-+				out);
-+
-+			return false;
-+		}
-+
-+		is_diff = zl3073x_out_is_diff(zldev, out);
-+		is_enabled = zl3073x_out_is_enabled(zldev, out);
-+	}
-+
-+	/* Skip N-pin if the corresponding input/output is differential */
-+	if (is_diff && zl3073x_is_n_pin(index)) {
-+		dev_dbg(zldev->dev, "%s%u is differential, skipping N-pin\n",
-+			name, index / 2);
-+
-+		return false;
-+	}
-+
-+	/* Skip the pin if it is disabled */
-+	if (!is_enabled) {
-+		dev_dbg(zldev->dev, "%s%u%c is disabled\n", name, index / 2,
-+			zl3073x_is_p_pin(index) ? 'P' : 'N');
-+
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+/**
-+ * zl3073x_dpll_pins_register - register all registerable DPLL pins
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Enumerates all possible input/output pins and registers all of them
-+ * that are registrable.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_pins_register(struct zl3073x_dpll *zldpll)
-+{
-+	struct zl3073x_dpll_pin *pin;
-+	enum dpll_pin_direction dir;
-+	u8 id, index;
-+	int rc;
-+
-+	/* Process input pins */
-+	for (index = 0; index < ZL3073X_NUM_PINS; index++) {
-+		/* First input pins and then output pins */
-+		if (index < ZL3073X_NUM_INPUT_PINS) {
-+			id = index;
-+			dir = DPLL_PIN_DIRECTION_INPUT;
-+		} else {
-+			id = index - ZL3073X_NUM_INPUT_PINS;
-+			dir = DPLL_PIN_DIRECTION_OUTPUT;
-+		}
-+
-+		/* Check if the pin registrable to this DPLL */
-+		if (!zl3073x_dpll_pin_is_registrable(zldpll, dir, id))
-+			continue;
-+
-+		pin = zl3073x_dpll_pin_alloc(zldpll, dir, id);
-+		if (IS_ERR(pin)) {
-+			rc = PTR_ERR(pin);
-+			goto error;
-+		}
-+
-+		rc = zl3073x_dpll_pin_register(pin, index);
-+		if (rc)
-+			goto error;
-+
-+		list_add(&pin->list, &zldpll->pins);
-+	}
-+
-+	return 0;
-+
-+error:
-+	zl3073x_dpll_pins_unregister(zldpll);
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_dpll_device_register - register DPLL device
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Registers given DPLL device into DPLL sub-system.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_device_register(struct zl3073x_dpll *zldpll)
-+{
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 dpll_mode_refsel;
-+	int rc;
-+
-+	/* Read DPLL mode and forcibly selected reference */
-+	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(zldpll->id),
-+			     &dpll_mode_refsel);
-+	if (rc)
-+		return rc;
-+
-+	/* Extract mode and selected input reference */
-+	zldpll->refsel_mode = FIELD_GET(ZL_DPLL_MODE_REFSEL_MODE,
-+					dpll_mode_refsel);
-+	zldpll->forced_ref = FIELD_GET(ZL_DPLL_MODE_REFSEL_REF,
-+				       dpll_mode_refsel);
-+
-+	zldpll->dpll_dev = dpll_device_get(zldev->clock_id, zldpll->id,
-+					   THIS_MODULE);
-+	if (IS_ERR(zldpll->dpll_dev)) {
-+		rc = PTR_ERR(zldpll->dpll_dev);
-+		zldpll->dpll_dev = NULL;
-+
-+		return rc;
-+	}
-+
-+	rc = dpll_device_register(zldpll->dpll_dev,
-+				  zl3073x_prop_dpll_type_get(zldev, zldpll->id),
-+				  &zl3073x_dpll_device_ops, zldpll);
-+	if (rc) {
-+		dpll_device_put(zldpll->dpll_dev);
-+		zldpll->dpll_dev = NULL;
-+	}
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_dpll_device_unregister - unregister DPLL device
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Unregisters given DPLL device from DPLL sub-system previously registered
-+ * by @zl3073x_dpll_device_register.
-+ */
-+static void
-+zl3073x_dpll_device_unregister(struct zl3073x_dpll *zldpll)
-+{
-+	WARN(!zldpll->dpll_dev, "DPLL device is not registered\n");
-+
-+	dpll_device_unregister(zldpll->dpll_dev, &zl3073x_dpll_device_ops,
-+			       zldpll);
-+	dpll_device_put(zldpll->dpll_dev);
-+	zldpll->dpll_dev = NULL;
-+}
-+
-+/**
-+ * zl3073x_dpll_changes_check - check for changes and send notifications
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Checks for changes on given DPLL device and its registered DPLL pins
-+ * and sends notifications about them.
-+ *
-+ * This function is periodically called from @zl3073x_dev_periodic_work.
-+ */
-+void
-+zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
-+{
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	enum dpll_lock_status lock_status;
-+	struct device *dev = zldev->dev;
-+	struct zl3073x_dpll_pin *pin;
-+	int rc;
-+
-+	/* Get current lock status for the DPLL */
-+	rc = zl3073x_dpll_lock_status_get(zldpll->dpll_dev, zldpll,
-+					  &lock_status, NULL, NULL);
-+	if (rc) {
-+		dev_err(dev, "Failed to get DPLL%u lock status: %pe\n",
-+			zldpll->id, ERR_PTR(rc));
-+		return;
-+	}
-+
-+	/* If lock status was changed then notify DPLL core */
-+	if (zldpll->lock_status != lock_status) {
-+		zldpll->lock_status = lock_status;
-+		dpll_device_change_ntf(zldpll->dpll_dev);
-+	}
-+
-+	/* Input pin monitoring does make sense only in automatic
-+	 * or forced reference modes.
-+	 */
-+	if (zldpll->refsel_mode != ZL_DPLL_MODE_REFSEL_MODE_AUTO &&
-+	    zldpll->refsel_mode != ZL_DPLL_MODE_REFSEL_MODE_REFLOCK)
-+		return;
-+
-+	list_for_each_entry(pin, &zldpll->pins, list) {
-+		enum dpll_pin_state state;
-+
-+		/* Output pins change checks are not necessary because output
-+		 * states are constant.
-+		 */
-+		if (!zl3073x_dpll_is_input_pin(pin))
-+			continue;
-+
-+		rc = zl3073x_dpll_ref_state_get(pin, &state);
-+		if (rc) {
-+			dev_err(dev,
-+				"Failed to get %s on DPLL%u state: %pe\n",
-+				pin->label, zldpll->id, ERR_PTR(rc));
-+			return;
-+		}
-+
-+		if (state != pin->pin_state) {
-+			dev_dbg(dev, "%s state changed: %u->%u\n", pin->label,
-+				pin->pin_state, state);
-+			pin->pin_state = state;
-+			dpll_pin_change_ntf(pin->dpll_pin);
-+		}
-+	}
-+}
-+
-+/**
-+ * zl3073x_dpll_init_fine_phase_adjust - do initial fine phase adjustments
-+ * @zldev: pointer to zl3073x device
-+ *
-+ * Performs initial fine phase adjustments needed per datasheet.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+int
-+zl3073x_dpll_init_fine_phase_adjust(struct zl3073x_dev *zldev)
-+{
-+	int rc;
-+
-+	rc = zl3073x_write_u8(zldev, ZL_REG_SYNTH_PHASE_SHIFT_MASK, 0x1f);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_write_u8(zldev, ZL_REG_SYNTH_PHASE_SHIFT_INTVL, 0x01);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_write_u16(zldev, ZL_REG_SYNTH_PHASE_SHIFT_DATA, 0xffff);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_write_u8(zldev, ZL_REG_SYNTH_PHASE_SHIFT_CTRL, 0x01);
-+	if (rc)
-+		return rc;
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_dpll_alloc - allocate DPLL device
-+ * @zldev: pointer to zl3073x device
-+ * @ch: DPLL channel number
-+ *
-+ * Allocates DPLL device structure for given DPLL channel.
-+ *
-+ * Return: pointer to DPLL device on success, error pointer on error
-+ */
-+struct zl3073x_dpll *
-+zl3073x_dpll_alloc(struct zl3073x_dev *zldev, u8 ch)
-+{
-+	struct zl3073x_dpll *zldpll;
-+
-+	zldpll = kzalloc(sizeof(*zldpll), GFP_KERNEL);
-+	if (!zldpll)
-+		return ERR_PTR(-ENOMEM);
-+
-+	zldpll->dev = zldev;
-+	zldpll->id = ch;
-+	INIT_LIST_HEAD(&zldpll->pins);
-+
-+	return zldpll;
-+}
-+
-+/**
-+ * zl3073x_dpll_free - free DPLL device
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Deallocates given DPLL device previously allocated by @zl3073x_dpll_alloc.
-+ */
-+void
-+zl3073x_dpll_free(struct zl3073x_dpll *zldpll)
-+{
-+	WARN(zldpll->dpll_dev, "DPLL device is still registered\n");
-+
-+	kfree(zldpll);
-+}
-+
-+/**
-+ * zl3073x_dpll_register - register DPLL device and all its pins
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Registers given DPLL device and all its pins into DPLL sub-system.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+int
-+zl3073x_dpll_register(struct zl3073x_dpll *zldpll)
-+{
-+	int rc;
-+
-+	rc = zl3073x_dpll_device_register(zldpll);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_dpll_pins_register(zldpll);
-+	if (rc) {
-+		zl3073x_dpll_device_unregister(zldpll);
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_dpll_unregister - unregister DPLL device and its pins
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Unregisters given DPLL device and all its pins from DPLL sub-system
-+ * previously registered by @zl3073x_dpll_register.
-+ */
-+void
-+zl3073x_dpll_unregister(struct zl3073x_dpll *zldpll)
-+{
-+	/* Unregister all pins and dpll */
-+	zl3073x_dpll_pins_unregister(zldpll);
-+	zl3073x_dpll_device_unregister(zldpll);
-+}
-diff --git a/drivers/dpll/zl3073x/dpll.h b/drivers/dpll/zl3073x/dpll.h
-new file mode 100644
-index 0000000000000..db7388cc377fd
---- /dev/null
-+++ b/drivers/dpll/zl3073x/dpll.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef _ZL3073X_DPLL_H
-+#define _ZL3073X_DPLL_H
-+
-+#include <linux/dpll.h>
-+#include <linux/list.h>
-+
-+#include "core.h"
-+
-+/**
-+ * struct zl3073x_dpll - ZL3073x DPLL sub-device structure
-+ * @list: this DPLL list entry
-+ * @dev: pointer to multi-function parent device
-+ * @id: DPLL index
-+ * @refsel_mode: reference selection mode
-+ * @forced_ref: selected reference in forced reference lock mode
-+ * @dpll_dev: pointer to registered DPLL device
-+ * @lock_status: last saved DPLL lock status
-+ * @pins: list of pins
-+ */
-+struct zl3073x_dpll {
-+	struct list_head		list;
-+	struct zl3073x_dev		*dev;
-+	u8				id;
-+	u8				refsel_mode;
-+	u8				forced_ref;
-+	struct dpll_device		*dpll_dev;
-+	enum dpll_lock_status		lock_status;
-+	struct list_head		pins;
-+};
-+
-+struct zl3073x_dpll *zl3073x_dpll_alloc(struct zl3073x_dev *zldev, u8 ch);
-+void zl3073x_dpll_free(struct zl3073x_dpll *zldpll);
-+
-+int zl3073x_dpll_register(struct zl3073x_dpll *zldpll);
-+void zl3073x_dpll_unregister(struct zl3073x_dpll *zldpll);
-+
-+int zl3073x_dpll_init_fine_phase_adjust(struct zl3073x_dev *zldev);
-+void zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll);
-+
-+#endif /* _ZL3073X_DPLL_H */
-diff --git a/drivers/dpll/zl3073x/regs.h b/drivers/dpll/zl3073x/regs.h
-index 753b42d8b2093..34e905053a1ef 100644
---- a/drivers/dpll/zl3073x/regs.h
-+++ b/drivers/dpll/zl3073x/regs.h
-@@ -72,6 +72,40 @@
- #define ZL_REG_FW_VER				ZL_REG(0, 0x05, 2)
- #define ZL_REG_CUSTOM_CONFIG_VER		ZL_REG(0, 0x07, 4)
- 
-+/*************************
-+ * Register Page 2, Status
-+ *************************/
-+
-+#define ZL_REG_REF_MON_STATUS(_idx)					\
-+	ZL_REG_IDX(_idx, 2, 0x02, 1, ZL3073X_NUM_REFS, 1)
-+#define ZL_REF_MON_STATUS_OK			0 /* all bits zeroed */
-+
-+#define ZL_REG_DPLL_MON_STATUS(_idx)					\
-+	ZL_REG_IDX(_idx, 2, 0x10, 1, ZL3073X_MAX_CHANNELS, 1)
-+#define ZL_DPLL_MON_STATUS_LOCK			BIT(0)
-+#define ZL_DPLL_MON_STATUS_HO			BIT(1)
-+#define ZL_DPLL_MON_STATUS_HO_READY		BIT(2)
-+
-+#define ZL_REG_DPLL_REFSEL_STATUS(_idx)					\
-+	ZL_REG_IDX(_idx, 2, 0x30, 1, ZL3073X_MAX_CHANNELS, 1)
-+#define ZL_DPLL_REFSEL_STATUS_REFSEL		GENMASK(3, 0)
-+#define ZL_DPLL_REFSEL_STATUS_STATE		GENMASK(6, 4)
-+#define ZL_DPLL_REFSEL_STATUS_STATE_LOCK	4
-+
-+/***********************
-+ * Register Page 5, DPLL
-+ ***********************/
-+
-+#define ZL_REG_DPLL_MODE_REFSEL(_idx)					\
-+	ZL_REG_IDX(_idx, 5, 0x04, 1, ZL3073X_MAX_CHANNELS, 4)
-+#define ZL_DPLL_MODE_REFSEL_MODE		GENMASK(2, 0)
-+#define ZL_DPLL_MODE_REFSEL_MODE_FREERUN	0
-+#define ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER	1
-+#define ZL_DPLL_MODE_REFSEL_MODE_REFLOCK	2
-+#define ZL_DPLL_MODE_REFSEL_MODE_AUTO		3
-+#define ZL_DPLL_MODE_REFSEL_MODE_NCO		4
-+#define ZL_DPLL_MODE_REFSEL_REF			GENMASK(7, 4)
-+
- /***********************************
-  * Register Page 9, Synth and Output
-  ***********************************/
-@@ -81,6 +115,11 @@
- #define ZL_SYNTH_CTRL_EN			BIT(0)
- #define ZL_SYNTH_CTRL_DPLL_SEL			GENMASK(6, 4)
- 
-+#define ZL_REG_SYNTH_PHASE_SHIFT_CTRL		ZL_REG(9, 0x1e, 1)
-+#define ZL_REG_SYNTH_PHASE_SHIFT_MASK		ZL_REG(9, 0x1f, 1)
-+#define ZL_REG_SYNTH_PHASE_SHIFT_INTVL		ZL_REG(9, 0x20, 1)
-+#define ZL_REG_SYNTH_PHASE_SHIFT_DATA		ZL_REG(9, 0x21, 2)
-+
- #define ZL_REG_OUTPUT_CTRL(_idx)					\
- 	ZL_REG_IDX(_idx, 9, 0x28, 1, ZL3073X_NUM_OUTS, 1)
- #define ZL_OUTPUT_CTRL_EN			BIT(0)
-@@ -100,6 +139,23 @@
- #define ZL_REF_CONFIG_ENABLE			BIT(0)
- #define ZL_REF_CONFIG_DIFF_EN			BIT(2)
- 
-+/********************************
-+ * Register Page 12, DPLL Mailbox
-+ ********************************/
-+
-+#define ZL_REG_DPLL_MB_MASK			ZL_REG(12, 0x02, 2)
-+
-+#define ZL_REG_DPLL_MB_SEM			ZL_REG(12, 0x04, 1)
-+#define ZL_DPLL_MB_SEM_WR			BIT(0)
-+#define ZL_DPLL_MB_SEM_RD			BIT(1)
-+
-+#define ZL_REG_DPLL_REF_PRIO(_idx)					\
-+	ZL_REG_IDX(_idx, 12, 0x52, 1, ZL3073X_NUM_REFS / 2, 1)
-+#define ZL_DPLL_REF_PRIO_REF_P			GENMASK(3, 0)
-+#define ZL_DPLL_REF_PRIO_REF_N			GENMASK(7, 4)
-+#define ZL_DPLL_REF_PRIO_MAX			14
-+#define ZL_DPLL_REF_PRIO_NONE			15
-+
- /*********************************
-  * Register Page 13, Synth Mailbox
-  *********************************/
--- 
-2.49.0
+	WHEN=after-fix
+	(while true; do date +%s.%N; ss -tenmoi; sleep 0.050; done) > /tmp/$WHEN-ss.txt &
+	nstat -n; (while true; do date +%s.%N; nstat; sleep 0.050; done)  > /tmp/$WHEN-nstat.txt &
+	tcpdump -i br0 -w /tmp/$WHEN-tcpdump.${eth}.pcap -n -s 116 -c 1000000 host 192.168.1.203 &
+	iperf3 -c 192.168.1.203
+	kill %1 %2 %3
 
+	[1] 2300
+	nstat: history is aged out, resetting
+	[2] 2304
+	[3] 2305
+	Connecting to host 192.168.1.203, port 5201
+	[  5] local 192.168.1.52 port 47730 connected to 192.168.1.203 port 5201
+	dropped privs to tcpdump
+	tcpdump: listening on br0, link-type EN10MB (Ethernet), snapshot length 116 bytes
+	[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+	[  5]   0.00-1.00   sec   115 MBytes   963 Mbits/sec   21    334 KBytes       
+	[  5]   1.00-2.00   sec   113 MBytes   949 Mbits/sec    3    325 KBytes       
+	[  5]   2.00-3.00   sec  41.8 MBytes   350 Mbits/sec  216   5.70 KBytes       
+	[  5]   3.00-4.00   sec   113 MBytes   952 Mbits/sec   77    234 KBytes       
+	[  5]   4.00-5.00   sec   110 MBytes   927 Mbits/sec    5    281 KBytes       
+	[  5]   5.00-6.00   sec  69.5 MBytes   583 Mbits/sec  129    336 KBytes       
+	[  5]   6.00-7.00   sec  66.8 MBytes   561 Mbits/sec  234    302 KBytes       
+	[  5]   7.00-8.00   sec   113 MBytes   949 Mbits/sec    8    312 KBytes       
+	[  5]   8.00-9.00   sec  89.9 MBytes   754 Mbits/sec   72    247 KBytes       
+	[  5]   9.00-10.00  sec   113 MBytes   949 Mbits/sec    6    235 KBytes       
+	- - - - - - - - - - - - - - - - - - - - - - - - -
+	[ ID] Interval           Transfer     Bitrate         Retr
+	[  5]   0.00-10.00  sec   946 MBytes   794 Mbits/sec  771               sender <<<
+	[  5]   0.00-10.04  sec   944 MBytes   789 Mbits/sec                  receiver <<<
+
+	iperf Done.
+	145337 packets captured
+	146674 packets received by filter
+	0 packets dropped by kernel
+	[1]   Terminated              ( while true; do
+	    date +%s.%N; ss -tenmoi; sleep 0.050;
+	done ) > /tmp/$WHEN-ss.txt
+	[root@hv2 ~]# 
+	[2]-  Terminated              ( while true; do
+	    date +%s.%N; nstat; sleep 0.050;
+	done ) > /tmp/$WHEN-nstat.txt
+	[3]+  Done                    tcpdump -i br0 -w /tmp/$WHEN-tcpdump.${eth}.pcap -n -s 116 -c 1000000 host 192.168.1.203
+
+## After Revert
+	WHEN=after-revert-6.6.93
+	(while true; do date +%s.%N; ss -tenmoi; sleep 0.050; done) > /tmp/$WHEN-ss.txt &
+	nstat -n; (while true; do date +%s.%N; nstat; sleep 0.050; done)  > /tmp/$WHEN-nstat.txt &
+	tcpdump -i br0 -w /tmp/$WHEN-tcpdump.${eth}.pcap -n -s 116 -c 1000000 host 192.168.1.203 &
+	iperf3 -c 192.168.1.203
+	kill %1 %2 %3
+	[1] 2088
+	nstat: history is aged out, resetting
+	[2] 2092
+	[3] 2093
+	Connecting to host 192.168.1.203, port 5201
+	dropped privs to tcpdump
+	tcpdump: listening on br0, link-type EN10MB (Ethernet), snapshot length 116 bytes
+	[  5] local 192.168.1.52 port 47256 connected to 192.168.1.203 port 5201
+	[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+	[  5]   0.00-1.00   sec   115 MBytes   962 Mbits/sec   13    324 KBytes       
+	[  5]   1.00-2.00   sec   114 MBytes   953 Mbits/sec    3    325 KBytes       
+	[  5]   2.00-3.00   sec   113 MBytes   947 Mbits/sec    4    321 KBytes       
+	[  5]   3.00-4.00   sec   113 MBytes   950 Mbits/sec    3    321 KBytes       
+	[  5]   4.00-5.00   sec   113 MBytes   946 Mbits/sec    5    322 KBytes       
+	[  5]   5.00-6.00   sec   113 MBytes   950 Mbits/sec    8    321 KBytes       
+	[  5]   6.00-7.00   sec   113 MBytes   948 Mbits/sec    5    312 KBytes       
+	[  5]   7.00-8.00   sec   113 MBytes   952 Mbits/sec    3    301 KBytes       
+	[  5]   8.00-9.00   sec   113 MBytes   945 Mbits/sec    7    301 KBytes       
+	[  5]   9.00-10.00  sec   114 MBytes   953 Mbits/sec    4    302 KBytes       
+	- - - - - - - - - - - - - - - - - - - - - - - - -
+	[ ID] Interval           Transfer     Bitrate         Retr
+	[  5]   0.00-10.00  sec  1.11 GBytes   950 Mbits/sec   55             sender
+	[  5]   0.00-10.04  sec  1.10 GBytes   945 Mbits/sec                  receiver
+
+	iperf Done.
+	[root@hv2 ~]# 189249 packets captured
+	189450 packets received by filter
+	0 packets dropped by kernel
+
+
+--
+Eric Wheeler
+--8323328-1713979476-1750104860=:30465--
 
