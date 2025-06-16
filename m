@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-197989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06953ADAC67
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:52:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E3BADAC73
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12DB73AD8D5
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B4E3A6580
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B40226E153;
-	Mon, 16 Jun 2025 09:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA7D26E718;
+	Mon, 16 Jun 2025 09:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mfoqK15q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="q9pH0txw"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B691FDA
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB85272E48
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750067567; cv=none; b=Y9Mfux7e9QcUkVTwh/LUg2UA34K0lojaAesO6TA27dZA25PSNRW0LNC2+fKpFsIQUdDeLgf83+4sCxutT1GqHUIpcRZ0EXBrcug0bh2/TbbFZ/cTn8XnKBkkTk7oblu0+Bx0uA2ONGUOOJUXZgh8EFBfsptbmafYgCGQspOKz18=
+	t=1750067646; cv=none; b=ExEoKGfKi2+sU1YdvgO5O68estZBu+CJvjBnWLufF86HfLJXA/UY32mZ9lxZdHunv6it5Toz5kWw/8cNFsEaIHX8+Y7oUAKVZ3LZ0pROIjtHf1lJyBQZRucg2tmF18s6QZPHMav5IrIlYdKl4B9EWnKI5V4f9KP9IO/bs7NVUaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750067567; c=relaxed/simple;
-	bh=eyCCFeXpNJkuoRvNuLvZERCSSHr9nR4B6i/r7pyX3l0=;
+	s=arc-20240116; t=1750067646; c=relaxed/simple;
+	bh=UcboFpRIDvTgyY8F8gep893lL/RoFNU4Lr4lwCqgTog=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eNzzOyVV240UN3nEpUtUe2DKqf9ZpORsfHf0J8rSmHfwW+TsWQOoBlzfMZ3ikTWs+d3/aOV1GitNWR/6eVXN9mkGI4o9AKfDtchfa6euFhoKO+1abqAvHC6bTnwnBUr985kfzo1rteL7lpVkUFq+TXMZjz1KY1oGaSsiYgxANgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mfoqK15q; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgRIl+ZYCZyXv5hGGmSW7WFsrusQVFvisC/6iTt3/5RSXQ+LbqkuKDYV+wDPwr4Cxji7QHYtvMPX1jI9eArMZxyDjD48daWNVlks4p/ezQixJzz/ZYt+sjJG1V+HS3hlAoIwSpTDdSBthMpzYWu96s5DrI+q/6prKNhaJp7BZU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=q9pH0txw; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,23 +37,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ESHTWsIsHIJfmh6ItbhYiVPgnEK6vFeZu09cq2P1rsw=; b=mfoqK15q5qSByZkB3fuPUOmzry
-	7i+NX4jPxVJHjLAYzIiNZXfjBppK3qAL5o5+pe3EDD4S4lfRZYOg5toyZzF/6KEazyx87ux35FGU2
-	8gsBDQq7qhYdfbJEV3NGzmeU0YIa2RGub30pfRqnUl3m26fuUDvc4ZrFbcZtmuEWNlzx1SjyZVm0o
-	YRzqK4qnUrH321IzGGGb8mruU0lubudu2ZaTBYBlTlyKIDGQ7Fo61bFp3YhMAc1W8U9IG5v+zBWmw
-	zVny402muAPNoh24x0QMSwW2XOip2n2psvbvxlZ+dDD509r/g6ae+WgFFJ5y3AEH4ICs9OIz17m27
-	oSic+3+w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42394)
+	bh=PQLRJj21WoHRMNwesijYpTUp8BJF+HSJRoZj1m2T2Jg=; b=q9pH0txwZu3dz/3Kzfbar0l8rn
+	SR+N45aZz2LKf6pJ3sacGHGz5vU9vBhfAVC3Iupi8KwYwvpLFqEY/5jNV3PCbzNinu5WVf2WiG8Lx
+	56NriIHWHJrDTo9Ie6LG4VmO3IUnLY5thSDX0ATaJ0o+EFNKakBN07xwv6pKyk2UofqrBMyC0ruuI
+	JAbero2oDUmAuc0SnEbrsUQHGu/QaiEME23yORvptamGjQLghH3+fTJA+66k6asPbS7YQjOOGT2rS
+	vK6cXOBrUhbtwhMwOZKbZ3o8gvzpOAqS+G3VmooJrykCDYCOazebT4m8tUIDLlU34ul6ck+b0W2Gp
+	SDxj7M0A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37464)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1uR6W8-0003Xa-1T;
-	Mon, 16 Jun 2025 10:52:40 +0100
+	id 1uR6XO-0003Xp-2r;
+	Mon, 16 Jun 2025 10:53:58 +0100
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uR6W7-0004iU-1B;
-	Mon, 16 Jun 2025 10:52:39 +0100
-Date: Mon, 16 Jun 2025 10:52:39 +0100
+	id 1uR6XN-0004ic-1m;
+	Mon, 16 Jun 2025 10:53:57 +0100
+Date: Mon, 16 Jun 2025 10:53:57 +0100
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
@@ -61,11 +61,10 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
 	David Miller <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/3] net: phy: add flag is_genphy_driven to
- struct phy_device
-Message-ID: <aE_pZxQX0mtBJxzQ@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 2/3] net: phy: improve phy_driver_is_genphy
+Message-ID: <aE_ptXbQQTuuYKv2@shell.armlinux.org.uk>
 References: <5778e86e-dd54-4388-b824-6132729ad481@gmail.com>
- <3f3ad6dc-402e-4915-8d5a-2306b6d5562b@gmail.com>
+ <c9ac3a7d-262a-425d-9153-97fe3ca6280a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,13 +73,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3f3ad6dc-402e-4915-8d5a-2306b6d5562b@gmail.com>
+In-Reply-To: <c9ac3a7d-262a-425d-9153-97fe3ca6280a@gmail.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Jun 14, 2025 at 10:30:43PM +0200, Heiner Kallweit wrote:
-> In order to get rid of phy_driver_is_genphy() and
-> phy_driver_is_genphy_10g(), as first step add and use a flag
-> phydev->is_genphy_driven.
+On Sat, Jun 14, 2025 at 10:31:57PM +0200, Heiner Kallweit wrote:
+> Use new flag phydev->is_genphy_driven to simplify this function.
+> Note that this includes a minor functional change:
+> Now this function returns true if ANY of the genphy drivers
+> is bound to the PHY device.
+> 
+> We have only one user in DSA driver mt7530, and there the
+> functional change doesn't matter.
 > 
 > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
