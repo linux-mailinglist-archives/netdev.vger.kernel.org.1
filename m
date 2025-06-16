@@ -1,112 +1,104 @@
-Return-Path: <netdev+bounces-197979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C195CADAC16
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:38:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A229ADAC1C
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:38:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B21E17151E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:38:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A86D1891DE5
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:39:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAF5273D7E;
-	Mon, 16 Jun 2025 09:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1DF27056D;
+	Mon, 16 Jun 2025 09:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="OEyRP9xW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="v6n1I2wC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-18.smtpout.orange.fr [193.252.22.18])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCAC272E6D;
-	Mon, 16 Jun 2025 09:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8622D1DB92A
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750066697; cv=none; b=qdr4sJP+gETMoTRCW7T5n8f5aYylNeqT2uTAIBWVeUnwVUmRUooN/Vw2pGlO+2skWtcdi8hfhgekvNSQNIqVQ1gCclbwxWxBqtbObUAQgbfx0AlwLn+/FERXbC+An8BNH5nlILY0PyEKueVUpH44sa1Z6w0q211550Y6JOUDPTw=
+	t=1750066720; cv=none; b=t2wxRzoJbvSWG+3InRqZRhvXz66Emo9alN8tfYUGjzS35dg883SOGjJUmxOkoUv2YJzHXSZn/reL9MgUOMLeHjDdObZkH1V0cYWWQHjcV40d3i30QoMEjcOiX42qnsvNk4j/aT25oUO8BauIMpt44VS1BibZlst8u+0VOyX3YA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750066697; c=relaxed/simple;
-	bh=eFWpLJrvSktG6hsikqM/vAYb5SGJiAG2EBNlsdvsk8c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BalvZG5STdPG7O5ZIegrv11Il2UVMiPmFsDXa7HBvLLdLF7GYygPsrQKwxJY/urUIIItVrkhhP16fIYJOTSouS9Di+w9tVUXw9s6Hx2oQv/al82GlJ0NJqjLO8T2vD30gmywoFeMYqmRlrXmhb1RjMGSzSWPSwlTQFK3TpaO4fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=OEyRP9xW; arc=none smtp.client-ip=193.252.22.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id R6GpufzEh5CROR6GquoLPE; Mon, 16 Jun 2025 11:37:02 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1750066622;
-	bh=H3wLlyw8govUof7jzDiaEVO+xcofIEdKMOe3pzartzs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=OEyRP9xW44ewXUweqboT5llf1e4621CPOiXfomOMnuGe8fCHddB6LBFiu0TwHmzM8
-	 UyaZ98d7nUFc0r4kYXFoXtVhIrtlUKhu6bLcLYankmzdni5YPm0/2BFsCac+G63mpC
-	 9CuKPxZmibBTRc2xNF8C8DMSTxr2C68HL3zGXVXEIGodQQJ+FnPGx+n6uZk7YGF3s7
-	 kppAgo078Os2kmioe2fqN1jPOl75ZwDfY0rx6+n36e6m1K1i0TCDtYQzu4zlSQWysy
-	 Nf80YeuBgis4QeSasjiSFXk+oIl7siJqJxsD+T7+yvrm5FxlQEWtFxFF3ARhNlClp3
-	 krHPbjPpzjBMA==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 16 Jun 2025 11:37:02 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <1716571a-664b-4b14-b94c-f76303766ec0@wanadoo.fr>
-Date: Mon, 16 Jun 2025 18:36:51 +0900
+	s=arc-20240116; t=1750066720; c=relaxed/simple;
+	bh=aPpR4JxWD7Qv1AsVPXBKR+ELanX70Syb89jNQzb+4gE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HOhKzBrtkK6mrBm+Lulr4SfvQ89uBgPJ/lTLlzQQxUqyIlKjRzTvbCaYEo+P1enNp21LcbW6C04zoKYvpUgk6aU1xVeWlhm7rugU2YfMEOhRkLFWgl3bjPcZUnPHezeHYBbbWHBxSTFbJPSmu7gLH8c//RSIFBfPD9CSOwUjhII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=v6n1I2wC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ymazMNkqSjKHhIcuupucvEPaklDWpQFzUKopMt7Nkek=; b=v6n1I2wCFp4HbcFIdXNWh4VXnU
+	COxNbX0BAxKbmmikc1p5BVe9RUh3bPzpO/3U7GCMtmm4Ekhc1GYgdKd6xHMPEo0ot0MTJZv0Y+dXp
+	4xZzbYE4Zd6C0+M+bBUbJZK0+YXLAxaWWRYj9xWFptLe53LsDdXTBu82lHn9MWQoU8BiTk3qdy3a+
+	64Q1m4LtOsL/+uVb4CYnXZ3OREqIH+j64J36jnfv5HMrC7jAlYHsKyrg4WXpcZqje6Kv5+38nyu7H
+	btGNWOzJWXqKLTwx4HOT8GA8gfuLrPOPHKYpxKXuppZzU+yA0JPQiKdTD0ZF33SPub05sSsrLb7+1
+	9osRVVGA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37044)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uR6IS-0003W9-0d;
+	Mon, 16 Jun 2025 10:38:32 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uR6IP-0004hM-1k;
+	Mon, 16 Jun 2025 10:38:29 +0100
+Date: Mon, 16 Jun 2025 10:38:29 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chris Morgan <macroalpha82@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Chris Morgan <macromorgan@hotmail.com>
+Subject: Re: [PATCH v3] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
+Message-ID: <aE_mFWgIuuIn06E3@shell.armlinux.org.uk>
+References: <20250613171002.50749-1-macroalpha82@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] net: can: mcp251x: use new GPIO line value setter
- callbacks
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-can@vger.kernel.org,
- linux-arm-msm@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- "Chester A. Unal" <chester.a.unal@arinc9.com>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-References: <20250616-gpiochip-set-rv-net-v2-0-cae0b182a552@linaro.org>
- <20250616-gpiochip-set-rv-net-v2-4-cae0b182a552@linaro.org>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20250616-gpiochip-set-rv-net-v2-4-cae0b182a552@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250613171002.50749-1-macroalpha82@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 16/06/2025 at 16:24, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> struct gpio_chip now has callbacks for setting line values that return
-> an integer, allowing to indicate failures. Convert the driver to using
-> them.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Fri, Jun 13, 2025 at 12:10:02PM -0500, Chris Morgan wrote:
+> @@ -409,7 +414,19 @@ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+>  	 * these are possibly used for other purposes on this
+>  	 * module, e.g. a serial port.
+>  	 */
+> -	sfp->state_hw_mask &= ~(SFP_F_TX_FAULT | SFP_F_LOS);
+> +	sfp_fixup_ignore_hw(sfp, (SFP_F_TX_FAULT | SFP_F_LOS));
+> +}
+> +
+> +static void sfp_fixup_potron(struct sfp *sfp)
+> +{
+> +	/*
+> +	 * The TX_FAULT and LOS pins on this device are used for serial
+> +	 * communication, so ignore them. Additionally, provide extra
+> +	 * time for this device to fully start up.
+> +	 */
+> +
+> +	sfp_fixup_long_startup(sfp);
+> +	sfp_fixup_ignore_hw(sfp, (SFP_F_TX_FAULT | SFP_F_LOS));
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+There's no need for parens around the second argument to
+sfp_fixup_ignore_hw() - the bitwise OR is unambiguous.
 
+Apart from that, the patch looks fine, thanks.
 
-Yours sincerely,
-Vincent Mailhol
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
