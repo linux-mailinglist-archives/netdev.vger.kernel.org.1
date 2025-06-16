@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-198329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 077BCADBDB1
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EDE4ADBDB4
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 209761892C22
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:35:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC9DA189309D
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E1E23498E;
-	Mon, 16 Jun 2025 23:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51EA23507F;
+	Mon, 16 Jun 2025 23:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bd7irCiz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8Ls6I10"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C7B230D35
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B0B233715
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750116884; cv=none; b=LWCSfXnDoDD4H2CvrG4vWc5yqNc09HWJEj31fWSXVimN35F0I/y8yXqomuc82FamNza0JOnr88gv/lc/xAoCXugx2580SFhNBZHY9vXzro/GejMo4rrqkzmL0bFotVkXDIdu+pUXKc8A8780P4gQ81jv0yV+zV7UJFdIZ5nHcQs=
+	t=1750116885; cv=none; b=W1oyfA/R729TGt1Wntv9si1GFKgYkwMep10P5DNpjnxwqQsRtgu8UhapC1NZ9z27R8CSI4Kf6Btokl6rev6VFu/aomo/HW9YD8NP512+sPMfO1TAY+i8WzEQG2ZHdeBahuN2yWV9+Z8uuAs/T3O1ak3XE4RWgivRexYbTJWekVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750116884; c=relaxed/simple;
-	bh=pdn7S/dQnqU2T11puBoCWwmMdGFX86ByMYdZIFSi8wk=;
+	s=arc-20240116; t=1750116885; c=relaxed/simple;
+	bh=6OLQeX+FE/26mPd1rIZ/R9GvzW/GSrssHvxZcMF1NnM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TbJVDEMcr1vc+WuYRQY41TKN0ggw7bp2cr0M1ft3amTuNtysqfNg0sXttWl+YDeyj8kz3T+eO52e62CAKMvdPyMGTKbTuP2W4efGmXt75+X/Jrt/PHQyuV6NtN+q6hJLAzEhTJgyihqchmFPOCupIUbaafmCvLEeRRYI1GJ8cZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bd7irCiz; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=mow0z7tIh221SABlBmqyK3tjy/oZfd3vA/FbE2SXD1kRuWigjJuJSddp7DF2J7CECqC8OX44wuGF8dhzxiEF1+m5BEONG8bRiUPZfMhp1kY1ywzHTpG9mG4U2083/OuobmDXCPTvRLIwM9vu+QQPLN4qoKYPmbnhbiGYMBEaaPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8Ls6I10; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2366e5e4dbaso19788685ad.1
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:34:42 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-234bfe37cccso64906805ad.0
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750116882; x=1750721682; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750116883; x=1750721683; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v98T4Qjhj3E25B9suhHhfSaudyzIuav/yv4R0A+07T8=;
-        b=bd7irCizfKLNuzSfcxCtdXGOYXh4PiSfZlqkjd0tgFlxatlKNpyVNy1TZ8KVyX/Blp
-         m3IJPOJGuKn3YoDOXegQaxbxqERWzNys6GddWm4KcfEVJ/XlyvXUj9idGQS/rrDC4/kl
-         zxK9I/WAO0cKbdqKO0BNGs9I0e+lVwRWOMHXKLZXA3DSf+WlqhIQ0klADh1aBlB0d+hp
-         WskSptSDR4ThBJ56imK8mWc5mZ+bviTPmecWY3DfhmedGl/t5yh1aL2pHnHxTm4mc/8o
-         0ytnmpg65BmAyobOvdsPp/HELAnvmclnskto7Xu3mmNuviNy+Zp0Bto2yeJLPZONKsyJ
-         yE+w==
+        bh=LnnIhAjJ2qDK7AN+bhZIsThcGT7sHOhZYAEsTvhgAqs=;
+        b=Q8Ls6I104dxeOaRSzTm04ZgN3P9u8JDNlqNIl8S05/qHphLh0QBtXiT+qV786pFgun
+         VLjPrV+0o0EbU7c5gOv3vvdbkJuHJrLYSLyGZaIsDjJP7kfSqhAHQrYww8wMPWwLF9lZ
+         LIFhFN6kkz0UqR8BXVKewVBKt2n0E5spuvPjvTxd13bB/oNeDE6oKNmKzEtOi3pZ1hbj
+         1aD7N4llA7QlakMT1ZRcqZo1PSp9MojEpXK7hYcyQRyEMXJ21uj70Da7Cuq9tlgU9eGU
+         9khDj8+BcltsKro42hfj/9JmQWu8hjxOMh9KNc0oJzHmGX7nWSZuLRtgG1LhLPN40gb1
+         6ASg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750116882; x=1750721682;
+        d=1e100.net; s=20230601; t=1750116883; x=1750721683;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v98T4Qjhj3E25B9suhHhfSaudyzIuav/yv4R0A+07T8=;
-        b=GOEvMn7zDehonvdz87ZWoruhQU7u8QzR/lE6SUJ0/FmLL7uI2Z1RdY3K4uYBaNBNiu
-         LKWfWXcnIpZyL5VoJ7bZBMYVPv7w01TtNmplz3a714JLZ2wRx1syMfP65Qkn0spa4iow
-         Y0c4/k35ABX3AGRFbSNFPskeqFFtn66pQydPA0fhF+FEBC7Zf1QuebWJQQlnVHls+sFn
-         DkKyxCNXqpL0+A12h4Dw79jJg1VHXiq7ZX0dKbm+g5Xhoc75j+/DTnALKhPHbf0vsrwr
-         ZXwmfRebKHBV/erILFOsoti/kciYRj72vZFwtdANPaaOKeQikpD7prBFOGmClPsa63qj
-         wBhw==
-X-Forwarded-Encrypted: i=1; AJvYcCUF9dj/8qvhdMzbdSLxRVWqA5wqJ6L8ZZt92v2lV6Wquzfp3ijUgID+ggaZD6KZQKsxVo10INA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ2NgKLCl+6QgAmyd4FKhUq5aDbFUxSUH0H+83Y42t3TspHoQ4
-	DZjnou7A7a1fNz9lomVPJnfl+Krh/WQPuHchi1UQSK4iwmYbVUL3fxw=
-X-Gm-Gg: ASbGncvGcWz23r9E3SeGs7H2BVHC7X6wjKbyM8TjKI/SkXv5btlKUUXOFvBtrMxODsI
-	cay9kA7CY+PDejCbjsIKJbs2NamBx8MrtgaZJ7Tz3Mmre5EfuP/Xcp1LVcpM1R3hdfIA92OEsvJ
-	6PsqidcRAFWF7NnFOv06PgC9cGPH5W7NgAldQg6FiktJgsLJBfwHjzWgM+x58zTLbE1xKNxYmtB
-	K1yu6hB2yUBMyRiksp6KiPXWPk60Ap5tTNwNLe190vPnoi6liBRwxrhFrF7jeBanQOWMtjq+MFq
-	BW8ZhXjPaWKEY/MKZaOG+MzeSc3ZGUNZESRw6Mq4ayZgp9WYkw==
-X-Google-Smtp-Source: AGHT+IHP8HGzX82aQNFbEGq/ZGoxKkikSjUOyU0j6V9fv3sCk+2En/aYkYH+zwW7IdPpBpoYNvsLJg==
-X-Received: by 2002:a17:903:2ac7:b0:235:278c:7d06 with SMTP id d9443c01a7336-2366ae00e80mr184243835ad.8.1750116881952;
-        Mon, 16 Jun 2025 16:34:41 -0700 (PDT)
+        bh=LnnIhAjJ2qDK7AN+bhZIsThcGT7sHOhZYAEsTvhgAqs=;
+        b=gDj/2MH1+WydorJilPcn4Ns7GmisxgaPnbGUt75rMxANi6s0MpO+hoxKR5zSnuKnPF
+         NWXmuxf6Tl0eLb9h9l5wuzWzjN/8HiokmiUkqQsQEfcilQ+5UXrOamdjkfRZ3MOmJQ/G
+         PBDqjyK8GE3ZHYt/yDphhiJX0RcOyBVeZTp/0JbKceqIW2BxcbOaPXDaIKhvmCmlr3jz
+         nYGRnoUEhIftoP1JpZHr6iAoRoaU00AHNlxVl73umNsHhVkVAVCrMZUbfuDk9UVGrrKf
+         rxEn53lb8e8sfHCLZd9rD+U8nzxX7kETlahOzE+r/Aqv/TIj7aosfQR3wTD4P2ExK9I/
+         crQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMzvrql6Lj6bS/jLXPhQZ4xngw5w6TOhpkhgXdXz/mxr+icnzIskGO37Mpys5W0Sy90PQ4Pec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEIuDfjClFLK6vSwff/dW1EW+EYTxeN0KdWYzv86q0GOrwX09z
+	1WnOFICNoQfjpR1YgkskF5ttwO1ErTVT8U9zfoBO1qm6jTExoY7HHc0=
+X-Gm-Gg: ASbGncuudc9HMAs14mx6o2RmIwLh6KuPcjdOpCfGrZ4ZdDoRUU6GbIpi74gtv8acKil
+	d74uZuzavftirtp1Ay2ftb7l8QVQ+SKfZ+AVTxCSbbTAO23Ulkc+MQG9sd3+wKRJoUo+07eszVM
+	lRITCqbaWFyIME71CZh4mzDeOFSCh2UGW95TrbDLYz5aceSHzdfSXNtX3VtgwLSRq8yy3wndATa
+	1zIP84pL8wPaYoSEsc7pd5DKsQ5uKCDw/Wx6Jg8rCYnRkH8LM34kl6t8o6GNiEZMlVDE+62v428
+	kVx/X8OmT1wf5pmC1SPUp8tNDBvuvXnUExZT6Vc=
+X-Google-Smtp-Source: AGHT+IEdZ0CP7FaoDFTe45NKaivJEbRgVjKtP5PMyXK8f5h6RN5A3iTIqsvvHswORyvz2So15BH1Rw==
+X-Received: by 2002:a17:903:19cc:b0:234:ef42:5d75 with SMTP id d9443c01a7336-2366b00ee6bmr148410275ad.20.1750116883354;
+        Mon, 16 Jun 2025 16:34:43 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de89393sm67220485ad.114.2025.06.16.16.34.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de89393sm67220485ad.114.2025.06.16.16.34.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 16:34:41 -0700 (PDT)
+        Mon, 16 Jun 2025 16:34:42 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -82,9 +82,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v1 net-next 03/15] ipv6: mcast: Check inet6_dev->dead under idev->mc_lock in __ipv6_dev_mc_inc().
-Date: Mon, 16 Jun 2025 16:28:32 -0700
-Message-ID: <20250616233417.1153427-4-kuni1840@gmail.com>
+Subject: [PATCH v1 net-next 04/15] ipv6: mcast: Remove mca_get().
+Date: Mon, 16 Jun 2025 16:28:33 -0700
+Message-ID: <20250616233417.1153427-5-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250616233417.1153427-1-kuni1840@gmail.com>
 References: <20250616233417.1153427-1-kuni1840@gmail.com>
@@ -98,107 +98,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Kuniyuki Iwashima <kuniyu@google.com>
 
-Since commit 63ed8de4be81 ("mld: add mc_lock for protecting
-per-interface mld data"), every multicast resource is protected
-by inet6_dev->mc_lock.
+Since commit 63ed8de4be81 ("mld: add mc_lock for protecting per-interface
+mld data"), the newly allocated struct ifmcaddr6 cannot be removed until
+inet6_dev->mc_lock is released, so mca_get() and mc_put() are unnecessary.
 
-RTNL is unnecessary in terms of protection but still needed for
-synchronisation between addrconf_ifdown() and __ipv6_dev_mc_inc().
+Let's remove the extra refcounting.
 
-Once we removed RTNL, there would be a race below, where we could
-add a multicast address to a dead inet6_dev.
-
-  CPU1                            CPU2
-  ====                            ====
-  addrconf_ifdown()               __ipv6_dev_mc_inc()
-                                    if (idev->dead) <-- false
-    dead = true                       return -ENODEV;
-    ipv6_mc_destroy_dev() / ipv6_mc_down()
-      mutex_lock(&idev->mc_lock)
-      ...
-      mutex_unlock(&idev->mc_lock)
-                                    mutex_lock(&idev->mc_lock)
-                                    ...
-                                    mutex_unlock(&idev->mc_lock)
-
-The race window can be easily closed by checking inet6_dev->dead
-under inet6_dev->mc_lock in __ipv6_dev_mc_inc() as addrconf_ifdown()
-will acquire it after marking inet6_dev dead.
-
-Let's check inet6_dev->dead under mc_lock in __ipv6_dev_mc_inc().
-
-Note that now __ipv6_dev_mc_inc() no longer depends on RTNL and
-we can remove ASSERT_RTNL() there and the RTNL comment above
-addrconf_join_solict().
+Note that mca_get() was only used in __ipv6_dev_mc_inc().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv6/addrconf.c |  7 +++----
- net/ipv6/mcast.c    | 11 +++++------
- 2 files changed, 8 insertions(+), 10 deletions(-)
+ net/ipv6/mcast.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ba2ec7c870cc..e4c48638211b 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2229,13 +2229,12 @@ void addrconf_dad_failure(struct sk_buff *skb, struct inet6_ifaddr *ifp)
- 	in6_ifa_put(ifp);
- }
- 
--/* Join to solicited addr multicast group.
-- * caller must hold RTNL */
-+/* Join to solicited addr multicast group. */
- void addrconf_join_solict(struct net_device *dev, const struct in6_addr *addr)
- {
- 	struct in6_addr maddr;
- 
--	if (dev->flags&(IFF_LOOPBACK|IFF_NOARP))
-+	if (READ_ONCE(dev->flags) & (IFF_LOOPBACK | IFF_NOARP))
- 		return;
- 
- 	addrconf_addr_solict_mult(addr, &maddr);
-@@ -3865,7 +3864,7 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
- 	 *	   Do not dev_put!
- 	 */
- 	if (unregister) {
--		idev->dead = 1;
-+		WRITE_ONCE(idev->dead, 1);
- 
- 		/* protected by rtnl_lock */
- 		RCU_INIT_POINTER(dev->ip6_ptr, NULL);
 diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 5cd94effbc92..15a37352124d 100644
+index 15a37352124d..aa1280df4c1f 100644
 --- a/net/ipv6/mcast.c
 +++ b/net/ipv6/mcast.c
-@@ -952,23 +952,22 @@ static void inet6_ifmcaddr_notify(struct net_device *dev,
- static int __ipv6_dev_mc_inc(struct net_device *dev,
- 			     const struct in6_addr *addr, unsigned int mode)
+@@ -867,11 +867,6 @@ static void mld_clear_report(struct inet6_dev *idev)
+ 	spin_unlock_bh(&idev->mc_report_lock);
+ }
+ 
+-static void mca_get(struct ifmcaddr6 *mc)
+-{
+-	refcount_inc(&mc->mca_refcnt);
+-}
+-
+ static void ma_put(struct ifmcaddr6 *mc)
  {
--	struct ifmcaddr6 *mc;
- 	struct inet6_dev *idev;
--
--	ASSERT_RTNL();
-+	struct ifmcaddr6 *mc;
+ 	if (refcount_dec_and_test(&mc->mca_refcnt)) {
+@@ -988,13 +983,11 @@ static int __ipv6_dev_mc_inc(struct net_device *dev,
+ 	rcu_assign_pointer(mc->next, idev->mc_list);
+ 	rcu_assign_pointer(idev->mc_list, mc);
  
- 	/* we need to take a reference on idev */
- 	idev = in6_dev_get(dev);
+-	mca_get(mc);
 -
- 	if (!idev)
- 		return -EINVAL;
- 
--	if (idev->dead) {
-+	mutex_lock(&idev->mc_lock);
+ 	mld_del_delrec(idev, mc);
+ 	igmp6_group_added(mc);
+ 	inet6_ifmcaddr_notify(dev, mc, RTM_NEWMULTICAST);
+ 	mutex_unlock(&idev->mc_lock);
+-	ma_put(mc);
 +
-+	if (READ_ONCE(idev->dead)) {
-+		mutex_unlock(&idev->mc_lock);
- 		in6_dev_put(idev);
- 		return -ENODEV;
- 	}
+ 	return 0;
+ }
  
--	mutex_lock(&idev->mc_lock);
- 	for_each_mc_mclock(idev, mc) {
- 		if (ipv6_addr_equal(&mc->mca_addr, addr)) {
- 			mc->mca_users++;
 -- 
 2.49.0
 
