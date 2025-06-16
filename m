@@ -1,153 +1,220 @@
-Return-Path: <netdev+bounces-198139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525A3ADB5E4
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:52:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEB74ADB5F4
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:54:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06C5117427D
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:52:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88B277A4D29
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65233265286;
-	Mon, 16 Jun 2025 15:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39ADA283121;
+	Mon, 16 Jun 2025 15:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dTUPR73E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRw0JrJ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F8C263C9B;
-	Mon, 16 Jun 2025 15:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB98278E79;
+	Mon, 16 Jun 2025 15:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750089115; cv=none; b=ge9zHnHjRXzsrpHAJ0SKikvpCelqQqrqICnORy7G2OjqAfBWBrPnMMb4YJrtsPVeTA4wXp862ZL0xL9DxLSnofEe/yLTNC7EXA7m2f93KYlwyotxezROOr/WyW6vTAJxVX6K7b0AiMkasrCxKetl8C82XqUgCOCLYryyLX1LWM8=
+	t=1750089274; cv=none; b=WcYDc4l7oTQuu49qk7caVWpfeSvagy3h0ZSrjx+dBVWv4ey0ztIr+Al/gUy5wXG4Z3ZrhFZ1Khb6egzbXl7ii9PKtMScjHSQ3260QT8IzJjOOBaplxTWEwVlBtMEAePgRkfZ4S44dvFYRsGlNK8i3EIZFCZDXzFvwYpFOcZW464=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750089115; c=relaxed/simple;
-	bh=YseFtmXDi554Cdo4z4Avx8hpjypNZzIQz2GGROAIBGU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dM+4qW4gqaw4GPVc6nQ/1+dZuYWz59i/5GtmZbWElm4colwklFsoD/p6G5YG7MTc/DLcdJQLbBrtE0LV/a/yn3jxq7Sqi9di2JpF9HfOzmEo2VrJhmgB5m8d+tQbLhACQn45pXX4OMEF168ewaQB57XvrN4b4Pe67boJJ7cwEEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dTUPR73E; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55GCMGum028058;
-	Mon, 16 Jun 2025 15:51:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=ZXAqwNs+BmvglevjdpdzR5FyKl5vU3
-	UcJ4tKtauv7+Q=; b=dTUPR73EZstATk5Xe8x5JyOiaRDnUUwd1TmddGhB8x4OfL
-	yEwE0RNXvWq07vm/ZfgR1gwvNBLsd5X2o565ym48KOz5XiZmludx3pC9xQWzzv5k
-	yZKblAiuITH/m12bsz9bhwXuBf3SjlLuWwQLdJtJ/Sh81seFp0vEDXZuLi/lsY+f
-	XcxMK2gDrhsoYPlUUhtFsHlFPjIQqY7TOTFB1zkylwFhd6REs1uj8uPW18SR8aPk
-	5zhCvY0kDevN4G7eZdKvMkeYK+oo5A86t8nUwK14hVw9dxwdymqRDPnKI1xkBuC9
-	FNF17lvZPo3OEcf9x0vL0o8eio8UuO14zHPoky2Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r1thc5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 15:51:43 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55GFkXBu006511;
-	Mon, 16 Jun 2025 15:51:42 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r1thc4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 15:51:42 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55GDgiSw025751;
-	Mon, 16 Jun 2025 15:51:42 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 479xy5mxtm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 15:51:42 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55GFpftI13959696
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Jun 2025 15:51:41 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 561B258054;
-	Mon, 16 Jun 2025 15:51:41 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB9B55803F;
-	Mon, 16 Jun 2025 15:51:40 +0000 (GMT)
-Received: from d.ibm.com (unknown [9.61.172.143])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 16 Jun 2025 15:51:40 +0000 (GMT)
-From: Dave Marquardt <davemarq@linux.ibm.com>
-To: Joe Damato <joe@dama.to>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH net v2] Fixed typo in netdevsim documentation
-In-Reply-To: <aFA2c96O-VFXms3G@MacBook-Air.local> (Joe Damato's message of
-	"Mon, 16 Jun 2025 18:21:23 +0300")
-References: <20250613-netdevsim-typo-fix-v2-1-d4e90aff3f2f@linux.ibm.com>
-	<aFA1seeltkOQROVn@MacBook-Air.local>
-	<aFA2c96O-VFXms3G@MacBook-Air.local>
-Date: Mon, 16 Jun 2025 10:51:40 -0500
-Message-ID: <87msa77khf.fsf@linux.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1750089274; c=relaxed/simple;
+	bh=q3ERfAh5Wy+Y9yDxFKPCc6BxDJQn6ZQJ6Ti16SPnhbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WqbRpayHuWPpwdMP4msHPnUcVfPogepjqS5XHsBPBfJPnc7SLVoepNimgO3FjUIdOLyh0xQfB5/Ry6gayxVOgwkSAi6YALZ6yiiIWFZF5jmimSwRYZIANaUqHTiug+SDh+KqJsqLbUKrTTZ/gPQ+MtLB1tSS/zFlkLr2YwnnMjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRw0JrJ0; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-747abb3cd0bso4241096b3a.1;
+        Mon, 16 Jun 2025 08:54:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750089272; x=1750694072; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DsotLJ0Tq8v8Qep/9/uIKbgNsK/CVWAdf4TKiG2Z1Fk=;
+        b=KRw0JrJ0/VObyXEPKszSsBwQ4E61OOAsrC5AadQ7oLl+nvELFJRjGjxoWcEgixCJ6w
+         eG459Rrb6NUY5YkoPhzXYCvX7bKvBNWLq3aT1PVJfjibSv98Bj6/Nt/Plrb2GW2J+6DP
+         mi1UrO701BfF/ym2BOv0i+L1M14qwLoMDwnnEU21L1r/+eipvMWyA4E3NKDYKvFjYeLN
+         NWU4mXRTbb8WsmoFJi1rW/ID6S/PNny/scP/J/PInMimOhToDkEfVSe7On4ajC81mDF7
+         xObeLRa9YJpZO9vklPMQlIi/PT0QpnYlONRsX+y2x8L7NP4Y2Z2/GIRExNLJjhz6GPL7
+         bZig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750089272; x=1750694072;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DsotLJ0Tq8v8Qep/9/uIKbgNsK/CVWAdf4TKiG2Z1Fk=;
+        b=kwzNEqlRvnh9HrPmnCEM1nRbtQxTZBtUXMtXsDM/oliYHfWJxCTc2Av7wkZ8ZcKwbq
+         /oKz5ciRgPUiGAj2zJZSOv4HZeZiP0j+u3GgcLNjNv0pbGywh8CUR9iBdIqxmQDs7gft
+         8nMzPSD0Yc8HysXlPSbKow7azZIh/zigDMIPsgjvB1Wjev/jYZJhK7sOkWlb8eHXUnQ6
+         JKZUxv4+NwebFLdiKKtnkyWqAU/ifQYjzj2xyvgpKef7e/ux8AVsDWcY50N9FtK8AXv2
+         UtbgCg9AxeltlAb0WmmzfZBXAkPQUGol4NDOZUuZnBp9e/KjpebZfN3Px2lneVJRCJAL
+         3w3g==
+X-Forwarded-Encrypted: i=1; AJvYcCVL1qFM0dpA83SdzoviLib4mU/RvvZmF8mYyPTCQb2KojmHPloKmjqtGuwKLDfHPFuAcowVrUsf@vger.kernel.org, AJvYcCW3MjX0OTszdMADrndbDB6uYyz5r3gyrtlSksYt2EVq8LjYl8mK4h2o7xX4wV4FzsdYB7Q9/Z49mn0w6ig=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb4kyJ845W8rFke7rZAPojBOhzQYr/9wIBYRt0pKkYx17H9Ftq
+	4q4vhglSUkNs215iyxHK0hKLsfewB4Hu1jg0ZQpbmAStAE1HqI80OFU=
+X-Gm-Gg: ASbGncvOgel79kQjWNYRftoo3Lqqvb2Nbumg3vJMhDhIsTaIehkTddGm8Sbf0J0hs+e
+	c1qZIVHx3N5jo5S72O9KzXXsJelXQ+UcZ9g9gAwm452HWMF7GeluxtypeeM96c5Zibyd+15s6X2
+	r7WzREvqPOsVtz59xcAPS7P3ddBccal8Gs7MJeogGEtr67eyXK6dTh5vRGthyO6v2KEwfKZse2K
+	E80Ep+fvfezDgn3er7GS2AmA3yD3B2CAm7aqsNfcaIm1qwN9b0Y6y3a84MRbW43Cyb3yGtaFmoE
+	X/nutkVsnBExsMz5Ygn1CQwonkbf3Sv55xa8inyRqvQM720UTsdnLy1XIqiOfxP3IFR7oZ78DVP
+	LZzB5roQ637o/YcMPaLrst2k=
+X-Google-Smtp-Source: AGHT+IGBbQO47U97OyA/s1rEzau9jZN7eao3Sz5Kjh41qnoM5N6war6gzRMxoRY7syzuVYnffzWGyA==
+X-Received: by 2002:a05:6a00:4b01:b0:736:9f2e:1357 with SMTP id d2e1a72fcca58-7489c483195mr14293260b3a.12.1750089271703;
+        Mon, 16 Jun 2025 08:54:31 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-748900d736bsm7234336b3a.176.2025.06.16.08.54.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 08:54:31 -0700 (PDT)
+Date: Mon, 16 Jun 2025 08:54:30 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: syzbot <syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in __linkwatch_sync_dev (2)
+Message-ID: <aFA-NpGpVF77Fyer@mini-arch>
+References: <684a39aa.a00a0220.1eb5f5.00fa.GAE@google.com>
+ <684c8a60.050a0220.be214.02a6.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LJ9S5Ezd8eSu0Hxm2EG1ge3DWyKJLeGx
-X-Proofpoint-ORIG-GUID: pGRXzdVMEzl4AROrX2vT8ZluptUBpSQq
-X-Authority-Analysis: v=2.4 cv=AqTu3P9P c=1 sm=1 tr=0 ts=68503d8f cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=E2WpO-MOJeG5IbnZ2i8A:9 a=q1B5Xg1zIbEA:10 a=5xguyzxG5YgA:10
- a=uq99_h5TRGwA:10 a=WT8JI4QBAcwA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE2MDEwMiBTYWx0ZWRfX4RmzJQPuPaSB wRaqGa1pcT9eAr3VON9dOVixUsZBrZbKTtWQjfiQo95NtilCfDHTqhM45JsKhgpQdsNp1EaRvld PPUzQT546ZOM+MyCAjIqmfpKQikZ5cKA7kKIIzJfnQ2woD6UwPBIrO1y9gwEkJB/7EGsGKrBwN5
- iFyLaRuNfOmcVqijYyHijv+sxI3IKI3lcCb8dPwRecLpnJ/e2XyghPix/YSCOGsn8ZmTLc8Hg9q 7wE/DBTDPOeUCjHIT84rau9nOjXx1xwun4jegOlmqENnYim3D5KswxeTB0ckdtlb8NY5kwOyR/5 UnsLXzHhtdxWk6OwrL2Byd+JB6yiGCsbHcgX2sUr6yDPKpbCH+YC3cLRt9qFk41Lvw3pFyHUQxH
- rGfnOXl6hZ0lwAO8wwCds51oXGvvm4uI9eg7VY4sGpixO+/XSJmRJ3EpFpI7MvT31vZU3/lL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-16_08,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 suspectscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=645 mlxscore=0 spamscore=0
- bulkscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506160102
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <684c8a60.050a0220.be214.02a6.GAE@google.com>
 
-Joe Damato <joe@dama.to> writes:
+On 06/13, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
+> 
+> HEAD commit:    27605c8c0f69 Merge tag 'net-6.16-rc2' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17bb9d70580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=8e5a54165d499a9
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a7b9d4580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1421310c580000
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-27605c8c.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/ab939a8a93b4/vmlinux-27605c8c.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/e90d45016aac/bzImage-27605c8c.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> RTNL: assertion failed at ./include/net/netdev_lock.h (72)
+> WARNING: CPU: 2 PID: 60 at ./include/net/netdev_lock.h:72 netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
+> WARNING: CPU: 2 PID: 60 at ./include/net/netdev_lock.h:72 __linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
+> Modules linked in:
+> CPU: 2 UID: 0 PID: 60 Comm: kworker/u32:3 Not tainted 6.16.0-rc1-syzkaller-00101-g27605c8c0f69 #0 PREEMPT(full) 
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+> Workqueue: bond0 bond_mii_monitor
+> RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
+> RIP: 0010:__linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
+> Code: 05 ff ff ff e8 94 b6 59 f8 c6 05 e9 0f 2e 07 01 90 ba 48 00 00 00 48 c7 c6 c0 8c e3 8c 48 c7 c7 60 8c e3 8c e8 94 7b 18 f8 90 <0f> 0b 90 90 e9 d6 fe ff ff 48 c7 c7 44 3b a8 90 e8 ae 86 c0 f8 e9
+> RSP: 0018:ffffc90000ce79f0 EFLAGS: 00010286
+> RAX: 0000000000000000 RBX: ffff8880363a2000 RCX: ffffffff817ae368
+> RDX: ffff888022148000 RSI: ffffffff817ae375 RDI: 0000000000000001
+> RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000001 R12: 1ffff9200019cf48
+> R13: ffff8880363a2cc5 R14: ffffffff8c5909c0 R15: ffffffff899ba310
+> FS:  0000000000000000(0000) GS:ffff8880d6954000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffd4122af9c CR3: 000000000e382000 CR4: 0000000000352ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
+>  bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
+>  bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
+>  bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
+>  process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
+>  process_scheduled_works kernel/workqueue.c:3321 [inline]
+>  worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
+>  kthread+0x3c5/0x780 kernel/kthread.c:464
+>  ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>  </TASK>
+> 
+> 
+> ---
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 
-> On Mon, Jun 16, 2025 at 06:18:09PM +0300, Joe Damato wrote:
->> On Fri, Jun 13, 2025 at 11:02:23AM -0500, Dave Marquardt wrote:
->> > Fixed a typographical error in "Rate objects" section
->> > 
->> > Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
->> > ---
->> > - Fixed typographical error in "Rate objects" section
->> > - Spell checked netdevsim.rst and found no additional errors
->> > -
->> > ---
->> >  Documentation/networking/devlink/netdevsim.rst | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> For future reference, since Breno gave a Reviewed-by for the last patch [1],
->> you could have included his tag since there were no substantive changes.
->> 
->> In any case:
->> 
->> Reviewed-by: Joe Damato <joe@dama.to>
->
-> On second thought... this should target net-next (not net) and should also CC Breno.
->
-> Have a look at:
->
->   https://www.kernel.org/doc/html/v5.16/process/submitting-patches.html
->
->   and
->
->   https://www.kernel.org/doc/html/v5.16/networking/netdev-FAQ.html
+#syz test
 
-Thanks. I'll send another update shortly.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index c4d53e8e7c15..e2c4bcdb8b1a 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2739,7 +2739,7 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 			ignore_updelay = true;
+ 	}
+ 
+-	bond_for_each_slave_rcu(bond, slave, iter) {
++	bond_for_each_slave(bond, slave, iter) {
+ 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
+ 
+ 		link_state = bond_check_dev_link(bond, slave->dev, 0);
+@@ -2962,35 +2962,28 @@ static void bond_mii_monitor(struct work_struct *work)
+ 	if (!bond_has_slaves(bond))
+ 		goto re_arm;
+ 
+-	rcu_read_lock();
++	/* Race avoidance with bond_close cancel of workqueue */
++	if (!rtnl_trylock()) {
++		delay = 1;
++		should_notify_peers = false;
++		goto re_arm;
++	}
++
+ 	should_notify_peers = bond_should_notify_peers(bond);
+ 	commit = !!bond_miimon_inspect(bond);
+ 	if (bond->send_peer_notif) {
+-		rcu_read_unlock();
+-		if (rtnl_trylock()) {
+-			bond->send_peer_notif--;
+-			rtnl_unlock();
+-		}
+-	} else {
+-		rcu_read_unlock();
++		bond->send_peer_notif--;
+ 	}
+ 
+ 	if (commit) {
+-		/* Race avoidance with bond_close cancel of workqueue */
+-		if (!rtnl_trylock()) {
+-			delay = 1;
+-			should_notify_peers = false;
+-			goto re_arm;
+-		}
+-
+ 		bond_for_each_slave(bond, slave, iter) {
+ 			bond_commit_link_state(slave, BOND_SLAVE_NOTIFY_LATER);
+ 		}
+ 		bond_miimon_commit(bond);
+-
+-		rtnl_unlock();	/* might sleep, hold no other locks */
+ 	}
+ 
++	rtnl_unlock();	/* might sleep, hold no other locks */
++
+ re_arm:
+ 	if (bond->params.miimon)
+ 		queue_delayed_work(bond->wq, &bond->mii_work, delay);
 
--Dave
 
