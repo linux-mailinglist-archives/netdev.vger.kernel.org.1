@@ -1,169 +1,597 @@
-Return-Path: <netdev+bounces-198276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 726ADADBBEE
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:28:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CAEADBBF0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:29:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 490CD7A188F
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:27:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42F671883CAF
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73DE21882F;
-	Mon, 16 Jun 2025 21:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3D0218592;
+	Mon, 16 Jun 2025 21:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4v4kq3J"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="uRRAQTST";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mpR9Fn93"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C861F1F099C
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 21:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE88218599;
+	Mon, 16 Jun 2025 21:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750109305; cv=none; b=kUs6jhkTKupnukGDsZ3n79bjxOYK+u/TotCXkW2QyXQfrXVuoiyWrfs3GTlvA9+fNqfPr/xT++SR/h7fwzXgJU8uR41QCmKR/zIxYd6iyHLeh9m+doBFF7FhXXplp4Gcd36SjPdZz3mTuhDFZDy1/OMfMHpHKtuetFQ/CzoFYcU=
+	t=1750109344; cv=none; b=Qqwd4KDApHjs721Do9Jj9lNVGuDVjJK6IjpybrplTqaxtFjcmlSI5oTSuWg3rwjYdR3sJweMGJ6b7dlXPEpwbs4ncIxM9pWF4jovi4VVP2vI9yDTtMf4BKKoRrIAPZsl3a8mFCJhjYVni/nUoKyeHCV3xnM25SpYlVtz1lB7VOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750109305; c=relaxed/simple;
-	bh=B81RvMnziV4dcH+AleQaurh906E6nPB/a2o0DOAGk7s=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XHgLCzcdi1PQowdvsKn65M87kRf17vW1Yfesb+idQeAdZU1+Me3SAB+V70jAZIdI0ifJLQdnZftJ0Asf5VF1sSvODBjjfvXR2KCfiPMaz4Va3SeLb5AVjRJoe4FYD+N97GYFdmF+sjOZ8RMWqNveqMFiqlufDpMUXWhDLjJOzuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b4v4kq3J; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-442e9c00bf4so42558475e9.3
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 14:28:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750109302; x=1750714102; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5XXAcOCB01OUObGgFW/V5O9cvQLuVzPmF47hEyzxgoE=;
-        b=b4v4kq3JktoutVnf6d4ldmo35bHiXFQId6zABctXlh+ZPV86NFxejgUROiTNeGnGNX
-         Yc8nkC2/DnL+KywUPARSzjJyGIbMId1JJbodZDiJFExjq5CXAC81GI3niuXuMunZqoyl
-         qbo7h2uzPhRSh9n8z2bY3p8Vc3crrKOVM+rKe1I8rkQc+VpaQynLHMlY0jHSCE7CvYX5
-         73I4ES521MW1NGrZi5d8k81cDVnswHatettY/CKlWp0kNLsYTy4mwNE5lt4z+DyZT932
-         blP3TgvprFKFMPfjDVpMNHo4MWzo7+guDCMLKfM/d4AlCVokj9SFhpROqYkYoB+0MFBc
-         gElA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750109302; x=1750714102;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5XXAcOCB01OUObGgFW/V5O9cvQLuVzPmF47hEyzxgoE=;
-        b=c/jhz82w/p8Rk/N8oY81UdwDzzMUI3ephsbnN2Bexj2N5bR+4RmD53DkeSK0UgVt6/
-         vWMMEvUK/G2zVgWyEbTafNEAczPKkB4oUQJVH3miI7W/eQm663g+HZapvLVLM/Kw6acx
-         6+NPuXMhXpJ/T/HxLjJ1p7xxy1i0/MNIYAyjP3W1eqgKowzt4edfYDNfkg8ItRZo6iay
-         oRQ1Vjmaj4aiGohV4lp2GpJtt3VuPqCYbma1GgOeJR5aiWwWMZo3WkMJV3vp51zdBHLt
-         3C3fWBBvk35HuQVnW7LgCeZVXG4Q6ArcgRmtu0Vlhq5jXChe3709gGXcvdwMLA7Na+y7
-         OcqA==
-X-Gm-Message-State: AOJu0Yy6PWc9D+VeU9q0w6FK+MNj8dBU0Gvvi8eHMQDoJc/LP3QrPDOF
-	v5aEkTtOsUkL7CCFlOTbIPZeFJm2MOPRYLDLZFFx6zkWv+ELu5A70j58+vfO6vnI
-X-Gm-Gg: ASbGncsaOP3ECyTALLqdvJCezgiaWd7JfGuyjqToIGJz+jBEAEwSvWQBhZsHZvQ9iGv
-	1A3earylsO4Ll+29irXGJ43JTLvJUqALgSXTV6fEzLdQ/3CIygeGmuiJagvUfvwVvfalI+O5RWs
-	N9EyVKq2wapqqwX4yYFpjuW1gK77rz36AFr3G0whS3Xgka2p8zTqxLqqpTYpTNnlyp5AE35oybV
-	k8jPLPwPdKJJfShy+cOiI7se/QfdyM5SzGwqy1OVqcUieyuOLKcGypOsZ+F9NIcZbA8bZvUpjIQ
-	s8S5EtIuno78bDxJbeQ8FPcTze5leN/uzD4yaXB9pFuJAslLfYkTMPaLvkdGjNRWUpo6r+jak57
-	YFKka0DlIZdi0G6E1+bsR9g90f9iKIpEsmegk9rZP5nQxgOlh2YZGzgU1508+Y7Ymwpq1xL5jw0
-	Ev1j0OEn7uDiqSCUFOeIPXHNU=
-X-Google-Smtp-Source: AGHT+IFgaIA0648XCawbMM/Uje0CDxIrVV0P16AKdzOA8bg46jzUDvdrSfo3k7CBlYAUfPlYQKhfhw==
-X-Received: by 2002:a05:600c:6087:b0:442:e9eb:1b48 with SMTP id 5b1f17b1804b1-4533caed5b0mr102543285e9.24.1750109301788;
-        Mon, 16 Jun 2025 14:28:21 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f4e:1600:59de:3cc:3fa9:3c6b? (p200300ea8f4e160059de03cc3fa93c6b.dip0.t-ipconnect.de. [2003:ea:8f4e:1600:59de:3cc:3fa9:3c6b])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a579808c24sm7353361f8f.43.2025.06.16.14.28.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jun 2025 14:28:21 -0700 (PDT)
-Message-ID: <da7f896f-2636-40c1-a8ab-bf4e55b6d726@gmail.com>
-Date: Mon, 16 Jun 2025 23:28:36 +0200
+	s=arc-20240116; t=1750109344; c=relaxed/simple;
+	bh=VGg1TsN3mfM+IWSHl51boEjCVoanSbODzDP6bzjB5Q4=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=mm3LcV9bagzJswGi1400TUb/NPCxguuifN2TqoUwNCax7nsCBvN6Q0Z9Pptt1w0KTcHgNrqb81ZG9a+VmpaeX2KMKi/Kf7yzBKeugX9rB224+U6WKXprKDiessVo+YrDjq09/bHNYS90Grly+jcpO7Pk37/ZsZj5Qy/YIyj8ytY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=uRRAQTST; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mpR9Fn93; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D679311400F0;
+	Mon, 16 Jun 2025 17:28:58 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Mon, 16 Jun 2025 17:28:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to; s=fm3; t=
+	1750109338; x=1750195738; bh=mdU8RAyqh2SFOIUCpZcd425QI97BAbrtoWp
+	EpDLU6lk=; b=uRRAQTSTOm7dROC0WKpCYT2x2ZODv/sapNQr69lofJ5bl01kuAM
+	FoAZnfWJ1tieLVX1bE8vCiNMzQhzg4ZuAR/OqrYibXx6RRwNsQrjosHhRdSaBIfd
+	j4fuc4vODhRUntJ+FO+QTn9SsLYajo1++1pqQWdyJCMjwiiQb7Fyfyym7Hzjyaw1
+	6QQlSE7nllvxB1mnr17/r0DCgZpCiiJesrDCFxNCMo9FFmQrcL0k0yehIYto67pq
+	kDr7VWextA//cYgbeTwLvsIo6m0peWOT6VpqZFq/+emhu68UAjp2sfnHDOUJmnK0
+	V+jEvWXH097VM5swx/q3satOaV3fHbtVhvA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750109338; x=
+	1750195738; bh=mdU8RAyqh2SFOIUCpZcd425QI97BAbrtoWpEpDLU6lk=; b=m
+	pR9Fn93KpLm3E9cX2l1AIbZSuQvliZ+h/jnqeczgvZkdH3g1IYXlRDU4aoGw/Cs6
+	nszlDQq3hqRlRS9mfOfZjwfdgaVUNEWyKPrgeTdimIWiigVptKZW6WgVquoALEad
+	8gLGEQay0LtC+EO6fqx7ic9zV1ZyXtoR3QUmU3xpF5tIPoOK7vwV/hCYOswemP1b
+	e7NFs+zK+J97h6W9pnI5k8Tra0NgbG22dm1MIUv7tA7Z7h7mJtn1ilItHZnFcqww
+	F0D7OGKRE84xHD2ZQbB8CF59Med6mFcsxf+Od/v6hJ8Nhvd8qB+UV5gGEPZaODer
+	PNdkgP1crTj0mKiyKh+lw==
+X-ME-Sender: <xms:mYxQaNskXyR3bkvB0MCO5O-s6vjmNwyd9yjf6LQ5u8JtwiK5NnUgJA>
+    <xme:mYxQaGePeSOjRX5egaYcW6NZPNuZZnIMZGacpTj1-3uxf11jvFDPPZ1zFpFQlXe6w
+    Dvd6So-pTUvOi4pMx4>
+X-ME-Received: <xmr:mYxQaAzx7M2Jel9JAnH7JTbldVzkY_gKeNzrSy_-IXdlwBR1qyJy3rDXLc5xUgLau5Z9Iw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvjeeiiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevuffogggtgfffkfesthhqredtredtvden
+    ucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvg
+    htqeenucggtffrrghtthgvrhhnpeefgeevtdeggfeiuedthefhleeivdduhfetheefffek
+    hedvheelveduvdeuuedtheenucffohhmrghinhepshihiihkrghllhgvrhdrrghpphhsph
+    hothdrtghomhdpkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfr
+    rghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprh
+    gtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhes
+    uggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehsughfsehfohhmihgthhgvvhdrmh
+    gvpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthht
+    ohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhsse
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhope
+    gtohhrsggvtheslhifnhdrnhgvthdprhgtphhtthhopehprggsvghnihesrhgvughhrght
+    rdgtohhm
+X-ME-Proxy: <xmx:moxQaEPWZnLzG9CqazZNXiZfa3oLxDd6vYEhfCWr1BVc2_xUNaRXiQ>
+    <xmx:moxQaN8wUfbtoXglAlA5TOlMlPQmEz1wjaZcAVRxSh6EvZTyMP0Z0g>
+    <xmx:moxQaEXF9MLGbcv3oD1yrgYdVqkerIJJqPHcP6JT4IEq5NYsHx6G7g>
+    <xmx:moxQaOeNrQ9c9bwisBkfaGgeOdn7t6ZY7S1IJeKsXihaO3ZlQWkrBw>
+    <xmx:moxQaOCk9d3V_3APJhOx3foW1YvypsuZXgaKOmtSHanw73BmcWBP-mB->
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 16 Jun 2025 17:28:57 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 44EEB9FCA5; Mon, 16 Jun 2025 14:28:56 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 418579FC7E;
+	Mon, 16 Jun 2025 14:28:56 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    Jonathan Corbet <corbet@lwn.net>,
+    Andrew Lunn <andrew+netdev@lunn.ch>,
+    Stanislav Fomichev <sdf@fomichev.me>,
+    Hangbin Liu <liuhangbin@gmail.com>, linux-doc@vger.kernel.org
+Subject: [PATCH net-next] bonding: Remove support for use_carrier = 0
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ftgmac100: select FIXED_PHY
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <077a3b63-60a6-4c99-98fe-46252f102a71@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <077a3b63-60a6-4c99-98fe-46252f102a71@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1922516.1750109336.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Jun 2025 14:28:56 -0700
+Message-ID: <1922517.1750109336@famine>
 
-On 16.06.2025 22:27, Heiner Kallweit wrote:
-> Depending on e.g. DT configuration this driver uses a fixed link.
-> So we shouldn't rely on the user to enable FIXED_PHY, select it in
-> Kconfig instead. We may end up with a non-functional driver otherwise.
-> 
-> Fixes: 38561ded50d0 ("net: ftgmac100: support fixed link")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/faraday/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/faraday/Kconfig b/drivers/net/ethernet/faraday/Kconfig
-> index c699bd6bc..474073c7f 100644
-> --- a/drivers/net/ethernet/faraday/Kconfig
-> +++ b/drivers/net/ethernet/faraday/Kconfig
-> @@ -31,6 +31,7 @@ config FTGMAC100
->  	depends on ARM || COMPILE_TEST
->  	depends on !64BIT || BROKEN
->  	select PHYLIB
-> +	select FIXED_PHY
->  	select MDIO_ASPEED if MACH_ASPEED_G6
->  	select CRC32
->  	help
+	 Remove the ability to disable use_carrier in bonding, and remove
+all code related to the old link state check that utilizes ethtool or
+ioctl to determine the link state of an interface in a bond.
 
-Two blamed authors missing, will resubmit.
+	To avoid acquiring RTNL many times per second, bonding's miimon
+link monitor inspects link state under RCU, but not under RTNL.  However,
+ethtool implementations in drivers may sleep, and therefore the ethtool or
+ioctl strategy is unsuitable for use with calls into driver ethtool
+functions.
+
+	The use_carrier option was introduced in 2003, to provide
+backwards compatibility for network device drivers that did not support
+the then-new netif_carrier_ok/on/off system.  Today, device drivers are
+expected to support netif_carrier_*, and the use_carrier backwards
+compatibility logic is no longer necessary.
+
+	Bonding now always behaves as if use_carrier=3D1, which relies on
+netif_carrier_ok() to determine the link state of interfaces.  This has
+been the default setting for use_carrier since its introduction.  For
+backwards compatibility, the option itself remains, but may only be set to
+1, and queries will always return 1.
+
+Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3Db8c48ea38ca27d150063
+Link: https://lore.kernel.org/lkml/000000000000eb54bf061cfd666a@google.com=
+/
+Link: https://lore.kernel.org/netdev/20240718122017.d2e33aaac43a.I10ab9c9d=
+ed97163aef4e4de10985cd8f7de60d28@changeid/
+Link: http://lore.kernel.org/netdev/aEt6LvBMwUMxmUyx@mini-arch
+Signed-off-by: Jay Vosburgh <jv@jvosburgh.net>
+
 ---
-pw-bot: cr
+ Documentation/networking/bonding.rst |  79 +++----------------
+ drivers/net/bonding/bond_main.c      | 113 ++-------------------------
+ drivers/net/bonding/bond_netlink.c   |  11 +--
+ drivers/net/bonding/bond_options.c   |   7 +-
+ drivers/net/bonding/bond_sysfs.c     |   6 +-
+ include/net/bonding.h                |   1 -
+ 6 files changed, 25 insertions(+), 192 deletions(-)
+
+diff --git a/Documentation/networking/bonding.rst b/Documentation/networki=
+ng/bonding.rst
+index a4c1291d2561..4ee20f6ab733 100644
+--- a/Documentation/networking/bonding.rst
++++ b/Documentation/networking/bonding.rst
+@@ -576,10 +576,8 @@ miimon
+ 	This determines how often the link state of each slave is
+ 	inspected for link failures.  A value of zero disables MII
+ 	link monitoring.  A value of 100 is a good starting point.
+-	The use_carrier option, below, affects how the link state is
+-	determined.  See the High Availability section for additional
+-	information.  The default value is 100 if arp_interval is not
+-	set.
++
++	The default value is 100 if arp_interval is not set.
+ =
+
+ min_links
+ =
+
+@@ -889,25 +887,14 @@ updelay
+ =
+
+ use_carrier
+ =
+
+-	Specifies whether or not miimon should use MII or ETHTOOL
+-	ioctls vs. netif_carrier_ok() to determine the link
+-	status. The MII or ETHTOOL ioctls are less efficient and
+-	utilize a deprecated calling sequence within the kernel.  The
+-	netif_carrier_ok() relies on the device driver to maintain its
+-	state with netif_carrier_on/off; at this writing, most, but
+-	not all, device drivers support this facility.
+-
+-	If bonding insists that the link is up when it should not be,
+-	it may be that your network device driver does not support
+-	netif_carrier_on/off.  The default state for netif_carrier is
+-	"carrier on," so if a driver does not support netif_carrier,
+-	it will appear as if the link is always up.  In this case,
+-	setting use_carrier to 0 will cause bonding to revert to the
+-	MII / ETHTOOL ioctl method to determine the link state.
+-
+-	A value of 1 enables the use of netif_carrier_ok(), a value of
+-	0 will use the deprecated MII / ETHTOOL ioctls.  The default
+-	value is 1.
++	Obsolete option that previously selected between MII /
++	ETHTOOL ioctls and netif_carrier_ok() to determine link
++	state.
++
++	All link state checks are now done with netif_carrier_ok().
++
++	For backwards compatibility, this option's value may be inspected
++	or set.  The only valid setting is 1.
+ =
+
+ xmit_hash_policy
+ =
+
+@@ -2029,22 +2016,8 @@ depending upon the device driver to maintain its ca=
+rrier state, by
+ querying the device's MII registers, or by making an ethtool query to
+ the device.
+ =
+
+-If the use_carrier module parameter is 1 (the default value),
+-then the MII monitor will rely on the driver for carrier state
+-information (via the netif_carrier subsystem).  As explained in the
+-use_carrier parameter information, above, if the MII monitor fails to
+-detect carrier loss on the device (e.g., when the cable is physically
+-disconnected), it may be that the driver does not support
+-netif_carrier.
+-
+-If use_carrier is 0, then the MII monitor will first query the
+-device's (via ioctl) MII registers and check the link state.  If that
+-request fails (not just that it returns carrier down), then the MII
+-monitor will make an ethtool ETHTOOL_GLINK request to attempt to obtain
+-the same information.  If both methods fail (i.e., the driver either
+-does not support or had some error in processing both the MII register
+-and ethtool requests), then the MII monitor will assume the link is
+-up.
++The MII monitor relies on the driver for carrier state information (via
++the netif_carrier subsystem).
+ =
+
+ 8. Potential Sources of Trouble
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+@@ -2128,34 +2101,6 @@ This will load tg3 and e1000 modules before loading=
+ the bonding one.
+ Full documentation on this can be found in the modprobe.d and modprobe
+ manual pages.
+ =
+
+-8.3. Painfully Slow Or No Failed Link Detection By Miimon
+----------------------------------------------------------
+-
+-By default, bonding enables the use_carrier option, which
+-instructs bonding to trust the driver to maintain carrier state.
+-
+-As discussed in the options section, above, some drivers do
+-not support the netif_carrier_on/_off link state tracking system.
+-With use_carrier enabled, bonding will always see these links as up,
+-regardless of their actual state.
+-
+-Additionally, other drivers do support netif_carrier, but do
+-not maintain it in real time, e.g., only polling the link state at
+-some fixed interval.  In this case, miimon will detect failures, but
+-only after some long period of time has expired.  If it appears that
+-miimon is very slow in detecting link failures, try specifying
+-use_carrier=3D0 to see if that improves the failure detection time.  If
+-it does, then it may be that the driver checks the carrier state at a
+-fixed interval, but does not cache the MII register values (so the
+-use_carrier=3D0 method of querying the registers directly works).  If
+-use_carrier=3D0 does not improve the failover, then the driver may cache
+-the registers, or the problem may be elsewhere.
+-
+-Also, remember that miimon only checks for the device's
+-carrier state.  It has no way to determine the state of devices on or
+-beyond other ports of a switch, or if a switch is refusing to pass
+-traffic while still maintaining carrier on.
+-
+ 9. SNMP agents
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ =
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
+in.c
+index c4d53e8e7c15..3534561fd932 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -142,8 +142,7 @@ module_param(downdelay, int, 0);
+ MODULE_PARM_DESC(downdelay, "Delay before considering link down, "
+ 			    "in milliseconds");
+ module_param(use_carrier, int, 0);
+-MODULE_PARM_DESC(use_carrier, "Use netif_carrier_ok (vs MII ioctls) in mi=
+imon; "
+-			      "0 for off, 1 for on (default)");
++MODULE_PARM_DESC(use_carrier, "Obsolete, has no effect");
+ module_param(mode, charp, 0);
+ MODULE_PARM_DESC(mode, "Mode of operation; 0 for balance-rr, "
+ 		       "1 for active-backup, 2 for balance-xor, "
+@@ -828,77 +827,6 @@ const char *bond_slave_link_status(s8 link)
+ 	}
+ }
+ =
+
+-/* if <dev> supports MII link status reporting, check its link status.
+- *
+- * We either do MII/ETHTOOL ioctls, or check netif_carrier_ok(),
+- * depending upon the setting of the use_carrier parameter.
+- *
+- * Return either BMSR_LSTATUS, meaning that the link is up (or we
+- * can't tell and just pretend it is), or 0, meaning that the link is
+- * down.
+- *
+- * If reporting is non-zero, instead of faking link up, return -1 if
+- * both ETHTOOL and MII ioctls fail (meaning the device does not
+- * support them).  If use_carrier is set, return whatever it says.
+- * It'd be nice if there was a good way to tell if a driver supports
+- * netif_carrier, but there really isn't.
+- */
+-static int bond_check_dev_link(struct bonding *bond,
+-			       struct net_device *slave_dev, int reporting)
+-{
+-	const struct net_device_ops *slave_ops =3D slave_dev->netdev_ops;
+-	struct mii_ioctl_data *mii;
+-	struct ifreq ifr;
+-	int ret;
+-
+-	if (!reporting && !netif_running(slave_dev))
+-		return 0;
+-
+-	if (bond->params.use_carrier)
+-		return netif_carrier_ok(slave_dev) ? BMSR_LSTATUS : 0;
+-
+-	/* Try to get link status using Ethtool first. */
+-	if (slave_dev->ethtool_ops->get_link) {
+-		netdev_lock_ops(slave_dev);
+-		ret =3D slave_dev->ethtool_ops->get_link(slave_dev);
+-		netdev_unlock_ops(slave_dev);
+-
+-		return ret ? BMSR_LSTATUS : 0;
+-	}
+-
+-	/* Ethtool can't be used, fallback to MII ioctls. */
+-	if (slave_ops->ndo_eth_ioctl) {
+-		/* TODO: set pointer to correct ioctl on a per team member
+-		 *       bases to make this more efficient. that is, once
+-		 *       we determine the correct ioctl, we will always
+-		 *       call it and not the others for that team
+-		 *       member.
+-		 */
+-
+-		/* We cannot assume that SIOCGMIIPHY will also read a
+-		 * register; not all network drivers (e.g., e100)
+-		 * support that.
+-		 */
+-
+-		/* Yes, the mii is overlaid on the ifreq.ifr_ifru */
+-		strscpy_pad(ifr.ifr_name, slave_dev->name, IFNAMSIZ);
+-		mii =3D if_mii(&ifr);
+-
+-		if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIPHY) =3D=3D 0) {
+-			mii->reg_num =3D MII_BMSR;
+-			if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIREG) =3D=3D 0)
+-				return mii->val_out & BMSR_LSTATUS;
+-		}
+-	}
+-
+-	/* If reporting, report that either there's no ndo_eth_ioctl,
+-	 * or both SIOCGMIIREG and get_link failed (meaning that we
+-	 * cannot report link status).  If not reporting, pretend
+-	 * we're ok.
+-	 */
+-	return reporting ? -1 : BMSR_LSTATUS;
+-}
+-
+ /*----------------------------- Multicast list --------------------------=
+----*/
+ =
+
+ /* Push the promiscuity flag down to appropriate slaves */
+@@ -1949,7 +1877,6 @@ int bond_enslave(struct net_device *bond_dev, struct=
+ net_device *slave_dev,
+ 	const struct net_device_ops *slave_ops =3D slave_dev->netdev_ops;
+ 	struct slave *new_slave =3D NULL, *prev_slave;
+ 	struct sockaddr_storage ss;
+-	int link_reporting;
+ 	int res =3D 0, i;
+ =
+
+ 	if (slave_dev->flags & IFF_MASTER &&
+@@ -1959,12 +1886,6 @@ int bond_enslave(struct net_device *bond_dev, struc=
+t net_device *slave_dev,
+ 		return -EPERM;
+ 	}
+ =
+
+-	if (!bond->params.use_carrier &&
+-	    slave_dev->ethtool_ops->get_link =3D=3D NULL &&
+-	    slave_ops->ndo_eth_ioctl =3D=3D NULL) {
+-		slave_warn(bond_dev, slave_dev, "no link monitoring support\n");
+-	}
+-
+ 	/* already in-use? */
+ 	if (netdev_is_rx_handler_busy(slave_dev)) {
+ 		SLAVE_NL_ERR(bond_dev, slave_dev, extack,
+@@ -2178,29 +2099,10 @@ int bond_enslave(struct net_device *bond_dev, stru=
+ct net_device *slave_dev,
+ =
+
+ 	new_slave->last_tx =3D new_slave->last_rx;
+ =
+
+-	if (bond->params.miimon && !bond->params.use_carrier) {
+-		link_reporting =3D bond_check_dev_link(bond, slave_dev, 1);
+-
+-		if ((link_reporting =3D=3D -1) && !bond->params.arp_interval) {
+-			/* miimon is set but a bonded network driver
+-			 * does not support ETHTOOL/MII and
+-			 * arp_interval is not set.  Note: if
+-			 * use_carrier is enabled, we will never go
+-			 * here (because netif_carrier is always
+-			 * supported); thus, we don't need to change
+-			 * the messages for netif_carrier.
+-			 */
+-			slave_warn(bond_dev, slave_dev, "MII and ETHTOOL support not available=
+ for slave, and arp_interval/arp_ip_target module parameters not specified=
+, thus bonding will not detect link failures! see bonding.txt for details\=
+n");
+-		} else if (link_reporting =3D=3D -1) {
+-			/* unable get link status using mii/ethtool */
+-			slave_warn(bond_dev, slave_dev, "can't get link status from slave; the=
+ network driver associated with this interface does not support MII or ETH=
+TOOL link status reporting, thus miimon has no effect on this interface\n"=
+);
+-		}
+-	}
+-
+ 	/* check for initial state */
+ 	new_slave->link =3D BOND_LINK_NOCHANGE;
+ 	if (bond->params.miimon) {
+-		if (bond_check_dev_link(bond, slave_dev, 0) =3D=3D BMSR_LSTATUS) {
++		if (netif_carrier_ok(slave_dev)) {
+ 			if (bond->params.updelay) {
+ 				bond_set_slave_link_state(new_slave,
+ 							  BOND_LINK_BACK,
+@@ -2742,7 +2644,7 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 	bond_for_each_slave_rcu(bond, slave, iter) {
+ 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
+ =
+
+-		link_state =3D bond_check_dev_link(bond, slave->dev, 0);
++		link_state =3D netif_carrier_ok(slave->dev);
+ =
+
+ 		switch (slave->link) {
+ 		case BOND_LINK_UP:
+@@ -6189,10 +6091,10 @@ static int __init bond_check_params(struct bond_pa=
+rams *params)
+ 		downdelay =3D 0;
+ 	}
+ =
+
+-	if ((use_carrier !=3D 0) && (use_carrier !=3D 1)) {
+-		pr_warn("Warning: use_carrier module parameter (%d), not of valid value=
+ (0/1), so it was set to 1\n",
+-			use_carrier);
+-		use_carrier =3D 1;
++	if (use_carrier !=3D 1) {
++		pr_err("Error: invalid use_carrier parameter (%d)\n",
++		       use_carrier);
++		return -EINVAL;
+ 	}
+ =
+
+ 	if (num_peer_notif < 0 || num_peer_notif > 255) {
+@@ -6439,7 +6341,6 @@ static int __init bond_check_params(struct bond_para=
+ms *params)
+ 	params->updelay =3D updelay;
+ 	params->downdelay =3D downdelay;
+ 	params->peer_notif_delay =3D 0;
+-	params->use_carrier =3D use_carrier;
+ 	params->lacp_active =3D 1;
+ 	params->lacp_fast =3D lacp_fast;
+ 	params->primary[0] =3D 0;
+diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond=
+_netlink.c
+index ac5e402c34bc..98f9bef61474 100644
+--- a/drivers/net/bonding/bond_netlink.c
++++ b/drivers/net/bonding/bond_netlink.c
+@@ -258,13 +258,8 @@ static int bond_changelink(struct net_device *bond_de=
+v, struct nlattr *tb[],
+ 			return err;
+ 	}
+ 	if (data[IFLA_BOND_USE_CARRIER]) {
+-		int use_carrier =3D nla_get_u8(data[IFLA_BOND_USE_CARRIER]);
+-
+-		bond_opt_initval(&newval, use_carrier);
+-		err =3D __bond_opt_set(bond, BOND_OPT_USE_CARRIER, &newval,
+-				     data[IFLA_BOND_USE_CARRIER], extack);
+-		if (err)
+-			return err;
++		if (nla_get_u8(data[IFLA_BOND_USE_CARRIER]) !=3D 1)
++			return -EINVAL;
+ 	}
+ 	if (data[IFLA_BOND_ARP_INTERVAL]) {
+ 		int arp_interval =3D nla_get_u32(data[IFLA_BOND_ARP_INTERVAL]);
+@@ -676,7 +671,7 @@ static int bond_fill_info(struct sk_buff *skb,
+ 			bond->params.peer_notif_delay * bond->params.miimon))
+ 		goto nla_put_failure;
+ =
+
+-	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, bond->params.use_carrier))
++	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, 1))
+ 		goto nla_put_failure;
+ =
+
+ 	if (nla_put_u32(skb, IFLA_BOND_ARP_INTERVAL, bond->params.arp_interval))
+diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond=
+_options.c
+index 91893c29b899..98dbee2b6aba 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -185,7 +185,6 @@ static const struct bond_opt_value bond_primary_resele=
+ct_tbl[] =3D {
+ };
+ =
+
+ static const struct bond_opt_value bond_use_carrier_tbl[] =3D {
+-	{ "off", 0,  0},
+ 	{ "on",  1,  BOND_VALFLAG_DEFAULT},
+ 	{ NULL,  -1, 0}
+ };
+@@ -411,7 +410,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAS=
+T] =3D {
+ 	[BOND_OPT_USE_CARRIER] =3D {
+ 		.id =3D BOND_OPT_USE_CARRIER,
+ 		.name =3D "use_carrier",
+-		.desc =3D "Use netif_carrier_ok (vs MII ioctls) in miimon",
++		.desc =3D "Obsolete, has no effect",
+ 		.values =3D bond_use_carrier_tbl,
+ 		.set =3D bond_option_use_carrier_set
+ 	},
+@@ -1068,10 +1067,6 @@ static int bond_option_peer_notif_delay_set(struct =
+bonding *bond,
+ static int bond_option_use_carrier_set(struct bonding *bond,
+ 				       const struct bond_opt_value *newval)
+ {
+-	netdev_dbg(bond->dev, "Setting use_carrier to %llu\n",
+-		   newval->value);
+-	bond->params.use_carrier =3D newval->value;
+-
+ 	return 0;
+ }
+ =
+
+diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_s=
+ysfs.c
+index 1e13bb170515..9a75ad3181ab 100644
+--- a/drivers/net/bonding/bond_sysfs.c
++++ b/drivers/net/bonding/bond_sysfs.c
+@@ -467,14 +467,12 @@ static ssize_t bonding_show_primary_reselect(struct =
+device *d,
+ static DEVICE_ATTR(primary_reselect, 0644,
+ 		   bonding_show_primary_reselect, bonding_sysfs_store_option);
+ =
+
+-/* Show the use_carrier flag. */
++/* use_carrier is obsolete, but print value for compatibility */
+ static ssize_t bonding_show_carrier(struct device *d,
+ 				    struct device_attribute *attr,
+ 				    char *buf)
+ {
+-	struct bonding *bond =3D to_bond(d);
+-
+-	return sysfs_emit(buf, "%d\n", bond->params.use_carrier);
++	return sysfs_emit(buf, "1\n");
+ }
+ static DEVICE_ATTR(use_carrier, 0644,
+ 		   bonding_show_carrier, bonding_sysfs_store_option);
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index 95f67b308c19..6fdf4d1e5256 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -124,7 +124,6 @@ struct bond_params {
+ 	int arp_interval;
+ 	int arp_validate;
+ 	int arp_all_targets;
+-	int use_carrier;
+ 	int fail_over_mac;
+ 	int updelay;
+ 	int downdelay;
+-- =
+
+2.25.1
+
 
