@@ -1,104 +1,139 @@
-Return-Path: <netdev+bounces-197980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A229ADAC1C
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:38:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27B0DADAC2C
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 11:43:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A86D1891DE5
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:39:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCE5716DBD4
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 09:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1DF27056D;
-	Mon, 16 Jun 2025 09:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C5627713;
+	Mon, 16 Jun 2025 09:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="v6n1I2wC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qk10xB1d"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8622D1DB92A
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62242E11CF;
+	Mon, 16 Jun 2025 09:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750066720; cv=none; b=t2wxRzoJbvSWG+3InRqZRhvXz66Emo9alN8tfYUGjzS35dg883SOGjJUmxOkoUv2YJzHXSZn/reL9MgUOMLeHjDdObZkH1V0cYWWQHjcV40d3i30QoMEjcOiX42qnsvNk4j/aT25oUO8BauIMpt44VS1BibZlst8u+0VOyX3YA4=
+	t=1750067009; cv=none; b=VmElNkAtHM1xcYIX6HO2KbDucZNUaAzf7w6cfZF5rEonok9yki4B1VJtnrTVdSQwW3VOPL6F14GTJ8Jj+cMEvCHxagwvEhuaGhadJLT7qOeAxQDZcpa8Ugzv5CCi4iT3Jpi5M6pIjizk48fh+O3N+1UDB/5DJXeU3LzAVlgNi2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750066720; c=relaxed/simple;
-	bh=aPpR4JxWD7Qv1AsVPXBKR+ELanX70Syb89jNQzb+4gE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HOhKzBrtkK6mrBm+Lulr4SfvQ89uBgPJ/lTLlzQQxUqyIlKjRzTvbCaYEo+P1enNp21LcbW6C04zoKYvpUgk6aU1xVeWlhm7rugU2YfMEOhRkLFWgl3bjPcZUnPHezeHYBbbWHBxSTFbJPSmu7gLH8c//RSIFBfPD9CSOwUjhII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=v6n1I2wC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ymazMNkqSjKHhIcuupucvEPaklDWpQFzUKopMt7Nkek=; b=v6n1I2wCFp4HbcFIdXNWh4VXnU
-	COxNbX0BAxKbmmikc1p5BVe9RUh3bPzpO/3U7GCMtmm4Ekhc1GYgdKd6xHMPEo0ot0MTJZv0Y+dXp
-	4xZzbYE4Zd6C0+M+bBUbJZK0+YXLAxaWWRYj9xWFptLe53LsDdXTBu82lHn9MWQoU8BiTk3qdy3a+
-	64Q1m4LtOsL/+uVb4CYnXZ3OREqIH+j64J36jnfv5HMrC7jAlYHsKyrg4WXpcZqje6Kv5+38nyu7H
-	btGNWOzJWXqKLTwx4HOT8GA8gfuLrPOPHKYpxKXuppZzU+yA0JPQiKdTD0ZF33SPub05sSsrLb7+1
-	9osRVVGA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37044)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uR6IS-0003W9-0d;
-	Mon, 16 Jun 2025 10:38:32 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uR6IP-0004hM-1k;
-	Mon, 16 Jun 2025 10:38:29 +0100
-Date: Mon, 16 Jun 2025 10:38:29 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Chris Morgan <macroalpha82@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Chris Morgan <macromorgan@hotmail.com>
-Subject: Re: [PATCH v3] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
-Message-ID: <aE_mFWgIuuIn06E3@shell.armlinux.org.uk>
-References: <20250613171002.50749-1-macroalpha82@gmail.com>
+	s=arc-20240116; t=1750067009; c=relaxed/simple;
+	bh=5Xnw2Jra1koYIIkdKsAEPyKurdAn/Vg9h1E/VggXMOs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rc9YP2ztAiFeysk8hYX9nVf4YySnK97u6rMNmoAm3ixRljtQLX6LZCijp1nFaNHkICp03I4vy0lcXo+I+1u3ZjrKO6cAU4ICtjIjD2stmXVIVKuiLYbimMZ8CdAL31LKkGZ4VH9hOc7Upq8kuAE2vdR4q7nR/Q3df/dZzi1VSuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qk10xB1d; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-607b59b447bso7537013a12.1;
+        Mon, 16 Jun 2025 02:43:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750067006; x=1750671806; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3VFAgYKBsVAl5qgJ+sBZ1kLGEhL365WNgJnTEeGjRfk=;
+        b=Qk10xB1dEURRHPx/RfgKtCaMavRH2J26brjJEy3rNwM+n5Llsc48szN6UcNDE9ltQM
+         4JCynhBe+qDA45jTOvBba3oKXEye8KZmu6XnMLLjfG5okTYH4/DidjpOKCSwOY8yEUIe
+         dFGP7643vXtQqlDqcwxmZooJ/M7UiPHHIbIKjqpa97SI0SdOtQcNHb4l7Bi0bdrNRXEc
+         gCpVu1v/8OSS3KmSZBnTGnb8R67tMZfdzy17yGuOFk4kyB5x0+7SmrGc4+BhrtWPdq9w
+         CGEJlwFEMUJIV5Bvx+z7U3miZNaY4xSwwlZ/fX0aOd/Y6OttPjtokgme8rM15OJnzyrA
+         D9tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750067006; x=1750671806;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3VFAgYKBsVAl5qgJ+sBZ1kLGEhL365WNgJnTEeGjRfk=;
+        b=IIfP4nQa6XcMj7u6Epcj4PgbxVHUn+PUwZ9/85VhuiZaHFSUGA9D8n+0QSCs5SjADf
+         u1NL6yU4uMISGk64ENj9dgFJLJjGXxVUPXKB918dLKrhVaJvyEg+fidjHF0BgpTkgz0D
+         b+6bnsbizlSeoclHHYPCMkGLT9FS3seawqxprmjb3ZpUCK9dYeTKUQJoXNM11A7dQuQc
+         EIfy8cPPaibbw6ca6Oqtevm7mlVOMIdwsZqo9xVH2Iew447YRWlivNV/dQKvItX9Orvf
+         c8D9qtOGTfAx7XecV3BioYUIOPMA/QVrC9hW8g9gj3Ks9iC5/bzwbklrX/OSDFiIfiCv
+         f84g==
+X-Forwarded-Encrypted: i=1; AJvYcCVVLc2hgKnvgOAuEpBD/hx/IfOpp3bgrP/ybA3CODI5tnoCE4VaSsGLEa9RM91MSdD94egcL107+w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEbq0M6YZtdN0nY4+6TE50zgUAEX73xdV5g2o7CVHm5kL17VWV
+	WeyRofLIWJre77jOGQjj329TXhhwQLCmnYWejJeJibSnbResSG4TWuMVnBN49g==
+X-Gm-Gg: ASbGncu7lMZm5zZ54pt8ghh2ArbzXHmhOV5AnGHuxyNZPHEuwRs98vaUKGL8ctgN1cx
+	aF+8iiOjcktZneKrtviH0Ha35ZF/WTe40tMTxN4Tn/GZYRNRapmuOkbTf0Q0Gl47C0gMGK9ZrP+
+	lDlDSQOE5biM/zGbn6vDgT8Ug0OagkB52g0BrWe9Epf8Xnuei9RU25POeTlf43T1QCFLST/u6lz
+	ET6dZctQSiAOjo3NgEWScvORyXf657eC5zGSQHfkcKRzvJLjKUpHj9IrH8THnTidhlJW7H7S9fL
+	zlUYtfkqMIOia0CKH+5wmTKbyFgXz/vBS8oxUtLjafK668EZNHss5C0y60jlI4UcjHU8lTVVUtw
+	=
+X-Google-Smtp-Source: AGHT+IEXy41elW6R91h+1b/5pcTjDGeEn67tl0LlxbC27fgalPTWziAdASr5L3/R8cDfm0MnFN65nA==
+X-Received: by 2002:a17:907:3f8e:b0:ad8:a935:b8ff with SMTP id a640c23a62f3a-adfad4159d5mr868055866b.31.1750067005785;
+        Mon, 16 Jun 2025 02:43:25 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::2ef? ([2620:10d:c092:600::1:a3c1])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec88ff6a9sm617061566b.83.2025.06.16.02.43.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Jun 2025 02:43:25 -0700 (PDT)
+Message-ID: <560f6cd7-f66e-43ca-b458-ae362d0779de@gmail.com>
+Date: Mon, 16 Jun 2025 10:44:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613171002.50749-1-macroalpha82@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/5] net: timestamp: add helper returning skb's tx
+ tstamp
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Jason Xing <kerneljasonxing@gmail.com>
+References: <cover.1749839083.git.asml.silence@gmail.com>
+ <766c5e599bc94296fe58087e4c30226260cddff8.1749839083.git.asml.silence@gmail.com>
+ <684f8218f2e39_1e2690294dd@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <684f8218f2e39_1e2690294dd@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 13, 2025 at 12:10:02PM -0500, Chris Morgan wrote:
-> @@ -409,7 +414,19 @@ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
->  	 * these are possibly used for other purposes on this
->  	 * module, e.g. a serial port.
->  	 */
-> -	sfp->state_hw_mask &= ~(SFP_F_TX_FAULT | SFP_F_LOS);
-> +	sfp_fixup_ignore_hw(sfp, (SFP_F_TX_FAULT | SFP_F_LOS));
-> +}
-> +
-> +static void sfp_fixup_potron(struct sfp *sfp)
-> +{
-> +	/*
-> +	 * The TX_FAULT and LOS pins on this device are used for serial
-> +	 * communication, so ignore them. Additionally, provide extra
-> +	 * time for this device to fully start up.
-> +	 */
-> +
-> +	sfp_fixup_long_startup(sfp);
-> +	sfp_fixup_ignore_hw(sfp, (SFP_F_TX_FAULT | SFP_F_LOS));
+On 6/16/25 03:31, Willem de Bruijn wrote:
+> Pavel Begunkov wrote:
+>> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
+>> associated with an error queue skb.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>   include/net/sock.h |  9 +++++++++
+>>   net/socket.c       | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 55 insertions(+)
+>>
+>> diff --git a/include/net/sock.h b/include/net/sock.h
+>> index 92e7c1aae3cc..0b96196d8a34 100644
+>> --- a/include/net/sock.h
+>> +++ b/include/net/sock.h
+>> @@ -2677,6 +2677,15 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+>>   void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
+>>   			     struct sk_buff *skb);
+>>   
+>> +enum {
+>> +	NET_TIMESTAMP_ORIGIN_SW		= 0,
+>> +	NET_TIMESTAMP_ORIGIN_HW		= 1,
+>> +};
+> 
+> Can you avoid introducing a new enum, and instead just return
+> SOF_TIMESTAMPING_TX_HARDWARE (1) or SOF_TIMESTAMPING_TX_SOFTWARE (2)?
 
-There's no need for parens around the second argument to
-sfp_fixup_ignore_hw() - the bitwise OR is unambiguous.
-
-Apart from that, the patch looks fine, thanks.
+I can't say I like it more because TX_{SW,HW} is just a small
+subset of SOF_TIMESTAMPING_* flags and the caller by default
+could assume that there might be other values as well, but let
+me send v5 and we'll see which is better.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pavel Begunkov
+
 
