@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C04CADBCA0
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:10:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4EC2ADBCA2
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:10:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 965C63A2B03
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:09:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9792D1734C0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BE3221550;
-	Mon, 16 Jun 2025 22:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6BA225408;
+	Mon, 16 Jun 2025 22:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKyKFsSO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jbgP+hzO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A9A4A0C;
-	Mon, 16 Jun 2025 22:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87B5224B05
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 22:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750111808; cv=none; b=ORLQvWktjeMdaqWzN82DaRbKguOHrjtycB+O8zCCwbvBAhepHlvzfuZKfO8m5gJG6H+u//HqQdiSfRWoEkpWrTM19bbdWpOiofVdwHbt86vh9wWs4XLzmrLJiZg2PYB8IhYb93GnwrXswne1VShEs8AZM8Xn1rDhNBTihqZDlOg=
+	t=1750111809; cv=none; b=HCnqH1gh1FztosTeclKfNGUn1Qxaqro5XS87de0eYJH/G5u8M+GUQAZq3XU5UwTnVnCkeo7R7QlAYloxNKF8Q9Zea7R7UsAAK48UwYAneDVHPJ5W4XQiuOMTqYY0GJ/QDhgSA8tq6HyMP0cPSPeDqLliJGX9tgo2pmgDueXLKvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750111808; c=relaxed/simple;
-	bh=OPxmYCFXXROUzhejBnVBLCe5VD2s5fkbuoEc+N9ZWBA=;
+	s=arc-20240116; t=1750111809; c=relaxed/simple;
+	bh=BMyJEqIXakUu8Q/coxq6kmO0L2hveQX8mNILFSh4PbA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZdN6sy9KAsvVr+0aHDSx7ng6G/3WnrnzymjUivbnup5IDCc2xMUi4UU8mp4S8+0mRXduF4YjTvO5ngBAasPgJSRyFakn3cwwGB/EyYgOzVjrSl7RPn4CyjlWjYpgs5dPrd/1j8kOUvrTI2KGulE6BkHSiWAT4MrxXKc0ZKwwwpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKyKFsSO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35813C4CEEA;
-	Mon, 16 Jun 2025 22:10:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=EFwIOOqDPfTI3Z+JBVMFIO7s2FtHkaK2Wi/F1TNXYPdMfofl7w0mtAHXsGNNIzTRdJGdQx1IRkqBgx58zaMbZjY3ScC14E24XWkxRtZqP68xnMHwQ8GnoW/BzAoOGaKJicjsDPxbDWIdv0jyRvrrSoV0UG1SYse19QCxoAt/jzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jbgP+hzO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67BD9C4CEEE;
+	Mon, 16 Jun 2025 22:10:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750111808;
-	bh=OPxmYCFXXROUzhejBnVBLCe5VD2s5fkbuoEc+N9ZWBA=;
+	s=k20201202; t=1750111809;
+	bh=BMyJEqIXakUu8Q/coxq6kmO0L2hveQX8mNILFSh4PbA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gKyKFsSOYdC6PUzcjI3a4xboBv8AHU2cvVveqPaKIVu93S9B+pTHpEvkly0oUWyAH
-	 qnmyRm8iNpKSn0XhqFoiJ6LDyubb03xFMPBw2YGUeljO/fE7+FE4/GotlZxJyiy42K
-	 FKhh3VxAL5t3f/SKW/eSd/7IQzaXYzNEz6nAqfvLjoudnZmP6LKwY2fvtxWuWPHxNo
-	 P4UB5rCZyAL/1xtUkyl49eEMhsfm37eatZmKzJ01BIqG8VLqp8GG1769Rgz0JbnBAm
-	 Z2ParFcz44Kz9T2ukoHiGYQlAhrwMeOAm253m40cPGdW+DucB4L/LLHajQq2PZ7A/F
-	 6AQ5k161guvKw==
+	b=jbgP+hzOemklZH/U/OZ92sg+8eipjkq6+P+29+RCAk8JWiX9BkK75uXwPSY7uj4wm
+	 FzuRjW85xJhtppKC7oGCqEkh0nPq8bNX86HjvnZVxRZU+gaQGx3JEcfZSvxmLDS/Qt
+	 Q7Jtt0jD9aPsKR6NGRee0/kwUhuokf6NYT6gcD8u4QZoZfV29/4n+W3N5tJzu4Lz4v
+	 xvF9RlyTRdIuRGBNWOheZ3UAw/FGvvOUgv99QCxxBioU+GiBXun02mO1L+z9kp1M3f
+	 gHzUnN2lEq06LnJKAPbENWAqM7U579ZRG5QFaBcmQEo0rI+fbU7HOLta5x836fXUWf
+	 RFx5fHfEOBeYw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E1838111D8;
-	Mon, 16 Jun 2025 22:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D6A38111D8;
+	Mon, 16 Jun 2025 22:10:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/tcp_ao: tracing: Hide tcp_ao events under
- CONFIG_TCP_AO
+Subject: Re: [PATCH net-next] net: stmmac: remove pcs_get_adv_lp() support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175011183700.2530350.11672479574209344326.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Jun 2025 22:10:37 +0000
-References: <20250612094616.4222daf0@batman.local.home>
-In-Reply-To: <20250612094616.4222daf0@batman.local.home>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netdev@vger.kernel.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- edumazet@google.com, ncardwell@google.com, kuniyu@amazon.com
+ <175011183824.2530350.4880030632930663714.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Jun 2025 22:10:38 +0000
+References: <E1uPkbT-004EyG-OQ@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1uPkbT-004EyG-OQ@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Jun 2025 09:46:16 -0400 you wrote:
-> From: Steven Rostedt <rostedt@goodmis.org>
+On Thu, 12 Jun 2025 17:16:35 +0100 you wrote:
+> It appears that the GMAC_ANE_ADV and GMAC_ANE_LPA registers are only
+> available for TBI and RTBI PHY interfaces. In commit 482b3c3ba757
+> ("net: stmmac: Drop TBI/RTBI PCS flags") support for these was dropped,
+> and thus it no longer makes sense to access these registers.
 > 
-> Several of the tcp_ao events are only called when CONFIG_TCP_AO is
-> defined. As each event can take up to 5K regardless if they are used or
-> not, it's best not to define them when they are not used. Add #ifdef
-> around these events when they are not used.
+> Remove the *_get_adv_lp() functions, and the now redundant struct
+> rgmii_adv and STMMAC_PCS_* definitions.
 > 
 > [...]
 
 Here is the summary with links:
-  - net/tcp_ao: tracing: Hide tcp_ao events under CONFIG_TCP_AO
-    https://git.kernel.org/netdev/net-next/c/3cfbde048b1c
+  - [net-next] net: stmmac: remove pcs_get_adv_lp() support
+    https://git.kernel.org/netdev/net-next/c/883af78926c1
 
 You are awesome, thank you!
 -- 
