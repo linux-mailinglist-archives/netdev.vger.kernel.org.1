@@ -1,60 +1,56 @@
-Return-Path: <netdev+bounces-198280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB82ADBC51
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:55:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C566ADBC5B
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F0A01890035
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:55:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EA0B3B831C
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398F221D3DB;
-	Mon, 16 Jun 2025 21:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3224220F47;
+	Mon, 16 Jun 2025 21:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="skHIjB2K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5ZFIR8I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1105C1E2823;
-	Mon, 16 Jun 2025 21:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72DB1E231E;
+	Mon, 16 Jun 2025 21:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750110925; cv=none; b=l0wq87tBW/RZRTd1pgAZ8fnS2q6g73uiRzRZcQ+70i41L2B7yWtUrJMswF1dNojTmm0x59qaixbKnjFzwggOX9K1CDjbxfO5NbFfhTn+HT7MCH1VuepRbMTDFYERXE7GIw6NCKCW6hIUimJuI6bd18QtW5YPqRd5RWv9ne7m60Q=
+	t=1750111050; cv=none; b=CJydTQmFyC2Hl1oc7RgLadRx2n2nsCmOKOQtpX1JpiqcmTHVNUoOQ46w4I6HqkJvG3vcb/gvXOheN6V51/EA07sFJzaPLaPtD3l7mJHFudMoVzm3Dwh3Q5rxbjEny+I74G61lii8yhJRPZ4f7jX9z7zsOesB5hRVMl/pHyLj/UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750110925; c=relaxed/simple;
-	bh=veD65YqTH8NhSkVXVb8XaFNPAT2G092j/e02FmwfxW4=;
+	s=arc-20240116; t=1750111050; c=relaxed/simple;
+	bh=eyc/gswzHPtBA6IU4zbzxIAE72gnf9Pb80P53cBpKZo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=asyykhMl3Fa+LhjmEVFHY+wiGOfqTie8cAd4CUlfQKGSaEPqy/8xr/KCTaomEmH2ImSBYA6bvKLKHvOQkDJx4nW/ILGqaLJjJhst48VT2iGgSOsPQ/OICddu6dT6wjItjE0Uc5m2oQYeZpbTdviEb39TFy8zNFGJTtOJI1zva6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=skHIjB2K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38887C4CEEE;
-	Mon, 16 Jun 2025 21:55:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Aex1dE8QU+u2f6YnwHtVe1OPFEKG5o631D2Vp+iZ7J54EnInob/8dHQQmMTbzxXkMiRmYc3ksruk02663EwEotZBB793vfRHxgsZEQeWmqh5v1hRRik791nrgvs23VuBFtoU0Ef5EsPy4+BT3jIA4U+tiKMzBJPxjwmYH40Gb24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5ZFIR8I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D213C4CEEE;
+	Mon, 16 Jun 2025 21:57:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750110924;
-	bh=veD65YqTH8NhSkVXVb8XaFNPAT2G092j/e02FmwfxW4=;
+	s=k20201202; t=1750111050;
+	bh=eyc/gswzHPtBA6IU4zbzxIAE72gnf9Pb80P53cBpKZo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=skHIjB2KEWRO5XJojksFvWRTITuvAFgNquyCVbWMY9XSXUhqzslUX06PRP49MZrqJ
-	 IQ+9VADzskSPJ+X1W85hUCFDJrcw6rpP0oOtO6FntrnpJy6ImA4eB4zG6c/F0ShGSV
-	 BtL+XaK9DGNoW8PNvC1cSFdPL8wARlBq2eC2kBFQ4ML79Q0SOMpaaLO6vfSwUQFJ15
-	 wiWy5YGUWetzjbRV6zzyxxSpJFLFoDJxgZ0VcEVsoR6Qr1w6IwNxEkqEBaC7O1P2KP
-	 xtIPSc77DmbXx9cn+7GKGGse3JvXyiaJVy0SxZavwxMcJUq+IVCP/kSavPcBQJ8bVX
-	 E5sO+nkixdzxg==
-Date: Mon, 16 Jun 2025 14:55:23 -0700
+	b=D5ZFIR8IhcbWH9fc4y5RPfd+OmRo0zDNYPDVBezcZjWENLoOdvTtzknfH3jdBS9+i
+	 /255zhjcbWhwVsvUyspw97hyRF46AGRst1pcnerNVdHo0wD7c8y9bOBlP+aF6ej2//
+	 5KDYfmDLT/UJ4F8wLYot9ru/ufoDD8VDkJ8Os88yTkgINpye0sQoR7uCq+/WNcQjf4
+	 lz132eii7I9rRYYBjTuO6j5Fp7lfI2AOj32W0q5yx2nXolTlRMKyn/aepwchgpijuy
+	 jobsTsGgra3MJVrTHInWnsFNKcCaNn6dr+XU+WGiM06/Yn4nhtYQgxcWT2oRcNrPA4
+	 gkV7EcMhOVIuQ==
+Date: Mon, 16 Jun 2025 14:57:29 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, lorenzo@kernel.org, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com
-Subject: Re: [PATCH bpf-next V1 3/7] net: xdp: Add kfuncs to store hw
- metadata in xdp_buff
-Message-ID: <20250616145523.63bd2577@kernel.org>
-In-Reply-To: <174897276809.1677018.15753779269046278541.stgit@firesoul>
-References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
-	<174897276809.1677018.15753779269046278541.stgit@firesoul>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/3] vsock/test: Improve transport_uaf test
+Message-ID: <20250616145729.1a16afdc@kernel.org>
+In-Reply-To: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
+References: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,33 +60,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 03 Jun 2025 19:46:08 +0200 Jesper Dangaard Brouer wrote:
-> Introduce the following kfuncs to store hw metadata provided by the NIC
-> into the xdp_buff struct:
-> 
-> - rx-hash: bpf_xdp_store_rx_hash
-> - rx-vlan: bpf_xdp_store_rx_vlan
-> - rx-hw-ts: bpf_xdp_store_rx_ts
+On Wed, 11 Jun 2025 21:56:49 +0200 Michal Luczaj wrote:
+> Increase the coverage of a test implemented in commit 301a62dfb0d0
+> ("vsock/test: Add test for UAF due to socket unbinding"). Take this
+> opportunity to factor out some utility code, drop a redundant sync between
+> client and server, and introduce a /proc/kallsyms harvesting logic for
+> auto-detecting registered vsock transports.
 
-My mental model would that these should operate within the "remote XDP".
-We have helpers to "get the metadata", now we're adding helpers to "set
-the metadata". Should the setting not be simply the inverse of the
-getting? Store to driver-specific format?
-
--> local driver - all the metadata in HW-specific format / descriptors
-  -> local XDP - GET and copy data to locally defined md prepend
--> remote drv - CPU map, veth) hooks in its own callbacks and md struct
-  -> remote XDP - read the data from md prepend and call SET
--> remote drv - check if XDP set any md in its struct and uses it when
-                converting to skb.
-
-Note, this is just the model for the API. We can always introduce
-optimizations, like a feature flag that makes the "local" driver output
-well known MD struct and have the remote driver pick that up, with
-neither XDP calling the helpers. 
-But from the model perspective since the GET operations are local to
-the driver owning the frame at the time, the SET operations should also
-operate on metadata local to the owning driver.
-
-That's my $0.02
+Hi Stefano! Sorry to ping, are these on your radar?
+I'm wondering if the delay is because of devconf.cz or you consider 
+the Suggested-by tags a strong enough indication of support :)
 
