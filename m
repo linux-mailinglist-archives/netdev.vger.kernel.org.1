@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8843ADBCD8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:30:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805BBADBCDD
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 483C11715C9
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:30:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CBFF3B47E6
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B242264BB;
-	Mon, 16 Jun 2025 22:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9110922A4EA;
+	Mon, 16 Jun 2025 22:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l7+7pFkx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oY5tAgJ0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E571EF0A6;
-	Mon, 16 Jun 2025 22:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8EF226CF6;
+	Mon, 16 Jun 2025 22:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750113025; cv=none; b=BxsOVd9LpYD5zJ3fWICPw5U78gG+Ps5qBEVA/pg9fwxKon+EzawfNXuDFrGOT5xbhZX6vvBs0WtqDAFYEK5XBCFP1aF+RSsJe9VV2PStuRac7XS/+ntYm+IPxIGx4cmY1ZqSTA+mvLVKQlcopDE4kiW6JBrK6vORiWOC+i3B+7E=
+	t=1750113027; cv=none; b=eenEVfO9k9+7MfLp/E7uwiQL4VpsMsiVSmOs7JhEl/NwsBucgyVPaAA9tXZYu8B5jmlRtYHi3SRFGYhLmRfCDAzIGbVypupfP5a/xkgVlkQRuyOYWVeZW68AldHcWRy6EGQ7KrMZksFLUUsIUCUVrhe7eZPycuj54fQUflsoBaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750113025; c=relaxed/simple;
-	bh=wdIpxSvYZMQELkmZoO10RQF9vFKpjjPVrr/XEK4dtxQ=;
+	s=arc-20240116; t=1750113027; c=relaxed/simple;
+	bh=WDVZv9EE6mS6jDvaajlm3u4/ZSWgLXQxQ1N6upZKKn0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Qpkkk0TFieqg5QGKjqNIXN5U9QgjAEr50cMWQtpye1WrXgj+FjvE5fYW5jdvzUz/O+kzoqraEqtZUZK9hsDkykJ0JugKi1r9WH3fcahGIAhBZ4oATph50mwJfyZo2+1kcCrDzkUsz/8AjZmbB7SNWvezISu9IolBCSQQ3AKTIxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l7+7pFkx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62CAAC4CEEA;
-	Mon, 16 Jun 2025 22:30:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KzoS4lTlO52FZ3y8PgOBxpzkD3NhktDi6ndpDV0M7X0MpeIWea9P0U6XlLAUwbyOJzmKwBI3z3tXRKwUuZ7fknuY34XMgHJ13EXhEPpdyJKyvvKgrVVi9dTDUXTQEvv4w1UGiUAMXI13LP6q86KR/G2lPTKlx+TYlit4jLhQdzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oY5tAgJ0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E56C0C4CEEF;
+	Mon, 16 Jun 2025 22:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750113025;
-	bh=wdIpxSvYZMQELkmZoO10RQF9vFKpjjPVrr/XEK4dtxQ=;
+	s=k20201202; t=1750113027;
+	bh=WDVZv9EE6mS6jDvaajlm3u4/ZSWgLXQxQ1N6upZKKn0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l7+7pFkxHg9xHbmKTZBMWXa3yyUBSmk+3qINpwFX0RqMSay733gfE0YaI5SSyPgKX
-	 wHmQDwpnVsNjuh1m782ekdpthkno35JWuBJecn2C56inM/dNWOvjhpC8vHBu1fiopA
-	 puJsZxTT7ZRQQ/XbeC3OMoSd68cRvB2HmcZF2noAzAJd66QDJfDrH9iiNPRpOr8/5b
-	 6o8Q6uL9773kbkiJwxxsqhK7rUOqsSC9EcZSeU0VhhhuwFZ8H0lrpvZx4B29kAEeX7
-	 skdAWSxDvz9fLKPBVbEzUNvg1GV/Hgs0AJZwvZ4OmIu/b8ZDWe99qBgHbQIm163p15
-	 gnmOhVPbYUBEA==
+	b=oY5tAgJ03t9L79RFF2nY/cl8ZB738UveLK+CGHvVPahajhd5CYC89lhzvjmHHrdcb
+	 nSraE+dF8VoIibrQia8RRZZxnvXgAA1eP73sxuf3asMPqksGdwRX1urDQ5+GKVDzh/
+	 F9P1aMg6oMOVWyLTuolVpKTJzq+N/oAMGOQydyubD/yUSyXRT3z5AhKxqTNL1O1Nfg
+	 Lr//oXonVACnP6KVzBqzcae29hjOnvXIB5UrbHpEQVxtWcvP0d/rjDRA0GzIMTbNJH
+	 jTjhMKE7RSABpVQ9ARIM038fImgSblT/IPxZxTmUObsNLvqmTEoNsJ28x/DUmkBdkT
+	 9t7vTTyWaHHSg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B6F38111D8;
-	Mon, 16 Jun 2025 22:30:55 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE038111D8;
+	Mon, 16 Jun 2025 22:30:56 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ptp: Use ratelimite for freerun error message
+Subject: Re: [PATCH net-next,v8] net: mana: Add handler for hardware servicing
+ events
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175011305400.2535792.11237173226777140565.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Jun 2025 22:30:54 +0000
-References: <20250613-ptp-v1-1-ee44260ce9e2@debian.org>
-In-Reply-To: <20250613-ptp-v1-1-ee44260ce9e2@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
+ <175011305549.2535792.9878725373600359262.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Jun 2025 22:30:55 +0000
+References: <1749834034-18498-1-git-send-email-haiyangz@linux.microsoft.com>
+In-Reply-To: <1749834034-18498-1-git-send-email-haiyangz@linux.microsoft.com>
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ haiyangz@microsoft.com, decui@microsoft.com, stephen@networkplumber.org,
+ kys@microsoft.com, paulros@microsoft.com, olaf@aepfle.de,
+ vkuznets@redhat.com, davem@davemloft.net, wei.liu@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, ssengar@linux.microsoft.com,
+ linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
+ kotaranov@microsoft.com, horms@kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 13 Jun 2025 10:15:46 -0700 you wrote:
-> Replace pr_err() with pr_err_ratelimited() in ptp_clock_settime() to
-> prevent log flooding when the physical clock is free running, which
-> happens on some of my hosts. This ensures error messages are
-> rate-limited and improves kernel log readability.
+On Fri, 13 Jun 2025 10:00:34 -0700 you wrote:
+> From: Haiyang Zhang <haiyangz@microsoft.com>
 > 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+> To collaborate with hardware servicing events, upon receiving the special
+> EQE notification from the HW channel, remove the devices on this bus.
+> Then, after a waiting period based on the device specs, rescan the parent
+> bus to recover the devices.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] ptp: Use ratelimite for freerun error message
-    https://git.kernel.org/netdev/net-next/c/e9a7795e75b7
+  - [net-next,v8] net: mana: Add handler for hardware servicing events
+    https://git.kernel.org/netdev/net-next/c/7768c5f41733
 
 You are awesome, thank you!
 -- 
