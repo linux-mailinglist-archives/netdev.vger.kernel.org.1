@@ -1,154 +1,201 @@
-Return-Path: <netdev+bounces-198157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB75EADB710
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:35:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F382ADB732
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3E897A8B56
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:34:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 157003A8F2E
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1F6286894;
-	Mon, 16 Jun 2025 16:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0307A286D62;
+	Mon, 16 Jun 2025 16:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OL7AUP4E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEWqZx5l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0BA2868AA;
-	Mon, 16 Jun 2025 16:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD6921FF37;
+	Mon, 16 Jun 2025 16:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750091749; cv=none; b=WDcaAOoVZXd49BgPt06S6IzJKtjWMoVGFpmXzWY73CWP4odnlbcGuCUpCd1jHH4c5I8D8IrQ/+wnXdclXAIdKz/MqhegGoCyr3CCfmm+EzkK9r7AltSyPAv8VGx8zODLQWe8+GxTwcoHSCQ0750dOeFE8YgAx1+okHzgLi0OVnM=
+	t=1750092013; cv=none; b=BWHbjF/6HjOzbTYjz8gzQ7eM5YgTKTF2oivUh1k0d052A3Y7zbpEgP3NzAODQIG48unId+rsifVVor1dmOLjdm+opb7sMouowjc8/hw6mOlLgqD/h5WJew6qx7p3b0tD5zl96cbzDib7ZsYN8d3y1SaeuGwpPnmAQJMdXtltpYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750091749; c=relaxed/simple;
-	bh=f//04nA86a2frPrdLvlf59G2O/r7xSN5UM0jMXIiuxU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vfa1WZ2o1pFu2hZOg9rjosu1VNYPMZNpLnfrdDNp3K18nNQtUpNXPLlxXkDG9EOgjvvmVEHcjyG0+0T4dzUgQjEKPI/amdHWx6n5BuQa/QFWThQ0zo2cwE4AOIAy5/rn8dq3+HtMLd4DleEJB+g7U48H8zF9RH8PK53DA3hCKH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OL7AUP4E; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-451d7b50815so39843025e9.2;
-        Mon, 16 Jun 2025 09:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750091746; x=1750696546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=p95WO1l7RogtvAaExfdpVHlBm0jGWO82lMgNc0hMKck=;
-        b=OL7AUP4EPe2KUXh2EN10joQXfUR6H/MEpImeGSREg71O1VpMz5heF8zPOoYxrDzG7E
-         +KULryfEasa49qnAf+hYcSkA0GjE/HSU64tN4EfgASezkDCgYWcUg7gryJlJ00cIm5cE
-         tk1q1N8doOxIxJel9Nn0XTQV/XQ/htu0VXuvox/urm8sybmpk9ReSTT58/FM1dfhKOT4
-         FbBb64zNx1E4k6aJ1bcebYLSXlognMx3iOyR3CxwbA9thWL576LwtIpXXxTnDLcaCdct
-         FQ9eEuk7nTyaucahwIi7yeY2jSN44Wk6Ct4nBXHW37mlsbm6qd2wddGdbMmkKDDroLUY
-         qIvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750091746; x=1750696546;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p95WO1l7RogtvAaExfdpVHlBm0jGWO82lMgNc0hMKck=;
-        b=wtMrQuXD2w43gsQEO/QZascAv5uPfmwxFHE7SuzW81dJG+rtEIRNoPs0G/l9Ex0lLr
-         fWZGws46YmXLH0JVCGvEpwfcCPk4/RLReZXRVVy07hOXGxasazjWbwBld4aP0EUM5AH0
-         fdskonC/zx9bkKgE/FGCc4eshxgoQzmiS+8zkKoY6l4T40PhluJT2lVRAKNeRAOOlD5b
-         8XSULib+Nrrz6HBCtqOU//n3gLjtVzHVvfOxf/z9lSgWKZTUiADsKrsxnVg2K3FluQfZ
-         RZKo6zKKj4m17E0JF6RIj+DWFJ+fOrDHD5EOKScAYTlhdWOqB6rFY/BLbolQ5skbhLYA
-         0Jsw==
-X-Forwarded-Encrypted: i=1; AJvYcCWB3T4BmB8ZvJ9vsTTe5UG+iy0ZavbvbbFPeyYKQsQEb4lEFVxRjwpqBL/no9VqgSHL9P63L+DHDA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWwfjuFrDEbV+m1TBNQVPxC+TSHVQiiYt8GayHP2us3wkmbKr0
-	AOdciTEXXcOmJIDawXw2SrwFsbAUn/LPieYbmTtBqC8dHwQ6yEEm8fQa
-X-Gm-Gg: ASbGnct59Cu/z1MSClWxo+5Yt5pd+tY6n6Xm7LshzjfVE+tDxNj3tV6birCakOlOlT5
-	s/kuztkBM8VR26pqNaazGrjNyUHdaYTS5Wg/vz1lJn9b29zixHMScstG6pgjeyBG1/OFHwL0Bji
-	9mEaCcsbw93U5n9bSypkdBb//7+bAoI6tZaGGadsJE8IvZeIjdLdbvHSjM/tldS8iKgLuM6hkel
-	mVCvhjrwYBqHTN+G0kjBCAm6mMOIGKQI0UYgp6GFByg5ju9sqMKO06vDPTXMzcq/EnFcjXO7vcn
-	UcLHln+cVPLnh1C5hE/Bj4liYQqjLJB3TEvCE5KnxbR7Qt38Sj4HPhy8OWclj2FYLXM2oQ==
-X-Google-Smtp-Source: AGHT+IFAPTIK3NWEph1La8TZ7u5iliYHvGiUwHtrT/yqY1uJDb81dZz062orV4ofhNmW3Oz3uIwG7Q==
-X-Received: by 2002:a05:600c:1e1d:b0:453:6ca:16a6 with SMTP id 5b1f17b1804b1-4533cae690dmr118354705e9.10.1750091745437;
-        Mon, 16 Jun 2025 09:35:45 -0700 (PDT)
-Received: from [192.168.8.100] ([185.69.144.34])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e172b03sm149127985e9.36.2025.06.16.09.35.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jun 2025 09:35:44 -0700 (PDT)
-Message-ID: <65907669-80cb-4c79-9979-4bd2c159c0ed@gmail.com>
-Date: Mon, 16 Jun 2025 17:37:01 +0100
+	s=arc-20240116; t=1750092013; c=relaxed/simple;
+	bh=DW/mYNwTouTw10FCu2yR/A/2ODddX0eTePEGQ27HCEI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZkkKERW6i+JcGbxVZpa6en/EO++PbPeh8Q24Vgy6Cqhpox6jBNwH8V7BmtQ8VmqXVvSboFdekOwyB7V2rB2YDsFVq+1QHaBtThfdMYc/F5fhHP8btIqL0YGTmB0FEAMG2r9K264uE3+hBZhdqPXGrqx1ie3QSsgUqaVIPTArO9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEWqZx5l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F052DC4CEEA;
+	Mon, 16 Jun 2025 16:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750092013;
+	bh=DW/mYNwTouTw10FCu2yR/A/2ODddX0eTePEGQ27HCEI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BEWqZx5lIfH8+gakxPxfUHRrDMUg5vM79KBdqR5ODrfT5TytEAZbAifZTI0i5/nA2
+	 8AeWFRLIBsqa0pOYYv+URXlYw3LrWz1zwpzuoSpr60tKJvS43jG35iHsMkpowjGMwh
+	 4z9q7nuvNthZA4XDqPJia5RbWIzfBYVaIxPjvdWyUqeZRVw5wMD8/y8tIVAxmEAbge
+	 FagM1IBgtCgKoN3CqHSsIQrVo7eVBTf1o1uKWq89wEHJAppKgSuprvxfaxY/4erHDU
+	 mU37kfV6w7GlXUVET68WRMQ3DM0WjHyHOulZRLvKRec+tW863oWSNnOYZAUgYK1C4B
+	 f5zldll0kZ3eA==
+Date: Mon, 16 Jun 2025 18:40:10 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <borkmann@iogearbox.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+	kernel-team@cloudflare.com, arthur@arthurfabre.com,
+	jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
+ xdp-rx-metadata.rst
+Message-ID: <aFBI6msJQn4-LZsH@lore-desk>
+References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
+ <174897279518.1677018.5982630277641723936.stgit@firesoul>
+ <aEJWTPdaVmlIYyKC@mini-arch>
+ <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
+ <87plfbcq4m.fsf@toke.dk>
+ <aEixEV-nZxb1yjyk@lore-rh-laptop>
+ <aEj6nqH85uBe2IlW@mini-arch>
+ <aFAQJKQ5wM-htTWN@lore-desk>
+ <aFA8BzkbzHDQgDVD@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/5] net: timestamp: add helper returning skb's tx
- tstamp
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Jason Xing <kerneljasonxing@gmail.com>
-References: <cover.1750065793.git.asml.silence@gmail.com>
- <702357dd8936ef4c0d3864441e853bfe3224a677.1750065793.git.asml.silence@gmail.com>
- <685031d760515_20ce862942c@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <685031d760515_20ce862942c@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="sDj39uYRsqJWsHZB"
+Content-Disposition: inline
+In-Reply-To: <aFA8BzkbzHDQgDVD@mini-arch>
 
-On 6/16/25 16:01, Willem de Bruijn wrote:
-> Pavel Begunkov wrote:
->> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
->> associated with an error queue skb.
->>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> ---
->>   include/net/sock.h |  4 ++++
->>   net/socket.c       | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 50 insertions(+)
->>
->> diff --git a/include/net/sock.h b/include/net/sock.h
->> index 92e7c1aae3cc..f5f5a9ad290b 100644
->> --- a/include/net/sock.h
->> +++ b/include/net/sock.h
->> @@ -2677,6 +2677,10 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
->>   void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
->>   			     struct sk_buff *skb);
->>   
->> +bool skb_has_tx_timestamp(struct sk_buff *skb, const struct sock *sk);
->> +int skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
->> +			 struct timespec64 *ts);
->> +
->>   static inline void
->>   sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb)
->>   {
->> diff --git a/net/socket.c b/net/socket.c
->> index 9a0e720f0859..2cab805943c0 100644
->> --- a/net/socket.c
->> +++ b/net/socket.c
->> @@ -843,6 +843,52 @@ static void put_ts_pktinfo(struct msghdr *msg, struct sk_buff *skb,
->>   		 sizeof(ts_pktinfo), &ts_pktinfo);
->>   }
->>   
->> +bool skb_has_tx_timestamp(struct sk_buff *skb, const struct sock *sk)
->> +{
-> 
-> I forgot to ask earlier, and not a reason for a respin.
-> 
-> Is the only reason that skb is not const here skb_hwtstamps?
 
-Yes, and also get_timestamp() for skb_get_tx_timestamp(). It's easy to patch,
-but I was hoping we can merge it through the io_uring tree without deps on
-net-next and add const to the new helpers after. It's definitely less trouble
-than orchestrating a separate branch otherwise. FWIW, it'd be fine to add
-const to the existing helpers in the meantime as long as the new functions
-stay non-const for now. Hope that works
+--sDj39uYRsqJWsHZB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Pavel Begunkov
+> On 06/16, Lorenzo Bianconi wrote:
+> > On Jun 10, Stanislav Fomichev wrote:
+> > > On 06/11, Lorenzo Bianconi wrote:
+> > > > > Daniel Borkmann <daniel@iogearbox.net> writes:
+> > > > >=20
+> > > > [...]
+> > > > > >>=20
+> > > > > >> Why not have a new flag for bpf_redirect that transparently st=
+ores all
+> > > > > >> available metadata? If you care only about the redirect -> skb=
+ case.
+> > > > > >> Might give us more wiggle room in the future to make it work w=
+ith
+> > > > > >> traits.
+> > > > > >
+> > > > > > Also q from my side: If I understand the proposal correctly, in=
+ order to fully
+> > > > > > populate an skb at some point, you have to call all the bpf_xdp=
+_metadata_* kfuncs
+> > > > > > to collect the data from the driver descriptors (indirect call)=
+, and then yet
+> > > > > > again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the =
+data in struct
+> > > > > > xdp_rx_meta again. This seems rather costly and once you add mo=
+re kfuncs with
+> > > > > > meta data aren't you better off switching to tc(x) directly so =
+the driver can
+> > > > > > do all this natively? :/
+> > > > >=20
+> > > > > I agree that the "one kfunc per metadata item" scales poorly. IIR=
+C, the
+> > > > > hope was (back when we added the initial HW metadata support) tha=
+t we
+> > > > > would be able to inline them to avoid the function call overhead.
+> > > > >=20
+> > > > > That being said, even with half a dozen function calls, that's st=
+ill a
+> > > > > lot less overhead from going all the way to TC(x). The goal of th=
+e use
+> > > > > case here is to do as little work as possible on the CPU that ini=
+tially
+> > > > > receives the packet, instead moving the network stack processing =
+(and
+> > > > > skb allocation) to a different CPU with cpumap.
+> > > > >=20
+> > > > > So even if the *total* amount of work being done is a bit higher =
+because
+> > > > > of the kfunc overhead, that can still be beneficial because it's =
+split
+> > > > > between two (or more) CPUs.
+> > > > >=20
+> > > > > I'm sure Jesper has some concrete benchmarks for this lying around
+> > > > > somewhere, hopefully he can share those :)
+> > > >=20
+> > > > Another possible approach would be to have some utility functions (=
+not kfuncs)
+> > > > used to 'store' the hw metadata in the xdp_frame that are executed =
+in each
+> > > > driver codebase before performing XDP_REDIRECT. The downside of thi=
+s approach
+> > > > is we need to parse the hw metadata twice if the eBPF program that =
+is bounded
+> > > > to the NIC is consuming these info. What do you think?
+> > >=20
+> > > That's the option I was asking about. I'm assuming we should be able
+> > > to reuse existing xmo metadata callbacks for this. We should be able
+> > > to hide it from the drivers also hopefully.
+> >=20
+> > If we move the hw metadata 'store' operations to the driver codebase (r=
+unning
+> > xmo metadata callbacks before performing XDP_REDIRECT), we will parse t=
+he hw
+> > metadata twice if we attach to the NIC an AF_XDP program consuming the =
+hw
+> > metadata, right? One parsing is done by the AF_XDP hw metadata kfunc, a=
+nd the
+> > second one would be performed by the native driver codebase.
+>=20
+> The native driver codebase will parse the hw metadata only if the
+> bpf_redirect set some flag, so unless I'm missing something, there
+> should not be double parsing. (but it's all user controlled, so doesn't
+> sound like a problem?)
 
+I do not have a strong opinion about it, I guess it is fine, but I am not
+100% sure if it fits in Jesper's use case.
+@Jesper: any input on it?
+
+Regards,
+Lorenzo
+
+>=20
+> > Moreover, this approach seems less flexible. What do you think?
+>=20
+> Agreed on the flexibility. Just trying to understand whether we really
+> need that flexibility. My worry is that we might expose too much of
+> the stack's internals with this and introduce some unexpected
+> dependencies. The things like Jesper mentioned in another thread:
+> set skb->hash before redirect to make GRO go fast... We either have
+> to make the stack more robust (my preference), or document these
+> cases clearly and have test coverage to avoid breakage in the future.
+
+--sDj39uYRsqJWsHZB
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFBI6gAKCRA6cBh0uS2t
+rDluAQDGPIrrlw65wQryPK9+Hj0hrdco/9ylRkdk0KC8Velo3AD/cttF4uhvrYLW
+YgYu1SWEYU0DYj7cb3qp5hK26dk6qwI=
+=QBjQ
+-----END PGP SIGNATURE-----
+
+--sDj39uYRsqJWsHZB--
 
