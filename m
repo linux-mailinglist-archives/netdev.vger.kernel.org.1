@@ -1,137 +1,135 @@
-Return-Path: <netdev+bounces-198202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70EF5ADB928
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:55:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 135ECADB93E
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:01:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE67F17402F
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:55:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62C4D1886317
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B240D28A1DB;
-	Mon, 16 Jun 2025 18:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7931CAA62;
+	Mon, 16 Jun 2025 19:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="xnfXcxrh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yxhmWNlz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5213F204C1A
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 18:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E992BEFF8;
+	Mon, 16 Jun 2025 19:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750100104; cv=none; b=VaoE8fcSZJKVx5kz6V4Z+LlFIyW/4S9/xqqaMbk0ZHrJTPf3ZNGytKSonIi7321J6q7r1tpXOJ3UPNKwjKabxr1qd7tgx+ILxxTI2fc9Z9lLUs86qiiSeQaXvCXFc16zTR09KNzJYPkdFFiCx0H12TyBXap6Iu3Fmk/x7SZlxLI=
+	t=1750100480; cv=none; b=ss21ntOsBbdCZxlO1qdRq/B5YHZepNd53PzwTzoP8//AXSC4lDFQ/EwDJ+kzG45h1lbdV1uBa3QL0MGcBCMhpZ0sICs3tvu5frzDx8HNuRx6u2ONWDOczZzMDrhw5xucNkLV+/Oh4WZ/veLkrLeU12zdiGRyWqrSOYO1BI7Cybk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750100104; c=relaxed/simple;
-	bh=Rn/7wRmGcAxzDqeisQ+LfcxOtH7Pz0HzM0OYTlth4Wo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LglrQsEJ35y208MUAufHRiY46bGN4I1Z9BpBnZcaMV+HG+ppk7fDHp04hzEwSkVu7JhzhQD0Jn2vLd+FvOEoM3+DMVJWPXmwYv7ltfl7jV5iJQXddf7CXf0n9GdtXtC5I64czWm6FV9n4ex2FK0+gyjC1JKnYQLYxqIbrV6KN9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=xnfXcxrh; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-748a42f718aso1717469b3a.2
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 11:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1750100102; x=1750704902; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yx81n7Pha/SR/jETIz5Pw/KIFtPSohKv2m9Lgpv8CxU=;
-        b=xnfXcxrh8jhPcE7C3QNByJVALfdP/HuTPVkK7u0aefN4fRFpDof2uyJRGq7ehyJ12D
-         /RZAcHEiZdhRX3dnFNqQJ9J0IMiawIuIBw/bTlEEtFLqy4exSsm+syH1ZMZg31/WTC9I
-         lgEosNVPeoE7hjgRxj+HBthGM/1LtK6RSr6Ue7H1oBFyyMGc3HYKyVfjlWfzyn8iweb0
-         DlRbODcxBmpr6FlBMXIa6k+hPFlPJjpFZ9KKQ9DbQPvtZ8sJ8J8FQEtishGk7u2xTxCa
-         1k9aKF9HpTeAKNiLk1xeSlLXWuMXBkHKDoQFsLLvFVbFZIuttEB2yK/6YYgigCWMfwTE
-         pZDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750100102; x=1750704902;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yx81n7Pha/SR/jETIz5Pw/KIFtPSohKv2m9Lgpv8CxU=;
-        b=JAyb67o11AW+Hw7NuWYNqjomZgiVXDbVoOJpGTyG/qK2XKGvIafIXDnwus+Q11jlo6
-         R/3VzLJ9XqfL7lD4w3GYRnJ31d9aCc/jGPhuf/4Y5SELcx//gRadvqBwd+S9qOL/bMjp
-         zf8zzyRAEEPuxMAJ8Ss4lHox8q72XuAeo4vRc5QeFdYfZ2gAoTvKN3OYj0lPrSpD+ps/
-         zCX1F+uFIg2Uc+vnJIBWfnnhlNgm6tZMgvUfmv7wlhRXb513KGM6sPNJuRsg4E8ldycw
-         lSdcHgDO258EnBU0jrUfTzab7Pzd/I+oqy6VdDb6COuXb1jz6P5tVb4x5OCnYQWpdRMH
-         RlFg==
-X-Gm-Message-State: AOJu0YyTNtvU5DYgdCEsQpZghjKu0dIpk11PEpvkefISuAxDXlXF8zgG
-	f0Ln7P8TnAKLJkBOnqY92XgIb3wFpK94rNOD8rRbMgDexGigc6rV3l42IkoO+g1QiAkVh5hASy8
-	6w9sM
-X-Gm-Gg: ASbGnctApvrxI+cQI+44pV1IQI9oEFSx4xDDtLQhAtxDelZYMyXJ8jLuqC+mjfzC+Vg
-	5dOmZ3qmcbJkvU1MId9nWvYnQP3FkA8OGAhfZq7N2Iy074pEsVNgwkrXie78UetAlY0OROScbhF
-	yqw7spKRpiZFrKIcxzGbn8Cddp2WkRe/k3msEjOpXvpnGhEktwcviPVCF+cDkhrxew2JCUkh8Ci
-	6kucdWxZm3FxbzwXMZ3bmNrTkFl4kOSnRwGYfJyvnN8FzPaidq23DeIABCNZ1A5sjDzMXCq7kQX
-	e75u1BLhP5saDkvZ3En5Z+YEXyCCIpvBREJW3bnwGOhaer0=
-X-Google-Smtp-Source: AGHT+IHRlsZnkjevup/hk1ceHV2FZkLVUYgnTw6UkBHNGi16boeOmFKJEEW9x1UzQqLP1jhWVHjmMg==
-X-Received: by 2002:a05:6a00:3990:b0:746:26fe:8cdf with SMTP id d2e1a72fcca58-7489cf72666mr14856387b3a.7.1750100102438;
-        Mon, 16 Jun 2025 11:55:02 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:3::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748900ad24csm7451015b3a.109.2025.06.16.11.55.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 11:55:02 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net v1 4/4] tcp: fix passive TFO socket having invalid NAPI ID
-Date: Mon, 16 Jun 2025 11:54:56 -0700
-Message-ID: <20250616185456.2644238-5-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250616185456.2644238-1-dw@davidwei.uk>
-References: <20250616185456.2644238-1-dw@davidwei.uk>
+	s=arc-20240116; t=1750100480; c=relaxed/simple;
+	bh=USxgzpl7+hY7G+QKeg4JLcc5y4PD6NU5jyW03ggM+7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RvLuwhU7H680bM5In8RRBYsKpxLwY3BnfjjuUJv6eDG1LO4JEknZOc/zDUiwMrDuGr4LbBz7m/iAXbwnVQOEUTRwV4qnVBOQElxYYoSkeB2Yooit9a5C+p0HLn/asEHkFzAxkUaHF3wRpX6QQH4w5ULiQ4dErVZjAaq9KUgCVAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yxhmWNlz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NAvcocV1hx7+8hA+DnXfce45O70Tw2fyTGzwBQS2idY=; b=yxhmWNlz1LbYftvFFhwws/TBf2
+	Rdei/1IW/XI/M1GrLUkW5WdXD0e4+fD0VA4iD3AVWN84ydajb/qY9SRwMgwsUPGJuL+X2kphrLaoD
+	036DlptDRiyTQbvrLdd5NdT3cztXWgAOtRIaXoxVsSjEnqSsb03AVJgbm2mQaO3ZZEmU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uRF4w-00G4wb-Q5; Mon, 16 Jun 2025 21:01:10 +0200
+Date: Mon, 16 Jun 2025 21:01:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: allison.henderson@oracle.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
+	hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org
+Subject: Re: [PATCH v2] rds: Expose feature parameters via sysfs
+Message-ID: <b71efc64-89b7-4f4b-af0e-9bf081cc9518@lunn.ch>
+References: <20250611224020.318684-1-konrad.wilk@oracle.com>
+ <20250611224020.318684-2-konrad.wilk@oracle.com>
+ <05ac7bdf-999c-487c-beb2-74153d03f6b1@lunn.ch>
+ <aFBlHiguQpdB1e86@char.us.oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFBlHiguQpdB1e86@char.us.oracle.com>
 
-There is a bug with passive TFO sockets returning an invalid NAPI ID 0
-from SO_INCOMING_NAPI_ID. Normally this is not an issue, but zero copy
-receive relies on a correct NAPI ID to process sockets on the right
-queue.
+> I could not for the life of me get the kernel to compile without
+> CONFIG_SYSFS, but here is the patch with the modifications you
+> enumerated:
 
-Fix by adding a skb_mark_napi_id().
+Please take a read of:
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- net/ipv4/tcp_fastopen.c | 3 +++
- 1 file changed, 3 insertions(+)
+https://docs.kernel.org/process/submitting-patches.html
 
-diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-index 9b83d639b5ac..d0ed1779861b 100644
---- a/net/ipv4/tcp_fastopen.c
-+++ b/net/ipv4/tcp_fastopen.c
-@@ -3,6 +3,7 @@
- #include <linux/tcp.h>
- #include <linux/rcupdate.h>
- #include <net/tcp.h>
-+#include <net/busy_poll.h>
- 
- void tcp_fastopen_init_key_once(struct net *net)
- {
-@@ -279,6 +280,8 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
- 
- 	refcount_set(&req->rsk_refcnt, 2);
- 
-+	sk_mark_napi_id(child, skb);
-+
- 	/* Now finish processing the fastopen child socket. */
- 	tcp_init_transfer(child, BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB, skb);
- 
--- 
-2.47.1
+and
 
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+You need a new thread for every version of the patch. You should also
+put the tree into the Subject: line, etc.
+
+> diff --git a/Documentation/ABI/stable/sysfs-driver-rds b/Documentation/ABI/stable/sysfs-driver-rds
+
+I could be bike shedding too much, but RDS is not a driver. It is a
+socket protocol, which you can layer on top of a few different
+transport protocols. So i don't think it should have -driver- in the
+filename.
+
+> new file mode 100644
+> index 000000000000..d0b4fe0d3ce4
+> --- /dev/null
+> +++ b/Documentation/ABI/stable/sysfs-driver-rds
+> @@ -0,0 +1,10 @@
+> +What:          /sys/kernel/rds/features
+> +Date:          June 2025
+> +KernelVersion: 6.17
+> +Contact:       rds-devel@oss.oracle.com 
+> +Description:   This file will contain the features that correspond
+> +               to the include/uapi/linux/rds.h in a string format.
+> +
+> +	       The intent is for applications compiled against rds.h
+> +	       to be able to query and find out what features the
+> +	       driver supports.
+
+Is that enough Documentation for somebody to make use of this file
+without having to do a deep dive into the kernel sources? If i need to
+do a deep dive, i might just as well handle the EOPNOTSUPP return
+values.
+
+> +static ssize_t features_show(struct kobject *kobj, struct kobj_attribute *attr,
+> +			     char *buf)
+> +{
+> +	return snprintf(buf, PAGE_SIZE, "get_tos\n"
+> +			"set_tos\n"
+> +			"socket_cancel_sent_to\n"
+> +			"socket_get_mr\n"
+> +			"socket_free_mr\n"
+> +			"socket_recverr\n"
+> +			"socket_cong_monitor\n"
+> +			"socket_get_mr_for_dest\n"
+> +			"socket_so_transport\n"
+> +			"socket_so_rxpath_latency\n");
+
+This is ABI. User space is going to start parsing this. Maybe we
+should add both here, and in the documentation, something like:
+
+  New lines will be added at random places within the file as new
+  features are added.
+
+This makes it clear that any code which tests line 4 for
+"socket_free_mr" could break in the future. The whole file needs to be
+searched for a feature.
+
+	Andrew
 
