@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-198309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5304ADBD27
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:46:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B4FBADBD29
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:46:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96D9A17430F
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE4373B7C06
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831E71E8332;
-	Mon, 16 Jun 2025 22:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAFA2264A8;
+	Mon, 16 Jun 2025 22:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YMbIiwsX"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DlfWBIUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2048.outbound.protection.outlook.com [40.107.101.48])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2042.outbound.protection.outlook.com [40.107.236.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2272225415
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 22:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C722222B6
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 22:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750113974; cv=fail; b=cNGqCB2Gm904opavdghGh2Zh8okUhNTVASazha7nySV4cKHETCu8fXiHc8b6g2M0kO4fnz9ejJMceOP2aDkrFFoj3g2UlEyRWD7tgCK3p+N7ugdvgtlJCB5CCaApfSiCkuPJ0pwjcMGAFSulmiknRDI91s6CLT3FbzxJ3DJNg4c=
+	t=1750113982; cv=fail; b=RQcbOIXo1IsCrdwfokV/czaw+JJA7rV1MVJImkLnDK7BtDbnDJKuM4iY6rH+ZtvHjaR15fRgQ/1dGriZlvT9TqO7A6UARk6IlSeBx95ytCIOkadSkHi1qXb1REZepbQeAo4I2kkUsAoZW8ggvU/IG/qbfkxacMaqWPp7YPkoZqc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750113974; c=relaxed/simple;
-	bh=TfVGp/h10MB/U8+zFaOW6e0KAfSgIILdyVBWF+pRyzg=;
+	s=arc-20240116; t=1750113982; c=relaxed/simple;
+	bh=4X4xbPKGwpj0eRlwo4yZEhSI24f6DeHbwIw2YrLWy3A=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=miOAjP2PMMGcwMJGWYr1NJKuOmr0yiKy2VjGpo5NCoObKd2VTXDv9RzYIMlhmGGDHwVCQJyfGZY4+SY+HNr0BnDP7ZrTVbto8IPlu+1zRgpnlpkfNEJQBX0f31AZBkgLr9eHwo9U3xVzdNl8MHxc4/UQFbFA6M8dus7CqD0MQ0Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YMbIiwsX; arc=fail smtp.client-ip=40.107.101.48
+	 MIME-Version:Content-Type; b=NvAC1SzTapnO82ZAuZ6eHgvWzTSaH4LvVQj6u0fT59plFjWjSB5umLpSKeKKpkO3U6IuV911b2d45R7o+tUsrxlq9Fh2XEwSLBqTbARPxubl2MZTP/h+DcF+x50ayfTSWncLW+bLft8vrAHT1koIdg+3qLA6t6Re16f8Ibwi0Hc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DlfWBIUC; arc=fail smtp.client-ip=40.107.236.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XyvmDboqgjVajCrXEcuDxXOyp4hVyVzu7Tpk9TD2IZ5AvbEPY13GTL6JxpWpRwbKxzEEp3gP9J4YoffouDgjtepv6OyLoPd6cE/QhgulzJwJak8XPAfvkt1icqnSy5S3hjy9FC+JNnBSYAF0g/aMlb08ampwfgUUyEKIA5+OQljyPVGDfcRV0nzJcByKbbpGuEPyxz8nDkmyzdSbuhdq2dhNa/nKYnqEc9SfPQgvaynzV21YKu6LKgwbna8gUglUTpw9cvNEGXHxWQkyytHnjV6wuiZXAXq1M/weQ2j4NqUXQT0CR3NyQOSxYEGGQLlDUxKxzpT5teog6PmO9UP7ww==
+ b=S3IUgpdHjWclzdyjEIj0QRwqK3XYOSULG4lP0MUgA8lViDzIYsisssR5+djCGH1pnj3PJxt03rlWON6pBNXccKao8Ycsw8CuJR4DxU2hL28kKcrpaOI2jefogo2PZtw0vd+SQ8Y3fTUZeHqUx8rkzyhFqVFxelc0OX8ba3NSt1gVjKY+ZJjsMED7Ht2y39hC4kxn8DHJXnXqbm7v81DbaTxjMv6HkCVZ+n3ZYPiaS8fbDZRfsPHHSLXvSMI8CAka2uvRD5GFCozdOjJvKV9zIZq62o39VoE2veP3JNy5QgUoU95nGRJ+4Vyak5pZGXmRnn7/a/Zm82YQZRtHXc1oOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8Senj96sPA6iDPigAucis7OFcDNXvI/6WHPovoglEF4=;
- b=npWCfzjtfYW63yR8FqcNTQe2I/gIFsRoFZNMdvRYwAcwuFmxPdS5o4etGi447EvkH7m7JnEJ6OfJ0+mr4koZnvlwzhq8vok/tjY+GbucVoEEXOtbuuYVHEhqVoaUYtCC4gHLqIW6PTmiArYd0cZY28Vw7fuMwLJruQFtU17sv8eDvFIsZ1nyaAPCFPTTn8QlutRRZouiulJh1GtqFpe05/ESVMECO7sRvfDL46n+zpjpx+rxddk2/wicMeZRGZ8kLSdj+jd7BrIDBCS4P+vOxYU7Qr5OohfVE99K0iMwk6uEXZ4dlRx8c4m0O+QDMpDau5dBz/YQfzI7wsaGJfGtdQ==
+ bh=1oz1qygwl8WZG1I5bJO3IZ33/pidQcvxD8A15jcV0v0=;
+ b=uMvg1JqsBlTp+U5pW7TiyxRPpwWOL1Buk40g2ax9nmyGmzHDkUSmOVIlItNKPtfCIqWBgM+Nht4khzTAxi4wdeaL85eg+f4iu3yIam/fjMn33E4gXPLTQwvWpBYk52TsGrqPVX1KvT5lEognKQJGqrP2lUeQkkww2PbyPGYufBpyPS91jb8G8JPmLE1RK7wKiTQfXO1O89pv9ngRfaV+TONe0zUcasayochMIeRYzJflp1P4MWoFiq8tQbrfBTYYQcraW3brY+K7+q85bCsAM7toTy/IafdC9nDTJj5dhQkZVcjzLeS3gEb6kUo2Slvqkajudra7TQGLPwXIdai7NA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8Senj96sPA6iDPigAucis7OFcDNXvI/6WHPovoglEF4=;
- b=YMbIiwsXqxwpulO/hni6TbCgXcM8hIuO+leyBS52Oe6zyQWTzvkBb19lrtWMLDYMsOD2t+77qUI7vaG4WTkF0HPBIok6sktgy6KOjfq4GGcBWP+ncCLd0TZjCKeaQuYEgCECKq4vC9VIEFbozMXqPc+CiPmuZdBvQMQ1n83SdkG9HX3mVA/W56gETsbOO6sUvFKxqLAijE1AVBODBE1xqnI6idOWV84gJYzLbEGdfBLvlhv8K41hnmJHI303c6wZ8Zzqb9KwnuPSTDS3Q5n8Zy7WQaxSe7yRSK2vTGyjB5YJBAr0RAnzybvBLsdf0y2Vjt1OrGUEK77Fd07mBY5HQQ==
-Received: from SA0PR13CA0011.namprd13.prod.outlook.com (2603:10b6:806:130::16)
- by MN0PR12MB5858.namprd12.prod.outlook.com (2603:10b6:208:379::8) with
+ bh=1oz1qygwl8WZG1I5bJO3IZ33/pidQcvxD8A15jcV0v0=;
+ b=DlfWBIUC6ugIPmLX41ytUsVNZrL4r61Yp1XeRDcVS/4qElMRgINTYqluQL7Zg8pgnrqrhfwj8kIP+Xeg4CCk8uHHajIESTBIW6TUbmcxfDbD7JVPYYQS/UHCXjJW6lorc6hsMTYK/1wkRJX8GPKtA0zTcjQkW7c1txRwOk1ZFqsdsok18pjOhRDAJfUQOx0/srQU8KEMa9A/q6wYFsY8I+NSevv+fAGJDCHC25US35NAMOIKabY5qliM/flWw3U5ebvhD5d0097jMOo7+TNBXWJ0N3qit68IGmuxgrrHshVI3YlbDT0mMMqTau0atboC6FjuCgG7aeJFP+llD6u85w==
+Received: from MW4P220CA0019.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::24)
+ by SA1PR12MB8860.namprd12.prod.outlook.com (2603:10b6:806:38b::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Mon, 16 Jun
- 2025 22:46:07 +0000
-Received: from SN1PEPF0002636B.namprd02.prod.outlook.com
- (2603:10b6:806:130:cafe::15) by SA0PR13CA0011.outlook.office365.com
- (2603:10b6:806:130::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.23 via Frontend Transport; Mon,
- 16 Jun 2025 22:46:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.27; Mon, 16 Jun
+ 2025 22:46:13 +0000
+Received: from CO1PEPF000042A7.namprd03.prod.outlook.com
+ (2603:10b6:303:115:cafe::b0) by MW4P220CA0019.outlook.office365.com
+ (2603:10b6:303:115::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Mon,
+ 16 Jun 2025 22:46:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002636B.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000042A7.mail.protection.outlook.com (10.167.243.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Mon, 16 Jun 2025 22:46:07 +0000
+ 15.20.8835.15 via Frontend Transport; Mon, 16 Jun 2025 22:46:13 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 16 Jun
- 2025 15:45:54 -0700
+ 2025 15:46:00 -0700
 Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 16 Jun
- 2025 15:45:49 -0700
+ 2025 15:45:55 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -83,9 +83,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Nikolay Aleksandrov
 	<razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
 	<petrm@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next v3 09/15] net: ipv6: ip6mr: Split ip6mr_forward2() in two
-Date: Tue, 17 Jun 2025 00:44:17 +0200
-Message-ID: <8932bd5c0fbe3f662b158803b8509604fa7bc113.1750113335.git.petrm@nvidia.com>
+Subject: [PATCH net-next v3 10/15] net: ipv6: Add ip6_mr_output()
+Date: Tue, 17 Jun 2025 00:44:18 +0200
+Message-ID: <3bcc034a3ab4d3c291072fff38f78d7fbbeef4e6.1750113335.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1750113335.git.petrm@nvidia.com>
 References: <cover.1750113335.git.petrm@nvidia.com>
@@ -101,137 +101,278 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636B:EE_|MN0PR12MB5858:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c353ff6-4dac-4dc1-ebdb-08ddad27954c
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A7:EE_|SA1PR12MB8860:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f66dace-2c97-4d5a-1c28-08ddad2798a4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eDozl8It4GIlW3I7YdiskAoGVx+NYXR1cuVktRGzcSQg5kXTSPEsRs21vGud?=
- =?us-ascii?Q?TebNwqxrGEKJzW8F0fffuRjqCcj3IEwohx8AoaG8tpJ9AM8cQgaIOgsOlPtf?=
- =?us-ascii?Q?cjlqJl3YG9nPR6R4jKpL+LzoqxeEje0YZSc67MIbpe5DTR1xEFowpxpu4346?=
- =?us-ascii?Q?GHTNZVO0aihsI97b15j+xIUzfvrbyLinkBLc3bb60IonQAU0FO4NKCKAbSte?=
- =?us-ascii?Q?Ol22lgFq/uCrGEMpiPynY3eh2TcLEwuABnoBaUSNWhzJRv8NM/V9CQ3lZZWE?=
- =?us-ascii?Q?YNOZ9jDVCp7DhfaIKOgm+iQljQDtI9vFzT2fi52A1EXVOYzYyi3zZ74ox9It?=
- =?us-ascii?Q?MCJ1HP2Y8Uwt3KS3h8NjjJE8UkVhtIK1rLqoJBpWvta6k8VMin5BwYwH5Z1o?=
- =?us-ascii?Q?Z0QtVeSc4AL6zKCQEnghz5/8lPR94QxKaDs1jpyMplZbD+myDkurt9BnqC8n?=
- =?us-ascii?Q?mVp7XT1wwJiNbJnhi479TvQuX3KGX6WMuNv2xFy8zOeqgF8onlz+hsaPrp6H?=
- =?us-ascii?Q?Z2N40LuUYO0n5ZVKfACEBGs/Z1QcN+CBmAgRoyS0Pf1W26ABxi/eRX8RRgvN?=
- =?us-ascii?Q?/KocQQ4tdEqloh6ooQLPIydNToXwY5WwxOaiTojmyRk0cBRzDsRpbBjCB+TV?=
- =?us-ascii?Q?9dab2hi78B5zRw1O+de/7h8d8XcaAG71NVIkm2FgCxNSIb8cB8WsTUiu6V+K?=
- =?us-ascii?Q?g6qNOYckRfHSRpWB+DK2DoG8pQl/65RQ71G04JQJaF00RMEcxpaHr4lBQkzv?=
- =?us-ascii?Q?HOVpr8GqtSVdf6W3eJm0FwWIgJeiuiVQ60GRa+Q8r4vgC1LHV7uApMIMQrmg?=
- =?us-ascii?Q?bBC4NulA0HECz7HMUTK8FG9B3XLUPQa/44buBw2q50oaDDldMgsaN/EZSCq4?=
- =?us-ascii?Q?ngxPWgcYCz2YdVzBjnvZ6L4olbyLeltXdantQB1WvToIW2RKJjOSxJixXDJd?=
- =?us-ascii?Q?7xXzBIm2+zRGH0APZe4wv8h2bM0V7enH3UNKuMPYdNplJqWJpADfyPGylTkm?=
- =?us-ascii?Q?KJdJe3zFt2CDJgsVff01Mm79UrlLKZLy/mRhHhLJJZxRijEH1rKqzeLW5pG5?=
- =?us-ascii?Q?DqJh2qkpLa52GRFaeBtotzdPcmNiwYQLPA0xd+aR0a4uuXyDIWP8agqtyxS8?=
- =?us-ascii?Q?XzHAqsmxCwW/Rp80jR4+6mk5lkBKYHFaGmuOyQDIjVF/Vt6kuQxIT5u8DRoZ?=
- =?us-ascii?Q?W+KfS+31TVQOEcVuMv7O5egW6TiuCpbPhhleiijxVybR23KwyF4nU0j2o0zu?=
- =?us-ascii?Q?9ivVxeTdZt5uKzGxDNkv7f2FryHvNDBHfpgKVR9+3kvX5igO526JbGXjAF0e?=
- =?us-ascii?Q?25E1NWZQ3Ujyc/baM3/GEJNnD6V4KGZReyR0ZTQRpJtfxmXikOlTPXbLDtHi?=
- =?us-ascii?Q?COJ2Bu2RuG8V65RHSB8+tMW6oOVPTLPVwYZs0JWdayyS/rN77JJEFObyF/1N?=
- =?us-ascii?Q?ix7JQ89hWlezL31OxbZ1N3fEyofA3So6au37vWyMEVNSoNApeMVLHjywm2As?=
- =?us-ascii?Q?PCK/ijEC8wZHO4YfbygjE5jXfB2UT/cl6lve?=
+	=?us-ascii?Q?o0IlltkPDCbWl5grl6DLrln2pGG8azBiXRyrkAXBW6qVofJNj47yv4EPDV+X?=
+ =?us-ascii?Q?5elD6wiYhgURfC9QshbbNqMTNwRZS58FBAJlTOQm0svBAF68vivhKiRCGoMl?=
+ =?us-ascii?Q?ZazgslUvq5TWEPCbbZ7R2m4H1fWmY+ynSVnaU+t0s0MPxqRqh/APufsXKIny?=
+ =?us-ascii?Q?o+M5YUmo7jZOOokS4iAFPq2SoLMzpwtykdEKZFxDuFO4bpPx0MPVPpJNDvWT?=
+ =?us-ascii?Q?zrdUJsWJsX+98d449LP4zUDSS/CesK5hQYN55xzFCRCINTpP2SBj1W1BARc+?=
+ =?us-ascii?Q?J1BF56dWdogW45+CxoRs0jZVd31Um5ST3+jLl8hngm+Ynucwim4Y6Y0KSDzI?=
+ =?us-ascii?Q?k13PyCNfv102ERHdKEtDgrowjYjhJyGFywjjDEJ5Qz2iIYfyrYDlGEKonaIc?=
+ =?us-ascii?Q?httqc+jkBK1ZfUYRi8VCZlCv0IzDtL2jEYK59Y8WhEs4dxWYUqzCYKqo/NUb?=
+ =?us-ascii?Q?vCMK/TZ8D1XrfkAEnKm13+rBBOneLS76T/U7kYSGJL7nHaYyCqbybTGh0Ja1?=
+ =?us-ascii?Q?Pl/MLBmIjKuQhLKLi6mo0HLQxKMqRm8zYS/7ASrdJFw9ZPg8NgfgEaYOHlRV?=
+ =?us-ascii?Q?yTiHsUahwibYzTNIbFQYmWJY0VZyOVdz9CYIM2rjB8eCHz2a9KTtEZrXUtpD?=
+ =?us-ascii?Q?Gv2XnhxuaANm4N48lxq44fyDpeyF3aXqgQwsnTFxBWOgUwukNdkn7IKVrC7q?=
+ =?us-ascii?Q?gjNf9vllEMcmqGEFi9Irxs4T9dhqLkuHDNV074WnL7i8e3/5rdawi4ECJtlX?=
+ =?us-ascii?Q?Hah5vAVVbw12HYEKBcj2e9Hx5Fhl5n1eNrJcAA+wjl/QockRWBaIgpvwXk43?=
+ =?us-ascii?Q?5kcfscSO6CZ7DhR4nKJc8tmR4FpOvjYvncrG/Qr4JldCuU8Tb4w2oaYEVJwq?=
+ =?us-ascii?Q?CmYOvQ/0aQK11HL/B5JbUvbdwV835VA2AlbuDF3j4qEv12xnglahy1s3WcQY?=
+ =?us-ascii?Q?rD9hqOfysTglN14St1eNC+nSuVjh84McIqNLqf18/APEX7Mv6aeCRRdo7ZTX?=
+ =?us-ascii?Q?iH+7RcO+ndlwupUoMGdBAtQ5j6gn3V9OrCNarc+b+TsMWSadzJJRrf3G4cvN?=
+ =?us-ascii?Q?QHV+A1wcC6KBf4w6uWTf6B+6esMYeaUYr13bGp7qujFwV3q/dWkvVFKFDzvT?=
+ =?us-ascii?Q?vXUSa+YKwO1KvjlzmUwc6OKcuPg4G0+3K4+C/UcDJ1PYnkcnz2/HnXA8Evus?=
+ =?us-ascii?Q?m66k+0wmlI8z78RHFEsgCo2hPYjL62gHOIdN94wx55q5x0WKfRYn4aphh+Wj?=
+ =?us-ascii?Q?Dw5S/ewe/+YZwHHeu5W7aWCb1xO178W1nJdlByv/Lkmyd8Z5H/Rs2tNYBx7l?=
+ =?us-ascii?Q?CrtfW0wq3mHUutHsdMXQgkdaNoTNIoe4YCAqkc3liOyLEIJQlxlhqTfkcNdU?=
+ =?us-ascii?Q?/0hmhuMgV3HQB09d9g8uGNTVWVhXekBFSKdCmqWbx/5XkRbXB1w+jxnm1nZ+?=
+ =?us-ascii?Q?z6suDNRicagFSrhKK5R7byFwFDwKvmiqsN2lWDw9W9YnI05jUo1ugzRahgEU?=
+ =?us-ascii?Q?WQ3MB6pjTniTcPB/0tuN9FwUcbBKUtzPpCoZ?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2025 22:46:07.5208
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2025 22:46:13.1746
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c353ff6-4dac-4dc1-ebdb-08ddad27954c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f66dace-2c97-4d5a-1c28-08ddad2798a4
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636B.namprd02.prod.outlook.com
+	CO1PEPF000042A7.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5858
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8860
 
-Some of the work of ip6mr_forward2() is specific to IPMR forwarding, and
-should not take place on the output path. In order to allow reuse of the
-common parts, extract out of the function a helper,
-ip6mr_prepare_forward().
+Multicast routing is today handled in the input path. Locally generated MC
+packets don't hit the IPMR code today. Thus if a VXLAN remote address is
+multicast, the driver needs to set an OIF during route lookup. Thus MC
+routing configuration needs to be kept in sync with the VXLAN FDB and MDB.
+Ideally, the VXLAN packets would be routed by the MC routing code instead.
+
+To that end, this patch adds support to route locally generated multicast
+packets. The newly-added routines do largely what ip6_mr_input() and
+ip6_mr_forward() do: make an MR cache lookup to find where to send the
+packets, and use ip6_output() to send each of them. When no cache entry is
+found, the packet is punted to the daemon for resolution.
+
+Similarly to the IPv4 case in a previous patch, the new logic is contingent
+on a newly-added IP6CB flag being set.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
 
 Notes:
     v3:
-    - Move kfree_skb() to the ip6mr_prepare_xmit() caller, like IPv4.
-    - The patch is now structurally so similar to the IPv4
-      one that the subject should reflect that. Update.
+    - kfree_skb() now needs to be in ip6mr_output2()
+    - The fallback version of ip6_mr_output(), compiled when
+      IPV6_MROUTE is not defined, needs to call ip6_output()
+      instead of silently leaking the SKB.
+    - Reindent the TTL condition
+    - Refold the skb2 = skb_clone() code
 
- net/ipv6/ip6mr.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ include/linux/ipv6.h    |   1 +
+ include/linux/mroute6.h |   7 +++
+ net/ipv6/ip6mr.c        | 118 ++++++++++++++++++++++++++++++++++++++++
+ net/ipv6/route.c        |   1 +
+ 4 files changed, 127 insertions(+)
 
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 41c348209e1b..bd964564160d 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -2035,11 +2035,10 @@ static inline int ip6mr_forward2_finish(struct net *net, struct sock *sk, struct
-  *	Processing handlers for ip6mr_forward
-  */
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index 5aeeed22f35b..db0eb0d86b64 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -156,6 +156,7 @@ struct inet6_skb_parm {
+ #define IP6SKB_SEG6	      256
+ #define IP6SKB_FAKEJUMBO      512
+ #define IP6SKB_MULTIPATH      1024
++#define IP6SKB_MCROUTE        2048
+ };
  
--static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
--			   struct sk_buff *skb, int vifi)
-+static int ip6mr_prepare_xmit(struct net *net, struct mr_table *mrt,
-+			      struct sk_buff *skb, int vifi)
- {
- 	struct vif_device *vif = &mrt->vif_table[vifi];
--	struct net_device *indev = skb->dev;
- 	struct net_device *vif_dev;
- 	struct ipv6hdr *ipv6h;
- 	struct dst_entry *dst;
-@@ -2047,7 +2046,7 @@ static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
+ #if defined(CONFIG_NET_L3_MASTER_DEV)
+diff --git a/include/linux/mroute6.h b/include/linux/mroute6.h
+index 63ef5191cc57..fddafdc168f7 100644
+--- a/include/linux/mroute6.h
++++ b/include/linux/mroute6.h
+@@ -31,6 +31,7 @@ extern int ip6_mroute_getsockopt(struct sock *, int, sockptr_t, sockptr_t);
+ extern int ip6_mr_input(struct sk_buff *skb);
+ extern int ip6mr_compat_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
+ extern int ip6_mr_init(void);
++extern int ip6_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb);
+ extern void ip6_mr_cleanup(void);
+ int ip6mr_ioctl(struct sock *sk, int cmd, void *arg);
+ #else
+@@ -58,6 +59,12 @@ static inline int ip6_mr_init(void)
+ 	return 0;
+ }
  
- 	vif_dev = vif_dev_read(vif);
- 	if (!vif_dev)
--		goto out_free;
-+		return -1;
- 
- #ifdef CONFIG_IPV6_PIMSM_V2
- 	if (vif->flags & MIFF_REGISTER) {
-@@ -2056,7 +2055,7 @@ static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
- 		DEV_STATS_ADD(vif_dev, tx_bytes, skb->len);
- 		DEV_STATS_INC(vif_dev, tx_packets);
- 		ip6mr_cache_report(mrt, skb, vifi, MRT6MSG_WHOLEPKT);
--		goto out_free;
-+		return -1;
- 	}
- #endif
- 
-@@ -2070,7 +2069,7 @@ static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
- 	dst = ip6_route_output(net, NULL, &fl6);
- 	if (dst->error) {
- 		dst_release(dst);
--		goto out_free;
-+		return -1;
- 	}
- 
- 	skb_dst_drop(skb);
-@@ -2094,10 +2093,20 @@ static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
- 	/* We are about to write */
- 	/* XXX: extension headers? */
- 	if (skb_cow(skb, sizeof(*ipv6h) + LL_RESERVED_SPACE(vif_dev)))
--		goto out_free;
-+		return -1;
- 
- 	ipv6h = ipv6_hdr(skb);
- 	ipv6h->hop_limit--;
-+	return 0;
++static inline int
++ip6_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb)
++{
++	return ip6_output(net, sk, skb);
 +}
 +
-+static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
-+			   struct sk_buff *skb, int vifi)
+ static inline void ip6_mr_cleanup(void)
+ {
+ 	return;
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index bd964564160d..a35f4f1c6589 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -2119,6 +2119,19 @@ static void ip6mr_forward2(struct net *net, struct mr_table *mrt,
+ 	kfree_skb(skb);
+ }
+ 
++static void ip6mr_output2(struct net *net, struct mr_table *mrt,
++			  struct sk_buff *skb, int vifi)
 +{
-+	struct net_device *indev = skb->dev;
-+
 +	if (ip6mr_prepare_xmit(net, mrt, skb, vifi))
 +		goto out_free;
++
++	ip6_output(net, NULL, skb);
++	return;
++
++out_free:
++	kfree_skb(skb);
++}
++
+ /* Called with rcu_read_lock() */
+ static int ip6mr_find_vif(struct mr_table *mrt, struct net_device *dev)
+ {
+@@ -2231,6 +2244,56 @@ static void ip6_mr_forward(struct net *net, struct mr_table *mrt,
+ 	kfree_skb(skb);
+ }
  
- 	IP6CB(skb)->flags |= IP6SKB_FORWARDED;
++/* Called under rcu_read_lock() */
++static void ip6_mr_output_finish(struct net *net, struct mr_table *mrt,
++				 struct net_device *dev, struct sk_buff *skb,
++				 struct mfc6_cache *c)
++{
++	int psend = -1;
++	int ct;
++
++	WARN_ON_ONCE(!rcu_read_lock_held());
++
++	atomic_long_inc(&c->_c.mfc_un.res.pkt);
++	atomic_long_add(skb->len, &c->_c.mfc_un.res.bytes);
++	WRITE_ONCE(c->_c.mfc_un.res.lastuse, jiffies);
++
++	/* Forward the frame */
++	if (ipv6_addr_any(&c->mf6c_origin) &&
++	    ipv6_addr_any(&c->mf6c_mcastgrp)) {
++		if (ipv6_hdr(skb)->hop_limit >
++		    c->_c.mfc_un.res.ttls[c->_c.mfc_parent]) {
++			/* It's an (*,*) entry and the packet is not coming from
++			 * the upstream: forward the packet to the upstream
++			 * only.
++			 */
++			psend = c->_c.mfc_parent;
++			goto last_forward;
++		}
++		goto dont_forward;
++	}
++	for (ct = c->_c.mfc_un.res.maxvif - 1;
++	     ct >= c->_c.mfc_un.res.minvif; ct--) {
++		if (ipv6_hdr(skb)->hop_limit > c->_c.mfc_un.res.ttls[ct]) {
++			if (psend != -1) {
++				struct sk_buff *skb2;
++
++				skb2 = skb_clone(skb, GFP_ATOMIC);
++				if (skb2)
++					ip6mr_output2(net, mrt, skb2, psend);
++			}
++			psend = ct;
++		}
++	}
++last_forward:
++	if (psend != -1) {
++		ip6mr_output2(net, mrt, skb, psend);
++		return;
++	}
++
++dont_forward:
++	kfree_skb(skb);
++}
  
+ /*
+  *	Multicast packets for forwarding arrive here
+@@ -2298,6 +2361,61 @@ int ip6_mr_input(struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++int ip6_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb)
++{
++	struct net_device *dev = skb_dst(skb)->dev;
++	struct flowi6 fl6 = (struct flowi6) {
++		.flowi6_iif = LOOPBACK_IFINDEX,
++		.flowi6_mark = skb->mark,
++	};
++	struct mfc6_cache *cache;
++	struct mr_table *mrt;
++	int err;
++	int vif;
++
++	WARN_ON_ONCE(!rcu_read_lock_held());
++
++	if (IP6CB(skb)->flags & IP6SKB_FORWARDED)
++		goto ip6_output;
++	if (!(IP6CB(skb)->flags & IP6SKB_MCROUTE))
++		goto ip6_output;
++
++	err = ip6mr_fib_lookup(net, &fl6, &mrt);
++	if (err < 0) {
++		kfree_skb(skb);
++		return err;
++	}
++
++	cache = ip6mr_cache_find(mrt,
++				 &ipv6_hdr(skb)->saddr, &ipv6_hdr(skb)->daddr);
++	if (!cache) {
++		vif = ip6mr_find_vif(mrt, dev);
++		if (vif >= 0)
++			cache = ip6mr_cache_find_any(mrt,
++						     &ipv6_hdr(skb)->daddr,
++						     vif);
++	}
++
++	/* No usable cache entry */
++	if (!cache) {
++		vif = ip6mr_find_vif(mrt, dev);
++		if (vif >= 0)
++			return ip6mr_cache_unresolved(mrt, vif, skb, dev);
++		goto ip6_output;
++	}
++
++	/* Wrong interface */
++	vif = cache->_c.mfc_parent;
++	if (rcu_access_pointer(mrt->vif_table[vif].dev) != dev)
++		goto ip6_output;
++
++	ip6_mr_output_finish(net, mrt, dev, skb, cache);
++	return 0;
++
++ip6_output:
++	return ip6_output(net, sk, skb);
++}
++
+ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
+ 		    u32 portid)
+ {
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 79c8f1acf8a3..df0caffefb38 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -1145,6 +1145,7 @@ static void ip6_rt_init_dst(struct rt6_info *rt, const struct fib6_result *res)
+ 		rt->dst.input = ip6_input;
+ 	} else if (ipv6_addr_type(&f6i->fib6_dst.addr) & IPV6_ADDR_MULTICAST) {
+ 		rt->dst.input = ip6_mc_input;
++		rt->dst.output = ip6_mr_output;
+ 	} else {
+ 		rt->dst.input = ip6_forward;
+ 	}
 -- 
 2.49.0
 
