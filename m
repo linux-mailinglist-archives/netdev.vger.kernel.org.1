@@ -1,127 +1,85 @@
-Return-Path: <netdev+bounces-198262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65584ADBB88
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:52:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8DFADBB9A
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78CFC189291A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:52:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677651892A26
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE622101B3;
-	Mon, 16 Jun 2025 20:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 520BA214A97;
+	Mon, 16 Jun 2025 20:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOS1qmqF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFXP+f0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFCA1FAC4D;
-	Mon, 16 Jun 2025 20:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A2D1E32C6;
+	Mon, 16 Jun 2025 20:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750107154; cv=none; b=k4QamR4B+P+rGW7oHpsGxJpuS9kGCqUscxjEBVwSyIL9EzNIIdAbBLHDdXsc7qXqWlIX6ATDa+7v9ZgX4z4yQoWKg5gAXySTHutA8cAhj1W9xtYALxnAOMPGOeM2LjfL9Ps/K6e+e6lbkMdDQGskpSyR//33AX9n2VsI7prZa+I=
+	t=1750107311; cv=none; b=VvCrGz5evyR6lMa/KWmgkRRDcqhys+ugFDMgRDOqYByl7jKSiNDUTE54iOR3P1JzTj9wirhNCW7fO8IAWcdykRQW9KTgw5Mzs00O+ovmPOlltSxj8XRBAV89aafd/37+0bfjpvynNACgT7qVzD2LWunlqZkMsVeffCmmLvMU9gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750107154; c=relaxed/simple;
-	bh=/QPXfKttFjUhg22/E4OyijBaAwE9LIOKJXwgi2S01bU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lXFdS+1EqxQNRnWit14rWZEM3iGZxK1DSSa8dCrbNx371p7V8KF4TsVNgHsq8QWWEMWPhquzBGYxHvX8PW7MSVw6wTULK7jw2YAYODx/C1BPTsBRj8tQlYGNPh4eXEjMzfqcZQ8Xk1CmmQVZBzqPaqrnfFUBfl22arm7Lnexrs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOS1qmqF; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ad89c10dfabso140637966b.0;
-        Mon, 16 Jun 2025 13:52:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750107151; x=1750711951; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MjHD7ImHqgaEg0QySeT0KO/CLSf7LriRa1vYRjxGumo=;
-        b=XOS1qmqFmUcUiw1wd7Ya933Ri7ekdmFmN8l6GHfPBkggNb1JbbZ+5/l7xIT0R9Q+TM
-         I2/RYOZI/Fy/vsjVIF24PH/kHlZZpAtF7fs6A/3bIli5EO8injwK5H6SecQFvGpruInE
-         fcW130JrUaMVVWWRxnmWtF9wxlz1m3jZdcACJ/E8q3a4fUaSe5URErDyMMlr3/oBB9yU
-         9U/5rv43pCD0GPJU0Otzf5XaubNw8BCpNy3ZM8hPzXdhg18+o0NcuD5RV8fD7Gnx4+Y9
-         c3OVmMYX80vdk4mRC+X4eW+Da3Xl+9f4oXOUTxa3ufnq7VlfbLcoP+qbU1BVfqnUua/Z
-         l3sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750107151; x=1750711951;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MjHD7ImHqgaEg0QySeT0KO/CLSf7LriRa1vYRjxGumo=;
-        b=JruoOzC6kxsanAOjynUVLiONVCotcfitqKpu77DZ7JfpCHRC20wS80YX/h+/HUQbXf
-         WASdoM8xPmkEWSK7tZ2ftHO7nW6iuQFMJQwKQ+NxpdngDMG0H0r30R+MvxH7CrYJkq3I
-         Al3sNyjsSY4x2tgaL2VfALO6E8tJWaWJlVA6uvtkKkMloRICt1v4GKP2fayWGEsNmdt5
-         Fat0LGUJzPAeZrLCo+GwzrNDv/GlBtuHHVe0SmuHlqawjKM0IJCJhKrHr0kW7+tkrtV7
-         oY0REavt1fGUpeT0V8ZhUMkvOyKlk/Nh2/iEHWAHcTmog+1SGwb9w0ck9QSvNAx0Mlxn
-         qxqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVFM8hU3BvKLk31cPOpEW+GDd5nHjSxnqBGN+3nQ2pVdywD6xMmk2tHuCca0k2ZfNojwPU=@vger.kernel.org, AJvYcCVgc7lyDaN3cwdIfmgCKmBb3Qw37SJCnKnzeERkqsC2WGZ9FbR8ynSWE++qDnTVzsSgONaEfX39iyFyFuPm@vger.kernel.org, AJvYcCWlC3kkqjKiXEBziWrVLu5Ynt8XCvA6sEYBaI6/g0Wo67QQtJf3QU6V8EVLSBo/AJt1T8mVuQBQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv7YPxzqlj9IJVoslYPFSaZ99YDfo1ImgjIWr2A5Wx4Us7ETcB
-	mkbWT+k4dePVc5kFfYDJ6nQ2mLhMyi/yBP7jE+29FvhKM8P4RJmxDX0k
-X-Gm-Gg: ASbGncvU58TrFBhFkkrgtKQsthg65H63o8AbHG/SRVsfOEo8TvR8krwTAN3fmmMyG+X
-	Gx/wvXlHTYquNn30S4qykcdmmZaUbgSDpj9ElG3OHj6tqcYxMm0Ld1OVhxgPaat5FibH7bTLxY2
-	H3RHQihll2uNgx2I6NmfSLVGr7YTvDz6wWflysUUwfv+gGJH2vhslE4HOqRouwYX+gLX8gbSNWA
-	tmcW04Aq8+uGIEnXuuyPvW0XDHNcqplnl4OOQe90p12u579rDQhbMKAIdn8RZ7KRtkMYj9rX7VF
-	Px7NYfnp0iX24cYCrtkIgNwczro+DXm31lms2M5PbIsQmgklO4/96lhJKdZ/
-X-Google-Smtp-Source: AGHT+IFH/SSx7c8PUrit49w4s+in5qNAffBYzMPwVtXx0HldiOhTr26CVPqogKFnR9YNJ3L1h9lIeg==
-X-Received: by 2002:a17:906:d555:b0:ade:3372:4525 with SMTP id a640c23a62f3a-adfad502daemr381962566b.9.1750107150465;
-        Mon, 16 Jun 2025 13:52:30 -0700 (PDT)
-Received: from skbuf ([86.127.223.77])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec81c60f1sm730344566b.60.2025.06.16.13.52.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 13:52:29 -0700 (PDT)
-Date: Mon, 16 Jun 2025 23:52:27 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Robert Cross <quantumcross@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: dsa: mv88e6xxx: fix external smi for mv88e6176
-Message-ID: <20250616205227.2qmzv2fsbx6j533t@skbuf>
-References: <20250616162023.2795566-1-quantumcross@gmail.com>
- <3c5a8746-4d57-49d5-8a3d-5af7514c46b3@lunn.ch>
- <CAATNC474tcoDeDaGg1GKbSAkb8QBT9rcHrHrszycWpQwzU+6XA@mail.gmail.com>
- <ad17b701-f260-473f-b96f-0668ce052e75@lunn.ch>
+	s=arc-20240116; t=1750107311; c=relaxed/simple;
+	bh=lPc2k06NOBYmbSOgcB2zAhNJtDMn5gzlWWidkWJg2IQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cItj9t6biVapAFUozerYitRcapaITjWzzWtHdYZFPeeoOaJuu29Q6k1LcGjlfqGigd12z8oI3uQYvm81zZNiRMXLd0D+qzeIcYFlOAf640lugXTuuVm2zDvHBsd7Nc/qrZ4TTg1qx58vZ43bs5YKxeyd22IXZrF4UF98vYA2vrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFXP+f0n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4510FC4CEEA;
+	Mon, 16 Jun 2025 20:55:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750107310;
+	bh=lPc2k06NOBYmbSOgcB2zAhNJtDMn5gzlWWidkWJg2IQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VFXP+f0nRIqS8iGZpoctvW73WpW3ntUVatBS9JZOn7J80UYQiVTFFnU8l1H08O5tg
+	 MWCGpCwAf9iOTnftK4TkmQrT69R/PkpPEfBGNZi5jIJDr5aSvGgxioZc/UF6QhfWU+
+	 KOBm5rvK3ciD2tfsW6XnR+vm1h0fAlJzC45+Q/05ojgmtBUIap8mBin+CwTi4d95k9
+	 3EKSoKwcNhGwBnfKi12cVc4okSzhCMXyfbKHu7LbE/Jv6WMYHsDPoNxYXFlS/619dF
+	 v9kqKYLK27K4pbQFJH2BDu3vsZlBTg4SaAO/1mTE+i10je2X3gNVFIu3aYEzyXEOCO
+	 VkAYA/MShlSdQ==
+Date: Mon, 16 Jun 2025 13:55:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, David Ahern <dsahern@gmail.com>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ mlxsw@nvidia.com, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 14/14] selftests: forwarding: Add a test for
+ verifying VXLAN MC underlay
+Message-ID: <20250616135509.255a1871@kernel.org>
+In-Reply-To: <be7149b5-0286-4b39-b6ce-809618354b13@kernel.org>
+References: <cover.1749757582.git.petrm@nvidia.com>
+	<78edac89730a346e957b69d4107fcd8f1c5c6266.1749757582.git.petrm@nvidia.com>
+	<20250613095755.54381628@kernel.org>
+	<ccaf0784-d7a3-41e2-b3e0-65b9022f15a6@kernel.org>
+	<87wm9bu13q.fsf@nvidia.com>
+	<426a2c83-38ca-4fa2-9270-b3e600e30d19@kernel.org>
+	<87sejztpvj.fsf@nvidia.com>
+	<be7149b5-0286-4b39-b6ce-809618354b13@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad17b701-f260-473f-b96f-0668ce052e75@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+On Mon, 16 Jun 2025 22:40:49 +0200 Matthieu Baerts wrote:
+> > Good point. The question then is whether to put it to forwarding/ or
+> > directly net/, which is has seen more use of lib.sh and therefore the
+> > same sort of coding style. I'll experiment with it and should be able to
+> > send it later in the week. I don't want to add it to the MC patchset.  
+> 
+> Since Jakub disabled SC2317 in NIPA [1], then I guess we can put this
+> .shellcheckrc file in net/, no?
 
-On Mon, Jun 16, 2025 at 08:43:14PM +0200, Andrew Lunn wrote:
-> On Mon, Jun 16, 2025 at 02:22:43PM -0400, Robert Cross wrote:
-> > According to the documents I'm looking at, the 88E6172 and
-> > 88E6176 both have external MDIO buses. I have brought up
-> > a board with two connected 88E6176 chips, each with a PHY
-> > that can only be managed with the MDC/MDIO_PHY pins of
-> > the 88E6176s.
-> > 
-> > After applying this patch I was able to successfully manage
-> > and control these external PHYs without issue. I'm not sure
-> > if you have access to the 88E6176 datasheet specifically,
-> > but this chip absolutely does have an external MDIO.
-> 
-> You are not understanding what i'm saying. This family has a single
-> MDIO bus controller. That controller is used by both the internal PHY
-> devices, plus there are two pins on the chip for external PHYs.
-> 
-> All the PHYs will appear on that one MDIO bus controller.
-> 
-> The MV88E6390_G2_SMI_PHY_CMD_FUNC_EXTERNAL bit is reserved on the 6352
-> family.
-> 
-> 	Andrew
-
-Is there any addition to Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
-that we could make in order to clarify which switch families have a
-combined internal+external MDIO bus and which ones have them separate?
-As you're saying, this is an area where mistakes happen relatively
-frequently.
+And drivers/net while at it, if you don't mind.
 
