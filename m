@@ -1,181 +1,100 @@
-Return-Path: <netdev+bounces-198041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60509ADB034
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:29:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97338ADB049
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9188E3A1EBF
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:29:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA1841888C99
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E16285C86;
-	Mon, 16 Jun 2025 12:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="VTK5V0/V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4AA3285CAB;
+	Mon, 16 Jun 2025 12:34:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499792E426F;
-	Mon, 16 Jun 2025 12:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750076980; cv=pass; b=HEWHxZqVzGJKDzvuqji1IZzNljDrfN6mi/EfIKJjhRyye0EIEpCpXnf4PnWKJN2E9vMIhFxfstZrBd1IHlPD/iHDpIUljl/6YooTwWY7N43C5SxquB7pR3YUAQYbuF0k4FphPSiCdVheATBmYIZOelMscSbs1cYW6IE0OBYtUro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750076980; c=relaxed/simple;
-	bh=D1nrTM3OWHNa73fOHQSyszn7QncKX5gjfoZAZmCJOV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BnSDdjzZrs6Ime/JhO+xrLVzYrPNxjiqoR0QB0GSqEzfldVp9Z7MTfdKrvZf0lpK64jSk1lD30LjlbFTWg5e1j5yffov4muejJqeXl8CYR5vnuD6i1tEyjZe6yrEKvZ86zpXU1LvbFFy27Jflk1gGc2A7/fb69qFSv8lfTvc+/s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=VTK5V0/V; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1750076894; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Kn8MGUt3qBaOkBsleWMs/iI7evtX+3Ii+lWmXB8xOO8yonT/tDL4OfelfnPrGyP69Xa6GXt64PMxsM5vBn5YsaN0I5GeJUR7YvPCpzogaDpzyN7GW1fehBmHRRYpAHqyTyzXBh1S8/TsCf+p6V2AaB6zIxcJ7XJ+dTVZeTb4YRc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1750076894; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=lS5jmrsM1AStlE4Oaeas/EKugjJN944zsH8rQcQ3FAk=; 
-	b=gZpW6CMh7kONQtxIuB9S8BJSCJKsvjeGsHGDKmIuXDXZlzskn5bJwbdnpsUcmAghdjwm7D9LGAU4Rel8QeQKW1q+5kRysuw841yRbvXfifnWduhN2bYLxbuLNXEh2MTtxoVgPSUuojnwR8DpXHHIQwqbIosI/MoGhZqfAJbm5mE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1750076894;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-	bh=lS5jmrsM1AStlE4Oaeas/EKugjJN944zsH8rQcQ3FAk=;
-	b=VTK5V0/Vh8vG0ADUhZJqoWC8GNkp9+Edtt7f54cvlzORP0TBC3O3iXDcIRVP1bPg
-	diBzmzi3jUJX7MfK81EwTr1m9SPAyKZNsnywz/gVppbbf7/4KM7BIphS3UCg/GYBOZD
-	MzraVGJabGmAR/4cao207oI0XAYOJPvc3s7lJ85s=
-Received: by mx.zohomail.com with SMTPS id 1750076891122319.76650013837536;
-	Mon, 16 Jun 2025 05:28:11 -0700 (PDT)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-To: Robin Murphy <robin.murphy@arm.com>, Yury Norov <yury.norov@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
- Heiko Stuebner <heiko@sntech.de>,
- Shreeya Patel <shreeya.patel@collabora.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
- Andy Yan <andy.yan@rock-chips.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Shawn Lin <shawn.lin@rock-chips.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- linux-pm@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev,
- linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-clk@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
- kernel@collabora.com, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
-Subject: Re: [PATCH 01/20] bitfield: introduce HWORD_UPDATE bitfield macros
-Date: Mon, 16 Jun 2025 14:27:55 +0200
-Message-ID: <3361713.44csPzL39Z@workhorse>
-In-Reply-To: <aEw7LBpmkfOqZgf1@yury>
-References:
- <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
- <1437fe89-341b-4b57-b1fa-a0395081e941@arm.com> <aEw7LBpmkfOqZgf1@yury>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548572737F9
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 12:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750077265; cv=none; b=tcYyunw7SNu/AfI8rkeZRnO0ilPSGO/381k59tNKAtFCt7UZF/q4MJrkSgMEQNON64exS+OrJ17aa7XjObNWL7IXZTcY9ZIxACKQNAD4zqiHrGvHPBb2wf/Xcn7Gz2uvYazUOZPCCREgWgx0MUZWKPlsfWOXumr0BXkJzgPGJX4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750077265; c=relaxed/simple;
+	bh=KZNprXaoNfoaHYjHemA6YofvAUOkORsU2bqHvO7dDUs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XYWhL1BBgEWy6bHYhay1TVQI1x/l6mTOdPSDk6WytpkcHEXtlsAFxeE6knJByiFg80w9+n8vfb9Vey18nugWQ7mrUESXeZuQpgpNF7u1XrN+g5q3p1PzRe5pxg5wY7EJ5u2jNTN9SYyQ5wu9cH+dSXEN+rqlyLnAJHg8WW78ZVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3ddb9c3b6edso56256475ab.3
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 05:34:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750077263; x=1750682063;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EywSoWx1oh75bdKkhb/CF3mvca8guENbG+VQo+//llY=;
+        b=b+xa1Z+/YPE70FI7CfwRW3oQj52dYiUv5Bg6AEcP7S+eliIlmlGYF3oKne20VvOJbe
+         sEhXJS5+GBhiJ5lFfMN/0HQ2GmtlTqxznRN/HrBXP3dQbRwNOPXJZh/w7jOfQ11rppHI
+         UNkmRtJPROiX6CP5rsGzeyq+bta6UpBIeDa63f/4YzriP659LjZbmK21gPfx3NRaj4Nl
+         Nh8nZwe5vz9SdK1ZXU/qxGliRDWNbuub+uVjyIKpTlDAv4YkCPw0SxDkmQlAbJ8G4TUT
+         mzF9cfC4hRax5IuNEz3NA/Mq89cmnPc9tV+Kj+XM05VDdW8DgJuMoIVN+ugdbAdvE07x
+         tJpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJEzW/9wKwva5muuRN4RTMLX3iyr474Wex4qMB+o5m7uCH+3b0UJ6ccNBEGimSo94pVNK6f9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2dNb8c2WisNwSS6LYBdomlzNyqkldvulZ3r26WJSJYubSa8AR
+	c5JLJGbNEE+J+bdzyqpIZ3+FXaFuIHPha3Pb+tLoP20HWgy86/X1lJd7reFPDPG3spc0E1t6zty
+	OIz7+0USvTj1M/Nfiu/CMa3wN+aLPWT7J6Lg0VU7LO00f313YswBzB7tg8xs=
+X-Google-Smtp-Source: AGHT+IELIt9EJpzp0lXMB6qbr/z7PV1C/VGfrhZiQunu8N7r/BP9kLgcRjsJMR1aWG1N/ZdBaa3Twfku9bGlKYiuSPN8oW9SZGGG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+X-Received: by 2002:a05:6e02:194f:b0:3dd:ebb5:5370 with SMTP id
+ e9e14a558f8ab-3de07d3404bmr99194745ab.22.1750077263538; Mon, 16 Jun 2025
+ 05:34:23 -0700 (PDT)
+Date: Mon, 16 Jun 2025 05:34:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68500f4f.050a0220.2608ac.0001.GAE@google.com>
+Subject: [syzbot] Monthly smc report (Jun 2025)
+From: syzbot <syzbot+list7085bff455d583cbad1e@syzkaller.appspotmail.com>
+To: jaka@linux.ibm.com, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Hello smc maintainers/developers,
 
-On Friday, 13 June 2025 16:52:28 Central European Summer Time Yury Norov wrote:
-> On Fri, Jun 13, 2025 at 02:54:50PM +0100, Robin Murphy wrote:
-> > On 2025-06-12 7:56 pm, Nicolas Frattaroli wrote:
-> > > Hardware of various vendors, but very notably Rockchip, often uses
-> > > 32-bit registers where the upper 16-bit half of the register is a
-> > > write-enable mask for the lower half.
-> > > 
-> > > This type of hardware setup allows for more granular concurrent register
-> > > write access.
-> > > 
-> > > Over the years, many drivers have hand-rolled their own version of this
-> > > macro, usually without any checks, often called something like
-> > > HIWORD_UPDATE or FIELD_PREP_HIWORD, commonly with slightly different
-> > > semantics between them.
-> > > 
-> > > Clearly there is a demand for such a macro, and thus the demand should
-> > > be satisfied in a common header file.
-> > > 
-> > > Add two macros: HWORD_UPDATE, and HWORD_UPDATE_CONST. The latter is a
-> > > version that can be used in initializers, like FIELD_PREP_CONST. The
-> > > macro names are chosen to not clash with any potential other macros that
-> > > drivers may already have implemented themselves, while retaining a
-> > > familiar name.
-> > 
-> > Nit: while from one angle it indeed looks similar, from another it's even
-> > more opaque and less meaningful than what we have already. Personally I
-> > cannot help but see "hword" as "halfword", so logically if we want 32+32-bit
-> > or 8+8-bit variants in future those would be WORD_UPDATE() and
-> > BYTE_UPDATE(), right? ;)
-> > 
-> > It's also confounded by "update" not actually having any obvious meaning at
-> > this level without all the implicit usage context. FWIW my suggestion would
-> > be FIELD_PREP_WM_U16, such that the reader instantly sees "FIELD_PREP with
-> > some additional semantics", even if they then need to glance at the
-> > kerneldoc for clarification that WM stands for writemask (or maybe WE for
-> > write-enable if people prefer). Plus it then leaves room to easily support
-> > different sizes (and potentially even bonkers upside-down Ux_WM variants?!)
-> > without any bother if we need to.
-> 
-> I like the idea. Maybe even shorter: FIELD_PREP_WM16()?
-> 
+This is a 31-day syzbot report for the smc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/smc
 
-I do think FIELD_PREP_WM16() is a good name. If everyone is okay with this
-as a name, I will use it in v2 of the series. And by "everyone" I really
-mean everyone should get their hot takes in before the end of the week,
-as I intend to send out a v2 on either Friday or the start of next week
-to keep the ball rolling, but I don't want to reroll a 20 patch series
-with a trillion recipients more than is absolutely necessary.
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 10 issues are still open.
 
-To that end, I'd also like to get some other naming choices clarified.
+Some of the still happening issues:
 
-As I gathered, these two macros should best be placed in its own header.
-Is include/linux/hw_bitfield.h a cromulent choice, or should we go with
-include/linux/hw_bits.h?
+Ref Crashes Repro Title
+<1> 340     Yes   general protection fault in smc_diag_dump_proto
+                  https://syzkaller.appspot.com/bug?extid=f69bfae0a4eb29976e44
+<2> 93      Yes   possible deadlock in smc_release
+                  https://syzkaller.appspot.com/bug?extid=621fd56ba002faba6392
+<3> 92      Yes   general protection fault in __smc_diag_dump (3)
+                  https://syzkaller.appspot.com/bug?extid=271fed3ed6f24600c364
 
-Furthermore, should it be FIELD_PREP_WM16_CONST or FIELD_PREP_CONST_WM16?
-I'm personally partial to the former.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-And finally, is it okay if I leave out refactoring Intel's
-_MASKED_FIELD() or should I see if I can at least replace its
-implementation while I'm at it?
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-For less opinionated changes, I'll also change all the `U` literal
-suffixes to `UL` wherever I've added them. As I understand it, it doesn't
-really make a difference in these instances, but `UL` is more prevalent
-in the kernel.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-Kind regards,
-Nicolas Frattaroli
-
-
+You may send multiple commands in a single email message.
 
