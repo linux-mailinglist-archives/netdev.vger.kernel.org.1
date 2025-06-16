@@ -1,618 +1,373 @@
-Return-Path: <netdev+bounces-198192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848EAADB8F3
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:37:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EE7ADB8FA
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAD8F170022
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:37:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCA68163DAB
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3313E289E11;
-	Mon, 16 Jun 2025 18:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4623A289803;
+	Mon, 16 Jun 2025 18:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="F7+fsU2K";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="N5ToyrU5"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ptZUoZdZ";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="s/4xhpy4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5EC289803;
-	Mon, 16 Jun 2025 18:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750099008; cv=none; b=FxltELXSEgX8XRSMPpwavqF5dg/VrECBYC6hnUadNcQvtVDNOrMqaYvByf82EIWvd70EXkjIv9ajIw/VVPTEQq/tnq3t7DAR8Cv7fulVFsi64Z289M7s+YSSSOu4zZ23G52q3Rjz84CvrKxlRHn2biTjz0QiAjvCKogTvDcw4NM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750099008; c=relaxed/simple;
-	bh=rXWYH7p+TELzHj7cz3VmttdZ8f7S9hMNC0erkLhN5Ss=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=uvNbE9pPoXUvsc8IeKIY/MQuwiuh1kU7BIWjTy7hCMZyCSyihft1+eKGq/tpc3ApyIkKDxz0L1d79PRqSI0OCaBeyNNsMHfI1XMXD+vsA26re8znIMx1wV7Hk2avqPuKCZ5PdOq1XgLjU5eM7ewoY2W/oyvAOjgF+sWG2iF3HIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=F7+fsU2K; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=N5ToyrU5; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 12F37114012B;
-	Mon, 16 Jun 2025 14:36:44 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Mon, 16 Jun 2025 14:36:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm3; t=1750099004; x=1750185404; bh=QepdZy+RFkCahfTNk7YME
-	MTm31VenBCyKUUpEJsxy3U=; b=F7+fsU2KL3V/MzwfGCHyXBXEVSObgli5ezcAM
-	lmWX9K5p6ezxBpyYSx6N8hAy5tLHT4h2fwDRotKLfDfex/H4AgORZ6wTqN90wZ1s
-	dB8QtX9uMl34xYEUVvjBqN9fgK/jjrdzgsIxlnHtkwW58UsvlmMYbA+Zvx1jAcDw
-	PE6cVgUSkFzmpgpaCH6YKAfQRXFcUzKxpV4kWnB0/axgk9whBvDI1IIsEPG0Xiwg
-	rrchDRvpljndER4ANmRN3VtnayTTtAu+jSEqCX6LNHTqj6Tx0cXm857oGcY7rXN9
-	fjFudhy+Tsp9CSd88HXimdBuYi2rbnfBy4rJH+V4h4Rs8vROg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1750099004; x=1750185404; bh=QepdZy+RFkCahfTNk7YMEMTm31VenBCyKUU
-	pEJsxy3U=; b=N5ToyrU52v+Uqd0vP9JlWZ8hL1Z3epllzk093JPBwRM9qyRXvZb
-	lmGZwx/oGNtZnHjea1ULcdDR1FBxsY/xrzlNDQvJRvTtrDwtFVacSzCCdT9Mo7ah
-	V981l4JaMkpt38jdCyE4jYMZ0D2xrYibW71IWuBuiEhmvfmMbowCLn+etXkunolE
-	M3nhd8AaSYbIGWShqyahmCg0ACpj2d+qW74AgkcgxG2RaqIAlNYgt1vnFielIyAe
-	XZsKOSzVLsRauS25HaB+BDrjHoBOploqsPEJY5ZVrc5+P9zSRnr/U8ra+irwQQx6
-	DRd4wTGtY6UInk9MELZVKpf5Kkjxh9vsvjQ==
-X-ME-Sender: <xms:O2RQaN93kZdMrd4yZGWpr6-7Yj2FbY9SI51yY2iK1uTkq7gsfmtaag>
-    <xme:O2RQaBuALGYBkf7EzlZzOTmhdgfpKsTJ0C0a-OwSmuNsFyjnFqecQNLE-Zmn6EBHm
-    IS-iSXBJlpKUwrHBwg>
-X-ME-Received: <xmr:O2RQaLAlT_bp1GiWnQy1QV88R9qQoaMNdRVyM3tAFaBQLA7G62NeaSVH4_r-UvcQajZsHg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvjeefvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhfogggtgfffkfesthhqredtredt
-    vdenucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrd
-    hnvghtqeenucggtffrrghtthgvrhhnpeeifedvleefleejveethfefieduueeivdefieev
-    leffuddvveeftdehffffteefffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthht
-    ohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvg
-    hmlhhofhhtrdhnvghtpdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvgdprhgt
-    phhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtthhopehsth
-    hfohhmihgthhgvvhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthes
-    ghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohep
-    phgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehshiiisghothdosgektg
-    egkegvrgefkegtrgdvjeguudehtddtieefsehshiiikhgrlhhlvghrrdgrphhpshhpohht
-    mhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:O2RQaBeYsp78a2RFisFDA2MwCL7qjcdmlU9pdYdS9J92GtXnXAZNqw>
-    <xmx:O2RQaCMwJ2rIqrigGEZHUCl6-vMvO_zTiwnZNqxoh8iYy3pRWGRYjQ>
-    <xmx:O2RQaDmNGaMdS_jqiCDKYm79B0TezYNnzlmYdVPje0PvpR30wktIlg>
-    <xmx:O2RQaMvo63fHP4_FmcP8wXGDgQ9kS9L6PYOyWlgluL3Po6wWC3zgag>
-    <xmx:PGRQaFU19WTDDYL-SWkZnOKciypsJOPEC0ta44W2Eudtqsw_Js3D6YPV>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 16 Jun 2025 14:36:43 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 0D9C49FCA5; Mon, 16 Jun 2025 11:36:42 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 0C7869FC7E;
-	Mon, 16 Jun 2025 11:36:42 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-    kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-    sdf@fomichev.me, liuhangbin@gmail.com, linux-kernel@vger.kernel.org,
-    syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] bonding: switch bond_miimon_inspect to rtnl lock
-In-reply-to: <20250616172213.475764-1-stfomichev@gmail.com>
-References: <20250616172213.475764-1-stfomichev@gmail.com>
-Comments: In-reply-to Stanislav Fomichev <stfomichev@gmail.com>
-   message dated "Mon, 16 Jun 2025 10:22:13 -0700."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5225A2BF01B;
+	Mon, 16 Jun 2025 18:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750099258; cv=fail; b=LH8k5GQvjQ05UZTIfzoXvD4dowJFs2OovsYyNTffzeQdrG+GjbfM2uJYlmqwgti4RPWPF+JLK4vhsKSmxBjHoyIruZ6S43Uy5z6y4xpH1xgGOWOh3Y9AxTfPMkdAZIofosQaVVTWDB9aGzEJQrU1yNv1bLPK2eFN7xTITHEea3c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750099258; c=relaxed/simple;
+	bh=GOofBoaochkGYfRniTZnTvD0HDP+wiNiWE2iJeVqCuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ApwcEKXmIBCiG9O0sISA1D0hbR8/YK2fWKJ+sUyjv23XQQnsI/qIAyx0I2j1cesCGQ366Uxrrj3VE0/Hs8cqzFf2Z7x+7b6+kO/eUp2AHcMyWCmd0qeKUMdmijaUyfExVr/E0xb5BCEkZx06ysfRdspihV9tlLLRSIdkLs1+AxE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ptZUoZdZ; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=s/4xhpy4; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55GHuUjj017647;
+	Mon, 16 Jun 2025 18:40:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=klhKWNXd2PVZhlmohk
+	SF73qNG3ObvF0ikKdnISNMZEw=; b=ptZUoZdZGnYzPrBtKUNyQan46od1l9BN+G
+	Hjqu2d+haKkm7qBSW5OEtPpmGME/xnZdnPZPDsiYxKzA8OBZttrquKqh7iQPawfW
+	KKPdoEOOOWqM47NvSglTpC//GQWUDm+FOfhjhxraMpYiWXBqN4PeotgoRtB0zoTM
+	cqQnnFjr11wygqyHSkljlmlDZSs47eiyk89O8nmfN5yqJz2sY8nzVtBw+iWgQ6E9
+	QruRIMNz/Xr8ndPk5zf3xMM30DYHRvPvDZsHXla85wlmoALuhZOwEiDAvM+0V2cN
+	N7YEV1Lsw5Is/xCS/WcbIdozWP8MGpYc6RSooPqUZkEIJV4+L02w==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 478yp4kj3q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Jun 2025 18:40:48 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55GHbhnV036378;
+	Mon, 16 Jun 2025 18:40:47 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04on2058.outbound.protection.outlook.com [40.107.102.58])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 478yhesmdj-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Jun 2025 18:40:47 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TVlF6MalFwcRnO04/yMSixJfo+VPv96/a4m9Vl8+/VdjwH80ocq7tvCGRc1Fl9nq8eu2IJ7qLtJEeacBriuYWrCgMrExx6rn3iErj5nS8Aqooa7GC1M8TFicomkisCoYM1jPRhuHT8vijC/GzZJ8E+scI+uPpnVBFjGtpBVULHjqBa9PBguBbxvtO0RdMdaJ4V1KvMLPbf/f4hEQu088Di0Dhanirgi8T2vywB/FLst/Mjlmea1Txp3Y4pfVwJyFVZSikDYSI1Oejn/9F+aCvFHu6TYNaneKXdekHOgeHZ/56XXH77NDix/BQL0mxRiUt4p1CQhBPsz4QskPNCH/qA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=klhKWNXd2PVZhlmohkSF73qNG3ObvF0ikKdnISNMZEw=;
+ b=kbSB0fA8Sn1lAExoQSm9QduZMdNWxKexcRoUcTbetcRWNBZlNrxkavoKCTFWE1M1ZfAECqFW37YexnMgyDYs/Qii9RcaCPDOF/NWKbWIELJ7p6OzsdYCjQFzjhorE3bPm1BO9fF7ZNSndlwc2me/iuwAmGcu2KtZ1idnZGZrrjMEebX3kReVV45G5+9ck4w8ir1JT7GmoNfgpsRij7481nE8v1OhFMKg0QqVfWvBSm29d/ohkLqczLQEXg9q2OoX+ymH2YwXijtkDmk+QCdn2FeJMq36pcLZH4TD2BXKI4FApLmNvJWtIKwucGSYGkG+U/Er6te+FoIOY8FLxL2i4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=klhKWNXd2PVZhlmohkSF73qNG3ObvF0ikKdnISNMZEw=;
+ b=s/4xhpy4bNSDtXl5NLDwKNua+r3BO7PcmsgjrtJ+rO93R5vlXTkcCsRT0Kb5aE/FT8pxYgCHAYxfX5nXO4n0YYZ9iHsaSMaL+N7flDzfNw8VjV1Vb4vIY0CUDOoxqL+0yrASbc0MIuO4tAbieyO8yXK7b/KJ4vbAAdxwzBK+Mws=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by IA3PR10MB8067.namprd10.prod.outlook.com (2603:10b6:208:50a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Mon, 16 Jun
+ 2025 18:40:45 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::2650:55cf:2816:5f2%6]) with mapi id 15.20.8835.026; Mon, 16 Jun 2025
+ 18:40:44 +0000
+Date: Mon, 16 Jun 2025 14:40:30 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: allison.henderson@oracle.com, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
+        hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org
+Subject: Re: [PATCH v2] rds: Expose feature parameters via sysfs
+Message-ID: <aFBlHiguQpdB1e86@char.us.oracle.com>
+References: <20250611224020.318684-1-konrad.wilk@oracle.com>
+ <20250611224020.318684-2-konrad.wilk@oracle.com>
+ <05ac7bdf-999c-487c-beb2-74153d03f6b1@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05ac7bdf-999c-487c-beb2-74153d03f6b1@lunn.ch>
+X-ClientProxiedBy: BL1PR13CA0164.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::19) To DM4PR10MB8218.namprd10.prod.outlook.com
+ (2603:10b6:8:1cc::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1912678.1750099002.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Jun 2025 11:36:42 -0700
-Message-ID: <1912679.1750099002@famine>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|IA3PR10MB8067:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d61b55b-3254-48f7-c22b-08ddad054db7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?RAaOic9uEKKHCLRx1F96RdjWMbwESK3WmEMxRIa2LzgLAQDnRQLowkXrN/O8?=
+ =?us-ascii?Q?G+G7KYGDDqB+lyklv0vcMXf0Q/GaeKUmDTkSMF8tX5zTvRqITN6bqnMkAyn9?=
+ =?us-ascii?Q?soGxh05S2RpsB8TMM0suS6yI/bOaU62Uhq/fFTx3n5khQp4PAE87fvRtAn+f?=
+ =?us-ascii?Q?bWPJhGQaS5i2Zm3Yc2iOwDT6xKPh92H+ILoHzSW1qTzje5UeYCciFXg23IDZ?=
+ =?us-ascii?Q?evurf16qriOSZGxv1xZx+SHVnlMTorg4gHN5n/f0sE7YwtkSDu+x85go8Kbd?=
+ =?us-ascii?Q?kDE3PG5boZ01p9UOTFs5dnnQaL5LzRwgtdrSv4AlwgggjzwiEysaUbz4svz4?=
+ =?us-ascii?Q?dtxh/+01qEaKB2x5OLYS+L7jav99GbwRNYVmDhbEZkk3yojMZmDTCGeTGsmx?=
+ =?us-ascii?Q?yFbTbRquNcG8B2e4wez3RTcGyfxP6FyUuJ9T60LjWA/NJWryX8msiirmPSuw?=
+ =?us-ascii?Q?ZBfeT7AyWrzHGPyb5sOWuqUxWoWcBgaBLGe8nAfH+jOQmXtN/zZ7Wkq2/csa?=
+ =?us-ascii?Q?4dF7JpdtWe9nbViHQ5RLXEEDFwXQbWAWuBILX+y4AAqpmdCLzP7m0QkcdrTv?=
+ =?us-ascii?Q?YE40jjfDwUixWft4JJprBSpbMjKb0G8UbyUtqufvJh2APF3KUIHHpMFuwhXq?=
+ =?us-ascii?Q?FYpY9EnD6BMjhKh6Ttf/7lhUUA50JuwOg1toeaQjwEVtzbu8Gjv1jNsvQJyO?=
+ =?us-ascii?Q?VUgMgVKz5iPQ2jeyt592GvXmaK+gA1Via1gRohPZg7oe4GwSlSh/AhsYhvnZ?=
+ =?us-ascii?Q?eqCi6VVxKf2FwjYhcCOxMi3cLQJMOeoY7iewtlZHEYlRatJo47xjSo5Vv+tV?=
+ =?us-ascii?Q?ELxozUW73VJwX/5F9YIq/ZfFrg6Fvj+R0unK2muCU6S9AoXJ7/2HRsgeeBoY?=
+ =?us-ascii?Q?7FgP0izlcu3H0Wdhvdt8HMDEvu9rgwVmCssSdDJ80UIOCTzPVYm+myoZZecH?=
+ =?us-ascii?Q?dAJ4uoRb/t4PT4EMS0FQcGDFCjmk4HqeBcjI/IN+fyd9Rv3vyJU0Ho5Vgdjd?=
+ =?us-ascii?Q?UvmfCeBDGquPk0EjX8myXk7rVyurbppI4pIun1Sk4n1SfGlDX9JvBmtYVBsY?=
+ =?us-ascii?Q?S6bmTeJ7X+jVAP8U5UpCD6ezfHUyKOU762BnTrC3/iz6dD989u658RGSndY5?=
+ =?us-ascii?Q?u8w8anYqSXq55rQFOUubW1iJg5CqPIC8SbrYWwuC+B12vgp4WWbgt7YTu+Tz?=
+ =?us-ascii?Q?ggNR5CbyhPNXxKGNKvlZZLnVKzvGcDhtydfm9EPMyPqkqkS6TtRk8Gm3m1TB?=
+ =?us-ascii?Q?ZjEa74fw7h9gW/59pJnEmK6wF4sbi/HINuL77QSMu5ewABqbIrK6zV7ECy+a?=
+ =?us-ascii?Q?LmbClraZwYblOeUdiPBYA1bkcqkFNlRLE3qzckXXQe7jPeDVXXohkZtajGIf?=
+ =?us-ascii?Q?XQYgcIwX1/ChbwDq7lZsBw0czunKTfaLlx8W1qvZrVmQEsnSWCNBWADZtbvx?=
+ =?us-ascii?Q?mfAew6T/vkE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?12xDD2voV3Nyt9UhF18g8Z+sHJKNhE8NnkYGL53TMe+vr9pwIefKKi1/iiBN?=
+ =?us-ascii?Q?sFfAGFoE6/lugLuOIaFUCtisvISwOyKPGJ8BozM23Nsn3TKQmzWRs2oTRQdy?=
+ =?us-ascii?Q?99xkO2wUMMeyxoETnJoWtPt0r2TzX2YXkM9QuThqNPuQPflmfYz8uXTgI5Iv?=
+ =?us-ascii?Q?6mnW7PLBYWYdtA6uMTDv8QNcqSNshRSn71PcVmYi2F4qgM4WwEWKVa1BWgxl?=
+ =?us-ascii?Q?xGngG+fyOgtHeRNkC1Jcf1iqyxoNaI8iAtB3m5is+tSfcx7kzUCWn3aowtiS?=
+ =?us-ascii?Q?ksTym99VDTL96gaws9i9FKFuqp/3JQcfBgebpRk9kjKSKdLxdi9LysN97Uq6?=
+ =?us-ascii?Q?wPXUelNLs9WNcWOthZi0UXjsAFd1LscreLlgidJuRzBl1vCU23CC38JbepD+?=
+ =?us-ascii?Q?u4AgXd9+EwfQAh6JpuMrubaIx3wrhdDdoRERyBRuEplLCUa1LNLSvS3KXQRd?=
+ =?us-ascii?Q?eXahM+w0bikkIiE18nG8XxQnXzFC4qZNJCqtR5r5pnkGlnXpqz1It892ps95?=
+ =?us-ascii?Q?0iA3tiIlYBCCTqUOZB803wHECcd5M7q50N5bx1Aw00C7rAOI4gQ0E7EsEqpV?=
+ =?us-ascii?Q?X4ohKQnW2N5eutBEEddAeCNJ3LYlkRACMM/27F/LlVnKc8IanyCvcErux/ZB?=
+ =?us-ascii?Q?xT9Aa9G9F+WsCeIYkgMGHj98F5VtPXdwnm9nPR+9Vr2lqUOrnsFPVZ91CUFf?=
+ =?us-ascii?Q?EgHro9dtSCDh/zTR/3PiQLyBPV4BoNqeYDiJ8yPdYycwUfiwYq6e2jUHsqwW?=
+ =?us-ascii?Q?N5OXoFB238aSpp9+UuvgISunVESuDOAkPaPYqV2MQ70bW5KmlL2cCvzeW2/g?=
+ =?us-ascii?Q?w/rX0mKGon/jHNx1cg7gqJMXg/XgybsMaxXLKl7E0BdWpWoqLsXfdDhGPWhf?=
+ =?us-ascii?Q?JxXUeQbiMx/sQFrkeGEHW7vOIk4tCRJGH9LKOVkYKtTO8JMEepFciEEDzOOp?=
+ =?us-ascii?Q?MWD5jIk/bV1DWQjQKBkj17p5LMuhFWdmuuzIf81GdIv6ZgKc0bSL4W+H4vtf?=
+ =?us-ascii?Q?pT0KiuLAnIpUkt03G7B9PPQ1rkpUP68i4C97SCiLi6Dvjfij3isDrBRcxqcK?=
+ =?us-ascii?Q?JwEf0iPqTePt/NScJG6s/pHylILmjBQ8cb0ymRktq3FTArZTzTsGHtfzKjqs?=
+ =?us-ascii?Q?4rxEhUGDKhL69oc+Gpj4zNJvupf4eopj6mAULLdLtIzSy4KZRatAt/uye0VH?=
+ =?us-ascii?Q?q1QQpOHj3UVg2CmvxqNHYxfcDVq3TSf90BC6A6ioz8kBlZdsToH0gppwPlrK?=
+ =?us-ascii?Q?p1diUUiI3mrR8tClsDLo3OQ9vbTO0TqMK8f9sAapI4xZO9o26kqdZrFi/kGR?=
+ =?us-ascii?Q?sbQ0A3RcSw77DJnQAMR/X6WPoa/9xiF72pmXlrtLtRyY80NV5Y6Q8rYgEB8e?=
+ =?us-ascii?Q?9SGlysGMq1vW34Ujue6s/YF+Mj9tQK1bcl2h6URdWms93x1FBMfozNS4OGax?=
+ =?us-ascii?Q?2tBD3IwqZODTyeFlpDbmFqhgfVVGz+hU21KYrPzAspHpcX4+h8ZgN/W6HNYQ?=
+ =?us-ascii?Q?dNMEbkkUSFjwq34xmzqgNIqcTIOPD5MQihG9ok0MZZSJBNoUSC5uApuqxKph?=
+ =?us-ascii?Q?wxaKk4XaaPVjXV7XzKVGDfRjZ2YTGqlRVIncm5hZoVHE4s34HBenZRyftYVE?=
+ =?us-ascii?Q?LQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	vdt6GWTBosRhs3rergcK1fETExhABZMsJcTLUwquu/VRcZCpx3oZWeVBRMZf7bLklPf9/4V1VdBDyBtXR/m9GoEqEQRYNu6tqhcw0xM3jhHoZTdA1vYeboQSKHUwwbopAN0JRBKFU3xK2Epv1ndM+1bXaqWuc/nvE0BNXILTyKlqHY3c2vmcZPMTpwEv32TDBcaw+6nXijcwySR3aVqIhgAWpUENgFQHig7s5hfxXFqezaLd74ECWE6nONvzwhWemzgBzlOA7aHpD3zZgoiqS8Re2cK6VoyfNB0ZdgycCy8DQk3ApblW6B3NCFrdn1oDZR3oW3z9mjKRsugx77QVS40wAm8BCa6sctJgExQ6hQjH/nKPqX4Y26HlmjXWELqcILhN83or+WojrtKpyk3zCU9AQjSjdzSal50gwOhr2Eh/5W2sCIeU0wuF3Q9avIO8DQWAQWJ0kjHu1BJTdb/29GWRrTbmVi8chFS0gwrmur+rVA01sAezPM8udQMON/XDZCqzgjhl6XcZnMQFRKn1Vj/kiGK6te3j6MsabotLdhBuYhJsJ3Nu4A1zjrCAPGJJ4RTEWuy+iO6P1elUTtVSPEBxcT1m+HIYrl5dftPhAPM=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d61b55b-3254-48f7-c22b-08ddad054db7
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2025 18:40:44.8757
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qQCvuOfZBQ8GP/3w9cO1kmRZcAvLHR44xRmKHz2/2wWy+hmFokiFSA2HuAIN1BENqJpngIomtCnZgq+p1Kuo2Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR10MB8067
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-16_09,2025-06-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0
+ phishscore=0 spamscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2506160126
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE2MDEyNiBTYWx0ZWRfX7LHmUGGW89AO VEHEI5RLLTRPIrFcetw7caGN+5Rvx/80lsiv0rOA/z82ks0lNzk7beYLd1RQZfUwnKVEuuG5chm fJ8mSKVt7LPzrxxdA0U2MOAlBeRf+BNg2CFzJ3ahhZDVlp3e+UnLwEUXZ7rb5jNB7za5ClIxOBq
+ epH/tDt9MHAEMPgWWgZv7VdO8o4YhuuBjLhSCY5WjeVNLobBR+L4xWKLfoGxGa8mQ7kyeB1MR9s ptBisX4pY9QFayiSMPDDTt8sIOI4gYL6qD+YNMBJu1Msb/AshxEi1I6NyCdzsuKAwTxq3UJodmm fTfEiN9S0/O9LEEy+T0yShA47lvmwa5jV4qAub75k3kBlKKSAbVjBqr/qgsogHVS+Av0DW9UX+e
+ pPQy8RQzbGCgQFrfuNJjf7wAju/hs2mkmpHGvcONXQsUJviCgyFN4ybrIiT69csPeUKN1Lz6
+X-Authority-Analysis: v=2.4 cv=K5EiHzWI c=1 sm=1 tr=0 ts=68506530 b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=yPCof4ZbAAAA:8 a=W8QsTb4b5T7U5S5YZd8A:9 a=CjuIK1q_8ugA:10 cc=ntf awl=host:14714
+X-Proofpoint-GUID: fxUsg38aVPgQLKylRRn1OtWQQ6zXW2Xj
+X-Proofpoint-ORIG-GUID: fxUsg38aVPgQLKylRRn1OtWQQ6zXW2Xj
 
-Stanislav Fomichev <stfomichev@gmail.com> wrote:
+On Fri, Jun 13, 2025 at 05:21:15PM +0200, Andrew Lunn wrote:
+> On Wed, Jun 11, 2025 at 06:39:19PM -0400, Konrad Rzeszutek Wilk wrote:
+> > We would like to have a programatic way for applications
+> > to query which of the features defined in include/uapi/linux/rds.h
+> > are actually implemented by the kernel.
+> > 
+> > The problem is that applications can be built against newer
+> > kernel (or older) and they may have the feature implemented or not.
+> > 
+> > The lack of a certain feature would signify that the kernel
+> > does not support it. The presence of it signifies the existence
+> > of it.
+> > 
+> > This would provide the application to query the sysfs and figure
+> > out what is supported.
+> > 
+> > This patch would expose this extra sysfs file:
+> > 
+> > /sys/kernel/rds/features
+> 
+> This should probably be documented somewhere under
+> Documentation/ABI/stable.
+> 
+> > which would contain string values of what the RDS driver supports.
+> > 
+> > Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > ---
+> >  net/rds/af_rds.c | 37 +++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 37 insertions(+)
+> > 
+> > diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+> > index 8435a20968ef..46cb8655df20 100644
+> > --- a/net/rds/af_rds.c
+> > +++ b/net/rds/af_rds.c
+> > @@ -33,6 +33,7 @@
+> >  #include <linux/module.h>
+> >  #include <linux/errno.h>
+> >  #include <linux/kernel.h>
+> > +#include <linux/kobject.h>
+> >  #include <linux/gfp.h>
+> >  #include <linux/in.h>
+> >  #include <linux/ipv6.h>
+> > @@ -871,6 +872,33 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
+> >  }
+> >  #endif
+> >  
+> > +#ifdef CONFIG_SYSFS
+> 
+> include/linux/sysfs.h has a stub for when SYSFS is not enabled. So you
+> should not need any #ifdefs
+> 
+>     Andrew
 
->Syzkaller reports the following issue:
->
-> RTNL: assertion failed at ./include/net/netdev_lock.h (72)
-> WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 netdev_ops_a=
-ssert_locked include/net/netdev_lock.h:72 [inline]
-> WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 __linkwatch_=
-sync_dev+0x1ed/0x230 net/core/link_watch.c:279
->
-> ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
-> bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
-> bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
-> bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
-> process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
-> process_scheduled_works kernel/workqueue.c:3321 [inline]
-> worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
-> kthread+0x3c5/0x780 kernel/kthread.c:464
-> ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
-> ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->
->As discussed in [0], the report is a bit bogus, but it exposes
->the fact that bond_miimon_inspect might sleep while its being
->called under RCU read lock. Convert bond_miimon_inspect callers
->(bond_mii_monitor) to rtnl lock.
+I could not for the life of me get the kernel to compile without
+CONFIG_SYSFS, but here is the patch with the modifications you
+enumerated:
 
-	Sorry, I missed the discussion on this last week.  This is on
-me, last year this came up and the correct fix is to remove all of the
-obsolete use_carrier logic in bonding.  A round trip on RTNL for every
-miimon pass is not realistic.
+From 46550ddbd78c878924e4398f07811aac63402ecf Mon Sep 17 00:00:00 2001
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date: Wed, 11 Jun 2025 15:29:39 -0400
+Subject: [PATCH] rds: Expose feature parameters via sysfs
 
-	I've got the following patch building as we speak, if it doesn't
-blow up I'll post it for real.
+We would like to have a programatic way for applications
+to query which of the features defined in include/uapi/linux/rds.h
+are actually implemented by the kernel.
 
-	Actually, reading the patch now as I write, I need to tweak the
-option setting logic, it should permit setting use_carrier to "on" or 1,
-but nothing else.  I had originally planned to permit setting it to
-anything and ignore the value, but decided later that turning it off
-should fail, as the behavior change implied by "off" won't happen.
+The problem is that applications can be built against newer
+kernel (or older) and they may have the feature implemented or not.
 
-	-J
+The lack of a certain feature would signify that the kernel
+does not support it. The presence of it signifies the existence
+of it.
 
- Documentation/networking/bonding.rst |  79 +++----------------
- drivers/net/bonding/bond_main.c      | 111 +--------------------------
- drivers/net/bonding/bond_netlink.c   |  11 +--
- drivers/net/bonding/bond_options.c   |  13 +---
- drivers/net/bonding/bond_sysfs.c     |   6 +-
- include/net/bonding.h                |   1 -
- 6 files changed, 19 insertions(+), 202 deletions(-)
+This would provide the application to query the sysfs and figure
+out what is supported.
 
-diff --git a/Documentation/networking/bonding.rst b/Documentation/networki=
-ng/bonding.rst
-index a4c1291d2561..4ee20f6ab733 100644
---- a/Documentation/networking/bonding.rst
-+++ b/Documentation/networking/bonding.rst
-@@ -576,10 +576,8 @@ miimon
- 	This determines how often the link state of each slave is
- 	inspected for link failures.  A value of zero disables MII
- 	link monitoring.  A value of 100 is a good starting point.
--	The use_carrier option, below, affects how the link state is
--	determined.  See the High Availability section for additional
--	information.  The default value is 100 if arp_interval is not
--	set.
-+
-+	The default value is 100 if arp_interval is not set.
- =
+This patch would expose this extra sysfs file:
 
- min_links
- =
+/sys/kernel/rds/features
 
-@@ -889,25 +887,14 @@ updelay
- =
+which would contain string values of what the RDS driver supports.
 
- use_carrier
- =
-
--	Specifies whether or not miimon should use MII or ETHTOOL
--	ioctls vs. netif_carrier_ok() to determine the link
--	status. The MII or ETHTOOL ioctls are less efficient and
--	utilize a deprecated calling sequence within the kernel.  The
--	netif_carrier_ok() relies on the device driver to maintain its
--	state with netif_carrier_on/off; at this writing, most, but
--	not all, device drivers support this facility.
--
--	If bonding insists that the link is up when it should not be,
--	it may be that your network device driver does not support
--	netif_carrier_on/off.  The default state for netif_carrier is
--	"carrier on," so if a driver does not support netif_carrier,
--	it will appear as if the link is always up.  In this case,
--	setting use_carrier to 0 will cause bonding to revert to the
--	MII / ETHTOOL ioctl method to determine the link state.
--
--	A value of 1 enables the use of netif_carrier_ok(), a value of
--	0 will use the deprecated MII / ETHTOOL ioctls.  The default
--	value is 1.
-+	Obsolete option that previously selected between MII /
-+	ETHTOOL ioctls and netif_carrier_ok() to determine link
-+	state.
-+
-+	All link state checks are now done with netif_carrier_ok().
-+
-+	For backwards compatibility, this option's value may be inspected
-+	or set.  The only valid setting is 1.
- =
-
- xmit_hash_policy
- =
-
-@@ -2029,22 +2016,8 @@ depending upon the device driver to maintain its ca=
-rrier state, by
- querying the device's MII registers, or by making an ethtool query to
- the device.
- =
-
--If the use_carrier module parameter is 1 (the default value),
--then the MII monitor will rely on the driver for carrier state
--information (via the netif_carrier subsystem).  As explained in the
--use_carrier parameter information, above, if the MII monitor fails to
--detect carrier loss on the device (e.g., when the cable is physically
--disconnected), it may be that the driver does not support
--netif_carrier.
--
--If use_carrier is 0, then the MII monitor will first query the
--device's (via ioctl) MII registers and check the link state.  If that
--request fails (not just that it returns carrier down), then the MII
--monitor will make an ethtool ETHTOOL_GLINK request to attempt to obtain
--the same information.  If both methods fail (i.e., the driver either
--does not support or had some error in processing both the MII register
--and ethtool requests), then the MII monitor will assume the link is
--up.
-+The MII monitor relies on the driver for carrier state information (via
-+the netif_carrier subsystem).
- =
-
- 8. Potential Sources of Trouble
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-@@ -2128,34 +2101,6 @@ This will load tg3 and e1000 modules before loading=
- the bonding one.
- Full documentation on this can be found in the modprobe.d and modprobe
- manual pages.
- =
-
--8.3. Painfully Slow Or No Failed Link Detection By Miimon
-----------------------------------------------------------
--
--By default, bonding enables the use_carrier option, which
--instructs bonding to trust the driver to maintain carrier state.
--
--As discussed in the options section, above, some drivers do
--not support the netif_carrier_on/_off link state tracking system.
--With use_carrier enabled, bonding will always see these links as up,
--regardless of their actual state.
--
--Additionally, other drivers do support netif_carrier, but do
--not maintain it in real time, e.g., only polling the link state at
--some fixed interval.  In this case, miimon will detect failures, but
--only after some long period of time has expired.  If it appears that
--miimon is very slow in detecting link failures, try specifying
--use_carrier=3D0 to see if that improves the failure detection time.  If
--it does, then it may be that the driver checks the carrier state at a
--fixed interval, but does not cache the MII register values (so the
--use_carrier=3D0 method of querying the registers directly works).  If
--use_carrier=3D0 does not improve the failover, then the driver may cache
--the registers, or the problem may be elsewhere.
--
--Also, remember that miimon only checks for the device's
--carrier state.  It has no way to determine the state of devices on or
--beyond other ports of a switch, or if a switch is refusing to pass
--traffic while still maintaining carrier on.
--
- 9. SNMP agents
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- =
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
-in.c
-index c4d53e8e7c15..6f042af66cca 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -142,8 +142,7 @@ module_param(downdelay, int, 0);
- MODULE_PARM_DESC(downdelay, "Delay before considering link down, "
- 			    "in milliseconds");
- module_param(use_carrier, int, 0);
--MODULE_PARM_DESC(use_carrier, "Use netif_carrier_ok (vs MII ioctls) in mi=
-imon; "
--			      "0 for off, 1 for on (default)");
-+MODULE_PARM_DESC(use_carrier, "Obsolete, has no effect");
- module_param(mode, charp, 0);
- MODULE_PARM_DESC(mode, "Mode of operation; 0 for balance-rr, "
- 		       "1 for active-backup, 2 for balance-xor, "
-@@ -828,77 +827,6 @@ const char *bond_slave_link_status(s8 link)
- 	}
- }
- =
-
--/* if <dev> supports MII link status reporting, check its link status.
-- *
-- * We either do MII/ETHTOOL ioctls, or check netif_carrier_ok(),
-- * depending upon the setting of the use_carrier parameter.
-- *
-- * Return either BMSR_LSTATUS, meaning that the link is up (or we
-- * can't tell and just pretend it is), or 0, meaning that the link is
-- * down.
-- *
-- * If reporting is non-zero, instead of faking link up, return -1 if
-- * both ETHTOOL and MII ioctls fail (meaning the device does not
-- * support them).  If use_carrier is set, return whatever it says.
-- * It'd be nice if there was a good way to tell if a driver supports
-- * netif_carrier, but there really isn't.
-- */
--static int bond_check_dev_link(struct bonding *bond,
--			       struct net_device *slave_dev, int reporting)
--{
--	const struct net_device_ops *slave_ops =3D slave_dev->netdev_ops;
--	struct mii_ioctl_data *mii;
--	struct ifreq ifr;
--	int ret;
--
--	if (!reporting && !netif_running(slave_dev))
--		return 0;
--
--	if (bond->params.use_carrier)
--		return netif_carrier_ok(slave_dev) ? BMSR_LSTATUS : 0;
--
--	/* Try to get link status using Ethtool first. */
--	if (slave_dev->ethtool_ops->get_link) {
--		netdev_lock_ops(slave_dev);
--		ret =3D slave_dev->ethtool_ops->get_link(slave_dev);
--		netdev_unlock_ops(slave_dev);
--
--		return ret ? BMSR_LSTATUS : 0;
--	}
--
--	/* Ethtool can't be used, fallback to MII ioctls. */
--	if (slave_ops->ndo_eth_ioctl) {
--		/* TODO: set pointer to correct ioctl on a per team member
--		 *       bases to make this more efficient. that is, once
--		 *       we determine the correct ioctl, we will always
--		 *       call it and not the others for that team
--		 *       member.
--		 */
--
--		/* We cannot assume that SIOCGMIIPHY will also read a
--		 * register; not all network drivers (e.g., e100)
--		 * support that.
--		 */
--
--		/* Yes, the mii is overlaid on the ifreq.ifr_ifru */
--		strscpy_pad(ifr.ifr_name, slave_dev->name, IFNAMSIZ);
--		mii =3D if_mii(&ifr);
--
--		if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIPHY) =3D=3D 0) {
--			mii->reg_num =3D MII_BMSR;
--			if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIREG) =3D=3D 0)
--				return mii->val_out & BMSR_LSTATUS;
--		}
--	}
--
--	/* If reporting, report that either there's no ndo_eth_ioctl,
--	 * or both SIOCGMIIREG and get_link failed (meaning that we
--	 * cannot report link status).  If not reporting, pretend
--	 * we're ok.
--	 */
--	return reporting ? -1 : BMSR_LSTATUS;
--}
--
- /*----------------------------- Multicast list --------------------------=
-----*/
- =
-
- /* Push the promiscuity flag down to appropriate slaves */
-@@ -1949,7 +1877,6 @@ int bond_enslave(struct net_device *bond_dev, struct=
- net_device *slave_dev,
- 	const struct net_device_ops *slave_ops =3D slave_dev->netdev_ops;
- 	struct slave *new_slave =3D NULL, *prev_slave;
- 	struct sockaddr_storage ss;
--	int link_reporting;
- 	int res =3D 0, i;
- =
-
- 	if (slave_dev->flags & IFF_MASTER &&
-@@ -1959,12 +1886,6 @@ int bond_enslave(struct net_device *bond_dev, struc=
-t net_device *slave_dev,
- 		return -EPERM;
- 	}
- =
-
--	if (!bond->params.use_carrier &&
--	    slave_dev->ethtool_ops->get_link =3D=3D NULL &&
--	    slave_ops->ndo_eth_ioctl =3D=3D NULL) {
--		slave_warn(bond_dev, slave_dev, "no link monitoring support\n");
--	}
--
- 	/* already in-use? */
- 	if (netdev_is_rx_handler_busy(slave_dev)) {
- 		SLAVE_NL_ERR(bond_dev, slave_dev, extack,
-@@ -2178,29 +2099,10 @@ int bond_enslave(struct net_device *bond_dev, stru=
-ct net_device *slave_dev,
- =
-
- 	new_slave->last_tx =3D new_slave->last_rx;
- =
-
--	if (bond->params.miimon && !bond->params.use_carrier) {
--		link_reporting =3D bond_check_dev_link(bond, slave_dev, 1);
--
--		if ((link_reporting =3D=3D -1) && !bond->params.arp_interval) {
--			/* miimon is set but a bonded network driver
--			 * does not support ETHTOOL/MII and
--			 * arp_interval is not set.  Note: if
--			 * use_carrier is enabled, we will never go
--			 * here (because netif_carrier is always
--			 * supported); thus, we don't need to change
--			 * the messages for netif_carrier.
--			 */
--			slave_warn(bond_dev, slave_dev, "MII and ETHTOOL support not available=
- for slave, and arp_interval/arp_ip_target module parameters not specified=
-, thus bonding will not detect link failures! see bonding.txt for details\=
-n");
--		} else if (link_reporting =3D=3D -1) {
--			/* unable get link status using mii/ethtool */
--			slave_warn(bond_dev, slave_dev, "can't get link status from slave; the=
- network driver associated with this interface does not support MII or ETH=
-TOOL link status reporting, thus miimon has no effect on this interface\n"=
-);
--		}
--	}
--
- 	/* check for initial state */
- 	new_slave->link =3D BOND_LINK_NOCHANGE;
- 	if (bond->params.miimon) {
--		if (bond_check_dev_link(bond, slave_dev, 0) =3D=3D BMSR_LSTATUS) {
-+		if (netif_carrier_ok(slave_dev)) {
- 			if (bond->params.updelay) {
- 				bond_set_slave_link_state(new_slave,
- 							  BOND_LINK_BACK,
-@@ -2742,7 +2644,7 @@ static int bond_miimon_inspect(struct bonding *bond)
- 	bond_for_each_slave_rcu(bond, slave, iter) {
- 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
- =
-
--		link_state =3D bond_check_dev_link(bond, slave->dev, 0);
-+		link_state =3D netif_carrier_ok(slave->dev);
- =
-
- 		switch (slave->link) {
- 		case BOND_LINK_UP:
-@@ -6189,12 +6091,6 @@ static int __init bond_check_params(struct bond_par=
-ams *params)
- 		downdelay =3D 0;
- 	}
- =
-
--	if ((use_carrier !=3D 0) && (use_carrier !=3D 1)) {
--		pr_warn("Warning: use_carrier module parameter (%d), not of valid value=
- (0/1), so it was set to 1\n",
--			use_carrier);
--		use_carrier =3D 1;
--	}
--
- 	if (num_peer_notif < 0 || num_peer_notif > 255) {
- 		pr_warn("Warning: num_grat_arp/num_unsol_na (%d) not in range 0-255 so =
-it was reset to 1\n",
- 			num_peer_notif);
-@@ -6439,7 +6335,6 @@ static int __init bond_check_params(struct bond_para=
-ms *params)
- 	params->updelay =3D updelay;
- 	params->downdelay =3D downdelay;
- 	params->peer_notif_delay =3D 0;
--	params->use_carrier =3D use_carrier;
- 	params->lacp_active =3D 1;
- 	params->lacp_fast =3D lacp_fast;
- 	params->primary[0] =3D 0;
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond=
-_netlink.c
-index ac5e402c34bc..948dbda2a164 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -257,15 +257,6 @@ static int bond_changelink(struct net_device *bond_de=
-v, struct nlattr *tb[],
- 		if (err)
- 			return err;
- 	}
--	if (data[IFLA_BOND_USE_CARRIER]) {
--		int use_carrier =3D nla_get_u8(data[IFLA_BOND_USE_CARRIER]);
--
--		bond_opt_initval(&newval, use_carrier);
--		err =3D __bond_opt_set(bond, BOND_OPT_USE_CARRIER, &newval,
--				     data[IFLA_BOND_USE_CARRIER], extack);
--		if (err)
--			return err;
--	}
- 	if (data[IFLA_BOND_ARP_INTERVAL]) {
- 		int arp_interval =3D nla_get_u32(data[IFLA_BOND_ARP_INTERVAL]);
- =
-
-@@ -676,7 +667,7 @@ static int bond_fill_info(struct sk_buff *skb,
- 			bond->params.peer_notif_delay * bond->params.miimon))
- 		goto nla_put_failure;
- =
-
--	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, bond->params.use_carrier))
-+	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, 1))
- 		goto nla_put_failure;
- =
-
- 	if (nla_put_u32(skb, IFLA_BOND_ARP_INTERVAL, bond->params.arp_interval))
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond=
-_options.c
-index 91893c29b899..12b0a6097b40 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -184,12 +184,6 @@ static const struct bond_opt_value bond_primary_resel=
-ect_tbl[] =3D {
- 	{ NULL,      -1},
- };
- =
-
--static const struct bond_opt_value bond_use_carrier_tbl[] =3D {
--	{ "off", 0,  0},
--	{ "on",  1,  BOND_VALFLAG_DEFAULT},
--	{ NULL,  -1, 0}
--};
--
- static const struct bond_opt_value bond_all_slaves_active_tbl[] =3D {
- 	{ "off", 0,  BOND_VALFLAG_DEFAULT},
- 	{ "on",  1,  0},
-@@ -411,8 +405,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAS=
-T] =3D {
- 	[BOND_OPT_USE_CARRIER] =3D {
- 		.id =3D BOND_OPT_USE_CARRIER,
- 		.name =3D "use_carrier",
--		.desc =3D "Use netif_carrier_ok (vs MII ioctls) in miimon",
--		.values =3D bond_use_carrier_tbl,
-+		.desc =3D "Obsolete, has no effect",
- 		.set =3D bond_option_use_carrier_set
- 	},
- 	[BOND_OPT_ACTIVE_SLAVE] =3D {
-@@ -1068,10 +1061,6 @@ static int bond_option_peer_notif_delay_set(struct =
-bonding *bond,
- static int bond_option_use_carrier_set(struct bonding *bond,
- 				       const struct bond_opt_value *newval)
- {
--	netdev_dbg(bond->dev, "Setting use_carrier to %llu\n",
--		   newval->value);
--	bond->params.use_carrier =3D newval->value;
--
- 	return 0;
- }
- =
-
-diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_s=
-ysfs.c
-index 1e13bb170515..9a75ad3181ab 100644
---- a/drivers/net/bonding/bond_sysfs.c
-+++ b/drivers/net/bonding/bond_sysfs.c
-@@ -467,14 +467,12 @@ static ssize_t bonding_show_primary_reselect(struct =
-device *d,
- static DEVICE_ATTR(primary_reselect, 0644,
- 		   bonding_show_primary_reselect, bonding_sysfs_store_option);
- =
-
--/* Show the use_carrier flag. */
-+/* use_carrier is obsolete, but print value for compatibility */
- static ssize_t bonding_show_carrier(struct device *d,
- 				    struct device_attribute *attr,
- 				    char *buf)
- {
--	struct bonding *bond =3D to_bond(d);
--
--	return sysfs_emit(buf, "%d\n", bond->params.use_carrier);
-+	return sysfs_emit(buf, "1\n");
- }
- static DEVICE_ATTR(use_carrier, 0644,
- 		   bonding_show_carrier, bonding_sysfs_store_option);
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 95f67b308c19..6fdf4d1e5256 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -124,7 +124,6 @@ struct bond_params {
- 	int arp_interval;
- 	int arp_validate;
- 	int arp_all_targets;
--	int use_carrier;
- 	int fail_over_mac;
- 	int updelay;
- 	int downdelay;
--- =
-
-2.49.0.dirty
-
-
-
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 ---
-	-Jay Vosburgh, jv@jvosburgh.net
+v3: Add the missing documentation
+    Remove the CONFIG_SYSFS #ifdef machinations
+---
+ Documentation/ABI/stable/sysfs-driver-rds | 10 ++++++++
+ net/rds/af_rds.c                          | 31 +++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 Documentation/ABI/stable/sysfs-driver-rds
+
+diff --git a/Documentation/ABI/stable/sysfs-driver-rds b/Documentation/ABI/stable/sysfs-driver-rds
+new file mode 100644
+index 000000000000..d0b4fe0d3ce4
+--- /dev/null
++++ b/Documentation/ABI/stable/sysfs-driver-rds
+@@ -0,0 +1,10 @@
++What:          /sys/kernel/rds/features
++Date:          June 2025
++KernelVersion: 6.17
++Contact:       rds-devel@oss.oracle.com 
++Description:   This file will contain the features that correspond
++               to the include/uapi/linux/rds.h in a string format.
++
++	       The intent is for applications compiled against rds.h
++	       to be able to query and find out what features the
++	       driver supports.
+diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+index 8435a20968ef..cc9ade29c58f 100644
+--- a/net/rds/af_rds.c
++++ b/net/rds/af_rds.c
+@@ -33,6 +33,7 @@
+ #include <linux/module.h>
+ #include <linux/errno.h>
+ #include <linux/kernel.h>
++#include <linux/kobject.h>
+ #include <linux/gfp.h>
+ #include <linux/in.h>
+ #include <linux/ipv6.h>
+@@ -871,6 +872,31 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
+ }
+ #endif
+ 
++static ssize_t features_show(struct kobject *kobj, struct kobj_attribute *attr,
++			     char *buf)
++{
++	return snprintf(buf, PAGE_SIZE, "get_tos\n"
++			"set_tos\n"
++			"socket_cancel_sent_to\n"
++			"socket_get_mr\n"
++			"socket_free_mr\n"
++			"socket_recverr\n"
++			"socket_cong_monitor\n"
++			"socket_get_mr_for_dest\n"
++			"socket_so_transport\n"
++			"socket_so_rxpath_latency\n");
++}
++static struct kobj_attribute rds_features_attr = __ATTR_RO(features);
++
++static struct attribute *rds_sysfs_attrs[] = {
++	&rds_features_attr.attr,
++	NULL,
++};
++static const struct attribute_group rds_sysfs_attr_group = {
++	.attrs = rds_sysfs_attrs,
++	.name = "rds",
++};
++
+ static void rds_exit(void)
+ {
+ 	sock_unregister(rds_family_ops.family);
+@@ -882,6 +908,7 @@ static void rds_exit(void)
+ 	rds_stats_exit();
+ 	rds_page_exit();
+ 	rds_bind_lock_destroy();
++	sysfs_remove_group(kernel_kobj, &rds_sysfs_attr_group);
+ 	rds_info_deregister_func(RDS_INFO_SOCKETS, rds_sock_info);
+ 	rds_info_deregister_func(RDS_INFO_RECV_MESSAGES, rds_sock_inc_info);
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -923,6 +950,10 @@ static int __init rds_init(void)
+ 	if (ret)
+ 		goto out_proto;
+ 
++	ret = sysfs_create_group(kernel_kobj, &rds_sysfs_attr_group);
++	if (ret)
++		goto out_proto;
++
+ 	rds_info_register_func(RDS_INFO_SOCKETS, rds_sock_info);
+ 	rds_info_register_func(RDS_INFO_RECV_MESSAGES, rds_sock_inc_info);
+ #if IS_ENABLED(CONFIG_IPV6)
+-- 
+2.43.5
+
 
