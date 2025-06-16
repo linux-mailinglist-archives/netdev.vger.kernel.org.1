@@ -1,76 +1,170 @@
-Return-Path: <netdev+bounces-198161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB575ADB73C
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:43:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE4DADB742
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:43:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB1D87A12EC
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:42:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 728203B0A78
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDC32868B3;
-	Mon, 16 Jun 2025 16:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795902877E4;
+	Mon, 16 Jun 2025 16:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qyrmHN1P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsKat6yq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA0B21C174
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0782868B3;
+	Mon, 16 Jun 2025 16:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750092207; cv=none; b=OL0Br+ZvIhu5s2RsAKsWoodee0WrlFtsvi5lZJD0LKeml5YBe9EADrJ621ltwdFfTE3ByQt4FO2x4tR2ObR2asWeUzPNQGmF/d5ErSNuQiforSQWbbMEcSjKtlCxRqFX496yRuctp5EQMyyBrzvVNVr0XkaUEHc+bG7/oFhiiFk=
+	t=1750092231; cv=none; b=VZT069Dk5cGg+feljKDFA3ZjcIJHoZ/iPFj4F8juw23ZDiCEkFuoXn5fYtUkwg9Byo9kS8lAQu+oaq0sAxz24WRGhd2kL1Mjv5R3/CP5IsrbAK0zybcZGxvS4q58ESOIayCUpGXfXVOgkY4Vu77rPNw281QcwLfZnULWoXRXXCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750092207; c=relaxed/simple;
-	bh=vgKHpIin0g9uK+ECZ8DMrKXid3Ki24jEuiHE83QJT/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ekeP6sUGxdZrBQtk8sZ9vn9PHyzYD5zy2YgAm+bzlaZwBBtL+tSmt6P0p8bhCbdxwVA4OJB31RZwC9ZHCZybAAsJLa51tXc7Kl8ojXoiiYQVlq23HfYrepEoueG2rHMBGHLiWujWaKXfer7IGPnBDcZA62gySjfd5bYi45aH1LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qyrmHN1P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC899C4CEEA;
-	Mon, 16 Jun 2025 16:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750092206;
-	bh=vgKHpIin0g9uK+ECZ8DMrKXid3Ki24jEuiHE83QJT/I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qyrmHN1PY/IDHQIPV4xvG4X4qZNHhmrYs8nSvy1/puhkpIkaUuwi6mmuN/uQqdcj6
-	 3g9s5HDJQfphHob0LMaFN5vjPW1mw/uON1YQh5ZeIs6lytBUWTUwhGEtLd7AkCQwvm
-	 b/+UhCLWxr6qOGDpdw4VDZmttbLtuLUe9G5h+O5yGQS4Pe083ZPhxsKHlhNg6KZR+s
-	 Ok6LcTc9sLwy1E7+ZzEseaJmmCudJYMsYh+ONmxjkvQiAiY9/M8jkcMk7qjYAPoaV7
-	 TqWbaL540Pi7SgwkPpWQH5dX51moq7+gDFL5xUz3Yr1TQt5m7ZimFElSjrDLzveLGa
-	 wDWhmQ8Rv2FxQ==
-Date: Mon, 16 Jun 2025 17:43:22 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Always check return value from
- airoha_ppe_foe_get_entry()
-Message-ID: <20250616164322.GB4794@horms.kernel.org>
-References: <20250616-check-ret-from-airoha_ppe_foe_get_entry-v1-1-1acae5d677f7@kernel.org>
+	s=arc-20240116; t=1750092231; c=relaxed/simple;
+	bh=GToAKMJOAzgaPnwur4vcXJJz5zZVnXepZMpNIkxPKEY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=LL4M1cD5oq2wtayvdgcYtFQlGg0bKt/b7BWzTPyX8jRRgzmd/86s6ZghWsw2T4UCY6XJIS+u+LnOssBM6N1M3mYmsh7ixHXP+oTKVnFDPj5eSALEZZonHpktpnG65AOgiim7Qf3iKxxlO4lw3pKhBZtq4WTfFgjJf1oHr0v1sDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsKat6yq; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-70b4e497d96so42625607b3.2;
+        Mon, 16 Jun 2025 09:43:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750092229; x=1750697029; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zLCRVz2k1at0n1nr33b0V9j3klWouJOz2HIaXuHS5yk=;
+        b=gsKat6yqTPsW9yeMqwG3bF8XcpFekzlrGdOx/Em3ZOnuVvFanDy9nRzCss1OeF86jO
+         t5jIhCOSHx3t2VV0aNrcxf24+ZPthNfUE2f013e4EWdiCQCNirDVrkbBg++NSZh1jbZU
+         qdFJbBrjgEQD6cpPsyXTGj5w7TUoEDd7Kp9igtlc5c8IsJgsaKzblEcEjcbDjjhapooZ
+         vPFE0YbBYA92TLO0ZV3TIK5IHTvoldt8wgH6l6GzNGxwFykHn7r5iqik8JqoHWwYxtLb
+         5X/l2mOYB0TgmIQPTydoeeUo8q8SXP4SPZwiJC+XrbGXv1uNrjG1bEFFNgZrxWKfx9l1
+         hcCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750092229; x=1750697029;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zLCRVz2k1at0n1nr33b0V9j3klWouJOz2HIaXuHS5yk=;
+        b=Zbdxnr1wYnmxPoOWckcsSuWlh2ufgVuOBiRJrz0dSfUZLm5YmeZ49kvte049o9yT/P
+         e+UJn6RlqY3/pjOIM6TLyQceyvIEYIAshJYKog3G0eee95JyCCNw6Wedx0YPw+lM6Isq
+         RyjuLLloKBcGqHk6dZJaOapta2U3u1YXe6lX8QIt+kknpf8BdAz8XWaYZbZ9PTjC+ZGZ
+         u9uJTc1axITB+u/3bD0I21PwL6pZlwbwa6xSRRudibsiFAhEEzyz2ojNjZZd9jCTEH91
+         MVCp5J1HoyGwfNnoM4w365l+PNGEFkMsBUiFhBnFvx2yXdnwsTWnStqhr7ZxlKdUBUFf
+         zlpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKqP0pw7hY3Gp33OaQFkRBM0vSwzNnYLrrqDCDjUCsUzKkET6ttF9HVhjbo/6kh7HDj4+hrIxvvw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0+bNkWoiKtzlyzzwcGtKDaLEXHcrQkKuRWoW+2rA5FDyQWojJ
+	Psnybh8UvmL1ljawZq3qVyLDSqKC35izpWRAVE5MfS0wMEmmYm43NffT
+X-Gm-Gg: ASbGnctDbUQ4H2h9SirLcW37vJi6luLRqR6S1OFlqn755suTPFn9o47VVJhUFaOyrDq
+	mxpif3pb9XyycrVuFoJvTLVCoBGNDcpd05sGwUFmxydQajk9m3mYpGaKoRI+gQoBf43+548LGPR
+	dFOH5iw1/E6oqXk9n1IpmtPce9mxwftvnfBbn86zXorrM+OzUQWsHRGZszDQONsYdUvsftgVrAq
+	0dAurmg0cqUFqM/csXRaSNYauZ6lfzFYsggTJVKedGNxAQaVlM0eYz7omDWW+lQQX964IRhXCyY
+	klZ5Oik1tBxJ3eH0Cbi0koqXDXYdeb/WHQgd2PTXvJOFp+DNzkstfYQdZNJj8ilGwL/8ABasnGU
+	YE90N3sP/VFLXXpvK8bNOZwSDDNQJYI88cr3gqlQz/w==
+X-Google-Smtp-Source: AGHT+IEe2ShsQXChv0t1KlspZ6IbgyUhhI5A4khvWSqPzGJvZ0uxWm69ALzGppn56dPOERUY5UbwwQ==
+X-Received: by 2002:a05:690c:89:b0:70d:ed5d:b4cd with SMTP id 00721157ae682-71175457355mr132435637b3.17.1750092228534;
+        Mon, 16 Jun 2025 09:43:48 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71194917307sm4336667b3.20.2025.06.16.09.43.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 09:43:47 -0700 (PDT)
+Date: Mon, 16 Jun 2025 12:43:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ io-uring@vger.kernel.org, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, 
+ Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Jason Xing <kerneljasonxing@gmail.com>
+Message-ID: <685049c36304b_2150e229495@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65907669-80cb-4c79-9979-4bd2c159c0ed@gmail.com>
+References: <cover.1750065793.git.asml.silence@gmail.com>
+ <702357dd8936ef4c0d3864441e853bfe3224a677.1750065793.git.asml.silence@gmail.com>
+ <685031d760515_20ce862942c@willemb.c.googlers.com.notmuch>
+ <65907669-80cb-4c79-9979-4bd2c159c0ed@gmail.com>
+Subject: Re: [PATCH v5 1/5] net: timestamp: add helper returning skb's tx
+ tstamp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250616-check-ret-from-airoha_ppe_foe_get_entry-v1-1-1acae5d677f7@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 16, 2025 at 12:27:06PM +0200, Lorenzo Bianconi wrote:
-> airoha_ppe_foe_get_entry routine can return NULL, so check the returned
-> pointer is not NULL in airoha_ppe_foe_flow_l2_entry_update()
+Pavel Begunkov wrote:
+> On 6/16/25 16:01, Willem de Bruijn wrote:
+> > Pavel Begunkov wrote:
+> >> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
+> >> associated with an error queue skb.
+> >>
+> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> >> ---
+> >>   include/net/sock.h |  4 ++++
+> >>   net/socket.c       | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+> >>   2 files changed, 50 insertions(+)
+> >>
+> >> diff --git a/include/net/sock.h b/include/net/sock.h
+> >> index 92e7c1aae3cc..f5f5a9ad290b 100644
+> >> --- a/include/net/sock.h
+> >> +++ b/include/net/sock.h
+> >> @@ -2677,6 +2677,10 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+> >>   void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
+> >>   			     struct sk_buff *skb);
+> >>   
+> >> +bool skb_has_tx_timestamp(struct sk_buff *skb, const struct sock *sk);
+> >> +int skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
+> >> +			 struct timespec64 *ts);
+> >> +
+> >>   static inline void
+> >>   sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb)
+> >>   {
+> >> diff --git a/net/socket.c b/net/socket.c
+> >> index 9a0e720f0859..2cab805943c0 100644
+> >> --- a/net/socket.c
+> >> +++ b/net/socket.c
+> >> @@ -843,6 +843,52 @@ static void put_ts_pktinfo(struct msghdr *msg, struct sk_buff *skb,
+> >>   		 sizeof(ts_pktinfo), &ts_pktinfo);
+> >>   }
+> >>   
+> >> +bool skb_has_tx_timestamp(struct sk_buff *skb, const struct sock *sk)
+> >> +{
+> > 
+> > I forgot to ask earlier, and not a reason for a respin.
+> > 
+> > Is the only reason that skb is not const here skb_hwtstamps?
 > 
-> Fixes: b81e0f2b58be3 ("net: airoha: Add FLOW_CLS_STATS callback support")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> Yes, and also get_timestamp() for skb_get_tx_timestamp(). It's easy to patch,
+> but I was hoping we can merge it through the io_uring tree without deps on
+> net-next and add const to the new helpers after. It's definitely less trouble
+> than orchestrating a separate branch otherwise.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Makes sense.
+
+> FWIW, it'd be fine to add
+> const to the existing helpers in the meantime as long as the new functions
+> stay non-const for now. Hope that works
+
+Yeah, agreed no need to add such dependencies.
+
+> -- 
+> Pavel Begunkov
+> 
+
 
 
