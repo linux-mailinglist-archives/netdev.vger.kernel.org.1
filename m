@@ -1,201 +1,214 @@
-Return-Path: <netdev+bounces-198159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F382ADB732
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:40:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC755ADB735
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 157003A8F2E
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:40:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70D8A16A993
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0307A286D62;
-	Mon, 16 Jun 2025 16:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1AAE2877E4;
+	Mon, 16 Jun 2025 16:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEWqZx5l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IiDccW4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD6921FF37;
-	Mon, 16 Jun 2025 16:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD2420FAA4
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750092013; cv=none; b=BWHbjF/6HjOzbTYjz8gzQ7eM5YgTKTF2oivUh1k0d052A3Y7zbpEgP3NzAODQIG48unId+rsifVVor1dmOLjdm+opb7sMouowjc8/hw6mOlLgqD/h5WJew6qx7p3b0tD5zl96cbzDib7ZsYN8d3y1SaeuGwpPnmAQJMdXtltpYo=
+	t=1750092064; cv=none; b=NNt4OdRPt+llH2htsrsld7dXycPbrLB2eYJXxDtkPK1n5ECSVYVPIXPf4Q/7Utg60MLbNCRSmtegd51m8LVf0QqDAhF//JEmrHaeV7yuDE3LgPM4Tc1p/Fxe81HEA4aNAXqSYhp71FiVgACuK70+c/CQGd3KRNTcpFSpf+UwUss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750092013; c=relaxed/simple;
-	bh=DW/mYNwTouTw10FCu2yR/A/2ODddX0eTePEGQ27HCEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZkkKERW6i+JcGbxVZpa6en/EO++PbPeh8Q24Vgy6Cqhpox6jBNwH8V7BmtQ8VmqXVvSboFdekOwyB7V2rB2YDsFVq+1QHaBtThfdMYc/F5fhHP8btIqL0YGTmB0FEAMG2r9K264uE3+hBZhdqPXGrqx1ie3QSsgUqaVIPTArO9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEWqZx5l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F052DC4CEEA;
-	Mon, 16 Jun 2025 16:40:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750092013;
-	bh=DW/mYNwTouTw10FCu2yR/A/2ODddX0eTePEGQ27HCEI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BEWqZx5lIfH8+gakxPxfUHRrDMUg5vM79KBdqR5ODrfT5TytEAZbAifZTI0i5/nA2
-	 8AeWFRLIBsqa0pOYYv+URXlYw3LrWz1zwpzuoSpr60tKJvS43jG35iHsMkpowjGMwh
-	 4z9q7nuvNthZA4XDqPJia5RbWIzfBYVaIxPjvdWyUqeZRVw5wMD8/y8tIVAxmEAbge
-	 FagM1IBgtCgKoN3CqHSsIQrVo7eVBTf1o1uKWq89wEHJAppKgSuprvxfaxY/4erHDU
-	 mU37kfV6w7GlXUVET68WRMQ3DM0WjHyHOulZRLvKRec+tW863oWSNnOYZAUgYK1C4B
-	 f5zldll0kZ3eA==
-Date: Mon, 16 Jun 2025 18:40:10 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <borkmann@iogearbox.net>,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
-	kernel-team@cloudflare.com, arthur@arthurfabre.com,
-	jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
- xdp-rx-metadata.rst
-Message-ID: <aFBI6msJQn4-LZsH@lore-desk>
-References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
- <174897279518.1677018.5982630277641723936.stgit@firesoul>
- <aEJWTPdaVmlIYyKC@mini-arch>
- <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
- <87plfbcq4m.fsf@toke.dk>
- <aEixEV-nZxb1yjyk@lore-rh-laptop>
- <aEj6nqH85uBe2IlW@mini-arch>
- <aFAQJKQ5wM-htTWN@lore-desk>
- <aFA8BzkbzHDQgDVD@mini-arch>
+	s=arc-20240116; t=1750092064; c=relaxed/simple;
+	bh=LwE/WuesUXIxV0abPIcpPADTky2PxZjAG+IcG/6YKSc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g81FupDej4mdct284re7qcyvlcW6BYwK+tuXet6WSeKn27ZlJFAM3cDJg570hTemEF7rvCNfglSOhPLwg0ypumkkXDD4R5z4LYVx2DRCmpiGty+rn2t1XXxNyPmVRJv9O8jMfXJu414n/Sy78VklU+9WfpE3OfTYhuu5KonFURQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IiDccW4t; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750092062;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E8lQD9OdGrrnpQH1qsSN5fp1bQN4PsZfD/B5xZ27lys=;
+	b=IiDccW4tOh4m6wAs6LL3boZwDkpsbcKOj3pG6kShnrtzl3lE5tHgVLBgS5UVA1s2Ww79w8
+	kD7vW//z07RIrGdrRU8u07gMwqAwrCGwLWOVSsmR7p5Q8EQN/BQVGCpU4Lb+C4TFDja4dn
+	U9Oul3E0NPhsF52lC1ewsN2jHZXg7ms=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-d1Zho7N8MJij7u1dH3uWBg-1; Mon,
+ 16 Jun 2025 12:40:56 -0400
+X-MC-Unique: d1Zho7N8MJij7u1dH3uWBg-1
+X-Mimecast-MFC-AGG-ID: d1Zho7N8MJij7u1dH3uWBg_1750092054
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F160719560B0;
+	Mon, 16 Jun 2025 16:40:52 +0000 (UTC)
+Received: from [10.45.224.53] (unknown [10.45.224.53])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CE7F8195608F;
+	Mon, 16 Jun 2025 16:40:45 +0000 (UTC)
+Message-ID: <9a0443f1-e3c0-443d-9120-636be25e6794@redhat.com>
+Date: Mon, 16 Jun 2025 18:40:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="sDj39uYRsqJWsHZB"
-Content-Disposition: inline
-In-Reply-To: <aFA8BzkbzHDQgDVD@mini-arch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 09/14] dpll: zl3073x: Register DPLL devices
+ and pins
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson <shannon.nelson@amd.com>,
+ Dave Jiang <dave.jiang@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250615201223.1209235-1-ivecera@redhat.com>
+ <20250615201223.1209235-10-ivecera@redhat.com>
+ <20250616160047.GG6918@horms.kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250616160047.GG6918@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
 
---sDj39uYRsqJWsHZB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-> On 06/16, Lorenzo Bianconi wrote:
-> > On Jun 10, Stanislav Fomichev wrote:
-> > > On 06/11, Lorenzo Bianconi wrote:
-> > > > > Daniel Borkmann <daniel@iogearbox.net> writes:
-> > > > >=20
-> > > > [...]
-> > > > > >>=20
-> > > > > >> Why not have a new flag for bpf_redirect that transparently st=
-ores all
-> > > > > >> available metadata? If you care only about the redirect -> skb=
- case.
-> > > > > >> Might give us more wiggle room in the future to make it work w=
-ith
-> > > > > >> traits.
-> > > > > >
-> > > > > > Also q from my side: If I understand the proposal correctly, in=
- order to fully
-> > > > > > populate an skb at some point, you have to call all the bpf_xdp=
-_metadata_* kfuncs
-> > > > > > to collect the data from the driver descriptors (indirect call)=
-, and then yet
-> > > > > > again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the =
-data in struct
-> > > > > > xdp_rx_meta again. This seems rather costly and once you add mo=
-re kfuncs with
-> > > > > > meta data aren't you better off switching to tc(x) directly so =
-the driver can
-> > > > > > do all this natively? :/
-> > > > >=20
-> > > > > I agree that the "one kfunc per metadata item" scales poorly. IIR=
-C, the
-> > > > > hope was (back when we added the initial HW metadata support) tha=
-t we
-> > > > > would be able to inline them to avoid the function call overhead.
-> > > > >=20
-> > > > > That being said, even with half a dozen function calls, that's st=
-ill a
-> > > > > lot less overhead from going all the way to TC(x). The goal of th=
-e use
-> > > > > case here is to do as little work as possible on the CPU that ini=
-tially
-> > > > > receives the packet, instead moving the network stack processing =
-(and
-> > > > > skb allocation) to a different CPU with cpumap.
-> > > > >=20
-> > > > > So even if the *total* amount of work being done is a bit higher =
-because
-> > > > > of the kfunc overhead, that can still be beneficial because it's =
-split
-> > > > > between two (or more) CPUs.
-> > > > >=20
-> > > > > I'm sure Jesper has some concrete benchmarks for this lying around
-> > > > > somewhere, hopefully he can share those :)
-> > > >=20
-> > > > Another possible approach would be to have some utility functions (=
-not kfuncs)
-> > > > used to 'store' the hw metadata in the xdp_frame that are executed =
-in each
-> > > > driver codebase before performing XDP_REDIRECT. The downside of thi=
-s approach
-> > > > is we need to parse the hw metadata twice if the eBPF program that =
-is bounded
-> > > > to the NIC is consuming these info. What do you think?
-> > >=20
-> > > That's the option I was asking about. I'm assuming we should be able
-> > > to reuse existing xmo metadata callbacks for this. We should be able
-> > > to hide it from the drivers also hopefully.
-> >=20
-> > If we move the hw metadata 'store' operations to the driver codebase (r=
-unning
-> > xmo metadata callbacks before performing XDP_REDIRECT), we will parse t=
-he hw
-> > metadata twice if we attach to the NIC an AF_XDP program consuming the =
-hw
-> > metadata, right? One parsing is done by the AF_XDP hw metadata kfunc, a=
-nd the
-> > second one would be performed by the native driver codebase.
->=20
-> The native driver codebase will parse the hw metadata only if the
-> bpf_redirect set some flag, so unless I'm missing something, there
-> should not be double parsing. (but it's all user controlled, so doesn't
-> sound like a problem?)
+On 16. 06. 25 6:00 odp., Simon Horman wrote:
+> On Sun, Jun 15, 2025 at 10:12:18PM +0200, Ivan Vecera wrote:
+>> Enumerate all available DPLL channels and registers a DPLL device for
+>> each of them. Check all input references and outputs and register
+>> DPLL pins for them.
+>>
+>> Number of registered DPLL pins depends on configuration of references
+>> and outputs. If the reference or output is configured as differential
+>> one then only one DPLL pin is registered. Both references and outputs
+>> can be also disabled from firmware configuration and in this case
+>> no DPLL pins are registered.
+>>
+>> All registrable references are registered to all available DPLL devices
+>> with exception of DPLLs that are configured in NCO (numerically
+>> controlled oscillator) mode. In this mode DPLL channel acts as PHC and
+>> cannot be locked to any reference.
+>>
+>> Device outputs are connected to one of synthesizers and each synthesizer
+>> is driven by some DPLL channel. So output pins belonging to given output
+>> are registered to DPLL device that drives associated synthesizer.
+>>
+>> Finally add kworker task to monitor async changes on all DPLL channels
+>> and input pins and to notify about them DPLL core. Output pins are not
+>> monitored as their parameters are not changed asynchronously by the
+>> device.
+>>
+>> Co-developed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
+>> Signed-off-by: Prathosh Satish <Prathosh.Satish@microchip.com>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> 
+> ...
+> 
+>> diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+> 
+> ...
+> 
+>> +static int
+>> +zl3073x_devm_dpll_init(struct zl3073x_dev *zldev, u8 num_dplls)
+>> +{
+>> +	struct kthread_worker *kworker;
+>> +	struct zl3073x_dpll *zldpll;
+>> +	unsigned int i;
+>> +	int rc;
+>> +
+>> +	INIT_LIST_HEAD(&zldev->dplls);
+>> +
+>> +	/* Initialize all DPLLs */
+>> +	for (i = 0; i < num_dplls; i++) {
+>> +		zldpll = zl3073x_dpll_alloc(zldev, i);
+>> +		if (IS_ERR(zldpll)) {
+>> +			dev_err_probe(zldev->dev, PTR_ERR(zldpll),
+>> +				      "Failed to alloc DPLL%u\n", i);
+> 
+> Hi Ivan,
+> 
+> Jumping to the error label will return rc.
+> But rc may not be initialised here.
+> 
+> Flagged by Smatch.
 
-I do not have a strong opinion about it, I guess it is fine, but I am not
-100% sure if it fits in Jesper's use case.
-@Jesper: any input on it?
+Hi Simon,
+good catch... thanks.
+Will fix this in v11 later today (after 24h).
 
-Regards,
-Lorenzo
+Ivan
 
->=20
-> > Moreover, this approach seems less flexible. What do you think?
->=20
-> Agreed on the flexibility. Just trying to understand whether we really
-> need that flexibility. My worry is that we might expose too much of
-> the stack's internals with this and introduce some unexpected
-> dependencies. The things like Jesper mentioned in another thread:
-> set skb->hash before redirect to make GRO go fast... We either have
-> to make the stack more robust (my preference), or document these
-> cases clearly and have test coverage to avoid breakage in the future.
+> 
+>> +			goto error;
+>> +		}
+>> +
+>> +		rc = zl3073x_dpll_register(zldpll);
+>> +		if (rc) {
+>> +			dev_err_probe(zldev->dev, rc,
+>> +				      "Failed to register DPLL%u\n", i);
+>> +			zl3073x_dpll_free(zldpll);
+>> +			goto error;
+>> +		}
+>> +
+>> +		list_add(&zldpll->list, &zldev->dplls);
+>> +	}
+>> +
+>> +	/* Perform initial firmware fine phase correction */
+>> +	rc = zl3073x_dpll_init_fine_phase_adjust(zldev);
+>> +	if (rc) {
+>> +		dev_err_probe(zldev->dev, rc,
+>> +			      "Failed to init fine phase correction\n");
+>> +		goto error;
+>> +	}
+>> +
+>> +	/* Initialize monitoring thread */
+>> +	kthread_init_delayed_work(&zldev->work, zl3073x_dev_periodic_work);
+>> +	kworker = kthread_run_worker(0, "zl3073x-%s", dev_name(zldev->dev));
+>> +	if (IS_ERR(kworker)) {
+>> +		rc = PTR_ERR(kworker);
+>> +		goto error;
+>> +	}
+>> +
+>> +	zldev->kworker = kworker;
+>> +	kthread_queue_delayed_work(zldev->kworker, &zldev->work, 0);
+>> +
+>> +	/* Add devres action to release DPLL related resources */
+>> +	rc = devm_add_action_or_reset(zldev->dev, zl3073x_dev_dpll_fini, zldev);
+>> +	if (rc)
+>> +		goto error;
+>> +
+>> +	return 0;
+>> +
+>> +error:
+>> +	zl3073x_dev_dpll_fini(zldev);
+>> +
+>> +	return rc;
+>> +}
+>> +
+> 
+> ...
+> 
 
---sDj39uYRsqJWsHZB
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFBI6gAKCRA6cBh0uS2t
-rDluAQDGPIrrlw65wQryPK9+Hj0hrdco/9ylRkdk0KC8Velo3AD/cttF4uhvrYLW
-YgYu1SWEYU0DYj7cb3qp5hK26dk6qwI=
-=QBjQ
------END PGP SIGNATURE-----
-
---sDj39uYRsqJWsHZB--
 
