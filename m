@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-198337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3098CADBDB9
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:35:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD44EADBDBD
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78F75175DB8
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:35:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 944871892FCA
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C8823815F;
-	Mon, 16 Jun 2025 23:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FD7238C36;
+	Mon, 16 Jun 2025 23:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="enKW4K/8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PW4jRbzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AF2238C36
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F277239E88
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750116894; cv=none; b=Y10MYUg+HVlREF9QWIAuzxfvuLT4ZLcNb6Sse0v8anWgAsxUZoIbzsKUY8lLIe2r456FNYJKvy/f3PQGhQQFLAn/n/mAj+TeyoMAFHOb1aJAnfSjI1teGOc2oRmPdr7l/JyDiJVoaLteRX/cd+/P+GBlVhy496XcGjWCBmUf2GY=
+	t=1750116896; cv=none; b=Ln9c/FjRro0j9kdyI8y0HYr7nsjP0IQVZn20+mSs5C0fNC1H1rcyVrE6TsgIM/NPseDTgkV0ky054hguCa8gEm00RfQm/VyXPtku9AhIaX2eCIoyv8UgJGRPtkIrxA/ZIo+LlSNqzvjRAor8kZugiOMPYrpy3LFyl+IZN58pheY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750116894; c=relaxed/simple;
-	bh=Rlx50UeLGtIQLjwfjg+tAHN9dPK4B4kLXPy07wHdPNY=;
+	s=arc-20240116; t=1750116896; c=relaxed/simple;
+	bh=VTvxtR0f51a9CvJjYElwMaIvf5GKOHP+BX4QtSqR5EQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qVkAwXTSpyDafJ4AED4HwRHwo9oMRl5Pdzwoj79A2EF5wvP9HPkWngVbshILx/xGg7LSpKzvKNFn9bX/mEYtMpeHdBwm3+NFQ+Q6dIPw31iUkj8lGG6QuguvTW5tJwab1FpluuDeUj6iPXGdsbYgt1mz1DF/wL8jTf969JQiGnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=enKW4K/8; arc=none smtp.client-ip=209.85.216.54
+	 MIME-Version; b=WUAcKztJMAYUTj6md1OJ7N7MkK+DS33j6e8T1iFaz2cF7NgZKBnBBYCst8ZEMmPocylSgi8mwCv02n3TkQrVVekf37vEiNX1y9WHKBHevxvGA2xL0EgUSmKS4gZsA816SpZJLwkUkJjWAXP1chukEqn69lRFZuF7ZsUzRqatW2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PW4jRbzZ; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-311da0bef4aso5791729a91.3
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:34:53 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-311ef4fb43dso4016654a91.3
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:34:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750116893; x=1750721693; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750116894; x=1750721694; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RI4xoY58S3ck2UdCQ7dr2b3rMhEjoj8/T7LDZGfNd0g=;
-        b=enKW4K/8tfHs0c3ASGMBSSyKpQ1HNqaPNIerVhdWIQVCXKTnTCWewyb/NFzTi4vrih
-         tHok8Caoq5uJpqtq0mYKgxGO//P+k8vZjgG41NYwa/naPKMgutN/I8GBviH8m232y06x
-         M3U7uCzwC8MkBF0xxEjauxztZkdKkg9fDAHMy/GGy/ntlnGlNd40MQO76VO9ADnPNutE
-         tYRbKLT0exiFA3BkYC86Auty3usKzYqWXLyzQpnfi8349KBnPU0Pbpo9ZxSXW08AUHCm
-         YKDVSKQPUnZTk9ecs/+Q635UprcR7NCPnPkzGwYBNgFdjgCNv2/LA2vYXLTZbofWdy+d
-         CzCA==
+        bh=gXbBA5GoQU2ZBqx8P6uWs8YzE92Ezh0aQl++jW7s7jw=;
+        b=PW4jRbzZzaMuiYcy/WdFVbB0mBqWT6iS3zCvRsuOzg4KBo0svCVnP3JwohimKDsUzJ
+         exyU/Vwes3uTErryIw5r1CULS1qaNNGmhxl7GGXPv7yLryloo8CWgVc32846uqUmRIO9
+         wGhC0izhB/RqQvJUJc4C4AaHhLd6lT+eFOV3+lCmzFiY0NfvswpOW/CULbkvvXaKDFZi
+         hQ9s3MO/5zIQI69954TPq2VhxBdsa7g8PQwWe5gyN8EsUi42xXdSvpWDfBJHG2TFIrIF
+         LmTo6N5n+TBarwBc/WZOtK4wCwLHtmasx+EOximIdEvhhbzD/cxRpZQJH5dot4Lfhbv5
+         e/zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750116893; x=1750721693;
+        d=1e100.net; s=20230601; t=1750116894; x=1750721694;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RI4xoY58S3ck2UdCQ7dr2b3rMhEjoj8/T7LDZGfNd0g=;
-        b=BwRv/x3iBx0hGHpEv5OunV8dlxr7M32oSfaF0c1RWJ+fIhhht3ANbjA8iCehv6giiG
-         KJ5PTAZmcXrF50oAw1rtCRo6qssvr9spFMS24A3oNrvDh6G6v6NYI4WpveZnk00fhMUc
-         pSUp2CYVbSwqGy+6HQ8MVV9l6JQUNDzlEE9w5gnKH48+LSt2aV50Z0WLtnvRn+wNWjDd
-         /VDnBkj1QKHFfAcguenjpunVT30/oWj9/9UhDskR6s4KOhJuAEDlumyPSBM27qpetgaX
-         tufd0ld8BzDWsvjLsg6v5QffvUrOXwXLdOAvApS4V8OSgeRZcYrZaoyLXHBbeZs+ckIe
-         hyXw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkBn/rbgCkFLnRr8/KAQ682ZNyH66O4dzxPScXUYta7dee7/O5QDzun5gqbKGh4neJKupasWM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwvfK7HzMJcKwdIfAfWJRLAET6rbP/5Gh4QeR3WyL95BSsVrlQ
-	dNzRAkWpOs/ySgzNlrHxPbHcZG5i5W9n7ZeKavbuR8Ct+DlmidIkeyM=
-X-Gm-Gg: ASbGnctVWX2Rf26PofK8DODRIEW2/BmjLqdYbv88sIw7vG8GyBDNzeHyxpQauJzNW3e
-	Ed3WC50YMRD3Uen+Vsuc9ef0xTtKjOTs/qXK6dQOMKCediygcsrvqGD5P4//WRlUtQDqlTU44vq
-	W9+o4bl37bFvQvDYEr5+Y4PHVnYcV/+hVeJqnTZ0Ee/yDQ4N3fNNzUDMr8HAWxWkJhVAP0MhjEg
-	U1mSRoWjJQTpRZ6DZ5hR+Tirm68czkOl5gaV1kEbStd1BKmVqK11T4HI8JlYulKumawhhrwCspZ
-	xOzwk9MZRj2kydI6Vr+L01UbOrWy+zwurnq2ggc=
-X-Google-Smtp-Source: AGHT+IHhKjPGqkwercFABIdTvtDbe23HWfrWCwJlf+IdKNbtiGH5aByOZ5Bn4tLqvyhF8IOkBzhPMg==
-X-Received: by 2002:a17:90b:582f:b0:313:bf67:b354 with SMTP id 98e67ed59e1d1-313f1b87a40mr20952938a91.0.1750116892781;
-        Mon, 16 Jun 2025 16:34:52 -0700 (PDT)
+        bh=gXbBA5GoQU2ZBqx8P6uWs8YzE92Ezh0aQl++jW7s7jw=;
+        b=g77eyGx+qDxe8zjS10JA2D1PqeSMMwe2SM3eV80b7z/RAbY5gy1/pZ8GENVo4GYeBp
+         j37hqgx5QpKBZ2PGPC0fkWXQeUISgWhE2ufCZ2BsSxMEpayC7pWoAKK1bE0tIbBMiy1X
+         v+k40KI5Yi9qoY7RFdE9e4eMNUwHk08F+yfpdlsLMQbpxpEe/EmxkCsvtarvxa6D1S8j
+         hmUUdYB2hsMZsWDtKs5RXUfXnFCTLYeaa1Q2m7Q5Nf5UKSFZZBrijp9YlQHx/ex6OmdZ
+         wJR/xg8Vch6dxVdGVRfcFzxn9qsI97260zHPNKTJSF9/DZv8POD3VqAYyijdh6iN/onV
+         +Ksw==
+X-Forwarded-Encrypted: i=1; AJvYcCWb1SoCsyttoGfhbuX7K7lUF6IynyikEnqFe6B5ex0vl0bEZwGsZd8kjzkhErfqxxDJzSwIM3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmPiWhZdkgDQrVriQYD46hpIe7+iLl7WSn+irpLpHVLMF6J2dz
+	6mWip0Nl+v6xcr/GDPRpH2NWZSF4ArpZQKZuFw//i2ojelpAeJjwNdA=
+X-Gm-Gg: ASbGncvjY/xaaz9uegXbLJMtRZvHziuk+XUDyfnI06xwqqkMD6OI/5kHDWDI6OheuZm
+	Xsvcr1WBA7DP23nWoH//rUvN9AZv/79VTJ/ef0AsbrTwR0qQBb1StQoOUBvCO4z3lKt2kHO99/V
+	8H4cZaCfEQIfkXbjgBC80yO5SmBpEQgH41s5Yiwnl+VETrUeT/ir/BACwrMq7A8+UwNXYtF0mdk
+	V4mxhHWg/rv3vWNsXp9vTp7ApSMpSXT4QZZRatl1caWguJj8gMJiTDC4+srDhHz5wdebsHXv1Or
+	qGU95/EdDT0+h+9lITHyS0EKcjl66byWRiQInLU=
+X-Google-Smtp-Source: AGHT+IFYDVuSK0k9r6yEh6R75yBe92YW8qdGZoiEq0aoX0sXHvJ9XjnY3uEoHXuLEVYryr3Ntgqnxg==
+X-Received: by 2002:a17:90b:582d:b0:312:f0d0:bc4 with SMTP id 98e67ed59e1d1-313f1be5b9dmr15478264a91.5.1750116894072;
+        Mon, 16 Jun 2025 16:34:54 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de89393sm67220485ad.114.2025.06.16.16.34.51
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de89393sm67220485ad.114.2025.06.16.16.34.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 16:34:52 -0700 (PDT)
+        Mon, 16 Jun 2025 16:34:53 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -82,9 +82,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v1 net-next 11/15] ipv6: anycast: Don't use rtnl_dereference().
-Date: Mon, 16 Jun 2025 16:28:40 -0700
-Message-ID: <20250616233417.1153427-12-kuni1840@gmail.com>
+Subject: [PATCH v1 net-next 12/15] ipv6: anycast: Don't hold RTNL for IPV6_LEAVE_ANYCAST and IPV6_ADDRFORM.
+Date: Mon, 16 Jun 2025 16:28:41 -0700
+Message-ID: <20250616233417.1153427-13-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250616233417.1153427-1-kuni1840@gmail.com>
 References: <20250616233417.1153427-1-kuni1840@gmail.com>
@@ -98,101 +98,135 @@ Content-Transfer-Encoding: 8bit
 
 From: Kuniyuki Iwashima <kuniyu@google.com>
 
-inet6_dev->ac_list is protected by inet6_dev->lock, so rtnl_dereference()
-is a bit rough annotation.
+inet6_sk(sk)->ipv6_ac_list is protected by lock_sock().
 
-As done in mcast.c, we can use ac_dereference() that checks if
-inet6_dev->lock is held.
+In ipv6_sock_ac_drop() and ipv6_sock_ac_close(),
+only __dev_get_by_index() and __in6_dev_get() requrie RTNL.
 
-Let's replace rtnl_dereference() with a new helper ac_dereference().
-
-Note that now addrconf_join_solict() / addrconf_leave_solict() in
-__ipv6_dev_ac_inc() / __ipv6_dev_ac_dec() does not need RTNL, so we
-can remove ASSERT_RTNL() there.
+Let's replace them with dev_get_by_index() and in6_dev_get()
+and drop RTNL from IPV6_LEAVE_ANYCAST and IPV6_ADDRFORM.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv6/addrconf.c |  2 --
- net/ipv6/anycast.c  | 17 ++++++++---------
- 2 files changed, 8 insertions(+), 11 deletions(-)
+ net/ipv6/anycast.c       | 36 ++++++++++++++++++++----------------
+ net/ipv6/ipv6_sockglue.c |  2 --
+ 2 files changed, 20 insertions(+), 18 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 78ee68771229..e9594938c2b4 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2252,7 +2252,6 @@ void addrconf_leave_solict(struct inet6_dev *idev, const struct in6_addr *addr)
- 	__ipv6_dev_mc_dec(idev, &maddr);
- }
- 
--/* caller must hold RTNL */
- static void addrconf_join_anycast(struct inet6_ifaddr *ifp)
- {
- 	struct in6_addr addr;
-@@ -2265,7 +2264,6 @@ static void addrconf_join_anycast(struct inet6_ifaddr *ifp)
- 	__ipv6_dev_ac_inc(ifp->idev, &addr);
- }
- 
--/* caller must hold RTNL */
- static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- {
- 	struct in6_addr addr;
 diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
-index 21e01695b48c..f510df93b1e9 100644
+index f510df93b1e9..8440e7b27f6d 100644
 --- a/net/ipv6/anycast.c
 +++ b/net/ipv6/anycast.c
-@@ -47,6 +47,9 @@
- static struct hlist_head inet6_acaddr_lst[IN6_ADDR_HSIZE];
- static DEFINE_SPINLOCK(acaddr_hash_lock);
- 
-+#define ac_dereference(a, idev)						\
-+	rcu_dereference_protected(a, lockdep_is_held(&(idev)->lock))
-+
- static int ipv6_dev_ac_dec(struct net_device *dev, const struct in6_addr *addr);
- 
- static u32 inet6_acaddr_hash(const struct net *net,
-@@ -319,16 +322,14 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
- 	struct net *net;
- 	int err;
- 
--	ASSERT_RTNL();
--
- 	write_lock_bh(&idev->lock);
- 	if (idev->dead) {
- 		err = -ENODEV;
- 		goto out;
- 	}
- 
--	for (aca = rtnl_dereference(idev->ac_list); aca;
--	     aca = rtnl_dereference(aca->aca_next)) {
-+	for (aca = ac_dereference(idev->ac_list, idev); aca;
-+	     aca = ac_dereference(aca->aca_next, idev)) {
- 		if (ipv6_addr_equal(&aca->aca_addr, addr)) {
- 			aca->aca_users++;
- 			err = 0;
-@@ -380,12 +381,10 @@ int __ipv6_dev_ac_dec(struct inet6_dev *idev, const struct in6_addr *addr)
+@@ -158,12 +158,10 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
+  */
+ int ipv6_sock_ac_drop(struct sock *sk, int ifindex, const struct in6_addr *addr)
  {
- 	struct ifacaddr6 *aca, *prev_aca;
+-	struct ipv6_pinfo *np = inet6_sk(sk);
+-	struct net_device *dev;
+ 	struct ipv6_ac_socklist *pac, *prev_pac;
++	struct ipv6_pinfo *np = inet6_sk(sk);
+ 	struct net *net = sock_net(sk);
+-
+-	ASSERT_RTNL();
++	struct net_device *dev;
+ 
+ 	prev_pac = NULL;
+ 	for (pac = np->ipv6_ac_list; pac; pac = pac->acl_next) {
+@@ -179,9 +177,11 @@ int ipv6_sock_ac_drop(struct sock *sk, int ifindex, const struct in6_addr *addr)
+ 	else
+ 		np->ipv6_ac_list = pac->acl_next;
+ 
+-	dev = __dev_get_by_index(net, pac->acl_ifindex);
+-	if (dev)
++	dev = dev_get_by_index(net, pac->acl_ifindex);
++	if (dev) {
+ 		ipv6_dev_ac_dec(dev, &pac->acl_addr);
++		dev_put(dev);
++	}
+ 
+ 	sock_kfree_s(sk, pac, sizeof(*pac));
+ 	return 0;
+@@ -190,21 +190,20 @@ int ipv6_sock_ac_drop(struct sock *sk, int ifindex, const struct in6_addr *addr)
+ void __ipv6_sock_ac_close(struct sock *sk)
+ {
+ 	struct ipv6_pinfo *np = inet6_sk(sk);
++	struct net *net = sock_net(sk);
+ 	struct net_device *dev = NULL;
+ 	struct ipv6_ac_socklist *pac;
+-	struct net *net = sock_net(sk);
+-	int	prev_index;
++	int prev_index = 0;
  
 -	ASSERT_RTNL();
--
- 	write_lock_bh(&idev->lock);
- 	prev_aca = NULL;
--	for (aca = rtnl_dereference(idev->ac_list); aca;
--	     aca = rtnl_dereference(aca->aca_next)) {
-+	for (aca = ac_dereference(idev->ac_list, idev); aca;
-+	     aca = ac_dereference(aca->aca_next, idev)) {
- 		if (ipv6_addr_equal(&aca->aca_addr, addr))
- 			break;
- 		prev_aca = aca;
-@@ -429,7 +428,7 @@ void ipv6_ac_destroy_dev(struct inet6_dev *idev)
- 	struct ifacaddr6 *aca;
+ 	pac = np->ipv6_ac_list;
+ 	np->ipv6_ac_list = NULL;
  
- 	write_lock_bh(&idev->lock);
--	while ((aca = rtnl_dereference(idev->ac_list)) != NULL) {
-+	while ((aca = ac_dereference(idev->ac_list, idev)) != NULL) {
- 		rcu_assign_pointer(idev->ac_list, aca->aca_next);
- 		write_unlock_bh(&idev->lock);
+-	prev_index = 0;
+ 	while (pac) {
+ 		struct ipv6_ac_socklist *next = pac->acl_next;
  
+ 		if (pac->acl_ifindex != prev_index) {
+-			dev = __dev_get_by_index(net, pac->acl_ifindex);
++			dev_put(dev);
++			dev = dev_get_by_index(net, pac->acl_ifindex);
+ 			prev_index = pac->acl_ifindex;
+ 		}
+ 		if (dev)
+@@ -212,6 +211,8 @@ void __ipv6_sock_ac_close(struct sock *sk)
+ 		sock_kfree_s(sk, pac, sizeof(*pac));
+ 		pac = next;
+ 	}
++
++	dev_put(dev);
+ }
+ 
+ void ipv6_sock_ac_close(struct sock *sk)
+@@ -220,9 +221,8 @@ void ipv6_sock_ac_close(struct sock *sk)
+ 
+ 	if (!np->ipv6_ac_list)
+ 		return;
+-	rtnl_lock();
++
+ 	__ipv6_sock_ac_close(sk);
+-	rtnl_unlock();
+ }
+ 
+ static void ipv6_add_acaddr_hash(struct net *net, struct ifacaddr6 *aca)
+@@ -413,14 +413,18 @@ int __ipv6_dev_ac_dec(struct inet6_dev *idev, const struct in6_addr *addr)
+ 	return 0;
+ }
+ 
+-/* called with rtnl_lock() */
+ static int ipv6_dev_ac_dec(struct net_device *dev, const struct in6_addr *addr)
+ {
+-	struct inet6_dev *idev = __in6_dev_get(dev);
++	struct inet6_dev *idev = in6_dev_get(dev);
++	int err;
+ 
+ 	if (!idev)
+ 		return -ENODEV;
+-	return __ipv6_dev_ac_dec(idev, addr);
++
++	err = __ipv6_dev_ac_dec(idev, addr);
++	in6_dev_put(idev);
++
++	return err;
+ }
+ 
+ void ipv6_ac_destroy_dev(struct inet6_dev *idev)
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 0c870713b08c..3d891aa6e7f5 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -120,9 +120,7 @@ struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
+ static bool setsockopt_needs_rtnl(int optname)
+ {
+ 	switch (optname) {
+-	case IPV6_ADDRFORM:
+ 	case IPV6_JOIN_ANYCAST:
+-	case IPV6_LEAVE_ANYCAST:
+ 		return true;
+ 	}
+ 	return false;
 -- 
 2.49.0
 
