@@ -1,91 +1,107 @@
-Return-Path: <netdev+bounces-198292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EFB5ADBCCC
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:23:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A396DADBCD4
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15493B44CC
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:23:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAD51712F5
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F69215F7C;
-	Mon, 16 Jun 2025 22:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1282F1E1C22;
+	Mon, 16 Jun 2025 22:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KbOUHcOc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAwbPPpS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05357205AB6;
-	Mon, 16 Jun 2025 22:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60C68F4A;
+	Mon, 16 Jun 2025 22:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750112600; cv=none; b=rKNrrR2W20Tx4y5hFK8JzZY8FyFQuTyUQiYLKlKZ2AKJ0x3zyblEWaXGiHErbiCjPCi8aMXv9pOOxg4Rr8B5IcbqY5hQ6IkEjr/R5NuNg7VTMWsPg8iUSb8+OHOysYjEAQ+iAtEYCAgXA0wWwWOIq1jVIQcsJ5dDaioeFevjPVM=
+	t=1750113023; cv=none; b=iip8T7bQZc7EFQRPCperbhofQpd62Qim4WOMeTGOuSJ1l/XsxKK64yISbnMVAEkrump2LbuH3JjDfD4yKccH+bujWytiQ2Y9UFun9VhxwmxM7eMTYLQCNQeXUv2pX+h5NxSCQRkcqGVoaXcxTBDKEctK/Lcv9M0XrXebEMq1TMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750112600; c=relaxed/simple;
-	bh=5DcPMaS2QcixZD9QjmCLF62HkWJvZo207lXJbnyTsFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H0kTRpJRlwfl+kYhdRVZuTo+vElk7YypRlGnia10dXN4DGVeGhrODUO/4VaIxjgZoYcahEyNIa9MifpM3QRhzKE7gKfEfhbmk339+TbqwAkx/N5VjibMV2JYQQ+L/S6KbPRWSkJOKmkAqiWBacQygeTGSRexsIw/Jf94FmLuRcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KbOUHcOc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4A74C4CEEA;
-	Mon, 16 Jun 2025 22:23:18 +0000 (UTC)
+	s=arc-20240116; t=1750113023; c=relaxed/simple;
+	bh=f1sSNyfpzFUk6skmWjbRzTOcr9W+CfHR1mATzudvQUU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=N1nTd3iMdCXDyQwaHzSg7qovCJYDtQI2Ob0YF4C5+U9skY+H8LrkPk/KWB2Vto+mJbv6nANUQBYIbBIAuyM+wJfC2ZI6LIAXx0heejFfB3qhMe0BxPdwFiRMHEQ24LTOQxgXztoX0bSnN2rvBvAAB40GWbyotmqwqOdB2GKCi4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAwbPPpS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 666F0C4CEEA;
+	Mon, 16 Jun 2025 22:30:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750112599;
-	bh=5DcPMaS2QcixZD9QjmCLF62HkWJvZo207lXJbnyTsFw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KbOUHcOcN669RMZ0PjqSZx+F61SgXJIdFdgvFCqfU8+z1Sh/lC+G2c8pbO6Q63sfq
-	 SzE7rwGiP4iB1tvHiUDntIXe+PmotGvOKRrKJM1broS4E8yjGz5n4l3fyacUNB/3XG
-	 Z6hC4+G/NxXmiW8wJxBgHg1ZOdf8oD8jOiws6c/xDiqxk0FZXnbCmRcdmZmW/nWYj+
-	 416TgB7ax+pqJt6l/JY0jMlOf7Ukyd94I7Kx0Bj31PYsa6yGtZ1PfsWk3dezv46b6J
-	 /XDdrjErMJqfDBU8nYVzaMZ3KfX0K647ToAf99+QnjtS580dMaqfS9IzNfjrmgtHx9
-	 6Go3ibydDAYwg==
-Date: Mon, 16 Jun 2025 15:23:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: longli@linuxonhyperv.com
-Cc: longli@microsoft.com, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
- Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shradha
- Gupta <shradhagupta@linux.microsoft.com>, Simon Horman <horms@kernel.org>,
- Konstantin Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti
- <schakrabarti@linux.microsoft.com>, Erick Archer
- <erick.archer@outlook.com>, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [Patch net-next v2] net: mana: Record doorbell physical address
- in PF mode
-Message-ID: <20250616152318.26e1ea3e@kernel.org>
-In-Reply-To: <1749836765-28886-1-git-send-email-longli@linuxonhyperv.com>
-References: <1749836765-28886-1-git-send-email-longli@linuxonhyperv.com>
+	s=k20201202; t=1750113022;
+	bh=f1sSNyfpzFUk6skmWjbRzTOcr9W+CfHR1mATzudvQUU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bAwbPPpSPOGN8SWFVs9ZKEXgHQ91VFJgwoONVYOVlAZ3PgOps50XQh/qnp6pBOPwQ
+	 WL7EzHWu5US/vDIiVSsPb1jJfHTtxqOy2wGAgnCPjdajj8/iDwAa/R7hY0lMBvt0x3
+	 a+FzOGmzrnLgytoEeZzZ0+XIn+LUPFn9qHvv8gn7na4LnAZC3sXa6tgRYcKfOUSMwt
+	 Lcz0EoaOrvIuuW2FjpR5XPM+IyC5MwTOpQCeLY+sNJoe5Eb02HyIISJPn+N+EzpsU1
+	 wL8QRRTHvCJTChZhLobtcJ8oCCQlVTZYlUtVJM8dw967SJ7xNJsxJGFMMkmEPmXCdj
+	 xM4FLyxi028pQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DDF38111D8;
+	Mon, 16 Jun 2025 22:30:52 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/8] netpoll: Untangle netconsole and netpoll
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175011305125.2535792.17187511380555589893.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Jun 2025 22:30:51 +0000
+References: <20250613-rework-v3-0-0752bf2e6912@debian.org>
+In-Reply-To: <20250613-rework-v3-0-0752bf2e6912@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, gustavold@gmail.com
 
-On Fri, 13 Jun 2025 10:46:05 -0700 longli@linuxonhyperv.com wrote:
-> MANA supports RDMA in PF mode. The driver should record the doorbell
-> physical address when in PF mode.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 13 Jun 2025 04:31:29 -0700 you wrote:
+> Initially netpoll and netconsole were created together, and some
+> functions are in the wrong file. Seperate netconsole-only functions
+> in netconsole, avoiding exports.
 > 
-> The doorbell physical address is used by the RDMA driver to map
-> doorbell pages of the device to user-mode applications through RDMA
-> verbs interface. In the past, they have been mapped to user-mode while
-> the device is in VF mode. With the support for PF mode implemented,
-> also expose those pages in PF mode.
+> 1. Expose netpoll logging macros in the public header to enable consistent
+>    log formatting across netpoll consumers.
+> 
+> [...]
 
-It'd be good to indicate if the PF mode support is implemented as in
-ready to be posted to the list, or implemented as in already in the
-tree? If it's in tree then please quote the commit. If upcoming please
-rephrase.
+Here is the summary with links:
+  - [net-next,v3,1/8] netpoll: remove __netpoll_cleanup from exported API
+    https://git.kernel.org/netdev/net-next/c/260948993a9f
+  - [net-next,v3,2/8] netpoll: expose netpoll logging macros in public header
+    https://git.kernel.org/netdev/net-next/c/afb023329c07
+  - [net-next,v3,3/8] netpoll: relocate netconsole-specific functions to netconsole module
+    https://git.kernel.org/netdev/net-next/c/5a34c9a85365
+  - [net-next,v3,4/8] netpoll: move netpoll_print_options to netconsole
+    https://git.kernel.org/netdev/net-next/c/ccc7edf0ada8
+  - [net-next,v3,5/8] netconsole: rename functions to better reflect their purpose
+    https://git.kernel.org/netdev/net-next/c/abebef96aab1
+  - [net-next,v3,6/8] netconsole: improve code style in parser function
+    https://git.kernel.org/netdev/net-next/c/d79206451f4f
+  - [net-next,v3,7/8] selftests: net: Refactor cleanup logic in lib_netcons.sh
+    https://git.kernel.org/netdev/net-next/c/bed365ca56ca
+  - [net-next,v3,8/8] selftests: net: add netconsole test for cmdline configuration
+    https://git.kernel.org/netdev/net-next/c/69d094ef69b9
 
-This commit msg is much better, thank you, but to a person handling
-backports it will still not be immediately clear whether this is prep
-work for a new code path, or a bug fix.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
