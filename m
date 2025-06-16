@@ -1,94 +1,93 @@
-Return-Path: <netdev+bounces-197936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33851ADA6BE
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 05:18:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6EEADA6C0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 05:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42C143A2FF0
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 03:17:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E3D87A702F
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 03:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B722986329;
-	Mon, 16 Jun 2025 03:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4909C13AD1C;
+	Mon, 16 Jun 2025 03:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUoAy+1n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elQ9Xdih"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C878F45
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 03:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFB82AD00
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 03:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750043878; cv=none; b=TRxTcACYwESZRJxLXNvQhCix9YnWvDrDK0WH9nIb6IdBHN9S6/r7vT8MrkC1gDFs7EL0opAWISlrrpDKLW/weRGI6fSnbjlFPz4mfyc9rxi7nGxJ26hMSWNKlaBRLH135RjLTz0AdLnSmMXTM3c8FAAqgM3K2L6VtfLRBC+2jg8=
+	t=1750044061; cv=none; b=nL4DdvR/4HT1Q7rriqOkpvwNYbZdn49SVc79z4Rg1qfysMBUiwf6uVMtnSyFLN1WMfMNDdaklg/NQw2U4zhiQAirbM1wNm1HAGQ6Ehfc7Zlbb/LgxMcbyqM+/5qpKRRS6WEiaBc8hKw3A6dGsCl5ZqAvi8avf3RYnyYDk0bplwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750043878; c=relaxed/simple;
-	bh=bcO49NRSg6tayxVkmPp6mFUy0319Yj6GtYa/L4MfNo4=;
+	s=arc-20240116; t=1750044061; c=relaxed/simple;
+	bh=Xb8ZB+hzl3/PgjKH84Qe0GJ4l9p6RG18ctrJ+WN2ZBU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EW70woT75F3VStkChg3AE7DhLWkuU6UkgL4Iwpcq1Ejdj8e+ymTxb69qP3lBfbXQegnkxRlCy+vdwhO1CnxEjb9DyvBpJIkaQdIfN+NSwxK1iiWGRAH8fcSVYAko0PsNEyC0JUNfT64e/nhZ8fiH7G6SsasebgVKuwlTfuBBfT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fUoAy+1n; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=FpniCjfDKVd5iwk8Zf5Lopmpo33SUfuZqpRN4sxQubwbjW/eDbdmtyjYqv5vrveV+rK3s+S0UWUDE09FLtYDQLaJH6/YF91MqLMr3E+akF3plKCZZm0wTLmG4gP5blX1JsH1n/AJ0lbh7H+ezxQws68cM846sgIPcUcc3wLdtzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elQ9Xdih; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750043875;
+	s=mimecast20190719; t=1750044057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QPNoVJ8bO6WJupVjhGNwIWzjAtlK/86/qpWF1MKm7pU=;
-	b=fUoAy+1nwIot63etluApWbyDXvkxpwOP1GwZqkSNkb7hDtltiJS6QR3cCYfxVtMRi2X1LO
-	JZRsvjjimIE8G9zf0eSLgYPFaiT8AoYbpADECNee80ee93tT/R37DZzK+/O6B+8B9RWoyk
-	mJp757dtrTn6VfrUOsJDpWIregbvtIg=
+	bh=KkkBksMILzJsHOSEEUzBsixchf0bVF/1eD7X0jYzbYo=;
+	b=elQ9XdihFryhq/vusFS/Y8LqLCpRQ6e9TksJliZ3xLgIpJEe2JXigJHP5QwPaLz6SZFi4B
+	uyF5XDtCUgWR3sK/LOAThUwaecgz/ST0wcFd6PYM+h+v2jc7OzqO543pYq/vXVGkVNlYRR
+	BdGF36D82Kg0P/42Ry/nPYn0G9gN3rc=
 Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
  [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-152-eI8bffH7OvSzDIeG9gdSsg-1; Sun, 15 Jun 2025 23:17:53 -0400
-X-MC-Unique: eI8bffH7OvSzDIeG9gdSsg-1
-X-Mimecast-MFC-AGG-ID: eI8bffH7OvSzDIeG9gdSsg_1750043873
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b2eb60594e8so2484966a12.1
-        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:17:53 -0700 (PDT)
+ us-mta-668-MM5aMaWqODejh_s-EShWig-1; Sun, 15 Jun 2025 23:20:54 -0400
+X-MC-Unique: MM5aMaWqODejh_s-EShWig-1
+X-Mimecast-MFC-AGG-ID: MM5aMaWqODejh_s-EShWig_1750044053
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b2f5cb0c101so2777429a12.1
+        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:20:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750043873; x=1750648673;
+        d=1e100.net; s=20230601; t=1750044053; x=1750648853;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QPNoVJ8bO6WJupVjhGNwIWzjAtlK/86/qpWF1MKm7pU=;
-        b=quXnHC6S3s0ouDRaWkxz77uqRZOpOaPyvFVjRxFUJNHKmkGGXy8BhuDjVnkwSW2vNb
-         AoGwy37QVMovYRZ6gq+ZwisR+pFjB8G8Okb6myP99XMW1peeVHcsN3pKnwgf4DjWM7rw
-         0Glh2t1+db5q0i6temXVo3FqpnSGbxRuiUqQZZUILC0E4NdCTTVaYHGvIGNvidgcXux9
-         L3Iar/a2UImRSLeceALEgWdIhgTd7baE8sKg3mvSPK9BOcY0NKhGFxcgiEkXBH0iv1Ro
-         S+D8oVCtt+nXeXvyk6GwzjGu9eXJS9tGPTHsBjfWgckbXfUlXg/92KMslIZZsT+xwPnE
-         xt/w==
-X-Gm-Message-State: AOJu0YxAsk9jVheAGmqx0uL8+P/mFZzwP6Li0ebwG+XtCTxEBpQCYvLW
-	dwpl/iooyE6byHEhZ/fItbE0AetezhoyCGL51THHJ/r+41Ad+KjI6eJJF3oRtaqieNwWmVIvBzd
-	c/h2h+zuFspJYV/dWDYv9+5ZHUXgIU/strMC1EBQWLIleF/Hh83YlxOTwNh5w0KqgsVO7731DUO
-	bKOhHVA4htmLAYsAwfvYmPheMGWTS73LLo
-X-Gm-Gg: ASbGncveBPzbX5jv5lvPzeF7sBc7WTDum3/gdqbk/PYQlyzJLq224uxmVn7AL+4Y+vb
-	MfOpf01VTDOtQuYkldpeXuLeSEF6Bi7IHNDLgHPQlZiFkPjIBm7oITHwu0yBAHeqcsvVVmbPWnP
-	FMng==
-X-Received: by 2002:a05:6a21:689:b0:21a:b9d4:ad73 with SMTP id adf61e73a8af0-21fbd8003damr12523901637.40.1750043872783;
-        Sun, 15 Jun 2025 20:17:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHtA26azy+rcHKI0Qtl5DW8Roq6gyXWaJIx1jz/wEUb7xn8qIhk0BwSmqVYLqwifxsZKQpYRC0oi9MG6GqtkYg=
-X-Received: by 2002:a05:6a21:689:b0:21a:b9d4:ad73 with SMTP id
- adf61e73a8af0-21fbd8003damr12523861637.40.1750043872355; Sun, 15 Jun 2025
- 20:17:52 -0700 (PDT)
+        bh=KkkBksMILzJsHOSEEUzBsixchf0bVF/1eD7X0jYzbYo=;
+        b=wlcaZ5wLqxHIG4LHi6OwfBXTVCkPmlbbiMT2Jm/kKTUPJ9ZKJ70ki45aCllvG+6lzu
+         wTgcruPXmfGefIeMBa7ix/8lmDhoMa/GtxUrlXuKbNUNXJO9NLZAPTkbJ7dyUm80OwWR
+         oQxVjgixzpZFDoolLGWAJUzyeeGZ05lyTikM8K8OCP8gdAFr73Jj0+HwssN//j30oJBs
+         epLEn3Jf4UyVAQEyTQBTzFv641VahhRTiPm9GvzS8c6Q2TXOMlRhpxGzsxbkdAjAu3qR
+         xoZ5twrTG84mnusTeQrLS7/NsO2IpiZQwZsVGJsSJgUG66ebyfpFDE8Beu/fZRg7/peB
+         OAgQ==
+X-Gm-Message-State: AOJu0YxQD+IIdRpSf9pfzFpw1yYsNlIzsA/ZPgdnm/Uu3ofY5LcQrNgK
+	+4DlJp6U95ZtFcri8lBpBYEkT2vDf1Ki/pdEQIfQtbQPXbt89kwZZpL5oNXXgN0myuLfwVhWcLQ
+	JA63wUN0KOQYssLhW3lyB6VxBgLT0dHoSCTMMLHqR4duLQ9ophX76DCdcP44r1C66swVAgeWTxw
+	ANI5G60pKAFLF3Xshar5mrRmJlO+B+hBE1
+X-Gm-Gg: ASbGncsaaqj7/KoDxKswrTyBCgHDyY8YNMCu4bINn1LHBOcrMsczddROL9J54wp3Do3
+	nVRpiLmNRVA3UFUqQSyNKx2jswdhQeXudTCvDbae0dDe3zBvBrG2GvSVKvcv9WvjSH++cX3DSLu
+	+EPw==
+X-Received: by 2002:a05:6a21:9ccb:b0:218:59b:b2f4 with SMTP id adf61e73a8af0-21fbd7b59ecmr8820173637.42.1750044053367;
+        Sun, 15 Jun 2025 20:20:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHMwbgcnLKrhlTEJEDMFYM1KoYy/fzCWCxZU/fH/gRHgjb1RUZF0CaSe6P5JM6N+6bD/puQ2FH1JTmngw0Qm3k=
+X-Received: by 2002:a05:6a21:9ccb:b0:218:59b:b2f4 with SMTP id
+ adf61e73a8af0-21fbd7b59ecmr8820140637.42.1750044052956; Sun, 15 Jun 2025
+ 20:20:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749210083.git.pabeni@redhat.com> <fa6c0bbe268dfdd6981741580efc084d101c1e7d.1749210083.git.pabeni@redhat.com>
- <CACGkMEsBsX-3ztNkQTH+J_32LcFaMwv-pOpTX0rXdLMmCj+JAA@mail.gmail.com> <e0e6139b-8afd-45ea-8396-b872245d398c@redhat.com>
-In-Reply-To: <e0e6139b-8afd-45ea-8396-b872245d398c@redhat.com>
+References: <cover.1749210083.git.pabeni@redhat.com> <d10b01bd14473ad95fb8d7f83ab1cd7c40c2a10e.1749210083.git.pabeni@redhat.com>
+ <CACGkMEtP5PoxS+=veyQimHB+Mui2+71tpJUYg5UcQCw9BR8yrg@mail.gmail.com> <91fcc95c-8527-4b4c-9c19-6a8dfea010ac@redhat.com>
+In-Reply-To: <91fcc95c-8527-4b4c-9c19-6a8dfea010ac@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 16 Jun 2025 11:17:41 +0800
-X-Gm-Features: AX0GCFuT8DpWw_WIYKxQkTkmyaah4Mqvan6saWvQOeaRYRw4Rdd5G0IVX0S1jlM
-Message-ID: <CACGkMEvQ0XKR8P_XVt=GU8n=_0_ugVDw1bmm-xqAJsKfDZ-3xw@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 5/8] net: implement virtio helpers to handle UDP
- GSO tunneling.
+Date: Mon, 16 Jun 2025 11:20:41 +0800
+X-Gm-Features: AX0GCFtK1fpwrecqdTrUaDhwaABw3_jK4BmSuV-8MgyVilg1eX-grahMzqYR0Ec
+Message-ID: <CACGkMEvTvYsECf8MOtTd7c1-YskUP-3rbec=qHTUuDgNLjPs6w@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 6/8] virtio_net: enable gso over UDP tunnel support.
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
 	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
@@ -99,154 +98,145 @@ Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 12, 2025 at 6:10=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+On Thu, Jun 12, 2025 at 6:18=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
 te:
 >
-> On 6/12/25 5:53 AM, Jason Wang wrote:
+> On 6/12/25 6:05 AM, Jason Wang wrote:
 > > On Fri, Jun 6, 2025 at 7:46=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
 wrote:
-> >> +static inline int virtio_net_hdr_tnl_from_skb(const struct sk_buff *s=
-kb,
-> >> +                                             struct virtio_net_hdr *h=
-dr,
-> >> +                                             unsigned int tnl_offset,
-> >> +                                             bool little_endian,
-> >> +                                             int vlan_hlen)
-> >> +{
-> >> +       struct virtio_net_hdr_tunnel *tnl;
-> >> +       unsigned int inner_nh, outer_th;
-> >> +       int tnl_gso_type;
-> >> +       int ret;
-> >> +
-> >> +       tnl_gso_type =3D skb_shinfo(skb)->gso_type & (SKB_GSO_UDP_TUNN=
-EL |
-> >> +
-> SKB_GSO_UDP_TUNNEL_CSUM);
-> >> +       if (!tnl_gso_type)
-> >> +               return virtio_net_hdr_from_skb(skb, hdr,
-> little_endian, false,
-> >> +                                              vlan_hlen);
-> >
-> > So tun_vnet_hdr_from_skb() has
-> >
-> >         int vlan_hlen =3D skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
-> >         int tnl_offset =3D tun_vnet_tnl_offset(flags);
-> >
-> >         if (virtio_net_hdr_tnl_from_skb(skb, hdr, tnl_offset,
-> >                                         tun_vnet_is_little_endian(flags=
-),
-> >                                         vlan_hlen)) {
-> >
-> >
-> > It looks like the outer vlan_hlen is used for the inner here?
-> vlan_hlen always refers to the outer vlan tag (if present), as it moves
-> the (inner) transport csum offset accordingly.
->
-> I can a comment to clarify the parsing.
->
-> Note that in the above call there is a single set of headers (no
-> encapsulation) so the vlan_hlen should be unambigous.
-
-I see.
-
-> >> +
-> >> +       /* Tunnel support not negotiated but skb ask for it. */
-> >> +       if (!tnl_offset)
-> >> +               return -EINVAL;
-> >> +
-> >> +       /* Let the basic parsing deal with plain GSO features. */
-> >> +       skb_shinfo(skb)->gso_type &=3D ~tnl_gso_type;
-> >> +       ret =3D virtio_net_hdr_from_skb(skb, hdr, true, false, vlan_hl=
-en);
->
-> Here I'll add:
->
->         Here vlan_hlen refers to the outer headers set, but still affect
->         the inner transport header offset.
-
-Thanks, then I want to know if we need to care about the inner vlan or
-it is something that is not supported by the kernel right now.
-
->
-> >> @@ -181,6 +208,22 @@ struct virtio_net_hdr_v1_hash {
-> >>         __le16 padding;
+> >>
+> >> If the related virtio feature is set, enable transmission and receptio=
+n
+> >> of gso over UDP tunnel packets.
+> >>
+> >> Most of the work is done by the previously introduced helper, just nee=
+d
+> >> to determine the UDP tunnel features inside the virtio_net_hdr and
+> >> update accordingly the virtio net hdr size.
+> >>
+> >> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >> ---
+> >> v2 -> v3:
+> >>   - drop the VIRTIO_HAS_EXTENDED_FEATURES conditionals
+> >>
+> >> v1 -> v2:
+> >>   - test for UDP_TUNNEL_GSO* only on builds with extended features sup=
+port
+> >>   - comment indentation cleanup
+> >>   - rebased on top of virtio helpers changes
+> >>   - dump more information in case of bad offloads
+> >> ---
+> >>  drivers/net/virtio_net.c | 70 +++++++++++++++++++++++++++++++--------=
+-
+> >>  1 file changed, 54 insertions(+), 16 deletions(-)
+> >>
+> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> >> index 18ad50de4928..0b234f318e39 100644
+> >> --- a/drivers/net/virtio_net.c
+> >> +++ b/drivers/net/virtio_net.c
+> >> @@ -78,15 +78,19 @@ static const unsigned long guest_offloads[] =3D {
+> >>         VIRTIO_NET_F_GUEST_CSUM,
+> >>         VIRTIO_NET_F_GUEST_USO4,
+> >>         VIRTIO_NET_F_GUEST_USO6,
+> >> -       VIRTIO_NET_F_GUEST_HDRLEN
+> >> +       VIRTIO_NET_F_GUEST_HDRLEN,
+> >> +       VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED,
+> >> +       VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED,
 > >>  };
 > >>
-> >> +/* This header after hashing information */
-> >> +struct virtio_net_hdr_tunnel {
-> >> +       __le16 outer_th_offset;
-> >> +       __le16 inner_nh_offset;
-> >> +};
+> >>  #define GUEST_OFFLOAD_GRO_HW_MASK ((1ULL << VIRTIO_NET_F_GUEST_TSO4) =
+| \
+> >> -                               (1ULL << VIRTIO_NET_F_GUEST_TSO6) | \
+> >> -                               (1ULL << VIRTIO_NET_F_GUEST_ECN)  | \
+> >> -                               (1ULL << VIRTIO_NET_F_GUEST_UFO)  | \
+> >> -                               (1ULL << VIRTIO_NET_F_GUEST_USO4) | \
+> >> -                               (1ULL << VIRTIO_NET_F_GUEST_USO6))
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_TSO6) | \
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_ECN)  | \
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_UFO)  | \
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_USO4) | \
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_USO6) | \
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAP=
+PED) | \
+> >> +                       (1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSU=
+M_MAPPED))
+> >>
+> >>  struct virtnet_stat_desc {
+> >>         char desc[ETH_GSTRING_LEN];
+> >> @@ -436,9 +440,14 @@ struct virtnet_info {
+> >>         /* Packet virtio header size */
+> >>         u8 hdr_len;
+> >>
+> >> +       /* UDP tunnel support */
+> >> +       u8 tnl_offset;
 > >> +
-> >> +struct virtio_net_hdr_v1_tunnel {
-> >> +       struct virtio_net_hdr_v1 hdr;
-> >> +       struct virtio_net_hdr_tunnel tnl;
-> >> +};
+> >>         /* Work struct for delayed refilling if we run low on memory. =
+*/
+> >>         struct delayed_work refill;
+> >>
+> >> +       bool rx_tnl_csum;
 > >> +
-> >> +struct virtio_net_hdr_v1_hash_tunnel {
-> >> +       struct virtio_net_hdr_v1_hash hdr;
-> >> +       struct virtio_net_hdr_tunnel tnl;
-> >> +};
+> >>         /* Is delayed refill enabled? */
+> >>         bool refill_enabled;
+> >>
+> >> @@ -2531,14 +2540,22 @@ static void virtnet_receive_done(struct virtne=
+t_info *vi, struct receive_queue *
+> >>         if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
+> >>                 virtio_skb_set_hash(&hdr->hash_v1_hdr, skb);
+> >>
+> >> -       if (flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> >> -               skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> >> +       /* restore the received value */
 > >
-> > Not a native speaker but I realize there's probably an issue:
+> > Nit: this comment seems to be redundant
 > >
-> >         le32 hash_value;        (Only if VIRTIO_NET_F_HASH_REPORT
-> negotiated)
-> >         le16 hash_report;       (Only if VIRTIO_NET_F_HASH_REPORT
-> negotiated)
-> >         le16 padding_reserved;  (Only if VIRTIO_NET_F_HASH_REPORT
-> negotiated)
-> >         le16 outer_th_offset    (Only if
-> > VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO or VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO
-> > negotiated)
-> >         le16 inner_nh_offset;   (Only if
-> > VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO or VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO
-> > negotiated)
-> >         le16 outer_nh_offset;   /* Only if VIRTIO_NET_F_OUT_NET_HEADER
-> > negotiated */
-> >         /* Only if VIRTIO_NET_F_OUT_NET_HEADER or VIRTIO_NET_F_IPSEC
-> > negotiated */
-> >         union {
-> >                 u8 padding_reserved_2[6];
-> >                 struct ipsec_resource_hdr {
-> >                         le32 resource_id;
-> >                         le16 resource_type;
-> >                 } ipsec_resource_hdr;
-> >         };
+> >> +       hdr->hdr.flags =3D flags;
+> >> +       if (virtio_net_chk_data_valid(skb, &hdr->hdr, vi->rx_tnl_csum)=
+) {
 > >
-> > I thought e.g outer_th_offset should have a fixed offset then
-> > everything is simplified but it looks not the case here. If we decide
-> > to do things like this, we will end up with a very huge uAPI
-> > definition for different features combinations. This doesn't follow
-> > the existing headers for example num_buffers exist no matter if
-> > MRG_RXBUF is negotiated.>> At least, if we decide to go with the
-> dynamic offset, it seems less
-> > valuable to define those headers with different combinations if both
-> > device and driver process the vnet header piece wisely
+> > Nit: this function did more than just check DATA_VALID, we probably
+> > need a better name.
 >
-> I'm a little confused here. AFAICT the dynamic offset is
-> requested/mandated by the specifications: if the hash related fields are
-> not present, they are actually non existing and everything below moves
-> upward.  I think we spent together quite some time to agree on this.
+> What about virtio_net_handle_csum_offload()?
 
-I'm sorry if I lose some context there.
+Works for me.
 
 >
-> If you want/intend the tunnel header to be at fixed offset inside the
-> virtio_hdr regardless of the negotiated features? That would yield to
-> slightly simpler but also slightly less efficient implementation.
-
-Yes. I feel it's probably too late to fix the spec. But I meant if the
-header offset of tunnel gso stuff is dynamic, it's probably not need
-to define:
-
-virtio_net_hdr_v1_tunnel and virtio_net_hdr_v1_hash_tunnel
-
-in the uAPI.
-
+> >
+> >> +               net_warn_ratelimited("%s: bad csum: flags: %x, gso_typ=
+e: %x rx_tnl_csum %d\n",
+> >> +                                    dev->name, hdr->hdr.flags,
+> >> +                                    hdr->hdr.gso_type, vi->rx_tnl_csu=
+m);
+> >> +               goto frame_err;
+> >> +       }
+> >>
+> >> -       if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+> >> -                                 virtio_is_little_endian(vi->vdev))) =
+{
+> >> -               net_warn_ratelimited("%s: bad gso: type: %u, size: %u\=
+n",
+> >> +       if (virtio_net_hdr_tnl_to_skb(skb, &hdr->hdr, vi->tnl_offset,
+> >
+> > I wonder why virtio_net_chk_data_valid() is not part of the
+> > virtio_net_hdr_tnl_to_skb().
 >
-> Also I guess (fear mostly) some specification clarification would be need=
-ed.
+> It can't be part of virtio_net_hdr_tnl_to_skb(), as hdr to skb
+> conversion is actually not symmetric with respect to the checksum - only
+> the driver handles DATA_VALID.
+>
+> Tun must not call virtio_net_chk_data_valid()  (or whatever different
+> name will use).
+
+Note that we've already dealt with this via introducing a boolean
+has_data_valid:
+
+static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
+                                          struct virtio_net_hdr *hdr,
+                                          bool little_endian,
+                                          bool has_data_valid,
+                                          int vlan_hlen)
+
 >
 > /P
 >
