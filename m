@@ -1,154 +1,181 @@
-Return-Path: <netdev+bounces-198227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742F5ADBACA
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:17:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7948BADBAD8
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FEAE189072D
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:17:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EA753B8B79
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C20528D823;
-	Mon, 16 Jun 2025 20:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A21728A70A;
+	Mon, 16 Jun 2025 20:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Yg3sXYnb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aIN+lqHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E05328A70A
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:15:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA44328E5F3
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750104924; cv=none; b=i1gft+LGPbbs7V240Qn2ICrFhAUSovtRxAP5AMjaWp6j7B5wVBOKXkWsZyowofjvBqC3aCq06yT6PylQf6iVo40SBVrD+MIYrDfsVbGiO66xPYG5movyuS1kKp7cN1ukeuM+rA8maHeDej3dEFlnR60TjPCofhPr21aaospTXnM=
+	t=1750104939; cv=none; b=s5DtRLGEEnzUVhS3B9ccvL9+rSyQ+zzHg38TDPUny4NYZXdlBBZA+ncDnt0FoVKojeux1DSWGiRAKr7WxtRT1Dh9Ttmlzx0JiXdvXAQDtg6/VgfORSCD8JKRVu4379XbExYs7dWflSo844UDKyHpnkOM566e3muairB6uwpxvhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750104924; c=relaxed/simple;
-	bh=68nl/kzlQOHFc0xpS0zwF9ghXcMk1ttQfn6HpaB+R4o=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=tiWiPEBN+BtangDLpB/RG7GlCRFOEYP343ysnoKRfO7acVV80HAiFJRvFgSlSXNjx7QZeXxjcbJRV8nWd7oGALYnR7jOc09/OO8Z50xNxq9M7qFbeXHAifvtm7EP4JKjcMgd0lyj5LFEMgm0qQ9oImrVUlGEGrUkbjKEfskc5Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Yg3sXYnb; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55GKBAFW014442;
-	Mon, 16 Jun 2025 20:15:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=fULxdXRDsw7CQ6/kfd1H1x
-	zgimrAJzQNxMbQWIYLgB0=; b=Yg3sXYnb+0HDmlnQvcDWv0ImBxZ1qJCouSHApu
-	fChoQP2w5Gv8FMCy2MxVOm6lasrOWv6XAyAr6N5TKjtSgWGg1imGotVCyuLM747x
-	dKUYPDg4hmEls3B0YqFABGLxfaQARExE9VMrkFQ9kj+zFMsnhF4B0izwENlbCgCb
-	7v0OEYSatiFv0gJuJbWVx2sHydOfXMbxZzdQdVmxupG+aB9/Y90xTJC7R4dSYUNe
-	WuyoUYimE+M+1eKhwxZz+je7Q4zcOmeDTZZDCyxrONUXTXZk9mFxqxUapqz5ZCtb
-	c0t7UqaE5F8SPXzDsK6E7Y33T+DY1cTWf/jRZXgOLzNDEuxA==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47akuw97cq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 20:15:20 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55GKF1Zu029092
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Jun 2025 20:15:01 GMT
-Received: from [10.216.18.85] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Mon, 16 Jun
- 2025 13:15:00 -0700
-Message-ID: <2c5257a7-e330-4983-8447-3e217b616b2e@quicinc.com>
-Date: Tue, 17 Jun 2025 01:44:56 +0530
+	s=arc-20240116; t=1750104939; c=relaxed/simple;
+	bh=FxmowEOxpcFkOJKOy3zoUNlCJ55LHjMJEDi32Q72eqY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VN8UMi+UizjwIaxRg87YJnunBtoCtdw0+NmQISOSbibDwlPIYDuZtp8n58WpXoe8iozG6j0uKz9f4EGEaEK44g5slGEANWeIBU/OoQcYoGrLOkpbID1ViG5e6yZF0qSneOkQ72eZlDAXBzbze8kq1lScg+QmxGmmycDvN0YJSbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aIN+lqHu; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b2c384b2945so3769542a12.0
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:15:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750104937; x=1750709737; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LVXcZxCzlon9dVVpKzVpNkMGRMkxdU1c8Z98pvBoY9U=;
+        b=aIN+lqHuynuW5sBfy65Z0435NUSSye0CAAiPhOFu0YBK2OOMQLQL65iGnOnwBfX9Gt
+         wrBvUjCv1XUHtSeFwiLwtha17pU6Ld5NsRihcbL3h8uMh2j5FLvnKogHULINBLpcLprm
+         v6W3Ktol03qSv8XDyVo3kdXWs8D5EP8emLbAyUUKwgPIAgp6DOwfmAQb2e8Oh4y5NQOB
+         glshfh9jwQE+d/k74FQ5NIpmjf7tnBDA5kA9MpwDOMvAvToVrB5Ow8Pndpvv2PF2C02o
+         +kCwlRC37YdxT+eLXVWtpzgXKy8K2DQwrr+2cq7FWJ5faWRifVQpQrZ9E2QOKvic59by
+         5qfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750104937; x=1750709737;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LVXcZxCzlon9dVVpKzVpNkMGRMkxdU1c8Z98pvBoY9U=;
+        b=geKSZOHWh61VX4fYEfwC0cqOxPCqprI37/MwlWyx83qurqfj5Xy82bgDne2nVQp5iy
+         kr9r/2dENo5q64IzbjTIZmNXCe1f+mUjn0MFC5++tfAQ2o5nNE4Vkval2QbPdXQzJ94O
+         qADjBSPSB/K6ifMRgjAgWjO1Ggb1n7VDDFvUH9/tUjUCtcbqZ7b5ATKkKOgLQhJSAkUJ
+         fhUKquOXkIpywrX0QyitDrE30bxNc6N0TRSSOC3xUJ+ThLESf4bqAjwsB0YNw5Pq2NsE
+         ZMEHcP/qsx1WJGjLSvn814zJVaXAvT0BmCvnuhjBfSijIe95F1DX5TN0tH4fbu9NUE1T
+         f5Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCViYmFMp3A6n2/zVfzNKgRXT/NWL7jqGr/52UVhwG8FqwaJdW1yVY6YcFsXFCauDpPmYphNdio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHJ9UsZHORwFnXbEpEvtz5M6sH33GmpS1qNYEzNOgsyV2/Dtlq
+	9c5GjNYSxt0Sbqxy0ZhL9G9sJtwLTPJ6Un7m98A0ISO9v8uIW3/DIps=
+X-Gm-Gg: ASbGncsE42aGmb+NM/ekUZ1ExRy4U1pouGdFpgzJ/SAAptWdcCwWUvOjY32vr3YVSFv
+	AKK9j+idAia5gUQjcVRjTm5fON31SMyxsZmvXkWgZJWQ6mfyuUvfJwG1IKEV3d6Hu544ugGocoa
+	RlrrFrgSVAgjuYJuSap2p/b5Z8rdE+t0t+EgbWrsPtxRdck2MtBKqrwDb1hZitMdzxyeBoPJdXM
+	AqDIMinEvzC4epq4kncIHaHgLMdUl9jQnh79rtb7p0p5Ymeu8nCVmXqepyQgKFUSQJNwnPZ7pM1
+	dJN6s8034wzTTh9ZiYCliu9TytabCZcacrVku+M=
+X-Google-Smtp-Source: AGHT+IEg+e89jnmD2bBUdQXi2cKQ4pL4s5N5gtFfQ8lHFzWrjfma8AE/SYMgbueUzlDPaMwb1JljwQ==
+X-Received: by 2002:a05:6a20:6a0b:b0:1f5:6b36:f57a with SMTP id adf61e73a8af0-21fbd7ff8c7mr15422013637.39.1750104936890;
+        Mon, 16 Jun 2025 13:15:36 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe1643ebdsm7388708a12.26.2025.06.16.13.15.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 13:15:36 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>,
+	netdev@vger.kernel.org,
+	syzbot+8a583bdd1a5cc0b0e068@syzkaller.appspotmail.com
+Subject: [PATCH v1 net] mpls: Use rcu_dereference_rtnl() in mpls_route_input_rcu().
+Date: Mon, 16 Jun 2025 13:15:12 -0700
+Message-ID: <20250616201532.1036568-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "Jason A. Donenfeld\"" <Jason@zx2c4.com>, <wireguard@lists.zx2c4.com>,
-        <netdev@vger.kernel.org>
-From: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
-Subject: Issue with rtnl_lock in wg_pm_notification
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 6xKmBaaPUQSDyZ3lQAHv2veAx1zn_8kL
-X-Authority-Analysis: v=2.4 cv=He0UTjE8 c=1 sm=1 tr=0 ts=68507b58 cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8
- a=AJ7OG-yrU3hLHepi_tcA:9 a=QEXdDO2ut3YA:10 a=Kfep4x4mMYYA:10
-X-Proofpoint-GUID: 6xKmBaaPUQSDyZ3lQAHv2veAx1zn_8kL
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE2MDE0MCBTYWx0ZWRfX8PaHLADbOBMu
- HMgrgle/2F0H+rcEntviKDEi+zBoktE5vJ5cQtEz/ds4crf5lJWt8KIKTIQZyJwm2HmzHM4vybj
- uV7svF6EMYtiZ+FsT2a2HGDmMFPtuHkP+vLYBtFDxy2lh1py9NNZr3Ql06jnSf9UT2PAYNAZIG7
- rMrjZSKo9lAqqS/xzcDl43UkZegv7Ji/YtPeoTwsvp7VZ997eFXhEytrxVRlxHz/v+Vf+hGVhMf
- mEZV0hjKoMBMvPEqm5VzBBj/NlzAlVmL8L8f3vRe/c+xoX29JgOoC4SPY6eSKj4eTuuUuStQjvP
- FFnMcHV+KwVHS/I9IbWLZ96XG3jdxvtTCGHoFD0kF9G52FEeyPJ0u72M/OoxLXy8w678YvYHo8B
- tuierlKos06OkB3SRLhDP6rjFilNdVFCEByjvpu17fjDaZLlhkDWFvQw+V7merprQxBgJ2lD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-16_10,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 clxscore=1011 malwarescore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 bulkscore=0 mlxlogscore=809 lowpriorityscore=0 phishscore=0
- adultscore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506160140
+Content-Transfer-Encoding: 8bit
 
-Hi All,
-I work on rmnet driver(more details at https://docs.kernel.org/networking/device_drivers/cellular/qualcomm/rmnet.html), This driver registers onto any physical network device in IP mode.
-This driver registers/deregisters for PM notifications based on the NETDEV_REGISTER/NETDEV_UNREGISTER notifications received for the physical netdevice.
+From: Kuniyuki Iwashima <kuniyu@google.com>
 
-In one of the tests, involving a frequent system suspend/resume and physical netdevice registration/de-registration, a deadlock has been observed involving the rtnl_lock and the pm_chain_head->rwsem.
-The sequence involves
-Thread1: unregister_netdev(holds rtnl_lock)-> notification sent to rmnet driver( netdev_chain) -> rmnet driver attempts to unregister for pm_notification( involves acquiring pm_chain_head->rwsem).
-Thread2: pm_suspend -> pm_notofier_call_chain(holds pm_chain_head->rwsem)-> wg_pm_notifcation(trying to acquire rtnl_lock)
+As syzbot reported [0], mpls_route_input_rcu() can be called
+from mpls_getroute(), where is under RTNL.
 
-I do not understand fully what wireguard functionality is, but considering that rtnl_lock is a global one, it does not seem to be a good design to have notification callback acquire this lock.
-Can we check if rthl_lock be avoided here OR 
-Use rtnl_trylock instead of using rtnl_lock and consider deferring the work to a context where it is safe to acquire the lock( may be a workqueue), something like below to avoid the deadlock?
+net->mpls.platform_label is only updated under RTNL.
 
-static int wg_pm_notification(struct notifier_block *nb, unsigned long action, void *data)
-{
-          struct wg_device *wg;
-          struct wg_peer *peer;
+Let's use rcu_dereference_rtnl() in mpls_route_input_rcu() to
+silence the splat.
 
-          /* If the machine is constantly suspending and resuming, as part of
-           * its normal operation rather than as a somewhat rare event, then we
-           * don't actually want to clear keys.
-           */
-          if (IS_ENABLED(CONFIG_PM_AUTOSLEEP) ||
-              IS_ENABLED(CONFIG_PM_USERSPACE_AUTOSLEEP))
-                          return 0;
+[0]:
+WARNING: suspicious RCU usage
+6.15.0-rc7-syzkaller-00082-g5cdb2c77c4c3 #0 Not tainted
+ ----------------------------
+net/mpls/af_mpls.c:84 suspicious rcu_dereference_check() usage!
 
-          if (action != PM_HIBERNATION_PREPARE && action != PM_SUSPEND_PREPARE)
-                          return 0;
+other info that might help us debug this:
 
-          if (rtnl_trylock()) {
-              list_for_each_entry(wg, &device_list, device_list) {
-                              mutex_lock(&wg->device_update_lock);
-                              list_for_each_entry(peer, &wg->peer_list, peer_list) {
-                                              del_timer(&peer->timer_zero_key_material);
-                                              wg_noise_handshake_clear(&peer->handshake);
-                                              wg_noise_keypairs_clear(&peer->keypairs);
-                              }
-                              mutex_unlock(&wg->device_update_lock);
-              }
+rcu_scheduler_active = 2, debug_locks = 1
+1 lock held by syz.2.4451/17730:
+ #0: ffffffff9012a3e8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #0: ffffffff9012a3e8 (rtnl_mutex){+.+.}-{4:4}, at: rtnetlink_rcv_msg+0x371/0xe90 net/core/rtnetlink.c:6961
 
-          } else {
+stack backtrace:
+CPU: 1 UID: 0 PID: 17730 Comm: syz.2.4451 Not tainted 6.15.0-rc7-syzkaller-00082-g5cdb2c77c4c3 #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x166/0x260 kernel/locking/lockdep.c:6865
+ mpls_route_input_rcu+0x1d4/0x200 net/mpls/af_mpls.c:84
+ mpls_getroute+0x621/0x1ea0 net/mpls/af_mpls.c:2381
+ rtnetlink_rcv_msg+0x3c9/0xe90 net/core/rtnetlink.c:6964
+ netlink_rcv_skb+0x16d/0x440 net/netlink/af_netlink.c:2534
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x53a/0x7f0 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg net/socket.c:727 [inline]
+ ____sys_sendmsg+0xa98/0xc70 net/socket.c:2566
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
+ __sys_sendmmsg+0x200/0x420 net/socket.c:2709
+ __do_sys_sendmmsg net/socket.c:2736 [inline]
+ __se_sys_sendmmsg net/socket.c:2733 [inline]
+ __x64_sys_sendmmsg+0x9c/0x100 net/socket.c:2733
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x230 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f0a2818e969
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0a28f52038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f0a283b5fa0 RCX: 00007f0a2818e969
+RDX: 0000000000000003 RSI: 0000200000000080 RDI: 0000000000000003
+RBP: 00007f0a28210ab1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f0a283b5fa0 R15: 00007ffce5e9f268
+ </TASK>
 
-                /* schedule a workqueue to delete timers clear up the keypairs of the peers?  */
+Fixes: 0189197f4416 ("mpls: Basic routing support")
+Reported-by: syzbot+8a583bdd1a5cc0b0e068@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/68507981.a70a0220.395abc.01ef.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/mpls/af_mpls.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-          }
-
-          rtnl_unlock();
-          rcu_barrier();
-}
-
-Thanks,
-Sharath
-
+diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+index d536c97144e9..47d7dfd9ad09 100644
+--- a/net/mpls/af_mpls.c
++++ b/net/mpls/af_mpls.c
+@@ -81,8 +81,8 @@ static struct mpls_route *mpls_route_input_rcu(struct net *net, unsigned index)
+ 
+ 	if (index < net->mpls.platform_labels) {
+ 		struct mpls_route __rcu **platform_label =
+-			rcu_dereference(net->mpls.platform_label);
+-		rt = rcu_dereference(platform_label[index]);
++			rcu_dereference_rtnl(net->mpls.platform_label);
++		rt = rcu_dereference_rtnl(platform_label[index]);
+ 	}
+ 	return rt;
+ }
+-- 
+2.49.0
 
 
