@@ -1,174 +1,136 @@
-Return-Path: <netdev+bounces-198321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B94CADBD7E
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:20:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6382ADBD81
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 319857A8EB7
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:19:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D11DB7A8DFF
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E1D22AE45;
-	Mon, 16 Jun 2025 23:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E192264A6;
+	Mon, 16 Jun 2025 23:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MckM5IBx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I74uuWpT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE417225795
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 23:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D0021FF5E;
+	Mon, 16 Jun 2025 23:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750116041; cv=none; b=nHsNRK5MpvlbvUukt54djiT0enSFynam69LXzLtOAq7KIwRMlmM/rZ89jmhW88AVYxLr7hIYnTmwFRl7PSOkxgEI0ZEc/vefr7XJX9BU2k13NL8owtkSMu0lPGc7cDJkPx5osDrVy+1O7+G0m/NloXrivmkzWvF/IIsvkaeChnM=
+	t=1750116076; cv=none; b=JSOMzM3DMmHgjHyJPInEkJL8RbPLabRrB+/3YTarjF6oB1HidwJQ6Jc49Gb6JXv9EaUxnVou54bE5OJacerTG68zYDBzfhqEDX2Y5kjRgNQR2EgR/uZl72i5sqkows5cXIlSzMVLY+A/4NXwJnvZWJQFrBCnggVfnycF3lBSoS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750116041; c=relaxed/simple;
-	bh=vNTnwF9GKK0IoF6o/nzhrJo2uLgI+FrXJuwxp8SqTQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PyTt5cWaV/o/3X0kTQsTvOwLcQSUBa5+qGgjKF8UGkUjDZhd2x9IuRNL1DmpToQP437tDVBpUX6TUjJn8pzkME8+d19AU+dmQ9uEmA7KK5DReyLmVS7Mmtf2gLmY63q1xQ23xOYuXPGwanAFViquiFfjw7tJ66ExHDUgTyOtD6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MckM5IBx; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235e389599fso85185ad.0
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:20:39 -0700 (PDT)
+	s=arc-20240116; t=1750116076; c=relaxed/simple;
+	bh=1U/vk/hToZB9yNutoVROj8CF01FsOu5fy9gSVKG5Hyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKhxLlBJ53GZA8g/bNkNLn/GEchpn4fJUS8W0jeVvP4eJ4nPH+Wfi0i1c1feKGUyNWBqFXPaJRuC7PYpSx1WtNXIuV0NY4tFBaMd3nzw0qaqABKvCxpxoVhCT3wy6hqGkLipytfE6tiEaomwVaFLXzVAFQeVSY+DOt+lwyTkUsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I74uuWpT; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-747e41d5469so5471791b3a.3;
+        Mon, 16 Jun 2025 16:21:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750116039; x=1750720839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kyytRBIss30VLX92/RelICIPjiY1WTLTsOKNaQMthuE=;
-        b=MckM5IBxSpxEkpnREDbQCGssFi2zwwoMzRv/sKjHGFe3Y21GIsKmbZHS1tw74x01PO
-         wFcsw+HnJ2D2dorp+sNRQS95c3nzqyAKN4BLNKC9accNGTN1dDIYa2ZNri8TDNW/XTZs
-         YMiVrpw/d4zNEa2gLWH4bTNxh0y4roULFxryzC/yMq4YMv0m0Fe3DY+nxOtd9ee+VbQk
-         IE9wR/r2EnIJNz8Ze/EJ6j1MTNJn6HY+p49afoGBJ4qjM1E1YOSN2rifo95w0xFGNt/N
-         kyCqaCsz1eAQC0x+5pNejlZNluMbjQbzVVz0YVwWWMRwuyxISouxIQ/ul6jT7WgR/unu
-         gExQ==
+        d=gmail.com; s=20230601; t=1750116074; x=1750720874; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6IqNHmz6GBQs1riK/mAoEi1wkyO1+RbMYiTYYA+9LAc=;
+        b=I74uuWpTfYi/SJGGhQRa4RrJyqkh1IjGbEJDYT75NAflxlJUCLpHVH2WAPHMbIIQgx
+         1772Dwp+hxaVwOKSrNCfll+B/ppjyvMhO867QkHveDuRKOuoEEns36X4P7nvtTrNM+iZ
+         hl98rGuFcrn93k4UUdn95hzDMlni2v8JI9ZN4mA01q87i+4oalXfv7JaJ8RW9GI0Nk/r
+         pwn/HVtcZxTPg59vSfBt0qbCp22JEGhwsFvs6jZsbsBWDaFC3WLR8QjmRiQeYji83AYn
+         SdY7IKv3/IY8b02RFgHCzS0PAIOX6sLtQ3fPHF0XejfPBDl02bn9OX7UGjhvQH8B736o
+         sTKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750116039; x=1750720839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kyytRBIss30VLX92/RelICIPjiY1WTLTsOKNaQMthuE=;
-        b=HWuARZSJM9tlIVyPOP3uU8OUzFqfuUUvdBXb9HmX2KvFwLUUJXNGjqONTIGWwEF2Mx
-         Bjk/voe+8+ot7Nt316d3fiFq0OBUrMWcbKPBC5hBh9cK7X82y+l7fGrOIWnFFDJNbPhA
-         GWNskV+x9QevuZazA/T0HOKcf/dMw2ATkXn5IW8MA6sSZa++1MQBQ98dpN22msMg84Ff
-         RSjVyeircC0C64rV1jr4KJZLtYQL/UTS6mjL062oGHj6/xttrdT9uYXnlp2pHAlqYNAZ
-         A78zugZESOUR88vaBOVXDevXGy4WNAXkK5JIm1DRB+Tf1bNBRUOk96e7IaO27IuxGx04
-         34nw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtAmr99KnV+v4RYo4dhZl5zg8X88ej/aztLVvIVF5K6odql0d7Dacp2PZzGxI61X1xBrt+vM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6yR6BZRzRr6pULIl/w22uti3owo89ci5mPdY8M5X3DdYGDMNZ
-	TZF37HSsaIb50jAzPBNhRi9VGftpEfBXPym39a64bKLvgOTxxlB1pSUQFgA2ZfdkXga6fJMLHKk
-	sEipYSI2lEwLMYfdRrRhKL3V9nKjeLmMlI84DNNZJ
-X-Gm-Gg: ASbGnctekdukQCcSq9c83Be3OPdxlyrXqa4AOLvmWGvPl34hfvr2nvLG0CKsLhfKxr1
-	/N4Nv6Bfg+YsW9OTGQYWtO0/Ogw9FyfNbVdQAVF7+nGvw0VJUyuuu62JR/bzGjcbFYcjCTw7p5U
-	Cezfg5NIvOFeAi15BXxAXjnC/9P8As51oXeiYwZ1Qnvaiu
-X-Google-Smtp-Source: AGHT+IHXnwARWegGFo3Ls/RMFPkkol/qsUQos1PSrw1y658KGXmes/6RuO0wwXI83dq5TgtFosifbJghm7S3DE4kZ4Y=
-X-Received: by 2002:a17:903:2f07:b0:22e:1858:fc25 with SMTP id
- d9443c01a7336-2366eef4f2bmr5835145ad.9.1750116038794; Mon, 16 Jun 2025
- 16:20:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750116074; x=1750720874;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6IqNHmz6GBQs1riK/mAoEi1wkyO1+RbMYiTYYA+9LAc=;
+        b=Ly+0C4VdTJ6i+n7FNE8M43yT5dPUSMJbhzRQtdnBH5zKyNuR6Z2EHkaR0vO4g5ukGl
+         tY5XdlMSM2NT11vuAJR6NYe1G1mtNwRf8cy6BtXGNgIa8x7fQDeHKDeAHVhBsEcFUm1l
+         c3WSuuwKuOhj6pXO/3pqDOnBTvWnbIJbPDEHB2TUgWFK12vZYHlaMAwFwujGEUzoYNYC
+         syjdLDctk4nabtusapOkDFitNoI6+CGURxhxuv41/BD6/sth2LhlFMEfpTEME5A6yCB+
+         lqcGO9k83Qiumf6yhr/HYxxyJifsUevXZGaQUeO9iTD418ujkEk0QYsxtjfBKsMnp1Zu
+         UIgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIVbyQ+Co0paAv8E7TSll/tYS63F26PG+0s7gc726JsttBGoSB9JiH4wd3dgog3CWhuS7SRe3wTQJbk/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjdO7oU4TBYAUkf5+XO4cdpADz5wB01vtRgw5ACznYFTKWzF8r
+	pyA0hkM1F5zh2wRDjOub8IEbM4zsHfO2g3p5237hBR4g4gPXEpMNs4o=
+X-Gm-Gg: ASbGncssxQi0XpFDXOQ8eCRDZCD3ros/CT8jDVvETbNYF08smsqKGYz4EWFGbWCjIG1
+	gnco76sg9jykTISWxIripiAE3WG3Or49p17CnO6C+S2mOemuBu8674fXsROO5wz25rGQrPUtl0M
+	khaOd1/fDkrFX+fFmxnZXVnFRafRQ1da8tBqJAQipS+SNxTwFUmlZ7Z/m7nmHH93CmMcM/s9b1g
+	CVsNE2I4J95nBj9uB9bbKkaeKPYdX03e9pjx2voBLwXUpRAT5wsZOMZGaRg8z1vGSSR4i7WfNqN
+	85gbNUuTtNHH2QfzQXWzlXtleA42unMFID9J2/Sq8qBlKrlajf7mlCJ9nXhuOICxJfdY3Iys4im
+	I5SaeWglpx4uBDHkx4rPmu8E=
+X-Google-Smtp-Source: AGHT+IGM8cCk/sYANsFsOLgKO/7O5wrU1+7vPfxQLYsZdlHZ3CBtISb4TBCWVP0aNDz/CZJ58Ooyiw==
+X-Received: by 2002:a05:6a00:b8b:b0:73f:f816:dd78 with SMTP id d2e1a72fcca58-7489cfcb325mr13794495b3a.15.1750116074469;
+        Mon, 16 Jun 2025 16:21:14 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-748900ac001sm7624361b3a.108.2025.06.16.16.21.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 16:21:14 -0700 (PDT)
+Date: Mon, 16 Jun 2025 16:21:13 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	sdf@fomichev.me, liuhangbin@gmail.com, linux-kernel@vger.kernel.org,
+	syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] bonding: switch bond_miimon_inspect to rtnl lock
+Message-ID: <aFCm6TuOAr5cokFw@mini-arch>
+References: <20250616172213.475764-1-stfomichev@gmail.com>
+ <1912679.1750099002@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616141441.1243044-1-mbloch@nvidia.com> <20250616141441.1243044-11-mbloch@nvidia.com>
-In-Reply-To: <20250616141441.1243044-11-mbloch@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 16 Jun 2025 16:20:25 -0700
-X-Gm-Features: AX0GCFtZpxhZvU77AkL5_V9_bYi_u1lZxXIho5kV2sVVHPGhYrOea7qfCuTr1rU
-Message-ID: <CAHS8izN_Aj6jswP=FRDu6a4TG1Qcc2HHQYxRUuL4HO_UShHkRg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 10/12] net/mlx5e: Implement queue mgmt ops and
- single channel swap
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, saeedm@nvidia.com, 
-	gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com, 
-	Leon Romanovsky <leon@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Dragos Tatulea <dtatulea@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1912679.1750099002@famine>
 
-On Mon, Jun 16, 2025 at 7:22=E2=80=AFAM Mark Bloch <mbloch@nvidia.com> wrot=
-e:
->
-> From: Saeed Mahameed <saeedm@nvidia.com>
->
-> The bulk of the work is done in mlx5e_queue_mem_alloc, where we allocate
-> and create the new channel resources, similar to
-> mlx5e_safe_switch_params, but here we do it for a single channel using
-> existing params, sort of a clone channel.
-> To swap the old channel with the new one, we deactivate and close the
-> old channel then replace it with the new one, since the swap procedure
-> doesn't fail in mlx5, we do it all in one place (mlx5e_queue_start).
->
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+On 06/16, Jay Vosburgh wrote:
+> Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> 
+> >Syzkaller reports the following issue:
+> >
+> > RTNL: assertion failed at ./include/net/netdev_lock.h (72)
+> > WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
+> > WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 __linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
+> >
+> > ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
+> > bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
+> > bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
+> > bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
+> > process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
+> > process_scheduled_works kernel/workqueue.c:3321 [inline]
+> > worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
+> > kthread+0x3c5/0x780 kernel/kthread.c:464
+> > ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
+> > ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+> >
+> >As discussed in [0], the report is a bit bogus, but it exposes
+> >the fact that bond_miimon_inspect might sleep while its being
+> >called under RCU read lock. Convert bond_miimon_inspect callers
+> >(bond_mii_monitor) to rtnl lock.
+> 
+> 	Sorry, I missed the discussion on this last week.  This is on
+> me, last year this came up and the correct fix is to remove all of the
+> obsolete use_carrier logic in bonding.  A round trip on RTNL for every
+> miimon pass is not realistic.
+> 
+> 	I've got the following patch building as we speak, if it doesn't
+> blow up I'll post it for real.
+> 
+> 	Actually, reading the patch now as I write, I need to tweak the
+> option setting logic, it should permit setting use_carrier to "on" or 1,
+> but nothing else.  I had originally planned to permit setting it to
+> anything and ignore the value, but decided later that turning it off
+> should fail, as the behavior change implied by "off" won't happen.
 
-Acked-by: Mina Almasry <almasrymina@google.com>
-
-> ---
->  .../net/ethernet/mellanox/mlx5/core/en_main.c | 98 +++++++++++++++++++
->  1 file changed, 98 insertions(+)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_main.c
-> index a51e204bd364..873a42b4a82d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -5494,6 +5494,103 @@ static const struct netdev_stat_ops mlx5e_stat_op=
-s =3D {
->         .get_base_stats      =3D mlx5e_get_base_stats,
->  };
->
-> +struct mlx5_qmgmt_data {
-> +       struct mlx5e_channel *c;
-> +       struct mlx5e_channel_param cparam;
-> +};
-> +
-> +static int mlx5e_queue_mem_alloc(struct net_device *dev, void *newq,
-> +                                int queue_index)
-> +{
-> +       struct mlx5_qmgmt_data *new =3D (struct mlx5_qmgmt_data *)newq;
-> +       struct mlx5e_priv *priv =3D netdev_priv(dev);
-> +       struct mlx5e_channels *chs =3D &priv->channels;
-> +       struct mlx5e_params params =3D chs->params;
-> +       struct mlx5_core_dev *mdev;
-> +       int err;
-> +
-> +       mutex_lock(&priv->state_lock);
-> +       if (!test_bit(MLX5E_STATE_OPENED, &priv->state)) {
-> +               err =3D -ENODEV;
-> +               goto unlock;
-> +       }
-> +
-> +       if (queue_index >=3D chs->num) {
-> +               err =3D -ERANGE;
-> +               goto unlock;
-> +       }
-> +
-> +       if (MLX5E_GET_PFLAG(&chs->params, MLX5E_PFLAG_TX_PORT_TS) ||
-> +           chs->params.ptp_rx   ||
-> +           chs->params.xdp_prog ||
-> +           priv->htb) {
-> +               netdev_err(priv->netdev,
-> +                          "Cloning channels with Port/rx PTP, XDP or HTB=
- is not supported\n");
-> +               err =3D -EOPNOTSUPP;
-
-I would have used a different error code here as EOFNOTSUPP usually
-means the driver doesn't support queue API at all.
-
---=20
-Thanks,
-Mina
+That's even better, thanks, will take a look!
 
