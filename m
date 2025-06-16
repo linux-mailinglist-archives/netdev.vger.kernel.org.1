@@ -1,208 +1,234 @@
-Return-Path: <netdev+bounces-198271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878C5ADBBBA
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:11:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7933ADBBC1
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4FC5188F315
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:11:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66B43A3561
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:13:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0BB21771C;
-	Mon, 16 Jun 2025 21:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE73A215F7C;
+	Mon, 16 Jun 2025 21:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fQAyqDFX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="qUQa1XPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C173214A6A
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 21:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46FF1E493C
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 21:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750108290; cv=none; b=s3phrbtE4r71m6jzJOHOP5HHUyyFTF1XYDgPHdRyxuSHIf4LQIt5mNf+cfKKXLu4UQ5G/kHAo476qyLyLChEKOyrxzbYhtEzc/KTU6BTwZ4cf5zaxCWEyGq+ADZhK5lwm9AYAp9S9nyelbUQzubKkq8CgG0+lWiNfObnE1zxr5g=
+	t=1750108404; cv=none; b=n9Vzpb8suPqG/XXO38EXcH68NhfvGJ2kaH49hJdExx/eYaYLgXEGBh2sGlI/EtgAQdfsI3bcZ+S3T37fVaOy7Lg7OgDWpVPgylFeH/ebXinSV2u7U/smNPrTPIV6n8oNYbco9SmLivoia5VM6eWpyQHBMvjq/Nm2yGiTc+e6514=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750108290; c=relaxed/simple;
-	bh=IgYPB6NSRiySo3tOXBpLXxIs1rnBT7hMzDeQePuqOK4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mrbYeRlcf2QB7tBog34vV7kz3J1cu4ZZKn6r4WKkiZSng2X+Qxz09AP4s9Z735M1Uv+4svgXF+iyUF6R9p/U8ylMVm0R/Pug/xa4KNzY4mRXp6sPl1qWI745m+8U2larhrMQRZYxT4NmUL4rA5XQ76kO0hvxXhJYjSK6F0bVXEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fQAyqDFX; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2348ac8e0b4so20365ad.1
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 14:11:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750108286; x=1750713086; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LzvFmHWfZ+bWAuTVcKtdw0qV+ufI/jqJ17BT4JBpweI=;
-        b=fQAyqDFXndu0UsFl8saunIo3W9n3ne/RJZC8mfGP2yx3C99n5bS1hE4vr0ns3CEHAw
-         5RDqh8ImgXuypkU/IpQj6WJNzFt0wqDqVcuVypKEpa8ox6grB4Tq+X3k/srDSbx4n02U
-         XepHHQKyPR4gD6vr7FbxGtr/PkJ/hkeLnuHdd4uLXy19KRYdQ9D/W2glCIDQYihfFN7Y
-         MZIwjTC0GH7KZ80du8mJXoJEZfwiSdQ+b8aiXfwhFxdSmMcLzxWbbjL0IXLVVFbSdXo4
-         Xc7si2e1de5W0fLR96QknZHu0xr3YOeghxFeTQPVw5X09QLaYRjVWrZ5QzpIyBSkTCk4
-         mEIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750108286; x=1750713086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LzvFmHWfZ+bWAuTVcKtdw0qV+ufI/jqJ17BT4JBpweI=;
-        b=wCKJfhGfYNVW2uR0KynX3F8SYTAdccmMVwyESvHbIPhBpe7KFMSa9egcG5CzGzGD5z
-         bU0t7vQ+xLLv2/mU6HOoiUW245XAgen/Ztnsny+acXxpB1uAAFv5uo3+I7P41TvIkBdO
-         ZEMigSpbqBkPFmQWKV61/CqqgldnzcZwqeAAqbDbWL3tOAfNEHso5j3oxk1BajAFj2wJ
-         vOLNzkszbc+JE7ATSDy3f/7gtZjDycYOfdhseU2xNLTMIx77hEHm1TCaDVG0QxOcGzrb
-         HiZWg3e+AdI38fQWRo3TuacKFa8+oSJyn4Mm/GFsiIfo+yiFLspGeY4LWYlUNQ6uStuI
-         MqTg==
-X-Gm-Message-State: AOJu0Ywy5x/ROJm7yxofqrSYmVwaakhBGQQsus8qqq5kjF+AT0ZM+dd7
-	gKSmTJSlhgmyBOUVC+EqRsTtUd2UzSoqcquSmlQBz8CbE3EZXcD4KBitGe+7X85Of1/IfB3X5w3
-	KuCAvwz1zlIyigOOCiEqRkeQbjvuLwPA088HzWrA2Sar+kTk8HvRC7OpHp44=
-X-Gm-Gg: ASbGncsDrZl5oJVivgRuPAbC1cT581X4kNhip++xoBU4cTW6gas7VTcN7h3hneLdFEa
-	9nKfjAp6bJGrorldgjaNipWrNofGfV20zui6NE6XbMUekUsQq6NJEw9bgegiVjP27nwZQ0qUuEd
-	kjs78dhki9iRI3ShYgHLbI8JknSuXQNxZtJ+DhWTkB+kZ7
-X-Google-Smtp-Source: AGHT+IEYD9mjZhB+8kdOtsUeVNHAgHFECRq5REI45W+eZ0qjy9K8ihOl699135DPyu8F/uAp0DbHfoASyudXxJwDbRk=
-X-Received: by 2002:a17:903:3b8f:b0:234:8eeb:d81a with SMTP id
- d9443c01a7336-2366c5cd450mr6187045ad.16.1750108286081; Mon, 16 Jun 2025
- 14:11:26 -0700 (PDT)
+	s=arc-20240116; t=1750108404; c=relaxed/simple;
+	bh=WFYJhGTYc9LbRG63V2tJrlZwMlhQRQ928hpczOCc6JQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ojY/ObspF7mINB2IHKPx1i/G5Ww6LS4N936VIR1hwssRq3uttqMRpbseyPpzKAAOTrslBG4ioMxOXwBcgzxB2HA0NVPVnMBEtmq09Td99pLzyhfvqBX/T7Q9TmnPxNHoZ2PFY7EK0m32jTaeMx8OF96ou/DbfBGhVZOecGhH800=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=qUQa1XPD; arc=none smtp.client-ip=51.77.79.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1750108385; x=1750367585;
+	bh=WFYJhGTYc9LbRG63V2tJrlZwMlhQRQ928hpczOCc6JQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=qUQa1XPD8WsdmpUT3vYQa/18xmIXSby8TOKkT+Wi8l3hMCu5bU2TPHJvqLHBw3Wrj
+	 loKTSEVoQWVuzU4iXCN4UfMJk4B2GNe5aGRHH9nlxIGQY9S1oUfit++6tZ9CAQQo/x
+	 k4jRBwX0GbdGZIx7I84wHHwo1Av+EQpDKcnqHZG0ciuFBoai6sDkASC4Um0Do+asVT
+	 3vmLRK35+8yTku+z1RURq8Wum9KDAcLy/P9f/+QHRdjRs3Qkxx3dWcG6gZGqmYM/qf
+	 Qdm48b2cLpTXE8+IL3tT50qUb4VIP5OrIriPbnbEAsYDm0Xrjn9aJEEw3tzwwv4f0z
+	 A9yNuzGzub2TQ==
+Date: Mon, 16 Jun 2025 21:13:01 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: William Liu <will@willsroot.io>
+Cc: Savy <savy@syst3mfailure.io>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+Message-ID: <KqiixybBnBLRGzU7hRxP5bpji1w9tvkkNJVawNPK04HV4Sq66HwoXkfvY-zUb-igUkh0WT0BdfbBmjpkA0H-tES79qTMRM9OuFH5HUsYwJs=@willsroot.io>
+In-Reply-To: <CAM0EoM=QxAJS4ZK68mup55O7wQFqkQds-p2Us3R0U-W6FK6krw@mail.gmail.com>
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <lVH_UKrQzWPCHJS7_1Cj0gmEV0x4KI3VB_4auivP0fDokTBbmWuDV455wXrf6eQzakVFoK6wUxlDuMw_Lo0p4P9ByPLSjklsIkQiNcd_hvQ=@willsroot.io> <CAM0EoMkoFJJQD_ZVSMb7DUo1mafevgujx+WA=1ecTeYBcpB1Lw@mail.gmail.com> <A2nutOWbLBIdLRrnsUdavOagBEebp4YBFx0DdL23njEFVAySZul2pDRK1xf76_g6dLb82YXCRb1Ry9btDkZqeY9Btib0KgViSIIfsi4BDfU=@willsroot.io> <CAM0EoMmhP_9UsF18M=6B6AbY_am8cEnaqggpnVb9fkmBB4vjtA@mail.gmail.com> <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io> <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com> <yA-qROHJ2pCMLiRG8Au4YMe_V2R27OhaXkkjkImGzbhdlyHUs5nCkbbJYGkNLM4Rt5812LGXHathpDmqSYTGv1D4YF-zeJdWbCnNIAezEdg=@willsroot.io> <CAM0EoM=QxAJS4ZK68mup55O7wQFqkQds-p2Us3R0U-W6FK6krw@mail.gmail.com>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 08d09a36e2caf42f7b7a383aff855807d7d4a64e
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250615205914.835368-1-almasrymina@google.com> <c126182c-8f26-41e2-a20d-ceefc2ced886@kernel.org>
-In-Reply-To: <c126182c-8f26-41e2-a20d-ceefc2ced886@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 16 Jun 2025 14:11:13 -0700
-X-Gm-Features: AX0GCFtZMmk9CxeJgCCVOcm5DzBrlgdeP3SE9Biv6QMSHTkAiL4Vqg5o1bTfpyM
-Message-ID: <CAHS8izPyzJvchqFNrRjY95D=41nya8Tmvx1eS9n0ijtHcUUETA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] page_pool: import Jesper's page_pool benchmark
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
-	Ignat Korchagin <ignat@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 16, 2025 at 2:29=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
-.org> wrote:
-> On 15/06/2025 22.59, Mina Almasry wrote:
-> > From: Jesper Dangaard Brouer <hawk@kernel.org>
-> >
-> > We frequently consult with Jesper's out-of-tree page_pool benchmark to
-> > evaluate page_pool changes.
-> >
-> > Import the benchmark into the upstream linux kernel tree so that (a)
-> > we're all running the same version, (b) pave the way for shared
-> > improvements, and (c) maybe one day integrate it with nipa, if possible=
-.
-> >
-> > Import bench_page_pool_simple from commit 35b1716d0c30 ("Add
-> > page_bench06_walk_all"), from this repository:
-> > https://github.com/netoptimizer/prototype-kernel.git
-> >
-> > Changes done during upstreaming:
-> > - Fix checkpatch issues.
-> > - Remove the tasklet logic not needed.
-> > - Move under tools/testing
-> > - Create ksft for the benchmark.
-> > - Changed slightly how the benchmark gets build. Out of tree, time_benc=
-h
-> >    is built as an independent .ko. Here it is included in
-> >    bench_page_pool.ko
-> >
-> > Steps to run:
-> >
-> > ```
-> > mkdir -p /tmp/run-pp-bench
-> > make -C ./tools/testing/selftests/net/bench
-> > make -C ./tools/testing/selftests/net/bench install INSTALL_PATH=3D/tmp=
-/run-pp-bench
-> > rsync --delete -avz --progress /tmp/run-pp-bench mina@$SERVER:~/
-> > ssh mina@$SERVER << EOF
-> >    cd ~/run-pp-bench && sudo ./test_bench_page_pool.sh
-> > EOF
-> > ```
-> >
-> > Output:
-> >
-> > ```
-> > (benchmrk dmesg logs)
-> >
->
-> Something is off with benchmark numbers compared to the OOT version.
->
 
-I assume you're comparing my results (my kernel config + my hardware +
-upstream benchmark) with your results (your kernel config + your
-hardware + OOT version). The problem may be in OOT vs upstream but it
-may be just different code/config/hardware.
 
-> Adding my numbers below, they were run on my testlab with:
->   - CPU E5-1650 v4 @ 3.60GHz
->   - kernel: net.git v6.15-12438-gd9816ec74e6d
->
-> > Fast path results:
-> > no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.368 ns
-> >
->
-> Fast-path on your CPU is faster (22 cycles(tsc) 6.128 ns) than my CPU.
-> What CPU is this?
 
-My test setup is a Gcloud A3 VM (so virtualized). The CPU is:
 
-cat /proc/cpuinfo
-...
-model name      : Intel(R) Xeon(R) Platinum 8481C CPU @ 2.70GHz
 
->
-> Type:no-softirq-page_pool01 Per elem: 22 cycles(tsc) 6.128 ns (step:0)
->   - (measurement period time:0.061282924 sec time_interval:61282924)
->   - (invoke count:10000000 tsc_interval:220619745)
->
-> > ptr_ring results:
-> > no-softirq-page_pool02 Per elem: 527 cycles(tsc) 195.187 ns
->
-> I'm surprised that ptr_ring benchmark is very slow, compared to my
-> result (below) 60 cycles(tsc) 16.853 ns.
->
-> Type:no-softirq-page_pool02 Per elem: 60 cycles(tsc) 16.853 ns (step:0)
->   - (measurement period time:0.168535760 sec time_interval:168535760)
->   - (invoke count:10000000 tsc_interval:606734160)
->
-> Maybe your kernel is compiled with some CONFIG debug thing that makes it
-> slower?
->
+On Monday, June 16th, 2025 at 8:41 PM, Jamal Hadi Salim <jhs@mojatatu.com> =
+wrote:
 
-Yeah, I actually just checked and I have CONFIG_DEBUG_NET on in my
-build, and a lot of other debug configs are turned on.
+>=20
+>=20
+> On Thu, Jun 12, 2025 at 11:34=E2=80=AFPM William Liu will@willsroot.io wr=
+ote:
+>=20
+> > On Thursday, June 12th, 2025 at 10:08 PM, Jamal Hadi Salim jhs@mojatatu=
+.com wrote:
+> >=20
+> > > Hi William,
+> > > Apologies again for the latency.
+> > >=20
+> > > On Mon, Jun 9, 2025 at 11:31=E2=80=AFAM William Liu will@willsroot.io=
+ wrote:
+> > >=20
+> > > > On Monday, June 9th, 2025 at 12:27 PM, Jamal Hadi Salim jhs@mojatat=
+u.com wrote:
+> > >=20
+> > > > > I didnt finish my thought on that: I meant just dont allow a seco=
+nd
+> > > > > netem to be added to a specific tree if one already exists. Dont
+> > > > > bother checking for duplication.
+> > > > >=20
+> > > > > cheers,
+> > > > > jamal
+> > > > >=20
+> > > > > > > [1] see "loopy fun" in https://lwn.net/Articles/719297/
+> > > >=20
+> > > > Hi Jamal,
+> > > >=20
+> > > > I came up with the following fix last night to disallow adding a ne=
+tem qdisc if one of its ancestral qdiscs is a netem. It's just a draft -I w=
+ill clean it up, move qdisc_match_from_root to sch_generic, add test cases,=
+ and submit a formal patchset for review if it looks good to you. Please le=
+t us know if you catch any edge cases or correctness issues we might be mis=
+sing.
+> > >=20
+> > > It is a reasonable approach for fixing the obvious case you are
+> > > facing. But I am still concerned.
+> > > Potentially if you had another netem on a different branch of the tre=
+e
+> > > it may still be problematic.
+> > > Consider a prio qdisc with 3 bands each with a netem child with dupli=
+cation on.
+> > > Your solution will solve it for each branch if one tries to add a
+> > > netem child to any of these netems.
+> > >=20
+> > > But consider you have a filter on the root qdisc or some intermediate
+> > > qdisc and an associated action that changes skb->prio; when it hits
+> > >=20
+> > > netem and gets duplicated then when it goes back to the root it may b=
+e
+> > > classified by prio to a different netem which will duplicate and on
+> > > and on..
+> > > BTW: I gave the example of skb->prio but this could be skb->mark.
+> >=20
+> > Ah, good catch. I attached the modified patch below then.
+> >=20
+> > > Perhaps we should only allow one netem per tree or allow more but
+> > > check for duplication and only allow one per tree...
+> >=20
+> > I believe we have to keep it at one netem per tree. The OOM loop can st=
+ill trigger if a netem without duplication has a netem child with duplicati=
+on. Consider the following setup:
+> >=20
+> > tc qdisc add dev lo root handle 1: netem limit 1
+> > tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 1=
+00% delay 1us reorder 100%
+>=20
+>=20
+> I didnt explain it clearly - I meant if you have a netem that has
+> duplication then dont allow another netem within the tree. Your patch
+> is in the right direction but does not check for duplication.
+>=20
+> > The first netem will store everything in the tfifo queue on netem_enque=
+ue. Since netem_dequeue calls enqueue on the child, and the child will dupl=
+icate every packet back to the root, the first netem's netem_dequeue will n=
+ever exit the tfifo_loop.
+> >=20
+> > Best,
+> > William
+> >=20
+> > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> > index fdd79d3ccd8c..4db5df202403 100644
+> > --- a/net/sched/sch_netem.c
+> > +++ b/net/sched/sch_netem.c
+> > @@ -1085,6 +1085,36 @@ static int netem_change(struct Qdisc *sch, struc=
+t nlattr *opt,
+> > return ret;
+> > }
+> >=20
+> > +static const struct Qdisc_class_ops netem_class_ops;
+> > +
+> > +static bool has_netem_in_tree(struct Qdisc *sch) {
+> > + struct Qdisc *root, *q;
+> > + unsigned int i;
+> > + bool ret =3D false;
+> > +
+> > + sch_tree_lock(sch);
+> > + root =3D qdisc_root_sleeping(sch);
+>=20
+>=20
+> Hrm. starting with qdisc_root_sleeping() seems quarky. Take a look at
+> dump() - and dig into something (off top of my head) like
+> hash_for_each(qdisc_dev(root)->qdisc_hash, b, q, hash)
+>=20
 
-Let me investigate here. Maybe trimming the debug configs and double
-checking my tree for debug logs I added would point to the difference.
+What is the issue here? My understanding is that the hashmap does not hold =
+the root - sch_api.c shows edge cases for the root node when adding and del=
+eting from the hashmap).
 
-I could also try to put both the OOT version and upstream version in
-my tree and do a proper A/B comparison that way.
+> > +
+> > + if (root->ops->cl_ops =3D=3D &netem_class_ops) {
+> > + ret =3D true;
+> > + goto unlock;
+> > + }
+> > +
+> > + hash_for_each_rcu(qdisc_dev(root)->qdisc_hash, i, q, hash) {
+> > + if (q->ops->cl_ops =3D=3D &netem_class_ops) {
+> > + ret =3D true;
+> > + goto unlock;
+> > + }
+> > + }
+> > +
+> > +unlock:
+> > + if (ret)
+> > + pr_warn("Cannot have multiple netems in tree\n");
+>=20
+>=20
+> No point to the pr_warn()
+>=20
+> > +
+> > + sch_tree_unlock(sch);
+> > + return ret;
+> > +}
+> > +
+> > static int netem_init(struct Qdisc *sch, struct nlattr *opt,
+> > struct netlink_ext_ack *extack)
+> > {
+> > @@ -1093,6 +1123,9 @@ static int netem_init(struct Qdisc *sch, struct n=
+lattr *opt,
+> >=20
+> > qdisc_watchdog_init(&q->watchdog, sch);
+> >=20
+> > + if (has_netem_in_tree(sch))
+> > + return -EINVAL;
+>=20
+>=20
+> set ext_ack to contain the string you had earlier ("Cannot have
+> multiple netems in tree") and user space will be able to see it.
+>=20
+> It will be easy to check the existing qdisc for netem_sched_data->duplica=
+te
+>=20
+> Also, please dont forget to run tdc tests and contribute one or more
+> testcase that captures the essence of what you are pushing here.
+>=20
+> cheers,
+> jamal
 
-If you do get chance to run this upstream version from your exact tree
-and config, that would be a good A/B comparison as well.
-
-> You can troubleshoot like this:
->   - select the `no-softirq-page_pool02` test via run_flags=3D$((2#100)).
->
->   # perf record -g modprobe bench_page_pool_simple run_flags=3D$((2#100))
-> loops=3D$((100*10**6))
->   # perf report --no-children
->
-
-Thanks, will do.
-
---=20
-Thanks,
-Mina
+Best,
+William
 
