@@ -1,213 +1,171 @@
-Return-Path: <netdev+bounces-197927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB9A1ADA616
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 03:46:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F1D1ADA62C
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 04:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30B947A75F5
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 01:45:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46C227A6E1D
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 02:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31682882B6;
-	Mon, 16 Jun 2025 01:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="G4GXZbHK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9466D27A112;
+	Mon, 16 Jun 2025 02:08:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013030.outbound.protection.outlook.com [40.107.159.30])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E1F28DF1B;
-	Mon, 16 Jun 2025 01:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750038134; cv=fail; b=eifWaw4A2t1Kg2GC4bvd5RtooM8VLxDCCDYGEOK7Gzsf0o3OUBEOLn93b7wGd+LUeQPxktEB5FG5qm1EsqpDOfqItfCNWSunYiKxfHecjLTz4YWYjd1OcDTF2+DSAn65kBYAW7WTcp8f1Zp7zZVoFFeXl3WhJ+HdeCX7+NJmOGQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750038134; c=relaxed/simple;
-	bh=hFWUh/3gdvJUhWTOOfvOKplgwt1QF6rIClBQNXDTEQg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gbGXvqHjGDI56gtaAL9i+nn/pjDap93ZcAyLbI2BAnBEKbtUwf/ocQjysgYyI9KmcYjSHLMCC9w6HVBEkq5M/Jn4CJsROrtr/lEyKg1P9YgnE0RH83Dy+Ekupod+7QhBJBby3zn7HxghmWNyDt3e0F37iF8zzA5IPl3Udg3wyKs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=G4GXZbHK; arc=fail smtp.client-ip=40.107.159.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LbJkcctC7ikUAc43DRYs73DfchsD+eWcScV4xjOlKsFdihPpE7Oo0watKt0/2P2fkmaAedvNOE2kGh0iLLZYk+UN3Xy0tEvi18m5dH1yGYU3S4lY2BZ2SLJg/vNBFq0vSIoOPQyDAALOoFvzVh07aAoXNea47O6FHFkqjYOVXyEEfPaisFLLkceEyDP9MpyN91/tYwFPm9knxVIbQ+lezpBHoxvRuI/LcYTt/jwEheVemrhZpha8VJwz2QCrE+ucM1zofDIeG6hKDyJIcURVNAw+gGedAsUL2lEkfieUcJEVHdzkLF5Zlc1xs+iPxdjh3EPD9+bURAG3cFSCrQT4Ig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lm36xLGOLvYHQQyVdVnyBfLpcdvm0KYHkIU0QNK5P+w=;
- b=kkveKcuM/olv6VIA+vyfdVBoJBugpoxsSdmKK/rIObLsHvThGsM9n3jCsJ3eKtJ4I0e+G+G6bwyZYsAVtStX+aSxJXWr+M6P+qP4/yqtKcLr/5BnHdtJERURVvNxBR4gdy0xZDt1VrpvxsSLfWdy9NhJOSe7ouNSCHerLtsnYQS5ZebvRzfyyfOOfn/Q9SQ/j+0F0V1aLhYrRBIb/KNyW3j7926+/JWc3OsUPEO8CM7UCjl9eo8LPCgHqjndXedwXC3tpDG+so1eTfKBi0TnlSgoHJ5Y7D5FAAvW3bkllWaihHJ69cGNkgKmCTCmU0PClvHyR/+NI1TSfjpN5yRzWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lm36xLGOLvYHQQyVdVnyBfLpcdvm0KYHkIU0QNK5P+w=;
- b=G4GXZbHKO39IhVf4aJphCUZQRfBTIAJuIRq5tP4bbSTsHHPNxYV+1HuoaqbO1xmE0huM0dBA1wnGRBK+KoqvE0v3YMM+wxXITkAf6X+RSGYEnhskv0+2f/B+Rq1azbmn5rg3seVd12pEYjPI8Z2q1JJNw3MhBWtIZIpkerJ1uSN/Eung2CMRfUpHuR4no4rR0qFKZ5KRgw1XC1OFEF4onZMFUCxJ6grarDfyulWRzH1TQgpBHJCYRoYvMn1ImhyvutOvcsarHX3f/3iVcIDN9DGV9ebsB7vSE0RHKkul/523cF4PfsbXUbhs9q35LRfp6y4YnWbnTozGFwEePDzoPg==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AS8PR04MB8070.eurprd04.prod.outlook.com (2603:10a6:20b:3f2::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Mon, 16 Jun
- 2025 01:42:08 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8835.027; Mon, 16 Jun 2025
- 01:42:08 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>, Marc Kleine-Budde <mkl@pengutronix.de>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kernel@pengutronix.de"
-	<kernel@pengutronix.de>, Frank Li <frank.li@nxp.com>
-Subject: RE: [PATCH net-next v2 07/10] net: fec: fec_enet_rx_queue(): replace
- manual VLAN header calculation with skb_vlan_eth_hdr()
-Thread-Topic: [PATCH net-next v2 07/10] net: fec: fec_enet_rx_queue(): replace
- manual VLAN header calculation with skb_vlan_eth_hdr()
-Thread-Index: AQHb26Wpjf5c6C5QHkK87JMa7bSPSrQBbS+AgAOYj5A=
-Date: Mon, 16 Jun 2025 01:42:08 +0000
-Message-ID:
- <PAXPR04MB8510A1946372F37B5F97E9F28870A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250612-fec-cleanups-v2-0-ae7c36df185e@pengutronix.de>
- <20250612-fec-cleanups-v2-7-ae7c36df185e@pengutronix.de>
- <729dfa8c-6eca-42c6-b9fd-5333208a0a69@lunn.ch>
-In-Reply-To: <729dfa8c-6eca-42c6-b9fd-5333208a0a69@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AS8PR04MB8070:EE_
-x-ms-office365-filtering-correlation-id: e8daff0a-fa09-4530-c32a-08ddac770193
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|7416014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?/NcoV1mKH8p6/RkbsTi4D6VYlf+VwpWQ/L6f9BW0p502X540U+eOnKyf5dnn?=
- =?us-ascii?Q?j8CHV3+UG+prpemHVbSmLjkCSZkxagLfq+cOe2+e2LinnRKtpDG5uOy9G54k?=
- =?us-ascii?Q?G1TGPKBwJ1IATFifRtLsnuF6wqZS2SJlzrX+0Dl7DF3/XsbNhsUivtkH5aaX?=
- =?us-ascii?Q?fnnTKcgcFXWkdUGEgunvl7Q9zB+i3t0YP7FmBGDOt7K6vFBuPD5sX0hN39lP?=
- =?us-ascii?Q?yQsy//xAY+OT2PizcUkhxXch3+T5dfCeQwKasTevwGyQibiPKwHHxT9zdZ5W?=
- =?us-ascii?Q?V8GgBllWRaWNTlm1nexu0ftjHF66Kx8hwvtbaD4U/5LtgLkm0yDq05iqQBzY?=
- =?us-ascii?Q?r0C8WDk+5IxJDvoBTDau9Xq+Jo6PR7XDkH28df6jd6UL1EdoRv90iz3pOz+5?=
- =?us-ascii?Q?F63tjLgsF/zNu36JIa7Dh4oQ6KrT4+rR3JD+VP/Dl2AOxmCI0GLY9+jiE0SC?=
- =?us-ascii?Q?WXk979nB5cveaRutzhkcrPwnZpZryAEdkLAeRGJuZhkjg5DPlN4u4X2/FWE2?=
- =?us-ascii?Q?1pVnEF4gUxiz9P7eCPKVLnTnn1+JYi0gkE5LuyEwLfdR4jd/7bHkehUsFKqF?=
- =?us-ascii?Q?Pmm/OYAkFZOxS+qZ+BRZ0QvPDOPNeAItDbY0I4yYwnY937PYJqHmL9NAqrGM?=
- =?us-ascii?Q?FI+ikrhEPAHzdqlK6dLraiaaVuhzAEtyfNyGCElT2OpxGkOPoB//imHHvT2O?=
- =?us-ascii?Q?E2nq8nmfo9QR6nw/QiX5WP6LiD9qW0WcyS3xw2hlT0mitOewQLs/Z4DZ0zz9?=
- =?us-ascii?Q?X6OcjGQmlBrEZI8L0KEfpa4wpxDc/DTEBM7c4bux/1QQssHaC1sKpYXJzR6R?=
- =?us-ascii?Q?m6DDW4PV2NjnxttgkupKmgsHeyBYRe6rFoUJ5moF6lb1CoPRLiuSjR7heNS5?=
- =?us-ascii?Q?7hGT3X9hyZUgPxMFiUPWtbe3bmAFepZX4Z77I9NMfhktakSWcZe0mRupHRAG?=
- =?us-ascii?Q?Mmb1nHzhbupycLoMYK9ZxM6ko4Yyw/QlZXA0NZOalzEG7Pmhzqyv18EcDMKW?=
- =?us-ascii?Q?+vJ42Qdm1toHuMj505ETS9CEmKZazrsVrdIohWwmIV3fdW3I6ANU8UD/UkfV?=
- =?us-ascii?Q?zGissXnPgUBQVX1Xu0RSh2Gj3ZlHP2BYHitiWhi0SYek/kHAMK8vDZ53ZHDU?=
- =?us-ascii?Q?r804X3JMDYlwPs2Q+5gu0Zc259xB022d1Oq9Ko1rQbJhzDNX1pe8CXk561qJ?=
- =?us-ascii?Q?wbZREq2nh4ntQvrjp6Wtff/vG0kqNI3hBA4g9jvw9NuGdhOM9iyCCTFueSxR?=
- =?us-ascii?Q?7HcClOrnE74TIs+g5W+nYRjFffbgCB3yrzalyMCQI4yMx7SU07tDugyr8D+h?=
- =?us-ascii?Q?sa0lcDl52N40pzp1iJfKDtRsU5XHPM3ebJNEYiUwrFvXv+9WP0zj2xoRBbvS?=
- =?us-ascii?Q?zZ1dP/oWCJq0tPSlBVWy0dDiTrBI6QXWQtbZCJTFTVNXCDpmVDHg9yMSFJHm?=
- =?us-ascii?Q?SGLIcF9jK44ZIUqJrGPJIKI/X29QNlwC28fStyEdMcoo5ZcDkpmZ7A=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?460tiHiDx27E3Pya63HJjEwH0aa7HVONJdgpaIq8vXjvceFCdH7nzQ+whTRw?=
- =?us-ascii?Q?nVRelaESiiSyPXawQT43K5S9QRtuOH1DKbCmOXdk3UVBmS+IBnWENr9mFhyl?=
- =?us-ascii?Q?nmrXuAEPrEL9zlkzjL5+S2kdX0Evw5MBshYHMHhslQ5oDnfsJYgpLJLW2FDA?=
- =?us-ascii?Q?VVtUVAZGQIPDlU0l4mMnpcNwvgBW00wYqk9ORWnkJEczhQQbXAGTZPFN6G3X?=
- =?us-ascii?Q?eSD0tWPKaoXHIa2EcLATOzWfMnNwUY3dXn9ea7WS0TWwpdt/9inwB0X1M5yw?=
- =?us-ascii?Q?HG1p9WxRQjJslgaWEe/VjmYd7dQHcLy1PGk71dAjUwq2Z6fdtEctgBQOIFN6?=
- =?us-ascii?Q?jbTCNtqEe6dXO4/O/Rz0TRNjTxdDUhDV/pam8Ih5+YHjrnBLX5HsS49Ueqsg?=
- =?us-ascii?Q?JplrcNxtH1w4TBeXJtrKgDWioquKXUle6qWC0ccGwX1Q5a19QABbwh2pFEcp?=
- =?us-ascii?Q?YkLJw3unmH9AZIYY7Ei6TXjZFpkYOhrMDx8cFuy2ODoOKdwATF9LzxGcMH66?=
- =?us-ascii?Q?HFzNSNDn862RBvI6K2Vk37v8WqhT4sMZQfT5ExI66oX4+7MFKhoWjD7BjNKs?=
- =?us-ascii?Q?/pX4lJiGstTkVgJsFKdfiyETN02LlGBOmzLiJH5P+1k+4ZKYF1kr+mUmQHQ/?=
- =?us-ascii?Q?fZLo5goqyyrXDyYezp1ogPE6m08Ld8vT+qa5VipnjihaTdZhj6xdWQjdJgvg?=
- =?us-ascii?Q?vXKYQVaqdm7R0FOi5s9ob9dkt6G5Zq93iY7MMJIItuLPbRUVy70Sipop56MA?=
- =?us-ascii?Q?gbzG0naJusOsXo/PloF4vBfzpKjzlJTMc3OEj1BHExDWw+8U3/RQbiFfnYbl?=
- =?us-ascii?Q?KxVp1Yo5KK7fdZOuNsBCCRSgEKvV4kyaacGbeT8cwIhvQ5KaZAt6u3ePpxrz?=
- =?us-ascii?Q?bV4HSuiAxOsyCBtLx+E0EWjsuksjaBekaDlsVWvPPjghjIkSntKb17CmfpFB?=
- =?us-ascii?Q?hAuiWmEBrpbMa4aWaJDg225P++1tvUPH0v9L9hL3wTvgXtisaHyrOhc+Vmjr?=
- =?us-ascii?Q?iV0Ru4Amlj+DeIOPjR7evp4O47vFJMLPU3toYOOf9eVBsYUnzdOILw0/rJpL?=
- =?us-ascii?Q?eq4JF/VXlSRXm9b+2Q2z3gnvRDs1vFht0hDd4IBfe/MOL9qigddGzWQ02ZuL?=
- =?us-ascii?Q?d3EflbbuqiiheYVIj1JFhhZh5+OmS3e1Cw1P/4HdSaEKI4ImlkJhctENAL81?=
- =?us-ascii?Q?BrR0LnMvmG5ALIAaQVM2YtpU/vEAjzq9awuPtAZJpL01NFZHLMilscBt+9Wl?=
- =?us-ascii?Q?b/Ql1oT49XDFD9xBlUb5u5jt6pnL28pCS26Ye7NAqS2mT7hYGEvqZt3HkW4j?=
- =?us-ascii?Q?79+ADYkjMTs7ElxGLkbxv3u8NxaYON+RTJKuMokytpnKPABLgb1Z+Xk7zLJn?=
- =?us-ascii?Q?OoXbjcMElpgru7cgwQo5upNGl+3jd9aD7V/mMSf9vP9In4WL/AlQ8Fk4DwXA?=
- =?us-ascii?Q?q7gyEDjxaT3sJ6aGW5Ym8VYfjcEmaKrk0OGI9fnegpetbR9fllq/nQDbofQq?=
- =?us-ascii?Q?S9AJ1eSIQiPZqIckwBICchsAqDBqsXz/gEUClWIRSB/ke/cX7YqsVx2PWCtu?=
- =?us-ascii?Q?1obcY8jT5bzqTUTPA30=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9E4263C69
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 02:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750039685; cv=none; b=UiBsmZFXEA0RApZtB1Egmd5nhBrWk7TiuZ4vEULDJ+/z0SDDe4Z7OfU6Uf6+VA1Q5o90Eco+MLcr2B6m7Ml7EGpuN7GWgLHgtPz5GJxiiGAY7ednQcPScOCAb7NB1LuC9UpfQJv/5I//9XGM8JOpVNaP3bQhIbwbgHM8A/FTE6Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750039685; c=relaxed/simple;
+	bh=h6HiMg5hqocGZ3813lP1lmu8DKVQX0Y9Ih977MAhtkM=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=HLrhjrRqDt8ktOD48PY0NgIAxcv/g+gRsmpI+wF7snMaEUM6yM9gHulRfoV1nH0IyOuH7Z4pxb66qsM+diUMLrPztMWw2oco2HULyG5+s52pvqH+9eLp7sCaOPZ/N4GBONTAlGWlGhsXY33K/hJJIjoEY6KVsgVSJKmBVwsQMro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpsz17t1750039645t08f9708f
+X-QQ-Originating-IP: 9kba30fIfcRT75y/niAAWfIULHrAr7CyphCDo7N/bCM=
+Received: from smtpclient.apple ( [36.110.17.29])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 16 Jun 2025 10:07:23 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 16735000456199326041
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8daff0a-fa09-4530-c32a-08ddac770193
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2025 01:42:08.3608
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: omiIOoLNJfeP8PSSTYRZimUKLB+VN93MX1S3SFuvY9axA5GhtqbN7sQ3n1IcuOWEL7Q2csyQ+LdN990mECpc2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8070
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [net-next v6 0/4] add broadcast_neighbor for no-stacking
+ networking arch
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <cover.1749525581.git.tonghao@bamaicloud.com>
+Date: Mon, 16 Jun 2025 10:07:13 +0800
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Zengbing Tu <tuzengbing@didiglobal.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <17E0F9C1-EB57-4ABC-BF6B-F54BCA9C6307@bamaicloud.com>
+References: <cover.1749525581.git.tonghao@bamaicloud.com>
+To: netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: NiJgP/70eYXdk1TI7QBxxfWld12KKitoeMgY3WBTRTmbh7Z5EHM69c61
+	KVzuBYCPLlhZBa9fViswTv063RwUOY837cWdpnLhfIR3qUq/cxm/VMFGtqJoZf+BdHr025r
+	N5pfhXN4cHd3Qte4uD/tNUZ9HV9uFX044mtoW7KXEwWWpaz3Z24a9Gmsw15zEo0fKfhfFvR
+	PTP2gdsuypbNTwD2ES6/ihoxAcAv/Znz9QYTZL05fBraLUxGtZk8p1tKttB09+leer4j4PJ
+	48zwFuieqQuNB7aZn+JEWzKQC9DKT1s5FtL2rfGP/oCoFo25ICDBARoV6XhqxD/ckqdEBon
+	mX/vZ4h7Ionk1hYuVTHkxezH9JFhefvqakmgvVCEE5T0ToGwyANqNpqTx9FzbQi3I5M2pjt
+	iqfgazOvi8eOXuF9rDQOYZCdoQH2UoqAnyDt5qHuT5bLEBTsj2N4zclnraWaWrdHDNaxF7+
+	HI2calqXXJhB/dnDMhqivQa8zbb++IZebYjRvdYRg7d6eiCs2m4V7aWink1OPQ7tmcuQLFq
+	a3mLO2r/DIOKH9nJpO2GwTL218w/FQZbgI53G3lATzG1qNbBSZkonV+fvz9cXK/xNdwzwzf
+	zWRxdOPIwV1NIOYl//iAlJUBDLdIt4M7GlHeDnILCrxrg9M2QxgO9CaAH8y6k/tNquHEqjc
+	RVPQ4nb55DASUkmNC2MaHjUK1iqTdCDwtU2ByvJiFZdyLAuJ14R5oyjGOFRq9YaKmX13PH+
+	PxE3zalURCvLkzaQXlI4uAa7cJb/8O1gO3okEaevHxxfQgWWo7rx1kN/ZwUnaptFDtAUh8j
+	I9RnIdyyLnCqPrIkpo8ZrOuk/E5aZWvjPXP5ciRgDq8AbwgPtV19nCIzsvPLetXmLU1U8JI
+	bNBvXN91S2bhDYJ3Nli5+b/+Te8JAc1lgVWZs8nDHWg0iM6rLaBiEQuv+pDz3ZEDSTfOP6Z
+	0rxn1pcG2N/A9bJ76h/2rPpGmvfRTkxSAJoc=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-> >  drivers/net/ethernet/freescale/fec_main.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/freescale/fec_main.c
-> > b/drivers/net/ethernet/freescale/fec_main.c
-> > index 6b456372de9a..f238cb60aa65 100644
-> > --- a/drivers/net/ethernet/freescale/fec_main.c
-> > +++ b/drivers/net/ethernet/freescale/fec_main.c
-> > @@ -1860,8 +1860,7 @@ fec_enet_rx_queue(struct net_device *ndev, u16
-> queue_id, int budget)
-> >  		    fep->bufdesc_ex &&
-> >  		    (ebdp->cbd_esc & cpu_to_fec32(BD_ENET_RX_VLAN))) {
-> >  			/* Push and remove the vlan tag */
-> > -			struct vlan_hdr *vlan_header =3D
-> > -					(struct vlan_hdr *) (data + ETH_HLEN);
-> > +			struct vlan_ethhdr *vlan_header =3D skb_vlan_eth_hdr(skb);
->=20
-> This is not 'obviously correct', so probably the commit message needs exp=
-anding.
->=20
-> static inline struct vlan_ethhdr *skb_vlan_eth_hdr(const struct sk_buff *=
-skb) {
-> 	return (struct vlan_ethhdr *)skb->data; }
->=20
-> I can see a few lines early:
->=20
-> 		data =3D skb->data;
->=20
-> but what about the + ETH_HLEN?
->=20
+ping
 
-The type of vlan_header has been changed from "struct vlan_hdr *" to
-"struct vlan_ethhdr *", so it is correct to use skb->data directly.
-
-struct vlan_ethhdr {
-	struct_group(addrs,
-		unsigned char	h_dest[ETH_ALEN];
-		unsigned char	h_source[ETH_ALEN];
-	);
-	__be16		h_vlan_proto;
-	__be16		h_vlan_TCI;
-	__be16		h_vlan_encapsulated_proto;
-};
+> 2025=E5=B9=B46=E6=9C=8810=E6=97=A5 11:44=EF=BC=8CTonghao Zhang =
+<tonghao@bamaicloud.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> For no-stacking networking arch, and enable the bond mode 4(lacp) in
+> datacenter, the switch require arp/nd packets as session =
+synchronization.
+> More details please see patch.
+>=20
+> v6 change log:
+> - del unnecessary rcu_read_lock in bond_xmit_broadcast =20
+>=20
+> v5 change log:
+> - format commit message of all patches
+> - use skb_header_pointer instead of pskb_may_pull
+> - send only packets to active slaves instead of all ports, and add =
+more commit log
+>=20
+> v4 change log:
+> - fix dec option in bond_close
+>=20
+> v3 change log:
+> - inc/dec broadcast_neighbor option in bond_open/close and UP state.
+> - remove explicit inline of bond_should_broadcast_neighbor
+> - remove sysfs option
+> - remove EXPORT_SYMBOL_GPL
+> - reorder option bond_opt_value
+> - use rcu_xxx in bond_should_notify_peers.
+>=20
+> v2 change log:
+> - add static branch for performance
+> - add more info about no-stacking arch in commit message
+> - add broadcast_neighbor info and format doc
+> - invoke bond_should_broadcast_neighbor only in BOND_MODE_8023AD mode =
+for performance
+> - explain why we need sending peer notify when failure recovery
+> - change the doc about num_unsol_na
+> - refine function name to ad_cond_set_peer_notif
+> - ad_cond_set_peer_notif invoked in ad_enable_collecting_distributing
+> - refine bond_should_notify_peers for lacp mode.
+>=20
+> Cc: Jay Vosburgh <jv@jvosburgh.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Zengbing Tu <tuzengbing@didiglobal.com>
+>=20
+> Tonghao Zhang (4):
+>  net: bonding: add broadcast_neighbor option for 802.3ad
+>  net: bonding: add broadcast_neighbor netlink option
+>  net: bonding: send peer notify when failure recovery
+>  net: bonding: add tracepoint for 802.3ad
+>=20
+> Documentation/networking/bonding.rst | 11 +++-
+> drivers/net/bonding/bond_3ad.c       | 19 ++++++
+> drivers/net/bonding/bond_main.c      | 87 ++++++++++++++++++++++++----
+> drivers/net/bonding/bond_netlink.c   | 16 +++++
+> drivers/net/bonding/bond_options.c   | 35 +++++++++++
+> include/net/bond_options.h           |  1 +
+> include/net/bonding.h                |  3 +
+> include/trace/events/bonding.h       | 37 ++++++++++++
+> include/uapi/linux/if_link.h         |  1 +
+> 9 files changed, 197 insertions(+), 13 deletions(-)
+> create mode 100644 include/trace/events/bonding.h
+>=20
+> --=20
+> 2.34.1
+>=20
+>=20
+>=20
 
 
