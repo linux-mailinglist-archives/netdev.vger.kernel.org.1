@@ -1,91 +1,120 @@
-Return-Path: <netdev+bounces-198154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1C5ADB6AE
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:24:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4AFDADB688
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B074175C8A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:23:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AC0B1889DB1
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27B2287501;
-	Mon, 16 Jun 2025 16:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D9DC286420;
+	Mon, 16 Jun 2025 16:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQ5hE9Kn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxE4ZsKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E63286D4C;
-	Mon, 16 Jun 2025 16:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88413259C9F;
+	Mon, 16 Jun 2025 16:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750090917; cv=none; b=XB79kGYd/F0lOImTY2W4gY2eLbrGM/0fn8o/J892S41NYlZaNmpqH8//LbDvH6sUXh2I47FCv4CbS9natdJ6lNy22pwAXj+P3JRaRW2RmT2NQjtqNt8m/ta8VKyu21C7xz52CadR7TKqyn6IvSWwFzPpyZUIYYBdkrrB3iW8zW0=
+	t=1750090881; cv=none; b=WduYWnOFXP6QwsITeo/woMPKGi3wC3AF5AJB6nr/QcWQThCqXuPjYCCh7NFkRk3jpeXwTgV/NafVKdtoV4cmcdq7a+Bc0iW1cnbfp33ozoUOT0ZZigqcq3oP87DtYHXJ0dSIdK+nAtpcN2E6tiZyvLslMKD1m8skVTm3OT+ZT0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750090917; c=relaxed/simple;
-	bh=RfRvUUYoMKCxEmMrEwHViOmEyxcA6EnHNTWW62LCo3I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EvRYQn2Xl3JoRqK3+UO0rKutNSFSP9qao8/RsIxgTpM0vG8te0LZXSK0TSXftNK+w02Wi+I129WuYk3a7InHITt8CcUfmx5GnF+6XIG73JA/RLjzroVWTGd2ASumsPIl67OM7ushdPlaohzPLT2rzrkWLSpn9/aQ5qDb1yZCkm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQ5hE9Kn; arc=none smtp.client-ip=209.85.160.178
+	s=arc-20240116; t=1750090881; c=relaxed/simple;
+	bh=k7/WisMXKbWlUR77eX7NtSJyTLCBVVNGedGYzI96uRg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jx/k5CIhtspKAWKIMcVVUPa4z/VLOcOFfoXa2M9e9fnY9ZbaaB5oKfUpue+DbqNm3XM93lFLsjhtPYb0YLJCQ0IrmjC7Tch1IIrNdVe+APm5/3VKa0GRERgjzXYuBOEMf47MN6xZzPSqHhWdl7gvCt3IjQzDM9JCHAP7AisBxGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxE4ZsKv; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a589b7dd5fso75867011cf.0;
-        Mon, 16 Jun 2025 09:21:55 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b26f7d2c1f1so4908178a12.0;
+        Mon, 16 Jun 2025 09:21:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750090915; x=1750695715; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750090878; x=1750695678; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jFLMSnoLv/CTUlJyxBIiOWdEUWj3gdBoK2X2AHkWCds=;
-        b=NQ5hE9KnhtQIP1yT6s+mD2afxS3Bpc4mpjC6ctAB6qD/3XL0FeWcM3AMPlTARSOpFy
-         7qMawJRKZfnpXOjoak4pzMhtwm9q0Wbuuw6J1iHfbGRrhTznlIrQqiXEMc8Vt1cxlMbI
-         hf0c92Uvg0Ze31WBztuoeqDs3e9qWliozk2ek4E+i8giQvnp3LBFcxSnCUQAzVtuACtT
-         GhErPpg6NdzNF+Bgq0hn5MXe+dexu4WDOuMAEDQotJApFRDJXe62eaHPD5loQkL3vsGH
-         YHRpDnBWBrxIXP2P7E+XOqjgCwFkHxMeL1p3nmqymSF3q/VBV0HQH/Cp7iS6NkuicJsJ
-         XG9Q==
+        bh=VpBWNqe15V8+KavYjcJ0yYawZufKK5c9dNkPp38Ln4Y=;
+        b=HxE4ZsKvEhIWz2axYUgC5vfebpG70DD9Lsgbvqpm9DHmE8LXEVvoh64mrysnu1n5T5
+         6ew7G35UqwQ47rPXhmoU48H7RjN7gmHeLpYnaJjdZeMHtYrCcQQ2cq4xgumG7BoX/LQs
+         LyH04YhDJSAos34ojCupIhLrfIjzOnlZbA5IKxUc3n3wPCXL06gydGF1TQjx68u0QN0j
+         /cYX1uYiO6W3X1jshm81WBsUf9yGzQ/Wcx5NQU7jgKjzkOl6rc6nqiSPiwRdmrBQ4grf
+         XIvduLiWQLNrJAYBrPPYyOJT58GsHOK9XIMdm9GaA0dRKL7baDwZGMa2z90Lq61rVNKm
+         Stdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750090915; x=1750695715;
+        d=1e100.net; s=20230601; t=1750090878; x=1750695678;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jFLMSnoLv/CTUlJyxBIiOWdEUWj3gdBoK2X2AHkWCds=;
-        b=YyDwn/uj0+SvYx7Cl2GoZ9+gtP1PR37p3JevAPz/C70QTRBbsG7dRqY+oW3134QdNN
-         59TJWzC9bKo04gjAqbVb6ea9ABBQ9PUmX7qyiSek9maIXCFdorrsjb9WH7Kfof6CAWDz
-         IVmJY8Lgo0HeRVSNJ5vOMBkZ2ytHTPHtAtvpNTsRP75K4I8n4lGKav3JngAOc7Itr3gA
-         Ys3rX1G5XKZNlegjxTIOYCr+ciYKRB5cytiwvgna5GT44rbVPwgm0AjnPEL5x6onYReJ
-         msSDpxT4JzxaTlPvGM7nAW9i1e4QNWmViusArjF5kpptAwhIWsq38ogXbwssKyNB8l3N
-         JiiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxj8leGOE0hYORg7KbdYYpj2muJYRerOeFEif64UXhKPWuVhUS5eiIbbvLgz4hI4+G1fERFW+siGXd1pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWDu1ahOurbjyaD6POAiQMCtQddNB5y8YjYM/yPBErpTtynO+C
-	lGpHJc+ovfDGDe79How80pLe1mAYDrq6wjnNQ2+3qQb3HyJgp+hDkGCd94Ruc18LCik=
-X-Gm-Gg: ASbGncu+5QRC0UCrovkcFI+W72fKbvKAnBBs0My9tL6jOeF6/KXrE7YxxwZ8XuMaoxX
-	HfqG3C8dmJOnThRwtQ6WzErTsafqd1BozRKB5RLkCvMj3YI2WBQYGiJey/Mo8D7QE3yRgiTvYIh
-	8cpXFf64ZuKN+PIvFhV65HEe0OKbmWuvHrcsLsAIytX98QT3mMkwLBrPOs4mr33pmKB1NmeGTgx
-	9hSBFlvOPnfjfZ8kkQAxrqoYcPddXp9iZdhpdPbXVtP02F1vJjJK7YxGRHtkELflOaW4tc+aiHa
-	tC4gpHpG6bD/HmKNX+pv3Ue950upS5tFktHaR+blREXIjYhvuOE30tz0m+UpZANEBL8iOACTB6e
-	Fo1VvPW4uw6xGG8w0fAap06Dctwy8SynM6CVVlxNK/A==
-X-Google-Smtp-Source: AGHT+IEOSfILcG9gkykewKvy4dyQpZ/6LjMM3OZLq4alndr+S6qX1BPsy940UsDGx+W57yjmAUHP5w==
-X-Received: by 2002:ac8:7d85:0:b0:477:64b0:6a21 with SMTP id d75a77b69052e-4a73c50a741mr165042891cf.23.1750090914508;
-        Mon, 16 Jun 2025 09:21:54 -0700 (PDT)
-Received: from localhost.localdomain (syn-184-074-055-142.biz.spectrum.com. [184.74.55.142])
-        by smtp.googlemail.com with ESMTPSA id d75a77b69052e-4a72a5298f2sm50952041cf.80.2025.06.16.09.21.53
+        bh=VpBWNqe15V8+KavYjcJ0yYawZufKK5c9dNkPp38Ln4Y=;
+        b=bAiIHfS4ErirhuzsWuTTQQJRy9xnOMB9758yAl09cokrTC0kOq8tVOgCqJHwRgur3w
+         e8950zQy+dsiM8pIwJzJvS0IqeHnhvrgFoX9MrdnC2YtHvaSmkB04WuNP/RLRiR8WhV6
+         gx1SZMjIJQivFEHVYt9YEH65eJ0nwMf/dLhtsVmAcxSpqTMqvSd2LCwkjkWq7ppa/bsW
+         4/6ImzaQoEeqlNr2R86vzzfrJZycuZxOg3kf2/HnqWXCrJ53vr+rEpF3MTpWbPwogiup
+         ghgOc5nD1e+1GYTBJWArxLXNdCTwQLysZBEDPTtCeME2742Ln8KJkhW8sZVK4g+Qw8mi
+         fjUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQAPLauNpzjOl0LWob1c7368RtGy7YZgks+dOhffdcbD2L+EHmbFWJvpNw2xH2/cF8IKi3vBaS2AbLIwo=@vger.kernel.org, AJvYcCVuK/YeExAPWGzSZCFi3uh5LyXa9ow/xJlrA8CBTa1jYnCxw+QR++fGBzG9PvA1s4ghPP0HkhmTlNzRksvG6bxE@vger.kernel.org, AJvYcCVwHrImk4qotmg7PIXkQaUMx4qyh1ULJnEPJ7Mixgs2UfVUATeZXkQDXk8YLYYfrnBqNXU8y+lpdR/4sw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1fAV3FwSB0uLhmYbVKuiikuykfZd9orNIKaTZ3pwXVUdfoiGa
+	URNrNSDDC+0TNfPGG53oCSjxo599CwFEnj5U5fKt6y/H4ApD2US516r3MJLO
+X-Gm-Gg: ASbGncsNgS0P1U8pwxFpNBuM5jazigdFeR2P7Rueo7nZaw2YwaDYjGH5Sbwz7KEjaRy
+	xSU6EA2eNkmVgPpslKhL1BQwEsWxwD9e+aeT7o2/Q2xcQ6xZ3GoP0UJ+bRHd+A59TcAjRj2Dq9K
+	FqARDUZZduN1WxCHngZ0ZmjTQnm7uG76Sz7Mg9Ha4ehZsWuSyWi5ZXK+8zTJs5ZnX7wrrshDYeq
+	PxVKtXI2P53QuG3dM1WefzVoCSrJ/TN47lbFUZMijYAA1BV3Z0a0MOJNTsYO+wJFIfU/XncBcD6
+	wTwanBeELANQojnNIvQwdNiF2OFPWCEEVTD21AFGIyATcEF+A713sDbxnuYpy2qFyKugWJvfogL
+	d/Cp73Aa5KOywMoGp/Oi4Yq0=
+X-Google-Smtp-Source: AGHT+IH5DqWr8tn3eyoLjnJaVFTvxrJy9DsLY+LkxxLU5h/ESvqg52ldyexR7aG8aD+QL/ZCJHTmfw==
+X-Received: by 2002:a05:6a00:1989:b0:746:24c9:c92e with SMTP id d2e1a72fcca58-7489cfdaf27mr15181815b3a.8.1750090878424;
+        Mon, 16 Jun 2025 09:21:18 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7488ffee55bsm6989549b3a.1.2025.06.16.09.21.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 09:21:54 -0700 (PDT)
-From: Robert Cross <quantumcross@gmail.com>
+        Mon, 16 Jun 2025 09:21:17 -0700 (PDT)
+From: Stanislav Fomichev <stfomichev@gmail.com>
 To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	skalluru@marvell.com,
+	manishc@marvell.com,
+	andrew+netdev@lunn.ch,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	sriharsha.basavapatna@broadcom.com,
+	somnath.kotur@broadcom.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	tariqt@nvidia.com,
+	saeedm@nvidia.com,
+	louis.peens@corigine.com,
+	shshaikh@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com,
+	ecree.xilinx@gmail.com,
+	horms@kernel.org,
+	dsahern@kernel.org,
+	shuah@kernel.org,
+	tglx@linutronix.de,
+	mingo@kernel.org,
+	ruanjinjie@huawei.com,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	petrm@nvidia.com,
+	kuniyu@google.com,
+	sdf@fomichev.me,
 	linux-kernel@vger.kernel.org,
-	Robert Cross <quantumcross@gmail.com>
-Subject: [PATCH v2] net: dsa: mv88e6xxx: fix external smi for mv88e6176
-Date: Mon, 16 Jun 2025 12:20:25 -0400
-Message-Id: <20250616162023.2795566-1-quantumcross@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	oss-drivers@corigine.com,
+	linux-net-drivers@amd.com,
+	linux-kselftest@vger.kernel.org,
+	leon@kernel.org
+Subject: [PATCH net-next v5 0/6] udp_tunnel: remove rtnl_lock dependency
+Date: Mon, 16 Jun 2025 09:21:11 -0700
+Message-ID: <20250616162117.287806-1-stfomichev@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,89 +123,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-(Sorry this is my second attempt, I fixed my email client)
+Recently bnxt had to grow back a bunch of rtnl dependencies because
+of udp_tunnel's infra. Add separate (global) mutext to protect
+udp_tunnel state.
 
-I was trying to enable external SMI on a mv88e6176.
-mv88e6390_g2_scratch_gpio_set_smi() would return -EBUSY when checking
-the scratch register Config DATA2 p0 mode to ensure that the external
-smi pins are free, but on my device, bit 4 of p0_mode was always 1,
-even if the port was completely disabled.
+v5:
+- remove unused variable (lkp@intel.com)
 
-Unless someone with the datasheet can prove me wrong, I believe that
-at least for the 6176, the mode mask here is 3 bits wide, and the
-fourth bit is irrelevant or reserved.
+v4:
+- grab lock in more places, specifically netlink and notifiers (Jakub)
+- convert geneve and vxlan notifiers to (sleepable) rtnl lock
 
-To fix this, I add a field in mv88e6xxx_info to denote a
-p0_mode_mask_override to use. If this is set to the default
-value of 0, then the definition of
-MV88E6352_G2_SCRATCH_CONFIG_DATA2_P0_MODE_MASK will be used as normal.
+v3:
+- fix 2 test failures (Jakub NIPA)
 
-I can confirm that this allows me to use external smi on my mv88e6176!
+v2:
+- move the lock into udp_tunnel_nic (Jakub)
+- reorder the lock ordering (Jakub)
+- move udp_ports_sleep removal into separate patch and update the test
+(Jakub)
 
-Fixes: 2510babcfaf0 ("net: dsa: mv88e6xxx: scratch registers and external MDIO pins")
-Signed-off-by: Robert Cross <quantumcross@gmail.com>
----
- drivers/net/dsa/mv88e6xxx/chip.c            | 1 +
- drivers/net/dsa/mv88e6xxx/chip.h            | 7 +++++++
- drivers/net/dsa/mv88e6xxx/global2_scratch.c | 7 ++++++-
- 3 files changed, 14 insertions(+), 1 deletion(-)
+Cc: Michael Chan <michael.chan@broadcom.com>
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 2281d6ab8c9ab..0fe7b6fc7016c 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -6013,6 +6013,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.multi_chip = true,
- 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
- 		.ops = &mv88e6176_ops,
-+		.p0_mode_mask_override = 0x7,
- 	},
- 
- 	[MV88E6185] = {
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index 7d00482f53a3b..6307c225ce94c 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -178,6 +178,13 @@ struct mv88e6xxx_info {
- 	 * port 0, 1 means internal PHYs range starts at port 1, etc
- 	 */
- 	unsigned int internal_phys_offset;
-+
-+	/* Some chips use 3 bits for the port mode in scratch
-+         * register CONFIG Data2.
-+         * If this is set to 0x0, it will use the default mask of
-+         * MV88E6352_G2_SCRATCH_CONFIG_DATA2_P0_MODE_MASK
-+         */
-+	u8 p0_mode_mask_override;
- };
- 
- struct mv88e6xxx_atu_entry {
-diff --git a/drivers/net/dsa/mv88e6xxx/global2_scratch.c b/drivers/net/dsa/mv88e6xxx/global2_scratch.c
-index 53a6d3ed63b32..7f1657eba7a4e 100644
---- a/drivers/net/dsa/mv88e6xxx/global2_scratch.c
-+++ b/drivers/net/dsa/mv88e6xxx/global2_scratch.c
-@@ -255,6 +255,7 @@ int mv88e6390_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
- 	int config_data1 = MV88E6352_G2_SCRATCH_CONFIG_DATA1;
- 	int config_data2 = MV88E6352_G2_SCRATCH_CONFIG_DATA2;
- 	bool no_cpu;
-+	u8 p0_mode_mask;
- 	u8 p0_mode;
- 	int err;
- 	u8 val;
-@@ -263,7 +264,11 @@ int mv88e6390_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
- 	if (err)
- 		return err;
- 
--	p0_mode = val & MV88E6352_G2_SCRATCH_CONFIG_DATA2_P0_MODE_MASK;
-+	p0_mode_mask = chip->info->p0_mode_mask_override;
-+	if( p0_mode_mask == 0x0) {
-+		p0_mode_mask = MV88E6352_G2_SCRATCH_CONFIG_DATA2_P0_MODE_MASK;
-+	}
-+	p0_mode = val & p0_mode_mask;
- 
- 	if (p0_mode == 0x01 || p0_mode == 0x02)
- 		return -EBUSY;
+Stanislav Fomichev (6):
+  geneve: rely on rtnl lock in geneve_offload_rx_ports
+  vxlan: drop sock_lock
+  udp_tunnel: remove rtnl_lock dependency
+  net: remove redundant ASSERT_RTNL() in queue setup functions
+  netdevsim: remove udp_ports_sleep
+  Revert "bnxt_en: bring back rtnl_lock() in the bnxt_open() path"
+
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  3 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 42 ++-------
+ drivers/net/ethernet/emulex/benet/be_main.c   |  3 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  1 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |  1 -
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  3 +-
+ .../ethernet/netronome/nfp/nfp_net_common.c   |  3 +-
+ .../net/ethernet/qlogic/qede/qede_filter.c    |  3 -
+ .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |  1 -
+ drivers/net/ethernet/sfc/ef10.c               |  1 -
+ drivers/net/geneve.c                          |  7 +-
+ drivers/net/netdevsim/netdevsim.h             |  2 -
+ drivers/net/netdevsim/udp_tunnels.c           | 12 ---
+ drivers/net/vxlan/vxlan_core.c                | 35 +++-----
+ drivers/net/vxlan/vxlan_private.h             |  2 +-
+ drivers/net/vxlan/vxlan_vnifilter.c           | 18 ++--
+ include/net/udp_tunnel.h                      | 87 ++++++++++++++-----
+ net/core/dev.c                                |  4 +-
+ net/ipv4/udp_tunnel_core.c                    | 16 ++--
+ net/ipv4/udp_tunnel_nic.c                     | 78 +++++++++++++----
+ .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 23 +----
+ 22 files changed, 176 insertions(+), 172 deletions(-)
+
 -- 
-2.39.5
+2.49.0
 
 
