@@ -1,176 +1,86 @@
-Return-Path: <netdev+bounces-198024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D59ADAD79
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:33:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67283ADAD7B
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:34:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A43757A13DA
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 10:32:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735543ABB5D
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 10:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA70298CDE;
-	Mon, 16 Jun 2025 10:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C397E298270;
+	Mon, 16 Jun 2025 10:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pBZvAe1J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HTQ7eFvY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D892229898A;
-	Mon, 16 Jun 2025 10:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2F127FD7C
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 10:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750069984; cv=none; b=nhfRGF3QIrc+bMuGAucXcTGLzPf/th1FJi3WcESIccEmwyVAYAFbfKIdBPN0IIUUBxPy5S44qse8NhOQK4oSIyMNLNHh4iZmj3ClftO8UjMnUVV7mRZFxrGePld1np5xtIo7YeUFCfmylx1Pa2jasyq+Yfu+uKDzhRlT5tG3pOM=
+	t=1750070012; cv=none; b=ld0aCvvxariPzk/axIjusRjVHj7vX0rNiNtxlew/OasyWFCJBkdjDhpR1Ws7GK/EQOzmWTOn2Z4oNL0r7WJp7B8ajeucHqXUfu33clRLVSwwwpV1jLCzNBIO9a7snm7UJ8+Ygc73eqwMi3bQUU7brLkflX+1AgUaIvVOrcJ1lW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750069984; c=relaxed/simple;
-	bh=evebD+70FLqdj7CqaCuFWQrCrqnpoUVPYITOothIMUo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TpW5eIoe2b9Zaf+U5NUlDGAfw9g4laj5kB1uQx686la89hkITCQpfmWfgripBN3IJU9PtUM6iO3oDt3OlBD6A9wRouy3AyPPUQVI8/zRggEYARFN2/Q47a6vy30hJnWkvy6lpoj0Qh4PfG58qeUpgGmSOvYfLv5V8pKCM/1gLes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pBZvAe1J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65DF7C4CEF1;
-	Mon, 16 Jun 2025 10:32:56 +0000 (UTC)
+	s=arc-20240116; t=1750070012; c=relaxed/simple;
+	bh=3ebRY26H1XYhLWH6tzAmlkRLTE0gf74bhstF6wlp81g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iydCZ0k6LefC8sd6KjAVlCUEdrraVogpD1JTNpfTzIJqRfsaZfEhGuHQQL3zbGbGRL7VivxxqRbPoyXSr5EC3aWhUgkJs4DN4ycYntmWnTbctIJfNZ+DCCrbE2r3ZNUja7p5Wrc9auhAmiJZGbZ684VikrZzmFxsrDS4JIvLAZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HTQ7eFvY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87D77C4CEEF;
+	Mon, 16 Jun 2025 10:33:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750069983;
-	bh=evebD+70FLqdj7CqaCuFWQrCrqnpoUVPYITOothIMUo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pBZvAe1JwqIjZIXUCdnEdbNESOcXJYUVo2Dh+TNhazCeEjkhj7MFrAdVctShgprte
-	 COR7DxjuTGHlMU6e0PCqLAlBlCDn11H1Xzc2gIOxLn+BN+GciwEiwMFcR85T/4Zl4D
-	 rLN3a6gBFPEa+j4ShJ321w+jfUoifuabcAFvtZgS9lLIwZhmveSIBlN7+8A5LeGraM
-	 EGS3XA9KSkSlxBXANUQM+oEoehvRT+eM59R4d+Gf3A07IIIuhCWEAEC8z6kePziEe7
-	 s2ioqxbBGouAmk+DTSRGKjPbesuMwIGuPIq/kwakiks5PuLqINnE8EjtFS+rkJU6qG
-	 CUyeGEB9erfcA==
-Message-ID: <5a4a9d58-d0c1-40f4-b18b-8b1a3dee55c2@kernel.org>
-Date: Mon, 16 Jun 2025 12:32:54 +0200
+	s=k20201202; t=1750070012;
+	bh=3ebRY26H1XYhLWH6tzAmlkRLTE0gf74bhstF6wlp81g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HTQ7eFvYlai6Fm7Plh3CUF5fdZQH42OhfVLxDXVvk4LYOABsm1o5J5efydBcdWkma
+	 T0oQSqelEUILokmDUZOFyywp+a7DPOH7BDNXrrU1SoIVTM6U9OA5dBKWruSW7DO+cm
+	 pe3yppISTO+1JgxB8ESDPQ2hQHVY5RPDGBLmlRirqY5EtcK4VVVXY5yufqg+V6YiD8
+	 8WfI9PBLa2DlTy0sJudiE2b2B/K5tfbAqovqsLoIEyLfI5QXVcFZ7NYqHzAWB885KU
+	 E1ayNCmavwIzwZM80yi3GYVBY6wZh04ZnM0gMsZGR95wdCbo2UHms3tTqEAtGXW0+u
+	 jI3PRM/eaFxFQ==
+Date: Mon, 16 Jun 2025 13:33:27 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	hkallweit1@gmail.com, davem@davemloft.net, pabeni@redhat.com,
+	kuba@kernel.org, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [net-next PATCH 0/6] Add support for 25G, 50G, and 100G to fbnic
+Message-ID: <20250616103327.GC750234@unreal>
+References: <174956639588.2686723.10994827055234129182.stgit@ahduyck-xeon-server.home.arpa>
+ <20250612094234.GA436744@unreal>
+ <daa8bb61-5b6c-49ab-8961-dc17ef2829bf@lunn.ch>
+ <20250612173145.GB436744@unreal>
+ <52be06d0-ad45-4e8c-9893-628ba8cebccb@lunn.ch>
+ <20250613160024.GC436744@unreal>
+ <aEyprg21XsgmJoOR@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/9] arm64: dts: imx93: move i.MX93 specific part from
- imx91_93_common.dtsi to imx93.dtsi
-To: Joy Zou <joy.zou@nxp.com>, "robh@kernel.org" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "shawnguo@kernel.org" <shawnguo@kernel.org>,
- "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "mcoquelin.stm32@gmail.com"
- <mcoquelin.stm32@gmail.com>,
- "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
- "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- "kernel@pengutronix.de" <kernel@pengutronix.de>,
- "festevam@gmail.com" <festevam@gmail.com>
-Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
- Frank Li <frank.li@nxp.com>, Ye Li <ye.li@nxp.com>,
- Jacky Bai <ping.bai@nxp.com>, Peng Fan <peng.fan@nxp.com>,
- Aisheng Dong <aisheng.dong@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>
-References: <20250613100255.2131800-1-joy.zou@nxp.com>
- <20250613100255.2131800-5-joy.zou@nxp.com>
- <27ca7dfa-9dee-43f5-9e97-78de5e964f6e@kernel.org>
- <AS4PR04MB9386F7BB0586AD1ADEB35237E170A@AS4PR04MB9386.eurprd04.prod.outlook.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <AS4PR04MB9386F7BB0586AD1ADEB35237E170A@AS4PR04MB9386.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aEyprg21XsgmJoOR@shell.armlinux.org.uk>
 
-On 16/06/2025 09:42, Joy Zou wrote:
+On Fri, Jun 13, 2025 at 11:43:58PM +0100, Russell King (Oracle) wrote:
+> On Fri, Jun 13, 2025 at 07:00:24PM +0300, Leon Romanovsky wrote:
+> > Excellent, like you said, no one needs this code except fbnic, which is
+> > exactly as was agreed - no core in/out API changes special for fbnic.
 > 
->> -----Original Message-----
->> From: Krzysztof Kozlowski <krzk@kernel.org>
->> Sent: 2025年6月13日 18:44
->> To: Joy Zou <joy.zou@nxp.com>; robh@kernel.org; krzk+dt@kernel.org;
->> conor+dt@kernel.org; shawnguo@kernel.org; s.hauer@pengutronix.de;
->> catalin.marinas@arm.com; will@kernel.org; andrew+netdev@lunn.ch;
->> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
->> pabeni@redhat.com; mcoquelin.stm32@gmail.com;
->> alexandre.torgue@foss.st.com; ulf.hansson@linaro.org;
->> richardcochran@gmail.com; kernel@pengutronix.de; festevam@gmail.com
->> Cc: devicetree@vger.kernel.org; linux-kernel@vger.kernel.org;
->> imx@lists.linux.dev; linux-arm-kernel@lists.infradead.org;
->> netdev@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com;
->> linux-pm@vger.kernel.org; Frank Li <frank.li@nxp.com>; Ye Li <ye.li@nxp.com>;
->> Jacky Bai <ping.bai@nxp.com>; Peng Fan <peng.fan@nxp.com>; Aisheng Dong
->> <aisheng.dong@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>
->> Subject: Re: [PATCH v5 4/9] arm64: dts: imx93: move i.MX93 specific
->> part from imx91_93_common.dtsi to imx93.dtsi
->>
->> On 13/06/2025 12:02, Joy Zou wrote:
->>> Move i.MX93 specific part from imx91_93_common.dtsi to imx93.dtsi.
->>
->> You just moved them to the common file. Why are you moving the same line
->> again?
-> Thanks for your comments!
-> These are the differences for the convenience of review.
+> Rather than getting all religious about this, I'd prefer to ask a
+> different question.
+> 
+> Is it useful to add 50GBASER, LAUI and 100GBASEP PHY interface modes,
+> and would anyone else use them? That's the real question here, and
+> *not* whomever is submitting the patches or who is the first user.
 
-So you just keep changing same lines for a review? No. It makes
-everything difficult to review.
+Right now, the answer is no. There are no available devices in the
+market which implement it.
 
-Organize your patches in logical chunks, as requested by submitting patches.
-
-
-
-Best regards,
-Krzysztof
+Thanks
 
