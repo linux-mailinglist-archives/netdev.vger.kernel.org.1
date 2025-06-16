@@ -1,482 +1,256 @@
-Return-Path: <netdev+bounces-197935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-197936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A2BFADA6A5
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 05:05:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33851ADA6BE
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 05:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 794C83A410B
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 03:04:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42C143A2FF0
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 03:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E3A28E594;
-	Mon, 16 Jun 2025 03:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B722986329;
+	Mon, 16 Jun 2025 03:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUoAy+1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC882AD00;
-	Mon, 16 Jun 2025 03:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C878F45
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 03:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750043104; cv=none; b=b8KDaIV+3RCQQUZP2bOvpnxSAORtoNEfuWdq67Vr1NQalj7vDlRNcgdwVgJSnbe5fgVM7jCi9+v65y1FPBditUegHmW1k/F9cHHCgHIWsd5WOa637lZF4Tmq+eBiPnCfjRSQ3JyUGfMJr0OzKPvmYdMn1IS132WQ2blDsKstv3s=
+	t=1750043878; cv=none; b=TRxTcACYwESZRJxLXNvQhCix9YnWvDrDK0WH9nIb6IdBHN9S6/r7vT8MrkC1gDFs7EL0opAWISlrrpDKLW/weRGI6fSnbjlFPz4mfyc9rxi7nGxJ26hMSWNKlaBRLH135RjLTz0AdLnSmMXTM3c8FAAqgM3K2L6VtfLRBC+2jg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750043104; c=relaxed/simple;
-	bh=QtT/c1m1WQn/tRePHxP4aSrTjgxlsffKC1b2lD0/iLI=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=anCw1bXZ5c+7yTzEyKL/jUx9ll3sJZXlX25sDjAAzpKs7hP4j9SmgHuMbSK0YJIHmRt2KL41mh6E1gO/QZmGUaRYWj6qHylPnjdUOVWou3TWElCuPMXIj08j+epE4G8HRJYkYkSQKNG488Ym+xSehrdixm1Xxj9QOsy7Hkvvet0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.33.113] (unknown [210.73.43.2])
-	by APP-01 (Coremail) with SMTP id qwCowACH+9nEiU9orVzWBg--.22797S2;
-	Mon, 16 Jun 2025 11:04:37 +0800 (CST)
-Message-ID: <c60e9579-c261-41e3-ad5a-f96ce6d76820@iscas.ac.cn>
-Date: Mon, 16 Jun 2025 11:04:36 +0800
+	s=arc-20240116; t=1750043878; c=relaxed/simple;
+	bh=bcO49NRSg6tayxVkmPp6mFUy0319Yj6GtYa/L4MfNo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EW70woT75F3VStkChg3AE7DhLWkuU6UkgL4Iwpcq1Ejdj8e+ymTxb69qP3lBfbXQegnkxRlCy+vdwhO1CnxEjb9DyvBpJIkaQdIfN+NSwxK1iiWGRAH8fcSVYAko0PsNEyC0JUNfT64e/nhZ8fiH7G6SsasebgVKuwlTfuBBfT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fUoAy+1n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750043875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QPNoVJ8bO6WJupVjhGNwIWzjAtlK/86/qpWF1MKm7pU=;
+	b=fUoAy+1nwIot63etluApWbyDXvkxpwOP1GwZqkSNkb7hDtltiJS6QR3cCYfxVtMRi2X1LO
+	JZRsvjjimIE8G9zf0eSLgYPFaiT8AoYbpADECNee80ee93tT/R37DZzK+/O6B+8B9RWoyk
+	mJp757dtrTn6VfrUOsJDpWIregbvtIg=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-eI8bffH7OvSzDIeG9gdSsg-1; Sun, 15 Jun 2025 23:17:53 -0400
+X-MC-Unique: eI8bffH7OvSzDIeG9gdSsg-1
+X-Mimecast-MFC-AGG-ID: eI8bffH7OvSzDIeG9gdSsg_1750043873
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b2eb60594e8so2484966a12.1
+        for <netdev@vger.kernel.org>; Sun, 15 Jun 2025 20:17:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750043873; x=1750648673;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QPNoVJ8bO6WJupVjhGNwIWzjAtlK/86/qpWF1MKm7pU=;
+        b=quXnHC6S3s0ouDRaWkxz77uqRZOpOaPyvFVjRxFUJNHKmkGGXy8BhuDjVnkwSW2vNb
+         AoGwy37QVMovYRZ6gq+ZwisR+pFjB8G8Okb6myP99XMW1peeVHcsN3pKnwgf4DjWM7rw
+         0Glh2t1+db5q0i6temXVo3FqpnSGbxRuiUqQZZUILC0E4NdCTTVaYHGvIGNvidgcXux9
+         L3Iar/a2UImRSLeceALEgWdIhgTd7baE8sKg3mvSPK9BOcY0NKhGFxcgiEkXBH0iv1Ro
+         S+D8oVCtt+nXeXvyk6GwzjGu9eXJS9tGPTHsBjfWgckbXfUlXg/92KMslIZZsT+xwPnE
+         xt/w==
+X-Gm-Message-State: AOJu0YxAsk9jVheAGmqx0uL8+P/mFZzwP6Li0ebwG+XtCTxEBpQCYvLW
+	dwpl/iooyE6byHEhZ/fItbE0AetezhoyCGL51THHJ/r+41Ad+KjI6eJJF3oRtaqieNwWmVIvBzd
+	c/h2h+zuFspJYV/dWDYv9+5ZHUXgIU/strMC1EBQWLIleF/Hh83YlxOTwNh5w0KqgsVO7731DUO
+	bKOhHVA4htmLAYsAwfvYmPheMGWTS73LLo
+X-Gm-Gg: ASbGncveBPzbX5jv5lvPzeF7sBc7WTDum3/gdqbk/PYQlyzJLq224uxmVn7AL+4Y+vb
+	MfOpf01VTDOtQuYkldpeXuLeSEF6Bi7IHNDLgHPQlZiFkPjIBm7oITHwu0yBAHeqcsvVVmbPWnP
+	FMng==
+X-Received: by 2002:a05:6a21:689:b0:21a:b9d4:ad73 with SMTP id adf61e73a8af0-21fbd8003damr12523901637.40.1750043872783;
+        Sun, 15 Jun 2025 20:17:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHtA26azy+rcHKI0Qtl5DW8Roq6gyXWaJIx1jz/wEUb7xn8qIhk0BwSmqVYLqwifxsZKQpYRC0oi9MG6GqtkYg=
+X-Received: by 2002:a05:6a21:689:b0:21a:b9d4:ad73 with SMTP id
+ adf61e73a8af0-21fbd8003damr12523861637.40.1750043872355; Sun, 15 Jun 2025
+ 20:17:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Subject: Re: [PATCH net-next 2/4] net: spacemit: Add K1 Ethernet MAC
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Russell King
- <linux@armlinux.org.uk>, Vivian Wang <uwu@dram.page>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn>
- <20250613-net-k1-emac-v1-2-cc6f9e510667@iscas.ac.cn>
- <7dfcfb04-8a7f-4884-9c91-413a6fb2a56b@lunn.ch>
-Content-Language: en-US
-In-Reply-To: <7dfcfb04-8a7f-4884-9c91-413a6fb2a56b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qwCowACH+9nEiU9orVzWBg--.22797S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3tr48Gw1DJw45ur4xKr4kWFg_yoWkXFW3pa
-	yDJFZ5GF17ZFy7Wr4qqr4DXr1Ivrn5tF4Ika4Yyan8Xr9Ikr1fCryrKrW2k3s3Cr909F45
-	uw1UZFsrWF4DKrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9mb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4
-	vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
-	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JV
-	WxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkI
-	wI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67AK6r48MxAIw28IcxkI7VAKI48JMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IY
-	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
-	0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07bfzV8UUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+References: <cover.1749210083.git.pabeni@redhat.com> <fa6c0bbe268dfdd6981741580efc084d101c1e7d.1749210083.git.pabeni@redhat.com>
+ <CACGkMEsBsX-3ztNkQTH+J_32LcFaMwv-pOpTX0rXdLMmCj+JAA@mail.gmail.com> <e0e6139b-8afd-45ea-8396-b872245d398c@redhat.com>
+In-Reply-To: <e0e6139b-8afd-45ea-8396-b872245d398c@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 16 Jun 2025 11:17:41 +0800
+X-Gm-Features: AX0GCFuT8DpWw_WIYKxQkTkmyaah4Mqvan6saWvQOeaRYRw4Rdd5G0IVX0S1jlM
+Message-ID: <CACGkMEvQ0XKR8P_XVt=GU8n=_0_ugVDw1bmm-xqAJsKfDZ-3xw@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 5/8] net: implement virtio helpers to handle UDP
+ GSO tunneling.
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Thu, Jun 12, 2025 at 6:10=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 6/12/25 5:53 AM, Jason Wang wrote:
+> > On Fri, Jun 6, 2025 at 7:46=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >> +static inline int virtio_net_hdr_tnl_from_skb(const struct sk_buff *s=
+kb,
+> >> +                                             struct virtio_net_hdr *h=
+dr,
+> >> +                                             unsigned int tnl_offset,
+> >> +                                             bool little_endian,
+> >> +                                             int vlan_hlen)
+> >> +{
+> >> +       struct virtio_net_hdr_tunnel *tnl;
+> >> +       unsigned int inner_nh, outer_th;
+> >> +       int tnl_gso_type;
+> >> +       int ret;
+> >> +
+> >> +       tnl_gso_type =3D skb_shinfo(skb)->gso_type & (SKB_GSO_UDP_TUNN=
+EL |
+> >> +
+> SKB_GSO_UDP_TUNNEL_CSUM);
+> >> +       if (!tnl_gso_type)
+> >> +               return virtio_net_hdr_from_skb(skb, hdr,
+> little_endian, false,
+> >> +                                              vlan_hlen);
+> >
+> > So tun_vnet_hdr_from_skb() has
+> >
+> >         int vlan_hlen =3D skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
+> >         int tnl_offset =3D tun_vnet_tnl_offset(flags);
+> >
+> >         if (virtio_net_hdr_tnl_from_skb(skb, hdr, tnl_offset,
+> >                                         tun_vnet_is_little_endian(flags=
+),
+> >                                         vlan_hlen)) {
+> >
+> >
+> > It looks like the outer vlan_hlen is used for the inner here?
+> vlan_hlen always refers to the outer vlan tag (if present), as it moves
+> the (inner) transport csum offset accordingly.
+>
+> I can a comment to clarify the parsing.
+>
+> Note that in the above call there is a single set of headers (no
+> encapsulation) so the vlan_hlen should be unambigous.
 
-Thanks for your review and suggestions.
+I see.
 
-On 6/13/25 22:32, Andrew Lunn wrote:
->> +static inline void emac_wr(struct emac_priv *priv, u32 reg, u32 val)
->> +{
->> +	writel(val, priv->iobase + reg);
->> +}
->> +
->> +static inline int emac_rd(struct emac_priv *priv, u32 reg)
->> +{
->> +	return readl(priv->iobase + reg);
->> +}
-> I only took a very quick look at the code. I'm sure there are more
-> issues....
+> >> +
+> >> +       /* Tunnel support not negotiated but skb ask for it. */
+> >> +       if (!tnl_offset)
+> >> +               return -EINVAL;
+> >> +
+> >> +       /* Let the basic parsing deal with plain GSO features. */
+> >> +       skb_shinfo(skb)->gso_type &=3D ~tnl_gso_type;
+> >> +       ret =3D virtio_net_hdr_from_skb(skb, hdr, true, false, vlan_hl=
+en);
 >
-> Please do not user inline functions in a .c file. Let the compiler
-> decide.
-I will remove "inline" in next version.
->> +static void emac_alloc_rx_desc_buffers(struct emac_priv *priv);
->> +static int emac_phy_connect(struct net_device *dev);
->> +static void emac_tx_timeout_task(struct work_struct *work);
-> No forward declarations. Move the code around so they are not needed.
-I will reorganize in next version.
->> +static int emac_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
->> +{
->> +	int ret = -EOPNOTSUPP;
->> +
->> +	if (!netif_running(ndev))
->> +		return -EINVAL;
->> +
->> +	switch (cmd) {
->> +	case SIOCGMIIPHY:
->> +	case SIOCGMIIREG:
->> +	case SIOCSMIIREG:
-> There is no need to test for these values. Just call phy_mii_ioctl()
-> and it will only act on IOCTLs it knows.
-I will simplify in next version.
->> +		if (!ndev->phydev)
->> +			return -EINVAL;
->> +		ret = phy_mii_ioctl(ndev->phydev, rq, cmd);
->> +		break;
->> +	default:
->> +		break;
->> +	}
->> +
->> +	return ret;
->> +}
->> +static int emac_up(struct emac_priv *priv)
->> +{
->> +	struct platform_device *pdev = priv->pdev;
->> +	struct net_device *ndev = priv->ndev;
->> +	int ret;
->> +
->> +#ifdef CONFIG_PM_SLEEP
->> +	pm_runtime_get_sync(&pdev->dev);
->> +#endif
-> You don't need this #ifdef, there is a stub function is PM_SLEEP is
-> not enabled.
-I will remove "#ifdef" in next version.
->> +
->> +	ret = emac_phy_connect(ndev);
->> +	if (ret) {
->> +		dev_err(&pdev->dev, "emac_phy_connect failed\n");
->> +		goto err;
->> +	}
->> +
->> +	emac_init_hw(priv);
->> +
->> +	emac_set_mac_addr(priv, ndev->dev_addr);
->> +	emac_configure_tx(priv);
->> +	emac_configure_rx(priv);
->> +
->> +	emac_alloc_rx_desc_buffers(priv);
->> +
->> +	if (ndev->phydev)
->> +		phy_start(ndev->phydev);
-> Is it possible to not have a PHY? emac_phy_connect() seems to return
-> an error if it cannot find one.
+> Here I'll add:
 >
-I will remove unnecessary if (ndev->phydev) checks in next version.
->> +static int emac_down(struct emac_priv *priv)
->> +{
->> +	struct platform_device *pdev = priv->pdev;
->> +	struct net_device *ndev = priv->ndev;
->> +
->> +	netif_stop_queue(ndev);
->> +
->> +	if (ndev->phydev) {
->> +		phy_stop(ndev->phydev);
->> +		phy_disconnect(ndev->phydev);
->> +	}
->> +
->> +	priv->link = false;
->> +	priv->duplex = DUPLEX_UNKNOWN;
->> +	priv->speed = SPEED_UNKNOWN;
->> +
->> +	emac_wr(priv, MAC_INTERRUPT_ENABLE, 0x0);
->> +	emac_wr(priv, DMA_INTERRUPT_ENABLE, 0x0);
->> +
->> +	free_irq(priv->irq, ndev);
->> +
->> +	napi_disable(&priv->napi);
->> +
->> +	emac_reset_hw(priv);
->> +	netif_carrier_off(ndev);
-> phylib will of done this when phy_stop() is called. Let phylib manage
-> the carrier. The only thing you probably need is netif_carrier_off()
-> in probe().
-I will remove netif_carrier_off here and add to probe.
->> +static int emac_change_mtu(struct net_device *ndev, int mtu)
->> +{
->> +	struct emac_priv *priv = netdev_priv(ndev);
->> +	u32 frame_len;
->> +
->> +	if (netif_running(ndev)) {
->> +		netdev_err(ndev, "must be stopped to change MTU\n");
->> +		return -EBUSY;
->> +	}
->> +
->> +	frame_len = mtu + ETHERNET_HEADER_SIZE + ETHERNET_FCS_SIZE;
->> +
->> +	if (frame_len < MINIMUM_ETHERNET_FRAME_SIZE ||
->> +	    frame_len > EMAC_RX_BUF_4K) {
->> +		netdev_err(ndev, "Invalid MTU setting\n");
->> +		return -EINVAL;
->> +	}
-> If you set ndev->mtu_max and ndev->mtu_min, the core will check this
-> for you.
->
-I will remove this check and use mtu_{min,max} instead.
->> +static void emac_reset(struct emac_priv *priv)
->> +{
->> +	if (!test_and_clear_bit(EMAC_RESET_REQUESTED, &priv->state))
->> +		return;
->> +	if (test_bit(EMAC_DOWN, &priv->state))
->> +		return;
->> +
->> +	netdev_err(priv->ndev, "Reset controller\n");
->> +
->> +	rtnl_lock();
->> +	netif_trans_update(priv->ndev);
->> +	while (test_and_set_bit(EMAC_RESETING, &priv->state))
->> +		usleep_range(1000, 2000);
-> Don't do endless loops waiting for the hardware. It may never
-> happen. Please use something from iopoll.h
-It seems that I had misunderstood the original code here. I will
-simplify the logic here in next version.
->> +static int emac_mii_read(struct mii_bus *bus, int phy_addr, int regnum)
->> +{
->> +	struct emac_priv *priv = bus->priv;
->> +	u32 cmd = 0;
->> +	u32 val;
->> +
->> +	cmd |= phy_addr & 0x1F;
->> +	cmd |= (regnum & 0x1F) << 5;
->> +	cmd |= MREGBIT_START_MDIO_TRANS | MREGBIT_MDIO_READ_WRITE;
->> +
->> +	emac_wr(priv, MAC_MDIO_DATA, 0x0);
->> +	emac_wr(priv, MAC_MDIO_CONTROL, cmd);
->> +
->> +	if (readl_poll_timeout(priv->iobase + MAC_MDIO_CONTROL, val,
->> +			       !((val >> 15) & 0x1), 100, 10000))
->> +		return -EBUSY;
-> readl_poll_timeout() returns an error code. Don't replace it.
-I will fix it next version.
->> +static void emac_adjust_link(struct net_device *dev)
->> +{
->> +	struct emac_priv *priv = netdev_priv(dev);
->> +	struct phy_device *phydev = dev->phydev;
->> +	bool link_changed = false;
->> +	u32 ctrl;
->> +
->> +	if (!phydev)
->> +		return;
-> How does that happen?
->
->> +	if (phydev->link) {
->> +		ctrl = emac_rd(priv, MAC_GLOBAL_CONTROL);
->> +
->> +		/* Update duplex and speed from PHY */
->> +
->> +		if (phydev->duplex != priv->duplex) {
->> +			link_changed = true;
->> +
->> +			if (!phydev->duplex)
->> +				ctrl &= ~MREGBIT_FULL_DUPLEX_MODE;
->> +			else
->> +				ctrl |= MREGBIT_FULL_DUPLEX_MODE;
->> +			priv->duplex = phydev->duplex;
->> +		}
->> +
->> +		if (phydev->speed != priv->speed) {
->> +			link_changed = true;
->> +
->> +			ctrl &= ~MREGBIT_SPEED;
->> +
->> +			switch (phydev->speed) {
->> +			case SPEED_1000:
->> +				ctrl |= MREGBIT_SPEED_1000M;
->> +				break;
->> +			case SPEED_100:
->> +				ctrl |= MREGBIT_SPEED_100M;
->> +				break;
->> +			case SPEED_10:
->> +				ctrl |= MREGBIT_SPEED_10M;
->> +				break;
->> +			default:
->> +				netdev_err(dev, "Unknown speed: %d\n",
->> +					   phydev->speed);
->> +				phydev->speed = SPEED_UNKNOWN;
->> +				break;
->> +			}
->> +
->> +			if (phydev->speed != SPEED_UNKNOWN)
->> +				priv->speed = phydev->speed;
->> +		}
->> +
->> +		emac_wr(priv, MAC_GLOBAL_CONTROL, ctrl);
->> +
->> +		if (!priv->link) {
->> +			priv->link = true;
->> +			link_changed = true;
->> +		}
->> +	} else if (priv->link) {
->> +		priv->link = false;
->> +		link_changed = true;
->> +		priv->duplex = DUPLEX_UNKNOWN;
->> +		priv->speed = SPEED_UNKNOWN;
->> +	}
->> +
->> +	if (link_changed)
->> +		phy_print_status(phydev);
-> Can this ever be false?
->
-I will remove these checks in next version.
->> +static int emac_phy_connect(struct net_device *ndev)
->> +{
->> +	struct emac_priv *priv = netdev_priv(ndev);
->> +	struct device *dev = &priv->pdev->dev;
->> +	struct phy_device *phydev;
->> +	struct device_node *np;
->> +	int ret;
->> +
->> +	ret = of_get_phy_mode(dev->of_node, &priv->phy_interface);
->> +	if (ret) {
->> +		dev_err(dev, "No phy-mode found");
->> +		return ret;
->> +	}
->> +
->> +	np = of_parse_phandle(dev->of_node, "phy-handle", 0);
->> +	if (!np && of_phy_is_fixed_link(dev->of_node))
->> +		np = of_node_get(dev->of_node);
->> +	if (!np) {
->> +		dev_err(dev, "No PHY specified");
->> +		return -ENODEV;
->> +	}
->> +
->> +	ret = emac_phy_interface_config(priv);
->> +	if (ret)
->> +		goto err_node_put;
->> +
->> +	phydev = of_phy_connect(ndev, np, &emac_adjust_link, 0,
->> +				priv->phy_interface);
->> +	if (IS_ERR_OR_NULL(phydev)) {
->> +		dev_err(dev, "Could not attach to PHY\n");
->> +		ret = phydev ? PTR_ERR(phydev) : -ENODEV;
->> +		goto err_node_put;
->> +	}
->> +
->> +	dev_info(dev, "%s: attached to PHY (UID 0x%x) Link = %d\n", ndev->name,
->> +		 phydev->phy_id, phydev->link);
-> Don't spam the log. Only output something if something unexpected
-> happens, an error etc.
-I will remove this in next version.
->> +static int emac_mdio_init(struct emac_priv *priv)
->> +{
->> +	struct device *dev = &priv->pdev->dev;
->> +	struct device_node *mii_np;
->> +	struct mii_bus *mii;
->> +	int ret;
->> +
->> +	mii_np = of_get_child_by_name(dev->of_node, "mdio-bus");
->> +	if (!mii_np) {
->> +		if (of_phy_is_fixed_link(dev->of_node)) {
->> +			if ((of_phy_register_fixed_link(dev->of_node) < 0))
->> +				return -ENODEV;
->> +
->> +			return 0;
->> +		}
->> +
->> +		dev_err(dev, "no %s child node found", "mdio-bus");
-> Why is that an error?
-I will remove this in the next version.
->> +		return -ENODEV;
->> +	}
->> +
->> +	if (!of_device_is_available(mii_np)) {
->> +		ret = -ENODEV;
->> +		goto err_put_node;
->> +	}
->> +
->> +	mii = devm_mdiobus_alloc(dev);
->> +	priv->mii = mii;
->> +
->> +	if (!mii) {
->> +		ret = -ENOMEM;
->> +		goto err_put_node;
->> +	}
->> +	mii->priv = priv;
->> +	mii->name = "emac mii";
->> +	mii->read = emac_mii_read;
->> +	mii->write = emac_mii_write;
->> +	mii->parent = dev;
->> +	mii->phy_mask = 0xffffffff;
->> +	snprintf(mii->id, MII_BUS_ID_SIZE, "%s", priv->pdev->name);
->> +
->> +	ret = devm_of_mdiobus_register(dev, mii, mii_np);
->> +	if (ret) {
->> +		dev_err_probe(dev, ret, "Failed to register mdio bus.\n");
->> +		goto err_put_node;
->> +	}
->> +
->> +	priv->phy = phy_find_first(mii);
->> +	if (!priv->phy) {
->> +		dev_err(dev, "no PHY found\n");
->> +		ret = -ENODEV;
-> Please don't use phy_find_first(). Use phy-handle to point to the phy.
->
-I will remove this next version.
->> +static void emac_ethtool_get_regs(struct net_device *dev,
->> +				  struct ethtool_regs *regs, void *space)
->> +{
->> +	struct emac_priv *priv = netdev_priv(dev);
->> +	u32 *reg_space = space;
->> +	int i;
->> +
->> +	regs->version = 1;
->> +
->> +	memset(reg_space, 0x0, EMAC_REG_SPACE_SIZE);
-> Is that needed?
-I will remove in next version.
->> +static int emac_get_link_ksettings(struct net_device *ndev,
->> +				   struct ethtool_link_ksettings *cmd)
->> +{
->> +	if (!ndev->phydev)
->> +		return -ENODEV;
->> +
->> +	phy_ethtool_ksettings_get(ndev->phydev, cmd);
-> phy_ethtool_get_link_ksettings().
-I will use phy_ethtool_{get,set}_link_ksettings in next version.
->> +	if (priv->tx_delay > EMAC_MAX_DELAY_PS) {
->> +		dev_err(&pdev->dev, "tx-internal-delay-ps delay too large, clamped");
-> Please return -EINVAL;
->
->> +		priv->tx_delay = EMAC_MAX_DELAY_PS;
->> +	}
->> +
->> +	if (priv->rx_delay > EMAC_MAX_DELAY_PS) {
->> +		dev_err(&pdev->dev, "rx-internal-delay-ps delay too large, clamped");
-> and here. The device tree is broken, and we want the developer to
-> notice and fix it. The easiest way to do that is to refuse to load the
-> driver.
->
->> +		priv->rx_delay = EMAC_MAX_DELAY_PS;
->> +	}
->> +
->> +	if (priv->tx_delay || priv->rx_delay) {
-> Why the if () ?
->
->> +		priv->tx_delay = delay_ps_to_unit(priv->tx_delay);
->> +		priv->rx_delay = delay_ps_to_unit(priv->rx_delay);
->> +
->> +		/* Show rounded result here for convenience */
->> +		dev_info(&pdev->dev,
->> +			 "MAC internal delay: TX: %u ps, RX: %u ps",
->> +			 delay_unit_to_ps(priv->tx_delay),
->> +			 delay_unit_to_ps(priv->rx_delay));
-> Please don't. 
-I will simplify the checking logic and remove the print in next version.
->> +static void emac_shutdown(struct platform_device *pdev)
->> +{
->> +}
+>         Here vlan_hlen refers to the outer headers set, but still affect
+>         the inner transport header offset.
 
-I will get rid of it in next version.
+Thanks, then I want to know if we need to care about the inner vlan or
+it is something that is not supported by the kernel right now.
 
-Thanks again for the review.
-
-Regards,
-Vivian "dramforever" Wang
-
-> Since it is empty, is it needed?
 >
-> 	Andrew
+> >> @@ -181,6 +208,22 @@ struct virtio_net_hdr_v1_hash {
+> >>         __le16 padding;
+> >>  };
+> >>
+> >> +/* This header after hashing information */
+> >> +struct virtio_net_hdr_tunnel {
+> >> +       __le16 outer_th_offset;
+> >> +       __le16 inner_nh_offset;
+> >> +};
+> >> +
+> >> +struct virtio_net_hdr_v1_tunnel {
+> >> +       struct virtio_net_hdr_v1 hdr;
+> >> +       struct virtio_net_hdr_tunnel tnl;
+> >> +};
+> >> +
+> >> +struct virtio_net_hdr_v1_hash_tunnel {
+> >> +       struct virtio_net_hdr_v1_hash hdr;
+> >> +       struct virtio_net_hdr_tunnel tnl;
+> >> +};
+> >
+> > Not a native speaker but I realize there's probably an issue:
+> >
+> >         le32 hash_value;        (Only if VIRTIO_NET_F_HASH_REPORT
+> negotiated)
+> >         le16 hash_report;       (Only if VIRTIO_NET_F_HASH_REPORT
+> negotiated)
+> >         le16 padding_reserved;  (Only if VIRTIO_NET_F_HASH_REPORT
+> negotiated)
+> >         le16 outer_th_offset    (Only if
+> > VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO or VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO
+> > negotiated)
+> >         le16 inner_nh_offset;   (Only if
+> > VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO or VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO
+> > negotiated)
+> >         le16 outer_nh_offset;   /* Only if VIRTIO_NET_F_OUT_NET_HEADER
+> > negotiated */
+> >         /* Only if VIRTIO_NET_F_OUT_NET_HEADER or VIRTIO_NET_F_IPSEC
+> > negotiated */
+> >         union {
+> >                 u8 padding_reserved_2[6];
+> >                 struct ipsec_resource_hdr {
+> >                         le32 resource_id;
+> >                         le16 resource_type;
+> >                 } ipsec_resource_hdr;
+> >         };
+> >
+> > I thought e.g outer_th_offset should have a fixed offset then
+> > everything is simplified but it looks not the case here. If we decide
+> > to do things like this, we will end up with a very huge uAPI
+> > definition for different features combinations. This doesn't follow
+> > the existing headers for example num_buffers exist no matter if
+> > MRG_RXBUF is negotiated.>> At least, if we decide to go with the
+> dynamic offset, it seems less
+> > valuable to define those headers with different combinations if both
+> > device and driver process the vnet header piece wisely
+>
+> I'm a little confused here. AFAICT the dynamic offset is
+> requested/mandated by the specifications: if the hash related fields are
+> not present, they are actually non existing and everything below moves
+> upward.  I think we spent together quite some time to agree on this.
+
+I'm sorry if I lose some context there.
+
+>
+> If you want/intend the tunnel header to be at fixed offset inside the
+> virtio_hdr regardless of the negotiated features? That would yield to
+> slightly simpler but also slightly less efficient implementation.
+
+Yes. I feel it's probably too late to fix the spec. But I meant if the
+header offset of tunnel gso stuff is dynamic, it's probably not need
+to define:
+
+virtio_net_hdr_v1_tunnel and virtio_net_hdr_v1_hash_tunnel
+
+in the uAPI.
+
+>
+> Also I guess (fear mostly) some specification clarification would be need=
+ed.
+>
+> /P
+>
+
+Thanks
 
 
