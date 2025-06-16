@@ -1,107 +1,127 @@
-Return-Path: <netdev+bounces-198261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABBDADBB79
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:48:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65584ADBB88
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DE04175ED0
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78CFC189291A
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B471E98F3;
-	Mon, 16 Jun 2025 20:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE622101B3;
+	Mon, 16 Jun 2025 20:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EiMzspfw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOS1qmqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB0F1B0F1E
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFCA1FAC4D;
+	Mon, 16 Jun 2025 20:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750106910; cv=none; b=Rr7Wil5em/kdp//392JkbMXAb7UN73zxTEZ9ywTCxKg43fbE2TZxECPVlDyqBoIU/UcE5d2pjJngHDNRyf3OrRR4KwMjnizG+OOThc4w/pQARTwXOHQx7RmXHrkakfzua/f48TitbgELmevtI+yzkCBsVDlRsv8vTPFKG/tgCxQ=
+	t=1750107154; cv=none; b=k4QamR4B+P+rGW7oHpsGxJpuS9kGCqUscxjEBVwSyIL9EzNIIdAbBLHDdXsc7qXqWlIX6ATDa+7v9ZgX4z4yQoWKg5gAXySTHutA8cAhj1W9xtYALxnAOMPGOeM2LjfL9Ps/K6e+e6lbkMdDQGskpSyR//33AX9n2VsI7prZa+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750106910; c=relaxed/simple;
-	bh=94pqwOQZJ6v7QfMDQpp7gmTCVHye4zUd2I05AKWuSNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d4BgKhEq09TN5Egk9UEPs7gBN/QOp/eAhwOsN56UmjYBkRWTPN9zf2JJQ6F9gJ2cnbHfXN6HHmZZTBnFOLdU3fzldV6HPykD3aEegVPr9d57bR1Vbn53yIeXzbnrxXSOJiEn7WTeAjTcF33f1MvL8QQmXbL5f2hwXMX3dPYcKTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EiMzspfw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A46D1C4CEEA;
-	Mon, 16 Jun 2025 20:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750106910;
-	bh=94pqwOQZJ6v7QfMDQpp7gmTCVHye4zUd2I05AKWuSNI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EiMzspfw0yGYEOOznOfdIzHeb9es9FcHSbJttoVtp4CEz//gZcH5MJP4kAUnU3QoK
-	 e1Uf+IfX6bbqjNJSKAJGvp+KITB11/XC/mZnqfHnTE9GE/0tn1+EIDIUt4jpAoUkMs
-	 FnoZ5rnBDNWzFx4heUfd19zGDKLAel02U4vGFlLFAvbiX2qPJhWvUH+q4yPXAfPujZ
-	 dsXJS43jFn/Sxj2lzffga7AJKJxIos8mno964wF/0kvluwOlzQJWqLgaLnw1XM3HT5
-	 5sMp5dSiGX7jighowvj3sBghSd0dfDrN3LsjMGAMfqfvj3/mORSveG9rqGUUAZiXXe
-	 AqhxEfr/hEHdg==
-Date: Mon, 16 Jun 2025 13:48:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net 3/3] bnxt_en: Update MRU and RSS table of RSS
- contexts on queue reset
-Message-ID: <20250616134828.703eafe5@kernel.org>
-In-Reply-To: <CACKFLimACdMBNZ2v-zpJ5=H1JdyWfLjN_0SqXkPe9waacq=GiQ@mail.gmail.com>
-References: <20250613231841.377988-1-michael.chan@broadcom.com>
-	<20250613231841.377988-4-michael.chan@broadcom.com>
-	<20250616133855.GA6187@horms.kernel.org>
-	<CACKFLimACdMBNZ2v-zpJ5=H1JdyWfLjN_0SqXkPe9waacq=GiQ@mail.gmail.com>
+	s=arc-20240116; t=1750107154; c=relaxed/simple;
+	bh=/QPXfKttFjUhg22/E4OyijBaAwE9LIOKJXwgi2S01bU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lXFdS+1EqxQNRnWit14rWZEM3iGZxK1DSSa8dCrbNx371p7V8KF4TsVNgHsq8QWWEMWPhquzBGYxHvX8PW7MSVw6wTULK7jw2YAYODx/C1BPTsBRj8tQlYGNPh4eXEjMzfqcZQ8Xk1CmmQVZBzqPaqrnfFUBfl22arm7Lnexrs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOS1qmqF; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ad89c10dfabso140637966b.0;
+        Mon, 16 Jun 2025 13:52:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750107151; x=1750711951; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MjHD7ImHqgaEg0QySeT0KO/CLSf7LriRa1vYRjxGumo=;
+        b=XOS1qmqFmUcUiw1wd7Ya933Ri7ekdmFmN8l6GHfPBkggNb1JbbZ+5/l7xIT0R9Q+TM
+         I2/RYOZI/Fy/vsjVIF24PH/kHlZZpAtF7fs6A/3bIli5EO8injwK5H6SecQFvGpruInE
+         fcW130JrUaMVVWWRxnmWtF9wxlz1m3jZdcACJ/E8q3a4fUaSe5URErDyMMlr3/oBB9yU
+         9U/5rv43pCD0GPJU0Otzf5XaubNw8BCpNy3ZM8hPzXdhg18+o0NcuD5RV8fD7Gnx4+Y9
+         c3OVmMYX80vdk4mRC+X4eW+Da3Xl+9f4oXOUTxa3ufnq7VlfbLcoP+qbU1BVfqnUua/Z
+         l3sQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750107151; x=1750711951;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MjHD7ImHqgaEg0QySeT0KO/CLSf7LriRa1vYRjxGumo=;
+        b=JruoOzC6kxsanAOjynUVLiONVCotcfitqKpu77DZ7JfpCHRC20wS80YX/h+/HUQbXf
+         WASdoM8xPmkEWSK7tZ2ftHO7nW6iuQFMJQwKQ+NxpdngDMG0H0r30R+MvxH7CrYJkq3I
+         Al3sNyjsSY4x2tgaL2VfALO6E8tJWaWJlVA6uvtkKkMloRICt1v4GKP2fayWGEsNmdt5
+         Fat0LGUJzPAeZrLCo+GwzrNDv/GlBtuHHVe0SmuHlqawjKM0IJCJhKrHr0kW7+tkrtV7
+         oY0REavt1fGUpeT0V8ZhUMkvOyKlk/Nh2/iEHWAHcTmog+1SGwb9w0ck9QSvNAx0Mlxn
+         qxqA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFM8hU3BvKLk31cPOpEW+GDd5nHjSxnqBGN+3nQ2pVdywD6xMmk2tHuCca0k2ZfNojwPU=@vger.kernel.org, AJvYcCVgc7lyDaN3cwdIfmgCKmBb3Qw37SJCnKnzeERkqsC2WGZ9FbR8ynSWE++qDnTVzsSgONaEfX39iyFyFuPm@vger.kernel.org, AJvYcCWlC3kkqjKiXEBziWrVLu5Ynt8XCvA6sEYBaI6/g0Wo67QQtJf3QU6V8EVLSBo/AJt1T8mVuQBQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv7YPxzqlj9IJVoslYPFSaZ99YDfo1ImgjIWr2A5Wx4Us7ETcB
+	mkbWT+k4dePVc5kFfYDJ6nQ2mLhMyi/yBP7jE+29FvhKM8P4RJmxDX0k
+X-Gm-Gg: ASbGncvU58TrFBhFkkrgtKQsthg65H63o8AbHG/SRVsfOEo8TvR8krwTAN3fmmMyG+X
+	Gx/wvXlHTYquNn30S4qykcdmmZaUbgSDpj9ElG3OHj6tqcYxMm0Ld1OVhxgPaat5FibH7bTLxY2
+	H3RHQihll2uNgx2I6NmfSLVGr7YTvDz6wWflysUUwfv+gGJH2vhslE4HOqRouwYX+gLX8gbSNWA
+	tmcW04Aq8+uGIEnXuuyPvW0XDHNcqplnl4OOQe90p12u579rDQhbMKAIdn8RZ7KRtkMYj9rX7VF
+	Px7NYfnp0iX24cYCrtkIgNwczro+DXm31lms2M5PbIsQmgklO4/96lhJKdZ/
+X-Google-Smtp-Source: AGHT+IFH/SSx7c8PUrit49w4s+in5qNAffBYzMPwVtXx0HldiOhTr26CVPqogKFnR9YNJ3L1h9lIeg==
+X-Received: by 2002:a17:906:d555:b0:ade:3372:4525 with SMTP id a640c23a62f3a-adfad502daemr381962566b.9.1750107150465;
+        Mon, 16 Jun 2025 13:52:30 -0700 (PDT)
+Received: from skbuf ([86.127.223.77])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec81c60f1sm730344566b.60.2025.06.16.13.52.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 13:52:29 -0700 (PDT)
+Date: Mon, 16 Jun 2025 23:52:27 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Robert Cross <quantumcross@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: dsa: mv88e6xxx: fix external smi for mv88e6176
+Message-ID: <20250616205227.2qmzv2fsbx6j533t@skbuf>
+References: <20250616162023.2795566-1-quantumcross@gmail.com>
+ <3c5a8746-4d57-49d5-8a3d-5af7514c46b3@lunn.ch>
+ <CAATNC474tcoDeDaGg1GKbSAkb8QBT9rcHrHrszycWpQwzU+6XA@mail.gmail.com>
+ <ad17b701-f260-473f-b96f-0668ce052e75@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad17b701-f260-473f-b96f-0668ce052e75@lunn.ch>
 
-On Mon, 16 Jun 2025 10:40:27 -0700 Michael Chan wrote:
-> On Mon, Jun 16, 2025 at 6:39=E2=80=AFAM Simon Horman <horms@kernel.org> w=
-rote:
-> > On Fri, Jun 13, 2025 at 04:18:41PM -0700, Michael Chan wrote: =20
-> > > From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> > >
-> > > The commit under the Fixes tag below which updates the VNICs' RSS
-> > > and MRU during .ndo_queue_start(), needs to be extended to cover any
-> > > non-default RSS contexts which have their own VNICs.  Without this
-> > > step, packets that are destined to a non-default RSS context may be
-> > > dropped after .ndo_queue_start(). =20
-> >
-> > This patch seems to be doing two things:
-> > 1. Addressing the bug described above
-> > 2. Implementing the optimisation below
-> >
-> > As such I think it would be best split into two patches.
-> > And I'd lean towards targeting the optimisation at net-next
-> > since "this scheme is just an improvement". =20
->=20
-> The original fix (without the improvement) was rejected by Jakub and
-> that's why we are improving it here.
->=20
-> Jakub, what do you think?
+Hi Andrew,
 
-I think the phrasing of the commit message could be better, but the fix
-is correct as is. We were shutting down just the main vNIC, now we shut
-down all the vNICs to which the queue belongs.
+On Mon, Jun 16, 2025 at 08:43:14PM +0200, Andrew Lunn wrote:
+> On Mon, Jun 16, 2025 at 02:22:43PM -0400, Robert Cross wrote:
+> > According to the documents I'm looking at, the 88E6172 and
+> > 88E6176 both have external MDIO buses. I have brought up
+> > a board with two connected 88E6176 chips, each with a PHY
+> > that can only be managed with the MDC/MDIO_PHY pins of
+> > the 88E6176s.
+> > 
+> > After applying this patch I was able to successfully manage
+> > and control these external PHYs without issue. I'm not sure
+> > if you have access to the 88E6176 datasheet specifically,
+> > but this chip absolutely does have an external MDIO.
+> 
+> You are not understanding what i'm saying. This family has a single
+> MDIO bus controller. That controller is used by both the internal PHY
+> devices, plus there are two pins on the chip for external PHYs.
+> 
+> All the PHYs will appear on that one MDIO bus controller.
+> 
+> The MV88E6390_G2_SMI_PHY_CMD_FUNC_EXTERNAL bit is reserved on the 6352
+> family.
+> 
+> 	Andrew
 
-It's not an "optimization" in the sense of an improvement to status quo,
-IIUC Pavan means that shutting down the vNIC is still not 100% correct
-for single queue reset, but best we can do with current FW. If we were
-to split this into 2 changes, I don't think those changes would form a
-logical progression: reset vNIC 0 (current) -> reset all (net) -> reset
-the correct set of vNICs (net-next).. ?
-
-I'd chalk this up to people writing sassy / opinion-tainted commit
-messages after reviewers disagree with their initial implementation.=20
-I tend not to fight it :)
+Is there any addition to Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+that we could make in order to clarify which switch families have a
+combined internal+external MDIO bus and which ones have them separate?
+As you're saying, this is an area where mistakes happen relatively
+frequently.
 
