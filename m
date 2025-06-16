@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-198069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF67ADB282
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:50:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B0DAADB26F
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:47:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEC153A2397
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:45:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 642731887A6D
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6F42777E9;
-	Mon, 16 Jun 2025 13:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5573C2877C3;
+	Mon, 16 Jun 2025 13:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmWNsdkc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nj7iNm+O"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881E22BF019
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3084018C02E
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750081550; cv=none; b=BQka5RyM5U0hxX3q7GrnbWX7J+BZ47X92omzQJq3n2wUWdF6YOLKT3nAnAR0IBxmZ2N4mvN1v2aHzb6EtlvlDxUrJ5B/I6btE1VbFAG6ceqpB9NP1WxVC9B74QmGvYllIXtgVgR9bWxEBibjeZWfORwnQRKPXA4DSE2v1L8CBzU=
+	t=1750081553; cv=none; b=BOk2h0LB0yGjAPqIP0/o3RhPe00gLBHPShjguxsEgn6f9g+LlXGBJyM0YEx+HMEMpffql/MxRNzkRfGpHaRugnpeuM0q1BUDbNG8hsKcPX+EkuJBYAiC+w7isC38mzNKbKwvrMfHhZztqzE1gw6uF2b1ZHHaXkCRH1CeqBKOBMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750081550; c=relaxed/simple;
-	bh=RTUvtWJIHeJfRXaRZvoP7GhruXdkJkNjDL2jCXJOtRE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jItNk1RfjKLh7IeW0VW6xq2h+BwdaTV3CW0Ym4IoT43wtfuAPzXW3m8J9+fXsJt1wBEazyG3p3et85fZc2eR2qky9vshfmSy1/MoZf9vSbthHc27dF3pgjqZoeMc4d41ncGm2gcala++QbqymFm3h5LF/BMRej/rHEyRYu8BLGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmWNsdkc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB234C4CEEA;
-	Mon, 16 Jun 2025 13:45:49 +0000 (UTC)
+	s=arc-20240116; t=1750081553; c=relaxed/simple;
+	bh=UfU3ocq2ii21xRQfAGGhtJtsNEug9yttyxDT5o40RTY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Ks/rLFMsD6ovlB5p7CIt+q/65lFy3CXKipEbTL83MGeVq0TPCHqwPtwvy87vyx3I/NhgbaIeiGZiGt2+q1YrDP+uzU8Hs4aiXMSLLO319UtS1jdqoT2EvLBmqq9Rqqhv652Pj5fY+wqk8war12Am2wm+XNgO18zOCXSgBqxBPfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nj7iNm+O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 672E8C4CEEA;
+	Mon, 16 Jun 2025 13:45:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750081550;
-	bh=RTUvtWJIHeJfRXaRZvoP7GhruXdkJkNjDL2jCXJOtRE=;
-	h=From:Subject:Date:To:Cc:From;
-	b=EmWNsdkctCoADDzcTZHXywQyCBFhSrqhSKZJpPBH5SxlROx3RB2/NViPa/2ENnRKI
-	 utQKiSm5ix1t8G4Azb+NNH7SmhHq0oae2q/kA7O/OqEUtqHKQcd/hmvwa10ZHIuw4F
-	 09njSbYfB+rAm3/1VXZZhkfdcoU5iwdTkw+FhNzLlDvYIqy6gwl1/zU50Mn5KhWQOW
-	 ZUTWtskPkTzJLG3ghhw6u25wm2jnqu1lP0cAFO9oqxSPg5MekIi3+Wx4pJ8QSK59Rm
-	 cRLIVNOl6DZaVH2C1HFToKgtkLeO/lbmuOcFVX7qa6CQ1T9tX69Wf1lzjCkl/Fq/Og
-	 OWpKq0cqnp1WA==
+	s=k20201202; t=1750081552;
+	bh=UfU3ocq2ii21xRQfAGGhtJtsNEug9yttyxDT5o40RTY=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=nj7iNm+OYBSplfczo98mxZ9+U8lPls+yrRbzFPwIO+FIPv0x+2aqb7Ce9qsyD+HVS
+	 6AS+Jyh64FbcJdZlMwYxfsf22cIvaBiGAgTraHdtFouBnQVyj5siBgJiqpgivW36QW
+	 z90N1k3GVAlT1g72CC3rlm6Vy+S2Me/ox35Zfh2hr2CsgsDJZsBb62PFCFHoC9WLNk
+	 gTfVzR0hFiBQGiH6Hrs4A/2T0OTUlBy5mh91NMVsT/0HIxGsv85gzjzzT+elt5K+24
+	 UePvuexzZO8Jdps7MY0zEyvE7pyNNQgP/SAvI1PC86UUQ3ocnoek7ssuhdja2WaBsW
+	 yRVMlOtqv27kQ==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [PATCH net-next v2 0/2] net: airoha: Improve hwfd
- buffer/descriptor queues setup
-Date: Mon, 16 Jun 2025 15:45:39 +0200
-Message-Id: <20250616-airoha-hw-num-desc-v2-0-bb328c0b8603@kernel.org>
+Date: Mon, 16 Jun 2025 15:45:40 +0200
+Subject: [PATCH net-next v2 1/2] net: airoha: Compute number of descriptors
+ according to reserved memory size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,11 +53,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAMgUGgC/22NwQrCMBBEf0X27EoSWls9+R/SQ0y2zaImstGql
- P67seDN45th3kyQSZgy7FcTCI2cOcUCZr0CF2wcCNkXBqNMrba6QsuSgsXwxPi4oqfsUOmdU01
- pXWWgDG9CPb8W6bErHDjfk7yXj1F/05+u/qcbNSps+7b11lb25JvDmSTSZZNkgG6e5w+OKBOIt
- QAAAA==
-X-Change-ID: 20250614-airoha-hw-num-desc-019c07061c42
+Message-Id: <20250616-airoha-hw-num-desc-v2-1-bb328c0b8603@kernel.org>
+References: <20250616-airoha-hw-num-desc-v2-0-bb328c0b8603@kernel.org>
+In-Reply-To: <20250616-airoha-hw-num-desc-v2-0-bb328c0b8603@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -66,28 +64,78 @@ Cc: linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Compute the number of hwfd buffers/descriptors according to the reserved
-memory size if provided via DTS.
-Reduce the required hwfd buffers queue size for QDMA1.
+In order to not exceed the reserved memory size for hwfd buffers,
+compute the number of hwfd buffers/descriptors according to the
+reserved memory size and the size of each hwfd buffer (2KB).
 
+Fixes: 3a1ce9e3d01b ("net: airoha: Add the capability to allocate hwfd buffers via reserved-memory")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-Changes in v2:
-- Rely on div_u64 to compute number of hw descriptors
-- Link to v1: https://lore.kernel.org/r/20250615-airoha-hw-num-desc-v1-0-8f88daa4abd7@kernel.org
+ drivers/net/ethernet/airoha/airoha_eth.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
----
-Lorenzo Bianconi (2):
-      net: airoha: Compute number of descriptors according to reserved memory size
-      net: airoha: Differentiate hwfd buffer size for QDMA0 and QDMA1
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index a7ec609d64dee9c8e901c7eb650bb3fe144ee00a..1b7fd7ee0cbf3e1f7717110c70e9c5183fdd93d4 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1065,19 +1065,13 @@ static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
+ 
+ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
+ {
++	int size, index, num_desc = HW_DSCP_NUM;
+ 	struct airoha_eth *eth = qdma->eth;
+ 	int id = qdma - &eth->qdma[0];
+ 	dma_addr_t dma_addr;
+ 	const char *name;
+-	int size, index;
+ 	u32 status;
+ 
+-	size = HW_DSCP_NUM * sizeof(struct airoha_qdma_fwd_desc);
+-	if (!dmam_alloc_coherent(eth->dev, size, &dma_addr, GFP_KERNEL))
+-		return -ENOMEM;
+-
+-	airoha_qdma_wr(qdma, REG_FWD_DSCP_BASE, dma_addr);
+-
+ 	name = devm_kasprintf(eth->dev, GFP_KERNEL, "qdma%d-buf", id);
+ 	if (!name)
+ 		return -ENOMEM;
+@@ -1099,8 +1093,12 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
+ 		rmem = of_reserved_mem_lookup(np);
+ 		of_node_put(np);
+ 		dma_addr = rmem->base;
++		/* Compute the number of hw descriptors according to the
++		 * reserved memory size and the payload buffer size
++		 */
++		num_desc = rmem->size / AIROHA_MAX_PACKET_SIZE;
+ 	} else {
+-		size = AIROHA_MAX_PACKET_SIZE * HW_DSCP_NUM;
++		size = AIROHA_MAX_PACKET_SIZE * num_desc;
+ 		if (!dmam_alloc_coherent(eth->dev, size, &dma_addr,
+ 					 GFP_KERNEL))
+ 			return -ENOMEM;
+@@ -1108,6 +1106,11 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
+ 
+ 	airoha_qdma_wr(qdma, REG_FWD_BUF_BASE, dma_addr);
+ 
++	size = num_desc * sizeof(struct airoha_qdma_fwd_desc);
++	if (!dmam_alloc_coherent(eth->dev, size, &dma_addr, GFP_KERNEL))
++		return -ENOMEM;
++
++	airoha_qdma_wr(qdma, REG_FWD_DSCP_BASE, dma_addr);
+ 	airoha_qdma_rmw(qdma, REG_HW_FWD_DSCP_CFG,
+ 			HW_FWD_DSCP_PAYLOAD_SIZE_MASK,
+ 			FIELD_PREP(HW_FWD_DSCP_PAYLOAD_SIZE_MASK, 0));
+@@ -1116,7 +1119,7 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
+ 	airoha_qdma_rmw(qdma, REG_LMGR_INIT_CFG,
+ 			LMGR_INIT_START | LMGR_SRAM_MODE_MASK |
+ 			HW_FWD_DESC_NUM_MASK,
+-			FIELD_PREP(HW_FWD_DESC_NUM_MASK, HW_DSCP_NUM) |
++			FIELD_PREP(HW_FWD_DESC_NUM_MASK, num_desc) |
+ 			LMGR_INIT_START | LMGR_SRAM_MODE_MASK);
+ 
+ 	return read_poll_timeout(airoha_qdma_rr, status,
 
- drivers/net/ethernet/airoha/airoha_eth.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
----
-base-commit: 8909f5f4ecd551c2299b28e05254b77424c8c7dc
-change-id: 20250614-airoha-hw-num-desc-019c07061c42
-
-Best regards,
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.49.0
 
 
