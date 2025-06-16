@@ -1,83 +1,88 @@
-Return-Path: <netdev+bounces-198056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32842ADB18A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:19:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F41D2ADB1C2
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11EEE3B79D8
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:17:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D7EA188AEC1
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A6F2E06FE;
-	Mon, 16 Jun 2025 13:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrDQxP9M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5763C298CDC;
+	Mon, 16 Jun 2025 13:25:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADB92E06EE;
-	Mon, 16 Jun 2025 13:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188B72701D0;
+	Mon, 16 Jun 2025 13:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750079774; cv=none; b=HXxmhtr3x/4Aj2OupQ3JIi8P5NwwNXpupSM5gRHv+m7aFRVKIvpQegAimW4e0fiy1ng6Z+gspUY4NVwv8wgZ/iivA8kBOPgonI6vupb5lqv15GxAcSD+CJxthfMmmuE2UvI5tc1NpMWFP6jO90mVF03u7ZFxayO9YfKY3Q2Voo4=
+	t=1750080348; cv=none; b=I/ipGHtS9/6La2xKLSEuOkbD4iaBkcVkMbtXk4iNsXx3g5dycnryrO4bEdlfm3eWOzZb2dJxHlqEefDQKZalAbF/rTc5iWTnjL94hv+cWtVoYQfVo9bq5zlp0jYdHqOUU2tsV4I33mFzecc1vFxRBT3FIl4k5m8XZVQ4009F1Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750079774; c=relaxed/simple;
-	bh=ijos+ZXc+kb+My9+MNdhO2s8PVtsN3Qz0nVOwY+r3rY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rMPCmM32ye0CGw79HQQ4a7t2v2fhbM/Vh1E+lOOlRb0RnvUGMK0dk7DmrICzbmqCwJuSGK4jw1xbPiUyccR2lIPGzvvhC8ayZNf9Hbl2yY+wf02vU2yFlOuGTm33ujkKdCo92ntdFaCTz7RSNikUo+tUEZZ6p0qRFgc7wGnLagA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrDQxP9M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E48B1C4CEEA;
-	Mon, 16 Jun 2025 13:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750079773;
-	bh=ijos+ZXc+kb+My9+MNdhO2s8PVtsN3Qz0nVOwY+r3rY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hrDQxP9MmH8s6HR9OXT17iQAC8iM272kzT96lZl6NZElnNtIVMIRMPVMk8ekuxz/n
-	 8oamRo930IM0NQuz2qze3J/IhhQ2SU3glyw7mk2zjfaiLdxkPPP4PzjaNwsC4MgwWs
-	 5pzQS3Sa1thr1vPK8WWx6pts5q0hv0ucB1eNjYq0M0qPkgpTfPs9GsF+u4u+FF3IrG
-	 c6chvBW+YT96A5Z55M6J+IlFMABwieid72nBmZvKJVuNn8hi4+vi5yLTXEm3oinqtg
-	 8PuwVqO7djWQesvBq/1JgFAPtSJHbCInUc5AWdB7E64nfNDgYZshB52b+k9hLusW+k
-	 gTel9JlWE7MOA==
-Date: Mon, 16 Jun 2025 14:16:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: linux@treblig.org
-Cc: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] vhost: vringh: Remove unused iotlb functions
-Message-ID: <20250616131609.GC4750@horms.kernel.org>
-References: <20250613230731.573512-1-linux@treblig.org>
- <20250613230731.573512-2-linux@treblig.org>
+	s=arc-20240116; t=1750080348; c=relaxed/simple;
+	bh=7jLZI80Hgb1SAIJq13IgdmwGWGYWoNlMu8efq1m7Cjs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q1whjYCxWO2jZosEdeAtC1LIdQ9EHxM5SwItDIhxNwyhR7fR+fQMfGSo4M2fheU0MokM7BkxQ5reFU7XH99RuRggKddczhNhmgb6HA4rA9TQEzgRZeh2xM4B8qcIPfI8mgaMT3oTXXn8gckp8VcSsanCwQymcyMs5btXVuABbn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bLW1Y1h7Pz2TSN3;
+	Mon, 16 Jun 2025 21:24:17 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2E0F6140279;
+	Mon, 16 Jun 2025 21:25:43 +0800 (CST)
+Received: from localhost.localdomain (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 16 Jun 2025 21:25:42 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <mkubecek@suse.cz>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH ethtool] ethtool: hibmcge: fix wrong register address in pretty print of ethtool -d command
+Date: Mon, 16 Jun 2025 21:18:40 +0800
+Message-ID: <20250616131840.812638-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613230731.573512-2-linux@treblig.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Sat, Jun 14, 2025 at 12:07:30AM +0100, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> The functions:
->   vringh_abandon_iotlb()
->   vringh_notify_disable_iotlb() and
->   vringh_notify_enable_iotlb()
-> 
-> were added in 2020 by
-> commit 9ad9c49cfe97 ("vringh: IOTLB support")
-> but have remained unused.
-> 
-> Remove them.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+The addresses of mac_addr_h and mac_addr_l are wrong,
+they need to be swapped.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: d89f6ee9c12a ("hibmcge: add support dump registers for hibmcge driver")
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ hibmcge.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hibmcge.c b/hibmcge.c
+index 921efd2..ca81bc0 100644
+--- a/hibmcge.c
++++ b/hibmcge.c
+@@ -36,8 +36,8 @@ static const struct hbg_offset_name_map hbg_spec_maps[] = {
+ 	{0x0004, "event_req"},
+ 	{0x0008, "mac_id"},
+ 	{0x000c, "phy_addr"},
+-	{0x0010, "mac_addr_h"},
+-	{0x0014, "mac_addr_l"},
++	{0x0010, "mac_addr_l"},
++	{0x0014, "mac_addr_h"},
+ 	{0x0018, "uc_max_num"},
+ 	{0x0024, "mdio_freq"},
+ 	{0x0028, "max_mtu"},
+-- 
+2.33.0
 
 
