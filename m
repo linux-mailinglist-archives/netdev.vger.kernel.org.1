@@ -1,88 +1,208 @@
-Return-Path: <netdev+bounces-198057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F41D2ADB1C2
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:25:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B84BADB1F7
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D7EA188AEC1
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:26:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09DB43AD265
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5763C298CDC;
-	Mon, 16 Jun 2025 13:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215822F2C7E;
+	Mon, 16 Jun 2025 13:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WoKnGQcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188B72701D0;
-	Mon, 16 Jun 2025 13:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7BE2877F9;
+	Mon, 16 Jun 2025 13:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750080348; cv=none; b=I/ipGHtS9/6La2xKLSEuOkbD4iaBkcVkMbtXk4iNsXx3g5dycnryrO4bEdlfm3eWOzZb2dJxHlqEefDQKZalAbF/rTc5iWTnjL94hv+cWtVoYQfVo9bq5zlp0jYdHqOUU2tsV4I33mFzecc1vFxRBT3FIl4k5m8XZVQ4009F1Is=
+	t=1750080392; cv=none; b=kd7ygGz32Ll3mJiqz+I8wUlN4a2s/I/mWORGk9OCsk+kUqaZzZkcYwzrhbLUaqlAzaC31qVdKGjee5NmXfwOIMwjxM6liZSTEAXfv9ZEG2osPL+fTHf8cT1B7QNaNXleO5HLfNg1kDTuL5qmp6N7hAFVQ2bPhYFcI12XWc05a7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750080348; c=relaxed/simple;
-	bh=7jLZI80Hgb1SAIJq13IgdmwGWGYWoNlMu8efq1m7Cjs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q1whjYCxWO2jZosEdeAtC1LIdQ9EHxM5SwItDIhxNwyhR7fR+fQMfGSo4M2fheU0MokM7BkxQ5reFU7XH99RuRggKddczhNhmgb6HA4rA9TQEzgRZeh2xM4B8qcIPfI8mgaMT3oTXXn8gckp8VcSsanCwQymcyMs5btXVuABbn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bLW1Y1h7Pz2TSN3;
-	Mon, 16 Jun 2025 21:24:17 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2E0F6140279;
-	Mon, 16 Jun 2025 21:25:43 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 16 Jun 2025 21:25:42 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <mkubecek@suse.cz>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH ethtool] ethtool: hibmcge: fix wrong register address in pretty print of ethtool -d command
-Date: Mon, 16 Jun 2025 21:18:40 +0800
-Message-ID: <20250616131840.812638-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	s=arc-20240116; t=1750080392; c=relaxed/simple;
+	bh=W1ULqCjf8lfOUmBr3Wu+Ci3avbmtCxJZhQsdCwBauN4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Gvz/PWtjdoR1jjeR5ge6994fjisyqYF0LDvLtvRzgeyjM+yX4fSJKldhDnpZ4Kqg8buJ+X6xaxluOU9PFxuss+NvPXL6m+tEOrQlI3G8bospdFQlWUosAk2vD7Z46n5eJ69Jk5E26zH/U0ATWsnZG/WLtuQ6Qj/OxjGUDLAdBf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WoKnGQcE; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750080390; x=1781616390;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=W1ULqCjf8lfOUmBr3Wu+Ci3avbmtCxJZhQsdCwBauN4=;
+  b=WoKnGQcEmOCoeRDyW7m6RUcmIFk/LMv99Q2N6WTGyT4wMS1UhG/TAmfq
+   98UZYXGZh/G3UBjIJc6hmuGHK+y/BtuD+GJHuxFQ/2i0Gzt3Wb0ClrzUP
+   E18x8C6NoGmi1QrWvWUKsN/K8C0nIaUxmRJeHmor34U+7j0sJ6ewpiBxT
+   Vx0Wi0D0Mmqnp1BuP+YQVp80ymlp0goHIsQ5G38KeosKy5g+qNejC9hQE
+   qafOWZ0CpIuHfnjBn16bBXXkAVAeuC9ix+RcX5vrnQampIxDnhnMrwPnk
+   r0aDfiL/A6IqvJgZfJSR1ZDSYPInGQVTBiA7FD3WPUx36U6q5G3hUm0lk
+   A==;
+X-CSE-ConnectionGUID: l92DMQDAQXK842n4QgPt+w==
+X-CSE-MsgGUID: uQJ+HUUlRVenVVfzFtJIiw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11465"; a="63255614"
+X-IronPort-AV: E=Sophos;i="6.16,241,1744095600"; 
+   d="scan'208";a="63255614"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 06:26:29 -0700
+X-CSE-ConnectionGUID: sUy1hWcBTaOgchksDDuQnw==
+X-CSE-MsgGUID: y/Hym029QOuoVBlZiI68jA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,241,1744095600"; 
+   d="scan'208";a="153426298"
+Received: from mjarzebo-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.92])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2025 06:26:10 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>, Robin Murphy
+ <robin.murphy@arm.com>, Yury Norov <yury.norov@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaehoon Chung
+ <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>, Heiko
+ Stuebner <heiko@sntech.de>, Shreeya Patel <shreeya.patel@collabora.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang
+ <hjc@rock-chips.com>, Andy Yan <andy.yan@rock-chips.com>, Maarten
+ Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+ <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David
+ Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Vinod Koul
+ <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, Nicolas
+ Frattaroli <frattaroli.nicolas@gmail.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Shawn Lin <shawn.lin@rock-chips.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, Krzysztof =?utf-8?Q?Wilczy?=
+ =?utf-8?Q?=C5=84ski?=
+ <kwilczynski@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, Rob
+ Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Chanwoo
+ Choi <cw00.choi@samsung.com>, MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-pm@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev,
+ linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-clk@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+ kernel@collabora.com, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
+Subject: Re: [PATCH 01/20] bitfield: introduce HWORD_UPDATE bitfield macros
+In-Reply-To: <3361713.44csPzL39Z@workhorse>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
+ <1437fe89-341b-4b57-b1fa-a0395081e941@arm.com> <aEw7LBpmkfOqZgf1@yury>
+ <3361713.44csPzL39Z@workhorse>
+Date: Mon, 16 Jun 2025 16:26:07 +0300
+Message-ID: <35d8c6372fb38f6d7e452c2e3b5a80327f20dae6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
 
-The addresses of mac_addr_h and mac_addr_l are wrong,
-they need to be swapped.
+On Mon, 16 Jun 2025, Nicolas Frattaroli <nicolas.frattaroli@collabora.com> wrote:
+> Hello,
+>
+> On Friday, 13 June 2025 16:52:28 Central European Summer Time Yury Norov wrote:
+>> On Fri, Jun 13, 2025 at 02:54:50PM +0100, Robin Murphy wrote:
+>> > On 2025-06-12 7:56 pm, Nicolas Frattaroli wrote:
+>> > > Hardware of various vendors, but very notably Rockchip, often uses
+>> > > 32-bit registers where the upper 16-bit half of the register is a
+>> > > write-enable mask for the lower half.
+>> > > 
+>> > > This type of hardware setup allows for more granular concurrent register
+>> > > write access.
+>> > > 
+>> > > Over the years, many drivers have hand-rolled their own version of this
+>> > > macro, usually without any checks, often called something like
+>> > > HIWORD_UPDATE or FIELD_PREP_HIWORD, commonly with slightly different
+>> > > semantics between them.
+>> > > 
+>> > > Clearly there is a demand for such a macro, and thus the demand should
+>> > > be satisfied in a common header file.
+>> > > 
+>> > > Add two macros: HWORD_UPDATE, and HWORD_UPDATE_CONST. The latter is a
+>> > > version that can be used in initializers, like FIELD_PREP_CONST. The
+>> > > macro names are chosen to not clash with any potential other macros that
+>> > > drivers may already have implemented themselves, while retaining a
+>> > > familiar name.
+>> > 
+>> > Nit: while from one angle it indeed looks similar, from another it's even
+>> > more opaque and less meaningful than what we have already. Personally I
+>> > cannot help but see "hword" as "halfword", so logically if we want 32+32-bit
+>> > or 8+8-bit variants in future those would be WORD_UPDATE() and
+>> > BYTE_UPDATE(), right? ;)
+>> > 
+>> > It's also confounded by "update" not actually having any obvious meaning at
+>> > this level without all the implicit usage context. FWIW my suggestion would
+>> > be FIELD_PREP_WM_U16, such that the reader instantly sees "FIELD_PREP with
+>> > some additional semantics", even if they then need to glance at the
+>> > kerneldoc for clarification that WM stands for writemask (or maybe WE for
+>> > write-enable if people prefer). Plus it then leaves room to easily support
+>> > different sizes (and potentially even bonkers upside-down Ux_WM variants?!)
+>> > without any bother if we need to.
+>> 
+>> I like the idea. Maybe even shorter: FIELD_PREP_WM16()?
+>> 
+>
+> I do think FIELD_PREP_WM16() is a good name. If everyone is okay with this
+> as a name, I will use it in v2 of the series. And by "everyone" I really
+> mean everyone should get their hot takes in before the end of the week,
+> as I intend to send out a v2 on either Friday or the start of next week
+> to keep the ball rolling, but I don't want to reroll a 20 patch series
+> with a trillion recipients more than is absolutely necessary.
 
-Fixes: d89f6ee9c12a ("hibmcge: add support dump registers for hibmcge driver")
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- hibmcge.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I'd never guess what WM stands for in this context without looking it
+up, but I'll be happy if we have FIELD_PREP_ and 16 in there. So works
+for me.
 
-diff --git a/hibmcge.c b/hibmcge.c
-index 921efd2..ca81bc0 100644
---- a/hibmcge.c
-+++ b/hibmcge.c
-@@ -36,8 +36,8 @@ static const struct hbg_offset_name_map hbg_spec_maps[] = {
- 	{0x0004, "event_req"},
- 	{0x0008, "mac_id"},
- 	{0x000c, "phy_addr"},
--	{0x0010, "mac_addr_h"},
--	{0x0014, "mac_addr_l"},
-+	{0x0010, "mac_addr_l"},
-+	{0x0014, "mac_addr_h"},
- 	{0x0018, "uc_max_num"},
- 	{0x0024, "mdio_freq"},
- 	{0x0028, "max_mtu"},
+> To that end, I'd also like to get some other naming choices clarified.
+>
+> As I gathered, these two macros should best be placed in its own header.
+> Is include/linux/hw_bitfield.h a cromulent choice, or should we go with
+> include/linux/hw_bits.h?
+
+I'll let y'all fight it out.
+
+> Furthermore, should it be FIELD_PREP_WM16_CONST or FIELD_PREP_CONST_WM16?
+> I'm personally partial to the former.
+
+Ditto.
+
+> And finally, is it okay if I leave out refactoring Intel's
+> _MASKED_FIELD() or should I see if I can at least replace its
+> implementation while I'm at it?
+
+I think you can just let us deal with that afterwards. You have enough
+users already.
+
+
+BR,
+Jani.
+
+
+>
+> For less opinionated changes, I'll also change all the `U` literal
+> suffixes to `UL` wherever I've added them. As I understand it, it doesn't
+> really make a difference in these instances, but `UL` is more prevalent
+> in the kernel.
+>
+> Kind regards,
+> Nicolas Frattaroli
+>
+>
+
 -- 
-2.33.0
-
+Jani Nikula, Intel
 
