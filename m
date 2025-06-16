@@ -1,139 +1,181 @@
-Return-Path: <netdev+bounces-198145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B133ADB669
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:15:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E55ADB676
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 18:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DAFC7A4AD8
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:13:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 016FE3AE02A
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 16:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEC52673B0;
-	Mon, 16 Jun 2025 16:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351B7216E26;
+	Mon, 16 Jun 2025 16:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fIykZ2so"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDEWEYeK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C5214A639
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 16:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4C717A2FA;
+	Mon, 16 Jun 2025 16:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750090513; cv=none; b=i45rsfhH5TnMUDrDuzPFdG5JgHuqEK4W+iRbuWDy0AlHkUXBUeS7u5OeE9lCy38X8b6oyP7C7G4t/TnjmEpdL8MrDOGEsXcfSvZGlpSGwIrNyUDoU2d94pJ8t65AAsrmmS9lJxeZJH7a8Ue30yC4DZuVzvKBsEEjZQEE2jDYnb4=
+	t=1750090705; cv=none; b=TS5iS0SoUg75iw8JIAN/ru7S/S+95We8wHDP/xOM9sqqwxONVu/Q/9QyT+X6f3uUz/O/RcgZnIOH6J1MvkRGDIm5pvsybMGRmZrc77ddfTYpCJdGxHIVePHcNDNtZM3WY2MOVWQ1YEDvuHbFyObYrBQ/bZ0uz++mcv7ZtFrZwIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750090513; c=relaxed/simple;
-	bh=F6Oo7MSRktRLrgUBCZ+ivA+8WxfXvoMDKEId5Ya/CmA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KkLRKkOP6h/arW0QN/3hN1xR58REOfY3jLrHsk4vGX5jz1i78FyL1exGmrizTt3evwjY+i+qVkrcQXiXCXdWYLRvLqG/q2whob1IjAU5yaq+/nSfkM94Ng0JQDaSv6mcVj6Jdej1O6XpSYRGFfeDiepOq9gXiPfVMdmlHAKGIkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fIykZ2so; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a531fcaa05so2905710f8f.3
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 09:15:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750090510; x=1750695310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F6Oo7MSRktRLrgUBCZ+ivA+8WxfXvoMDKEId5Ya/CmA=;
-        b=fIykZ2soJsouRr0DkAP/8FLbGKGVrbDHeaBJD8smejvmYusJJbiFMv/3Puwoc+/DdM
-         2SHQpYtkAQGO0XWo8JpLw3KhfXRzUBC7jJeBwqaC2lNO0LPVoiZcHlvLPTn/P62S/Oo/
-         1u7yECMbbyXsaiEEuMwxl1sYNJcsAPLST8A10CinzXoMj0TkNGfhPj3OuaAGMVlVStOs
-         8HschH9uGE1kewYGr39CihYmBwa6lKfWxSTY8Bec1I1TldCcF5fZ/U/XpMNZZQUqTUlZ
-         xFDRtXfrk9d6FAH9Fdu8FEAOt398WWOVt7S2Yzss+s7V0/NelNFrMi+8n8SXxcmP6LBu
-         tO0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750090510; x=1750695310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F6Oo7MSRktRLrgUBCZ+ivA+8WxfXvoMDKEId5Ya/CmA=;
-        b=cwW8y2hSkDpG9foU8MI13jj/vJ7nNm4evBUmkjXzhJx1zpbT2y8hD/BQHcpj1vdXle
-         U0TiFkpgMc6Y7A5GwNHBAeyMHPy4QLKNPcI3gdD4OdgH/yOdr1aa/NoMrNVKQ+3JpBtk
-         +30m4jw5fp/xIP3HEiko7onF/R1JaHjUCjFsqNtYdn3cnbA0Y7nKhUkHk4IQEv9tOHsL
-         n4eKos39CO7uhD6/k4n9Q9Yxb+34fYIuKKInmItakoWmx6zRB1Xf6guLYn4o0oYKbhVo
-         ba3oYfJ9KSTSU3PmMrOE7nApS9AVafmJzsNsGC4ikEvWRbJCRgDexay9ctqKjbORwj3h
-         EhrA==
-X-Gm-Message-State: AOJu0Yx6H2UyKLl5BkCpd4mrlS1hQWMlgd0QUxXQXdEEuV5MrtpkVTEv
-	iVAukIrSLQgC5cTq6hUqoWxJpmU2a7ldNHHmxQKSvZOn6n99Gx/4zKDl1UJYA2OxfycBXET/a1y
-	Dbt/VqtePLu1yvBsihORXmtkpBMVlX8Y=
-X-Gm-Gg: ASbGncsyTDXHcFZFdLF0Rn8zKTTgnEPZt4Ecy1vG0Pd3R9+HI8Dm9aPMv/I/OBYOY4l
-	35yEiAITiAGwfPsp3okd9kxjIqvpailew8Q2QKIRV5avXfh0s1iIZFSDxSwPx8bs2/6zNX21Nht
-	J1ArNT1JliWxMu8elKjEA/0wK03M+m2MBWwn6M+BNcmLWrvlap1BeSWoEBMlNnfSXg8++ZN0A/V
-	o9X
-X-Google-Smtp-Source: AGHT+IFw6HPm4vLZMXCQ2cK51YwrRRHvhLIRH9jxUwuSYACN0ckjKjpAKEMvxH56MpZZ1fw8DTCmw8jVTCEeDuJVt98=
-X-Received: by 2002:a05:6000:4716:b0:3a4:ead4:5ea4 with SMTP id
- ffacd0b85a97d-3a5723aec40mr7007020f8f.24.1750090509802; Mon, 16 Jun 2025
- 09:15:09 -0700 (PDT)
+	s=arc-20240116; t=1750090705; c=relaxed/simple;
+	bh=QuPwZTmN5ribhxKsREDovtdslKeq4Hhftis1ZPbSwrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CdMSeFKQ6SYIK+mCh/1VXN+oTmuFXI/o4o996nWsFvA7RgWOztQB2Reayn5/U21E9+Ns4/T7jBMlsFjy/h0RHTKUlKKCoI9L9cYk2UrX7yKenz2a1b6Y1DhjjABnvbf2jEGRnIT5yO2daPU9mBKAE4cZtCzteTZ/6/C2Iv4U0cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDEWEYeK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC033C4CEEA;
+	Mon, 16 Jun 2025 16:18:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750090704;
+	bh=QuPwZTmN5ribhxKsREDovtdslKeq4Hhftis1ZPbSwrE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XDEWEYeK4BGLUdGmH4Wq0QJapOyIDvi8igvcE/Kz05MItoR23l1DOQxlf5qsXSbB0
+	 wgloOkZrjEKwWjL0KITnMAKtZL6IVnlB0PKc/LYRV0reoH/2L29RNKWdzqHQz2sxNH
+	 z/lqzrTK+VskYHschRctCYTny43pdEJ8IA5uUaKI41b2I4N2KHvI/LbMPT3JrziCQc
+	 LQTtdYqx5De1Ulv0ry+DhLBkj97DSiBKRC7lpWR6BxyIYvqUaUyDFKy3oDQjiZQmR0
+	 SV8nGwErxPHd03rSyz5W+rZCvkP8BK2ysxhCR9RQGUP/B3OOr17uoz27mMxc9Q7c+K
+	 GFrEszAhOk2DQ==
+Message-ID: <426a2c83-38ca-4fa2-9270-b3e600e30d19@kernel.org>
+Date: Mon, 16 Jun 2025 18:18:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <174974059576.3327565.11541374883434516600.stgit@ahduyck-xeon-server.home.arpa>
- <174974092054.3327565.9587401305919779622.stgit@ahduyck-xeon-server.home.arpa>
- <20250616153438.GE6918@horms.kernel.org>
-In-Reply-To: <20250616153438.GE6918@horms.kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 16 Jun 2025 09:14:33 -0700
-X-Gm-Features: AX0GCFumCfPBXEqSTEl9S5YNWo3JJ5j8qLpU541MP-bRwxG-glXZQQ3jD_vwKfw
-Message-ID: <CAKgT0UfEkGiAu2mO15yaF1HRdRLsercm4vJsyi-xg8Je0c_i5A@mail.gmail.com>
-Subject: Re: [net-next PATCH v2 3/6] fbnic: Replace 'link_mode' with 'aui'
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, hkallweit1@gmail.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, pabeni@redhat.com, 
-	kuba@kernel.org, kernel-team@meta.com, edumazet@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v2 14/14] selftests: forwarding: Add a test for
+ verifying VXLAN MC underlay
+Content-Language: en-GB, fr-BE
+To: Petr Machata <petrm@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@gmail.com>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ mlxsw@nvidia.com, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+References: <cover.1749757582.git.petrm@nvidia.com>
+ <78edac89730a346e957b69d4107fcd8f1c5c6266.1749757582.git.petrm@nvidia.com>
+ <20250613095755.54381628@kernel.org>
+ <ccaf0784-d7a3-41e2-b3e0-65b9022f15a6@kernel.org> <87wm9bu13q.fsf@nvidia.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <87wm9bu13q.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 16, 2025 at 8:34=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Thu, Jun 12, 2025 at 08:08:40AM -0700, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexanderduyck@fb.com>
-> >
-> > The way we were using "link_mode" really was more to describe the
-> > interface between the attachment unit interface(s) we were using on the
-> > device. Specifically the AUI is describing the modulation and the numbe=
-r of
-> > lanes we are using. So we can simplify this by replacing link_mode with
-> > aui.
-> >
-> > In addition this change makes it so that the enum we use for the FW val=
-ues
-> > represents actual link modes that will be normally advertised by a link
-> > partner. The general idea is to look at using this to populate
-> > lp_advertising in the future so that we don't have to force the value a=
-nd
-> > can instead default to autoneg allowing the user to change it should th=
-ey
-> > want to force the link down or are doing some sort of manufacturing tes=
-t
-> > with a loopback plug.
-> >
-> > Lastly we make the transition from fw_settings to aui/fec a one time th=
-ing
-> > during phylink_init. The general idea is when we start phylink we shoul=
-d no
-> > longer update the setting based on the FW and instead only allow the us=
-er
-> > to provide the settings.
-> >
-> > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
->
-> Hi Alexander,
->
-> This patch is doing a lot - I count 3 things.
-> Could you try and break it up a bit in v3?
+Hi Petr,
 
-Actually I need to clean this up a bit more anyway. Looks like I have
-some text from the earlier version still here as the last item was
-moved to patch 4 I believe.
+On 16/06/2025 17:06, Petr Machata wrote:
+> 
+> Matthieu Baerts <matttbe@kernel.org> writes:
+> 
+>> Hi Jakub, Petr,
+>>
+>> On 13/06/2025 18:57, Jakub Kicinski wrote:
+>>> On Thu, 12 Jun 2025 22:10:48 +0200 Petr Machata wrote:
+>>>> Add tests for MC-routing underlay VXLAN traffic.
+>>>>
+>>>> Signed-off-by: Petr Machata <petrm@nvidia.com>
+>>>> ---
+>>>>
+>>>> Notes:
+>>>>     v2:
+>>>>     - Adjust as per shellcheck citations
+>>>
+>>> Noob question - would we also be able to squash the unreachable code
+>>> warnings if we declared ALL_TESTS as an array instead of a string?
+>>> IDK if there's any trick we could use to make shellcheck stop
+>>> complaining. Not blocking the series, obviously.
+>>>
+>>> CC Matthieu, I presume you may have already investigated this :)
+>>
+>> Thank you for the Cc. Yes indeed, I already had this case.
+>>
+>> I don't think declaring ALL_TESTS as an array would help for this case
+>> -- even if it looks clearer than a long string -- because I think
+>> shellcheck will simply check if all the different functions are called
+>> directly. As mentioned in Shellcheck wiki [1]: "ShellCheck may
+>> incorrectly believe that code is unreachable if it's invoked by variable
+>> name or in a trap. In such a case, please Ignore the message".
+>>
+>> That what we did with MPTCP, see the top of the mptcp_join.sh file for
+>> example [2], where we have:
+>>
+>>> # ShellCheck incorrectly believes that most of the code here is unreachable
+>>> # because it's invoked by variable name, see how the "tests" array is used
+>>> #shellcheck disable=SC2317
+>>
+>> If you add this at the top of your new file, followed by an empty line,
+>> shellcheck will ignore this issue for the whole file.
+> 
+> The ALL_TESTS issue is not the end of it either. We use helpers that
+> call stuff indirectly all over the place. defer, in_ns... It would make
+> sense to me to just disable SC2317 in NIPA runs. Or maybe even put it in
+> net/forwarding/.shellcheckrc. Pretty much all those tests are written in
+> a style that will hit these issues.
 
-Since it is mostly just renames anyway, splitting it up should be
-pretty straight forward.
+In this case, I think it would be better to add this .shellcheckrc file
+in net/forwarding. If you modify NIPA, I don't think people will know
+what is allowed or not, or what command line to use, no?
+
+Note that NIPA's shellcheck reports are currently ignoring all "info"
+and "style" severities -- so including SC2317 -- except for new files or
+the ones that were previously shellcheck compliant.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
