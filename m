@@ -1,234 +1,78 @@
-Return-Path: <netdev+bounces-198272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7933ADBBC1
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:13:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7201ADBBCF
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 23:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66B43A3561
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:13:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9F6E3A3537
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 21:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE73A215F7C;
-	Mon, 16 Jun 2025 21:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77A01F2BA4;
+	Mon, 16 Jun 2025 21:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="qUQa1XPD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ttNpKq/N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46FF1E493C
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 21:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259D82BEFED;
+	Mon, 16 Jun 2025 21:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750108404; cv=none; b=n9Vzpb8suPqG/XXO38EXcH68NhfvGJ2kaH49hJdExx/eYaYLgXEGBh2sGlI/EtgAQdfsI3bcZ+S3T37fVaOy7Lg7OgDWpVPgylFeH/ebXinSV2u7U/smNPrTPIV6n8oNYbco9SmLivoia5VM6eWpyQHBMvjq/Nm2yGiTc+e6514=
+	t=1750108741; cv=none; b=pY9trK+Dmp4br4kJweVRPvrnzx/QINT5sZEJ+OT8hZlVfG6d9C8pclwuzy8MzHAJ9/CAPfL6S5mahQ/FgzU65IbyNTIUurWrzbQP91xNXCGNtoEeGcnheAXJdDicv/5kNgf43P1+O22frS8ytAP5xGvkFMJLuqbNZnVtoUczaSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750108404; c=relaxed/simple;
-	bh=WFYJhGTYc9LbRG63V2tJrlZwMlhQRQ928hpczOCc6JQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ojY/ObspF7mINB2IHKPx1i/G5Ww6LS4N936VIR1hwssRq3uttqMRpbseyPpzKAAOTrslBG4ioMxOXwBcgzxB2HA0NVPVnMBEtmq09Td99pLzyhfvqBX/T7Q9TmnPxNHoZ2PFY7EK0m32jTaeMx8OF96ou/DbfBGhVZOecGhH800=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=qUQa1XPD; arc=none smtp.client-ip=51.77.79.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1750108385; x=1750367585;
-	bh=WFYJhGTYc9LbRG63V2tJrlZwMlhQRQ928hpczOCc6JQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=qUQa1XPD8WsdmpUT3vYQa/18xmIXSby8TOKkT+Wi8l3hMCu5bU2TPHJvqLHBw3Wrj
-	 loKTSEVoQWVuzU4iXCN4UfMJk4B2GNe5aGRHH9nlxIGQY9S1oUfit++6tZ9CAQQo/x
-	 k4jRBwX0GbdGZIx7I84wHHwo1Av+EQpDKcnqHZG0ciuFBoai6sDkASC4Um0Do+asVT
-	 3vmLRK35+8yTku+z1RURq8Wum9KDAcLy/P9f/+QHRdjRs3Qkxx3dWcG6gZGqmYM/qf
-	 Qdm48b2cLpTXE8+IL3tT50qUb4VIP5OrIriPbnbEAsYDm0Xrjn9aJEEw3tzwwv4f0z
-	 A9yNuzGzub2TQ==
-Date: Mon, 16 Jun 2025 21:13:01 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: Savy <savy@syst3mfailure.io>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-Message-ID: <KqiixybBnBLRGzU7hRxP5bpji1w9tvkkNJVawNPK04HV4Sq66HwoXkfvY-zUb-igUkh0WT0BdfbBmjpkA0H-tES79qTMRM9OuFH5HUsYwJs=@willsroot.io>
-In-Reply-To: <CAM0EoM=QxAJS4ZK68mup55O7wQFqkQds-p2Us3R0U-W6FK6krw@mail.gmail.com>
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <lVH_UKrQzWPCHJS7_1Cj0gmEV0x4KI3VB_4auivP0fDokTBbmWuDV455wXrf6eQzakVFoK6wUxlDuMw_Lo0p4P9ByPLSjklsIkQiNcd_hvQ=@willsroot.io> <CAM0EoMkoFJJQD_ZVSMb7DUo1mafevgujx+WA=1ecTeYBcpB1Lw@mail.gmail.com> <A2nutOWbLBIdLRrnsUdavOagBEebp4YBFx0DdL23njEFVAySZul2pDRK1xf76_g6dLb82YXCRb1Ry9btDkZqeY9Btib0KgViSIIfsi4BDfU=@willsroot.io> <CAM0EoMmhP_9UsF18M=6B6AbY_am8cEnaqggpnVb9fkmBB4vjtA@mail.gmail.com> <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io> <CAM0EoMnd0nZxJW3zpEuBGWTwB3AnJSnj242f9hMpcLdBWdcbfQ@mail.gmail.com> <yA-qROHJ2pCMLiRG8Au4YMe_V2R27OhaXkkjkImGzbhdlyHUs5nCkbbJYGkNLM4Rt5812LGXHathpDmqSYTGv1D4YF-zeJdWbCnNIAezEdg=@willsroot.io> <CAM0EoM=QxAJS4ZK68mup55O7wQFqkQds-p2Us3R0U-W6FK6krw@mail.gmail.com>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 08d09a36e2caf42f7b7a383aff855807d7d4a64e
+	s=arc-20240116; t=1750108741; c=relaxed/simple;
+	bh=EorTzHoVc3/xhNMu51TieYCCOxxDeamaIYaQQITc+TI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YX8yMd5Iv71Yq7vwzsptAEreLjOzrMhzVR5X2Av0CTk4kKqMpcPRwy8/4D+s3qBu+NZcPl+WCvZQDGpondxqQaETstesaAjT/kPsQNG/PqKqL6vpQtCHX4sJI9Sjfq6GpfnASblDYw0urFUrZL8cJHDLt9ciAinOXjW6/P4koys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ttNpKq/N; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=g/eTvuKctPiNU4S+YYDAoBjwAzv9ftGfxRJh7MtARmE=; b=ttNpKq/NPcesTfbq2ajefLrQkK
+	41U6T1Mjc2ulBWvT4UAwkm3xkZSFH+t7P8cok05bAaZB23M4tabIjBVgmq8GzSMI8YIBWwTuiCIt3
+	HVQaq/ZJjxc0zAdFI5DPeDheLzYtF2eP1Wn8RKK0I0Vv81MqhOClDa27kzB5+zY8V+8Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uRHE9-00G5cV-Be; Mon, 16 Jun 2025 23:18:49 +0200
+Date: Mon, 16 Jun 2025 23:18:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Robert Cross <quantumcross@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: dsa: mv88e6xxx: fix external smi for mv88e6176
+Message-ID: <64029640-9c93-4019-97bc-c371cf14e91f@lunn.ch>
+References: <20250616162023.2795566-1-quantumcross@gmail.com>
+ <3c5a8746-4d57-49d5-8a3d-5af7514c46b3@lunn.ch>
+ <CAATNC474tcoDeDaGg1GKbSAkb8QBT9rcHrHrszycWpQwzU+6XA@mail.gmail.com>
+ <ad17b701-f260-473f-b96f-0668ce052e75@lunn.ch>
+ <20250616205227.2qmzv2fsbx6j533t@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250616205227.2qmzv2fsbx6j533t@skbuf>
 
+> Is there any addition to Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+> that we could make in order to clarify which switch families have a
+> combined internal+external MDIO bus and which ones have them separate?
+> As you're saying, this is an area where mistakes happen relatively
+> frequently.
 
+It should be possible to add a constraint. Only compatible
+"marvell,mv88e6190" can use "mdio-external"
 
-
-
-
-On Monday, June 16th, 2025 at 8:41 PM, Jamal Hadi Salim <jhs@mojatatu.com> =
-wrote:
-
->=20
->=20
-> On Thu, Jun 12, 2025 at 11:34=E2=80=AFPM William Liu will@willsroot.io wr=
-ote:
->=20
-> > On Thursday, June 12th, 2025 at 10:08 PM, Jamal Hadi Salim jhs@mojatatu=
-.com wrote:
-> >=20
-> > > Hi William,
-> > > Apologies again for the latency.
-> > >=20
-> > > On Mon, Jun 9, 2025 at 11:31=E2=80=AFAM William Liu will@willsroot.io=
- wrote:
-> > >=20
-> > > > On Monday, June 9th, 2025 at 12:27 PM, Jamal Hadi Salim jhs@mojatat=
-u.com wrote:
-> > >=20
-> > > > > I didnt finish my thought on that: I meant just dont allow a seco=
-nd
-> > > > > netem to be added to a specific tree if one already exists. Dont
-> > > > > bother checking for duplication.
-> > > > >=20
-> > > > > cheers,
-> > > > > jamal
-> > > > >=20
-> > > > > > > [1] see "loopy fun" in https://lwn.net/Articles/719297/
-> > > >=20
-> > > > Hi Jamal,
-> > > >=20
-> > > > I came up with the following fix last night to disallow adding a ne=
-tem qdisc if one of its ancestral qdiscs is a netem. It's just a draft -I w=
-ill clean it up, move qdisc_match_from_root to sch_generic, add test cases,=
- and submit a formal patchset for review if it looks good to you. Please le=
-t us know if you catch any edge cases or correctness issues we might be mis=
-sing.
-> > >=20
-> > > It is a reasonable approach for fixing the obvious case you are
-> > > facing. But I am still concerned.
-> > > Potentially if you had another netem on a different branch of the tre=
-e
-> > > it may still be problematic.
-> > > Consider a prio qdisc with 3 bands each with a netem child with dupli=
-cation on.
-> > > Your solution will solve it for each branch if one tries to add a
-> > > netem child to any of these netems.
-> > >=20
-> > > But consider you have a filter on the root qdisc or some intermediate
-> > > qdisc and an associated action that changes skb->prio; when it hits
-> > >=20
-> > > netem and gets duplicated then when it goes back to the root it may b=
-e
-> > > classified by prio to a different netem which will duplicate and on
-> > > and on..
-> > > BTW: I gave the example of skb->prio but this could be skb->mark.
-> >=20
-> > Ah, good catch. I attached the modified patch below then.
-> >=20
-> > > Perhaps we should only allow one netem per tree or allow more but
-> > > check for duplication and only allow one per tree...
-> >=20
-> > I believe we have to keep it at one netem per tree. The OOM loop can st=
-ill trigger if a netem without duplication has a netem child with duplicati=
-on. Consider the following setup:
-> >=20
-> > tc qdisc add dev lo root handle 1: netem limit 1
-> > tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 1=
-00% delay 1us reorder 100%
->=20
->=20
-> I didnt explain it clearly - I meant if you have a netem that has
-> duplication then dont allow another netem within the tree. Your patch
-> is in the right direction but does not check for duplication.
->=20
-> > The first netem will store everything in the tfifo queue on netem_enque=
-ue. Since netem_dequeue calls enqueue on the child, and the child will dupl=
-icate every packet back to the root, the first netem's netem_dequeue will n=
-ever exit the tfifo_loop.
-> >=20
-> > Best,
-> > William
-> >=20
-> > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> > index fdd79d3ccd8c..4db5df202403 100644
-> > --- a/net/sched/sch_netem.c
-> > +++ b/net/sched/sch_netem.c
-> > @@ -1085,6 +1085,36 @@ static int netem_change(struct Qdisc *sch, struc=
-t nlattr *opt,
-> > return ret;
-> > }
-> >=20
-> > +static const struct Qdisc_class_ops netem_class_ops;
-> > +
-> > +static bool has_netem_in_tree(struct Qdisc *sch) {
-> > + struct Qdisc *root, *q;
-> > + unsigned int i;
-> > + bool ret =3D false;
-> > +
-> > + sch_tree_lock(sch);
-> > + root =3D qdisc_root_sleeping(sch);
->=20
->=20
-> Hrm. starting with qdisc_root_sleeping() seems quarky. Take a look at
-> dump() - and dig into something (off top of my head) like
-> hash_for_each(qdisc_dev(root)->qdisc_hash, b, q, hash)
->=20
-
-What is the issue here? My understanding is that the hashmap does not hold =
-the root - sch_api.c shows edge cases for the root node when adding and del=
-eting from the hashmap).
-
-> > +
-> > + if (root->ops->cl_ops =3D=3D &netem_class_ops) {
-> > + ret =3D true;
-> > + goto unlock;
-> > + }
-> > +
-> > + hash_for_each_rcu(qdisc_dev(root)->qdisc_hash, i, q, hash) {
-> > + if (q->ops->cl_ops =3D=3D &netem_class_ops) {
-> > + ret =3D true;
-> > + goto unlock;
-> > + }
-> > + }
-> > +
-> > +unlock:
-> > + if (ret)
-> > + pr_warn("Cannot have multiple netems in tree\n");
->=20
->=20
-> No point to the pr_warn()
->=20
-> > +
-> > + sch_tree_unlock(sch);
-> > + return ret;
-> > +}
-> > +
-> > static int netem_init(struct Qdisc *sch, struct nlattr *opt,
-> > struct netlink_ext_ack *extack)
-> > {
-> > @@ -1093,6 +1123,9 @@ static int netem_init(struct Qdisc *sch, struct n=
-lattr *opt,
-> >=20
-> > qdisc_watchdog_init(&q->watchdog, sch);
-> >=20
-> > + if (has_netem_in_tree(sch))
-> > + return -EINVAL;
->=20
->=20
-> set ext_ack to contain the string you had earlier ("Cannot have
-> multiple netems in tree") and user space will be able to see it.
->=20
-> It will be easy to check the existing qdisc for netem_sched_data->duplica=
-te
->=20
-> Also, please dont forget to run tdc tests and contribute one or more
-> testcase that captures the essence of what you are pushing here.
->=20
-> cheers,
-> jamal
-
-Best,
-William
+	Andrew
 
