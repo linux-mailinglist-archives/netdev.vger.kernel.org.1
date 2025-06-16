@@ -1,96 +1,118 @@
-Return-Path: <netdev+bounces-198050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71226ADB105
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:04:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CACADB11A
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 15:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53E751887068
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:04:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2A81889C1B
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 13:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C63D285C9A;
-	Mon, 16 Jun 2025 13:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490382C08B4;
+	Mon, 16 Jun 2025 13:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cc1YTGGd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Etludh7d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2AE264A9D
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 13:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA94C2980B0;
+	Mon, 16 Jun 2025 13:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750079068; cv=none; b=BAz8vBIN3kBo1lsWxsEBEz6gXaZm8M5PMfkGV1QZ3SffqQ0SNWLAfhQSOSHtOcap1Fg//sRtGDYnrlyRaosSq/x6VmIznrnLJ8/uuyCYz6lDlMHBZ6VQgECInISrhkKJnKI4Y3tgARnLLI9/W5yaXBoefo2jJlRNTeeHsmwwuJQ=
+	t=1750079190; cv=none; b=luBuJgZ1fheFrL22eklkDggi7zVU3LBuG5o6QaKhR+Ke3ConRCQ7zycjnEGBPga+yY+iaux9oW1rNV73wxKgW46etVaeVhjcQdpkYuHb+8peDjiaCntcVpnjZ7NIgCMcb8RN8gFPrvV3SLS18wZVJgjbAFGYkEZif+8STypxo0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750079068; c=relaxed/simple;
-	bh=2VLxKu0NSWdjjWfNhhjVvp1kjTv89OQClqD3z18Xu+A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JUSkG4ItmChL/jkjoN3Rn2WwIDFk1rvQc7age9tWoOO/l3WV/xXGoi8RoijSF52Sz2DkmLe5m2eRmunPagxDfH+7phA6J4bUpDpOCGg00BZ8qEYZtT+HQbHnpJcM102fNwIZuZifcAXuTtvLA9SqTlJTqlu30TK5jyLNRPGgoCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cc1YTGGd; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7e41513d-ba2e-49f2-9e3e-af29874cac41@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750079058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rujyH1t6vY0cQ6LiXyseN0+yF/6S2Le4E97EcNLFkcs=;
-	b=Cc1YTGGd3mUGgJbouiKuknTAoAAGBJnKpzb1ZVQ2/A9KQWM4sTvFFPHt9U4FuF7E8S0x4C
-	oCfciCe9YyK7V5kgV5RGNKtNWV0v3E6ooA5rl+1qIvTLNo6rtzyhESqM+m/ZD5QOgrY3y4
-	GQ7t9DYmezXnczOhTdgTaYvgBrle014=
-Date: Mon, 16 Jun 2025 14:04:09 +0100
+	s=arc-20240116; t=1750079190; c=relaxed/simple;
+	bh=T6wJzTLO+nGf43vLM3Fwpt1bP/VNgv49Gb8skEx3yIo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dr2Nq7XA7bNzdylalMWP+RoYB3HKjNsNZdeKLs3S4Hm/zL391JOxgDa1cOjUaMCB6VGO7PUHVw+YrZ3NisYj7SiW1NuIO633BEvMdE6u9HkpjKL7wurM4ZMMfsD7nKS3RFv/KOnhQSufLn5qDAyehltkSoEDG2pVktH2oL30To4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Etludh7d; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6EiGoP0CFRPN9DlmZM3Ult5DiFuokD7txHWgsRXBcRM=; b=Etludh7dptxTH6P3Xz+xzQmn4M
+	Pk9fgXsVBhX6nlUcl/bIdl8VkxWLYWFmfr/qZ1LWpn7R4uemH0Nb7uWb7aBEdNXWihw5Tx6OK0ZAt
+	RZG3PgaUf+ZuUqdsrp9D+lNIJxt3YM81WpBkrsQyhMhcZ7vWSAWI3ltxQTSETcXpE/Us=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uR9XH-00G2lm-N1; Mon, 16 Jun 2025 15:06:03 +0200
+Date: Mon, 16 Jun 2025 15:06:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Subbaraya Sundeep <sbhatta@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-tegra@vger.kernel.org,
+	Alexis Lothorrr <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH] net: stmmac: Fix PTP ref clock for Tegra234
+Message-ID: <e87b4398-41de-4584-87fe-b9ad1df32dbe@lunn.ch>
+References: <20250612062032.293275-1-jonathanh@nvidia.com>
+ <aEqyrWDPykceDM2x@a5393a930297>
+ <85e27a26-b115-49aa-8e23-963bff11f3f6@lunn.ch>
+ <e720596d-6fbb-40a4-9567-e8d05755cf6f@nvidia.com>
+ <353f4fd1-5081-48f4-84fd-ff58f2ba1698@lunn.ch>
+ <9544a718-1c1a-4c6b-96ae-d777400305a7@nvidia.com>
+ <5a3e1026-740a-4829-bfd2-ce4c4525d2a0@lunn.ch>
+ <f769098f-2268-491e-9c94-dbecf7a280a4@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] dpll: remove documentation of rclk_dev_name
-To: Simon Horman <horms@kernel.org>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org
-References: <20250616-dpll-member-v1-1-8c9e6b8e1fd4@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250616-dpll-member-v1-1-8c9e6b8e1fd4@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f769098f-2268-491e-9c94-dbecf7a280a4@nvidia.com>
 
-On 16/06/2025 13:58, Simon Horman wrote:
-> Remove documentation of rclk_dev_name member of dpll_device which
-> doesn't exist.
+On Mon, Jun 16, 2025 at 11:06:54AM +0100, Jon Hunter wrote:
 > 
-> Flagged by ./scripts/kernel-doc -none
+> On 13/06/2025 14:22, Andrew Lunn wrote:
+> > > > So you can definitively say, PTP does actually work? You have ptp4l
+> > > > running with older kernels and DT blob, and it has sync to a grand
+> > > > master?
+> > > 
+> > > So no I can't say that and I have not done any testing with PTP to be clear.
+> > > However, the problem I see, is that because the driver defines the name as
+> > > 'ptp-ref', if we were to update both the device-tree and the driver now to
+> > > use the expected name 'ptp_ref', then and older device-tree will no longer
+> > > work with the new driver regardless of the PTP because the
+> > > devm_clk_bulk_get() in tegra_mgbe_probe() will fail.
+> > > 
+> > > I guess we could check to see if 'ptp-ref' or 'ptp_ref' is present during
+> > > the tegra_mgbe_probe() and then update the mgbe_clks array as necessary.
+> > 
+> > Lets just consider for the moment, that it never worked.
 > 
-> Introduced by commit 9431063ad323 ("dpll: core: Add DPLL framework base
-> functions")
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
->   drivers/dpll/dpll_core.h | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
-> index 2b6d8ef1cdf3..9b11e637397b 100644
-> --- a/drivers/dpll/dpll_core.h
-> +++ b/drivers/dpll/dpll_core.h
-> @@ -45,7 +45,6 @@ struct dpll_device {
->    * @dpll_refs:		hold referencees to dplls pin was registered with
->    * @parent_refs:	hold references to parent pins pin was registered with
->    * @prop:		pin properties copied from the registerer
-> - * @rclk_dev_name:	holds name of device when pin can recover clock from it
->    * @refcount:		refcount
->    * @rcu:		rcu_head for kfree_rcu()
->    **/
-> 
+> To be clear, by 'it never worked', you are referring to only PTP support?
+> Then yes that is most likely.
 
-Thanks!
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Yes, i'm just referring to PTP. I would be very surprised if
+sending/receiving Ethernet frames is broken, that gets lots of
+testing.
+
+> > If we change the device tree to the expected 'ptp_ref', some devices
+> > actually start working. None regress, because none ever worked. We can
+> > also get the DT change added to stable, so older devices start
+> > working. We keep the code nice and clean, no special case.
+> 
+> Although PTP may not work, basic ethernet support does and 'correcting' the
+> device-tree only, will break basic ethernet support for this device.
+
+We clearly don't want to do that. But we should be able to come up
+with a fix which does not make things worse. The obvious one is that
+we have both ptp-ref and ptp_ref in tegra234.dtsi, so that both
+mgbe_clks in dwmac-tegra.c and stmmac_probe_config_dt is happy.
+
+	Andrew
 
