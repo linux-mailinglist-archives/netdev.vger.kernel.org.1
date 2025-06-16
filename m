@@ -1,74 +1,177 @@
-Return-Path: <netdev+bounces-198216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D169CADBA9A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:13:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE463ADBAA4
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FB4517441A
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:13:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DBB217444F
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8EC1FBE9B;
-	Mon, 16 Jun 2025 20:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD3E2882DB;
+	Mon, 16 Jun 2025 20:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdlBqKzH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgjXGrxw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6DF1898E8
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE7721767A
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750104791; cv=none; b=HG8bWT5tVjO1v7isBLTPH8svoevLH5dBUh5aOkg7e03Twspfg70HfRapLrtd2GG6jjKZ2C3A8ZHnQ8fh6hMg63ArDLEliY2F5+ZnASC3xbWEWY0nqdyQZfPlqGEFnZu+SJBkb7zBBlS6wiClNhWMXseP/ud4P50lDY/pjYgU5Js=
+	t=1750104863; cv=none; b=U0ECwgWxuMfAzP+bUBnhCTivl+zLuTXOXSfZ+ain/P2uTK/wvfFaY+83WXQ1UkuaEK4FKkHD+WV/WV8tSvevZqKGgOmSAFbwDJRGWmh58IsV/sWWtHWOydTl1u4sDT/2SuXj8AF494VBugqRjhxNvH026BhcNlHLLRURSucg7wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750104791; c=relaxed/simple;
-	bh=nlh8J7Qun1pDJlyZjl8w8zo9XjfixAWLTNiff0nzJ6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Or2T2hkjumNa8x1p3yGicWz4CtwFkwl3RwjT3H2rEwpO8SGbeTKEqAyO1nE/uBHD3TUGA8MoAV/EqrCueoZVi+JmbW084LmOwATBpxtsfKJ/FUzmyXO/hq0WYtPvgbqjX68s8yKDpWXnyuSfaYS6xEZHHeYWF3LfLuWRow9q2mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdlBqKzH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DD91C4CEEA;
-	Mon, 16 Jun 2025 20:13:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750104791;
-	bh=nlh8J7Qun1pDJlyZjl8w8zo9XjfixAWLTNiff0nzJ6o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tdlBqKzHHyiLzvA9VxJKqnHWDxeqH2DlZc/v1CRbH9OhPFC0jgw739L+hKnDKPWqN
-	 +QEdukHcRTm7VmeZ4MP8VZ14p7LXm/Z71lQ8RBPPqiyg73qi/MywZNonQKydGq1aYt
-	 yN8on5VQwcnCbQLSOs5oIzXu2d0j42EM9tRMzog/Nb7M25hT8b0YIRRkExNTPZVnN/
-	 JwFFAljKyjspFZimjcySdZ6vrqx2KgGzPrys0R4FPC399IZ5H4a8ZiJNO3Jbwf/kaj
-	 VMGCP7aj1JoM7423F1Jtg7Kap+u1nRaMlMdSdygj6cIBl/UCAOJqt+O38w9QwltdKf
-	 rvKgYgLpMnDYg==
-Date: Mon, 16 Jun 2025 13:13:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Neal
- Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew
- Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH net v1 3/4] selftests: net: add test for passive TFO
- socket NAPI ID
-Message-ID: <20250616131310.61c99775@kernel.org>
-In-Reply-To: <20250616185456.2644238-4-dw@davidwei.uk>
-References: <20250616185456.2644238-1-dw@davidwei.uk>
-	<20250616185456.2644238-4-dw@davidwei.uk>
+	s=arc-20240116; t=1750104863; c=relaxed/simple;
+	bh=TwP2O71xNX5KZBAcekuLe3rjLWvw+dJPP0fdo82f4Wo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TyzYaQ/2QqjjT+wacbrAwJXYKHw0ZIVgkLZ2VBM0u9GJ1HkTLI5ePn7daoSUVlCyinO73j6EYFLyMvUdPRo3IWYzA8DL+BW4qlrFyGMARc4h4X6ymbRouB8xkLg6rDdNsTNkzLhS0hrxDwPbVko36TtL1ELJcvRzebTeylFQT/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RgjXGrxw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750104860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Aad9Gkf4CPYgn7WvQvhOXyC5N0TDYkAraLsrfuZwf9I=;
+	b=RgjXGrxwuxpox3mC+RTFvEPEj434Mo1FDa8B56vJP7b8QFCqJDX2Ql7zmkEl3NDMTWxvM2
+	ylBNHCo6Al6iQwhYF4JsaxN0JySZfryAUcq7k/+Z1zOkRqXbdsAjoN4Ddc4c/id0WWt7Jd
+	KqIPIBWYbwMs/E7TsSaf8wDU7/Emb70=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-592-FGeS-c9YOQuieXqBPEq_vA-1; Mon,
+ 16 Jun 2025 16:14:17 -0400
+X-MC-Unique: FGeS-c9YOQuieXqBPEq_vA-1
+X-Mimecast-MFC-AGG-ID: FGeS-c9YOQuieXqBPEq_vA_1750104854
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 05F3D19560B2;
+	Mon, 16 Jun 2025 20:14:14 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.45.224.53])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BEB1330001B1;
+	Mon, 16 Jun 2025 20:14:05 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>
+Subject: [PATCH net-next v11 00/14] Add Microchip ZL3073x support (part 1)
+Date: Mon, 16 Jun 2025 22:13:50 +0200
+Message-ID: <20250616201404.1412341-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, 16 Jun 2025 11:54:55 -0700 David Wei wrote:
-> Add a test that checks that the NAPI ID of a passive TFO socket is valid
-> i.e. not zero.
+Add support for Microchip Azurite DPLL/PTP/SyncE chip family that
+provides DPLL and PTP functionality. This series bring first part
+that adds the core functionality and basic DPLL support.
 
-Could you run shellcheck and make sure none of the warnings are legit?
+The next part of the series will bring additional DPLL functionality
+like eSync support, phase offset and frequency offset reporting and
+phase adjustments.
+
+Testing was done by myself and by Prathosh Satish on Microchip EDS2
+development board with ZL30732 DPLL chip connected over I2C bus.
+
+---
+Changelog:
+v11:
+Fixed uninitialized 'rc' in error-path in patch 9
+v10:
+Usage of str_enabled_disabled() where possible.
+v9:
+After discussion with Jakub Kicinski we agreed that it would be better
+to implement whole functionality in a single driver without touching
+MFD sub-system. Besides touching multiple sub-systems by single device
+there are also some technical issues that are easier resolvable
+in a single driver. Additionally the firmware flashing functionality
+would bring more than 1000 lines of code with previous approach to
+the MFD driver - it is not something the MFD maintainers would like
+to see.
+
+Ivan Vecera (14):
+  dt-bindings: dpll: Add DPLL device and pin
+  dt-bindings: dpll: Add support for Microchip Azurite chip family
+  dpll: Add basic Microchip ZL3073x support
+  dpll: zl3073x: Add support for devlink device info
+  dpll: zl3073x: Protect operations requiring multiple register accesses
+  dpll: zl3073x: Fetch invariants during probe
+  dpll: zl3073x: Add clock_id field
+  dpll: zl3073x: Read DPLL types and pin properties from system firmware
+  dpll: zl3073x: Register DPLL devices and pins
+  dpll: zl3073x: Implement input pin selection in manual mode
+  dpll: zl3073x: Add support to get/set priority on input pins
+  dpll: zl3073x: Implement input pin state setting in automatic mode
+  dpll: zl3073x: Add support to get/set frequency on input pins
+  dpll: zl3073x: Add support to get/set frequency on output pins
+
+ .../devicetree/bindings/dpll/dpll-device.yaml |   76 +
+ .../devicetree/bindings/dpll/dpll-pin.yaml    |   45 +
+ .../bindings/dpll/microchip,zl30731.yaml      |  115 ++
+ Documentation/networking/devlink/index.rst    |    1 +
+ Documentation/networking/devlink/zl3073x.rst  |   37 +
+ MAINTAINERS                                   |   10 +
+ drivers/Kconfig                               |    4 +-
+ drivers/dpll/Kconfig                          |    6 +
+ drivers/dpll/Makefile                         |    2 +
+ drivers/dpll/zl3073x/Kconfig                  |   36 +
+ drivers/dpll/zl3073x/Makefile                 |   10 +
+ drivers/dpll/zl3073x/core.c                   |  968 +++++++++++
+ drivers/dpll/zl3073x/core.h                   |  371 ++++
+ drivers/dpll/zl3073x/dpll.c                   | 1494 +++++++++++++++++
+ drivers/dpll/zl3073x/dpll.h                   |   42 +
+ drivers/dpll/zl3073x/i2c.c                    |   95 ++
+ drivers/dpll/zl3073x/prop.c                   |  358 ++++
+ drivers/dpll/zl3073x/prop.h                   |   34 +
+ drivers/dpll/zl3073x/regs.h                   |  206 +++
+ drivers/dpll/zl3073x/spi.c                    |   95 ++
+ 20 files changed, 4003 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/dpll/dpll-device.yaml
+ create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+ create mode 100644 Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+ create mode 100644 Documentation/networking/devlink/zl3073x.rst
+ create mode 100644 drivers/dpll/zl3073x/Kconfig
+ create mode 100644 drivers/dpll/zl3073x/Makefile
+ create mode 100644 drivers/dpll/zl3073x/core.c
+ create mode 100644 drivers/dpll/zl3073x/core.h
+ create mode 100644 drivers/dpll/zl3073x/dpll.c
+ create mode 100644 drivers/dpll/zl3073x/dpll.h
+ create mode 100644 drivers/dpll/zl3073x/i2c.c
+ create mode 100644 drivers/dpll/zl3073x/prop.c
+ create mode 100644 drivers/dpll/zl3073x/prop.h
+ create mode 100644 drivers/dpll/zl3073x/regs.h
+ create mode 100644 drivers/dpll/zl3073x/spi.c
+
 -- 
-pw-bot: cr
+2.49.0
+
 
