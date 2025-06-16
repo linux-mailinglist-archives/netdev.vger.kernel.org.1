@@ -1,211 +1,137 @@
-Return-Path: <netdev+bounces-198175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D48ADB7B0
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:22:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EA8ADB7B4
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 19:23:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17EAD188D94B
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:22:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BCAE188D939
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 17:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81D02877C3;
-	Mon, 16 Jun 2025 17:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F199528851B;
+	Mon, 16 Jun 2025 17:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQNzei1N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YofZZmVz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B192BF017;
-	Mon, 16 Jun 2025 17:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5DD72607;
+	Mon, 16 Jun 2025 17:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750094537; cv=none; b=eWQhUh7V7kBXVlgh7XRoUUmI879dgpOx1gXcI3V84AHDpXW1nuokyGhK7CEX1buepHjd8jdmdGL2bmWkjaqOAZdDWQWxn+mGWvQVrTpPLyKlOq0ZFcneTvwUMxSiHRMfOQcmrp1Ab6reqPueePHj6NUAHI2fkgZ99GnrBmcdbT0=
+	t=1750094608; cv=none; b=F6O0ZSjAgLcAQ2FUPzii/+QvwJvDS00dd4wFCAgEVxhVUnKtelmtTVFnBxYUhtaOtYkvFwTDimHkj+CBfS8fRMU6llv2br2b+rt7dThIdDanLacuJV4Jb6YG5VoLlfzqQF7M2pYcsLrL3sMSdlLATcIjVUx8tVq5rejxds1dPs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750094537; c=relaxed/simple;
-	bh=P+SSue73N4lAs0qB3b4VM8Xkfxno5zBJHyIJqBse+wo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cgXjpp0tmnNc9RpaSx61o52e07GcrgAhTCdCgxMY43riMj2WL05Is8PoqY8KUklZhp0Fskr8DPE86RjPQjfJZ81SlisZGJno3jfwhO5kysLOB5ZCY2MRBa38og3SYHpuJ0MtvqZML7o/sCLKkQLDQsorK1K9kT1+mgZk2td59G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQNzei1N; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1750094608; c=relaxed/simple;
+	bh=+l4ppMaVCu63D4oHT/VFaC9XIkU5AWpD2V0YNiZREaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RNaeJ25hHa7WTqNq0ErarVLwmDOr/c7BF3xIT3V1ciFTi/e0ni2D8DfdWGpH6rB5+LCp47X0cp3nxDdyH41Lb6IlqPvzlEEjZPRHNt1+b9Qmb1kcEWREb5Y3ZJYJhil5VqFmr/o6Qz8dHBL0mCm9jkzwrrAcXzYRZsiFUVPNQow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YofZZmVz; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-234b440afa7so47977345ad.0;
-        Mon, 16 Jun 2025 10:22:15 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso5584603a91.3;
+        Mon, 16 Jun 2025 10:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750094535; x=1750699335; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G1485tA8GgfFcfzz2MsCdOclvlrLtL+++u0j91aiOZ8=;
-        b=ZQNzei1Nt8RE5kmpAXy6fZgwgX1jwcieizIdyNnvyLi5h4eGCNmswD18CZvfPLR/ZJ
-         w+FJ6RhkbmncQUvN18hKVIEqdnx0mbNSLM12eXbT2kwJbJMeYd/jw5iFjI8TCRjewXYg
-         Xd/9971GQJ/Oif3DhYTDF4n2oOaYnbfI+yAQIYwMLzriygNSeNSPNJlbVl8kJ9abOjj9
-         C0CP4pjTZ0e+pucKucmFgdLbq2C2OF97luFXqjzo5RCsi0tq3kK2SPwF9QROJRXtyhHq
-         XPiSsDbmZQGRVtpLRawLEfI4o1OZmJ7iERTrRvekRwO87tm13knP94tsvbgtsjfZcNL5
-         vnEA==
+        d=gmail.com; s=20230601; t=1750094607; x=1750699407; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Bcecguv7Lx+rjWJW35AroK+WdqJscdUsmjDvoTT5PQk=;
+        b=YofZZmVzKoPyNZUJdXusZh7H+xumzUNu+p1K3RC8+LNdSkYkVcz2R5WqanXsd7c5CA
+         C7Pys5NGoVL8a8hZ4yEGHaS7pusXy3sM6IGOVKK60JHXq6YSaeDOJthrijU8LrFJ6OEz
+         buTMQ6f6J/je9TSlkhsWvAyDbFOA/WFWnaSkQPgawsj2q0Hu5re99Oxh02MyBgZiTWOC
+         rvicwg22nk9HITuuthwLCacQBoHpmIVm+i9vbaGEWq/SnTSVqIwVdvjompyU+2iTPk2L
+         WexvPUWfdlE4OG7DJWtFaxuUs+v25HSsMuIlVI57bUONj7lWoXkx6++t6I4LlkQM4Q6g
+         Yxiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750094535; x=1750699335;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G1485tA8GgfFcfzz2MsCdOclvlrLtL+++u0j91aiOZ8=;
-        b=LaLCKqTglI2mLjMaQ60kniw8SIAUvHzKXYaNnAJg+DGNgjj3cNPhltf5na349L/+S2
-         RP9iSe9U+psABG8AB1kEbS7KPchRwzWCuGbeV0Cc+QUuJ/7u6w2G+OGq8RJz+V4F8kBF
-         fYdawS2rTV7HdxWKhkpo82L/AnY0gH7hAXzvZEsAiytgTM2tZYsKFlipHkCbO5nbdu2F
-         Famcp5Bk5B8frIrKtdQ+7UelOx60rx5slKJTJEPQOBBiqLpWNves4Rn1lNaZYsNbWRL9
-         8EszLvu73WcyssjxaLTO7jULk5+wO2GMb45ZgmfYqjBtWHUrTOqPpUeUkqrzyjNpUkiz
-         n7mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW5mM1+BwAwMnIXZr9rxlVTe0IoCWf1OLJy8sSSdH5kaMqxMJvmWFMVUHZEpkfmVpgWaE3amJULz03byWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk//KiCSL9LwgPKD1beodak6+sXmsbk3cWxWHlSxVlIgxuebZp
-	/Qpd2eCw/xLKClmJK0uIyesgUsf3Z0LlncvuOqgTK4stucmX7aDOy9r1nLb+
-X-Gm-Gg: ASbGncsOrQqr+L9nszWU/3Pp7D4mLGN+NR3cB70XgnKsQrHX4QFAjvo6Ii3is0+CH5Q
-	ajxJhp+5F5PLAZ6Vk6d0poN0YqFp1y/bhecr9n/kmacgt8nh2jae4Z2vI1/MiuVtYdlwYLtUVqI
-	tThGydArV0g+8OUJ2p+INxA1MudlLHCN80ImfxgehgaFpjU3yA2K6UJ4lXu6GD4gDTi0SxFmSn4
-	6SyKcsqHT3gKZ4IBrLXZe59lqjGdz5NIeHuhg3sgedLa1UpIsHxwNSZsYywskj949eQBaFh4Pzn
-	jORY2YNNFJMLCwXHp2pMfMyK/pJtjE2EzWjv6MP+5aQSr43PQoMtteJdsNM1Dgl1UdkC55S1zqk
-	U9K0BEzWjcmXNLlsaktA7bhQ=
-X-Google-Smtp-Source: AGHT+IEwHn9PP+yunLgpuZIxZZXjUSR/YE46VZUktC0AKteUOAbi6+3q4leQnmNqSCrmFYUiSvfS0g==
-X-Received: by 2002:a17:902:c404:b0:235:c9ef:c9e1 with SMTP id d9443c01a7336-2366b337dfbmr150977425ad.5.1750094534981;
-        Mon, 16 Jun 2025 10:22:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750094607; x=1750699407;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bcecguv7Lx+rjWJW35AroK+WdqJscdUsmjDvoTT5PQk=;
+        b=n2eFlomyglPRjYOapt2dakhomxk2r00NgYxR4oaMDGnYHhRL4gyo6VHw3U/DRwV0fI
+         dIuWBj9m9GVF42jVL1f7wBSrAifw3dOl/wH3sPLydZEX2gDN1nfXspehaWbNNVRiyPqR
+         O8TsgPlyzdliycfTfZBCnYckOyhlK6AaoeAumphS6dG6QyQs4LBCi1PzwMnabyhSEz53
+         ewKqawbOT6oTikglWOvJptk2KchTaaue5AtNIkqgZ6EsrOg8GH1aqTEKsg3xWu67cIKD
+         b4NHEynC23OZk8wFB8AgJ2xE/gU3qgqVN4CeKQLX6FI1oTiHZlg5y3BLxIAkRr8Pkqkm
+         ikJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcyJ5ht6aweXeEWv8wiSIrSU0tCW6IY92CcHhga9QpPBXvj7j2nlj/bT6xGv62/kghU2f3QJaZp/R+aYU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqquWRokEXigDdPFupAQHvFy26B0ZZ5XWMARjk8ATRMCnRnBVo
+	FkLlg3gtalLVnPLT+i9EkCQFB2RO4Lnfe5fycLi4/c8XEzQ+1bQq0Bo=
+X-Gm-Gg: ASbGncsem3J4EsoIjo8Z5YvsRRY3zLlIanfuuz7YMvT6Th7LcoSS9/IwolLeGMiB4J8
+	6igecElqvCNntukc5UGi40fsLnC4r2Vp/H8S3Tf5aqj2wgduXZApE4HhYEHjQNaAEbybJ/mgvA2
+	9NDMdiJ0YndT3wCe0nKf46qgOYaTpPj7hgherBcYMGEZy4C7y18zBv98AazFMs8DsYRKtncukOS
+	DhXYecfJTBvdT2E1Lx5C0l1apd+E8G1+SCoJQY/PYlaELNii86gR8BrQiJt1ByM62Rynqlh+BTr
+	74C4le5ktAvJCWfWRaU7PFHHxNJzMrk/sYpbsTmdB3HMK2cxfGYPSRH0I73jQS3xD5HOIokyK9L
+	Bc+r7IWuJEYYJGQDGbpU/nij6Lr5BCW9Xgg==
+X-Google-Smtp-Source: AGHT+IFfQB9Clm1X82qpx0OvfXc8H2gIYXEJfbAdy0qqZVrsr/8ozgKrWw0ODjmsciNUtolB2Tuv5w==
+X-Received: by 2002:a17:90b:2dcc:b0:311:9c1f:8516 with SMTP id 98e67ed59e1d1-313f1c3fb20mr17528197a91.15.1750094606695;
+        Mon, 16 Jun 2025 10:23:26 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2365dfc56a7sm64049785ad.233.2025.06.16.10.22.14
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2365deb0fb6sm63390435ad.141.2025.06.16.10.23.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 10:22:14 -0700 (PDT)
+        Mon, 16 Jun 2025 10:23:26 -0700 (PDT)
+Date: Mon, 16 Jun 2025 10:23:25 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jv@jvosburgh.net,
-	andrew+netdev@lunn.ch,
-	sdf@fomichev.me,
-	liuhangbin@gmail.com,
-	linux-kernel@vger.kernel.org,
-	syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
-Subject: [PATCH net] bonding: switch bond_miimon_inspect to rtnl lock
-Date: Mon, 16 Jun 2025 10:22:13 -0700
-Message-ID: <20250616172213.475764-1-stfomichev@gmail.com>
-X-Mailer: git-send-email 2.49.0
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, willemb@google.com,
+	sdf@fomichev.me, asml.silence@gmail.com
+Subject: Re: [PATCH net v1] net: netmem: fix skb_ensure_writable with
+ unreadable skbs
+Message-ID: <aFBTDZPj97PAe-EI@mini-arch>
+References: <20250615200733.520113-1-almasrymina@google.com>
+ <aFAsRzbS1vTyB_uO@mini-arch>
+ <CAHS8izMgmSQPPqu4xo1To=4vFvJi+cxP72KewhMJ+BqDbka0hQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMgmSQPPqu4xo1To=4vFvJi+cxP72KewhMJ+BqDbka0hQ@mail.gmail.com>
 
-Syzkaller reports the following issue:
+On 06/16, Mina Almasry wrote:
+> On Mon, Jun 16, 2025 at 7:38 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 06/15, Mina Almasry wrote:
+> > > skb_ensure_writable should succeed when it's trying to write to the
+> > > header of the unreadable skbs, so it doesn't need an unconditional
+> > > skb_frags_readable check. The preceding pskb_may_pull() call will
+> > > succeed if write_len is within the head and fail if we're trying to
+> > > write to the unreadable payload, so we don't need an additional check.
+> > >
+> > > Removing this check restores DSCP functionality with unreadable skbs as
+> > > it's called from dscp_tg.
+> >
+> > Can you share more info on which use-case (or which call sites) you're
+> > trying to fix?
+> 
+> Hi Stan,
+> 
+> It's the use case of setting a DSCP header, and the call site is
+> dscp_tg() -> skb_ensure_writable.
+> 
+> Repro steps should roughly be:
+> 
+> # Set DSCP header
+> sudo iptables -tmangle -A POSTROUTING -p tcp -m comment --comment
+> "foo" -j DSCP --set-dscp 0x08
+> 
+> # then run some unreadable netmem workload.
+> 
+> Before this change you should see 0 throughput, after this change the
+> unreadable netmem workload should work as expected.
 
- RTNL: assertion failed at ./include/net/netdev_lock.h (72)
- WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 netdev_ops_assert_locked include/net/netdev_lock.h:72 [inline]
- WARNING: CPU: 0 PID: 1141 at ./include/net/netdev_lock.h:72 __linkwatch_sync_dev+0x1ed/0x230 net/core/link_watch.c:279
+Ah, so this is basically all netfilter, makes sense, thanks!
 
- ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:63
- bond_check_dev_link+0x3f9/0x710 drivers/net/bonding/bond_main.c:863
- bond_miimon_inspect drivers/net/bonding/bond_main.c:2745 [inline]
- bond_mii_monitor+0x3c0/0x2dc0 drivers/net/bonding/bond_main.c:2967
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3321 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-As discussed in [0], the report is a bit bogus, but it exposes
-the fact that bond_miimon_inspect might sleep while its being
-called under RCU read lock. Convert bond_miimon_inspect callers
-(bond_mii_monitor) to rtnl lock.
-
-Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
-Link: http://lore.kernel.org/netdev/aEt6LvBMwUMxmUyx@mini-arch [0]
-Fixes: f7a11cba0ed7 ("bonding: hold ops lock around get_link")
-Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
----
- drivers/net/bonding/bond_main.c | 34 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index c4d53e8e7c15..ab40f0828680 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2720,7 +2720,6 @@ static int bond_slave_info_query(struct net_device *bond_dev, struct ifslave *in
- 
- /*-------------------------------- Monitoring -------------------------------*/
- 
--/* called with rcu_read_lock() */
- static int bond_miimon_inspect(struct bonding *bond)
- {
- 	bool ignore_updelay = false;
-@@ -2729,17 +2728,17 @@ static int bond_miimon_inspect(struct bonding *bond)
- 	struct slave *slave;
- 
- 	if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP) {
--		ignore_updelay = !rcu_dereference(bond->curr_active_slave);
-+		ignore_updelay = !rtnl_dereference(bond->curr_active_slave);
- 	} else {
- 		struct bond_up_slave *usable_slaves;
- 
--		usable_slaves = rcu_dereference(bond->usable_slaves);
-+		usable_slaves = rtnl_dereference(bond->usable_slaves);
- 
- 		if (usable_slaves && usable_slaves->count == 0)
- 			ignore_updelay = true;
- 	}
- 
--	bond_for_each_slave_rcu(bond, slave, iter) {
-+	bond_for_each_slave(bond, slave, iter) {
- 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
- 
- 		link_state = bond_check_dev_link(bond, slave->dev, 0);
-@@ -2962,35 +2961,28 @@ static void bond_mii_monitor(struct work_struct *work)
- 	if (!bond_has_slaves(bond))
- 		goto re_arm;
- 
--	rcu_read_lock();
-+	/* Race avoidance with bond_close cancel of workqueue */
-+	if (!rtnl_trylock()) {
-+		delay = 1;
-+		should_notify_peers = false;
-+		goto re_arm;
-+	}
-+
- 	should_notify_peers = bond_should_notify_peers(bond);
- 	commit = !!bond_miimon_inspect(bond);
- 	if (bond->send_peer_notif) {
--		rcu_read_unlock();
--		if (rtnl_trylock()) {
--			bond->send_peer_notif--;
--			rtnl_unlock();
--		}
--	} else {
--		rcu_read_unlock();
-+		bond->send_peer_notif--;
- 	}
- 
- 	if (commit) {
--		/* Race avoidance with bond_close cancel of workqueue */
--		if (!rtnl_trylock()) {
--			delay = 1;
--			should_notify_peers = false;
--			goto re_arm;
--		}
--
- 		bond_for_each_slave(bond, slave, iter) {
- 			bond_commit_link_state(slave, BOND_SLAVE_NOTIFY_LATER);
- 		}
- 		bond_miimon_commit(bond);
--
--		rtnl_unlock();	/* might sleep, hold no other locks */
- 	}
- 
-+	rtnl_unlock();	/* might sleep, hold no other locks */
-+
- re_arm:
- 	if (bond->params.miimon)
- 		queue_delayed_work(bond->wq, &bond->mii_work, delay);
--- 
-2.49.0
-
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
