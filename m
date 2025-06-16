@@ -1,209 +1,284 @@
-Return-Path: <netdev+bounces-198218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE930ADBAA8
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:14:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2685DADBAD3
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63735174A76
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:14:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D29673B7519
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8926A288C13;
-	Mon, 16 Jun 2025 20:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC13C28DB76;
+	Mon, 16 Jun 2025 20:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJn81z94"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9102BEFF0
-	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92AE28B7C8
+	for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750104870; cv=none; b=OAJeUM0p9Yhlhb+cdKnBLmB5v99rLwuU90HuWtdK6YZBVf8PegGgVVXvVYyabhQI29RdVPjDLon1xOuhRwczOQos8HdEh0GTdKSzP7LSvgEXOAcrFda41lwx2hwBII0VkbVHC+geFhZUo2y+1aHvftrrO79bKFmIE8Zl8y/PYV4=
+	t=1750104936; cv=none; b=uaeeFXQLQvditsNfoWq/OU1bdRgqbSXhlM2g/EfmBXWV49hxZYYZBrxybLyRfH0BKoeK9OcC5qbuEiPStxlQcDDEo2fagvN6AZgHJQ0vS6MNnQjH3r9WvO/r+kJN3eUiej5F0WnkGKKkzSlUQraLck/YdHd0eiEu+9x8scLqRUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750104870; c=relaxed/simple;
-	bh=V9e+eLsV51hESvlS9FPGF9+JtzTpMCVKCdPxLku5XQ0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=CWaJDnrXOXy+AGbAAncx0cLpy7J+jovW/NW43RLWMCkkSFSmDWHkm+6TfO7ImW1wz/Nwudikd4FNWRDn2uMnA6/DHTfXrY4ij4fHrBhyvr8RzUcN3kPEyu9pvL0HiaW2xpCexpaHHrzy7KHjb+9+bxN1D0CEKWdgOXAzP5jzEO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
-Received: from localhost (localhost [127.0.0.1])
-	by mx.ewheeler.net (Postfix) with ESMTP id E73308A;
-	Mon, 16 Jun 2025 13:14:21 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id HmQgDA-inrHY; Mon, 16 Jun 2025 13:14:20 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1750104936; c=relaxed/simple;
+	bh=d1q/HA9Pr5ZKcepknO7dXUZ4YXuc5K07/Z4NO8cX60k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jYOxAPHyUJANct55T6B+hPWDBcNA0n2TEKH3ecXDmVZ0AuvxZ8/VY4wcXnQJVDZfCKZLvfbEbavyqCKAIrstNNpvnZC7wn/DHaSl4+TYGmw/1DnXG7nk9BKcPcxPQe2u0lp63i4OAUOci7dyDjWD5LyohynAqPNtbQuiS/kKnxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cJn81z94; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750104933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PC33ycQpyMMM+DSnzjKCYZzW6We8j70qodfbGCwwodk=;
+	b=cJn81z9449ofYg7BlxUUjuPRjLXSZ+GvOee/wbBVFPcTMEvQvtEgIJ69CCbJciaNsMXIQb
+	U9vmFNDQqVy4MLR1KC6SWXuFjDl4iRJ1Y2CKHUoFaiYdGqB/JsZCFr+lmc7u3roPCFXk2p
+	hqMgLvd8w2bOD+l/twmEb33lhSi50GQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-594-tnvad7ByNSiYLHM2zzS99g-1; Mon,
+ 16 Jun 2025 16:15:29 -0400
+X-MC-Unique: tnvad7ByNSiYLHM2zzS99g-1
+X-Mimecast-MFC-AGG-ID: tnvad7ByNSiYLHM2zzS99g_1750104926
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx.ewheeler.net (Postfix) with ESMTPSA id 5100045;
-	Mon, 16 Jun 2025 13:14:20 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 5100045
-Date: Mon, 16 Jun 2025 13:13:59 -0700 (PDT)
-From: Eric Wheeler <netdev@lists.ewheeler.net>
-To: Neal Cardwell <ncardwell@google.com>
-cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
-    stable@kernel.org
-Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
- retransmits were sent
-In-Reply-To: <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
-Message-ID: <a8579544-a9de-63ae-61ed-283c872289a@ewheeler.net>
-References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
- <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com> <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
- <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B0CEA1800296;
+	Mon, 16 Jun 2025 20:15:26 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.45.224.53])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 52F9B30001B1;
+	Mon, 16 Jun 2025 20:15:20 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>
+Subject: [PATCH net-next v11 10/14] dpll: zl3073x: Implement input pin selection in manual mode
+Date: Mon, 16 Jun 2025 22:14:00 +0200
+Message-ID: <20250616201404.1412341-11-ivecera@redhat.com>
+In-Reply-To: <20250616201404.1412341-1-ivecera@redhat.com>
+References: <20250616201404.1412341-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-1713979476-1750104860=:30465"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Implement input pin state setting if the DPLL is running in manual mode.
+The driver indicates manual mode if the DPLL mode is one of ref-lock,
+forced-holdover, freerun.
 
---8323328-1713979476-1750104860=:30465
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Use these modes to implement input pin state change between connected
+and disconnected states. When the user set the particular pin as
+connected the driver marks this input pin as forced reference and
+switches the DPLL mode to ref-lock. When the use set the pin as
+disconnected the driver switches the DPLL to freerun or forced holdover
+mode. The switch to holdover mode is done if the DPLL has holdover
+capability (e.g is currently locked with holdover acquired).
 
-On Sun, 15 Jun 2025, Eric Wheeler wrote:
-> On Tue, 10 Jun 2025, Neal Cardwell wrote:
-> > On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > >
-> > > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > >
-> > > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > >
-> > > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > > >
-> > > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> > > > > > >
-> > > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
-> > > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> > > > > > > > >
-> > > > > > > > > Hello Neal,
-> > > > > > > > >
-> > > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
-> > > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
-> > > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
-> > > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
-> > > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
-> > > > > > > > >
-> > > > > > > > > Interestingly, the problem only presents itself when transmitting
-> > > > > > > > > from Linux; receive traffic (to Linux) performs just fine:
-> > > > > > > > >         ~60Mbit: Linux v6.6.85 =TX=> 10GbE -> switch -> 1GbE  -> device
-> > > > > > > > >          ~1Gbit: device        =TX=>  1GbE -> switch -> 10GbE -> Linux v6.6.85
-> > > > > > > > >
-> > > > > > > > > Through bisection, we found this first-bad commit:
-> > > > > > > > >
-> > > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
-> > > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
-> > > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
-> > 
-> 
-> > The attached patch should apply (with "git am") for any recent kernel
-> > that has the "tcp: fix to allow timestamp undo if no retransmits were
-> > sent" patch it is fixing. So you should be able to test it on top of
-> > the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
-> > easier.
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/zl3073x/dpll.c | 118 ++++++++++++++++++++++++++++++++++++
+ drivers/dpll/zl3073x/prop.c |   9 ++-
+ 2 files changed, 124 insertions(+), 3 deletions(-)
 
-Definitely better, but performance is ~15% slower vs reverting, and the
-retransmit counts are still higher than the other.  In the two sections
-below you can see the difference between after the fix and after the
-revert.  
+diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+index 56ca5c8dd9155..89da2c34609eb 100644
+--- a/drivers/dpll/zl3073x/dpll.c
++++ b/drivers/dpll/zl3073x/dpll.c
+@@ -132,6 +132,81 @@ zl3073x_dpll_selected_ref_get(struct zl3073x_dpll *zldpll, u8 *ref)
+ 	return 0;
+ }
+ 
++/**
++ * zl3073x_dpll_selected_ref_set - select reference in manual mode
++ * @zldpll: pointer to zl3073x_dpll
++ * @ref: input reference to be selected
++ *
++ * Selects the given reference for the DPLL channel it should be
++ * locked to.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_dpll_selected_ref_set(struct zl3073x_dpll *zldpll, u8 ref)
++{
++	struct zl3073x_dev *zldev = zldpll->dev;
++	u8 mode, mode_refsel;
++	int rc;
++
++	mode = zldpll->refsel_mode;
++
++	switch (mode) {
++	case ZL_DPLL_MODE_REFSEL_MODE_REFLOCK:
++		/* Manual mode with ref selected */
++		if (ref == ZL3073X_DPLL_REF_NONE) {
++			switch (zldpll->lock_status) {
++			case DPLL_LOCK_STATUS_LOCKED_HO_ACQ:
++			case DPLL_LOCK_STATUS_HOLDOVER:
++				/* Switch to forced holdover */
++				mode = ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER;
++				break;
++			default:
++				/* Switch to freerun */
++				mode = ZL_DPLL_MODE_REFSEL_MODE_FREERUN;
++				break;
++			}
++			/* Keep selected reference */
++			ref = zldpll->forced_ref;
++		} else if (ref == zldpll->forced_ref) {
++			/* No register update - same mode and same ref */
++			return 0;
++		}
++		break;
++	case ZL_DPLL_MODE_REFSEL_MODE_FREERUN:
++	case ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER:
++		/* Manual mode without no ref */
++		if (ref == ZL3073X_DPLL_REF_NONE)
++			/* No register update - keep current mode */
++			return 0;
++
++		/* Switch to reflock mode and update ref selection */
++		mode = ZL_DPLL_MODE_REFSEL_MODE_REFLOCK;
++		break;
++	default:
++		/* For other modes like automatic or NCO ref cannot be selected
++		 * manually
++		 */
++		return -EOPNOTSUPP;
++	}
++
++	/* Build mode_refsel value */
++	mode_refsel = FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, mode) |
++		      FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
++
++	/* Update dpll_mode_refsel register */
++	rc = zl3073x_write_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(zldpll->id),
++			      mode_refsel);
++	if (rc)
++		return rc;
++
++	/* Store new mode and forced reference */
++	zldpll->refsel_mode = mode;
++	zldpll->forced_ref = ref;
++
++	return rc;
++}
++
+ /**
+  * zl3073x_dpll_connected_ref_get - get currently connected reference
+  * @zldpll: pointer to zl3073x_dpll
+@@ -283,6 +358,48 @@ zl3073x_dpll_input_pin_state_on_dpll_get(const struct dpll_pin *dpll_pin,
+ 	return zl3073x_dpll_ref_state_get(pin, state);
+ }
+ 
++static int
++zl3073x_dpll_input_pin_state_on_dpll_set(const struct dpll_pin *dpll_pin,
++					 void *pin_priv,
++					 const struct dpll_device *dpll,
++					 void *dpll_priv,
++					 enum dpll_pin_state state,
++					 struct netlink_ext_ack *extack)
++{
++	struct zl3073x_dpll *zldpll = dpll_priv;
++	struct zl3073x_dpll_pin *pin = pin_priv;
++	u8 new_ref;
++	int rc;
++
++	switch (zldpll->refsel_mode) {
++	case ZL_DPLL_MODE_REFSEL_MODE_REFLOCK:
++	case ZL_DPLL_MODE_REFSEL_MODE_FREERUN:
++	case ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER:
++		if (state == DPLL_PIN_STATE_CONNECTED) {
++			/* Choose the pin as new selected reference */
++			new_ref = zl3073x_input_pin_ref_get(pin->id);
++		} else if (state == DPLL_PIN_STATE_DISCONNECTED) {
++			/* No reference */
++			new_ref = ZL3073X_DPLL_REF_NONE;
++		} else {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "Invalid pin state for manual mode");
++			return -EINVAL;
++		}
++
++		rc = zl3073x_dpll_selected_ref_set(zldpll, new_ref);
++		break;
++	default:
++		/* In other modes we cannot change input reference */
++		NL_SET_ERR_MSG(extack,
++			       "Pin state cannot be changed in current mode");
++		rc = -EOPNOTSUPP;
++		break;
++	}
++
++	return rc;
++}
++
+ static int
+ zl3073x_dpll_output_pin_state_on_dpll_get(const struct dpll_pin *dpll_pin,
+ 					  void *pin_priv,
+@@ -358,6 +475,7 @@ zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
+ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
+ 	.direction_get = zl3073x_dpll_pin_direction_get,
+ 	.state_on_dpll_get = zl3073x_dpll_input_pin_state_on_dpll_get,
++	.state_on_dpll_set = zl3073x_dpll_input_pin_state_on_dpll_set,
+ };
+ 
+ static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops = {
+diff --git a/drivers/dpll/zl3073x/prop.c b/drivers/dpll/zl3073x/prop.c
+index bc8b78cfb5ae0..c3224e78cbf01 100644
+--- a/drivers/dpll/zl3073x/prop.c
++++ b/drivers/dpll/zl3073x/prop.c
+@@ -201,11 +201,14 @@ struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
+ 	if (!props)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	/* Set default pin type */
+-	if (dir == DPLL_PIN_DIRECTION_INPUT)
++	/* Set default pin type and capabilities */
++	if (dir == DPLL_PIN_DIRECTION_INPUT) {
+ 		props->dpll_props.type = DPLL_PIN_TYPE_EXT;
+-	else
++		props->dpll_props.capabilities =
++			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
++	} else {
+ 		props->dpll_props.type = DPLL_PIN_TYPE_GNSS;
++	}
+ 
+ 	props->dpll_props.phase_range.min = S32_MIN;
+ 	props->dpll_props.phase_range.max = S32_MAX;
+-- 
+2.49.0
 
-Here is the output:
-
-## After fixing with your patch:
-	https://www.linuxglobal.com/out/for-neal/after-fix.tar.gz
-
-	WHEN=after-fix
-	(while true; do date +%s.%N; ss -tenmoi; sleep 0.050; done) > /tmp/$WHEN-ss.txt &
-	nstat -n; (while true; do date +%s.%N; nstat; sleep 0.050; done)  > /tmp/$WHEN-nstat.txt &
-	tcpdump -i br0 -w /tmp/$WHEN-tcpdump.${eth}.pcap -n -s 116 -c 1000000 host 192.168.1.203 &
-	iperf3 -c 192.168.1.203
-	kill %1 %2 %3
-
-	[1] 2300
-	nstat: history is aged out, resetting
-	[2] 2304
-	[3] 2305
-	Connecting to host 192.168.1.203, port 5201
-	[  5] local 192.168.1.52 port 47730 connected to 192.168.1.203 port 5201
-	dropped privs to tcpdump
-	tcpdump: listening on br0, link-type EN10MB (Ethernet), snapshot length 116 bytes
-	[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-	[  5]   0.00-1.00   sec   115 MBytes   963 Mbits/sec   21    334 KBytes       
-	[  5]   1.00-2.00   sec   113 MBytes   949 Mbits/sec    3    325 KBytes       
-	[  5]   2.00-3.00   sec  41.8 MBytes   350 Mbits/sec  216   5.70 KBytes       
-	[  5]   3.00-4.00   sec   113 MBytes   952 Mbits/sec   77    234 KBytes       
-	[  5]   4.00-5.00   sec   110 MBytes   927 Mbits/sec    5    281 KBytes       
-	[  5]   5.00-6.00   sec  69.5 MBytes   583 Mbits/sec  129    336 KBytes       
-	[  5]   6.00-7.00   sec  66.8 MBytes   561 Mbits/sec  234    302 KBytes       
-	[  5]   7.00-8.00   sec   113 MBytes   949 Mbits/sec    8    312 KBytes       
-	[  5]   8.00-9.00   sec  89.9 MBytes   754 Mbits/sec   72    247 KBytes       
-	[  5]   9.00-10.00  sec   113 MBytes   949 Mbits/sec    6    235 KBytes       
-	- - - - - - - - - - - - - - - - - - - - - - - - -
-	[ ID] Interval           Transfer     Bitrate         Retr
-	[  5]   0.00-10.00  sec   946 MBytes   794 Mbits/sec  771               sender <<<
-	[  5]   0.00-10.04  sec   944 MBytes   789 Mbits/sec                  receiver <<<
-
-	iperf Done.
-	145337 packets captured
-	146674 packets received by filter
-	0 packets dropped by kernel
-	[1]   Terminated              ( while true; do
-	    date +%s.%N; ss -tenmoi; sleep 0.050;
-	done ) > /tmp/$WHEN-ss.txt
-	[root@hv2 ~]# 
-	[2]-  Terminated              ( while true; do
-	    date +%s.%N; nstat; sleep 0.050;
-	done ) > /tmp/$WHEN-nstat.txt
-	[3]+  Done                    tcpdump -i br0 -w /tmp/$WHEN-tcpdump.${eth}.pcap -n -s 116 -c 1000000 host 192.168.1.203
-
-## After Revert
-	WHEN=after-revert-6.6.93
-	(while true; do date +%s.%N; ss -tenmoi; sleep 0.050; done) > /tmp/$WHEN-ss.txt &
-	nstat -n; (while true; do date +%s.%N; nstat; sleep 0.050; done)  > /tmp/$WHEN-nstat.txt &
-	tcpdump -i br0 -w /tmp/$WHEN-tcpdump.${eth}.pcap -n -s 116 -c 1000000 host 192.168.1.203 &
-	iperf3 -c 192.168.1.203
-	kill %1 %2 %3
-	[1] 2088
-	nstat: history is aged out, resetting
-	[2] 2092
-	[3] 2093
-	Connecting to host 192.168.1.203, port 5201
-	dropped privs to tcpdump
-	tcpdump: listening on br0, link-type EN10MB (Ethernet), snapshot length 116 bytes
-	[  5] local 192.168.1.52 port 47256 connected to 192.168.1.203 port 5201
-	[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-	[  5]   0.00-1.00   sec   115 MBytes   962 Mbits/sec   13    324 KBytes       
-	[  5]   1.00-2.00   sec   114 MBytes   953 Mbits/sec    3    325 KBytes       
-	[  5]   2.00-3.00   sec   113 MBytes   947 Mbits/sec    4    321 KBytes       
-	[  5]   3.00-4.00   sec   113 MBytes   950 Mbits/sec    3    321 KBytes       
-	[  5]   4.00-5.00   sec   113 MBytes   946 Mbits/sec    5    322 KBytes       
-	[  5]   5.00-6.00   sec   113 MBytes   950 Mbits/sec    8    321 KBytes       
-	[  5]   6.00-7.00   sec   113 MBytes   948 Mbits/sec    5    312 KBytes       
-	[  5]   7.00-8.00   sec   113 MBytes   952 Mbits/sec    3    301 KBytes       
-	[  5]   8.00-9.00   sec   113 MBytes   945 Mbits/sec    7    301 KBytes       
-	[  5]   9.00-10.00  sec   114 MBytes   953 Mbits/sec    4    302 KBytes       
-	- - - - - - - - - - - - - - - - - - - - - - - - -
-	[ ID] Interval           Transfer     Bitrate         Retr
-	[  5]   0.00-10.00  sec  1.11 GBytes   950 Mbits/sec   55             sender
-	[  5]   0.00-10.04  sec  1.10 GBytes   945 Mbits/sec                  receiver
-
-	iperf Done.
-	[root@hv2 ~]# 189249 packets captured
-	189450 packets received by filter
-	0 packets dropped by kernel
-
-
---
-Eric Wheeler
---8323328-1713979476-1750104860=:30465--
 
