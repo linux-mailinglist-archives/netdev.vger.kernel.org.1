@@ -1,49 +1,42 @@
-Return-Path: <netdev+bounces-198253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0AE3ADBB10
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:23:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51DD4ADBB12
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 22:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01EED3A9351
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:21:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA8631892F14
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 20:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E81728A1EB;
-	Mon, 16 Jun 2025 20:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q1L+5YqC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9281028934E;
+	Mon, 16 Jun 2025 20:20:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.hostedemail.com (smtprelay0014.hostedemail.com [216.40.44.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D403820E007;
-	Mon, 16 Jun 2025 20:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DF3BA42;
+	Mon, 16 Jun 2025 20:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750105106; cv=none; b=IC9mj/YJuizInpVQaNkzWn+w6hgG5pHyurcHxqBc9mQkmI2jB9NuN0B3S27H+58sABDl07tlrI+YJ1RVjfRKq07gUvVImewutUnTWuyxn7p+c/yyqAk67hf4nIJqp8QlaKvCbtm/PK8cEHei62SvGr9mXhmAw7nBNzZsqFepOYY=
+	t=1750105242; cv=none; b=ZliCzlfmo6maah2feHlsVDMzNz7FpQVJMxl+NLsLEweNmH0kXPjYude/AAD7DJsXAP4/bPyFcdZcOjraEtcdRf8qRH4V6wZfzxOJ+TFD8BCTH38XPPKbIVsIGEPhOUla61dd96zUi+1BTiV8fqI+RWB6Q10dCg2Yu8GD0P7PZYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750105106; c=relaxed/simple;
-	bh=/MZXgXnlklMlun1yRXTlVVqUOti5H5p9f/tFG3NnfAA=;
+	s=arc-20240116; t=1750105242; c=relaxed/simple;
+	bh=0Ryv9UCpOn6jJJKlgtabqaN9ktZGehGgpZGDWaGIGVM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rt9jCyoG7RGCa5vMQ5AjmdFUW64m6yPoZ8aTXjG/8W5GorvBpbMmSqPzqRaj4x9lOPsdPZzvKPyWHRK5Rzi2Y0iruFiU4QPIkQx5afbCCAgQei0q7NyR94VTjZsHuxseWpXxJsgaMOrLTR/MaiTrngJ+Y/VyrJapVhZBqzeODWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q1L+5YqC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04310C4CEEA;
-	Mon, 16 Jun 2025 20:18:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750105106;
-	bh=/MZXgXnlklMlun1yRXTlVVqUOti5H5p9f/tFG3NnfAA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q1L+5YqCUVTRb+sOuaFaGlDkz9czU/kPnX3LPHN2U1saqAO6c8YetXiqAzlcKYTKC
-	 Q4YjUimfqO8SMT3VKuIlka4XfEQYrzO4qsWMP+r87oXMW0PicD7o1mWuRIERfQXD0R
-	 mA65oZ82F5pdSY3CMBhAVOYfqJwjgn4NiNasnoAIQlhMGGpAnLZY7UJR/Tye8finGg
-	 IHAxdN0qeUHBXXflfJa4hJxCSBM8QYv1ZdueB1vxq0zF+s0Jra/Ls/FVi4TDfeXyqy
-	 xWVyPtx/Ni+UWM3uASdVV4J7GFMsbysREi9C6YBQlaQeoPJiHJL9uznUL+ODLALw4O
-	 AYxNt4FX9kXMQ==
-Date: Mon, 16 Jun 2025 13:18:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+	 MIME-Version:Content-Type; b=d+RB2GCAZcyTgw7q3QLlsAFkdNKuQ39iQLG0YXRu9fXwJQNANh89er+rVetDcUJrfi1FLnzsTWRPBy33ff1lbAdVwesZdxTociaeU6P6AxE1QvEt8u2c1n3jMqaHxy2++4sSoAPcK/zMN673s/7xnyRTWXIjU7VGrH6d68ZxLgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf02.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay08.hostedemail.com (Postfix) with ESMTP id EA9CA140DFB;
+	Mon, 16 Jun 2025 20:20:37 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf02.hostedemail.com (Postfix) with ESMTPA id ACD2780014;
+	Mon, 16 Jun 2025 20:20:35 +0000 (UTC)
+Date: Mon, 16 Jun 2025 16:20:39 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: Simon Horman <horms@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
  Linux trace kernel <linux-trace-kernel@vger.kernel.org>,
  netdev@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
@@ -52,11 +45,13 @@ Cc: Simon Horman <horms@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
  Iwashima <kuniyu@amazon.com>
 Subject: Re: [PATCH] net/tcp_ao: tracing: Hide tcp_ao events under
  CONFIG_TCP_AO
-Message-ID: <20250616131825.65e1c058@kernel.org>
-In-Reply-To: <20250616144718.4e8e12bf@batman.local.home>
+Message-ID: <20250616162039.6c030caa@gandalf.local.home>
+In-Reply-To: <20250616131825.65e1c058@kernel.org>
 References: <20250612094616.4222daf0@batman.local.home>
 	<20250614153003.GP414686@horms.kernel.org>
 	<20250616144718.4e8e12bf@batman.local.home>
+	<20250616131825.65e1c058@kernel.org>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,20 +60,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: ACD2780014
+X-Stat-Signature: zxgueftpktfut71o33xeh3itqyewppis
+X-Rspamd-Server: rspamout06
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1/QrVKUF34VSnGMYo8mgDlWQZvoVVtRkoc=
+X-HE-Tag: 1750105235-693059
+X-HE-Meta: U2FsdGVkX1/Vn+Fk0EmiKG4pbp2Z4qZAwO5j3KL1FUoiwCoeBmmAL5GXGcmyc4wHb+OYnJkr2uFuD2wttsjOoW8RJZoHQmGU8Dfb6k8ev68FJRFAKUku0Yq/OyN8A1nFWNbufKxhY7TEV1rbwLWfVoxITlKlnSqDRzYN6xIlvcQLZ2J1tiv+w7K9qRvmMI9AlkYK3ngDX/0ncvgcZo+FudFdtNfrwvmWbaPnG+t8ZdPvIbOT/RiMfoz15D56E/atkZubz7Ww3VyjbEXHld4qmQgzJAk4BbPH5LZLV6mSYyF6LolXCuuMVhLm7vCWu3Tc8fzrVdlBNoWEFO4QZfQ7v0e72NLWJdVJ
 
-On Mon, 16 Jun 2025 14:47:18 -0400 Steven Rostedt wrote:
-> On Sat, 14 Jun 2025 16:30:03 +0100
-> Simon Horman <horms@kernel.org> wrote:
-> 
-> > I agree that the events and classes covered by this #define
-> > are not used unless CONFIG_TCP_AO is set. And that the small
-> > number of TCP_AO related events that are left outside
-> > the define are used even when CONFIG_TCP_AO is not set.
+On Mon, 16 Jun 2025 13:18:25 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> On Mon, 16 Jun 2025 14:47:18 -0400 Steven Rostedt wrote:
+> > On Sat, 14 Jun 2025 16:30:03 +0100
+> > Simon Horman <horms@kernel.org> wrote:
+> >   
+> > > I agree that the events and classes covered by this #define
+> > > are not used unless CONFIG_TCP_AO is set. And that the small
+> > > number of TCP_AO related events that are left outside
+> > > the define are used even when CONFIG_TCP_AO is not set.
+> > > 
+> > > Reviewed-by: Simon Horman <horms@kernel.org>    
 > > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>  
+> > Should I take this or should this go through the networking tree?  
 > 
-> Should I take this or should this go through the networking tree?
+> Weak preference towards networking tree. We'll apply by the end of 
+> the day.
 
-Weak preference towards networking tree. We'll apply by the end of 
-the day.
+Thanks, much appreciated.
+
+-- Steve
 
