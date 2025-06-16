@@ -1,141 +1,181 @@
-Return-Path: <netdev+bounces-198040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1476EADAFDF
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:10:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60509ADB034
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 14:29:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0EC07A6C99
-	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9188E3A1EBF
+	for <lists+netdev@lfdr.de>; Mon, 16 Jun 2025 12:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574192E425C;
-	Mon, 16 Jun 2025 12:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E16285C86;
+	Mon, 16 Jun 2025 12:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EEyg/Hp6"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="VTK5V0/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDF02E4241;
-	Mon, 16 Jun 2025 12:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750075821; cv=none; b=ROis3f7MOIlJhmAtkFNAayEsqZKs+eXD0gNBjWjrqNzt3nRltssFo9SIjX6iSTtQ1AkfrRIl+CSsXyNajW2grot9EFf2NKzcCbJwxyON6OTkbYQg3z92t8GzkTZWSC0SQPZp4Y9NOX9kP7K/yBOr4GfT8fUWOaI/GCY7lTXd1iI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750075821; c=relaxed/simple;
-	bh=ojwhMmVeMqnjZosqlXZruxACtgqBN03bmbQ1B9/E6UI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q8C9cYtqz5m9yAOQCPvXID20ipzJPAQfzxxLLK5b1kuY+IHswAwlRE9o82d2tqkyduimfDEANlwQtIEHoYKYws9EauiDjqj3L/r1Hs49+L5C5w0YEg5QhONnQtScjaGBMRxQhbdlhXsZSWxCoushX1W8DO3D5cVq3cetzcH+e8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EEyg/Hp6; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0D9D0205B1;
-	Mon, 16 Jun 2025 12:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1750075816;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QAo/rJoPJaVKk6/wqH24mlqd1olNxReIFJb4vfD2uts=;
-	b=EEyg/Hp645fFSuxaOy1mGDBN/y7qfmX8LqB/i8dgo50hV3oMUizGP9yaXCwt8Uje6kL6mF
-	gaqkgdO7z48gIBDUevCzrzPtYR8MDj1kx7EswQ3jQ2H5ktr1DQc7sgpQeewIdsM7hUlgfp
-	7ID3oNq3HthGCYZouA303VyDmFOulN4ytAbGKe81xPFZUl8fj1Ra5xsWoLvZcQTbQxz8c+
-	SHJzrT/vPkt/jhCpfo9i8UJg10Gen0Xm3T/fJs0DVnjQXKlyhWNjwsNQYKZw7/UJIkfzDz
-	H3e6tKQv5vN3ibI7n13bmW79ZKg/AuleT1HH36zfa7J8HOsWdIdgug9RLxL8Cw==
-Date: Mon, 16 Jun 2025 14:10:12 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
- <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark
- Brown <broonie@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v13 02/13] net: pse-pd: Add support for
- reporting events
-Message-ID: <20250616141012.31305f81@kmaincent-XPS-13-7390>
-In-Reply-To: <20250616135722.2645177e@kmaincent-XPS-13-7390>
-References: <20250610-feature_poe_port_prio-v13-0-c5edc16b9ee2@bootlin.com>
-	<20250610-feature_poe_port_prio-v13-2-c5edc16b9ee2@bootlin.com>
-	<20250614121843.427cfc42@kernel.org>
-	<20250616135722.2645177e@kmaincent-XPS-13-7390>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499792E426F;
+	Mon, 16 Jun 2025 12:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750076980; cv=pass; b=HEWHxZqVzGJKDzvuqji1IZzNljDrfN6mi/EfIKJjhRyye0EIEpCpXnf4PnWKJN2E9vMIhFxfstZrBd1IHlPD/iHDpIUljl/6YooTwWY7N43C5SxquB7pR3YUAQYbuF0k4FphPSiCdVheATBmYIZOelMscSbs1cYW6IE0OBYtUro=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750076980; c=relaxed/simple;
+	bh=D1nrTM3OWHNa73fOHQSyszn7QncKX5gjfoZAZmCJOV4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BnSDdjzZrs6Ime/JhO+xrLVzYrPNxjiqoR0QB0GSqEzfldVp9Z7MTfdKrvZf0lpK64jSk1lD30LjlbFTWg5e1j5yffov4muejJqeXl8CYR5vnuD6i1tEyjZe6yrEKvZ86zpXU1LvbFFy27Jflk1gGc2A7/fb69qFSv8lfTvc+/s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=VTK5V0/V; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1750076894; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Kn8MGUt3qBaOkBsleWMs/iI7evtX+3Ii+lWmXB8xOO8yonT/tDL4OfelfnPrGyP69Xa6GXt64PMxsM5vBn5YsaN0I5GeJUR7YvPCpzogaDpzyN7GW1fehBmHRRYpAHqyTyzXBh1S8/TsCf+p6V2AaB6zIxcJ7XJ+dTVZeTb4YRc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1750076894; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=lS5jmrsM1AStlE4Oaeas/EKugjJN944zsH8rQcQ3FAk=; 
+	b=gZpW6CMh7kONQtxIuB9S8BJSCJKsvjeGsHGDKmIuXDXZlzskn5bJwbdnpsUcmAghdjwm7D9LGAU4Rel8QeQKW1q+5kRysuw841yRbvXfifnWduhN2bYLxbuLNXEh2MTtxoVgPSUuojnwR8DpXHHIQwqbIosI/MoGhZqfAJbm5mE=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
+	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1750076894;
+	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
+	bh=lS5jmrsM1AStlE4Oaeas/EKugjJN944zsH8rQcQ3FAk=;
+	b=VTK5V0/Vh8vG0ADUhZJqoWC8GNkp9+Edtt7f54cvlzORP0TBC3O3iXDcIRVP1bPg
+	diBzmzi3jUJX7MfK81EwTr1m9SPAyKZNsnywz/gVppbbf7/4KM7BIphS3UCg/GYBOZD
+	MzraVGJabGmAR/4cao207oI0XAYOJPvc3s7lJ85s=
+Received: by mx.zohomail.com with SMTPS id 1750076891122319.76650013837536;
+	Mon, 16 Jun 2025 05:28:11 -0700 (PDT)
+From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+To: Robin Murphy <robin.murphy@arm.com>, Yury Norov <yury.norov@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Heiko Stuebner <heiko@sntech.de>,
+ Shreeya Patel <shreeya.patel@collabora.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
+ Andy Yan <andy.yan@rock-chips.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Shawn Lin <shawn.lin@rock-chips.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-pm@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev,
+ linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-clk@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+ kernel@collabora.com, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
+Subject: Re: [PATCH 01/20] bitfield: introduce HWORD_UPDATE bitfield macros
+Date: Mon, 16 Jun 2025 14:27:55 +0200
+Message-ID: <3361713.44csPzL39Z@workhorse>
+In-Reply-To: <aEw7LBpmkfOqZgf1@yury>
+References:
+ <20250612-byeword-update-v1-0-f4afb8f6313f@collabora.com>
+ <1437fe89-341b-4b57-b1fa-a0395081e941@arm.com> <aEw7LBpmkfOqZgf1@yury>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddvieehgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
- ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 
-Le Mon, 16 Jun 2025 13:57:22 +0200,
-Kory Maincent <kory.maincent@bootlin.com> a =C3=A9crit :
+Hello,
 
-> Le Sat, 14 Jun 2025 12:18:43 -0700,
-> Jakub Kicinski <kuba@kernel.org> a =C3=A9crit :
->=20
-> > On Tue, 10 Jun 2025 10:11:36 +0200 Kory Maincent wrote: =20
-> > > +static struct net_device *
-> > > +pse_control_find_net_by_id(struct pse_controller_dev *pcdev, int id,
-> > > +			   netdevice_tracker *tracker)
-> > > +{
-> > > +	struct pse_control *psec, *next;
-> > > +
-> > > +	mutex_lock(&pse_list_mutex);
-> > > +	list_for_each_entry_safe(psec, next, &pcdev->pse_control_head,
-> > > list) {   =20
-> >=20
-> > nit: _safe is not necessary here, the body of the if always exits after
-> > dropping the lock =20
->=20
-> Indeed, I will drop it.
->=20
-> > Do you plan to add more callers for this function?
-> > Maybe it's better if it returns the psec pointer with the refcount
-> > elevated. Because it would be pretty neat if we could move the=20
-> > ethnl_pse_send_ntf(netdev, notifs, &extack); that  pse_isr() does
-> > right after calling this function under the rtnl_lock.
-> > I don't think calling ethnl_pse_send_ntf() may crash the kernel as is,
-> > but it feels like a little bit of a trap to have ethtool code called
-> > outside of any networking lock. =20
->=20
-> Ok. My aim was to put the less amount of code inside the rtnl lock but if=
- you
-> prefer I will call ethnl_pse_send_ntf() with the lock acquired.
+On Friday, 13 June 2025 16:52:28 Central European Summer Time Yury Norov wrote:
+> On Fri, Jun 13, 2025 at 02:54:50PM +0100, Robin Murphy wrote:
+> > On 2025-06-12 7:56 pm, Nicolas Frattaroli wrote:
+> > > Hardware of various vendors, but very notably Rockchip, often uses
+> > > 32-bit registers where the upper 16-bit half of the register is a
+> > > write-enable mask for the lower half.
+> > > 
+> > > This type of hardware setup allows for more granular concurrent register
+> > > write access.
+> > > 
+> > > Over the years, many drivers have hand-rolled their own version of this
+> > > macro, usually without any checks, often called something like
+> > > HIWORD_UPDATE or FIELD_PREP_HIWORD, commonly with slightly different
+> > > semantics between them.
+> > > 
+> > > Clearly there is a demand for such a macro, and thus the demand should
+> > > be satisfied in a common header file.
+> > > 
+> > > Add two macros: HWORD_UPDATE, and HWORD_UPDATE_CONST. The latter is a
+> > > version that can be used in initializers, like FIELD_PREP_CONST. The
+> > > macro names are chosen to not clash with any potential other macros that
+> > > drivers may already have implemented themselves, while retaining a
+> > > familiar name.
+> > 
+> > Nit: while from one angle it indeed looks similar, from another it's even
+> > more opaque and less meaningful than what we have already. Personally I
+> > cannot help but see "hword" as "halfword", so logically if we want 32+32-bit
+> > or 8+8-bit variants in future those would be WORD_UPDATE() and
+> > BYTE_UPDATE(), right? ;)
+> > 
+> > It's also confounded by "update" not actually having any obvious meaning at
+> > this level without all the implicit usage context. FWIW my suggestion would
+> > be FIELD_PREP_WM_U16, such that the reader instantly sees "FIELD_PREP with
+> > some additional semantics", even if they then need to glance at the
+> > kerneldoc for clarification that WM stands for writemask (or maybe WE for
+> > write-enable if people prefer). Plus it then leaves room to easily support
+> > different sizes (and potentially even bonkers upside-down Ux_WM variants?!)
+> > without any bother if we need to.
+> 
+> I like the idea. Maybe even shorter: FIELD_PREP_WM16()?
+> 
 
-psec pointer is private to pse so we will have something like the following.
-Is it ok for you ?
+I do think FIELD_PREP_WM16() is a good name. If everyone is okay with this
+as a name, I will use it in v2 of the series. And by "everyone" I really
+mean everyone should get their hot takes in before the end of the week,
+as I intend to send out a v2 on either Friday or the start of next week
+to keep the ball rolling, but I don't want to reroll a 20 patch series
+with a trillion recipients more than is absolutely necessary.
 
-psec =3D pse_control_find_by_id(pcdev, i, &tracker);
-rtnl_lock();
-if (psec && psec->attached_phydev &&
-    psec->attached_phydev->attached_dev)
-	ethnl_pse_send_ntf(psec->attached_phydev->attached_dev, notifs,
-			   &extack);
-rtnl_unlock();
-pse_control_put(psec);
+To that end, I'd also like to get some other naming choices clarified.
+
+As I gathered, these two macros should best be placed in its own header.
+Is include/linux/hw_bitfield.h a cromulent choice, or should we go with
+include/linux/hw_bits.h?
+
+Furthermore, should it be FIELD_PREP_WM16_CONST or FIELD_PREP_CONST_WM16?
+I'm personally partial to the former.
+
+And finally, is it okay if I leave out refactoring Intel's
+_MASKED_FIELD() or should I see if I can at least replace its
+implementation while I'm at it?
+
+For less opinionated changes, I'll also change all the `U` literal
+suffixes to `UL` wherever I've added them. As I understand it, it doesn't
+really make a difference in these instances, but `UL` is more prevalent
+in the kernel.
+
+Kind regards,
+Nicolas Frattaroli
 
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
