@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-198681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F2BAADD071
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:50:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B91ADD07B
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C61A189A574
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:46:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92D38189AC95
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19E62EBDD7;
-	Tue, 17 Jun 2025 14:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA82F22FAD4;
+	Tue, 17 Jun 2025 14:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQ5YycKn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m2rqk0BR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E118A2EBDD0
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E042EBDE1
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750171377; cv=none; b=U3XIfOO8D7hdXJnWgc+f5BfI6qUuNxkDQOzwMart1VEBuQVUpVRJs11qiqc/4R2YZeHq88siNdlkDexpdpyMoIZzPNlDNIhM6KDmzFoarzISVcj/JCPMK6UvF+xucksJRqV9YFLBe86SYyUYxOajr2I2jRRQmZKdymivLW20DzE=
+	t=1750171379; cv=none; b=lyT/1VgCCmkwrvCVRcjQ3ZJjbf9j9pw9jmncKdmB4FNo2VEHNS/PoqBo5LzzdlMnJztvgwddbyMyg3xjL868v81raBJ+KtbdurmHGbI70RfNcCG9yOUPwC7RYEFFKBgKCYWY6O1NwR0p9bL9A5CODz6UUD5ZpU3girjCn7A+3M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750171377; c=relaxed/simple;
-	bh=IkdzTDOnCVz+pp0XXy5lIUtkl/UdLE+N42T889pXOvo=;
+	s=arc-20240116; t=1750171379; c=relaxed/simple;
+	bh=S8HYvxTqeZ7r9i7AAfXJjhNKMdRvxq3YNI89CR9B98g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CXfxSRyZlypzPwTGaweZoJIQ4k5oHI17ooV17cHUzfO09QSSeY2DEoZ+mEO/wRyELYWIJkv9545en3DFA5IBOmqmBL5fmHS67+qqpN95l85g9BkxRmXAancXX00CdepFWPY2FJiKpvrVGN/64zNlvfyULYXtUbAiPEVxDiTedy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQ5YycKn; arc=none smtp.client-ip=209.85.208.43
+	 MIME-Version; b=TjdXkAmEUiNjIy0MG947k27/ldH5woAhhKusqY8YIxuC18TigwxcX4/lSLOFZcLeXdJ/tusAG5VYezN0k5vaYtvRoDAuwLdLLyO6j+fOYenyM8ic+PLDFhBXjmW/WGqwGtjwQBVzJKUSH0gnJLnWzV46rS2MFfNIlgfUPIVqtu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m2rqk0BR; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-60867565fb5so10360874a12.3
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:42:55 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-60780d74bbaso1596731a12.0
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:42:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750171374; x=1750776174; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750171376; x=1750776176; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b1CC0lezYqaB9rAs8sazcxq/muZtdyXXodE6LVJIx48=;
-        b=UQ5YycKnupbZIOX6VKXatyw9hhmNrBiOsJssAaPEZhIxLtPfQ4rHvZRK0BonVEvYFy
-         rCbT6oy0rSfd4DewfYynUi0RgPlKXvQNtZvgRdlI/k6nbLeo2K32IBmWjkuTN+Kbb3IE
-         VdDqFMv/eUtDceMO3qXNHAdRcZa1At+haJca2NFyeOitXshoinKw3ObEBsgAymK9wLQs
-         A4xgnaH7EdMY2KQA/j36ITizrpZX/fc0Ei8uWu7v2baw/09MvGJZeqcDx9qmw/hopQbs
-         MiHcmJCL8k7V+Z8I8MkzHVVVDEFMxNHsRX7m517pTzctmniAllc3qOzoo1r4ybgFn2+I
-         GuWw==
+        bh=dCtcPIZevXn/wsBH1v49v/fZYOdOVBa0MB6MKc1RQ2M=;
+        b=m2rqk0BRa8IRef5jvwnu/wsa+rZ/4mN97/Mdpr+cVoSGTDqvFBrZDEogCYbASXPdC2
+         VG42tWOOjRUpD/CCsvZBxD92k9qI0UoHLjG9X5Zo/GIQv6GIAfVDnG9yX9ys80CD3JQ8
+         geIvw6e1zhBmTDsrPQWQqWib2ue6aGvojBkgBuEHY4oD191dU959oIGIjVfVfphyin8n
+         6G8KaMle67avYwW5VZzf/qDFXtQqRV3r8+N8aiXbJ19BhFdnkGPXQQMCVZptgpvgJc0M
+         SKQGzQQgDrf4h4q+7ZRmre8U9YdV2woXol2xC9w0uBgHbnRIFgbk034nP+SFWkb9Hwyu
+         xrnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750171374; x=1750776174;
+        d=1e100.net; s=20230601; t=1750171376; x=1750776176;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b1CC0lezYqaB9rAs8sazcxq/muZtdyXXodE6LVJIx48=;
-        b=rhXEpmUQO553iHXooRiKgBmZd03fUvIs2EtaLFMbm4Re7zW18EBDpH0Q0xCEOFTdRv
-         WPurh428KkFFxw3CqnxRnIV82HI75ZvO76Uvp/4ou8fyh3YkPtAo6SRb/QC1D1/1NX5V
-         8DHeppHncG+VPQwkcGssiSIWhnMa6SUAcdA65a/bjCMTfkTymkmDD39CUqg4/veqPwkk
-         gaWegyVLM9/AmynfgtGq7+hVN+9iVjayzn0TE62U/iNEGsu95sFght/bY9RHP8M2kChB
-         eVmM1NC/gesuB/5xvGbZ8CmOAq0ueTbA9suTq4hxQHbEyQiHCfxCIN8BRQdI3kyrXYXg
-         SCVQ==
-X-Gm-Message-State: AOJu0YzSVdwz3RMa2BxsVGgOvvMhoEAkE0a9cfJH3eDTGxaD70IcQMet
-	eVh0BM5I+JQ7oRcC+FnmXYqFvhSPPYALjhSBdYNAV7HS07H/0qPjsEN3
-X-Gm-Gg: ASbGnct6CAmVaPZrn6jntY5xjyCdHiImjmpgPA/xid840VY80fUO0fglUzOnL4fyJGP
-	xHwmOJwWshXF/OPfXElJ89cbB1k/tp04hn8aX9VsPjvMzgcB8g5VuoQmyr41rwxLM/84P26sdOs
-	C//YZy+I7DxorHyNMrKsKWMxK5Ladskl9SfA/0UWStkFPAU8yYT3FGexZMQ7zm9SVl/YR9i8eJN
-	O4sFIk99aITba1G81XfjWF3fOGFGBwr6iwMZx/TPZlvXj9faoIEU7xVUhh1B8xfQCqDDx06x4aX
-	RnVZDeImhMub3rcY07ADl8K8R/mw5P4HsPjDJukfK2L+3Qqf3IqzAw5PBMedrSYYetwLAyZQ04C
-	jnWIvuqVLebOK
-X-Google-Smtp-Source: AGHT+IHBjTUuyMMzqazEb2B+Jsr46hhBJsxTL99wfi537PzNjRsBIrDDIPwrbnL/foK47O/9fXqSRw==
-X-Received: by 2002:a17:907:e8a:b0:adf:86df:de9b with SMTP id a640c23a62f3a-adfad329db8mr1297369866b.16.1750171373948;
-        Tue, 17 Jun 2025 07:42:53 -0700 (PDT)
+        bh=dCtcPIZevXn/wsBH1v49v/fZYOdOVBa0MB6MKc1RQ2M=;
+        b=L7+l41RFDmSlNQYI1BvJPzzCGKvL3mckISyRcpqunAFZ/vn0+Wn4DLhuCvNOjPsnwC
+         TmKij1c1mPKZ2YfcInLwexhuse2UadTJbP+k2pRmHu/KnZryqmHgrh7mGHjd6fTdLg+S
+         AJddmnuWBIsqJURlNt3NAZbrwyP097Cx5FinjWwntY8LMLEjIUiBoZGDOCSZ8DF6ULEE
+         uFA6VrLsipg0HcvNiUPqRqgZzST/Hur0R41EIHTV6TRNdo+FkEEFJ64bF+Rk1oMRn3IU
+         2fk1dfKaUmM8iAWRRr7zSqRZgPgCBrxv4mIOwhJY7cZHs+6ViMXa+srcogy/g5PZyO/c
+         xJow==
+X-Gm-Message-State: AOJu0Yxju05bliHKZ693X/NvVI0k8XzJriAQt5UniK/sn+4jZ9wrz10d
+	rc0ZjIRrKbN0QGWpZtFUQlUY4pkRIStU8UXztsA1gX5o6odOD5UmvgTv
+X-Gm-Gg: ASbGnctEVN+5EfzSnxLakTs2JMadRQs7QEIVjyuH1ImLgOEITgwXjjsOZHgkCzvcVZj
+	T4pgWq3fi8KRiDxMbeKNeE/sZOagXUGRlZVoAFq+Zg03V5FF7XEj6aQNbF7Js0HTRft2nOoGt5x
+	FMRqN2XeuO4EDteGwnnEIBkJgO1yXUTKG/iuPb4pVxNcILfn22ltxfyB/uIjGb0O8dvvNl0I9C5
+	2BmYv60eMtTEQsB/vxMwaw+q6HblqrUQEst+Ua1W2/Vyt5Wf8IKEJHBfREg2dloew7uckYnTNFo
+	LvnMRLD7n7aAzT2F6fcyPjK9y1dbOHn/rVF4vpG6cKBBuOovk/ERz8Z+Z2RkbfrKI6nRGyN1ipP
+	BWlxz+ZhLGiedYsm9jxqKZlY=
+X-Google-Smtp-Source: AGHT+IEtq2Q/6v672bT+43FyurJCupcvKTWS+WFy30fZjeI9Xa1nnv/2iUs0RFaVLAKlJ16Gb45LMg==
+X-Received: by 2002:a05:6402:254e:b0:601:470b:6d47 with SMTP id 4fb4d7f45d1cf-608ce49dba2mr13520855a12.1.1750171376458;
+        Tue, 17 Jun 2025 07:42:56 -0700 (PDT)
 Received: from localhost (tor-exit-56.for-privacy.net. [185.220.101.56])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-adec88ff249sm863051066b.82.2025.06.17.07.42.53
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-60900cdd4f1sm5205441a12.2.2025.06.17.07.42.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 07:42:53 -0700 (PDT)
+        Tue, 17 Jun 2025 07:42:56 -0700 (PDT)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 X-Google-Original-From: Maxim Mikityanskiy <maxim@isovalent.com>
 To: Daniel Borkmann <daniel@iogearbox.net>,
@@ -84,9 +84,9 @@ To: Daniel Borkmann <daniel@iogearbox.net>,
 	Nikolay Aleksandrov <razor@blackwall.org>
 Cc: netdev@vger.kernel.org,
 	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH RFC net-next 13/17] udp: Support gro_ipv4_max_size > 65536
-Date: Tue, 17 Jun 2025 16:40:12 +0200
-Message-ID: <20250617144017.82931-14-maxim@isovalent.com>
+Subject: [PATCH RFC net-next 14/17] udp: Validate UDP length in udp_gro_receive
+Date: Tue, 17 Jun 2025 16:40:13 +0200
+Message-ID: <20250617144017.82931-15-maxim@isovalent.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250617144017.82931-1-maxim@isovalent.com>
 References: <20250617144017.82931-1-maxim@isovalent.com>
@@ -100,67 +100,40 @@ Content-Transfer-Encoding: 8bit
 
 From: Maxim Mikityanskiy <maxim@isovalent.com>
 
-Currently, gro_max_size and gro_ipv4_max_size can be set to values
-bigger than 65536, and GRO will happily aggregate UDP to the configured
-size (for example, with TCP traffic in VXLAN tunnels). However,
-udp_gro_complete uses the 16-bit length field in the UDP header to store
-the length of the aggregated packet. It leads to the packet truncation
-later in __udp4_lib_rcv.
-
-Fix this by storing 0 to the UDP length field and by restoring the real
-length from skb->len in __udp4_lib_rcv.
+In the previous commit we started using uh->len = 0 as a marker of a GRO
+packet bigger than 65536 bytes. To prevent abuse by maliciously crafted
+packets, check the length in the UDP header in udp_gro_receive. Note
+that a similar check is present in udp_gro_receive_segment, but not in
+the UDP socket gro_receive flow.
 
 Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 ---
- net/ipv4/udp.c         | 5 ++++-
- net/ipv4/udp_offload.c | 7 +++++--
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ net/ipv4/udp_offload.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index dde52b8050b8..6200e09d9a37 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2642,7 +2642,7 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
- {
- 	struct sock *sk = NULL;
- 	struct udphdr *uh;
--	unsigned short ulen;
-+	unsigned int ulen;
- 	struct rtable *rt = skb_rtable(skb);
- 	__be32 saddr, daddr;
- 	struct net *net = dev_net(skb->dev);
-@@ -2666,6 +2666,9 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
- 		goto short_packet;
- 
- 	if (proto == IPPROTO_UDP) {
-+		if (!ulen)
-+			ulen = skb->len;
-+
- 		/* UDP validates ulen. */
- 		if (ulen < sizeof(*uh) || pskb_trim_rcsum(skb, ulen))
- 			goto short_packet;
 diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 85b5aa82d7d7..ee12847a0347 100644
+index ee12847a0347..93e1fea32e6f 100644
 --- a/net/ipv4/udp_offload.c
 +++ b/net/ipv4/udp_offload.c
-@@ -930,12 +930,15 @@ static int udp_gro_complete_segment(struct sk_buff *skb)
- int udp_gro_complete(struct sk_buff *skb, int nhoff,
- 		     udp_lookup_t lookup)
- {
--	__be16 newlen = htons(skb->len - nhoff);
-+	unsigned int newlen = skb->len - nhoff;
- 	struct udphdr *uh = (struct udphdr *)(skb->data + nhoff);
- 	struct sock *sk;
- 	int err;
+@@ -794,6 +794,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
+ 	struct sk_buff *p;
+ 	struct udphdr *uh2;
+ 	unsigned int off = skb_gro_offset(skb);
++	unsigned int ulen;
+ 	int flush = 1;
  
--	uh->len = newlen;
-+	if (newlen <= GRO_LEGACY_MAX_SIZE)
-+		uh->len = htons(newlen);
-+	else
-+		uh->len = 0;
+ 	/* We can do L4 aggregation only if the packet can't land in a tunnel
+@@ -826,6 +827,10 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
+ 	     !NAPI_GRO_CB(skb)->csum_valid))
+ 		goto out;
  
- 	sk = INDIRECT_CALL_INET(lookup, udp6_lib_lookup_skb,
- 				udp4_lib_lookup_skb, skb, uh->source, uh->dest);
++	ulen = ntohs(uh->len);
++	if (ulen <= sizeof(*uh) || ulen != skb_gro_len(skb))
++		goto out;
++
+ 	/* mark that this skb passed once through the tunnel gro layer */
+ 	NAPI_GRO_CB(skb)->encap_mark = 1;
+ 
 -- 
 2.49.0
 
