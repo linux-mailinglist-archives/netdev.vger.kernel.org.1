@@ -1,180 +1,127 @@
-Return-Path: <netdev+bounces-198697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9083ADD106
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:08:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA1AADD10E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:10:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B62FA1882B40
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:08:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 576C81644C5
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D942E972A;
-	Tue, 17 Jun 2025 15:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7A62E8894;
+	Tue, 17 Jun 2025 15:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KmUTNzQA"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18DB2E889A
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810071CDA2E
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750172890; cv=none; b=Q/crJpeKGB0xgF+XsBEhRpwDJwwVvIf7LK+IWN01Xp32XKyXCyGriOT46BZNGlc/MrTClnRhlpTWIUQiHEng/MmxC7UE0n9Bcq05lUc56LnjghuqoyQrleQypsH+FUe9Ob9NYht7GZffiJeC/VswhZS9NdH65DRWdGArv8DuIs0=
+	t=1750173018; cv=none; b=XWcoHfRqG9WiFRqtYJnq6+f0AcRPnWWyfhQOdEblPUxLeSAM8Vo3DTA363j4xidT/q9L5oonRzM5qqexIRJJD4D3+plz4c6A+rQ7qhcR+O8I9Re7Rr5EX8rnBHw7IlAmY79dNsung+HZPcIjpkTDNDqmFss4ZQ1KnlVkzIAYi2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750172890; c=relaxed/simple;
-	bh=MlST4HpCX/8lpMelJ6BJ1R2IsWPXG8rqsXFPnElrw7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cQtfbri4yaHqx8hW4k3f01iN0P+/A6uVSf6pmWct6dzJjr5ZsVMi8zVIchcVY40qUVEJb+ICXnU9mRW7y5uXWUY2Jk7kTnWTQchKgDFberscTs15YWedK8AaHFffz4PJMA46SarYE5eNAM/uRafd1FWRRnoM3Ehbp5cjO/PY85Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uRXuZ-0003lG-6t; Tue, 17 Jun 2025 17:07:43 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uRXuX-003zen-1k;
-	Tue, 17 Jun 2025 17:07:41 +0200
-Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 2A3B842AA50;
-	Tue, 17 Jun 2025 15:07:41 +0000 (UTC)
-Date: Tue, 17 Jun 2025 17:07:40 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, imx@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel@pengutronix.de, Frank Li <Frank.Li@nxp.com>, 
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next v3 03/10] net: fec: add missing header files
-Message-ID: <20250617-funky-auspicious-stallion-25f396-mkl@pengutronix.de>
-References: <20250617-fec-cleanups-v3-0-a57bfb38993f@pengutronix.de>
- <20250617-fec-cleanups-v3-3-a57bfb38993f@pengutronix.de>
- <b6687ad2-1fd9-4cb5-8f5d-8c203599f002@intel.com>
+	s=arc-20240116; t=1750173018; c=relaxed/simple;
+	bh=Q4vV3HbVxFLXV1EBL2EoQ/+XT0Mzn4sSeRk874/9McE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FSX2rJcNtoQC+FIkZ+eCrQKgl94h0/x8ZJhCGUxfqDhoOQYCsOovKKYTKh9PAa66MRw2eVoDJd5Xp8NmsmLijpsBNWvV+47Rn6jh1TWVs/BpIZBa6rMsbXG75ABnWf3Pp74O9XRLMJfEYbCJbV88Ff5k9lLKk0Q1J7uwjm403+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KmUTNzQA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750173015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q4vV3HbVxFLXV1EBL2EoQ/+XT0Mzn4sSeRk874/9McE=;
+	b=KmUTNzQAGMXb69iSC4ozxvo383jJAmOxrD8p5Y44MR/j4C+/NDP4cEbQWlWxBkptdGKXdf
+	rfilfoJlyTBtmEFhSFGeVUQTqOSKXfybKt0ICtxsGKcFQzYv8DMMum+kkm6uqxi8I7GxvJ
+	IwYS3Nrcvj4ZfF0gDnU7spJN7JVxM5o=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-EJ4Lp_Y7PqiX6HeYVSo2Vw-1; Tue, 17 Jun 2025 11:10:13 -0400
+X-MC-Unique: EJ4Lp_Y7PqiX6HeYVSo2Vw-1
+X-Mimecast-MFC-AGG-ID: EJ4Lp_Y7PqiX6HeYVSo2Vw_1750173008
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ade32b5771bso73109966b.0
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:10:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750173008; x=1750777808;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q4vV3HbVxFLXV1EBL2EoQ/+XT0Mzn4sSeRk874/9McE=;
+        b=MHzRylnyjLTjFbE5+VCa5eVvXLtSK7a4Jbcopiy0sDm7w7BKkyW7gOFNVf6c+jw5FP
+         HsXEU6G5PbHCQyuQgGAhEoWq9aP9/JyHq/coDxKB0YIr3Pn6Cr1Zwkkeg5kuSg7afBMz
+         zCTQ1ESOb7If3mLQnrhWmzsns2pU0J58qHSYIvJ5UF98IjYuMuRBGUzJ8qJ+aDCqET0D
+         QlO66hTH5LQcEMGUZAifHvdcC++HfRpA0P7MS3DAONA+xjpSRrcvG9FSIUETUwPS4htJ
+         TBYm26sNABD5KCeGZDk3SxJCWLnaLkTea1lidv61NA8lGKD4xYb+oQxroz9IGESr819s
+         kdjw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFvJnmDTthyAOGr2s8KOjHb3HruFJaLro8EReKOHZffHU3z0fh1N59+hOQY4d0mFUOq9Nvm8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9YQWiOy725/FIJ269757XB/fvW2iVLBsAgCthXxq60npywrGt
+	ORcWN0nWqk160sNOiio3adYCX2L0k+c7s/ROuQKQBM7eQYHaR/Q0uHtIRrAMM5hkFCZVaFUEsQt
+	J51UhpMBkF0okfQv4KAIakHrmhlMzz2BtDkwpClq0fbPTN4BVPlTi7VmXcg==
+X-Gm-Gg: ASbGncsffM84TFVYa8IXUvHjNLpqcWKtJlepmLHQ9fHjK2SoxzD7Uhea9B187F0ZIs1
+	NHPLpuQ50k1zi6R1CD1VMEIqc4UZBy0Le3i4lnkFlemzgFq254qDc2Vq9FjIWBjfYVc1SJpy4Mu
+	gBS/KgOB8mefac5ZU8kygEIlaA1pDPNe+/SC1Bp9adu5mIHe3suHXMekH3INqQ9pbLbYTpGVCea
+	Q/S8cNmDuJoW1iMpSXr/H81Kl5KzRpM9zt1L0PAOiEXjW6I415vNtSxPcjsaLIdKQ/gH+fyVUqn
+	XXeXKTGxkuHtfBLFAtg=
+X-Received: by 2002:a17:907:2da9:b0:ad9:16c8:9ff4 with SMTP id a640c23a62f3a-adfad2773b1mr1287012066b.11.1750173007733;
+        Tue, 17 Jun 2025 08:10:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHum6NSFVGaMZlyajlBzCyusq5rsMbr/f1X+qSV8BcuCBxgvXcCVTF1LKybETNjy2yXeASF3A==
+X-Received: by 2002:a17:907:2da9:b0:ad9:16c8:9ff4 with SMTP id a640c23a62f3a-adfad2773b1mr1287007966b.11.1750173007348;
+        Tue, 17 Jun 2025 08:10:07 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec88fe907sm888000966b.93.2025.06.17.08.10.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 08:10:06 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 717EE1AF7182; Tue, 17 Jun 2025 17:10:05 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+ kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
+ Magnus Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>
+Subject: Performance impact of disabling VLAN offload [was: Re: [PATCH
+ bpf-next V1 7/7] net: xdp: update documentation for xdp-rx-metadata.rst]
+In-Reply-To: <76a5330e-dc52-41ea-89c2-ddcde4b414bd@kernel.org>
+References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
+ <174897279518.1677018.5982630277641723936.stgit@firesoul>
+ <aEJWTPdaVmlIYyKC@mini-arch>
+ <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
+ <87plfbcq4m.fsf@toke.dk> <aEixEV-nZxb1yjyk@lore-rh-laptop>
+ <aEj6nqH85uBe2IlW@mini-arch> <aFAQJKQ5wM-htTWN@lore-desk>
+ <aFA8BzkbzHDQgDVD@mini-arch> <aFBI6msJQn4-LZsH@lore-desk>
+ <87h60e4meo.fsf@toke.dk> <76a5330e-dc52-41ea-89c2-ddcde4b414bd@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 17 Jun 2025 17:10:05 +0200
+Message-ID: <875xgu4d6a.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vb7ad2zc4mjylvxd"
-Content-Disposition: inline
-In-Reply-To: <b6687ad2-1fd9-4cb5-8f5d-8c203599f002@intel.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
 
+> Later we will look at using the vlan tag. Today we have disabled HW
+> vlan-offloading, because XDP originally didn't support accessing HW vlan
+> tags.
 
---vb7ad2zc4mjylvxd
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v3 03/10] net: fec: add missing header files
-MIME-Version: 1.0
+Side note (with changed subject to disambiguate): Do you have any data
+on the performance impact of disabling VLAN offload that you can share?
+I've been sort of wondering whether saving those couple of bytes has any
+measurable impact on real workloads (where you end up looking at the
+headers anyway, so saving the cache miss doesn't matter so much)?
 
-On 17.06.2025 16:55:19, Alexander Lobakin wrote:
-> From: Marc Kleine-Budde <mkl@pengutronix.de>
-> Date: Tue, 17 Jun 2025 15:24:53 +0200
->=20
-> > The fec.h isn't self contained. Add missing header files, so that it ca=
-n be
-> > parsed by language servers without errors.
-> >=20
-> > Reviewed-by: Wei Fang <wei.fang@nxp.com>
-> > Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> > ---
-> >  drivers/net/ethernet/freescale/fec.h | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >=20
-> > diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/etherne=
-t/freescale/fec.h
-> > index ce1e4fe4d492..4098d439a6ff 100644
-> > --- a/drivers/net/ethernet/freescale/fec.h
-> > +++ b/drivers/net/ethernet/freescale/fec.h
-> > @@ -15,7 +15,9 @@
-> >  /*********************************************************************=
-*******/
-> > =20
-> >  #include <linux/clocksource.h>
-> > +#include <linux/ethtool.h>
-> >  #include <linux/net_tstamp.h>
-> > +#include <linux/phy.h>
-> >  #include <linux/pm_qos.h>
-> >  #include <linux/bpf.h>
-> >  #include <linux/ptp_clock_kernel.h>
->=20
-> Sort alphabetically while at it? You'd only need to move bpf.h AFAICS.
+-Toke
 
-After sorting, the incremental diff will look like this:
-
-diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/fr=
-eescale/fec.h
-index 15334a5cce0f..1fe5e92afeb3 100644
---- a/drivers/net/ethernet/freescale/fec.h
-+++ b/drivers/net/ethernet/freescale/fec.h
-@@ -14,16 +14,16 @@
- #define FEC_H
- /*************************************************************************=
-***/
-=20
-+#include <dt-bindings/firmware/imx/rsrc.h>
-+#include <linux/bpf.h>
- #include <linux/clocksource.h>
- #include <linux/ethtool.h>
-+#include <linux/firmware/imx/sci.h>
- #include <linux/net_tstamp.h>
- #include <linux/phy.h>
- #include <linux/pm_qos.h>
--#include <linux/bpf.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/timecounter.h>
--#include <dt-bindings/firmware/imx/rsrc.h>
--#include <linux/firmware/imx/sci.h>
- #include <net/xdp.h>
-=20
- #if defined(CONFIG_M523x) || defined(CONFIG_M527x) || defined(CONFIG_M528x=
-) || \
-
-Is that okay? If so, I'll squash it.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---vb7ad2zc4mjylvxd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmhRhLkACgkQDHRl3/mQ
-kZynRwf5AfBSqlvS6ZPaUDdzbaT4ChHehHLaV34f0P/3xHED8RIiw7WIX23Zui9c
-JoTWQ6dr2L24g9pj0yaq6sxcuKCLnN5Cg0HXZ/p+ZhQr52HozhR+wT7BHAnNjkfn
-P6rUERHpn/RikEUObpv6UVjfCKTR5IUlNF6ByYDhJeYJ/SVqc99NgnQj/g5FkHV4
-4Fz2zVrwe8Szj0IscA+2BVYEPog5pYDnlRUx+X28G9hE0C9nmatzWnYLcTAn2ooV
-UBPCqwpYHHQUWBwlG3CDUXhmB3ZANddW68zg1jX8lw6lA3cpRU1/tceo67puj9Pp
-VSEwopzAQSPGlsU9RmGwLiZc4a6kqw==
-=1zfJ
------END PGP SIGNATURE-----
-
---vb7ad2zc4mjylvxd--
 
