@@ -1,172 +1,123 @@
-Return-Path: <netdev+bounces-198764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE63ADDB24
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:06:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 945DFADDB29
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EC4B19421B4
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:06:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B531942910
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F77227991E;
-	Tue, 17 Jun 2025 18:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF9E2EBB8A;
+	Tue, 17 Jun 2025 18:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bVJOm9ed"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWu3tdEW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC66F2E9ED9
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 18:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840942EBB84;
+	Tue, 17 Jun 2025 18:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750183555; cv=none; b=pbNd9vLVrcq0sjkYWkG1/4OIabPBX7uTH9G/HdeP8spwKQU+F1g1Dd93pzZlz7cYg1hc+F/oONafHbq/LShFr63mqLzs8wovuWSQxQCrYUSF+wDkFmez6c9eZR80+Mmjz+5fCD6OXEk7BvG8uZZJWdVpqpcVEYGIKMcvnO8KABk=
+	t=1750183944; cv=none; b=KJKkARFm+Hk0jIlqqrpbnHcgo4uEPyvnSIqSUdeXfzbSICUiIlYQiFdqQ/sUKC1xogKH4ldYx+gGVj2rADXxbJzMRb8JuZn4L0PlXBKEd6mnY+FisxPRFdzSl/IncJgwmJSEn5afvfnAbhAJLY1ei+22BB4yg10PkMCAi7qG9cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750183555; c=relaxed/simple;
-	bh=h7LPw6HAuuf1bCeJa1RgcpqeqeCQipjupmPiTv7RMOM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=old/kGTK1AFRkU8Po4H7CDxvH31iukFfRCwIe4JgITZVSvzgF73ZzaBwhTF8/LO4y4oHnkQoUkCjNm3vIeHW8F08lzwRYMn8DUB1x9e6DsOmt40KafnJmhETrx8gOprJsryWaL+ktDB/PtO8eevdwwkEnAo/CzQVvQ4rsuYTN2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bVJOm9ed; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-735ac221670so3299240a34.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 11:05:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750183553; x=1750788353; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J9eX4yKKsn7UK5SuJXx14EEAvCxdu+2h+1upkUapmAo=;
-        b=bVJOm9edqnYZv7HFrTF2Zgp/CRIX1cJVRQ1ziMHnUcZX4+92ngytmNa6g7ce+Nq6YJ
-         xLmg04KMwk/+/FPUAt3dsmbI+pLtS9M8Rn4cJ2VaeeDERqdsUt9fI7blPHuuHgx5yjA/
-         BpLKW0sWba0n7nBCWybSdp+kbh+lY376BZ8fC3FuyebeKNz/aB2ZwWVnHLPWW+/Hb2CQ
-         WYzoWMtJxf/CfAvCZFgGusi7jPokfBcG/ZGNLFGZEV8L4HnP3EvORNMc7fly4mjG4d3G
-         hVMrEJ4f8gtGO/8prwQPHLyVEA63uHqaB6Tn+gR0LsxirWP7HBtI2g8llfndTj+ZEtos
-         gcnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750183553; x=1750788353;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J9eX4yKKsn7UK5SuJXx14EEAvCxdu+2h+1upkUapmAo=;
-        b=aLF4Xp3LS+Ae1LOWqnYzkPsmmhlH66MHGc2eS+awh8hoM4Rg6dbKT/Fqsgqz74Icrh
-         1NBwCOPDg/omWlo0Pr1YQEde1FT3Vcfh7lwXEnhRzedJiVwaYqFruj4V0ZKJ03RJLCo7
-         CswgXpstoNhodxRCOt2n1A9UXK8u/Iv+eShHW7G/CGnXVLGXe8uoGDTz43jts0r+iEdE
-         QnxsxveR38wJ/blgabwfJa9HcStaV503dJqNh6qJ4GOQcOz0N9wrh+Zxf0/b06EkV0JK
-         P//Y5SkUIWKzPKSbIXcIXmktX7J4+cl/1FrbdVhLeMVz5Z/m5clMPDo34rQFVfBuD3wD
-         hKsQ==
-X-Gm-Message-State: AOJu0YynVYH6WWy7tNeyY5L2k64FV3cq60n0fp9uS4plS/RynOAhn1iC
-	EFL7yVo/c6SCmemZ1rBQiG2vY2az4cCZw5AEmAil/x02a4peHuHDY4OdDEdjew==
-X-Gm-Gg: ASbGncu8+aj2Q8NsOENWYUXct3KYENuIf5MHa/eXGMrPozO2z9gUDN+b/GqPzN6uBmD
-	PQZktcBfe7VPEvoh1TcR1YwFCR9evVYBAN5Lnqg8JwINP6aPFaTN5M95oPYQqhM3GWMhl2jB7h9
-	MrxubRWompwNVjVBwKMzZk8KZJssV6lTck+VGfhAarTtL6rNah3U693OBPiXbt1jUGyRCpTI7oy
-	76tRwx31+7iKyej45Zd8u5vnakkVdHn9fBVCmS75Tv0S67BHUlDBOw/bMJHnKfGwnqKvzCkJ2vf
-	x1PDvAKjLD3XVIjsbhy4ly00TzhirVCxpDq3b35CYSaVvkkN6HRlm7hY7EtsoQ7UK3sN5vffMxS
-	x+bKElQ==
-X-Google-Smtp-Source: AGHT+IG0nsz+Bl72AGaTdQTESqmfkLtO8iAQgXdaDwDrd1QYndP7Yv7BCQbiL2PS+jjMyQzc1Rm7fA==
-X-Received: by 2002:a9d:630e:0:b0:735:a61d:5764 with SMTP id 46e09a7af769-73a60a123bamr1665205a34.9.1750183552747;
-        Tue, 17 Jun 2025 11:05:52 -0700 (PDT)
-Received: from localhost.localdomain ([2600:1700:fb0:1bc0:f874:e308:dae5:7d9f])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73a283dc014sm1659906a34.7.2025.06.17.11.05.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 11:05:52 -0700 (PDT)
-From: Chris Morgan <macroalpha82@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Chris Morgan <macromorgan@hotmail.com>
-Subject: [PATCH v4] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
-Date: Tue, 17 Jun 2025 13:03:24 -0500
-Message-ID: <20250617180324.229487-1-macroalpha82@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750183944; c=relaxed/simple;
+	bh=PN6qsQoRnaklytAma65XbMxOUtI9t4kJ9UFM3WpYRvE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HYP5tujQP3naiwg+dJJjjGeRBUUF9XK4nN9v2G+nNN13KLmrCoLl8NhYAiAhPg2uuR7aWjRjuiBw9UGIwTdoDkWpH0sHD3DTYyq5EGriMgUs7GCXU7dW/8MUxUnRXFIkGPT++TGDmpWpvkVjKUbvPoMzZdDZjZbROYNkR/5Muq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWu3tdEW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FAEC4CEE3;
+	Tue, 17 Jun 2025 18:12:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750183944;
+	bh=PN6qsQoRnaklytAma65XbMxOUtI9t4kJ9UFM3WpYRvE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SWu3tdEWJn3GD6RtX+JmPHQoqCmhDQkNGWHkSEf3ZU9o7gbtFkMSIetp98r2MSOVX
+	 g/V4+9qr6V1YVaiqTep5UxgAeN2hpYkxTYqJlvrNNwkLWMWVNaZMUw7UEKLKQj0A1H
+	 TPiHlCfqjWM5zltG5oxD8pG0vxu4AtQHCjmjiz0sffPhDyiwaIdirNONqh30vMW3jp
+	 +mcW+NLDmZmiEnt5T5kHhHIN14ZJmyyn9UeecnRC/sAytC0fIPFZx+zBruSTH7/Vjt
+	 NvS1eQhjZRMszEMMSQJz7FyFGQuBognT9E80/cgSMosDrtJK3lsNyfjiYeVGFn60Jn
+	 spQIaaSI2UKgA==
+Date: Tue, 17 Jun 2025 19:12:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>
+Cc: corbet@lwn.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-doc@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, skhan@linuxfoundation.com,
+	jacob.e.keller@intel.com, alok.a.tiwari@oracle.com
+Subject: Re: [PATCH v2 2/2] docs: net: clarify sysctl value constraints
+Message-ID: <20250617181219.GB2545@horms.kernel.org>
+References: <20250614225324.82810-1-abdelrahmanfekry375@gmail.com>
+ <20250614225324.82810-3-abdelrahmanfekry375@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250614225324.82810-3-abdelrahmanfekry375@gmail.com>
 
-From: Chris Morgan <macromorgan@hotmail.com>
+On Sun, Jun 15, 2025 at 01:53:24AM +0300, Abdelrahman Fekry wrote:
+> So, i also noticed that some of the parameters represented
+> as boolean have no value constrain checks and accept integer
+> values due to u8 implementation, so i wrote a note for every
+> boolean parameter that have no constrain checks in code. and
+> fixed a typo in fmwark instead of fwmark.
+> 
+> Added notes for 19 confirmed parameters,
+> Verified by code inspection and runtime testing.
 
-Add quirk for Potron SFP+ XGSPON ONU Stick (YV SFP+ONT-XGSPON).
+Please consider using imperative mode in patch descriptions.
 
-This device uses pins 2 and 7 for UART communication, so disable
-TX_FAULT and LOS. Additionally as it is an embedded system in an
-SFP+ form factor provide it enough time to fully boot before we
-attempt to use it.
+> - No changes for v2 in this patch , still waiting to be reviewed.
 
-https://www.potrontec.com/index/index/list/cat_id/2.html#11-83
-https://pon.wiki/xgs-pon/ont/potron-technology/x-onu-sfpp/
+The text on the line above would fit better along
+side the "No change." below the scissors ("---") a few lines below.
 
-Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
----
-Changes since v3:
- - Removed unnecessary parenthesis.
-Changes since v2:
- - Waited until merge window closed (sorry).
- - Only disable hardware LOS and TX_FAULT, as software appears to
-   work.
- - Created sfp_fixup_ignore_hw() helper which is used to disable
-   specific hardware signals and use said helper with both the
-   SFP+ONT-XGSPON stick as well as the existing sfp_fixup_halny_gsfp()
-   which performs similar fixups.
----
- drivers/net/phy/sfp.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+> Signed-off-by: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>
+> ---
+> v2:
+> - No change.
+> v1:
+> - Added notes for booleans that accept 0-255 not only 0/1.
+>  Documentation/networking/ip-sysctl.rst | 70 ++++++++++++++++++++------
+>  1 file changed, 55 insertions(+), 15 deletions(-)
+> 
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+> index 68778532faa5..38f2981290d6 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -70,6 +70,8 @@ ip_forward_use_pmtu - BOOLEAN
+>  
+>  	- 0 - disabled
+>  	- 1 - enabled
+> +
+> +	note: Accepts integer values (0-255) but only 0/1 have defined behaviour.
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 347c1e0e94d9..5347c95d1e77 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -361,6 +361,11 @@ static void sfp_fixup_ignore_tx_fault(struct sfp *sfp)
- 	sfp->state_ignore_mask |= SFP_F_TX_FAULT;
- }
- 
-+static void sfp_fixup_ignore_hw(struct sfp *sfp, unsigned int mask)
-+{
-+	sfp->state_hw_mask &= ~mask;
-+}
-+
- static void sfp_fixup_nokia(struct sfp *sfp)
- {
- 	sfp_fixup_long_startup(sfp);
-@@ -409,7 +414,19 @@ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
- 	 * these are possibly used for other purposes on this
- 	 * module, e.g. a serial port.
- 	 */
--	sfp->state_hw_mask &= ~(SFP_F_TX_FAULT | SFP_F_LOS);
-+	sfp_fixup_ignore_hw(sfp, SFP_F_TX_FAULT | SFP_F_LOS);
-+}
-+
-+static void sfp_fixup_potron(struct sfp *sfp)
-+{
-+	/*
-+	 * The TX_FAULT and LOS pins on this device are used for serial
-+	 * communication, so ignore them. Additionally, provide extra
-+	 * time for this device to fully start up.
-+	 */
-+
-+	sfp_fixup_long_startup(sfp);
-+	sfp_fixup_ignore_hw(sfp, SFP_F_TX_FAULT | SFP_F_LOS);
- }
- 
- static void sfp_fixup_rollball_cc(struct sfp *sfp)
-@@ -512,6 +529,8 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK_F("Walsun", "HXSX-ATRC-1", sfp_fixup_fs_10gt),
- 	SFP_QUIRK_F("Walsun", "HXSX-ATRI-1", sfp_fixup_fs_10gt),
- 
-+	SFP_QUIRK_F("YV", "SFP+ONU-XGSPON", sfp_fixup_potron),
-+
- 	// OEM SFP-GE-T is a 1000Base-T module with broken TX_FAULT indicator
- 	SFP_QUIRK_F("OEM", "SFP-GE-T", sfp_fixup_ignore_tx_fault),
- 
--- 
-2.43.0
+In his review of v1 [*] Jacob said:
 
+  "Hm. In many cases any non-zero value might be interpreted as "enabled" I
+   suppose that is simply "undefined behavior"?
+
+Looking over the parsing and use of ip_forward_use_pmtu (I did not check
+the other parameters whose documentation this patch updates) I would take
+Jacob's remark a few steps further.
+
+It seems to me that values of 0-255 are accepted and while 0 means
+disabled, all the other values mean enabled. That is because that
+what the code does. And being part of the UAPI it can't be changed.
+
+So I don't think it is correct to describe only values 0/1 having defined
+behaviour. Because the code defines behaviour for all the values in the
+range 0-255.
+
+[*] https://lore.kernel.org/netdev/8b53b5be-82eb-458c-8269-d296bffcef33@intel.com/
+
+...
 
