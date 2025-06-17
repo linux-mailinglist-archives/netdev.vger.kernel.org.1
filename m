@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-198673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF66AADD065
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:49:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2908ADD070
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 370BF188A182
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:45:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E18B3A41BB
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C502EA49C;
-	Tue, 17 Jun 2025 14:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F972EAD11;
+	Tue, 17 Jun 2025 14:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLonJtNk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jp78h38a"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C862E92DE
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AA92E3B1C
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750171364; cv=none; b=iVlENxNveFG6qiZQ2Wy597k12nL5GzECcYPRMeaPKH1e7hpd/6DYll1ylW/du+o/sxGBPCR/Zf8aklBDt5P+fOgIe1Yk3uxKzX064cijAFfdfN0bOuwxCPqwwiUqkRYQkDa/JdbXRcShdjUVoZBVjnHmA1F0tW4463+anZisFDI=
+	t=1750171365; cv=none; b=fFkAV8TowKIdpCrduc46AXDTX0sktE8ASZZqQJX188wk9UEhJDkTC3zN2Jop804L7XH7GElxx6m41avuiGPyb39wNSwTjvEFps8WBl+1FedLkTRBBXEzdX+qLcvL5KG+fwHjKqyTdFBwRs8C36ocdFwJfe2/bd1SO7I0UoVhtgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750171364; c=relaxed/simple;
-	bh=ts8zpbOE5dz/Z2Merb/hbx55izpaUw2dCUwvZ4+OvIU=;
+	s=arc-20240116; t=1750171365; c=relaxed/simple;
+	bh=cbkfSbj1v3wvGrHH39kL/bZMsinT6UtpFGhPzE3KE+k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CY/Q1gg9gjDchc5H1wON5E1/8XpOs1mKKq37TicxwLXH+gD3R1GkyKk0ELjDaFYOzlPEJ5I+U7LkrQkTqs+w29VKFzTpcAAAVWAdPcZspghJxs7O4fuX1fNQ/Ekjjy/Z3Db1fpBMQD9mjDAakbohYXG0QUqLzRIxmEg8LWWtpNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLonJtNk; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=ELF4pgyG1LJ0VVVvAKQzjV/hU+62d4W6V4RqyMvp35ijAm7vMedG+gY7q9xL7a0ohiDx4hI2bu8v/YI3PwDTFVbh07wheYKSlvFcFuQeqj3tIQFPAH8bavBGEI0/dimxTrs7hmdSQjwogZ7+T42Eu1C93ZIBRQp+JnggkO645fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jp78h38a; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ad8a6c202ffso1073876466b.3
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:42:40 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-adb2e9fd208so1175407666b.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750171359; x=1750776159; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750171361; x=1750776161; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CgnQitPx589T/W1yiw2S2s9LYUQwGPiU89AWtWkuV6A=;
-        b=NLonJtNkWdnmJrA0SEI682RNFxAJc2a6pAAvuQIhX+G2uFnJTcAdFsICBpDYtpUrbC
-         lTuZOQuUmnC49CqvFRl6CPRtZY7U3i01nuQhOJ0HlShGADraHTyKulKXkYbxOmc+gwxn
-         3qDvVtkQtfIqdAB2wMd3q4uev7bTUUdCww6lWAlCj0IjRb+NDfZ0bj66Yj4inIbiQFCq
-         N27uSXDa1xNNMhPeUCukCuMSihI2gufP9LsJ/PUg3ErkwpVthGS1P7c9g+z9jUw4ZMzt
-         uWUDk/OvqJkyWqq7OLdFX3R0ih+wr/wL2zlX+Zhw6Vc5c8T9T9rclkPCTsGoiTU5K/b4
-         4vdA==
+        bh=fNFfL4AGXHP0tK1zEY2pHIqKensgZlso6Fm3Rjpow0c=;
+        b=jp78h38aTAL+cnKnqtwHKmdYH5LB3rd5gxDlJMD8bLEeHhmCw0U0d2vhnX3j6x7fkF
+         5yyFP3qrbAwZ9Z4/6YqmvfNEE3HRAY94i1pnDDuEr+MDwLM5itdUiESruumD7moZgodZ
+         NaC+sod4OLMLc81HF3BuTppnIE8AgLu6W3YkuHuzUnyx+Et9QX7k0Rhlvd1CzlKgNa+Z
+         gvgbRKvW6Myfrw3asEmUcWarMfpVYgA0OltqUTIy8pi2zv6AAO9DFRLnbbVP/CltXN7X
+         oHjlv3gXv2SEFVJitAPzllPuJVQw/7QLLY1WZAzV8qJYm58O6IVdTDsbusXRcgYhHkX1
+         fJ8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750171359; x=1750776159;
+        d=1e100.net; s=20230601; t=1750171361; x=1750776161;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CgnQitPx589T/W1yiw2S2s9LYUQwGPiU89AWtWkuV6A=;
-        b=owB9hR6DBGVCF+Fc50RaGogjA55iNS4uqvNC0sws95/KxVvpszDUlFWktvoeaMXudW
-         C6PC5PVMpXduYzKJ2nenh5PCsuv1xUtw91oEQnN1WQn+1dGBawUzroPbuHIpksSEPb5O
-         ywvN2au1FDs6H52/GTq50fruuJj4j+YUYdzQ3yEFBENvX88BBpWH+e1H14b2MjAjteof
-         xcH2XMuQl72rTLCsI3dI7w8/Ct7X/4M0CKv42fpE16/3mQRD2XUnhDXxYUCz8zlc3AAS
-         wGzdlf/5e9tBMSHA9S8KjcVQTkEtZjR3DPfi+yR407domUVhwWbE0VmVDBQkPAvVNkMN
-         MOsg==
-X-Gm-Message-State: AOJu0YzyVXIEEiXHQTIjvcQ/KHfmt7qnO8XYFZaR1T66di4hzmqMz2GG
-	FQVgqUZZ5oYV/i4xKrTXPDPMMa0RYHyTkOR8O2H7ChMKnIg855RfNadp
-X-Gm-Gg: ASbGnctH/PeGIWiN/hNOQ8EZj9JpNFQJaPMOdCFUBUbN2b9yl5Y5SwbaL6l1+xri1DD
-	aYB4QKzjZD6Ngt7FEfh/SEpbwudyRogP8mExl0Lo2uDMJG8ImtYjehEQab9eiFbpwimxeQDyj3W
-	abobBCqQDuImnFeQjVZaq3vgZ2UQKftz7dZu8CXarC1364UJ9OY9UwBx+8T3iXcNFYESagqt+UU
-	N/Z/yzsuNbE0fIRUBgTVUPqME2OgL83YIdWNMAQscGXYnXndaFi90sG5iSNOX22G9qhPB496vSV
-	KaHADs2YxX5+EwZjEoIBsIWJ6jx692up6kk5qeh+weHy3t17cJXVV1x4cErevXGz2EoOIfAEtOF
-	GVMv+lfhrBOlv
-X-Google-Smtp-Source: AGHT+IHAvfDe7cmY1jM/kpkrUHuH8mG7ErZ4Mmp4rocPss+gv3KMNewT55KpXnmqN+0y1+XuHKkQ0g==
-X-Received: by 2002:a17:907:930b:b0:adb:4523:90c6 with SMTP id a640c23a62f3a-adfad4cf64dmr1440933066b.54.1750171359205;
-        Tue, 17 Jun 2025 07:42:39 -0700 (PDT)
+        bh=fNFfL4AGXHP0tK1zEY2pHIqKensgZlso6Fm3Rjpow0c=;
+        b=gRSJQuCIFb0UPl7vfO9xWrCXZPFFMgkzGhqh0DiGIoRWK3A4qbUife2uG9hAieOmcS
+         w5njXBIt1MXO0zKi7W4agWQB9Pii86MEqetjQAekviAWkEyyELEjxE6F/m/oNmP2wN1x
+         d/33T4xT+1Lz+dFWWwMPJFdkqdNkfYW/aUlj6jQj0UjzdcCnysHQmvAt+bnIJH2qZmxy
+         rUgcu8Fvf5Ef92XLhNrWUQyMWR3Hd5BYlmhju3+2jaavRGCBD/B9NzgA6IN0mWW2OszI
+         oHZqErWfuSoy96sD8OBv6vhHlIKcfVTmQp1qohkkLmUwrr4NpKMLPALrtmoWUEz/otQL
+         OARQ==
+X-Gm-Message-State: AOJu0YwxLeGuDmMsk7UboiPCln0KGmJaEVq/cK3Kkwn+TCP1GJuSZHvl
+	C4MRdCAwpXwlpuljhztLiA7mZV+VwjW+29i5OusIGuaXiSE9gl05Hm8b
+X-Gm-Gg: ASbGnct9B6gJe/OUxztm1Mdg65ByBTFesvCFbSFx/qKjpBlX53zzWj/18aOo9+F3C3U
+	1BzKpxrGVjxsmZP3BW7HTnKsbEAngoweG/l02EfJHeUzPKt4iQK16G+3pvIZW835HJ3Z/CmzOgy
+	05EW3yA3JKjpezZsZynIUBwjJFlCrPLfsu6zO18TOF5bGI+ljolgBNxdyRSPx/pAQsYNDEeFG6t
+	dLk2i2AY6KaxRjMvTYCWJARCM4d8DrAzPFC40nTYMlmirxPLRjkT8EyHLAxy+6tRNvjGegLOq9F
+	gdyWSyBnE94Xs1/lb4Zjrv+d86MAa2rYPsc79GWJF0SC9nxclAcrncc9d/BDZh8spfD5oWx/F6z
+	oO49OBC4Uehhu
+X-Google-Smtp-Source: AGHT+IFryJ9gWYyNiLgyob7YjyXoD+ZtbPpPEOUpIBDfJVAxmFInljEjGXPHbUz6v4bgC54SCn719g==
+X-Received: by 2002:a17:907:3f0c:b0:ad5:3055:784d with SMTP id a640c23a62f3a-adfad54b20bmr1170167466b.34.1750171360949;
+        Tue, 17 Jun 2025 07:42:40 -0700 (PDT)
 Received: from localhost (tor-exit-56.for-privacy.net. [185.220.101.56])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-adec892b8e7sm878802466b.132.2025.06.17.07.42.38
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-adf37467a91sm781716666b.166.2025.06.17.07.42.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 07:42:38 -0700 (PDT)
+        Tue, 17 Jun 2025 07:42:40 -0700 (PDT)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 X-Google-Original-From: Maxim Mikityanskiy <maxim@isovalent.com>
 To: Daniel Borkmann <daniel@iogearbox.net>,
@@ -84,9 +84,9 @@ To: Daniel Borkmann <daniel@iogearbox.net>,
 	Nikolay Aleksandrov <razor@blackwall.org>
 Cc: netdev@vger.kernel.org,
 	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH RFC net-next 05/17] net/mlx5e: Remove jumbo_remove step from TX path
-Date: Tue, 17 Jun 2025 16:40:04 +0200
-Message-ID: <20250617144017.82931-6-maxim@isovalent.com>
+Subject: [PATCH RFC net-next 06/17] net/mlx4: Remove jumbo_remove step from TX path
+Date: Tue, 17 Jun 2025 16:40:05 +0200
+Message-ID: <20250617144017.82931-7-maxim@isovalent.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250617144017.82931-1-maxim@isovalent.com>
 References: <20250617144017.82931-1-maxim@isovalent.com>
@@ -101,106 +101,103 @@ Content-Transfer-Encoding: 8bit
 From: Maxim Mikityanskiy <maxim@isovalent.com>
 
 Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
-unnecessary steps from the mlx5e and mlx5i TX path, that used to check
-and remove HBH.
+unnecessary steps from the mlx4 TX path, that used to check and remove
+HBH.
 
 Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_tx.c   | 75 +++----------------
- 1 file changed, 12 insertions(+), 63 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c | 42 +++++-----------------
+ 1 file changed, 8 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-index 55a8629f0792..a4f78152e8f5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-@@ -146,12 +146,11 @@ mlx5e_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struct sk_buff *skb,
-  * to inline later in the transmit descriptor
-  */
- static inline u16
--mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb, int *hopbyhop)
-+mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb)
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+index 87f35bcbeff8..c5d564e5a581 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+@@ -636,28 +636,20 @@ static int get_real_size(const struct sk_buff *skb,
+ 			 struct net_device *dev,
+ 			 int *lso_header_size,
+ 			 bool *inline_ok,
+-			 void **pfrag,
+-			 int *hopbyhop)
++			 void **pfrag)
  {
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 	u16 ihs;
+ 	struct mlx4_en_priv *priv = netdev_priv(dev);
+ 	int real_size;
  
--	*hopbyhop = 0;
- 	if (skb->encapsulation) {
- 		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
- 			ihs = skb_inner_transport_offset(skb) +
-@@ -161,17 +160,12 @@ mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb, int *hopbyhop)
- 		stats->tso_inner_packets++;
- 		stats->tso_inner_bytes += skb->len - ihs;
- 	} else {
--		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
-+		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
- 			ihs = skb_transport_offset(skb) + sizeof(struct udphdr);
--		} else {
-+		else
- 			ihs = skb_tcp_all_headers(skb);
--			if (ipv6_has_hopopt_jumbo(skb)) {
+ 	if (shinfo->gso_size) {
+ 		*inline_ok = false;
+-		*hopbyhop = 0;
+ 		if (skb->encapsulation) {
+ 			*lso_header_size = skb_inner_tcp_all_headers(skb);
+ 		} else {
+-			/* Detects large IPV6 TCP packets and prepares for removal of
+-			 * HBH header that has been pushed by ip6_xmit(),
+-			 * mainly so that tcpdump can dissect them.
+-			 */
+-			if (ipv6_has_hopopt_jumbo(skb))
 -				*hopbyhop = sizeof(struct hop_jumbo_hdr);
--				ihs -= sizeof(struct hop_jumbo_hdr);
--			}
--		}
- 		stats->tso_packets++;
--		stats->tso_bytes += skb->len - ihs - *hopbyhop;
-+		stats->tso_bytes += skb->len - ihs;
- 	}
- 
- 	return ihs;
-@@ -233,7 +227,6 @@ struct mlx5e_tx_attr {
- 	__be16 mss;
- 	u16 insz;
- 	u8 opcode;
--	u8 hopbyhop;
- };
- 
- struct mlx5e_tx_wqe_attr {
-@@ -270,16 +263,14 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 
- 	if (skb_is_gso(skb)) {
--		int hopbyhop;
--		u16 ihs = mlx5e_tx_get_gso_ihs(sq, skb, &hopbyhop);
-+		u16 ihs = mlx5e_tx_get_gso_ihs(sq, skb);
- 
- 		*attr = (struct mlx5e_tx_attr) {
- 			.opcode    = MLX5_OPCODE_LSO,
- 			.mss       = cpu_to_be16(skb_shinfo(skb)->gso_size),
- 			.ihs       = ihs,
- 			.num_bytes = skb->len + (skb_shinfo(skb)->gso_segs - 1) * ihs,
--			.headlen   = skb_headlen(skb) - ihs - hopbyhop,
--			.hopbyhop  = hopbyhop,
-+			.headlen   = skb_headlen(skb) - ihs,
- 		};
- 
- 		stats->packets += skb_shinfo(skb)->gso_segs;
-@@ -434,7 +425,6 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	struct mlx5_wqe_data_seg *dseg;
- 	struct mlx5e_tx_wqe_info *wi;
- 	u16 ihs = attr->ihs;
+ 			*lso_header_size = skb_tcp_all_headers(skb);
+ 		}
+ 		real_size = CTRL_SIZE + shinfo->nr_frags * DS_SIZE +
+-			ALIGN(*lso_header_size - *hopbyhop + 4, DS_SIZE);
++			ALIGN(*lso_header_size + 4, DS_SIZE);
+ 		if (unlikely(*lso_header_size != skb_headlen(skb))) {
+ 			/* We add a segment for the skb linear buffer only if
+ 			 * it contains data */
+@@ -884,7 +876,6 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int desc_size;
+ 	int real_size;
+ 	u32 index, bf_index;
 -	struct ipv6hdr *h6;
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 	int num_dma;
+ 	__be32 op_own;
+ 	int lso_header_size;
+ 	void *fragptr = NULL;
+@@ -893,7 +884,6 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	bool stop_queue;
+ 	bool inline_ok;
+ 	u8 data_offset;
+-	int hopbyhop;
+ 	bool bf_ok;
  
-@@ -451,28 +441,7 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	if (ihs) {
- 		u8 *start = eseg->inline_hdr.start;
+ 	tx_ind = skb_get_queue_mapping(skb);
+@@ -903,7 +893,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		goto tx_drop;
  
--		if (unlikely(attr->hopbyhop)) {
+ 	real_size = get_real_size(skb, shinfo, dev, &lso_header_size,
+-				  &inline_ok, &fragptr, &hopbyhop);
++				  &inline_ok, &fragptr);
+ 	if (unlikely(!real_size))
+ 		goto tx_drop_count;
+ 
+@@ -956,7 +946,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		data = &tx_desc->data;
+ 		data_offset = offsetof(struct mlx4_en_tx_desc, data);
+ 	} else {
+-		int lso_align = ALIGN(lso_header_size - hopbyhop + 4, DS_SIZE);
++		int lso_align = ALIGN(lso_header_size + 4, DS_SIZE);
+ 
+ 		data = (void *)&tx_desc->lso + lso_align;
+ 		data_offset = offsetof(struct mlx4_en_tx_desc, lso) + lso_align;
+@@ -1021,31 +1011,15 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			((ring->prod & ring->size) ?
+ 				cpu_to_be32(MLX4_EN_BIT_DESC_OWN) : 0);
+ 
+-		lso_header_size -= hopbyhop;
+ 		/* Fill in the LSO prefix */
+ 		tx_desc->lso.mss_hdr_size = cpu_to_be32(
+ 			shinfo->gso_size << 16 | lso_header_size);
+ 
++		/* Copy headers;
++		 * note that we already verified that it is linear
++		 */
++		memcpy(tx_desc->lso.header, skb->data, lso_header_size);
+ 
+-		if (unlikely(hopbyhop)) {
 -			/* remove the HBH header.
 -			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
 -			 */
--			if (skb_vlan_tag_present(skb)) {
--				mlx5e_insert_vlan(start, skb, ETH_HLEN + sizeof(*h6));
--				ihs += VLAN_HLEN;
--				h6 = (struct ipv6hdr *)(start + sizeof(struct vlan_ethhdr));
--			} else {
--				unsafe_memcpy(start, skb->data,
--					      ETH_HLEN + sizeof(*h6),
--					      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
--				h6 = (struct ipv6hdr *)(start + ETH_HLEN);
--			}
+-			memcpy(tx_desc->lso.header, skb->data, ETH_HLEN + sizeof(*h6));
+-			h6 = (struct ipv6hdr *)((char *)tx_desc->lso.header + ETH_HLEN);
 -			h6->nexthdr = IPPROTO_TCP;
 -			/* Copy the TCP header after the IPv6 one */
 -			memcpy(h6 + 1,
@@ -208,59 +205,15 @@ index 55a8629f0792..a4f78152e8f5 100644
 -					sizeof(struct hop_jumbo_hdr),
 -			       tcp_hdrlen(skb));
 -			/* Leave ipv6 payload_len set to 0, as LSO v2 specs request. */
--		} else if (skb_vlan_tag_present(skb)) {
-+		if (skb_vlan_tag_present(skb)) {
- 			mlx5e_insert_vlan(start, skb, ihs);
- 			ihs += VLAN_HLEN;
- 			stats->added_vlan_packets++;
-@@ -492,7 +461,7 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	}
- 
- 	dseg += wqe_attr->ds_cnt_ids;
--	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr->ihs + attr->hopbyhop,
-+	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr->ihs,
- 					  attr->headlen, dseg);
- 	if (unlikely(num_dma < 0))
- 		goto err_drop;
-@@ -1015,34 +984,14 @@ void mlx5i_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	eseg->mss = attr.mss;
- 
- 	if (attr.ihs) {
--		if (unlikely(attr.hopbyhop)) {
--			struct ipv6hdr *h6;
--
--			/* remove the HBH header.
--			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
--			 */
--			unsafe_memcpy(eseg->inline_hdr.start, skb->data,
--				      ETH_HLEN + sizeof(*h6),
--				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
--			h6 = (struct ipv6hdr *)((char *)eseg->inline_hdr.start + ETH_HLEN);
--			h6->nexthdr = IPPROTO_TCP;
--			/* Copy the TCP header after the IPv6 one */
--			unsafe_memcpy(h6 + 1,
--				      skb->data + ETH_HLEN + sizeof(*h6) +
--						  sizeof(struct hop_jumbo_hdr),
--				      tcp_hdrlen(skb),
--				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
--			/* Leave ipv6 payload_len set to 0, as LSO v2 specs request. */
 -		} else {
--			unsafe_memcpy(eseg->inline_hdr.start, skb->data,
--				      attr.ihs,
--				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
+-			/* Copy headers;
+-			 * note that we already verified that it is linear
+-			 */
+-			memcpy(tx_desc->lso.header, skb->data, lso_header_size);
 -		}
-+		unsafe_memcpy(eseg->inline_hdr.start, skb->data,
-+			      attr.ihs,
-+			      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
- 		eseg->inline_hdr.sz = cpu_to_be16(attr.ihs);
- 		dseg += wqe_attr.ds_cnt_inl;
- 	}
+ 		ring->tso_packets++;
  
--	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr.ihs + attr.hopbyhop,
-+	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr.ihs,
- 					  attr.headlen, dseg);
- 	if (unlikely(num_dma < 0))
- 		goto err_drop;
+ 		i = shinfo->gso_segs;
 -- 
 2.49.0
 
