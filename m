@@ -1,107 +1,113 @@
-Return-Path: <netdev+bounces-198372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31BDADBE75
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:13:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA96ADBE74
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE6E83AF941
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:12:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E50F189426C
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A341A316C;
-	Tue, 17 Jun 2025 01:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499491C2334;
+	Tue, 17 Jun 2025 01:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpwsPJFT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDUz+tgm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD9115B0EC;
-	Tue, 17 Jun 2025 01:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF2915B0EC;
+	Tue, 17 Jun 2025 01:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750122694; cv=none; b=ZPArqeDPURRnOY471mmjsy2yLRftdhu9oo/aGtnVO8Pqyiu4tww/XHyq/5T0S2UndGAFZGxLnP2HS6iIGpx+PI9s8dWzKLg7haxw3TIoI6OktUzjsLr9I+Hy6ME4JYNTaAAP9dSQ9+dQNfEl8iuxxJgE4rGxAnN3XZ8IOwxyfUI=
+	t=1750122711; cv=none; b=olD5bYR8I39YumzmsWiLq22w2xvtabhEU83yPfJKnecBl34r7+SWso9zR5Rwr45IXOYw3TYb0cbrkYXVtjwxFboAqvi40jiLSrWrQVOOh5nHD8flZdsL9E2Ip4n2HbxIHySxevaemo/uFZ8JcwnmOLSD2RfQh+AcuWprX5vGGGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750122694; c=relaxed/simple;
-	bh=VDirG6A/g/TEdXqnGoFj1/CsBbPQO6xAuFa27Ep85Dk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nGMlSLqByEIaSm+BKGFfLEurd0d+3+ebN1z3vCzoyp1UrRyH9iePJAn4Xu9p88q456K5koPCJ/j3yMmMkJUQmi+EO4QvsaSU9Exge7WABcC6Oh/+XHCqt86QcvZDL2THIrWuPTI254Ty1zD8ZemqlTtUBWmweXIBa8XBrgmsKIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpwsPJFT; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3134c67a173so6029266a91.1;
-        Mon, 16 Jun 2025 18:11:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750122692; x=1750727492; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MBe6mnVPEoty7chluPQ6x86Gyik+l7YUJhx9KWhanMU=;
-        b=mpwsPJFTfjC2wk7nzDfELHuZnOJZKOtzCWApNPRYq6osnXFnAZlUHOlqyMaWXZXP7E
-         T4A90ksE4OTBOY4Z7uFo7ZcJh7w3h3ikBrl11ssYIy/IOjSEZyQ6qZGBNAkiAJ5XPQEc
-         YC44kVM12v9sfjcHFX3IfzuAOUMZYo9HuvtO7KGsggg4W+eJXRWXCROavB/5En2/SMZa
-         8TunDxPOzM5NhFKQQ0ZvfxiW/LWSuZNv9xTOJTCF6p2dn9CWLD93p+hEc4VD9sosoutZ
-         aPpBf5tAzR0H31+jrnV9iz7mEgpkMXrWkaX7cZ3x0NLQIkHnWwS0LgfdmQ3TR48DnJpJ
-         JHaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750122692; x=1750727492;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MBe6mnVPEoty7chluPQ6x86Gyik+l7YUJhx9KWhanMU=;
-        b=emNFYSsLfBW0SCL/wSr5CBdQDUZ+tkfBI19uOPWiQIdlQE0OMoi3wRc5ukGCwqN1az
-         n2dbSfcdyFeiowOfNFMKknjhBtk1hnEdea/5SG0iJkPN89RoQTezCkHIJyW401cNJ3GK
-         aQWiNXmhhlTmu4BoUI97fz5h/hBLRXEOGHEd8+8dUGDdkaSwcbq5VBLXN7Wskq7H2Lm0
-         e4DU4d8HBEK2G9Ik3GwdAP7/23cCMYoqQxdPbQSORC+GXO1DpDKw3Cqw7hrKxyPvBfzJ
-         5DbWO0bemmvbpQY4A0+t5D1O9ObsKtidoTa7iYfHiaoulZgSSzuxLgI903v5j0BMxQm1
-         G0Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOWETUQZZCKohg+uaS0rEhsPolAVOMPPtF0yQU98/D8KgaKUK7t+YMlbeXDraXK4SyhrPRVOZ8@vger.kernel.org, AJvYcCXaWACI6US7Yz/G/kEl/D+cUK48KtceZS9BF7laSWRJlDuupfqAj+ONVZEGjqu8EFNwiDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4IyTeoGZvNspekHLRjN28RlgCjGQXbBBndcZARkRRE98a/I+P
-	P8X7DOXBO7sDwnA//vEvedwwMPgS6VkIwi42kbYKujHOrJESOudaEPA=
-X-Gm-Gg: ASbGnctr9l8Nd5EVNqxRt9Z4yQNpcReA3ewfJ+T3+xe+KzcdPFV/zvocV9Dm8qPExBK
-	J8RHfgONw/Ll08LGoY4HwTJkGDuwq8Qw1+S13B8Zn3/5MYOtoaRuM5cww0LjouKsFhepUuorM5+
-	LXVlJG1tD1uhjlGW5dDXKL/6b5zXVmlxXDgvrhdoL1A8CC9E4AKSLn2d2iTGioykTaitHnfnhrd
-	7RTxakHxrZvifX/X3WO7AqPFaNJ8PlBQX3z6kfEDy5ip7U5P1E5Ode4RjyKtLcnsl4n0h8n1LvO
-	wVar/SGwTLNIDPKVCCJraMo7avQ/vag5hTtMxhw7lXfn2jajj1jquBriPSUR8klpr49W2bkuYg2
-	e8KrYhH48ga6oXmJKw3lDNVw=
-X-Google-Smtp-Source: AGHT+IFzPQDRIGM5kXz/uPr8WOIkUly3GXBqmdKT7BP8Ta0SSrkDREhdVM/Lq840MeRMt3Hk/BFdAg==
-X-Received: by 2002:a17:90b:3a4b:b0:311:c970:c9c0 with SMTP id 98e67ed59e1d1-313f1cd6841mr15161613a91.22.1750122692422;
-        Mon, 16 Jun 2025 18:11:32 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-313c1bcbb6dsm9395479a91.6.2025.06.16.18.11.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 18:11:32 -0700 (PDT)
-Date: Mon, 16 Jun 2025 18:11:31 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
-Message-ID: <aFDAwydw5HrCXAjd@mini-arch>
-References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1750122711; c=relaxed/simple;
+	bh=iVaWv2RzWaaVpLuDLobgnSNSuWym8RHkG55Fpi0YUmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I2pMR5cN/Urpmch8nFkkn8IyH2BYgW2Tx9VQLt6H6WsVozODryMzL1Zgbv4L2S+3cY6GiMTT1qWmFEyUygFpULIrykT0iy+jvVJCRUN/gLdw2e4Ie3l33gnHVpgmc2G8ZLPJnH2aln2eU1NkPiXjC+uN9s4Y/XLlghtX1Zs1KNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDUz+tgm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE66C4CEEA;
+	Tue, 17 Jun 2025 01:11:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750122710;
+	bh=iVaWv2RzWaaVpLuDLobgnSNSuWym8RHkG55Fpi0YUmI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZDUz+tgmmat53i4A+5QK7mFlGbgaBHM2POFECs9Tkk4AWrIz7JOaEfJskAUaum+oW
+	 4O6FJx5D5oAtBuWaPZPUFPlmKOrip8yd8026FEsnB+qyo5o0VeOPWy+xSZA64ZEZGw
+	 PmzX/vZJHfYY5T31ZpqfrXWu3f/PRzAq/dkpQo3K6GAXHJYvqkzFDRW6W7S/ALevJM
+	 mT89C+Tv37QjS0UF4x58lvSnig0A47YWCnkC8GnMkaa3+MhANIRZndmi56+aKqnoI/
+	 zeG4OQKyWFF3Li1Cct2omWAFieEmrVJbgeNQV8LNma7YzgOPTGRgyTs926/PnDfZUA
+	 wou35Gs6DxCug==
+Date: Mon, 16 Jun 2025 18:11:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>, Yury Norov
+ <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron
+ <Jonathan.Cameron@huwei.com>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Kevin Tian <kevin.tian@intel.com>, Long Li
+ <longli@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas
+ <bhelgaas@google.com>, Rob Herring <robh@kernel.org>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Krzysztof Wilczy???~Dski
+ <kw@linux.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Haiyang Zhang
+ <haiyangz@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
+ Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Leon
+ Romanovsky <leon@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Erni
+ Sri Satya Vennela <ernis@linux.microsoft.com>, Peter Zijlstra
+ <peterz@infradead.org>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Paul Rosswurm <paulros@microsoft.com>, Shradha Gupta
+ <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v6 0/5] Allow dyn MSI-X vector allocation of MANA
+Message-ID: <20250616181148.2aed5dfe@kernel.org>
+In-Reply-To: <20250612061055.GA20126@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1749650984-9193-1-git-send-email-shradhagupta@linux.microsoft.com>
+	<20250611085416.2e09b8cd@kernel.org>
+	<20250612061055.GA20126@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250617002236.30557-1-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 06/17, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Wed, 11 Jun 2025 23:10:55 -0700 Shradha Gupta wrote:
+> On Wed, Jun 11, 2025 at 08:54:16AM -0700, Jakub Kicinski wrote:
+> > On Wed, 11 Jun 2025 07:09:44 -0700 Shradha Gupta wrote:  
+> > > Changes in v6
+> > >  * rebased to linux-next's v6.16-rc1 as per Jakub's suggestion  
+> > 
+> > I meant a branch, basically apply the patches on the v6.16-rc1 tag
+> > and push it out to GitHub, kernel.org or somewhere else public.
+> > Then we can pull it in and maintain the stable commit IDs.
+> > No need to repost the patches, FWIW, just share the branch here
+> > once you pushed it out..  
 > 
-> Introduce a control method in the xsk path to let users have the chance
-> to tune it manually.
+> Oh, understood. Thanks for the clarity. Here is a github repo branch
+> with the changes on v6.16-rc1 tag
+> https://github.com/shradhagupta6/linux/tree/shradha_v6.16-rc1
 
-Can you expand more on why the defaults don't work for you?
+The tag was good, but when I pulled it my check scripts complained:
 
-Also, can we put these settings into the socket instead of (global/ns)
-sysctl?
+Commit a19036b86845 ("net: mana: Allocate MSI-X vectors dynamically")
+	committer Signed-off-by missing
+	author email:    shradhagupta@linux.microsoft.com
+	committer email: shradhagupta@microsoft.com
+	Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+
+etc. You seem to have committed the patches with a slightly different
+email address. Not a huge deal but better to fix it if we can.
+
+So please base the tag. The code can stay the same just adjust the
+committer or author/signoff email addrs. We can use this as an
+opportunity to add Bjorn's email.
+
+No need to repost the code just ping here once you updated the tag.
 
