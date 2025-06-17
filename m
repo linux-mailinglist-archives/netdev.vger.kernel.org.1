@@ -1,169 +1,109 @@
-Return-Path: <netdev+bounces-198756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B668DADDAA7
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:30:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C7FADDABE
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:35:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9555B16A0FA
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:25:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC103B4B7A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6211E28507A;
-	Tue, 17 Jun 2025 17:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFE323AE84;
+	Tue, 17 Jun 2025 17:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cz0W+RDj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKx39ld6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA6628505A
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E3820C497
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750181093; cv=none; b=LvqM5sfucTT7GI9x3SUAZJm9OVr0V+LYSU8AXsu1NJfOYjmB1frPDL4IRJ/OA58eORE7rUGybw/lldsnt2CSTcWnECAWMyRdn9nquEsnjgnJ2w+BSOhXhFzxIjWwaSmRrdNi/Suu6qFIKBHBHQZzNTmHooeNQD2S795eUSqw0Is=
+	t=1750181752; cv=none; b=FmHNAdaL8uGyLtrkgMFRYuvPIXoX+XRq6k8S7vtLkhUMLGUuAb5apBRM62lb4cLXQQD0dURYqTiQBgP7FRNrOHxY3h2rJOccES5N/zw1EOxiKB2qrfN0/A9rH6qoCvV3y8A0980U1lsPEcbWfVVnrPMnhUJvwx+OWo84EgdBAJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750181093; c=relaxed/simple;
-	bh=+FKYhC65acRjCptcBCdTfvJjihtOo3kpZIKtCE8VtpY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rNsN8Y0YyIqR+jnopWe4Pr847k6hn0qxRlX7Ph0Y4sagCY0sHN2tSS8jTCCSvJ/BEasbqXtAyfM68drJKg3la4GnbN4QYvEL8P1joV7+LLYdutQw6BS78nhiOYZQDy0v9ITmlAn81X44KkCTZFUq3gvEOI8bsbQf6BnKuPaXDYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cz0W+RDj; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750181092; x=1781717092;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+FKYhC65acRjCptcBCdTfvJjihtOo3kpZIKtCE8VtpY=;
-  b=cz0W+RDjCyWYyA/q1PX6O2aCUCnnAddMNZpAw3+Kw8hD188wUm2iCU5F
-   VzyOMLEZtntpuHqYw3jdEM2yOVOP4pGIcI1oIsqxIIkoQZBkino8pYPfq
-   /3dCKKTpKuSjWcqrNV//2zO0HLEHYVSUM5+i9z3i7ExhFlNK0zuEJMQzd
-   PmPHNums59XrooyVNrsTWxgoV7eVfuFtspsArqRl3KafnsDRb7yX9ZD3/
-   ajRrOME8paU5xf1M4NndIi1/hAUFaH4QGyKpjyzgmNNyRBwYUkYEYkAvG
-   GIQmMBlUJyR9v/aONd2ik1AgerC5wynDcFjtB5ykIAS1AGtNNTmsjkGQK
-   w==;
-X-CSE-ConnectionGUID: ZdGNgEneRnKRMtCipnaKPA==
-X-CSE-MsgGUID: FgzysDKoTpqaCIxMQWtg+g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="69820132"
-X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
-   d="scan'208";a="69820132"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 10:24:50 -0700
-X-CSE-ConnectionGUID: rxzOTzKjR86z6LQ5bGP7KA==
-X-CSE-MsgGUID: t8ok117BQ2qE17MQjNorQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
-   d="scan'208";a="152741178"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Jun 2025 10:24:49 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	anthony.l.nguyen@intel.com,
-	dima.ruinskiy@intel.com,
-	richardcochran@gmail.com,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>,
-	Gil Fine <gil.fine@linux.intel.com>
-Subject: [PATCH net 3/3] e1000e: set fixed clock frequency indication for Nahum 11 and Nahum 13
-Date: Tue, 17 Jun 2025 10:24:43 -0700
-Message-ID: <20250617172444.1419560-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
-References: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1750181752; c=relaxed/simple;
+	bh=IxMZiGivgJcFKNyfPm4dRzReUn2WtW5awAEmS9HIx7A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OhZA/cRjlx2Rmu95gi5NYxybjQH2oKZhiaXiTBl54XFbT4Y52pRUJfXx4ipryEoorno5HhSwkWkM/THxN4wChXtdFlUscjq9cxnVLewwCHyiFA8TgTrrghYPpsJCN6CGR4Y+PtYPO37fdilc4PDClTWFEfwoL/UkVW5ComPHVk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKx39ld6; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a752944794so24333151cf.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 10:35:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750181750; x=1750786550; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IxMZiGivgJcFKNyfPm4dRzReUn2WtW5awAEmS9HIx7A=;
+        b=BKx39ld6ASbl3/CLc5qng6j8aARxDIzctHcAMWdq+0aoewDVRzc5TeVYN2wUomQ9Bk
+         lEiLbDGZmhi7tIBybfKJcXiLP9d6H0zoeSZ+w5xgOUpMcQNksym4dGdGnoKZGBnMDI/q
+         K4YDotY4s+0WU19TVYapepBe2YrMICmqkwofuIjYXfLRXapaxzQ56vqW0MU5ISFG8iQw
+         gnYOYnr1+vTHyziU54EdcrhnrNpC6a+A8UZ95cltAuwbzqR5HSebf5Qt9U97qzjvln3i
+         YbPyFTElqyXcdF7hoek6iNSZDgfR/9D6qUiHNn29/L1TaMRTLPUjk8KQEbZHl7ZGlCtZ
+         g+9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750181750; x=1750786550;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IxMZiGivgJcFKNyfPm4dRzReUn2WtW5awAEmS9HIx7A=;
+        b=fCscici+/vbxjklRl0Dpn1l1Nhxnjw7m0uoYQ73CqO6ZfyBt2P8U00DKWv6ezWECMr
+         Lywize1z5DDqGmHO8Oo9s4McdwcYmYiP5Aj2jxuP9wZfq+dBuH70rLvANp7lQW2cDKMp
+         1hHeTjxKDhTRTst9CNjhbRiQVNryOE4X0hwJYiTn+JCBVZy+lb6K7pLec1w0eAafsjOr
+         /N7x+fu+eq6jr8J6YHxByY3jiycB/enKnNGYDopqECraYHUwOKT6rE7gIyQHbkdScR1k
+         /owr3r9gId387i6kTT4TbUXsxS1KfJiBBmP4OfjOYzTmkCC9JJR5BmPigH9y4ni3HqP/
+         G71g==
+X-Forwarded-Encrypted: i=1; AJvYcCVAT5gMT3qW8Eh5zFNxlo4/rUY9g4xE/S5CfzHMp3bs7K890P5uAakfKIcRrcqQFdprv0Ba4V0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGcOBHdYzqr090r9PTtGifwvsaxGUpj4ArHiv2kkD7muHWQjSZ
+	ze463vxCKlhJNiKAeg0HY8XeT8zb4GDqs8LYjcfOzKhqROYvXRv9cVDZBBF9j20aYDrMNYDkHvF
+	7SfeltlW8FCvxr8l80vWwsj7bcLTmULinKAcVgVE4
+X-Gm-Gg: ASbGncsK0YSqMCusVq8gnJ9z9DKTq034p0JvpuXhtXj6L8HdVlyjgMAQ8yU6hPCci98
+	WKDIuEBdEaYDLrw73rD4N22hJQrFV/rXBTzzCi+RitDqpB7lodKItK09EHJroF2e5mW+2qnQTQX
+	13t87H+3O9YYPSce6akD+CJWdWZUSu3PBApjvx1dsRRKlMsCCiry+8R2s=
+X-Google-Smtp-Source: AGHT+IEci5c9iAKbnuiaE8WHwP6fIysQji2cASuwElQo+GvwPwiaVd4EnWKsrOW156RvOHggsC4NqSU6M8P9p2gXSjo=
+X-Received: by 2002:ac8:5a53:0:b0:477:4224:9607 with SMTP id
+ d75a77b69052e-4a73c4bc9bfmr230930881cf.12.1750181749852; Tue, 17 Jun 2025
+ 10:35:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <aEzIYYxt0is9upYG@v4bel-B760M-AORUS-ELITE-AX>
+In-Reply-To: <aEzIYYxt0is9upYG@v4bel-B760M-AORUS-ELITE-AX>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 17 Jun 2025 10:35:38 -0700
+X-Gm-Features: AX0GCFu2V9OmhB8zB52ChC7zYsM3DIqkBnmIytsLfmy5MNnMVd_vHdbpZpezEzs
+Message-ID: <CANn89iLvbOP1Hnt7CtucWE5n6n72HhYBeTjNuTCqiY=AH_8DOA@mail.gmail.com>
+Subject: Re: [PATCH v3] net/sched: fix use-after-free in taprio_dev_notifier
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: vinicius.gomes@intel.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, vladimir.oltean@nxp.com, netdev@vger.kernel.org, 
+	v4bel@theori.io
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+On Fri, Jun 13, 2025 at 5:55=E2=80=AFPM Hyunwoo Kim <imv4bel@gmail.com> wro=
+te:
+>
+> Since taprio=E2=80=99s taprio_dev_notifier() isn=E2=80=99t protected by a=
+n
+> RCU read-side critical section, a race with advance_sched()
+> can lead to a use-after-free.
+>
+> Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
+>
+> Fixes: fed87cc6718a ("net/sched: taprio: automatically calculate queueMax=
+SDU based on TC gate durations")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
 
-On some systems with Nahum 11 and Nahum 13 the value of the XTAL clock in
-the software STRAP is incorrect. This causes the PTP timer to run at the
-wrong rate and can lead to synchronization issues.
-
-The STRAP value is configured by the system firmware, and a firmware
-update is not always possible. Since the XTAL clock on these systems
-always runs at 38.4MHz, the driver may ignore the STRAP and just set
-the correct value.
-
-Fixes: cc23f4f0b6b9 ("e1000e: Add support for Meteor Lake")
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Reviewed-by: Gil Fine <gil.fine@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 14 +++++++++++---
- drivers/net/ethernet/intel/e1000e/ptp.c    |  8 +++++---
- 2 files changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index a96f4cfa6e17..7719e15813ee 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -3534,9 +3534,6 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
- 	case e1000_pch_cnp:
- 	case e1000_pch_tgp:
- 	case e1000_pch_adp:
--	case e1000_pch_mtp:
--	case e1000_pch_lnp:
--	case e1000_pch_ptp:
- 	case e1000_pch_nvp:
- 		if (er32(TSYNCRXCTL) & E1000_TSYNCRXCTL_SYSCFI) {
- 			/* Stable 24MHz frequency */
-@@ -3552,6 +3549,17 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
- 			adapter->cc.shift = shift;
- 		}
- 		break;
-+	case e1000_pch_mtp:
-+	case e1000_pch_lnp:
-+	case e1000_pch_ptp:
-+		/* System firmware can misreport this value, so set it to a
-+		 * stable 38400KHz frequency.
-+		 */
-+		incperiod = INCPERIOD_38400KHZ;
-+		incvalue = INCVALUE_38400KHZ;
-+		shift = INCVALUE_SHIFT_38400KHZ;
-+		adapter->cc.shift = shift;
-+		break;
- 	case e1000_82574:
- 	case e1000_82583:
- 		/* Stable 25MHz frequency */
-diff --git a/drivers/net/ethernet/intel/e1000e/ptp.c b/drivers/net/ethernet/intel/e1000e/ptp.c
-index 89d57dd911dc..ea3c3eb2ef20 100644
---- a/drivers/net/ethernet/intel/e1000e/ptp.c
-+++ b/drivers/net/ethernet/intel/e1000e/ptp.c
-@@ -295,15 +295,17 @@ void e1000e_ptp_init(struct e1000_adapter *adapter)
- 	case e1000_pch_cnp:
- 	case e1000_pch_tgp:
- 	case e1000_pch_adp:
--	case e1000_pch_mtp:
--	case e1000_pch_lnp:
--	case e1000_pch_ptp:
- 	case e1000_pch_nvp:
- 		if (er32(TSYNCRXCTL) & E1000_TSYNCRXCTL_SYSCFI)
- 			adapter->ptp_clock_info.max_adj = MAX_PPB_24MHZ;
- 		else
- 			adapter->ptp_clock_info.max_adj = MAX_PPB_38400KHZ;
- 		break;
-+	case e1000_pch_mtp:
-+	case e1000_pch_lnp:
-+	case e1000_pch_ptp:
-+		adapter->ptp_clock_info.max_adj = MAX_PPB_38400KHZ;
-+		break;
- 	case e1000_82574:
- 	case e1000_82583:
- 		adapter->ptp_clock_info.max_adj = MAX_PPB_25MHZ;
--- 
-2.47.1
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
