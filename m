@@ -1,138 +1,150 @@
-Return-Path: <netdev+bounces-198801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91D3ADDDD9
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:21:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E6BADDDDD
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A590189D6BE
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:21:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18E0C17D924
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516D92F0C66;
-	Tue, 17 Jun 2025 21:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CCF2F0056;
+	Tue, 17 Jun 2025 21:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="llwU1GOl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRPcXb6/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E1C2F0C51
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548BD2F002C;
+	Tue, 17 Jun 2025 21:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750195275; cv=none; b=kjXNqA+nIDBUEDG71M7ont0BX9hwvJaEUbKCCG0i8YW2LigipPvEMngmpYqok7COIIKQhrcpqnzU/2qLXXilU1ND7UMfcJYRGct/oJjbIAryFvbrYCc8Cu1Am06kz26G4iuxQLbDh50e3p8Cl+2s0wJ4he1xbdpDN5IIhfXee8U=
+	t=1750195423; cv=none; b=VordSDddkk0f49PTZDCgRXnMniQonVL8yQ6FKGzbxFFHgqJe+Bk5tCK22xXpwKweo2CvkXFYFFdmxksYFb4QUf+G+6FIID8JXiWr1RDRD1eLUpVc1cnIoYua/UK2cUX5JmPDapfIjazttpyU3Qos6LxZOLYBk5Yk536x4PuaytQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750195275; c=relaxed/simple;
-	bh=ghAlQ8swgyvg35n8kIto2l2q8/TqHbqUK8up7gWveKo=;
+	s=arc-20240116; t=1750195423; c=relaxed/simple;
+	bh=xCaeqnGFURa4WE7ZGAQiMIxRYtRhwOv7fu5xpngpuHE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pJJqQi8R+fO0pJXSf3Y5JVNZBaPnZY4DVRabbwLJe+5fZ7g+URqHctggpQ9HhHhAeQMBDIkZ68JMQO7cS2NvMEllU1Zbp4gyJSaQNfH8UJtg586T6ReucXhIEN2gVseWvLEgxcfj5xe8ViacbUAJ/nf5Hhw5pNx9ViIpI9Dtr+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=llwU1GOl; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7487d2b524eso3246939b3a.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:21:13 -0700 (PDT)
+	 MIME-Version:Content-Type; b=h+ARYKY7pYTWcgxC50UOV7WPwHGmQB+la8oVCkTwDOf94cBZdLzWJgo26qFx9EfKFnzOQKAh8lbhGzAjxeaL0/QWjHv3EjZPnwi9Fd/kR0jD14huUHDkJvjhvd1b6mnP1XdsL6QQBlRrAen+h4Wm84AniLtmzSSFO3hBSvVmaUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRPcXb6/; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2353a2bc210so55404455ad.2;
+        Tue, 17 Jun 2025 14:23:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1750195273; x=1750800073; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750195416; x=1750800216; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7gIz4H+2pv9KQZOljDt5KCA3lWDXWg/fXMu/yNzlViw=;
-        b=llwU1GOlPY4VobZ5kL2n1r5CjxSt7SV5LAHi73ZOa7pdeNtALjZlGISfWM/ooHTUUm
-         VrDASJHxZ2oGWls3ITMzkzRZWhCsVBLuWGW8vRJDHwICjSj0tY4L+SgtgHPScitQC9V9
-         ZKm4Qq8CEoWQujypLJNujUPFApOOqUp3LddAqCr01D9y5TTcKyF3SLrXXMx5k/vYJIU/
-         +TBVXPYRzWH9VM5aBOkM3PbYXQ4DM9ye6AgWUNv/ap1m6bydx/lMDwQXwL78iBQYh55N
-         B4u0BsvOh7pqN00e2DVJvvWGJqhW7rSfxCDzr4WEkS9bMZPet9njppKxysCVDmAzXUj/
-         dfAg==
+        bh=3aS75VzdIUay76QJsK2VftduMxFyEPBUJ8MrlD9vVBg=;
+        b=LRPcXb6/dATDFd5GZtbhOxAWiGpnLHScMZsWBMjo6JxGGEzW3Ij9akopnK1hYBzGiT
+         JrPdHW8NUWyIniNFlh56tdIxGQTTqjtCGDbEh4pC+RFQZIMHMHck93L8dyu+6voHONA0
+         sE0yyVdXUs/xQdHnHgAbLOuNdzz0fsR8O8FVEcLvvohWpqhW6ISl0nDrUuovvLkAAXmQ
+         7FF6YF7gLDWgjg74Hhn2f9Xgg5jFxt4Tz6WvsjLwm9Z6Pxwq7xeZPjg6eUS5G5FBJzwC
+         o272MZK1F2j3aK5Obg3LNBEo6dScMlICvPmeQ+xMDm5zdnddW5PwJt3hwe0fD5U8PqIB
+         mYag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750195273; x=1750800073;
+        d=1e100.net; s=20230601; t=1750195416; x=1750800216;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7gIz4H+2pv9KQZOljDt5KCA3lWDXWg/fXMu/yNzlViw=;
-        b=NfPZAgBMAPI0sBssfVpZ+crqraa5RCQH+0Tl9uYk/iTxufHWl1vZXwgwgcc/8Inbs5
-         GiVWFrS37Y8yqwBrEj4/LcDgeaq3umbNgx6YB76vBuL2L0/r/+jG31QWZ9GtwSrIfsgE
-         5GMBtxsq63DsAipXIrDPwFdQZilZgwHbKMNKBtU7KXXBSebOtNqCSTTwZfzBqL1GIE92
-         Xq2AYb6nGpMfn2xnVuaiKRif4uOTVOXjV7MJRRK+QgBTJd9mtSLqN+2f4Rkl4sDwE4x7
-         ZQvILmDTLmO43Oj2U9VVZQAgAhnGmVMf+KI+3OcZJoU1+7hFxhtVlYeXswzXHsHTDG/i
-         xULA==
-X-Gm-Message-State: AOJu0YzHVchAUWwbI75s04WSTvGdOqSGDzOFZ3Eyl7AAQj+x6x+ww4+1
-	EoDonlbL1EsO6L8FZf3RXSf7NkxwQ5VnqWwOAe3jhiOhliRAnf0S4pLdCBQpcT+xS3vGEIP3cM+
-	svcbJ
-X-Gm-Gg: ASbGncuhxXbUy8JXVKQBtYpSGDiWANH5GVOHvMzsM5Qfnng8ZDYBalJIYinWbqr4JNA
-	RKD+QBL6vzEIe5SJK0Hw8ySnpf9cio+SH7SEIrTjBne0FSsnMHfkcFGKn2+nyHr5H/tyz2W90mK
-	E8/vD9ubYiB3bfxW/FpRo2v6m7e2KFxLHCOGB+Bh3kqnnuLdq1vLvjJsuZjFNfaK7r314F8BP0K
-	JEYCWgCUsJvzqhCdRMbZDxefiLAVcZtryQuHxsFJT3co/aIZwPrGdVWGZr0hEQP0UswOGnI00Bs
-	P7rfyST7RtbP63G8h649Af3nUlaBKDfmZcucFBxzg6nLeuPk0SGfDg7AkZQ=
-X-Google-Smtp-Source: AGHT+IFjJYJY4HUnRemVKkvpiXWB9kScTBPZwW7E27iISmUbRxII68iwE5TffemguSIHj1oFVvSnGQ==
-X-Received: by 2002:a05:6a00:1142:b0:736:5f75:4a44 with SMTP id d2e1a72fcca58-7489d050d66mr17450589b3a.22.1750195273209;
-        Tue, 17 Jun 2025 14:21:13 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:71::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748900ad24csm9739582b3a.109.2025.06.17.14.21.12
+        bh=3aS75VzdIUay76QJsK2VftduMxFyEPBUJ8MrlD9vVBg=;
+        b=Be2lyDOc6EHp/4xvhWm+KmGy2p31+8N/277/WSn6pPBxajVG2WBUwHklxIVkCj2iEi
+         Z8M+cFC1mUPUIWDz26KM6Zhp5wiE9F7SPuJcsUJnjffwZw2nKBo3t9kHI8tIgyvyfimm
+         6vNxPoo0fZP/fWd13MhtABn5YcoPwJgfnCEGMLRc/qkvlrqhYK8YvEDe05WPtPO63q2s
+         hCXSkX+qT70iznwfA89OPvmDXynFjrS3YPB2zkBa7qhX1mGSzLU+MrGULClag6NU8iIn
+         s7JQa/X5zGUYN5hKXAKijxryj8bIHuxHQXLobfnD/+7Bzvdvno0/kWWIz3oUUCi/Mazk
+         s3wA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcySXnrcCE2/F/cV1hVk0MMv30G5/awx9RThSedrVVJKh7fujuzjHzmgjewEZuUWb4MKrcXll9@vger.kernel.org, AJvYcCUffizbbQlIR+5XVAeZnFkMbbGKFFSyFg0hhKx6nMhgARzw+LCmoDbq1s5yHSPotaI9Ac1BraptaYJ1cniCiVf2H6UsDBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3JZykYeGfOpN9imosmgIbuvjYuGRCHVwetYLPsv4r3+2wRYP4
+	O8QMpVThmsZCh9j/cLv7Nu1/NwhQEtAXBmUYAFT/TSYpW8DfVTtVVfE=
+X-Gm-Gg: ASbGncs5gVwiveF7X/5BdA9LwKvwR0KqHpIfsXL78LnqLfWyKRahZMGJEUTW+JPJY5w
+	09EMNLAbhBYTjWUrQFnpQbTkfgcZYtTHSfo+UVe0z6XrQ1YF1t7zLuzJdhCmzY3Oa6Ax7LCbFX0
+	JuR2Xm94J9ZX9+hzyXRgLMcsOCad23MLUgAi06lc5zqhXyrg1Op3elZXT8iTq1GCqs7wYBJinWU
+	OpHNr9YthCo9TDbGsXgiC0SFZYwYmWUqm3S1dVDWkC9F2hdo13ZnwhwQapN0YWT2cWjd96p7aBJ
+	2XKwne605vGKNeqU39Tf1ZVOwAbUgOly7RdLWu4=
+X-Google-Smtp-Source: AGHT+IFHZ0ZWlFVwyZopd1xDHLBtbjq+QG30lwWa8nF+92idCEzGbE1SXnaJi7UyFS4DRU/i0m1k5Q==
+X-Received: by 2002:a17:902:f68d:b0:234:8f5d:e3a4 with SMTP id d9443c01a7336-2366b32e4camr222408265ad.2.1750195416453;
+        Tue, 17 Jun 2025 14:23:36 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23699a75d65sm12534805ad.91.2025.06.17.14.23.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 14:21:12 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net v2 4/4] tcp: fix passive TFO socket having invalid NAPI ID
-Date: Tue, 17 Jun 2025 14:21:02 -0700
-Message-ID: <20250617212102.175711-5-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250617212102.175711-1-dw@davidwei.uk>
-References: <20250617212102.175711-1-dw@davidwei.uk>
+        Tue, 17 Jun 2025 14:23:35 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: paul@paul-moore.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	horms@kernel.org,
+	huw@codeweavers.com,
+	john.cs.hey@gmail.com,
+	kuba@kernel.org,
+	kuni1840@gmail.com,
+	kuniyu@google.com,
+	linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller@googlegroups.com
+Subject: Re: [PATCH v1 net] calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
+Date: Tue, 17 Jun 2025 14:22:36 -0700
+Message-ID: <20250617212334.1910048-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <CAHC9VhTPymjNwkz9FHFHQbbRMgjMQT80zj1aT+3CFDVY=Eo5wg@mail.gmail.com>
+References: <CAHC9VhTPymjNwkz9FHFHQbbRMgjMQT80zj1aT+3CFDVY=Eo5wg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-There is a bug with passive TFO sockets returning an invalid NAPI ID 0
-from SO_INCOMING_NAPI_ID. Normally this is not an issue, but zero copy
-receive relies on a correct NAPI ID to process sockets on the right
-queue.
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 17 Jun 2025 17:04:18 -0400
+> On Mon, Jun 16, 2025 at 1:26 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrote:
+> >
+> > From: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> > syzkaller reported a null-ptr-deref in sock_omalloc() while allocating
+> > a CALIPSO option.  [0]
+> >
+> > The NULL is of struct sock, which was fetched by sk_to_full_sk() in
+> > calipso_req_setattr().
+> >
+> > Since commit a1a5344ddbe8 ("tcp: avoid two atomic ops for syncookies"),
+> > reqsk->rsk_listener could be NULL when SYN Cookie is returned to its
+> > client, as hinted by the leading SYN Cookie log.
+> >
+> > Here are 3 options to fix the bug:
+> >
+> >   1) Return 0 in calipso_req_setattr()
+> >   2) Return an error in calipso_req_setattr()
+> >   3) Alaways set rsk_listener
+> >
+> > 1) is no go as it bypasses LSM, but 2) effectively disables SYN Cookie
+> > for CALIPSO.  3) is also no go as there have been many efforts to reduce
+> > atomic ops and make TCP robust against DDoS.  See also commit 3b24d854cb35
+> > ("tcp/dccp: do not touch listener sk_refcnt under synflood").
+> >
+> > As of the blamed commit, SYN Cookie already did not need refcounting,
+> > and no one has stumbled on the bug for 9 years, so no CALIPSO user will
+> > care about SYN Cookie.
+> >
+> > Let's return an error in calipso_req_setattr() and calipso_req_delattr()
+> > in the SYN Cookie case.
+> 
+> I think that's reasonable, but I think it would be nice to have a
+> quick comment right before the '!sk' checks to help people who may hit
+> the CALIPSO/SYN-cookie issue in the future.  Maybe "/*
+> tcp_syncookies=2 can result in sk == NULL */" ?
 
-Fix by adding a sk_mark_napi_id_set().
+tcp_syncookies=1 enables SYN cookie and =2 forces it for every request.
+I just used =2 to reproduce the issue without SYN flooding, so it would
+be /* sk is NULL for SYN+ACK w/ SYN Cookie */
 
-Fixes: e5907459ce7e ("tcp: Record Rx hash and NAPI ID in tcp_child_process")
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- net/ipv4/tcp_fastopen.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-index 9b83d639b5ac..5107121c5e37 100644
---- a/net/ipv4/tcp_fastopen.c
-+++ b/net/ipv4/tcp_fastopen.c
-@@ -3,6 +3,7 @@
- #include <linux/tcp.h>
- #include <linux/rcupdate.h>
- #include <net/tcp.h>
-+#include <net/busy_poll.h>
- 
- void tcp_fastopen_init_key_once(struct net *net)
- {
-@@ -279,6 +280,8 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
- 
- 	refcount_set(&req->rsk_refcnt, 2);
- 
-+	sk_mark_napi_id_set(child, skb);
-+
- 	/* Now finish processing the fastopen child socket. */
- 	tcp_init_transfer(child, BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB, skb);
- 
--- 
-2.47.1
-
+But I think no one will hit it (at least so for 9 years) and wonder why
+because SYN could be dropped randomly under such a event.
 
