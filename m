@@ -1,125 +1,110 @@
-Return-Path: <netdev+bounces-198485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC802ADC52B
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:39:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475D9ADC54A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1A433ABC20
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 08:38:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E86F5171741
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 08:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737DD28FA93;
-	Tue, 17 Jun 2025 08:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB4228A70A;
+	Tue, 17 Jun 2025 08:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DLGs21Sl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a75bxEWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D47D2AD0D;
-	Tue, 17 Jun 2025 08:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A65D23B601
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750149543; cv=none; b=XRTbW2RtT9K9lHKJ693c6VjDox0vTmG4K8XejmFKLjydS4Qo/oW6YZZrb9/X98ppWpHddsyYFRtRK3pZulMsXyEPNVExRYyQd0CAnBieqjirJUux2GowEnBYRUMtZMkUSEScETqqlijr6lB+62BfOcTg13AMr0pEqz0FrTMbYvU=
+	t=1750149944; cv=none; b=Dhr3TXzBANzjvLX92j/O7gPxhm3Xmp2IBt87s8gVAuRr46XPU7bCHha+pYF2iJpHGD9RdPF6/u0nhHLucswc4YN5Br94D2lRr4ZCTzOabqIBuT7UvEs5qx7Logw5CGoHTkEAjgOsr0oZkARNdE7nH+g8eFQ1jwZ7UXCr9dDz6ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750149543; c=relaxed/simple;
-	bh=5GKY5sBiJ94ezFHEaUbp9RYLPqQWJyB8UuP3zBIcjmA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EuFq9uzWDsOru23xD9Sz5BbhzFS8i03vo/V0rdIOkuVEsndn4bt3Dc9qtOXfno/C47xqKaJ/oH8g5I0sW07XxqcbkPyPzr855G4VCZIrqnzSu99YiP/A2AmXviit6FSteXANEslsRE+Isj+CipZryx+XHbFzjAIAaV7KrZL7P5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DLGs21Sl; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55GNXt1Z031548;
-	Tue, 17 Jun 2025 01:38:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=VvrxOl46dE2voqkeT8SgCprbB
-	EdBQIVHPEh8DeXm5R8=; b=DLGs21Sl5b1A7abkc9baWXGISU2Nx1YUrlJPNxldO
-	nUzt5TRdbZx6cdI09wr+lgsqGD+mh4BLbhm9maPhMqwGdxnvORDB3KDs1DkUpfv/
-	AkKFqC2Sy58nri58+T0h27k9BDc6DhGFmD931m6t7zVtajJ1bfw4jj1x2q68VmzO
-	t1hWHAvB3EV+281mLX2mwh7OOQnRRnoQwP46n73pBKil3cWQ6Pq8ShvTCqz5U4eC
-	h++BecrtSw/aW0wVSu6Yo7Of578Xc0cjXH82fTTcFsCwgmfXw2ytzo9Mm2AcJ9iA
-	zj0U2oEolL8FhXDj3ovbsj7E88mVx/Upy5SGqKctWhfWw==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47aw21rxve-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Jun 2025 01:38:47 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 17 Jun 2025 01:38:46 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 17 Jun 2025 01:38:46 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 1531B62676C;
-	Tue, 17 Jun 2025 01:38:42 -0700 (PDT)
-Date: Tue, 17 Jun 2025 14:08:42 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-Subject: Re: [RFC]Page pool buffers stuck in App's socket queue
-Message-ID: <20250617083842.GA417272@maili.marvell.com>
-References: <20250616080530.GA279797@maili.marvell.com>
- <d152d5fa-e846-48ba-96f4-77493996d099@huawei.com>
+	s=arc-20240116; t=1750149944; c=relaxed/simple;
+	bh=Qo8up+mYBA49jQEuH9zzWhj2VUVYH7YMsUEyhRW/3r0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=evMDvKFqA7x+f9pziG6IP3qDvdjTDN4CD3oIWhXZoiwJeBWXeG3vOL6sZrErT+IK271VP589LdJ1/e5n2R27Hhj792SHoUKHF1uGipRqwxeTpbrSECJ6qqsZgRleulYreI9use6PkMsAg/8xnSByq/MMdKh0zp+LuUpghiMATlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a75bxEWj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB65C4CEE3;
+	Tue, 17 Jun 2025 08:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750149943;
+	bh=Qo8up+mYBA49jQEuH9zzWhj2VUVYH7YMsUEyhRW/3r0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=a75bxEWjXFic1PakmB8kWp71Du8dsbAHz2jxsGgU4hUobTDZdG2otN6A2pgXmgjn8
+	 duFwHfVytGlLYrKzoUc1izjCu0ASUiQSPQB2z4RHhARtC2yndq2hHvmeqDX82+DG1F
+	 rCCflG96RX94PLA4jVfmVkpSDJ+XiYhKwvAgVF3mIUbR45lcX1gRr3hzqbrwtNcgdH
+	 Z7Z0/Rit2d596dH9U+kn9xGhowQn1GWUsuwbDgfxO2IBAKMLg9QlVhffWcFrmEWM4k
+	 xvHcS/Rk1tTQFTRVyzw0HwHsVj6D1/FG06wIRXCko6S4mI9qmOwXDjmo1R8kSpWiM8
+	 FdSWDbtbHkVEg==
+From: Simon Horman <horms@kernel.org>
+Date: Tue, 17 Jun 2025 09:45:39 +0100
+Subject: [PATCH net-next] nfc: Remove checks for nla_data returning NULL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <d152d5fa-e846-48ba-96f4-77493996d099@huawei.com>
-X-Proofpoint-GUID: 6qlfk6nOuYiMn8ZaBITEqb46CkTMp0sO
-X-Proofpoint-ORIG-GUID: 6qlfk6nOuYiMn8ZaBITEqb46CkTMp0sO
-X-Authority-Analysis: v=2.4 cv=DfMXqutW c=1 sm=1 tr=0 ts=68512997 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=i0EeH86SAAAA:8 a=20KFwNOVAAAA:8 a=e0OHxoh_bsvbLNUbZbIA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE3MDA2OSBTYWx0ZWRfX5/MUD9U/15we xiisDhPnUSQCh/IM5jkA13xCES8zgijUEGjVc0UxCdnAQFNCE5w1jLWi6stfL/ySPu/7SG5JQkv NU9Fl2KrW6bPjIWXFtteOvDrm0LcBOpz16i1MoGudC1I0ABrysiwUQPGHNTb1bQSYuEKuTFmZHn
- VfesEr1xjDQw8MmdhKxq+1xqlRrPi9K6S0X8hCMsUCWMJ5gCZi2iExT3IsaIKPNr8byUiliKeyt Ufh+Wr4zeH95w1reSTGRgTdFhfje6k2GRL8QsF1O+ZJ3qFAMFi+Px0YKprjEHpUmwBC8jZuNs9U 1Ywkz0PwCHT+NXaHNQ5ica+BzDz/YPdmKOfGFtA3/XSwJeKWRb2SFTRbLe8vIAT4Geo6ofzCQ6p
- OKIxs/xX99puzZ56OtktSnaNBA8aHwp5AjJsRnZ/55kbYVm/3CG300Wc/E1Y6LtaTByQ/JYM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-17_03,2025-06-13_01,2025-03-28_01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250617-nfc-null-data-v1-1-c7525ead2e95@kernel.org>
+X-B4-Tracking: v=1; b=H4sIADIrUWgC/x3MTQqAIBBA4avErBvQwP6uEi1ExxqIKdQiiO6et
+ PwW7z2QKDIlGKsHIl2ceJcCXVfgVisLIftiaFRjVKs7lOBQzm1Db7PFzpmBTO+DChpKc0QKfP+
+ /CYQyCt0Z5vf9AKWRdl9pAAAA
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.14.0
 
-On 2025-06-17 at 12:03:41, Yunsheng Lin (linyunsheng@huawei.com) wrote:
-> > Customer was asking us for a mechanism to drain these sockets, as they dont want to kill their Apps.
-> > The proposal is to have debugfs which shows "pid  last_processed_skb_time  number_of_packets  socket_fd/inode_number"
-> > for each raw6/raw4 sockets created in the system. and
-> > any write to the debugfs (any specific command) will drain the socket.
-> >
-> > 1. Could you please comment on the proposal ?
->
-> I would say the above is kind of working around the problem.
-> It would be good to fix the Apps or fix the page_pool.
->
-> > 2. Could you suggest a better way ?
->
-> For fixing the page_pool part, I would be suggesting to keep track
-> of all the inflight pages and detach those pages from page_pool when
-> page_pool_destroy() is called, the tracking part was [1], unfortunately
-> the maintainers seemed to choose an easy way instead of a long term
-> direction, see [2].
->
-> 1. https://lore.kernel.org/all/20250307092356.638242-1-linyunsheng@huawei.com/
-> 2. https://lore.kernel.org/all/20250409-page-pool-track-dma-v9-0-6a9ef2e0cba8@redhat.com/
+The implementation of nla_data is as follows:
 
-i think, both issues are different. Above links, fixes late DMA unmap issue. In my case,
-buffers do not return at all. So some entity should purge those socket queues which are not getting
-processed. App modification would be difficult as customer may use opensource Apps/third party apps.
+static inline void *nla_data(const struct nlattr *nla)
+{
+	return (char *) nla + NLA_HDRLEN;
+}
 
-Buffers are stuck in socket queue. And we need to free them. Page pool infra tracking socket queue and
-process information would be an over kill ? And packets in socket queue of a process, being freed from page pool wont
-work well. (That app could be killed later, causing skbs to be freed. or we dont know whether App processing socket queue
-is slow).
+Excluding the case where nla is exactly -NLA_HDRLEN, it will not return
+NULL. And it seems misleading to assume that it can, other than in this
+corner case. So drop checks for this condition.
 
-I was thinking of extending /proc/net/raw and /proc/net/raw6 OR creating similar proc entries; which
-can show "pid and timestamp of first skb in the queue" etc. And a .proc_write() function to purge a
-specifc socket queue. Using these, customer can decide which queue is stuck and purge manualy (thru some script) after
-netdevice down/up.
+Flagged by Smatch.
+
+Compile tested only.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ net/nfc/netlink.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/net/nfc/netlink.c b/net/nfc/netlink.c
+index 6a40b8d0350d..a18e2c503da6 100644
+--- a/net/nfc/netlink.c
++++ b/net/nfc/netlink.c
+@@ -1192,7 +1192,7 @@ static int nfc_genl_llc_sdreq(struct sk_buff *skb, struct genl_info *info)
+ 			continue;
+ 
+ 		uri = nla_data(sdp_attrs[NFC_SDP_ATTR_URI]);
+-		if (uri == NULL || *uri == 0)
++		if (*uri == 0)
+ 			continue;
+ 
+ 		tid = local->sdreq_next_tid++;
+@@ -1540,10 +1540,6 @@ static int nfc_genl_se_io(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ 	apdu = nla_data(info->attrs[NFC_ATTR_SE_APDU]);
+-	if (!apdu) {
+-		rc = -EINVAL;
+-		goto put_dev;
+-	}
+ 
+ 	ctx = kzalloc(sizeof(struct se_io_ctx), GFP_KERNEL);
+ 	if (!ctx) {
+
 
