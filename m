@@ -1,259 +1,128 @@
-Return-Path: <netdev+bounces-198773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4006AADDBFB
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:03:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFBAADDC1E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:17:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDCE6401792
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:03:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4AD166E2D
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404E61B4F0F;
-	Tue, 17 Jun 2025 19:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A372E25486E;
+	Tue, 17 Jun 2025 19:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bqazzS8c"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="f24dP1a6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B6E8F54;
-	Tue, 17 Jun 2025 19:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EC725178C
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 19:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750187002; cv=none; b=H9oNkeW4wLe/tvBH2Ut1V+YuliJZaQJrzP1cFSDJ1BUhAqAa2Unb2ke3mKWLT2LCUMwAJ6dH0nm/0zJkK983Zs8Y7coqMmh3TrmihUZqrxuRO0EfIh88L4YlS7tm9s/wfiNVKzPDkZ1O6BEs+bSwAjG0GRjDqP0iEZkzuWSqcNQ=
+	t=1750187866; cv=none; b=G6XBnlrrDxzn1aab0nhGs4sVAbWjxQosohm9QvW2PjYpav00sAx3WlpwHqynvUF/8wPT7Z3Iap9EIAHvs6JSjSq7xg/12z/ln3tct9hL5Ox5j08zwoIU9LdXQ1FuFCTinMTr2DKeGaxeFJCpNk8aPWUjRTtvDhU/WrX0uQxyUFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750187002; c=relaxed/simple;
-	bh=WQjtsw0NPGqZlrAYykaoA04ih9gqLZRnTR2w8Qkg6OI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TqfM9OgNbltiH9MjPq81ilWYhHiRmSBKKca/IjMwo+n5lWGdTHhmZGOei256rtd32Eftf0iMcWx50HC+GanO3Gv799DukH4YvlgTfr5g+SFwwLGzQ+H2MGhtHTv+cc+wBW1NNMNiueeQZAwEdEXqH/4J0netvAvKmZpCVEVeQsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bqazzS8c; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a4f64cdc2dso541627f8f.1;
-        Tue, 17 Jun 2025 12:03:18 -0700 (PDT)
+	s=arc-20240116; t=1750187866; c=relaxed/simple;
+	bh=1bP6rJEA8wFohueF5jqDh/zAC0rZ53XrMgdF+00Sxw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CVSz6Cu6sqlFdoUkh6Pf+qIqqnUiUr3BUu1MhvsX1qH7q7E4RFRp097iNNnbLD8LPikcQDL/Y/deqzyISf4vJ92ug/S+qS3ul2tcMGKm85XKXDFU8BIq910En3EWqlIjrSheIkXADHKpwLzQpKigaeQsHhO2OHPI7TxFNETkEqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=f24dP1a6; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4530921461aso53380235e9.0
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 12:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750186996; x=1750791796; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EO3mzn9mneUBLNjzsLrlXivcJJ9LbOVSxL2XTHOAkJs=;
-        b=bqazzS8cjw8wVy7rPFpETia1j9JuFPepabBkeuiC0LG1Je02Ngh5/cBq8yNWxd27jv
-         h91mkw5djEa+ks8NzhWTgoUe3MQ1mHu121I8QoYyjrMcN9IbZjhMXLiti1uaQpgy29aA
-         MKpHb/9XuiPLsOCOlFGVH5msXewhgguitMiXnWg9NF9iXeCdGT2cZYjzWwR+rChEp18l
-         uN0Qxga1wWd570ZhTRmohQ8aX6e9gD5uZSIYN3pEA5SOgXucTjLlSaKf+yd+Q9nvZOGW
-         7eSiClWKWZQD2fCLiuSjXupZwpXXNKKXpVKabnqgC6UO3xFbfRmwVuZQNamKI+leeSp9
-         ae4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750186996; x=1750791796;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1750187863; x=1750792663; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EO3mzn9mneUBLNjzsLrlXivcJJ9LbOVSxL2XTHOAkJs=;
-        b=U/hbzVvUY1u+KptM9W/3v+AjfD/C8W9LNwRyhnvsNoHPYNWsVWwfskAcTXr0Ftc6eX
-         RGHoXELtwZY8C5phQ5cW0HYdHJXc4WRx2Qp3ijC2XFQ9AszJ03bpKdss37XEfEoz27fr
-         rc9qLbkoCviyXcqbSqfD+dFE+v6WRsT324mgfTtoNUn9njckvMkB+q7ChyC6McSTShNN
-         sAnuePdzKlUBpFs8KsYjSInkiPivgILY4Rx/NjArHaiRHYUsAHKGN0yKMrHK4CLtUwHk
-         0Nv84BAUGU1kqjf2hkNOht9PyENSEvHQGug89UGE8BEqPF1CXw2v2JE7Br30ZvM4XWqK
-         2BmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVU6KFjsasAU8k75SicccmnwrXoCaiy266s5nQWedsXNaFHPom4jLlPDGHjKy3Qfexwm3GM6WzE@vger.kernel.org, AJvYcCWp0pI83aFjpoKG424DKEaUNoYUe7g/sWfCQaraONgpIgGNfREx/VLXdGb9ZdwjNzYb72k0jn0QWOHLOnI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9GvlUHyoldkchSBTxBp3H5O+lXCNWeXx3GvhuvfJHBhnNaMvt
-	TmzBZBw4IdO377FK/1sM+H3dut4n2b9fdN9mT2QihIR8ZDZvvDy8FHRO
-X-Gm-Gg: ASbGncuj3wI57P70AcKM1kSqTA3VHRedA7rJdM0a6Qy8GLgzH7hiyyS1jlQXG1ULnps
-	Vh2tF34i6OLQoq4648WHcPzphOCoKE+iQ4F1MQP2KHM1z3HQ6mGFCGZXUUW+rCO8nsgEYszqSMR
-	mKbFOZyid7y2VIGGZ4vbxWu04/7XsEiOOycbSKNA/KuUwjhkWrCmrNOSSBydgSSwFHr9Cjy3FJk
-	544wnQIpyU1R3cKl3VeZ37bnzjzVvl4HHHqizW80FKZrNmAk7Qt/SEeL0zw8MRbpgknpwOsbpLk
-	P855c4gfXztOP0tj73GACQISpOgkG7k106GjGfr9D0Cn0UwINMD96prN6UVakznbkQKHdoIqL5v
-	Cz4QaD/re23khCynZrLvPmZum3A+vVk9KzCGYQDfuH4qdrJ1rfm/nDnHNrQPnPzy5WlPANuoVPE
-	Y=
-X-Google-Smtp-Source: AGHT+IGPYOJx3kioh4/Cp5rmSZs9Wa2Eub6qaVkHJvzcap4KstPmLTQfvBIw1iPfY+vo3y+94HhsEQ==
-X-Received: by 2002:a05:6000:188d:b0:3a5:28f9:7175 with SMTP id ffacd0b85a97d-3a572e7a00cmr4222203f8f.9.1750186996274;
-        Tue, 17 Jun 2025 12:03:16 -0700 (PDT)
-Received: from thomas-precision3591.home (2a01cb00014ec300200c9c87d117a78e.ipv6.abo.wanadoo.fr. [2a01:cb00:14e:c300:200c:9c87:d117:a78e])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4532e1838e4sm187427735e9.40.2025.06.17.12.03.15
+        bh=uvfQMwCx3aaFLH1gBYzFPVa5Y0KFbLLTPkKAtJ7FGcM=;
+        b=f24dP1a6dfCFYcJJz9zsm/qxBai4Kp/6CWp1u6yb5AR3BJAqSBmKihBlsObpDAmyBK
+         rH2EN970kST+6qFYVH8eSayc1z9Tu8gTR0nDMFCD5iZLQHxwwpHRcn546psZp1H3PDL/
+         TsfRJgvSN+Kwgpekvg0HzFVmFjshdTGkU9Czhgs6HpcL21QH95DKcRfVxIYaPc0vFbLi
+         2l7WhVpoNH6weLKZwwURN9Ixny85r4mYVs0p13tGQDQkBuNosxIkSCkj9bFuWWVqx5+l
+         2i0SqJKu51oGLHO+Kfx+V6NjhIu3nUeTdG4k6e10E6W1YVwqpP14fcGRTqeK2MO5EFWc
+         zKfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750187863; x=1750792663;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uvfQMwCx3aaFLH1gBYzFPVa5Y0KFbLLTPkKAtJ7FGcM=;
+        b=jokelU8mR6IYlzHY6CwIqsJh/e5yUhaWkZ8NYrq2RXZPFxcZyKsP33IDIRMXUxJeTt
+         dx8nKs3ToM1Rha7QxYyVjhP0/2VUoAhCi8r7YQltFLnk06UTCIVVzEE468NBLoPc5+VU
+         QOsrQ02aUfglRKbjz/MDWwVamDetkJqjgQnqsTFT0CjnLHgDM/L9myuTRH/4xZ9+LqpC
+         S8qSO4qhbcqdGTLBvE/QZXK7LiiaSDSt9kZ36BMDIv7hkQ+5qc059ydN/+BDHPEZAkft
+         fpNax/rNdFHZIIxIdl3vwMIaty54j2HZ+xiBG/oS9km/oPxg65PPzdzlwgaJQtNdqpPH
+         priQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6325sQhSiwPOkyasmXMEk6vBmM8XTxq2Xi/CxyxYq0iVDdeKhR8Z0aHV7FPikXLbqeuWFGto=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTg2S+Nz+7Z+n00rzpHZINd5svAgBw6zI5t3wCND5oGauGdv0d
+	YYLtkOBhi2EFFlhQk6/3zbA8s0+d7IXH8GwKWHQo00wtvYDNG0jHxZkekH7Ei9p6nVQ=
+X-Gm-Gg: ASbGncv1vLr9Q4Wc6IgIC2QSuO0OLL1nb2FpR4AMxsgC9yg84Iwxk3AdOFh+jeI1Pvr
+	YDEThXZl0E7PbA2BwsqDcIxpKDi8oqGBHDV4l9zHtS3HeVTNSQ3yLI1T00YGLMuQ+DAMChSbjVp
+	Y3v2anT5ofPrY9cJvzS8BgQjE9P/on8JycuP/wHeTPEkmeHrEviXlXNgBI5Z8s0N/pmpJqRWH6T
+	1u8RDFoK/tlyeHxebGsXJa+8JVtU4nqAk84i/jy99O8A2veSk7Z+chhDVooyl8uzdBW9hsQVg9D
+	WUqQBwBO9Aa3TAVvOGh9DjjM27Bbc2n4/IFr47DIHPO9MR7NX7IK1zaVbvCHVuPBgUo=
+X-Google-Smtp-Source: AGHT+IH6QEm50PmO7DOXT3ObwZddoTuvRG1KMDkLrrDO70vSNhxTbXEd9HYKRQhDrOpboEzGDHDmKw==
+X-Received: by 2002:a05:600c:1f10:b0:442:e0f9:394d with SMTP id 5b1f17b1804b1-453560d2fe9mr22881915e9.24.1750187862956;
+        Tue, 17 Jun 2025 12:17:42 -0700 (PDT)
+Received: from MacBook-Air.local ([5.100.243.24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532dea1925sm188221825e9.12.2025.06.17.12.17.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 12:03:15 -0700 (PDT)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Taehee Yoo <ap420073@gmail.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net,v2] ethernet: ionic: Fix DMA mapping tests
-Date: Tue, 17 Jun 2025 20:57:52 +0200
-Message-ID: <20250617185949.80565-3-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <3b19f145-8318-4f92-aa92-3ab160667c79@amd.com>
-References: <3b19f145-8318-4f92-aa92-3ab160667c79@amd.com>
+        Tue, 17 Jun 2025 12:17:42 -0700 (PDT)
+Date: Tue, 17 Jun 2025 22:17:39 +0300
+From: Joe Damato <joe@dama.to>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
+Message-ID: <aFG_U2lGIPWTDp1E@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
+ <aFDAwydw5HrCXAjd@mini-arch>
+ <CAL+tcoDYiwH8nz5u=sUiYucJL+VkGx4M50q9Lc2jsPPupZ2bFg@mail.gmail.com>
+ <aFGp8tXaL7NCORhk@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFGp8tXaL7NCORhk@mini-arch>
 
-Removing wrappers around `dma_map_XXX()` to prevent collision between
-0 as a valid address and 0 as an error code.
+On Tue, Jun 17, 2025 at 10:46:26AM -0700, Stanislav Fomichev wrote:
+> On 06/17, Jason Xing wrote:
 
-Fixes: ac8813c0ab7d ("ionic: convert Rx queue buffers to use page_pool")
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
-Another solution is to remove the wrappers altogether so that it doesn't
-call multiple times the `dma_mapping_error()`.  This also makes the code 
-more similar to other calls of the DMA mapping API (even if wrappers
-around the DMA API are quite common, checking the return code of mapping
-in the wrapper does not seem to be common).
+> > >
+> > > Also, can we put these settings into the socket instead of (global/ns)
+> > > sysctl?
+> > 
+> > As to MAX_PER_SOCKET_BUDGET, it seems not easy to get its
+> > corresponding netns? I have no strong opinion on this point for now.
+> 
+> I'm suggesting something along these lines (see below). And then add
+> some way to configure it (plus, obviously, set the default value
+> on init). 
 
-Thomas
++1 from me on making this per-socket instead of global with sysfs.
 
- .../net/ethernet/pensando/ionic/ionic_txrx.c  | 70 ++++++-------------
- 1 file changed, 22 insertions(+), 48 deletions(-)
-
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 2ac59564ded1..1905790d0c4d 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -12,12 +12,7 @@
- #include "ionic_lif.h"
- #include "ionic_txrx.h"
- 
--static dma_addr_t ionic_tx_map_single(struct ionic_queue *q,
--				      void *data, size_t len);
- 
--static dma_addr_t ionic_tx_map_frag(struct ionic_queue *q,
--				    const skb_frag_t *frag,
--				    size_t offset, size_t len);
- 
- static void ionic_tx_desc_unmap_bufs(struct ionic_queue *q,
- 				     struct ionic_tx_desc_info *desc_info);
-@@ -320,9 +315,9 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 		dma_sync_single_for_device(q->dev, dma_addr,
- 					   len, DMA_TO_DEVICE);
- 	} else /* XDP_REDIRECT */ {
--		dma_addr = ionic_tx_map_single(q, frame->data, len);
--		if (!dma_addr)
--			return -EIO;
-+		dma_addr = dma_map_single(q->dev, frame->data, len, DMA_TO_DEVICE);
-+		if (dma_mapping_error(q->dev, dma_addr))
-+			goto dma_err;
- 	}
- 
- 	buf_info->dma_addr = dma_addr;
-@@ -355,11 +350,12 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 							   skb_frag_size(frag),
- 							   DMA_TO_DEVICE);
- 			} else {
--				dma_addr = ionic_tx_map_frag(q, frag, 0,
--							     skb_frag_size(frag));
-+				dma_addr = skb_frag_dma_map(q->dev, frag, 0,
-+							    skb_frag_size(frag),
-+							    DMA_TO_DEVICE);
- 				if (dma_mapping_error(q->dev, dma_addr)) {
- 					ionic_tx_desc_unmap_bufs(q, desc_info);
--					return -EIO;
-+					goto dma_err;
- 				}
- 			}
- 			bi->dma_addr = dma_addr;
-@@ -388,6 +384,12 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 	ionic_txq_post(q, ring_doorbell);
- 
- 	return 0;
-+
-+dma_err:
-+	net_warn_ratelimited("%s: DMA map failed on %s!\n",
-+			     dev_name(q->dev), q->name);
-+	q_to_tx_stats(q)->dma_map_err++;
-+	return -EIO;
- }
- 
- int ionic_xdp_xmit(struct net_device *netdev, int n,
-@@ -1072,38 +1074,6 @@ int ionic_txrx_napi(struct napi_struct *napi, int budget)
- 	return rx_work_done;
- }
- 
--static dma_addr_t ionic_tx_map_single(struct ionic_queue *q,
--				      void *data, size_t len)
--{
--	struct device *dev = q->dev;
--	dma_addr_t dma_addr;
--
--	dma_addr = dma_map_single(dev, data, len, DMA_TO_DEVICE);
--	if (unlikely(dma_mapping_error(dev, dma_addr))) {
--		net_warn_ratelimited("%s: DMA single map failed on %s!\n",
--				     dev_name(dev), q->name);
--		q_to_tx_stats(q)->dma_map_err++;
--		return 0;
--	}
--	return dma_addr;
--}
--
--static dma_addr_t ionic_tx_map_frag(struct ionic_queue *q,
--				    const skb_frag_t *frag,
--				    size_t offset, size_t len)
--{
--	struct device *dev = q->dev;
--	dma_addr_t dma_addr;
--
--	dma_addr = skb_frag_dma_map(dev, frag, offset, len, DMA_TO_DEVICE);
--	if (unlikely(dma_mapping_error(dev, dma_addr))) {
--		net_warn_ratelimited("%s: DMA frag map failed on %s!\n",
--				     dev_name(dev), q->name);
--		q_to_tx_stats(q)->dma_map_err++;
--		return 0;
--	}
--	return dma_addr;
--}
- 
- static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
- 			    struct ionic_tx_desc_info *desc_info)
-@@ -1115,9 +1085,9 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
- 	skb_frag_t *frag;
- 	int frag_idx;
- 
--	dma_addr = ionic_tx_map_single(q, skb->data, skb_headlen(skb));
--	if (!dma_addr)
--		return -EIO;
-+	dma_addr = dma_map_single(q->dev, skb->data, skb_headlen(skb), DMA_TO_DEVICE);
-+	if (dma_mapping_error(q->dev, dma_addr))
-+		goto dma_early_fail;
- 	buf_info->dma_addr = dma_addr;
- 	buf_info->len = skb_headlen(skb);
- 	buf_info++;
-@@ -1125,8 +1095,8 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
- 	frag = skb_shinfo(skb)->frags;
- 	nfrags = skb_shinfo(skb)->nr_frags;
- 	for (frag_idx = 0; frag_idx < nfrags; frag_idx++, frag++) {
--		dma_addr = ionic_tx_map_frag(q, frag, 0, skb_frag_size(frag));
--		if (!dma_addr)
-+		dma_addr = skb_frag_dma_map(q->dev, frag, 0, skb_frag_size(frag), DMA_TO_DEVICE);
-+		if (dma_mapping_error(q->dev, dma_addr))
- 			goto dma_fail;
- 		buf_info->dma_addr = dma_addr;
- 		buf_info->len = skb_frag_size(frag);
-@@ -1147,6 +1117,10 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
- 	}
- 	dma_unmap_single(dev, desc_info->bufs[0].dma_addr,
- 			 desc_info->bufs[0].len, DMA_TO_DEVICE);
-+dma_early_fail:
-+	net_warn_ratelimited("%s: DMA map failed on %s!\n",
-+			     dev_name(dev), q->name);
-+	q_to_tx_stats(q)->dma_map_err++;
- 	return -EIO;
- }
- 
--- 
-2.43.0
-
+I feel like the direction networking has taken lately (netdev-genl, for
+example) is to make things more granular instead of global.
 
