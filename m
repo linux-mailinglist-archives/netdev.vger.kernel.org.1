@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-198754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9CA1ADDA95
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:26:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6ED5ADDAA2
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E38563A9D0C
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:24:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 506AC167514
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64AC285059;
-	Tue, 17 Jun 2025 17:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53508285067;
+	Tue, 17 Jun 2025 17:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i2Vp0AEO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dy30LHsC"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F336A18E025
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F8D23B600
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750181091; cv=none; b=UqMpQdn2GEUS7KANc7KYEaw0PV9F6Ap/uiE3KEDYUop5fbZsNNuQ+eKQOEVCGKz9uN7L+Lb9uSEOtsHRIDh3Z49m1J2NXHleM5aXIeZBIxVDtUGXArAvEqE7QZ4ho7EINgS8uLcfaJ5ZWdWAh5iEMNJR3mX0vKcx7FkdKpRiL+E=
+	t=1750181092; cv=none; b=SNlW+B2w6GnSfMbZyD4xy9OfnlXF1FPC7Gl+YYA9UwspKNFq6QjfFStQh6P1jeIgpd8wTDahiROnnjB/+mM/iCHImANi1lNddpnXdynjhrbvtzCDXgNQBGAetm63fDxXV9+ssZAfSSx9ca+GPY1wtUrzH4UskjFaq6eaFzuwsPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750181091; c=relaxed/simple;
-	bh=ruClvUSszSmABV4+4MjnxRujH+w8EJohxQQefWzkPZk=;
+	s=arc-20240116; t=1750181092; c=relaxed/simple;
+	bh=j0QCNAuOJ5qCpjEv6bfW/2PceErQ7vqzE22Didog0yg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BTYjRjydGbeADqyQ3B5QcoTNIzyoRoZzxaUkf018OTArancZqX/SahvwWtIb38251bFtJZ4SIVY6Uk7xhGZHwkko/jKp+1bSz1mKDsaLi635icGLj8eYaHQBnACJlgzMA+zToQZ6fDylQR/6EYl9uENRyzk1TBZtKRpO+T2thXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i2Vp0AEO; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=bJ6xbGd7S0jo7qcKOPly3ZF0tz0RBDo6u6itf4tvTob+RlVfjKgsMuh0rJq2e93QqQHCbDdeH9cgtDwHxN0494HLXqUgLHmQNAMmALMs9b8cgrinUphm5AVPs3reZD9JsDFG7kchse0Ri9X8B/aAzwGC6HRcibwFdNF68r1yV6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dy30LHsC; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750181090; x=1781717090;
+  t=1750181091; x=1781717091;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ruClvUSszSmABV4+4MjnxRujH+w8EJohxQQefWzkPZk=;
-  b=i2Vp0AEO7nTDDI/+MYAxn3rS1RGFDdsSpgxK3flGwY+NYmdehM2OPm/X
-   RKcqkyjqVhYnGvWBTfV+V6dj8g2xCaxl1APGa+gG0iCTkqRp8sginwDNN
-   YRD8wZjRSU95MKNanBm8YI/oOA4Cfu4KwO4RyuDKrf0dnEiQNmZ3XSFMu
-   2W86jBknB7ddWMdXzVjYEVj5lKKXWCN52qHKKyiPgAPc3rVBG8wgGo3Yi
-   WkRDvEpYjMx+Hj50h9Fmsst9CQd1QKBwOHDxTN8XEI/lDjhaSZYOzmrDI
-   8BSv4xZ+nUm8fwWAp2OzhTiWRp+aDMNaUjQcX49v+ZJB2KWLw3H4RmSvm
+  bh=j0QCNAuOJ5qCpjEv6bfW/2PceErQ7vqzE22Didog0yg=;
+  b=Dy30LHsCdsHPzXUjdgTgAlp2xW+v1kNoNaG06Ieyl8GQzLfMULKQ1EP1
+   CMkv2HWlxckJcYg1Cn0j10DBg/Z9jbiZUtrmx4AouxUpTdrt5h0DOKsuw
+   FCZbT11xXlaWCRaVgr6TwkxjsUnz71kWepuEJJLEPobG49QxPVs0Oi1Zq
+   TPQp4zWC5bv7cVNQp7OUzjEXY23UQSY9vevo+czgWLmCcRcJYug9aWfbx
+   1GsRDLBadTqM8RTHzJet6uKEN7REkIBW5z2G77U1RpNqv/rStramuZRvs
+   r00sxB8vu6C7LyOZdEvRcUix2D3fwekzvMTMN5rl5FqcCDGS7Ih1TVmAz
    w==;
-X-CSE-ConnectionGUID: UhmvQvkQRlKVeBFA6Kh6zg==
-X-CSE-MsgGUID: qxir8qcLT2GU8ckyRhfS3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="69820117"
+X-CSE-ConnectionGUID: 9vbauscDTZ6KT1/Zhq3jOg==
+X-CSE-MsgGUID: rwLAfGGIR8ORXHd1DSXdEA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="69820125"
 X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
-   d="scan'208";a="69820117"
+   d="scan'208";a="69820125"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 10:24:49 -0700
-X-CSE-ConnectionGUID: 952LMo20RWqnPlgnI3EWQQ==
-X-CSE-MsgGUID: x3ffvE7QRwK6pxKLeu8hKw==
+X-CSE-ConnectionGUID: Q2UREqV1Q/C8lRzFV1168A==
+X-CSE-MsgGUID: cYGv7YoTQSqt9lX03Go3+g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
-   d="scan'208";a="152741166"
+   d="scan'208";a="152741172"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Jun 2025 10:24:48 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 17 Jun 2025 10:24:49 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,16 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Krishna Kumar <krikku@gmail.com>,
+Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>,
 	anthony.l.nguyen@intel.com,
-	krishna.ku@flipkart.com,
-	ahmed.zaki@intel.com,
-	przemyslaw.kitszel@intel.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 1/3] net: ice: Perform accurate aRFS flow match
-Date: Tue, 17 Jun 2025 10:24:41 -0700
-Message-ID: <20250617172444.1419560-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 2/3] ice: fix eswitch code memory leak in reset scenario
+Date: Tue, 17 Jun 2025 10:24:42 -0700
+Message-ID: <20250617172444.1419560-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
 References: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
@@ -86,153 +84,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Krishna Kumar <krikku@gmail.com>
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-This patch fixes an issue seen in a large-scale deployment under heavy
-incoming pkts where the aRFS flow wrongly matches a flow and reprograms the
-NIC with wrong settings. That mis-steering causes RX-path latency spikes
-and noisy neighbor effects when many connections collide on the same
-hash (some of our production servers have 20-30K connections).
+Add simple eswitch mode checker in attaching VF procedure and allocate
+required port representor memory structures only in switchdev mode.
+The reset flows triggers VF (if present) detach/attach procedure.
+It might involve VF port representor(s) re-creation if the device is
+configured is switchdev mode (not legacy one).
+The memory was blindly allocated in current implementation,
+regardless of the mode and not freed if in legacy mode.
 
-set_rps_cpu() calls ndo_rx_flow_steer() with flow_id that is calculated by
-hashing the skb sized by the per rx-queue table size. This results in
-multiple connections (even across different rx-queues) getting the same
-hash value. The driver steer function modifies the wrong flow to use this
-rx-queue, e.g.: Flow#1 is first added:
-    Flow#1:  <ip1, port1, ip2, port2>, Hash 'h', q#10
+Kmemeleak trace:
+unreferenced object (percpu) 0x7e3bce5b888458 (size 40):
+  comm "bash", pid 1784, jiffies 4295743894
+  hex dump (first 32 bytes on cpu 45):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 0):
+    pcpu_alloc_noprof+0x4c4/0x7c0
+    ice_repr_create+0x66/0x130 [ice]
+    ice_repr_create_vf+0x22/0x70 [ice]
+    ice_eswitch_attach_vf+0x1b/0xa0 [ice]
+    ice_reset_all_vfs+0x1dd/0x2f0 [ice]
+    ice_pci_err_resume+0x3b/0xb0 [ice]
+    pci_reset_function+0x8f/0x120
+    reset_store+0x56/0xa0
+    kernfs_fop_write_iter+0x120/0x1b0
+    vfs_write+0x31c/0x430
+    ksys_write+0x61/0xd0
+    do_syscall_64+0x5b/0x180
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Later when a new flow needs to be added:
-	    Flow#2:  <ip3, port3, ip4, port4>, Hash 'h', q#20
+Testing hints (ethX is PF netdev):
+- create at least one VF
+    echo 1 > /sys/class/net/ethX/device/sriov_numvfs
+- trigger the reset
+    echo 1 > /sys/class/net/ethX/device/reset
 
-The driver finds the hash 'h' from Flow#1 and updates it to use q#20. This
-results in both flows getting un-optimized - packets for Flow#1 goes to
-q#20, and then reprogrammed back to q#10 later and so on; and Flow #2
-programming is never done as Flow#1 is matched first for all misses. Many
-flows may wrongly share the same hash and reprogram rules of the original
-flow each with their own q#.
-
-Tested on two 144-core servers with 16K netperf sessions for 180s. Netperf
-clients are pinned to cores 0-71 sequentially (so that wrong packets on q#s
-72-143 can be measured). IRQs are set 1:1 for queues -> CPUs, enable XPS,
-enable aRFS (global value is 144 * rps_flow_cnt).
-
-Test notes about results from ice_rx_flow_steer():
----------------------------------------------------
-1. "Skip:" counter increments here:
-    if (fltr_info->q_index == rxq_idx ||
-	arfs_entry->fltr_state != ICE_ARFS_ACTIVE)
-	    goto out;
-2. "Add:" counter increments here:
-    ret = arfs_entry->fltr_info.fltr_id;
-    INIT_HLIST_NODE(&arfs_entry->list_entry);
-3. "Update:" counter increments here:
-    /* update the queue to forward to on an already existing flow */
-
-Runtime comparison: original code vs with the patch for different
-rps_flow_cnt values.
-
-+-------------------------------+--------------+--------------+
-| rps_flow_cnt                  |      512     |    2048      |
-+-------------------------------+--------------+--------------+
-| Ratio of Pkts on Good:Bad q's | 214 vs 822K  | 1.1M vs 980K |
-| Avoid wrong aRFS programming  | 0 vs 310K    | 0 vs 30K     |
-| CPU User                      | 216 vs 183   | 216 vs 206   |
-| CPU System                    | 1441 vs 1171 | 1447 vs 1320 |
-| CPU Softirq                   | 1245 vs 920  | 1238 vs 961  |
-| CPU Total                     | 29 vs 22.7   | 29 vs 24.9   |
-| aRFS Update                   | 533K vs 59   | 521K vs 32   |
-| aRFS Skip                     | 82M vs 77M   | 7.2M vs 4.5M |
-+-------------------------------+--------------+--------------+
-
-A separate TCP_STREAM and TCP_RR with 1,4,8,16,64,128,256,512 connections
-showed no performance degradation.
-
-Some points on the patch/aRFS behavior:
-1. Enabling full tuple matching ensures flows are always correctly matched,
-   even with smaller hash sizes.
-2. 5-6% drop in CPU utilization as the packets arrive at the correct CPUs
-   and fewer calls to driver for programming on misses.
-3. Larger hash tables reduces mis-steering due to more unique flow hashes,
-   but still has clashes. However, with larger per-device rps_flow_cnt, old
-   flows take more time to expire and new aRFS flows cannot be added if h/w
-   limits are reached (rps_may_expire_flow() succeeds when 10*rps_flow_cnt
-   pkts have been processed by this cpu that are not part of the flow).
-
-Fixes: 28bf26724fdb0 ("ice: Implement aRFS")
-Signed-off-by: Krishna Kumar <krikku@gmail.com>
+Fixes: 415db8399d06 ("ice: make representor code generic")
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_arfs.c | 48 +++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.c b/drivers/net/ethernet/intel/ice/ice_arfs.c
-index 2bc5c7f59844..1f7834c03550 100644
---- a/drivers/net/ethernet/intel/ice/ice_arfs.c
-+++ b/drivers/net/ethernet/intel/ice/ice_arfs.c
-@@ -377,6 +377,50 @@ ice_arfs_is_perfect_flow_set(struct ice_hw *hw, __be16 l3_proto, u8 l4_proto)
- 	return false;
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index 6aae03771746..2e4f0969035f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -508,10 +508,14 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_repr *repr, unsigned long *id)
+  */
+ int ice_eswitch_attach_vf(struct ice_pf *pf, struct ice_vf *vf)
+ {
+-	struct ice_repr *repr = ice_repr_create_vf(vf);
+ 	struct devlink *devlink = priv_to_devlink(pf);
++	struct ice_repr *repr;
+ 	int err;
  
-+/**
-+ * ice_arfs_cmp - Check if aRFS filter matches this flow.
-+ * @fltr_info: filter info of the saved ARFS entry.
-+ * @fk: flow dissector keys.
-+ * @n_proto:  One of htons(ETH_P_IP) or htons(ETH_P_IPV6).
-+ * @ip_proto: One of IPPROTO_TCP or IPPROTO_UDP.
-+ *
-+ * Since this function assumes limited values for n_proto and ip_proto, it
-+ * is meant to be called only from ice_rx_flow_steer().
-+ *
-+ * Return:
-+ * * true	- fltr_info refers to the same flow as fk.
-+ * * false	- fltr_info and fk refer to different flows.
-+ */
-+static bool
-+ice_arfs_cmp(const struct ice_fdir_fltr *fltr_info, const struct flow_keys *fk,
-+	     __be16 n_proto, u8 ip_proto)
-+{
-+	/* Determine if the filter is for IPv4 or IPv6 based on flow_type,
-+	 * which is one of ICE_FLTR_PTYPE_NONF_IPV{4,6}_{TCP,UDP}.
-+	 */
-+	bool is_v4 = fltr_info->flow_type == ICE_FLTR_PTYPE_NONF_IPV4_TCP ||
-+		     fltr_info->flow_type == ICE_FLTR_PTYPE_NONF_IPV4_UDP;
++	if (!ice_is_eswitch_mode_switchdev(pf))
++		return 0;
 +
-+	/* Following checks are arranged in the quickest and most discriminative
-+	 * fields first for early failure.
-+	 */
-+	if (is_v4)
-+		return n_proto == htons(ETH_P_IP) &&
-+			fltr_info->ip.v4.src_port == fk->ports.src &&
-+			fltr_info->ip.v4.dst_port == fk->ports.dst &&
-+			fltr_info->ip.v4.src_ip == fk->addrs.v4addrs.src &&
-+			fltr_info->ip.v4.dst_ip == fk->addrs.v4addrs.dst &&
-+			fltr_info->ip.v4.proto == ip_proto;
-+
-+	return fltr_info->ip.v6.src_port == fk->ports.src &&
-+		fltr_info->ip.v6.dst_port == fk->ports.dst &&
-+		fltr_info->ip.v6.proto == ip_proto &&
-+		!memcmp(&fltr_info->ip.v6.src_ip, &fk->addrs.v6addrs.src,
-+			sizeof(struct in6_addr)) &&
-+		!memcmp(&fltr_info->ip.v6.dst_ip, &fk->addrs.v6addrs.dst,
-+			sizeof(struct in6_addr));
-+}
-+
- /**
-  * ice_rx_flow_steer - steer the Rx flow to where application is being run
-  * @netdev: ptr to the netdev being adjusted
-@@ -448,6 +492,10 @@ ice_rx_flow_steer(struct net_device *netdev, const struct sk_buff *skb,
- 			continue;
++	repr = ice_repr_create_vf(vf);
+ 	if (IS_ERR(repr))
+ 		return PTR_ERR(repr);
  
- 		fltr_info = &arfs_entry->fltr_info;
-+
-+		if (!ice_arfs_cmp(fltr_info, &fk, n_proto, ip_proto))
-+			continue;
-+
- 		ret = fltr_info->fltr_id;
- 
- 		if (fltr_info->q_index == rxq_idx ||
 -- 
 2.47.1
 
