@@ -1,313 +1,652 @@
-Return-Path: <netdev+bounces-198401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36610ADBFD4
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 05:24:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8980BADBFE1
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 05:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 264383B473D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:24:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4682F3AB4DD
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A601D143C61;
-	Tue, 17 Jun 2025 03:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA6223A9AB;
+	Tue, 17 Jun 2025 03:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+sljC5K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2nq5ClG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792C58BEC
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 03:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B058A20CCFB
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 03:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750130684; cv=none; b=Juzn/dIbCmn52lu6p3vG7m8plla5UMTQvFRretd28ZdB4azc+tZ7o6mwIA9Xn1sr3JAtok8Siaqyd5+1QzdDh4D87zGu74z5tYbNp52e0koQl9tYVWFJh6D19M2T8N+HejUJOQ0yJZqj5Zl/VmxLkhDfovRv7DRBzIAWf2w7zlU=
+	t=1750130927; cv=none; b=Mp14AIvZqnoikd0EwZ8qZhxPU1/n3ZcVwXkSYbmXrf0bRgs/zYHsyNJIKEiBpa1ftZ6nD9PckhMUrzCDFsV6W98y+g1ohG2qc4oysX0aaoW/WGxZR39ptepOWCXWsF2sxQGDcdQyynb6UZ065TPYjYeRkVGY6pXeDky/zq9kHnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750130684; c=relaxed/simple;
-	bh=as3teyKqrzFl9S++ScMVJ5X58cpYf1CU1ICfBaOlV4E=;
+	s=arc-20240116; t=1750130927; c=relaxed/simple;
+	bh=D3IkZ7iI4qZeGc4JUt8yZukT8YMHbcG+JkA3RwAVHdg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ITixr7I/UFFG4IDG+hMTHcESK3QI7WMBVWvJ/mVty90DhjZMvKv/KH7M/eR91raYA4wUrC06FK/NL2snBEuGjHoBhSNbdXA4mcdfsS9292OP06MSGgag7HCfSUEf2W3FcS++60og4hCmnenEBjb/9/jrIr7anVB69Lr5o+U7rBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q+sljC5K; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=gatnRu2S5u4QJFxFKI/y6MiT+zCwaEFLkAFks/EFaNUUYDA8xGHBw1jha9w3HpeZ9s89aa3upO4ODkz0z343/gcs42FxL+VCkLJeyPpB9ORGwa4eWbC9Kw58GuCeUicjIGiGO5hhX93GGBj7XaWHryOabmP3kyC+7jsG3BlhX54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g2nq5ClG; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750130681;
+	s=mimecast20190719; t=1750130923;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IES4OEcARwBvPnsidi2m6ybrD+CM/2ggk1lkfoCToGg=;
-	b=Q+sljC5K7lK8vn5adGgaXjIpn9P/74siwJ1PJEfKyOmUS2WSfdw4h0T4Vi8cfCvYfSFB1I
-	A1SA70TrAQJS0ES00VHeOhzSOTyZAyqqE/UqjZX7XfTLeU8C/Dy55T/13IU2g8CRLm9WFf
-	mJ83rR4265ikQYLfi8LVJB3t2sWEAcM=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=1ZnjLocapY1GDtsVX0XE+EGlfXbZ9yLF/3jYtxyATXo=;
+	b=g2nq5ClGmRYhATMg/q0QRV5c/z888Airtcn8IYq7WjsEJFXhpsnEa0qCWjvAZkxTbc6c7c
+	Rn2pM5yAyOOq0Andhs++9uJnt6dxa3Iby22QPzWGxEt5ewQBvjoy/VoQicO0KiwUidq7lc
+	TL0PSX9BFlZDFqnUJ5S8zwPUlfYE+Sg=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-CGTCV7fsMhSbq1WOaqVrHg-1; Mon, 16 Jun 2025 23:24:39 -0400
-X-MC-Unique: CGTCV7fsMhSbq1WOaqVrHg-1
-X-Mimecast-MFC-AGG-ID: CGTCV7fsMhSbq1WOaqVrHg_1750130678
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b3184712fd8so1962703a12.3
-        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:24:39 -0700 (PDT)
+ us-mta-562-G8uvjNDOOCC1ulG6LLUDTA-1; Mon, 16 Jun 2025 23:28:40 -0400
+X-MC-Unique: G8uvjNDOOCC1ulG6LLUDTA-1
+X-Mimecast-MFC-AGG-ID: G8uvjNDOOCC1ulG6LLUDTA_1750130919
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b26e73d375aso5545836a12.2
+        for <netdev@vger.kernel.org>; Mon, 16 Jun 2025 20:28:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750130678; x=1750735478;
+        d=1e100.net; s=20230601; t=1750130919; x=1750735719;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IES4OEcARwBvPnsidi2m6ybrD+CM/2ggk1lkfoCToGg=;
-        b=jorK6LUYov2dkWGvyOWHJipQhvmSmyECT3w+bQ/6x9lC8ypwoB2UIB5HyxPZFOQcDh
-         fVkCsexuseuQyUSk3a3tzgO4+vcuNINwCW9ITkMIo+FW+AwmxHleVqMxVWSAtws+y8mP
-         S6/qrsJnUCz2CKMbqVJMC27cgwZiWWszQdl5ov68MiL4dF7Uffjvdv5LJZL8c55WmTfD
-         9RZ1e0RQsu7DIKwya7aZ5Jli8+mo+O5Nv1NViIhzcy4J28W54ykSkIDMi0w8h9ZRVvEf
-         YptGw3DrvBqJnjsU5Z7TAzXDmBDM0K6dCI9VnsPKufqzN3Fk32y8vlOzl9hVmSdggF2D
-         XgnA==
-X-Forwarded-Encrypted: i=1; AJvYcCW1XcxbJuIVFdYlQhhpjQENjwKRcEmrb13p8Dkihh/xQp73htRvom6i1He+HCOZfoqonmMFExU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc2ruXCObdKRZjGhHWWctReoTguyUgi3IlhVPEhXiIGvAzjk7x
-	W+zILi2d36PXt5dKpTGZBSzNE5/O+zoJQgJoibv96buD/AQcxvNsoLpgpd5cLl10Zu0sqOtfqkf
-	+ohBJH9fF2G9aJaY6R0GJ6+WMVcm/uugbbtdpB5gfBFj9qOigmMiXl6FrOlkpNpvDudOabeCN3b
-	0BQ3wS+/nTYRdrMVE5wS6/bNxRcZmVdAGQ
-X-Gm-Gg: ASbGncurO/7O1hO1fwocMhtD1cWO85/x4P4vhUq90Cxzpqbsjhtb1OI4BTyTiyM/O6+
-	yoRdxgctDy0ABc8PeXgB9PERSrXg2fuUH6/lT4DoUfc3ATxkostQYLZ6o5wcgSbzSktAMfCOYDL
-	/w5gQZ
-X-Received: by 2002:a05:6a21:b90:b0:21f:a883:d1dd with SMTP id adf61e73a8af0-21fbd4ddac8mr18709484637.14.1750130678310;
-        Mon, 16 Jun 2025 20:24:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGoYPOIsM1+IfFJw9di/BhSKLHCBv/fkorMNtLJsixKJrzAf0ZzDxBP/7z6vbIkblCH36IxZAQcT4RIar7X+wg=
-X-Received: by 2002:a05:6a21:b90:b0:21f:a883:d1dd with SMTP id
- adf61e73a8af0-21fbd4ddac8mr18709446637.14.1750130677879; Mon, 16 Jun 2025
- 20:24:37 -0700 (PDT)
+        bh=1ZnjLocapY1GDtsVX0XE+EGlfXbZ9yLF/3jYtxyATXo=;
+        b=pRmtE5rw5aIMDcWI96j89NF89EkegkBJ5rLdMfHcr+8q7BRUtXX4CVc0JSmm4N9ida
+         SLpIpVvKymvP8jw6u/lmsSyFMXN5daoj+Ijl8MrB9nMBeArUeSYgJMIXObn4fAGkm7Wo
+         NeZCUqu/IZEfsygVkxDqGGdEJj4CNVkWySDN83QpVE8TDm8lrmlTIZwtOOnu7ZREcjXT
+         ZH65w01pnwJSBogBZMkde330oqmGOE1/SKQ+VSn9cY7PPiSU7xkzetNpsCDibcxKtUtq
+         /co1zPVJrWFrv1qtq4e3aDT0WFuPuVgDhv+kBljcdHz07kWwLSfrahAwciRX00OvgoGu
+         IuwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7yEkdJ3ltrjOZsJ9Ddh3SY0jBYnkotK2kX9Q+AXs+jP8biuTjB9a8TObGnDcHfM30g5jOgtg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBlP/Q4wXqgWknjC6bgK4/MM76msvCphUME84+UV70IcjUOsOp
+	lS9HhOsWBMVxGWrBfcIoQ3LZ8K1Pj257UM6ec6pUvw2E3IFf1SgLqSq4Tct4tkA3sqMrdmxDHEV
+	x2zMU/6n1HCYZGdDLyvJ1wRtpEcTKh/k2hx8Jaw/4+ARbJ0/YtCkP6D7+jM7U1pQZW5aGnuKeon
+	cUzt+mlVJXzME/CGjSy03UC0R07tOAOsTI
+X-Gm-Gg: ASbGnctI2qfwaUdphahNUD+ax9slUN/jAXKbZEFcxeniNQxG/W4Ei2WAJQa31Jqf0qp
+	Jgq3jM33jvhw8avQW9OUCbX3di2a5zxmhGHG0MCSfaGZna9H6jObNWyVQRQhRUm65ORx3SNTeqW
+	P6XtqN
+X-Received: by 2002:a05:6a20:9f48:b0:215:de13:e212 with SMTP id adf61e73a8af0-21fbd4bbebemr18475193637.15.1750130918914;
+        Mon, 16 Jun 2025 20:28:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGojw2ZaoSQc7LcnecH8We8ufRtfHIeDRaftsdYUa9/oGmMTDfgHybQ3gnppKJHWwNG36xG8kElsRKXtsoFLHM=
+X-Received: by 2002:a05:6a20:9f48:b0:215:de13:e212 with SMTP id
+ adf61e73a8af0-21fbd4bbebemr18475139637.15.1750130918331; Mon, 16 Jun 2025
+ 20:28:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749210083.git.pabeni@redhat.com> <a38c6a4618962237dde1c4077120a3a9d231e2c0.1749210083.git.pabeni@redhat.com>
- <CACGkMEtExmmfmtd0+6YwgjuiWR-T5RvfcnHEbmH=ewqNXHPHYA@mail.gmail.com>
- <b7099b02-f0d4-492c-a15b-2a93a097d3f5@redhat.com> <CACGkMEsuRSOY3xe9=9ONMM3ZBGdyz=5cbTZ0sUp38cYrgtE07w@mail.gmail.com>
- <1f0933e0-ab58-41b8-832b-5336618be8b3@redhat.com>
-In-Reply-To: <1f0933e0-ab58-41b8-832b-5336618be8b3@redhat.com>
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-1-95d8b348de91@daynix.com>
+ <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
+ <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com> <CACGkMEu6fZaErFEu7_UFsykXRL7Z+CwmkcxmvJHC+eN_j0pQvg@mail.gmail.com>
+ <4eaa7aaa-f677-4a31-bcc2-badcb5e2b9f6@daynix.com> <CACGkMEu3QH+VdHqQEePYz_z+_bNYswpA-KNxzz0edEOSSkJtWw@mail.gmail.com>
+ <75ef190e-49fc-48aa-abf2-579ea31e4d15@daynix.com> <CACGkMEu2n-O0UtVEmcPkELcg9gpML=m5W=qYPjeEjp3ba73Eiw@mail.gmail.com>
+ <760e9154-3440-464f-9b82-5a0c66f482ee@daynix.com>
+In-Reply-To: <760e9154-3440-464f-9b82-5a0c66f482ee@daynix.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 17 Jun 2025 11:24:26 +0800
-X-Gm-Features: AX0GCFtjFokecGrFCmamqCZX8pF_HH4pzNmqNAq-QMWcWQ9TLHUTMikpe8W9ic0
-Message-ID: <CACGkMEv1m0RBWeuzgH2XnbsKZXo79Q3xqmzAPb+C5gOtUzm8WQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 7/8] tun: enable gso over UDP tunnel support.
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
+Date: Tue, 17 Jun 2025 11:28:26 +0800
+X-Gm-Features: AX0GCFu7C79F_NF_tsdftJB3uWwwAlsfeJAmSIVcZ0cQgWARIymF17AjoTvBB_A
+Message-ID: <CACGkMEtCr65RFB0jeprX3iQ3ke997AWF0FGH6JW_zuJOLqS5uw@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Andrew Melnychenko <andrew@daynix.com>, Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 16, 2025 at 6:17=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Fri, Jun 6, 2025 at 5:10=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
 >
-> On 6/16/25 6:53 AM, Jason Wang wrote:
-> > On Thu, Jun 12, 2025 at 7:03=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >> On 6/12/25 6:55 AM, Jason Wang wrote:
-> >>> On Fri, Jun 6, 2025 at 7:46=E2=80=AFPM Paolo Abeni <pabeni@redhat.com=
-> wrote:
-> >>>> @@ -1720,8 +1732,16 @@ static ssize_t tun_get_user(struct tun_struct=
- *tun, struct tun_file *tfile,
+> On 2025/06/06 9:48, Jason Wang wrote:
+> > On Thu, Jun 5, 2025 at 3:58=E2=80=AFPM Akihiko Odaki <akihiko.odaki@day=
+nix.com> wrote:
+> >>
+> >> On 2025/06/05 10:53, Jason Wang wrote:
+> >>> On Wed, Jun 4, 2025 at 3:20=E2=80=AFPM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
 > >>>>
-> >>>>         if (tun->flags & IFF_VNET_HDR) {
-> >>>>                 int vnet_hdr_sz =3D READ_ONCE(tun->vnet_hdr_sz);
-> >>>> +               int parsed_size;
-> >>>>
-> >>>> -               hdr_len =3D tun_vnet_hdr_get(vnet_hdr_sz, tun->flags=
-, from, &gso);
-> >>>> +               if (vnet_hdr_sz < TUN_VNET_TNL_SIZE) {
-> >>>
-> >>> I still don't understand why we need to duplicate netdev features in
-> >>> flags, and it seems to introduce unnecessary complexities. Can we
-> >>> simply check dev->features instead?
-> >>>
-> >>> I think I've asked before, for example, we don't duplicate gso and
-> >>> csum for non tunnel packets.
-> >>
-> >> My fear was that if
-> >> - the guest negotiated VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO
-> >> - tun stores the negotiated offload info netdev->features
-> >> - the tun netdev UDP tunnel feature is disabled via ethtool
-> >>
-> >> tun may end-up sending to the guest packets without filling the tnl hd=
-r,
-> >> which should be safe, as the driver should not use such info as no GSO
-> >> over UDP packets will go through, but is technically against the
-> >> specification.
-> >
-> > Probably not? For example this is the way tun works with non tunnel GSO=
- as well.
-> >
-> > (And it allows the flexibility of debugging etc).
-> >
-> >>
-> >> The current implementation always zero the whole virtio net hdr space,
-> >> so there is no such an issue.
-> >>
-> >> Still the additional complexity is ~5 lines and makes all the needed
-> >> information available on a single int, which is quite nice performance
-> >> wise. Do you have strong feeling against it?
-> >
-> > See above and at least we can disallow the changing of UDP tunnel GSO
-> > (but I don't see too much value).
->
-> I'm sorry, but I don't understand what is the suggestion/request here.
-> Could you please phrase it?
-
-I meant I don't see strong reasons to duplicate tunnel gso/csum in tun->fla=
-gs:
-
-1) extra complexity
-2) non tunnel gso doesn't do this (and for macvtap, it tries to
-emulate netdev->features)
-3) we can find way to disallow toggling tunnel gso/csum via ethtool
-(but I don't see too much value)
-
->
-> Also please allow me to re-state my main point. The current
-> implementation adds a very limited amount of code in the control path,
-> and makes the data path simpler and faster - requiring no new argument
-> to the tun_hdr_* helper instead of (at least) one as the other alternativ=
-e.
->
-> It looks like tun_hdr_* argument list could grow with every new feature,
-> but I think we should try to avoid that.
-
-See above:
-
-1) for HOST_UDP_XXX we can assume it is enabled
-2) for GUEST_UDP_XXX we can check netdev->features
-
-So passing netdev->features seems to be sufficient, it avoids
-introducing new argument when a new offload is supported in the
-future.
-
->
-> >>>> @@ -2426,7 +2460,16 @@ static int tun_xdp_one(struct tun_struct *tun=
+> >>>> On 2025/06/04 10:18, Jason Wang wrote:
+> >>>>> On Tue, Jun 3, 2025 at 1:31=E2=80=AFPM Akihiko Odaki <akihiko.odaki=
+@daynix.com> wrote:
+> >>>>>>
+> >>>>>> On 2025/06/03 12:19, Jason Wang wrote:
+> >>>>>>> On Fri, May 30, 2025 at 12:50=E2=80=AFPM Akihiko Odaki <akihiko.o=
+daki@daynix.com> wrote:
+> >>>>>>>>
+> >>>>>>>> They are useful to implement VIRTIO_NET_F_RSS and
+> >>>>>>>> VIRTIO_NET_F_HASH_REPORT.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >>>>>>>> Tested-by: Lei Yang <leiyang@redhat.com>
+> >>>>>>>> ---
+> >>>>>>>>      include/linux/virtio_net.h | 188 ++++++++++++++++++++++++++=
++++++++++++++++++++
+> >>>>>>>>      1 file changed, 188 insertions(+)
+> >>>>>>>>
+> >>>>>>>> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_n=
+et.h
+> >>>>>>>> index 02a9f4dc594d..426f33b4b824 100644
+> >>>>>>>> --- a/include/linux/virtio_net.h
+> >>>>>>>> +++ b/include/linux/virtio_net.h
+> >>>>>>>> @@ -9,6 +9,194 @@
+> >>>>>>>>      #include <uapi/linux/tcp.h>
+> >>>>>>>>      #include <uapi/linux/virtio_net.h>
+> >>>>>>>>
+> >>>>>>>> +struct virtio_net_hash {
+> >>>>>>>> +       u32 value;
+> >>>>>>>> +       u16 report;
+> >>>>>>>> +};
+> >>>>>>>> +
+> >>>>>>>> +struct virtio_net_toeplitz_state {
+> >>>>>>>> +       u32 hash;
+> >>>>>>>> +       const u32 *key;
+> >>>>>>>> +};
+> >>>>>>>> +
+> >>>>>>>> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TY=
+PE_IPv4 | \
+> >>>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYP=
+E_TCPv4 | \
+> >>>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYP=
+E_UDPv4 | \
+> >>>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYP=
+E_IPv6 | \
+> >>>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYP=
+E_TCPv6 | \
+> >>>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYP=
+E_UDPv6)
+> >>>>>>>> +
+> >>>>>>>> +#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
+> >>>>>>>> +
+> >>>>>>>> +static inline void virtio_net_toeplitz_convert_key(u32 *input, =
+size_t len)
+> >>>>>>>> +{
+> >>>>>>>> +       while (len >=3D sizeof(*input)) {
+> >>>>>>>> +               *input =3D be32_to_cpu((__force __be32)*input);
+> >>>>>>>> +               input++;
+> >>>>>>>> +               len -=3D sizeof(*input);
+> >>>>>>>> +       }
+> >>>>>>>> +}
+> >>>>>>>> +
+> >>>>>>>> +static inline void virtio_net_toeplitz_calc(struct virtio_net_t=
+oeplitz_state *state,
+> >>>>>>>> +                                           const __be32 *input,=
+ size_t len)
+> >>>>>>>> +{
+> >>>>>>>> +       while (len >=3D sizeof(*input)) {
+> >>>>>>>> +               for (u32 map =3D be32_to_cpu(*input); map; map &=
+=3D (map - 1)) {
+> >>>>>>>> +                       u32 i =3D ffs(map);
+> >>>>>>>> +
+> >>>>>>>> +                       state->hash ^=3D state->key[0] << (32 - =
+i) |
+> >>>>>>>> +                                      (u32)((u64)state->key[1] =
+>> i);
+> >>>>>>>> +               }
+> >>>>>>>> +
+> >>>>>>>> +               state->key++;
+> >>>>>>>> +               input++;
+> >>>>>>>> +               len -=3D sizeof(*input);
+> >>>>>>>> +       }
+> >>>>>>>> +}
+> >>>>>>>> +
+> >>>>>>>> +static inline u8 virtio_net_hash_key_length(u32 types)
+> >>>>>>>> +{
+> >>>>>>>> +       size_t len =3D 0;
+> >>>>>>>> +
+> >>>>>>>> +       if (types & VIRTIO_NET_HASH_REPORT_IPv4)
+> >>>>>>>> +               len =3D max(len,
+> >>>>>>>> +                         sizeof(struct flow_dissector_key_ipv4_=
+addrs));
+> >>>>>>>> +
+> >>>>>>>> +       if (types &
+> >>>>>>>> +           (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPO=
+RT_UDPv4))
+> >>>>>>>> +               len =3D max(len,
+> >>>>>>>> +                         sizeof(struct flow_dissector_key_ipv4_=
+addrs) +
+> >>>>>>>> +                         sizeof(struct flow_dissector_key_ports=
+));
+> >>>>>>>> +
+> >>>>>>>> +       if (types & VIRTIO_NET_HASH_REPORT_IPv6)
+> >>>>>>>> +               len =3D max(len,
+> >>>>>>>> +                         sizeof(struct flow_dissector_key_ipv6_=
+addrs));
+> >>>>>>>> +
+> >>>>>>>> +       if (types &
+> >>>>>>>> +           (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPO=
+RT_UDPv6))
+> >>>>>>>> +               len =3D max(len,
+> >>>>>>>> +                         sizeof(struct flow_dissector_key_ipv6_=
+addrs) +
+> >>>>>>>> +                         sizeof(struct flow_dissector_key_ports=
+));
+> >>>>>>>> +
+> >>>>>>>> +       return len + sizeof(u32);
+> >>>>>>>> +}
+> >>>>>>>> +
+> >>>>>>>> +static inline u32 virtio_net_hash_report(u32 types,
+> >>>>>>>> +                                        const struct flow_keys_=
+basic *keys)
+> >>>>>>>> +{
+> >>>>>>>> +       switch (keys->basic.n_proto) {
+> >>>>>>>> +       case cpu_to_be16(ETH_P_IP):
+> >>>>>>>> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT=
+)) {
+> >>>>>>>> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_=
+TCP &&
+> >>>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TC=
+Pv4))
+> >>>>>>>> +                               return VIRTIO_NET_HASH_REPORT_TC=
+Pv4;
+> >>>>>>>> +
+> >>>>>>>> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_=
+UDP &&
+> >>>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UD=
+Pv4))
+> >>>>>>>> +                               return VIRTIO_NET_HASH_REPORT_UD=
+Pv4;
+> >>>>>>>> +               }
+> >>>>>>>> +
+> >>>>>>>> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+> >>>>>>>> +                       return VIRTIO_NET_HASH_REPORT_IPv4;
+> >>>>>>>> +
+> >>>>>>>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> >>>>>>>> +
+> >>>>>>>> +       case cpu_to_be16(ETH_P_IPV6):
+> >>>>>>>> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT=
+)) {
+> >>>>>>>> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_=
+TCP &&
+> >>>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TC=
+Pv6))
+> >>>>>>>> +                               return VIRTIO_NET_HASH_REPORT_TC=
+Pv6;
+> >>>>>>>> +
+> >>>>>>>> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_=
+UDP &&
+> >>>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UD=
+Pv6))
+> >>>>>>>> +                               return VIRTIO_NET_HASH_REPORT_UD=
+Pv6;
+> >>>>>>>> +               }
+> >>>>>>>> +
+> >>>>>>>> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
+> >>>>>>>> +                       return VIRTIO_NET_HASH_REPORT_IPv6;
+> >>>>>>>> +
+> >>>>>>>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> >>>>>>>> +
+> >>>>>>>> +       default:
+> >>>>>>>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> >>>>>>>> +       }
+> >>>>>>>> +}
+> >>>>>>>> +
+> >>>>>>>> +static inline void virtio_net_hash_rss(const struct sk_buff *sk=
+b,
+> >>>>>>>> +                                      u32 types, const u32 *key=
 ,
-> >>>>         if (metasize > 0)
-> >>>>                 skb_metadata_set(skb, metasize);
+> >>>>>>>> +                                      struct virtio_net_hash *h=
+ash)
+> >>>>>>>> +{
+> >>>>>>>> +       struct virtio_net_toeplitz_state toeplitz_state =3D { .k=
+ey =3D key };
+> >>>>>>>> +       struct flow_keys flow;
+> >>>>>>>> +       struct flow_keys_basic flow_basic;
+> >>>>>>>> +       u16 report;
+> >>>>>>>> +
+> >>>>>>>> +       if (!skb_flow_dissect_flow_keys(skb, &flow, 0)) {
+> >>>>>>>> +               hash->report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> >>>>>>>> +               return;
+> >>>>>>>> +       }
+> >>>>>>>> +
+> >>>>>>>> +       flow_basic =3D (struct flow_keys_basic) {
+> >>>>>>>> +               .control =3D flow.control,
+> >>>>>>>> +               .basic =3D flow.basic
+> >>>>>>>> +       };
+> >>>>>>>> +
+> >>>>>>>> +       report =3D virtio_net_hash_report(types, &flow_basic);
+> >>>>>>>> +
+> >>>>>>>> +       switch (report) {
+> >>>>>>>> +       case VIRTIO_NET_HASH_REPORT_IPv4:
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >>>>>>>> +                                        (__be32 *)&flow.addrs.v=
+4addrs,
+> >>>>>>>> +                                        sizeof(flow.addrs.v4add=
+rs));
+> >>>>>>>> +               break;
+> >>>>>>>> +
+> >>>>>>>> +       case VIRTIO_NET_HASH_REPORT_TCPv4:
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >>>>>>>> +                                        (__be32 *)&flow.addrs.v=
+4addrs,
+> >>>>>>>> +                                        sizeof(flow.addrs.v4add=
+rs));
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.=
+ports.ports,
+> >>>>>>>> +                                        sizeof(flow.ports.ports=
+));
+> >>>>>>>> +               break;
+> >>>>>>>> +
+> >>>>>>>> +       case VIRTIO_NET_HASH_REPORT_UDPv4:
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >>>>>>>> +                                        (__be32 *)&flow.addrs.v=
+4addrs,
+> >>>>>>>> +                                        sizeof(flow.addrs.v4add=
+rs));
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.=
+ports.ports,
+> >>>>>>>> +                                        sizeof(flow.ports.ports=
+));
+> >>>>>>>> +               break;
+> >>>>>>>> +
+> >>>>>>>> +       case VIRTIO_NET_HASH_REPORT_IPv6:
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >>>>>>>> +                                        (__be32 *)&flow.addrs.v=
+6addrs,
+> >>>>>>>> +                                        sizeof(flow.addrs.v6add=
+rs));
+> >>>>>>>> +               break;
+> >>>>>>>> +
+> >>>>>>>> +       case VIRTIO_NET_HASH_REPORT_TCPv6:
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >>>>>>>> +                                        (__be32 *)&flow.addrs.v=
+6addrs,
+> >>>>>>>> +                                        sizeof(flow.addrs.v6add=
+rs));
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.=
+ports.ports,
+> >>>>>>>> +                                        sizeof(flow.ports.ports=
+));
+> >>>>>>>> +               break;
+> >>>>>>>> +
+> >>>>>>>> +       case VIRTIO_NET_HASH_REPORT_UDPv6:
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >>>>>>>> +                                        (__be32 *)&flow.addrs.v=
+6addrs,
+> >>>>>>>> +                                        sizeof(flow.addrs.v6add=
+rs));
+> >>>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.=
+ports.ports,
+> >>>>>>>> +                                        sizeof(flow.ports.ports=
+));
+> >>>>>>>> +               break;
+> >>>>>>>> +
+> >>>>>>>> +       default:
+> >>>>>>>> +               hash->report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> >>>>>>>> +               return;
+> >>>>>>>
+> >>>>>>> So I still think we need a comment here to explain why this is no=
+t an
+> >>>>>>> issue if the device can report HASH_XXX_EX. Or we need to add the
+> >>>>>>> support, since this is the code from the driver side, I don't thi=
+nk we
+> >>>>>>> need to worry about the device implementation issues.
+> >>>>>>
+> >>>>>> This is on the device side, and don't report HASH_TYPE_XXX_EX.
+> >>>>>>
+> >>>>>>>
+> >>>>>>> For the issue of the number of options, does the spec forbid fall=
+back
+> >>>>>>> to VIRTIO_NET_HASH_REPORT_NONE? If not, we can do that.
+> >>>>>>
+> >>>>>> 5.1.6.4.3.4 "IPv6 packets with extension header" says:
+> >>>>>>     > If VIRTIO_NET_HASH_TYPE_TCP_EX is set and the packet has a T=
+CPv6
+> >>>>>>     > header, the hash is calculated over the following fields:
+> >>>>>>     > - Home address from the home address option in the IPv6 dest=
+ination
+> >>>>>>     >   options header. If the extension header is not present, us=
+e the
+> >>>>>>     >   Source IPv6 address.
+> >>>>>>     > - IPv6 address that is contained in the Routing-Header-Type-=
+2 from the
+> >>>>>>     >   associated extension header. If the extension header is no=
+t present,
+> >>>>>>     >   use the Destination IPv6 address.
+> >>>>>>     > - Source TCP port
+> >>>>>>     > - Destination TCP port
+> >>>>>>
+> >>>>>> Therefore, if VIRTIO_NET_HASH_TYPE_TCP_EX is set, the packet has a=
+ TCPv6
+> >>>>>> and an home address option in the IPv6 destination options header =
+is
+> >>>>>> present, the hash is calculated over the home address. If the hash=
+ is
+> >>>>>> not calculated over the home address in such a case, the device is
+> >>>>>> contradicting with this section and violating the spec. The same g=
+oes
+> >>>>>> for the other HASH_TYPE_XXX_EX types and Routing-Header-Type-2.
+> >>>>>
+> >>>>> Just to make sure we are one the same page. I meant:
+> >>>>>
+> >>>>> 1) If the hash is not calculated over the home address (in the case=
+ of
+> >>>>> IPv6 destination destination), it can still report
+> >>>>> VIRTIO_NET_RSS_HASH_TYPE_IPv6. This is what you implemented in your
+> >>>>> series. So the device can simply fallback to e.g TCPv6 if it can't
+> >>>>> understand all or part of the IPv6 options.
 > >>>>
-> >>>> -       if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
-> >>>> +       /* Assume tun offloads are enabled if the provided hdr is la=
-rge
-> >>>> +        * enough.
-> >>>> +        */
-> >>>> +       if (READ_ONCE(tun->vnet_hdr_sz) >=3D TUN_VNET_TNL_SIZE &&
-> >>>> +           xdp->data - xdp->data_hard_start >=3D TUN_VNET_TNL_SIZE)
-> >>>> +               flags =3D tun->flags | TUN_VNET_TNL_MASK;
-> >>>> +       else
-> >>>> +               flags =3D tun->flags & ~TUN_VNET_TNL_MASK;
+> >>>> The spec says it can fallback if "the extension header is not presen=
+t",
+> >>>> not if the device can't understand the extension header.
 > >>>
-> >>> I'm not sure I get the point that we need dynamics of
-> >>> TUN_VNET_TNL_MASK here. We know if tunnel gso and its csum or enabled
-> >>> or not,
+> >>> I don't think so,
+> >>>
+> >>> 1) spec had a condition beforehand:
+> >>>
+> >>> """
+> >>> If VIRTIO_NET_HASH_TYPE_TCP_EX is set and the packet has a TCPv6
+> >>> header, the hash is calculated over the following fields:
+> >>> ...
+> >>> If the extension header is not present ...
+> >>> """
+> >>>
+> >>> So the device can choose not to set VIRTIO_NET_HASH_TYPE_TCP_EX as
+> >>> spec doesn't say device MUST set VIRTIO_NET_HASH_TYPE_TCP_EX if ...
+> >>>
+> >>> 2) implementation wise, since device has limited resources, we can't
+> >>> expect the device can parse arbitrary number of ipv6 options
+> >>>
+> >>> 3) if 1) and 2) not the case, we need fix the spec otherwise implemen=
+t
+> >>> a spec compliant device is impractical
 > >>
-> >> How does tun know about VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO or
-> >> VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO_CSUM?
+> >> The statement is preceded by the following:
+> >>   >  The device calculates the hash on IPv4 packets according to
+> >>   > =E2=80=99Enabled hash types=E2=80=99 bitmask as follows:
+> >>
+> >> The 'Enabled hash types' bitmask is specified by the device.
+> >>
+> >> I think the spec needs amendment.
 > >
-> > I think it can be done in a way that works for non-tunnel gso.
+> > Michael, can you help to clarify here?
 > >
-> > The most complicated case is probably the case HOST_UDP_TUNNEL_X is
-> > enabled but GUEST_UDP_TUNNEL_X is not. In this case tun can know this
-> > by:
+> >>
+> >> I wonder if there are any people interested in the feature though.
+> >> Looking at virtnet_set_hashflow() in drivers/net/virtio_net.c, the
+> >> driver of Linux does not let users configure HASH_TYPE_XXX_EX. I suppo=
+se
+> >> Windows supports HASH_TYPE_XXX_EX, but those who care network
+> >> performance most would use Linux so HASH_TYPE_XXX_EX support without
+> >> Linux driver's support may not be useful.
 > >
-> > 1) vnet_hdr_len is large enough
-> > 2) UDP tunnel GSO is not enabled in netdev->features
-> >
-> > If HOST_UDP_TUNNEL_X is not enabled by GUEST_UDP_TUNNEL_X is enabled,
-> > it can behave like existing non-tunnel GSO: still accept the UDP GSO
-> > tunnel packet.
+> > It might be still interesting for example for the hardware virtio
+> > vendors to support windows etc.
 >
-> AFAICS the text above matches/describes quite accurately the
-> implementation proposed in this patch and quoted above. Which in turn
-> confuses me, because I don't see what you would prefer to see
-> implemented differently.
+> I don't know if Windows needs them for e.g., device/driver certification
+> so surveying Windows makes sense.
 
-I meant those can be done without using tun->flags.
+Yuri, can you help to clarify this?
 
 >
-> >> The user-space does not tell the tun device about any of the host
-> >> offload features. Plain/baremetal GSO information are always available
-> >> in the basic virtio net header, so there is no size check, but the
-> >> overall behavior is similar - tun assumes the features have been
-> >> negotiated if the relevant bits are present in the header.
 > >
-> > I'm not sure I understand here, there's no bit in the virtio net
-> > header that tells us if the packet contains the tunnel gso field. And
-> > the check of:
+> >>
+> >>>
+> >>>>
+> >>>>> 2) the VIRTIO_NET_SUPPORTED_HASH_TYPES is not checked against the
+> >>>>> tun_vnet_ioctl_sethash(), so userspace may set
+> >>>>> VIRTIO_NET_HASH_TYPE_TCP_EX regardless of what has been returned by
+> >>>>> tun_vnet_ioctl_gethashtypes(). In this case they won't get
+> >>>>> VIRTIO_NET_HASH_TYPE_TCP_EX.
+> >>>>
+> >>>> That's right. It's the responsibility of the userspace to set only t=
+he
+> >>>> supported hash types.
+> >>>
+> >>> Well, the kernel should filter out the unsupported one to have a
+> >>> robust uAPI. Otherwise, we give green light to the buggy userspace
+> >>> which will have unexpected results.
+> >>
+> >> My reasoning was that it may be fine for some use cases other than VM
+> >> (e.g., DPDK); in such a use case, it is fine as long as the UAPI works
+> >> in the best-effort basis.
 > >
-> > READ_ONCE(tun->vnet_hdr_sz) >=3D TUN_VNET_TNL_SIZE
-> >
-> > seems to be not buggy. As qemu already did:
-> >
-> > static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_b=
-ufs,
-> >                                        int version_1, int hash_report)
-> > {
-> >     int i;
-> >     NetClientState *nc;
-> >
-> >     n->mergeable_rx_bufs =3D mergeable_rx_bufs;
-> >
-> >     if (version_1) {
-> >         n->guest_hdr_len =3D hash_report ?
-> >             sizeof(struct virtio_net_hdr_v1_hash) :
-> >             sizeof(struct virtio_net_hdr_mrg_rxbuf);
-> >         n->rss_data.populate_hash =3D !!hash_report;
-> >
-> > ...
+> > Best-effort might increase the chance for user visisable changes after
+> > migration.
 >
-> Note that the qemu code quoted above does not include tunnel handling.
+> It is a trade-off between catching a migration bug for VMM and making
+> life a bit easier for userspace programs other than VMM.
+
+My understanding is to avoid breaking the migration compatibility as
+much as possible as fixing that would be complicated or even
+impossible.
+
 >
-> TUN_VNET_TNL_SIZE (=3D=3D sizeof(struct virtio_net_hdr_v1_tunnel)) will b=
+> >
+> >>
+> >> For example, suppose a userspace program that processes TCP packets; t=
+he
+> >> program can enable: HASH_TYPE_IPv4, HASH_TYPE_TCPv4, HASH_TYPE_IPv6, a=
+nd
+> >> HASH_TYPE_TCPv6. Ideally, the kernel should support all the hash types=
+,
+> >> but, even if e.g., HASH_TYPE_TCPv6 is not available,
+> >
+> > For "available" did you mean it is not supported by the device?
+> >
+> >> it will fall back
+> >> to HASH_TYPE_IPv6, which still does something good and may be acceptab=
+le.
+> >
+> > This fallback is exactly the same as I said above, let
+> > VIRTIO_NET_HASH_TYPE_TCP_EX to fallback.
+> >
+> > My point is that, the implementation should either:
+> >
+> > 1) allow fallback so it can claim to support all hash types
+> >
+> > or
+> >
+> > 2) don't allow fallback so it can only support a part of the hash types
+> >
+> > If we're doing something in the middle, for example, allow part of the
+> > type to fallback.
+>
+> 1) or the middle will make it unsuitable for VM because it violates the
+> virtio spec. 2) makes sense though the trade-off I mentioned should be
+> taken into consideration.
+>
+> >
+> >>
+> >> That said, for a use case that involves VM and implements virtio-net
+> >> (e.g., QEMU), setting an unsupported hash type here is definitely a bu=
+g.
+> >> Catching the bug may outweigh the extra trouble for other use cases.
+> >>
+> >>>
+> >>>>
+> >>>>> 3) implementing part of the hash types might complicate the migrati=
+on
+> >>>>> or at least we need to describe the expectations of libvirt or othe=
+r
+> >>>>> management in this case. For example, do we plan to have a dedicate=
+d
+> >>>>> Qemu command line like:
+> >>>>>
+> >>>>> -device virtio-net-pci,hash_report=3Don,supported_hash_types=3DX,Y,=
+Z?
+> >>>>
+> >>>> I posted a patch series to implement such a command line for vDPA[1]=
+.
+> >>>> The patch series that wires this tuntap feature up[2] reuses the
+> >>>> infrastructure so it doesn't bring additional complexity.
+> >>>>
+> >>>> [1]
+> >>>> https://lore.kernel.org/qemu-devel/20250530-vdpa-v1-0-5af4109b1c19@d=
+aynix.com/
+> >>>> [2]
+> >>>> https://lore.kernel.org/qemu-devel/20250530-hash-v5-0-343d7d7a8200@d=
+aynix.com/
+> >>>
+> >>> I meant, if we implement a full hash report feature, it means a singl=
 e
-> too small when VIRTIO_NET_F_HASH_REPORT is enabled, too.
+> >>> hash cmdline option is more than sufficient and so compatibility code
+> >>> can just turn it off when dealing with machine types. This is much
+> >>> more simpler than
+> >>>
+> >>> 1) having both hash as well as supported_hash_features
+> >>> 2) dealing both hash as well as supported_hash_features in compatibil=
+ity codes
+> >>> 3) libvirt will be happy
+> >>>
+> >>> For [1], it seems it introduces a per has type option, this seems to
+> >>> be a burden to the management layer as it need to learn new option
+> >>> everytime a new hash type is supported
+> >>
+> >> Even with the command line you proposed (supported_hash_types=3DX,Y,Z)=
+, it
+> >> is still necessary to know the values the supported_hash_types propert=
+y
+> >> accepts (X.Y,Z), so I don't think it makes difference.
+> >
+> > It could be a uint32_t.
 >
-> I did not handle that case here, due to the even greater overlapping with=
-:
->
-> https://lore.kernel.org/netdev/20250530-rss-v12-0-95d8b348de91@daynix.com=
-/
->
-> What I intended to do is:
-> - set another bit in `flags` according to the negotiated
-> VIRTIO_NET_F_HASH_REPORT value
-> - use such info in tun_vnet_parse_size() to computed the expected vnet
-> hdr len correctly.
-> - replace TUN_VNET_TNL_SIZE usage in tun.c with tun_vnet_parse_size() cal=
-ls
->
-> I'm unsure if the above answer your question/doubt.
+> The management layer will need to know what bits are accepted even with
+> uint32_t.
 
-For hash reporting since we don't have a netdev feature for that, a
-new argument for tun_hdr_XXX() is probably needed for that
-
->
-> Anyhow I now see that keeping the UDP GSO related fields offset constant
-> regardless of VIRTIO_NET_F_HASH_REPORT would remove some ambiguity from
-> the relevant control path.
-
-Not a native speaker but I think the ambiguity mainly come from the
-"Only if" that is something like
-
-"Only if VIRTIO_NET_F_HASH_REPORT negotiated"
+Ease the management, basically it would be used by debugging or
+machine type only.
 
 >
-> I think/hope we are still on time to update the specification clarifying
-> that, but I'm hesitant to take that path due to the additional
-> (hopefully small) overhead for the data path - and process overhead TBH.
+> >
+> >>
+> >> The burden to the management layer is already present for features, so
+> >> it is an existing problem (or its mere extension).
+> >
+> > Yes, but since this feature is new it's better to try our best to avoid=
+ that.
+> >
+> >>
+> >> This problem was discussed in the following thread in the past, but no
+> >> solution is implemented yet, and probably solving it will be difficult=
+.
+> >> https://lore.kernel.org/qemu-devel/20230731223148.1002258-5-yuri.bendi=
+tovich@daynix.com/
+> >
+> > It's a similar issue but not the same, it looks more like a discussion
+> > on whether the fallback from vhost-net to qemu works for missing
+> > features etc.
 >
-> On the flip (positive) side such action will decouple more this series
-> from the HASH_REPORT support.
+> Perhaps we may be able to do better since this feature is new as you say
+> and we don't have to worry much about breaking change. I don't have an
+> idea for that yet.
+
+Right.
+
 >
-> Please advice, thanks!
->
-> /P
+> Regards,
+> Akihiko Odaki
 >
 
 Thanks
