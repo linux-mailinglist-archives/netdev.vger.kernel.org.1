@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0B9ADDF49
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:00:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F2BADDF4C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D15400551
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:59:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4481189CFE5
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E223B298994;
-	Tue, 17 Jun 2025 23:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E29829DB8F;
+	Tue, 17 Jun 2025 23:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYsLRobG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7C/zaDL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82EA298275;
-	Tue, 17 Jun 2025 23:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D4F298CA6;
+	Tue, 17 Jun 2025 23:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750201204; cv=none; b=Avr3kV4Rs7o51MRazZ37QkvyUA4tSKCLKMz0gCohhEvXTxWshoQBf5xMO5b211knZJKP3TPUmrJX0Qm3t79a442IqvxtCdX1+0HLbLTmYMhmN/TdkvHVnDW5L0KcTfFsH9Bm/lS8zJph5tpJ8bGhjXRUvUkdDlAy5BnusF6fkts=
+	t=1750201206; cv=none; b=kLF9QrVBTNl1cOWP9zP9wMunh4bxzxRV6F34egGvnR6hxne5rJrKTw65hrtuQbR0JpbX+bPORf7JEhTStjvBOLN+d3ouYt7fG+d9vHgp8X3CPwgLH9Vh55ry54pLO09ZfYmIOy5bzFo15sXOo34q9zu7xuZPY9J54rXjwHAEpUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750201204; c=relaxed/simple;
-	bh=HuFBBcDx/SSiJ1CaVdEQJoYVORBHZvXh4C+mUcAk3Ww=;
+	s=arc-20240116; t=1750201206; c=relaxed/simple;
+	bh=lCpYwprXV7CwJRsBN3bGZ+l2iUgPR67nqne4oPrW2yE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nHFuol+226vXD/OHPy93TebCS+UYZ0OKbRkTy5Taglg0iGE30aLiDtZr6bg49SeCoO+pGIaJoKqQ6o1az/mfXeKGFNv/ObBmAZdVG+MUR+Sy3gLwqC5WsmLHFhVfP79v0ZQoV4aBnQx+bxF2rlkplYU8kHw/rii0vlVhUBGD3xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYsLRobG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3854EC4CEE3;
-	Tue, 17 Jun 2025 23:00:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lPAK9q8QM63u4LSrmOcX6wPf2ySYawozR+JQO3RPIykFplaGk9+61334x/xHjRmpVgHMJ1cg4YQRqxPQSPmDJ8QN855n6LQAMnrqjbYt8a9ZkffXT9+MkFOpieCy24RG+vFobMiEPgDnZcI/fW3TqI40at9PKsfFrR3e1defEhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7C/zaDL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C4D3C4CEF3;
+	Tue, 17 Jun 2025 23:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750201204;
-	bh=HuFBBcDx/SSiJ1CaVdEQJoYVORBHZvXh4C+mUcAk3Ww=;
+	s=k20201202; t=1750201205;
+	bh=lCpYwprXV7CwJRsBN3bGZ+l2iUgPR67nqne4oPrW2yE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dYsLRobGovWK8YlNN+8KEm4q+NEiFup2AJfdINStHkZP30RvUNH/EOCUAd2gCroCs
-	 jHysuMYhD7KWuEZPchtsF5YhcxtssHA9PLJlblCw/Ij1Lqkr1k86Oz2SujS86EdEpi
-	 Ok8ZSUCrbo/14vLR06waub6fNjKr/09NTGKUEa4ZJO5LaJZiV+QDZZh9su7H/fKx1P
-	 bnItIeVDOu01E0sELihmEbBatR37wPS4sBISZLXIeUUMgQCfr6/bMaQ3PJuLnyrVVv
-	 GC/1Ow2kVzmeORPZLNBWqF+J6bDSTyQrw3Facm077vkfPgPdodejEIn6YpnpTdhV4Y
-	 Zmu9K8rHN8Z4A==
+	b=U7C/zaDLDIf6t9o3aiBPLmzyjOEUDajRPIWGx1jXnwjLKXH4aQo4cIPH26Lv+mBy4
+	 6PZ9ijFEYFoGdEhUSXKalqIRKZMx448Qw12hOAvEILK6LX0jxfa43hTiiCLlCq9A/p
+	 TupCnAjoKVqG24MnRdDFd1tJtBd/75oKo9/S+87oEjzMaK6+U42fluGaABu2kbaSPu
+	 iKCBIuMoRq2bPDIalcNjxKnQC9dVZ3oc8wEaKg2Ug13i+X6z5HOKjYTpssZj7wOnJW
+	 SPiJVIpnwxdr1RUh7symac+uYpceFqKlyqzBdqSec941my18g/corfH1eVo8MFfxRy
+	 EA6hpHfOfifTg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFDC38111DD;
-	Tue, 17 Jun 2025 23:00:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3425938111DD;
+	Tue, 17 Jun 2025 23:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1] net: netmem: fix skb_ensure_writable with
- unreadable
- skbs
+Subject: Re: [PATCH net] can: tcan4x5x: fix power regulator retrieval during
+ probe
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020123275.3727356.1557210847421675241.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:00:32 +0000
-References: <20250615200733.520113-1-almasrymina@google.com>
-In-Reply-To: <20250615200733.520113-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- willemb@google.com, sdf@fomichev.me, asml.silence@gmail.com
+ <175020123399.3727356.275761194504576050.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:00:33 +0000
+References: <20250617155123.2141584-2-mkl@pengutronix.de>
+In-Reply-To: <20250617155123.2141584-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, brett.werling@garmin.com,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Sun, 15 Jun 2025 20:07:33 +0000 you wrote:
-> skb_ensure_writable should succeed when it's trying to write to the
-> header of the unreadable skbs, so it doesn't need an unconditional
-> skb_frags_readable check. The preceding pskb_may_pull() call will
-> succeed if write_len is within the head and fail if we're trying to
-> write to the unreadable payload, so we don't need an additional check.
+On Tue, 17 Jun 2025 17:50:02 +0200 you wrote:
+> From: Brett Werling <brett.werling@garmin.com>
 > 
-> Removing this check restores DSCP functionality with unreadable skbs as
-> it's called from dscp_tg.
+> Fixes the power regulator retrieval in tcan4x5x_can_probe() by ensuring
+> the regulator pointer is not set to NULL in the successful return from
+> devm_regulator_get_optional().
+> 
+> Fixes: 3814ca3a10be ("can: tcan4x5x: tcan4x5x_can_probe(): turn on the power before parsing the config")
+> Signed-off-by: Brett Werling <brett.werling@garmin.com>
+> Link: https://patch.msgid.link/20250612191825.3646364-1-brett.werling@garmin.com
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v1] net: netmem: fix skb_ensure_writable with unreadable skbs
-    https://git.kernel.org/netdev/net/c/6f793a1d0537
+  - [net] can: tcan4x5x: fix power regulator retrieval during probe
+    https://git.kernel.org/netdev/net/c/db2272054520
 
 You are awesome, thank you!
 -- 
