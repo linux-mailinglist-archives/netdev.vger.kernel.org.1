@@ -1,50 +1,94 @@
-Return-Path: <netdev+bounces-198824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F2BADDF4C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:00:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E155FADDF60
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4481189CFE5
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CD8517E195
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E29829DB8F;
-	Tue, 17 Jun 2025 23:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2596293C57;
+	Tue, 17 Jun 2025 23:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7C/zaDL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2/jcO8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D4F298CA6;
-	Tue, 17 Jun 2025 23:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FEC2F5313
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750201206; cv=none; b=kLF9QrVBTNl1cOWP9zP9wMunh4bxzxRV6F34egGvnR6hxne5rJrKTw65hrtuQbR0JpbX+bPORf7JEhTStjvBOLN+d3ouYt7fG+d9vHgp8X3CPwgLH9Vh55ry54pLO09ZfYmIOy5bzFo15sXOo34q9zu7xuZPY9J54rXjwHAEpUs=
+	t=1750201594; cv=none; b=OjkRcfIMlaVTbvjlRGyT5J/uAqgZHOo6mNfW7UeI+dMyePotIpA6nVfKM+PPpJh0gkGRUBSqOULgR7D2YZEt9ncZCh8cOuUx8Yd6C+NHKR3Hr7BECrK21O5q0ekvJ7VmsTdqNpAQ/WlBtftMLL67Fv04/W5EYtb+dIzOoL7GX/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750201206; c=relaxed/simple;
-	bh=lCpYwprXV7CwJRsBN3bGZ+l2iUgPR67nqne4oPrW2yE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lPAK9q8QM63u4LSrmOcX6wPf2ySYawozR+JQO3RPIykFplaGk9+61334x/xHjRmpVgHMJ1cg4YQRqxPQSPmDJ8QN855n6LQAMnrqjbYt8a9ZkffXT9+MkFOpieCy24RG+vFobMiEPgDnZcI/fW3TqI40at9PKsfFrR3e1defEhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7C/zaDL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C4D3C4CEF3;
-	Tue, 17 Jun 2025 23:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750201205;
-	bh=lCpYwprXV7CwJRsBN3bGZ+l2iUgPR67nqne4oPrW2yE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U7C/zaDLDIf6t9o3aiBPLmzyjOEUDajRPIWGx1jXnwjLKXH4aQo4cIPH26Lv+mBy4
-	 6PZ9ijFEYFoGdEhUSXKalqIRKZMx448Qw12hOAvEILK6LX0jxfa43hTiiCLlCq9A/p
-	 TupCnAjoKVqG24MnRdDFd1tJtBd/75oKo9/S+87oEjzMaK6+U42fluGaABu2kbaSPu
-	 iKCBIuMoRq2bPDIalcNjxKnQC9dVZ3oc8wEaKg2Ug13i+X6z5HOKjYTpssZj7wOnJW
-	 SPiJVIpnwxdr1RUh7symac+uYpceFqKlyqzBdqSec941my18g/corfH1eVo8MFfxRy
-	 EA6hpHfOfifTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3425938111DD;
-	Tue, 17 Jun 2025 23:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1750201594; c=relaxed/simple;
+	bh=QphvZN62mTOXzzCHHyf/h0E9ng4ZwXuRyW3ukOicqEM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LqBZ8hXCCjkVB5/w/YYxfMOabP/ZAWyrmtJlzP/4/GULJ7Vk1PhPbG2Uj/xdcUYoymh1a06hxw7dv1xEwfQFUolj8YJNycDXOhvu3dAAfRUEE8c3OB7LvhN13b42Q+dfpvG1aV29bZSMeaf7jNp9lsT31ahEYXlOpAlh5tYizQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2/jcO8r; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-236377f00a1so56240775ad.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:06:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750201592; x=1750806392; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1r5A+ftzWTWjTVhZsrkqVGma+/L+zMTgogVSh7PcLbg=;
+        b=k2/jcO8rXC0EFE/vV0o1GhMZ3fKLXYT2MSHbHezppjAfUeU7dpSLv3Cr672K2OKiKN
+         ySbzw1iHUqoFFKCqRFyhacOo5cjEvwlLueGF0YO1vreqcdvWBUNbdWNQ8MvELdJFCESK
+         JkhJf8Amx6dglnbVs6cf5PCAp5OIfZOqTDwWHP718RK3jalezlP/9Uv/mDQ+Ca7WMD+T
+         5KZEwwSjBtu0hTQgXXSTME2s/oKvkvy6ItmHkUISw1H17pte6sozteGw2fy6zhrx+VKc
+         TN4yFYsz3mrABIosrgGIuTnHrHQRnVJRtB3SUAS5Izx6lXJv8SiY9nRXAdUtDq/LpC4v
+         UUxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750201592; x=1750806392;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1r5A+ftzWTWjTVhZsrkqVGma+/L+zMTgogVSh7PcLbg=;
+        b=T0sg48CpVXLuVQ1ZjtYc/TGxhJgJcP29ox5BVWk42VLcUrIkyK773LPTctStnKRnOy
+         GddyohA1VOPCrXix2UqXVrYdo003CRZ6+HBm447gW2k4E/5/jSovhTEXCgbVuXAl1lfr
+         a1SqFABL2Aj17hv8IfWxFucwoT2xR0hTQbmPUWWsp9eZrRXJn+zKryxhalXJhXDvHPRG
+         fioq+ot6rjvAbEBdud5gZYaCsq2DOxKL8jMIw4fiqXU2ldqpUtSQ8Cs15fbDKq0WfN9J
+         SW9mg6VSN7CdUQHWITwLIjqrNjxvSBxwJmH6cTfxGHMqalEvoSo8PEk0C51BAF/7N3pX
+         R/dw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdbW5D3yNKC4S71qlfDKNtG/jcR4Shk217Eaa7c81nMhow6AIDMf1SAsKG1GOTcx6ovYJja3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFXSAN3on7bmbnh9WxvMAm8SZpxtqQwirHfHaQ1pvnZXw736rL
+	FF2903bu86jhGMyDu4kiE6ME1g40W/eHYfwLZpvvLdUfscGtFm/77IQ=
+X-Gm-Gg: ASbGncvZb6RynuSfwq6H0x6bA6/xJQzob+LcToHqaWiIXobt1RPCA1M5jHM2QXcozKK
+	cXtinemgAyDttzC9gW6CdaCbEEpxT2+kS2RMMblzipI1c9JjZxKk5jIQycnHsjzeUdo+KU+QKl2
+	6pNuhAqyzThbyHPMPJgPR7+lFnxspVpIqhAtMrvoDyuLbCs8O/GQ4So1WKzLsg1cxY99SYF1CzP
+	kDnEAz4fB1s8Bj8c5XVMAHxm/upMzvBvwnFYg0BJS2nFXD7+u6nMv/y2Lcy8B61+HJcvtF+J4Yh
+	1ocu0W5+isTaZxY+GW8hbvXrLPubog8DBFwY4E8=
+X-Google-Smtp-Source: AGHT+IGoI/82qZhdYe1j4UlTR+w9ytLpnrKWSTHFVO2TVbq3Oe0VWdiPgrfE10GZ0U8Z1cLRENRQ/Q==
+X-Received: by 2002:a17:903:1a83:b0:234:9656:7db9 with SMTP id d9443c01a7336-2366b122186mr240092015ad.32.1750201592515;
+        Tue, 17 Jun 2025 16:06:32 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88c09dsm86549425ad.33.2025.06.17.16.06.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 16:06:31 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: nico.escande@gmail.com
+Cc: davem@davemloft.net,
+	decot+git@google.com,
+	edumazet@google.com,
+	gnaaman@drivenets.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2] neighbour: add support for NUD_PERMANENT proxy entries
+Date: Tue, 17 Jun 2025 16:06:03 -0700
+Message-ID: <20250617230627.31793-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250617141334.3724863-1-nico.escande@gmail.com>
+References: <20250617141334.3724863-1-nico.escande@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,47 +96,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] can: tcan4x5x: fix power regulator retrieval during
- probe
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175020123399.3727356.275761194504576050.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:00:33 +0000
-References: <20250617155123.2141584-2-mkl@pengutronix.de>
-In-Reply-To: <20250617155123.2141584-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, brett.werling@garmin.com,
- stable@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
-
-On Tue, 17 Jun 2025 17:50:02 +0200 you wrote:
-> From: Brett Werling <brett.werling@garmin.com>
+From: Nicolas Escande <nico.escande@gmail.com>
+Date: Tue, 17 Jun 2025 16:13:34 +0200
+> As discussesd before in [0] proxy entries (which are more configuration
+> than runtime data) should stay when the link (carrier) goes does down.
+> This is what happens for regular neighbour entries.
 > 
-> Fixes the power regulator retrieval in tcan4x5x_can_probe() by ensuring
-> the regulator pointer is not set to NULL in the successful return from
-> devm_regulator_get_optional().
+> So lets fix this by:
+>   - storing in proxy entries the fact that it was added as NUD_PERMANENT
+>   - not removing NUD_PERMANENT proxy entries when the carrier goes down
+>     (same as how it's done in neigh_flush_dev() for regular neigh entries)
 > 
-> Fixes: 3814ca3a10be ("can: tcan4x5x: tcan4x5x_can_probe(): turn on the power before parsing the config")
-> Signed-off-by: Brett Werling <brett.werling@garmin.com>
-> Link: https://patch.msgid.link/20250612191825.3646364-1-brett.werling@garmin.com
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> [0]: https://lore.kernel.org/netdev/c584ef7e-6897-01f3-5b80-12b53f7b4bf4@kernel.org/
 > 
-> [...]
+> Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
 
-Here is the summary with links:
-  - [net] can: tcan4x5x: fix power regulator retrieval during probe
-    https://git.kernel.org/netdev/net/c/db2272054520
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
