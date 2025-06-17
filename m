@@ -1,186 +1,285 @@
-Return-Path: <netdev+bounces-198700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22780ADD11A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:11:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C6CAADD11F
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19AB316ED48
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:11:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFF223AB9AC
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0AC2E973A;
-	Tue, 17 Jun 2025 15:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D502E972B;
+	Tue, 17 Jun 2025 15:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StrN1Zw5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C992E9733;
-	Tue, 17 Jun 2025 15:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA712E88B1
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750173094; cv=none; b=N3jZuiY8HDVxyq5moyC5Ay8zsqVPk2zepSTWAGhs5exJ7fnStMbdM1Po8HTIf/I33rvVardpsM63MJiqAyJtOgryWoO8Mk2tMwH63vIcC514jrOoPRUs5zZOzsIC9p05jSqQ9scarbJ1oRBeDgoZjsErfV7eEyCjA42mbJQLvdM=
+	t=1750173114; cv=none; b=l1hIWR7dYZs8VjFAE4AC2ZbEgHKVmYEOGDkTZTsnf2n6/55CrshiwlHU5UGlivenxbQ3/E1oL4urZHNCj7D2Ap81ekYGsReePNP8lszcTEiELeKXp/Qi48xqULsEbPZEq+WwUV6vtrZQVColh1ItBH2af7QAptt0ROX1uHYFleM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750173094; c=relaxed/simple;
-	bh=Zsh5aIo+bj1A7ONN8PodNeASYr6LUKd2rkEpVPlcDeI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jK6adyT52nI2/J2H+V7ic2JGkyPOPfFb94s5gh7kozb/P8ctq5sGBaqIe+mNF1Ks1vUv1fz863nXmPdqa3VtAKhH1vKEt1L0qeilF55Fru0NQyDp/lKgLX1OAUGx/lJMNnATsy3pkm4eBsC7THBF/g6/5Bc4Ft16lIRvQch1SOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a43972dcd7so74762411cf.3;
-        Tue, 17 Jun 2025 08:11:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750173090; x=1750777890;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vO7a97pP4ukARVbDLbAKCzb/am8gMifgt4A7ef66jhM=;
-        b=g9EEG7INJWGa258Oy6rwWUhcAW5siUx754PCwx1qyuK08jwI5gqkjE14bG1xKD/JM8
-         xsAAbt2tvarOnfHUPyUJYX0oFVBT/+iFn5HkuoUV3BVHd+2XiVFiqCHXULydYyura4uN
-         /Yi4GKxEtZYjQEgjqL2v0ZETmrG9zk7ZpVuoyVE+y8zMGfwgrulsqthprMqhK0IJ0snT
-         aS4nRW41jeGadduS7fA8Hss7720VCVGTOne6g8ZJgRCi49WdI+mCFZZXlT4w85+PPmTj
-         6oGtXk0c34EoJdp3ICpjm9zdrNdELv2lnZL44eSJ+cezPCaVhQi/fuZw35S5e1G0JV/t
-         ETyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCODdI5maIZUK8x0b7XIpV7twfijqCLwT0vRSf9GJoUmUxZRxEf4sr5BHcymSm+AmCV68vaKd2@vger.kernel.org, AJvYcCW6QH9AbRhASs8oZSaKpEcXgpept2q2UjaPZ9vWBvKiSyfUXu53BEnyGPyKii3qcacMS/6v37yCsHi+PgHk@vger.kernel.org, AJvYcCXLLEo53Kyqn8oZY1XopYTE7JjcWrcOOqgbRucC5RnN0ZbsThEP+yspSpuQCk//LStr+qSj9hvAT73T@vger.kernel.org, AJvYcCXZMhVHeCEU/DaTls4owpiz/p4bP1845CCTqegH+gBwNNdTmsFn788hM7Pn7wZTFeRxBJ3JZ9IvIthijMiwjTG3gcQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzldXLIHKmXN3T27/zEhLD5EOGy6Pb54tRCWNNoatRNr+pAavAZ
-	VRhNGrNY0KKJ1F/0WhvGaP8mFqv7zPQXbAXIhno82sW+HYUj6MFZOYmkRVygy83l
-X-Gm-Gg: ASbGncuElgRO6SV5/+LcoIL9wDW431E+t5j9a5eVIxhaT87pgP2gMg6kalwOs6nNMFT
-	5owkPGWK+op9ilHvEkuHrfQ92Bi16DbxiJlPmYXjORI5p2loKd+yZ8w3k+s0Di5ZEI+J3CGmHA2
-	sTdRAM4R/0XZhBM2MHzG6JaLl9CW/eKfK/Dg4ivvHFI0zRvPZa528u/E7JZKOJXCd8zEuGXvV+j
-	5n2hMtvlSAWXej1APncljXAayH2dK3JJ+u1teYfXXuo/dwj15ISEm9uXzeY0xktUJ7EcmMQJhxy
-	wwpbAE/GHzXzpLRcHU9yMc1L9mdDZkauApjl8n+3mfQ35P4DAz8+yjz6wjCpE0THRZOHlGCuwN2
-	clFzsS9YB28/C2DHh8M2F57btdafu
-X-Google-Smtp-Source: AGHT+IEX2Bjy6La5Rp4ul7jKmgUKQN0m3E3+9FXnVOfpn6cUDld26sB6pcM1We78L1iu0pDJcE3oYg==
-X-Received: by 2002:a05:622a:18a0:b0:4a4:3d6e:57c8 with SMTP id d75a77b69052e-4a73c5f941cmr219515821cf.34.1750173089864;
-        Tue, 17 Jun 2025 08:11:29 -0700 (PDT)
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com. [209.85.222.172])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb4ed60787sm33751536d6.48.2025.06.17.08.11.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 08:11:29 -0700 (PDT)
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c5b8d13f73so644463285a.0;
-        Tue, 17 Jun 2025 08:11:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUYcHUlfymYbkzumkB8iWuE177kGit9rIEh//B4Yf5wMBjl2ya0cG2/XKPslSxtioo/T2bfbcL8@vger.kernel.org, AJvYcCV0JcIlH8vn/7IkMizb5q4BwaXLN9CQFYbBZJ/DvD/H4DnXvn/TVrcQKVXAGNEQ6LaGuPEhIpleUu4F@vger.kernel.org, AJvYcCVgBlCeqz1Mf5lBmftoihhUbWbo1yFWIGhesfZ1gxfDDWsYrPtyyvxZGKENoxxgh66YIFQgTe6WMF85FBJO@vger.kernel.org, AJvYcCWPQ6i22dD7bpyARLHlA6my0VBew96gN4Nige6Rn4sgF1bKvdQjGCDpWY+7Zsp+Fxdp0MwO3xysnbOhSpHaeS4/8LQ=@vger.kernel.org
-X-Received: by 2002:a05:620a:4690:b0:7d3:913e:802e with SMTP id
- af79cd13be357-7d3c6cf5d27mr1916389785a.41.1750173089155; Tue, 17 Jun 2025
- 08:11:29 -0700 (PDT)
+	s=arc-20240116; t=1750173114; c=relaxed/simple;
+	bh=yBk/hB/A5C/xZQ12ojP/bpDCKY6cbtGBKyb6z7Jwi18=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aMqJFYy25+1T5EOvOqKE8HAGG76s/kqsZqZDAcRFG0h6DWvRPyIe/a1Fu438Q1YSfJx4u+1yY/83AMfYeZeWAy73jt2/to9D84ASHQWZSZvZy1Tg37605Xcf/5j1WjELJNGYxfbjjO833fhl9c0UVoFxF2bumbh1ouEQNP/Mjec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StrN1Zw5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C210C4CEE7;
+	Tue, 17 Jun 2025 15:11:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750173114;
+	bh=yBk/hB/A5C/xZQ12ojP/bpDCKY6cbtGBKyb6z7Jwi18=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=StrN1Zw54qnx1043U4Gfec7pDpcFX/XahuRp3+OObA/iYqJOIyaidua5Dpe0osMXj
+	 oMU67ZkYZGfa23xgZ+SYU7t7o9SW5Ku9yqJQh4z5U1Y4kD+fvTvBJwffrjcE8w+Llw
+	 5YTk+HukuxM8YqXaFEUYAoV1dbhFwR0AjVkF3GSmQGU5ASP1cctzCuvByjVULflj+L
+	 oJk6Rgb/3Zds8/BmmLCpxLiWmgNnPkwLyyZoe4/XPSaT02TepHOGj1GR9qoCCi3YGZ
+	 yTOI/qTxPyqiRCCIUFox45NYrOcARf7LlQl6mMpdqb9ad6J/tNccF056rxSzVHgyok
+	 7ZPPfTdHBg7EA==
+Date: Tue, 17 Jun 2025 16:11:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, duanqiangwen@net-swift.com,
+	linglingzhang@trustnetic.com, jiawenwu@net-swift.com
+Subject: Re: [PATCH net-next 03/12] net: libwx: add wangxun vf common api
+Message-ID: <20250617151150.GL5000@horms.kernel.org>
+References: <20250611083559.14175-1-mengyuanlou@net-swift.com>
+ <20250611083559.14175-4-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611061609.15527-1-john.madieu.xa@bp.renesas.com> <20250611061609.15527-2-john.madieu.xa@bp.renesas.com>
-In-Reply-To: <20250611061609.15527-2-john.madieu.xa@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 17 Jun 2025 17:11:17 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXE-C4FAXOfzQv8xfgFytwpqkARDORGLkosZtCsjK8nmg@mail.gmail.com>
-X-Gm-Features: Ac12FXyQCqP8CWB4cTKabVnuKWIm_-hzOXZkBQa3qOJhr22FARrB3ykfGLTgX08
-Message-ID: <CAMuHMdXE-C4FAXOfzQv8xfgFytwpqkARDORGLkosZtCsjK8nmg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] clk: renesas: r9a09g047: Add clock and reset
- signals for the GBETH IPs
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, krzk+dt@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, robh@kernel.org, 
-	biju.das.jz@bp.renesas.com, devicetree@vger.kernel.org, john.madieu@gmail.com, 
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	magnus.damm@gmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611083559.14175-4-mengyuanlou@net-swift.com>
 
-Hi John,
+On Wed, Jun 11, 2025 at 04:35:50PM +0800, Mengyuan Lou wrote:
+> Add common wx_configure_vf and wx_set_mac_vf for
+> ngbevf and txgbevf.
+> 
+> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 
-On Wed, 11 Jun 2025 at 11:02, John Madieu <john.madieu.xa@bp.renesas.com> wrote:
-> Add clock and reset entries for the Gigabit Ethernet Interfaces (GBETH 0-1)
-> IPs found on the RZ/G3E SoC. This includes various PLLs, dividers, and mux
-> clocks needed by these two GBETH IPs.
->
-> Reviewed-by: Biju Das <biju.das.jz@bp.renesas.com>
-> Tested-by: Biju Das <biju.das.jz@bp.renesas.com>
-> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
+...
 
-Thanks for your patch!
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.h b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
 
-> --- a/drivers/clk/renesas/r9a09g047-cpg.c
-> +++ b/drivers/clk/renesas/r9a09g047-cpg.c
-> @@ -85,7 +95,18 @@ static const struct clk_div_table dtable_2_64[] = {
->         {0, 0},
->  };
->
-> +static const struct clk_div_table dtable_2_100[] = {
-> +       {0, 2},
-> +       {1, 10},
-> +       {2, 100},
-> +       {0, 0},
-> +};
+...
+
+> +#define WX_VXMRQC_PSR(f)         FIELD_PREP(GENMASK(5, 1), f)
+> +#define WX_VXMRQC_PSR_MASK       GENMASK(5, 1)
+> +#define WX_VXMRQC_PSR_L4HDR      BIT(0)
+> +#define WX_VXMRQC_PSR_L3HDR      BIT(1)
+> +#define WX_VXMRQC_PSR_L2HDR      BIT(2)
+> +#define WX_VXMRQC_PSR_TUNHDR     BIT(3)
+> +#define WX_VXMRQC_PSR_TUNMAC     BIT(4)
+
+...
+
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c
+
+...
+
+> +/**
+> + * wx_configure_tx_ring_vf - Configure Tx ring after Reset
+> + * @wx: board private structure
+> + * @ring: structure containing ring specific data
+> + *
+> + * Configure the Tx descriptor ring after a reset.
+> + **/
+> +static void wx_configure_tx_ring_vf(struct wx *wx, struct wx_ring *ring)
+> +{
+> +	u8 reg_idx = ring->reg_idx;
+> +	u64 tdba = ring->dma;
+> +	u32 txdctl = 0;
+> +	int ret;
 > +
->  /* Mux clock tables */
-> +static const char * const smux2_gbe0_rxclk[] = { ".plleth_gbe0", "et0_rxc_rx_clk" };
-> +static const char * const smux2_gbe0_txclk[] = { ".plleth_gbe0", "et0_txc_tx_clk" };
-> +static const char * const smux2_gbe1_rxclk[] = { ".plleth_gbe1", "et1-rxc-rx_clk" };
-> +static const char * const smux2_gbe1_txclk[] = { ".plleth_gbe1", "et1-txc-tx_clk" };
+> +	/* disable queue to avoid issues while updating state */
+> +	wr32(wx, WX_VXTXDCTL(reg_idx), WX_VXTXDCTL_FLUSH);
+> +	wr32(wx, WX_VXTDBAL(reg_idx), tdba & DMA_BIT_MASK(32));
+> +	wr32(wx, WX_VXTDBAH(reg_idx), tdba >> 32);
+> +
+> +	/* enable relaxed ordering */
+> +	pcie_capability_clear_and_set_word(wx->pdev, PCI_EXP_DEVCTL,
+> +					   0, PCI_EXP_DEVCTL_RELAX_EN);
+> +
+> +	/* reset head and tail pointers */
+> +	wr32(wx, WX_VXTDH(reg_idx), 0);
+> +	wr32(wx, WX_VXTDT(reg_idx), 0);
+> +	ring->tail = wx->hw_addr + WX_VXTDT(reg_idx);
+> +
+> +	/* reset ntu and ntc to place SW in sync with hardwdare */
 
-Please use consistent naming for the external clocks (underscores
-vs. dashes).  However, both differ from the similar names used on
-RZ/V2H and RZ/V2N; perhaps use the naming from the latter instead?
+nit: hardware
 
->  static const char * const smux2_xspi_clk0[] = { ".pllcm33_div3", ".pllcm33_div4" };
->  static const char * const smux2_xspi_clk1[] = { ".smux2_xspi_clk0", ".pllcm33_div5" };
->
+> +	ring->next_to_clean = 0;
+> +	ring->next_to_use = 0;
+> +
+> +	txdctl |= WX_VXTXDCTL_BUFLEN(wx_buf_len(ring->count));
+> +	txdctl |= WX_VXTXDCTL_ENABLE;
+> +
+> +	/* set WTHRESH to encourage burst writeback, it should not be set
+> +	 * higher than 1 when ITR is 0 as it could cause false TX hangs
+> +	 *
+> +	 * In order to avoid issues WTHRESH + PTHRESH should always be equal
+> +	 * to or less than the number of on chip descriptors, which is
+> +	 * currently 40.
+> +	 */
+> +	/* reinitialize tx_buffer_info */
+> +	memset(ring->tx_buffer_info, 0,
+> +	       sizeof(struct wx_tx_buffer) * ring->count);
+> +
+> +	wr32(wx, WX_VXTXDCTL(reg_idx), txdctl);
+> +	/* poll to verify queue is enabled */
+> +	ret = read_poll_timeout(rd32, txdctl, txdctl & WX_VXTXDCTL_ENABLE,
+> +				1000, 10000, true, wx, WX_VXTXDCTL(reg_idx));
+> +	if (ret == -ETIMEDOUT)
+> +		wx_err(wx, "Could not enable Tx Queue %d\n", reg_idx);
+> +}
 
-> @@ -214,6 +252,30 @@ static const struct rzv2h_mod_clk r9a09g047_mod_clks[] __initconst = {
->                                                 BUS_MSTOP(8, BIT(4))),
->         DEF_MOD("sdhi_2_aclk",                  CLK_PLLDTY_ACPU_DIV4, 10, 14, 5, 14,
->                                                 BUS_MSTOP(8, BIT(4))),
-> +       DEF_MOD("gbeth_0_clk_tx_i",             CLK_SMUX2_GBE0_TXCLK, 11, 8, 5, 24,
-> +                                               BUS_MSTOP(8, BIT(5))),
-> +       DEF_MOD("gbeth_0_clk_rx_i",             CLK_SMUX2_GBE0_RXCLK, 11, 9, 5, 25,
-> +                                               BUS_MSTOP(8, BIT(5))),
-> +       DEF_MOD("gbeth_0_clk_tx_180_i",         CLK_SMUX2_GBE0_TXCLK, 11, 10, 5, 26,
-> +                                               BUS_MSTOP(8, BIT(5))),
-> +       DEF_MOD("gbeth_0_clk_rx_180_i",         CLK_SMUX2_GBE0_RXCLK, 11, 11, 5, 27,
-> +                                               BUS_MSTOP(8, BIT(5))),
-> +       DEF_MOD("gbeth_0_aclk_csr_i",           CLK_PLLDTY_DIV8, 11, 12, 5, 28,
-> +                                               BUS_MSTOP(8, BIT(5))),
-> +       DEF_MOD("gbeth_0_aclk_i",               CLK_PLLDTY_DIV8, 11, 13, 5, 29,
-> +                                               BUS_MSTOP(8, BIT(5))),
-> +       DEF_MOD("gbeth_1_clk_tx_i",             CLK_SMUX2_GBE1_TXCLK, 11, 14, 5, 30,
-> +                                               BUS_MSTOP(8, BIT(6))),
-> +       DEF_MOD("gbeth_1_clk_rx_i",             CLK_SMUX2_GBE1_RXCLK, 11, 15, 5, 31,
-> +                                               BUS_MSTOP(8, BIT(6))),
-> +       DEF_MOD("gbeth_1_clk_tx_180_i",         CLK_SMUX2_GBE1_TXCLK, 12, 0, 6, 0,
+...
 
-scripts/checkpatch.pl says:
+> +void wx_setup_psrtype_vf(struct wx *wx)
+> +{
+> +	/* PSRTYPE must be initialized */
+> +	u32 psrtype = WX_VXMRQC_PSR_L2HDR |
+> +		      WX_VXMRQC_PSR_L3HDR |
+> +		      WX_VXMRQC_PSR_L4HDR |
+> +		      WX_VXMRQC_PSR_TUNHDR |
+> +		      WX_VXMRQC_PSR_TUNMAC;
+> +
+> +	if (wx->num_rx_queues > 1)
+> +		psrtype |= BIT(14);
 
-    WARNING: please, no space before tabs
+Here bit 14 of psrtype may be set (what is bit 14?).
 
-> +                                               BUS_MSTOP(8, BIT(6))),
-> +       DEF_MOD("gbeth_1_clk_rx_180_i",         CLK_SMUX2_GBE1_RXCLK, 12, 1, 6, 1,
-> +                                               BUS_MSTOP(8, BIT(6))),
-> +       DEF_MOD("gbeth_1_aclk_csr_i",           CLK_PLLDTY_DIV8, 12, 2, 6, 2,
-> +                                               BUS_MSTOP(8, BIT(6))),
-> +       DEF_MOD("gbeth_1_aclk_i",               CLK_PLLDTY_DIV8, 12, 3, 6, 3,
-> +                                               BUS_MSTOP(8, BIT(6))),
+> +
+> +	wr32m(wx, WX_VXMRQC, WX_VXMRQC_PSR_MASK, WX_VXMRQC_PSR(psrtype));
 
-Shouldn't all of these use DEF_MOD_MUX_EXTERNAL() instead of DEF_MOD(),
-like on RZ/V2H and RZ/V2N?
+But WX_VXMRQC_PSR() uses a mask that limits psrtype to 5 bits.
 
->         DEF_MOD("cru_0_aclk",                   CLK_PLLDTY_ACPU_DIV2, 13, 2, 6, 18,
->                                                 BUS_MSTOP(9, BIT(4))),
->         DEF_MOD_NO_PM("cru_0_vclk",             CLK_PLLVDO_CRU0, 13, 3, 6, 19,
+This is flagged by W=1 builds with gcc-8.5.0 on x86_64
+(but curiously not gcc-15.1.0 builds). It is flagged like this:
 
-The rest LGTM. Note that I don't have access to the Additional Document,
-so I couldn't verify all details.
+  CC [M]  drivers/net/ethernet/wangxun/libwx/wx_vf_lib.o
+In file included from <command-line>:
+drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c: In function 'wx_setup_psrtype_vf':
+././include/linux/compiler_types.h:568:38: error: call to '__compiletime_assert_1833' declared with attribute error: FIELD_PREP: value too large for the field
+  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+                                      ^
+././include/linux/compiler_types.h:549:4: note: in definition of macro '__compiletime_assert'
+    prefix ## suffix();    \
+    ^~~~~~
+././include/linux/compiler_types.h:568:2: note: in expansion of macro '_compiletime_assert'
+  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+  ^~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+ #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+                                     ^~~~~~~~~~~~~~~~~~
+./include/linux/bitfield.h:68:3: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+   BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?  \
+   ^~~~~~~~~~~~~~~~
+./include/linux/bitfield.h:115:3: note: in expansion of macro '__BF_FIELD_CHECK'
+   __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: "); \
+   ^~~~~~~~~~~~~~~~
+drivers/net/ethernet/wangxun/libwx/wx_vf.h:73:34: note: in expansion of macro 'FIELD_PREP'
+ #define WX_VXMRQC_PSR(f)         FIELD_PREP(GENMASK(5, 1), f)
+                                  ^~~~~~~~~~
+drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c:195:43: note: in expansion of macro 'WX_VXMRQC_PSR'
+  wr32m(wx, WX_VXMRQC, WX_VXMRQC_PSR_MASK, WX_VXMRQC_PSR(psrtype));
+                                           ^~~~~~~~~~~~~
+make[7]: *** [scripts/Makefile.build:203:
+drivers/net/ethernet/wangxun/libwx/wx_vf_lib.o] Error 1:
 
-Gr{oetje,eeting}s,
+> +}
 
-                        Geert
+...
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+> +void wx_configure_rx_ring_vf(struct wx *wx, struct wx_ring *ring)
+> +{
+> +	u8 reg_idx = ring->reg_idx;
+> +	union wx_rx_desc *rx_desc;
+> +	u64 rdba = ring->dma;
+> +	u32 rxdctl;
+> +
+> +	/* disable queue to avoid issues while updating state */
+> +	rxdctl = rd32(wx, WX_VXRXDCTL(reg_idx));
+> +	wx_disable_rx_queue(wx, ring);
+> +
+> +	wr32(wx, WX_VXRDBAL(reg_idx), rdba & DMA_BIT_MASK(32));
+> +	wr32(wx, WX_VXRDBAH(reg_idx), rdba >> 32);
+> +
+> +	/* enable relaxed ordering */
+> +	pcie_capability_clear_and_set_word(wx->pdev, PCI_EXP_DEVCTL,
+> +					   0, PCI_EXP_DEVCTL_RELAX_EN);
+> +
+> +	/* reset head and tail pointers */
+> +	wr32(wx, WX_VXRDH(reg_idx), 0);
+> +	wr32(wx, WX_VXRDT(reg_idx), 0);
+> +	ring->tail = wx->hw_addr + WX_VXRDT(reg_idx);
+> +
+> +	/* initialize rx_buffer_info */
+> +	memset(ring->rx_buffer_info, 0,
+> +	       sizeof(struct wx_rx_buffer) * ring->count);
+> +
+> +	/* initialize Rx descriptor 0 */
+> +	rx_desc = WX_RX_DESC(ring, 0);
+> +	rx_desc->wb.upper.length = 0;
+> +
+> +	/* reset ntu and ntc to place SW in sync with hardwdare */
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+nit: hardware
+
+> +	ring->next_to_clean = 0;
+> +	ring->next_to_use = 0;
+> +	ring->next_to_alloc = 0;
+> +
+> +	wx_configure_srrctl_vf(wx, ring, reg_idx);
+> +
+> +	/* allow any size packet since we can handle overflow */
+> +	rxdctl &= ~WX_VXRXDCTL_BUFLEN_MASK;
+> +	rxdctl |= WX_VXRXDCTL_BUFLEN(wx_buf_len(ring->count));
+> +	rxdctl |= WX_VXRXDCTL_ENABLE | WX_VXRXDCTL_VLAN;
+> +
+> +	/* enable RSC */
+> +	rxdctl &= ~WX_VXRXDCTL_RSCMAX_MASK;
+> +	rxdctl |= WX_VXRXDCTL_RSCMAX(0);
+> +	rxdctl |= WX_VXRXDCTL_RSCEN;
+> +
+> +	wr32(wx, WX_VXRXDCTL(reg_idx), rxdctl);
+> +
+> +	/* pf/vf reuse */
+> +	wx_enable_rx_queue(wx, ring);
+> +	wx_alloc_rx_buffers(ring, wx_desc_unused(ring));
+> +}
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h
+> new file mode 100644
+> index 000000000000..43ea126b79eb
+> --- /dev/null
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
+> +
+> +#ifndef _WX_VF_LIB_H_
+> +#define _WX_VF_LIB_H_
+> +
+> +void wx_configure_msix_vf(struct wx *wx);
+> +int wx_write_uc_addr_list_vf(struct net_device *netdev);
+> +void wx_setup_psrtype_vf(struct wx *wx);
+> +void wx_setup_vfmrqc_vf(struct wx *wx);
+> +void wx_configure_tx_vf(struct wx *wx);
+> +void wx_configure_rx_ring_vf(struct wx *wx, struct wx_ring *ring);
+> +
+> +#endif /* _WX_VF_LIB_H_ */
+> -- 
+> 2.30.1
+> 
 
