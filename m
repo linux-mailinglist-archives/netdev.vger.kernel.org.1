@@ -1,107 +1,124 @@
-Return-Path: <netdev+bounces-198444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39615ADC2C2
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:01:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11319ADC30C
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15D1318916C5
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:01:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B382F1715BE
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F612236A8B;
-	Tue, 17 Jun 2025 07:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A5528C84A;
+	Tue, 17 Jun 2025 07:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJ5CxfCX"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="fUvIbnOi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8033C01
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8133328C5CB
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750143653; cv=none; b=S1LVSKQQaR5UyUrlCTgwyEEN2HGnRLT6a1A1DqOP01xw4kUh1bjHmo0wPOE7UACSxMokBJD5+Lm8mWsfUwkfsT6BXqNUuA1yriWE4zCVhZyXCJl+LirRJStHLW2xbxE/U/VezjVfegu24DoITzuqvGsXesGMKVKQgVYkLihlnqs=
+	t=1750144643; cv=none; b=pCTTFRtQHSAunq1UNPlNF6ot3fpr2QPQc8/9md5A0aJSDELSwumFawIoKw6EWnfSkMknahWH1IuzRd7sCy5w3KmEwFwtGt+n6OZpc2BOHpxTrNyCKm8DCx+9VD4NChc9EmUS3grXXR1pIlZno+qqsJl9EgmzgmITF6p8UNhWpVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750143653; c=relaxed/simple;
-	bh=NcwBh6EnekHcip7sx/0f94JunjhSmAdwjt/WnP1X8mg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1rYchFWlP5dG5CvRcMHry6oFQdgaRXY+z3V2NoeU8rVpgTOMhyTe53Kk3o6ZfGWfhfqzejEheUgna291Te/JC0ZxVXBakjGr1QG97KvO17a1ZOFgB6lAQA5pmu8rM/mb5ArhLwK3htBHZKoIKPqLXdZHJ2K3pBpaPpgRYnBq9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJ5CxfCX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72154C4CEE3;
-	Tue, 17 Jun 2025 07:00:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750143652;
-	bh=NcwBh6EnekHcip7sx/0f94JunjhSmAdwjt/WnP1X8mg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PJ5CxfCXEc+7PMKfh7lTABYWzG0J/7eQgxc/g1FXaQpHbfgoCFNLMiU535FKonCvU
-	 KlisFU+jQ0nQ7uSvlBW1vQCUlUL0sqTmgrS1KSgaziMWtmkDvd/nnQGL/lP2c2HI0X
-	 6I19RL3trLQb1wD16DPGyhK8S9U0+o89xaEBg1qnCHTiUcZ79TLVCMSkdmpsu0I627
-	 2bjv4bw5VuSOSPmV/p4Wut3kknpGcLVyIieUuPfPzwMDwEUZdMFF67bjU9MEhXNQZb
-	 cZj0+zwBlLkZHFd8vj31j5OWPxFhOSZRTAIcrN8fvhqZdZ4ggG5c5iUp2R6TDgMiuv
-	 Bge4iZk+h8eZQ==
-Date: Tue, 17 Jun 2025 08:00:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, hkallweit1@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, pabeni@redhat.com,
-	kuba@kernel.org, kernel-team@meta.com, edumazet@google.com
-Subject: Re: [net-next PATCH v2 3/6] fbnic: Replace 'link_mode' with 'aui'
-Message-ID: <20250617070048.GD5000@horms.kernel.org>
-References: <174974059576.3327565.11541374883434516600.stgit@ahduyck-xeon-server.home.arpa>
- <174974092054.3327565.9587401305919779622.stgit@ahduyck-xeon-server.home.arpa>
- <20250616153438.GE6918@horms.kernel.org>
- <CAKgT0UfEkGiAu2mO15yaF1HRdRLsercm4vJsyi-xg8Je0c_i5A@mail.gmail.com>
+	s=arc-20240116; t=1750144643; c=relaxed/simple;
+	bh=tHhhIwl3c1sdm8uLIehmnpvDeqygJ6AVWfWrHwCgizE=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=naA8530fO9+IPYOfDyOAjUIQsscQQPM/GExm4R8pTZx3Qz9bed+btzJw/vaYMIbT5ldBL+bWPryghwl0hXtxXhcHoU6RMf/oO14fHnds2JJuz25H5CrWzVBXTpnmPhqLmb1fVwDalMXT5gLkTLhnyLra4+xItR18H1KwMYjAQ60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=fUvIbnOi; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1750144642; x=1781680642;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=S7mtE75Ltr+IjlrJYk/4JQDqzCJ96F9mHQk1ALhVti8=;
+  b=fUvIbnOidnmTS0sld9X31aYakKm3+j5jdUuitomIh/dsYU6O9wVpju3g
+   bzWs0R6Bl6G814ZS98NKjpDrzOnrtho/WYoWpIcceSlxry8pAvJK+GCF9
+   CyL48ude0H4O/z+QWjEe8JuEMrdDNIpDY+l8Rwq2dZN2N+Ter4z5h77KL
+   csy1800je1+qPOeqDfLDzbakeO5/h+7T9K39nkDenQ+5ZnPRDXnkmCe4b
+   1D91zmCsE6QobjsZRDGLQwCYN/da4LRE5V+CIat6MOW/m6KjzvrK9t+qj
+   Lh03qSBce2OuWh0zD7mUvH5aSIolgB2Rc1OJ2bB/mfJecNs90Rj8LjgJl
+   g==;
+X-IronPort-AV: E=Sophos;i="6.16,242,1744070400"; 
+   d="scan'208";a="510717155"
+Subject: RE: [PATCH v12 net-next 3/9] net: ena: Add device reload capability through
+ devlink
+Thread-Topic: [PATCH v12 net-next 3/9] net: ena: Add device reload capability through
+ devlink
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 07:17:16 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:15151]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.18.47:2525] with esmtp (Farcaster)
+ id d860e375-f97f-46ad-a7a6-af066a885370; Tue, 17 Jun 2025 07:17:14 +0000 (UTC)
+X-Farcaster-Flow-ID: d860e375-f97f-46ad-a7a6-af066a885370
+Received: from EX19D022EUA004.ant.amazon.com (10.252.50.82) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 17 Jun 2025 07:17:14 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D022EUA004.ant.amazon.com (10.252.50.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 17 Jun 2025 07:17:13 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1544.014; Tue, 17 Jun 2025 07:17:13 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
+	<richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+	<amitbern@amazon.com>, "Allen, Neil" <shayagr@amazon.com>, "Ostrovsky,
+ Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
+	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
+	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
+	<leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+Thread-Index: AQHb2rKM3kLAXMwbu0yTALZCBMtEjbQGh9MAgAByPRA=
+Date: Tue, 17 Jun 2025 07:17:13 +0000
+Message-ID: <a841114688ac4ec3a65da55f2ce32a40@amazon.com>
+References: <20250611092238.2651-1-darinzon@amazon.com>
+	<20250611092238.2651-4-darinzon@amazon.com>
+ <20250616172730.5545c02e@kernel.org>
+In-Reply-To: <20250616172730.5545c02e@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UfEkGiAu2mO15yaF1HRdRLsercm4vJsyi-xg8Je0c_i5A@mail.gmail.com>
 
-On Mon, Jun 16, 2025 at 09:14:33AM -0700, Alexander Duyck wrote:
-> On Mon, Jun 16, 2025 at 8:34 AM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Thu, Jun 12, 2025 at 08:08:40AM -0700, Alexander Duyck wrote:
-> > > From: Alexander Duyck <alexanderduyck@fb.com>
-> > >
-> > > The way we were using "link_mode" really was more to describe the
-> > > interface between the attachment unit interface(s) we were using on the
-> > > device. Specifically the AUI is describing the modulation and the number of
-> > > lanes we are using. So we can simplify this by replacing link_mode with
-> > > aui.
-> > >
-> > > In addition this change makes it so that the enum we use for the FW values
-> > > represents actual link modes that will be normally advertised by a link
-> > > partner. The general idea is to look at using this to populate
-> > > lp_advertising in the future so that we don't have to force the value and
-> > > can instead default to autoneg allowing the user to change it should they
-> > > want to force the link down or are doing some sort of manufacturing test
-> > > with a loopback plug.
-> > >
-> > > Lastly we make the transition from fw_settings to aui/fec a one time thing
-> > > during phylink_init. The general idea is when we start phylink we should no
-> > > longer update the setting based on the FW and instead only allow the user
-> > > to provide the settings.
-> > >
-> > > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
-> >
-> > Hi Alexander,
-> >
-> > This patch is doing a lot - I count 3 things.
-> > Could you try and break it up a bit in v3?
-> 
-> Actually I need to clean this up a bit more anyway. Looks like I have
-> some text from the earlier version still here as the last item was
-> moved to patch 4 I believe.
-> 
-> Since it is mostly just renames anyway, splitting it up should be
-> pretty straight forward.
+> > +In order to use devlink, environment variable ``ENA_DEVLINK_INCLUDE``
+> needs to be set.
+> > +
+> > +.. code-block:: shell
+> > +
+> > +  ENA_DEVLINK_INCLUDE=3D1 make
+>=20
+> This part of the doc refers to building the driver out of tree?
+> We probably don't want to make a precedent for adding OOT docs to the
+> tree.
+> --
+> pw-bot: cr
 
-Thanks, I think that would help (me) a lot.
+You're absolutely right, I missed this.
+Thank you for noticing. Will fix it in v13.
 
