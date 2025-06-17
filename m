@@ -1,137 +1,206 @@
-Return-Path: <netdev+bounces-198496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE970ADC6E3
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:44:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0A03ADC6EB
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41EFF18942D6
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:45:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20E771894D59
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B8A2C032B;
-	Tue, 17 Jun 2025 09:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3991028F519;
+	Tue, 17 Jun 2025 09:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AMDuYYoD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FnSpc5cR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2A72BE7C8
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884F92135CE
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750153470; cv=none; b=WPt/wSoVhibIeHJ3Y4GiOgFP4PBw9W3cDa+XnNuHBfnezS+wtaYsKB+nLe+WftjbySCI9jdXmz9xOnUePbfHIa/DXDlsM227BHFUl3+oE+jzax0TqpP05f4kwvwf/99vx7moEp7+S4RTtwkf1Tyto8e4AdEsLxjutWkWxCbYN3Y=
+	t=1750153555; cv=none; b=JwFoSrLNPo+dtYFihSbUoKRZRb/7Y69bXwBMb3W4IJaw8Sy/vlCSsDcxBfCbfkx9QWah4GI4rv906Qm+EMde8+BvLomNhCpmzAEXIl2/OwZ5D54vqltWGaWxizkEMjFwWIwe+37zaLh+AlbRi0p1rk/M2HmHdJUpiKTeizrBIzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750153470; c=relaxed/simple;
-	bh=e4uRqKiHK+914gVeOIiVV3X3FcUt9r0rHl937hvIjjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=VLcYKzevzkCdBU1QMPFJMeKLBHorbypw5ildykYmOMltukzfzYSsTZ4iqfiEj0wj5f5Smxxk5krLj5lh5VlQAybN62wUnuQ395nu+4Zr375T24ckISQxi5OK9QrYbyTmFAhPdo/6MNz13ZnWgeMlixRN1vbW7IcnHwBcuBqSbPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AMDuYYoD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750153466;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rzL8BCb5z5mTe8AmKnSvyMsKdN+ktV9EKzPlxxLDauM=;
-	b=AMDuYYoDWFJKnahySOKC7fu/UovDN6k0UTkmMIPV70HymgS1GDLj29vd9bYslqJnpNaeeq
-	ugNe4tn24TZsLlZC23YsVaXKRxP0BRDr+uPRfnQM4BQzco1AtYV369AKkttflG443hF4h1
-	4XElNQqDsLX6VB7o8dhARnhOVl2ZiWM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-XMF7oVzXO5S37r5M1eyQKw-1; Tue, 17 Jun 2025 05:44:25 -0400
-X-MC-Unique: XMF7oVzXO5S37r5M1eyQKw-1
-X-Mimecast-MFC-AGG-ID: XMF7oVzXO5S37r5M1eyQKw_1750153464
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a56b3dee17so2013106f8f.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 02:44:25 -0700 (PDT)
+	s=arc-20240116; t=1750153555; c=relaxed/simple;
+	bh=FTG3vysmZjBSiuhxPTjNxRWCOLBUQueoVeH+pT5jbzE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vtl+lojWj/Viaxyv47y40GJAwa/0Yj0I6o8M/MScnM2jrr+L509RAuF0fZqdeSyRvpmXHzFbWd0w38vy9bwRHXssn6cNfitUeo95DisixN8cXCCQsz1eVOw7j4Kqtm7efdQBfSTdnEEZc3OjtIV5NHCaZLVO2L01y2q1rrXN2Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FnSpc5cR; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso5885962b3a.2
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 02:45:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750153553; x=1750758353; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uMaKcH2OTjZJu3jxDaO7Jj/PLmOhmTa53JwiymMoy3s=;
+        b=FnSpc5cRWZKG3ZycKNTV3Iuw2F5adfwf6O1TYsM+ny7f/UPiFt3P78+sj3gEzs/YV2
+         oV0p+CYOKDalnt1agciQEqf0zRofnKPy4wtlMVq7ROh1WEoWm6YFHgxrgq/F50lKL9nl
+         dr6wVPLY66YvHaIF3S2FK0fo/DLl2F5H/OJ8ip3otK3HhxBwtwHA5gfF/5XXHMwdsX8g
+         Knltjg0DS4uwculynQJgC5/wZxGu6WVeVZ0xC4X0xXxdDMuoMVIgfu0uGzp8Vmqu3umA
+         LffDPeXaRq0wuiJeq+WAyjP6aqROI0ffvUsxlpNSs1H8QiCbJTKfEMnYSrW3wkU679nn
+         DUcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750153464; x=1750758264;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rzL8BCb5z5mTe8AmKnSvyMsKdN+ktV9EKzPlxxLDauM=;
-        b=Wg4n2qIkrQXtF3Mvzy0c8KPoFBy/isVNBQCZ2BZlbh80GPst3ee7eR5NBwfpfVR3bH
-         mQSBCnHNBeDWhEySpwJ9UpfvVtd2+JNnTkgKYo58fVEXN4RFmKgxAOYK9/dkiaxr7/ha
-         Dhd5WoHFVmyK9aNEj+AWDJ5Ve6d9rqb2lt9kK4iQpJA7aezayHaRGA6jLA50TQG4/7LM
-         rdRKNYt173JxKacv3cPK3G3nerN+aTGaF1dz1egL+AS1rPWyqTRD00bhmBVxyTHqJOXM
-         tva7z2+ZqK/YUUvWRCI4FgBOYpVRuL2C2sV4oSTnbcuzH+80j6kk+pmtjWtlTK8PNOsB
-         AZrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWODM72rSDS5NjiJTKF7Lot+754nh6QooDZHRqGXN1SvrXC06jEEYUUb34QwQFXwypucd5bHnY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlfbQWCbCxoVsp1ZOVDqTBL4Z45jRdZQR8JODRjdPSQaJEf5jy
-	Pz4H5IMucLFR1iyRnIaph7LhsvkQbhol1edGUXD1YoDMCpnqRPHxw7Q1oR0wUlSak3RknECn2Dw
-	TzFwxbd5l5yY0SfbZsVSfDO0UvVPIRLnCPM77e0doF1y3bX0cF0K7/4XgcA==
-X-Gm-Gg: ASbGncsmu/T66Bh3oQzwiFxrr0dTG3fUTmupwNFUiD66K7a32H/5bVV65I/Rb0KE8GN
-	jkbPwtT2KZpyQmnWlN1qjanrhkYpOlkYGZZzyKREKyh0cerxapb0L2NBfkiFqnFjaQwmoLErBI9
-	QliE2JxX4rbrF6iSqmBZUA/gPjw4dTHDziaeNW6LaqXXBKAPtULBKnX9fiTlxC8/lwZQ+/O0NU+
-	82m2YVDd0Kha9bxgy6FuCPCykqQzuMRQTn2DIWDj7CA/R3HVTUYK1bgpzPTJM/qlS7pdwy0a2hm
-	qUAsK0uPGNpQJOMxm/ueYC+eqGlGRdBoYhZ63G7aDLBeeJBpaUcrX6fJCEazPxnpl9ELEg==
-X-Received: by 2002:a05:6000:4106:b0:3a5:7c5a:8c43 with SMTP id ffacd0b85a97d-3a57c5a8d11mr6597976f8f.11.1750153464174;
-        Tue, 17 Jun 2025 02:44:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEKE4/hdGNiZlnyMYBRWFUzYwIsk6LZeUq2PZYEGJVxcoKxTedoN7Csr9UGI1dlan0YwSjvcg==
-X-Received: by 2002:a05:6000:4106:b0:3a5:7c5a:8c43 with SMTP id ffacd0b85a97d-3a57c5a8d11mr6597942f8f.11.1750153463754;
-        Tue, 17 Jun 2025 02:44:23 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2448:cb10:3ac6:72af:52e3:719a? ([2a0d:3344:2448:cb10:3ac6:72af:52e3:719a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e13d009sm172188815e9.20.2025.06.17.02.44.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 02:44:23 -0700 (PDT)
-Message-ID: <558d81d1-3cd0-41f8-87b1-aa7be05f2924@redhat.com>
-Date: Tue, 17 Jun 2025 11:44:21 +0200
+        d=1e100.net; s=20230601; t=1750153553; x=1750758353;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uMaKcH2OTjZJu3jxDaO7Jj/PLmOhmTa53JwiymMoy3s=;
+        b=R6XPInfSLLIVgpN1AN7B3R6JMhv/MDbSsPWfa0I1x+T3+QxZyXQb1W3ict7p4kjwVp
+         O6vNLOXk8T3HinluU2YY+VNQGYIUoqtf8NwZPILb9xkoCktIqGJo7khgbZoTzkgAj06I
+         XXr9wyVve1O9bnHB+Rq9KsSfynt34TVDA/mu9EKCpJuGdIiN1m4eesrb2lgeYmFDR74v
+         1eK+9VgmDda0/Idrbk9xKoEhT/nliDkb42rS9E4hbhITOZRFh4M3HXHt5nlGtxmE5llL
+         G892E8s006i9FPzwvrQ/MhoUvRcpl3eHl5MMCVWNKKYzVCQ3zpFH0CvjdNE/JjXD7EyZ
+         +YzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWwpi+ZCQs4eCSPtMd1tt0+ZL3ZiGSzcQEd/2ehSxJpgnIvsEoqxKCFKMeG7xASGy9pzyCtoz0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgah+HsUIGwU+RCEChgJE3l5ozWoAx+Giwb1tB2ZcJBpzyQYAC
+	hJueLOXO038YskjMMk2FSuWY0/39PUHUs4M6AX+YxQflDjV6g5CNW7PF
+X-Gm-Gg: ASbGnctgpnvVwFy70nkh27iV1o/ANgMk+ws5thhMmjtMHufKtOZFKB9gQKCu/hjSuy+
+	76xLE1xJTCbYkC1WJcbVS0ryd/q3DqHQKpesv3omcgoeLNNZ7XXuivd/SqK5eS/TCPdLxsWjus/
+	vF25Rhe2wCq7LUH7ofuJIITtpTrCg7kNY9iSYPptQETLl9MXwI/TtmrN/67FFQDuS/GYYDCm31Y
+	oQGdM2ZCDk2oJcb/fP/1HRF3tZMQAHqk0ARqiWS7H6CI8M/qKt198SBnYg6DW3pzvV2S6TZMnsb
+	f3D2CIVnGAGmgktyfYjlnP3MnGdS5EnsUXfqXR3E7BioRNbT4bU=
+X-Google-Smtp-Source: AGHT+IHC6C3nFx0qOtOXUxWGGw8UP9VrQnXNMQYFKCS+cTaZcf9w6YdAxILm9X0brCNIHw3MEqG9Ag==
+X-Received: by 2002:a05:6a21:9991:b0:1ee:d418:f764 with SMTP id adf61e73a8af0-21fbd5d2f85mr18681250637.38.1750153552581;
+        Tue, 17 Jun 2025 02:45:52 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe1680c1esm7090505a12.48.2025.06.17.02.45.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 02:45:51 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com
+Subject: [PATCH net-next] eth: bnxt: add netmem TX support
+Date: Tue, 17 Jun 2025 09:45:40 +0000
+Message-Id: <20250617094540.819832-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 net-next 11/15] tcp: accecn: AccECN option failure
- handling
-To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250610125314.18557-1-chia-yu.chang@nokia-bell-labs.com>
- <20250610125314.18557-12-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250610125314.18557-12-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/10/25 2:53 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 3de6641c776e..d7cdc6589a9c 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -1087,6 +1087,7 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
->  	/* Simultaneous open SYN/ACK needs AccECN option but not SYN */
->  	if (unlikely((TCP_SKB_CB(skb)->tcp_flags & TCPHDR_ACK) &&
->  		     tcp_ecn_mode_accecn(tp) &&
-> +		     inet_csk(sk)->icsk_retransmits < 2 &&
->  		     sock_net(sk)->ipv4.sysctl_tcp_ecn_option &&
->  		     remaining >= TCPOLEN_ACCECN_BASE)) {
->  		u32 saving = tcp_synack_options_combine_saving(opts);
+Use netmem_dma_*() helpers and declare netmem_tx to support netmem TX.
+By this change, all bnxt devices will support the netmem TX.
 
-AFAICS here the AccECN option is allowed even on the first retransmit as
-opposed of what enforced for synack packets and what stated in the
-commit message. Why?
+bnxt_start_xmit() uses memcpy() if a packet is too small. However,
+netmem packets are unreadable, so memcpy() is not allowed.
+It should check whether an skb is readable, and if an SKB is unreadable,
+it is processed by the normal transmission logic.
 
-Either code change or code/commit message comment needed.
+netmem TX can be tested with ncdevmem.c
 
-Thanks,
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 28 ++++++++++++++---------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
 
-Paolo
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 869580b6f70d..4de9dc123a18 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -477,6 +477,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct bnxt_tx_ring_info *txr;
+ 	struct bnxt_sw_tx_bd *tx_buf;
+ 	__le32 lflags = 0;
++	skb_frag_t *frag;
+ 
+ 	i = skb_get_queue_mapping(skb);
+ 	if (unlikely(i >= bp->tx_nr_rings)) {
+@@ -563,7 +564,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		lflags |= cpu_to_le32(TX_BD_FLAGS_NO_CRC);
+ 
+ 	if (free_size == bp->tx_ring_size && length <= bp->tx_push_thresh &&
+-	    !lflags) {
++	    skb_frags_readable(skb) && !lflags) {
+ 		struct tx_push_buffer *tx_push_buf = txr->tx_push;
+ 		struct tx_push_bd *tx_push = &tx_push_buf->push_bd;
+ 		struct tx_bd_ext *tx_push1 = &tx_push->txbd2;
+@@ -598,9 +599,9 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		skb_copy_from_linear_data(skb, pdata, len);
+ 		pdata += len;
+ 		for (j = 0; j < last_frag; j++) {
+-			skb_frag_t *frag = &skb_shinfo(skb)->frags[j];
+ 			void *fptr;
+ 
++			frag = &skb_shinfo(skb)->frags[j];
+ 			fptr = skb_frag_address_safe(frag);
+ 			if (!fptr)
+ 				goto normal_tx;
+@@ -708,8 +709,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			cpu_to_le32(cfa_action << TX_BD_CFA_ACTION_SHIFT);
+ 	txbd0 = txbd;
+ 	for (i = 0; i < last_frag; i++) {
+-		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+-
++		frag = &skb_shinfo(skb)->frags[i];
+ 		prod = NEXT_TX(prod);
+ 		txbd = &txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
+ 
+@@ -721,7 +721,8 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			goto tx_dma_error;
+ 
+ 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
+-		dma_unmap_addr_set(tx_buf, mapping, mapping);
++		netmem_dma_unmap_addr_set(skb_frag_netmem(frag), tx_buf,
++					  mapping, mapping);
+ 
+ 		txbd->tx_bd_haddr = cpu_to_le64(mapping);
+ 
+@@ -778,9 +779,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	for (i = 0; i < last_frag; i++) {
+ 		prod = NEXT_TX(prod);
+ 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
+-		dma_unmap_page(&pdev->dev, dma_unmap_addr(tx_buf, mapping),
+-			       skb_frag_size(&skb_shinfo(skb)->frags[i]),
+-			       DMA_TO_DEVICE);
++		frag = &skb_shinfo(skb)->frags[i];
++		netmem_dma_unmap_page_attrs(&pdev->dev,
++					    dma_unmap_addr(tx_buf, mapping),
++					    skb_frag_size(frag),
++					    DMA_TO_DEVICE, 0);
+ 	}
+ 
+ tx_free:
+@@ -3422,9 +3425,11 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
+ 			skb_frag_t *frag = &skb_shinfo(skb)->frags[j];
+ 
+ 			tx_buf = &txr->tx_buf_ring[ring_idx];
+-			dma_unmap_page(&pdev->dev,
+-				       dma_unmap_addr(tx_buf, mapping),
+-				       skb_frag_size(frag), DMA_TO_DEVICE);
++			netmem_dma_unmap_page_attrs(&pdev->dev,
++						    dma_unmap_addr(tx_buf,
++								   mapping),
++						    skb_frag_size(frag),
++						    DMA_TO_DEVICE, 0);
+ 		}
+ 		dev_kfree_skb(skb);
+ 	}
+@@ -16713,6 +16718,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (BNXT_SUPPORTS_QUEUE_API(bp))
+ 		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
+ 	dev->request_ops_lock = true;
++	dev->netmem_tx = true;
+ 
+ 	rc = register_netdev(dev);
+ 	if (rc)
+-- 
+2.34.1
 
 
