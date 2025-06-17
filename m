@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC39ADDFB0
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:31:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB8DADDFAD
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DB26189BA04
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C5D617C335
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5925E2BD5A7;
-	Tue, 17 Jun 2025 23:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC722957CE;
+	Tue, 17 Jun 2025 23:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvBR/YOQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iz9PRamX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291622BD022
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBB51EA7D2;
+	Tue, 17 Jun 2025 23:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750203030; cv=none; b=PPtzdXvar708zuUI+hetu8xmdYuJbhNq55xRw2KQv7baDN7i84FjT64x8E6Np5HdgzSLOwQY2OPHIcwD/dKnPoSrh3wLzHODJw/bhh8Zi2rblWlRg/FRH90LuGuW14MsBwPZbBJW0xUMbV7O2c8TStejWl13pg7fZBEFijLQ/rM=
+	t=1750203032; cv=none; b=Dr0R1YVLW3xrEQVB9xF9jNqqbSNKf3Ct6ClL4eElUJSOKHAk/dAXvQftB9SpZsm31P8ji9zhXWydpmfupefFv5xCE/DB9UmVf0nONflr/k30NfBDaFMmsV1J/2NYRUGirwHtKJSLJbdsH5JRIiiXgFaIB+73ClT08mpLaJMYooA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750203030; c=relaxed/simple;
-	bh=73H5ECTS6wNX9RBNyA+x+jh+26xq9XojuYwV90BXPe0=;
+	s=arc-20240116; t=1750203032; c=relaxed/simple;
+	bh=xzrMAcEnfRM69WTjL20uKG/AKZ06N55tGbVgilMsrMA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XWSHPe9HY4djx3Lnb24u8z+0NZq7SPy1nc6FHN0IoxTaik91OAA//EQW6JF8fac5ue25JdFw6K5IAa87Nt7CPWVQp9wcUvNBDflKb8Vb3z8NZCsTR6xZHyaINCQLdAsX6iBA50Dd3V+t0/zrSU9qON21HFpUttyPI7zWNECmHFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvBR/YOQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0595C4CEED;
-	Tue, 17 Jun 2025 23:30:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iruTjfVmrxs28MZuXQ/X6H/2GBh3xNisggJJFZyEs0I4eebX24JCEOQlhsaCTXqJl6jR8Yh5k3uWdh1zSVk0TaUfblNjChwDU1avgNzMc0GjQIvIpl+sUbOiI8Ksfh7nWfxooS2kgrDJiCuAPH/LAUPtXTdmkeaIJvIW7vPBt7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iz9PRamX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A1FFC4CEED;
+	Tue, 17 Jun 2025 23:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750203029;
-	bh=73H5ECTS6wNX9RBNyA+x+jh+26xq9XojuYwV90BXPe0=;
+	s=k20201202; t=1750203031;
+	bh=xzrMAcEnfRM69WTjL20uKG/AKZ06N55tGbVgilMsrMA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TvBR/YOQIqbgmo/b1QBDV/cnzAJ1AElSmrqFQ2J4ldv/KH0RgGZ7NlWDlOjD+T6o5
-	 leOpRHoNOvQmLayslMISy9luGHhJYSmS2XGbL5Xvt1m5O7ObFWQtl+uaDQz3KBPozV
-	 KZKYBaxurWrrWLIwc7IDmi4WYjYkMwidsKc/l3T0Zk13jjvnXgJHvM1E1QpjgHx5Am
-	 YL0aKryBJnBtIpOVVcKF0gBHEpBvlfSj5O1ODdhE3B2mdR5v5tVjJVQk3EMw7FRMOv
-	 FFglirm7FX+TEB9BVUuhHXTeZHUhbd+IwcTzJuaraVh0dNkWKbchrh/JrbySZQ0Eb4
-	 X4il6c3OwR75Q==
+	b=iz9PRamXqF0jLCaiVQiYfqxMNVE8SiLDyQnfLxW31fnwoQ8Ltd3sNziB6RhFV9Ujc
+	 x5LdL/EH2+ulCWfO1iGh9RG+Qqkf77uB7tzLs5879O6WbeVCtYY3C75RvU1I+7pFcj
+	 auRGS68zQbLu46ryaCwPOEWrVqq2trjC03xtIGF7V8VHlTzBV1cHlRw2cep3H60NHE
+	 +cL6OAEIn/KZaTskXVZIQY+rypglkKobp/kjiEcUYWH1F873LhppkndtE9PQ4TMEdF
+	 JGvCm3zfcSs4wvIq/liKVrbGbvC8QltGsOeWkRp0vN30q9OIBo/MVSAPw49bDxZkXF
+	 TFEiahTB86CAg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BCA38111DD;
-	Tue, 17 Jun 2025 23:30:59 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADAE38111DD;
+	Tue, 17 Jun 2025 23:31:00 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] tcp: remove obsolete RFC3517/RFC6675 code
+Subject: Re: [PATCH v2] selftests: nettest: Fix typo in log and error messages
+ for
+ clarity
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020305798.3735715.10987456229938172839.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:30:57 +0000
-References: <20250615001435.2390793-1-ncardwell.sw@gmail.com>
-In-Reply-To: <20250615001435.2390793-1-ncardwell.sw@gmail.com>
-To: Neal Cardwell <ncardwell.sw@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- netdev@vger.kernel.org, ncardwell@google.com
+ <175020305948.3735715.13926918048338586145.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:30:59 +0000
+References: <20250615084822.1344759-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250615084822.1344759-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, darren.kenny@oracle.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 14 Jun 2025 20:14:32 -0400 you wrote:
-> From: Neal Cardwell <ncardwell@google.com>
-> 
-> RACK-TLP loss detection has been enabled as the default loss detection
-> algorithm for Linux TCP since 2018, in:
-> 
->  commit b38a51fec1c1 ("tcp: disable RFC6675 loss detection")
+On Sun, 15 Jun 2025 01:48:12 -0700 you wrote:
+> This patch corrects several logging and error message in nettest.c:
+> - Corrects function name in log messages "setsockopt" -> "getsockopt".
+> - Closes missing parentheses in "setsockopt(IPV6_FREEBIND)".
+> - Replaces misleading error text ("Invalid port") with the correct
+>   description ("Invalid prefix length").
+> - remove Redundant wording like "status from status" and clarifies
+>   context in IPC error messages.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/3] tcp: remove obsolete and unused RFC3517/RFC6675 loss recovery code
-    https://git.kernel.org/netdev/net-next/c/1c120191dcec
-  - [net-next,v2,2/3] tcp: remove RFC3517/RFC6675 hint state: lost_skb_hint, lost_cnt_hint
-    https://git.kernel.org/netdev/net-next/c/ba4618885b23
-  - [net-next,v2,3/3] tcp: remove RFC3517/RFC6675 tcp_clear_retrans_hints_partial()
-    https://git.kernel.org/netdev/net-next/c/db16319efcc7
+  - [v2] selftests: nettest: Fix typo in log and error messages for clarity
+    https://git.kernel.org/netdev/net-next/c/416b6030e39e
 
 You are awesome, thank you!
 -- 
