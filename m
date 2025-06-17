@@ -1,261 +1,189 @@
-Return-Path: <netdev+bounces-198685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFB15ADD07D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:51:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C025ADD092
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84128189B8E8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:46:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81B7B40061A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059112DE1F0;
-	Tue, 17 Jun 2025 14:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3046120E716;
+	Tue, 17 Jun 2025 14:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/M3BM9v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEv04ID9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A2D2DE202
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059CC20E31B;
+	Tue, 17 Jun 2025 14:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750171388; cv=none; b=MM9lm3nFXX67FxpD4zYIMXfpJpEYb57RpE6mo7pIrqkJH3N0YgKv/nimk1dsI85SZA4lesjPX5zWNl9cgOEVUFTKfGJSfb6bFMvLjvei45MsF0pTe4A9K8Y7woRzbHFhJoLAUduQNjqytg651H2f+YM2do8QsSASaRT7J6w2jEg=
+	t=1750171645; cv=none; b=WwUSiIp+y93XRjY8CMuI1i42CcrGNt/GFuvOaO6WnaDUGMCGlQIKYQrNtnznSooFe+R3XJ+eQ4MiXiO5R0+K0VV6N9rD9FwhVDezNJvR64pGVq5bwHcTSizvHrt3eT8Nx0kymQobOZjVpVN7hCAS7qzl/Pk2ERyhzUZ2ZfIvUis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750171388; c=relaxed/simple;
-	bh=ZwdBg7ZhPRIbFkB/fUyjA+q6A0+cV4op6Nmd1bbK1iw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GdwyBBoUq5cpWU/WJL0Y+euJUA0qQe6wKOO6hhJXZnpf4tZC5RaKzPaxHZ9NkP5ufXooLlJX700HEtdKjNvfmql8KXq3s98+etfP92/V/+zQujYW4fC2g6Gfghdtw6BV1xlmaXaCHlp6PSPFtYEXp9SaqBjstidYBIjzU2wdDI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/M3BM9v; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ade76b8356cso1161837566b.2
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750171385; x=1750776185; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y4UOiZy0CZw6x7DX+UfykyvrQt+08D0x1aVz0zKvDCA=;
-        b=U/M3BM9vGAvtFOppn7pvE8k53NKA/ayuXFxXbqIY+YEPa0AZjxaGe2zH0nwdB5ttBn
-         bWnvt1TFNnmYFKoeYT48CbY+zA+ILzfOzkudUBOZJ3GeRfWvOu+wS0+/7b5uWhi9+v9C
-         X71yOym5X3tNfmdrz6zy4hyzm2kbzDJvJe4ys85AKRfnl623y7G0oQzWciN7E9She7po
-         O6cBVnEUyZDUKCUQSAV5SRXQGfWW2aYVX6C26a+q63F4rebgppDsp0bkznJVc5Wg+thn
-         pgnmm8/SQxV6QGidB8q5dMk27jHVwYCwmVJ5w4fIavUhPcrikTemexhTvWSR4e5AXWA+
-         DJbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750171385; x=1750776185;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y4UOiZy0CZw6x7DX+UfykyvrQt+08D0x1aVz0zKvDCA=;
-        b=dLYx5mPirHHT/0bDxPMICrOV/5IFGB5jbrgCJIrnWNJCZdSkKmWjKFX+APjVrKiW0/
-         DJHgXRcWirU2KCHc9dN3poGy1scKX8hYDgj9uyNTJRQjzo5rAfTnQOXe/WJOa3hjPA0U
-         blC7d3KHoYeRYoYZgu8szrySVWRHxgGFgmM9H96TE1MRIXv6/oWB4kPEnyHFk89yUIC4
-         okFcaPmUxpL3EMyLPysodP/10S8bk3ssdKWZph1rmXoFCTWeuuwRxI7ZAJWSKjsRSOdQ
-         9EywqBNpRwEzDqzjZnatqITu6n73Q0E1oqbZ6LpbkIWczQGJnvk261Fg1pAq12mGGy12
-         NZVg==
-X-Gm-Message-State: AOJu0YyKhC7P4hzyx4z3by336Ot0BJwwLKeXqyyXaf/vZE7+zI9OzUsE
-	IaMREI+iO4tZvnQP+xsKPZb40bLJ/suiM2/EMFCuUijE3bEfm6E3pObB
-X-Gm-Gg: ASbGnctkPD1T/Yxbm/bfVnqHQoSnFOir9WxAJYJm3JJpTUwvT4nkzobnPWwWf2RSKM1
-	2luclx8CqbvI+LmjPQ/woStlKzitHRIE2E1nKHbaQvwQoXaZMJkfJ2+vGZyw8v2NgvloyZeTcGS
-	XwLAJ7jSkeSz1XUIeYqYY1RjMjQusYlj1jqYyY5SAXixnwjlU83VpkrvNPJsmJJd8x9HfBWX52N
-	3Lr2QxDtE9PzST30rxCZuxK2X6UYPmmL3FyU/m0rv6HcA8yV0GvuBqk213ReKX4trrowHuT577V
-	LprgA6EDxwP6tm5k9FClnL64/sI2OCAlJek0PlvPT3CP+gj8ARr4j7ZFEzfZ6WNFvbjzU2p7odh
-	VONf05ZuL1HwK
-X-Google-Smtp-Source: AGHT+IFDvsY0oL43MHzoUu4Ykv3ZVWICXFhVXs+can16qIkGnoSLBZGktE6a8A/rOddwRXmNXOh+rQ==
-X-Received: by 2002:a17:906:9fce:b0:adb:43d0:aedb with SMTP id a640c23a62f3a-adfad6fe9ecmr1301248166b.61.1750171384922;
-        Tue, 17 Jun 2025 07:43:04 -0700 (PDT)
-Received: from localhost (tor-exit-56.for-privacy.net. [185.220.101.56])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-adec897bae7sm867342066b.162.2025.06.17.07.43.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 07:43:04 -0700 (PDT)
-From: Maxim Mikityanskiy <maxtram95@gmail.com>
-X-Google-Original-From: Maxim Mikityanskiy <maxim@isovalent.com>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org,
-	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH RFC net-next 17/17] geneve: Enable BIG TCP packets
-Date: Tue, 17 Jun 2025 16:40:16 +0200
-Message-ID: <20250617144017.82931-18-maxim@isovalent.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250617144017.82931-1-maxim@isovalent.com>
-References: <20250617144017.82931-1-maxim@isovalent.com>
+	s=arc-20240116; t=1750171645; c=relaxed/simple;
+	bh=EP3AmJUQi/Br2LcUuN8Nq94JPv31ghb621rcoWf0hIA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=odMdSi/0Gd6FGetuHZp9seMpmPN/qASqlQd36odYHqMAbP7/OELBMsTivnWN2GNKCg8IgfvaRhxxjxclRO+h57Pu9bHzO9HS0mZm/rC+4EOuxWVZQ5Au5dV8CSAa6+veRzb3tBlEH21PfLLdalk7uVIUUH6QZWO7Q0XzA8kasZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEv04ID9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AD72C4CEE3;
+	Tue, 17 Jun 2025 14:47:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750171644;
+	bh=EP3AmJUQi/Br2LcUuN8Nq94JPv31ghb621rcoWf0hIA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WEv04ID9wkfnkrVqihSRMZAN6avZJmFK00rfBo4S/QayA5t8uJLFYENxCDrDlXCXH
+	 l0bBy2iZ4W5Qz8EGMdO/Yig4rU/MP0VlO4BseDmgpCKJHgYyoiiBvJveJb58LIez1c
+	 j/Dt9GQf1QzHbUIuoA5uQNBxYcQCJs6iWqYbNsUNDZtyZu1JEmapwoZ/ZjldYXupNE
+	 Jh4amdsTGEe8KF/dn5D3UfrxYU8YciAdgTT9cbtrtL5YOqxe3c/wvojbhnxKyxAEwi
+	 RleXRekeIMzoTkK+o4m4J+3Wk7WP/oBOveztYFcFhp3/j7Yvv6e5nEtNFj1kPbfZuY
+	 L/dVXxNinG07w==
+Message-ID: <76a5330e-dc52-41ea-89c2-ddcde4b414bd@kernel.org>
+Date: Tue, 17 Jun 2025 16:47:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
+ xdp-rx-metadata.rst
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <borkmann@iogearbox.net>, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ sdf@fomichev.me, kernel-team@cloudflare.com, arthur@arthurfabre.com,
+ jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
+ <174897279518.1677018.5982630277641723936.stgit@firesoul>
+ <aEJWTPdaVmlIYyKC@mini-arch>
+ <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net> <87plfbcq4m.fsf@toke.dk>
+ <aEixEV-nZxb1yjyk@lore-rh-laptop> <aEj6nqH85uBe2IlW@mini-arch>
+ <aFAQJKQ5wM-htTWN@lore-desk> <aFA8BzkbzHDQgDVD@mini-arch>
+ <aFBI6msJQn4-LZsH@lore-desk> <87h60e4meo.fsf@toke.dk>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <87h60e4meo.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Daniel Borkmann <daniel@iogearbox.net>
 
-In Cilium we do support BIG TCP, but so far the latter has only been
-enabled for direct routing use-cases. A lot of users rely on Cilium
-with vxlan/geneve tunneling though. The underlying kernel infra for
-tunneling has not been supporting BIG TCP up to this point.
 
-Given we do now, bump tso_max_size for geneve netdevs up to GSO_MAX_SIZE
-to allow the admin to use BIG TCP with geneve tunnels.
+On 17/06/2025 13.50, Toke Høiland-Jørgensen wrote:
+> Lorenzo Bianconi <lorenzo@kernel.org> writes:
+> 
+>>> On 06/16, Lorenzo Bianconi wrote:
+>>>> On Jun 10, Stanislav Fomichev wrote:
+>>>>> On 06/11, Lorenzo Bianconi wrote:
+>>>>>>> Daniel Borkmann <daniel@iogearbox.net> writes:
+>>>>>>>
+>>>>>> [...]
+>>>>>>>>>
+>>>>>>>>> Why not have a new flag for bpf_redirect that transparently stores all
+>>>>>>>>> available metadata? If you care only about the redirect -> skb case.
+>>>>>>>>> Might give us more wiggle room in the future to make it work with
+>>>>>>>>> traits.
+>>>>>>>>
+>>>>>>>> Also q from my side: If I understand the proposal correctly, in order to fully
+>>>>>>>> populate an skb at some point, you have to call all the bpf_xdp_metadata_* kfuncs
+>>>>>>>> to collect the data from the driver descriptors (indirect call), and then yet
+>>>>>>>> again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the data in struct
+>>>>>>>> xdp_rx_meta again. This seems rather costly and once you add more kfuncs with
+>>>>>>>> meta data aren't you better off switching to tc(x) directly so the driver can
+>>>>>>>> do all this natively? :/
+>>>>>>>
+>>>>>>> I agree that the "one kfunc per metadata item" scales poorly. IIRC, the
+>>>>>>> hope was (back when we added the initial HW metadata support) that we
+>>>>>>> would be able to inline them to avoid the function call overhead.
+>>>>>>>
+>>>>>>> That being said, even with half a dozen function calls, that's still a
+>>>>>>> lot less overhead from going all the way to TC(x). The goal of the use
+>>>>>>> case here is to do as little work as possible on the CPU that initially
+>>>>>>> receives the packet, instead moving the network stack processing (and
+>>>>>>> skb allocation) to a different CPU with cpumap.
+>>>>>>>
+>>>>>>> So even if the *total* amount of work being done is a bit higher because
+>>>>>>> of the kfunc overhead, that can still be beneficial because it's split
+>>>>>>> between two (or more) CPUs.
+>>>>>>>
+>>>>>>> I'm sure Jesper has some concrete benchmarks for this lying around
+>>>>>>> somewhere, hopefully he can share those :)
+>>>>>>
+>>>>>> Another possible approach would be to have some utility functions (not kfuncs)
+>>>>>> used to 'store' the hw metadata in the xdp_frame that are executed in each
+>>>>>> driver codebase before performing XDP_REDIRECT. The downside of this approach
+>>>>>> is we need to parse the hw metadata twice if the eBPF program that is bounded
+>>>>>> to the NIC is consuming these info. What do you think?
+>>>>>
+>>>>> That's the option I was asking about. I'm assuming we should be able
+>>>>> to reuse existing xmo metadata callbacks for this. We should be able
+>>>>> to hide it from the drivers also hopefully.
+>>>>
+>>>> If we move the hw metadata 'store' operations to the driver codebase (running
+>>>> xmo metadata callbacks before performing XDP_REDIRECT), we will parse the hw
+>>>> metadata twice if we attach to the NIC an AF_XDP program consuming the hw
+>>>> metadata, right? One parsing is done by the AF_XDP hw metadata kfunc, and the
+>>>> second one would be performed by the native driver codebase.
+>>>
+>>> The native driver codebase will parse the hw metadata only if the
+>>> bpf_redirect set some flag, so unless I'm missing something, there
+>>> should not be double parsing. (but it's all user controlled, so doesn't
+>>> sound like a problem?)
+>>
+>> I do not have a strong opinion about it, I guess it is fine, but I am not
+>> 100% sure if it fits in Jesper's use case.
+>> @Jesper: any input on it?
+> 
+> FWIW, one of the selling points of XDP is (IMO) that it allows you to
+> basically override any processing the stack does. I think this should
+> apply to hardware metadata as well (for instance, if the HW metadata
+> indicates that a packet is TCP, and XDP performs encapsulation before
+> PASSing it, the metadata should be overridden to reflect this).
 
-BIG TCP on geneve disabled:
+I fully agree :-)
 
-  Standard MTU:
+> So if the driver populates these fields natively, I think this should
+> either happen before the XDP program is run (so it can be overridden),
+> or it should check if the XDP program already set the values and leave
+> them be if so. Both of those obviously incur overhead; not sure which
+> would be more expensive, though...
+> 
 
-    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
-    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
-    Recv   Send    Send
-    Socket Socket  Message  Elapsed
-    Size   Size    Size     Time     Throughput
-    bytes  bytes   bytes    secs.    10^6bits/sec
+Yes, if the XDP BPF-prog choose to override a field, then it's value
+should "win". As I explained in [0], this is our first main production
+use-case.  To override the RX-hash with the tunnel inner-headers.
 
-    131072  16384  16384    30.00    37391.34
+  [0] 
+https://lore.kernel.org/all/ca38f2ed-999f-4ce1-8035-8ee9247f27f2@kernel.org/
 
-  8k MTU:
+Later we will look at using the vlan tag. Today we have disabled HW
+vlan-offloading, because XDP originally didn't support accessing HW vlan
+tags.  Next hurdle for us is our usage of tail-calls, which cannot
+access the HW RX-metadata via the "get" kfuncs.  Not part of this
+patchset, but we have considered if someone calls the "store" kfunc, if
+tail-calls invoking the "get" kfunc could return the stored value
+(even-though it is not device bound).
 
-    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
-    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
-    Recv   Send    Send
-    Socket Socket  Message  Elapsed
-    Size   Size    Size     Time     Throughput
-    bytes  bytes   bytes    secs.    10^6bits/sec
+The last field is the HW timestamp, which we also don't currently use.
+Notice that this patchset stores the timestamp in skb_shared_info area.
+Storing in this area will likely cause a cache-miss. Thus, "if the
+driver populates these fields natively" and automatically then it will
+be a performance concern.
 
-    262144  32768  32768    60.00    58030.19
+For now, I just need to override the RX-hash and have this survive to
+CPUMAP (+veth).  Adding some flag that stores all three HW metadata
+natively in the driver is something that we can add later IMHO.
 
-BIG TCP on geneve enabled:
+--Jesper
 
-  Standard MTU:
-
-    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
-    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
-    Recv   Send    Send
-    Socket Socket  Message  Elapsed
-    Size   Size    Size     Time     Throughput
-    bytes  bytes   bytes    secs.    10^6bits/sec
-
-    131072  16384  16384    30.00    40891.57
-
-  8k MTU:
-
-    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
-    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
-    Recv   Send    Send
-    Socket Socket  Message  Elapsed
-    Size   Size    Size     Time     Throughput
-    bytes  bytes   bytes    secs.    10^6bits/sec
-
-    262144  32768  32768    60.00    61458.39
-
-Example receive side:
-
-  swapper       0 [008]  3682.509996: net:netif_receive_skb: dev=geneve0 skbaddr=0xffff8f3b0a781800 len=129492
-        ffffffff8cfe3aaa __netif_receive_skb_core.constprop.0+0x6ca ([kernel.kallsyms])
-        ffffffff8cfe3aaa __netif_receive_skb_core.constprop.0+0x6ca ([kernel.kallsyms])
-        ffffffff8cfe47dd __netif_receive_skb_list_core+0xed ([kernel.kallsyms])
-        ffffffff8cfe4e52 netif_receive_skb_list_internal+0x1d2 ([kernel.kallsyms])
-        ffffffff8cfe573c napi_complete_done+0x7c ([kernel.kallsyms])
-        ffffffff8d046c23 gro_cell_poll+0x83 ([kernel.kallsyms])
-        ffffffff8cfe586d __napi_poll+0x2d ([kernel.kallsyms])
-        ffffffff8cfe5f8d net_rx_action+0x20d ([kernel.kallsyms])
-        ffffffff8c35d252 handle_softirqs+0xe2 ([kernel.kallsyms])
-        ffffffff8c35d556 __irq_exit_rcu+0xd6 ([kernel.kallsyms])
-        ffffffff8c35d81e irq_exit_rcu+0xe ([kernel.kallsyms])
-        ffffffff8d2602b8 common_interrupt+0x98 ([kernel.kallsyms])
-        ffffffff8c000da7 asm_common_interrupt+0x27 ([kernel.kallsyms])
-        ffffffff8d2645c5 cpuidle_enter_state+0xd5 ([kernel.kallsyms])
-        ffffffff8cf6358e cpuidle_enter+0x2e ([kernel.kallsyms])
-        ffffffff8c3ba932 call_cpuidle+0x22 ([kernel.kallsyms])
-        ffffffff8c3bfb5e do_idle+0x1ce ([kernel.kallsyms])
-        ffffffff8c3bfd79 cpu_startup_entry+0x29 ([kernel.kallsyms])
-        ffffffff8c30a6c2 start_secondary+0x112 ([kernel.kallsyms])
-        ffffffff8c2c142d common_startup_64+0x13e ([kernel.kallsyms])
-
-Example transmit side:
-
-  swapper       0 [002]  3403.688687: net:net_dev_xmit: dev=enp10s0f0np0 skbaddr=0xffff8af31d104ae8 len=129556 rc=0
-        ffffffffa75e19c3 dev_hard_start_xmit+0x173 ([kernel.kallsyms])
-        ffffffffa75e19c3 dev_hard_start_xmit+0x173 ([kernel.kallsyms])
-        ffffffffa7653823 sch_direct_xmit+0x143 ([kernel.kallsyms])
-        ffffffffa75e2780 __dev_queue_xmit+0xc70 ([kernel.kallsyms])
-        ffffffffa76a1205 ip_finish_output2+0x265 ([kernel.kallsyms])
-        ffffffffa76a1577 __ip_finish_output+0x87 ([kernel.kallsyms])
-        ffffffffa76a165b ip_finish_output+0x2b ([kernel.kallsyms])
-        ffffffffa76a179e ip_output+0x5e ([kernel.kallsyms])
-        ffffffffa76a19d5 ip_local_out+0x35 ([kernel.kallsyms])
-        ffffffffa770d0e5 iptunnel_xmit+0x185 ([kernel.kallsyms])
-        ffffffffc179634e nf_nat_used_tuple_new.cold+0x1129 ([kernel.kallsyms])
-        ffffffffc179d3e0 geneve_xmit+0x920 ([kernel.kallsyms])
-        ffffffffa75e18af dev_hard_start_xmit+0x5f ([kernel.kallsyms])
-        ffffffffa75e1d3f __dev_queue_xmit+0x22f ([kernel.kallsyms])
-        ffffffffa76a1205 ip_finish_output2+0x265 ([kernel.kallsyms])
-        ffffffffa76a1577 __ip_finish_output+0x87 ([kernel.kallsyms])
-        ffffffffa76a165b ip_finish_output+0x2b ([kernel.kallsyms])
-        ffffffffa76a179e ip_output+0x5e ([kernel.kallsyms])
-        ffffffffa76a1de2 __ip_queue_xmit+0x1b2 ([kernel.kallsyms])
-        ffffffffa76a2135 ip_queue_xmit+0x15 ([kernel.kallsyms])
-        ffffffffa76c70a2 __tcp_transmit_skb+0x522 ([kernel.kallsyms])
-        ffffffffa76c931a tcp_write_xmit+0x65a ([kernel.kallsyms])
-        ffffffffa76ca3b9 __tcp_push_pending_frames+0x39 ([kernel.kallsyms])
-        ffffffffa76c1fb6 tcp_rcv_established+0x276 ([kernel.kallsyms])
-        ffffffffa76d3957 tcp_v4_do_rcv+0x157 ([kernel.kallsyms])
-        ffffffffa76d6053 tcp_v4_rcv+0x1243 ([kernel.kallsyms])
-        ffffffffa769b8ea ip_protocol_deliver_rcu+0x2a ([kernel.kallsyms])
-        ffffffffa769bab7 ip_local_deliver_finish+0x77 ([kernel.kallsyms])
-        ffffffffa769bb4d ip_local_deliver+0x6d ([kernel.kallsyms])
-        ffffffffa769abe7 ip_sublist_rcv_finish+0x37 ([kernel.kallsyms])
-        ffffffffa769b713 ip_sublist_rcv+0x173 ([kernel.kallsyms])
-        ffffffffa769bde2 ip_list_rcv+0x102 ([kernel.kallsyms])
-        ffffffffa75e4868 __netif_receive_skb_list_core+0x178 ([kernel.kallsyms])
-        ffffffffa75e4e52 netif_receive_skb_list_internal+0x1d2 ([kernel.kallsyms])
-        ffffffffa75e573c napi_complete_done+0x7c ([kernel.kallsyms])
-        ffffffffa7646c23 gro_cell_poll+0x83 ([kernel.kallsyms])
-        ffffffffa75e586d __napi_poll+0x2d ([kernel.kallsyms])
-        ffffffffa75e5f8d net_rx_action+0x20d ([kernel.kallsyms])
-        ffffffffa695d252 handle_softirqs+0xe2 ([kernel.kallsyms])
-        ffffffffa695d556 __irq_exit_rcu+0xd6 ([kernel.kallsyms])
-        ffffffffa695d81e irq_exit_rcu+0xe ([kernel.kallsyms])
-        ffffffffa78602b8 common_interrupt+0x98 ([kernel.kallsyms])
-        ffffffffa6600da7 asm_common_interrupt+0x27 ([kernel.kallsyms])
-        ffffffffa78645c5 cpuidle_enter_state+0xd5 ([kernel.kallsyms])
-        ffffffffa756358e cpuidle_enter+0x2e ([kernel.kallsyms])
-        ffffffffa69ba932 call_cpuidle+0x22 ([kernel.kallsyms])
-        ffffffffa69bfb5e do_idle+0x1ce ([kernel.kallsyms])
-        ffffffffa69bfd79 cpu_startup_entry+0x29 ([kernel.kallsyms])
-        ffffffffa690a6c2 start_secondary+0x112 ([kernel.kallsyms])
-        ffffffffa68c142d common_startup_64+0x13e ([kernel.kallsyms])
-
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Co-developed-by: Maxim Mikityanskiy <maxim@isovalent.com>
-Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
----
- drivers/net/geneve.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index ffc15a432689..e230ec5516b4 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -1221,6 +1221,8 @@ static void geneve_setup(struct net_device *dev)
- 	dev->max_mtu = IP_MAX_MTU - GENEVE_BASE_HLEN - dev->hard_header_len;
- 
- 	netif_keep_dst(dev);
-+	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
-+
- 	dev->priv_flags &= ~IFF_TX_SKB_SHARING;
- 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
- 	dev->lltx = true;
--- 
-2.49.0
 
 
