@@ -1,48 +1,78 @@
-Return-Path: <netdev+bounces-198742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A985ADD6CB
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:37:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B81ADD67F
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A386A1942985
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:22:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 753D2406A2E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3822C2E8DEC;
-	Tue, 17 Jun 2025 16:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5565C2ECD23;
+	Tue, 17 Jun 2025 16:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvlNmAsV"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C9OyXwPm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6CB2E8DE7;
-	Tue, 17 Jun 2025 16:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07F32EA171
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750176941; cv=none; b=n7RfJrRrkTKa+p9OGpp6lXp8YCPNtLbn3k8Qm18hu75x2H03nj2NtG0AEXlkZGYyeJbD33gFL8T8kBLjYHgcaUiIkFkVf8zJvU0GAoGx5z6Pz7N6Jh2TJcjGdVj2xLKEWYkj11J/5FAM3NvG9RwFc5vSahSxaM9IAsuqPrvJhz0=
+	t=1750177101; cv=none; b=E2NKSRDtvbexbWvFbOQ1ZP4QU0yZ89L/dc+Q/Qk/lmvk7o4k3+xhOMLw6HXANT2/fjuZ3kcnlCnWtEEhm64+a8ofQDdbDfDiFClm7/po0f8gZiBGbMHBTNrPNXt3qiS3LUW4tKTZavgVN5OFt+wKniEnqQnKkzcb1ygCugctKbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750176941; c=relaxed/simple;
-	bh=eTJA3M+r9FzFmCsCGg0wA/hZcR8eO+gyr9ekfhT2wKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aToyFcMl0oHCQNdpJ49UXy087K70WKS/Rv1MUFqnNou9nQQGYNsY0qG2z2M0sWi2TZGhzV7p5yQedyESY4K4xyfhhDkzs+Ls36hVOeNW4A4QuhwUtR9HO20fLMT8R1bLBQMrGqmvtnhlJorzQJKO80iXn2oNNsWycoMJsCD/Al4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvlNmAsV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 983D1C4CEE3;
-	Tue, 17 Jun 2025 16:15:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750176940;
-	bh=eTJA3M+r9FzFmCsCGg0wA/hZcR8eO+gyr9ekfhT2wKQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gvlNmAsV3grAMl60+4PsyLWDgf0rtuUHR5QQyg/yuPBJ1Vw/7G90JLCvGCYeQog0j
-	 J2/PgW/u4in9zvftBbOlVxxxDi5bwzd6fwg1SdWdRnWVs/ttb38shjte2GjDJ0IUoF
-	 FTPN11m2ciQaYlxjGT/zwzJKk0vAwKPapNa2XYxwF2rHDPcZsnleTRk9IHA8GgoRBL
-	 xrQki2I1A48QBALASeqk9WHUY7Z7F4zujqQZG1JHvPDbfiNqIxVGD3kNh/AE2zxqsX
-	 3FvCiIU/89lQCexKTMBfSt75wHdUV70FMHyPtSUeMgYoWA2dCXR/Nm4hF7YurnjA9/
-	 hpkZ3twuJfimg==
-Message-ID: <1221e418-a9b8-41e8-a940-4e7a25288fe0@kernel.org>
-Date: Tue, 17 Jun 2025 18:15:33 +0200
+	s=arc-20240116; t=1750177101; c=relaxed/simple;
+	bh=BDk9NerncGTKWnCMkEh4NcxNRABqig9U0sMgwlclsFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=EmTsKgKQKrxbspSGcq8XgGoaUF7DDPdLf39UPaSu/FmgoUbRH4BLsleypw8iS7rNpsawwOW6g0+Nazg8DeHoTI5w7YWFAN3N8uYwqxSWubxfTUEwjPSq4hnKzKuKywwWVd6dDFyltYfl4/ngnvNvDtbnz4B0Aerfvp4vLRTBYIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=C9OyXwPm; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3138d31e40aso5908387a91.1
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:18:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1750177098; x=1750781898; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZBTZgEr/jdYE4IOPEYCC1EEPCPcizM+4dIMiF/rIsPI=;
+        b=C9OyXwPmTycTftesLyFM4ly2lENSGSS5j8YmPrgrLWuC8bGyhY2toGQK466ReVZ+DT
+         AkOIMub1KxkcuA2koa8oh2atWq96cl9RVmirA3t30tGTXOwWwiDcy+BaCuPBr0YuX2FJ
+         5KCvygLYOF5e4wPcJUOXz3rUFdJunYF1EHnJU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750177098; x=1750781898;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZBTZgEr/jdYE4IOPEYCC1EEPCPcizM+4dIMiF/rIsPI=;
+        b=FBz4HDyJolq5dXf44HOZMhkkZpO8ywjojNUX/tSeXaqWhcL3lmwA2nGKQX5kPfcNz2
+         /fDaQshBGRJGtc90jSm4aUgFtKcE80q+hXGKyC61vjWLIk1QWwzm+Dq0c++AN6QjwiQv
+         B7N4nxAoFn6HzWqadNMlSJ494HyQsHp2hCiOUa5olT4p9Kd4Nbb/OidJX8tQmk7qH8xl
+         bsjxAIXLv1J8FMtO+gNzDMK2B0zNU3dasCd1BQEfCGoMvRE9/+E8l8BeOFUPYnGNOx9q
+         e+zpma4p985UFfNrut379MY/syd8SS6Twrsd1fZ5/sv8VAgkZe+6OKnz92eU/Ox9wXXX
+         32IA==
+X-Forwarded-Encrypted: i=1; AJvYcCWki6Bal6XSG5GFFAaD0pYXciQb7UmvWj5+4857qW/l+A1THJBxqL5UV2KB4HG0+13ljOkIPcU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhNzk9OdLhwdMWMm6otvHFusyJQzzgiKVDZBL96x3+1aJCE5v9
+	/e8OIwT91VZ9PwQI8fq8TqlI4E1ItEqcwbvTTrhAwQ7hds5YmDQcS4TDQ9dlQcLCpQ==
+X-Gm-Gg: ASbGncvwDLYooCe4uOQMhyVo6Cs7nXY9JvXLpzFHe/wHvTIkGvr7+6uf+jsA2dAXlQu
+	YQlmFJXYqmJhRzF+v7v805kEbvYKd353+GMWbxTMYBOdm4/Ag9xIw4YHkodMcG50R7c3EIADVCt
+	iBBOHbeONgt+7oe2F++9YoDG4cV08B8TTYzWLjbarB5e3/2wQ8+uq9qHaRZbN9ncEj5ilHiqzMU
+	PxcvV9aEzWdeG2/B/EjuhQNshMjImso0ruD3Sc5He7y57y+ksgMnxrKLQ12e88PwajaSa6FK4N5
+	pICklv3kaEX3QV6+3iQYdZOLao45EbShNuPVnvv+izAyM2WUb+rDzydPKEOlGpW4LHIiFd1ihEg
+	8kNz51we8nNeMfRgIItuqzQzrjA==
+X-Google-Smtp-Source: AGHT+IFOgj9cKNRmusfNs/8i1W+vPbt1qmsmD7dSd8TjsTe+5kY3DJx4i4oWbfmwAaPvyr3fdv5lRw==
+X-Received: by 2002:a17:90b:3ec5:b0:311:e8cc:4248 with SMTP id 98e67ed59e1d1-313f1e51737mr24178526a91.33.1750177097908;
+        Tue, 17 Jun 2025 09:18:17 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1b6d4c8sm10841327a91.48.2025.06.17.09.18.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jun 2025 09:18:16 -0700 (PDT)
+Message-ID: <de8cd4e8-144d-468c-9267-51d642800cdf@broadcom.com>
+Date: Tue, 17 Jun 2025 09:18:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,118 +80,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
- xdp-rx-metadata.rst
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Daniel Borkmann <borkmann@iogearbox.net>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- sdf@fomichev.me, kernel-team@cloudflare.com, arthur@arthurfabre.com,
- jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, arzeznik@cloudflare.com,
- Yan Zhai <yan@cloudflare.com>
-References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
- <174897279518.1677018.5982630277641723936.stgit@firesoul>
- <aEJWTPdaVmlIYyKC@mini-arch>
- <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net> <87plfbcq4m.fsf@toke.dk>
- <aEixEV-nZxb1yjyk@lore-rh-laptop> <aEj6nqH85uBe2IlW@mini-arch>
- <ca38f2ed-999f-4ce1-8035-8ee9247f27f2@kernel.org>
- <aFA5hxzOkxVMB_eZ@mini-arch>
+Subject: Re: [PATCH net-next v4 12/14] net: dsa: b53: fix unicast/multicast
+ flooding on BCM5325
+To: =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>,
+ jonas.gorski@gmail.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, vivien.didelot@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+References: <20250614080000.1884236-1-noltari@gmail.com>
+ <20250614080000.1884236-13-noltari@gmail.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <aFA5hxzOkxVMB_eZ@mini-arch>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250614080000.1884236-13-noltari@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-
-
-On 16/06/2025 17.34, Stanislav Fomichev wrote:
-> On 06/13, Jesper Dangaard Brouer wrote:
->>
->> On 11/06/2025 05.40, Stanislav Fomichev wrote:
->>> On 06/11, Lorenzo Bianconi wrote:
->>>>> Daniel Borkmann <daniel@iogearbox.net> writes:
->>>>>
->>>> [...]
->>>>>>>
->>>>>>> Why not have a new flag for bpf_redirect that transparently stores all
->>>>>>> available metadata? If you care only about the redirect -> skb case.
->>>>>>> Might give us more wiggle room in the future to make it work with
->>>>>>> traits.
->>>>>>
->>>>>> Also q from my side: If I understand the proposal correctly, in order to fully
->>>>>> populate an skb at some point, you have to call all the bpf_xdp_metadata_* kfuncs
->>>>>> to collect the data from the driver descriptors (indirect call), and then yet
->>>>>> again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the data in struct
->>>>>> xdp_rx_meta again. This seems rather costly and once you add more kfuncs with
->>>>>> meta data aren't you better off switching to tc(x) directly so the driver can
->>>>>> do all this natively? :/
->>>>>
->>>>> I agree that the "one kfunc per metadata item" scales poorly. IIRC, the
->>>>> hope was (back when we added the initial HW metadata support) that we
->>>>> would be able to inline them to avoid the function call overhead.
->>>>>
->>>>> That being said, even with half a dozen function calls, that's still a
->>>>> lot less overhead from going all the way to TC(x). The goal of the use
->>>>> case here is to do as little work as possible on the CPU that initially
->>>>> receives the packet, instead moving the network stack processing (and
->>>>> skb allocation) to a different CPU with cpumap.
->>>>>
->>>>> So even if the *total* amount of work being done is a bit higher because
->>>>> of the kfunc overhead, that can still be beneficial because it's split
->>>>> between two (or more) CPUs.
->>>>>
->>>>> I'm sure Jesper has some concrete benchmarks for this lying around
->>>>> somewhere, hopefully he can share those :)
->>>>
->>>> Another possible approach would be to have some utility functions (not kfuncs)
->>>> used to 'store' the hw metadata in the xdp_frame that are executed in each
->>>> driver codebase before performing XDP_REDIRECT. The downside of this approach
->>>> is we need to parse the hw metadata twice if the eBPF program that is bounded
->>>> to the NIC is consuming these info. What do you think?
->>>
->>> That's the option I was asking about. I'm assuming we should be able
->>> to reuse existing xmo metadata callbacks for this. We should be able
->>> to hide it from the drivers also hopefully.
->>
->> I'm not against this idea of transparently stores all available metadata
->> into the xdp_frame (via some flag/config), but it does not fit our
->> production use-case.  I also think that this can be added later.
->>
->> We need the ability to overwrite the RX-hash value, before redirecting
->> packet to CPUMAP (remember as cover-letter describe RX-hash needed
->> *before* the GRO engine processes the packet in CPUMAP. This is before
->> TC/BPF).
+On 6/14/25 00:59, Álvaro Fernández Rojas wrote:
+> BCM5325 doesn't implement UC_FLOOD_MASK, MC_FLOOD_MASK and IPMC_FLOOD_MASK
+> registers.
+> This has to be handled differently with other pages and registers.
 > 
-> Make sense. Can we make GRO not flush a bucket for same_flow=0 instead?
-> This will also make it work better for other regular tunneled traffic.
-> Setting hash in BPF to make GRO go fast seems too implementation specific :-(
+> Fixes: a8b659e7ff75 ("net: dsa: act as passthrough for bridge port flags")
+> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 
-I feel misunderstood here.  This was a GRO side-note to remind reviewers
-that netstack expect that RX-hash isn't zero at napi_gro_receive().
-This is not a make GRO faster, but a lets comply with netstack.
-
-The important BPF optimization is the part that you forgot to quote in
-the reply, so let me reproduce what I wrote below.  TL;DR: RX-hash
-needed to be the tunnel inner-headers else outer-headers SW hash calc
-will land everything on same veth RX-queue.
-
-On 13/06/2025 12.59, Jesper Dangaard Brouer wrote:
- >
->> Our use-case for overwriting the RX-hash value is load-balancing
->> IPSEC encapsulated tunnel traffic at XDP stage via CPUMAP redirects.
->> This is generally applicable to tunneling in that we want the store
->> the RX-hash of the tunnels inner-headers.  Our IPSEC use-case have a
->> variation that we only decrypt[1] the first 32 bytes to calc a LB
->> hash over inner-headers, and then redirect the original packet to
->> CPUMAP.  The IPSEC packets travel into a veth device, which we
->> discovered will send everything on a single RX-queue... because
->> RX-hash (calc by netstack) will obviously use the outer-headers,
->> meaning this LB doesn't scale. >>
->> I hope this makes it clear, why we need BPF-prog ability to
->> explicitly "store" the RX-hash in the xdp-frame.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
