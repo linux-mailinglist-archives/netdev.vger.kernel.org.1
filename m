@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-198755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6ED5ADDAA2
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:30:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B668DADDAA7
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 506AC167514
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:25:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9555B16A0FA
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53508285067;
-	Tue, 17 Jun 2025 17:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6211E28507A;
+	Tue, 17 Jun 2025 17:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dy30LHsC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cz0W+RDj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F8D23B600
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA6628505A
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750181092; cv=none; b=SNlW+B2w6GnSfMbZyD4xy9OfnlXF1FPC7Gl+YYA9UwspKNFq6QjfFStQh6P1jeIgpd8wTDahiROnnjB/+mM/iCHImANi1lNddpnXdynjhrbvtzCDXgNQBGAetm63fDxXV9+ssZAfSSx9ca+GPY1wtUrzH4UskjFaq6eaFzuwsPo=
+	t=1750181093; cv=none; b=LvqM5sfucTT7GI9x3SUAZJm9OVr0V+LYSU8AXsu1NJfOYjmB1frPDL4IRJ/OA58eORE7rUGybw/lldsnt2CSTcWnECAWMyRdn9nquEsnjgnJ2w+BSOhXhFzxIjWwaSmRrdNi/Suu6qFIKBHBHQZzNTmHooeNQD2S795eUSqw0Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750181092; c=relaxed/simple;
-	bh=j0QCNAuOJ5qCpjEv6bfW/2PceErQ7vqzE22Didog0yg=;
+	s=arc-20240116; t=1750181093; c=relaxed/simple;
+	bh=+FKYhC65acRjCptcBCdTfvJjihtOo3kpZIKtCE8VtpY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bJ6xbGd7S0jo7qcKOPly3ZF0tz0RBDo6u6itf4tvTob+RlVfjKgsMuh0rJq2e93QqQHCbDdeH9cgtDwHxN0494HLXqUgLHmQNAMmALMs9b8cgrinUphm5AVPs3reZD9JsDFG7kchse0Ri9X8B/aAzwGC6HRcibwFdNF68r1yV6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dy30LHsC; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=rNsN8Y0YyIqR+jnopWe4Pr847k6hn0qxRlX7Ph0Y4sagCY0sHN2tSS8jTCCSvJ/BEasbqXtAyfM68drJKg3la4GnbN4QYvEL8P1joV7+LLYdutQw6BS78nhiOYZQDy0v9ITmlAn81X44KkCTZFUq3gvEOI8bsbQf6BnKuPaXDYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cz0W+RDj; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750181091; x=1781717091;
+  t=1750181092; x=1781717092;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=j0QCNAuOJ5qCpjEv6bfW/2PceErQ7vqzE22Didog0yg=;
-  b=Dy30LHsCdsHPzXUjdgTgAlp2xW+v1kNoNaG06Ieyl8GQzLfMULKQ1EP1
-   CMkv2HWlxckJcYg1Cn0j10DBg/Z9jbiZUtrmx4AouxUpTdrt5h0DOKsuw
-   FCZbT11xXlaWCRaVgr6TwkxjsUnz71kWepuEJJLEPobG49QxPVs0Oi1Zq
-   TPQp4zWC5bv7cVNQp7OUzjEXY23UQSY9vevo+czgWLmCcRcJYug9aWfbx
-   1GsRDLBadTqM8RTHzJet6uKEN7REkIBW5z2G77U1RpNqv/rStramuZRvs
-   r00sxB8vu6C7LyOZdEvRcUix2D3fwekzvMTMN5rl5FqcCDGS7Ih1TVmAz
+  bh=+FKYhC65acRjCptcBCdTfvJjihtOo3kpZIKtCE8VtpY=;
+  b=cz0W+RDjCyWYyA/q1PX6O2aCUCnnAddMNZpAw3+Kw8hD188wUm2iCU5F
+   VzyOMLEZtntpuHqYw3jdEM2yOVOP4pGIcI1oIsqxIIkoQZBkino8pYPfq
+   /3dCKKTpKuSjWcqrNV//2zO0HLEHYVSUM5+i9z3i7ExhFlNK0zuEJMQzd
+   PmPHNums59XrooyVNrsTWxgoV7eVfuFtspsArqRl3KafnsDRb7yX9ZD3/
+   ajRrOME8paU5xf1M4NndIi1/hAUFaH4QGyKpjyzgmNNyRBwYUkYEYkAvG
+   GIQmMBlUJyR9v/aONd2ik1AgerC5wynDcFjtB5ykIAS1AGtNNTmsjkGQK
    w==;
-X-CSE-ConnectionGUID: 9vbauscDTZ6KT1/Zhq3jOg==
-X-CSE-MsgGUID: rwLAfGGIR8ORXHd1DSXdEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="69820125"
+X-CSE-ConnectionGUID: ZdGNgEneRnKRMtCipnaKPA==
+X-CSE-MsgGUID: FgzysDKoTpqaCIxMQWtg+g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="69820132"
 X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
-   d="scan'208";a="69820125"
+   d="scan'208";a="69820132"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 10:24:49 -0700
-X-CSE-ConnectionGUID: Q2UREqV1Q/C8lRzFV1168A==
-X-CSE-MsgGUID: cYGv7YoTQSqt9lX03Go3+g==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 10:24:50 -0700
+X-CSE-ConnectionGUID: rxzOTzKjR86z6LQ5bGP7KA==
+X-CSE-MsgGUID: t8ok117BQ2qE17MQjNorQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
-   d="scan'208";a="152741172"
+   d="scan'208";a="152741178"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa003.fm.intel.com with ESMTP; 17 Jun 2025 10:24:49 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,14 +65,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>,
+Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 2/3] ice: fix eswitch code memory leak in reset scenario
-Date: Tue, 17 Jun 2025 10:24:42 -0700
-Message-ID: <20250617172444.1419560-3-anthony.l.nguyen@intel.com>
+	dima.ruinskiy@intel.com,
+	richardcochran@gmail.com,
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>,
+	Gil Fine <gil.fine@linux.intel.com>
+Subject: [PATCH net 3/3] e1000e: set fixed clock frequency indication for Nahum 11 and Nahum 13
+Date: Tue, 17 Jun 2025 10:24:43 -0700
+Message-ID: <20250617172444.1419560-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
 References: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
@@ -84,73 +85,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+From: Vitaly Lifshits <vitaly.lifshits@intel.com>
 
-Add simple eswitch mode checker in attaching VF procedure and allocate
-required port representor memory structures only in switchdev mode.
-The reset flows triggers VF (if present) detach/attach procedure.
-It might involve VF port representor(s) re-creation if the device is
-configured is switchdev mode (not legacy one).
-The memory was blindly allocated in current implementation,
-regardless of the mode and not freed if in legacy mode.
+On some systems with Nahum 11 and Nahum 13 the value of the XTAL clock in
+the software STRAP is incorrect. This causes the PTP timer to run at the
+wrong rate and can lead to synchronization issues.
 
-Kmemeleak trace:
-unreferenced object (percpu) 0x7e3bce5b888458 (size 40):
-  comm "bash", pid 1784, jiffies 4295743894
-  hex dump (first 32 bytes on cpu 45):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 0):
-    pcpu_alloc_noprof+0x4c4/0x7c0
-    ice_repr_create+0x66/0x130 [ice]
-    ice_repr_create_vf+0x22/0x70 [ice]
-    ice_eswitch_attach_vf+0x1b/0xa0 [ice]
-    ice_reset_all_vfs+0x1dd/0x2f0 [ice]
-    ice_pci_err_resume+0x3b/0xb0 [ice]
-    pci_reset_function+0x8f/0x120
-    reset_store+0x56/0xa0
-    kernfs_fop_write_iter+0x120/0x1b0
-    vfs_write+0x31c/0x430
-    ksys_write+0x61/0xd0
-    do_syscall_64+0x5b/0x180
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+The STRAP value is configured by the system firmware, and a firmware
+update is not always possible. Since the XTAL clock on these systems
+always runs at 38.4MHz, the driver may ignore the STRAP and just set
+the correct value.
 
-Testing hints (ethX is PF netdev):
-- create at least one VF
-    echo 1 > /sys/class/net/ethX/device/sriov_numvfs
-- trigger the reset
-    echo 1 > /sys/class/net/ethX/device/reset
-
-Fixes: 415db8399d06 ("ice: make representor code generic")
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Fixes: cc23f4f0b6b9 ("e1000e: Add support for Meteor Lake")
+Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+Reviewed-by: Gil Fine <gil.fine@linux.intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/e1000e/netdev.c | 14 +++++++++++---
+ drivers/net/ethernet/intel/e1000e/ptp.c    |  8 +++++---
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 6aae03771746..2e4f0969035f 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -508,10 +508,14 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_repr *repr, unsigned long *id)
-  */
- int ice_eswitch_attach_vf(struct ice_pf *pf, struct ice_vf *vf)
- {
--	struct ice_repr *repr = ice_repr_create_vf(vf);
- 	struct devlink *devlink = priv_to_devlink(pf);
-+	struct ice_repr *repr;
- 	int err;
- 
-+	if (!ice_is_eswitch_mode_switchdev(pf))
-+		return 0;
-+
-+	repr = ice_repr_create_vf(vf);
- 	if (IS_ERR(repr))
- 		return PTR_ERR(repr);
- 
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index a96f4cfa6e17..7719e15813ee 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -3534,9 +3534,6 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
+ 	case e1000_pch_cnp:
+ 	case e1000_pch_tgp:
+ 	case e1000_pch_adp:
+-	case e1000_pch_mtp:
+-	case e1000_pch_lnp:
+-	case e1000_pch_ptp:
+ 	case e1000_pch_nvp:
+ 		if (er32(TSYNCRXCTL) & E1000_TSYNCRXCTL_SYSCFI) {
+ 			/* Stable 24MHz frequency */
+@@ -3552,6 +3549,17 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
+ 			adapter->cc.shift = shift;
+ 		}
+ 		break;
++	case e1000_pch_mtp:
++	case e1000_pch_lnp:
++	case e1000_pch_ptp:
++		/* System firmware can misreport this value, so set it to a
++		 * stable 38400KHz frequency.
++		 */
++		incperiod = INCPERIOD_38400KHZ;
++		incvalue = INCVALUE_38400KHZ;
++		shift = INCVALUE_SHIFT_38400KHZ;
++		adapter->cc.shift = shift;
++		break;
+ 	case e1000_82574:
+ 	case e1000_82583:
+ 		/* Stable 25MHz frequency */
+diff --git a/drivers/net/ethernet/intel/e1000e/ptp.c b/drivers/net/ethernet/intel/e1000e/ptp.c
+index 89d57dd911dc..ea3c3eb2ef20 100644
+--- a/drivers/net/ethernet/intel/e1000e/ptp.c
++++ b/drivers/net/ethernet/intel/e1000e/ptp.c
+@@ -295,15 +295,17 @@ void e1000e_ptp_init(struct e1000_adapter *adapter)
+ 	case e1000_pch_cnp:
+ 	case e1000_pch_tgp:
+ 	case e1000_pch_adp:
+-	case e1000_pch_mtp:
+-	case e1000_pch_lnp:
+-	case e1000_pch_ptp:
+ 	case e1000_pch_nvp:
+ 		if (er32(TSYNCRXCTL) & E1000_TSYNCRXCTL_SYSCFI)
+ 			adapter->ptp_clock_info.max_adj = MAX_PPB_24MHZ;
+ 		else
+ 			adapter->ptp_clock_info.max_adj = MAX_PPB_38400KHZ;
+ 		break;
++	case e1000_pch_mtp:
++	case e1000_pch_lnp:
++	case e1000_pch_ptp:
++		adapter->ptp_clock_info.max_adj = MAX_PPB_38400KHZ;
++		break;
+ 	case e1000_82574:
+ 	case e1000_82583:
+ 		adapter->ptp_clock_info.max_adj = MAX_PPB_25MHZ;
 -- 
 2.47.1
 
