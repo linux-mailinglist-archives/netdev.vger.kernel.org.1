@@ -1,118 +1,101 @@
-Return-Path: <netdev+bounces-198747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3B3FADD7D3
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:49:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11488ADD92E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:03:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09E607A721F
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:47:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61C534A0F9D
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74FC22DF80;
-	Tue, 17 Jun 2025 16:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24232DFF0E;
+	Tue, 17 Jun 2025 16:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IerOSroE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2azXULNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F3020CCFB
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07172FA65E;
+	Tue, 17 Jun 2025 16:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750178769; cv=none; b=ZKaQbD2hbzQU4Y5cXTiKx2CD31HRaoPQ+MipopJ2JtXXMHhBjGbOJT5jAIJl0uT9oS6LVStyJ/UzIVL7N0NcMfh3cbi41eHvfKWBv/LhK5vlEst0NfpooJP8eAVnU+KEDOfXkNejIxXWGSOXKJ8+eGH4awgklSuUibbgx9NtRPE=
+	t=1750179192; cv=none; b=tUp9SBaTeumoqjHsl+pEM6bquyYlFgP2W5VMEz7oJiI/lXZTddVXe2KKyyzZO342u+ovA/BBFAlD/rqtUMMJJMFC8/tV3BMc2y7u7CC2lodaLrV/I8bvePftKNM+nHQwWa1wgbCtq+KJBsUJp7Jl7X2U114v/0Kb4L4zMYFpuHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750178769; c=relaxed/simple;
-	bh=uWfAziTOz1MRs6LVuvbVnfVycgqVL9M9QBH/O0iFVkU=;
+	s=arc-20240116; t=1750179192; c=relaxed/simple;
+	bh=EDRaIpa6wJ70zFFE4EgCOpigV30lcRZVVqC50V/lpiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qk0Ehhhz5w/qBn0Msy2yG+71GTyBOpsZg5n0qEEun/6JvwJo2lP+EJ6cdnp2wJHGCFz26CUag5Zz1vlowGRuFiT2cLpzaGcBK7+LmyJsGz0L66bd4owPXPTKFmLHkKlug6Qn3NZMvOKj/AYu+dMs6684p7vSfe5z1i0Th7rbsmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IerOSroE; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 1DA7011401D2;
-	Tue, 17 Jun 2025 12:46:06 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Tue, 17 Jun 2025 12:46:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1750178766; x=1750265166; bh=C60h2rY3ZjJ1acxDqWM2lsFLfdoAgNVk1jw
-	o0JoHuec=; b=IerOSroEODtHDFT3ueVeX403N69lTG7o2P0Kz6TAhXz5xEjqM8x
-	KSC2ETsvj1sxHHAro105ydn6Vg2aH1wR/+MxCNsFL/DmgP9fqGnJWLxWsdhYglvr
-	lMU+MP9t4ULcCkHZrU84p0pw14rRov8aRndK8VSS7DUnRSuw3Dsx5PVsEItbC4LX
-	QQYmTgv53Pr546Gl65Q6cGeNaHvLc8FG5SscOhnh09DCKKnaVi5bFqO+u0DX1tX3
-	dv+UHg9DXIjx0ah37MHIDeSzYSCmXrDChu5qwJGhvNezAIji2jRBTnPCpgJ1GjoA
-	4zZQ+h8phvT6x/c/ILh/iGzbi4s6JGVvbtA==
-X-ME-Sender: <xms:zZtRaJxQByv7W1tlf0xH0Gkfwo-PoEn6SrSeQv280YUi8oGvB-0Sqw>
-    <xme:zZtRaJSWT8QU4I3W3L7C6B-VdaNCpek3k-9xYoqIZsltY_htbaP0Jc4tvINEGS8PG
-    8Xk8Pf8c4oiF0E>
-X-ME-Received: <xmr:zZtRaDVt_DYLl_BSq2Qkim18V7_9lJ1LyKZXpWV8Dq0UaRLkpt9AYxoMZPxk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdeilecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
-    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
-    hgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefg
-    leekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthho
-    peekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehgnhgruhhlthesrhgvughhrg
-    htrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgt
-    phhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhise
-    hrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgt
-    ohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughsrghhvghr
-    nheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:zZtRaLiJVxtLgSViuD4eTX0Y-cRRjXV7gwItw2FuT6A0pjD7cSeqKg>
-    <xmx:zZtRaLC35AvaWI1pnkcVOflHqy-dBputD-GmNR-HiYQeKNB-OfAuAw>
-    <xmx:zZtRaELykAT24X4bGcJSDRmyrNuFp_IfZ4Vc7qms_uHIVrE_X6sUEA>
-    <xmx:zZtRaKAD1C7k_rq3SYjdOWPFttzn4FpixEinGVXVilUrLQ9UasPUrQ>
-    <xmx:zptRaCX0JO0mPRuY1e1m076X37Ma7wCyfNo1FZSmkKYwDfm_AGV14a-x>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 17 Jun 2025 12:46:04 -0400 (EDT)
-Date: Tue, 17 Jun 2025 19:46:02 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH net-next] ipv6: Simplify link-local address generation
- for IPv6 GRE.
-Message-ID: <aFGbyuXocIo3ejFC@shredder>
-References: <a9144be9c7ec3cf09f25becae5e8fdf141fde9f6.1750075076.git.gnault@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kLrg4jrYkSN16wR/TzRH44UH9qsrObQMBWLBFLctWK9Aco8nikKrCUVEKm3ucG04AyH2jxs2yrir1LLpuNg3GTrJKpme3DIcoCEwwptW+Pl7bviomKP0WbYJmuNWRES2sJsyyqmaSy3m3PoOmsaroEE5+pHlQ2wNDuMZN0M35kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2azXULNl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=qLwy9nWk7FQ2u1fpqK0kJMRSGlwXC3AvpuB1jdFpBfY=; b=2a
+	zXULNlLbVY2lA4WHwdHGKkxblSf0mo45WNp+Gn5lID9vZ7Yf/KTBHQBvKl94A+4xcEO4X0/IkCOv1
+	0fic+BJ5OSeJ4W/fPjKVypf1HB1qvGsVbPWobIcMDIfuSi488jokKwMlWBP90yNvNeBEfMaQ8fn/m
+	DyKUfIC/3rsRfVQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uRZYQ-00GC94-PV; Tue, 17 Jun 2025 18:52:58 +0200
+Date: Tue, 17 Jun 2025 18:52:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Fabio Estevam <festevam@gmail.com>
+Cc: Frank Li <Frank.Li@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Stefan Wahren <wahrenst@gmx.net>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
+Subject: Re: [PATCH v4 1/1] dt-bindings: net: convert qca,qca7000.txt yaml
+ format
+Message-ID: <c4864e76-cec3-4794-825d-cc9ccbf92e43@lunn.ch>
+References: <20250616184820.1997098-1-Frank.Li@nxp.com>
+ <CAOMZO5DwJ9bk26TBU46_fU0ydwQL__dxUoOULuKyZYWRdbJ0YQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a9144be9c7ec3cf09f25becae5e8fdf141fde9f6.1750075076.git.gnault@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOMZO5DwJ9bk26TBU46_fU0ydwQL__dxUoOULuKyZYWRdbJ0YQ@mail.gmail.com>
 
-On Mon, Jun 16, 2025 at 01:58:29PM +0200, Guillaume Nault wrote:
-> Since commit 3e6a0243ff00 ("gre: Fix again IPv6 link-local address
-> generation."), addrconf_gre_config() has stopped handling IP6GRE
-> devices specially and just calls the regular addrconf_addr_gen()
-> function to create their link-local IPv6 addresses.
+On Tue, Jun 17, 2025 at 01:09:21PM -0300, Fabio Estevam wrote:
+> On Mon, Jun 16, 2025 at 3:48 PM Frank Li <Frank.Li@nxp.com> wrote:
 > 
-> We can thus avoid using addrconf_gre_config() for IP6GRE devices and
-> use the normal IPv6 initialisation path instead (that is, jump directly
-> to addrconf_dev_config() in addrconf_init_auto_addrs()).
+> > +examples:
+> > +  - |
+> > +    spi {
+> > +        #address-cells = <1>;
+> > +        #size-cells = <0>;
+> > +
+> > +        ethernet@0 {
+> > +            compatible = "qca,qca7000";
+> > +            reg = <0x0>;
+> > +            interrupt-parent = <&gpio3>;      /* GPIO Bank 3 */
+> > +            interrupts = <25 0x1>;            /* Index: 25, rising edge */
+> > +            spi-cpha;                         /* SPI mode: CPHA=1 */
+> > +            spi-cpol;                         /* SPI mode: CPOL=1 */
+> > +            spi-max-frequency = <8000000>;    /* freq: 8 MHz */
 > 
-> See commit 3e6a0243ff00 ("gre: Fix again IPv6 link-local address
-> generation.") for a deeper explanation on how and why GRE devices
-> started handling their IPv6 link-local address generation specially,
-> why it was a problem, and why this is not even necessary in most cases
-> (especially for GRE over IPv6).
+> All of these comments are obvious and don't bring any new information.
 > 
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> I recommend dropping all of them.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+I would also suggest replacing 0x1 with IRQ_TYPE_EDGE_RISING.
+
+  Andrew
 
