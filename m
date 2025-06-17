@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-198376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A43ADBE9C
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:40:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB80DADBE9D
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3C647A7FC4
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:38:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 909D116B983
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209E51C2334;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992D11C861F;
 	Tue, 17 Jun 2025 01:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KssTiJ/J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5rrPSne"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC77D1B4F0F
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733781C84AA
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750124398; cv=none; b=pncD2MT7Atc4/njQZQj1G6usNy0Jhi2z7ewMtr0xcuI3Zfhhnm5QcZQKvFkYssSORYXy0CKN04JyfELyBrXkaKs89vHkVsHh/Kpt1+6Cyu90K3P2VQm16+KxNnLxgIUCddG0TIuXBS+64LFoVNeNIh18X6fzqQvS6ldPGV69y94=
+	t=1750124398; cv=none; b=WES9SbR8QPpdYeVpAW0lkzfCaYxI1/WMCNNV/qMT5wbN7KGrtynX0urv7cnj2jrygbct4Uo5y0gR76w8cZM5znym6viVgisB1iEtkIiPd4+VcE6YRg0h7e6MMoXmsgKWhOHN1i6M30/MDoTYtwjrhIDkSOEjBt799CW39+C0uls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750124398; c=relaxed/simple;
-	bh=ARUnOZyEha7Qm2uenKmUWaOVPmP0bGt/Jy590t/vwg4=;
+	bh=q7yeQ3Kp5P7sVk46SH5M1+CK8aFzEjqPFW6CeFSqGl0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MeY9FOVM/0RXdSdfNJ3iSaSfBOaCiyhmfGmISB0UQQZRHwDzelV2MRp9T/dgAQlZAVwmOCfsIJxXnBN9oiXUB7ZtuGgyGPz52/0845YGEhwSMxJNmPLzfRyCpM1VFDbjeSmAO7vnsEPpDSTp56hDYyGCEKvoyTjT83a0kQaQhSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KssTiJ/J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 573FDC4CEF4;
+	 MIME-Version; b=PmzTcg5jTw55h4aR0IF69PGjvv4FxxvT2J/XAA2rA1u8wfKViBwObVnlfmYW9EpWXYyEIrB0Dd9/vyS+DT8+fzClitspMiTyFUlgxe4Qm0iWSKpSyoUUqcfNtfJgbIhZyrTDc6AMxUbQFj36baQjtFBOj49AV4zB483hmu3OWGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5rrPSne; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0334C4CEF0;
 	Tue, 17 Jun 2025 01:39:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1750124397;
-	bh=ARUnOZyEha7Qm2uenKmUWaOVPmP0bGt/Jy590t/vwg4=;
+	bh=q7yeQ3Kp5P7sVk46SH5M1+CK8aFzEjqPFW6CeFSqGl0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KssTiJ/J2KWPAu+Af5M3HGKLLAzzizYGLEuYp861v6EK6QNBKEQkZCvJtXbgZP+gn
-	 jmQysnqXA8xn95zRQPKAjkiEH9fhU9oKv2vzE1dM9gm3q9qGwdjX3480Gz/2VpVlSq
-	 bG87VVZFDLNc6DMLCNOuTlzRwyMuEjkFbvp0aX5XavzsE8rzoDgvmdvVhSUkUGbO+C
-	 rq8Czzox5DmfFHaztt7v+I9NHAXJgP47mXqbrB5U29WwT8CO2aRhP7wziY16AcVkRh
-	 3l+9Zg01xGXMHssoBO0DLN/3TB5fALufcVdeDeWnMh8mVkX4v6DmipJ8Y3ESLHZv05
-	 dhmnz6MiUThNg==
+	b=N5rrPSneWEy/blDI1uh1DXhRVFmBjDgvNYoaywNBAdJLYWz3UmUzxPfn90Bdmk0wW
+	 VyvC4t78cvUU8cvNR0s1tz46ZElMl7eHoCv6l+QhtYTTuva9U28LkmLkvxLJ8HQ9TK
+	 BOo5L9IRwxMOxcttBVMRAk8aq3rrUDFzDg6oLNJJc1WtcBfzDMYMZhqUtxORSTSDke
+	 09Xy9Q+c/5JkFYzVZ+wa+bAV8WTn99WUzbCV4IrSn7qXmp3T1hAV+VNjjDqgodgfAC
+	 1vPzimKuGaH5itEv0lBSKrTX8RZDLDkO6XSqu+t4amGeoppxtPSUywsPH34xci6+Ck
+	 z/BlgpKMhfSNg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/3] eth: sfc: sienna: migrate to new RXFH callbacks
-Date: Mon, 16 Jun 2025 18:39:53 -0700
-Message-ID: <20250617013954.427411-3-kuba@kernel.org>
+Subject: [PATCH net-next 3/3] eth: sfc: migrate to new RXFH callbacks
+Date: Mon, 16 Jun 2025 18:39:54 -0700
+Message-ID: <20250617013954.427411-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250617013954.427411-1-kuba@kernel.org>
 References: <20250617013954.427411-1-kuba@kernel.org>
@@ -66,63 +66,79 @@ Content-Transfer-Encoding: 8bit
 
 Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
 add dedicated callbacks for getting and setting rxfh fields").
+
 This driver's RXFH config is read only / fixed so the conversion
-is purely factoring out the handling into a helper.
+is purely factoring out the handling into a helper. One thing of
+note that this is one of the two drivers which pays attention to
+rss_context.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../net/ethernet/sfc/siena/ethtool_common.h   |  2 +
- drivers/net/ethernet/sfc/siena/ethtool.c      |  1 +
- .../net/ethernet/sfc/siena/ethtool_common.c   | 77 ++++++++++---------
- 3 files changed, 43 insertions(+), 37 deletions(-)
+ drivers/net/ethernet/sfc/ethtool_common.h |   2 +
+ drivers/net/ethernet/sfc/ethtool.c        |   1 +
+ drivers/net/ethernet/sfc/ethtool_common.c | 104 ++++++++++++----------
+ 3 files changed, 58 insertions(+), 49 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/siena/ethtool_common.h b/drivers/net/ethernet/sfc/siena/ethtool_common.h
-index d674bab0f65b..278d69e920d9 100644
---- a/drivers/net/ethernet/sfc/siena/ethtool_common.h
-+++ b/drivers/net/ethernet/sfc/siena/ethtool_common.h
-@@ -46,6 +46,8 @@ int efx_siena_ethtool_get_rxfh(struct net_device *net_dev,
- int efx_siena_ethtool_set_rxfh(struct net_device *net_dev,
- 			       struct ethtool_rxfh_param *rxfh,
- 			       struct netlink_ext_ack *extack);
-+int efx_siena_ethtool_get_rxfh_fields(struct net_device *net_dev,
-+				      struct ethtool_rxfh_fields *info);
- int efx_siena_ethtool_reset(struct net_device *net_dev, u32 *flags);
- int efx_siena_ethtool_get_module_eeprom(struct net_device *net_dev,
- 					struct ethtool_eeprom *ee,
-diff --git a/drivers/net/ethernet/sfc/siena/ethtool.c b/drivers/net/ethernet/sfc/siena/ethtool.c
-index c5ad84db9613..994909789bfe 100644
---- a/drivers/net/ethernet/sfc/siena/ethtool.c
-+++ b/drivers/net/ethernet/sfc/siena/ethtool.c
-@@ -264,6 +264,7 @@ const struct ethtool_ops efx_siena_ethtool_ops = {
- 	.get_rxfh_key_size	= efx_siena_ethtool_get_rxfh_key_size,
- 	.get_rxfh		= efx_siena_ethtool_get_rxfh,
- 	.set_rxfh		= efx_siena_ethtool_set_rxfh,
-+	.get_rxfh_fields	= efx_siena_ethtool_get_rxfh_fields,
- 	.get_ts_info		= efx_ethtool_get_ts_info,
- 	.get_module_info	= efx_siena_ethtool_get_module_info,
- 	.get_module_eeprom	= efx_siena_ethtool_get_module_eeprom,
-diff --git a/drivers/net/ethernet/sfc/siena/ethtool_common.c b/drivers/net/ethernet/sfc/siena/ethtool_common.c
-index eeee676fdca7..47cd16a113cf 100644
---- a/drivers/net/ethernet/sfc/siena/ethtool_common.c
-+++ b/drivers/net/ethernet/sfc/siena/ethtool_common.c
-@@ -801,6 +801,46 @@ static int efx_ethtool_get_class_rule(struct efx_nic *efx,
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.h b/drivers/net/ethernet/sfc/ethtool_common.h
+index fc52e891637d..24db4fccbe78 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.h
++++ b/drivers/net/ethernet/sfc/ethtool_common.h
+@@ -49,6 +49,8 @@ int efx_ethtool_get_rxfh(struct net_device *net_dev,
+ int efx_ethtool_set_rxfh(struct net_device *net_dev,
+ 			 struct ethtool_rxfh_param *rxfh,
+ 			 struct netlink_ext_ack *extack);
++int efx_ethtool_get_rxfh_fields(struct net_device *net_dev,
++				struct ethtool_rxfh_fields *info);
+ int efx_ethtool_create_rxfh_context(struct net_device *net_dev,
+ 				    struct ethtool_rxfh_context *ctx,
+ 				    const struct ethtool_rxfh_param *rxfh,
+diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
+index afbedca63b29..23c6a7df78d0 100644
+--- a/drivers/net/ethernet/sfc/ethtool.c
++++ b/drivers/net/ethernet/sfc/ethtool.c
+@@ -268,6 +268,7 @@ const struct ethtool_ops efx_ethtool_ops = {
+ 	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
+ 	.get_rxfh		= efx_ethtool_get_rxfh,
+ 	.set_rxfh		= efx_ethtool_set_rxfh,
++	.get_rxfh_fields	= efx_ethtool_get_rxfh_fields,
+ 	.create_rxfh_context	= efx_ethtool_create_rxfh_context,
+ 	.modify_rxfh_context	= efx_ethtool_modify_rxfh_context,
+ 	.remove_rxfh_context	= efx_ethtool_remove_rxfh_context,
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
+index 2d734496733f..9e06317f80b6 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.c
++++ b/drivers/net/ethernet/sfc/ethtool_common.c
+@@ -800,6 +800,61 @@ static int efx_ethtool_get_class_rule(struct efx_nic *efx,
  	return rc;
  }
  
-+int efx_siena_ethtool_get_rxfh_fields(struct net_device *net_dev,
-+				      struct ethtool_rxfh_fields *info)
++int efx_ethtool_get_rxfh_fields(struct net_device *net_dev,
++				struct ethtool_rxfh_fields *info)
 +{
-+	struct efx_nic *efx = netdev_priv(net_dev);
++	struct efx_nic *efx = efx_netdev_priv(net_dev);
++	struct efx_rss_context_priv *ctx;
 +	__u64 data;
++	s32 rc = 0;
++
++	ctx = &efx->rss_context.priv;
++
++	mutex_lock(&net_dev->ethtool->rss_lock);
++	if (info->rss_context) {
++		ctx = efx_find_rss_context_entry(efx, info->rss_context);
++		if (!ctx) {
++			rc = -ENOENT;
++			goto out_unlock;
++		}
++	}
 +
 +	data = 0;
-+	if (!efx_rss_active(&efx->rss_context)) /* No RSS */
-+		goto out_setdata;
++	if (!efx_rss_active(ctx)) /* No RSS */
++		goto out_setdata_unlock;
 +
 +	switch (info->flow_type) {
 +	case UDP_V4_FLOW:
 +	case UDP_V6_FLOW:
-+		if (efx->rss_context.rx_hash_udp_4tuple)
++		if (ctx->rx_hash_udp_4tuple)
 +			data = (RXH_L4_B_0_1 | RXH_L4_B_2_3 |
 +				RXH_IP_SRC | RXH_IP_DST);
 +		else
@@ -144,29 +160,41 @@ index eeee676fdca7..47cd16a113cf 100644
 +	default:
 +		break;
 +	}
-+out_setdata:
++out_setdata_unlock:
 +	info->data = data;
-+	return 0;
++out_unlock:
++	mutex_unlock(&net_dev->ethtool->rss_lock);
++	return rc;
 +}
 +
- int efx_siena_ethtool_get_rxnfc(struct net_device *net_dev,
- 				struct ethtool_rxnfc *info, u32 *rule_locs)
+ int efx_ethtool_get_rxnfc(struct net_device *net_dev,
+ 			  struct ethtool_rxnfc *info, u32 *rule_locs)
  {
-@@ -813,43 +853,6 @@ int efx_siena_ethtool_get_rxnfc(struct net_device *net_dev,
+@@ -812,55 +867,6 @@ int efx_ethtool_get_rxnfc(struct net_device *net_dev,
  		info->data = efx->n_rx_channels;
  		return 0;
  
 -	case ETHTOOL_GRXFH: {
+-		struct efx_rss_context_priv *ctx = &efx->rss_context.priv;
 -		__u64 data;
 -
--		data = 0;
--		if (!efx_rss_active(&efx->rss_context)) /* No RSS */
--			goto out_setdata;
+-		mutex_lock(&net_dev->ethtool->rss_lock);
+-		if (info->flow_type & FLOW_RSS && info->rss_context) {
+-			ctx = efx_find_rss_context_entry(efx, info->rss_context);
+-			if (!ctx) {
+-				rc = -ENOENT;
+-				goto out_unlock;
+-			}
+-		}
 -
--		switch (info->flow_type) {
+-		data = 0;
+-		if (!efx_rss_active(ctx)) /* No RSS */
+-			goto out_setdata_unlock;
+-
+-		switch (info->flow_type & ~FLOW_RSS) {
 -		case UDP_V4_FLOW:
 -		case UDP_V6_FLOW:
--			if (efx->rss_context.rx_hash_udp_4tuple)
+-			if (ctx->rx_hash_udp_4tuple)
 -				data = (RXH_L4_B_0_1 | RXH_L4_B_2_3 |
 -					RXH_IP_SRC | RXH_IP_DST);
 -			else
@@ -188,8 +216,10 @@ index eeee676fdca7..47cd16a113cf 100644
 -		default:
 -			break;
 -		}
--out_setdata:
+-out_setdata_unlock:
 -		info->data = data;
+-out_unlock:
+-		mutex_unlock(&net_dev->ethtool->rss_lock);
 -		return rc;
 -	}
 -
