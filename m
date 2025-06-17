@@ -1,52 +1,50 @@
-Return-Path: <netdev+bounces-198576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA91CADCBD8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B5D2ADCCDE
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:19:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 290C61896A05
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 12:48:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E56A319404E1
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C16C2C032B;
-	Tue, 17 Jun 2025 12:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455D22E7172;
+	Tue, 17 Jun 2025 13:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOhoEtyF"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C082290D96;
-	Tue, 17 Jun 2025 12:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209512E7175
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 13:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750164517; cv=none; b=sZBLct74HUZa5rOJMDSe+5x3wt3BAu71sRp+ahKDpBFgzADNLI9+kz5c610ANNwwWZP9SgUMFlu9OAa7qWKPvZoBcHS2C4CDesic7Cj/GEJP2rVFELdbLvEHSvX7JqYWYRxEgKG1+0988zhfo6/cnYCKfjVlT01nPpVPtz/VMao=
+	t=1750165812; cv=none; b=O2QeF+Usux6QYCvr2hFNWLEBBdIPhCNqaMNhythLxtt1SzAB78CRDKE0qTbovpWMvLBycWGC+XA4viVQzFlm4mUOX2dlv154PYdGSvDfwXPt7fkckTFOZRp3cYtm5Zt5D9Ekkfi6AP2okzcd8fO1P4q+0o5fACDvDnG7p71UXiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750164517; c=relaxed/simple;
-	bh=yhH9A3DVdAxdZrmhqK+CWc/OlW8R+tyhfF13mkbvm9Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SLHBf0Xs01MgMFWRIOV5nX0qIANkgHUc6pzmQPIESQ6MqI74TO0IegIm+7jmfimoTCF7CPndy6suT132aIQGg6Fo5CoqPNTZ8VcoBisbXXrUkdUzzHKETlis5wnGJ2Yd3CFxFFduzZYQ5PdBtmAS8tZix5RKs2ZQIdxnyN7S+io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bM65J3DNmz2Cfbd;
-	Tue, 17 Jun 2025 20:44:36 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 74E4C18001B;
-	Tue, 17 Jun 2025 20:48:30 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Jun
- 2025 20:48:29 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] tcp: Remove inet_hashinfo2_free_mod()
-Date: Tue, 17 Jun 2025 21:06:13 +0800
-Message-ID: <20250617130613.498659-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750165812; c=relaxed/simple;
+	bh=rzhBktWYLUVD2Je0U8gOnQ/C308rWqSm2eNzRCVbkvA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IpRXx3NDhAeY3oR0KSB1MEultdzrkMhhf9XDRQjl66ZBNUVT7Nx07iFFxB00B4h5WITrgcjNoM7y4gbdsRIXerWdVlqcdW+96C9YHYkQuwdb97HcwQRubyZW7tIcsE6Fy7VPuOg1xf77WoRimN3L6cdq8X8IfIvBW3qSbYcR7vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pOhoEtyF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9129AC4CEE3;
+	Tue, 17 Jun 2025 13:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750165811;
+	bh=rzhBktWYLUVD2Je0U8gOnQ/C308rWqSm2eNzRCVbkvA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pOhoEtyFi0pZoAdU9uKxT4dctaSg40+vf6nxRn0te+JTwc0HITmB+6v1jdKHTxQWl
+	 ODDnX7JXgYD/Z/0p22gn7pXg9SO5v8Iuxl9U6TPUrlTjeOF4w1mAa5mJbyUS4ansFN
+	 uR3QOzj7/VptUJdN/5c8vUwQusrNZcJnHwnozv1wEXrTra9hFvQa+tTfH90n6f9mNU
+	 Gpw6VctYaBhOU9MqO0kXVCTclA32GDp8R/YciSfANJt9vEWEJeMfeNJaOP1y1rQtZh
+	 B14ytXf1N/dA+6X1HsJZokpFr6jY7vChTOCPPra+nLuLmO3RP8FHf69ToEHDigY/dQ
+	 Zh/y8fMfW3rnw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F42380DBF0;
+	Tue, 17 Jun 2025 13:10:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,35 +52,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Subject: Re: [PATCH net-next 0/7][pull request] igc: harmonize queue priority
+ and
+ add preemptible queue support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175016584025.3120559.2555735972352303574.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 13:10:40 +0000
+References: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ faizal.abdul.rahim@linux.intel.com, faizal.abdul.rahim@intel.com,
+ chwee.lin.choong@intel.com, vladimir.oltean@nxp.com, horms@kernel.org,
+ vitaly.lifshits@intel.com, dima.ruinskiy@intel.com
 
-DCCP was removed, inet_hashinfo2_free_mod() is unused now.
+Hello:
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- include/net/inet_hashtables.h | 6 ------
- 1 file changed, 6 deletions(-)
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-index 4564b5d348b1..ae09e91398a5 100644
---- a/include/net/inet_hashtables.h
-+++ b/include/net/inet_hashtables.h
-@@ -202,12 +202,6 @@ static inline spinlock_t *inet_ehash_lockp(
- 
- int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo);
- 
--static inline void inet_hashinfo2_free_mod(struct inet_hashinfo *h)
--{
--	kfree(h->lhash2);
--	h->lhash2 = NULL;
--}
--
- static inline void inet_ehash_locks_free(struct inet_hashinfo *hashinfo)
- {
- 	kvfree(hashinfo->ehash_locks);
+On Wed, 11 Jun 2025 11:03:02 -0700 you wrote:
+> Faizal Rahim says:
+> 
+> MAC Merge support for frame preemption was previously added for igc:
+> https://lore.kernel.org/netdev/20250418163822.3519810-1-anthony.l.nguyen@intel.com/
+> 
+> This series builds on that work and adds support for:
+> - Harmonizing taprio and mqprio queue priority behavior, based on past
+>   discussions and suggestions:
+>   https://lore.kernel.org/all/20250214102206.25dqgut5tbak2rkz@skbuf/
+> - Enabling preemptible queue support for both taprio and mqprio, with
+>   priority harmonization as a prerequisite.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/7] igc: move TXDCTL and RXDCTL related macros
+    https://git.kernel.org/netdev/net-next/c/fe4d9e8394ff
+  - [net-next,2/7] igc: add DCTL prefix to related macros
+    https://git.kernel.org/netdev/net-next/c/4cdb4ef8a9ff
+  - [net-next,3/7] igc: refactor TXDCTL macros to use FIELD_PREP and GEN_MASK
+    https://git.kernel.org/netdev/net-next/c/e35ba6d3c6c3
+  - [net-next,4/7] igc: assign highest TX queue number as highest priority in mqprio
+    https://git.kernel.org/netdev/net-next/c/650a2fe79538
+  - [net-next,5/7] igc: add private flag to reverse TX queue priority in TSN mode
+    https://git.kernel.org/netdev/net-next/c/e395f6a690d8
+  - [net-next,6/7] igc: add preemptible queue support in taprio
+    https://git.kernel.org/netdev/net-next/c/17643482e9ff
+  - [net-next,7/7] igc: add preemptible queue support in mqprio
+    https://git.kernel.org/netdev/net-next/c/a7d45bcfde3c
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
