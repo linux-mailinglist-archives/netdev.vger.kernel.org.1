@@ -1,251 +1,211 @@
-Return-Path: <netdev+bounces-198706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35670ADD180
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:31:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02724ADD191
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64B541896AAE
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:31:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F7047A931A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8892E9737;
-	Tue, 17 Jun 2025 15:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95152E9753;
+	Tue, 17 Jun 2025 15:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VmkrqHCs"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="I2WGwzfF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11023111.outbound.protection.outlook.com [40.93.201.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691EB1E8332;
-	Tue, 17 Jun 2025 15:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750174293; cv=none; b=kXjzo3J2zZeJEI4TDe5V2TgX72Zr6LF7HKvEBW2WmPFTLZeBZSuU9WVdDks7Lb3YQNeM7pr1jkY9m/TgoQDMiyCIfVg343jaYQfJbLDM/5yA5BbaLcuJ1roMkdFlER0ci6fhP+2YJjaAcrSXJMrEX1hoOtjyrbAdJACCyybObUU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750174293; c=relaxed/simple;
-	bh=rqsoueWdM1nAxX6i3TdFvPfMOP8bCIS3N3NGt3+7CO4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PXEhFyUeOc/LRr7vkZutx+Xg7nGNYtTCmpBBjBcS4alwLx3K3T2iPP/lBg4fWTBt91aeDEsNkjdNmMx9PZkxjThQWHPeVTjIM1W0n0FSkRMo0ON9J9OqxwA3XN4Ma9AJwUfrnOKgPMeC16PeSKFBDdM32GGrhYMiqAlYjCxg4iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VmkrqHCs; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-236192f8770so41404835ad.0;
-        Tue, 17 Jun 2025 08:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750174291; x=1750779091; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vONKiPDQFvOV04sWTQ5N/d0Nqz6jFzaBcRhqCM37kEI=;
-        b=VmkrqHCsYn2fcTK7aYzdHSBxb8fbolgMIe41ZDcwF/tJQ3gl+8mA5l7B8W3K7mrwwL
-         u9gFVCbUbIIph2dR+SpVxej76tYrptfjvXGNRtcEk4Jl5aRwge0r0QicA8Ia6sBzGULE
-         HPq0O5cEGeT7EiIVO000CH6yU8Z2TNQBTDsIDPWpV0JYvOIyFueRVwoEVw4+guDCOu97
-         HLC4W1pHJ2RH+nLrEkt4IJUr/CtBkNBAuGbuH6P7sRr7EsYmApm9f3x0iJydU2OvCHli
-         Y4XCT45nSoQRvqHxQvz8UootX0tt4iRs7NFC04/Phn/VyBjtaZP75xOTyuGAbN8t8nyO
-         kGsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750174291; x=1750779091;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vONKiPDQFvOV04sWTQ5N/d0Nqz6jFzaBcRhqCM37kEI=;
-        b=RBINeGF2SPSvirpS1Tzab4k1ENcw96h/HhqtXq5ywL8kS19N8tVYGXANOxzw1Po0Ft
-         2gWxnMc5K+b7AGfO5lP6w8EpaPt0EJ4ay3dsmcDRy4Zttu2GKE4oEaZrj8WG+0zGOWVD
-         fqVEtpStiTHB4IEgkDABVT0FpsKN2wBXP0Zf0mGm/uNid67sjAEA04OgJvPZhHffh3mX
-         snkNaG9NRj+iWqbvtyVxnQgkE/kD6tBSZe3GtBoKHTQPXSYKfy+JXZ99aVWZJ/vUFV5H
-         7yQIlT1wp3k/PaK69ik5VlY7UGequiDWuEEqpBdx4b+6JFED9nF079Ap48gBHCxsF5jN
-         iAsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWDVz1AQ+QXoHfLlmT79cKfiCyAq9nZ/pYtKkE45m0oTuMX1f3DfCZmkvfId8DHXSDe2FA=@vger.kernel.org, AJvYcCX8MuQC9l/fQQ5TIz4zzkxIOurCFK+5tfnxjm31n5CObYHc4ogYYj6pwfBWIA8hBxpKckUgeb6X@vger.kernel.org, AJvYcCX9G6okYyvV7slndFpgVimyvFXbHMqIJnewEWV5WmKfZUyNnckgt1VduopkVHP/UggLYRfn8jMEO37SUPBL@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhJ/Rc2EcnJsU7BxJhoIshD7n56PZeWz6FEkjEhCDjlPw8xaTW
-	QPTQciBWB6dVsrPcdhzXO6gBM+/3Me9sJCA2WUuQCy+kTwerOLJuUs9B
-X-Gm-Gg: ASbGncubfmHeLfLr3tOFaFh2ry158f2khWQnUZFiVLjR1oQ8RfSx1dqfzqgUsEm92rj
-	XnzfOtlLvW4Mx0/G1dIUhR75eysiJQn94plzCmrzR3sjPuvJqj6Qn+ROdrunmhl0nUfqqJZG/9/
-	4CM+XN11gbfjLvn+eKfWNFVgs+IEPYkG9AKsWRaNi80yH3XjWReaYEsrTB+Rp6jygi+449xlWwo
-	Gdw1jmnlw91hDzxwS4FtGi0QDhFqKsKixaIYGul+yXA2vYvAnbuN3QF8tay37pBZkCJtjBSR2uj
-	sOj9x4KZUogf2MKLL3Ow0UDd+Q2DrGjhNnlmIWDbupqWhet0gJjbPtv2cjjAee6A9NVHP7pUYbp
-	S+UzGSZV5
-X-Google-Smtp-Source: AGHT+IGYJo30uXrZf1g+2eeuGKvcXBXQtOlctiDYvFKA0bX2SqJAcMGk1oSS7fnVY2Di05z0qFETSw==
-X-Received: by 2002:a17:902:d48d:b0:236:71a5:4416 with SMTP id d9443c01a7336-23691eabe15mr41899625ad.20.1750174290520;
-        Tue, 17 Jun 2025 08:31:30 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de7839dsm81188535ad.127.2025.06.17.08.31.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 08:31:30 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	fupan.lfp@antgroup.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	leonardi@redhat.com,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next v3 3/3] test/vsock: Add ioctl SIOCINQ tests
-Date: Tue, 17 Jun 2025 23:31:20 +0800
-Message-Id: <20250617153120.1348774-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <fnznqsbg56rfk7szjcprpo4mxy7e4patmj2u5yxbtj33dlj34w@7t5xylskewa5>
-References: <fnznqsbg56rfk7szjcprpo4mxy7e4patmj2u5yxbtj33dlj34w@7t5xylskewa5>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D5A2ECD0A;
+	Tue, 17 Jun 2025 15:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.111
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750174325; cv=fail; b=m3SuRAAoWA7fvQNYaBvzKGwH/pXYB9QiOey74BSdf3wwVAmi2phJV77Cp3KcQcqHld+WEZ+yfP4BqqM4CbXsSZC0abllpByutgKJsXnMVFerQUNAfIl11Gk7jYckm/gSFURM5ME0YmtmMxc9htgti8gwboVn6tdeDbwGHbwD2c0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750174325; c=relaxed/simple;
+	bh=XYvS83oYAG3seyXg3uilXJ0GfimPNMbR52Zn3D/qdrQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PZWBy9e2IWlwsH+jLhWILyXhESTg16rYGt7whkj0+qNHxP+KOO0MQCao7p2odXXgIQ+gdHVVFjObpZCJSI1VoKGBlm7lcrkDxbSh2sg0/ar8/lc4t0OTciqglxmh96/Kx1jLZA9QzbWFSrmSjPN6QSBJrymHA/X9QY/POVx1Bp4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=I2WGwzfF; arc=fail smtp.client-ip=40.93.201.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Hpk1lfz1YzrhtxMYrbafIM0hPHUc4tRKvTPLfSUjs6W8Seai4bS+26pOfDH9MZHyWuQYbAvO2BS10HsfFvFjjsTnKKsxPYZMCHllXC7bbKlCPcRdq89a8N4t5sRAvZ5Agny+XItE6nrYhhzT3xQiD0RIuLdK2Tgb7i4hzUyXmiY3n+S8hJyefFXn0F8v9RIf+c+z0RMgexZDVqsk0Pp0lY28eBinq1l4NkybS49ENFxk8B5z3eVO8bZxqEyXH4Z6uz8s8ii92i5SSduDBepMLMzqos+zeddLXfiEMy9tXHn8/n24PsBkkb3ZD8EfywOenO1z2Y4g2J8TO2U+jUmO6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XYvS83oYAG3seyXg3uilXJ0GfimPNMbR52Zn3D/qdrQ=;
+ b=EFtzZyU4SICqV3GZQy1Nzjk3ov7AVU041cAivPzD0chGPXxdkeyyThvGVUAdC+jDcXZ0RhNuEd/1HSdkHm/SeE4wyYcRVB+F43Zu3VHkbS3ki6n1yie4DlRHx8H81y/SpShVtQeDWwDzqSfaheh6s37rXGzQij5GE0HZHJCLBzKlzCl1JYmF7vbhw8HlD4tpQJbas66YI28SHhp/Wl7hQ9oerp8gGaFE86xxOKWT/XeiPBHb84CGbHvpKTMS6GX+YPBrLiZ5gWcm6OsV2pNi2UoxkDvz1yuWQ08lOxjamQlSQyl3M4mpOjHAv1fEBb7z33ESzZvlG6E7691B4i5UXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XYvS83oYAG3seyXg3uilXJ0GfimPNMbR52Zn3D/qdrQ=;
+ b=I2WGwzfFzqQEh8MHH5SfV7KMrPK01iZbDyt0xPc4XVFOdH+jRCrWOjy0x7lAF7tUphadz7uZXwAH699cKyq+A6MfODLO6TL8ynaNmsm9SleHvL4SCrc2Am2Di7/J/bQx+Z6TXaCVewv3j0EOY+F98Gtr5HFbmE4I7Yj9YMupwZw=
+Received: from SN6PR2101MB0943.namprd21.prod.outlook.com (2603:10b6:805:f::12)
+ by SA6PR21MB4412.namprd21.prod.outlook.com (2603:10b6:806:422::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.6; Tue, 17 Jun
+ 2025 15:31:56 +0000
+Received: from SN6PR2101MB0943.namprd21.prod.outlook.com
+ ([fe80::c112:335:8240:6ecf]) by SN6PR2101MB0943.namprd21.prod.outlook.com
+ ([fe80::c112:335:8240:6ecf%6]) with mapi id 15.20.8880.004; Tue, 17 Jun 2025
+ 15:31:50 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>, Dexuan Cui
+	<decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, Souradeep Chakrabarti
+	<schakrabarti@linux.microsoft.com>, Erni Sri Satya Vennela
+	<ernis@linux.microsoft.com>, Long Li <longli@microsoft.com>, Dipayaan Roy
+	<dipayanroy@linux.microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Paul Rosswurm
+	<paulros@microsoft.com>, Shradha Gupta <shradhagupta@microsoft.com>
+Subject: RE: [PATCH net-next] net: mana: Set tx_packets to post gso processing
+ packet count
+Thread-Topic: [PATCH net-next] net: mana: Set tx_packets to post gso
+ processing packet count
+Thread-Index: AQHb33uylD82leaymEmBsNhs3CnzjrQHenEw
+Date: Tue, 17 Jun 2025 15:31:50 +0000
+Message-ID:
+ <SN6PR2101MB0943F7B2345EFD61E3EBDF41CA73A@SN6PR2101MB0943.namprd21.prod.outlook.com>
+References:
+ <1750160021-24589-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To:
+ <1750160021-24589-1-git-send-email-shradhagupta@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1e5d2ae4-d312-4282-94c9-fae123fa986f;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-06-17T15:30:06Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR2101MB0943:EE_|SA6PR21MB4412:EE_
+x-ms-office365-filtering-correlation-id: 47ea12ec-9a2b-4353-79dd-08ddadb4148c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|921020|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?aovlH1pHXbphknPUgxLl7DhdU5gxUqPQf190QhJL47AcZJCOT7TYdhjC5RgN?=
+ =?us-ascii?Q?bHFfbZ8tlz972mJHlIcE4Lo5ifIkVL8EkmWlEZVSiwt1EXq0kUQGkf/Az1f/?=
+ =?us-ascii?Q?69bwCsEPu6blOD1b4Wx9AY2GBxUlst1ixhuxkHeKQHxKBngrL+1+BbqpiVsM?=
+ =?us-ascii?Q?hpAaxdtzEg31z8Si5/2cNxCPmr0jeWTtLV8c+12o043aoovP5ZPSDkmwKGEd?=
+ =?us-ascii?Q?LYkTztmcApKuJTTAy9TzS18tirJUIhlYqC3GWVGocfWeLmv0AungkoUG6yMj?=
+ =?us-ascii?Q?RbGrlVLKWdvKWH1G4hxZT9la7uO4eIxZ6vdR9IzfX3eZZiHrTcFJpVVImAXV?=
+ =?us-ascii?Q?xZPZNAVLrKUM42MEMAYKJUFIlmEQP8gRWWPs+XbZgq0kRm9mrCA2Hqs0QAyx?=
+ =?us-ascii?Q?/wsfVOpy9IzCw69wsy+cX698LqvJRvVH33huzgY416FvoCD2QbBD7Q1jE8uW?=
+ =?us-ascii?Q?WpfblY1RzEVrbtSX3QppJwXnrmObd7aqeBG+cf7gSatZPL+vayLFrP2XmqNd?=
+ =?us-ascii?Q?VqIE1s00oXqLKJvVG6VIeYvzu99DaHWDFS+Lp9vMQnnLw/wOdwo5qqmjr2NB?=
+ =?us-ascii?Q?B3XSI3i1f/SbPr2NNY1PU9x7MCn6NL04oUJFbg2izEunA3+M9wPVVOoTMW52?=
+ =?us-ascii?Q?cj1Xe0KyrRrz6DzxRur3h0zQjjrlVTqg415n1zZKVJqg5IPTO8IyXjbzaR6Q?=
+ =?us-ascii?Q?xoxNjzQgiBiSH5Gy/HBqxesDB+E3pDB/c1Ko7NA+SiutkmkIbeYSrRxXRX1U?=
+ =?us-ascii?Q?mWl1ToVR0WLelbjtHk0QBSsZWso5EPmhf2oHmTx3Nmn64/d8cC3Xot6k1P+B?=
+ =?us-ascii?Q?7l4o3lyMOJf05mwxfxTKLNUYlE+l3k0cT281xAEdjlwd2iv8S7PLH5mH9FcG?=
+ =?us-ascii?Q?SY2yh+SKaJwliOj3aOucqRtQBzmq96UrIo/UjkUvZgdTqHKskJPBsQTFrqoP?=
+ =?us-ascii?Q?YmEXVYkBTVHI9Dq/DRzjZJvTxeHRlDOv9HbzYuiGbUvGTc4XkwUsl9EMWDJS?=
+ =?us-ascii?Q?26vXYWFwm9u3m1OND+ZFHyDn0rsic39nqxhe+jaf/lH6iJM/MBK5J+hic5wo?=
+ =?us-ascii?Q?jDEHWwFM3mwTsExTApAC6iJ9CdveTok6EvkceZJw1aDHgyvVFbgGEu4qBCmg?=
+ =?us-ascii?Q?NDLTT3PHWK+RrLvnnqOZ0kCIeSA5xvjvYdh3ku8pa0gM3xxxEgIyK6ztLt4O?=
+ =?us-ascii?Q?fLpUIanSF3zuFlryMMudHFuta1cQmZQUlcta28o6yuyVTo3tBpi0HddzGcAJ?=
+ =?us-ascii?Q?cDmc7w1mYHkUVttiBH9zKW+jLrN5zlBNTwEbaLJA3AM6kflQEeEMUtvKVh0A?=
+ =?us-ascii?Q?fHbM63eK/DuZoIakkC1tvKQgMtSj0QieUEFeXtRn/uVWGosbjR1zF5p4f5om?=
+ =?us-ascii?Q?lPYrTk5TduoKS1ZLsvVBHqH7JRQgm+aDLFDC2a/GBOqJSW6mWwTsMAJ6Du1t?=
+ =?us-ascii?Q?sBfkeTsQM8HZ5b28a5QCE+mzkuJUknfxAN7gSx6/penkl6WZ+FtYgLF1tP0F?=
+ =?us-ascii?Q?CSdIFtkUFsRzn20=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR2101MB0943.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(921020)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?VcnRSET8nCrbNYFbc1BPfB4HwEJ2pPUZFesSUwfteh3VBOYFGmMtqY6EmGlW?=
+ =?us-ascii?Q?jIaRi3oJDH5YYsQhZQmkAya0Y/+EEzORGyM3EM8EX5cjaR8XX9mU8h7Zj0dr?=
+ =?us-ascii?Q?hD/CbG+K/nhq0mBPDZ/WHWFvY26ZcEuoqy6FLB6wzUbSbdyBbXqWNT8lI2bU?=
+ =?us-ascii?Q?6x7gB1D2t7TUHNu6AkhfWJir3MkLoU020OgOULGut63aF4Lti9OwTmIrRrfv?=
+ =?us-ascii?Q?L1Jv6VPezAVRuyMmtNT9Nb/vsG+2UOiyzF+7LvV8pNbnaacHxUmPyX8LkfZO?=
+ =?us-ascii?Q?9cDV5Vgn9uC0il26e2av/NdkAlH2Ih7UFbFvhQOUSymqBXYV2d4QIwKwNzxO?=
+ =?us-ascii?Q?HsgWeecW/u+pxln1Ul+exoua+5UiujBfgC5Vsi50FshnKNuEorr4ln38Y4sN?=
+ =?us-ascii?Q?NKvbIAqvwcrqdg8w5HPpEABFNRan8Df2qjR+F+TQowE2sh/+TgDWuNH2gy3v?=
+ =?us-ascii?Q?qrXIms9OAHUb9occukVy38jKwizqtTZgNOjZrz3wg9QEqL9jdZVc2wGq/nPl?=
+ =?us-ascii?Q?yhwzwECvPdoKyZUGCcS59NMQPIKmiYWZERKmvKRRjsliHgh4ZbIHi6Q+Zuc7?=
+ =?us-ascii?Q?plUzSCCEdA3+GHfQJ3bAku1IkTHstzFWOM1MaKLP2KlMIS/ypJo3HesWSRRf?=
+ =?us-ascii?Q?o9k7wMJRiI1RjOheSfadbv2cHcy6ockAaNG1qWh9IxVk8pxu7DSl0BHTelqL?=
+ =?us-ascii?Q?Q7Y8PnDJT1+MQHxzhPz8D247kl7zWgYv3NdncdodgN8LGyii3DfcA5Zu8Kns?=
+ =?us-ascii?Q?KPR4SPHsI/oRhkCGTVrvKs5tJ10FGMP6jS9fix0iNC1hvMvTT5VGM8oEVbTO?=
+ =?us-ascii?Q?JD+LPVI3+zkUwJCy+s7AwVqnX4NeZceYP1RDiG2WTM1AfkZnEadOLYARm6gW?=
+ =?us-ascii?Q?uE5SqrJN0Rk5/womDki9HsY38c6ruhmTA4BNP6/ZeFeBmOQPRIqy85bSGauW?=
+ =?us-ascii?Q?i+n+qiuRQAYfYP6JDAUcfCHiD5y+IoOMmbWJyZG4TqrhbHGTBnanwNL/YF7T?=
+ =?us-ascii?Q?gar/5n2HSahsoLdC5PiTPCPXigjF9aiWwPvPoSpUpQJ4C5/p3TUCxqW2VYN+?=
+ =?us-ascii?Q?ioKFWt44CFAYAVWcgsy5NKdTW5w2r1ojvQ/AZHixUKzfAkcy0mfZyR1Scpw4?=
+ =?us-ascii?Q?/AA68WC7NiCE9a/QOY8Rers90I8RcNMBFKi6qfyiCLoQ+ayjlbkEMR8gMcRW?=
+ =?us-ascii?Q?OWWAMWDDG1KFVHlpLOjiEczN/flTFDTIOLXUwFOgVyQZAGBcZvM2cGLcvAr2?=
+ =?us-ascii?Q?kEKT4sAuEk+6CN+HeTVc49AlSd01f/lHU17wCsBZ9X/daoNhkpKCmvWExDOx?=
+ =?us-ascii?Q?twcHbEiQn76p7VLhCXFitcaBFfvnsR8GKQ3cME6Rc7EgTy2BPaSl7EbyeAno?=
+ =?us-ascii?Q?lUf/jO/h8CQBNMFt9UkscD8TjYyTL4mxGuaYBTKyXy6ppjROgej74lU542oc?=
+ =?us-ascii?Q?ODxMYnT36PmoOVv4qZWfmD5SD/2hwfHDdlmoB82qzLzgGVxowgIhwROh6+Ya?=
+ =?us-ascii?Q?cn3HEu4iupkw6Fo8hdhplGZEDKEuNjMdYkkuNqlsZHbnHFrtg4xiLO/E/RwE?=
+ =?us-ascii?Q?Gx5D1kESIy/62u+c9+wP4pChoto4Ji1fHvmgRDMm?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR2101MB0943.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47ea12ec-9a2b-4353-79dd-08ddadb4148c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2025 15:31:50.6857
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: koTI6+N1i+luIHW5LVXdS0fESPKA9uDhYHAoyCDN/bvg9htwGw1kBO1qO3ntQTcSBHG7Wt1saXB+MjwwXoO18w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR21MB4412
 
-> On Tue, Jun 17, 2025 at 12:53:46PM +0800, Xuewei Niu wrote:
-> >Add SIOCINQ ioctl tests for both SOCK_STREAM and SOCK_SEQPACKET.
-> >
-> >The client waits for the server to send data, and checks if the SIOCINQ
-> >ioctl value matches the data size. After consuming the data, the client
-> >checks if the SIOCINQ value is 0.
-> >
-> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-> >---
-> > tools/testing/vsock/vsock_test.c | 82 ++++++++++++++++++++++++++++++++
-> > 1 file changed, 82 insertions(+)
-> >
-> >diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> >index f669baaa0dca..66bb9fde7eca 100644
-> >--- a/tools/testing/vsock/vsock_test.c
-> >+++ b/tools/testing/vsock/vsock_test.c
-> >@@ -1305,6 +1305,58 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-> > 	close(fd);
-> > }
-> >
-> >+static void test_unread_bytes_server(const struct test_opts *opts, int type)
-> >+{
-> >+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-> >+	int client_fd;
-> >+
-> >+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
-> >+	if (client_fd < 0) {
-> >+		perror("accept");
-> >+		exit(EXIT_FAILURE);
-> >+	}
-> >+
-> >+	for (int i = 0; i < sizeof(buf); i++)
-> >+		buf[i] = rand() & 0xFF;
-> >+
-> >+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
-> >+	control_writeln("SENT");
-> >+	control_expectln("RECEIVED");
-> >+
-> >+	close(client_fd);
-> >+}
-> >+
-> >+static void test_unread_bytes_client(const struct test_opts *opts, int type)
-> >+{
-> >+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-> >+	int ret, fd;
-> >+	int sock_bytes_unread;
-> >+
-> >+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
-> >+	if (fd < 0) {
-> >+		perror("connect");
-> >+		exit(EXIT_FAILURE);
-> >+	}
-> >+
-> >+	control_expectln("SENT");
-> >+	/* The data has arrived but has not been read. The expected is
-> >+	 * MSG_BUF_IOCTL_LEN.
-> >+	 */
-> >+	ret = ioctl_int(fd, TIOCINQ, &sock_bytes_unread, MSG_BUF_IOCTL_LEN);
-> >+	if (ret) {
-> 
-> Since we are returning a value !=0 only if EOPNOTSUPP, I think we can 
-> just return a bool when the ioctl is supported or not, like for 
-> vsock_wait_sent().
 
-Will do.
 
-> >+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
-> >+		goto out;
-> >+	}
-> >+
-> >+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-> >+	// All date has been consumed, so the expected is 0.
-> 
-> s/date/data
-> 
-> Please follow the style of the file (/* */ for comments)
+> -----Original Message-----
+> From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Sent: Tuesday, June 17, 2025 7:34 AM
+> To: Dexuan Cui <decui@microsoft.com>; Wei Liu <wei.liu@kernel.org>;
+> Haiyang Zhang <haiyangz@microsoft.com>; KY Srinivasan <kys@microsoft.com>=
+;
+> Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski
+> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Konstantin Taranov
+> <kotaranov@microsoft.com>; Souradeep Chakrabarti
+> <schakrabarti@linux.microsoft.com>; Erni Sri Satya Vennela
+> <ernis@linux.microsoft.com>; Long Li <longli@microsoft.com>; Dipayaan Roy
+> <dipayanroy@linux.microsoft.com>; Shiraz Saleem
+> <shirazsaleem@microsoft.com>
+> Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>;
+> netdev@vger.kernel.org; linux-hyperv@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>; Shradha
+> Gupta <shradhagupta@microsoft.com>
+> Subject: [PATCH net-next] net: mana: Set tx_packets to post gso processin=
+g
+> packet count
+>=20
+> Allow tx_packets and tx_bytes counter in the driver to represent
+> the packets transmitted post GSO processing.
+>=20
+> Currently they are populated as bigger pre-GSO packets and bytes
+>=20
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
 
-Will do.
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-> >+	ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
-> >+	control_writeln("RECEIVED");
-> 
-> Why we need this control barrier here?
-
-Nice catch! It is not necessary. Will remote it.
-
-Thanks,
-Xuewei
-
-> >+
-> >+out:
-> >+	close(fd);
-> >+}
-> >+
-> > static void test_stream_unsent_bytes_client(const struct test_opts *opts)
-> > {
-> > 	test_unsent_bytes_client(opts, SOCK_STREAM);
-> >@@ -1325,6 +1377,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
-> > 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
-> > }
-> >
-> >+static void test_stream_unread_bytes_client(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_client(opts, SOCK_STREAM);
-> >+}
-> >+
-> >+static void test_stream_unread_bytes_server(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_server(opts, SOCK_STREAM);
-> >+}
-> >+
-> >+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
-> >+}
-> >+
-> >+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
-> >+}
-> >+
-> > #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> > /* This define is the same as in 'include/linux/virtio_vsock.h':
-> >  * it is used to decide when to send credit update message during
-> >@@ -2051,6 +2123,16 @@ static struct test_case test_cases[] = {
-> > 		.run_client = test_stream_nolinger_client,
-> > 		.run_server = test_stream_nolinger_server,
-> > 	},
-> >+	{
-> >+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
-> >+		.run_client = test_stream_unread_bytes_client,
-> >+		.run_server = test_stream_unread_bytes_server,
-> >+	},
-> >+	{
-> >+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
-> >+		.run_client = test_seqpacket_unread_bytes_client,
-> >+		.run_server = test_seqpacket_unread_bytes_server,
-> >+	},
-> > 	{},
-> > };
-> >
-> >-- 
-> >2.34.1
-> >
 
