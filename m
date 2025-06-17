@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-198767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF57ADDB33
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:20:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A58C5ADDB42
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719CF4A19B4
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:20:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED6E7ABA4A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218152EBBBA;
-	Tue, 17 Jun 2025 18:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D8823D283;
+	Tue, 17 Jun 2025 18:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIirQAwP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAbd4Gsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8EA2EBB81
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 18:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0247F2EBBB8;
+	Tue, 17 Jun 2025 18:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750184406; cv=none; b=kw9UmpyCJi3ehBn+ELU7vVQDdE1z9aVsNxG6KVoCd5g49yZwAaOhdrYaRlRPLFfEdKETVptVC6sMhBWx6aYgGtB5EfvFpdPHdOo2pdS6wUcTZfewU8M6Q+IIdAeR7caFXZSmXmm5IZKIjfJZvKVIw/g2KBcvl5AbDz+HXvbODUc=
+	t=1750184554; cv=none; b=CkLwMcFgyY71AzOXcFg1j73u0G2pjvvh6mrPKXhG4CTJFuc6LpdQzzJ+CrnPH0lum7tKJpw7IL14CPfP9obIu63/kwVLf/ppYCWNsaXSbgzTWvVoBO60GU4eepeIl0pETtn4ZmqbCE+LV3eWsSTCKjr5A9mDVaGK1VTel6IhX1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750184406; c=relaxed/simple;
-	bh=zsuj48oEhMSpMjl4wfFrZCJr3/lQqZQDS/tkFwHyCH8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=PhzBdr/7uXcWSemTfcNe0A6BNg/xmujG1qxLwHZguAj2FgvfaC+qg3PmGA9/SX/PC8skN/MvWpevbqE3b61FSXC/tPyY2Rq/YoudQolZi/3V7LEI71kn9ZEgTJwzXouJx5Yd9PlNeBlK+eRX/m/vxcpZnEev3lZ1C+uY2DJpSCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HIirQAwP; arc=none smtp.client-ip=209.85.208.54
+	s=arc-20240116; t=1750184554; c=relaxed/simple;
+	bh=rRATALdhRcn5DZSQIwnUYb/BCKnqu3gR4V6mBlBkB/w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nSnMXdvi/QctW6cvmTgwj0h0txJP4fYFP5RDNLt6g8BQ6JqHdk1a5CZCxP9C0MLRhhHIVXV/JU4HzF6ETaSvFzfI965dtwm0uTPHzzUS5APV17hBCxviaF7C5gtAsUtNo1RCSh8o9jlOdW+uU8DpKu9KP9IsxnZwjmAsY3KK6tQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JAbd4Gsi; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-607c2b96b29so11911822a12.1
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 11:20:04 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b2c4e46a89fso4843651a12.2;
+        Tue, 17 Jun 2025 11:22:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750184403; x=1750789203; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OBnkQFYBIf8SAaIRtdd4YtxmuKvDJZMAlsjfLB0rFWU=;
-        b=HIirQAwP/bkHxSY36Yt6c+vc3a6bfdgAiqn4S9jxPiPMs+s9p8PSeN7vbBFNwRp+za
-         6vYxhxsl93vzP1FYGOJdQcItbl71jwSnjo0a4hcn3Q6CjW2IlMxO9Nr8d9jrcJFR99yb
-         CIJL2/HWzePP9pmCb9qKppLZBoRDrU7xBtcsIN8bLPb+MhSJHmP0rjTv98gVG8Q5mx6n
-         WpoaLMjIgQ6EFKtvPTMLgmf1YDJKWqMQ+npFwNHg1VzUEUaeSzSLggcjCZS5k8gWgFX8
-         mLspAlRJwj3/X0H+1CVNEadAB80T4Ua9OUusNl9W/bUEep1yXTM2UnzEBCABcG45cJ+y
-         Pyyw==
+        d=gmail.com; s=20230601; t=1750184551; x=1750789351; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6+6yUoMuq5S3gjE0GRLY4LeWHot5xsTS/R1ypehyGnM=;
+        b=JAbd4GsiSBQ9JWgO17KJsjYqwEccruT0sr3YZt3De4JJXayv587TF6ebwzloy+mpd/
+         Fl2ZHzxtNc3Q2HKJ0ARKl8tNcR40PrkmC9PuA7FoP+CaIHELoR+hbeTdK/BLzes5vZhX
+         lgtzKfatwykOH8lszdPtlU7lM6gllgukCvMm6TJWds4eDB+AYFfSeQ4bR8Z/CrfeEmHh
+         lbQiJP2RiT8sKN1DhsiO7h1h8SqUXb+YP2pYJDnheyolTOOfGRqLUkL15FS1Rfzxv4rH
+         NyuF30gAekJ4F9XT4ppQYGnIX9ug0WBSxKCclKM83ClXLI7NXgkZKUOCd4Tg7+qROUOS
+         ohiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750184403; x=1750789203;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OBnkQFYBIf8SAaIRtdd4YtxmuKvDJZMAlsjfLB0rFWU=;
-        b=j9eFEpiT3/3IoHcPv1hfOu2eufCJDgFEmQ9dpSAlUuaAK/VZ0BGlptY7UPMDFwrhdI
-         A+cp7rbiA5eSFZYLXWJXfiGSEDPExKXMMVw83//9DvdP3NBYL+wGoNkNCzj7h1/I+hNk
-         wUQ596HwARyWz/gDI0tzuwv/9dYt+pFvQ6uTjKUeano8KMfFZ6a5UIODOGgCv/ZTra6M
-         EOhRiNyvp4NvO42KQ8Xkeqr1Yi2wMBk83Izs0HNFa27qS18evXqjDiHXQ2TGSKVazpbv
-         TD89VEBo6CW7K/hsaVdDZ/ImehLjrUIqy5GJhS5Tjqir6vAvg4dSOqRwgZXRXiN1FIzl
-         7DRg==
-X-Gm-Message-State: AOJu0Yw1eCvBWzIMie3wtweRk9I7L2c+IHltT/58xPmOjwJTH7L8jVBz
-	g0ehZaECEFu2gnsbszZiqbs9UV+4eZoUmspbwFApRMxC7EgfWmp+D1X6
-X-Gm-Gg: ASbGnctsIiukU1TgnMzo+3yDWCwPaqnsG3BUIDHF/7e6/ygjMxbv2h/RaaXo2cnBcRC
-	TH8/QxvO9oCiARDPI0n2HS/jNr9ruRBdB06bMMxREont4nxKkakhG1UNZjkbLkRw40qGhZL+vNG
-	0RqxovFpvbgxL5CCzZK/TSR2rc2z7yL7Wdte8u5tkdNeow5ukqV25MCyRuWSpoD011WSaoWlQdJ
-	TnLLKIOQFkv/bKObpmeYcnQTrbB9vkJJLqPUS9R8cC2cZe/yncxm3b8D6iILKxvZBvTMmcyKmFE
-	ORj3Gnb8Q1/WgbshqUMVTJzw6JQ/DTWaHg6vE9XfBHnAKShU4LX4dU7+zauBsURY09VPhvITYWr
-	Dup71MOlMMuftP3kW2Z5L7Q0d03cuMqra3ZQJm/ZrLOudWsuaACTpQcho6wp/+5BS1rHs2t5Rp8
-	OqTqwtgx+WeAprnSPmE0fYWE1oEQ==
-X-Google-Smtp-Source: AGHT+IEP+yuogx3Q+T0BwTrGDJ9P+6NXwkPNl+kxar3wRiUWiysQTi/Yla21meeMV2m99p3fexGw/w==
-X-Received: by 2002:a17:907:1c0d:b0:ad8:af1f:938d with SMTP id a640c23a62f3a-adfad54b0f7mr1049649066b.37.1750184402428;
-        Tue, 17 Jun 2025 11:20:02 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f28:f900:8891:cf5b:7d2c:9892? (p200300ea8f28f9008891cf5b7d2c9892.dip0.t-ipconnect.de. [2003:ea:8f28:f900:8891:cf5b:7d2c:9892])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-adec892b0f3sm897052566b.126.2025.06.17.11.20.01
+        d=1e100.net; s=20230601; t=1750184551; x=1750789351;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6+6yUoMuq5S3gjE0GRLY4LeWHot5xsTS/R1ypehyGnM=;
+        b=ZZeKhIw3crjxGKQ+qmmc1tMwZcVDIpwPZyDs6iWSuOonCBptDvv505w57rSXA817XW
+         uvr3zoB99k/HPfZhKXblP9BLr0RVpMngdYY2zya1QwZdhVLTsH0m9Utb31+tXksx6NiH
+         Sb3bRbKhHmGMnco/j4F5ruCZrm7U0c3HTgWx3BERZhPUMKevMKX0YSoSxleFaFadSwt/
+         UFTPljeaja3GloZtC66A8gywNrx1gF1jsKoua88oznbxHyL3Sk9LYhonsc/d/4U35VGi
+         N7QcqE3VcOJCVFH1ZFm6mMZpBEYWO7o9g/84PSXGU1GwP3k0KpJtkwHxtlJXTvHTU8sR
+         2ykA==
+X-Forwarded-Encrypted: i=1; AJvYcCXp2BSfxcWUZ1ef6z1jit9K2H9by5cBUu3n5rSum2Pmlif25qEgIp9nc45U214ta3mp7sOj9Z4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHAp1bi/jJTIppOQqbeLB+8iD8AhX+novrkgx8djo3B111JPZY
+	a8BPgia98KON4IQ7ltgRH6Na2fqiwBqiYPhuIox7L0/M77ToyzAeEHc6peWxNN7y
+X-Gm-Gg: ASbGncvqhIvJqzcQCjMBSL67ufj4M6ae4UtRyjX7LhWJoDJTYNuT21G5RqWiVlLMqMb
+	L8Og9mTaf987T1rhZPnPolnRxfO+jbSTXFiiZLDMjsgeM3Ee7X/VWtxesoaWJcAo92WZfRtwMmq
+	hm3OEtwB78RzM1YnkiJGmseETQOFVIv50Fd22BjPaCiYwQ4pCwe3nFaqHv5aXx2zh1wjPrRhHHO
+	k6KYbgdxHLJkBctsAyUCZXdTnEmO7D9IHGOFp7fEzUPMZmW0H7Gn2Mfkcow8K1ByEceiUGSuiQl
+	YVzw4TR/H6JSi8HU/3dLYxYAhqChPZyupFV/GFai+UoKjJCaz6MrgpKL4WG+pUXjkWMpBNr1U0N
+	cMm5U5F1geXMLeA==
+X-Google-Smtp-Source: AGHT+IFgrqJZVVHc6CZw1rbCUX7xXW7mFmdlAjjsynjIlFhhsOoP42hQdJ3kJ8yMNpcaIKSWoIt3mA==
+X-Received: by 2002:a05:6a21:9010:b0:215:d9fc:382e with SMTP id adf61e73a8af0-21fbd4dd9fdmr21722887637.13.1750184551147;
+        Tue, 17 Jun 2025 11:22:31 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe168d7ecsm9247635a12.64.2025.06.17.11.22.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 11:20:02 -0700 (PDT)
-Message-ID: <476bb33b-5584-40f0-826a-7294980f2895@gmail.com>
-Date: Tue, 17 Jun 2025 20:20:17 +0200
+        Tue, 17 Jun 2025 11:22:30 -0700 (PDT)
+Message-ID: <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com>
+Date: Tue, 17 Jun 2025 11:22:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,87 +83,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH RESUBMIT net] net: ftgmac100: select FIXED_PHY
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Simon Horman <horms@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- rentao.bupt@gmail.com
+Subject: Re: Tulip 21142 panic on physical link disconnect
+To: Greg Chandler <chandleg@wizardsworks.org>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
+ <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+ <385f2469f504dd293775d3c39affa979@wizardsworks.org>
+ <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
+ <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
 Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ WlfRzlpjIPmdjgoicA==
+In-Reply-To: <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Depending on e.g. DT configuration this driver uses a fixed link.
-So we shouldn't rely on the user to enable FIXED_PHY, select it in
-Kconfig instead. We may end up with a non-functional driver otherwise.
+(please no top posting)
 
-Fixes: 38561ded50d0 ("net: ftgmac100: support fixed link")
-Cc: stable@vger.kernel.org
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/faraday/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+On 6/17/25 11:19, Greg Chandler wrote:
+> 
+> Hmm...  I'm wondering if that means it's an alpha-only issue then, which 
+> would make this a much larger headache than it already is.
+> Also thank you for checking, I appreciate you taking the time.
+> 
+> I assume the those interfaces actually work right? (simple ping over 
+> that interface would be enough)  I posted in a subsequent message that 
+> mine do not appear to at all.
 
-diff --git a/drivers/net/ethernet/faraday/Kconfig b/drivers/net/ethernet/faraday/Kconfig
-index c699bd6bc..474073c7f 100644
---- a/drivers/net/ethernet/faraday/Kconfig
-+++ b/drivers/net/ethernet/faraday/Kconfig
-@@ -31,6 +31,7 @@ config FTGMAC100
- 	depends on ARM || COMPILE_TEST
- 	depends on !64BIT || BROKEN
- 	select PHYLIB
-+	select FIXED_PHY
- 	select MDIO_ASPEED if MACH_ASPEED_G6
- 	select CRC32
- 	help
+Oh yeah, they work just fine:
+
+udhcpc: broadcasting discover
+[   19.197697] net eth0: Setting full-duplex based on MII#1 link partner 
+capability of cde1
+
+# ping -c 1 192.168.254.123
+PING 192.168.254.123 (192.168.254.123): 56 data bytes
+64 bytes from 192.168.254.123: seq=0 ttl=64 time=2.902 ms
+
+--- 192.168.254.123 ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 2.902/2.902/2.902 ms
+
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.03  sec  39.6 MBytes  33.1 Mbits/sec    0            sender
+[  5]   0.00-10.07  sec  39.8 MBytes  33.1 Mbits/sec 
+receiver
+
+
+> 
+> My next step is to build that driver as a module, and see if it changes 
+> anything (I'm doubting it will).
+> Then after that go dig up a different adapter, and see if it's the 
+> network stack or the driver.
+> 
+> I've been hard pressed over the last week to get a lot of diagnosing time.
+
+Let me know if I can run experiments, I can load any kernel version on 
+this Cobalt Qube2 meaning that bisections are possible.
+
+Good luck!
 -- 
-2.49.0
-
-
-
+Florian
 
