@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-198512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0FCADC82A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 12:26:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3E2AADC883
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 12:38:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29650188D4B0
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:27:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA7363B8B0D
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAA3291C13;
-	Tue, 17 Jun 2025 10:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993E828FA85;
+	Tue, 17 Jun 2025 10:38:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8487262B
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 10:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E003FBB3
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 10:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750155996; cv=none; b=CnkaHlxWPcW2M1E3hNpZ362EJGbX+D01+2KZre752Dnd8NKZJcVQzflDPPUouq6wKUu8Iba+Tg1HtcBMoxvNZgdDoaoU5Y7JZnREMxuwt/NAd+au3SuHE4f8QB68nf6niADE1lyH0OhqMH2SXhhkRi7LUKRLoS65UqNyT1ma6QM=
+	t=1750156693; cv=none; b=sGDl+tjdrFUfihK4ZY0L+KfD21NFbGcTa8+LppqbXYCwAV9Oxf5xcOKwGd+b9hnqi9FACoPqhMvwNLxjzf3XlVsph/tSfmpsv5TD1XUVbf+/5pqIRY7uu5XkVWrUbM0HHBJsqB4Jic6sj+UOUbEnEOloDCYsiH5tLNXxRTq1GKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750155996; c=relaxed/simple;
-	bh=oCij1Ggt853Fuf+idNfxBlGZT3/JEnF0MYY7UjGItss=;
+	s=arc-20240116; t=1750156693; c=relaxed/simple;
+	bh=yQnryOtjNwCN/ixxc0X/UQBjV3J6kSMGI39bcmLIqzI=;
 	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=JsyvnO8B+XmVm6Sdi5kv5olnCLHiYJBh+0EZuyfsqSzGc13KWD7f2dE4Nn3KuemrUL67TLtM8GYz38t984InO0MKqowa72vtZFTilwXxX48//6mzryVuCjMDUUPPoMz7p3lW+kYvB+XmcR82njj2dZAnpYwx/QqA71/Rjaco+Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=15.184.224.54
+	 Message-Id:References:To; b=cJrvCmRIgNN8cLBfdXKvDQIp0OfXOhLqEmlN/xWK2TsRcyQSTVZ2niIYdxPijD6dsK7zPIk64kE8w7iupOlPOF5HDNIk2N0j39+EC2cuXY8FNaMSEz9C34gNHznq8ZKkjjE7TuMTkMuEzA33vZVcSl+ECoQ9NGovqDvZWLqrYjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.204.34.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz3t1750155960tbe971f0d
-X-QQ-Originating-IP: Lm8akfMBp6+jS6GzwQCy74lykbjwlMggpSuHC0AGiLA=
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpgz3t1750156661t455eefbd
+X-QQ-Originating-IP: lAML69alHGh7O9fzutSxrVrfZCPJZMv1X4K/HdbsN8U=
 Received: from smtpclient.apple ( [111.202.70.102])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 17 Jun 2025 18:25:57 +0800 (CST)
+	id ; Tue, 17 Jun 2025 18:37:39 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9586956857377675218
+X-BIZMAIL-ID: 11492525034527067265
 Content-Type: text/plain;
 	charset=utf-8
 Precedence: bulk
@@ -45,15 +45,14 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [net-next v6 1/4] net: bonding: add broadcast_neighbor option for
- 802.3ad
+Subject: Re: [net-next v6 4/4] net: bonding: add tracepoint for 802.3ad
 From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <20250616160431.2aff8ec6@kernel.org>
-Date: Tue, 17 Jun 2025 18:25:47 +0800
+In-Reply-To: <1931181.1750120130@famine>
+Date: Tue, 17 Jun 2025 18:37:29 +0800
 Cc: netdev@vger.kernel.org,
- Jay Vosburgh <jv@jvosburgh.net>,
  "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>,
  Simon Horman <horms@kernel.org>,
  Jonathan Corbet <corbet@lwn.net>,
@@ -64,59 +63,164 @@ Cc: netdev@vger.kernel.org,
  Nikolay Aleksandrov <razor@blackwall.org>,
  Zengbing Tu <tuzengbing@didiglobal.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <DC8E2D25-3CEB-4E45-965E-D6A3D2DD4B3D@bamaicloud.com>
+Message-Id: <C75C5F1F-544F-4613-91D9-4F876EF286B3@bamaicloud.com>
 References: <cover.1749525581.git.tonghao@bamaicloud.com>
- <ff319dfdedc2bc319431c49d7f71faaa80c42d44.1749525581.git.tonghao@bamaicloud.com>
- <20250616160431.2aff8ec6@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
+ <10b8f570bd59104a1c7d5ecdc9a82c6ec61d2d1c.1749525581.git.tonghao@bamaicloud.com>
+ <1931181.1750120130@famine>
+To: Jay Vosburgh <jv@jvosburgh.net>
 X-Mailer: Apple Mail (2.3826.600.51.1.1)
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MG1k13TElWXs+zlFe3SnXmJHYimzh4GbY2VXG5f7/ZYwpvsAfYNbKnsO
-	CurRmKPrVMk6XNCqumfv+JBOF6jLt5hLgq3yGRwa4vWEp0ID9TYRdbi8bJO1FmKeDDmM8XD
-	7QG4vvDivygQQy4u4gPSBdgxRPp+DqtawHk3lzgyDLVkJ+7kN9DFKzWexjSJYmuzOkVOI3U
-	NGr2TqNa5sfOOA6dlE/RQ40tUYMAI//zmSFO0w8KFpOIEsVrUJxOJi2zXycl0n5MEMr6i/o
-	idFKFSIJXK+AKj378Frchtckcv+GhlJALDAZ4l+v25USoyOKvl1/dxwlEDJHu+TfjJdIYuN
-	GxBRLzmplU7tUhdYet83mEBwcjTCVzop1TUDJ1tAks39dVNfh3LW46YMDqJtr34NkukSmq3
-	nsLtDEIdup5r+ptwbejh8HWPYe1H3wv5ANx5lUDuZ1QxqeO2mZ6gM33PorFAq62MPrPgutN
-	0lyPAdRe4wK8HzyD9tuYl8eqmUNKPIt2vMG758PdLmKzxezMmeW4htWyW9zmtfyCnsYhgOi
-	hpdyKte7eNITIh5XQHYuIOooe2gYsaRMNXMvviqCzMktpoLPBq6qa5B30vPQE8sRa8bbAl+
-	aTHMO5/AzwOt/93lN/Sb1KLqb9pSPydeLzCGJSH7I3m65TSkct2k4EZErwCwfahLe7MA5jr
-	onaWri6oqnNzpuLOSNEWnD6TYiz2bZqelnxNpob8cmFNudvIC5bmRyJASSSc6QLwN3IdnDo
-	44GzwQh7uo2JQgc6fQA35ABCsRUismH9A29vigbhMJhVxj27e0jzzE+kQA8VnPP9mdS1HPx
-	yvqewU+n18QCO3rCcaUaAQSfOpV/e5qlCoMNesPxMAGk/jUGqjqSQRJwZqAE2zo2wt3R/9v
-	PLAQyXndBXEH2eBDDjllnLQnZi2NFBuCu3udsHE8wZ8+nFXCtEJYRLl2XuP4tr3B++PxqxU
-	MCiU+HNKOUNqbD594scSAabB5dV1cl6EnAKM=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-XMAILINFO: OW4JKxETGMY2Xk5feeU1Dmu7HUamHs2RkBAl3NBNxJ/fm8X0ZJ3atLIn
+	mmzYQcVy/oy8tkaWTsWfTOpTGvpRlPqkFjdxXmsJXHmUIIGFeaGWWkwObC4rEKnX628Ul+N
+	/jkLD+faqG13b++AaOTUo5e8af/jNeYMXuLEoiegELhVMF1nwleIlFbVPyeh23wJ4WMo/hm
+	4YGtRePVp+X2oxoaQmnSyZxgphq9FQfKfBoe1+ZE9rWdBdAJFE23Dwl0x7z8O6pBO674ajP
+	BLEZ/OItXfpLR3wgdSh3HFFSBtV2lLYUOPL8CWJI+p+zMrQ882o3l1gTY0zaKRR/wCBRJgw
+	h8J92BY2+2koEqUNtDfrXuAdJuHnwlgcXwPQuPeKM687WSlWuLpP1xL8HpnQ3gsbpGgjihR
+	POldqFSmoKEJkaHsPX5qHdEMTeYp26UiG1C14fitrZMiIHeUbnM7u+zSVOVQtS++VATqJPf
+	ECbkPXoto/M5Ota5dcYA8TpfN44WEFXkEqbcmj4h7JlvBlHQ17mh+kscSg2ZQrIcTESGDM/
+	ILyRQ44YkxtYty4oTYCtrwoFu2eso4L7qz8x54zfw564xhA3nqzOH32QrSJQdEJ+B/OWy3B
+	itVuSC0mVOfkign5mnZUkeeIfZoJWRyfozo4Ci+9Lu1wu7thqOjK3EYgjutDVDfiI2fwwhn
+	qxFTFt37a6wRyjv+YmxUJlEjpRX/u+TZMqXbr8xf+O42XLwUYvqUAIQxntoT3vq88GT+U6W
+	xJudV+nXR6ocTAAjaOAwIZreVwy8DUmtXq3Y5dAmBKKLk8x1BudBMHF1u4yrTBok4XTK1NX
+	AeDUrwXHGoxUdl/fE3PRx0Rl72pFWbmpkzTekjQeOeILlHei6iU1DVOtdR1GeEr+luAbESJ
+	CGcczm3k/IABeyRrl8JNNLcg6infnS4JkVAI+4bmNTuBYZ1rZA4YJEzpeS2anarXVhebEMo
+	BshCIIBN6yDiK1zGveXgCdjYJd/wc6k7od6o7ddA8QZUMXw==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
 X-QQ-RECHKSPAM: 0
 
 
 
-> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 07:04=EF=BC=8CJakub Kicinski =
-<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 08:28=EF=BC=8CJay Vosburgh =
+<jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
 >=20
-> On Tue, 10 Jun 2025 11:44:42 +0800 Tonghao Zhang wrote:
->> + if (bond->params.broadcast_neighbor)
->> + static_branch_inc(&bond_bcast_neigh_enabled);
->> }
+> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+>=20
+>> Users can monitor NIC link status changes through netlink. However, =
+LACP
+>> protocol failures may occur despite operational physical links. There =
+is
+>> no way to detect LACP state changes. This patch adds tracepoint at
+>> LACP state transition.
+>=20
+> This patch really has nothing to do with the rest of the series
+> (it's unrelated to the broadcast_neighbor functionality), and should
+> really be sent separately.
+=E2=80=A6 monitoring the lacp state is part of =E2=80=9Cno-stacking=E2=80=9D=
+ arch solution. So I sent it as series.
+if unnecessary, I will set it separately.
+
+> That said, I recall asking about work that was proposed some
+Sorry I may miss your commits about this patch.
+> time ago to create netlink events (visible to ip monitor, et al) when
+> the LACP state changes.  That would be a cleaner method to watch the
+> LACP state machine (as it would integrate with all of the other event
+Why not consider a BPF+tracepoint solution? It provides more flexible =
+LACP data collection with simpler implementation.
+> infrastructure).  Maybe I missed the response, but what became of that
+> work?
+>=20
+> -J
+>=20
+>> Cc: Jay Vosburgh <jv@jvosburgh.net>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>> Cc: Steven Rostedt <rostedt@goodmis.org>
+>> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+>> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+>> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
+>> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+>> ---
+>> drivers/net/bonding/bond_3ad.c |  6 ++++++
+>> include/trace/events/bonding.h | 37 =
+++++++++++++++++++++++++++++++++++
+>> 2 files changed, 43 insertions(+)
+>> create mode 100644 include/trace/events/bonding.h
 >>=20
->> if (bond_mode_can_use_xmit_hash(bond))
->> @@ -4475,6 +4480,10 @@ static int bond_close(struct net_device =
-*bond_dev)
->> bond_alb_deinitialize(bond);
->> bond->recv_probe =3D NULL;
+>> diff --git a/drivers/net/bonding/bond_3ad.c =
+b/drivers/net/bonding/bond_3ad.c
+>> index d1c2d416ac87..55703230ab29 100644
+>> --- a/drivers/net/bonding/bond_3ad.c
+>> +++ b/drivers/net/bonding/bond_3ad.c
+>> @@ -16,6 +16,9 @@
+>> #include <net/bond_3ad.h>
+>> #include <net/netlink.h>
 >>=20
->> + if (BOND_MODE(bond) =3D=3D BOND_MODE_8023AD &&
->> +    bond->params.broadcast_neighbor)
->> + static_branch_dec(&bond_bcast_neigh_enabled);
+>> +#define CREATE_TRACE_POINTS
+>> +#include <trace/events/bonding.h>
+>> +
+>> /* General definitions */
+>> #define AD_SHORT_TIMEOUT           1
+>> #define AD_LONG_TIMEOUT            0
+>> @@ -1146,6 +1149,9 @@ static void ad_mux_machine(struct port *port, =
+bool *update_slave_arr)
+>>   port->actor_port_number,
+>>   last_state,
+>>   port->sm_mux_state);
+>> +
+>> + trace_3ad_mux_state(port->slave->dev, last_state, =
+port->sm_mux_state);
+>> +
+>> switch (port->sm_mux_state) {
+>> case AD_MUX_DETACHED:
+>> port->actor_oper_port_state &=3D ~LACP_STATE_SYNCHRONIZATION;
+>> diff --git a/include/trace/events/bonding.h =
+b/include/trace/events/bonding.h
+>> new file mode 100644
+>> index 000000000000..1ee4b07d912a
+>> --- /dev/null
+>> +++ b/include/trace/events/bonding.h
+>> @@ -0,0 +1,37 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +
+>> +#if !defined(_TRACE_BONDING_H) || defined(TRACE_HEADER_MULTI_READ)
+>> +#define _TRACE_BONDING_H
+>> +
+>> +#include <linux/netdevice.h>
+>> +#include <linux/tracepoint.h>
+>> +
+>> +#undef TRACE_SYSTEM
+>> +#define TRACE_SYSTEM bonding
+>> +
+>> +TRACE_EVENT(3ad_mux_state,
+>> + TP_PROTO(struct net_device *dev, u32 last_state, u32 curr_state),
+>> + TP_ARGS(dev, last_state, curr_state),
+>> +
+>> + TP_STRUCT__entry(
+>> + __field(int, ifindex)
+>> + __string(dev_name, dev->name)
+>> + __field(u32, last_state)
+>> + __field(u32, curr_state)
+>> + ),
+>> +
+>> + TP_fast_assign(
+>> + __entry->ifindex =3D dev->ifindex;
+>> + __assign_str(dev_name);
+>> + __entry->last_state =3D last_state;
+>> + __entry->curr_state =3D curr_state;
+>> + ),
+>> +
+>> + TP_printk("ifindex %d dev %s last_state 0x%x curr_state 0x%x",
+>> +   __entry->ifindex, __get_str(dev_name),
+>> +   __entry->last_state, __entry->curr_state)
+>> +);
+>> +
+>> +#endif /* _TRACE_BONDING_H */
+>> +
+>> +#include <trace/define_trace.h>
+>> --=20
+>> 2.34.1
+>>=20
 >=20
-> is .broadcast_neighbor automatically cleared when mode is changed?
-> I don't see it in the code.
-No clean this value when changing the mode, this option don=E2=80=99t =
-work in other mode.  But it is better to clean up it.
-> --=20
-> pw-bot: cr
->=20
->=20
+> ---
+> -Jay Vosburgh, jv@jvosburgh.net
+
 
 
