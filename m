@@ -1,96 +1,88 @@
-Return-Path: <netdev+bounces-198814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DBF2ADDEA5
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C7AADDEBC
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:29:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0861189C1DA
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:20:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AED81189C447
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6F8288CBE;
-	Tue, 17 Jun 2025 22:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CF42F5316;
+	Tue, 17 Jun 2025 22:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fkbUJ8qH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RufVZDS7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07EF2F5312;
-	Tue, 17 Jun 2025 22:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AAB2F5312;
+	Tue, 17 Jun 2025 22:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750198804; cv=none; b=EIoWodGHwCFPCjVZHSJBTZ1yLyrQRNbdq8iuN2NyVVaseZFkbqjLx8DJq1SvyzubMsRWrJFmpJEFTRjqT0LXA9+6AE7uVHwwX0PGU4fIqoYOCn0PzXRnwYuPrJp/eygKSFujBkemvT0aUXGLwDZzWmMp0K/1dyap6e46npBH4n0=
+	t=1750199365; cv=none; b=noSPpztuBzvF9pt+cDCRJ+aLugF0mMyRvX7zwj+IHhrh6RmJXq1B1eI/eTtbg/JpzIeaux5J0vLsnRgojjUL5ZvvREDdwTarHXZ7+j/SwYpDOCUOAMJMApu1v7GRpOtg2Uhin1pM8NmEju+xF4lBlKt9BAMk3pQ4yvphe0BFC80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750198804; c=relaxed/simple;
-	bh=9q43kaCItYpfDG1jtrjq+bni/HfVsYltE9XsXWL+axA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hLG1XzIrV9g8CJcMFqLbRF7inXtqtq0uZBqhROCsd9hbD9nJU9RFlyq9b8JshJ7Hn3MULO+1/9FA4/6AqJ+qxv/cpa44vDkndNDUnlW9Hm0lGgG2zX7rU0d267w6zX6ghd+NOueHzQDkguJ52MeG4XEEaZ4NKUVgJVT6r9GBs4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fkbUJ8qH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63DBCC4CEE3;
-	Tue, 17 Jun 2025 22:20:04 +0000 (UTC)
+	s=arc-20240116; t=1750199365; c=relaxed/simple;
+	bh=QJ1n1NnRMG8vhqAxWWAHSQAiiQAgwBeioj7GJRcNK4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BV8aaTpyrszxPGHbTzZna8ceNCIQddqxO2jaguS9E1n0Sj8i6/OSHenJylRW1tERUSQZrdnIiO9xu9/cvntwmrN6YJbReBvAMeL7ia8sxewuOkkxcAkT1PT6Hm9ogsXttVR1OGy6jsjpqJGPcAehFYcqRSbkiOnUDpc/g7EQmpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RufVZDS7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A976C4CEE3;
+	Tue, 17 Jun 2025 22:29:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750198804;
-	bh=9q43kaCItYpfDG1jtrjq+bni/HfVsYltE9XsXWL+axA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fkbUJ8qHB8jz8HcZYyc5jtTNZA1pd37eHzDDLWC+hmJ970VScKJ+kV6O6vGKIGJ/Q
-	 Z7Qs0AsorrfbgO7ed9XHteOb3z6wpE8MdrP/SamebvtK99Ivptp3RKpsaOLXZuGp0+
-	 Xufc398uTR+Wcw7PYRmn0pHOaojbbf1NFcqEVh854RJsGM3UltKwv1yL4cwlcHu0G+
-	 T+PWohNv5p2Lkq+NE4MRbcj6aitN8U9AAVVnMCweJQk8TC3WFbgvpYSxG7FYJb0wuN
-	 PloJ1VUH9fclB5li0YOzApfHMfbsxJweAZUz8GlPAsB/Hw4bKcEukiXLqPCI7IW8o8
-	 pWwMhenQs0N8Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C9C38111DD;
-	Tue, 17 Jun 2025 22:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750199365;
+	bh=QJ1n1NnRMG8vhqAxWWAHSQAiiQAgwBeioj7GJRcNK4o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RufVZDS7kZNYjt6zFgqrNkcRj/yaq1iBekMAK9vEZFtmRvUEB6ObgV3kiXPD0pkih
+	 uB58xPP55H7o7mo8z30a12p/7wbjY7+9H5CvySrmgTmiZN1yx/kmV1YidADoxJiD9i
+	 T7zY15kFWkcV0A1AVQfvB3jHP+bq+LRVTVsYYsJF95HxeCUCh0jQPwDQr2wf65ArZ5
+	 iBqIgmLAISKtsId8PC3XE36CxEB2i1Ol0zHHuza2x76xr8p25c5ie1efi2Z28xXshY
+	 Qraw+MkCu6CnifaMK0bE/85fQeZ2JeSIixEHMQCRdgJJe0u6pRh+pwgnnG+oqLYWc/
+	 N5Vg0g7IO/M7Q==
+Date: Tue, 17 Jun 2025 15:29:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org, Vadim
+ Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni
+ <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, "David S .
+ Miller" <davem@davemloft.net>, Richard Cochran <richardcochran@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Jason Xing
+ <kerneljasonxing@gmail.com>
+Subject: Re: [PATCH v5 0/5] io_uring cmd for tx timestamps
+Message-ID: <20250617152923.01c274a1@kernel.org>
+In-Reply-To: <efd53c47-4be9-4a91-aef1-7f0cb8bae750@kernel.dk>
+References: <cover.1750065793.git.asml.silence@gmail.com>
+	<efd53c47-4be9-4a91-aef1-7f0cb8bae750@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] vsock/test: Improve transport_uaf test
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175019883300.3717086.5304057159618682213.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 22:20:33 +0000
-References: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
-In-Reply-To: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: sgarzare@redhat.com, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 11 Jun 2025 21:56:49 +0200 you wrote:
-> Increase the coverage of a test implemented in commit 301a62dfb0d0
-> ("vsock/test: Add test for UAF due to socket unbinding"). Take this
-> opportunity to factor out some utility code, drop a redundant sync between
-> client and server, and introduce a /proc/kallsyms harvesting logic for
-> auto-detecting registered vsock transports.
+On Tue, 17 Jun 2025 08:52:35 -0600 Jens Axboe wrote:
+> On 6/16/25 3:46 AM, Pavel Begunkov wrote:
+> > Vadim Fedorenko suggested to add an alternative API for receiving
+> > tx timestamps through io_uring. The series introduces io_uring socket
+> > cmd for fetching tx timestamps, which is a polled multishot request,
+> > i.e. internally polling the socket for POLLERR and posts timestamps
+> > when they're arrives. For the API description see Patch 5.
+> > 
+> > It reuses existing timestamp infra and takes them from the socket's
+> > error queue. For networking people the important parts are Patch 1,
+> > and io_uring_cmd_timestamp() from Patch 5 walking the error queue.
+> > 
+> > It should be reasonable to take it through the io_uring tree once
+> > we have consensus, but let me know if there are any concerns.  
 > 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> 
-> [...]
+> Sounds like we're good to queue this up for 6.17?
 
-Here is the summary with links:
-  - [net-next,v3,1/3] vsock/test: Introduce vsock_bind_try() helper
-    https://git.kernel.org/netdev/net-next/c/d56a8dbff8fe
-  - [net-next,v3,2/3] vsock/test: Introduce get_transports()
-    https://git.kernel.org/netdev/net-next/c/3070c05b7afd
-  - [net-next,v3,3/3] vsock/test: Cover more CIDs in transport_uaf test
-    https://git.kernel.org/netdev/net-next/c/0cb6db139f39
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I think so. Can I apply patch 1 off v6.16-rc1 and merge it in to
+net-next? Hash will be 2410251cde0bac9f6, you can pull that across.
+LMK if that works.
 
