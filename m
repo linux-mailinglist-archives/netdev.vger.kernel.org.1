@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-198370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39430ADBE6D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:12:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3EF4ADBE65
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A4961893CF7
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:12:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3618B7A801C
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201AC212B14;
-	Tue, 17 Jun 2025 01:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6710E1E25E3;
+	Tue, 17 Jun 2025 01:10:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EB8204F8B;
-	Tue, 17 Jun 2025 01:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62401A5B85;
+	Tue, 17 Jun 2025 01:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750122607; cv=none; b=Jf3MOfAl+he00CvMlGjZZsXahcH26Xx69Jcyf4/yLx1zVQ4T+cClhty49tpDXPuRHwSLcqYTpxQnDSKEHv6wpPnwHb8WBYQVWgTcUtSxzUNvQx6F5ceOSXMyWX7gIj2ziOCMZgmVyHOFoKqm3Yqr7Q/LP9X9kwx7qezxlNxqul8=
+	t=1750122601; cv=none; b=tvsszAntQ4t89oHUU612aFLW7Ko3N2w8gVIcM5toOx9ieUzTVXZqeCagrXMuvX0m4ratorAF/ikjPpUPMrz89se8tOChxjltkNqeBgtsb+V3oqq/O+sCnQr6j72hmEZ1V8tVlXuxScRma8Zfj9E45dkyLMM84TmT0WGqyRyCWbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750122607; c=relaxed/simple;
-	bh=yw1SwsDEDdg6ajXD1eO2HDKrUh/trmJ0jiWLVtXBMPk=;
+	s=arc-20240116; t=1750122601; c=relaxed/simple;
+	bh=9mrKoGUe6Vlojg69hEInfg1bG/5otYIqtTsH6wU58k0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ror9GFE5snz5PV5IepNQD9NofpciWrTp7szOSaFoK0oCY492mAI1nZ0SLneTZfaAMu+ItwmUMVI7sOHILOfoh+WrVScmhNYDySazwlX65Umcg6bLZd2C8kuIhqzhHOwd4zAgHsEmEMc9RK1ALXnYsgh4WNiFNpL6h6YAUi/eO4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=ufyq1PgGAoNdpXCF1bf7GqGNUTqzGs7rjIXzSPOL7PvtLbwER0pbatS3AR1iR81YCKbf6AMklXgzvh3wSl1hMr4Ij5fVRl5ER7Bqg+/2ov6r1O0TEsWyCLKQsddN4EuqXPww52APdGtw4mFT6BBs996ClEKmLbgkECORsQYS7FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bLpdH1fc8z13MKJ;
-	Tue, 17 Jun 2025 09:07:47 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bLpf71L9zz2TSLW;
+	Tue, 17 Jun 2025 09:08:31 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1049B1401F0;
+	by mail.maildlp.com (Postfix) with ESMTPS id BAF7D140275;
 	Tue, 17 Jun 2025 09:09:57 +0800 (CST)
 Received: from localhost.localdomain (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -48,9 +48,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <michal.swiatkowski@linux.intel.com>,
 	<shaojijie@huawei.com>
-Subject: [PATCH V2 net-next 5/8] net: hns3: set the freed pointers to NULL when lifetime is not end
-Date: Tue, 17 Jun 2025 09:02:52 +0800
-Message-ID: <20250617010255.1183069-6-shaojijie@huawei.com>
+Subject: [PATCH V2 net-next 6/8] net: hns3: delete redundant address before the array
+Date: Tue, 17 Jun 2025 09:02:53 +0800
+Message-ID: <20250617010255.1183069-7-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250617010255.1183069-1-shaojijie@huawei.com>
 References: <20250617010255.1183069-1-shaojijie@huawei.com>
@@ -65,97 +65,43 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-From: Jian Shen <shenjian15@huawei.com>
+From: Yonglong Liu <liuyonglong@huawei.com>
 
-There are several pointers are freed but not set to NULL,
-and their lifetime is not end immediately. To avoid misusing
-there wild pointers, set them to NULL.
+Address before the array is redundant, this patch delete it.
 
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c        | 1 +
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c   | 4 ++++
- drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 4 ++++
- 3 files changed, 9 insertions(+)
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c | 2 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index 6a244ba5e051..0d6db46db5ed 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -276,6 +276,7 @@ static int hns3_lp_run_test(struct net_device *ndev, enum hnae3_loop mode)
- 			good_cnt++;
- 		} else {
- 			kfree_skb(skb);
-+			skb = NULL;
- 			netdev_err(ndev, "hns3_lb_run_test xmit failed: %d\n",
- 				   tx_ret);
- 		}
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+index c46490693594..21deec217668 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+@@ -2110,7 +2110,7 @@ static int hclge_dbg_dump_mng_table(struct hclge_dev *hdev, char *buf, int len)
+ 	for (i = 0; i < HCLGE_DBG_MNG_TBL_MAX; i++) {
+ 		hclge_cmd_setup_basic_desc(&desc, HCLGE_MAC_ETHERTYPE_IDX_RD,
+ 					   true);
+-		req0 = (struct hclge_mac_ethertype_idx_rd_cmd *)&desc.data;
++		req0 = (struct hclge_mac_ethertype_idx_rd_cmd *)desc.data;
+ 		req0->index = cpu_to_le16(i);
+ 
+ 		ret = hclge_cmd_send(&hdev->hw, &desc, 1);
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index e0a2ca21ee46..9d7c9523c9e1 100644
+index 9d7c9523c9e1..b76400e67a23 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -5208,6 +5208,7 @@ static void hclge_fd_free_node(struct hclge_dev *hdev,
- {
- 	hlist_del(&rule->rule_node);
- 	kfree(rule);
-+	rule = NULL;
- 	hclge_sync_fd_state(hdev);
- }
+@@ -2358,7 +2358,7 @@ static int hclge_common_thrd_config(struct hclge_dev *hdev,
+ 	for (i = 0; i < 2; i++) {
+ 		hclge_cmd_setup_basic_desc(&desc[i],
+ 					   HCLGE_OPC_RX_COM_THRD_ALLOC, false);
+-		req = (struct hclge_rx_com_thrd *)&desc[i].data;
++		req = (struct hclge_rx_com_thrd *)desc[i].data;
  
-@@ -5232,6 +5233,7 @@ static void hclge_update_fd_rule_node(struct hclge_dev *hdev,
- 		new_rule->rule_node.pprev = old_rule->rule_node.pprev;
- 		memcpy(old_rule, new_rule, sizeof(*old_rule));
- 		kfree(new_rule);
-+		new_rule = NULL;
- 		break;
- 	case HCLGE_FD_DELETED:
- 		hclge_fd_dec_rule_cnt(hdev, old_rule->location);
-@@ -8521,6 +8523,7 @@ static void hclge_update_mac_node(struct hclge_mac_node *mac_node,
- 		if (mac_node->state == HCLGE_MAC_TO_ADD) {
- 			list_del(&mac_node->node);
- 			kfree(mac_node);
-+			mac_node = NULL;
- 		} else {
- 			mac_node->state = HCLGE_MAC_TO_DEL;
- 		}
-@@ -9151,6 +9154,7 @@ static void hclge_uninit_vport_mac_list(struct hclge_vport *vport,
- 		case HCLGE_MAC_TO_ADD:
- 			list_del(&mac_node->node);
- 			kfree(mac_node);
-+			mac_node = NULL;
- 			break;
- 		}
- 	}
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-index e3f86638540b..3ffd47b30ad3 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-@@ -933,6 +933,7 @@ static void hclgevf_update_mac_node(struct hclgevf_mac_addr_node *mac_node,
- 		if (mac_node->state == HCLGEVF_MAC_TO_ADD) {
- 			list_del(&mac_node->node);
- 			kfree(mac_node);
-+			mac_node = NULL;
- 		} else {
- 			mac_node->state = HCLGEVF_MAC_TO_DEL;
- 		}
-@@ -2395,6 +2396,7 @@ static int hclgevf_init_msi(struct hclgevf_dev *hdev)
- 					sizeof(int), GFP_KERNEL);
- 	if (!hdev->vector_irq) {
- 		devm_kfree(&pdev->dev, hdev->vector_status);
-+		hdev->vector_status = NULL;
- 		pci_free_irq_vectors(pdev);
- 		return -ENOMEM;
- 	}
-@@ -2408,6 +2410,8 @@ static void hclgevf_uninit_msi(struct hclgevf_dev *hdev)
- 
- 	devm_kfree(&pdev->dev, hdev->vector_status);
- 	devm_kfree(&pdev->dev, hdev->vector_irq);
-+	hdev->vector_status = NULL;
-+	hdev->vector_irq = NULL;
- 	pci_free_irq_vectors(pdev);
- }
- 
+ 		/* The first descriptor set the NEXT bit to 1 */
+ 		if (i == 0)
 -- 
 2.33.0
 
