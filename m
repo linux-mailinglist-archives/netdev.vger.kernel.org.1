@@ -1,163 +1,128 @@
-Return-Path: <netdev+bounces-198393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CFE3ADBED2
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:49:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE6CADBEF7
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 04:16:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 046FF3B417F
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:48:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECBE87A0FE0
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 02:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95911DED63;
-	Tue, 17 Jun 2025 01:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83502205502;
+	Tue, 17 Jun 2025 02:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMRlW/EX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j1TdVCDR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58A11DD9AB
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF4E1448D5;
+	Tue, 17 Jun 2025 02:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750124938; cv=none; b=F5goGEBzoGu9AHVaHEOb2KEabWXaVp+qhP0UEghUyo4CCYqVdORv+jZQ7Y306oj4tv3s7A8LuZzIsIHyTuafs9ARn7ckU7lqAfCjP42w6OVWkehb7jj+spmkB9Op/PVXMNx7q5+a8TuN3p3QQBtdnZJOYsh9Qv1ZOXHMwVi+2Ro=
+	t=1750126565; cv=none; b=UwXfjEshRpQKRxcH9e77Ce7JeH+omuKqshKB09g6qahQSTP/ioB0n0GorLRCuebJwqzwp4qAkgobB8FfYfWP33S9wXAByZeXRkgmJ6BmBzAMONqZl1jpCrtD7KPJM14XU7VDz6lsdp6xXyId/3Dz0bFImLU3HMoFJ20lydyEIS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750124938; c=relaxed/simple;
-	bh=o2HdVt64P6zSejf1UFow3+GSPNMKziBQdRDRJyFNi8o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K81cakj6BTec8D1tvyqOVh4qfat6ikhDmdHjf2YoXNST09rlWe6bKXors8a5q0IUfT4DaXOlS7+SOji7tTxALlCOFwirj6UcadBmeMC7KzSodY2E+ms2vk16W5/gnb+Mv93M9vIOigTSQaKpoKB+isk3KIBZa7s94Jw8ZgLTmLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FMRlW/EX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 307C6C4CEF0;
-	Tue, 17 Jun 2025 01:48:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750124938;
-	bh=o2HdVt64P6zSejf1UFow3+GSPNMKziBQdRDRJyFNi8o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FMRlW/EXcckovnLnQ0fA6vtMnqOXi70wi+dEIhGfCyHPhJO/741VwgL6OtVqWdTpt
-	 +mWf7acih4/YFHEvunO5IGRsDlqtmqavg+v1agntgEvQVXF9vSaFiTrKoB4vfETuY9
-	 OWDrKOaEIEcDG4XJrIFyfttzmDNtcDpvnwXwjuz94QmXojevh9uxM8bYfInI6ek7/Y
-	 YigidFDbau4ftSRP7SIeyfRX2sDAMwF9qfLALDEq7irn4iDLgrtW/rWq8Sk4zqa0Bl
-	 XegGN7GxjVSgwziDkHsN77+N9JLXjxTGmYhpllRiTMm7tGhD17c6BIFxP42SIFkE0Z
-	 D8Y5uJRLe4kKA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	madalin.bucur@nxp.com,
-	ioana.ciornei@nxp.com,
-	marcin.s.wojtas@gmail.com,
-	bh74.an@samsung.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 5/5] eth: sxgbe: migrate to new RXFH callbacks
-Date: Mon, 16 Jun 2025 18:48:48 -0700
-Message-ID: <20250617014848.436741-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250617014848.436741-1-kuba@kernel.org>
-References: <20250617014848.436741-1-kuba@kernel.org>
+	s=arc-20240116; t=1750126565; c=relaxed/simple;
+	bh=9Rs8vzAZ7KyK3Lqf11YHvEhxEo+LZ2hRXOosRo93hNE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OoXoqwIaf/dY3L9/v8nAgMHFKO8p2xNusa3CsuM51ABniwH6vjujbWvuzZZ0pr7W3Y8gzkDAsBcD3bsWEvD8MyHluQC9Y967IuwPE6wehN5bHO37slfCSTbkqtxlHLLfYVbOPN+vylxH31Le3MxvALYAvKfOOFt3ES5NnKdm26o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j1TdVCDR; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-86d029e2bdeso209788039f.1;
+        Mon, 16 Jun 2025 19:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750126563; x=1750731363; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9Rs8vzAZ7KyK3Lqf11YHvEhxEo+LZ2hRXOosRo93hNE=;
+        b=j1TdVCDRCwL+0f4/k0WkOc7RWXH6mbQ8bOMZoxeDLqlwFG4sxjFUqoA/Tj5E6hbIvC
+         ujuRmU+on7LD0Dli6nKUiOqq0mhrWz9M0sIIvM6YFYHh7JcuZvK3UyzPP6PQbSx+YFzu
+         ahH7T1plJVi8ZVqnT5EEIxybAW5VA8W5TRRnpbS29IR+hJV6uLhd5laUF7xNtGJJ8Abf
+         pjXPHEjtkNKyzyh/2+bjHwAjb6WQyo9Xq6g3qcDLamp40j5YZYjHJUWMTpWZutl+lBT9
+         ksp4cVU5W0i7PHMl/XiTIgap5eo4gN1t+w53voMWxUwgH1sWi8hQrPtolkavwD0H9yqB
+         x7+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750126563; x=1750731363;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9Rs8vzAZ7KyK3Lqf11YHvEhxEo+LZ2hRXOosRo93hNE=;
+        b=HjlJI2538WUepDBJL2/5sxka0hMVX4nzXzNJlOjDLJBZ6FUf2SFWPkIF9vrOJJQ5DO
+         NhU5PrgKZNBWhVcT/DYiHcfmd6OJ5FiiSm4AiHoii5Ei4trnJUbFXlmPZ/aIcH4EhOom
+         4TeNhEH9f3jhbCGO80Ea2Q/jxZJuZW602laE30LJHim8AFfxtpObi7C1rur8AwuQKCLW
+         xD3itJiVmq3rFrQ0mWKWy16UouhVQ7HgJnGfpT0UADouGO8BWwarnzTIwQqvUtUtNtUq
+         X3sVpEOkIxVcRn333G8XC2OoqWdp37AGMEAGkYDP6CXOmqHlcSS9OOXL6MAe5cUQGfqp
+         0/yw==
+X-Forwarded-Encrypted: i=1; AJvYcCWr5zZ1LIleZvWojtgzCGNoHmBuwSK6/ewv99EzU8+5MaoOYmt1PJB4PDcwaiJQNi0Lrws=@vger.kernel.org, AJvYcCXbvReMVTCmMIB24PXd82qgvK7QdGnKJl/mjzbNFrzACuft1fZKR0ope1ZhLll0xu1R1y+1GhcM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw93UfHXB5wkYngpRPGGUBzcJkJ9oIy9AzqhKzE5x0Sw3MCzxhL
+	xhF4PARBUv4QC51Wxs452UPnh+18rYwQq9GyKsJWj1Qf+qMGHe9V33CyI0EG8KuMfhXZ6vastuz
+	4FF90yosNqSKfNu1+VsT//co2eDKFd3A=
+X-Gm-Gg: ASbGncunRHn+GLtRQrdpm/nanY7dTXYsVnPLyZJMpRRNAVV+oKb2hMpo4TczbwNeHFg
+	YWoTSeD1K4TLkrMD6m5urrvxZUfz9MkejXW9Wk6CKkNWdYf/7An6XdvKUTh3IalI/CfDctCwB7w
+	obMqedwojcSQGmNsXI2TiFuAGN9ek8JSRdaTyLkAJP3b8=
+X-Google-Smtp-Source: AGHT+IFCvjb73KQSXxgjC5qianq5cX/gQ5C0FQ4nChybXFM0jsB5uAd0qYuj2BDodabcEK+52Kyk3YMvBphQC6Wkd8M=
+X-Received: by 2002:a05:6e02:2784:b0:3dd:bb43:1fc0 with SMTP id
+ e9e14a558f8ab-3de22d3edb8mr6817985ab.11.1750126562959; Mon, 16 Jun 2025
+ 19:16:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250617002236.30557-1-kerneljasonxing@gmail.com> <aFDAwydw5HrCXAjd@mini-arch>
+In-Reply-To: <aFDAwydw5HrCXAjd@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 17 Jun 2025 10:15:26 +0800
+X-Gm-Features: AX0GCFuL5VzRQrdRqTiHEiYEbm_3vgvV8cts9iF2G633evT8KwDF6LuTAnLSXmk
+Message-ID: <CAL+tcoDYiwH8nz5u=sUiYucJL+VkGx4M50q9Lc2jsPPupZ2bFg@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
-add dedicated callbacks for getting and setting rxfh fields").
+Hi Stanislav,
 
-RXFH is all this driver supports in RXNFC so old callbacks are
-completely removed.
+On Tue, Jun 17, 2025 at 9:11=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 06/17, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Introduce a control method in the xsk path to let users have the chance
+> > to tune it manually.
+>
+> Can you expand more on why the defaults don't work for you?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../ethernet/samsung/sxgbe/sxgbe_ethtool.c    | 45 +++----------------
- 1 file changed, 7 insertions(+), 38 deletions(-)
+We use a user-level tcp stack with xsk to transmit packets that have
+higher priorities than other normal kernel tcp flows. It turns out
+that enlarging the number can minimize times of triggering sendto
+sysctl, which contributes to faster transmission. it's very easy to
+hit the upper bound (namely, 32) if you log the return value of
+sendto. I mentioned a bit about this in the second patch, saying that
+we can have a similar knob already appearing in the qdisc layer.
+Furthermore, exposing important parameters can help applications
+complete their AI/auto-tuning to judge which one is the best fit in
+their production workload. That is also one of the promising
+tendencies :)
 
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-index 4a439b34114d..ad73733644f9 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-@@ -308,8 +308,8 @@ static int sxgbe_set_coalesce(struct net_device *dev,
- 	return 0;
- }
- 
--static int sxgbe_get_rss_hash_opts(struct sxgbe_priv_data *priv,
--				   struct ethtool_rxnfc *cmd)
-+static int sxgbe_get_rxfh_fields(struct net_device *dev,
-+				 struct ethtool_rxfh_fields *cmd)
- {
- 	cmd->data = 0;
- 
-@@ -344,26 +344,11 @@ static int sxgbe_get_rss_hash_opts(struct sxgbe_priv_data *priv,
- 	return 0;
- }
- 
--static int sxgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
--			   u32 *rule_locs)
-+static int sxgbe_set_rxfh_fields(struct net_device *dev,
-+				 const struct ethtool_rxfh_fields *cmd,
-+				 struct netlink_ext_ack *extack)
- {
- 	struct sxgbe_priv_data *priv = netdev_priv(dev);
--	int ret = -EOPNOTSUPP;
--
--	switch (cmd->cmd) {
--	case ETHTOOL_GRXFH:
--		ret = sxgbe_get_rss_hash_opts(priv, cmd);
--		break;
--	default:
--		break;
--	}
--
--	return ret;
--}
--
--static int sxgbe_set_rss_hash_opt(struct sxgbe_priv_data *priv,
--				  struct ethtool_rxnfc *cmd)
--{
- 	u32 reg_val = 0;
- 
- 	/* RSS does not support anything other than hashing
-@@ -421,22 +406,6 @@ static int sxgbe_set_rss_hash_opt(struct sxgbe_priv_data *priv,
- 	return 0;
- }
- 
--static int sxgbe_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
--{
--	struct sxgbe_priv_data *priv = netdev_priv(dev);
--	int ret = -EOPNOTSUPP;
--
--	switch (cmd->cmd) {
--	case ETHTOOL_SRXFH:
--		ret = sxgbe_set_rss_hash_opt(priv, cmd);
--		break;
--	default:
--		break;
--	}
--
--	return ret;
--}
--
- static void sxgbe_get_regs(struct net_device *dev,
- 			   struct ethtool_regs *regs, void *space)
- {
-@@ -489,8 +458,8 @@ static const struct ethtool_ops sxgbe_ethtool_ops = {
- 	.get_channels = sxgbe_get_channels,
- 	.get_coalesce = sxgbe_get_coalesce,
- 	.set_coalesce = sxgbe_set_coalesce,
--	.get_rxnfc = sxgbe_get_rxnfc,
--	.set_rxnfc = sxgbe_set_rxnfc,
-+	.get_rxfh_fields = sxgbe_get_rxfh_fields,
-+	.set_rxfh_fields = sxgbe_set_rxfh_fields,
- 	.get_regs = sxgbe_get_regs,
- 	.get_regs_len = sxgbe_get_regs_len,
- 	.get_eee = sxgbe_get_eee,
--- 
-2.49.0
+>
+> Also, can we put these settings into the socket instead of (global/ns)
+> sysctl?
 
+As to MAX_PER_SOCKET_BUDGET, it seems not easy to get its
+corresponding netns? I have no strong opinion on this point for now.
+
+Thanks,
+Jason
 
