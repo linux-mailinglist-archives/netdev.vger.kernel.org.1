@@ -1,302 +1,138 @@
-Return-Path: <netdev+bounces-198720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96745ADD48D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:11:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65043ADD4B6
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25E51947ECE
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:04:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74800173980
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0682C2ED147;
-	Tue, 17 Jun 2025 16:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234192ED173;
+	Tue, 17 Jun 2025 16:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyhWfOwV"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="MibmGQ+Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f99.google.com (mail-ed1-f99.google.com [209.85.208.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C108E2ECD33;
-	Tue, 17 Jun 2025 16:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448582F2345
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750176009; cv=none; b=ozclS2wtY69bwKVtCIG3QrD29JusJhWOusTQyNO+HUXQMiNf0iDgvpS10eeMtTDBiSUTh9IfioT4nUO3l8Cy4tsPELPL2ozIxd15yexYSEa5gVg0wbNlvlMJ+P2sD0KV7qxDCRmVj8ChXserPniYiFggS/5ZPyeVOyOpBg1DKiY=
+	t=1750176111; cv=none; b=Bg1UvN8HATXpVA4doyMjY9ORIYmTQ7NRDI6M7i4cAuO/m9+s/fVTYvCEkx+ElKa+DPFuv0Lm34LNB0B5xmM+yZyoJUFauBvzeoVvTebptbRnAugWbfGMOmU05oD0mz1saKV+xlLoCZ2sSrzybQuQMB0m6AQA1DsHnJVBJQQMJLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750176009; c=relaxed/simple;
-	bh=RyjFEiBY6VQWOdFRWsesICSXRLCWbA6jugn3H5Rqqj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qKbFEmYsGevj8hnYHJPhnR25Y1ls4pJL3nBWSOurpqgRT6QB13ZEEtBIoE+Sqhr2AmR+NtamoSq2lgctRh/tdyfa7i9gxZiaZK0pAcFk3CPMLu2gBOT1UElhIFYWS49MZ0Ye2zOnA/Hmlpc4WuEncwzPfs2TiyG8+bIFyE0D4t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NyhWfOwV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 030C3C4CEF0;
-	Tue, 17 Jun 2025 16:00:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750176009;
-	bh=RyjFEiBY6VQWOdFRWsesICSXRLCWbA6jugn3H5Rqqj0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NyhWfOwVdK3L2Bb75J5vSsIdX6gOEeQSFExVwbnkPQ6fTa1GkhQLqeW4MIH0zu6ps
-	 tkAmw0a7l1eXM71V0mnEYz84sMb1R+ifsYhfiZ31Z7O1RvJu3Qgu74E6apfmWeK3UM
-	 C46NzCOtRELdsM7tDF4JBneKytKgKeM3tmyizqMeGRBc/YIIpWZMHPEiGqFvjHiGVM
-	 X23MLpgrm5E4jt8VhfDmnaONt69UTkJO4LF8M/jwql5fqPw6mUg9ExOeqBaPj0k4fE
-	 yJ0IZXWO72X7nv9fHXtPiihMPM+lxaN8P5JXGsO6br6QDedqCrOISzsewDKZsKrFuS
-	 IpD9VAx/T+gPw==
-Date: Tue, 17 Jun 2025 18:00:01 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
- <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
- <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Ruben Wauters"
- <rubenru09@aol.com>, "Shuah Khan" <skhan@linuxfoundation.org>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
- peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH v5 10/15] docs: sphinx: add a parser for yaml files for
- Netlink specs
-Message-ID: <20250617180001.46931ba9@sal.lan>
-In-Reply-To: <20250617154049.104ef6ff@sal.lan>
-References: <cover.1750146719.git.mchehab+huawei@kernel.org>
-	<c407d769c9f47083e8f411c13989522e32262562.1750146719.git.mchehab+huawei@kernel.org>
-	<m27c1ak0k9.fsf@gmail.com>
-	<20250617154049.104ef6ff@sal.lan>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1750176111; c=relaxed/simple;
+	bh=9toDD7tmhalc4U5luIvrtKKyxtNLA3+RUnV6XemW4e4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pF/MyW27r4ck1AXqL30tg2HaaHSIKgzK6slmhoY0LLAJhnKyq2UcLCQtQLW7wVQi9zy2bzokaNDe8xnXwJqlIPqDN6WHXHur49nHIQNEGQsA3YDBL4QzncRbMgAjOnzxH8mniLWJkKb55mRy/AL4gHzkb4IEIN6zOHtD9fuWFxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=MibmGQ+Q; arc=none smtp.client-ip=209.85.208.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-ed1-f99.google.com with SMTP id 4fb4d7f45d1cf-6070a8f99ffso840669a12.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:01:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1750176107; x=1750780907; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WALP22qPaSmrlHrSd0ASkEUPW5PSB3MfUO3Tow5jPlY=;
+        b=MibmGQ+Qu74LE0OzAGdGwlsJPtylbsVGf8JInMOpZvaAXW27/ro1GBFwc89zdxPb3T
+         kBMU8O0ZlKYFm/lwdi3UekL3++ILNSaATNLkxqhnyfyw0tYNqGU170p9klnO0FIpFSVO
+         /c3DmnLg9J7drI5DUwdg+lvLYK9zc/grgWkGHZ5bBRdz/Ot8w7mkKUgUmGHYmhDa/YCc
+         R8uwrEgTaAR0xK76cRkaxym4iEPLWmVRWDhr1qt6rXGGJvxfqfT/CJECaitlmwpP4+33
+         E4pxL5IVTz5IEXSqJKPQ2QoM32MK9y3IK5aEENJGVYW4gOQNbSA7kHiAqpCo4wQtGvWr
+         SaOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750176107; x=1750780907;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WALP22qPaSmrlHrSd0ASkEUPW5PSB3MfUO3Tow5jPlY=;
+        b=OCnMbwARopoyz5gqg0ZVt0I4QoHXdb+2Wkgj69wv1JezlNOoy4HFlquV3xPCP91ahM
+         r/ALW45gfdszsznBjJLNB3wkBV2vBMvBVCfPuebHg2fb17it7vjVtw+MS2xVnOJ1K4XN
+         t6TTwf5lBdFj41IlAy5L0EhpKjY2+xxjm9AMyNUe88l05OYw6qENIHEZw6v3qA7iuYmF
+         c1Zd3YU6yqdw46YhPU+JBSGRRDcH7xK9Znv4pBch0KFi9hkTfhZf79dcqpercpgc+mZR
+         tFH/lsHvvFRqEmAGmvQG9XVsJWuj9wUlkx+8U/mlBeQkOqU6OUFhpDtzHJv+vbEBkg9h
+         mNgw==
+X-Gm-Message-State: AOJu0Yyvl0DNHzh4ySR4NAaeDAXSa7VsdeENEMjTr1CplJCZTaPre6Vh
+	FJAnIXTXMqrBJ82fwtAkRlslpMBBO4j5Wa/9aZO3TFjyn7o1JjmKT3wqKiY8BuT0EKKTtNUFV/C
+	jdpdjg8gs7P4z8vM6b0uHFaYdztobW0YK8vfB
+X-Gm-Gg: ASbGncuCFsftoOFqg+nNUMZROAdjG0/wrO+jfaVpleEFZtRg+zgwU+D5JtZCEYnbV7u
+	PwgX8X9rwO77yYO42cgqvp3YNjpHpedNzKvPmmR5+G5JXvnkVNzmIJzkuNmqgFVNcQx3IRp345t
+	vtVpM2LaZfo5YRi5G+M9vX4Uk7Nr2wMK4DgDZeVpwWhXKRkDJ/DiwucMUXwU9eJt8q7MzCksHuO
+	WmN30GT9LBv7S869caiSe8T9nTS/Na8HAUL06KTqMrNrNDiDcq+eS97I1AqfEAlBgZiTFj9vXCl
+	rq0H37cVJI56AFWcSwlgYCfdZ7XQOeoyReabWyCnLCSPauGOe9IVzh7Si6YSMdp0aa7MBE2SX/F
+	5dA==
+X-Google-Smtp-Source: AGHT+IGZ+YYeyAaS/UmytzZ4/0h0owiA91i4AAGrzla1ogNt8j4VSgXABaWm/O5pfhlp0PBoeyEYq4mIqAmN
+X-Received: by 2002:a05:6402:3514:b0:600:ecab:a724 with SMTP id 4fb4d7f45d1cf-608d09447ccmr4130553a12.3.1750176104222;
+        Tue, 17 Jun 2025 09:01:44 -0700 (PDT)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id 4fb4d7f45d1cf-608b49e105asm389643a12.29.2025.06.17.09.01.44;
+        Tue, 17 Jun 2025 09:01:44 -0700 (PDT)
+X-Relaying-Domain: 6wind.com
+Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
+	by smtpservice.6wind.com (Postfix) with ESMTPS id B26681065C;
+	Tue, 17 Jun 2025 18:01:43 +0200 (CEST)
+Received: from dichtel by bretzel with local (Exim 4.94.2)
+	(envelope-from <nicolas.dichtel@6wind.com>)
+	id 1uRYkp-004aSX-Dn; Tue, 17 Jun 2025 18:01:43 +0200
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next] ip6_tunnel: enable to change proto of fb tunnels
+Date: Tue, 17 Jun 2025 18:01:25 +0200
+Message-ID: <20250617160126.1093435-1-nicolas.dichtel@6wind.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Em Tue, 17 Jun 2025 15:40:49 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
+This is possible via the ioctl API:
+> ip -6 tunnel change ip6tnl0 mode any
 
-> > > +            # Parse message with RSTParser
-> > > +            for i, line in enumerate(msg.split('\n')):
-> > > +                result.append(line, document.current_source, i)   =20
-> >=20
-> > This has the effect of associating line numbers from the generated ReST
-> > with the source .yaml file, right? So errors will be reported against
-> > the wrong place in the file. Is there any way to show the cause of the
-> > error in the intermediate ReST? =20
->=20
-> Yes, but this will require modifying the parser. I prefer merging this
-> series without such change, and then having a separate changeset
-> addressing it.
->=20
-> There are two ways we can do that:
->=20
-> 1. The parser can add a ReST comment with the line number. This
->    is what it is done by kerneldoc.py Sphinx extension:
->=20
-> 	lineoffset =3D 0
-> 	line_regex =3D re.compile(r"^\.\. LINENO ([0-9]+)$")
->         for line in lines:
->             match =3D line_regex.search(line)
->             if match:
->                 lineoffset =3D int(match.group(1)) - 1 # sphinx counts li=
-nes from 0
->             else:
->                 doc =3D str(env.srcdir) + "/" + env.docname + ":" + str(s=
-elf.lineno)
->                 result.append(line, doc + ": " + filename, lineoffset)
->                 lineoffset +=3D 1
->=20
->    I kept the same way after its conversion to Python, as right now,
->    it supports both a Python class and a command lin command. I may
->    eventually clean it up in the future.
->=20
-> 2. making the parser return a tuple. At kernel_abi.py, as the parser
->    returns content from multiple files, such tuple is:
->=20
-> 		 (rst_output, filename, line_number)
->=20
->    and the code for it is (cleaned up):
->=20
-> 	for msg, f, ln in kernel_abi.doc(show_file=3Dshow_file,
->                                          show_symbols=3Dshow_symbols,
->                                          filter_path=3Dabi_type):
->=20
->             lines =3D statemachine.string2lines(msg, tab_width,
->                                               convert_whitespace=3DTrue)
->=20
->             for line in lines:
->                 content.append(line, f, ln - 1) # sphinx counts lines fro=
-m 0
->=20
-> (2) is cleaner and faster, but (1) is easier to implement on an=20
-> already-existing code.
+Let's align the netlink API:
+> ip link set ip6tnl0 type ip6tnl mode any
 
-The logic below implements (1). This seems to be the easiest way for
-pyyaml. I will submit as 2 separate patches at the end of the next
-version.
-
-Please notice that I didn't check yet for the "quality" of the
-line numbers. Some tweaks could be needed later on.
-
-Regards,
-Mauro
-
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
+ net/ipv6/ip6_tunnel.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-=46rom 750daebebadcd156b5fe9b516f4fae4bd42b9d2c Mon Sep 17 00:00:00 2001
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Date: Tue, 17 Jun 2025 17:54:03 +0200
-Subject: [PATCH] docs: parser_yaml.py: add support for line numbers from the
- parser
-
-Instead of printing line numbers from the temp converted ReST
-file, get them from the original source.
-
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-
-diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/par=
-ser_yaml.py
-index 635945e1c5ba..15c642fc0bd5 100755
---- a/Documentation/sphinx/parser_yaml.py
-+++ b/Documentation/sphinx/parser_yaml.py
-@@ -29,6 +29,8 @@ class YamlParser(Parser):
-=20
-     netlink_parser =3D YnlDocGenerator()
-=20
-+    re_lineno =3D re.compile(r"\.\. LINENO ([0-9]+)$")
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 894d3158a6f0..03ad45189621 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -2053,8 +2053,17 @@ static int ip6_tnl_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	struct ip6_tnl_net *ip6n = net_generic(net, ip6_tnl_net_id);
+ 	struct ip_tunnel_encap ipencap;
+ 
+-	if (dev == ip6n->fb_tnl_dev)
+-		return -EINVAL;
++	if (dev == ip6n->fb_tnl_dev) {
++		if (!data[IFLA_IPTUN_PROTO]) {
++			NL_SET_ERR_MSG(extack,
++				       "Only protocol can be changed for fallback tunnel");
++			return -EINVAL;
++		}
 +
-     def do_parse(self, inputstring, document, msg):
-         """Parse YAML and generate a document tree."""
-=20
-@@ -38,8 +40,14 @@ class YamlParser(Parser):
-=20
-         try:
-             # Parse message with RSTParser
--            for i, line in enumerate(msg.split('\n')):
--                result.append(line, document.current_source, i)
-+            lineoffset =3D 0;
-+            for line in msg.split('\n'):
-+                match =3D self.re_lineno.match(line)
-+                if match:
-+                    lineoffset =3D int(match.group(1))
-+                    continue
-+
-+                result.append(line, document.current_source, lineoffset)
-=20
-             rst_parser =3D RSTParser()
-             rst_parser.parse('\n'.join(result), document)
-
-=46rom 15c1f9db30f3abdce110e19788d87f9fe1417781 Mon Sep 17 00:00:00 2001
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Date: Tue, 17 Jun 2025 17:28:04 +0200
-Subject: [PATCH] tools: netlink_yml_parser.py: add line numbers to parsed d=
-ata
-
-When something goes wrong, we want Sphinx error to point to the
-right line number from the original source, not from the
-processed ReST data.
-
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-
-diff --git a/tools/net/ynl/pyynl/netlink_yml_parser.py b/tools/net/ynl/pyyn=
-l/netlink_yml_parser.py
-index 866551726723..a9d8ab6f2639 100755
---- a/tools/net/ynl/pyynl/netlink_yml_parser.py
-+++ b/tools/net/ynl/pyynl/netlink_yml_parser.py
-@@ -20,6 +20,16 @@
- from typing import Any, Dict, List
- import yaml
-=20
-+LINE_STR =3D '__lineno__'
-+
-+class NumberedSafeLoader(yaml.SafeLoader):
-+    """Override the SafeLoader class to add line number to parsed data"""
-+
-+    def construct_mapping(self, node):
-+        mapping =3D super().construct_mapping(node)
-+        mapping[LINE_STR] =3D node.start_mark.line
-+
-+        return mapping
-=20
- class RstFormatters:
-     """RST Formatters"""
-@@ -127,6 +137,11 @@ class RstFormatters:
-         """Return a formatted label"""
-         return f".. _{title}:\n\n"
-=20
-+    @staticmethod
-+    def rst_lineno(lineno: int) -> str:
-+        """Return a lineno comment"""
-+        return f".. LINENO {lineno}\n"
-+
- class YnlDocGenerator:
-     """YAML Netlink specs Parser"""
-=20
-@@ -144,6 +159,9 @@ class YnlDocGenerator:
-         """Parse 'do' section and return a formatted string"""
-         lines =3D []
-         for key in do_dict.keys():
-+            if key =3D=3D LINE_STR:
-+                lines.append(self.fmt.rst_lineno(do_dict[key]))
-+                continue
-             lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level =
-+ 1))
-             if key in ['request', 'reply']:
-                 lines.append(self.parse_do_attributes(do_dict[key], level =
-+ 1) + "\n")
-@@ -174,6 +192,10 @@ class YnlDocGenerator:
-             lines.append(self.fmt.rst_paragraph(operation["doc"]) + "\n")
-=20
-             for key in operation.keys():
-+                if key =3D=3D LINE_STR:
-+                    lines.append(self.fmt.rst_lineno(operation[key]))
-+                    continue
-+
-                 if key in preprocessed:
-                     # Skip the special fields
-                     continue
-@@ -233,6 +255,9 @@ class YnlDocGenerator:
-         for definition in defs:
-             lines.append(self.fmt.rst_section(namespace, 'definition', def=
-inition["name"]))
-             for k in definition.keys():
-+                if k =3D=3D LINE_STR:
-+                    lines.append(self.fmt.rst_lineno(definition[k]))
-+                    continue
-                 if k in preprocessed + ignored:
-                     continue
-                 lines.append(self.fmt.rst_fields(k, self.fmt.sanitize(defi=
-nition[k]), 0))
-@@ -268,6 +293,9 @@ class YnlDocGenerator:
-                 lines.append(self.fmt.rst_subsubsection(attr_line))
-=20
-                 for k in attr.keys():
-+                    if k =3D=3D LINE_STR:
-+                        lines.append(self.fmt.rst_lineno(attr[k]))
-+                        continue
-                     if k in preprocessed + ignored:
-                         continue
-                     if k in linkable:
-@@ -306,6 +334,8 @@ class YnlDocGenerator:
-         lines =3D []
-=20
-         # Main header
-+        lineno =3D obj.get('__lineno__', 0)
-+        lines.append(self.fmt.rst_lineno(lineno))
-=20
-         family =3D obj['name']
-=20
-@@ -354,7 +384,7 @@ class YnlDocGenerator:
-     def parse_yaml_file(self, filename: str) -> str:
-         """Transform the YAML specified by filename into an RST-formatted =
-string"""
-         with open(filename, "r", encoding=3D"utf-8") as spec_file:
--            yaml_data =3D yaml.safe_load(spec_file)
--            content =3D self.parse_yaml(yaml_data)
-+            numbered_yaml =3D yaml.load(spec_file, Loader=3DNumberedSafeLo=
-ader)
-+            content =3D self.parse_yaml(numbered_yaml)
-=20
-         return content
++		ip6_tnl_netlink_parms(data, &p);
++		ip6_tnl0_update(netdev_priv(ip6n->fb_tnl_dev), &p);
++		return 0;
++	}
+ 
+ 	if (ip_tunnel_netlink_encap_parms(data, &ipencap)) {
+ 		int err = ip6_tnl_encap_setup(t, &ipencap);
+-- 
+2.47.1
 
 
