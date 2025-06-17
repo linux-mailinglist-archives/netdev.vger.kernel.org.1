@@ -1,141 +1,107 @@
-Return-Path: <netdev+bounces-198443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB5C6ADC2C0
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:00:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39615ADC2C2
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6C3A7F6F
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:00:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15D1318916C5
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB7D28C866;
-	Tue, 17 Jun 2025 07:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F612236A8B;
+	Tue, 17 Jun 2025 07:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDprnsY6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJ5CxfCX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3288C28C5A9;
-	Tue, 17 Jun 2025 07:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8033C01
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750143626; cv=none; b=s+hK5t0Vn9xkJ5Lw8vwQe9vUdtIuNNDpy9sEw50GHKHecRi2KpaMyLRi6iqSlRnZoXJp6K9fJYgw4b+JiH5eBMYE6XDNZjbuEyys0UXjbsZh+CHCBMqlcplhvpZEjdBREk9s6o5NREcTrwxUTABBoM3cCI+RP3HR2GTgLzbZMgQ=
+	t=1750143653; cv=none; b=S1LVSKQQaR5UyUrlCTgwyEEN2HGnRLT6a1A1DqOP01xw4kUh1bjHmo0wPOE7UACSxMokBJD5+Lm8mWsfUwkfsT6BXqNUuA1yriWE4zCVhZyXCJl+LirRJStHLW2xbxE/U/VezjVfegu24DoITzuqvGsXesGMKVKQgVYkLihlnqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750143626; c=relaxed/simple;
-	bh=EZJG11e4pWpqrTF5AUNg7CFYWOk3WqLPNIo7rSIH9ys=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ja3KrKfH52MNQsUjrWO0p2Nw1GxRC45SvghzYa1lJCrYOS8QrAQEv8wwqyOIrheogfzWfscaDqFiuPe/8V6b1Zod8PT5KA0CHYw0a5lCnUpeHRfX8IK80w8Ht7M00gjEXhDsmNTN8DJeqeNTubS9V9qfMioMlfDTF6BViNxcPSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TDprnsY6; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-acae7e7587dso811931366b.2;
-        Tue, 17 Jun 2025 00:00:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750143623; x=1750748423; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SMox0MpwPKygAR/vnpy2GVz1YAIGJ060oJ50J1k9QBo=;
-        b=TDprnsY6W7GflWn0XE6L7pK4wMnG6EfvSvb9cG17EozA36u7COdt2YYzQHTodT1Lr+
-         gnltsEzOHr0eDYuUISJ2H95DyAwDWA4Xpyil+9aNNyGDUWM76Vyvpgquj7cZ2avbpTi6
-         oxUeoeA17hPfV1nnOmJ7HTgX1aaaRKKksKpCQ7Kd2DWfLG52brng+ovwZ4JFdjIV1beH
-         AyDVYO2NBkof1hF1lKkG5uIj1uUrnZMHS37DLrt6jyoJEvm1Lm2jGKrrRhiStmLwiI2s
-         3ZeV5DCc3yWO1oR1/8FJhs3kv9WcB4bneClvvlepUkDeTGLZn+V69yXZi7JoQzj4IixM
-         cbxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750143623; x=1750748423;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SMox0MpwPKygAR/vnpy2GVz1YAIGJ060oJ50J1k9QBo=;
-        b=DVzDfLNF50oQiw15FKRT9QQEf6o8UMGZAWEOaaTu07b0qnqRDhULvC+7K4OwQpMAzD
-         uSWEB8bC8YwnY0fSjnLOfR8kS/a/HJrKhorSsXTBAK3EQdQoqreikQK8tE+fUVx8yXyX
-         AgeAkvy6c1m9Z2W0+28Y/9uPxe5N6QZiJwFi25XsXgNy+OteJPv52PVs+0vhw3NVwioZ
-         l+o5Uun5I3o6hP4zMA8l4xdc0hQMxHlPxvxSsJr0tQU/9KkAe32z2V2V80RfgrLvXtFm
-         V+bFRCMUeJXxB/Pmz9e6EeHkX18GAlhiF1Z9NfotaCh9KayMQx9CqyPBb0F8mAAJUcUo
-         /6dw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHMFs/xoy6y0Zvf7+ypKJVvjloHk01IWChFDmD5dY5vMbzC3pN64F0h9OT40douU1RUNPpKig=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywykcqenkh0mVjvE6oaTV/HuNwET0Bxj33BycJ7wT/HrlPyOaAf
-	Bkuq6Ibn2B3MGHIY8ABw05WYYQhPL/bpxgO62UoHRcQmn9ZgkVd5o0de
-X-Gm-Gg: ASbGncsI8sWm5+JRFd8SheP9qKAUFy9+x/V9fE6dqoQZq2zgnaNZD+Sb8TXBhuIBCtv
-	y8pLlrnGp0iq2uNqxIT0hbAFEO8TqPgHwCmPgPH7HS9fjFGC9prybPLEKLA5yrPOYyS5bI4vO7l
-	uSqtCctl+QiQMPOGLBxCGcSpIYjAAoXl+ZkJF8Xljz1HL9YXMLmWM/BibGI3cOTT6mSG1i9K38t
-	eq3rmDRdJ5eMOUYzrogXS8Fp1QCWxnDPvt14JT+TWrstaODh+2RqfzI2KBOF+WSVosuP38qKr7u
-	qNf9tT9cbCGiqB+5Jp/gV0ojD/eW5L+x/Wwrk2s205oVkm5uOl53Y/9aRVJB6BPC575a+Y4CK7t
-	nPB72F8LQx4BCu9I/LNbTmerZKHMf7PzPUVrhrTizIjUnAv+q5FcjWxjK7ZJUTHGrLOikyoe3GF
-	8222PD
-X-Google-Smtp-Source: AGHT+IG/cgpbEdoHbmAHFosZet4Q31av0Fyi15tiHrgYeewEF3HhOE3WMKRoWF0jKeLc8Rstwt9KjA==
-X-Received: by 2002:a17:906:c105:b0:ad9:85d3:e141 with SMTP id a640c23a62f3a-adfad52b9e4mr1177113166b.53.1750143623241;
-        Tue, 17 Jun 2025 00:00:23 -0700 (PDT)
-Received: from localhost.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec8158d4dsm800843066b.28.2025.06.17.00.00.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 00:00:22 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v3 nf-next 3/3] netfilter: nf_flow_table_ip: don't follow fastpath when marked teardown
-Date: Tue, 17 Jun 2025 09:00:07 +0200
-Message-ID: <20250617070007.23812-4-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250617070007.23812-1-ericwouds@gmail.com>
-References: <20250617070007.23812-1-ericwouds@gmail.com>
+	s=arc-20240116; t=1750143653; c=relaxed/simple;
+	bh=NcwBh6EnekHcip7sx/0f94JunjhSmAdwjt/WnP1X8mg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1rYchFWlP5dG5CvRcMHry6oFQdgaRXY+z3V2NoeU8rVpgTOMhyTe53Kk3o6ZfGWfhfqzejEheUgna291Te/JC0ZxVXBakjGr1QG97KvO17a1ZOFgB6lAQA5pmu8rM/mb5ArhLwK3htBHZKoIKPqLXdZHJ2K3pBpaPpgRYnBq9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJ5CxfCX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72154C4CEE3;
+	Tue, 17 Jun 2025 07:00:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750143652;
+	bh=NcwBh6EnekHcip7sx/0f94JunjhSmAdwjt/WnP1X8mg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PJ5CxfCXEc+7PMKfh7lTABYWzG0J/7eQgxc/g1FXaQpHbfgoCFNLMiU535FKonCvU
+	 KlisFU+jQ0nQ7uSvlBW1vQCUlUL0sqTmgrS1KSgaziMWtmkDvd/nnQGL/lP2c2HI0X
+	 6I19RL3trLQb1wD16DPGyhK8S9U0+o89xaEBg1qnCHTiUcZ79TLVCMSkdmpsu0I627
+	 2bjv4bw5VuSOSPmV/p4Wut3kknpGcLVyIieUuPfPzwMDwEUZdMFF67bjU9MEhXNQZb
+	 cZj0+zwBlLkZHFd8vj31j5OWPxFhOSZRTAIcrN8fvhqZdZ4ggG5c5iUp2R6TDgMiuv
+	 Bge4iZk+h8eZQ==
+Date: Tue, 17 Jun 2025 08:00:48 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, hkallweit1@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, pabeni@redhat.com,
+	kuba@kernel.org, kernel-team@meta.com, edumazet@google.com
+Subject: Re: [net-next PATCH v2 3/6] fbnic: Replace 'link_mode' with 'aui'
+Message-ID: <20250617070048.GD5000@horms.kernel.org>
+References: <174974059576.3327565.11541374883434516600.stgit@ahduyck-xeon-server.home.arpa>
+ <174974092054.3327565.9587401305919779622.stgit@ahduyck-xeon-server.home.arpa>
+ <20250616153438.GE6918@horms.kernel.org>
+ <CAKgT0UfEkGiAu2mO15yaF1HRdRLsercm4vJsyi-xg8Je0c_i5A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKgT0UfEkGiAu2mO15yaF1HRdRLsercm4vJsyi-xg8Je0c_i5A@mail.gmail.com>
 
-When a flow is marked for teardown, because the destination is not valid
-any more, the software fastpath may still be in effect and traffic is
-still send to the wrong destination. Change the ip/ipv6 hooks to not use
-the software fastpath for a flow that is marked to be teared down and let
-the packet continue along the normal path.
+On Mon, Jun 16, 2025 at 09:14:33AM -0700, Alexander Duyck wrote:
+> On Mon, Jun 16, 2025 at 8:34 AM Simon Horman <horms@kernel.org> wrote:
+> >
+> > On Thu, Jun 12, 2025 at 08:08:40AM -0700, Alexander Duyck wrote:
+> > > From: Alexander Duyck <alexanderduyck@fb.com>
+> > >
+> > > The way we were using "link_mode" really was more to describe the
+> > > interface between the attachment unit interface(s) we were using on the
+> > > device. Specifically the AUI is describing the modulation and the number of
+> > > lanes we are using. So we can simplify this by replacing link_mode with
+> > > aui.
+> > >
+> > > In addition this change makes it so that the enum we use for the FW values
+> > > represents actual link modes that will be normally advertised by a link
+> > > partner. The general idea is to look at using this to populate
+> > > lp_advertising in the future so that we don't have to force the value and
+> > > can instead default to autoneg allowing the user to change it should they
+> > > want to force the link down or are doing some sort of manufacturing test
+> > > with a loopback plug.
+> > >
+> > > Lastly we make the transition from fw_settings to aui/fec a one time thing
+> > > during phylink_init. The general idea is when we start phylink we should no
+> > > longer update the setting based on the FW and instead only allow the user
+> > > to provide the settings.
+> > >
+> > > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> >
+> > Hi Alexander,
+> >
+> > This patch is doing a lot - I count 3 things.
+> > Could you try and break it up a bit in v3?
+> 
+> Actually I need to clean this up a bit more anyway. Looks like I have
+> some text from the earlier version still here as the last item was
+> moved to patch 4 I believe.
+> 
+> Since it is mostly just renames anyway, splitting it up should be
+> pretty straight forward.
 
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
----
- net/netfilter/nf_flow_table_ip.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 64a12b9668e7..f9bf2b466ca8 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -542,6 +542,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 	dir = tuplehash->tuple.dir;
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
- 
-+	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
-+		return NF_ACCEPT;
-+
- 	switch (tuplehash->tuple.xmit_type) {
- 	case FLOW_OFFLOAD_XMIT_NEIGH:
- 		rt = dst_rtable(tuplehash->tuple.dst_cache);
-@@ -838,6 +841,9 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
- 	dir = tuplehash->tuple.dir;
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
- 
-+	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
-+		return NF_ACCEPT;
-+
- 	switch (tuplehash->tuple.xmit_type) {
- 	case FLOW_OFFLOAD_XMIT_NEIGH:
- 		rt = dst_rt6_info(tuplehash->tuple.dst_cache);
--- 
-2.47.1
-
+Thanks, I think that would help (me) a lot.
 
