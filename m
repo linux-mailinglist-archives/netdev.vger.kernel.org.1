@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D21ADDF8A
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:20:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B4D1ADDF8C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BAA316C453
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:20:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C95F5189CA6C
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1DA29826D;
-	Tue, 17 Jun 2025 23:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1192BE7BE;
+	Tue, 17 Jun 2025 23:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNCj+k3q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WxHNB7E/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6322D1F5847;
-	Tue, 17 Jun 2025 23:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86892980B0;
+	Tue, 17 Jun 2025 23:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750202402; cv=none; b=cBYJa8qlqKsvvnGKL+nkuaKku3RbcXHM4reLIXt3vY/8bv+zzOb97UMGqLZ4QoKBZZD3JeWqS4/eE2zwZSpau7WVDD3oU7U/7qUR8Iohb1XfTTy+xGIQwWof+wGcl7Rs+OdAyJ0AE1Fali7cFrv/9pMgjejeRg94QiwNHJ4MP9M=
+	t=1750202403; cv=none; b=fHPO3+VsCH1dWZ+ENaxQvu2csDhIRHUKEiXB3DlZtuhJSng7RBFzaVkqJxkOo5ptfNM5FSopHhgzP2FUfaOmLymnm/GugsHwdtcoUl5vt112bh+iwQWvI7k8CRQHJWM/ExMQ/YzJ5DYX5Rtdv1rZvuH0xwEoNBdjh2SzkP0lBTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750202402; c=relaxed/simple;
-	bh=tUMfbZaV2KdqnBHZfGQhAgjQy/l7+5wMfermKy1C0Xs=;
+	s=arc-20240116; t=1750202403; c=relaxed/simple;
+	bh=D/MwPuNU7YSZbfUwSYVCnvHmZw+UsvYgVrx2QwzZlwE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RYlC9SNkSiBWU2CFSnn2Kz5joj8Gl1BCAae7vVqSCrA8dJ8n/1aaM0yltheumOO7LQdsTm4P6F8RYUdTc+1ua7Mp7eqS1zseT2Xaa5MkaMKoG/UTLiYPZIkTdvVv7G4RYtC0nW2dgNAnA24qELJdejeZ0nbp0TEQpjXo1xyrAbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNCj+k3q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9ACC4CEE3;
-	Tue, 17 Jun 2025 23:20:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=V+F1OSRSp30HJO4l02M3939hgK5yxca1px2kmHORAFJeb2AKIgVc+vcj2hTMcpO5UK2cO8NIMWAHfeG6bwVka75t3mc9DLzyC5tZkHFLipzsfaDJKJZJ1zYDUlJ5rCEJ79bUgHlq+5nHIsLFCRqZm8bYCXmyICeuh6o6MoUNgKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WxHNB7E/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67FAAC4CEF0;
+	Tue, 17 Jun 2025 23:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750202402;
-	bh=tUMfbZaV2KdqnBHZfGQhAgjQy/l7+5wMfermKy1C0Xs=;
+	s=k20201202; t=1750202403;
+	bh=D/MwPuNU7YSZbfUwSYVCnvHmZw+UsvYgVrx2QwzZlwE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BNCj+k3q0uLbx1jAxYLpfFz/Pa4F3J3n9K2AiR1YNH4Y92v9MlWecdNPYoG4S/ujb
-	 PHlnbVao3Hj0xmvBC8pzYhZdOHENJYHFsLSv+Wp626xp8blbGgx9C1a3p1zVon0wod
-	 EoR9lBNnSyL5iRORJmTShxwVwkTDHt4dzABYPnlJwMMV5m4U9GCg8s1t2QV+w8ZNtz
-	 OYEIz6p8VW7gCiGykaNabC/1aFkS9G8F0UdpaB0eiN064XWyriZdLyguxGqJpSpt8Y
-	 Kia9TZh87uRe6ZQyE0mkaedm0SLSFOqbEwDEMC50WOLWr8as5Up9wo1JldgdGteEC3
-	 rcnI3VkihdF5Q==
+	b=WxHNB7E/kR6pm2qGY6LmRvp2wDqa5Uf6G3FrZHQ6Abz8w/cXakkDceIoeaSzGSsOQ
+	 lbbvenJaRFEHtaR8K8lg7erM8JxMDCkoyL1vI+A7IRxeVRw8UpKZzmmXJEuDBqBV8m
+	 jxY8BZY0A/pP2bmd4OoGBg/BwieDFNCVpt9lmaS5JPNaPPJtcly/12ccee8dTa16DF
+	 o3e21pb8jejXy0wFlZ28ogUbSzOFjjGS+ONBNijyofanWJHHgt+hppNkmakH2d0H+o
+	 1WsgfrtXfNjqkV6qDKWElODfzf8sZcg3Q2Ef9Zqwz4WDwi+VtjHpwECUv7OQSSmTlM
+	 Ry+w3DECM41Sg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD3538111DD;
-	Tue, 17 Jun 2025 23:20:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BE538111DD;
+	Tue, 17 Jun 2025 23:20:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] bnxt_en: Improve comment wording and error return code
+Subject: Re: [PATCH net-next v2] net: bcmgenet: update PHY power down
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020243050.3732875.7654821234752870349.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:20:30 +0000
-References: <20250615154051.1365631-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250615154051.1365631-1-alok.a.tiwari@oracle.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: netdev@vger.kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- darren.kenny@oracle.com, linux-kernel@vger.kernel.org
+ <175020243174.3732875.2118110252101243802.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:20:31 +0000
+References: <20250614025817.3808354-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20250614025817.3808354-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, opendmb@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 15 Jun 2025 08:40:40 -0700 you wrote:
-> Improved wording and grammar in several comments for clarity.
->   "the must belongs" -> "it must belong"
->   "mininum" -> "minimum"
->   "fileds" -> "fields"
+On Fri, 13 Jun 2025 19:58:16 -0700 you wrote:
+> From: Doug Berger <opendmb@gmail.com>
 > 
-> Replaced return -1 with -EINVAL in hwrm_ring_alloc_send_msg()
-> to return a proper error code.
+> The disable sequence in bcmgenet_phy_power_set() is updated to
+> match the inverse sequence and timing (and spacing) of the
+> enable sequence. This ensures that LEDs driven by the GENET IP
+> are disabled when the GPHY is powered down.
 > 
 > [...]
 
 Here is the summary with links:
-  - bnxt_en: Improve comment wording and error return code
-    https://git.kernel.org/netdev/net-next/c/10f3829a1309
+  - [net-next,v2] net: bcmgenet: update PHY power down
+    https://git.kernel.org/netdev/net-next/c/90b4e1cf6de0
 
 You are awesome, thank you!
 -- 
