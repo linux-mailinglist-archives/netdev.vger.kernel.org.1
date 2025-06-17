@@ -1,241 +1,224 @@
-Return-Path: <netdev+bounces-198703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3159ADD133
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:21:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6488EADD143
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9A0C3AE3D1
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:21:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45E0B3B144E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2358D2EBDCA;
-	Tue, 17 Jun 2025 15:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2122D2EB5A7;
+	Tue, 17 Jun 2025 15:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZrobwjA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPNd/Fwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CD72EB5C0
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818EE217F34;
+	Tue, 17 Jun 2025 15:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750173687; cv=none; b=goA5ShiNhBhntpY912iP79ZVj18w9NxZYzbVWrLmD4d+KAfplB4gRNQfZq+8+jxc8TY6/lfIuLejcILpqQJulgAL5Rfr7n3bUjP4Mc/vdM5NgkPjqD95w1XUQ7hOF8a/9pGbyYX1B0tNK1uoT5k2ONZGBAiYNmPA/W2KlJM9JaY=
+	t=1750173861; cv=none; b=BfnEQtXtdUf33hh7X3HabWI/PbCtjHPxqEI0qXJR5lKopUs7CkF8MRRX780GV/hh68GPrheqOdY2B//CqpfzbJcfCOFGZ044E4g0e9FuPymo6uDa8V2TxQZ3K9FhVudtyBDSTfMwDrU3DFx1SyMNBHlese8b68q1T1mPqBk1jnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750173687; c=relaxed/simple;
-	bh=D7Sm7Z8o9wrG2DILp1d81NcnEtOVz1w8yhboj0jyHxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mmyAEBk7J8eSW8tjPnwESezpnT78G/F/nHWiWJDVVjhPogGknEazyGJRkYboFANpx19gvDLcc2/HKOOiKx0sZ2l1SukL8nLxYS24GGwC6y1UucSNoaNyoqE9nXZzxwJQUSb5VM4pwT7fOZ6lwsVv1Ko6UHWRdD4ii+io7fCR9g8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZrobwjA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750173684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6CNZp4Yl2H/9Cdj6XouU0nprVFIEoQUBC+80peSkJR8=;
-	b=ZZrobwjAWAPCtHLGu6diheYMtWyVh3NZBR9BWpnxeMykGzFpr0iyRpXZkftWGlrxIvnKiE
-	72sYIZahYAxEW28eh5pRS+5CHEWORalaacnhX6dDdoJqnf5fWkLhvXMImetWHGscbn3f4Q
-	WAP4cvZHDbbL1LkBuUIK4Bsb90CGpkU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-210-6g660AhUOEasHE2gK1F88Q-1; Tue, 17 Jun 2025 11:21:22 -0400
-X-MC-Unique: 6g660AhUOEasHE2gK1F88Q-1
-X-Mimecast-MFC-AGG-ID: 6g660AhUOEasHE2gK1F88Q_1750173681
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450eaae2934so48235755e9.2
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:21:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750173681; x=1750778481;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1750173861; c=relaxed/simple;
+	bh=Ff9lS1Yd/+nqGtnrmnMrj8V8fDZxSoDHmktWe2ibSwA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=QEXGzuajy8+3KRd/yG+fY2f9fMml1G1sWM+5vh+5me5jZWPTJa1+TY+Pjqw+Yi2OngKceoWpQ/PHeCwwBMfQs78HnaJmzUzJNXB5RfN/+BaHgF3xQ99jdOfUGjgNB0jCKNhW9lSoKL1atbVSs3B6EOwMH/deYYK4dKQk5KlAmB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPNd/Fwj; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-313910f392dso5298561a91.2;
+        Tue, 17 Jun 2025 08:24:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750173858; x=1750778658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6CNZp4Yl2H/9Cdj6XouU0nprVFIEoQUBC+80peSkJR8=;
-        b=OM+nVGL8wwyPwYG+NzZN9aZuYYaqktx5cipXLlYggnLqn6lzBejaQa8bVxB87QrX/f
-         DxtUJ5Y06Aep8GX2TNMyBLQuqoF29M4CPSlaU/i7EfN87vqgV3wwwMwI6v2iDRoMcdwF
-         Vq+tqco4CeaT3lk/548m3pdTfIB18lovxiPSFqCgVXEwLfJkC/NTiz76/p/YQUzqYu0e
-         JzwuXItsG455K6gpeYUHaUGJofXoZji6mbzfbpgVhFsKy9T9EFOFzulpth6HhLdNcFGk
-         jDJ7wiEr5iG3uCpqR+Y9rl0uMNvXNn1XasRxvrgVmiDfkL5JBTGiedyf7a6Y/G0jJ2q5
-         tP9g==
-X-Forwarded-Encrypted: i=1; AJvYcCULtX6LFUQPZMyts5SHqFUH2hI1K4W3S2xk9T7J83cMUGOhzwlTu9SBEeprGIthGSPMRMVkcdc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTLEerRZiTA79ZvkS3YxbTNBd8vMjWrz2p9zvATIbACPNgEONV
-	hyK7jR7x3d3uG4mjmIzkZHeZ39GZlSc1DG1hub8jnPU943nv9wh+I34YtmRXfsxhzNcr1LbOasG
-	NNX1iDna8Odf+JOE61UJZpAADwoDQYcMYJtfXWzqLLv8uBorR9Lp+W7qzsQ==
-X-Gm-Gg: ASbGncuDWPwMf/zR+/xhC8vECowSDuPG89lfYcwnCqbFqCDcVNKRI2UY1h6JdK1wMlw
-	x1syeoB10h/gEJl0UMmxwcNTXSa5dVKUXiYGZlM1t2xOFf+HcziFcZ0ETtcVTeou3fWzF44e/mF
-	dK4wAMOLPHqs2Xt18F0mwcMZX7LsKVOHqHhx4Fw6ace2bRh0Ed/b/+A8zPF/PEGyCt1kND3jVDl
-	iGmBk/VDRAL0R23Nl9sYTdPSnAuIUrZ8kpyR0pQ3r6qM8ctd7ZZVF3pw1njXm3QspRQ04XwrEx8
-	Ytxtb6UjNiYe7krG7HE+xiI9zPwc
-X-Received: by 2002:a05:600c:1e02:b0:43d:b85:1831 with SMTP id 5b1f17b1804b1-4533c9dbbfemr141095215e9.0.1750173681400;
-        Tue, 17 Jun 2025 08:21:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOqu3b57WklFuqqnAtvsRHZ0LJvT+ZbOW6XRYMLwqjSK0FduBdtkCovgyUALJLzqgQ/aP+vg==
-X-Received: by 2002:a05:600c:1e02:b0:43d:b85:1831 with SMTP id 5b1f17b1804b1-4533c9dbbfemr141094715e9.0.1750173680915;
-        Tue, 17 Jun 2025 08:21:20 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.200.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e195768sm180099565e9.0.2025.06.17.08.21.18
+        bh=+jbR+py3WXxAosAVt09Fd+QIJmRYUlK/h5DTO/DPsSM=;
+        b=CPNd/FwjpbJ47HpCukq7VPM+rSS92NU8KLvbKcz6/Nzb/3vYn53XN6MzThWM5KR6G4
+         s7Hjmxoxfp/WBS+bCYw0g7Y6wCeFiCdwNjhpBoBLycuXyIhnDrEYkfwxzxky5N2C+ps+
+         cEBbAbJMvislNaOm5ny3VxlGu12wbtcTSWKQzc8N1GH0ekdy9TR8Oh9iLuToTjId6lO7
+         YqRhDVw9Ovrfr0gsJl1XF6y0/Kzw36TM/J+krlb7FkZGW8q4/6r5EPFiExwALHcMgV0U
+         Py/4xOxqSfG9fTQ9wtp/dsjA6vIYtCCsGX7IfbejbnTFdXUeDkRYqBhy5brx2fx1VyGq
+         en0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750173858; x=1750778658;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+jbR+py3WXxAosAVt09Fd+QIJmRYUlK/h5DTO/DPsSM=;
+        b=GpnSnrf7uy4Gk5sikw6q0HNLfUfI91/mIIIdVlRPsKsyjO25SCMdbAFu+zd4ZxBQJ0
+         fx212wDvuAJnpXvyCveWNZByfCnk57RmMLqW5XB2ynJPppaYwMwN5vtjyodglAtlp6bO
+         E4+L97NRc26QdQCXR421VVXv0KOvmLe5Kb/Uy3aqyj08HLx682O0LjwyCABhbTa3nuU6
+         wI/QBULo+xdNOcvSbfdrLw9POUduLZm/n9TTid5mU1vw4LF6rp8y6+kwChYkPmdtZynN
+         DmZa3WH8+c9frgNHahozyeKJU51cHom2Iep9rbKDbaXuNobi4wkSbrPWOSvstr8DBH9Z
+         5fRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBPImt+obI+xBaOS5Z7P2uTVroSx4kGAfocDPtzCfiP20KN9QnMFg6EPsi1cz9XNmFNeNjxK+L@vger.kernel.org, AJvYcCWK9ckO1r0lGDcZvRDxQLk6g6TxmjdPxzg4ki6yrNTeO6edkEEfMkXs9k3HX4qpxCbDnio=@vger.kernel.org, AJvYcCXVB0y7VDmho4zqX6ildu4ie4OQNkQiyTLUHfqAwV8bCDgLmZWd6C2ibRvSqVzoPkeFsGK0KSfkZp4VeMIx@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1mkDpTSFu+PnNKZE2upLdn2Z0ojDmtYHfTnhFHh7ItLmE96lk
+	xz9lmsnOnABDacivIj3DmZREJPGkgX+g+NAxh8yWn5RCYos759e3RBNG
+X-Gm-Gg: ASbGncswl4btAWWwTXSVM3JFNjZ6+GDMSGMXfpRKyZoTjB8d/V/6ZgDj/lf0GPqqUvp
+	DzQdWequJ6pPDtDuUaBafbRqmQ6+07lmFDLGZogTH3b+3kMqkkDOyBL4xK9Lo60czxGcdeM2MoQ
+	ylX+em7/7UQ/OCyvi/zPZsamfBFKVU8qxGQgUbUkTtCF6ZzVQYRrREyuXbPXP90fVYkITpndojy
+	bRxn0gZPnyCmA9gwXNX1QGAnpcQL+ouoxOfpbRbjV6bkk+7478aZnkl09eDZsXVfs4M9F1YxrE3
+	RMT2rxIMdfPKy6S85FGofz53D3SnEC67MaPAEADjZtgyAk7Bx8npHUW0KioIeGkoKPcQRfohCp4
+	3bcqA1m9b
+X-Google-Smtp-Source: AGHT+IH5MD2+jZvIUtC67uk+pIfR42yS9eI+xyYHXF0u5t7e1n8p6rWyAE/h3yACBAbGGBO+BxREIQ==
+X-Received: by 2002:a17:90b:1807:b0:312:e9d:4002 with SMTP id 98e67ed59e1d1-313f1d9bd7cmr21120975a91.28.1750173857515;
+        Tue, 17 Jun 2025 08:24:17 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c19d0e36sm10806236a91.15.2025.06.17.08.24.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 08:21:20 -0700 (PDT)
-Date: Tue, 17 Jun 2025 17:21:16 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: mst@redhat.com, pabeni@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, netdev@vger.kernel.org, stefanha@redhat.com, 
-	leonardi@redhat.com, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, fupan.lfp@antgroup.com, Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [PATCH net-next v3 3/3] test/vsock: Add ioctl SIOCINQ tests
-Message-ID: <fnznqsbg56rfk7szjcprpo4mxy7e4patmj2u5yxbtj33dlj34w@7t5xylskewa5>
-References: <20250617045347.1233128-1-niuxuewei.nxw@antgroup.com>
- <20250617045347.1233128-4-niuxuewei.nxw@antgroup.com>
+        Tue, 17 Jun 2025 08:24:17 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	fupan.lfp@antgroup.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	leonardi@redhat.com,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v3 2/3] test/vsock: Add retry mechanism to ioctl wrapper
+Date: Tue, 17 Jun 2025 23:23:48 +0800
+Message-Id: <20250617152348.1346298-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <uqpldq5hhpmmgayozfh62wiloggk7rsih6n5lzby75cgxvhbiq@fspi6ik7lbp6>
+References: <uqpldq5hhpmmgayozfh62wiloggk7rsih6n5lzby75cgxvhbiq@fspi6ik7lbp6>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250617045347.1233128-4-niuxuewei.nxw@antgroup.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 17, 2025 at 12:53:46PM +0800, Xuewei Niu wrote:
->Add SIOCINQ ioctl tests for both SOCK_STREAM and SOCK_SEQPACKET.
->
->The client waits for the server to send data, and checks if the SIOCINQ
->ioctl value matches the data size. After consuming the data, the client
->checks if the SIOCINQ value is 0.
->
->Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->---
-> tools/testing/vsock/vsock_test.c | 82 ++++++++++++++++++++++++++++++++
-> 1 file changed, 82 insertions(+)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f669baaa0dca..66bb9fde7eca 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1305,6 +1305,58 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-> 	close(fd);
-> }
->
->+static void test_unread_bytes_server(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int client_fd;
->+
->+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
->+	if (client_fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	for (int i = 0; i < sizeof(buf); i++)
->+		buf[i] = rand() & 0xFF;
->+
->+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_writeln("SENT");
->+	control_expectln("RECEIVED");
->+
->+	close(client_fd);
->+}
->+
->+static void test_unread_bytes_client(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int ret, fd;
->+	int sock_bytes_unread;
->+
->+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_expectln("SENT");
->+	/* The data has arrived but has not been read. The expected is
->+	 * MSG_BUF_IOCTL_LEN.
->+	 */
->+	ret = ioctl_int(fd, TIOCINQ, &sock_bytes_unread, MSG_BUF_IOCTL_LEN);
->+	if (ret) {
+> On Tue, Jun 17, 2025 at 12:53:45PM +0800, Xuewei Niu wrote:
+> >Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
+> >int value and an expected int value. The function will not return until
+> >either the ioctl returns the expected value or a timeout occurs, thus
+> >avoiding immediate failure.
+> >
+> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> >---
+> > tools/testing/vsock/util.c | 37 ++++++++++++++++++++++++++++---------
+> > tools/testing/vsock/util.h |  1 +
+> > 2 files changed, 29 insertions(+), 9 deletions(-)
+> >
+> >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+> >index 0c7e9cbcbc85..ecfbe52efca2 100644
+> >--- a/tools/testing/vsock/util.c
+> >+++ b/tools/testing/vsock/util.c
+> >@@ -16,6 +16,7 @@
+> > #include <unistd.h>
+> > #include <assert.h>
+> > #include <sys/epoll.h>
+> >+#include <sys/ioctl.h>
+> > #include <sys/mman.h>
+> > #include <linux/sockios.h>
+> >
+> >@@ -97,28 +98,46 @@ void vsock_wait_remote_close(int fd)
+> > 	close(epollfd);
+> > }
+> >
+> >-/* Wait until transport reports no data left to be sent.
+> >- * Return false if transport does not implement the unsent_bytes() callback.
+> >+/* Wait until ioctl gives an expected int value.
+> >+ * Return a negative value if the op is not supported.
+> >  */
+> >-bool vsock_wait_sent(int fd)
+> >+int ioctl_int(int fd, unsigned long op, int *actual, int expected)
+> > {
+> >-	int ret, sock_bytes_unsent;
+> >+	int ret;
+> >+	char name[32];
+> >+
+> >+	if (!actual) {
+> >+		fprintf(stderr, "%s requires a non-null pointer\n", __func__);
+> >+		exit(EXIT_FAILURE);
+> >+	}
+> 
+> I think we can skip this kind of validation in a test, it will crash 
+> anyway and we don't have in other places.
 
-Since we are returning a value !=0 only if EOPNOTSUPP, I think we can 
-just return a bool when the ioctl is supported or not, like for 
-vsock_wait_sent().
+Will do.
 
->+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
->+		goto out;
->+	}
->+
->+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->+	// All date has been consumed, so the expected is 0.
+> >+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
+> >
+> > 	timeout_begin(TIMEOUT);
+> > 	do {
+> >-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
+> >+		ret = ioctl(fd, op, actual);
+> > 		if (ret < 0) {
+> > 			if (errno == EOPNOTSUPP)
+> > 				break;
+> >
+> >-			perror("ioctl(SIOCOUTQ)");
+> >+			perror(name);
+> > 			exit(EXIT_FAILURE);
+> > 		}
+> >-		timeout_check("SIOCOUTQ");
+> >-	} while (sock_bytes_unsent != 0);
+> >+		timeout_check(name);
+> >+	} while (*actual != expected);
+> > 	timeout_end();
+> >
+> >-	return !ret;
+> >+	return ret;
+> >+}
+> >+
+> >+/* Wait until transport reports no data left to be sent.
+> >+ * Return false if transport does not implement the unsent_bytes() callback.
+> >+ */
+> >+bool vsock_wait_sent(int fd)
+> >+{
+> >+	int sock_bytes_unsent;
+> >+
+> >+	return !(ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0));
+> > }
+> >
+> > /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
+> >diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+> >index 5e2db67072d5..f3fe725cdeab 100644
+> >--- a/tools/testing/vsock/util.h
+> >+++ b/tools/testing/vsock/util.h
+> >@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
+> > int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> > 			   struct sockaddr_vm *clientaddrp);
+> > void vsock_wait_remote_close(int fd);
+> >+int ioctl_int(int fd, unsigned long op, int *actual, int expected);
+> 
+> what about using vsock_* prefix?
+> nit: if not, please move after the vsock_* functions.
 
-s/date/data
+My first thought was that `ioctl_int()` doesn't take any arguments related
+to vsock (e.g. cid).
 
-Please follow the style of the file (/* */ for comments)
-
->+	ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
->+	control_writeln("RECEIVED");
-
-Why we need this control barrier here?
+I am fine with the prefix, and will add it back.
 
 Thanks,
-Stefano
+Xuewei
 
->+
->+out:
->+	close(fd);
->+}
->+
-> static void test_stream_unsent_bytes_client(const struct test_opts *opts)
-> {
-> 	test_unsent_bytes_client(opts, SOCK_STREAM);
->@@ -1325,6 +1377,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
-> 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
-> }
->
->+static void test_stream_unread_bytes_client(const struct test_opts *opts)
->+{
->+	test_unread_bytes_client(opts, SOCK_STREAM);
->+}
->+
->+static void test_stream_unread_bytes_server(const struct test_opts *opts)
->+{
->+	test_unread_bytes_server(opts, SOCK_STREAM);
->+}
->+
->+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
->+{
->+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
->+}
->+
->+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
->+{
->+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
->+}
->+
-> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> /* This define is the same as in 'include/linux/virtio_vsock.h':
->  * it is used to decide when to send credit update message during
->@@ -2051,6 +2123,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_nolinger_client,
-> 		.run_server = test_stream_nolinger_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
->+		.run_client = test_stream_unread_bytes_client,
->+		.run_server = test_stream_unread_bytes_server,
->+	},
->+	{
->+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
->+		.run_client = test_seqpacket_unread_bytes_client,
->+		.run_server = test_seqpacket_unread_bytes_server,
->+	},
-> 	{},
-> };
->
->-- 
->2.34.1
->
-
+> The rest LGTM!
+> 
+> Thanks,
+> Stefano
+> 
+> > bool vsock_wait_sent(int fd);
+> > void send_buf(int fd, const void *buf, size_t len, int flags,
+> > 	      ssize_t expected_ret);
+> >-- 
+> >2.34.1
+> >
 
