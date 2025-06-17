@@ -1,302 +1,302 @@
-Return-Path: <netdev+bounces-198719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6BFADD45C
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:09:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96745ADD48D
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:11:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E16981942D1E
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:58:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25E51947ECE
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CBC2DFF2C;
-	Tue, 17 Jun 2025 15:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0682C2ED147;
+	Tue, 17 Jun 2025 16:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="adZxpdz9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyhWfOwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY4PR02CU008.outbound.protection.outlook.com (mail-westcentralusazon11021119.outbound.protection.outlook.com [40.93.199.119])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B942F234A;
-	Tue, 17 Jun 2025 15:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.199.119
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750175695; cv=fail; b=E9A37hZYHL9kXvRVYYuCgqi4e0iTwajc7mfOV6uieDpFVugPiWcDJPKCypcjpo7NNCxZNPeG3CxebZ3SVSj/fTt4RDuaMr+njtoVgBaSvbgsJwsOH7BW5DwO99z5RV1JeFb7zipoeu0y0h9O2yujFXqhpw+yYkkud26uEa5Vz2k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750175695; c=relaxed/simple;
-	bh=1w5xGHlouqvbCHA1pByANf0BbMKoQMlF0muA1GISNPY=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tHa4VaonNLl5jV29E6kgnH6L6locPwdDbe3KQ3AO3e8ws8j9kshJoWYRYlNEIM88il5IYLNzRXS2Q7HQep4NK/rHhqEDLgKkraJycZ1tTEJjO+kXZUwxOHWX5aj+1pzzxGO+WzMdhNfmL8LmbpeZeA8kOwKAA/17jk+F5hCFl5Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=adZxpdz9; arc=fail smtp.client-ip=40.93.199.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ks5/LSGsXAvo5mdFFQPqHvnptEmau7Sep66oe8PQCrSHWNix3GOBA5k69brwMYzSvk2IanoiIy9DCb8qnfp8/LsC3+NCPSA8HdX/jw5FO5FxUMp4TwuImNZeV9swaVEUnfZQxG1/RM9VsWniVIjsF2ceH5K43pfh3A7IuvdTpOfG9tomL/AO+Jbg1PS1sCO/IzJotm6sgLEZIrbEadrDYgIeXu1Gvm+P6Q1Zuc3gin9g+qr07btPTHa8j99el/IU9flvea3E95FtHUFoDON0AbyhhS/bf858ZdhXxQcDiP+DSYKtt9FtL+vHA8QmCdSQ73aVp1bGV4BHHObYKuPQkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U8G9mD8BPdKNIjowEnopKzxsO+IxzE+1xDei1yuQ72M=;
- b=cobtHKJ7NuZ4SGDQUeRciQzUhp+mK5rRB6kmgXCS2/uwwVw6enxyvRw3mFwoQ9wqUHZLcA7SjJEdR3qJdPQzA/f5BNw8ITyzFun+kM7kYqYuPgeACr3WR6Y1pR7APChuhFtnj0wEzHEf9lYXbTMQyTGji8+YaIymcohcbsn1u57c0S4YK3xjZAaCujIhAexgb+y2MgKJSAA66BsSc00Lgr0GAQozr1W124L51Vcd6Ui6Rpmz0ofQkZhNFjqz//LsYC4OxyevkpbJSsTulCc2uhKV2V96Gd6vhVg2W8EOeqjm/wOT635/Vk/fSg0qKwMgAv4/tm2F7YgzANZ25aIGIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U8G9mD8BPdKNIjowEnopKzxsO+IxzE+1xDei1yuQ72M=;
- b=adZxpdz9B/GLVl6xCzoXlJigT0lPRWs0fGy0lFgR5G435bTnjpBScjaAB1sCJhj54GnkYsmC/536Y9JBiKMFnLBRCy19uFuZ3G6hOlotBQDrYtRo9XgKrXagmGLmBSSDH2oUSzp6H02DRARG2BX4DpY7FdgWN01AxBo3xCdjONs=
-Received: from DS7PR21MB3102.namprd21.prod.outlook.com (2603:10b6:8:76::17) by
- DS7PR21MB3428.namprd21.prod.outlook.com (2603:10b6:8:93::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.17; Tue, 17 Jun 2025 15:54:47 +0000
-Received: from DS7PR21MB3102.namprd21.prod.outlook.com
- ([fe80::b029:2ac5:d92c:504f]) by DS7PR21MB3102.namprd21.prod.outlook.com
- ([fe80::b029:2ac5:d92c:504f%3]) with mapi id 15.20.8880.004; Tue, 17 Jun 2025
- 15:54:47 +0000
-From: Long Li <longli@microsoft.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>, "horms@kernel.org"
-	<horms@kernel.org>, Shiraz Saleem <shirazsaleem@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "schakrabarti@linux.microsoft.com"
-	<schakrabarti@linux.microsoft.com>, "gerhard@engleder-embedded.com"
-	<gerhard@engleder-embedded.com>, "rosenp@gmail.com" <rosenp@gmail.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>
-Subject: RE: [EXTERNAL] [PATCH net-next v3 3/4] net: mana: Add speed support
- in mana_get_link_ksettings
-Thread-Topic: [EXTERNAL] [PATCH net-next v3 3/4] net: mana: Add speed support
- in mana_get_link_ksettings
-Thread-Index: AQHb31fuhL95mOtqekCQtB34Vu5SILQHgXcg
-Date: Tue, 17 Jun 2025 15:54:47 +0000
-Message-ID:
- <DS7PR21MB31024C9BF35A681628CC1DB5CE73A@DS7PR21MB3102.namprd21.prod.outlook.com>
-References: <1750144656-2021-1-git-send-email-ernis@linux.microsoft.com>
- <1750144656-2021-4-git-send-email-ernis@linux.microsoft.com>
-In-Reply-To: <1750144656-2021-4-git-send-email-ernis@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=75c59bb2-d076-4c11-81cb-e186013c36a1;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-06-17T15:54:15Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS7PR21MB3102:EE_|DS7PR21MB3428:EE_
-x-ms-office365-filtering-correlation-id: 3d5c5b2e-c4d2-4767-7a29-08ddadb7495b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018|921020;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?EMBw2zKdqT1XSc1gVxDsoWsM7gGcCt3+v2EqZkXIiGIiSubcjN7FH3lrzXdC?=
- =?us-ascii?Q?XSpGrPDy33h6BTKpg4zG3SqWqN0GKm0ZquofVe1OgrNQviyxmiG7TsBtIekY?=
- =?us-ascii?Q?W3Pv3x7BFMhV8tbhNHWADTYYzNgxrLQy+gpomNYylFa+th2GMLXsjsUhf4M7?=
- =?us-ascii?Q?j0IB9GlrzXKw8tEi6mSGSUcnuMowaaoHBIvGaSGV7NUA57slC2wSRfqoUcqP?=
- =?us-ascii?Q?RDaQ0qXPaF4zzktfVYfkAG+jfg9YIFvAJKfhfl+jYOAxble76xiySqDdlcNv?=
- =?us-ascii?Q?UlYWn0D1leeF2H3QGGWG+WWUAYjUg9MenWIzO2yVHc5yr5/+5P6XsrS4BbKR?=
- =?us-ascii?Q?ZaUOBzBZme6O6NtRbspJKm54+2BaZBRTGF/4L7TeEldQWa2ZBvYoWaTX6vNu?=
- =?us-ascii?Q?sKSIkR0seNt08nCTJKXnGnv5Vrv4l43OD4Acrr3S9yrzxX3AJbE4AEqK5+st?=
- =?us-ascii?Q?k2F0WMtFL+G2RcrXVN6+VQUtinkIc5OZoiLe/f92+Rnzjjp4fwYpZO0uEa5C?=
- =?us-ascii?Q?2gim7//0o7/QmrJow5UUJjepFodAt/WQOwj+wlMN9XVwZqTwJVn8bB5v2ro8?=
- =?us-ascii?Q?RKqi3wGdJ5ZwcJ0khssuE0+FdxyR7yZQKJGxiGX91ISE4VqMuPIJSFFgmHPc?=
- =?us-ascii?Q?s15Q2lEnsPxTghqez7SvnCXUy8Kgy+cJvH10IO6bAJSojPl8sbRHzBSs9w38?=
- =?us-ascii?Q?ERo8aCXIVzs0wrFyaAq6KIcXvJc2SaN7H+/bWcW+/24uN7lGDHYxikpluiyO?=
- =?us-ascii?Q?eXm4kCmhUhw9+o0j2DzRwZ6bRQvjsI27FtpSNHL2mNtvWVOJlagSuBcsl6gh?=
- =?us-ascii?Q?1/Ci/Ck7ctycfMcCwoPGAA3NJHXR18F16IKFBYm8zszzCH5xF7K9BRfEQT+X?=
- =?us-ascii?Q?IR1M1I5owLNOyQ/E/EjpC/yBVn/be1KyVRWdrZZpdI7s9454Fq87WGY3hmE9?=
- =?us-ascii?Q?0QPlKP8Ui84dBJa/Cf8o5ytL9gy983xph8sHaptUo2plSRYbsVo62BV2zz8x?=
- =?us-ascii?Q?6iNU61CFstdM5o/n8LFFnkKpAJX0iJnG+WA8fpiRPSXYwb49ytEJeur6KXSt?=
- =?us-ascii?Q?sSV7zzy96JLbkVmA06DakLTrhvqi8NzWQeTGgIWbYHA+JzfOdNTbx2HjFE62?=
- =?us-ascii?Q?VajI6EdUZp+JHg3POZLeyljClirN3h0Cc7kHsoAVYIAzD1c903UmOiRTCsth?=
- =?us-ascii?Q?/vb48bwTcrgAJ409xn6ukfQflOgZCYUyOA2b6aFzxITHzJ2PrRSFZo6vxtVe?=
- =?us-ascii?Q?4qHNCLz1rTtDC4xDnZ4DiHER1/qeq61W2U+18gmbyRhpHMo7jGKBW+lsFlu7?=
- =?us-ascii?Q?5ji6gzhXaEkDJWPOLX3dooldwwuuPsOggtsu3j9/tSVVgfedOxOLXvrvbqBc?=
- =?us-ascii?Q?0cApwXEu9YyFpqlSoXV0UUuO0Tgew9YF5p0Th3N2A4N1hx+TvgGXC5Nahsa0?=
- =?us-ascii?Q?YFwowB2JHdVvO1SQoxYyqATr6uoD+w/MzO86K0u3dcYKLsWRB/+YyrgJwap/?=
- =?us-ascii?Q?lQf+Nrd+DngaCbw=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR21MB3102.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018)(921020);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?XafIgBsoUTgLhKhgIQuf/SsfWCZTPQlWqeleGlSh5fYkP6LLB1Ys2yrGC1wX?=
- =?us-ascii?Q?L8lbI42Uv8nGdHE/jdvVzLBkXd69iV1euYfYUQ5N2AdnQ+HbKv8e0rcjYAZR?=
- =?us-ascii?Q?lGNY+2deL0R/tC3vaLLPnL5Di1gloKIlU7W84ZE1AHdW75T8Fd6ryPoT2lrD?=
- =?us-ascii?Q?uD1O6zTrJQbz/Kohm1ZMSvFn4L7uHC3jP4Es+Z4jeQCxYiUUBq5HlRAFckzz?=
- =?us-ascii?Q?zWGssmwBvQsrc65bylh3Ix1JToRDZkx/NXiSodBYFj2UthD795XsDe9U0Sdu?=
- =?us-ascii?Q?SeR5rQjnoMyRCpTwbZweHM4lhY8plR7kqHZIg6fVubnsNK2LFRbdt1Hns/H0?=
- =?us-ascii?Q?t8MCLRbOvzEjlyRYTPVTbiy1nie/bjjST40N1TaUdVsCwMzJ9ow6Gi/rntJQ?=
- =?us-ascii?Q?udo6QLHSMbRydILAM4rsWQQZWV3jauhqUxCxWg+15rrG7zdVs64m89XUT1Yx?=
- =?us-ascii?Q?oCQOGIiCOiGtNxehpDuwSXtUo/wR2N5e40JXPweOmHXuMhHA9UPFBKWdReqv?=
- =?us-ascii?Q?NUCFbBbEh5wxWYMfEouWf9NhFQsM8hvG329uYKluc+YJ0BnV1kj+CgHYFCTI?=
- =?us-ascii?Q?4KK6GVwTrsDEZJNLwEE8TXgGoXqQXpsP7lLKTzASRc99J8Q06jmvej1C19BN?=
- =?us-ascii?Q?uFAeXvMZzWzDdc+7dn+j0ospMTFjzFyCYE9gnbrFTcgWZU2xOp7gOEF76Mw1?=
- =?us-ascii?Q?HYM2fhsP3BSyBVNXQl5zY90MM/6Y+E8mMlRdjIrz43sDUXjpNlZrMKp5Y+Mi?=
- =?us-ascii?Q?ssvrlD2NDmYerFRqKy9aXcAw4vzHIJ/e7V2y/33DD/6Pr15fodvR23vihbMn?=
- =?us-ascii?Q?qAzTYeRYDgBo/9NtrIzDVpjYuhfOIDB2x2VJX7O4ZIktlMjeUeO81dd8TgZk?=
- =?us-ascii?Q?OCrhWImNAbzQTdtWoxIpxgx/Ng4d85yM45OBuSgRuzo2BZTEo5kBgHdqbZ5I?=
- =?us-ascii?Q?cxHph9MbJwMWrBFeKdpg1RwrfI/OIBmSHpTMkNNxtjBJ0vfKjfOQh7JCUH/r?=
- =?us-ascii?Q?Afn2nusPwP/+A2e/6iyVGR+1cEzvyG8Bq70E2ubS6j/kc8nI1iEHaHt3K1In?=
- =?us-ascii?Q?6zeMtav7Gc/IsDcQ1Zxh2gYaZO1CZz0J8H6QM8o+E30elgNfEpJR6U0/BWA7?=
- =?us-ascii?Q?EoZz0yVKVLZhY6hTE3OzJtQHOjfMyfNsTE6fZiYLN/TtvZ0vwmzdD+wOi0sO?=
- =?us-ascii?Q?0ujIh34S+47LTZsZP50f5iYaF+Xtc0NrQBVpw4wK6uyuvQM76QSPaoRU44It?=
- =?us-ascii?Q?WoTEsygk8lF5oxlfq9ScDf+DPDbFwClJ3czZNZh/z3yqo5EQ+UhN2aj4Sh33?=
- =?us-ascii?Q?Nk46q+0Trma/0clzMkzU7AJzg79G1a4pZDYBdx8trnuJUJ+OGGMS6AgSQOxu?=
- =?us-ascii?Q?wOP6fMI+weflH41SsVQtdV8BgpDroz6RKrFIeutYlMnAPPRkRzwkVide5bGL?=
- =?us-ascii?Q?6jUOkT8KrR7iO6NALDBDpuerYFdDOgoeqA1q+pOmpCGA4NzmFNijjMQbWQaV?=
- =?us-ascii?Q?yauf0s/2X0+tRb7Q0WyjvyPmWpKbil9iwryufP39Hds261XH3oPTLq89fckf?=
- =?us-ascii?Q?QZWkXkv+1svMHc+yGM+1LNCzo5iwlwznIt6JpsL1?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C108E2ECD33;
+	Tue, 17 Jun 2025 16:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750176009; cv=none; b=ozclS2wtY69bwKVtCIG3QrD29JusJhWOusTQyNO+HUXQMiNf0iDgvpS10eeMtTDBiSUTh9IfioT4nUO3l8Cy4tsPELPL2ozIxd15yexYSEa5gVg0wbNlvlMJ+P2sD0KV7qxDCRmVj8ChXserPniYiFggS/5ZPyeVOyOpBg1DKiY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750176009; c=relaxed/simple;
+	bh=RyjFEiBY6VQWOdFRWsesICSXRLCWbA6jugn3H5Rqqj0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qKbFEmYsGevj8hnYHJPhnR25Y1ls4pJL3nBWSOurpqgRT6QB13ZEEtBIoE+Sqhr2AmR+NtamoSq2lgctRh/tdyfa7i9gxZiaZK0pAcFk3CPMLu2gBOT1UElhIFYWS49MZ0Ye2zOnA/Hmlpc4WuEncwzPfs2TiyG8+bIFyE0D4t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NyhWfOwV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 030C3C4CEF0;
+	Tue, 17 Jun 2025 16:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750176009;
+	bh=RyjFEiBY6VQWOdFRWsesICSXRLCWbA6jugn3H5Rqqj0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NyhWfOwVdK3L2Bb75J5vSsIdX6gOEeQSFExVwbnkPQ6fTa1GkhQLqeW4MIH0zu6ps
+	 tkAmw0a7l1eXM71V0mnEYz84sMb1R+ifsYhfiZ31Z7O1RvJu3Qgu74E6apfmWeK3UM
+	 C46NzCOtRELdsM7tDF4JBneKytKgKeM3tmyizqMeGRBc/YIIpWZMHPEiGqFvjHiGVM
+	 X23MLpgrm5E4jt8VhfDmnaONt69UTkJO4LF8M/jwql5fqPw6mUg9ExOeqBaPj0k4fE
+	 yJ0IZXWO72X7nv9fHXtPiihMPM+lxaN8P5JXGsO6br6QDedqCrOISzsewDKZsKrFuS
+	 IpD9VAx/T+gPw==
+Date: Tue, 17 Jun 2025 18:00:01 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
+ <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
+ <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Ruben Wauters"
+ <rubenru09@aol.com>, "Shuah Khan" <skhan@linuxfoundation.org>,
+ joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
+ peterz@infradead.org, stern@rowland.harvard.edu
+Subject: Re: [PATCH v5 10/15] docs: sphinx: add a parser for yaml files for
+ Netlink specs
+Message-ID: <20250617180001.46931ba9@sal.lan>
+In-Reply-To: <20250617154049.104ef6ff@sal.lan>
+References: <cover.1750146719.git.mchehab+huawei@kernel.org>
+	<c407d769c9f47083e8f411c13989522e32262562.1750146719.git.mchehab+huawei@kernel.org>
+	<m27c1ak0k9.fsf@gmail.com>
+	<20250617154049.104ef6ff@sal.lan>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR21MB3102.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d5c5b2e-c4d2-4767-7a29-08ddadb7495b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2025 15:54:47.7426
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: y83DuE1drWfoA8FATK+4CmBe4cDK6LvXkiIgriISBJ5m+Phy7oxaHo9cGoOB0VDTk0SP3mL5NsvnOcx9hGabCA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR21MB3428
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> Subject: [PATCH net-next v3 3/4] net: mana: Add speed support in
-> mana_get_link_ksettings
->=20
-> Allow mana ethtool get_link_ksettings operation to report the maximum spe=
-ed
-> supported by the SKU in mbps.
->=20
-> The driver retrieves this information by issuing a HWC command to the har=
-dware
-> via mana_query_link_cfg(), which retrieves the SKU's maximum supported sp=
-eed.
->=20
-> These APIs when invoked on hardware that are older/do not support these A=
-PIs,
-> the speed would be reported as UNKNOWN.
->=20
-> Before:
-> $ethtool enP30832s1
-> > Settings for enP30832s1:
->         Supported ports: [  ]
->         Supported link modes:   Not reported
->         Supported pause frame use: No
->         Supports auto-negotiation: No
->         Supported FEC modes: Not reported
->         Advertised link modes:  Not reported
->         Advertised pause frame use: No
->         Advertised auto-negotiation: No
->         Advertised FEC modes: Not reported
->         Speed: Unknown!
->         Duplex: Full
->         Auto-negotiation: off
->         Port: Other
->         PHYAD: 0
->         Transceiver: internal
->         Link detected: yes
->=20
-> After:
-> $ethtool enP30832s1
-> > Settings for enP30832s1:
->         Supported ports: [  ]
->         Supported link modes:   Not reported
->         Supported pause frame use: No
->         Supports auto-negotiation: No
->         Supported FEC modes: Not reported
->         Advertised link modes:  Not reported
->         Advertised pause frame use: No
->         Advertised auto-negotiation: No
->         Advertised FEC modes: Not reported
->         Speed: 16000Mb/s
->         Duplex: Full
->         Auto-negotiation: off
->         Port: Other
->         PHYAD: 0
->         Transceiver: internal
->         Link detected: yes
->=20
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Reviewed-by: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
+Em Tue, 17 Jun 2025 15:40:49 +0200
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
 
-Reviewed-by: Long Li <longli@microsoft.com>
+> > > +            # Parse message with RSTParser
+> > > +            for i, line in enumerate(msg.split('\n')):
+> > > +                result.append(line, document.current_source, i)   =20
+> >=20
+> > This has the effect of associating line numbers from the generated ReST
+> > with the source .yaml file, right? So errors will be reported against
+> > the wrong place in the file. Is there any way to show the cause of the
+> > error in the intermediate ReST? =20
+>=20
+> Yes, but this will require modifying the parser. I prefer merging this
+> series without such change, and then having a separate changeset
+> addressing it.
+>=20
+> There are two ways we can do that:
+>=20
+> 1. The parser can add a ReST comment with the line number. This
+>    is what it is done by kerneldoc.py Sphinx extension:
+>=20
+> 	lineoffset =3D 0
+> 	line_regex =3D re.compile(r"^\.\. LINENO ([0-9]+)$")
+>         for line in lines:
+>             match =3D line_regex.search(line)
+>             if match:
+>                 lineoffset =3D int(match.group(1)) - 1 # sphinx counts li=
+nes from 0
+>             else:
+>                 doc =3D str(env.srcdir) + "/" + env.docname + ":" + str(s=
+elf.lineno)
+>                 result.append(line, doc + ": " + filename, lineoffset)
+>                 lineoffset +=3D 1
+>=20
+>    I kept the same way after its conversion to Python, as right now,
+>    it supports both a Python class and a command lin command. I may
+>    eventually clean it up in the future.
+>=20
+> 2. making the parser return a tuple. At kernel_abi.py, as the parser
+>    returns content from multiple files, such tuple is:
+>=20
+> 		 (rst_output, filename, line_number)
+>=20
+>    and the code for it is (cleaned up):
+>=20
+> 	for msg, f, ln in kernel_abi.doc(show_file=3Dshow_file,
+>                                          show_symbols=3Dshow_symbols,
+>                                          filter_path=3Dabi_type):
+>=20
+>             lines =3D statemachine.string2lines(msg, tab_width,
+>                                               convert_whitespace=3DTrue)
+>=20
+>             for line in lines:
+>                 content.append(line, f, ln - 1) # sphinx counts lines fro=
+m 0
+>=20
+> (2) is cleaner and faster, but (1) is easier to implement on an=20
+> already-existing code.
 
-> ---
-> Changes in v3:
-> * Rebase to latest net-next branch.
-> Changes in v2:
-> * No change.
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c      | 1 +
->  drivers/net/ethernet/microsoft/mana/mana_ethtool.c | 6 ++++++
->  include/net/mana/mana.h                            | 2 ++
->  3 files changed, 9 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 547dff450b6d..d7079e05dfb8 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -1272,6 +1272,7 @@ int mana_query_link_cfg(struct mana_port_context
-> *apc)
->  		return err;
->  	}
->  	apc->speed =3D resp.link_speed_mbps;
-> +	apc->max_speed =3D resp.qos_speed_mbps;
->  	return 0;
->  }
->=20
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index 4fb3a04994a2..a1afa75a9463 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -495,6 +495,12 @@ static int mana_set_ringparam(struct net_device *nde=
-v,
-> static int mana_get_link_ksettings(struct net_device *ndev,
->  				   struct ethtool_link_ksettings *cmd)  {
-> +	struct mana_port_context *apc =3D netdev_priv(ndev);
-> +	int err;
-> +
-> +	err =3D mana_query_link_cfg(apc);
-> +	cmd->base.speed =3D (err) ? SPEED_UNKNOWN : apc->max_speed;
-> +
->  	cmd->base.duplex =3D DUPLEX_FULL;
->  	cmd->base.port =3D PORT_OTHER;
->=20
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h index
-> 038b18340e51..e1030a7d2daa 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -533,6 +533,8 @@ struct mana_port_context {
->  	u16 port_idx;
->  	/* Currently configured speed (mbps) */
->  	u32 speed;
-> +	/* Maximum speed supported by the SKU (mbps) */
-> +	u32 max_speed;
->=20
->  	bool port_is_up;
->  	bool port_st_save; /* Saved port state */
-> --
-> 2.34.1
+The logic below implements (1). This seems to be the easiest way for
+pyyaml. I will submit as 2 separate patches at the end of the next
+version.
+
+Please notice that I didn't check yet for the "quality" of the
+line numbers. Some tweaks could be needed later on.
+
+Regards,
+Mauro
+
+---
+
+=46rom 750daebebadcd156b5fe9b516f4fae4bd42b9d2c Mon Sep 17 00:00:00 2001
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Date: Tue, 17 Jun 2025 17:54:03 +0200
+Subject: [PATCH] docs: parser_yaml.py: add support for line numbers from the
+ parser
+
+Instead of printing line numbers from the temp converted ReST
+file, get them from the original source.
+
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/par=
+ser_yaml.py
+index 635945e1c5ba..15c642fc0bd5 100755
+--- a/Documentation/sphinx/parser_yaml.py
++++ b/Documentation/sphinx/parser_yaml.py
+@@ -29,6 +29,8 @@ class YamlParser(Parser):
+=20
+     netlink_parser =3D YnlDocGenerator()
+=20
++    re_lineno =3D re.compile(r"\.\. LINENO ([0-9]+)$")
++
+     def do_parse(self, inputstring, document, msg):
+         """Parse YAML and generate a document tree."""
+=20
+@@ -38,8 +40,14 @@ class YamlParser(Parser):
+=20
+         try:
+             # Parse message with RSTParser
+-            for i, line in enumerate(msg.split('\n')):
+-                result.append(line, document.current_source, i)
++            lineoffset =3D 0;
++            for line in msg.split('\n'):
++                match =3D self.re_lineno.match(line)
++                if match:
++                    lineoffset =3D int(match.group(1))
++                    continue
++
++                result.append(line, document.current_source, lineoffset)
+=20
+             rst_parser =3D RSTParser()
+             rst_parser.parse('\n'.join(result), document)
+
+=46rom 15c1f9db30f3abdce110e19788d87f9fe1417781 Mon Sep 17 00:00:00 2001
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Date: Tue, 17 Jun 2025 17:28:04 +0200
+Subject: [PATCH] tools: netlink_yml_parser.py: add line numbers to parsed d=
+ata
+
+When something goes wrong, we want Sphinx error to point to the
+right line number from the original source, not from the
+processed ReST data.
+
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+diff --git a/tools/net/ynl/pyynl/netlink_yml_parser.py b/tools/net/ynl/pyyn=
+l/netlink_yml_parser.py
+index 866551726723..a9d8ab6f2639 100755
+--- a/tools/net/ynl/pyynl/netlink_yml_parser.py
++++ b/tools/net/ynl/pyynl/netlink_yml_parser.py
+@@ -20,6 +20,16 @@
+ from typing import Any, Dict, List
+ import yaml
+=20
++LINE_STR =3D '__lineno__'
++
++class NumberedSafeLoader(yaml.SafeLoader):
++    """Override the SafeLoader class to add line number to parsed data"""
++
++    def construct_mapping(self, node):
++        mapping =3D super().construct_mapping(node)
++        mapping[LINE_STR] =3D node.start_mark.line
++
++        return mapping
+=20
+ class RstFormatters:
+     """RST Formatters"""
+@@ -127,6 +137,11 @@ class RstFormatters:
+         """Return a formatted label"""
+         return f".. _{title}:\n\n"
+=20
++    @staticmethod
++    def rst_lineno(lineno: int) -> str:
++        """Return a lineno comment"""
++        return f".. LINENO {lineno}\n"
++
+ class YnlDocGenerator:
+     """YAML Netlink specs Parser"""
+=20
+@@ -144,6 +159,9 @@ class YnlDocGenerator:
+         """Parse 'do' section and return a formatted string"""
+         lines =3D []
+         for key in do_dict.keys():
++            if key =3D=3D LINE_STR:
++                lines.append(self.fmt.rst_lineno(do_dict[key]))
++                continue
+             lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level =
++ 1))
+             if key in ['request', 'reply']:
+                 lines.append(self.parse_do_attributes(do_dict[key], level =
++ 1) + "\n")
+@@ -174,6 +192,10 @@ class YnlDocGenerator:
+             lines.append(self.fmt.rst_paragraph(operation["doc"]) + "\n")
+=20
+             for key in operation.keys():
++                if key =3D=3D LINE_STR:
++                    lines.append(self.fmt.rst_lineno(operation[key]))
++                    continue
++
+                 if key in preprocessed:
+                     # Skip the special fields
+                     continue
+@@ -233,6 +255,9 @@ class YnlDocGenerator:
+         for definition in defs:
+             lines.append(self.fmt.rst_section(namespace, 'definition', def=
+inition["name"]))
+             for k in definition.keys():
++                if k =3D=3D LINE_STR:
++                    lines.append(self.fmt.rst_lineno(definition[k]))
++                    continue
+                 if k in preprocessed + ignored:
+                     continue
+                 lines.append(self.fmt.rst_fields(k, self.fmt.sanitize(defi=
+nition[k]), 0))
+@@ -268,6 +293,9 @@ class YnlDocGenerator:
+                 lines.append(self.fmt.rst_subsubsection(attr_line))
+=20
+                 for k in attr.keys():
++                    if k =3D=3D LINE_STR:
++                        lines.append(self.fmt.rst_lineno(attr[k]))
++                        continue
+                     if k in preprocessed + ignored:
+                         continue
+                     if k in linkable:
+@@ -306,6 +334,8 @@ class YnlDocGenerator:
+         lines =3D []
+=20
+         # Main header
++        lineno =3D obj.get('__lineno__', 0)
++        lines.append(self.fmt.rst_lineno(lineno))
+=20
+         family =3D obj['name']
+=20
+@@ -354,7 +384,7 @@ class YnlDocGenerator:
+     def parse_yaml_file(self, filename: str) -> str:
+         """Transform the YAML specified by filename into an RST-formatted =
+string"""
+         with open(filename, "r", encoding=3D"utf-8") as spec_file:
+-            yaml_data =3D yaml.safe_load(spec_file)
+-            content =3D self.parse_yaml(yaml_data)
++            numbered_yaml =3D yaml.load(spec_file, Loader=3DNumberedSafeLo=
+ader)
++            content =3D self.parse_yaml(numbered_yaml)
+=20
+         return content
 
 
