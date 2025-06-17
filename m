@@ -1,178 +1,241 @@
-Return-Path: <netdev+bounces-198702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D067DADD124
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:14:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3159ADD133
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F66A177328
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9A0C3AE3D1
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38B52E9729;
-	Tue, 17 Jun 2025 15:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2358D2EBDCA;
+	Tue, 17 Jun 2025 15:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h56s71rz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZrobwjA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800B12E54A9;
-	Tue, 17 Jun 2025 15:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CD72EB5C0
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750173241; cv=none; b=doUDiv6qBudSHHGN4/idXrVH37XtKFzIpp+oA/CIUT+fq+AZOT6vhO/ql1k65T8+3eedzptpeVzoWkJq3QRGmSjDnGmaqLlnbwKQAq9JXZGNyb+UnR8kYJ3NP5+RjZmXIT2vVuWdLDy//TI3SmXmd1u1v8zHkMGyi9TZEnW9sI8=
+	t=1750173687; cv=none; b=goA5ShiNhBhntpY912iP79ZVj18w9NxZYzbVWrLmD4d+KAfplB4gRNQfZq+8+jxc8TY6/lfIuLejcILpqQJulgAL5Rfr7n3bUjP4Mc/vdM5NgkPjqD95w1XUQ7hOF8a/9pGbyYX1B0tNK1uoT5k2ONZGBAiYNmPA/W2KlJM9JaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750173241; c=relaxed/simple;
-	bh=VzacSK8CHt4963WLrZki0L0yVFovLxHcIRT7RHBkl5g=;
+	s=arc-20240116; t=1750173687; c=relaxed/simple;
+	bh=D7Sm7Z8o9wrG2DILp1d81NcnEtOVz1w8yhboj0jyHxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rGe6CBaLr6Kvn71rrNUnkK3K1k0QggwnqstIUfgn0Y+8G0SUojVK5+HR95IE2wxx91ee4GhG6UZclp2lK4wuwuIRljEqSM836tQWwIf/ylYuKBAEq2qwAS4mOCDxwEc7faJ7+4Zjxe9jyyLvSS8nq3jtvsxTzkbvY58xEWqYWh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h56s71rz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8F4EC4CEE7;
-	Tue, 17 Jun 2025 15:13:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750173240;
-	bh=VzacSK8CHt4963WLrZki0L0yVFovLxHcIRT7RHBkl5g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h56s71rzs/udGDVL1EShezKp0igc+0Rne8OItAUMPt/V+imFOpByZva5b6rNSPCPz
-	 x10s7tra/R4mERRgf1U6LZdeQuS0OjGghdedHAzChpkjI4cmakcBFle+SkXx+xKxO3
-	 fQEQ6CsdJ0QtyeRFsfnzAkg34fORkchNKKRSmoBWH6E1VgFnVavZK75gAUYGoE0sms
-	 KN0t3zoB/6qZ2Qm+4xkeFhn8DBLPh4Y5NLk0NUNI2c5YktuwVjsmUFIaAoxRA9pFKF
-	 WMuWczHQy+H+fLL+0dnlFXqnt0zphLrMZa092gk7WuVwIhvxN7cNTHhHH/0/fPX3Xd
-	 jtgAQcoYn0Yhg==
-Date: Tue, 17 Jun 2025 10:13:54 -0500
-From: Rob Herring <robh@kernel.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Jia-Wei Chang <jia-wei.chang@mediatek.com>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v4 01/13] dt-bindings: net: mediatek,net: update for
- mt7988
-Message-ID: <20250617151354.GA2392458-robh@kernel.org>
-References: <20250616095828.160900-1-linux@fw-web.de>
- <20250616095828.160900-2-linux@fw-web.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mmyAEBk7J8eSW8tjPnwESezpnT78G/F/nHWiWJDVVjhPogGknEazyGJRkYboFANpx19gvDLcc2/HKOOiKx0sZ2l1SukL8nLxYS24GGwC6y1UucSNoaNyoqE9nXZzxwJQUSb5VM4pwT7fOZ6lwsVv1Ko6UHWRdD4ii+io7fCR9g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZrobwjA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750173684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6CNZp4Yl2H/9Cdj6XouU0nprVFIEoQUBC+80peSkJR8=;
+	b=ZZrobwjAWAPCtHLGu6diheYMtWyVh3NZBR9BWpnxeMykGzFpr0iyRpXZkftWGlrxIvnKiE
+	72sYIZahYAxEW28eh5pRS+5CHEWORalaacnhX6dDdoJqnf5fWkLhvXMImetWHGscbn3f4Q
+	WAP4cvZHDbbL1LkBuUIK4Bsb90CGpkU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-210-6g660AhUOEasHE2gK1F88Q-1; Tue, 17 Jun 2025 11:21:22 -0400
+X-MC-Unique: 6g660AhUOEasHE2gK1F88Q-1
+X-Mimecast-MFC-AGG-ID: 6g660AhUOEasHE2gK1F88Q_1750173681
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450eaae2934so48235755e9.2
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:21:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750173681; x=1750778481;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6CNZp4Yl2H/9Cdj6XouU0nprVFIEoQUBC+80peSkJR8=;
+        b=OM+nVGL8wwyPwYG+NzZN9aZuYYaqktx5cipXLlYggnLqn6lzBejaQa8bVxB87QrX/f
+         DxtUJ5Y06Aep8GX2TNMyBLQuqoF29M4CPSlaU/i7EfN87vqgV3wwwMwI6v2iDRoMcdwF
+         Vq+tqco4CeaT3lk/548m3pdTfIB18lovxiPSFqCgVXEwLfJkC/NTiz76/p/YQUzqYu0e
+         JzwuXItsG455K6gpeYUHaUGJofXoZji6mbzfbpgVhFsKy9T9EFOFzulpth6HhLdNcFGk
+         jDJ7wiEr5iG3uCpqR+Y9rl0uMNvXNn1XasRxvrgVmiDfkL5JBTGiedyf7a6Y/G0jJ2q5
+         tP9g==
+X-Forwarded-Encrypted: i=1; AJvYcCULtX6LFUQPZMyts5SHqFUH2hI1K4W3S2xk9T7J83cMUGOhzwlTu9SBEeprGIthGSPMRMVkcdc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTLEerRZiTA79ZvkS3YxbTNBd8vMjWrz2p9zvATIbACPNgEONV
+	hyK7jR7x3d3uG4mjmIzkZHeZ39GZlSc1DG1hub8jnPU943nv9wh+I34YtmRXfsxhzNcr1LbOasG
+	NNX1iDna8Odf+JOE61UJZpAADwoDQYcMYJtfXWzqLLv8uBorR9Lp+W7qzsQ==
+X-Gm-Gg: ASbGncuDWPwMf/zR+/xhC8vECowSDuPG89lfYcwnCqbFqCDcVNKRI2UY1h6JdK1wMlw
+	x1syeoB10h/gEJl0UMmxwcNTXSa5dVKUXiYGZlM1t2xOFf+HcziFcZ0ETtcVTeou3fWzF44e/mF
+	dK4wAMOLPHqs2Xt18F0mwcMZX7LsKVOHqHhx4Fw6ace2bRh0Ed/b/+A8zPF/PEGyCt1kND3jVDl
+	iGmBk/VDRAL0R23Nl9sYTdPSnAuIUrZ8kpyR0pQ3r6qM8ctd7ZZVF3pw1njXm3QspRQ04XwrEx8
+	Ytxtb6UjNiYe7krG7HE+xiI9zPwc
+X-Received: by 2002:a05:600c:1e02:b0:43d:b85:1831 with SMTP id 5b1f17b1804b1-4533c9dbbfemr141095215e9.0.1750173681400;
+        Tue, 17 Jun 2025 08:21:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOqu3b57WklFuqqnAtvsRHZ0LJvT+ZbOW6XRYMLwqjSK0FduBdtkCovgyUALJLzqgQ/aP+vg==
+X-Received: by 2002:a05:600c:1e02:b0:43d:b85:1831 with SMTP id 5b1f17b1804b1-4533c9dbbfemr141094715e9.0.1750173680915;
+        Tue, 17 Jun 2025 08:21:20 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.200.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e195768sm180099565e9.0.2025.06.17.08.21.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 08:21:20 -0700 (PDT)
+Date: Tue, 17 Jun 2025 17:21:16 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Xuewei Niu <niuxuewei97@gmail.com>
+Cc: mst@redhat.com, pabeni@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, netdev@vger.kernel.org, stefanha@redhat.com, 
+	leonardi@redhat.com, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, fupan.lfp@antgroup.com, Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Subject: Re: [PATCH net-next v3 3/3] test/vsock: Add ioctl SIOCINQ tests
+Message-ID: <fnznqsbg56rfk7szjcprpo4mxy7e4patmj2u5yxbtj33dlj34w@7t5xylskewa5>
+References: <20250617045347.1233128-1-niuxuewei.nxw@antgroup.com>
+ <20250617045347.1233128-4-niuxuewei.nxw@antgroup.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250616095828.160900-2-linux@fw-web.de>
+In-Reply-To: <20250617045347.1233128-4-niuxuewei.nxw@antgroup.com>
 
-On Mon, Jun 16, 2025 at 11:58:11AM +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Update binding for mt7988 which has 3 gmac and 2 reg items.
-> 
-> With RSS-IRQs the interrupt max-items is now 6. Add interrupt-names
-> to make them accessible by name.
-> 
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> ---
-> v4:
-> - increase max interrupts to 8 because of RSS/LRO interrupts
+On Tue, Jun 17, 2025 at 12:53:46PM +0800, Xuewei Niu wrote:
+>Add SIOCINQ ioctl tests for both SOCK_STREAM and SOCK_SEQPACKET.
+>
+>The client waits for the server to send data, and checks if the SIOCINQ
+>ioctl value matches the data size. After consuming the data, the client
+>checks if the SIOCINQ value is 0.
+>
+>Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+>---
+> tools/testing/vsock/vsock_test.c | 82 ++++++++++++++++++++++++++++++++
+> 1 file changed, 82 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f669baaa0dca..66bb9fde7eca 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1305,6 +1305,58 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
+> 	close(fd);
+> }
+>
+>+static void test_unread_bytes_server(const struct test_opts *opts, int type)
+>+{
+>+	unsigned char buf[MSG_BUF_IOCTL_LEN];
+>+	int client_fd;
+>+
+>+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
+>+	if (client_fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	for (int i = 0; i < sizeof(buf); i++)
+>+		buf[i] = rand() & 0xFF;
+>+
+>+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
+>+	control_writeln("SENT");
+>+	control_expectln("RECEIVED");
+>+
+>+	close(client_fd);
+>+}
+>+
+>+static void test_unread_bytes_client(const struct test_opts *opts, int type)
+>+{
+>+	unsigned char buf[MSG_BUF_IOCTL_LEN];
+>+	int ret, fd;
+>+	int sock_bytes_unread;
+>+
+>+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("SENT");
+>+	/* The data has arrived but has not been read. The expected is
+>+	 * MSG_BUF_IOCTL_LEN.
+>+	 */
+>+	ret = ioctl_int(fd, TIOCINQ, &sock_bytes_unread, MSG_BUF_IOCTL_LEN);
+>+	if (ret) {
 
-But the schema says 6?
+Since we are returning a value !=0 only if EOPNOTSUPP, I think we can 
+just return a bool when the ioctl is supported or not, like for 
+vsock_wait_sent().
 
-> - dropped Robs RB due to this change
-> - allow interrupt names
-> - add interrupt-names without reserved IRQs on mt7988
->   this requires mtk driver patch:
->   https://patchwork.kernel.org/project/netdevbpf/patch/20250616080738.117993-2-linux@fw-web.de/
-> 
-> v2:
-> - change reg to list of items
-> ---
->  .../devicetree/bindings/net/mediatek,net.yaml | 28 ++++++++++++++++---
->  1 file changed, 24 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> index 9e02fd80af83..f8025f73b1cb 100644
-> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> @@ -28,7 +28,10 @@ properties:
->        - ralink,rt5350-eth
->  
->    reg:
-> -    maxItems: 1
-> +    items:
-> +      - description: Register for accessing the MACs.
-> +      - description: SoC internal SRAM used for DMA operations.
-> +    minItems: 1
->  
->    clocks:
->      minItems: 2
-> @@ -40,7 +43,11 @@ properties:
->  
->    interrupts:
->      minItems: 1
-> -    maxItems: 4
-> +    maxItems: 6
-> +
-> +  interrupt-names:
-> +    minItems: 1
-> +    maxItems: 6
->  
->    power-domains:
->      maxItems: 1
-> @@ -348,7 +355,17 @@ allOf:
->      then:
->        properties:
->          interrupts:
-> -          minItems: 4
-> +          minItems: 2
-> +
-> +        interrupt-names:
-> +          minItems: 2
-> +          items:
-> +            - const: tx
-> +            - const: rx
-> +            - const: rx-ring0
-> +            - const: rx-ring1
-> +            - const: rx-ring2
-> +            - const: rx-ring3
->  
->          clocks:
->            minItems: 24
-> @@ -381,8 +398,11 @@ allOf:
->              - const: xgp2
->              - const: xgp3
->  
-> +        reg:
-> +          minItems: 2
-> +
->  patternProperties:
-> -  "^mac@[0-1]$":
-> +  "^mac@[0-2]$":
->      type: object
->      unevaluatedProperties: false
->      allOf:
-> -- 
-> 2.43.0
-> 
+>+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
+>+		goto out;
+>+	}
+>+
+>+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
+>+	// All date has been consumed, so the expected is 0.
+
+s/date/data
+
+Please follow the style of the file (/* */ for comments)
+
+>+	ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
+>+	control_writeln("RECEIVED");
+
+Why we need this control barrier here?
+
+Thanks,
+Stefano
+
+>+
+>+out:
+>+	close(fd);
+>+}
+>+
+> static void test_stream_unsent_bytes_client(const struct test_opts *opts)
+> {
+> 	test_unsent_bytes_client(opts, SOCK_STREAM);
+>@@ -1325,6 +1377,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
+> 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
+> }
+>
+>+static void test_stream_unread_bytes_client(const struct test_opts *opts)
+>+{
+>+	test_unread_bytes_client(opts, SOCK_STREAM);
+>+}
+>+
+>+static void test_stream_unread_bytes_server(const struct test_opts *opts)
+>+{
+>+	test_unread_bytes_server(opts, SOCK_STREAM);
+>+}
+>+
+>+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
+>+{
+>+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
+>+}
+>+
+>+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
+>+{
+>+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
+>+}
+>+
+> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
+> /* This define is the same as in 'include/linux/virtio_vsock.h':
+>  * it is used to decide when to send credit update message during
+>@@ -2051,6 +2123,16 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_nolinger_client,
+> 		.run_server = test_stream_nolinger_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
+>+		.run_client = test_stream_unread_bytes_client,
+>+		.run_server = test_stream_unread_bytes_server,
+>+	},
+>+	{
+>+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
+>+		.run_client = test_seqpacket_unread_bytes_client,
+>+		.run_server = test_seqpacket_unread_bytes_server,
+>+	},
+> 	{},
+> };
+>
+>-- 
+>2.34.1
+>
+
 
