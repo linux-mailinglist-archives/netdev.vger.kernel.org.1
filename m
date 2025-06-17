@@ -1,191 +1,91 @@
-Return-Path: <netdev+bounces-198354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E15AADBE15
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 02:23:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9AF0ADBE1A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 02:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B011175724
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:23:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EA13188F749
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 00:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEB08632C;
-	Tue, 17 Jun 2025 00:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B428635D;
+	Tue, 17 Jun 2025 00:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ms3AZYzF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhnDAOHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F507081C;
-	Tue, 17 Jun 2025 00:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5244345C0B
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 00:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750119774; cv=none; b=AEFL1eRz0WXH59LXD9PZIs8fiOKn21dSrJQ8pItwqzaRseHV83FJH7QA4bUSf2IMQvlv/kBye9eIbiPd/nVZjitNum0eHN4N0eFi+Mbm52RoiGLPWAyk9JJ0hjhFsFb364dN1MSEG1OBIypm0YY+n70N4pkx6SUiGZosYQs6M24=
+	t=1750120052; cv=none; b=DH1URO5lfb5OlTDVNcnWKkoAl7TrbRYLdmXvbKbajrYmEh+KxcuHdl/ItzKICBfi9gRNf781q6ANb6LMOiXe4IDi8C/d4yj9o/pJbIhlTURJQ1H8eIw4Ujf7TYmSlzLP6cqmshIpg3xx9qS7u1PHKd8u0BYHENc04N9nvLbMv70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750119774; c=relaxed/simple;
-	bh=LjmFIvbIx/X2HSNLxsHAjRGijhoUvfvaPQ45w2lI0Ds=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L85xGSC01UWeg91iHAvad+4MUq1Yzvv//z1iF2qIpBp948Ri/Qvnkii68MHfBZm6I5Cimu3qpQI0iukBNgZE8oLGcYpv/3t7qWGHtQ5UrOZIvc3dSxlQMMV5GbCQIsrtUO20Cw5/X3aVgrQaom+4se0NTkcFN6s1KPEB8/wVJSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ms3AZYzF; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-748582445cfso3240704b3a.2;
-        Mon, 16 Jun 2025 17:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750119772; x=1750724572; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4GqxNk2hsS3kZerb8KyOXxCHPthV5aOceCEJLElO9+g=;
-        b=ms3AZYzFdjkb2Yf4XjmkJdJ7aVswJm++D5shqJGrgphpOOgvn5VKHMJXqdd7J+m1Ix
-         cWjLD60UOG9lMJgptdmf07in5irzBlyHN3iGg3wSMenAxletoVagV9Oc3NvVC48Ws9tV
-         7lEtOH+vOUuRXhVzeihWOrcwp9ZolDLFa5mIf64lfqIjEavQNyibhPEcQ/ADViaqtgyv
-         ga/Z2nVNGNKD6+4rPP9kM2rZscXaQA/QF12avEZyCon5raRPaTzvM52tTfHg/Eu+BP/A
-         TMU5Zvnzoiv2knWBaG7aOBprypkfctIOQ3dkjJBeknv/Jq2vhSc/zcOHaDfEp8fW1tTp
-         mkaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750119772; x=1750724572;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4GqxNk2hsS3kZerb8KyOXxCHPthV5aOceCEJLElO9+g=;
-        b=CGQOmgIcXVxxDIJ25fWPcpxsEPTG7OCYNRA4rmSMf+lt9Eq6IMqhLiPX7FL+ojBwoG
-         cz9m+CdDV6Lfry+ZQ96zfv+b55sL9mzvE8gX7xx8n/Tc68iIGa8UPw5hcHfSD5hl/Yrb
-         oEKqGX3KkAOdOAK0OwtmWEv4B+50eoifcvekRxKhdbljF3Py2jvqpbLUgru88KUsXRmV
-         Acer7DBm7eQH+H+5U9m6u9cUhmJE58J15u8XDW/y1ZEys1a6JFZ3RSDo/j6b0V90M7x1
-         dl1MjDKAT9rMioMWrSYS2W/cc0A1EsATOtYC43JhCA/+2y9urSCiDetVYybWl5ya3Cv6
-         xJTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXSuzWwDZPMigqVSxuhOxAl7AIYZG4mDBDt7V1xT1M2Pjy8pK3ztOaGCoeR5+Bn/VE4AzbhgEk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgFfq+HgHtWHwv7YnJGUYKz9gQG381vDwt6qm+SHAu2sY3E6Ly
-	Yt0L+L5lgdoVjmG9ji4xm3Y22BmXpUiFMdNkFWnNi6xlrKFK8W8jPWuI
-X-Gm-Gg: ASbGncv5etHHSEfxLS93s4W1p+XWs+pgtHY6xc6xWyydgj5pBg5pAofvyDVjfWWxXow
-	Snyud0zZ3XGiQvXRn1UBg8CfTHTdSqm4d0i6jERojYI6+HdkoZ7ZH5LxFeuVeAjYSFYbajPreb4
-	DnF3xruNtolHTBLWv4mYI8Tnha8+67b15v0h6xbLmGiTHWMskoeqcTaPW+yB0vVpMexSA+JT5qW
-	NGbQzOsuwvKqFnnO+x/U6Q8/B+scIEVLVdxkHHUxv5LrGvJoTwB1nnqK0NxsuEpLJTANDboFerj
-	nxJ7BpG8WgUyZXX5yGTMehK2OBi6uqMwxN8VN16ATUsAvaYvopCrmy97lCydeOuDCJn+QYEflha
-	YG3TbRI65VY4pG+aZ8VNyNi0i
-X-Google-Smtp-Source: AGHT+IF1/WZfSbxuATFdyizLTC5WHTYRx/D/D7r/8xD37bd3xRZOPPAiR/WxRX4Xj7shNOrnImCJOw==
-X-Received: by 2002:a05:6a00:2d8e:b0:72d:3b2e:fef9 with SMTP id d2e1a72fcca58-7489cfe84a0mr16812447b3a.20.1750119772231;
-        Mon, 16 Jun 2025 17:22:52 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([111.201.27.248])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748900d252esm7488606b3a.163.2025.06.16.17.22.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 17:22:51 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 2/2] net: xsk: make xsk_tx_batch_size tunable
-Date: Tue, 17 Jun 2025 08:22:36 +0800
-Message-Id: <20250617002236.30557-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250617002236.30557-1-kerneljasonxing@gmail.com>
-References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1750120052; c=relaxed/simple;
+	bh=kCWSN/mECWjeMP782jqMFjBrJ2LwHrL1WSGMwnPCVDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gPGgOmdjDCPoSQVSkbePz9crl3xCZbffu01bbcsTg16kuXLsJCRxYYfyie9x52DIlg1xjlbfT8oe0CdKs5cmVRVHBGYAX/KIDyg8dXkt9Y2qDcgp4WFu1s63IQzicQ72bLSn2k4oTqa/LMWEqhg3PApUYyy3ntZrcfBUBeoQouw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhnDAOHo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33298C4CEED;
+	Tue, 17 Jun 2025 00:27:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750120052;
+	bh=kCWSN/mECWjeMP782jqMFjBrJ2LwHrL1WSGMwnPCVDA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QhnDAOHooiqIzIWeRqSIhgW4OWdb0HpMlhlYtG3cZs8toWz1LuNhrr7lQma6tnTXr
+	 pxsDy9m/SYu8hvgB86uH2T84fK5Ww1dMD8tACWavN3K6ifgOx7gFF5lCu3wFzy7Vue
+	 jusY52MU5t5/BTI4Bw5CI8Ej9fVIz+Iz3f1t6LFam1MieCkLtFXzqKDuEZV8wFYsuS
+	 Wa31etPiZd6NBDDDOOYsZkc2tvAPV3Ob/CSA1eeU5tUnEa2a8mnP4PsRlZ6i7OQjiA
+	 YfsNHoPy3GQPjcB0Ac6htG/45v5nYjDphlG1ba2EiruHyMrqGu91R8jYDYcAsC3xYa
+	 JLcsCCx7lBGlg==
+Date: Mon, 16 Jun 2025 17:27:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Arinzon <darinzon@amazon.com>
+Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, "Richard Cochran" <richardcochran@gmail.com>,
+ "Woodhouse, David" <dwmw@amazon.com>, "Machulsky, Zorik"
+ <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, Saeed
+ Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori,
+ Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
+ "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel"
+ <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt,
+ Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>,
+ "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>,
+ "Agroskin, Shay" <shayagr@amazon.com>, "Ostrovsky, Evgeny"
+ <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, "Machnikowski,
+ Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
+ <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
+ <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH v12 net-next 3/9] net: ena: Add device reload capability
+ through devlink
+Message-ID: <20250616172730.5545c02e@kernel.org>
+In-Reply-To: <20250611092238.2651-4-darinzon@amazon.com>
+References: <20250611092238.2651-1-darinzon@amazon.com>
+	<20250611092238.2651-4-darinzon@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Jason Xing <kernelxing@tencent.com>
+On Wed, 11 Jun 2025 12:22:32 +0300 David Arinzon wrote:
+> +In order to use devlink, environment variable ``ENA_DEVLINK_INCLUDE`` needs to be set.
+> +
+> +.. code-block:: shell
+> +
+> +  ENA_DEVLINK_INCLUDE=1 make
 
-In some cases, users probably expect to see xsk_generic_xmit() can
-handle more desc at one time. Make it tunable and it would be similar
-with how dev_tx_weight works in xsk path.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/net/hotdata.h      | 1 +
- net/core/hotdata.c         | 3 ++-
- net/core/sysctl_net_core.c | 8 ++++++++
- net/xdp/xsk.c              | 4 +---
- 4 files changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 2df1e8175a85..862bd168fdd8 100644
---- a/include/net/hotdata.h
-+++ b/include/net/hotdata.h
-@@ -41,6 +41,7 @@ struct net_hotdata {
- 	int			sysctl_skb_defer_max;
- 	int			sysctl_mem_pcpu_rsv;
- 	int			sysctl_xsk_max_per_socket_budget;
-+	int			sysctl_xsk_tx_batch_size;
- };
- 
- #define inet_ehash_secret	net_hotdata.tcp_protocol.secret
-diff --git a/net/core/hotdata.c b/net/core/hotdata.c
-index 5131714eee63..e08fd0ee1b05 100644
---- a/net/core/hotdata.c
-+++ b/net/core/hotdata.c
-@@ -20,6 +20,7 @@ struct net_hotdata net_hotdata __cacheline_aligned = {
- 	.sysctl_max_skb_frags = MAX_SKB_FRAGS,
- 	.sysctl_skb_defer_max = 64,
- 	.sysctl_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE,
--	.sysctl_xsk_max_per_socket_budget = 32
-+	.sysctl_xsk_max_per_socket_budget = 32,
-+	.sysctl_xsk_tx_batch_size = 32
- };
- EXPORT_SYMBOL(net_hotdata);
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index 9f9946b7ffc0..73be2d9e6bab 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -647,6 +647,14 @@ static struct ctl_table net_core_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec
- 	},
-+	{
-+		.procname	= "xsk_tx_batch_size",
-+		.data		= &net_hotdata.sysctl_xsk_tx_batch_size,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec
-+	},
-+
- };
- 
- static struct ctl_table netns_core_table[] = {
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 95027f964858..4215a40abb69 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -34,8 +34,6 @@
- #include "xdp_umem.h"
- #include "xsk.h"
- 
--#define TX_BATCH_SIZE 32
--
- void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
- {
- 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
-@@ -780,8 +778,8 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- static int __xsk_generic_xmit(struct sock *sk)
- {
-+	u32 max_batch = READ_ONCE(net_hotdata.sysctl_xsk_tx_batch_size);
- 	struct xdp_sock *xs = xdp_sk(sk);
--	u32 max_batch = TX_BATCH_SIZE;
- 	bool sent_frame = false;
- 	struct xdp_desc desc;
- 	struct sk_buff *skb;
+This part of the doc refers to building the driver out of tree?
+We probably don't want to make a precedent for adding OOT docs
+to the tree.
 -- 
-2.43.5
-
+pw-bot: cr
 
