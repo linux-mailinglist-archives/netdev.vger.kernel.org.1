@@ -1,138 +1,146 @@
-Return-Path: <netdev+bounces-198506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C405ADC753
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:59:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA83ADC75D
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 12:01:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE5363A4327
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:59:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE8B418839EC
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03063293474;
-	Tue, 17 Jun 2025 09:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76132C08D0;
+	Tue, 17 Jun 2025 10:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0TjXq9ws"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VtgTVgEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1BF27380D
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A4E294A0C
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 10:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750154379; cv=none; b=uzTLeOdsLpAqvtXx4y2YDSCkT3oKi3QNRvoMWxbl3xMl815ev2aAkGUbHuTfK+vO2s9LLBRDSJyS1saou1Hv6s3rDeq8wU0RuazilEGlv12x146hQzFGSpTgSfcP/XAV32+yX4CptGO0IGXhQldL7DzXWNZpqtCe50Y6Y+KmfHQ=
+	t=1750154458; cv=none; b=KJLjb9cnltKTgwkm6zO0Z2uGxeWVs5/W695UWcPu8wmsM4Rjr3Mp1HH4Mz0OW9eoOdhVmCGgVhZrcHAB+lmrzHzPhFynz90dOgmYZGrT+wAeuxHu6MyUoRH3CTYpOUQO5tfAadRyeDJZ2aDCwhAxsKOMuWkiOshS2ZttvkSNrf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750154379; c=relaxed/simple;
-	bh=T11Yz+QUum6W/Sp7RvfgeObytTx3A4fLEIOKNpWe1W0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pPTglzCNd363fSClxBAcPV7tQvSmotbpFTJAmGa+YbUstTuaGh0G6hVj+JrJpEd/ntkOk1Y14UDWT3V7SoT/shOC6ytU4yJIuCAu0h2Ml+dWsxvREap3Jdm/nQC6L9vnoxVnHfbPZrC+Ypiy4cdJvkNAKa0p2xBcl7OUNGI/i6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0TjXq9ws; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-311d5fdf1f0so5167039a91.1
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 02:59:38 -0700 (PDT)
+	s=arc-20240116; t=1750154458; c=relaxed/simple;
+	bh=63f0TqEe7ZSJlAEEDh5c6QP7qrLi0rXRzYggtZFz3+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U8upXwt0JuAnif96X4guIddh7LFw7DEG0zwrbrxeMyoRP8zWObfSeJivbrRsVCOCYtx38o1mHjuNfXH5A3eIh/j3fSu4ikS8r2hRPdbTZOn6PkbP7cGpJ/hEaWNjd6Kip/IHsScEbWKoCyFlKZobmaft6A0TiJceCzTRTUKWLyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VtgTVgEO; arc=none smtp.client-ip=209.85.128.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-45347d6cba3so5806855e9.0
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 03:00:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750154377; x=1750759177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T11Yz+QUum6W/Sp7RvfgeObytTx3A4fLEIOKNpWe1W0=;
-        b=0TjXq9wsqHxffuRU1c2RR3tmQWMF3rgMBTSDAo9A/RLJjl0o6leFDXIaZdZtjY1xU0
-         RShNNws1gi6oJK/iG1MnJMBfexe4U28MD1AhI2ZbxliYTZ0FMQxxP6F8hDSnvp8YT3AE
-         iZCXg6bqiczFP9ms8kUlOCQ6J/fYs2ALe58KBZBV/QhPRqrs8iwdvhvXgX9lDhWQEqga
-         EjhzdnNnx+1+X2T5Cx0VAdmZ5c+IqTJONdibdkyxozeNKAVNjJ9BCphcORfcz1xRrxNu
-         wg+GYtQDp6udbBNvZLfXj21lGHzYfrZOZDXFhHep/4JL/cuQAG2iMnpBqlYijnou7H0X
-         DCGw==
+        d=suse.com; s=google; t=1750154455; x=1750759255; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=63f0TqEe7ZSJlAEEDh5c6QP7qrLi0rXRzYggtZFz3+4=;
+        b=VtgTVgEOKtrCkqMX4unbbSIrCU3tRWd9VRML+CeTM68VOv88gNhJWuZyGajcecdP0O
+         0/bY5iuY1IIQQG5tFi2LHNRh/5/JLztDNAdK8S8XyfAHD/WXkPgfgD1kQ9koR243msbM
+         0F/aNKyTokJmbblE+CDTCluN/IadEGieSO3ws805DcT7TQu6V8lD+/va+AzIM342/HqD
+         akpEjYm00QtlpfJBzpWIF4XccQkq5ELeo8Le8DT5MycagWkrRrlV5tBoU9zQ8cC0b4we
+         d1tEsS14ibTIfOYAYLzUMn8NfOhPXOEMh1Aze1XvAZzjlqfM9rDJhx35B3Hhs6VuVDK+
+         v9Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750154377; x=1750759177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T11Yz+QUum6W/Sp7RvfgeObytTx3A4fLEIOKNpWe1W0=;
-        b=tBFqPNekLEMuBhhEskHmrn+Xc6trsNGoO5aBn3HkS9ILIRn7LkugqVLeuTLH2Cd8df
-         bWahF4e7t/3tLvLSnK+M1Sxw96BrNP5zKvuNAYbc6AbmZl6jX40K98v5c4k9pQfaHHNm
-         Gz3VP1Gd0iPJyUOOawrUIMpXaDBvWiTVxA+Gj9jDkqVCIhhf34UVujLhwMvlGw2ty1v1
-         0fylRfDGllWkxs+/ULN6qylGpeqTfLLVFVunRF/8WKJHxIbMefQ67tDDtoocJrS/q4Ev
-         TrW3Yy2suoGWKY8wcj72mcyXHZZBgT0GFoWYpcmMuFfnq9JyAyA9LeDeSKS3JxsH5gqq
-         4yZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFTRLoRFuSI8+pbN473BBWN6xHNQCcgQszyn/y9WRLu2O1fplTsq8aVzeQBtAkbH2pRPNaAxs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz86Y5V1cKjBPajvTkctEKdu9xwI8Eg5zPSP85uQkDk2xLfV0NW
-	KKCqt5nQk3eJp36MJpvWH8nLcJ6mMRIdif5dXfjsKbNLXmnDOL73S/UgvEy0xgN7nc4LDmHzU+7
-	5AYOPHWNpMpoARVhxd0ZSntS5dluZtQ5aa96CtvFE
-X-Gm-Gg: ASbGncvzYRJ9Pw0rmDY7Vl3CXJI8JPYvd6Rjv9IizeFvcWwRtSBcmYNBeFb1CvYUXK7
-	U6/da9oZCWcct2xKqDZKN9jVj86RSYZy7VOYSA0GfT25XHad1vjfQ0aYCWEZNACQAS/h77seh/C
-	bzwyIhS2K/ljabERp/foQc6/vqRbWjJu3LSZvb8vdv5iQlt7zukIn59ZXuVp5YIGy+TMR+u9LM
-X-Google-Smtp-Source: AGHT+IHNeTT68NvBOK6LqdXHKIzzjhA446o1WLmbvK+HGnNpsJHS6OxLDqwqwuxWZSw59pGNsBTCbNKTHvryBpKg8jQ=
-X-Received: by 2002:a17:90b:3a4b:b0:313:5d2f:54f8 with SMTP id
- 98e67ed59e1d1-313f1e22fc8mr22826886a91.33.1750154377458; Tue, 17 Jun 2025
- 02:59:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750154455; x=1750759255;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=63f0TqEe7ZSJlAEEDh5c6QP7qrLi0rXRzYggtZFz3+4=;
+        b=ePgyiBCpMnXYp5SJ8ZjUFfRleE8dVyJoMH/n7VrqwBt3Qra7YhrZzy1q2/q/9/BCv9
+         WMfKn20Tv4xDgA/h2OLyO/i1n06lNiMN0S6WZQyOdadJUfEHRm5VgK3XUhJplPuve7dv
+         2211oIIaaLNPhSL83tG6EgdZhdtUX65vjKlwHOO8+SLvVnhrzipm3Ew5yN9U9XcjSc52
+         xx19NcQl0mSlW6GkAXOPTknoiCn4MoZyIl88z9qdw9uix9e0n4TR4ujFMpQtQcQWfIlN
+         Zehuj8B/rgfeXO4muVoyjhVOaZrOJ7gmyv0bDy1yvqis7VGzr0de4sGLhLPJMcLrah4T
+         4VNg==
+X-Forwarded-Encrypted: i=1; AJvYcCW5nZ1yWtCzPTnlsZVTyyp9C+OlvT+zhxygEPm6KdJX9HyznbqlJMI5sup+pu96NsyrdbU7vD4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7mgcWHgHczrOhzKZmFFHPoDTjT/nlVE9aL4/i3vW75K5+sABY
+	YdgWlro3nRDjrZCClvo7TGqnE65ZHf6iiiRhXxPn+7XCPywOOJZ8aTDz0P+2fRJrvvk=
+X-Gm-Gg: ASbGncs3qCdoL41V0zpcd7OMKjKWsabT9TEjncbNVNOwY9jAEb9pGIFJKrlX/l6MzCE
+	0Xy+9WQ9VljktFIZBb27kytOAmmDqDlLATvDdhz8pFpJxQkr2s3TFTeqtIEj1X397pGE7y7u83r
+	BhYa84jcAsIIbGU3QqEPEyz64rh3M5lFkBCIgOVFqf4pFbOKyhcngkhNjOgDi52p+264XKWklVC
+	/ArmHFrpFYyGScACe3YPjrfDrafYonXXrGGIroQEMnBGVwa4RtQYAmbMj036ZOi71bJUEh9zqKe
+	QKaPCXXkV37RyfhwuQZczmezvjiwndhgs2vJarFffW0rslZX20BE/phYwp8sdN8+
+X-Google-Smtp-Source: AGHT+IFOY4uMo1XQEX4RuwIHAMfgibmwRB22iBO5mpSJQ1+dfkCUk/eEmOPDTUbzxCn/VYVxqmedIA==
+X-Received: by 2002:a05:600d:10f:b0:452:fdfa:3b3b with SMTP id 5b1f17b1804b1-4533cadf885mr65921715e9.5.1750154454019;
+        Tue, 17 Jun 2025 03:00:54 -0700 (PDT)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e195768sm171790845e9.0.2025.06.17.03.00.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 03:00:53 -0700 (PDT)
+Date: Tue, 17 Jun 2025 12:00:51 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: syzbot <syzbot+31eb4d4e7d9bc1fc1312@syzkaller.appspotmail.com>, 
+	inwardvessel@gmail.com
+Cc: akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org, 
+	axboe@kernel.dk, bpf@vger.kernel.org, cgroups@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, hannes@cmpxchg.org, haoluo@google.com, 
+	hawk@kernel.org, john.fastabend@gmail.com, jolsa@kernel.org, josef@toxicpanda.com, 
+	kpsingh@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, martin.lau@linux.dev, mhocko@kernel.org, 
+	muchun.song@linux.dev, mykolal@fb.com, netdev@vger.kernel.org, roman.gushchin@linux.dev, 
+	sdf@fomichev.me, shakeel.butt@linux.dev, shuah@kernel.org, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, tj@kernel.org, yonghong.song@linux.dev
+Subject: Re: [syzbot] [cgroups?] general protection fault in
+ __cgroup_rstat_lock
+Message-ID: <qzzfped7jds7kcr466zahbrcw2eg5n6ke7drzxm6btexv36ca2@mici3xiuajuz>
+References: <6751e769.050a0220.b4160.01df.GAE@google.com>
+ <683c7dee.a00a0220.d8eae.0032.GAE@google.com>
+ <p32ytuin2hmxacacroykhtfxf6l5l7sji33dt4xknnojqm4xh2@hrldb5d6fgfj>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6850d3bd.a70a0220.395abc.01fa.GAE@google.com> <CANp29Y68ZaQnb0R2fZSLjcCxiOE3uZyW4b7wLEYMAycF0WHNUg@mail.gmail.com>
- <97d6493279ab5c63e8844e8b0f349b2528d2832b.camel@sipsolutions.net>
- <CANp29Y5+W426u0jUz0PT=zVde+QqSD9H1fLpTuaKSzCLrt5FcA@mail.gmail.com> <49456d11ed8d4ff3adc71286b17dc657a6db131b.camel@sipsolutions.net>
-In-Reply-To: <49456d11ed8d4ff3adc71286b17dc657a6db131b.camel@sipsolutions.net>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Tue, 17 Jun 2025 11:59:24 +0200
-X-Gm-Features: AX0GCFtZpFbzd7aS93ErUYuYC0VlHJTlAFEcYitrHyt4jKcV8u_uptKDLdvv-rk
-Message-ID: <CANp29Y4hwwLhju3=AVeNuGt-yCwR_Rey1ML_Tkc5sTFzu55yUw@mail.gmail.com>
-Subject: Re: [syzbot] [wireless?] WARNING: net/mac80211/tx.c:LINE at
- __ieee80211_beacon_get, CPU: syz.NUM.NUM/NUM
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: syzbot <syzbot+468656785707b0e995df@syzkaller.appspotmail.com>, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="krlwbo2bq63d5qwa"
+Content-Disposition: inline
+In-Reply-To: <p32ytuin2hmxacacroykhtfxf6l5l7sji33dt4xknnojqm4xh2@hrldb5d6fgfj>
+
+
+--krlwbo2bq63d5qwa
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [syzbot] [cgroups?] general protection fault in
+ __cgroup_rstat_lock
+MIME-Version: 1.0
 
-On Tue, Jun 17, 2025 at 11:50=E2=80=AFAM Johannes Berg
-<johannes@sipsolutions.net> wrote:
->
-> On Tue, 2025-06-17 at 11:48 +0200, Aleksandr Nogikh wrote:
-> > On Tue, Jun 17, 2025 at 11:43=E2=80=AFAM Johannes Berg
-> > <johannes@sipsolutions.net> wrote:
-> > >
-> > > On Tue, 2025-06-17 at 11:34 +0200, Aleksandr Nogikh wrote:
-> > > > #syz dup: WARNING in __ieee80211_beacon_get
-> > > >
-> > >
-> > > Not just this one :)
-> > >
-> > > https://lore.kernel.org/linux-wireless/20250617104902.146e10919be1.I8=
-5f352ca4a2dce6f556e5ff45ceaa5f3769cb5ce@changeid/
-> > >
-> >
-> > Ah, interesting :)
-> >
-> > FWIW, in this particular case, syzbot sent the duplicate report
-> > because the WARNING format has somewhat changed in the latest
-> > linux-next. So before we updated syzbot's parsing rules, it had
-> > managed to re-report quite a few duplicates.
->
-> Right, I had noticed that, but then I looked and the old counter is
-> already at well over 100k so I decided to finally look at it again ;-)
+On Mon, Jun 02, 2025 at 04:15:56PM +0200, Michal Koutn=FD <mkoutny@suse.com=
+> wrote:
+> I'd say this might be relevant (although I don't see the possibly
+> incorrect error handlnig path) but it doesn't mean this commit fixes it,
+> it'd rather require the reproducer to adjust the N on this path.
 
-Nice! So re-reporting things is not always that bad ;)
-Thanks for looking into the problem!
+Hm, possibly syzbot caught up here [1]:
 
->
-> This is a really long-standing problem that we discussed a few times in
-> the past I think, and basically the system is loaded enough that the
-> hwsim hrtimer can fire on time and pull the beacon, but the workqueues
-> are overloaded and cannot do the necessary work within the ~100ms beacon
-> interval ...
->
-> Should be rare in practice, but a WARN_ON() that doesn't say anything
-> about what's going on doesn't help anyway.
+-mkdir(&(0x7f0000000000)=3D'./cgroup/file0\x00', 0xd0939199c36b4d28) (fail_=
+nth: 8)
++mkdirat$cgroup_root(0xffffffffffffff9c, &(0x7f00000005c0)=3D'./cgroup.net/=
+syz0\x00', 0x1ff) (fail_nth: 23)
 
-That sounds totally reasonable indeed.
+So there's something fishy in the error handling.
 
->
-> johannes
+HTH,
+Michal
+
+[1] https://lore.kernel.org/lkml/68403875.a00a0220.d4325.000a.GAE@google.co=
+m/
+
+--krlwbo2bq63d5qwa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaFE80QAKCRB+PQLnlNv4
+CFc5AQDFUQDIxN7rZwIY/4HwJm40c4uz7Kwbk8e3RX9sQwVOOQEA0j9JsDa/0bOB
+mCi/pTl0V4lRqubAZXTV4nhvtAtknwY=
+=+ozi
+-----END PGP SIGNATURE-----
+
+--krlwbo2bq63d5qwa--
 
