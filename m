@@ -1,166 +1,164 @@
-Return-Path: <netdev+bounces-198793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC1EADDD8F
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:02:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C83BADDD94
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7A8A19400F0
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:02:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A1EA17B48E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18DD1E8335;
-	Tue, 17 Jun 2025 21:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961FF25C82E;
+	Tue, 17 Jun 2025 21:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aDn1j1Y0"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="d8kRfGIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BB228FFE1
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5371288CBE
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750194140; cv=none; b=ZmtPgYhWcdgLyqSFyQ1UO9AETONxWWi4OvmFIO0zkA6kjDy7A0rhK7+opw6Qj9Hs3Dg3HZDmnEqVeVZifF0x+Xq4em9JmV6K6TRkIn08Qtyo1eDYGBjmhXUvwDfqtLO56n6A8ns9qsGO+W6PtykUOBEsNOFYtyZEjSZ1dC6grj4=
+	t=1750194274; cv=none; b=c+xWX66i+O4/xO2BNDnYQRFkpdXUX/7jxfnh8RRvryrUhmd8rR4xcBJY9zwvNvVzcoGOIcsueGTx5A9tSo6A+y+9VEpSngK9V/n/PW1IkjlNJz10ReGhq8wP18IIsgyLY5x8cSgl7znaLvPQe9j20uprq0eQg/qeS5hv9cZUvXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750194140; c=relaxed/simple;
-	bh=bbJvFUQkw3L5PkboYUMBfNQJNB7Cj+N0QgAqzbHFUjs=;
+	s=arc-20240116; t=1750194274; c=relaxed/simple;
+	bh=G7EyBO9aaixvVybf61PXE6lTfXuLk1htvEcQFvTJAzM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VEPIEtuvAp6WSOiJhY7CtCY1XnjyS0ScDEpKTFdIzm2gTX7flkUhCtWC4EgjD5I0DSfj+s0r67vKnhcmizvBUhcTiPFRidQKeetOwD5DqRsYWotN6FCtATV8OdUtiH8yK2N4Coixrkcmq3cahQo795PlU7Di3vmcLVgmh6QM2xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aDn1j1Y0; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2348ac8e0b4so11075ad.1
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:02:19 -0700 (PDT)
+	 To:Cc:Content-Type; b=t0oDa4/lL1XR4ErTJhx4DX0RddUA8FjM9iH1deqeqWlThG4zMrmr3BAvmFKTrUY/7uMAb5TmiivQLe1pzUMy9IYnRqCxFT45HA1x2RRLK25pPsiMV1V/zpoJiD/EUefi9ZzkJmNLNFcr3JiRn20Gfmwxeig+6vIIIV81OK5dn+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=d8kRfGIp; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-71101668dedso53966207b3.1
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750194138; x=1750798938; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1750194270; x=1750799070; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FJpTkL6dnMUxXhqmmFV6413864xvIfSCiGQ5PuutKRk=;
-        b=aDn1j1Y0l7AYNZt7Qy2X/e0gj9YhLQyvqm5fO3SG1G8YnpRudZJlswM9i1g/sLnTmF
-         sbK03Wq2AEDVQTVRZ/cSFGIZLx+IjFb8gYhKVxvWBe09v4Bnrc9Ge1dBAInBw5m8BmQh
-         i7sTsW8G+fteiiRuitK8u7d+5+lS8p8TRMcOJbBGTi8b+B5WelEd3mFtSbIW+2sRp26y
-         kGWI+VC7sTUvztAHKIQhkqIjEkA8P6TN+r9F+R6EP0O20xnOBi/ht4pTgW5rrnBUSKBW
-         FbLA2i6ben0GVHPNh8AZ3cRGFxNf/yzICjzPnzlzYPKgQXWuO1dpG91TpYDFPVzuOUkw
-         TduQ==
+        bh=CLSaH5FJ0osFIVIC7b0ua1GAmBIi8+s8Y1MlWceWV4Y=;
+        b=d8kRfGIp3RdQR+cjCI8hG3Oau0KjjVm2IcPrRSLhktOd4p0gxHWAu/iYgTGn/lY8Mo
+         pT7ieg3bOESqn25Fh/zzwEZ9QmOakDGGm0qEZGpgpU1V/IYtWBFU73Ac0KkK+5bzqcMT
+         CPJR+b4xJ45cwPnsuvr+cL+PHCKal30Y0O8DmhFeF4nTjm7lPtZHwl5DC+e8nmdHcN4X
+         H6EhKQm728EDGDFgwr1vMMDqD9w+O9VrMhjUbPbXAInmC6fNLi9FbUgJzQtNIetWKiJA
+         52amJ3mIrdqyz7Sq9VjwVWmRk4Z/knaZbtwIqKWIodpZVD0IIzoTGwbSSr9R6hZJFVnL
+         YFqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750194138; x=1750798938;
+        d=1e100.net; s=20230601; t=1750194270; x=1750799070;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FJpTkL6dnMUxXhqmmFV6413864xvIfSCiGQ5PuutKRk=;
-        b=WkxBcAWATzKaF3pxDuT7693wtt8xHeOnIB8ZuMou3D0tKH8f8ZR0oLzh0Zcs6fk0kO
-         V+v2WibhUEGTTtYg3Z5xNyAWGu045Bfd3WzEb60tZMvmXO/FWHUJ21QuUX91KJL0zVwc
-         wRPrSbpA6hRZhNoh71GUOcemLEU4yJFgMA+JuuxDxCSh14SeLdf7shc7d8lfyrwGGzST
-         wgtjWrlQGQLz36ELQHlzv58WZfTq6gMormjfhYW/1zf5EKyNYqb8VILoBaQAoiQfehUQ
-         dS8iwRSJ5X8Jb0veu08mx8dQvO1cVkr6Y0OQUy8/h2L7J7rakNuFKNo7Kl2txWOMSQUn
-         UZFg==
-X-Forwarded-Encrypted: i=1; AJvYcCX73BoufttMqLe7M5nEWjzqJtXdO2Iwn7nhuTI/Ytem0EOCk5EORgq7j/SgeRI6bdPRXJI64b0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuEmD6NtB9Qq/EQWJSWee/Cuu2P9UsDzd3CyCDv1WN038OJxE4
-	o/6vzYPFhCyblt00ztNw6XvgXZuQUByXg1f3TH8VH+eTQkn/5CFhjXuKvl0kV2L404nNbQVDcp4
-	xkutm3a9mjbUx7Bx6G1cnP7sb+0pJ7s2stOd8UVhO
-X-Gm-Gg: ASbGncvT9v/7UTdu2TPXFcuAGeVmmwhR7vn3nzmwoW6SP6zD47CvZrV4WiYo7sGwEqv
-	VNWUG5cL2+A146VWwcpxkFrDGkv8IRaUPg38DxA+sx84ICP7Z2gkiC4URYBUj9+47KzxMCPAj6X
-	M+D/fJ7pVIh8hOulWqOKw4/7UmJN5hWsZYBqk92PmEZ2yOPW54+XTRvfUH8bmvrC2LqECliEhcv
-	w==
-X-Google-Smtp-Source: AGHT+IHgMRu1fKsSV7XOy4vWnT6+ZEd1bH1oAglzGxguVpljDMbdpGfPlD9igC63Hsmb+pjcSFZ3ktzSSxCDH6UqpcY=
-X-Received: by 2002:a17:902:694c:b0:231:ddc9:7b82 with SMTP id
- d9443c01a7336-2366eef033amr6826765ad.13.1750194138053; Tue, 17 Jun 2025
- 14:02:18 -0700 (PDT)
+        bh=CLSaH5FJ0osFIVIC7b0ua1GAmBIi8+s8Y1MlWceWV4Y=;
+        b=Xo9Im97pOnF/GkmNZ50NobJGQt+4GeeB6iEBygNZThB8BaZatXLGkaTACdq1snTjk2
+         DnLSTAyQRzAMENdbCqNs8ZT4Q+SBZ1ZfGnS/bjxpDMNhUJC30z2tjneYfejSQGSXBFeL
+         GvVNmx/tLtT/iazFs+hUVEfYUesqQBQrMBZwtxZhLthz7ftzK09gsZRbsuJklKGlqq9E
+         9O28nmh9yF9d4w4la2yYkdWfGmzaHi1ZXH+PTaLXZp7CWIK2NNklcgZBkHbbCqWtTuhP
+         VSS6Jh5ucfs9/LKqLS+0t0mpMrzu9q8cDtyd0EIlr7KeZPYjVNof1VBpLlYhjgNv+W6n
+         P+Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/N79lp3FDklqrHSTx189YWscl7udI533H7OoEw1OZ3MaykPIHpefIWRW4MW4wzot0LLUFOeI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqMRCJx4vefnPrnIP66Dd16iO6lx3Q5bcNmitrYV/99lRq0HQg
+	scX8i84g30jELe9EulRtLXBb494AhDueZXScgQ6trN2LW2V6PbV0e1di0Xxw6AYX8YqHgah4fmK
+	sL7Ad30xFnAARvBUN109oz64mHvewRcocPzo3qJDR
+X-Gm-Gg: ASbGncvly3BwTh1K0Via9TTYefc2bWt/Kw/AeARNcmRDGbGJoJuQYNNCFel3NBwPH/5
+	qxcFGO/AldmuXvjfRY3BH/ksIPgT57fjTssa4eq6nraPZOcsuGFpHWBM8DwsuLKAKMdA9ptY6a5
+	+K4TdNq/0jp228XJs8Hcg3ji1vVbRmtZTrXgO/8bBRaIY=
+X-Google-Smtp-Source: AGHT+IF1EZ1a0hQWE4asfB5JT5FSJBolOr0rcgGVLC/42lBKbzDGscabkq8Ij553a+7rnbN0R+EVacrmZkz63U4IiPM=
+X-Received: by 2002:a05:690c:6:b0:70b:6651:b3e2 with SMTP id
+ 00721157ae682-71175384ed3mr212955347b3.6.1750194269666; Tue, 17 Jun 2025
+ 14:04:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616080530.GA279797@maili.marvell.com> <d152d5fa-e846-48ba-96f4-77493996d099@huawei.com>
-In-Reply-To: <d152d5fa-e846-48ba-96f4-77493996d099@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 17 Jun 2025 14:02:05 -0700
-X-Gm-Features: AX0GCFvUw1z75ffCbqGSTrvshjJ_0t0dfFX0hDbMSAmZ2EGaeyX7sOFJGQGhBUs
-Message-ID: <CAHS8izNBNoMfheMbW5_FS1zMHW61BZVzDLHgv0+E0Zn6U=jD-g@mail.gmail.com>
-Subject: Re: [RFC]Page pool buffers stuck in App's socket queue
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
+References: <20250616172612.920438-1-kuni1840@gmail.com>
+In-Reply-To: <20250616172612.920438-1-kuni1840@gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 17 Jun 2025 17:04:18 -0400
+X-Gm-Features: Ac12FXxP97gXP9l2v6eRR4pipJgnyOXpsbqjly8R6nBKnPWsPTOXFXGZ5UfFv1c
+Message-ID: <CAHC9VhTPymjNwkz9FHFHQbbRMgjMQT80zj1aT+3CFDVY=Eo5wg@mail.gmail.com>
+Subject: Re: [PATCH v1 net] calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Huw Davies <huw@codeweavers.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>, 
+	John Cheung <john.cs.hey@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 16, 2025 at 11:34=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.c=
+On Mon, Jun 16, 2025 at 1:26=E2=80=AFPM Kuniyuki Iwashima <kuni1840@gmail.c=
 om> wrote:
 >
-> On 2025/6/16 16:05, Ratheesh Kannoth wrote:
-> > Hi,
-> >
-> > Recently customer faced a page pool leak issue And keeps on gettting fo=
-llowing message in
-> > console.
-> > "page_pool_release_retry() stalled pool shutdown 1 inflight 60 sec"
-> >
-> > Customer runs "ping" process in background and then does a interface do=
-wn/up thru "ip" command.
-> >
-> > Marvell octeotx2 driver does destroy all resources (including page pool=
- allocated for each queue of
-> > net device) during interface down event. This page pool destruction wil=
-l wait for all page pool buffers
-> > allocated by that instance to return to the pool, hence the above messa=
-ge (if some buffers
-> > are stuck).
-> >
-> > In the customer scenario, ping App opens both RAW and RAW6 sockets. Eve=
-n though Customer ping
-> > only ipv4 address, this RAW6 socket receives some IPV6 Router Advertise=
-ment messages which gets generated
-> > in their network.
-> >
-> > [   41.643448]  raw6_local_deliver+0xc0/0x1d8
-> > [   41.647539]  ip6_protocol_deliver_rcu+0x60/0x490
-> > [   41.652149]  ip6_input_finish+0x48/0x70
-> > [   41.655976]  ip6_input+0x44/0xcc
-> > [   41.659196]  ip6_sublist_rcv_finish+0x48/0x68
-> > [   41.663546]  ip6_sublist_rcv+0x16c/0x22c
-> > [   41.667460]  ipv6_list_rcv+0xf4/0x12c
-> >
-> > Those packets will never gets processed. And if customer does a interfa=
-ce down/up, page pool
-> > warnings will be shown in the console.
-> >
-> > Customer was asking us for a mechanism to drain these sockets, as they =
-dont want to kill their Apps.
-> > The proposal is to have debugfs which shows "pid  last_processed_skb_ti=
-me  number_of_packets  socket_fd/inode_number"
-> > for each raw6/raw4 sockets created in the system. and
-> > any write to the debugfs (any specific command) will drain the socket.
-> >
-> > 1. Could you please comment on the proposal ?
+> From: Kuniyuki Iwashima <kuniyu@google.com>
 >
-> I would say the above is kind of working around the problem.
-> It would be good to fix the Apps or fix the page_pool.
+> syzkaller reported a null-ptr-deref in sock_omalloc() while allocating
+> a CALIPSO option.  [0]
 >
-> > 2. Could you suggest a better way ?
+> The NULL is of struct sock, which was fetched by sk_to_full_sk() in
+> calipso_req_setattr().
 >
-> For fixing the page_pool part, I would be suggesting to keep track
-> of all the inflight pages and detach those pages from page_pool when
-> page_pool_destroy() is called, the tracking part was [1], unfortunately
-> the maintainers seemed to choose an easy way instead of a long term
-> direction, see [2].
+> Since commit a1a5344ddbe8 ("tcp: avoid two atomic ops for syncookies"),
+> reqsk->rsk_listener could be NULL when SYN Cookie is returned to its
+> client, as hinted by the leading SYN Cookie log.
+>
+> Here are 3 options to fix the bug:
+>
+>   1) Return 0 in calipso_req_setattr()
+>   2) Return an error in calipso_req_setattr()
+>   3) Alaways set rsk_listener
+>
+> 1) is no go as it bypasses LSM, but 2) effectively disables SYN Cookie
+> for CALIPSO.  3) is also no go as there have been many efforts to reduce
+> atomic ops and make TCP robust against DDoS.  See also commit 3b24d854cb3=
+5
+> ("tcp/dccp: do not touch listener sk_refcnt under synflood").
+>
+> As of the blamed commit, SYN Cookie already did not need refcounting,
+> and no one has stumbled on the bug for 9 years, so no CALIPSO user will
+> care about SYN Cookie.
+>
+> Let's return an error in calipso_req_setattr() and calipso_req_delattr()
+> in the SYN Cookie case.
 
-This is not that accurate IMO. Your patch series and the merged patch
-series from Toke does the same thing: both keep track of dma-mapped
-pages, so that they can be unmapped at page_pool_destroy time. Toke
-just did the tracking in a simpler way that people were willing to
-review.
+I think that's reasonable, but I think it would be nice to have a
+quick comment right before the '!sk' checks to help people who may hit
+the CALIPSO/SYN-cookie issue in the future.  Maybe "/*
+tcp_syncookies=3D2 can result in sk =3D=3D NULL */" ?
 
-So, if you had a plan to detach pages on page_pool_destroy on top of
-your tracking, the exact same plan should work on top of Toke's
-tracking. It may be useful to code that and send an RFC if you have
-time. It would indeed fix this periodic warning issue.
+> diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
+> index 62618a058b8f..e25ed02a54bf 100644
+> --- a/net/ipv6/calipso.c
+> +++ b/net/ipv6/calipso.c
+> @@ -1207,6 +1207,9 @@ static int calipso_req_setattr(struct request_sock =
+*req,
+>         struct ipv6_opt_hdr *old, *new;
+>         struct sock *sk =3D sk_to_full_sk(req_to_sk(req));
+>
+> +       if (!sk)
+> +               return -ENOMEM;
+> +
+>         if (req_inet->ipv6_opt && req_inet->ipv6_opt->hopopt)
+>                 old =3D req_inet->ipv6_opt->hopopt;
+>         else
+> @@ -1247,6 +1250,9 @@ static void calipso_req_delattr(struct request_sock=
+ *req)
+>         struct ipv6_txoptions *txopts;
+>         struct sock *sk =3D sk_to_full_sk(req_to_sk(req));
+>
+> +       if (!sk)
+> +               return;
+> +
+>         if (!req_inet->ipv6_opt || !req_inet->ipv6_opt->hopopt)
+>                 return;
+>
+> --
+> 2.49.0
 
 --=20
-Thanks,
-Mina
+paul-moore.com
 
