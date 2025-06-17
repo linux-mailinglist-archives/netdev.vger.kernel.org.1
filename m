@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-198389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2469AADBECF
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:49:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D720ADBED0
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:49:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195B13B4122
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:48:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31BD43B522E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BC8381AF;
-	Tue, 17 Jun 2025 01:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF2F1AA1D2;
+	Tue, 17 Jun 2025 01:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghZHwz0f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J83jmMQh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA531662E7
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399771A317D
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750124936; cv=none; b=Ji94Jtrk5r8gSMrzlK0dqYADepN8ZJ7G63oRYaVIRBE06cxGbbC3hF5uTTkN66HxBIMYx6bMhPuR4pDGjxNjddAknD6rIfgwL1vyz5gTt2cL4P7ebQIrMiVi3gOm4etzmc5fpaXBXLpmk5NgO7QI2mpw3IU/tzLphb1vNUYPgfA=
+	t=1750124937; cv=none; b=TuNiH+w8Sga/zemalOnIdaZNXAXsQJRSW35r/IFEuOGWnVv8NB07j/tKVtm+ua5pplwtX/cJB862ivITBByst+KnTwubsfwnypjyBHWkLvCFl1xk6cLmB439obzHPGqxBq4VU8hvakC+fFzIyWTlQOfi0LnDlsa7bZjzv2vwjV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750124936; c=relaxed/simple;
-	bh=7ECgga5wfIG6E4vn9JUPK6kIfhdsLlcbIil5k4AQXUg=;
+	s=arc-20240116; t=1750124937; c=relaxed/simple;
+	bh=tsTNwbMyXQyNCUsZ/Mr6/Wjq3agKavr46zd2lX4Bpco=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H+rAskr5LKg0LLT/Il/tnmcBzpyJKlWX5cJgal7IdFEvlNw0pJ2zlC/JVb3d4EaRWPhW6tnoqA0PErkMowSxo/1Sxjp9t/pqaTygb8r5P4b6oZExacYcYzLJyIk5MnAFcU1AmUMqHdwbQdO9uyS/LUEfimNefIkUT6wSIquLBWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghZHwz0f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 397F2C4CEF3;
+	 MIME-Version; b=ez8Sa1u/5aRROoD8HfebWWQaP6X9e9EvNXbiV6FbnvyAJrlahz8YJvDRGBVqzEOliXfd7R6qyIhYFYUX0UprSvF544wRz8d3fZsMKkyyecZHbu8032XCttQa86fsGnAgd7xKRH1Wb/Llh36vLdAK2l4ZlXGRjf+I1Kwg1pSoKA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J83jmMQh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B21DCC4CEF6;
 	Tue, 17 Jun 2025 01:48:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750124936;
-	bh=7ECgga5wfIG6E4vn9JUPK6kIfhdsLlcbIil5k4AQXUg=;
+	s=k20201202; t=1750124937;
+	bh=tsTNwbMyXQyNCUsZ/Mr6/Wjq3agKavr46zd2lX4Bpco=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ghZHwz0fo2pu5/dEagunDsRMB/PVc5z+e2UHdaMKYL/mIKGX3t3IDLWftjG1CgAWS
-	 axnDWVK5WEizthkUE0Dge4F16ezxremkKA11w3PI4QscNlFCLXKFLaxNEJvs1cE+BI
-	 1mCYMznKdPJ5v1Ip3Jc4NpsMB78zgggxsmqs2es0p0TjiT0P5YDvAGvPSKVJWv3ZsP
-	 njkXm6mMTX47HWYL9XlkESM+nDGkJeqB/0kCU+Fd4iRAzfsQF1A49JW0buPIhgq/Fh
-	 LRJ/5bZDWV6Z2COt/41gfvoKcuI/yK9VLWJeFkpsBo2oCoKTKn88CAdiFGHNDpz2yF
-	 4V5iAb2dyVowA==
+	b=J83jmMQh5wchmmKzrjrOwPGLNnElqFRm9LwEAuMufWVgGyUrKkstYZ6Q2lkH5rctm
+	 BC7YB5fmZY8bK5Xz/SuYiXjgNW6A4p3rBUR+GXHG7wJ8F+T0FdPmU/X+1470UOdA4d
+	 X2RP6g0tyv52CBm4jZRv70W+xP7w3HBzogFzGiygj2EWoFhUO0nY/B7Rtsy8IL2Ybt
+	 fcdQqgXS+J96wIKG7zmlVzXvRhrWuyyFBO3UUy6d+6r47uRqyuLJB7Z7b9Our5z0PV
+	 EAJjrUEcw3IohXdWRMIQUYlhQrzs3dcuMeEiCN3qEEs4WnB5BGAU1yt4o8cnxYlenS
+	 9R5TOCEqtbNPQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	marcin.s.wojtas@gmail.com,
 	bh74.an@samsung.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/5] eth: niu: migrate to new RXFH callbacks
-Date: Mon, 16 Jun 2025 18:48:44 -0700
-Message-ID: <20250617014848.436741-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/5] eth: mvpp2: migrate to new RXFH callbacks
+Date: Mon, 16 Jun 2025 18:48:45 -0700
+Message-ID: <20250617014848.436741-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250617014848.436741-1-kuba@kernel.org>
 References: <20250617014848.436741-1-kuba@kernel.org>
@@ -72,67 +72,115 @@ add dedicated callbacks for getting and setting rxfh fields").
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/sun/niu.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ .../net/ethernet/marvell/mvpp2/mvpp2_cls.h    |  6 ++--
+ .../net/ethernet/marvell/mvpp2/mvpp2_cls.c    |  6 ++--
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 31 +++++++++++++++----
+ 3 files changed, 33 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index ddca8fc7883e..75d7e10944d4 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -7077,8 +7077,10 @@ static int niu_ethflow_to_flowkey(u64 ethflow, u64 *flow_key)
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.h
+index 85c9c6e80678..caadf3aea95d 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.h
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.h
+@@ -272,8 +272,10 @@ int mvpp22_port_rss_ctx_indir_set(struct mvpp2_port *port, u32 rss_ctx,
+ int mvpp22_port_rss_ctx_indir_get(struct mvpp2_port *port, u32 rss_ctx,
+ 				  u32 *indir);
  
+-int mvpp2_ethtool_rxfh_get(struct mvpp2_port *port, struct ethtool_rxnfc *info);
+-int mvpp2_ethtool_rxfh_set(struct mvpp2_port *port, struct ethtool_rxnfc *info);
++int mvpp2_ethtool_rxfh_get(struct mvpp2_port *port,
++			   struct ethtool_rxfh_fields *info);
++int mvpp2_ethtool_rxfh_set(struct mvpp2_port *port,
++			   const struct ethtool_rxfh_fields *info);
+ 
+ void mvpp2_cls_init(struct mvpp2 *priv);
+ 
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
+index 8ed83fb98862..44b201817d94 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
+@@ -1618,7 +1618,8 @@ int mvpp22_port_rss_ctx_indir_get(struct mvpp2_port *port, u32 port_ctx,
+ 	return 0;
  }
  
--static int niu_get_hash_opts(struct niu *np, struct ethtool_rxnfc *nfc)
-+static int niu_get_rxfh_fields(struct net_device *dev,
-+			       struct ethtool_rxfh_fields *nfc)
+-int mvpp2_ethtool_rxfh_set(struct mvpp2_port *port, struct ethtool_rxnfc *info)
++int mvpp2_ethtool_rxfh_set(struct mvpp2_port *port,
++			   const struct ethtool_rxfh_fields *info)
  {
-+	struct niu *np = netdev_priv(dev);
- 	u64 class;
+ 	u16 hash_opts = 0;
+ 	u32 flow_type;
+@@ -1656,7 +1657,8 @@ int mvpp2_ethtool_rxfh_set(struct mvpp2_port *port, struct ethtool_rxnfc *info)
+ 	return mvpp2_port_rss_hash_opts_set(port, flow_type, hash_opts);
+ }
  
- 	nfc->data = 0;
-@@ -7290,9 +7292,6 @@ static int niu_get_nfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
- 	int ret = 0;
+-int mvpp2_ethtool_rxfh_get(struct mvpp2_port *port, struct ethtool_rxnfc *info)
++int mvpp2_ethtool_rxfh_get(struct mvpp2_port *port,
++			   struct ethtool_rxfh_fields *info)
+ {
+ 	unsigned long hash_opts;
+ 	u32 flow_type;
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index a7872d14a49d..8ebb985d2573 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -5588,9 +5588,6 @@ static int mvpp2_ethtool_get_rxnfc(struct net_device *dev,
+ 		return -EOPNOTSUPP;
  
- 	switch (cmd->cmd) {
+ 	switch (info->cmd) {
 -	case ETHTOOL_GRXFH:
--		ret = niu_get_hash_opts(np, cmd);
+-		ret = mvpp2_ethtool_rxfh_get(port, info);
 -		break;
  	case ETHTOOL_GRXRINGS:
- 		cmd->data = np->num_rx_rings;
+ 		info->data = port->nrxqs;
  		break;
-@@ -7313,8 +7312,11 @@ static int niu_get_nfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
- 	return ret;
- }
+@@ -5628,9 +5625,6 @@ static int mvpp2_ethtool_set_rxnfc(struct net_device *dev,
+ 		return -EOPNOTSUPP;
  
--static int niu_set_hash_opts(struct niu *np, struct ethtool_rxnfc *nfc)
-+static int niu_set_rxfh_fields(struct net_device *dev,
-+			       const struct ethtool_rxfh_fields *nfc,
-+			       struct netlink_ext_ack *extack)
- {
-+	struct niu *np = netdev_priv(dev);
- 	u64 class;
- 	u64 flow_key = 0;
- 	unsigned long flags;
-@@ -7656,9 +7658,6 @@ static int niu_set_nfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 	int ret = 0;
- 
- 	switch (cmd->cmd) {
+ 	switch (info->cmd) {
 -	case ETHTOOL_SRXFH:
--		ret = niu_set_hash_opts(np, cmd);
+-		ret = mvpp2_ethtool_rxfh_set(port, info);
 -		break;
  	case ETHTOOL_SRXCLSRLINS:
- 		ret = niu_add_ethtool_tcam_entry(np, cmd);
+ 		ret = mvpp2_ethtool_cls_rule_ins(port, info);
  		break;
-@@ -7912,6 +7911,8 @@ static const struct ethtool_ops niu_ethtool_ops = {
- 	.set_phys_id		= niu_set_phys_id,
- 	.get_rxnfc		= niu_get_nfc,
- 	.set_rxnfc		= niu_set_nfc,
-+	.get_rxfh_fields	= niu_get_rxfh_fields,
-+	.set_rxfh_fields	= niu_set_rxfh_fields,
- 	.get_link_ksettings	= niu_get_link_ksettings,
- 	.set_link_ksettings	= niu_set_link_ksettings,
- };
+@@ -5747,6 +5741,29 @@ static int mvpp2_ethtool_set_rxfh(struct net_device *dev,
+ 	return mvpp2_modify_rxfh_context(dev, NULL, rxfh, extack);
+ }
+ 
++static int mvpp2_ethtool_get_rxfh_fields(struct net_device *dev,
++					 struct ethtool_rxfh_fields *info)
++{
++	struct mvpp2_port *port = netdev_priv(dev);
++
++	if (!mvpp22_rss_is_supported(port))
++		return -EOPNOTSUPP;
++
++	return mvpp2_ethtool_rxfh_get(port, info);
++}
++
++static int mvpp2_ethtool_set_rxfh_fields(struct net_device *dev,
++					 const struct ethtool_rxfh_fields *info,
++					 struct netlink_ext_ack *extack)
++{
++	struct mvpp2_port *port = netdev_priv(dev);
++
++	if (!mvpp22_rss_is_supported(port))
++		return -EOPNOTSUPP;
++
++	return mvpp2_ethtool_rxfh_set(port, info);
++}
++
+ static int mvpp2_ethtool_get_eee(struct net_device *dev,
+ 				 struct ethtool_keee *eee)
+ {
+@@ -5813,6 +5830,8 @@ static const struct ethtool_ops mvpp2_eth_tool_ops = {
+ 	.get_rxfh_indir_size	= mvpp2_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh		= mvpp2_ethtool_get_rxfh,
+ 	.set_rxfh		= mvpp2_ethtool_set_rxfh,
++	.get_rxfh_fields	= mvpp2_ethtool_get_rxfh_fields,
++	.set_rxfh_fields	= mvpp2_ethtool_set_rxfh_fields,
+ 	.create_rxfh_context	= mvpp2_create_rxfh_context,
+ 	.modify_rxfh_context	= mvpp2_modify_rxfh_context,
+ 	.remove_rxfh_context	= mvpp2_remove_rxfh_context,
 -- 
 2.49.0
 
