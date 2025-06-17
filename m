@@ -1,138 +1,196 @@
-Return-Path: <netdev+bounces-198721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65043ADD4B6
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:13:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 210A4ADD54F
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74800173980
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:05:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1794B1885573
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234192ED173;
-	Tue, 17 Jun 2025 16:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4A12F2352;
+	Tue, 17 Jun 2025 16:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="MibmGQ+Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdomRiN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f99.google.com (mail-ed1-f99.google.com [209.85.208.99])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448582F2345
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4F91B4257
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750176111; cv=none; b=Bg1UvN8HATXpVA4doyMjY9ORIYmTQ7NRDI6M7i4cAuO/m9+s/fVTYvCEkx+ElKa+DPFuv0Lm34LNB0B5xmM+yZyoJUFauBvzeoVvTebptbRnAugWbfGMOmU05oD0mz1saKV+xlLoCZ2sSrzybQuQMB0m6AQA1DsHnJVBJQQMJLA=
+	t=1750176267; cv=none; b=rAI99kRahdd+1kdZSAko3ibVGtkmEVUPc4voKqrpkGd3/NaxpoLp+zasdb+q8lKh86/IBiDGJtLAoDOn/wLx3qNFeioD4MRLPLQ/VBY6kIZxge5FSqPp22yNiAiHLrqTp/dcCQI33GLT/FHr7RwEYAapWPJij0YEXgkhB31297U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750176111; c=relaxed/simple;
-	bh=9toDD7tmhalc4U5luIvrtKKyxtNLA3+RUnV6XemW4e4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pF/MyW27r4ck1AXqL30tg2HaaHSIKgzK6slmhoY0LLAJhnKyq2UcLCQtQLW7wVQi9zy2bzokaNDe8xnXwJqlIPqDN6WHXHur49nHIQNEGQsA3YDBL4QzncRbMgAjOnzxH8mniLWJkKb55mRy/AL4gHzkb4IEIN6zOHtD9fuWFxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=MibmGQ+Q; arc=none smtp.client-ip=209.85.208.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ed1-f99.google.com with SMTP id 4fb4d7f45d1cf-6070a8f99ffso840669a12.3
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:01:48 -0700 (PDT)
+	s=arc-20240116; t=1750176267; c=relaxed/simple;
+	bh=kgpHxwklZZndalThT99cZ+EI4AXYQwa3eGnbi+C8dzo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qIRZnu4LClJa+oNfei687RUPYQCXuo/4qz71f2ZVhgr7gKGxVDziBtpnxi60eSoPZbtVtgbgkork/2bYkdGKgLYttlXLGKAoEUEnRCW4sOzEsuiX4eyLwH4yF9aKWlg4IbZ84eFKxw8mQgxQrXeRZcJOa6LaJB0i8To1mf9zY50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IdomRiN3; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b2c49373c15so4622571a12.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1750176107; x=1750780907; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WALP22qPaSmrlHrSd0ASkEUPW5PSB3MfUO3Tow5jPlY=;
-        b=MibmGQ+Qu74LE0OzAGdGwlsJPtylbsVGf8JInMOpZvaAXW27/ro1GBFwc89zdxPb3T
-         kBMU8O0ZlKYFm/lwdi3UekL3++ILNSaATNLkxqhnyfyw0tYNqGU170p9klnO0FIpFSVO
-         /c3DmnLg9J7drI5DUwdg+lvLYK9zc/grgWkGHZ5bBRdz/Ot8w7mkKUgUmGHYmhDa/YCc
-         R8uwrEgTaAR0xK76cRkaxym4iEPLWmVRWDhr1qt6rXGGJvxfqfT/CJECaitlmwpP4+33
-         E4pxL5IVTz5IEXSqJKPQ2QoM32MK9y3IK5aEENJGVYW4gOQNbSA7kHiAqpCo4wQtGvWr
-         SaOw==
+        d=gmail.com; s=20230601; t=1750176265; x=1750781065; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=likMQHZGXTezHe2Xv/iadx8pWp/Bi+O8w1V2oxspZFM=;
+        b=IdomRiN3oxFSj3bRh+FVyozomrW2joIY+5Yi/SHaypXDhzxZ2DXWGwPKwP31U59s+x
+         Uvwb7eNBtvwWafFLdigRDMj4bEqtmtHkOE5n44TArOD6Qp8OfOaNwGCMty/5NckIvb3q
+         wRmKlVumT9s0OtU3FfF8jXQvsuU3z52ZPxx51BL9u7lQKvU9CDdtWzumR4e6FKc9NkHT
+         YheafwPT2t73ZsScgtmcRVYOtw7UyDpDaal4ZKcgPUa+eMZxlM/ii6v7udg5JbbFbNrV
+         WRnR60TI8ElSrrmJvzhlRcJ+78Zxi4FJGLo1mPA3uS3TxtH+Te/b30MdH1CD+enQt+K2
+         3L3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750176107; x=1750780907;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1750176265; x=1750781065;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WALP22qPaSmrlHrSd0ASkEUPW5PSB3MfUO3Tow5jPlY=;
-        b=OCnMbwARopoyz5gqg0ZVt0I4QoHXdb+2Wkgj69wv1JezlNOoy4HFlquV3xPCP91ahM
-         r/ALW45gfdszsznBjJLNB3wkBV2vBMvBVCfPuebHg2fb17it7vjVtw+MS2xVnOJ1K4XN
-         t6TTwf5lBdFj41IlAy5L0EhpKjY2+xxjm9AMyNUe88l05OYw6qENIHEZw6v3qA7iuYmF
-         c1Zd3YU6yqdw46YhPU+JBSGRRDcH7xK9Znv4pBch0KFi9hkTfhZf79dcqpercpgc+mZR
-         tFH/lsHvvFRqEmAGmvQG9XVsJWuj9wUlkx+8U/mlBeQkOqU6OUFhpDtzHJv+vbEBkg9h
-         mNgw==
-X-Gm-Message-State: AOJu0Yyvl0DNHzh4ySR4NAaeDAXSa7VsdeENEMjTr1CplJCZTaPre6Vh
-	FJAnIXTXMqrBJ82fwtAkRlslpMBBO4j5Wa/9aZO3TFjyn7o1JjmKT3wqKiY8BuT0EKKTtNUFV/C
-	jdpdjg8gs7P4z8vM6b0uHFaYdztobW0YK8vfB
-X-Gm-Gg: ASbGncuCFsftoOFqg+nNUMZROAdjG0/wrO+jfaVpleEFZtRg+zgwU+D5JtZCEYnbV7u
-	PwgX8X9rwO77yYO42cgqvp3YNjpHpedNzKvPmmR5+G5JXvnkVNzmIJzkuNmqgFVNcQx3IRp345t
-	vtVpM2LaZfo5YRi5G+M9vX4Uk7Nr2wMK4DgDZeVpwWhXKRkDJ/DiwucMUXwU9eJt8q7MzCksHuO
-	WmN30GT9LBv7S869caiSe8T9nTS/Na8HAUL06KTqMrNrNDiDcq+eS97I1AqfEAlBgZiTFj9vXCl
-	rq0H37cVJI56AFWcSwlgYCfdZ7XQOeoyReabWyCnLCSPauGOe9IVzh7Si6YSMdp0aa7MBE2SX/F
-	5dA==
-X-Google-Smtp-Source: AGHT+IGZ+YYeyAaS/UmytzZ4/0h0owiA91i4AAGrzla1ogNt8j4VSgXABaWm/O5pfhlp0PBoeyEYq4mIqAmN
-X-Received: by 2002:a05:6402:3514:b0:600:ecab:a724 with SMTP id 4fb4d7f45d1cf-608d09447ccmr4130553a12.3.1750176104222;
-        Tue, 17 Jun 2025 09:01:44 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 4fb4d7f45d1cf-608b49e105asm389643a12.29.2025.06.17.09.01.44;
-        Tue, 17 Jun 2025 09:01:44 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id B26681065C;
-	Tue, 17 Jun 2025 18:01:43 +0200 (CEST)
-Received: from dichtel by bretzel with local (Exim 4.94.2)
-	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1uRYkp-004aSX-Dn; Tue, 17 Jun 2025 18:01:43 +0200
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next] ip6_tunnel: enable to change proto of fb tunnels
-Date: Tue, 17 Jun 2025 18:01:25 +0200
-Message-ID: <20250617160126.1093435-1-nicolas.dichtel@6wind.com>
-X-Mailer: git-send-email 2.47.1
+        bh=likMQHZGXTezHe2Xv/iadx8pWp/Bi+O8w1V2oxspZFM=;
+        b=Xa8sLOdMOzBOTOuzGuxgOwBQPqN3vhoAKiaJXE7TosidfLwOXNg+RNxNr58LASrJGM
+         GTWxvCgbkwF5VFjtupSCokA2chTc/iASR7ye1kwTnkMz1hL2IRYBM4LUghdq1i+6tarX
+         jEHkeIZJLIwZcj6ZlVW4uErcPcnQPQlRH+NWwmLc74p9l0L9fPDWrCzv5mL3i7XwhO1Y
+         cmQxMe2zysnbu9W4PxmDsPARC7t8Qj41DMdpmLog+k8wBd+JdhxySw87IrEAy2853D+E
+         OsupNyoLIrR7/yydgFjBWmBbTe6Oh5s6Q/G75NWbB99+BCzQ5X/at/QVBiZa4cciukrX
+         Rp0g==
+X-Gm-Message-State: AOJu0YyC0q+hpi3KndJtPkiGmAxbyWXi6tJGlrNnTOZNxFhO6F2mt+Za
+	BGn1wXO9CuvP/aVYLHJHIRaK/WODu7F80Oj0w7uPiWFljoHFjKorcaEscJcQcD7mz8lKMEKqdYb
+	Sy+eDEvm8l6ZQmBR4+J1OZ4gJCPwEMxivfzIIy3o=
+X-Gm-Gg: ASbGnct7GcK/W2M81TF/0DihHvEwPKv91zjmy2piTTfSoZaKeZ/YoKPq4cFWsoPkRZW
+	uW9HMvtXxeK53nkRbHvUT4bJsBlty4Jfu31B06RK837l4yvcD6vKGXU5qAci2mByYMvCNcrFrBi
+	+n1BRztk4i/tK4E1BXreXU26c2ZRt3anAsq3abt+UrF85Tqw==
+X-Google-Smtp-Source: AGHT+IE9IYlny+0+NqQKm7ojjuxGofEOK+Mm15rGr5P+kqm7wimf4u6IrsuJX8H5NNoSZQObRS8+2A92i9G6piizrPU=
+X-Received: by 2002:a17:90a:d2c6:b0:311:e8cc:425e with SMTP id
+ 98e67ed59e1d1-313f1df4413mr20400150a91.31.1750176264733; Tue, 17 Jun 2025
+ 09:04:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250613174749.406826-1-vladimir.oltean@nxp.com>
+ <20250613174749.406826-2-vladimir.oltean@nxp.com> <CAO9qdTE0jt5U_dN09kPEzu-NUCds2VY1Ch2up9RoLazsc1j49w@mail.gmail.com>
+ <20250615160352.qsobc7c2g3zbckp2@skbuf>
+In-Reply-To: <20250615160352.qsobc7c2g3zbckp2@skbuf>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Wed, 18 Jun 2025 01:04:15 +0900
+X-Gm-Features: AX0GCFuRMprajXRtg-YosKAYBb3fYiUtLrDNzZc-ERuFY6MrU_L37xxq-_f0FTA
+Message-ID: <CAO9qdTHnfMJFEOvENFGxestOWGE-5rzvA1XKdQn1y1KX-Sn=og@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] ptp: fix breakage after ptp_vclock_in_use() rework
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Yangbo Lu <yangbo.lu@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
 
-This is possible via the ioctl API:
-> ip -6 tunnel change ip6tnl0 mode any
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+>
+> On Mon, Jun 16, 2025 at 12:34:59AM +0900, Jeongjun Park wrote:
+> > However, I don't think it is appropriate to fix ptp_vclock_in_use().
+> > I agree that ptp->n_vclocks should be checked in the path where
+> > ptp_clock_freerun() is called, but there are many drivers that do not
+> > have any contact with ptp->n_vclocks in the path where
+> > ptp_clock_unregister() is called.
+>
+> What do you mean there are many drivers that do not have any contact
+> with ptp->n_vclocks? It is a feature visible only to the core, and
+> transparent to the drivers. All drivers have contact with it, or none
+> do. It all depends solely upon user configuration, and not dependent at
+> all upon the specific driver.
+>
 
-Let's align the netlink API:
-> ip link set ip6tnl0 type ip6tnl mode any
+I think I wrote it strangely, so I'll explain it again.
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- net/ipv6/ip6_tunnel.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+As you know, ptp_clock_{register,unregister}() is called not only in the
+ptp core but also in several networking drivers to use the ptp clock
+function. However, although these kernel drivers does not use any
+n_vclocks-related functionality, the initial implementation of
+ptp_vclock_in_use() acquired n_vclocks_mux and checked n_vclocks when
+ptp_clock_unregister() was called.
 
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 894d3158a6f0..03ad45189621 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -2053,8 +2053,17 @@ static int ip6_tnl_changelink(struct net_device *dev, struct nlattr *tb[],
- 	struct ip6_tnl_net *ip6n = net_generic(net, ip6_tnl_net_id);
- 	struct ip_tunnel_encap ipencap;
- 
--	if (dev == ip6n->fb_tnl_dev)
--		return -EINVAL;
-+	if (dev == ip6n->fb_tnl_dev) {
-+		if (!data[IFLA_IPTUN_PROTO]) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Only protocol can be changed for fallback tunnel");
-+			return -EINVAL;
-+		}
-+
-+		ip6_tnl_netlink_parms(data, &p);
-+		ip6_tnl0_update(netdev_priv(ip6n->fb_tnl_dev), &p);
-+		return 0;
-+	}
- 
- 	if (ip_tunnel_netlink_encap_parms(data, &ipencap)) {
- 		int err = ip6_tnl_encap_setup(t, &ipencap);
--- 
-2.47.1
+> > The reason I removed the ptp->n_vclocks check logic from the
+> > ptp_vclock_in_use() function is to prevent false positives from lockdep,
+> > but also to prevent the performance overhead caused by locking
+> > ptp->n_vclocks_mux and checking ptp->n_vclocks when calling
+> > ptp_vclock_in_use() from a driver that has nothing to do with
+> > ptp->n_vclocks.
+>
+> Can you quantify the performance overhead caused by acquiring
+> ptp->n_vclocks_mux on unregistering physical clocks?
+>
 
+I think this performance overhead is a bit hard to quantify, but I think
+it's wrong to add code inside ptp_clock_unregister() that performs
+unnecessary locking in most cases except for some special cases.
+
+> >
+> > Therefore, I think it would be appropriate to modify ptp_clock_freerun()
+> > like this instead of ptp_vclock_in_use():
+> > ---
+> >  drivers/ptp/ptp_private.h | 14 ++++++++++++--
+> >  1 file changed, 12 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+> > index 528d86a33f37..abd99087f0ca 100644
+> > --- a/drivers/ptp/ptp_private.h
+> > +++ b/drivers/ptp/ptp_private.h
+> > @@ -104,10 +104,20 @@ static inline bool ptp_vclock_in_use(struct
+> > ptp_clock *ptp)
+> >  /* Check if ptp clock shall be free running */
+> >  static inline bool ptp_clock_freerun(struct ptp_clock *ptp)
+> >  {
+> > +   bool ret = false;
+> > +
+> >     if (ptp->has_cycles)
+> > -       return false;
+> > +       return ret;
+> > +
+> > +   if (mutex_lock_interruptible(&ptp->n_vclocks_mux))
+> > +       return true;
+> > +
+> > +   if (ptp_vclock_in_use(ptp) && ptp->n_vclocks)
+> > +       ret = true;
+> > +
+> > +   mutex_unlock(&ptp->n_vclocks_mux);
+> >
+> > -   return ptp_vclock_in_use(ptp);
+> > +   return ret;
+> >  }
+> >
+> >  extern const struct class ptp_class;
+> > --
+>
+> If we leave the ptp_vclock_in_use() implementation as
+> "return !ptp->is_virtual_clock;", then a physical PTP clock with
+> n_vclocks=0 will have ptp_vclock_in_use() return true.
+> Do you consider that expected behavior? What does "vclocks in use"
+> even mean?
+>
+> In any case, I do agree with the fact that we shouldn't need to acquire
+> a mutex in ptp_clock_unregister() to avoid racing with the sysfs device
+> attributes. This seems avoidable with better operation ordering
+> (unregister child virtual clocks when sysfs calls are no longer
+> possible), or the use of pre-existing "ptp->defunct", or some other
+> mechanism.
+>
+> You can certainly expand on that idea in net-next. The lockdep splat is
+> a completely unrelated issue, and only that part is 'net' material.
+
+I agree with this, so I think it would be a good idea to add the
+ptp->n_vclocks check to the caller function that absolutely needs it,
+like the patch I sent in the previous email, and to remove the
+ptp_vclock_in_use() function altogether and replace it with the code that
+checks ptp->is_virtual_clock.
+
+Of course, I think this idea should be discussed through net-next after
+this problems caused by the previous patch are resolved as you mentioned.
+
+Regards,
+
+Jeongjun Park
 
