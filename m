@@ -1,122 +1,177 @@
-Return-Path: <netdev+bounces-198804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EE4ADDDE7
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7D3ADDE08
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D992F17DC01
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:30:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C172A189E387
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B749D2DBF51;
-	Tue, 17 Jun 2025 21:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7DC2F2722;
+	Tue, 17 Jun 2025 21:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEyxF3f4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmarUdqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502252EFDB2;
-	Tue, 17 Jun 2025 21:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E272F30CC;
+	Tue, 17 Jun 2025 21:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750195813; cv=none; b=DYq4ONdMrGsQUXtROgjMl95HGrR+rKWjNIwkPDNwdfRcdfbECnJrT0MT1ln74B+zu+9QNo79QIacYAYQQps92Qqiv56rJ8L4fdNXLm6tQB5ca+cik3Ffr3BVRDGVynnSW7zGoS6nYQ/mBvfHytaLg/M28DGdtaO54dbQHxK8GWA=
+	t=1750195903; cv=none; b=YyXbgnKGU5fBBnG/viMoxabLCi3Oi3x5KdGDZDPqdovyFh2d4pQhPg0tAwIu0psdWQvCdzngwhPfs8FfK+aElKZCwH914IEtvbv4pctSFyOP3+2HpYZaq2twYhSmBYB4yW58RyTCAldb/qBJIKuQXEWHicI/Mz1A3RMy49dru9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750195813; c=relaxed/simple;
-	bh=jiP8xbBvm1cvkS8muOTzto5Z82L2aKeW+7MsVHYfaYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nv3oUU8Esq4PpYdvnpPKjLoJxvC7SI5z5vo7YXG3bTCqiqACta2gd347m7nhTmzUhDAGuMhQWvxEMaZJ7jZc5HUSZDg6EZuYOAHqXUxgrmB7Mv9rebxVM9fmTzghXisRI5M/Nfjv8QdN4KdK4+ef4kblP7FqPVIe0p2ku1l5LKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XEyxF3f4; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-234d366e5f2so82769015ad.1;
-        Tue, 17 Jun 2025 14:30:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750195811; x=1750800611; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mTbtcXAi0UCuLpVRrm81ZJg6wnZpaGU+V9PP7dgvRgE=;
-        b=XEyxF3f47Dd4GsFdLFThJpnIYwQo6Q9yKisX0eChc2PZrErRXYlIzkSJjv8zixmo7N
-         U+D6NARiANKXNxxGV/S7OapjmAKsBhngH8movJat2RHcVRw//yO6AMzeA2K4h7coUtTw
-         uQa7UgaeRcHw/Aiti7yAqiytUkGppQA/EUxhfRNS5vJeND0OgzRVT5notBRxfUolUKax
-         PEyu4lgVwAy/VffnHwlssKPKDcAZyHdaSfKRLl4SjBHuYWNcdXF96ah6Krf/5cYC72wA
-         SySmh8Q7H53PjPaM/5ZgtgFzz5UdQamDltHKI5tAOL/RM+GA0Jkp/SZYZu93QcTYARI+
-         fL/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750195811; x=1750800611;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mTbtcXAi0UCuLpVRrm81ZJg6wnZpaGU+V9PP7dgvRgE=;
-        b=R+IGi9ppi4uQvmDSLUmZdStPWGYPbi5WiIqqaZ+xPT8pNGvGVLprDUKCkuiohxX7BQ
-         rVH5RORJzCiQ4DdidcOFNpMCWzebU6j5Gx1BZ4eCOmRfbNYzMRco9TAcJGouCztjfwH2
-         DMbM3urSzQjW9+6pX3ZY64k0loPWkdpKRm/UZqUhlOVT31B1h6qq0LuECZ5pSoHbBZE+
-         zHoQ2m7iN/MYb4k2WByNNdP3YpMQXz7X2h4QecQXMFMpwPj7L5dwDdxrsUARjLUwrGd3
-         23eomUNZW4CmQFG5FwoOm3OL56kEjl8tCQJe2Cljx+AgYtr2ttkgkyd7rVSnS/fonsBk
-         lnPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmIO9JBF8XaTNeu3RJYayVy7j36p/5oOjVckLP6j4MKkSN9Yng0XIghaxz0vCWrY76X8PSx6V8LcGH/U8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVYoYmtg8WfGVj/N1TyLoXU7qwxDRu32+eyQEBN5rZhFuMgUuT
-	oFR5bCpoovu3mzQeWmhUwXS3+zB1meWfGmdwlG+2B/tugmWArLyKJ0M=
-X-Gm-Gg: ASbGncvoY5EKjVIbm58kPjR8fgmtj2nOG75UrXfCny0BDingLUxky+sCPWr+TxOpeEY
-	ilvphJk92VKlT2awk5MeTfHDymW5/2nC6UBrl3DcPd2fJb9aHQEj85AU3ykZG8LEhTs9cjhd8tD
-	2vJUADO02JbPeTlTP5eEqVsUVF0rrQqQfgtGAR9PT3g6FyJ9mmp448BPW6eI1NfbI1C52NrnEj1
-	T1WfqWzvIVaTrN/1YS/kouBOXEnBOPsG+7D5mGKt5nzh2NRtjfI1DR13gCnil5SOnlAFUFBBQwI
-	1L5nf689wRh1rNfnEJPBHEf1rnsFvdlWbR7ibQ5C3kKpkYJTzdcxj74EGMPnojkF+TjffcTiJ0Y
-	2ATxkDX32NJfz/38IGtZOug0=
-X-Google-Smtp-Source: AGHT+IHiCZunwaaJjtzIQEZAsX9pMdt7B3YfAFAsa8w34AEtZGaqLSQlr+9zn9U1so3Qbi/LBOui+w==
-X-Received: by 2002:a17:903:124a:b0:235:f3e6:467f with SMTP id d9443c01a7336-2366b3138e6mr234079925ad.2.1750195811419;
-        Tue, 17 Jun 2025 14:30:11 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2365decb0c5sm85211725ad.215.2025.06.17.14.30.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 14:30:10 -0700 (PDT)
-Date: Tue, 17 Jun 2025 14:30:10 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1750195903; c=relaxed/simple;
+	bh=1YfwZW+S936XwdA8SGfJ1ZJvlipD9uTXygNO4srMawo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BWrl/fwZcbwWBEcKxMkQFCJPUAghwLr4ETQ3G0/zqBGUnvzaVwO+umBbCrqaHe9Wt2xY1m0b6lkI/Jp7FrJr2E00mA8gPxcCrk3hPGMaKqW877GTFTqBfep3XdCaFEKktQZnkAFa+SxNOGWu57oLURUcQOEumwlHExYURyd/FKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmarUdqc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEBBFC4CEF1;
+	Tue, 17 Jun 2025 21:31:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750195902;
+	bh=1YfwZW+S936XwdA8SGfJ1ZJvlipD9uTXygNO4srMawo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YmarUdqcOEke0FSqL0Xg4J8Lsf3Wt1uxrnUTrBql9tooIzqRSqrJXRb/RthUG96tM
+	 UhmIuCJamZ3RxGpHFDGNgVGHqRgU1HHltdd03/dUDd3yZXgKOp1z4NJsBzWdqKZRoT
+	 Nhpr9RanMRtnDUygTTyNdDrv/EZ+9j1PkN20sbSIICvlIom/jxXKO7Iy/l/5DOxHrK
+	 Bbs/ObfLHkXDYrqiBgMagOsKvqyvb6JzIr1I9Liskj/HU2yXXiA0ZapCnbVd5Mg2Kc
+	 jqYO7cFto/25mDOQtAHCbJcXHeN3ftaqa2xSE6M8SFyV/zeuKzmBhVcfLIJFp6Mr6z
+	 Mn6XCuVHjg8Yw==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Rajendra Nayak <quic_rjendra@quicinc.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Amit Kucheria <amitk@kernel.org>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Zhang Rui <rui.zhang@intel.com>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Wesley Cheng <quic_wcheng@quicinc.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
+	Lee Jones <lee@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, ap420073@gmail.com
-Subject: Re: [PATCH net v1] netmem: fix skb_frag_address_safe with unreadable
- skbs
-Message-ID: <aFHeYuMf_LCv6Yng@mini-arch>
-References: <20250617210950.1338107-1-almasrymina@google.com>
- <CAHS8izMWiiHbfnHY=r5uCjHmDSDbWgsOOrctyuxJF3Q3+XLxWw@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alex Elder <elder@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Andy Gross <agross@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Georgi Djakov <djakov@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Robert Foss <rfoss@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Taniya Das <quic_tdas@quicinc.com>,
+	Sibi Sankar <quic_sibis@quicinc.com>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Imran Shaik <quic_imrashai@quicinc.com>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Jessica Zhang <quic_jesszhan@quicinc.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Tony Luck <tony.luck@intel.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	David Wronek <david@mainlining.org>,
+	Jens Reidel <adrian@mainlining.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Danila Tikhonov <danila@jiaxyga.com>
+Cc: devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev,
+	linux-remoteproc@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-hardening@vger.kernel.org,
+	linux@mainlining.org,
+	~postmarketos/upstreaming@lists.sr.ht,
+	Connor Mitchell <c.dog29@hotmail.com>
+Subject: Re: (subset) [PATCH 00/33] Add support for Qualcomm Snapdragon SM7150 SoC and Google Pixel 4a
+Date: Tue, 17 Jun 2025 16:31:26 -0500
+Message-ID: <175019588888.714929.17490930593303808143.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
+References: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izMWiiHbfnHY=r5uCjHmDSDbWgsOOrctyuxJF3Q3+XLxWw@mail.gmail.com>
 
-On 06/17, Mina Almasry wrote:
-> On Tue, Jun 17, 2025 at 2:09 PM Mina Almasry <almasrymina@google.com> wrote:
-> >
-> > skb_frag_address_safe() needs a check that the
-> > skb_frag_page exists check similar to skb_frag_address().
-> >
-> > Cc: ap420073@gmail.com
-> >
-> 
-> Sorry, I realized right after hitting send, I'm missing:
-> 
-> Fixes: 9f6b619edf2e ("net: support non paged skb frags")
-> 
-> I can respin after the 24hr cooldown.
 
-The function is used in five drivers, none of which support devmem tx,
-does not look like there is a reason to route it via net.
+On Tue, 22 Apr 2025 23:17:01 +0300, Danila Tikhonov wrote:
+> This patch series adds support for the Qualcomm Snapdragon 730/730G/732G
+> (SM7150) platform along with the Google Pixel 4a (sunfish) device. Since
+> the most critical drivers were submitted and applied in separate patch
+> series, this series is largely composed of DT bindings and device‑trees.
+> 
+> To date, we’ve tested SM7150 support on the following eleven devices:
+> - Google Pixel 4a (sunfish)
+> - Samsung Galaxy A71 (a715f)
+> - Lenovo Tab P11 Pro (j706f)
+> - Xiaomi POCO X2 (phoenix)
+> - Xiaomi POCO X3 (karna) / POCO X3 NFC (surya)
+> - Xiaomi Redmi Note 10 Pro (sweet)
+> - Xiaomi Redmi Note 12 Pro (sweet_k6a)
+> - Xiaomi Mi 9T / Redmi K20 (davinci)
+> - Xiaomi Mi Note 10 Lite (toco)
+> - Xiaomi Mi Note 10 (CC9 Pro) & Mi Note 10 Pro (CC9 Pro Premium) (tucana)
+> - Xiaomi Mi 11 Lite 4G (courbet)
+> 
+> [...]
 
-The change it self looks good, but not really sure it's needed.
-skb_frag_address_safe is used in some pass-data-via-descriptor-ring mode,
-I don't see 'modern' drivers (besides bnxt which added this support in 2015)
-use it.
+Applied, thanks!
+
+[01/33] dt-bindings: arm: cpus: Add Kryo 470 CPUs
+        commit: 7b768d1235dbd98ef7268596995d86df31afce21
+
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
 
