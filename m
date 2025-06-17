@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 430A0ADDFA8
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C78ADDFAA
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AD9317C128
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DA15175E93
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A3C29CB24;
-	Tue, 17 Jun 2025 23:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2F1136A;
+	Tue, 17 Jun 2025 23:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GvTWoNpF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lwGoNx2H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145A4295519
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE3828C851
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750203005; cv=none; b=uxyD113hUe9K7jVt+SZtGf5vYZUE5Vnp0N7JN9DTSDs09kTaTietJsD9shD3Wzbtq8A663PTBr8DgjpB2PqqYL7xWt8+B4hawC6mrjmOO5zae/AiC2LduMvHmBSUSRrogXUn8xbEFbLlw8Snw92dt1aZm5ecxYHMfrKJc4PWBJY=
+	t=1750203024; cv=none; b=DZZv5zscCTMTh82KfrquCHAlH7b6Qclbjyf5k3NaXDNR6yk6W0lTnI2iLJYaCNaPN9ZivSlAtVmE49aeEpUXd8k3gSWXQuunSn+IBATy63QsvoqZW+nAA8PJlxfowD0yWJK5TYtBAcdyfYbEhurFvHJPa8dz5xUYBVSY1vEGBjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750203005; c=relaxed/simple;
-	bh=05ar+x5d0epXfJQcIJrP3p7566sQKAu5y+XQLiJgv94=;
+	s=arc-20240116; t=1750203024; c=relaxed/simple;
+	bh=tcMHWk4FkgjU/bW20uI6112m4lCsw+x2BSh1ZhtUv2w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JiHMqEN2rWkJHXcK2qWpaXVYP2dpGcZU9KdsOycY7fx2qTk52dY97ZZLvIlY2y3tUWfyhv9HYFeXqsp3zlbiAPQ51RynaGQP9SMff26szZW9z8ut8fwU2TMu0khqKCH5mD3yXv1bl7Fj9jdgkbe0o3Ph7k/Tler/UirFG/AwUKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GvTWoNpF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6690C4CEE3;
-	Tue, 17 Jun 2025 23:30:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dwBEsogSeSv4u5mLGp0rk/5+OKX7PjH/Cc7a1RD4I28IMC1JQZiTkNeRlpYLzjS9ZVQbjPfLvS4B4rhD6nDje9u24fYSlRRYB6rkljC/vVUShbxBNzMgOTk7T8V3a7OBkUE0gy/rV8Dvq04GW0mytOqwzji76AFuNX8WC7RbCyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lwGoNx2H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF843C4CEE3;
+	Tue, 17 Jun 2025 23:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750203004;
-	bh=05ar+x5d0epXfJQcIJrP3p7566sQKAu5y+XQLiJgv94=;
+	s=k20201202; t=1750203024;
+	bh=tcMHWk4FkgjU/bW20uI6112m4lCsw+x2BSh1ZhtUv2w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GvTWoNpFNRVIks6Egrwq+lsekbYUhojL4gGE5zyUCRbMOsSmzOTVo5zxPTyGq9AxL
-	 GhWw7sZkKjnd/H2wc+ktCmfG86ATXI3beLvbM3sZfbmyxJnfuJHQWMdyB2oTY/xIx7
-	 vj5+CSa736cmhNryweZvnrNe7FQamf1nWgj3XgNm33cFWyLbbbPfg/0HphKtcPnzDj
-	 rpSdboOWKu+LyTlov6jUfszQQ/KFRIO5ACDvSHcwKqkAmytgvgGmywwGxAfJ6RWx61
-	 7E7D0+4BCJSLfAwvZIUiScoYautff9/29xoD1hdrwyisB/RAkxi3XtX3uvRPZCxngi
-	 Z7QbsB9pNRWTA==
+	b=lwGoNx2HcdoFIqXfNx2lyArccnRGQvr9Cbvt01sXr/oLXvauWbaCk71QzAFv9YQMz
+	 fbtEU3kqLl3nno0scsgd/MYZ+kqIEJei7DwVEl3y2jj2BCF+elOaPWF9OVtY2bWbdF
+	 eYHJu1VFJ3Z3EivQdMmBS9b0K9Ky+1yvhx6llYBuY009Jwhh/cDwkaDz8qOmDdEGJk
+	 LKsfeABU/tnIP0x0k2eNWjZQnPNYTgdh8y6RYevgF8MWavZrcAFy6utYFb90s1EJ/o
+	 NPW0I3dBICjMhLJZm9C1/CevHnSth/DGZuFbwl3oj/7G7SUFJRdZWUnScmMdda7RX0
+	 4FFDgoecp44/g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD7338111DD;
-	Tue, 17 Jun 2025 23:30:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D2E38111DD;
+	Tue, 17 Jun 2025 23:30:54 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net/sched: fix use-after-free in taprio_dev_notifier
+Subject: Re: [PATCH net-next 0/4] nte: stmmac: visconti: cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020303324.3735715.12082273700118012368.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:30:33 +0000
-References: <aEzIYYxt0is9upYG@v4bel-B760M-AORUS-ELITE-AX>
-In-Reply-To: <aEzIYYxt0is9upYG@v4bel-B760M-AORUS-ELITE-AX>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: vinicius.gomes@intel.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, vladimir.oltean@nxp.com,
- netdev@vger.kernel.org, v4bel@theori.io
+ <175020305298.3735715.14567227448478806213.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:30:52 +0000
+References: <aFCHJWXSLbUoogi6@shell.armlinux.org.uk>
+In-Reply-To: <aFCHJWXSLbUoogi6@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, nobuhiro1.iwamatsu@toshiba.co.jp, pabeni@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 13 Jun 2025 20:54:57 -0400 you wrote:
-> Since taprio’s taprio_dev_notifier() isn’t protected by an
-> RCU read-side critical section, a race with advance_sched()
-> can lead to a use-after-free.
+On Mon, 16 Jun 2025 22:05:41 +0100 you wrote:
+> Hi,
 > 
-> Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
+> A short series of cleanups to the visconti dwmac glue.
 > 
-> Fixes: fed87cc6718a ("net/sched: taprio: automatically calculate queueMaxSDU based on TC gate durations")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> 
-> [...]
+>  .../net/ethernet/stmicro/stmmac/dwmac-visconti.c   | 129 ++++++++++++---------
+>  1 file changed, 74 insertions(+), 55 deletions(-)
 
 Here is the summary with links:
-  - [v3] net/sched: fix use-after-free in taprio_dev_notifier
-    https://git.kernel.org/netdev/net/c/b160766e26d4
+  - [net-next,1/4] net: stmmac: visconti: re-arrange speed decode
+    https://git.kernel.org/netdev/net-next/c/7d7525876b5a
+  - [net-next,2/4] net: stmmac: visconti: reorganise visconti_eth_set_clk_tx_rate()
+    https://git.kernel.org/netdev/net-next/c/1923c6c3a8b7
+  - [net-next,3/4] net: stmmac: visconti: clean up code formatting
+    https://git.kernel.org/netdev/net-next/c/1a3a638d2d23
+  - [net-next,4/4] net: stmmac: visconti: make phy_intf_sel local
+    https://git.kernel.org/netdev/net-next/c/d54d42a41b65
 
 You are awesome, thank you!
 -- 
