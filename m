@@ -1,114 +1,144 @@
-Return-Path: <netdev+bounces-198429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF1A2ADC26E
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 08:33:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4ECADC276
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 08:34:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C2EF3B6745
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 06:33:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF7B3AB9DD
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 06:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAAD217F26;
-	Tue, 17 Jun 2025 06:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D7A28B503;
+	Tue, 17 Jun 2025 06:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="eKF33h08"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8D2289349;
-	Tue, 17 Jun 2025 06:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147C016B3B7;
+	Tue, 17 Jun 2025 06:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750142029; cv=none; b=cnSJ39WR64ckWHd9OofDbDag2NPOBQxxcGjwKH9b5Da2YqTdRCOeb9Qe10OXFrJE7NRK8RAp7mZegfgbBUBHpUzRD2YzTw6RPb77GcCnMg6Ezsv6QVenbHnajCWO6v4ty/ma31C2sm0FexdRA76bvyaEnkR0bcQA+NgrOP05rbw=
+	t=1750142066; cv=none; b=CQj2bWj46NiVM1JnRaVrePEAMCUzKn+D0niu3voH2A8wBhJRtGhEfiUhSj+92fnT1qGg1UIjhzhNFGsQ+WLITDC86TpvPjAd0sjS9EdLg2VsLjFQBX8t/rQhGkOXrxOJ4AsJdBxffI+pBFICh/QUjenjYTsHIzlOMyMqmawCLxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750142029; c=relaxed/simple;
-	bh=p0ZHKgJeiGzErL88/GscM6rOo7KxAVj1KVR5oh3Kqqo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bZagmUituwAcwYukxWLjjaTabSPiAOHPiYGmlz0HuNg9R2wSVckeaBIDXIKtr8VCMIaXjRltYkjuA/5Ceb8PfBksivDOzL+Mlkpp4CboF148C4iWl5j3XtzKLIC6ZYBKbho57uf5QsCId4zu8wM3l/3mKZtlj9w4QPbNJQpLXzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bLxmS2ZDfzRkQc;
-	Tue, 17 Jun 2025 14:29:28 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3C7F31402DB;
-	Tue, 17 Jun 2025 14:33:44 +0800 (CST)
-Received: from [10.67.112.40] (10.67.112.40) by dggpemf200006.china.huawei.com
- (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Jun
- 2025 14:33:43 +0800
-Message-ID: <d152d5fa-e846-48ba-96f4-77493996d099@huawei.com>
-Date: Tue, 17 Jun 2025 14:33:41 +0800
+	s=arc-20240116; t=1750142066; c=relaxed/simple;
+	bh=waS7//7mESOoJ0KPrUPjr8RYE0ggAPYjN8HDSpBN9fU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SBFDUZX6U0jriUd3ipBBGmr6tYnfd1RwXoWGGM8OWwK6ik6zghaj9bOEyzg8rssyYFl8/k/Z/6qA4y5rTibzR6vPapKkoxNeChU5UEKD20gBPiGWSNjlviOH/5UMgDsp6pbBq8PyakeWPKiLrqi5w2A5xfqLdYM+KBIwkW+yvK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=eKF33h08; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55GNXmk7031454;
+	Mon, 16 Jun 2025 23:34:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=AV2HzGw9EyINSKLyYtsSssn
+	pW4NDyvKSwe7LrSIKmic=; b=eKF33h08JZlWHXP+4zMpn36crA1zadCAX9EkV8e
+	URn2OPMFax00VtM8bKrCWyPrJAH2hncKpjLI4gVoalYK12J0Hb/GUc6YN7fQM44A
+	wVSU9atmIxSlsBq3+3fIAk0APszvxSpCN1lhYCMJbBsFicWPHh9C+DcpNgpE5urB
+	04zK4AeLFoeeAlxjozte0L2SbQ6sq53wguNzGkeSe99B/1EiOPIywxtmFLn6n1B5
+	VGlTe0fqv81xhEOW3hIuI87/JlXHgSdrKZiIPEkt3TFbVMGNLETj9Tgh7fbt8pPR
+	xRM0pcx+ZCJFDj53caVjXwi/z88OJzgCmjyCCNtAry+7rOA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47aw21rpta-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Jun 2025 23:34:12 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 16 Jun 2025 23:34:11 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 16 Jun 2025 23:34:11 -0700
+Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with ESMTP id 9F6E562676B;
+	Mon, 16 Jun 2025 23:34:07 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Hariprasad Kelam <hkelam@marvell.com>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        "Subbaraya
+ Sundeep" <sbhatta@marvell.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        "Andrew Lunn" <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: [net] Octeontx2-pf: Fix Backpresure configuration
+Date: Tue, 17 Jun 2025 12:04:02 +0530
+Message-ID: <20250617063403.3582210-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC]Page pool buffers stuck in App's socket queue
-To: Ratheesh Kannoth <rkannoth@marvell.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-References: <20250616080530.GA279797@maili.marvell.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20250616080530.GA279797@maili.marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: hJvi0UwyBlPuEQToEF_8xjL_R591C_iW
+X-Proofpoint-ORIG-GUID: hJvi0UwyBlPuEQToEF_8xjL_R591C_iW
+X-Authority-Analysis: v=2.4 cv=DfMXqutW c=1 sm=1 tr=0 ts=68510c64 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=cIFZUDyxDlkkEMaN0r4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE3MDA1MiBTYWx0ZWRfX43+QRQoJQsNI t9vpXvjvDE46T1s4+fiqNA/GDkVe7t4Nwv0QNQKm3Ocrko8sgBd52nAnQYTz00Qbf07Jq36b/3R SxV5GFrn8qwLekr1gPxVMXgBrIdMFUZOf1KdJ8zpz92zKNnsWZ/Xu0RLX7EtR6fvik7XE/AOFjg
+ BlVHXN4qrIhZsb8+PEsLbBPPtgqlmQQCx2Jp/l/1KF2vvbh5aHlT8hdC7cPF14VWXC9rq0Gi6Bx XAKOmOnXWSUWTQ5jN3/bLP50Qo86AgJNYhB8q2eyw5HBk4Q+swiFFWwz60eZnzRxhY+1QzFBHpv fASbeS/brH1Q3iGcrG3N5A6EhlKbd0XaHS8PWYH+k5MKpWL9fHgnLyO3FUuZP2Lru4LtbsaKmGt
+ ZoejZ5GoUcb/4hG9z4fYT3MzPukFPIFaSrpaZxmu5tGpbbaWEzIcFoSv9rDVHcE99vRK/STg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-17_02,2025-06-13_01,2025-03-28_01
 
-On 2025/6/16 16:05, Ratheesh Kannoth wrote:
-> Hi,
-> 
-> Recently customer faced a page pool leak issue And keeps on gettting following message in
-> console.
-> "page_pool_release_retry() stalled pool shutdown 1 inflight 60 sec"
-> 
-> Customer runs "ping" process in background and then does a interface down/up thru "ip" command.
-> 
-> Marvell octeotx2 driver does destroy all resources (including page pool allocated for each queue of
-> net device) during interface down event. This page pool destruction will wait for all page pool buffers
-> allocated by that instance to return to the pool, hence the above message (if some buffers
-> are stuck).
-> 
-> In the customer scenario, ping App opens both RAW and RAW6 sockets. Even though Customer ping
-> only ipv4 address, this RAW6 socket receives some IPV6 Router Advertisement messages which gets generated
-> in their network.
-> 
-> [   41.643448]  raw6_local_deliver+0xc0/0x1d8
-> [   41.647539]  ip6_protocol_deliver_rcu+0x60/0x490
-> [   41.652149]  ip6_input_finish+0x48/0x70
-> [   41.655976]  ip6_input+0x44/0xcc
-> [   41.659196]  ip6_sublist_rcv_finish+0x48/0x68
-> [   41.663546]  ip6_sublist_rcv+0x16c/0x22c
-> [   41.667460]  ipv6_list_rcv+0xf4/0x12c
-> 
-> Those packets will never gets processed. And if customer does a interface down/up, page pool
-> warnings will be shown in the console.
-> 
-> Customer was asking us for a mechanism to drain these sockets, as they dont want to kill their Apps.
-> The proposal is to have debugfs which shows "pid  last_processed_skb_time  number_of_packets  socket_fd/inode_number"
-> for each raw6/raw4 sockets created in the system. and
-> any write to the debugfs (any specific command) will drain the socket.
-> 
-> 1. Could you please comment on the proposal ?
+NIX block can receive packets from multiple links such as
+MAC (RPM), LBK and CPT.
 
-I would say the above is kind of working around the problem.
-It would be good to fix the Apps or fix the page_pool.
+       -----------------
+ RPM --|     NIX       |
+       -----------------
+             |
+             |
+            LBK
 
-> 2. Could you suggest a better way ?
+Each link supports multiple channels for example RPM link supports
+16 channels. In case of link oversubsribe, NIX will assert backpressure
+on receive channels.
 
-For fixing the page_pool part, I would be suggesting to keep track
-of all the inflight pages and detach those pages from page_pool when
-page_pool_destroy() is called, the tracking part was [1], unfortunately
-the maintainers seemed to choose an easy way instead of a long term
-direction, see [2].
+The previous patch considered a single channel per link, resulting in
+backpressure not being enabled on the remaining channels
 
-1. https://lore.kernel.org/all/20250307092356.638242-1-linyunsheng@huawei.com/
-2. https://lore.kernel.org/all/20250409-page-pool-track-dma-v9-0-6a9ef2e0cba8@redhat.com/
+Fixes: a7ef63dbd588 ("octeontx2-af: Disable backpressure between CPT and NIX")
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 6f572589f1e5..6b5c9536d26d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -1822,7 +1822,7 @@ int otx2_nix_config_bp(struct otx2_nic *pfvf, bool enable)
+ 		req->chan_cnt = IEEE_8021QAZ_MAX_TCS;
+ 		req->bpid_per_chan = 1;
+ 	} else {
+-		req->chan_cnt = 1;
++		req->chan_cnt = pfvf->hw.rx_chan_cnt;
+ 		req->bpid_per_chan = 0;
+ 	}
+ 
+@@ -1847,7 +1847,7 @@ int otx2_nix_cpt_config_bp(struct otx2_nic *pfvf, bool enable)
+ 		req->chan_cnt = IEEE_8021QAZ_MAX_TCS;
+ 		req->bpid_per_chan = 1;
+ 	} else {
+-		req->chan_cnt = 1;
++		req->chan_cnt = pfvf->hw.rx_chan_cnt;
+ 		req->bpid_per_chan = 0;
+ 	}
+ 
+-- 
+2.34.1
+
 
