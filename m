@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-198382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C043ADBEC8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:46:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92580ADBEC9
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09FBB3B6E7B
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:45:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FDE217575F
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1C62AD0D;
-	Tue, 17 Jun 2025 01:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D47B18DB35;
+	Tue, 17 Jun 2025 01:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MqXr+0Uu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d16oyZeA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE7647
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295AA15B0EC
 	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750124761; cv=none; b=Jis+OBSPxZ0EPg58ARtN7ZG0EA9Ki7l9iIwiLy2vdiDOrEytPnlcJLHfjcw7Wza5AJOcoW6jBcUlZREPjQKTjGZ3vZWmgYaiEeggG/iSgXcCcTN7Ue0PVABbWcJM9pwFFPnaiwSaGa9SwI7erbfqnDfvtEC94wr+Vc7Rz+CX+pQ=
+	t=1750124762; cv=none; b=CN3ioilxUbVDK+cTB6kjwQpLI4P8yc2MBQM3SXjjY+uOWOX0Kpme1dESA1h1o1+Wsej2qp+Yv2rtvTvkcAF9206vol4kqZr+cchaVRsB1tNpf24/VfZvsO1ciQ7AcYF82TEsXMIJKQV4TX0TPLmaRT0mSUDYv0t00oRia2v7X8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750124761; c=relaxed/simple;
-	bh=eCb5h2nC3xMJByO+qw1OCQYi/btW2p1P6H5pzPCQ+50=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gk87LW+duw75xM36MPlno7K9ARHRqC93WL3++vEtN5ro4DdabYcZ5oZEQp5nh+EkJV042ZflgXgmYdc2TBjHHpY8mrzXFpCUmFf9nshEa3e3ppIDzNwvpm0HveA0f3YW9/OJ6k+ve0zquDmodDDy/r+sYWa9zqlWbHpfgvMef4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MqXr+0Uu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55D9DC4CEEA;
-	Tue, 17 Jun 2025 01:46:00 +0000 (UTC)
+	s=arc-20240116; t=1750124762; c=relaxed/simple;
+	bh=EspybNWz96a8SsKay7lVMYQKFHr61YfoXMkIgj6Tl7E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=munryR3nivoTgCqXE74Q5tSsbxj+qyOEO6r2xi8xvc7L9Zy9+/KuNnV4Io+EJvP1JSc1Ik3+pOP9ve8eBPJ0RoOqiLDt3YCXb9GELBm/fbb5UPhmPzthVfwA7k6e0/9cAlDGYz1mI8g1F0GA58k2mA+HbdqHR/QT25kCzNMavZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d16oyZeA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1087BC4CEEF;
+	Tue, 17 Jun 2025 01:46:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750124760;
-	bh=eCb5h2nC3xMJByO+qw1OCQYi/btW2p1P6H5pzPCQ+50=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MqXr+0UuGDXkeMVMRmYKcK8oiAPWP7DeK9SBKuuD7OfOlxH7NmWGZ4xbys3Iwl49M
-	 KOMR3kkVwl0QaDiF4XrzRvvMc/qmSQqFjDDG/EEtw0GBoaFO1IWrlymrQoCjW6Xby5
-	 5eef7v1q27ebUacQctNxUdPaEjd8n/VkH9wa5nPFlVwWOyGjyEp3GfqdabTh/QOSz0
-	 MnrgUlxA/7PDjPpyWXybRAI93qh9g7TBWfkkyCjMc4rVTOc6eJjMiCWiqvfcMiKDDT
-	 Dgy0rQUOzfwQD9v+fW+twlw4IRYGbkBKsUISUEG6rgI1ju5eXlXDySfK1ueP24hk+G
-	 FvKLwNEi4CspA==
+	s=k20201202; t=1750124761;
+	bh=EspybNWz96a8SsKay7lVMYQKFHr61YfoXMkIgj6Tl7E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=d16oyZeADeqR9u3zRA+w5UfU7lB/dG35/UmN8j3gOVSQKbq/zAmfccetoF7EtAxCp
+	 SiPCDdiOG8sO8JlXOvogy0sc0f6/HRVD6jK7x1ilhjQVjWDmSc44tiTvEwmp6gJaXt
+	 tPeK+MCZ8dU0M5r8Xx44iyKRLh/vkeJiFvyor3WO/vfR+byv8TjhbmSc+t0zsoJ37K
+	 UxHJbL/nNsXextBXmy2kRCoHd54/dOLw4dbbGj6qLH69aBzAFk6LvjLgMY5HdOQHzB
+	 F1uREn9SRSLaGC/aamD4cMVvGAOqQiwfFr/hSJwQYxLxZQXlI3WojWJJECbnkH2BPM
+	 O4dpqDT82oI4w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,10 +61,12 @@ Cc: netdev@vger.kernel.org,
 	hkelam@marvell.com,
 	bbhushan2@marvell.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/5] eth: migrate some drivers to new RXFH callbacks
-Date: Mon, 16 Jun 2025 18:45:50 -0700
-Message-ID: <20250617014555.434790-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/5] eth: bnx2x: migrate to new RXFH callbacks
+Date: Mon, 16 Jun 2025 18:45:51 -0700
+Message-ID: <20250617014555.434790-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250617014555.434790-1-kuba@kernel.org>
+References: <20250617014555.434790-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,23 +75,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Migrate a batch of drivers to the recently added dedicated
-.get_rxfh_fields and .set_rxfh_fields ethtool callbacks.
+Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
+add dedicated callbacks for getting and setting rxfh fields").
 
-Jakub Kicinski (5):
-  eth: bnx2x: migrate to new RXFH callbacks
-  eth: bnxt: migrate to new RXFH callbacks
-  eth: ena: migrate to new RXFH callbacks
-  eth: thunder: migrate to new RXFH callbacks
-  eth: otx2: migrate to new RXFH callbacks
+The driver as no other RXNFC functionality so the SET callback can
+be now removed.
 
- drivers/net/ethernet/amazon/ena/ena_ethtool.c | 40 ++++++-------------
- .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   | 33 ++++++---------
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 24 ++++++-----
- .../ethernet/cavium/thunder/nicvf_ethtool.c   | 37 +++++++----------
- .../marvell/octeontx2/nic/otx2_ethtool.c      | 31 ++++++++------
- 5 files changed, 71 insertions(+), 94 deletions(-)
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   | 33 ++++++++-----------
+ 1 file changed, 13 insertions(+), 20 deletions(-)
 
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+index 44199855ebfb..528ce9ca4f54 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+@@ -3318,8 +3318,11 @@ static int bnx2x_set_phys_id(struct net_device *dev,
+ 	return 0;
+ }
+ 
+-static int bnx2x_get_rss_flags(struct bnx2x *bp, struct ethtool_rxnfc *info)
++static int bnx2x_get_rxfh_fields(struct net_device *dev,
++				 struct ethtool_rxfh_fields *info)
+ {
++	struct bnx2x *bp = netdev_priv(dev);
++
+ 	switch (info->flow_type) {
+ 	case TCP_V4_FLOW:
+ 	case TCP_V6_FLOW:
+@@ -3361,20 +3364,21 @@ static int bnx2x_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
+ 	case ETHTOOL_GRXRINGS:
+ 		info->data = BNX2X_NUM_ETH_QUEUES(bp);
+ 		return 0;
+-	case ETHTOOL_GRXFH:
+-		return bnx2x_get_rss_flags(bp, info);
+ 	default:
+ 		DP(BNX2X_MSG_ETHTOOL, "Command parameters not supported\n");
+ 		return -EOPNOTSUPP;
+ 	}
+ }
+ 
+-static int bnx2x_set_rss_flags(struct bnx2x *bp, struct ethtool_rxnfc *info)
++static int bnx2x_set_rxfh_fields(struct net_device *dev,
++				 const struct ethtool_rxfh_fields *info,
++				 struct netlink_ext_ack *extack)
+ {
++	struct bnx2x *bp = netdev_priv(dev);
+ 	int udp_rss_requested;
+ 
+ 	DP(BNX2X_MSG_ETHTOOL,
+-	   "Set rss flags command parameters: flow type = %d, data = %llu\n",
++	   "Set rss flags command parameters: flow type = %d, data = %u\n",
+ 	   info->flow_type, info->data);
+ 
+ 	switch (info->flow_type) {
+@@ -3460,19 +3464,6 @@ static int bnx2x_set_rss_flags(struct bnx2x *bp, struct ethtool_rxnfc *info)
+ 	}
+ }
+ 
+-static int bnx2x_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
+-{
+-	struct bnx2x *bp = netdev_priv(dev);
+-
+-	switch (info->cmd) {
+-	case ETHTOOL_SRXFH:
+-		return bnx2x_set_rss_flags(bp, info);
+-	default:
+-		DP(BNX2X_MSG_ETHTOOL, "Command parameters not supported\n");
+-		return -EOPNOTSUPP;
+-	}
+-}
+-
+ static u32 bnx2x_get_rxfh_indir_size(struct net_device *dev)
+ {
+ 	return T_ETH_INDIRECTION_TABLE_SIZE;
+@@ -3684,10 +3675,11 @@ static const struct ethtool_ops bnx2x_ethtool_ops = {
+ 	.set_phys_id		= bnx2x_set_phys_id,
+ 	.get_ethtool_stats	= bnx2x_get_ethtool_stats,
+ 	.get_rxnfc		= bnx2x_get_rxnfc,
+-	.set_rxnfc		= bnx2x_set_rxnfc,
+ 	.get_rxfh_indir_size	= bnx2x_get_rxfh_indir_size,
+ 	.get_rxfh		= bnx2x_get_rxfh,
+ 	.set_rxfh		= bnx2x_set_rxfh,
++	.get_rxfh_fields	= bnx2x_get_rxfh_fields,
++	.set_rxfh_fields	= bnx2x_set_rxfh_fields,
+ 	.get_channels		= bnx2x_get_channels,
+ 	.set_channels		= bnx2x_set_channels,
+ 	.get_module_info	= bnx2x_get_module_info,
+@@ -3711,10 +3703,11 @@ static const struct ethtool_ops bnx2x_vf_ethtool_ops = {
+ 	.get_strings		= bnx2x_get_strings,
+ 	.get_ethtool_stats	= bnx2x_get_ethtool_stats,
+ 	.get_rxnfc		= bnx2x_get_rxnfc,
+-	.set_rxnfc		= bnx2x_set_rxnfc,
+ 	.get_rxfh_indir_size	= bnx2x_get_rxfh_indir_size,
+ 	.get_rxfh		= bnx2x_get_rxfh,
+ 	.set_rxfh		= bnx2x_set_rxfh,
++	.get_rxfh_fields	= bnx2x_get_rxfh_fields,
++	.set_rxfh_fields	= bnx2x_set_rxfh_fields,
+ 	.get_channels		= bnx2x_get_channels,
+ 	.set_channels		= bnx2x_set_channels,
+ 	.get_link_ksettings	= bnx2x_get_vf_link_ksettings,
 -- 
 2.49.0
 
