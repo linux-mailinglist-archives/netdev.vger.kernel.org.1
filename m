@@ -1,166 +1,120 @@
-Return-Path: <netdev+bounces-198450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC604ADC322
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:19:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 400D3ADC32A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C933BA690
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:18:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30CF53A74E5
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE08E290D8C;
-	Tue, 17 Jun 2025 07:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9E728C872;
+	Tue, 17 Jun 2025 07:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="YsOf1Xy5"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="fwVh8mDi"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B049290BC6;
-	Tue, 17 Jun 2025 07:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A9228CF77;
+	Tue, 17 Jun 2025 07:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750144666; cv=none; b=BSDcT1mib6y4EgXLU+uhvVHyEPcNBUxO5vU817a1Ew2HAaiWoruNek5/X0BTfzXHsPP1eT0nwOBsIyH6j7MuePDYm8XeFcAWX7wppUoeLyYo1LYMQhhdcBhceqkIDNbuxBwO7E1RyEZ1vusUcTsiTgs9Z3kM3ncO4wxyFbSWwac=
+	t=1750144861; cv=none; b=qrFBs7ZVVtBKyvU0CJbPdGpoIGVWTHYo4N4WuVkivYMkhOP9V6+7cfTvi3tI/dcpJIxnNnWGwZGF80ULqlicGY9OjMcRdE98FGeziNHfxW6qd2ejf18QqPT2ge3vLlEp3NLg8iwr18bL0RioqzfN8G9D4ynZE6uxc8pE36v2vIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750144666; c=relaxed/simple;
-	bh=F1gx+vQUf172w9LtF5/IcAONaJB4Rn6JW/DLAOvKpbs=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References; b=Zzwb+owVW03jCDpbXy+agejn7x5FHJbN9ja16X+nqHrI+lv/zw8lmBuQy/Ew8uGnoTQnVsDm9z44zXgRt15N3wE7ElXKqYuB6xdWzh5UrdlJWlQPAdh5RSih9PWTlFP+6+yvp4IS+RTdInPNePTztv6KipcXqhxvFb+4CsTZLcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=YsOf1Xy5; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id C861921176DE; Tue, 17 Jun 2025 00:17:44 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C861921176DE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1750144664;
-	bh=iuVu/Xa3ktHW/EAnoVfNYUcqYE9Q+71sMK3z+ize3FE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=YsOf1Xy5hTI2oxbqUTFGo+722wGke5IoBpEN4NC/cooN7BGHR2TjeQijUIXjHjiaD
-	 S5BHvWSP4J00O+qvS9eDmR+RP1rZPzy6o7bk2ATLlltmL4a2QO/majA6EpHePT6n8Y
-	 9C2qW8LXFKW7alWITmP5h+Gx6eVAxKjaboRndxQo=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shirazsaleem@microsoft.com,
-	leon@kernel.org,
-	ernis@linux.microsoft.com,
-	shradhagupta@linux.microsoft.com,
-	schakrabarti@linux.microsoft.com,
-	gerhard@engleder-embedded.com,
-	rosenp@gmail.com,
-	sdf@fomichev.me,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v3 4/4] net: mana: Handle unsupported HWC commands
-Date: Tue, 17 Jun 2025 00:17:36 -0700
-Message-Id: <1750144656-2021-5-git-send-email-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1750144656-2021-1-git-send-email-ernis@linux.microsoft.com>
-References: <1750144656-2021-1-git-send-email-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1750144861; c=relaxed/simple;
+	bh=+dMeJaNU9Vw4n/TfbkPoCtzN+XBmJGEmPcGDrf/Xk44=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SxrM6ZoRwdHTtGlvP4X5N14C58U/3J/5zviZJA5HTpovPQmCFKQWkEoLu6zz6wQmeL8n4I8Vij9EoMyo16kUWnvkKURK9PT5la7i6+lgx0Kciy+rYofyGcnfwWff1mrn6xlgxBLShv83AO+ecdFLEcjN6bGJqb7P0322JG24zqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=fwVh8mDi; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 55H7KCtmC1823722, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1750144813; bh=sVuaS1fFDiOjECct3A6H6Zdc5xLKjkJu0DxycWPbt2I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=fwVh8mDigVYOgTnPB3ws4ilSz2E6R+UVZy/1iDq9EM9IfyfpbQfZP6FAPp4+1C6ZV
+	 lV/xq+Hq6bBMfaQnqvTWN1sz/O4GstUc7Mj/b24CkCIpynke4haH5hYw2C08k5Lleu
+	 rF0lEmLmhaFIYKTjl9QABDdBOHF4uBiurcFYNfull/rFdFtLpqor1C7XEqDgxJ0Pgs
+	 aFc9ssZvV3AujjGyll+aHJ5ijJLyrFGr/spf5lrMpxqT5RgnOJtFlrwmRdjVvWK3dR
+	 Hbo6spuhAEUa/YH3jT8CoZIkLCgdnfvSKx1X+qMZxySJyLDgAqopU1rrtOgyVodfEb
+	 NV0tB0v524S3w==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 55H7KCtmC1823722
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Jun 2025 15:20:13 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 17 Jun 2025 15:20:18 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 17 Jun 2025 15:20:17 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Tue, 17 Jun 2025 15:20:17 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Joe Damato <joe@dama.to>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "jdamato@fastly.com" <jdamato@fastly.com>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v2 1/2] rtase: Link IRQs to NAPI instances
+Thread-Topic: [PATCH net-next v2 1/2] rtase: Link IRQs to NAPI instances
+Thread-Index: AQHb3m33AoUqGLYRxU6yyEFpsNftQ7QFZ3yAgAGLATA=
+Date: Tue, 17 Jun 2025 07:20:17 +0000
+Message-ID: <69799fd428b94d778a1c2e108a6d3f27@realtek.com>
+References: <20250616032226.7318-1-justinlai0215@realtek.com>
+ <20250616032226.7318-2-justinlai0215@realtek.com>
+ <aFA7VdI7BWQOKW0V@MacBook-Air.local>
+In-Reply-To: <aFA7VdI7BWQOKW0V@MacBook-Air.local>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-If any of the HWC commands are not recognized by the
-underlying hardware, the hardware returns the response
-header status of -1. Log the information using
-netdev_info_once to avoid multiple error logs in dmesg.
+> On Mon, Jun 16, 2025 at 11:22:25AM +0800, Justin Lai wrote:
+> > Link IRQs to NAPI instances with netif_napi_set_irq. This information
+> > can be queried with the netdev-genl API.
+> >
+> > Also add support for persistent NAPI configuration using
+> > netif_napi_add_config().
+> >
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > ---
+> >  .../net/ethernet/realtek/rtase/rtase_main.c   | 20 +++++++++++++------
+> >  1 file changed, 14 insertions(+), 6 deletions(-)
+> >
+>=20
+> Did you test the persistent NAPI config on one of these devices?
+>=20
+> Reviewed-by: Joe Damato <joe@dama.to>
 
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Reviewed-by: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
-Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
-Changes in v3:
-* Rebase to latest net-next branch.
-Changes in v2:
-* Define GDMA_STATUS_CMD_UNSUPPORTED for unsupported HWC status code
-  instead of using -1.
----
- drivers/net/ethernet/microsoft/mana/hw_channel.c |  4 ++++
- drivers/net/ethernet/microsoft/mana/mana_en.c    | 11 +++++++++++
- include/net/mana/gdma.h                          |  1 +
- 3 files changed, 16 insertions(+)
+Hi Joe,
 
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 3d3677c0d014..650d22654d49 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -891,6 +891,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 	}
- 
- 	if (ctx->status_code && ctx->status_code != GDMA_STATUS_MORE_ENTRIES) {
-+		if (ctx->status_code == GDMA_STATUS_CMD_UNSUPPORTED) {
-+			err = -EOPNOTSUPP;
-+			goto out;
-+		}
- 		if (req_msg->req.msg_type != MANA_QUERY_PHY_STAT)
- 			dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
- 				ctx->status_code);
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index d7079e05dfb8..5aee7bda1504 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -847,6 +847,9 @@ static int mana_send_request(struct mana_context *ac, void *in_buf,
- 	err = mana_gd_send_request(gc, in_len, in_buf, out_len,
- 				   out_buf);
- 	if (err || resp->status) {
-+		if (err == -EOPNOTSUPP)
-+			return err;
-+
- 		if (req->req.msg_type != MANA_QUERY_PHY_STAT)
- 			dev_err(dev, "Failed to send mana message: %d, 0x%x\n",
- 				err, resp->status);
-@@ -1252,6 +1255,10 @@ int mana_query_link_cfg(struct mana_port_context *apc)
- 				sizeof(resp));
- 
- 	if (err) {
-+		if (err == -EOPNOTSUPP) {
-+			netdev_info_once(ndev, "MANA_QUERY_LINK_CONFIG not supported\n");
-+			return err;
-+		}
- 		netdev_err(ndev, "Failed to query link config: %d\n", err);
- 		return err;
- 	}
-@@ -1294,6 +1301,10 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
- 				sizeof(resp));
- 
- 	if (err) {
-+		if (err == -EOPNOTSUPP) {
-+			netdev_info_once(ndev, "MANA_SET_BW_CLAMP not supported\n");
-+			return err;
-+		}
- 		netdev_err(ndev, "Failed to set bandwidth clamp for speed %u, err = %d",
- 			   speed, err);
- 		return err;
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index bfae59202669..fdf144988cec 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -10,6 +10,7 @@
- #include "shm_channel.h"
- 
- #define GDMA_STATUS_MORE_ENTRIES	0x00000105
-+#define GDMA_STATUS_CMD_UNSUPPORTED	0xffffffff
- 
- /* Structures labeled with "HW DATA" are exchanged with the hardware. All of
-  * them are naturally aligned and hence don't need __packed.
--- 
-2.34.1
+Yes, I tested it, and the persistent NAPI config worked correctly on
+the device.
 
+Thanks,
+Justin
 
