@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12FA3ADDF67
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:10:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D006FADDF69
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:10:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7D9417E17D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795E8189DD97
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670DF2957A9;
-	Tue, 17 Jun 2025 23:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BA82957CE;
+	Tue, 17 Jun 2025 23:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QaP3PGJy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeY+/BRn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCA7295531
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ADB295531
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750201804; cv=none; b=h5F6f9xUi4yZ1Mxve4psQRHOWo1FESBS+NtWDgiVhEvNXM/PfyXyrA/gUA1kw7HGgOInEd8v9GmKF4+lSbr2zg3nlyASblTkvvNxQJpmmfXVJ7GJ79j9ABb2LR7tMcJ+nXDo++ZEmLkOCkECLLK4zX/SjonysjqRC/JxiEChlP0=
+	t=1750201813; cv=none; b=Ub0mOtvFcME5hO9J6OwbkS7F+WEBLp4bJxgugyhSz35Nnm3FJ2KdT5ePPf6ORIMdciX2r+hmxnQ/28ixSgS43sA3wmaScgOIHLL77lQ1wGlVCs56Or2VnT/pKlVrboADqUSdjYBlQTXR79pi/BuQ3RJo4Dt7Cp0rkAwxmKMEi1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750201804; c=relaxed/simple;
-	bh=hf6VGmJN2wcWRSTg/+Ju/5u6ux48QGSCU3Q746i96qQ=;
+	s=arc-20240116; t=1750201813; c=relaxed/simple;
+	bh=NLmZbAINQrKpTqQpqNfxPgtqEb0sB7XeT47yiorXI6w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=APmaw/jE9gL+35p7hVqBzR6xSq46jmPlQB3JXbMy7htuT3E7r54xtlJW42qr1W2DvY00SfURghi5Knunx64MYfsXhNWfXduHpVZUEmVAq8bBBIH7PB32iPCeY5Qu3Te9Nck/5dojTILMB4EATV2vEFMTeWfGImdUyXqvXPBOeXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QaP3PGJy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB7DFC4CEE3;
-	Tue, 17 Jun 2025 23:10:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YDSi/XO6fyNytGPklLNOlVfZVy1HqbCjBJ+viT83WAS6bkvfykdF2to8d1tPCLh5APrIy9BYmN7iA5pEQ7HseKyqUA+ibvWq0g2foyJULgwgApjHMPnphJ0MFkN+2kXT77K6qgVY6uAEe0mJs1LxyD7eNgoQy7O+SrDbDuicld4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MeY+/BRn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 328ACC4CEED;
+	Tue, 17 Jun 2025 23:10:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750201803;
-	bh=hf6VGmJN2wcWRSTg/+Ju/5u6ux48QGSCU3Q746i96qQ=;
+	s=k20201202; t=1750201813;
+	bh=NLmZbAINQrKpTqQpqNfxPgtqEb0sB7XeT47yiorXI6w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QaP3PGJyTpwnrEV1VfjoFWuTKzkxQ5OqxB5CNFjVDyC2L4Q2yC04sBMIVZfan2Aa9
-	 4zVzX3J7k14yOI45ANLo8Z3FSv9nQ7sx6zg93vuhgs0WKuEN/rrUT5iZBcj15au7uo
-	 WAAL03Js81dytrDsala75lQaZvifVoHwIu12JOIkWN47I2lFeEWnSrUMWG2kd+hxoa
-	 H7xDrhexgTZu/LnAkzq+oV0hMbOAOjHyU/pb6KG7DDIX6tzcmYxZ1Njv1rBHnSPcd1
-	 ZfMP9eFPkzMx6FZiCzsVhvOTs1G5gPE9yG1B9n5Hbo629EYvv/3/IAS88uTdtFq6Lx
-	 K3ks7VZGZBfEg==
+	b=MeY+/BRnKSJtQIpfkUgm5S90dpg8BaAd3E9/X4zxA9F3zdFVm0v82Low6gsBPBOHe
+	 iFFOjUJp1giTMHEe0SPayfjJOKYUIxYagHv0n+AAF2ilgYK90TtH9zlfBog6ugcEP4
+	 WGcwTuQGzAKLT2wW8gItRfMw2MulwZU5f0u1o+1KwDaGyGvmel+8JA6h0vXVDdI8gk
+	 l9MlsvBi9aRk9Ja+hujhrKFI28BcH+xjVLN2PqAHEsl+vVZhgrIub71qvkzsxR9Jo8
+	 O87Frd6uUIw9izt1Omd0Md27fdFbmaeiOWUrV/l5WX85U49iWn+A4vTD0mJzoCV/eV
+	 HsEiOX7K/5QfA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DC738111DD;
-	Tue, 17 Jun 2025 23:10:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB638111DD;
+	Tue, 17 Jun 2025 23:10:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] bnxt_en: Bug fixes
+Subject: Re: [PATCH net-next 0/3] net: stmmac: rk: more cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020183225.3730251.406729643354262674.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:10:32 +0000
-References: <20250613231841.377988-1-michael.chan@broadcom.com>
-In-Reply-To: <20250613231841.377988-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
+ <175020184173.3730251.3213755803607439009.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:10:41 +0000
+References: <aE_u8mCkUXEWTzJe@shell.armlinux.org.uk>
+In-Reply-To: <aE_u8mCkUXEWTzJe@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 13 Jun 2025 16:18:38 -0700 you wrote:
-> Thie first patch fixes a crash during PCIe AER when the bnxt_re RoCE
-> driver is loaded.  The second patch is a refactor patch needed by
-> patch 3.  Patch 3 fixes a packet drop issue if queue restart is done
-> on a ring belonging to a non-default RSS context.  Patch 2 and 3 are
-> version 2 that has addressed the v1 issue by reducing the scope of
-> the traffic disruptions:
+On Mon, 16 Jun 2025 11:16:18 +0100 you wrote:
+> Hi,
 > 
-> [...]
+> Another couple of cleanups removing pointless code.
+> 
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
 
 Here is the summary with links:
-  - [net,1/3] bnxt_en: Fix double invocation of bnxt_ulp_stop()/bnxt_ulp_start()
-    https://git.kernel.org/netdev/net/c/1e9ac33fa271
-  - [net,2/3] bnxt_en: Add a helper function to configure MRU and RSS
-    https://git.kernel.org/netdev/net/c/e11baaea94e2
-  - [net,3/3] bnxt_en: Update MRU and RSS table of RSS contexts on queue reset
-    https://git.kernel.org/netdev/net/c/5dacc94c6fe6
+  - [net-next,1/3] net: stmmac: rk: fix code formmating issue
+    https://git.kernel.org/netdev/net-next/c/a44769c97e9a
+  - [net-next,2/3] net: stmmac: rk: use device rather than platform device in rk_priv_data
+    https://git.kernel.org/netdev/net-next/c/8f6503993911
+  - [net-next,3/3] net: stmmac: rk: remove unnecessary clk_mac
+    https://git.kernel.org/netdev/net-next/c/cf283fd6b8be
 
 You are awesome, thank you!
 -- 
