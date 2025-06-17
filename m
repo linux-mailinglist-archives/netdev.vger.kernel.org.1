@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-198581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D2DADCC2F
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:00:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2127ADCC33
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0406178DC9
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:00:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D863189968A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90CA2E8881;
-	Tue, 17 Jun 2025 13:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DA32E92C8;
+	Tue, 17 Jun 2025 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPQOJoNB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+NEw9tF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5C82E4270;
-	Tue, 17 Jun 2025 13:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1945D2DE1ED;
+	Tue, 17 Jun 2025 13:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750165202; cv=none; b=nW8Edl1G8vr1Pyg9gCFf6EJtJ2Iaz6f6EJ/A3FDoXj42y7rCmJPjAAWWHS9Mn85G3Nv2xsuGTzSpvhNxOB1ls+fQ1Q2mnJxGbUhfi2cu1Nwo8QzYXHcnM7qSeG8jVpzCPaSYEWvHBarkHlhoAIu6/CxXAb5nvqnWkmmdO1abUjU=
+	t=1750165204; cv=none; b=DQedRi9rLOVT05V7AaSenI3EhhNGqcOlHGl0PcEjzAJZuxFQZC42hCCPhow8tnnq6IVVnoLtUcDEqIGYHOjxYoYd1l9ULl0mfZLSeifURRpTh+yOl31YK+YJ2tHf08PiXKmFUsEIFs0K+Y62W/urXQnG6sZftXEznhtGU0QQuQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750165202; c=relaxed/simple;
-	bh=lYCtkVyKdENR+dzqdVYy9VsqrApiz6GmggKM0FQrVSk=;
+	s=arc-20240116; t=1750165204; c=relaxed/simple;
+	bh=oOGH7JrUTQsVKaPTed6EUUmZzVLb9azQu8wIKI3QOHs=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=e5nfr1fPKtiLsvJOHdP5NNOzrlXjht7uhUuUwqMYYpSX8IqKFT9/JGebO1t4pJFjuliUlxWmjHQNvCr1TB7EpgrchPFuYDDuGa+1E7Zghob/n1iFbAHXGdAjSAolXP9yc5yFfFtYRp62H8hPTBbZ0aRkTzlEHe1r3JwujAuDrbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPQOJoNB; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version:Content-Type; b=s7S9VKeplWA76lYFFXK7xsfyHEmxu0oMwc1UCWEXvdn9eHc1G3PzbpbRqdtQR2ZBDCnZXAp8T0xRDBhxDsAvGsViT2I4aR5Em5C+9GdN21ubfgUbhK64xP4QQZNM/TZMguCEaFSCPyxEXtBAALLsUGIYrslVYC1H908J8gYiuYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+NEw9tF; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a365a6804eso4179128f8f.3;
-        Tue, 17 Jun 2025 06:00:00 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-451d6ade159so47259795e9.1;
+        Tue, 17 Jun 2025 06:00:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750165199; x=1750769999; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750165201; x=1750770001; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+1xGMAYjkvYIscDppoqoFS0dk0S9bQU0DsTqywoNvoQ=;
-        b=VPQOJoNBZ/hmzaa8kpW2ZxG17UNR6fzmGgJx/f7O9pV8LuIgjMO8GtpdLC/9hFrbOU
-         gcHReDWz7n9g5K2YvZ6DD6F6t6Zs7zstfeh70WDOoZ/BXXgPPl/lq7R7GwgUkAGRlItH
-         Qc15GYYxipy8Xy4tBBoQdTlPDkILV9FWyN0FSDKGlVYx9wvOaPzGVxFcOEWXkPCPNbGQ
-         wBWwPg3CqiF3XU9wldBAcuuiI/URmZWsjJGbx8y8xkML205X7bI/v6hDm8NaZJJDMXuR
-         gXA41S1J0qiD/xpGXlD/MYEuqdlqxqHjtyYuj4/3REEw2nSN+7YwEeq1TsX/jxSrjyi/
-         m3jA==
+        bh=oOGH7JrUTQsVKaPTed6EUUmZzVLb9azQu8wIKI3QOHs=;
+        b=m+NEw9tFIBqIUfQP52Z5fD5NGbLVD8mFN+OwaTIbLNXdwzb5u1t2bmhjW43sQcz7dH
+         SbYLlf+9zrzA3vYGXJSPxoD07lFRlXIkp7Ddo7SXh5d8LsM9MfuldIqwiMh/UpTABz92
+         zrV2NdBBluZtgO3UuN76vCzwkUzJVwCQsI8rtl9fBusR/fHzY7x597MZL9iqoRSdg2IZ
+         kKnAKtX4rIIX1i6amLd/Dk92Ra7cZvrDN6ADewyXZfxO4fU+WZRwK0YnORNs4ePD+A8M
+         y9C/oRauvg4BcZeHNNa7uNiodEQIbLHRW5Uxp37bhsLcVlb2k3Rc7P4TnTQWTel7MAhK
+         p+Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750165199; x=1750769999;
+        d=1e100.net; s=20230601; t=1750165201; x=1750770001;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+1xGMAYjkvYIscDppoqoFS0dk0S9bQU0DsTqywoNvoQ=;
-        b=BdFq+p+/KlZ/UHesJrB5Tek18g9pGxYli4l6UpdAw+M3LMPR20wMVFD1gjQXE/I0/B
-         d1C7GThzgbnmGWy5wiqzn5ULkrWuW7lI4V41IClknKU+79+tO2DxDNCi2KEKT+3VPe4w
-         23jkYKObQAEKFBvmiuJkxIk+L6LLzAh7+IXCFn+gfSGfDhG8xDv4M2n1I1Qzph1gRkvQ
-         I9+nb6GD8qDqQgvMV7KskNZ0jijsKlMqS7/j2trYzERh2GdsqxgfskSoAVHvNbq4JRg0
-         jGBCh/jC9mwXxc4FFMnzhSU/7brXJ1S++ijQ4hfG7FSTdF4Qgl+snBzlu8AiNDCWs8L7
-         eRWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUH+CmJV1G1yIVcE+/5v+9+8UvKpD9LqA4/jYYNVOm7qDPXkriuq+TxTPxoa81i5qnWy+dp6TiJ@vger.kernel.org, AJvYcCVpT6oWm6/wpagbpjLuxNGQ8hmh2cK4NcswPteQ70AnXNPj7dxEl0xC2L52AehmybJ33L1VYIJBxMTg684=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbCd42GjiTLckxUoDFSFDXvHx7idUZQejDUXKsdOG6Svut5qaj
-	JZ5cWcRz2glgUqPxlEkkTwjn+MQ96iti2m+KpKbyvVvKqij8TdY3jBAI
-X-Gm-Gg: ASbGnctxzJizCyM+8kMzx8EXAfsufasEsvxL9smgvzYdtupD1yxuK6dIDSpkjgom1F2
-	IMupta8dJxzS9j62GI6j7JPLju1Z2RmxmWXu2cDhuIVuAhVgThX8eoHfWENaKqViMNw1b/tfEr6
-	gdjDK7Uf1pUnxpBwNfFl0OLW3dtN2TaUZzXuAnS+9XvgH/YoXocHB9WdN/9XHaPHRKRK0pteCiM
-	MgqVT45PN+XrpxBmiqrFfBGYc8BUFgIsTlN68+mpV82z/2jkKDM86BHtrzkswEkYp+raMk+B3Lf
-	Vux9lJ9hpmiNy+oOE5Gyws4p5IJQ0ZsEdjZBJObN6H9fESSWM/auISUA/Cylnn2sYLkBMWBjJds
-	=
-X-Google-Smtp-Source: AGHT+IEJqryb3c66QPuNLx2gZA7HOsR9NZhIMg8bp3yLVq2tmPiEQ398MZ3ApYQ2ePQKbLlR5FM2Dg==
-X-Received: by 2002:a05:6000:310e:b0:3a4:ee40:715c with SMTP id ffacd0b85a97d-3a572370f67mr11657229f8f.14.1750165199271;
-        Tue, 17 Jun 2025 05:59:59 -0700 (PDT)
+        bh=oOGH7JrUTQsVKaPTed6EUUmZzVLb9azQu8wIKI3QOHs=;
+        b=bf9cWQfykwqQVdvE8oZ6dfUj9cnmtvZgqSxTDKGC9AVVwmRlzgUqA2l3aEcklhWiFU
+         gNF5a4qMUCTuGjOvkoEnadJVPZ079y7k/hcY447Ih/qBzXJv6lEmtS6Tw7guuIXjyOH1
+         hraRmLuDGCv5yy448/d2uup112d4XfLweZDeYRGzVisfJd/ox03ZcbpeATvIbiM7Yizq
+         P061UrMQHwCUEABqxH2azmjJCdwec1CK1kid4cJSJUvCPigWIilQ4mJ0LB91I1ZF4C1H
+         3OPbBnp7lFNjd9+V5vSKQRTFoFXBhgwtOc64/wtGWUGJ6PrKazLQTXBklaUmkLwgVxD1
+         xNpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZO1k7vST8QZ1ztrzBJlHYxuSZMAkAv3TSxtp+7RSsudwTHDMoEw0nx4zoRAtSV+LKIjSVuqI0r/7oXGg=@vger.kernel.org, AJvYcCUcLsvefEieSocp7/PImjOGIqGm5Zw9ZifOpBaqyJcWDOAs4/bZianKT45fc9vv5/wRzeV8oH2k@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwK6nBxtvgIvgl76qnLB2zCnUZ7kZtemYZeyIAcFZI4VVNgzQF
+	1nNvX6zi3YS8X00+gLW1csU8x78cMU8Pccx1/K0bT5C87AccqB0qCTGd
+X-Gm-Gg: ASbGnctnt9MPLEwD7JAuig4iqxycYNVNO78OWdJJq1OWHRTmop/7wpL+fPK/2w7F0de
+	je3out0jLlnQ1ZQuE3vcziRbz95ELag/nqwC+DdIaHjjQQr57xoxjZHf5EEJWWtv4Su1vLxSsCd
+	G0ClWd1WdsefScqm+jFrHBxDoyROI1qkqZCgok4DcHDGE7yW47Axx5EAw4SwLwS1oBwDM11KSfT
+	cU04BRLEht2EiTRpCHBRRM8h7V6wDXOJYLNwXckt7vP2u30Cce5M/Dx90VcKV9kw6PU6+Okkndq
+	58ZErZ2LjTkV7n9yw5D8ylNc+IVSQtvf5ifFLqZdpBAJRiHonDVxeDsWjg9Z3HQZ4Fe9A08Fecc
+	Jz1MNCGVQ4g==
+X-Google-Smtp-Source: AGHT+IETuY2veNgQQqSIB3Ky6YQwB5mMQ2rh+RHx+Fzcqage9RO7z8pdqYCPHjlEHVhLI1hObHSabA==
+X-Received: by 2002:a05:600c:4f14:b0:450:d30e:ff96 with SMTP id 5b1f17b1804b1-4533d05d802mr129289755e9.0.1750165201251;
+        Tue, 17 Jun 2025 06:00:01 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:8931:baa3:a9ed:4f01])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b47198sm13724028f8f.81.2025.06.17.05.59.58
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e259108sm173519385e9.32.2025.06.17.06.00.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 05:59:58 -0700 (PDT)
+        Tue, 17 Jun 2025 06:00:00 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
@@ -84,13 +84,13 @@ Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
   joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
   linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
   netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
-Subject: Re: [PATCH v5 03/15] tools: ynl_gen_rst.py: create a top-level
- reference
-In-Reply-To: <4496d88c381b9f7ddce37c5a2d53156c5e8e6a17.1750146719.git.mchehab+huawei@kernel.org>
-Date: Tue, 17 Jun 2025 11:40:59 +0100
-Message-ID: <m2sejyk5vo.fsf@gmail.com>
+Subject: Re: [PATCH v5 08/15] docs: netlink: index.rst: add a netlink index
+ file
+In-Reply-To: <4d8a16864767c1eb660cb905dbc935a3d0df8d9a.1750146719.git.mchehab+huawei@kernel.org>
+Date: Tue, 17 Jun 2025 11:43:03 +0100
+Message-ID: <m2o6umk5s8.fsf@gmail.com>
 References: <cover.1750146719.git.mchehab+huawei@kernel.org>
-	<4496d88c381b9f7ddce37c5a2d53156c5e8e6a17.1750146719.git.mchehab+huawei@kernel.org>
+	<4d8a16864767c1eb660cb905dbc935a3d0df8d9a.1750146719.git.mchehab+huawei@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -102,43 +102,10 @@ Content-Type: text/plain
 
 Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 
-> Currently, rt documents are referred with:
->
-> Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`rt-link<../../networking/netlink_spec/rt-link>`
-> Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-> Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
->
-> that's hard to maintain, and may break if we change the way
-> rst files are generated from yaml. Better to use instead a
-> reference for the netlink family.
->
-> So, add a netlink-<foo> reference to all generated docs.
+> Instead of generating the index file, use glob to automatically
+> include all data from yaml.
 >
 > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-I would still prefer to see patches 3 and 4 merged since they are part
-of the same fix.
-
-> ---
->  tools/net/ynl/pyynl/ynl_gen_rst.py | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
-> index 0cb6348e28d3..7bfb8ceeeefc 100755
-> --- a/tools/net/ynl/pyynl/ynl_gen_rst.py
-> +++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
-> @@ -314,10 +314,11 @@ def parse_yaml(obj: Dict[str, Any]) -> str:
->  
->      # Main header
->  
-> -    lines.append(rst_header())
-> -
->      family = obj['name']
->  
-> +    lines.append(rst_header())
-> +    lines.append(rst_label("netlink-" + family))
-> +
->      title = f"Family ``{family}`` netlink specification"
->      lines.append(rst_title(title))
->      lines.append(rst_paragraph(".. contents:: :depth: 3\n"))
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
