@@ -1,211 +1,251 @@
-Return-Path: <netdev+bounces-198705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0A9ADD146
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:24:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35670ADD180
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE6C3179824
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:24:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64B541896AAE
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE872EB5C4;
-	Tue, 17 Jun 2025 15:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8892E9737;
+	Tue, 17 Jun 2025 15:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSZiIOGW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VmkrqHCs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D013818A6AE
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691EB1E8332;
+	Tue, 17 Jun 2025 15:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750173890; cv=none; b=sEqGBuk5pEuiAoCmMkCyFbiIFks9/Ky9ZrWO0Q/cSWg12P9Zk+D7rdYmYnMXdoR3Sw49RqhzwMq0P6g35Rh3QK+37sSQTtQ/DmpktmKwDchALa3nTrSEpCNV10hZ5rrVByJKYfJOtllzPGqSARoSTxg7OZGumlPiq7i8Y+X6eCQ=
+	t=1750174293; cv=none; b=kXjzo3J2zZeJEI4TDe5V2TgX72Zr6LF7HKvEBW2WmPFTLZeBZSuU9WVdDks7Lb3YQNeM7pr1jkY9m/TgoQDMiyCIfVg343jaYQfJbLDM/5yA5BbaLcuJ1roMkdFlER0ci6fhP+2YJjaAcrSXJMrEX1hoOtjyrbAdJACCyybObUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750173890; c=relaxed/simple;
-	bh=Y8gxeEKFkYw0UIV/IY7FhDkAqzZ2xhiVyi4v6GxhZx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kjsD/6RDpyUtiunv9LuDqYbZhD13cm69hdUu6v7527TTYVOKj5zrybmglF63g9yi8akBmW62S4IM3jFL+1DlSmzPqyWsvXJ+4I6nWD8GDCx2cJM3NH/85gqwjMfC4QE3TD2VRi9F70tDMHudeblQdBOHOLhT1FeRLT6lBP51YNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aSZiIOGW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750173888;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H7t/M+XkM4gCOEnwp8IXnN3sMzd4/YJo/8sq4GFgliY=;
-	b=aSZiIOGWwYcXGZ1zK9ihIkDE/h8fofdl+a+ynYHMM9GOvLnWCikeKqFFxrkbc7Zg3bEiGe
-	mXn/mfz0mHuEjzm7tGeB5bgVkN3r7MFVlYjP+ynEw9IU1YAKfZ9W2llp1eJclrLZakSR0T
-	HozqA4LWB4hDXEdLwoFFWpL7v2vBp1M=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-6-1BCn5KlRNMm5c0kISSvxOw-1; Tue, 17 Jun 2025 11:24:46 -0400
-X-MC-Unique: 1BCn5KlRNMm5c0kISSvxOw-1
-X-Mimecast-MFC-AGG-ID: 1BCn5KlRNMm5c0kISSvxOw_1750173885
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4530ec2c87cso30158945e9.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:24:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750173885; x=1750778685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1750174293; c=relaxed/simple;
+	bh=rqsoueWdM1nAxX6i3TdFvPfMOP8bCIS3N3NGt3+7CO4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=PXEhFyUeOc/LRr7vkZutx+Xg7nGNYtTCmpBBjBcS4alwLx3K3T2iPP/lBg4fWTBt91aeDEsNkjdNmMx9PZkxjThQWHPeVTjIM1W0n0FSkRMo0ON9J9OqxwA3XN4Ma9AJwUfrnOKgPMeC16PeSKFBDdM32GGrhYMiqAlYjCxg4iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VmkrqHCs; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-236192f8770so41404835ad.0;
+        Tue, 17 Jun 2025 08:31:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750174291; x=1750779091; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H7t/M+XkM4gCOEnwp8IXnN3sMzd4/YJo/8sq4GFgliY=;
-        b=R6BSlPHLDoJGlEYwaCTTqP1PwNNoTIqVkuJOCsEVAl4ACvnNJfbx28tlSWgN8BHqUW
-         dTllEx7GR9Q54t8IqkkxG+bfypXJoWt889MmJPZ4akMSgLuAvvHUwthrXX0kSzbXYcxy
-         tQK9w6E2UFLQfFhKDL3fxf/CbHj0R+PtYPc+Udx8K3o7VGz0KwfX7ACxL8J30LV9gFCt
-         qdBOLMmRBioIB76UUC9BmKrhInx3NS/DL5UzjHvUMhLYAflLuPPLlQWi0UKGLd62NGvN
-         im7eMBJSJTF+a6Tbw81F9pCPvOhMC4BIYdUc4pPq/9KmOycmaCoE0fKaXlqgqzF1rq/J
-         1MSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbzfBAntGoak2UDTK3udtTAlC5DUDA7hQzDqHyVv86iJb4y10DXEm2xOTFYxp6En1cBgMta7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc24lHvGsYPI7M1EpjedB5XPcskdoCJaBdbXAahek9p72/a9XD
-	+MYzItBONPfyPBjzebyU1yjHDP+SbeGj7UCpuKaG1GD6AtD6uIGnfI/hyXeGeo7fuSaZYnjVocM
-	h0VXPBPOORx8MjLKHawoPwpX3wEEQrkr8c6zaZoPfukj7pl7FiOUAxgpLtw==
-X-Gm-Gg: ASbGncvgj7zMLfRydQIi6uObZMa3zkj1Q2vNaZJRDxeqg4VsoHxvbVh6nUN28/0upqj
-	ryZTgE83vgMM9LowlptRSy+YSh27ruChzbFGdaYjNQsOYJK23p/U3ZWdWBAXOn7AFXeZ+GOH2Yk
-	LGA5P/rxYjD7FSpJJLBZGlyz9CQsSDSKslnuiWnxBjqt9zjVIDNmM1EhOUKGXnZVZ83p9JLkG1b
-	UR45u4la7IhWDv3nXdUcPBKT2JHUXrK6DJ9ON3iwPCQOi4w3kz68Y3PShPy/Fcg/ghni0bIT0lf
-	1/z0CvY6wUozA9a1U+OGXBdcpxNo
-X-Received: by 2002:a05:600c:8b01:b0:441:d437:e3b8 with SMTP id 5b1f17b1804b1-4533cac9179mr118928555e9.23.1750173885151;
-        Tue, 17 Jun 2025 08:24:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsm6jVbEl2m7WR2NEEu2J8dhq+GSg2FL6XFR2OWFKAilrHXhJdlDK5TX0Ng08O9R8MuoDrjg==
-X-Received: by 2002:a05:600c:8b01:b0:441:d437:e3b8 with SMTP id 5b1f17b1804b1-4533cac9179mr118928105e9.23.1750173884572;
-        Tue, 17 Jun 2025 08:24:44 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.200.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b089b5sm14100994f8f.48.2025.06.17.08.24.41
+        bh=vONKiPDQFvOV04sWTQ5N/d0Nqz6jFzaBcRhqCM37kEI=;
+        b=VmkrqHCsYn2fcTK7aYzdHSBxb8fbolgMIe41ZDcwF/tJQ3gl+8mA5l7B8W3K7mrwwL
+         u9gFVCbUbIIph2dR+SpVxej76tYrptfjvXGNRtcEk4Jl5aRwge0r0QicA8Ia6sBzGULE
+         HPq0O5cEGeT7EiIVO000CH6yU8Z2TNQBTDsIDPWpV0JYvOIyFueRVwoEVw4+guDCOu97
+         HLC4W1pHJ2RH+nLrEkt4IJUr/CtBkNBAuGbuH6P7sRr7EsYmApm9f3x0iJydU2OvCHli
+         Y4XCT45nSoQRvqHxQvz8UootX0tt4iRs7NFC04/Phn/VyBjtaZP75xOTyuGAbN8t8nyO
+         kGsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750174291; x=1750779091;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vONKiPDQFvOV04sWTQ5N/d0Nqz6jFzaBcRhqCM37kEI=;
+        b=RBINeGF2SPSvirpS1Tzab4k1ENcw96h/HhqtXq5ywL8kS19N8tVYGXANOxzw1Po0Ft
+         2gWxnMc5K+b7AGfO5lP6w8EpaPt0EJ4ay3dsmcDRy4Zttu2GKE4oEaZrj8WG+0zGOWVD
+         fqVEtpStiTHB4IEgkDABVT0FpsKN2wBXP0Zf0mGm/uNid67sjAEA04OgJvPZhHffh3mX
+         snkNaG9NRj+iWqbvtyVxnQgkE/kD6tBSZe3GtBoKHTQPXSYKfy+JXZ99aVWZJ/vUFV5H
+         7yQIlT1wp3k/PaK69ik5VlY7UGequiDWuEEqpBdx4b+6JFED9nF079Ap48gBHCxsF5jN
+         iAsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWDVz1AQ+QXoHfLlmT79cKfiCyAq9nZ/pYtKkE45m0oTuMX1f3DfCZmkvfId8DHXSDe2FA=@vger.kernel.org, AJvYcCX8MuQC9l/fQQ5TIz4zzkxIOurCFK+5tfnxjm31n5CObYHc4ogYYj6pwfBWIA8hBxpKckUgeb6X@vger.kernel.org, AJvYcCX9G6okYyvV7slndFpgVimyvFXbHMqIJnewEWV5WmKfZUyNnckgt1VduopkVHP/UggLYRfn8jMEO37SUPBL@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhJ/Rc2EcnJsU7BxJhoIshD7n56PZeWz6FEkjEhCDjlPw8xaTW
+	QPTQciBWB6dVsrPcdhzXO6gBM+/3Me9sJCA2WUuQCy+kTwerOLJuUs9B
+X-Gm-Gg: ASbGncubfmHeLfLr3tOFaFh2ry158f2khWQnUZFiVLjR1oQ8RfSx1dqfzqgUsEm92rj
+	XnzfOtlLvW4Mx0/G1dIUhR75eysiJQn94plzCmrzR3sjPuvJqj6Qn+ROdrunmhl0nUfqqJZG/9/
+	4CM+XN11gbfjLvn+eKfWNFVgs+IEPYkG9AKsWRaNi80yH3XjWReaYEsrTB+Rp6jygi+449xlWwo
+	Gdw1jmnlw91hDzxwS4FtGi0QDhFqKsKixaIYGul+yXA2vYvAnbuN3QF8tay37pBZkCJtjBSR2uj
+	sOj9x4KZUogf2MKLL3Ow0UDd+Q2DrGjhNnlmIWDbupqWhet0gJjbPtv2cjjAee6A9NVHP7pUYbp
+	S+UzGSZV5
+X-Google-Smtp-Source: AGHT+IGYJo30uXrZf1g+2eeuGKvcXBXQtOlctiDYvFKA0bX2SqJAcMGk1oSS7fnVY2Di05z0qFETSw==
+X-Received: by 2002:a17:902:d48d:b0:236:71a5:4416 with SMTP id d9443c01a7336-23691eabe15mr41899625ad.20.1750174290520;
+        Tue, 17 Jun 2025 08:31:30 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de7839dsm81188535ad.127.2025.06.17.08.31.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 08:24:43 -0700 (PDT)
-Date: Tue, 17 Jun 2025 17:24:36 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>, berrange@redhat.com
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH RFC net-next v4 00/11] vsock: add namespace support to
- vhost-vsock
-Message-ID: <bgntskdmtb3usi6izcxywuhpvyldnoaxnomub4t7vfclv3xqhx@gjcs5ay4mkyt>
-References: <20250616-vsock-vmtest-v4-0-bdd1659c33fb@meta.com>
+        Tue, 17 Jun 2025 08:31:30 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	fupan.lfp@antgroup.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	leonardi@redhat.com,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v3 3/3] test/vsock: Add ioctl SIOCINQ tests
+Date: Tue, 17 Jun 2025 23:31:20 +0800
+Message-Id: <20250617153120.1348774-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <fnznqsbg56rfk7szjcprpo4mxy7e4patmj2u5yxbtj33dlj34w@7t5xylskewa5>
+References: <fnznqsbg56rfk7szjcprpo4mxy7e4patmj2u5yxbtj33dlj34w@7t5xylskewa5>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250616-vsock-vmtest-v4-0-bdd1659c33fb@meta.com>
+Content-Transfer-Encoding: 8bit
 
-CCing Daniel who commented v2.
+> On Tue, Jun 17, 2025 at 12:53:46PM +0800, Xuewei Niu wrote:
+> >Add SIOCINQ ioctl tests for both SOCK_STREAM and SOCK_SEQPACKET.
+> >
+> >The client waits for the server to send data, and checks if the SIOCINQ
+> >ioctl value matches the data size. After consuming the data, the client
+> >checks if the SIOCINQ value is 0.
+> >
+> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> >---
+> > tools/testing/vsock/vsock_test.c | 82 ++++++++++++++++++++++++++++++++
+> > 1 file changed, 82 insertions(+)
+> >
+> >diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+> >index f669baaa0dca..66bb9fde7eca 100644
+> >--- a/tools/testing/vsock/vsock_test.c
+> >+++ b/tools/testing/vsock/vsock_test.c
+> >@@ -1305,6 +1305,58 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
+> > 	close(fd);
+> > }
+> >
+> >+static void test_unread_bytes_server(const struct test_opts *opts, int type)
+> >+{
+> >+	unsigned char buf[MSG_BUF_IOCTL_LEN];
+> >+	int client_fd;
+> >+
+> >+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
+> >+	if (client_fd < 0) {
+> >+		perror("accept");
+> >+		exit(EXIT_FAILURE);
+> >+	}
+> >+
+> >+	for (int i = 0; i < sizeof(buf); i++)
+> >+		buf[i] = rand() & 0xFF;
+> >+
+> >+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
+> >+	control_writeln("SENT");
+> >+	control_expectln("RECEIVED");
+> >+
+> >+	close(client_fd);
+> >+}
+> >+
+> >+static void test_unread_bytes_client(const struct test_opts *opts, int type)
+> >+{
+> >+	unsigned char buf[MSG_BUF_IOCTL_LEN];
+> >+	int ret, fd;
+> >+	int sock_bytes_unread;
+> >+
+> >+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
+> >+	if (fd < 0) {
+> >+		perror("connect");
+> >+		exit(EXIT_FAILURE);
+> >+	}
+> >+
+> >+	control_expectln("SENT");
+> >+	/* The data has arrived but has not been read. The expected is
+> >+	 * MSG_BUF_IOCTL_LEN.
+> >+	 */
+> >+	ret = ioctl_int(fd, TIOCINQ, &sock_bytes_unread, MSG_BUF_IOCTL_LEN);
+> >+	if (ret) {
+> 
+> Since we are returning a value !=0 only if EOPNOTSUPP, I think we can 
+> just return a bool when the ioctl is supported or not, like for 
+> vsock_wait_sent().
 
-On Mon, Jun 16, 2025 at 09:32:49PM -0700, Bobby Eshleman wrote:
->This series adds namespace support to vhost-vsock. It does not add
->namespaces to any of the guest transports (virtio-vsock, hyperv, or
->vmci).
->
->The current revision only supports two modes: local or global. Local
->mode is complete isolation of namespaces, while global mode is complete
->sharing between namespaces of CIDs (the original behavior).
->
->If it is deemed necessary to add mixed mode up front, it is doable but
->at the cost of more complexity than local and global modes. Mixed will
->require adding the notion of allocation to the socket lookup functions
->(like vhost_vsock_get()) and also more logic will be necessary for
->controlling or using lookups differently based on mixed-to-global or
->global-to-mixed scenarios.
->
->The current implementation takes into consideration the future need for mixed
->mode and makes sure it is possible by making vsock_ns_mode per-namespace, as for
->mixed mode we need at least one "global" namespace and one "mixed"
->namespace for it to work. Is it feasible to support local and global
->modes only initially?
->
->I've demoted this series to RFC, as I haven't been able to re-run the
->tests after rebasing onto the upstreamed vmtest.sh, some of the code is
->still pretty messy, there are still some TODOs, stale comments, and
->other work to do. I thought reviewers might want to see the current
->state even though unfinished, since I'll be OoO until the second week of
->July and that just feels like a long time of silence given we've already
->all done work on this together.
->
->Thanks again for everyone's help and reviews!
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
->---
->Changes in v3:
->- add notion of "modes"
->- add procfs /proc/net/vsock_ns_mode
->- local and global modes only
->- no /dev/vhost-vsock-netns
->- vmtest.sh already merged, so new patch just adds new tests for NS
->- Link to v2:
->  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
+Will do.
 
-Thanks for this!
-FYI I'll be off for the next days, I hope to comment next week.
+> >+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
+> >+		goto out;
+> >+	}
+> >+
+> >+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
+> >+	// All date has been consumed, so the expected is 0.
+> 
+> s/date/data
+> 
+> Please follow the style of the file (/* */ for comments)
+
+Will do.
+
+> >+	ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
+> >+	control_writeln("RECEIVED");
+> 
+> Why we need this control barrier here?
+
+Nice catch! It is not necessary. Will remote it.
 
 Thanks,
-Stefano
+Xuewei
 
->
->Changes in v2:
->- only support vhost-vsock namespaces
->- all g2h namespaces retain old behavior, only common API changes
->  impacted by vhost-vsock changes
->- add /dev/vhost-vsock-netns for "opt-in"
->- leave /dev/vhost-vsock to old behavior
->- removed netns module param
->- Link to v1:
->  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
->
->Changes in v1:
->- added 'netns' module param to vsock.ko to enable the
->  network namespace support (disabled by default)
->- added 'vsock_net_eq()' to check the "net" assigned to a socket
->  only when 'netns' support is enabled
->- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
->
->---
->Bobby Eshleman (11):
->      selftests/vsock: add NS tests to vmtest.sh
->      vsock: a per-net vsock NS mode state
->      vsock: add vsock net ns helpers
->      vsock: add net to vsock skb cb
->      vsock: add common code for vsock NS support
->      virtio-vsock: add netns to common code
->      vhost/vsock: add netns support
->      vsock/virtio: add netns hooks
->      hv_sock: add netns hooks
->      vsock/vmci: add netns hooks
->      vsock/loopback: add netns support
->
-> MAINTAINERS                             |   1 +
-> drivers/vhost/vsock.c                   |  48 ++-
-> include/linux/virtio_vsock.h            |  12 +
-> include/net/af_vsock.h                  |  53 ++-
-> include/net/net_namespace.h             |   4 +
-> include/net/netns/vsock.h               |  19 ++
-> net/vmw_vsock/af_vsock.c                | 203 +++++++++++-
-> net/vmw_vsock/hyperv_transport.c        |   2 +-
-> net/vmw_vsock/virtio_transport.c        |   5 +-
-> net/vmw_vsock/virtio_transport_common.c |  14 +-
-> net/vmw_vsock/vmci_transport.c          |   4 +-
-> net/vmw_vsock/vsock_loopback.c          |   4 +-
-> tools/testing/selftests/vsock/vmtest.sh | 555 +++++++++++++++++++++++++++++---
-> 13 files changed, 843 insertions(+), 81 deletions(-)
->---
->base-commit: 8909f5f4ecd551c2299b28e05254b77424c8c7dc
->change-id: 20250325-vsock-vmtest-b3a21d2102c2
->
->Best regards,
->-- 
->Bobby Eshleman <bobbyeshleman@meta.com>
->
->
-
+> >+
+> >+out:
+> >+	close(fd);
+> >+}
+> >+
+> > static void test_stream_unsent_bytes_client(const struct test_opts *opts)
+> > {
+> > 	test_unsent_bytes_client(opts, SOCK_STREAM);
+> >@@ -1325,6 +1377,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
+> > 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
+> > }
+> >
+> >+static void test_stream_unread_bytes_client(const struct test_opts *opts)
+> >+{
+> >+	test_unread_bytes_client(opts, SOCK_STREAM);
+> >+}
+> >+
+> >+static void test_stream_unread_bytes_server(const struct test_opts *opts)
+> >+{
+> >+	test_unread_bytes_server(opts, SOCK_STREAM);
+> >+}
+> >+
+> >+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
+> >+{
+> >+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
+> >+}
+> >+
+> >+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
+> >+{
+> >+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
+> >+}
+> >+
+> > #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
+> > /* This define is the same as in 'include/linux/virtio_vsock.h':
+> >  * it is used to decide when to send credit update message during
+> >@@ -2051,6 +2123,16 @@ static struct test_case test_cases[] = {
+> > 		.run_client = test_stream_nolinger_client,
+> > 		.run_server = test_stream_nolinger_server,
+> > 	},
+> >+	{
+> >+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
+> >+		.run_client = test_stream_unread_bytes_client,
+> >+		.run_server = test_stream_unread_bytes_server,
+> >+	},
+> >+	{
+> >+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
+> >+		.run_client = test_seqpacket_unread_bytes_client,
+> >+		.run_server = test_seqpacket_unread_bytes_server,
+> >+	},
+> > 	{},
+> > };
+> >
+> >-- 
+> >2.34.1
+> >
 
