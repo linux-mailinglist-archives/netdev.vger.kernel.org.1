@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-198535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF68ADC964
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:31:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C277ADC97A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:33:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F4E07A7146
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:30:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CF843A23C7
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BFD1EDA3C;
-	Tue, 17 Jun 2025 11:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05CFB211A3C;
+	Tue, 17 Jun 2025 11:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X5XOKB7I"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WI9WNo5u"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE4B1459EA
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 11:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8B51EDA3C;
+	Tue, 17 Jun 2025 11:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750159889; cv=none; b=YLpULwrd3WyGqlXlhUz0F1rIc/O99Tr64Ie2IdUtriCFXp3wU+JsgxZgSeajXboXntAHr0aD6p6Lw81rtAHDbGVoETjh+i5vXpLQHzSz7EWMURGgfPEUFzWjp+UxIxs0xWQpuITy7h3bb82UDRhDMDQyU+Dp2jwP7nRgy1HdGlE=
+	t=1750160024; cv=none; b=olTcUWZLIApVob6RCIpGj/J/9XhMg1kF0hQepAYAmglAcMpHGZyLpLO5qb6CRlMTQnen+uJhciUPjr89BOpVnf2Wt2fT8hvhtmBclqtSPNhWSA8FMNE/UL5DwysAJ/39liUve/xjLupP5GVBTdGB34KoxlDMGImez+MhpSrrmso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750159889; c=relaxed/simple;
-	bh=CbtyhyV0vJi/H/XvLk3VNzZ26rtNJzm4aQ047PyL+KQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jF8tFvtV79Eu9HOBu6cc3yHdFl29EWB/zC6bVv3N/blfOFPuwuX3gICOQAagccZRJ/YF3+jvI11C73DUeJ192jQIeeruTcUcXosmGSqibyVVmVaQA7jQYZAUTjK3+ITKeJSVQ3txQ01MQ3Z+wkibIUmlvUillU+xaIPoevh6uQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X5XOKB7I; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750159887;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CbtyhyV0vJi/H/XvLk3VNzZ26rtNJzm4aQ047PyL+KQ=;
-	b=X5XOKB7Ig921PVhbUR/47raAY/jKj7zpNiY1uS67PJtUXz/iyLYsKVmjJ3G0d5EmlGgjWp
-	H3FNyHGvJTjUS3YUdFWXcBo64U47MqolhvXLCLRZRnpc5Dl2abCEKNSUgzfq0BiwbHR99W
-	DBYArD9tFCt046qVT3msUb+nNggWYGk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-359-eqNtu5pINqmTtdwGJ5bylQ-1; Tue,
- 17 Jun 2025 07:31:25 -0400
-X-MC-Unique: eqNtu5pINqmTtdwGJ5bylQ-1
-X-Mimecast-MFC-AGG-ID: eqNtu5pINqmTtdwGJ5bylQ_1750159884
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D439C19560B7;
-	Tue, 17 Jun 2025 11:31:23 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.64.166])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4269D19560A3;
-	Tue, 17 Jun 2025 11:31:21 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  Ilya Maximets
- <i.maximets@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Simon Horman <horms@kernel.org>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Gal
- Pressman <gal@nvidia.com>
-Subject: Re: [ovs-dev] [PATCH net] openvswitch: Allocate struct
- ovs_pcpu_storage dynamically
-In-Reply-To: <20250613123629.-XSoQTCu@linutronix.de> (Sebastian Andrzej
-	Siewior's message of "Fri, 13 Jun 2025 14:36:29 +0200")
-References: <20250613123629.-XSoQTCu@linutronix.de>
-Date: Tue, 17 Jun 2025 07:31:14 -0400
-Message-ID: <f7tqzzipptp.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1750160024; c=relaxed/simple;
+	bh=jrgGdbP5apEQcDQ6yICK0dFB5pKV+9fGdc5AglGKEA0=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=S1J/M9lt70DKaq/xGCYKnELbMGvKmg1O2ShhXGrg8dktOd+iP2kDucQIaUqJM6SfSgD51mbrkKU5FdViEsYdEpi0x9wweh3sVsQVesq7xieNIAO3LK+p5Qg6GYrwuhdQuyAyvFmJCR0Lt4/yKdo0KI4cW8odPK6Mr4ZIw9tZ2Io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WI9WNo5u; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 16A1A2117F96; Tue, 17 Jun 2025 04:33:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 16A1A2117F96
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1750160023;
+	bh=mKTNlW0AkzZv+T51lkhj5+K+zcs0xhJdeNPYEm/GAs4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WI9WNo5uIStGKShk9LQnljONwGpcrCZKMnaGmNxfChSOW/r5f9cGRuHrC/9+sBzH2
+	 ZpplGvcYcJ9VgOFhXKrNgnV/aoBWGc2EdulBjkzYtNL1RgQKiZaFpzKkSU31+G9A83
+	 F+0Hdo8jKAOMWOYkGkiu+fa0x+CgAgTvwlDy5OeM=
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>
+Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: [PATCH net-next] net: mana: Set tx_packets to post gso processing packet count
+Date: Tue, 17 Jun 2025 04:33:41 -0700
+Message-Id: <1750160021-24589-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+Allow tx_packets and tx_bytes counter in the driver to represent
+the packets transmitted post GSO processing.
 
-> PERCPU_MODULE_RESERVE defines the maximum size that can by used for the
-> per-CPU data size used by modules. This is 8KiB.
->
-> Commit 035fcdc4d240c ("openvswitch: Merge three per-CPU structures into
-> one") restructured the per-CPU memory allocation for the module and
-> moved the separate alloc_percpu() invocations at module init time to a
-> static per-CPU variable which is allocated by the module loader.
->
-> The size of the per-CPU data section for openvswitch is 6488 bytes which
-> is ~80% of the available per-CPU memory. Together with a few other
-> modules it is easy to exhaust the available 8KiB of memory.
->
-> Allocate ovs_pcpu_storage dynamically at module init time.
->
-> Reported-by: Gal Pressman <gal@nvidia.com>
-> Closes:
-> https://lore.kernel.org/all/c401e017-f8db-4f57-a1cd-89beb979a277@nvidia.com
-> Fixes: 035fcdc4d240c ("openvswitch: Merge three per-CPU structures into one")
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->
-> Gal, would you please be so kind and check if this works for you?
->
+Currently they are populated as bigger pre-GSO packets and bytes
 
-I was hoping Gal would have gotten back by now.
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index e68b8190bb7a..c3b6478cb1d3 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -251,10 +251,10 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	struct netdev_queue *net_txq;
+ 	struct mana_stats_tx *tx_stats;
+ 	struct gdma_queue *gdma_sq;
++	int err, len, num_gso_seg;
+ 	unsigned int csum_type;
+ 	struct mana_txq *txq;
+ 	struct mana_cq *cq;
+-	int err, len;
+ 
+ 	if (unlikely(!apc->port_is_up))
+ 		goto tx_drop;
+@@ -407,6 +407,7 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	skb_queue_tail(&txq->pending_skbs, skb);
+ 
+ 	len = skb->len;
++	num_gso_seg = skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : 1;
+ 	net_txq = netdev_get_tx_queue(ndev, txq_idx);
+ 
+ 	err = mana_gd_post_work_request(gdma_sq, &pkg.wqe_req,
+@@ -431,10 +432,13 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	/* skb may be freed after mana_gd_post_work_request. Do not use it. */
+ 	skb = NULL;
+ 
++	/* Populated the packet and bytes counters based on post GSO packet
++	 * calculations
++	 */
+ 	tx_stats = &txq->stats;
+ 	u64_stats_update_begin(&tx_stats->syncp);
+-	tx_stats->packets++;
+-	tx_stats->bytes += len;
++	tx_stats->packets += num_gso_seg;
++	tx_stats->bytes += len + ((num_gso_seg - 1) * gso_hs);
+ 	u64_stats_update_end(&tx_stats->syncp);
+ 
+ tx_busy:
+
+base-commit: 8909f5f4ecd551c2299b28e05254b77424c8c7dc
+-- 
+2.34.1
 
 
