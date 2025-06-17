@@ -1,181 +1,216 @@
-Return-Path: <netdev+bounces-198809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D98FADDE4C
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:57:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D04F4ADDE52
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:59:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 485423B907A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:56:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8C2F172885
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266E429293F;
-	Tue, 17 Jun 2025 21:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C15293C57;
+	Tue, 17 Jun 2025 21:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GuPdFl+G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZ1LW146"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E0B288CBE
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382B1293B44;
+	Tue, 17 Jun 2025 21:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750197421; cv=none; b=AaEPBv7H2+mrj+B2XSVZ08NXMRBzGaZCfhy4c/r/MwFi6hg3pgW4/em4lioATbIoVsKie9kdPgcHkjrQ2Y/7oCHf3iYC2kYCF+Tx/+1w/uDwrstdOkl61npyw7WwDh503R75cJAy/CK/ZbMaIObiNBMNWB22PKOktPli93M7lRQ=
+	t=1750197586; cv=none; b=qDDaddEM0b7MpaKJUh3tGmcbX2Z2U4dkroT4NT9ksPlsceiHhpZHo9X3HuIgcwsxK5g998K0BhQVlFexyluBuD8f++dvjDRNxXZldsqofWM1j3RmkPtiNm7VdlcWiYPfgEZ0m2x+8fLbibLtmxORD3cFrUGzb6bC/YFektx8GxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750197421; c=relaxed/simple;
-	bh=Kp9DI+2v2LShpJweRToRLsuNXfdRv2B57tjdewX2aF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PgEa6JxNC8kwJYi2UaDR2jyKnbQAKE8Y+cPEyiSiN3XappD0mBUxWNZNhWgMz4amyUKFZ219Q+OZe9Rggn472VFUJoZYWplID8RKzd6uPRDNGUtx9mrNxcK+VI4/4gtX5ENl14yYdPMhzRj4Adin+bl23WwTC3TfNXNjjk6md14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GuPdFl+G; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750197418;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8MAberZB82Z3SmBMhm5B8kfRhyx/yzqVg3f57rHIguU=;
-	b=GuPdFl+GD7Q3qeNT28yDMcDUOssUSUpk0KC11paSI2J535vObkhG2ocg3Kfxd6uyflOS/d
-	DFMQvr23Mx+dg3Zzz9vYk6wSu/SDyoawoKo2LqwAR3u/sVumGYjSn0XY4cNKsj/7J33l+5
-	wIfWAihfrsDE/ERcYLPSariRJKqHzqU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472-bJLoURv0OW6013eF0sGQBw-1; Tue, 17 Jun 2025 17:56:56 -0400
-X-MC-Unique: bJLoURv0OW6013eF0sGQBw-1
-X-Mimecast-MFC-AGG-ID: bJLoURv0OW6013eF0sGQBw_1750197415
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4e9252ba0so3132933f8f.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:56:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750197415; x=1750802215;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8MAberZB82Z3SmBMhm5B8kfRhyx/yzqVg3f57rHIguU=;
-        b=up8l/6Ivz0mZUHzFPeLCi3+FbATZth0SNRjj9BBnvCRqIi4Wn8oRMzEo4jS0S9dwtM
-         UtoysIkqegcffX2exwDHdD1AWxpD5yZLOuuZc4NaMjJe2F3y9RKiArZVNTcUbP6KjGe1
-         EVAt8Q1uKrhMw9POcBC3qNEmibJN1ZvxAPHHK9VmGtlmG04AlAcNwMCtc2DV+tfC4IHF
-         WB//Pis2YU1r5om073HwFMArrRq3YVNmNFJstNm/ZvGwnqPdNjrYsNfgZL287nnXJ4pU
-         iyZdklL4rSVPfzaq3bGdjAxYsAoPXvQk1SX41+Jein2ogUjRx4HkcOZE4jdlOfxea7C8
-         PrXw==
-X-Gm-Message-State: AOJu0YwXJ5AbIsmCZFYENrLk9GrkBe9ktwO9fvwYhoX5WsXrzpmhUSOz
-	kUDAZknM3TqAamXtoZF+qrqFbWC9WZSR4hRZOT/Nr2pK28xwvQU8qbtW6xq0z0Px+/6vpNsKe0S
-	ccS8J4pByZpWEpLsVrNR7NRQGm3GL8l9Axx77FhPUmHlRoEAA8ZTy4zNqdw==
-X-Gm-Gg: ASbGncu8YcHdiGvfrYN2t1P/3zdmW9b6ttQ7ELPpTGrU0uEX2I8JKNARJjxQXKIhiLJ
-	0NeUZFXGmqqcYimtZaH/fDMCd/aPFov3RcXLk6rwJRy7c2GkB9QImBZoVsctmWMidgk+a9mdpq+
-	HBI5xd33zBfbTXXIFP1pJnvDbLEj1HzCm5/tsom0U1+ernXdYk6dY7b6nyZu0DYzHxbxrzAhWQ2
-	4Dg7HiHHWthLWIPo5Et9T60/aHNmZ4I00VoTvWLe4DW8lsL6EX9+EWwzxLMiqmzU7Hl5buLoZ4y
-	E/BT2W8MvNVIeu9uoDg/+pWHVky2P0zwcllDfzkAMzxRChqN16mhxsJLXlZGeYr1kxhdoQ==
-X-Received: by 2002:a05:6000:25e9:b0:3a4:d994:be4b with SMTP id ffacd0b85a97d-3a572367d55mr11055136f8f.1.1750197414923;
-        Tue, 17 Jun 2025 14:56:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHiebOmEYk+uqov68RgYSGzETTCjeLdec14dBe0riZts1tKLupIn7pTXi12Ct4usn7f1R5b6g==
-X-Received: by 2002:a05:6000:25e9:b0:3a4:d994:be4b with SMTP id ffacd0b85a97d-3a572367d55mr11055124f8f.1.1750197414493;
-        Tue, 17 Jun 2025 14:56:54 -0700 (PDT)
-Received: from localhost (net-130-25-105-15.cust.vodafonedsl.it. [130.25.105.15])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8c4e8sm184972735e9.3.2025.06.17.14.56.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 14:56:53 -0700 (PDT)
-Date: Tue, 17 Jun 2025 23:56:53 +0200
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linyunsheng@huawei.com
-Subject: Re: [RFC]Page pool buffers stuck in App's socket queue
-Message-ID: <aFHkpVXoAP5JtCzQ@lore-desk>
-References: <20250616080530.GA279797@maili.marvell.com>
+	s=arc-20240116; t=1750197586; c=relaxed/simple;
+	bh=XYYXrTGU6D3/slr86eXxan/EdIa14xem8KtqhrpPTdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jp6pBlFcD4jCEfQTStnw0WxfULLTJSxKVksNe2ynH50iACJhINh/jmJ5HT1bmvg+KDQLubkwmfpZgsUnOa8UHGxkQiaXXs/ePtPJQt/xa3qwFI2jwI43HQkKfAHtVolBGX2AuW8eAgvWUhL2DX/6uA3mbYCAFzV58ELD2TgFRTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZ1LW146; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B91AC4CEE3;
+	Tue, 17 Jun 2025 21:59:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750197586;
+	bh=XYYXrTGU6D3/slr86eXxan/EdIa14xem8KtqhrpPTdo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fZ1LW146tDdoprbiGo+BovJUk3VRbDRpcjyyXK8ZzNKRw/IcrBQ84Do6wzfuNXQ76
+	 /cx48bywafNv607RfeubQVmth/fjS2hmAePpPmj/HJfPUWLlgbhs5oziEO6675QbD6
+	 UjCiwOCwRvZkLTIq7JIxVtbOeTY5EU8TrZEBxgQoFi3Ymj3l3zq/h+VD0bx3F5owXa
+	 BybszcJw5dYx1NWhUDqZy83RBr0wdimPID5obNIeBMsMeClYnjEFTWgV89JxKfUB60
+	 fjWb6uQWC8SGX4JA8ThFRDbKyNVeRgZE+SQSqR9R1f3R1alHqO+tpsY9EAaeDoGI/u
+	 1iR5qcRy74QNg==
+Date: Tue, 17 Jun 2025 14:59:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: Chris Snook <chris.snook@gmail.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ingo Molnar
+ <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jeff Garzik
+ <jeff@garzik.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ethernet: alt1: Fix missing DMA mapping tests
+Message-ID: <20250617145944.10d444f4@kernel.org>
+In-Reply-To: <20250616140246.612740-2-fourier.thomas@gmail.com>
+References: <20250613074356.210332b1@kernel.org>
+	<20250616140246.612740-2-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oKdl6g1Fns34EoZE"
-Content-Disposition: inline
-In-Reply-To: <20250616080530.GA279797@maili.marvell.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon, 16 Jun 2025 15:59:55 +0200 Thomas Fourier wrote:
+> According to Shuah Khan[1], all `dma_map()` functions should be tested
+> before using the pointer.  This patch checks for errors after all
+> `dma_map()` calls.
 
---oKdl6g1Fns34EoZE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The link and reference to Shuah's presentation is not necessary.
+Just say that the DMA functions can fail so we need the error check.
+ 
+> In `atl1_alloc_rx_buffers()`, when the dma mapping fails,
+> the buffer is deallocated ans marked as such.
+> 
+> In `atl1_tx_map()`, the previously dma_mapped buffers are de-mapped and an
+> error is returned.
+> 
+> [1] https://events.static.linuxfound.org/sites/events/files/slides/Shuah_Khan_dma_map_error.pdf
+>
+> Fixes: f3cc28c79760 ("Add Attansic L1 ethernet driver.")
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 
-> Hi,
->=20
-> Recently customer faced a page pool leak issue And keeps on gettting foll=
-owing message in
-> console.
-> "page_pool_release_retry() stalled pool shutdown 1 inflight 60 sec"
->=20
-> Customer runs "ping" process in background and then does a interface down=
-/up thru "ip" command.
->=20
-> Marvell octeotx2 driver does destroy all resources (including page pool a=
-llocated for each queue of
-> net device) during interface down event. This page pool destruction will =
-wait for all page pool buffers
-> allocated by that instance to return to the pool, hence the above message=
- (if some buffers
-> are stuck).
->=20
-> In the customer scenario, ping App opens both RAW and RAW6 sockets. Even =
-though Customer ping
-> only ipv4 address, this RAW6 socket receives some IPV6 Router Advertiseme=
-nt messages which gets generated
-> in their network.
->=20
-> [   41.643448]  raw6_local_deliver+0xc0/0x1d8
-> [   41.647539]  ip6_protocol_deliver_rcu+0x60/0x490
-> [   41.652149]  ip6_input_finish+0x48/0x70
-> [   41.655976]  ip6_input+0x44/0xcc
-> [   41.659196]  ip6_sublist_rcv_finish+0x48/0x68
-> [   41.663546]  ip6_sublist_rcv+0x16c/0x22c
-> [   41.667460]  ipv6_list_rcv+0xf4/0x12c
->=20
-> Those packets will never gets processed. And if customer does a interface=
- down/up, page pool
-> warnings will be shown in the console.
->=20
-> Customer was asking us for a mechanism to drain these sockets, as they do=
-nt want to kill their Apps.
-> The proposal is to have debugfs which shows "pid  last_processed_skb_time=
-  number_of_packets  socket_fd/inode_number"
-> for each raw6/raw4 sockets created in the system. and
-> any write to the debugfs (any specific command) will drain the socket.
->=20
-> 1. Could you please comment on the proposal ?
-> 2. Could you suggest a better way ?
->=20
-> -Ratheesh
+Please don't send the new versions in reply to old ones.
+For those of us who use their inbox as a FIFO of pending submissions
+it messes up ordering.
 
-Hi,
+> diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
+> index cfdb546a09e7..dd0e01d3a023 100644
+> --- a/drivers/net/ethernet/atheros/atlx/atl1.c
+> +++ b/drivers/net/ethernet/atheros/atlx/atl1.c
+> @@ -1869,6 +1869,14 @@ static u16 atl1_alloc_rx_buffers(struct atl1_adapter *adapter)
+>  		buffer_info->dma = dma_map_page(&pdev->dev, page, offset,
+>  						adapter->rx_buffer_len,
+>  						DMA_FROM_DEVICE);
+> +		if (dma_mapping_error(&pdev->dev, buffer_info->dma)) {
+> +			buffer_info->alloced = 0;
+> +			buffer_info->skb = NULL;
+> +			buffer_info->dma = 0;
 
-this problem recall me an issue I had in the past with page_pool
-and TCP traffic destroying the pool (not sure if it is still valid):
+maybe you could move the map call a little further up, before all the
+buffer_info fields are populated? So we dont have to clean them up?
 
-https://lore.kernel.org/netdev/ZD2HjZZSOjtsnQaf@lore-desk/
+> +			kfree_skb(skb);
+> +			adapter->soft_stats.rx_dropped++;
+> +			break;
+> +		}
+>  		rfd_desc->buffer_addr = cpu_to_le64(buffer_info->dma);
+>  		rfd_desc->buf_len = cpu_to_le16(adapter->rx_buffer_len);
+>  		rfd_desc->coalese = 0;
+> @@ -2183,8 +2191,8 @@ static int atl1_tx_csum(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  	return 0;
+>  }
+>  
+> -static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+> -	struct tx_packet_desc *ptpd)
+> +static int atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+> +		       struct tx_packet_desc *ptpd)
+>  {
+>  	struct atl1_tpd_ring *tpd_ring = &adapter->tpd_ring;
+>  	struct atl1_buffer *buffer_info;
+> @@ -2194,6 +2202,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  	unsigned int nr_frags;
+>  	unsigned int f;
+>  	int retval;
+> +	u16 first_mapped;
+>  	u16 next_to_use;
+>  	u16 data_len;
+>  	u8 hdr_len;
+> @@ -2201,6 +2210,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  	buf_len -= skb->data_len;
+>  	nr_frags = skb_shinfo(skb)->nr_frags;
+>  	next_to_use = atomic_read(&tpd_ring->next_to_use);
+> +	first_mapped = next_to_use;
+>  	buffer_info = &tpd_ring->buffer_info[next_to_use];
+>  	BUG_ON(buffer_info->skb);
+>  	/* put skb in last TPD */
+> @@ -2216,6 +2226,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
+>  						offset, hdr_len,
+>  						DMA_TO_DEVICE);
+> +		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
+> +			goto dma_err;
+>  
+>  		if (++next_to_use == tpd_ring->count)
+>  			next_to_use = 0;
+> @@ -2242,6 +2254,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  								page, offset,
+>  								buffer_info->length,
+>  								DMA_TO_DEVICE);
+> +				if (dma_mapping_error(&adapter->pdev->dev,
+> +						      buffer_info->dma))
+> +					goto dma_err;
+>  				if (++next_to_use == tpd_ring->count)
+>  					next_to_use = 0;
+>  			}
+> @@ -2254,6 +2269,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
+>  						offset, buf_len,
+>  						DMA_TO_DEVICE);
+> +		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
+> +			goto dma_err;
+>  		if (++next_to_use == tpd_ring->count)
+>  			next_to_use = 0;
+>  	}
+> @@ -2277,6 +2294,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  			buffer_info->dma = skb_frag_dma_map(&adapter->pdev->dev,
+>  				frag, i * ATL1_MAX_TX_BUF_LEN,
+>  				buffer_info->length, DMA_TO_DEVICE);
+> +			if (dma_mapping_error(&adapter->pdev->dev,
+> +					      buffer_info->dma))
+> +				goto dma_err;
+>  
+>  			if (++next_to_use == tpd_ring->count)
+>  				next_to_use = 0;
+> @@ -2285,6 +2305,22 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+>  
+>  	/* last tpd's buffer-info */
+>  	buffer_info->skb = skb;
+> +
+> +	return 0;
+> +
+> + dma_err:
+> +	while (first_mapped != next_to_use) {
+> +		buffer_info = &tpd_ring->buffer_info[first_mapped];
+> +		dma_unmap_page(&adapter->pdev->dev,
+> +			       buffer_info->dma,
+> +			       buffer_info->length,
+> +			       DMA_TO_DEVICE);
+> +		buffer_info->dma = 0;
+> +
+> +		if (++first_mapped == tpd_ring->count)
+> +			first_mapped = 0;
+> +	}
+> +	return -ENOMEM;
+>  }
+>  
+>  static void atl1_tx_queue(struct atl1_adapter *adapter, u16 count,
+> @@ -2419,7 +2455,8 @@ static netdev_tx_t atl1_xmit_frame(struct sk_buff *skb,
+>  		}
+>  	}
+>  
+> -	atl1_tx_map(adapter, skb, ptpd);
+> +	if (atl1_tx_map(adapter, skb, ptpd))
+> +		return NETDEV_TX_BUSY;
 
-Do you have ongoing TCP flows?
+You should drop the packet. Occasional packet loss is better than
+having a packet that we can't map for some platform reasons blocking
+the queue
 
-Regards,
-Lorenzo
-
->=20
-
---oKdl6g1Fns34EoZE
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFHkpAAKCRA6cBh0uS2t
-rJciAP4kr3mXRHurFuZcWturaTMGISYAguYrukCV8U9yWHjsAgD+MxhlvONcverh
-W/NGSNtKhX38Yr5Ys0hqEb1xMzSGjgI=
-=Y9Ae
------END PGP SIGNATURE-----
-
---oKdl6g1Fns34EoZE--
+>  	atl1_tx_queue(adapter, count, ptpd);
+>  	atl1_update_mailbox(adapter);
+>  	return NETDEV_TX_OK;
 
 
