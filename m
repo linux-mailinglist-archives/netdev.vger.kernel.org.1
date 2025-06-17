@@ -1,90 +1,89 @@
-Return-Path: <netdev+bounces-198371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E4AADBE71
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B31BDADBE75
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1778B3B8B04
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:12:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE6E83AF941
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8DF1A5B94;
-	Tue, 17 Jun 2025 01:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A341A316C;
+	Tue, 17 Jun 2025 01:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdKxWxtw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpwsPJFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44BD19CC3A;
-	Tue, 17 Jun 2025 01:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD9115B0EC;
+	Tue, 17 Jun 2025 01:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750122645; cv=none; b=f6+L/FbHp2l7efZUg5rAKKp1uqKuGlJBv7TkU2d4YRe8jUGe1hS3dPtSDayCfeRCbGojz+39bf1au1mAadFjOPUsC3rDIZ6tvwCgulW6ZMPXYumqfq4ukFm1qXQEjnBvZFVs7zr3loxAFIjSCYIdwE7chxs/OwzsVrF+XmsmksE=
+	t=1750122694; cv=none; b=ZPArqeDPURRnOY471mmjsy2yLRftdhu9oo/aGtnVO8Pqyiu4tww/XHyq/5T0S2UndGAFZGxLnP2HS6iIGpx+PI9s8dWzKLg7haxw3TIoI6OktUzjsLr9I+Hy6ME4JYNTaAAP9dSQ9+dQNfEl8iuxxJgE4rGxAnN3XZ8IOwxyfUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750122645; c=relaxed/simple;
-	bh=fT1xXHNwQD5SOpaUNKqqlhoPF1dWwLBuO1DYC7Fxtag=;
+	s=arc-20240116; t=1750122694; c=relaxed/simple;
+	bh=VDirG6A/g/TEdXqnGoFj1/CsBbPQO6xAuFa27Ep85Dk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cqWwQK+AcizlvQdFvipSOhHzBsvB3KhdcRZWC+4kv3ANW9ZYZj8X80AEO16gX/HC/rzgWJgs6FVc3iQFOGuQmFcBxs5KT+oE6PxPoFhy6F9Qs5PMzwm1VKWhRSya+ykp9OO/ygeCYgjXOlIx2oSYNfL6/JJNbxn7BWL4g/IXbqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YdKxWxtw; arc=none smtp.client-ip=209.85.210.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=nGMlSLqByEIaSm+BKGFfLEurd0d+3+ebN1z3vCzoyp1UrRyH9iePJAn4Xu9p88q456K5koPCJ/j3yMmMkJUQmi+EO4QvsaSU9Exge7WABcC6Oh/+XHCqt86QcvZDL2THIrWuPTI254Ty1zD8ZemqlTtUBWmweXIBa8XBrgmsKIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpwsPJFT; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-748c3afd0dbso755277b3a.0;
-        Mon, 16 Jun 2025 18:10:43 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3134c67a173so6029266a91.1;
+        Mon, 16 Jun 2025 18:11:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750122643; x=1750727443; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750122692; x=1750727492; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xdCG7GiKOa8Kksg/uV4W6JGwK3wPZmMq/t9MwV0TaY8=;
-        b=YdKxWxtwAevjII4ABMqzCoy+xDXdGKsIUmfRIUjFvvDmLSPIXXaQd4gUbnDxriajK1
-         aOs7cI2NJSgcTVs0OBRFBMkFgDJIjx6zK3ANNOO/WTDx5LfLp/1GyEQF5eB/61+5jcVT
-         83t30MMVvXimq4celhFN4EqFCDc+WfFZfl9+rACEXAkyLd949I+N6dU5usP8kBblwbb5
-         40ufvG4m+n8jKNWOjFWFEiql8Pd3kiQFVB+GG/FRxlXA4Jl9kyQciZ9nWk8WoetVNFoD
-         85PV7FIsN6zH+vAW5eetQZPxrpFWDkU/J4fwbnsMnmG/JKtNf6216/eyBiqYqNqFjkXM
-         gnJw==
+        bh=MBe6mnVPEoty7chluPQ6x86Gyik+l7YUJhx9KWhanMU=;
+        b=mpwsPJFTfjC2wk7nzDfELHuZnOJZKOtzCWApNPRYq6osnXFnAZlUHOlqyMaWXZXP7E
+         T4A90ksE4OTBOY4Z7uFo7ZcJh7w3h3ikBrl11ssYIy/IOjSEZyQ6qZGBNAkiAJ5XPQEc
+         YC44kVM12v9sfjcHFX3IfzuAOUMZYo9HuvtO7KGsggg4W+eJXRWXCROavB/5En2/SMZa
+         8TunDxPOzM5NhFKQQ0ZvfxiW/LWSuZNv9xTOJTCF6p2dn9CWLD93p+hEc4VD9sosoutZ
+         aPpBf5tAzR0H31+jrnV9iz7mEgpkMXrWkaX7cZ3x0NLQIkHnWwS0LgfdmQ3TR48DnJpJ
+         JHaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750122643; x=1750727443;
+        d=1e100.net; s=20230601; t=1750122692; x=1750727492;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xdCG7GiKOa8Kksg/uV4W6JGwK3wPZmMq/t9MwV0TaY8=;
-        b=TrARs/YV19YZK10b6QWx2sIwSDHhyO51Fi6u7iyt7sb2UXvoXGfnY5g4mI35tdAg1D
-         gVzzU48JNuWO7phbmDwVLx81SqrarEIaEX1Ngt0XHYcWA/RtFCqQ16ufMyCyqY8mQ+VN
-         rjtEAtKRcoGgCY77T/SEGPjkddv5NQWo7xUs6B5TdHRRM4YMf28QLFfZHNTd4qNHJzbV
-         jtrVFzMOQh5y7zZuR8/Wh/VQCr6n091OXP+VYVrxW6PJqHEwR5j7KoXZOr0dI01nfWGi
-         rmTjci+MUo+4YOLZdPUny3qiIvnG6BKIIan1s/zFXA966mfAbkP+WIW7PY5wmqtAoK1K
-         16ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVpRUCGpuGrsfDD6r6s4ajdtL/NgeHm+SJdgtl6pvjpophtvBKaRH7fZ654zGez/BMeEQTI6m24UG4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPdZ4XvsfOhOLyFs1REqnbK1+zTRmZ44ywt3wryC6POkZpIap0
-	tMtIGJgdir9Rkq7tDzyvizXHQ5H3sWjPLLLtFF30rkCB8Jibtc6t8ZI=
-X-Gm-Gg: ASbGncuZIw4AMLALJEC1Vqjts/U6y+ZpXl1yj2BBVHvAw5Xy/KuUW7JlIfarLecPFK0
-	8rPfElq/IGhiTblUfm+sxdjXlbg/iIRxV92AoSNmhQAzdFMqQoLgOwCE3xEAIy7iLS/op/6VDQE
-	gjeW4vLEtp7BtUomLkpT5tRusl0t4YXQ2H6HP7cDQy4b5r6SKHeckJCCDqVg4SCxdePg6BIZvW0
-	sB0fTGivbyO2oNARy1cix2OfGGCEWTdcu6v3c/URVToDLSxvY6vXgzspPLlRLPBh0qLm/0oicnw
-	B4Iet8A/xNTHyJzr4SUcpGbyptkEgwjUE3k9+/u1yxh++KfG8dCIgz1/yLxUaLzj18UyIaWmT2M
-	t8+2uO6YNqZjgS7MIpB/95JE=
-X-Google-Smtp-Source: AGHT+IH3wooPtQRQ7+Atp8Y8bDiCDFHOOMUJuevw+XdayNuEvKHxK3WB5inEZi/1Pvx032/2YdelVQ==
-X-Received: by 2002:a05:6a00:806:b0:742:3fe0:8289 with SMTP id d2e1a72fcca58-7489cfc5518mr16972640b3a.20.1750122642853;
-        Mon, 16 Jun 2025 18:10:42 -0700 (PDT)
+        bh=MBe6mnVPEoty7chluPQ6x86Gyik+l7YUJhx9KWhanMU=;
+        b=emNFYSsLfBW0SCL/wSr5CBdQDUZ+tkfBI19uOPWiQIdlQE0OMoi3wRc5ukGCwqN1az
+         n2dbSfcdyFeiowOfNFMKknjhBtk1hnEdea/5SG0iJkPN89RoQTezCkHIJyW401cNJ3GK
+         aQWiNXmhhlTmu4BoUI97fz5h/hBLRXEOGHEd8+8dUGDdkaSwcbq5VBLXN7Wskq7H2Lm0
+         e4DU4d8HBEK2G9Ik3GwdAP7/23cCMYoqQxdPbQSORC+GXO1DpDKw3Cqw7hrKxyPvBfzJ
+         5DbWO0bemmvbpQY4A0+t5D1O9ObsKtidoTa7iYfHiaoulZgSSzuxLgI903v5j0BMxQm1
+         G0Qg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOWETUQZZCKohg+uaS0rEhsPolAVOMPPtF0yQU98/D8KgaKUK7t+YMlbeXDraXK4SyhrPRVOZ8@vger.kernel.org, AJvYcCXaWACI6US7Yz/G/kEl/D+cUK48KtceZS9BF7laSWRJlDuupfqAj+ONVZEGjqu8EFNwiDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4IyTeoGZvNspekHLRjN28RlgCjGQXbBBndcZARkRRE98a/I+P
+	P8X7DOXBO7sDwnA//vEvedwwMPgS6VkIwi42kbYKujHOrJESOudaEPA=
+X-Gm-Gg: ASbGnctr9l8Nd5EVNqxRt9Z4yQNpcReA3ewfJ+T3+xe+KzcdPFV/zvocV9Dm8qPExBK
+	J8RHfgONw/Ll08LGoY4HwTJkGDuwq8Qw1+S13B8Zn3/5MYOtoaRuM5cww0LjouKsFhepUuorM5+
+	LXVlJG1tD1uhjlGW5dDXKL/6b5zXVmlxXDgvrhdoL1A8CC9E4AKSLn2d2iTGioykTaitHnfnhrd
+	7RTxakHxrZvifX/X3WO7AqPFaNJ8PlBQX3z6kfEDy5ip7U5P1E5Ode4RjyKtLcnsl4n0h8n1LvO
+	wVar/SGwTLNIDPKVCCJraMo7avQ/vag5hTtMxhw7lXfn2jajj1jquBriPSUR8klpr49W2bkuYg2
+	e8KrYhH48ga6oXmJKw3lDNVw=
+X-Google-Smtp-Source: AGHT+IFzPQDRIGM5kXz/uPr8WOIkUly3GXBqmdKT7BP8Ta0SSrkDREhdVM/Lq840MeRMt3Hk/BFdAg==
+X-Received: by 2002:a17:90b:3a4b:b0:311:c970:c9c0 with SMTP id 98e67ed59e1d1-313f1cd6841mr15161613a91.22.1750122692422;
+        Mon, 16 Jun 2025 18:11:32 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7488ffecccesm7545059b3a.5.2025.06.16.18.10.42
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-313c1bcbb6dsm9395479a91.6.2025.06.16.18.11.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 18:10:42 -0700 (PDT)
-Date: Mon, 16 Jun 2025 18:10:41 -0700
+        Mon, 16 Jun 2025 18:11:32 -0700 (PDT)
+Date: Mon, 16 Jun 2025 18:11:31 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hangbin Liu <liuhangbin@gmail.com>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] bonding: Remove support for use_carrier = 0
-Message-ID: <aFDAkS3VUgHwxxr6@mini-arch>
-References: <1922517.1750109336@famine>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
+Message-ID: <aFDAwydw5HrCXAjd@mini-arch>
+References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,40 +92,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1922517.1750109336@famine>
+In-Reply-To: <20250617002236.30557-1-kerneljasonxing@gmail.com>
 
-On 06/16, Jay Vosburgh wrote:
-> 	 Remove the ability to disable use_carrier in bonding, and remove
-> all code related to the old link state check that utilizes ethtool or
-> ioctl to determine the link state of an interface in a bond.
+On 06/17, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> 	To avoid acquiring RTNL many times per second, bonding's miimon
-> link monitor inspects link state under RCU, but not under RTNL.  However,
-> ethtool implementations in drivers may sleep, and therefore the ethtool or
-> ioctl strategy is unsuitable for use with calls into driver ethtool
-> functions.
-> 
-> 	The use_carrier option was introduced in 2003, to provide
-> backwards compatibility for network device drivers that did not support
-> the then-new netif_carrier_ok/on/off system.  Today, device drivers are
-> expected to support netif_carrier_*, and the use_carrier backwards
-> compatibility logic is no longer necessary.
-> 
-> 	Bonding now always behaves as if use_carrier=1, which relies on
-> netif_carrier_ok() to determine the link state of interfaces.  This has
-> been the default setting for use_carrier since its introduction.  For
-> backwards compatibility, the option itself remains, but may only be set to
-> 1, and queries will always return 1.
-> 
-> Reported-by: syzbot+b8c48ea38ca27d150063@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=b8c48ea38ca27d150063
-> Link: https://lore.kernel.org/lkml/000000000000eb54bf061cfd666a@google.com/
-> Link: https://lore.kernel.org/netdev/20240718122017.d2e33aaac43a.I10ab9c9ded97163aef4e4de10985cd8f7de60d28@changeid/
-> Link: http://lore.kernel.org/netdev/aEt6LvBMwUMxmUyx@mini-arch
-> Signed-off-by: Jay Vosburgh <jv@jvosburgh.net>
+> Introduce a control method in the xsk path to let users have the chance
+> to tune it manually.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Can you expand more on why the defaults don't work for you?
 
-Maybe better to target 'net' with the following?
-Fixes: f7a11cba0ed7 ("bonding: hold ops lock around get_link")
+Also, can we put these settings into the socket instead of (global/ns)
+sysctl?
 
