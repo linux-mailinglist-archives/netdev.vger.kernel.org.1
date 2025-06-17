@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-198531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 972FEADC917
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:08:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0950ADC919
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A1F189A606
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:09:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 513F71886D80
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 11:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D18E2D9EC2;
-	Tue, 17 Jun 2025 11:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA4D2D9EDC;
+	Tue, 17 Jun 2025 11:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="aVQhSr6Q"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="tPhMl3bZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA1E290BA2
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 11:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E029D2D9EC2
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 11:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750158526; cv=none; b=eaD3l0A9z6ahucvCUG8YFRgqwBvKgYF1wIRDkD3NkpgH7S3FvSFW8p8Nq7PsgjnlfZCZXuaDMLYxmNdLM7YzQELCpO5LwoH+8Pw4miNmHbF3VxBpxSfXZqnUfCDXT4Actm3FhrfYjLxPxbhU3NnScl4D2kKCrsQgkGT9E/zWj58=
+	t=1750158536; cv=none; b=bvBr9kMFOSpdE7adH5GvlHGi7lHlF0tzpG4FHOPmoNOofCHSG5xLiKYeqUSBb9z0vgw/fU3l8qLBxfjA0MqJsdZuURHOy8TcIFwjmeN6Q5cRDoarGFe1OkxONBHe3d0u9lcgNHDL0cUQgMPkcKtY5Bg/lWOkaMehU5Q3967ahJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750158526; c=relaxed/simple;
-	bh=IRR/axaqJSB8U6ZdY+vkjVvS2JUVYtosnoHTOV3F8Nw=;
+	s=arc-20240116; t=1750158536; c=relaxed/simple;
+	bh=Go3XF2QRyP8C6K/W70V35BJZysinNasBBl2ihRJdpJ4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oMLfrlx3m2Bmp2/hPw8bQ4OygCVOKsZ6PqBxzWu2FoAhCWv+vYaQXEPX8wjloQBQhF1DQo7bdjcc/JDjmz3npcFJtgtKaQQntxH9W4Dd7dZFA9NsVy+npaTyLUCRK8PMhP9Ck+GRTg32856R+JFUowH01ChcnGPyrRVKAggUz94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=aVQhSr6Q; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=bJG1VFAg6RMR4JX1gcaZIYVkMr6IjVFmOXlBfaolsO5GMW4z8vVxcvFguqil1MPvUHyLRWDMmpDHSl5I82aEDX9osZrTZ6agaj8VUOeQKjsoVoO/W/5IL+vor9HoY/M4qBLFcpevB0Hhd65N6dBSfJGoqxuqebJ9FhLViaLuOSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=tPhMl3bZ; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1750158525; x=1781694525;
+  t=1750158534; x=1781694534;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PjD3xdTrNY9z67bTqV6P/R/0uiJK8x+0ndOsd7RRhXc=;
-  b=aVQhSr6QAjYGFFVOfytHZ3aSUR5+mdhln12pbmx6pJ/rn7/sOwgoCbIg
-   pGdqd7GFM18B/nxyc1K2wSPPwVSsQg7YtGIr9qJpYqCl2QWVIJABetfpw
-   thBR4YxOx9yUTLSZM2ez5+cuoMQUApmijhNnvEhvTF5G/PjgXRkW5Cgzr
-   rejezH63BQUfNpH6scqs0Uj61Ghq6M/SAhRZpNJh+yVJ4AxCXi0gnKuRy
-   quehkQd8ZNBCJm3yFDvyXK2WDmWxVStxwGA/0C9vCXi2qno5Ol2MVx/lh
-   g1ynqFyoNh4mlU+Vawvv5ihKfixeMsvZ4N1ROnrdoxDNpyg+C0BOPkOM+
-   Q==;
+  bh=GbwxBityWS0tMEbwOAubEYR9XH67BBHvE190oDqFUO4=;
+  b=tPhMl3bZ/ESZ31LNAQYuHcyhTTWa7tC44bprWEK91H8Y6u7OlDJrjYrn
+   /oFXfv6ZH+zG8mOMbD36oQZl4KZwfpt6U3HY6BWq2h+5jxh2bV+8swdPv
+   NzBn8AlH26pQKjram7fLSSwa0R+HxlzjK1SYec1tM/qU7qc1C0ipZ6bFX
+   kjRgElY7AtHVfNUWqIYOCDQJyMlv82QSmEeCwN606kVX4NfsuINIuJrJC
+   CBN0DE+kgtTgU1qaCT6+ceI9yqWV5fe9VCa2qwa1vzZa9eJCrQ+4X85zK
+   hv7ok6JuPIOHt2y0E7QJ9/c5GTDypbHCUP+fIbfZ2Yk94RVROMHBxeJ98
+   w==;
 X-IronPort-AV: E=Sophos;i="6.16,243,1744070400"; 
-   d="scan'208";a="310082908"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 11:08:41 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:25025]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.14.39:2525] with esmtp (Farcaster)
- id 51019dc6-85e9-4a2a-b1a7-2583fede3946; Tue, 17 Jun 2025 11:08:40 +0000 (UTC)
-X-Farcaster-Flow-ID: 51019dc6-85e9-4a2a-b1a7-2583fede3946
+   d="scan'208";a="212749553"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 11:08:54 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.17.79:48482]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.31.140:2525] with esmtp (Farcaster)
+ id 1546e7be-67f2-4e19-a508-686fd2b13187; Tue, 17 Jun 2025 11:08:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 1546e7be-67f2-4e19-a508-686fd2b13187
 Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 17 Jun 2025 11:08:40 +0000
+ Tue, 17 Jun 2025 11:08:53 +0000
 Received: from HFA15-G9FV5D3.amazon.com (10.85.143.172) by
  EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 17 Jun 2025 11:08:28 +0000
+ Tue, 17 Jun 2025 11:08:41 +0000
 From: David Arinzon <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -79,9 +79,9 @@ CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
 	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
 	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
 	<leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH v13 net-next 8/9] net: ena: View PHC stats using debugfs
-Date: Tue, 17 Jun 2025 14:05:44 +0300
-Message-ID: <20250617110545.5659-9-darinzon@amazon.com>
+Subject: [PATCH v13 net-next 9/9] net: ena: Add PHC documentation
+Date: Tue, 17 Jun 2025 14:05:45 +0300
+Message-ID: <20250617110545.5659-10-darinzon@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250617110545.5659-1-darinzon@amazon.com>
 References: <20250617110545.5659-1-darinzon@amazon.com>
@@ -96,75 +96,119 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
  EX19D005EUA002.ant.amazon.com (10.252.50.11)
 
-Add an entry named `phc_stats` to view the PHC statistics.
-If PHC is enabled, the stats are printed, as below:
+Provide the relevant information and guidelines
+about the feature support in the ENA driver.
 
-phc_cnt: 0
-phc_exp: 0
-phc_skp: 0
-phc_err_dv: 0
-phc_err_ts: 0
-
-If PHC is disabled, no statistics will be displayed.
-
+Signed-off-by: Amit Bernstein <amitbern@amazon.com>
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_debugfs.c | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ .../device_drivers/ethernet/amazon/ena.rst    | 93 +++++++++++++++++++
+ 1 file changed, 93 insertions(+)
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_debugfs.c b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-index d9327cd8..46ed8098 100644
---- a/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-@@ -8,6 +8,35 @@
- #include <linux/seq_file.h>
- #include <linux/pci.h>
- #include "ena_debugfs.h"
-+#include "ena_phc.h"
-+
-+static int phc_stats_show(struct seq_file *file, void *priv)
-+{
-+	struct ena_adapter *adapter = file->private;
-+
-+	if (!ena_phc_is_active(adapter))
-+		return 0;
-+
-+	seq_printf(file,
-+		   "phc_cnt: %llu\n",
-+		   adapter->ena_dev->phc.stats.phc_cnt);
-+	seq_printf(file,
-+		   "phc_exp: %llu\n",
-+		   adapter->ena_dev->phc.stats.phc_exp);
-+	seq_printf(file,
-+		   "phc_skp: %llu\n",
-+		   adapter->ena_dev->phc.stats.phc_skp);
-+	seq_printf(file,
-+		   "phc_err_dv: %llu\n",
-+		   adapter->ena_dev->phc.stats.phc_err_dv);
-+	seq_printf(file,
-+		   "phc_err_ts: %llu\n",
-+		   adapter->ena_dev->phc.stats.phc_err_ts);
-+
-+	return 0;
-+}
-+
-+DEFINE_SHOW_ATTRIBUTE(phc_stats);
+diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
+index 7b7b8891..14784a0a 100644
+--- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
++++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
+@@ -224,6 +224,99 @@ descriptor it was received on would be recycled. When a packet smaller
+ than RX copybreak bytes is received, it is copied into a new memory
+ buffer and the RX descriptor is returned to HW.
  
- void ena_debugfs_init(struct net_device *dev)
- {
-@@ -15,6 +44,12 @@ void ena_debugfs_init(struct net_device *dev)
- 
- 	adapter->debugfs_base =
- 		debugfs_create_dir(dev_name(&adapter->pdev->dev), NULL);
++.. _`PHC`:
 +
-+	debugfs_create_file("phc_stats",
-+			    0400,
-+			    adapter->debugfs_base,
-+			    adapter,
-+			    &phc_stats_fops);
- }
++PTP Hardware Clock (PHC)
++========================
++.. _`ptp-userspace-api`: https://docs.kernel.org/driver-api/ptp.html#ptp-hardware-clock-user-space-api
++.. _`testptp`: https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/ptp/testptp.c
++
++ENA Linux driver supports PTP hardware clock providing timestamp reference to achieve nanosecond resolution.
++
++**PHC support**
++
++PHC depends on the PTP module, which needs to be either loaded as a module or compiled into the kernel.
++
++Verify if the PTP module is present:
++
++.. code-block:: shell
++
++  grep -w '^CONFIG_PTP_1588_CLOCK=[ym]' /boot/config-`uname -r`
++
++- If no output is provided, the ENA driver cannot be loaded with PHC support.
++
++**PHC activation**
++
++The feature is turned off by default, in order to turn the feature on, the ENA driver
++can be loaded in the following way:
++
++- devlink:
++
++.. code-block:: shell
++
++  sudo devlink dev param set pci/<domain:bus:slot.function> name enable_phc value true cmode driverinit
++  sudo devlink dev reload pci/<domain:bus:slot.function>
++  # for example:
++  sudo devlink dev param set pci/0000:00:06.0 name enable_phc value true cmode driverinit
++  sudo devlink dev reload pci/0000:00:06.0
++
++All available PTP clock sources can be tracked here:
++
++.. code-block:: shell
++
++  ls /sys/class/ptp
++
++PHC support and capabilities can be verified using ethtool:
++
++.. code-block:: shell
++
++  ethtool -T <interface>
++
++**PHC timestamp**
++
++To retrieve PHC timestamp, use `ptp-userspace-api`_, usage example using `testptp`_:
++
++.. code-block:: shell
++
++  testptp -d /dev/ptp$(ethtool -T <interface> | awk '/PTP Hardware Clock:/ {print $NF}') -k 1
++
++PHC get time requests should be within reasonable bounds,
++avoid excessive utilization to ensure optimal performance and efficiency.
++The ENA device restricts the frequency of PHC get time requests to a maximum
++of 125 requests per second. If this limit is surpassed, the get time request
++will fail, leading to an increment in the phc_err_ts statistic.
++
++**PHC statistics**
++
++PHC can be monitored using debugfs (if mounted):
++
++.. code-block:: shell
++
++  sudo cat /sys/kernel/debug/<domain:bus:slot.function>/phc_stats
++
++  # for example:
++  sudo cat /sys/kernel/debug/0000:00:06.0/phc_stats
++
++PHC errors must remain below 1% of all PHC requests to maintain the desired level of accuracy and reliability
++
++=================   ======================================================
++**phc_cnt**         | Number of successful retrieved timestamps (below expire timeout).
++**phc_exp**         | Number of expired retrieved timestamps (above expire timeout).
++**phc_skp**         | Number of skipped get time attempts (during block period).
++**phc_err_dv**      | Number of failed get time attempts due to device errors (entering into block state).
++**phc_err_ts**      | Number of failed get time attempts due to timestamp errors (entering into block state),
++                    | This occurs if driver exceeded the request limit or device received an invalid timestamp.
++=================   ======================================================
++
++PHC timeouts:
++
++=================   ======================================================
++**expire**          | Max time for a valid timestamp retrieval, passing this threshold will fail
++                    | the get time request and block new requests until block timeout.
++**block**           | Blocking period starts once get time request expires or fails,
++                    | all get time requests during block period will be skipped.
++=================   ======================================================
++
+ Statistics
+ ==========
  
- void ena_debugfs_terminate(struct net_device *dev)
 -- 
 2.47.1
 
