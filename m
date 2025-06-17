@@ -1,123 +1,96 @@
-Return-Path: <netdev+bounces-198765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945DFADDB29
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:12:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA74ADDB31
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:18:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B531942910
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:12:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1DF7162992
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF9E2EBB8A;
-	Tue, 17 Jun 2025 18:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWu3tdEW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224CF2EBBB8;
+	Tue, 17 Jun 2025 18:18:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840942EBB84;
-	Tue, 17 Jun 2025 18:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91CD2EBB93;
+	Tue, 17 Jun 2025 18:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750183944; cv=none; b=KJKkARFm+Hk0jIlqqrpbnHcgo4uEPyvnSIqSUdeXfzbSICUiIlYQiFdqQ/sUKC1xogKH4ldYx+gGVj2rADXxbJzMRb8JuZn4L0PlXBKEd6mnY+FisxPRFdzSl/IncJgwmJSEn5afvfnAbhAJLY1ei+22BB4yg10PkMCAi7qG9cY=
+	t=1750184285; cv=none; b=ogFBM8nBiofpvlFFFKD5arVdKUxa+OjdxKvpTKbjSnVvmdBD3niDe9vthWR9Ihk1fyT5n9jvkQWR82dZgkSf97HFaOYrY9KvrgRFAMBuSFNgxm3IXF4rTeL8vHlAXKzwvpkl268rshGSv+vfccc7hfj3tikxw6K+Ao5VzkNWysM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750183944; c=relaxed/simple;
-	bh=PN6qsQoRnaklytAma65XbMxOUtI9t4kJ9UFM3WpYRvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HYP5tujQP3naiwg+dJJjjGeRBUUF9XK4nN9v2G+nNN13KLmrCoLl8NhYAiAhPg2uuR7aWjRjuiBw9UGIwTdoDkWpH0sHD3DTYyq5EGriMgUs7GCXU7dW/8MUxUnRXFIkGPT++TGDmpWpvkVjKUbvPoMzZdDZjZbROYNkR/5Muq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWu3tdEW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FAEC4CEE3;
-	Tue, 17 Jun 2025 18:12:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750183944;
-	bh=PN6qsQoRnaklytAma65XbMxOUtI9t4kJ9UFM3WpYRvE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SWu3tdEWJn3GD6RtX+JmPHQoqCmhDQkNGWHkSEf3ZU9o7gbtFkMSIetp98r2MSOVX
-	 g/V4+9qr6V1YVaiqTep5UxgAeN2hpYkxTYqJlvrNNwkLWMWVNaZMUw7UEKLKQj0A1H
-	 TPiHlCfqjWM5zltG5oxD8pG0vxu4AtQHCjmjiz0sffPhDyiwaIdirNONqh30vMW3jp
-	 +mcW+NLDmZmiEnt5T5kHhHIN14ZJmyyn9UeecnRC/sAytC0fIPFZx+zBruSTH7/Vjt
-	 NvS1eQhjZRMszEMMSQJz7FyFGQuBognT9E80/cgSMosDrtJK3lsNyfjiYeVGFn60Jn
-	 spQIaaSI2UKgA==
-Date: Tue, 17 Jun 2025 19:12:19 +0100
-From: Simon Horman <horms@kernel.org>
-To: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>
-Cc: corbet@lwn.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-doc@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, skhan@linuxfoundation.com,
-	jacob.e.keller@intel.com, alok.a.tiwari@oracle.com
-Subject: Re: [PATCH v2 2/2] docs: net: clarify sysctl value constraints
-Message-ID: <20250617181219.GB2545@horms.kernel.org>
-References: <20250614225324.82810-1-abdelrahmanfekry375@gmail.com>
- <20250614225324.82810-3-abdelrahmanfekry375@gmail.com>
+	s=arc-20240116; t=1750184285; c=relaxed/simple;
+	bh=4hx6YBGdH9zrg2hg4KnoxAVKtdMcK9YsjcuPnwFco78=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=oslQ7EmLebk8+jv6rpnMHYR76W9MCt0ARTmpVsDmb3uqLXI2L7WCr/coMXG0EOdlAHiMEDioPZ1hODLDUWu2wnHryaOC6XDdqYDa8qGNHF5yufH/yqliGjzcDimDLU0zivUJh3TqFreB53HmP5wF2nRhXvxOnXaDEgnvIDsgtX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
+Received: from mail.wizardsworks.org (localhost [127.0.0.1])
+	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55HIJdef010654;
+	Tue, 17 Jun 2025 11:19:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250614225324.82810-3-abdelrahmanfekry375@gmail.com>
+Date: Tue, 17 Jun 2025 11:19:39 -0700
+From: Greg Chandler <chandleg@wizardsworks.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Tulip 21142 panic on physical link disconnect
+In-Reply-To: <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
+ <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+ <385f2469f504dd293775d3c39affa979@wizardsworks.org>
+ <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
+Message-ID: <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
+X-Sender: chandleg@wizardsworks.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jun 15, 2025 at 01:53:24AM +0300, Abdelrahman Fekry wrote:
-> So, i also noticed that some of the parameters represented
-> as boolean have no value constrain checks and accept integer
-> values due to u8 implementation, so i wrote a note for every
-> boolean parameter that have no constrain checks in code. and
-> fixed a typo in fmwark instead of fwmark.
+
+Hmm...  I'm wondering if that means it's an alpha-only issue then, which 
+would make this a much larger headache than it already is.
+Also thank you for checking, I appreciate you taking the time.
+
+I assume the those interfaces actually work right? (simple ping over 
+that interface would be enough)  I posted in a subsequent message that 
+mine do not appear to at all.
+
+My next step is to build that driver as a module, and see if it changes 
+anything (I'm doubting it will).
+Then after that go dig up a different adapter, and see if it's the 
+network stack or the driver.
+
+I've been hard pressed over the last week to get a lot of diagnosing 
+time.
+
+
+
+On 2025/06/16 12:01, Florian Fainelli wrote:
+> On 6/10/25 11:53, Greg Chandler wrote:
+>> 
+>> 
+>> I decided to test this again before I got sidetracked on my bigger 
+>> issue.
+>> The kernel I repored this on was 6.12.12 on alpha, this is also that 
+>> same version, but with a make distclean, and just about every single 
+>> debug option turned on.
+>> 
+>> I left the last line of the kernel boot in this output as well, 
+>> showing "link beat good"
+>> 
+>> I pulled the plug and it happened again immediately.
+>> I waited 10 sec, and plugged it back in, and I do not get a "link up" 
+>> type message that I would expect to see.
 > 
-> Added notes for 19 confirmed parameters,
-> Verified by code inspection and runtime testing.
-
-Please consider using imperative mode in patch descriptions.
-
-> - No changes for v2 in this patch , still waiting to be reviewed.
-
-The text on the line above would fit better along
-side the "No change." below the scissors ("---") a few lines below.
-
-> Signed-off-by: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>
-> ---
-> v2:
-> - No change.
-> v1:
-> - Added notes for booleans that accept 0-255 not only 0/1.
->  Documentation/networking/ip-sysctl.rst | 70 ++++++++++++++++++++------
->  1 file changed, 55 insertions(+), 15 deletions(-)
-> 
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-> index 68778532faa5..38f2981290d6 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -70,6 +70,8 @@ ip_forward_use_pmtu - BOOLEAN
->  
->  	- 0 - disabled
->  	- 1 - enabled
-> +
-> +	note: Accepts integer values (0-255) but only 0/1 have defined behaviour.
-
-In his review of v1 [*] Jacob said:
-
-  "Hm. In many cases any non-zero value might be interpreted as "enabled" I
-   suppose that is simply "undefined behavior"?
-
-Looking over the parsing and use of ip_forward_use_pmtu (I did not check
-the other parameters whose documentation this patch updates) I would take
-Jacob's remark a few steps further.
-
-It seems to me that values of 0-255 are accepted and while 0 means
-disabled, all the other values mean enabled. That is because that
-what the code does. And being part of the UAPI it can't be changed.
-
-So I don't think it is correct to describe only values 0/1 having defined
-behaviour. Because the code defines behaviour for all the values in the
-range 0-255.
-
-[*] https://lore.kernel.org/netdev/8b53b5be-82eb-458c-8269-d296bffcef33@intel.com/
-
-...
+> I was not able to reproduce this on my Cobalt Qube2 with the link being 
+> UP and then pulling the cable unfortunately, I could try other things 
+> if you want me to.
 
