@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-198649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17FBEADCF28
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:16:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC06ADCF0A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1243A471B
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:10:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85D84161969
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94B52F2C62;
-	Tue, 17 Jun 2025 14:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65ED2F3636;
+	Tue, 17 Jun 2025 14:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZx5vJ+/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G1e0TEqf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF2B2E3AF7;
-	Tue, 17 Jun 2025 14:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD9C2F2C65;
+	Tue, 17 Jun 2025 14:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750169212; cv=none; b=YvefLm4MTCsWErQBT1629dAnJCUzvM69AxXrqrXHNVSUNKs2UzVQEragZth5UzGJZW10wGwiGIoUhLJRi1U3iIBVvBI29XNZx8MlumMIOjm/89zhyRkuozL5/Z/YjXXPsWh6RHNhDBZpFmfQBo3ciJFe+2hlTyCZRp3iTZY2qco=
+	t=1750169214; cv=none; b=QEmyTV1jaA1Y4jmHOIfMNFORoDsmM3YgjDM2l5yhkb6c7F2g2JKbUxbbmklxNkMyCMX1uqsbSEFBCq4R5S6ZbAndoICV7AkwASVRQOy8qvS+XoZWYn297PuLH4zuBJ9DWiMmPZpjywvKxFNtNjTuGCpN0++s3vcP6wq7a7cOlNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750169212; c=relaxed/simple;
-	bh=QanEo+QGGszDR0Sk/3PJwI0RgEt2GEePQCIZAobVUgg=;
+	s=arc-20240116; t=1750169214; c=relaxed/simple;
+	bh=ddaSzyi4tO+6sW+HNK8noKB7YZDbPSSBl1I8Dbqa/74=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PvL0dqHIEuyfKZKySIGRI3FZx9LUwVTX7A5PhB2Os1bbUxo2toWuZbMHz2+9Y2sAeswYP1DmLgfoCFNf2LR+nEcPo/dIVOe5ZAcER3z0s9Sq1Bvk5qfLI2SrZsjO15djtSu9FP5u6ZPahqXthPE3k6UzzUHQZ4iOoOYB9XIeMt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KZx5vJ+/; arc=none smtp.client-ip=209.85.222.180
+	 MIME-Version; b=CsGQQHXL0Gj8ubxKVNUtMcAMvq+3T5OsDCx0aljLPqUczHcGL127/pSwnU6k27Q8+r071W+jh8SMqFCn6v9B92z+gVdHUzU/Yrtz/wVoLfj1W6IfhUP0r6G70E+C32P+NQjjNk8+bI2bcYgo8VEUbbSLpQoeeVPtd3wCWWQWdhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G1e0TEqf; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7caeeef95d4so636294485a.2;
-        Tue, 17 Jun 2025 07:06:51 -0700 (PDT)
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7d3862646eeso344737885a.2;
+        Tue, 17 Jun 2025 07:06:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750169210; x=1750774010; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750169212; x=1750774012; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4snp8j5f16mfsjhTubK6LH83nFpMYq7LYKMK9jFRaxQ=;
-        b=KZx5vJ+/J+RdjuxwRY3oxEImjY1l1C00fcC3R2KGvBueLzioHfm2FqeQV3odjGekC7
-         MIGJ5ClaXrTK4AH4pdJD+QCEZePHBRshP2wJfeyc28HFQrhGjEjOn37nUbyFtZtXa6Mk
-         BoE2Q/lDRLOM6quvEYzmr2v8/ggygf0Um9s08jVFw8cHdl14plMTTUYQODFF7TnSvUGd
-         1uI+iKjWBlcEFtXmNB6r50emb6Y8fLGj86LsJD4hQG4J6SQ+9979LjsdrCyz5bpZ1sOl
-         GqkPO2T67SCKHLAquORBCrV1fzlplIr4Krg6sYI5HgLFvu3EwWSomCDfv+w74pFZ3sOU
-         K/rA==
+        bh=L2xCWQnac4NJitog/nymRYN6yKz1wqreokZHWRlOwmE=;
+        b=G1e0TEqfxM7n0KjybxQc1YAhKOEqVVTRbNbmHbgkvnDzrfX5ygeG1SfmpwvXjLY1be
+         zpanfwBYEyoq2TNdYpMdsMcYCscat85ro0ePZJ1+qPXQNu6M0RQzauEEOADnsg7ckPbm
+         PgmLVzl1PNTR7ErMngoGyYvmurxfUCXSxuv/YC8Qr4Svl70VK1CQwri/kiv3blFr10nW
+         Q70cqAaYWdU1lBAuozVvKyfFUDZ37r57V8J74MV0c/2q/YYh3JBmHgp3DzLCgMDIwnUW
+         WrVoYrsWdVw0Dy63q8+Mmnh59Ms1nsmRZRtDJ1n4NSFz73hmCQSZDhxdDHcItMEsqGEQ
+         5lCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750169210; x=1750774010;
+        d=1e100.net; s=20230601; t=1750169212; x=1750774012;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4snp8j5f16mfsjhTubK6LH83nFpMYq7LYKMK9jFRaxQ=;
-        b=wJke2YhjLVdUoPATQGUb2HTjFjzxI10C3o+AE6wuMD/hq68AXS1zQK6a6+XSZLioqm
-         yqMT/EGBE3FAbhBAKkWCXqpWGdhHkh8Hl6S6hT4BhgaDkJqz6Qi0EY1hfvVaX0GMkddp
-         55gpXACJdq9hBup+i8o1iQwuJJI4KGNAWH58qeN8hv+YA70Fn/yQAI2zxx2cdqo26s/1
-         Xil6ydP0zSVNHMcZhhMYo4amdowt06oXWdHOsHMTlb/87LpplRcz1qCNGza9j7VEwLaQ
-         NnV7vG+WaCpVXRK78AwSyXXiAKufDGulT8bXs3R1BZ1J+VMJ2dFglZwM3UJpB9Ry2h8N
-         6v2w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5PKQrua/0oinbiBhtSMizfpLd7tYiHzHDw2GpHdK/6mvZikhIDGUfbU4s/upqWZhCgbQhVJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4Mi+NMTj3Zo8tRNC3oqIoz93MA4Jn8+cYblAajnIHnEmlmyFH
-	jVj6ruFxnchGSAtNrAhiuXSRPL2syZ+h4yGujWUKUSUwfoDJilJCO6eDBYzvmA==
-X-Gm-Gg: ASbGncs0M0AEMNStus+D8PgbdVaneIUDpwxPJjm5TrbOEpb1OCpI/TQVnvfoRrR3hxm
-	FrWRPBbqcWYbIUpU8cQExkQyxLNJydKA/JS04eYKyqsf9tU9e0ukcHAQAGIQyhNhs7AmeeDFnus
-	fw7Ul+DZRAw819J3qA6MqOzljK0y0SqzjnM7nFmL1F/wcM+PJEM8DomN4VajLMnNbnJa9YDmDfg
-	t7kkcymqx8AG3HywJiUzIGGslHxy+xz/fx1FZb2J5WtRyguUg20wGBvGK/h5vH6cBXMpPdsrjHQ
-	CYpuwin7/10NCmpwuv4k8Ld8TRElpSBlCOGTupx7xsjd9wpxFLBy0FuV0mBhYtvuCilLL4ZPiXk
-	7oLgbwXI9oVuLNDR+HR3HXF/iY8LmysoAQ5Ep9g9iLkCcn7dzq9e5z2RYb78C4UtWfQ==
-X-Google-Smtp-Source: AGHT+IG5EyN3lBwq2NuNBfMHQOOXGMkLduLruYNMnU6omd9FLTRXr3vVyQS0XyPcsJZmjoOZus0KZA==
-X-Received: by 2002:a05:620a:2628:b0:7d3:8f51:a5a5 with SMTP id af79cd13be357-7d3c6cfe4efmr2253152585a.51.1750169209714;
-        Tue, 17 Jun 2025 07:06:49 -0700 (PDT)
+        bh=L2xCWQnac4NJitog/nymRYN6yKz1wqreokZHWRlOwmE=;
+        b=G2py14N8DqZqC1XZCw5kmECt70lS7crf01D+1RyH/H+KzTB+qvbeglNzQbjjdepcrh
+         t9ZBgKFjeFeU81gdnV9rB4QFJgh50CmbG7E6RDAQ/WhIDhaZzWzuTwhnowzujAJcutQ/
+         ZlRyf4jfkZQiyhk7EZK9x/0DRBKvRiKwVrXuBHdUYi0I2je1uVRDC5nM8yRFy2uhdUYZ
+         oqqdSQWp8u7VPLs6K8ZvgT61R5Wi72atuQAz/XxeM+24kyVZb+7sdUZNeqEe5IUbpCo6
+         E5+UwBd797MtWmBrW9VrSy/o1ODfSuPSAAdblLoxBpnje9xUG9Yqnp96/gaVw/caxxCW
+         1jZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWubv3yH4RQWRiplMdMqJJdEKlw4UXF0ehYaL5MqvzxlSKnX9AIDI6dm2xqzXuChuXK9RfnuZg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywpfz7GftXQwk4HHNaV8aCVcoN99M4vvehduve1f0UWau+M/Hor
+	dAO5K0+XNX3vrLJi6/ZR4gmW9QVXhWzWeSz7RZkiU9kLEkRQfgXSKstvwQa6cA==
+X-Gm-Gg: ASbGncuOZsdegYEd7tFOixstfMY4vRwbxIhBCcsafvkZZdlonwkVbq144WvFnoDLmtK
+	CS/FXTfLDp/qACcqkwCpBFtDaWJW8VhLKq/ABOQa0LyPq7xN8Iw9gc1LhuOhvTye4IovAKY8gZc
+	L+IDQpMc/97DseePyeJqEEjO8NV6ttqC8/8G94S92iYc0Jxq+potPQ+wz819Ag9tozw/oGL1OVt
+	3/yP3AXWttU68qH5pTAYWzFH2PIAgSe0TBihsT+Lk9vfwyqMKE8EjCVJfFd8qfkFT1+sCeiuXAj
+	b3GWz0UKTYe371MdKpS4QsVmQK9kQR7vW64CEyDUrOf/ZPbs1Zz5rIv0feuDxXl6T/mcASJSqZl
+	IWtKvil2KVx9KVusRUhYCEhhmgsNmTNan8YsCzBiWJHGVfVF0PZ8fP5Rj+0MRy/kgpQ==
+X-Google-Smtp-Source: AGHT+IE2hb9wSLu1qT1950ifXxhmUu+L/xRKjt10NspPgRdPN0YalOw4nZxLG8qDqsxPMd2FVfso0A==
+X-Received: by 2002:a05:620a:4008:b0:7d0:a1da:3a3c with SMTP id af79cd13be357-7d3c6c0c79fmr2082942885a.3.1750169210411;
+        Tue, 17 Jun 2025 07:06:50 -0700 (PDT)
 Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3b8edbe29sm651079585a.91.2025.06.17.07.06.48
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3b8edbe29sm651079585a.91.2025.06.17.07.06.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 07:06:49 -0700 (PDT)
+        Tue, 17 Jun 2025 07:06:50 -0700 (PDT)
 From: Stephen Smalley <stephen.smalley.work@gmail.com>
 To: selinux@vger.kernel.org
 Cc: paul@paul-moore.com,
@@ -80,9 +80,9 @@ Cc: paul@paul-moore.com,
 	netdev@vger.kernel.org,
 	horms@kernel.org,
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v5 37/42] selinux: convert xfrm and netlabel permission checks
-Date: Tue, 17 Jun 2025 10:05:24 -0400
-Message-ID: <20250617140531.2036-38-stephen.smalley.work@gmail.com>
+Subject: [PATCH v5 38/42] selinux: switch selinux_lsm_setattr() checks to current namespace
+Date: Tue, 17 Jun 2025 10:05:25 -0400
+Message-ID: <20250617140531.2036-39-stephen.smalley.work@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250617140531.2036-1-stephen.smalley.work@gmail.com>
 References: <20250617140531.2036-1-stephen.smalley.work@gmail.com>
@@ -94,118 +94,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert the xfrm and netlabel permission checks to use the appropriate
-namespace-aware helper for each check. When in process context, use
-cred_tsid_has_perm() to check permission; when not in process context,
-use selinux_state_has_perm().
+Switch the selinux_lsm_setattr() checks to only check against
+the current SELinux namespace because this operation only changes
+the SID in the current namespace.
 
 Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 ---
- security/selinux/netlabel.c |  6 +++---
- security/selinux/xfrm.c     | 33 ++++++++++++++++++---------------
- 2 files changed, 21 insertions(+), 18 deletions(-)
+ security/selinux/hooks.c | 44 ++++++++++++++++++++++------------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/security/selinux/netlabel.c b/security/selinux/netlabel.c
-index 9c360f2ee7fc..06ce45f628f8 100644
---- a/security/selinux/netlabel.c
-+++ b/security/selinux/netlabel.c
-@@ -137,7 +137,7 @@ void selinux_netlbl_cache_invalidate(void)
-  * @gateway: true if host is acting as a gateway, false otherwise
-  *
-  * Description:
-- * When a packet is dropped due to a call to avc_has_perm() pass the error
-+ * When a packet is dropped due to a permission denial, pass the error
-  * code to the NetLabel subsystem so any protocol specific processing can be
-  * done.  This is safe to call even if you are unsure if NetLabel labeling is
-  * present on the packet, NetLabel is smart enough to only act when it should.
-@@ -478,8 +478,8 @@ int selinux_netlbl_sock_rcv_skb(struct sk_security_struct *sksec,
- 		perm = RAWIP_SOCKET__RECVFROM;
- 	}
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index e79d63e923de..2045da8b2b85 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -6697,35 +6697,41 @@ static int selinux_lsm_getattr(unsigned int attr, struct task_struct *p,
+ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ {
+ 	const struct cred *cred = current_cred();
++	struct selinux_state *state = current_selinux_state;
+ 	struct task_security_struct *tsec;
+ 	struct cred *new;
+-	u32 sid = 0, ptsid;
++	u32 mysid = current_sid(), sid = 0, ptsid;
+ 	int error;
+ 	char *str = value;
  
--	rc = avc_has_perm(sksec->state, sksec->sid, nlbl_sid, sksec->sclass,
--			  perm, ad);
-+	rc = selinux_state_has_perm(sksec->state, sksec->sid, nlbl_sid,
-+				    sksec->sclass, perm, ad);
- 	if (rc == 0)
- 		return 0;
+ 	/*
+ 	 * Basic control over ability to set these attributes at all.
+ 	 */
++	/*
++	 * Only check against the current SELinux namespace
++	 * because only the SID in the current namespace
++	 * is changed by this operation.
++	 */
+ 	switch (attr) {
+ 	case LSM_ATTR_EXEC:
+-		error = cred_self_has_perm(cred, SECCLASS_PROCESS,
+-					   PROCESS__SETEXEC, NULL);
++		error = avc_has_perm(state, mysid, mysid, SECCLASS_PROCESS,
++				     PROCESS__SETEXEC, NULL);
+ 		break;
+ 	case LSM_ATTR_FSCREATE:
+-		error = cred_self_has_perm(cred, SECCLASS_PROCESS,
+-					   PROCESS__SETFSCREATE, NULL);
++		error = avc_has_perm(state, mysid, mysid, SECCLASS_PROCESS,
++				     PROCESS__SETFSCREATE, NULL);
+ 		break;
+ 	case LSM_ATTR_KEYCREATE:
+-		error = cred_self_has_perm(cred, SECCLASS_PROCESS,
+-					   PROCESS__SETKEYCREATE, NULL);
++		error = avc_has_perm(state, mysid, mysid, SECCLASS_PROCESS,
++				     PROCESS__SETKEYCREATE, NULL);
+ 		break;
+ 	case LSM_ATTR_SOCKCREATE:
+-		error = cred_self_has_perm(cred, SECCLASS_PROCESS,
+-					   PROCESS__SETSOCKCREATE, NULL);
++		error = avc_has_perm(state, mysid, mysid, SECCLASS_PROCESS,
++				     PROCESS__SETSOCKCREATE, NULL);
+ 		break;
+ 	case LSM_ATTR_CURRENT:
+-		error = cred_self_has_perm(cred, SECCLASS_PROCESS,
+-					   PROCESS__SETCURRENT, NULL);
++		error = avc_has_perm(state, mysid, mysid, SECCLASS_PROCESS,
++				     PROCESS__SETCURRENT, NULL);
+ 		break;
+ 	default:
+ 		error = -EOPNOTSUPP;
+@@ -6740,7 +6746,7 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ 			str[size-1] = 0;
+ 			size--;
+ 		}
+-		error = security_context_to_sid(current_selinux_state, value, size,
++		error = security_context_to_sid(state, value, size,
+ 						&sid, GFP_KERNEL);
+ 		if (error == -EINVAL && attr == LSM_ATTR_FSCREATE) {
+ 			if (!has_cap_mac_admin(true)) {
+@@ -6766,9 +6772,8 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
  
-diff --git a/security/selinux/xfrm.c b/security/selinux/xfrm.c
-index 855f77630bdb..be91a28ab47b 100644
---- a/security/selinux/xfrm.c
-+++ b/security/selinux/xfrm.c
-@@ -102,9 +102,9 @@ static int selinux_xfrm_alloc_user(struct xfrm_sec_ctx **ctxp,
- 	if (rc)
- 		goto err;
+ 				return error;
+ 			}
+-			error = security_context_to_sid_force(
+-						      current_selinux_state,
+-						      value, size, &sid);
++			error = security_context_to_sid_force(state, value,
++							      size, &sid);
+ 		}
+ 		if (error)
+ 			return error;
+@@ -6805,7 +6810,7 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ 			goto abort_change;
  
--	rc = avc_has_perm(current_selinux_state,
--			  current_sid(), ctx->ctx_sid,
--			  SECCLASS_ASSOCIATION, ASSOCIATION__SETCONTEXT, NULL);
-+	rc = cred_tsid_has_perm(current_cred(), ctx->ctx_sid,
-+				SECCLASS_ASSOCIATION, ASSOCIATION__SETCONTEXT,
-+				NULL);
- 	if (rc)
- 		goto err;
- 
-@@ -137,10 +137,9 @@ static int selinux_xfrm_delete(struct xfrm_sec_ctx *ctx)
- 	if (!ctx)
- 		return 0;
- 
--	return avc_has_perm(current_selinux_state,
--			    current_sid(), ctx->ctx_sid,
--			    SECCLASS_ASSOCIATION, ASSOCIATION__SETCONTEXT,
--			    NULL);
-+	return cred_tsid_has_perm(current_cred(), ctx->ctx_sid,
-+				  SECCLASS_ASSOCIATION,
-+				  ASSOCIATION__SETCONTEXT, NULL);
- }
- 
- /*
-@@ -162,8 +161,9 @@ int selinux_xfrm_policy_lookup(struct xfrm_sec_ctx *ctx, u32 fl_secid)
- 	if (!selinux_authorizable_ctx(ctx))
- 		return -EINVAL;
- 
--	rc = avc_has_perm(state, fl_secid, ctx->ctx_sid,
--			  SECCLASS_ASSOCIATION, ASSOCIATION__POLMATCH, NULL);
-+	rc = selinux_state_has_perm(state, fl_secid, ctx->ctx_sid,
-+				    SECCLASS_ASSOCIATION,
-+				    ASSOCIATION__POLMATCH, NULL);
- 	return (rc == -EACCES ? -ESRCH : rc);
- }
- 
-@@ -205,8 +205,9 @@ int selinux_xfrm_state_pol_flow_match(struct xfrm_state *x,
- 	/* We don't need a separate SA Vs. policy polmatch check since the SA
- 	 * is now of the same label as the flow and a flow Vs. policy polmatch
- 	 * check had already happened in selinux_xfrm_policy_lookup() above. */
--	return (avc_has_perm(state, flic_sid, state_sid, SECCLASS_ASSOCIATION,
--			     ASSOCIATION__SENDTO, NULL) ? 0 : 1);
-+	return (selinux_state_has_perm(state, flic_sid, state_sid,
-+				       SECCLASS_ASSOCIATION,
-+				       ASSOCIATION__SENDTO, NULL) ? 0 : 1);
- }
- 
- static u32 selinux_xfrm_skb_sid_egress(struct sk_buff *skb)
-@@ -425,8 +426,9 @@ int selinux_xfrm_sock_rcv_skb(struct sk_security_struct *sksec, struct sk_buff *
- 	/* This check even when there's no association involved is intended,
- 	 * according to Trent Jaeger, to make sure a process can't engage in
- 	 * non-IPsec communication unless explicitly allowed by policy. */
--	return avc_has_perm(sksec->state, sk_sid, peer_sid,
--			    SECCLASS_ASSOCIATION, ASSOCIATION__RECVFROM, ad);
-+	return selinux_state_has_perm(sksec->state, sk_sid, peer_sid,
-+				      SECCLASS_ASSOCIATION,
-+				      ASSOCIATION__RECVFROM, ad);
- }
- 
- /*
-@@ -469,6 +471,7 @@ int selinux_xfrm_postroute_last(u32 sk_sid, struct sk_buff *skb,
- 	/* This check even when there's no association involved is intended,
- 	 * according to Trent Jaeger, to make sure a process can't engage in
- 	 * non-IPsec communication unless explicitly allowed by policy. */
--	return avc_has_perm(state, sk_sid, SECINITSID_UNLABELED,
--			    SECCLASS_ASSOCIATION, ASSOCIATION__SENDTO, ad);
-+	return selinux_state_has_perm(state, sk_sid, SECINITSID_UNLABELED,
-+				      SECCLASS_ASSOCIATION,
-+				      ASSOCIATION__SENDTO, ad);
- }
+ 		if (!current_is_single_threaded()) {
+-			error = security_bounded_transition(current_selinux_state,
++			error = security_bounded_transition(state,
+ 							    tsec->sid, sid);
+ 			if (error)
+ 				goto abort_change;
+@@ -6817,8 +6822,7 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ 		 * because only the SID in the current namespace
+ 		 * is changed by a transition.
+ 		 */
+-		error = avc_has_perm(current_selinux_state,
+-				     tsec->sid, sid, SECCLASS_PROCESS,
++		error = avc_has_perm(state, tsec->sid, sid, SECCLASS_PROCESS,
+ 				     PROCESS__DYNTRANSITION, NULL);
+ 		if (error)
+ 			goto abort_change;
+@@ -6832,8 +6836,8 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ 			 * because only the SID in the current namespace
+ 			 * is changed by a transition.
+ 			 */
+-			error = avc_has_perm(current_selinux_state,
+-					     ptsid, sid, SECCLASS_PROCESS,
++			error = avc_has_perm(state, ptsid, sid,
++					     SECCLASS_PROCESS,
+ 					     PROCESS__PTRACE, NULL);
+ 			if (error)
+ 				goto abort_change;
 -- 
 2.49.0
 
