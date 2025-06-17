@@ -1,96 +1,76 @@
-Return-Path: <netdev+bounces-198828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D006FADDF69
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:10:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA618ADDF82
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795E8189DD97
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:10:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 966113AF243
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BA82957CE;
-	Tue, 17 Jun 2025 23:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B2E2957A7;
+	Tue, 17 Jun 2025 23:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeY+/BRn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8j89+jY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ADB295531
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5D02957A0
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750201813; cv=none; b=Ub0mOtvFcME5hO9J6OwbkS7F+WEBLp4bJxgugyhSz35Nnm3FJ2KdT5ePPf6ORIMdciX2r+hmxnQ/28ixSgS43sA3wmaScgOIHLL77lQ1wGlVCs56Or2VnT/pKlVrboADqUSdjYBlQTXR79pi/BuQ3RJo4Dt7Cp0rkAwxmKMEi1I=
+	t=1750202390; cv=none; b=sGepC/UKSSaxPEMLX3WxAVnX/dnsQuycmZLqjjXfHRSN6WHRJB6gnui4sl4wv4O7HH9i2LhXzCORIj40YfYaC7FFkmrtadT5SkrevyCmlQ/J437iL4B0OTK+FSkfgi8aazvCMgFTX3U7nEG8j6/QyKnzvBNgQU5HW6rvTspywFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750201813; c=relaxed/simple;
-	bh=NLmZbAINQrKpTqQpqNfxPgtqEb0sB7XeT47yiorXI6w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YDSi/XO6fyNytGPklLNOlVfZVy1HqbCjBJ+viT83WAS6bkvfykdF2to8d1tPCLh5APrIy9BYmN7iA5pEQ7HseKyqUA+ibvWq0g2foyJULgwgApjHMPnphJ0MFkN+2kXT77K6qgVY6uAEe0mJs1LxyD7eNgoQy7O+SrDbDuicld4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MeY+/BRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 328ACC4CEED;
-	Tue, 17 Jun 2025 23:10:13 +0000 (UTC)
+	s=arc-20240116; t=1750202390; c=relaxed/simple;
+	bh=xwErtfx1oZZk5KtXH+yo33f7wFefCput2SOyitQeFc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OBm6LY39xzyo3Tvg7WIHDEQHLWoUCM75YxryGTrSxefsryvuM8ROP1EpWIIZR+oEH8F7xH2iXIXIicKColyWOOdXeEj4gAwEb0oLW7jRGmYNkAOsBB+vNJrlEeOG/nKLl/a5Dj3At1zKelX/TiEVmZnnGDmDfml8nF7whQ5tMXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8j89+jY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A248C4CEE3;
+	Tue, 17 Jun 2025 23:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750201813;
-	bh=NLmZbAINQrKpTqQpqNfxPgtqEb0sB7XeT47yiorXI6w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MeY+/BRnKSJtQIpfkUgm5S90dpg8BaAd3E9/X4zxA9F3zdFVm0v82Low6gsBPBOHe
-	 iFFOjUJp1giTMHEe0SPayfjJOKYUIxYagHv0n+AAF2ilgYK90TtH9zlfBog6ugcEP4
-	 WGcwTuQGzAKLT2wW8gItRfMw2MulwZU5f0u1o+1KwDaGyGvmel+8JA6h0vXVDdI8gk
-	 l9MlsvBi9aRk9Ja+hujhrKFI28BcH+xjVLN2PqAHEsl+vVZhgrIub71qvkzsxR9Jo8
-	 O87Frd6uUIw9izt1Omd0Md27fdFbmaeiOWUrV/l5WX85U49iWn+A4vTD0mJzoCV/eV
-	 HsEiOX7K/5QfA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB638111DD;
-	Tue, 17 Jun 2025 23:10:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750202389;
+	bh=xwErtfx1oZZk5KtXH+yo33f7wFefCput2SOyitQeFc4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H8j89+jYdF3eO2z6jY1PU9ZYXfnzaZYd1l5CqHpR40YBHFsYWx3mvZHK2nlBULwNQ
+	 YQwE33fFU12FXWF6KANceNcGcfZ305rAwqQdrtaMj661082ztZt8ETMEQIfiMjN/jQ
+	 9js+I1w+QmwUapwpbWMJ196clA/LNxogdTKp9Z6tfQkoEUoM9YJQa2Ow48JBm7nNs5
+	 OeZbe4yn7JOCDQRMnPAFRPsVUQBoHwDNmAK1tutbHFpoLWCUsyPXPwbN/ad/BR2tqe
+	 ywMQkOOqrBQ3wkCVldrytIgICwJ32s9tIAL2h8K8aNjkhAl07G7zHoND/Tb696Mqsz
+	 fnO1hoVLFRAsw==
+Date: Tue, 17 Jun 2025 16:19:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, Yuchung Cheng
+ <ycheng@google.com>
+Subject: Re: [PATCH net-next v2 1/3] tcp: remove obsolete and unused
+ RFC3517/RFC6675 loss recovery code
+Message-ID: <20250617161948.3a0ae368@kernel.org>
+In-Reply-To: <20250615001435.2390793-2-ncardwell.sw@gmail.com>
+References: <20250615001435.2390793-1-ncardwell.sw@gmail.com>
+	<20250615001435.2390793-2-ncardwell.sw@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] net: stmmac: rk: more cleanups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175020184173.3730251.3213755803607439009.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:10:41 +0000
-References: <aE_u8mCkUXEWTzJe@shell.armlinux.org.uk>
-In-Reply-To: <aE_u8mCkUXEWTzJe@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sat, 14 Jun 2025 20:14:33 -0400 Neal Cardwell wrote:
+> +	RACK: 0x1   enables RACK loss detection, for fast detection of lost
+> +		    retransmissions and tail drops, and resilience to
+> +		    reordering. currrently, setting this bit to 0 has no
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+                                currently ^
 
-On Mon, 16 Jun 2025 11:16:18 +0100 you wrote:
-> Hi,
-> 
-> Another couple of cleanups removing pointless code.
-> 
->  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
+fixed when applying
 
-Here is the summary with links:
-  - [net-next,1/3] net: stmmac: rk: fix code formmating issue
-    https://git.kernel.org/netdev/net-next/c/a44769c97e9a
-  - [net-next,2/3] net: stmmac: rk: use device rather than platform device in rk_priv_data
-    https://git.kernel.org/netdev/net-next/c/8f6503993911
-  - [net-next,3/3] net: stmmac: rk: remove unnecessary clk_mac
-    https://git.kernel.org/netdev/net-next/c/cf283fd6b8be
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> +		    effect, since RACK is the only supported loss detection
+> +		    algorithm.
 
