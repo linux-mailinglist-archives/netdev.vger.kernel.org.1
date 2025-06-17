@@ -1,127 +1,212 @@
-Return-Path: <netdev+bounces-198698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA1AADD10E
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:10:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B95B2ADD112
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 576C81644C5
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:10:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C14F188CF55
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7A62E8894;
-	Tue, 17 Jun 2025 15:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE062E88BC;
+	Tue, 17 Jun 2025 15:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KmUTNzQA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ch7lVb55"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810071CDA2E
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389802E8897
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 15:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750173018; cv=none; b=XWcoHfRqG9WiFRqtYJnq6+f0AcRPnWWyfhQOdEblPUxLeSAM8Vo3DTA363j4xidT/q9L5oonRzM5qqexIRJJD4D3+plz4c6A+rQ7qhcR+O8I9Re7Rr5EX8rnBHw7IlAmY79dNsung+HZPcIjpkTDNDqmFss4ZQ1KnlVkzIAYi2U=
+	t=1750173069; cv=none; b=im5wtXEj7SvqfNc/C/3dLRBW/lzMwlM+QJl2XWAe+MYZymcOY+tsV9PSUCcFq28wg7jVopEa1mU8F7syrqY+whJBAAVGtQIi2NKBrRhxEYrbmr6m4mpxVUL9igkrMXdLdbkAkIOF0rAIwrWyquHdD6bBLuf/L8MrQLfkM+5s7so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750173018; c=relaxed/simple;
-	bh=Q4vV3HbVxFLXV1EBL2EoQ/+XT0Mzn4sSeRk874/9McE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=FSX2rJcNtoQC+FIkZ+eCrQKgl94h0/x8ZJhCGUxfqDhoOQYCsOovKKYTKh9PAa66MRw2eVoDJd5Xp8NmsmLijpsBNWvV+47Rn6jh1TWVs/BpIZBa6rMsbXG75ABnWf3Pp74O9XRLMJfEYbCJbV88Ff5k9lLKk0Q1J7uwjm403+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KmUTNzQA; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1750173069; c=relaxed/simple;
+	bh=pdPq9PlVlHWZ2cVzJk1emG6nTw+vRlKhWuL8ddlKXW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GOWvHtoFfYdCk4q75eHk5tK205dYhAdjE/OO7Vz2ldLUxoJIucHaZpRkKzyn4NOS8rSvXE+NlrVVsT9x04P/fCsXHuj2wcoH4/apHHAwlkKiBOCHmbI70ZZP6Cbe7vHWzNwda2w7e4nZd3E/E/k9NLNJrueCD/8lJLhWB+kSTdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ch7lVb55; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750173015;
+	s=mimecast20190719; t=1750173067;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q4vV3HbVxFLXV1EBL2EoQ/+XT0Mzn4sSeRk874/9McE=;
-	b=KmUTNzQAGMXb69iSC4ozxvo383jJAmOxrD8p5Y44MR/j4C+/NDP4cEbQWlWxBkptdGKXdf
-	rfilfoJlyTBtmEFhSFGeVUQTqOSKXfybKt0ICtxsGKcFQzYv8DMMum+kkm6uqxi8I7GxvJ
-	IwYS3Nrcvj4ZfF0gDnU7spJN7JVxM5o=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WGX6svIlWpZEQ5EFYjPNzt7elF0IRahwc1dWlkYR+Go=;
+	b=ch7lVb55ygvkafVcr0sV4mtXe13cyh1+QBcqnOpzHgGAdx7pznKq1RSEoVCx26VzFzG8Sf
+	yBd+8iA83NLY76SM+JTCMh7SyZ7lS65fOXg6tI6DnXML2qAWLRExVVuk0tv7b1SkM2SwXG
+	fJFCYtxZDkFopIUIVaVe6FqK02559gQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-EJ4Lp_Y7PqiX6HeYVSo2Vw-1; Tue, 17 Jun 2025 11:10:13 -0400
-X-MC-Unique: EJ4Lp_Y7PqiX6HeYVSo2Vw-1
-X-Mimecast-MFC-AGG-ID: EJ4Lp_Y7PqiX6HeYVSo2Vw_1750173008
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ade32b5771bso73109966b.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:10:13 -0700 (PDT)
+ us-mta-630-4yMlnIUuOhWGLiElpsoKSA-1; Tue, 17 Jun 2025 11:11:06 -0400
+X-MC-Unique: 4yMlnIUuOhWGLiElpsoKSA-1
+X-Mimecast-MFC-AGG-ID: 4yMlnIUuOhWGLiElpsoKSA_1750173065
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-450d290d542so35530245e9.1
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 08:11:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750173008; x=1750777808;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4vV3HbVxFLXV1EBL2EoQ/+XT0Mzn4sSeRk874/9McE=;
-        b=MHzRylnyjLTjFbE5+VCa5eVvXLtSK7a4Jbcopiy0sDm7w7BKkyW7gOFNVf6c+jw5FP
-         HsXEU6G5PbHCQyuQgGAhEoWq9aP9/JyHq/coDxKB0YIr3Pn6Cr1Zwkkeg5kuSg7afBMz
-         zCTQ1ESOb7If3mLQnrhWmzsns2pU0J58qHSYIvJ5UF98IjYuMuRBGUzJ8qJ+aDCqET0D
-         QlO66hTH5LQcEMGUZAifHvdcC++HfRpA0P7MS3DAONA+xjpSRrcvG9FSIUETUwPS4htJ
-         TBYm26sNABD5KCeGZDk3SxJCWLnaLkTea1lidv61NA8lGKD4xYb+oQxroz9IGESr819s
-         kdjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFvJnmDTthyAOGr2s8KOjHb3HruFJaLro8EReKOHZffHU3z0fh1N59+hOQY4d0mFUOq9Nvm8o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9YQWiOy725/FIJ269757XB/fvW2iVLBsAgCthXxq60npywrGt
-	ORcWN0nWqk160sNOiio3adYCX2L0k+c7s/ROuQKQBM7eQYHaR/Q0uHtIRrAMM5hkFCZVaFUEsQt
-	J51UhpMBkF0okfQv4KAIakHrmhlMzz2BtDkwpClq0fbPTN4BVPlTi7VmXcg==
-X-Gm-Gg: ASbGncsffM84TFVYa8IXUvHjNLpqcWKtJlepmLHQ9fHjK2SoxzD7Uhea9B187F0ZIs1
-	NHPLpuQ50k1zi6R1CD1VMEIqc4UZBy0Le3i4lnkFlemzgFq254qDc2Vq9FjIWBjfYVc1SJpy4Mu
-	gBS/KgOB8mefac5ZU8kygEIlaA1pDPNe+/SC1Bp9adu5mIHe3suHXMekH3INqQ9pbLbYTpGVCea
-	Q/S8cNmDuJoW1iMpSXr/H81Kl5KzRpM9zt1L0PAOiEXjW6I415vNtSxPcjsaLIdKQ/gH+fyVUqn
-	XXeXKTGxkuHtfBLFAtg=
-X-Received: by 2002:a17:907:2da9:b0:ad9:16c8:9ff4 with SMTP id a640c23a62f3a-adfad2773b1mr1287012066b.11.1750173007733;
-        Tue, 17 Jun 2025 08:10:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHum6NSFVGaMZlyajlBzCyusq5rsMbr/f1X+qSV8BcuCBxgvXcCVTF1LKybETNjy2yXeASF3A==
-X-Received: by 2002:a17:907:2da9:b0:ad9:16c8:9ff4 with SMTP id a640c23a62f3a-adfad2773b1mr1287007966b.11.1750173007348;
-        Tue, 17 Jun 2025 08:10:07 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec88fe907sm888000966b.93.2025.06.17.08.10.06
+        d=1e100.net; s=20230601; t=1750173065; x=1750777865;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WGX6svIlWpZEQ5EFYjPNzt7elF0IRahwc1dWlkYR+Go=;
+        b=r5mOvfHh0bCc4nQ7tuiPrvK0rfGht8pAAH8T9DzPQCWFJ2Npz5LgxoeA9cGqFYayD6
+         tY4+csLA4s8c+1VvKzTMrl0TmJr47T+ViMcl4IzCtEIrhlu6N9v4gMTfGEZtvHUwNFjV
+         5wfL+SK3ZfCS57TmN4ooWx92XjiGyoLao6Yg9vRysm+Rn2K9hjgip+V5mTDXDqF+bY++
+         MTWZ0LeOgOwSC0ugoJpA5HDJBe4ghv6HmscfsTo8QTONC8CGolT2OY5hcEHNJo14mk3P
+         uv7tPTyaSx9oyCgcIMxD2QO5nMPOWGwIXvL53mtkeoNp6/nZBuRVOx+zN6k0Swu8XLyJ
+         k3QA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLM8amVe5w8TkqFv0XIvpVl5VP/v/zOasHt7OUHmHq7mi5x7HI6eNrS1WCzHYSk46wII91tq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhodqLwGK3zpg5NF03H1VGAxEr2NI5Ef/58VlR/PHrz0tjKRoQ
+	9b0I8gVhHVkZn1/Vxqu5i91stxgXl2QfiVn45u9NKN/xp99u9CnKiLVrpbncCqu6/aK+1Fy/3Yq
+	wF3gzJjmEB/i7an/TdZrWMP7eA6CE7773iP3LRpCSVxvCB6/8lNZe1ZPrmQ==
+X-Gm-Gg: ASbGnctusmKIVt+Ss2V8/x2/qJ/DwQFzY+HZzkhdp3d0iK0+jLz4bCjzfaO+ATyZfET
+	RX1skfjQ4d/69J4wXiYOPe2hLbvjshTHkZtZ54tusUuHgSi4A8SGpogQ/KFPgCcNFp+/xbG/7qo
+	dp65GLfaseqLNmTSEMxzEpYyZ/vnLznbxMQ4Q3O93O3jJg57MQfc7vb0CRlBrCVEld7QITi3KBC
+	D90RBZY4hbdcBRRWc6obLfRPytQFNb9p6K5Zu6aByoru3PGLEYc8hof7/E0MiviKdRt8FaGM7tY
+	Z/FuqumCEfypYIXp3E91llAtDfzU
+X-Received: by 2002:a05:600c:4f54:b0:43b:c0fa:f9dd with SMTP id 5b1f17b1804b1-4533cab1c91mr100034865e9.25.1750173064652;
+        Tue, 17 Jun 2025 08:11:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLw5YcffSL+V+Aaktp6ydgR00R6Aiz6j5f4o7u0CbWcG6l7Jh0rci6v44UVdISCb4YtYblWQ==
+X-Received: by 2002:a05:600c:4f54:b0:43b:c0fa:f9dd with SMTP id 5b1f17b1804b1-4533cab1c91mr100034365e9.25.1750173064079;
+        Tue, 17 Jun 2025 08:11:04 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.200.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e13c192sm179620505e9.26.2025.06.17.08.11.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 08:10:06 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 717EE1AF7182; Tue, 17 Jun 2025 17:10:05 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
- Magnus Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Subject: Performance impact of disabling VLAN offload [was: Re: [PATCH
- bpf-next V1 7/7] net: xdp: update documentation for xdp-rx-metadata.rst]
-In-Reply-To: <76a5330e-dc52-41ea-89c2-ddcde4b414bd@kernel.org>
-References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
- <174897279518.1677018.5982630277641723936.stgit@firesoul>
- <aEJWTPdaVmlIYyKC@mini-arch>
- <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
- <87plfbcq4m.fsf@toke.dk> <aEixEV-nZxb1yjyk@lore-rh-laptop>
- <aEj6nqH85uBe2IlW@mini-arch> <aFAQJKQ5wM-htTWN@lore-desk>
- <aFA8BzkbzHDQgDVD@mini-arch> <aFBI6msJQn4-LZsH@lore-desk>
- <87h60e4meo.fsf@toke.dk> <76a5330e-dc52-41ea-89c2-ddcde4b414bd@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 17 Jun 2025 17:10:05 +0200
-Message-ID: <875xgu4d6a.fsf@toke.dk>
+        Tue, 17 Jun 2025 08:11:03 -0700 (PDT)
+Date: Tue, 17 Jun 2025 17:10:59 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Xuewei Niu <niuxuewei97@gmail.com>
+Cc: mst@redhat.com, pabeni@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, netdev@vger.kernel.org, stefanha@redhat.com, 
+	leonardi@redhat.com, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, fupan.lfp@antgroup.com, Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Subject: Re: [PATCH net-next v3 2/3] test/vsock: Add retry mechanism to ioctl
+ wrapper
+Message-ID: <uqpldq5hhpmmgayozfh62wiloggk7rsih6n5lzby75cgxvhbiq@fspi6ik7lbp6>
+References: <20250617045347.1233128-1-niuxuewei.nxw@antgroup.com>
+ <20250617045347.1233128-3-niuxuewei.nxw@antgroup.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250617045347.1233128-3-niuxuewei.nxw@antgroup.com>
 
-> Later we will look at using the vlan tag. Today we have disabled HW
-> vlan-offloading, because XDP originally didn't support accessing HW vlan
-> tags.
+On Tue, Jun 17, 2025 at 12:53:45PM +0800, Xuewei Niu wrote:
+>Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
+>int value and an expected int value. The function will not return until
+>either the ioctl returns the expected value or a timeout occurs, thus
+>avoiding immediate failure.
+>
+>Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+>---
+> tools/testing/vsock/util.c | 37 ++++++++++++++++++++++++++++---------
+> tools/testing/vsock/util.h |  1 +
+> 2 files changed, 29 insertions(+), 9 deletions(-)
+>
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 0c7e9cbcbc85..ecfbe52efca2 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -16,6 +16,7 @@
+> #include <unistd.h>
+> #include <assert.h>
+> #include <sys/epoll.h>
+>+#include <sys/ioctl.h>
+> #include <sys/mman.h>
+> #include <linux/sockios.h>
+>
+>@@ -97,28 +98,46 @@ void vsock_wait_remote_close(int fd)
+> 	close(epollfd);
+> }
+>
+>-/* Wait until transport reports no data left to be sent.
+>- * Return false if transport does not implement the unsent_bytes() callback.
+>+/* Wait until ioctl gives an expected int value.
+>+ * Return a negative value if the op is not supported.
+>  */
+>-bool vsock_wait_sent(int fd)
+>+int ioctl_int(int fd, unsigned long op, int *actual, int expected)
+> {
+>-	int ret, sock_bytes_unsent;
+>+	int ret;
+>+	char name[32];
+>+
+>+	if (!actual) {
+>+		fprintf(stderr, "%s requires a non-null pointer\n", __func__);
+>+		exit(EXIT_FAILURE);
+>+	}
 
-Side note (with changed subject to disambiguate): Do you have any data
-on the performance impact of disabling VLAN offload that you can share?
-I've been sort of wondering whether saving those couple of bytes has any
-measurable impact on real workloads (where you end up looking at the
-headers anyway, so saving the cache miss doesn't matter so much)?
+I think we can skip this kind of validation in a test, it will crash 
+anyway and we don't have in other places.
 
--Toke
+>+
+>+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
+>
+> 	timeout_begin(TIMEOUT);
+> 	do {
+>-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
+>+		ret = ioctl(fd, op, actual);
+> 		if (ret < 0) {
+> 			if (errno == EOPNOTSUPP)
+> 				break;
+>
+>-			perror("ioctl(SIOCOUTQ)");
+>+			perror(name);
+> 			exit(EXIT_FAILURE);
+> 		}
+>-		timeout_check("SIOCOUTQ");
+>-	} while (sock_bytes_unsent != 0);
+>+		timeout_check(name);
+>+	} while (*actual != expected);
+> 	timeout_end();
+>
+>-	return !ret;
+>+	return ret;
+>+}
+>+
+>+/* Wait until transport reports no data left to be sent.
+>+ * Return false if transport does not implement the unsent_bytes() callback.
+>+ */
+>+bool vsock_wait_sent(int fd)
+>+{
+>+	int sock_bytes_unsent;
+>+
+>+	return !(ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0));
+> }
+>
+> /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index 5e2db67072d5..f3fe725cdeab 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
+> int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> 			   struct sockaddr_vm *clientaddrp);
+> void vsock_wait_remote_close(int fd);
+>+int ioctl_int(int fd, unsigned long op, int *actual, int expected);
+
+what about using vsock_* prefix?
+nit: if not, please move after the vsock_* functions.
+
+The rest LGTM!
+
+Thanks,
+Stefano
+
+> bool vsock_wait_sent(int fd);
+> void send_buf(int fd, const void *buf, size_t len, int flags,
+> 	      ssize_t expected_ret);
+>-- 
+>2.34.1
+>
 
 
