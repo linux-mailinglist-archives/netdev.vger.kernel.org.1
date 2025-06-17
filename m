@@ -1,109 +1,94 @@
-Return-Path: <netdev+bounces-198757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C7FADDABE
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:35:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1998FADDABF
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC103B4B7A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:35:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF31C16CA21
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 17:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFE323AE84;
-	Tue, 17 Jun 2025 17:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKx39ld6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842C4221F14;
+	Tue, 17 Jun 2025 17:36:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E3820C497
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061A015D1
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 17:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750181752; cv=none; b=FmHNAdaL8uGyLtrkgMFRYuvPIXoX+XRq6k8S7vtLkhUMLGUuAb5apBRM62lb4cLXQQD0dURYqTiQBgP7FRNrOHxY3h2rJOccES5N/zw1EOxiKB2qrfN0/A9rH6qoCvV3y8A0980U1lsPEcbWfVVnrPMnhUJvwx+OWo84EgdBAJI=
+	t=1750181765; cv=none; b=l8FfF4facTUJG1hvnNUQQNEUcgKXRoj0AMWRZLqGemwEH/Xf32eiup3ioZAY7dU2rGPOOB2ncpwgtmyhKiV9L+AQtpcuV7atr2Fb/vUbx2R3GmxGpUTVGzmtmLHPB7ZmNJZn4nTCIuWqKwK2ngwAfqtYSDiXP6x9lrxxK2DrfZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750181752; c=relaxed/simple;
-	bh=IxMZiGivgJcFKNyfPm4dRzReUn2WtW5awAEmS9HIx7A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OhZA/cRjlx2Rmu95gi5NYxybjQH2oKZhiaXiTBl54XFbT4Y52pRUJfXx4ipryEoorno5HhSwkWkM/THxN4wChXtdFlUscjq9cxnVLewwCHyiFA8TgTrrghYPpsJCN6CGR4Y+PtYPO37fdilc4PDClTWFEfwoL/UkVW5ComPHVk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKx39ld6; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a752944794so24333151cf.3
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 10:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750181750; x=1750786550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IxMZiGivgJcFKNyfPm4dRzReUn2WtW5awAEmS9HIx7A=;
-        b=BKx39ld6ASbl3/CLc5qng6j8aARxDIzctHcAMWdq+0aoewDVRzc5TeVYN2wUomQ9Bk
-         lEiLbDGZmhi7tIBybfKJcXiLP9d6H0zoeSZ+w5xgOUpMcQNksym4dGdGnoKZGBnMDI/q
-         K4YDotY4s+0WU19TVYapepBe2YrMICmqkwofuIjYXfLRXapaxzQ56vqW0MU5ISFG8iQw
-         gnYOYnr1+vTHyziU54EdcrhnrNpC6a+A8UZ95cltAuwbzqR5HSebf5Qt9U97qzjvln3i
-         YbPyFTElqyXcdF7hoek6iNSZDgfR/9D6qUiHNn29/L1TaMRTLPUjk8KQEbZHl7ZGlCtZ
-         g+9g==
+	s=arc-20240116; t=1750181765; c=relaxed/simple;
+	bh=po5VHLFgAh0+4aYh5ZRnHIy7yH8amwWKV9UqEt/DDsw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=RHjJ7e7Ddn6ih+GwtAYVcUmSbOlctRWyNPy/BQHQ9Cdz1P2/g8cvXH+rHwqaR1mu4YVvLmOjemb/he3Z3XJ2AKoB+pHYy0u+dFQL1B+6I5RrDSKznt+vNDg+PNsrTIA0/4vXGi0zfr8Ro0lhgtEei5bhy920lwQ4DHGXyjBxX9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8730ca8143eso659336939f.0
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 10:36:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750181750; x=1750786550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IxMZiGivgJcFKNyfPm4dRzReUn2WtW5awAEmS9HIx7A=;
-        b=fCscici+/vbxjklRl0Dpn1l1Nhxnjw7m0uoYQ73CqO6ZfyBt2P8U00DKWv6ezWECMr
-         Lywize1z5DDqGmHO8Oo9s4McdwcYmYiP5Aj2jxuP9wZfq+dBuH70rLvANp7lQW2cDKMp
-         1hHeTjxKDhTRTst9CNjhbRiQVNryOE4X0hwJYiTn+JCBVZy+lb6K7pLec1w0eAafsjOr
-         /N7x+fu+eq6jr8J6YHxByY3jiycB/enKnNGYDopqECraYHUwOKT6rE7gIyQHbkdScR1k
-         /owr3r9gId387i6kTT4TbUXsxS1KfJiBBmP4OfjOYzTmkCC9JJR5BmPigH9y4ni3HqP/
-         G71g==
-X-Forwarded-Encrypted: i=1; AJvYcCVAT5gMT3qW8Eh5zFNxlo4/rUY9g4xE/S5CfzHMp3bs7K890P5uAakfKIcRrcqQFdprv0Ba4V0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGcOBHdYzqr090r9PTtGifwvsaxGUpj4ArHiv2kkD7muHWQjSZ
-	ze463vxCKlhJNiKAeg0HY8XeT8zb4GDqs8LYjcfOzKhqROYvXRv9cVDZBBF9j20aYDrMNYDkHvF
-	7SfeltlW8FCvxr8l80vWwsj7bcLTmULinKAcVgVE4
-X-Gm-Gg: ASbGncsK0YSqMCusVq8gnJ9z9DKTq034p0JvpuXhtXj6L8HdVlyjgMAQ8yU6hPCci98
-	WKDIuEBdEaYDLrw73rD4N22hJQrFV/rXBTzzCi+RitDqpB7lodKItK09EHJroF2e5mW+2qnQTQX
-	13t87H+3O9YYPSce6akD+CJWdWZUSu3PBApjvx1dsRRKlMsCCiry+8R2s=
-X-Google-Smtp-Source: AGHT+IEci5c9iAKbnuiaE8WHwP6fIysQji2cASuwElQo+GvwPwiaVd4EnWKsrOW156RvOHggsC4NqSU6M8P9p2gXSjo=
-X-Received: by 2002:ac8:5a53:0:b0:477:4224:9607 with SMTP id
- d75a77b69052e-4a73c4bc9bfmr230930881cf.12.1750181749852; Tue, 17 Jun 2025
- 10:35:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750181763; x=1750786563;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tRp9PCwUOoJxnwPAseC8adT2g24KGuJfatti5I5xZLM=;
+        b=addNRSRpeU9CrII6ZpBeKooKeStXUjEAUrTf6rhcfFJeDcvIPD4gt0VzZ5c+Qx9g1p
+         NJBINwp1trt51JYyyb9FcOwcbbR0VGG2LthcSFSqkwsYftRTp0Vjg4fIdt+Ksc9dqHbO
+         jBwdg2UHF1rTbcy7LF74joU4zlY+xqP1DmFjWRB0WyKxXzEliGy/6o0oGIEFmtZpuK4d
+         3w2pBMZHk54KwiIbtq5bpiiwcELnuyFqMuhxkvYT73uyrx83kAaAO5Z3Qw+4irGDiW6T
+         DQfJy9nhGY8QPwS7c1314TqeLSMqm08bNIciIjUtkWhk1uFNlyO+hIjHk3dULo8bP8wF
+         Q5sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQDGVgbUsdMA8m4xyn7KqqqHQ7OCDIF6o4tGAp0CJZsicDhdL0UPaxLRt3H73gaVyipqR/pgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHLJP5l9RBXzddCm6O0sUts5m8ZR8VR6dfRrq5rJND/Fdp/bLM
+	ZWPjQwzbjE5ngaGraI7aZDqkhn1MOYZmYkJTmTQbMN1pLghsDsSXRH4j/fJS9JEfJA8kkTrVrWP
+	PBA2svtOYSFcdObxiz2+Ngl9VTEtX5NCFSXyZVRoYMjzUzqbt+9ZWobCKlpo=
+X-Google-Smtp-Source: AGHT+IG2NnluvTF+ZS28/wS/Yl0jJbq3XTO0UDSSYpDOQu1R2P+FhlbO87/9ojA0d4TJI8bdCFXKYRbWZeTyt/ycEYH/ig194OZg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aEzIYYxt0is9upYG@v4bel-B760M-AORUS-ELITE-AX>
-In-Reply-To: <aEzIYYxt0is9upYG@v4bel-B760M-AORUS-ELITE-AX>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 17 Jun 2025 10:35:38 -0700
-X-Gm-Features: AX0GCFu2V9OmhB8zB52ChC7zYsM3DIqkBnmIytsLfmy5MNnMVd_vHdbpZpezEzs
-Message-ID: <CANn89iLvbOP1Hnt7CtucWE5n6n72HhYBeTjNuTCqiY=AH_8DOA@mail.gmail.com>
-Subject: Re: [PATCH v3] net/sched: fix use-after-free in taprio_dev_notifier
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: vinicius.gomes@intel.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, vladimir.oltean@nxp.com, netdev@vger.kernel.org, 
-	v4bel@theori.io
+X-Received: by 2002:a05:6e02:c72:b0:3dc:9b89:6a3b with SMTP id
+ e9e14a558f8ab-3de22cef37amr31040435ab.8.1750181763142; Tue, 17 Jun 2025
+ 10:36:03 -0700 (PDT)
+Date: Tue, 17 Jun 2025 10:36:03 -0700
+In-Reply-To: <0000000000004fc49a0617826da3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6851a783.050a0220.2608ac.001f.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] possible deadlock in mgmt_remove_adv_monitor_complete
+From: syzbot <syzbot+e8651419c44dbc2b8768@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 13, 2025 at 5:55=E2=80=AFPM Hyunwoo Kim <imv4bel@gmail.com> wro=
-te:
->
-> Since taprio=E2=80=99s taprio_dev_notifier() isn=E2=80=99t protected by a=
-n
-> RCU read-side critical section, a race with advance_sched()
-> can lead to a use-after-free.
->
-> Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
->
-> Fixes: fed87cc6718a ("net/sched: taprio: automatically calculate queueMax=
-SDU based on TC gate durations")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> ---
+syzbot suspects this issue was fixed by commit:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+commit e6ed54e86aae9e4f7286ce8d5c73780f91b48d1c
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Tue Jun 3 20:12:39 2025 +0000
+
+    Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_complete
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=177d790c580000
+start commit:   4c49f38e20a5 net: stmmac: fix TSO DMA API usage causing oops
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1362a5aee630ff34
+dashboard link: https://syzkaller.appspot.com/bug?extid=e8651419c44dbc2b8768
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11348b30580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17abf40f980000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_complete
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
