@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B4D1ADDF8C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:20:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA2BADDF8E
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:21:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C95F5189CA6C
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:20:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1932400370
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1192BE7BE;
-	Tue, 17 Jun 2025 23:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA582DBF4E;
+	Tue, 17 Jun 2025 23:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WxHNB7E/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gX2L5TdO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86892980B0;
-	Tue, 17 Jun 2025 23:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273BD2D12F1;
+	Tue, 17 Jun 2025 23:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750202403; cv=none; b=fHPO3+VsCH1dWZ+ENaxQvu2csDhIRHUKEiXB3DlZtuhJSng7RBFzaVkqJxkOo5ptfNM5FSopHhgzP2FUfaOmLymnm/GugsHwdtcoUl5vt112bh+iwQWvI7k8CRQHJWM/ExMQ/YzJ5DYX5Rtdv1rZvuH0xwEoNBdjh2SzkP0lBTQ=
+	t=1750202405; cv=none; b=In9GhjP5ClJJSHWvbqGPRYjBivLKxRuBLS6HY5ZAC1Ef40JdBmBTkrNzgXTeY2KAObhzIL0mt7TeN2wSUOAILdV6ZXw/0g/eI8pj73Xl8oAz3+rG8H3lmDiGi3sm2J5AyhsSThRPv8op7Q999kifuZ0o8fxwv69XugdfNd3/+fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750202403; c=relaxed/simple;
-	bh=D/MwPuNU7YSZbfUwSYVCnvHmZw+UsvYgVrx2QwzZlwE=;
+	s=arc-20240116; t=1750202405; c=relaxed/simple;
+	bh=i9TKNdIlWuBqyoNihNjsATzBaXsZQKN09WakJmYXqYw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V+F1OSRSp30HJO4l02M3939hgK5yxca1px2kmHORAFJeb2AKIgVc+vcj2hTMcpO5UK2cO8NIMWAHfeG6bwVka75t3mc9DLzyC5tZkHFLipzsfaDJKJZJ1zYDUlJ5rCEJ79bUgHlq+5nHIsLFCRqZm8bYCXmyICeuh6o6MoUNgKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WxHNB7E/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67FAAC4CEF0;
-	Tue, 17 Jun 2025 23:20:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=SE9P+q/JHt9H7CbCdXPOX8nGzEPq663tEdasiHTfc0mizDcZcnxrhE7RtC4tulryb1jx6pLrarsGFIYeZxEbFTFZuFujN5avRq2XyNvnau7HtWbgAGUY6hep2tKrLk2hdwQDPAb/XYLslOxPKsWnhF4lV2kG32qIcT29U8eNDDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gX2L5TdO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E68FDC4CEF0;
+	Tue, 17 Jun 2025 23:20:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750202403;
-	bh=D/MwPuNU7YSZbfUwSYVCnvHmZw+UsvYgVrx2QwzZlwE=;
+	s=k20201202; t=1750202404;
+	bh=i9TKNdIlWuBqyoNihNjsATzBaXsZQKN09WakJmYXqYw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WxHNB7E/kR6pm2qGY6LmRvp2wDqa5Uf6G3FrZHQ6Abz8w/cXakkDceIoeaSzGSsOQ
-	 lbbvenJaRFEHtaR8K8lg7erM8JxMDCkoyL1vI+A7IRxeVRw8UpKZzmmXJEuDBqBV8m
-	 jxY8BZY0A/pP2bmd4OoGBg/BwieDFNCVpt9lmaS5JPNaPPJtcly/12ccee8dTa16DF
-	 o3e21pb8jejXy0wFlZ28ogUbSzOFjjGS+ONBNijyofanWJHHgt+hppNkmakH2d0H+o
-	 1WsgfrtXfNjqkV6qDKWElODfzf8sZcg3Q2Ef9Zqwz4WDwi+VtjHpwECUv7OQSSmTlM
-	 Ry+w3DECM41Sg==
+	b=gX2L5TdOdQW2Zl9FmwXUp8+gwBLmfd4XX74XkFdUFJHAq4AX3qzY1kmDQfM7bLZYK
+	 jFooWESdRqbloEzGG5mZND6LIB8px8U0iJ1TjlIFVlnb57gFb+rePP1f9PEFLLgfw3
+	 m6M+Ab1Fffuns8EeZ9OWqjM8m83Z1YMgkDxM+zzFX5Ag4BexFrjJwegXfpuvYXCbro
+	 AqSVlZ/d3jT05NrkAMNQ+Zwgz6GhsJkGx9B2vaXsJN3jxMzh4qE8OvZ9Z9986jYpIZ
+	 sRMNypTJNSViwB40SV7RMB6ReEYAMFvDVCiCeeuq8Z/6IL3e1awoPnWacDxV3vPWl0
+	 ZQFaZwojqEkDA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BE538111DD;
-	Tue, 17 Jun 2025 23:20:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC8E38111DD;
+	Tue, 17 Jun 2025 23:20:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,17 +52,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: bcmgenet: update PHY power down
+Subject: Re: [PATCH net-next] net: liquidio: Remove unused
+ validate_cn23xx_pf_config_info()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020243174.3732875.2118110252101243802.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:20:31 +0000
-References: <20250614025817.3808354-1-florian.fainelli@broadcom.com>
-In-Reply-To: <20250614025817.3808354-1-florian.fainelli@broadcom.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, opendmb@gmail.com,
- bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ <175020243324.3732875.171242718895048477.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:20:33 +0000
+References: <20250614234941.61769-1-linux@treblig.org>
+In-Reply-To: <20250614234941.61769-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 
 Hello:
@@ -70,19 +70,21 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 13 Jun 2025 19:58:16 -0700 you wrote:
-> From: Doug Berger <opendmb@gmail.com>
+On Sun, 15 Jun 2025 00:49:41 +0100 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 > 
-> The disable sequence in bcmgenet_phy_power_set() is updated to
-> match the inverse sequence and timing (and spacing) of the
-> enable sequence. This ensures that LEDs driven by the GENET IP
-> are disabled when the GPHY is powered down.
+> [Note, I'm wondering if actually this is a case of a missing call;
+> the other similar function is called in __verify_octeon_config_info(),
+> but I don't have or know the hardware.]
+> 
+> validate_cn23xx_pf_config_info() was added in 2016 by
+> commit 72c0091293c0 ("liquidio: CN23XX device init and sriov config")
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: bcmgenet: update PHY power down
-    https://git.kernel.org/netdev/net-next/c/90b4e1cf6de0
+  - [net-next] net: liquidio: Remove unused validate_cn23xx_pf_config_info()
+    https://git.kernel.org/netdev/net-next/c/5216b3b25018
 
 You are awesome, thank you!
 -- 
