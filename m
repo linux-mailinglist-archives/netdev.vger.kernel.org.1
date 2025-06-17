@@ -1,216 +1,114 @@
-Return-Path: <netdev+bounces-198810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D04F4ADDE52
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:59:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584BDADDE65
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8C2F172885
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:59:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A010A17F2E3
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C15293C57;
-	Tue, 17 Jun 2025 21:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D1F29346F;
+	Tue, 17 Jun 2025 22:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZ1LW146"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P9lbGFqH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382B1293B44;
-	Tue, 17 Jun 2025 21:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638173594C;
+	Tue, 17 Jun 2025 22:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750197586; cv=none; b=qDDaddEM0b7MpaKJUh3tGmcbX2Z2U4dkroT4NT9ksPlsceiHhpZHo9X3HuIgcwsxK5g998K0BhQVlFexyluBuD8f++dvjDRNxXZldsqofWM1j3RmkPtiNm7VdlcWiYPfgEZ0m2x+8fLbibLtmxORD3cFrUGzb6bC/YFektx8GxI=
+	t=1750197610; cv=none; b=Xgj9gWOMsxy0ijvs3VzTvT3E+rMFAkualJCYn6DtsR11qKhdKxhMuQoFEtuF6539aCiBgcbTmT7z+GFwKSfeCYBpthqy6knRSZJgJhKp6MlmocqaJ6MH0CWvUpeBjxxspj0yqSAiI+eN0p4c02ToIkTIjivRZEbajGyOXYuyKBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750197586; c=relaxed/simple;
-	bh=XYYXrTGU6D3/slr86eXxan/EdIa14xem8KtqhrpPTdo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jp6pBlFcD4jCEfQTStnw0WxfULLTJSxKVksNe2ynH50iACJhINh/jmJ5HT1bmvg+KDQLubkwmfpZgsUnOa8UHGxkQiaXXs/ePtPJQt/xa3qwFI2jwI43HQkKfAHtVolBGX2AuW8eAgvWUhL2DX/6uA3mbYCAFzV58ELD2TgFRTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZ1LW146; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B91AC4CEE3;
-	Tue, 17 Jun 2025 21:59:45 +0000 (UTC)
+	s=arc-20240116; t=1750197610; c=relaxed/simple;
+	bh=w85DzPEHKnEH32aJad7kpo9/EdvqI8PTVlSwnc+CrQs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uPT4A5tQfZTG3cdPX+kGViSl0ylZkoBqinUNjzeHKRKsZq2hIK7PTskMgjqinW0o6AfD1F4oG6lgtGDq2tt+uznBGxgcqKOJKjmL/ru1JH+cPPECR5H/JMMbYKuBLwtKc+BL+Eil+Km/EPLWAhVRWdxL3wLv2ZPtWbOPjTp3/m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P9lbGFqH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED36CC4CEE3;
+	Tue, 17 Jun 2025 22:00:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750197586;
-	bh=XYYXrTGU6D3/slr86eXxan/EdIa14xem8KtqhrpPTdo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fZ1LW146tDdoprbiGo+BovJUk3VRbDRpcjyyXK8ZzNKRw/IcrBQ84Do6wzfuNXQ76
-	 /cx48bywafNv607RfeubQVmth/fjS2hmAePpPmj/HJfPUWLlgbhs5oziEO6675QbD6
-	 UjCiwOCwRvZkLTIq7JIxVtbOeTY5EU8TrZEBxgQoFi3Ymj3l3zq/h+VD0bx3F5owXa
-	 BybszcJw5dYx1NWhUDqZy83RBr0wdimPID5obNIeBMsMeClYnjEFTWgV89JxKfUB60
-	 fjWb6uQWC8SGX4JA8ThFRDbKyNVeRgZE+SQSqR9R1f3R1alHqO+tpsY9EAaeDoGI/u
-	 1iR5qcRy74QNg==
-Date: Tue, 17 Jun 2025 14:59:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: Chris Snook <chris.snook@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ingo Molnar
- <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jeff Garzik
- <jeff@garzik.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] ethernet: alt1: Fix missing DMA mapping tests
-Message-ID: <20250617145944.10d444f4@kernel.org>
-In-Reply-To: <20250616140246.612740-2-fourier.thomas@gmail.com>
-References: <20250613074356.210332b1@kernel.org>
-	<20250616140246.612740-2-fourier.thomas@gmail.com>
+	s=k20201202; t=1750197610;
+	bh=w85DzPEHKnEH32aJad7kpo9/EdvqI8PTVlSwnc+CrQs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=P9lbGFqHPkdvRR0T4aHKak6RRg6FwdYV4a7essTNdtxm8GYS2NwIDEzfXBn3SvoIl
+	 GXRkXgPHG1gs7KyJQ9FkR4/ExK2Po4UEHM9igSC/rFKVWPFgBZsXhXn4SbMzV1LJzU
+	 O40aTsLYE2vi6W/7BkfXpp+4Ooyzzav4510VEfwHh028qKqnVBv8EOFTaNt/aEIWgI
+	 E82DZLsO0ndttEow8G9iCS9+5mAivSGfU9eWCCQ4a/jAN6Zm+ouW7DeQWCPCLWyGXC
+	 paCqNxBFHz8yQd6Er+iNj35SOcofofofCBSq6loQGI7YprZK9p5uOi1SwetqYtbltZ
+	 dxwGQucw7Hm7Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE4F38111DD;
+	Tue, 17 Jun 2025 22:00:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v6 0/5] Allow dyn MSI-X vector allocation of MANA
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175019763850.3710346.12665177654858419970.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 22:00:38 +0000
+References: 
+ <1749650984-9193-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: 
+ <1749650984-9193-1-git-send-email-shradhagupta@linux.microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nipun.gupta@amd.com, yury.norov@gmail.com,
+ jgg@ziepe.ca, Jonathan.Cameron@huwei.com, anna-maria@linutronix.de,
+ kevin.tian@intel.com, longli@microsoft.com, tglx@linutronix.de,
+ bhelgaas@google.com, robh@kernel.org, manivannan.sadhasivam@linaro.org,
+ kw@linux.com, lpieralisi@kernel.org, decui@microsoft.com, wei.liu@kernel.org,
+ haiyangz@microsoft.com, kys@microsoft.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kotaranov@microsoft.com, horms@kernel.org, leon@kernel.org,
+ mlevitsk@redhat.com, ernis@linux.microsoft.com, peterz@infradead.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, paulros@microsoft.com,
+ shradhagupta@microsoft.com
 
-On Mon, 16 Jun 2025 15:59:55 +0200 Thomas Fourier wrote:
-> According to Shuah Khan[1], all `dma_map()` functions should be tested
-> before using the pointer.  This patch checks for errors after all
-> `dma_map()` calls.
+Hello:
 
-The link and reference to Shuah's presentation is not necessary.
-Just say that the DMA functions can fail so we need the error check.
- 
-> In `atl1_alloc_rx_buffers()`, when the dma mapping fails,
-> the buffer is deallocated ans marked as such.
+This series was applied to netdev/net-next.git (main)
+by Shradha Gupta <shradhagupta@linux.microsoft.com>:
+
+On Wed, 11 Jun 2025 07:09:44 -0700 you wrote:
+> In this patchset we want to enable the MANA driver to be able to
+> allocate MSI-X vectors in PCI dynamically.
 > 
-> In `atl1_tx_map()`, the previously dma_mapped buffers are de-mapped and an
-> error is returned.
+> The first patch exports pci_msix_prepare_desc() in PCI to be able to
+> correctly prepare descriptors for dynamically added MSI-X vectors.
 > 
-> [1] https://events.static.linuxfound.org/sites/events/files/slides/Shuah_Khan_dma_map_error.pdf
->
-> Fixes: f3cc28c79760 ("Add Attansic L1 ethernet driver.")
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+> The second patch adds the support of dynamic vector allocation in
+> pci-hyperv PCI controller by enabling the MSI_FLAG_PCI_MSIX_ALLOC_DYN
+> flag and using the pci_msix_prepare_desc() exported in first patch.
+> 
+> [...]
 
-Please don't send the new versions in reply to old ones.
-For those of us who use their inbox as a FIFO of pending submissions
-it messes up ordering.
+Here is the summary with links:
+  - [v6,1/5] PCI/MSI: Export pci_msix_prepare_desc() for dynamic MSI-X allocations
+    https://git.kernel.org/netdev/net-next/c/5da8a8b8090b
+  - [v6,2/5] PCI: hv: Allow dynamic MSI-X vector allocation
+    https://git.kernel.org/netdev/net-next/c/ad518f2557b9
+  - [v6,3/5] net: mana: explain irq_setup() algorithm
+    https://git.kernel.org/netdev/net-next/c/4607617af1b4
+  - [v6,4/5] net: mana: Allow irq_setup() to skip cpus for affinity
+    https://git.kernel.org/netdev/net-next/c/845c62c543d6
+  - [v6,5/5] net: mana: Allocate MSI-X vectors dynamically
+    https://git.kernel.org/netdev/net-next/c/755391121038
 
-> diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
-> index cfdb546a09e7..dd0e01d3a023 100644
-> --- a/drivers/net/ethernet/atheros/atlx/atl1.c
-> +++ b/drivers/net/ethernet/atheros/atlx/atl1.c
-> @@ -1869,6 +1869,14 @@ static u16 atl1_alloc_rx_buffers(struct atl1_adapter *adapter)
->  		buffer_info->dma = dma_map_page(&pdev->dev, page, offset,
->  						adapter->rx_buffer_len,
->  						DMA_FROM_DEVICE);
-> +		if (dma_mapping_error(&pdev->dev, buffer_info->dma)) {
-> +			buffer_info->alloced = 0;
-> +			buffer_info->skb = NULL;
-> +			buffer_info->dma = 0;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-maybe you could move the map call a little further up, before all the
-buffer_info fields are populated? So we dont have to clean them up?
-
-> +			kfree_skb(skb);
-> +			adapter->soft_stats.rx_dropped++;
-> +			break;
-> +		}
->  		rfd_desc->buffer_addr = cpu_to_le64(buffer_info->dma);
->  		rfd_desc->buf_len = cpu_to_le16(adapter->rx_buffer_len);
->  		rfd_desc->coalese = 0;
-> @@ -2183,8 +2191,8 @@ static int atl1_tx_csum(struct atl1_adapter *adapter, struct sk_buff *skb,
->  	return 0;
->  }
->  
-> -static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
-> -	struct tx_packet_desc *ptpd)
-> +static int atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
-> +		       struct tx_packet_desc *ptpd)
->  {
->  	struct atl1_tpd_ring *tpd_ring = &adapter->tpd_ring;
->  	struct atl1_buffer *buffer_info;
-> @@ -2194,6 +2202,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  	unsigned int nr_frags;
->  	unsigned int f;
->  	int retval;
-> +	u16 first_mapped;
->  	u16 next_to_use;
->  	u16 data_len;
->  	u8 hdr_len;
-> @@ -2201,6 +2210,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  	buf_len -= skb->data_len;
->  	nr_frags = skb_shinfo(skb)->nr_frags;
->  	next_to_use = atomic_read(&tpd_ring->next_to_use);
-> +	first_mapped = next_to_use;
->  	buffer_info = &tpd_ring->buffer_info[next_to_use];
->  	BUG_ON(buffer_info->skb);
->  	/* put skb in last TPD */
-> @@ -2216,6 +2226,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
->  						offset, hdr_len,
->  						DMA_TO_DEVICE);
-> +		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
-> +			goto dma_err;
->  
->  		if (++next_to_use == tpd_ring->count)
->  			next_to_use = 0;
-> @@ -2242,6 +2254,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  								page, offset,
->  								buffer_info->length,
->  								DMA_TO_DEVICE);
-> +				if (dma_mapping_error(&adapter->pdev->dev,
-> +						      buffer_info->dma))
-> +					goto dma_err;
->  				if (++next_to_use == tpd_ring->count)
->  					next_to_use = 0;
->  			}
-> @@ -2254,6 +2269,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
->  						offset, buf_len,
->  						DMA_TO_DEVICE);
-> +		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
-> +			goto dma_err;
->  		if (++next_to_use == tpd_ring->count)
->  			next_to_use = 0;
->  	}
-> @@ -2277,6 +2294,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  			buffer_info->dma = skb_frag_dma_map(&adapter->pdev->dev,
->  				frag, i * ATL1_MAX_TX_BUF_LEN,
->  				buffer_info->length, DMA_TO_DEVICE);
-> +			if (dma_mapping_error(&adapter->pdev->dev,
-> +					      buffer_info->dma))
-> +				goto dma_err;
->  
->  			if (++next_to_use == tpd_ring->count)
->  				next_to_use = 0;
-> @@ -2285,6 +2305,22 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
->  
->  	/* last tpd's buffer-info */
->  	buffer_info->skb = skb;
-> +
-> +	return 0;
-> +
-> + dma_err:
-> +	while (first_mapped != next_to_use) {
-> +		buffer_info = &tpd_ring->buffer_info[first_mapped];
-> +		dma_unmap_page(&adapter->pdev->dev,
-> +			       buffer_info->dma,
-> +			       buffer_info->length,
-> +			       DMA_TO_DEVICE);
-> +		buffer_info->dma = 0;
-> +
-> +		if (++first_mapped == tpd_ring->count)
-> +			first_mapped = 0;
-> +	}
-> +	return -ENOMEM;
->  }
->  
->  static void atl1_tx_queue(struct atl1_adapter *adapter, u16 count,
-> @@ -2419,7 +2455,8 @@ static netdev_tx_t atl1_xmit_frame(struct sk_buff *skb,
->  		}
->  	}
->  
-> -	atl1_tx_map(adapter, skb, ptpd);
-> +	if (atl1_tx_map(adapter, skb, ptpd))
-> +		return NETDEV_TX_BUSY;
-
-You should drop the packet. Occasional packet loss is better than
-having a packet that we can't map for some platform reasons blocking
-the queue
-
->  	atl1_tx_queue(adapter, count, ptpd);
->  	atl1_update_mailbox(adapter);
->  	return NETDEV_TX_OK;
 
 
