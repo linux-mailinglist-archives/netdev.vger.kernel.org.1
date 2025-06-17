@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-198676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B317ADD04D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:46:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F104DADD077
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A82AF16B72A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:45:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1402140421E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0A62EB5C2;
-	Tue, 17 Jun 2025 14:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438132EB5CE;
+	Tue, 17 Jun 2025 14:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mw6rxMHY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUXR+5G2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECC12EB5AB
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6E72EB5C0
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750171368; cv=none; b=ICIKebEO2XDswoP7hQKKG5m/b5KCpQRhvUlapHwm5SskDdFq10XsFnb3/fEPpCjF9XJI0WQPcWzxHEPBu4GLMGFU8bZ1g9yzfE1bGoCmI9BYDsX6+/0AJOfBdny0ir0bRP/OVLKTI5iJKLbYI5ZonhpYZa5WC9UhpZdKqJq5eKI=
+	t=1750171370; cv=none; b=c8eGQCl2SJbpSn06hF3R0zxI++CPfsIgha/SZl+5Wtl7H4Epqw1ZlcJLL/rd1ljUBZwM9jjQK2XWISOzzRprettNnVBii7VwEujXA+t52LNKDMCkRhs/3UEeH/rYEnHU/o33mdqiTZdilJeCJ1WAaeZ/HkttSn0LK0iSEGiVe7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750171368; c=relaxed/simple;
-	bh=yqrzwZtXS6VWsKtMpqhPxEWKbw0C5/RqukDPGLCEAro=;
+	s=arc-20240116; t=1750171370; c=relaxed/simple;
+	bh=xi/0J0PMhyK2hpMw7V85EB4a4XDUT5f9Dj33hdaiEkk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iD1KehfYhXIb+TBm5rnl4QKdrGZ/ZsX+JsUUgrLVXvSHDqw1Hcr7P/batBkGOKCApEOzbbjL657FaYe9d1NZFw8jF+Ib8TFXd1T18azCvloRaq1P+5iJIdifsEm4rfJHZyYYy4G/6FVksk21f1YqMGb2FPCuIwoOFUhNsrApGoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mw6rxMHY; arc=none smtp.client-ip=209.85.208.50
+	 MIME-Version; b=NywqS4mhYL7VhfjudB16By4i5kFQr11JUcSrkGBKM3I5cAdTs7jdX0ciRplKNe89b0KeQCoYibNo9Rl5ilLIvR8EIWvQ51OVCn5SZZHADI1SNfzev6ynR13MGGnDEpCacVldYysAK2C91f+Hgb87cuQRlVWdCsGy1otQZYlUWE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUXR+5G2; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60700a745e5so12903792a12.3
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:42:46 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-adb2e9fd208so1175431366b.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:42:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750171365; x=1750776165; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750171367; x=1750776167; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qk7VWcVEbFnLsY2SleKq0fg8xNpOYOiGVUBmMjWbD8k=;
-        b=mw6rxMHYWX5RorcrqeKrNgi++zKCCm5rRlIaVxAzbfdEGXkqXH/Qs38xl6U237z1zq
-         blrWCLYfuAblh6dnvgKtoGO1+jlxzutNSpBsLJfXU5njDY+W4kPKv6vfru5dQoyn1Y/b
-         NkMhc5+PHw7A2V0cD/Vh6hjxyVnMxVQhTrn09iyAM9O6FOWPnQs5vr00RwJ/Fu4AACeA
-         FePK48szh8ZoefBQamFQdjIEFXGHiZw4xJpo7r4Bp7Hm9Osi3PVdzuD3rFMZErAWmttf
-         CZ9GvVJKDNem0xXuSQBqd8BqJ19qij2Z0W+7+1z9IZonh8PpCaUCnLq7kReozK0urMnD
-         0ZIQ==
+        bh=bpZ9g9LBepWtI/50rlGwLCDJm2CZ001eBZvjx5PwPPQ=;
+        b=FUXR+5G2XxA4lROflsGehZhcaLnbp6bFDMc5pwt+zSxqjqpW/kfAjBfZS9083PCX+Q
+         RZA02RxEKa1KEYoB/R3xi7Kl/JEWA1X3tJGFFH5JoPtrzsF4D3Yuesfd7zLtGXgq/Ibi
+         1EgRO1b57/RJ+4voVYIiJZGouVY5+obZ9cjZAhDoqVf8Fu1B5knEDMm1n1DayGw6phjf
+         6oQ/mXtx9/+GtL3lbmyC55sAuZnO9Ss3qBsIFQE8Wy/5M45v95bMFa8NVkVDHA7Dybmn
+         CN7PnrxH0u4lpUorg32BBHz795fGSp9Rx2frkjE2bMqqGVA89gdveobuLiGcQyXsDNuI
+         MD6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750171365; x=1750776165;
+        d=1e100.net; s=20230601; t=1750171367; x=1750776167;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qk7VWcVEbFnLsY2SleKq0fg8xNpOYOiGVUBmMjWbD8k=;
-        b=J3KPoeGBaB+4GwFqHT793ZbimNJII2Ngwa6+d7705Aidx6wdz8RWrIFSt9ehwxsbcA
-         qXOL3sbVpj6VpT5agru8W8sqW663J6aDljqIMRR/V9FT0O5fjf/ox35rDB49JtE+42/d
-         JbFRbo+QtNV+7ToPiWyE+vIlPnQHFVLHYcBbRc+xZY1ezVXvjATOLWZRGCBfTyopzVF0
-         L56H2gM4LToUuQUc9JW0rLiRsNkAXGXSsNMINGFDYC2dMRqBNSC78WjF5q+bxAhLGfWJ
-         77nzvbtl30JbPEbFcIeZYkTtwRXFSAujSze0FxhuzIQ8NcjG+qU2C36NET81xljoq7wb
-         L89Q==
-X-Gm-Message-State: AOJu0YxgIUORT14DQ3pbPtVKGOYPoIGE643QTqtG1NPhj/3SuvJIOCdE
-	vXhWZcixpcv8tAKesdwH4aFLY8OhPwKVbAm7VIxVuG6ZLPvVtC1BCMVr
-X-Gm-Gg: ASbGncu7AIiWgJRNxH77UpgZF/zGire7nUYTU5EuL4w3laZ/+Nm2QVIodaHagCrlR6n
-	Wgr0Qv5azCIli+K3I/RZ7XfDzzUoqS1Dm/cfySegbGdOYqboqdpEsyiArJU2h4A9K/5FUn+sx5G
-	TiJPHEeL8ySjv6J8a1ro4douQNzUYBCaTVKNgCL3pVx7oGiaaU4S7jlU4a8sYwrNhMz5YA/oZeL
-	WzodjCWwNKzFGZ0DbyuiTyYC0jbNmS5Ucy2o79+eDRBx9LfkHoEAK9rD2cpOawYOZXwihzxIHgx
-	F+HUS49vf4S/Y/BXeNbHpm1TDttz/lF+aWV8TAOyyZpYlj/MiSIyuUSDg2a+pLXYeyU6/et8eOC
-	MytWhbweElKib
-X-Google-Smtp-Source: AGHT+IGXtcZ0BhyRT1r5y5IgQMghaL1rsQBJaS5sskmA7chn0qYPAm/Sd4I3XcA225eBLKOoosB/eQ==
-X-Received: by 2002:a05:6402:440a:b0:607:1b7a:b989 with SMTP id 4fb4d7f45d1cf-608d0862b0emr12309921a12.12.1750171364834;
-        Tue, 17 Jun 2025 07:42:44 -0700 (PDT)
+        bh=bpZ9g9LBepWtI/50rlGwLCDJm2CZ001eBZvjx5PwPPQ=;
+        b=jdQgp3zsuXU/yo+PjDZU4Pwf5JNn4pmU/XOfKtohRyQb36O74tdsBA3qXD2HdhI6X2
+         aHAadk6iSq4rGKLyPUFCRHc4MyQjKfTy8duHJY5kQeuMAfUNM+BHYI2VIBn93QJa8yO6
+         5QY8lzb14EiWZGs6pN0RQW7vr8Il0L5IErcp2LsIT7lh0YEh82m+UX0/H48fHNMPx9A4
+         /Gw7LWmUDImtVTIznDq501+4YVmUAU50TCsc2YAAP+9ryQ74QnIFFPbMJPtc658pkXX2
+         WPd41uKetYLSRwsM2sHkaPRuMCmRyIgdayQDFKrO/JigXWw4ZsNPrVQNOl5muzmTFp2c
+         6FgQ==
+X-Gm-Message-State: AOJu0YxysGDyyFXiIeAK5e2bv6P51I7Oiu+mVeizA0PJIGVUGJ/SXEKH
+	gfVnVajYzrYigIAiF3h1rKCUYmAAfurOAhnbegKFjr+tDQmqkOrwp4MP
+X-Gm-Gg: ASbGncsDttu01akUt4S6e6dvCQ1yqflBBjjUXd3aZZw4PUL7meFTsc/xkeD+fcfnK94
+	ovexf3wBHuJf2BiJC8iWZNkBAhsckM49g45JYwKwWT+YUwAe2He4K95HbnaEEE4gnXQ/89mrym9
+	I5y64MkeNI7UzY0mI9kwXtSB5Y/y1TSw3bhZmFqu7H9EnlcOPbpMr1Ov0qSSJkbqtMbXmNarrpw
+	0nD+vWHrXfKRvxpopTu/hXWVV3+Lmg638chYKPmKxvm2833JEIe2UQfLpjp2BH0l+CsQLCiNFq4
+	xMY6EQdAKB+cXR5jkIsY46Su9f/tqSZ91/GM7xOiK9D/siLgrBW8SEqMCQac+pLbGG+Bv6kM1kJ
+	uPKD6GU/qlj3I
+X-Google-Smtp-Source: AGHT+IGNTqc6sFueTDTgrgFGYl3ue4NCmqn4JUYyD93oBqqcxpi3syO253TQmaLuTMixY2hgOWuRtA==
+X-Received: by 2002:a17:907:6e8a:b0:ad5:5b2e:655b with SMTP id a640c23a62f3a-adfad3d9dc0mr1436358466b.25.1750171366573;
+        Tue, 17 Jun 2025 07:42:46 -0700 (PDT)
 Received: from localhost (tor-exit-56.for-privacy.net. [185.220.101.56])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-6097bf50ab5sm2399485a12.43.2025.06.17.07.42.43
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-adec81c0157sm866924666b.48.2025.06.17.07.42.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 07:42:44 -0700 (PDT)
+        Tue, 17 Jun 2025 07:42:46 -0700 (PDT)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 X-Google-Original-From: Maxim Mikityanskiy <maxim@isovalent.com>
 To: Daniel Borkmann <daniel@iogearbox.net>,
@@ -84,9 +84,9 @@ To: Daniel Borkmann <daniel@iogearbox.net>,
 	Nikolay Aleksandrov <razor@blackwall.org>
 Cc: netdev@vger.kernel.org,
 	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH RFC net-next 08/17] bnxt_en: Remove jumbo_remove step from TX path
-Date: Tue, 17 Jun 2025 16:40:07 +0200
-Message-ID: <20250617144017.82931-9-maxim@isovalent.com>
+Subject: [PATCH RFC net-next 09/17] gve: Remove jumbo_remove step from TX path
+Date: Tue, 17 Jun 2025 16:40:08 +0200
+Message-ID: <20250617144017.82931-10-maxim@isovalent.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250617144017.82931-1-maxim@isovalent.com>
 References: <20250617144017.82931-1-maxim@isovalent.com>
@@ -101,61 +101,28 @@ Content-Transfer-Encoding: 8bit
 From: Maxim Mikityanskiy <maxim@isovalent.com>
 
 Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
-unnecessary steps from the bnxt_en TX path, that used to check and
-remove HBH.
+unnecessary steps from the gve TX path, that used to check and remove
+HBH.
 
 Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 21 ---------------------
- 1 file changed, 21 deletions(-)
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d5495762c945..7f10bcf45280 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -511,9 +511,6 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			return NETDEV_TX_BUSY;
- 	}
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index 9d705d94b065..e7e7adfc9b47 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -925,9 +925,6 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 	int num_buffer_descs;
+ 	int total_num_descs;
  
--	if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
--		goto tx_free;
+-	if (skb_is_gso(skb) && unlikely(ipv6_hopopt_jumbo_remove(skb)))
+-		goto drop;
 -
- 	length = skb->len;
- 	len = skb_headlen(skb);
- 	last_frag = skb_shinfo(skb)->nr_frags;
-@@ -13663,7 +13660,6 @@ static bool bnxt_exthdr_check(struct bnxt *bp, struct sk_buff *skb, int nw_off,
- 			      u8 **nextp)
- {
- 	struct ipv6hdr *ip6h = (struct ipv6hdr *)(skb->data + nw_off);
--	struct hop_jumbo_hdr *jhdr;
- 	int hdr_count = 0;
- 	u8 *nexthdr;
- 	int start;
-@@ -13692,24 +13688,7 @@ static bool bnxt_exthdr_check(struct bnxt *bp, struct sk_buff *skb, int nw_off,
- 		if (hdrlen > 64)
- 			return false;
- 
--		/* The ext header may be a hop-by-hop header inserted for
--		 * big TCP purposes. This will be removed before sending
--		 * from NIC, so do not count it.
--		 */
--		if (*nexthdr == NEXTHDR_HOP) {
--			if (likely(skb->len <= GRO_LEGACY_MAX_SIZE))
--				goto increment_hdr;
--
--			jhdr = (struct hop_jumbo_hdr *)hp;
--			if (jhdr->tlv_type != IPV6_TLV_JUMBO || jhdr->hdrlen != 0 ||
--			    jhdr->nexthdr != IPPROTO_TCP)
--				goto increment_hdr;
--
--			goto next_hdr;
--		}
--increment_hdr:
- 		hdr_count++;
--next_hdr:
- 		nexthdr = &hp->nexthdr;
- 		start += hdrlen;
- 	}
+ 	if (tx->dqo.qpl) {
+ 		/* We do not need to verify the number of buffers used per
+ 		 * packet or per segment in case of TSO as with 2K size buffers
 -- 
 2.49.0
 
