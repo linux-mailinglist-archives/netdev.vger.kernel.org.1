@@ -1,89 +1,93 @@
-Return-Path: <netdev+bounces-198451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400D3ADC32A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:21:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B00EADC372
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 09:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30CF53A74E5
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:20:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02A807A935C
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 07:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9E728C872;
-	Tue, 17 Jun 2025 07:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5678D22AE45;
+	Tue, 17 Jun 2025 07:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="fwVh8mDi"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="JtTO9nKU"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A9228CF77;
-	Tue, 17 Jun 2025 07:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BB728C022
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750144861; cv=none; b=qrFBs7ZVVtBKyvU0CJbPdGpoIGVWTHYo4N4WuVkivYMkhOP9V6+7cfTvi3tI/dcpJIxnNnWGwZGF80ULqlicGY9OjMcRdE98FGeziNHfxW6qd2ejf18QqPT2ge3vLlEp3NLg8iwr18bL0RioqzfN8G9D4ynZE6uxc8pE36v2vIc=
+	t=1750145727; cv=none; b=qaDPD89XlQqTNNlmbjHhWF8GsQcclXzFnx6n+J6B2PfMiYhFfZKApHHlMIcT7cfBnPUIbwYeQK3IMJpBC1YCfAIDT/tSD/P1yoh+URIR/clgdI0PBv4hrwBPhy6hHqksn7s2H3SFYyG+J3aQL7/TFgrMzxBd0v1wODdaLgObQd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750144861; c=relaxed/simple;
-	bh=+dMeJaNU9Vw4n/TfbkPoCtzN+XBmJGEmPcGDrf/Xk44=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SxrM6ZoRwdHTtGlvP4X5N14C58U/3J/5zviZJA5HTpovPQmCFKQWkEoLu6zz6wQmeL8n4I8Vij9EoMyo16kUWnvkKURK9PT5la7i6+lgx0Kciy+rYofyGcnfwWff1mrn6xlgxBLShv83AO+ecdFLEcjN6bGJqb7P0322JG24zqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=fwVh8mDi; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 55H7KCtmC1823722, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1750144813; bh=sVuaS1fFDiOjECct3A6H6Zdc5xLKjkJu0DxycWPbt2I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=fwVh8mDigVYOgTnPB3ws4ilSz2E6R+UVZy/1iDq9EM9IfyfpbQfZP6FAPp4+1C6ZV
-	 lV/xq+Hq6bBMfaQnqvTWN1sz/O4GstUc7Mj/b24CkCIpynke4haH5hYw2C08k5Lleu
-	 rF0lEmLmhaFIYKTjl9QABDdBOHF4uBiurcFYNfull/rFdFtLpqor1C7XEqDgxJ0Pgs
-	 aFc9ssZvV3AujjGyll+aHJ5ijJLyrFGr/spf5lrMpxqT5RgnOJtFlrwmRdjVvWK3dR
-	 Hbo6spuhAEUa/YH3jT8CoZIkLCgdnfvSKx1X+qMZxySJyLDgAqopU1rrtOgyVodfEb
-	 NV0tB0v524S3w==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 55H7KCtmC1823722
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Jun 2025 15:20:13 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 17 Jun 2025 15:20:18 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 17 Jun 2025 15:20:17 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Tue, 17 Jun 2025 15:20:17 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Joe Damato <joe@dama.to>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "jdamato@fastly.com" <jdamato@fastly.com>,
-        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v2 1/2] rtase: Link IRQs to NAPI instances
-Thread-Topic: [PATCH net-next v2 1/2] rtase: Link IRQs to NAPI instances
-Thread-Index: AQHb3m33AoUqGLYRxU6yyEFpsNftQ7QFZ3yAgAGLATA=
-Date: Tue, 17 Jun 2025 07:20:17 +0000
-Message-ID: <69799fd428b94d778a1c2e108a6d3f27@realtek.com>
-References: <20250616032226.7318-1-justinlai0215@realtek.com>
- <20250616032226.7318-2-justinlai0215@realtek.com>
- <aFA7VdI7BWQOKW0V@MacBook-Air.local>
-In-Reply-To: <aFA7VdI7BWQOKW0V@MacBook-Air.local>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
+	s=arc-20240116; t=1750145727; c=relaxed/simple;
+	bh=8E7L+2tQKhnJFTnt5SXSgwV5/56pSG2wFG8c5SFSbj0=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Lth3nQ50yj6N7XYirPMGV2aowqbEQWElNxGIX4aoTtcUMlMunyjzrhzNos+YmDdw+4u/ZyuALVCpzFNGFovh7MGZG4b/Yj5dRB1XmHgB8MRPhAIrrzBx7ViS6Rxz7IfsARH59TnG8mR/2AB9Y0+TagefaWduHAwIURlz7G80QD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=JtTO9nKU; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1750145725; x=1781681725;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=8E7L+2tQKhnJFTnt5SXSgwV5/56pSG2wFG8c5SFSbj0=;
+  b=JtTO9nKUh9sArHt8srVApWHJGXBbRMpXnLlzEbTVJmYrXbnPuIVr4nuo
+   tE3vK4e6vc0Xzof2dtSkJctptMDWT3a7P/FnKYkuOUa6QbAlo76v79h2v
+   YZGCFPkoWiiu/CY2o8O9xo+EpfXeB+myVwwYE2VBbf09pgr6vMEjwlSUb
+   RuHa9LsK6vsMqibHUzmi4NHvG4/SQPXTnh4aD2Izn1/8yORD/9Q/CJMpQ
+   c3q1vSrkitE3S6KAmFyjtqT4sYIvlED3g+qlcWCCnrHEePGEu+IOyme0k
+   D5b4ixgKCqjDXfUMMH9r6SwEJIkjtljs1EROx8APkHyT/VMpGbwEuLfkf
+   A==;
+X-IronPort-AV: E=Sophos;i="6.16,242,1744070400"; 
+   d="scan'208";a="105374300"
+Subject: RE: [PATCH net-next 3/5] eth: ena: migrate to new RXFH callbacks
+Thread-Topic: [PATCH net-next 3/5] eth: ena: migrate to new RXFH callbacks
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 07:35:21 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:8051]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.38.93:2525] with esmtp (Farcaster)
+ id 70271acf-3d11-4e25-a0fa-f683c1b96b14; Tue, 17 Jun 2025 07:35:20 +0000 (UTC)
+X-Farcaster-Flow-ID: 70271acf-3d11-4e25-a0fa-f683c1b96b14
+Received: from EX19D022EUA001.ant.amazon.com (10.252.50.125) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 17 Jun 2025 07:35:19 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D022EUA001.ant.amazon.com (10.252.50.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 17 Jun 2025 07:35:19 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1544.014; Tue, 17 Jun 2025 07:35:19 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Subbaraya Sundeep <sbhatta@marvell.com>, Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>, "Allen, Neil"
+	<shayagr@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>,
+	"skalluru@marvell.com" <skalluru@marvell.com>, "manishc@marvell.com"
+	<manishc@marvell.com>, "michael.chan@broadcom.com"
+	<michael.chan@broadcom.com>, "pavan.chebbi@broadcom.com"
+	<pavan.chebbi@broadcom.com>, "sgoutham@marvell.com" <sgoutham@marvell.com>,
+	"gakula@marvell.com" <gakula@marvell.com>, "hkelam@marvell.com"
+	<hkelam@marvell.com>, "bbhushan2@marvell.com" <bbhushan2@marvell.com>
+Thread-Index: AQHb3ymYIDksRSFg40KbuWeQ6mrAm7QG6dCAgAAMIUA=
+Date: Tue, 17 Jun 2025 07:35:19 +0000
+Message-ID: <a2ef14e7839148d195c051d48dc3ccb2@amazon.com>
+References: <20250617014555.434790-1-kuba@kernel.org>
+ <20250617014555.434790-4-kuba@kernel.org> <aFEQI00XSUK4OQ39@9fd6dd105bf2>
+In-Reply-To: <aFEQI00XSUK4OQ39@9fd6dd105bf2>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -93,28 +97,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-> On Mon, Jun 16, 2025 at 11:22:25AM +0800, Justin Lai wrote:
-> > Link IRQs to NAPI instances with netif_napi_set_irq. This information
-> > can be queried with the netdev-genl API.
+> > Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
+> > add dedicated callbacks for getting and setting rxfh fields").
 > >
-> > Also add support for persistent NAPI configuration using
-> > netif_napi_add_config().
-> >
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > ---
-> >  .../net/ethernet/realtek/rtase/rtase_main.c   | 20 +++++++++++++------
-> >  1 file changed, 14 insertions(+), 6 deletions(-)
-> >
+> > The driver as no other RXNFC functionality so the SET callback can
+> typo as->has. Apart from this minor typo entire patchset lgtm.
 >=20
-> Did you test the persistent NAPI config on one of these devices?
->=20
-> Reviewed-by: Joe Damato <joe@dama.to>
+> Thanks,
+> Sundeep
 
-Hi Joe,
+Besides Sundeep's note, the patch lgtm.
+Thanks for making the change.
 
-Yes, I tested it, and the persistent NAPI config worked correctly on
-the device.
-
-Thanks,
-Justin
+Reviewed-by: David Arinzon <darinzon@amazon.com>
 
