@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-198798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60DBADDDD6
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:21:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B39ADDDD7
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 254ED189DAD4
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:21:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEDA017DA06
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D37A2F0025;
-	Tue, 17 Jun 2025 21:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D202F0C4E;
+	Tue, 17 Jun 2025 21:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="xgjgf2vy"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ef2kJDqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CB22749F4
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136512EBBBA
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750195272; cv=none; b=tjZ4Brw33/O/sqCi/11ZZqAJzQaNfsL4CWsbjmGL8lk/O2lrgjgmqv9PsPag1JNq45wUwDLloJtNL1TD5LalWt95JgHJdKZks5C345L/ld/49Ucg89kKjGPrusbfmLclVMw5phX9yki6fTqkoaxZcskcD20Z0FQilIhMp+cWvsg=
+	t=1750195273; cv=none; b=Z290tNMwtzzL8QrXwLMQZB1ieKRiVbvPB3dQZMajr983A0mjcQzoMSD3CACfg3I6JZzAztCscVx5xg3bhWbmuC1PEaTRZuvybhCb0wbB73ISDIleF/FdRTAyLhvPgtZ7hVUBOtAcLj7vEEgGyOJc3aVjLY33x9Ds1hltOxEKnN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750195272; c=relaxed/simple;
-	bh=Nu4HUb7oq+s8HlR1G0vZ31EDK8rNQ+SidlnO+WjEGyo=;
+	s=arc-20240116; t=1750195273; c=relaxed/simple;
+	bh=GUHcWBv3v6WOfLMVNou9LijYypkXBouBKN+DfHXaI3s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R4Vn1grqgPch5BL4EoO+qn37qeuVWeCgDVyS5ZL79acAmsWBgxkB8ruSvKuQZnEsI2/cyHa8PATqzteksLrX/hFSuswg3/WT6sRjxEQt/iUfwaUE0TjxZqwdTB32Kc3cjY9UF3NjCL1YtpppzH1xQ6aaujGKQD4ldNeKE19eBcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=xgjgf2vy; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=ZzykMrz1UEDu6dojoJd687IET9ZEa/fQo0Zba3dL+gyrUwab6rIZ2Eidl+NIlX2c1coNeUUCvJf5JQ2Ttv+C2gqhSUJE0KXjR64ixRGOuRfLTWxcQUYVh8a1zRruZyP/Hn6mXBy340HnWNjExnLUWM0miunN1ghcTjpho4zonIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=ef2kJDqD; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-23633a6ac50so90364855ad.2
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:21:10 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b170c99aa49so4263299a12.1
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:21:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1750195270; x=1750800070; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1750195271; x=1750800071; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nwN9qz9sZIc3Mzo9yc0Mf9VaP+qtGxOf6Nsoprc1PVs=;
-        b=xgjgf2vytL+XJfEtSIOKHNb567lp/X/GNVM99T+RtvxrlKSY3xJov+l4TZdM16FcHJ
-         hJcdCXMZZs/Y3vo5okzl9Mzxu1GBl0RBQMMJjD/J06aTaT7XH0HTNgBke0cAS96riPp/
-         ZMu2qGPFvPutKO2Qa1jIwk3+p2SCk9Srr8CaxztYiZV0z5JzDzvf7GLHysRAhE4mamCW
-         X/A/thdBI4lOGl+hOWhKSJ1AkSrnwnuFOb4kLqu8b3Xuq9K1IgVWGvxNVMUoYbXvxles
-         VxOSC4P1GkDijGEg3kkgXJQq2RCaOmAu4oOCBZKfMHQr01uFq0k0eTPmUUfQL7DGaO/g
-         nF3A==
+        bh=XbIbknM3WMvrCMCQc65HhIO1Itulu6nDy9KVhZ3RXwE=;
+        b=ef2kJDqD+vzVmktfeGylaM7r6AQdm8tJqmfbPbtXuMqCzTaw+CQSJS0lAk2Ea+lbXg
+         9l+L6tvyjsh4LxwNjOqfNkjCs7zyEqQIidkMo8/EqqdDgG8/3uZ0Uh1yqBHu0zDhG+SI
+         wycWG5Rd4RGtj9bg3jnJtdPptBpqMXgvufpDZkRNh/zToYzAAXxYvwy7/cvCv+aV70C7
+         ysvftwCw0RCtqM/2vLFUNUwxJfFev/0vGAP1LmFG27chpdIKeKaWgiKAw58DhuWqpye8
+         32F5oJ/aLvNs/jrs5dw4vged72PqkckaPfquJK5xA8lSogcP4KSUnK9yTvU90v7dzAFc
+         5xYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750195270; x=1750800070;
+        d=1e100.net; s=20230601; t=1750195271; x=1750800071;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nwN9qz9sZIc3Mzo9yc0Mf9VaP+qtGxOf6Nsoprc1PVs=;
-        b=TH2ODVudR2kBl53rF8yBt+3U3y4frHgQrqPl6Q/5hhSPAnqxliXhEOt+1wej39vkp6
-         QIusAhapIsQihPhYdeBbZqRojOT6NsUuxBluCnqNgUBKeF2lC8Xaa6zmgtOpgLJtqH1O
-         nkSm94ya4zZM2gIQkWuypGObNNElkDY3rVNs79L8p2xmHFtt+rzBXVPsSQdU2/t245D0
-         GEkxKVjds9UXwBFDogUBn4kqcf1EriPeQLrEFIDnJXOLnXOAPUY/fjo2G9T4yjHir9Fj
-         1iGU1ueSatjgua/LZENNyDU+ewEvNdVuIBMFJJBoKppmxZXLMNSZgsG+YcBmb5NioeFT
-         g9AA==
-X-Gm-Message-State: AOJu0YyoWGkWVm1T6X3rivAffTaMUa7FZepVgz3l9cF7RxByAYyjYLkk
-	Dm4DsbSyGUV/uvGGB4yDm4wqin1fPBkdbuiaQaW1C8CWPbVpBYhHvvUP+tGe+8j5FPOrjIscAY0
-	+m3Kc
-X-Gm-Gg: ASbGncvun2FrwhsXMY6LMndusNwuvXDriHn35M7D7kThSmecW3DLd2MlPcoRsd+ZRmP
-	yKyeyCXWVqNp+6Z5xol2L0VUiKWUfD5vgaePRigbPkg5GAkurZDiy5vUwm1CtOaCOR4vJsj6eJY
-	AkzfnIPtjv8lm11Oa029fJnX+nhlKgCxw3siCnXlI4TW0XlC4d/YWVgt+XsMCO4DJpHfrplkYgE
-	Y1VY5EzjZFMNgE9nDkjR9lwRz9NFpDnLl1iMwotNUSAHhR2tbhXItD5iw/+H5ACL8haoJSHO6N2
-	O+z5hXxbhrCD46o9UZBfK51WOCIcSZjEOsU6AVxYN5Ms6CZb
-X-Google-Smtp-Source: AGHT+IEUONIaqxldtzsCyB8l+rv+S1TBiwsU2asSJjoz8e0GgPmFFN2ihGw6dherMROsxNW0FqgrRA==
-X-Received: by 2002:a17:902:e747:b0:234:d292:be7a with SMTP id d9443c01a7336-2366b337fe8mr239760905ad.1.1750195270268;
-        Tue, 17 Jun 2025 14:21:10 -0700 (PDT)
+        bh=XbIbknM3WMvrCMCQc65HhIO1Itulu6nDy9KVhZ3RXwE=;
+        b=GE0OWKUS9YVRZicVUKlItRF5XgCUszW5E720si+X+3NJFMjXzo1Dqk+hIetuYN6mIr
+         39XjKXEJc8o/ybhkfFxQBkztpcAYUJaLUnD6i5CfpbENXf3yKjPySfvUrSx6TNHjfd9x
+         XSLrDhW8f6ISt4n6LfxhbBliQi6/myIcZUTtzef7tnSehifxtMnS2d1jduKvHfrWxzG1
+         gV3uMkeKFm//LGmDHKTTWPLlEyUPv6DvdVA4yRYVMR6ocpvi/dqCcsAlO+mtRjUZ9D1r
+         wrFXPgt3pmOdqEyxmOy4/1dNSXYSxLHIrioYPf6i5/EKhlMEM1HD0CKvRGtq4BfdH98B
+         XFiQ==
+X-Gm-Message-State: AOJu0Yw1auu9wyJxs7q9hbB2DV45Pffq6vvBR3ODOoJykJ+LzqvfxpHB
+	8XNCNOS70OpypBBUkaabz+N1P6/qYXgT0LEfTitnWFLYbSmwSFvl4mLqY7rsQpHbsLnYrbwnf8H
+	NeE3v
+X-Gm-Gg: ASbGncuUo1VZkY9wv5gzQB/sZtrgSqoMBchB8fhTPak0coV3PZRPy2TnY8j2jD22f+V
+	YgINPHsB/BHRgOtAFqt8C+QlVWRPWtKdiACR3Egp0kmwsRFnSTIDCDaZy6Uh6nfkWMsgjDYcdSA
+	zXsaF5Y9iflKhnOmDfNb/rA/451i3Psmr34XrbFZdefcjmw6rn9uLwC4Xcs1my/fUIXRudYaUmI
+	BV+l/7SL1gcXU+aiZhKwr2UxzVbPeams2s7VQo/VSaJIc7FS2GrfrzOAhsPvitznRTHN9R+qeHY
+	HDvOu1Ohf520OUEf7DAPeyh4Jbtj+VMXzflSqWARxqkdNgZA
+X-Google-Smtp-Source: AGHT+IGsyGVRj2QmnJaR0Cc+Y3wn8CQl8JG9YaHsrPuxI++GbDCjj+7oZmuDLPvgFQXNvKwNaJxEgQ==
+X-Received: by 2002:a17:90b:55cd:b0:312:639:a06a with SMTP id 98e67ed59e1d1-313f1d0aa4emr21614954a91.31.1750195271248;
+        Tue, 17 Jun 2025 14:21:11 -0700 (PDT)
 Received: from localhost ([2a03:2880:2ff:44::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365dea8d2dsm85150985ad.160.2025.06.17.14.21.09
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de782b2sm85586535ad.111.2025.06.17.14.21.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Jun 2025 14:21:10 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
@@ -84,9 +84,9 @@ Cc: Eric Dumazet <edumazet@google.com>,
 	Simon Horman <horms@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net v2 1/4] selftests: netdevsim: improve lib.sh include in peer.sh
-Date: Tue, 17 Jun 2025 14:20:59 -0700
-Message-ID: <20250617212102.175711-2-dw@davidwei.uk>
+Subject: [PATCH net v2 2/4] selftests: net: add passive TFO test binary
+Date: Tue, 17 Jun 2025 14:21:00 -0700
+Message-ID: <20250617212102.175711-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250617212102.175711-1-dw@davidwei.uk>
 References: <20250617212102.175711-1-dw@davidwei.uk>
@@ -98,27 +98,218 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix the peer.sh test to run from INSTALL_PATH.
+Add a simple passive TFO server and client test binary. This will be
+used to test the SO_INCOMING_NAPI_ID of passive TFO accepted sockets.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- tools/testing/selftests/drivers/net/netdevsim/peer.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/.gitignore |   1 +
+ tools/testing/selftests/net/Makefile   |   1 +
+ tools/testing/selftests/net/tfo.c      | 171 +++++++++++++++++++++++++
+ 3 files changed, 173 insertions(+)
+ create mode 100644 tools/testing/selftests/net/tfo.c
 
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/peer.sh b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-index 1bb46ec435d4..7f32b5600925 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-@@ -1,7 +1,8 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0-only
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 532bb732bc6d..c6dd2a335cf4 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -50,6 +50,7 @@ tap
+ tcp_fastopen_backup_key
+ tcp_inq
+ tcp_mmap
++tfo
+ timestamping
+ tls
+ toeplitz
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index ab996bd22a5f..ab8da438fd78 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -110,6 +110,7 @@ TEST_GEN_PROGS += proc_net_pktgen
+ TEST_PROGS += lwt_dst_cache_ref_loop.sh
+ TEST_PROGS += skf_net_off.sh
+ TEST_GEN_FILES += skf_net_off
++TEST_GEN_FILES += tfo
  
--source ../../../net/lib.sh
-+lib_dir=$(dirname $0)/../../../net
-+source $lib_dir/lib.sh
- 
- NSIM_DEV_1_ID=$((256 + RANDOM % 256))
- NSIM_DEV_1_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_1_ID
+ # YNL files, must be before "include ..lib.mk"
+ YNL_GEN_FILES := busy_poller netlink-dumps
+diff --git a/tools/testing/selftests/net/tfo.c b/tools/testing/selftests/net/tfo.c
+new file mode 100644
+index 000000000000..eb3cac5e583c
+--- /dev/null
++++ b/tools/testing/selftests/net/tfo.c
+@@ -0,0 +1,171 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <error.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <arpa/inet.h>
++#include <sys/socket.h>
++#include <netinet/tcp.h>
++#include <errno.h>
++
++static int cfg_server;
++static int cfg_client;
++static int cfg_port = 8000;
++static struct sockaddr_in6 cfg_addr;
++static char *cfg_outfile;
++
++static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
++{
++	int ret;
++
++	sin6->sin6_family = AF_INET6;
++	sin6->sin6_port = htons(port);
++
++	ret = inet_pton(sin6->sin6_family, str, &sin6->sin6_addr);
++	if (ret != 1) {
++		/* fallback to plain IPv4 */
++		ret = inet_pton(AF_INET, str, &sin6->sin6_addr.s6_addr32[3]);
++		if (ret != 1)
++			return -1;
++
++		/* add ::ffff prefix */
++		sin6->sin6_addr.s6_addr32[0] = 0;
++		sin6->sin6_addr.s6_addr32[1] = 0;
++		sin6->sin6_addr.s6_addr16[4] = 0;
++		sin6->sin6_addr.s6_addr16[5] = 0xffff;
++	}
++
++	return 0;
++}
++
++static void run_server(void)
++{
++	unsigned long qlen = 32;
++	int fd, opt, connfd;
++	socklen_t len;
++	char buf[64];
++	FILE *outfile;
++
++	outfile = fopen(cfg_outfile, "w");
++	if (!outfile)
++		error(1, errno, "fopen() outfile");
++
++	fd = socket(AF_INET6, SOCK_STREAM, 0);
++	if (fd == -1)
++		error(1, errno, "socket()");
++
++	opt = 1;
++	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
++		error(1, errno, "setsockopt(SO_REUSEADDR)");
++
++	if (setsockopt(fd, SOL_TCP, TCP_FASTOPEN, &qlen, sizeof(qlen)) < 0)
++		error(1, errno, "setsockopt(TCP_FASTOPEN)");
++
++	if (bind(fd, (struct sockaddr *)&cfg_addr, sizeof(cfg_addr)) < 0)
++		error(1, errno, "bind()");
++
++	if (listen(fd, 5) < 0)
++		error(1, errno, "listen()");
++
++	len = sizeof(cfg_addr);
++	connfd = accept(fd, (struct sockaddr *)&cfg_addr, &len);
++	if (connfd < 0)
++		error(1, errno, "accept()");
++
++	len = sizeof(opt);
++	if (getsockopt(connfd, SOL_SOCKET, SO_INCOMING_NAPI_ID, &opt, &len) < 0)
++		error(1, errno, "getsockopt(SO_INCOMING_NAPI_ID)");
++
++	read(connfd, buf, 64);
++	fprintf(outfile, "%d\n", opt);
++
++	fclose(outfile);
++	close(connfd);
++	close(fd);
++}
++
++static void run_client(void)
++{
++	int fd;
++	char *msg = "Hello, world!";
++
++	fd = socket(AF_INET6, SOCK_STREAM, 0);
++	if (fd == -1)
++		error(1, errno, "socket()");
++
++	sendto(fd, msg, strlen(msg), MSG_FASTOPEN, (struct sockaddr *)&cfg_addr, sizeof(cfg_addr));
++
++	close(fd);
++}
++
++static void usage(const char *filepath)
++{
++	error(1, 0, "Usage: %s (-s|-c) -h<server_ip> -p<port> -o<outfile> ", filepath);
++}
++
++static void parse_opts(int argc, char **argv)
++{
++	struct sockaddr_in6 *addr6 = (void *) &cfg_addr;
++	char *addr = NULL;
++	int ret;
++	int c;
++
++	if (argc <= 1)
++		usage(argv[0]);
++
++	while ((c = getopt(argc, argv, "sch:p:o:")) != -1) {
++		switch (c) {
++		case 's':
++			if (cfg_client)
++				error(1, 0, "Pass one of -s or -c");
++			cfg_server = 1;
++			break;
++		case 'c':
++			if (cfg_server)
++				error(1, 0, "Pass one of -s or -c");
++			cfg_client = 1;
++			break;
++		case 'h':
++			addr = optarg;
++			break;
++		case 'p':
++			cfg_port = strtoul(optarg, NULL, 0);
++			break;
++		case 'o':
++			cfg_outfile = strdup(optarg);
++			if (!cfg_outfile)
++				error(1, 0, "outfile invalid");
++			break;
++		}
++	}
++
++	if (cfg_server && addr)
++		error(1, 0, "Server cannot have -h specified");
++
++	memset(addr6, 0, sizeof(*addr6));
++	addr6->sin6_family = AF_INET6;
++	addr6->sin6_port = htons(cfg_port);
++	addr6->sin6_addr = in6addr_any;
++	if (addr) {
++		ret = parse_address(addr, cfg_port, addr6);
++		if (ret)
++			error(1, 0, "Client address parse error: %s", addr);
++	}
++}
++
++int main(int argc, char **argv)
++{
++	parse_opts(argc, argv);
++
++	if (cfg_server)
++		run_server();
++	else if (cfg_client)
++		run_client();
++
++	return 0;
++}
 -- 
 2.47.1
 
