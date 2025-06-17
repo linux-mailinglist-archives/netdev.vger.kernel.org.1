@@ -1,167 +1,289 @@
-Return-Path: <netdev+bounces-198818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08769ADDF0C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:36:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5CE8ADDF11
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:41:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E4FB189C934
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:36:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15F4D189CA9F
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D35A2F532F;
-	Tue, 17 Jun 2025 22:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9C42F530F;
+	Tue, 17 Jun 2025 22:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eyYKRfRN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWyXIIps"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87152F5316;
-	Tue, 17 Jun 2025 22:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258762F5316;
+	Tue, 17 Jun 2025 22:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750199766; cv=none; b=s1vsKhjIUlWo/pv6YV0Y0q2M7klPdndvcB+ICZuLJWrr1WQXoVsdsd2DSHpnN1kQVSdzYm4+IRZo0kCQ2fe4LDXNWaoTOnR2UjqhMsXentFLerMPitEBlnD1VAUY00F8HNFF3oBPOpsjB0mUOEA9NewmhojEram24vbMAqaBxIc=
+	t=1750200101; cv=none; b=DhNBDsWlYE1cTs+AM3dCzZr+oieCCk5yoDK2KaOqAfAEmV6KAM8hss+LcB84OfntOvcZTobHGWFEsdM8QGf0Er27Uwzd7KpCZIUutPJhDhEwKhYrL5u7K1ogdyZyHuoEG48xKw+58R0tg7IlZKHlCYRYxHl7xJoDXFczK/Vxac8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750199766; c=relaxed/simple;
-	bh=sl26ObIUgcfhCsxOrL5q9KS81TDnKHG7kwchskWJVnE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ON6y6kjgh8sws+Wsa/Q4sn6YvfV9SW9UwWkQMI2m7Sw1Pxr93gQ1sb/jRkX9492CpiEudGnlzak7bfT6GozK9TDS1PhPIkGKNcoWLzB2f0nLVswo+rGYQ4YTjach+ril2NQ+x/lqUQbgvTPrQWZZzSlucc7JNnH7c57yyie1png=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eyYKRfRN; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1750200101; c=relaxed/simple;
+	bh=z6Q1//wQs9LZ6r6PraeXYvNy6N5OebSJIIp5rPuHcyQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l7PlYkdUsdWoKl1iRWDljRHevGop4yJ4Zf4zae+MVGoZWnthOOqa8b9bc8VeNMU/4m1l7MHaZ7RVotx2YDMpmsK0pap4uxkWZ5hXCHfdVXhbSIndvP1OKNvPk2oi2PGHmVA2iDr/VMdSUlumV+7VvkszqVwEqI+AuimuLQXi8OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWyXIIps; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-235ea292956so57861775ad.1;
-        Tue, 17 Jun 2025 15:36:04 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-234bfe37cccso80981875ad.0;
+        Tue, 17 Jun 2025 15:41:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750199764; x=1750804564; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BslBmwEX63SpkQgXswNn2wvkE3/iV6LHLzaWgxFwnTc=;
-        b=eyYKRfRNixW9ErAdvSnpo0L/N3tx8RmVEpH3udJEyJ5driBXxzhg3+nF4V2mAnMdrJ
-         4YfliAWna9CwjFezebIVB43I96vwUW49Gmai/euDGgV5y67C+0vB6WDIfrrVCE4sjKhj
-         P+diE8W2WDuf7WICwMRpZq8I6lUz0eauSk97W//l6KX3f4onw2gMvfp4fYGk1aGSFXCy
-         W7QoYfoyq4ftoZ0XROymtwp0WQak7Mokm9bcn0G1YKARAGL9zeGZ3MnMj53VflxlO2Do
-         Qj+S3JPZvGF0xrGHW99nPN7rtgJI6kOkfFG/7CiXin7yv8NoCiJvsKc0mbaSBBZSkP3d
-         LEag==
+        d=gmail.com; s=20230601; t=1750200098; x=1750804898; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=auXJgeEOpVRSvnZqLlR4YSRhDBSCmKI5t4o8ZmJ6/B0=;
+        b=LWyXIIpsPhocLYZaweqRYliqlFE1Usccq0rsEzYo054rCX45Q3aPk2Gx1T7kFFwIe7
+         2kY9Xs2IoRWm29/Dl4OyFgx2orKcAqVJCAsc5BJ3BL0NMGUIxQfn68CcjyihzL0/Bhdv
+         2IfRFJ9ajy68axIbqT62RiGQvSsLyOUCOqYN/17u3Xk9ezlSAzbkYslRFH1ltDQIs12l
+         wbdL/mEjiEK//boC66hPoBealWjP3+g7oEQO/nBW8ThPMcaUWOigHqNFqkWgb4TlC1Ao
+         rrickn0eEggKBRvcMk0npqGMhwLl6SA6TIOJt86IQ6Nve7v9dREyIm+TVycaNUcIUmSK
+         lELw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750199764; x=1750804564;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BslBmwEX63SpkQgXswNn2wvkE3/iV6LHLzaWgxFwnTc=;
-        b=pyhVWdSt8l4uL295F15JcsY1ucPIQdjriFROG5V76sKoisrF4DGds2BktnvPYvb16w
-         cuSxcI80Ung/DZwD0i0PB8Py8yrC08wX7CpzowYSYjEOfWbxXQ+u8179DzY3vU9M7Efi
-         htAruKio5yACDWdwP9M/ppKayYWF7TwTgh/KMtk1BGHQ3uewG0bKIeiu95sNVxm94Kis
-         9EGX1EaadzOIXT4L52oHXxm7W2p5xn8v97nGFVzykHPivpole76gc6//VW4moULHfkO+
-         Uv2WVtzxwPanBkcODNo4siMCr1f0YnHTMPyqW5oa5Se6xUrLYPKEr+kHAlHZoUzHMS4F
-         bEsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfZum6sJJXJU3jmCRXRSxPj70eU1uyrjMZMFXAG9SpqDwtHxPvLztM+E1Iy80XqfJTPmUBBZ44wG5qRpLeo6ZDoBxTXsE=@vger.kernel.org, AJvYcCX1LdQdOAeoB+vN3W03xY+ZGbOC3dVQh4/P65dRgxwTR2+hmJ+BH9fwWsUfakJE32Wtg4qWvrUs@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGpvObryE28JTpUduLfDm7f9xCjaevKhJNY/CvSjLIBruwKekm
-	Q1XX4bPWtWdrO1AOlE4e4bem0fQAmDVG3Qqb9gl2bAxsn3hmI9pbQgg=
-X-Gm-Gg: ASbGnct34R3FWfnqU59qUmIrEv261WNRFufxd0qezw1AYa2UYvtr5lMU0VUlorbkGyx
-	LIkqw05H6U42LLwWOZ5vl785WM8zeFin6p6DcyB/NVPBi5SKQ2qQZsJgUJdR9RfWNr3UABaEekf
-	HuCEMvqHKcgHR2jhlJ5a0LAtjy+b1chU+8/l/rwVXkve6XeHC9oMogUtbOhj5lzFN1R1SPnQcJt
-	R1KgeoKtEyK/oT7jnmVMxEWxNmTVvny9mfTOAeP07bqFswqunMMVOrg4xwt1aLOZVE21e8hIRRR
-	Z/gDfZut3bbbatax66GWloGkJ4yx1fYbm/vadLw=
-X-Google-Smtp-Source: AGHT+IE1PEjlOZHq/6qvvcs7qyAZrObDSTCsfokzw52ipsmbNvfckY8Niwzqd4Rqn6ssyvveSaNZTA==
-X-Received: by 2002:a17:902:d542:b0:234:f4da:7eeb with SMTP id d9443c01a7336-2366afe986cmr197072925ad.7.1750199764064;
-        Tue, 17 Jun 2025 15:36:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750200098; x=1750804898;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=auXJgeEOpVRSvnZqLlR4YSRhDBSCmKI5t4o8ZmJ6/B0=;
+        b=jwEcqAcbQtu+/XubrSz1OxetPdsEby3Tegzlka6XxnyvDZJp5gv8W5RTih1qdQBPav
+         ACOQ2KzXqp6XbclXYNI9RgTt3pyn29cS3nOnDopMccXrOw4n3jLErBzJccaHg0DXKiMi
+         Mhub0Bawn+OaxrP9CC2Y2u6tVwi3NQNPbDu7U7bgYAC3qwPylN8IMdohqNZPDRF7DZsS
+         2ZEgGxJwHY96tWcYVGPxUzGOnGxH5VE0ufOmHcCegAaGIPKsjYibKpeAGwpUKfXa0gP+
+         iwyq9hqloRyzV0RD180RdBcIDveOk+7D5eXai5Ywku85p4T0/gjZPxnr+3/1rThitSQp
+         XHxA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0T1T4aek4RvY3HWu/cYGPEKVSx/Us68qYtEtMNqAzGF9sAUnO1llMrDBZqbs5oI4rmjzPxLuT@vger.kernel.org, AJvYcCX9NbO+9fztVkhwD3avCN0euLY12HG/3zsOvj6G3vfp+RWa9JgizfSsrvyQgU3nqUBadEhGV933XsPV4XWUTp1ZMweV830=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0ulLBjti3Xf5xmqC+O4hxIePElGMBKGoB/auwiXyp0nhf4UJN
+	CWCCmEQGf38fX82HxaBsN/Rc7XNCms8WhO6PORggR8pN6kMgcJhlSLg=
+X-Gm-Gg: ASbGnctot0qa1W6YhSKBYSyc1+046Ke3IlYAa8azRMj8wGQFPuU8cBFLHlpoSAA6RKI
+	Od0XHD81FIPyOmo1eM+WfKyBbWt4H2bDe5lMNCO85Z1YBmhlWcW+HcAavPuQa2Q5ndsHM0lOv9O
+	mL7GmBpcH1ib5mrwCIjke9L7oqsl/Y57Mq7wDVL6qEwqXmFGXqMhSgUGcGo/YK/qt15wyM0nSTy
+	cC43dK+3irEB0A8VNkOhEZO/YVltdmEiQAX2GMmkMIXuJhEiczHpAvFsD+rIxgqPKY0KcEpes3R
+	8bP2NfTeXB/gQJ3V8erFyDRcZFHXXfdiJ4JsAlI=
+X-Google-Smtp-Source: AGHT+IGeuiLtsLMkcrjDdH8g/FfhLcMwQJUOHfRiYONvtLzi9eE63aXduZnOL6/mOqr1qs4OdWXr7A==
+X-Received: by 2002:a17:902:da2d:b0:235:2375:7ead with SMTP id d9443c01a7336-2366b14d317mr245807145ad.28.1750200098201;
+        Tue, 17 Jun 2025 15:41:38 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365decb5ccsm85988045ad.223.2025.06.17.15.36.02
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d8a1924sm85938945ad.68.2025.06.17.15.41.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 15:36:03 -0700 (PDT)
+        Tue, 17 Jun 2025 15:41:37 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: paul@paul-moore.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	horms@kernel.org,
-	huw@codeweavers.com,
-	john.cs.hey@gmail.com,
-	kuba@kernel.org,
-	kuni1840@gmail.com,
-	kuniyu@google.com,
-	linux-security-module@vger.kernel.org,
+To: Paul Moore <paul@paul-moore.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Huw Davies <huw@codeweavers.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller@googlegroups.com
-Subject: Re: [PATCH v1 net] calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
-Date: Tue, 17 Jun 2025 15:35:48 -0700
-Message-ID: <20250617223601.14060-1-kuni1840@gmail.com>
+	linux-security-module@vger.kernel.org,
+	syzkaller <syzkaller@googlegroups.com>,
+	John Cheung <john.cs.hey@gmail.com>
+Subject: [PATCH v2 net] calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
+Date: Tue, 17 Jun 2025 15:40:42 -0700
+Message-ID: <20250617224125.17299-1-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <CAHC9VhQ0trrgHyJxQOqAQAeN2bCsCx0JeXQgj_xeQbcckCbdZg@mail.gmail.com>
-References: <CAHC9VhQ0trrgHyJxQOqAQAeN2bCsCx0JeXQgj_xeQbcckCbdZg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 17 Jun 2025 18:08:15 -0400
-> On Tue, Jun 17, 2025 at 5:23 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrote:
-> > From: Paul Moore <paul@paul-moore.com>
-> > Date: Tue, 17 Jun 2025 17:04:18 -0400
-> > > On Mon, Jun 16, 2025 at 1:26 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrote:
-> > > >
-> > > > From: Kuniyuki Iwashima <kuniyu@google.com>
-> > > >
-> > > > syzkaller reported a null-ptr-deref in sock_omalloc() while allocating
-> > > > a CALIPSO option.  [0]
-> > > >
-> > > > The NULL is of struct sock, which was fetched by sk_to_full_sk() in
-> > > > calipso_req_setattr().
-> > > >
-> > > > Since commit a1a5344ddbe8 ("tcp: avoid two atomic ops for syncookies"),
-> > > > reqsk->rsk_listener could be NULL when SYN Cookie is returned to its
-> > > > client, as hinted by the leading SYN Cookie log.
-> > > >
-> > > > Here are 3 options to fix the bug:
-> > > >
-> > > >   1) Return 0 in calipso_req_setattr()
-> > > >   2) Return an error in calipso_req_setattr()
-> > > >   3) Alaways set rsk_listener
-> > > >
-> > > > 1) is no go as it bypasses LSM, but 2) effectively disables SYN Cookie
-> > > > for CALIPSO.  3) is also no go as there have been many efforts to reduce
-> > > > atomic ops and make TCP robust against DDoS.  See also commit 3b24d854cb35
-> > > > ("tcp/dccp: do not touch listener sk_refcnt under synflood").
-> > > >
-> > > > As of the blamed commit, SYN Cookie already did not need refcounting,
-> > > > and no one has stumbled on the bug for 9 years, so no CALIPSO user will
-> > > > care about SYN Cookie.
-> > > >
-> > > > Let's return an error in calipso_req_setattr() and calipso_req_delattr()
-> > > > in the SYN Cookie case.
-> > >
-> > > I think that's reasonable, but I think it would be nice to have a
-> > > quick comment right before the '!sk' checks to help people who may hit
-> > > the CALIPSO/SYN-cookie issue in the future.  Maybe "/*
-> > > tcp_syncookies=2 can result in sk == NULL */" ?
-> >
-> > tcp_syncookies=1 enables SYN cookie and =2 forces it for every request.
-> > I just used =2 to reproduce the issue without SYN flooding, so it would
-> > be /* sk is NULL for SYN+ACK w/ SYN Cookie */
-> 
-> Sure, that sounds good.
-> 
-> > But I think no one will hit it (at least so for 9 years) and wonder why
-> > because SYN could be dropped randomly under such a event.
-> 
-> Yes, you are probably correct, but that doesn't mean a brief comment
-> as described above isn't a good idea.  If you add the comment and
-> you've got my ACK.
+From: Kuniyuki Iwashima <kuniyu@google.com>
 
-Ok, will post v2 with comments and your tag.
+syzkaller reported a null-ptr-deref in sock_omalloc() while allocating
+a CALIPSO option.  [0]
 
-> 
-> Acked-by: Paul Moore <paul@paul-moore.com>
->
+The NULL is of struct sock, which was fetched by sk_to_full_sk() in
+calipso_req_setattr().
 
-Thanks!
+Since commit a1a5344ddbe8 ("tcp: avoid two atomic ops for syncookies"),
+reqsk->rsk_listener could be NULL when SYN Cookie is returned to its
+client, as hinted by the leading SYN Cookie log.
+
+Here are 3 options to fix the bug:
+
+  1) Return 0 in calipso_req_setattr()
+  2) Return an error in calipso_req_setattr()
+  3) Alaways set rsk_listener
+
+1) is no go as it bypasses LSM, but 2) effectively disables SYN Cookie
+for CALIPSO.  3) is also no go as there have been many efforts to reduce
+atomic ops and make TCP robust against DDoS.  See also commit 3b24d854cb35
+("tcp/dccp: do not touch listener sk_refcnt under synflood").
+
+As of the blamed commit, SYN Cookie already did not need refcounting,
+and no one has stumbled on the bug for 9 years, so no CALIPSO user will
+care about SYN Cookie.
+
+Let's return an error in calipso_req_setattr() and calipso_req_delattr()
+in the SYN Cookie case.
+
+This can be reproduced by [1] on Fedora and now connect() of nc times out.
+
+[0]:
+TCP: request_sock_TCPv6: Possible SYN flooding on port [::]:20002. Sending cookies.
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
+CPU: 3 UID: 0 PID: 12262 Comm: syz.1.2611 Not tainted 6.14.0 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+RIP: 0010:read_pnet include/net/net_namespace.h:406 [inline]
+RIP: 0010:sock_net include/net/sock.h:655 [inline]
+RIP: 0010:sock_kmalloc+0x35/0x170 net/core/sock.c:2806
+Code: 89 d5 41 54 55 89 f5 53 48 89 fb e8 25 e3 c6 fd e8 f0 91 e3 00 48 8d 7b 30 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 26 01 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b
+RSP: 0018:ffff88811af89038 EFLAGS: 00010216
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff888105266400
+RDX: 0000000000000006 RSI: ffff88800c890000 RDI: 0000000000000030
+RBP: 0000000000000050 R08: 0000000000000000 R09: ffff88810526640e
+R10: ffffed1020a4cc81 R11: ffff88810526640f R12: 0000000000000000
+R13: 0000000000000820 R14: ffff888105266400 R15: 0000000000000050
+FS:  00007f0653a07640(0000) GS:ffff88811af80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f863ba096f4 CR3: 00000000163c0005 CR4: 0000000000770ef0
+PKRU: 80000000
+Call Trace:
+ <IRQ>
+ ipv6_renew_options+0x279/0x950 net/ipv6/exthdrs.c:1288
+ calipso_req_setattr+0x181/0x340 net/ipv6/calipso.c:1204
+ calipso_req_setattr+0x56/0x80 net/netlabel/netlabel_calipso.c:597
+ netlbl_req_setattr+0x18a/0x440 net/netlabel/netlabel_kapi.c:1249
+ selinux_netlbl_inet_conn_request+0x1fb/0x320 security/selinux/netlabel.c:342
+ selinux_inet_conn_request+0x1eb/0x2c0 security/selinux/hooks.c:5551
+ security_inet_conn_request+0x50/0xa0 security/security.c:4945
+ tcp_v6_route_req+0x22c/0x550 net/ipv6/tcp_ipv6.c:825
+ tcp_conn_request+0xec8/0x2b70 net/ipv4/tcp_input.c:7275
+ tcp_v6_conn_request+0x1e3/0x440 net/ipv6/tcp_ipv6.c:1328
+ tcp_rcv_state_process+0xafa/0x52b0 net/ipv4/tcp_input.c:6781
+ tcp_v6_do_rcv+0x8a6/0x1a40 net/ipv6/tcp_ipv6.c:1667
+ tcp_v6_rcv+0x505e/0x5b50 net/ipv6/tcp_ipv6.c:1904
+ ip6_protocol_deliver_rcu+0x17c/0x1da0 net/ipv6/ip6_input.c:436
+ ip6_input_finish+0x103/0x180 net/ipv6/ip6_input.c:480
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ NF_HOOK include/linux/netfilter.h:308 [inline]
+ ip6_input+0x13c/0x6b0 net/ipv6/ip6_input.c:491
+ dst_input include/net/dst.h:469 [inline]
+ ip6_rcv_finish net/ipv6/ip6_input.c:79 [inline]
+ ip6_rcv_finish+0xb6/0x490 net/ipv6/ip6_input.c:69
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ NF_HOOK include/linux/netfilter.h:308 [inline]
+ ipv6_rcv+0xf9/0x490 net/ipv6/ip6_input.c:309
+ __netif_receive_skb_one_core+0x12e/0x1f0 net/core/dev.c:5896
+ __netif_receive_skb+0x1d/0x170 net/core/dev.c:6009
+ process_backlog+0x41e/0x13b0 net/core/dev.c:6357
+ __napi_poll+0xbd/0x710 net/core/dev.c:7191
+ napi_poll net/core/dev.c:7260 [inline]
+ net_rx_action+0x9de/0xde0 net/core/dev.c:7382
+ handle_softirqs+0x19a/0x770 kernel/softirq.c:561
+ do_softirq.part.0+0x36/0x70 kernel/softirq.c:462
+ </IRQ>
+ <TASK>
+ do_softirq arch/x86/include/asm/preempt.h:26 [inline]
+ __local_bh_enable_ip+0xf1/0x110 kernel/softirq.c:389
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
+ __dev_queue_xmit+0xc2a/0x3c40 net/core/dev.c:4679
+ dev_queue_xmit include/linux/netdevice.h:3313 [inline]
+ neigh_hh_output include/net/neighbour.h:523 [inline]
+ neigh_output include/net/neighbour.h:537 [inline]
+ ip6_finish_output2+0xd69/0x1f80 net/ipv6/ip6_output.c:141
+ __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
+ ip6_finish_output+0x5dc/0xd60 net/ipv6/ip6_output.c:226
+ NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ ip6_output+0x24b/0x8d0 net/ipv6/ip6_output.c:247
+ dst_output include/net/dst.h:459 [inline]
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ NF_HOOK include/linux/netfilter.h:308 [inline]
+ ip6_xmit+0xbbc/0x20d0 net/ipv6/ip6_output.c:366
+ inet6_csk_xmit+0x39a/0x720 net/ipv6/inet6_connection_sock.c:135
+ __tcp_transmit_skb+0x1a7b/0x3b40 net/ipv4/tcp_output.c:1471
+ tcp_transmit_skb net/ipv4/tcp_output.c:1489 [inline]
+ tcp_send_syn_data net/ipv4/tcp_output.c:4059 [inline]
+ tcp_connect+0x1c0c/0x4510 net/ipv4/tcp_output.c:4148
+ tcp_v6_connect+0x156c/0x2080 net/ipv6/tcp_ipv6.c:333
+ __inet_stream_connect+0x3a7/0xed0 net/ipv4/af_inet.c:677
+ tcp_sendmsg_fastopen+0x3e2/0x710 net/ipv4/tcp.c:1039
+ tcp_sendmsg_locked+0x1e82/0x3570 net/ipv4/tcp.c:1091
+ tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1358
+ inet6_sendmsg+0xb9/0x150 net/ipv6/af_inet6.c:659
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0xf4/0x2a0 net/socket.c:733
+ __sys_sendto+0x29a/0x390 net/socket.c:2187
+ __do_sys_sendto net/socket.c:2194 [inline]
+ __se_sys_sendto net/socket.c:2190 [inline]
+ __x64_sys_sendto+0xe1/0x1c0 net/socket.c:2190
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xc3/0x1d0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f06553c47ed
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0653a06fc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f0655605fa0 RCX: 00007f06553c47ed
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000000000b
+RBP: 00007f065545db38 R08: 0000200000000140 R09: 000000000000001c
+R10: f7384d4ea84b01bd R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f0655605fac R14: 00007f0655606038 R15: 00007f06539e7000
+ </TASK>
+Modules linked in:
+
+[1]:
+dnf install -y selinux-policy-targeted policycoreutils netlabel_tools procps-ng nmap-ncat
+mount -t selinuxfs none /sys/fs/selinux
+load_policy
+netlabelctl calipso add pass doi:1
+netlabelctl map del default
+netlabelctl map add default address:::1 protocol:calipso,1
+sysctl net.ipv4.tcp_syncookies=2
+nc -l ::1 80 &
+nc ::1 80
+
+Fixes: e1adea927080 ("calipso: Allow request sockets to be relabelled by the lsm.")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Reported-by: John Cheung <john.cs.hey@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAP=Rh=MvfhrGADy+-WJiftV2_WzMH4VEhEFmeT28qY+4yxNu4w@mail.gmail.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Acked-by: Paul Moore <paul@paul-moore.com>
+---
+v2: Add comments
+v1: https://lore.kernel.org/netdev/20250616172612.920438-1-kuni1840@gmail.com/
+---
+ net/ipv6/calipso.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
+index 62618a058b8f..a247bb93908b 100644
+--- a/net/ipv6/calipso.c
++++ b/net/ipv6/calipso.c
+@@ -1207,6 +1207,10 @@ static int calipso_req_setattr(struct request_sock *req,
+ 	struct ipv6_opt_hdr *old, *new;
+ 	struct sock *sk = sk_to_full_sk(req_to_sk(req));
+ 
++	/* sk is NULL for SYN+ACK w/ SYN Cookie */
++	if (!sk)
++		return -ENOMEM;
++
+ 	if (req_inet->ipv6_opt && req_inet->ipv6_opt->hopopt)
+ 		old = req_inet->ipv6_opt->hopopt;
+ 	else
+@@ -1247,6 +1251,10 @@ static void calipso_req_delattr(struct request_sock *req)
+ 	struct ipv6_txoptions *txopts;
+ 	struct sock *sk = sk_to_full_sk(req_to_sk(req));
+ 
++	/* sk is NULL for SYN+ACK w/ SYN Cookie */
++	if (!sk)
++		return;
++
+ 	if (!req_inet->ipv6_opt || !req_inet->ipv6_opt->hopopt)
+ 		return;
+ 
+-- 
+2.49.0
+
 
