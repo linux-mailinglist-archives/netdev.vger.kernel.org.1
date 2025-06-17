@@ -1,94 +1,116 @@
-Return-Path: <netdev+bounces-198594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480C0ADCD15
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:26:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16000ADCD07
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7CFD18898E3
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:21:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1F087A55CC
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A6628C5A4;
-	Tue, 17 Jun 2025 13:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSWSeLSJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9C44A3E;
+	Tue, 17 Jun 2025 13:24:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE892E717B;
-	Tue, 17 Jun 2025 13:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EAA2E7179;
+	Tue, 17 Jun 2025 13:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750166401; cv=none; b=Nw4jsjTt+1Mi5V7R+kRL2FAAquBSWgckw6/pXTwzGxslznlHBFWu4cQCgNPvwFf8rSQugoQlFkiQO4oUjrO6qfmGg8BvVJreoUueDnwQGFFjgn0/MyUiqa9aTITAO6VgZ3C3gcdGiPF0giQRRscGxiSA2mB4GmFuUKXPRBx+g8s=
+	t=1750166670; cv=none; b=nQqacByYDLMdZ+jG8VpqlUQUSOOBdjyER6SDhyTR10EyvpwMUXRVT/+GCLc7UWntZ2W88JIlmX0pxdRsuM22/mBb7BWhleYK9PZG+woeu1RKc6EGG0QL3sgXJvL97UghQwDsxu9Br/T+uM4uFHf9mFgriI0xX4ETyggmYoawsps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750166401; c=relaxed/simple;
-	bh=rT+q1cuJk4X808ltKP0mkhT3jOCWnDD6rLSYm7eJiSU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j6njA9hPTqDfuwQDUToL5tFoOjw/5UFOkxgjxDWIGwjmm7qxS47mUEC5AwkfRreXwfAYKCL/sNh+qmZDRBZMXF3+ghhgAnpOVo2ZMtmbNF54a+0ISbYOGwEqU8QsEC6VOgVIEcpWbRUvZG7SMnscrTn7NOsJ0+uAP60MO+L3uZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSWSeLSJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20AAAC4CEE3;
-	Tue, 17 Jun 2025 13:20:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750166401;
-	bh=rT+q1cuJk4X808ltKP0mkhT3jOCWnDD6rLSYm7eJiSU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OSWSeLSJ6MXSVQhDACyJSWXbm0jojPUBCKBQR149UO1tEgpfAM2kRGgx0dwZeJz2D
-	 3IqjELK5sY6fK6ZPiRamigQDDhtW0Lczth9VK4E8vfwGCSOh4rV7wr1DaErBPtUpYj
-	 gUXn4kZyrCYiYR5MDR5HbzpksmN+KGsNScuxPifEpgQJ3tvms+jvD/JvykAB3u+pJL
-	 PhI/TysnqJq8COWLyDCFPap0d98nxzivib/5zohS/s1hB/60yDzNMPqtxY7yZgHGQ0
-	 OupkFIyU41Z0r6eTpKYxHG8DllzpJEVRCjVg1sEjj4slZoGHjgAkRvtJUPwnyek6aW
-	 uYd8YSjGtr6Mg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF25380DBF0;
-	Tue, 17 Jun 2025 13:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1750166670; c=relaxed/simple;
+	bh=rMdH19Ha3Xz24HHYBArjf+McyOLpaD9H7J/RsDJcwb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fD/KnzLOHSb5vNqCcVP0tGYsVipP4YVDNRtub6k0jEqrpFeJ5MwhIDbv72yHQ15YJ92ODqdVO1rKq9ZDuFiRD+dsempAFChCt8Pv5Aia2RG2mjrZLZK1Jm7iwz2PQZaoric63eTq337HnaC8ZhCGKFGOI/AFaPblfk4xtcad93s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-adb5cb6d8f1so1054475966b.3;
+        Tue, 17 Jun 2025 06:24:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750166667; x=1750771467;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yZICFVnnnVkMN743/FIJcvBC1yVrX98jV652ZYbnCU4=;
+        b=iW9e0F3tdtMOpLJ/74zfLV8/2MYjDzYYkObQGPu0OqwiodwtPbL/5MgfzHVVx7qq8j
+         I2TbNpD2rKXnjhbTlWfTjkmgcwMy6ALXnOsJRnxPsTDlLY6qltR3UsWINha1R1vXSK+k
+         +fKA+LHgqlbm2GzugBxaONQ43Rs/IbZTk+cSAhCXC0VX42eLIy5u/dbBdwGgt/iJKBNX
+         +alqB4RMtZDVcirf9ZZg/RO9bq/zGJLoVX9LJ+0N7iNl9QgU7REtbS1kc9wrVQiN6W5z
+         wVHWV7sO0xagaLDhGou4Gj95h/+Zx1DPKL7Uc9iwUBba6uYIsA3ARP4hDbJdtWf6kcbV
+         kPMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFBNv1+1mU0iLQ2W8ptLoZBmTK6QUizb1HzqtChlYiZ+4ntYuzl6YTlrhqdOAF80hB9gkpPHg9uPubHGg=@vger.kernel.org, AJvYcCUp4V4XB+hbUDvvgfieilfkOieK/pdRpNdupndOfOUZ1f11hL4OZe5UGR5of8caT0lASS40M3hO0FFdxDd8E5H4@vger.kernel.org, AJvYcCUyguMTzq10E6aGTw7Kv6Q7oYZh1PM5iTt8OswYlgtuiaFQoxjwnA+0sARI4mbQ3OD1l0iTRGEs@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjTnulWUpA+0BN+u0sOGojFnMq8R0Vyu830XJ+4WqBxDptqE2p
+	gedeYVxKJhRmRxkgUTNhODrrFqiSxjHLNOz0gZhk+NRaxctyrABF3MeS
+X-Gm-Gg: ASbGnctc5Jkbhi0XU/LG786kPUUrEghnZT3lBRkgfG8Z28hQ/Di3uGP7UdI07oz44aD
+	t/zWeDM4jhdTlalOkRe3nDba7lK1Yzu6Lt723wkJwwNdLagT7Gbo06URic4e5Ek1m8d12tq+blE
+	+7ye5ilroEP3unnN3XSZgD4W8940ay2UkyZfMjNY72ZU3x270Z0kvQo0k6R2VLfqFW8JM66KlWC
+	7GjRphQW8fiOsqDjEZ0dWXNrga+Wid5ZiCG/ilkYYlLZ7D0KxUSUhE6p6jANodf+Pv1FEEsBZaZ
+	ZZErDh0MkzlZi2jemqJw5g2py/fbWJk2JTbGfIAxm4mqMJ5XTn9Abg==
+X-Google-Smtp-Source: AGHT+IGb/qV6q15Q5myFKayi4K5nSnZqUdVvCniIl3Tz87O9hLcBmM/EKSqLdBxQCLQnRtXfxzrDhw==
+X-Received: by 2002:a17:906:6a18:b0:add:deb1:d84d with SMTP id a640c23a62f3a-adfad29d0b3mr1296023866b.1.1750166666357;
+        Tue, 17 Jun 2025 06:24:26 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:71::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0138c533dsm11930466b.7.2025.06.17.06.24.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 06:24:25 -0700 (PDT)
+Date: Tue, 17 Jun 2025 06:24:23 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Wei <dw@davidwei.uk>, Shuah Khan <shuah@kernel.org>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	gustavold@gmail.com
+Subject: Re: [PATCH net-next v3 4/4] netdevsim: account dropped packet length
+ in stats on queue free
+Message-ID: <aFFsh6kFOkhGOO7Q@gmail.com>
+References: <20250617-netdevsim_stat-v3-0-afe4bdcbf237@debian.org>
+ <20250617-netdevsim_stat-v3-4-afe4bdcbf237@debian.org>
+ <20250617055934.3fd9d322@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: phy: Add c45_phy_ids sysfs directory
- entry
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175016642975.3127577.11877299160287159944.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 13:20:29 +0000
-References: <20250613131903.2961-1-yajun.deng@linux.dev>
-In-Reply-To: <20250613131903.2961-1-yajun.deng@linux.dev>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250617055934.3fd9d322@kernel.org>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 13 Jun 2025 21:19:03 +0800 you wrote:
-> The phy_id field only shows the PHY ID of the C22 device, and the C45
-> device did not store its PHY ID in this field.
+On Tue, Jun 17, 2025 at 05:59:34AM -0700, Jakub Kicinski wrote:
+> On Tue, 17 Jun 2025 01:19:00 -0700 Breno Leitao wrote:
+> > -static void nsim_queue_free(struct nsim_rq *rq)
+> > +static void nsim_queue_free(struct net_device *dev, struct nsim_rq *rq)
+> >  {
+> >  	hrtimer_cancel(&rq->napi_timer);
+> > +	dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);
 > 
-> Add a new phy_mmd_group, and export the mmd<n>_device_id for the C45
-> device. These files are invisible to the C22 device.
-> 
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-> 
-> [...]
+> here we are in process context and debug checks complain about the use
+> of this_cpu_ptr(). Let's wrap this in local_bh_disable() / enable() ?
 
-Here is the summary with links:
-  - [net-next,v3] net: phy: Add c45_phy_ids sysfs directory entry
-    https://git.kernel.org/netdev/net-next/c/170e4e3944aa
+Thanks. I was able to reproduce it. Your suggestion avoids the complain.
+I suppose we should just wrap dev_dstats_rx_dropped_add(), right?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+	diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+	index 5d0b801e81129..07171cf8b07ee 100644
+	--- a/drivers/net/netdevsim/netdev.c
+	+++ b/drivers/net/netdevsim/netdev.c
+	@@ -635,7 +635,9 @@ static struct nsim_rq *nsim_queue_alloc(void)
+	static void nsim_queue_free(struct net_device *dev, struct nsim_rq *rq)
+	{
+		hrtimer_cancel(&rq->napi_timer);
+	+	local_bh_disable();
+		dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);
+	+	local_bh_enable();
+		skb_queue_purge_reason(&rq->skb_queue, SKB_DROP_REASON_QUEUE_PURGE);
+		kfree(rq);
+	}
 
 
