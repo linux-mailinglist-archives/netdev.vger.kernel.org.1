@@ -1,163 +1,149 @@
-Return-Path: <netdev+bounces-198785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42124ADDCF8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D47ADDD0B
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 22:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8F0F7A652F
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:08:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7284917FA5A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41A92EE996;
-	Tue, 17 Jun 2025 20:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3795B2EFD93;
+	Tue, 17 Jun 2025 20:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Of12+ksd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bcv8J52d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F182EFDA4;
-	Tue, 17 Jun 2025 20:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60512EFD83
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 20:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750190929; cv=none; b=rJ/2AsHghjRS0/vt7QApKsOSbV8oXgbmeeeCCIgHrQTdXNC/Pka4i+XjZ5ls3cc/CapDBELYjzdy3U0M8gJMCWiVw8a4gXC8b1ooCYMgEpb72wzLmpZvKJxLYI7ab4DfMv7oy9gsx4chOr6XjZ+t/pVZw/RU18s2wyupPACYquA=
+	t=1750191281; cv=none; b=PNxsKihBCp9YRuBdMZxFRGrQYYHKcNgFa8Cu71xfQTHaEXToatTotxNCrKtL0fENTXLQNhyDbue3+1Owg4g82w4YfWfvKuXZUS0ECpbmkUt1KN1yvjVJmOADSuWvuuMo1yO/c4KNEr9NV8FJ1eln4fwAvP4+11ElEnwmJ+y27Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750190929; c=relaxed/simple;
-	bh=+7MkDaNSvLbnsgCHheztecylUhUYF6UYGE+0ya+iFnQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=IoQ9NYfdyKxipWo5NOUAcQyhdLmpiWEeY+kvACB2jhcXCuY+qzex9lrJkxbLCnaHWL/nXtchxjfRFVZeKFkXlCjCxXoviDbd35pU6BBOE11ovfTqt69wcoXERRYrHUL99h8WU9ApbhC0sS4g596oX8CoG4SW34JVS06JakPcYBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Of12+ksd; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-70e77831d68so60857167b3.2;
-        Tue, 17 Jun 2025 13:08:47 -0700 (PDT)
+	s=arc-20240116; t=1750191281; c=relaxed/simple;
+	bh=INcAZefW15cBrtKKp1JIdih6FkyAnjMuDj4MdBbxCik=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=My0DyXQ8qR/TxrSU0lgBNxm+WLsilAkQXNbgOoOYV3bnorlfs2Hs0xKdKgjLvC8jxwCxy3uWMZVW1q0b/2+5hXYuL1RYrV0XNp424ipHJFWBk/QThGH4qk8MQAmbMOtluyzFmT8aa2rrOdS2TGE+1I6YAbL+qJVaGIQxGDerd74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bcv8J52d; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2357c61cda7so3205ad.1
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 13:14:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750190927; x=1750795727; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1750191278; x=1750796078; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K47AyRD9C8APvHVdVcg+JhX/4k3xEAD2ampnaOSEuhg=;
-        b=Of12+ksdHJ+tENHEsoqZjPC1qi1G52Ca0vHmraBoPB84EvZHGkiNGsqe9pw8uHXgHc
-         jnBrH44c4lNSE0cfYhxiAkoeodKdwcujISe27WEJCA4OAhmttylUtDnpM4A0l26Q1zDs
-         bfLG9ySdNZ68ZkXSXZNsYq2yGNcxmJmHpscsXJp4Tq4zSx0koobmewcve0RSh5QBPfIM
-         F4Z6fu5ceMZmC7SrtDQK4Sf+b/zFpUFnEkqaIFN2xUiuSZCpuGqQsr7xXFUt2y3ynkTx
-         jEKh0GCnOPZU+nEInIBFCvIwwGDBI/1q1SZ3kLeXRnSz28AFAuI38Y/ymc9t9c539kwZ
-         hBVA==
+        bh=9rtxoD/HgRcRcM4T/4LdH/w+9lyF8T1e+IM1csMbVXM=;
+        b=bcv8J52dR2NCgpSaNxvePiDcd0ycVc9SPiks4hQqd8mfNmWsSU2Jpg4z+MpexEWRT+
+         RadnEHbXRrziLrqALI2AZe1ZNDQ+5VMl2lsWOT/rh3+2BlQVgoWoIHnK6qCJ9gobery3
+         jgdJtGXjrgcA44RVPLurWE6+DjF3AAFpJ2JnHAvvKCE/GErI7ANbuc8ESkgwm5YwoLlD
+         kX0UQ4EIZuj7C8Q2yvddNVPMaSxChNPUwxsg6/d4UGHtnYXHg9+OYlqdIdUtNHLDW1ej
+         6q5Xi5U9bndI/GyKj3SSleFKIbHyBlphsreGJdmwUHRYxCeIJ4Qp4xpwWB+aTTMu65Pc
+         1ThQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750190927; x=1750795727;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=K47AyRD9C8APvHVdVcg+JhX/4k3xEAD2ampnaOSEuhg=;
-        b=Cy5mtxoF22L5HDePCEvyBGhHATqK/M/URWBEZUS+8UWclH39tf1htIseXy9BhysSdf
-         QbzP4Pv6+mfgbkj7v11gZyAUwsmlegQWYXbDDP/AR41TpoeU70CR2sPvWykfKLlMbswM
-         ohhrmL+Zh3O45Q3fSXBwbF2Ad+aFTPY7pIHuYzAikpLXcxm9PGZ29Oucywuyz8U/itu4
-         m+C7LK6mFaKrVsUDP+5V1WrRTRCLd24qScWeVioUfNDc3UcPWy+A4t0FEkDd4oodaLp5
-         DF5G8ep3GNrqMQ89K9yPwCwRCyDwuSXBZHYDSCzKEprix25/VDe2TnmgN/wK+54BXraP
-         ZQVA==
-X-Forwarded-Encrypted: i=1; AJvYcCU97YyPbzNG+O7jPh6lwqPkxYZu4dDrm7JM588c/BBNbFCN/9nwVilIQzzn7hsqFWWMGYTTMCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGdSquRwCCITY92D2y4n2aXkouWcwPUxaBIn06HgHJz9ubN7mD
-	pUDqdsRxBcegLOTb/b0f3wK5/uvc1ftfSnzc7WSdeySykAxkEQ9deDOh
-X-Gm-Gg: ASbGncvl895Ma7wlzQQXnaoRvZVQsw8XassRrp5G8PfRwNcRX+qcYjBbv5AGANfKzPX
-	uEZKFoqjNjI/1jG729aF5VUm8JBhti+msjXtyxi3BxXMfS9Ee4+0c8Xaef7mWjNyzyP7Ptc2zaL
-	4Pbn7REGhHz05Kqx7VzzY1fohMmBSlos61HmxyAKC/+YGrdCg73xyhtK9/toSVEjDmi9J6VhNk0
-	DV4ABdc5+YavUgz2X6U9jM6dTgPf9cETiL9FtiKGLcJuE18ZMreElN2pKpxHF19ZNb/dKU98QeC
-	EkxiGgfJV4zhm9SN+0NCCObguoNs8bcj6c45VsziA3f6ZrtVG4qPA1gpfogFl3XMb1XBTJ3O9Zd
-	SXefMFn1TPNmaBHwuKMk+wl8T40iK1Rd7suzd+727sg==
-X-Google-Smtp-Source: AGHT+IFh09BwRMGRKSRbvS48EJlBsM0xkYWgCclKY7R3GPqJENpdjndn0ctvt/sI7UnizFlnQgMVIA==
-X-Received: by 2002:a05:690c:7246:b0:70e:1821:a219 with SMTP id 00721157ae682-71175463114mr218771127b3.36.1750190926947;
-        Tue, 17 Jun 2025 13:08:46 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7118ff66f34sm10726687b3.123.2025.06.17.13.08.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 13:08:46 -0700 (PDT)
-Date: Tue, 17 Jun 2025 16:08:45 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- john.fastabend@gmail.com, 
- martin.lau@linux.dev, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <6851cb4dcdae7_2f713f294e4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <aFGoUWgo09Gfk-Dt@mini-arch>
-References: <20250616143846.2154727-1-willemdebruijn.kernel@gmail.com>
- <aFGoUWgo09Gfk-Dt@mini-arch>
-Subject: Re: [PATCH bpf-next] bpf: lru: adjust free target to avoid global
- table starvation
+        d=1e100.net; s=20230601; t=1750191278; x=1750796078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9rtxoD/HgRcRcM4T/4LdH/w+9lyF8T1e+IM1csMbVXM=;
+        b=APQhXB5NEqQi6srzEKNk/D4RC5O4RLYr62kltZ3ANM5gVAOF4XiYKIBf7D2LCM739g
+         yARyOhQ+gc7h9MK0t0U3jKt9bmdm03LL4KfRQ5ZhmS+zMsD1dDQBjA2LNaLRvPuKrz+6
+         HTXsXuV7FKF6KOisSlJDoNIEFOxKXNe95UMAcD4yr8pBwbO1cFLy0G5gTpHQ+N34Kiqr
+         idItHY3KjBnnSIbsenSpqhNCJa1yjr43zfa5PQQsmmYa49E9d8Qpd3Sp6rj2eeVTQKS1
+         77XXbAvmhBDWtqV8cR3erXHFKLXzHwZW+KWEeZZ/PrOUHTvTVqrvSd+xaszpN9oTOD5z
+         +puw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXc6NRb+Y0SzyXgmdZ20Uh+vjz7CQYOgBdQQQ/zyy13mYso9eR35A6JZijlsQ3ZAeDq5ZOpPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHxISWC/+UQVgY4W4GIATXCk3ItqdCPjp5qP1EoLsjb6oiKggz
+	+bYxsaFg8Hryzf4midqQHgL8hRqjTrW9gMshvM6RPcSoWq6iGzO+tUxt/o3gZ5folEQbmUv4kP/
+	nfC01btOXHDrqqOq0fyDovy/Estvm1NfBciRX3+by
+X-Gm-Gg: ASbGncuNIS6xsInnoVEodJqif5hE/aN/XBB8r2TVuvtBQitEPAnGo2QYpdjAqrnYkDC
+	dYYmb/bm6hy1EmqXtNc1nFjpcrE3lqNo0n9ySoiBe2ylcI2b8G9gYsOcGGwkz/7psZes9Bd/Lvq
+	CjRKs+drLUzxgQ80fAH7cGliZzo3sVnpRXoWiBwSfiae1UtzqzOq8UXqbTO8/Y8cUucFFVhIhqS
+	Hqmyy4oXjKL
+X-Google-Smtp-Source: AGHT+IGAr7vUMZbGDr8Ufm4vwLgohiqqfQKu73zFNXQZQq6y5/FQJtDLyE3dokM7LkNnxh3uKDQVgX9ckv2eJWpVijM=
+X-Received: by 2002:a17:902:c952:b0:234:afcf:d9e2 with SMTP id
+ d9443c01a7336-2366f0099d5mr8419825ad.17.1750191277405; Tue, 17 Jun 2025
+ 13:14:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250617094540.819832-1-ap420073@gmail.com>
+In-Reply-To: <20250617094540.819832-1-ap420073@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 17 Jun 2025 13:14:24 -0700
+X-Gm-Features: AX0GCFsaW9VZd1TliMlsA4Qz-XJHztdIn2K8WV88e4OqY6kyhAct4KzbnRXJIek
+Message-ID: <CAHS8izNXHvavBAWyyvwzwFh6CgaBhCnvQvtMsE4B2CHVm206hg@mail.gmail.com>
+Subject: Re: [PATCH net-next] eth: bnxt: add netmem TX support
+To: Taehee Yoo <ap420073@gmail.com>, Pranjal Shrivastava <praan@google.com>, 
+	Shivaji Kant <shivajikant@google.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Pavel Begunkov <asml.silence@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Stanislav Fomichev wrote:
-> On 06/16, Willem de Bruijn wrote:
-> > From: Willem de Bruijn <willemb@google.com>
-> > 
-> > BPF_MAP_TYPE_LRU_HASH can recycle most recent elements well before the
-> > map is full, due to percpu reservations and force shrink before
-> > neighbor stealing. Once a CPU is unable to borrow from the global map,
-> > it will once steal one elem from a neighbor and after that each time
-> > flush this one element to the global list and immediately recycle it.
-> > 
-> > Batch value LOCAL_FREE_TARGET (128) will exhaust a 10K element map
-> > with 79 CPUs. CPU 79 will observe this behavior even while its
-> > neighbors hold 78 * 127 + 1 * 15 == 9921 free elements (99%).
-> > 
-> > CPUs need not be active concurrently. The issue can appear with
-> > affinity migration, e.g., irqbalance. Each CPU can reserve and then
-> > hold onto its 128 elements indefinitely.
-> > 
-> > Avoid global list exhaustion by limiting aggregate percpu caches to
-> > half of map size, by adjusting LOCAL_FREE_TARGET based on cpu count.
-> > This change has no effect on sufficiently large tables.
-> 
-> The code and rationale look good to me!
+On Tue, Jun 17, 2025 at 2:45=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
+te:
+>
+> Use netmem_dma_*() helpers and declare netmem_tx to support netmem TX.
+> By this change, all bnxt devices will support the netmem TX.
+>
+> bnxt_start_xmit() uses memcpy() if a packet is too small. However,
 
-Great :)
+nit: this is slightly inaccurate. memcpy itself is not a problem (via
+skb_copy_from_linear_data) is not an issue because I think that's
+copying the linear part of the skb. What is really a is
+skb_frag_address_safe(). Unreadable skbs have no valid address.
 
-> There is also
-> Documentation/bpf/map_lru_hash_update.dot which mentions
-> LOCAL_FREE_TARGET, not sure if it's easy to convey these clamping
-> details in there? Or, instead, maybe expand on it in
-> Documentation/bpf/map_hash.rst?
+This made me realize that skb_frag_address_safe() is broken :( it
+needs this check, similar to skb_frag_address():
 
-Good catch. How about in the graph I replace LOCAL_FREE_TARGET by
-target_free and in map_hash.rst something like the following diff:
+```
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index c05057869e08..da03ff71b05e 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3681,7 +3681,12 @@ static inline void *skb_frag_address(const
+skb_frag_t *frag)
+  */
+ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
+ {
+-       void *ptr =3D page_address(skb_frag_page(frag));
++       void *ptr;
++
++       if (!skb_frag_page(frag))
++               return NULL;
++
++       ptr =3D page_address(skb_frag_page(frag));
+        if (unlikely(!ptr))
+                return NULL;
+```
 
- - Attempt to use CPU-local state to batch operations
--- Attempt to fetch free nodes from global lists
-+- Attempt to fetch ``target_free`` free nodes from global lists
- - Attempt to pull any node from a global list and remove it from the hashmap
- - Attempt to pull any node from any CPU's list and remove it from the hashmap
- 
-+The number of nodes to borrow from the global list in a batch, ``target_free``,
-+depends on the size of the map. Larger batch size reduces lock contention, but
-+may also exhaust the global structure. The value is computed at map init to
-+avoid exhaustion, by limiting aggregate reservation by all CPUs to half the map
-+size. Bounded by a minimum of 1 and maximum budget of 128 at a time.
+I guess I'll send this fix to net.
 
-Btw, there is also great documentation on
-https://docs.ebpf.io/linux/map-type/BPF_MAP_TYPE_LRU_HASH/. That had a
-small error in the order of those Attempt operations above that I
-fixed up this week. I'll also update the LOCAL_FREE_TARGET there.
-Since it explains the LRU mechanism well, should I link to it as well?
+> netmem packets are unreadable, so memcpy() is not allowed.
+> It should check whether an skb is readable, and if an SKB is unreadable,
+> it is processed by the normal transmission logic.
+>
+> netmem TX can be tested with ncdevmem.c
+>
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 
-> This <size>/<nrcpu>/2 is a heuristic,
-> so maybe we can give some guidance on the recommended fill level for
-> small (size/nrcpu < 128) maps?
+Seems like a straightforward conversion to using the netmem dma
+mapping API. I don't see anything concerning/unusualy.
 
-I don't know if we can suggest a size that works for all cases. It depends on
-factors like the number of CPUs that actively update the map and how tolerable
-prematurely removed elements are to the workload.
+Acked-by: Mina Almasry <almasrymina@google.com>
+
+--=20
+Thanks,
+Mina
 
