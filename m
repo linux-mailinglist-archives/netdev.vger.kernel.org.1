@@ -1,141 +1,173 @@
-Return-Path: <netdev+bounces-198732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF40ADD5E8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:28:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1346EADD5C1
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBB442C4FE6
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:17:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D711F402C48
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AED202C38;
-	Tue, 17 Jun 2025 16:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E932B2EF2AF;
+	Tue, 17 Jun 2025 16:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EPAIyukk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJ+GtD+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E934B2376E6
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B905E2ED161
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750176689; cv=none; b=Y7WnmWeJRmM8znl3d3SqOG3Ea+VX97SM8Bi6wNHkLx2WpH9rMUsKzuCR/SNBWt+P85tuzzxpa0XWDWW9lgP/c0bnB+br56hqf2XuJ41Z3EEnDCF2aOsdrab5bzYsJ5bLEIcYNriC6MDExFFCqdrbWEthvVEIO7S+xxH5XUuKV0I=
+	t=1750176769; cv=none; b=mLh/kLnAu0Rgz4pgtB8j0yKFFMiHF3R2uImw0heDEj6QiwCNFRGFA7ryGFAySaYvipRtWIkhLy6DIjxpod//4Y0rA1Av1ONg1NlfNV9yqSHcZERSeDwOtPqGa3QvpJu4Z3BDyMSuJdhezDFLFkuWVAhYsR3q6tb2SIQJMIIrj0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750176689; c=relaxed/simple;
-	bh=OC9vIJisTHYQPwuKN43tUkgM5DyhMcufbbVGOYHKqSs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mznmLa8DVuqfYbtZ7mX2rlOfqkrg6Sef6YAQRjRFZws3F5t+znXMSBuTpRzbDL3xXLMmvd0UBfAvZJUGwdeldbOHAKhQvpogmcZPtNWQmzIwkh0CmLPD2Fx19CnG6Jf0omobI9Ev6hx2A2ERWrCsQ3kwOwgs+VURqMaYRlm5VgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EPAIyukk; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-234fcadde3eso76497895ad.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 09:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1750176686; x=1750781486; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pLW7r7HuYcGyR7rLZ3NHXY+eg0CZ2RMHf0gILHhKaYs=;
-        b=EPAIyukkEyYSIaXNc0u04ZJB8sJoMGUhJ0gKg6xOS3EtAa4j5KRfzXKyRqxisSi34S
-         iKquasV/0r5dqEhKPRgKbPhLA5j+a5NoF4UjKtmExFtvkPrV1+hJxJ2TmgUqC1t69Q8u
-         Ti0xW5roNRaMAhEZPnLpI7nb4EnGx7a54u/IM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750176686; x=1750781486;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pLW7r7HuYcGyR7rLZ3NHXY+eg0CZ2RMHf0gILHhKaYs=;
-        b=DAVEi/y4L21AHhz6yIyqp1Qo6b6kEC/o/76/Y8rNK3itItjZKFBNyw7CZbyi6Y803h
-         ZRm4TAJ/EYsXGFvroOB8EDYgQgOe9Ws9XRSvl6yF/2AQbfmrXxhqKtHvZPuyfrJviCTA
-         zZkyvmnQ9sLINREfROndRdbKHfmyNunXX/P5Tm4xYwwfRdgHriSBmkviNpqF+6BoE6/z
-         SrJNdSs04LhTMc38QyDc2MQubidpFFqCp9FCg7JmzoQ2Ay8kMf0fveOEqQYDd/Hh2uVe
-         5QiLTTZ83H/19czB1I3kPkT9HI37D4OHSbIRPy0HCP5H1iy4erfWK5c6y4gDT5Cmi8/B
-         iCQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXms8zzmmjwsd7yBQdzMGd6iq85Hw/RHGolWpKCOeXqzn0X3lBzCPdLFgwlZQ8aitXxsQKnPw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztUdefm8eviXuefl5Nsf22pE0dCVWo0G/Ye4DwW0EGmMzu07+b
-	we8nUEuvH4dA68hTubsv2CgYxgdtNnPOcQuULsSm5hDEj2CvxNevRZY4SZmpcYetHA==
-X-Gm-Gg: ASbGncsCskBRc4BiZllJeRQ1dsgq/OIEIsymNhTL2MBoyspfJPl6rRi3U10RTbR8GLD
-	tws4I52czjc2t57cJ9+YaUwjMQAT2Ii6OgCIJQRgy/jFpkrQEqYQRmpVngtwWobMivYYRVNHy69
-	Qlvj2d4Qffwk+AAcrfdifkCy5jedYiAciBWN3ZUDxNaQTCsjwHcxFeKiB2+WKutxt7V0VQfvA2O
-	o7FVov4q909NRG7uh/JIXI4GV9oe4uDYQ4nTrKhVlPl+1dhIoX2/i/Q4gxkC7dV9+Ufmxy873Sm
-	QXfUaeQoVXncUqhrOyJlxX8FZGMduFwq7zEoQNGFJOkVs3/RFG7V8lvzlm4Ek2KmYK5VYqy4WM8
-	WNzm6fgII/h+rQ++VKf+/dVALtF+8N4Dejeu8
-X-Google-Smtp-Source: AGHT+IEQKmeU9Bz4bli+f2koEvgctbXY/o26ffiLON6VsMQzQ7u7NsjgIKe+pJ3R8VpocXxpXL8oig==
-X-Received: by 2002:a17:902:eccc:b0:235:f18f:2924 with SMTP id d9443c01a7336-2366b32a043mr227376315ad.15.1750176686223;
-        Tue, 17 Jun 2025 09:11:26 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2369e7be838sm3279455ad.125.2025.06.17.09.11.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 09:11:25 -0700 (PDT)
-Message-ID: <499e7609-9000-4f49-9654-90b141f72394@broadcom.com>
-Date: Tue, 17 Jun 2025 09:11:23 -0700
+	s=arc-20240116; t=1750176769; c=relaxed/simple;
+	bh=Q6IU7MahY0AJ7EHn5wDiKte0GfMwA8ixOozEWfqowhs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cY6zVtZugYHuJ8J890r9TF+GuYyDQHx6WYJjPUNNpvEqOyl0GFuyJi+7BlHoPY1DzFcNvxyCwGUfdYOc6fJfowKQh8qp4PcBUgL85qYiyGYhEKfQrWWR63uarsIZE1s6IzscksDQxojIhTl1ND1/iE9/FkMWRMWdixcBYlrWBNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HJ+GtD+V; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750176766;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Zexs8K/QpVyKUlBp9EBZI/iuw73u6oXS3jY4YqwIY10=;
+	b=HJ+GtD+V7h4Bb5pTcfFp0EBVtUIruDS03Y31uFEfSCJP0YWWHNiPYQB9r9liqMFp/5C5gp
+	oT5PaqWnnDPzH8h6p3QN9sm+D2v4bIUrDCeLL4JLhAXEo8x6DBQ1pE0XVEJdZFR9FAKgXH
+	d9bxSg51cQsCLOLz/yUBoHzo8VvtDRg=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-393-VfZ7-ShnM8-j080RnRZLRg-1; Tue,
+ 17 Jun 2025 12:12:43 -0400
+X-MC-Unique: VfZ7-ShnM8-j080RnRZLRg-1
+X-Mimecast-MFC-AGG-ID: VfZ7-ShnM8-j080RnRZLRg_1750176759
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 954F418089B5;
+	Tue, 17 Jun 2025 16:12:38 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.33.2])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6833B195E346;
+	Tue, 17 Jun 2025 16:12:33 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Yuri Benditovich <yuri.benditovich@daynix.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH v4 net-next 0/8] virtio: introduce GSO over UDP tunnel
+Date: Tue, 17 Jun 2025 18:12:07 +0200
+Message-ID: <cover.1750176076.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 14/14] net: dsa: b53: ensure BCM5325 PHYs are
- enabled
-To: =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>,
- jonas.gorski@gmail.com, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, vivien.didelot@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dgcbueu@gmail.com
-References: <20250614080000.1884236-1-noltari@gmail.com>
- <20250614080000.1884236-15-noltari@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250614080000.1884236-15-noltari@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 6/14/25 01:00, Álvaro Fernández Rojas wrote:
-> According to the datasheet, BCM5325 uses B53_PD_MODE_CTRL_25 register to
-> disable clocking to individual PHYs.
-> Only ports 1-4 can be enabled or disabled and the datasheet is explicit
-> about not toggling BIT(0) since it disables the PLL power and the switch.
-> 
-> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
+Some virtualized deployments use UDP tunnel pervasively and are impacted
+negatively by the lack of GSO support for such kind of traffic in the
+virtual NIC driver.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+The virtio_net specification recently introduced support for GSO over
+UDP tunnel, this series updates the virtio implementation to support
+such a feature.
+
+Currently the kernel virtio support limits the feature space to 64,
+while the virtio specification allows for a larger number of features.
+Specifically the GSO-over-UDP-tunnel-related virtio features use bits
+65-69.
+
+The first four patches in this series rework the virtio and vhost
+feature support to cope with up to 128 bits. The limit is set by
+a define and could be easily raised in future, as needed.
+
+This implementation choice is aimed at keeping the code churn as
+limited as possible. For the same reason, only the virtio_net driver is
+reworked to leverage the extended feature space; all other
+virtio/vhost drivers are unaffected, but could be upgraded to support
+the extended features space in a later time.
+
+The last four patches bring in the actual GSO over UDP tunnel support.
+As per specification, some additional fields are introduced into the
+virtio net header to support the new offload. The presence of such
+fields depends on the negotiated features.
+
+New helpers are introduced to convert the UDP-tunneled skb metadata to
+an extended virtio net header and vice versa. Such helpers are used by
+the tun and virtio_net driver to cope with the newly supported offloads.
+
+Tested with basic stream transfer with all the possible permutations of
+host kernel/qemu/guest kernel with/without GSO over UDP tunnel support.
+
+---
+v3 -> v4:
+  - vnet sockopt cleanup
+  - fixed offset for UDP-tunnel related field
+  - use dev->features instead of flags
+v3: https://lore.kernel.org/netdev/cover.1749210083.git.pabeni@redhat.com/
+
+v2 -> v3:
+  - uint128_t -> u64[2]
+  - dropped related ifdef
+  - define and use vnet_hdr with tunnel layouts
+v2: https://lore.kernel.org/netdev/cover.1748614223.git.pabeni@redhat.com/
+
+v1 -> v2:
+  - fix build failures
+  - many comment clarification
+  - changed the vhost_net ioctl API
+  - fixed some hdr <> skb helper bugs
+v1: https://lore.kernel.org/netdev/cover.1747822866.git.pabeni@redhat.com/
+
+Paolo Abeni (8):
+  virtio: introduce extended features
+  virtio_pci_modern: allow configuring extended features
+  vhost-net: allow configuring extended features
+  virtio_net: add supports for extended offloads
+  net: implement virtio helpers to handle UDP GSO tunneling.
+  virtio_net: enable gso over UDP tunnel support.
+  tun: enable gso over UDP tunnel support.
+  vhost/net: enable gso over UDP tunnel support.
+
+ drivers/net/tun.c                      |  70 +++++++--
+ drivers/net/tun_vnet.h                 |  88 +++++++++--
+ drivers/net/virtio_net.c               | 109 +++++++++++---
+ drivers/vhost/net.c                    |  95 +++++++++---
+ drivers/vhost/vhost.c                  |   2 +-
+ drivers/vhost/vhost.h                  |   4 +-
+ drivers/virtio/virtio.c                |  43 +++---
+ drivers/virtio/virtio_debug.c          |  27 ++--
+ drivers/virtio/virtio_pci_modern.c     |  10 +-
+ drivers/virtio/virtio_pci_modern_dev.c |  69 +++++----
+ include/linux/virtio.h                 |   5 +-
+ include/linux/virtio_config.h          |  41 +++---
+ include/linux/virtio_features.h        |  88 +++++++++++
+ include/linux/virtio_net.h             | 196 ++++++++++++++++++++++++-
+ include/linux/virtio_pci_modern.h      |  43 +++++-
+ include/uapi/linux/if_tun.h            |   9 ++
+ include/uapi/linux/vhost.h             |   7 +
+ include/uapi/linux/vhost_types.h       |   5 +
+ include/uapi/linux/virtio_net.h        |  33 +++++
+ 19 files changed, 780 insertions(+), 164 deletions(-)
+ create mode 100644 include/linux/virtio_features.h
+
 -- 
-Florian
+2.49.0
+
 
