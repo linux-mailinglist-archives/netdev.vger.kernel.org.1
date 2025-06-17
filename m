@@ -1,180 +1,207 @@
-Return-Path: <netdev+bounces-198768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A58C5ADDB42
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:22:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3263ADDB57
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 20:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED6E7ABA4A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:21:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D30667A8285
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D8823D283;
-	Tue, 17 Jun 2025 18:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F452EBBB7;
+	Tue, 17 Jun 2025 18:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAbd4Gsi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GGzs0c9z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0247F2EBBB8;
-	Tue, 17 Jun 2025 18:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2F82EBB90;
+	Tue, 17 Jun 2025 18:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750184554; cv=none; b=CkLwMcFgyY71AzOXcFg1j73u0G2pjvvh6mrPKXhG4CTJFuc6LpdQzzJ+CrnPH0lum7tKJpw7IL14CPfP9obIu63/kwVLf/ppYCWNsaXSbgzTWvVoBO60GU4eepeIl0pETtn4ZmqbCE+LV3eWsSTCKjr5A9mDVaGK1VTel6IhX1Q=
+	t=1750185089; cv=none; b=na/a1W6i1QpKRzjapW3MAKE+Nh9Nimb7ZvG9MUMco7zexQD9jouGSXdU5fi627ANWoeB2H4QKCBy678kH6EiZqOKHMVuTU55sKDWUuEO4m0wan/+kDwrZnq+n7U6wzksi+U50WUSCc857+DcFYEGyd/N+AVJEeNuT62qFph+6V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750184554; c=relaxed/simple;
-	bh=rRATALdhRcn5DZSQIwnUYb/BCKnqu3gR4V6mBlBkB/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nSnMXdvi/QctW6cvmTgwj0h0txJP4fYFP5RDNLt6g8BQ6JqHdk1a5CZCxP9C0MLRhhHIVXV/JU4HzF6ETaSvFzfI965dtwm0uTPHzzUS5APV17hBCxviaF7C5gtAsUtNo1RCSh8o9jlOdW+uU8DpKu9KP9IsxnZwjmAsY3KK6tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JAbd4Gsi; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b2c4e46a89fso4843651a12.2;
-        Tue, 17 Jun 2025 11:22:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750184551; x=1750789351; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+6yUoMuq5S3gjE0GRLY4LeWHot5xsTS/R1ypehyGnM=;
-        b=JAbd4GsiSBQ9JWgO17KJsjYqwEccruT0sr3YZt3De4JJXayv587TF6ebwzloy+mpd/
-         Fl2ZHzxtNc3Q2HKJ0ARKl8tNcR40PrkmC9PuA7FoP+CaIHELoR+hbeTdK/BLzes5vZhX
-         lgtzKfatwykOH8lszdPtlU7lM6gllgukCvMm6TJWds4eDB+AYFfSeQ4bR8Z/CrfeEmHh
-         lbQiJP2RiT8sKN1DhsiO7h1h8SqUXb+YP2pYJDnheyolTOOfGRqLUkL15FS1Rfzxv4rH
-         NyuF30gAekJ4F9XT4ppQYGnIX9ug0WBSxKCclKM83ClXLI7NXgkZKUOCd4Tg7+qROUOS
-         ohiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750184551; x=1750789351;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6+6yUoMuq5S3gjE0GRLY4LeWHot5xsTS/R1ypehyGnM=;
-        b=ZZeKhIw3crjxGKQ+qmmc1tMwZcVDIpwPZyDs6iWSuOonCBptDvv505w57rSXA817XW
-         uvr3zoB99k/HPfZhKXblP9BLr0RVpMngdYY2zya1QwZdhVLTsH0m9Utb31+tXksx6NiH
-         Sb3bRbKhHmGMnco/j4F5ruCZrm7U0c3HTgWx3BERZhPUMKevMKX0YSoSxleFaFadSwt/
-         UFTPljeaja3GloZtC66A8gywNrx1gF1jsKoua88oznbxHyL3Sk9LYhonsc/d/4U35VGi
-         N7QcqE3VcOJCVFH1ZFm6mMZpBEYWO7o9g/84PSXGU1GwP3k0KpJtkwHxtlJXTvHTU8sR
-         2ykA==
-X-Forwarded-Encrypted: i=1; AJvYcCXp2BSfxcWUZ1ef6z1jit9K2H9by5cBUu3n5rSum2Pmlif25qEgIp9nc45U214ta3mp7sOj9Z4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHAp1bi/jJTIppOQqbeLB+8iD8AhX+novrkgx8djo3B111JPZY
-	a8BPgia98KON4IQ7ltgRH6Na2fqiwBqiYPhuIox7L0/M77ToyzAeEHc6peWxNN7y
-X-Gm-Gg: ASbGncvqhIvJqzcQCjMBSL67ufj4M6ae4UtRyjX7LhWJoDJTYNuT21G5RqWiVlLMqMb
-	L8Og9mTaf987T1rhZPnPolnRxfO+jbSTXFiiZLDMjsgeM3Ee7X/VWtxesoaWJcAo92WZfRtwMmq
-	hm3OEtwB78RzM1YnkiJGmseETQOFVIv50Fd22BjPaCiYwQ4pCwe3nFaqHv5aXx2zh1wjPrRhHHO
-	k6KYbgdxHLJkBctsAyUCZXdTnEmO7D9IHGOFp7fEzUPMZmW0H7Gn2Mfkcow8K1ByEceiUGSuiQl
-	YVzw4TR/H6JSi8HU/3dLYxYAhqChPZyupFV/GFai+UoKjJCaz6MrgpKL4WG+pUXjkWMpBNr1U0N
-	cMm5U5F1geXMLeA==
-X-Google-Smtp-Source: AGHT+IFgrqJZVVHc6CZw1rbCUX7xXW7mFmdlAjjsynjIlFhhsOoP42hQdJ3kJ8yMNpcaIKSWoIt3mA==
-X-Received: by 2002:a05:6a21:9010:b0:215:d9fc:382e with SMTP id adf61e73a8af0-21fbd4dd9fdmr21722887637.13.1750184551147;
-        Tue, 17 Jun 2025 11:22:31 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe168d7ecsm9247635a12.64.2025.06.17.11.22.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 11:22:30 -0700 (PDT)
-Message-ID: <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com>
-Date: Tue, 17 Jun 2025 11:22:28 -0700
+	s=arc-20240116; t=1750185089; c=relaxed/simple;
+	bh=XPD0E6xQgTVH4IjnsmJ69h+bHt2lmoQrqOhiXIJh0lU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sEwiJwr+pp/SDFOg3CYWfzyyXheZKwOQ2KCJfnkMhB6B0g98+SpCPMcol5hSsdekGIJOyJ7tCOpP89yLEtrINGKAvqmkkwf/2LtC3APdFRENApzSBU+Z7emrtJKZy4czOgEHalYYJ8Z//j/rEvbp566CVYFKoAD1v62bWM5ouKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GGzs0c9z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAAB0C4CEE3;
+	Tue, 17 Jun 2025 18:31:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750185089;
+	bh=XPD0E6xQgTVH4IjnsmJ69h+bHt2lmoQrqOhiXIJh0lU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GGzs0c9zcn8nIQ04zNDLudS0oQ1e7abWV+d2fLy4Lb4213uYypwIOg3rBd4iu2D2c
+	 qo5k3v+YOwSZ5AAO5qYdoRcvPBOW10DmPb1ZrH/qA0An1IkJYtkxZ0lr9XH6FOXjQ4
+	 XiQIyuRCgQbTg3JPOv010FSL+2nx7bS3V+DcsrMwFiFj97ohDAbTA0GagBEe5iygUy
+	 SUsS8DwATC0Ew1NUGwPZ6otGRb9XgMQYTbolhWWVk+zrzaybPa7NLce165NaZoERQm
+	 HwLMRCa899had9//Q0JTHjX9y1RgVUZV9gawy/AjaEvC2bQsw5LEhRJ3Yj+VZWyEWU
+	 d3eb6qaaaaLaA==
+Date: Tue, 17 Jun 2025 19:31:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>
+Cc: corbet@lwn.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-doc@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, skhan@linuxfoundation.com,
+	jacob.e.keller@intel.com, alok.a.tiwari@oracle.com
+Subject: Re: [PATCH v2 1/2] docs: net: sysctl documentation cleanup
+Message-ID: <20250617183124.GC2545@horms.kernel.org>
+References: <20250614225324.82810-1-abdelrahmanfekry375@gmail.com>
+ <20250614225324.82810-2-abdelrahmanfekry375@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Tulip 21142 panic on physical link disconnect
-To: Greg Chandler <chandleg@wizardsworks.org>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org
-References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
- <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
- <385f2469f504dd293775d3c39affa979@wizardsworks.org>
- <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
- <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- WlfRzlpjIPmdjgoicA==
-In-Reply-To: <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250614225324.82810-2-abdelrahmanfekry375@gmail.com>
 
-(please no top posting)
+On Sun, Jun 15, 2025 at 01:53:23AM +0300, Abdelrahman Fekry wrote:
+> I noticed that some boolean parameters have missing default values
+> (enabled/disabled) in the documentation so i checked the initialization
+> functions to get their default values, also there was some inconsistency
+> in the representation. During the process , i stumbled upon a typo in
+> cipso_rbm_struct_valid instead of cipso_rbm_struct_valid.
 
-On 6/17/25 11:19, Greg Chandler wrote:
-> 
-> Hmm...  I'm wondering if that means it's an alpha-only issue then, which 
-> would make this a much larger headache than it already is.
-> Also thank you for checking, I appreciate you taking the time.
-> 
-> I assume the those interfaces actually work right? (simple ping over 
-> that interface would be enough)  I posted in a subsequent message that 
-> mine do not appear to at all.
+Please consider using the imperative mood in patch discriptions.
 
-Oh yeah, they work just fine:
+As per [*] please denote the target tree for Networking patches.
+In this case net-next seems appropriate.
 
-udhcpc: broadcasting discover
-[   19.197697] net eth0: Setting full-duplex based on MII#1 link partner 
-capability of cde1
+  [PATCH net-next v3 1/2] ...
 
-# ping -c 1 192.168.254.123
-PING 192.168.254.123 (192.168.254.123): 56 data bytes
-64 bytes from 192.168.254.123: seq=0 ttl=64 time=2.902 ms
+[*] https://docs.kernel.org/process/maintainer-netdev.html
 
---- 192.168.254.123 ping statistics ---
-1 packets transmitted, 1 packets received, 0% packet loss
-round-trip min/avg/max = 2.902/2.902/2.902 ms
+And please make sure the patches apply cleanly, without fuzz, on
+top of the target tree: this series seems to apply cleanly neither
+on net or net-next.
 
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.03  sec  39.6 MBytes  33.1 Mbits/sec    0            sender
-[  5]   0.00-10.07  sec  39.8 MBytes  33.1 Mbits/sec 
-receiver
-
+The text below, up to (but not including your Signed-off-by line)
+doesn't belong in the patch description. If you wish to include
+notes or commentary of this nature then please do so below the
+scissors ("---"). But I think the brief summary you already
+have there is sufficient in this case - we can follow
+the link to v1 for more information.
 
 > 
-> My next step is to build that driver as a module, and see if it changes 
-> anything (I'm doubting it will).
-> Then after that go dig up a different adapter, and see if it's the 
-> network stack or the driver.
+> Thanks for the review.
 > 
-> I've been hard pressed over the last week to get a lot of diagnosing time.
+> On Thu, 12 Jun 2025, Jacob Keller wrote:
+> > Would it make sense to use "0 (disabled)" and "1 (enabled)" with
+> > parenthesis for consistency with the default value?
+> 
+> Used as suggested.
+> 
+> On Fri, 13 Jun 2025, ALOK TIWARI wrote:
+> > for consistency
+> > remove extra space before colon
+> > Default: 1 (enabled)
+> 
+> Fixed. 
+> 
+> On Sat, 14 Jun 2025 10:46:29 -0700, Jakub Kicinski wrote:
+> > You need to repost the entire series. Make sure you read:
+> > https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+> > before you do.
+> 
+> Reposted the entire series, Thanks for you patiency.
+> 
+> Signed-off-by: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>
+> ---
+> v2:
+> - Deleted space before colon for consistency
+> - Standardized more boolean representation (0/1 with enabled/disabled)
+> 
+> v1: https://lore.kernel.org/all/20250612162954.55843-2-abdelrahmanfekry375@gmail.com/
+> - Fixed typo in cipso_rbm_struct_valid
+> - Added missing default value declarations
+> - Standardized boolean representation (0/1 with enabled/disabled)
+>  Documentation/networking/ip-sysctl.rst | 47 ++++++++++++++++++++------
+>  1 file changed, 37 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+> index 0f1251cce314..68778532faa5 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -8,14 +8,16 @@ IP Sysctl
+>  ==============================
+>  
+>  ip_forward - BOOLEAN
+> -	- 0 - disabled (default)
+> -	- not 0 - enabled
+> +	- 0 (disabled)
+> +	- not 0 (enabled)
+>  
+>  	Forward Packets between interfaces.
+>  
+>  	This variable is special, its change resets all configuration
+>  	parameters to their default state (RFC1122 for hosts, RFC1812
+>  	for routers)
+> +
+> +	Default: 0 (disabled)
+>  
+>  ip_default_ttl - INTEGER
+>  	Default value of TTL field (Time To Live) for outgoing (but not
+> @@ -75,7 +77,7 @@ fwmark_reflect - BOOLEAN
+>  	If unset, these packets have a fwmark of zero. If set, they have the
+>  	fwmark of the packet they are replying to.
 
-Let me know if I can run experiments, I can load any kernel version on 
-this Cobalt Qube2 meaning that bisections are possible.
+Maybe it would be more consistent to describe this in terms
+of enabled / disabled rather than set / unset.
 
-Good luck!
+>  
+> -	Default: 0
+> +	Default: 0 (disabled)
+>  
+>  fib_multipath_use_neigh - BOOLEAN
+>  	Use status of existing neighbor entry when determining nexthop for
+> @@ -368,7 +370,7 @@ tcp_autocorking - BOOLEAN
+>  	queue. Applications can still use TCP_CORK for optimal behavior
+>  	when they know how/when to uncork their sockets.
+>  
+> -	Default : 1
+> +	Default: 1 (enabled)
+
+For consistency, would it make sense to document the possible values here.
+
+>  
+>  tcp_available_congestion_control - STRING
+>  	Shows the available congestion control choices that are registered.
+> @@ -407,6 +409,12 @@ tcp_congestion_control - STRING
+>  
+>  tcp_dsack - BOOLEAN
+>  	Allows TCP to send "duplicate" SACKs.
+> +
+> +	Possible values:
+> +		- 0 (disabled)
+> +		- 1 (enabled)
+
+In the case of ip_forward, the possible values are not explicitly named
+as such and appear at the top of the documentation for the parameter.
+
+Here they are explicitly named possible values and appear below the
+description of the parameter, but before documentation of the Default.
+Elsewhere, e.g. ip_forward_use_pmtu, they appear after the documentation of
+the Default. And sometimes, e.g. ip_default_ttl, the possible values are
+documented at all.
+
+Likewise, indentation and use of blank lines seems inconsistent.
+
+Is there a value in cleaning this up too?
+
+> +
+> +	Default: 1 (enabled)
+>  
+
+...
+
 -- 
-Florian
+pw-bot: changes-requested
 
