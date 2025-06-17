@@ -1,278 +1,144 @@
-Return-Path: <netdev+bounces-198474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28592ADC453
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:14:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E7AADC469
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 10:19:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FFB017852A
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 08:10:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1FC21883FD5
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 08:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C31290D96;
-	Tue, 17 Jun 2025 08:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="NuRkwCfV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDE6288CB5;
+	Tue, 17 Jun 2025 08:19:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012049.outbound.protection.outlook.com [52.101.66.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B44E291166;
-	Tue, 17 Jun 2025 08:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750147755; cv=fail; b=qE3L9+aOwP7tSJh6Ot7D9uAbJRE5tqz7STCQMJLR/l/+hpt2W8hsKx+I2xf9QzUQNVOTwFH0YRrCIHvo+8qhf13SZYHwbwsmGOvutj4TMHXL8H2oipoDmPVR7itCbHfQOoPHRrk4avlznD3sAgHNasEFRdox3G8pNdvBMCaGMXA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750147755; c=relaxed/simple;
-	bh=xHoNGmU/XfLKIw32zNRxQQP/ZxZymyOlKViL4Sdw6Nk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ud2ZrnNtErwtsHR0YoOFxTquoYdZgZUL2ORGPPqdRa3IZQS0LWf9ufQVWrATMFFHFfX5DfzTcTsm9ePdmsPOumdrqac8ukUcKUbVQO6/lfzJ2taNWhWJrl774D4ttf7HlPaCljeNaZy1RNey+nbu7ql5mgXg/Dco55QW6adXSl0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=NuRkwCfV; arc=fail smtp.client-ip=52.101.66.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f/4sW4xgl2qO6Xm+qAm8d19pYMFiEhSEWN3vZETaQJC/7MPbuu6V8Wd2Lb+kqq2kKT6RkW2+p3qc9ul/BRt/fHrftvVT7qjox8+rLF3BG4b0+kkqWQoK+u5/+rJ4S3phIqZRkxAPZZSgsE6E0ozvg8VaAumJIZ+fjK8HdJZXMgM8y1g2sOfMWnfKBvR3BM9nn+NASkeHHcx/uEfKemshtR0J/Gp4MlOq+X9A5lvCkBXvhbKJpoLSisvYGBD6AGZ5parSIauWgS7DlyGMzoncFfEpiWGysifdtL+/BCobjg+SIyeW5h2urFGpCEhgMEY8f8WLj7Zc9G0NS4Wk1X4rxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bSK5mj89dQXwlW+W5oHpKWxB7hIv9hboTnHU8IskhqA=;
- b=gA/981bvVZ9qftXou6cKeHByvMARQtTfZkeLWXUtdF8/smXsSZ/1Gpp+GtNSXE1ByVTuoAQzHN9SqPglV5ZaG0YhGTgh0HzYG4WQZV/0gAvBI9dhcgSkq+EXmSsGP2EPxnqUP9jwveExUihS4bafRjtHYlErXtGwrBL8pGM+P5EZEpTTIRKhNPVzVI2bnlTttvkYf5It1NoIRe9VVpFb2oqwP/cYCPS01b+6fvGHemgzAzFd01a5axTjHy280i3JKF9oiMllAir1PUGz1RQdvjTKi2oyLNfbCp3Y9lVKPEahttCUVUoR81jgmZKmbZ6+mSvHmZARrGtdAHLEpMAk3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bSK5mj89dQXwlW+W5oHpKWxB7hIv9hboTnHU8IskhqA=;
- b=NuRkwCfVxMSIceDA6PE7DoqN+Oh2S+VDKS0O+2vv6W5E8ejyjuQJthnWcO+kBxBztwF/j8vDvotWhAhRgW0e6Dvb2ydwpCqWpBHeYt7IfrhsnKHp0rgBcozXkAQMdBkRuRFwV4sTG6sQq1+k1s5F9rFWlTT+oTPS+RpZ2xkfT5Yn3TMrO4xsG8t58MoYF99m2ykjVRuQux7/aBdxsTkNkudJ2KNjNlL/ojl0EtkskH3W9AkwqhQEDqNIs5mVOTISBwfFUaUpfd7BnVs5V7/zHX2qvec5qRO3S/p3jb36+p3aLakl92sIMiTjyBNJtme5iRB8vcHqO5XyfQaJoLOAag==
-Received: from AS4PR04MB9386.eurprd04.prod.outlook.com (2603:10a6:20b:4e9::8)
- by AS8PR04MB8328.eurprd04.prod.outlook.com (2603:10a6:20b:3fc::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Tue, 17 Jun
- 2025 08:09:10 +0000
-Received: from AS4PR04MB9386.eurprd04.prod.outlook.com
- ([fe80::261e:eaf4:f429:5e1c]) by AS4PR04MB9386.eurprd04.prod.outlook.com
- ([fe80::261e:eaf4:f429:5e1c%7]) with mapi id 15.20.8835.026; Tue, 17 Jun 2025
- 08:09:10 +0000
-From: Joy Zou <joy.zou@nxp.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-CC: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "edumazet@google.com" <edumazet@google.com>, Peng Fan
-	<peng.fan@nxp.com>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "shawnguo@kernel.org"
-	<shawnguo@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Jacky Bai <ping.bai@nxp.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, Ye Li <ye.li@nxp.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, "festevam@gmail.com"
-	<festevam@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "mcoquelin.stm32@gmail.com"
-	<mcoquelin.stm32@gmail.com>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>, "s.hauer@pengutronix.de"
-	<s.hauer@pengutronix.de>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Frank Li <frank.li@nxp.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"will@kernel.org" <will@kernel.org>, "ulf.hansson@linaro.org"
-	<ulf.hansson@linaro.org>, Aisheng Dong <aisheng.dong@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>
-Subject: RE: Re: [PATCH v5 0/9] Add i.MX91 platform support
-Thread-Topic: Re: [PATCH v5 0/9] Add i.MX91 platform support
-Thread-Index: AQHb318amoI2njSFi0289legb0w7BQ==
-Date: Tue, 17 Jun 2025 08:09:10 +0000
-Message-ID:
- <AS4PR04MB93863494863F595F74B12129E173A@AS4PR04MB9386.eurprd04.prod.outlook.com>
-References: <20250613100255.2131800-1-joy.zou@nxp.com>
- <175011005057.2433615.9910599057752637741.robh@kernel.org>
-In-Reply-To: <175011005057.2433615.9910599057752637741.robh@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS4PR04MB9386:EE_|AS8PR04MB8328:EE_
-x-ms-office365-filtering-correlation-id: cc859da0-94bd-4097-9c49-08ddad763d5e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?YNUrASlyyKBNyneCLmo1UGtsi3i9HfbKDbEO8awprK01pWuXeLCP3vHkXHUi?=
- =?us-ascii?Q?1WjY5RQ7yZIo0mV4e52EtlxewfYesaGTszVs8lc9bYk3IzXj2kELN0C2Hr6p?=
- =?us-ascii?Q?nYQ+xiUokHLfSyyIaSaKFx0HlJJZKj1IBjpCzlNShbU5hGSSBYmYhSQe7+/Q?=
- =?us-ascii?Q?QO5g159rqLiHa4kEG8l8UEX/JIJ3oiRabe7qUHnBo/BOyefkIdIaQosuIUYe?=
- =?us-ascii?Q?gqecq/kuc33ZrxbbJGWdY9rhH6yHkhJ+vmt6POCFPJs3TNJB/bS7lrNMH5ZO?=
- =?us-ascii?Q?l1D2SMn80feFb/oj04YL2LVnigiJsg9GKezzUFM1ps0ZTWj9U5f79uCTcSvI?=
- =?us-ascii?Q?Fr1ZEZxm8TS4gNPzRG7UamEpZLoPxQ1zZD8FNKRxwwdc08aKmS4nuDo3WJny?=
- =?us-ascii?Q?D/wn//Syjg58AB4ZRpskIq6Liz46ephMa8mygkb3sW1FmolcO49Zio3XNsIg?=
- =?us-ascii?Q?fqJ+/+UMpISbQPU4n9QWWG30G2u0pWlFKw06FmjbGsrKPo5fuNN/oUL5DQJX?=
- =?us-ascii?Q?CK2zv+Avf7JZ/AqxsHfGWEIITVJA+IbhZ6TQW/8iVCMyH4TlVR7FQaHacmp+?=
- =?us-ascii?Q?q2IwVwnFgk2ikOTwMpzVGAZH5atHFSzFmqddZ8AMSXgnmwoNXZA8vhcoKlWV?=
- =?us-ascii?Q?Pg8+NB3FC1uENDls/heLHk/lZ6uyIKU9LsYSZEyuHOUxCP/W3GWPSFB7QTo7?=
- =?us-ascii?Q?LDuKeFW8kAfL0UG9AhnHKqe2WDhgXyefLJmzvAnTu0arSrRW15YTQ+YqBWeU?=
- =?us-ascii?Q?MXi8wqVX4UVWLM+t3taP2nk5sWNMnmyMMwZXKG+hCJznPUMXbVJDBLq4zLgL?=
- =?us-ascii?Q?7MQP/ew9Xd3rqXfDAnxoZBk1bhCRk4YRk5Ukcxrdntgh3gdnoAM13B6QYZnX?=
- =?us-ascii?Q?o5IeIV/IXQqrV5XxBzcsP4PMXkd1UR+bu36Y61cWg9+57ULpKH124YQ8wcCR?=
- =?us-ascii?Q?+GjATQBHjDSLYQVRms01bYvm96ktfPVRNSGw5azEUKh8jLN51ffRT5EeEVgx?=
- =?us-ascii?Q?IJpjb7AHFz6TshjnBKt2mv2aW6tllkuJV1pMBNqKKoRRGCnExvU6fY3ru2E4?=
- =?us-ascii?Q?6ZaClaCbUL/2WBHO/JxijlGyKJKTmtX7a+UbVrKFOlU2eFcrTmdr2oxNGGT4?=
- =?us-ascii?Q?jCfzrw82ZmC5lAvWZlMETyY1oWSYyLllSbiX+XAmatXdeeUXdH5A/d3oV0zt?=
- =?us-ascii?Q?LgTGcyIllFNAtJVnYE5YzAJ/DVqYhIWddSLsQDmxZtJqLoMbi0xIE6gVkJ0o?=
- =?us-ascii?Q?11SmjtFjKSkWFTQKB+SSz3gPABr+aTa9MIn3RWqtFzTC+Pp40SDy33CCW79V?=
- =?us-ascii?Q?BLXWt411IPMrOEBXUE7hPHAd/S+JWMyvi09Nx57ehhL9wXBeoi7qUYpI8+MO?=
- =?us-ascii?Q?hRu31HuUGDTDJ/2Doooddk9EJZZuXaG5BwzFHAxV848dMGjwtA+RkssXoG4S?=
- =?us-ascii?Q?9pzzCPrTqhoFIzomk4xKRoGyxJQp4yxLinGKcb2GCkeLCo6tcGvhxIQXVu3f?=
- =?us-ascii?Q?TLS/e5NexH24hLM=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9386.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?0lQ8uOV+eaUJX6NbCphYh1b/TqpIc57AtcLjVAj3vmz+uN7//B2Z0fGzJwnp?=
- =?us-ascii?Q?1+bhIW9a8DexP4Mfz8J44kF3ABd0ZRyn8yYZd/KZs8xwbPZ+C5k9TWEGOSAf?=
- =?us-ascii?Q?knlYn0F7RzVdu4GIsYeu69oabTsbIrznSOQ1woPTRC4w+sFtRtPYawRmPexk?=
- =?us-ascii?Q?FyhORP+mxGapDEPpFnBZNFq3HBOrpB27zpgXp6OcoDX8MV58sKHbdtUyJO+b?=
- =?us-ascii?Q?xpUP6oGv3lkcUnaO662KTc4wulUHXylYDXqRAGX2BnjjXHVcvDk3ycFtkQSY?=
- =?us-ascii?Q?HFvUN1JFXeavt96CkkmYTAAJROajZE865bczx+ZaSOp4mHghIdBqkDlzpXCp?=
- =?us-ascii?Q?qagXyIhAMSsuoYffZJI6nyyzQ6TVJT3Uxu6odroytTbxpVF6FTJPDC6WDmjs?=
- =?us-ascii?Q?9vUT0QqBR5DSwjzEtIu0DbVMTmVGxhPm2gGLIt6pnzz+1iwzJQIkIBD70xQx?=
- =?us-ascii?Q?g1EwRWmKMhCxBZvC3XPo8zdJPIUpRA+HY92uy9Lf8wKGqhJysw1kCjHjizQw?=
- =?us-ascii?Q?4wGVeTgkyVu3l9ZvsgCabYlxWKFNIU/5dsAt5IPW0t3JueU0Qy7otiqySfU4?=
- =?us-ascii?Q?bFDj8aMsOqvYtQQ6tggKfMo7cIIQE4KhpukqUIsivC1xSEm9j7pr+zTh9j7K?=
- =?us-ascii?Q?HZsPfdD8Af8nO7FEnAq4KSvTXRbRrCX/V4pspafGRBoEE5L0hgHL0blkWkza?=
- =?us-ascii?Q?SmhJZ+Kia3YhBpdAlPSXzmC5v8GWnzZlm2MswIPjeac1pVf/C9iYAyCj2FKU?=
- =?us-ascii?Q?nRwDcSYVj/3KBNpfgmuW3ahCtIayrvwcf4UkKpYhmhwSLSMHntM+vqmFoUNz?=
- =?us-ascii?Q?Y90Ux6JIiOcualRXW+fK43NB/kTLFsXiyvBjcPymy6X0sZLF/FSgg7ZrFluS?=
- =?us-ascii?Q?BDdg1xJBY2juA3dYVEoj8BdOXHINQuLF+4MJd2AZxrJL5Y+Uj3pEJPWyubcH?=
- =?us-ascii?Q?Mw2dvmSPuweTkDcpo6ggWcP1C8FhXEpSvHcUPwzdntjQ2NuPuCMx9/a3n1Ar?=
- =?us-ascii?Q?WEC2qZRfokeLbxGwZZeEXrjirmdCWCd3e40GfjzTwmFHtTStyQUI4Mh+6L26?=
- =?us-ascii?Q?QENOmKYYwxcfLyCS19pHb4TIFHu3duYebaqRMnMXuSS7Tfik8zrxZizjK0/4?=
- =?us-ascii?Q?x82VaVQpquexIWHGUSsaVQu461QC0jQjm7gVFFCB8eRg4YFX+O7Plm0IV+G1?=
- =?us-ascii?Q?xUHfcAKJObxQ9ixQu6psz7KOW0u5C+HWcdb/Lhk0nJakYVcwXv2reb+1x8Q6?=
- =?us-ascii?Q?on6kitDId+uDqk7+FT72qo5azBfqhLcJ0/iSYLmqMa1rTBksT+/VFaP2Wocw?=
- =?us-ascii?Q?1O6AjCu8o67XPYhdrVABABxI+3fh89KAWD/qbgxNxW0CKvgO393KsdOC+7Sl?=
- =?us-ascii?Q?R5ADJRZTgbK9WdCrmjxV2/lAN/Il/5fdgGK0YpG0G42cHuaTtM2CPj4bVUJ5?=
- =?us-ascii?Q?ilQWHvG+ruuDZYC8tBj0OZWLpgaloR2IGSFs45Atkbt65+safO4pPmc+ISBf?=
- =?us-ascii?Q?jBnPBofQcyUZQBZ5PXC5Jos6sMwQxJI/tnsrerDZiCy/TpQKFm9p90Ar/B1G?=
- =?us-ascii?Q?/X3Y071ct5RzT8R++nQ=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3B423B613;
+	Tue, 17 Jun 2025 08:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750148348; cv=none; b=KjZlT3Q6ChXAdkkDB+pqIlQXbKZcBPlWj7WXGkCxNQpEssdsE9SyzYJZACAQeulTso5enktnsIg7m12TAYKkkrj6LT+aaDBTrwPahpluy+H0+zS+ugh8s1DCEBxhaK9hnPgUU3lVL1gWVmRFKh63bycMzIARDdPhraYgT//4q3o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750148348; c=relaxed/simple;
+	bh=0QBx3S4pR9yGPZRxv42Jcjnl/yxbqO2uUWAQbRqmdcQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=sOdpFyMyycfd3w5dBO6tlnLSoSY8ZzsTsOjiUWJDze/JDo3l+evSSqCy/0z7bejPZNzlAFeIe+b74dDSUC1m2YfLgs/5PuaArX58dDCSxAOrs1XzfZD9nkyfY3e2BAn0lJ5qp/N7f8pax1LM7eh/8oOSExsoxTcIXG6JxSQjWC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ade48b24c97so849097366b.2;
+        Tue, 17 Jun 2025 01:19:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750148345; x=1750753145;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pU9RK0FjTK1hqgTN7WX4td/gkt1srvZwQJntX2m5NRQ=;
+        b=ZC8npfN19uHtt5doADPIs0dDEi6cAJAWLvWDKdd49vU58hpCZV2MLVbbLmlGT8tw9a
+         +MvMdWCEhdaWMncDwwi4+dUK9JTLypINgAOsm9Us8rFNlEUwhteoQaG8ISe3ga/ibWop
+         XYfYfeEk5i3bz/SAgUm0gFUEMuwlr+K3P2JHKF3FuKNhBFWMZR2pmZLX4Ud7/50B0VXc
+         UwUOPvMMnuBv/Esm7E3g2Pgw1H/mSlCsn/Qstyh6k7nEoRz65KFBOlp+AWx3lQwJ39JZ
+         ZpcpETD6zrOkPj8LK4oJ4PV9E2dc5svDzb4aJRFxzVgI8c2oNGjmfnmjS4g9V+O82I9q
+         IWSA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2owwNd7lyYpIFHoqkT9iBXmpoP/Bb+vX4JqTd2WkMw3YVLerytOyWZsSLapESEMOsmXQNUZlSia+EKvnHQCEh@vger.kernel.org, AJvYcCWopoqFStz1/4rwFnIMwyVr6LzQffA0JOYWT/4bJ2Ig5dwTnyy6D4I4Kkt/yvH6aQhO6oT7ltKkdvzwO48=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7PQAfnsjeLweKPur1wR+arWQxv+N64X/vBQQw6BNi99g0oxA9
+	nrBJ0TslLFK5YNhz1XZuiGY1n8ig8nWurkM51anfdc6oYwO8qxwyTzr8
+X-Gm-Gg: ASbGnctElR9jl/gGyay57Tisj0LZN7EXRb8/NugvVGGuAxx8jzM5mMG7eKpxdeoC5eE
+	o/NHsLDEHd0j9I1tyUp9r9AeMR+A5jWra14hXpArwTKrB8J250MzwSuGa3y+YOzwWMlx2s+i9+L
+	Gqy517RJZqsrg9Y1TMNTQtJ2EtoJaNnPM+0VtLsrdV8gYdzVAug7nzA9/7iqbvkIx8o7sqYLcPu
+	5JHtMXGpPploAtdM/AP0EcHTQNYCD7BjSiRfoKnZluckd6Vmz5gVnheeNtRtJ9A4bcPsTO0i4a6
+	VJQXZFNIdYLsMdBZKSpZsewIJI972YGXnYAc6O2QkT3RK2AGjEySYR3ankrJ
+X-Google-Smtp-Source: AGHT+IG9ywPdN8qyZ23q8J76IOZM0OqfE3nGcxdDTlCQCbnIyPwr4P36tPZ/M786LEOJQ6SOUX9tPA==
+X-Received: by 2002:a17:907:3c94:b0:ad8:9909:20b5 with SMTP id a640c23a62f3a-adfad4b7cf4mr1235254666b.56.1750148344390;
+        Tue, 17 Jun 2025 01:19:04 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60992edde8dsm513720a12.23.2025.06.17.01.19.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jun 2025 01:19:03 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v3 0/4] netdevsim: implement RX statistics using
+ NETDEV_PCPU_STAT_DSTATS
+Date: Tue, 17 Jun 2025 01:18:56 -0700
+Message-Id: <20250617-netdevsim_stat-v3-0-afe4bdcbf237@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9386.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc859da0-94bd-4097-9c49-08ddad763d5e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2025 08:09:10.3509
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rlRexoDHS48AvLrMgbBMdHmDf6+nGGrh9nEET6kS4I5+07cRWMf4+0eAoF83OrK0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8328
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPEkUWgC/2XNSwrDIBSF4a3IHcfio7GaUfdRSjHxJnFQU1QkJ
+ WTvBemgj/Hh/84GCaPHBB3ZIGLxyS8BOiIbAsNsw4TUO+gICCZapjijAbPDkvz9lrLN1LTGtEZ
+ wZBKhIfCIOPq1ghcImGnANcO1ITD7lJf4rE+F1/2N8l+0cMrowHmv2pMzqh/PDntvw2GJU7WK+
+ OzlXy8oo0aPVmot1XDUX/2+7y9tlkOc9wAAAA==
+X-Change-ID: 20250610-netdevsim_stat-95995921e03e
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ gustavold@gmail.com, Joe Damato <joe@dama.to>
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1691; i=leitao@debian.org;
+ h=from:subject:message-id; bh=0QBx3S4pR9yGPZRxv42Jcjnl/yxbqO2uUWAQbRqmdcQ=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoUST2VV2ss8ZKdD+wi5ZTaPVUXHOLML5c0Obeh
+ PjmI7e2QEGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaFEk9gAKCRA1o5Of/Hh3
+ bcyHD/9sD7qMhejP0P0QOecX4XrtneMqqObWYqwy6DLwNIbRiGFV7P4lnTITFqZznWC7ujWLzb9
+ zjaGaSI6LYiUL/6c3EScwVMG/g1OCYpkWBcOMUOcMW2HsJ1WC/c9F7qI8PX9YRg7VbitE2Hb16V
+ LlURQj97s0TBelOEgthzaOz5flj2fAfvKLA1vNdpFsvUYtHqR1yJgVhBsrCF1SgN7bGiupNtUTv
+ 278qbCyQV432wtKK1D+y/crzccDP31x94li4cfDnQhpjwW0mxr38GeSD6xoWAwfZcg6dqxjGMCy
+ lWUegnQCNDIGsMkO7MaKbsALT8jTxRVJM1BLvpQgxK/GcZk6ci5IXnwIcT/5xbcdNJeZcvvjlSW
+ ZGGjJs70dLnTp2AwmnPgzUcJGja6Hf0MkRs/zjcwqUtbpEtASNDsyN3q2Hs1l/jwOZbmL8uilzA
+ GwJMFc2JFIANDGZn6T8v+2J43nfYBLXQRvj5g2N2CcDMEKQFcpQ3HiRpeHmBmSSuvaH3I6r2N3r
+ CbTYR3UvoWI7CD0LAUgXxMGo29GxHLQUeqs/GHCaT/Z3r35NwlqLY5yJnqD2T5bcEA0Jt6anD0C
+ fLFPh09xSvnCvaBwGQc00/Nj9eQDz4mFoZouExwSBFj8a3tfE48thv4meW30BwfcyAiUyWIzaAY
+ 2qxP5ZAuhDuFYCA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
+The netdevsim driver previously lacked RX statistics support, which
+prevented its use with the GenerateTraffic() test framework, as this
+framework verifies traffic flow by checking RX byte counts.
 
-> -----Original Message-----
->=20
-> On Fri, 13 Jun 2025 18:02:46 +0800, Joy Zou wrote:
-> > The design of i.MX91 platform is very similar to i.MX93.
-> > Extracts the common parts in order to reuse code.
-> >
-> > The mainly difference between i.MX91 and i.MX93 is as follows:
-> > - i.MX91 removed some clocks and modified the names of some clocks.
-> > - i.MX91 only has one A core.
-> > - i.MX91 has different pinmux.
-> > - i.MX91 has updated to new temperature sensor same with i.MX95.
-> >
-> > Joy Zou (8):
-> >   dt-bindings: soc: imx-blk-ctrl: add i.MX91 blk-ctrl compatible
-> >   arm64: dts: freescale: rename imx93.dtsi to imx91_93_common.dtsi
-> >   arm64: dts: imx93: move i.MX93 specific part from
-> imx91_93_common.dtsi
-> >     to imx93.dtsi
-> >   arm64: dts: imx91: add i.MX91 dtsi support
-> >   arm64: dts: freescale: add i.MX91 11x11 EVK basic support
-> >   arm64: defconfig: enable i.MX91 pinctrl
-> >   pmdomain: imx93-blk-ctrl: mask DSI and PXP PD domain register on
-> >     i.MX91
-> >   net: stmmac: imx: add i.MX91 support
-> >
-> > Pengfei Li (1):
-> >   dt-bindings: arm: fsl: add i.MX91 11x11 evk board
-> >
-> >  .../devicetree/bindings/arm/fsl.yaml          |    6 +
-> >  .../soc/imx/fsl,imx93-media-blk-ctrl.yaml     |   55 +-
-> >  arch/arm64/boot/dts/freescale/Makefile        |    1 +
-> >  .../boot/dts/freescale/imx91-11x11-evk.dts    |  878 ++++++++++
-> >  arch/arm64/boot/dts/freescale/imx91-pinfunc.h |  770 +++++++++
-> >  arch/arm64/boot/dts/freescale/imx91.dtsi      |  124 ++
-> >  .../boot/dts/freescale/imx91_93_common.dtsi   | 1215 ++++++++++++++
-> >  arch/arm64/boot/dts/freescale/imx93.dtsi      | 1412 ++---------------
-> >  arch/arm64/configs/defconfig                  |    1 +
-> >  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   |    2 +
-> >  drivers/pmdomain/imx/imx93-blk-ctrl.c         |   15 +
-> >  11 files changed, 3166 insertions(+), 1313 deletions(-)  create mode
-> > 100644 arch/arm64/boot/dts/freescale/imx91-11x11-evk.dts
-> >  create mode 100644 arch/arm64/boot/dts/freescale/imx91-pinfunc.h
-> >  create mode 100644 arch/arm64/boot/dts/freescale/imx91.dtsi
-> >  create mode 100644
-> arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> >
-> > --
-> > 2.37.1
-> >
-> My bot found new DTB warnings on the .dts files added or changed in this
-> series.
-Thanks for your reminder!
-Have run DT checks and found this warning. The temperature bindings and dri=
-ver patch v6 is reviewing.
-So add note to the " [PATCH v5 5/9] arm64: dts: imx91: add i.MX91 dtsi supp=
-ort" patch.
-Refer to the link: https://patchwork.kernel.org/project/linux-arm-kernel/pa=
-tch/20250407-imx91tmu-v6-0-e48c2aa3ae44@nxp.com/
-BR
-Joy Zou
->=20
-> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings =
-are
-> fixed by another series. Ultimately, it is up to the platform maintainer =
-whether
-> these warnings are acceptable or not. No need to reply unless the platfor=
-m
-> maintainer has comments.
->=20
-> If you already ran DT checks and didn't see these error(s), then make sur=
-e
-> dt-schema is up to date:
->=20
->   pip3 install dtschema --upgrade
->=20
->=20
-> This patch series was applied (using b4) to base:
->  Base: attempting to guess base-commit...
->  Base: tags/v6.16-rc1-6-g8a22d9e79cf0 (best guess, 6/7 blobs matched)
->=20
-> If this is not the correct base, please add 'base-commit' tag (or use b4 =
-which
-> does this automatically)
->=20
-> New warnings running 'make CHECK_DTBS=3Dy for
-> arch/arm64/boot/dts/freescale/' for
-> 20250613100255.2131800-1-joy.zou@nxp.com:
->=20
-> arch/arm64/boot/dts/freescale/imx91-11x11-evk.dtb:
-> /soc@0/bus@44000000/thermal-sensor@44482000: failed to match any
-> schema with compatible: ['fsl,imx91-tmu']
->=20
->=20
->=20
->=20
+This patch migrates netdevsim from its custom statistics collection to
+the NETDEV_PCPU_STAT_DSTATS framework, as suggested by Jakub. This
+change not only standardizes the statistics handling but also adds the
+necessary RX statistics support required by the test framework.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v3:
+- Rely on netdev from caller instead of napi->dev in nsim_queue_free().
+- Link to v2: https://lore.kernel.org/r/20250613-netdevsim_stat-v2-0-98fa38836c48@debian.org
+
+Changes in v2:
+- Changed the RX collection place from nsim_napi_rx() to nsim_rcv (Joe
+  Damato)
+- Collect RX dropped packets statistic in nsim_queue_free() (Jakub)
+- Added a helper in dstat to add values to RX dropped packets
+- Link to v1: https://lore.kernel.org/r/20250611-netdevsim_stat-v1-0-c11b657d96bf@debian.org
+
+---
+Breno Leitao (4):
+      netdevsim: migrate to dstats stats collection
+      netdevsim: collect statistics at RX side
+      net: add dev_dstats_rx_dropped_add() helper
+      netdevsim: account dropped packet length in stats on queue free
+
+ drivers/net/netdevsim/netdev.c    | 54 +++++++++++++++------------------------
+ drivers/net/netdevsim/netdevsim.h |  5 ----
+ include/linux/netdevice.h         | 10 ++++++++
+ 3 files changed, 31 insertions(+), 38 deletions(-)
+---
+base-commit: 3b5b1c428260152e47c9584bc176f358b87ca82d
+change-id: 20250610-netdevsim_stat-95995921e03e
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
 
