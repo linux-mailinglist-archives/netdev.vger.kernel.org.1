@@ -1,185 +1,381 @@
-Return-Path: <netdev+bounces-198660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7C1ADCFA9
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:27:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98FDAADCFAF
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44F8B3A92AD
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:19:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10D7C189CE55
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 14:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E082E7167;
-	Tue, 17 Jun 2025 14:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CF12EF646;
+	Tue, 17 Jun 2025 14:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M4YUdIju"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fF1VuWA8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ADB2ED14F
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 14:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1320E2EF640;
+	Tue, 17 Jun 2025 14:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750169636; cv=none; b=qe/L7BkMDdJiYzMY8Y16LcOLABnMNeZ716YlhwjUMlR4aAJktNlbM51o0o4S2BNNL+Yoo+KnQtpzraKbRW65R3WVkvll6IklMeHPf9x0LgAL+vuQ7hNLU/+ZK6TJyBZMJU8S9Pk6mtXc9K+0L/pVN34BebC7Pl/xHVg0MoHEZHo=
+	t=1750169770; cv=none; b=l0ksZHBgkY6PexeH2rJOhbhjya1YHKpTQ/DWtCekpOmE1Ak5foiRlRPO8B7Ela/CysUmCjV15c3rOyG6HU4c388MLyDBK50OdqgCNAPWJjB9R/ZQVILBqS5hkCw3pXG23xvZkk0S+WFaRRrp4xG54iOGIsrIIzuIsrrkbIs+Sy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750169636; c=relaxed/simple;
-	bh=9Jr/nh5zsSZ6ZfHN9eMSmD1nuDAFx7H7tNJbmsTCZEA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R3oV7Of+U5OqEEKDlUztSs/5V3Ek3engsUREsOHWDqn+k3VwVZstIZYP/N3mmqttPHNJFqjfIm7aO+g41aA8kt8a6k2DlH8g2Xk6LyZToQInNIU10h8fLGa/YDxlz9witKRU4+HGnjuf72DJEApCPo/aDPi/IT4Ck/KaoY3CNSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M4YUdIju; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-450cea01b9cso26970685e9.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 07:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750169633; x=1750774433; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ihNvZAx/taNs+ys12ArC1X8y+CGszG5ocAZrN4df6AA=;
-        b=M4YUdIjuDMBngNaL4VsKnzq+gHoffpemvXhYECUPeCsCwe06KjKWcyE20c9+OiqN58
-         2Nu3YjqVFOIjD9KLkCT6c6XUs5Uw0oBrqP5uphhBYxJbupDHt/NiOTJrMoIKhS1Txj3t
-         D4rrEBByEbjCfTkrkAImqHnVJqR7koe+sc64nUTJYg1rIpjXZlnEwtz1vGhF2ZG1qL0L
-         rnWUWmMJpG1qDBcTZSroFdX/vmqicRDG67a0bjBDyFcMFreJZDxJhOzGWTSkTjfYhKxA
-         njewD3uOqMREDp3qiNU/lqoT4V4iwA8UqHPJZhG97TZtziaNo6Pk2zUNYnB2KkLw7M2T
-         uJjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750169633; x=1750774433;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ihNvZAx/taNs+ys12ArC1X8y+CGszG5ocAZrN4df6AA=;
-        b=noplIfEeXBUj466k8ULm4/N+dyKlSoHo4UcI7/me2JDTNUCqE1WISoOXv3zYOmTCVa
-         23WuPvDCjI/emLv+0YnLhLy2NmShKkoOaeiiSj4MbAiHZigECwFWjpM6X3dhOuroTV2h
-         AD3BzjBMKs/2+Z8dE9X7jShVo0DWBXHZ3kBRWnYi2VVpIBOZJv8ijqrdGwR2BTdDBBe3
-         UhR1p1ilhI1TyOKxBRKuXeqyQZU821Imi3T4XMqHr3ubdt617m9/TmCbyhTEDDGmaBY1
-         fE7/Ik0I8lrEghHDzh/Z0Vq9Dho0merp0BqfU+ssnzLRVyIF+soLYlHsEBI/hyUZ3CqI
-         WJEQ==
-X-Gm-Message-State: AOJu0Yyc+o+iqzA5KRw+ArfFYIpuicrHQTi6sg1+PAnhTTDzJThVtJ/H
-	hfE6mrwe8f7NTLJtn5m0+/vLyuOk3TqpJ9yBGmotPw7wa7PxJzxEmwnw
-X-Gm-Gg: ASbGncuSoHg/AoOVVOaxM5GH0Y/bnw264bE+PK5LhqtK8qxG+FoPQvPZwawqztVKH6L
-	ZJRenHhFZ+xuScQxcosN3v9rSGkeJUO+ZeSDOZ9AU4Dteg5B87/5btFCJbCisIQje0OWs/LbSaA
-	DmNIbNiLqdCgu27xYDQdLWHJmrg3Fiin7KKHJ4cdYSxBZo1TaeD6+jsnKAG4XxUa2AiGMvW5snW
-	Kr9vU0i6OcQYIT8DXFkf7Pw1zl0mYMOYa/sWqZ2gojcIsTsfq3IG6RSmNJn9LHx4IuhASlAiiQD
-	b7emYbeQ/Y7xcjTSjNxRzT0mkgu9jAQg8hvQHZYBBoDY9j2vsr+WqZ1cXq9mobItJQSzMjDqDcs
-	ohmXXLOEpy+Stuj86ZEw=
-X-Google-Smtp-Source: AGHT+IHDX8sOKNZo6OEqLotACfIgLKLRmuqZ0u8VePquxSO1bdaxOxSuiz+ju+UCfRqpQWvden+UMg==
-X-Received: by 2002:a05:600c:1e1d:b0:453:b44:eb69 with SMTP id 5b1f17b1804b1-4533ca7518dmr145435125e9.13.1750169632508;
-        Tue, 17 Jun 2025 07:13:52 -0700 (PDT)
-Received: from syracuse.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e224600sm178837315e9.8.2025.06.17.07.13.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 07:13:52 -0700 (PDT)
-From: Nicolas Escande <nico.escande@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	decot+git@google.com,
-	kuniyu@google.com,
-	gnaaman@drivenets.com,
-	Nicolas Escande <nico.escande@gmail.com>
-Subject: [PATCH net-next v2] neighbour: add support for NUD_PERMANENT proxy entries
-Date: Tue, 17 Jun 2025 16:13:34 +0200
-Message-ID: <20250617141334.3724863-1-nico.escande@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1750169770; c=relaxed/simple;
+	bh=ozObT4G+e1ERPtGN5wryTjI6kwpquW8iznHSx9HC8jw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UMRPp0pI5oJzcsCmUFqD5OkvaR6QW35YlaYYZ3mt9N6RAo3vnrsdDV8pLpkIm52i/bUVly/MEIopOepV3jKEEs1bkvDv/vP0rYfzFyeIaVxVY1okhEW5VnunuxLRf7UZAhAs/bzD/lKJnJRs7gzl//7CbFEDvBMjcbELGvWnnoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fF1VuWA8; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750169768; x=1781705768;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ozObT4G+e1ERPtGN5wryTjI6kwpquW8iznHSx9HC8jw=;
+  b=fF1VuWA8UOC273ndaIE1pX75W6beEXcTfrkZ8085lTW68V1MKcubkUqs
+   wLZdFM+AMQwtC/Uoz59FFw8oww90KI45LaL4PmNzjvN7xQryQ52b4F/9O
+   B8YSNRdsEdJfv1SMxZRwhQahNwc42dOV1aWssdEKS/ggFSgaJ5OEnP7k+
+   +ZKNyM4HItWhEki/M95WQ7G4E6h/FMP49raloB4vqUp3nLSBRR3FmXTpe
+   fwrMnpOptPcR7B2MjtAu0zD0oIUYrHeTAEC72ZWY8w9IzLgqxaiu3ebUQ
+   KdCyU5sI+RAxs2/UBXsVArUmF5JA7filprGppMe/UEO/yy5VKTSFvThIP
+   A==;
+X-CSE-ConnectionGUID: jQF352TaROmP0VYqOLisoQ==
+X-CSE-MsgGUID: 1MsxglgHSLmsDzaJhGloFw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="74884726"
+X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
+   d="scan'208";a="74884726"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 07:16:07 -0700
+X-CSE-ConnectionGUID: g7CM7erkR36dzffKYdLElw==
+X-CSE-MsgGUID: 2nxl4uyDTxGa+zvZ75Xvmg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,243,1744095600"; 
+   d="scan'208";a="186051534"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 07:16:04 -0700
+Date: Tue, 17 Jun 2025 16:15:12 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michal.swiatkowski@linux.intel.com
+Subject: Re: [PATCH V2 net-next 2/8] net: hns3: use hns3_get_ae_dev() helper
+ to reduce the unnecessary middle layer conversion
+Message-ID: <aFF4cFqIoZnkH2VA@mev-dev.igk.intel.com>
+References: <20250617010255.1183069-1-shaojijie@huawei.com>
+ <20250617010255.1183069-3-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250617010255.1183069-3-shaojijie@huawei.com>
 
-As discussesd before in [0] proxy entries (which are more configuration
-than runtime data) should stay when the link (carrier) goes does down.
-This is what happens for regular neighbour entries.
+On Tue, Jun 17, 2025 at 09:02:49AM +0800, Jijie Shao wrote:
+> There are too many indirection layers in the HNS3 driver code.
+> This issue was previously discussed with the maintainer,
+> who suggested adding a helper function to fix the issue.
+> In fact, the hns3_get_ae_dev() helper is already defined
+> and can fix this issue.
+> 
+> This patch uses hns3_get_ae_dev() helper to reduce the unnecessary
+> middle layer conversion. Apply it to the whole HNS3 driver.
+> The former discusstion can be checked from the link.
 
-So lets fix this by:
-  - storing in proxy entries the fact that it was added as NUD_PERMANENT
-  - not removing NUD_PERMANENT proxy entries when the carrier goes down
-    (same as how it's done in neigh_flush_dev() for regular neigh entries)
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-[0]: https://lore.kernel.org/netdev/c584ef7e-6897-01f3-5b80-12b53f7b4bf4@kernel.org/
-
-Signed-off-by: Nicolas Escande <nico.escande@gmail.com>
----
- include/net/neighbour.h |  1 +
- net/core/neighbour.c    | 12 +++++++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 9a832cab5b1d..c7ce5ec7be23 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -182,6 +182,7 @@ struct pneigh_entry {
- 	netdevice_tracker	dev_tracker;
- 	u32			flags;
- 	u8			protocol;
-+	bool			permanent;
- 	u32			key[];
- };
- 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 49dce9a82295..85a5535de8ba 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -54,7 +54,8 @@ static void __neigh_notify(struct neighbour *n, int type, int flags,
- 			   u32 pid);
- static void neigh_update_notify(struct neighbour *neigh, u32 nlmsg_pid);
- static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
--				    struct net_device *dev);
-+				    struct net_device *dev,
-+				    bool skip_perm);
- 
- #ifdef CONFIG_PROC_FS
- static const struct seq_operations neigh_stat_seq_ops;
-@@ -423,7 +424,7 @@ static int __neigh_ifdown(struct neigh_table *tbl, struct net_device *dev,
- {
- 	write_lock_bh(&tbl->lock);
- 	neigh_flush_dev(tbl, dev, skip_perm);
--	pneigh_ifdown_and_unlock(tbl, dev);
-+	pneigh_ifdown_and_unlock(tbl, dev, skip_perm);
- 	pneigh_queue_purge(&tbl->proxy_queue, dev ? dev_net(dev) : NULL,
- 			   tbl->family);
- 	if (skb_queue_empty_lockless(&tbl->proxy_queue))
-@@ -803,7 +804,8 @@ int pneigh_delete(struct neigh_table *tbl, struct net *net, const void *pkey,
- }
- 
- static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
--				    struct net_device *dev)
-+				    struct net_device *dev,
-+				    bool skip_perm)
- {
- 	struct pneigh_entry *n, **np, *freelist = NULL;
- 	u32 h;
-@@ -811,12 +813,15 @@ static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
- 	for (h = 0; h <= PNEIGH_HASHMASK; h++) {
- 		np = &tbl->phash_buckets[h];
- 		while ((n = *np) != NULL) {
-+			if (skip_perm && n->permanent)
-+				goto skip;
- 			if (!dev || n->dev == dev) {
- 				*np = n->next;
- 				n->next = freelist;
- 				freelist = n;
- 				continue;
- 			}
-+skip:
- 			np = &n->next;
- 		}
- 	}
-@@ -1983,6 +1988,7 @@ static int neigh_add(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		pn = pneigh_lookup(tbl, net, dst, dev, 1);
- 		if (pn) {
- 			pn->flags = ndm_flags;
-+			pn->permanent = !!(ndm->ndm_state & NUD_PERMANENT);
- 			if (protocol)
- 				pn->protocol = protocol;
- 			err = 0;
--- 
-2.49.0
-
+> 
+> Link: https://patchwork.kernel.org/project/netdevbpf/patch/20230310081404.947-1-lanhao@huawei.com/
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+> ChangeLog:
+> v1 -> v2:
+>   - Change commit message and title, suggested by Michal Swiatkowski.
+>   v1: https://lore.kernel.org/all/20250612021317.1487943-1-shaojijie@huawei.com/
+> ---
+>  .../ethernet/hisilicon/hns3/hns3_debugfs.c    |  8 ++---
+>  .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 12 +++----
+>  .../ethernet/hisilicon/hns3/hns3_ethtool.c    | 36 +++++++++----------
+>  3 files changed, 28 insertions(+), 28 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+> index 4e5d8bc39a1b..4f6ed7c7ee68 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+> @@ -684,7 +684,7 @@ static int hns3_dbg_rx_queue_info(struct hnae3_handle *h,
+>  				  char *buf, int len)
+>  {
+>  	char data_str[ARRAY_SIZE(rx_queue_info_items)][HNS3_DBG_DATA_STR_LEN];
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	char *result[ARRAY_SIZE(rx_queue_info_items)];
+>  	struct hns3_nic_priv *priv = h->priv;
+>  	char content[HNS3_DBG_INFO_LEN];
+> @@ -789,7 +789,7 @@ static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+>  				  char *buf, int len)
+>  {
+>  	char data_str[ARRAY_SIZE(tx_queue_info_items)][HNS3_DBG_DATA_STR_LEN];
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	char *result[ARRAY_SIZE(tx_queue_info_items)];
+>  	struct hns3_nic_priv *priv = h->priv;
+>  	char content[HNS3_DBG_INFO_LEN];
+> @@ -1034,7 +1034,7 @@ static int hns3_dbg_tx_bd_info(struct hns3_dbg_data *d, char *buf, int len)
+>  static void
+>  hns3_dbg_dev_caps(struct hnae3_handle *h, char *buf, int len, int *pos)
+>  {
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	unsigned long *caps = ae_dev->caps;
+>  	u32 i, state;
+>  
+> @@ -1364,7 +1364,7 @@ hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd)
+>  
+>  int hns3_dbg_init(struct hnae3_handle *handle)
+>  {
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const char *name = pci_name(handle->pdev);
+>  	int ret;
+>  	u32 i;
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> index 5c8c62ea6ac0..6babc636145b 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> @@ -547,9 +547,9 @@ void hns3_set_vector_coalesce_rx_ql(struct hns3_enet_tqp_vector *tqp_vector,
+>  static void hns3_vector_coalesce_init(struct hns3_enet_tqp_vector *tqp_vector,
+>  				      struct hns3_nic_priv *priv)
+>  {
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(priv->ae_handle->pdev);
+>  	struct hns3_enet_coalesce *tx_coal = &tqp_vector->tx_group.coal;
+>  	struct hns3_enet_coalesce *rx_coal = &tqp_vector->rx_group.coal;
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(priv->ae_handle);
+>  	struct hns3_enet_coalesce *ptx_coal = &priv->tx_coal;
+>  	struct hns3_enet_coalesce *prx_coal = &priv->rx_coal;
+>  
+> @@ -1304,7 +1304,7 @@ static int hns3_get_l4_protocol(struct sk_buff *skb, u8 *ol4_proto,
+>  static bool hns3_tunnel_csum_bug(struct sk_buff *skb)
+>  {
+>  	struct hns3_nic_priv *priv = netdev_priv(skb->dev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(priv->ae_handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(priv->ae_handle);
+>  	union l4_hdr_info l4;
+>  
+>  	/* device version above V3(include V3), the hardware can
+> @@ -1504,7 +1504,7 @@ static int hns3_handle_vtags(struct hns3_enet_ring *tx_ring,
+>  	 * VLAN enabled, only one VLAN header is allowed in skb, otherwise it
+>  	 * will cause RAS error.
+>  	 */
+> -	ae_dev = pci_get_drvdata(handle->pdev);
+> +	ae_dev = hns3_get_ae_dev(handle);
+>  	if (unlikely(skb_vlan_tagged_multi(skb) &&
+>  		     ae_dev->dev_version <= HNAE3_DEVICE_VERSION_V2 &&
+>  		     handle->port_base_vlan_state ==
+> @@ -4747,7 +4747,7 @@ static int hns3_nic_init_vector_data(struct hns3_nic_priv *priv)
+>  
+>  static void hns3_nic_init_coal_cfg(struct hns3_nic_priv *priv)
+>  {
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(priv->ae_handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(priv->ae_handle);
+>  	struct hns3_enet_coalesce *tx_coal = &priv->tx_coal;
+>  	struct hns3_enet_coalesce *rx_coal = &priv->rx_coal;
+>  
+> @@ -5226,7 +5226,7 @@ static void hns3_info_show(struct hns3_nic_priv *priv)
+>  static void hns3_set_cq_period_mode(struct hns3_nic_priv *priv,
+>  				    enum dim_cq_period_mode mode, bool is_tx)
+>  {
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(priv->ae_handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(priv->ae_handle);
+>  	struct hnae3_handle *handle = priv->ae_handle;
+>  	int i;
+>  
+> @@ -5264,7 +5264,7 @@ void hns3_cq_period_mode_init(struct hns3_nic_priv *priv,
+>  
+>  static void hns3_state_init(struct hnae3_handle *handle)
+>  {
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	struct net_device *netdev = handle->kinfo.netdev;
+>  	struct hns3_nic_priv *priv = netdev_priv(netdev);
+>  
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> index 6715222aeb66..ae220f49df64 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> @@ -86,7 +86,7 @@ static int hns3_get_sset_count(struct net_device *netdev, int stringset);
+>  static int hns3_lp_setup(struct net_device *ndev, enum hnae3_loop loop, bool en)
+>  {
+>  	struct hnae3_handle *h = hns3_get_handle(ndev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	int ret;
+>  
+>  	if (!h->ae_algo->ops->set_loopback ||
+> @@ -171,7 +171,7 @@ static void hns3_lp_setup_skb(struct sk_buff *skb)
+>  	 * the purpose of mac or serdes selftest.
+>  	 */
+>  	handle = hns3_get_handle(ndev);
+> -	ae_dev = pci_get_drvdata(handle->pdev);
+> +	ae_dev = hns3_get_ae_dev(handle);
+>  	if (ae_dev->dev_version < HNAE3_DEVICE_VERSION_V2)
+>  		ethh->h_dest[5] += HNS3_NIC_LB_DST_MAC_ADDR;
+>  	eth_zero_addr(ethh->h_source);
+> @@ -692,7 +692,7 @@ static void hns3_get_pauseparam(struct net_device *netdev,
+>  				struct ethtool_pauseparam *param)
+>  {
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  
+>  	if (!test_bit(HNAE3_DEV_SUPPORT_PAUSE_B, ae_dev->caps))
+>  		return;
+> @@ -706,7 +706,7 @@ static int hns3_set_pauseparam(struct net_device *netdev,
+>  			       struct ethtool_pauseparam *param)
+>  {
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  
+>  	if (!test_bit(HNAE3_DEV_SUPPORT_PAUSE_B, ae_dev->caps))
+>  		return -EOPNOTSUPP;
+> @@ -751,7 +751,7 @@ static int hns3_get_link_ksettings(struct net_device *netdev,
+>  				   struct ethtool_link_ksettings *cmd)
+>  {
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	const struct hnae3_ae_ops *ops;
+>  	u8 module_type;
+>  	u8 media_type;
+> @@ -861,7 +861,7 @@ static int hns3_set_link_ksettings(struct net_device *netdev,
+>  				   const struct ethtool_link_ksettings *cmd)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
+>  	int ret;
+>  
+> @@ -932,7 +932,7 @@ static u32 hns3_get_rss_key_size(struct net_device *netdev)
+>  static u32 hns3_get_rss_indir_size(struct net_device *netdev)
+>  {
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  
+>  	return ae_dev->dev_specs.rss_ind_tbl_size;
+>  }
+> @@ -954,7 +954,7 @@ static int hns3_set_rss(struct net_device *netdev,
+>  			struct netlink_ext_ack *extack)
+>  {
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  
+>  	if (!h->ae_algo->ops->set_rss)
+>  		return -EOPNOTSUPP;
+> @@ -1024,7 +1024,7 @@ static int hns3_set_reset(struct net_device *netdev, u32 *flags)
+>  {
+>  	enum hnae3_reset_type rst_type = HNAE3_NONE_RESET;
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	const struct hnae3_ae_ops *ops = h->ae_algo->ops;
+>  	const struct hns3_reset_type_map *rst_type_map;
+>  	enum ethtool_reset_flags rst_flags;
+> @@ -1189,7 +1189,7 @@ static int hns3_set_tx_push(struct net_device *netdev, u32 tx_push)
+>  {
+>  	struct hns3_nic_priv *priv = netdev_priv(netdev);
+>  	struct hnae3_handle *h = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(h);
+>  	u32 old_state = test_bit(HNS3_NIC_STATE_TX_PUSH_ENABLE, &priv->state);
+>  
+>  	if (!test_bit(HNAE3_DEV_SUPPORT_TX_PUSH_B, ae_dev->caps) && tx_push)
+> @@ -1377,7 +1377,7 @@ static int hns3_check_gl_coalesce_para(struct net_device *netdev,
+>  				       struct ethtool_coalesce *cmd)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	u32 rx_gl, tx_gl;
+>  
+>  	if (cmd->rx_coalesce_usecs > ae_dev->dev_specs.max_int_gl) {
+> @@ -1449,7 +1449,7 @@ static int hns3_check_ql_coalesce_param(struct net_device *netdev,
+>  					struct ethtool_coalesce *cmd)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  
+>  	if ((cmd->tx_max_coalesced_frames || cmd->rx_max_coalesced_frames) &&
+>  	    !ae_dev->dev_specs.int_ql_max) {
+> @@ -1473,7 +1473,7 @@ hns3_check_cqe_coalesce_param(struct net_device *netdev,
+>  			      struct kernel_ethtool_coalesce *kernel_coal)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  
+>  	if ((kernel_coal->use_cqe_mode_tx || kernel_coal->use_cqe_mode_rx) &&
+>  	    !hnae3_ae_dev_cq_supported(ae_dev)) {
+> @@ -1649,7 +1649,7 @@ static void hns3_get_fec_stats(struct net_device *netdev,
+>  			       struct ethtool_fec_stats *fec_stats)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
+>  
+>  	if (!hnae3_ae_dev_fec_stats_supported(ae_dev) || !ops->get_fec_stats)
+> @@ -1700,7 +1700,7 @@ static int hns3_get_fecparam(struct net_device *netdev,
+>  			     struct ethtool_fecparam *fec)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
+>  	u8 fec_ability;
+>  	u8 fec_mode;
+> @@ -1725,7 +1725,7 @@ static int hns3_set_fecparam(struct net_device *netdev,
+>  			     struct ethtool_fecparam *fec)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
+>  	u32 fec_mode;
+>  
+> @@ -1747,7 +1747,7 @@ static int hns3_get_module_info(struct net_device *netdev,
+>  #define HNS3_SFF_8636_V1_3 0x03
+>  
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
+>  	struct hns3_sfp_type sfp_type;
+>  	int ret;
+> @@ -1797,7 +1797,7 @@ static int hns3_get_module_eeprom(struct net_device *netdev,
+>  				  struct ethtool_eeprom *ee, u8 *data)
+>  {
+>  	struct hnae3_handle *handle = hns3_get_handle(netdev);
+> -	struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+> +	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
+>  	const struct hnae3_ae_ops *ops = handle->ae_algo->ops;
+>  
+>  	if (ae_dev->dev_version < HNAE3_DEVICE_VERSION_V2 ||
+> -- 
+> 2.33.0
 
