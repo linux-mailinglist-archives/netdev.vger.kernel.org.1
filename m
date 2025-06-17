@@ -1,113 +1,84 @@
-Return-Path: <netdev+bounces-198373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA96ADBE74
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:13:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F852ADBE9A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 03:40:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E50F189426C
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:13:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BDBA3ACD6A
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 01:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499491C2334;
-	Tue, 17 Jun 2025 01:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756A918E025;
+	Tue, 17 Jun 2025 01:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDUz+tgm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pe+bOmRq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF2915B0EC;
-	Tue, 17 Jun 2025 01:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2B233993
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 01:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750122711; cv=none; b=olD5bYR8I39YumzmsWiLq22w2xvtabhEU83yPfJKnecBl34r7+SWso9zR5Rwr45IXOYw3TYb0cbrkYXVtjwxFboAqvi40jiLSrWrQVOOh5nHD8flZdsL9E2Ip4n2HbxIHySxevaemo/uFZ8JcwnmOLSD2RfQh+AcuWprX5vGGGU=
+	t=1750124397; cv=none; b=pQxIhWlkIPZUrq70uT7gIhBeUijXNVIeGN8JgVWS1oebfvJRnr+QnpYEoxhlhSG6u7Ogkc8MXcxDW0CsIDs7Rl7tw7DCIoVteYyKQJiYiVnFRZV0GhPc4LFilDHyFphI0T94U0s/+tcavBDr6Qgcse2PVUFo1/iMyVizmLyu5PE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750122711; c=relaxed/simple;
-	bh=iVaWv2RzWaaVpLuDLobgnSNSuWym8RHkG55Fpi0YUmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I2pMR5cN/Urpmch8nFkkn8IyH2BYgW2Tx9VQLt6H6WsVozODryMzL1Zgbv4L2S+3cY6GiMTT1qWmFEyUygFpULIrykT0iy+jvVJCRUN/gLdw2e4Ie3l33gnHVpgmc2G8ZLPJnH2aln2eU1NkPiXjC+uN9s4Y/XLlghtX1Zs1KNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDUz+tgm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE66C4CEEA;
-	Tue, 17 Jun 2025 01:11:49 +0000 (UTC)
+	s=arc-20240116; t=1750124397; c=relaxed/simple;
+	bh=1olH4n+uWFCMMqqo7FDstbBmN+whvo7bHLAujFXW8WI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YleZVij/rwe42YlvXIHEACZcUgB0udSpnpXSFmZxftSU9ez8x8OnF1P4uDIjFtWQLHBzl64FI5/7GpD1TFmfQuFnzGvvn3vUw45GYmRg0cYdldFusCPusAeVav2N2tg21sjBGv4xCC9BU9q0RXKxyZKWAqVS7Pv/EGPEeaSgg2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pe+bOmRq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC4AC4CEEA;
+	Tue, 17 Jun 2025 01:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750122710;
-	bh=iVaWv2RzWaaVpLuDLobgnSNSuWym8RHkG55Fpi0YUmI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZDUz+tgmmat53i4A+5QK7mFlGbgaBHM2POFECs9Tkk4AWrIz7JOaEfJskAUaum+oW
-	 4O6FJx5D5oAtBuWaPZPUFPlmKOrip8yd8026FEsnB+qyo5o0VeOPWy+xSZA64ZEZGw
-	 PmzX/vZJHfYY5T31ZpqfrXWu3f/PRzAq/dkpQo3K6GAXHJYvqkzFDRW6W7S/ALevJM
-	 mT89C+Tv37QjS0UF4x58lvSnig0A47YWCnkC8GnMkaa3+MhANIRZndmi56+aKqnoI/
-	 zeG4OQKyWFF3Li1Cct2omWAFieEmrVJbgeNQV8LNma7YzgOPTGRgyTs926/PnDfZUA
-	 wou35Gs6DxCug==
-Date: Mon, 16 Jun 2025 18:11:48 -0700
+	s=k20201202; t=1750124396;
+	bh=1olH4n+uWFCMMqqo7FDstbBmN+whvo7bHLAujFXW8WI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pe+bOmRq4UN4/iVq8UKM35VkgvEvjZeo79S29cBh+5WQxY3rEHqWEuRbceM4o3vds
+	 0i8AeCdCbj/Yw7LzRZzkN8rh5ur/Ft0JYn9b6JS83VywFMHPkilct9c0y+1b6NS5oh
+	 xDb9koFJ13Qm/7he4R5k6d5BVkPaMpgZ7vcweaG5gTpSQPrQ8hq3e0FO8pjMse0bvz
+	 HWc8f1tbfGQO9sTVd2WtTibVuIBNPdTGqt7NJu11ps4pwy5mt44CJ8rL6gs+U3lzpe
+	 kb2fdDC+HEFZCkW+HsYR6VfyAYiKpn9Sh/mQjcFmlydDtpRSUbeSreOXHnywABbnfn
+	 BpP4fDjcmJomg==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>, Yury Norov
- <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron
- <Jonathan.Cameron@huwei.com>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Kevin Tian <kevin.tian@intel.com>, Long Li
- <longli@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas
- <bhelgaas@google.com>, Rob Herring <robh@kernel.org>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Krzysztof Wilczy???~Dski
- <kw@linux.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Haiyang Zhang
- <haiyangz@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Leon
- Romanovsky <leon@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Erni
- Sri Satya Vennela <ernis@linux.microsoft.com>, Peter Zijlstra
- <peterz@infradead.org>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- Paul Rosswurm <paulros@microsoft.com>, Shradha Gupta
- <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v6 0/5] Allow dyn MSI-X vector allocation of MANA
-Message-ID: <20250616181148.2aed5dfe@kernel.org>
-In-Reply-To: <20250612061055.GA20126@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1749650984-9193-1-git-send-email-shradhagupta@linux.microsoft.com>
-	<20250611085416.2e09b8cd@kernel.org>
-	<20250612061055.GA20126@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	ecree.xilinx@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] eth: sfc: migrate to new RXFH callbacks
+Date: Mon, 16 Jun 2025 18:39:51 -0700
+Message-ID: <20250617013954.427411-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 11 Jun 2025 23:10:55 -0700 Shradha Gupta wrote:
-> On Wed, Jun 11, 2025 at 08:54:16AM -0700, Jakub Kicinski wrote:
-> > On Wed, 11 Jun 2025 07:09:44 -0700 Shradha Gupta wrote:  
-> > > Changes in v6
-> > >  * rebased to linux-next's v6.16-rc1 as per Jakub's suggestion  
-> > 
-> > I meant a branch, basically apply the patches on the v6.16-rc1 tag
-> > and push it out to GitHub, kernel.org or somewhere else public.
-> > Then we can pull it in and maintain the stable commit IDs.
-> > No need to repost the patches, FWIW, just share the branch here
-> > once you pushed it out..  
-> 
-> Oh, understood. Thanks for the clarity. Here is a github repo branch
-> with the changes on v6.16-rc1 tag
-> https://github.com/shradhagupta6/linux/tree/shradha_v6.16-rc1
+Migrate AMD/Solarflare drivers to the recently added dedicated
+.get_rxfh_fields ethtool callback.
 
-The tag was good, but when I pulled it my check scripts complained:
+Jakub Kicinski (3):
+  eth: sfc: falcon: migrate to new RXFH callbacks
+  eth: sfc: sienna: migrate to new RXFH callbacks
+  eth: sfc: migrate to new RXFH callbacks
 
-Commit a19036b86845 ("net: mana: Allocate MSI-X vectors dynamically")
-	committer Signed-off-by missing
-	author email:    shradhagupta@linux.microsoft.com
-	committer email: shradhagupta@microsoft.com
-	Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+ drivers/net/ethernet/sfc/ethtool_common.h     |   2 +
+ .../net/ethernet/sfc/siena/ethtool_common.h   |   2 +
+ drivers/net/ethernet/sfc/ethtool.c            |   1 +
+ drivers/net/ethernet/sfc/ethtool_common.c     | 104 +++++++++---------
+ drivers/net/ethernet/sfc/falcon/ethtool.c     |  51 +++++----
+ drivers/net/ethernet/sfc/siena/ethtool.c      |   1 +
+ .../net/ethernet/sfc/siena/ethtool_common.c   |  78 ++++++-------
+ 7 files changed, 130 insertions(+), 109 deletions(-)
 
-etc. You seem to have committed the patches with a slightly different
-email address. Not a huge deal but better to fix it if we can.
+-- 
+2.49.0
 
-So please base the tag. The code can stay the same just adjust the
-committer or author/signoff email addrs. We can use this as an
-opportunity to add Bjorn's email.
-
-No need to repost the code just ping here once you updated the tag.
 
