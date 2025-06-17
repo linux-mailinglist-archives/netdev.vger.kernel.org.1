@@ -1,102 +1,94 @@
-Return-Path: <netdev+bounces-198774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FFBAADDC1E
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:17:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08806ADDC28
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 21:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4AD166E2D
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:17:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A808B17FD5E
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 19:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A372E25486E;
-	Tue, 17 Jun 2025 19:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F41825BEFC;
+	Tue, 17 Jun 2025 19:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="f24dP1a6"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="RuyUVvdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EC725178C
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 19:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDA020297C
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 19:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750187866; cv=none; b=G6XBnlrrDxzn1aab0nhGs4sVAbWjxQosohm9QvW2PjYpav00sAx3WlpwHqynvUF/8wPT7Z3Iap9EIAHvs6JSjSq7xg/12z/ln3tct9hL5Ox5j08zwoIU9LdXQ1FuFCTinMTr2DKeGaxeFJCpNk8aPWUjRTtvDhU/WrX0uQxyUFg=
+	t=1750188067; cv=none; b=Cs3kWIgypFYUDkVRRziqAmQyn2g1kW3+Cb3ivqnD8PQRpI+/byOfxHwPNQyzgvYDR6TmaPP8Ie1yuc5AkxUo2Vigu/V36BTG0qVklNWRahqFIPGW0iBVGRWYUonI5JxhX8B3XVJ4xUS7pcR5kwgCOKkLt55VO2liXzvIQ77z2IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750187866; c=relaxed/simple;
-	bh=1bP6rJEA8wFohueF5jqDh/zAC0rZ53XrMgdF+00Sxw8=;
+	s=arc-20240116; t=1750188067; c=relaxed/simple;
+	bh=m4CmsPwi1LYcihZgdD+bmOz7Mop8oKPwflndYy/Webs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CVSz6Cu6sqlFdoUkh6Pf+qIqqnUiUr3BUu1MhvsX1qH7q7E4RFRp097iNNnbLD8LPikcQDL/Y/deqzyISf4vJ92ug/S+qS3ul2tcMGKm85XKXDFU8BIq910En3EWqlIjrSheIkXADHKpwLzQpKigaeQsHhO2OHPI7TxFNETkEqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=f24dP1a6; arc=none smtp.client-ip=209.85.128.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=HpY2dCOI65Txkoouh1wvHm0E4RJrRhW6UPf1XKVqjRbQCyPHdKErVGKDaKsl/sPwyJ9JGHAspEv15Oro2gC+SyFSh0iDVC8UpdDgxXbC8K0lzHcHEjuUl9n5Xc7XGjdUbs13TA/ExNW722HJ3Lhi+k22r5SrlfUKYtNbUTvtEGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=RuyUVvdT; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4530921461aso53380235e9.0
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 12:17:44 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-451d6ade159so51380515e9.1
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 12:21:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1750187863; x=1750792663; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1750188063; x=1750792863; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uvfQMwCx3aaFLH1gBYzFPVa5Y0KFbLLTPkKAtJ7FGcM=;
-        b=f24dP1a6dfCFYcJJz9zsm/qxBai4Kp/6CWp1u6yb5AR3BJAqSBmKihBlsObpDAmyBK
-         rH2EN970kST+6qFYVH8eSayc1z9Tu8gTR0nDMFCD5iZLQHxwwpHRcn546psZp1H3PDL/
-         TsfRJgvSN+Kwgpekvg0HzFVmFjshdTGkU9Czhgs6HpcL21QH95DKcRfVxIYaPc0vFbLi
-         2l7WhVpoNH6weLKZwwURN9Ixny85r4mYVs0p13tGQDQkBuNosxIkSCkj9bFuWWVqx5+l
-         2i0SqJKu51oGLHO+Kfx+V6NjhIu3nUeTdG4k6e10E6W1YVwqpP14fcGRTqeK2MO5EFWc
-         zKfA==
+        bh=GYnTvqEzbKEHc3jOrWk/rFOyt80FMkGIZEqohOmHsiw=;
+        b=RuyUVvdTmDCr6RRnHSBpXieSQnsxAbC+kBKcpWdFFHfpcB8VI6+NZfiRu6U3iUfEOA
+         zbJ+QVU/Q96Lzf5V5XnzkqDQlPoUL7P41Xs29Duu4pmCmQBlk+6wlRNTaelEFWsu29/1
+         B7+E/OzuCjuTQ5nwv8fVmQ+O/p7T+rLsegnF3g0YTFoCcTP2sIjmePVhL0MePazMz+xz
+         YfFqCSwPeWlr2IZ0HPmYfePxNQkGwRXYygYUccv+Ah43H3HgPKf32RuoXze1sqN7dJ6B
+         EqIF22ETYEbqfsp65TUvhK2rf72oHpPC67cbQxt/H2YqO30f7rZ5/aWV6Z+lNk2hPmpa
+         im0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750187863; x=1750792663;
+        d=1e100.net; s=20230601; t=1750188063; x=1750792863;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uvfQMwCx3aaFLH1gBYzFPVa5Y0KFbLLTPkKAtJ7FGcM=;
-        b=jokelU8mR6IYlzHY6CwIqsJh/e5yUhaWkZ8NYrq2RXZPFxcZyKsP33IDIRMXUxJeTt
-         dx8nKs3ToM1Rha7QxYyVjhP0/2VUoAhCi8r7YQltFLnk06UTCIVVzEE468NBLoPc5+VU
-         QOsrQ02aUfglRKbjz/MDWwVamDetkJqjgQnqsTFT0CjnLHgDM/L9myuTRH/4xZ9+LqpC
-         S8qSO4qhbcqdGTLBvE/QZXK7LiiaSDSt9kZ36BMDIv7hkQ+5qc059ydN/+BDHPEZAkft
-         fpNax/rNdFHZIIxIdl3vwMIaty54j2HZ+xiBG/oS9km/oPxg65PPzdzlwgaJQtNdqpPH
-         priQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6325sQhSiwPOkyasmXMEk6vBmM8XTxq2Xi/CxyxYq0iVDdeKhR8Z0aHV7FPikXLbqeuWFGto=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTg2S+Nz+7Z+n00rzpHZINd5svAgBw6zI5t3wCND5oGauGdv0d
-	YYLtkOBhi2EFFlhQk6/3zbA8s0+d7IXH8GwKWHQo00wtvYDNG0jHxZkekH7Ei9p6nVQ=
-X-Gm-Gg: ASbGncv1vLr9Q4Wc6IgIC2QSuO0OLL1nb2FpR4AMxsgC9yg84Iwxk3AdOFh+jeI1Pvr
-	YDEThXZl0E7PbA2BwsqDcIxpKDi8oqGBHDV4l9zHtS3HeVTNSQ3yLI1T00YGLMuQ+DAMChSbjVp
-	Y3v2anT5ofPrY9cJvzS8BgQjE9P/on8JycuP/wHeTPEkmeHrEviXlXNgBI5Z8s0N/pmpJqRWH6T
-	1u8RDFoK/tlyeHxebGsXJa+8JVtU4nqAk84i/jy99O8A2veSk7Z+chhDVooyl8uzdBW9hsQVg9D
-	WUqQBwBO9Aa3TAVvOGh9DjjM27Bbc2n4/IFr47DIHPO9MR7NX7IK1zaVbvCHVuPBgUo=
-X-Google-Smtp-Source: AGHT+IH6QEm50PmO7DOXT3ObwZddoTuvRG1KMDkLrrDO70vSNhxTbXEd9HYKRQhDrOpboEzGDHDmKw==
-X-Received: by 2002:a05:600c:1f10:b0:442:e0f9:394d with SMTP id 5b1f17b1804b1-453560d2fe9mr22881915e9.24.1750187862956;
-        Tue, 17 Jun 2025 12:17:42 -0700 (PDT)
+        bh=GYnTvqEzbKEHc3jOrWk/rFOyt80FMkGIZEqohOmHsiw=;
+        b=iMpaGG8A8ZMvz/9ZYpbrNvFv7xWgYZiExK52ufmaKK99Pn2cMBk2jCKq6bubfpfe/r
+         vGXnZ4iuoZVza5vZEYtqC/2AjkcWZUO94tmjDbCEwSa4Nt2ns//JAmMYrOFc08GMdhoZ
+         aEgso/ebsfWvEejrbaWmGzoQ31S0J8x7+LbpsA3L8QVBCJ9XibpS6qZet8YPfL7zE4Bp
+         BjauGgvvfKPKyZYJzSeytFFiP9aoeSes34KYEPSZOatyAFtp6tIzLAQ1clXKMfUGP9tB
+         tVsSfyGo198O0zNGU3VD7PriO+aopC9FkDH+w2vWekHTY95gh6FYo/WsE3UuvNxZixWz
+         NgnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBdAkBkZpRSqqzqb0ymGp1XLBT1DjPtRK7x4P0eX/CD8wlrTDiII2GXGcoTpwI0KB4ivmGyEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxdYvdPu00/OLUMdNusZD4/43OdC2M5U/WV305mORmCUJBMn3S
+	K6jbxcHhZvPZnw0sW1GewVQPtHIvqv89jSlwQZ69JyHiXwVpY69qOIz+uZ/reQ7BK2s=
+X-Gm-Gg: ASbGncsi/Xgf6iX0p+toJDN2eozjOZFF+Sxw2c+6MBakLvqdrjAqzN5G0IopMQNOorX
+	zuKMHS0BBRdTmC7I4STBXILFOjKdDXye+URsf25K2Asfg+Ud8fTlAR0uJCeH3hlT/xAaM6DI/5R
+	wxgXUYz1DaeR2d6VJD6imEMbO/dujFfRTV0zH2q9eQPqjDWtJOiql0wA7dPMYpvwzrUH1fmH8sl
+	LHeoeviL4jqc10qJdUmqMQ9t3tcDV9GIQV/qQX8glXUsOhLodOzPxvqmbYkaLDTg58wOqMU5PcL
+	279gzYJdUodQCfZtmleBQN/g2WcfZ9zuAIUtICZEv8PJ/L7aWm8YGy1PZi6m0nyohsw=
+X-Google-Smtp-Source: AGHT+IFCngCCBjqWrGJVjxyEGSCQO8KrIo44b2+A2LtAvPVHfuZY1iilZmGThH2+VFZpFeIf9MblMg==
+X-Received: by 2002:a05:6000:144e:b0:3a4:f975:30f7 with SMTP id ffacd0b85a97d-3a572e58f6fmr11553498f8f.56.1750188062774;
+        Tue, 17 Jun 2025 12:21:02 -0700 (PDT)
 Received: from MacBook-Air.local ([5.100.243.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532dea1925sm188221825e9.12.2025.06.17.12.17.40
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b089d8sm15003128f8f.57.2025.06.17.12.21.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 12:17:42 -0700 (PDT)
-Date: Tue, 17 Jun 2025 22:17:39 +0300
+        Tue, 17 Jun 2025 12:21:02 -0700 (PDT)
+Date: Tue, 17 Jun 2025 22:20:59 +0300
 From: Joe Damato <joe@dama.to>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
-Message-ID: <aFG_U2lGIPWTDp1E@MacBook-Air.local>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	madalin.bucur@nxp.com, ioana.ciornei@nxp.com,
+	marcin.s.wojtas@gmail.com, bh74.an@samsung.com
+Subject: Re: [PATCH net-next 1/5] eth: niu: migrate to new RXFH callbacks
+Message-ID: <aFHAG86ALakLJRa7@MacBook-Air.local>
 Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
- <aFDAwydw5HrCXAjd@mini-arch>
- <CAL+tcoDYiwH8nz5u=sUiYucJL+VkGx4M50q9Lc2jsPPupZ2bFg@mail.gmail.com>
- <aFGp8tXaL7NCORhk@mini-arch>
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, madalin.bucur@nxp.com,
+	ioana.ciornei@nxp.com, marcin.s.wojtas@gmail.com,
+	bh74.an@samsung.com
+References: <20250617014848.436741-1-kuba@kernel.org>
+ <20250617014848.436741-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,24 +97,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFGp8tXaL7NCORhk@mini-arch>
+In-Reply-To: <20250617014848.436741-2-kuba@kernel.org>
 
-On Tue, Jun 17, 2025 at 10:46:26AM -0700, Stanislav Fomichev wrote:
-> On 06/17, Jason Xing wrote:
-
-> > >
-> > > Also, can we put these settings into the socket instead of (global/ns)
-> > > sysctl?
-> > 
-> > As to MAX_PER_SOCKET_BUDGET, it seems not easy to get its
-> > corresponding netns? I have no strong opinion on this point for now.
+On Mon, Jun 16, 2025 at 06:48:44PM -0700, Jakub Kicinski wrote:
+> Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
+> add dedicated callbacks for getting and setting rxfh fields").
 > 
-> I'm suggesting something along these lines (see below). And then add
-> some way to configure it (plus, obviously, set the default value
-> on init). 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/sun/niu.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
 
-+1 from me on making this per-socket instead of global with sysfs.
-
-I feel like the direction networking has taken lately (netdev-genl, for
-example) is to make things more granular instead of global.
+Reviewed-by: Joe Damato <joe@dama.to>
 
