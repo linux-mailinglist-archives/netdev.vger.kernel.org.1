@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 200A0ADDFAC
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:30:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC39ADDFB0
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:31:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8C59189B9D9
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DB26189BA04
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 23:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C04E29A9F5;
-	Tue, 17 Jun 2025 23:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5925E2BD5A7;
+	Tue, 17 Jun 2025 23:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4a7GVyq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvBR/YOQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B0028C2D1;
-	Tue, 17 Jun 2025 23:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291622BD022
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 23:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750203028; cv=none; b=V96MHK/VLUiPoUPWRjT7YU+vqYMmecR0HGmGPV83c9A6tw8Cxpjx+r0IaTWH0WMVKABZUL0yBz5mSTRWoyOLg1hODbB2jsBFOljJP1q0BdCsnwUdQ4XvR/X4qxbDIXX0QR9M+ZwIS/fpX873EI3BPJKmQvUFJp4rgVkMUZ8Ors4=
+	t=1750203030; cv=none; b=PPtzdXvar708zuUI+hetu8xmdYuJbhNq55xRw2KQv7baDN7i84FjT64x8E6Np5HdgzSLOwQY2OPHIcwD/dKnPoSrh3wLzHODJw/bhh8Zi2rblWlRg/FRH90LuGuW14MsBwPZbBJW0xUMbV7O2c8TStejWl13pg7fZBEFijLQ/rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750203028; c=relaxed/simple;
-	bh=h7uRpo1qewWYveGSzv0LBvul9IHdQyYQNCRNh3R0DjM=;
+	s=arc-20240116; t=1750203030; c=relaxed/simple;
+	bh=73H5ECTS6wNX9RBNyA+x+jh+26xq9XojuYwV90BXPe0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RvpPjAvYMZTmi3PTWIGaSHofyR9e+bXEwWEME6w/rQ8+9o3sE2bgzzkNpKf83bA9yHAMIwbEi1C/U3vpDhtvaJ0dWHvHbeYepQ4cV+XheeuCB8qwhP3dDR2nkjwnGkpU7ISdKJ1rE10eQm11oZUIhdOm4nR7Zvh9BbKUVm5Tau8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4a7GVyq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 358CDC4CEE3;
-	Tue, 17 Jun 2025 23:30:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=XWSHPe9HY4djx3Lnb24u8z+0NZq7SPy1nc6FHN0IoxTaik91OAA//EQW6JF8fac5ue25JdFw6K5IAa87Nt7CPWVQp9wcUvNBDflKb8Vb3z8NZCsTR6xZHyaINCQLdAsX6iBA50Dd3V+t0/zrSU9qON21HFpUttyPI7zWNECmHFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvBR/YOQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0595C4CEED;
+	Tue, 17 Jun 2025 23:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750203028;
-	bh=h7uRpo1qewWYveGSzv0LBvul9IHdQyYQNCRNh3R0DjM=;
+	s=k20201202; t=1750203029;
+	bh=73H5ECTS6wNX9RBNyA+x+jh+26xq9XojuYwV90BXPe0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y4a7GVyqTmLRdTkBwAgWLexEnA21Nad1j4iSf5uWhT9rylzy5ma04L9OpR1QJiGs4
-	 M5N41FBDk2xsyx2ZtLRsYFJb9CEaepQpLQrmOnWOoNXTyFuICV78x30Dd7g3uaEYWt
-	 ayhYEAVmHXlYcsbJXIPDm3sSEtglb42nXXd3ouuPA3dB15M9ogPAnyzOg7Ae04B/dS
-	 R2/QKm268jUwZ18wwxrCKubgIb9Aaqd4zLh8bIkZjw4Gh0xZK+48U7DQ/+ilHMdpcl
-	 DEW9GxZdjYqo7Zqz/rKX68Zzmj5KGbrxa3YAVy3L4vyw6NROtLVVWqsInaFNGUU6Z1
-	 liJkiiSE3wgqw==
+	b=TvBR/YOQIqbgmo/b1QBDV/cnzAJ1AElSmrqFQ2J4ldv/KH0RgGZ7NlWDlOjD+T6o5
+	 leOpRHoNOvQmLayslMISy9luGHhJYSmS2XGbL5Xvt1m5O7ObFWQtl+uaDQz3KBPozV
+	 KZKYBaxurWrrWLIwc7IDmi4WYjYkMwidsKc/l3T0Zk13jjvnXgJHvM1E1QpjgHx5Am
+	 YL0aKryBJnBtIpOVVcKF0gBHEpBvlfSj5O1ODdhE3B2mdR5v5tVjJVQk3EMw7FRMOv
+	 FFglirm7FX+TEB9BVUuhHXTeZHUhbd+IwcTzJuaraVh0dNkWKbchrh/JrbySZQ0Eb4
+	 X4il6c3OwR75Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD6E38111DD;
-	Tue, 17 Jun 2025 23:30:57 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BCA38111DD;
+	Tue, 17 Jun 2025 23:30:59 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] Link NAPI instances to queues and IRQs
+Subject: Re: [PATCH net-next v2 0/3] tcp: remove obsolete RFC3517/RFC6675 code
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175020305650.3735715.11500418526187029243.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Jun 2025 23:30:56 +0000
-References: <20250616032226.7318-1-justinlai0215@realtek.com>
-In-Reply-To: <20250616032226.7318-1-justinlai0215@realtek.com>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, horms@kernel.org, jdamato@fastly.com,
- pkshih@realtek.com, larry.chiu@realtek.com
+ <175020305798.3735715.10987456229938172839.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 23:30:57 +0000
+References: <20250615001435.2390793-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20250615001435.2390793-1-ncardwell.sw@gmail.com>
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ netdev@vger.kernel.org, ncardwell@google.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 16 Jun 2025 11:22:24 +0800 you wrote:
-> This patch series introduces netdev-genl support to rtase, enabling
-> user-space applications to query the relationships between IRQs,
-> queues, and NAPI instances.
+On Sat, 14 Jun 2025 20:14:32 -0400 you wrote:
+> From: Neal Cardwell <ncardwell@google.com>
 > 
-> v1 -> v2:
-> - Use netif_napi_add_config() to support persistent NAPI configuration.
-> - Use enum netdev_queue_type instead of driver-specific values.
-> - Rename ring_type to type.
+> RACK-TLP loss detection has been enabled as the default loss detection
+> algorithm for Linux TCP since 2018, in:
+> 
+>  commit b38a51fec1c1 ("tcp: disable RFC6675 loss detection")
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/2] rtase: Link IRQs to NAPI instances
-    https://git.kernel.org/netdev/net-next/c/9f611bfd1011
-  - [net-next,v2,2/2] rtase: Link queues to NAPI instances
-    https://git.kernel.org/netdev/net-next/c/8d672a3e51ad
+  - [net-next,v2,1/3] tcp: remove obsolete and unused RFC3517/RFC6675 loss recovery code
+    https://git.kernel.org/netdev/net-next/c/1c120191dcec
+  - [net-next,v2,2/3] tcp: remove RFC3517/RFC6675 hint state: lost_skb_hint, lost_cnt_hint
+    https://git.kernel.org/netdev/net-next/c/ba4618885b23
+  - [net-next,v2,3/3] tcp: remove RFC3517/RFC6675 tcp_clear_retrans_hints_partial()
+    https://git.kernel.org/netdev/net-next/c/db16319efcc7
 
 You are awesome, thank you!
 -- 
