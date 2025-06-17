@@ -1,102 +1,94 @@
-Return-Path: <netdev+bounces-198593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB398ADCCFD
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:22:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 480C0ADCD15
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 15:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C166E3BF018
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:14:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7CFD18898E3
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 13:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2825F2E7191;
-	Tue, 17 Jun 2025 13:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A6628C5A4;
+	Tue, 17 Jun 2025 13:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iNa0xfO4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSWSeLSJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7CF2E7166;
-	Tue, 17 Jun 2025 13:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE892E717B;
+	Tue, 17 Jun 2025 13:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750166096; cv=none; b=A0CFZi+NkIovxPNEjyZvJQGCJJGeDIZCG6UnejjBuEJpsub6hFBleA9OpCNNLmcazcr1HL434V3Pz0IEBkjzMw6nDhPVXUXE6lHlW7hdyJLHCb3xlcLuZgQ8DZMare1EI1t1BUgBE4WVtHMcoCMR++z77ipfEOXVD8JqJG0lvAk=
+	t=1750166401; cv=none; b=Nw4jsjTt+1Mi5V7R+kRL2FAAquBSWgckw6/pXTwzGxslznlHBFWu4cQCgNPvwFf8rSQugoQlFkiQO4oUjrO6qfmGg8BvVJreoUueDnwQGFFjgn0/MyUiqa9aTITAO6VgZ3C3gcdGiPF0giQRRscGxiSA2mB4GmFuUKXPRBx+g8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750166096; c=relaxed/simple;
-	bh=jWHsSqNV6uTusVU5NnYNCN38+Xz/eWr0z5GEMNQdJ0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m0i+1PT5iTQoKt2Gkh6iEVcWp+jO0czH5oy/KQYltoGzi0psLRZ5GKEso3VtMGCFPx1U0C1pLR2l7XW2k4uP9MiYvSxka/fXDvWc8GJ0mjGbSz139rPAeBOhQwVYnFrngnJ4czmiHpss4VgvnwqvspGtESQ6UrGiCAhhaQBWx18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iNa0xfO4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uFLVJFpH5AQoGq4DYrwcdK29TEFz0/SXGmStaKvh9BQ=; b=iNa0xfO4f+V3dWu6OtwziiklHV
-	0IJbfpT5pYTvjelAZi7SLIUz1B2jI+jxV2Bl7wn7Kyx2lP3m7taNuoWdw3sawN3A6NuNcMxIJiWOC
-	OWPE8t/U79D6l66Bf8vpY0PEv64H7lkmHTDjIyxDBRcb4PKKarmyZljW4ZZuy1SBNwYI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uRW90-00GAVk-BT; Tue, 17 Jun 2025 15:14:30 +0200
-Date: Tue, 17 Jun 2025 15:14:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2 2/2] net: mdio: Add MDIO bus controller for
- Airoha AN7583
-Message-ID: <065e26cf-1bfb-462c-8cbc-9b4b29f1262d@lunn.ch>
-References: <20250617091655.10832-1-ansuelsmth@gmail.com>
- <20250617091655.10832-2-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1750166401; c=relaxed/simple;
+	bh=rT+q1cuJk4X808ltKP0mkhT3jOCWnDD6rLSYm7eJiSU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=j6njA9hPTqDfuwQDUToL5tFoOjw/5UFOkxgjxDWIGwjmm7qxS47mUEC5AwkfRreXwfAYKCL/sNh+qmZDRBZMXF3+ghhgAnpOVo2ZMtmbNF54a+0ISbYOGwEqU8QsEC6VOgVIEcpWbRUvZG7SMnscrTn7NOsJ0+uAP60MO+L3uZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSWSeLSJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20AAAC4CEE3;
+	Tue, 17 Jun 2025 13:20:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750166401;
+	bh=rT+q1cuJk4X808ltKP0mkhT3jOCWnDD6rLSYm7eJiSU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OSWSeLSJ6MXSVQhDACyJSWXbm0jojPUBCKBQR149UO1tEgpfAM2kRGgx0dwZeJz2D
+	 3IqjELK5sY6fK6ZPiRamigQDDhtW0Lczth9VK4E8vfwGCSOh4rV7wr1DaErBPtUpYj
+	 gUXn4kZyrCYiYR5MDR5HbzpksmN+KGsNScuxPifEpgQJ3tvms+jvD/JvykAB3u+pJL
+	 PhI/TysnqJq8COWLyDCFPap0d98nxzivib/5zohS/s1hB/60yDzNMPqtxY7yZgHGQ0
+	 OupkFIyU41Z0r6eTpKYxHG8DllzpJEVRCjVg1sEjj4slZoGHjgAkRvtJUPwnyek6aW
+	 uYd8YSjGtr6Mg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF25380DBF0;
+	Tue, 17 Jun 2025 13:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250617091655.10832-2-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] net: phy: Add c45_phy_ids sysfs directory
+ entry
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175016642975.3127577.11877299160287159944.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Jun 2025 13:20:29 +0000
+References: <20250613131903.2961-1-yajun.deng@linux.dev>
+In-Reply-To: <20250613131903.2961-1-yajun.deng@linux.dev>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Jun 17, 2025 at 11:16:53AM +0200, Christian Marangi wrote:
-> Airoha AN7583 SoC have 2 dedicated MDIO bus controller in the SCU
-> register map. To driver register an MDIO controller based on the DT
-> reg property and access the register by accessing the parent syscon.
-> 
-> The MDIO bus logic is similar to the MT7530 internal MDIO bus but
-> deviates of some setting and some HW bug.
-> 
-> On Airoha AN7583 the MDIO clock is set to 25MHz by default and needs to
-> be correctly setup to 2.5MHz to correctly work (by setting the divisor
-> to 10x).
-> 
-> There seems to be Hardware bug where AN7583_MII_RWDATA
-> is not wiped in the context of unconnected PHY and the
-> previous read value is returned.
-> 
-> Example: (only one PHY on the BUS at 0x1f)
->  - read at 0x1f report at 0x2 0x7500
->  - read at 0x0 report 0x7500 on every address
-> 
-> To workaround this, we reset the Mdio BUS at every read
-> to have consistent values on read operation.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Hello:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-    Andrew
+On Fri, 13 Jun 2025 21:19:03 +0800 you wrote:
+> The phy_id field only shows the PHY ID of the C22 device, and the C45
+> device did not store its PHY ID in this field.
+> 
+> Add a new phy_mmd_group, and export the mmd<n>_device_id for the C45
+> device. These files are invisible to the C22 device.
+> 
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] net: phy: Add c45_phy_ids sysfs directory entry
+    https://git.kernel.org/netdev/net-next/c/170e4e3944aa
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
