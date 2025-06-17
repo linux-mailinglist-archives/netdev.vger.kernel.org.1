@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-198739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8130ADD5D8
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:27:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1D9BADD634
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 18:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6AA27AE3CD
-	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:18:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C945E19479B3
+	for <lists+netdev@lfdr.de>; Tue, 17 Jun 2025 16:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254482ED84B;
-	Tue, 17 Jun 2025 16:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC542ED863;
+	Tue, 17 Jun 2025 16:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UmbjYMes"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7GY92Mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9E02EE27D
-	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D622F7434
+	for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 16:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750176801; cv=none; b=ENeI2MU/lwUm7TIa9ZgzOS7YksBMbkU9s+jo75DCPnm3GAML7wAjOP1/iTBGE/Ow0OZ8DzkH/T/a/C/5VKBDBGbOFxrU9YbSVgBozz31mvB4LBDw2/bsxw91m6+j14xzWsnj2QP3WWAig5GKqbxtHXJYkP2Bla++q11qrP1KlfA=
+	t=1750176806; cv=none; b=VwpPcoHZxKD+hr43F+QeAsPm3ihubDMX9RGwft26acTv6w5gAKTtHrvTtcnqftyA5g/dUZIc54Rx337AUgjC+e03cn/eeuJBHE5eHuPpC0xFlSLsml3UrqjrwV16mtGkhIZAzLnZiLeOEahuiTl6I09aQgth/6S1iwfbTl6wlVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750176801; c=relaxed/simple;
-	bh=e5cqxqrsru9KQaUOBFvFshVlXIwwE0x5S+PzNHDtaLI=;
+	s=arc-20240116; t=1750176806; c=relaxed/simple;
+	bh=1zjH3WiB5Mhbh8hCpyJBHoh+OTf4G2WiPjzxSwo3dMk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=recYLq++uSlUZkXVZoUDjTuej3U+bC+9bYeYe2ACIO2CV0og66yIf1JA0Cevu1MQR0Ku/oXuUnDXVMPQX6SnnBRtv8ZpXeu7Dj4xxuZrtdih1N6UW8Jx4euboqBl6fqMlHIdv4mvm83oOFFMCvAkhVUOZpOdjmvVZrs9TjHKk5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UmbjYMes; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=CA73Bzp9Z4J7c43Rab+HZUbgMfGgsVzryGqgm06h1JYt4252+tLTEyf2qkgGHGlJdjWyIkR9eKnk5yFIrW/OM/bfhVVdNpQD3f28vHhoTBSvohoPXfD26kb++KHP9WkvDiqymcGf6sC8hofCWHQSVz3ItMrn8iRw7TtgrgreM70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G7GY92Mz; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750176798;
+	s=mimecast20190719; t=1750176804;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XEVeyi5+aB4tF3zQf1ocegIc/5aiM0vbtpwZuiqI4VE=;
-	b=UmbjYMes9rmE9h6LRMwV7MilhwVG66mdoTtFDodbJF70Z5wBkCXsmtJOkrCBwdGYK+nRke
-	G0uoHn0i6LMZWmPEwviM7zG/on6Ym3NR45ewi1msCFPC5ASDYo1rQMf0GAg2g3lkh8wFVn
-	FN7YZOsFnNgo+Iwjn9SNeBd+UNTuW0Q=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=clONQk41qCil1gd37C0FbUDbiqP0G8Ihlk90AV3fWkI=;
+	b=G7GY92Mz5WK5zoyDzm2ArJ5sITGEHRQ52nL1jDHoQ8msPPzFyy8PdhkreGjwjURQyr1uEt
+	Pq35DmcY8em0Ut9tFBEgVqYDayM8uEctJUmZ2sUsU29BL6McBGwpzhP+9EsLna7jd44kPr
+	3vAZ/WjZYz0TkejrUcSzRO7Nw2+qcqY=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-138-lGH3ZEG8NSizL1kOglXR5Q-1; Tue,
- 17 Jun 2025 12:13:14 -0400
-X-MC-Unique: lGH3ZEG8NSizL1kOglXR5Q-1
-X-Mimecast-MFC-AGG-ID: lGH3ZEG8NSizL1kOglXR5Q_1750176790
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-569-M_N3cUQSPU68m1lf07Gi5Q-1; Tue,
+ 17 Jun 2025 12:13:17 -0400
+X-MC-Unique: M_N3cUQSPU68m1lf07Gi5Q-1
+X-Mimecast-MFC-AGG-ID: M_N3cUQSPU68m1lf07Gi5Q_1750176796
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 880491800C20;
-	Tue, 17 Jun 2025 16:13:10 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 43F6D1956056;
+	Tue, 17 Jun 2025 16:13:16 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.33.2])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F2C14195E342;
-	Tue, 17 Jun 2025 16:13:05 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1E6A51956094;
+	Tue, 17 Jun 2025 16:13:10 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
@@ -70,9 +70,9 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	Yuri Benditovich <yuri.benditovich@daynix.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v4 net-next 6/8] virtio_net: enable gso over UDP tunnel support.
-Date: Tue, 17 Jun 2025 18:12:13 +0200
-Message-ID: <cd6225a065ce8f2e2fe052c2e02ecf78e7ee9d4f.1750176076.git.pabeni@redhat.com>
+Subject: [PATCH v4 net-next 7/8] tun: enable gso over UDP tunnel support.
+Date: Tue, 17 Jun 2025 18:12:14 +0200
+Message-ID: <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
 In-Reply-To: <cover.1750176076.git.pabeni@redhat.com>
 References: <cover.1750176076.git.pabeni@redhat.com>
 Precedence: bulk
@@ -84,206 +84,368 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-If the related virtio feature is set, enable transmission and reception
-of gso over UDP tunnel packets.
-
-Most of the work is done by the previously introduced helper, just need
-to determine the UDP tunnel features inside the virtio_net_hdr and
-update accordingly the virtio net hdr size.
+Add new tun features to represent the newly introduced virtio
+GSO over UDP tunnel offload. Allows detection and selection of
+such features via the existing TUNSETOFFLOAD ioctl and compute
+the expected virtio header size and tunnel header offset using
+the current netdev features, so that we can plug almost seamless
+the newly introduced virtio helpers to serialize the extended
+virtio header.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
 v3 -> v4:
-  - tnl header fields at constant offset, update the parsing accordingly
-  - keep separate status for tnl offload tx and tnl offload rx
-  - drop redundant comment
+  - virtio tnl-related fields are at fixed offset, cleanup
+    the code accordingly.
+  - use netdev features instead of flags bit to check for
+    the configured offload
+  - drop packet in case of enabled features/configured hdr
+    size mismatch
 
 v2 -> v3:
-  - drop the VIRTIO_HAS_EXTENDED_FEATURES conditionals
-
-v1 -> v2:
-  - test for UDP_TUNNEL_GSO* only on builds with extended features support
-  - comment indentation cleanup
-  - rebased on top of virtio helpers changes
-  - dump more information in case of bad offloads
+  - cleaned-up uAPI comments
+  - use explicit struct layout instead of raw buf.
 ---
- drivers/net/virtio_net.c | 85 ++++++++++++++++++++++++++++++----------
- 1 file changed, 64 insertions(+), 21 deletions(-)
+ drivers/net/tun.c           | 70 ++++++++++++++++++++++++-----
+ drivers/net/tun_vnet.h      | 88 +++++++++++++++++++++++++++++++++----
+ include/uapi/linux/if_tun.h |  9 ++++
+ 3 files changed, 148 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index e6c0a9660bb4..edf0197526f5 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -78,15 +78,19 @@ static const unsigned long guest_offloads[] = {
- 	VIRTIO_NET_F_GUEST_CSUM,
- 	VIRTIO_NET_F_GUEST_USO4,
- 	VIRTIO_NET_F_GUEST_USO6,
--	VIRTIO_NET_F_GUEST_HDRLEN
-+	VIRTIO_NET_F_GUEST_HDRLEN,
-+	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED,
-+	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED,
- };
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index f8c5e2fd04df..bae0370a8152 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -186,7 +186,8 @@ struct tun_struct {
+ 	struct net_device	*dev;
+ 	netdev_features_t	set_features;
+ #define TUN_USER_FEATURES (NETIF_F_HW_CSUM|NETIF_F_TSO_ECN|NETIF_F_TSO| \
+-			  NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4)
++			  NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4 | \
++			  NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM)
  
- #define GUEST_OFFLOAD_GRO_HW_MASK ((1ULL << VIRTIO_NET_F_GUEST_TSO4) | \
--				(1ULL << VIRTIO_NET_F_GUEST_TSO6) | \
--				(1ULL << VIRTIO_NET_F_GUEST_ECN)  | \
--				(1ULL << VIRTIO_NET_F_GUEST_UFO)  | \
--				(1ULL << VIRTIO_NET_F_GUEST_USO4) | \
--				(1ULL << VIRTIO_NET_F_GUEST_USO6))
-+			(1ULL << VIRTIO_NET_F_GUEST_TSO6) | \
-+			(1ULL << VIRTIO_NET_F_GUEST_ECN)  | \
-+			(1ULL << VIRTIO_NET_F_GUEST_UFO)  | \
-+			(1ULL << VIRTIO_NET_F_GUEST_USO4) | \
-+			(1ULL << VIRTIO_NET_F_GUEST_USO6) | \
-+			(1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED) | \
-+			(1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED))
- 
- struct virtnet_stat_desc {
- 	char desc[ETH_GSTRING_LEN];
-@@ -439,6 +443,13 @@ struct virtnet_info {
- 	/* Work struct for delayed refilling if we run low on memory. */
- 	struct delayed_work refill;
- 
-+	/* UDP tunnel support */
-+	bool tx_tnl;
+ 	int			align;
+ 	int			vnet_hdr_sz;
+@@ -925,6 +926,7 @@ static int tun_net_init(struct net_device *dev)
+ 	dev->hw_features = NETIF_F_SG | NETIF_F_FRAGLIST |
+ 			   TUN_USER_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
+ 			   NETIF_F_HW_VLAN_STAG_TX;
++	dev->hw_enc_features = dev->hw_features;
+ 	dev->features = dev->hw_features;
+ 	dev->vlan_features = dev->features &
+ 			     ~(NETIF_F_HW_VLAN_CTAG_TX |
+@@ -1698,7 +1700,8 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 	struct sk_buff *skb;
+ 	size_t total_len = iov_iter_count(from);
+ 	size_t len = total_len, align = tun->align, linear;
+-	struct virtio_net_hdr gso = { 0 };
++	struct virtio_net_hdr_v1_hash_tunnel hdr;
++	struct virtio_net_hdr *gso;
+ 	int good_linear;
+ 	int copylen;
+ 	int hdr_len = 0;
+@@ -1708,6 +1711,15 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 	int skb_xdp = 1;
+ 	bool frags = tun_napi_frags_enabled(tfile);
+ 	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
++	netdev_features_t features = 0;
 +
-+	bool rx_tnl;
++	/*
++	 * Keep it easy and always zero the whole buffer, even if the
++	 * tunnel-related field will be touched only when the feature
++	 * is enabled and the hdr size id compatible.
++	 */
++	memset(&hdr, 0, sizeof(hdr));
++	gso = (struct virtio_net_hdr *)&hdr;
+ 
+ 	if (!(tun->flags & IFF_NO_PI)) {
+ 		if (len < sizeof(pi))
+@@ -1721,7 +1733,12 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 	if (tun->flags & IFF_VNET_HDR) {
+ 		int vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
+ 
+-		hdr_len = tun_vnet_hdr_get(vnet_hdr_sz, tun->flags, from, &gso);
++		if (vnet_hdr_sz >= TUN_VNET_TNL_SIZE)
++			features = NETIF_F_GSO_UDP_TUNNEL |
++				   NETIF_F_GSO_UDP_TUNNEL_CSUM;
 +
-+	bool rx_tnl_csum;
-+
- 	/* Is delayed refill enabled? */
- 	bool refill_enabled;
++		hdr_len = __tun_vnet_hdr_get(vnet_hdr_sz, tun->flags,
++					     features, from, gso);
+ 		if (hdr_len < 0)
+ 			return hdr_len;
  
-@@ -498,6 +509,7 @@ struct virtio_net_common_hdr {
- 		struct virtio_net_hdr hdr;
- 		struct virtio_net_hdr_mrg_rxbuf	mrg_hdr;
- 		struct virtio_net_hdr_v1_hash hash_v1_hdr;
-+		struct virtio_net_hdr_v1_hash_tunnel tnl_hdr;
- 	};
- };
- 
-@@ -2531,14 +2543,21 @@ static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *
- 	if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
- 		virtio_skb_set_hash(&hdr->hash_v1_hdr, skb);
- 
--	if (flags & VIRTIO_NET_HDR_F_DATA_VALID)
--		skb->ip_summed = CHECKSUM_UNNECESSARY;
-+	hdr->hdr.flags = flags;
-+	if (virtio_net_handle_csum_offload(skb, &hdr->hdr, vi->rx_tnl_csum)) {
-+		net_warn_ratelimited("%s: bad csum: flags: %x, gso_type: %x rx_tnl_csum %d\n",
-+				     dev->name, hdr->hdr.flags,
-+				     hdr->hdr.gso_type, vi->rx_tnl_csum);
-+		goto frame_err;
-+	}
- 
--	if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
--				  virtio_is_little_endian(vi->vdev))) {
--		net_warn_ratelimited("%s: bad gso: type: %u, size: %u\n",
-+	if (virtio_net_hdr_tnl_to_skb(skb, &hdr->tnl_hdr, vi->rx_tnl,
-+				      vi->rx_tnl_csum,
-+				      virtio_is_little_endian(vi->vdev))) {
-+		net_warn_ratelimited("%s: bad gso: type: %x, size: %u, flags %x tunnel %d tnl csum %d\n",
- 				     dev->name, hdr->hdr.gso_type,
--				     hdr->hdr.gso_size);
-+				     hdr->hdr.gso_size, hdr->hdr.flags,
-+				     vi->rx_tnl, vi->rx_tnl_csum);
- 		goto frame_err;
+@@ -1755,7 +1772,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 		 * (e.g gso or jumbo packet), we will do it at after
+ 		 * skb was created with generic XDP routine.
+ 		 */
+-		skb = tun_build_skb(tun, tfile, from, &gso, len, &skb_xdp);
++		skb = tun_build_skb(tun, tfile, from, gso, len, &skb_xdp);
+ 		err = PTR_ERR_OR_ZERO(skb);
+ 		if (err)
+ 			goto drop;
+@@ -1799,7 +1816,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 		}
  	}
  
-@@ -3250,9 +3269,9 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+-	if (tun_vnet_hdr_to_skb(tun->flags, skb, &gso)) {
++	if (tun_vnet_hdr_tnl_to_skb(tun->flags, features, skb, &hdr)) {
+ 		atomic_long_inc(&tun->rx_frame_errors);
+ 		err = -EINVAL;
+ 		goto free_skb;
+@@ -2050,13 +2067,21 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 	}
  
- static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
+ 	if (vnet_hdr_sz) {
+-		struct virtio_net_hdr gso;
++		struct virtio_net_hdr_v1_hash_tunnel hdr;
++		struct virtio_net_hdr *gso;
+ 
+-		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
++		ret = tun_vnet_hdr_tnl_from_skb(tun->flags, tun->dev, skb,
++						&hdr);
+ 		if (ret)
+ 			return ret;
+ 
+-		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
++		/*
++		 * Drop the packet if the configured header size is too small
++		 * WRT the enabled offloads.
++		 */
++		gso = (struct virtio_net_hdr *)&hdr;
++		ret = __tun_vnet_hdr_put(vnet_hdr_sz, tun->dev->features,
++					 iter, gso);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -2357,7 +2382,9 @@ static int tun_xdp_one(struct tun_struct *tun,
  {
--	struct virtio_net_hdr_mrg_rxbuf *hdr;
- 	const unsigned char *dest = ((struct ethhdr *)skb->data)->h_dest;
- 	struct virtnet_info *vi = sq->vq->vdev->priv;
-+	struct virtio_net_hdr_v1_hash_tunnel *hdr;
- 	int num_sg;
- 	unsigned hdr_len = vi->hdr_len;
- 	bool can_push;
-@@ -3265,17 +3284,17 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
- 	/* Even if we can, don't push here yet as this would skew
- 	 * csum_start offset below. */
- 	if (can_push)
--		hdr = (struct virtio_net_hdr_mrg_rxbuf *)(skb->data - hdr_len);
-+		hdr = (struct virtio_net_hdr_v1_hash_tunnel *)(skb->data -
-+							       hdr_len);
- 	else
--		hdr = &skb_vnet_common_hdr(skb)->mrg_hdr;
-+		hdr = &skb_vnet_common_hdr(skb)->tnl_hdr;
+ 	unsigned int datasize = xdp->data_end - xdp->data;
+ 	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
++	struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr;
+ 	struct virtio_net_hdr *gso = &hdr->gso;
++	netdev_features_t features = 0;
+ 	struct bpf_prog *xdp_prog;
+ 	struct sk_buff *skb = NULL;
+ 	struct sk_buff_head *queue;
+@@ -2426,7 +2453,17 @@ static int tun_xdp_one(struct tun_struct *tun,
+ 	if (metasize > 0)
+ 		skb_metadata_set(skb, metasize);
  
--	if (virtio_net_hdr_from_skb(skb, &hdr->hdr,
--				    virtio_is_little_endian(vi->vdev), false,
--				    0))
-+	if (virtio_net_hdr_tnl_from_skb(skb, hdr, vi->tx_tnl,
-+					virtio_is_little_endian(vi->vdev), 0))
- 		return -EPROTO;
- 
- 	if (vi->mergeable_rx_bufs)
--		hdr->num_buffers = 0;
-+		hdr->hash_hdr.hdr.num_buffers = 0;
- 
- 	sg_init_table(sq->sg, skb_shinfo(skb)->nr_frags + (can_push ? 1 : 2));
- 	if (can_push) {
-@@ -6764,10 +6783,20 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		if (virtio_has_feature(vdev, VIRTIO_NET_F_HOST_USO))
- 			dev->hw_features |= NETIF_F_GSO_UDP_L4;
- 
-+		if (virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO)) {
-+			dev->hw_features |= NETIF_F_GSO_UDP_TUNNEL;
-+			dev->hw_enc_features = dev->hw_features;
-+		}
-+		if (dev->hw_features & NETIF_F_GSO_UDP_TUNNEL &&
-+		    virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO_CSUM)) {
-+			dev->hw_features |= NETIF_F_GSO_UDP_TUNNEL_CSUM;
-+			dev->hw_enc_features |= NETIF_F_GSO_UDP_TUNNEL_CSUM;
-+		}
+-	if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
++	/*
++	 * Assume tunnel offloads are enabled if the received hdr is large
++	 * enough.
++	 */
++	if (READ_ONCE(tun->vnet_hdr_sz) >= TUN_VNET_TNL_SIZE &&
++	    xdp->data - xdp->data_hard_start >= TUN_VNET_TNL_SIZE)
++		features = NETIF_F_GSO_UDP_TUNNEL |
++			   NETIF_F_GSO_UDP_TUNNEL_CSUM;
 +
- 		dev->features |= NETIF_F_GSO_ROBUST;
++	tnl_hdr = (struct virtio_net_hdr_v1_hash_tunnel *)gso;
++	if (tun_vnet_hdr_tnl_to_skb(tun->flags, features, skb, tnl_hdr)) {
+ 		atomic_long_inc(&tun->rx_frame_errors);
+ 		kfree_skb(skb);
+ 		ret = -EINVAL;
+@@ -2812,6 +2849,8 @@ static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
  
- 		if (gso)
--			dev->features |= dev->hw_features & NETIF_F_ALL_TSO;
-+			dev->features |= dev->hw_features;
- 		/* (!csum && gso) case will be fixed by register_netdev() */
+ }
+ 
++#define PLAIN_GSO (NETIF_F_GSO_UDP_L4 | NETIF_F_TSO | NETIF_F_TSO6)
++
+ /* This is like a cut-down ethtool ops, except done via tun fd so no
+  * privs required. */
+ static int set_offload(struct tun_struct *tun, unsigned long arg)
+@@ -2841,6 +2880,18 @@ static int set_offload(struct tun_struct *tun, unsigned long arg)
+ 			features |= NETIF_F_GSO_UDP_L4;
+ 			arg &= ~(TUN_F_USO4 | TUN_F_USO6);
+ 		}
++
++		/*
++		 * Tunnel offload is allowed only if some plain offload is
++		 * available, too.
++		 */
++		if (features & PLAIN_GSO && arg & TUN_F_UDP_TUNNEL_GSO) {
++			features |= NETIF_F_GSO_UDP_TUNNEL;
++			if (arg & TUN_F_UDP_TUNNEL_GSO_CSUM)
++				features |= NETIF_F_GSO_UDP_TUNNEL_CSUM;
++			arg &= ~(TUN_F_UDP_TUNNEL_GSO |
++				 TUN_F_UDP_TUNNEL_GSO_CSUM);
++		}
  	}
  
-@@ -6860,7 +6889,10 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
- 	}
+ 	/* This gives the user a way to test for new features in future by
+@@ -2852,7 +2903,6 @@ static int set_offload(struct tun_struct *tun, unsigned long arg)
+ 	tun->dev->wanted_features &= ~TUN_USER_FEATURES;
+ 	tun->dev->wanted_features |= features;
+ 	netdev_update_features(tun->dev);
+-
+ 	return 0;
+ }
  
--	if (vi->has_rss_hash_report)
-+	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) ||
-+	    virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO))
-+		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash_tunnel);
-+	else if (vi->has_rss_hash_report)
- 		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
- 	else if (virtio_has_feature(vdev, VIRTIO_NET_F_MRG_RXBUF) ||
- 		 virtio_has_feature(vdev, VIRTIO_F_VERSION_1))
-@@ -6868,6 +6900,13 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	else
- 		vi->hdr_len = sizeof(struct virtio_net_hdr);
+diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+index 58b9ac7a5fc4..7450fc153bb4 100644
+--- a/drivers/net/tun_vnet.h
++++ b/drivers/net/tun_vnet.h
+@@ -6,6 +6,8 @@
+ #define TUN_VNET_LE     0x80000000
+ #define TUN_VNET_BE     0x40000000
  
-+	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM))
-+		vi->rx_tnl_csum = true;
-+	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO))
-+		vi->rx_tnl = true;
-+	if (virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO))
-+		vi->tx_tnl = true;
++#define TUN_VNET_TNL_SIZE	sizeof(struct virtio_net_hdr_v1_hash_tunnel)
 +
- 	if (virtio_has_feature(vdev, VIRTIO_F_ANY_LAYOUT) ||
- 	    virtio_has_feature(vdev, VIRTIO_F_VERSION_1))
- 		vi->any_header_sg = true;
-@@ -7178,6 +7217,10 @@ static struct virtio_device_id id_table[] = {
+ static inline bool tun_vnet_legacy_is_little_endian(unsigned int flags)
+ {
+ 	bool be = IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
+@@ -107,16 +109,26 @@ static inline long tun_vnet_ioctl(int *vnet_hdr_sz, unsigned int *flags,
+ 	}
+ }
  
- static unsigned int features[] = {
- 	VIRTNET_FEATURES,
-+	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
-+	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM,
-+	VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO,
-+	VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO_CSUM,
- };
+-static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
+-				   struct iov_iter *from,
+-				   struct virtio_net_hdr *hdr)
++static inline unsigned int tun_vnet_parse_size(netdev_features_t features)
++{
++	if (!(features & NETIF_F_GSO_UDP_TUNNEL))
++		return sizeof(struct virtio_net_hdr);
++
++	return TUN_VNET_TNL_SIZE;
++}
++
++static inline int __tun_vnet_hdr_get(int sz, unsigned int flags,
++				     netdev_features_t features,
++				     struct iov_iter *from,
++				     struct virtio_net_hdr *hdr)
+ {
++	unsigned int parsed_size = tun_vnet_parse_size(features);
+ 	u16 hdr_len;
  
- static unsigned int features_legacy[] = {
+ 	if (iov_iter_count(from) < sz)
+ 		return -EINVAL;
+ 
+-	if (!copy_from_iter_full(hdr, sizeof(*hdr), from))
++	if (!copy_from_iter_full(hdr, parsed_size, from))
+ 		return -EFAULT;
+ 
+ 	hdr_len = tun_vnet16_to_cpu(flags, hdr->hdr_len);
+@@ -129,32 +141,59 @@ static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
+ 	if (hdr_len > iov_iter_count(from))
+ 		return -EINVAL;
+ 
+-	iov_iter_advance(from, sz - sizeof(*hdr));
++	iov_iter_advance(from, sz - parsed_size);
+ 
+ 	return hdr_len;
+ }
+ 
+-static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+-				   const struct virtio_net_hdr *hdr)
++static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
++				   struct iov_iter *from,
++				   struct virtio_net_hdr *hdr)
++{
++	return __tun_vnet_hdr_get(sz, flags, 0, from, hdr);
++}
++
++static inline int __tun_vnet_hdr_put(int sz, netdev_features_t features,
++				     struct iov_iter *iter,
++				     const struct virtio_net_hdr *hdr)
+ {
++	unsigned int parsed_size = tun_vnet_parse_size(features);
++
+ 	if (unlikely(iov_iter_count(iter) < sz))
+ 		return -EINVAL;
+ 
+-	if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr)))
++	if (unlikely(copy_to_iter(hdr, parsed_size, iter) != parsed_size))
+ 		return -EFAULT;
+ 
+-	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
++	if (iov_iter_zero(sz - parsed_size, iter) != sz - parsed_size)
+ 		return -EFAULT;
+ 
+ 	return 0;
+ }
+ 
++static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
++				   const struct virtio_net_hdr *hdr)
++{
++	return __tun_vnet_hdr_put(sz, 0, iter, hdr);
++}
++
+ static inline int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
+ 				      const struct virtio_net_hdr *hdr)
+ {
+ 	return virtio_net_hdr_to_skb(skb, hdr, tun_vnet_is_little_endian(flags));
+ }
+ 
++static inline int
++tun_vnet_hdr_tnl_to_skb(unsigned int flags, netdev_features_t features,
++			struct sk_buff *skb,
++			const struct virtio_net_hdr_v1_hash_tunnel *hdr)
++{
++	return virtio_net_hdr_tnl_to_skb(skb, hdr,
++					 !!(features & NETIF_F_GSO_UDP_TUNNEL),
++					 !!(features & NETIF_F_GSO_UDP_TUNNEL_CSUM),
++					 tun_vnet_is_little_endian(flags));
++}
++
+ static inline int tun_vnet_hdr_from_skb(unsigned int flags,
+ 					const struct net_device *dev,
+ 					const struct sk_buff *skb,
+@@ -183,4 +222,35 @@ static inline int tun_vnet_hdr_from_skb(unsigned int flags,
+ 	return 0;
+ }
+ 
++static inline int
++tun_vnet_hdr_tnl_from_skb(unsigned int flags,
++			  const struct net_device *dev,
++			  const struct sk_buff *skb,
++			  struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr)
++{
++	bool has_tnl_offload = !!(dev->features & NETIF_F_GSO_UDP_TUNNEL);
++	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
++
++	if (virtio_net_hdr_tnl_from_skb(skb, tnl_hdr, has_tnl_offload,
++					tun_vnet_is_little_endian(flags),
++					vlan_hlen)) {
++		struct virtio_net_hdr_v1 *hdr = &tnl_hdr->hash_hdr.hdr;
++		struct skb_shared_info *sinfo = skb_shinfo(skb);
++
++		if (net_ratelimit()) {
++			netdev_err(dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
++				   sinfo->gso_type, tun_vnet16_to_cpu(flags, hdr->gso_size),
++				   tun_vnet16_to_cpu(flags, hdr->hdr_len));
++			print_hex_dump(KERN_ERR, "tun: ",
++				       DUMP_PREFIX_NONE,
++				       16, 1, skb->head,
++				       min(tun_vnet16_to_cpu(flags, hdr->hdr_len), 64), true);
++		}
++		WARN_ON_ONCE(1);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ #endif /* TUN_VNET_H */
+diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+index 287cdc81c939..79d53c7a1ebd 100644
+--- a/include/uapi/linux/if_tun.h
++++ b/include/uapi/linux/if_tun.h
+@@ -93,6 +93,15 @@
+ #define TUN_F_USO4	0x20	/* I can handle USO for IPv4 packets */
+ #define TUN_F_USO6	0x40	/* I can handle USO for IPv6 packets */
+ 
++/* I can handle TSO/USO for UDP tunneled packets */
++#define TUN_F_UDP_TUNNEL_GSO		0x080
++
++/*
++ * I can handle TSO/USO for UDP tunneled packets requiring csum offload for
++ * the outer header
++ */
++#define TUN_F_UDP_TUNNEL_GSO_CSUM	0x100
++
+ /* Protocol info prepended to the packets (when IFF_NO_PI is not set) */
+ #define TUN_PKT_STRIP	0x0001
+ struct tun_pi {
 -- 
 2.49.0
 
