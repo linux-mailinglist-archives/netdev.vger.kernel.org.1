@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-199038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2757ADEB27
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:01:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B7AADEB20
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C1B717A309
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:01:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F6823A8B75
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2932E3AE7;
-	Wed, 18 Jun 2025 12:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E8D2DFF18;
+	Wed, 18 Jun 2025 12:00:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from glittertind.blackshift.org (glittertind.blackshift.org [116.203.23.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD922DFF13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE7E2DF3E8
 	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 12:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.23.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750248041; cv=none; b=mb4AV9UHf+Onrsy2N4I1Fl5AMa+jFYLHKIHFoneqdX+Gb+UAxElm6gmKbIaP4XOCtqXvR8w4RC9XOSWgnt6Re007MaAXcVO+LJmZ32dibKMFe+J2W7WVumqwTV8ah4o+zWwNXGX4i0leqJLRS86cCCpp3frzK/2lBRBWqbPAELg=
+	t=1750248039; cv=none; b=dJemZRFNVMoxnvA1E6BX1qHNKEPwmfjQIlCanHH96sBk4Y6PQuWj1LSzHNevhnFG/5Xsy/eetWVtyoY8vq6384Qj6LoVe53CGqvKzryHlGgh1YJ+BYQCsBaeEgR+ngEBY5z6ITpXMmkUWdQprc1rQOhseoDrFPX47wnmo+GGs3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750248041; c=relaxed/simple;
-	bh=sA04u1PdDgRmLuhc7IHhWUv+JPtsYb7W1PMpqmuQz+g=;
+	s=arc-20240116; t=1750248039; c=relaxed/simple;
+	bh=2iqO7eQNAV+YgDrv6QeqkeUmG4rDnaxv9v7CVkxZzwk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=miRsePfnuTuHLVFi4uDc8E8QlVFmZXGSBziX62qc+3kBxu+56OC1nvm1178h5wA25bbD4E6JbqPJzJzROAYqTFRlmjnxV2bd04+pPmA+Dgu/ICnuO9zyF5w5zI+6wgXVn1gEYVGotsYjXBlFZ1YNnLs3pur2EnTf69W1unbwWWs=
+	 In-Reply-To:To:Cc; b=ixfd9cTH7xX75tzEuA4344i1r70afwYuy9diV0zscBA9ncDuSUS7JStYv9yLCa68bmD8Chv+D4+TG2ts62p/zgFahJbu30igSFrIKSwPectXHQJ+BbdZpPbwD0RhLm+YIL8ZFe6uC3ND9GXSt8wcXLh70tX0S/udj8/ZU5fxHaU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=none smtp.mailfrom=hardanger.blackshift.org; arc=none smtp.client-ip=116.203.23.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=hardanger.blackshift.org
@@ -34,24 +34,24 @@ Received: from bjornoya.blackshift.org (unknown [IPv6:2003:e3:7f3d:bb00:d189:60c
 	 key-exchange X25519 server-signature ECDSA (secp384r1)
 	 client-signature RSA-PSS (4096 bits))
 	(Client CN "bjornoya.blackshift.org", Issuer "R10" (verified OK))
-	by glittertind.blackshift.org (Postfix) with ESMTPS id 0861F66FC59
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 12:00:34 +0000 (UTC)
+	by glittertind.blackshift.org (Postfix) with ESMTPS id 6969766FC49
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 12:00:33 +0000 (UTC)
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id B223B42B56F
+	by bjornoya.blackshift.org (Postfix) with SMTP id 2F27B42B560
 	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 12:00:33 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 09BC842B50B;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 29EEB42B50D;
 	Wed, 18 Jun 2025 12:00:29 +0000 (UTC)
 Received: from hardanger.blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 7141dbd4;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 560da31b;
 	Wed, 18 Jun 2025 12:00:28 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Wed, 18 Jun 2025 14:00:02 +0200
-Subject: [PATCH net-next v4 02/11] net: fec: struct fec_enet_private:
- remove obsolete comment
+Date: Wed, 18 Jun 2025 14:00:03 +0200
+Subject: [PATCH net-next v4 03/11] net: fec: switch from asm/cacheflush.h
+ to linux/cacheflush.h
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250618-fec-cleanups-v4-2-c16f9a1af124@pengutronix.de>
+Message-Id: <20250618-fec-cleanups-v4-3-c16f9a1af124@pengutronix.de>
 References: <20250618-fec-cleanups-v4-0-c16f9a1af124@pengutronix.de>
 In-Reply-To: <20250618-fec-cleanups-v4-0-c16f9a1af124@pengutronix.de>
 To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
@@ -71,45 +71,49 @@ To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
  Alexander Lobakin <aleksander.lobakin@intel.com>
 Cc: imx@lists.linux.dev, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, kernel@pengutronix.de, bpf@vger.kernel.org, 
- Marc Kleine-Budde <mkl@pengutronix.de>, Frank Li <Frank.Li@nxp.com>, 
- Andrew Lunn <andrew@lunn.ch>
+ Marc Kleine-Budde <mkl@pengutronix.de>
 X-Mailer: b4 0.15-dev-6f78e
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1013; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=sA04u1PdDgRmLuhc7IHhWUv+JPtsYb7W1PMpqmuQz+g=;
- b=kA0DAAoBDHRl3/mQkZwByyZiAGhSqkahux7b8pEGV48hgTPjvgsVEoF/MhMJowe+KK1is1Czb
- YkBMwQAAQoAHRYhBJ/7DNivZ6hf/BVs8wx0Zd/5kJGcBQJoUqpGAAoJEAx0Zd/5kJGc7nQIAJTo
- N/fzhUb43E4oLTJlc3gdzyV7UqD5BaUED+IWZkfkV25Kzlfub3CwHU0xXGCCWP6rl2IREY8+YRl
- 4R6HFvlvkTebMhC0boQNBlTRR/KKwRuEEJytT4Oq+S83jEsSgJbSrE7vXYLyNPrln9Bl3KKJiC/
- 7OgkK7G99RqYVgfFIaGzN0RCXn3dPiHwyjE7DTNyILbzaJwavFN+QpiToiAhmAZwKyjSPfwNDh7
- opVPhbOk2/DYR1YdKs12d9WEeEuclrigJ3DPhObWDrEG9TeQjFsMwLKm6WSvX3WC1NLiUVxUhgC
- jZkjfXQ7n+NHgJ3iZrFWTyed9VtlH+s88P7Wza0=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=913; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=2iqO7eQNAV+YgDrv6QeqkeUmG4rDnaxv9v7CVkxZzwk=;
+ b=owEBbQGS/pANAwAKAQx0Zd/5kJGcAcsmYgBoUqpIOh+pePAfrUw9h11M1LbpjtWPktc4wOq4A
+ eYyf2THEs+JATMEAAEKAB0WIQSf+wzYr2eoX/wVbPMMdGXf+ZCRnAUCaFKqSAAKCRAMdGXf+ZCR
+ nCVWB/0RELPYGv01SjxvDftWfmQ9L9dLEyHXry0UNyxoHcG9pWCxLMD5GUyHw/bewdnSLMlAd4q
+ Jr6Obc8ClsM4S0JBc5LPvR4Zx8i8OPPvl+vIpKjpyLvk5gnny61k0M7pPNZgFi9s7Co8IZf7RN9
+ eekfj0AkzClDDERXhKbO+vQCvHpcTkOjNJgUdWTa+tMEbpNRLE0yj3PQIOdaLc30GkCAJpuY9Jz
+ RYubuwtKmOit3B98Ybe1FTnCN3encL8lwTziXIo/r+bcAqdfkZaiXBLKhNv68bg5RVJACtkFGhm
+ lQj6efYOgI9WW2h4b6AGvlE+qPyOt8wnh9xXko96/C1juOXP
 X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
  fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
 
-In commit 4d494cdc92b3 ("net: fec: change data structure to support
-multiqueue") the data structures were changed, so that the comment about
-the sent-in-place skb doesn't apply any more. Remove it.
+To fix the checkpatch warning, use linux/cacheflush.h instead of
+asm/cacheflush.h.
 
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/ethernet/freescale/fec.h | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/ethernet/freescale/fec_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-index 3cce9bba5dee..ce1e4fe4d492 100644
---- a/drivers/net/ethernet/freescale/fec.h
-+++ b/drivers/net/ethernet/freescale/fec.h
-@@ -614,7 +614,6 @@ struct fec_enet_private {
- 	unsigned int num_tx_queues;
- 	unsigned int num_rx_queues;
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 17e9bddb9ddd..dbfc191bcde1 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -49,6 +49,7 @@
+ #include <linux/bitops.h>
+ #include <linux/io.h>
+ #include <linux/irq.h>
++#include <linux/cacheflush.h>
+ #include <linux/clk.h>
+ #include <linux/crc32.h>
+ #include <linux/platform_device.h>
+@@ -71,8 +72,6 @@
+ #include <linux/bpf.h>
+ #include <linux/bpf_trace.h>
  
--	/* The saved address of a sent-in-place packet/buffer, for skfree(). */
- 	struct fec_enet_priv_tx_q *tx_queue[FEC_ENET_MAX_TX_QS];
- 	struct fec_enet_priv_rx_q *rx_queue[FEC_ENET_MAX_RX_QS];
+-#include <asm/cacheflush.h>
+-
+ #include "fec.h"
  
+ static void set_multicast_list(struct net_device *ndev);
 
 -- 
 2.47.2
