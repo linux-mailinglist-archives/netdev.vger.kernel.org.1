@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-199110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9BEADEF50
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:28:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A76ADEF55
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:29:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0BB406C7C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:26:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6C0A3A7006
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262392EE281;
-	Wed, 18 Jun 2025 14:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5A72EE5FB;
+	Wed, 18 Jun 2025 14:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLHdTVfh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULqi2OtX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F018B2EB5A8;
-	Wed, 18 Jun 2025 14:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220D82EE5F7;
+	Wed, 18 Jun 2025 14:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750256683; cv=none; b=gR27LZ2Y3JL96lRLaMlh9UhFK1NXB9z2u18gPYQr2qYaj5fg7TRIYKVAJwCbLtxJlZqXc0NrWIv7x9g5v6zXvUOprqe1U3yeR4AzdAF4e+hR0JghrW8Fz0R+BW1J/aXvmiYkPBi4rGS1/QATaWgEw4XIGroB44P2NVndqfraXUA=
+	t=1750256685; cv=none; b=QvwkjbbmciSKxUBKcxje8FmpSx0aMYrQE6NglNzA+fruMCZ/vHckMDSdF5y2RJ+jun3oh5YVzC+IM16P1Pqpou4XOZnhCihS/hwlYCz8ei370J4xn/S43ykgHEnhZ+oD2aP3SeGCR4Wewm0/gr5F9PPLmqQ+3ZZBee21Cq0azwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750256683; c=relaxed/simple;
-	bh=5X69klc0I5PpzlSj7ikkdfXm51zSMkRP81iDMAIdLbs=;
+	s=arc-20240116; t=1750256685; c=relaxed/simple;
+	bh=YMnNgfS5IcXRGDhGxBj9UTTtfo/Re9Qj3nh2BIc6ugE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Q0znqnH+XmJ82o9DKIsZaywsVMKCumz4tdcHZAEryBluhI5sHNw70cpzgiP5EK9rzqGqCu7TzrQ8aKH4Uyrg0zRoLes6OEDMr57hWkmR5weryypqEjRJgbtQk0Bmqs5Lc4AZNc/1WTYFQcvBBYVI6wZ1qk8AaPWATz0SgWLEAq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NLHdTVfh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA30AC4CEEE;
-	Wed, 18 Jun 2025 14:24:40 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FTObjvHPMkvZFhetzDG8FBcSLlg4+ri33LePKoHYuiZJIeiX0IvLei5AHKh/nLQFaYCvWNoad79JeTr5S72DLqqOA0k5nVV4S7s60CTTw32SNc82f0GjQNFQoKdIqNvdzu/c5pRtOeqIE/SkhH2ppExVvf47u05T80dEaezMPFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULqi2OtX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090DCC4CEE7;
+	Wed, 18 Jun 2025 14:24:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750256682;
-	bh=5X69klc0I5PpzlSj7ikkdfXm51zSMkRP81iDMAIdLbs=;
+	s=k20201202; t=1750256684;
+	bh=YMnNgfS5IcXRGDhGxBj9UTTtfo/Re9Qj3nh2BIc6ugE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=NLHdTVfhf+n09kp2/BsHGxYMJOUEDMSvfM9bPGpayWSnxgFXSeDYVer+kaP0e2a2N
-	 6AFVVqeLpBlqgSjo4cfx+PkGIRUr0BB4jgwtEzfDHDu0VeFQEny2rvlZm5PnyXanRJ
-	 mI5w9o2GwhqIPV+GSD/R3VTkMMgA8hIjVh5lu8KEH+xSmbJQJg6RBJCODjkr7frczt
-	 doGj0PItYd6guPnAAPniHArgqhut7BJhiHNCyyMvnY0gF6Iqfv3dyDCmQcI6ZS0A7F
-	 aVZB6ozSZtpu9iaqSHnPf3nW7F2Jrmcyq2+uufQOjAWuFsKW/Qqpiaf7FJ45KNtRgD
-	 ZsCn+JFkEcMOA==
+	b=ULqi2OtX/7uQ/OyVEFJUJbHWJf3scVmdfB1Syvh1A4yU2en3qY22gH5zbO+8gRnRa
+	 hkbFmDA2P6JVzt1LFORxfc146FtCnKyYkkEofHabLnYIa9NegiYDfilBFz4uDXKRiQ
+	 5uR3h8wbJ4IRinqaWjy5tSJJYJtD7kVJaSQ1TDeh9IJoA1LjQMR/fQtzGIqwspuouy
+	 oK6qxAsRjkOo6Wgp8EBDzVwUXpIfaNSA6jmunz57dkdgBW2yAuxrzAhbNVpGqagV6j
+	 AQFHZkqiiWnGTZdk0nigGjp3zDt1t+72/V4fBpgOev4AvDA6e8kagEYHVa83WlxwJs
+	 UkakWSC6iLfKQ==
 From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 18 Jun 2025 10:24:20 -0400
-Subject: [PATCH v15 7/9] ref_tracker: add a way to create a symlink to the
- ref_tracker_dir debugfs file
+Date: Wed, 18 Jun 2025 10:24:21 -0400
+Subject: [PATCH v15 8/9] net: add symlinks to ref_tracker_dir for netns
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250618-reftrack-dbgfs-v15-7-24fc37ead144@kernel.org>
+Message-Id: <20250618-reftrack-dbgfs-v15-8-24fc37ead144@kernel.org>
 References: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
 In-Reply-To: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>, 
@@ -74,159 +73,82 @@ Cc: Krzysztof Karas <krzysztof.karas@intel.com>,
  dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
  Jeff Layton <jlayton@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4548; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=5X69klc0I5PpzlSj7ikkdfXm51zSMkRP81iDMAIdLbs=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoUswZRy4G7laETNP8iYtaM4jXEjG6wT1hnrchO
- CixQWnlh3qJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaFLMGQAKCRAADmhBGVaC
- FZocD/9FIdqyye26ITj4dkHQP+/w8rMXrzB//J5h34BcHu5Avlrgjr+fRQTYN07cws9TQTXQKDF
- H1Ykh37fmprvQqyXXXjpe6T6SxfWBbWz8svJyUe62aAG2IPOAcMGkKm1bU564ijNkwFiYC94ffk
- vhbdrXV8Se8dbzj2P9WKYJVDdJrsia79ChZdyTELowz0QauGzw+VP14RiPLlP1LO4JvqnMTlnpM
- +oEBw5uXDR/X2mLdIcNu2LHvL/hS0SLWCYG0IPCZK0wcAWihK98WAQjwYPyK3toRikgqxTCHTsD
- EkNPl0xQXiH580B6nxkk43yig1zHOQGBITHcdEWHRixChIli8RvSVAL4/M9tg3x60qIvJe0YiQd
- iSIyE82WGIEmVqqR1b3h7IQ6eLPX/LvzPJ3RcdeVUfw3AzCS6eA9Y/gFaFwjDz24AgOpGf2yDB4
- QulbwmYnmZOlz7carI0FlYepCY8DDdctusqUgE8Y/Uk0yHhjRTCsfIq+ZdnJ6A36+ciHH7Igg5J
- w9L/S1CMlSPdY7hJRWWIeSd0yzz8/fj7TsGEq0iBXlkd1DWyndF5Ad0wQ8BkNmaF7uY2/dVyoFQ
- gzJ+9l5maT08SeJrZp6r66avIHCPZOu16MAK5S9BTLFgrXycWRKy9lFQ7lWgeNnXGOO7rw5wLCc
- xf/aF+dgG8Btj3Q==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1850; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=YMnNgfS5IcXRGDhGxBj9UTTtfo/Re9Qj3nh2BIc6ugE=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoUswZ2MQDxuR/bgGgaU7roXXK3jAFb6b+3gRcS
+ 2Gh2m6jG66JAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaFLMGQAKCRAADmhBGVaC
+ FWbzEADGmjNlfCIKt1Gur8k7XtE/w1mW0K4oZJEjKP6do61OM8e8nqjb9qNpTPPNIqPRS8ksLAT
+ 7fxTEm8eKTPUzIFDNRl6j5gL5lCtGFR0ZLLdC7VrHQzVuNhoXyKTKKkWxnrwIIdLS7nGwI5p1VM
+ w6e5BGFGMJgplw18uRbfjP5B6WJx+L6Q/2MfGXx+TwMiJRZMKKDmnTz6qVtd252m0a9ZDf4KWZE
+ a2VD/tO/NU6T+ix4piM6P6WhS7rUpMzfdMVDtQ/k1hGIJaWTNDkawiaf4l6tT44Us5F9uSBCHRS
+ DW8Y/xShIRKCT6qviKNXeDEZ/DG21lX3PDhJelE+hvsc3E+Co6FD/5p3ZLIBIbvt1dgGPof0+tH
+ K1er113ZqMhxLFjGI6iWU1Vr9rXsdm7jvkTfkIJNl9a20/ltGUQ6uF5aVgmLRhf7cmihN616Ht3
+ bZKen7vLJ5IRhAVR/Zf/VPwJdajFITJbfqnSyBFiXA4zKGG+GkJzaecll2x/BZrZKa1SejAUqVN
+ +GRWo0tm5msdh1EaliOk00PjSzeTh8KLepeEmLJlW4ppgsa1kJcmR3BVr1GfuGpwXExPb5MA6/o
+ j2YhxO9fLrNhuHZnFoiE9aqKMcIexE8krjzHceVH0zikTPxGYwqROKhVDMlgdyT0NjdaDQewznW
+ Dli1BSjXtLm6TjQ==
 X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
  fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Add the ability for a subsystem to add a user-friendly symlink that
-points to a ref_tracker_dir's debugfs file. Add a separate
-debugfs_symlinks xarray and use that to track symlinks. The reaper
-workqueue job will remove symlinks before their corresponding dentries.
+After assigning the inode number to the namespace, use it to create a
+unique name for each netns refcount tracker with the ns.inum and
+net_cookie values in it, and register a symlink to the debugfs file for
+it.
+
+init_net is registered before the ref_tracker dir is created, so add a
+late_initcall() to register its files and symlinks.
 
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- include/linux/ref_tracker.h | 11 ++++++++++
- lib/ref_tracker.c           | 50 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 61 insertions(+)
+ net/core/net_namespace.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index 28bbf436a8f4646cfac181d618195a9460bda196..e1323de93bf6b891aa14ad8d9b4b28d02e10f9f7 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -29,6 +29,7 @@ struct ref_tracker_dir {
- #ifdef CONFIG_DEBUG_FS
- 
- void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir);
-+void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...);
- 
- #else /* CONFIG_DEBUG_FS */
- 
-@@ -36,6 +37,11 @@ static inline void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir)
- {
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index aa1e34181ed6f353921a23411fa227b612db661a..45de05d8f0877a4e717bdad4ed776ae27f98944a 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -791,12 +791,40 @@ struct net *get_net_ns_by_pid(pid_t pid)
  }
+ EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
  
-+static inline __ostream_printf
-+void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
++#ifdef CONFIG_NET_NS_REFCNT_TRACKER
++static void net_ns_net_debugfs(struct net *net)
 +{
++	ref_tracker_dir_symlink(&net->refcnt_tracker, "netns-%llx-%u-refcnt",
++				net->net_cookie, net->ns.inum);
++	ref_tracker_dir_symlink(&net->notrefcnt_tracker, "netns-%llx-%u-notrefcnt",
++				net->net_cookie, net->ns.inum);
 +}
 +
- #endif /* CONFIG_DEBUG_FS */
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
-@@ -85,6 +91,11 @@ static inline void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir)
- {
- }
- 
-+static inline __ostream_printf
-+void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
++static int __init init_net_debugfs(void)
++{
++	ref_tracker_dir_debugfs(&init_net.refcnt_tracker);
++	ref_tracker_dir_debugfs(&init_net.notrefcnt_tracker);
++	net_ns_net_debugfs(&init_net);
++	return 0;
++}
++late_initcall(init_net_debugfs);
++#else
++static void net_ns_net_debugfs(struct net *net)
 +{
 +}
++#endif
 +
- static inline void ref_tracker_dir_exit(struct ref_tracker_dir *dir)
+ static __net_init int net_ns_net_init(struct net *net)
  {
- }
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index c938ef56954b2169458e9b23a3db2441bcf91aa6..6608520d6118685a9cfa497827f6a89318b3360c 100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -44,6 +44,7 @@ struct ref_tracker_dir_stats {
-  * dentries asynchronously.
-  */
- static struct xarray		debugfs_dentries;
-+static struct xarray		debugfs_symlinks;
- static struct work_struct	debugfs_reap_worker;
- 
- #define REF_TRACKER_DIR_DEAD	XA_MARK_0
-@@ -55,6 +56,10 @@ static inline void ref_tracker_debugfs_mark(struct ref_tracker_dir *dir)
- 	__xa_set_mark(&debugfs_dentries, (unsigned long)dir, REF_TRACKER_DIR_DEAD);
- 	xa_unlock_irqrestore(&debugfs_dentries, flags);
- 
-+	xa_lock_irqsave(&debugfs_symlinks, flags);
-+	__xa_set_mark(&debugfs_symlinks, (unsigned long)dir, REF_TRACKER_DIR_DEAD);
-+	xa_unlock_irqrestore(&debugfs_symlinks, flags);
-+
- 	schedule_work(&debugfs_reap_worker);
- }
- #else
-@@ -451,6 +456,45 @@ void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir)
- }
- EXPORT_SYMBOL(ref_tracker_dir_debugfs);
- 
-+void __ostream_printf ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
-+{
-+	char name[NAME_MAX + 1];
-+	struct dentry *symlink, *dentry;
-+	va_list args;
 +	int ret;
 +
-+	symlink = xa_load(&debugfs_symlinks, (unsigned long)dir);
-+	dentry = xa_load(&debugfs_dentries, (unsigned long)dir);
-+
-+	/* Already created?*/
-+	if (symlink && !xa_is_err(symlink))
-+		return;
-+
-+	if (!dentry || xa_is_err(dentry))
-+		return;
-+
-+	va_start(args, fmt);
-+	ret = vsnprintf(name, sizeof(name), fmt, args);
-+	va_end(args);
-+	name[sizeof(name) - 1] = '\0';
-+
-+	if (ret < sizeof(name)) {
-+		symlink = debugfs_create_symlink(name, ref_tracker_debug_dir,
-+						 dentry->d_name.name);
-+		if (!IS_ERR(symlink)) {
-+			void *old;
-+
-+			old = xa_store_irq(&debugfs_symlinks, (unsigned long)dir,
-+					   symlink, GFP_KERNEL);
-+			if (xa_is_err(old))
-+				debugfs_remove(symlink);
-+			else
-+				WARN_ON_ONCE(old);
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(ref_tracker_dir_symlink);
-+
- static void debugfs_reap_work(struct work_struct *work)
- {
- 	struct dentry *dentry;
-@@ -459,6 +503,11 @@ static void debugfs_reap_work(struct work_struct *work)
- 
- 	do {
- 		reaped = false;
-+		xa_for_each_marked(&debugfs_symlinks, index, dentry, REF_TRACKER_DIR_DEAD) {
-+			xa_erase_irq(&debugfs_symlinks, index);
-+			debugfs_remove(dentry);
-+			reaped = true;
-+		}
- 		xa_for_each_marked(&debugfs_dentries, index, dentry, REF_TRACKER_DIR_DEAD) {
- 			xa_erase_irq(&debugfs_dentries, index);
- 			debugfs_remove(dentry);
-@@ -471,6 +520,7 @@ static int __init ref_tracker_debugfs_init(void)
- {
- 	INIT_WORK(&debugfs_reap_worker, debugfs_reap_work);
- 	xa_init_flags(&debugfs_dentries, XA_FLAGS_LOCK_IRQ);
-+	xa_init_flags(&debugfs_symlinks, XA_FLAGS_LOCK_IRQ);
- 	ref_tracker_debug_dir = debugfs_create_dir("ref_tracker", NULL);
- 	return 0;
+ #ifdef CONFIG_NET_NS
+ 	net->ns.ops = &netns_operations;
+ #endif
+-	return ns_alloc_inum(&net->ns);
++	ret = ns_alloc_inum(&net->ns);
++	if (!ret)
++		net_ns_net_debugfs(net);
++	return ret;
  }
+ 
+ static __net_exit void net_ns_net_exit(struct net *net)
 
 -- 
 2.49.0
