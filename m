@@ -1,143 +1,164 @@
-Return-Path: <netdev+bounces-199079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0B82ADED7B
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:09:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 710C6ADEDB1
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFCEA1770E6
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:08:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 249753BDD2D
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4502E9EC2;
-	Wed, 18 Jun 2025 13:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679632E8DF5;
+	Wed, 18 Jun 2025 13:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="GRVyP+7X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7rzJfxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5112E7165;
-	Wed, 18 Jun 2025 13:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918DA2DFF3C
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 13:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750252061; cv=none; b=CD8ciQZB/6FUC9M3n9lxAXTCK4+8u8WPoRT9YpyaloFWf0Xb/tj7wRippb+369xdHDWtRvyBt5SxCm2MQiBzWhdnJ8xqoBQPZFQXrc8WOCSGYSjIkCcuMLBg8/9/JTT7w0+rgReRc3ee7Toc+uuhQYiwkOibhQsQ4elCmJ8o5tU=
+	t=1750252876; cv=none; b=WS2FOYEqS8hAKNSyEzHXS/foPHfXU0EnAUAOlVho/a8Vkq3GVMAf8/Kp1OsW2GVJv9gtSry9+h82b33HBeOy57FfDu0y3TAO57kAxeibnUDA9cV36ZjRVD+QA9gseEHSa/Gs9A9YhSCZaEr3ddlHBeVLbrKPAezYiKwKVU1MMJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750252061; c=relaxed/simple;
-	bh=t6vAFDzDrK8ZzVOZlXu8C77KiX06i6EU6js6nROcR/M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o9wDj8cjF8N6WwX5FPYfajeXFUquiy07gAiY6gBu40qZ6/oJlxDrdwUHicxMay5ly3Jn0QUTKxt73gV6mA9D9rgFeO7n73GVwFY4pM3aX35tvyyD6QzrHkQ5Ick2nAb1G0X9QhyWUjFA/s+Nb/6VQT9EPbRrVSplz81CdzVnjOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=GRVyP+7X; arc=none smtp.client-ip=134.0.28.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout2.routing.net (Postfix) with ESMTP id 185E260300;
-	Wed, 18 Jun 2025 13:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1750252051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R8TYFDiksgklK5x53zlk7GXLxBUpXGWS8/QWLup/HFY=;
-	b=GRVyP+7XYwHbXbkkIjsdwALJCy1LgQQ4gMFDDlrU8flaPcT0imKCGtA714W+91mShFL2xh
-	+M7y+joguRtaK1mrIkaqVgxwRzG7/VHtrgYLkUnrBCFgARcWU8HrLWFQdLYBsr1pvp31qZ
-	EraoDOvtRLRFGuY7igtcnnwxmgz81m4=
-Received: from frank-u24.. (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id D31F2122703;
-	Wed, 18 Jun 2025 13:07:30 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	arinc.unal@arinc9.com
-Subject: [net-next v5 3/3] net: ethernet: mtk_eth_soc: skip first IRQ if not used
-Date: Wed, 18 Jun 2025 15:07:14 +0200
-Message-ID: <20250618130717.75839-4-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250618130717.75839-1-linux@fw-web.de>
-References: <20250618130717.75839-1-linux@fw-web.de>
+	s=arc-20240116; t=1750252876; c=relaxed/simple;
+	bh=kT0Spwcq+vogP8F2a8/Wd2vNFi9nvabufuc5xT+bLyQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lVoO0xTVLHIzF2/jXlGRx7fFRNMAzqD4Gkald48vnWYMfYMscVh/7tFcf2Xnu3Jlt3f9m9XBXA4xepkgLpTFtfJXShak1uREp/PomTQYUEeknfx4YJr8C8/gDbYHwmfJkK96JHkBmueZHTg/2+OIMFhWp4vlcfxp454abuU3v68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k7rzJfxo; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6077d0b9bbeso12624255a12.3
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 06:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750252873; x=1750857673; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ILlB2y1mDBr74OFUoZhZeCUrTGp8IjTl6Y5tgDyynyg=;
+        b=k7rzJfxo+9mLNSo7YOwZv0PYXKPyPo+bpaJQtb2ltSyqbORCGJS88V0BflmKSdOxYg
+         AqbYAep8N/R+tFmw0b5j7XWxzh2dKsfmfRzzk3vN8ihaf3tgA93aZUyYu4jWjo81DdwH
+         VTuI0z32apjbUUtyVN7daCMeSkZDHf8U/FJlL82QnVv3+UjSzdD0DTNj01ZWI/Td6jaB
+         M2F9dhonFB4ngOPMzG4mUQplibWTwHfJVBB9GQQNiRRS5Lh4Pj1MzRCdFcEG+xI11Fbr
+         AxFLYE4GlGALgyskgzVG+4BTASMAzrSQGVCdCKP++o+9y+fzzl2rep6rv7k+DGdASZQB
+         rALg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750252873; x=1750857673;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ILlB2y1mDBr74OFUoZhZeCUrTGp8IjTl6Y5tgDyynyg=;
+        b=CGkaBHlE7aNmNc4VojghPEOnSAgo0a7FGZQ8e58I4uXyjOvmqfwhCnrGTxuEdSa1xC
+         9tu6Pu5g1a0+RPU1/3Ru8nH4St8hjXJ0QrB8gKMgju+8aiw/gjfoLGH5drORQLo+3rGe
+         Af5GtlbrT6gmIJdEazpvm7qXbVZOxp1/Y4A6BhMHWeffANh0Kbopa3igN3vyiIOEVMij
+         tFomqbbbyUZv6ElEqYVZ/Q4lT7tHHVpycaGrG5BNKXZ39CehKsCxvMuTABPNyMUFMXzr
+         HGLIQv5Q7DI6jCoCXOSG5IxX3rWKGpPo/s4BgOhEsQGjDWfZ9QN+8MemSfLqSz/V7Nrp
+         IKLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXigQ+9dy6TvzmL1j3E4jO2vR0jP4mJNgFc4ui1IsNrOr5/1bobOyx98vgfp+Z1pSODVyLRB7o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCdTENC4G6SEJPAuNmDEJhU2ZyeLSTK/DKhfXq5ErnVi67hOH5
+	9qK0QTAuEt4l5kr94qMM09Nd1Q7aVVDlH1djN3YIEmeNuwcu4oJqb9F1RVq5cYVUECf2wM4nw9+
+	qCKUIxQnn0WOn+NE58dDFG3Lm4OPx+24=
+X-Gm-Gg: ASbGncuoGhmUQ8YRvND6Uy37re91fmc9DGJ+xyetbpeIqF/D3I4qINDJdBhxtLJWrCZ
+	FShZs3nPMA6gnOfnxYZuhmBw9CoxZHSZhI2Ay1KAD3plDvN2V+nrlGfNghyVLtnX7YbkRMOXyUi
+	JQLGc74zz1WLcx/vX+XcKlAfCf8asU2PefJbEwma99y3Zh
+X-Google-Smtp-Source: AGHT+IHh9IHQiF5HWHtF8YGKvn675M5sQc7BHyjXFld0V7pc0Q44BolF0XABqI94KltSlDplNoXwKFj6lv9bXFeQUQI=
+X-Received: by 2002:a05:6402:2786:b0:607:116e:108d with SMTP id
+ 4fb4d7f45d1cf-608d094bf38mr15081690a12.21.1750252872624; Wed, 18 Jun 2025
+ 06:21:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250617094540.819832-1-ap420073@gmail.com> <CAHS8izNXHvavBAWyyvwzwFh6CgaBhCnvQvtMsE4B2CHVm206hg@mail.gmail.com>
+In-Reply-To: <CAHS8izNXHvavBAWyyvwzwFh6CgaBhCnvQvtMsE4B2CHVm206hg@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 18 Jun 2025 22:20:59 +0900
+X-Gm-Features: AX0GCFvcn0tPGH_1iTBLmfJx47U_lxi75NJPo6NONd33qGNxhP_ip0WpSBJpyhA
+Message-ID: <CAMArcTVpYct8FP1r3UsVaHDW+fSY6FG9NNmhDfyiTjgCkiYsxw@mail.gmail.com>
+Subject: Re: [PATCH net-next] eth: bnxt: add netmem TX support
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pranjal Shrivastava <praan@google.com>, Shivaji Kant <shivajikant@google.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Pavel Begunkov <asml.silence@gmail.com>, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com, 
+	pavan.chebbi@broadcom.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Frank Wunderlich <frank-w@public-files.de>
+On Wed, Jun 18, 2025 at 5:14=E2=80=AFAM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
 
-On SoCs without MTK_SHARED_INT capability (all except mt7621 and
-mt7628) platform_get_irq() is called for the first IRQ (eth->irq[0])
-but it is never used.
-Skip the first IRQ and reduce the IRQ-count to 2.
+Hi Mina,
+Thanks a lot for your review!
 
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
----
-v5:
-- change commit title and description
-v4:
-- drop >2 condition as max is already 2 and drop the else continue
-- update comment to explain which IRQs are taken in legacy way
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 12 ++++++++----
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  4 ++--
- 2 files changed, 10 insertions(+), 6 deletions(-)
+> On Tue, Jun 17, 2025 at 2:45=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+> >
+> > Use netmem_dma_*() helpers and declare netmem_tx to support netmem TX.
+> > By this change, all bnxt devices will support the netmem TX.
+> >
+> > bnxt_start_xmit() uses memcpy() if a packet is too small. However,
+>
+> nit: this is slightly inaccurate. memcpy itself is not a problem (via
+> skb_copy_from_linear_data) is not an issue because I think that's
+> copying the linear part of the skb. What is really a is
+> skb_frag_address_safe(). Unreadable skbs have no valid address.
+>
+> This made me realize that skb_frag_address_safe() is broken :( it
+> needs this check, similar to skb_frag_address():
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 875e477a987b..7990c84b2b56 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -3354,10 +3354,14 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
- 	 * the second is for TX, and the third is for RX.
- 	 */
- 	for (i = 0; i < MTK_FE_IRQ_NUM; i++) {
--		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
--			eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
--		else
--			eth->irq[i] = platform_get_irq(pdev, i);
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
-+			if (i == 0)
-+				eth->irq[MTK_FE_IRQ_SHARED] = platform_get_irq(pdev, i);
-+			else
-+				eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
-+		} else {
-+			eth->irq[i] = platform_get_irq(pdev, i + 1);
-+		}
- 
- 		if (eth->irq[i] < 0) {
- 			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 8cdf1317dff5..9261c0e13b59 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -643,8 +643,8 @@
- #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
- 
- #define MTK_FE_IRQ_SHARED	0
--#define MTK_FE_IRQ_TX		1
--#define MTK_FE_IRQ_RX		2
-+#define MTK_FE_IRQ_TX		0
-+#define MTK_FE_IRQ_RX		1
- #define MTK_FE_IRQ_NUM		(MTK_FE_IRQ_RX + 1)
- 
- struct mtk_rx_dma {
--- 
-2.43.0
+You're right!
+The real problem is the skb_frag_address_safe(), as you mentioned.
+I will fix a git commit message in the v2.
 
+Thanks a lot!
+Taehee Yoo
+
+>
+> ```
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index c05057869e08..da03ff71b05e 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -3681,7 +3681,12 @@ static inline void *skb_frag_address(const
+> skb_frag_t *frag)
+>   */
+>  static inline void *skb_frag_address_safe(const skb_frag_t *frag)
+>  {
+> -       void *ptr =3D page_address(skb_frag_page(frag));
+> +       void *ptr;
+> +
+> +       if (!skb_frag_page(frag))
+> +               return NULL;
+> +
+> +       ptr =3D page_address(skb_frag_page(frag));
+>         if (unlikely(!ptr))
+>                 return NULL;
+> ```
+>
+> I guess I'll send this fix to net.
+>
+> > netmem packets are unreadable, so memcpy() is not allowed.
+> > It should check whether an skb is readable, and if an SKB is unreadable=
+,
+> > it is processed by the normal transmission logic.
+> >
+> > netmem TX can be tested with ncdevmem.c
+> >
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+>
+> Seems like a straightforward conversion to using the netmem dma
+> mapping API. I don't see anything concerning/unusualy.
+>
+> Acked-by: Mina Almasry <almasrymina@google.com>
+>
+> --
+> Thanks,
+> Mina
 
