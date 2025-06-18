@@ -1,108 +1,135 @@
-Return-Path: <netdev+bounces-199115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A1CADEFFB
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:44:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C0FADF02F
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77EEA1888FFA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:43:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181FF3A2BF3
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C58D2EBDEB;
-	Wed, 18 Jun 2025 14:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA9619ABB6;
+	Wed, 18 Jun 2025 14:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LtAPE+X9"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="Nbknur+1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxout1.routing.net (mxout1.routing.net [134.0.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BCA2EBB97
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 14:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CDAF9CB;
+	Wed, 18 Jun 2025 14:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750257785; cv=none; b=iclleGRd47GHRWKNrhmo0UPdd7jSn8XVdCrigMTTwSjMnxVmG4u0fNwoFioBh1ZLMl7rEnll5ET4wXz4X+8sO6UMa087zMAXFWbcOjNB87qJzFHjfbwd5Hoosjlz3YEbh24GKB+ebKkDTFqsnXeoB5bYCOo8huVWBjio+B7W1t8=
+	t=1750258224; cv=none; b=PlKglEolCdQFpgZBSkjPWx6cCrlOkA+cuOezxJJRall9xuE2JdotQ7neSQg9gMzpocooqLGdtZ4AqdvI3eKqV31M1QYCKlxNlQ5JpNRx7eogebF/64GKhaQxl6Q1DVfo6GtQt55I42z5cKUK9fVg3+pVPCbmPokfOHOQc9gf1lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750257785; c=relaxed/simple;
-	bh=sivnm0xuPxOT6Mjxg93688oMuAlEBbuGA/VVxeCY0XY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DNXP32e7jZZAAnbZUThKttlRr8ddpjIcuxqhcESbtXviEzgn5e+RaU0l396smcKPSSCETezHQcBnsYZCtvmrko94dp42sspyHWHEOk/z35G2V/5VqhCHoXLb1hyEYgBNeYSOlDArnsACLQILcB1fXnuVuNJJeEImQTWrLEiCtw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LtAPE+X9; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a522224582so3915794f8f.3
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:43:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750257782; x=1750862582; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ae0v2pviLHYCneMRFhUDA2jcfp6LP3hX/XjdANdjOxY=;
-        b=LtAPE+X9IeMi9tTkVUvKBlfR7DwDHkLRjG6NTfP6duXhWsHGxbfEcGU3bevzBS0bRT
-         zFAz4DGshCQM8eJbXQpNHx1V8q0itRes5w6W2AxmuIo0hZB21wErD2b7edw3QitAs3ur
-         TuXNoTPlwg2wzYasXEO6Hj+7+EHFhB9k9n3J1o+o19bwPvLUsep7WRJtUhBI9hyKvrkQ
-         VuMKmBdT8pvfbZJPhLwYKPfr4ec1wGyEyFZ6WZUkT4qT/omOY9gbmDWfLAIC0eU+Amqj
-         +p+jk4A6lDEcWJ6Wn9jeb7n8RAGN9q6wDTpYFA2l79ohEe/v26Ys/nxdRbRQK1kaUDht
-         ZMSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750257782; x=1750862582;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ae0v2pviLHYCneMRFhUDA2jcfp6LP3hX/XjdANdjOxY=;
-        b=A4U8vP0FrQdAglXz8r6A94reRLg/UHuPGTzITJTh/U1OlfZgzqeV1odh/8pjvZXDdm
-         YVMxVoPgsXpxTr1JMc3fXntUK4FEkwmNRXxjovk2Qdt7umOTJhCmpaca+aOAkzQUQcHa
-         Gh/qYg/2b3d5FBuSWoNIpI9YuuNVmX50nMQsHjfYhRbC15OpsFQOK6IIO+DWI9oOVtcn
-         GwPtm3q09hBOj8lEj6RbY5ERHOqekkcdjprPKXYAfYuaBVhQKjxZnRTZRZNqAXQYsP6d
-         6vhH7Lz5RtM9rb10sB/+kegZrF3caP5/QWFgvLkc+2MkLy1V/Q/W0KlyjXJr2h7+5Oqw
-         EbDA==
-X-Gm-Message-State: AOJu0YzSR5KPgknfPgqI505pSBZgWqw8TvWa10DAjb1D2FgWm2fXJuIH
-	t1TQiA24QySMTqGPB/ZfrLF0OYNgjEYsPd/zc/dWqQWrre/pXqC1Lt6i
-X-Gm-Gg: ASbGncsS19GiI9EsqVcrqW6ADN1DY4/GLJR8Xy/UDBC0uWzMiNvRL6Tntho/bWWflvC
-	WpIKBXFyoS1fi/3/wGLGif1wb1R12hTolu/jQgDhL07jEQhGhJJqTZNh88I3mXvVpoM95iEmqF+
-	qZq5kdWMWx+Cnwqn3ofUdPlk0+/d5hMqp8wq+8L8RIX1NZ6Qsue8yxwd30Nf6ECtQvBqeq6/17y
-	gb3/kTs27bJBNdnJ1ozS2SXtjcxYknaeJKR9MvizNuW3Ai3j804Yt0oYngTDgx5kJrwHMaXYybp
-	D/YC4FHy7OSWofmz9umTDzaJH4JPxBHV+MwZhE+lXMi2FPrQ64hTAVUzHYQSneAFVVJzv1HNsgW
-	6BDPIzWuPC/+s2SiEQBmBp4mq1ubsRMpBS6KdVesE8MdbWQ9o5w==
-X-Google-Smtp-Source: AGHT+IFNWdKpnJh3ecj8GI5ZqF0XSASnDLq74mHgd46W/l9Hk+vzZjz23xRQLNEYTjFxTF39X7HNOQ==
-X-Received: by 2002:a5d:64c2:0:b0:3a5:2d42:aa25 with SMTP id ffacd0b85a97d-3a572e55b64mr13650236f8f.50.1750257781871;
-        Wed, 18 Jun 2025 07:43:01 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a547d2sm17507523f8f.19.2025.06.18.07.43.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jun 2025 07:43:01 -0700 (PDT)
-Message-ID: <d600aff4-3e4a-4664-a247-c44fdba6681a@gmail.com>
-Date: Wed, 18 Jun 2025 15:43:00 +0100
+	s=arc-20240116; t=1750258224; c=relaxed/simple;
+	bh=fB7KyoRN2gpN9HFgeI9W3VaZODcts6RtL/092DIdZ7o=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=dnHhWXbs1AJKIFzNCnObYx3/XIPbPa8jklieErT2x1JJR9l/FVh3WXS/yuZJBUKRb1Mpq83iUjsxTY95QeDCI4Dam+mZ/Ry0tHiNvMmi94xVu0NdH0o3/cRic8a5u7XfwlaK7nnWfdcOAURxIqiCwJZk714FjEqRNdOfpQR4Mj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=Nbknur+1; arc=none smtp.client-ip=134.0.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbox3.masterlogin.de (unknown [192.168.10.78])
+	by mxout1.routing.net (Postfix) with ESMTP id 3474E41ADE;
+	Wed, 18 Jun 2025 14:50:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1750258214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N7tr9vCzas4Dcx7c2Tgeu4LP6gHZKQuy1GdaO/TFlr4=;
+	b=Nbknur+18KqPDja5RX/s65/bE/pPe42K7+j6BqbbBZ2lfnz1+IlheE52B92cm6xDpE+eM3
+	+1J2JXUED1AfYvVCBLE/WbHiocrItKJfci05mR4apGeGPAdDixOTM5mR2MMA0ap8wmz/zh
+	dXnO3+qaeB8OGQJndQ74liL4RhdsOEM=
+Received: from [127.0.0.1] (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
+	by mxbox3.masterlogin.de (Postfix) with ESMTPSA id 0453F360048;
+	Wed, 18 Jun 2025 14:50:12 +0000 (UTC)
+Date: Wed, 18 Jun 2025 16:50:13 +0200
+From: Frank Wunderlich <linux@fw-web.de>
+To: Daniel Golle <daniel@makrotopia.org>
+CC: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Simon Horman <horms@kernel.org>,
+ arinc.unal@arinc9.com
+Subject: Re: [net-next v5 1/3] net: ethernet: mtk_eth_soc: support named IRQs
+User-Agent: K-9 Mail for Android
+In-Reply-To: <aFLFYe8mq4tbLfdf@pidgin.makrotopia.org>
+References: <20250618130717.75839-1-linux@fw-web.de> <20250618130717.75839-2-linux@fw-web.de> <aFLFYe8mq4tbLfdf@pidgin.makrotopia.org>
+Message-ID: <601853CD-F47A-452A-87AC-668E73A3E971@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] eth: sfc: sienna: migrate to new RXFH
- callbacks
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org
-References: <20250617013954.427411-1-kuba@kernel.org>
- <20250617013954.427411-3-kuba@kernel.org>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20250617013954.427411-3-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mail-ID: e609ebad-906a-455e-bb64-4bc71f18ceb5
 
-On 17/06/2025 02:39, Jakub Kicinski wrote:
-> Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
-> add dedicated callbacks for getting and setting rxfh fields").
-> This driver's RXFH config is read only / fixed so the conversion
-> is purely factoring out the handling into a helper.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Am 18=2E Juni 2025 15:55:45 MESZ schrieb Daniel Golle <daniel@makrotopia=2E=
+org>:
+>On Wed, Jun 18, 2025 at 03:07:12PM +0200, Frank Wunderlich wrote:
+>> From: Frank Wunderlich <frank-w@public-files=2Ede>
+>>=20
+>> Add named interrupts and keep index based fallback for existing
+>> devicetrees=2E
+>>=20
+>> Currently only rx and tx IRQs are defined to be used with mt7988, but
+>> later extended with RSS/LRO support=2E
+>>=20
+>> Signed-off-by: Frank Wunderlich <frank-w@public-files=2Ede>
+>> Reviewed-by: Simon Horman <horms@kernel=2Eorg>
+>> =20
+>> +static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *=
+eth)
+>> +{
+>> +	int i;
+>> +
+>> +	/* future SoCs beginning with MT7988 should use named IRQs in dts */
+>> +	eth->irq[1] =3D platform_get_irq_byname(pdev, "tx");
+>> +	eth->irq[2] =3D platform_get_irq_byname(pdev, "rx");
+>> +	if (eth->irq[1] >=3D 0 && eth->irq[2] >=3D 0)
+>> +		return 0;
+>
+>I'd rather extend that logic and fall back to the legacy way only in case
+>of -ENXIO=2E Ie=2E add here:
+>
+>if (eth->irq[1] !=3D -ENXIO)
+>	return eth->irq[1];
+>
+>if (eth->irq[2] !=3D -ENXIO)
+>	return eth->irq[2];
 
-Typo in subject: "sienna" should be "siena".
-Apart from that,
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+I would do this later after the consts are used
+ instead of index numbers,just to not add lines
+ that are changed later again=2EBetter adding the
+ lines already with the consts=2E
+
+>Maybe also output a warning at this point in case MTK_SHARED_INT is no
+>set, to recommend users to update their device tree to named interrupts=
+=2E
+
+I understand the reason behind (documentation
+ which irq is used for which purpose),but
+ previous devicetrees of non-shared SoCs using
+ at least the reserved irq 0=2E Mt7986 has 0 and 3
+ defined in dts=2E That could be tricky in binding,
+ so my way was starting with irq names now for
+ new additions and leaving existing dts as they
+ are=2E
+
+Maybe i should add the mt7988 ethernet binding change from my dts series h=
+ere=2E=2E=2E
+
+regards Frank
 
