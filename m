@@ -1,174 +1,129 @@
-Return-Path: <netdev+bounces-199279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AED7DADF9EE
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 01:55:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FA3ADFA0F
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 02:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CC11188D383
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 23:56:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA760189C85B
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B140284B3B;
-	Wed, 18 Jun 2025 23:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF844171CD;
+	Thu, 19 Jun 2025 00:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="epLsLDBb"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="nhF3BEGN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8741F09BF
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 23:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2647229A0
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 00:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750290941; cv=none; b=HiWUSy0vtIW7XE7nzbu24AADDl7TNw2pC52Tdg8ZwqVz97U3rr+fAZYylu8+LJ6lCTZqxRIy/6w7fLYiINYR+U5v44Ei9PPrirNrrJOGXPMh3jQj2KBeMPoxe1Kl6USrt6gTlNLhhX2TzZROrCQDtq13ff37hmZQJX9PeFi36pU=
+	t=1750292354; cv=none; b=B50Jx5wQHyYgRYLN5zHMKEk9FGGsnqWrGRuFTBuXuh9djhC0zJJ3N3hb0iGj1wOJo2yfZefnS2Qf/suecDhCuGkFxX7O9GwETLK12ZqHu/OTAQE7atmBJ3NuA3q7zmjj/dsIXIyXzf858IhGKhGqPE6rdIhEcDYU5dXGyVIrD8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750290941; c=relaxed/simple;
-	bh=jXiE9rzeNs/RRjF+fEh/djBAzoD6GL5vfoqjbMTJVtM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Aatw7Qx59G3LYMuZCZhgxbRlvrxcEu2TbZUPrIi00yhVdSEoxqwo0wDTQ8Idl8Z8EjwpWhAmACjFTk8IuX7sNdwKxqC/q9c+uSn+9DcqsE96eeTChqcOwsbTtVXlBFWoYVz5T9ez2dBFAS81rPWzUtnQn7KxwEQMoMwNnw9eV5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=epLsLDBb; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3de247e4895so05ab.1
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 16:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750290939; x=1750895739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OhvnUJBdUC24eZOisoPiZwhVd/LIwB2bYvJ6RT4qk7Y=;
-        b=epLsLDBbkmHP5kptTc0JsZlOWw5LmHVUQmlaOnYKZgkwi8aq9NDDJaYJBPxB4bUhp0
-         SIdzS1haD9EBI8ud71RIm1LIx4NgaT+yM3COPyw+mpvzZp2VZF+dXEhTmiTcbbjlFl6K
-         NjLajHkgthw2JUgCPzsO5LDKcDHXH+IuhOKzCdv0iz+u6U4QsP/XmILQcc56g25qesah
-         esSfc+lG8Licz36wDKwkxhMbOsh/o3waZ+vQGGyokI1ii9TqFDWcabIwbXAG+JT02MHT
-         a5FKqdKLZacGuYGWl6tA+Wdql/PRxTBJKghz7P55Vs/Zji5F1OdqlxpJuWXA43fnolPf
-         MkIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750290939; x=1750895739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OhvnUJBdUC24eZOisoPiZwhVd/LIwB2bYvJ6RT4qk7Y=;
-        b=ingFKeMsDYYbyjpn5/3XUFsMvY5CTYCFLLLZgNzf01wfANVnmwrcU+Usl+gFyWQNBb
-         Tk05jMaZx2rMkjJe3Ux57WyJNfWZWP60JcJ9I4n0koDezaIthXaE3PaiD1RjNXd5J6Ud
-         eYmCHQ0AmvNDRJ2+ggid9GUQfcI39CNddMfvqe7OX7zPPGdCRjjcQKJRvYul4QISaaM1
-         PMklJJMHZbDJDgo+tfgmiEA6NQDzv+0WYU3UYXBGRM6VLN7/Mzqz8rSFlc8lWdGQ/2CZ
-         PlMD6Iq/hA4vANP9kS2y8Tt00YUd9jPk5Em9oOKm2AMY4u34OycpYNBC26THuOGmDycq
-         W4Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8wckyRWluXMliQG752l+8lZmLdK3R6CPaBVvK1Q9kYFlDpoRwS1JbCJ5zsQQdh9CE4jxatzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6Xqwf4xnpt1CEl6rNUPCdDUgUX/InX6So3CudPOgBZgJu9pQu
-	mr7AqcD+tPmi4DNnVuq0rgohwPTHT9pMh9VRJG3oFTRevLVsc4TJ4lZ1enMihA0D4yIFvm192C4
-	fkGBw6nPSCHlCHqhjLq2fUD1dXXYjFI5W7sZapOgv
-X-Gm-Gg: ASbGncs+tSi/mZoLfA/behrYiKsTnkuJpq8MyC3nK4piXTUs9hee4mEQ296pReohzid
-	6BYmRdzAnlneP3RMFW2PPV+P1mSBFDmzZy49fa4HQ3J/uQpc5BAxz1HqFpizEnm9Vhpp3CliqGt
-	Z6N9W7AyRjEzLuZcmiaWG7Wz7iW9zEJSVJbNf3SgCzTZVFbHhoBR8ZWiN52SWDV7Yrm2DLC3DTx
-	kKx
-X-Google-Smtp-Source: AGHT+IEAj3oIerZ8VMhDsBvB9jTtKhynwQ/opLvvI7poEt160ct1eaw1qJ+tjnjOnXuXTGGXuUfKXdzM8SueivuxuaI=
-X-Received: by 2002:a05:6e02:4507:20b0:3d9:3ee7:a75b with SMTP id
- e9e14a558f8ab-3de304f2062mr903775ab.1.1750290938367; Wed, 18 Jun 2025
- 16:55:38 -0700 (PDT)
+	s=arc-20240116; t=1750292354; c=relaxed/simple;
+	bh=1pdGs8PCp1UcfvBUEXk8lET8V2GQ20A0pL1erU9Fkss=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G4mccpdLkDAc7//3rp87uF5mv6tUMpsN83QQ/+/i5FR61rEE+sCWfNNEyPHXedkOCFHd3BRx5vo8Vwq2BshuSSXMpAjTC7mIwB9IJ0expkKebssz+p1vpZYmZ5o0xJ9iggtTF1eJe/wjwezWz74ff3GMiWNNd84F1jEMjsKhgws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=nhF3BEGN; arc=none smtp.client-ip=67.231.149.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0409409.ppops.net [127.0.0.1])
+	by m0409409.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 55I0E1li028818;
+	Thu, 19 Jun 2025 00:13:44 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=jan2016.eng; bh=lwO6or+sX6L6YwMfjpDLPwlZGQuXCpG7O
+	et+pkopD1A=; b=nhF3BEGNACAm4kJ/uUGejZ3lJOX1bNRgTdnSSFyoSJ8VxBpJv
+	BUFb9SF8i2bn1BXjGLXvZQ9UQ4Vbh98pzeAN+k+5CYDq8uuDfcnNGjeVAamXIoaJ
+	qOJV55DDeToY+9KydggQxKaT+KH62eidxNxj1nPALdEcWGNS3mSUYx66iC4rbfWy
+	ZwiRnWvcmKPSV4TIXX4WteGbDcFhBAesCwOMjIwiSr+cf3rWcEF6NsqnCs6FxMvl
+	JmTYDwGiLbkvkRcSiP6ERcnvDLXwRgRNjwsoIlwkYfXv+FYeDu6/MQvbU0chagwe
+	hfu+5D2P6KF/EAfQ1xB3m9PWh57grQqY8BCeQ==
+Received: from prod-mail-ppoint5 (prod-mail-ppoint5.akamai.com [184.51.33.60] (may be forged))
+	by m0409409.ppops.net-00190b01. (PPS) with ESMTPS id 479jdxdx1p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Jun 2025 00:13:44 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint5.akamai.com [127.0.0.1])
+	by prod-mail-ppoint5.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 55IKZIiI028389;
+	Wed, 18 Jun 2025 16:13:43 -0700
+Received: from prod-mail-relay11.akamai.com ([172.27.118.250])
+	by prod-mail-ppoint5.akamai.com (PPS) with ESMTP id 47bt2tuk1k-1;
+	Wed, 18 Jun 2025 16:13:43 -0700
+Received: from bos-lhv9ol.bos01.corp.akamai.com (bos-lhv9ol.bos01.corp.akamai.com [172.28.41.79])
+	by prod-mail-relay11.akamai.com (Postfix) with ESMTP id 34AAB33B2C;
+	Wed, 18 Jun 2025 23:13:43 +0000 (GMT)
+From: Jason Baron <jbaron@akamai.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com
+Subject: [PATCH net-next v2 0/3] Fix netlink rcvbuf wraparound
+Date: Wed, 18 Jun 2025 19:13:20 -0400
+Message-Id: <cover.1750285100.git.jbaron@akamai.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250618104025.3463656-1-yuyanghuang@google.com> <20250618182029.GV1699@horms.kernel.org>
-In-Reply-To: <20250618182029.GV1699@horms.kernel.org>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Thu, 19 Jun 2025 08:55:01 +0900
-X-Gm-Features: Ac12FXz88D2o7FcO2slqJtiNgJD5NxCpvCi7fsUGH4HLmFCQnQ7_XC7-NAVyGH8
-Message-ID: <CADXeF1F6q5NfboqbnoGJPFf9C1x3-v2OkspKqYhnFOVL2=1vdg@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftest: add selftest for anycast notifications
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-18_06,2025-06-18_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=1 phishscore=0 mlxscore=1 malwarescore=0
+ spamscore=1 mlxlogscore=216 adultscore=0 suspectscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506180198
+X-Proofpoint-GUID: hNpsKI-HpgjiLIwDjYVmlNFiZqkqsWvB
+X-Proofpoint-ORIG-GUID: hNpsKI-HpgjiLIwDjYVmlNFiZqkqsWvB
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDE5OCBTYWx0ZWRfX7NpJZlIuDuJ8
+ hCCH5q7RHAhN2KUD40lWVBwATDyYxr76sEW/b9rDWUhxhfEGkcGPFasKQeVh0613aOh+lIvwlSb
+ fJ6Y9TEQQmyqsiwKo1ZWIlnQ4StIyyaYeNtyIJxq0qLvTZlMdz4xAx9c1fy34InzplyRlaQUgHq
+ +qINLLiBdXFFlUbFwPtcDEHabxcidOg9vBAar7kXh9C+iwUWVOLrUbtVwHQ9gt74psUcXrvmlaj
+ Rot3BHNa0LHNt/8we471Lp7U2cgBVPYaXbojJ1mW2FzJe5hLl3ohYBGsBDVshAq3spaUpEyzlLY
+ SttWXYmGMWwLdQajTtjt5nfWCis7S7K9GDjfycwV/mrcWR/0aLiYnbLAlPumxFPU5/5wZOQSamB
+ MmdpvjGA8Aq3fV8xLIMWiSVb2ngM6Do2SwUc+gR+eVBnmhoIBtnc2JzIBjbJdwgJ0YMTqyap
+X-Authority-Analysis: v=2.4 cv=f8hIBPyM c=1 sm=1 tr=0 ts=68534828 cx=c_pps
+ a=NpDlK6FjLPvvy7XAFEyJFw==:117 a=NpDlK6FjLPvvy7XAFEyJFw==:17
+ a=6IFa9wvqVegA:10 a=O-JOM7JplPKJ8x8Q_08A:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-18_06,2025-06-18_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=48 bulkscore=0
+ suspectscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 spamscore=48 impostorscore=0 clxscore=1015 mlxlogscore=4
+ mlxscore=48 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506180198
 
-Thanks for the review feedback, I will move the clean up to a seaparte patc=
-h.
+The sk->sk_rmem_alloc field of a netlink socket can wraparound as a
+signed int when comparing to sk->sk_rcvbuf, when sk->sk_rcvbuf approaches
+INT_MAX. This can be reproduced by forcing sk->sk_rcvbuf to INT_MAX and
+this can exhaust all of memory.
 
-On Thu, Jun 19, 2025 at 3:20=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Wed, Jun 18, 2025 at 07:40:25PM +0900, Yuyang Huang wrote:
-> > This commit adds a new kernel selftest to verify RTNLGRP_IPV6_ACADDR
-> > notifications. The test works by adding/removing a dummy interface,
-> > enabling packet forwarding, and then confirming that user space can
-> > correctly receive anycast notifications.
-> >
-> > The test relies on the iproute2 version to be 6.13+.
-> >
-> > Tested by the following command:
-> > $ vng -v --user root --cpus 16 -- \
-> > make -C tools/testing/selftests TARGETS=3Dnet
-> > TEST_PROGS=3Drtnetlink_notification.sh \
-> > TEST_GEN_PROGS=3D"" run_tests
-> >
-> > Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
-> > ---
-> >  .../selftests/net/rtnetlink_notification.sh   | 52 +++++++++++++++++--
-> >  1 file changed, 47 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/net/rtnetlink_notification.sh b/to=
-ols/testing/selftests/net/rtnetlink_notification.sh
->
-> ...
->
-> > @@ -18,12 +20,11 @@ kci_test_mcast_addr_notification()
-> >       local tmpfile
-> >       local monitor_pid
-> >       local match_result
-> > -     local test_dev=3D"test-dummy1"
-> >
-> >       tmpfile=3D$(mktemp)
-> >       defer rm "$tmpfile"
-> >
-> > -     ip monitor maddr > $tmpfile &
-> > +     ip monitor maddr > "$tmpfile" &
-> >       monitor_pid=3D$!
-> >       defer kill_process "$monitor_pid"
-> >
-> > @@ -32,7 +33,7 @@ kci_test_mcast_addr_notification()
-> >       if [ ! -e "/proc/$monitor_pid" ]; then
-> >               RET=3D$ksft_skip
-> >               log_test "mcast addr notification: iproute2 too old"
-> > -             return $RET
-> > +             return "$RET"
-> >       fi
-> >
-> >       ip link add name "$test_dev" type dummy
->
-> > @@ -53,7 +54,48 @@ kci_test_mcast_addr_notification()
-> >               RET=3D$ksft_fail
-> >       fi
-> >       log_test "mcast addr notification: Expected 4 matches, got $match=
-_result"
-> > -     return $RET
-> > +     return "$RET"
-> > +}
->
-> ...
->
-> > @@ -67,4 +109,4 @@ require_command ip
-> >
-> >  tests_run
-> >
-> > -exit $EXIT_STATUS
-> > +exit "$EXIT_STATUS"
->
-> Hi,
->
-> While I like the changes above (that I haven't trimmed-out)
-> these seem to be clean-ups that aren't strictly related
-> to the subject of this patch. IOW, they don't belong in this patch
-> (but could be a separate patch).
->
-> --
-> pw-bot: changes-requested
+I've added a sock_rcvbuf_has_space() helper function to generalize the
+fix as a similar approach has already been implemented for udp sockets.
+
+v2:
+-add Fixes:
+-add sock_rcvbuf_has_space() helper
+-use helper functions for udp netlink
+-remove excessive parentheses
+
+Jason Baron (3):
+  net: add sock_rcvbuf_has_space() helper
+  udp: use __sock_rcvbuf_has_space() helper
+  netlink: Fix wraparound of sk->sk_rmem_alloc
+
+ include/net/sock.h       | 38 ++++++++++++++++++++++++++++++++++++++
+ net/ipv4/udp.c           | 13 ++-----------
+ net/netlink/af_netlink.c | 35 +++++++++++++++++++++--------------
+ 3 files changed, 61 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
 
