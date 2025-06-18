@@ -1,64 +1,69 @@
-Return-Path: <netdev+bounces-199066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC056ADECD8
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:43:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53CDDADECDA
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E69F188C732
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:40:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE14C3B0DF6
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA778285CA2;
-	Wed, 18 Jun 2025 12:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76070286D64;
+	Wed, 18 Jun 2025 12:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4q4dPAS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T35oes2F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B0F145FE0;
-	Wed, 18 Jun 2025 12:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F09B258CD0;
+	Wed, 18 Jun 2025 12:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750250379; cv=none; b=LTu0XJwykwQmr9+YV9BFoG+djmJNGZrcDpTJ2B1RxMgeLtz0Kyup+KNgJv8cCE6RBfelOQNVW04HXU6VFImlgMCCL9OQX+mtYr3++GgHl1AFZIQAe1N1/XstgHt+FDTxWvDurGN9Hoh7YinuB5qgC8vM2ran+H7onQ3K2UtXOQI=
+	t=1750250425; cv=none; b=GVqFqoHQUjzgtDHsHu8go2u6ZZ71z0/DoK32NZsyjv3H4KK0yxcan12qet+cWbbL3VrMAaMDylMmbiwsLd8/KXPFD9SmsXjVEQh+qUv5q1qzOj9eCXH2eKcurSoMFXDjsqlFix7y6U2TeqF6/7cAV+qalhiKKPGEATcKuOL4Bxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750250379; c=relaxed/simple;
-	bh=WG7j8G6GOIk4GTEuTb80cckRD2B1MQmBRHVOT434W38=;
+	s=arc-20240116; t=1750250425; c=relaxed/simple;
+	bh=lKJkRX5S1J6VtzITZ5xzBjEBLhnqYUnVxruczGLyT08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hi2us/brEnk3yyQs066B10wvLpK7ON4uhI6eFcVH+FfXh+dObuDYs0TOcFzlVkRL1SKpV0TMjkL4Lbwo2gb+nfNDDSDy5A+/ltGR398dRFz2M7ImxKzzITH5NWEzAB8zBFQqlFd38W5rXBslqKNcqvwfFu6EitHEXCAeybRfUik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4q4dPAS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD17BC4CEE7;
-	Wed, 18 Jun 2025 12:39:35 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QpBrawzBhEZTLwy7FJuYvlWdZA4Sdd8eL8og4KKA1BkRsAWXdfD2vfggr5jcGigNrTAMNApIHMGyEOMljSVllZ+8ROXro+lDyVJZi9GPIDOXzJu/OM52qxDoNaT+X9vaUdJo+x7XbsxDUjI/2zdLYetVU4hqmlXsTxcKexiP5d0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T35oes2F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6CDC4CEE7;
+	Wed, 18 Jun 2025 12:40:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750250379;
-	bh=WG7j8G6GOIk4GTEuTb80cckRD2B1MQmBRHVOT434W38=;
+	s=k20201202; t=1750250424;
+	bh=lKJkRX5S1J6VtzITZ5xzBjEBLhnqYUnVxruczGLyT08=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S4q4dPASMsbovjTlxIqD3yC4iPmDJDtuKDOHClUD084oQrFRwVfB5RPk9youEtp8q
-	 LxAS8xZpTtBGT4/bq2CvIc+4tE9IL9uUx+hj+6mThaDE73v1VrPWjtifDEbDg5+5ie
-	 KrAzDPUey8kV3gAK7upUCpF25Pr824GFimEjbkBJHf4gKXhgVk27I6Y64J3H+Sl3qZ
-	 A6T3eIKgPlOUb8xuta5CHXlka1gbAAB4vbSKOh8aaBDjr1AmybJLydgHelPLRUuH8w
-	 opgUL6KCNR5tlwkgzwz/etBVcsL/scCEh+5gkriE0bLX/AoCjwNo/LyIuiXvMo/hWY
-	 NyBtEMBv9tnYA==
-Date: Wed, 18 Jun 2025 13:39:33 +0100
+	b=T35oes2Fkomfh40d6u66VAQWgiTTkCCDSuXaUmP9wZj+ZvbxEJppK5DeCdXziOEhg
+	 3HEpnVRqlDeTIAfAtsfh8HKcdGHc7Uqpj6S6eN2INZPxSjVIwS2jXPoJjuaciRncRy
+	 Xxm82+PegCaah7+5vTiKGWtGcO+DjQzVo+ZUt7AqelZLpBZY33KdEBNwB5Uaq1WxK2
+	 eOMNofrX6l+G0WeTImkNi69icQxs5GeLX0ZqZP3QGnVRWs1KH+cTaMtewy/RNj2FaO
+	 2cqyu3Mxebizp7QLsFdK6B8Fb+28XA5K2+Ds9lwEFxz13m0Kvrv1ACzaUaSh3pE8vU
+	 lxd9Pi9CUntEQ==
+Date: Wed, 18 Jun 2025 13:40:19 +0100
 From: Simon Horman <horms@kernel.org>
-To: Frank Wunderlich <frank-w@public-files.de>
-Cc: linux@fw-web.de, nbd@nbd.name, sean.wang@mediatek.com,
-	lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, daniel@makrotopia.org,
-	arinc.unal@arinc9.com
-Subject: Re: Re: [net-next v4 2/3] net: ethernet: mtk_eth_soc: add consts for
- irq index
-Message-ID: <20250618123933.GP1699@horms.kernel.org>
-References: <20250616080738.117993-1-linux@fw-web.de>
- <20250616080738.117993-3-linux@fw-web.de>
- <20250618083623.GF2545@horms.kernel.org>
- <trinity-86a5b58b-a74a-48be-80ae-aa306e95f214-1750238697100@trinity-msg-rest-gmx-gmx-live-b647dc579-2m42j>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Akira Yokosawa <akiyks@gmail.com>,
+	Breno Leitao <leitao@debian.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Ignacio Encinas Rubio <ignacio@iencinas.com>,
+	Jan Stancek <jstancek@redhat.com>, Marco Elver <elver@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
+	Shuah Khan <skhan@linuxfoundation.org>, joel@joelfernandes.org,
+	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
+	lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
+	stern@rowland.harvard.edu
+Subject: Re: [PATCH v5 05/15] tools: ynl_gen_rst.py: make the index parser
+ more generic
+Message-ID: <20250618124019.GQ1699@horms.kernel.org>
+References: <cover.1750146719.git.mchehab+huawei@kernel.org>
+ <1cd8b28bfe159677b8a8b1228b04ba2919c8aee8.1750146719.git.mchehab+huawei@kernel.org>
+ <20250617115927.GK5000@horms.kernel.org>
+ <20250618085735.7f9aa5a6@foz.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,44 +72,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <trinity-86a5b58b-a74a-48be-80ae-aa306e95f214-1750238697100@trinity-msg-rest-gmx-gmx-live-b647dc579-2m42j>
+In-Reply-To: <20250618085735.7f9aa5a6@foz.lan>
 
-On Wed, Jun 18, 2025 at 09:24:57AM +0000, Frank Wunderlich wrote:
-> Hi,
+On Wed, Jun 18, 2025 at 08:57:35AM +0200, Mauro Carvalho Chehab wrote:
+> Em Tue, 17 Jun 2025 12:59:27 +0100
+> Simon Horman <horms@kernel.org> escreveu:
 > 
-> > Gesendet: Mittwoch, 18. Juni 2025 um 10:36
-> > Von: "Simon Horman" <horms@kernel.org>
-> > Betreff: Re: [net-next v4 2/3] net: ethernet: mtk_eth_soc: add consts for irq index
-> >
-> > On Mon, Jun 16, 2025 at 10:07:35AM +0200, Frank Wunderlich wrote:
-> > > From: Frank Wunderlich <frank-w@public-files.de>
+> > On Tue, Jun 17, 2025 at 10:02:02AM +0200, Mauro Carvalho Chehab wrote:
+> > > It is not a good practice to store build-generated files
+> > > inside $(srctree), as one may be using O=<BUILDDIR> and even
+> > > have the Kernel on a read-only directory.
 > > > 
-> > > Use consts instead of fixed integers for accessing IRQ array.
+> > > Change the YAML generation for netlink files to allow it
+> > > to parse data based on the source or on the object tree.
 > > > 
-> > > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> > > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 > > > ---
-> > > v4:
-> > > - calculate max from last (rx) irq index and use it for array size too
+> > >  tools/net/ynl/pyynl/ynl_gen_rst.py | 22 ++++++++++++++++------
+> > >  1 file changed, 16 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
+> > > index 7bfb8ceeeefc..b1e5acafb998 100755
+> > > --- a/tools/net/ynl/pyynl/ynl_gen_rst.py
+> > > +++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
+> > > @@ -365,6 +365,7 @@ def parse_arguments() -> argparse.Namespace:
+> > >  
+> > >      parser.add_argument("-v", "--verbose", action="store_true")
+> > >      parser.add_argument("-o", "--output", help="Output file name")
+> > > +    parser.add_argument("-d", "--input_dir", help="YAML input directory")
+> > >  
+> > >      # Index and input are mutually exclusive
+> > >      group = parser.add_mutually_exclusive_group()
+> > > @@ -405,11 +406,14 @@ def write_to_rstfile(content: str, filename: str) -> None:
+> > >      """Write the generated content into an RST file"""
+> > >      logging.debug("Saving RST file to %s", filename)
+> > >  
+> > > +    dir = os.path.dirname(filename)
+> > > +    os.makedirs(dir, exist_ok=True)
+> > > +
+> > >      with open(filename, "w", encoding="utf-8") as rst_file:
+> > >          rst_file.write(content)  
 > > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>
+> > Hi Mauro,
+> > 
+> > With this patch applied I see the following, which did not happen before.
 > 
-> thanks for review and the RB
-> 
-> i thinking about changing the const names to this:
-> 
-> MTK_ETH_IRQ_SHARED	=> MTK_FE_IRQ_SHARED
-> MTK_ETH_IRQ_TX		=> MTK_FE_IRQ_TX
-> MTK_ETH_IRQ_RX		=> MTK_FE_IRQ_RX
-> MTK_ETH_IRQ_MAX		=> MTK_FE_IRQ_NUM
-> 
-> because of i currently working on RSS/LRO patches and here MTK_FE_IRQ_NUM is used as name 
-> with same meaning like my current MTK_ETH_IRQ_MAX (where max should be same as RX and NUM
-> is one more because it is a count).
-> Current IRQs also target the MTK frame-engine which is different to the PDMA RX engine
-> used for RSS/LRO later, so MTK_ETH_IRQ_RX and MTK_ETH_IRQ_MAX are maybe misleading when RSS/LRO 
-> support will come in.
-> 
-> can i change the consts like this and keep your RB?
+> Thanks! this was an intermediate step. I'll just drop this patch and
+> fix conflicts at the next version.
 
-Yes, no objections from my side.
+Likewise, thanks.
 
