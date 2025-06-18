@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-198959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A833ADE6E5
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:29:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DE45ADE6DC
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A33C51740F0
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:28:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B0D87A1499
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A0E28A1DE;
-	Wed, 18 Jun 2025 09:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 451EC28C024;
+	Wed, 18 Jun 2025 09:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="A5SZsXH0"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZLxDjdNm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECFF284663
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C763028A737
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750238700; cv=none; b=N3U4b9tJABR868Q5PLY8fjlgJmeHvxxil1aIKKqS3wRgHljaumXLk1IWF+WWyxb0IFWumhpcV9ntvWCBbV1KvNyxpOujJq9ydU4obt/U7LGwB7s6vVLoC7qa0hL7EwBp9Y0brGHxueK++eqSIOZYC1JU7vy5IzHHkPxWvBj3A5M=
+	t=1750238706; cv=none; b=YGzk5ZsEWxM4FKdwPBCGlpb+hRrIvt5bJ6JSrveXT2jj2GGYI/yX+cSEIgV77RCqwX8lb7PqbdMMf0KvCYh4acm8kZlBT4pKeeSR/JEpSVWU8T6Cpjkx15U9pVVDcMiaBqRAFeWq+MsVYf2QdDhaHU6hnUz8/zLqBUWoWWY/JyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750238700; c=relaxed/simple;
-	bh=+jYbBLULxAnZLs4ECjDPNXUyJh89OcFcoxdMunkJ9hg=;
+	s=arc-20240116; t=1750238706; c=relaxed/simple;
+	bh=08oA8hPOsrDK3lSa1F0SUeNKY+TrOL5cocyrpPRH6+I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CVCfdAzuon7TILSUH/GTFk7pbTDp8EpSgU8unw/nScq2BsLRsnd0auXPj79U4AXdKtJQtXwY2fjD1TmVxc5+I0nTioa44lEF6uKtodlxyuLPMavFAiVZDrrNdh8iUb+kCqMSF40dA+gCOmmr0Ynf+ileiCJlxasWmIe/m3nlqds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=A5SZsXH0; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=KUKO1cGppop7PUps7BVFKIQFL8boqpFTQZ5SVl6mKW4zUnB5mMyu1zZzpVEPck7pdpnxY1VMFFluTAhwSJKc0+AuLrqnTACVQSe4G9ruoZbmCkiSTSOv7PbZnAozIL1cDkjeYrP3nfCfYT3MmJX5YJNA+XH6oCDy5O2Gkaws6eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZLxDjdNm; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-748d982e97cso1257450b3a.1
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 02:24:58 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b31bca0a32bso1146607a12.2
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 02:25:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1750238698; x=1750843498; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1750238702; x=1750843502; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yjZBGiGgqOOLwfoyW1GtVx9ASyWTSLK+uTZekEDcjuo=;
-        b=A5SZsXH0ziLOCzWA4h+hHUSnH9RgHHJyPn4Xvou/XiIezzlNW8V0Z9UPL7YjpgdcY3
-         E45R+6pdnSj23D1vOONS2P+gDDLt06FGZ3SrFnzFcL31O1l+6ZniPSWixWVrKst+YUwo
-         t+DbsLT8sjfH9LAPm9NlVWqakkgEm+Egjcy20=
+        bh=4+gOFkKLFvEJmdYu+HtH/HGCKi1JwVY2mcFRySruaZs=;
+        b=ZLxDjdNmR7QaJ25ZQk518EDhZspd5tZ88srTEnLOK8DLZvC3MWRoCb1Lw8oOsj9HLn
+         FicvMNQ/hyYuW2IAPn5PYaDnQaPg8CMKPaorwUi6POFzhwY1eIbbpRwIxcDSufrmKMlS
+         8x3PHbMh9Boo4eu1VyLgBZFNqnKH/Tu5FSFTg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750238698; x=1750843498;
+        d=1e100.net; s=20230601; t=1750238702; x=1750843502;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yjZBGiGgqOOLwfoyW1GtVx9ASyWTSLK+uTZekEDcjuo=;
-        b=EeisTi6mmEwcBbCDG1oaB6yQS2w8iEZdByfeK/UIEgOTJYQbWpWXrazYElxdmi9vu5
-         NLsEDSWHZpoFInTwwsJrZQkAzdOMuosQ/lECTZidW2Ucx8QqLBZWmez9xKmpieGuf5k6
-         x/F70XnfJh4dwDl3lfM27I5l+UAmZPFMxmcNrsa78qltZfgtIBn+KQLm+xx+o9xdVgRA
-         hIAjWWqlw1hi0j15FbkFYaJVwDMAyGWHrZ/GN2Tt6mAWx4G5FGhLM1mAdV/M9RlpB1jU
-         UPHcRTJrnNpYKwMpdoVdjwRAd9mPh/UnX8b1umIIwukM+t0yT6nLMY1g1ROgcFiH5P/6
-         oRxw==
-X-Gm-Message-State: AOJu0Yyk1IbBiiYfwZ54N+doZZDc9giBsoDk1UqLVT06VTD5fNlMoz74
-	euhSau25YmEAWT2LQHFT++WQFh+LYu9ri7pv33ySWRUNJu9RtgGrJqXM0AWj40gCbw==
-X-Gm-Gg: ASbGnctMBriuZkEx5uURQ7UKXN5LyGyWrQb6eNYfE3Zi7yy6QM/McTWGuECpGS51jZP
-	ezbSHUdDnZ2loaaeI8nZbefckwwRL8vqXwgqbxa3+Xz1zbNc9DHuq2LU23VkMdRY8P0U70kJI9P
-	KD2mVCXz7efhuNTcvvJ0WLxyeZM83sMBeNwigZw6oYzEm9mnEVH0dw5zc4hieFnALT8W57tDSDN
-	LeAeg+QrMaLVDkShcTgs1Efj1BO0E6x9SXfIxrNUsgADwFvybDe634VClPVFloJydIhmxKUsqN6
-	lqLr1ICuVZgMmdBeCSy3jx76JmKQ2LpPc9MVOeS41n8iFVoa/w7U9u2GCVuCd97wc4gitZhYuGU
-	gWUEddJ+h8GXTa5RR/yg6HdRO5B4u
-X-Google-Smtp-Source: AGHT+IH4MG64SCB97l2547kyD7vV1k62qfuOQWN4U926rjrfJcngE2qahuMITfeWAa1wKvRdjfbKWw==
-X-Received: by 2002:a05:6a00:2186:b0:748:33f3:8da8 with SMTP id d2e1a72fcca58-7489cfc2976mr18661159b3a.5.1750238697791;
-        Wed, 18 Jun 2025 02:24:57 -0700 (PDT)
+        bh=4+gOFkKLFvEJmdYu+HtH/HGCKi1JwVY2mcFRySruaZs=;
+        b=FdBaGtNsnzYk8Cp9SqS8owGJz42rwwoXB20n7Y3fwbBVEu2Ul01jBERM+nmltxXUMr
+         aJXU+5NKxNVbLIHvsokWq90CcTmVHl1vv68ibtM3ejbc3PSwiZjDUyON/2GAfZ/zxF5R
+         lodpXjg7pnzkevLsEywLjrR7YxxIIIpMDsjqpuz+ZBsMG2X6uH7IxyEUk++vZ9igEgVx
+         Uhi2J4M29jR2Ez/eLL89sWLPp6VjPPnUGDeOM5Lmc8JxHcsUv5hPTm611i6tqx4Q4DdA
+         3GAfsjMIb6LN9YFR3YOreBQ8bavGUH+ungQtKC9/36RIIqsBJ63cUuZkifz2sbaiPjr/
+         1uwg==
+X-Gm-Message-State: AOJu0YwtREjg6YeHOAx9NScslzP06orBWBKl7mTZ+sLtff+616tVvVK4
+	T3p+gqeCFpjEG0xU1K71Y5vaKIOXP4tTVvpF2aa8WTbfzQrQKYORrbdrG0tLo98lOw==
+X-Gm-Gg: ASbGncvARBQeWAJU6cLxTxfLBOK/vgXMbGYkg2BLw4khP9XG0mXHGM/JMIR3xCu43aM
+	fayP+K6T0VKOfnevKmhVr7VCA4FCkQkRrVDG1aoR23N4Cyhbw6K05z9BiXadKFwyHNFW9cg+0jn
+	NPo3dd3075zE6FbvKzZXT6VsFj+52oPij2tPlWCEg4d76Iq8DwkpSoww8/dMfmmfBOfZnbmIrUj
+	5YNfgB4rDR5t373PxSC4mIQSjCHuwNU4uN6LluKyw0T3BHTW0h3RELhE+u+ZqXNIBtnQUn1QVlq
+	cfoJnlKuACXKVlbi6W4tFwc5Us6kxPUECfZgWQXydFc5VpY1TqxJSaNEf/BWXt7JQ+Uo+XvHZ0p
+	qgrhoZlCDhJ5e+dSybUeZAGFxTmOS
+X-Google-Smtp-Source: AGHT+IGw8yxXdQh2amb9XSNSbxdyzkvTlZqwO/31fLEFaYmbVII4tCXAI6y6qqhSpGVGCPwydb7GHg==
+X-Received: by 2002:a05:6a21:3289:b0:1f5:a3e8:64c1 with SMTP id adf61e73a8af0-21fbd3d4182mr26806176637.0.1750238702020;
+        Wed, 18 Jun 2025 02:25:02 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7488ffecd08sm10408993b3a.27.2025.06.18.02.24.53
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7488ffecd08sm10408993b3a.27.2025.06.18.02.24.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 02:24:57 -0700 (PDT)
+        Wed, 18 Jun 2025 02:25:01 -0700 (PDT)
 From: Vikas Gupta <vikas.gupta@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -84,9 +84,9 @@ Cc: netdev@vger.kernel.org,
 	Vikas Gupta <vikas.gupta@broadcom.com>,
 	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [net-next, 08/10] bng_en: Add irq allocation support
-Date: Wed, 18 Jun 2025 14:47:38 +0000
-Message-ID: <20250618144743.843815-9-vikas.gupta@broadcom.com>
+Subject: [net-next, 09/10] bng_en: Initialize default configuration
+Date: Wed, 18 Jun 2025 14:47:39 +0000
+Message-ID: <20250618144743.843815-10-vikas.gupta@broadcom.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250618144743.843815-1-vikas.gupta@broadcom.com>
 References: <20250618144743.843815-1-vikas.gupta@broadcom.com>
@@ -98,132 +98,564 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add irq allocation functions. This will help
-to allocate IRQs to both netdev and RoCE aux devices.
+Query resources from the firmware and, based on the
+availability of resources, initialize the default
+settings. The default settings include:
+1. Rings and other resource reservations with the
+firmware. This ensures that resources are reserved
+before network and auxiliary devices are created.
+2. Mapping the BAR, which helps access doorbells since
+its size is known after querying the firmware.
+3. Retrieving the TCs and hardware CoS queue mappings.
 
 Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
 Reviewed-by: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnge/bnge.h     |  3 +
- .../net/ethernet/broadcom/bnge/bnge_resc.c    | 69 +++++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_resc.h    | 13 ++++
- 3 files changed, 85 insertions(+)
+ drivers/net/ethernet/broadcom/bnge/bnge.h     |  14 ++
+ .../net/ethernet/broadcom/bnge/bnge_core.c    | 122 +++++++++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  54 +++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   1 +
+ .../net/ethernet/broadcom/bnge/bnge_resc.c    | 207 ++++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_resc.h    |   3 +
+ 6 files changed, 401 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
-index b58d8fc6f258..3c161b1a9b62 100644
+index 3c161b1a9b62..06465b318f5c 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-@@ -172,6 +172,9 @@ struct bnge_dev {
+@@ -80,6 +80,12 @@ enum {
+ 	BNGE_RSS_CAP_ESP_V6_RSS_CAP			= BIT(7),
+ };
+ 
++#define BNGE_MAX_QUEUE		8
++struct bnge_queue_info {
++	u8      queue_id;
++	u8      queue_profile;
++};
++
+ struct bnge_dev {
+ 	struct device	*dev;
+ 	struct pci_dev	*pdev;
+@@ -89,6 +95,7 @@ struct bnge_dev {
+ 	char		board_serialno[BNGE_VPD_FLD_LEN];
+ 
+ 	void __iomem	*bar0;
++	void __iomem 	*bar1;
+ 
+ 	u16		chip_num;
+ 	u8		chip_rev;
+@@ -172,6 +179,13 @@ struct bnge_dev {
  #define BNGE_SUPPORTS_TPA(bd)	((bd)->max_tpa_v2)
  
  	u8                      num_tc;
-+
-+	struct bnge_irq		*irq_tbl;
-+	u16			irqs_acquired;
- };
++	u8			max_tc;
++	u8			max_lltc;	/* lossless TCs */
++	struct bnge_queue_info	q_info[BNGE_MAX_QUEUE];
++	u8			tc_to_qidx[BNGE_MAX_QUEUE];
++	u8			q_ids[BNGE_MAX_QUEUE];
++	u8			max_q;
++	u8			port_count;
  
- static inline bool bnge_is_roce_en(struct bnge_dev *bd)
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_resc.c b/drivers/net/ethernet/broadcom/bnge/bnge_resc.c
-index 68e094474822..84f91e05a2b0 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_resc.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_resc.c
-@@ -326,3 +326,72 @@ int bnge_reserve_rings(struct bnge_dev *bd)
+ 	struct bnge_irq		*irq_tbl;
+ 	u16			irqs_acquired;
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_core.c b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
+index cef68c4b6343..bad77973f100 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_core.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
+@@ -54,9 +54,46 @@ static void bnge_nvm_cfg_ver_get(struct bnge_dev *bd)
+ 			 nvm_info.nvm_cfg_ver_upd);
+ }
+ 
++static int bnge_func_qcaps(struct bnge_dev *bd)
++{
++	int rc;
++
++	rc = bnge_hwrm_func_qcaps(bd);
++	if (rc)
++		return rc;
++
++	rc = bnge_hwrm_queue_qportcfg(bd);
++	if (rc) {
++		dev_err(bd->dev, "query qportcfg failure rc: %d\n", rc);
++		return rc;
++	}
++
++	rc = bnge_hwrm_func_resc_qcaps(bd);
++	if (rc) {
++		dev_err(bd->dev, "query resc caps failure rc: %d\n", rc);
++		return rc;
++	}
++
++	rc = bnge_hwrm_func_qcfg(bd);
++	if (rc) {
++		dev_err(bd->dev, "query config failure rc: %d\n", rc);
++		return rc;
++	}
++
++	rc = bnge_hwrm_vnic_qcaps(bd);
++	if (rc) {
++		dev_err(bd->dev, "vnic caps failure rc: %d\n", rc);
++		return rc;
++	}
++
++	return 0;
++}
++
+ static void bnge_fw_unregister_dev(struct bnge_dev *bd)
+ {
++	/* ctx mem free after unrgtr only */
+ 	bnge_hwrm_func_drv_unrgtr(bd);
++	bnge_free_ctx_mem(bd);
+ }
+ 
+ static int bnge_fw_register_dev(struct bnge_dev *bd)
+@@ -86,7 +123,25 @@ static int bnge_fw_register_dev(struct bnge_dev *bd)
+ 		return rc;
+ 	}
+ 
++	rc = bnge_alloc_ctx_mem(bd);
++	if (rc) {
++		dev_err(bd->dev, "Failed to allocate ctx mem rc: %d\n", rc);
++		goto err_func_unrgtr;
++	}
++
++	/* Get the resources and configuration from firmware */
++	rc = bnge_func_qcaps(bd);
++	if (rc) {
++		dev_err(bd->dev, "Failed initial configuration rc: %d\n", rc);
++		rc = -ENODEV;
++		goto err_func_unrgtr;
++	}
++
+ 	return 0;
++
++err_func_unrgtr:
++	bnge_fw_unregister_dev(bd);
++	return rc;
+ }
+ 
+ static void bnge_pci_disable(struct pci_dev *pdev)
+@@ -142,14 +197,46 @@ static void bnge_unmap_bars(struct pci_dev *pdev)
+ {
+ 	struct bnge_dev *bd = pci_get_drvdata(pdev);
+ 
++	if (bd->bar1) {
++		pci_iounmap(pdev, bd->bar1);
++		bd->bar1 = NULL;
++	}
++
+ 	if (bd->bar0) {
+ 		pci_iounmap(pdev, bd->bar0);
+ 		bd->bar0 = NULL;
+ 	}
+ }
+ 
++static void bnge_set_max_func_irqs(struct bnge_dev *bd,
++				   unsigned int max_irqs)
++{
++	bd->hw_resc.max_irqs = max_irqs;
++}
++
++static int bnge_get_max_irq(struct pci_dev *pdev)
++{
++	u16 ctrl;
++
++	pci_read_config_word(pdev, pdev->msix_cap + PCI_MSIX_FLAGS, &ctrl);
++	return (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
++}
++
++static int bnge_map_db_bar(struct bnge_dev *bd)
++{
++	if (!bd->db_size)
++		return -ENODEV;
++
++	bd->bar1 = pci_iomap(bd->pdev, 2, bd->db_size);
++	if (!bd->bar1)
++		return -ENOMEM;
++
++	return 0;
++}
++
+ static int bnge_probe_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ {
++	unsigned int max_irqs;
+ 	struct bnge_dev *bd;
+ 	int rc;
+ 
+@@ -198,10 +285,41 @@ static int bnge_probe_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_hwrm_cleanup;
+ 	}
+ 
++	max_irqs = bnge_get_max_irq(pdev);
++	bnge_set_max_func_irqs(bd, max_irqs);
++
++	bnge_aux_init_dflt_config(bd);
++
++	rc = bnge_net_init_dflt_config(bd);
++	if (rc) {
++		dev_err(&pdev->dev, "Error setting up default cfg to netdev rc = %d\n",
++			rc);
++		goto err_fw_reg;
++	}
++
++	rc = bnge_map_db_bar(bd);
++	if (rc) {
++		dev_err(&pdev->dev, "Failed mapping doorbell BAR rc = %d, aborting\n",
++			rc);
++		goto err_config_uninit;
++	}
++
++	rc = bnge_alloc_irqs(bd);
++	if (rc) {
++		dev_err(&pdev->dev, "Error IRQ allocation rc = %d\n", rc);
++		goto err_config_uninit;
++	}
++
+ 	pci_save_state(pdev);
+ 
+ 	return 0;
+ 
++err_config_uninit:
++	bnge_net_uninit_dflt_config(bd);
++
++err_fw_reg:
++	bnge_fw_unregister_dev(bd);
++
+ err_hwrm_cleanup:
+ 	bnge_cleanup_hwrm_resources(bd);
+ 
+@@ -221,6 +339,10 @@ static void bnge_remove_one(struct pci_dev *pdev)
+ {
+ 	struct bnge_dev *bd = pci_get_drvdata(pdev);
+ 
++	bnge_free_irqs(bd);
++
++	bnge_net_uninit_dflt_config(bd);
++
+ 	bnge_fw_unregister_dev(bd);
+ 
+ 	bnge_cleanup_hwrm_resources(bd);
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+index 577ac5dcdd9b..ffdec285948e 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+@@ -647,3 +647,57 @@ int bnge_hwrm_vnic_qcaps(struct bnge_dev *bd)
  
  	return rc;
  }
 +
-+int bnge_alloc_irqs(struct bnge_dev *bd)
++#define BNGE_CNPQ(q_profile)	\
++		((q_profile) ==	\
++		 QUEUE_QPORTCFG_RESP_QUEUE_ID0_SERVICE_PROFILE_LOSSY_ROCE_CNP)
++
++int bnge_hwrm_queue_qportcfg(struct bnge_dev *bd)
 +{
-+	u16 aux_msix, tx_cp, num_entries;
-+	u16 irqs_demand, max, min = 1;
-+	int i, rc = 0;
++	struct hwrm_queue_qportcfg_output *resp;
++	struct hwrm_queue_qportcfg_input *req;
++	u8 i, j, *qptr;
++	bool no_rdma;
++	int rc = 0;
 +
-+	irqs_demand = bnge_nqs_demand(bd);
-+	max = bnge_get_max_func_irqs(bd);
-+	if (irqs_demand > max)
-+		irqs_demand = max;
-+
-+	if (!(bd->flags & BNGE_EN_SHARED_CHNL))
-+		min = 2;
-+
-+	irqs_demand = pci_alloc_irq_vectors(bd->pdev, min, irqs_demand,
-+					    PCI_IRQ_MSIX);
-+	aux_msix = bnge_aux_get_msix(bd);
-+	if (irqs_demand < 0 || irqs_demand < aux_msix) {
-+		rc = -ENODEV;
-+		goto err_free_irqs;
-+	}
-+
-+	num_entries = irqs_demand;
-+	if (pci_msix_can_alloc_dyn(bd->pdev))
-+		num_entries = max;
-+	bd->irq_tbl = kcalloc(num_entries, sizeof(*bd->irq_tbl), GFP_KERNEL);
-+	if (!bd->irq_tbl) {
-+		rc = -ENOMEM;
-+		goto err_free_irqs;
-+	}
-+
-+	for (i = 0; i < irqs_demand; i++)
-+		bd->irq_tbl[i].vector = pci_irq_vector(bd->pdev, i);
-+
-+	bd->irqs_acquired = irqs_demand;
-+	/* Reduce rings based upon num of vectors allocated.
-+	 * We dont need to consider NQs as they have been calculated
-+	 * and must be more than irqs_demand.
-+	 */
-+	rc = bnge_adjust_rings(bd, &bd->rx_nr_rings,
-+			       &bd->tx_nr_rings,
-+			       irqs_demand - aux_msix, min == 1);
++	rc = hwrm_req_init(bd, req, HWRM_QUEUE_QPORTCFG);
 +	if (rc)
-+		goto err_free_irqs;
++		return rc;
 +
-+	tx_cp = bnge_num_tx_to_cp(bd, bd->tx_nr_rings);
-+	bd->nq_nr_rings = (min == 1) ?
-+		max_t(u16, tx_cp, bd->rx_nr_rings) :
-+		tx_cp + bd->rx_nr_rings;
++	resp = hwrm_req_hold(bd, req);
++	rc = hwrm_req_send(bd, req);
++	if (rc)
++		goto qportcfg_exit;
 +
-+	/* Readjust tx_nr_rings_per_tc */
-+	if (!bd->num_tc)
-+		bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
++	if (!resp->max_configurable_queues) {
++		rc = -EINVAL;
++		goto qportcfg_exit;
++	}
++	bd->max_tc = resp->max_configurable_queues;
++	bd->max_lltc = resp->max_configurable_lossless_queues;
++	if (bd->max_tc > BNGE_MAX_QUEUE)
++		bd->max_tc = BNGE_MAX_QUEUE;
 +
-+	return 0;
++	no_rdma = !bnge_is_roce_en(bd);
++	qptr = &resp->queue_id0;
++	for (i = 0, j = 0; i < bd->max_tc; i++) {
++		bd->q_info[j].queue_id = *qptr;
++		bd->q_ids[i] = *qptr++;
++		bd->q_info[j].queue_profile = *qptr++;
++		bd->tc_to_qidx[j] = j;
++		if (!BNGE_CNPQ(bd->q_info[j].queue_profile) || no_rdma)
++			j++;
++	}
++	bd->max_q = bd->max_tc;
++	bd->max_tc = max_t(u8, j, 1);
 +
-+err_free_irqs:
-+	dev_err(bd->dev, "Failed to allocate IRQs err = %d\n", rc);
-+	bnge_free_irqs(bd);
++	if (resp->queue_cfg_info & QUEUE_QPORTCFG_RESP_QUEUE_CFG_INFO_ASYM_CFG)
++		bd->max_tc = 1;
++
++	if (bd->max_lltc > bd->max_tc)
++		bd->max_lltc = bd->max_tc;
++
++qportcfg_exit:
++	hwrm_req_drop(bd, req);
++	return rc;
++}
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
+index 59ec1899879a..6c03923eb559 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
+@@ -22,5 +22,6 @@ int bnge_hwrm_func_qcaps(struct bnge_dev *bd);
+ int bnge_hwrm_vnic_qcaps(struct bnge_dev *bd);
+ int bnge_hwrm_func_qcfg(struct bnge_dev *bd);
+ int bnge_hwrm_func_resc_qcaps(struct bnge_dev *bd);
++int bnge_hwrm_queue_qportcfg(struct bnge_dev *bd);
+ 
+ #endif /* _BNGE_HWRM_LIB_H_ */
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_resc.c b/drivers/net/ethernet/broadcom/bnge/bnge_resc.c
+index 84f91e05a2b0..d98f8f9216e9 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_resc.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_resc.c
+@@ -5,6 +5,7 @@
+ #include <linux/module.h>
+ #include <linux/pci.h>
+ #include <linux/ethtool.h>
++#include <linux/netdevice.h>
+ 
+ #include "bnge.h"
+ #include "bnge_hwrm.h"
+@@ -28,6 +29,16 @@ static u16 bnge_get_max_func_irqs(struct bnge_dev *bd)
+ 	return min_t(u16, hw_resc->max_irqs, hw_resc->max_nqs);
+ }
+ 
++static unsigned int bnge_get_max_func_stat_ctxs(struct bnge_dev *bd)
++{
++	return bd->hw_resc.max_stat_ctxs;
++}
++
++static unsigned int bnge_get_max_func_cp_rings(struct bnge_dev *bd)
++{
++	return bd->hw_resc.max_cp_rings;
++}
++
+ static int bnge_aux_get_dflt_msix(struct bnge_dev *bd)
+ {
+ 	int roce_msix = BNGE_MAX_ROCE_MSIX;
+@@ -68,6 +79,20 @@ static u16 bnge_func_stat_ctxs_demand(struct bnge_dev *bd)
+ 	return bd->nq_nr_rings + bnge_aux_get_stat_ctxs(bd);
+ }
+ 
++static int bnge_get_dflt_aux_stat_ctxs(struct bnge_dev *bd)
++{
++	int stat_ctx = 0;
++
++	if (bnge_is_roce_en(bd)) {
++		stat_ctx = BNGE_MIN_ROCE_STAT_CTXS;
++
++		if (!bd->pf.port_id && bd->port_count > 1)
++			stat_ctx++;
++	}
++
++	return stat_ctx;
++}
++
+ static u16 bnge_nqs_demand(struct bnge_dev *bd)
+ {
+ 	return bd->nq_nr_rings + bnge_aux_get_msix(bd);
+@@ -395,3 +420,185 @@ void bnge_free_irqs(struct bnge_dev *bd)
+ 	kfree(bd->irq_tbl);
+ 	bd->irq_tbl = NULL;
+ }
++
++static void _bnge_get_max_rings(struct bnge_dev *bd, u16 *max_rx,
++				u16 *max_tx, u16 *max_nq)
++{
++	struct bnge_hw_resc *hw_resc = &bd->hw_resc;
++	u16 max_ring_grps = 0, max_cp;
++	int rc;
++
++	*max_tx = hw_resc->max_tx_rings;
++	*max_rx = hw_resc->max_rx_rings;
++	*max_nq = min_t(int, bnge_get_max_func_irqs(bd),
++			hw_resc->max_stat_ctxs);
++	max_ring_grps = hw_resc->max_hw_ring_grps;
++	if (bnge_is_agg_reqd(bd))
++		*max_rx >>= 1;
++
++	max_cp = bnge_get_max_func_cp_rings(bd);
++
++	/* Fix RX and TX rings according to number of CPs available */
++	rc = bnge_fix_rings_count(max_rx, max_tx, max_cp, false);
++	if (rc) {
++		*max_rx = 0;
++		*max_tx = 0;
++	}
++
++	*max_rx = min_t(int, *max_rx, max_ring_grps);
++}
++
++static int bnge_get_max_rings(struct bnge_dev *bd, u16 *max_rx,
++			      u16 *max_tx, bool shared)
++{
++	u16 rx, tx, nq;
++
++	_bnge_get_max_rings(bd, &rx, &tx, &nq);
++	*max_rx = rx;
++	*max_tx = tx;
++	if (!rx || !tx || !nq)
++		return -ENOMEM;
++
++	return bnge_fix_rings_count(max_rx, max_tx, nq, shared);
++}
++
++static int bnge_get_dflt_rings(struct bnge_dev *bd, u16 *max_rx, u16 *max_tx,
++			       bool shared)
++{
++	int rc;
++
++	rc = bnge_get_max_rings(bd, max_rx, max_tx, shared);
++	if (rc) {
++		dev_info(bd->dev, "Not enough rings available\n");
++		return rc;
++	}
++
++	if (bnge_is_roce_en(bd)) {
++		int max_cp, max_stat, max_irq;
++
++		/* Reserve minimum resources for RoCE */
++		max_cp = bnge_get_max_func_cp_rings(bd);
++		max_stat = bnge_get_max_func_stat_ctxs(bd);
++		max_irq = bnge_get_max_func_irqs(bd);
++		if (max_cp <= BNGE_MIN_ROCE_CP_RINGS ||
++		    max_irq <= BNGE_MIN_ROCE_CP_RINGS ||
++		    max_stat <= BNGE_MIN_ROCE_STAT_CTXS)
++			return 0;
++
++		max_cp -= BNGE_MIN_ROCE_CP_RINGS;
++		max_irq -= BNGE_MIN_ROCE_CP_RINGS;
++		max_stat -= BNGE_MIN_ROCE_STAT_CTXS;
++		max_cp = min_t(u16, max_cp, max_irq);
++		max_cp = min_t(u16, max_cp, max_stat);
++		rc = bnge_adjust_rings(bd, max_rx, max_tx, max_cp, shared);
++		if (rc)
++			rc = 0;
++	}
++
 +	return rc;
 +}
 +
-+void bnge_free_irqs(struct bnge_dev *bd)
++/* In initial default shared ring setting, each shared ring must have a
++ * RX/TX ring pair.
++ */
++static void bnge_trim_dflt_sh_rings(struct bnge_dev *bd)
 +{
-+	pci_free_irq_vectors(bd->pdev);
-+	kfree(bd->irq_tbl);
-+	bd->irq_tbl = NULL;
++	bd->nq_nr_rings = min_t(u16, bd->tx_nr_rings_per_tc, bd->rx_nr_rings);
++	bd->rx_nr_rings = bd->nq_nr_rings;
++	bd->tx_nr_rings_per_tc = bd->nq_nr_rings;
++	bd->tx_nr_rings = bd->tx_nr_rings_per_tc;
++}
++
++static int bnge_net_init_dflt_rings(struct bnge_dev *bd, bool sh)
++{
++	u16 dflt_rings, max_rx_rings, max_tx_rings, rc;
++
++	if (sh)
++		bd->flags |= BNGE_EN_SHARED_CHNL;
++
++	dflt_rings = netif_get_num_default_rss_queues();
++
++	rc = bnge_get_dflt_rings(bd, &max_rx_rings, &max_tx_rings, sh);
++	if (rc)
++		return rc;
++	bd->rx_nr_rings = min_t(u16, dflt_rings, max_rx_rings);
++	bd->tx_nr_rings_per_tc = min_t(u16, dflt_rings, max_tx_rings);
++	if (sh)
++		bnge_trim_dflt_sh_rings(bd);
++	else
++		bd->nq_nr_rings = bd->tx_nr_rings_per_tc + bd->rx_nr_rings;
++	bd->tx_nr_rings = bd->tx_nr_rings_per_tc;
++
++	rc = bnge_reserve_rings(bd);
++	if (rc && rc != -ENODEV)
++		dev_warn(bd->dev, "Unable to reserve tx rings\n");
++	bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
++	if (sh)
++		bnge_trim_dflt_sh_rings(bd);
++
++	/* Rings may have been reduced, re-reserve them again */
++	if (bnge_need_reserve_rings(bd)) {
++		rc = bnge_reserve_rings(bd);
++		if (rc && rc != -ENODEV)
++			dev_warn(bd->dev, "Fewer rings reservation failed\n");
++		bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
++	}
++	if (rc) {
++		bd->tx_nr_rings = 0;
++		bd->rx_nr_rings = 0;
++	}
++
++	return rc;
++}
++
++static int bnge_alloc_rss_indir_tbl(struct bnge_dev *bd)
++{
++	u16 entries;
++
++	entries = BNGE_MAX_RSS_TABLE_ENTRIES;
++
++	bd->rss_indir_tbl_entries = entries;
++	bd->rss_indir_tbl =
++		kmalloc_array(entries, sizeof(*bd->rss_indir_tbl), GFP_KERNEL);
++	if (!bd->rss_indir_tbl)
++		return -ENOMEM;
++
++	return 0;
++}
++
++int bnge_net_init_dflt_config(struct bnge_dev *bd)
++{
++	struct bnge_hw_resc *hw_resc;
++	int rc;
++
++	rc = bnge_alloc_rss_indir_tbl(bd);
++	if (rc)
++		return rc;
++
++	rc = bnge_net_init_dflt_rings(bd, true);
++	if (rc)
++		goto err_free_tbl;
++
++	hw_resc = &bd->hw_resc;
++	bd->max_fltr = hw_resc->max_rx_em_flows + hw_resc->max_rx_wm_flows +
++		       BNGE_L2_FLTR_MAX_FLTR;
++
++	return 0;
++
++err_free_tbl:
++	kfree(bd->rss_indir_tbl);
++	bd->rss_indir_tbl = NULL;
++	return rc;
++}
++
++void bnge_net_uninit_dflt_config(struct bnge_dev *bd)
++{
++	kfree(bd->rss_indir_tbl);
++	bd->rss_indir_tbl = NULL;
++}
++
++void bnge_aux_init_dflt_config(struct bnge_dev *bd)
++{
++	bd->aux_num_msix = bnge_aux_get_dflt_msix(bd);
++	bd->aux_num_stat_ctxs = bnge_get_dflt_aux_stat_ctxs(bd);
 +}
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_resc.h b/drivers/net/ethernet/broadcom/bnge/bnge_resc.h
-index c6cef514588f..23db93e03787 100644
+index 23db93e03787..b39fd1a7a81b 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_resc.h
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_resc.h
-@@ -51,8 +51,21 @@ struct bnge_hw_rings {
- 	u16 rss_ctx;
- };
- 
-+/* "TXRX", 2 hypens, plus maximum integer */
-+#define BNGE_IRQ_NAME_EXTRA	17
-+struct bnge_irq {
-+	irq_handler_t	handler;
-+	unsigned int	vector;
-+	u8		requested:1;
-+	u8		have_cpumask:1;
-+	char		name[IFNAMSIZ + BNGE_IRQ_NAME_EXTRA];
-+	cpumask_var_t	cpu_mask;
-+};
-+
- int bnge_reserve_rings(struct bnge_dev *bd);
+@@ -66,6 +66,9 @@ int bnge_reserve_rings(struct bnge_dev *bd);
  int bnge_fix_rings_count(u16 *rx, u16 *tx, u16 max, bool shared);
-+int bnge_alloc_irqs(struct bnge_dev *bd);
-+void bnge_free_irqs(struct bnge_dev *bd);
+ int bnge_alloc_irqs(struct bnge_dev *bd);
+ void bnge_free_irqs(struct bnge_dev *bd);
++int bnge_net_init_dflt_config(struct bnge_dev *bd);
++void bnge_net_uninit_dflt_config(struct bnge_dev *bd);
++void bnge_aux_init_dflt_config(struct bnge_dev *bd);
  
  static inline u32
  bnge_adjust_pow_two(u32 total_ent, u16 ent_per_blk)
