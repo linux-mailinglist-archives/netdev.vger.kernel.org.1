@@ -1,171 +1,180 @@
-Return-Path: <netdev+bounces-199252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5B1ADF927
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:03:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DFBEADF929
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6E201BC1D3A
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:03:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5668D3B8B5F
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFFD21CFF7;
-	Wed, 18 Jun 2025 22:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkCExPN0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627B7239561;
+	Wed, 18 Jun 2025 22:03:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AB0186294;
-	Wed, 18 Jun 2025 22:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12C821A452
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750284185; cv=none; b=J23xNFMSguGz/qgxbVRVo5mDQKmOgwS7PGnBTfIrddDMoJWbah9zstZti2NmlaPEJ8E8xvEeTyumr8ZwkaPA0FdljTo3+8kLPeum70jqy7ISNuuw7aN65W8j1pYnivaq/RVhkq6pztELVRX3+ljCU0Ulq9gmbozJkChQPJFSiD0=
+	t=1750284203; cv=none; b=XPst7vxBGgHdz6t83C6brJbRMZz1DrcVYsp/vyA0gxjEpKg7Higww64lmxjeuUBC0/80774hKBLplP1auu9APmPRDXAf2BfHSxtMW6J7KMqsIQD6X5B1lgtOKeW6YkPRSuNpc87isEglLISP4vTgd0/R+/CXeU3Z9CATlVNgl3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750284185; c=relaxed/simple;
-	bh=XCrE9YZpd1aOHLMWh4zYUf3neHcw+UBD/EiQR4z9ErM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CcvrpfbKy91uDcli5hDaKW0A9/RD7AXmEKEQE9+uoONOoB/iGJrFZY5nBS07z6KrpddzEtW+k+BoOgu52r3Dpjx+IUvWGcF5NbfB6abTpN+hYP66XM+8eILKDeChkYInFbmi4Fvb97npv3AZ3hPfyGv/Y9a/qYp6obx4BFQCHd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JkCExPN0; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-70a57a8ffc3so1704727b3.0;
-        Wed, 18 Jun 2025 15:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750284182; x=1750888982; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XCrE9YZpd1aOHLMWh4zYUf3neHcw+UBD/EiQR4z9ErM=;
-        b=JkCExPN07UMYjpnHyVp/Oo5M6aagFSfGCf7LLBCBb89k79dXUlkgfUyweeXMQNh6dd
-         riMZ/+SvQftmmNzmpcczgCi3p06HgolRPP9KavU8cIVo/nxiL5cghujqdDsTlC9upjE2
-         tIQRpS9YUc01Mq3lc0WrQny54O/eikm46z7b2Q78LIWfbpqUoNvUcef2jZ9WgAPrM/Z6
-         MHvwNe2Rb/8sYEnWMKyzLrPfyiz8Au2YoI1k62gx+JLZWzc3AI3myHrh3/okDvOgEqVQ
-         AJTe2MQhaOzDjnYUZGURh6q21qH7MRz875oDPmrDn7Kje64MCCb2nFqVMZqwMI374jSj
-         shug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750284182; x=1750888982;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XCrE9YZpd1aOHLMWh4zYUf3neHcw+UBD/EiQR4z9ErM=;
-        b=vzc6WUVIr5z/pVkQXp8E5QTytAkT2XkFOhrGAOsjkb2CQUNQsWHOVTZi3fkWHUeo+K
-         rV6At5IsE70ELLUN9ToWGXEQIPCbSAEQff1ssLfrsaiWEIhZixPreMy8BNsflYo2tzRs
-         A9K7zhOT2g3yhYJSCRtiYi4d+cIEequiLa2uygjZqMsz4q4wBxDmYb7oWjlvYk1Hu5As
-         6r1Vi+u7a1F/YPORDjK1m7yLed8tZexxCE1jrukPygox18iPHUwVeYnmGR7Dkw5agMg5
-         4IXWfHrM9hkqiorZt/t3qFeTZEiBJGyDyFVBRRAalfkbHe593cY/T9RGBQBZvb5rRUtQ
-         p6Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwlV5M22dBBlLf7KKA8U8QIh/IGaomcQOU/adT+YDupDQ0SaSOZO9QuSHHaoR/xpmBoMgwF3iT@vger.kernel.org, AJvYcCWDAETDyqId8JJCy0or9eKVWI6wB5qepr1ZfmqAlXqwmUTKpIBfRUEpCL6cIMlRyIlAor0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCW7UhySKPk6v9EKKeyvMz95QHhy2y7rISgfbNFthHKEz9jiSK
-	HzUL1WXZTIo3s2+NrDmmEklwSPvpwqO8++I3ESN3uBPDQvVpNkNVEpNr
-X-Gm-Gg: ASbGncvfEG38bVj+yojJJSKVPjQ3fY/Mr6NoNQ2rSML0aHLrJqguwfrxyZzJ2Z3JMTg
-	1VVPS4Hu8styZjNWdPF8bAUF5IF41j/MvamSOO4A5r4xqwImx2qoNJUJEWfAPmu7wThYZVR0qRR
-	GmXgUOV47IAjclvcJorlkdzdBKB/HC9WNylLa6n23g3oqCxS5ddBJYP6s1oXu9wVTZIAzvdyEsV
-	OkOlc7fQPWK4ijm9NYoiLyhcMGxTAAM/q4MSbls1w9M00lOZLsXWRBe6x2gb+maYFXkk8Mz7Oya
-	AmKVT5TSTAZbwfVRqG2/jgPzcrkO8lMtiw+dX+9Svqrbrlylt/bweB/dEU7fkrIzzvyaytEho45
-	RT9pYmSOliLx78g0Iz4wN3e9DUEsq2QZeGpnhCiB4Qw==
-X-Google-Smtp-Source: AGHT+IH/0+BZXssfQvwAQjkInwKwqJzwZ7siKQhj/08N0p9PmdqMfx2lOhibjDK4nAR8ejA5fMc+JA==
-X-Received: by 2002:a05:690c:4c0f:b0:70e:a1e:d9c7 with SMTP id 00721157ae682-7117545bf11mr267700867b3.10.1750284182608;
-        Wed, 18 Jun 2025 15:03:02 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-712b7b99eabsm262107b3.89.2025.06.18.15.03.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 15:03:02 -0700 (PDT)
-Date: Wed, 18 Jun 2025 18:03:01 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
- Anton Protopopov <a.s.protopopov@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- bpf <bpf@vger.kernel.org>, 
- Network Development <netdev@vger.kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <685337959d81b_36b4e62943a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAADnVQJ9e3Sf_kAh1LNqqeVvs7dwOC-AY_KEj5eRGGLGyC1F5A@mail.gmail.com>
-References: <20250616143846.2154727-1-willemdebruijn.kernel@gmail.com>
- <aFLFkFpQP789M1Tx@mail.gmail.com>
- <CAADnVQJ9e3Sf_kAh1LNqqeVvs7dwOC-AY_KEj5eRGGLGyC1F5A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] bpf: lru: adjust free target to avoid global
- table starvation
+	s=arc-20240116; t=1750284203; c=relaxed/simple;
+	bh=Ifwvi8dIvMiZN9RBQ1iHgerYGgCFf+NSHsY0DsDmx18=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZpOp9dayQct3i7unfh4zIJRyZ1mZyFilzRbtH+mbbCnsph5ygUl7jSvzJgGKLXkdL3VBEKCt/AomT3ExKlUsCD8c+bRFq7iJyhWZgKASi6UzqZBqYtWeszT6m1k9VwnUnnkZXOUzYIRFaFlIaHJcxMm6IBPFJ16rIsG00SxN+60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id 3F2678A;
+	Wed, 18 Jun 2025 15:03:15 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id DSeB3lR9Hvwy; Wed, 18 Jun 2025 15:03:13 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 6963445;
+	Wed, 18 Jun 2025 15:03:13 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 6963445
+Date: Wed, 18 Jun 2025 15:03:09 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
+To: Neal Cardwell <ncardwell@google.com>
+cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
+    stable@kernel.org
+Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
+ retransmits were sent
+In-Reply-To: <CADVnQymCso04zj8N0DYP9EkhTwXqtbsCu1xLxAUC60rSd09Rkw@mail.gmail.com>
+Message-ID: <452b3c16-b994-a627-c737-99358be8b030@ewheeler.net>
+References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
+ <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com> <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
+ <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net> <a8579544-a9de-63ae-61ed-283c872289a@ewheeler.net> <CADVnQymCso04zj8N0DYP9EkhTwXqtbsCu1xLxAUC60rSd09Rkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="8323328-1413097006-1750284193=:12017"
 
-Alexei Starovoitov wrote:
-> On Wed, Jun 18, 2025 at 6:50=E2=80=AFAM Anton Protopopov
-> <a.s.protopopov@gmail.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--8323328-1413097006-1750284193=:12017
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+
+On Mon, 16 Jun 2025, Neal Cardwell wrote:
+
+> On Mon, Jun 16, 2025 at 4:14 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
 > >
-> > On 25/06/16 10:38AM, Willem de Bruijn wrote:
-> > > From: Willem de Bruijn <willemb@google.com>
+> > On Sun, 15 Jun 2025, Eric Wheeler wrote:
+> > > On Tue, 10 Jun 2025, Neal Cardwell wrote:
+> > > > On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > >
+> > > > > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > >
+> > > > > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > >
+> > > > > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > >
+> > > > > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > >
+> > > > > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
+> > > > > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > Hello Neal,
+> > > > > > > > > > >
+> > > > > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
+> > > > > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
+> > > > > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
+> > > > > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
+> > > > > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
+> > > > > > > > > > >
+> > > > > > > > > > > Interestingly, the problem only presents itself when transmitting
+> > > > > > > > > > > from Linux; receive traffic (to Linux) performs just fine:
+> > > > > > > > > > >         ~60Mbit: Linux v6.6.85 =TX=> 10GbE -> switch -> 1GbE  -> device
+> > > > > > > > > > >          ~1Gbit: device        =TX=>  1GbE -> switch -> 10GbE -> Linux v6.6.85
+> > > > > > > > > > >
+> > > > > > > > > > > Through bisection, we found this first-bad commit:
+> > > > > > > > > > >
+> > > > > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
+> > > > > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
+> > > > > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
+> > > >
 > > >
-> > > BPF_MAP_TYPE_LRU_HASH can recycle most recent elements well before =
-the
-> > > map is full, due to percpu reservations and force shrink before
-> > > neighbor stealing. Once a CPU is unable to borrow from the global m=
-ap,
-> > > it will once steal one elem from a neighbor and after that each tim=
-e
-> > > flush this one element to the global list and immediately recycle i=
-t.
-> > >
-> > > Batch value LOCAL_FREE_TARGET (128) will exhaust a 10K element map
-> > > with 79 CPUs. CPU 79 will observe this behavior even while its
-> > > neighbors hold 78 * 127 + 1 * 15 =3D=3D 9921 free elements (99%).
-> > >
-> > > CPUs need not be active concurrently. The issue can appear with
-> > > affinity migration, e.g., irqbalance. Each CPU can reserve and then=
-
-> > > hold onto its 128 elements indefinitely.
-> > >
-> > > Avoid global list exhaustion by limiting aggregate percpu caches to=
-
-> > > half of map size, by adjusting LOCAL_FREE_TARGET based on cpu count=
-.
-> > > This change has no effect on sufficiently large tables.
-> > >
-> > > Similar to LOCAL_NR_SCANS and lru->nr_scans, introduce a map variab=
-le
-> > > lru->free_target. The extra field fits in a hole in struct bpf_lru.=
-
-> > > The cacheline is already warm where read in the hot path. The field=
- is
-> > > only accessed with the lru lock held.
+> > > > The attached patch should apply (with "git am") for any recent kernel
+> > > > that has the "tcp: fix to allow timestamp undo if no retransmits were
+> > > > sent" patch it is fixing. So you should be able to test it on top of
+> > > > the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
+> > > > easier.
 > >
-> > Hi Willem! The patch looks very reasonable. I've bumbed into this
-> > issue before (see https://lore.kernel.org/bpf/ZJwy478jHkxYNVMc@zh-lab=
--node-5/)
-> > but didn't follow up, as we typically have large enough LRU maps.
+> > Definitely better, but performance is ~15% slower vs reverting, and the
+> > retransmit counts are still higher than the other.  In the two sections
+> > below you can see the difference between after the fix and after the
+> > revert.
 > >
-> > I've tested your patch (with a patched map_tests/map_percpu_stats.c
-> > selftest), works as expected for small maps. E.g., before your patch
-> > map of size 4096 after being updated 2176 times from 32 threads on 32=
-
-> > CPUS contains around 150 elements, after your patch around (expected)=
-
-> > 2100 elements.
+> > Here is the output:
 > >
-> > Tested-by: Anton Protopopov <a.s.protopopov@gmail.com>
-> =
+> > ## After fixing with your patch:
+> >         - - - - - - - - - - - - - - - - - - - - - - - - -
+> >         [ ID] Interval           Transfer     Bitrate         Retr
+> >         [  5]   0.00-10.00  sec   946 MBytes   794 Mbits/sec  771               sender <<<
+> >         [  5]   0.00-10.04  sec   944 MBytes   789 Mbits/sec                  receiver <<<
+> >
+> > ## After Revert
+> >         - - - - - - - - - - - - - - - - - - - - - - - - -
+> >         [ ID] Interval           Transfer     Bitrate         Retr
+> >         [  5]   0.00-10.00  sec  1.11 GBytes   950 Mbits/sec   55             sender
+> >         [  5]   0.00-10.04  sec  1.10 GBytes   945 Mbits/sec                  receiver
+> 
+> Thanks for the test data!
+> 
+> Looking at the traces, there are no undo events, and no spurious loss
+> recovery events that I can see. So I don't see how the fix patch,
+> which changes undo behavior, would be relevant to the performance in
+> the test. It looks to me like the "after-fix" test just got unlucky
+> with packet losses, and because the receiver does not have SACK
+> support, any bad luck can easily turn into very poor performance, with
+> 200ms timeouts during fast recovery.
+> 
+> Would you have cycles to run the "after-fix" and "after-revert-6.6.93"
+> cases multiple times, so we can get a sense of what is signal and what
+> is noise? Perhaps 20 or 50 trials for each approach?
+ 
+I ran 50 tests after revert and compare that to after the fix using both
+average and geometric mean, and it still appears to be slightly slower
+then with the revert alone:
 
-> Looks like we have consensus.
+	# after-revert-6.6.93    
+	Arithmetic Mean: 843.64 Mbits/sec
+	Geometric Mean: 841.95 Mbits/sec
 
-Great. Thanks for the reviews and testing. Good to have more data that
-the issue is well understood and the approach helps.
+	# after-tcp-fix-6.6.93    
+	Arithmetic Mean: 823.00 Mbits/sec
+	Geometric Mean: 819.38 Mbits/sec
 
-> Willem,
-> please target bpf tree when you respin.
+Do you think that this is an actual performance regression, or just a
+sample set that is not big enough to work out the averages?
 
-Done: https://lore.kernel.org/bpf/20250618215803.3587312-1-willemdebruijn=
-.kernel@gmail.com/T/#u=
+Here is the data collected for each of the 50 tests:
+	- https://www.linuxglobal.com/out/for-neal/after-revert-6.6.93.tar.gz
+	- https://www.linuxglobal.com/out/for-neal/after-tcp-fix-6.6.93.tar.gz
+
+
+--
+Eric Wheeler
+
+
+> Thanks!
+> neal
+> 
+--8323328-1413097006-1750284193=:12017--
 
