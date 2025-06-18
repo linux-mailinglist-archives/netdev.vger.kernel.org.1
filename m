@@ -1,331 +1,157 @@
-Return-Path: <netdev+bounces-198873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04668ADE18A
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 05:15:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A84F8ADE1C2
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 05:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A214717AC58
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:15:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A292A3BC33E
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E3C1D5CD1;
-	Wed, 18 Jun 2025 03:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KEv7+wB+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BAE1E0B86;
+	Wed, 18 Jun 2025 03:41:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1547081C;
-	Wed, 18 Jun 2025 03:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C41F1D9A5D;
+	Wed, 18 Jun 2025 03:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750216541; cv=none; b=lAOS8EYoxiwEwq1LRG3Hv+6/Zzeqvvqhkg/HLmKDcRFn8eyKQGamc8FNwUyw7QMSXuTJFuSBHHw3y/muVoz5PfU1qZPIx8eUc8ye9YDyVjjZe5i1fElCL1m7g68TSa0Rj4HuWPygCcnoW4vqljpB/ClR5UX6Kglw0rEKZB5xYS8=
+	t=1750218119; cv=none; b=Eyi86cKRFgFY2EPsTy9kCMCgQpeP6WUWE2mv70RQkw6VPEYO+1Mhbjt0tttxo1+wInralXF+l5PtaETbYuaKyfMC4OsvyNRv7voMdpf7pM2Es0Q9Qb+QUNwXQpYk8furqE3qXsbwVOrpu8j50okPlFl+dl0jIRTTFCkuH20z0yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750216541; c=relaxed/simple;
-	bh=c+vEJdDJsRwQHhI1CpUzuBcNkccnDg+9ty9uoEZzDcU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lFadndhbEY7RfgDhEXyZjNFt9zGvPqoG9GRZ/lSgtb3Z1nt08ZrEG52wzPBuwmnC8+Zjr9co2BJUWdO8TPnChd6UxRIgc/ERtFZeoNxLIpOmkJIm659gAgAfhcc4wpEGlObYVEhwpnftBitEO5SFRCrIZr0Lse3uw3U+uhErWjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KEv7+wB+; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I1tZZl003415;
-	Wed, 18 Jun 2025 03:15:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=ilc0x
-	ElubqWzUTRKoEIEMaqZ3ILEy4Lu1+zZo2uWQaQ=; b=KEv7+wB+QSNcnJogAsHej
-	E6TSY0CfLWFRAlHuTaphY9lY460QLcAJduQrBBmSvjTw1DRUAhmWtyDmS+IIl7XC
-	GCzsDmDkO4YlGhL2MAgmAAkERCbZlkcIAypw77ZcYGL7MzNiXn25kUZdczzXx8wi
-	+7gXqOeFBLi1noqFTyHSprPQVP6UkuSXKoPK7QvRJWLF1YmKkpBeHENvCIh0pqOI
-	ANmQdnIDeGiYdz8TiV0wFQiLDHhJwt6mFr7mLb7a2MPx0Qjt7IKOl2r3T42qmJfo
-	el7ydXkvFqjHFU4e/GotSFbKsyvsj+pab8kxK2XPLvvh+SkY4hMwj8pqJOoY4VE+
-	Q==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47900exw82-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Jun 2025 03:15:31 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55I0K7ZZ026880;
-	Wed, 18 Jun 2025 03:15:30 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 478yhgb9rr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Jun 2025 03:15:30 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55I3FTuf002711;
-	Wed, 18 Jun 2025 03:15:29 GMT
-Received: from konrad-char-us-oracle-com.osdevelopmeniad.oraclevcn.com (konrad-char-us-oracle-com.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.23])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 478yhgb9r7-2;
-	Wed, 18 Jun 2025 03:15:29 +0000
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: allison.henderson@oracle.com, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
-        andrew@lunn.ch
-Cc: hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH net v3] rds: Expose feature parameters via sysfs (and ELF)
-Date: Tue, 17 Jun 2025 23:13:09 -0400
-Message-ID: <20250618031522.3859138-2-konrad.wilk@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250618031522.3859138-1-konrad.wilk@oracle.com>
-References: <20250618031522.3859138-1-konrad.wilk@oracle.com>
+	s=arc-20240116; t=1750218119; c=relaxed/simple;
+	bh=mClwktUuIUKCAi9FZnjiyUaJnofqGsQT3KVF0qvMQqU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hGF1GrhMaRIzWnHZbv73Pdxznc3ocE+xYFKo3IaSPVpYG4f0bDIXO9gacBawDD3mBmYeYsHZBu91A+WCAjJOfP51QRp/cEkJZRdMMsbre+Q07FFX8W0YrOq7t/SYSb+K0Mtyhn6nABH3Rk03cilHABGqDvZJRXTyQd05HVNPhcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [127.0.0.2] (unknown [210.73.43.2])
+	by APP-01 (Coremail) with SMTP id qwCowABnFtVpNVJoV95NBw--.6548S2;
+	Wed, 18 Jun 2025 11:41:30 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Subject: [PATCH net-next v2 0/6] Add Ethernet MAC support for SpacemiT K1
+Date: Wed, 18 Jun 2025 11:40:45 +0800
+Message-Id: <20250618-net-k1-emac-v2-0-94f5f07227a8@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-18_01,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 phishscore=0
- adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506180025
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDAyNSBTYWx0ZWRfX04CVDqYtRVW+ Dy3loey4RLlVAOAmEhdTq8dHqvotMXjoIKog8AggAOVm1mCQ+7JUF1+yps86Kv3uBP1Qakk9lB4 36aL/Nhb+PcAKV0X8GgFnvhqIsYuSyh8Au3uWCNs1GJkYkPL7sQVWTiflCTe/74vyOWsA6gisPd
- rXFvGcBpqNc97l2S8kHADuaXON84n6nj6TVh+BLXmsZqseexyZl2N6K3DgQx0RRwwN0Uz7OaSGr Xe8QTtr1kiuMVXPOL2xijF2WBPd2Tzwn9uZolpKgEu+rJ+AsUtX44GG3K4c5zw7WlBCT86iXuWD nPCeuLVuJ2nL+qy4uR77uJzaMBRS7+wAp1FAwOa0vzb8OGcwm+EaYTTOU3n6rWAJBkOdYDeSFY8
- PIbAlGSZTgwhrYKQ1t7JR6gICGv2Cvtg4ZHUFKLc/8AL0oGGbajw7/SisQ8WX5MXXSRwpM3R
-X-Proofpoint-ORIG-GUID: q4UoCfT7CCMlSABd7WTVllV7vQEVFbpz
-X-Authority-Analysis: v=2.4 cv=X/5SKHTe c=1 sm=1 tr=0 ts=68522f53 b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=m4ZG2DmCZvx6Djf13nYA:9 cc=ntf awl=host:13207
-X-Proofpoint-GUID: q4UoCfT7CCMlSABd7WTVllV7vQEVFbpz
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD01UmgC/1WP0W7CMAxFf6XK8xzF6RqgQoj/mHjIghnRaAp2V
+ jGh/vtCgIc9Xl37HPumhDiSqL65KaYpShxTCfatUeHo0xdB3JesrLGdccZBogzfCDT4AC3hEju
+ zJO/eVdk4Mx3itdI+1H0w0TWr3aNhuvwUfH7Wn14IwjgMMffN5DQ64IB3ykAivor7Zv3wYmsQs
+ V1ptAYXxkI54LQn3nKUINmzLqRNNR2j5JF/60MTVtWL8e/2CcFACO6wog6Nc4ttQXnRPuiQ1G6
+ e5z8eKFlJHAEAAA==
+X-Change-ID: 20250606-net-k1-emac-3e181508ea64
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, 
+ Vivian Wang <wangruikang@iscas.ac.cn>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Alexandre Ghiti <alex@ghiti.fr>
+Cc: Vivian Wang <uwu@dram.page>, Lukas Bulwahn <lukas.bulwahn@redhat.com>, 
+ Geert Uytterhoeven <geert+renesas@glider.be>, 
+ Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: b4 0.14.2
+X-CM-TRANSID:qwCowABnFtVpNVJoV95NBw--.6548S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxur1fZr1fXr47tFWxCrWxWFg_yoW5CF1xpa
+	y8ZrZxuwnxJr47trs7uws7urWfWa1vy3W5WF1UtryrX3sF9FWUJrnakr15Gr1UZrWrJryS
+	yr4kZw1fCFn8Ar7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9E14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67AK6r48MxAIw28IcxkI7VAKI4
+	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
+	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjx
+	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
+	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sR_XTm7UUUUU==
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-We would like to have a programmatic way for applications
-to query which of the features defined in include/uapi/linux/rds.h
-are actually implemented by the kernel.
+SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
+Add a driver for them, as well as the supporting devicetree and bindings
+updates.
 
-The problem is that applications can be built against newer
-kernel (or older) and they may have the feature implemented or not.
+Tested on BananaPi BPI-F3 and Milk-V Jupiter.
 
-The lack of a certain feature would signify that the kernel
-does not support it. The presence of it signifies the existence
-of it.
+I would like to note that even though some bit field names superficially
+resemble that of DesignWare MAC, all other differences point to it in
+fact being a custom design.
 
-This would provide the application to query the sysfs and figure
-out what is supported on a running system.
+Based on SpacemiT drivers [1]. This series depends on reset controller
+support for K1 [2]. These patches can also be pulled from:
 
-This patch would expose this extra sysfs file:
+https://github.com/dramforever/linux/tree/k1/ethernet/v2
 
-/sys/kernel/rds/features/ioctl_get_tos
-/sys/kernel/rds/features/ioctl_set_tos
-/sys/kernel/rds/features/socket_cancel_sent_to
-/sys/kernel/rds/features/socket_cong_monitor
-/sys/kernel/rds/features/socket_free_mr
-/sys/kernel/rds/features/socket_get_mr
-/sys/kernel/rds/features/socket_get_mr_for_dest
-/sys/kernel/rds/features/socket_recverr
-/sys/kernel/rds/features/socket_so_rxpath_latency
-/sys/kernel/rds/features/socket_so_transport
+Note on patch 3: I am still fairly certain that such a bus with empty
+ranges is allowed under both the spirit and the letter of simple-bus
+bindings [3].  This also passes "make dtbs_check" with only unrelated
+warnings that was already there.
 
-With the value of 'supported' in them. In the future this value
-could change to say 'deprecated' or have other values (for example
-different versions) or can be runtime changed.
+[1]: https://github.com/spacemit-com/linux-k1x
+[2]: https://lore.kernel.org/all/20250613011139.1201702-1-elder@riscstar.com
+[3]: https://github.com/devicetree-org/dt-schema/commit/ed9190d20f146d13e262cc9138506326f7d4da91
 
-The choice to use sysfs and this particular way is modeled on the
-filesystems usage exposing their features.
-
-Alternative solution such as exposing one file ('features') with
-each feature enumerated (which cgroup does) is a bit limited in
-that it does not provide means to provide extra content in the future
-for each feature. For example if one of the features had three
-modes and one wanted to set a particular one at runtime - that
-does not exist in cgroup (albeit it can be implemented but it would
-be quite hectic to have just one single attribute).
-
-Another solution of using an ioctl to expose a bitmask has the
-disadvantage of being less flexible in the future and while it can
-have a bit of supported/unsupported, it is not clear how one would
-change modes or expose versions. It is most certainly feasible
-but it can get seriously complex fast.
-
-As such this mechanism offers the basic support we require
-now and offers the flexibility for the future.
-
-Lastly, we also utilize the ELF note macro to expose these via
-so that applications that have not yet initialized RDS transport
-can inspect the kernel module to see if they have the appropiate
-support and choose an alternative protocol if they wish so.
-
-Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 ---
-v3: Add the missing documentation
-    Remove the CONFIG_SYSFS #ifdef machinations
-    Redo it with each feature as a seperate file in 'features'
-    directory.
----
- Documentation/ABI/stable/sysfs-transport-rds | 55 +++++++++++++++++
- net/rds/af_rds.c                             | 62 +++++++++++++++++++-
- 2 files changed, 116 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/ABI/stable/sysfs-transport-rds
+Changes in v2:
+- dts: Put eth0 and eth1 nodes under a bus with dma-ranges
+- dts: Added Milk-V Jupiter
+- Fix typo in emac_init_hw() that broke the driver (Oops!)
+- Reformatted line lengths to under 80
+- Addressed other v1 review comments
+- Link to v1: https://lore.kernel.org/r/20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn
 
-diff --git a/Documentation/ABI/stable/sysfs-transport-rds b/Documentation/ABI/stable/sysfs-transport-rds
-new file mode 100644
-index 000000000000..db4de277f717
---- /dev/null
-+++ b/Documentation/ABI/stable/sysfs-transport-rds
-@@ -0,0 +1,55 @@
-+What:          /sys/kernel/rds/features/*
-+Date:          June 2025
-+KernelVersion: 6.17
-+Contact:       rds-devel@oss.oracle.com
-+Description:   This directory contains the features that this kernel
-+               has been built with and supports. They correspond
-+               to the include/uapi/linux/rds.h features.
-+
-+	       The intent is for applications compiled against rds.h
-+	       to be able to query and find out what features the
-+	       driver supports. The current expected value is 'supported'.
-+
-+	       The features so far are:
-+
-+	       ioctl_get_tos
-+	       ioctl_set_tos
-+
-+		Allows the user to set on the socket a type of
-+		service(tos) value associated forever.
-+
-+	       socket_cancel_sent_to
-+
-+		Allows to cancel all pending messages to a given destination.
-+
-+	       socket_cong_monitor
-+
-+		RDS provides an explicit monitoring wherein a 64-bit mask value
-+		on the socket and each bit corresponds to a group of ports.
-+
-+		When a congestion update arrives, RDS checks the set of ports
-+		that became uncongested against the bit mask.
-+
-+		If they overlap, a control messages is enqueued on the socket,
-+		and the application is woken up.
-+
-+	       socket_get_mr
-+	       socket_get_mr_for_dest
-+	       socket_free_mr
-+
-+		RDS allows a process to register or release memory ranges for
-+		RDMA.
-+
-+	       socket_recverr
-+
-+		RDS will send RDMA notification messages to the application for
-+		any RDMA operation that fails. By default this is off.
-+
-+	       socket_so_rxpath_latency
-+
-+		Receive path latency in various stages of receive path.
-+
-+	       socket_so_transport
-+
-+		Attach the socket to the underlaying transport (TCP or RDMA)
-+		before invoking bind on the socket.
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 8435a20968ef..449b20f236a5 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -32,7 +32,9 @@
-  */
- #include <linux/module.h>
- #include <linux/errno.h>
-+#include <linux/elfnote.h>
- #include <linux/kernel.h>
-+#include <linux/kobject.h>
- #include <linux/gfp.h>
- #include <linux/in.h>
- #include <linux/ipv6.h>
-@@ -871,6 +873,53 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
- }
- #endif
- 
-+static ssize_t supported_show(struct kobject *kobj, struct kobj_attribute *attr,
-+			     char *buf)
-+{
-+	return sysfs_emit(buf, "supported\n");
-+}
-+
-+#define SYSFS_ATTR(_name)					\
-+ELFNOTE64("rds." #_name, 0, 1);				\
-+static struct kobj_attribute rds_attr_##_name = {		\
-+	.attr = {.name = __stringify(_name), .mode = 0444 },	\
-+	.show = supported_show,					\
-+}
-+
-+SYSFS_ATTR(ioctl_set_tos);
-+SYSFS_ATTR(ioctl_get_tos);
-+SYSFS_ATTR(socket_cancel_sent_to);
-+SYSFS_ATTR(socket_cong_monitor);
-+SYSFS_ATTR(socket_get_mr);
-+SYSFS_ATTR(socket_get_mr_for_dest);
-+SYSFS_ATTR(socket_free_mr);
-+SYSFS_ATTR(socket_recverr);
-+SYSFS_ATTR(socket_so_rxpath_latency);
-+SYSFS_ATTR(socket_so_transport);
-+
-+#define ATTR_LIST(_name) &rds_attr_##_name.attr
-+
-+static struct attribute *rds_feat_attrs[] = {
-+	ATTR_LIST(ioctl_set_tos),
-+	ATTR_LIST(ioctl_get_tos),
-+	ATTR_LIST(socket_cancel_sent_to),
-+	ATTR_LIST(socket_cong_monitor),
-+	ATTR_LIST(socket_get_mr),
-+	ATTR_LIST(socket_get_mr_for_dest),
-+	ATTR_LIST(socket_free_mr),
-+	ATTR_LIST(socket_recverr),
-+	ATTR_LIST(socket_so_rxpath_latency),
-+	ATTR_LIST(socket_so_transport),
-+	NULL,
-+};
-+
-+static const struct attribute_group rds_feat_group = {
-+	.attrs = rds_feat_attrs,
-+	.name = "features",
-+};
-+
-+static struct kobject *rds_sysfs_kobj;
-+
- static void rds_exit(void)
- {
- 	sock_unregister(rds_family_ops.family);
-@@ -882,6 +931,8 @@ static void rds_exit(void)
- 	rds_stats_exit();
- 	rds_page_exit();
- 	rds_bind_lock_destroy();
-+	sysfs_remove_group(rds_sysfs_kobj, &rds_feat_group);
-+	kobject_put(rds_sysfs_kobj);
- 	rds_info_deregister_func(RDS_INFO_SOCKETS, rds_sock_info);
- 	rds_info_deregister_func(RDS_INFO_RECV_MESSAGES, rds_sock_inc_info);
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -923,6 +974,14 @@ static int __init rds_init(void)
- 	if (ret)
- 		goto out_proto;
- 
-+	rds_sysfs_kobj = kobject_create_and_add("rds", kernel_kobj);
-+	if (!rds_sysfs_kobj)
-+		goto out_proto;
-+
-+	ret = sysfs_create_group(rds_sysfs_kobj, &rds_feat_group);
-+	if (ret)
-+		goto out_kobject;
-+
- 	rds_info_register_func(RDS_INFO_SOCKETS, rds_sock_info);
- 	rds_info_register_func(RDS_INFO_RECV_MESSAGES, rds_sock_inc_info);
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -931,7 +990,8 @@ static int __init rds_init(void)
- #endif
- 
- 	goto out;
--
-+out_kobject:
-+	kobject_put(rds_sysfs_kobj);
- out_proto:
- 	proto_unregister(&rds_proto);
- out_stats:
+---
+Vivian Wang (6):
+      dt-bindings: net: Add support for SpacemiT K1
+      net: spacemit: Add K1 Ethernet MAC
+      riscv: dts: Add network-bus dma-ranges for SpacemiT K1
+      riscv: dts: spacemit: Add Ethernet support for K1
+      riscv: dts: spacemit: Add Ethernet support for BPI-F3
+      riscv: dts: spacemit: Add Ethernet support for Jupiter
+
+ .../devicetree/bindings/net/spacemit,k1-emac.yaml  |   81 +
+ arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts    |   46 +
+ arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts  |   46 +
+ arch/riscv/boot/dts/spacemit/k1-pinctrl.dtsi       |   48 +
+ arch/riscv/boot/dts/spacemit/k1.dtsi               |   31 +
+ drivers/net/ethernet/Kconfig                       |    1 +
+ drivers/net/ethernet/Makefile                      |    1 +
+ drivers/net/ethernet/spacemit/Kconfig              |   29 +
+ drivers/net/ethernet/spacemit/Makefile             |    6 +
+ drivers/net/ethernet/spacemit/k1_emac.c            | 1934 ++++++++++++++++++++
+ drivers/net/ethernet/spacemit/k1_emac.h            |  416 +++++
+ 11 files changed, 2639 insertions(+)
+---
+base-commit: d9946fe286439c2aeaa7953b8c316efe5b83d515
+change-id: 20250606-net-k1-emac-3e181508ea64
+prerequisite-message-id: <20250613011139.1201702-1-elder@riscstar.com>
+prerequisite-patch-id: 2c73c63bef3640e63243ddcf3c07b108d45f6816
+prerequisite-patch-id: 0faba75db33c96a588e722c4f2b3862c4cbdaeae
+prerequisite-patch-id: 5db8688ef86188ec091145fae9e14b2211cd2b8c
+prerequisite-patch-id: e0fe84381637dc888d996a79ea717ff0e3441bd1
+prerequisite-patch-id: 2fc0ef1c2fcda92ad83400da5aadaf194fe78627
+prerequisite-patch-id: bfa54447803e5642059c386e2bd96297e691d0bf
+
+Best regards,
 -- 
-2.43.5
+Vivian "dramforever" Wang
 
 
