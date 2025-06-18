@@ -1,123 +1,96 @@
-Return-Path: <netdev+bounces-198912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0E3ADE4B8
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:45:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFC8ADE4CD
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAA4A1890D0C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2D91179673
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F8B27EC98;
-	Wed, 18 Jun 2025 07:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3F01D5CEA;
+	Wed, 18 Jun 2025 07:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ygjFBizO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PquaoUNy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C8C1EF389;
-	Wed, 18 Jun 2025 07:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6FD944F
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750232699; cv=none; b=KEnptIqutrsflHhQKs8OLk+dMZJ+yx6v7GMQVaXS6pcjhFY11xJP1UqLOhcbm1C2cF0pxQBYEzGvV4k/AP3s+TqdL+yGuoxE2BSU6a1er9aXNu5YI9jY7QGwYntLZxKLa0NJ7+/VBokg15upbIj580VvIZN9T8sJuwiUJuio6z4=
+	t=1750232920; cv=none; b=EhBMuf65noYLbFbc0DsnxF+6aVmlxQ+kJ7vMipd+acZL+6Z9LiZSdWvy45tceIQHU0T4IdUjJQDTaEkknDvlLdhG6KENX1TM+U3HLw99QF+JVTTOZ8tQTkJF1rGUuZED42krK75+4tRQAbyt3rm5bpxC0RYwh2TbA+vRwFlsaQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750232699; c=relaxed/simple;
-	bh=FFNidNQVJhVMPvZDCBwpffmyOW0CnVZwvZqZUZahEbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mpHYQ9rVYF4z4I5oQnkl2wtKItedi+2vSCRIQrM1EPhu8VTdEozXNZaT2i+6Y+AVbNv1inQy5MNuZlTkLhAb83NQKwy4V+ECb3dIOGn2hCJCxzchKwSLqC3X8XietRfVnwsdgH0/bwUkmg84QiWicqLxJKY1RVK3PoW6KG/9qSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ygjFBizO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A623CC4CEE7;
-	Wed, 18 Jun 2025 07:44:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1750232699;
-	bh=FFNidNQVJhVMPvZDCBwpffmyOW0CnVZwvZqZUZahEbc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ygjFBizOCM1fgb9sj+yJSWW2zJ1e7Z4lQU3fMQjVZne+1nYCdeD4dfHmBD5b9lN1H
-	 Ld/WnlAt6sSO6i/HaxMIHPu21h8/t7Zn8jU45pkTl3CMFML+o/pplBptXsjRMS+qO1
-	 1mDvLWLSeIJ0NA0ok9J7U3TalsTn+zTDDBAD0LEk=
-Date: Wed, 18 Jun 2025 09:44:56 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vincent Cuissard <cuissard@marvell.com>,
-	Samuel Ortiz <sameo@linux.intel.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Linus Torvalds <torvalds@linuxfoundation.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] NFC: nci: uart: Set tty->disc_data only in success path
-Message-ID: <2025061838-frustrate-operative-bd34@gregkh>
-References: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
+	s=arc-20240116; t=1750232920; c=relaxed/simple;
+	bh=+/zmf0Zit1fRNlUV5u/lb+nGJi/dBvp3kAUks71W9P0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=L30NNqJjBKWx2TD5+fIIhhwhnblZSV1U+lsNdfH8Eh31SKPOe0xpRLmXVvtS78lsrG2dcxrG7XTx3g/T06sXQSxQA05me55pTdwQTwqjVKPYGu64rIHO5Zgk/uIoV6UehrHscXdcwkQ4ZArxXvqnxfV+lC6yggkfOVxpjSTFiMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PquaoUNy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFA4CC4CEE7;
+	Wed, 18 Jun 2025 07:48:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750232920;
+	bh=+/zmf0Zit1fRNlUV5u/lb+nGJi/dBvp3kAUks71W9P0=;
+	h=From:Subject:Date:To:Cc:From;
+	b=PquaoUNyLF0WxQ6Sx6Up9q7eFUUOgbvrZCWwkUXyfJw1MqfsvLprQF1mFmeu8jvAB
+	 atmT0aOFdO/6dUYvl443aWq0i/eTS5HC6oGQLvJd+KPF+RIn1InVRFONm2IKEcvxFM
+	 i5oCSTwzd8IWqNzxnXyUP1Ay643J+RVzJEgtysUR4fiEYze6AZ7gnnJZX0afYPsORF
+	 gaINh7JGOtbCyf3dOBiUgEKH6ezjAjV19jmyYOhx8yYCN2hFHcsMH81TmxzykLFdRs
+	 /myrgGgy/2VyjTt/a5GchaBHgckNiayogkYSkNOsTA3BkL+kuIbFXR/juh9vntN7Ca
+	 CqNUsQlhDIJuA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net v3 0/2] net: airoha: Improve hwfd buffer/descriptor
+ queues setup
+Date: Wed, 18 Jun 2025 09:48:03 +0200
+Message-Id: <20250618-airoha-hw-num-desc-v3-0-18a6487cd75e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADNvUmgC/x3MTQqAIBBA4avErBsoQ6muEi1Mx5xFFko/EN49a
+ fkt3nshUWRKMFYvRLo48R4KuroC43VYCdkWg2iEbFTbo+a4e43+xnBuaCkZVE4uyg2ul5qghEc
+ kx88/neacP8CIWb1kAAAA
+X-Change-ID: 20250618-airoha-hw-num-desc-6f5b6f9f85ae
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Wed, Jun 18, 2025 at 09:36:50AM +0200, Krzysztof Kozlowski wrote:
-> Setting tty->disc_data before opening the NCI device means we need to
-> clean it up on error paths.  This also opens some short window if device
-> starts sending data, even before NCIUARTSETDRIVER IOCTL succeeded
-> (broken hardware?).  Close the window by exposing tty->disc_data only on
-> the success path, when opening of the NCI device and try_module_get()
-> succeeds.
-> 
-> The code differs in error path in one aspect: tty->disc_data won't be
-> ever assigned thus NULL-ified.  This however should not be relevant
-> difference, because of "tty->disc_data=NULL" in nci_uart_tty_open().
-> 
-> Cc: Greg KH <gregkh@linuxfoundation.org>
-> Cc: Linus Torvalds <torvalds@linuxfoundation.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Fixes: 9961127d4bce ("NFC: nci: add generic uart support")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  net/nfc/nci/uart.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/nfc/nci/uart.c b/net/nfc/nci/uart.c
-> index ed1508a9e093..aab107727f18 100644
-> --- a/net/nfc/nci/uart.c
-> +++ b/net/nfc/nci/uart.c
-> @@ -119,22 +119,22 @@ static int nci_uart_set_driver(struct tty_struct *tty, unsigned int driver)
->  
->  	memcpy(nu, nci_uart_drivers[driver], sizeof(struct nci_uart));
->  	nu->tty = tty;
-> -	tty->disc_data = nu;
->  	skb_queue_head_init(&nu->tx_q);
->  	INIT_WORK(&nu->write_work, nci_uart_write_work);
->  	spin_lock_init(&nu->rx_lock);
->  
->  	ret = nu->ops.open(nu);
->  	if (ret) {
-> -		tty->disc_data = NULL;
->  		kfree(nu);
-> +		return ret;
->  	} else if (!try_module_get(nu->owner)) {
->  		nu->ops.close(nu);
-> -		tty->disc_data = NULL;
->  		kfree(nu);
->  		return -ENOENT;
->  	}
-> -	return ret;
-> +	tty->disc_data = nu;
-> +
-> +	return 0;
->  }
+Compute the number of hwfd buffers/descriptors according to the reserved
+memory size if provided via DTS.
+Reduce the required hwfd buffers queue size for QDMA1.
 
-Looks good, thanks for cleaning this up:
+---
+Changes in v3:
+- Target net tree instead of net-next one
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Changes in v2:
+- Rely on div_u64 to compute number of hw descriptors
+- Link to v1: https://lore.kernel.org/r/20250615-airoha-hw-num-desc-v1-0-8f88daa4abd7@kernel.org
+
+---
+Lorenzo Bianconi (2):
+      net: airoha: Compute number of descriptors according to reserved memory size
+      net: airoha: Differentiate hwfd buffer size for QDMA0 and QDMA1
+
+ drivers/net/ethernet/airoha/airoha_eth.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
+---
+base-commit: 0aff00432cc755ad7713f8a2f305395d443cdd4c
+change-id: 20250618-airoha-hw-num-desc-6f5b6f9f85ae
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
