@@ -1,251 +1,129 @@
-Return-Path: <netdev+bounces-198937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E38ADE626
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:56:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA6CADE659
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4112B17122A
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:57:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7826F3A4AA7
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CE527F00B;
-	Wed, 18 Jun 2025 08:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3D127FD55;
+	Wed, 18 Jun 2025 09:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sSX0dr/U"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f73.google.com (mail-vs1-f73.google.com [209.85.217.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C318B25B1C5;
-	Wed, 18 Jun 2025 08:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3135B27FB3C
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750237015; cv=none; b=UwdSE7XY6TkGp5q2+fIwrjGo/HJ+OMytLKeWUMiSOfToY+QVfEwiHG3xlaH8PgTdwZWUCaF8gxvfCC74UKrhIcKoNUqt3+q2w3DD6KiuqxAZP/10DSkxX179b/jb8IpadDc/ZoJxoMO0QUUI1zBlS7Rqc7M0GDZpe3fLRV7jLd4=
+	t=1750237971; cv=none; b=ID0KW5MdwoNfmRE+HFS/D4gMASX/jTroBqIQ4Na4KWVFWpPTiMqvW7ueV+Skyr3XQgtHQCdvHwXowQD5GNUCGfxa1yBXuptqvh4bye6J2jJUXWRVZyigXEoQP6vD8549iRBD527zb4HmrPK0FS5pCpfUdUrIZ22YkjFBuiTgN5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750237015; c=relaxed/simple;
-	bh=9To1BSpsPsNIGrHogpM+R444lxBSfMxpMbu2q+8LxE4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pB9mafOcHPup0eUOTgXc5MG2jWbJBHpQ0RnYkNbiI+lwjXk1Gm4MHNTreaJtqqVRS3eNf75uC1IlSuhjjvqBg7GYqebyiEPORdjtAfQMwmMuIBDXDLlGcIwYhZRIGBlGq2H9j7cA3PqmYltjmk9ag3dN/mmbUN8IhgNvQ4Xnnh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bMctd6GXjz6L570;
-	Wed, 18 Jun 2025 16:52:09 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6CD6B140426;
-	Wed, 18 Jun 2025 16:56:49 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 18 Jun
- 2025 10:56:48 +0200
-Date: Wed, 18 Jun 2025 09:56:46 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Ivan Vecera <ivecera@redhat.com>
-CC: <netdev@vger.kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko
-	<jiri@resnulli.us>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Prathosh Satish
-	<Prathosh.Satish@microchip.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson
-	<shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, Michal Schmidt <mschmidt@redhat.com>, Petr Oros
-	<poros@redhat.com>
-Subject: Re: [PATCH net-next v11 03/14] dpll: Add basic Microchip ZL3073x
- support
-Message-ID: <20250618095646.00004595@huawei.com>
-In-Reply-To: <20250616201404.1412341-4-ivecera@redhat.com>
-References: <20250616201404.1412341-1-ivecera@redhat.com>
-	<20250616201404.1412341-4-ivecera@redhat.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1750237971; c=relaxed/simple;
+	bh=t2pxm20EYK1NEk7N8OBNO0lB8u3wCvWAGc5TfAuwAzA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sFnBRiKTxtI6rPpuzoxvQnKhduiKMnUwBTHMkeWBRkxAkDq9gXECQnKb4SPd94rFaZJt3IyzhHukZKFW5W+1+39KfaUJCeGkOd3v6JOHYidlI4SWUg7W2GZYk0san9vfkZS3aBpsuArLCpciGIJl7ehIh8Ejay/tLvcosCEL5xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sSX0dr/U; arc=none smtp.client-ip=209.85.217.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-vs1-f73.google.com with SMTP id ada2fe7eead31-4e8fe2529f5so554665137.2
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 02:12:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750237969; x=1750842769; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CA8zH38USDmVdEW34eD/0nQwX97M0Frbjyk5UTzBNpc=;
+        b=sSX0dr/Ui9pH0OCsAckeYzdd4H4T2p/ccFf5xK+vcU+vqFDhO7bNzNU4p2qHzTNHQQ
+         sk4889KHLXnFLrwPFg+x5hQqbvFuCOWPZtOVYM7nbmBnkEjMgFhijEQulrAmqJ8VVVNv
+         m9VWX0pCjg0wWuoi4+0ZnXgHof5jAmL6XZubliZWnVG/KGuuPYGKM3TAH1MSXqeiRf98
+         vGUUsw3yF4IA7vS9GtWEIQXRjRDdlpWXpWdBKF+r1DPgWPPR1TCDQMMHQVEkB3O2CrU4
+         QriHECcEMsKSRHsQYtevaABe82gZ9kMwAwhKKZVPJev1OIfWzptz+xX+677NRqrKsC+l
+         f3Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750237969; x=1750842769;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CA8zH38USDmVdEW34eD/0nQwX97M0Frbjyk5UTzBNpc=;
+        b=Ce3vTnnxqZwac9dFFZlOj9l8xtXYB9BdS9cqJmmxz6aOFb/p4xochb2GdG2iXz/+Tj
+         4SQqccMsM1IVqTfI5swKYKVIve7rDvzj42emPt2azvnfGXwPw+ltLqMVB8wA57fwKHZh
+         THxXMv9XBOGh4hCXKQnvFB4sqb4PwQ5IuaoyKRpDtU933hJ0sBV63DvBveH+fKB1N2so
+         YUHS94YtozIxjF1y4FJQWbQaG7AcyRgmp/2DfInys8AB9iEglh44Slx32KAZeWB3XymD
+         LXTb4IT2v3HNNhIknJjq+JqQEvqNsRfLosE41ki/k1XKMlyQZ9ooN8NLySEyKfOO7/iK
+         17rg==
+X-Forwarded-Encrypted: i=1; AJvYcCVl6pjGqb1ba3edbJQZhLq0B/4meavwVCvAfDudo394TZ2tq5dw6aZEPwoH0KMtDTap6idm8zI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXHQCWUEAt915EblUqOBrOmpOxpI45VXYl733+e2CUcT2HYZ0r
+	oYeywqoNBA7jJ03sF4sQaIsxUQv/7ZQ6AmOi8jGh5trO08xYcze32m2MxXDqOdS7vB8le8p9dSw
+	kkCOqyYmWq09l7Q==
+X-Google-Smtp-Source: AGHT+IGJLytDZk7JzkqbXxMhMHJbQ7LvbD744CtkCOSjXzwU2CV5jbW75dyd2eh66YHVQStSyAK/CUpYopDjAQ==
+X-Received: from vsw3.prod.google.com ([2002:a67:f083:0:b0:4e7:e350:addb])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:4194:b0:4e5:8c2a:fbee with SMTP id ada2fe7eead31-4e7f643ae25mr11292470137.15.1750237969059;
+ Wed, 18 Jun 2025 02:12:49 -0700 (PDT)
+Date: Wed, 18 Jun 2025 09:12:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
+Message-ID: <20250618091246.1260322-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: tcp_time_to_recover() cleanup
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 16 Jun 2025 22:13:53 +0200
-Ivan Vecera <ivecera@redhat.com> wrote:
+tcp_time_to_recover() does not need the @flag argument.
 
-> Microchip Azurite ZL3073x represents chip family providing DPLL
-> and optionally PHC (PTP) functionality. The chips can be connected
-> be connected over I2C or SPI bus.
-> 
-> They have the following characteristics:
-> * up to 5 separate DPLL units (channels)
-> * 5 synthesizers
-> * 10 input pins (references)
-> * 10 outputs
-> * 20 output pins (output pin pair shares one output)
-> * Each reference and output can operate in either differential or
->   single-ended mode (differential mode uses 2 pins)
-> * Each output is connected to one of the synthesizers
-> * Each synthesizer is driven by one of the DPLL unit
-> 
-> The device uses 7-bit addresses and 8-bits values. It exposes 8-, 16-,
-> 32- and 48-bits registers in address range <0x000,0x77F>. Due to 7bit
-> addressing, the range is organized into pages of 128 bytes, with each
-> page containing a page selector register at address 0x7F.
-> For reading/writing multi-byte registers, the device supports bulk
-> transfers.
-> 
-> Add basic functionality to access device registers and probe
-> functionality for both I2C and SPI cases.
-> 
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-A few trivial drive by comments.
+Its first parameter can be marked const, and of tcp_sock type.
 
-> diff --git a/drivers/dpll/zl3073x/i2c.c b/drivers/dpll/zl3073x/i2c.c
-> new file mode 100644
-> index 0000000000000..bca1cd729895c
-> --- /dev/null
-> +++ b/drivers/dpll/zl3073x/i2c.c
-> @@ -0,0 +1,93 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <linux/dev_printk.h>
-> +#include <linux/err.h>
-> +#include <linux/i2c.h>
-> +#include <linux/module.h>
-> +#include <linux/regmap.h>
-> +
-> +#include "core.h"
-> +
-> +static int zl3073x_i2c_probe(struct i2c_client *client)
-> +{
-> +	struct device *dev = &client->dev;
-> +	struct zl3073x_dev *zldev;
-> +
-> +	zldev = zl3073x_devm_alloc(dev);
-> +	if (IS_ERR(zldev))
-> +		return PTR_ERR(zldev);
-> +
-> +	zldev->regmap = devm_regmap_init_i2c(client, &zl3073x_regmap_config);
-> +	if (IS_ERR(zldev->regmap)) {
-> +		dev_err_probe(dev, PTR_ERR(zldev->regmap),
-> +			      "Failed to initialize regmap\n");
-> +		return PTR_ERR(zldev->regmap);
-As below.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp_input.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-> +	}
-
-> diff --git a/drivers/dpll/zl3073x/spi.c b/drivers/dpll/zl3073x/spi.c
-> new file mode 100644
-> index 0000000000000..219676da71b78
-> --- /dev/null
-> +++ b/drivers/dpll/zl3073x/spi.c
-> @@ -0,0 +1,93 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <linux/dev_printk.h>
-> +#include <linux/err.h>
-> +#include <linux/module.h>
-> +#include <linux/regmap.h>
-> +#include <linux/spi/spi.h>
-> +
-> +#include "core.h"
-> +
-> +static int zl3073x_spi_probe(struct spi_device *spi)
-> +{
-> +	struct device *dev = &spi->dev;
-> +	struct zl3073x_dev *zldev;
-> +
-> +	zldev = zl3073x_devm_alloc(dev);
-> +	if (IS_ERR(zldev))
-> +		return PTR_ERR(zldev);
-> +
-> +	zldev->regmap = devm_regmap_init_spi(spi, &zl3073x_regmap_config);
-> +	if (IS_ERR(zldev->regmap)) {
-> +		dev_err_probe(dev, PTR_ERR(zldev->regmap),
-> +			      "Failed to initialize regmap\n");
-> +		return PTR_ERR(zldev->regmap);
-
-return dev_err_probe();
-One of it's biggest advantages is that dev_err_probe() returns the
-ret value passed in avoiding duplication like this and saving
-a few lines of code each time.
-
-> +	}
-> +
-> +	return zl3073x_dev_probe(zldev, spi_get_device_match_data(spi));
-> +}
-> +
-> +static const struct spi_device_id zl3073x_spi_id[] = {
-> +	{
-> +		.name = "zl30731",
-> +		.driver_data = (kernel_ulong_t)&zl3073x_chip_info[ZL30731],
-
-Not my subsystem so up to you, but in general over time we've found that
-an enum + array tends to bring few benefits over appropriately named
-zl30731_chip_info separate structures.
-
-> +	},
-> +	{
-> +		.name = "zl30732",
-> +		.driver_data = (kernel_ulong_t)&zl3073x_chip_info[ZL30732],
-> +	},
-> +	{
-> +		.name = "zl30733",
-> +		.driver_data = (kernel_ulong_t)&zl3073x_chip_info[ZL30733],
-> +	},
-> +	{
-> +		.name = "zl30734",
-> +		.driver_data = (kernel_ulong_t)&zl3073x_chip_info[ZL30734],
-> +	},
-> +	{
-> +		.name = "zl30735",
-> +		.driver_data = (kernel_ulong_t)&zl3073x_chip_info[ZL30735]
-> +	},
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(spi, zl3073x_spi_id);
-> +
-> +static const struct of_device_id zl3073x_spi_of_match[] = {
-> +	{
-> +		.compatible = "microchip,zl30731",
-> +		.data = &zl3073x_chip_info[ZL30731]
-> +	},
-> +	{
-> +		.compatible = "microchip,zl30732",
-> +		.data = &zl3073x_chip_info[ZL30732]
-> +	},
-> +	{
-> +		.compatible = "microchip,zl30733",
-> +		.data = &zl3073x_chip_info[ZL30733]
-> +	},
-> +	{
-> +		.compatible = "microchip,zl30734",
-> +		.data = &zl3073x_chip_info[ZL30734]
-> +	},
-> +	{
-> +		.compatible = "microchip,zl30735",
-> +		.data = &zl3073x_chip_info[ZL30735]
-> +	},
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(of, zl3073x_spi_of_match);
-> +
-> +static struct spi_driver zl3073x_spi_driver = {
-> +	.driver = {
-> +		.name = "zl3073x-spi",
-> +		.of_match_table = zl3073x_spi_of_match,
-> +	},
-> +	.probe = zl3073x_spi_probe,
-> +	.id_table = zl3073x_spi_id,
-> +};
-> +module_spi_driver(zl3073x_spi_driver);
-> +
-> +MODULE_AUTHOR("Ivan Vecera <ivecera@redhat.com>");
-> +MODULE_DESCRIPTION("Microchip ZL3073x SPI driver");
-> +MODULE_IMPORT_NS("ZL3073X");
-> +MODULE_LICENSE("GPL");
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 05b9571c9c92599df800307afd9c655771425f1e..e5664e6131defc69f533860c480328d9ad433b37 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -2336,10 +2336,8 @@ static bool tcp_check_sack_reneging(struct sock *sk, int *ack_flag)
+  * Main question: may we further continue forward transmission
+  * with the same cwnd?
+  */
+-static bool tcp_time_to_recover(struct sock *sk, int flag)
++static bool tcp_time_to_recover(const struct tcp_sock *tp)
+ {
+-	struct tcp_sock *tp = tcp_sk(sk);
+-
+ 	/* Has loss detection marked at least one packet lost? */
+ 	return tp->lost_out != 0;
+ }
+@@ -3000,7 +2998,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
+ 
+ 		tcp_identify_packet_loss(sk, ack_flag);
+ 		if (icsk->icsk_ca_state != TCP_CA_Recovery) {
+-			if (!tcp_time_to_recover(sk, flag))
++			if (!tcp_time_to_recover(tp))
+ 				return;
+ 			/* Undo reverts the recovery state. If loss is evident,
+ 			 * starts a new recovery (e.g. reordering then loss);
+@@ -3029,7 +3027,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
+ 			tcp_try_undo_dsack(sk);
+ 
+ 		tcp_identify_packet_loss(sk, ack_flag);
+-		if (!tcp_time_to_recover(sk, flag)) {
++		if (!tcp_time_to_recover(tp)) {
+ 			tcp_try_to_open(sk, flag);
+ 			return;
+ 		}
+-- 
+2.50.0.rc2.696.g1fc2a0284f-goog
 
 
