@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB933ADE0BA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:40:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CDAADE0BD
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BAF61785AE
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B10D4189B00A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A47B1922FA;
-	Wed, 18 Jun 2025 01:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1156219A288;
+	Wed, 18 Jun 2025 01:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouLCo4yw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dw/g8ufy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2073A3A1DB;
-	Wed, 18 Jun 2025 01:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C800B199396;
+	Wed, 18 Jun 2025 01:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750210840; cv=none; b=ZBI73Mdo3xdMY1Myc5NjoQm6gZZNqUvQlbRi6RfQYWd8MG1lwJb7fQORAw+nZubwLiT6lpOUurjJBEhSOtc1QlXGK5GCwq3mXAguNZ9OqAOSCrA8mHUZvkRjvdwnqqwUNTHJzG/pXEoaBOKCwE7+0oMEPD2hhgIAsPMNBkyKXac=
+	t=1750210842; cv=none; b=s6o9K1Qf5eHNiVYhEYjfH97w6rxfW2m3nT+gTzI09WPaVmNAD90PaYcp57fjbnrChncR/uTxVlddeCOXJf0uAh8/ZhmvTzgPzAp2ERsqhTJ3NXPX9srzQYQs5iU/7+RNbiM6eKu31KCSklasH0v3RfGP1lhmrcPG51jrKqQIOQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750210840; c=relaxed/simple;
-	bh=oVI16x2/FtAROcV7OsmmjED9sjLpxlYCzbKyqsxl814=;
+	s=arc-20240116; t=1750210842; c=relaxed/simple;
+	bh=dWWHgiEt3tYWTZRgQm02U8aGJUCEgTY0w6sEmnkU+4s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GuWj4ugGNwCoeZD8uwkx8EDrgmSs5Gb+c5jETP+qc/OaubyXm8CyimmxRyUziF7AuPOxIhFdfD+gfhm9oGNFUcEHmUruqL5vrARE3FGAhbK3GRSJ7U4yDW2b6yPH9boSztNBMYWaaiKtBaoK6Pe2aHWiC09VlsZw79zNjv0yEDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouLCo4yw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09BBC4CEE3;
-	Wed, 18 Jun 2025 01:40:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=EOeaqdgMAwHUXcMNCjSAvVcIz62zJpSucv2Zhr+XXFO6s1D0xvKOVXaoR23InDEzI4OJceUXUZGA/WDPyYjPYB6dwfLoBuQdSIw5ajRVWAIWZcIO+NfSKc82YY1w8aRsIrKc8QeHxWzzLC6vJPJ8EzNBopo/BInmBfRYJLFodC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dw/g8ufy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 348C4C4CEF0;
+	Wed, 18 Jun 2025 01:40:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750210840;
-	bh=oVI16x2/FtAROcV7OsmmjED9sjLpxlYCzbKyqsxl814=;
+	s=k20201202; t=1750210841;
+	bh=dWWHgiEt3tYWTZRgQm02U8aGJUCEgTY0w6sEmnkU+4s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ouLCo4yw4jp3rBKePUYVHasSmTOHOqs7Mib/rMreHGnIlmR9s/XcSJUyBZxHm25cR
-	 TWcie5xMPqDLfLmiD93gKF7NOfOi4sGZxy0AYXilRQJI5GvFqUCvX1V00MPv3Q4lyY
-	 41YM984WOynFUBZNBakronJ+BwBQ42nqs4WY2Sy668PkCgflCz9nGO49P2Wyj/Fz20
-	 r6wN/OhWXjR88+cQHJuQ+AfgG0DJBj/8Wh6JPCATNoRDpQVMAmobBRHnmWdObZLjnh
-	 GlDd0VULZ5VyQ8RkyylmXbbvt6tHWxEt6zn1whLKHQcAWbERPp5BLN3W79/UjZlKEz
-	 I0+oveNmnvn7A==
+	b=dw/g8ufyu11VCbuMaNH4zZzsZdGQI+Frv2Bdhof0fbxSnVzrdeBylNSHvRJhDwibv
+	 QD3nGymvb8a2VPn8/d/F+xH5C2fcdkUVNUfs9gBSYOYcnoBtQf/YiioPQ8qWhU/1Fi
+	 /TwI0Cz59/BlnTyiC5q7u6K6bE2XF85SWcYyM4R8LcW5T8dAQ6pLOup1yl6nQK2rwo
+	 tNb+jVEzw8TSsodBpO8MgA6c/kh20BoqSecflSaYFp9EDsbuguuuZnpJU8gCvFN5nQ
+	 WmlL/8Ss+ex1zz0eLaE1Kz/w/ns6U8ZH+eTjGkqyptLL6PEMAm3kXr+3w1NQjjOHsu
+	 npR4ZTWw/z2xg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC4C38111DD;
-	Wed, 18 Jun 2025 01:41:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADD338111DD;
+	Wed, 18 Jun 2025 01:41:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] gve: Fix various typos and improve code comments
+Subject: Re: [PATCH v2 0/5] net: use new GPIO line value setter callbacks
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175021086849.3761578.16887973997581697428.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Jun 2025 01:41:08 +0000
-References: <20250616054504.1644770-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250616054504.1644770-1-alok.a.tiwari@oracle.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, jeroendb@google.com,
- hramamurthy@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, netdev@vger.kernel.org, almasrymina@google.com,
- bcf@google.com, linux-kernel@vger.kernel.org, ziweixiao@google.com,
- joshwash@google.com, willemb@google.com, pkaligineedi@google.com
+ <175021086974.3761578.16857215533657509710.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Jun 2025 01:41:09 +0000
+References: <20250616-gpiochip-set-rv-net-v2-0-cae0b182a552@linaro.org>
+In-Reply-To: <20250616-gpiochip-set-rv-net-v2-0-cae0b182a552@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linus.walleij@linaro.org, chester.a.unal@arinc9.com, daniel@makrotopia.org,
+ dqfext@gmail.com, sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, mkl@pengutronix.de,
+ mailhol.vincent@wanadoo.fr, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-can@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, bartosz.golaszewski@linaro.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 15 Jun 2025 22:45:00 -0700 you wrote:
-> - Correct spelling and improves the clarity of comments
->    "confiugration" -> "configuration"
->    "spilt" -> "split"
->    "It if is 0" -> "If it is 0"
->    "DQ" -> "DQO" (correct abbreviation)
-> - Clarify BIT(0) flag usage in gve_get_priv_flags()
-> - Replaced hardcoded array size with GVE_NUM_PTYPES
->   for clarity and maintainability.
+On Mon, 16 Jun 2025 09:24:03 +0200 you wrote:
+> Commit 98ce1eb1fd87e ("gpiolib: introduce gpio_chip setters that return
+> values") added new line setter callbacks to struct gpio_chip. They allow
+> to indicate failures to callers. We're in the process of converting all
+> GPIO controllers to using them before removing the old ones. This series
+> converts all GPIO chips implemented under drivers/net/.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] gve: Fix various typos and improve code comments
-    https://git.kernel.org/netdev/net-next/c/b52a93bbaa51
-  - [2/2] gve: Return error for unknown admin queue command
-    https://git.kernel.org/netdev/net-next/c/b11344f63fdd
+  - [v2,1/5] net: dsa: vsc73xx: use new GPIO line value setter callbacks
+    https://git.kernel.org/netdev/net-next/c/c73832445bf2
+  - [v2,2/5] net: dsa: mt7530: use new GPIO line value setter callbacks
+    https://git.kernel.org/netdev/net-next/c/4a03562794a3
+  - [v2,3/5] net: can: mcp251x: propagate the return value of mcp251x_spi_write()
+    https://git.kernel.org/netdev/net-next/c/b9e3c7af9e4d
+  - [v2,4/5] net: can: mcp251x: use new GPIO line value setter callbacks
+    https://git.kernel.org/netdev/net-next/c/5d31311715b5
+  - [v2,5/5] net: phy: qca807x: use new GPIO line value setter callbacks
+    https://git.kernel.org/netdev/net-next/c/dea3be40464a
 
 You are awesome, thank you!
 -- 
