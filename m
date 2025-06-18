@@ -1,124 +1,84 @@
-Return-Path: <netdev+bounces-198843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C20BADE000
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A796FADE03D
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B171189A039
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:32:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76F7D3B9694
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D333412E5D;
-	Wed, 18 Jun 2025 00:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7000242049;
+	Wed, 18 Jun 2025 00:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e4+6Mc3j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXtJaDtS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D26C2F5313;
-	Wed, 18 Jun 2025 00:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431B229A5;
+	Wed, 18 Jun 2025 00:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750206753; cv=none; b=Vt7/gREeU8S7ni2R18uh4xPDm43IS1AdApvwC5XqlyKEgnqz3aHOGci7rFov2G6BF+drQred3enXZSW5/TWgMEyD3qC8HycYda7ualAg6GCKPRd2kwTYOw4Iez72UWbHtxIDJrGpWFPlVZ5gu1b6X+Hu8j50J1XTjcsS9AxVfU8=
+	t=1750208196; cv=none; b=OR/ZNmFoGYo+n5XToL90OXxXcFeKgZQIZTwjfzxjv8+XW9os0LXGcVmeQQzKIf+TQtpIyrb0zFEzkxrIpi6Z/lHagdrqFoKiOyh2W8k03CY4LXh9n8Ih1dNtXI3JYUm7dfuSSyyTUoO9e4T135+LfoWX9R9kxBrkNQnJdQv3qrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750206753; c=relaxed/simple;
-	bh=gRD63paj8zYb8vqRhC7emST10NJ6H4lIO2wH0ZxCBVs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=XcXOJZl4eBG3M5o1+vdSSQ7PGd71EqUeIoy/jwJGCFLM7tjioYyzFhqx0AgTtfU8y0Z/gM9XK0THEUuXNSudJO6J4XhJLBnEGOzIyzzrGABJoSguBneC5CNu3sikHqYTiFQDl/9/1ox9tkOgttBYwp7+0PW1Psi2YMreOrlIWmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e4+6Mc3j; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3de252f75d7so10145485ab.3;
-        Tue, 17 Jun 2025 17:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750206751; x=1750811551; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gRD63paj8zYb8vqRhC7emST10NJ6H4lIO2wH0ZxCBVs=;
-        b=e4+6Mc3jGEnU8Wba0LCzIxbbGFnrrgN9jRTdNqxoRclegUfzZjPIbUz6a3eagh9DrY
-         w2JvORFnqQKxBZzVX3WdT9t8kgLHJCMr2vwZeOI1Nu1RvhPErBiUbexrZGVYivYwFU6w
-         s6tK/U2B9KQxzEVuwLpA2FSq89OlzCM9ZOYRshN3ZI1UXcmU4kMOYM2eoDAX3fVD8fcB
-         qek5dc9v44cHBRHmoAOx7wCBOZ6jp9hDi0ZCmyc6pljUqOwsTiG0r7azZMrunbw8NkO3
-         w4aMvIcQY7l9cCW6yIkCu1fqUztPW5sKGJoJUQI5HNmSuTB5iPUkSKErd+xvy+UDCfwK
-         814w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750206751; x=1750811551;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gRD63paj8zYb8vqRhC7emST10NJ6H4lIO2wH0ZxCBVs=;
-        b=iULTfm9FyHVMPYiRacecmTI5XUuPUH+Vq33rDENk3h8b2Lu3PtlLsSj5VRGA8tmiRI
-         mm/G9+eAEWUCPebIPZkOTBq81biDRE4pdxpSR/iTGD0SljRfwSVHYlID9B6wqsYttAjY
-         2Ksz0cPh6w5BO8BREczm5fALg6S3F0Gkcei4eQEknmMPJXELyEETTAyCb+zqSKiPBtph
-         Ptj+e4xRXScsFk01ESux3nkf7lnMai2kNF+RvF9qocv1hGZXKoJtMio6BfxCORNyayd0
-         2tc6XomrtlC8pj2LlG0fAxUdbO8ppdTJvQ5eVeJzKbCTmSYAqlDmKzZvEVjNUFe2+hBh
-         hYzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLn9sySoBf2rskfyiUve8WRFgOtGGkQs+zWsUiw3LJXVGSElC30SlC0MEm+I2aJPOoLDFARQjo@vger.kernel.org, AJvYcCVcNXeZN99vLleH7QBv238UUjxDXQU8sCubjVmzMDDn5b9YGr+3u4mM8MM7omHWBBM2I9g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq9d3djy5rMYuB4ZOyWdfxDC7HXx80QAyn4mrVkpSttQWUS1Is
-	8oITBjOQcrE4S5jotvJcXUM143FdMrEAkSLRinpsjIWdjPl5gCbIlm017s4uzGNvgCikfIZ7xzR
-	FSXxrFj68cys7lN4jn4lGi3F/bl94wB0=
-X-Gm-Gg: ASbGnctqB5QFj6YOkSe7Lb9ygPrR4aVKrcMXanXTZ41CuWo4n4k1l2jZUIVBsb9Tlta
-	sW4MIqF2vuVhelfkqNYOB8+ZobqdY6yx6fNeAcbT/P1lkEPrg5tyXhqv2W4ht9iXwNxbnIP1x/4
-	gXrFiyCQHTNQCBs1ZUQLt1YM5iHRWuclz84/YPldDvPODHqS+Zb/tv
-X-Google-Smtp-Source: AGHT+IEoUjHGuMcbn0vuucku2ubMhfDr2MZ9mzCwsctHfGG771naqIAzGep2J28JD1GOwIRFuYZWt6iybjoANyhJ5AI=
-X-Received: by 2002:a05:6e02:1a2b:b0:3dd:d746:25eb with SMTP id
- e9e14a558f8ab-3de07cd170amr178487945ab.16.1750206751301; Tue, 17 Jun 2025
- 17:32:31 -0700 (PDT)
+	s=arc-20240116; t=1750208196; c=relaxed/simple;
+	bh=jf0PfUJI2wJjcwG+5ifpaB1FC4hkqfOWN/t2FhiaSW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=meGkjFIsa3/pk8NxnDJJxoYAkSLaEbC7Ov2kJRW+a5k9Hit4LU6wFjguvMfcXk6j9hSj5y/KrlQd1TccXkJTdKAzyMo43u+PHA2xkcXrsxkSj6/OMC/5ndTo03HFt0FjIwkVxiiqQpf9Ey9pyogj5gdBiI+KbBYWHeaweWs+BzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXtJaDtS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B779C4CEEE;
+	Wed, 18 Jun 2025 00:56:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750208195;
+	bh=jf0PfUJI2wJjcwG+5ifpaB1FC4hkqfOWN/t2FhiaSW8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VXtJaDtSao0XAs3sY0reVQeBGgmLFDQncc3RAtkxD1JfR7lI9jpLk1hWD88War5dy
+	 GDEhR0p/kxBnspAGDW0u7hxhMHqK8ClMwaB6xrKayQpGWAynC8GCYgM869Q4OK7/sY
+	 9CnFvhb2hW+fuhZtjo9vM+xhYbcofh6jl4x5ynL3j33hLWrz+Z44F8FGaShWp+FfEb
+	 vRGhHd0r+LNoFFDdNYtxc76+AoNAafNIw6C3/40IYhciUugFATdzXa+1FXRjsJfleH
+	 0abLaA+OSduu92co2HVjl+Un5PRv0G5KPE624MV/gvbNmwD28xa/e6Hqbt7fg1y8GD
+	 7bS89z/pFaaCg==
+Date: Tue, 17 Jun 2025 17:56:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>
+Cc: jonas.gorski@gmail.com, florian.fainelli@broadcom.com, andrew@lunn.ch,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, vivien.didelot@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Subject: Re: [PATCH net-next v4 00/14] net: dsa: b53: fix BCM5325 support
+Message-ID: <20250617175634.73ce12c9@kernel.org>
+In-Reply-To: <20250614080000.1884236-1-noltari@gmail.com>
+References: <20250614080000.1884236-1-noltari@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
- <aFDAwydw5HrCXAjd@mini-arch> <CAL+tcoDYiwH8nz5u=sUiYucJL+VkGx4M50q9Lc2jsPPupZ2bFg@mail.gmail.com>
- <aFGp8tXaL7NCORhk@mini-arch> <aFG_U2lGIPWTDp1E@MacBook-Air.local>
-In-Reply-To: <aFG_U2lGIPWTDp1E@MacBook-Air.local>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 18 Jun 2025 08:31:55 +0800
-X-Gm-Features: AX0GCFvHM96B6Xidefi7yZNbGcKX7cv5xfztkil6L5CcZTJxtBwwX90cywalQ6M
-Message-ID: <CAL+tcoA67FiFZ_DVO-22vvWEcPjt1UScb_hcTvJhuWsiEYd5EA@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
-To: Joe Damato <joe@dama.to>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 18, 2025 at 3:17=E2=80=AFAM Joe Damato <joe@dama.to> wrote:
->
-> On Tue, Jun 17, 2025 at 10:46:26AM -0700, Stanislav Fomichev wrote:
-> > On 06/17, Jason Xing wrote:
->
-> > > >
-> > > > Also, can we put these settings into the socket instead of (global/=
-ns)
-> > > > sysctl?
-> > >
-> > > As to MAX_PER_SOCKET_BUDGET, it seems not easy to get its
-> > > corresponding netns? I have no strong opinion on this point for now.
-> >
-> > I'm suggesting something along these lines (see below). And then add
-> > some way to configure it (plus, obviously, set the default value
-> > on init).
->
-> +1 from me on making this per-socket instead of global with sysfs.
->
-> I feel like the direction networking has taken lately (netdev-genl, for
-> example) is to make things more granular instead of global.
+On Sat, 14 Jun 2025 09:59:46 +0200 =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
+> These patches get the BCM5325 switch working with b53.
+>=20
+> The existing brcm legacy tag only works with BCM63xx switches.
+> We need to add a new legacy tag for BCM5325 and BCM5365 switches, which
+> require including the FCS and length.
+>=20
+> I'm not really sure that everything here is correct since I don't work for
+> Broadcom and all this is based on the public datasheet available for the
+> BCM5325 and my own experiments with a Huawei HG556a (BCM6358).
+>=20
+> Both sets of patches have been merged due to the change requested by Jonas
+> about BRCM_HDR register access depending on legacy tags.
 
-Agree. Previously I missed using sock_net(sk)->core->xxx to make it
-namespecified :(
-
-Thanks,
-Jason
+=46rom the commit messages sounds like the support for these switches
+never really worked properly. So I'll drop the Fixes tag when applying.
+No objection if you'd like to argue with stable folks for stable
+inclusion once these reach Linus, given what lands in stable these days.
+But I don't want to implicitly support that by applying with the Fixes
+tags.
 
