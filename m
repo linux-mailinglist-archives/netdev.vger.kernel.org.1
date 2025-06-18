@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-199261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E27ADF935
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:08:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B1AADF936
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:08:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B7D17AF59
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:08:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF6D4A2951
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0525527E05C;
-	Wed, 18 Jun 2025 22:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9DC27E062;
+	Wed, 18 Jun 2025 22:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DK6GWnRq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HF/41mzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6069727E04A
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1931E27E05C
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750284486; cv=none; b=Ad5yhJn/AIFVkNhUQ2dAEEqlgCDKavjA1+de7ie0d7hZtelHZ/nsE3cbKviR9KxWlhXxJ2pwFj9TIOTIOHuv3VW+zzg4EcDuK6reM5OfZqDeQm96ah/8GtEgrN32D+lk3C+q0J6DLQqFTUkVgyDUNMtRQgtQ3XMHOXe3QfG6VfQ=
+	t=1750284494; cv=none; b=gLzgPG8CmWTlcLh8hr1sZL/+Jvg8cGxf0FI6FmkRBqRk0J4iifYY/+Um26qSTLd80449L3q038G/DDtVq5+oIBvRBHn5VxVS7YQpvM9jxRTFPZIVMVkW3kajEhKNE6Lau3+TVhTFnk3eHR4AAFiSKeZnv/dj74fG/7zgx8oZSgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750284486; c=relaxed/simple;
-	bh=r/MWRKglJPrUdvlirAeyFpOz7VQ01oUQaniVJ/Pl7CY=;
+	s=arc-20240116; t=1750284494; c=relaxed/simple;
+	bh=8rSZBM+2G3JxDo0bDT95Mi9KPzEaeGKNAtynlSjiwW0=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kcf6Fvf9neDR5hToM+UEM1TN8AgLcmlhZkUf2/9V7FVmnvbARv7JZC1n2kES+Vlm+RSCLnpYB8iSdzVpRwVrjDcVRcrDGOj3saffI/c6nJkNrqkrEDqOp8nD0bSznP9IbS5tHpXzk2YIgaRZTDLrN6HclpG5gZZxQthLceWKjJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DK6GWnRq; arc=none smtp.client-ip=209.85.210.180
+	 MIME-Version:Content-Type; b=pX78aXV9zGnMUyYRx2LEC3iDy/xYBP7XsbQuT3JOVTMUgZ+CvCYWjvcNScMXVGfeETFhuXd/6xvzighb/v9EusWE0e40hFyi0D5MNzSFOONsu1/YR7jsvDb2lZdrwLOWDL3ueYCCZ8lyJnSVQVWEPMbJ8jexYpHoSeJKtJVnJNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HF/41mzu; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso83515b3a.2
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:08:05 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235a3dd4f0dso1200905ad.0
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:08:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750284484; x=1750889284; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750284491; x=1750889291; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=7WDPOF1v6u06FnqyqD9SX1flvZuTqN6z9TS+jy+wb1M=;
-        b=DK6GWnRqxd/zTWyJjOpA/J81xYQLypU6n+P3eJd7ELi70Sv2+aBRDuRXbChUu2XIWz
-         z7zm8hRsa7lONsy858znBUXP3w4qJMKQoi53lmBnYf5EyWzKKrPq6ffBGoPhqGNZYVBz
-         vMyWiR/OyJCe/7mYtNGDbU+IJcX7g8Si3dsgTcJrXZ1VtnyRSXSY5BD7pRKtVRT2qPdJ
-         cZ8kzraDzIwfUICiDgcrUdKDv3DacWD+rmzLHPjLfGzxdAoDBtK1Z1aAOn6JlmcZKQ+Z
-         5I5Dp7PIqc64dCTTKsE4uCR6Di6zLgPQU5lGaW8i9YLDxNNmUE+rgxW29CglZ2kTpV5c
-         LAiQ==
+        bh=9zLeKsLC54GrWgQTvH5KRC9Xx2XhH1v9eQbOgi1AN6g=;
+        b=HF/41mzuOsyz6opjYU98a+pHpWmknF7fq9rLIV0UIk1mcmxGRWju5qHsrXR4Y4mIY6
+         qItd+4yd5cpPu3jQ+8kMZxj8KHVbMdARsOqFhlFjLG4RMHP6pJdcDxg6jtxIdvjziLQN
+         lV6swcflGauGrigH1kJcOZLGppVsG6M95QgyNdsTpAI65MXvtUIcXNPT8jqEoMEcU5u0
+         S2aLenvcKT5wE1YFPXshY6/uUglq73cQFOhpoENrDrHM4MlVZ3X5h/UhSIxMzeCblvpA
+         bWG4kk02dHVKNySxXAl7/1P+oK7l2eOa2mZgoaO40Oahas4McrMGugaoTadB1ARryrSV
+         OzTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750284484; x=1750889284;
+        d=1e100.net; s=20230601; t=1750284491; x=1750889291;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=7WDPOF1v6u06FnqyqD9SX1flvZuTqN6z9TS+jy+wb1M=;
-        b=VkwB4BdeHznEQq6GQoqLtHqrq5yAPoQDnuloeFY44jXfZyC8vzO/7o51afGSmpc6+T
-         z94c0OsvlIMIVBeOsn9qCs0n3N0J4z2rcJVN5r7XVYn0bgsNn4qFyKjarx/sdbzy/FkY
-         n8dcoGyU4ArulmnJjJlwCJD8c97xfmbFikvXVq2ij6RcIv93BcAOgV7OxSwoDk+GKjIG
-         unfSup/2ll+KeFfAO+LSizYF+JQCSkCxAU4dhvLqhlp9gGvRhkiVgg2dBYK4jmJU/Oh1
-         oZAEJnKxESAKiAEZupht/JbMGQlRTu9Eoyzf1b31YufGHVlPeQmHNoswmsUUagpEBFS6
-         nm+A==
-X-Gm-Message-State: AOJu0Yyf6JX+9G8ABM6vt6ckmqEJDqiJkpXOl7hbgaa5+2qVLqrXx0CS
-	wrPWRLj+6SuzA4i+AnUoUkHk6LCYSNovOjGvZpOQZhAAexW7vWEASVNo
-X-Gm-Gg: ASbGncuaN00ZgpChCFAgDWtmbuuBZFder8Bah8WwvzTA4L4tZIv30CS2H6auPqJg/ca
-	WQjFIU4nSXFwpS4LSOYXuOuzl8soe8+lPByXRH+CJRCj0uKpjZpnD82R4dHhuFFYrLKOKwTSo1e
-	/E1IFTRfPr1yRo/XjaZ8pKoDSHtYn2OXVXY/Js9wm4LZt1IRxsv4O++mSdyrfessZKJG2RjeCf3
-	+JWhGwi3uOMBwJB6F+RSEKkuumqew/F+OntyQSFbdbttOGgbwAW+MFezRp+9fW68UV6hMIoSnYi
-	SDPEgkKPKpTYubp68N7LdN91uO2ab9nLFZiCKp8vKBANueqSbsmtnRxywpbqNDBTu2Z7WOf/jK0
-	Enn4IRgIJtJLcdA==
-X-Google-Smtp-Source: AGHT+IF/oc/leYdDRi6ayMRQw9pyyIUov/mdJxXjcruqCQGiLqYEWP70IrKw1hABgO3QY3KDapVohA==
-X-Received: by 2002:a05:6a00:21c3:b0:742:a334:466a with SMTP id d2e1a72fcca58-7489cf97ddbmr27178844b3a.12.1750284484566;
-        Wed, 18 Jun 2025 15:08:04 -0700 (PDT)
+        bh=9zLeKsLC54GrWgQTvH5KRC9Xx2XhH1v9eQbOgi1AN6g=;
+        b=Z1nO38q9c80bnoWeyk0d4KnP0u/0haRqwjzKvfe0Yd9Nae05aIDMmqqHycFhP2JgKP
+         64zmsTzV5TGmJ3gNhLz0aduO8Dlrs/ZxGJUzK/yb6A81G2NkOZvTn/PH8I9KoIQA7oBr
+         ROyYG/NgQ41Yebai898WNeZzhSnDeqNSYB1NtWy3cAzOnDyQEdaGtxw5e3qQ9NNPKsX5
+         pzaiCKX1kbb3AbPQJzUSQWNlqozespM/uOWZqjVjmv+coLU6uHy+Vr4uY7GjoWjNKmPf
+         xG69PL0lGrBJv6Tv5lldZWBDX+51zdRev5/Ecp2XNMPZnSgPDnS0Ok9dh9OanyCAXXDW
+         KqKg==
+X-Gm-Message-State: AOJu0Yy7StwM5hRBaarYv7pi2jXdMP2iMQKykaA12DHeSsE8NgOld4Oe
+	HbektYVnz37Sz8uKdiuqMstGjgf4BolUvjUQZdd6y5W8Gp+JvL+JFe37
+X-Gm-Gg: ASbGncuCP3fo1P5pACoeNzpxwm7/aUbm+3EkrQqwOt+LMNFMXGkA5nYrCt5r+e8Vf3L
+	SdOu1+SnUMlgUqB9YU9IIJxQuFYJuKKDNPrxNEnAuS8DauLxgmRi/89eItPXp3IScKK7fjc2Jjl
+	4IWnE5Rn5OsEQ5VTmhwRVa6++v91CkLG7JbyMgE7ZteQxf+IfTwYFzqrzV7H7nvAILsxLyHC4Oq
+	JLRiNwEtU5p/uaRx5yo4UAhSFSvIgxV4FhDEQ7iwLWN48hRSRsa5IaMmGSvKZK9IwXzW/lXDHcM
+	eYPY8iLGWGykOnTCMZ0YKPPyZ9MkXJgk7PSrFwxREKh5ukIRdYqHkjAHeam/6EzRQCWP7YhDVdZ
+	39zcpmbOXiqizaQ==
+X-Google-Smtp-Source: AGHT+IGY2v3GWBubFJaujt9AdKDSFgg//CRJ9SOg3x0axm0ajUkoJPrviC8NlnYJTTBOTdCgQsu4Cg==
+X-Received: by 2002:a17:903:1b64:b0:226:38ff:1d6a with SMTP id d9443c01a7336-2366afbd7ffmr241061865ad.7.1750284491326;
+        Wed, 18 Jun 2025 15:08:11 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([98.97.35.53])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748900d2897sm12104681b3a.173.2025.06.18.15.08.03
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88eb54sm105901275ad.2.2025.06.18.15.08.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 15:08:03 -0700 (PDT)
-Subject: [net-next PATCH v3 7/8] fbnic: Add support for reporting link config
+        Wed, 18 Jun 2025 15:08:10 -0700 (PDT)
+Subject: [net-next PATCH v3 8/8] fbnic: Add support for setting/getting pause
+ configuration
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux@armlinux.org.uk, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
  davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org,
  kernel-team@meta.com, edumazet@google.com
-Date: Wed, 18 Jun 2025 15:08:02 -0700
+Date: Wed, 18 Jun 2025 15:08:09 -0700
 Message-ID: 
- <175028448275.625704.60592644122010798.stgit@ahduyck-xeon-server.home.arpa>
+ <175028448974.625704.14427543910503058114.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <175028434031.625704.17964815932031774402.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -97,133 +98,73 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-This change adds some basic support for reporting the current link config
-to the user via ethtool. Currently the main components reported are the
-carrier status, link speed, and FEC.
-
-For now we are handling the FEC directly as phylink doesn't have support
-for it. The plan is to work on incorporating FEC support into phylink and
-eventually adding the ability for us to set the FEC configuration through
-phylink itself.
-
-In addition as we don't yet have SFP or PHY support the listed modes
-supported are including ones not supported by the media we are attached to.
-That will hopefully be addressed once we can get the QSFP modules
-supported.
+Phylink already handles most of the pieces necessary for configuring
+autonegotation. With that being the case we can add support for
+getting/setting pause now by just passing through the ethtool call to the
+phylink code.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c |    3 +
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    4 ++
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   61 +++++++++++++++++++++++
- 3 files changed, 68 insertions(+)
+ drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c |    2 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    4 ++++
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   16 ++++++++++++++++
+ 3 files changed, 22 insertions(+)
 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 4646e80c3462..7cb191155d79 100644
+index 7cb191155d79..7fe9983d3c0e 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -1683,6 +1683,7 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
- 	.get_drvinfo		= fbnic_get_drvinfo,
- 	.get_regs_len		= fbnic_get_regs_len,
- 	.get_regs		= fbnic_get_regs,
-+	.get_link		= ethtool_op_get_link,
- 	.get_coalesce		= fbnic_get_coalesce,
+@@ -1688,6 +1688,8 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
  	.set_coalesce		= fbnic_set_coalesce,
  	.get_ringparam		= fbnic_get_ringparam,
-@@ -1705,6 +1706,8 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
- 	.set_channels		= fbnic_set_channels,
- 	.get_ts_info		= fbnic_get_ts_info,
- 	.get_ts_stats		= fbnic_get_ts_stats,
-+	.get_link_ksettings	= fbnic_phylink_ethtool_ksettings_get,
-+	.get_fecparam		= fbnic_phylink_get_fecparam,
- 	.get_eth_mac_stats	= fbnic_get_eth_mac_stats,
- 	.get_eth_ctrl_stats	= fbnic_get_eth_ctrl_stats,
- 	.get_rmon_stats		= fbnic_get_rmon_stats,
+ 	.set_ringparam		= fbnic_set_ringparam,
++	.get_pauseparam		= fbnic_phylink_get_pauseparam,
++	.set_pauseparam		= fbnic_phylink_set_pauseparam,
+ 	.get_strings		= fbnic_get_strings,
+ 	.get_ethtool_stats	= fbnic_get_ethtool_stats,
+ 	.get_sset_count		= fbnic_get_sset_count,
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index c30c060b72e0..943a52c77ed3 100644
+index 943a52c77ed3..a3dc85d3838b 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -92,5 +92,9 @@ void fbnic_time_stop(struct fbnic_net *fbn);
+@@ -92,6 +92,10 @@ void fbnic_time_stop(struct fbnic_net *fbn);
  void __fbnic_set_rx_mode(struct net_device *netdev);
  void fbnic_clear_rx_mode(struct net_device *netdev);
  
-+int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
-+					struct ethtool_link_ksettings *cmd);
-+int fbnic_phylink_get_fecparam(struct net_device *netdev,
-+			       struct ethtool_fecparam *fecparam);
- int fbnic_phylink_init(struct net_device *netdev);
- #endif /* _FBNIC_NETDEV_H_ */
++void fbnic_phylink_get_pauseparam(struct net_device *netdev,
++				  struct ethtool_pauseparam *pause);
++int fbnic_phylink_set_pauseparam(struct net_device *netdev,
++				 struct ethtool_pauseparam *pause);
+ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
+ 					struct ethtool_link_ksettings *cmd);
+ int fbnic_phylink_get_fecparam(struct net_device *netdev,
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index a693a9f4d5fd..3a11d2a27de9 100644
+index 3a11d2a27de9..7ce3fdd25282 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -24,6 +24,67 @@ static phy_interface_t fbnic_phylink_select_interface(u8 aui)
+@@ -24,6 +24,22 @@ static phy_interface_t fbnic_phylink_select_interface(u8 aui)
  	return PHY_INTERFACE_MODE_NA;
  }
  
-+static void
-+fbnic_phylink_get_supported_fec_modes(unsigned long *supported)
-+{
-+	/* The NIC can support up to 8 possible combinations.
-+	 * Either 50G-CR, or 100G-CR2
-+	 *   This is with RS FEC mode only
-+	 * Either 25G-CR, or 50G-CR2
-+	 *   This is with No FEC, RS, or Base-R
-+	 */
-+	if (phylink_test(supported, 100000baseCR2_Full) ||
-+	    phylink_test(supported, 50000baseCR_Full))
-+		phylink_set(supported, FEC_RS);
-+	if (phylink_test(supported, 50000baseCR2_Full) ||
-+	    phylink_test(supported, 25000baseCR_Full)) {
-+		phylink_set(supported, FEC_BASER);
-+		phylink_set(supported, FEC_NONE);
-+		phylink_set(supported, FEC_RS);
-+	}
-+}
-+
-+int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
-+					struct ethtool_link_ksettings *cmd)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+	int err;
-+
-+	err = phylink_ethtool_ksettings_get(fbn->phylink, cmd);
-+	if (!err) {
-+		unsigned long *supp = cmd->link_modes.supported;
-+
-+		cmd->base.port = PORT_DA;
-+		cmd->lanes = (fbn->aui & FBNIC_AUI_MODE_R2) ? 2 : 1;
-+
-+		fbnic_phylink_get_supported_fec_modes(supp);
-+	}
-+
-+	return err;
-+}
-+
-+int fbnic_phylink_get_fecparam(struct net_device *netdev,
-+			       struct ethtool_fecparam *fecparam)
++void fbnic_phylink_get_pauseparam(struct net_device *netdev,
++				  struct ethtool_pauseparam *pause)
 +{
 +	struct fbnic_net *fbn = netdev_priv(netdev);
 +
-+	if (fbn->fec & FBNIC_FEC_RS) {
-+		fecparam->active_fec = ETHTOOL_FEC_RS;
-+		fecparam->fec = ETHTOOL_FEC_RS;
-+	} else if (fbn->fec & FBNIC_FEC_BASER) {
-+		fecparam->active_fec = ETHTOOL_FEC_BASER;
-+		fecparam->fec = ETHTOOL_FEC_BASER;
-+	} else {
-+		fecparam->active_fec = ETHTOOL_FEC_OFF;
-+		fecparam->fec = ETHTOOL_FEC_OFF;
-+	}
-+
-+	if (fbn->aui & FBNIC_AUI_MODE_PAM4)
-+		fecparam->fec |= ETHTOOL_FEC_AUTO;
-+
-+	return 0;
++	phylink_ethtool_get_pauseparam(fbn->phylink, pause);
 +}
 +
- static struct fbnic_net *
- fbnic_pcs_to_net(struct phylink_pcs *pcs)
++int fbnic_phylink_set_pauseparam(struct net_device *netdev,
++				 struct ethtool_pauseparam *pause)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++
++	return phylink_ethtool_set_pauseparam(fbn->phylink, pause);
++}
++
+ static void
+ fbnic_phylink_get_supported_fec_modes(unsigned long *supported)
  {
 
 
