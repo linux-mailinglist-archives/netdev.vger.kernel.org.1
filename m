@@ -1,169 +1,117 @@
-Return-Path: <netdev+bounces-199063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8573CADECC8
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:41:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B2DADEC94
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:36:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D24151BC484D
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:37:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2521C7A787B
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A207D2E2640;
-	Wed, 18 Jun 2025 12:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0EF2EA15C;
+	Wed, 18 Jun 2025 12:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="XvAbdhO9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpTgTRhZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE512DF3E8;
-	Wed, 18 Jun 2025 12:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D898F2DE204;
+	Wed, 18 Jun 2025 12:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750250095; cv=none; b=fdu00lFHmAkfBCBSAiR7PxOiBzJ6///ozfV6wyo2V8+YrEKKPIoAQU0oJ3ONjl4Hsbty+n+NQa88PSj6V0jUDEJreh/ixJF9qAVi4VjKqjSMrUJ1PLgqk9iooxg/oKfzLccgfrMKjBbvkEkavlSuT7rkqPmEM+fc7SKL6WBD61A=
+	t=1750250049; cv=none; b=bJEme0JjVrWLsdly2puFyopO7OyaFdxWDFGrQFPvw0lXYJb2+AYM6Ko5P/PUel8zhYhSd0rHcrOgkXK8jvV89ucIL3tBFFZaAgeA9F1mV4R4IYek7zlXXKBMiRZXiwhwzwZvIX11GWsKaTgZqo0GIE4o6HIqygOiAczSTVvO4qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750250095; c=relaxed/simple;
-	bh=+xdQqkU9neaPKDSewD9n2v8JbhsqM+sf1DMZOvK233o=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X9wPvaRQfs5J5GoHU7tFds+ho8ESCM8o7cA+OlmGy9H5N/oTkB5EVIDxr2ockrPccO6+oLgJULNra0cmgX/nQUDkKq+gkmOco+a1J6txB3u9clbyeGd2LXpfw9M1Zz0BCpYI+fSXYoKgysYOMKTmopwHm3XAPYKS13jhwtiAOhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=XvAbdhO9; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uRs0B-00CJi8-BH; Wed, 18 Jun 2025 14:34:51 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=1LkTAo+m9WKRSreDzMStbwx7+niLQSYtLsSyhAAe21M=; b=XvAbdhO9KtxJO1qpncN+sUSEsM
-	rU3XMLdFUByT85WjEVJWzsRO59VfiZ2o0E5izBBBLhW3Ll6QOncuu3kwkydfPHAiAB6zDEJeCzg27
-	Ubienf0YiWiBW5QjFDIcUEcyapQbnEFfYnd6qAtvGQKOnwuGLj6wwbVLKn7AC5oUxb0qQOWukETzt
-	u5YM3L/DFC2UoNXwfcohWA5lGwVV6q+1xmA2iq0MB5rTeoDBwEyi4n3baWp/yXU3XlT/4cmaNtm6V
-	bHF551DtBzyZaGnJJ1001WTg6DfkCnlY5hTcjPL3AUXB8hxSiV4JzUTNC9iiyr2S9QTASYWspjNOH
-	GwlXgJFw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uRs0B-0004by-0H; Wed, 18 Jun 2025 14:34:51 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uRrzp-00DbRZ-RC; Wed, 18 Jun 2025 14:34:29 +0200
-From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 18 Jun 2025 14:34:02 +0200
-Subject: [PATCH net 3/3] vsock: Fix transport_* TOCTOU
+	s=arc-20240116; t=1750250049; c=relaxed/simple;
+	bh=CqtW2tNbfWVC0/PJLiDcBr6CPf9A3LFNx9bnw1lWXdw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nQ5nzTDQl5UOd+kIe4QvgwjyTTbIOPQXuIkIir9qaTQCbO2q2lbkC2lhIpQ3Jf24q5jjp+TteaNKm9WdcLBz2aKOqyT8L4iJPn5iqxYp2sNKi+uw4lJQ0oOrX5TpX6gCYpNOVcooiX+2M5xq6PjHEKyc6SiU6t2oDtFiMaiU8/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpTgTRhZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69762C4CEE7;
+	Wed, 18 Jun 2025 12:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750250049;
+	bh=CqtW2tNbfWVC0/PJLiDcBr6CPf9A3LFNx9bnw1lWXdw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QpTgTRhZ5Xe4fvAIXro9/JvXN2JfjblpwUOUnRcBqCGPZSup2mjMvddb37oMtKb6H
+	 DemTvUQikcwmPWnxqQQ8eTiq3qxBWqIMj4pwD3dJJeMSViSU66QQlrv7v66jmxDuE/
+	 AAc7JVuyghm0VxJI885Hf5PPxHBNlXMwdHHx826DYGCFjttUm4HB//xmwiA2ALgOck
+	 4RLazNONmA/0K5CcKnjBXaU7laoY2Mh9BGzEt1FFfIGkloZOZ/6QtoBsrYP/17Miwx
+	 OuHmoVISw5s6HLY0Qc98cu3ADHkK+qv7clBzrdSYInRuW32zj23QK5Ad05D5OmNx/v
+	 TgxRwiJWtqyzA==
+Date: Wed, 18 Jun 2025 13:34:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Thompson <davthompson@nvidia.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"u.kleine-koenig@baylibre.com" <u.kleine-koenig@baylibre.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Asmaa Mnebhi <asmaa@nvidia.com>
+Subject: Re: [PATCH net v1] mlxbf_gige: return EPROBE_DEFER if PHY IRQ is not
+ available
+Message-ID: <20250618123405.GN1699@horms.kernel.org>
+References: <20250613185129.1998882-1-davthompson@nvidia.com>
+ <20250616124502.GA4750@horms.kernel.org>
+ <MN0PR12MB5907DC095A95A1BA1F2472FDC773A@MN0PR12MB5907.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250618-vsock-transports-toctou-v1-3-dd2d2ede9052@rbox.co>
-References: <20250618-vsock-transports-toctou-v1-0-dd2d2ede9052@rbox.co>
-In-Reply-To: <20250618-vsock-transports-toctou-v1-0-dd2d2ede9052@rbox.co>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN0PR12MB5907DC095A95A1BA1F2472FDC773A@MN0PR12MB5907.namprd12.prod.outlook.com>
 
-Transport assignment may race with module unload. Protect new_transport
-from becoming a stale pointer.
+On Tue, Jun 17, 2025 at 08:07:37PM +0000, David Thompson wrote:
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: Monday, June 16, 2025 8:45 AM
+> > To: David Thompson <davthompson@nvidia.com>
+> > Cc: andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> > kuba@kernel.org; pabeni@redhat.com; u.kleine-koenig@baylibre.com;
+> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Asmaa Mnebhi
+> > <asmaa@nvidia.com>
+> > Subject: Re: [PATCH net v1] mlxbf_gige: return EPROBE_DEFER if PHY IRQ is not
+> > available
+> > 
+> > On Fri, Jun 13, 2025 at 06:51:29PM +0000, David Thompson wrote:
+> > > The message "Error getting PHY irq. Use polling instead"
+> > > is emitted when the mlxbf_gige driver is loaded by the kernel before
+> > > the associated gpio-mlxbf driver, and thus the call to get the PHY IRQ
+> > > fails since it is not yet available. The driver probe() must return
+> > > -EPROBE_DEFER if acpi_dev_gpio_irq_get_by() returns the same.
+> > >
+> > > Signed-off-by: David Thompson <davthompson@nvidia.com>
+> > > Reviewed-by: Asmaa Mnebhi <asmaa@nvidia.com>
+> > 
+> > Thanks David,
+> > 
+> > I as a bug fix this needs a Fixes tag, which you can add by simply replying to this
+> > email.
+> > 
+> > Else we can treat it as an enhancement for net-next.
+> 
+> Yes, good point Simon.
+> 
+> This patch is a fix, so should have the following Fixes tag:
+> 	Fixes: 6c2a6ddca763 ("net: mellanox: mlxbf_gige: Replace non-standard interrupt handling")
 
-This also takes care of an insecure call in vsock_use_local_transport();
-add a lockdep assert.
+Thanks David,
 
-BUG: unable to handle page fault for address: fffffbfff8056000
-Oops: Oops: 0000 [#1] SMP KASAN
-RIP: 0010:vsock_assign_transport+0x366/0x600
-Call Trace:
- vsock_connect+0x59c/0xc40
- __sys_connect+0xe8/0x100
- __x64_sys_connect+0x6e/0xc0
- do_syscall_64+0x92/0x1c0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
+I notice that in the meantime that this has been marked as Changes Requested
+in patchwork. Presumably due to my earlier comment about a Fixes tag.
 
-Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- net/vmw_vsock/af_vsock.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+Could you post a v2 with the Fixes tag?
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 337540efc237c8bc482a6730948fc773c00854f1..133d7c8d2231e5c2e5e6a697de3b104fe05d8020 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -407,6 +407,8 @@ EXPORT_SYMBOL_GPL(vsock_enqueue_accept);
- 
- static bool vsock_use_local_transport(unsigned int remote_cid)
- {
-+	lockdep_assert_held(&vsock_register_mutex);
-+
- 	if (!transport_local)
- 		return false;
- 
-@@ -464,6 +466,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 
- 	remote_flags = vsk->remote_addr.svm_flags;
- 
-+	mutex_lock(&vsock_register_mutex);
-+
- 	switch (sk->sk_type) {
- 	case SOCK_DGRAM:
- 		new_transport = transport_dgram;
-@@ -479,12 +483,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 			new_transport = transport_h2g;
- 		break;
- 	default:
--		return -ESOCKTNOSUPPORT;
-+		ret = -ESOCKTNOSUPPORT;
-+		goto unlock;
- 	}
- 
- 	if (vsk->transport) {
--		if (vsk->transport == new_transport)
--			return 0;
-+		if (vsk->transport == new_transport) {
-+			ret = 0;
-+			goto unlock;
-+		}
- 
- 		/* transport->release() must be called with sock lock acquired.
- 		 * This path can only be taken during vsock_connect(), where we
-@@ -508,8 +515,12 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 	/* We increase the module refcnt to prevent the transport unloading
- 	 * while there are open sockets assigned to it.
- 	 */
--	if (!new_transport || !try_module_get(new_transport->module))
--		return -ENODEV;
-+	if (!new_transport || !try_module_get(new_transport->module)) {
-+		ret = -ENODEV;
-+		goto unlock;
-+	}
-+
-+	mutex_unlock(&vsock_register_mutex);
- 
- 	if (sk->sk_type == SOCK_SEQPACKET) {
- 		if (!new_transport->seqpacket_allow ||
-@@ -528,6 +539,9 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 	vsk->transport = new_transport;
- 
- 	return 0;
-+unlock:
-+	mutex_unlock(&vsock_register_mutex);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(vsock_assign_transport);
- 
+Feel free to also include
+Reviewed-by: Simon Horman <horms@kernel.org>
 
--- 
-2.49.0
 
 
