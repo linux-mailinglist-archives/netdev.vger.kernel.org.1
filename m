@@ -1,100 +1,82 @@
-Return-Path: <netdev+bounces-199195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CBFADF5D4
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:27:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCF7ADF5FE
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A3CA188B57C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 18:27:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CABDF7A3CF2
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 18:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3347B2F3C37;
-	Wed, 18 Jun 2025 18:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C832F4A1C;
+	Wed, 18 Jun 2025 18:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SESRP/RI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XzYud4bf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089033085AF;
-	Wed, 18 Jun 2025 18:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764D12F4A13;
+	Wed, 18 Jun 2025 18:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750271230; cv=none; b=XETPtWDDnJSySUvhLz1EPc5cXu/e63jQa7Vh+KdacntKektWCAv36j7Gv2kn+2XJWmhA7GFobDWdy7RvZKn4lkqw/4Ov1jkOotUEZzEFws9Z4LL9GnLEEmU5ZWKwJpEHQZv95KobMe4XAalyQ9OO7v5bZBC0jhbiFHmYJRUje3k=
+	t=1750271618; cv=none; b=el3df1VmRcij4paN5K5oK7XF6auyOpBUjM0DudV7u5eO4bBH1iwTC447Ch9wK2h7A0qYPh+1tgT93iAIqYq/f82ykZrvx2EVig9FNBqvRlxVfBeQWxD4rH8YM4xsCG0grdlFQ9IqSk7uWHSZ0JqSoGp849HIk8zf9VqnHN21xb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750271230; c=relaxed/simple;
-	bh=01x0kqXcoH2iofNuPO0sDmz6jzhYn7gy1dxHbLncwX8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=P3T79mCW3E5OzQrrhgkEZLyPnjc3A46fdYZ+K+akyFtiMn9so1ZMk+UpszKq2kVR+s61o+Y0zRKLYrFPK5KKR4oDyUeFLObEytAl225yc7T2vI3xmZDQi3Rga1Gr8WAveyLZXTHk1pe7+kbhUXkATDGJ9VLVvs8ofoIlq8NOUw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SESRP/RI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46106C4CEEF;
-	Wed, 18 Jun 2025 18:27:07 +0000 (UTC)
+	s=arc-20240116; t=1750271618; c=relaxed/simple;
+	bh=Qvk01E4K4eKwx+8ladXQ0z7hVsHIb+7XaYBHTXV1Qho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t+AKM80dlvk/AaHMTJ+1UHJ3r+PMAgNmJ2zanazKDYd9cv1qGVPFDLaXwOFVHbJuFABSd9211xKMK2vQcERhWk/CDB8hjRSEO2Qjx+O+Rj5hJT3lrAiLW1G5p3orC4bCmHikeIitp2km/cYqgD52HqYpbyd4It9qgLhyWMN1JbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XzYud4bf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E3F6C4CEE7;
+	Wed, 18 Jun 2025 18:33:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750271229;
-	bh=01x0kqXcoH2iofNuPO0sDmz6jzhYn7gy1dxHbLncwX8=;
-	h=From:Date:Subject:To:Cc:From;
-	b=SESRP/RIZQ+ddfyIAy6xf9BJa0P0iyhTw7dfjfZWZPbP33ejucd+gTVvDjWMgUI10
-	 +dvoXrvbTJTQotar1odoWLJo5cyqNvPHbT47I5GKr1dkTOSckKb4fHTyWgUJ1aam6t
-	 O2GKqD7IZk6qSl4IVQ0unWKh4W5ncKQuUfAXS53bAfVNgoFURrE+N63+UgeBIV0GxQ
-	 TTys5UPcvtvTfZqmidSm3waR0gryvTl3cixMWUMhK6kZZ1/Fv9XfTem5yYIoSYVV3C
-	 RJPissmkor12WJcUFaZVGgsS5O30zlu+tpGHRVjbpUKXVGNJtlzAMAemdrDwXn0nBP
-	 4OOhsrk5ah0AA==
+	s=k20201202; t=1750271618;
+	bh=Qvk01E4K4eKwx+8ladXQ0z7hVsHIb+7XaYBHTXV1Qho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XzYud4bftYB9pjydcI4H4I2BpBLdO83lNw+wguQau46tp6Sh0UauAF4ND4tOpOpLP
+	 D2/Kf8q0knJy5v0b1oZHaSKTA3P2gFtLrDxnRRjOmXCsfz1C8tnF8niME+kTuWtXav
+	 CbT8TSSE6zTs9qIQoa9OQtf98mZ/Lx0dYzZbc2ViKVGru0vTDkM9w9P5HpHA1p16hJ
+	 MOBmcZfOBbgBUozS+2zstmeSdPwOdMynK6nwraPDiwIJMJ4eOg6cNdh50DkWoJ19jn
+	 ZCw0l0fqTM0wMXyELOFqtPjq5UaoY6mCns0psqj6uWdg+NBrxJ3VthF6OHpaOBqKXd
+	 xZvDXhGQThkMA==
+Date: Wed, 18 Jun 2025 19:33:33 +0100
 From: Simon Horman <horms@kernel.org>
-Date: Wed, 18 Jun 2025 19:27:00 +0100
-Subject: [PATCH RFC net] net/mlx5: Avoid NULL dereference in dest_is_valid
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/2] net: stmmac: loongson1: provide match data
+ struct
+Message-ID: <20250618183333.GW1699@horms.kernel.org>
+References: <aFKXzlno7HkG-cNh@shell.armlinux.org.uk>
+ <E1uRqE9-004c7G-CB@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250618-mlx5-dest-v1-1-db983334259a@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAPMEU2gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDM0ML3dycClPdlNTiEt1ksyRLw+TUFJPUtBQloPqCotS0zAqwWdFKQW7
- OCnmpJUqxtbUAkc/4iWQAAAA=
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Mark Bloch <markb@mellanox.com>, Paul Blakey <paulb@mellanox.com>, 
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
- Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1uRqE9-004c7G-CB@rmk-PC.armlinux.org.uk>
 
-Elsewhere in dest_is_valid it is assumed that dest may be NULL.
-But the line updated by this patch dereferences dest unconditionally.
-This seems to be inconsistent.
+On Wed, Jun 18, 2025 at 11:41:09AM +0100, Russell King (Oracle) wrote:
+> Provide a structure for match data rather than using the function
+> pointer as match data. This allows stronger type-checking for the
+> function itself, and allows extensions to the match data.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Flagged by Smatch.
-Compile tested only.
-
-Fixes: ff189b435682 ("net/mlx5: Add ignore level support fwd to table rules")
-Signed-off-by: Simon Horman <horms@kernel.org>
----
-I am posting this as an RFC as I am not completely sure this change is
-necessary. F.e. an invariant that I'm unaware of may preclude dest
-from being NULL in this case.
----
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index a8046200d376..7eeab93a1aa9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -2041,7 +2041,8 @@ static bool dest_is_valid(struct mlx5_flow_destination *dest,
- 		    ft->type != FS_FT_NIC_TX)
- 			return false;
- 
--		if (dest->type == MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE &&
-+		if (dest &&
-+		    dest->type == MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE &&
- 		    ft->type != dest->ft->type)
- 			return false;
- 	}
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
