@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7A4ADF899
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 23:19:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F5E6ADF89A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 23:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42384164801
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:19:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59D7C3BE47F
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23940279DDE;
-	Wed, 18 Jun 2025 21:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D95C27A933;
+	Wed, 18 Jun 2025 21:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NxhMhAN7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFxnse35"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F338F215077
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 21:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2858427A46A
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 21:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750281584; cv=none; b=APp38dMltNkJ/CfKvJK5ByQRdqgkI9huCPYneF+8njYBKlw9dgpNai6MTTQxaBJ5mpwU2SDq86S31BYoImHUW4P97abB6GhVH7uTzOFiJZvbbmAMdQ9q4r3balkd5GJ8vJ0G23trBzTRVyHNZRGUO8bxcejTKJWq1v23yNvpsrg=
+	t=1750281585; cv=none; b=BW3+P1vL1msWceJuJEGSVLDuuQXehVzVGfZcTmv/ZOKZdKup/qotbO7QLWwJ8fq4c9+a89kKL8SNd+vAMLVmBVQXLj/fnCY/De7pGBCNVH7ZBO5V0vSPsBhefVm05HM6/QQdMeZ3Inef9vzpG+jXuBUYm8JslsEUuMN56Ozsvwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750281584; c=relaxed/simple;
-	bh=ISZfq8QUra9jyxk33xryobMwLRXR5HJ8VY2263KtrUc=;
+	s=arc-20240116; t=1750281585; c=relaxed/simple;
+	bh=Bpk6aIdGoZoKCWNPayNeb8aKmTTtjgj6g6k39AbaS64=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hN/pKbXhF4TsIZO5IewqbUCACPxV5Oovhf30u/A5Vy7PFWJ77nhnxNDa/0FaXYpqJ5jFuaas5RGDtjXI+Zh5KtYdvn0dS6Z0BttTDuCDvJ8WBr3R7OtEIKztb+XvlzXdz60zW6EmI1zHGg6Q8nukEea3SzMStAuNFRqYgk6D/EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NxhMhAN7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AEA9C4CEE7;
-	Wed, 18 Jun 2025 21:19:43 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gWgGMQYxpQ0SO7rTeosrVV5D0+NuB8Eqtvv3uE2NQ1QgJ2nemuudHjW/oNRttSZ0JK9AtjdacLBYDizsL8r+n3sSmdViBYS1Gn8VFae07rT6lYr50Ffa8+MQD34lpxWfNoMmTaznUoIjq5dzKEdjoDFLYvTioB/AzXXHjkq7sbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFxnse35; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A660AC4CEEF;
+	Wed, 18 Jun 2025 21:19:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750281583;
-	bh=ISZfq8QUra9jyxk33xryobMwLRXR5HJ8VY2263KtrUc=;
+	s=k20201202; t=1750281584;
+	bh=Bpk6aIdGoZoKCWNPayNeb8aKmTTtjgj6g6k39AbaS64=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NxhMhAN7omTWKu3vzA5RNPX9XXIK+ee25dc7p5l51qV2HA8QclBMk1kY81hR7xXju
-	 Si7kTwufa4Tyun2NuWnzm/zk/R9aOXJtw6HJUru5cunCltUgsfayW3UoTXUirbeG5V
-	 R0Edt3yPt30QSWBo551MnM+u4S1Y7zNPp81vi8sH6Yzzfxs0B+j1jA2+fGIt5UAbgf
-	 6DmzTWagQFoSJyfZeT9KOnOm95WJYVrIpMLPAtoZI2cMkO5aHUa/m16Rz9q0mufQzl
-	 uujYmNn65bqyTyZgIF5utBXX+MBEadX229gz8w1bilyBrM4yoRdzukfDX4nEOuwJLV
-	 4Up3bNrvzLBdw==
+	b=SFxnse35/CN55IauHih6cML8fvpTcVO29A5z2HGfcu4L1S0JneCeAD3ZK9PJ21fYk
+	 aQzepOoqKZ8zG9Jnqp0/sl3/CTyHhEjHSEmiZWoG4jheVJ+iFzDRGhTeW33egvNCBt
+	 o/bt5Irnoa8LbUtvRWCCGUl8/gfDX5lNB/INJCnsH80Dky1sRoqXPlJ/4niLezFVZY
+	 P2zo+1ZG+/YhNlxVdWYgq/Jh0eXWG+s3eN5FwVaSan9FxpKU0w7V4IkDmPZ83w7YxE
+	 L66iWXs06AQRI9TWsX/LFdFCxjzOtj7t5mH87fa7QhCd1EbgbHC42JFC21N/WVNean
+	 52xZqgxK9owXQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1233806649;
-	Wed, 18 Jun 2025 21:20:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D013806649;
+	Wed, 18 Jun 2025 21:20:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates
- 2025-06-17 (ice, e1000e)
+Subject: Re: [PATCH RESUBMIT net] net: ftgmac100: select FIXED_PHY
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175028161175.259999.12955264513898085028.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Jun 2025 21:20:11 +0000
-References: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250617172444.1419560-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+ <175028161299.259999.1742509414083669246.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Jun 2025 21:20:12 +0000
+References: <476bb33b-5584-40f0-826a-7294980f2895@gmail.com>
+In-Reply-To: <476bb33b-5584-40f0-826a-7294980f2895@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew+netdev@lunn.ch, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+ horms@kernel.org, f.fainelli@gmail.com, rentao.bupt@gmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 17 Jun 2025 10:24:40 -0700 you wrote:
-> For ice:
-> Krishna Kumar modifies aRFS match criteria to correctly identify
-> matching filters.
+On Tue, 17 Jun 2025 20:20:17 +0200 you wrote:
+> Depending on e.g. DT configuration this driver uses a fixed link.
+> So we shouldn't rely on the user to enable FIXED_PHY, select it in
+> Kconfig instead. We may end up with a non-functional driver otherwise.
 > 
-> Grzegorz fixes a memory leak in eswitch legacy mode.
-> 
-> For e1000e:
-> Vitaly sets clock frequency on some Nahum systems which may misreport
-> their value.
+> Fixes: 38561ded50d0 ("net: ftgmac100: support fixed link")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] net: ice: Perform accurate aRFS flow match
-    https://git.kernel.org/netdev/net/c/5d3bc9e5e725
-  - [net,2/3] ice: fix eswitch code memory leak in reset scenario
-    https://git.kernel.org/netdev/net/c/48c8b214974d
-  - [net,3/3] e1000e: set fixed clock frequency indication for Nahum 11 and Nahum 13
-    https://git.kernel.org/netdev/net/c/688a0d61b2d7
+  - [RESUBMIT,net] net: ftgmac100: select FIXED_PHY
+    https://git.kernel.org/netdev/net/c/ae409629e022
 
 You are awesome, thank you!
 -- 
