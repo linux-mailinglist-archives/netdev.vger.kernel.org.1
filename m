@@ -1,316 +1,98 @@
-Return-Path: <netdev+bounces-198979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7294ADE91E
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:36:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC0CADE852
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:18:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D325C3A9965
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0D9D3A4212
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1112853F6;
-	Wed, 18 Jun 2025 10:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fj7dwJft"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDFF284690;
+	Wed, 18 Jun 2025 10:16:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908462853E0
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 10:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4388C27FD7F;
+	Wed, 18 Jun 2025 10:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750242838; cv=none; b=A+3lm1QnRWo4yPuWSlbgWzqs/sVjNkJaPtzo/lJT3XU1sE0Qx+YRXN0ckBjsvhOzZlj9XOeqrbE1UcU8krPXx0XM3wT2M5QUBospkNRqbItFMMHs/vqYd0D/USWG2muUdj9tZsEGVsXcUe2buDyzDCjOkthB0KFmYCST/GAmbW4=
+	t=1750241766; cv=none; b=WnBWXYrKsOAzmAaJRmKTSKRtfqrztDVBOdHDRzKB6C1AuzYt5RZA7KxjmwXMoxNx4hox9iqCml908KuN+MLsdF72ZkgOqUtDgl0rhZStWfsXi6SQXdTwxt4Egr5IIbls/EkwAbwaqrSagvX7VGzmLj6+/IcmZfvF975ehdz5gfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750242838; c=relaxed/simple;
-	bh=8AtEpxHS6rvy3BPLx4KHxLnHdb252IDjwNW05a9fofA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QkljOlD/d8aQesUGMdT1ohFdPwRmkYmPm0BSiMeMNZvIyK9fmMs30IoingEJeWszX1YTVWKN7po640Y9d/hqUMdyliTkfd0MktJkbFqjkg7R/sY1vsNel6M7c9SWWMwczJpGu5Lcqx8smysSkU8GB+d5iSzhTRmpMmIskXS3av0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fj7dwJft; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3de247e4895so95ab.1
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 03:33:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750242835; x=1750847635; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bMasm5NLTeOa3LnvwNhHz6yuIvcaDzts0c15W8EV/BY=;
-        b=fj7dwJftZnqQlzGvH1H9G2TZV+2Xi1OBAx3/jcl1HzYA5PVRg/w+5hnDj0FNatRbos
-         3RvJeJq2H9F4eoP2QNTVbejiq+BwOlSTBs2n+8+L25V71uhj9dYQ9HYTBiwYHl2C3ObX
-         E2WgkqgYpcB0CAKEOW6iZBJsYuLnoPaKbBTur6CJ61WPIYFGYsEnfz3TTVcwvhremhXq
-         mE9mU3yYDJuu4qXyuL8topw0QaSBmIG+oqVCxOaLKGoruojIkXsaBXPAIafxCLjpIsM9
-         /MsNtDMVbbzeHTwy9X8IuAAovUCXdwRFSW2IiUgnNiYV1kfK3WIbP9dkvlZwrvz9J0/g
-         bGJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750242835; x=1750847635;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bMasm5NLTeOa3LnvwNhHz6yuIvcaDzts0c15W8EV/BY=;
-        b=xGLcAGFaIKUvl2A5zEk38v4sNVP3iCGycJV1e38wiadikqGGrvZS+PD4rqI+r3vah4
-         hcwQZWhgyMvJkhpNa5qiad7DMHtWJyUK6vZIu+wlEWP/ZjZiQ8h/z3igREej0xOPO+4F
-         MmHgJBzaEnOK23hEq5ABeWMNXpvJyV9dw96EVg0eZsyHBOKJRJKo7BbZ5dBYzzpXKibC
-         uBXg5vdpfoi+5PZdQOQfejlns4/ww79dGv8MOl9mmKpiI1+rTzFovX/y/KhtoY9ZVYHz
-         yyOMIQVNJ/qTK/gN3ACV6hAeaGX/G/FRHqLX071eVxTB2E+dK9+ho8jEgm0r4Q/W1u/p
-         Z1fA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0WUiVhyh/8n8dRO/uVGIjS3pR6IyJl7vvG7t22OjQfmPOLT+ftOt1PFJcscsEza8x7hhisL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVR8aKVuQ9Zk2zU5G0Xd6DTfsglaqjI+ny/wFxPjRAnx2K73Zl
-	xs/amw2PiH+7Bq6aqYA56ijW/cDw5GQ7MZ9F+WglFsrsx9+v7qEWY8usHAqjS8uXElge8mPsPTj
-	eBvy50M+Wk2B1AHl1V5lAkoLFuDBO2t2C2aiBMFdt
-X-Gm-Gg: ASbGnctX6E9gz1JenGDteaZ3D78fbiJ9n7tsyBUARYOVmDadRVQsvwAih7OLJU8uHaw
-	/X3cPFJhEVvyXKjfIUGtgPJEUsrk7CJoCW5cxzeAm1Y+drHY/M3LWQfTqxAXhnrPuMdDyQtPzg+
-	bwSWdaW8honHPS30Kizz/zGpY/vXXfve6qn055A5JRJpeVZgSE6QE/0dfNRn+f7Ffhfx46ue0b3
-	w==
-X-Google-Smtp-Source: AGHT+IFUn0kte+qO4e1bwA89IY61wmWpdTt8zSSKdMIWffb7S2xtlYoRgW/IyLqPu3AZHr+Gd6Rdhrj8xjt2/opYI9k=
-X-Received: by 2002:a05:6e02:1fcc:b0:3dd:c6d6:85ef with SMTP id
- e9e14a558f8ab-3de2e65fec3mr61995ab.2.1750242834499; Wed, 18 Jun 2025 03:33:54
- -0700 (PDT)
+	s=arc-20240116; t=1750241766; c=relaxed/simple;
+	bh=63P/YM6AlzgZ9xMkMXKv9TnQwwkHN8E+6brIEKb3snA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W+f0DSoNXmMwRcmWDBgMLt3hJl795fhbQYkPU8itLklwf9zAFxayXPP9cTLhGt+bhiw7VMwZFDBZ/FFd3yeTfk/bUr4diTGxYsp63Zsv20p5xJna/JsxjcSPYjpvbnYoTsH2ZDA8gTWU5CVdZNa6IdDqbRKAV6kFd7K/iXmyXX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bMfhb5DjNz28fQ1;
+	Wed, 18 Jun 2025 18:13:35 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7A02718005F;
+	Wed, 18 Jun 2025 18:16:00 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 18 Jun
+ 2025 18:15:59 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <wenjia@linux.ibm.com>, <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
+	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<linux-rdma@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net/smc: remove unused input parameters in smc_buf_get_slot
+Date: Wed, 18 Jun 2025 18:33:42 +0800
+Message-ID: <20250618103342.1423913-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250618103204.3458380-1-yuyanghuang@google.com>
-In-Reply-To: <20250618103204.3458380-1-yuyanghuang@google.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Wed, 18 Jun 2025 19:33:18 +0900
-X-Gm-Features: Ac12FXwsiARm_Bq9k6H7Tpcmasnme1vYzSaQJxx2EPhqDxzJLIxovjT9qe_4KFQ
-Message-ID: <CADXeF1FvJZpVhLO1nHpVBgZoOzZ=6zOnRtkN9m8GsCoyJxMjXw@mail.gmail.com>
-Subject: Re: [PATCH net-next, v3] selftest: Add selftest for multicast address notifications
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-Sorry, please ignore this patch. Accidentally send the old patch again.....
+The input parameter "compressed_bufsize" of smc_buf_get_slot is unused,
+remove it.
 
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/smc/smc_core.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-On Wed, Jun 18, 2025 at 7:32=E2=80=AFPM Yuyang Huang <yuyanghuang@google.co=
-m> wrote:
->
-> This commit adds a new kernel selftest to verify RTNLGRP_IPV4_MCADDR
-> and RTNLGRP_IPV6_MCADDR notifications. The test works by adding and
-> removing a dummy interface and then confirming that the system
-> correctly receives join and removal notifications for the 224.0.0.1
-> and ff02::1 multicast addresses.
->
-> The test relies on the iproute2 version to be 6.13+.
->
-> Tested by the following command:
-> $ vng -v --user root --cpus 16 -- \
-> make -C tools/testing/selftests TARGETS=3Dnet
-> TEST_PROGS=3Drtnetlink_notification.sh \
-> TEST_GEN_PROGS=3D"" run_tests
->
-> Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
-> ---
->
-> Changelog since v2:
-> - Move the test cases to a separate file.
->
-> Changelog since v1:
-> - Skip the test if the iproute2 is too old.
->
->  tools/testing/selftests/net/Makefile          |   1 +
->  .../selftests/net/rtnetlink_notification.sh   | 159 ++++++++++++++++++
->  2 files changed, 160 insertions(+)
->  create mode 100755 tools/testing/selftests/net/rtnetlink_notification.sh
->
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index 70a38f485d4d..ad258b25bc9d 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -40,6 +40,7 @@ TEST_PROGS +=3D netns-name.sh
->  TEST_PROGS +=3D link_netns.py
->  TEST_PROGS +=3D nl_netdev.py
->  TEST_PROGS +=3D rtnetlink.py
-> +TEST_PROGS +=3D rtnetlink_notification.sh
->  TEST_PROGS +=3D srv6_end_dt46_l3vpn_test.sh
->  TEST_PROGS +=3D srv6_end_dt4_l3vpn_test.sh
->  TEST_PROGS +=3D srv6_end_dt6_l3vpn_test.sh
-> diff --git a/tools/testing/selftests/net/rtnetlink_notification.sh b/tool=
-s/testing/selftests/net/rtnetlink_notification.sh
-> new file mode 100755
-> index 000000000000..a2c1afed5023
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/rtnetlink_notification.sh
-> @@ -0,0 +1,159 @@
-> +#!/bin/bash
-> +#
-> +# This test is for checking rtnetlink notification callpaths, and get as=
- much
-> +# coverage as possible.
-> +#
-> +# set -e
-> +
-> +ALL_TESTS=3D"
-> +       kci_test_mcast_addr_notification
-> +"
-> +
-> +VERBOSE=3D0
-> +PAUSE=3Dno
-> +PAUSE_ON_FAIL=3Dno
-> +
-> +source lib.sh
-> +
-> +# set global exit status, but never reset nonzero one.
-> +check_err()
-> +{
-> +       if [ $ret -eq 0 ]; then
-> +               ret=3D$1
-> +       fi
-> +       [ -n "$2" ] && echo "$2"
-> +}
-> +
-> +run_cmd_common()
-> +{
-> +       local cmd=3D"$*"
-> +       local out
-> +       if [ "$VERBOSE" =3D "1" ]; then
-> +               echo "COMMAND: ${cmd}"
-> +       fi
-> +       out=3D$($cmd 2>&1)
-> +       rc=3D$?
-> +       if [ "$VERBOSE" =3D "1" -a -n "$out" ]; then
-> +               echo "    $out"
-> +       fi
-> +       return $rc
-> +}
-> +
-> +run_cmd() {
-> +       run_cmd_common "$@"
-> +       rc=3D$?
-> +       check_err $rc
-> +       return $rc
-> +}
-> +
-> +end_test()
-> +{
-> +       echo "$*"
-> +       [ "${VERBOSE}" =3D "1" ] && echo
-> +
-> +       if [[ $ret -ne 0 ]] && [[ "${PAUSE_ON_FAIL}" =3D "yes" ]]; then
-> +               echo "Hit enter to continue"
-> +               read a
-> +       fi;
-> +
-> +       if [ "${PAUSE}" =3D "yes" ]; then
-> +               echo "Hit enter to continue"
-> +               read a
-> +       fi
-> +
-> +}
-> +
-> +kci_test_mcast_addr_notification()
-> +{
-> +       local tmpfile
-> +       local monitor_pid
-> +       local match_result
-> +
-> +       tmpfile=3D$(mktemp)
-> +
-> +       ip monitor maddr > $tmpfile &
-> +       monitor_pid=3D$!
-> +       sleep 1
-> +       if [ ! -e "/proc/$monitor_pid" ]; then
-> +               end_test "SKIP: mcast addr notification: iproute2 too old=
-"
-> +               rm $tmpfile
-> +               return $ksft_skip
-> +       fi
-> +
-> +       run_cmd ip link add name test-dummy1 type dummy
-> +       run_cmd ip link set test-dummy1 up
-> +       run_cmd ip link del dev test-dummy1
-> +       sleep 1
-> +
-> +       match_result=3D$(grep -cE "test-dummy1.*(224.0.0.1|ff02::1)" $tmp=
-file)
-> +
-> +       kill $monitor_pid
-> +       rm $tmpfile
-> +       # There should be 4 line matches as follows.
-> +       # 13: test-dummy1    inet6 mcast ff02::1 scope global
-> +       # 13: test-dummy1    inet mcast 224.0.0.1 scope global
-> +       # Deleted 13: test-dummy1    inet mcast 224.0.0.1 scope global
-> +       # Deleted 13: test-dummy1    inet6 mcast ff02::1 scope global
-> +       if [ $match_result -ne 4 ];then
-> +               end_test "FAIL: mcast addr notification"
-> +               return 1
-> +       fi
-> +       end_test "PASS: mcast addr notification"
-> +}
-> +
-> +kci_test_rtnl()
-> +{
-> +       local current_test
-> +       local ret=3D0
-> +
-> +       for current_test in ${TESTS:-$ALL_TESTS}; do
-> +               $current_test
-> +               check_err $?
-> +       done
-> +
-> +       return $ret
-> +}
-> +
-> +usage()
-> +{
-> +       cat <<EOF
-> +usage: ${0##*/} OPTS
-> +
-> +        -t <test>   Test(s) to run (default: all)
-> +                    (options: $(echo $ALL_TESTS))
-> +        -v          Verbose mode (show commands and output)
-> +        -P          Pause after every test
-> +        -p          Pause after every failing test before cleanup (for d=
-ebugging)
-> +EOF
-> +}
-> +
-> +#check for needed privileges
-> +if [ "$(id -u)" -ne 0 ];then
-> +       end_test "SKIP: Need root privileges"
-> +       exit $ksft_skip
-> +fi
-> +
-> +for x in ip;do
-> +       $x -Version 2>/dev/null >/dev/null
-> +       if [ $? -ne 0 ];then
-> +               end_test "SKIP: Could not run test without the $x tool"
-> +               exit $ksft_skip
-> +       fi
-> +done
-> +
-> +while getopts t:hvpP o; do
-> +       case $o in
-> +               t) TESTS=3D$OPTARG;;
-> +               v) VERBOSE=3D1;;
-> +               p) PAUSE_ON_FAIL=3Dyes;;
-> +               P) PAUSE=3Dyes;;
-> +               h) usage; exit 0;;
-> +               *) usage; exit 1;;
-> +       esac
-> +done
-> +
-> +[ $PAUSE =3D "yes" ] && PAUSE_ON_FAIL=3D"no"
-> +
-> +kci_test_rtnl
-> +
-> +exit $?
-> --
-> 2.50.0.rc1.591.g9c95f17f64-goog
->
+diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+index ac07b963aede..262746e304dd 100644
+--- a/net/smc/smc_core.c
++++ b/net/smc/smc_core.c
+@@ -2100,8 +2100,7 @@ int smc_uncompress_bufsize(u8 compressed)
+ /* try to reuse a sndbuf or rmb description slot for a certain
+  * buffer size; if not available, return NULL
+  */
+-static struct smc_buf_desc *smc_buf_get_slot(int compressed_bufsize,
+-					     struct rw_semaphore *lock,
++static struct smc_buf_desc *smc_buf_get_slot(struct rw_semaphore *lock,
+ 					     struct list_head *buf_list)
+ {
+ 	struct smc_buf_desc *buf_slot;
+@@ -2442,7 +2441,7 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
+ 		bufsize = smc_uncompress_bufsize(bufsize_comp);
+ 
+ 		/* check for reusable slot in the link group */
+-		buf_desc = smc_buf_get_slot(bufsize_comp, lock, buf_list);
++		buf_desc = smc_buf_get_slot(lock, buf_list);
+ 		if (buf_desc) {
+ 			buf_desc->is_dma_need_sync = 0;
+ 			SMC_STAT_RMB_SIZE(smc, is_smcd, is_rmb, true, bufsize);
+-- 
+2.34.1
+
 
