@@ -1,288 +1,202 @@
-Return-Path: <netdev+bounces-199081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87822ADEDCF
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:29:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6298ADEE19
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D59E1897003
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:29:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 508447AC718
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B3DF9CB;
-	Wed, 18 Jun 2025 13:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CABB2E9EB8;
+	Wed, 18 Jun 2025 13:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="WIAuXkm9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Sd9kZIkw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QTFWxdFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075162E8DFF;
-	Wed, 18 Jun 2025 13:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7C72E92CF
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 13:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750253337; cv=none; b=Uwny/7i7zJdGJdSjBleQiChl/vl/f9r6IvKwW6ml8YbI+OAwnQCWXKLTWsaKuIoaRoLYW29PcMKFWS6vBokBPTyVFxBkGuZysA98nLMmhjRD3bbfc2jAYDrZH2tR4HFzZvm/dyW+7UyWVv18TCHXO7K47by008TRlQrW5bXBw6I=
+	t=1750254088; cv=none; b=FPAqZIWOguPpkd5H+f5+ggWH428kfMcWu3XOLtyD3pComcL8LLzcJqCfhT8G3DiwY11jUnbhOvrDl8VOEu5r9Zdk0IqBWbH5eDEQCCxiYtkM2XLxD8HmowSW93zW/Nygoj7k/a24x1ktNYWw6qReX/SuSPhPhGC9COAOkEB2lvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750253337; c=relaxed/simple;
-	bh=4pvL2pRMcn6SX0QoJ4lt3Ga1uPDK5VKhU4BGa8uBuGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+i5mV/7HVXkfxXYpJpudpG72hRI9IVBhP9xXLyykNUd51EXQ+ESJHu7V+DMn7VuCaLlIZbzHLkr4q6oec5sCwtNxVub1P0luciF7CuCULPdppKpzwY2Eb5oA+Nd+QUu1vm7CO4Y4qRznfKE8o6UJ5mpnYMqw+mlJaQab/wtnFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=WIAuXkm9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Sd9kZIkw; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 3C3EE13803E5;
-	Wed, 18 Jun 2025 09:28:55 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Wed, 18 Jun 2025 09:28:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1750253335;
-	 x=1750339735; bh=vz/7ulDQUN+PP0dM9GXUeJUIxa3j77kggycAnGY4Aws=; b=
-	WIAuXkm9l14HnRsq+a1xjXC9OQMw0cStyCOO0VyO1kntZf+QvA1RXHQEE+5D336a
-	+FH+YijbW8zZS4F7C21Au630CUB27tUWo6QmQw3SCr+JZkxqDfYnwUfTNTTjU7q/
-	xIBAdGnSip0Rk3i45TIkQQHJtcXhpvFC1fUriosNzfqBUCsJSOze5nWFNaaH0bG1
-	iynaonWX6LxjIw6b7rqiYbop6VSdrXc+8xjE+ihWLE6I1i/4QBP+lOMJ+qhyL3KP
-	N4/jMjnRSkRDk3+Fs0CcW5yfE3tFCsbeVi3/daCSVd3pCiDv1mk4FzHjDhBDnJnw
-	MqFsPf/TGHsKjbzMC/nvRQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1750253335; x=1750339735; bh=vz/7ulDQUN+PP0dM9GXUeJUIxa3j77kggyc
-	AnGY4Aws=; b=Sd9kZIkwjLSpU63LKWOqonj0DhUPRtv3KFnyftCDFFHhMhRnB5C
-	YSpZKF/nvENe/HtM43I9NLi+UBlL8n7vidU1rxwSqyMNFUaqHKGDLlnP2RWxDTFV
-	VXUXxOzsNXTkpzIrniCXy8LIbPGL1LHLoVKwn7dB91bN1dCAac7iiRrEvqemVZdv
-	eREyXRdZS68rstll5G3p037yKeR6UfDVzddhhJnzL1pci2jbO4PcvAHcTE67SPZJ
-	tUORupVgtDItOelNRBA/8QAE/mgrCxjFbQXvVWE7gS5IL3HvgXGDwG2YJIyi4Yj7
-	j346176r/cBIF7229PSGdtskqQpK7TO7lQQ==
-X-ME-Sender: <xms:Fr9SaDXJus_9wzUBchy22L94tQaXiufEdKVnROeqHWYQeShz8rfzhA>
-    <xme:Fr9SaLllH_4qsIi8S7lkt7IzPA12B7PwPZ9NER9vhxA7C43-hUIf7z4WwbLb0HVFs
-    YV_GojJXvSTeg>
-X-ME-Received: <xmr:Fr9SaPbdrpTw5w0TpLJytfxSIOg8_i3mFK54MVTuFqKyrsBept5evnej6pthMxauXbyJo1JCd-lNSFhmDj_k_GDtE2hEvlN1nu4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvjeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesghdtreertddtjeen
-    ucfhrhhomhepofgrrhgvkhcuofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuceomh
-    grrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecuggft
-    rfgrthhtvghrnhepgfduleetfeevhfefheeiteeliefhjefhleduveetteekveettddvge
-    euteefjedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
-    mhepmhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomhdpnh
-    gspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepphhmvghn
-    iigvlhesmhholhhgvghnrdhmphhgrdguvgdprhgtphhtthhopehvihhtrghlhidrlhhifh
-    hshhhithhssehinhhtvghlrdgtohhmpdhrtghpthhtoheprghnthhhohhnhidrlhdrnhhg
-    uhihvghnsehinhhtvghlrdgtohhmpdhrtghpthhtohepphhriigvmhihshhlrgifrdhkih
-    htshiivghlsehinhhtvghlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepihhnthgvlhdqfihirhgvugdqlhgrnheslh
-    hishhtshdrohhsuhhoshhlrdhorhhgpdhrtghpthhtoheprhgvghhrvghsshhiohhnshes
-    lhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehsthgrsghlvgesvhhgvghrrd
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehsrghshhgrlheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:Fr9SaOXxiqGZJ6PRaIa1vVEGuUGYlV8waY0PKFMz6vUCtVlRJMMQZA>
-    <xmx:Fr9SaNmA3G7BgKOD7Z-LCPHmL8e5C1fA3zSKLINjbABD4bobzBU2OQ>
-    <xmx:Fr9SaLdumMaeA8tTEHRt0xFh8RLLLD6U7Ae96pcY-B2EBn2cB_M3hw>
-    <xmx:Fr9SaHEfsbeM9YCETFAke0FdKOpdgWawjzDq4svvZe4ZsdNf6LSutg>
-    <xmx:F79SaEJ90y1IT8yN5gw3royZ04hOBwZRf1UdlaDLIYQjXoAz976a7W8A>
-Feedback-ID: i1568416f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 18 Jun 2025 09:28:53 -0400 (EDT)
-Date: Wed, 18 Jun 2025 15:28:51 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	regressions@lists.linux.dev, stable@vger.kernel.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on
- Meteor Lake - 6.14.2
-Message-ID: <aFK_ExmGqmi-oQby@mail-itl>
-References: <b5d72f51-3cd0-aeca-60af-41a20ad59cd5@intel.com>
- <Z_-l2q9ZhszFxiqA@mail-itl>
- <d37a7c9e-7b3f-afc2-b010-e9785f39a785@intel.com>
- <aAZF0JUKCF0UvfF6@mail-itl>
- <aAZH7fpaGf7hvX6T@mail-itl>
- <e0034a96-e285-98c8-b526-fb167747aedc@intel.com>
- <aB0zLQawNrImVqPE@mail-itl>
- <c918d4f5-ee53-4f64-b152-cea0f6d99c4f@molgen.mpg.de>
- <aB0-JLSDT03fosST@mail-itl>
- <aB1JnJG_CH5vxAsw@mail-itl>
+	s=arc-20240116; t=1750254088; c=relaxed/simple;
+	bh=cwSLHOZKVWKiSOwX2fZ1oB9Don0/TFoIe8ujDQT7v9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jKvorikPDFcijveMeMc43BkXEhDlL09wnzISAu1Ot2uzMMCTEbFNKZ01oa1N4aUXqt0TdNMuqtBKpsLXugfX/zcd02jxA+CfJVreSweS9pZ91/0iNxmAB6yP3oYDi5FwF+1j13TZ0DOurFoN/NwE7Bko+sTB+zYUtKEI27cX8HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QTFWxdFO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C2AAC4CEE7;
+	Wed, 18 Jun 2025 13:41:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750254087;
+	bh=cwSLHOZKVWKiSOwX2fZ1oB9Don0/TFoIe8ujDQT7v9Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QTFWxdFOLMCMOTmod/3PKBqveXm9v3TtfQHJh18fffwpiaA8YEFmIpF1SUqAvxMS3
+	 ChxqSLVwZM5M+tELK8vmJMq5X6u1HjF6wqhmjOMLPiJCpoT/b8k2Kw6fU/L7AOW7f5
+	 669dhySp1wtxMI8zuvRmgoQ2ue0CWUfDnYCyCeLrLEX7940f8unkV8HCZuNRO9hybj
+	 y8w47DycTv70J2Q5rBoglU3FrXai8H+yKFz+euDLNbFg1P5l23FojPh5GiV0drjS2r
+	 LWjtooCOAbWJx0/6ZuTeztK6EJ3pwd4YTxtLvB2KwLQl0eWmPB1BIOP9BMhrXjekYZ
+	 zYrUehElzYCNw==
+Date: Wed, 18 Jun 2025 06:41:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net 0/4] af_unix: Fix two OOB issues.
+Message-ID: <20250618064126.2cf21b31@kernel.org>
+In-Reply-To: <20250618043453.281247-1-kuni1840@gmail.com>
+References: <20250618043453.281247-1-kuni1840@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="iUL4KGRviabJX8Lu"
-Content-Disposition: inline
-In-Reply-To: <aB1JnJG_CH5vxAsw@mail-itl>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+On Tue, 17 Jun 2025 21:34:38 -0700 Kuniyuki Iwashima wrote:
+> Patch 1 fixes issues that happen when multiple consumed OOB
+> skbs are placed consecutively in the recv queue.
+> 
+> Patch 2 fixes an inconsistent behaviour that close()ing a socket
+> with a consumed OOB skb at the head of the recv queue triggers
+> -ECONNRESET on the peer's recv().
+
+It appears to break the scm_rights tests, including a UAF.
 
 
---iUL4KGRviabJX8Lu
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Jun 2025 15:28:51 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	regressions@lists.linux.dev, stable@vger.kernel.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on
- Meteor Lake - 6.14.2
+# #  RUN           scm_rights.stream_listener.self_ref ...
+# # scm_rights.c:176:self_ref:Expected 0 (0) == ret (4)
+# # self_ref: Test terminated by assertion
+# #          FAIL  scm_rights.stream_listener.self_ref
+# not ok 25 scm_rights.stream_listener.self_ref
+# #  RUN           scm_rights.stream_listener.triangle ...
+# # scm_rights.c:176:triangle:Expected 0 (0) == ret (12)
+# # triangle: Test terminated by assertion
+# #          FAIL  scm_rights.stream_listener.triangle
+# not ok 26 scm_rights.stream_listener.triangle
+# #  RUN           scm_rights.stream_listener.cross_edge ...
+# # scm_rights.c:176:cross_edge:Expected 0 (0) == ret (16)
+# # cross_edge: Test terminated by assertion
+# #          FAIL  scm_rights.stream_listener.cross_edge
+# not ok 27 scm_rights.stream_listener.cross_edge
+# #  RUN           scm_rights.stream_listener.backtrack_from_scc ...
 
-On Fri, May 09, 2025 at 02:17:32AM +0200, Marek Marczykowski-G=C3=B3recki w=
-rote:
-> On Fri, May 09, 2025 at 01:28:36AM +0200, Marek Marczykowski-G=C3=B3recki=
- wrote:
-> > On Fri, May 09, 2025 at 01:13:28AM +0200, Paul Menzel wrote:
-> > > Dear Marek, dear Vitaly,
-> > >=20
-> > >=20
-> > > Am 09.05.25 um 00:41 schrieb Marek Marczykowski-G=C3=B3recki:
-> > > > On Thu, May 08, 2025 at 09:26:18AM +0300, Lifshits, Vitaly
-> > > > > On 4/21/2025 4:28 PM, Marek Marczykowski-G=C3=B3recki wrote:
-> > > > > > On Mon, Apr 21, 2025 at 03:19:12PM +0200, Marek Marczykowski-G=
-=C3=B3recki wrote:
-> > > > > > > On Mon, Apr 21, 2025 at 03:44:02PM +0300, Lifshits, Vitaly wr=
-ote:
-> > > > > > > >=20
-> > > > > > > >=20
-> > > > > > > > On 4/16/2025 3:43 PM, Marek Marczykowski-G=C3=B3recki wrote:
-> > > > > > > > > On Wed, Apr 16, 2025 at 03:09:39PM +0300, Lifshits, Vital=
-y wrote:
-> > > > > > > > > > Can you please also share the output of ethtool -i? I w=
-ould like to know the
-> > > > > > > > > > NVM version that you have on your device.
-> > > > > > > > >=20
-> > > > > > > > > driver: e1000e
-> > > > > > > > > version: 6.14.1+
-> > > > > > > > > firmware-version: 1.1-4
-> > > > > > > > > expansion-rom-version:
-> > > > > > > > > bus-info: 0000:00:1f.6
-> > > > > > > > > supports-statistics: yes
-> > > > > > > > > supports-test: yes
-> > > > > > > > > supports-eeprom-access: yes
-> > > > > > > > > supports-register-dump: yes
-> > > > > > > > > supports-priv-flags: yes
-> > > > > > > > >=20
-> > > > > > > >=20
-> > > > > > > > Your firmware version is not the latest, can you check with=
- the board
-> > > > > > > > manufacturer if there is a BIOS update to your system?
-> > > > > > >=20
-> > > > > > > I can check, but still, it's a regression in the Linux driver=
- - old
-> > > > > > > kernel did work perfectly well on this hw. Maybe new driver t=
-ries to use
-> > > > > > > some feature that is missing (or broken) in the old firmware?
-> > > > > >=20
-> > > > > > A little bit of context: I'm maintaining the kernel package for=
- a Qubes
-> > > > > > OS distribution. While I can try to update firmware on my test =
-system, I
-> > > > > > have no influence on what hardware users will use this kernel, =
-and
-> > > > > > which firmware version they will use (and whether all the vendo=
-rs
-> > > > > > provide newer firmware at all). I cannot ship a kernel that is =
-known
-> > > > > > to break network on some devices.
-> > > > > >=20
-> > > > > > > > Also, you mentioned that on another system this issue doesn=
-'t reproduce, do
-> > > > > > > > they have the same firmware version?
-> > > > > > >=20
-> > > > > > > The other one has also 1.1-4 firmware. And I re-checked, e100=
-0e from
-> > > > > > > 6.14.2 works fine there.
-> > >=20
-> > > > > Thank you for your detailed feedback and for providing the reques=
-ted
-> > > > > information.
-> > > > >=20
-> > > > > We have conducted extensive testing of this patch across multiple=
- systems
-> > > > > and have not observed any packet loss issues. Upon comparing the =
-mentioned
-> > > > > setups, we noted that while the LAN controller is similar, the CP=
-U differs.
-> > > > > We believe that the issue may be related to transitions in the CP=
-U's low
-> > > > > power states.
-> > > > >=20
-> > > > > Consequently, we kindly request that you disable the CPU low powe=
-r state
-> > > > > transitions in the S0 system state and verify if the issue persis=
-ts. You can
-> > > > > disable this in the kernel parameters on the command line with id=
-le=3Dpoll.
-> > > > > Please note that this command is intended for debugging purposes =
-only, as it
-> > > > > may result in higher power consumption.
-> > > >=20
-> > > > I tried with idle=3Dpoll, and it didn't help, I still see a lot of =
-packet
-> > > > losses. But I can also confirm that idle=3Dpoll makes the system use
-> > > > significantly more power (previously at 25-30W, with this option st=
-ays
-> > > > at about 42W).
-> > > >=20
-> > > > Is there any other info I can provide, enable some debug features or
-> > > > something?
-> > > >=20
-> > > > I see the problem is with receiving packets - in my simple ping tes=
-t,
-> > > > the ping target sees all the echo requests (and respond to them), b=
-ut
-> > > > the responses aren't reaching ping back (and are not visible on tcp=
-dump
-> > > > on the problematic system either).
-> > >=20
-> > > As the cause is still unclear, can the commit please be reverted in t=
-he
-> > > master branch due adhere to Linux=E2=80=99 no-regression policy, so t=
-hat it can be
-> > > reverted from the stable series?
-> > >=20
-> > > Marek, did you also test 6.15 release candidates?
-> >=20
-> > The last test I did was on 6.15-rc3. I can re-test on -rc5.
->=20
-> Same with 6.15-rc5.
+[ 5716.340166][T26625] ==================================================================
+[ 5716.340494][T26625] BUG: KASAN: slab-use-after-free in __unix_walk_scc+0x8e0/0xce0
+[ 5716.340761][T26625] Read of size 8 at addr ffff88801d8c6fd0 by task kworker/u17:0/26625
+[ 5716.341015][T26625] 
+[ 5716.341103][T26625] CPU: 2 UID: 0 PID: 26625 Comm: kworker/u17:0 Not tainted 6.16.0-rc1-virtme #1 PREEMPT(full) 
+[ 5716.341109][T26625] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[ 5716.341112][T26625] Workqueue: events_unbound __unix_gc
+[ 5716.341118][T26625] Call Trace:
+[ 5716.341120][T26625]  <TASK>
+[ 5716.341123][T26625]  dump_stack_lvl+0x82/0xd0
+[ 5716.341133][T26625]  print_address_description.constprop.0+0x2c/0x400
+[ 5716.341141][T26625]  ? __unix_walk_scc+0x8e0/0xce0
+[ 5716.341145][T26625]  print_report+0xb4/0x270
+[ 5716.341148][T26625]  ? __unix_walk_scc+0x8e0/0xce0
+[ 5716.341152][T26625]  ? kasan_addr_to_slab+0x25/0x80
+[ 5716.341155][T26625]  ? __unix_walk_scc+0x8e0/0xce0
+[ 5716.341158][T26625]  kasan_report+0xca/0x100
+[ 5716.341163][T26625]  ? __unix_walk_scc+0x8e0/0xce0
+[ 5716.341168][T26625]  __unix_walk_scc+0x8e0/0xce0
+[ 5716.341174][T26625]  ? __pfx___unix_walk_scc+0x10/0x10
+[ 5716.341178][T26625]  ? do_raw_spin_lock+0x130/0x270
+[ 5716.341185][T26625]  ? __pfx_do_raw_spin_lock+0x10/0x10
+[ 5716.341189][T26625]  ? lock_acquire+0x10c/0x170
+[ 5716.341192][T26625]  ? __unix_gc+0x8b/0x400
+[ 5716.341197][T26625]  __unix_gc+0x29f/0x400
+[ 5716.341201][T26625]  ? __pfx___unix_gc+0x10/0x10
+[ 5716.341207][T26625]  ? rcu_is_watching+0x12/0xc0
+[ 5716.341215][T26625]  ? rcu_is_watching+0x12/0xc0
+[ 5716.341219][T26625]  process_one_work+0xe43/0x1660
+[ 5716.341228][T26625]  ? __pfx_process_one_work+0x10/0x10
+[ 5716.341233][T26625]  ? assign_work+0x16c/0x240
+[ 5716.341241][T26625]  worker_thread+0x591/0xcf0
+[ 5716.341246][T26625]  ? __pfx_worker_thread+0x10/0x10
+[ 5716.341250][T26625]  kthread+0x37e/0x600
+[ 5716.341254][T26625]  ? __pfx_kthread+0x10/0x10
+[ 5716.341256][T26625]  ? ret_from_fork+0x1b/0x320
+[ 5716.341261][T26625]  ? __lock_release+0x5d/0x170
+[ 5716.341265][T26625]  ? rcu_is_watching+0x12/0xc0
+[ 5716.341268][T26625]  ? __pfx_kthread+0x10/0x10
+[ 5716.341271][T26625]  ret_from_fork+0x240/0x320
+[ 5716.341274][T26625]  ? __pfx_kthread+0x10/0x10
+[ 5716.341276][T26625]  ret_from_fork_asm+0x1a/0x30
+[ 5716.341286][T26625]  </TASK>
+[ 5716.341288][T26625] 
+[ 5716.347648][T26625] Allocated by task 12654:
+[ 5716.347814][T26625]  kasan_save_stack+0x24/0x50
+[ 5716.347983][T26625]  kasan_save_track+0x14/0x30
+[ 5716.348171][T26625]  __kasan_slab_alloc+0x59/0x70
+[ 5716.348348][T26625]  kmem_cache_alloc_noprof+0x10b/0x330
+[ 5716.348522][T26625]  sk_prot_alloc.constprop.0+0x4e/0x1b0
+[ 5716.348695][T26625]  sk_alloc+0x36/0x6c0
+[ 5716.348823][T26625]  unix_create1+0x84/0x6f0
+[ 5716.348991][T26625]  unix_create+0xcb/0x170
+[ 5716.349119][T26625]  __sock_create+0x23c/0x6a0
+[ 5716.349287][T26625]  __sys_socket+0x11a/0x1d0
+[ 5716.349457][T26625]  __x64_sys_socket+0x72/0xb0
+[ 5716.349634][T26625]  do_syscall_64+0xc1/0x380
+[ 5716.349803][T26625]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[ 5716.350014][T26625] 
+[ 5716.350098][T26625] Freed by task 12654:
+[ 5716.350223][T26625]  kasan_save_stack+0x24/0x50
+[ 5716.350390][T26625]  kasan_save_track+0x14/0x30
+[ 5716.350586][T26625]  kasan_save_free_info+0x3b/0x60
+[ 5716.350759][T26625]  __kasan_slab_free+0x38/0x50
+[ 5716.350930][T26625]  kmem_cache_free+0x149/0x330
+[ 5716.351099][T26625]  __sk_destruct+0x46e/0x780
+[ 5716.351269][T26625]  unix_release_sock+0xa0e/0xf90
+[ 5716.351440][T26625]  unix_release+0x8c/0xf0
+[ 5716.351574][T26625]  __sock_release+0xa6/0x260
+[ 5716.351763][T26625]  sock_close+0x18/0x20
+[ 5716.351980][T26625]  __fput+0x35c/0xa80
+[ 5716.352125][T26625]  fput_close_sync+0xdd/0x190
+[ 5716.352293][T26625]  __x64_sys_close+0x7d/0xd0
+[ 5716.352464][T26625]  do_syscall_64+0xc1/0x380
+[ 5716.352724][T26625]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[ 5716.352933][T26625] 
+[ 5716.353018][T26625] The buggy address belongs to the object at ffff88801d8c6940
+[ 5716.353018][T26625]  which belongs to the cache UNIX-STREAM of size 1984
+[ 5716.353553][T26625] The buggy address is located 1680 bytes inside of
+[ 5716.353553][T26625]  freed 1984-byte region [ffff88801d8c6940, ffff88801d8c7100)
+[ 5716.353951][T26625] 
+[ 5716.354037][T26625] The buggy address belongs to the physical page:
+[ 5716.354324][T26625] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1d8c0
+[ 5716.354621][T26625] head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+[ 5716.354966][T26625] flags: 0x80000000000040(head|node=0|zone=1)
+[ 5716.355181][T26625] page_type: f5(slab)
+[ 5716.355311][T26625] raw: 0080000000000040 ffff888005b4edc0 ffffea00002b7610 ffffea0000763210
+[ 5716.355702][T26625] raw: 0000000000000000 00000000000e000e 00000000f5000000 0000000000000000
+[ 5716.356022][T26625] head: 0080000000000040 ffff888005b4edc0 ffffea00002b7610 ffffea0000763210
+[ 5716.356330][T26625] head: 0000000000000000 00000000000e000e 00000000f5000000 0000000000000000
+[ 5716.356727][T26625] head: 0080000000000003 ffffea0000763001 00000000ffffffff 00000000ffffffff
+[ 5716.357027][T26625] head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+[ 5716.357434][T26625] page dumped because: kasan: bad access detected
+[ 5716.357635][T26625] 
+[ 5716.357716][T26625] Memory state around the buggy address:
+[ 5716.357874][T26625]  ffff88801d8c6e80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[ 5716.358115][T26625]  ffff88801d8c6f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[ 5716.358382][T26625] >ffff88801d8c6f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[ 5716.358720][T26625]                                                  ^
+[ 5716.358921][T26625]  ffff88801d8c7000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[ 5716.359162][T26625]  ffff88801d8c7080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[ 5716.359506][T26625] ==================================================================
+[ 5716.359805][T26625] Disabling lock debugging due to kernel taint
 
-And the same issue still applies to 6.16-rc2. FWIW Qubes OS kernel has
-this buggy patch revered and nobody complained (contrary to the version
-with the patch included). Should I submit the revert patch?
-
---=20
-Best Regards,
-Marek Marczykowski-G=C3=B3recki
-Invisible Things Lab
-
---iUL4KGRviabJX8Lu
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmhSvxMACgkQ24/THMrX
-1yyXAQf+K53U8Y6jWL6iyqumhg77CPbzn0qaQrxtA2sKrbY+GBzdBG3ptbzs1bY0
-T5YlBl9fiGCHMqAO1H/BgQnbHY7oRk2jMgR10m52fMWE0pnsHPcHxVi2ChLvrpfx
-UdYSbRHZpEDwVZNfQkAI0ppKGF/It+BtIjD9xWeLqOiezEr6GmT2Z1uvBywbwq4m
-AbK3ZFzvSHIEUyVQZMXopcGwsAzJWL19/zPJOLLXDIMhUy9mKvpNR7/MjivwuuT4
-Y0oy6tAuqGLJv3m0oIIByL7lAc/2oq0TizFTqOGnvGMJYALdXiA2QpKNZSc2MT8t
-NUXAGDW3WOntp2X+TvgJW4+pfqn8Rw==
-=MhTN
------END PGP SIGNATURE-----
-
---iUL4KGRviabJX8Lu--
+# # scm_rights.c:176:backtrack_from_scc:Expected 0 (0) == ret (22)
+# # backtrack_from_scc: Test terminated by assertion
+# #          FAIL  scm_rights.stream_listener.backtrack_from_scc
+# not ok 28 scm_rights.stream_listener.backtrack_from_scc
+-- 
+pw-bot: cr
 
