@@ -1,163 +1,132 @@
-Return-Path: <netdev+bounces-199162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20FE5ADF3AE
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:27:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7EC2ADF3B5
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B003D4A0070
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:27:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 818573B4937
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6B22EE5E9;
-	Wed, 18 Jun 2025 17:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459742F003F;
+	Wed, 18 Jun 2025 17:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ExCcmEt7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0GMLe5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0410B2F1980
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 17:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FEA2FEE0F;
+	Wed, 18 Jun 2025 17:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750267620; cv=none; b=lO+uO61k82lcXunJmL6fEk0t5Z2CRE/vbg9vcuSq6MtjEQ3M7F8gDbDr2O9AF3nfEFiSmdKXnWeV9TywnmasB1bjRfQds3E3a6shCqCqtFxPwZO3wV1rnliFJdOkhuQVr2JgiHac+MjVIUszK2DwfZEVzITm+kzVumNxYZgJgi4=
+	t=1750267670; cv=none; b=kZY8RTy9iFGxFB0lW2Fv/hEn84+XAbtjSz/pgPZGg8WjA1Sqlz5lpcC9DBv4hTq3U+cboV1mZ79UpMIEW3j1w3SapR3T4yxTVWxDtFoR9TTAerJjzgxG/wW5MD9ZWN7Z7JFGlFYnns6mI2P3Ei0B1ZMxwL9J7b+MrnOwGlEiShc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750267620; c=relaxed/simple;
-	bh=J+BqwMFmKcN19hQQ3aT9eKAwy1PnKrQMbSUnQLnRrRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=saaTADJb442+TKJToANRG5td+LaP0kw61xwGkIInHGCpaqkQsS2yOYN81DecKc56YuV009k4i13rmG1Q3tnkHok6P9HKntW/nMmERY2vMhhHi2R7x8Kaat8ZNEL/bm/oNDdcS5sYx5+gNO7yHGI+xr85rOuVKTIXQE6zUH/0UU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ExCcmEt7; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-735a6faec9eso4276102a34.3
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 10:26:58 -0700 (PDT)
+	s=arc-20240116; t=1750267670; c=relaxed/simple;
+	bh=i6qGqcOLeZ+C33Fl0SoQO/hHSNceE95rDLEGVJmh26g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L8b+k0folKRPYdH3gsYtJYixHDcyzII5BzJqjLG7iPDU51HP72MRN0aS4vW8YfEMPbVJshYfcBWuckHTHQYq7cdD9sGCK/xEe9FqaS6C4oCyDLgdrCA7NLEzrHXNGfAkgWLlkgnJ4CF/M3Yj5pakLv6otVllPLHq+2AH5tl6+No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0GMLe5i; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-313336f8438so1414779a91.0;
+        Wed, 18 Jun 2025 10:27:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750267618; x=1750872418; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6p/EuXGOB6YYcPGLEVBf9Y7M5MlRj/BCkj3EsNFJrV8=;
-        b=ExCcmEt7QmOfyUwyLYxRx+HhgwPbPxK7N2c9ZLkfSM2IIUnZwY7ufRKHXkSS1DcozT
-         +3sGB1Jg6oNi/hF3wDg9yfKRbl58x0MsSjffEWHv4klpvzZ5JzY7ceii/zUCj17Gq9l8
-         j3cxwd0Js/sbmVGv6F/ilYk0zYCp//hxlV9bRVT8DdF3L15TffCZTk7YxxG7yWdjWqqv
-         tsn3qTjO1l0kH0/rWL7vULt9cFARTaE23T+k/ZEevjM4kbHqN6/Uk3MLYx6U6VN4++aJ
-         jXwudLUHrDBNirphbHihu39YTIFxmdge7TzUrAYsIY8Ro+3+6L8hb0GxAkrCdN13ldZK
-         WCeA==
+        d=gmail.com; s=20230601; t=1750267664; x=1750872464; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u+q5GpQ2p91YPUwXGOT+L4Iu/3q5RIn50B6DUy0Q7so=;
+        b=J0GMLe5ibmi6acJy4t+xOstgKNyU4Ls6us72KXQ/ONM5Z1FEQgrzcGvQHbksMtFs/l
+         kecjHxqdi1zygRrJckNCsdGZDv5uTEYQo4oCDoSSki8vtVVYcfylbGkpJ5Y6r05WQEhO
+         Si9nO+/MyTcMKO4oP/4XmMCnNkeoTcal2m60Wq9PWl/hK2BO4P3ZvxcWUp26el0hCXks
+         EYIdakmgblUw3V5UqkRXaWCz5ukwyBJGfibzG/wyCjFVOSRuZ/6pDid+Z0C6KGmPOVyw
+         fla95oFxGmaXgEzkLVyp+RQB9agXe5jXSnqZzy1trF9EBAypwnGWoNu1Um3WQPHFDZjt
+         WbOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750267618; x=1750872418;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6p/EuXGOB6YYcPGLEVBf9Y7M5MlRj/BCkj3EsNFJrV8=;
-        b=TR0vWiQjQtnTz1Z4+kgZAKmfYTnffamZxRIXl94fAeUP07PUc/MIsr2+WNQhBz+t5X
-         ylfJ+wKwhdq7v9kXmSnoEUjzJNBXRRTwsop0/LN+xKDRIh+P6Vf1WnESQSUHOVYuZDim
-         1Gg/FR1+LtjS1ncPsnLIAUCwu2QzgxRA0m03KD9+JEIZLBaE5uuQnPR8iRFrJ7FsC93s
-         DbvEAJptJCkcW/D17NZGDqiAdUwl7sdToFrCN25PA5pQlMP1isKBk8mnI41/GcOOm+tF
-         Lbe1mRW5m9tQx14Os5Gy2uKh1mR0gyNpAbLDo3OCcVy14GLoOfan6D3Pm/eRodNDHMKW
-         TG2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/2AP0A1ToPUHEefMTMdzuTtyyYVzJB3eldnDAJ9ZBWK3mRrLoIn5XJfSuF+cQrJBDKIhCNyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy88T8EybMf9BaWT1GkgGDj5teOIj8QyOSeQN/o2gpCGW5EagfI
-	Nz5oV2Zu0aHATuZJjxWWTAnaIVwLWX/XxZxlSHmmfWeTl1nObnLxNPjDlthffNhu7h4=
-X-Gm-Gg: ASbGncu8SbGtbickkJWoYuYhps0GGhc3Uh6I/5FPYsgncJW2XlBKhH8ovuiwbXPzNci
-	JHOp5DOzlteikj+X4HVI3JaYRlToI3AXATG7fdx1Jtus9lWtxoCuJVu17DY+hruiirNnr5yfdiN
-	rusD2WpWxPASF2Y861SnNFvoA1zZQRryzCwzW6EJ1GKooWZ7FRkLatRukstO5SHKE9d7wgwD7iy
-	/ZMke1wBlGoMuocOVo5CC9hetN1lF86iMNUO4GiXDyohZAnd0Z7ubC2MLpHru/QRuNAhM1t05tp
-	4pCl/25FygpyQ4lbS9ihyEHOe0VtPLCZKLx1JtkV2kMAP+xd6SjuO10TJhWDivlTUrcuyw==
-X-Google-Smtp-Source: AGHT+IFP0GuBKlRwXw2OJNEzq9cywJo2wUE5iUpl+qcRNZHJ6Edt+/XzOGWu0ECCFUNYcg28rXeKvA==
-X-Received: by 2002:a05:6830:6219:b0:735:b4ef:acaf with SMTP id 46e09a7af769-73a36405b46mr12502515a34.27.1750267618055;
-        Wed, 18 Jun 2025 10:26:58 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:1b3b:c162:aefa:da1b])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73a284039bdsm2037108a34.22.2025.06.18.10.26.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 10:26:57 -0700 (PDT)
-Date: Wed, 18 Jun 2025 20:26:56 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 12/13] net: mctp: add gateway routing support
-Message-ID: <c336c490-e002-48a8-bda7-b095ebde4c33@suswa.mountain>
+        d=1e100.net; s=20230601; t=1750267664; x=1750872464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u+q5GpQ2p91YPUwXGOT+L4Iu/3q5RIn50B6DUy0Q7so=;
+        b=sYg7F97dikc/oI2gxa2BZ3BduzdcKR0uDWK4RpuNCCiFTpRPDUaw3Rzcms5CufSDVn
+         CSbFjjLl7AtSUBFgf+yMEnkCmrm7wScCHMikdZDqsldOpP4RvDt/v7ezXCtsgR7j1Oev
+         /b1Jls9sIAgkuk6os7DQxweEY58VXlGZqKLSznU9PMvidfoZZKGv/z4oIEQSUL7zT324
+         4D+et2hgp4rrz0bfflDcqSgCORrDdEsOYagQ8Mp1/Sp/l2bmdRgKp5WlUTTRqx76ZDsS
+         5atM4MoyCdGR84s72ZGKshCoOqNI8j6XTHT8rlFTwsg5JjY+j9tDFRHTYI3oozFfHLV0
+         RRIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUSkrLgRQhhCPfzi2KOapUzOwlZs3ptDbYc2g3rzJYoKm4xZDk+bmYkR4cv3IGKbI2xC+muSS2CklRD470/@vger.kernel.org, AJvYcCV70Fe/5OQXRj4NOKBDa3u/EZj2pjCLPP3F3P5Dnv6Y4Sa8wRldoiDJ+JWDrmu6z5ZPAhBB6JdH@vger.kernel.org, AJvYcCVZjfBKj4ZRVgEVhO6lwSqeF+H4F4dldTBGWrHkAd+tongmAuLIa+qZGM7+BShimplFIGc4KNy4zWyTcGh8u5w=@vger.kernel.org, AJvYcCViwPS3fxjYgoSlB+fWixMJSTXIkZw9zyl1gmkpwPGgIUEPmhPcprkU8/J1Qvk31vNtAXUE/iF8rzIWwdX8jkwi@vger.kernel.org, AJvYcCWEZ3gwZm9n2G+yPkZkq6KELxYzYv8DX7QUliNtlUbIebYXt66+AmVHXNOiDZaAW/Vdu2ergFQMYSs=@vger.kernel.org, AJvYcCWtnU7mPMIfHJaYYpWluXCIPO7Ok3zcpjRZRnCIOiVc+eBz3HSNwhFvv1ei/TpeAA/oUXLDqH6D0LSZ@vger.kernel.org, AJvYcCX83+XdGwZNRoGoa34UrUd7s8zoE4lnji8B1LvVyxTfVjbb+H8O6pnN7R1BNvJUwUkR/ws6bOitZ8bZq7Xc@vger.kernel.org, AJvYcCX9uariTuA4YFF35kFD9fohASw22CU+dwSr657npxYyWzi56b/z2eY12EWoRG2C8JO/15i9fFFOcEJfTNw=@vger.kernel.org, AJvYcCXMuKdOSk8RTrOIquyA9BaN6w4Na6hKzPT+9jx5h0A/1AIATGlC4vM+0NABKq77xod97AGUoJJEHkEb@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGCUTYA8MoG0WWyRm3wEsFaWG5muvWq4PcQdBwJED/i7pMdqZ6
+	VTh4tNKP1r7eFcNy0fjT1NDu3NlEJlB2r8oK+Zt551KgaQ9/ycmh7lSMIue1zCeC04EN5bYw0ov
+	VbAe9f6OMYO1hT01yJh9YPU5sWY83f2E=
+X-Gm-Gg: ASbGncsw8GCC5Gk0+8PGYz7Za69uyjTZi2SK9KICaByvy8vdpXZZ2W+iJDIc1VGTqkX
+	WokitcMFEVaO+yijF0ftOA+UPEnsGyOMbVV0KXZ/872tAoCXOcuyo0Z83DIQ0bD7+EaAvbhW0ww
+	vBwq00cl4ZFUXTulEar//+Q5S/mgnA5Y0IhlH5Gspd73g=
+X-Google-Smtp-Source: AGHT+IHgojIF7ZtAWL01BJX9X9RDL/KOffVgqU2TBitLwLXw3+WIYaOCUYiiv/uPX3E3RPRNcpmmIUzrPPvpRfNOxow=
+X-Received: by 2002:a17:90b:53ce:b0:311:fde5:c4ae with SMTP id
+ 98e67ed59e1d1-3158bfee2a1mr70211a91.6.1750267664414; Wed, 18 Jun 2025
+ 10:27:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611-dev-forwarding-v1-12-6b69b1feb37f@codeconstruct.com.au>
+References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com> <20250615-ptr-as-ptr-v12-6-f43b024581e8@gmail.com>
+In-Reply-To: <20250615-ptr-as-ptr-v12-6-f43b024581e8@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 18 Jun 2025 19:27:32 +0200
+X-Gm-Features: Ac12FXyjLr8F_PeGOXgNiD3lzcYVOjPw7Oy7KTgQZIrIWl7ZUXuM1dkxLpsBDQ8
+Message-ID: <CANiq72nji33-=cLnEkpsXyovctshNZ5-pheBBxQdNscWdReO_A@mail.gmail.com>
+Subject: Re: [PATCH v12 6/6] rust: enable `clippy::ref_as_ptr` lint
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Breno Leitao <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jeremy,
+On Sun, Jun 15, 2025 at 10:55=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
+> wrote:
+>
+>  rust/kernel/configfs.rs  | 20 ++++++--------------
+>  rust/kernel/device_id.rs |  2 +-
+>  rust/kernel/fs/file.rs   |  2 +-
 
-kernel test robot noticed the following build warnings:
+Andreas, Christian, Danilo, Greg: it would be nice to get Acked-by's
+for your bits.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-don-t-use-source-cb-data-when-forwarding-ensure-pkt_type-is-set/20250611-143319
-base:   0097c4195b1d0ca57d15979626c769c74747b5a0
-patch link:    https://lore.kernel.org/r/20250611-dev-forwarding-v1-12-6b69b1feb37f%40codeconstruct.com.au
-patch subject: [PATCH net-next 12/13] net: mctp: add gateway routing support
-config: csky-randconfig-r073-20250612 (https://download.01.org/0day-ci/archive/20250613/202506131515.a5tCsTj0-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 14.3.0
+(This particular one can be tricky in other cases due to lifetime extension=
+.)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202506131515.a5tCsTj0-lkp@intel.com/
+Thanks!
 
-New smatch warnings:
-net/mctp/route.c:1381 mctp_route_nlparse_common() error: uninitialized symbol 'gateway'.
-
-vim +/gateway +1381 net/mctp/route.c
-
-33d33bef994e518 Jeremy Kerr   2025-06-11  1350  static int mctp_route_nlparse_common(struct net *net, struct nlmsghdr *nlh,
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1351  				     struct netlink_ext_ack *extack,
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1352  				     struct nlattr **tb, struct rtmsg **rtm,
-33d33bef994e518 Jeremy Kerr   2025-06-11  1353  				     struct mctp_dev **mdev,
-75626016e50cb9a Jeremy Kerr   2025-06-11  1354  				     struct mctp_fq_addr *gatewayp,
-33d33bef994e518 Jeremy Kerr   2025-06-11  1355  				     mctp_eid_t *daddr_start)
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1356  {
-75626016e50cb9a Jeremy Kerr   2025-06-11  1357  	struct mctp_fq_addr *gateway;
-75626016e50cb9a Jeremy Kerr   2025-06-11  1358  	unsigned int ifindex = 0;
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1359  	struct net_device *dev;
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1360  	int rc;
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1361  
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1362  	rc = nlmsg_parse(nlh, sizeof(struct rtmsg), tb, RTA_MAX,
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1363  			 rta_mctp_policy, extack);
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1364  	if (rc < 0) {
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1365  		NL_SET_ERR_MSG(extack, "incorrect format");
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1366  		return rc;
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1367  	}
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1368  
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1369  	if (!tb[RTA_DST]) {
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1370  		NL_SET_ERR_MSG(extack, "dst EID missing");
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1371  		return -EINVAL;
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1372  	}
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1373  	*daddr_start = nla_get_u8(tb[RTA_DST]);
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1374  
-75626016e50cb9a Jeremy Kerr   2025-06-11  1375  	if (tb[RTA_OIF])
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1376  		ifindex = nla_get_u32(tb[RTA_OIF]);
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1377  
-75626016e50cb9a Jeremy Kerr   2025-06-11  1378  	if (tb[RTA_GATEWAY])
-75626016e50cb9a Jeremy Kerr   2025-06-11  1379  		gateway = nla_data(tb[RTA_GATEWAY]);
-
-Unitialized on else path
-
-06d2f4c583a7d89 Matt Johnston 2021-07-29  1380  
-75626016e50cb9a Jeremy Kerr   2025-06-11 @1381  	if (ifindex && gateway) {
-                                                                       ^^^^^^^
-warning.
-
-75626016e50cb9a Jeremy Kerr   2025-06-11  1382  		NL_SET_ERR_MSG(extack,
-75626016e50cb9a Jeremy Kerr   2025-06-11  1383  			       "cannot specify both ifindex and gateway");
-33d33bef994e518 Jeremy Kerr   2025-06-11  1384  		return -EINVAL;
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Cheers,
+Miguel
 
