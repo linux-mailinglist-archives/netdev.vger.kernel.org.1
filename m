@@ -1,116 +1,188 @@
-Return-Path: <netdev+bounces-198868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59B99ADE127
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 04:37:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B91ADE132
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 04:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9FAE189B976
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:37:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85E97161BB7
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A216378F36;
-	Wed, 18 Jun 2025 02:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F431A23AF;
+	Wed, 18 Jun 2025 02:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ogls+M8B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zeac9Oxy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BEF1A08A4
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 02:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEBE2D600;
+	Wed, 18 Jun 2025 02:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750214223; cv=none; b=peHo3RMgKcrM9khGHnkHvQHylJ9t3fmA4njkLhjZ5pXaMps+Djzpx/KitFKTYxdDnGgB6IAgslxykHY3tCEfoPcyc5MojRvg5M9lfFsznf8vlM04nTMVEGNY5GM45pg7PLCRP8jh7FNwohLl4feK5l6xDsaT0/BdSQTdzFaOXfY=
+	t=1750214542; cv=none; b=kzQx1sLiTm7EwDBQRHAiZuM411Nn6AutHnv1mHtz9BTMlE4RhKt31AWjdDmtHLULAnjrOuQMEYK+0h+RFjchTtoCExRQMV5I1SIVShEM2/eqpCIiicK5BxzxxJ+CHFhcB5gKqasHNdxF5DtSOLuqqgyDJMTmRKFkp+HCO7FJI8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750214223; c=relaxed/simple;
-	bh=zCTAi8gefriT5heozI4vTsZWDN8qPafoBOHcO3SUBPg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MZqZ0mXqDxbDWfG9TA1TRCz/Q4tn7GNz/lBxCTDwTQGQeajAjO3LkSqQLQedYcOgJm+63MFYIrExVqTpPW/iaF1zanOzMUrrLetZ9Dey+2qzpRmx0UWPfxd1ItKQA9B9UsvlfnFr97AgdDkp2KFgeboeeY6AQGYkHB8QL5NRK+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ogls+M8B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750214220;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zCTAi8gefriT5heozI4vTsZWDN8qPafoBOHcO3SUBPg=;
-	b=Ogls+M8BXlBsdxEv3rBvCKsrzbIaLtXLL1pshd4IMAfdJFYbCDNdZ9f00wiBFo9KmsCnCt
-	nw5oYiU1CsYye9ogs1GoOVP8IYyUQ0KJ1gkS3OJlT58UWwJdhI8ffHKVVOSjHLhcGy6Qhw
-	Q2+AJn7BPvOvRxpYiyZSiPr/SxBAmEk=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-295-WHzeWvE8PBW_Ipjfyl7UpQ-1; Tue, 17 Jun 2025 22:36:59 -0400
-X-MC-Unique: WHzeWvE8PBW_Ipjfyl7UpQ-1
-X-Mimecast-MFC-AGG-ID: WHzeWvE8PBW_Ipjfyl7UpQ_1750214218
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b2eb60594e8so4064784a12.1
-        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 19:36:59 -0700 (PDT)
+	s=arc-20240116; t=1750214542; c=relaxed/simple;
+	bh=7i5+1Vmj56/aTiTJ9aGMjarno6AIHKUGDq5Tb5xI53w=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Qp1uyn0t6Ihj2le3grGWwxxXCn1+khWCGHvSwU4UOhjyuubBmqgiIOh1SG7i6cIZf/loYKlcmNn/VKWIxivDhdOxsBkC3iUo7bsa+QPofMPaWLFcJe+RVjLygN305D8RsQKuNFbkhADKxL0vOGVTRI4XxrPoq+Qt9Tr/RhrWFcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zeac9Oxy; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-234d3261631so42993285ad.1;
+        Tue, 17 Jun 2025 19:42:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750214540; x=1750819340; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fuYMA/57H5BAmU65jan5lqjjy5ZSUjRygUj6a7SK/2Y=;
+        b=Zeac9OxyEjM3XiYbjjvZp1WyxDQwQA2xjSyXBDTo8KQar5w9CyV5z1e1LnUhPlBT+H
+         kbSZTNd+9+QCMZeG1BrwZ9Mj6Qu7POCh2/H+He7I2bOqeviGGdyQNPCArwPsslPQeNxh
+         ME9Pes/GBToONF9wFALEeYA5cJqfOZ6KZT2M/LKdrzCINC0+2M0EOb+/UrsLkoU1OnQl
+         8JylhFK+OpEW81/g0cT67kDM9N7EW8FhilYbK6JqQaTZRLJ2hirOonAWSKB81mCwlE1z
+         qOaJ6O4u/QzbR+2Yh7opC8+nQLYoeW0RAfvhOUnFrCaUOfwDq0h+XYyIJA8z2V/VrBUb
+         03Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750214218; x=1750819018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zCTAi8gefriT5heozI4vTsZWDN8qPafoBOHcO3SUBPg=;
-        b=rrQtma2lGJIFaOzyp4FjXqn37fSKnelxRStpDYQF2YSLy87NphS6XcJQuXYMYP8gQW
-         MqhTDMtn/x9lIH9r9f5FJq82Johh5UdViABhUSku4Iz5hJGKEOrXwYVr2bO3vBCe07uH
-         iuRjZbqXT7TMF91dfbPNwKvTj3l5PIQSznE8VswBCDeiGBOhg1hXLMbDQYkwNrCpoxnN
-         aMk7a+OA0g6ry9iYlUHlZaeUEDS3lj/wG4e06xYIXCsIgKPKttYp5T0nzYW8MeQtxMsa
-         t/w74QGiVG7tnemMMWXRFN8y/M10W3ZHV4ssXL4D2+W9xIuMIwJPF//l2bViICJl581D
-         3/dQ==
-X-Gm-Message-State: AOJu0Yy/4JT5CARkZS3BB6skzlUtQzf7DaUu+QVMvdmJtQOA+S3ta/UM
-	dIR3DXu2r7i3UYND6ZlENNoQtaTE+6BFY22Gh6rAFRHA/m6Mrb1rpNwKbu6csSqANQw44gldRVZ
-	5JVeXky74UlDtdYO7QLs1Ne/mUbVL/ayJwi/PiYbM8fvvLPM6RiBxJDJBel0X1uW4OoCF3te0DF
-	nptSq1pxIk68ab4dqnb62/ZLToLk8t03o1bKfESsCrtcsg/TU5
-X-Gm-Gg: ASbGncu/xz8JTD4YwRzvaHurQW6vtpheFLa3ACw8rEMDyHwITiIj45xsw+mZz5qNjA7
-	ZOpTssqhU8c+BbIHPVEtxVMhBPIPXEyiMOHZjgCThiecMXhnCXw0XQqV7Eeu/G3/5jtrfNoGbF1
-	M2XQ==
-X-Received: by 2002:a05:6a20:a123:b0:217:4f95:6a51 with SMTP id adf61e73a8af0-21fbd7af798mr23625559637.29.1750214218024;
-        Tue, 17 Jun 2025 19:36:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IER8W/gaz9Iia8qgHNQx7v5IO0lrt2J7J7RL61AgDGKfZ7q/yER/mbfgYCV3QeynKT8OzI3vqi5bQhkqlxR0vo=
-X-Received: by 2002:a05:6a20:a123:b0:217:4f95:6a51 with SMTP id
- adf61e73a8af0-21fbd7af798mr23625531637.29.1750214217640; Tue, 17 Jun 2025
- 19:36:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750214540; x=1750819340;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fuYMA/57H5BAmU65jan5lqjjy5ZSUjRygUj6a7SK/2Y=;
+        b=RN0cAfDPl7PYEaN7z4c1j5YW98RbhXJY4V9lUeoKb0oSSuNJM+/DARd9KpJzuTV792
+         AbpYcvXdoNuO2q1wmw/BWsYIF1oZZdAoFf5gyBVjTAGDwyBkCgo3gOVF2ngGNLYYR1b1
+         h1SHMNjyBmhzHKyVoZLYbxpgdObdyDl10HIJdaqtUG83RF8j1NPIr2Svr9jLuIBGmdll
+         bVgTXGDt+1GzMQC3x4UaAYArRWQ2HsrtADrCsXjsOLXQIu4+BYek/ClJ/Ut1+9lbLU0L
+         99iTJ8pI0sjKtp02LcBtlq54AG8+67PeNxu11IoPVHpI94ZLy8PC+zrmTKaz+Hh9xSqc
+         RkPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLt7hZS8zC5EcZiZi/aKkKQ3FZUKVEffYgy7rSPaO8dPnQWvyI3v7p5NmWyNcb4Pb2ivegDczC@vger.kernel.org, AJvYcCWNv8BBzDRBHDfcQfyDBhaumEVWWfeTznMvRUqZ+5TX+8u42ePazKVmlX9H1qPrIkSk19zusnMhGrM=@vger.kernel.org, AJvYcCX3bKc1k9nL8NmLE0M/fJjhFhsmIrOC+irLpZpoRatQmW64CcN8XTzjPCVth1qhZN3lzewAKtE/nAyq8oeB@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsKKhNMC4br6m60dJVgX42JDvHhOfY2TP/NOB5kA/1bz0JYkHR
+	BPZE1ZNmOnpeRI0n2Sy/unAoXZn9ZRUDd+CtLhfSZAfj9nnzVrN4gTX5
+X-Gm-Gg: ASbGnctElc4OdgGyfJkfiX9wCx6gbIb/azu8BWb1E5pKD7m3+xvV3XqN6Zyp5aBaexM
+	Cker3lhgf/tsEBis4cIdHFwWFVfo8cGXBTHuEaae6KbCEsPFlng8sGZY6eV5xncO9MKRb7xk6H8
+	DhCjx6AZBccLeTVQL4dfwzCZgxafOpmpKXHdCTNBE9tvPtMhSqUIBu3ccuvwOGgWR/vYkWykARj
+	xo12PDQapS+ZiSWTTX2pNCVbs975WuwjugIAssmGu/UN+QYiaRHgQBJswsoskJ3r9mNckg3+Ex2
+	zfcv0j3YWNY6hITZIlLrZOHo6593sYdzaHW1tQ960YTHP5aKSDW0U1PJFVfB9Md4MAbahXzIXGV
+	t1ct3eqXVfiYoIqiwvB+dm3vBNf08EtDt
+X-Google-Smtp-Source: AGHT+IHvoHz8x/cvMCuTAeyI0cA9D+sbDRrQQCvuQAcnDzndTzmiRTQy44tnbpaZaEQHbGQzSCzMBg==
+X-Received: by 2002:a17:903:2347:b0:235:91a:4d with SMTP id d9443c01a7336-2366b0185e5mr212827035ad.23.1750214539698;
+        Tue, 17 Jun 2025 19:42:19 -0700 (PDT)
+Received: from [10.0.2.15] (KD106167137155.ppp-bb.dion.ne.jp. [106.167.137.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365dfc68c1sm88027995ad.238.2025.06.17.19.42.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jun 2025 19:42:19 -0700 (PDT)
+Message-ID: <1adba2c6-e4c3-4da2-874e-a304a1fdfd25@gmail.com>
+Date: Wed, 18 Jun 2025 11:42:14 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1750176076.git.pabeni@redhat.com> <fad17d61c90caae4dcd56ea21e0ce6df8f2336cd.1750176076.git.pabeni@redhat.com>
-In-Reply-To: <fad17d61c90caae4dcd56ea21e0ce6df8f2336cd.1750176076.git.pabeni@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 18 Jun 2025 10:36:46 +0800
-X-Gm-Features: AX0GCFvcrIhuBYoh6XZr8DJLmavu0bzqilksoAcDFPoIBtG2WS8qbF9Fa9doBiA
-Message-ID: <CACGkMEuBp4U4XHOGSSaDaQv2Y_ch5eWaUNazDbVx-fviHkr0jA@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 4/8] virtio_net: add supports for extended offloads
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Akira Yokosawa <akiyks@gmail.com>
+Subject: Re: [PATCH v5 01/15] docs: conf.py: properly handle include and
+ exclude patterns
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>
+Cc: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Ignacio Encinas Rubio <ignacio@iencinas.com>,
+ Jan Stancek <jstancek@redhat.com>, Marco Elver <elver@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
+ Shuah Khan <skhan@linuxfoundation.org>, joel@joelfernandes.org,
+ linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
+ lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
+ stern@rowland.harvard.edu, Akira Yokosawa <akiyks@gmail.com>
+References: <cover.1750146719.git.mchehab+huawei@kernel.org>
+ <cca10f879998c8f0ea78658bf9eabf94beb0af2b.1750146719.git.mchehab+huawei@kernel.org>
+Content-Language: en-US
+In-Reply-To: <cca10f879998c8f0ea78658bf9eabf94beb0af2b.1750146719.git.mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 18, 2025 at 12:13=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> The virtio_net driver needs it to implement GSO over UDP tunnel
-> offload.
->
-> The only missing piece is mapping them to/from the extended
-> features.
->
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Hi Mauro,
+
+A comment on compatibility with earlier Sphinx.
+
+On Tue, 17 Jun 2025 10:01:58 +0200, Mauro Carvalho Chehab wrote:
+> When one does:
+> 	make SPHINXDIRS="foo" htmldocs
+> 
+> All patterns would be relative to Documentation/foo, which
+> causes the include/exclude patterns like:
+> 
+> 	include_patterns = [
+> 		...
+> 		f'foo/*.{ext}',
+> 	]
+> 
+> to break. This is not what it is expected. Address it by
+> adding a logic to dynamically adjust the pattern when
+> SPHINXDIRS is used.
+> 
+> That allows adding parsers for other file types.
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 > ---
+>  Documentation/conf.py | 52 +++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 48 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/conf.py b/Documentation/conf.py
+> index 12de52a2b17e..e887c1b786a4 100644
+> --- a/Documentation/conf.py
+> +++ b/Documentation/conf.py
+> @@ -17,6 +17,54 @@ import os
+>  import sphinx
+>  import shutil
+>  
+> +# Location of Documentation/ directory
+> +doctree = os.path.abspath('.')
+> +
+> +# List of patterns that don't contain directory names, in glob format.
+> +include_patterns = ['**.rst']
+> +exclude_patterns = []
+> +
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Where "exclude_patterns" has been with us ever since Sphinx 1.0,
+"include_patterns" was added fairly recently in Sphinx 5.1 [1].
 
-Thanks
+[1]: https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-include_patterns
 
+So, this breaks earlier Sphinx versions.
+
+Also, after applying all of v5 on top of docs-next, I see these new
+warnings with Sphinx 7.2.6 (of Ubuntu 24.04):
+
+/<srcdir>/Documentation/output/ca.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/cec.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/dmx.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/frontend.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/lirc.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/media.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/net.h.rst: WARNING: document isn't included in any toctree
+/<srcdir>/Documentation/output/videodev2.h.rst: WARNING: document isn't included in any toctree
+
+Sphinx 7.3.7 and later are free of them.  I have no idea which change in
+Sphinx 7.3 got rid of them.
+
+Now that the parallel build performance regression has be resolved in
+Sphinx 7.4, I don't think there is much demand for keeping Sphinx versions
+compatible.
+These build errors and extra warnings would encourage people to upgrade
+there Sphinx.  So I'm not going to nack this.
+
+Of course, getting rid of above warnings with < Sphinx 7.3 would be ideal.
+
+        Thanks, Akira
+
+> +# List of patterns that contain directory names in glob format.
+> +dyn_include_patterns = []
+> +dyn_exclude_patterns = ['output']
+> +
+[...]
 
