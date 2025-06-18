@@ -1,141 +1,207 @@
-Return-Path: <netdev+bounces-198900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C6DEADE413
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:57:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7973ADE419
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFEA1189A59F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 06:58:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DD6F189C90E
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E672580ED;
-	Wed, 18 Jun 2025 06:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C302580FE;
+	Wed, 18 Jun 2025 06:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvLvDGTF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mE1SWuzX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA80257AC2;
-	Wed, 18 Jun 2025 06:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ED21FF7B3;
+	Wed, 18 Jun 2025 06:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750229863; cv=none; b=LFb8Nj5hq9iiH0rxbc2eh6wHAmFzAfvHqUy9HgqWMoMHWqnmkgNBiQCTSuZshSbM9RMJS7tXoG6BO9cGtoSugPVsXIb1pzgC3466iYwG+PJZ/6WRfLhk5+pL3ralU543xB54iibXkBfoc/VKIvB5Ejt1OjHT7iHRyt+7+9uX4/A=
+	t=1750229990; cv=none; b=e9y6RHaNVdOZIqwNH0X9zs69tuV6fUvAK1N202mMbHUMA+XnXXU9es+RUn/T77uwUAxqIhEoH7lb/xFp54aofbm9OVf5a5r/vM5ssjjnGRq8TAdiOV3hYyMLsFo73GLlpss6yxmJrI6fbQNxsafWhD++RuzzSWpBYbGtkgM5wqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750229863; c=relaxed/simple;
-	bh=RFQtspKngvjxdT3mkmOe3FrXsaTZvezQsEA/vCFJOSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EAO9l/DlT7ue7MjCCJzoPCe97tsaluHrpPWZd4GAz12WsZmWzTBf13tvnCzBMhiFspeXPmdvM7RXDMx474ist49pztNCzIGXI5Np0R9rUIpwy1coZD+yaPvcYletYlOX03lHU8k6UL73PKbopSOIHBSwiXS8AkdKpjZpSOgKCyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pvLvDGTF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25104C4CEED;
-	Wed, 18 Jun 2025 06:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750229862;
-	bh=RFQtspKngvjxdT3mkmOe3FrXsaTZvezQsEA/vCFJOSQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pvLvDGTFYOWl3fc6P3KuOrtwdTiOuGl6+DvxBg0GsdS8wmwav5EBVT67CPl1IzQ8v
-	 N988iKSa2lXRm7aA8OMF9nuKVcuNHDRz4/TRHg/tYLneDDdP/53A96EV3k/z7/RADQ
-	 YC+4NbycT40fGbDxSYmS8+2ijRBYxGB0UzmCh22CHyzULWpfWYw5WMYydCpH2Ml86M
-	 z7SqWtLuvwHhNvsSbOugVYLLe4ZJowKDOGaXSuLd2iA3GwoyCDAoN3/UOFKuuJ+97o
-	 KZoSRqmOHg2FwrqHFE+R9jWnEjc436segDd5QKyu+BG2yCOucbbQkW3RYKORUGtfvR
-	 0reNTsB2M81qQ==
-Date: Wed, 18 Jun 2025 08:57:35 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Akira Yokosawa <akiyks@gmail.com>, Breno Leitao
- <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, Donald Hunter
- <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, Ignacio
- Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>,
- Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben
- Wauters <rubenru09@aol.com>, Shuah Khan <skhan@linuxfoundation.org>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
- peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH v5 05/15] tools: ynl_gen_rst.py: make the index parser
- more generic
-Message-ID: <20250618085735.7f9aa5a6@foz.lan>
-In-Reply-To: <20250617115927.GK5000@horms.kernel.org>
-References: <cover.1750146719.git.mchehab+huawei@kernel.org>
-	<1cd8b28bfe159677b8a8b1228b04ba2919c8aee8.1750146719.git.mchehab+huawei@kernel.org>
-	<20250617115927.GK5000@horms.kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1750229990; c=relaxed/simple;
+	bh=tgVG2WpIp6l5iSHtTYoJpxfchin4wnASWx7ei0hEnwY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DHT8R3GqjI13Qg9VgpysjdFIH043gjnW62BGekM3vfCD+qzsW760A3EBIvAWaesPCj2yp92hSuCRfrDfqJtyXe/EtDpIciUnQg+EW37zid2NRCoX0JJGFaL630EmtPEth21NPUBOi3wc+2OxENqI2pvc06c8VVoJKjhz34HwXmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mE1SWuzX; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3dc8265b9b5so57658685ab.1;
+        Tue, 17 Jun 2025 23:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750229988; x=1750834788; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ic8LKy9ADhzEP6S+OIsJXOEbT/AR9cuzJIG/8ySLhAk=;
+        b=mE1SWuzXiVYM+7kRZHs1HrUpnDhmtPH4dg67dZQEhUmAA7EYhQFfnFWBs7ySvMD1EE
+         MVIGx382SRTjESmYmNxBWUG60PANGNoPDH0SvGDOiqvDXIGf5mAK0UFbYF3x6bYkn82I
+         SW00EL7LjaFtgqG6gLuqsyz0uHsabwCRBCAnYtTnFf7SdcGJ0tc0qSIYdWCNwhJLIVeG
+         1xXj0MuVRcPYxCZpQklNc2/1lftPhw1qGqD91WToQDyOlO+mCAdN0UU+0K1PxDb/TW9m
+         9HHREM7qjPxOfJCW6mE0dxdEON80Xv5v1Gml/EchbEbEVoGOjggLjLl0xUxb+mVHJBoE
+         hmhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750229988; x=1750834788;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ic8LKy9ADhzEP6S+OIsJXOEbT/AR9cuzJIG/8ySLhAk=;
+        b=TbhUtdLp/6kRZ1z2MT6fo1GPfn7qa63fSGjhVhucYyVX3AJ5WbK41dQsB6cfa+4mm2
+         VY9+OtGfXcI69rNDdVGTxSYPnmIKjvaBRyvk1ZWVa6k8Z01QovZynHwDnZfVfZtfFSRC
+         BFUpo5LeJsJ3RCA3z2sGRuTRslcwhAQoTZVaM9cJmbUJ/NNgMUS+R0Ap2cUCWMacuBBQ
+         EF9StK3173UydD9zr+w8HisOxBG+96zrnVZpSKOLiijLl9UBc1UWKMPavCOKg7ECAetH
+         BxOq7Usy4lX1mWH4UROLBzPEy7DR1nNHfbF4C7rrx/5+kLMaeKkAUM++t117x2LZ1SnX
+         C3Vg==
+X-Forwarded-Encrypted: i=1; AJvYcCViQvpRAkR20PHodBQnWP37SsFHsquwDiXUOcCGr+Tf+fdjCHaahZWJZR1NABrc/rt8G/9D2LQh@vger.kernel.org, AJvYcCWGl+dq4GHqVnj51ABTCaAKildc2UtRiCvKDWrVQXw41PASnC+HRZG632fePxVGnnnlhu8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9NV5/YRnv6n60sJDS/CMty8eURrAS3WydsM+EXx8PeqzrXNrf
+	+RgdhRuUF7qeeRfAR/HkZQAfTlHLa+fRFq3PH/KuthDoEufO2umefIMerm/ZmAJv0Qa9H5WRDKa
+	iZn0LOwIKnrl4wgnRvahUlDQgewT50d8=
+X-Gm-Gg: ASbGncv+NDVmByR116YnA6mLJYyxU2WBanol/GoHU2dz3PKpYo5+5HiUtl8cGxQAxot
+	B2P1M5+p6LgMBjMAHcMujE1BwKhtQLBDGsawRxsPE5n3IvGmuZZ4MlOIgDfbANgkSTRct3vEnoq
+	L3MRLrK9fUA0KE3Sya7l4Z0Ldgmc5QZ+BtOqfDFJnVeL0=
+X-Google-Smtp-Source: AGHT+IEAW28eFuOPmtmfXSAzLWk/IkC2pjcweE5PedYIFfXG8JPaXh6Rl4cs13/i7D91l3qju92wOcJNZpa7gR63lmo=
+X-Received: by 2002:a05:6e02:3786:b0:3dd:b7ea:c3d9 with SMTP id
+ e9e14a558f8ab-3de07c412e4mr191358095ab.7.1750229988278; Tue, 17 Jun 2025
+ 23:59:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
+ <aFDAwydw5HrCXAjd@mini-arch> <CAL+tcoDYiwH8nz5u=sUiYucJL+VkGx4M50q9Lc2jsPPupZ2bFg@mail.gmail.com>
+ <aFGp8tXaL7NCORhk@mini-arch> <CAL+tcoAQ8xVXRmnjafgGWYDWy_FYuA=P4_Tzmh1zUkna2BF+nA@mail.gmail.com>
+In-Reply-To: <CAL+tcoAQ8xVXRmnjafgGWYDWy_FYuA=P4_Tzmh1zUkna2BF+nA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 18 Jun 2025 14:59:10 +0800
+X-Gm-Features: AX0GCFsGBi18MS7iY09IUCwohHB77XBAlmYnARMYi3s3FsN46eNYvk73rkH8Qlo
+Message-ID: <CAL+tcoAtJJ4ZO464UaeLUi8jt1RQr7Lg7fk6vdKPPe6fdw_gZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Em Tue, 17 Jun 2025 12:59:27 +0100
-Simon Horman <horms@kernel.org> escreveu:
+On Wed, Jun 18, 2025 at 8:29=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Wed, Jun 18, 2025 at 1:46=E2=80=AFAM Stanislav Fomichev <stfomichev@gm=
+ail.com> wrote:
+> >
+> > On 06/17, Jason Xing wrote:
+> > > Hi Stanislav,
+> > >
+> > > On Tue, Jun 17, 2025 at 9:11=E2=80=AFAM Stanislav Fomichev <stfomiche=
+v@gmail.com> wrote:
+> > > >
+> > > > On 06/17, Jason Xing wrote:
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > Introduce a control method in the xsk path to let users have the =
+chance
+> > > > > to tune it manually.
+> > > >
+> > > > Can you expand more on why the defaults don't work for you?
+> > >
+> > > We use a user-level tcp stack with xsk to transmit packets that have
+> > > higher priorities than other normal kernel tcp flows. It turns out
+> > > that enlarging the number can minimize times of triggering sendto
+> > > sysctl, which contributes to faster transmission. it's very easy to
+> > > hit the upper bound (namely, 32) if you log the return value of
+> > > sendto. I mentioned a bit about this in the second patch, saying that
+> > > we can have a similar knob already appearing in the qdisc layer.
+> > > Furthermore, exposing important parameters can help applications
+> > > complete their AI/auto-tuning to judge which one is the best fit in
+> > > their production workload. That is also one of the promising
+> > > tendencies :)
+> > >
+> > > >
+> > > > Also, can we put these settings into the socket instead of (global/=
+ns)
+> > > > sysctl?
+> > >
+> > > As to MAX_PER_SOCKET_BUDGET, it seems not easy to get its
+> > > corresponding netns? I have no strong opinion on this point for now.
+>
+> To add to that, after digging into this part, I realized that we're
+> able to use sock_net(sk)->core.max_tx_budget directly to finish the
+> namespace stuff because xsk_create() calls sk_alloc() which correlates
+> its netns in the sk->sk_net. Sounds reasonable?
 
-> On Tue, Jun 17, 2025 at 10:02:02AM +0200, Mauro Carvalho Chehab wrote:
-> > It is not a good practice to store build-generated files
-> > inside $(srctree), as one may be using O=<BUILDDIR> and even
-> > have the Kernel on a read-only directory.
-> > 
-> > Change the YAML generation for netlink files to allow it
-> > to parse data based on the source or on the object tree.
-> > 
-> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> > ---
-> >  tools/net/ynl/pyynl/ynl_gen_rst.py | 22 ++++++++++++++++------
-> >  1 file changed, 16 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
-> > index 7bfb8ceeeefc..b1e5acafb998 100755
-> > --- a/tools/net/ynl/pyynl/ynl_gen_rst.py
-> > +++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
-> > @@ -365,6 +365,7 @@ def parse_arguments() -> argparse.Namespace:
-> >  
-> >      parser.add_argument("-v", "--verbose", action="store_true")
-> >      parser.add_argument("-o", "--output", help="Output file name")
-> > +    parser.add_argument("-d", "--input_dir", help="YAML input directory")
-> >  
-> >      # Index and input are mutually exclusive
-> >      group = parser.add_mutually_exclusive_group()
-> > @@ -405,11 +406,14 @@ def write_to_rstfile(content: str, filename: str) -> None:
-> >      """Write the generated content into an RST file"""
-> >      logging.debug("Saving RST file to %s", filename)
-> >  
-> > +    dir = os.path.dirname(filename)
-> > +    os.makedirs(dir, exist_ok=True)
-> > +
-> >      with open(filename, "w", encoding="utf-8") as rst_file:
-> >          rst_file.write(content)  
-> 
-> Hi Mauro,
-> 
-> With this patch applied I see the following, which did not happen before.
+Updated patch here:
+https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonxing@gmail.co=
+m/
 
-Thanks! this was an intermediate step. I'll just drop this patch and
-fix conflicts at the next version.
-
-> 
-> $ make -C tools/net/ynl
-> ...
-> Traceback (most recent call last):
->   File ".../tools/net/ynl/generated/../pyynl/ynl_gen_rst.py", line 464, in <module>
->     main()
->     ~~~~^^
->   File ".../tools/net/ynl/generated/../pyynl/ynl_gen_rst.py", line 456, in main
->     write_to_rstfile(content, args.output)
->     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
->   File ".../tools/net/ynl/generated/../pyynl/ynl_gen_rst.py", line 410, in write_to_rstfile
->     os.makedirs(dir, exist_ok=True)
->     ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
->   File "<frozen os>", line 227, in makedirs
-> FileNotFoundError: [Errno 2] No such file or directory: ''
-> make[1]: *** [Makefile:55: conntrack.rst] Error 1
-> 
-
-
+Please review :0
 
 Thanks,
-Mauro
+Jason
+
+>
+> >
+> > I'm suggesting something along these lines (see below). And then add
+> > some way to configure it (plus, obviously, set the default value
+> > on init). There is also a question on whether you need separate
+> > values for MAX_PER_SOCKET_BUDGET and TX_BATCH_SIZE, and if yes,
+>
+> For now, actually I don't see a specific reason to separate them, so
+> let me use a single one in V2. My use case only expects to see the
+> TX_BATCH_SIZE adjustment.
+>
+> > then why.
+> >
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 72c000c0ae5f..fb2caec9914d 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -424,7 +424,7 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, s=
+truct xdp_desc *desc)
+> >         rcu_read_lock();
+> >  again:
+> >         list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > -               if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGET) {
+> > +               if (xs->tx_budget_spent >=3D xs->max_tx_budget) {
+>
+> If we implement it like this, xs->max_tx_budget has to read a
+> per-netns from somewhere and then initialize it. The core problem
+> still remains: where to store the per netns value.
+>
+> Do you think using the aforementioned sock_net(sk)->core.max_tx_budget
+> is possible?
+>
+> Thanks,
+> Jason
+>
+> >                         budget_exhausted =3D true;
+> >                         continue;
+> >                 }
+> > @@ -779,7 +779,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >  static int __xsk_generic_xmit(struct sock *sk)
+> >  {
+> >         struct xdp_sock *xs =3D xdp_sk(sk);
+> > -       u32 max_batch =3D TX_BATCH_SIZE;
+> >         bool sent_frame =3D false;
+> >         struct xdp_desc desc;
+> >         struct sk_buff *skb;
+> > @@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+> >                 goto out;
+> >
+> >         while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+> > -               if (max_batch-- =3D=3D 0) {
+> > +               if (xs->max_tx_budget-- =3D=3D 0) {
+> >                         err =3D -EAGAIN;
+> >                         goto out;
+> >                 }
 
