@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E26ADEAC3
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:48:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B356ADEABA
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:48:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D8E517A05F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:48:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BCEB189F180
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D772E88BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6828B2E7F3E;
 	Wed, 18 Jun 2025 11:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cSGAy1pk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECOl5BRe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CB32DE213;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D4D2DE20D;
 	Wed, 18 Jun 2025 11:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750247212; cv=none; b=XD4RgyrHqXV/3xiyfnfh364M7HNIpVy/CSL7TjB5ZZQidyNm0Yr8Cop6oQUTZ15DVqz/3QrCkQc9wKk5r7LVlQ4lgBZXnwyx0kEbjs6SzlmK3hZ4P8bWyYJg/URvIUji9bK1BEz0EJIrMCIAOer3gE98UpnR1e9TLqibVQ5uQw4=
+	t=1750247212; cv=none; b=LT763bLPtpS5heMkhVEqIbSRug02NrRUqXy9d7O//6zvVezyYGvD/Gx9w2XIoATPqZM0MZSBmHgDsUtFTCpWm0fMeMYJBqmvCZLJQeOhtcrl/zkSS49My+1N++xl/Zo8rrWiQGr1/iSeSkBNvtKjOer94BXzS3gpOHdnHzvT194=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750247212; c=relaxed/simple;
-	bh=NWHr6s5MAHhaxWhvDkXosw3Qmf8A786TTZ4Xlu7HoGk=;
+	bh=ZRwnGGD63dY02hpT4BqTMDO35vMSt+NPRBYC3eA8F/0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dv1hVjnkBH/0f1fWN5j2/Ko34OZGb2HSJHpa/m/j2lCHObi/2DbAcyR702F+PZrAOqZAk6D3guzxsepyn0232ZptDtCT9oLMsjRnqFjQSapi14p2s7tGgcKA4ssaNuKqFKfkcda+/pomKltiTcsAFJTzgD7FCRqbJJbX3Xs5ovQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cSGAy1pk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F740C4CEF8;
+	 MIME-Version; b=QZm9zPaxqgC4BgiIPcO5T4eT7z2LceM0QSDsAJz/uCYPFpCzco4ACB3mdEGOrwBENMj2wQYlVr5pRPaqTgj7KlZmgakrblhmYcTzO0tDVnzU7xRaH2eDkBMpUuAucMzOD8TYjRlN5eXFr7OEViQhZAsWUYzdqxmKSaYc/Tj/JA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECOl5BRe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B4D3C4AF0D;
 	Wed, 18 Jun 2025 11:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1750247211;
-	bh=NWHr6s5MAHhaxWhvDkXosw3Qmf8A786TTZ4Xlu7HoGk=;
+	bh=ZRwnGGD63dY02hpT4BqTMDO35vMSt+NPRBYC3eA8F/0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cSGAy1pkx0lHX7M1U4NRaQlSAbCks10vzCMZ3Lwp7jN7tTyI4o/o7ECCEHeJ1JMi5
-	 7qUZYUs6JZWa3Ygd9xI7P2EO3duNcqsWgQTOZj74iyoyLMbsE8kK36B3yuXl6gNvzP
-	 ToSW3nmFsiJs+JatBz4j+i2zJpMd26G0srbgHhKzjpdzW91puiAqGiAk9JRkhF46vc
-	 XYai7lwOrfznU/s3N3yi9DYx9NDP00Kh2Nr5TYEoPA3lMdb9wrsNDImBd+1qjagtn/
-	 ir2SNUyrhW6ITKNmdaEeMib51LbIUjaz7bT4aykffehjfTd2D41OWktI0b+uidPe3R
-	 cGW7HRjZ+GHtQ==
+	b=ECOl5BRe87OvUepxguUsJp/4l1hRNtCbwqNjCMKeGjYqvokOnyKNABZOuwY98Q2fa
+	 fCERk7jEx/Ju37vT0DqTitnglMTMQis7idZXo+SwLhbtE61LZmPrs6aBYRHG68NJZd
+	 nUMkWxDj1a+YTHrDhD2XHEiyOrQnLUxMXYcKERiMZZ3NhcOnU2BI4NDLhqP7b2fY8A
+	 LHfttEj3+Hk8O9XTn9UzR7ttvklSQtu68sg81o9oR7+pX56iGvpm4a9AepBQq13LFX
+	 rtTriENeStpvgwr1RmTCLLCMPaoOQeNJfjpkOzFDe6Z1u0qpY3uCnYsTt0MrPhPoM3
+	 em4D2Y/94bjNA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uRrFh-000000036V2-3AR5;
+	id 1uRrFh-000000036V7-3HmZ;
 	Wed, 18 Jun 2025 13:46:49 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
@@ -61,6 +61,8 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	"Paolo Abeni" <pabeni@redhat.com>,
 	"Ruben Wauters" <rubenru09@aol.com>,
 	"Shuah Khan" <skhan@linuxfoundation.org>,
+	Jakub Kicinski <mchehab+huawei@kernel.org>,
+	Simon Horman <mchehab+huawei@kernel.org>,
 	joel@joelfernandes.org,
 	linux-kernel-mentees@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
@@ -68,9 +70,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v6 12/15] MAINTAINERS: add netlink_yml_parser.py to linux-doc
-Date: Wed, 18 Jun 2025 13:46:39 +0200
-Message-ID: <4077605f84d7ba6423dcb5fda4e96ac950856f1d.1750246291.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v6 13/15] tools: netlink_yml_parser.py: add line numbers to parsed data
+Date: Wed, 18 Jun 2025 13:46:40 +0200
+Message-ID: <21722a5346cfc3b8a0ad7427fca157cff032e2f0.1750246291.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1750246291.git.mchehab+huawei@kernel.org>
 References: <cover.1750246291.git.mchehab+huawei@kernel.org>
@@ -83,31 +85,108 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-The documentation build depends on the parsing code
-at ynl_gen_rst.py. Ensure that changes to it will be c/c
-to linux-doc ML and maintainers by adding an entry for
-it. This way, if a change there would affect the build,
-or the minimal version required for Python, doc developers
-may know in advance.
+When something goes wrong, we want Sphinx error to point to the
+right line number from the original source, not from the
+processed ReST data.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Reviewed-by: Breno Leitao <leitao@debian.org>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ tools/net/ynl/pyynl/lib/doc_generator.py | 34 ++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a92290fffa16..caa3425e5755 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7202,6 +7202,7 @@ F:	scripts/get_abi.py
- F:	scripts/kernel-doc*
- F:	scripts/lib/abi/*
- F:	scripts/lib/kdoc/*
-+F:	tools/net/ynl/pyynl/netlink_yml_parser.py
- F:	scripts/sphinx-pre-install
- X:	Documentation/ABI/
- X:	Documentation/admin-guide/media/
+diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
+index 866551726723..a9d8ab6f2639 100644
+--- a/tools/net/ynl/pyynl/lib/doc_generator.py
++++ b/tools/net/ynl/pyynl/lib/doc_generator.py
+@@ -20,6 +20,16 @@
+ from typing import Any, Dict, List
+ import yaml
+ 
++LINE_STR = '__lineno__'
++
++class NumberedSafeLoader(yaml.SafeLoader):
++    """Override the SafeLoader class to add line number to parsed data"""
++
++    def construct_mapping(self, node):
++        mapping = super().construct_mapping(node)
++        mapping[LINE_STR] = node.start_mark.line
++
++        return mapping
+ 
+ class RstFormatters:
+     """RST Formatters"""
+@@ -127,6 +137,11 @@ class RstFormatters:
+         """Return a formatted label"""
+         return f".. _{title}:\n\n"
+ 
++    @staticmethod
++    def rst_lineno(lineno: int) -> str:
++        """Return a lineno comment"""
++        return f".. LINENO {lineno}\n"
++
+ class YnlDocGenerator:
+     """YAML Netlink specs Parser"""
+ 
+@@ -144,6 +159,9 @@ class YnlDocGenerator:
+         """Parse 'do' section and return a formatted string"""
+         lines = []
+         for key in do_dict.keys():
++            if key == LINE_STR:
++                lines.append(self.fmt.rst_lineno(do_dict[key]))
++                continue
+             lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level + 1))
+             if key in ['request', 'reply']:
+                 lines.append(self.parse_do_attributes(do_dict[key], level + 1) + "\n")
+@@ -174,6 +192,10 @@ class YnlDocGenerator:
+             lines.append(self.fmt.rst_paragraph(operation["doc"]) + "\n")
+ 
+             for key in operation.keys():
++                if key == LINE_STR:
++                    lines.append(self.fmt.rst_lineno(operation[key]))
++                    continue
++
+                 if key in preprocessed:
+                     # Skip the special fields
+                     continue
+@@ -233,6 +255,9 @@ class YnlDocGenerator:
+         for definition in defs:
+             lines.append(self.fmt.rst_section(namespace, 'definition', definition["name"]))
+             for k in definition.keys():
++                if k == LINE_STR:
++                    lines.append(self.fmt.rst_lineno(definition[k]))
++                    continue
+                 if k in preprocessed + ignored:
+                     continue
+                 lines.append(self.fmt.rst_fields(k, self.fmt.sanitize(definition[k]), 0))
+@@ -268,6 +293,9 @@ class YnlDocGenerator:
+                 lines.append(self.fmt.rst_subsubsection(attr_line))
+ 
+                 for k in attr.keys():
++                    if k == LINE_STR:
++                        lines.append(self.fmt.rst_lineno(attr[k]))
++                        continue
+                     if k in preprocessed + ignored:
+                         continue
+                     if k in linkable:
+@@ -306,6 +334,8 @@ class YnlDocGenerator:
+         lines = []
+ 
+         # Main header
++        lineno = obj.get('__lineno__', 0)
++        lines.append(self.fmt.rst_lineno(lineno))
+ 
+         family = obj['name']
+ 
+@@ -354,7 +384,7 @@ class YnlDocGenerator:
+     def parse_yaml_file(self, filename: str) -> str:
+         """Transform the YAML specified by filename into an RST-formatted string"""
+         with open(filename, "r", encoding="utf-8") as spec_file:
+-            yaml_data = yaml.safe_load(spec_file)
+-            content = self.parse_yaml(yaml_data)
++            numbered_yaml = yaml.load(spec_file, Loader=NumberedSafeLoader)
++            content = self.parse_yaml(numbered_yaml)
+ 
+         return content
 -- 
 2.49.0
 
