@@ -1,188 +1,135 @@
-Return-Path: <netdev+bounces-199188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B52CADF51D
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:56:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 304D6ADF54C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:00:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 844607ADE44
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:55:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 004EC403021
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56973085A9;
-	Wed, 18 Jun 2025 17:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773222F49F5;
+	Wed, 18 Jun 2025 17:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PPkJYQSW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xb2D0QJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C923085A0;
-	Wed, 18 Jun 2025 17:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B61B3085C4;
+	Wed, 18 Jun 2025 17:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750269358; cv=none; b=hSiQMlpisVV/u8VZLvKT34xkYBY6/kz01HkOmfEXUowaVVTqE8ThZByQBFyPkImIqtXATgdtwzll0RWb9BtFuDvyCHn7NsBsyzbQOA2K54+1TYNHg7Y6Pwl6C3es5r7gR+85qvk82yDNj96x54//3XJnZvBZslp7FabQ1ySHCAE=
+	t=1750269408; cv=none; b=fY+UFGJgDNdmnA4XWBjeEQp/mKIJq40wSqvI/KSlZmFp2qyVQoaZHnCLX28EIFxPsoYn/m1sNwVu6Ez1JRSB8EoW1WIw8fcotxs5ZGiH5VhCAuQdiE8rhbJZ9wGQgKMSs6lnVuW5Bx8ymoIvzOvNP9sC/GprJER94zlVCKRoQc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750269358; c=relaxed/simple;
-	bh=ALn2j9Qo4vXynfn53zWqfw0fXJmWqmfzwyAt/KCwrF4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qsB4hPVa+uH0AfIX1VhxggaDuvMnOgZXofKmNeIzN2Uws3yD1IIbwG93p+7H82KVDJFvdHGJYDgotj/G0KFCXslj5PENgDtz04E0s8cK5+N7543QZVgFueIxYS9PKPtfFYWdVEtp78zB8Vgu4OCV0l4bcSiDh3Ml28N0VkwFaYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PPkJYQSW; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55IHtdbj377578;
-	Wed, 18 Jun 2025 12:55:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1750269339;
-	bh=PTqXkeWdOJ01dOchQdWmJ3HLZ+mY40AHiSRqSHI6bU0=;
-	h=From:To:CC:Subject:Date;
-	b=PPkJYQSWjbFPhgazjQrIQRkzaC1OjJ98bocYItjZV3UX6eLWosLsjPbOPuy0LQRnk
-	 pZAYqvSjy2kvvTRiwXw5m7h/bOxoi6GX9Cq9WZZYCiIyuN8iFNYNNSnuznrZPx0llX
-	 KyLSaCDF2FXhFto91xin+Mw5d1v6HI75evfAi7QI=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55IHtdY6591755
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 18 Jun 2025 12:55:39 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 18
- Jun 2025 12:55:38 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 18 Jun 2025 12:55:38 -0500
-Received: from localhost (akira.dhcp.ti.com [10.24.69.4])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55IHtbFZ4143062;
-	Wed, 18 Jun 2025 12:55:38 -0500
-From: Himanshu Mittal <h-mittal1@ti.com>
-To: <h-mittal1@ti.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>,
-        <m-malladi@ti.com>, <pratheesh@ti.com>, <prajith@ti.com>
-Subject: [PATCH net-next v3] net: ti: icssg-prueth: Add prp offload support to ICSSG driver
-Date: Wed, 18 Jun 2025 23:25:36 +0530
-Message-ID: <20250618175536.430568-1-h-mittal1@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750269408; c=relaxed/simple;
+	bh=RFrhjba+jX00ww6cE0VuGNNBUQaISwhdA2R1o+tAwj8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eqVM4/wu2zc8mXUmtJ7/fKK+KS4fZ+df3J+564o56kwgvEZioAPajzsY/564Zem0rEftZUC94dBCDe5iPpIFROPaWyzThmhair8q7IWx9Ht3MHsuX/5tBlFNvZJnPEvTu+QbDxsUeKm3DOofQgJ85NQFZWvsXmgjzcjLsSEwKPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xb2D0QJ8; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-553b5165cf5so6287812e87.0;
+        Wed, 18 Jun 2025 10:56:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750269405; x=1750874205; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RFrhjba+jX00ww6cE0VuGNNBUQaISwhdA2R1o+tAwj8=;
+        b=Xb2D0QJ8GxQMnCx45mpG2T8ERq5a/qqwOec18vYtxcLmHx0k3kFkTmLJDgnPa46exj
+         yuTp/tckFGfp2BD8j0TUVsYAu1tnidvbIV8AW2f1RB1YGZsYQ5CN4mI8xkpVKzpITGOF
+         X//CnqzKy2loc3X9bNWUR8cs4Ngju3z9N//5E00nqqNBqVVRRrRMk2VsLei1C8HS8rs9
+         6IebSp+wVjn7KXkQSUgHmP4J+0UK0p3c8FqtYcB8+xSWdD5tRhPvuBm9ppTkPEpbbcDX
+         hecaH85n+gQsiuvyLUKiySfnouuZbkDzaQx971/4MPWyslXbC6UqbnPRJYmhCKv4lbqt
+         Bjkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750269405; x=1750874205;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RFrhjba+jX00ww6cE0VuGNNBUQaISwhdA2R1o+tAwj8=;
+        b=PlHzVttt1AlLs4axR+Dz+x/P18qe4UI9Bt/zJGo2YIddJL76Hm/yJxPln6V+F2X6jL
+         GmuA+b1WQ0nwXFtAHx+qfB0rSY9YYao4x+pTEy9C5TT6NyXOMDYB27OfGHb0euj2EREk
+         a8cC82tkQdZWIGs/lrfcr3SZkcGz798Hd221ZSFhQULpJ0zJM/6zXkvo6GER2AlBov7v
+         6cMiq67ohz5seK6vo4W3EJ3WngsnGLiO1VUPYlga266H7sqAnJhuCWp4CS0yV3TO8TrS
+         JC3NAtMNypjwg7Z3etaiwMLF0koYDmLZw7+alyHnSkjtQLKCDPUXj7J4Px8l3mLhoMPb
+         Kgew==
+X-Forwarded-Encrypted: i=1; AJvYcCUmdYTcCwtlqbwtlGExSM+pN4t/iDLK/En8/CNg8jIuz8kYW+M9qj7XlQEA5+fbo0bhxqTfhSXW@vger.kernel.org, AJvYcCUr0cdkjxRNfFxxZPddoRDmraK3dBePz7v8dgYPJnId4ZFVLdF8cDEkjoDsRFGlO6T06RbwUebO3xQj4lXDCelq@vger.kernel.org, AJvYcCVxfpvQNGUsW85170qcZb00QaAHj3If8JU7VtXAMhNNx686RSBmaYb96ymxEz62VLYwVSpV+wDAtSfTNbwh@vger.kernel.org, AJvYcCWcj1RxCJ4KSmZFY94kQ5AyTI1UHdAqV4qKMbjzjMlavY005+wcjT2CjL1e9HpjxJHYH1pUCeact941@vger.kernel.org, AJvYcCWmhvApDhADzWuHPhPVO30NURY7EVDI/tJthe86AlWd/lrkqc2xWiCv202wl7G7CjKxWkbpJBtPA+eJasq8@vger.kernel.org, AJvYcCWpO3/cy0QeGSjDTzJFakc7lGK7clCoyRm46EdEuo2tsE2Ywpz0amx7J++mOiPVrdC8NzlqElrIN/he@vger.kernel.org, AJvYcCX3M1Eio2t0SxwioB3xc01+mfQl1YZLPPEvfWCyAhpx+LxKo8LmJefFq5X8WfQg0lJ4SLU8xeFMmlytOpY=@vger.kernel.org, AJvYcCXRB6DSdQK91kDKfekRPhXnhUOYudgdrhOie455DkjQBBBgNnqBJP0UuJ9Xnargjtt/KRKbMq4OqSM=@vger.kernel.org, AJvYcCXWaKwUGuT3IJF1s43PWtLuyB9EKfOsLfGUM9ku8vrsysbgdPOezqa/6crD4KRSHkV+7gIoxdVUOL7ZmxLFk08=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK67Bg7NxW4RQfeRT7ZR67idwLHCcMYXWUXH3OIhwm4mNlCuy7
+	n8fhLFGtD/DaYJXWvn1KUoGI9Ry2sIZNc86bRDTvj6h0+524oHdRofDQFwKDLdo+dYCZGSKHClb
+	DXnZcdLOcjaicAJ6nFRmYWw0E74SlnoM=
+X-Gm-Gg: ASbGncttUPiG/X93FePL+dNkjOdHhoLo9YYSMkvpL+9srhvaqMY4r4xiwBUNaqYhRfW
+	+sdYQ8r+h4lEqQNRp5mTZZupe3AqFX3Mufxrlg8foQzBp8hMij9r9gKFStzbDBBmMnQS48Fljup
+	Gac96w1AcWwpr7aLnvI+o3WhABfUDK5TcSOrvpbKY03nXaJqHuRwP4SD2SpnFDE64IMpnBdg==
+X-Google-Smtp-Source: AGHT+IFYpQNeIBg62gf2bJKGY02IKzd8mHZl9tpr1i/aaJGRezLkroXz7FNXVmmWP0ibkJJnM2113j3XPbjKe0XRBDs=
+X-Received: by 2002:a2e:a7c1:0:b0:32b:53b1:c86a with SMTP id
+ 38308e7fff4ca-32b53b1ce9fmr41415971fa.24.1750269404558; Wed, 18 Jun 2025
+ 10:56:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+ <20250615-ptr-as-ptr-v12-4-f43b024581e8@gmail.com> <de30bc80-3dc9-4fac-afe8-bf6b0df42ea9@kernel.org>
+ <CANiq72mOHbxt3xOJw8f=j184TRYs9y3wvcopH-h6P2SLe4jVNQ@mail.gmail.com>
+In-Reply-To: <CANiq72mOHbxt3xOJw8f=j184TRYs9y3wvcopH-h6P2SLe4jVNQ@mail.gmail.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Wed, 18 Jun 2025 13:56:08 -0400
+X-Gm-Features: AX0GCFtQa8QSLL1IyAtkspzHqh-LWDey5MUYh6_rGpgLIHwPpEpm3BqmaQGaU5c
+Message-ID: <CAJ-ks9nnNjBfzCasOtFZGXBj=UKqZxuyh3-Emj3yFrz=9f8tmg@mail.gmail.com>
+Subject: Re: [PATCH v12 4/6] rust: enable `clippy::as_underscore` lint
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Danilo Krummrich <dakr@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Breno Leitao <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for ICSSG PRP mode which supports offloading of:
- - Packet duplication and PRP trailer insertion
- - Packet duplicate discard and PRP trailer removal
+On Wed, Jun 18, 2025 at 1:50=E2=80=AFPM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Wed, Jun 18, 2025 at 7:38=E2=80=AFPM Danilo Krummrich <dakr@kernel.org=
+> wrote:
+> >
+> > Shouldn't this be `c_long`?
+>
+> Yeah, agreed, it is clearer -- I mentioned that for similar ones in a
+> previous version.
 
-Signed-off-by: Himanshu Mittal <h-mittal1@ti.com>
----
-v3-v2:
-- Addresses comment to fix structure documentation
++1
 
-v2: https://lore.kernel.org/all/20250618102907.GA1699@horms.kernel.org/
+Miguel, would you mind taking care of this on apply? Quite a big
+series to send again.
 
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 12 +++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  5 +++++
- 2 files changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index a1e013b0a0eb..2aa812cbab92 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -148,8 +148,10 @@ static int prueth_emac_start(struct prueth *prueth)
- 
- 	if (prueth->is_switch_mode)
- 		firmwares = prueth->icssg_switch_firmwares;
--	else if (prueth->is_hsr_offload_mode)
-+	else if (prueth->is_hsr_offload_mode && HSR_V1 == prueth->hsr_prp_version)
- 		firmwares = prueth->icssg_hsr_firmwares;
-+	else if (prueth->is_hsr_offload_mode && PRP_V1 == prueth->hsr_prp_version)
-+		firmwares = prueth->icssg_prp_firmwares;
- 	else
- 		firmwares = prueth->icssg_emac_firmwares;
- 
-@@ -1527,6 +1529,7 @@ static int prueth_netdevice_event(struct notifier_block *unused,
- 	struct netdev_notifier_changeupper_info *info;
- 	struct prueth_emac *emac = netdev_priv(ndev);
- 	struct prueth *prueth = emac->prueth;
-+	enum hsr_version hsr_ndev_version;
- 	int ret = NOTIFY_DONE;
- 
- 	if (ndev->netdev_ops != &emac_netdev_ops)
-@@ -1538,6 +1541,11 @@ static int prueth_netdevice_event(struct notifier_block *unused,
- 
- 		if ((ndev->features & NETIF_PRUETH_HSR_OFFLOAD_FEATURES) &&
- 		    is_hsr_master(info->upper_dev)) {
-+			hsr_get_version(info->upper_dev, &hsr_ndev_version);
-+			if (hsr_ndev_version != HSR_V1 && hsr_ndev_version != PRP_V1)
-+				return -EOPNOTSUPP;
-+			prueth->hsr_prp_version = hsr_ndev_version;
-+
- 			if (info->linking) {
- 				if (!prueth->hsr_dev) {
- 					prueth->hsr_dev = info->upper_dev;
-@@ -1858,6 +1866,8 @@ static int prueth_probe(struct platform_device *pdev)
- 				  prueth->icssg_switch_firmwares, "eth", "sw");
- 	icssg_mode_firmware_names(dev, prueth->icssg_emac_firmwares,
- 				  prueth->icssg_hsr_firmwares, "eth", "hsr");
-+	icssg_mode_firmware_names(dev, prueth->icssg_emac_firmwares,
-+				  prueth->icssg_prp_firmwares, "eth", "prp");
- 
- 	spin_lock_init(&prueth->vtbl_lock);
- 	spin_lock_init(&prueth->stats_lock);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index c03e3b3626c1..9ca2e7fdefbd 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -13,6 +13,7 @@
- #include <linux/etherdevice.h>
- #include <linux/genalloc.h>
- #include <linux/if_vlan.h>
-+#include <linux/if_hsr.h>
- #include <linux/interrupt.h>
- #include <linux/kernel.h>
- #include <linux/mfd/syscon.h>
-@@ -290,6 +291,7 @@ struct icssg_firmwares {
-  * @vlan_tbl: VLAN-FID table pointer
-  * @hw_bridge_dev: pointer to HW bridge net device
-  * @hsr_dev: pointer to the HSR net device
-+ * @hsr_prp_version: enum to store the protocol version of hsr master
-  * @br_members: bitmask of bridge member ports
-  * @hsr_members: bitmask of hsr member ports
-  * @prueth_netdevice_nb: netdevice notifier block
-@@ -303,6 +305,7 @@ struct icssg_firmwares {
-  * @icssg_emac_firmwares: Firmware names for EMAC mode, indexed per MAC
-  * @icssg_switch_firmwares: Firmware names for SWITCH mode, indexed per MAC
-  * @icssg_hsr_firmwares: Firmware names for HSR mode, indexed per MAC
-+ * @icssg_prp_firmwares: Firmware names for PRP mode, indexed per MAC
-  */
- struct prueth {
- 	struct device *dev;
-@@ -332,6 +335,7 @@ struct prueth {
- 
- 	struct net_device *hw_bridge_dev;
- 	struct net_device *hsr_dev;
-+	enum hsr_version hsr_prp_version;
- 	u8 br_members;
- 	u8 hsr_members;
- 	struct notifier_block prueth_netdevice_nb;
-@@ -349,6 +353,7 @@ struct prueth {
- 	struct icssg_firmwares icssg_emac_firmwares[PRUETH_NUM_MACS];
- 	struct icssg_firmwares icssg_switch_firmwares[PRUETH_NUM_MACS];
- 	struct icssg_firmwares icssg_hsr_firmwares[PRUETH_NUM_MACS];
-+	struct icssg_firmwares icssg_prp_firmwares[PRUETH_NUM_MACS];
- };
- 
- struct emac_tx_ts_response {
--- 
-2.34.1
-
+Cheers.
+Tamir
 
