@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-198949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B54ADE6BF
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:25:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2DDAADE6B9
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B4CA189A8F7
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:25:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E32C7A5A4A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABF62857CD;
-	Wed, 18 Jun 2025 09:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D193284B5D;
+	Wed, 18 Jun 2025 09:23:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F42285050
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916AF284B5A
 	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750238629; cv=none; b=oC6DkjAyR1VBXLaMFnXBXd5CSrZoFvbUJajnZQJbWwXT+W4lVsGnQ17Tnr8rUoOzSPFtWs3VzKVIP+dKtnFA3D1daa/hINcz7Om9PY1JYrNqCLoJnCIbQlSHot4jfnEe2BITZPY5BnPXCWUd6jJNP3Y54JAr8nWQeqKDwpZSi9w=
+	t=1750238628; cv=none; b=fQAXge7wBZr2jXino0wRTYEYINIg77NoLl2I+kBWZfUZz5epzsJ6rgDPbv2V22h24mYy1dR2lOLvm6g4Tyc/zYbL0Z6S7eacF+632gmcdcNzdeUkDWBmoJ5e3w5B/cu2+2lm0Pi11vLP+BDeIPFjR96+QSFIg5nusT9b0y+VTu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750238629; c=relaxed/simple;
-	bh=x95FPIiZF2U5LIXolnV3wOtlByNtSpe6rHf/SsFoQW4=;
+	s=arc-20240116; t=1750238628; c=relaxed/simple;
+	bh=GHLxTrlSMuk0d/Wy0qsNXva352NCpYuchmI9pjamm7w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZU8McZS9sVzyj0+DD1pnXdbLYcGS3ObhoV1nFf6Vz1ESQ5r/CuGbtf45xIX1d64E3rS6/yxbIAAGZF/dJy8LNzWUmnjUR/W8ae5hUvd/WmOEXaMvEoIpcwX8d6NrwToRRrTkL9Hj+J6yT9rLqrBxCdJDBtPw7wHhhfUchB6GRWA=
+	 MIME-Version; b=t4Vwo4hoc2ap2DswVxr1hxJ5Zc5c9/olwU4SgPeFbYDKoe79sj4BDwkfWsgztFw0O618FsrWgChkn+mch3O9nA/adcAmIDefdKBX0fM6uqf8FaSul+HQ3/39fCgxDyH5nriTuc+LEvvZ56UjCCSXIrwfKpuFkhWH8mfki4g63QI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,26 +33,26 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1uRp1D-0006bJ-Uz
+	id 1uRp1D-0006bI-Oo
 	for netdev@vger.kernel.org; Wed, 18 Jun 2025 11:23:43 +0200
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1uRp1C-00478u-0O
+	id 1uRp1C-00478v-0O
 	for netdev@vger.kernel.org;
 	Wed, 18 Jun 2025 11:23:42 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id CB49842B2B9
+	by bjornoya.blackshift.org (Postfix) with SMTP id CC16142B2BA
 	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:23:41 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 2B04142B277;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 399AD42B279;
 	Wed, 18 Jun 2025 09:23:39 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 8605c166;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 6f0b9b29;
 	Wed, 18 Jun 2025 09:23:38 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -63,9 +63,9 @@ Cc: davem@davemloft.net,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 05/10] can: rcar_canfd: Simplify data access in rcar_canfd_{ge,pu}t_data()
-Date: Wed, 18 Jun 2025 11:19:59 +0200
-Message-ID: <20250618092336.2175168-6-mkl@pengutronix.de>
+Subject: [PATCH net-next 06/10] can: rcar_canfd: Repurpose f_dcfg base for other registers
+Date: Wed, 18 Jun 2025 11:20:00 +0200
+Message-ID: <20250618092336.2175168-7-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250618092336.2175168-1-mkl@pengutronix.de>
 References: <20250618092336.2175168-1-mkl@pengutronix.de>
@@ -83,49 +83,134 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Replace the repeated casts, pointer additions, and pointer dereferences
-by array accesses to improve readability.
+Reuse the existing Channel Data Bitrate Configuration Register offset
+member in the register configuration as the base offset for all related
+channel-specific registers.
+Rename the member and update the (incorrect) comment to reflect this.
+Replace the function-like channel-specific register offset macros by
+inline functions.
+
+This fixes the offsets of all other (currently unused) channel-specific
+registers on R-Car Gen4 and RZ/G3E, and allows us to replace
+RCANFD_GEN4_FDCFG() by the more generic rcar_canfd_f_cfdcfg().
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Link: https://patch.msgid.link/4f43f44dcfda13d48a2c502648833934a51d9d6c.1749655315.git.geert+renesas@glider.be
+Link: https://patch.msgid.link/75c8197c849fc9e360a75d4fa55bc01c1d850433.1749655315.git.geert+renesas@glider.be
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/rcar/rcar_canfd.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/can/rcar/rcar_canfd.c | 52 ++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rcar_canfd.c
-index 3244584a6ee5..dded509793bb 100644
+index dded509793bb..8baf8a928da7 100644
 --- a/drivers/net/can/rcar/rcar_canfd.c
 +++ b/drivers/net/can/rcar/rcar_canfd.c
-@@ -781,23 +781,23 @@ static void rcar_canfd_update_bit(void __iomem *base, u32 reg,
- static void rcar_canfd_get_data(struct rcar_canfd_channel *priv,
- 				struct canfd_frame *cf, u32 off)
- {
-+	u32 *data = (u32 *)cf->data;
- 	u32 i, lwords;
+@@ -425,19 +425,10 @@
+ #define RCANFD_C_RPGACC(r)		(0x1900 + (0x04 * (r)))
  
- 	lwords = DIV_ROUND_UP(cf->len, sizeof(u32));
- 	for (i = 0; i < lwords; i++)
--		*((u32 *)cf->data + i) =
--			rcar_canfd_read(priv->base, off + i * sizeof(u32));
-+		data[i] = rcar_canfd_read(priv->base, off + i * sizeof(u32));
+ /* R-Car Gen4 Classical and CAN FD mode specific register map */
+-#define RCANFD_GEN4_FDCFG(m)		(0x1404 + (0x20 * (m)))
+-
+ #define RCANFD_GEN4_GAFL_OFFSET		(0x1800)
+ 
+ /* CAN FD mode specific register map */
+ 
+-/* RSCFDnCFDCmXXX -> RCANFD_F_XXX(m) */
+-#define RCANFD_F_DCFG(gpriv, m)		((gpriv)->info->regs->f_dcfg + (0x20 * (m)))
+-#define RCANFD_F_CFDCFG(m)		(0x0504 + (0x20 * (m)))
+-#define RCANFD_F_CFDCTR(m)		(0x0508 + (0x20 * (m)))
+-#define RCANFD_F_CFDSTS(m)		(0x050c + (0x20 * (m)))
+-#define RCANFD_F_CFDCRC(m)		(0x0510 + (0x20 * (m)))
+-
+ /* RSCFDnCFDGAFLXXXj offset */
+ #define RCANFD_F_GAFL_OFFSET		(0x1000)
+ 
+@@ -510,7 +501,7 @@ struct rcar_canfd_regs {
+ 	u16 cfcc;	/* Common FIFO Configuration/Control Register */
+ 	u16 cfsts;	/* Common FIFO Status Register */
+ 	u16 cfpctr;	/* Common FIFO Pointer Control Register */
+-	u16 f_dcfg;	/* Global FD Configuration Register */
++	u16 coffset;	/* Channel Data Bitrate Configuration Register */
+ 	u16 rfoffset;	/* Receive FIFO buffer access ID register */
+ 	u16 cfoffset;	/* Transmit/receive FIFO buffer access ID register */
+ };
+@@ -641,7 +632,7 @@ static const struct rcar_canfd_regs rcar_gen3_regs = {
+ 	.cfcc = 0x0118,
+ 	.cfsts = 0x0178,
+ 	.cfpctr = 0x01d8,
+-	.f_dcfg = 0x0500,
++	.coffset = 0x0500,
+ 	.rfoffset = 0x3000,
+ 	.cfoffset = 0x3400,
+ };
+@@ -651,7 +642,7 @@ static const struct rcar_canfd_regs rcar_gen4_regs = {
+ 	.cfcc = 0x0120,
+ 	.cfsts = 0x01e0,
+ 	.cfpctr = 0x0240,
+-	.f_dcfg = 0x1400,
++	.coffset = 0x1400,
+ 	.rfoffset = 0x6000,
+ 	.cfoffset = 0x6400,
+ };
+@@ -800,6 +791,37 @@ static void rcar_canfd_put_data(struct rcar_canfd_channel *priv,
+ 		rcar_canfd_write(priv->base, off + i * sizeof(u32), data[i]);
  }
  
- static void rcar_canfd_put_data(struct rcar_canfd_channel *priv,
- 				struct canfd_frame *cf, u32 off)
- {
-+	const u32 *data = (u32 *)cf->data;
- 	u32 i, lwords;
- 
- 	lwords = DIV_ROUND_UP(cf->len, sizeof(u32));
- 	for (i = 0; i < lwords; i++)
--		rcar_canfd_write(priv->base, off + i * sizeof(u32),
--				 *((u32 *)cf->data + i));
-+		rcar_canfd_write(priv->base, off + i * sizeof(u32), data[i]);
- }
- 
++/* RSCFDnCFDCmXXX -> rcar_canfd_f_xxx(gpriv, ch) */
++static inline unsigned int rcar_canfd_f_dcfg(struct rcar_canfd_global *gpriv,
++					     unsigned int ch)
++{
++	return gpriv->info->regs->coffset + 0x00 + 0x20 * ch;
++}
++
++static inline unsigned int rcar_canfd_f_cfdcfg(struct rcar_canfd_global *gpriv,
++					       unsigned int ch)
++{
++	return gpriv->info->regs->coffset + 0x04 + 0x20 * ch;
++}
++
++static inline unsigned int rcar_canfd_f_cfdctr(struct rcar_canfd_global *gpriv,
++					       unsigned int ch)
++{
++	return gpriv->info->regs->coffset + 0x08 + 0x20 * ch;
++}
++
++static inline unsigned int rcar_canfd_f_cfdsts(struct rcar_canfd_global *gpriv,
++					       unsigned int ch)
++{
++	return gpriv->info->regs->coffset + 0x0c + 0x20 * ch;
++}
++
++static inline unsigned int rcar_canfd_f_cfdcrc(struct rcar_canfd_global *gpriv,
++					       unsigned int ch)
++{
++	return gpriv->info->regs->coffset + 0x10 + 0x20 * ch;
++}
++
  static void rcar_canfd_tx_failure_cleanup(struct net_device *ndev)
+ {
+ 	u32 i;
+@@ -827,8 +849,8 @@ static void rcar_canfd_set_mode(struct rcar_canfd_global *gpriv)
+ 
+ 		for_each_set_bit(ch, &gpriv->channels_mask,
+ 				 gpriv->info->max_channels)
+-			rcar_canfd_set_bit(gpriv->base, RCANFD_GEN4_FDCFG(ch),
+-					   val);
++			rcar_canfd_set_bit(gpriv->base,
++					   rcar_canfd_f_cfdcfg(gpriv, ch), val);
+ 	} else {
+ 		if (gpriv->fdmode)
+ 			rcar_canfd_set_bit(gpriv->base, RCANFD_GRMCFG,
+@@ -1468,7 +1490,7 @@ static void rcar_canfd_set_bittiming(struct net_device *ndev)
+ 		cfg = (RCANFD_DCFG_DTSEG1(gpriv, tseg1) | RCANFD_DCFG_DBRP(brp) |
+ 		       RCANFD_DCFG_DSJW(gpriv, sjw) | RCANFD_DCFG_DTSEG2(gpriv, tseg2));
+ 
+-		rcar_canfd_write(priv->base, RCANFD_F_DCFG(gpriv, ch), cfg);
++		rcar_canfd_write(priv->base, rcar_canfd_f_dcfg(gpriv, ch), cfg);
+ 	} else {
+ 		/* Classical CAN only mode */
+ 		if (gpriv->info->shared_can_regs) {
 -- 
 2.47.2
 
