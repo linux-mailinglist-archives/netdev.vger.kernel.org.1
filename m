@@ -1,80 +1,63 @@
-Return-Path: <netdev+bounces-199129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F5EADF1A9
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:46:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE65AADF207
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B3F37ADC19
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:45:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A01817F496
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BCD18DB03;
-	Wed, 18 Jun 2025 15:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45ED42EFDB5;
+	Wed, 18 Jun 2025 15:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuEFOF+J"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jpJza5Pm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1088628E7;
-	Wed, 18 Jun 2025 15:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275912ECD3C;
+	Wed, 18 Jun 2025 15:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750261582; cv=none; b=IwswSpJDPsOn2fnmHIgkDe87KZQuP75jqjCe+iNZaNRkwavC9KYcHLNBSo1Z61pmzawYxNrLDmQI5Ob9FA57tvVkorJQxuN9AqMKViNPGIhudOw/qLVuhWHjRJ8z0XjrSxSFKERBaNUAAY3qC07uWG8OpAjOQmkIkTch2tB9H58=
+	t=1750262346; cv=none; b=S1hemCZFtPqmyD9cR5IJvUJ64BHJ7qIjs6hVI+nf/Rih5HwNlrbqCNGjutwXDNEX85fXs76t8CT+jVX3mTAY0oj56EQNBK1VzwkEIfpdzWpYDX7dg5huM1ThLXmQUQvUiV39e48WmUEP03KHkZfCNOD/LSsyRK+XQZJ+ptskNmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750261582; c=relaxed/simple;
-	bh=RkhAhy7cJp7ZZXWeYy/4iE+8/T6IKGFMwCV6ga9hQfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fi66Uw4W6XVNqzP/rvYNvXcYqMf0IxZ3O/GA7GVv3RPPaHATu/cDtnIdEBePjgxjwIxcbLOcruru0CYqOSXylY2QuHA0q4r1gcE1znCgJBqnoHszA4BCd8O+A5okwHdHoTmU/LHSdibFJQSPt/yiFH63rMOXQKrfS/WeM2kJ8JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UuEFOF+J; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742caef5896so5935362b3a.3;
-        Wed, 18 Jun 2025 08:46:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750261580; x=1750866380; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=egqntrQT0mcTNXSQUXdoAiXmKkzBs77HbRV6QGmeUAk=;
-        b=UuEFOF+JdyiAj3Nd86ECLudy3nFgZviRj9XMGM1HgtNHFgSSuIRZm44OY1ANjGlvbB
-         Qv5i2mPINBbQQHAr2CMzd4v26XIjUnDp4SrIUmySMz7DO7fzEq1sF/i6oFfxZOhj56zA
-         Bdgqe4C0c/sNX5SZuI+T97D/PFvJZcekWt37jIxPJqkaZv60khEK3sjJorfapBZG/gyI
-         EqXtusq7O4EurM5ERY6GTTyA7+p3qYyrts8nRTkjLto1I4p6Ydn+nGcSf2ELVFn2QzkI
-         Qr2XE/Sjk+pIHm2nDEcO1v6spMiytoFH7i5F6QZZggFcuRSc2kNOGfKzSoR5wFzdeHu5
-         Ym7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750261580; x=1750866380;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=egqntrQT0mcTNXSQUXdoAiXmKkzBs77HbRV6QGmeUAk=;
-        b=kwccK/DSq+6/9r5GePcwlB951hD+XeP+EisCDzXlKC4ZLoP6dyUIDqWya7CThRBPAs
-         X9xhbHh1Tlc0tAvfRnZrgYe0ukxhnLu3+eVARzkwPAHZwIv6c9B0q1azeK0ABvDFQoIU
-         nuaP3GsfYOnvkdL5IoygiKiRwFCYRjbC6Kv9cAkxKiRInZmTcyUWRibnj/nM0Bzb9wfE
-         dfjo4kE8z8RV2njLjscCLu3ltMH9lzxHdi9tqVneV2LxbgwZJoZHUBdhYy0dtF4NFqOJ
-         kGbUcJpYEAumFL2AjaGjxYB5rg5eqxev/kGzLs4eUXQuiMMlBKbc06+uOMqtRCE1XoR4
-         aE0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVmkqAnpClrAH/4NKg3+1w1ePYclrjOA2ENWr+85KmHK2cMBiB0fjmfqHHwZihJfID6LJVd3zdU7kE=@vger.kernel.org, AJvYcCWnXKf4Ro1La0rxdfVg+7n+/ThnozhTTf5rfUIZEVHvICLSIZJJEBgnSB26/HNeZery9E8mzB48@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRByMoQSrfNWEnhwwFFKFsxOw1jgdpy9qbeIG1INjTzkASwXn6
-	ODWUOGm+y1Lgy+rsrc81wRYZqgoK+ka8Q44OnNyYVINY0/kWwHZIutTW
-X-Gm-Gg: ASbGncvM7ac1u9QRCjEeq2L1dalPE8zeENbgGmt7RpCEOtQECLSdTcy5zszdXcxsWwi
-	QYQF8Wdpt61iKedRp0wtgFvt4/mzjwvbQBoDUn48paQe2bNKF2QBpYBk92mC1vhNeXlvCp+J7Kr
-	tR5duHifQB4z9w1nWkyyvryEorJfFh5h1hC2Q1vTtIoxunecdLTDHQmBMEBqcTlALLuIb2SMk8B
-	590pnyLkrn51RM2UfwCk15iXJFRDNBbAzctGajY66v4tSfiJCKvm8ZMoeg5vnZ7/W3dbrIaXQao
-	UdlLzIKucz66PPjeWhDHa61ta2RXalGM9Ke3hNMIHakhioeePpjVE7J5oojP83Q22GBzGDmMqQ/
-	hAA6DdfJ3xRh/RtFj4WhT/G0WTsVoOm8E
-X-Google-Smtp-Source: AGHT+IGojw9TogQCLzzrFvTji884jdeSs6pD+joQuFZ1XOjZry8dO66lcKyVpPr1hvTndaJFUZbB5g==
-X-Received: by 2002:a05:6a00:895:b0:73e:2dc5:a93c with SMTP id d2e1a72fcca58-7489cf9a3bbmr21984258b3a.11.1750261580264;
-        Wed, 18 Jun 2025 08:46:20 -0700 (PDT)
-Received: from [10.0.2.15] (KD106167137155.ppp-bb.dion.ne.jp. [106.167.137.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74890082e71sm11574559b3a.107.2025.06.18.08.46.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jun 2025 08:46:19 -0700 (PDT)
-Message-ID: <17f2a9ce-85ac-414a-b872-fbcd30354473@gmail.com>
-Date: Thu, 19 Jun 2025 00:46:15 +0900
+	s=arc-20240116; t=1750262346; c=relaxed/simple;
+	bh=CibxHS6GY+GqRLUvVhyMjHBa8Bs8bIOkIvOyKIjRJwQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=sCZOXAgRjuMgYYZsRyIMmxMkTYA0nxxJ3PMIrWtxCcV71p1V6ykaewZY82WOsenplaRKPO8wvAIn/m7gFQMhL8QGGPUM6rwDKIzY1/F6Ys7GUc8WA/kFh+6uLqtDt3rx8T9+5pZq2I3KUZmkVW7WlEMWveYzdCgLrXTkJMXXYT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jpJza5Pm; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I9rClg011037;
+	Wed, 18 Jun 2025 15:58:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	x0qRlTbO7X/d/0oR5r6fAgbOsxi1Ac3vlI97bqLLbBs=; b=jpJza5PmuA1xClgV
+	2p8SE3Nv34Hcb1D2rUwVavRshr4EwalDhFkbVboY2Z7Yw18kbYMIG9OPB1Pr3EO4
+	bk2nCK4jMcMwRt1pxSNeM/MQ7aeJAVoEW2RTM9x0jlHxEI45KFQlxvx2ZK0fHxNz
+	8u0TU+kxUbAD/XufZowateupc9KG6Z/9vplKN17cnQpYgAfu2HivRmWyUbieQYdH
+	FxdYlg2prHZr0n7X+AsIW4xag9CmqXaXTxb7BzHFqI7VOng8iHIE2ov6uC3tzplp
+	NpWwop05m8xkljlqrF72wKO1D17wm4kh0g0ckXSV/B756zwUkkceSXDu8FfehUBK
+	2rbjXw==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4791f7cqab-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Jun 2025 15:58:50 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55IFwn1v032646
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Jun 2025 15:58:49 GMT
+Received: from [10.253.36.28] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 18 Jun
+ 2025 08:58:43 -0700
+Message-ID: <512e3355-a110-4e7c-ab43-04f714950971@quicinc.com>
+Date: Wed, 18 Jun 2025 23:58:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,97 +65,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/15] Don't generate netlink .rst files inside
- $(srctree)
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
- Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- Jonathan Corbet <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Ignacio Encinas Rubio <ignacio@iencinas.com>, Marco Elver
- <elver@google.com>, Shuah Khan <skhan@linuxfoundation.org>,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jan Stancek <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
- Ruben Wauters <rubenru09@aol.com>, joel@joelfernandes.org,
- linux-kernel-mentees@lists.linux.dev, lkmm@lists.linux.dev,
- netdev@vger.kernel.org, peterz@infradead.org, stern@rowland.harvard.edu,
- Breno Leitao <leitao@debian.org>, Randy Dunlap <rdunlap@infradead.org>,
- Akira Yokosawa <akiyks@gmail.com>
-References: <cover.1750246291.git.mchehab+huawei@kernel.org>
+Subject: Re: [PATCH 5/8] dt-bindings: clock: qcom: Add NSS clock controller
+ for IPQ5424 SoC
+To: Krzysztof Kozlowski <krzk@kernel.org>, Georgi Djakov <djakov@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Will
+ Deacon" <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>
+References: <20250617-qcom_ipq5424_nsscc-v1-0-4dc2d6b3cdfc@quicinc.com>
+ <20250617-qcom_ipq5424_nsscc-v1-5-4dc2d6b3cdfc@quicinc.com>
+ <b628b85b-75c4-4c85-b340-d26b1eb6d83e@kernel.org>
 Content-Language: en-US
-From: Akira Yokosawa <akiyks@gmail.com>
-In-Reply-To: <cover.1750246291.git.mchehab+huawei@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <b628b85b-75c4-4c85-b340-d26b1eb6d83e@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDEzNCBTYWx0ZWRfX8Za/vyljFqC5
+ 5CHAZ6LmzJLY3U51wMI20ufhmVFfuH7aGNyAcaRyPueVyBuJRSDm4AoNXO1LqrwePqwT6ddtXqB
+ sCO+MRO6fXdEqnmHR5yuzndlBW6AyMExETie21Tu9BCH8t2ckzmrRuzwzAyyRRdgW3MV06OoCFB
+ 3paU1ABuS4BDJpx7koqM7ci32DIBKWNbaIdg0j2CK5kqwLRohIOj66C6wlljc8bv+0RyjuZswZY
+ jMqwnKAtC8U6rp8S1ZFlqbZeyU/ziLcwVQ/m17Ueq0QBJphOVzwVjMm8U5cG/KlH11AYBSU/xvz
+ vhxw3RE9deSUKKwauE9Ec1gEfa6BRR/DrnTg2OusHiiJP/A8PTc29qyA3jH8j50kubkM+CHKgyL
+ zIwqI701R0wtNKn+qjkQ1+SOVNAckuDtkf4PcXvWFI1QY1mYUYAJIRrjgtTeXSVPVC6yo1a9
+X-Proofpoint-GUID: _-FqpXlC-gP6RwvTHHwf4ZHE5QsZZD6g
+X-Proofpoint-ORIG-GUID: _-FqpXlC-gP6RwvTHHwf4ZHE5QsZZD6g
+X-Authority-Analysis: v=2.4 cv=FrIF/3rq c=1 sm=1 tr=0 ts=6852e23a cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=P-IC7800AAAA:8
+ a=gEfo2CItAAAA:8 a=COk6AnOGAAAA:8 a=VwQbUJbxAAAA:8 a=yXJ3Pirk8toTXRASsBEA:9
+ a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22 a=sptkURWiP4Gy88Gu7hUp:22
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-18_05,2025-06-18_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a
+ authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2506180134
 
-Hi Mauro,
 
-On 2025/06/18 20:46, Mauro Carvalho Chehab wrote:
-> As discussed at:
->    https://lore.kernel.org/all/20250610101331.62ba466f@foz.lan/
+
+On 6/17/2025 10:49 PM, Krzysztof Kozlowski wrote:
+> On 17/06/2025 14:06, Luo Jie wrote:
+>> NSS clock controller provides the clocks and resets to the
+>> networking blocks such as PPE (Packet Process Engine) and
+>> UNIPHY (PCS) on IPQ5424 devices.
 > 
-> changeset f061c9f7d058 ("Documentation: Document each netlink family")
-> added a logic which generates *.rst files inside $(srctree). This is bad
-> when O=<BUILDDIR> is used.
+> Please wrap commit message according to Linux coding style / submission
+> process (neither too early nor over the limit):
+> https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
 > 
-> A recent change renamed the yaml files used by Netlink, revealing a bad
-> side effect: as "make cleandocs" don't clean the produced files and symbols
-> appear duplicated for people that don't build the kernel from scratch.
+
+OK.
+
+>>
+>> Add the compatible "qcom,ipq5424-nsscc" support based on the
+>> current IPQ9574 NSS clock controller DT binding file.
+>> ICC clocks are always provided by the NSS clock controller
+>> of IPQ9574 and IPQ5424, so add interconnect-cells as required
+>> DT property.
+>>
+>> Also add master/slave ids for IPQ5424 networking interfaces,
+>> which is used by nss-ipq5424 driver for providing interconnect
+>> services using icc-clk framework.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
+>>   .../bindings/clock/qcom,ipq9574-nsscc.yaml         | 66 +++++++++++++++++++---
+>>   include/dt-bindings/clock/qcom,ipq5424-nsscc.h     | 65 +++++++++++++++++++++
+>>   include/dt-bindings/interconnect/qcom,ipq5424.h    | 13 +++++
+>>   include/dt-bindings/reset/qcom,ipq5424-nsscc.h     | 46 +++++++++++++++
+>>   4 files changed, 182 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>> index 17252b6ea3be..5bc2fe049b26 100644
+>> --- a/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>> +++ b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>> @@ -4,7 +4,7 @@
+>>   $id: http://devicetree.org/schemas/clock/qcom,ipq9574-nsscc.yaml#
+>>   $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   
+>> -title: Qualcomm Networking Sub System Clock & Reset Controller on IPQ9574
+>> +title: Qualcomm Networking Sub System Clock & Reset Controller on IPQ9574 and IPQ5424
+>>   
+>>   maintainers:
+>>     - Bjorn Andersson <andersson@kernel.org>
+>> @@ -12,21 +12,25 @@ maintainers:
+>>   
+>>   description: |
+>>     Qualcomm networking sub system clock control module provides the clocks,
+>> -  resets on IPQ9574
+>> +  resets on IPQ9574 and IPQ5424
+>>   
+>> -  See also::
+>> +  See also:
+>> +    include/dt-bindings/clock/qcom,ipq5424-nsscc.h
+>>       include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+>> +    include/dt-bindings/reset/qcom,ipq5424-nsscc.h
+>>       include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+>>   
+>>   properties:
+>>     compatible:
+>> -    const: qcom,ipq9574-nsscc
+>> +    enum:
+>> +      - qcom,ipq5424-nsscc
+>> +      - qcom,ipq9574-nsscc
+>>   
+>>     clocks:
+>>       items:
+>>         - description: Board XO source
+>> -      - description: CMN_PLL NSS 1200MHz (Bias PLL cc) clock source
+>> -      - description: CMN_PLL PPE 353MHz (Bias PLL ubi nc) clock source
+>> +      - description: CMN_PLL NSS 1200 MHz or 300 MHZ (Bias PLL cc) clock source
+>> +      - description: CMN_PLL PPE 353 MHz  or 375 MHZ (Bias PLL ubi nc) clock source
 > 
-> This series adds an yaml parser extension and uses an index file with glob for
-> *. We opted to write such extension in a way that no actual yaml conversion
-> code is inside it. This makes it flexible enough to handle other types of yaml
-> files in the future. The actual yaml conversion logic were placed at 
-> netlink_yml_parser.py. 
+> This change means devices are different. Just ocme with your own schema.
+
+The NSS clock controller hardware block on the IPQ5424 SoC is identical
+in design to that of the IPQ9574 SoC. The main difference is in the
+clock rates for its two parent clocks sourced from the CMN PLL block.
+
+Given this, would it be acceptable to update the clock name and its
+description to use a more generic clock name, such as "nss" and "ppe"
+instead of the current "nss_1200" and "ppe_353"?
+
 > 
-> As requested by YNL maintainers, this version has netlink_yml_parser.py
-> inside tools/net/ynl/pyynl/ directory. I don't like mixing libraries with
-> binaries, nor to have Python libraries spread all over the Kernel. IMO,
-> the best is to put all of them on a common place (scripts/lib, python/lib,
-> lib/python, ...) but, as this can be solved later, for now let's keep it this
-> way.
-> 
-> ---
-> 
-> v6:
-> - YNL doc parser is now at tools/net/ynl/pyynl/lib/doc_generator.py;
-> - two patches got merged;
-> - added instructions to test docs with Sphinx 3.4.3 (minimal supported
->   version);
-> - minor fixes.
-
-Quick tests against Sphinx 3.4.3 using container images based on
-debian:bullseye and almalinux:9, both of which have 3.4.3 as their distro
-packages, emits a *bunch* of warnings like the following:
-
-/<srcdir>/Documentation/netlink/specs/conntrack.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-/<srcdir>/Documentation/netlink/specs/devlink.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-/<srcdir>/Documentation/netlink/specs/dpll.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-/<srcdir>/Documentation/netlink/specs/ethtool.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-/<srcdir>/Documentation/netlink/specs/fou.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-[...]
-
-I suspect there should be a minimal required minimal version of PyYAML.
-
-"pip freeze" based on almalinux:9 says:
-
-    PyYAML==5.4.1
-
-"pip freeze" based on debian:bullseye says:
-
-    PyYAML==5.3.1
-
-What is the minimal required version here?
-
-And if users of those old distros need to manually upgrade PyYAML,
-why don't you suggest them to upgrade Sphinx as well?
-
-        Thanks, Akira
-
->
-> v5:
-> - some patch reorg;
-> - netlink_yml_parser.py is now together with ynl tools;
-> - minor fixes.
-[...]
+> Best regards,
+> Krzysztof
 
 
