@@ -1,108 +1,105 @@
-Return-Path: <netdev+bounces-198902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0541ADE41B
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:00:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E71ADE427
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F26AE3A769D
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 06:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7A63A4752
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EBD25A2B2;
-	Wed, 18 Jun 2025 06:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7643A2777F9;
+	Wed, 18 Jun 2025 07:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDHLaRNy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPp4O0WF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA671FF7B3;
-	Wed, 18 Jun 2025 06:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F611A23BB;
+	Wed, 18 Jun 2025 07:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750229992; cv=none; b=cM6BAVpdsLxOpCdWhvS+4OJbGxzcCnT9QZyb1jWB4UAO7dT+dMTBZCu30uhYQF+8oUf5fk71GeBNpBc8XMNRy7HgaQiASYMJWYYuUEEoglb4ud23kKPu9gh9RpTbyHMSeuYwHZgNRAt196LX7oXBl5MHydjX3PN0rtM+mCDKSIg=
+	t=1750230152; cv=none; b=McH3JUwCH5rwGfzhI6EZ0QbytKdg8Ka5GiOJjR4Ziv3UH6LASCvHjryFXlg0qiZ9iBpccKyhhxwb/u0A9szmOB/jLwFdcf0U1LqRyLySwCB6al7XnAl7rs5fE0QkXQUT+Q98jGnfYX+ajHHH+bKpUoWr8SjfYIhVMZD7Nmn45GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750229992; c=relaxed/simple;
-	bh=OhHcdfVoijsiepONmPCsYtD9gB53gFZoE4YRYNkxUbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SRE1mJGEHE+djtxoiJjiHYBcV1LlnikoKb+/BGqkBq4mji1pl72gxBtm6PQ4SHTLhVkM6o9B8pxqyzrcS6mbk3rZ0z9OvBijLG1CeGis1O+NsoJ97y3Ua3y3YQaOqYHoSN+kpbc+H22McM1fHcVuGf4RKLXJa1BhBfF/CYiNVXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDHLaRNy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC6BC4CEE7;
-	Wed, 18 Jun 2025 06:59:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750229991;
-	bh=OhHcdfVoijsiepONmPCsYtD9gB53gFZoE4YRYNkxUbU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MDHLaRNyUKCEWaqBYJKIhN5Z4nDFPqaVzVNvBpj3xBafcsT1z7+Tv552hXQgjKkDg
-	 XK1gyAQH0jvVP2Nefwi6Oog9YzxB8T8d8goxyyn1JjzfCpsPeztmgGtdNhidioySVV
-	 5Ox+948AlMrY22nGOjYpDim2s+1SuntGDJzuZbqTc193zZmmt5LotnPkgO5U18JwYq
-	 W9MYRz52PINXfUqALl2ibprDN2Mwo3C5DlPjdq/7oVZSGb+y7eTl4lYk8iR9sURWSd
-	 Z41ly2bjhcTy/5MJG/cLPhvqvogiBY64gnPXoAiF8WMd3upwpNg2Y4IWX/A1nupWYP
-	 H3gqayExhZoxg==
-Date: Wed, 18 Jun 2025 08:59:45 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
- <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
- <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Ruben Wauters"
- <rubenru09@aol.com>, "Shuah Khan" <skhan@linuxfoundation.org>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
- peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH v5 01/15] docs: conf.py: properly handle include and
- exclude patterns
-Message-ID: <20250618085945.2876f6a1@foz.lan>
-In-Reply-To: <m21prilkkx.fsf@gmail.com>
-References: <cover.1750146719.git.mchehab+huawei@kernel.org>
-	<cca10f879998c8f0ea78658bf9eabf94beb0af2b.1750146719.git.mchehab+huawei@kernel.org>
-	<m21prilkkx.fsf@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1750230152; c=relaxed/simple;
+	bh=AZ8eakkbu827EuhTE2TgSWfoJamjsmR+ZwSjs+5D78o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ulwvPjgw8SZDfkwp2ITv6v8w4q2HUi53r4AYLKD/kD37jpFPvVQJ4cnc1JCOQQcoL8CgjB381NX03IVkJq9cbve8zyGyVknjHswtlKLm2PjABpnCZRp85RQpEWkE71mpj5Ep7A2fLukkhh7+D9vWQwpJvygik41Hs80yrfU9jzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPp4O0WF; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3ddd2710d14so60905185ab.2;
+        Wed, 18 Jun 2025 00:02:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750230150; x=1750834950; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AZ8eakkbu827EuhTE2TgSWfoJamjsmR+ZwSjs+5D78o=;
+        b=OPp4O0WFb3bZDzUH0gOHDHkeXt9XdietkJ18gt67e/IuHSs1KEdW2OPMAq54CcstFL
+         WvgiPO/MC0gVGF0dNzMVazRsb+zbRGitwNb6PuTOrkjwsR8Tyi0IQ/qPJS+ldLoSJbzL
+         Iaa6V0z7eKqVR69Q7m/q1CKEs67V9FZbgQC10t9UYjLMnbyzStJ6xWqVmcDtACpGRC0j
+         VZ155G8jC9VLkZcy9z2eIDbAZEXE19onmjtgSAC5YPkeMJr+YLbhUUpu6GKC9eOgo68b
+         sNSsT7Hf2/gOvuQYED7yPq5ELsuibu0RcNbOGwdctixADyCJtkaBh0hFezZvT/kqcA2K
+         zfvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750230150; x=1750834950;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AZ8eakkbu827EuhTE2TgSWfoJamjsmR+ZwSjs+5D78o=;
+        b=qMAwZa1bf+OcHU1qZH4Ist11DOhL9THEJVkJgpk0MU+ljZilvulRF+cpEw/JbJ9BCX
+         HdmMHsRJyoV0P99scxlScREnvaNSMbT9wlKaqL1qXf5Vv/czi94ltRLiXHXldei3iHhB
+         u2kGjfjWvQFvwvs7FBXiFEaJ4ql69bwvBJ5ZP/sllCSZJQmm2jtgIFhL5jhjtXxc1PC3
+         2nW2/e0fXLCDt8BLILdNSF9SA2cAnxyrKAO/qtjVMzu380YWlroQLS4ypTLSh3qtPlVo
+         eSSAJwp+rbt7CT9SL4JzVH4c5HbXVeilfzTy/xxJLAuQnZCHZ73nVo5c3pPNm/TBZU4v
+         LCaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVsTmhIW2vDp7Dwb8Hq8BJ3lON09EsubfIC2wuLIrL8z6wi00nUuynIAk91rnJ0Brs45rntxgs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHYoGPf/azMXe62aWANVIrDcMdntYnVxB8i65Vi3JHCy/15yhq
+	5BWTRsAy2SqZ+Klv3kXXLaJUW0UGPv3RHE7YOZWvblCeP1sw1NUWguH7RvjTc1asACJUIr//3p3
+	kT1JccCyE5uu1JIY1odXRHtmgk/zzt8I=
+X-Gm-Gg: ASbGncsa6bn8Lx8jHqD6izbhvJ5WSdjkTAp+Y+RDlf0Uor9HLjASehmoUj9eyV9kgCf
+	jEUCwuXLq31dkz0wDb3VvoEMMK2x0MPm/u7LQTebhEszEBxqkxFacc6cUSAh2uR8tHSWXPIeQD1
+	thbBpPjCUAVMamTwa6zdAOh/Gchik2hrKEI9BBPdnlZDY=
+X-Google-Smtp-Source: AGHT+IFagww3pxOoOKsEFeuXbX+NHva9IsyD9xZhOtoR8v7SpOOBVYkojySXKhuMk5XZSqETNSbTEv9mBPBVHaZh344=
+X-Received: by 2002:a05:6e02:2482:b0:3dc:8058:ddfc with SMTP id
+ e9e14a558f8ab-3de07cd045fmr165604885ab.11.1750230149937; Wed, 18 Jun 2025
+ 00:02:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <cover.1750065793.git.asml.silence@gmail.com> <702357dd8936ef4c0d3864441e853bfe3224a677.1750065793.git.asml.silence@gmail.com>
+In-Reply-To: <702357dd8936ef4c0d3864441e853bfe3224a677.1750065793.git.asml.silence@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 18 Jun 2025 15:01:51 +0800
+X-Gm-Features: AX0GCFtI_6Syj--jN1osN8b3IwBnDhOc9cmGPDIfbz9j-qf3m5_nSa7qw0hJtXc
+Message-ID: <CAL+tcoAeWk0MPw56NjrPBm3BOUmAMnSrw=wbbMUe3X92-wd4Mg@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] net: timestamp: add helper returning skb's tx tstamp
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Em Tue, 17 Jun 2025 11:38:06 +0100
-Donald Hunter <donald.hunter@gmail.com> escreveu:
+On Mon, Jun 16, 2025 at 5:45=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
+> associated with an error queue skb.
+>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
-> 
-> > When one does:
-> > 	make SPHINXDIRS="foo" htmldocs
-> >
-> > All patterns would be relative to Documentation/foo, which
-> > causes the include/exclude patterns like:
-> >
-> > 	include_patterns = [
-> > 		...
-> > 		f'foo/*.{ext}',
-> > 	]
-> >
-> > to break. This is not what it is expected. Address it by
-> > adding a logic to dynamically adjust the pattern when
-> > SPHINXDIRS is used.
-> >
-> > That allows adding parsers for other file types.
-> >
-> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>  
-> 
-> Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-Thanks for reviewing. At the next version, I'm placing some backward
-compatible code for Sphinx 5.1, based on Akira's feedback.
-
-As the basic logic is the same, I'm keeping your review there.
-
-
-Thanks,
-Mauro
+Thanks!
 
