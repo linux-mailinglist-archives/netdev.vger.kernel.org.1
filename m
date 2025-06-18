@@ -1,180 +1,163 @@
-Return-Path: <netdev+bounces-198926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA965ADE577
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:24:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92454ADE57B
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46B97163189
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:24:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D03E3AFAA0
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0866274FC2;
-	Wed, 18 Jun 2025 08:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9260C27EC76;
+	Wed, 18 Jun 2025 08:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="loRFV+Tk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNrGdRwL"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2057.outbound.protection.outlook.com [40.107.243.57])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B00C35963;
-	Wed, 18 Jun 2025 08:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750235079; cv=fail; b=lV6+rRRMMd9rVVVrlYvLHAbQha4l3mFlKXo6oDZg2A4RWZqyqJvstmUN0xxyXAj5E6FWop4vbDXSCJCY9CqUK7Uez4cplwgABbPc7tcSXphNOqwdMnclc9L4P25Zku4JfHQazrG1ozZnO9P3TX6SZBrwqNJPrW5ax97gZ5ntjtM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750235079; c=relaxed/simple;
-	bh=iJDe/XiJxArp03Yc/QRR15PdW8brZLmLykxKUOZW57o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=DmhyZDZAWfE+zABmamOVl19DveN6gGY/RQ+VgiYcY1oVONu1XCXokF6rKJ6XrECI5jEIXhjoKZJKumtNxCSht6Fc43P1OWbhNYLzJNbUvdR4U9P3rmh9OrCc2ZSvNLT59gItpUdRm3WwEVXKJnOvjovRyw928a7sW114G1EL2LA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=loRFV+Tk; arc=fail smtp.client-ip=40.107.243.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PhBKiC8tK0X7Em3JzjLMMkrWc8b0/dHN6EM097PrD7QZRIYx/LSkLTHs4PwHdo+2q98r4RRRRTMEP/1mEnS1aUj6dN03OVWBm31iXqW6G1dGYi2NjTQXvE1Kl2JrCtNwaeQ6liHwC5RJYaivEffvrSkDTVKaTMbEpAITeifEz78AJRdYogiBBi4WXwAJEKqgWUhpNknAi1A6pIV3K5p7RRw+g063+ejmqRuWTmH3IBbS0YWkximCGPAk79aDqVHdlOVqhSNjSIB9GUFTpBe79fjODItHcP0wRS/ysQRgkfHsKMi0GqcGCIwqEkGpKqO188LtSz/2xoIF+ycKJ8xwSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SwwELUu6vzexH8mh3upiNMwxON1SnlXzZJExOLrbU/c=;
- b=S+dqCJfPWKwvi02hn1VLNBsCd+TbkDzzKSLLo4MIaSXbIaecik5vUkaWdf2RXE+cFaxOqnO3UEomvxz/QyHlUjb4RcXra+O8zEV2slUmFyfUTySp5pf8Ln69cMxXu4D2rbwX3eLGrDKuImgURAJps1m5gvhXBhm7dmgA8SfHRHmMb7xZMw2RWSA0SBStJlwofK98+8kAefLjuHTAGWMMlQCYienFdEtVnpHLznlj3hf2RDBoEVZzNRM/ctOk525pLSbFlfXGl82JfdMuwL5no4dL8Cmqhh57jS25R88vfawmkbh6nGgOMnd+PC8Rrdgg0gLPcTZt7+16adeVF+zkkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SwwELUu6vzexH8mh3upiNMwxON1SnlXzZJExOLrbU/c=;
- b=loRFV+TkDfJeHeHcOh1owzQSZ8exfHHQq44io9XmiCgxOQONvflxX/jqZ/VRhL5iH3m1hzOJpFBNfOF6G3at437j+IZTEpl2mW3q5JV6ZvA0LqUR47GUgWaN/GjbtfyH+IiV9OgX/AYcUEOWshUlRJixIcqf6XRCTcx+lOEaWUaeo7fpBbd/gKO/8t+7Lk2WNXL3X11YsIpoJeIfZe/LgBqfTio1/zph5thSE7yMm26J/XyVivlKg06Mpk2ve4cWswF1J8/Fu7c/YoAxm/RvGQiZKEJnPTlIO5rVM1ckgOdEmoYJL2rXv/1AD0coEi9jGDbf+feCuVb0/dU9SPoDJQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by CH1PR12MB9576.namprd12.prod.outlook.com (2603:10b6:610:2ad::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Wed, 18 Jun
- 2025 08:24:34 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%7]) with mapi id 15.20.8857.019; Wed, 18 Jun 2025
- 08:24:34 +0000
-Date: Wed, 18 Jun 2025 11:24:22 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, skalluru@marvell.com,
-	manishc@marvell.com, andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
-	somnath.kotur@broadcom.com, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, tariqt@nvidia.com, saeedm@nvidia.com,
-	louis.peens@corigine.com, shshaikh@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com, ecree.xilinx@gmail.com,
-	horms@kernel.org, dsahern@kernel.org, shuah@kernel.org,
-	tglx@linutronix.de, mingo@kernel.org, ruanjinjie@huawei.com,
-	razor@blackwall.org, petrm@nvidia.com, kuniyu@google.com,
-	sdf@fomichev.me, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
-	oss-drivers@corigine.com, linux-net-drivers@amd.com,
-	linux-kselftest@vger.kernel.org, leon@kernel.org
-Subject: Re: [PATCH net-next v5 2/6] vxlan: drop sock_lock
-Message-ID: <aFJ3tnfby14zIBm8@shredder>
-References: <20250616162117.287806-1-stfomichev@gmail.com>
- <20250616162117.287806-3-stfomichev@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250616162117.287806-3-stfomichev@gmail.com>
-X-ClientProxiedBy: TL2P290CA0016.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::18) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605C135963;
+	Wed, 18 Jun 2025 08:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750235127; cv=none; b=JFNvCPVRbwXogIfdPIisKmZphcc6T7AtvAlHLwxmY9wYUNsU99Rdxxe/teu+JBjA81FKKW+H4Ie2YkCDtE09d35Mrkh9uscqczDsiBfH/YGsdvqK0Rf34b1lFtmHq4FrSlpyA7Fni5aB8JNd7Mt8YDF/QrhcIFBnmcwKLErlH+E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750235127; c=relaxed/simple;
+	bh=CfnRxmufD9BFa5b8W1bL5FF2qtdnavYecQUsRTtCjJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOIgPPKVdNjQuEG6Ln1gOgScVX/5JmITod08eHlNRFQ0TNego9jo5kDZA7IjEx6cxQ42d9cVmLIw1fMnRpTXOGRDYKy7pHn6+nxm8uUmkEQ6lJ4sGJvqim4WdqQ0BULRsk6WKns8F18GmQs68aNo3rjJG9tidgArLjioIN+z+IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNrGdRwL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF5EC4CEE7;
+	Wed, 18 Jun 2025 08:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750235126;
+	bh=CfnRxmufD9BFa5b8W1bL5FF2qtdnavYecQUsRTtCjJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nNrGdRwLhZ7NP0P6VyZegnph1FkmFymqeTegErJcd+OoajPMd/mZfGF07/mEir47S
+	 +M4+0S5SJAih9ojrKXszbdqmHYJvFveMJPfx9CcA0dYNJt9GrVl1fQnGhV8XS3w1D5
+	 DhXdcJI8NMWKG+cj/6ekw4l5Lwk5tSHaJ74EM3FbgMoL9qv5eab3ISECnU8JzEUS8P
+	 Y0NIQyLxOtJsC0GlZcXIcDrIFfGUPkvf8tUDHclnMOYb33O7avMkkCDZjnGghLpObV
+	 B6Z0fBjFuQRr8DHI/RdwKyRkmg4n3LhpRH+H47fkQTzKIblTgwFmvQ1VB9zpRT+dwo
+	 E/5hB09Ftoymw==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1uRo6n-000000007yV-2JUI;
+	Wed, 18 Jun 2025 10:25:25 +0200
+Date: Wed, 18 Jun 2025 10:25:25 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Chris Lew <chris.lew@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hemant Kumar <quic_hemantk@quicinc.com>,
+	Maxim Kochetkov <fido_max@inbox.ru>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: qrtr: mhi: synchronize qrtr and mhi preparation
+Message-ID: <aFJ39fpIkEpqtZiM@hovoldconsulting.com>
+References: <20250604-qrtr_mhi_auto-v2-1-a143433ddaad@oss.qualcomm.com>
+ <aFJwfXsnxiCEWL1u@hovoldconsulting.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CH1PR12MB9576:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd250b08-aa17-4804-0f48-08ddae418e44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OxK8TIe5HbkenqpBOLqOt8/HHyFK4qVm2Q0aq5n3s/u1SFczLS9cdCmzDbRv?=
- =?us-ascii?Q?Gkg4cKUvBoaJzXDeQCv5uy09BPGKJXHeatO3tQ49/YMEuz7qkm51ms8hKR+I?=
- =?us-ascii?Q?KGRrKsbl1wdoJsqPlM0eCdb8hJ+KRbGD5tj59mVn7fbgwliW+7n0nanDxRKi?=
- =?us-ascii?Q?ltCfIXeOwhNpJJ8CITOmkKURs8UDNgzs+jI1zOHHyeRP8Lw9II56P8yx9DWu?=
- =?us-ascii?Q?5OUjLgZAaItAVlsXDPcQ6a4Cob/e9ip5D0Z/LhRnRGg7pWP5JjCfTQioRR65?=
- =?us-ascii?Q?RAIdwL3w9I9zRYmJ9eKx2X0KJv4KzTN+ARykYMJrsA0WTWdtu570LZk7HUme?=
- =?us-ascii?Q?SXXh4HxjbBGJ9hehABZG1n2xCX3KwvrUhI1hVFWaJJH1DArulFU29MIMsTNz?=
- =?us-ascii?Q?2HgLgKIG4/OrAEjAb/owzMUxbBon/PTYTf3++HBU8xpVXeeXNUSTLNcILU4Z?=
- =?us-ascii?Q?PhHqHP9JpZ3nSJAqGj+57J7oLLy6i0sUqVq59z6DlScGp/QZKgvQWUw2zpCx?=
- =?us-ascii?Q?IuV0qhI495o4I6Ri7vdMpfLF6Wlt8e4KCkVuyH+egubOrpfQQ2hYFTQiys1E?=
- =?us-ascii?Q?zYgp45NLPVLyoa2NttxqN6XwRlU1aUY3WT2UhZ9LA6GnsUYyOewdd+q+Tygx?=
- =?us-ascii?Q?X2fmsNZhLXGt7bSQj7n4MaQg+27ElmvKzUeORWiDA3gVcAR+HWwZJSINaEbG?=
- =?us-ascii?Q?o+wK8aMxGm11/1tqkwWvAL9aSTJJVLtbkkNY4Ksh3+8JtO/ahv/NZBuZoCOA?=
- =?us-ascii?Q?B0rOV84GgVS4mkw5j0pfZ0ltIrqITc/MF1TiDxC7VFP1A9qokoIxv0KsxHpu?=
- =?us-ascii?Q?Qq6ah2e2R7x2GM6XMx4EHDIgNACVn4VS4yFvK0t9EK8xswwfYlpLk8A1WmD9?=
- =?us-ascii?Q?C4hh21mkuvtlyc1htogfd79fOYJOYFQ9KXSlOZ4r0HIR/Yy1u++PlhY/RNfn?=
- =?us-ascii?Q?jlp5Phjb8Frwvxd8gJ7U6ybpzETYkA1tlZTTj0eqXjQnc6YzW4SHxnMH9siY?=
- =?us-ascii?Q?oAWxn2M98yJpvK4VV1P+Bc2Ew6KtmLtnTxStDCHYcH2VWOG0KC2NCDviH7oV?=
- =?us-ascii?Q?k7afHEizdfKKBXFywnQCqha44fzDcxcQOGdDQWULBoWTms8dEELFIdFA8K0v?=
- =?us-ascii?Q?oyihSRfQ9Afa4Nnn67L8Utxfr1TLMzrPfT8I12E0TZk3lPPYfClSCTnWBb8R?=
- =?us-ascii?Q?EQdC0G57APLTMw/8ss9GPKyofNmMWeHPxUXxZQ+avUkZLEI05WI/sJV+VPQ6?=
- =?us-ascii?Q?fVex7dZKYvrYGYswibneHqOIUYONVzjfrRBdcIfbpsd72rEENkgxRwnJwVd+?=
- =?us-ascii?Q?J+HYxXBME2klJsd6oZO2U0Mqso/5ccM4EkIicRgkDnjUmM2z0nZGUmMCqr7K?=
- =?us-ascii?Q?iAD6ue5uIsVyA2v9kCco79MrZaCH1+RymHmFRcfq4mtp3wAhGAt54QDm1FHh?=
- =?us-ascii?Q?l+/5UDhsiK8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?18IjXM+LgeUWLxzLTiwxM1rBIHBJOV7U2bSkU8Zhd63O5918QlIszS/WttAy?=
- =?us-ascii?Q?wsC/wZDoEvybOU/omYXrGevtxdwMvVdtNDLNlKm+jrTfXRed/RO5D9Keato0?=
- =?us-ascii?Q?5A8Iphxwc2Ed+/QDTv347aF7Hk1cXQaCesDxhPd6eal5HulDxqMQ39C8adFL?=
- =?us-ascii?Q?NW4nPX7uFu0ESXXaD/SskDA0gkzLsST8/CXFzMJKZt6CCxpaxl3Q7h9yE2jP?=
- =?us-ascii?Q?L8bcxoOmsWut5+FN0QLeAqDDQBIi+G7nLmH6E2Tyki25zRdVj4V0+hNqYDDP?=
- =?us-ascii?Q?NsgOoa5MNhfCgKKK9k0O/oIEbLP9O2tBgI09czPZQ8vkMOR8T6xiVaEYuFqz?=
- =?us-ascii?Q?Vab133eD/CmrGBAmqyxUICUHkC5gp1tyoN1nS10MIzqSZ5iPS9TXE+sdWmPH?=
- =?us-ascii?Q?vMTOwCqmSYSp9PNE6BxIFp+b4WKsz+NzkzClQgvRe+haDlmTdzRd+OBAZ53n?=
- =?us-ascii?Q?DCoM7kexhFxlOtqrO39yv9GQdt/GEdjNPnLO+lbIQfcesrFzNDqED7Q9mNVJ?=
- =?us-ascii?Q?K4u7gr5kgZ7NZWp5CTrf3L9PFT0MWZBqlruLpfRDGjpBroz14X0HmaQhpBu6?=
- =?us-ascii?Q?FS5p2rByhgtN/4bx0hWwhaxyG6WlhFirfktyaHGBFBPTBZKPdvsBVi/1q+km?=
- =?us-ascii?Q?e/aPpXusUmRgXj7/gC/BmMzMjCm8sQNoX10SULBrZIRHuyoWCeFF+3nfdIUv?=
- =?us-ascii?Q?o8Zaeph7l4gasEflg1cYtkrCrApa73F5l9JA1aihEhBgh/X01o0KNgkOyKRw?=
- =?us-ascii?Q?26TUVq6m9ofNaQIbT75Rt/IDwokV/loFvdfCkLJeOiZ17hpsg9ablxIkiTUe?=
- =?us-ascii?Q?fKxv8hASvkAzXtZaPLTr7nADTiwF6R8oxKOOihxqarHLmcJcoGMURDEma5t5?=
- =?us-ascii?Q?0LtC8cOXQ3r6uV77qKwUW/g1sjT5nz2Ar3Yka+u58+lVdETZcvV6ocJ1gmYN?=
- =?us-ascii?Q?/xqsLXoEFTV3b1TVO1JZRfLCwGSdpvSdGidxb5rQRU3UxbOZfxGgSwZCzUqS?=
- =?us-ascii?Q?vWScj/A6kLrlqPoLNXkrnLA8XiGYS6rWMsBsprdDrmQVCnx7bZAQbZRZh4Se?=
- =?us-ascii?Q?5WScVKDJJ+2kOyPkhyY70vfrYcz7jUHNr9oFGOZsph5wjcPfuycAd32lTP4T?=
- =?us-ascii?Q?PNy7cZy+lWk56ZxjgqfFbBqxRTbJmW7gVBVZBcgnvYiMlNWfF+LQsi2IUbpK?=
- =?us-ascii?Q?yl0JAeah+k7+WxOqpuBKY5HAuCXDx5XfLTuYVXDLelJ6vUUlL9TjPVPKScjP?=
- =?us-ascii?Q?v1TTVZAo6j5rehWzNv1BQ9EL158Y9Uua92UpPURusllpAsObHnhj8zUZxJij?=
- =?us-ascii?Q?nocd+PZNXN5qqMSGJZ4s6b1BNBiJCJS7J3ZhsM+xkTT4yaU29WzVlLp/QHnv?=
- =?us-ascii?Q?d7odIbflLt4eZuFYV85+aKoxMSwKa2HASwsMGcbn+QzYCxXEOwv6AbfRfMi6?=
- =?us-ascii?Q?1rb1k+S+NjXceSGoDmjX/Lkzw1R+BN6bvdb5FCp2nHSY2OwBTNcIroxUiF55?=
- =?us-ascii?Q?kk1IxAQnLyk4DTY0qOw6sSe27RHPUeBh4sl2bzDiL/wLFm9UuTTsglJ4/2Dm?=
- =?us-ascii?Q?j/GXXtG1wBsOXmiP/l/cfZMjCfcYDUh6GsUgUPo3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd250b08-aa17-4804-0f48-08ddae418e44
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2025 08:24:34.1042
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8WcDMjy3orOKo3yeVM2hZmE28+c7xIQjbxKD0xIdSblJDgxl1R/RU+U2ZFEAmH3wKd5FHabS4gAbvk/JAy0c5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9576
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFJwfXsnxiCEWL1u@hovoldconsulting.com>
 
-On Mon, Jun 16, 2025 at 09:21:13AM -0700, Stanislav Fomichev wrote:
-> We won't be able to sleep soon in vxlan_offload_rx_ports and won't be
-> able to grab sock_lock. Instead of having separate spinlock to
-> manage sockets, rely on rtnl lock. This is similar to how geneve
-> manages its sockets.
+On Wed, Jun 18, 2025 at 09:53:34AM +0200, Johan Hovold wrote:
+> On Wed, Jun 04, 2025 at 02:05:42PM -0700, Chris Lew wrote:
+> > The call to qrtr_endpoint_register() was moved before
+> > mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
+> > callback can occur before the qrtr endpoint is registered.
+> > 
+> > Now the reverse can happen where qrtr will try to send a packet
+> > before the channels are prepared. The correct sequence needs to be
+> > prepare the mhi channel, register the qrtr endpoint, queue buffers for
+> > receiving dl transfers.
+> > 
+> > Since qrtr will not use mhi_prepare_for_transfer_autoqueue(), qrtr must
+> > do the buffer management and requeue the buffers in the dl_callback.
+> > Sizing of the buffers will be inherited from the mhi controller
+> > settings.
+> > 
+> > Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+> > Reported-by: Johan Hovold <johan@kernel.org>
+> > Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
+> > Signed-off-by: Chris Lew <chris.lew@oss.qualcomm.com>
 > 
-> Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
+> Thanks for the update. I believe this one should have a stable tag as
+> well as it fixes a critical boot failure on Qualcomm platforms that we
+> hit frequently with the in-kernel pd-mapper.
+> 
+> And it indeed fixes the crash:
+> 
+> Tested-by: Johan Hovold <johan+linaro@kernel.org>
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+While it fixes the registration race and NULL-deref, something else is
+not right with the patch.
+
+On resume from suspend I now get a bunch of mhi errors for the ath12k
+wifi:
+
+[   25.843963] mhi mhi1: Requested to power ON
+[   25.848766] mhi mhi1: Power on setup success
+[   25.939124] mhi mhi1: Wait for device to enter SBL or Mission mode
+[   26.325393] mhi mhi1: Error recycling buffer for chan:21
+[   26.331193] mhi mhi1: Error recycling buffer for chan:21
+[   26.336798] mhi mhi1: Error recycling buffer for chan:21
+[   26.342390] mhi mhi1: Error recycling buffer for chan:21
+[   26.347994] mhi mhi1: Error recycling buffer for chan:21
+[   26.353609] mhi mhi1: Error recycling buffer for chan:21
+[   26.359207] mhi mhi1: Error recycling buffer for chan:21
+...
+
+and after that there's a warning at shutdown when tearing down mhi:
+
+[   36.384573] WARNING: CPU: 5 PID: 109 at mm/slub.c:4753 free_large_kmalloc+0x13c/0x160
+[   36.552152] CPU: 5 UID: 0 PID: 109 Comm: kworker/u52:0 Not tainted 6.16.0-rc2 #10 PREEMPT
+[   36.560724] Hardware name: Qualcomm CRD, BIOS 6.0.241007.BOOT.MXF.2.4-00534.1-HAMOA-1 10/ 7/2024
+[   36.569835] Workqueue: mhi_hiprio_wq mhi_pm_st_worker [mhi]
+[   36.575648] pstate: 21400005 (nzCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[   36.582882] pc : free_large_kmalloc+0x13c/0x160
+[   36.587610] lr : kfree+0x208/0x32c
+[   36.591166] sp : ffff80008107b900
+[   36.594636] x29: ffff80008107b900 x28: 0000000000000000 x27: ffff800082b9d690
+[   36.602045] x26: ffff800082f681e0 x25: ffff800082f681e8 x24: 00000000ffffffff
+[   36.609454] x23: ffff00080406cd80 x22: 0000000000000001 x21: ffff0008023f2000
+[   36.616863] x20: 05a2dd88f4602478 x19: fffffdffe008fc80 x18: 00000000000c8dc0
+[   36.624272] x17: 0000000000000028 x16: ffffdd893588f02c x15: ffffdd8936a28928
+[   36.631681] x14: ffffdd8936af16e8 x13: 0000000000008000 x12: 0000000000000000
+[   36.639097] x11: ffffdd893709c968 x10: 0000000000000001 x9 : ffff0008099c95c0
+[   36.646505] x8 : 0000001000000000 x7 : ffff0008099c95c0 x6 : 00000008823f2000
+[   36.653915] x5 : ffffdd8937417f60 x4 : 0000000000000020 x3 : ffff000801c2d7e0
+[   36.661324] x2 : 0bfffe0000000000 x1 : ffff0008023f2000 x0 : 00000000000000ff
+[   36.668733] Call trace:
+[   36.671307]  free_large_kmalloc+0x13c/0x160 (P)
+[   36.676036]  kfree+0x208/0x32c
+[   36.679241]  mhi_reset_chan+0x1d4/0x2e4 [mhi]
+[   36.683786]  mhi_driver_remove+0x1bc/0x1fc [mhi]
+[   36.688597]  device_remove+0x70/0x80
+[   36.692341]  device_release_driver_internal+0x1e4/0x240
+[   36.697778]  device_release_driver+0x18/0x24
+[   36.702233]  bus_remove_device+0xd0/0x148
+[   36.706424]  device_del+0x148/0x374
+[   36.710077]  mhi_destroy_device+0xb0/0x13c [mhi]
+[   36.714888]  device_for_each_child+0x60/0xbc
+[   36.719344]  mhi_pm_disable_transition+0x154/0x510 [mhi]
+[   36.724875]  mhi_pm_st_worker+0x2dc/0xb18 [mhi]
+[   36.729594]  process_one_work+0x20c/0x610
+[   36.733788]  worker_thread+0x244/0x388
+[   36.737711]  kthread+0x150/0x220
+[   36.741093]  ret_from_fork+0x10/0x20
+
+Johan
 
