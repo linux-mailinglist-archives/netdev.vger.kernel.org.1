@@ -1,129 +1,236 @@
-Return-Path: <netdev+bounces-198938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA6CADE659
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:12:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAD04ADE66A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:17:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7826F3A4AA7
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:12:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337C63AC08E
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3D127FD55;
-	Wed, 18 Jun 2025 09:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB3E27EC98;
+	Wed, 18 Jun 2025 09:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sSX0dr/U"
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="r3sPQk27"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f73.google.com (mail-vs1-f73.google.com [209.85.217.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3135B27FB3C
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F115328151C;
+	Wed, 18 Jun 2025 09:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750237971; cv=none; b=ID0KW5MdwoNfmRE+HFS/D4gMASX/jTroBqIQ4Na4KWVFWpPTiMqvW7ueV+Skyr3XQgtHQCdvHwXowQD5GNUCGfxa1yBXuptqvh4bye6J2jJUXWRVZyigXEoQP6vD8549iRBD527zb4HmrPK0FS5pCpfUdUrIZ22YkjFBuiTgN5g=
+	t=1750238247; cv=none; b=HhcEVkGChDB1ZxjRc+FLmILoDVfhA3r9RmMoTzuQVbnMuePknbTjbICYkMnVXjjRRRA+dG2LwVSUHFZL2Rne4sxRPeVeAy2v5vTp7v4rVmKm+OPjh7HFdgXE8WRtkFkoTypPlSR0R5CF1tZxqDbWYX3w7Rp5ZgG3R2Gvc8vL3Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750237971; c=relaxed/simple;
-	bh=t2pxm20EYK1NEk7N8OBNO0lB8u3wCvWAGc5TfAuwAzA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sFnBRiKTxtI6rPpuzoxvQnKhduiKMnUwBTHMkeWBRkxAkDq9gXECQnKb4SPd94rFaZJt3IyzhHukZKFW5W+1+39KfaUJCeGkOd3v6JOHYidlI4SWUg7W2GZYk0san9vfkZS3aBpsuArLCpciGIJl7ehIh8Ejay/tLvcosCEL5xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sSX0dr/U; arc=none smtp.client-ip=209.85.217.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vs1-f73.google.com with SMTP id ada2fe7eead31-4e8fe2529f5so554665137.2
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 02:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750237969; x=1750842769; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CA8zH38USDmVdEW34eD/0nQwX97M0Frbjyk5UTzBNpc=;
-        b=sSX0dr/Ui9pH0OCsAckeYzdd4H4T2p/ccFf5xK+vcU+vqFDhO7bNzNU4p2qHzTNHQQ
-         sk4889KHLXnFLrwPFg+x5hQqbvFuCOWPZtOVYM7nbmBnkEjMgFhijEQulrAmqJ8VVVNv
-         m9VWX0pCjg0wWuoi4+0ZnXgHof5jAmL6XZubliZWnVG/KGuuPYGKM3TAH1MSXqeiRf98
-         vGUUsw3yF4IA7vS9GtWEIQXRjRDdlpWXpWdBKF+r1DPgWPPR1TCDQMMHQVEkB3O2CrU4
-         QriHECcEMsKSRHsQYtevaABe82gZ9kMwAwhKKZVPJev1OIfWzptz+xX+677NRqrKsC+l
-         f3Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750237969; x=1750842769;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CA8zH38USDmVdEW34eD/0nQwX97M0Frbjyk5UTzBNpc=;
-        b=Ce3vTnnxqZwac9dFFZlOj9l8xtXYB9BdS9cqJmmxz6aOFb/p4xochb2GdG2iXz/+Tj
-         4SQqccMsM1IVqTfI5swKYKVIve7rDvzj42emPt2azvnfGXwPw+ltLqMVB8wA57fwKHZh
-         THxXMv9XBOGh4hCXKQnvFB4sqb4PwQ5IuaoyKRpDtU933hJ0sBV63DvBveH+fKB1N2so
-         YUHS94YtozIxjF1y4FJQWbQaG7AcyRgmp/2DfInys8AB9iEglh44Slx32KAZeWB3XymD
-         LXTb4IT2v3HNNhIknJjq+JqQEvqNsRfLosE41ki/k1XKMlyQZ9ooN8NLySEyKfOO7/iK
-         17rg==
-X-Forwarded-Encrypted: i=1; AJvYcCVl6pjGqb1ba3edbJQZhLq0B/4meavwVCvAfDudo394TZ2tq5dw6aZEPwoH0KMtDTap6idm8zI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXHQCWUEAt915EblUqOBrOmpOxpI45VXYl733+e2CUcT2HYZ0r
-	oYeywqoNBA7jJ03sF4sQaIsxUQv/7ZQ6AmOi8jGh5trO08xYcze32m2MxXDqOdS7vB8le8p9dSw
-	kkCOqyYmWq09l7Q==
-X-Google-Smtp-Source: AGHT+IGJLytDZk7JzkqbXxMhMHJbQ7LvbD744CtkCOSjXzwU2CV5jbW75dyd2eh66YHVQStSyAK/CUpYopDjAQ==
-X-Received: from vsw3.prod.google.com ([2002:a67:f083:0:b0:4e7:e350:addb])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:4194:b0:4e5:8c2a:fbee with SMTP id ada2fe7eead31-4e7f643ae25mr11292470137.15.1750237969059;
- Wed, 18 Jun 2025 02:12:49 -0700 (PDT)
-Date: Wed, 18 Jun 2025 09:12:46 +0000
+	s=arc-20240116; t=1750238247; c=relaxed/simple;
+	bh=v0t2nXxFlkhUf2easunPGlpe9oTBFkYRqwutkwgWiyc=;
+	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
+	 In-Reply-To:References; b=cKcgkINzRn98A/5V06y/nxpZrryhO08pQu8Fp8WwttFowE1Nrss7Ar/D4y3xmfzLSRXPpZS7mUf8Trh1Nx9rwKkve5PDuu8ZlOr4ZgDXB8qhy2e7jB/S8qSI939HYOy6RxlWfFncfeHMQ4Rxw2sE+OFoDRq21/EySYkDOILPo5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=r3sPQk27; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
+	s=s31663417; t=1750238087; x=1750842887; i=frank-w@public-files.de;
+	bh=31MkZx6QLAqtW/NqnNOi+UscMDhWWhNudTK63d8OWVo=;
+	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
+	 Content-Type:Date:In-Reply-To:References:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=r3sPQk27on1YoyTLna09nRRPjUc6CgT1ZqBQzQLMM4LRL2IqExQN8oPpUsNWwtId
+	 1Vr9dzj1v/EpYd8JG26ihFW4tTjmCO3jkWSCqhnsg2n+7b0IwMJCHAuwV6/sD/2ca
+	 lMmBH8RHmfr1kGRtReH0OssTInLfaZvuM5R7Zl2CMV20sUfPLzfWjxzRonx4Mn6xq
+	 COH0o98B7Tbb2z7S3ZBXqsmcHi1oetso28bSV37GzE6r2WSdMwfRGyUoyR5H1JE0+
+	 g0bRK+HRMF7D+x6nXoxy5kIQwsaUY9k5OVYm2+E2kzCdo/yw+lkZaXZWyebCJc/+2
+	 sQGGP0l03OBayDjbzg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [100.65.113.165] ([100.65.113.165]) by
+ trinity-msg-rest-gmx-gmx-live-847b5f5c86-t48nw (via HTTP); Wed, 18 Jun 2025
+ 09:14:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
-Message-ID: <20250618091246.1260322-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: tcp_time_to_recover() cleanup
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Message-ID: <trinity-98989ec6-5b15-49ab-b7e0-60e5e23dd82b-1750238087001@trinity-msg-rest-gmx-gmx-live-847b5f5c86-t48nw>
+From: Frank Wunderlich <frank-w@public-files.de>
+To: horms@kernel.org, linux@fw-web.de
+Cc: nbd@nbd.name, sean.wang@mediatek.com, lorenzo@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, daniel@makrotopia.org,
+ arinc.unal@arinc9.com
+Subject: Aw: Re: [net-next v4 3/3] net: ethernet: mtk_eth_soc: change code
+ to skip first IRQ completely
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 18 Jun 2025 09:14:47 +0000
+In-Reply-To: <20250618083556.GE2545@horms.kernel.org>
+References: <20250616080738.117993-1-linux@fw-web.de>
+ <20250616080738.117993-4-linux@fw-web.de>
+ <20250618083556.GE2545@horms.kernel.org>
+X-UI-CLIENT-META-MAIL-DROP: W10=
+X-Provags-ID: V03:K1:cgeZTBzTr16R05ltfUpcloI8raW3AvLgsejsxFqfAoMHyHWNB5vkqYr3kXrTTzFVpnwCe
+ dTDpwkYJXjF83EtsHZx+QCZWl0ineJYaJctMIX5cNyc+orbBsc6vWRBXVj9LYPYwpcqmuz8AwIZE
+ eBEva+vW2Pf6ABpTggQqOjj1pTwlKX6GReTp0yk8xC8V2yAYZDkDB5tl3VIFyQtfU3Wstty438SX
+ DQ4+lDn5ds9J9huivawUQogrcsvDjJ2RO4rp7WzqLMvGUJZ8Wkrdgs5cwsWUy3ZPPyZ98XEpqdW4
+ PPe2Tuixm0kYGL7TKvgwAFrlqEMr5xP0UXQlhRi5TPdJ65g5FEyx3Vlz9nT1VPkBpk=
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:nPaP/13hdPQ=;c6rGciUDjgJwvNettvYeQyHtQ9w
+ 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
+ RnGwNw2N8Mh+qDBjqdf40Ll/7gsxXlQ=
+Content-Transfer-Encoding: quoted-printable
 
-tcp_time_to_recover() does not need the @flag argument.
+Hi Simon,
 
-Its first parameter can be marked const, and of tcp_sock type.
+thanks for your review
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_input.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+> Gesendet: Mittwoch, 18. Juni 2025 um 10:35
+> Von: "Simon Horman" <horms@kernel.org>
+> Betreff: Re: [net-next v4 3/3] net: ethernet: mtk_eth_soc: change code t=
+o skip first IRQ completely
+>
+> On Mon, Jun 16, 2025 at 10:07:36AM +0200, Frank Wunderlich wrote:
+> > From: Frank Wunderlich <frank-w@public-files.de>
+> >=20
+> > On SoCs without MTK_SHARED_INT capability (mt7621 + mt7628) the first
+> > IRQ (eth->irq[0]) was read but never used. Do not read it and reduce
+> > the IRQ-count to 2 because of skipped index 0.
+>=20
+> Describing the first IRQ as read seems a bit confusing to me - do we rea=
+d
+> it? And saying get or got seems hard to parse. So perhaps something like
+> this would be clearer?
+>=20
+> ... platform_get_irq() is called for the first IRQ (eth->irq[0]) but
+> it is never used.
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 05b9571c9c92599df800307afd9c655771425f1e..e5664e6131defc69f533860c480328d9ad433b37 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -2336,10 +2336,8 @@ static bool tcp_check_sack_reneging(struct sock *sk, int *ack_flag)
-  * Main question: may we further continue forward transmission
-  * with the same cwnd?
-  */
--static bool tcp_time_to_recover(struct sock *sk, int flag)
-+static bool tcp_time_to_recover(const struct tcp_sock *tp)
- {
--	struct tcp_sock *tp = tcp_sk(sk);
--
- 	/* Has loss detection marked at least one packet lost? */
- 	return tp->lost_out != 0;
- }
-@@ -3000,7 +2998,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
- 
- 		tcp_identify_packet_loss(sk, ack_flag);
- 		if (icsk->icsk_ca_state != TCP_CA_Recovery) {
--			if (!tcp_time_to_recover(sk, flag))
-+			if (!tcp_time_to_recover(tp))
- 				return;
- 			/* Undo reverts the recovery state. If loss is evident,
- 			 * starts a new recovery (e.g. reordering then loss);
-@@ -3029,7 +3027,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
- 			tcp_try_undo_dsack(sk);
- 
- 		tcp_identify_packet_loss(sk, ack_flag);
--		if (!tcp_time_to_recover(sk, flag)) {
-+		if (!tcp_time_to_recover(tp)) {
- 			tcp_try_to_open(sk, flag);
- 			return;
- 		}
--- 
-2.50.0.rc2.696.g1fc2a0284f-goog
+ok, i change it in next version
 
+> >=20
+> > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> > ---
+> > v4:
+> > - drop >2 condition as max is already 2 and drop the else continue
+> > - update comment to explain which IRQs are taken in legacy way
+> > ---
+> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 20 ++++++++++++++++----
+> >  drivers/net/ethernet/mediatek/mtk_eth_soc.h |  4 ++--
+> >  2 files changed, 18 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net=
+/ethernet/mediatek/mtk_eth_soc.c
+> > index 3ecb399dcf81..f3fcbb00822c 100644
+> > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > @@ -3341,16 +3341,28 @@ static int mtk_get_irqs(struct platform_device=
+ *pdev, struct mtk_eth *eth)
+> >  {
+> >  	int i;
+> > =20
+> > +	/* future SoCs beginning with MT7988 should use named IRQs in dts */
+>=20
+> Perhaps this comment belongs in the patch that adds support for named IR=
+Qs.
+
+also thought that after sending it :)
+
+> >  	eth->irq[MTK_ETH_IRQ_TX] =3D platform_get_irq_byname(pdev, "tx");
+> >  	eth->irq[MTK_ETH_IRQ_RX] =3D platform_get_irq_byname(pdev, "rx");
+> >  	if (eth->irq[MTK_ETH_IRQ_TX] >=3D 0 && eth->irq[MTK_ETH_IRQ_RX] >=3D=
+ 0)
+> >  		return 0;
+> > =20
+> > +	/* legacy way:
+> > +	 * On MTK_SHARED_INT SoCs (MT7621 + MT7628) the first IRQ is taken f=
+rom
+> > +	 * devicetree and used for rx+tx.
+> > +	 * On SoCs with non-shared IRQ the first was not used, second entry =
+is
+> > +	 * TX and third is RX.
+>=20
+> Maybe I am slow. But I had a bit of trouble parsing this.
+> Perhaps this is clearer?
+>=20
+>         * devicetree and used for both RX and TX - it is shared.
+> 	* On SoCs with non-shared IRQs the first entry is not used,
+>         * the second is for TX, and the third is for RX.
+
+I would also move this comment in first patch with your changes requested.
+
+/* legacy way:
+ * On MTK_SHARED_INT SoCs (MT7621 + MT7628) the first IRQ is taken from
+ * devicetree and used for both RX and TX - it is shared.
+ * On SoCs with non-shared IRQs the first entry is not used,
+ * the second is for TX, and the third is for RX.
+ */
+
+i can keep your RB there?
+
+> > +	 */
+> > +
+> >  	for (i =3D 0; i < MTK_ETH_IRQ_MAX; i++) {
+> > -		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
+> > -			eth->irq[i] =3D eth->irq[MTK_ETH_IRQ_SHARED];
+> > -		else
+> > -			eth->irq[i] =3D platform_get_irq(pdev, i);
+> > +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
+> > +			if (i =3D=3D 0)
+> > +				eth->irq[MTK_ETH_IRQ_SHARED] =3D platform_get_irq(pdev, i);
+> > +			else
+> > +				eth->irq[i] =3D eth->irq[MTK_ETH_IRQ_SHARED];
+> > +		} else {
+> > +			eth->irq[i] =3D platform_get_irq(pdev, i + 1);
+> > +		}
+> > =20
+> >  		if (eth->irq[i] < 0) {
+> >  			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
+
+code changes are OK?
+
+regards Frank
 
