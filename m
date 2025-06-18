@@ -1,199 +1,171 @@
-Return-Path: <netdev+bounces-198908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51AB0ADE49B
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711A2ADE4A6
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB4067A2764
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:30:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F07123A7BF1
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4181E5B60;
-	Wed, 18 Jun 2025 07:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A386127E7CF;
+	Wed, 18 Jun 2025 07:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v2iriRO5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LTAl8TCO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660C4156C6F
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B4719DFA2
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750231891; cv=none; b=XQxf8rJWaDmYNbnlF2pPh6l0whiDZUDOJRMDQl4CmOyUhrvecTVN+o62+3tTEUtHZfZQrPPB8E/t8VdhPHmz2GDm/q/2OHEmViEE3suCrL4RnJvSw1dzml5IgvVxTB5KuEF0xjMnAqKU1Pqys7RD1QAqRrtpa6QzOaImb36inBg=
+	t=1750232220; cv=none; b=ttmV6s1ZDk7GadT4SJuAPsYi4kIuzbfmoONRv+7/MHXS40ccI2mf0RzND13wa8oOz7VVsKpvqlhc8Fmtcuqr5w1JbVn8mi+ax3Uea+pTIRPHMcX9qC/oIITScpvkqMOcielc63iFVFhfbvOaYwnS6CtCmD+ufyInsvOuwIe/JtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750231891; c=relaxed/simple;
-	bh=qGKtNA+4Ur+0wRwwDR2ly6BdRm8nznmwwWHMjHlMxqI=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=EpCW7Qn//8eAd1QVUn1OT/cOfId32X5fOLjBnprRfUxvaV6ZuadeGQ0I85NAjTPeuAkp6giR1Q2o/LOQ37Hquhmo5D7dqRefZLyt4wzBr1i77w4QUU3gcrCpmrpEHlew9HPul+YKvae1h+nk2gaE/yPpfS26wCkUNO6lPSIhkag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v2iriRO5; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750231886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/LmJLS/LfF8q1QehsgbJlKxthaaM7XEKqiN320caAco=;
-	b=v2iriRO5XrGcDS4t443RomB1f03LSiiYcIO6+yBpEZAb9RcZyxtc1Wbj36kCDd8eqVIx09
-	BWiR0R/3YqCjcYv6SX9GcAjXGEQz+DD6PoX6DB+Sgu4XZS8hslFY2UOUK4qecImvYoRkFa
-	dfA0wMlPqbtmAR2RmgYWIlZBbT5qqbI=
+	s=arc-20240116; t=1750232220; c=relaxed/simple;
+	bh=WkRs/TboFDX8xfzfGINehv8lcvkeaBoDHGvUNBlrxXw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JfF8KU2wUe89K38e9kXP+TDuS3iJmBr3Fogxtms1guAeZPomso+oSb44PSHj32+p4fwgGgKKFd2ZK1pcCbiGKB7vA7X0onS7Ixul6iXo+1iu+x+FLwZPOMLWqrJFRzGyF72Wa4FJFJvzqVsgfA4YBw2mgBHy7lwvRGV6CfJAWBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LTAl8TCO; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45306976410so1973335e9.3
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 00:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1750232217; x=1750837017; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XZXBxt0cc6L0naAoZJZAGNT6TJUcn+mtDHZVLEqs+No=;
+        b=LTAl8TCOxh1uOwiGrB8LrimzoI0hpWdZKIcoOk/sdaTPZ0m/KK4oTpy9EpyCWySKaO
+         rVguNPBlRlEtticcaia4kU44Szw1+PNwbceUGu41zmDdX92XKLgqneouNgIZuk/9W4zw
+         NTMM57h7Sxi7GLnoAhaEKEzoFykIglwEYCWzxDa/z6R6PuoDHd2WUOLW2i0WZEPwI9cY
+         wst0pI0mBX52ouJd0klX+SEJbZQ7WouC+oq4sp1HKqP+VBmKNkyQgDhIxT9NxiGTsAeA
+         bUVoxDpNRUSALO5U0AWUUIJ+oYFwjhsUsUY2pJoZJja+sW1b52vCUvEEUl6vXT9ue0xe
+         IkJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750232217; x=1750837017;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XZXBxt0cc6L0naAoZJZAGNT6TJUcn+mtDHZVLEqs+No=;
+        b=t8tlfKHK6eH1wprrSl+4nQ02M4yfeJ9ePv9S0z+9KObWiNL//5PIyKzS2BtW02Zh/Y
+         Pbl5FDR42kHiELGGgBJ+u207rBYjfNOW9OxcT4tBOnjvRIQJDYJQtuzvP7OSX+56CsDm
+         VafZNP8DJ8mfi85WKOIRc5gmrK5FbKI0MOz3sDrYY3p94ct0BLp6Sgvg7mvxXGY2fxW7
+         tfE/1nU0+OYKDI8ea8k7bQXZ13AeSBQ+4/uWk+elGzWOmJpwutS6ugahLppSZ/GWdh9J
+         nJWO+85wJhfm5mnYjaGCFYBBo73UyxoREryX2WmfLv/l42NzE82m0cfxERBO1Zuil11C
+         Df4w==
+X-Forwarded-Encrypted: i=1; AJvYcCU5kT4Dyub+H/q/NEyIA9/mWO4gCP78jkzmiH2vZLDgIOi5En2lh0YEGaSxtyJ5G8Zz92ZrjFU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlDzR1kZBAGYGQikJ9yQzgUradGvGYxAes93sNrb6ZHZQeGISP
+	PKW2z61GYZcGpiMoErtsyr6RbwK4pdSuchTMRc/7Q6LcU0vzhSRtz0aU5RLKx8i/iSE=
+X-Gm-Gg: ASbGncszqTinnXyN8hdU0ftv/3tvsaBtmIo9ita1k0ofhLBhoB5H9wdnYa4YUzYKS80
+	g9eu9wkfgOkZluH5NW4Gy1ZETNEdWKZdH1wWn1NgcA+xlQpS91CYPpp7S9PC0Gaybe7LWtTGQsj
+	z9odYEsiS+XtAKDOk4dKHyttM8Lf6s71E6Md3xZ6YEUTG/2EIGEb5Us0fgloHikLf5rEn5o1872
+	2eK+qhoZTV2aZmria7lCm/XY0lYH84F/q8DuLfk9QnKnP85fJpM240ICGv565N5DGTzlQApJmsg
+	TW+ErP38jLqx0nDjvCjgqn2Q5aKuVOukZNNsp/zKfVgrXCQe+gaHq8IcxU8+DEHi85ZX9fJLni5
+	U3u4hoaDV
+X-Google-Smtp-Source: AGHT+IGzdx4bFzKCr1o8dRWdVSdkAmLcmC90spjSihYQwSyc0weZmyPLolTCTmYgiIecY8zC3ErPWA==
+X-Received: by 2002:a05:600c:1d0d:b0:43b:ca39:a9b8 with SMTP id 5b1f17b1804b1-4533ca48dffmr58906925e9.2.1750232216922;
+        Wed, 18 Jun 2025 00:36:56 -0700 (PDT)
+Received: from kuoka.. ([178.197.223.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532de8f2e0sm195792835e9.8.2025.06.18.00.36.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jun 2025 00:36:56 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Vincent Cuissard <cuissard@marvell.com>,
+	Samuel Ortiz <sameo@linux.intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Linus Torvalds <torvalds@linuxfoundation.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] NFC: nci: uart: Set tty->disc_data only in success path
+Date: Wed, 18 Jun 2025 09:36:50 +0200
+Message-ID: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3853.100.6.1.1\))
-Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Matthew Schwartz <matthew.schwartz@linux.dev>
-In-Reply-To: <20250611164339.2828069-1-kuni1840@gmail.com>
-Date: Wed, 18 Jun 2025 00:30:58 -0700
-Cc: christian@heusel.eu,
- davem@davemloft.net,
- difrost.kernel@gmail.com,
- dnaim@cachyos.org,
- edumazet@google.com,
- horms@kernel.org,
- kuba@kernel.org,
- kuniyu@amazon.com,
- linux-kernel@vger.kernel.org,
- mario.limonciello@amd.com,
- netdev@vger.kernel.org,
- pabeni@redhat.com,
- regressions@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CAD52833-6A51-494F-A437-2459B772E768@linux.dev>
-References: <58be003a-c956-494b-be04-09a5d2c411b9@heusel.eu>
- <20250611164339.2828069-1-kuni1840@gmail.com>
-To: Kuniyuki Iwashima <kuni1840@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1821; i=krzysztof.kozlowski@linaro.org;
+ h=from:subject; bh=WkRs/TboFDX8xfzfGINehv8lcvkeaBoDHGvUNBlrxXw=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoUmyR9Sy/6+NxZF35Vz8mGEq+q31qkerrdCl1S
+ kIPLmllOdKJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaFJskQAKCRDBN2bmhouD
+ 13omD/4zhyiDc3yVsBfIujWpgDnnQ/l3ePHvdbts5xY9N05fFjRhLNIv9Z/PMQfCL5sWiYJxZZo
+ 9X1IAcKsu7TItxoN+Kx8Ah6IruEbidB02Nyt/C9TxaWVzETWDWvDCUQzwpM1H1lVNmQPojXIwgU
+ wZaoSbr66Qlgyygzsh8npVA48SkBzSucYhEpPfGVP2+5MIMEJthHwGaoUyss0tfJAGD0XA6VMl7
+ Ad8vdIwkI0ZCY3kkpnHxYMsWSYFzJAZmRRvrJC4B2+rQHdctXwwfSvjBrlTWMV9r6tt5c3EBk/P
+ xnmPGhzHSXp11rasBPlmwmubeC4879dQdbewqlIVj5ymyfSVLqOdvzoXrqBwoXajhxUDS78SN/y
+ iEs/8phFmc98F5kLrJ2cB9zI5hoSD/VmM50fHfgjuVpSjF+fQqnRl4D+wuj6rgvmpmL5otgI50O
+ eUC1qmE30Almsx/ey2bbBlVsHeSvC41jwzdMK+Y93qjIoZdqaqVc4AztnwPFk3pCw3f/dnpCn8Y
+ YYleGNGUgPIcPC5sKa/McvfOHO7VHEHTXkOfuTdqk5d+pqc6XesjhE3YKNTYLyO0rWb70akwz4c
+ l9Ey/IYMak4UQ0W6IgEV1JIL/PHA6xqIs2jbjimYqngW79+VBvS77zkrz4B4ZtSNvuzp2a59Ej7 bsaAbyuHHDH8vfQ==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
 
+Setting tty->disc_data before opening the NCI device means we need to
+clean it up on error paths.  This also opens some short window if device
+starts sending data, even before NCIUARTSETDRIVER IOCTL succeeded
+(broken hardware?).  Close the window by exposing tty->disc_data only on
+the success path, when opening of the NCI device and try_module_get()
+succeeds.
 
+The code differs in error path in one aspect: tty->disc_data won't be
+ever assigned thus NULL-ified.  This however should not be relevant
+difference, because of "tty->disc_data=NULL" in nci_uart_tty_open().
 
-> On Jun 11, 2025, at 9:42=E2=80=AFAM, Kuniyuki Iwashima =
-<kuni1840@gmail.com> wrote:
->=20
-> From: Christian Heusel <christian@heusel.eu>
-> Date: Wed, 11 Jun 2025 13:46:01 +0200
->> On 25/06/10 09:22PM, Jacek =C5=81uczak wrote:
->>> Hi,
->>=20
->> Hey,
->>=20
->>> Bisection points to:
->>> [3f84d577b79d2fce8221244f2509734940609ca6] af_unix: Inherit sk_flags
->>> at connect().
->>=20
->> I'm also suffering from an issue that I have bisected to the same =
-commit,
->> although in a totally different environment and with other =
-reproduction
->> steps: For me the Xorg server crashes as soon as I re-plug my laptops
->> power chord and afterwards I can only switch to a TTY to debug. No
->> errors are logged in the dmesg.
->>=20
->> This is the relevant excerpt from the Xorg log (full one is =
-attached):
->>=20
->> [    36.544] (EE) modeset(0): Failed to set CTM property: -13
->> [    36.544] (EE) modeset(0): Failed to set CTM property: -13
->> [    36.544] (II) modeset(0): EDID vendor "LEN", prod id 16553
->> [    36.544] (II) modeset(0): Printing DDC gathered Modelines:
->> [    36.544] (II) modeset(0): Modeline "1920x1080"x0.0  138.78  1920 =
-1968 2000 2080  1080 1090 1096 1112 -hsync -vsync (66.7 kHz eP)
->> [    36.547] (EE) modeset(0): Failed to set CTM property: -13
->> [    36.547] (EE) modeset(0): Failed to set CTM property: -13
->> [    36.547] (II) modeset(0): EDID vendor "LEN", prod id 16553
->> [    36.547] (II) modeset(0): Printing DDC gathered Modelines:
->> [    36.547] (II) modeset(0): Modeline "1920x1080"x0.0  138.78  1920 =
-1968 2000 2080  1080 1090 1096 1112 -hsync -vsync (66.7 kHz eP)
->> [    36.897] (WW) modeset(0): Present-unflip: queue flip during flip =
-on CRTC 0 failed: Permission denied
->> [    37.196] (EE) modeset(0): Failed to set CTM property: -13
->> [    37.196] (EE) modeset(0): failed to set mode: No such file or =
-directory
->>=20
->>=20
->> I can also confirm that reverting the patch on top of 6.16-rc1 fixes =
-the
->> issue for me (thanks for coming up with the revert to Naim from the
->> CachyOS team!).
->>=20
->> My xorg version is 21.1.16-1 on Arch Linux and I have attached the
->> revert, my xorg log from the crash and bisection log to this mail!
->>=20
->> I'll also CC a few of the netdev people that might have further =
-insights
->> for this issue!
->>=20
->>> Reverting entire SO_PASSRIGHTS fixes the issue.
->=20
-> Thanks for the report.
->=20
-> Could you test the diff below ?
->=20
-> look like some programs start listen()ing before setting
-> SO_PASSCRED or SO_PASSPIDFD and there's a small race window.
->=20
-> ---8<---
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index fd6b5e17f6c4..87439d7f965d 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1971,7 +1971,8 @@ static void unix_maybe_add_creds(struct sk_buff =
-*skb, const struct sock *sk,
-> if (UNIXCB(skb).pid)
-> return;
->=20
-> - if (unix_may_passcred(sk) || unix_may_passcred(other)) {
-> + if (unix_may_passcred(sk) || unix_may_passcred(other) ||
-> +     !other->sk_socket) {
-> UNIXCB(skb).pid =3D get_pid(task_tgid(current));
-> current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
-> }
-> ---8<---
+Cc: Greg KH <gregkh@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linuxfoundation.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Fixes: 9961127d4bce ("NFC: nci: add generic uart support")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ net/nfc/nci/uart.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Hello,=20
-
-On my MSI Claw with Lunar Lake chipset I am unable to make it past my =
-bootloader even with this posted diff.
-I bisected and it led to af_unix: Inherit sk_flags at connect().
-
-In my case, I am unable to attach any logs because my device completely =
-freezes before the journal initializes.
-
-This diff, which makes it essentially a full revert, lets me boot into a =
-kernel built from latest master:
-
----8<---
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 22e170fb5dda..4dfe94c6d00c 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1708,7 +1708,6 @@ static int unix_stream_connect(struct socket =
-*sock, struct sockaddr *uaddr,
-        unix_peer(newsk) =3D sk;
-        newsk->sk_state =3D TCP_ESTABLISHED;
-        newsk->sk_type =3D sk->sk_type;
--       newsk->sk_scm_recv_flags =3D other->sk_scm_recv_flags;
-        init_peercred(newsk, &peercred);
-=20
-        newu =3D unix_sk(newsk);
-@@ -1840,6 +1839,7 @@ static int unix_accept(struct socket *sock, struct =
-socket *newsock,
-        unix_state_lock(tsk);
-        unix_update_edges(unix_sk(tsk));
-        newsock->state =3D SS_CONNECTED;
-+       tsk->sk_scm_recv_flags =3D READ_ONCE(sk->sk_scm_recv_flags);
-        sock_graft(tsk, newsock);
-        unix_state_unlock(tsk);
-        return 0;
----8<---
+diff --git a/net/nfc/nci/uart.c b/net/nfc/nci/uart.c
+index ed1508a9e093..aab107727f18 100644
+--- a/net/nfc/nci/uart.c
++++ b/net/nfc/nci/uart.c
+@@ -119,22 +119,22 @@ static int nci_uart_set_driver(struct tty_struct *tty, unsigned int driver)
+ 
+ 	memcpy(nu, nci_uart_drivers[driver], sizeof(struct nci_uart));
+ 	nu->tty = tty;
+-	tty->disc_data = nu;
+ 	skb_queue_head_init(&nu->tx_q);
+ 	INIT_WORK(&nu->write_work, nci_uart_write_work);
+ 	spin_lock_init(&nu->rx_lock);
+ 
+ 	ret = nu->ops.open(nu);
+ 	if (ret) {
+-		tty->disc_data = NULL;
+ 		kfree(nu);
++		return ret;
+ 	} else if (!try_module_get(nu->owner)) {
+ 		nu->ops.close(nu);
+-		tty->disc_data = NULL;
+ 		kfree(nu);
+ 		return -ENOENT;
+ 	}
+-	return ret;
++	tty->disc_data = nu;
++
++	return 0;
+ }
+ 
+ /* ------ LDISC part ------ */
+-- 
+2.45.2
 
 
