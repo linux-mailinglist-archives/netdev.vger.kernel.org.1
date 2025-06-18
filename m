@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACEB2ADE0C1
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4197ADE0C2
 	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:41:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7F4717851F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2817E1899CFB
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4DD1A2C0B;
-	Wed, 18 Jun 2025 01:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C630A1A841F;
+	Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tfqVV9Qk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1L3nMpP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B9D1A257D
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 01:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987611A76DA;
+	Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750210844; cv=none; b=W0Nxc68Y/8gGozl3/BBcB6EtM9emKs1WzpcTTdreNs285435DTVNvfSB9OdaBXDJy9LQ/iKGe7SqJ8Fsseq39mn8VIhZ0iY3F88j6sFc/Ck0NBOATwIYptvxDMWdA2E2teymS9OpJpbcnAxVcaZMuT0rmrhDiorIwyFt5IhQM1s=
+	t=1750210845; cv=none; b=eJDCImzaY+1cT87Wpr+0dhJnQXTFirIb5w2l0Ci/sDVcHaoxEH38xXOrbmQC+HIhULQNIKVnUxVBDriE0bjybyQAMp17K9+pFHtqDSWx9vTNB1kjw3D6/jeliQRosVL85vsimjM17V/caLrLkK9yB7X+rxKjR+zAtGyJdnuwwGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750210844; c=relaxed/simple;
-	bh=t41Fj3F1m2eth8O6DUdE38buJ4uioOavkJNwo+vPmJU=;
+	s=arc-20240116; t=1750210845; c=relaxed/simple;
+	bh=CPDNdYSNL6xVNSl76c7r/hPSIQ5IB5Yq4jCfuT2xYgk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LsVPG7H5dPvp5/QwQwJF8RpygvKKe46cZsdFI7hI0CBONvXd3334jUzfBkzC53qr6+O+8u4S3ZXKbqBinRR7xnPuZS+FmzxJbaNuMI8wCLePk4A4hryKG+xN7OnsBzPk7AIRu8d3QjoFnRYyUZB/j7LeJaF3Hb0+URPUpFskUsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tfqVV9Qk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BD63C4CEE3;
-	Wed, 18 Jun 2025 01:40:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=S8na8tAro3+dsPvckOB49WKkHF821C0p6skrxjAufnwFsT/VXNpKR91XDdZTQMNwNBd1Ud9qVFFL5nxIzuZ/L8KvF8EAjLMaVBPfVu0A6LZxCry0k6LdtfeD0Rf7DuCHBabYNCZIcdQLsIKUytfFzH9cV4k3axL1Tz4B9G0DSy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1L3nMpP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76741C4CEE7;
+	Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750210844;
-	bh=t41Fj3F1m2eth8O6DUdE38buJ4uioOavkJNwo+vPmJU=;
+	s=k20201202; t=1750210845;
+	bh=CPDNdYSNL6xVNSl76c7r/hPSIQ5IB5Yq4jCfuT2xYgk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tfqVV9QkOEToA4i07Wx3eI6DzCsJDAIPuzX6aSjYL3QBNK/Ibn3KNbdCSDgbv6ljJ
-	 HPUemsMbl5snz59NVR484LH/8pjy68WpxqGegmTjAh9ERGQab/q7e1FxHFz5MOeNhF
-	 B/A51QCBTldnkXZSMaFm6nx62rMkOu7xKmZFBCy1ZKvMWzOQbbC8z1abKFzDk4K2bM
-	 c9bug9b1IrOTggOzTU3Wwtk7WBztiIPTVX8/JQ8Hdj+38YhRfrCMGLjI/o7zNWByE8
-	 CyffSDYirtg51p8qifgor+MvXwwVoStxiZmIkWkP1pkw4Zu7WH5mHEvywGX3i/BG8n
-	 3Vsc5xdAo6xHA==
+	b=h1L3nMpPhuRC2UGUtItuZYwnT3ikdBj1OHsIzrxq2nlqRcqUiihgCkxg6q+jPfeiA
+	 BOBujCzAOdG8e0nbR5vpPcV4XfhBjZA7cKajGlywl4j39yIWhJjJvzjlV2UGbJf62L
+	 7tW2BwE88mReVqUYqdictoH0PanzJlrITykHpU45obXjFGjzAhQr97nADE/jIk/SYs
+	 rXmAfW9A41qFFmW+S0QGy2oWDzm7RZDCwONoxVJw9cxWm3uk4Two0/w9yG9racllpG
+	 y57GzzN04QARqMASKNWN1AOsaRur1thZGPmEph8V/QfGX2ERyBXPEpeN2T6zrK80yA
+	 oD3yDFZglgmvA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE8738111DD;
-	Wed, 18 Jun 2025 01:41:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B6239FEB6F;
+	Wed, 18 Jun 2025 01:41:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,65 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/15] ipmr,
- ip6mr: Allow MC-routing locally-generated MC packets
+Subject: Re: [PATCH net-next v2 1/3] netmem: fix netmem comments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175021087241.3761578.9440566211529797488.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Jun 2025 01:41:12 +0000
-References: <cover.1750113335.git.petrm@nvidia.com>
-In-Reply-To: <cover.1750113335.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@gmail.com, netdev@vger.kernel.org,
- horms@kernel.org, razor@blackwall.org, idosch@nvidia.com, mlxsw@nvidia.com
+ <175021087398.3761578.7087583906945747084.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Jun 2025 01:41:13 +0000
+References: <20250615203511.591438-1-almasrymina@google.com>
+In-Reply-To: <20250615203511.591438-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
+ shuah@kernel.org, sdf@fomichev.me, jdamato@fastly.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 17 Jun 2025 00:44:08 +0200 you wrote:
-> Multicast routing is today handled in the input path. Locally generated MC
-> packets don't hit the IPMR code. Thus if a VXLAN remote address is
-> multicast, the driver needs to set an OIF during route lookup. In practice
-> that means that MC routing configuration needs to be kept in sync with the
-> VXLAN FDB and MDB. Ideally, the VXLAN packets would be routed by the MC
-> routing code instead.
+On Sun, 15 Jun 2025 20:35:09 +0000 you wrote:
+> Trivial fix to a couple of outdated netmem comments. No code changes,
+> just more accurately describing current code.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> 
+> ---
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,01/15] net: ipv4: Add a flags argument to iptunnel_xmit(), udp_tunnel_xmit_skb()
-    https://git.kernel.org/netdev/net-next/c/e3411e326fa4
-  - [net-next,v3,02/15] net: ipv4: ipmr: ipmr_queue_xmit(): Drop local variable `dev'
-    https://git.kernel.org/netdev/net-next/c/3b7bc938e0ad
-  - [net-next,v3,03/15] net: ipv4: ipmr: Split ipmr_queue_xmit() in two
-    https://git.kernel.org/netdev/net-next/c/b2e653bcff0f
-  - [net-next,v3,04/15] net: ipv4: Add ip_mr_output()
-    https://git.kernel.org/netdev/net-next/c/35bec72a24ac
-  - [net-next,v3,05/15] net: ipv6: Make udp_tunnel6_xmit_skb() void
-    https://git.kernel.org/netdev/net-next/c/6a7d88ca15f7
-  - [net-next,v3,06/15] net: ipv6: Add a flags argument to ip6tunnel_xmit(), udp_tunnel6_xmit_skb()
-    https://git.kernel.org/netdev/net-next/c/f78c75d84fe8
-  - [net-next,v3,07/15] net: ipv6: ip6mr: Fix in/out netdev to pass to the FORWARD chain
-    https://git.kernel.org/netdev/net-next/c/3365afd3abda
-  - [net-next,v3,08/15] net: ipv6: ip6mr: Make ip6mr_forward2() void
-    https://git.kernel.org/netdev/net-next/c/094f39d5e84d
-  - [net-next,v3,09/15] net: ipv6: ip6mr: Split ip6mr_forward2() in two
-    https://git.kernel.org/netdev/net-next/c/1b02f4475d29
-  - [net-next,v3,10/15] net: ipv6: Add ip6_mr_output()
-    https://git.kernel.org/netdev/net-next/c/96e8f5a9fe2d
-  - [net-next,v3,11/15] vxlan: Support MC routing in the underlay
-    https://git.kernel.org/netdev/net-next/c/f8337efa4ff5
-  - [net-next,v3,12/15] selftests: forwarding: lib: Move smcrouted helpers here
-    https://git.kernel.org/netdev/net-next/c/2a719b7bacc7
-  - [net-next,v3,13/15] selftests: net: lib: Add ip_link_has_flag()
-    https://git.kernel.org/netdev/net-next/c/4baa1d3a5080
-  - [net-next,v3,14/15] selftests: forwarding: adf_mcd_start(): Allow configuring custom interfaces
-    https://git.kernel.org/netdev/net-next/c/237f84a6d24a
-  - [net-next,v3,15/15] selftests: forwarding: Add a test for verifying VXLAN MC underlay
-    https://git.kernel.org/netdev/net-next/c/e3180379e2df
+  - [net-next,v2,1/3] netmem: fix netmem comments
+    https://git.kernel.org/netdev/net-next/c/0f66b616b87c
+  - [net-next,v2,2/3] selftests: devmem: remove unused variable
+    https://git.kernel.org/netdev/net-next/c/46cbaef5d816
+  - [net-next,v2,3/3] selftests: devmem: add ipv4 support to chunks test
+    https://git.kernel.org/netdev/net-next/c/fb7612b6c44b
 
 You are awesome, thank you!
 -- 
