@@ -1,145 +1,249 @@
-Return-Path: <netdev+bounces-199033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B2C9ADEACB
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:49:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A809AADEAF7
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A8B2189F4D7
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:49:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32C593BAE0B
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB5B2EA14A;
-	Wed, 18 Jun 2025 11:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fjEpijrh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D6E2980BF;
+	Wed, 18 Jun 2025 11:55:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2732DE215;
-	Wed, 18 Jun 2025 11:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1868927EFE3
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 11:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750247212; cv=none; b=N2tOJfOvYZbYC/tycSeMMCAJTnhibLZf5QfU12omgyYB1sqEE5cWAku/FnBOx/+DW57Yufl+pTNjl1CZS+fsJxbL6d426brnqdIDvvC0ucUHDMTc2VvBxC7plC8GjvzdW41rhjZNPb+AOdOaN1SaBMKfyOF9gzxPdbeV7Ejfxtk=
+	t=1750247723; cv=none; b=RbPdJctob9Rvvk9QKcA66S1iXAvKDPBUX+yMKlT5scY8fmGsrew3TTmj8ics4nB7Fpy3MGDG/ilTxt0wmO0SVFaO/gUiQNozmFyylc7YUzSrCioV8WCkw/df+7F2dl1smCP7H2UUxdMMoK0h3um+YODsW0NBGTzf51N05zluyoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750247212; c=relaxed/simple;
-	bh=Eu6NvKMYNdmD8XfJnfUGiXHKuW5qDdQasrskHf5QPZ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O/38wzLXqEMtP7TPta0CAsbiXyrzWZ1BgzQV0WWP2BYTlBLDlWSyZJ1gOTJOFE1HtnY4B8iycwFCHJBc7JgmkHyCp2XU3+D39vNidxcCuA7ODUZeeHckN5UJ+pv8a49CUkWPtqU1yL1VhJ1O85rD0L9nW+y5EZDAKz1126vZ6iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fjEpijrh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 920EDC116B1;
-	Wed, 18 Jun 2025 11:46:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750247211;
-	bh=Eu6NvKMYNdmD8XfJnfUGiXHKuW5qDdQasrskHf5QPZ8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fjEpijrhqmBNi8KU6pghGSfrWjrHcK2mBeSSvc2NDXzB7WXtrfLdwY8ITSuZ0SLW4
-	 UOflw5ezusNQkSFMEDNC7Lin8D068h2KUvM9OXhpG6uMfCZKWAwxbd/X8pGTRtUM5f
-	 xxSn8zU6tdbY/GvwUziDCZHUxFyIH4YrtSLbpPKCCy8uKkOnoG/71aCc1i5k7ZkjcC
-	 0WyFGvHe9i51p1Y8hXnnh+3hM/uYlsVEQGfw8fkirnoyVe5qxoByk3xrPJp4Q20KK4
-	 Sfr4Sy7eDT/yGeAHl7Y5DOJXXYpsMmct0qoA5o4fy7lMEtttq6T9dimECUthi6IHQV
-	 Iuxlo5NIn76lA==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
-	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uRrFh-000000036VE-3W9N;
-	Wed, 18 Jun 2025 13:46:49 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	"Akira Yokosawa" <akiyks@gmail.com>,
-	"Breno Leitao" <leitao@debian.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Donald Hunter" <donald.hunter@gmail.com>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Ignacio Encinas Rubio" <ignacio@iencinas.com>,
-	"Jan Stancek" <jstancek@redhat.com>,
-	"Marco Elver" <elver@google.com>,
-	"Mauro Carvalho Chehab" <mchehab+huawei@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>,
-	"Ruben Wauters" <rubenru09@aol.com>,
-	"Shuah Khan" <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	joel@joelfernandes.org,
-	linux-kernel-mentees@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	lkmm@lists.linux.dev,
-	netdev@vger.kernel.org,
-	peterz@infradead.org,
-	stern@rowland.harvard.edu
-Subject: [PATCH v6 15/15] docs: sphinx: add a file with the requirements for lowest version
-Date: Wed, 18 Jun 2025 13:46:42 +0200
-Message-ID: <e5666ba0c2867a0e78ff91727e827d706ce08668.1750246291.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1750246291.git.mchehab+huawei@kernel.org>
-References: <cover.1750246291.git.mchehab+huawei@kernel.org>
+	s=arc-20240116; t=1750247723; c=relaxed/simple;
+	bh=rV1FvSLqghXqE4qzk31QsNV3iebUOeRNk3tkWm8+jkA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b7Z5Bo9FUiKm6E77BkzNMdkUIoi+yzUWOsxG0ZZvgWGljUNuvbfnyhMArdWE/eM5Ze4bNpT+YI9BV7SlA/ACT3boTlZhV5KgY0xOypgOIJmDmNbWxOZ0i7jWGqWMem188iitgvLDQfqpzqAc6dNKRKdr3XDXVIPBcnc0pOXcoGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7646E61E64783;
+	Wed, 18 Jun 2025 13:54:47 +0200 (CEST)
+Message-ID: <580ed7b6-1045-4347-a88e-edbf982cb287@molgen.mpg.de>
+Date: Wed, 18 Jun 2025 13:54:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: convert ice_add_prof() to
+ bitmap
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>
+References: <20250618112925.12193-2-przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250618112925.12193-2-przemyslaw.kitszel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Those days, it is hard to install a virtual env that would
-build docs with Sphinx 3.4.3, as even python 3.13 is not
-compatible anymore with it.
+Dear Przemek, dear Jesse,
 
-	/usr/bin/python3.9 -m venv sphinx_3.4.3
-	. sphinx_3.4.3/bin/activate
-	pip install -r Documentation/sphinx/min_requirements.txt
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- Documentation/doc-guide/sphinx.rst        | 15 +++++++++++++++
- Documentation/sphinx/min_requirements.txt |  8 ++++++++
- 2 files changed, 23 insertions(+)
- create mode 100644 Documentation/sphinx/min_requirements.txt
+Thank you for the patch.
 
-diff --git a/Documentation/doc-guide/sphinx.rst b/Documentation/doc-guide/sphinx.rst
-index 5a91df105141..13943eb532ac 100644
---- a/Documentation/doc-guide/sphinx.rst
-+++ b/Documentation/doc-guide/sphinx.rst
-@@ -131,6 +131,21 @@ It supports two optional parameters:
- ``--no-virtualenv``
- 	Use OS packaging for Sphinx instead of Python virtual environment.
- 
-+Installing Sphinx Minimal Version
-+---------------------------------
-+
-+When changing Sphinx build system, it is important to ensure that
-+the minimal version will still be supported. Nowadays, it is
-+becoming harder to do that on modern distributions, as it is not
-+possible to install with Python 3.13 and above.
-+
-+The recommended way is to use the lowest supported Python version
-+as defined at Documentation/process/changes.rst, creating
-+a venv with it with, and install minimal requirements with::
-+
-+	/usr/bin/python3.9 -m venv sphinx_min
-+	. sphinx_min/bin/activate
-+	pip install -r Documentation/sphinx/min_requirements.txt
- 
- Sphinx Build
- ============
-diff --git a/Documentation/sphinx/min_requirements.txt b/Documentation/sphinx/min_requirements.txt
-new file mode 100644
-index 000000000000..89ea36d5798f
---- /dev/null
-+++ b/Documentation/sphinx/min_requirements.txt
-@@ -0,0 +1,8 @@
-+Sphinx==3.4.3
-+jinja2<3.1
-+docutils<0.18
-+sphinxcontrib-applehelp==1.0.4
-+sphinxcontrib-devhelp==1.0.2
-+sphinxcontrib-htmlhelp==2.0.1
-+sphinxcontrib-qthelp==1.0.3
-+sphinxcontrib-serializinghtml==1.1.5
--- 
-2.49.0
+Am 18.06.25 um 13:28 schrieb Przemek Kitszel:
+> From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> 
+> Previously the ice_add_prof() took an array of u8 and looped over it with
+> for_each_set_bit(), examining each 8 bit value as a bitmap.
+> This was just hard to understand and unnecessary, and was triggering
+> undefined behavior sanitizers with unaligned accesses within bitmap
+> fields (on our internal tools/builds). Since the @ptype being passed in
+> was already declared as a bitmap, refactor this to use native types with
+> the advantage of simplifying the code to use a single loop.
 
+Any tests to verify no regressions are introduced?
+
+> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> CC: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>   .../net/ethernet/intel/ice/ice_flex_pipe.h    |  7 +-
+>   .../net/ethernet/intel/ice/ice_flex_pipe.c    | 78 +++++++------------
+>   drivers/net/ethernet/intel/ice/ice_flow.c     |  4 +-
+>   3 files changed, 34 insertions(+), 55 deletions(-)
+
+More removed lines than added ones is always a good diff stat.
+
+> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+> index 28b0897adf32..ee5d9f9c9d53 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+> @@ -39,9 +39,10 @@ bool ice_hw_ptype_ena(struct ice_hw *hw, u16 ptype);
+>   
+>   /* XLT2/VSI group functions */
+>   int
+> -ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
+> -	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
+> -	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap);
+> +ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id,
+> +	     unsigned long *ptypes, const struct ice_ptype_attributes *attr,
+> +	     u16 attr_cnt, struct ice_fv_word *es, u16 *masks, bool symm,
+> +	     bool fd_swap);
+>   struct ice_prof_map *
+>   ice_search_prof_id(struct ice_hw *hw, enum ice_block blk, u64 id);
+>   int
+> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+> index ed95072ca6e3..363ae79a3620 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+> @@ -3043,16 +3043,16 @@ ice_disable_fd_swap(struct ice_hw *hw, u8 prof_id)
+>    * the ID value used here.
+>    */
+>   int
+> -ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
+> -	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
+> -	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap)
+> +ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id,
+> +	     unsigned long *ptypes, const struct ice_ptype_attributes *attr,
+> +	     u16 attr_cnt, struct ice_fv_word *es, u16 *masks, bool symm,
+> +	     bool fd_swap)
+>   {
+> -	u32 bytes = DIV_ROUND_UP(ICE_FLOW_PTYPE_MAX, BITS_PER_BYTE);
+>   	DECLARE_BITMAP(ptgs_used, ICE_XLT1_CNT);
+>   	struct ice_prof_map *prof;
+> -	u8 byte = 0;
+> -	u8 prof_id;
+>   	int status;
+> +	u8 prof_id;
+> +	u16 ptype;
+>   
+>   	bitmap_zero(ptgs_used, ICE_XLT1_CNT);
+>   
+> @@ -3102,57 +3102,35 @@ ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
+>   	prof->context = 0;
+>   
+>   	/* build list of ptgs */
+> -	while (bytes && prof->ptg_cnt < ICE_MAX_PTG_PER_PROFILE) {
+> -		u8 bit;
+> +	for_each_set_bit(ptype, ptypes, ICE_FLOW_PTYPE_MAX) {
+> +		u8 ptg;
+>   
+> -		if (!ptypes[byte]) {
+> -			bytes--;
+> -			byte++;
+> +		/* The package should place all ptypes in a non-zero
+> +		 * PTG, so the following call should never fail.
+> +		 */
+> +		if (ice_ptg_find_ptype(hw, blk, ptype, &ptg))
+>   			continue;
+> -		}
+>   
+> -		/* Examine 8 bits per byte */
+> -		for_each_set_bit(bit, (unsigned long *)&ptypes[byte],
+> -				 BITS_PER_BYTE) {
+> -			u16 ptype;
+> -			u8 ptg;
+> -
+> -			ptype = byte * BITS_PER_BYTE + bit;
+> -
+> -			/* The package should place all ptypes in a non-zero
+> -			 * PTG, so the following call should never fail.
+> -			 */
+> -			if (ice_ptg_find_ptype(hw, blk, ptype, &ptg))
+> -				continue;
+> +		/* If PTG is already added, skip and continue */
+> +		if (test_bit(ptg, ptgs_used))
+> +			continue;
+>   
+> -			/* If PTG is already added, skip and continue */
+> -			if (test_bit(ptg, ptgs_used))
+> -				continue;
+> +		set_bit(ptg, ptgs_used);
+> +		/* Check to see there are any attributes for this ptype, and
+> +		 * add them if found.
+> +		 */
+> +		status = ice_add_prof_attrib(prof, ptg, ptype, attr, attr_cnt);
+> +		if (status == -ENOSPC)
+> +			break;
+> +		if (status) {
+> +			/* This is simple a ptype/PTG with no attribute */
+> +			prof->ptg[prof->ptg_cnt] = ptg;
+> +			prof->attr[prof->ptg_cnt].flags = 0;
+> +			prof->attr[prof->ptg_cnt].mask = 0;
+>   
+> -			__set_bit(ptg, ptgs_used);
+> -			/* Check to see there are any attributes for
+> -			 * this PTYPE, and add them if found.
+> -			 */
+> -			status = ice_add_prof_attrib(prof, ptg, ptype,
+> -						     attr, attr_cnt);
+> -			if (status == -ENOSPC)
+> +			if (++prof->ptg_cnt >= ICE_MAX_PTG_PER_PROFILE)
+>   				break;
+> -			if (status) {
+> -				/* This is simple a PTYPE/PTG with no
+> -				 * attribute
+> -				 */
+> -				prof->ptg[prof->ptg_cnt] = ptg;
+> -				prof->attr[prof->ptg_cnt].flags = 0;
+> -				prof->attr[prof->ptg_cnt].mask = 0;
+> -
+> -				if (++prof->ptg_cnt >=
+> -				    ICE_MAX_PTG_PER_PROFILE)
+> -					break;
+> -			}
+>   		}
+> -
+> -		bytes--;
+> -		byte++;
+>   	}
+>   
+>   	list_add(&prof->list, &hw->blk[blk].es.prof_map);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+> index d97b751052f2..c63e43b8b110 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_flow.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+> @@ -1421,7 +1421,7 @@ ice_flow_add_prof_sync(struct ice_hw *hw, enum ice_block blk,
+>   	}
+>   
+>   	/* Add a HW profile for this flow profile */
+> -	status = ice_add_prof(hw, blk, prof_id, (u8 *)params->ptypes,
+> +	status = ice_add_prof(hw, blk, prof_id, params->ptypes,
+>   			      params->attr, params->attr_cnt, params->es,
+>   			      params->mask, symm, true);
+>   	if (status) {
+> @@ -1617,7 +1617,7 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+>   		break;
+>   	}
+>   
+> -	status = ice_add_prof(hw, blk, id, (u8 *)prof->ptypes,
+> +	status = ice_add_prof(hw, blk, id, prof->ptypes,
+>   			      params->attr, params->attr_cnt,
+>   			      params->es, params->mask, false, false);
+>   	if (status)
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
