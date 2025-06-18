@@ -1,74 +1,62 @@
-Return-Path: <netdev+bounces-199215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B1BADF744
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:53:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334ECADF745
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 263783B3923
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:52:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E34F13B5363
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F41E218EBA;
-	Wed, 18 Jun 2025 19:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E1921931B;
+	Wed, 18 Jun 2025 19:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUl14hYy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTIo2LKW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CAC1E0B91
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 19:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9ADA1E0B91;
+	Wed, 18 Jun 2025 19:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750276380; cv=none; b=qbrak2PXC/L2DExr6mdxLenJBhjI1Mbts0pCYmY2UGBbqKZRkNAy5NIXZTm+B+I1g9ks6gkep8+afhVDsiptgCnAeRmDn9RlTOgTMrp0tg7JnHVIGJaeeCpCFbK0iEjJDTw2ZeuY5Bi9Xaqr3UzLw8WElsqFNCLaLsVF3/0DUIk=
+	t=1750276394; cv=none; b=qElRkBWoIRCCdi7afCPv2cFzgoP7V0wszqn4dZDe5yitN/59P8gtg7RA3YLEIp7zkztjHjnnLmk6l15dO685NRyeVLtMUCau3rGuLkmiIQPml2ghV6V/IUhOcrz0om840HKUwdjR1p9wnllDubOmExc6qZLbmns9/O2HK+46d9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750276380; c=relaxed/simple;
-	bh=Df4uybVq0INmI+tUI3DD5faVB+fT+oyAmjUGI9y3sas=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mi29n6N2ngWzs1jqh+5tjP6RfFGw4KzL931cMz3PZh3OPYX/Qboxk2CG2O0SCIkyMNMmDBjZnlnPBaInqH0KTdLULwX7iqQa1IegDlDl+D3k4YaiU0uS7NMIxF61RCSk/bBowwDDO51iiWsdbP82jur57QiKxy0d+qIg/7G9U9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZUl14hYy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750276377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TEUK2iYhSISuYbhQ8sfXPieZPIqAkTCAr0cGeA8h18I=;
-	b=ZUl14hYyyAD5XtniYFLcunL9QYsnIw7eApJO+mxx0jD3bey2sc46kb+gkVUaZoCvkuOKJH
-	lPJr2C+CmIRsg5nK/jNuUF9b69fhNh92CMtekiisv5pe0UZNEqmnL1wDxDZU+6SD4YNPKg
-	9OACElThCmiKg/R4MbjGW8VHDhP+I7s=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-32-FPh4BImVPFWtyhUVmE0FaA-1; Wed,
- 18 Jun 2025 15:52:52 -0400
-X-MC-Unique: FPh4BImVPFWtyhUVmE0FaA-1
-X-Mimecast-MFC-AGG-ID: FPh4BImVPFWtyhUVmE0FaA_1750276371
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9536F180028D;
-	Wed, 18 Jun 2025 19:52:50 +0000 (UTC)
-Received: from dechen-thinkpadx1carbongen9.rht.csb (dhcp129-124.rdu.redhat.com [10.13.129.124])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9B9F918003FC;
-	Wed, 18 Jun 2025 19:52:48 +0000 (UTC)
-From: Dennis Chen <dechen@redhat.com>
-To: netdev@vger.kernel.org
-Cc: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
+	s=arc-20240116; t=1750276394; c=relaxed/simple;
+	bh=oPU7685ZJ45AjRsgwSe2lgXLJwMXeypEgdbEMPJe2vc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PRbGwIcdk4YDux5UncNehNsgEmLd4xsePZdOJshp1lxMm38jbhhviiUUpdMovAk3YZ9QytvZbngrmvOfBLDZxQOzrK5yxFNadjYxhQ2L5U9zURpn0tb5BD7fSPaCgudBobT7KGC4eGDRBiorOoOfXi069X0m0McIAf0c4w9Hr5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTIo2LKW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2377CC4CEE7;
+	Wed, 18 Jun 2025 19:53:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750276394;
+	bh=oPU7685ZJ45AjRsgwSe2lgXLJwMXeypEgdbEMPJe2vc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bTIo2LKWrQmMfucTfZhxO4p9e3pTYIQbc0DAJAWc5jdTuTrcpW0yHZ5gpuiAlxY0t
+	 3suoh0Bol753Y6XPBjgkcENJZLY7kRF18nLC53EvBlZXOJMr4c4a13qWuuaCSXrjek
+	 aAtF3fi94ztvqMr6TskS7p5sck2agv36aERLyjhBd1J3Pe1wa8c5cKXTlQ+IUQVVrX
+	 A2Q8t2n2fdCDnmSInKFtKYtMNXdh/XugomTpbIivILWo1+sUbOSuhYZdS4eKOl+dhG
+	 hzdZRlC/8cbLL2GoziL9BrhNDe73LFklxt6JhcdJ+vlUqkqh12gLJF+sTapKVps3YY
+	 Wm41Uhd59vXWg==
+From: carlos.bilbao@kernel.org
+To: jv@jvosburgh.net,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	Dennis Chen <dechen@redhat.com>
-Subject: [PATCH net] i40e: report VF tx_dropped with tx_errors instead of tx_discards
-Date: Wed, 18 Jun 2025 15:52:40 -0400
-Message-ID: <20250618195240.95454-1-dechen@redhat.com>
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: sforshee@kernel.org,
+	bilbao@vt.edu,
+	Carlos Bilbao <carlos.bilbao@kernel.org>
+Subject: [PATCH] bonding: Improve the accuracy of LACPDU transmissions
+Date: Wed, 18 Jun 2025 14:53:09 -0500
+Message-ID: <20250618195309.368645-1-carlos.bilbao@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,101 +64,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Currently the tx_dropped field in VF stats is not updated correctly
-when reading stats from the PF. This is because it reads from
-i40e_eth_stats.tx_discards which seems to be unused for per VSI stats,
-as it is not updated by i40e_update_eth_stats() and the corresponding
-register, GLV_TDPC, is not implemented[1].
+From: Carlos Bilbao <carlos.bilbao@kernel.org>
 
-Use i40e_eth_stats.tx_errors instead, which is actually updated by
-i40e_update_eth_stats() by reading from GLV_TEPC.
+Improve the timing accuracy of LACPDU transmissions in the bonding 802.3ad
+(LACP) driver. The current approach relies on a decrementing counter to
+limit the transmission rate. In our experience, this method is susceptible
+to delays (such as those caused by CPU contention or soft lockups) which
+can lead to accumulated drift in the LACPDU send interval. Over time, this
+drift can cause synchronization issues with the top-of-rack (ToR) switch
+managing the LAG, manifesting as lag map flapping. This in turn can trigger
+temporary interface removal and potential packet loss.
 
-To test, create a VF and try to send bad packets through it:
+This patch improves stability with a jiffies-based mechanism to track and
+enforce the minimum transmission interval; keeping track of when the next
+LACPDU should be sent.
 
-$ echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
-$ cat test.py
-from scapy.all import *
-
-vlan_pkt = Ether(dst="ff:ff:ff:ff:ff:ff") / Dot1Q(vlan=999) / IP(dst="192.168.0.1") / ICMP()
-ttl_pkt = IP(dst="8.8.8.8", ttl=0) / ICMP()
-
-print("Send packet with bad VLAN tag")
-sendp(vlan_pkt, iface="enp2s0f0v0")
-print("Send packet with TTL=0")
-sendp(ttl_pkt, iface="enp2s0f0v0")
-$ ip -s link show dev enp2s0f0
-16: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
-    link/ether 3c:ec:ef:b7:e0:ac brd ff:ff:ff:ff:ff:ff
-    RX:  bytes packets errors dropped  missed   mcast
-             0       0      0       0       0       0
-    TX:  bytes packets errors dropped carrier collsns
-             0       0      0       0       0       0
-    vf 0     link/ether e2:c6:fd:c1:1e:92 brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
-    RX: bytes  packets  mcast   bcast   dropped
-             0        0       0       0        0
-    TX: bytes  packets   dropped
-             0        0        0
-$ python test.py
-Send packet with bad VLAN tag
-.
-Sent 1 packets.
-Send packet with TTL=0
-.
-Sent 1 packets.
-$ ip -s link show dev enp2s0f0
-16: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
-    link/ether 3c:ec:ef:b7:e0:ac brd ff:ff:ff:ff:ff:ff
-    RX:  bytes packets errors dropped  missed   mcast
-             0       0      0       0       0       0
-    TX:  bytes packets errors dropped carrier collsns
-             0       0      0       0       0       0
-    vf 0     link/ether e2:c6:fd:c1:1e:92 brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
-    RX: bytes  packets  mcast   bcast   dropped
-             0        0       0       0        0
-    TX: bytes  packets   dropped
-             0        0        0
-
-A packet with non-existent VLAN tag and a packet with TTL = 0 are sent,
-but tx_dropped is not incremented.
-
-After patch:
-
-$ ip -s link show dev enp2s0f0
-19: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
-    link/ether 3c:ec:ef:b7:e0:ac brd ff:ff:ff:ff:ff:ff
-    RX:  bytes packets errors dropped  missed   mcast
-             0       0      0       0       0       0
-    TX:  bytes packets errors dropped carrier collsns
-             0       0      0       0       0       0
-    vf 0     link/ether 4a:b7:3d:37:f7:56 brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
-    RX: bytes  packets  mcast   bcast   dropped
-             0        0       0       0        0
-    TX: bytes  packets   dropped
-             0        0        2
-
-Fixes: dc645daef9af5bcbd9c ("i40e: implement VF stats NDO")
-Signed-off-by: Dennis Chen <dechen@redhat.com>
-    Link: https://www.intel.com/content/www/us/en/content-details/596333/intel-ethernet-controller-x710-tm4-at2-carlsville-datasheet.html
+Suggested-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
+Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
 ---
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/bonding/bond_3ad.c | 18 ++++++++----------
+ include/net/bond_3ad.h         |  5 +----
+ 2 files changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 88e6bef69342..2dbe38eb9494 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -5006,7 +5006,7 @@ int i40e_get_vf_stats(struct net_device *netdev, int vf_id,
- 	vf_stats->broadcast  = stats->rx_broadcast;
- 	vf_stats->multicast  = stats->rx_multicast;
- 	vf_stats->rx_dropped = stats->rx_discards + stats->rx_discards_other;
--	vf_stats->tx_dropped = stats->tx_discards;
-+	vf_stats->tx_dropped = stats->tx_errors;
- 
- 	return 0;
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index c6807e473ab7..47610697e4e5 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -1375,10 +1375,12 @@ static void ad_churn_machine(struct port *port)
+  */
+ static void ad_tx_machine(struct port *port)
+ {
+-	/* check if tx timer expired, to verify that we do not send more than
+-	 * 3 packets per second
+-	 */
+-	if (port->sm_tx_timer_counter && !(--port->sm_tx_timer_counter)) {
++	unsigned long now = jiffies;
++
++	/* Check if enough time has passed since the last LACPDU sent */
++	if (time_after_eq(now, port->sm_tx_next_jiffies)) {
++		port->sm_tx_next_jiffies += ad_ticks_per_sec / AD_MAX_TX_IN_SECOND;
++
+ 		/* check if there is something to send */
+ 		if (port->ntt && (port->sm_vars & AD_PORT_LACP_ENABLED)) {
+ 			__update_lacpdu_from_port(port);
+@@ -1395,10 +1397,6 @@ static void ad_tx_machine(struct port *port)
+ 				port->ntt = false;
+ 			}
+ 		}
+-		/* restart tx timer(to verify that we will not exceed
+-		 * AD_MAX_TX_IN_SECOND
+-		 */
+-		port->sm_tx_timer_counter = ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
+ 	}
  }
+ 
+@@ -2199,9 +2197,9 @@ void bond_3ad_bind_slave(struct slave *slave)
+ 		/* actor system is the bond's system */
+ 		__ad_actor_update_port(port);
+ 		/* tx timer(to verify that no more than MAX_TX_IN_SECOND
+-		 * lacpdu's are sent in one second)
++		 * lacpdu's are sent in the configured interval (1 or 30 secs))
+ 		 */
+-		port->sm_tx_timer_counter = ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
++		port->sm_tx_next_jiffies = jiffies + ad_ticks_per_sec / AD_MAX_TX_IN_SECOND;
+ 
+ 		__disable_port(port);
+ 
+diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+index 2053cd8e788a..956d4cb45db1 100644
+--- a/include/net/bond_3ad.h
++++ b/include/net/bond_3ad.h
+@@ -231,10 +231,7 @@ typedef struct port {
+ 	mux_states_t sm_mux_state;	/* state machine mux state */
+ 	u16 sm_mux_timer_counter;	/* state machine mux timer counter */
+ 	tx_states_t sm_tx_state;	/* state machine tx state */
+-	u16 sm_tx_timer_counter;	/* state machine tx timer counter
+-					 * (always on - enter to transmit
+-					 *  state 3 time per second)
+-					 */
++	unsigned long sm_tx_next_jiffies;/* expected jiffies for next LACPDU sent */
+ 	u16 sm_churn_actor_timer_counter;
+ 	u16 sm_churn_partner_timer_counter;
+ 	u32 churn_actor_count;
 -- 
-2.49.0
+2.43.0
 
 
