@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-198856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4197ADE0C2
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:41:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B52EAADE0C6
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2817E1899CFB
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:41:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FB5E17A380
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C630A1A841F;
-	Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453C31C54AA;
+	Wed, 18 Jun 2025 01:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1L3nMpP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P9fLrjK4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987611A76DA;
-	Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226001C1F22
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 01:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750210845; cv=none; b=eJDCImzaY+1cT87Wpr+0dhJnQXTFirIb5w2l0Ci/sDVcHaoxEH38xXOrbmQC+HIhULQNIKVnUxVBDriE0bjybyQAMp17K9+pFHtqDSWx9vTNB1kjw3D6/jeliQRosVL85vsimjM17V/caLrLkK9yB7X+rxKjR+zAtGyJdnuwwGE=
+	t=1750210847; cv=none; b=rSKMrPOaeMTWeWQMG+TQV2owiiWj8UdPZ6vNi2F/JVGOFqYmlEL3MPFZLdkzy4j3Z8jlyMqjL3d5pjnx2hqOQ4dzbs59loywLmnFXSrnEeYJSsQeI0j9tAFP86Dehyof1QkRMw3kIWRumh673xIbDtHljIRMP7J4eKtK462XNVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750210845; c=relaxed/simple;
-	bh=CPDNdYSNL6xVNSl76c7r/hPSIQ5IB5Yq4jCfuT2xYgk=;
+	s=arc-20240116; t=1750210847; c=relaxed/simple;
+	bh=shkgRdsq0oMcO63KauYOVczjozHUqma8bF+4DiAQ+64=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S8na8tAro3+dsPvckOB49WKkHF821C0p6skrxjAufnwFsT/VXNpKR91XDdZTQMNwNBd1Ud9qVFFL5nxIzuZ/L8KvF8EAjLMaVBPfVu0A6LZxCry0k6LdtfeD0Rf7DuCHBabYNCZIcdQLsIKUytfFzH9cV4k3axL1Tz4B9G0DSy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1L3nMpP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76741C4CEE7;
-	Wed, 18 Jun 2025 01:40:45 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BeaYW2GJrtUMRiDMkJz3N0GWGVn9ymU4Jf6e3KPoPkPjBUiRCUq3QNUy39aW2hOYYjP39gOh4QS5vpKMA9TtdlT94dtAlmyRiSlNaznPD4G6TE2RV+vOvpyGuZrAjASTlszxoJSd+gzcGIUGH2OYQHkOhcvLqhp55liYESkDskI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P9fLrjK4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACF9AC4CEF1;
+	Wed, 18 Jun 2025 01:40:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750210845;
-	bh=CPDNdYSNL6xVNSl76c7r/hPSIQ5IB5Yq4jCfuT2xYgk=;
+	s=k20201202; t=1750210846;
+	bh=shkgRdsq0oMcO63KauYOVczjozHUqma8bF+4DiAQ+64=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h1L3nMpPhuRC2UGUtItuZYwnT3ikdBj1OHsIzrxq2nlqRcqUiihgCkxg6q+jPfeiA
-	 BOBujCzAOdG8e0nbR5vpPcV4XfhBjZA7cKajGlywl4j39yIWhJjJvzjlV2UGbJf62L
-	 7tW2BwE88mReVqUYqdictoH0PanzJlrITykHpU45obXjFGjzAhQr97nADE/jIk/SYs
-	 rXmAfW9A41qFFmW+S0QGy2oWDzm7RZDCwONoxVJw9cxWm3uk4Two0/w9yG9racllpG
-	 y57GzzN04QARqMASKNWN1AOsaRur1thZGPmEph8V/QfGX2ERyBXPEpeN2T6zrK80yA
-	 oD3yDFZglgmvA==
+	b=P9fLrjK4UXPfczqfWKL8iLQiKcCnN7zSc/cbDSTD5dvBpuvsMV3BIMrPlIwEHqSr1
+	 aXNWJFe9FK3FnG53CQD6OFIAUjfj3B1u3iMvUGZldb9ecPUZi6UsXz+iFPM4uLL2eG
+	 rRabqaVxwBLIu6GXLzDXF9MMFww5SdIDZ+HOkDL7PDSy8hymymi9BsqqUeAddzVgu4
+	 ZehoRHmsQPCNpjdP4/OIWZ6d/yaermRZNs/ZAUYcrMYt5bhu1j6eC84kh2uYLw2Sd1
+	 Aet3SjbHqw1DjZHXIPMNyTbv8/Ld1Zub1QJ24J0bi5dIQHW7w5rRkLK8xj1qtAOyMn
+	 XQcFf/e3davDw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B6239FEB6F;
-	Wed, 18 Jun 2025 01:41:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B8338111DD;
+	Wed, 18 Jun 2025 01:41:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 1/3] netmem: fix netmem comments
+Subject: Re: [PATCH net-next v2 0/3] Misc vlan cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175021087398.3761578.7087583906945747084.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Jun 2025 01:41:13 +0000
-References: <20250615203511.591438-1-almasrymina@google.com>
-In-Reply-To: <20250615203511.591438-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
- shuah@kernel.org, sdf@fomichev.me, jdamato@fastly.com
+ <175021087524.3761578.17869990457841609350.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Jun 2025 01:41:15 +0000
+References: <20250616132626.1749331-1-gal@nvidia.com>
+In-Reply-To: <20250616132626.1749331-1-gal@nvidia.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 15 Jun 2025 20:35:09 +0000 you wrote:
-> Trivial fix to a couple of outdated netmem comments. No code changes,
-> just more accurately describing current code.
+On Mon, 16 Jun 2025 16:26:23 +0300 you wrote:
+> This patch series addresses compilation issues with objtool when VLAN
+> support is disabled (CONFIG_VLAN_8021Q=n) and makes related improvements
+> to the VLAN infrastructure.
 > 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
+> When CONFIG_VLAN_8021Q=n, CONFIG_OBJTOOL=y, and CONFIG_OBJTOOL_WERROR=y,
+> the following compilation error occurs:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/3] netmem: fix netmem comments
-    https://git.kernel.org/netdev/net-next/c/0f66b616b87c
-  - [net-next,v2,2/3] selftests: devmem: remove unused variable
-    https://git.kernel.org/netdev/net-next/c/46cbaef5d816
-  - [net-next,v2,3/3] selftests: devmem: add ipv4 support to chunks test
-    https://git.kernel.org/netdev/net-next/c/fb7612b6c44b
+  - [net-next,v2,1/3] net: vlan: Make is_vlan_dev() a stub when VLAN is not configured
+    https://git.kernel.org/netdev/net-next/c/2de1ba0887e5
+  - [net-next,v2,2/3] net: vlan: Replace BUG() with WARN_ON_ONCE() in vlan_dev_* stubs
+    https://git.kernel.org/netdev/net-next/c/60a8b1a5d082
+  - [net-next,v2,3/3] net: vlan: Use IS_ENABLED() helper for CONFIG_VLAN_8021Q guard
+    https://git.kernel.org/netdev/net-next/c/9c5f5a5bf0da
 
 You are awesome, thank you!
 -- 
