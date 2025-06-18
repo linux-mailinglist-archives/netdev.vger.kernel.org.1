@@ -1,50 +1,71 @@
-Return-Path: <netdev+bounces-199221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80BEDADF7B0
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:30:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5795ADF7D3
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:39:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12AED17790C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:30:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D605164DE5
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1D71D63C2;
-	Wed, 18 Jun 2025 20:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EDA21B9F0;
+	Wed, 18 Jun 2025 20:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K96cTTjd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qneuOEFx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D09121C17D
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C824188006
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750278595; cv=none; b=jYxnlBUTVdY7pMb8eRuo7+a0CqTZVVX49r7W70+Tf+KLs1Svz/140eOBaQwBT9tjbSd7buCmMSa9Ezvq16TmyLXYifpxwAH2QrNUF7TR3lMcxoxZav64bUHwsjHlFn2qUYZmgK/fIOZpCNeRW9ooYmzM5ylmgNCHQOjXwkiy+WI=
+	t=1750279141; cv=none; b=KJvEm5UNgt9oSnl37dEWHFKcwak9RzA6l8tMmG2N0gYrVoc0aAyP3L3whlplz71mnACUzrLWCUZJm/vQm5dc8OYH3mpki1R4ixb9VLVcbjcvr2e4CAFXL4wY47L9STvOX6Xt091Irk206FDLPWAZcxiuX4ak71y0IxKHXlLW3pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750278595; c=relaxed/simple;
-	bh=GPiJq6EIs3EurNaCXhqyBPJfW4n3klyTEaZ1sxjArRU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KVSk39DLI03SwgFaYd+lmXsDGtvw9XRDtmWbwF/j8P5ALGZHCrjz8DQGGsjPmFaEvfwtPuJrkNNpQo8hFSyNS3RybASE3zZ2zqs3wjRfDocHocW9ElevrAtKsNM3qsJ5+iPzgsc9vdAzKg9n1P/NcTuaIH5otbSod1E22jl4JGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K96cTTjd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8A5FC4CEE7;
-	Wed, 18 Jun 2025 20:29:54 +0000 (UTC)
+	s=arc-20240116; t=1750279141; c=relaxed/simple;
+	bh=Z1Kesft2KmeKXaJXdvQmIir0e5I0Q7Bat/zqr9NXxSA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RgmjFZsxMYI10LrEpLdZCrp1DMkjVtWOcV4mn6ylpumGR3/On8mU/9Z6TP5vnzSbjnPr+Riz+FgdO/3IaddKBBDOq08tdvOheVYO2xYnWAE+RXehYy8dIY8MpBqPVSUk+SJspWxRyxI4bN0YdfQrJQjft8R+CPR6tS/sAA7HhoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qneuOEFx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76852C4CEE7;
+	Wed, 18 Jun 2025 20:39:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750278594;
-	bh=GPiJq6EIs3EurNaCXhqyBPJfW4n3klyTEaZ1sxjArRU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K96cTTjdMja7MIwbbg8lK165OSTxE4yj4D40w5QXxToC1BCypIwXe2MUuSPYMCOsO
-	 NffdcKcnkDXfQMPbsZwNZ4/OcrDPXVGYjgNjJSzJywp2clsDkjqK8+2Mepu3YqKIP/
-	 SWJ+9Onc3xc7jl+GgIONqpE1yjbJpqk2KZIcF/41g6FU+oqlM7u52TZQkCh73Est5q
-	 U2HRARP/5meqwEz7+B8TA6QkoU30YQdWhWR69Fg/G6C4iEpYx29QBv1EJIR4QhirqJ
-	 zYnotXaiBQYVTpnrqDcGgheGsQxyy+RcRZjvZdaI+8y8gzCh9BNC/GGueByIu6u7Uk
-	 IplTVGcOyQx1g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B433806649;
-	Wed, 18 Jun 2025 20:30:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750279141;
+	bh=Z1Kesft2KmeKXaJXdvQmIir0e5I0Q7Bat/zqr9NXxSA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qneuOEFxwJMrPlp71MuWjtWcm+sjzPU432wi+/vRaGpGsBKUP8VLjeHd7CgK5ViM/
+	 FL4ih+uXNRJUJjtfUoVkgpxhsbx7gucDV+J5UNvH0JqSeqc9bgnYlpg+v6mYZ3egLp
+	 y8B+PMpZi4YN/oOffXWOwesTbNc8mjYiIvPp+PSH/nYIjThZa55JxLBy0NziVvAeO5
+	 IqsfLwT9NnMVj6l41K18ki12OssBsyyfhDv15szUIVDk1PXyXRZyhtFRN5izR3hOpy
+	 Ntiwm+QlgdgykmJ4BrLQacZgQi1TiYPOhn5xX+Pp+c4USet4BdfVsZ2qfCoS6NYJ26
+	 hFlKhq6e3qv+A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	ajit.khaparde@broadcom.com,
+	sriharsha.basavapatna@broadcom.com,
+	somnath.kotur@broadcom.com,
+	shenjian15@huawei.com,
+	salil.mehta@huawei.com,
+	shaojijie@huawei.com,
+	cai.huoqing@linux.dev,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	louis.peens@corigine.com,
+	mbloch@nvidia.com,
+	manishc@marvell.com,
+	ecree.xilinx@gmail.com,
+	joe@dama.to,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 00/10] eth: finish migration to the new RXFH callbacks
+Date: Wed, 18 Jun 2025 13:38:13 -0700
+Message-ID: <20250618203823.1336156-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,56 +73,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] eth: migrate some drivers to new RXFH
- callbacks
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175027862274.246778.380508616545971353.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Jun 2025 20:30:22 +0000
-References: <20250617014555.434790-1-kuba@kernel.org>
-In-Reply-To: <20250617014555.434790-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shayagr@amazon.com, akiyano@amazon.com, darinzon@amazon.com,
- skalluru@marvell.com, manishc@marvell.com, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com
 
-Hello:
+Finish drivers conversions to callbacks added by
+commit 9bb00786fc61 ("net: ethtool: add dedicated callbacks for
+getting and setting rxfh fields"). Remove the conditional calling
+in the core, rxnfc callbacks are no longer used for RXFH.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Jakub Kicinski (10):
+  eth: sfc: falcon: migrate to new RXFH callbacks
+  eth: sfc: siena: migrate to new RXFH callbacks
+  eth: sfc: migrate to new RXFH callbacks
+  eth: benet: migrate to new RXFH callbacks
+  eth: qede: migrate to new RXFH callbacks
+  eth: mlx5: migrate to new RXFH callbacks
+  eth: nfp: migrate to new RXFH callbacks
+  eth: hinic: migrate to new RXFH callbacks
+  eth: hns3: migrate to new RXFH callbacks
+  net: ethtool: don't mux RXFH via rxnfc callbacks
 
-On Mon, 16 Jun 2025 18:45:50 -0700 you wrote:
-> Migrate a batch of drivers to the recently added dedicated
-> .get_rxfh_fields and .set_rxfh_fields ethtool callbacks.
-> 
-> Jakub Kicinski (5):
->   eth: bnx2x: migrate to new RXFH callbacks
->   eth: bnxt: migrate to new RXFH callbacks
->   eth: ena: migrate to new RXFH callbacks
->   eth: thunder: migrate to new RXFH callbacks
->   eth: otx2: migrate to new RXFH callbacks
-> 
-> [...]
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   4 +-
+ .../hns3/hns3_common/hclge_comm_rss.h         |   4 +-
+ .../mellanox/mlx5/core/en/fs_ethtool.h        |  14 +++
+ drivers/net/ethernet/sfc/ethtool_common.h     |   2 +
+ .../net/ethernet/sfc/siena/ethtool_common.h   |   2 +
+ .../net/ethernet/emulex/benet/be_ethtool.c    |  57 +++++-----
+ .../hns3/hns3_common/hclge_comm_rss.c         |   6 +-
+ .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  33 ++++--
+ .../hisilicon/hns3/hns3pf/hclge_main.c        |   4 +-
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      |   4 +-
+ .../net/ethernet/huawei/hinic/hinic_ethtool.c |  47 +++-----
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  19 ++++
+ .../mellanox/mlx5/core/en_fs_ethtool.c        |  25 ++---
+ .../mellanox/mlx5/core/ipoib/ethtool.c        |  19 ++++
+ .../ethernet/netronome/nfp/nfp_net_ethtool.c  |  17 +--
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  22 ++--
+ drivers/net/ethernet/sfc/ethtool.c            |   1 +
+ drivers/net/ethernet/sfc/ethtool_common.c     | 104 +++++++++---------
+ drivers/net/ethernet/sfc/falcon/ethtool.c     |  51 +++++----
+ drivers/net/ethernet/sfc/siena/ethtool.c      |   1 +
+ .../net/ethernet/sfc/siena/ethtool_common.c   |  77 ++++++-------
+ net/ethtool/ioctl.c                           |  59 +++-------
+ 22 files changed, 308 insertions(+), 264 deletions(-)
 
-Here is the summary with links:
-  - [net-next,1/5] eth: bnx2x: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/f1a6fcc454dd
-  - [net-next,2/5] eth: bnxt: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/82113468a088
-  - [net-next,3/5] eth: ena: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/e7860a6e1826
-  - [net-next,4/5] eth: thunder: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/e8b87384391b
-  - [net-next,5/5] eth: otx2: migrate to new RXFH callbacks
-    https://git.kernel.org/netdev/net-next/c/f99ff3c2a328
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0
 
 
