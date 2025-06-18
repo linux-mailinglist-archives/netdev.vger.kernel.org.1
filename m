@@ -1,105 +1,123 @@
-Return-Path: <netdev+bounces-198911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F721ADE4A9
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:39:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0E3ADE4B8
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8867177E9B
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:39:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAA4A1890D0C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9424527E07D;
-	Wed, 18 Jun 2025 07:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F8B27EC98;
+	Wed, 18 Jun 2025 07:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmGbiLy3"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ygjFBizO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC972F533D
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C8C1EF389;
+	Wed, 18 Jun 2025 07:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750232352; cv=none; b=fV2oc8eIMTCUR2+krs8Ljn8EPTN7CaIKdtPq2RDmuIjqmFp2wEDGrrboL7FNISLgtgw1jins9oy/7c+JY9WlDs4JjhxI8TiF9PZoMSXnEcTV5N20XAi92YE4a9mVFvymNtZJwABfD21z+yhtH/RJjQstZiyrwJen/k1pvsH4D90=
+	t=1750232699; cv=none; b=KEnptIqutrsflHhQKs8OLk+dMZJ+yx6v7GMQVaXS6pcjhFY11xJP1UqLOhcbm1C2cF0pxQBYEzGvV4k/AP3s+TqdL+yGuoxE2BSU6a1er9aXNu5YI9jY7QGwYntLZxKLa0NJ7+/VBokg15upbIj580VvIZN9T8sJuwiUJuio6z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750232352; c=relaxed/simple;
-	bh=BXfpVsjWF0Y78+XsAp5AT1RaqbCb/hX1z9JCJ/YUswA=;
+	s=arc-20240116; t=1750232699; c=relaxed/simple;
+	bh=FFNidNQVJhVMPvZDCBwpffmyOW0CnVZwvZqZUZahEbc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GaUgZT0wsQMGbMKfMjcfYUwxDJp2H7/1x99lZJ6Pp6yIqqRTNsp2BQwJ2hoVbj9ug4z/wNe6toSGk8A5NxdJutmJJAepyuzFRvaLC8LVGl9q1zcWQ8ZbrTGJR919sEozMj7TknGl5ocvPe2YbO33WnY1FpbQKj0zVryESBL/P6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmGbiLy3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C502C4CEE7;
-	Wed, 18 Jun 2025 07:39:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750232351;
-	bh=BXfpVsjWF0Y78+XsAp5AT1RaqbCb/hX1z9JCJ/YUswA=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=mpHYQ9rVYF4z4I5oQnkl2wtKItedi+2vSCRIQrM1EPhu8VTdEozXNZaT2i+6Y+AVbNv1inQy5MNuZlTkLhAb83NQKwy4V+ECb3dIOGn2hCJCxzchKwSLqC3X8XietRfVnwsdgH0/bwUkmg84QiWicqLxJKY1RVK3PoW6KG/9qSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ygjFBizO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A623CC4CEE7;
+	Wed, 18 Jun 2025 07:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1750232699;
+	bh=FFNidNQVJhVMPvZDCBwpffmyOW0CnVZwvZqZUZahEbc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QmGbiLy3WreaKTciX0axCUsGg49kV6/sc/gGCErHdNBCr99cH1GrPnVnlkJOm3+9q
-	 BundZ2J83ddUDvMbMMGvzpQNdCmzuFG+XHKPDvjdS6t3KKfkA70OxFqhYgjxdZG+bu
-	 fu6yO9HZFnBHZEoi4R813zfAebXLbBe47i/az/jhEOp4BB6kFk6y+NL+i8TFRqvMJa
-	 I4TpX416cZrCLTYFJhY4jIU69QiI74Cejg3LIujQV8p1xJooyiQvw6hM30KbuWen2D
-	 7uvL2iXHoW0ux/Q/kauhuhxLIG85Fgi2/zjsrpubX3GwrP5a0S6jz8ueLfMsmYWVJL
-	 /uySsCko3bqgw==
-Date: Wed, 18 Jun 2025 09:39:09 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=ygjFBizOCM1fgb9sj+yJSWW2zJ1e7Z4lQU3fMQjVZne+1nYCdeD4dfHmBD5b9lN1H
+	 Ld/WnlAt6sSO6i/HaxMIHPu21h8/t7Zn8jU45pkTl3CMFML+o/pplBptXsjRMS+qO1
+	 1mDvLWLSeIJ0NA0ok9J7U3TalsTn+zTDDBAD0LEk=
+Date: Wed, 18 Jun 2025 09:44:56 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Always check return value from
- airoha_ppe_foe_get_entry()
-Message-ID: <aFJtHUmhoqjJUN9T@lore-desk>
-References: <20250616-check-ret-from-airoha_ppe_foe_get_entry-v1-1-1acae5d677f7@kernel.org>
- <20250617153131.56a783c4@kernel.org>
+	Vincent Cuissard <cuissard@marvell.com>,
+	Samuel Ortiz <sameo@linux.intel.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Linus Torvalds <torvalds@linuxfoundation.org>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] NFC: nci: uart: Set tty->disc_data only in success path
+Message-ID: <2025061838-frustrate-operative-bd34@gregkh>
+References: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="uo43+w1z7RWJd+56"
-Content-Disposition: inline
-In-Reply-To: <20250617153131.56a783c4@kernel.org>
-
-
---uo43+w1z7RWJd+56
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
 
-> On Mon, 16 Jun 2025 12:27:06 +0200 Lorenzo Bianconi wrote:
-> > Subject: [PATCH net-next] net: airoha: Always check return value from a=
-iroha_ppe_foe_get_entry()
-> >=20
-> > airoha_ppe_foe_get_entry routine can return NULL, so check the returned
-> > pointer is not NULL in airoha_ppe_foe_flow_l2_entry_update()
-> >=20
-> > Fixes: b81e0f2b58be3 ("net: airoha: Add FLOW_CLS_STATS callback support=
-")
->=20
-> Looks like the commit under fixes is in net, is the tree in the subject
-> wrong?
+On Wed, Jun 18, 2025 at 09:36:50AM +0200, Krzysztof Kozlowski wrote:
+> Setting tty->disc_data before opening the NCI device means we need to
+> clean it up on error paths.  This also opens some short window if device
+> starts sending data, even before NCIUARTSETDRIVER IOCTL succeeded
+> (broken hardware?).  Close the window by exposing tty->disc_data only on
+> the success path, when opening of the NCI device and try_module_get()
+> succeeds.
+> 
+> The code differs in error path in one aspect: tty->disc_data won't be
+> ever assigned thus NULL-ified.  This however should not be relevant
+> difference, because of "tty->disc_data=NULL" in nci_uart_tty_open().
+> 
+> Cc: Greg KH <gregkh@linuxfoundation.org>
+> Cc: Linus Torvalds <torvalds@linuxfoundation.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Fixes: 9961127d4bce ("NFC: nci: add generic uart support")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  net/nfc/nci/uart.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/nfc/nci/uart.c b/net/nfc/nci/uart.c
+> index ed1508a9e093..aab107727f18 100644
+> --- a/net/nfc/nci/uart.c
+> +++ b/net/nfc/nci/uart.c
+> @@ -119,22 +119,22 @@ static int nci_uart_set_driver(struct tty_struct *tty, unsigned int driver)
+>  
+>  	memcpy(nu, nci_uart_drivers[driver], sizeof(struct nci_uart));
+>  	nu->tty = tty;
+> -	tty->disc_data = nu;
+>  	skb_queue_head_init(&nu->tx_q);
+>  	INIT_WORK(&nu->write_work, nci_uart_write_work);
+>  	spin_lock_init(&nu->rx_lock);
+>  
+>  	ret = nu->ops.open(nu);
+>  	if (ret) {
+> -		tty->disc_data = NULL;
+>  		kfree(nu);
+> +		return ret;
+>  	} else if (!try_module_get(nu->owner)) {
+>  		nu->ops.close(nu);
+> -		tty->disc_data = NULL;
+>  		kfree(nu);
+>  		return -ENOENT;
+>  	}
+> -	return ret;
+> +	tty->disc_data = nu;
+> +
+> +	return 0;
+>  }
 
-ack, fine. I will post v2 targeting net tree.
+Looks good, thanks for cleaning this up:
 
-Regards,
-Lorenzo
-
---uo43+w1z7RWJd+56
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFJtHQAKCRA6cBh0uS2t
-rCKsAQCEFmeCcYEX24UTb6vH2FZr1eqY6402wluHC5kMW0VdqQD+OI0UDARUoXKC
-xgnAAwGTKjYg1NfFKAcFPp9nkKkWYAA=
-=Awjz
------END PGP SIGNATURE-----
-
---uo43+w1z7RWJd+56--
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
