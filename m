@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B356ADEABA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:48:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28616ADEAC0
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BCEB189F180
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:48:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4BD317E637
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6828B2E7F3E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670E12E7639;
 	Wed, 18 Jun 2025 11:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECOl5BRe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="skrqAHXT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D4D2DE20D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295162DBF5B;
 	Wed, 18 Jun 2025 11:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750247212; cv=none; b=LT763bLPtpS5heMkhVEqIbSRug02NrRUqXy9d7O//6zvVezyYGvD/Gx9w2XIoATPqZM0MZSBmHgDsUtFTCpWm0fMeMYJBqmvCZLJQeOhtcrl/zkSS49My+1N++xl/Zo8rrWiQGr1/iSeSkBNvtKjOer94BXzS3gpOHdnHzvT194=
+	t=1750247212; cv=none; b=ODVty495NJMsJet221E4FlF81hCGDjfH8cYGDXzFicAheuYQ1jbaSr+nuUsoo+4NK+k6+X1J2PJszAe7+lsN/DKAkK8xQvlYlHECOYroFTNgaJUVONWX1LIR1zjtQ0JacBQC8jgEcnFHYrCtgnlAXvaBSWN31uDQeEm31gFgYx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750247212; c=relaxed/simple;
-	bh=ZRwnGGD63dY02hpT4BqTMDO35vMSt+NPRBYC3eA8F/0=;
+	bh=sLGX0eyqIoRSaJCtRaOhRqFB+mw5FlWjFBG7e4HNq2I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QZm9zPaxqgC4BgiIPcO5T4eT7z2LceM0QSDsAJz/uCYPFpCzco4ACB3mdEGOrwBENMj2wQYlVr5pRPaqTgj7KlZmgakrblhmYcTzO0tDVnzU7xRaH2eDkBMpUuAucMzOD8TYjRlN5eXFr7OEViQhZAsWUYzdqxmKSaYc/Tj/JA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECOl5BRe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B4D3C4AF0D;
+	 MIME-Version; b=L/4UxkMLsTpQ81U0VLlnAXWdQ1ukA52uA5T8OLt//wQ/GSFDn7mHcJahGVaLoFfUGE8QWbVGztCTJq/3fcHm0wz8yvENJhVYrPHzp8DR8rWC8d7ZnbC65BAh/POa/P0gtTtFYLyHpn0oB55708KR/Y+HOqYTEkB9qPqrHEAdmbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=skrqAHXT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AEB2C113CF;
 	Wed, 18 Jun 2025 11:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1750247211;
-	bh=ZRwnGGD63dY02hpT4BqTMDO35vMSt+NPRBYC3eA8F/0=;
+	bh=sLGX0eyqIoRSaJCtRaOhRqFB+mw5FlWjFBG7e4HNq2I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ECOl5BRe87OvUepxguUsJp/4l1hRNtCbwqNjCMKeGjYqvokOnyKNABZOuwY98Q2fa
-	 fCERk7jEx/Ju37vT0DqTitnglMTMQis7idZXo+SwLhbtE61LZmPrs6aBYRHG68NJZd
-	 nUMkWxDj1a+YTHrDhD2XHEiyOrQnLUxMXYcKERiMZZ3NhcOnU2BI4NDLhqP7b2fY8A
-	 LHfttEj3+Hk8O9XTn9UzR7ttvklSQtu68sg81o9oR7+pX56iGvpm4a9AepBQq13LFX
-	 rtTriENeStpvgwr1RmTCLLCMPaoOQeNJfjpkOzFDe6Z1u0qpY3uCnYsTt0MrPhPoM3
-	 em4D2Y/94bjNA==
+	b=skrqAHXTbHNgSUzyZwiGm2Fupr9l61UiluGGSBvxmKD6r+ld9HPm3T/9gtlevsEN6
+	 XYEIMvCdpCYWMAWMOv/sjIRwyu9+XIVe9F2260gT/2mGyR/T0esmbK6J4BcMZ5l0l9
+	 nZ8L2eoAnaFoL60aFn+A2mj6Rbvj/yYuyxbr3Jp1XTH8PO93Mn8+ghO4bV2Z/gRanl
+	 +0LXBRO3gvGxUgV2ZieuJg4JKdANstYjf0aKHJaKQLucOsPDKvOfj09pk7JZQIkrUw
+	 Tf9PXDfi1cuumo4aRVBB1PWSa++psvYvq1kEOiJfK8v5YDRCHYbO4UguU2/eZNSjTq
+	 WmJIGEttZ5UxA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uRrFh-000000036V7-3HmZ;
+	id 1uRrFh-000000036VA-3PEz;
 	Wed, 18 Jun 2025 13:46:49 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
@@ -70,9 +70,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v6 13/15] tools: netlink_yml_parser.py: add line numbers to parsed data
-Date: Wed, 18 Jun 2025 13:46:40 +0200
-Message-ID: <21722a5346cfc3b8a0ad7427fca157cff032e2f0.1750246291.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v6 14/15] docs: parser_yaml.py: add support for line numbers from the parser
+Date: Wed, 18 Jun 2025 13:46:41 +0200
+Message-ID: <33fc2894166805b93d4cf652cff9927a54b4f242.1750246291.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1750246291.git.mchehab+huawei@kernel.org>
 References: <cover.1750246291.git.mchehab+huawei@kernel.org>
@@ -85,108 +85,111 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-When something goes wrong, we want Sphinx error to point to the
-right line number from the original source, not from the
-processed ReST data.
+Instead of printing line numbers from the temp converted ReST
+file, get them from the original source.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/net/ynl/pyynl/lib/doc_generator.py | 34 ++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ Documentation/sphinx/parser_yaml.py      | 12 ++++++++++--
+ tools/net/ynl/pyynl/lib/doc_generator.py | 16 ++++++++++++----
+ 2 files changed, 22 insertions(+), 6 deletions(-)
 
+diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/parser_yaml.py
+index 2b2af239a1c2..5360fcfd4fde 100755
+--- a/Documentation/sphinx/parser_yaml.py
++++ b/Documentation/sphinx/parser_yaml.py
+@@ -29,6 +29,8 @@ class YamlParser(Parser):
+ 
+     netlink_parser = YnlDocGenerator()
+ 
++    re_lineno = re.compile(r"\.\. LINENO ([0-9]+)$")
++
+     def do_parse(self, inputstring, document, msg):
+         """Parse YAML and generate a document tree."""
+ 
+@@ -38,8 +40,14 @@ class YamlParser(Parser):
+ 
+         try:
+             # Parse message with RSTParser
+-            for i, line in enumerate(msg.split('\n')):
+-                result.append(line, document.current_source, i)
++            lineoffset = 0;
++            for line in msg.split('\n'):
++                match = self.re_lineno.match(line)
++                if match:
++                    lineoffset = int(match.group(1))
++                    continue
++
++                result.append(line, document.current_source, lineoffset)
+ 
+             rst_parser = RSTParser()
+             rst_parser.parse('\n'.join(result), document)
 diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
-index 866551726723..a9d8ab6f2639 100644
+index a9d8ab6f2639..7f4f98983cdf 100644
 --- a/tools/net/ynl/pyynl/lib/doc_generator.py
 +++ b/tools/net/ynl/pyynl/lib/doc_generator.py
-@@ -20,6 +20,16 @@
- from typing import Any, Dict, List
- import yaml
- 
-+LINE_STR = '__lineno__'
-+
-+class NumberedSafeLoader(yaml.SafeLoader):
-+    """Override the SafeLoader class to add line number to parsed data"""
-+
-+    def construct_mapping(self, node):
-+        mapping = super().construct_mapping(node)
-+        mapping[LINE_STR] = node.start_mark.line
-+
-+        return mapping
- 
- class RstFormatters:
-     """RST Formatters"""
-@@ -127,6 +137,11 @@ class RstFormatters:
-         """Return a formatted label"""
-         return f".. _{title}:\n\n"
- 
-+    @staticmethod
-+    def rst_lineno(lineno: int) -> str:
-+        """Return a lineno comment"""
-+        return f".. LINENO {lineno}\n"
-+
- class YnlDocGenerator:
-     """YAML Netlink specs Parser"""
- 
-@@ -144,6 +159,9 @@ class YnlDocGenerator:
+@@ -158,9 +158,11 @@ class YnlDocGenerator:
+     def parse_do(self, do_dict: Dict[str, Any], level: int = 0) -> str:
          """Parse 'do' section and return a formatted string"""
          lines = []
++        if LINE_STR in do_dict:
++            lines.append(self.fmt.rst_lineno(do_dict[LINE_STR]))
++
          for key in do_dict.keys():
-+            if key == LINE_STR:
-+                lines.append(self.fmt.rst_lineno(do_dict[key]))
-+                continue
+             if key == LINE_STR:
+-                lines.append(self.fmt.rst_lineno(do_dict[key]))
+                 continue
              lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level + 1))
              if key in ['request', 'reply']:
-                 lines.append(self.parse_do_attributes(do_dict[key], level + 1) + "\n")
-@@ -174,6 +192,10 @@ class YnlDocGenerator:
+@@ -187,13 +189,15 @@ class YnlDocGenerator:
+         lines = []
+ 
+         for operation in operations:
++            if LINE_STR in operation:
++                lines.append(self.fmt.rst_lineno(operation[LINE_STR]))
++
+             lines.append(self.fmt.rst_section(namespace, 'operation',
+                                               operation["name"]))
              lines.append(self.fmt.rst_paragraph(operation["doc"]) + "\n")
  
              for key in operation.keys():
-+                if key == LINE_STR:
-+                    lines.append(self.fmt.rst_lineno(operation[key]))
-+                    continue
-+
-                 if key in preprocessed:
-                     # Skip the special fields
+                 if key == LINE_STR:
+-                    lines.append(self.fmt.rst_lineno(operation[key]))
                      continue
-@@ -233,6 +255,9 @@ class YnlDocGenerator:
-         for definition in defs:
-             lines.append(self.fmt.rst_section(namespace, 'definition', definition["name"]))
-             for k in definition.keys():
-+                if k == LINE_STR:
-+                    lines.append(self.fmt.rst_lineno(definition[k]))
-+                    continue
-                 if k in preprocessed + ignored:
-                     continue
-                 lines.append(self.fmt.rst_fields(k, self.fmt.sanitize(definition[k]), 0))
-@@ -268,6 +293,9 @@ class YnlDocGenerator:
-                 lines.append(self.fmt.rst_subsubsection(attr_line))
  
-                 for k in attr.keys():
-+                    if k == LINE_STR:
-+                        lines.append(self.fmt.rst_lineno(attr[k]))
-+                        continue
-                     if k in preprocessed + ignored:
-                         continue
-                     if k in linkable:
-@@ -306,6 +334,8 @@ class YnlDocGenerator:
+                 if key in preprocessed:
+@@ -253,10 +257,12 @@ class YnlDocGenerator:
          lines = []
  
-         # Main header
-+        lineno = obj.get('__lineno__', 0)
-+        lines.append(self.fmt.rst_lineno(lineno))
+         for definition in defs:
++            if LINE_STR in definition:
++                lines.append(self.fmt.rst_lineno(definition[LINE_STR]))
++
+             lines.append(self.fmt.rst_section(namespace, 'definition', definition["name"]))
+             for k in definition.keys():
+                 if k == LINE_STR:
+-                    lines.append(self.fmt.rst_lineno(definition[k]))
+                     continue
+                 if k in preprocessed + ignored:
+                     continue
+@@ -284,6 +290,9 @@ class YnlDocGenerator:
+             lines.append(self.fmt.rst_section(namespace, 'attribute-set',
+                                               entry["name"]))
+             for attr in entry["attributes"]:
++                if LINE_STR in attr:
++                    lines.append(self.fmt.rst_lineno(attr[LINE_STR]))
++
+                 type_ = attr.get("type")
+                 attr_line = attr["name"]
+                 if type_:
+@@ -294,7 +303,6 @@ class YnlDocGenerator:
  
-         family = obj['name']
- 
-@@ -354,7 +384,7 @@ class YnlDocGenerator:
-     def parse_yaml_file(self, filename: str) -> str:
-         """Transform the YAML specified by filename into an RST-formatted string"""
-         with open(filename, "r", encoding="utf-8") as spec_file:
--            yaml_data = yaml.safe_load(spec_file)
--            content = self.parse_yaml(yaml_data)
-+            numbered_yaml = yaml.load(spec_file, Loader=NumberedSafeLoader)
-+            content = self.parse_yaml(numbered_yaml)
- 
-         return content
+                 for k in attr.keys():
+                     if k == LINE_STR:
+-                        lines.append(self.fmt.rst_lineno(attr[k]))
+                         continue
+                     if k in preprocessed + ignored:
+                         continue
 -- 
 2.49.0
 
