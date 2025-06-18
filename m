@@ -1,171 +1,158 @@
-Return-Path: <netdev+bounces-199262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B1AADF936
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:08:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D545ADF939
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF6D4A2951
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:08:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C344B17FFA9
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9DC27E062;
-	Wed, 18 Jun 2025 22:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B3420FAB6;
+	Wed, 18 Jun 2025 22:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HF/41mzu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpPaG3Hj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1931E27E05C
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A233085CE;
+	Wed, 18 Jun 2025 22:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750284494; cv=none; b=gLzgPG8CmWTlcLh8hr1sZL/+Jvg8cGxf0FI6FmkRBqRk0J4iifYY/+Um26qSTLd80449L3q038G/DDtVq5+oIBvRBHn5VxVS7YQpvM9jxRTFPZIVMVkW3kajEhKNE6Lau3+TVhTFnk3eHR4AAFiSKeZnv/dj74fG/7zgx8oZSgk=
+	t=1750284978; cv=none; b=VxWhe+oCT9yc8v3OAkUKPSPnvCVOnyYV4Eo+fZhIzo3DVsGuUDGbOjBvzAd1hSLijuoUSuR0rqNplcoD7UWoXGFVA/v57MecQqBaX8TNZoNyXFQQdVjX+LgW8ZLZm8Gvfni+tDPm1trVl7Z5yHoyMXUOuk4h7BbcAH0rO7JN3R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750284494; c=relaxed/simple;
-	bh=8rSZBM+2G3JxDo0bDT95Mi9KPzEaeGKNAtynlSjiwW0=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pX78aXV9zGnMUyYRx2LEC3iDy/xYBP7XsbQuT3JOVTMUgZ+CvCYWjvcNScMXVGfeETFhuXd/6xvzighb/v9EusWE0e40hFyi0D5MNzSFOONsu1/YR7jsvDb2lZdrwLOWDL3ueYCCZ8lyJnSVQVWEPMbJ8jexYpHoSeJKtJVnJNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HF/41mzu; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1750284978; c=relaxed/simple;
+	bh=Vo7VYqC9atPmpKK5GIJvwBLcV8TQc0xjKdO4cIBRMSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hSGXZjNiDAY9iVanzt32ga8q3LGhN+mwDcX+ig0Kqnz8crKtBwMPoWGWx3XlsFUVlTEgVyX966Xoo2/4BDwRGDvpdTtShuRP9FZf/UELqRCyQTMyfURF7YOlCJaHAGD0QAxugpRJsGtAcuShme3bOhrGhYndSknKOHJUNW9T3RU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpPaG3Hj; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-235a3dd4f0dso1200905ad.0
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:08:11 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-747fc7506d4so105511b3a.0;
+        Wed, 18 Jun 2025 15:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750284491; x=1750889291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9zLeKsLC54GrWgQTvH5KRC9Xx2XhH1v9eQbOgi1AN6g=;
-        b=HF/41mzuOsyz6opjYU98a+pHpWmknF7fq9rLIV0UIk1mcmxGRWju5qHsrXR4Y4mIY6
-         qItd+4yd5cpPu3jQ+8kMZxj8KHVbMdARsOqFhlFjLG4RMHP6pJdcDxg6jtxIdvjziLQN
-         lV6swcflGauGrigH1kJcOZLGppVsG6M95QgyNdsTpAI65MXvtUIcXNPT8jqEoMEcU5u0
-         S2aLenvcKT5wE1YFPXshY6/uUglq73cQFOhpoENrDrHM4MlVZ3X5h/UhSIxMzeCblvpA
-         bWG4kk02dHVKNySxXAl7/1P+oK7l2eOa2mZgoaO40Oahas4McrMGugaoTadB1ARryrSV
-         OzTQ==
+        d=gmail.com; s=20230601; t=1750284976; x=1750889776; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bXXyW8YyKFcv52VvbZL/IMJUOoJuNpl+uHasmSoiSoQ=;
+        b=mpPaG3HjbEKB0s6EqV9tLXXGcx15rx5Irckub94+fKeB/4EeInxcIvqZLXpi4wOuHs
+         G5Qg5uFvtzLo2w8Rf6KgzEBLRn9I3n907jCMb13+vGiImjo96+e2RNulfpr/smnSTFxg
+         OVDREVcprS9qsTbnfROxeCqy/t2Et92wOh3A8+8k/YiBNvQxRpH40+zTrlOMRBJb8g8p
+         JVwwEd87gyPLjBCr7+Vw0w+tI126lH4N5xv/P5pTN96gQJGzshbEKUcAv2h9n8TBHecZ
+         Ol+jfMtad+AeN3yfb0pJ8SJJrLbSCrsMhMkVeY9vW+G9zO3vcS+XSjlndUHIdxEE34NL
+         uyxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750284491; x=1750889291;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9zLeKsLC54GrWgQTvH5KRC9Xx2XhH1v9eQbOgi1AN6g=;
-        b=Z1nO38q9c80bnoWeyk0d4KnP0u/0haRqwjzKvfe0Yd9Nae05aIDMmqqHycFhP2JgKP
-         64zmsTzV5TGmJ3gNhLz0aduO8Dlrs/ZxGJUzK/yb6A81G2NkOZvTn/PH8I9KoIQA7oBr
-         ROyYG/NgQ41Yebai898WNeZzhSnDeqNSYB1NtWy3cAzOnDyQEdaGtxw5e3qQ9NNPKsX5
-         pzaiCKX1kbb3AbPQJzUSQWNlqozespM/uOWZqjVjmv+coLU6uHy+Vr4uY7GjoWjNKmPf
-         xG69PL0lGrBJv6Tv5lldZWBDX+51zdRev5/Ecp2XNMPZnSgPDnS0Ok9dh9OanyCAXXDW
-         KqKg==
-X-Gm-Message-State: AOJu0Yy7StwM5hRBaarYv7pi2jXdMP2iMQKykaA12DHeSsE8NgOld4Oe
-	HbektYVnz37Sz8uKdiuqMstGjgf4BolUvjUQZdd6y5W8Gp+JvL+JFe37
-X-Gm-Gg: ASbGncuCP3fo1P5pACoeNzpxwm7/aUbm+3EkrQqwOt+LMNFMXGkA5nYrCt5r+e8Vf3L
-	SdOu1+SnUMlgUqB9YU9IIJxQuFYJuKKDNPrxNEnAuS8DauLxgmRi/89eItPXp3IScKK7fjc2Jjl
-	4IWnE5Rn5OsEQ5VTmhwRVa6++v91CkLG7JbyMgE7ZteQxf+IfTwYFzqrzV7H7nvAILsxLyHC4Oq
-	JLRiNwEtU5p/uaRx5yo4UAhSFSvIgxV4FhDEQ7iwLWN48hRSRsa5IaMmGSvKZK9IwXzW/lXDHcM
-	eYPY8iLGWGykOnTCMZ0YKPPyZ9MkXJgk7PSrFwxREKh5ukIRdYqHkjAHeam/6EzRQCWP7YhDVdZ
-	39zcpmbOXiqizaQ==
-X-Google-Smtp-Source: AGHT+IGY2v3GWBubFJaujt9AdKDSFgg//CRJ9SOg3x0axm0ajUkoJPrviC8NlnYJTTBOTdCgQsu4Cg==
-X-Received: by 2002:a17:903:1b64:b0:226:38ff:1d6a with SMTP id d9443c01a7336-2366afbd7ffmr241061865ad.7.1750284491326;
-        Wed, 18 Jun 2025 15:08:11 -0700 (PDT)
-Received: from ahduyck-xeon-server.home.arpa ([98.97.35.53])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88eb54sm105901275ad.2.2025.06.18.15.08.10
+        d=1e100.net; s=20230601; t=1750284976; x=1750889776;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bXXyW8YyKFcv52VvbZL/IMJUOoJuNpl+uHasmSoiSoQ=;
+        b=X48f9bDhycuHyd0FNfDzRuK9edEp1O7s+I+a2fhYqvY7psKg09BFDPGcDCBG6A1SgR
+         5dfwcsayhQYQSArq1Dx1XUWG+npJtoyXhaAPy2l6oQxJrf689C2qwV4XxY/Id08HaW/u
+         NGzKgeRcVtd1BLweXHixietWsG3ZfBag682w+LD8Ppry+Vr5M76eaSsuERcMQ8BYg8Op
+         +7q6IdZYVtYgRPcr8Qc8mgLoQTmEP/pysKZIUym/n+Ddr0L+t6hfh6tn3ju27tsG8ltD
+         hxnWMQHp06QKwDj+CVCp3IROjFvKbcehhgYAp5TZuyoYLY8x6DVda4l+o/XapyPfEnzk
+         mckg==
+X-Forwarded-Encrypted: i=1; AJvYcCVKUXaYqjuE6I2ryW++TPlXJJTrKQW38LB5/K2Pw3HKLPNsusnVf+GaL5SU5QqrQzX3Tc2G1Zq4m8laTg==@vger.kernel.org, AJvYcCVMpa9YtxKUanB+NFaB8mDIknh4PeAFY4VLTo8aYyy/R2ZFR9acGVAy/dF0JY7Zp2m025Y=@vger.kernel.org, AJvYcCVw4rSA3P7l2mekqHvl+GPL67eAPqJfTwEybvZJ2+AzxIrJdFaOcBFEOiT6dwHRdVCPqPDzrqktxNwfA9+o@vger.kernel.org, AJvYcCW+vkiV4csyfFNh3gsawXNOuY/vpPAHeiVwZOzFn/IS2EGuFFyEZb0cOaNnF3Q7EpUPRFbET6RZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeM1piEU4upEFX3f3qQPQ6Z9xlNoFrNjGAENFoCy6X/ptUdqng
+	0clJfgoYSwNBDYiG5KReRYWm+xGONRgVxUv47uobJZqYq5QLKRReRcs=
+X-Gm-Gg: ASbGncvw2fLt5HFCdEHlJmDeqjERroSjcOZ6XN8VFhmDQ2/HZ7v3Nkks7zOdNSsetW4
+	4QLEj7XnLl+W4UeVEkJczbObau55WRE1Z62fxHvTbTNtWzbDjKJAWnFFGoD9FLtQ1h/o6iAoPj9
+	1cU1f+Uy2i54S7jcS0CY4zOk+A4oqtcRVFGfHu+0wG1uWPPaXUR8+A1WTuVO5Pm6K0y1NB6FGkO
+	PdytVl1NcHC7neT+Si5RexroVcv48gnhOd/L4BbBUJFBLThMZCFgUAwe6Tk3n+wVhkyPGlqlX9Q
+	2yMob3N5Ee5yqz2xJXX8N6/m/YVqd3VT82dHrnrSD95SLggc2OWbxyAn87WKn4QtJf2wNxMFmsv
+	eoYzDvZrzfqLjEj996FTbunQ=
+X-Google-Smtp-Source: AGHT+IExSMfGb5fUayBdf0peRgvJAdEA/VgzwPukDOR/vhSvbbVTtarNLjFlaHdPhkauF08P1jVFfQ==
+X-Received: by 2002:a05:6a21:8cc6:b0:20f:94bd:eecf with SMTP id adf61e73a8af0-21fbd7ffb6bmr27695976637.42.1750284976452;
+        Wed, 18 Jun 2025 15:16:16 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7489000519bsm11673996b3a.38.2025.06.18.15.16.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 15:08:10 -0700 (PDT)
-Subject: [net-next PATCH v3 8/8] fbnic: Add support for setting/getting pause
- configuration
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux@armlinux.org.uk, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org,
- kernel-team@meta.com, edumazet@google.com
-Date: Wed, 18 Jun 2025 15:08:09 -0700
-Message-ID: 
- <175028448974.625704.14427543910503058114.stgit@ahduyck-xeon-server.home.arpa>
-In-Reply-To: 
- <175028434031.625704.17964815932031774402.stgit@ahduyck-xeon-server.home.arpa>
-References: 
- <175028434031.625704.17964815932031774402.stgit@ahduyck-xeon-server.home.arpa>
-User-Agent: StGit/1.5
+        Wed, 18 Jun 2025 15:16:16 -0700 (PDT)
+Date: Wed, 18 Jun 2025 15:16:15 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, saeedm@nvidia.com, gal@nvidia.com,
+	leonro@nvidia.com, tariqt@nvidia.com,
+	Leon Romanovsky <leon@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, Dragos Tatulea <dtatulea@nvidia.com>,
+	Mina Almasry <almasrymina@google.com>
+Subject: Re: [PATCH net-next v6 12/12] net/mlx5e: Add TX support for netmems
+Message-ID: <aFM6r9kFHeTdj-25@mini-arch>
+References: <20250616141441.1243044-1-mbloch@nvidia.com>
+ <20250616141441.1243044-13-mbloch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250616141441.1243044-13-mbloch@nvidia.com>
 
-From: Alexander Duyck <alexanderduyck@fb.com>
+On 06/16, Mark Bloch wrote:
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+> 
+> Declare netmem TX support in netdev.
+> 
+> As required, use the netmem aware dma unmapping APIs
+> for unmapping netmems in tx completion path.
+> 
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h | 3 ++-
+>  drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 ++
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> index e837c21d3d21..6501252359b0 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> @@ -362,7 +362,8 @@ mlx5e_tx_dma_unmap(struct device *pdev, struct mlx5e_sq_dma *dma)
+>  		dma_unmap_single(pdev, dma->addr, dma->size, DMA_TO_DEVICE);
+>  		break;
+>  	case MLX5E_DMA_MAP_PAGE:
+> -		dma_unmap_page(pdev, dma->addr, dma->size, DMA_TO_DEVICE);
+> +		netmem_dma_unmap_page_attrs(pdev, dma->addr, dma->size,
+> +					    DMA_TO_DEVICE, 0);
 
-Phylink already handles most of the pieces necessary for configuring
-autonegotation. With that being the case we can add support for
-getting/setting pause now by just passing through the ethtool call to the
-phylink code.
+For this to work, the dma->addr needs to be 0, so the callers of the
+dma_map() need to be adjusted as well, or am I missing something?
+There is netmem_dma_unmap_addr_set to handle that, but I don't see
+anybody calling it. Do we need to add the following (untested)?
 
-Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c |    2 ++
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    4 ++++
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   16 ++++++++++++++++
- 3 files changed, 22 insertions(+)
-
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 7cb191155d79..7fe9983d3c0e 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -1688,6 +1688,8 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
- 	.set_coalesce		= fbnic_set_coalesce,
- 	.get_ringparam		= fbnic_get_ringparam,
- 	.set_ringparam		= fbnic_set_ringparam,
-+	.get_pauseparam		= fbnic_phylink_get_pauseparam,
-+	.set_pauseparam		= fbnic_phylink_set_pauseparam,
- 	.get_strings		= fbnic_get_strings,
- 	.get_ethtool_stats	= fbnic_get_ethtool_stats,
- 	.get_sset_count		= fbnic_get_sset_count,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index 943a52c77ed3..a3dc85d3838b 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -92,6 +92,10 @@ void fbnic_time_stop(struct fbnic_net *fbn);
- void __fbnic_set_rx_mode(struct net_device *netdev);
- void fbnic_clear_rx_mode(struct net_device *netdev);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+index 55a8629f0792..fb6465210aed 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+@@ -210,7 +210,9 @@ mlx5e_txwqe_build_dsegs(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+ 		if (unlikely(dma_mapping_error(sq->pdev, dma_addr)))
+ 			goto dma_unmap_wqe_err;
  
-+void fbnic_phylink_get_pauseparam(struct net_device *netdev,
-+				  struct ethtool_pauseparam *pause);
-+int fbnic_phylink_set_pauseparam(struct net_device *netdev,
-+				 struct ethtool_pauseparam *pause);
- int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- 					struct ethtool_link_ksettings *cmd);
- int fbnic_phylink_get_fecparam(struct net_device *netdev,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 3a11d2a27de9..7ce3fdd25282 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -24,6 +24,22 @@ static phy_interface_t fbnic_phylink_select_interface(u8 aui)
- 	return PHY_INTERFACE_MODE_NA;
- }
+-		dseg->addr       = cpu_to_be64(dma_addr);
++		dseg->addr = 0;
++		if (!netmem_is_net_iov(skb_frag_netmem(frag)))
++			dseg->addr = cpu_to_be64(dma_addr);
+ 		dseg->lkey       = sq->mkey_be;
+ 		dseg->byte_count = cpu_to_be32(fsz);
  
-+void fbnic_phylink_get_pauseparam(struct net_device *netdev,
-+				  struct ethtool_pauseparam *pause)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	phylink_ethtool_get_pauseparam(fbn->phylink, pause);
-+}
-+
-+int fbnic_phylink_set_pauseparam(struct net_device *netdev,
-+				 struct ethtool_pauseparam *pause)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	return phylink_ethtool_set_pauseparam(fbn->phylink, pause);
-+}
-+
- static void
- fbnic_phylink_get_supported_fec_modes(unsigned long *supported)
- {
-
-
 
