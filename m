@@ -1,111 +1,94 @@
-Return-Path: <netdev+bounces-198851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185D3ADE0B3
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:36:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FEDADE0B9
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:40:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6FC3177738
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:36:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F14A1897EEA
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B9E1922DE;
-	Wed, 18 Jun 2025 01:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A270F191F6A;
+	Wed, 18 Jun 2025 01:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="DYQSFL0K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/e8xzMo"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FB54A1D;
-	Wed, 18 Jun 2025 01:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBE73A1DB
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 01:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750210612; cv=none; b=j2CGyFyBVQQI9AJ+cf2V/8M4HygFDAoepIB4xO6A76eb40jb8DvFpQUf3XI6m+UgbNyTKctSXQaG1V0NqoyANbj/ldR5NMnMuSFg45cOAVcgvICk7utEJw3WYncDXfJZJzhZTGZ+dCWhn89R1LrlNgcb0UdNlcLSb4u2/vC/I4U=
+	t=1750210799; cv=none; b=AXH0x51ZwVicWElr8Ql1owQq7FgqlZpLVT9PZMQ7eJZHnAAIDQ0fSplm8XKbklYoQm/l3785dp2YcAq4PyXMSfcMnBWQcpeGf0SPwyf4uhbwJwjK7rS1vQzZZd0K1U8BXI1ghkBMZl4IORYsPuaUwx5NmpXzl114CHZE9+ReTeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750210612; c=relaxed/simple;
-	bh=0YXcTlTA8MQJecj8M0ciHnHSxcN58n9/4eqEv7wyl8w=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=fTYXHzdajNNHBSqTRM48AjDX3ekS4rS3Q8ZF6wFVqMagcHcKw7PQ9iK3Y2dgd44ag+Akck900eKKtZTOn9EfVgOgMzfX5NHaSAn20ZpaHop8QhpZKs2v+UgnYQLGVKLgFptNumeYti+yT2IHGD3P6jxYfSi3xQjf/DX4RmfBkqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=DYQSFL0K; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id CABE0201FF46; Tue, 17 Jun 2025 18:36:50 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CABE0201FF46
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1750210610;
-	bh=1h0AInxYHYfF4/KB+FPDZESjCJlmWWe6zwOwKGbLEP4=;
-	h=From:To:Cc:Subject:Date:Reply-To:From;
-	b=DYQSFL0KzEfpSDh+MpS0jQgGHPN0cyzAZRe5jfVhgtP6OrFYIAYzqsmTJWJGwI5TM
-	 tyjblO/eNd7CVbKIDRXpJ8/xStjpyJQ+w2nkKiy5FLraqilAs9BCEshakh7F3nQdQd
-	 87/NM5r3pt52sJSiz4EUT17udVQUCtNWjjT0TT0s=
-From: longli@linuxonhyperv.com
-To: "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Long Li <longli@microsoft.com>
-Subject: [Patch net-next v3] net: mana: Record doorbell physical address in PF mode
-Date: Tue, 17 Jun 2025 18:36:46 -0700
-Message-Id: <1750210606-12167-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-Reply-To: longli@microsoft.com
+	s=arc-20240116; t=1750210799; c=relaxed/simple;
+	bh=+gQxlRDwEQJipj2AvzePmkX5oEsySNzw+jhj3cDDx20=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KJbPI0qD3mieEDt3wy5Bxrzke50npl9PL1NJPvQearVGion6upkhakC5aHm8yho2nZrSY/pQS+bLe6JT3Nt2iJM+nsENGhE+bmVilzppQOcIrma9zjwPayjNNZOKC5YZ804y1jn0pXY5CIrTP02sZRYxivZs+gy66yCeSitJFAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/e8xzMo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00D70C4CEE3;
+	Wed, 18 Jun 2025 01:39:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750210799;
+	bh=+gQxlRDwEQJipj2AvzePmkX5oEsySNzw+jhj3cDDx20=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u/e8xzMoT7PdyZG1hr3NNvJfGcJtf92nyX6lmRfxm2JRkXWHe7dtLGn+ja076cYvi
+	 KZ/mRRu8BmyqewPnYRJHObtfGwCTzFAHfGB1h9vO6Z6/lE98qsjnBGFkVnW9Ewkdfk
+	 HZWKHJYSTrc5ZRCSiQcptiKV8z3e542WxwKskWo+5ytRJFrauxFg36mCEwxfwlt5gU
+	 JlBbEAg8Bap2CFYwxKO0C3A7zTtenQpC7AuHNzmaNlf/+ZI9YvdEdkB/0BH8TsL02J
+	 MLJnmiI6dV2FKgLHYZ56rwK3TS8GGTvw5aufQmUX5ukj/B+T9CvRuFHK9zlpMQMwtH
+	 iHg5ieNKOnSxA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC2838111DD;
+	Wed, 18 Jun 2025 01:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] mpls: Use rcu_dereference_rtnl() in
+ mpls_route_input_rcu().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175021082750.3761578.17866878135605007692.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Jun 2025 01:40:27 +0000
+References: <20250616201532.1036568-1-kuni1840@gmail.com>
+In-Reply-To: <20250616201532.1036568-1-kuni1840@gmail.com>
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, ebiederm@xmission.com,
+ kuniyu@google.com, netdev@vger.kernel.org,
+ syzbot+8a583bdd1a5cc0b0e068@syzkaller.appspotmail.com
 
-From: Long Li <longli@microsoft.com>
+Hello:
 
-MANA supports RDMA in PF mode. The driver should record the doorbell
-physical address when in PF mode.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The doorbell physical address is used by the RDMA driver to map
-doorbell pages of the device to user-mode applications through RDMA
-verbs interface. In the past, they have been mapped to user-mode while
-the device is in VF mode. With the support for PF mode implemented,
-also expose those pages in PF mode.
+On Mon, 16 Jun 2025 13:15:12 -0700 you wrote:
+> From: Kuniyuki Iwashima <kuniyu@google.com>
+> 
+> As syzbot reported [0], mpls_route_input_rcu() can be called
+> from mpls_getroute(), where is under RTNL.
+> 
+> net->mpls.platform_label is only updated under RTNL.
+> 
+> [...]
 
-Support for PF mode is implemented in
-290e5d3c49f6 ("net: mana: Add support for Multi Vports on Bare metal")
+Here is the summary with links:
+  - [v1,net] mpls: Use rcu_dereference_rtnl() in mpls_route_input_rcu().
+    https://git.kernel.org/netdev/net/c/6dbb0d97c509
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
-Changes
-v2: add more details in commit message on how the doorbell physical address is used
-v3: add the early commit detail where the support for PF mode is implemented
-
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 3504507477c6..52cf7112762c 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -31,6 +31,9 @@ static void mana_gd_init_pf_regs(struct pci_dev *pdev)
- 	gc->db_page_base = gc->bar0_va +
- 				mana_gd_r64(gc, GDMA_PF_REG_DB_PAGE_OFF);
- 
-+	gc->phys_db_page_base = gc->bar0_pa +
-+				mana_gd_r64(gc, GDMA_PF_REG_DB_PAGE_OFF);
-+
- 	sriov_base_off = mana_gd_r64(gc, GDMA_SRIOV_REG_CFG_BASE_OFF);
- 
- 	sriov_base_va = gc->bar0_va + sriov_base_off;
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
