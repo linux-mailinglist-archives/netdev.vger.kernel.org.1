@@ -1,133 +1,191 @@
-Return-Path: <netdev+bounces-199049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F29ADEBEF
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:25:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F10DADEC2C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2E0E1894558
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:22:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCDE400E1B
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A45B2556E;
-	Wed, 18 Jun 2025 12:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936D72DFF2F;
+	Wed, 18 Jun 2025 12:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AISR77Ei"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XukT4AiT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C564EB38;
-	Wed, 18 Jun 2025 12:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE80F9CB;
+	Wed, 18 Jun 2025 12:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750249260; cv=none; b=oO0tgpx0/hgUXkTikGannridfVg72frQ5axBigbYvtDMCUwxLEFMT0KDvr54EjXz9oMDL9vCSz3cy2uVdUPtPhzRHDLFC2p+Vs5a5X0CzzUh50ciE8XzkL5vqmpBmNgV8BrV3GgJcWeduL3PjO7FUp7LrKqNztOKCi5eaH/NJsM=
+	t=1750249335; cv=none; b=tGOTD6XRISn67KFbGsRAwMvIK26p1LPP/TTI2maA7n/Ro7UzOd2SjCZ1l1h3of6Q0LMc/aDmvrGBo6hjO61tfGMGdwELE6i6kV4rvPunrNc22VhL0+5ukFmSMXQs0STG0W+ZFcvfhdYJsCa4BfLb+XVWyezKC1d18yCQnfgVDo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750249260; c=relaxed/simple;
-	bh=De2hGz3gvtQnW5EJe07LzzlHoUlHB5o1oUjN4eO7FcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=URGV71PSTP/dEHQlDGetgFKzvUAsLkr2i4vmo954nC9DI7jhB1M8ZUAy6lrvP+1D8OamSuNQyPM56Bdi89Z2rvdiXv/Cc8VeKA7lAauowivUIOlwcw0F6dFggGuRvjhsg0pPgZYY9hDc3Am9JKrxFtPz5vTOAhkmHi93Q88AwQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AISR77Ei; arc=none smtp.client-ip=209.85.167.53
+	s=arc-20240116; t=1750249335; c=relaxed/simple;
+	bh=AkOJGHFfJ0D1Hi2CzC1gFV13rZ2OfQfKVC5qrPuOvQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=nI4xBgn3673Vk85FdrZ+qoXyEebngQTKrAVWWA5sddUuHRTsvq0rQXxOEZVDBYyeQTAsRb1cxSv540lujmoOS5y3g6LqNNjhQwC+AUBxi9473ivv/oh0XiU3jCr2B1QXYWI8R8pZAGfQZjWsKR1r8dsMHjZypomXJUDH0+PVTz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XukT4AiT; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-553b3316160so4333906e87.2;
-        Wed, 18 Jun 2025 05:20:58 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5533303070cso6551632e87.2;
+        Wed, 18 Jun 2025 05:22:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750249257; x=1750854057; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20230601; t=1750249332; x=1750854132; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EJCOxXHVo1xvCRwBVR7i8ri/Hq2UMjfD/lprAcsfHqE=;
-        b=AISR77EiyumfJk6hsV3LUONyi3g0wSkcs3KThT4Jc4397oVC9Z9YZ7HZuJ5G4vyJr7
-         HVmktIuSAmUTBXlZLOrJSbFyfA1WHcyDfTCQT1idCYlgQi+qqxyEmnKszirgiQrJpfPQ
-         yZGPC2yhzV5YhOzNNh4GYJZ64Z847W2QC5lYFRXZ380cxicdxIXY23vnISSnp3rC/2Xv
-         Xs7uNutPhuDaTBe4IKsCakYWg1n1586Hp4LiqYgbR4NCBitCXRYNt8ydV6BmpL6ZglEk
-         zohDqqr7yJpsCCv4DTKv3T0ayAnrQ9PoccgU4RZ7Xrytx36jJLfqkRTGAUEVOx8roIHJ
-         pXSw==
+        bh=YX5uE2UWP9Ptw7Kk9zAitIAFib0/p57/vRRfmjUetJ4=;
+        b=XukT4AiT05nir0bLDw3EghBZSLTkWIZ/AKeT3C6O6ApqXCFxcLSGU0Dbk0aCCDoPG3
+         A5sUrQWges20sQLHTX0qCCq+K6VEukhy7fvSuGJ48reVFGRtsbqujRszcNtZm4lZREPF
+         t1lhX05PYrqgaG088HeTJnGyZGRc/UQP1CGuzt+ZZijuqwIDeySd7hQ5rC6oE9po1rtJ
+         EOMYOLZjhytn9cK9W75Yx7S45exIdt+MviauQRVlYHa7jgzGRQeekGR96gk77TtnI+wr
+         uu/v6sd3n4G8P6jm6DGGC6imG/EnKhjh0jrHof6PvRikoTzgSJPVEg0VHtn4fDcIjQHd
+         Gneg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750249257; x=1750854057;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1750249332; x=1750854132;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJCOxXHVo1xvCRwBVR7i8ri/Hq2UMjfD/lprAcsfHqE=;
-        b=h2u2ogUll11pA3MGXBWK21a09NJ1KhFpdZxLKbW9VjW/zxMnLpBM/akzpBn1OEBMOY
-         7wyKcwU4teRBKu1W+A+De9ROeHCTH5t6Dc6qubUeFtpokJtiKY721NUpbtU8MZytO+Ni
-         mJ5RFeRl1GWttvlqVIF1pSjifNS76q0ZH6XyjdyNLo+SfUl60GeFeS3Z/7bRwTom/f4J
-         AsW9amAN/nfLBFw+ayl5RA23JswOgGA5Ugr9cosCGqNJawbwndHaIfZv2hWkxF+p885U
-         1CyKhO6TAUoKxd4DSOqmiVO2OGUd1kU8ORTQGJoEbMfvpHLJk62pbxSmB5PUfmEo3tYx
-         t3qw==
-X-Forwarded-Encrypted: i=1; AJvYcCV18hnhQcqOWgqXu8o0vAT9fha0dIM99yYNw0isuzrCGzzXvcJtRfUfMfkQW3ZtfXf2yz12CkZE@vger.kernel.org, AJvYcCXko6V7if0QU+OYbWJ66+uf5ZQMfyq2/clns/8JACP8G/HIggfv7xK+XFQvh3/z0o3XeCSvLtgjFI4nGiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7TfRai/57GgO8HDza1xFWSWg4aO4FBForMB1SdwGG5hqaeFHP
-	YszPv4+DwcuIonze7vk9Y4ax2I4hAT4ygJaaFIbs7Yk+rVrVMGh56HYe
-X-Gm-Gg: ASbGncvoX5mH+27Np6p4arqR3Cbx8iYRVfq81dSD7L2rYwr7ju6ON8q1ZjmuYqwRttk
-	MbQwWG+dh5psuRGGaKVGAwnQ3+FiJ2ZAu7H25ObacFzXEfW7N/7gX9c8yx8ba5PErMeUBNjEgUT
-	SEhL6uIo2U6FFAKyQr3SyrJpseTPtCyaGwvstcM6MtqLEyfwpjKIalDF1mLb3Lqwwa2Sjwz4ItM
-	OOakTLUqgHzb90fqYq6Yp7watGVgec08dEZr51nf6s11tW3FiDFwxAjb+K2ojBKhxN8yW3EuweK
-	D4/toePK5nldv3RJtTKDBQyTF69R5UpLAPMlRE3m8itJQ1VASlgFwK852od7Cz6vzhEltU2wECM
-	t4h3cpj3K12dMIaV9NuP3miMo6yPivkF7Jf57mFzWGag=
-X-Google-Smtp-Source: AGHT+IGrMKRd6JzreiglJoe7+dUDlEgWBSSJMKLHN6wu5zjoGH+5+ND/JVY7fkFZC9OLskp5z+ZNCQ==
-X-Received: by 2002:a05:6512:3989:b0:553:543d:d996 with SMTP id 2adb3069b0e04-553b6f0f91bmr4855311e87.33.1750249256446;
-        Wed, 18 Jun 2025 05:20:56 -0700 (PDT)
-Received: from ?IPV6:2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703? ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553ac1e0c73sm2254440e87.198.2025.06.18.05.20.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jun 2025 05:20:55 -0700 (PDT)
-Message-ID: <449c1edd-fb57-4ee6-849c-84e68c2aa5c5@gmail.com>
-Date: Wed, 18 Jun 2025 15:20:54 +0300
+        bh=YX5uE2UWP9Ptw7Kk9zAitIAFib0/p57/vRRfmjUetJ4=;
+        b=Ib/mwyZ416XS/HrZZ4MM8swOQiyv3zDiOjZWp3431ymB7pgv1RIhfp/scJ5CV5wyst
+         OUChHvURJuKq1Sm6x7e09Z8HFraBa/MqNvm3DLOCTUPovh3D32wR7us21Y3GGZjNNKPl
+         95LL1qfidZo4PvyNIcUqFe7dBEFryABxHQM8CiVpJmWnL0EDjoDBNSmiuFNSKqVjXi/I
+         SN/dEcufAn/xTGPX0p1ZUbr5BTWJnPBW3ZWawkd/mDW4fPkyWyVYhNPd5GxoAGdSEbG9
+         nz5SBkg19AXdAhdN8JxsKDcf/91Mm91K6T+RJjhdKINWSWe36seEaePwhR7JHyfCF/hs
+         emQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQxbV0Koza8LUQW/1ATa5bWpyb4MyTOHmBRrO19zOf8IUS7yCmXu+Wd8InvBszb6HrM7mY4OAq@vger.kernel.org, AJvYcCWdWOrVKI7ke3bUicIA/YeRDsuDUrJEQ+CMCWD3NQfhGuQcGDngMJ13jxpg6Eggwy2QeeFw1yoNYhDvI/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuAn6QhJIjIwGvPjBUhUPSwj8KGv8w3tbS48MBkHDU+0N3ko+3
+	VkBmQsT3g6tHEn5y9VWaHzywrscfVThb68A8qAzZtDFvloDETE1HP2CP
+X-Gm-Gg: ASbGncsQ4q/Se4SkYp/3KR7fymQYLJLDiB12kxwx1BVQrVcCedxI0GJLBEcqS9Efn3k
+	vPpkGlh6PT/vM1kwyNwOSQt6UPXKlEAmpyrcCRta4lRPhmq2E4C3a/n8PV+W0RNnfy7/Ul5AgHQ
+	w/NxLDktwAiHWm2xeKtf73OoFgU2W8WWxJW7zBcnKeLa2hjEPapQnucT0kCWv2d2GiMC+N+qdCc
+	uV1rcffRD9iVmA8EqMfHNrlXmT1WzrbkIktegOjX2GA+O+Knlgprex4PM2uavzYD7vzDWwIcZlF
+	T4m6s/E1HVX6UEqYXfpR0nY2HTwe6m53yZwUcPDCvJHDyJC/8pQ9voezPhKFkz0EmKoQi8S2aDp
+	t9Bs=
+X-Google-Smtp-Source: AGHT+IGJ1vZmmV2E3HMazrFPTb/BZIZ9ZVcruq8NwutkVwOcMvDD2EOlPnoGnZTqlnhGwGI9Cs9rNA==
+X-Received: by 2002:a05:6512:15a4:b0:553:3178:2928 with SMTP id 2adb3069b0e04-553b6e8834bmr4675292e87.16.1750249331405;
+        Wed, 18 Jun 2025 05:22:11 -0700 (PDT)
+Received: from mva-rohm ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553ac1c1d1csm2235445e87.160.2025.06.18.05.22.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jun 2025 05:22:10 -0700 (PDT)
+Date: Wed, 18 Jun 2025 15:22:02 +0300
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>,
+	Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: gianfar: Use
+ device_get_named_child_node_count()
+Message-ID: <3a33988fc042588cb00a0bfc5ad64e749cb0eb1f.1750248902.git.mazziesaccount@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net-next: gianfar: Use
- device_get_named_child_node_count()
-To: Simon Horman <horms@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <22ded703f447ecda728ec6d03e6ec5e7ae68019f.1750157720.git.mazziesaccount@gmail.com>
- <aFFVvjM4Dho863x2@black.fi.intel.com>
- <20250618104251.GD1699@horms.kernel.org>
-Content-Language: en-US, en-AU, en-GB, en-BW
-From: Matti Vaittinen <mazziesaccount@gmail.com>
-In-Reply-To: <20250618104251.GD1699@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="OEbY+A2xp9C7j9WX"
+Content-Disposition: inline
 
-On 18/06/2025 13:42, Simon Horman wrote:
-> On Tue, Jun 17, 2025 at 02:47:10PM +0300, Andy Shevchenko wrote:
->> On Tue, Jun 17, 2025 at 01:58:26PM +0300, Matti Vaittinen wrote:
->>> We can avoid open-coding the loop construct which counts firmware child
->>> nodes with a specific name by using the newly added
->>> device_get_named_child_node_count().
->>>
->>> The gianfar driver has such open-coded loop. Replace it with the
->>> device_get_child_node_count_named().
->>
->> Just a side note: The net-next is assumed to be in the square brackets, so when
->> you format patch, use something like
->>
->> 	git format-patch --subject-prefix="PATCH, net-next" ...
-> 
-> Hi Matti,
-> 
-> It looks like this patch has been marked as Changes Requested in patchwork.
 
-Thanks for the heads-up. I don't really follow the patchwork.
+--OEbY+A2xp9C7j9WX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> I assume because of Andy's comment above.
-> 
-> Could you address that and submit a v2?
+We can avoid open-coding the loop construct which counts firmware child
+nodes with a specific name by using the newly added
+device_get_named_child_node_count().
 
-Right. I'll re-spin with different subject.
+The gianfar driver has such open-coded loop. Replace it with the
+device_get_child_node_count_named().
 
-Yours,
-	-- Matti
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+Previously sent as part of the BD79124 ADC series:
+https://lore.kernel.org/all/95b6015cd5f6fcce535982118543d47504ed609f.174222=
+5817.git.mazziesaccount@gmail.com/
+
+All dependencies should be in net-next now.
+
+Compile tested only!
+---
+ drivers/net/ethernet/freescale/gianfar.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/etherne=
+t/freescale/gianfar.c
+index bcbcad613512..7c0f049f0938 100644
+--- a/drivers/net/ethernet/freescale/gianfar.c
++++ b/drivers/net/ethernet/freescale/gianfar.c
+@@ -97,6 +97,7 @@
+ #include <linux/phy_fixed.h>
+ #include <linux/of.h>
+ #include <linux/of_net.h>
++#include <linux/property.h>
+=20
+ #include "gianfar.h"
+=20
+@@ -571,18 +572,6 @@ static int gfar_parse_group(struct device_node *np,
+ 	return 0;
+ }
+=20
+-static int gfar_of_group_count(struct device_node *np)
+-{
+-	struct device_node *child;
+-	int num =3D 0;
+-
+-	for_each_available_child_of_node(np, child)
+-		if (of_node_name_eq(child, "queue-group"))
+-			num++;
+-
+-	return num;
+-}
+-
+ /* Reads the controller's registers to determine what interface
+  * connects it to the PHY.
+  */
+@@ -654,8 +643,10 @@ static int gfar_of_init(struct platform_device *ofdev,=
+ struct net_device **pdev)
+ 		num_rx_qs =3D 1;
+ 	} else { /* MQ_MG_MODE */
+ 		/* get the actual number of supported groups */
+-		unsigned int num_grps =3D gfar_of_group_count(np);
++		unsigned int num_grps;
+=20
++		num_grps =3D device_get_named_child_node_count(&ofdev->dev,
++							     "queue-group");
+ 		if (num_grps =3D=3D 0 || num_grps > MAXGROUPS) {
+ 			dev_err(&ofdev->dev, "Invalid # of int groups(%d)\n",
+ 				num_grps);
+--=20
+2.49.0
+
+
+--OEbY+A2xp9C7j9WX
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEIx+f8wZb28fLKEhTeFA3/03aocUFAmhSr2YACgkQeFA3/03a
+ocWk4wf8DXM53+9i/agAaQTn7ykbmvYReY/KPywU0raYz6xuZdXPAl5YlMMQPIWj
+1X1DyJzDuWWYx4CDUyQNJS035LVkIIpX3FVko1sQbeCpU+lB7yK1WiwRkF2Sy8ay
+xQfnAqRwtEmV/gPNGEgLHyFKxEKx4XnNhJBwkgnNi6asJYE3+fm/y2O6FQDI67gP
+ZjOoNOIWB8qJiUt7vjsPJSbyabHA0TwZfA0AMyIBJ12+tHkcYxh9/rYsDlOBDGAM
+MdF4ontQmgp8UlFd/4P5dMR78y6VtH/9WYxwM0FXEDGVTynUv8HaNO0Baz+XJcaM
+b3wyS6az21Q41ZqejPvsqtjPafu6lQ==
+=7mu5
+-----END PGP SIGNATURE-----
+
+--OEbY+A2xp9C7j9WX--
 
