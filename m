@@ -1,141 +1,197 @@
-Return-Path: <netdev+bounces-199101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F86ADEF34
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:24:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84176ADEF3A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:25:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24ED61884956
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:24:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 227DC1886FEF
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2AFF2EACE5;
-	Wed, 18 Jun 2025 14:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WMHUvDwn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156FD2EBB8D;
+	Wed, 18 Jun 2025 14:24:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25042E8DED;
-	Wed, 18 Jun 2025 14:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392842E8DED;
+	Wed, 18 Jun 2025 14:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750256644; cv=none; b=YcumIq5DMCrrltn/R/w0xcHsahdPDirQhbAWrVwzGzc22GONJfruPg6JIYr5DVLVb4WpXBF2m8vTPfG/FpPD5vXMv1o8Dm5bu6iYTrmd/UK5CiUwC+VMaBwjUKPQIkHbNT0qCxrQqxhkzJVklbk/OMsxe5X0tuJ2ynbc1DMGwII=
+	t=1750256650; cv=none; b=N/8tA9F9nIBeuC/ICR5H1jIP7wky6wDNf7V19zv34f17mvShi+3sXxlfdL12P6Sieya8lBWoP3ChotJwJQzBK1UFsOM8MbBaGT3nYyNjYaPdwUd9M+jU88rQXrQvD9D+8KjkKKOKXAebyZ/9EXEND84v2HDquooa9lwUMQop2wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750256644; c=relaxed/simple;
-	bh=jbtwj0PcQl52Hf+ECRiBFoySeNQq1NFpX1lg20GW3Vs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OfI0/csh8LHSLWwSo9drJFmKiZ6EFijt3PS+ajsq9bpClodTMQ/Tq/mPPEtdi2g1Ls2J2MAtMLUaPyScG1kpN2IZmMLpEpxfTQlYv3VzRKNNoICYJVzouIi5BC6f5oC0i+P+Yad5i9+iKBlL9qgq0Kc13yQEciuYBeKVL1iMhWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WMHUvDwn; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-32addf54a00so57291111fa.1;
-        Wed, 18 Jun 2025 07:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750256641; x=1750861441; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/IcyrFiwGOWpE62gt/B9Io7YT03yFKnIKHU1p3jqjyk=;
-        b=WMHUvDwnNZBbJvLYppG/yTvEbXerjNgQFdYB7gKGV06xb/B2rqpQ1BgtiaVCdaI3Ju
-         gFnIlFthiGunc+u6LQJ18WPQduttv42WVb8ioe4rQwoxs34zdrt7eruvNhuNxpempojc
-         4Mc9XMpSiVkHyOXPFPkLlSzeayai6U3Hw/LOstu3V+dGT4B1wWsBPJIhEnZhtSDESgDh
-         3agyjiCaQnzHLV9kq/jOMz8FUS4DDxKEtvDAZ+hZuSlFR3wROUkRU+qxG4wKp4ASSKJ7
-         OUO6viH3Yk7NARt+xVJDF7nBJatsOsaCklAVkZn6Wlq8pFCA7j+3VVcsg+8w1fUpQx8T
-         KEHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750256641; x=1750861441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/IcyrFiwGOWpE62gt/B9Io7YT03yFKnIKHU1p3jqjyk=;
-        b=qo1pVoAOOnJ6Uqx3MXglSK2XdZlzjtnFObFMIULsoJETXKhcnh/iPEAu+yT+7VcSkI
-         Lvmd8w7M4OyogeVpWpI9FrLk2Vd56S+0L5GNQqcVK521M4G5yoH2AAnRjAelHg5VX4as
-         4933wilMaYCtTx/HabqYTCS3EtAjJVBPnejbibidWbN0eOvMvK0PPfzxGxDYim3eHrw3
-         PPfvFeL/BzhShnCz3wugnZpQpQxY6K3JuYWJi85NcJC3LMVbYa14gtVuO1k4hnffDWue
-         pCdtRv6ANKKP1ZqPmZCDaoKTT353008ktPUmsOPth0JwT2J+nrBE1My6d1495l1yL2HQ
-         myzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRvW73HCeghYsiESFkyyhvbk4Ur/Hq6r1ZipY67hpVkpIhO+4TSEHc5WjTICTndwVTl4De0+m2@vger.kernel.org, AJvYcCWtS6E1kZYf4cFWU0BP+Aahuoz7uZR7O6J98Ee2wOfENTIv+fc12zp1umD6ittn3S5hu16Im6908vCMcng=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKzJtsF99BL7qS+BiudVnycwEXDBX+X5eFsxuSrHlBET+Uzow7
-	mcM6N4s9oKWEz2+OJ9T/r3mi6RX9NuO1FFBI4RtEQ7kKe1469ip5yOVf628m64Av89q5R3W+DUn
-	xOyLlcL6Ko7o27L6sMEV0CEkqAcaq140=
-X-Gm-Gg: ASbGnctimDZ88aDsxjrz1rQf2TTgAohx3KcJFREgT+hmR3j3gUEju841gw5Dkpwwc99
-	IFLutF16qIclUy2TYa43JUJKzSi5qYs4lvXI8yhACTY754+Ia5jcJIOwknIEkAQ72njhseYnTm0
-	+68faypg2cT2FcG6ZiejUSGM93AcbdLxq9sh9GUMfZoxbmAPGoeQEuRKBRCZPCuNpC7vWycU3IZ
-	9nEiQ==
-X-Google-Smtp-Source: AGHT+IEZh5GJLMzXVURg6y/wUKcSU6h1BN8I6BhM2UM98yCfN6NMmxeH65p8HJYUiGNaknluPkCqmJUBhgE91ih5+FI=
-X-Received: by 2002:a05:651c:2120:b0:32b:4773:7a80 with SMTP id
- 38308e7fff4ca-32b4a4b1834mr62679451fa.25.1750256640657; Wed, 18 Jun 2025
- 07:24:00 -0700 (PDT)
+	s=arc-20240116; t=1750256650; c=relaxed/simple;
+	bh=bi81rDOTqtPi0s6oEwF6JDygTavaOvX9oS5mne9wc4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oIQaBvDKNKErke52aei5lsov9V4SQjfZ+0BVIKo4iJ8aSY1CeKAV5nBFN0x4XM7MYWM+HuJj0zxYpy8ulbD9cOP8DDXetdZxXKPj3Xx0YdL/OB2dSKtFZVgp4zW45C+mlGpgw505ztoos98ie5Su7ggdN3URObAMFNzdrOnubEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uRtZL-000000003nZ-3dHt;
+	Wed, 18 Jun 2025 14:23:57 +0000
+Date: Wed, 18 Jun 2025 16:23:49 +0200
+From: Daniel Golle <daniel@makrotopia.org>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, Simon Horman <horms@kernel.org>,
+	arinc.unal@arinc9.com
+Subject: Re: [net-next v5 2/3] net: ethernet: mtk_eth_soc: add consts for irq
+ index
+Message-ID: <aFLL9Uhu6zmovd2O@pidgin.makrotopia.org>
+References: <20250618130717.75839-1-linux@fw-web.de>
+ <20250618130717.75839-3-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617123531.23523-1-pranav.tyagi03@gmail.com> <20250618105413.GF1699@horms.kernel.org>
-In-Reply-To: <20250618105413.GF1699@horms.kernel.org>
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Date: Wed, 18 Jun 2025 19:53:48 +0530
-X-Gm-Features: Ac12FXzbQSWSku9aQkLDSeV-_P6DV8Ph-V1X5OS2vHElwTOgP6u_-N5ZVzKDCk0
-Message-ID: <CAH4c4j+CN552qxSy8OpSzyZysTMW=gRKjLR-GPYV9cPuvduFkA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: replace strncpy with strscpy
-To: Simon Horman <horms@kernel.org>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618130717.75839-3-linux@fw-web.de>
 
-On Wed, Jun 18, 2025 at 4:24=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Tue, Jun 17, 2025 at 06:05:31PM +0530, Pranav Tyagi wrote:
-> > Replace the deprecated strncpy() with strscpy() as the destination
-> > buffer should be NUL-terminated and does not require any trailing
-> > NUL-padding. Also, since NUL-termination is guaranteed,
-> > use sizeof(conf.algo) in place of sizeof(conf.algo) - 1
-> > as the size parameter.
-> >
-> > Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
-> > ---
-> >  net/sched/em_text.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/sched/em_text.c b/net/sched/em_text.c
-> > index 420c66203b17..1d0debfd62e5 100644
-> > --- a/net/sched/em_text.c
-> > +++ b/net/sched/em_text.c
-> > @@ -108,7 +108,7 @@ static int em_text_dump(struct sk_buff *skb, struct=
- tcf_ematch *m)
-> >       struct text_match *tm =3D EM_TEXT_PRIV(m);
-> >       struct tcf_em_text conf;
-> >
-> > -     strncpy(conf.algo, tm->config->ops->name, sizeof(conf.algo) - 1);
-> > +     strscpy(conf.algo, tm->config->ops->name, sizeof(conf.algo));
->
-> Hi Pranav,
->
-> Because the destination is an array I think we can use the two-argument
-> version of strscpy() here.
->
->         strscpy(conf.algo, tm->config->ops->name);
->
-> >       conf.from_offset =3D tm->from_offset;
-> >       conf.to_offset =3D tm->to_offset;
-> >       conf.from_layer =3D tm->from_layer;
->
-> --
-> pw-bot: changes-requested
+On Wed, Jun 18, 2025 at 03:07:13PM +0200, Frank Wunderlich wrote:
+> From: Frank Wunderlich <frank-w@public-files.de>
+> 
+> Use consts instead of fixed integers for accessing IRQ array.
+> 
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-Hi,
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 
-Thanks for the feedback. I'll update the patch accordingly
-and send a v2 for the same.
-
-Regards
-Pranav Tyagi
+> ---
+> v5:
+> - rename consts to be compatible with upcoming RSS/LRO changes
+>   MTK_ETH_IRQ_SHARED => MTK_FE_IRQ_SHARED
+>   MTK_ETH_IRQ_TX => MTK_FE_IRQ_TX
+>   MTK_ETH_IRQ_RX => MTK_FE_IRQ_RX
+>   MTK_ETH_IRQ_MAX => MTK_FE_IRQ_NUM
+> v4:
+> - calculate max from last (rx) irq index and use it for array size too
+> ---
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 22 ++++++++++-----------
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.h |  7 ++++++-
+>  2 files changed, 17 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> index 39b673ed7495..875e477a987b 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -3342,9 +3342,9 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
+>  	int i;
+>  
+>  	/* future SoCs beginning with MT7988 should use named IRQs in dts */
+> -	eth->irq[1] = platform_get_irq_byname(pdev, "tx");
+> -	eth->irq[2] = platform_get_irq_byname(pdev, "rx");
+> -	if (eth->irq[1] >= 0 && eth->irq[2] >= 0)
+> +	eth->irq[MTK_FE_IRQ_TX] = platform_get_irq_byname(pdev, "tx");
+> +	eth->irq[MTK_FE_IRQ_RX] = platform_get_irq_byname(pdev, "rx");
+> +	if (eth->irq[MTK_FE_IRQ_TX] >= 0 && eth->irq[MTK_FE_IRQ_RX] >= 0)
+>  		return 0;
+>  
+>  	/* legacy way:
+> @@ -3353,9 +3353,9 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
+>  	 * On SoCs with non-shared IRQs the first entry is not used,
+>  	 * the second is for TX, and the third is for RX.
+>  	 */
+> -	for (i = 0; i < 3; i++) {
+> +	for (i = 0; i < MTK_FE_IRQ_NUM; i++) {
+>  		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
+> -			eth->irq[i] = eth->irq[0];
+> +			eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
+>  		else
+>  			eth->irq[i] = platform_get_irq(pdev, i);
+>  
+> @@ -3421,7 +3421,7 @@ static void mtk_poll_controller(struct net_device *dev)
+>  
+>  	mtk_tx_irq_disable(eth, MTK_TX_DONE_INT);
+>  	mtk_rx_irq_disable(eth, eth->soc->rx.irq_done_mask);
+> -	mtk_handle_irq_rx(eth->irq[2], dev);
+> +	mtk_handle_irq_rx(eth->irq[MTK_FE_IRQ_RX], dev);
+>  	mtk_tx_irq_enable(eth, MTK_TX_DONE_INT);
+>  	mtk_rx_irq_enable(eth, eth->soc->rx.irq_done_mask);
+>  }
+> @@ -4907,7 +4907,7 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
+>  	eth->netdev[id]->features |= eth->soc->hw_features;
+>  	eth->netdev[id]->ethtool_ops = &mtk_ethtool_ops;
+>  
+> -	eth->netdev[id]->irq = eth->irq[0];
+> +	eth->netdev[id]->irq = eth->irq[MTK_FE_IRQ_SHARED];
+>  	eth->netdev[id]->dev.of_node = np;
+>  
+>  	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
+> @@ -5184,17 +5184,17 @@ static int mtk_probe(struct platform_device *pdev)
+>  	}
+>  
+>  	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
+> -		err = devm_request_irq(eth->dev, eth->irq[0],
+> +		err = devm_request_irq(eth->dev, eth->irq[MTK_FE_IRQ_SHARED],
+>  				       mtk_handle_irq, 0,
+>  				       dev_name(eth->dev), eth);
+>  	} else {
+> -		err = devm_request_irq(eth->dev, eth->irq[1],
+> +		err = devm_request_irq(eth->dev, eth->irq[MTK_FE_IRQ_TX],
+>  				       mtk_handle_irq_tx, 0,
+>  				       dev_name(eth->dev), eth);
+>  		if (err)
+>  			goto err_free_dev;
+>  
+> -		err = devm_request_irq(eth->dev, eth->irq[2],
+> +		err = devm_request_irq(eth->dev, eth->irq[MTK_FE_IRQ_RX],
+>  				       mtk_handle_irq_rx, 0,
+>  				       dev_name(eth->dev), eth);
+>  	}
+> @@ -5240,7 +5240,7 @@ static int mtk_probe(struct platform_device *pdev)
+>  		} else
+>  			netif_info(eth, probe, eth->netdev[i],
+>  				   "mediatek frame engine at 0x%08lx, irq %d\n",
+> -				   eth->netdev[i]->base_addr, eth->irq[0]);
+> +				   eth->netdev[i]->base_addr, eth->irq[MTK_FE_IRQ_SHARED]);
+>  	}
+>  
+>  	/* we run 2 devices on the same DMA ring so we need a dummy device
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> index 6f72a8c8ae1e..8cdf1317dff5 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> @@ -642,6 +642,11 @@
+>  
+>  #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
+>  
+> +#define MTK_FE_IRQ_SHARED	0
+> +#define MTK_FE_IRQ_TX		1
+> +#define MTK_FE_IRQ_RX		2
+> +#define MTK_FE_IRQ_NUM		(MTK_FE_IRQ_RX + 1)
+> +
+>  struct mtk_rx_dma {
+>  	unsigned int rxd1;
+>  	unsigned int rxd2;
+> @@ -1292,7 +1297,7 @@ struct mtk_eth {
+>  	struct net_device		*dummy_dev;
+>  	struct net_device		*netdev[MTK_MAX_DEVS];
+>  	struct mtk_mac			*mac[MTK_MAX_DEVS];
+> -	int				irq[3];
+> +	int				irq[MTK_FE_IRQ_NUM];
+>  	u32				msg_enable;
+>  	unsigned long			sysclk;
+>  	struct regmap			*ethsys;
+> -- 
+> 2.43.0
+> 
 
