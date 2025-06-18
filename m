@@ -1,165 +1,129 @@
-Return-Path: <netdev+bounces-199205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 318EAADF6BE
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:20:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE80ADF6C2
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D238A3BEB30
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:19:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F7AE17E033
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E257220D51A;
-	Wed, 18 Jun 2025 19:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41D6207A0B;
+	Wed, 18 Jun 2025 19:22:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lucaweiss.eu header.i=@lucaweiss.eu header.b="a7HkDahI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jy4x/7PV"
 X-Original-To: netdev@vger.kernel.org
-Received: from ahti.lucaweiss.eu (ahti.lucaweiss.eu [128.199.32.197])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CF71A2632;
-	Wed, 18 Jun 2025 19:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.199.32.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41CA23085AE;
+	Wed, 18 Jun 2025 19:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750274393; cv=none; b=fH+8ZhcnV0GVfD8WQi75GzDVIm8vajiXVxck7NndaXbODnEZqnhGpSeKoXaaDsvSaIC26X+jGvo/di7Dl79Tts0iBwJVOt6bgtkcEXLDBlMwiQ+M64QkfsAhn0qTKrToOAA291GuaXZM1XCLyKGlStaep7JkQBihmDqc8HsFrjM=
+	t=1750274542; cv=none; b=BvEU/ptkkp8L1awwQJ3ULZo723uoHaZVw5yLd8omLVgI9/k2tufn0NHq4AE7DcdgAzU6xQR10JSp07qlktib2NS5DrX9HdJ0wyb5n5gNhJG1dkh5ueLcirFCngEK8V9h7FCcZFxHmin3juP9Xaxd31EaoARJiNTT2lZIhgSwwys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750274393; c=relaxed/simple;
-	bh=l+CGLaIk4eVguzrZZFsUdEtSHXK3ZjcP7ggXpAQ0o8w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BhpTFSNppSOwVAHwuS5NX1HTOP9hZQyMlLB6/7o+Keii12yK11ZlBOiJeThXksuMls4a3onv5LgKigHReTbT8cFP/vmUFaYHlwNF0w/ASNC2VyzVZTilwlXevuwVSaTTj21tsvCSgAAqEYkyuAjhOCI9S/wPQnLFNn7JnEcxwxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=lucaweiss.eu; spf=pass smtp.mailfrom=lucaweiss.eu; dkim=pass (1024-bit key) header.d=lucaweiss.eu header.i=@lucaweiss.eu header.b=a7HkDahI; arc=none smtp.client-ip=128.199.32.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=lucaweiss.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lucaweiss.eu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lucaweiss.eu; s=s1;
-	t=1750274383; bh=l+CGLaIk4eVguzrZZFsUdEtSHXK3ZjcP7ggXpAQ0o8w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=a7HkDahICdgPiRTpNg1HTPNq5u+XQyHBc8SKqAd/jak7dPWPOY0f5KQXCP0JF9LkR
-	 406IVwmhHOjhKffoYccr40dotXqjdddNrw+xg5DKmjqEvT+sp3GHYu8dTmsbf3wB8+
-	 xanZWfpue4k/l74iwyWnPFICi9MaTQYX06Oav0Oc=
-Message-ID: <ea183f5a-b4c8-4dc0-960f-dba0db5a5abb@lucaweiss.eu>
-Date: Wed, 18 Jun 2025 21:19:42 +0200
+	s=arc-20240116; t=1750274542; c=relaxed/simple;
+	bh=K+Sxn5ZFjdLNK4MAiVvRQ0Ik9p5RLUsRzxE55lXXHiQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WdfRwCZ5nPvN3/Fyawd6ebMmcdNtrpK5CVwPqEx5tRvilOPmfnEB3iOwL0p0805WMJ2UlrTtJeCJyYNYZG3GEY5cB7GNf59vVsInWbDiP7kEm3ixoKfBIGQyg5pGh/Tglo7uc66aXdhkw+Ho2Hx2M6D4RMM3dCjXIR4CKjdfXhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jy4x/7PV; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-875ce3c8e24so194293539f.1;
+        Wed, 18 Jun 2025 12:22:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750274540; x=1750879340; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K+Sxn5ZFjdLNK4MAiVvRQ0Ik9p5RLUsRzxE55lXXHiQ=;
+        b=Jy4x/7PVs+t67m5SWs2qRt14Ewq74gdp7CigkhWZNQ61pjXU02mcF/uheRzduCNxOq
+         K/NOPWkbb+WzstX7ZiffzIm4llw3hJ/txNDlE0+w9ZFYpzKTh12cj3oNMHvFqN9e5EHr
+         mqnNlCZ8HsX6uAq3/L/7fMxiKhC4WFWzxAp0ruSHaE3N3UNeIlMtOkwVVpkqfd6R/1uB
+         FjYUMm5fjR8dm/pRT9MmY/PGeKPwcBCTnNe0+jbHkit+67cE0Qt6LpCOuZ7iQmPF6/Nu
+         BjD8skLZchX1VEpkxyykmxyMO4h886y60kHWTvNiMntZID5ZRqhTlsKKZ6ubZg/L+dbu
+         EPnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750274540; x=1750879340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K+Sxn5ZFjdLNK4MAiVvRQ0Ik9p5RLUsRzxE55lXXHiQ=;
+        b=a5ZebYXLi7Vzu7RD+y8rjykxiF+pkZr0HoHonqWKIcBRf8YZMK/c0sx2sXQAAQass0
+         1qnRIJ9d057tL2nhemk4F67s8IXAuPzudM+IObuhgpGzF4qWRVhI5Fdtnatc1rXXkMsJ
+         yfEgZpvZb4HjhsHcluyjx96Om0yeEGOKbjwSrnYUMxZpRgR/t4SbPGBxsRSGwVFZpFmg
+         uJLZ2RI322Veym2KXNbN8UMydIpAzG8J0jEWGqOwtAniL17yYOyHLIgUFCkfwvsXMZgP
+         cAvkQNCPnUzfuWdsQxzgx5YvhRPy+cHa7uLHwrNer5qi896mS8qZauzp8TGYertaM/UQ
+         nafQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4iI7uJb13Yuu6JDre81+BrEPdhWeyqDMo3782Yq6MG4ZQW0x73XMx7m/OBdRQPAdKeQw=@vger.kernel.org, AJvYcCVAV13g/2l5+qkxfI+/dZGY9qig4rb2W31dG8jYAibp/vX5nOwaPtyydJ3HJQG6XmIvIdCkD0Ym@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8tSAIgatXJayb5Ecy7zYFSYH+AndQ/Vi9XBLMDO+AMYbtyluI
+	AOu13ioRjiN93PGEpgxLmAeCfFosSM3M+W0+kw7h4HMOvfITwVxJk/qBZ3DZBay9hCWDsttRg6A
+	YG8W3ywZ0Oe8jUMebHVwBIs1rQaVHRBY=
+X-Gm-Gg: ASbGnct1507z7737lQPNQlTQdaTocaOMImhiiBCXd8xeiW8+HpB2b98qm8spS2+pmhX
+	vKaR6Ddy/FSPEog5Hjv14vUgH78wleE2lh1sSRKL93tuWJ30da5QMGrOS5UfudnlvgNgnPvnmaA
+	E85WlXwvJN1MwTT3k2oNySHsFtvfilL3MBiuMr13jPufY=
+X-Google-Smtp-Source: AGHT+IG2hEsrQOuGjhv1gsjDmB2ZXYLINw/QptPg+a1sMwMqZJqieX7poWJ7RU1vqQ+Kr4d1fE7nLR3UqlHe0kkQqU8=
+X-Received: by 2002:a05:6e02:1522:b0:3de:2102:f1d8 with SMTP id
+ e9e14a558f8ab-3de2102f53dmr116891125ab.18.1750274540223; Wed, 18 Jun 2025
+ 12:22:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] iio: Add Qualcomm Sensor Manager drivers
-Content-Language: en-US
-To: Yassine Oudjana <y.oudjana@protonmail.com>,
- Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>,
- Sean Nyekjaer <sean@geanix.com>,
- Javier Carrasco <javier.carrasco.cruz@gmail.com>,
- Matti Vaittinen <mazziesaccount@gmail.com>,
- Antoniu Miclaus <antoniu.miclaus@analog.com>,
- Ramona Gradinariu <ramona.gradinariu@analog.com>,
- "Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- =?UTF-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?= <barnabas.czeman@mainlining.org>,
- Danila Tikhonov <danila@jiaxyga.com>,
- Antoni Pokusinski <apokusinski01@gmail.com>,
- Vasileios Amoiridis <vassilisamir@gmail.com>,
- Petar Stoykov <pd.pstoykov@gmail.com>,
- shuaijie wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Ingo Molnar <mingo@kernel.org>
-Cc: Yassine Oudjana <yassine.oudjana@gmail.com>,
- linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20250406140706.812425-1-y.oudjana@protonmail.com>
- <20250406140706.812425-4-y.oudjana@protonmail.com>
-From: Luca Weiss <luca@lucaweiss.eu>
-In-Reply-To: <20250406140706.812425-4-y.oudjana@protonmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250618065553.96822-1-kerneljasonxing@gmail.com> <aFLWpssHj9sE9vvc@mini-arch>
+In-Reply-To: <aFLWpssHj9sE9vvc@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 19 Jun 2025 03:21:44 +0800
+X-Gm-Features: AX0GCFtRPZS7-yuuAEBOnY_Nb8fXmLzjToI7h7V4uWl7SK5t0tRTC65U76KxMoY
+Message-ID: <CAL+tcoDX=VOPQokJ+xZwyO1GcGwyyJtH2Vowh8d3T0SEzS8_6Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: xsk: add sysctl_xsk_max_tx_budget in the
+ xmit path
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Yassine!
+On Wed, Jun 18, 2025 at 11:09=E2=80=AFPM Stanislav Fomichev
+<stfomichev@gmail.com> wrote:
+>
+> On 06/18, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > For some applications, it's quite useful to let users have the chance t=
+o
+> > tune the max budget, like accelerating transmission, when xsk is sendin=
+g
+> > packets. Exposing such a knob also helps auto/AI tuning in the long run=
+.
+> >
+> > The patch unifies two definitions into one that is 32 by default and
+> > makes the sysctl knob namespecified.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > v2
+> > Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxin=
+g@gmail.com/
+> > 1. use a per-netns sysctl knob
+>
+> Why are you still insisting on the sysctl? Why not a per-socket (struct
+> xdp_sock) value? And then you can add a setsockopt (xsk_setsockopt) to tu=
+ne it.
 
-On 06-04-2025 4:08 p.m., Yassine Oudjana wrote:
-> Add drivers for sensors exposed by the Qualcomm Sensor Manager service,
-> which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
-> include accelerometers, gyroscopes, pressure sensors, proximity sensors
-> and magnetometers.
-> 
-> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
+Oh, I gave that thought too. At that time, I was thinking it requires
+an extra system call to take effect. Maybe not that flexible?
 
-<snip>
+I'll follow your advice in V3 if no other objections arise.
 
-> +static const char *const qcom_smgr_sensor_type_platform_names[] = {
-> +	[SNS_SMGR_SENSOR_TYPE_ACCEL] = "qcom-smgr-accel",
-> +	[SNS_SMGR_SENSOR_TYPE_GYRO] = "qcom-smgr-gyro",
-> +	[SNS_SMGR_SENSOR_TYPE_MAG] = "qcom-smgr-mag",
-> +	[SNS_SMGR_SENSOR_TYPE_PROX_LIGHT] = "qcom-smgr-prox-light",
-> +	[SNS_SMGR_SENSOR_TYPE_PRESSURE] = "qcom-smgr-pressure",
-> +	[SNS_SMGR_SENSOR_TYPE_HALL_EFFECT] = "qcom-smgr-hall-effect"
-> +};
-> +
-> +static void qcom_smgr_unregister_sensor(void *data)
-> +{
-> +	struct platform_device *pdev = data;
-> +
-> +	platform_device_unregister(pdev);
-> +}
-> +
-> +static int qcom_smgr_register_sensor(struct qcom_smgr *smgr,
-> +				     struct qcom_smgr_sensor *sensor)
-> +{
-> +	struct platform_device *pdev;
-> +	const char *name = qcom_smgr_sensor_type_platform_names[sensor->type];
-
-On msm8226 lg-lenok I get NULL here leading to a crash with the next call.
-
-I get sensor->type=0 for some heart rate sensor on that watch. I've 
-added this patch on top to fix that (excuse the formatting):
-
-<snip>
-
-> diff --git a/drivers/iio/common/qcom_smgr/qmi/sns_smgr.h b/drivers/iio/common/qcom_smgr/qmi/sns_smgr.h
-> new file mode 100644
-> index 000000000000..a741dfd87452
-> --- /dev/null
-> +++ b/drivers/iio/common/qcom_smgr/qmi/sns_smgr.h
-> @@ -0,0 +1,163 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __SSC_SNS_SMGR_H__
-> +#define __SSC_SNS_SMGR_H__
-> +
-> +#include <linux/iio/common/qcom_smgr.h>
-> +#include <linux/soc/qcom/qmi.h>
-> +#include <linux/types.h>
-> +
-> +/*
-> + * The structures of QMI messages used by the service were determined
-> + * purely by watching transactions between proprietary Android userspace
-> + * components and SSC. along with comparing values reported by Android APIs
-> + * to values received in response messages. Due to that, the purpose or
-> + * meaning of many fields remains unknown. Such fields are named "val*",
-> + * "data*" or similar. Furthermore, the true maximum sizes of some messages
-> + * with unknown array fields may be different than defined here.
-> + */
-> +
-> +#define SNS_SMGR_QMI_SVC_ID			0x0100
-> +#define SNS_SMGR_QMI_SVC_V1			1
-> +#define SNS_SMGR_QMI_INS_ID			50
-This instance ID needs to be 0 on msm8974 and msm8226, so I assume we 
-don't want to make this a define but just add the 50 and the 0 as-is to 
-the match table?
-
-Regards
-Luca
+Thanks,
+Jason
 
