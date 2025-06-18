@@ -1,217 +1,178 @@
-Return-Path: <netdev+bounces-199130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5801ADF1AD
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:47:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F5EADF1A9
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:46:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D9FD3BC362
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:47:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B3F37ADC19
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0BE18DB03;
-	Wed, 18 Jun 2025 15:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BCD18DB03;
+	Wed, 18 Jun 2025 15:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="npZKAEJ1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuEFOF+J"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2066.outbound.protection.outlook.com [40.107.102.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40E228E7
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750261648; cv=fail; b=R93bYmtilTtkJvODQf89ZTIrNCOxkQuZGfmHRHHAxhsTfUK1pqx0aPzfmIrWK1vjl+fcthQdHtwx/oHusPryASUfdy5BRoT/mP6bstg1QuMMsDvXq3lX3VRLPAMWCcNkPXE6G8H8CzqI95If7XZjCNOphw6OdCYjmakDaJiSq2M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750261648; c=relaxed/simple;
-	bh=md3b5d9RMSOOco5uZERFW1Hy8fteVTWpK7PqteeP9uE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ngP8YzjyYS3hIak1If2EvaYlk5LpGIegkTwgBm83sJwYLbscbxHssmHaB8ZLGf5b/w7qqJyEFu4T7bs1yg7NWN3rYFfh7T1xXkAdU3Y3YNhvAoGz5tQ87BDyRKKPMc97NRdQ7riZtnJbpqR8R4nCcLUOPEgONI9BltSYeBtMXAQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=npZKAEJ1; arc=fail smtp.client-ip=40.107.102.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NqjZHWjd6/DV2u31SKbh6vVWw0SRMjdxwGbvMFrJFjNfdy2joRv47vrb5btfPEFMUWW210Txiejk8syWCk1k1Bc1KQPgZvYfkAIkL7kJkV41tT5mjvvGDjEn4QB2RJXHwqBdI4ZGg3HE37/KmjpzMlr64gsOmaGfTkY7UnOxWvvZnNmE99Z1d4d9Wy022xIre0IWQD/yd8mUNAlt0KXbgjxUXFLTYyb8O41gfWgCLxrxrVY6kpcJCsknRsjeQoZ4d6Uzxb477S89TQa+sdP0EH2aHv8ouAXA5v5/la+aM9yFy1jgew65SPSuBNNvLKbWCxd9paK9d14FajmXoO4dHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OxM4FfkK9odOZXcSXOtFx+lZMmKb9VbTV9ttijeExFc=;
- b=JuHHMfRpgDQyC1jWrVDrZ4zBJ1z+/dC0YEiHm/i4hp87R3Fk0/4jPvja+AFz1CZaLtoK4dD5VtKbDylsMCYruPegyRgBHmfTuoT2c3t2J2Y84A9yEld0WG44D14BViZoJnKsFmiueIuoGn97mHj9QYsq/uDgR/TtlupBl5Xv20yDO1l4jsv8Ey338I4qIOnri9rIR1+Txvq1HP5Q/ZX7di5Xk30rdG/kKm+xDL2UMZoZOiHN8tr8KuJESswGb0XUua8JYJl7r4NxmbMfuhdCWntU4NAFqWVW6dT7F+k5v4/dJ32fHLRjwM8Xf3wnYkiNGJM069dafFbHd+GJdzrFRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OxM4FfkK9odOZXcSXOtFx+lZMmKb9VbTV9ttijeExFc=;
- b=npZKAEJ15yQZ6nHmE73fvz1OdWdzqqViI/AYdLAz0ZHxgm26T1/keCI8bMhH4RiMMyj3WY/7Il0jVESFzDRgHtuOmIJlVN9IMRDIu+e8Xf4UA/WN8uOWTJ8YVOUh1Ob/+siTfRFVXngQNSF4bjYJ1ons2yi17yQMWHMsP1wtVgPrBQNBW+wopqFimnrahVgaxBxAj1B+7gImbm24IvT3bSaZeSv60R4VYf2TQzu8/qRxcCEx7DsJfMGIVxprghWDLcoDdSnefLi1IgGfRkU169j5RiqmkJA7E0Vv0tlOv7Ug/4LOKcmZuNnV4DE+HRM+bP972b+WmF9Mk49jpIoybA==
-Received: from DS7PR05CA0032.namprd05.prod.outlook.com (2603:10b6:8:2f::31) by
- IA0PR12MB7652.namprd12.prod.outlook.com (2603:10b6:208:434::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.19; Wed, 18 Jun 2025 15:47:24 +0000
-Received: from CY4PEPF0000EE3A.namprd03.prod.outlook.com
- (2603:10b6:8:2f:cafe::17) by DS7PR05CA0032.outlook.office365.com
- (2603:10b6:8:2f::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.22 via Frontend Transport; Wed,
- 18 Jun 2025 15:47:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE3A.mail.protection.outlook.com (10.167.242.12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.21 via Frontend Transport; Wed, 18 Jun 2025 15:47:23 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 18 Jun
- 2025 08:47:04 -0700
-Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 18 Jun
- 2025 08:47:02 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>
-Subject: [PATCH iproute2-next] ip: VXLAN: Add support for IFLA_VXLAN_MC_ROUTE
-Date: Wed, 18 Jun 2025 17:44:43 +0200
-Message-ID: <14b0000cd0f10a03841ce62c40501a2dc1df2bc4.1750259118.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1088628E7;
+	Wed, 18 Jun 2025 15:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750261582; cv=none; b=IwswSpJDPsOn2fnmHIgkDe87KZQuP75jqjCe+iNZaNRkwavC9KYcHLNBSo1Z61pmzawYxNrLDmQI5Ob9FA57tvVkorJQxuN9AqMKViNPGIhudOw/qLVuhWHjRJ8z0XjrSxSFKERBaNUAAY3qC07uWG8OpAjOQmkIkTch2tB9H58=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750261582; c=relaxed/simple;
+	bh=RkhAhy7cJp7ZZXWeYy/4iE+8/T6IKGFMwCV6ga9hQfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fi66Uw4W6XVNqzP/rvYNvXcYqMf0IxZ3O/GA7GVv3RPPaHATu/cDtnIdEBePjgxjwIxcbLOcruru0CYqOSXylY2QuHA0q4r1gcE1znCgJBqnoHszA4BCd8O+A5okwHdHoTmU/LHSdibFJQSPt/yiFH63rMOXQKrfS/WeM2kJ8JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UuEFOF+J; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742caef5896so5935362b3a.3;
+        Wed, 18 Jun 2025 08:46:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750261580; x=1750866380; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=egqntrQT0mcTNXSQUXdoAiXmKkzBs77HbRV6QGmeUAk=;
+        b=UuEFOF+JdyiAj3Nd86ECLudy3nFgZviRj9XMGM1HgtNHFgSSuIRZm44OY1ANjGlvbB
+         Qv5i2mPINBbQQHAr2CMzd4v26XIjUnDp4SrIUmySMz7DO7fzEq1sF/i6oFfxZOhj56zA
+         Bdgqe4C0c/sNX5SZuI+T97D/PFvJZcekWt37jIxPJqkaZv60khEK3sjJorfapBZG/gyI
+         EqXtusq7O4EurM5ERY6GTTyA7+p3qYyrts8nRTkjLto1I4p6Ydn+nGcSf2ELVFn2QzkI
+         Qr2XE/Sjk+pIHm2nDEcO1v6spMiytoFH7i5F6QZZggFcuRSc2kNOGfKzSoR5wFzdeHu5
+         Ym7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750261580; x=1750866380;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=egqntrQT0mcTNXSQUXdoAiXmKkzBs77HbRV6QGmeUAk=;
+        b=kwccK/DSq+6/9r5GePcwlB951hD+XeP+EisCDzXlKC4ZLoP6dyUIDqWya7CThRBPAs
+         X9xhbHh1Tlc0tAvfRnZrgYe0ukxhnLu3+eVARzkwPAHZwIv6c9B0q1azeK0ABvDFQoIU
+         nuaP3GsfYOnvkdL5IoygiKiRwFCYRjbC6Kv9cAkxKiRInZmTcyUWRibnj/nM0Bzb9wfE
+         dfjo4kE8z8RV2njLjscCLu3ltMH9lzxHdi9tqVneV2LxbgwZJoZHUBdhYy0dtF4NFqOJ
+         kGbUcJpYEAumFL2AjaGjxYB5rg5eqxev/kGzLs4eUXQuiMMlBKbc06+uOMqtRCE1XoR4
+         aE0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVmkqAnpClrAH/4NKg3+1w1ePYclrjOA2ENWr+85KmHK2cMBiB0fjmfqHHwZihJfID6LJVd3zdU7kE=@vger.kernel.org, AJvYcCWnXKf4Ro1La0rxdfVg+7n+/ThnozhTTf5rfUIZEVHvICLSIZJJEBgnSB26/HNeZery9E8mzB48@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRByMoQSrfNWEnhwwFFKFsxOw1jgdpy9qbeIG1INjTzkASwXn6
+	ODWUOGm+y1Lgy+rsrc81wRYZqgoK+ka8Q44OnNyYVINY0/kWwHZIutTW
+X-Gm-Gg: ASbGncvM7ac1u9QRCjEeq2L1dalPE8zeENbgGmt7RpCEOtQECLSdTcy5zszdXcxsWwi
+	QYQF8Wdpt61iKedRp0wtgFvt4/mzjwvbQBoDUn48paQe2bNKF2QBpYBk92mC1vhNeXlvCp+J7Kr
+	tR5duHifQB4z9w1nWkyyvryEorJfFh5h1hC2Q1vTtIoxunecdLTDHQmBMEBqcTlALLuIb2SMk8B
+	590pnyLkrn51RM2UfwCk15iXJFRDNBbAzctGajY66v4tSfiJCKvm8ZMoeg5vnZ7/W3dbrIaXQao
+	UdlLzIKucz66PPjeWhDHa61ta2RXalGM9Ke3hNMIHakhioeePpjVE7J5oojP83Q22GBzGDmMqQ/
+	hAA6DdfJ3xRh/RtFj4WhT/G0WTsVoOm8E
+X-Google-Smtp-Source: AGHT+IGojw9TogQCLzzrFvTji884jdeSs6pD+joQuFZ1XOjZry8dO66lcKyVpPr1hvTndaJFUZbB5g==
+X-Received: by 2002:a05:6a00:895:b0:73e:2dc5:a93c with SMTP id d2e1a72fcca58-7489cf9a3bbmr21984258b3a.11.1750261580264;
+        Wed, 18 Jun 2025 08:46:20 -0700 (PDT)
+Received: from [10.0.2.15] (KD106167137155.ppp-bb.dion.ne.jp. [106.167.137.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74890082e71sm11574559b3a.107.2025.06.18.08.46.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jun 2025 08:46:19 -0700 (PDT)
+Message-ID: <17f2a9ce-85ac-414a-b872-fbcd30354473@gmail.com>
+Date: Thu, 19 Jun 2025 00:46:15 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3A:EE_|IA0PR12MB7652:EE_
-X-MS-Office365-Filtering-Correlation-Id: f17594cf-c6c0-4bad-e54a-08ddae7f6b54
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?BKuBg+Ol9ELCuOv2fZPoa+ajCnAbg8vM/InhNjbefNq6pT2yTQbs34pYpeP2?=
- =?us-ascii?Q?ivXvqBTJjOupaZsoKqVHqyTq79pwc9mKEusAVdcBKSiZTG1O9r/E191xCPeq?=
- =?us-ascii?Q?W9i1UaasgwjXc7eT1qOHE1Zkk3g5JhRlp7VrS7brN70xPkDDCEQsnLGJRJgg?=
- =?us-ascii?Q?EGpws/8pBdlS77oVMYGPT6oNeusL1FOHxv1kJ42PwwV3QThzpSL+bIa3hSLl?=
- =?us-ascii?Q?Rts2vOLEU2ybIEUP6JOiNLMouRBEAW9OKwv5tOJgpdgzEi7Lu3m/nv2LwxEV?=
- =?us-ascii?Q?q7aVAlRgbPB9Opebte14o3WUQrfrZJmc08f/2AIatkd/O/9L45UxrO6ioZBv?=
- =?us-ascii?Q?75MzH/XDiLjEHYiNMjvX08TSkF26XgEjN2dggR6Qo7JQFxNCSajRdWzFwWUQ?=
- =?us-ascii?Q?8lsb8LIO9kbvSVrq24l7LW+wvmPYf1SXYIIq8Lr56J1BXrzCTg6Bu7eLEXpP?=
- =?us-ascii?Q?jLcl/iNjh6CJhBdaXeLTmXDoaytLjlNvt70x5HC40AcMzPcQPlsYOOg0ZWtG?=
- =?us-ascii?Q?19hQI/n38gA1fyxnXCka6ON9UZcK9kbEwJsZs3GGVwVSFcTEyxzrnwpxD0Z+?=
- =?us-ascii?Q?uamwbPriXFAtOB26iyBvYMMgRszL1VFHpHC13LkvmsqlD0Af3J7zy+r8tVWW?=
- =?us-ascii?Q?kNvesMYBCMvmqbhAoUMPAVz8nQ169NNnkFF7bCVnlK6lx8lVPE3gJt0Tl6c1?=
- =?us-ascii?Q?G1FJcSQ4NRNjHb2lA6/P698kPVFGwuycxFweBMOOK6qb6oBW6tfy1hrK7FlT?=
- =?us-ascii?Q?M6+rM479dtBRmrFpSNr/IOM5+KXuMCr+SgCwfAbvxUllfDca79CB0fKi4Xkk?=
- =?us-ascii?Q?l+y2qdJqHmpFdi9urnfS6/mYoFtCUIWEFfv7tj0CWyoahh8I/YEuJ+66wiDm?=
- =?us-ascii?Q?V4ZEkQ/PqaWhoR830b5hLT49/X6WEi8ldmLY4wFxfmy9wZONSI1U4pmc2fP4?=
- =?us-ascii?Q?Q0FyXQBU3GU2vu2ND5tPADwShLkhLM5RW3wd7xgIy16oNqvgh1mzrge88fG/?=
- =?us-ascii?Q?Fgil/lO1ht5ltiO8su6HcNdsGZZY/AfuIW7kZf94iCGJugp+Wm85E0udGtJm?=
- =?us-ascii?Q?Lh/w2R0VwY2Strq6NjkKWEDNDiK3uBLgx+rnFiJ3PtbBmEWzkqQb/R9gxAmP?=
- =?us-ascii?Q?6atANPLUnKZvDiJwsUT87Jd6RcDhExTBNONiLjSWTkdlES/5fXEI8N17lc+M?=
- =?us-ascii?Q?PLkIJxTB8lDMjrIRZjZHnrhtl+AmCRERP09Jy4EVVYXTx7s2xRyRRn0uzpr5?=
- =?us-ascii?Q?lGCd8gojTwLrrfvzdgjmpAtOTYtpLpDmLqDsMWdE7PTqT1cZDW3VMnR80f3+?=
- =?us-ascii?Q?DcMiQCIhWyafl7Nokv1u1JJVx8aH6UKbZlhWo1lZP65T5NNsdNo3Mkl4v1d5?=
- =?us-ascii?Q?z7qCFSadvCL+cZFwGnGistjJc3b6R2dWY3VB1UbtRVWhbFRyiTccEMJZhqAe?=
- =?us-ascii?Q?vEF4vWFyFPrl2G1YiyMazcQVIfOsxeH+y4+Y/1Z3ZjeXc7pxX+vabjHyMZW0?=
- =?us-ascii?Q?f2OipvrsM++hSpckPC7Z57BOLoH1Z77WrjFD?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2025 15:47:23.9814
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f17594cf-c6c0-4bad-e54a-08ddae7f6b54
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3A.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7652
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/15] Don't generate netlink .rst files inside
+ $(srctree)
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Ignacio Encinas Rubio <ignacio@iencinas.com>, Marco Elver
+ <elver@google.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jan Stancek <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Ruben Wauters <rubenru09@aol.com>, joel@joelfernandes.org,
+ linux-kernel-mentees@lists.linux.dev, lkmm@lists.linux.dev,
+ netdev@vger.kernel.org, peterz@infradead.org, stern@rowland.harvard.edu,
+ Breno Leitao <leitao@debian.org>, Randy Dunlap <rdunlap@infradead.org>,
+ Akira Yokosawa <akiyks@gmail.com>
+References: <cover.1750246291.git.mchehab+huawei@kernel.org>
+Content-Language: en-US
+From: Akira Yokosawa <akiyks@gmail.com>
+In-Reply-To: <cover.1750246291.git.mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The flag controls whether underlay packets should be MC-routed or (default)
-sent to the indicated physical netdevice.
+Hi Mauro,
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- ip/iplink_vxlan.c     | 10 ++++++++++
- man/man8/ip-link.8.in | 10 ++++++++++
- 2 files changed, 20 insertions(+)
+On 2025/06/18 20:46, Mauro Carvalho Chehab wrote:
+> As discussed at:
+>    https://lore.kernel.org/all/20250610101331.62ba466f@foz.lan/
+> 
+> changeset f061c9f7d058 ("Documentation: Document each netlink family")
+> added a logic which generates *.rst files inside $(srctree). This is bad
+> when O=<BUILDDIR> is used.
+> 
+> A recent change renamed the yaml files used by Netlink, revealing a bad
+> side effect: as "make cleandocs" don't clean the produced files and symbols
+> appear duplicated for people that don't build the kernel from scratch.
+> 
+> This series adds an yaml parser extension and uses an index file with glob for
+> *. We opted to write such extension in a way that no actual yaml conversion
+> code is inside it. This makes it flexible enough to handle other types of yaml
+> files in the future. The actual yaml conversion logic were placed at 
+> netlink_yml_parser.py. 
+> 
+> As requested by YNL maintainers, this version has netlink_yml_parser.py
+> inside tools/net/ynl/pyynl/ directory. I don't like mixing libraries with
+> binaries, nor to have Python libraries spread all over the Kernel. IMO,
+> the best is to put all of them on a common place (scripts/lib, python/lib,
+> lib/python, ...) but, as this can be solved later, for now let's keep it this
+> way.
+> 
+> ---
+> 
+> v6:
+> - YNL doc parser is now at tools/net/ynl/pyynl/lib/doc_generator.py;
+> - two patches got merged;
+> - added instructions to test docs with Sphinx 3.4.3 (minimal supported
+>   version);
+> - minor fixes.
 
-diff --git a/ip/iplink_vxlan.c b/ip/iplink_vxlan.c
-index 9649a8eb..a6e95398 100644
---- a/ip/iplink_vxlan.c
-+++ b/ip/iplink_vxlan.c
-@@ -37,6 +37,7 @@ static const struct vxlan_bool_opt {
- 	{ "remcsum_tx", IFLA_VXLAN_REMCSUM_TX,		false },
- 	{ "remcsum_rx", IFLA_VXLAN_REMCSUM_RX,		false },
- 	{ "localbypass", IFLA_VXLAN_LOCALBYPASS,	true },
-+	{ "mcroute",	IFLA_VXLAN_MC_ROUTE,		false },
- };
- 
- static void print_explain(FILE *f)
-@@ -67,6 +68,7 @@ static void print_explain(FILE *f)
- 		"		[ [no]localbypass ]\n"
- 		"		[ [no]external ] [ gbp ] [ gpe ]\n"
- 		"		[ [no]vnifilter ]\n"
-+		"		[ [no]mcroute ]\n"
- 		"\n"
- 		"Where:	VNI	:= 0-16777215\n"
- 		"	ADDR	:= { IP_ADDRESS | any }\n"
-@@ -378,6 +380,14 @@ static int vxlan_parse_opt(struct link_util *lu, int argc, char **argv,
- 			check_duparg(&attrs, IFLA_VXLAN_VNIFILTER,
- 				     *argv, *argv);
- 			addattr8(n, 1024, IFLA_VXLAN_VNIFILTER, 0);
-+		} else if (!strcmp(*argv, "mcroute")) {
-+			check_duparg(&attrs, IFLA_VXLAN_MC_ROUTE,
-+				     *argv, *argv);
-+			addattr8(n, 1024, IFLA_VXLAN_MC_ROUTE, 1);
-+		} else if (!strcmp(*argv, "nomcroute")) {
-+			check_duparg(&attrs, IFLA_VXLAN_MC_ROUTE,
-+				     *argv, *argv);
-+			addattr8(n, 1024, IFLA_VXLAN_MC_ROUTE, 0);
- 		} else if (matches(*argv, "help") == 0) {
- 			explain();
- 			return -1;
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index 91fa0cf1..e3297c57 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -663,6 +663,8 @@ the following additional arguments are supported:
- .B gpe
- ] [
- .RB [ no ] vnifilter
-+] [
-+.RB [ no ] mcroute
- ]
- 
- .in +8
-@@ -796,6 +798,14 @@ device with external flag set. once enabled, bridge vni command is used to manag
- vni filtering table on the device. The device can only receive packets with vni's configured
- in the vni filtering table.
- 
-+.sp
-+.RB [ no ] mcroute
-+- when the VXLAN tunnel has a multicast remote, whether the underlay packets
-+should be sent directly to the physical device (the default), or whether they
-+should be multicast-routed. In the latter case, for purposes of matching a
-+multicast route, (S,G) are, respectively, local and remote address of the
-+tunnel, and iif is the tunnel physical device.
-+
- .sp
- .B gbp
- - enables the Group Policy extension (VXLAN-GBP).
--- 
-2.49.0
+Quick tests against Sphinx 3.4.3 using container images based on
+debian:bullseye and almalinux:9, both of which have 3.4.3 as their distro
+packages, emits a *bunch* of warnings like the following:
+
+/<srcdir>/Documentation/netlink/specs/conntrack.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
+/<srcdir>/Documentation/netlink/specs/devlink.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
+/<srcdir>/Documentation/netlink/specs/dpll.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
+/<srcdir>/Documentation/netlink/specs/ethtool.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
+/<srcdir>/Documentation/netlink/specs/fou.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
+[...]
+
+I suspect there should be a minimal required minimal version of PyYAML.
+
+"pip freeze" based on almalinux:9 says:
+
+    PyYAML==5.4.1
+
+"pip freeze" based on debian:bullseye says:
+
+    PyYAML==5.3.1
+
+What is the minimal required version here?
+
+And if users of those old distros need to manually upgrade PyYAML,
+why don't you suggest them to upgrade Sphinx as well?
+
+        Thanks, Akira
+
+>
+> v5:
+> - some patch reorg;
+> - netlink_yml_parser.py is now together with ynl tools;
+> - minor fixes.
+[...]
 
 
