@@ -1,98 +1,89 @@
-Return-Path: <netdev+bounces-198975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC0CADE852
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:18:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA78BADE917
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:34:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0D9D3A4212
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:15:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 534AB179968
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDFF284690;
-	Wed, 18 Jun 2025 10:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1242874FD;
+	Wed, 18 Jun 2025 10:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouSDihnf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4388C27FD7F;
-	Wed, 18 Jun 2025 10:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AB8284687;
+	Wed, 18 Jun 2025 10:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750241766; cv=none; b=WnBWXYrKsOAzmAaJRmKTSKRtfqrztDVBOdHDRzKB6C1AuzYt5RZA7KxjmwXMoxNx4hox9iqCml908KuN+MLsdF72ZkgOqUtDgl0rhZStWfsXi6SQXdTwxt4Egr5IIbls/EkwAbwaqrSagvX7VGzmLj6+/IcmZfvF975ehdz5gfI=
+	t=1750242842; cv=none; b=GFcuvCyk1IAFUUvsrmKS1VPZ+7UBg8AJHbtK2kD5K5BELU+HwdLEKy+QQXzZHQReBmsd86TDQvme19SA1OX1ES8J/JC83LWrAFR7vsJgISlExjNwraTTpMGygD8AS2RRjlShuxqRbjbtecT0pIv0qqFiQY73WbVlw8JsJ2lk+g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750241766; c=relaxed/simple;
-	bh=63P/YM6AlzgZ9xMkMXKv9TnQwwkHN8E+6brIEKb3snA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W+f0DSoNXmMwRcmWDBgMLt3hJl795fhbQYkPU8itLklwf9zAFxayXPP9cTLhGt+bhiw7VMwZFDBZ/FFd3yeTfk/bUr4diTGxYsp63Zsv20p5xJna/JsxjcSPYjpvbnYoTsH2ZDA8gTWU5CVdZNa6IdDqbRKAV6kFd7K/iXmyXX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bMfhb5DjNz28fQ1;
-	Wed, 18 Jun 2025 18:13:35 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7A02718005F;
-	Wed, 18 Jun 2025 18:16:00 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 18 Jun
- 2025 18:15:59 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <wenjia@linux.ibm.com>, <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
-	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<linux-rdma@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] net/smc: remove unused input parameters in smc_buf_get_slot
-Date: Wed, 18 Jun 2025 18:33:42 +0800
-Message-ID: <20250618103342.1423913-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750242842; c=relaxed/simple;
+	bh=9f+ncWU/Z9cZ5BuK9I51GBaZ/Ti54fUCxV8DLs5s288=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lCB/ocgEP9Ti1xy+4/RLKidZj8wsScKLhBCl/9wET+ryzzZ0bJREP5RE87V50chaCAiF2PIAUAGyY67lFqNXjePErYHh6uLJg6acuakTZOMfT0H9MzRMRDlAYPOi6eqxr5uNfzRWfClzUqWqz9YqAkwzRRsl4wpvY7icbOq9muE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouSDihnf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F32EC4CEE7;
+	Wed, 18 Jun 2025 10:34:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750242842;
+	bh=9f+ncWU/Z9cZ5BuK9I51GBaZ/Ti54fUCxV8DLs5s288=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ouSDihnfm6VK+p96sz+Ep1KNgPVNzEPSyW6fdagJdLl3jt6D53u2DFWp6X5DdGn4G
+	 cCi5mre0VS19KLHnX0vS/gAcO0pFheo388ldPBJiXX5Qdm0FwC821F8wqilNK/P+Wt
+	 L1o4IKKmdkeexEfogdz8Qy+Z/2GIY1cqCgJPLs166r2euO/cQfWD0PkPT2wnP2Msz8
+	 bqjKt2zNCbgipaV3uBkCaAymj9DzCA9LK/MMhpAYeW3tBX+bOb6fAZ2rWnKBot5gh1
+	 VSnlOBPmkC5h8Y5qE3waSP4bZofdcbKT+iQmmAkkGN6B+6W8J5847jG22qGS5RwtzN
+	 byNW8IwCG4mkA==
+Date: Wed, 18 Jun 2025 11:33:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] selftests: net: use slowwait to stabilize
+ vrf_route_leaking test
+Message-ID: <20250618103358.GB1699@horms.kernel.org>
+References: <20250617105101.433718-1-liuhangbin@gmail.com>
+ <20250617105101.433718-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250617105101.433718-2-liuhangbin@gmail.com>
 
-The input parameter "compressed_bufsize" of smc_buf_get_slot is unused,
-remove it.
+On Tue, Jun 17, 2025 at 10:50:59AM +0000, Hangbin Liu wrote:
+> The vrf_route_leaking test occasionally fails due to connectivity issues
+> in our testing environment. A sample failure message shows that the ping
+> check fails intermittently
+> 
+>   PING 2001:db8:16:2::2 (2001:db8:16:2::2) 56 data bytes
+> 
+>   --- 2001:db8:16:2::2 ping statistics ---
+>   1 packets transmitted, 0 received, 100% packet loss, time 0ms
+> 
+>   TEST: Basic IPv6 connectivity                                       [FAIL]
+> 
+> This is likely due to insufficient wait time on slower machines. To address
+> this, switch to using slowwait, which provides a longer and more reliable
+> wait for setup completion.
+> 
+> Before this change, the test failed 3 out of 10 times. After applying this
+> fix, the test was run 30 times without any failure.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
- net/smc/smc_core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index ac07b963aede..262746e304dd 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -2100,8 +2100,7 @@ int smc_uncompress_bufsize(u8 compressed)
- /* try to reuse a sndbuf or rmb description slot for a certain
-  * buffer size; if not available, return NULL
-  */
--static struct smc_buf_desc *smc_buf_get_slot(int compressed_bufsize,
--					     struct rw_semaphore *lock,
-+static struct smc_buf_desc *smc_buf_get_slot(struct rw_semaphore *lock,
- 					     struct list_head *buf_list)
- {
- 	struct smc_buf_desc *buf_slot;
-@@ -2442,7 +2441,7 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
- 		bufsize = smc_uncompress_bufsize(bufsize_comp);
- 
- 		/* check for reusable slot in the link group */
--		buf_desc = smc_buf_get_slot(bufsize_comp, lock, buf_list);
-+		buf_desc = smc_buf_get_slot(lock, buf_list);
- 		if (buf_desc) {
- 			buf_desc->is_dma_need_sync = 0;
- 			SMC_STAT_RMB_SIZE(smc, is_smcd, is_rmb, true, bufsize);
--- 
-2.34.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
