@@ -1,117 +1,143 @@
-Return-Path: <netdev+bounces-199120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9D4ADF0C3
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:09:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9AB0ADF0E1
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D95FD4A158D
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:09:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E72141885A52
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD96F2EE98C;
-	Wed, 18 Jun 2025 15:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91AD2EF646;
+	Wed, 18 Jun 2025 15:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X6j8dsn0"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TYjo1P9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D15B283145;
-	Wed, 18 Jun 2025 15:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEEC2EF288;
+	Wed, 18 Jun 2025 15:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750259372; cv=none; b=sDxQi3NQrh9y/ZhiZE3Qt2NhZ4SdQcvrjM01IxsMBKA0TCslnkZqF75RKt5CbbeDHGyuqo4xDubhJR6ftMKP8xMwsSvFUIi/3Y0AEUzCDsRRe9V/92w+HxxnRzsj1248v6RTt2pqFWMQ74yFIPDCuXq3ByEU1s/yY6xJt2p7yDc=
+	t=1750259633; cv=none; b=kTgRE1aKNCXjrs6sbIvGsjVjbWjwoH4q/bmGjyjq51Ak6KTHbsQhbWsNh8llBF83O79TVCvm8hRTE6kasg0M8NBnpGw3B4Bo7uV2M8qBI7w/Fyw1T6XnIJTeMintFECyapvcOAfHvwELiYpXR9w/3tBlDg0tp3IkDtnr4ienPsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750259372; c=relaxed/simple;
-	bh=sHdDL0lA0stF0MeG+rkk3pcKnkNoIWMrrmlS6ON+UeA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QvSODjh26pEHpgrqbZuDOXzcgI2Q4XgpAo4Xk7xYz3WAqV90KKM8gsBb+LMZvIdxY5fB3qv3WiotIw+cSRWvH6BgeUXtMjUjN0piUaDCZYCp3ObqL7mvNf0xUtoxbQNQsZmXFM3pCHq1GLF2ONyk5oRklJ+RJjEpPyrxT4bGp0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X6j8dsn0; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b2c4e46a89fso5760606a12.2;
-        Wed, 18 Jun 2025 08:09:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750259370; x=1750864170; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cNb6f+/HlT4jqkJKTMtbJO2tCcxdBDz9ZG+I5Pj37LI=;
-        b=X6j8dsn01GqLFdtPPpw2RP0UDa+OFHPobow29Y8aI4wUFZgowERLmBPpcou2mLt5VY
-         Q6PuzLt7Uoc/u/iJQMSc91y6l+nFSA2nm2Xvy7P52UAAX0fJr5qoGcu21OvhTe4J0xnG
-         pVn8roaszI3K1W4mHCrPIQsRRsNX03GE1nq16p92zCbaIYTJU4KgtiZeMJYJddoV4X69
-         lNKzPlUor1v1wsNcnBLIhybw/2P6MRXmPSWRKyhExRZ7ueMjOhNlEcpFqJkvCl3XZTKB
-         eG4BLJQgh+6v5JIk8hNJiuuvatVRHGe3ywzjHwfWDE5BH7eJ3bxwR8RE8ubKiJ3W6a5h
-         hEjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750259370; x=1750864170;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cNb6f+/HlT4jqkJKTMtbJO2tCcxdBDz9ZG+I5Pj37LI=;
-        b=TFyKnHQnO7iF6+RRACWQ0IHfvuEk76K2U4iOdLdd72PRuj4n9Oy39r0QN+a7ORLvDL
-         oCa7opVGtD8dU1bwjr9NEfXDe22Uj/q2knp1al6vbhd2yrR2QuWHJGbaiOcYNaHAJQ5W
-         OlrPNYaxk4Ouqbv867pUz94ZVIWFuSZ+Ps16rj58ilGBnX22EudywM61kYzYceqzRFAg
-         R8Uh92sB9HvnRopR7A1m8osLLrLBTTSvMbYKrOhy/8J0nvNsrB/oShjYKKmg5QCgWXKY
-         wgPYmGnr7WG2J5RNUbj8iiH1waVgO0YS2/YYRC7QL3NWyoatwdqnWOLbohCJFHDdXcVU
-         4/tw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtdKwKgJ5q27cKSdSw8GONhjaAbdHNevo64BR3AWsTtUFPbKGA/HJnPnhqby+pru84y677G+mX@vger.kernel.org, AJvYcCW3gZABBUGZgFs1xkX4ULA5Sf9HulGdZJ6P/VfKElndWmajH95IR7VVCxcGs4GIvBWjJAQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXSwBQ4RqVvJz+6UKnP/cPj6nEnJ46cfxvjwDIf8QcJP0MpFsD
-	KoBooyO/mgOdk2ia5QOADUP7KlAEp5X2lnOx+EO93xF4fkQrhdVONx8=
-X-Gm-Gg: ASbGncttH/hcN4z2UloZeIw/JbjhyITMA6rzDvvOrAYs/YtVjehUg4Zk0CjKw+4DKqS
-	BaHyqAFdhYGgJn1FLz0eDK+hqJ1Cb+HnAclYzk1P5gVhSJF2e1iB7pkEfP7xSCdvUS/TWp1pUC7
-	6jFmlGtex9i2kBDYht9FyrjAfpT1Q0fL15sUTFO4PUDUrtg5OyviyZ15BmTR/ySrIut62wqamCU
-	qZrTchTda2oXSBAUXAAJR9fpiBxzSiODscACf3ZKy65mAV8QUB6mvrHPggerl5PNiOVaViLRWiQ
-	4HiwXFP0N3hhloADy3+DMPnLaRlHttNyNHshi9o/9SstwTz0tQAAChW1765voZu7LnkneajIbrF
-	YSEM/Y4q0QoGe8kqmRLOSrUQ=
-X-Google-Smtp-Source: AGHT+IGUm7uBSvn4NHDyf/t75YKWMdQKachTxhA8/0XLD5p+1+PaWOBk+QFFO5aAgkLt6UXKrHgO/Q==
-X-Received: by 2002:a05:6a21:6d8c:b0:21a:bfb6:1c74 with SMTP id adf61e73a8af0-21fbd58c764mr30915422637.34.1750259368276;
-        Wed, 18 Jun 2025 08:09:28 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b2fe163a470sm11130566a12.9.2025.06.18.08.09.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 08:09:27 -0700 (PDT)
-Date: Wed, 18 Jun 2025 08:09:26 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2] net: xsk: add sysctl_xsk_max_tx_budget in
- the xmit path
-Message-ID: <aFLWpssHj9sE9vvc@mini-arch>
-References: <20250618065553.96822-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1750259633; c=relaxed/simple;
+	bh=Z4WjAjhgs+9cAWXseeZVzK0u2AHpialFbmIzK+axu28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Dj1wVyMklGHjYPPxQtgxgyZr5fqFwUx/F5MLthBL0cwLZmqsOexdDDGP3OFbUa3NGXXV9Z+HM6eELhi8mu9YDofxxt2jb3G4NuRy0DSRzcX2/sdhPxDaEHNe1TypMApXd800F7I4Ofa1rWeIADjQv5eFHDn6TAV+gheE2uuanuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=TYjo1P9E; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55I9231C015638;
+	Wed, 18 Jun 2025 15:13:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	BvKiGeQQXdoaNRy8cKQkU1P8BTdh5zPp9R1GKNeEFeA=; b=TYjo1P9E8jrf+vtK
+	B4mqkoC4jb/sodFzM6AqHQTtwsNRTuu9renvffElLBm9SfU4atamvmnSw5uByu59
+	UC/x0S/ZLi/QUiTrP2veC77Sher2JDnL/q7YCqhS7A5JEplsuUcq0jJGrlubh3LD
+	J9ImWWK8Ato2Iydzv6MfOlave32KwxbSIVgUlkvLBrEwn62TvxsBjsi5e5L8+D9x
+	AjSqJ0tIdFE4lK1OfM2MA/t4jJvQZiSKuUgq9p1Gv2Pi7eTzWH/OOYSzQCSiyCAu
+	D99lXvCCq7RhjWKwmMdpGHcFDZSt7kO5t+SocCmSpyJbzgQpZGwFPy1dpaFwCKI2
+	xOchng==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47b9akv2nb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Jun 2025 15:13:33 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55IFDWEE028125
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Jun 2025 15:13:32 GMT
+Received: from [10.253.36.28] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 18 Jun
+ 2025 08:13:26 -0700
+Message-ID: <c2cefd3f-3579-4c41-ac0d-08869b51eaaa@quicinc.com>
+Date: Wed, 18 Jun 2025 23:13:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250618065553.96822-1-kerneljasonxing@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/8] dt-bindings: interconnect: Add Qualcomm IPQ5424
+ NSSNOC IDs
+To: Krzysztof Kozlowski <krzk@kernel.org>, Georgi Djakov <djakov@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Will
+ Deacon" <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>
+References: <20250617-qcom_ipq5424_nsscc-v1-0-4dc2d6b3cdfc@quicinc.com>
+ <20250617-qcom_ipq5424_nsscc-v1-1-4dc2d6b3cdfc@quicinc.com>
+ <8fc66f04-27f1-416e-b7c5-d3045e94f13a@kernel.org>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <8fc66f04-27f1-416e-b7c5-d3045e94f13a@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: erdZe8h3cOfKGCAKK3MbpbXil2YGXIBE
+X-Authority-Analysis: v=2.4 cv=UPTdHDfy c=1 sm=1 tr=0 ts=6852d79d cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=P-IC7800AAAA:8
+ a=wEgfWPuv0KXlM2Taas8A:9 a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDEyOCBTYWx0ZWRfX2T73sEv55TzK
+ bd2uZbTfg0L2+P63qECMxQqLAgBX2DldXYERVfx46bZMKKPLfF2m2RhfjgFcVOZEuE4XNfFWlsd
+ nJ1lMYGAsx28VCZ4X6AHBVTB3KHgCZhwKX3iync4b5clhbKFfgpGpUW+siJEWZEDUtTTj8Ov3wu
+ T8DMEg9q5dqS0AbTDaTfWYtxJsxo6WcbNoGnA6iAPSo7yE+XVn3rrKJ1Qwn3M6+RgHi/cyx1n/s
+ W/NEleWEOfIT5bnL8U7JkKn3swRxzRj1griirdwWD6ZtpVLcOuq1KpyQaRePkmfvmcsG737i6Pu
+ oSO5jXusIIxamwQteRvkWI1Z7Xc+LQqxZ9KP5RGns6l3pISoYctKUucmLVaH3WTmLTjY0g14juM
+ EEkz9RU0o8WdTO1HhTcHbwhcZyeIQtMIEXBENvD8epVD34qMTdBdbGJBhsAV4SkvuE5544jG
+X-Proofpoint-GUID: erdZe8h3cOfKGCAKK3MbpbXil2YGXIBE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-18_05,2025-06-18_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0 bulkscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a
+ authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2506180128
 
-On 06/18, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> For some applications, it's quite useful to let users have the chance to
-> tune the max budget, like accelerating transmission, when xsk is sending
-> packets. Exposing such a knob also helps auto/AI tuning in the long run.
-> 
-> The patch unifies two definitions into one that is 32 by default and
-> makes the sysctl knob namespecified.
-> 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> v2
-> Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxing@gmail.com/
-> 1. use a per-netns sysctl knob
 
-Why are you still insisting on the sysctl? Why not a per-socket (struct
-xdp_sock) value? And then you can add a setsockopt (xsk_setsockopt) to tune it.
+
+On 6/17/2025 10:47 PM, Krzysztof Kozlowski wrote:
+> On 17/06/2025 14:06, Luo Jie wrote:
+>> Add the NSSNOC master/slave ids for Qualcomm IPQ5424 network
+>> subsystem (NSS) hardware blocks. These will be used by the
+>> gcc-ipq5424 driver that provides the interconnect services
+>> by using the icc-clk framework.
+> 
+> Please wrap commit message according to Linux coding style / submission
+> process (neither too early nor over the limit):
+> https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
+> 
+> Best regards,
+> Krzysztof
+
+Thanks. I will update the commit message to follow the guideline.
 
