@@ -1,168 +1,171 @@
-Return-Path: <netdev+bounces-199017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D08FADEA99
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:45:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 240F4ADEA93
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FC5D189E285
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:46:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97301189DF3A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 11:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE950205E2F;
-	Wed, 18 Jun 2025 11:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98172BEC28;
+	Wed, 18 Jun 2025 11:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1by10cV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB022F5323;
-	Wed, 18 Jun 2025 11:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32B92BDC28;
+	Wed, 18 Jun 2025 11:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750247151; cv=none; b=eHNr88SSAIb1TtbBqYSvphYZVP8koRvGhIzazDLKEc1jHJjjYNhiqv9FYzQcNbA7aDrVwV1zZ8v2hjwnCc4wgsD8HI0p+u1+UWBt7GLt/FVc1DQv/iG/jVJ4cVwisLo2FuHhYgYTDri6vZ05rpx5TLYOhBm2cZxQ4K78mA+qOZ4=
+	t=1750247106; cv=none; b=H2/ZT3ZfCvkPk3ltVEhjIn1e1lCkCGAlfJlO65NVxMKJa+7LAp0DKNTZO2SWZBum92Rfde3YSo6toLBAKlM/S7XS94CmMxFhmz3n/+gAc5/rjSz6yT2bI5XTO5MFrG1Wlpgx0wd3qGo9uF7kQaCfGglk1GtoSa0hFuknRYIOlrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750247151; c=relaxed/simple;
-	bh=WYJ16Alk09q6fIdfKWEBzJa6GAWM1uSoSPLuY7xDDcI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q1GN5sUk+K6xivIRVbIyfMvHLBxRv6o/YhcdnDNiCkbeETFpzYtEWg+4uU1dQTJ8OlcYpxl1nNTbh2UBebwLnb6TSQgjxlXcBT1mndFYY0tJX1Bq7XlSl/g6gUoYlUISLPAE33MAbu6agdm1jNoMgURYbwf5EIlmoti7xQiRD+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (188.234.0.8) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 18 Jun
- 2025 14:45:30 +0300
-From: d.privalov <d.privalov@omp.ru>
-To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, Miklos Szeredi <mszeredi@redhat.com>, Dmitriy
- Privalov <d.privalov@omp.ru>
-Subject: [PATCH 5.10/5.15 1/1] fuse: don't increment nlink in link()
-Date: Wed, 18 Jun 2025 14:44:09 +0300
-Message-ID: <20250618114409.179601-1-d.privalov@omp.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750247106; c=relaxed/simple;
+	bh=4DxwVQzbl8QL94anK1H5LVZzfWgTCdM52+1S4HzI3ts=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BLBYNZdrUP9u7E2AwEil64Fts374GF2i+wSVlBh7QulQY7ReJw00bD564L7wTIogLRRC6QOiuudoOnor/NCDWehuctIJ3q9qjqh7YYKPlu+G1brXmUCSW15GNrmAN3kOLLu8yynssx2STiOhYBe9apaJIQVme+TqzXhw0l7Jj4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1by10cV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173A1C4CEE7;
+	Wed, 18 Jun 2025 11:45:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750247105;
+	bh=4DxwVQzbl8QL94anK1H5LVZzfWgTCdM52+1S4HzI3ts=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S1by10cVaTcMICpnEDqlgbOe8aUivg0S0v1Kvhsq0/j8p/YYIShdcKZZP0ShuNsVG
+	 zlylBS9qv53ZCFlKU6W+QmUtC3IOXSThr7eFL5aNvavpWfimK4ADaNcj/ocPXON5LK
+	 cIC5RLpTVbtuRI7JJSerbbGNJJKOphW2jP6WiZVIdi/aLc4+32X6/nBvBseod1AfYd
+	 HcYrKZwe5V2PIxC304RaFkV1sUiww7wmiawn0EAhwcPwJoUoJXzaA69Mt9KwndogXV
+	 ONnbuXkivC2xfUOBS+zg4kf+mPxLGfmdzTR6JecL/Ss3XtCZGs9T8seF+UFOqwVt4V
+	 NhRJ4p3DcJBYA==
+Date: Wed, 18 Jun 2025 13:44:58 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Akira Yokosawa <akiyks@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Eric
+ Dumazet <edumazet@google.com>, Ignacio Encinas Rubio
+ <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>, Marco Elver
+ <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben Wauters
+ <rubenru09@aol.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
+ peterz@infradead.org, stern@rowland.harvard.edu
+Subject: Re: [PATCH v5 01/15] docs: conf.py: properly handle include and
+ exclude patterns
+Message-ID: <20250618134458.10ee8412@foz.lan>
+In-Reply-To: <1adba2c6-e4c3-4da2-874e-a304a1fdfd25@gmail.com>
+References: <cover.1750146719.git.mchehab+huawei@kernel.org>
+	<cca10f879998c8f0ea78658bf9eabf94beb0af2b.1750146719.git.mchehab+huawei@kernel.org>
+	<1adba2c6-e4c3-4da2-874e-a304a1fdfd25@gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 06/18/2025 11:27:56
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 194137 [Jun 18 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: d.privalov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 62 0.3.62
- e2af3448995f5f8a7fe71abf21bb23519d0f38c3
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 188.234.0.8
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/18/2025 11:29:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/18/2025 9:13:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Miklos Szeredi <mszeredi@redhat.com>
+Hi Akira,
 
-commit 97f044f690bac2b094bfb7fb2d177ef946c85880 upstream.
+Em Wed, 18 Jun 2025 11:42:14 +0900
+Akira Yokosawa <akiyks@gmail.com> escreveu:
 
-The fuse_iget() call in create_new_entry() already updated the inode with
-all the new attributes and incremented the attribute version.
+> Hi Mauro,
+> 
+> A comment on compatibility with earlier Sphinx.
+> 
+> On Tue, 17 Jun 2025 10:01:58 +0200, Mauro Carvalho Chehab wrote:
+> > When one does:
+> > 	make SPHINXDIRS="foo" htmldocs
+> > 
+> > All patterns would be relative to Documentation/foo, which
+> > causes the include/exclude patterns like:
+> > 
+> > 	include_patterns = [
+> > 		...
+> > 		f'foo/*.{ext}',
+> > 	]
+> > 
+> > to break. This is not what it is expected. Address it by
+> > adding a logic to dynamically adjust the pattern when
+> > SPHINXDIRS is used.
+> > 
+> > That allows adding parsers for other file types.
+> > 
+> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> > ---
+> >  Documentation/conf.py | 52 +++++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 48 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/Documentation/conf.py b/Documentation/conf.py
+> > index 12de52a2b17e..e887c1b786a4 100644
+> > --- a/Documentation/conf.py
+> > +++ b/Documentation/conf.py
+> > @@ -17,6 +17,54 @@ import os
+> >  import sphinx
+> >  import shutil
+> >  
+> > +# Location of Documentation/ directory
+> > +doctree = os.path.abspath('.')
+> > +
+> > +# List of patterns that don't contain directory names, in glob format.
+> > +include_patterns = ['**.rst']
+> > +exclude_patterns = []
+> > +  
+> 
+> Where "exclude_patterns" has been with us ever since Sphinx 1.0,
+> "include_patterns" was added fairly recently in Sphinx 5.1 [1].
+> 
+> [1]: https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-include_patterns
+> 
+> So, this breaks earlier Sphinx versions.
 
-Incrementing the nlink will result in the wrong count.  This wasn't noticed
-because the attributes were invalidated right after this.
+Heh, testing against old versions is harder with python 3.13 (Fedora
+42 default), as one library used by older Sphinx versions were dropped.
 
-Updating ctime is still needed for the writeback case when the ctime is not
-refreshed.
+I found a way to make it backward compatible up to 3.4.3, with a
+backward-compatible logic at conf.py. I'll send the new version in a few.
 
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
----
- fs/fuse/dir.c | 29 ++++++++++-------------------
- 1 file changed, 10 insertions(+), 19 deletions(-)
+> Also, after applying all of v5 on top of docs-next, I see these new
+> warnings with Sphinx 7.2.6 (of Ubuntu 24.04):
+> 
+> /<srcdir>/Documentation/output/ca.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/cec.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/dmx.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/frontend.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/lirc.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/media.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/net.h.rst: WARNING: document isn't included in any toctree
+> /<srcdir>/Documentation/output/videodev2.h.rst: WARNING: document isn't included in any toctree
 
-diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
-index 4488a53a192d..7055fdc1b8ce 100644
---- a/fs/fuse/dir.c
-+++ b/fs/fuse/dir.c
-@@ -807,7 +807,7 @@ void fuse_flush_time_update(struct inode *inode)
- 	mapping_set_error(inode->i_mapping, err);
- }
- 
--void fuse_update_ctime(struct inode *inode)
-+static void fuse_update_ctime_in_cache(struct inode *inode)
- {
- 	if (!IS_NOCMTIME(inode)) {
- 		inode->i_ctime = current_time(inode);
-@@ -816,6 +816,12 @@ void fuse_update_ctime(struct inode *inode)
- 	}
- }
- 
-+void fuse_update_ctime(struct inode *inode)
-+{
-+	fuse_invalidate_attr(inode);
-+	fuse_update_ctime_in_cache(inode);
-+}
-+
- static int fuse_unlink(struct inode *dir, struct dentry *entry)
- {
- 	int err;
-@@ -986,25 +992,10 @@ static int fuse_link(struct dentry *entry, struct inode *newdir,
- 	args.in_args[1].size = newent->d_name.len + 1;
- 	args.in_args[1].value = newent->d_name.name;
- 	err = create_new_entry(fm, &args, newdir, newent, inode->i_mode);
--	/* Contrary to "normal" filesystems it can happen that link
--	   makes two "logical" inodes point to the same "physical"
--	   inode.  We invalidate the attributes of the old one, so it
--	   will reflect changes in the backing inode (link count,
--	   etc.)
--	*/
--	if (!err) {
--		struct fuse_inode *fi = get_fuse_inode(inode);
--
--		spin_lock(&fi->lock);
--		fi->attr_version = atomic64_inc_return(&fm->fc->attr_version);
--		if (likely(inode->i_nlink < UINT_MAX))
--			inc_nlink(inode);
--		spin_unlock(&fi->lock);
--		fuse_invalidate_attr(inode);
--		fuse_update_ctime(inode);
--	} else if (err == -EINTR) {
-+	if (!err)
-+		fuse_update_ctime_in_cache(inode);
-+	else if (err == -EINTR)
- 		fuse_invalidate_attr(inode);
--	}
- 	return err;
- }
- 
--- 
-2.34.1
+We should likely use a Sphinx extension for those as well. Building those
+are also made via some Makefile tricks that predates the time we start
+adding our own extensions at the tree.
 
+> Sphinx 7.3.7 and later are free of them.  I have no idea which change in
+> Sphinx 7.3 got rid of them.
+> 
+> Now that the parallel build performance regression has be resolved in
+> Sphinx 7.4, I don't think there is much demand for keeping Sphinx versions
+> compatible.
+> These build errors and extra warnings would encourage people to upgrade
+> there Sphinx.  So I'm not going to nack this.
+> 
+> Of course, getting rid of above warnings with < Sphinx 7.3 would be ideal.
+
+I'm all for using newer versions, but we need to check what LTS distros
+are using those days.
+
+On my machine, with -jauto, 3.4.3 is taking 11 minutes to build, which
+is twice the time of 8.2.3. IMO, this is a very good reason for people
+stop using legacy versions when possible :-)
+
+Regards,
+Mauro
 
