@@ -1,174 +1,105 @@
-Return-Path: <netdev+bounces-199219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF9FADF78F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:18:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3197DADF7AF
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C384C3BD535
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:17:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF94C3BFFC1
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FDE215077;
-	Wed, 18 Jun 2025 20:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE20821A452;
+	Wed, 18 Jun 2025 20:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BmbqJwA5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fkZQs4Nw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F8C3085BA;
-	Wed, 18 Jun 2025 20:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96F11D63C2
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750277877; cv=none; b=L+8Pncrt7wQqX5xFfinDv/GLorZsffm/8aJvJINhNzKnBGnw+jydu85ixuhWAiYhBPU0wGCsnENfOAigdY7mWGRQErv9PG4hWBz5spDfs39rOgvI1CceTvGVUVVwQaUA+YlziCMJl5ELZFLxu8ph9UZ3u5CEXX+xR2UBMCBxrlk=
+	t=1750278593; cv=none; b=Zn+8UcLkn4VR+WhhiBw/vEy1RIifrBkJF+Fp93wGe4Kj1gGqN+p8J8HTKDq3NgfDBAifLybvheJfX/UG++P1YIz9cTYOkEOhDHxr3pGgcl12CLfit7u8Ly1TlOIXBlXar/nPWlG5OjHrD3MRsmqlSn1U//e3VJMQ05IkGGgOmgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750277877; c=relaxed/simple;
-	bh=eIm31ulfxb/iodvSgzs4HeeUc/QBLhrVAgBlSL3l1Y0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSNGo5b3f0ONSmliDfszpTTSwxix9vQAulKcEbcGcj4fHwV25vjQ+RgM0gz8A9gxjIM2tUM/EF4SNgCEdd36qgXJJjK6AyuiQHEMnUP1hQYfwtWqz6YK2oWSxZEfSYz0Er2kolHSO/DCrN10dDnCE/sXa1jr6qyU0vMTRyz6cwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BmbqJwA5; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750277876; x=1781813876;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eIm31ulfxb/iodvSgzs4HeeUc/QBLhrVAgBlSL3l1Y0=;
-  b=BmbqJwA5Xc2BL8VzMl5jh73mRe63jQbzS4MxNwnif5FvRCYBZPOxyjrr
-   Q5x3r6kAhOmUlQUxsMOnBGE218l+/H3mAjtEXfH3MqjeXBr8UQayCml0r
-   shxU2pBczHwFKfFYMbDioYcoSeIdXz4mp/jEwPkmyaLOhGBeqvMZUyrIp
-   4SfRLt3VNaiD+1iagNKEHavORKDfe3WYQSxyX+dSITbw+p5fsBXEn4M70
-   NQ0Am+B80Oeiwec9T6Gag9sGxbWUQk05lC7pYzLAMtWcVXnLFv+ItHeTd
-   Gz6QBnE5VkA6XQC1G5YUL7qQnpRB6r0K64c+ETkIB8eg2Idu3u+u6CBLn
-   g==;
-X-CSE-ConnectionGUID: 2f2Mg5mnRFiiP6Aeuzf0dQ==
-X-CSE-MsgGUID: 6ba/qYFsQp+NcTDcwUQpCg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="52663565"
-X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="52663565"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 13:17:37 -0700
-X-CSE-ConnectionGUID: vVtGXGxpSoiWUDzCKCU8FQ==
-X-CSE-MsgGUID: w55BZNQfQ8WmNHo73rQ5gw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="154888280"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 18 Jun 2025 13:17:32 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uRzDt-000K8U-0T;
-	Wed, 18 Jun 2025 20:17:29 +0000
-Date: Thu, 19 Jun 2025 04:16:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [net-next, 09/10] bng_en: Initialize default configuration
-Message-ID: <202506190321.0HgmyniP-lkp@intel.com>
-References: <20250618144743.843815-10-vikas.gupta@broadcom.com>
+	s=arc-20240116; t=1750278593; c=relaxed/simple;
+	bh=hUXqrxbrUuQsx3aJdqIt2qpClM8NtY0AkLc2VAqeDA4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BLzclZ58527K3EPVCbrJwWlKa6mSL/P+q6mWmjw8qFxjn52QuXJQCSTu3ZQZz2/O6cONK3qUJqJanDOJ5aO6ExV+jrB4VgIPPgBpyx4DoRly5uewM5wleOk83gjBUJ2HRb7TOEin16Gm76Wq/P3alkg7AgnitzNkFffHk0y+Z68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fkZQs4Nw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C6AFC4CEE7;
+	Wed, 18 Jun 2025 20:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750278593;
+	bh=hUXqrxbrUuQsx3aJdqIt2qpClM8NtY0AkLc2VAqeDA4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fkZQs4NwKnODbLoMSeMo9T16ZcEpPa1e6JluhKxcBL/aK+GuyIu66uYYreODMWG07
+	 IeGE6XFY644LjoiJFE0yMOWMMMOpKlePlZCgviYlWJ4y6Pj4KRyuCzzSvd4VPKi3rO
+	 CTXeWqBZH+zuwrEgRY7Gm6miflJPniLpUakSKohSqVwYaK04K4sa2YsW2QASAIG6Ye
+	 ygIh/IP8rGp12ssGm4hWOwMa2R3caxCyPJ1wm61du12B9JHVbmtgnhb/WkePE5wk7s
+	 szf7UwiE94Jt9Ru7ijYisE7rdxfuHPFCeb2UZ06Ranioql9xZt9wVLblUE0TpJ1q+F
+	 IJ8A/JTCQdvkA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE753806649;
+	Wed, 18 Jun 2025 20:30:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618144743.843815-10-vikas.gupta@broadcom.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/5] eth: migrate more drivers to new RXFH
+ callbacks
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175027862148.246778.2859409211781478341.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Jun 2025 20:30:21 +0000
+References: <20250617014848.436741-1-kuba@kernel.org>
+In-Reply-To: <20250617014848.436741-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ madalin.bucur@nxp.com, ioana.ciornei@nxp.com, marcin.s.wojtas@gmail.com,
+ bh74.an@samsung.com
 
-Hi Vikas,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.16-rc2 next-20250618]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Mon, 16 Jun 2025 18:48:43 -0700 you wrote:
+> Migrate a batch of drivers to the recently added dedicated
+> .get_rxfh_fields and .set_rxfh_fields ethtool callbacks.
+> 
+> Jakub Kicinski (5):
+>   eth: niu: migrate to new RXFH callbacks
+>   eth: mvpp2: migrate to new RXFH callbacks
+>   eth: dpaa: migrate to new RXFH callbacks
+>   eth: dpaa2: migrate to new RXFH callbacks
+>   eth: sxgbe: migrate to new RXFH callbacks
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20250618144743.843815-10-vikas.gupta%40broadcom.com
-patch subject: [net-next, 09/10] bng_en: Initialize default configuration
-config: i386-randconfig-012-20250619 (https://download.01.org/0day-ci/archive/20250619/202506190321.0HgmyniP-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250619/202506190321.0HgmyniP-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next,1/5] eth: niu: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/b82d92dd71cb
+  - [net-next,2/5] eth: mvpp2: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/b6f7e4fafe77
+  - [net-next,3/5] eth: dpaa: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/17da66f140c2
+  - [net-next,4/5] eth: dpaa2: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/20ffe3bbc2ce
+  - [net-next,5/5] eth: sxgbe: migrate to new RXFH callbacks
+    https://git.kernel.org/netdev/net-next/c/c2cd2f6125bd
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506190321.0HgmyniP-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/broadcom/bnge/bnge_resc.c:533:15: warning: result of comparison of constant -19 with expression of type 'u16' (aka 'unsigned short') is always true [-Wtautological-constant-out-of-range-compare]
-     533 |         if (rc && rc != -ENODEV)
-         |                   ~~ ^  ~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_resc.c:542:16: warning: result of comparison of constant -19 with expression of type 'u16' (aka 'unsigned short') is always true [-Wtautological-constant-out-of-range-compare]
-     542 |                 if (rc && rc != -ENODEV)
-         |                           ~~ ^  ~~~~~~~
-   2 warnings generated.
-
-
-vim +533 drivers/net/ethernet/broadcom/bnge/bnge_resc.c
-
-   511	
-   512	static int bnge_net_init_dflt_rings(struct bnge_dev *bd, bool sh)
-   513	{
-   514		u16 dflt_rings, max_rx_rings, max_tx_rings, rc;
-   515	
-   516		if (sh)
-   517			bd->flags |= BNGE_EN_SHARED_CHNL;
-   518	
-   519		dflt_rings = netif_get_num_default_rss_queues();
-   520	
-   521		rc = bnge_get_dflt_rings(bd, &max_rx_rings, &max_tx_rings, sh);
-   522		if (rc)
-   523			return rc;
-   524		bd->rx_nr_rings = min_t(u16, dflt_rings, max_rx_rings);
-   525		bd->tx_nr_rings_per_tc = min_t(u16, dflt_rings, max_tx_rings);
-   526		if (sh)
-   527			bnge_trim_dflt_sh_rings(bd);
-   528		else
-   529			bd->nq_nr_rings = bd->tx_nr_rings_per_tc + bd->rx_nr_rings;
-   530		bd->tx_nr_rings = bd->tx_nr_rings_per_tc;
-   531	
-   532		rc = bnge_reserve_rings(bd);
- > 533		if (rc && rc != -ENODEV)
-   534			dev_warn(bd->dev, "Unable to reserve tx rings\n");
-   535		bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
-   536		if (sh)
-   537			bnge_trim_dflt_sh_rings(bd);
-   538	
-   539		/* Rings may have been reduced, re-reserve them again */
-   540		if (bnge_need_reserve_rings(bd)) {
-   541			rc = bnge_reserve_rings(bd);
-   542			if (rc && rc != -ENODEV)
-   543				dev_warn(bd->dev, "Fewer rings reservation failed\n");
-   544			bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
-   545		}
-   546		if (rc) {
-   547			bd->tx_nr_rings = 0;
-   548			bd->rx_nr_rings = 0;
-   549		}
-   550	
-   551		return rc;
-   552	}
-   553	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
