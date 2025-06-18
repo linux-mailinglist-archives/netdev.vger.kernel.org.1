@@ -1,213 +1,194 @@
-Return-Path: <netdev+bounces-198841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E836DADDFE7
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:09:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868D2ADDFFD
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A3A817CDB4
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:09:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FDF318951A4
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 00:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C9017D2;
-	Wed, 18 Jun 2025 00:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9E612E5D;
+	Wed, 18 Jun 2025 00:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAnYbqRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1431362;
-	Wed, 18 Jun 2025 00:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020562F5319;
+	Wed, 18 Jun 2025 00:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750205341; cv=none; b=QK9KOTgZry1o+0t+QbqHZc4yIKCfKzV0iJugui7EItvuwjaSMpePmT9Sci1VGVVRewh1sZ3PTCTkfliDqVTioE/fxyAqrjzQXaQaCToN46soeObGnxRwoxRznNGkm6OPnWwQcCMikPPidlbrD2GdDjr6gfqoH0xQ9QSQyCDo4dU=
+	t=1750206616; cv=none; b=Xw4bkJmLVLVzNFS8n4YDaRPUbroFMRk2KiWpUgGv0q6HrIlTQpIk6X/dYK9pmfvwXgDGTdYDMVxRziF6xFP1ggObPl5Bg9E8ZlOlOaTv5Rx3QXOZutNtgZoZl+e40kfpTiuxbWFQemrdRHMd2WUkAgLseEJBvXfcpfpDgJZxMjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750205341; c=relaxed/simple;
-	bh=Lk70ooPuIoOcs1tkJF7x2dkbLiotCwY9cR+w6sgUM2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OR0s9hoAZE+6BN9ffnxTVdLc2f+SgnkwPuVXt4jEnXAofgZxrPKrCzw516MIsdAgFLsK7NOcMiv5qXgKyMm7px0YMgHjc2bX1y/DcSnFuC5hGq2kW1PkXWF1ZwUy2CXg0Kh7HKXXRRxjF83QyfvBrBhQet7K5XOgltAtGlzf+WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-28-6852038d4a0f
-Date: Wed, 18 Jun 2025 09:08:40 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Harry Yoo <harry.yoo@oracle.com>, Mina Almasry <almasrymina@google.com>,
-	willy@infradead.org, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com,
-	ilias.apalodimas@linaro.org, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
-	horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: netmem series needs some love and Acks from MM folks
-Message-ID: <20250618000840.GA23579@system.software.com>
-References: <20250609043225.77229-1-byungchul@sk.com>
- <20250609043225.77229-2-byungchul@sk.com>
- <20250609123255.18f14000@kernel.org>
- <20250610013001.GA65598@system.software.com>
- <20250611185542.118230c1@kernel.org>
- <20250613011305.GA18998@system.software.com>
- <CAHS8izMsKaP66A1peCHEMxaqf0SV-O6uRQ9Q6MDNpnMbJ+XLUA@mail.gmail.com>
- <aFDTikg1W3Bz_s5E@hyeyoo>
- <129fe808-4285-48fe-95b6-00ea19bd87af@redhat.com>
+	s=arc-20240116; t=1750206616; c=relaxed/simple;
+	bh=J5ySEFWhq9LCjitNgRpmtizRHVw23bPTElxZL9DBvzY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PA7JgKSEUHTNlwXmmzaXYPLq5yjcG968wH86ykHJb9IH/VYOvNI2rWHdgSuf8UdO1W+r++JtlI3wFo+GLxXagPVfgsZuaBRvrmfT61gnSBRFxyYCSQ6CtbdbFv59CZltRQTVvq9blMcfFZCSXALJuoRaFPN+DUIukZf5HOKi43Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AAnYbqRY; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-875f28fde67so247032039f.1;
+        Tue, 17 Jun 2025 17:30:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750206614; x=1750811414; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zVarlzHXaw9fMY+SeAqt+J9Miev+/z+elaWT2O9AvXU=;
+        b=AAnYbqRYidoFmPafbdXGEykobioSWrT/0JiLBA71DsrnVgcaRC9jHvrz3959P3m2Vx
+         fnRHSzlchEBpK8YERrw3r235/nMBYUDC0OFPv9mIQ3pxJOoWCfrzGXAq07Mb8qZ25NiE
+         1cQTxcrSU5Flh04RStItigHbpT9u2f46QcBq2J4+YCXeAsFezvCVxfUjSC7G6jvwnGnj
+         gnYJe79D1F9DowA/jlPVNXULo9LNYPAK+X02viSD9gQwChGw4SNDGze0ralrr2DM+jzx
+         Ct4udlqQRlu2pKm+1XSLLwXTcpPUV0YGR0Z8XjalFRkzxZlU27Nzxk7ejYdY8lBcRw03
+         Ibfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750206614; x=1750811414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zVarlzHXaw9fMY+SeAqt+J9Miev+/z+elaWT2O9AvXU=;
+        b=q3+kupI2N0qbxB3kf016sjbF14ebunIrjT9us6s1aDfqMveplw1E5XmSrEpS+f/3HE
+         /l+WTqzRRpVqce6YM1/lHbbnzS9PN3CY1XpequX4Elu1x5dpeqFiYejtsaL3xMJYT+6V
+         3CTwiMzlfu44g4SwMeSNo0g1lufBhH2jqiRt6Xl8IsNkFhWiFfyrWWwXFCyjAYZusmH1
+         ZKIWvojfhoCbC7NqwKyKHN0Jk4DuTKU2xH5OAsS20xXLponj9PK3o0rk236tTA8NbyiD
+         LtwDNhOw/25iqc27ev9lQX62qZP01qsSBIUrsxuNkAMHPosC1I8X2tOZfdgyZ6iTHPRt
+         H4Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSz9z41BO2xlBFeWyDEi9UABHwRiLiPUQZBambiXZtTN5ZGIkQRNlJyq1d2l6CJygcpBU=@vger.kernel.org, AJvYcCXDtofKji1QUe/Bu+ZiN4NzYbEvneZz9JSmldnun7ZW3zqjcKsexixM3RLrmhH786mSB9rpqBCK@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRYyC/HYfNFpFaccblcZDpu0c1TjkPxtewW0cbHcUM+OBf50mh
+	k4LiLZ06XgDEOYdbngzOln7QOYL8DnI6e1S9MqdISAXc3E5kx2M0Dt7i3jZ9U7V1JuNE8eR0prb
+	sq1w3T9QQsxDChDySCkIhwe0HUF9sIFk=
+X-Gm-Gg: ASbGncvWIK9BI6+oOu4GxQGHrJtg6gsPatNl2JrFEPcjBnXu4qqIMM0TyU8XEo6rmD7
+	9sH3F1XDd+MQHjZWb04z4RKR/Vd1c7hfoWZmVWEpYDuwXJxwaOH4oDl/HqF9FU+eVe06zY3D7NE
+	ymt3oUvFbHLeu/y8BdadyjbEEDtY4jtnKizNaRXdCnVA==
+X-Google-Smtp-Source: AGHT+IFWGHaEyVtVfD1k+kMn+hvVlYBEbfE+kop7kkGmWKjveEGo8dEU7n6CGiSUCIw6g61z9EOJ7B9/Z2+VSy+eSrk=
+X-Received: by 2002:a05:6e02:2401:b0:3dd:89b0:8e1b with SMTP id
+ e9e14a558f8ab-3de07cc46d3mr199751495ab.15.1750206614075; Tue, 17 Jun 2025
+ 17:30:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <129fe808-4285-48fe-95b6-00ea19bd87af@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTYRTHe3af3V2Hg+tKeyp6cRVGkJpInKhEo5dLpVRCRAU18tZWvuSm
-	poJktQxFp6WYzrelNV8yV6t0ikjaKktBWyirrImlZWSS1tCUalMkv/04/z/ndz4chpJWCJcy
-	yug4XhUtj5TRYiwecS/foKUOKvy1dgqKjbU03JlIhMp+sxCKa+oR/Jx8J4Jxy3MaKm46nI0u
-	DYZfxt8UDD4bEIHdMISh+WoDBQPZ7TRkaaYouGSuEkB3vVYIeb9vU9CQ2i+C103FNHyo/SuE
-	obYsDC901Rjs2mB4pvcCR8c3BBZjgwAcmSU05Fr1NHzU2BFYnwxgKLqoRWBssQlhaqKYDvbm
-	Hla/EXCNuvciTm+K5x5UrecybFaKM9Wk05xp7LqI6+ttprn2ginMNZrHBVzW5e8092PwLeZG
-	W3pozviwB3OdeouIGzet2M8eEW+N4COVCbzKL+iEWPEh/5XoXL5PoqVMmop6l2cgN4awgWTE
-	cAPPcf77EqGLMbuWOAxNIhfTrA+x2SYpFy9i1xFT2j0nixmKvUaTnj7LTLCQDSF/7j8VuFjC
-	AsmrmMCukpS9RZGRlwPUbOBBXhR+mrFRzq3TpVbnnHHyMlL5h5kdrySXHxXN1N3YIDL5yDbD
-	nuxq8rj+ucC1k7BmhnyurkWzVy8hrVU2nIM8dPMUunkK3X+Fbp5Cj3ANkiqjE6LkyshAX0VS
-	tDLR92RMlAk5X8eQMn3UjMa6w9sQyyCZu+TengMKqVCeoE6KakOEoWSLJBXtYQqpJEKelMyr
-	Yo6r4iN5dRtaxmDZYkmA43yElD0tj+PP8vw5XjWXChi3palox7EtRdvO+H97M+F/92RtwL5M
-	49D30pQFuw8ZsjXZLaYQTVfeZu86cdpIWVNs3c6c+/5qk2dHLm2v2dXiVziqQteC3bcHFmA6
-	WcF6hV0YXHXiq/RpecGV1lOhPpsyHiTtXZP1ZFXncMeXMH34aFd67zCypqZIDufGKrwMQ6FI
-	vE6G1Qr5xvWUSi3/B2gXCps2AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SXUhTcRyG+e+cnXM2Wh3X0oNiwawMKctI/EERSkQHL6TyIrSLHHpoy6/a
-	1LQyNKVQmmWF5Jy1skxN3Fzl1MRiTt0ssmbastRaKRV9LW1MLWtTIu8e3vfluXopTHyaH0gp
-	MrI4ZYYsTUoIcWHc1qINamyvfNMFz3rQ6hsJuO3JhVtvWvmgbWhBMDX9ioRJSy8BNdfcGGj7
-	i3H4qZ/BYLzHScJY7QQOHWdMGDjPWQlQF89icKq1jgdd1TY+PG0p48OlmZsYmArekDDQriVg
-	tPEPHybMahxsmnocxsqioUfnD+5HnxFY9CYeuM9WE3DRriPgXfEYAnuXE4eqwjIE+k4HH2Y9
-	WiJayt6tf8lj2zQjJKszZrN36sLYUocdY40NJQRr/HGBZF8PdRCs9fIszra1TvJYddFXgnWN
-	D+Pst85Bgq358J3H6u8O4uxjnYXc7Zco3JbCpSlyOOXG7UlC+WjFM/JwRWiu5aq4AA0FlyIB
-	xdBbmIqRar6PcXoN465tJ31M0KGMwzGN+VhCr2OMpw1eFlIYXU4wg68t88VyOoaZa+7m+VhE
-	A3OpxoP7RmL6BsZ86XNiC4UfY6t8j/sY81p/XbF7c8rLQcytOWohXsUU3auanwvo7cz0Pcc8
-	r6BDmIctvbzzaKlmkUmzyKT5b9IsMukQ3oAkioycdJkiLTJclSrPy1DkhidnphuR9x21+b/K
-	W9HUwC4zoikkXSIyxO6Ri/myHFVeuhkxFCaViGqscXKxKEWWd4xTZh5QZqdxKjMKonBpgCh2
-	H5ckpg/KsrhUjjvMKf+1PEoQWIAeDG5WmOMNNsnXvvvdnV9GpR+vuRjp29Kmk1Z3aMzzbk//
-	6sK6FyvrTE8Cm483d6rid7q2TdsFO/yPnFCPy0MkYflr3VVtxM3I4Ka+eGQ5Gu2azIvyK81y
-	WoZliSXX3eZc229DQnllgiuZLBRGLStuJD7NRKzojzy0v2B4JEAjxVVyWUQYplTJ/gIzik1J
-	GQMAAA==
-X-CFilter-Loop: Reflected
+References: <20250617002236.30557-1-kerneljasonxing@gmail.com>
+ <aFDAwydw5HrCXAjd@mini-arch> <CAL+tcoDYiwH8nz5u=sUiYucJL+VkGx4M50q9Lc2jsPPupZ2bFg@mail.gmail.com>
+ <aFGp8tXaL7NCORhk@mini-arch>
+In-Reply-To: <aFGp8tXaL7NCORhk@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 18 Jun 2025 08:29:37 +0800
+X-Gm-Features: AX0GCFuU4Jx26_Q3UukDWBpW0S7oJpgBBZn_BF_pYuRRFkUWp-gjvlq_mALcIHU
+Message-ID: <CAL+tcoAQ8xVXRmnjafgGWYDWy_FYuA=P4_Tzmh1zUkna2BF+nA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] net: xsk: add two sysctl knobs
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 17, 2025 at 06:09:36PM +0200, David Hildenbrand wrote:
-> On 17.06.25 04:31, Harry Yoo wrote:
-> > On Fri, Jun 13, 2025 at 07:19:07PM -0700, Mina Almasry wrote:
-> > > On Thu, Jun 12, 2025 at 6:13 PM Byungchul Park <byungchul@sk.com> wrote:
-> > > > 
-> > > > On Wed, Jun 11, 2025 at 06:55:42PM -0700, Jakub Kicinski wrote:
-> > > > > On Tue, 10 Jun 2025 10:30:01 +0900 Byungchul Park wrote:
-> > > > > > > What's the intended relation between the types?
-> > > > > > 
-> > > > > > One thing I'm trying to achieve is to remove pp fields from struct page,
-> > > > > > and make network code use struct netmem_desc { pp fields; } instead of
-> > > > > > sturc page for that purpose.
-> > > > > > 
-> > > > > > The reason why I union'ed it with the existing pp fields in struct
-> > > > > > net_iov *temporarily* for now is, to fade out the existing pp fields
-> > > > > > from struct net_iov so as to make the final form like:
-> > > > > 
-> > > > > I see, I may have mixed up the complaints there. I thought the effort
-> > > > > was also about removing the need for the ref count. And Rx is
-> > > > > relatively light on use of ref counting.
-> > > > > 
-> > > > > > > netmem_ref exists to clearly indicate that memory may not be readable.
-> > > > > > > Majority of memory we expect to allocate from page pool must be
-> > > > > > > kernel-readable. What's the plan for reading the "single pointer"
-> > > > > > > memory within the kernel?
-> > > > > > > 
-> > > > > > > I think you're approaching this problem from the easiest and least
-> > > > > > 
-> > > > > > No, I've never looked for the easiest way.  My bad if there are a better
-> > > > > > way to achieve it.  What would you recommend?
-> > > > > 
-> > > > > Sorry, I don't mean that the approach you took is the easiest way out.
-> > > > > I meant that between Rx and Tx handling Rx is the easier part because
-> > > > > we already have the suitable abstraction. It's true that we use more
-> > > > > fields in page struct on Rx, but I thought Tx is also more urgent
-> > > > > as there are open reports for networking taking references on slab
-> > > > > pages.
-> > > > > 
-> > > > > In any case, please make sure you maintain clear separation between
-> > > > > readable and unreadable memory in the code you produce.
-> > > > 
-> > > > Do you mean the current patches do not?  If yes, please point out one
-> > > > as example, which would be helpful to extract action items.
-> > > > 
-> > > 
-> > > I think one thing we could do to improve separation between readable
-> > > (pages/netmem_desc) and unreadable (net_iov) is to remove the struct
-> > > netmem_desc field inside the net_iov, and instead just duplicate the
-> > > pp/pp_ref_count/etc fields. The current code gives off the impression
-> > > that net_iov may be a container of netmem_desc which is not really
-> > > accurate.
-> > > 
-> > > But I don't think that's a major blocker. I think maybe the real issue
-> > > is that there are no reviews from any mm maintainers?
-> > 
-> > Let's try changing the subject to draw some attention from MM people :)
-> 
-> Hi, it worked! :P
-> 
-> I hope Willy will find his way to this thread as well.
-> 
-> > 
-> > > So I'm not 100%
-> > > sure this is in line with their memdesc plans. I think probably
-> > > patches 2->8 are generic netmem-ifications that are good to merge
-> > > anyway, but I would say patch 1 and 9 need a reviewed by from someone
-> > > on the mm side. Just my 2 cents.
-> > 
-> > As someone who worked on the zpdesc series, I think it is pretty much
-> > in line with the memdesc plans.
-> > 
-> > I mean, it does differ a bit from the initial idea of generalizing it as
-> > "bump" allocator, but overall, it's still aligned with the memdesc
-> > plans, and looks like a starting point, IMHO.
-> 
-> Just to summarize (not that there is any misunderstanding), the first
-> step of the memdesc plan is simple:
-> 
-> 1) have a dedicated data-structure we will allocate alter dynamically.
-> 
-> 2) Make it overlay "struct page" for now in a way that doesn't break things
-> 
-> 3) Convert all users of "struct page" to the new data-structure
-> 
-> Later, the memdesc data-structure will then actually come be allocated
-> dynamically, so "struct page" content will not apply anymore, and we can
-> shrink "struct page".
-> 
-> 
-> What I see in this patch is exactly 1) and 2).
-> 
-> I am not 100% sure about existing "struct net_iov" and how that
-> interacts with "struct page" overlay. I suspects it's just a dynamically
-> allocated structure?
-> 
-> Because this patch changes the layout of "struct net_iov", which is a
-> bit confusing at first sight?
+On Wed, Jun 18, 2025 at 1:46=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 06/17, Jason Xing wrote:
+> > Hi Stanislav,
+> >
+> > On Tue, Jun 17, 2025 at 9:11=E2=80=AFAM Stanislav Fomichev <stfomichev@=
+gmail.com> wrote:
+> > >
+> > > On 06/17, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > Introduce a control method in the xsk path to let users have the ch=
+ance
+> > > > to tune it manually.
+> > >
+> > > Can you expand more on why the defaults don't work for you?
+> >
+> > We use a user-level tcp stack with xsk to transmit packets that have
+> > higher priorities than other normal kernel tcp flows. It turns out
+> > that enlarging the number can minimize times of triggering sendto
+> > sysctl, which contributes to faster transmission. it's very easy to
+> > hit the upper bound (namely, 32) if you log the return value of
+> > sendto. I mentioned a bit about this in the second patch, saying that
+> > we can have a similar knob already appearing in the qdisc layer.
+> > Furthermore, exposing important parameters can help applications
+> > complete their AI/auto-tuning to judge which one is the best fit in
+> > their production workload. That is also one of the promising
+> > tendencies :)
+> >
+> > >
+> > > Also, can we put these settings into the socket instead of (global/ns=
+)
+> > > sysctl?
+> >
+> > As to MAX_PER_SOCKET_BUDGET, it seems not easy to get its
+> > corresponding netns? I have no strong opinion on this point for now.
 
-The changes of the layout was asked by network folks, that was to split
-the struct net_iov fields to two, netmem_desc and net_iov specific ones.
+To add to that, after digging into this part, I realized that we're
+able to use sock_net(sk)->core.max_tx_budget directly to finish the
+namespace stuff because xsk_create() calls sk_alloc() which correlates
+its netns in the sk->sk_net. Sounds reasonable?
 
-How to organize struct net_iov further is up to the network folks, but
-I believe the current layout should be the first step.
+>
+> I'm suggesting something along these lines (see below). And then add
+> some way to configure it (plus, obviously, set the default value
+> on init). There is also a question on whether you need separate
+> values for MAX_PER_SOCKET_BUDGET and TX_BATCH_SIZE, and if yes,
 
-	Byungchul
+For now, actually I don't see a specific reason to separate them, so
+let me use a single one in V2. My use case only expects to see the
+TX_BATCH_SIZE adjustment.
 
-> 
-> --
-> Cheers,
-> 
-> David / dhildenb
+> then why.
+>
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 72c000c0ae5f..fb2caec9914d 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -424,7 +424,7 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, str=
+uct xdp_desc *desc)
+>         rcu_read_lock();
+>  again:
+>         list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> -               if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGET) {
+> +               if (xs->tx_budget_spent >=3D xs->max_tx_budget) {
+
+If we implement it like this, xs->max_tx_budget has to read a
+per-netns from somewhere and then initialize it. The core problem
+still remains: where to store the per netns value.
+
+Do you think using the aforementioned sock_net(sk)->core.max_tx_budget
+is possible?
+
+Thanks,
+Jason
+
+>                         budget_exhausted =3D true;
+>                         continue;
+>                 }
+> @@ -779,7 +779,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock =
+*xs,
+>  static int __xsk_generic_xmit(struct sock *sk)
+>  {
+>         struct xdp_sock *xs =3D xdp_sk(sk);
+> -       u32 max_batch =3D TX_BATCH_SIZE;
+>         bool sent_frame =3D false;
+>         struct xdp_desc desc;
+>         struct sk_buff *skb;
+> @@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+>                 goto out;
+>
+>         while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+> -               if (max_batch-- =3D=3D 0) {
+> +               if (xs->max_tx_budget-- =3D=3D 0) {
+>                         err =3D -EAGAIN;
+>                         goto out;
+>                 }
 
