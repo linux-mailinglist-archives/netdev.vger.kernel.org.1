@@ -1,95 +1,80 @@
-Return-Path: <netdev+bounces-198846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90519ADE044
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:00:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD91ADE0A4
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 03:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78A9017B92F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1BA417CDFA
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 01:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2833B1624DF;
-	Wed, 18 Jun 2025 01:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF98188713;
+	Wed, 18 Jun 2025 01:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hticJJ4d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tRlk/SaJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB34D155382;
-	Wed, 18 Jun 2025 01:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9D035963;
+	Wed, 18 Jun 2025 01:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750208423; cv=none; b=Q85TpOJUkTGGy5f2FyVV0dchioO1pkRRQyl+f5S4MCNNU6bsgGcyFjx9ntuusRhn0WnOps+OAJiB0q8Jy/+HRAM+f2i7cmHHEUoNMRpLjd8+eWQpk/lEVddYogKlYIZTFY7KVcr3ujitF2Nx+4ph0c/udrscC4YfgXwYlYG894k=
+	t=1750209908; cv=none; b=AxH7PwlfZh/VQYY8YqX2fH5OTmlDad04ECRpRPpkiOBEPRnUSEd8Y6XN9jwxYklSTMahe+OUZoWiW46vnU9UX/ru/2VHiXUL6MYQcT+tzCZk+t617uJgihl4fnR8GJlRyRX/Xn89VdMz5w3YIT5lMCQ4Ae/anVSpyVob8lQD+yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750208423; c=relaxed/simple;
-	bh=R30wj6lVsUukB/5V0YaHiWsAyeqatmoZoojwTEb5r18=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=comA7juSQcFDUycBB/+cMmdXJtrMuXk6+izXmBpUZyXvzZ11/qcxK2PEmYsAJPCi+ft9RTo+obff6o5TLgkevLpkkNuPE6bDdUqM4AExrxLNhHkH6s26mMRcd3csmu6bWoK+u3Jk1zbyFrFg3OwyQnrptmGUX4VuvXcMxl9pA30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hticJJ4d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B7C9C4CEF1;
-	Wed, 18 Jun 2025 01:00:22 +0000 (UTC)
+	s=arc-20240116; t=1750209908; c=relaxed/simple;
+	bh=vlNf4DPU02s/S3Bp9z5v57PZRC5NERyxi9d51QzIa7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=usKyo+5+8gnlT5ZYmZflhF3iyXGhPxXx8lrdCff+ukFgweaNeuqzQiWzMeRaxy8xtMuKqwP4brKf/7J9DvSfr0a8TEnGEeveIJFr7Tgy6l50+sf9pczwVuKyzRp77lY6yI5iozQoCmHVwF8vcfs2BscwZ+hoKNmhJ7UYTGJ1qnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tRlk/SaJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB49EC4CEE3;
+	Wed, 18 Jun 2025 01:25:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750208422;
-	bh=R30wj6lVsUukB/5V0YaHiWsAyeqatmoZoojwTEb5r18=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hticJJ4dc1EMiMi2mnnT8USwJJkaSfZKjzB1pJwbGv2MjSTZIZkPGQ+nIsSNj+9gC
-	 SJDGLjGTk+UVZJsJNKrldT5CIYv7JAPukyhLprey0odT3Xy6HGPGJLKttAQXxHf+Fg
-	 fuP4k9LtkYCQ3CNIGUb9s5pVs+d1/c+QVrPrH31YKWQ0rC/Ih/knyk1EMDmLBoOdh3
-	 EyANFeruVq4dZSaJPtN7drOpza6XSnenM0/FGLQzSpIRoF3B/hT9W3OnbkLWVCGZKS
-	 F8M23+i1QW9qVJGBRzu7LcgamDgcQiPBHj8iY9Nn9R81VSIY8NXc7qAIwDHbCamtXE
-	 x/LG1Ut9pCLWQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B2E38111DD;
-	Wed, 18 Jun 2025 01:00:52 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750209907;
+	bh=vlNf4DPU02s/S3Bp9z5v57PZRC5NERyxi9d51QzIa7Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tRlk/SaJrtO1Yp2Saapb549sOJdf32hClt9BTxlQmtrLMj7oE3CDmDbIxX8hiov7R
+	 9LRI5DE4YgUr2v8fr0KsOPDm3QoZMZsS4akj++0nzVns8g4+CPRMUNBqKyTTTTuvBb
+	 97y4xgm0mUF92OJ+H9nFBaM3RqMB2XbxO1IebuxYWZxl5/zwdO2/5KmB5fFoCloOKH
+	 ENnOGQUW/qFC8W17547KzYbdipfixrFQpzox+ATc2ee9igN2yntByRXqcs2bytSPaQ
+	 /8JdJ+2NdEJC78eE7x/ZUJd9VTAoYYHKwUGDVua0FwI3kI1fu3eMH9Qsnoqh7s/46/
+	 P+RHo7DR1HoCg==
+Date: Tue, 17 Jun 2025 18:25:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn
+ Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+ <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+ <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
+ <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>, Michael Ellerman
+ <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v03 1/1] hinic3: management interfaces
+Message-ID: <20250617182505.6cfbd99f@kernel.org>
+In-Reply-To: <c17133d2629728942ade513d3e761277cca4b44d.1750054732.git.zhuyikai1@h-partners.com>
+References: <cover.1750054732.git.zhuyikai1@h-partners.com>
+	<c17133d2629728942ade513d3e761277cca4b44d.1750054732.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next,
- v4] selftest: Add selftest for multicast address notifications
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175020845099.3753357.3589246479890125144.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Jun 2025 01:00:50 +0000
-References: <20250614053522.623820-1-yuyanghuang@google.com>
-In-Reply-To: <20250614053522.623820-1-yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, maze@google.com, lorenzo@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 16 Jun 2025 15:27:50 +0800 Fan Gong wrote:
+>  25 files changed, 3735 insertions(+), 15 deletions(-)
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 14 Jun 2025 14:35:22 +0900 you wrote:
-> This commit adds a new kernel selftest to verify RTNLGRP_IPV4_MCADDR
-> and RTNLGRP_IPV6_MCADDR notifications. The test works by adding and
-> removing a dummy interface and then confirming that the system
-> correctly receives join and removal notifications for the 224.0.0.1
-> and ff02::1 multicast addresses.
-> 
-> The test relies on the iproute2 version to be 6.13+.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4] selftest: Add selftest for multicast address notifications
-    https://git.kernel.org/netdev/net-next/c/e74058f5619f
-
-You are awesome, thank you!
+Break it up into smaller patches, please.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
