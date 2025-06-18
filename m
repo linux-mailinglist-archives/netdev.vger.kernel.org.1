@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-199257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57F5ADF933
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:07:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3BB7ADF934
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BE617AA6B9
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:06:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF8BB561E7D
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B59827E066;
-	Wed, 18 Jun 2025 22:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550C327E1B1;
+	Wed, 18 Jun 2025 22:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMnIeSnj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzbC+ViF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9302D2580FF
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8680727E062
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750284459; cv=none; b=DJJsGw1aQP3C8dLOKfo1knw+BBrGeXM/t4HLXWi8BEETmIArFN8xu1Yo2WmZb1gm5lLE2o/cPzThb5dw9+BBqrahGWyHYrRyqO59wfp+YkrTCEraL1+9EZ7YDwQ1r/gUCUWssYboab4FY+0fr7notlm2J4X/sv+61DEsjgPYhDI=
+	t=1750284466; cv=none; b=GTXxXs9VNMyhI9ueDn+JHYB8UbMWYmi6E1tyT80Xlzd0Lq9eC1oyzMr7MAd2kwVUT8V9+fAzMC/0kG+RJ3vTLBLmE/PF4db+JcLBjgXhjyvD7VnpVN6eAw4QoT7Oxd97oxUALUP53cvBIs9JSDMnvFGRZGFhyRf+jxZVWUdV21g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750284459; c=relaxed/simple;
-	bh=QOKu7lk8kgaPxuY/IMONXJo14+qY58aqMhkViZbG8v0=;
+	s=arc-20240116; t=1750284466; c=relaxed/simple;
+	bh=UtzwZ6JQSJ9U1swtmMZyoyJoRvsN71+3fF5ueXjvUZQ=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cMm76DMlhcvZCSgDRDG3PruwPeod9bEXsD9+2Rc0urcUkjqq2rvezxLtmNDnAQqQBhd9YSGpdSAWQnzaCTnQMqoc2bReccqq/uNSImA+FGDNdnCh32a9cOGYw5LxiJPYPvvFsiMLJPNX5P/G4Gt3ar6rnf0zwAIziKalhaugNhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMnIeSnj; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version:Content-Type; b=rbQlgbJs7nUQBwhVGFJIM2NogWFy24OF6l5W4A4wPRIP4WCUXqSYT3Vl6SeU8JO3PYYNmrIigFcnszQSTISvIpYK9X69t/mTGR3vMKnS6BZ2HqulTGrBNNq/7N7N//SU7zvj0OlDmDTX9IoglI1GunRkbvOm87e3QTrWWpq8DdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzbC+ViF; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-234b9dfb842so2108145ad.1
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:07:37 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2363616a1a6so1325595ad.3
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:07:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750284457; x=1750889257; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750284464; x=1750889264; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=xnk5Ipa9mN5lqV5s0VEFSw9LlfkWrrwBVuRWcxw3vAI=;
-        b=dMnIeSnjxDyEFLGraUryobWaEGNL6gykyvSy9RqEKXEHVrprVhU2JC/8yzW51l2F34
-         5kHrwpSFMzeJeDi8+yk/cZXD3BCEikMtKPhST+K839088Ko061UhVo1m4zZM7fsK0flW
-         0vGt0QGCsp6tHNbqU7xXkvnqIxpjaVgacfP13MIrCFI/xxqnmzF65reCrHc/c15Ai5SF
-         rkFqVkUogO522PIZTDwGsUp/GrdFaMKc/CFjy69aJRISDYlVuhp+qtS70/e29cKKLca+
-         /WiEzbsvsNnI7kARmidjGlfrniFJIc4v67+sS15yJl82YSaj0G/2Kloc6vDzU3FefLBh
-         +PoA==
+        bh=5X7h1ogZ7QqUxr18oBaEZoIoSHd5hynsRK9IwAtv/L4=;
+        b=hzbC+ViFpzJOu1iGhGNqhP9IRatM3WUgvV7ilWCQBlwHr+kUZ/qfgCXPmUQawP6yJy
+         VfLfNJwhmZFZGhgR51dlb9vir23d1BUtbq6S+T8rVxe9snJ7YuVXkFoPUsYsHjorSrNB
+         gCcNd7tYhJ4bkMh9PUZNFFl6mNsbRe8dR05mC7aPmaqeH/ntD/4178nPngTody+0/DWA
+         L+apfxoXPUbzUdt2U3y+T023rQO0WbiwQgXm/1lw4C78oA9awheTK0kyjvPG5MZFFjMi
+         H0Gk9im5vcbsAqi1quZuDslWqih1Fo0QYzDJK/lO73YXIWHnRCGPOhcGUmiWwsBa5lcZ
+         YNgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750284457; x=1750889257;
+        d=1e100.net; s=20230601; t=1750284464; x=1750889264;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xnk5Ipa9mN5lqV5s0VEFSw9LlfkWrrwBVuRWcxw3vAI=;
-        b=Wqj9fqRt6EFtn6VA6NkzHiYuEcjZT0z5kL8abO+PJzOAXMj+WpFUx8Ku5rcSAcCHS2
-         NkDoxSee2wseOnlIM/KmugkGQoDWfNqsuN7nuybk/zGBHt1P6+IEFCSvejqiddS5kuU6
-         OebNugkXmCqht6HjOq3LbNcLhFqqJJkt0fHUI5GwZU4rCw4nZOb0HoOjK65KqnpiUheO
-         hj7mXytkbtak0HA+p3VaDLUmesiDMyjoZEgE4qyctdFH2k9bJJOzs3X3Z6B7ha7w4c5k
-         tQYXzcgcwnZjRUxRDcmaW7mHzLeiptU1Bm/h016nzhMkxhFFYBxWy5PGLI3UKj9O2iz+
-         Tnxg==
-X-Gm-Message-State: AOJu0YxcJmfonipc9bOw5PTd1/HVp2ZMo5zA2TdmJDCdCwxTveB04wlR
-	kctp3WRDevcHruRYS7dIT8/ULcyU0GTzrjpGYxldWomx87zVGj9TOi8Y
-X-Gm-Gg: ASbGncuDyl7CYzbzQFBw5lIvvyt0KY2jD+B/45CHtklaNvJoSh5Kw7y4TbIKkyGOCJB
-	Z8F7MBSW1cjioQhnQlOaliaozOZWlT8Lyv0h5Q10AFNOXErWhNsKT6QJVO9ckxdGt103kT0Lqsf
-	5uZEdc1Yhbz8FesQtqy66rc/fo7tKDbgjLqeCotdALgBPPRsvbo1U1PkW0J2Oz+zuSw599j69Q6
-	kLJhmbSFCFdZ0ejadURrPqrOa7BoUBjlj67/1+v8B3Zs/syh+SVZTAWPWhz+1cHTyqRk0h3lQwN
-	KyLD8Su1pFPIzUAZocf72SBvyrLrWiF5LlniFf5shENiw9hfSR2nnmMW37CHh3dfvx4HYCYjxKR
-	hgUiiZUVmUVkS5g==
-X-Google-Smtp-Source: AGHT+IGhIbr/DOF205MdgO4ObhsNv1wNXdrCqVBA51r5tDbOp0NHWzLOX850cb7ziUGmyLmwOETWIA==
-X-Received: by 2002:a17:903:3a83:b0:234:c8ec:51b5 with SMTP id d9443c01a7336-2366b3e34f0mr318926355ad.53.1750284456964;
-        Wed, 18 Jun 2025 15:07:36 -0700 (PDT)
+        bh=5X7h1ogZ7QqUxr18oBaEZoIoSHd5hynsRK9IwAtv/L4=;
+        b=K22krfdNsEN3x7G90hKQAMc8w/NrmDsVjzhmghXmhTJJ2NXwbP0FPzDzte2/lt7a8r
+         ZpWXUE6Kwj2H3lja/ni7pcRM21LZAFpsTmPOGhhayZLJq3uMdzkfu+UkTlIDJoe3SRDB
+         z6NNkl8r73Qc5XIC1+XcXVgTAG+H0QVvAlK9ieIx5Ti8aoMiKMSqLFXxQoRNJH2z705N
+         n9C9m77FZCRZff4Kit25alWTWS3PQjvnb08OWl1hWRpEV3eDE/x/3+Y1KLItVIgR75vi
+         pXAcHXzrgVq7SJCpeuI0Ocx5Yjr5AMHz9DDiAYjMksnYmZWRj9rogdgxEexluTueKvOM
+         rJxA==
+X-Gm-Message-State: AOJu0YwGM/NtxhGABdv5Lv12nsPiy+BfgPThCxq/BuOuPbDxg972kM0f
+	xqoNACFvRreGBt8nNPbq6y9ZGYQfKYSJOPnkAIMZRELW8p+l4bXd1j05
+X-Gm-Gg: ASbGnctU/yAe1INeNv0VpKFYhizSHhXD+746qWWA4IIac7QLliuXjUen2UNeeWnyJ6I
+	8AYJihYSMj+5XaGUa8KD9gZMdp9IdcMveMoRhOmOaorrHspwWImK+5cT+vf4Wc5QMaOK6sx+KAl
+	O9yL5N93J6KRBMs0qCQMH0ZfXa0BCjhaiLvm9+bZA3G/lGbvFp8YxR9rv8vszh0rJ8rt1cuFErb
+	hBix6IeMLRNWZyvYNEj7kuBAimEtoQ1B7sE5WVifFObo6cWqvRN8xqHV1zxDz2I1WIKOhh1VJZg
+	/FBtNYHkbjyVv0j0TZmKneN2zQhcT9DDOq7g1MOpNYSV6IXSNnrghOXteJ9zS1V/vVaA4GeSXA8
+	pkABi1XlN8rNpzA==
+X-Google-Smtp-Source: AGHT+IHx7aO8wBXnyzILDVZGtENj1mjdRSOX6ka4sqaiEth1c889dUo3zwwgCRpUFNTNaq0aSB8QTg==
+X-Received: by 2002:a17:902:ebc1:b0:234:8c64:7885 with SMTP id d9443c01a7336-2366b17dd03mr296250775ad.53.1750284463735;
+        Wed, 18 Jun 2025 15:07:43 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([98.97.35.53])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de781dfsm106410985ad.131.2025.06.18.15.07.36
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3158a318802sm536958a91.35.2025.06.18.15.07.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 15:07:36 -0700 (PDT)
-Subject: [net-next PATCH v3 3/8] fbnic: Retire "AUTO" flags and cleanup
- handling of FW link settings
+        Wed, 18 Jun 2025 15:07:43 -0700 (PDT)
+Subject: [net-next PATCH v3 4/8] fbnic: Replace link_mode with AUI
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux@armlinux.org.uk, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
  davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org,
  kernel-team@meta.com, edumazet@google.com
-Date: Wed, 18 Jun 2025 15:07:35 -0700
+Date: Wed, 18 Jun 2025 15:07:42 -0700
 Message-ID: 
- <175028445548.625704.1367708155813490215.stgit@ahduyck-xeon-server.home.arpa>
+ <175028446219.625704.8050098629750896117.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <175028434031.625704.17964815932031774402.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -98,258 +97,169 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-There were several issues in the way we were handling the link info coming
-from firmware.
-
-First is the fact that we were carrying around "AUTO" flags to indicate
-that we needed to populate the values. We can just drop this and assume
-that we will always be populating the settings from firmware. With this we
-can also clean up the masking as the "AUTO" flags were just there to be
-stripped anyway.
-
-Second since we are getting rid of the "AUTO" setting we still need a way
-to report that the link is not configured. We convert the link_mode "AUTO"
-to "UNKNOWN" to do this. With this we can avoid reporting link up in the
-phylink_pcs_get_state call as we will just set link to 0 and return without
-updating the link speed. This is preferred versus the driver just forcing
-50G which makes it harder to recover when the FW does start providing valid
-settings.
-
-With this the plan is to eventually replace the link_mode we use with the
-interface_mode from phylink for all intents and purposes and have the two
-be interchangeable. At that point we can convert the FW provided settings
-over to something closer to link partner settings and give phylink greater
-control of the interface allowing for user override of the settings and an
-asynchronous setup of the link versus having to pull early settings from
-firmware.
+The way we were using "link_mode" was really more to describe the interface
+between the attachment unit interface(s) we were using on the device.
+Specifically the AUI is describing the modulation and the number of lanes
+we are using. So we can simplify this by replacing link_mode with aui.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |   89 ++++++++++-------------
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h     |    6 --
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    2 -
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   17 ++--
- 4 files changed, 48 insertions(+), 66 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |   25 +++++++++++------------
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h     |   18 ++++++++---------
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    3 +--
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   10 +++++----
+ 4 files changed, 27 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index ea5ea7e329cb..56b429c96a7c 100644
+index 56b429c96a7c..0528724011c1 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -452,7 +452,7 @@ static u32 __fbnic_mac_cmd_config_asic(struct fbnic_dev *fbd,
- 		command_config |= FBNIC_MAC_COMMAND_CONFIG_RX_PAUSE_DIS;
- 
- 	/* Disable fault handling if no FEC is requested */
--	if ((fbn->fec & FBNIC_FEC_MODE_MASK) == FBNIC_FEC_OFF)
-+	if (fbn->fec == FBNIC_FEC_OFF)
- 		command_config |= FBNIC_MAC_COMMAND_CONFIG_FLT_HDL_DIS;
- 
- 	return command_config;
-@@ -468,7 +468,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+@@ -468,14 +468,14 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
  		return false;
  
  	/* Define the expected lane mask for the status bits we need to check */
--	switch (fbn->link_mode & FBNIC_LINK_MODE_MASK) {
-+	switch (fbn->link_mode) {
- 	case FBNIC_LINK_100R2:
+-	switch (fbn->link_mode) {
+-	case FBNIC_LINK_100R2:
++	switch (fbn->aui) {
++	case FBNIC_AUI_100GAUI2:
  		lane_mask = 0xf;
  		break;
-@@ -476,7 +476,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+-	case FBNIC_LINK_50R1:
++	case FBNIC_AUI_50GAUI1:
  		lane_mask = 3;
  		break;
- 	case FBNIC_LINK_50R2:
--		switch (fbn->fec & FBNIC_FEC_MODE_MASK) {
-+		switch (fbn->fec) {
+-	case FBNIC_LINK_50R2:
++	case FBNIC_AUI_LAUI2:
+ 		switch (fbn->fec) {
  		case FBNIC_FEC_OFF:
  			lane_mask = 0x63;
+@@ -488,7 +488,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
  			break;
-@@ -494,7 +494,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+ 		}
+ 		break;
+-	case FBNIC_LINK_25R1:
++	case FBNIC_AUI_25GAUI:
+ 		lane_mask = 1;
+ 		break;
  	}
- 
- 	/* Use an XOR to remove the bits we expect to see set */
--	switch (fbn->fec & FBNIC_FEC_MODE_MASK) {
-+	switch (fbn->fec) {
- 	case FBNIC_FEC_OFF:
- 		lane_mask ^= FIELD_GET(FBNIC_SIG_PCS_OUT0_BLOCK_LOCK,
- 				       pcs_status);
-@@ -540,64 +540,55 @@ static bool fbnic_pcs_get_link_asic(struct fbnic_dev *fbd)
+@@ -540,27 +540,26 @@ static bool fbnic_pcs_get_link_asic(struct fbnic_dev *fbd)
  	return link;
  }
  
--static void fbnic_pcs_get_fw_settings(struct fbnic_dev *fbd)
-+static void
-+fbnic_mac_get_fw_settings(struct fbnic_dev *fbd, u8 *link_mode, u8 *fec)
+-static void
+-fbnic_mac_get_fw_settings(struct fbnic_dev *fbd, u8 *link_mode, u8 *fec)
++static void fbnic_mac_get_fw_settings(struct fbnic_dev *fbd, u8 *aui, u8 *fec)
  {
--	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
--	u8 link_mode = fbn->link_mode;
--	u8 fec = fbn->fec;
--
--	/* Update FEC first to reflect FW current mode */
--	if (fbn->fec & FBNIC_FEC_AUTO) {
--		switch (fbd->fw_cap.link_fec) {
--		case FBNIC_FW_LINK_FEC_NONE:
--			fec = FBNIC_FEC_OFF;
--			break;
--		case FBNIC_FW_LINK_FEC_RS:
--			fec = FBNIC_FEC_RS;
--			break;
--		case FBNIC_FW_LINK_FEC_BASER:
--			fec = FBNIC_FEC_BASER;
--			break;
--		default:
--			return;
--		}
--
--		fbn->fec = fec;
-+	/* Retrieve default speed from FW */
-+	switch (fbd->fw_cap.link_speed) {
-+	case FBNIC_FW_LINK_SPEED_25R1:
-+		*link_mode = FBNIC_LINK_25R1;
-+		break;
-+	case FBNIC_FW_LINK_SPEED_50R2:
-+		*link_mode = FBNIC_LINK_50R2;
-+		break;
-+	case FBNIC_FW_LINK_SPEED_50R1:
-+		*link_mode = FBNIC_LINK_50R1;
-+		*fec = FBNIC_FEC_RS;
-+		return;
-+	case FBNIC_FW_LINK_SPEED_100R2:
-+		*link_mode = FBNIC_LINK_100R2;
-+		*fec = FBNIC_FEC_RS;
-+		return;
-+	default:
-+		*link_mode = FBNIC_LINK_UNKONWN;
-+		return;
+ 	/* Retrieve default speed from FW */
+ 	switch (fbd->fw_cap.link_speed) {
+ 	case FBNIC_FW_LINK_SPEED_25R1:
+-		*link_mode = FBNIC_LINK_25R1;
++		*aui = FBNIC_AUI_25GAUI;
+ 		break;
+ 	case FBNIC_FW_LINK_SPEED_50R2:
+-		*link_mode = FBNIC_LINK_50R2;
++		*aui = FBNIC_AUI_LAUI2;
+ 		break;
+ 	case FBNIC_FW_LINK_SPEED_50R1:
+-		*link_mode = FBNIC_LINK_50R1;
++		*aui = FBNIC_AUI_50GAUI1;
+ 		*fec = FBNIC_FEC_RS;
+ 		return;
+ 	case FBNIC_FW_LINK_SPEED_100R2:
+-		*link_mode = FBNIC_LINK_100R2;
++		*aui = FBNIC_AUI_100GAUI2;
+ 		*fec = FBNIC_FEC_RS;
+ 		return;
+ 	default:
+-		*link_mode = FBNIC_LINK_UNKONWN;
++		*aui = FBNIC_AUI_UNKNOWN;
+ 		return;
  	}
  
--	/* Do nothing if AUTO mode is not engaged */
--	if (fbn->link_mode & FBNIC_LINK_AUTO) {
--		switch (fbd->fw_cap.link_speed) {
--		case FBNIC_FW_LINK_SPEED_25R1:
--			link_mode = FBNIC_LINK_25R1;
--			break;
--		case FBNIC_FW_LINK_SPEED_50R2:
--			link_mode = FBNIC_LINK_50R2;
--			break;
--		case FBNIC_FW_LINK_SPEED_50R1:
--			link_mode = FBNIC_LINK_50R1;
--			fec = FBNIC_FEC_RS;
--			break;
--		case FBNIC_FW_LINK_SPEED_100R2:
--			link_mode = FBNIC_LINK_100R2;
--			fec = FBNIC_FEC_RS;
--			break;
--		default:
--			return;
--		}
--
--		fbn->link_mode = link_mode;
-+	/* Update FEC first to reflect FW current mode */
-+	switch (fbd->fw_cap.link_fec) {
-+	case FBNIC_FW_LINK_FEC_NONE:
-+		*fec = FBNIC_FEC_OFF;
-+		break;
-+	case FBNIC_FW_LINK_FEC_RS:
-+	default:
-+		*fec = FBNIC_FEC_RS;
-+		break;
-+	case FBNIC_FW_LINK_FEC_BASER:
-+		*fec = FBNIC_FEC_BASER;
-+		break;
- 	}
- }
- 
- static int fbnic_pcs_enable_asic(struct fbnic_dev *fbd)
- {
-+	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
-+
- 	/* Mask and clear the PCS interrupt, will be enabled by link handler */
- 	wr32(fbd, FBNIC_SIG_PCS_INTR_MASK, ~0);
+@@ -588,7 +587,7 @@ static int fbnic_pcs_enable_asic(struct fbnic_dev *fbd)
  	wr32(fbd, FBNIC_SIG_PCS_INTR_STS, ~0);
  
  	/* Pull in settings from FW */
--	fbnic_pcs_get_fw_settings(fbd);
-+	fbnic_mac_get_fw_settings(fbd, &fbn->link_mode, &fbn->fec);
+-	fbnic_mac_get_fw_settings(fbd, &fbn->link_mode, &fbn->fec);
++	fbnic_mac_get_fw_settings(fbd, &fbn->aui, &fbn->fec);
  
  	return 0;
  }
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-index 4d508e1e2151..f4e75530a939 100644
+index f4e75530a939..151d785116cb 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-@@ -25,11 +25,8 @@ enum {
- 	FBNIC_FEC_OFF		= 0,
- 	FBNIC_FEC_RS		= 1,
+@@ -27,21 +27,21 @@ enum {
  	FBNIC_FEC_BASER		= 2,
--	FBNIC_FEC_AUTO		= 4,
  };
  
--#define FBNIC_FEC_MODE_MASK	(FBNIC_FEC_AUTO - 1)
--
- /* Treat the link modes as a set of modulation/lanes bitmask:
+-/* Treat the link modes as a set of modulation/lanes bitmask:
++/* Treat the AUI modes as a modulation/lanes bitmask:
   * Bit 0: Lane Count, 0 = R1, 1 = R2
   * Bit 1: Modulation, 0 = NRZ, 1 = PAM4
-@@ -40,12 +37,11 @@ enum {
- 	FBNIC_LINK_50R2		= 1,
- 	FBNIC_LINK_50R1		= 2,
- 	FBNIC_LINK_100R2	= 3,
--	FBNIC_LINK_AUTO		= 4,
-+	FBNIC_LINK_UNKONWN	= 4,
+- * Bit 2: Retrieve link mode from FW
++ * Bit 2: Unknown Modulation/Lane Configuration
+  */
+ enum {
+-	FBNIC_LINK_25R1		= 0,
+-	FBNIC_LINK_50R2		= 1,
+-	FBNIC_LINK_50R1		= 2,
+-	FBNIC_LINK_100R2	= 3,
+-	FBNIC_LINK_UNKONWN	= 4,
++	FBNIC_AUI_25GAUI	= 0,	/* 25.7812GBd	25.78125 * 1 */
++	FBNIC_AUI_LAUI2		= 1,	/* 51.5625GBd	25.78128 * 2 */
++	FBNIC_AUI_50GAUI1	= 2,	/* 53.125GBd	53.125   * 1 */
++	FBNIC_AUI_100GAUI2	= 3,	/* 106.25GBd	53.125   * 2 */
++	FBNIC_AUI_UNKNOWN	= 4,
  };
  
- #define FBNIC_LINK_MODE_R2	(FBNIC_LINK_50R2)
- #define FBNIC_LINK_MODE_PAM4	(FBNIC_LINK_50R1)
--#define FBNIC_LINK_MODE_MASK	(FBNIC_LINK_AUTO - 1)
+-#define FBNIC_LINK_MODE_R2	(FBNIC_LINK_50R2)
+-#define FBNIC_LINK_MODE_PAM4	(FBNIC_LINK_50R1)
++#define FBNIC_AUI_MODE_R2	(FBNIC_AUI_LAUI2)
++#define FBNIC_AUI_MODE_PAM4	(FBNIC_AUI_50GAUI1)
  
  enum fbnic_sensor_id {
  	FBNIC_SENSOR_TEMP,		/* Temp in millidegrees Centigrade */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index aa812c63d5af..7bd7812d9c06 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -736,8 +736,6 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 	 */
- 	netdev->ethtool->wol_enabled = true;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index 561837e80ec8..c30c060b72e0 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -42,9 +42,8 @@ struct fbnic_net {
+ 	struct phylink_config phylink_config;
+ 	struct phylink_pcs phylink_pcs;
  
--	fbn->fec = FBNIC_FEC_AUTO | FBNIC_FEC_RS;
--	fbn->link_mode = FBNIC_LINK_AUTO | FBNIC_LINK_50R2;
- 	netif_carrier_off(netdev);
+-	/* TBD: Remove these when phylink supports FEC and lane config */
++	u8 aui;
+ 	u8 fec;
+-	u8 link_mode;
  
- 	netif_tx_stop_all_queues(netdev);
+ 	/* Cached top bits of the HW time counter for 40b -> 64b conversion */
+ 	u32 time_high;
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 860b02b22c15..cb375a3dafe8 100644
+index cb375a3dafe8..edd8738c981a 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -21,23 +21,20 @@ fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+@@ -21,15 +21,15 @@ fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
  	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
  	struct fbnic_dev *fbd = fbn->fbd;
  
--	/* For now we use hard-coded defaults and FW config to determine
--	 * the current values. In future patches we will add support for
--	 * reconfiguring these values and changing link settings.
--	 */
--	switch (fbd->fw_cap.link_speed) {
--	case FBNIC_FW_LINK_SPEED_25R1:
-+	switch (fbn->link_mode) {
-+	case FBNIC_LINK_25R1:
+-	switch (fbn->link_mode) {
+-	case FBNIC_LINK_25R1:
++	switch (fbn->aui) {
++	case FBNIC_AUI_25GAUI:
  		state->speed = SPEED_25000;
  		break;
--	case FBNIC_FW_LINK_SPEED_50R2:
-+	case FBNIC_LINK_50R2:
-+	case FBNIC_LINK_50R1:
+-	case FBNIC_LINK_50R2:
+-	case FBNIC_LINK_50R1:
++	case FBNIC_AUI_LAUI2:
++	case FBNIC_AUI_50GAUI1:
  		state->speed = SPEED_50000;
  		break;
--	case FBNIC_FW_LINK_SPEED_100R2:
-+	case FBNIC_LINK_100R2:
+-	case FBNIC_LINK_100R2:
++	case FBNIC_AUI_100GAUI2:
  		state->speed = SPEED_100000;
  		break;
  	default:
--		state->speed = SPEED_UNKNOWN;
--		break;
-+		state->link = 0;
-+		return;
- 	}
- 
- 	state->duplex = DUPLEX_FULL;
 
 
 
