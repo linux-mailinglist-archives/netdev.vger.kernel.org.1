@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-199173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC30ADF4E4
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:51:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17B33ADF4E3
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9D68188F9DB
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:51:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73AA77A6A47
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6282F94A2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE592FCFC0;
 	Wed, 18 Jun 2025 17:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b+nVhw2W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C0AI+59f"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3642FCE1B
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 17:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3752FCE39
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 17:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750268571; cv=none; b=JSFYbrlVVsFKuk/fh0ySVIhs+wydqompW2PdKt8NMsSw4y9ZRDV67DXnlRLboEV00w5yAI921gH4jLNa6PNoF3X5WPDoWURaV0FdhJecMjKmBEGPoWG7MgyLRD4XpANXRSeychyXVi6vqGfgYbB4vZyxzPNalgyHq5/FSZd52mY=
+	t=1750268571; cv=none; b=T+Vc2iQ35Xsvi5oesExzIB8hijB4eTTD1RMTWCPIDhRztJ5w0WarDCz6E8UOUPbCOBgWHpfFGyraN9YuMvUcGvOHaLD6Jc/mMjpQWl6MRGb22KBv1+kUiUOYiO1joimYJY75XTHuzhKbhUDy7FH34xwdOVTuenAr+YCZ3xOVbKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750268571; c=relaxed/simple;
-	bh=mplcTV6dpM5G22cKrIxGs3Uee1GGvtTTMJbgytRsIgo=;
+	bh=4d4XH/+HK9R8KUKGQznmA7c3eJShoMSNXblqL9FkGmw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TwgZ1tkVbE2PfrWA0K8lUeRTiW4FZRzXoAUwj/Nif9qJXMsu7jK6hJC+vgAbrw9+2VXb+6/ZjXrRtPT2vw4/wZjC0rrbj848QzUlc0pqWb/zif2//B53yeEHtMIxSM2npoi3poqIuDJmgkKAklDWT2pewPz25E9VIC3ozRrzRjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b+nVhw2W; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=CkkctZbLEp2dhOKrrNCVKjLP4bZYCRrUVju5bwdS9hnrHSpG+q+0NxqBSI+ZaKiD5Djj0mj/RG8SVj+7d9Q4LIC1aER62Dfa1I5VqjyJu5RKJ6Jmm1cv/ToheYh4EdP/7qr5IUMteTZQBtTGjFHmFrPfRDIsjVJhTEQD6QDXbis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C0AI+59f; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750268568; x=1781804568;
+  t=1750268570; x=1781804570;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mplcTV6dpM5G22cKrIxGs3Uee1GGvtTTMJbgytRsIgo=;
-  b=b+nVhw2WH6aBKl5MzWfZiVwP4MqNLofE9YqgUNoAVSMr7sNGLD+etF0u
-   hKnmmqRvMbkcxx75DDaxz4CjXFkQ4otsNuuLgUOGvbyXL15/8q4Lj/ZG1
-   qm49Tou7L3y6EOfRXdZtu7ddRyNzS/arCrjozfbKzEMQfcoqAvH82w3UO
-   s+CVmEsPwrL3lGZDbG14IC+2RmZMJn5QAVxe9JCI1HsUl0watOHPKIIrx
-   HXXhdO3I3NxGGculmOC6LyzHk1vcJf4r+5vI5wteDsU1PbSVRQwPxBMVm
-   EC51go/UAH+5z3niVIyhYmWXj2Ko13aifb96w16lAc7jRkq7qahO4c6sC
-   A==;
-X-CSE-ConnectionGUID: b6hvZCHqT5GV6puNMuMFfA==
-X-CSE-MsgGUID: Z1ryWZSrRn2UF9DFKlAkOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="56183673"
+  bh=4d4XH/+HK9R8KUKGQznmA7c3eJShoMSNXblqL9FkGmw=;
+  b=C0AI+59fHC74LYJwDb9pA6oehlushtOPM2gQx5RSKEVeBhPLBUWWhrs/
+   0ImByM9GYd3D9p2wBRVzS3pM2PvqIn74KJ953c28ruz9+r6WfyBGtS4x2
+   NrJa9/ef0N0WfXhMfC55VX3oqNO3oBAXiWUjD3TWMBqBh+vk6C4XvT2KI
+   scq367BCOU8en8zoNImLRDIV99i5O0VK27WY3ga3ewknWTT6GdFjCmAJy
+   LTydSLzhlB5Lo/brAIQwdxR+DRnWxDL0Ca1X6VoopCMm3Ui+ec4pZTB5+
+   wiNv9YuWaWoIefRc0s5THyOAodnBAH2hpGrkpzGy0In6RlWN5RqwXK2uY
+   Q==;
+X-CSE-ConnectionGUID: ggQKlPn+Rv2OpXhkk8cfWA==
+X-CSE-MsgGUID: WMJtUZdmSqmTYXvxR4tyGA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="56183685"
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="56183673"
+   d="scan'208";a="56183685"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 10:42:47 -0700
-X-CSE-ConnectionGUID: TV0MdPCXR8ak1v4RiscHBA==
-X-CSE-MsgGUID: sXDmJk+9T3WdbgU4uoBKTw==
+X-CSE-ConnectionGUID: I+wQOvgpS4+k3jSh45vLOg==
+X-CSE-MsgGUID: Cf+Vm9ikScqYI9XZaMECYw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="149695842"
+   d="scan'208";a="149695859"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa007.fm.intel.com with ESMTP; 18 Jun 2025 10:42:44 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 18 Jun 2025 10:42:45 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,17 +65,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
-	jacob.e.keller@intel.com,
+	karol.kolacinski@intel.com,
 	przemyslaw.kitszel@intel.com,
 	richardcochran@gmail.com,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Milena Olech <milena.olech@intel.com>,
 	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 02/15] ice: rename TSPLL and CGU functions and definitions
-Date: Wed, 18 Jun 2025 10:42:14 -0700
-Message-ID: <20250618174231.3100231-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 03/15] ice: fix E825-C TSPLL register definitions
+Date: Wed, 18 Jun 2025 10:42:15 -0700
+Message-ID: <20250618174231.3100231-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250618174231.3100231-1-anthony.l.nguyen@intel.com>
 References: <20250618174231.3100231-1-anthony.l.nguyen@intel.com>
@@ -87,1210 +85,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-Rename TSPLL and CGU functions, definitions etc. to match the file name
-and have consistent naming scheme.
+The E825-C hardware has a slightly different register layout for register
+19 of the Clock Generation Unit and TSPLL. The fbdiv_intgr value can be 10
+bits wide.
 
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Milena Olech <milena.olech@intel.com>
+Additionally, most of the fields that were in register 24 are made
+available in register 23 instead. The programming logic already has a
+corrected definition for register 23, but it incorrectly still used the
+8-bit definition of fbdiv_intgr. This results in truncating some of the
+values of fbdiv_intgr, including the value used for the 156.25MHz signal.
+
+The driver only used register 24 to obtain the enable status, which we
+should read from register 23. This results in an incorrect output for the
+log messages, but does not change any functionality besides
+disabled-by-default dynamic debug messages.
+
+Fix the register definitions, and adjust the code to properly reflect the
+enable/disable status in the log messages.
+
+Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c   |  28 +-
- drivers/net/ethernet/intel/ice/ice_common.h   |  36 +-
- drivers/net/ethernet/intel/ice/ice_ptp.c      |   2 +-
- .../net/ethernet/intel/ice/ice_ptp_consts.h   |  16 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |   4 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  11 +-
- drivers/net/ethernet/intel/ice/ice_tspll.c    | 350 +++++++++---------
- drivers/net/ethernet/intel/ice/ice_tspll.h    |  32 +-
- drivers/net/ethernet/intel/ice/ice_type.h     |  20 +-
- 9 files changed, 244 insertions(+), 255 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.h | 17 ++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_tspll.c  | 17 +++++++----------
+ 2 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 8cb3cb978ea1..bc292d61892c 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2301,12 +2301,12 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 		info->clk_freq = FIELD_GET(ICE_TS_CLK_FREQ_M, number);
- 		info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
- 	} else {
--		info->clk_freq = ICE_TIME_REF_FREQ_156_250;
-+		info->clk_freq = ICE_TSPLL_FREQ_156_250;
- 		info->clk_src = ICE_CLK_SRC_TCXO;
- 	}
- 
--	if (info->clk_freq < NUM_ICE_TIME_REF_FREQ) {
--		info->time_ref = (enum ice_time_ref_freq)info->clk_freq;
-+	if (info->clk_freq < NUM_ICE_TSPLL_FREQ) {
-+		info->time_ref = (enum ice_tspll_freq)info->clk_freq;
- 	} else {
- 		/* Unknown clock frequency, so assume a (probably incorrect)
- 		 * default to avoid out-of-bounds look ups of frequency
-@@ -2314,7 +2314,7 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 		 */
- 		ice_debug(hw, ICE_DBG_INIT, "1588 func caps: unknown clock frequency %u\n",
- 			  info->clk_freq);
--		info->time_ref = ICE_TIME_REF_FREQ_25_000;
-+		info->time_ref = ICE_TSPLL_FREQ_25_000;
- 	}
- 
- 	ice_debug(hw, ICE_DBG_INIT, "func caps: ieee_1588 = %u\n",
-@@ -6134,17 +6134,17 @@ u32 ice_get_link_speed(u16 index)
- }
- 
- /**
-- * ice_read_cgu_reg_e82x - Read a CGU register
-- * @hw: pointer to the HW struct
-+ * ice_read_cgu_reg - Read a CGU register
-+ * @hw: Pointer to the HW struct
-  * @addr: Register address to read
-- * @val: storage for register value read
-+ * @val: Storage for register value read
-  *
-  * Read the contents of a register of the Clock Generation Unit. Only
-- * applicable to E822 devices.
-+ * applicable to E82X devices.
-  *
-  * Return: 0 on success, other error codes when failed to read from CGU.
-  */
--int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
-+int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
- 		.opcode = ice_sbq_msg_rd,
-@@ -6166,17 +6166,17 @@ int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
- }
- 
- /**
-- * ice_write_cgu_reg_e82x - Write a CGU register
-- * @hw: pointer to the HW struct
-+ * ice_write_cgu_reg - Write a CGU register
-+ * @hw: Pointer to the HW struct
-  * @addr: Register address to write
-- * @val: value to write into the register
-+ * @val: Value to write into the register
-  *
-  * Write the specified value to a register of the Clock Generation Unit. Only
-- * applicable to E822 devices.
-+ * applicable to E82X devices.
-  *
-  * Return: 0 on success, other error codes when failed to write to CGU.
-  */
--int ice_write_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 val)
-+int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
- 		.opcode = ice_sbq_msg_wr,
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 24d5623076b8..8aa370e6c0f1 100644
+index 8aa370e6c0f1..ed375babcde3 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.h
 +++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -39,8 +39,8 @@
- #define FEC_RECEIVER_ID_PCS0 (0x33 << FEC_RECV_ID_SHIFT)
- #define FEC_RECEIVER_ID_PCS1 (0x34 << FEC_RECV_ID_SHIFT)
- 
--#define NAC_CGU_DWORD9 0x24
--union nac_cgu_dword9 {
-+#define ICE_CGU_R9 0x24
-+union ice_cgu_r9 {
- 	struct {
- 		u32 time_ref_freq_sel : 3;
- 		u32 clk_eref1_en : 1;
-@@ -62,24 +62,24 @@ union nac_cgu_dword9 {
- 	u32 val;
+@@ -74,7 +74,7 @@ union ice_cgu_r16 {
  };
  
--#define NAC_CGU_DWORD16_E825C 0x40
--union nac_cgu_dword16_e825c {
-+#define ICE_CGU_R16 0x40
-+union ice_cgu_r16 {
+ #define ICE_CGU_R19 0x4c
+-union ice_cgu_r19 {
++union ice_cgu_r19_e82x {
  	struct {
- 		u32 synce_remndr : 6;
- 		u32 synce_phlmt_en : 1;
- 		u32 misc13 : 17;
--		u32 tspll_ck_refclkfreq : 8;
-+		u32 ck_refclkfreq : 8;
- 	};
- 	u32 val;
- };
- 
--#define NAC_CGU_DWORD19 0x4c
--union nac_cgu_dword19 {
-+#define ICE_CGU_R19 0x4c
-+union ice_cgu_r19 {
- 	struct {
--		u32 tspll_fbdiv_intgr : 8;
-+		u32 fbdiv_intgr : 8;
+ 		u32 fbdiv_intgr : 8;
  		u32 fdpll_ulck_thr : 5;
- 		u32 misc15 : 3;
--		u32 tspll_ndivratio : 4;
-+		u32 ndivratio : 4;
- 		u32 tspll_iref_ndivratio : 3;
- 		u32 misc19 : 1;
- 		u32 japll_ndivratio : 4;
-@@ -89,8 +89,8 @@ union nac_cgu_dword19 {
+@@ -89,6 +89,21 @@ union ice_cgu_r19 {
  	u32 val;
  };
  
--#define NAC_CGU_DWORD22 0x58
--union nac_cgu_dword22 {
-+#define ICE_CGU_R22 0x58
-+union ice_cgu_r22 {
- 	struct {
- 		u32 fdpll_frac_div_out_nc : 2;
- 		u32 fdpll_lock_int_for : 1;
-@@ -113,8 +113,8 @@ union nac_cgu_dword22 {
- 	u32 val;
- };
- 
--#define NAC_CGU_DWORD23_E825C 0x5C
--union nac_cgu_dword23_e825c {
-+#define ICE_CGU_R23 0x5C
-+union ice_cgu_r23 {
- 	struct {
- 		u32 cgupll_fbdiv_intgr : 10;
- 		u32 ux56pll_fbdiv_intgr : 10;
-@@ -129,10 +129,10 @@ union nac_cgu_dword23_e825c {
- 	u32 val;
- };
- 
--#define NAC_CGU_DWORD24 0x60
--union nac_cgu_dword24 {
-+#define ICE_CGU_R24 0x60
-+union ice_cgu_r24 {
- 	struct {
--		u32 tspll_fbdiv_frac : 22;
-+		u32 fbdiv_frac : 22;
- 		u32 misc20 : 2;
- 		u32 ts_pll_enable : 1;
- 		u32 time_sync_tspll_align_sel : 1;
-@@ -480,6 +480,6 @@ ice_aq_write_i2c(struct ice_hw *hw, struct ice_aqc_link_topo_addr topo_addr,
- int ice_get_pca9575_handle(struct ice_hw *hw, u16 *pca9575_handle);
- int ice_read_pca9575_reg(struct ice_hw *hw, u8 offset, u8 *data);
- bool ice_fw_supports_report_dflt_cfg(struct ice_hw *hw);
--int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val);
--int ice_write_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 val);
-+int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val);
-+int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val);
- #endif /* _ICE_COMMON_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 8742f7336f72..b8cf8d64aaaa 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1636,7 +1636,7 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
- 		int err;
- 
- 		/* Enable/disable CGU 1PPS output for E825C */
--		err = ice_cgu_cfg_pps_out(hw, !!period);
-+		err = ice_tspll_cfg_pps_out_e825c(hw, !!period);
- 		if (err)
- 			return err;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-index 7b748286f653..19dddd9b53dd 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-@@ -281,7 +281,7 @@ struct ice_eth56g_mac_reg_cfg eth56g_mac_cfg[NUM_ICE_ETH56G_LNK_SPD] = {
- 
- /* struct ice_time_ref_info_e82x
-  *
-- * E822 hardware can use different sources as the reference for the PTP
-+ * E82X hardware can use different sources as the reference for the PTP
-  * hardware clock. Each clock has different characteristics such as a slightly
-  * different frequency, etc.
-  *
-@@ -289,8 +289,8 @@ struct ice_eth56g_mac_reg_cfg eth56g_mac_cfg[NUM_ICE_ETH56G_LNK_SPD] = {
-  * reference. See the struct ice_time_ref_info_e82x for information about the
-  * meaning of each constant.
-  */
--const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
--	/* ICE_TIME_REF_FREQ_25_000 -> 25 MHz */
-+const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TSPLL_FREQ] = {
-+	/* ICE_TSPLL_FREQ_25_000 -> 25 MHz */
- 	{
- 		/* pll_freq */
- 		823437500, /* 823.4375 MHz PLL */
-@@ -298,7 +298,7 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		0x136e44fabULL,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
-+	/* ICE_TSPLL_FREQ_122_880 -> 122.88 MHz */
- 	{
- 		/* pll_freq */
- 		783360000, /* 783.36 MHz */
-@@ -306,7 +306,7 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		0x146cc2177ULL,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
-+	/* ICE_TSPLL_FREQ_125_000 -> 125 MHz */
- 	{
- 		/* pll_freq */
- 		796875000, /* 796.875 MHz */
-@@ -314,7 +314,7 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		0x141414141ULL,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
-+	/* ICE_TSPLL_FREQ_153_600 -> 153.6 MHz */
- 	{
- 		/* pll_freq */
- 		816000000, /* 816 MHz */
-@@ -322,7 +322,7 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		0x139b9b9baULL,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
-+	/* ICE_TSPLL_FREQ_156_250 -> 156.25 MHz */
- 	{
- 		/* pll_freq */
- 		830078125, /* 830.78125 MHz */
-@@ -330,7 +330,7 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
- 		0x134679aceULL,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
-+	/* ICE_TSPLL_FREQ_245_760 -> 245.76 MHz */
- 	{
- 		/* pll_freq */
- 		783360000, /* 783.36 MHz */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 6c6ab5c0d0f4..278231443546 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2126,7 +2126,7 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- static int ice_ptp_init_phc_e825(struct ice_hw *hw)
- {
- 	/* Initialize the Clock Generation Unit */
--	return ice_init_cgu_e82x(hw);
-+	return ice_tspll_init(hw);
- }
- 
- /**
-@@ -2799,7 +2799,7 @@ static int ice_ptp_init_phc_e82x(struct ice_hw *hw)
- 	wr32(hw, PF_SB_REM_DEV_CTL, val);
- 
- 	/* Initialize the Clock Generation Unit */
--	err = ice_init_cgu_e82x(hw);
-+	err = ice_tspll_init(hw);
- 	if (err)
- 		return err;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 3bf45fd327ed..5896b346e579 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -272,7 +272,7 @@ struct ice_cgu_pin_desc {
- extern const struct ice_phy_reg_info_eth56g eth56g_phy_res[NUM_ETH56G_PHY_RES];
- 
- /* Table of constants related to possible TIME_REF sources */
--extern const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ];
-+extern const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TSPLL_FREQ];
- 
- /* Table of constants for Vernier calibration on E822 */
- extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
-@@ -314,7 +314,8 @@ void ice_ptp_reset_ts_memory_quad_e82x(struct ice_hw *hw, u8 quad);
-  *
-  * Returns the current TIME_REF from the capabilities structure.
-  */
--static inline enum ice_time_ref_freq ice_e82x_time_ref(const struct ice_hw *hw)
++union ice_cgu_r19_e825 {
++	struct {
++		u32 tspll_fbdiv_intgr : 10;
++		u32 fdpll_ulck_thr : 5;
++		u32 misc15 : 1;
++		u32 tspll_ndivratio : 4;
++		u32 tspll_iref_ndivratio : 3;
++		u32 misc19 : 1;
++		u32 japll_ndivratio : 4;
++		u32 japll_postdiv_pdivratio : 3;
++		u32 misc27 : 1;
++	};
++	u32 val;
++};
 +
-+static inline enum ice_tspll_freq ice_e82x_time_ref(const struct ice_hw *hw)
- {
- 	return hw->func_caps.ts_func_info.time_ref;
- }
-@@ -328,17 +329,17 @@ static inline enum ice_time_ref_freq ice_e82x_time_ref(const struct ice_hw *hw)
-  * change, such as an update to the CGU registers.
-  */
- static inline void
--ice_set_e82x_time_ref(struct ice_hw *hw, enum ice_time_ref_freq time_ref)
-+ice_set_e82x_time_ref(struct ice_hw *hw, enum ice_tspll_freq time_ref)
- {
- 	hw->func_caps.ts_func_info.time_ref = time_ref;
- }
- 
--static inline u64 ice_e82x_pll_freq(enum ice_time_ref_freq time_ref)
-+static inline u64 ice_e82x_pll_freq(enum ice_tspll_freq time_ref)
- {
- 	return e82x_time_ref[time_ref].pll_freq;
- }
- 
--static inline u64 ice_e82x_nominal_incval(enum ice_time_ref_freq time_ref)
-+static inline u64 ice_e82x_nominal_incval(enum ice_tspll_freq time_ref)
- {
- 	return e82x_time_ref[time_ref].nominal_incval;
- }
+ #define ICE_CGU_R22 0x58
+ union ice_cgu_r22 {
+ 	struct {
 diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.c b/drivers/net/ethernet/intel/ice/ice_tspll.c
-index 520996e50d76..2fe619214a1a 100644
+index 2fe619214a1a..74a9fc35fb1a 100644
 --- a/drivers/net/ethernet/intel/ice/ice_tspll.c
 +++ b/drivers/net/ethernet/intel/ice/ice_tspll.c
-@@ -6,8 +6,8 @@
- #include "ice_ptp_hw.h"
- 
- static const struct
--ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
--	/* ICE_TIME_REF_FREQ_25_000 -> 25 MHz */
-+ice_tspll_params_e82x e82x_tspll_params[NUM_ICE_TSPLL_FREQ] = {
-+	/* ICE_TSPLL_FREQ_25_000 -> 25 MHz */
- 	{
- 		/* refclk_pre_div */
- 		1,
-@@ -19,7 +19,7 @@ ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 		6,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
-+	/* ICE_TSPLL_FREQ_122_880 -> 122.88 MHz */
- 	{
- 		/* refclk_pre_div */
- 		5,
-@@ -31,7 +31,7 @@ ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 		7,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
-+	/* ICE_TSPLL_FREQ_125_000 -> 125 MHz */
- 	{
- 		/* refclk_pre_div */
- 		5,
-@@ -43,7 +43,7 @@ ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 		7,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
-+	/* ICE_TSPLL_FREQ_153_600 -> 153.6 MHz */
- 	{
- 		/* refclk_pre_div */
- 		5,
-@@ -55,7 +55,7 @@ ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 		6,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
-+	/* ICE_TSPLL_FREQ_156_250 -> 156.25 MHz */
- 	{
- 		/* refclk_pre_div */
- 		5,
-@@ -67,7 +67,7 @@ ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 		6,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
-+	/* ICE_TSPLL_FREQ_245_760 -> 245.76 MHz */
- 	{
- 		/* refclk_pre_div */
- 		10,
-@@ -81,86 +81,86 @@ ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- };
- 
- static const struct
--ice_cgu_pll_params_e825c e825c_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
--	/* ICE_TIME_REF_FREQ_25_000 -> 25 MHz */
-+ice_tspll_params_e825c e825c_tspll_params[NUM_ICE_TSPLL_FREQ] = {
-+	/* ICE_TSPLL_FREQ_25_000 -> 25 MHz */
- 	{
--		/* tspll_ck_refclkfreq */
-+		/* ck_refclkfreq */
- 		0x19,
--		/* tspll_ndivratio */
-+		/* ndivratio */
- 		1,
--		/* tspll_fbdiv_intgr */
-+		/* fbdiv_intgr */
- 		320,
--		/* tspll_fbdiv_frac */
-+		/* fbdiv_frac */
- 		0,
- 		/* ref1588_ck_div */
- 		0,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
-+	/* ICE_TSPLL_FREQ_122_880 -> 122.88 MHz */
- 	{
--		/* tspll_ck_refclkfreq */
-+		/* ck_refclkfreq */
- 		0x29,
--		/* tspll_ndivratio */
-+		/* ndivratio */
- 		3,
--		/* tspll_fbdiv_intgr */
-+		/* fbdiv_intgr */
- 		195,
--		/* tspll_fbdiv_frac */
-+		/* fbdiv_frac */
- 		1342177280UL,
- 		/* ref1588_ck_div */
- 		0,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
-+	/* ICE_TSPLL_FREQ_125_000 -> 125 MHz */
- 	{
--		/* tspll_ck_refclkfreq */
-+		/* ck_refclkfreq */
- 		0x3E,
--		/* tspll_ndivratio */
-+		/* ndivratio */
- 		2,
--		/* tspll_fbdiv_intgr */
-+		/* fbdiv_intgr */
- 		128,
--		/* tspll_fbdiv_frac */
-+		/* fbdiv_frac */
- 		0,
- 		/* ref1588_ck_div */
- 		0,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
-+	/* ICE_TSPLL_FREQ_153_600 -> 153.6 MHz */
- 	{
--		/* tspll_ck_refclkfreq */
-+		/* ck_refclkfreq */
- 		0x33,
--		/* tspll_ndivratio */
-+		/* ndivratio */
- 		3,
--		/* tspll_fbdiv_intgr */
-+		/* fbdiv_intgr */
- 		156,
--		/* tspll_fbdiv_frac */
-+		/* fbdiv_frac */
- 		1073741824UL,
- 		/* ref1588_ck_div */
- 		0,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
-+	/* ICE_TSPLL_FREQ_156_250 -> 156.25 MHz */
- 	{
--		/* tspll_ck_refclkfreq */
-+		/* ck_refclkfreq */
- 		0x1F,
--		/* tspll_ndivratio */
-+		/* ndivratio */
- 		5,
--		/* tspll_fbdiv_intgr */
-+		/* fbdiv_intgr */
- 		256,
--		/* tspll_fbdiv_frac */
-+		/* fbdiv_frac */
- 		0,
- 		/* ref1588_ck_div */
- 		0,
- 	},
- 
--	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
-+	/* ICE_TSPLL_FREQ_245_760 -> 245.76 MHz */
- 	{
--		/* tspll_ck_refclkfreq */
-+		/* ck_refclkfreq */
- 		0x52,
--		/* tspll_ndivratio */
-+		/* ndivratio */
- 		3,
--		/* tspll_fbdiv_intgr */
-+		/* fbdiv_intgr */
- 		97,
--		/* tspll_fbdiv_frac */
-+		/* fbdiv_frac */
- 		2818572288UL,
- 		/* ref1588_ck_div */
- 		0,
-@@ -168,25 +168,25 @@ ice_cgu_pll_params_e825c e825c_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- };
- 
- /**
-- * ice_clk_freq_str - Convert time_ref_freq to string
-+ * ice_tspll_clk_freq_str - Convert time_ref_freq to string
-  * @clk_freq: Clock frequency
-  *
-- * Return: specified TIME_REF clock frequency converted to a string
-+ * Return: specified TIME_REF clock frequency converted to a string.
-  */
--static const char *ice_clk_freq_str(enum ice_time_ref_freq clk_freq)
-+static const char *ice_tspll_clk_freq_str(enum ice_tspll_freq clk_freq)
- {
- 	switch (clk_freq) {
--	case ICE_TIME_REF_FREQ_25_000:
-+	case ICE_TSPLL_FREQ_25_000:
- 		return "25 MHz";
--	case ICE_TIME_REF_FREQ_122_880:
-+	case ICE_TSPLL_FREQ_122_880:
- 		return "122.88 MHz";
--	case ICE_TIME_REF_FREQ_125_000:
-+	case ICE_TSPLL_FREQ_125_000:
- 		return "125 MHz";
--	case ICE_TIME_REF_FREQ_153_600:
-+	case ICE_TSPLL_FREQ_153_600:
- 		return "153.6 MHz";
--	case ICE_TIME_REF_FREQ_156_250:
-+	case ICE_TSPLL_FREQ_156_250:
- 		return "156.25 MHz";
--	case ICE_TIME_REF_FREQ_245_760:
-+	case ICE_TSPLL_FREQ_245_760:
- 		return "245.76 MHz";
- 	default:
- 		return "Unknown";
-@@ -194,12 +194,12 @@ static const char *ice_clk_freq_str(enum ice_time_ref_freq clk_freq)
- }
- 
- /**
-- * ice_clk_src_str - Convert time_ref_src to string
-+ * ice_tspll_clk_src_str - Convert time_ref_src to string
-  * @clk_src: Clock source
-  *
-  * Return: specified clock source converted to its string name
-  */
--static const char *ice_clk_src_str(enum ice_clk_src clk_src)
-+static const char *ice_tspll_clk_src_str(enum ice_clk_src clk_src)
- {
- 	switch (clk_src) {
- 	case ICE_CLK_SRC_TCXO:
-@@ -212,8 +212,8 @@ static const char *ice_clk_src_str(enum ice_clk_src clk_src)
- }
- 
- /**
-- * ice_cfg_cgu_pll_e82x - Configure the Clock Generation Unit
-- * @hw: pointer to the HW struct
-+ * ice_tspll_cfg_e82x - Configure the Clock Generation Unit TSPLL
-+ * @hw: Pointer to the HW struct
-  * @clk_freq: Clock frequency to program
-  * @clk_src: Clock source to select (TIME_REF, or TCXO)
-  *
-@@ -223,21 +223,20 @@ static const char *ice_clk_src_str(enum ice_clk_src clk_src)
-  * Return:
-  * * %0       - success
-  * * %-EINVAL - input parameters are incorrect
-- * * %-EBUSY  - failed to lock TS PLL
-+ * * %-EBUSY  - failed to lock TSPLL
-  * * %other   - CGU read/write failure
-  */
--static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
--				enum ice_time_ref_freq clk_freq,
--				enum ice_clk_src clk_src)
-+static int ice_tspll_cfg_e82x(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
-+			      enum ice_clk_src clk_src)
+@@ -230,7 +230,7 @@ static int ice_tspll_cfg_e82x(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
+ 			      enum ice_clk_src clk_src)
  {
  	union tspll_ro_bwm_lf bwm_lf;
--	union nac_cgu_dword19 dw19;
--	union nac_cgu_dword22 dw22;
--	union nac_cgu_dword24 dw24;
--	union nac_cgu_dword9 dw9;
-+	union ice_cgu_r19 dw19;
-+	union ice_cgu_r22 dw22;
-+	union ice_cgu_r24 dw24;
-+	union ice_cgu_r9 dw9;
- 	int err;
- 
--	if (clk_freq >= NUM_ICE_TIME_REF_FREQ) {
-+	if (clk_freq >= NUM_ICE_TSPLL_FREQ) {
- 		dev_warn(ice_hw_to_dev(hw), "Invalid TIME_REF frequency %u\n",
- 			 clk_freq);
- 		return -EINVAL;
-@@ -249,129 +248,127 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
- 		return -EINVAL;
- 	}
- 
--	if (clk_src == ICE_CLK_SRC_TCXO &&
--	    clk_freq != ICE_TIME_REF_FREQ_25_000) {
-+	if (clk_src == ICE_CLK_SRC_TCXO && clk_freq != ICE_TSPLL_FREQ_25_000) {
- 		dev_warn(ice_hw_to_dev(hw),
- 			 "TCXO only supports 25 MHz frequency\n");
- 		return -EINVAL;
- 	}
- 
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD9, &dw9.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R9, &dw9.val);
- 	if (err)
- 		return err;
- 
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD24, &dw24.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R24, &dw24.val);
- 	if (err)
- 		return err;
- 
--	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_BWM_LF, &bwm_lf.val);
-+	err = ice_read_cgu_reg(hw, TSPLL_RO_BWM_LF, &bwm_lf.val);
- 	if (err)
- 		return err;
- 
- 	/* Log the current clock configuration */
--	ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+	ice_debug(hw, ICE_DBG_PTP, "Current TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
- 		  str_enabled_disabled(dw24.ts_pll_enable),
--		  ice_clk_src_str(dw24.time_ref_sel),
--		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ice_tspll_clk_src_str(dw24.time_ref_sel),
-+		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
- 		  bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
- 
- 	/* Disable the PLL before changing the clock source or frequency */
- 	if (dw24.ts_pll_enable) {
- 		dw24.ts_pll_enable = 0;
- 
--		err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD24, dw24.val);
-+		err = ice_write_cgu_reg(hw, ICE_CGU_R24, dw24.val);
- 		if (err)
- 			return err;
- 	}
- 
- 	/* Set the frequency */
- 	dw9.time_ref_freq_sel = clk_freq;
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD9, dw9.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R9, dw9.val);
- 	if (err)
- 		return err;
- 
--	/* Configure the TS PLL feedback divisor */
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD19, &dw19.val);
-+	/* Configure the TSPLL feedback divisor */
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R19, &dw19.val);
- 	if (err)
- 		return err;
- 
--	dw19.tspll_fbdiv_intgr = e822_cgu_params[clk_freq].feedback_div;
--	dw19.tspll_ndivratio = 1;
-+	dw19.fbdiv_intgr = e82x_tspll_params[clk_freq].feedback_div;
-+	dw19.ndivratio = 1;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD19, dw19.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R19, dw19.val);
- 	if (err)
- 		return err;
- 
--	/* Configure the TS PLL post divisor */
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD22, &dw22.val);
-+	/* Configure the TSPLL post divisor */
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R22, &dw22.val);
- 	if (err)
- 		return err;
- 
--	dw22.time1588clk_div = e822_cgu_params[clk_freq].post_pll_div;
-+	dw22.time1588clk_div = e82x_tspll_params[clk_freq].post_pll_div;
- 	dw22.time1588clk_sel_div2 = 0;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD22, dw22.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R22, dw22.val);
- 	if (err)
- 		return err;
- 
--	/* Configure the TS PLL pre divisor and clock source */
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD24, &dw24.val);
-+	/* Configure the TSPLL pre divisor and clock source */
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R24, &dw24.val);
- 	if (err)
- 		return err;
- 
--	dw24.ref1588_ck_div = e822_cgu_params[clk_freq].refclk_pre_div;
--	dw24.tspll_fbdiv_frac = e822_cgu_params[clk_freq].frac_n_div;
-+	dw24.ref1588_ck_div = e82x_tspll_params[clk_freq].refclk_pre_div;
-+	dw24.fbdiv_frac = e82x_tspll_params[clk_freq].frac_n_div;
- 	dw24.time_ref_sel = clk_src;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD24, dw24.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R24, dw24.val);
- 	if (err)
- 		return err;
- 
- 	/* Finally, enable the PLL */
- 	dw24.ts_pll_enable = 1;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD24, dw24.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R24, dw24.val);
- 	if (err)
- 		return err;
- 
- 	/* Wait to verify if the PLL locks */
- 	usleep_range(1000, 5000);
- 
--	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_BWM_LF, &bwm_lf.val);
-+	err = ice_read_cgu_reg(hw, TSPLL_RO_BWM_LF, &bwm_lf.val);
- 	if (err)
- 		return err;
- 
- 	if (!bwm_lf.plllock_true_lock_cri) {
--		dev_warn(ice_hw_to_dev(hw), "CGU PLL failed to lock\n");
-+		dev_warn(ice_hw_to_dev(hw), "TSPLL failed to lock\n");
- 		return -EBUSY;
- 	}
- 
- 	/* Log the current clock configuration */
--	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+	ice_debug(hw, ICE_DBG_PTP, "New TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
- 		  str_enabled_disabled(dw24.ts_pll_enable),
--		  ice_clk_src_str(dw24.time_ref_sel),
--		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ice_tspll_clk_src_str(dw24.time_ref_sel),
-+		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
- 		  bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
- 
- 	return 0;
- }
- 
- /**
-- * ice_cfg_cgu_pll_dis_sticky_bits_e82x - disable TS PLL sticky bits
-- * @hw: pointer to the HW struct
-+ * ice_tspll_dis_sticky_bits_e82x - disable TSPLL sticky bits
-+ * @hw: Pointer to the HW struct
-  *
-- * Configure the Clock Generation Unit TS PLL sticky bits so they don't latch on
-- * losing TS PLL lock, but always show current state.
-+ * Configure the Clock Generation Unit TSPLL sticky bits so they don't latch on
-+ * losing TSPLL lock, but always show current state.
-  *
-- * Return: 0 on success, other error codes when failed to read/write CGU
-+ * Return: 0 on success, other error codes when failed to read/write CGU.
-  */
--static int ice_cfg_cgu_pll_dis_sticky_bits_e82x(struct ice_hw *hw)
-+static int ice_tspll_dis_sticky_bits_e82x(struct ice_hw *hw)
- {
- 	union tspll_cntr_bist_settings cntr_bist;
- 	int err;
- 
--	err = ice_read_cgu_reg_e82x(hw, TSPLL_CNTR_BIST_SETTINGS,
--				    &cntr_bist.val);
-+	err = ice_read_cgu_reg(hw, TSPLL_CNTR_BIST_SETTINGS, &cntr_bist.val);
- 	if (err)
- 		return err;
- 
-@@ -379,13 +376,12 @@ static int ice_cfg_cgu_pll_dis_sticky_bits_e82x(struct ice_hw *hw)
- 	cntr_bist.i_plllock_sel_0 = 0;
- 	cntr_bist.i_plllock_sel_1 = 0;
- 
--	return ice_write_cgu_reg_e82x(hw, TSPLL_CNTR_BIST_SETTINGS,
--				      cntr_bist.val);
-+	return ice_write_cgu_reg(hw, TSPLL_CNTR_BIST_SETTINGS, cntr_bist.val);
- }
- 
- /**
-- * ice_cfg_cgu_pll_e825c - Configure the Clock Generation Unit for E825-C
-- * @hw: pointer to the HW struct
-+ * ice_tspll_cfg_e825c - Configure the TSPLL for E825-C
-+ * @hw: Pointer to the HW struct
-  * @clk_freq: Clock frequency to program
-  * @clk_src: Clock source to select (TIME_REF, or TCXO)
-  *
-@@ -395,23 +391,22 @@ static int ice_cfg_cgu_pll_dis_sticky_bits_e82x(struct ice_hw *hw)
-  * Return:
-  * * %0       - success
-  * * %-EINVAL - input parameters are incorrect
-- * * %-EBUSY  - failed to lock TS PLL
-+ * * %-EBUSY  - failed to lock TSPLL
-  * * %other   - CGU read/write failure
-  */
--static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
--				 enum ice_time_ref_freq clk_freq,
--				 enum ice_clk_src clk_src)
-+static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
-+			       enum ice_clk_src clk_src)
+-	union ice_cgu_r19 dw19;
++	union ice_cgu_r19_e82x dw19;
+ 	union ice_cgu_r22 dw22;
+ 	union ice_cgu_r24 dw24;
+ 	union ice_cgu_r9 dw9;
+@@ -398,9 +398,9 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
+ 			       enum ice_clk_src clk_src)
  {
  	union tspll_ro_lock_e825c ro_lock;
--	union nac_cgu_dword16_e825c dw16;
--	union nac_cgu_dword23_e825c dw23;
--	union nac_cgu_dword19 dw19;
--	union nac_cgu_dword22 dw22;
--	union nac_cgu_dword24 dw24;
--	union nac_cgu_dword9 dw9;
-+	union ice_cgu_r16 dw16;
-+	union ice_cgu_r23 dw23;
-+	union ice_cgu_r19 dw19;
-+	union ice_cgu_r22 dw22;
-+	union ice_cgu_r24 dw24;
-+	union ice_cgu_r9 dw9;
- 	int err;
- 
--	if (clk_freq >= NUM_ICE_TIME_REF_FREQ) {
-+	if (clk_freq >= NUM_ICE_TSPLL_FREQ) {
- 		dev_warn(ice_hw_to_dev(hw), "Invalid TIME_REF frequency %u\n",
- 			 clk_freq);
- 		return -EINVAL;
-@@ -423,46 +418,44 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
- 		return -EINVAL;
- 	}
- 
--	if (clk_src == ICE_CLK_SRC_TCXO &&
--	    clk_freq != ICE_TIME_REF_FREQ_156_250) {
-+	if (clk_src == ICE_CLK_SRC_TCXO && clk_freq != ICE_TSPLL_FREQ_156_250) {
- 		dev_warn(ice_hw_to_dev(hw),
- 			 "TCXO only supports 156.25 MHz frequency\n");
- 		return -EINVAL;
- 	}
- 
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD9, &dw9.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R9, &dw9.val);
++	union ice_cgu_r19_e825 dw19;
+ 	union ice_cgu_r16 dw16;
+ 	union ice_cgu_r23 dw23;
+-	union ice_cgu_r19 dw19;
+ 	union ice_cgu_r22 dw22;
+ 	union ice_cgu_r24 dw24;
+ 	union ice_cgu_r9 dw9;
+@@ -428,10 +428,6 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
  	if (err)
  		return err;
  
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD24, &dw24.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R24, &dw24.val);
+-	err = ice_read_cgu_reg(hw, ICE_CGU_R24, &dw24.val);
+-	if (err)
+-		return err;
+-
+ 	err = ice_read_cgu_reg(hw, ICE_CGU_R16, &dw16.val);
  	if (err)
  		return err;
- 
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD16_E825C, &dw16.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R16, &dw16.val);
- 	if (err)
- 		return err;
- 
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, &dw23.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R23, &dw23.val);
- 	if (err)
- 		return err;
- 
--	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
-+	err = ice_read_cgu_reg(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
- 	if (err)
- 		return err;
+@@ -446,7 +442,7 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
  
  	/* Log the current clock configuration */
--	ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+	ice_debug(hw, ICE_DBG_PTP, "Current TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
- 		  str_enabled_disabled(dw24.ts_pll_enable),
--		  ice_clk_src_str(dw23.time_ref_sel),
--		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ice_tspll_clk_src_str(dw23.time_ref_sel),
-+		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
+ 	ice_debug(hw, ICE_DBG_PTP, "Current TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+-		  str_enabled_disabled(dw24.ts_pll_enable),
++		  str_enabled_disabled(dw23.ts_pll_enable),
+ 		  ice_tspll_clk_src_str(dw23.time_ref_sel),
+ 		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
  		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
- 
- 	/* Disable the PLL before changing the clock source or frequency */
- 	if (dw23.ts_pll_enable) {
- 		dw23.ts_pll_enable = 0;
- 
--		err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C,
--					     dw23.val);
-+		err = ice_write_cgu_reg(hw, ICE_CGU_R23, dw23.val);
- 		if (err)
- 			return err;
- 	}
-@@ -478,33 +471,30 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
- 		dw9.time_ref_en = 1;
- 		dw9.clk_eref0_en = 0;
- 	}
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD9, dw9.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R9, dw9.val);
+@@ -486,8 +482,8 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
  	if (err)
  		return err;
  
- 	/* Choose the referenced frequency */
--	dw16.tspll_ck_refclkfreq =
--	e825c_cgu_params[clk_freq].tspll_ck_refclkfreq;
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD16_E825C, dw16.val);
-+	dw16.ck_refclkfreq = e825c_tspll_params[clk_freq].ck_refclkfreq;
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R16, dw16.val);
+-	dw19.fbdiv_intgr = e825c_tspll_params[clk_freq].fbdiv_intgr;
+-	dw19.ndivratio = e825c_tspll_params[clk_freq].ndivratio;
++	dw19.tspll_fbdiv_intgr = e825c_tspll_params[clk_freq].fbdiv_intgr;
++	dw19.tspll_ndivratio = e825c_tspll_params[clk_freq].ndivratio;
+ 
+ 	err = ice_write_cgu_reg(hw, ICE_CGU_R19, dw19.val);
+ 	if (err)
+@@ -518,6 +514,7 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
  	if (err)
  		return err;
  
--	/* Configure the TS PLL feedback divisor */
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD19, &dw19.val);
-+	/* Configure the TSPLL feedback divisor */
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R19, &dw19.val);
- 	if (err)
- 		return err;
++	dw24.val = 0;
+ 	dw24.fbdiv_frac = e825c_tspll_params[clk_freq].fbdiv_frac;
  
--	dw19.tspll_fbdiv_intgr =
--		e825c_cgu_params[clk_freq].tspll_fbdiv_intgr;
--	dw19.tspll_ndivratio =
--		e825c_cgu_params[clk_freq].tspll_ndivratio;
-+	dw19.fbdiv_intgr = e825c_tspll_params[clk_freq].fbdiv_intgr;
-+	dw19.ndivratio = e825c_tspll_params[clk_freq].ndivratio;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD19, dw19.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R19, dw19.val);
- 	if (err)
- 		return err;
- 
--	/* Configure the TS PLL post divisor */
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD22, &dw22.val);
-+	/* Configure the TSPLL post divisor */
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R22, &dw22.val);
- 	if (err)
- 		return err;
- 
-@@ -512,135 +502,133 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
- 	dw22.time1588clk_div = 5;
- 	dw22.time1588clk_sel_div2 = 0;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD22, dw22.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R22, dw22.val);
- 	if (err)
- 		return err;
- 
--	/* Configure the TS PLL pre divisor and clock source */
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, &dw23.val);
-+	/* Configure the TSPLL pre divisor and clock source */
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R23, &dw23.val);
- 	if (err)
- 		return err;
- 
--	dw23.ref1588_ck_div =
--		e825c_cgu_params[clk_freq].ref1588_ck_div;
-+	dw23.ref1588_ck_div = e825c_tspll_params[clk_freq].ref1588_ck_div;
- 	dw23.time_ref_sel = clk_src;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, dw23.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R23, dw23.val);
- 	if (err)
- 		return err;
- 
--	dw24.tspll_fbdiv_frac =
--		e825c_cgu_params[clk_freq].tspll_fbdiv_frac;
-+	dw24.fbdiv_frac = e825c_tspll_params[clk_freq].fbdiv_frac;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD24, dw24.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R24, dw24.val);
- 	if (err)
- 		return err;
- 
- 	/* Finally, enable the PLL */
- 	dw23.ts_pll_enable = 1;
- 
--	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, dw23.val);
-+	err = ice_write_cgu_reg(hw, ICE_CGU_R23, dw23.val);
- 	if (err)
- 		return err;
- 
- 	/* Wait to verify if the PLL locks */
- 	usleep_range(1000, 5000);
- 
--	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
-+	err = ice_read_cgu_reg(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
- 	if (err)
- 		return err;
- 
- 	if (!ro_lock.plllock_true_lock_cri) {
--		dev_warn(ice_hw_to_dev(hw), "CGU PLL failed to lock\n");
-+		dev_warn(ice_hw_to_dev(hw), "TSPLL failed to lock\n");
- 		return -EBUSY;
- 	}
+ 	err = ice_write_cgu_reg(hw, ICE_CGU_R24, dw24.val);
+@@ -545,7 +542,7 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
  
  	/* Log the current clock configuration */
--	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+	ice_debug(hw, ICE_DBG_PTP, "New TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
- 		  str_enabled_disabled(dw24.ts_pll_enable),
--		  ice_clk_src_str(dw23.time_ref_sel),
--		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ice_tspll_clk_src_str(dw23.time_ref_sel),
-+		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
+ 	ice_debug(hw, ICE_DBG_PTP, "New TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+-		  str_enabled_disabled(dw24.ts_pll_enable),
++		  str_enabled_disabled(dw23.ts_pll_enable),
+ 		  ice_tspll_clk_src_str(dw23.time_ref_sel),
+ 		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
  		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
- 
- 	return 0;
- }
- 
- /**
-- * ice_cfg_cgu_pll_dis_sticky_bits_e825c - disable TS PLL sticky bits for E825-C
-- * @hw: pointer to the HW struct
-+ * ice_tspll_dis_sticky_bits_e825c - disable TSPLL sticky bits for E825-C
-+ * @hw: Pointer to the HW struct
-  *
-- * Configure the Clock Generation Unit TS PLL sticky bits so they don't latch on
-- * losing TS PLL lock, but always show current state.
-+ * Configure the Clock Generation Unit TSPLL sticky bits so they don't latch on
-+ * losing TSPLL lock, but always show current state.
-  *
-- * Return: 0 on success, other error codes when failed to read/write CGU
-+ * Return: 0 on success, other error codes when failed to read/write CGU.
-  */
--static int ice_cfg_cgu_pll_dis_sticky_bits_e825c(struct ice_hw *hw)
-+static int ice_tspll_dis_sticky_bits_e825c(struct ice_hw *hw)
- {
- 	union tspll_bw_tdc_e825c bw_tdc;
- 	int err;
- 
--	err = ice_read_cgu_reg_e82x(hw, TSPLL_BW_TDC_E825C, &bw_tdc.val);
-+	err = ice_read_cgu_reg(hw, TSPLL_BW_TDC_E825C, &bw_tdc.val);
- 	if (err)
- 		return err;
- 
- 	bw_tdc.i_plllock_sel_1_0 = 0;
- 
--	return ice_write_cgu_reg_e82x(hw, TSPLL_BW_TDC_E825C, bw_tdc.val);
-+	return ice_write_cgu_reg(hw, TSPLL_BW_TDC_E825C, bw_tdc.val);
- }
- 
- #define ICE_ONE_PPS_OUT_AMP_MAX 3
- 
- /**
-- * ice_cgu_cfg_pps_out - Configure 1PPS output from CGU
-+ * ice_tspll_cfg_pps_out_e825c - Enable/disable 1PPS output and set amplitude
-  * @hw: pointer to the HW struct
-  * @enable: true to enable 1PPS output, false to disable it
-  *
-  * Return: 0 on success, other negative error code when CGU read/write failed.
-  */
--int ice_cgu_cfg_pps_out(struct ice_hw *hw, bool enable)
-+int ice_tspll_cfg_pps_out_e825c(struct ice_hw *hw, bool enable)
- {
--	union nac_cgu_dword9 dw9;
-+	union ice_cgu_r9 r9;
- 	int err;
- 
--	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD9, &dw9.val);
-+	err = ice_read_cgu_reg(hw, ICE_CGU_R9, &r9.val);
- 	if (err)
- 		return err;
- 
--	dw9.one_pps_out_en = enable;
--	dw9.one_pps_out_amp = enable * ICE_ONE_PPS_OUT_AMP_MAX;
--	return ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD9, dw9.val);
-+	r9.one_pps_out_en = enable;
-+	r9.one_pps_out_amp = enable * ICE_ONE_PPS_OUT_AMP_MAX;
-+	return ice_write_cgu_reg(hw, ICE_CGU_R9, r9.val);
- }
- 
- /**
-- * ice_init_cgu_e82x - Initialize CGU with settings from firmware
-- * @hw: pointer to the HW structure
-+ * ice_tspll_init - Initialize TSPLL with settings from firmware
-+ * @hw: Pointer to the HW structure
-  *
-- * Initialize the Clock Generation Unit of the E822 device.
-+ * Initialize the Clock Generation Unit of the E82X/E825 device.
-  *
-- * Return: 0 on success, other error codes when failed to read/write/cfg CGU
-+ * Return: 0 on success, other error codes when failed to read/write/cfg CGU.
-  */
--int ice_init_cgu_e82x(struct ice_hw *hw)
-+int ice_tspll_init(struct ice_hw *hw)
- {
- 	struct ice_ts_func_info *ts_info = &hw->func_caps.ts_func_info;
- 	int err;
- 
--	/* Disable sticky lock detection so lock err reported is accurate */
-+	/* Disable sticky lock detection so lock err reported is accurate. */
- 	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825)
--		err = ice_cfg_cgu_pll_dis_sticky_bits_e825c(hw);
-+		err = ice_tspll_dis_sticky_bits_e825c(hw);
- 	else
--		err = ice_cfg_cgu_pll_dis_sticky_bits_e82x(hw);
-+		err = ice_tspll_dis_sticky_bits_e82x(hw);
- 	if (err)
- 		return err;
- 
--	/* Configure the CGU PLL using the parameters from the function
-+	/* Configure the TSPLL using the parameters from the function
- 	 * capabilities.
- 	 */
- 	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825)
--		err = ice_cfg_cgu_pll_e825c(hw, ts_info->time_ref,
--					    (enum ice_clk_src)ts_info->clk_src);
-+		err = ice_tspll_cfg_e825c(hw, ts_info->time_ref,
-+					  (enum ice_clk_src)ts_info->clk_src);
- 	else
--		err = ice_cfg_cgu_pll_e82x(hw, ts_info->time_ref,
--					   (enum ice_clk_src)ts_info->clk_src);
-+		err = ice_tspll_cfg_e82x(hw, ts_info->time_ref,
-+					 (enum ice_clk_src)ts_info->clk_src);
- 
- 	return err;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.h b/drivers/net/ethernet/intel/ice/ice_tspll.h
-index 82ddcf4078fe..3dcc525bb829 100644
---- a/drivers/net/ethernet/intel/ice/ice_tspll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_tspll.h
-@@ -5,16 +5,16 @@
- #define _ICE_TSPLL_H_
- 
- /**
-- * struct ice_cgu_pll_params_e82x - E82X CGU parameters
-+ * struct ice_tspll_params_e82x - E82X TSPLL parameters
-  * @refclk_pre_div: Reference clock pre-divisor
-  * @feedback_div: Feedback divisor
-  * @frac_n_div: Fractional divisor
-  * @post_pll_div: Post PLL divisor
-  *
-  * Clock Generation Unit parameters used to program the PLL based on the
-- * selected TIME_REF frequency.
-+ * selected TIME_REF/TCXO frequency.
-  */
--struct ice_cgu_pll_params_e82x {
-+struct ice_tspll_params_e82x {
- 	u32 refclk_pre_div;
- 	u32 feedback_div;
- 	u32 frac_n_div;
-@@ -22,25 +22,25 @@ struct ice_cgu_pll_params_e82x {
- };
- 
- /**
-- * struct ice_cgu_pll_params_e825c - E825C CGU parameters
-- * @tspll_ck_refclkfreq: tspll_ck_refclkfreq selection
-- * @tspll_ndivratio: ndiv ratio that goes directly to the pll
-- * @tspll_fbdiv_intgr: TS PLL integer feedback divide
-- * @tspll_fbdiv_frac:  TS PLL fractional feedback divide
-- * @ref1588_ck_div: clock divider for tspll ref
-+ * struct ice_tspll_params_e825c - E825-C TSPLL parameters
-+ * @ck_refclkfreq: ck_refclkfreq selection
-+ * @ndivratio: ndiv ratio that goes directly to the PLL
-+ * @fbdiv_intgr: TSPLL integer feedback divisor
-+ * @fbdiv_frac: TSPLL fractional feedback divisor
-+ * @ref1588_ck_div: clock divisor for tspll ref
-  *
-  * Clock Generation Unit parameters used to program the PLL based on the
-  * selected TIME_REF/TCXO frequency.
-  */
--struct ice_cgu_pll_params_e825c {
--	u32 tspll_ck_refclkfreq;
--	u32 tspll_ndivratio;
--	u32 tspll_fbdiv_intgr;
--	u32 tspll_fbdiv_frac;
-+struct ice_tspll_params_e825c {
-+	u32 ck_refclkfreq;
-+	u32 ndivratio;
-+	u32 fbdiv_intgr;
-+	u32 fbdiv_frac;
- 	u32 ref1588_ck_div;
- };
- 
--int ice_cgu_cfg_pps_out(struct ice_hw *hw, bool enable);
--int ice_init_cgu_e82x(struct ice_hw *hw);
-+int ice_tspll_cfg_pps_out_e825c(struct ice_hw *hw, bool enable);
-+int ice_tspll_init(struct ice_hw *hw);
- 
- #endif /* _ICE_TSPLL_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 3d68f465952d..03c6c271865d 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -326,17 +326,17 @@ struct ice_hw_common_caps {
- #define ICE_TS_TMR_IDX_ASSOC_M		BIT(24)
- 
- /* TIME_REF clock rate specification */
--enum ice_time_ref_freq {
--	ICE_TIME_REF_FREQ_25_000	= 0,
--	ICE_TIME_REF_FREQ_122_880	= 1,
--	ICE_TIME_REF_FREQ_125_000	= 2,
--	ICE_TIME_REF_FREQ_153_600	= 3,
--	ICE_TIME_REF_FREQ_156_250	= 4,
--	ICE_TIME_REF_FREQ_245_760	= 5,
-+enum ice_tspll_freq {
-+	ICE_TSPLL_FREQ_25_000	= 0,
-+	ICE_TSPLL_FREQ_122_880	= 1,
-+	ICE_TSPLL_FREQ_125_000	= 2,
-+	ICE_TSPLL_FREQ_153_600	= 3,
-+	ICE_TSPLL_FREQ_156_250	= 4,
-+	ICE_TSPLL_FREQ_245_760	= 5,
- 
--	NUM_ICE_TIME_REF_FREQ,
-+	NUM_ICE_TSPLL_FREQ,
- 
--	ICE_TIME_REF_FREQ_INVALID	= -1,
-+	ICE_TSPLL_FREQ_INVALID	= -1,
- };
- 
- /* Clock source specification */
-@@ -349,7 +349,7 @@ enum ice_clk_src {
- 
- struct ice_ts_func_info {
- 	/* Function specific info */
--	enum ice_time_ref_freq time_ref;
-+	enum ice_tspll_freq time_ref;
- 	u8 clk_freq;
- 	u8 clk_src;
- 	u8 tmr_index_assoc;
 -- 
 2.47.1
 
