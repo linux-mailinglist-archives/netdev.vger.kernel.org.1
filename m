@@ -1,282 +1,168 @@
-Return-Path: <netdev+bounces-199168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 751DAADF46C
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:43:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C41ADF4D5
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A18E3A8F37
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:43:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04246189453A
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4242FD87D;
-	Wed, 18 Jun 2025 17:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKTfdMki"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1441B2FA62C;
+	Wed, 18 Jun 2025 17:42:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF8D2FE38D
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 17:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DA12FA62F;
+	Wed, 18 Jun 2025 17:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750268452; cv=none; b=kihSIa7gpKB5TiOLv1xQ53GgT3X6wrLghSLTKgazXvx1QvChzaxTOBHoaWJl0sMvBeohLfC3AAzUQD3jvOT1LEmJcPaGCckaqRD7vzxWSYfLC9Qj6cn4dPPnPM30aerk+FnWU9omcbVxOPxVrzjEHKgavN5jsP3o5IQNluJdgdw=
+	t=1750268532; cv=none; b=kbSf0JM/fTwwCgKHbOMcCzilGbQZeMBdywf84KuUAdNmpSo0LSKk7JZ2+/yb5PJIZWP/PKhGT+FlGZ7Y+ud6p6PdC6urvHBMKGDjBnjj4TSNN2D6oIqWeUw/8EBdYuO6IWPOMjOZddMM+hKoj0rktB0dpVWi6DRJAHYsOq8kY6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750268452; c=relaxed/simple;
-	bh=4sFWwkFXi8BvpD8IMU8juMRg7f+DirSsf+Ud/E9pRzw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tJOpAZe1IpJs7AISrfRGb4Yt1kIxEK3G9TYH/gK4i00pkeh1RSRy5I/LqYtUWb1gjT8TJspOBnRrM9rS0CTMeerlwx5/Po24lUvcHME6EPIoUSEQEQaVvN0Qpcd5Kado+ZRqfU0aRSENai2fUR2O9Nt+83jqdkNad901WV+tC5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZKTfdMki; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750268444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QyjtI6z4LqPR2c4duviV1oQl9DWLYnzH4cNekvsPaJY=;
-	b=ZKTfdMkiRBxVhKaZlowFwwUCoT2CSQnfLD4e79dpP6Wa9/0f6qvuE+GQ1xHN5JrCtCKQ0L
-	zqCzqWl9QoIhk0Dbz6m7moPI9z0wdAi2jpiAgT4dz8zIGZ6oOmaz/NDPiCY3xB19d9EuqI
-	3hjr3lB9dR0/y09caxJrw2pAU2G5srQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-255-pl_Q8kV5NWSi5ttg2wXUzA-1; Wed, 18 Jun 2025 13:40:42 -0400
-X-MC-Unique: pl_Q8kV5NWSi5ttg2wXUzA-1
-X-Mimecast-MFC-AGG-ID: pl_Q8kV5NWSi5ttg2wXUzA_1750268442
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae012f87dd1so109417666b.3
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 10:40:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750268442; x=1750873242;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QyjtI6z4LqPR2c4duviV1oQl9DWLYnzH4cNekvsPaJY=;
-        b=a4h8hILK7giOsZABzqCtwGcqS9BKgy0Rk/0tHty3WEWXpIsce1tlwLRotSkJYeTFzd
-         ImI2Vi/EXvlzCqcjKZsPRiB7/7Ocp9jMGVHl6br9b7Lrevq17hu7o0vmQOVYvLpDC5GP
-         4P6YettzCFou+bpZ4kFK0I1nIROUA/TMfXwWEsyM7a/T93p2A+tBB/JJl392VG5Ao1mA
-         LzMCgI7vr6+TAyWw+arI8kKSmYPnJvBxRVv82HgLmKbPwAdGjhI78qticsQqq+F9/cYd
-         NG3QoA1FeA9MPWPocwCz2WtMkTRf11dZxsyF7UCJBAwnd7Nn4T8ZuIRXAGRE52pz450E
-         5ItA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPuIdaER1/ZHV2h+nrMAdoeJJwTNyDwww8yRyTw/I8QJs0IM1ilhMolVrKoP69/hUOisTg9xM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbZFkmwqmp5f/3+gJaZt52x9geMsCdtXMfVRfAHzLtRPar5Ngp
-	GeBxXuaVNbYDPTjEhxCdHfhsU89gBw0QPZxEjr5foltWkWT3SgDZtEbgj4rli5xoJVjFAc8pXxq
-	yYc9rfd9ThE1xIvgeYFdjaLcm03cT//8DMX/esdZ2dEt0H1VcuMLubJf5jg==
-X-Gm-Gg: ASbGncss7EwkoqfB/bFqV0MjhDV6xSGtDnYn0yFo0NcU5qw8DPA31s8n4AmKYdta5Zx
-	euWOHFEf3URPCNF9/ZrkiuQAzOOmd+9zGU8WjJKRvmG/xONAzJgdH7toiRkthUDQuGn71CqTHII
-	QWnLgbxBhVIk/m5I8NoDYHuCV4s4xeSA+LDi79kPElmRR+t/gEjY0dhUaFXPUZZpywpFbI2N4uG
-	dUqFu5yYb9hzz7CAshepptA4o2LhnCykslBCgW8X/GpnWD2CrVD0JDZcCovKVFpSMk07BEW807p
-	YINKz3WQe8cdRD15ilk7P2ntjjPHlsG7PnuaIUfpCW+3jG1EJE6u2loWYuTrJg==
-X-Received: by 2002:a17:907:3f1f:b0:ad2:417b:2ab5 with SMTP id a640c23a62f3a-adfad4f5a5amr1527475366b.60.1750268441527;
-        Wed, 18 Jun 2025 10:40:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHJxKyWXcdF99utGWSG81lMA2wUOYJgcYHm0gBuwbodj41pCAPM9kqV+i3SsT8FRKkHC4LNpQ==
-X-Received: by 2002:a17:907:3f1f:b0:ad2:417b:2ab5 with SMTP id a640c23a62f3a-adfad4f5a5amr1527470666b.60.1750268440967;
-        Wed, 18 Jun 2025 10:40:40 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:c:37e0:8998:e0cf:68cc:1b62? ([2a01:e0a:c:37e0:8998:e0cf:68cc:1b62])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adec897c397sm1066045766b.167.2025.06.18.10.40.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jun 2025 10:40:40 -0700 (PDT)
-Message-ID: <f6dcf50e-99ee-4e2d-86a8-5ffa2c7aacc7@redhat.com>
-Date: Wed, 18 Jun 2025 19:40:36 +0200
+	s=arc-20240116; t=1750268532; c=relaxed/simple;
+	bh=PFOvRPg2CJBPcJUPWyP7JdVspRXn33CIKGD2PUZrvUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iaik5aBcpnFOKmvpFZZzBEBnsRlRFa0lFigdZUboV/W3igliFxVVrHwrIOtTfP8vo2GfCPP+JtBsjGtywqsLA1e9C3KT3f9PSz5dqoCcUrJhkdbhsdbuOyByQNZpDz9ozcqZgOgWoWILyfho2uchWW5spfwS36/AvTOAJOZV6C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uRwez-000000004uy-0gef;
+	Wed, 18 Jun 2025 17:41:59 +0000
+Date: Wed, 18 Jun 2025 19:41:50 +0200
+From: Daniel Golle <daniel@makrotopia.org>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, Simon Horman <horms@kernel.org>,
+	arinc.unal@arinc9.com
+Subject: Re: [net-next v5 3/3] net: ethernet: mtk_eth_soc: skip first IRQ if
+ not used
+Message-ID: <aFL6XhghHobju0th@pidgin.makrotopia.org>
+References: <20250618130717.75839-1-linux@fw-web.de>
+ <20250618130717.75839-4-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 5/6] rust: enable `clippy::cast_lossless` lint
-To: Tamir Duberstein <tamird@gmail.com>,
- Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
- <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Brendan Higgins <brendan.higgins@linux.dev>, David Gow
- <davidgow@google.com>, Rae Moar <rmoar@google.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
- Saravana Kannan <saravanak@google.com>,
- Abdiel Janulgue <abdiel.janulgue@gmail.com>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Robin Murphy <robin.murphy@arm.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Nicolas Schier <nicolas.schier@linux.dev>,
- Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Benno Lossin <lossin@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, Breno Leitao
- <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
- linux-block@vger.kernel.org, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org,
- linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org
-References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
- <20250615-ptr-as-ptr-v12-5-f43b024581e8@gmail.com>
-Content-Language: en-US, fr
-From: Jocelyn Falempe <jfalempe@redhat.com>
-In-Reply-To: <20250615-ptr-as-ptr-v12-5-f43b024581e8@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618130717.75839-4-linux@fw-web.de>
 
-On 15/06/2025 22:55, Tamir Duberstein wrote:
-> Before Rust 1.29.0, Clippy introduced the `cast_lossless` lint [1]:
+On Wed, Jun 18, 2025 at 03:07:14PM +0200, Frank Wunderlich wrote:
+> From: Frank Wunderlich <frank-w@public-files.de>
 > 
->> Rust’s `as` keyword will perform many kinds of conversions, including
->> silently lossy conversions. Conversion functions such as `i32::from`
->> will only perform lossless conversions. Using the conversion functions
->> prevents conversions from becoming silently lossy if the input types
->> ever change, and makes it clear for people reading the code that the
->> conversion is lossless.
+> On SoCs without MTK_SHARED_INT capability (all except mt7621 and
+> mt7628) platform_get_irq() is called for the first IRQ (eth->irq[0])
+> but it is never used.
+
+I know that technically MTK_SHARED_INT is a capability flag, but it's
+rather a non-capability. Hardware having dedicated interrupts for RX and
+TX is "more capable" than (older, legacy) hardware with just one shared
+interrupt for both...
+
+So maybe better:
+"On SoCs with dedicated RX and TX interrupts (all except MT7621 and
+MT7628) ..."
+
+Reading the datasheet of some recent MediaTek SoC it is worth
+noting that there are 4 interrupts assigned to the frame engine and
+the FE_INT_GRP register can be used to assign functions to them.
+
+So technically, calling them RX and TX in DT is wrong, becaues they
+are fe_int0, fe_int1, fe_int2 and fe_int3, which are then assigned
+one or more functions by the driver using that FE_INT_GRP register.
+
+However, it's the driver then assigns QDMA TX to fe_int1 and RX to
+fe_int2 while leaving fe_int0 and fe_int3 unsued.
+
+That's what the magic value 0x21021000 which is written to FE_INT_GRP
+register does.
+
+On MT7988 and newer, in addition to those 4 frame engine interrupts
+there are **another 4** interrupts for PDMA, typically used to
+service 4 RX rings while one of the fe_int* is used to indicate
+TX done.
+
+> Skip the first IRQ and reduce the IRQ-count to 2.
 > 
-> While this doesn't eliminate unchecked `as` conversions, it makes such
-> conversions easier to scrutinize.  It also has the slight benefit of
-> removing a degree of freedom on which to bikeshed. Thus apply the
-> changes and enable the lint -- no functional change intended.
-
-Thanks, it looks good to me, for the drm_panic_qr.rs part.
-
-Acked-by: Jocelyn Falempe <jfalempe@redhat.com>
-
-> 
-> Link: https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless [1]
-> Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> Link: https://lore.kernel.org/all/D8ORTXSUTKGL.1KOJAGBM8F8TN@proton.me/
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-> Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 > ---
->   Makefile                             | 1 +
->   drivers/gpu/drm/drm_panic_qr.rs      | 4 ++--
->   drivers/gpu/nova-core/regs.rs        | 2 +-
->   drivers/gpu/nova-core/regs/macros.rs | 2 +-
->   rust/bindings/lib.rs                 | 1 +
->   rust/kernel/net/phy.rs               | 4 ++--
->   rust/uapi/lib.rs                     | 1 +
->   7 files changed, 9 insertions(+), 6 deletions(-)
+> v5:
+> - change commit title and description
+> v4:
+> - drop >2 condition as max is already 2 and drop the else continue
+> - update comment to explain which IRQs are taken in legacy way
+> ---
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 12 ++++++++----
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.h |  4 ++--
+>  2 files changed, 10 insertions(+), 6 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index 0ba22c361de8..29cf39be14de 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -481,6 +481,7 @@ export rust_common_flags := --edition=2021 \
->   			    -Wclippy::all \
->   			    -Wclippy::as_ptr_cast_mut \
->   			    -Wclippy::as_underscore \
-> +			    -Wclippy::cast_lossless \
->   			    -Wclippy::ignored_unit_patterns \
->   			    -Wclippy::mut_mut \
->   			    -Wclippy::needless_bitwise_bool \
-> diff --git a/drivers/gpu/drm/drm_panic_qr.rs b/drivers/gpu/drm/drm_panic_qr.rs
-> index dd55b1cb764d..6b59d19ab631 100644
-> --- a/drivers/gpu/drm/drm_panic_qr.rs
-> +++ b/drivers/gpu/drm/drm_panic_qr.rs
-> @@ -404,7 +404,7 @@ fn pop3(&mut self) -> Option<(u16, usize)> {
->               let mut out = 0;
->               let mut exp = 1;
->               for i in 0..poplen {
-> -                out += self.decimals[self.len + i] as u16 * exp;
-> +                out += u16::from(self.decimals[self.len + i]) * exp;
->                   exp *= 10;
->               }
->               Some((out, NUM_CHARS_BITS[poplen]))
-> @@ -425,7 +425,7 @@ fn next(&mut self) -> Option<Self::Item> {
->           match self.segment {
->               Segment::Binary(data) => {
->                   if self.offset < data.len() {
-> -                    let byte = data[self.offset] as u16;
-> +                    let byte = u16::from(data[self.offset]);
->                       self.offset += 1;
->                       Some((byte, 8))
->                   } else {
-> diff --git a/drivers/gpu/nova-core/regs.rs b/drivers/gpu/nova-core/regs.rs
-> index 5a1273230306..c1cb6d4c49ee 100644
-> --- a/drivers/gpu/nova-core/regs.rs
-> +++ b/drivers/gpu/nova-core/regs.rs
-> @@ -32,7 +32,7 @@ pub(crate) fn architecture(self) -> Result<Architecture> {
->       pub(crate) fn chipset(self) -> Result<Chipset> {
->           self.architecture()
->               .map(|arch| {
-> -                ((arch as u32) << Self::IMPLEMENTATION.len()) | self.implementation() as u32
-> +                ((arch as u32) << Self::IMPLEMENTATION.len()) | u32::from(self.implementation())
->               })
->               .and_then(Chipset::try_from)
->       }
-> diff --git a/drivers/gpu/nova-core/regs/macros.rs b/drivers/gpu/nova-core/regs/macros.rs
-> index 7ecc70efb3cd..6851af8b5885 100644
-> --- a/drivers/gpu/nova-core/regs/macros.rs
-> +++ b/drivers/gpu/nova-core/regs/macros.rs
-> @@ -264,7 +264,7 @@ pub(crate) fn $field(self) -> $res_type {
->           pub(crate) fn [<set_ $field>](mut self, value: $to_type) -> Self {
->               const MASK: u32 = $name::[<$field:upper _MASK>];
->               const SHIFT: u32 = $name::[<$field:upper _SHIFT>];
-> -            let value = ((value as u32) << SHIFT) & MASK;
-> +            let value = (u32::from(value) << SHIFT) & MASK;
->               self.0 = (self.0 & !MASK) | value;
->   
->               self
-> diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
-> index 81b6c7aa4916..7631c9f6708d 100644
-> --- a/rust/bindings/lib.rs
-> +++ b/rust/bindings/lib.rs
-> @@ -25,6 +25,7 @@
->   )]
->   
->   #[allow(dead_code)]
-> +#[allow(clippy::cast_lossless)]
->   #[allow(clippy::ptr_as_ptr)]
->   #[allow(clippy::undocumented_unsafe_blocks)]
->   #[cfg_attr(CONFIG_RUSTC_HAS_UNNECESSARY_TRANSMUTES, allow(unnecessary_transmutes))]
-> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-> index 32ea43ece646..65ac4d59ad77 100644
-> --- a/rust/kernel/net/phy.rs
-> +++ b/rust/kernel/net/phy.rs
-> @@ -142,7 +142,7 @@ pub fn is_autoneg_enabled(&self) -> bool {
->           // SAFETY: The struct invariant ensures that we may access
->           // this field without additional synchronization.
->           let bit_field = unsafe { &(*self.0.get())._bitfield_1 };
-> -        bit_field.get(13, 1) == bindings::AUTONEG_ENABLE as u64
-> +        bit_field.get(13, 1) == u64::from(bindings::AUTONEG_ENABLE)
->       }
->   
->       /// Gets the current auto-negotiation state.
-> @@ -427,7 +427,7 @@ impl<T: Driver> Adapter<T> {
->           // where we hold `phy_device->lock`, so the accessors on
->           // `Device` are okay to call.
->           let dev = unsafe { Device::from_raw(phydev) };
-> -        T::match_phy_device(dev) as i32
-> +        T::match_phy_device(dev).into()
->       }
->   
->       /// # Safety
-> diff --git a/rust/uapi/lib.rs b/rust/uapi/lib.rs
-> index e79a1f49f055..08e68ebef606 100644
-> --- a/rust/uapi/lib.rs
-> +++ b/rust/uapi/lib.rs
-> @@ -14,6 +14,7 @@
->   #![cfg_attr(test, allow(unsafe_op_in_unsafe_fn))]
->   #![allow(
->       clippy::all,
-> +    clippy::cast_lossless,
->       clippy::ptr_as_ptr,
->       clippy::undocumented_unsafe_blocks,
->       dead_code,
-> 
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> index 875e477a987b..7990c84b2b56 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -3354,10 +3354,14 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
+>  	 * the second is for TX, and the third is for RX.
+>  	 */
+>  	for (i = 0; i < MTK_FE_IRQ_NUM; i++) {
+> -		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
+> -			eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
+> -		else
+> -			eth->irq[i] = platform_get_irq(pdev, i);
+> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
+> +			if (i == 0)
 
+This would make it even more readable:
+			if (i == MTK_FE_IRQ_SHARED)
+
+
+Other than that looks good to me:
+
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+
+> +				eth->irq[MTK_FE_IRQ_SHARED] = platform_get_irq(pdev, i);
+> +			else
+> +				eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
+> +		} else {
+> +			eth->irq[i] = platform_get_irq(pdev, i + 1);
+> +		}
+>  
+>  		if (eth->irq[i] < 0) {
+>  			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> index 8cdf1317dff5..9261c0e13b59 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> @@ -643,8 +643,8 @@
+>  #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
+>  
+>  #define MTK_FE_IRQ_SHARED	0
+> -#define MTK_FE_IRQ_TX		1
+> -#define MTK_FE_IRQ_RX		2
+> +#define MTK_FE_IRQ_TX		0
+> +#define MTK_FE_IRQ_RX		1
+>  #define MTK_FE_IRQ_NUM		(MTK_FE_IRQ_RX + 1)
+>  
+>  struct mtk_rx_dma {
+> -- 
+> 2.43.0
+> 
+> 
 
