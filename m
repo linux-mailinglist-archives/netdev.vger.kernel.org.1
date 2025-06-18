@@ -1,214 +1,111 @@
-Return-Path: <netdev+bounces-199232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD4AADF7DD
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:40:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39473ADF82C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:56:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 241EF7A9FA3
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:38:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A75441898510
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 20:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE4C21FF31;
-	Wed, 18 Jun 2025 20:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5004C21D00D;
+	Wed, 18 Jun 2025 20:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1+xUTWE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c+ndTP98"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7F621FF2A
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CC221CC57
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750279150; cv=none; b=ZHmUszEd+opSOXxV+W8BE2eLUPy4y6Td6/zQbF7W4vf/692qwROIu+VmpzYm9cSwOmC0zY72Cm5qUaon0QQSDVMeP7olZIcJf9J4YWzdD2I+y/ZJdOEUcC0bKUNSpQDg6fGz4yaIpPjYSRn1BFbKgEq9PbbVRHZ+YmdLaTLY20o=
+	t=1750280179; cv=none; b=pE0n3H9i6oxTRv9X9bYdquoj7+xKR/YVFIIKmR/sD+YZ0LfskBs/jXE6NskDMJbVr2trX428aVEy1xh9ajMdc0BQEBKRJb1jEgoWOf0HKMTSKe28hXRSb15sJCRxZp4zoWzAVrxCBdQRBnmlq2qymLx3erzgNTml2BwDrImGmUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750279150; c=relaxed/simple;
-	bh=R36eUYjCC2cXVuTJy0YHf9kqMoaYOj3NkQPqauhCwY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hP4MnyqJW4IoPniaflPdkiAEOBjFfOYMepcC+1L8/kz6zAOXmpaJ0qbaEzMxoUDRadhZsZ4kIUpJOLpIsIhl++qz2t+7p4pQHtct4p8hUMX60OhfF/Eo0z/S72wOcxqO7AYPjc7yViKUc3oA+dV/Pub56l4uCOg6VVFZUVFvf6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1+xUTWE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E85C4CEF4;
-	Wed, 18 Jun 2025 20:39:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750279149;
-	bh=R36eUYjCC2cXVuTJy0YHf9kqMoaYOj3NkQPqauhCwY8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N1+xUTWESPpjMArvLQ8GQCJpihMXId2OKFqDZWdN/Bkk4XLt/y0nL0HqHAEP8+nF1
-	 rVEMYh5BYd2PInH5HOtbDOfXQBEpzUi5KeTOlcz3QJmSgcn8kF4tmW0Rj9E4GgIv4b
-	 K0nSk/leL77U3gTLYgg9/cyfj15T+Cusklx+Af9K/+yY+gdjIcnWo1cnN8XTsGW88I
-	 5Q1QD5iRhnoejnp1XYOgMfLnbPJtVlrhred/9R8ju5mfip8oYCIN5CYiGLLGYS5Nt6
-	 bs/mt86fC4hnIVA6sh9Z2RdKpZrk+h2EubiaUHB70NHlTo1AxY2ozVtiT2Xk/JV834
-	 JsN45fspRrHCA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	ajit.khaparde@broadcom.com,
-	sriharsha.basavapatna@broadcom.com,
-	somnath.kotur@broadcom.com,
-	shenjian15@huawei.com,
-	salil.mehta@huawei.com,
-	shaojijie@huawei.com,
-	cai.huoqing@linux.dev,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	louis.peens@corigine.com,
-	mbloch@nvidia.com,
-	manishc@marvell.com,
-	ecree.xilinx@gmail.com,
-	joe@dama.to,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 10/10] net: ethtool: don't mux RXFH via rxnfc callbacks
-Date: Wed, 18 Jun 2025 13:38:23 -0700
-Message-ID: <20250618203823.1336156-11-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250618203823.1336156-1-kuba@kernel.org>
-References: <20250618203823.1336156-1-kuba@kernel.org>
+	s=arc-20240116; t=1750280179; c=relaxed/simple;
+	bh=yPuRJawzEWJ1EyGIWK1zT50vZKMJKo73qria//lQPcc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=p2E/1FHUkB7JeiAXvDoycuEpgmN9t1hqXHvDktWpn0GS1jRFcPyJbs6VRXSctBuySSTrp/G/essSnXNTCp7J/pW0kuGZ45yzXxjNuBJBOepyBCLQsYfP7FrnJ0zpP52zjFQKfztJ2mmXTUTsAXLrGsW0r9TTpy5iptVK9kJPXSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c+ndTP98; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-740774348f6so49353b3a.1
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 13:56:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750280177; x=1750884977; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mgEMhBGnSzoypEISslS/Kxa6JMNk8Qvu76svdRFkeqI=;
+        b=c+ndTP988uqDrlxPPwYGFNBSFUR3l0RfkzD/PPmMrdRN/CyS65CMsHZaJYf096zQur
+         3g0g5ypbJozgtEkf9kmhxAg/9v4X0cNl+vg2prNwmTCd7OD3DQeOHiTdgt8zaoaOr0sL
+         a2GytWRurqrGs8snCBq59yalgfWBYZxILt+7FjI5OX4iIth9IeKp7QFHuL0bIw20mXCn
+         XFzo5Ka2fKVckRZLTTNMqENjBver40jSYF+NYppqsNKsrjBFTs8hnOWzApKMZu0iQSrW
+         rR3mjleyEbdhrYUFpyKdjXwHWCgygLng7Iz4hfiMBV/8VjWFvq6VBH6MbzTpr9IvXFAU
+         4zrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750280177; x=1750884977;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mgEMhBGnSzoypEISslS/Kxa6JMNk8Qvu76svdRFkeqI=;
+        b=FEx55vomRN8iEQdoMLAre7xLt17xPRRyaNMSekunQDiwWFTfhfhQov0jf1iVXhvwNy
+         5E4g2pUAtpW6BJNyVgG9o9e227ILK98FKM2bdDtwYuUg1KvgUBb3uxJaxvhYrdAVcYJq
+         QXwb5fw1Zy2gzpoR25TfiiAjvXTym+DbdzLD3gn9n6R3OkrQyx7JvUBZmj6uk6HcXwKz
+         ZhgudlPHB+GvA1rfXY/ep4n64bYKUjfnnSecytg1XAdcsBdd3d7Kg2PF/GXLeJoWs4cC
+         w/E1XQjDvrhmfF6pbs7iIxo9lK5+a5zaK4UjEj9ZvTIohpM7SZlRoHCifwVTuklVMDZ3
+         6Vew==
+X-Gm-Message-State: AOJu0YxOPOZs89TUID/vnhZmrqcj5Ni5OqNzv2dv7f0ODhlt2ooqwbn+
+	w4WM7t0ODenBqWTQqCSbz+j04t8//Sa48H7Owu0QD5zGYiLNhJnkyLQ6hQ5NFCWkwAkCjSG9LS4
+	4w68hy2jEhd14bcw97RWKc6P5Ak6PRSMEaChQY4QYDVCGpkBGGAjAAA+WXK3bdK2WjMtmdDgD4k
+	3kgmd27BBASUOadfy+4zDqfVAp2A5ffY+1iy7KdBfpZRVDTPwvC0dzRMpQEhMD6QA=
+X-Google-Smtp-Source: AGHT+IGdAVb11hevfXclChQEtCUtIDcLel0+esqPqUojNt899+GV78+G2AgxOj7MIf4OWrM+5N7MZSNtAetIGbCT4g==
+X-Received: from pfbjo8.prod.google.com ([2002:a05:6a00:9088:b0:748:fb38:1909])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1aca:b0:736:ff65:3fcc with SMTP id d2e1a72fcca58-7489d03355dmr28313713b3a.16.1750280177074;
+ Wed, 18 Jun 2025 13:56:17 -0700 (PDT)
+Date: Wed, 18 Jun 2025 20:56:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
+Message-ID: <20250618205613.1432007-1-hramamurthy@google.com>
+Subject: [PATCH net-next 0/3] gve: XDP TX and redirect support for DQ RDA
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, sdf@fomichev.me, willemb@google.com, 
+	ziweixiao@google.com, pkaligineedi@google.com, joshwash@google.com, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-All drivers have been converted. Stop using the rxnfc fallbacks
-for Rx Flow Hashing configuration.
+From: Joshua Washington <joshwash@google.com>
 
-Joe pointed out in earlier review that in ethtool_set_rxfh()
-we need both .get_rxnfc and .get_rxfh_fields, because we need
-both the ring count and flow hashing (because we call
-ethtool_check_flow_types()). IOW the existing check added
-for transitioning drivers was buggy.
+A previous patch series[1] introduced the ability to process XDP buffers
+to the DQ RDA queue format. This is a follow-up patch series to
+introduce XDP_TX and XDP_REDIRECT support and expose XDP support to the
+kernel.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/ethtool/ioctl.c | 59 ++++++++++++++-------------------------------
- 1 file changed, 18 insertions(+), 41 deletions(-)
+Link: https://git.kernel.org/netdev/net-next/c/e2ac75a8a967 [1]
 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index a14cf901c32d..82cde640aa87 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1037,33 +1037,21 @@ static int ethtool_check_xfrm_rxfh(u32 input_xfrm, u64 rxfh)
- static int ethtool_check_flow_types(struct net_device *dev, u32 input_xfrm)
- {
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
--	struct ethtool_rxnfc info = {
--		.cmd = ETHTOOL_GRXFH,
--	};
- 	int err;
- 	u32 i;
- 
- 	for (i = 0; i < __FLOW_TYPE_COUNT; i++) {
-+		struct ethtool_rxfh_fields fields = {
-+			.flow_type	= i,
-+		};
-+
- 		if (!flow_type_hashable(i))
- 			continue;
- 
--		info.flow_type = i;
-+		if (ops->get_rxfh_fields(dev, &fields))
-+			continue;
- 
--		if (ops->get_rxfh_fields) {
--			struct ethtool_rxfh_fields fields = {
--				.flow_type	= info.flow_type,
--			};
--
--			if (ops->get_rxfh_fields(dev, &fields))
--				continue;
--
--			info.data = fields.data;
--		} else {
--			if (ops->get_rxnfc(dev, &info, NULL))
--				continue;
--		}
--
--		err = ethtool_check_xfrm_rxfh(input_xfrm, info.data);
-+		err = ethtool_check_xfrm_rxfh(input_xfrm, fields.data);
- 		if (err)
- 			return err;
- 	}
-@@ -1080,7 +1068,7 @@ ethtool_set_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 	size_t info_size = sizeof(info);
- 	int rc;
- 
--	if (!ops->set_rxnfc && !ops->set_rxfh_fields)
-+	if (!ops->set_rxfh_fields)
- 		return -EOPNOTSUPP;
- 
- 	rc = ethtool_rxnfc_copy_struct(cmd, &info, &info_size, useraddr);
-@@ -1103,9 +1091,6 @@ ethtool_set_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 			return rc;
- 	}
- 
--	if (!ops->set_rxfh_fields)
--		return ops->set_rxnfc(dev, &info);
--
- 	fields.data = info.data;
- 	fields.flow_type = info.flow_type & ~FLOW_RSS;
- 	if (info.flow_type & FLOW_RSS)
-@@ -1120,9 +1105,10 @@ ethtool_get_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 	struct ethtool_rxnfc info;
- 	size_t info_size = sizeof(info);
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct ethtool_rxfh_fields fields = {};
- 	int ret;
- 
--	if (!ops->get_rxnfc && !ops->get_rxfh_fields)
-+	if (!ops->get_rxfh_fields)
- 		return -EOPNOTSUPP;
- 
- 	ret = ethtool_rxnfc_copy_struct(cmd, &info, &info_size, useraddr);
-@@ -1133,24 +1119,15 @@ ethtool_get_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 	    !ops->rxfh_per_ctx_fields)
- 		return -EINVAL;
- 
--	if (ops->get_rxfh_fields) {
--		struct ethtool_rxfh_fields fields = {
--			.flow_type	= info.flow_type & ~FLOW_RSS,
--		};
-+	fields.flow_type = info.flow_type & ~FLOW_RSS;
-+	if (info.flow_type & FLOW_RSS)
-+		fields.rss_context = info.rss_context;
- 
--		if (info.flow_type & FLOW_RSS)
--			fields.rss_context = info.rss_context;
-+	ret = ops->get_rxfh_fields(dev, &fields);
-+	if (ret < 0)
-+		return ret;
- 
--		ret = ops->get_rxfh_fields(dev, &fields);
--		if (ret < 0)
--			return ret;
--
--		info.data = fields.data;
--	} else {
--		ret = ops->get_rxnfc(dev, &info, NULL);
--		if (ret < 0)
--			return ret;
--	}
-+	info.data = fields.data;
- 
- 	return ethtool_rxnfc_copy_to_user(useraddr, &info, info_size, NULL);
- }
-@@ -1528,7 +1505,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 	u8 *rss_config;
- 	int ret;
- 
--	if ((!ops->get_rxnfc && !ops->get_rxfh_fields) || !ops->set_rxfh)
-+	if (!ops->get_rxnfc || !ops->get_rxfh_fields || !ops->set_rxfh)
- 		return -EOPNOTSUPP;
- 
- 	if (ops->get_rxfh_indir_size)
+Joshua Washington (3):
+  gve: rename gve_xdp_xmit to gve_xdp_xmit_gqi
+  gve: refactor DQO TX methods to be more generic for XDP
+  gve: add XDP_TX and XDP_REDIRECT support for DQ RDA
+
+ drivers/net/ethernet/google/gve/gve.h        |  27 ++-
+ drivers/net/ethernet/google/gve/gve_dqo.h    |   2 +
+ drivers/net/ethernet/google/gve/gve_main.c   |  42 +++-
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c |  77 +++++-
+ drivers/net/ethernet/google/gve/gve_tx.c     |   4 +-
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 236 +++++++++++++++----
+ 6 files changed, 314 insertions(+), 74 deletions(-)
+
 -- 
-2.49.0
+2.49.0.1101.gccaa498523-goog
 
 
