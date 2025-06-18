@@ -1,124 +1,228 @@
-Return-Path: <netdev+bounces-199067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53CDDADECDA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:44:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F441ADECF5
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE14C3B0DF6
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:40:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 367903AC319
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76070286D64;
-	Wed, 18 Jun 2025 12:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362622E06FA;
+	Wed, 18 Jun 2025 12:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T35oes2F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNf1h64f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F09B258CD0;
-	Wed, 18 Jun 2025 12:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070462E06EF;
+	Wed, 18 Jun 2025 12:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750250425; cv=none; b=GVqFqoHQUjzgtDHsHu8go2u6ZZ71z0/DoK32NZsyjv3H4KK0yxcan12qet+cWbbL3VrMAaMDylMmbiwsLd8/KXPFD9SmsXjVEQh+qUv5q1qzOj9eCXH2eKcurSoMFXDjsqlFix7y6U2TeqF6/7cAV+qalhiKKPGEATcKuOL4Bxk=
+	t=1750250809; cv=none; b=dEmrdUz359GmHWZ1vE1GCdRLt4nkgALqnzZ6H2QxbkNQ88RdkClogkxW7/YQONCL+cZtMxrtHauy2+WGI2IFe9oEtsjJkTuXz41FiUvWrkQYSJZPbi//2coVQTqXH+Y+QpUynbPaYLrA+cH2zSelXcOxncVzyRC1SAvISoNZGW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750250425; c=relaxed/simple;
-	bh=lKJkRX5S1J6VtzITZ5xzBjEBLhnqYUnVxruczGLyT08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QpBrawzBhEZTLwy7FJuYvlWdZA4Sdd8eL8og4KKA1BkRsAWXdfD2vfggr5jcGigNrTAMNApIHMGyEOMljSVllZ+8ROXro+lDyVJZi9GPIDOXzJu/OM52qxDoNaT+X9vaUdJo+x7XbsxDUjI/2zdLYetVU4hqmlXsTxcKexiP5d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T35oes2F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6CDC4CEE7;
-	Wed, 18 Jun 2025 12:40:20 +0000 (UTC)
+	s=arc-20240116; t=1750250809; c=relaxed/simple;
+	bh=u1fNk4sNonPlV/2H949IVwNt/MR1MgWaifstjaJVxO4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B5j9xOsuqYiuWEWln37CT1XzPo6uMQBg568PQ+E4GCLiSy3y+80fA1kI6eusx+h6pFhOir1OOACnyuTlSjlLOoo5lvCusSFHXLVzqMPIY+tV/Cd9Uy+xdfMFs09N86UasqaqlulXImEdtjodp0lKZk/eE5PK4oyB5RgVcIRGZG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNf1h64f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBEB9C4CEE7;
+	Wed, 18 Jun 2025 12:46:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750250424;
-	bh=lKJkRX5S1J6VtzITZ5xzBjEBLhnqYUnVxruczGLyT08=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T35oes2Fkomfh40d6u66VAQWgiTTkCCDSuXaUmP9wZj+ZvbxEJppK5DeCdXziOEhg
-	 3HEpnVRqlDeTIAfAtsfh8HKcdGHc7Uqpj6S6eN2INZPxSjVIwS2jXPoJjuaciRncRy
-	 Xxm82+PegCaah7+5vTiKGWtGcO+DjQzVo+ZUt7AqelZLpBZY33KdEBNwB5Uaq1WxK2
-	 eOMNofrX6l+G0WeTImkNi69icQxs5GeLX0ZqZP3QGnVRWs1KH+cTaMtewy/RNj2FaO
-	 2cqyu3Mxebizp7QLsFdK6B8Fb+28XA5K2+Ds9lwEFxz13m0Kvrv1ACzaUaSh3pE8vU
-	 lxd9Pi9CUntEQ==
-Date: Wed, 18 Jun 2025 13:40:19 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Akira Yokosawa <akiyks@gmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Ignacio Encinas Rubio <ignacio@iencinas.com>,
-	Jan Stancek <jstancek@redhat.com>, Marco Elver <elver@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
-	Shuah Khan <skhan@linuxfoundation.org>, joel@joelfernandes.org,
-	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
-	stern@rowland.harvard.edu
-Subject: Re: [PATCH v5 05/15] tools: ynl_gen_rst.py: make the index parser
- more generic
-Message-ID: <20250618124019.GQ1699@horms.kernel.org>
-References: <cover.1750146719.git.mchehab+huawei@kernel.org>
- <1cd8b28bfe159677b8a8b1228b04ba2919c8aee8.1750146719.git.mchehab+huawei@kernel.org>
- <20250617115927.GK5000@horms.kernel.org>
- <20250618085735.7f9aa5a6@foz.lan>
+	s=k20201202; t=1750250808;
+	bh=u1fNk4sNonPlV/2H949IVwNt/MR1MgWaifstjaJVxO4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nNf1h64fOgTzzyKYLnOG6pt4r/ATOcHrnakMZUTFUdWN76xMAKy/aPjTKRDA7HPk/
+	 yLIhIf4Cbd8Sz3HTGEKOiX3lPZb8bP2Dd7yINp58hd6CrSKGuKET8piFkHCz1I+hPM
+	 KfsZ1p9Vj5/i4/WsKC+cDp4/tuFawTqwriMhznsrnEh+46SuXpHNf6t0qDr+H5kIx5
+	 qS9Z75u3H4D7SCAlvNEpLxF0xUz2Q2snVtxpEoZN/dyNBUNFgOpKan8drS200moqJe
+	 BHZZi00AhDnfmsjjuCR6eEzjkkxZNgJyUK+DTpEjL1OKnOw8n8WBVMeHx/FJEnc5ZT
+	 zY3JV676s2mlQ==
+Message-ID: <f445633e-b72c-4b5d-bb18-acda1c1d4de6@kernel.org>
+Date: Wed, 18 Jun 2025 14:46:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618085735.7f9aa5a6@foz.lan>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] page_pool: import Jesper's page_pool
+ benchmark
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>, Ignat Korchagin <ignat@cloudflare.com>
+References: <20250615205914.835368-1-almasrymina@google.com>
+ <c126182c-8f26-41e2-a20d-ceefc2ced886@kernel.org>
+ <CAHS8izPyzJvchqFNrRjY95D=41nya8Tmvx1eS9n0ijtHcUUETA@mail.gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAHS8izPyzJvchqFNrRjY95D=41nya8Tmvx1eS9n0ijtHcUUETA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 18, 2025 at 08:57:35AM +0200, Mauro Carvalho Chehab wrote:
-> Em Tue, 17 Jun 2025 12:59:27 +0100
-> Simon Horman <horms@kernel.org> escreveu:
-> 
-> > On Tue, Jun 17, 2025 at 10:02:02AM +0200, Mauro Carvalho Chehab wrote:
-> > > It is not a good practice to store build-generated files
-> > > inside $(srctree), as one may be using O=<BUILDDIR> and even
-> > > have the Kernel on a read-only directory.
-> > > 
-> > > Change the YAML generation for netlink files to allow it
-> > > to parse data based on the source or on the object tree.
-> > > 
-> > > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> > > ---
-> > >  tools/net/ynl/pyynl/ynl_gen_rst.py | 22 ++++++++++++++++------
-> > >  1 file changed, 16 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
-> > > index 7bfb8ceeeefc..b1e5acafb998 100755
-> > > --- a/tools/net/ynl/pyynl/ynl_gen_rst.py
-> > > +++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
-> > > @@ -365,6 +365,7 @@ def parse_arguments() -> argparse.Namespace:
-> > >  
-> > >      parser.add_argument("-v", "--verbose", action="store_true")
-> > >      parser.add_argument("-o", "--output", help="Output file name")
-> > > +    parser.add_argument("-d", "--input_dir", help="YAML input directory")
-> > >  
-> > >      # Index and input are mutually exclusive
-> > >      group = parser.add_mutually_exclusive_group()
-> > > @@ -405,11 +406,14 @@ def write_to_rstfile(content: str, filename: str) -> None:
-> > >      """Write the generated content into an RST file"""
-> > >      logging.debug("Saving RST file to %s", filename)
-> > >  
-> > > +    dir = os.path.dirname(filename)
-> > > +    os.makedirs(dir, exist_ok=True)
-> > > +
-> > >      with open(filename, "w", encoding="utf-8") as rst_file:
-> > >          rst_file.write(content)  
-> > 
-> > Hi Mauro,
-> > 
-> > With this patch applied I see the following, which did not happen before.
-> 
-> Thanks! this was an intermediate step. I'll just drop this patch and
-> fix conflicts at the next version.
 
-Likewise, thanks.
+
+On 16/06/2025 23.11, Mina Almasry wrote:
+> On Mon, Jun 16, 2025 at 2:29 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+>> On 15/06/2025 22.59, Mina Almasry wrote:
+>>> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>
+>>> We frequently consult with Jesper's out-of-tree page_pool benchmark to
+>>> evaluate page_pool changes.
+>>>
+>>> Import the benchmark into the upstream linux kernel tree so that (a)
+>>> we're all running the same version, (b) pave the way for shared
+>>> improvements, and (c) maybe one day integrate it with nipa, if possible.
+>>>
+>>> Import bench_page_pool_simple from commit 35b1716d0c30 ("Add
+>>> page_bench06_walk_all"), from this repository:
+>>> https://github.com/netoptimizer/prototype-kernel.git
+>>>
+>>> Changes done during upstreaming:
+>>> - Fix checkpatch issues.
+>>> - Remove the tasklet logic not needed.
+>>> - Move under tools/testing
+>>> - Create ksft for the benchmark.
+>>> - Changed slightly how the benchmark gets build. Out of tree, time_bench
+>>>     is built as an independent .ko. Here it is included in
+>>>     bench_page_pool.ko
+>>>
+>>> Steps to run:
+>>>
+>>> ```
+>>> mkdir -p /tmp/run-pp-bench
+>>> make -C ./tools/testing/selftests/net/bench
+>>> make -C ./tools/testing/selftests/net/bench install INSTALL_PATH=/tmp/run-pp-bench
+>>> rsync --delete -avz --progress /tmp/run-pp-bench mina@$SERVER:~/
+>>> ssh mina@$SERVER << EOF
+>>>     cd ~/run-pp-bench && sudo ./test_bench_page_pool.sh
+>>> EOF
+>>> ```
+>>>
+>>> Output:
+>>>
+>>> ```
+>>> (benchmrk dmesg logs)
+>>>
+>>
+>> Something is off with benchmark numbers compared to the OOT version.
+>>
+> 
+> I assume you're comparing my results (my kernel config + my hardware +
+> upstream benchmark) with your results (your kernel config + your
+> hardware + OOT version). The problem may be in OOT vs upstream but it
+> may be just different code/config/hardware.
+
+True I used OOT version.
+
+Just applied this patch, but I get compile error. Because Makefile tries
+to get kernel headers (net/page_pool/helpers.h) from local Linux
+installation instead of git tree.  This need to be adjusted for patch,
+such that it builds with src-local/git tree provided headers.
+
+$ make -C ./tools/testing/selftests/net/bench/page_pool/
+make: Entering directory 
+'/home/jbrouer/git/kernel/net/tools/testing/selftests/net/bench/page_pool'
+make[1]: Entering directory '/usr/src/kernels/6.5.12-100.fc37.x86_64'
+   CC [M] 
+/home/jbrouer/git/kernel/net/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.o
+/home/jbrouer/git/kernel/net/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c:12:10: 
+fatal error: net/page_pool/helpers.h: No such file or directory
+    12 | #include <net/page_pool/helpers.h>
+       |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [scripts/Makefile.build:243: 
+/home/jbrouer/git/kernel/net/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.o] 
+Error 1
+make[2]: *** [/usr/src/kernels/6.5.12-100.fc37.x86_64/Makefile:2046: 
+/home/jbrouer/git/kernel/net/tools/testing/selftests/net/bench/page_pool] 
+Error 2
+make[1]: *** [Makefile:246: __sub-make] Error 2
+make[1]: Leaving directory '/usr/src/kernels/6.5.12-100.fc37.x86_64'
+make: *** [Makefile:14: all] Error 2
+make: Leaving directory 
+'/home/jbrouer/git/kernel/net/tools/testing/selftests/net/bench/page_pool'
+
+
+>> Adding my numbers below, they were run on my testlab with:
+>>    - CPU E5-1650 v4 @ 3.60GHz
+>>    - kernel: net.git v6.15-12438-gd9816ec74e6d
+>>
+>>> Fast path results:
+>>> no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.368 ns
+>>>
+>>
+>> Fast-path on your CPU is faster (22 cycles(tsc) 6.128 ns) than my CPU.
+>> What CPU is this?
+> 
+> My test setup is a Gcloud A3 VM (so virtualized). The CPU is:
+> 
+> cat /proc/cpuinfo
+> ...
+> model name      : Intel(R) Xeon(R) Platinum 8481C CPU @ 2.70GHz
+> 
+>>
+>> Type:no-softirq-page_pool01 Per elem: 22 cycles(tsc) 6.128 ns (step:0)
+>>    - (measurement period time:0.061282924 sec time_interval:61282924)
+>>    - (invoke count:10000000 tsc_interval:220619745)
+>>
+>>> ptr_ring results:
+>>> no-softirq-page_pool02 Per elem: 527 cycles(tsc) 195.187 ns
+>>
+>> I'm surprised that ptr_ring benchmark is very slow, compared to my
+>> result (below) 60 cycles(tsc) 16.853 ns.
+>>
+>> Type:no-softirq-page_pool02 Per elem: 60 cycles(tsc) 16.853 ns (step:0)
+>>    - (measurement period time:0.168535760 sec time_interval:168535760)
+>>    - (invoke count:10000000 tsc_interval:606734160)
+>>
+>> Maybe your kernel is compiled with some CONFIG debug thing that makes it
+>> slower?
+>>
+> 
+> Yeah, I actually just checked and I have CONFIG_DEBUG_NET on in my
+> build, and a lot of other debug configs are turned on.
+> 
+
+The CONFIG_DEBUG_NET should be low overhead, so I don't expect this to
+be the root-cause.  Other CONFIG options are more likely the issue.
+
+> Let me investigate here. Maybe trimming the debug configs and double
+> checking my tree for debug logs I added would point to the difference.
+>
+
+The perf record trick below will help you identify overhead more rabidly 
+IMHO.
+
+
+> I could also try to put both the OOT version and upstream version in
+> my tree and do a proper A/B comparison that way.
+> 
+> If you do get chance to run this upstream version from your exact tree
+> and config, that would be a good A/B comparison as well.
+> 
+>> You can troubleshoot like this:
+>>    - select the `no-softirq-page_pool02` test via run_flags=$((2#100)).
+>>
+>>    # perf record -g modprobe bench_page_pool_simple run_flags=$((2#100))
+>> loops=$((100*10**6))
+>>    # perf report --no-children
+>>
+> 
+> Thanks, will do.
+
+With a micro-benchmark like this, the perf report should help you to
+quickly indentify the kernel debug CONFIG that adds the overhead.
+
+--Jesper
+
 
