@@ -1,106 +1,127 @@
-Return-Path: <netdev+bounces-199075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9895ADED7F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:10:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5DDFADED78
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 727263BB427
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:10:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32E80189DE20
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2022E3B18;
-	Wed, 18 Jun 2025 13:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652B62E9755;
+	Wed, 18 Jun 2025 13:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YMF1N/Dw"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="RhzH9Zfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3E884A2B;
-	Wed, 18 Jun 2025 13:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623E02E92CD;
+	Wed, 18 Jun 2025 13:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750251708; cv=none; b=UpxvvwgolVRbFNQT/nsRGLvJgKcL6Y1P2xpPtRVClCwYYwqs3Qd151+NOQIRI4KXqI1RD2Kbz7xfGZL28/3lw5apXKf1B2Hxt4T219fxcalVxxBZ5gO3Lr4GWB1+h3vYIChtzkLUb8n9Bt6ubBdS1vOE1r8lL1uhuo1dNQ1udgU=
+	t=1750252060; cv=none; b=l0GfmQ+y8309CbIeYuerwaTPz7DZZkUBad/OxEWVGsubk8wYkv74MMmddsmzkQPvzLkv1jSpASb5BfZmdTpUJTedVqBBN7tGAxUmjZ2u44EKWQ0jmD1/9tGY4l+d06+Hfy/220iSnfCl9n8qWzxxqVGNNLBsHvkLOt5d/AsllGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750251708; c=relaxed/simple;
-	bh=NYZYSSve7QHWHfqE4xO8B7PhBRaUetfbNJNkYtQ4ezY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NSYpWzj0gf2pTzKB7VyHsBrl8E+Akh0xpS2TX2mcSEaAde/pBLIrCu7hLW8d6+oirgkyqu+nbqaDHSiULjpn2FEGSBG8wHJqTkiGF2RCA0hwh9/Z7B94GETkUgZddL3cA1oVdBzNjP8+YscsWUQEMOngUmF6kaAx2GZecQZQ1VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YMF1N/Dw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NuZPEnGK2UT8OIemmJKYsUbIdmar41JE/LEfSfWAXkI=; b=YMF1N/DwVMLurWX8fHwWtdqhuG
-	graSvGX8/nHXe7PrDRPdTnlk2XjMoajpw4QuVFJGfQJEN/W5nN/FcWlIFcvzJGQnIXVcEGXHD9gwf
-	t65R+fBA41oPe40V9Paex4EgbGw5O4YWYON4BScYZbm9lsSZQedKIul14BbhMkFE9Qr9nCBkEL2B4
-	4OvevnLF4eyDVtWBwq1luk29I7hSCQEIRvzpaZJBYLdSeIZ4cMbGJ8b5sjxU/j+yTz8k5qnB+BGul
-	MbwhXZW+KBEqca8JY5N19OJOw/LS2b6sxkKdBvQGWZJS/gPi29KssQ+YJLJoewVQNnPJBVbu3YaYA
-	o25T0bWQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55674)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uRsQ7-0006Uk-0w;
-	Wed, 18 Jun 2025 14:01:39 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uRsQ6-0006r5-09;
-	Wed, 18 Jun 2025 14:01:38 +0100
-Date: Wed, 18 Jun 2025 14:01:37 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
+	s=arc-20240116; t=1750252060; c=relaxed/simple;
+	bh=3pvuwSe57OyXWYyH6qSbVju+S2OcvM/F5upjFh4+loU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o3HL9AshCRju22GNbEVFYnMKX3qyw84aA5Pc6eomfXXrM0N0fh0YD234SLGPUCcwgVWuaYaIhACW5W5dqMUMLKfkpg4JRG/bdfNirgTXZ8Tsq7KApOR3k1QsgYR9XLjB+7MwaNzi3M0Xjdq7BWddSRDgW4t3rUQHXAFq8W0euAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=RhzH9Zfb; arc=none smtp.client-ip=134.0.28.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
+	by mxout3.routing.net (Postfix) with ESMTP id 54971614C4;
+	Wed, 18 Jun 2025 13:07:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1750252050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7RRMFR5bvStrbJAlB1dlE3PbQroltgCFLw5x1wwfKug=;
+	b=RhzH9ZfbD9Bw1e4a0IYqZtEtXY+8lYnCPrL5sYbd5jSow/OhpdlnoNudzDABQvaS5Z5AVV
+	rht0jTKYIgZo4iOBiaqAmm+rcfbbBroW98hPMAiWpcsXEWEZHf/R2PuFo9RAKhn9ODb+9H
+	T+97Dy3hwqm5zVU5gl2hm15RrEiCZso=
+Received: from frank-u24.. (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 166401226D6;
+	Wed, 18 Jun 2025 13:07:30 +0000 (UTC)
+From: Frank Wunderlich <linux@fw-web.de>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	Phil Elwell <phil@raspberrypi.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v8 6/6] net: usb: lan78xx: remove unused struct
- members
-Message-ID: <aFK4sc9d8e_vopcN@shell.armlinux.org.uk>
-References: <20250618122602.3156678-1-o.rempel@pengutronix.de>
- <20250618122602.3156678-7-o.rempel@pengutronix.de>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	arinc.unal@arinc9.com
+Subject: [net-next v5 0/3] rework IRQ handling in mtk_eth_soc
+Date: Wed, 18 Jun 2025 15:07:11 +0200
+Message-ID: <20250618130717.75839-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618122602.3156678-7-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 18, 2025 at 02:26:02PM +0200, Oleksij Rempel wrote:
-> Remove unused members from struct lan78xx_net, including:
-> 
->     driver_priv
->     suspend_count
->     mdix_ctrl
-> 
-> These fields are no longer used in the driver and can be safely removed
-> as part of a cleanup.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+From: Frank Wunderlich <frank-w@public-files.de>
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+This series introduces named IRQs while keeping the index based way
+for older dts.
+Further it makes some cleanup like adding consts for index access and
+avoids loading first IRQ which was not used on non SHARED_INT SoCs.
+    
+changes:
+    
+    v5:
+    - fixed typo and add linebreak in description of patch 1
+    - moved comments from previous patch #3 to patch #1 with changes suggested by simon
+    - rename consts to be compatible with upcoming RSS/LRO changes
+      MTK_ETH_IRQ_SHARED => MTK_FE_IRQ_SHARED
+      MTK_ETH_IRQ_TX => MTK_FE_IRQ_TX
+      MTK_ETH_IRQ_RX => MTK_FE_IRQ_RX
+      MTK_ETH_IRQ_MAX => MTK_FE_IRQ_NUM
+    - change commit title and description in patch 3
+    
+    v4:
+    - calculate max from last (rx) irq index and use it for array size too
+    - drop >2 condition as max is already 2 and drop the else continue
+    - update comment to explain which IRQs are taken in legacy way
+    
+    v3:
+    added patches
+    - #2 (add constants for irq index)
+    - #3 (skip first IRQ on ! MTK_SHARED_INT)
+    to the v2 non-series patch
+    
+    https://patchwork.kernel.org/project/netdevbpf/patch/20250615084521.32329-1-linux@fw-web.de/
+    
+Tested on BPI-R4/mt7988 with IRQ names and BPI-R2/mt7623 and BPI-R3/mt7986 with upstreamed
+dts via index-mode.
+I do not have any MTK_SHARED_INT (mt7621/mt7628) boards to testing.
 
-Thanks!
+Frank Wunderlich (3):
+  net: ethernet: mtk_eth_soc: support named IRQs
+  net: ethernet: mtk_eth_soc: add consts for irq index
+  net: ethernet: mtk_eth_soc: skip first IRQ if not used
+
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 62 +++++++++++++++------
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h |  7 ++-
+ 2 files changed, 51 insertions(+), 18 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
