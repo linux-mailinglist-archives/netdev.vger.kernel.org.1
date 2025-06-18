@@ -1,126 +1,99 @@
-Return-Path: <netdev+bounces-198915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047E0ADE4D0
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:48:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59912ADE4D1
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:49:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143463BCD08
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:48:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A1963BC874
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B49923E32E;
-	Wed, 18 Jun 2025 07:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18640253941;
+	Wed, 18 Jun 2025 07:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4ZTWC+M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FujFC+7A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EC2944F
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F31944F
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750232926; cv=none; b=OD7j5ZC6Wxp+ZlxcT/bNUa0TsudigY+CrKLZTzZ0Qh9B9WAHesB4N0IhlQwCS377volC38VnK8saa0vByNWEMa+JCJCawmAtqaEGC35rBc17QQKrEyjhXBBVaKh2V+uu0g4VvbL4slLq/TU7aqpk8her04YJA5bmz39f+2nLy5A=
+	t=1750232994; cv=none; b=pxbWk/ptJ8gdSh0EQr8QCDQIFVjkaczsVSbOrwdex3xXpErtI0vdWtBKM12T+urfsDNa0iXrg0RTG7UOGwTJl/0Ck1zpmb1mffMW7Ag1RzsLeVf209mnwYbj5Y0rM7oSIJx/0+3YnCPBADJ4kE3+JOQi+4ggtOmrRqHWA+x3/Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750232926; c=relaxed/simple;
-	bh=zmxmRAuGPbnBoWImjaQfSrdRisEJjiibW7+o0uMkNko=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uceVHiaJzQZ/hI9HrLeXuuUKtM960XeBH9vD0hy16OOhTWBWpruXMKRMSD93UwYfv9thatQvqZ2tjrlwQXnsVJa1WAs4rDI1rCP0QkCmcywCDq5sXGwoYkQwko9OjYCswZ1qjf/6nkjMki8HbNw/Yr/Gv9sIOcRG7ZQRW7WLRh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4ZTWC+M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43521C4CEE7;
-	Wed, 18 Jun 2025 07:48:45 +0000 (UTC)
+	s=arc-20240116; t=1750232994; c=relaxed/simple;
+	bh=aC64CEq1Onwzg7hQyJBpP3n73y+2vG8xqxjywocSUUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQkard7TwbyYV+HrdDEJfYVjpBPNlcm4HW6UCfJ2AwlW6CE14bCNwwmI9J3Z+LjtFHI7TuDfDVbx0DwKWwXP7UEFY4CkjGgDV/uZhFBCyAS29GTkuSOBs7g/JLMjEslPLIHZJLH1TWvcmVCLRgca2ACpEI8/9Sisz4Q/V047y44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FujFC+7A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9BBC4CEE7;
+	Wed, 18 Jun 2025 07:49:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750232925;
-	bh=zmxmRAuGPbnBoWImjaQfSrdRisEJjiibW7+o0uMkNko=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=X4ZTWC+MQ2HneiK1Z1/U+4C8CiA96Jz5ldqrn8y+xTFQGtPGFvwo3X/8tMVLBpGQ+
-	 cTuWbi4Cvw1PUHn7X4lpo/rt2RSxTQRMBYTFkzr0MJBYXc0xpw6R1UEix/eNBoX3XW
-	 gUd9+Zm6vbS0dOQFYhAX72ARIkbo31U4N+oE/J3c1ubS98uunV4rbPcc0DEncHEFD1
-	 npHpPuWaTjMB0GlOrLMio1xvggAvpzmWyJRwO/2SqzSJQwK37uzzb6KLnqFHDwB1dK
-	 Y/jMjhyhsEM8VaLQXz+OZ3n5rg3CR63CMDnsgEpyXxN0JvYRB1HRrWr/NID7IeTvlQ
-	 Ar8mVnlIv/maA==
+	s=k20201202; t=1750232993;
+	bh=aC64CEq1Onwzg7hQyJBpP3n73y+2vG8xqxjywocSUUI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FujFC+7Ahq84E2eCe+Iiou4DRzWv2GhCOKy0IPaIsSQypsdcoCFpIHGUboR85UBkm
+	 FvLILNyJOE7g/IDFE9scsVoaGTGPmbAYEHTLI0DDgydUhYlhYz8XNTmazgJGu6maGL
+	 sLstO3vI5FXbowGzjg2IDWMa9cWPTFyOuT4blRD2K17dPJljo2l3JR02ksGjsWwvpw
+	 dB8NXfC7BKglijPdr4A7aXSCdp9qLPZzk8O5WJwg/9KZJHO4/PG6I5EN22ral76jBS
+	 JAN163WWy4+TW+4GlIraP6DyBcNaAerYnA2/kS1S7mRb4Q0BZtUL5iiSa6NXqIIfBC
+	 1Xi8l+90P9WZg==
+Date: Wed, 18 Jun 2025 09:49:51 +0200
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 18 Jun 2025 09:48:05 +0200
-Subject: [PATCH net v3 2/2] net: airoha: Differentiate hwfd buffer size for
- QDMA0 and QDMA1
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/2] net: airoha: Improve hwfd
+ buffer/descriptor queues setup
+Message-ID: <aFJvnxVVM_sdSpKX@lore-desk>
+References: <20250616-airoha-hw-num-desc-v2-0-bb328c0b8603@kernel.org>
+ <20250617183244.641d9cd3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250618-airoha-hw-num-desc-v3-2-18a6487cd75e@kernel.org>
-References: <20250618-airoha-hw-num-desc-v3-0-18a6487cd75e@kernel.org>
-In-Reply-To: <20250618-airoha-hw-num-desc-v3-0-18a6487cd75e@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="v6JufC9cwr1xoEbW"
+Content-Disposition: inline
+In-Reply-To: <20250617183244.641d9cd3@kernel.org>
 
-In oreder to reduce the required hwfd buffers queue size for QDMA1,
-differentiate hwfd buffer size for QDMA0 and QDMA1 and use 2KB for QDMA0
-and 1KB for QDMA1.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+--v6JufC9cwr1xoEbW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 1b7fd7ee0cbf3e1f7717110c70e9c5183fdd93d4..06dea3a13e77ce11f35dbd36966a34c5ef229c11 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1068,14 +1068,15 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 	int size, index, num_desc = HW_DSCP_NUM;
- 	struct airoha_eth *eth = qdma->eth;
- 	int id = qdma - &eth->qdma[0];
-+	u32 status, buf_size;
- 	dma_addr_t dma_addr;
- 	const char *name;
--	u32 status;
- 
- 	name = devm_kasprintf(eth->dev, GFP_KERNEL, "qdma%d-buf", id);
- 	if (!name)
- 		return -ENOMEM;
- 
-+	buf_size = id ? AIROHA_MAX_PACKET_SIZE / 2 : AIROHA_MAX_PACKET_SIZE;
- 	index = of_property_match_string(eth->dev->of_node,
- 					 "memory-region-names", name);
- 	if (index >= 0) {
-@@ -1096,9 +1097,9 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 		/* Compute the number of hw descriptors according to the
- 		 * reserved memory size and the payload buffer size
- 		 */
--		num_desc = rmem->size / AIROHA_MAX_PACKET_SIZE;
-+		num_desc = div_u64(rmem->size, buf_size);
- 	} else {
--		size = AIROHA_MAX_PACKET_SIZE * num_desc;
-+		size = buf_size * num_desc;
- 		if (!dmam_alloc_coherent(eth->dev, size, &dma_addr,
- 					 GFP_KERNEL))
- 			return -ENOMEM;
-@@ -1111,9 +1112,10 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
- 		return -ENOMEM;
- 
- 	airoha_qdma_wr(qdma, REG_FWD_DSCP_BASE, dma_addr);
-+	/* QDMA0: 2KB. QDMA1: 1KB */
- 	airoha_qdma_rmw(qdma, REG_HW_FWD_DSCP_CFG,
- 			HW_FWD_DSCP_PAYLOAD_SIZE_MASK,
--			FIELD_PREP(HW_FWD_DSCP_PAYLOAD_SIZE_MASK, 0));
-+			FIELD_PREP(HW_FWD_DSCP_PAYLOAD_SIZE_MASK, !!id));
- 	airoha_qdma_rmw(qdma, REG_FWD_DSCP_LOW_THR, FWD_DSCP_LOW_THR_MASK,
- 			FIELD_PREP(FWD_DSCP_LOW_THR_MASK, 128));
- 	airoha_qdma_rmw(qdma, REG_LMGR_INIT_CFG,
+> On Mon, 16 Jun 2025 15:45:39 +0200 Lorenzo Bianconi wrote:
+> > Compute the number of hwfd buffers/descriptors according to the reserved
+> > memory size if provided via DTS.
+> > Reduce the required hwfd buffers queue size for QDMA1.
+>=20
+> Same question regarding target tree, FWIW
 
--- 
-2.49.0
+ack, fine. I will post v3 targeting net tree.
 
+Regards,
+Lorenzo
+
+--v6JufC9cwr1xoEbW
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFJvnwAKCRA6cBh0uS2t
+rHwQAQDRWhuDKkooK+3SdVhoIcSjVlWNQW9cx1j+py4qwhHrxwD/REl0bOTp+6/n
+fZd/+nOnfqJphhHl2l5TM92s7tbawAI=
+=pcct
+-----END PGP SIGNATURE-----
+
+--v6JufC9cwr1xoEbW--
 
