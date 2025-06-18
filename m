@@ -1,93 +1,205 @@
-Return-Path: <netdev+bounces-199245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A526ADF8BA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 23:27:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B418CADF8BC
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 23:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F57D178613
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:27:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F3D77A36F2
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 21:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936C227A935;
-	Wed, 18 Jun 2025 21:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5622C27AC36;
+	Wed, 18 Jun 2025 21:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XvqJjFEF"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="fEWUU3hI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A04D1B78F3;
-	Wed, 18 Jun 2025 21:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8230227A927
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 21:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750282062; cv=none; b=Ydh1eWrd6pTYK4s0NbB5TMAB9LhnAvkEaDGJOzkBSvQ90VdSvAhGSYOtuTe3IYf2zLVLbqW/tzfub07wW9K904nrESht+ZOKoehR+/tvCq41K3JQ4JAk8t1NBKUnh49Ol1xj69Wafermv9IxZGwI51aeXUDtqSFe4RIj4Dfkbkk=
+	t=1750282079; cv=none; b=nhnXlm6xawGgv4uwGSpdrGxOAbg9CA14X2twhCzQ4K4P2pfybmftn9uGWPKw90xldy6lHhY0kOX3bMYAq47biQDdZGCDPWk3yNzJwtMkuNwOk6/MZuGq8o1zGSAwAkcM/busZHgnlK7Tl5PWFb6n5Efg6gnN6SH6nv5xHZmatWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750282062; c=relaxed/simple;
-	bh=oPxq0nX9YaRrg5ryLM85TKzyoC0Q/WSIiKqdSGONZE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OXP9EELEm3iJk7l1Y0GG4JIBh/XnLKnLXYzZ+eVH0Q2mJi+VcMgJHLqDOnIEN8KA5d5iKYt2DZqXfvuaNi3Y4d/mQ4TzVBMsTKOppXqjW1gBdhuvdektu16pk/Y8+GQE4CqgK6Ci2RBfJGJitez5rEHeN8SvF9hBBErUg50mKTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XvqJjFEF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95919C4CEE7;
-	Wed, 18 Jun 2025 21:27:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750282061;
-	bh=oPxq0nX9YaRrg5ryLM85TKzyoC0Q/WSIiKqdSGONZE0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XvqJjFEF3slokQpe5oESAULdrxwFBepSGJk8qBsx66ZNL9rP96u0oV9EXrb8X2Oe+
-	 SAd5PUAo88TZiwqfPl03m7vresQzPLtSb86tdTWy6r4jHzPdxDdnmc7mUoxo5QIVI/
-	 JF0HdO+AseVqM+U84yCm2tGTPWj0BdLMc1JCvg3vHruNKbAtH+GUbtdx/0d3ZWRe1z
-	 7+0pV9PMYqwPwEpDH4MnLbnK2kLb0GG6BP683kJd+GoPGwJjgBjffQbXFVeF5Nq9iq
-	 Ceb12pXZh+ZoGt7VLfEa9ZHSgtNra5wxAqAsOyg81uj0GX3ka5fcy7S2bfMVpvgmSe
-	 uO0IpFkW3jNKg==
-Date: Wed, 18 Jun 2025 14:27:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>, Stanislav Fomichev
- <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, ap420073@gmail.com
-Subject: Re: [PATCH net v1] netmem: fix skb_frag_address_safe with
- unreadable skbs
-Message-ID: <20250618142740.65203c69@kernel.org>
-In-Reply-To: <CAHS8izOMfmj6R8OReNqvoasb_b0M=gsnrCOv3budBRXrYjO67g@mail.gmail.com>
-References: <20250617210950.1338107-1-almasrymina@google.com>
-	<CAHS8izMWiiHbfnHY=r5uCjHmDSDbWgsOOrctyuxJF3Q3+XLxWw@mail.gmail.com>
-	<aFHeYuMf_LCv6Yng@mini-arch>
-	<CAHS8izOMfmj6R8OReNqvoasb_b0M=gsnrCOv3budBRXrYjO67g@mail.gmail.com>
+	s=arc-20240116; t=1750282079; c=relaxed/simple;
+	bh=EP4GfDzPRDFeYPr7p/vB/MrvwsL1FFCmU8ddXHJy9ac=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FAwUxP1B1odrZ46jrpkp/CyN0wefheGJzvc+RkuToLCyd20gpCxKNRX1e+ayILE4X/Mbw5kWXyW+4j3Z6xLRW9megE4you0g0gqqEt6OBLVXy5QNHZPG5Vw8tFV1ays25bqD+9QwXGzT4EAobI/PtsrvIBRVN9OwlgzbzEX8pqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=fEWUU3hI; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 3312B2C0708;
+	Thu, 19 Jun 2025 09:27:48 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1750282068;
+	bh=EP4GfDzPRDFeYPr7p/vB/MrvwsL1FFCmU8ddXHJy9ac=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=fEWUU3hIIqqE7X/22GiiTfOMQlTKl9u7/4q9GHvlUYPdgaas/FvNSDZUkA9q3HR4U
+	 +eTobQn0ipbce7M06EggSKhFhYn2+rUcnNUwEKlBdVKtQJgnVBZMF1lUMJ02cZ6zhO
+	 HgljHyVDdw1mVnh5WYewRX3WN4YzgqSXdV/I2yoIt7uFf/ffFbC2g9R/ggWIH0E14Z
+	 yE0uxnihi5bhxpFmjBKPnC5Fl8UIXNdOSKAPxH4TLayqxgBc6jVf3TbeTyP3YuVF4s
+	 qn7JpugWdg27xbMIQBAsH6IJ9TcYp3IbVTFn/TPYH0qoJNKGLCOD9iKcwamaWLNOPP
+	 tH4jCyerj+/Tw==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B68532f540001>; Thu, 19 Jun 2025 09:27:48 +1200
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 19 Jun 2025 09:27:47 +1200
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.014; Thu, 19 Jun 2025 09:27:47 +1200
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: "markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>, 'Andrew Lunn'
+	<andrew@lunn.ch>
+CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"michael@fossekall.de" <michael@fossekall.de>, "daniel@makrotopia.org"
+	<daniel@makrotopia.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: AW: [PATCH] net: phy: realtek: convert RTL8226-CG to c45 only
+Thread-Topic: AW: [PATCH] net: phy: realtek: convert RTL8226-CG to c45 only
+Thread-Index: AQHIkk1ZwrMdRrTYJJUEkbagN+qSQAGXWE03tCJIh9CAAD6dgA==
+Date: Wed, 18 Jun 2025 21:27:47 +0000
+Message-ID: <e63c2332-ade2-4c93-be21-a550125c543e@alliedtelesis.co.nz>
+References: <20250617150147.2602135-1-markus.stockhausen@gmx.de>
+ <6e0e38b4-db64-4b63-ac36-4a432b762767@lunn.ch>
+ <788b01dbe016$b92c4470$2b84cd50$@gmx.de>
+In-Reply-To: <788b01dbe016$b92c4470$2b84cd50$@gmx.de>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <91334455D1FE754F87636CB304101750@alliedtelesis.co.nz>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=F7/0dbhN c=1 sm=1 tr=0 ts=68532f54 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=P-IC7800AAAA:8 a=8fhZBx2WqT7_uYTOGB8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
+X-SEG-SpamProfiler-Score: 0
 
-On Tue, 17 Jun 2025 14:52:17 -0700 Mina Almasry wrote:
-> > > Sorry, I realized right after hitting send, I'm missing:
-> > >
-> > > Fixes: 9f6b619edf2e ("net: support non paged skb frags")
-> > >
-> > > I can respin after the 24hr cooldown.  
-> >
-> > The function is used in five drivers, none of which support devmem tx,
-> > does not look like there is a reason to route it via net.
-> >
-> > The change it self looks good, but not really sure it's needed.
-> > skb_frag_address_safe is used in some pass-data-via-descriptor-ring mode,
-> > I don't see 'modern' drivers (besides bnxt which added this support in 2015)
-> > use it.  
-> 
-> Meh, a judgement call could be made here.  I've generally tried to
-> make sure skb helpers are (unreadable) netmem compatible without a
-> thorough analysis of all the callers to make sure they do or will one
-> day use (unreadable) netmem. Seems better to me to fix this before
-> some code path that plumbs unreadable memory to the helper is actually
-> merged and that code starts crashing.
-
-Fair points, tho I prefer the simple heuristic of "can it trigger on
-net", otherwise it's really easy to waste time pondering each single
-patch. I'll apply to net-next as is. Stanislav, do you want to ack?
+SGkgTWFya3VzLA0KDQpPbiAxOC8wNi8yMDI1IDE4OjAzLCBtYXJrdXMuc3RvY2toYXVzZW5AZ214
+LmRlIHdyb3RlOg0KPj4gVm9uOiBBbmRyZXcgTHVubiA8YW5kcmV3QGx1bm4uY2g+DQo+PiBHZXNl
+bmRldDogRGllbnN0YWcsIDE3LiBKdW5pIDIwMjUgMTc6MzYNCj4+IEFuOiBNYXJrdXMgU3RvY2to
+YXVzZW4gPG1hcmt1cy5zdG9ja2hhdXNlbkBnbXguZGU+DQo+PiBCZXRyZWZmOiBSZTogW1BBVENI
+XSBuZXQ6IHBoeTogcmVhbHRlazogY29udmVydCBSVEw4MjI2LUNHIHRvIGM0NSBvbmx5DQo+Pg0K
+Pj4gT24gVHVlLCBKdW4gMTcsIDIwMjUgYXQgMTE6MDE6NDdBTSAtMDQwMCwgTWFya3VzIFN0b2Nr
+aGF1c2VuIHdyb3RlOg0KPj4+IFRoZSBSVEw4MjI2LUNHIGNhbiBiZSBmb3VuZCBvbiBkZXZpY2Vz
+IGxpa2UgdGhlIFp5eGVsIFhHUzEyMTAtMTIuIFRoZXNlDQo+Pj4gYXJlIGRyaXZlbiBieSBhIFJU
+TDkzMDJCIFNvQyB0aGF0IGhhcyBhY3RpdmUgcGh5IGhhcmR3YXJlIHBvbGxpbmcgaW4NCj4+PiB0
+aGUgYmFja2dyb3VuZC4NCj4+IEl0IHdvdWxkIGJlIGEgbG90IGJldHRlciB0byBqdXN0IHR1cm4g
+dGhhdCBwb2xsaW5nIG9mZi4NCkkgaGF2ZSBleHBlcmltZW50ZWQgd2l0aCB0dXJuaW5nIHRoZSBw
+b2xsaW5nIG9mZiBvbiBteSBib2FyZCBidXQgaXQgDQp0ZW5kcyB0byBtYWtlIG90aGVyIHN3aXRj
+aCB0aGluZ3Mgbm90IHdvcmsuIFRoZSBvYnZpb3VzIG9uZSBpcyB0aGUgTEVEcyANCmJ1dCBJIGFs
+c28gc2F3IG90aGVyIHN3aXRjaGluZyBmdW5jdGlvbmFsaXR5IChlLmcuIHBhY2tldCBmb3J3YXJk
+aW5nLCANCmZkYiBtYWludGVuYW5jZSkgc3RvcCB3b3JraW5nLg0KPiBUaGlzIGlzIG91ciBjaGFs
+bGVuZ2U6IGh0dHBzOi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4L3Y2LjE2LXJjMi9zb3VyY2Uv
+ZHJpdmVycy9uZXQvbWRpby9tZGlvLXJlYWx0ZWstcnRsOTMwMC5jI0wzNjYNCg0KVG8gYmUgaG9u
+ZXN0IEknZCBuZXZlciBjb25zaWRlcmVkIGR5bmFtaWNhbGx5IHN3aXRjaGluZyBiZXR3ZWVuIGMy
+MiBhbmQgDQpjNDUuIEkndmUgc2VlbiBtZGlvIGNvbnRyb2xsZXJzIGJ1c3NlcyB0aGF0IGNhbiBw
+dXQgaW4gZWl0aGVyIG1vZGUgYXMgYSANCnBpbmN0cmwgdHlwZSBvZiBvcGVyYXRpb24gYW5kIGlm
+IHNlZW4gUEhZcyB0aGF0IGNhbiBiZSBhY2Nlc3NlZCBhcyANCmVpdGhlciBjMjIgb3IgYzQ1IGFu
+ZCBldmVuIHN1cHBvcnQgZm9yIGM0NSBvdmVyIGMyMi4gQnV0IEknZCBuZXZlciBzZWVuIA0KYW55
+dGhpbmcgdGhhdCBuZWVkZWQgdG8gc3VwcG9ydCBib3RoIGF0IHRoZSBzYW1lIHRpbWUuIFRoZSBv
+bmx5IHJlYXNvbiBJIA0KcHV0IHRoZSByZXN0cmljdGlvbiBpbiB3YXMgSSBkaWRuJ3Qgd2FudCB0
+aGUgc3dpdGNoIHBoeSBwb2xsaW5nIHVuaXQgDQppbnRlcmZlcmluZy4gSSBhbHNvIGRvbid0IGhh
+dmUgYW55ICh3b3JraW5nwqBbMV0pwqBSZWFsdGVrIGhhcmR3YXJlIHdpdGggYSANCmMyMiBQSFkg
+dG8gdGVzdCBvbi4NCg0KSSB0aGluayB0aGF0IHBlcmhhcHMgd2UgZG9uJ3QgbmVlZCB0aGlzIHJl
+c3RyaWN0aW9uIGFzIHRoZSB0cmFuc2ZlciB0eXBlIA0KaXMgc2V0IHZpYSBTTUlfQUNDRVNTX1BI
+WV9DVFJMXzEuIEkgdGhpbmsgd2Ugd291bGQgaG93ZXZlciBuZWVkIHRvIA0KcmVjb25jaWxlIHRo
+ZSBvdGhlciBmZWVkYmFjayB5b3UgaGFkIGFyb3VuZCB0cmFja2luZyB0aGUgcGFnZSBudW1iZXIg
+Zm9yIA0KdGhlIGMyMiBhY2Nlc3NlcyB3aGljaCBoYXMgbm90IGJlZW4gaW1wbGVtZW50ZWQuDQoN
+ClsxXSAtIEkgZG8gaGF2ZSBhIFp5eGVsIGJvYXJkIHRoYXQgd2lsbCBwcm9iYWJseSBkbyB0aGUg
+dHJpY2sgYnV0IHNvIGZhciANCkkndmUgYmVlbiB1bmFibGUgdG8gZ2V0IGl0IGJvb3RpbmcgbXkg
+aW1hZ2VzLiBJIHdhbnQgdG8gYXZvaWQgbWVzc2luZyB1cCANCnRoZSBzdG9jayBmaXJtd2FyZSBz
+byBJIGhhdmVuJ3QgdHJpZWQgYW55dGhpbmcgdG9vIGludmFzaXZlLg0KDQo+Pj4gQXMgc29vbiBh
+cyB0aGlzIGlzIGFjdGl2ZSBhbmQgc2V0IHRvIGM0NSBtb3N0IGMyMg0KPj4+IHJlZ2lzdGVyIGFj
+Y2Vzc2VzIGFyZSBibG9ja2VkIGFuZCB3aWxsIHN0b3Agd29ya2luZy4gQ29udmVydCB0aGUNCj4+
+PiBwaHkgdG8gYSBjNDUtb25seSBmdW5jdGlvbiBzZXQuDQo+Pj4NCj4+PiBGb3IgZG9jdW1lbnRh
+dGlvbiBwdXJwb3NlcyBzb21lIHJlZ2lzdGVyIGV4dHJhY3RzIHRoYXQgd2hlcmUgdGFrZW4gdG8N
+Cj4+PiB2ZXJpZnkgcHJvcGVyIGRldGVjdGlvbi4NCj4+IFBsZWFzZSBjb3VsZCB5b3Ugc2hvdyB1
+cyB0aGUgb3V0cHV0IGZyb20gZXRodG9vbCBiZWZvcmUvYWZ0ZXIuDQo+Pg0KPj4+ICAgCQlQSFlf
+SURfTUFUQ0hfRVhBQ1QoMHgwMDFjYzgzOCksDQo+Pj4gICAJCS5uYW1lICAgICAgICAgICA9ICJS
+VEw4MjI2LUNHIDIuNUdicHMgUEhZIiwNCj4+PiAtCQkuZ2V0X2ZlYXR1cmVzICAgPSBydGw4MjJ4
+X2dldF9mZWF0dXJlcywNCj4+IFlvdSBjYW4gc2VlIHRoaXMgY2FsbHMgZ2VucGh5X3JlYWRfYWJp
+bGl0aWVzKHBoeWRldikgYXQgdGhlIGVuZCwgc28NCj4+IHJlYWRpbmcgaW5mb3JtYXRpb24gYWJv
+dXQgMTAvMTAwLzFHIHNwZWVkcywgdXNpbmcgdGhlIHN0YW5kYXJkIEMyMg0KPj4gcmVnaXN0ZXJz
+Lg0KPj4NCj4+PiAtCQkuY29uZmlnX2FuZWcgICAgPSBydGw4MjJ4X2NvbmZpZ19hbmVnLA0KPj4+
+IC0JCS5yZWFkX3N0YXR1cyAgICA9IHJ0bDgyMnhfcmVhZF9zdGF0dXMsDQo+Pj4gLQkJLnN1c3Bl
+bmQgICAgICAgID0gZ2VucGh5X3N1c3BlbmQsDQo+Pj4gLQkJLnJlc3VtZSAgICAgICAgID0gcnRs
+Z2VuX3Jlc3VtZSwNCj4+PiArCQkuc29mdF9yZXNldCAgICAgPSBydGw4MjJ4X2M0NV9zb2Z0X3Jl
+c2V0LA0KPj4+ICsJCS5nZXRfZmVhdHVyZXMgICA9IHJ0bDgyMnhfYzQ1X2dldF9mZWF0dXJlcywN
+Cj4+IFRoaXMgb25seSBjYWxscyBnZW5waHlfYzQ1X3BtYV9yZWFkX2FiaWxpdGllcygpLiBTbyBp
+IGV4cGVjdCAxMC8xMDAvMUcNCj4+IGlzIG1pc3NpbmcuDQo+IEkgaGFkIHRvIHBhdGNoIHRoZSBt
+ZGlvIGRyaXZlciB0byBtYWtlIHRoZSBleGlzdGluZyBSVEw4MjI2IHBoeSBkcml2ZXIgd29yaw0K
+PiB3aXRoDQo+IEl0LiBTbyB3aGVuZXZlciBhIGMyMiBjb21tYW5kIGlzIHNlbnQgaXQgd2lsbCB0
+b2dnbGUgdGhlIHByb3RvY29sLiBJIGRvIG5vdA0KPiBiZWxpZXZlDQo+IHRoYXQgdGhpcyBpcyB3
+aGF0IGl0IHdhcyBkZXNpZ25lZCBmb3IgYnV0IG1heWJlIENocmlzIGhhcyBzb21lIG1vcmUNCj4g
+ZXhwZXJpZW5jZS4NCg0KSSBkb24ndCBrbm93IG9uZSB3YXkgb3IgdGhlIG90aGVyIGlmIHN3YXBw
+aW5nIGJldHdlZW4gYzIyIGFuZCBjNDUgaXMgYSANCnRoaW5nIHRoYXQgdGhlIGhhcmR3YXJlIGFs
+bG93cy4gSXQncyBub3Qgc29tZXRoaW5nIHRoZSBkcml2ZXIgSSB3cm90ZSANCnN1cHBvcnRzIGJ1
+dCBpdCBjb3VsZCBwb3NzaWJseSBiZSBhZGRlZCBieSByZW1vdmluZyB0aGUgY2hlY2sgYW5kIA0K
+dW5jb25kaXRpb25hbGx5IHN1cHBseWluZyB0aGUgcmVxdWlyZWQgcmVhZC93cml0ZSBmdW5jdGlv
+bnMuIFRvIHBsYXkgDQpuaWNlbHkgd2l0aCB0aGUgUFBVIGl0IHdvdWxkIG5lZWQgdG8gdHJhY2sg
+dGhlIFBIWSBwYWdlIGFjY2Vzc2VzIGxpa2UgDQp0aGUgb3BlbldSVCBpbXBsZW1lbnRhdGlvbiBk
+b2VzLg0KDQo+DQo+IE91dHB1dCB3aXRoIHBhdGNoZWQgYnVzOg0KPg0KPiBbICAgNDkuNTUyNjI3
+XSB0b2dnbGUgYnVzIDEgZnJvbSBjNDUgdG8gYzIyIHRvIHJlYWQgcG9ydCAyNCBwYWdlIDAgcmVn
+aXN0ZXINCj4gMQ0KPiBbICAgNDkuNTYwNjYzXSB0b2dnbGUgYnVzIDEgZnJvbSBjMjIgdG8gYzQ1
+DQo+IC4uLg0KPiAjIGV0aHRvb2wgbGFuOQ0KPiBTZXR0aW5ncyBmb3IgbGFuOToNCj4gICAgICAg
+ICAgU3VwcG9ydGVkIHBvcnRzOiBbIFRQIE1JSSBdDQo+ICAgICAgICAgIFN1cHBvcnRlZCBsaW5r
+IG1vZGVzOiAgIDEwYmFzZVQvSGFsZiAxMGJhc2VUL0Z1bGwNCj4gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgMTAwYmFzZVQvSGFsZiAxMDBiYXNlVC9GdWxsDQo+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIDEwMDBiYXNlVC9GdWxsDQo+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIDI1MDBiYXNlVC9GdWxsDQo+ICAgICAgICAgIFN1cHBvcnRlZCBwYXVz
+ZSBmcmFtZSB1c2U6IFN5bW1ldHJpYyBSZWNlaXZlLW9ubHkNCj4gICAgICAgICAgU3VwcG9ydHMg
+YXV0by1uZWdvdGlhdGlvbjogWWVzDQo+ICAgICAgICAgIFN1cHBvcnRlZCBGRUMgbW9kZXM6IE5v
+dCByZXBvcnRlZA0KPiAgICAgICAgICBBZHZlcnRpc2VkIGxpbmsgbW9kZXM6ICAxMGJhc2VUL0hh
+bGYgMTBiYXNlVC9GdWxsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDEwMGJh
+c2VUL0hhbGYgMTAwYmFzZVQvRnVsbA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAxMDAwYmFzZVQvRnVsbA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAyNTAw
+YmFzZVQvRnVsbA0KPiAgICAgICAgICBBZHZlcnRpc2VkIHBhdXNlIGZyYW1lIHVzZTogU3ltbWV0
+cmljIFJlY2VpdmUtb25seQ0KPiAgICAgICAgICBBZHZlcnRpc2VkIGF1dG8tbmVnb3RpYXRpb246
+IFllcw0KPiAgICAgICAgICBBZHZlcnRpc2VkIEZFQyBtb2RlczogTm90IHJlcG9ydGVkDQo+ICAg
+ICAgICAgIFNwZWVkOiBVbmtub3duIQ0KPiAgICAgICAgICBEdXBsZXg6IFVua25vd24hICgyNTUp
+DQo+ICAgICAgICAgIFBvcnQ6IFR3aXN0ZWQgUGFpcg0KPiAgICAgICAgICBQSFlBRDogMjQNCj4g
+ICAgICAgICAgVHJhbnNjZWl2ZXI6IGV4dGVybmFsDQo+ICAgICAgICAgIEF1dG8tbmVnb3RpYXRp
+b246IG9uDQo+ICAgICAgICAgIE1ESS1YOiBVbmtub3duDQo+ICAgICAgICAgIFN1cHBvcnRzIFdh
+a2Utb246IGQNCj4gICAgICAgICAgV2FrZS1vbjogZA0KPiAgICAgICAgICBMaW5rIGRldGVjdGVk
+OiBubw0KPg0KPiBUaGUgUlRMODIyNiBzZWVtcyB0byBzdXBwb3J0IHByb3BlciBNRElPX1BNQV9F
+WFRBQkxFIGZsYWdzLg0KPiBTbyBnZW5waHlfYzQ1X3BtYV9yZWFkX2FiaWxpdGllcygpIGNhbiBj
+b252ZW5pZW50bHkgY2FsbA0KPiBnZW5waHlfYzQ1X3BtYV9yZWFkX2V4dF9hYmlsaXRpZXMoKSBh
+bmQgMTAvMTAwLzEwMDAgaXMNCj4gcG9wdWxhdGVkIHJpZ2h0Lg0KPg0KPiBPdXRwdXRzIHdpdGgg
+cGF0Y2hlZCBkcml2ZXI6DQo+DQo+ICMgZXRodG9vbCBsYW45DQo+IFNldHRpbmdzIGZvciBsYW45
+Og0KPiAgICAgICAgICBTdXBwb3J0ZWQgcG9ydHM6IFsgVFAgXQ0KPiAgICAgICAgICBTdXBwb3J0
+ZWQgbGluayBtb2RlczogICAxMGJhc2VUL0hhbGYgMTBiYXNlVC9GdWxsDQo+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIDEwMGJhc2VUL0hhbGYgMTAwYmFzZVQvRnVsbA0KPiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAxMDAwYmFzZVQvRnVsbA0KPiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAyNTAwYmFzZVQvRnVsbA0KPiAgICAgICAgICBTdXBwb3J0
+ZWQgcGF1c2UgZnJhbWUgdXNlOiBTeW1tZXRyaWMgUmVjZWl2ZS1vbmx5DQo+ICAgICAgICAgIFN1
+cHBvcnRzIGF1dG8tbmVnb3RpYXRpb246IFllcw0KPiAgICAgICAgICBTdXBwb3J0ZWQgRkVDIG1v
+ZGVzOiBOb3QgcmVwb3J0ZWQNCj4gICAgICAgICAgQWR2ZXJ0aXNlZCBsaW5rIG1vZGVzOiAgMTBi
+YXNlVC9IYWxmIDEwYmFzZVQvRnVsbA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAxMDBiYXNlVC9IYWxmIDEwMGJhc2VUL0Z1bGwNCj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgMTAwMGJhc2VUL0Z1bGwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgMjUwMGJhc2VUL0Z1bGwNCj4gICAgICAgICAgQWR2ZXJ0aXNlZCBwYXVzZSBmcmFtZSB1c2U6
+IFN5bW1ldHJpYyBSZWNlaXZlLW9ubHkNCj4gICAgICAgICAgQWR2ZXJ0aXNlZCBhdXRvLW5lZ290
+aWF0aW9uOiBZZXMNCj4gICAgICAgICAgQWR2ZXJ0aXNlZCBGRUMgbW9kZXM6IE5vdCByZXBvcnRl
+ZA0KPiAgICAgICAgICBTcGVlZDogVW5rbm93biENCj4gICAgICAgICAgRHVwbGV4OiBVbmtub3du
+ISAoMjU1KQ0KPiAgICAgICAgICBQb3J0OiBUd2lzdGVkIFBhaXINCj4gICAgICAgICAgUEhZQUQ6
+IDI0DQo+ICAgICAgICAgIFRyYW5zY2VpdmVyOiBleHRlcm5hbA0KPiAgICAgICAgICBBdXRvLW5l
+Z290aWF0aW9uOiBvbg0KPiAgICAgICAgICBNREktWDogVW5rbm93bg0KPiAgICAgICAgICBTdXBw
+b3J0cyBXYWtlLW9uOiBkDQo+ICAgICAgICAgIFdha2Utb246IGQNCj4gICAgICAgICAgTGluayBk
+ZXRlY3RlZDogbm8NCj4NCj4gTWFya3Vz
 
