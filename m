@@ -1,200 +1,169 @@
-Return-Path: <netdev+bounces-198983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 682DEADE942
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:41:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401BEADE951
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0251189ECD2
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:41:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C691F3A785E
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 10:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4146A283FDF;
-	Wed, 18 Jun 2025 10:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BCA28505F;
+	Wed, 18 Jun 2025 10:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WK2kvWoY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KmCEIcKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FB1283FDC
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 10:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E145115D1;
+	Wed, 18 Jun 2025 10:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750243240; cv=none; b=eZ12FfCNpIOmUwEis0Ue/r9eZ1y12jw0e8YkxtOG6wsKZyHF9ikbllAMnqPUkE3SwvLd/GceJomg8GJ45Llw1mbdAJCkn6Fn2CMk5QmzBLsBSGRpYfiZceXzNIn3WDBIGyzZuG7wRsH7LwY0LPb+jwJ2Qoi16d4x971bZ/nDiWY=
+	t=1750243318; cv=none; b=H9pxwnZRElCFlgILNhW4K6b/D3YvYc+24KdX+9eh0Cigaa5CTRPHLNx8Fhz7tDqKVYsMrtwgdO/sYHIel1VZMw/xpJUfURr4NnuUnndkZA12OKkyqnlsuInPDt7eHkvLqaxj5i6aL4Fa1uToqIJ22uvq2kwhE0lE7If7NI8Sbao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750243240; c=relaxed/simple;
-	bh=IFrk+Wt+3IOL5c/d/oA9s1HjP/eu3QahRP+hmKMQO48=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MwWJ0ofnB+w9jSaL/AeyUIqa6XFekM0cv6SMGR4LLpSBHo4nCUFD7KlO4Ph8+XGZf8ihC1nYy96uFQs2TM+pxe8cmMbiac1P+7yQERcI34bcgvv9XZ/P5Cg/oIm06qUP3R9RKd68Av2FMCnGQPXpYERtxaqFwCtufpMvvYTTOjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WK2kvWoY; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748764d84feso9360156b3a.2
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 03:40:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750243236; x=1750848036; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=O5ZRzpxuw236Qa1RlkQYMr8Acq5Mq2S5Ae5QLL/5mzs=;
-        b=WK2kvWoYfJaQgF++P5iaPDbW/BY0ytQCs+vhdngpQSGRgg2xfiHcRSzqRA/4m0mPD0
-         Km+mTIrtuN4GVPFfqgxj8S9iEJoSscsxfUEsDX9MG1w4Phf2jNfcH9WcHK6D1BoIB60y
-         J+zg4Z6e+uYDhRuhVW9gibl14kJ74l2UYqzL0yYIBVNaXw09WjN1asXicGKtNllqEVNp
-         ryD+i4aSTKtMHvakEjAWKpdkYRDWxfmGfIeMYtoCKFZ55IUr2zVvwUcWW6qQRrmVWgq1
-         b4QtiMcZZyKK1PSuvQDeN5pZJM9n3yKQFlKGbJn+4tiUOb5v2JA/Biauq7kYF3QX2d4H
-         T2xQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750243236; x=1750848036;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O5ZRzpxuw236Qa1RlkQYMr8Acq5Mq2S5Ae5QLL/5mzs=;
-        b=KR5HtcaXyHUVqpkZG9wUAOeXe2AvU7Vjyjbcik1mSbR9J9drnxO0pCicHBPd0FG7lU
-         qtcOkMsqhk1XUnr3XZFKv+72E+zBadX3i3ACY47yRzxPCWuP+LM12hlUWmG9JON3wivF
-         2Epfvtnngo0DSB+hZi2GcKALM1cTP/4p/Cm/80DPPsShYYtAFVAQ86I0keRGYDDX/f8x
-         lZx4OVyvgczpZVbGYXZ5QkFlERTvnAom5a8KyPmPblFyaxDBICazU3zOmONqLRJMLhAh
-         mniobyJzb4CpqQjqo+SUVam64JZXRoxMeAP611FqF1+x6rVGHisrggkKInXKNIBlS9ZY
-         d4pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8xCaJg/KjSt74A+z+6bsM0La/yONAPr4wPuo4Uz5Jadx7FnxGHAq6aXnRhC1aJM+4qbVaMfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZfile25PtHcToRfqCIjb9oaBYuveKm0cvdzdwNxvnouy8Mt/l
-	zRZqFaYmYtQR7tflmoPebSEj8GsojeZSBrTSznWevKX+PsYCy6YqeMP6rMBiuXyc4uun0oQSxvE
-	oSOqWfLTeMmARG75sAkRnZK4h/Q==
-X-Google-Smtp-Source: AGHT+IFm6jRnVgcFeMCAYW1rUtQm4z9LOhLiOCwsAqf3bSFUHFjg6zoWoywY8kEyAIzz78G43yBDi8e2+p1zScjWFw==
-X-Received: from pfbgd14.prod.google.com ([2002:a05:6a00:830e:b0:740:5196:b63a])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:4b4c:b0:740:9d7c:8f5c with SMTP id d2e1a72fcca58-7489cfde7a6mr23990572b3a.18.1750243236415;
- Wed, 18 Jun 2025 03:40:36 -0700 (PDT)
-Date: Wed, 18 Jun 2025 19:40:25 +0900
+	s=arc-20240116; t=1750243318; c=relaxed/simple;
+	bh=k0LXltQZW3ApzJfj+AHhZrtAxdbVdDUSqytiiy7bwD4=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=N2yb9TpqeGtTVhayjU1r48G+f87fFT8Nt7TDQvq2gUpNi6eaSER0qEbkzv/+H6ON00bOTNB9p503g7O1owpUR4iwEBbkUSogYKH/jAH7YqWrxzjZH5BKTEo8nr65ZPHgzw6gGam9SvkqHoE8S8RPZJr4XAxdnllxEe++uExB5k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KmCEIcKF; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Cm/933WhUbzY2Ue6anpW6daO4H0jv7g+t//DGt737a8=; b=KmCEIcKFhTTTC5XlkVRRdi6Q6L
+	gfoMjuP0cDyjUGyz6KEdDcJ4zuuhX1KMcLtXoxV8o8d3WaE170hQxYgs1LCHMXnbmT8GzEgoxu7eT
+	JkAWuUVRWRg5kFGOnCZ3b6p2L8eK6I+9U2qGgn4b+RM07Ii0Zgys1xaiDlj+UCrV/9e+EVBDNvkgn
+	+I0YA/ADwi77krhLJI5A0+xuqPOm+2SviJzaI/OosZh/q48Jb6AjhXYz0HvTTmm6drETWag1lHHQT
+	Og5Sbx2F2kpBkYZ6E7CgL5yccMDomgqa7y8S55Rwy2vW0q7fyji2C+zrUJPhB30SPp2rWGGE3FeQG
+	0AhIcjxw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:60256 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uRqEn-0006Ia-2s;
+	Wed, 18 Jun 2025 11:41:49 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uRqE9-004c7G-CB; Wed, 18 Jun 2025 11:41:09 +0100
+In-Reply-To: <aFKXzlno7HkG-cNh@shell.armlinux.org.uk>
+References: <aFKXzlno7HkG-cNh@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 1/2] net: stmmac: loongson1: provide match data
+ struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.rc2.761.g2dc52ea45b-goog
-Message-ID: <20250618104025.3463656-1-yuyanghuang@google.com>
-Subject: [PATCH net-next] selftest: add selftest for anycast notifications
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uRqE9-004c7G-CB@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 18 Jun 2025 11:41:09 +0100
 
-This commit adds a new kernel selftest to verify RTNLGRP_IPV6_ACADDR
-notifications. The test works by adding/removing a dummy interface,
-enabling packet forwarding, and then confirming that user space can
-correctly receive anycast notifications.
+Provide a structure for match data rather than using the function
+pointer as match data. This allows stronger type-checking for the
+function itself, and allows extensions to the match data.
 
-The test relies on the iproute2 version to be 6.13+.
-
-Tested by the following command:
-$ vng -v --user root --cpus 16 -- \
-make -C tools/testing/selftests TARGETS=net
-TEST_PROGS=rtnetlink_notification.sh \
-TEST_GEN_PROGS="" run_tests
-
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../selftests/net/rtnetlink_notification.sh   | 52 +++++++++++++++++--
- 1 file changed, 47 insertions(+), 5 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 24 ++++++++++++++-----
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/net/rtnetlink_notification.sh b/tools/testing/selftests/net/rtnetlink_notification.sh
-index 39c1b815bbe4..2d938861197c 100755
---- a/tools/testing/selftests/net/rtnetlink_notification.sh
-+++ b/tools/testing/selftests/net/rtnetlink_notification.sh
-@@ -8,9 +8,11 @@
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+index 3e86810717d3..78d9540be10c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+@@ -46,6 +46,10 @@ struct ls1x_dwmac {
+ 	struct regmap *regmap;
+ };
  
- ALL_TESTS="
- 	kci_test_mcast_addr_notification
-+	kci_test_anycast_addr_notification
- "
- 
- source lib.sh
-+test_dev="test-dummy1"
- 
- kci_test_mcast_addr_notification()
++struct ls1x_data {
++	int (*init)(struct platform_device *pdev, void *bsp_priv);
++};
++
+ static int ls1b_dwmac_syscon_init(struct platform_device *pdev, void *priv)
  {
-@@ -18,12 +20,11 @@ kci_test_mcast_addr_notification()
- 	local tmpfile
- 	local monitor_pid
- 	local match_result
--	local test_dev="test-dummy1"
+ 	struct ls1x_dwmac *dwmac = priv;
+@@ -143,9 +147,9 @@ static int ls1x_dwmac_probe(struct platform_device *pdev)
+ {
+ 	struct plat_stmmacenet_data *plat_dat;
+ 	struct stmmac_resources stmmac_res;
++	const struct ls1x_data *data;
+ 	struct regmap *regmap;
+ 	struct ls1x_dwmac *dwmac;
+-	int (*init)(struct platform_device *pdev, void *priv);
+ 	int ret;
  
- 	tmpfile=$(mktemp)
- 	defer rm "$tmpfile"
+ 	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+@@ -159,8 +163,8 @@ static int ls1x_dwmac_probe(struct platform_device *pdev)
+ 		return dev_err_probe(&pdev->dev, PTR_ERR(regmap),
+ 				     "Unable to find syscon\n");
  
--	ip monitor maddr > $tmpfile &
-+	ip monitor maddr > "$tmpfile" &
- 	monitor_pid=$!
- 	defer kill_process "$monitor_pid"
+-	init = of_device_get_match_data(&pdev->dev);
+-	if (!init) {
++	data = of_device_get_match_data(&pdev->dev);
++	if (!data) {
+ 		dev_err(&pdev->dev, "No of match data provided\n");
+ 		return -EINVAL;
+ 	}
+@@ -175,21 +179,29 @@ static int ls1x_dwmac_probe(struct platform_device *pdev)
+ 				     "dt configuration failed\n");
  
-@@ -32,7 +33,7 @@ kci_test_mcast_addr_notification()
- 	if [ ! -e "/proc/$monitor_pid" ]; then
- 		RET=$ksft_skip
- 		log_test "mcast addr notification: iproute2 too old"
--		return $RET
-+		return "$RET"
- 	fi
+ 	plat_dat->bsp_priv = dwmac;
+-	plat_dat->init = init;
++	plat_dat->init = data->init;
+ 	dwmac->plat_dat = plat_dat;
+ 	dwmac->regmap = regmap;
  
- 	ip link add name "$test_dev" type dummy
-@@ -53,7 +54,48 @@ kci_test_mcast_addr_notification()
- 		RET=$ksft_fail
- 	fi
- 	log_test "mcast addr notification: Expected 4 matches, got $match_result"
--	return $RET
-+	return "$RET"
-+}
-+
-+kci_test_anycast_addr_notification()
-+{
-+	RET=0
-+	local tmpfile
-+	local monitor_pid
-+	local match_result
-+
-+	tmpfile=$(mktemp)
-+	defer rm "$tmpfile"
-+
-+	ip monitor acaddress > "$tmpfile" &
-+	monitor_pid=$!
-+	defer kill_process "$monitor_pid"
-+	sleep 1
-+
-+	if [ ! -e "/proc/$monitor_pid" ]; then
-+		RET=$ksft_skip
-+		log_test "anycast addr notification: iproute2 too old"
-+		return "$RET"
-+	fi
-+
-+	ip link add name "$test_dev" type dummy
-+	check_err $? "failed to add dummy interface"
-+	ip link set "$test_dev" up
-+	check_err $? "failed to set dummy interface up"
-+	sysctl -qw net.ipv6.conf."$test_dev".forwarding=1
-+	ip link del dev "$test_dev"
-+	check_err $? "Failed to delete dummy interface"
-+	sleep 1
-+
-+	# There should be 2 line matches as follows.
-+	# 9: dummy2    inet6 any fe80:: scope global
-+	# Deleted 9: dummy2    inet6 any fe80:: scope global
-+	match_result=$(grep -cE "$test_dev.*(fe80::)" "$tmpfile")
-+	if [ "$match_result" -ne 2 ]; then
-+		RET=$ksft_fail
-+	fi
-+	log_test "anycast addr notification: Expected 2 matches, got $match_result"
-+	return "$RET"
+ 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
  }
  
- #check for needed privileges
-@@ -67,4 +109,4 @@ require_command ip
- 
- tests_run
- 
--exit $EXIT_STATUS
-+exit "$EXIT_STATUS"
++static const struct ls1x_data ls1b_dwmac_data = {
++	.init = ls1b_dwmac_syscon_init,
++};
++
++static const struct ls1x_data ls1c_dwmac_data = {
++	.init = ls1c_dwmac_syscon_init,
++};
++
+ static const struct of_device_id ls1x_dwmac_match[] = {
+ 	{
+ 		.compatible = "loongson,ls1b-gmac",
+-		.data = &ls1b_dwmac_syscon_init,
++		.data = &ls1b_dwmac_data,
+ 	},
+ 	{
+ 		.compatible = "loongson,ls1c-emac",
+-		.data = &ls1c_dwmac_syscon_init,
++		.data = &ls1c_dwmac_data,
+ 	},
+ 	{ }
+ };
 -- 
-2.50.0.rc2.761.g2dc52ea45b-goog
+2.30.2
 
 
