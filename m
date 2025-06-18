@@ -1,219 +1,169 @@
-Return-Path: <netdev+bounces-199132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58916ADF279
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 18:21:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB4AADF28F
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 18:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ACDA3AD18F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:20:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC91C4A2F44
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC772EF9D5;
-	Wed, 18 Jun 2025 16:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1FB2F0C65;
+	Wed, 18 Jun 2025 16:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B9/zZbRF"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="Gz77tB45"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62121C861F;
-	Wed, 18 Jun 2025 16:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264D32E9ED5
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 16:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750263641; cv=none; b=Ui2O6qZuEEfUFUmW8u9XHt0/CZ03ER5GNWWyRoZXagQAlsW1fVMTcCb0rOL1XgV69BHaDc6KGlmm3GeoFnaV4fbMGpBW5idlsa7J7BxdTD4BX3qeG80sjHk+4XwLR5j8RolxjA1e+H5un0BnYIR9u/Qd5tK2yoCt/NS05Q4KejU=
+	t=1750263952; cv=none; b=RgtNd8MgTYL/uzUy2YPZ0n9A19uDlKcqcUJ9HmpFAlE3w+TD33GGIE9JVad5+Dev881XdRpSq7HblPqceEG9taKyibTq7G6B1UW97SUtvZ3mVHoq1VVtwPXg2E4v4L0gPDDlZTfr6amcamZqd4yyoGeOBhYMF3278we7IkONa60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750263641; c=relaxed/simple;
-	bh=IkySy5pTUIaa1j80e/sSRvJR71Vpo8qwgLf6v3TA6as=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iGAlDhvsyBSzlqX4zRYF6lpHUy2FaxKgjKWNEySThJYKVLvB+c8aWl76X2Y0nD7/hXlHnfjrXL9TJRUhc2rUDA3tXQ4jXrNRtxqDBbZf7ck8e8mTsqbcsXzvl2qxRtsnS/y7ttGAFMoObfAi7SjXfH3i7GMOvgxWbdMVCzj0TQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B9/zZbRF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0DA4C4CEE7;
-	Wed, 18 Jun 2025 16:20:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750263640;
-	bh=IkySy5pTUIaa1j80e/sSRvJR71Vpo8qwgLf6v3TA6as=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B9/zZbRFgUlUjn1SvFThE5Oars1U8O/jKfPUmrref+JR6AdcjD43bqeNQsK5J91vf
-	 TAEZTCRZru5ZwjP1QKJuYegddPHlQ+hMGMf/pFcT7WxDCjutITnxs8E1CqWhs9j6Sl
-	 8s47TFgICxVNvyxm1jtzbDfjGvEHpSDoJjBGKLP5v+2nI0xTvNHOQSlPF9i84+YPTm
-	 26zOvmoOKXhSRDRvH1H01TvKP42ZngFGxa6hBZq/yJEeSz0jZW10OIaf/kdRqLsd9P
-	 6GMfbiE4gpXNdTr5/ubXM43Li8PbaUbuQLxZaLl6LPiIqB2GM4ExTvRheNNy/vPDUh
-	 ZEK4fjNxVCOlg==
-Date: Wed, 18 Jun 2025 18:20:32 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Akira Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, linux-kernel@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Ignacio Encinas Rubio <ignacio@iencinas.com>, Marco
- Elver <elver@google.com>, Shuah Khan <skhan@linuxfoundation.org>, Donald
- Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, Jan
- Stancek <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Ruben
- Wauters <rubenru09@aol.com>, joel@joelfernandes.org,
- linux-kernel-mentees@lists.linux.dev, lkmm@lists.linux.dev,
- netdev@vger.kernel.org, peterz@infradead.org, stern@rowland.harvard.edu,
- Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v6 00/15] Don't generate netlink .rst files inside
- $(srctree)
-Message-ID: <20250618182032.03e7a727@sal.lan>
-In-Reply-To: <17f2a9ce-85ac-414a-b872-fbcd30354473@gmail.com>
-References: <cover.1750246291.git.mchehab+huawei@kernel.org>
-	<17f2a9ce-85ac-414a-b872-fbcd30354473@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1750263952; c=relaxed/simple;
+	bh=Xt7U1x3SkNTaDSR5L1DVqg/uyQUndXVGHRE3Zd14eVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SCTLn/QAjWhQkoRa7wLHwQApfMKCdnDDWsrAVd8MW078p3prt9EIcRLB8QgjLRrAAnMHbPthlitj/bC3dT29CYjR6hdKKHgPYwuCRAUvRQf8FKGMxFom7q08x3FgsmOOjNeQbMc7IohxNDk3VkFW/AT7/48YeouUcdRiQ8mVWWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=Gz77tB45; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-313336f8438so1404896a91.0
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 09:25:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1750263949; x=1750868749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=81pEAwXmixuxAF0u6MPMjW9qRqViI6uiK6RzRIZYnIg=;
+        b=Gz77tB45qW8OyP/4AtWTEBommtgPvGbimohXVdYUrOqdOKcuE75Fpciyy0ED653+7K
+         8ez+roM5+v71PtjCpk57TemK64zMcDgkwGOKflM2qL+e8POUEkhvW5y0Omj1vv4zJlHn
+         3mGTo1L4f6vewU8UNr7JUMMbVFzrFcEVHtJX943uj4zUVJcADEhA3sdZTxzXtQtm8cIW
+         IXDg2Y/qOjVXlzHKSO34xAo3eodwEU1F1vO2VFfzAGKmBq0hRaTBM3t+XMZr9hplolj8
+         D0DvRki5JukMSyJgEm879QgTZ9SKRtN6toHNQ+s4aCHHYW4pm9TJ6a16a3JtWJ8t1o83
+         LnMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750263949; x=1750868749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=81pEAwXmixuxAF0u6MPMjW9qRqViI6uiK6RzRIZYnIg=;
+        b=d8BG09me7wV79V9YCIM/FZfGf1Nw6qu3VYIzJqxONxUnsyPI6L4bondXmkQohUU+Wv
+         Sq2fdZKK5IcRnbm5Vgl4Az3mTjO9Fjhx2GwJoWM6F4BU8Fz0qtZVFaJed/kfbR/Nr+ws
+         ef1OWSU0dei7I/g9RLlvS0lgQAW6PU1O9hKoSvWw3BIVmJn7USnS+zVhxmER7UAz8lp5
+         82puCCwVjQaiElEY6GQn+2O5lZUG1ybL5v5en+ZADmppClc5UwCRKJPIxeo0gfjfGbKy
+         jbTu01RGQg80h4gxy8TrvtiXuQiIApifIJI9frPeHrA/UGD7s5hGiFybtI2+GG/dYNsc
+         dUzQ==
+X-Gm-Message-State: AOJu0Yy5LqDxwCNYssCFsZEKz0qX7wwDtVXhYCZe+C4xHlHW7CMNJ0SE
+	k4i/UGYDIyjAd0WVH6fnVnv2TZiRjRqnEH6EN23VH7aDVEOGMgw6FLE+nViHHabnYP5UhSjafnq
+	U/sbfcoQ=
+X-Gm-Gg: ASbGncvcOk09r0RjYcU7OEqltOCdlYLK0ojQSmVHNiZaXNUs15LEs0pZR6opG5k0fTm
+	PJHMyQTJs/w3XqN5rkb03ReoEe+7L5tmgG7pUbqSOSPcrIgsUd3yMb0oA70rM4J68GBNUPQOw9N
+	lOXzTVSPGjYr4SZtG2ME6R2zkEHdUhRMwHxD26fZ45XzsZI4gPwDD+0g6PYN50hYKj8RuVzhuYO
+	FxJxNcxnv19Yajj83d20/BSybmW6ccR8zDf0nhynThtvnpaLYMAIL/q9jCbt//jkbPUHeGiB9Li
+	dVzO5nikOmgn/27tNbBSWAf8/uD/GP+2pZ+Q42bd6H9bjrz6Bg0=
+X-Google-Smtp-Source: AGHT+IELPUoe/0lbZ51Ep3CRUjBzFoOI7DQHZMtTAMEPeIerj8Ci4FOU7fjbN+PdNVV9TUydT51TQQ==
+X-Received: by 2002:a17:90a:e7c3:b0:311:b0ec:135e with SMTP id 98e67ed59e1d1-313f1befc7dmr10086256a91.2.1750263949142;
+        Wed, 18 Jun 2025 09:25:49 -0700 (PDT)
+Received: from t14.. ([2001:5a8:4528:b100:d683:8e90:dec5:4c47])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3158a2768c6sm137475a91.44.2025.06.18.09.25.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jun 2025 09:25:48 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: [RESEND PATCH v2 bpf-next 00/12] bpf: tcp: Exactly-once socket iteration
+Date: Wed, 18 Jun 2025 09:25:31 -0700
+Message-ID: <20250618162545.15633-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Em Thu, 19 Jun 2025 00:46:15 +0900
-Akira Yokosawa <akiyks@gmail.com> escreveu:
+TCP socket iterators use iter->offset to track progress through a
+bucket, which is a measure of the number of matching sockets from the
+current bucket that have been seen or processed by the iterator. On
+subsequent iterations, if the current bucket has unprocessed items, we
+skip at least iter->offset matching items in the bucket before adding
+any remaining items to the next batch. However, iter->offset isn't
+always an accurate measure of "things already seen" when the underlying
+bucket changes between reads which can lead to repeated or skipped
+sockets. Instead, this series remembers the cookies of the sockets we
+haven't seen yet in the current bucket and resumes from the first cookie
+in that list that we can find on the next iteration.
 
-> Hi Mauro,
-> 
-> On 2025/06/18 20:46, Mauro Carvalho Chehab wrote:
-> > As discussed at:
-> >    https://lore.kernel.org/all/20250610101331.62ba466f@foz.lan/
-> > 
-> > changeset f061c9f7d058 ("Documentation: Document each netlink family")
-> > added a logic which generates *.rst files inside $(srctree). This is bad
-> > when O=<BUILDDIR> is used.
-> > 
-> > A recent change renamed the yaml files used by Netlink, revealing a bad
-> > side effect: as "make cleandocs" don't clean the produced files and symbols
-> > appear duplicated for people that don't build the kernel from scratch.
-> > 
-> > This series adds an yaml parser extension and uses an index file with glob for
-> > *. We opted to write such extension in a way that no actual yaml conversion
-> > code is inside it. This makes it flexible enough to handle other types of yaml
-> > files in the future. The actual yaml conversion logic were placed at 
-> > netlink_yml_parser.py. 
-> > 
-> > As requested by YNL maintainers, this version has netlink_yml_parser.py
-> > inside tools/net/ynl/pyynl/ directory. I don't like mixing libraries with
-> > binaries, nor to have Python libraries spread all over the Kernel. IMO,
-> > the best is to put all of them on a common place (scripts/lib, python/lib,
-> > lib/python, ...) but, as this can be solved later, for now let's keep it this
-> > way.
-> > 
-> > ---
-> > 
-> > v6:
-> > - YNL doc parser is now at tools/net/ynl/pyynl/lib/doc_generator.py;
-> > - two patches got merged;
-> > - added instructions to test docs with Sphinx 3.4.3 (minimal supported
-> >   version);
-> > - minor fixes.  
-> 
-> Quick tests against Sphinx 3.4.3 using container images based on
-> debian:bullseye and almalinux:9, both of which have 3.4.3 as their distro
-> packages, emits a *bunch* of warnings like the following:
-> 
-> /<srcdir>/Documentation/netlink/specs/conntrack.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-> /<srcdir>/Documentation/netlink/specs/devlink.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-> /<srcdir>/Documentation/netlink/specs/dpll.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-> /<srcdir>/Documentation/netlink/specs/ethtool.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-> /<srcdir>/Documentation/netlink/specs/fou.yaml:: WARNING: YAML parsing error: AttributeError("'Values' object has no attribute 'tab_width'")
-> [...]
-> 
-> I suspect there should be a minimal required minimal version of PyYAML.
+This is a continuation of the work started in [1]. This series largely
+replicates the patterns applied to UDP socket iterators, applying them
+instead to TCP socket iterators.
 
-Likely yes. From my side, I didn't change anything related to PyYAML, 
-except by adding a loader at the latest patch to add line numbers.
+CHANGES
+=======
+v1 -> v2:
+* In patch five ("bpf: tcp: Avoid socket skips and repeats during
+  iteration"), remove unnecessary bucket bounds checks in
+  bpf_iter_tcp_resume. In either case, if st->bucket is outside the
+  current table's range then bpf_iter_tcp_resume_* calls *_get_first
+  which immediately returns NULL anyway and the logic will fall through.
+  (Martin)
+* Add a check at the top of bpf_iter_tcp_resume_listening and
+  bpf_iter_tcp_resume_established to see if we're done with the current
+  bucket and advance it immediately instead of wasting time finding the
+  first matching socket in that bucket with
+  (listening|established)_get_first. In v1, we originally discussed
+  adding logic to advance the bucket in bpf_iter_tcp_seq_next and
+  bpf_iter_tcp_seq_stop, but after trying this the logic seemed harder
+  to track. Overall, keeping everything inside bpf_iter_tcp_resume_*
+  seemed a bit clearer. (Martin)
+* Instead of using a timeout in the last patch ("selftests/bpf: Add
+  tests for bucket resume logic in established sockets") to wait for
+  sockets to leave the ehash table after calling close(), use
+  bpf_sock_destroy to deterministically destroy and remove them. This
+  introduces one more patch ("selftests/bpf: Create iter_tcp_destroy
+  test program") to create the iterator program that destroys a selected
+  socket. Drive this through a destroy() function in the last patch
+  which, just like close(), accepts a socket file descriptor. (Martin)
+* Introduce one more patch ("selftests/bpf: Allow for iteration over
+  multiple states") to fix a latent bug in iter_tcp_soreuse where the
+  sk->sk_state != TCP_LISTEN check was ignored. Add the "ss" variable to
+  allow test code to configure which socket states to allow.
 
-The above warnings don't seem related. So, probably this was already
-an issue.
+[1]: https://lore.kernel.org/bpf/20250502161528.264630-1-jordan@jrife.io/
 
-Funny enough, I did, on my venv:
+Jordan Rife (12):
+  bpf: tcp: Make mem flags configurable through
+    bpf_iter_tcp_realloc_batch
+  bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
+  bpf: tcp: Get rid of st_bucket_done
+  bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch
+    items
+  bpf: tcp: Avoid socket skips and repeats during iteration
+  selftests/bpf: Add tests for bucket resume logic in listening sockets
+  selftests/bpf: Allow for iteration over multiple ports
+  selftests/bpf: Allow for iteration over multiple states
+  selftests/bpf: Make ehash buckets configurable in socket iterator
+    tests
+  selftests/bpf: Create established sockets in socket iterator tests
+  selftests/bpf: Create iter_tcp_destroy test program
+  selftests/bpf: Add tests for bucket resume logic in established
+    sockets
 
-	$ pip install PyYAML==5.1
-	$ tools/net/ynl/pyynl/ynl_gen_rst.py -i Documentation/netlink/specs/dpll.yaml -o Documentation/output/netlink/specs/dpll.rst -v
-	...
-	$ make clean; make SPHINXDIRS="netlink/specs" htmldocs
-	...
+ net/ipv4/tcp_ipv4.c                           | 263 +++++++---
+ .../bpf/prog_tests/sock_iter_batch.c          | 450 +++++++++++++++++-
+ .../selftests/bpf/progs/sock_iter_batch.c     |  37 +-
+ 3 files changed, 668 insertions(+), 82 deletions(-)
 
-but didn't get any issue (I have a later version installed outside
-venv - not sure it it will do the right thing).
+-- 
+2.43.0
 
-That's what I have at venv:
-
------------------------------ ---------
-Package                       Version
------------------------------ ---------
-alabaster                     0.7.13
-babel                         2.17.0
-certifi                       2025.6.15
-charset-normalizer            3.4.2
-docutils                      0.17.1
-idna                          3.10
-imagesize                     1.4.1
-Jinja2                        2.8.1
-MarkupSafe                    1.1.1
-packaging                     25.0
-pip                           25.1.1
-Pygments                      2.19.1
-PyYAML                        5.1
-requests                      2.32.4
-setuptools                    80.1.0
-snowballstemmer               3.0.1
-Sphinx                        3.4.3
-sphinxcontrib-applehelp       1.0.4
-sphinxcontrib-devhelp         1.0.2
-sphinxcontrib-htmlhelp        2.0.1
-sphinxcontrib-jsmath          1.0.1
-sphinxcontrib-qthelp          1.0.3
-sphinxcontrib-serializinghtml 1.1.5
-urllib3                       2.4.0
------------------------------ ---------
-
-> "pip freeze" based on almalinux:9 says:
-> 
->     PyYAML==5.4.1
-> 
-> "pip freeze" based on debian:bullseye says:
-> 
->     PyYAML==5.3.1
-> 
-> What is the minimal required version here?
-
-Breno, what's the minimal version? Please update requirements.txt
-to ensure that, and modify ./scripts/sphinx-pre-install to
-check for it.
-
-> 
-> And if users of those old distros need to manually upgrade PyYAML,
-> why don't you suggest them to upgrade Sphinx as well?
-
-The criteria we used to define minimal version for python/sphinx
-was having them released at the end of 2020/beginning 2021. So,
-up to ~4 years old. We also double-checked latest LTS versions
-from major distros.
-
-With that, PyYAML 5.4.1 met the ~4 years old, and so 5.3.1 and
-5.1.
-
-funny enough:
-
-	$ git grep tab_width Documentation/netlink/
-
-doesn't return anything. Yet, tab_width is used by sphinx
-extensions. The in-kernel ones do it the right way using
-get:
-
-	tab_width = self.options.get('tab-width',
-				     self.state.document.settings.tab_width)
-
-But perhaps some other extension you might have installed on your
-environment has issues, or maybe Documentation/sphinx/parser_yaml.py
-need to expand tabs with certain versions of docutils.
-
-Please compare the versions that you're using on your test
-environment with the ones I used here.
-
-Regards,
-Mauro
 
