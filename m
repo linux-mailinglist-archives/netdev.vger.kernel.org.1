@@ -1,131 +1,100 @@
-Return-Path: <netdev+bounces-198896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CFA3ADE3D6
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:41:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 899FAADE3E4
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 08:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F2F8189CA68
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 06:41:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB84B189CE17
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 06:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BA420B1FC;
-	Wed, 18 Jun 2025 06:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD19D207A32;
+	Wed, 18 Jun 2025 06:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvXLH0gE"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LyRkDIjO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37A020ADCF
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 06:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84B8205E3E;
+	Wed, 18 Jun 2025 06:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750228867; cv=none; b=bcpsB38huF6J1AuYMLbK+gZxTEzrQBtopX3iDQZDqIoLqpyx3s3lbxaFDGtnqiM/Nm2D1l6MMaHtmnJezX/BSwr2+5Jn/XoYGFADduT9xFT8tS1I3l7YWKPzusCv5gRMMycyIf7hzgnRtYdP8BeWT682CdgQaXM3wzbY9BjPheA=
+	t=1750228986; cv=none; b=JpIhVB6SriT+COY/L/fTR1nBlEPhLA1nLVzbH6TRCGIG8Qhm9zPpccO4LLyu45G7m6ECYnAR9oE/XujlfWD8WI2yFmCC/XBQnAVr8Be+/xxxK6sL4OfWkxrSAA5x2YByASI0KzVnMhil/n8D6yqvADPZ5gBz+5Laezvz7JroqXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750228867; c=relaxed/simple;
-	bh=Gyv0Qv0vHzmES2NEobbJjW8Gk4GIjLCH6jynrUiRLUw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s6Whkj3G87Q/Mwvmu0dN4oDs9yy9mxiDLFMrsCN2MZIcH98HMtlCeRT5vknmHHmCVAegWxuMvU+TGY6XPwUWkOdd5QNx6j5+qNRE2+peJwb1FskIIugtAKhnwzG4uFq/xVyQhuZ48dh8H2nEkzXZxtRF8qDbrTr0EkvwFFbGtuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvXLH0gE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88039C4CEE7;
-	Wed, 18 Jun 2025 06:41:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750228867;
-	bh=Gyv0Qv0vHzmES2NEobbJjW8Gk4GIjLCH6jynrUiRLUw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mvXLH0gESVHAELIig1bt1rXmoGC5p+LZknJhN6pm9iBNwncU+A8em/KRIqZa8s197
-	 aQapzSw1guRGZKAGBzxLbm9uTy+bjQNxANoAlqpqL7DdRyvas1KWulHV1hNBDgn7o0
-	 m8cVSj5+6yhzXdL7WkJBAObfX3q7E09++2Epc8WG5dmph58sWmDtcI0WyKy8CYlnA7
-	 BfPYz1Jq1vq4K0LLGKjC4oSgf0E0Xj4RYdMTH8cJblQnm+KE3LStJjqIYGAi9eV6+C
-	 uxtCA0F+WUjM3FFmG4cQG6ZpqRJeHAlGn12Flz8D6gDMrxPNa4C0u1YuCdw4cw1+9q
-	 NmLiAd4bCZEAg==
-Message-ID: <e666e773-556a-4564-b9b2-607b062bfce4@kernel.org>
-Date: Wed, 18 Jun 2025 08:41:03 +0200
+	s=arc-20240116; t=1750228986; c=relaxed/simple;
+	bh=TJUZCm6ddsBdak6VruOCcHc1UW0VdnrNlHVFekdpcOA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=joWDMh+vwnnQbQpLbQSK0xFQUQSMT5fc+jVJmPF06tdd5UQ7GDgg1uT8BXhd2Et8VygUqXlLPK6a8YzStMuLMmRTvrYuV8kgoIsM37/NqYFEPXUHFu5JuDWDmzWcI4CHmyKzf8h8fMEpP/z3GFNwTH6HAkS+IUau+u5r0eiwOWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LyRkDIjO; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55HNXMQg023310;
+	Tue, 17 Jun 2025 23:42:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=TJUZCm6ddsBdak6VruOCcHc1U
+	W0VdnrNlHVFekdpcOA=; b=LyRkDIjOd5tX//Yc3kweBYU6sM3/7DQohOPvITVx2
+	G4AV415wnHRMdAIztoWAdxLAg2RUiRBFZC0b+zGGjsFcWRHNg1x5R9sAjnTDh9en
+	3a74ICYq+OuEw6qsKaPDnftML0RaXPbn53HLUrep2OdN1mpJl/ro7RaUZJieedTS
+	IqOVaxRGeukP9+mH4RlprfUzamDC8/u7UtI7vCl4Mw/AJId1hM4Cy2PedjsAiByn
+	Wj8dwXmIo2CdCehIadhxmPDFDUP56OfSud6xGrVadWhePbf8vUefrvVRBetR0xXB
+	uxfIIWDDP4rCHZUtv+6Y0CCYIidATUjJYGJe23Sm+IjPA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47bj4xrp9u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Jun 2025 23:42:34 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 17 Jun 2025 23:42:34 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 17 Jun 2025 23:42:33 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 81BF83F7043;
+	Tue, 17 Jun 2025 23:42:30 -0700 (PDT)
+Date: Wed, 18 Jun 2025 12:12:29 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <linyunsheng@huawei.com>
+Subject: Re: [RFC]Page pool buffers stuck in App's socket queue
+Message-ID: <20250618064229.GA824830@maili.marvell.com>
+References: <20250616080530.GA279797@maili.marvell.com>
+ <aFHkpVXoAP5JtCzQ@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] nfc: Remove checks for nla_data returning NULL
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20250617-nfc-null-data-v1-1-c7525ead2e95@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250617-nfc-null-data-v1-1-c7525ead2e95@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aFHkpVXoAP5JtCzQ@lore-desk>
+X-Authority-Analysis: v=2.4 cv=ULrdHDfy c=1 sm=1 tr=0 ts=68525fda cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=aV8IDli8uWC4K53TSP0A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE4MDA1NiBTYWx0ZWRfX2pZG7u6c+SW3 V1VVPzPSnryHcHcdQsh/MdJwDeOug2sDpy0qqiyaMNQSekolcHVPFFJmavWeNjSbq/0lG2RH+qj Pn3p0t8Byu8ajtNZhJL7isPlDiVrD0Nrn1CYD1k9fOKHLweE+ODaD9Jb5D53Cb9KSx71ih7ngIi
+ oKeyjEK1bYJdP2Tq4QKMLJX9u2I9CWyotojYmV0DrlAFpNZxDanyR/vIzFWgXL/KiKWck6FmyvT E05ZhkaV7+FRpV4RY6X1Dds/2A4lWf3GgQF1VziL+5RVD2EtE0HLdv+NR5nk3hmz7u4PDjwcD7w LNtWszW9jIme+SgM16NtlUAv9vMB1teoQJhOU8KFWUIS9VVkFPJo7AWIh4Kr+9ynpQu6gbNq65M
+ D8gpQxrGwNLFvTqDEKmsWFWMfmkgnEZ+3+bHJzQuJXfMcE/8VwGqSB43NeHIP4/smAq5XIn/
+X-Proofpoint-GUID: 4brJkww31Ll_X-odFeJyVQUzHLo6Ue6W
+X-Proofpoint-ORIG-GUID: 4brJkww31Ll_X-odFeJyVQUzHLo6Ue6W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-18_02,2025-06-13_01,2025-03-28_01
 
-On 17/06/2025 10:45, Simon Horman wrote:
-> The implementation of nla_data is as follows:
-> 
-> static inline void *nla_data(const struct nlattr *nla)
-> {
-> 	return (char *) nla + NLA_HDRLEN;
-> }
-> 
-> Excluding the case where nla is exactly -NLA_HDRLEN, it will not return
-> NULL. And it seems misleading to assume that it can, other than in this
-> corner case. So drop checks for this condition.
-> 
-> Flagged by Smatch.
-> 
-> Compile tested only.
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
+On 2025-06-18 at 03:26:53, Lorenzo Bianconi (lorenzo.bianconi@redhat.com) wrote:
+>
+> Hi,
+>
+> this problem recall me an issue I had in the past with page_pool
+> and TCP traffic destroying the pool (not sure if it is still valid):
+>
+> https://lore.kernel.org/netdev/ZD2HjZZSOjtsnQaf@lore-desk/
+>
+> Do you have ongoing TCP flows?
+No. it is just ping running. If we kill the ping process, Page pool prints stops.
 
