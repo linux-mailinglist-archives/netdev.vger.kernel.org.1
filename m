@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-198916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59912ADE4D1
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:49:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E968ADE4DE
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A1963BC874
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:49:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4E23BCEB2
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18640253941;
-	Wed, 18 Jun 2025 07:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FujFC+7A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6D227EFE4;
+	Wed, 18 Jun 2025 07:51:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F31944F
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21945274FC1;
+	Wed, 18 Jun 2025 07:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750232994; cv=none; b=pxbWk/ptJ8gdSh0EQr8QCDQIFVjkaczsVSbOrwdex3xXpErtI0vdWtBKM12T+urfsDNa0iXrg0RTG7UOGwTJl/0Ck1zpmb1mffMW7Ag1RzsLeVf209mnwYbj5Y0rM7oSIJx/0+3YnCPBADJ4kE3+JOQi+4ggtOmrRqHWA+x3/Hc=
+	t=1750233080; cv=none; b=SU4yr5Xm38xfj/HEOUvr9CrCVhXFZAYWBs1a4niFkLsAcnIpmDxzndwDPI9+5OIWhWQIvJAiqQCE8TAmiaSKKkjcHo7HpQ26cZDwWpYf2NFllAw+/PEw9GU9cq5frBahACQJPkH5nQ4DWPf26xLgMcse/rvPyIs0iSJTIg3U1c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750232994; c=relaxed/simple;
-	bh=aC64CEq1Onwzg7hQyJBpP3n73y+2vG8xqxjywocSUUI=;
+	s=arc-20240116; t=1750233080; c=relaxed/simple;
+	bh=rAfrW60BLN+fDfYASvZhfQlbeXXKoxyFtavzHgjUXuQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQkard7TwbyYV+HrdDEJfYVjpBPNlcm4HW6UCfJ2AwlW6CE14bCNwwmI9J3Z+LjtFHI7TuDfDVbx0DwKWwXP7UEFY4CkjGgDV/uZhFBCyAS29GTkuSOBs7g/JLMjEslPLIHZJLH1TWvcmVCLRgca2ACpEI8/9Sisz4Q/V047y44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FujFC+7A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9BBC4CEE7;
-	Wed, 18 Jun 2025 07:49:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750232993;
-	bh=aC64CEq1Onwzg7hQyJBpP3n73y+2vG8xqxjywocSUUI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FujFC+7Ahq84E2eCe+Iiou4DRzWv2GhCOKy0IPaIsSQypsdcoCFpIHGUboR85UBkm
-	 FvLILNyJOE7g/IDFE9scsVoaGTGPmbAYEHTLI0DDgydUhYlhYz8XNTmazgJGu6maGL
-	 sLstO3vI5FXbowGzjg2IDWMa9cWPTFyOuT4blRD2K17dPJljo2l3JR02ksGjsWwvpw
-	 dB8NXfC7BKglijPdr4A7aXSCdp9qLPZzk8O5WJwg/9KZJHO4/PG6I5EN22ral76jBS
-	 JAN163WWy4+TW+4GlIraP6DyBcNaAerYnA2/kS1S7mRb4Q0BZtUL5iiSa6NXqIIfBC
-	 1Xi8l+90P9WZg==
-Date: Wed, 18 Jun 2025 09:49:51 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qEn55u8q6u/ca/OcI2trQ7pPVzDyO9XFTvhIjugxLntk5b/bxLI27ElcCvs4dNhEcn6xWeG8vZsRWZ/F2bLnD65caUvt9rr90Pq75oiWAXf6wONZ96xZSlG8LgpEdoZmoJMFUwh+QQ3uy29Faz3/QlGrTHdyl4dT/yiS4r6OYPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6071ac9dc3eso11484307a12.1;
+        Wed, 18 Jun 2025 00:51:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750233077; x=1750837877;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K2Oawlv3qlJ5B14XZ51kOBRIKyOtdglt4ohJphGiBj4=;
+        b=dqaVDwwweU2tHiG9Bv2WqCV3TtKQnbWylwJ3WjhXG8XJdi2Yr6w3IxxXGmGih1flop
+         EdXxE+1UtuhOHXyLeMolprIF8xrCEPKpwtPWoxbYtIFJEyQ9Xr5EWk7IOVEz3gTzkwGC
+         lh4FHUVvPpkBOcwjfaiE5DbLEzDloHALF1BMojSu1ILX1lVV1XC7z770P1nUsnqfPAaK
+         +lN9gYdoK+N0W6H0DoHsXjv6pjyVeR3AGgQ5M8wIcF4K09O9xqIAWJAEgvi2WR399pVD
+         CSuP/ETq6ALCU/NGZAwvCh09YprT1QTGVEdxOFj7busBWB5abL8M7mX0xsb/elwyAIwD
+         BSiw==
+X-Forwarded-Encrypted: i=1; AJvYcCV6nBc54X0BNqamileJV78i/upr/mE918cXc1APG6hqRoNUpc5bO1hn6H+fAk4Oq2hyKFuyf1KDJvo=@vger.kernel.org, AJvYcCVY0s0xdgoqdifsR7C9MtBJIN1weaU/ts2z6zIVSKIxbvdkz1csHeaa1cdX2ptuzgu5bfHqOxVR@vger.kernel.org, AJvYcCW6TSERJJ33aCC3bq6bdbtVkMY2kpp6iQIKRjqO7XVuQK4+gFjJp6WKilbP2JpouCiAGIN53yaIfBEuv/6H@vger.kernel.org, AJvYcCWRxUGseCAHX2p90aXPv+fihsbVs2efZpg3Y+ypsFokZgDBmpyxwl8EmBR7osfN80he8o/K7K7S+khAK3g9Zm6n@vger.kernel.org
+X-Gm-Message-State: AOJu0YwA/JLZEoNXSHquKgYXwlRI8CULEkWtsd/TDS/F5zyVsT4UhQap
+	5RFHm/xUf5sUgnms3CaLR/xRMIhcNAAH2TvBNdfXRfEHnnCbOvNUK9RG
+X-Gm-Gg: ASbGncsVP+1ORgCdlPbrtWJdRdsIQAvJCwD+UvitvFkOKF9ety/gw6+6LBkOCrSwMoe
+	ALH80YedVSOAX5wX5ay6F2iMWQgR/iYz1IfCYBXqoEYyyY6BPORjYLJiI3mde9UNWIxRrKIwy4i
+	gyxHCFx70gBCEqkxcRPVS2G1a+E21NHLIMNJuv37P1LW8abBz3C4gTw32/d3NYLV9T7Yq+w2riN
+	o8cZwznKDmH/6sff5IRzmywkL0KaZo5WmfSI4SE76jeCDvQ/EQethP9+JsbF4KFh8LmhbwlidXH
+	G4ZW8xOpdmSxI2QX2r2kh3aCxy2/Fmb+cCOW5Gy7BJvxbdnEf77W
+X-Google-Smtp-Source: AGHT+IEROA+4lveuN1ZdmzI6YFzyyJzoc5RM1e8Cc9lT3Mb4GkQQtqkmyGFKaOws5hWV84IJgQt/FQ==
+X-Received: by 2002:a05:6402:5188:b0:607:f55d:7c56 with SMTP id 4fb4d7f45d1cf-608d097a0a3mr16221027a12.25.1750233077168;
+        Wed, 18 Jun 2025 00:51:17 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-608b4a92ea2sm9265967a12.60.2025.06.18.00.51.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jun 2025 00:51:16 -0700 (PDT)
+Date: Wed, 18 Jun 2025 00:51:14 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/2] net: airoha: Improve hwfd
- buffer/descriptor queues setup
-Message-ID: <aFJvnxVVM_sdSpKX@lore-desk>
-References: <20250616-airoha-hw-num-desc-v2-0-bb328c0b8603@kernel.org>
- <20250617183244.641d9cd3@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v3 3/5] netconsole: append msgid to sysdata
+Message-ID: <aFJv8gGqCBZr6gOb@gmail.com>
+References: <20250616-netconsole-msgid-v3-0-4d2610577571@gmail.com>
+ <20250616-netconsole-msgid-v3-3-4d2610577571@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="v6JufC9cwr1xoEbW"
-Content-Disposition: inline
-In-Reply-To: <20250617183244.641d9cd3@kernel.org>
-
-
---v6JufC9cwr1xoEbW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250616-netconsole-msgid-v3-3-4d2610577571@gmail.com>
 
-> On Mon, 16 Jun 2025 15:45:39 +0200 Lorenzo Bianconi wrote:
-> > Compute the number of hwfd buffers/descriptors according to the reserved
-> > memory size if provided via DTS.
-> > Reduce the required hwfd buffers queue size for QDMA1.
->=20
-> Same question regarding target tree, FWIW
+On Mon, Jun 16, 2025 at 10:08:37AM -0700, Gustavo Luiz Duarte wrote:
+> Add msgcounter to the netconsole_target struct to generate message IDs.
+> If the msgid_enabled attribute is true, increment msgcounter and append
+> msgid=<msgcounter> to sysdata buffer before sending the message.
+> 
+> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
 
-ack, fine. I will post v3 targeting net tree.
-
-Regards,
-Lorenzo
-
---v6JufC9cwr1xoEbW
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaFJvnwAKCRA6cBh0uS2t
-rHwQAQDRWhuDKkooK+3SdVhoIcSjVlWNQW9cx1j+py4qwhHrxwD/REl0bOTp+6/n
-fZd/+nOnfqJphhHl2l5TM92s7tbawAI=
-=pcct
------END PGP SIGNATURE-----
-
---v6JufC9cwr1xoEbW--
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
