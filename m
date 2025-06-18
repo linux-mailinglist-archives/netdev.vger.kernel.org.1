@@ -1,279 +1,403 @@
-Return-Path: <netdev+bounces-198866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C8FADE10B
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 04:18:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A36AAADE200
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 06:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F2EF189B400
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 02:19:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 720AB3B37DB
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 04:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32DF218CC1C;
-	Wed, 18 Jun 2025 02:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F301E1E1C;
+	Wed, 18 Jun 2025 04:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="byoVeCZu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWpYJPg5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F0512E5B;
-	Wed, 18 Jun 2025 02:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6549443
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 04:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750213120; cv=none; b=SoUYm/lEIfPd8K2acVqHfWAK3f1oQIV34dChwYmGB56dSUoGuVE7KweTxXgoLaOYFgkdq+9Ve1rsz7zbjE/hAHPektGyY0GUkM0KfNU7bTOqGTAXC7I4EtrKvV8Ct5Y41gQmFEJGk3r57ak0LpPGqUpu9HsduMzbOHMXxKZ4itM=
+	t=1750219720; cv=none; b=EzjxhsUASbXg3lXotrFjEVHd1SycOvIFBnLYjPA8XZgAMIpbXb1X/VwVG2xmCwWxN24mjXtBY5OYVKxdzik+N/Q8fG1mx17SbbYiNBZZYttJIQLTw1bGehOTOktKXyu/YY9iQ0EWAgGUorTySeX34aSuD0IxtPBRm9lR1AbuY0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750213120; c=relaxed/simple;
-	bh=FeQphIc5D1myg11vQruSQmO3Z93PdqqImp9iOYt4LXA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gYmAK9JRqb9qpSGO3f08vcO8OX9rfjpWLwa0djAJG/8rLTr3G3P85dK4RrTnzs+W9sJ+OlRqyf+ScyMq/eBLqIz1iJXRkQ3+0dgyot+Wq09FaZI6r48mRSF3/Vsp1Nz2pA3HJRbnn6MIZacrqwGpYDnWW50L1vboOyOh+SB3OIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=byoVeCZu; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750213119; x=1781749119;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=FeQphIc5D1myg11vQruSQmO3Z93PdqqImp9iOYt4LXA=;
-  b=byoVeCZuDYHFVtLDQatUw0Rzb6CtBFeA5oyXVIg9qYQGcDsRpMYizpld
-   ZgPVOYhAphvnKk4KZSEJKWDI3UFRNkFj6ZPwtcm++iixAjpU/XVJ1ofav
-   s0iL656Q49cIWaUCFXw7EjRUvgJlgrmVOKBs7gDRabs0lRDLp7JH3TWt6
-   YwCOrxL6cBUioY+sQGyW4HdSqadRvExYFF+f24E3O86GojZdvHgEWWV+m
-   UahXiWkCnNsjlnqfiPaeCXIiSFLIze7xWF2Zk1HfNtWtOJkrb7hiSTgUs
-   s2IX975vlOiyMJP8+mcSRLPCi/Fz1HReVskkOvKST2MvLn23uUz4tMtaY
-   w==;
-X-CSE-ConnectionGUID: hJPn5559RF2GEpqUwXu6mg==
-X-CSE-MsgGUID: qOJyEes4S3CErVtZTxfOdA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11467"; a="56217704"
-X-IronPort-AV: E=Sophos;i="6.16,245,1744095600"; 
-   d="scan'208";a="56217704"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2025 19:18:38 -0700
-X-CSE-ConnectionGUID: PVpardVjR1eUwYbuL/jfqg==
-X-CSE-MsgGUID: 4lRf095TRCO1+tzLM2P/TA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,245,1744095600"; 
-   d="scan'208";a="153918946"
-Received: from unknown (HELO CannotLeaveINTEL.bj.intel.com) ([10.238.153.146])
-  by fmviesa005.fm.intel.com with ESMTP; 17 Jun 2025 19:18:35 -0700
-From: Jun Miao <jun.miao@intel.com>
-To: kuba@kernel.org,
-	sbhatta@marvell.com,
-	oneukum@suse.com
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	qiang.zhang@linux.dev,
-	jun.miao@intel.com
-Subject: [PATCH v5] net: usb: Convert tasklet API to new bottom half workqueue mechanism
-Date: Wed, 18 Jun 2025 01:05:59 -0400
-Message-ID: <20250618050559.64974-1-jun.miao@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750219720; c=relaxed/simple;
+	bh=tn/TdDXPi2al9D390UfpiitwUmNbEGwyZdXh8zW6K8M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a7QBBSFMZ7OpXee0iTOCXT1vW9y7PdbIVpxzHeFD6wUmYIK8u+32vic0u6yeGj2oykbdqTPNf8lGYCVbFmgFb0mMJkwd4XzNKkZDn+FwA+oiRzEsKTVXUv++9XqAtx75A9P3lE4eTFVUYXJG1aPLIZehPgLjNAGOJyoD6/Zsm7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LWpYJPg5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750219717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Mtt2cOVxjAFmRWRVU9+CcWDTLQU+MQ3stdwXHiJD/nw=;
+	b=LWpYJPg5UYBmqEwhv0d0bPr23mGYcHlD4I3ZqYljUNghQejkMpEO1Vim84AMKpKHKHq1Iw
+	uH1WKX5Fvz3/uen6QB5fB4DCQqQkQXSk5B3E3kjzfjwAnhQY/DeGG022z8oGqje7dM1aNP
+	PoaYSU/aQpfgnPjIcxBhUsqo0z5PuVE=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-572-5_jTi8BqPvWexjXpDAfaag-1; Wed, 18 Jun 2025 00:08:35 -0400
+X-MC-Unique: 5_jTi8BqPvWexjXpDAfaag-1
+X-Mimecast-MFC-AGG-ID: 5_jTi8BqPvWexjXpDAfaag_1750219714
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3141a9a6888so2625646a91.3
+        for <netdev@vger.kernel.org>; Tue, 17 Jun 2025 21:08:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750219714; x=1750824514;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mtt2cOVxjAFmRWRVU9+CcWDTLQU+MQ3stdwXHiJD/nw=;
+        b=NFYQp1q9FmOiXm29ddqTho6IBYJAEPIQYgpud9hiyZLdMng9ZV+UfhLVDcmhowpyOH
+         PcxwzIkB9+tXTpebZ2Tb6Ve6qZ+YE+hEJwMTUxine2R6SHceAhLkRs4jqYBIhai7CMdh
+         DPaWPlmy5b5ivIkFxR6zrAU0AcgWlvwoTxtQ+84tBIwF6FfrAit4jXXBaOS7O7ljAbXq
+         bF/dlxl1EtKPmn2JXqSHwtGd2HGlBXxdQcDl9rLLgqHklrzXUqQYqMuF/X35yEN3vtjk
+         XZRIsgmW21AFFpN1/pEMGoXBlEPMOjZVtsZhrWdDL0VhVkcokTw02lyQDz6cTsXZJwNz
+         W0Qg==
+X-Gm-Message-State: AOJu0Yw3pQHfP0ITILjd/SwVOHVDOqzmj2HRyEkXmicAYEE1tHrK8J6N
+	R4kCjd2o7ePu+Txxcjj/YOUl1oQgCiUg/2J0x+R9GFuQ6bK+jRaKZB9La650IbtU7ED/tO7flZm
+	azmEeBiRYxBHbSwuvK0bwNcEfjLGybASbp6yVcLdn+ltsfnGHeIXNIN6iYHoRr921Nd4ftV7EXr
+	jOZVQqZnxJO+5da6oSqowiuC25B0uZ064PIi10EuVactJsLZJ5IBA=
+X-Gm-Gg: ASbGncsB5sMaegILyq2EjpVVGnrS21o3Bdgu4mYuKEN2WTm3qq3VvDxQ7B6EhrqB2Ns
+	8D/ibmiW6HD9pd5n7Jq5P1rab7zmEYeSazDocAJLGBcmpGGj1RaO13aeHfvWs3P+catpii0TAE3
+	GRbw==
+X-Received: by 2002:a17:90b:540e:b0:311:ed2:b758 with SMTP id 98e67ed59e1d1-313f1c7d714mr20163416a91.3.1750219713985;
+        Tue, 17 Jun 2025 21:08:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEa2/1PdLUIf4h1Rlj/M6ElO1/mH9EJyXR7wmTVi2lKwTUNmQdqNSU5N2GsI7IzTdd/noqx3Wy9mt3KKPbMeEw=
+X-Received: by 2002:a17:90b:540e:b0:311:ed2:b758 with SMTP id
+ 98e67ed59e1d1-313f1c7d714mr20163363a91.3.1750219713420; Tue, 17 Jun 2025
+ 21:08:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1750176076.git.pabeni@redhat.com> <5385db79f3fdb59c8cbf235ef4453122ef19ae7e.1750176076.git.pabeni@redhat.com>
+In-Reply-To: <5385db79f3fdb59c8cbf235ef4453122ef19ae7e.1750176076.git.pabeni@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 18 Jun 2025 12:08:22 +0800
+X-Gm-Features: AX0GCFvgJ389CNybsy-Dxvb3-L-kxxF25p6HZmf86adSbavIKD9VmokLiy0UViI
+Message-ID: <CACGkMEsx-pcwC=_-cMMMdGZ=E5P-5W=4YoivMQiy=FB1W7GKog@mail.gmail.com>
+Subject: Re: [PATCH v4 net-next 5/8] net: implement virtio helpers to handle
+ UDP GSO tunneling.
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Migrate tasklet APIs to the new bottom half workqueue mechanism. It
-replaces all occurrences of tasklet usage with the appropriate workqueue
-APIs throughout the usbnet driver. This transition ensures compatibility
-with the latest design and enhances performance.
+On Wed, Jun 18, 2025 at 12:13=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> The virtio specification are introducing support for GSO over UDP
+> tunnel.
+>
+> This patch brings in the needed defines and the additional virtio hdr
+> parsing/building helpers.
+>
+> The UDP tunnel support uses additional fields in the virtio hdr, and such
+> fields location can change depending on other negotiated features -
+> specifically VIRTIO_NET_F_HASH_REPORT.
+>
+> Try to be as conservative as possible with the new field validation.
+>
+> Existing implementation for plain GSO offloads allow for invalid/
+> self-contradictory values of such fields. With GSO over UDP tunnel we can
+> be more strict, with no need to deal with legacy implementation.
+>
+> Since the checksum-related field validation is asymmetric in the driver
+> and in the device, introduce a separate helper to implement the new check=
+s
+> (to be used only on the driver side).
+>
+> Note that while the feature space exceeds the 64-bit boundaries, the
+> guest offload space is fixed by the specification of the
+> VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET command to a 64-bit size.
+>
+> Prior to the UDP tunnel GSO support, each guest offload bit corresponded
+> to the feature bit with the same value and vice versa.
+>
+> Due to the limited 'guest offload' space, relevant features in the high
+> 64 bits are 'mapped' to free bits in the lower range. That is simpler
+> than defining a new command (and associated features) to exchange an
+> extended guest offloads set.
+>
+> As a consequence, the uAPIs also specify the mapped guest offload value
+> corresponding to the UDP tunnel GSO features.
+>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> --
+> v3 -> v4:
+>   - fixed offset for UDP GSO tunnel, update accordingly the helpers
+>   - tried to clarified vlan_hlen semantic
+>   - virtio_net_chk_data_valid() -> virtio_net_handle_csum_offload()
+>
+> v2 -> v3:
+>   - add definitions for possible vnet hdr layouts with tunnel support
+>
+> v1 -> v2:
+>   - 'relay' -> 'rely' typo
+>   - less unclear comment WRT enforced inner GSO checks
+>   - inner header fields are allowed only with 'modern' virtio,
+>     thus are always le
+>   - clarified in the commit message the need for 'mapped features'
+>     defines
+>   - assume little_endian is true when UDP GSO is enabled.
+>   - fix inner proto type value
+> ---
+>  include/linux/virtio_net.h      | 196 ++++++++++++++++++++++++++++++--
+>  include/uapi/linux/virtio_net.h |  33 ++++++
+>  2 files changed, 221 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> index 02a9f4dc594d..449487c914a8 100644
+> --- a/include/linux/virtio_net.h
+> +++ b/include/linux/virtio_net.h
+> @@ -47,9 +47,9 @@ static inline int virtio_net_hdr_set_proto(struct sk_bu=
+ff *skb,
+>         return 0;
+>  }
+>
+> -static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> -                                       const struct virtio_net_hdr *hdr,
+> -                                       bool little_endian)
+> +static inline int __virtio_net_hdr_to_skb(struct sk_buff *skb,
+> +                                         const struct virtio_net_hdr *hd=
+r,
+> +                                         bool little_endian, u8 hdr_gso_=
+type)
+>  {
+>         unsigned int nh_min_len =3D sizeof(struct iphdr);
+>         unsigned int gso_type =3D 0;
+> @@ -57,8 +57,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff =
+*skb,
+>         unsigned int p_off =3D 0;
+>         unsigned int ip_proto;
+>
+> -       if (hdr->gso_type !=3D VIRTIO_NET_HDR_GSO_NONE) {
+> -               switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
+> +       if (hdr_gso_type !=3D VIRTIO_NET_HDR_GSO_NONE) {
+> +               switch (hdr_gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
+>                 case VIRTIO_NET_HDR_GSO_TCPV4:
+>                         gso_type =3D SKB_GSO_TCPV4;
+>                         ip_proto =3D IPPROTO_TCP;
+> @@ -84,7 +84,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff =
+*skb,
+>                         return -EINVAL;
+>                 }
+>
+> -               if (hdr->gso_type & VIRTIO_NET_HDR_GSO_ECN)
+> +               if (hdr_gso_type & VIRTIO_NET_HDR_GSO_ECN)
+>                         gso_type |=3D SKB_GSO_TCP_ECN;
+>
+>                 if (hdr->gso_size =3D=3D 0)
+> @@ -122,7 +122,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buf=
+f *skb,
+>
+>                                 if (!protocol)
+>                                         virtio_net_hdr_set_proto(skb, hdr=
+);
+> -                               else if (!virtio_net_hdr_match_proto(prot=
+ocol, hdr->gso_type))
+> +                               else if (!virtio_net_hdr_match_proto(prot=
+ocol, hdr_gso_type))
+>                                         return -EINVAL;
+>                                 else
+>                                         skb->protocol =3D protocol;
+> @@ -153,7 +153,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buf=
+f *skb,
+>                 }
+>         }
+>
+> -       if (hdr->gso_type !=3D VIRTIO_NET_HDR_GSO_NONE) {
+> +       if (hdr_gso_type !=3D VIRTIO_NET_HDR_GSO_NONE) {
+>                 u16 gso_size =3D __virtio16_to_cpu(little_endian, hdr->gs=
+o_size);
+>                 unsigned int nh_off =3D p_off;
+>                 struct skb_shared_info *shinfo =3D skb_shinfo(skb);
+> @@ -199,6 +199,13 @@ static inline int virtio_net_hdr_to_skb(struct sk_bu=
+ff *skb,
+>         return 0;
+>  }
+>
+> +static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> +                                       const struct virtio_net_hdr *hdr,
+> +                                       bool little_endian)
+> +{
+> +       return __virtio_net_hdr_to_skb(skb, hdr, little_endian, hdr->gso_=
+type);
+> +}
+> +
+>  static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
+>                                           struct virtio_net_hdr *hdr,
+>                                           bool little_endian,
+> @@ -242,4 +249,177 @@ static inline int virtio_net_hdr_from_skb(const str=
+uct sk_buff *skb,
+>         return 0;
+>  }
+>
+> +static inline unsigned int virtio_l3min(bool is_ipv6)
+> +{
+> +       return is_ipv6 ? sizeof(struct ipv6hdr) : sizeof(struct iphdr);
+> +}
+> +
+> +static inline int
+> +virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
+> +                         const struct virtio_net_hdr_v1_hash_tunnel *vhd=
+r,
+> +                         bool tnl_hdr_negotiated,
+> +                         bool tnl_csum_negotiated,
+> +                         bool little_endian)
+> +{
+> +       const struct virtio_net_hdr *hdr =3D (const struct virtio_net_hdr=
+ *)vhdr;
+> +       unsigned int inner_nh, outer_th, inner_th;
+> +       unsigned int inner_l3min, outer_l3min;
+> +       u8 gso_inner_type, gso_tunnel_type;
+> +       bool outer_isv6, inner_isv6;
+> +       int ret;
+> +
+> +       gso_tunnel_type =3D hdr->gso_type & VIRTIO_NET_HDR_GSO_UDP_TUNNEL=
+;
+> +       if (!gso_tunnel_type)
+> +               return virtio_net_hdr_to_skb(skb, hdr, little_endian);
+> +
+> +       /* Tunnel not supported/negotiated, but the hdr asks for it. */
+> +       if (!tnl_hdr_negotiated)
+> +               return -EINVAL;
+> +
+> +       /* Either ipv4 or ipv6. */
+> +       if (gso_tunnel_type =3D=3D VIRTIO_NET_HDR_GSO_UDP_TUNNEL)
+> +               return -EINVAL;
+> +
+> +       /* The UDP tunnel must carry a GSO packet, but no UFO. */
+> +       gso_inner_type =3D hdr->gso_type & ~(VIRTIO_NET_HDR_GSO_ECN |
+> +                                          VIRTIO_NET_HDR_GSO_UDP_TUNNEL)=
+;
+> +       if (!gso_inner_type || gso_inner_type =3D=3D VIRTIO_NET_HDR_GSO_U=
+DP)
+> +               return -EINVAL;
+> +
+> +       /* Rely on csum being present. */
+> +       if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM))
+> +               return -EINVAL;
+> +
+> +       /* Validate offsets. */
+> +       outer_isv6 =3D gso_tunnel_type & VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IP=
+V6;
+> +       inner_isv6 =3D gso_inner_type =3D=3D VIRTIO_NET_HDR_GSO_TCPV6;
+> +       inner_l3min =3D virtio_l3min(inner_isv6);
+> +       outer_l3min =3D ETH_HLEN + virtio_l3min(outer_isv6);
+> +
+> +       inner_th =3D __virtio16_to_cpu(little_endian, hdr->csum_start);
+> +       inner_nh =3D le16_to_cpu(vhdr->inner_nh_offset);
+> +       outer_th =3D le16_to_cpu(vhdr->outer_th_offset);
+> +       if (outer_th < outer_l3min ||
+> +           inner_nh < outer_th + sizeof(struct udphdr) ||
+> +           inner_th < inner_nh + inner_l3min)
+> +               return -EINVAL;
+> +
+> +       /* Let the basic parsing deal with plain GSO features. */
+> +       ret =3D __virtio_net_hdr_to_skb(skb, hdr, true,
+> +                                     hdr->gso_type & ~gso_tunnel_type);
+> +       if (ret)
+> +               return ret;
+> +
+> +       /* In case of USO, the inner protocol is still unknown and
+> +        * `inner_isv6` is just a guess, additional parsing is needed.
+> +        * The previous validation ensures that accessing an ipv4 inner
+> +        * network header is safe.
+> +        */
+> +       if (gso_inner_type =3D=3D VIRTIO_NET_HDR_GSO_UDP_L4) {
+> +               struct iphdr *iphdr =3D (struct iphdr *)(skb->data + inne=
+r_nh);
+> +
+> +               inner_isv6 =3D iphdr->version =3D=3D 6;
+> +               inner_l3min =3D virtio_l3min(inner_isv6);
+> +               if (inner_th < inner_nh + inner_l3min)
+> +                       return -EINVAL;
+> +       }
+> +
+> +       skb_set_inner_protocol(skb, inner_isv6 ? htons(ETH_P_IPV6) :
+> +                                                htons(ETH_P_IP));
+> +       if (hdr->flags & VIRTIO_NET_HDR_F_UDP_TUNNEL_CSUM) {
+> +               if (!tnl_csum_negotiated)
+> +                       return -EINVAL;
+> +
+> +               skb_shinfo(skb)->gso_type |=3D SKB_GSO_UDP_TUNNEL_CSUM;
+> +       } else {
+> +               skb_shinfo(skb)->gso_type |=3D SKB_GSO_UDP_TUNNEL;
+> +       }
+> +
+> +       skb->inner_transport_header =3D inner_th + skb_headroom(skb);
+> +       skb->inner_network_header =3D inner_nh + skb_headroom(skb);
+> +       skb->inner_mac_header =3D inner_nh + skb_headroom(skb);
+> +       skb->transport_header =3D outer_th + skb_headroom(skb);
+> +       skb->encapsulation =3D 1;
+> +       return 0;
+> +}
+> +
+> +/* Checksum-related fields validation for the driver */
+> +static inline int virtio_net_handle_csum_offload(struct sk_buff *skb,
+> +                                                struct virtio_net_hdr *h=
+dr,
+> +                                                bool tnl_csum_negotiated=
+)
+> +{
+> +       if (!(hdr->gso_type & VIRTIO_NET_HDR_GSO_UDP_TUNNEL)) {
+> +               if (!(hdr->flags & VIRTIO_NET_HDR_F_DATA_VALID))
+> +                       return 0;
+> +
+> +               skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> +               if (!(hdr->flags & VIRTIO_NET_HDR_F_UDP_TUNNEL_CSUM))
+> +                       return 0;
+> +
+> +               /* tunnel csum packets are invalid when the related
+> +                * feature has not been negotiated
+> +                */
+> +               if (!tnl_csum_negotiated)
+> +                       return -EINVAL;
+> +               skb->csum_level =3D 1;
+> +               return 0;
+> +       }
+> +
+> +       /* DATA_VALID is mutually exclusive with NEEDS_CSUM, and GSO
+> +        * over UDP tunnel requires the latter
+> +        */
+> +       if (hdr->flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> +               return -EINVAL;
+> +       return 0;
+> +}
+> +
+> +/*
+> + * vlan_hlen always refers to the outermost MAC header. That also
+> + * means it refers to the only MAC header, if the packet does not carry
+> + * any encapsulation.
+> + */
+> +static inline int
+> +virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
+> +                           struct virtio_net_hdr_v1_hash_tunnel *vhdr,
+> +                           bool tnl_hdr_negotiated,
+> +                           bool little_endian,
 
-As suggested by Jakub, we have used the system workqueue to schedule on
-(system_bh_wq), so the action performed is usbnet_bh_work() instead of
-usbnet_bh_workqueue() to replace the usbnet_bh_tasklet().
+Nit: it looks to me we can just accept netdev_features_t here.
 
-Signed-off-by: Jun Miao <jun.miao@intel.com>
----
-v1->v2:
-    Check patch warning, delete the more spaces.
-v2->v3:
-    Fix the kernel test robot noticed the following build errors:
-    >> drivers/net/usb/usbnet.c:1974:47: error: 'struct usbnet' has no member named 'bh'
-v3->v4:
-	Keep "GFP_ATOMIC" flag as it is.
-	If someone want to change the flags (which Im not sure is correct) it should be a separate commit.
+Others look good.
 
-v4->v5:
-	As suggested by Jakub, we have used the system workqueue to schedule on(system_bh_wq), 
-	replace the workqueue with work in usbnet_bh_workqueue() and the comments.
----
- drivers/net/usb/usbnet.c   | 36 ++++++++++++++++++------------------
- include/linux/usb/usbnet.h |  2 +-
- 2 files changed, 19 insertions(+), 19 deletions(-)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index c39dfa17813a..234d47bbfec8 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -461,7 +461,7 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
- 
- 	__skb_queue_tail(&dev->done, skb);
- 	if (dev->done.qlen == 1)
--		tasklet_schedule(&dev->bh);
-+		queue_work(system_bh_wq, &dev->bh_work);
- 	spin_unlock(&dev->done.lock);
- 	spin_unlock_irqrestore(&list->lock, flags);
- 	return old_state;
-@@ -549,7 +549,7 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
- 		default:
- 			netif_dbg(dev, rx_err, dev->net,
- 				  "rx submit, %d\n", retval);
--			tasklet_schedule (&dev->bh);
-+			queue_work(system_bh_wq, &dev->bh_work);
- 			break;
- 		case 0:
- 			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
-@@ -709,7 +709,7 @@ void usbnet_resume_rx(struct usbnet *dev)
- 		num++;
- 	}
- 
--	tasklet_schedule(&dev->bh);
-+	queue_work(system_bh_wq, &dev->bh_work);
- 
- 	netif_dbg(dev, rx_status, dev->net,
- 		  "paused rx queue disabled, %d skbs requeued\n", num);
-@@ -778,7 +778,7 @@ void usbnet_unlink_rx_urbs(struct usbnet *dev)
- {
- 	if (netif_running(dev->net)) {
- 		(void) unlink_urbs (dev, &dev->rxq);
--		tasklet_schedule(&dev->bh);
-+		queue_work(system_bh_wq, &dev->bh_work);
- 	}
- }
- EXPORT_SYMBOL_GPL(usbnet_unlink_rx_urbs);
-@@ -861,14 +861,14 @@ int usbnet_stop (struct net_device *net)
- 	/* deferred work (timer, softirq, task) must also stop */
- 	dev->flags = 0;
- 	timer_delete_sync(&dev->delay);
--	tasklet_kill(&dev->bh);
-+	disable_work_sync(&dev->bh_work);
- 	cancel_work_sync(&dev->kevent);
- 
- 	/* We have cyclic dependencies. Those calls are needed
- 	 * to break a cycle. We cannot fall into the gaps because
- 	 * we have a flag
- 	 */
--	tasklet_kill(&dev->bh);
-+	disable_work_sync(&dev->bh_work);
- 	timer_delete_sync(&dev->delay);
- 	cancel_work_sync(&dev->kevent);
- 
-@@ -955,7 +955,7 @@ int usbnet_open (struct net_device *net)
- 	clear_bit(EVENT_RX_KILL, &dev->flags);
- 
- 	// delay posting reads until we're fully open
--	tasklet_schedule (&dev->bh);
-+	queue_work(system_bh_wq, &dev->bh_work);
- 	if (info->manage_power) {
- 		retval = info->manage_power(dev, 1);
- 		if (retval < 0) {
-@@ -1123,7 +1123,7 @@ static void __handle_link_change(struct usbnet *dev)
- 		 */
- 	} else {
- 		/* submitting URBs for reading packets */
--		tasklet_schedule(&dev->bh);
-+		queue_work(system_bh_wq, &dev->bh_work);
- 	}
- 
- 	/* hard_mtu or rx_urb_size may change during link change */
-@@ -1198,11 +1198,11 @@ usbnet_deferred_kevent (struct work_struct *work)
- 		} else {
- 			clear_bit (EVENT_RX_HALT, &dev->flags);
- 			if (!usbnet_going_away(dev))
--				tasklet_schedule(&dev->bh);
-+				queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
--	/* tasklet could resubmit itself forever if memory is tight */
-+	/* work could resubmit itself forever if memory is tight */
- 	if (test_bit (EVENT_RX_MEMORY, &dev->flags)) {
- 		struct urb	*urb = NULL;
- 		int resched = 1;
-@@ -1224,7 +1224,7 @@ usbnet_deferred_kevent (struct work_struct *work)
- fail_lowmem:
- 			if (resched)
- 				if (!usbnet_going_away(dev))
--					tasklet_schedule(&dev->bh);
-+					queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
-@@ -1325,7 +1325,7 @@ void usbnet_tx_timeout (struct net_device *net, unsigned int txqueue)
- 	struct usbnet		*dev = netdev_priv(net);
- 
- 	unlink_urbs (dev, &dev->txq);
--	tasklet_schedule (&dev->bh);
-+	queue_work(system_bh_wq, &dev->bh_work);
- 	/* this needs to be handled individually because the generic layer
- 	 * doesn't know what is sufficient and could not restore private
- 	 * information if a remedy of an unconditional reset were used.
-@@ -1547,7 +1547,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
- 
- /*-------------------------------------------------------------------------*/
- 
--// tasklet (work deferred from completions, in_irq) or timer
-+// work (work deferred from completions, in_irq) or timer
- 
- static void usbnet_bh (struct timer_list *t)
- {
-@@ -1601,16 +1601,16 @@ static void usbnet_bh (struct timer_list *t)
- 					  "rxqlen %d --> %d\n",
- 					  temp, dev->rxq.qlen);
- 			if (dev->rxq.qlen < RX_QLEN(dev))
--				tasklet_schedule (&dev->bh);
-+				queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 		if (dev->txq.qlen < TX_QLEN (dev))
- 			netif_wake_queue (dev->net);
- 	}
- }
- 
--static void usbnet_bh_tasklet(struct tasklet_struct *t)
-+static void usbnet_bh_work(struct work_struct *work)
- {
--	struct usbnet *dev = from_tasklet(dev, t, bh);
-+	struct usbnet *dev = from_work(dev, work, bh_work);
- 
- 	usbnet_bh(&dev->delay);
- }
-@@ -1742,7 +1742,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
- 	skb_queue_head_init (&dev->txq);
- 	skb_queue_head_init (&dev->done);
- 	skb_queue_head_init(&dev->rxq_pause);
--	tasklet_setup(&dev->bh, usbnet_bh_tasklet);
-+	INIT_WORK(&dev->bh_work, usbnet_bh_work);
- 	INIT_WORK (&dev->kevent, usbnet_deferred_kevent);
- 	init_usb_anchor(&dev->deferred);
- 	timer_setup(&dev->delay, usbnet_bh, 0);
-@@ -1971,7 +1971,7 @@ int usbnet_resume (struct usb_interface *intf)
- 
- 			if (!(dev->txq.qlen >= TX_QLEN(dev)))
- 				netif_tx_wake_all_queues(dev->net);
--			tasklet_schedule (&dev->bh);
-+			queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
-diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
-index 0b9f1e598e3a..208682f77179 100644
---- a/include/linux/usb/usbnet.h
-+++ b/include/linux/usb/usbnet.h
-@@ -58,7 +58,7 @@ struct usbnet {
- 	unsigned		interrupt_count;
- 	struct mutex		interrupt_mutex;
- 	struct usb_anchor	deferred;
--	struct tasklet_struct	bh;
-+	struct work_struct	bh_work;
- 
- 	struct work_struct	kevent;
- 	unsigned long		flags;
--- 
-2.43.0
+Thanks
 
 
