@@ -1,131 +1,249 @@
-Return-Path: <netdev+bounces-199099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F014ADEED5
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:09:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1DD7ADEF1C
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 16:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5861646CA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:09:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41CD71897CCF
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BF92EACF8;
-	Wed, 18 Jun 2025 14:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E71D2E8E00;
+	Wed, 18 Jun 2025 14:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p/qL+k/v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F5InniY9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4097C2EAB84
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 14:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCDC280027;
+	Wed, 18 Jun 2025 14:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750255732; cv=none; b=GoWHBkNwp+HFKoMEFoLyPU10UnHgFl/WhCj1NKGaPlJi9EmdTmbGmbAwWWUTtQmpe3+uKc85AgZpbsdjkG1bPH/qCrpZr3krBlLDGlEi25vxQdUk2JkgNKHxwjYkonLb65tdDghs8Yy5h90HcKz+RLjXSymuM5hesmRZ3O20Cds=
+	t=1750256614; cv=none; b=LzMbMWEJ182+UeZfq1fOLZXhwtZVsgOTWlIFAVgTbLlTUT7CEFHoZK01yjy5Xq0pWj0rFyVwG7+VR1cyUIKgLYcPxYkuFryaXOIkYx6n8lBOKaNP5JxgQuXrSMCo2QSIBrWNcZ7SxiW825jYcd9gF6Rd+h/3uYYessPWU9XwZeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750255732; c=relaxed/simple;
-	bh=as4hr2pkeiJwV+mjIOp91WXa9weijSBnTuTmiChnlJY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aWp2hzjaxb/hCxWIYBqT2AmVYUr1sDKPsJNlfRilVO0dHg0kLR1BDHDkZBmQ6hUk7JNGVt5DLYrPrL7LzSX1fWIJhFCybxQtrBsvwbZeU8s4aP/9pi1YU/aDNJ8l/WXtjYvrtK5cSmKDWuc5KmwtMMCUKGVV01a62QC9wNZy36g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p/qL+k/v; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4a587a96f0aso195295531cf.3
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 07:08:50 -0700 (PDT)
+	s=arc-20240116; t=1750256614; c=relaxed/simple;
+	bh=rrYKoMv7Uk4ch1aZuKLh5PjZvex15SXOuAtOym4MjiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=giGCEI6Ahl9vpyRahWtCKp2/isuSCZ7SaWiZfusG21HxrQ1k1VmzWvCtNWGHBkHy7l+PU0eSpoCjJaFviFAPWCz+OCcZTKNmlHzbOEZ14oOLnKmMkZfm+8hKO/XCSFCgrNiATC1j3i5U9Ilf0x5XVZecuUTwTDwdPe01q4a3l+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F5InniY9; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3a4e57d018cso986586f8f.1;
+        Wed, 18 Jun 2025 07:23:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750255730; x=1750860530; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0oSgpc/ixYySGKuAcje8gt2adL4OhK1cPwTfYtJezek=;
-        b=p/qL+k/vpgcVitBvzLJwb5K6NHw464SkpOepmpg/wlx20QMBzjMnnkcKEISd1PShMC
-         az605QUi2Cxna299xQPZ1wZEn/GS4/DbEPSGeMf5BZIoXoPEy3tyamJxfs7bmaR9Tqti
-         e+ENl1d3DfyM1mMMsGtufkm5Y/rv1SocGHt4LZ71cVCeUJIgx8QJH49aOlMwAQzK+XVa
-         +ZWVWSPScW6Dub4fGELmKLoWm+82wv0IGuBnKj1AZbXRqbb+raKE0mEdfajlmUIjq18t
-         qP74ji6b1SyYwLbRrausMvFaSQcYpsERVSX9RP8D1r7vDpVtqTkEPhcSuU5tuh2pFLh7
-         THAg==
+        d=gmail.com; s=20230601; t=1750256611; x=1750861411; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YPK0mkTHcO8NLt38PWjFw4lbg65xpQlmO3zLhw4rqDw=;
+        b=F5InniY9T7786T4sb5xzV1WNiL8hv1Wspb75EzZiNS25U+87rW08hHh8qOn1tWFCZV
+         bEBAXK9VVPuka4ywQnaC0v3XQInjuPrpDnJWpvzPnhCKd3FvbF2rfxASpUrBIFh+JOd2
+         o/KjxUu/9JyCCHK/bERNsGiEq/hvgB688P4S6+9rPZ2WfJpDSEqH9mudL1clTO3rBvgz
+         5fC+SPg6X91zLdMtzj0NcJPF3PhcjA/lYGLyefo/M8Ro/vOqoSNaW/9LUuyQC5dniAFG
+         Et3f1ohuQQa4JSuYIm+QDkgfWyyr//EBgiJ/L0nZqtT+uwO+hvz4zhvGIfSs95eSnIVw
+         xP9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750255730; x=1750860530;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0oSgpc/ixYySGKuAcje8gt2adL4OhK1cPwTfYtJezek=;
-        b=R4Y3SKAcszEtUktBKwilTZeHri3wEVyaBFyPlwEqvgL/GZKxgpQg+o5/mMEDxSZKrR
-         EhvVUhP+PR/W4g8P2SM35HwnRu0Uif1yrNxDHJcVyrq2QySONqa6IMttIUeJo8EkGljb
-         P1sG6i9w5tmB6xA63gLAMs0B1mSZ0apvVPKs0Ey6DaiCaHEXXV1BDTBvPWOlhIFZiQkL
-         FZAYQi3/2Xv6y1W7UYW9vHvpmbEF8tTAG9BPXli4EtaMtDMHSFg3O57Af6qOtcjsUZiI
-         p6cQgiOOFCfC1l6XwTtZzamo8O3/2RIU5tTaVD6okrfguWak+NZzyzs+qSBliuFpJd2A
-         5PWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDzjsRVYPa+/a9RjKJC+Twyz7mgKhuahZN1Iz6J1jwcjra7OcA4WWyBU9g7a2BKIYUPbiaQF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9C8LRpbQjPysLxQX9mMqbcRQozOpw80ViotjG+QIAP8pQ1ucZ
-	vSmsjJCxx4DH4ziZXS/jHAGCRRFYq0DYdQ0qd9wi7ylJrSLdKi49tfYrSIWLJJuj0y+TnlrfPmj
-	Mn7xwbO21TB1gbQ==
-X-Google-Smtp-Source: AGHT+IHSUmmpYfT06xELokgDqTewtUCHh4ReO1GDJQci3SaAMiXNj+xYRIUn6qB3zPUN4BYyrYvvY3n8wqyXEA==
-X-Received: from qtar2.prod.google.com ([2002:ac8:5c82:0:b0:480:3049:24e2])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:148b:b0:476:95dd:521c with SMTP id d75a77b69052e-4a73c683b34mr253186661cf.45.1750255730080;
- Wed, 18 Jun 2025 07:08:50 -0700 (PDT)
-Date: Wed, 18 Jun 2025 14:08:44 +0000
-In-Reply-To: <20250618140844.1686882-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1750256611; x=1750861411;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YPK0mkTHcO8NLt38PWjFw4lbg65xpQlmO3zLhw4rqDw=;
+        b=OnMcPhq1A6cngztTM9qBEPeuyysceVoa4YabjciInBzd7IkLlXB15XepnIllN/iZD4
+         LoeoBwSZmgpaXtlfevonQ1OMYGA1Diea3/T/fu9zJKpBOf94ik3nCZ7QmezShmuVAlAt
+         3Df/+aK8+RUyGWvWqWmR/dfy1kjgX5M56B+EpiFMtgfs0b+JULc0WiT3Kxg+Il3kbwEd
+         SVYK/8Zsa+Fgf6MfdOaY+dHTfN/qicf58GIrRU44VqfcDnIwzFyfG+NeDzWLvLFz3VSe
+         60xG7Ka9HgK2Wl+KulDeCe6jE3I5LdbXt6WqGoFyZB0p00nOQ8+/qsNnlqM7RmFgEKKV
+         vp8w==
+X-Forwarded-Encrypted: i=1; AJvYcCVt/u+AGlPk52lQ23H6IUAYacEB2DA+5ejwxqzy/Dq7H/dDytZjEb3yfhpF7mxCCGjrxhIEH1GqveJDbgc=@vger.kernel.org, AJvYcCVypn1yf8gY6cg71kdUuZSEDvIT9umQFb/iPoB+xmfQdo9wktJR3QhjiZPMkMnbPhnvRHTR7OSw@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPkv+rBjj0jmVxTRc6wzMquriodRJG2Zjh2iCHPccAA+BvEvHb
+	rhy/jGQVQjNF0e+7o7N9kbNCICjLHhZ8R3V+MvPvFzqOja1AH53trhuy
+X-Gm-Gg: ASbGnctRBB6bpjwtrbcWvkwb0KhXgCRIAV9mC3uX9E7Moqgw079rmJq7p/hOfryp3fO
+	u3EXxZYqTpLfxd2RBjL3nzzDDFY25wkCgktm+A9IFY40Fnc4kVMV/8DQCK56gACLPFzCJD5J8LU
+	Civnx5s1MFDTKZYxQdw9l4TqzRWC9sZzc73GhaUssOMYpYckTgw1qhy7xIwR8b/heE95zlLP7Mn
+	22tg+ICEwVa3QpdUGv6hu8cBK328J8Nd81uQ+Al179KSK599bWYW66NV62GHRRmoc3iN90aAWIt
+	uKbde0E8m2YjLfNQbrjAa6jLNXehMNmw9lOjXJtG3URiPx5iLwapWLP7dd0/M9aVvNmKdxhReAK
+	EXtMA5tXNz7sBhhzH27KF1Tqse3v8w/DDyG4eBb4TKgRhES5odzmLqz1gZrCZPNxnKfBF9tbQBs
+	c=
+X-Google-Smtp-Source: AGHT+IG7GmVSnOGPPkPDurjvfOGF9vV6K0D4X+LTwcXkzNj+v10cCf/8xwwAPYWXD0cqTToIEYGwog==
+X-Received: by 2002:a5d:5849:0:b0:3a3:6a3d:163a with SMTP id ffacd0b85a97d-3a5723adb10mr5201477f8f.12.1750256610510;
+        Wed, 18 Jun 2025 07:23:30 -0700 (PDT)
+Received: from thomas-precision3591.home (2a01cb00014ec30077ebd188a5e29661.ipv6.abo.wanadoo.fr. [2a01:cb00:14e:c300:77eb:d188:a5e2:9661])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4532de8c229sm207823045e9.6.2025.06.18.07.23.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jun 2025 07:23:30 -0700 (PDT)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Jeff Garzik <jeff@garzik.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] ethernet: atl1: Add missing DMA mapping error checks
+Date: Wed, 18 Jun 2025 16:22:16 +0200
+Message-ID: <20250618142220.75936-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250618140844.1686882-1-edumazet@google.com>
-X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
-Message-ID: <20250618140844.1686882-3-edumazet@google.com>
-Subject: [PATCH net 2/2] net: atm: fix /proc/net/atm/lec handling
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-/proc/net/atm/lec must ensure safety against dev_lec[] changes.
+The `dma_map_XXX()` functions can fail and must be checked using
+`dma_mapping_error()`.  This patch adds proper error handling for all
+DMA mapping calls.
 
-It appears it had dev_put() calls without prior dev_hold(),
-leading to imbalance and UAF.
+In `atl1_alloc_rx_buffers()`, if DMA mapping fails, the buffer is
+deallocated and marked accordingly.
 
-Fixes: da177e4c3f41 ("Linux-2.6.12-rc2")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+In `atl1_tx_map()`, previously mapped buffers are unmapped and the
+packet is dropped on failure.
+
+Fixes: f3cc28c79760 ("Add Attansic L1 ethernet driver.")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 ---
- net/atm/lec.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/atheros/atlx/atl1.c | 50 +++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 6 deletions(-)
 
-diff --git a/net/atm/lec.c b/net/atm/lec.c
-index 1e1f3eb0e2ba3cc1caa52e49327cecb8d18250e7..afb8d3eb2185078eb994e70c67d581e6dd96a452 100644
---- a/net/atm/lec.c
-+++ b/net/atm/lec.c
-@@ -909,7 +909,6 @@ static void *lec_itf_walk(struct lec_state *state, loff_t *l)
- 	v = (dev && netdev_priv(dev)) ?
- 		lec_priv_walk(state, l, netdev_priv(dev)) : NULL;
- 	if (!v && dev) {
--		dev_put(dev);
- 		/* Partial state reset for the next time we get called */
- 		dev = NULL;
- 	}
-@@ -933,6 +932,7 @@ static void *lec_seq_start(struct seq_file *seq, loff_t *pos)
- {
- 	struct lec_state *state = seq->private;
+diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
+index cfdb546a09e7..9b53d87bf6ab 100644
+--- a/drivers/net/ethernet/atheros/atlx/atl1.c
++++ b/drivers/net/ethernet/atheros/atlx/atl1.c
+@@ -1861,14 +1861,21 @@ static u16 atl1_alloc_rx_buffers(struct atl1_adapter *adapter)
+ 			break;
+ 		}
  
-+	mutex_lock(&lec_mutex);
- 	state->itf = 0;
- 	state->dev = NULL;
- 	state->locked = NULL;
-@@ -950,8 +950,9 @@ static void lec_seq_stop(struct seq_file *seq, void *v)
- 	if (state->dev) {
- 		spin_unlock_irqrestore(&state->locked->lec_arp_lock,
- 				       state->flags);
--		dev_put(state->dev);
-+		state->dev = NULL;
- 	}
-+	mutex_unlock(&lec_mutex);
+-		buffer_info->alloced = 1;
+-		buffer_info->skb = skb;
+-		buffer_info->length = (u16) adapter->rx_buffer_len;
+ 		page = virt_to_page(skb->data);
+ 		offset = offset_in_page(skb->data);
+ 		buffer_info->dma = dma_map_page(&pdev->dev, page, offset,
+ 						adapter->rx_buffer_len,
+ 						DMA_FROM_DEVICE);
++		if (dma_mapping_error(&pdev->dev, buffer_info->dma)) {
++			kfree_skb(skb);
++			adapter->soft_stats.rx_dropped++;
++			break;
++		}
++
++		buffer_info->alloced = 1;
++		buffer_info->skb = skb;
++		buffer_info->length = (u16)adapter->rx_buffer_len;
++
+ 		rfd_desc->buffer_addr = cpu_to_le64(buffer_info->dma);
+ 		rfd_desc->buf_len = cpu_to_le16(adapter->rx_buffer_len);
+ 		rfd_desc->coalese = 0;
+@@ -2183,8 +2190,8 @@ static int atl1_tx_csum(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 	return 0;
  }
  
- static void *lec_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+-static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+-	struct tx_packet_desc *ptpd)
++static int atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
++		       struct tx_packet_desc *ptpd)
+ {
+ 	struct atl1_tpd_ring *tpd_ring = &adapter->tpd_ring;
+ 	struct atl1_buffer *buffer_info;
+@@ -2194,6 +2201,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 	unsigned int nr_frags;
+ 	unsigned int f;
+ 	int retval;
++	u16 first_mapped;
+ 	u16 next_to_use;
+ 	u16 data_len;
+ 	u8 hdr_len;
+@@ -2201,6 +2209,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 	buf_len -= skb->data_len;
+ 	nr_frags = skb_shinfo(skb)->nr_frags;
+ 	next_to_use = atomic_read(&tpd_ring->next_to_use);
++	first_mapped = next_to_use;
+ 	buffer_info = &tpd_ring->buffer_info[next_to_use];
+ 	BUG_ON(buffer_info->skb);
+ 	/* put skb in last TPD */
+@@ -2216,6 +2225,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
+ 						offset, hdr_len,
+ 						DMA_TO_DEVICE);
++		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
++			goto dma_err;
+ 
+ 		if (++next_to_use == tpd_ring->count)
+ 			next_to_use = 0;
+@@ -2242,6 +2253,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 								page, offset,
+ 								buffer_info->length,
+ 								DMA_TO_DEVICE);
++				if (dma_mapping_error(&adapter->pdev->dev,
++						      buffer_info->dma))
++					goto dma_err;
+ 				if (++next_to_use == tpd_ring->count)
+ 					next_to_use = 0;
+ 			}
+@@ -2254,6 +2268,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
+ 						offset, buf_len,
+ 						DMA_TO_DEVICE);
++		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
++			goto dma_err;
+ 		if (++next_to_use == tpd_ring->count)
+ 			next_to_use = 0;
+ 	}
+@@ -2277,6 +2293,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 			buffer_info->dma = skb_frag_dma_map(&adapter->pdev->dev,
+ 				frag, i * ATL1_MAX_TX_BUF_LEN,
+ 				buffer_info->length, DMA_TO_DEVICE);
++			if (dma_mapping_error(&adapter->pdev->dev,
++					      buffer_info->dma))
++				goto dma_err;
+ 
+ 			if (++next_to_use == tpd_ring->count)
+ 				next_to_use = 0;
+@@ -2285,6 +2304,22 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 
+ 	/* last tpd's buffer-info */
+ 	buffer_info->skb = skb;
++
++	return 0;
++
++ dma_err:
++	while (first_mapped != next_to_use) {
++		buffer_info = &tpd_ring->buffer_info[first_mapped];
++		dma_unmap_page(&adapter->pdev->dev,
++			       buffer_info->dma,
++			       buffer_info->length,
++			       DMA_TO_DEVICE);
++		buffer_info->dma = 0;
++
++		if (++first_mapped == tpd_ring->count)
++			first_mapped = 0;
++	}
++	return -ENOMEM;
+ }
+ 
+ static void atl1_tx_queue(struct atl1_adapter *adapter, u16 count,
+@@ -2419,7 +2454,10 @@ static netdev_tx_t atl1_xmit_frame(struct sk_buff *skb,
+ 		}
+ 	}
+ 
+-	atl1_tx_map(adapter, skb, ptpd);
++	if (atl1_tx_map(adapter, skb, ptpd)) {
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
+ 	atl1_tx_queue(adapter, count, ptpd);
+ 	atl1_update_mailbox(adapter);
+ 	return NETDEV_TX_OK;
 -- 
-2.50.0.rc2.696.g1fc2a0284f-goog
+2.43.0
 
 
