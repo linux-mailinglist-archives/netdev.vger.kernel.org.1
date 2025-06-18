@@ -1,139 +1,123 @@
-Return-Path: <netdev+bounces-199185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C440ADF4F0
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:52:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E385ADF4F4
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:53:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 450DF1BC33EA
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:52:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E02411BC2CFE
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408423085D7;
-	Wed, 18 Jun 2025 17:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5BD2FCFF8;
+	Wed, 18 Jun 2025 17:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c8+eOmPV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUAq9iNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32853085AA
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 17:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B9F2F4303;
+	Wed, 18 Jun 2025 17:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750268579; cv=none; b=SfBN+viTsnxH2WB9LIGtpkEjMxJQaYr5wKga3lPy7zSKoJLcF/OLlR2zXK/l3xH1z8jLJ+nrxzqQ/oPv3S95nqWl6tEqmgHAgH9YJx6WSmjFSrz5qGyRSCwlzBa+c/sUb1/MlYXgxVeAgBrANdbtq7dYEEQ8k7ijzwYR2sUuHU4=
+	t=1750268667; cv=none; b=fThs+/Ha2/IylvqDfjW1IO2UBgSEfDsvHBwVPYsaa9t7FEVcSBYW9JjkYvzDPFWwOl14V84FQ4hklaMlsDFp6+/rL1o3Zhg63WCQDv/IAdEjnBpA96UJZuV7H0aQL32NYRezyEkwlBoRDUOf5agrj9Zx4kQy+o2kZq4GGnaG51I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750268579; c=relaxed/simple;
-	bh=JZRs3NlHp5F6bBE5Ucu4kzhg5BzIEsY+ETBlB1hrpwM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PShL20ZBkQ03oLmIwyi5zy63aoJYulCHKu+ZnDNtWd11275zwNqZ5RDulnZuQCwOzAnN9A+ffu6nuKuTGrKFA/3HcNTuV0a8/vJ1mtEJ0wnIRRGELXSjg80PPc2RmtcJNnMUWNnCSqBo4o5I9XeP8Lv9YGu3ftSbBzSG7+m4TrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c8+eOmPV; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750268577; x=1781804577;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JZRs3NlHp5F6bBE5Ucu4kzhg5BzIEsY+ETBlB1hrpwM=;
-  b=c8+eOmPVl3FHyWM2wOwDdzB8dxgSExF9oTE9v08e9OYAxsL1gYD+Mnge
-   gMaVlKy/4Xz33I/7/FzhnnsluIULuPYEZu47CwIxPTWj3Ba3RgfIhXjcL
-   Muka+U4lm2NRI13NT2kyYKnwO3XVoq+EaIkRfGFK50+H7Ykx4L/BZImgj
-   FT9tQ/2XnkQ9HAheM7U3K6yxkcWJ+xVHF1awutxkUzpq+rpG1gvdy4U9N
-   lkmAvyqxOCDwttpya46ZoEMlLqwU0yEoCRb+ucnG8ldI80nHBn327vMIn
-   8Haju6IWxsbS8UzgT9RwvBt7vGlSF2YzPmvGoY0sXM+o52Wv9USh/bCkF
-   A==;
-X-CSE-ConnectionGUID: k8zOf8zMQR+npIrZVjcrRg==
-X-CSE-MsgGUID: hPc2sL2iQWWRpfw3tIzS0w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="56183780"
-X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="56183780"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 10:42:54 -0700
-X-CSE-ConnectionGUID: ExZfNtfPRHiBoXV+8OpVjA==
-X-CSE-MsgGUID: b8DyjT0gT6KEHgSUtehk3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="149696040"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa007.fm.intel.com with ESMTP; 18 Jun 2025 10:42:54 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	anthony.l.nguyen@intel.com,
-	karol.kolacinski@intel.com,
-	przemyslaw.kitszel@intel.com,
-	richardcochran@gmail.com,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 15/15] ice: default to TIME_REF instead of TXCO on E825-C
-Date: Wed, 18 Jun 2025 10:42:27 -0700
-Message-ID: <20250618174231.3100231-16-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250618174231.3100231-1-anthony.l.nguyen@intel.com>
-References: <20250618174231.3100231-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1750268667; c=relaxed/simple;
+	bh=J3emUuMS2sP+fVu514LS2iE2SxNv9+tMuhs+QvDPSzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GXNcmbXeA9TGpEoLQfF54LLuBWy/qB2nUgEV7lwDC55u/FJN+61CfKw9pwIgpLcRxMUgh4bgi1pis+qBs1t2GFbegz7MRfPNTwuti+VI4SoY5F0HiXMfD4Xycc0+SiYsxk/cSSvT2JN9tzpUiCGGGbHAokDccGKrtCs62i/iye4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUAq9iNP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B86DBC4CEE7;
+	Wed, 18 Jun 2025 17:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750268667;
+	bh=J3emUuMS2sP+fVu514LS2iE2SxNv9+tMuhs+QvDPSzI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RUAq9iNPBOvtBZ6kjZvzyDf3azz9pNEJrtV802b0Y+7oFzo46N+wIUNg/gUWuVYNv
+	 0zTcE5vpf09zObs3MB5J0eo6OqIPMHS2hzU8M6zIhoCiDCJqMS64GU9M2cvpKemyE6
+	 2cQfwsDPfUcwxAICjnnffdcOSRG7xmqYXPDVZgl7Mo2lPxi8/0fvmHvNSPg0dSTHSu
+	 uRRXbMuBmGgK+dW6FH4AGtLJYIu9K/KZlCp0EFVJQAiTuHA+H5PyIBduZh3y/5F0hn
+	 36XXhmH+5bXNB865NML1afkhVnOFmu9mD/2qEx7ja97HEAcU+6YLo11U1bNdFcUrRV
+	 sQv648YcGy5eQ==
+Message-ID: <ccbc2a76-20fe-4f70-b69b-9d05b59f24b8@kernel.org>
+Date: Wed, 18 Jun 2025 19:44:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 1/6] rust: enable `clippy::ptr_as_ptr` lint
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Tamir Duberstein <tamird@gmail.com>,
+ Christian Brauner <brauner@kernel.org>, David Gow <davidgow@google.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tejun Heo <tj@kernel.org>,
+ Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
+ <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Brendan Higgins <brendan.higgins@linux.dev>, Rae Moar <rmoar@google.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
+ Saravana Kannan <saravanak@google.com>,
+ Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+ Daniel Almeida <daniel.almeida@collabora.com>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Nicolas Schier <nicolas.schier@linux.dev>,
+ Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Benno Lossin <lossin@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, Breno Leitao
+ <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
+ linux-block@vger.kernel.org, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org,
+ linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org
+References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+ <20250615-ptr-as-ptr-v12-1-f43b024581e8@gmail.com>
+ <CAJ-ks9=6RSaLmNmDBv-TzJfGF8WzEi9Vd-s=1wyqBcF7_f7qQQ@mail.gmail.com>
+ <CANiq72kgnKH2SSp76EdPeysExBWasqhTyf1JyReR65g6FMsidA@mail.gmail.com>
+From: Danilo Krummrich <dakr@kernel.org>
+Content-Language: en-US
+In-Reply-To: <CANiq72kgnKH2SSp76EdPeysExBWasqhTyf1JyReR65g6FMsidA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+On 6/18/25 6:45 PM, Miguel Ojeda wrote:
+> On Wed, Jun 18, 2025 at 3:54 PM Tamir Duberstein <tamird@gmail.com> wrote:
+>>
+>> @Andreas Hindborg could you please have a look for configfs?
+>>
+>> @Rafael J. Wysocki @Viresh Kumar could you please have a look for cpufreq?
+> 
+> Thanks Tamir.
+> 
+> Christian, Danilo, David, Greg, Tejun: It would also be nice to get
+> Acked-by's for your bits. Thanks!
 
-The driver currently defaults to the internal oscillator as the clock
-source for E825-C hardware. While this clock source is labeled TCXO,
-indicating a temperature compensated oscillator, this is only true for some
-board designs. Many board designs have a less capable oscillator. The
-E825-C hardware may also have its clock source set to the TIME_REF pin.
-This pin is connected to the DPLL and is often a more stable clock source.
-The choice of the internal oscillator is not suitable for all systems,
-especially those which want to enable SyncE support.
+For the whole series and the bits I maintain:
 
-There is currently no interface available for users to configure the clock
-source. Other variants of the E82x board have the clock source configured
-in the NVM, but E825-C lacks this capability, so different board designs
-cannot select a different default clock via firmware.
+Acked-by: Danilo Krummrich <dakr@kernel.org>
 
-In most setups, the TIME_REF is a suitable default clock source.
-Additionally, we now fall back to the internal oscillator automatically if
-the TIME_REF clock source cannot be locked.
+--
 
-Change the default clock source for E825-C to TIME_REF. Note that the
-driver logs a dev_dbg message upon configuring the TSPLL which includes the
-clock source and frequency. This can be enabled to confirm which clock
-source is in use.
-
-Longterm a proper interface to dynamically introspect and change the clock
-source will be designed (perhaps some extension of the DPLL subsystem?)
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index bc292d61892c..84cd8c6dcf39 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2302,7 +2302,7 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 		info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
- 	} else {
- 		info->clk_freq = ICE_TSPLL_FREQ_156_250;
--		info->clk_src = ICE_CLK_SRC_TCXO;
-+		info->clk_src = ICE_CLK_SRC_TIME_REF;
- 	}
- 
- 	if (info->clk_freq < NUM_ICE_TSPLL_FREQ) {
--- 
-2.47.1
-
+Independent from that, won't this potentially leave us with a lot of warnings
+from code that goes through other trees in the upcoming merge window? How do we
+deal with that?
 
