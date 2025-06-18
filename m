@@ -1,105 +1,129 @@
-Return-Path: <netdev+bounces-198903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-198904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E71ADE427
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:02:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88708ADE445
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 09:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7A63A4752
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:02:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBDE3188CA46
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 07:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7643A2777F9;
-	Wed, 18 Jun 2025 07:02:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE9C27E07C;
+	Wed, 18 Jun 2025 07:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPp4O0WF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="I2EZxJXs";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BbgFDKDY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F611A23BB;
-	Wed, 18 Jun 2025 07:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9632E27816E;
+	Wed, 18 Jun 2025 07:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750230152; cv=none; b=McH3JUwCH5rwGfzhI6EZ0QbytKdg8Ka5GiOJjR4Ziv3UH6LASCvHjryFXlg0qiZ9iBpccKyhhxwb/u0A9szmOB/jLwFdcf0U1LqRyLySwCB6al7XnAl7rs5fE0QkXQUT+Q98jGnfYX+ajHHH+bKpUoWr8SjfYIhVMZD7Nmn45GI=
+	t=1750230500; cv=none; b=ekNVla0Zo7NcqlIKiZYLJ9FQAijI5gh7bxej/MA15XfAs5w94qBaOgTj6YG2nVRuWEQtLVeBbMLyHDIesnYmdVovTRWGyENylRGKTi0b2YHQgr2CkAJopkuLgjt7OLXVfMxRB18+EX6ag87dZf0surpZV9UimSd3zDESySE4IEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750230152; c=relaxed/simple;
-	bh=AZ8eakkbu827EuhTE2TgSWfoJamjsmR+ZwSjs+5D78o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ulwvPjgw8SZDfkwp2ITv6v8w4q2HUi53r4AYLKD/kD37jpFPvVQJ4cnc1JCOQQcoL8CgjB381NX03IVkJq9cbve8zyGyVknjHswtlKLm2PjABpnCZRp85RQpEWkE71mpj5Ep7A2fLukkhh7+D9vWQwpJvygik41Hs80yrfU9jzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPp4O0WF; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3ddd2710d14so60905185ab.2;
-        Wed, 18 Jun 2025 00:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750230150; x=1750834950; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AZ8eakkbu827EuhTE2TgSWfoJamjsmR+ZwSjs+5D78o=;
-        b=OPp4O0WFb3bZDzUH0gOHDHkeXt9XdietkJ18gt67e/IuHSs1KEdW2OPMAq54CcstFL
-         WvgiPO/MC0gVGF0dNzMVazRsb+zbRGitwNb6PuTOrkjwsR8Tyi0IQ/qPJS+ldLoSJbzL
-         Iaa6V0z7eKqVR69Q7m/q1CKEs67V9FZbgQC10t9UYjLMnbyzStJ6xWqVmcDtACpGRC0j
-         VZ155G8jC9VLkZcy9z2eIDbAZEXE19onmjtgSAC5YPkeMJr+YLbhUUpu6GKC9eOgo68b
-         sNSsT7Hf2/gOvuQYED7yPq5ELsuibu0RcNbOGwdctixADyCJtkaBh0hFezZvT/kqcA2K
-         zfvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750230150; x=1750834950;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AZ8eakkbu827EuhTE2TgSWfoJamjsmR+ZwSjs+5D78o=;
-        b=qMAwZa1bf+OcHU1qZH4Ist11DOhL9THEJVkJgpk0MU+ljZilvulRF+cpEw/JbJ9BCX
-         HdmMHsRJyoV0P99scxlScREnvaNSMbT9wlKaqL1qXf5Vv/czi94ltRLiXHXldei3iHhB
-         u2kGjfjWvQFvwvs7FBXiFEaJ4ql69bwvBJ5ZP/sllCSZJQmm2jtgIFhL5jhjtXxc1PC3
-         2nW2/e0fXLCDt8BLILdNSF9SA2cAnxyrKAO/qtjVMzu380YWlroQLS4ypTLSh3qtPlVo
-         eSSAJwp+rbt7CT9SL4JzVH4c5HbXVeilfzTy/xxJLAuQnZCHZ73nVo5c3pPNm/TBZU4v
-         LCaA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsTmhIW2vDp7Dwb8Hq8BJ3lON09EsubfIC2wuLIrL8z6wi00nUuynIAk91rnJ0Brs45rntxgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHYoGPf/azMXe62aWANVIrDcMdntYnVxB8i65Vi3JHCy/15yhq
-	5BWTRsAy2SqZ+Klv3kXXLaJUW0UGPv3RHE7YOZWvblCeP1sw1NUWguH7RvjTc1asACJUIr//3p3
-	kT1JccCyE5uu1JIY1odXRHtmgk/zzt8I=
-X-Gm-Gg: ASbGncsa6bn8Lx8jHqD6izbhvJ5WSdjkTAp+Y+RDlf0Uor9HLjASehmoUj9eyV9kgCf
-	jEUCwuXLq31dkz0wDb3VvoEMMK2x0MPm/u7LQTebhEszEBxqkxFacc6cUSAh2uR8tHSWXPIeQD1
-	thbBpPjCUAVMamTwa6zdAOh/Gchik2hrKEI9BBPdnlZDY=
-X-Google-Smtp-Source: AGHT+IFagww3pxOoOKsEFeuXbX+NHva9IsyD9xZhOtoR8v7SpOOBVYkojySXKhuMk5XZSqETNSbTEv9mBPBVHaZh344=
-X-Received: by 2002:a05:6e02:2482:b0:3dc:8058:ddfc with SMTP id
- e9e14a558f8ab-3de07cd045fmr165604885ab.11.1750230149937; Wed, 18 Jun 2025
- 00:02:29 -0700 (PDT)
+	s=arc-20240116; t=1750230500; c=relaxed/simple;
+	bh=HQUhUUMz1hwkIw0H+WnoEWZYfkvGVKwDKzojTFzI74U=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UdjKcgBirfvUfRmRS4w32XIcPJhtWW5X3X41jZeAPVnFPP1S7R9TCBVFWSOxUEwBHhvNVFWfp3feF7lVyY/BaYH/qKTiMf5B3jRmXEYySm3mqy0kUqzUo7AdOi9u5uQWvK11OuuVhOT2jBb8nfI3Wj39J3vpzuHfeSh8d0n2Wmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=I2EZxJXs; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BbgFDKDY; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1750230496;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AthrdE03eMT6iyFsW/vA3bdClID4lHYN+YmePk1prAg=;
+	b=I2EZxJXsMG2CTO7g5gZZf1qltdHNLqFjmsBKmGggS50/UZiRsCFPdz5DhOb9RGxWls8eHc
+	bYP7KbbfUGQmtJ+Ee8tXBgYXe1lQVNuX15Uf2dX3uS+JM41tqXajUfALR7RqZvU689ESES
+	sma/nVhg/68/CO3nsc42B36La6pHvxaHub9NC5pkh/nwRcUhvxnuZFRwECywBr0I2pCYb6
+	Em7GDPpRqTjKla2tOiCnr1m3gzHky/MkqTz6qqck8DKGjyEffqZvt6pNnhzAIOYKM4MbKy
+	icNyrZ3X8jBpzLnamNQ3388eI438j5sNT0JP7DL31r166XhFFWFTGy4iKB3x7Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1750230496;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AthrdE03eMT6iyFsW/vA3bdClID4lHYN+YmePk1prAg=;
+	b=BbgFDKDY3M2uyykrupOKp2zK1iwQwdxSS5saBGNgSDiVEZPEd+V2WAEzhndjPyjbxNOD1t
+	ipt47VuIseiY7GDA==
+Subject: [PATCH net-next v3 0/2] net: Don't use %pK through printk
+Date: Wed, 18 Jun 2025 09:08:05 +0200
+Message-Id: <20250618-restricted-pointers-net-v3-0-3b7a531e58bb@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1750065793.git.asml.silence@gmail.com> <702357dd8936ef4c0d3864441e853bfe3224a677.1750065793.git.asml.silence@gmail.com>
-In-Reply-To: <702357dd8936ef4c0d3864441e853bfe3224a677.1750065793.git.asml.silence@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 18 Jun 2025 15:01:51 +0800
-X-Gm-Features: AX0GCFtI_6Syj--jN1osN8b3IwBnDhOc9cmGPDIfbz9j-qf3m5_nSa7qw0hJtXc
-Message-ID: <CAL+tcoAeWk0MPw56NjrPBm3BOUmAMnSrw=wbbMUe3X92-wd4Mg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] net: timestamp: add helper returning skb's tx tstamp
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIANVlUmgC/3XNTQ7CIBAF4Ks0rMUApT+68h7GBYHBTmKgASQ1T
+ e8u4saYdPnyZr63kggBIZJzs5IAGSN6V0J7aIielLsDRVMyEUx0TDJJA8QUUCcwdPboEoRIHSS
+ qRm2MYS10hpPyPQewuFT5Sj4HDpZEbqWZMCYfXnUy89p/db6vZ04Z5UJZpkH2ZenyQPdMwTtcj
+ gaqm8WvNexbolgnqe0AdoRewb+1bdsbHhNJuxgBAAA=
+X-Change-ID: 20250404-restricted-pointers-net-a8cddd03e5d1
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1750230493; l=1640;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=HQUhUUMz1hwkIw0H+WnoEWZYfkvGVKwDKzojTFzI74U=;
+ b=QlTPnkpsoB7IxMXFtb6EQuaKpoYFy/ecQsJwnFfe1wgZEQyKZKKJ6NznpDduSF+m9engtl6GI
+ i8njRl6iDk7CynbKVDiatPcDnpR0+yna592iCmay7YDBYaG/O14khee
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-On Mon, Jun 16, 2025 at 5:45=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
-> associated with an error queue skb.
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+In the past %pK was preferable to %p as it would not leak raw pointer
+values into the kernel log.
+Since commit ad67b74d2469 ("printk: hash addresses printed with %p")
+the regular %p has been improved to avoid this issue.
+Furthermore, restricted pointers ("%pK") were never meant to be used
+through printk(). They can still unintentionally leak raw pointers or
+acquire sleeping locks in atomic contexts.
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Switch to the regular pointer formatting which is safer and
+easier to reason about.
+There are still a few users of %pK left, but these use it through seq_file,
+for which its usage is safe.
 
-Thanks!
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+---
+Changes in v3:
+- Fix typo in commit messages
+- Link to v2: https://lore.kernel.org/r/20250417-restricted-pointers-net-v2-0-94cf7ef8e6ae@linutronix.de
+
+Changes in v2:
+- Drop wifi/ath patches, they are submitted on their own now
+- Link to v1: https://lore.kernel.org/r/20250414-restricted-pointers-net-v1-0-12af0ce46cdd@linutronix.de
+
+---
+Thomas Weißschuh (2):
+      ice: Don't use %pK through printk or tracepoints
+      net/mlx5: Don't use %pK through printk or tracepoints
+
+ drivers/net/ethernet/intel/ice/ice_main.c                      |  2 +-
+ drivers/net/ethernet/intel/ice/ice_trace.h                     | 10 +++++-----
+ .../ethernet/mellanox/mlx5/core/sf/dev/diag/dev_tracepoint.h   |  2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+---
+base-commit: 52da431bf03b5506203bca27fe14a97895c80faf
+change-id: 20250404-restricted-pointers-net-a8cddd03e5d1
+
+Best regards,
+-- 
+Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+
 
