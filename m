@@ -1,113 +1,102 @@
-Return-Path: <netdev+bounces-199060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27DEADECAE
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:39:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D019ADECED
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CFF1BC2B38
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:35:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73504169E7D
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1B52E3B14;
-	Wed, 18 Jun 2025 12:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C63286432;
+	Wed, 18 Jun 2025 12:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DijN8Sil"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="IbgubzVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF85285C8B;
-	Wed, 18 Jun 2025 12:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3564288C25
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 12:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750249895; cv=none; b=QXg3Ummf9kpN+YzTAPu/SEGRU73V/R0FhqkfLhpGU3pN13H2kjJXx1TMDy/1BLf8ITsMlcKBQPtb2Is+XsJ6b8kY9o3APIYJ3qSE3nlkYgihv1AMyDVKEIqW8Q2gu1vPOQA8Z81v12lL8/gD4U8NgR4H5Z5PhEkubL+xuu1oJmI=
+	t=1750250629; cv=none; b=JBoj29QVff9tKjzt3POzAJAt/5TJptvx9eSena1OFyJwySyazpgVG3UbKIGnZENCmeIOQFGgwN8mm6EOiIUKosRRMreRnfOakjll3g7iHI6VdLEDnEATscCfNYKcSdxKU+uc7QwXrYvuZBJN+md7n9YLChOALShAmYcW3ZEFvNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750249895; c=relaxed/simple;
-	bh=3ZrI052V23T+mNrFLFPPcK3CIF/YjYSdxgqZH0iO2d0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xsq9zPZq23KjhwKK+THSw8yX8UyUpxA8jJRYuIWUCxJ+WU40ZS44qVpzSs1EPQ/2KqB9AgSpa96v5YhiUrhyYoyFYQfqqCd1Mw6vrNFtIg40zP33vmoXe3MM8AoItIOA3E3DUDEkoICGfovaauFkrT3fDDDn3Nd279d33Gc2hkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DijN8Sil; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 464B3C4CEE7;
-	Wed, 18 Jun 2025 12:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750249893;
-	bh=3ZrI052V23T+mNrFLFPPcK3CIF/YjYSdxgqZH0iO2d0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DijN8Sil7SIDh7aMjK7gKz3beUUdlrtDXsfV9XqMLHI2sWXIPtLhM9yZKqEhdLv0S
-	 16UPsbzgcQ/2ZsrzKi70rJ+Cfjy3JGmJ+KmSxJCt9z5wRq09rmY0McIDUQqnz10aW9
-	 eBy84xrynrdhhZ3XQyI7hYerF6M+z25EkcOZmpay0EwFLprTzfNBvrxFVazlqo5XTW
-	 zzt468nWONM2EYqrbOVk859JQXXPzqN9yAADNYQ5bSAUtlT1o7E5gzrTXNwc/VQcjJ
-	 KUPXZZ/qElxiFMuYaksyZwOVodEgisAenxD7DGhN6W5Q/Uq3bHXp3XJnKOXOl/AKfb
-	 +PJD2RifMK7qw==
-Date: Wed, 18 Jun 2025 13:31:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: Re: [PATCH] vhost: Fix typos in comments and clarity on alignof
- usage
-Message-ID: <20250618123130.GM1699@horms.kernel.org>
-References: <20250615173933.1610324-1-alok.a.tiwari@oracle.com>
- <20250617183741.GD2545@horms.kernel.org>
- <eb95149b-89eb-437f-813d-0045635aee8b@oracle.com>
+	s=arc-20240116; t=1750250629; c=relaxed/simple;
+	bh=LJOl3iVxdLqWTnYrqhGFjB6SUJ0Pn6WjK3KpdQZOJyc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LtNjtGWdyN0h4Uzf7kTF1GNrqzx6BNImgiY7704/Rr/VWANoRIcFhoR7b/HhcWK47BdqTxMadOLnDVpF+p/x6w6a/OEpjk1KE51G6Dk6Yaq0LseR5ihVzjPy4Ifso2yEpPjjaFFVfwZYupmEzpCGWUmwN8IjOfThsJVOcFum9yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=IbgubzVf; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uRrzq-00CJdb-IV; Wed, 18 Jun 2025 14:34:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=ihyBf5E+gzJ5kBv9T40XlfDhBl6X2+hvJwoX0tSQLr4=
+	; b=IbgubzVf8XhgT+sxWhHIoah/74KWgJuJNYwuM0mpFf0YPd17h51NwO8YUaWBnwaw3CTzUyCkw
+	cRrT7Zp+1KgVxyRj5Se5xYiK6sSKcD7TgZ3opaztdoYJJ8ypJ9DTdLhsoaiXiJLDpNCNhauWcyCjv
+	lkYBrIz0+zcFS1yQzWOWMsbD2b2hUSKfj4ZAG+XvfdcETEN+RCb7HD41xETAxnGoXyIKMpjq3zMC6
+	/5AR0ZHUpTX579YrYby+N8Ubh+FDvgaOPtrQVDciz8rkfyR/o2l1b03h3pHSzcO0QS/Eg+kQedpMe
+	1s86jzK2n4arb175Hj6clqGXGh0AddF826hSpg==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uRrzp-0001Wj-FF; Wed, 18 Jun 2025 14:34:29 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uRrzo-00DbRZ-7G; Wed, 18 Jun 2025 14:34:28 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net 0/3] vsock: Fix transport_{h2g,g2h,dgram,local} TOCTOU
+ issues
+Date: Wed, 18 Jun 2025 14:33:59 +0200
+Message-Id: <20250618-vsock-transports-toctou-v1-0-dd2d2ede9052@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb95149b-89eb-437f-813d-0045635aee8b@oracle.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADeyUmgC/x3MwQrCMAyA4VcZORuo1eL0VWSH2kUXhGYk2RiMv
+ bvF43f4/x2MlMng0e2gtLKx1IbzqYMy5foh5LEZYogppHjB1aR80TVXm0Xd0KW4LHh93dJ4LzH
+ 3IUGrZ6U3b//zEyo5DMfxA1tHnrluAAAA
+X-Change-ID: 20250523-vsock-transports-toctou-4b75d9c2a805
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-On Wed, Jun 18, 2025 at 01:31:09AM +0530, ALOK TIWARI wrote:
-> 
-> 
-> Thanks Simon,
-> 
-> On 6/18/2025 12:07 AM, Simon Horman wrote:
-> > On Sun, Jun 15, 2025 at 10:39:11AM -0700, Alok Tiwari wrote:
-> > > This patch fixes multiple typos and improves comment clarity across
-> > > vhost.c.
-> > > - Correct spelling errors: "thead" -> "thread", "RUNNUNG" -> "RUNNING"
-> > >    and "available".
-> > > - Improve comment by replacing informal comment ("Supersize me!")
-> > >    with a clear description.
-> > > - Use __alignof__ correctly on dereferenced pointer types for better
-> > >    readability and alignment with kernel documentation.
-> > Could you expand on the last point?
-> > I see that the patch uses __alignof__ with rather than without parentheses.
-> > But I don't follow how that corresponds with the comment above.
-> 
-> only I can say "__alignof__ *vq->avail" is valid C,
-> but it can hard to read and easy to misinterpret.
-> Without proper parentheses sometime, __alignof__ *vq->avail can be
-> misleading to reader. it may not be immediately clear whether it refers to
-> alignment of the pointer vq->avail or
-> alignment of the object it points to.
-> __alignof__(*vq->avail) adds parentheses that clarify the intention
-> explicitly.
-> I can not see very clear guide line to using parentheses or not for
-> __alignof__ in kernel document apart
-> from(https://www.kernel.org/doc/html/latest/process/coding-style.html).
-> Additionally, I have not been able to locate examples in the kernel code
-> where __alignof__ is used without parentheses.
+transport_{h2g,g2h,dgram,local} may become NULL on vsock_core_unregister().
+Make sure a poorly timed `rmmod transport` won't lead to a NULL/stale
+pointer dereference.
 
-Thanks, I understand now.
+Note that these oopses are pretty unlikely to happen in the wild. Splats
+were collected after sprinkling kernel with mdelay()s.
 
-Perhaps it's not important, but FWIIW I was confused by "correctly".
-And something like this seems a bit clearer to me.
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (3):
+      vsock: Fix transport_{h2g,g2h} TOCTOU
+      vsock: Fix transport_g2h TOCTOU
+      vsock: Fix transport_* TOCTOU
 
-  - Use __alignof__ with parentheses which is in keeping with kernel coding
-    style for an __attribute__ and arguably improves readability of what is
-    being aligned.
+ net/vmw_vsock/af_vsock.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
+---
+base-commit: d0fa59897e049e84432600e86df82aab3dce7aa5
+change-id: 20250523-vsock-transports-toctou-4b75d9c2a805
 
-In any case, thanks for your explanation.
-This patch now looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
 
 
