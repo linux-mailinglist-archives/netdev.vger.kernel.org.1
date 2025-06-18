@@ -1,180 +1,152 @@
-Return-Path: <netdev+bounces-199253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DFBEADF929
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:03:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537B9ADF92F
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5668D3B8B5F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:03:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 956A87A6577
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627B7239561;
-	Wed, 18 Jun 2025 22:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460A627F018;
+	Wed, 18 Jun 2025 22:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bmh1PY74"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12C821A452
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FE927EFF4
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750284203; cv=none; b=XPst7vxBGgHdz6t83C6brJbRMZz1DrcVYsp/vyA0gxjEpKg7Higww64lmxjeuUBC0/80774hKBLplP1auu9APmPRDXAf2BfHSxtMW6J7KMqsIQD6X5B1lgtOKeW6YkPRSuNpc87isEglLISP4vTgd0/R+/CXeU3Z9CATlVNgl3Y=
+	t=1750284439; cv=none; b=oUIXeVi6h7NH/McYHK3m+z6evlXbNYPHnRHktnfvuiF4O+b9uC4m+kw2u3dMWRP8wtpRgr3AoFWhmPk/UsCXjvvdrMxxQcCP/zj7/AAaZWUPJf15swHKivLBJQH8WH9UcXBdv4fBi2dCMPy/fxPepJQ1aAmnJ2kycUmnretbGlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750284203; c=relaxed/simple;
-	bh=Ifwvi8dIvMiZN9RBQ1iHgerYGgCFf+NSHsY0DsDmx18=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZpOp9dayQct3i7unfh4zIJRyZ1mZyFilzRbtH+mbbCnsph5ygUl7jSvzJgGKLXkdL3VBEKCt/AomT3ExKlUsCD8c+bRFq7iJyhWZgKASi6UzqZBqYtWeszT6m1k9VwnUnnkZXOUzYIRFaFlIaHJcxMm6IBPFJ16rIsG00SxN+60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
-Received: from localhost (localhost [127.0.0.1])
-	by mx.ewheeler.net (Postfix) with ESMTP id 3F2678A;
-	Wed, 18 Jun 2025 15:03:15 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id DSeB3lR9Hvwy; Wed, 18 Jun 2025 15:03:13 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx.ewheeler.net (Postfix) with ESMTPSA id 6963445;
-	Wed, 18 Jun 2025 15:03:13 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 6963445
-Date: Wed, 18 Jun 2025 15:03:09 -0700 (PDT)
-From: Eric Wheeler <netdev@lists.ewheeler.net>
-To: Neal Cardwell <ncardwell@google.com>
-cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
-    stable@kernel.org
-Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
- retransmits were sent
-In-Reply-To: <CADVnQymCso04zj8N0DYP9EkhTwXqtbsCu1xLxAUC60rSd09Rkw@mail.gmail.com>
-Message-ID: <452b3c16-b994-a627-c737-99358be8b030@ewheeler.net>
-References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
- <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com> <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
- <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net> <a8579544-a9de-63ae-61ed-283c872289a@ewheeler.net> <CADVnQymCso04zj8N0DYP9EkhTwXqtbsCu1xLxAUC60rSd09Rkw@mail.gmail.com>
+	s=arc-20240116; t=1750284439; c=relaxed/simple;
+	bh=Zfw9r/CjxyD3/T/FBJpIDs8gZG38Uk1Mm6aVAeKri5Q=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=tLwPRC++464E0HuWBvlQ7ulVFv1lRE+qzPrVRPcdX05IVuLpB8itNDRny/stzOL+DQzaNj8A5ZASgEk7l0SBZFbN1DVlVAmDK8RoBs+kOBbMs371JzmEiq+Ij+QjiA0CqhAZR33xkNWjnEYRIwXx7ogK+p7rd/U8cu2+5ly0HPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bmh1PY74; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-23636167b30so1994335ad.1
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 15:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750284437; x=1750889237; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
+        bh=ResaT67xXCdshcqf/Mz1Hh2eOY08aovvWJ5kJET0+Kg=;
+        b=Bmh1PY74MtLtPQwJA4ZmuJ8xf53ita23c3E1SSmnvV5fcLjPDK6BYad2EKp1qzkdDA
+         0pOS4IWby2fl2ws5GRAV1QUIJByBRLn+pT+yFl24NwU/Scd2jZFGitRGPgaYIyWobLOC
+         c1wNOu6AUbCODghNDd09ttS8me7odqgu3SaQsU+TETnsuBWmqGDGSqga1lNiXZK6nBGH
+         S+w2XY1uF4ypQOBpmUmpUEgOq2I4x2iT6mWeXnBNapWq06FFZ5Jn3ZKe/ZJhWq5lMvMW
+         E//XPUkbNcgI0A+ghfs2FtwLvkniScWBU4gn3AXbT+FoCxI8RuU25NTxOl+8979LV9Hp
+         wC5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750284437; x=1750889237;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ResaT67xXCdshcqf/Mz1Hh2eOY08aovvWJ5kJET0+Kg=;
+        b=E/UP/jF8amzet8OK4JX1WHF5XBOLFXxfs7ESEF91+ASCPIW6M2LuJGaIsrQexCHUD0
+         p8BpzP36hQH6kJs+HdvE+WnqZg/d5tXpQ3cyy0rhOxNW9eMcjIxDG8q8CqHRmn64rl1q
+         85emrs3JQLZwcHVBAsZ8R8mCRvZOJu48Ycr3I/BR77Eolin3e9+yPlyUZ1geWpGF7XRI
+         6SvH1M11cRJ0+kPpDiK896O29vXZpGrtFz+CTxuAJsXtF5irWPJ3/YiKtTSgUGFikq5c
+         akiuKBUlaUrfVzU4M2pq/bXc1E4VXJfi/svUFQ0EV3BVlNV9nQyKoXyW3vYiFTQARunX
+         10hQ==
+X-Gm-Message-State: AOJu0YxodVFVmb88rl/KQO4DYepWp8x56I5QhuCQ2+AnPtKunr0Ruc50
+	Zu82yW/WkDsT3RpMs6GfUkpzrYGk3DK5WwQdA6rwhvEckq8PsekVdw0ZkKzwmg==
+X-Gm-Gg: ASbGncujONZtAzsxWNWhu+2ivwbpauyWPxCHQj3l3jLpjGpSgI7dRimnYoBbCvXXfCP
+	+rkrJ4yihidF/5LaIIbdz0NL55vv/ak46d318BUuY/5n3pliL9JGpj0cqp6QF9UweiG5zhNShgO
+	tuw/1K9wiGPW1y5FzEOMWgojaS+QSFTpZXyFu1r7Ncco1rgF+99xxwiAcSNzgpp5x3y4CS5n/sL
+	nq54D9WjDz7gvDhP5f+3QjY1XC1nbxi0HDh3AFQUiGtY8wr5C+4l8e6XT20ahyPI+EzsCXtTlpi
+	/Gxt6RcKYKVEBzdGS9TpOu+USapGHHrju5xGlZ0u6T13k3QsxsLfHq2zPz57LgEUsW/gPFsYwjl
+	RpEEWPAAQethrzJ+tgLiM
+X-Google-Smtp-Source: AGHT+IEJCuQvlM/FsP+LaPN2G3uGbbqVtf3lVqXWvYLuy32z3Io/bRNNI6Cy8MdtHNd4JnYVnMSDEw==
+X-Received: by 2002:a17:902:ccc2:b0:234:a139:1203 with SMTP id d9443c01a7336-2366b3c5ac7mr307133975ad.32.1750284436891;
+        Wed, 18 Jun 2025 15:07:16 -0700 (PDT)
+Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d8a19d7sm106135295ad.83.2025.06.18.15.07.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jun 2025 15:07:16 -0700 (PDT)
+Subject: [net-next PATCH v3 0/8] Add support for 25G, 50G, and 100G to fbnic
+From: Alexander Duyck <alexander.duyck@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux@armlinux.org.uk, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org,
+ kernel-team@meta.com, edumazet@google.com
+Date: Wed, 18 Jun 2025 15:07:15 -0700
+Message-ID: 
+ <175028434031.625704.17964815932031774402.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-1413097006-1750284193=:12017"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+The fbnic driver up till now had avoided actually reporting link as the
+phylink setup only supported up to 40G configurations. This changeset is
+meant to start addressing that by adding support for 50G and 100G interface
+types.
 
---8323328-1413097006-1750284193=:12017
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+With that basic support added fbnic can then set those types based on the
+EEPROM configuration provided by the firmware and then report those speeds
+out using the information provided via the phylink call for getting the
+link ksettings. This provides the basic MAC support and enables supporting
+the speeds as well as configuring flow control.
 
-On Mon, 16 Jun 2025, Neal Cardwell wrote:
+After this I plan to add support for a PHY that will represent the SerDes
+PHY being used to manage the link as we need a way to indicate link
+training into phylink to prevent link flaps on the PCS while the SerDes is
+in training, and then after that I will look at rolling support for our
+PCS/PMA into the XPCS driver.
 
-> On Mon, Jun 16, 2025 at 4:14 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> >
-> > On Sun, 15 Jun 2025, Eric Wheeler wrote:
-> > > On Tue, 10 Jun 2025, Neal Cardwell wrote:
-> > > > On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > >
-> > > > > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > > >
-> > > > > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > > > >
-> > > > > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
-> > > > > > > >
-> > > > > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> > > > > > > > >
-> > > > > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
-> > > > > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > Hello Neal,
-> > > > > > > > > > >
-> > > > > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
-> > > > > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
-> > > > > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
-> > > > > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
-> > > > > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
-> > > > > > > > > > >
-> > > > > > > > > > > Interestingly, the problem only presents itself when transmitting
-> > > > > > > > > > > from Linux; receive traffic (to Linux) performs just fine:
-> > > > > > > > > > >         ~60Mbit: Linux v6.6.85 =TX=> 10GbE -> switch -> 1GbE  -> device
-> > > > > > > > > > >          ~1Gbit: device        =TX=>  1GbE -> switch -> 10GbE -> Linux v6.6.85
-> > > > > > > > > > >
-> > > > > > > > > > > Through bisection, we found this first-bad commit:
-> > > > > > > > > > >
-> > > > > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
-> > > > > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
-> > > > > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
-> > > >
-> > >
-> > > > The attached patch should apply (with "git am") for any recent kernel
-> > > > that has the "tcp: fix to allow timestamp undo if no retransmits were
-> > > > sent" patch it is fixing. So you should be able to test it on top of
-> > > > the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
-> > > > easier.
-> >
-> > Definitely better, but performance is ~15% slower vs reverting, and the
-> > retransmit counts are still higher than the other.  In the two sections
-> > below you can see the difference between after the fix and after the
-> > revert.
-> >
-> > Here is the output:
-> >
-> > ## After fixing with your patch:
-> >         - - - - - - - - - - - - - - - - - - - - - - - - -
-> >         [ ID] Interval           Transfer     Bitrate         Retr
-> >         [  5]   0.00-10.00  sec   946 MBytes   794 Mbits/sec  771               sender <<<
-> >         [  5]   0.00-10.04  sec   944 MBytes   789 Mbits/sec                  receiver <<<
-> >
-> > ## After Revert
-> >         - - - - - - - - - - - - - - - - - - - - - - - - -
-> >         [ ID] Interval           Transfer     Bitrate         Retr
-> >         [  5]   0.00-10.00  sec  1.11 GBytes   950 Mbits/sec   55             sender
-> >         [  5]   0.00-10.04  sec  1.10 GBytes   945 Mbits/sec                  receiver
-> 
-> Thanks for the test data!
-> 
-> Looking at the traces, there are no undo events, and no spurious loss
-> recovery events that I can see. So I don't see how the fix patch,
-> which changes undo behavior, would be relevant to the performance in
-> the test. It looks to me like the "after-fix" test just got unlucky
-> with packet losses, and because the receiver does not have SACK
-> support, any bad luck can easily turn into very poor performance, with
-> 200ms timeouts during fast recovery.
-> 
-> Would you have cycles to run the "after-fix" and "after-revert-6.6.93"
-> cases multiple times, so we can get a sense of what is signal and what
-> is noise? Perhaps 20 or 50 trials for each approach?
- 
-I ran 50 tests after revert and compare that to after the fix using both
-average and geometric mean, and it still appears to be slightly slower
-then with the revert alone:
+v2:
+- Fixed issue with fbnic_mac_get_fw_settings changes being pulled forward
+  into patch 3 from patch 4.
+- Updated CC list to include full list from maintainers.
+v3:
+- Stripped out the QSFP support from the first patch
+- Split the third patch "fbnic: Replace link_mode with AUI" into 3
+    fbnic: Retire "AUTO" flags and cleanup handling of FW link settings
+    fbnic: Replace link_mode with AUI
+    fbnic: Update FW link mode values to represent actual link modes
+- Added Reviewed by to
+    fbnic: Add support for setting/getting pause configuration
+- Various wording fixes for patch descriptions due to patch splitting
 
-	# after-revert-6.6.93    
-	Arithmetic Mean: 843.64 Mbits/sec
-	Geometric Mean: 841.95 Mbits/sec
+---
 
-	# after-tcp-fix-6.6.93    
-	Arithmetic Mean: 823.00 Mbits/sec
-	Geometric Mean: 819.38 Mbits/sec
+Alexander Duyck (8):
+      net: phy: Add interface types for 50G and 100G
+      fbnic: Do not consider mailbox "initialized" until we have verified fw version
+      fbnic: Retire "AUTO" flags and cleanup handling of FW link settings
+      fbnic: Replace link_mode with AUI
+      fbnic: Update FW link mode values to represent actual link modes
+      fbnic: Set correct supported modes and speeds based on FW setting
+      fbnic: Add support for reporting link config
+      fbnic: Add support for setting/getting pause configuration
 
-Do you think that this is an actual performance regression, or just a
-sample set that is not big enough to work out the averages?
 
-Here is the data collected for each of the 50 tests:
-	- https://www.linuxglobal.com/out/for-neal/after-revert-6.6.93.tar.gz
-	- https://www.linuxglobal.com/out/for-neal/after-tcp-fix-6.6.93.tar.gz
-
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   5 +
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c    |  23 +++-
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |   8 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  95 ++++++-------
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  23 ++--
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   2 -
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  11 +-
+ .../net/ethernet/meta/fbnic/fbnic_phylink.c   | 126 +++++++++++++++---
+ drivers/net/phy/phy-core.c                    |   3 +
+ drivers/net/phy/phy_caps.c                    |   9 ++
+ drivers/net/phy/phylink.c                     |  13 ++
+ include/linux/phy.h                           |  12 ++
+ 12 files changed, 237 insertions(+), 93 deletions(-)
 
 --
-Eric Wheeler
 
-
-> Thanks!
-> neal
-> 
---8323328-1413097006-1750284193=:12017--
 
