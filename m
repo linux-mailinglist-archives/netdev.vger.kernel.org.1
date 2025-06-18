@@ -1,168 +1,141 @@
-Return-Path: <netdev+bounces-199169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C41ADF4D5
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:50:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11039ADF4DD
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 19:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04246189453A
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCAA63A985E
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 17:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1441B2FA62C;
-	Wed, 18 Jun 2025 17:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7EF2FCE20;
+	Wed, 18 Jun 2025 17:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ADY6pX9f"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DA12FA62F;
-	Wed, 18 Jun 2025 17:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B552FCE11
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 17:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750268532; cv=none; b=kbSf0JM/fTwwCgKHbOMcCzilGbQZeMBdywf84KuUAdNmpSo0LSKk7JZ2+/yb5PJIZWP/PKhGT+FlGZ7Y+ud6p6PdC6urvHBMKGDjBnjj4TSNN2D6oIqWeUw/8EBdYuO6IWPOMjOZddMM+hKoj0rktB0dpVWi6DRJAHYsOq8kY6w=
+	t=1750268565; cv=none; b=B4PqDj49NMEue/cS4kdsGj5jrxTAgx/y8UOr0/YIKFopEQYDt+ejEbVZN9BvZ5VH35Oj7id5y2l4+sXo6h3GzysYo1BId6dNN1N90sojiliFsDkeyPLz34rUefOw1iecurOgCJzGSJ9Tsbvh6Y3M2nJ2Q6QZ9wgO5koyrdNSbU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750268532; c=relaxed/simple;
-	bh=PFOvRPg2CJBPcJUPWyP7JdVspRXn33CIKGD2PUZrvUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Iaik5aBcpnFOKmvpFZZzBEBnsRlRFa0lFigdZUboV/W3igliFxVVrHwrIOtTfP8vo2GfCPP+JtBsjGtywqsLA1e9C3KT3f9PSz5dqoCcUrJhkdbhsdbuOyByQNZpDz9ozcqZgOgWoWILyfho2uchWW5spfwS36/AvTOAJOZV6C4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uRwez-000000004uy-0gef;
-	Wed, 18 Jun 2025 17:41:59 +0000
-Date: Wed, 18 Jun 2025 19:41:50 +0200
-From: Daniel Golle <daniel@makrotopia.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, Simon Horman <horms@kernel.org>,
-	arinc.unal@arinc9.com
-Subject: Re: [net-next v5 3/3] net: ethernet: mtk_eth_soc: skip first IRQ if
- not used
-Message-ID: <aFL6XhghHobju0th@pidgin.makrotopia.org>
-References: <20250618130717.75839-1-linux@fw-web.de>
- <20250618130717.75839-4-linux@fw-web.de>
+	s=arc-20240116; t=1750268565; c=relaxed/simple;
+	bh=ezfkWYilFJoWjnrdYnziJbrI9I7n/cw46+cyVaxD7S4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XBJAcdEbuGFXd7sbNIa74eBuz7Evwe+EYJf/GkhAtsXqIL6gFSAutoQKAT8mM4fD/AnXx82lR0FERSOtZsQl2yotUiMKkWAKedDKjL85QDYbx/A5F7o/Gplr2YtPGlWrj1RlJVU1aadEWaJTsWvz2iqIsdxfQol2qI1eChu1pdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ADY6pX9f; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750268564; x=1781804564;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ezfkWYilFJoWjnrdYnziJbrI9I7n/cw46+cyVaxD7S4=;
+  b=ADY6pX9fx8o6VIxUBkpWSslDBHTzTsL23K8hJ7X8vHK1QhBNt3JFthTC
+   alOOdd9MlLISASM4Aa6CGUe5HYtRG6b0iMipRH0tsgvZmBzQoui+Rt0P3
+   7uFMIUc5h79KRZflseV/gIBfXwu7MyHSkzhIK9kmQ/zJ9R6Dqm0BqiaQU
+   hSdeyxdZpr8WHgZVwLiR4oFQLHZiHdADi1Ro1tAlucJMmKRVbcPjJSJdj
+   TBycFspjh/fbiXEwf+q2p/Pt8cdLjYNa4rsnae+//PH+OguBQKwoMCk7Z
+   hu6tsrULKt7ktK/O945pX6IzPjS89/IydyLusZqSueTHPdoM9MgCeybWE
+   Q==;
+X-CSE-ConnectionGUID: loxUpT4tSRyRGCV10kRe6A==
+X-CSE-MsgGUID: LFSG1xGiTpe8AdiHSQRtPA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="56183658"
+X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
+   d="scan'208";a="56183658"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 10:42:43 -0700
+X-CSE-ConnectionGUID: 7HSDCHPCTHGz4IrrVZ6MvQ==
+X-CSE-MsgGUID: fCdFJyRVREeDkLfML7fmWA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
+   d="scan'208";a="149695803"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa007.fm.intel.com with ESMTP; 18 Jun 2025 10:42:42 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	karol.kolacinski@intel.com,
+	jacob.e.keller@intel.com,
+	przemyslaw.kitszel@intel.com,
+	richardcochran@gmail.com
+Subject: [PATCH net-next 00/15][pull request] ice: Separate TSPLL from PTP and clean up
+Date: Wed, 18 Jun 2025 10:42:12 -0700
+Message-ID: <20250618174231.3100231-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618130717.75839-4-linux@fw-web.de>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 18, 2025 at 03:07:14PM +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> On SoCs without MTK_SHARED_INT capability (all except mt7621 and
-> mt7628) platform_get_irq() is called for the first IRQ (eth->irq[0])
-> but it is never used.
+Jake Keller says:
 
-I know that technically MTK_SHARED_INT is a capability flag, but it's
-rather a non-capability. Hardware having dedicated interrupts for RX and
-TX is "more capable" than (older, legacy) hardware with just one shared
-interrupt for both...
+Separate TSPLL related functions and definitions from all PTP-related
+files and clean up the code by implementing multiple helpers.
 
-So maybe better:
-"On SoCs with dedicated RX and TX interrupts (all except MT7621 and
-MT7628) ..."
+Adjust TSPLL wait times and fall back to TCXO on lock failure to ensure
+proper init flow of TSPLL.
 
-Reading the datasheet of some recent MediaTek SoC it is worth
-noting that there are 4 interrupts assigned to the frame engine and
-the FE_INT_GRP register can be used to assign functions to them.
+Change default clock source for E825-C from TCXO to TIME_REF if its
+available.
+---
+IWL: https://lore.kernel.org/intel-wired-lan/20250501-kk-tspll-improvements-alignment-v4-0-24c83d0ce7a8@intel.com/
 
-So technically, calling them RX and TX in DT is wrong, becaues they
-are fe_int0, fe_int1, fe_int2 and fe_int3, which are then assigned
-one or more functions by the driver using that FE_INT_GRP register.
+The following are changes since commit fc4842cd0f117042a648cf565da4db0c04a604be:
+  Merge branch 'netconsole-msgid' into main
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
-However, it's the driver then assigns QDMA TX to fe_int1 and RX to
-fe_int2 while leaving fe_int0 and fe_int3 unsued.
+Jacob Keller (4):
+  ice: fix E825-C TSPLL register definitions
+  ice: clear time_sync_en field for E825-C during reprogramming
+  ice: read TSPLL registers again before reporting status
+  ice: default to TIME_REF instead of TXCO on E825-C
 
-That's what the magic value 0x21021000 which is written to FE_INT_GRP
-register does.
+Karol Kolacinski (11):
+  ice: move TSPLL functions to a separate file
+  ice: rename TSPLL and CGU functions and definitions
+  ice: remove ice_tspll_params_e825 definitions
+  ice: use designated initializers for TSPLL consts
+  ice: add TSPLL log config helper
+  ice: add ICE_READ/WRITE_CGU_REG_OR_DIE helpers
+  ice: use bitfields instead of unions for CGU regs
+  ice: add multiple TSPLL helpers
+  ice: wait before enabling TSPLL
+  ice: fall back to TCXO on TSPLL lock fail
+  ice: move TSPLL init calls to ice_ptp.c
 
-On MT7988 and newer, in addition to those 4 frame engine interrupts
-there are **another 4** interrupts for PDMA, typically used to
-service 4 RX rings while one of the fe_int* is used to indicate
-TX done.
+ drivers/net/ethernet/intel/ice/Makefile       |   2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   1 +
+ drivers/net/ethernet/intel/ice/ice_cgu_regs.h | 181 ------
+ drivers/net/ethernet/intel/ice/ice_common.c   |  71 ++-
+ drivers/net/ethernet/intel/ice/ice_common.h   |  58 ++
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  14 +-
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   | 177 +-----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 564 +-----------------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  54 +-
+ drivers/net/ethernet/intel/ice/ice_tspll.c    | 518 ++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_tspll.h    |  31 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |  20 +-
+ 12 files changed, 712 insertions(+), 979 deletions(-)
+ delete mode 100644 drivers/net/ethernet/intel/ice/ice_cgu_regs.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_tspll.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_tspll.h
 
-> Skip the first IRQ and reduce the IRQ-count to 2.
-> 
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> ---
-> v5:
-> - change commit title and description
-> v4:
-> - drop >2 condition as max is already 2 and drop the else continue
-> - update comment to explain which IRQs are taken in legacy way
-> ---
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 12 ++++++++----
->  drivers/net/ethernet/mediatek/mtk_eth_soc.h |  4 ++--
->  2 files changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> index 875e477a987b..7990c84b2b56 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -3354,10 +3354,14 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
->  	 * the second is for TX, and the third is for RX.
->  	 */
->  	for (i = 0; i < MTK_FE_IRQ_NUM; i++) {
-> -		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
-> -			eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
-> -		else
-> -			eth->irq[i] = platform_get_irq(pdev, i);
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
-> +			if (i == 0)
+-- 
+2.47.1
 
-This would make it even more readable:
-			if (i == MTK_FE_IRQ_SHARED)
-
-
-Other than that looks good to me:
-
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
-
-> +				eth->irq[MTK_FE_IRQ_SHARED] = platform_get_irq(pdev, i);
-> +			else
-> +				eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
-> +		} else {
-> +			eth->irq[i] = platform_get_irq(pdev, i + 1);
-> +		}
->  
->  		if (eth->irq[i] < 0) {
->  			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-> index 8cdf1317dff5..9261c0e13b59 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-> @@ -643,8 +643,8 @@
->  #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
->  
->  #define MTK_FE_IRQ_SHARED	0
-> -#define MTK_FE_IRQ_TX		1
-> -#define MTK_FE_IRQ_RX		2
-> +#define MTK_FE_IRQ_TX		0
-> +#define MTK_FE_IRQ_RX		1
->  #define MTK_FE_IRQ_NUM		(MTK_FE_IRQ_RX + 1)
->  
->  struct mtk_rx_dma {
-> -- 
-> 2.43.0
-> 
-> 
 
