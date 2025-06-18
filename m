@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-199059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAEBFADEC67
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:33:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C27DEADECAE
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 14:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF2A71891931
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:30:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CFF1BC2B38
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 12:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640A12EAB8E;
-	Wed, 18 Jun 2025 12:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1B52E3B14;
+	Wed, 18 Jun 2025 12:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dYakY6J5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DijN8Sil"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5D62EA15F
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 12:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF85285C8B;
+	Wed, 18 Jun 2025 12:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750249693; cv=none; b=pOFF5j9vKU5iBNOhk9a+U0vK8r1Ksxk/UEiIZZbRY7UMYCwjoilhdAImtpR8lRw25u7pJIIDEpw+w3e8cueIoKDYbrY+TpyPRzpmfQWkmg7tdNy12q/54PR7fi3O5yL02/lNMejgon4mTBnTL8Sd486wfBJW2Q3htZJ7RB8/QyE=
+	t=1750249895; cv=none; b=QXg3Ummf9kpN+YzTAPu/SEGRU73V/R0FhqkfLhpGU3pN13H2kjJXx1TMDy/1BLf8ITsMlcKBQPtb2Is+XsJ6b8kY9o3APIYJ3qSE3nlkYgihv1AMyDVKEIqW8Q2gu1vPOQA8Z81v12lL8/gD4U8NgR4H5Z5PhEkubL+xuu1oJmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750249693; c=relaxed/simple;
-	bh=lvDeYY1tyHLW44AqHwWF82BKnD0o1q8Cao4PGtdqJcc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VaOgj8n3kdJ+QH4tKmHglxEKtjhKAFF5KjbEAB+WA4nQa+V6IiY170LBI4xbRv0tYqSRV79WNV49e3J0YU4H3sKJZwT95qDE57u9133WuUIU7kCP+Dpc4EhfLheLfWEP9FzLSIiJrCPYU6eI4kaNRs/dHpZmHPcnQYG7dox+ryk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dYakY6J5; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-553b51f5218so5203372e87.0
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 05:28:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750249687; x=1750854487; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lvDeYY1tyHLW44AqHwWF82BKnD0o1q8Cao4PGtdqJcc=;
-        b=dYakY6J5RcYzb6omLmKYYIz3TI3xl/KZHg1mfJgQ/ArkezRGWpHZALVwx2Ssm3uIux
-         dwfgA8QHt1H6TGPmDx/nQ1Co8QKFzoAB0r4PhB6A+8q4CzbNhzMkxycx8MiiFOHXfy0F
-         Y0P9YQL21+lWZD/v4hB1eQXMmPF9TgEyik/eH3A98lbfmNu2CGv/GNLhylgIkeLugSHZ
-         ffxHVk2Zxp1mK6kUOo6pA4ZwGh0Ov0nLJXiaJ2GSXuLCJ7gruSeeKZZOAGDm7+WZhQBA
-         TbPig0qdgIAQ+bC+XSuiSJ+ihuc/wDfQK4MHfw34BPC2uit/IjfFuxSShOvjqYxTuLAs
-         eXdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750249687; x=1750854487;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lvDeYY1tyHLW44AqHwWF82BKnD0o1q8Cao4PGtdqJcc=;
-        b=pSX0+rs0o3D+nElE5s6CSNHLE/kw7QfetYMFc3X21tqLEPXmOuQni0WKQRt4FY9T1+
-         9xjhEcSCncUBaXqmSMBWGUJ2yzW9uPcXLVcxTDYenaZa7FsYVhO+2BOH+/dB+PBlUB7W
-         bRHuuOwjBPS54cW7PZvnrVh2T92QPtXLJxNyDKQyCpj7HP7bZP1PDlH0pfznW2UOx7Fc
-         3QC+jo7YkECYYJFPgpUWgN7pbYleUAzXnX/vz2Q1r09KlWnCBrVJORQoCR6qoDxo0CNe
-         OqyLikOwP/VXiUoA52M+rTSBgUIUDvBeIPkEhBk0mEuhxM7suK8OSxJlznlJ/2nUh7O2
-         /QcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYA45b92RjQcDSzECGhaP1Usv68RGDwxMA3FlDM8emxylCmleZ3EqpyiHG6yEVzfYoAPdIn9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRvoFMf9czxHtPgnVHCSnKQUOCWBG5wYg1Z2VzUIUSDZ80DFX6
-	JbcyRCsdZTMnt0f0QJVak5iwsNVCkbQilPieVRw90mhOcYCKinP7KJjken5yd7gZX/0qSa/tN+H
-	eq19OYFzVirKyIBpcjN83M7sK3XVR1WYHiYPGDzZWlg==
-X-Gm-Gg: ASbGncsc2TmuBTeVVFq7aJz3LgB45PnzjzTEzZiSpcsuQLFkuORCacH3jQVkBS+IPQK
-	vXIWsoZfT0PKkz2MipUJlVhsc/g+HVnzpfI56KGSKM4YLPssmlaQCXdWO72PUg4Ao/OERQbgH+R
-	m5aaeXKZ5dOQR77/75FeOEzkTujxrmEPp6J0MNP1osmFg=
-X-Google-Smtp-Source: AGHT+IEqcYdJwMh4FSJGyni6X0wxHGpPoUz/ob8ESveA1VpUKphDYobFyqmST5aw3MNHLgS47EAGeONWHSlMXxk934Q=
-X-Received: by 2002:a05:6512:2315:b0:553:adf2:38bb with SMTP id
- 2adb3069b0e04-553b6f42459mr4514077e87.46.1750249687261; Wed, 18 Jun 2025
- 05:28:07 -0700 (PDT)
+	s=arc-20240116; t=1750249895; c=relaxed/simple;
+	bh=3ZrI052V23T+mNrFLFPPcK3CIF/YjYSdxgqZH0iO2d0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xsq9zPZq23KjhwKK+THSw8yX8UyUpxA8jJRYuIWUCxJ+WU40ZS44qVpzSs1EPQ/2KqB9AgSpa96v5YhiUrhyYoyFYQfqqCd1Mw6vrNFtIg40zP33vmoXe3MM8AoItIOA3E3DUDEkoICGfovaauFkrT3fDDDn3Nd279d33Gc2hkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DijN8Sil; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 464B3C4CEE7;
+	Wed, 18 Jun 2025 12:31:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750249893;
+	bh=3ZrI052V23T+mNrFLFPPcK3CIF/YjYSdxgqZH0iO2d0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DijN8Sil7SIDh7aMjK7gKz3beUUdlrtDXsfV9XqMLHI2sWXIPtLhM9yZKqEhdLv0S
+	 16UPsbzgcQ/2ZsrzKi70rJ+Cfjy3JGmJ+KmSxJCt9z5wRq09rmY0McIDUQqnz10aW9
+	 eBy84xrynrdhhZ3XQyI7hYerF6M+z25EkcOZmpay0EwFLprTzfNBvrxFVazlqo5XTW
+	 zzt468nWONM2EYqrbOVk859JQXXPzqN9yAADNYQ5bSAUtlT1o7E5gzrTXNwc/VQcjJ
+	 KUPXZZ/qElxiFMuYaksyZwOVodEgisAenxD7DGhN6W5Q/Uq3bHXp3XJnKOXOl/AKfb
+	 +PJD2RifMK7qw==
+Date: Wed, 18 Jun 2025 13:31:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Re: [PATCH] vhost: Fix typos in comments and clarity on alignof
+ usage
+Message-ID: <20250618123130.GM1699@horms.kernel.org>
+References: <20250615173933.1610324-1-alok.a.tiwari@oracle.com>
+ <20250617183741.GD2545@horms.kernel.org>
+ <eb95149b-89eb-437f-813d-0045635aee8b@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616-gpiochip-set-rv-net-v2-0-cae0b182a552@linaro.org> <20250616-gpiochip-set-rv-net-v2-2-cae0b182a552@linaro.org>
-In-Reply-To: <20250616-gpiochip-set-rv-net-v2-2-cae0b182a552@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 18 Jun 2025 14:27:53 +0200
-X-Gm-Features: AX0GCFtOmBUtsD4jP5iXZmqQJNmNp3Xkluag7JKU4cjSCOXhD78FpOnWyAbPHYM
-Message-ID: <CACRpkdYi0oVa3uek7zcb2Jy_YPded6jfEKoXUp=BL01V5XX1MQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] net: dsa: mt7530: use new GPIO line value setter callbacks
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Chester A. Unal" <chester.a.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, 
-	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-can@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eb95149b-89eb-437f-813d-0045635aee8b@oracle.com>
 
-On Mon, Jun 16, 2025 at 9:24=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl>=
- wrote:
+On Wed, Jun 18, 2025 at 01:31:09AM +0530, ALOK TIWARI wrote:
+> 
+> 
+> Thanks Simon,
+> 
+> On 6/18/2025 12:07 AM, Simon Horman wrote:
+> > On Sun, Jun 15, 2025 at 10:39:11AM -0700, Alok Tiwari wrote:
+> > > This patch fixes multiple typos and improves comment clarity across
+> > > vhost.c.
+> > > - Correct spelling errors: "thead" -> "thread", "RUNNUNG" -> "RUNNING"
+> > >    and "available".
+> > > - Improve comment by replacing informal comment ("Supersize me!")
+> > >    with a clear description.
+> > > - Use __alignof__ correctly on dereferenced pointer types for better
+> > >    readability and alignment with kernel documentation.
+> > Could you expand on the last point?
+> > I see that the patch uses __alignof__ with rather than without parentheses.
+> > But I don't follow how that corresponds with the comment above.
+> 
+> only I can say "__alignof__ *vq->avail" is valid C,
+> but it can hard to read and easy to misinterpret.
+> Without proper parentheses sometime, __alignof__ *vq->avail can be
+> misleading to reader. it may not be immediately clear whether it refers to
+> alignment of the pointer vq->avail or
+> alignment of the object it points to.
+> __alignof__(*vq->avail) adds parentheses that clarify the intention
+> explicitly.
+> I can not see very clear guide line to using parentheses or not for
+> __alignof__ in kernel document apart
+> from(https://www.kernel.org/doc/html/latest/process/coding-style.html).
+> Additionally, I have not been able to locate examples in the kernel code
+> where __alignof__ is used without parentheses.
 
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> struct gpio_chip now has callbacks for setting line values that return
-> an integer, allowing to indicate failures. Convert the driver to using
-> them.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Thanks, I understand now.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Perhaps it's not important, but FWIIW I was confused by "correctly".
+And something like this seems a bit clearer to me.
 
-Yours,
-Linus Walleij
+  - Use __alignof__ with parentheses which is in keeping with kernel coding
+    style for an __attribute__ and arguably improves readability of what is
+    being aligned.
+
+In any case, thanks for your explanation.
+This patch now looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
