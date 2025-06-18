@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-199264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45A7ADF956
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:25:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B552ADF95C
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 00:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57CA74A122E
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:25:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 064413ABDB4
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 22:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D5427E7FB;
-	Wed, 18 Jun 2025 22:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FBF27F01A;
+	Wed, 18 Jun 2025 22:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S248oXyi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nWjEJaUb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AFB3085AA
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC95227EC6F
+	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 22:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750285506; cv=none; b=QMyPOuW7Omzz6bwRLNq9P9HmN1bbzk8iLa76hvOv4KB+V2UQSzpusNiq9vPkWVbWfWgoSC7SSCYvxlO09VAW2pDi7AtNuC65uQZFmkC2d5KoVCk2XAvH7+mpu/+9SzhIf5W1mRJXoK3iK1gH+flDU3WXqeX4SEPCXr7Ld/K5rnA=
+	t=1750285508; cv=none; b=sqDOTFZWM0BGcJ9jM6SdNWAu1wQPLpLrh2uw0B8I326LU4xbl70HdH42KjBe650Gy1wSCzLjRu8x0N6PzL2b0sj8b6/3sNT/IuSlTz11bmQTpaVpT+k0Yn6DWYhTmqIFL4pcuU3ViTPJ14sLYtOp3cOD7FnaImWYDu35RfMA04I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750285506; c=relaxed/simple;
-	bh=/C0mKxIHEbpL62vBDZxpL6tZO8RNdm66a6YCQJP1wVE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=khvB2HV726hK5gO+Brxyl1HIxLgHtmk0SUdBYXenFEVizW5Fj+BOi4rQEiCI2MT4zlqNj2t13cgQT7LLJBVEC7kOWfoqalk5SaX9JNocE8h5v9WLaSLZfktOUbOzI1TlygUC+59/a6SRtL5izsOkAeACikFYESwpIgAnKNExPE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S248oXyi; arc=none smtp.client-ip=192.198.163.17
+	s=arc-20240116; t=1750285508; c=relaxed/simple;
+	bh=fdrkhdq6W8qDicqoFfmLZP4nTL8We3Md3i1yKTHvv50=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=kDRQ/f9Zu/vYe3n6M/oL6i/7cZ4tmo94Sv/n62jouUpJTFeoPmFyx1OJXWXLJzJqj+b7AqK+ErkZS+Y1dkQiSKRsPOFRNTJoNQHNEm4lv/B2zFyKNop5hkYH8Yu7+fimrDQprApJ+LlsgW6I+TXnFMRLKwGSGlKOCA2ZTuQ1Uk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nWjEJaUb; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750285505; x=1781821505;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=/C0mKxIHEbpL62vBDZxpL6tZO8RNdm66a6YCQJP1wVE=;
-  b=S248oXyipUsubdqI1BvDBSZcfoG2Bjcekym+LnfDItACFMEeAHqQP24E
-   YTDQjg95ZNxDgtsiE2JweuoTpQNQa6QgKHygMFPq3y4LuJTxcvxop0mKs
-   5CmsSJfjdTYmocybiMdvhUvxKGm0U9CPrd5478AmOhkWMx+fa4poqqLg9
-   JkIKi8ZjKT+sh6Ood+cyOv0AiocHOUp5/e8jzEx6Mp74zATpigrM0ZjrE
-   b/77ixGYVKe3WBvklbtlJslJ08FA5ftw38dOvtjEHCc6+jm+HlJ/ZcctE
-   A8WW0HztgV/dwUHacs4338kWdlBJgg5cYE5bLRGSm3XzOuSD6yIZnNtlU
+  t=1750285507; x=1781821507;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=fdrkhdq6W8qDicqoFfmLZP4nTL8We3Md3i1yKTHvv50=;
+  b=nWjEJaUbDD73hMo4VSY1xCrPhKTv1U0k+cq6Ts3+p6qa3EGLL0cK5zNE
+   jEfbdxj+ebloSKujGIH/1kNYezXLZA0xNZmBeabqXU+n8+tHaE9vGZ+fZ
+   oIeJq9eEfDeyXbqHz+VjThIMGDOYYnTZ9ITkKY77s+mMvI1XNH0OSbV0l
+   zunmPxHVGsBR8h1CxTwPdYvObULcczMoctKPaDX0KwwXdJqgq2QEjaWIj
+   9xtej7ioa470p471jDfM8mRzYGr0fFu/GmsAqG9InswUluXbVPaqpzhni
+   xj/fO/3CKjoLkMZUhR4qfhzv01Y+9u/tWCYqfiaNtWvrCGKhfdzPsvnyo
    Q==;
-X-CSE-ConnectionGUID: p3yi28RPThOnTnPwpKM1FA==
-X-CSE-MsgGUID: nGXusL0IQ4ufvoYA+CvEeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="52447731"
+X-CSE-ConnectionGUID: 7XiQk3gQQg+XxoCMYK8GNw==
+X-CSE-MsgGUID: tZ+LJvKtRSiD/g64Hkf50w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="52447732"
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="52447731"
+   d="scan'208";a="52447732"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 15:25:04 -0700
-X-CSE-ConnectionGUID: Dd23nvGPSJSF6pDs1bvqEQ==
-X-CSE-MsgGUID: iWxuQtHMSRuepUX3zNd2kg==
+X-CSE-ConnectionGUID: 4KdJiOfmRMK584uutzn+6Q==
+X-CSE-MsgGUID: 6Ms/ebpQQoCwJqzJN/nhbw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="149870000"
+   d="scan'208";a="149870004"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
   by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 15:25:04 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-next 0/8] ice: cleanups and preparation for live
- migration
-Date: Wed, 18 Jun 2025 15:24:35 -0700
-Message-Id: <20250618-e810-live-migration-jk-migration-prep-v1-0-72a37485453e@intel.com>
+Date: Wed, 18 Jun 2025 15:24:36 -0700
+Subject: [PATCH iwl-next 1/8] ice: add support for reading and unpacking Rx
+ queue context
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,10 +70,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAKM8U2gC/03NwQqEMAwE0F+RnA20trrFXxEPolHjaldaUUH8d
- 8OePL5hmLkgUmCKUCYXBNo58s8LdJpAOzZ+IORODJnKclVoh+S0wpl3woWH0GzSx+n7whpoRWd
- cp3JjbWs/IFsS9nz+fyrgY0ZP5wb1fT9yJPNqgQAAAA==
-X-Change-ID: 20250618-e810-live-migration-jk-migration-prep-838d05344c47
+Message-Id: <20250618-e810-live-migration-jk-migration-prep-v1-1-72a37485453e@intel.com>
+References: <20250618-e810-live-migration-jk-migration-prep-v1-0-72a37485453e@intel.com>
+In-Reply-To: <20250618-e810-live-migration-jk-migration-prep-v1-0-72a37485453e@intel.com>
 To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
 Cc: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org, 
  Madhu Chittim <madhu.chittim@intel.com>, Yahui Cao <yahui.cao@intel.com>, 
@@ -81,77 +80,134 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
  Przemek Kitszel <przemyslaw.kitszel@intel.com>
 X-Mailer: b4 0.14.2
 
-Various cleanups and preparation to the ice driver code for supporting
-SR-IOV live migration.
+In order to support live migration, the ice driver will need to read
+certain data from the Rx queue context. This is stored in the hardware in a
+packed format.
 
-The logic for unpacking Rx queue context data is added. This is the inverse
-of the existing packing logic. Thanks to <linux/packing.h> this is trivial
-to add.
+Since we use <linux/packing.h> for the mapping between the packed hardware
+format and the unpacked structure, it is trivial to enable unpacking
+support via the unpack_fields() function.
 
-Code to enable both reading and writing the Tx queue context for a queue
-over a shared hardware register interface is added. Thanks to ice_adapter,
-this is locked across all PFs that need to use it, preventing concurrency
-issues with multiple PFs.
+Add the ice_unpack_rxq_ctx() function based on the unpack_fields() API.
+Re-use the same field definitions from the packing implementation.
 
-The RSS hash configuration requested by a VF is cached within the VF
-structure. This will be used to track and restore the same configuration
-during migration load.
+Add ice_copy_rxq_ctx_from_hw() to copy the Rx queue context data from the
+hardware registers.
 
-ice_sriov_set_msix_vec_count() is updated to use pci_iov_vf_id() instead of
-open-coding a worse equivalent, and checks to avoid rebuilding MSI-X if the
-current request is for the existing amount of vectors.
+Use these to implement ice_read_rxq_ctx() which will return the Rx queue
+context to the caller in its unpacked ice_rlan_ctx struct.
 
-A new ice_get_vf_by_dev() helper function is added to simplify accessing a
-VF from its PCI device structure. This will be used more heavily within the
-live migration code itself.
-
-REVIEW NOTES:
-
-This is the first eight patches of my full series to support live
-migration. The full series (based on net-next) is available at [1] for
-early preview if you want to see the changes in context.
-
-Some of these changes are not "used" until the live migration patches
-themselves. However, I felt they were sufficiently large and review-able on
-their own. Additionally, if I keep them included within the live migration
-series it is 15 patches which is at the limit of acceptable size for
-netdev. I'd prefer to merge these cleanups first in order to reduce the
-burden of review for the whole feature.
+This will enable the migration logic access to the relevant data about the
+Rx device queues. It can easily be copied to the target system as part of
+the migration payload, where it will be used to configure the Rx queues.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: [1] https://github.com/jacob-keller/linux/tree/e810-live-migration/jk-migration-tlv
+Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
 ---
-Jacob Keller (8):
-      ice: add support for reading and unpacking Rx queue context
-      ice: add functions to get and set Tx queue context
-      ice: save RSS hash configuration for migration
-      ice: move ice_vsi_update_l2tsel to ice_lib.c
-      ice: expose VF functions used by live migration
-      ice: use pci_iov_vf_id() to get VF ID
-      ice: avoid rebuilding if MSI-X vector count is unchanged
-      ice: introduce ice_get_vf_by_dev() wrapper
+ drivers/net/ethernet/intel/ice/ice_common.h |  2 +
+ drivers/net/ethernet/intel/ice/ice_common.c | 60 +++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
 
- drivers/net/ethernet/intel/ice/ice_adapter.h    |   2 +
- drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  14 +-
- drivers/net/ethernet/intel/ice/ice_common.h     |   6 +
- drivers/net/ethernet/intel/ice/ice_hw_autogen.h |  12 ++
- drivers/net/ethernet/intel/ice/ice_lib.h        |   8 +
- drivers/net/ethernet/intel/ice/ice_sriov.h      |   7 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h     |  34 +++-
- drivers/net/ethernet/intel/ice/ice_virtchnl.h   |  19 ++
- drivers/net/ethernet/intel/ice/ice_adapter.c    |   1 +
- drivers/net/ethernet/intel/ice/ice_common.c     | 233 +++++++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_lib.c        |  35 ++++
- drivers/net/ethernet/intel/ice/ice_sriov.c      |  19 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c     |   3 +
- drivers/net/ethernet/intel/ice/ice_virtchnl.c   |  59 +-----
- 14 files changed, 384 insertions(+), 68 deletions(-)
----
-base-commit: d16813402994bde9201030ef877c9d753227e6dd
-change-id: 20250618-e810-live-migration-jk-migration-prep-838d05344c47
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index f5f132e5b5f945280b53b0eb35aef37c66e3f384..5f15bf83f06a8992f8b260c128df2c625f0bb9f1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -118,6 +118,8 @@ void ice_set_safe_mode_caps(struct ice_hw *hw);
+ 
+ int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
+ 		      u32 rxq_index);
++int ice_read_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
++		     u32 rxq_index);
+ 
+ int
+ ice_aq_get_rss_lut(struct ice_hw *hw, struct ice_aq_get_set_rss_lut_params *get_params);
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index a8b66f7e7f4e65f311daaeb39f1c673ec4cca7ca..2800ec4763688c0d194d29686b470e555a457c1c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1352,6 +1352,26 @@ static void ice_copy_rxq_ctx_to_hw(struct ice_hw *hw,
+ 	}
+ }
+ 
++/**
++ * ice_copy_rxq_ctx_from_hw - Copy packed Rx Queue context from HW registers
++ * @hw: pointer to the hardware structure
++ * @rxq_ctx: pointer to the packed Rx queue context
++ * @rxq_index: the index of the Rx queue
++ */
++static void ice_copy_rxq_ctx_from_hw(struct ice_hw *hw,
++				     ice_rxq_ctx_buf_t *rxq_ctx,
++				     u32 rxq_index)
++{
++	u32 *ctx = (u32 *)rxq_ctx;
++
++	/* Copy each dword separately from HW */
++	for (int i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++, ctx++) {
++		*ctx = rd32(hw, QRX_CONTEXT(i, rxq_index));
++
++		ice_debug(hw, ICE_DBG_QCTX, "qrxdata[%d]: %08X\n", i, *ctx);
++	}
++}
++
+ #define ICE_CTX_STORE(struct_name, struct_field, width, lsb) \
+ 	PACKED_FIELD((lsb) + (width) - 1, (lsb), struct struct_name, struct_field)
+ 
+@@ -1395,6 +1415,21 @@ static void ice_pack_rxq_ctx(const struct ice_rlan_ctx *ctx,
+ 		    QUIRK_LITTLE_ENDIAN | QUIRK_LSW32_IS_FIRST);
+ }
+ 
++/**
++ * ice_unpack_rxq_ctx - Unpack Rx queue context from a HW buffer
++ * @buf: the HW buffer to unpack from
++ * @ctx: the Rx queue context to unpack
++ *
++ * Unpack the Rx queue context from the HW buffer into the CPU-friendly
++ * structure.
++ */
++static void ice_unpack_rxq_ctx(const ice_rxq_ctx_buf_t *buf,
++			       struct ice_rlan_ctx *ctx)
++{
++	unpack_fields(buf, sizeof(*buf), ctx, ice_rlan_ctx_fields,
++		      QUIRK_LITTLE_ENDIAN | QUIRK_LSW32_IS_FIRST);
++}
++
+ /**
+  * ice_write_rxq_ctx - Write Rx Queue context to hardware
+  * @hw: pointer to the hardware structure
+@@ -1420,6 +1455,31 @@ int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
+ 	return 0;
+ }
+ 
++/**
++ * ice_read_rxq_ctx - Read Rx queue context from HW
++ * @hw: pointer to the hardware structure
++ * @rlan_ctx: pointer to the Rx queue context
++ * @rxq_index: the index of the Rx queue
++ *
++ * Read the Rx queue context from the hardware registers, and unpack it into
++ * the sparse Rx queue context structure.
++ *
++ * Returns: 0 on success, or -EINVAL if the Rx queue index is invalid.
++ */
++int ice_read_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
++		     u32 rxq_index)
++{
++	ice_rxq_ctx_buf_t buf = {};
++
++	if (rxq_index > QRX_CTRL_MAX_INDEX)
++		return -EINVAL;
++
++	ice_copy_rxq_ctx_from_hw(hw, &buf, rxq_index);
++	ice_unpack_rxq_ctx(&buf, rlan_ctx);
++
++	return 0;
++}
++
+ /* LAN Tx Queue Context */
+ static const struct packed_field_u8 ice_tlan_ctx_fields[] = {
+ 				    /* Field			Width	LSB */
 
-Best regards,
 -- 
-Jacob Keller <jacob.e.keller@intel.com>
+2.48.1.397.gec9d649cc640
 
 
