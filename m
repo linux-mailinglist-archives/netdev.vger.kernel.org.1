@@ -1,122 +1,140 @@
-Return-Path: <netdev+bounces-199091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B858ADEE87
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:54:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74453ADEE94
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DC4C4047B6
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:54:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FDF91BC1E47
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595392EA72C;
-	Wed, 18 Jun 2025 13:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADEC27E1C3;
+	Wed, 18 Jun 2025 13:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCwnS1L9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXLa9lvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4621C6FE1;
-	Wed, 18 Jun 2025 13:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7B82EA733;
+	Wed, 18 Jun 2025 13:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750254871; cv=none; b=Dk3Q5F059VevOsNtdrn2pIRLOk6jnXLTQCACLcd/krYnN7zx1TVoJMDTcQIDOLmmn3NvtxsrkacBZKw0J1egKdqVGJg2IFqG00bnr0BrqVvgxBffwN13VyzcOnBXIwQaq/wGRs9t6F1AIcN7Q9o+I2NuiOuc1fxtbb3W/Xr4DH4=
+	t=1750254941; cv=none; b=jRrbyim23EgC2Nhq2hz/Lv9Upcr5cgMIpdo7sjAp3vWqCt00CwGG7uD2ETw3kqsyTqSk+7JbNqC+Tg1v9/v6NDldh3TBQrHH7ncsK/p59X/6yek/6/uXGwsLGXiXQFnSh9PPw/kmTOVSPQ7JymzwI/3eBPKmQTTvZ20sOSTv0x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750254871; c=relaxed/simple;
-	bh=UKk//vSIWaJthUCrkf5IZytcjvhwxfOCufg0WdZ1FaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qp3ZjO9nhwrDYUu9PuI9KHMNSMLd8ueuatW1cdtJiZeoqz2ytCcsFHqlQYrnrxEhOm5HdLZi+eDYx9acPbjGc502DzwaK3b7UDytLXcBz7u0ebVNLUea7fdAEsb5T7X7Z7HvYAPwXl2sgOQDiHY4jc4jNXNsyd1SbVhorCb/LSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCwnS1L9; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1750254941; c=relaxed/simple;
+	bh=gx+h3lSh4Jepxc+O8pXLQ82fTA6oke/o0DXkKDYoMJA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EdI51It0Bknn1jA0IJ7uP0gCDxGYhCW1H2SvB/cidsHgWTa7J2GNY5G4I9ghFwOtdPvSY4Trsc4zsH5JVozB+qUt3lsIyruK48XGsqiaShUjXtUnBCpVILlEMI3UXLI5gVYq12nt4ULmU9nreSHEjNKTADwVwk/ZqpFZ/JKDwRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXLa9lvU; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43edecbfb94so78815235e9.1;
-        Wed, 18 Jun 2025 06:54:29 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-450cf214200so60234915e9.1;
+        Wed, 18 Jun 2025 06:55:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750254868; x=1750859668; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VsjqlWk6bmFlt9a3E9KK327lUQiY5+ZZ+i/JJjNAi0U=;
-        b=aCwnS1L9Qf0TzTSXXJNemiEsxWnDNOyKuzTIODgwGgqpaqlwC/8FVOp+E2SAx3cDz/
-         fOtCEQu8PB0n9FbG8+x8/pkxwwlLQvAG0FKBcxkAqeT/ha3rqsFJW/b/9nrnt2Jjc3Gb
-         ZBQSKT57ROSZaa8aDcevoauy87Saq95vTOpkm7xwZ9qdJp6m66/hRhUVwA/wtjcVOpO+
-         AeHXrCFvmSD/2CRSWLubsIlIEB642kiDVzff5dWzyDPy73FM56H24cLJLhd81I1E0v5p
-         nKPTCnSdmSJRXN2yOWMl46OEuKFagir5vh1qS6DBYnY/mso5wangTCxgplyj2WE0Ca2o
-         WuxA==
+        d=gmail.com; s=20230601; t=1750254938; x=1750859738; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gx+h3lSh4Jepxc+O8pXLQ82fTA6oke/o0DXkKDYoMJA=;
+        b=AXLa9lvUEh3j3vNkqnm+G4asiw+lP6caJScDSQbeHBscSXp8pbIHFT/CIvjLgpddzc
+         9OUedXM4lfjs5cZ0G0ciS2PfOjozRewpPgx5M0UCG/hYSlq3UUnyi5rFDfe9cOM2TkdH
+         XJ10nhI6F+qwFnsOfj+1x7X4RoiSH4D0lOq+McKEfBWLvFpiOFjYDLyaytGBOj/nBvJg
+         xtc569S9vpoyK8eavWWtrfVPxhXNVQxvwET5K7AxswLYB2qVWTEOa7r8qhMBzVIDWbnl
+         i9dhHGGeBB5jK6Ob5eTuO4EZfVZCRkK/TpDY4xghn0AXaDzFjL47FgcAIVR6lJ1AsWRf
+         TGNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750254868; x=1750859668;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VsjqlWk6bmFlt9a3E9KK327lUQiY5+ZZ+i/JJjNAi0U=;
-        b=xCwRO7f10Gt9dRG90XiXK2L5l0bZrZGu1KUOb4kUDIWiGmXjiG6njHxw1YlmoBIi3u
-         JCbJIs79vkWY1cVap7q9aeuXXrf1kiN3rGN/yWx9VjeX3R9xGnWyD++5OfeLjddXDCwb
-         yD4Xp6BtR0PVJI4bORxPrct1cSxZFeq3B9wuR2Nfz/O3HkDnZyOTNgUpNhSoJGcjBa0o
-         CVJLgEgHh3gddRTF9WMLNzDF6TBILXddhARE2tHp71nGWLIQ+JiUvqkZkcNWyI1SAvmc
-         khepJ51zWz9ofHY7hVMmm2BgVl3IroyXHoIZNX1AHqVXQHDhSEWZm6dhGxGULmMTTAiM
-         R1EA==
-X-Forwarded-Encrypted: i=1; AJvYcCW25HwrfKSfx5/8R2qVZul2sjKX9KdmJa3jTiWfnhj2NBbpyGuXcyIvAxp8oTmC2mcGyjLGpy0iuHEPA28=@vger.kernel.org, AJvYcCWmkVZyoPc2a7GQPyk74mwhHLBHIxuEn1ngFYQZauIJmxgg/XRJoVQNgHL9+8wuTHOsJ6Bs45o4@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlCKmiDajd+lEVeGaJ8Uozcn96CIFu9J014hi5tCnNhm/2LMb7
-	DkTETy881u2WVuGiOStXGwxbJPqtu3c9TZ3i9CtoucIIWcMOHjo4+4CK
-X-Gm-Gg: ASbGncvVilBz4rr6nXfTcEoub/Kb+0nyEEmlKstBcAf1UsNvGrMDwYpQbFJVlv1jvhA
-	EL+UPC5Mqx8ynIoHTvcdSBZ7lJO5PQ9R7VSsX1pKhEbxqiklaIbp+3Lns6dqeRSXjg52ttksSrd
-	PK0ls3XCD2Cu9L8zt7OJv/hYUPU2Y9DrH4b3ejse0+gi6u1n91dRNu7O1DwftVqtGfoYStppL6E
-	V1QLyC3MSgXKLcilfGN5lztzEL2enJ0HFfJtH0+08l9KUMMYH5jmwqr5wC+hZELhOALnkFPS0T5
-	UrZAmKhbYmFwN5Sdrm2D2lPQGJkQDmNMvTMJfZYrTlFpKJ0yFs1Vr5t2d4j/
-X-Google-Smtp-Source: AGHT+IGK0BK6ayZuw30y2UmFGch38fYUMJhCpRBmDebTNO7bFXfxfhyJc3ld19M5sFBfc55vHw3/ig==
-X-Received: by 2002:a05:600c:698d:b0:442:ccf0:41e6 with SMTP id 5b1f17b1804b1-4533ca4e339mr182304675e9.3.1750254867610;
-        Wed, 18 Jun 2025 06:54:27 -0700 (PDT)
-Received: from localhost ([87.254.0.133])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4532e156e8dsm214525955e9.31.2025.06.18.06.54.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 06:54:27 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] igc: Make the const read-only array supported_sizes static
-Date: Wed, 18 Jun 2025 14:54:08 +0100
-Message-ID: <20250618135408.1784120-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.49.0
+        d=1e100.net; s=20230601; t=1750254938; x=1750859738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gx+h3lSh4Jepxc+O8pXLQ82fTA6oke/o0DXkKDYoMJA=;
+        b=frEKAiQffdYIa3BnKFNovACcpBipN48ZdfWgANOD46AFjXY/W+7jTcpVUZPU4xj3LF
+         HJDaQShciTY9SO+Mm+cmKBk98EyVZpdkmbr9rjEs6EFLmp16OfcfpUUj6P62piHhjbhh
+         KB3dHjX2OcJvKvtY6XerB0HGQx0VxQEQyirwz4c6gq85uo8Sk7oDKA60Pks+v5DvFo3X
+         atDsRYD1QuXfbFG/IocIHZ2U4seKTH0gsqxn5B7IsgW6blo5LUHYF5UU3BD86v8FQxeG
+         Ljf1R9op40bItjJx5LxOAXRPUYpzCDDEYLUlZ0VDTmoFiwmVMOEtH5HeCRssQ8EF3k16
+         zeJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMeGekd/dLlGukZRDsw4fxQp5nvdusxWblPnyrfDfINe1Jblr9G0+9sXltPUuIiZej6Nn+e7A7@vger.kernel.org, AJvYcCVe++pRHEfrgSo4uFurR7UJxHsKYMER67KpXYOnaj2rLznQYfeESY+pxU8WcnHX0Kq4R88=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPvDe+Qrm7I6xvaqd1g2mrW6gOMkjKzINx1ljjlZytTkKcqddA
+	W7QRMMzF/4QaZa8+jqZhzYc8EWzM+lvbBtT82qfLnOlZyhOH6kp2cgmNelwrK4fHq72BgNJRqLk
+	lJMuzyeLGckoYhrLRwmEaPhuyO6IKtx36jw==
+X-Gm-Gg: ASbGncuHUs7Lh8QXWqW8gae3U2+5JlM6dbKInXBSfgcWTqVsNtlgYkkq7kXeq4xYlGo
+	qH8NuP4D9OrZSJpyLc/UvGtN6/y6i8QX/sxjKe2zC+WDWap77MkrEkZdca6k9knssKtA12/YAo2
+	ixwHHIb8tx0Purdy6LxLs55Q9mY91S2mqV1St/p6QeVo5dKcNq5hALPXi7fs983df8r/0wsLiYm
+	aZ6bTy+HoY=
+X-Google-Smtp-Source: AGHT+IHDoKNc8XOtTbe2orSChEcrWqEC8PHhmYDUT8YfV2CDPcqRIsj9tUSL68FxNGM41+8brCOybvH3mptxoFLHPEw=
+X-Received: by 2002:a05:600c:3e19:b0:439:9424:1b70 with SMTP id
+ 5b1f17b1804b1-4533cadf928mr170600855e9.30.1750254938270; Wed, 18 Jun 2025
+ 06:55:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20250616143846.2154727-1-willemdebruijn.kernel@gmail.com> <aFLFkFpQP789M1Tx@mail.gmail.com>
+In-Reply-To: <aFLFkFpQP789M1Tx@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 18 Jun 2025 06:55:26 -0700
+X-Gm-Features: Ac12FXxJByYbVqEo1nTEMnir_otv-CadiwMHeSWF5PYiM4XSd4cdw3LKtJhQ9b0
+Message-ID: <CAADnVQJ9e3Sf_kAh1LNqqeVvs7dwOC-AY_KEj5eRGGLGyC1F5A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf: lru: adjust free target to avoid global
+ table starvation
+To: Anton Protopopov <a.s.protopopov@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Don't populate the const read-only array supported_sizes on the
-stack at run time, instead make it static.
+On Wed, Jun 18, 2025 at 6:50=E2=80=AFAM Anton Protopopov
+<a.s.protopopov@gmail.com> wrote:
+>
+> On 25/06/16 10:38AM, Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> >
+> > BPF_MAP_TYPE_LRU_HASH can recycle most recent elements well before the
+> > map is full, due to percpu reservations and force shrink before
+> > neighbor stealing. Once a CPU is unable to borrow from the global map,
+> > it will once steal one elem from a neighbor and after that each time
+> > flush this one element to the global list and immediately recycle it.
+> >
+> > Batch value LOCAL_FREE_TARGET (128) will exhaust a 10K element map
+> > with 79 CPUs. CPU 79 will observe this behavior even while its
+> > neighbors hold 78 * 127 + 1 * 15 =3D=3D 9921 free elements (99%).
+> >
+> > CPUs need not be active concurrently. The issue can appear with
+> > affinity migration, e.g., irqbalance. Each CPU can reserve and then
+> > hold onto its 128 elements indefinitely.
+> >
+> > Avoid global list exhaustion by limiting aggregate percpu caches to
+> > half of map size, by adjusting LOCAL_FREE_TARGET based on cpu count.
+> > This change has no effect on sufficiently large tables.
+> >
+> > Similar to LOCAL_NR_SCANS and lru->nr_scans, introduce a map variable
+> > lru->free_target. The extra field fits in a hole in struct bpf_lru.
+> > The cacheline is already warm where read in the hot path. The field is
+> > only accessed with the lru lock held.
+>
+> Hi Willem! The patch looks very reasonable. I've bumbed into this
+> issue before (see https://lore.kernel.org/bpf/ZJwy478jHkxYNVMc@zh-lab-nod=
+e-5/)
+> but didn't follow up, as we typically have large enough LRU maps.
+>
+> I've tested your patch (with a patched map_tests/map_percpu_stats.c
+> selftest), works as expected for small maps. E.g., before your patch
+> map of size 4096 after being updated 2176 times from 32 threads on 32
+> CPUS contains around 150 elements, after your patch around (expected)
+> 2100 elements.
+>
+> Tested-by: Anton Protopopov <a.s.protopopov@gmail.com>
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/intel/igc/igc_tsn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Looks like we have consensus.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index b23b9ca451a7..8a110145bfee 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -431,7 +431,7 @@ static u8 igc_fpe_get_frag_size_mult(const struct igc_fpe_t *fpe)
- 
- u32 igc_fpe_get_supported_frag_size(u32 frag_size)
- {
--	const u32 supported_sizes[] = {64, 128, 192, 256};
-+	static const u32 supported_sizes[] = { 64, 128, 192, 256 };
- 
- 	/* Find the smallest supported size that is >= frag_size */
- 	for (int i = 0; i < ARRAY_SIZE(supported_sizes); i++) {
--- 
-2.49.0
-
+Willem,
+please target bpf tree when you respin.
 
