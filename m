@@ -1,238 +1,119 @@
-Return-Path: <netdev+bounces-199084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C95ADEE2F
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:43:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D67F5ADEE37
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 15:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DADF4A2011
-	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:43:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E1AC7A18EC
+	for <lists+netdev@lfdr.de>; Wed, 18 Jun 2025 13:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420002E9ECB;
-	Wed, 18 Jun 2025 13:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eb3mtq7e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2B727F00D;
+	Wed, 18 Jun 2025 13:44:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5091227E1C3
-	for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 13:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5974C2E9ED7;
+	Wed, 18 Jun 2025 13:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750254189; cv=none; b=Rxtd2LDUGQURGP9rZ/ZgJC/wDsmKktUfeQPKnKaZaAYnNjCEdDO7B+f7qIasLbDzYBi1qdK7XY87Rqu8FShJOnL0N7wIIcpT0V1kSGxPc6vPKiVlqB55LZLIavYDwlF3T6PgxhFR82JqWrG4hck+LKBmGoR6dFmHkgM3dtv6Uys=
+	t=1750254258; cv=none; b=d6/qfy3/Mwci6fljvzK8d2H7civ0d7e/kFQZAhlXDBj2I1PrIJIqGvu/mwIOimNFmN3GBRRoiY/23tePGmOnomouQalrmh5U1p1AB8yo0cFWFw9B8m98FC3BtihLSRjj++qWgab/dfx/9fqPjS6ZY+AgU/VZZ5tGQ7lwlsPgqik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750254189; c=relaxed/simple;
-	bh=lPZFQ1SbLNDn4ql0bNMO1Y3UOqUYirOhb7bM8OXtknM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZP/jblApk3K5uLLiFfBM96i1T3WUB8cfqS7qsm8DPpAfMnLkMmF8RvxgGoIHEBKBgolenMASnUZ7R5Xr1eElhMiB57wVtFj6CtZlJdpXPFcDSp3FaRTs9/hLxIp8RgNiXJhxKgE9wXzd31q6vibtNIm/iLD0uHm7XfYI+niJtP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eb3mtq7e; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-60789b450ceso13511740a12.2
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 06:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750254185; x=1750858985; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=161UH8PN1dLl3cBIWKy4zaw4h8NX3WLyAHggvUoqd2Y=;
-        b=eb3mtq7eW33KwNO4ilSnAf/+5GR5Mi0ZHY6D38ZU4vsPbANpROmb/2WAbgUov9G7gv
-         MZvF+fpAFulvMcT+pgFi7KjKIRTKnRP3BZHEkNjJHHvVJpaeKv2f4dxcVkRtMVqTbwy4
-         /v7nyYBNUVop68Zq0XvNQSqgi/ojOL0Jp5TcouiOEcTC96eNkcRT0VcVUtx5ZrA+pGiZ
-         +NYnanS/y0sS5QaMh4nhfVq2otP0Z5kr49gSplt+ZuNZ7yF3+fGRTFlQ4VeyOl1jpXmB
-         hR4sa7ocLsxHdPyIbASz/mYTFFaSc7TfqZvH6bk5JR+PsBcK3PP4DJSVDf4TIRRZ/GjD
-         TBLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750254185; x=1750858985;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=161UH8PN1dLl3cBIWKy4zaw4h8NX3WLyAHggvUoqd2Y=;
-        b=lwaIGrzm7n7zmx++CpTY4+f+SQcvPI86u9I9/+8GGqDzuVrrA0WnWhEdOiPm9lzqWD
-         Dlj4FsqxeR7MI63iwcqmCfo8wIhyS5NbWm39R15KfFZV3RyJLco6t8EmbmL26rPYA4WY
-         74Wp/cqb7Am+wc9FJrsmpJiNpaiE/tTVtIqDKZdlZt8h2L1vlcKk2e9zAq5vxFw9UTcY
-         uSPQkJ/vFltGdRvq4xYLN6ShltaR2HQtDdCy5kb6ObEfTdrXMK5HQXLcmODmTVqe+YT4
-         jw7De8q6W14RNdGhkwVSYf+20sZAeM4fKKYrOQei6f4ereBQAk9a8DUfAkzkLuyUHehX
-         EGgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWXO53F3Wr9WWCdxaqPQxPQfhT+BVMoxpWILsP3Ygd/5IHak7Zgq3pIUgkj38Lk6uEvFbnwjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcGgXUdWJNR9tTs41Ghdz+hQYS+yjhscMOSMqMdyDbsweGD8Mk
-	EXFCAGKln6gJSRbeVI6dqeuIhgS1LG0uPo641vrpKOK9YUpA9wy2vFp4yrkm6ySiFF4Wr1TkHxu
-	/syCt3VnxB7m6tb8EJMPxjzjqfueOztM=
-X-Gm-Gg: ASbGncuZOViGQwMcgtJcSuOMd4D6aNMTnJOE4SZXkYIYoI7W5m7YyEkzuZuJgiponuA
-	sG9ec0eAgKxT8u5FQzwKuxuca47YTpy/qpfx+nvgDa8ubnfIlz9WxWEmY9/XPiYqPz8akNv+hIC
-	vcuVV7WA7b4vKfQWRbk0xb43ROCN9xoN6LUFcQ1Ew0A9UW
-X-Google-Smtp-Source: AGHT+IGOgUqOLS/Wq0ykIWiASQmncShf6kjBdYHmSLFvF3czCL7KdBdLBxBUSeV5r9HhxGH0dhIkYnMiUflXi9xKhXk=
-X-Received: by 2002:a05:6402:13d4:b0:602:cfab:ea9a with SMTP id
- 4fb4d7f45d1cf-608d09e38b2mr16050281a12.27.1750254185282; Wed, 18 Jun 2025
- 06:43:05 -0700 (PDT)
+	s=arc-20240116; t=1750254258; c=relaxed/simple;
+	bh=co5bGLiFes/lPuppOZJbAHvjUkoyFffOex0DflgZZBk=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oLO9m446u2wMbtYTQNMpg/0c0ycsF8APuy1BJ6A8+AOdRwJ4ar2ZtB1xiy/9MOlI0oQNUQk30R5phaBR/FnQ7siNIddw8LjEk5DqP23wViSUwC86aAv/MmMiOUkG7VQn/qTLgxs5B7rX7kS9EIccLOBGEr+PgI++kSb6nKBePB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bMlH01WyPz2Cfm2;
+	Wed, 18 Jun 2025 21:40:12 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id A63401A016C;
+	Wed, 18 Jun 2025 21:44:06 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 18 Jun 2025 21:44:05 +0800
+Message-ID: <c546b003-5161-479c-902d-103b67838d75@huawei.com>
+Date: Wed, 18 Jun 2025 21:44:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250617094540.819832-1-ap420073@gmail.com> <aFHPw5pjyA9yIepf@mini-arch>
-In-Reply-To: <aFHPw5pjyA9yIepf@mini-arch>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 18 Jun 2025 22:42:52 +0900
-X-Gm-Features: AX0GCFtpMO5BsPFdvqMioNGJakxt2Xf0k2lF5g67dWfDpIiuH0FPjs5cvW29esk
-Message-ID: <CAMArcTUWueMBxTJpStiPbUtSSMKBjScySzSaiMkbL+ovoHJkiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] eth: bnxt: add netmem TX support
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, almasrymina@google.com, 
-	sdf@fomichev.me, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH V2 net-next 5/8] net: hns3: set the freed pointers to NULL
+ when lifetime is not end
+To: Simon Horman <horms@kernel.org>
+References: <20250617010255.1183069-1-shaojijie@huawei.com>
+ <20250617010255.1183069-6-shaojijie@huawei.com>
+ <20250618111212.GI1699@horms.kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20250618111212.GI1699@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Wed, Jun 18, 2025 at 5:27=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
+
+on 2025/6/18 19:12, Simon Horman wrote:
+> On Tue, Jun 17, 2025 at 09:02:52AM +0800, Jijie Shao wrote:
+>> From: Jian Shen <shenjian15@huawei.com>
+>>
+>> There are several pointers are freed but not set to NULL,
+>> and their lifetime is not end immediately. To avoid misusing
+>> there wild pointers, set them to NULL.
+>>
+>> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>> ---
+>>   drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c        | 1 +
+>>   drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c   | 4 ++++
+>>   drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 4 ++++
+>>   3 files changed, 9 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+>> index 6a244ba5e051..0d6db46db5ed 100644
+>> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+>> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+>> @@ -276,6 +276,7 @@ static int hns3_lp_run_test(struct net_device *ndev, enum hnae3_loop mode)
+>>   			good_cnt++;
+>>   		} else {
+>>   			kfree_skb(skb);
+>> +			skb = NULL;
+> I am sceptical about the merit of setting local variables to NULL like this.
+> In general defensive coding is not the preferred approach in the Kernel.
 >
+> And in this case, won't this result in a NULL dereference when
+> skb_get(skb) is called if the loop this code resides in iterates again?
 
-Hi Stanislav,
-Thanks a lot for your review!
+Since HNS3_NIC_LB_TEST_PKT_NUM is 1, the loop will only iterate once,
+so the current change will not cause any issues.
+However, upon reviewing the code, this change is indeed unnecessary and may cause confusion,
+so I will drop this change in the v3.
 
-> On 06/17, Taehee Yoo wrote:
-> > Use netmem_dma_*() helpers and declare netmem_tx to support netmem TX.
-> > By this change, all bnxt devices will support the netmem TX.
-> >
-> > bnxt_start_xmit() uses memcpy() if a packet is too small. However,
-> > netmem packets are unreadable, so memcpy() is not allowed.
-> > It should check whether an skb is readable, and if an SKB is unreadable=
-,
-> > it is processed by the normal transmission logic.
-> >
-> > netmem TX can be tested with ncdevmem.c
-> >
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 28 ++++++++++++++---------
-> >  1 file changed, 17 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
-hernet/broadcom/bnxt/bnxt.c
-> > index 869580b6f70d..4de9dc123a18 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > @@ -477,6 +477,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
-skb, struct net_device *dev)
-> >       struct bnxt_tx_ring_info *txr;
-> >       struct bnxt_sw_tx_bd *tx_buf;
-> >       __le32 lflags =3D 0;
-> > +     skb_frag_t *frag;
-> >
-> >       i =3D skb_get_queue_mapping(skb);
-> >       if (unlikely(i >=3D bp->tx_nr_rings)) {
-> > @@ -563,7 +564,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
-skb, struct net_device *dev)
-> >               lflags |=3D cpu_to_le32(TX_BD_FLAGS_NO_CRC);
-> >
-> >       if (free_size =3D=3D bp->tx_ring_size && length <=3D bp->tx_push_=
-thresh &&
-> > -         !lflags) {
-> > +         skb_frags_readable(skb) && !lflags) {
-> >               struct tx_push_buffer *tx_push_buf =3D txr->tx_push;
-> >               struct tx_push_bd *tx_push =3D &tx_push_buf->push_bd;
-> >               struct tx_bd_ext *tx_push1 =3D &tx_push->txbd2;
-> > @@ -598,9 +599,9 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
-skb, struct net_device *dev)
-> >               skb_copy_from_linear_data(skb, pdata, len);
-> >               pdata +=3D len;
-> >               for (j =3D 0; j < last_frag; j++) {
-> > -                     skb_frag_t *frag =3D &skb_shinfo(skb)->frags[j];
-> >                       void *fptr;
-> >
-> > +                     frag =3D &skb_shinfo(skb)->frags[j];
-> >                       fptr =3D skb_frag_address_safe(frag);
-> >                       if (!fptr)
-> >                               goto normal_tx;
-> > @@ -708,8 +709,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
-skb, struct net_device *dev)
-> >                       cpu_to_le32(cfa_action << TX_BD_CFA_ACTION_SHIFT)=
-;
-> >       txbd0 =3D txbd;
-> >       for (i =3D 0; i < last_frag; i++) {
-> > -             skb_frag_t *frag =3D &skb_shinfo(skb)->frags[i];
-> > -
-> > +             frag =3D &skb_shinfo(skb)->frags[i];
-> >               prod =3D NEXT_TX(prod);
-> >               txbd =3D &txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(pro=
-d)];
-> >
-> > @@ -721,7 +721,8 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *=
-skb, struct net_device *dev)
-> >                       goto tx_dma_error;
-> >
-> >               tx_buf =3D &txr->tx_buf_ring[RING_TX(bp, prod)];
-> > -             dma_unmap_addr_set(tx_buf, mapping, mapping);
-> > +             netmem_dma_unmap_addr_set(skb_frag_netmem(frag), tx_buf,
-> > +                                       mapping, mapping);
-> >
-> >               txbd->tx_bd_haddr =3D cpu_to_le64(mapping);
-> >
-> > @@ -778,9 +779,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff =
-*skb, struct net_device *dev)
-> >       for (i =3D 0; i < last_frag; i++) {
-> >               prod =3D NEXT_TX(prod);
-> >               tx_buf =3D &txr->tx_buf_ring[RING_TX(bp, prod)];
-> > -             dma_unmap_page(&pdev->dev, dma_unmap_addr(tx_buf, mapping=
-),
-> > -                            skb_frag_size(&skb_shinfo(skb)->frags[i]),
-> > -                            DMA_TO_DEVICE);
-> > +             frag =3D &skb_shinfo(skb)->frags[i];
-> > +             netmem_dma_unmap_page_attrs(&pdev->dev,
-> > +                                         dma_unmap_addr(tx_buf, mappin=
-g),
-> > +                                         skb_frag_size(frag),
-> > +                                         DMA_TO_DEVICE, 0);
-> >       }
-> >
-> >  tx_free:
-> > @@ -3422,9 +3425,11 @@ static void bnxt_free_one_tx_ring_skbs(struct bn=
-xt *bp,
-> >                       skb_frag_t *frag =3D &skb_shinfo(skb)->frags[j];
-> >
-> >                       tx_buf =3D &txr->tx_buf_ring[ring_idx];
-> > -                     dma_unmap_page(&pdev->dev,
-> > -                                    dma_unmap_addr(tx_buf, mapping),
-> > -                                    skb_frag_size(frag), DMA_TO_DEVICE=
-);
-> > +                     netmem_dma_unmap_page_attrs(&pdev->dev,
-> > +                                                 dma_unmap_addr(tx_buf=
-,
-> > +                                                                mappin=
-g),
-> > +                                                 skb_frag_size(frag),
-> > +                                                 DMA_TO_DEVICE, 0);
-> >               }
-> >               dev_kfree_skb(skb);
-> >       }
-> > @@ -16713,6 +16718,7 @@ static int bnxt_init_one(struct pci_dev *pdev, =
-const struct pci_device_id *ent)
-> >       if (BNXT_SUPPORTS_QUEUE_API(bp))
-> >               dev->queue_mgmt_ops =3D &bnxt_queue_mgmt_ops;
-> >       dev->request_ops_lock =3D true;
-> > +     dev->netmem_tx =3D true;
-> >
-> >       rc =3D register_netdev(dev);
-> >       if (rc)
+But I hope this patch can still be retained, and the other changes should be appropriate.
+
+Thansk,
+Jijie Shao
+
 >
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+>>   			netdev_err(ndev, "hns3_lb_run_test xmit failed: %d\n",
+>>   				   tx_ret);
+>>   		}
+> ...
 >
-> Similar to what I had internally for testing. One thing to think about
-> here might be to put that netmem_tx=3Dtrue under BNXT_SUPPORTS_QUEUE_API
-> conditional. This way both rx/tx will either be supported or not. But
-> since there is probably no real FW requirement for TX, should be good
-> as is.
-
-I agree with you.
-Since netmem TX doesn't require any specific hardware or firmware
-features, it should be safe to enable this for all bnxt devices.
-
-Thanks a lot!
-Taehee Yoo
 
