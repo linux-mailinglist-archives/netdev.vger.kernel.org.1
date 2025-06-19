@@ -1,143 +1,282 @@
-Return-Path: <netdev+bounces-199459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25477AE0621
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB37FAE0628
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85053A68D6
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:43:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC22D3B85D2
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853FA23D2BC;
-	Thu, 19 Jun 2025 12:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I/Q1/tW9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178DA23B607;
+	Thu, 19 Jun 2025 12:44:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A26523D283
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 12:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881E02459DA
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 12:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750337026; cv=none; b=XBc3DevS5VU9aS7hRAYav27dIwX/RZDyUAsy8Ij7wgqqOmPjxqMZHehdta1wTxrXcznBlIOI1EVR3YHbrK0SHwEKwjUueTM7nn0/W83w9hLZcTYv89N1v3JZ99VV2tbD+fMWUNE85TrYatl+wXjwJYV+3BTcKkvPII44z/ypLYU=
+	t=1750337077; cv=none; b=dBbWNdchmsCQWawe6+uPpp6Q3JDmtl9tO/ZyA6odzN9mzqEAxMFVBZ6BgSISIRr4Q3NPsB+2UiKr/lWb1ABl3eXCgeI3jdowI5qdbK/0LNjhlU3jzyNtGRl3o/k2h0H4483rpyvFSAxucoFHf8THG6fYdKdp59Epe1bjqFjfv0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750337026; c=relaxed/simple;
-	bh=6VrA574brT6VW/4UkR55B+2t41g9GvZgzDG0MC8lqW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D6U8X66JaHTo57JNX6Vd1mlgCGVKboF+N04N7Lmtg4klPJJ9Ub+/HCi20Jhk4kr+350SEK8ajF1yyOdWWAkPX1izKbUpIjm13MEVAR5IPjv5BE7/ebvIMwdV49umV3jgg6NpBx56dDRbIk6speS3/nO9KhcqWx4b7MSsbwJ78lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I/Q1/tW9; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6735a940-bce8-43f5-a6d7-7a48ace197c8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750337019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=88IeTx3F+Ru63iJfLhr9wYINj1DkxKZKk7DiEWTICcw=;
-	b=I/Q1/tW9NmVAli9fK97FXdwi9um9a5ePp3DzfxcTOgIiIaRm3KVi4eKOcHQmlEsE2SSas6
-	xWEE0ZVi+UrtKvHxP3GfsUSP89LWKtK3bVXi2ILF4wdjxvvXYUFUB2hsiapeswu7k39Kxb
-	MxtirJ1a9+m24g+W2b8WVPMYKOltQk8=
-Date: Thu, 19 Jun 2025 13:43:35 +0100
+	s=arc-20240116; t=1750337077; c=relaxed/simple;
+	bh=IKXF0/yurjqDNBiH0w68hFyg1wp0lDCtHbmscaE5SZ4=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=I6De+CQYaJKQ03oAZAEdKf9OHrb234YRO5oWzWkCmBnRixYnlS4ou01UydegOdtGiVytOtZeEZBZ0uaSX9/CeErg94YbBDMpBK1XJz6TN1eSWtY4UjnyPMjWRjSKt5h+KrRG9bM1siIOwhOni5XY2hEwgsabWGMOWi6WifmgH40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bNKxj3sKfzvZDD;
+	Thu, 19 Jun 2025 20:42:17 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 90B0D14011F;
+	Thu, 19 Jun 2025 20:44:30 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 19 Jun 2025 20:44:29 +0800
+Message-ID: <2ecff914-0e84-4d72-b6a1-3571908c9e2c@huawei.com>
+Date: Thu, 19 Jun 2025 20:44:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next, 03/10] bng_en: Add firmware communication mechanism
-To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- vsrama-krishna.nemani@broadcom.com,
- Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
- Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-References: <20250618144743.843815-1-vikas.gupta@broadcom.com>
- <20250618144743.843815-4-vikas.gupta@broadcom.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250618144743.843815-4-vikas.gupta@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<ajit.khaparde@broadcom.com>, <sriharsha.basavapatna@broadcom.com>,
+	<somnath.kotur@broadcom.com>, <shenjian15@huawei.com>,
+	<salil.mehta@huawei.com>, <cai.huoqing@linux.dev>, <saeedm@nvidia.com>,
+	<tariqt@nvidia.com>, <louis.peens@corigine.com>, <mbloch@nvidia.com>,
+	<manishc@marvell.com>, <ecree.xilinx@gmail.com>, <joe@dama.to>
+Subject: Re: [PATCH net-next 09/10] eth: hns3: migrate to new RXFH callbacks
+To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
+References: <20250618203823.1336156-1-kuba@kernel.org>
+ <20250618203823.1336156-10-kuba@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20250618203823.1336156-10-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On 18/06/2025 15:47, Vikas Gupta wrote:
-> Add support to communicate with the firmware.
-> Future patches will use these functions to send the
-> messages to the firmware.
-> Functions support allocating request/response buffers
-> to send a particular command. Each command has certain
-> timeout value to which the driver waits for response from
-> the firmware. In error case, commands may be either timed
-> out waiting on response from the firmware or may return
-> a specific error code.
-> 
-> Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> Reviewed-by: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-> Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+
+on 2025/6/19 4:38, Jakub Kicinski wrote:
+> Migrate to new callbacks added by commit 9bb00786fc61 ("net: ethtool:
+> add dedicated callbacks for getting and setting rxfh fields").
+
+Thanks,
+Reviewed-by: Jijie Shao<shaojijie@huawei.com>
+
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->   drivers/net/ethernet/broadcom/bnge/Makefile   |   3 +-
->   drivers/net/ethernet/broadcom/bnge/bnge.h     |  13 +
->   .../net/ethernet/broadcom/bnge/bnge_hwrm.c    | 503 ++++++++++++++++++
->   .../net/ethernet/broadcom/bnge/bnge_hwrm.h    | 107 ++++
->   4 files changed, 625 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm.c
->   create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/Makefile b/drivers/net/ethernet/broadcom/bnge/Makefile
-> index e021a14d2fa0..b296d7de56ce 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/Makefile
-> +++ b/drivers/net/ethernet/broadcom/bnge/Makefile
-> @@ -3,4 +3,5 @@
->   obj-$(CONFIG_BNGE) += bng_en.o
+> This driver wins the award for most convoluted abstraction layers :/
+
+HaHa, it is indeed a bit convoluted
+But there's nothing wrong with the design.
+
+> ---
+>   drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  4 +--
+>   .../hns3/hns3_common/hclge_comm_rss.h         |  4 +--
+>   .../hns3/hns3_common/hclge_comm_rss.c         |  6 ++--
+>   .../ethernet/hisilicon/hns3/hns3_ethtool.c    | 33 ++++++++++++++-----
+>   .../hisilicon/hns3/hns3pf/hclge_main.c        |  4 +--
+>   .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  4 +--
+>   6 files changed, 36 insertions(+), 19 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> index 4e44f28288f9..8dc7d6fae224 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> @@ -690,9 +690,9 @@ struct hnae3_ae_ops {
+>   	int (*set_rss)(struct hnae3_handle *handle, const u32 *indir,
+>   		       const u8 *key, const u8 hfunc);
+>   	int (*set_rss_tuple)(struct hnae3_handle *handle,
+> -			     struct ethtool_rxnfc *cmd);
+> +			     const struct ethtool_rxfh_fields *cmd);
+>   	int (*get_rss_tuple)(struct hnae3_handle *handle,
+> -			     struct ethtool_rxnfc *cmd);
+> +			     struct ethtool_rxfh_fields *cmd);
 >   
->   bng_en-y := bnge_core.o \
-> -	    bnge_devlink.o
-> +	    bnge_devlink.o \
-> +	    bnge_hwrm.o
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
-> index 19d85aabab4e..8f2a562d9ae2 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-> @@ -13,6 +13,8 @@ enum board_idx {
->   	BCM57708,
->   };
+>   	int (*get_tc_size)(struct hnae3_handle *handle);
 >   
-> +#define INVALID_HW_RING_ID      ((u16)-1)
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.h
+> index cdafa63fe38b..cbc02b50c6e7 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.h
+> @@ -108,7 +108,7 @@ void hclge_comm_get_rss_indir_tbl(struct hclge_comm_rss_cfg *rss_cfg,
+>   int hclge_comm_set_rss_algo_key(struct hclge_comm_hw *hw, const u8 hfunc,
+>   				const u8 *key);
+>   int hclge_comm_init_rss_tuple_cmd(struct hclge_comm_rss_cfg *rss_cfg,
+> -				  struct ethtool_rxnfc *nfc,
+> +				  const struct ethtool_rxfh_fields *nfc,
+>   				  struct hnae3_ae_dev *ae_dev,
+>   				  struct hclge_comm_rss_input_tuple_cmd *req);
+>   u64 hclge_comm_convert_rss_tuple(u8 tuple_sets);
+> @@ -129,5 +129,5 @@ int hclge_comm_set_rss_hash_key(struct hclge_comm_rss_cfg *rss_cfg,
+>   int hclge_comm_set_rss_tuple(struct hnae3_ae_dev *ae_dev,
+>   			     struct hclge_comm_hw *hw,
+>   			     struct hclge_comm_rss_cfg *rss_cfg,
+> -			     struct ethtool_rxnfc *nfc);
+> +			     const struct ethtool_rxfh_fields *nfc);
+>   #endif
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c
+> index 4e2bb6556b1c..1eca53aaf598 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c
+> @@ -151,7 +151,7 @@ EXPORT_SYMBOL_GPL(hclge_comm_set_rss_hash_key);
+>   int hclge_comm_set_rss_tuple(struct hnae3_ae_dev *ae_dev,
+>   			     struct hclge_comm_hw *hw,
+>   			     struct hclge_comm_rss_cfg *rss_cfg,
+> -			     struct ethtool_rxnfc *nfc)
+> +			     const struct ethtool_rxfh_fields *nfc)
+>   {
+>   	struct hclge_comm_rss_input_tuple_cmd *req;
+>   	struct hclge_desc desc;
+> @@ -422,7 +422,7 @@ int hclge_comm_set_rss_algo_key(struct hclge_comm_hw *hw, const u8 hfunc,
+>   }
+>   EXPORT_SYMBOL_GPL(hclge_comm_set_rss_algo_key);
+>   
+> -static u8 hclge_comm_get_rss_hash_bits(struct ethtool_rxnfc *nfc)
+> +static u8 hclge_comm_get_rss_hash_bits(const struct ethtool_rxfh_fields *nfc)
+>   {
+>   	u8 hash_sets = nfc->data & RXH_L4_B_0_1 ? HCLGE_COMM_S_PORT_BIT : 0;
+>   
+> @@ -448,7 +448,7 @@ static u8 hclge_comm_get_rss_hash_bits(struct ethtool_rxnfc *nfc)
+>   }
+>   
+>   int hclge_comm_init_rss_tuple_cmd(struct hclge_comm_rss_cfg *rss_cfg,
+> -				  struct ethtool_rxnfc *nfc,
+> +				  const struct ethtool_rxfh_fields *nfc,
+>   				  struct hnae3_ae_dev *ae_dev,
+>   				  struct hclge_comm_rss_input_tuple_cmd *req)
+>   {
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> index 6715222aeb66..3513293abda9 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> @@ -978,6 +978,16 @@ static int hns3_set_rss(struct net_device *netdev,
+>   					rxfh->hfunc);
+>   }
+>   
+> +static int hns3_get_rxfh_fields(struct net_device *netdev,
+> +				struct ethtool_rxfh_fields *cmd)
+> +{
+> +	struct hnae3_handle *h = hns3_get_handle(netdev);
 > +
->   struct bnge_dev {
->   	struct device	*dev;
->   	struct pci_dev	*pdev;
-> @@ -22,6 +24,17 @@ struct bnge_dev {
->   	char		board_serialno[BNGE_VPD_FLD_LEN];
->   
->   	void __iomem	*bar0;
+> +	if (h->ae_algo->ops->get_rss_tuple)
+> +		return h->ae_algo->ops->get_rss_tuple(h, cmd);
+> +	return -EOPNOTSUPP;
+> +}
 > +
-> +	/* HWRM members */
-> +	u16			hwrm_cmd_seq;
-> +	u16			hwrm_cmd_kong_seq;
-> +	struct dma_pool		*hwrm_dma_pool;
-> +	struct hlist_head	hwrm_pending_list;
-> +	u16			hwrm_max_req_len;
-> +	u16			hwrm_max_ext_req_len;
-> +	unsigned int		hwrm_cmd_timeout;
-> +	unsigned int		hwrm_cmd_max_timeout;
-> +	struct mutex		hwrm_cmd_lock;	/* serialize hwrm messages */
->   };
-
-It's all looks pretty similar to what is used in bnxt driver. Why do you
-duplicate the code rather then reusing (and improving) the existing one?
-
-I didn't look carefully, but in case it's impossible to merge hwrm code
-from bnxt, you have to make function names prepended with bnge prefix...
-
-
-
+>   static int hns3_get_rxnfc(struct net_device *netdev,
+>   			  struct ethtool_rxnfc *cmd,
+>   			  u32 *rule_locs)
+> @@ -988,10 +998,6 @@ static int hns3_get_rxnfc(struct net_device *netdev,
+>   	case ETHTOOL_GRXRINGS:
+>   		cmd->data = h->kinfo.num_tqps;
+>   		return 0;
+> -	case ETHTOOL_GRXFH:
+> -		if (h->ae_algo->ops->get_rss_tuple)
+> -			return h->ae_algo->ops->get_rss_tuple(h, cmd);
+> -		return -EOPNOTSUPP;
+>   	case ETHTOOL_GRXCLSRLCNT:
+>   		if (h->ae_algo->ops->get_fd_rule_cnt)
+>   			return h->ae_algo->ops->get_fd_rule_cnt(h, cmd);
+> @@ -1275,15 +1281,22 @@ static int hns3_set_ringparam(struct net_device *ndev,
+>   	return ret;
+>   }
+>   
+> +static int hns3_set_rxfh_fields(struct net_device *netdev,
+> +				const struct ethtool_rxfh_fields *cmd,
+> +				struct netlink_ext_ack *extack)
+> +{
+> +	struct hnae3_handle *h = hns3_get_handle(netdev);
+> +
+> +	if (h->ae_algo->ops->set_rss_tuple)
+> +		return h->ae_algo->ops->set_rss_tuple(h, cmd);
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>   static int hns3_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
+>   {
+>   	struct hnae3_handle *h = hns3_get_handle(netdev);
+>   
+>   	switch (cmd->cmd) {
+> -	case ETHTOOL_SRXFH:
+> -		if (h->ae_algo->ops->set_rss_tuple)
+> -			return h->ae_algo->ops->set_rss_tuple(h, cmd);
+> -		return -EOPNOTSUPP;
+>   	case ETHTOOL_SRXCLSRLINS:
+>   		if (h->ae_algo->ops->add_fd_entry)
+>   			return h->ae_algo->ops->add_fd_entry(h, cmd);
+> @@ -2105,6 +2118,8 @@ static const struct ethtool_ops hns3vf_ethtool_ops = {
+>   	.get_rxfh_indir_size = hns3_get_rss_indir_size,
+>   	.get_rxfh = hns3_get_rss,
+>   	.set_rxfh = hns3_set_rss,
+> +	.get_rxfh_fields = hns3_get_rxfh_fields,
+> +	.set_rxfh_fields = hns3_set_rxfh_fields,
+>   	.get_link_ksettings = hns3_get_link_ksettings,
+>   	.get_channels = hns3_get_channels,
+>   	.set_channels = hns3_set_channels,
+> @@ -2142,6 +2157,8 @@ static const struct ethtool_ops hns3_ethtool_ops = {
+>   	.get_rxfh_indir_size = hns3_get_rss_indir_size,
+>   	.get_rxfh = hns3_get_rss,
+>   	.set_rxfh = hns3_set_rss,
+> +	.get_rxfh_fields = hns3_get_rxfh_fields,
+> +	.set_rxfh_fields = hns3_set_rxfh_fields,
+>   	.get_link_ksettings = hns3_get_link_ksettings,
+>   	.set_link_ksettings = hns3_set_link_ksettings,
+>   	.nway_reset = hns3_nway_reset,
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index a5b480d59fbf..5acefd57df45 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -4872,7 +4872,7 @@ static int hclge_set_rss(struct hnae3_handle *handle, const u32 *indir,
+>   }
+>   
+>   static int hclge_set_rss_tuple(struct hnae3_handle *handle,
+> -			       struct ethtool_rxnfc *nfc)
+> +			       const struct ethtool_rxfh_fields *nfc)
+>   {
+>   	struct hclge_vport *vport = hclge_get_vport(handle);
+>   	struct hclge_dev *hdev = vport->back;
+> @@ -4890,7 +4890,7 @@ static int hclge_set_rss_tuple(struct hnae3_handle *handle,
+>   }
+>   
+>   static int hclge_get_rss_tuple(struct hnae3_handle *handle,
+> -			       struct ethtool_rxnfc *nfc)
+> +			       struct ethtool_rxfh_fields *nfc)
+>   {
+>   	struct hclge_vport *vport = hclge_get_vport(handle);
+>   	u8 tuple_sets;
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+> index c4f35e8e2177..f1657f50cdda 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+> @@ -606,7 +606,7 @@ static int hclgevf_set_rss(struct hnae3_handle *handle, const u32 *indir,
+>   }
+>   
+>   static int hclgevf_set_rss_tuple(struct hnae3_handle *handle,
+> -				 struct ethtool_rxnfc *nfc)
+> +				 const struct ethtool_rxfh_fields *nfc)
+>   {
+>   	struct hclgevf_dev *hdev = hclgevf_ae_get_hdev(handle);
+>   	int ret;
+> @@ -624,7 +624,7 @@ static int hclgevf_set_rss_tuple(struct hnae3_handle *handle,
+>   }
+>   
+>   static int hclgevf_get_rss_tuple(struct hnae3_handle *handle,
+> -				 struct ethtool_rxnfc *nfc)
+> +				 struct ethtool_rxfh_fields *nfc)
+>   {
+>   	struct hclgevf_dev *hdev = hclgevf_ae_get_hdev(handle);
+>   	u8 tuple_sets;
 
