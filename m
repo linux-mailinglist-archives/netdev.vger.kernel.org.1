@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-199621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C8AAE0FE8
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:10:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A8FAE0FED
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3D264A1DB5
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:10:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 213474A0B5E
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA0428C870;
-	Thu, 19 Jun 2025 23:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923AE21D3C0;
+	Thu, 19 Jun 2025 23:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJCwf2fb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wwk4E4C2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB8C2111;
-	Thu, 19 Jun 2025 23:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4181A20E711
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 23:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750374632; cv=none; b=kIKC7amCmsdZykCmNVgWjvP2wZSfWj+v1+mQZMirXM4ppfmFBXBSWlNLQlB8TDd5ZkwLKNtc4mJ8rKLVEscD8XVQDkqF6IpaUQjENObcP6d+etfwq1cGxRgVnB48SiZWyleQPh2LcjOnF6vqK1r4iH8fdd1Dg9s4xqI2GrYJTJk=
+	t=1750375174; cv=none; b=t7pBatnFI/ZNgtP0u+JlLAUsjlV9ZKYQhnHOwgmJMyWigi1iEb9E3P0rkWLBj4IiduoTdgwLG8gtxwDgwnAJwGnLCWI3e/WwVx3ec7BmWTvDmIAPYfYrQ0sZhJS73bGloX/bAYDaV0LJcVc0Z35Hd2K1z842fgq3eWJLlRIQdAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750374632; c=relaxed/simple;
-	bh=rnVGVNG7SOYESn+2orXzfsDBfz1d8U4NDTEnCFm0dE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FNNiM2k74uKfrMjviqHFzoPRucnnS9apcmRK5yHA32K9zRvgSBEwtXwaIq9qMOyonbezLU1dVEvfJlOz3CBVkR7TbdS66gROS9548hrmbYdSe7ugb0wzY93I2NIGPkr9eXettNKPBFLJD2pJEb/zvEJBXd4fHR6u5XpgbcQTAR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJCwf2fb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9EEC4CEEA;
-	Thu, 19 Jun 2025 23:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750374631;
-	bh=rnVGVNG7SOYESn+2orXzfsDBfz1d8U4NDTEnCFm0dE8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tJCwf2fbGxdSVgK9Drd/CsR1mKOia0H+KByw58GuiVjufxkDflRyHQJsFiC8Jw3/X
-	 PzK7Ivn0g3s30WXb/sX69Psc66rs5qOWZ80vUNfG6rXhndrQlz1qSRFhQP0RVErcDS
-	 s6zIxnoxny50AuSZt55K6UTOy5ilFptvMzmB82Gq2rPU2+bNiBtVdYml8gAgfNiaBA
-	 H5XvoKPDROMxDiJPnKKUwkn/UhawdllQEiWXZn3en31eKlqDBaCUBzIazwDuS/W5Mk
-	 /2UDjmhXAREdDDuKFD2yuc+SU8Fv6wVKO6Isiy3rbyzmf8DfB/uqZxJ4uqNyMIQWeH
-	 E85H3tOrscgEQ==
-Date: Thu, 19 Jun 2025 16:10:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Michal Simek <michal.simek@amd.com>, Saravana Kannan
- <saravanak@google.com>, Leon Romanovsky <leon@kernel.org>, Dave Ertman
- <david.m.ertman@intel.com>, linux-kernel@vger.kernel.org, Ira Weiny
- <ira.weiny@intel.com>, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net 4/4] net: axienet: Split into MAC and MDIO drivers
-Message-ID: <20250619161030.6f14def9@kernel.org>
-In-Reply-To: <20250619200537.260017-5-sean.anderson@linux.dev>
-References: <20250619200537.260017-1-sean.anderson@linux.dev>
-	<20250619200537.260017-5-sean.anderson@linux.dev>
+	s=arc-20240116; t=1750375174; c=relaxed/simple;
+	bh=qkF4P7fPLySORTd7l5qaEb+29XEJDlsACaybE1ReOoU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VFViYMdMSl1ZYSmToPYrY/z/4Q5DRc4xGA5Y4JlrYyUCgfwX66R9itCSS7TII8tVqaMaXEt/407XFy/LlemezTEa6IUPxo51TsFgDLPUsmvdH/Sg2V0cd5JjXIXrM2L3nODH7JOolygkJ0hlu/ZLd4Dv97Q7WMiHgXVPA8YqDW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wwk4E4C2; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5a69ba82-813e-4f6f-9f62-7d68a9c74197@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750375164;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jWjprf8y6cAF4Vs6ys1NyVQMZL58pnQZ4Y/NPoHcBJ8=;
+	b=Wwk4E4C2IvGBD9QrcvoNNDOOLPT/KnHLPLgEpFIN6dxZdSEIArJKhd7PM+PP/qFm/SlN+u
+	jw5wupAx8JwpsMMEIxQcZM06V1qD4gLm3l4wJFS8WgWF4Y8HSplK7e2yE3KKMCwT80CaW7
+	x+rlS2wEUJ6DeykVAgqnr+tK0VIFYfA=
+Date: Thu, 19 Jun 2025 19:19:15 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net 4/4] net: axienet: Split into MAC and MDIO drivers
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Michal Simek <michal.simek@amd.com>, Saravana Kannan <saravanak@google.com>,
+ Leon Romanovsky <leon@kernel.org>, Dave Ertman <david.m.ertman@intel.com>,
+ linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+ linux-arm-kernel@lists.infradead.org
+References: <20250619200537.260017-1-sean.anderson@linux.dev>
+ <20250619200537.260017-5-sean.anderson@linux.dev>
+ <20250619161030.6f14def9@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250619161030.6f14def9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 19 Jun 2025 16:05:37 -0400 Sean Anderson wrote:
-> Returning EPROBE_DEFER after probing a bus may result in an infinite
-> probe loop if the EPROBE_DEFER error is never resolved. For example, if
-> the PCS is located on another MDIO bus and that MDIO bus is missing its
-> driver then we will always return EPROBE_DEFER. But if there are any
-> devices on our own MDIO bus (such as PHYs), those devices will be
-> successfully bound before we fail our own probe. This will cause the
-> deferred probing infrastructure to continuously try to probe our device.
+On 6/19/25 19:10, Jakub Kicinski wrote:
+> On Thu, 19 Jun 2025 16:05:37 -0400 Sean Anderson wrote:
+>> Returning EPROBE_DEFER after probing a bus may result in an infinite
+>> probe loop if the EPROBE_DEFER error is never resolved. For example, if
+>> the PCS is located on another MDIO bus and that MDIO bus is missing its
+>> driver then we will always return EPROBE_DEFER. But if there are any
+>> devices on our own MDIO bus (such as PHYs), those devices will be
+>> successfully bound before we fail our own probe. This will cause the
+>> deferred probing infrastructure to continuously try to probe our device.
+>> 
+>> To prevent this, split the MAC and MDIO functionality into separate
+>> auxiliary devices. These can then be re-probed independently.
 > 
-> To prevent this, split the MAC and MDIO functionality into separate
-> auxiliary devices. These can then be re-probed independently.
+> There's a, pardon the expression, C++-like build failure here
+> culminating in:
+> 
+> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of '__exittest'
+> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of '__inittest'
+> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of 'init_module'
+> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of 'cleanup_module'
+> 
+> I'm guessing the existing module_platform_driver() and the new
+> module_auxiliary_driver() don't want to be friends when this 
+> code is built as a module?
 
-There's a, pardon the expression, C++-like build failure here
-culminating in:
+Hm, I thought I had built this as a module. I guess not. Will fix.
 
-drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of '__exittest'
-drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of '__inittest'
-drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of 'init_module'
-drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of 'cleanup_module'
-
-I'm guessing the existing module_platform_driver() and the new
-module_auxiliary_driver() don't want to be friends when this 
-code is built as a module?
--- 
-pw-bot: cr
+--Sean
 
