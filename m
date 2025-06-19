@@ -1,48 +1,86 @@
-Return-Path: <netdev+bounces-199404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC74FAE028F
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:24:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C74AE0299
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 331BF17FEDB
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:24:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91EB94A0040
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4634E222566;
-	Thu, 19 Jun 2025 10:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890B6222578;
+	Thu, 19 Jun 2025 10:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="em0J8tBU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xp8hvEFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1587E2222C5;
-	Thu, 19 Jun 2025 10:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF67221F05
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 10:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750328675; cv=none; b=LMQ5gCdDOx8SFdi6xCa+8eA/gU3vS9k8wnm0vVN1IVr5MNUttGUjOiZ5cL0qUALc7SpqOYMd6zuGi8b7B2azlyeLw1wGv5xF/uQ+WBKn8yH1rcddL7SAobsrQaUiqn6dTJnPZjMO/rUHHwfB3jfIotDrbV9cr6S7Z1mH8dCe9PU=
+	t=1750328791; cv=none; b=dDpVpeESZmeVkW2OmpOAwDuwf6w3GRA2GCb6/m/xhfwzwgyrAhBwfRUE/V38BNPyZMvNhzIxJ2hr00U0oPEzKI7daZqM2mH0dxYcGY+H2MZpPyydsyikUsAqoIFYChOoY6gJRuxwQRdLmrHIWF1dN4opfYGlDPxRhv7Sc6pRpOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750328675; c=relaxed/simple;
-	bh=KBSsy/BlJxV1qwZnyo+C8SN0dRhnb7EWEpJVD7QDyMQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jFZk9eJqye+ZCQVrdLNyq43pmesGuzB6leS9CNuV3at1LM/QhXn0hAkOM7Wf4HmhO6km1EGOZobcYhWPfCgp5s1dHaX5FOliRX11kPCaEEOp6Jbk+BIcy8OQfkimvjo9of6uYRmNEmksx0pCnKKZBpNcUOC0HbKYTZQ3n7vFL+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=em0J8tBU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F3FDC4CEEA;
-	Thu, 19 Jun 2025 10:24:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750328674;
-	bh=KBSsy/BlJxV1qwZnyo+C8SN0dRhnb7EWEpJVD7QDyMQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=em0J8tBUtud5bznU+lt1PYj2RC2d/Up1tUvdqsRTm6StLJDJDhCQJvvQwsS80WeeP
-	 py777ZWC3yHLV6AkkwHNiT4eH6CXZEWV9eMtp8xrGrGafGx/L+tW5igurnx1GYKEZZ
-	 z2aplgxELANRFosFbcNj17NXmJ8KBKx/4evwkKiTCTgd9DmGNytWC1CdCQHu0Z6oJo
-	 DU3P4HM/YP9+WZIOPewzNdOxDYIlM8aOirJC1r7RRoBuT4nJbKJipBroLPuIDID7uW
-	 /lj/T6nXnoWw++tSTCVn41QVVfpwARgByQ4UOz45IB8QYVFJ/juVh/kYYP6z4Tz+eb
-	 tfuOEziKsv0mA==
-Message-ID: <a122981d-ac9a-4c7e-a8a3-d50a3e613f0b@kernel.org>
-Date: Thu, 19 Jun 2025 12:24:29 +0200
+	s=arc-20240116; t=1750328791; c=relaxed/simple;
+	bh=uIkR6jBLvHVVu+t7vvNakNoTzduwd0/oSjyURQUiH7k=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NmJYUv8q4QfiZxE5CGK7aE1okZv84XHPwOWlKb2b0iAxWTsygyeLBVXCJTa1nDsmmyy/oHpPgAi6vcq0JdhEFThmp8Yh3ZLjlQVEK5MK9wkTKs8xGG/aBY1ORkbAx4qcrVjGFuGqtxPZKBCMlUA72VDb0MzWium9z3wG4d5W6pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xp8hvEFf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750328788;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OP3jCXVT1xG5YLm4tZwT7KKfRcEV9RnIaEZyJGpzLg4=;
+	b=Xp8hvEFf6m8loejZn5cJfuoIGqYAARfv+80vhNNqQuM8x1O7AloOu21Vukzh7tKiSBDipq
+	ppQP26tivEnPlZ0QjduIU6rErEexHkWclzus0mI8eaQvyDX+uuUmMJUEetOv1S2oHwSpG7
+	p+4xPibgs6u9MsKzX1Z1OxGw6TtJOBo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-SQq3BM0UPoSIFRCVS1DwIA-1; Thu, 19 Jun 2025 06:26:27 -0400
+X-MC-Unique: SQq3BM0UPoSIFRCVS1DwIA-1
+X-Mimecast-MFC-AGG-ID: SQq3BM0UPoSIFRCVS1DwIA_1750328786
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so3680685e9.1
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 03:26:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750328786; x=1750933586;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OP3jCXVT1xG5YLm4tZwT7KKfRcEV9RnIaEZyJGpzLg4=;
+        b=ok5TsPhSRE5yyNCW/slazm6dyqS3KSUx1WHJ6Lnao/bplUxM0075q/to+S/mQfvJmG
+         xKuUJEWMpXAsbFiOGFWQnDU00VMDJyneY0QMfaE+IwrU1yEaxZdT2h/RgPomhf4+agt6
+         jvhrMbI/sF8fraE2a9cf6tkCH/r65i6+Jbaui/clvSaBC9/cf8YOquIZOiAFV3FHmWJq
+         6bPwCTFEfNZagDnA/DRtluqJvhud+r+nXlYTsCqV/LPtFw+7qoPoTa0iTZLiCdsPId15
+         cdKe/WTqNlE0q6fmnWQNhF+rBhKSpjFB0Q+DdW2H5Q58Rs17E7ozHf0+FVU1jAf9lxd5
+         BrBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVu5HDRaSnf/Y7+qLgc8OJmJ8fzOClWlvO2rDF75TMFVVw4EGDxaTd8JR0i63biIi3UHjRQ8Tg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGSPZsJsANp6bX2C+jsLz2L66VoHG//phc7XOwkvPucyEWzAWK
+	egMcFvyjSfwxGkBfGqeWTkgOknqTLjD0z1PQH4Ib76JNVFDbT252BykHkZxE8/mKBtX/Q4+7kd+
+	IjGH3X3rx5Ozybqu6GyhInuhnWyBb298wcf1iJ+Z0F2B6xmxXDYZAxHme0Q==
+X-Gm-Gg: ASbGncs8b6NJaT8HN1kU2OpCFM2Pzywg0tlkld20AwGtdw6KG8s9sMjMsJL1322s9H/
+	kgIDGrciZJ395OZHzqGO0nOXEf20GH2RKjmer6H7BsiKPvR8/Yh0/8UgSEg1CMbWvXzrWo6ITey
+	sYkN+O++bSLLCKqiv/1BkgFSGTB/FHF3j0htTa0IhVKZ0WadRRQ8fuzEfdRJgAgMVAbjwNAHxJu
+	tsTfW6mlAmFU9OKFrIpHurlA7MnBeM5fL4Iirt6J3goK4n9gQZ8RDt7G6MN/R/lsEh/nFet+KBl
+	Qrb44X2XzJnawu9sRwdWJ8BUtc5XLAeCwWCMy+Q0ywA2lRJQsaV1bd6smAfjTf++xvLbpw==
+X-Received: by 2002:a05:600c:1d06:b0:453:c39:d0a7 with SMTP id 5b1f17b1804b1-4533ca7a286mr175812815e9.5.1750328786258;
+        Thu, 19 Jun 2025 03:26:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFjtjLrSWYLK97IRqG4e85+6HQ/14bjbSoySDhs2GmA9qzWZgLZmuL0UN20NK+uIgY+VKlqRQ==
+X-Received: by 2002:a05:600c:1d06:b0:453:c39:d0a7 with SMTP id 5b1f17b1804b1-4533ca7a286mr175812555e9.5.1750328785837;
+        Thu, 19 Jun 2025 03:26:25 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271a:7310:d5d8:c311:8743:3e10? ([2a0d:3344:271a:7310:d5d8:c311:8743:3e10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535e741757sm25911685e9.0.2025.06.19.03.26.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 03:26:24 -0700 (PDT)
+Message-ID: <f343fc9d-b3a3-4dbb-9a9c-242b7b79b97d@redhat.com>
+Date: Thu, 19 Jun 2025 12:26:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,141 +88,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] page_pool: import Jesper's page_pool
- benchmark
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@toke.dk>, Ignat Korchagin <ignat@cloudflare.com>
-References: <20250615205914.835368-1-almasrymina@google.com>
- <c126182c-8f26-41e2-a20d-ceefc2ced886@kernel.org>
- <CAHS8izPyzJvchqFNrRjY95D=41nya8Tmvx1eS9n0ijtHcUUETA@mail.gmail.com>
- <f445633e-b72c-4b5d-bb18-acda1c1d4de6@kernel.org>
- <CAHS8izOhNRNXyAgfuKW1xKb8PTernfer6tJfxG5FZmq7pePjwA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: lan743x: fix potential out-of-bounds
+ write in lan743x_ptp_io_event_clock_get()
+From: Paolo Abeni <pabeni@redhat.com>
+To: Alexey Kodanev <aleksei.kodanev@bell-sw.com>, netdev@vger.kernel.org,
+ Bryan Whitehead <bryan.whitehead@microchip.com>
+Cc: UNGLinuxDriver@microchip.com,
+ Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, Rengarajan.S@microchip.com
+References: <20250616113743.36284-1-aleksei.kodanev@bell-sw.com>
+ <6a6eb40f-9790-460b-aeab-d6977c0371dc@redhat.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAHS8izOhNRNXyAgfuKW1xKb8PTernfer6tJfxG5FZmq7pePjwA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <6a6eb40f-9790-460b-aeab-d6977c0371dc@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 19/06/2025 06.19, Mina Almasry wrote:
-> On Wed, Jun 18, 2025 at 5:46 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>>> Something is off with benchmark numbers compared to the OOT version.
->>>>
->>>
->>> I assume you're comparing my results (my kernel config + my hardware +
->>> upstream benchmark) with your results (your kernel config + your
->>> hardware + OOT version). The problem may be in OOT vs upstream but it
->>> may be just different code/config/hardware.
+On 6/19/25 12:04 PM, Paolo Abeni wrote:
+> On 6/16/25 1:37 PM, Alexey Kodanev wrote:
+>> Before calling lan743x_ptp_io_event_clock_get(), the 'channel' value
+>> is checked against the maximum value of PCI11X1X_PTP_IO_MAX_CHANNELS(8).
+>> This seems correct and aligns with the PTP interrupt status register
+>> (PTP_INT_STS) specifications.
 >>
->> True I used OOT version.
+>> However, lan743x_ptp_io_event_clock_get() writes to ptp->extts[] with
+>> only LAN743X_PTP_N_EXTTS(4) elements, using channel as an index:
 >>
->> Just applied this patch, but I get compile error. Because Makefile tries
->> to get kernel headers (net/page_pool/helpers.h) from local Linux
->> installation instead of git tree.  This need to be adjusted for patch,
->> such that it builds with src-local/git tree provided headers.
+>>     lan743x_ptp_io_event_clock_get(..., u8 channel,...)
+>>     {
+>>         ...
+>>         /* Update Local timestamp */
+>>         extts = &ptp->extts[channel];
+>>         extts->ts.tv_sec = sec;
+>>         ...
+>>     }
 >>
-> 
-> I believe the fix to that is to do:
-> 
-> make KDIR=$(pwd) -C ./tools/testing/selftests/net/bench
-> 
-
-Yes, this worked for me.
-
-> I.e. the build files assume you're building the test to run it on the
-> current machine, to cross compile it for a different machine under
-> test, we need to pass explicit KDIR. I've kinda copy-pasted what other
-> TEST_GEN_MODS_DIR= makefiles do. In theory we could do something else
-> but I am guessing the way current TEST_GEN_MODS_DIR does it is the way
-> to go. Does it work for you if you do that?
-
-Yes.
-
-> [...]
->>>
->>> Yeah, I actually just checked and I have CONFIG_DEBUG_NET on in my
->>> build, and a lot of other debug configs are turned on.
->>>
+>> To avoid an out-of-bounds write and utilize all the supported GPIO
+>> inputs, set LAN743X_PTP_N_EXTTS to 8.
 >>
->> The CONFIG_DEBUG_NET should be low overhead, so I don't expect this to
->> be the root-cause.  Other CONFIG options are more likely the issue.
->>
+>> Detected using the static analysis tool - Svace.
+>> Fixes: 60942c397af6 ("net: lan743x: Add support for PTP-IO Event Input External Timestamp (extts)")
+>> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
 > 
-> Thank you very much for the tips. Perf report showed the locking was
-> taking forever on my kernel... I had locking debug configs enabled in
-> my build... sorry... with those disabled, I get much more sane
-> results:
-> 
-> [  185.557293] bench_page_pool: time_bench_page_pool01_fast_path():
-> Cannot use page_pool fast-path
-> [  185.607873] bench_page_pool: Type:no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.177 ns (step:0) - (measurement period
-> time:0.041772642 sec time_interval:41772642) - (invoke count:10000000 tsc_interval:112778487)
-> [  185.627090] bench_page_pool: time_bench_page_pool02_ptr_ring():
-> Cannot use page_pool fast-path
-> [  185.826991] bench_page_pool: Type:no-softirq-page_pool02 Per elem: 51 cycles(tsc) 19.117 ns (step:0) - (measurement period
-> time:0.191178107 sec time_interval:191178107) - (invoke count:10000000 tsc_interval:516173586)
-> [  185.846380] bench_page_pool: time_bench_page_pool03_slow(): Cannot
-> use page_pool fast-path
-> [  186.479432] bench_page_pool: Type:no-softirq-page_pool03 Per elem: 168 cycles(tsc) 62.469 ns (step:0) - (measurement period
-> time:0.624690697 sec time_interval:624690697) - (invoke count:10000000 tsc_interval:1686656879)
+> @Rengarajan: I see you suggested this approach on V1, but it would be
+> nice to have explicit ack here (or even better in this case tested-by)
 
+Rengarajan email address is bouncing. @Bryan: same request as above for
+you (or any other person @microchip).
 
-My results with this patch:
+Thanks,
 
-$ sudo ./test_bench_page_pool.sh
-rmmod: ERROR: Module bench_page_pool is not currently loaded
-[268960.638885] bench_page_pool: Loaded
-[268960.684603] bench_page_pool: Type:for_loop Per elem: 1 cycles(tsc) 
-0.420 ns (step:0) - (measurement period time:0.042037752 sec 
-time_interval:42037752) - (invoke count:100000000 tsc_interval:151336355)
-[268961.203806] bench_page_pool: Type:atomic_inc Per elem: 18 
-cycles(tsc) 5.010 ns (step:0) - (measurement period time:0.501077936 sec 
-time_interval:501077936) - (invoke count:100000000 tsc_interval:1803899823)
-[268961.332771] bench_page_pool: Type:lock Per elem: 39 cycles(tsc) 
-11.041 ns (step:0) - (measurement period time:0.110410468 sec 
-time_interval:110410468) - (invoke count:10000000 tsc_interval:397481145)
-[268961.350718] bench_page_pool: time_bench_page_pool01_fast_path(): 
-Cannot use page_pool fast-path
-[268961.425335] bench_page_pool: Type:no-softirq-page_pool01 Per elem: 
-23 cycles(tsc) 6.571 ns (step:0) - (measurement period time:0.065719390 
-sec time_interval:65719390) - (invoke count:10000000 tsc_interval:236591475)
-[268961.444666] bench_page_pool: time_bench_page_pool02_ptr_ring(): 
-Cannot use page_pool fast-path
-[268961.622103] bench_page_pool: Type:no-softirq-page_pool02 Per elem: 
-60 cycles(tsc) 16.862 ns (step:0) - (measurement period time:0.168626201 
-sec time_interval:168626201) - (invoke count:10000000 
-tsc_interval:607060218)
-[268961.641608] bench_page_pool: time_bench_page_pool03_slow(): Cannot 
-use page_pool fast-path
-[268962.387479] bench_page_pool: Type:no-softirq-page_pool03 Per elem: 
-265 cycles(tsc) 73.739 ns (step:0) - (measurement period 
-time:0.737399722 sec time_interval:737399722) - (invoke count:10000000 
-tsc_interval:2654665224)
-
-Fast path results:
-no-softirq-page_pool01 Per elem: 23 cycles(tsc) 6.571 ns
-
-ptr_ring results:
-no-softirq-page_pool02 Per elem: 60 cycles(tsc) 16.862 ns
-
-slow path results:
-no-softirq-page_pool03 Per elem: 265 cycles(tsc) 73.739 ns
-
-
-> Does this alleviate your concern? Or do you still see an issue here?
-> There is still a delta between our results, on different
-> hardware/configs but results are in a sane range now.
-
-Now the results a sane and in range :-)
-
---Jesper
-
+Paolo
 
 
