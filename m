@@ -1,135 +1,97 @@
-Return-Path: <netdev+bounces-199600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF039AE0ED2
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:04:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2DAAE0EFB
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:21:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 887DB16A458
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 21:04:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1CDB3A36A0
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 21:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1264A25DD07;
-	Thu, 19 Jun 2025 21:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839DB2459F9;
+	Thu, 19 Jun 2025 21:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="cW6D1BRd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=earthlink.net header.i=@earthlink.net header.b="EyTQbxuQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mta-201a.earthlink-vadesecure.net (mta-201b.earthlink-vadesecure.net [51.81.229.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65853253B43
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 21:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995AB1E7C1C;
+	Thu, 19 Jun 2025 21:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.81.229.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750367060; cv=none; b=hEsD/1RTdFiozZz+YMeFMcFOFNzQp+2USOV2IdWZGnqERxO7S9Y+uf05WSGBMOxvqU1cZPQxThPil0aJE9qENLU8qJPMKYgPJ47tAu85LuY4KQnmr6mTRkKAu2bsM4vVAv1Ox7FTrWEZhzKEUqYpF+VTr/bdaIwfSvLkByDDe1w=
+	t=1750368112; cv=none; b=BU5Krkr+zBZuXfpk5aFvJmSN1j6KB6bQNpkanU+2j0Sw2oMQIHLlUmY0OHT0kX+M9/40LigO+ZRJuGsuILrldM+aGOEm+kc+shxTrA//Zop9tRoD1+bJoJhtl0LPS6Q6X76vzGlbiKSeXJn+7IpVjDP9M1M/oosQjPzRkh19VHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750367060; c=relaxed/simple;
-	bh=f38j4Iqo8acxnIhtuXkeD3cynLv4OcZQ7P8GpdgZm4k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l53w65UcvgGiUD7nHnAKcdPamOoRuIao5YrS+74i0u1Ieq2wfLcm2heqkr45aZhwA3Hj9jd2P6VQMxIcPGFhhB9rC3LWIShrh46AcDxYOvevp9qKeaLzXgGB8oZQegNNNuEMO7cU62rXGdoPixBylRcYklxI1KP0AK0aIEaZZXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=cW6D1BRd; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-71173646662so12744137b3.2
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 14:04:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1750367057; x=1750971857; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lumfk+fpW+/5RKyXlyleHS+MaP2GOeXbKZfOKNMMyIc=;
-        b=cW6D1BRdeBH/yBYWcL/wW3xI9TIZwqjiAhDhf9YbmcTVJdcRUbCyG1arPgo+Yy6/aT
-         Oaj4L9eF5s//T1+B/suXBN/LTab7Wt8VosVtYC6wWA4gLN0WbwvP46YDVaxLguhLFu1S
-         S0WufY4MjC0O4LwZcgY2FgQ8PL4jmfMAJ8fvtoA30rBXnt8C+NtpkIOcLAmwFxoeWr8Y
-         V14/jcyLgFMOTcpl3YCy6yyouurTHPnH+kId/uokOJ0Fr3WSjxbZzHpXDgLwuz3+/XbQ
-         FURBQqIQpG5Uqg3omXXvKTbMUq2QmjOcLG75sn/DNq+9wrvGnaKN9dEl+ysaV2nHAr03
-         yYFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750367057; x=1750971857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lumfk+fpW+/5RKyXlyleHS+MaP2GOeXbKZfOKNMMyIc=;
-        b=uhiaB5sdXANjg3XgaaT3nnB07mW1tNpKKpSz5j+qsfGo1ZS0KNOGDnajd6O1+QGgCt
-         gYdBYRRRExozA7f7FKgvDJ7FuFjXVU9usiky5F3bura9cMbN+OKg79dY3dQCd2bGmsJk
-         E0Egha69oDfJsiRksbZuFJS7ae9TPMTzOflYY+yUv7y97o4/xietmusgmHI6YrmTeQ/N
-         6anBtzhqkgJjj0zjOYLeXrd+Q8vXViQXEKvBnWDuzorhcXtl48s067mHuLVxSl4yUFwX
-         Qm6frlK4wQ24/7hTFevEJ5W1uqX9ccIi/qpHsZDnX0VXUM9Oow5N5aixO5whTm/xRFIa
-         fHUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVP/DTuXgJnH5CLM77TTOeBBANKtsZ3Tw21EEGREZCW+zuji27V7a8Eb54LTH5xhIAlHcFHSfo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybaA+8bZYs4CwXjY9xaBLfK++2gczB4TjwVfEVV5uRjmYy3Rco
-	3gyJtpzDcT7xtkAH8V102J0nNFxpODpL8QTlF8ekSNlyBBnN2NS6EYDaek/1ZzdI4a1B2sRsL/9
-	at2AWkh0K7EnZa3WysHLDpIpTT0CjoBXCrPrfGAuAioJ+Gi6JCYQ=
-X-Gm-Gg: ASbGncvbPfVtS6G1iMzgHS51VvaHr2uOs2UEEyEgC5B1qW2ByfGjFRflcHy9aabytwE
-	t3Q8mr+zwuKKXajn45PcGyLQscknFNISNTpH8hHMAxgvMzkZHI3FSY0L07kJ0RC/lrZl/fwTln7
-	5PYdm4vtFFgutobF6ulRC32Qb3jzw953e+sXfHsqhk1bd+MFypGwl57A==
-X-Google-Smtp-Source: AGHT+IHTFe77unrYK9C7+eJbf2IZV6JzFgf/SfY74D8DPdljUvrt1WKcgPBYC5tSk0+mGANvgDk4AqDQw6/LqYvuk2Y=
-X-Received: by 2002:a05:690c:350f:b0:705:750e:37b7 with SMTP id
- 00721157ae682-712c639d784mr9888287b3.5.1750367057365; Thu, 19 Jun 2025
- 14:04:17 -0700 (PDT)
+	s=arc-20240116; t=1750368112; c=relaxed/simple;
+	bh=OCouZ563iybBnAa+5WrnH7Rsa1cCJeJzF5RAPNWT7ns=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GOJHvWH89d9hChP7P2nbsSlLocHUxb1sBDLXxvfxArEdPCeY7bna7PgksnrZ3pbZlgCaVLeK5OV2rJeqnerk1kh7U1nQ2I+/Ux9sjKdcpCG6UwOKpzKKBGT4A+GvmiTOguoepdUK829EzhtfNn5+8yaxHbsdQdF/2MOCvLnbXa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=onemain.com; spf=pass smtp.mailfrom=onemain.com; dkim=pass (2048-bit key) header.d=earthlink.net header.i=@earthlink.net header.b=EyTQbxuQ; arc=none smtp.client-ip=51.81.229.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=onemain.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onemain.com
+Authentication-Results: earthlink-vadesecure.net;
+ auth=pass smtp.auth=svnelson@teleport.com smtp.mailfrom=sln@onemain.com;
+DKIM-Signature: v=1; a=rsa-sha256; bh=Zth3NOT6hBrmTViZaCMJcSRN9B5Sbk7W2dm4FX
+ pSX3Q=; c=relaxed/relaxed; d=earthlink.net; h=from:reply-to:subject:
+ date:to:cc:resent-date:resent-from:resent-to:resent-cc:in-reply-to:
+ references:list-id:list-help:list-unsubscribe:list-unsubscribe-post:
+ list-subscribe:list-post:list-owner:list-archive; q=dns/txt;
+ s=dk12062016; t=1750367778; x=1750972578; b=EyTQbxuQmY3eG51sU9sYLBAZBg1
+ DCWLCqJICc2xSpDKhI0NOmEHvoSKacKNwX6cqQ6KRWF+6B7lLgGWuM5l1YvyxUhEIRSgO+0
+ M5Eb244yJj86/cMhM/hx/7x9mHgUBST7F7a1g3nYdDRnISTjr+pnh0DAQ+8v5CDG87xmdPN
+ 8/uaVCGuFdqlwGJM+OHe68oJOQoaPq5FqOUNEKOy74Sr9Qz8zSUinb43zsJOVBZKoqaB/2X
+ xgLQa/2AVxJ9VTSMyxJTDtch0doIw9k5DSSGkPUmAxchmSuoVKPxxxXQ5c8MzRonSheWSP3
+ pJDE3YV5DmO5zcwXRlKvVmwgGEXW0Yg==
+Received: from poptart.. ([50.47.159.51])
+ by vsel2nmtao01p.internal.vadesecure.com with ngmta
+ id 71176d0c-184a8e382a193ae9; Thu, 19 Jun 2025 21:16:18 +0000
+From: Shannon Nelson <sln@onemain.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Shannon Nelson <sln@onemain.com>
+Subject: [PATCH net] CREDITS: Add entry for Shannon Nelson
+Date: Thu, 19 Jun 2025 14:16:07 -0700
+Message-Id: <20250619211607.1244217-1-sln@onemain.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250428195022.24587-2-stephen.smalley.work@gmail.com> <20250521003211.8847-1-kuniyu@amazon.com>
-In-Reply-To: <20250521003211.8847-1-kuniyu@amazon.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 19 Jun 2025 17:04:06 -0400
-X-Gm-Features: AX0GCFuvQDcj0Q4-T6mYoDn82kX6DVurSN3n5y6exOy2D1H3OZ7Mt_ie8lnZOc8
-Message-ID: <CAHC9VhT71e7r6eS-j3o+ruciG1jyrBJ8zvrvQgaf3r+6CkgSuw@mail.gmail.com>
-Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
- interface
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: stephen.smalley.work@gmail.com, anna@kernel.org, brauner@kernel.org, 
-	casey@schaufler-ca.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, jack@suse.cz, jmorris@namei.org, kuba@kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, omosnace@redhat.com, pabeni@redhat.com, 
-	selinux@vger.kernel.org, serge@hallyn.com, trondmy@kernel.org, 
-	viro@zeniv.linux.org.uk, willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 20, 2025 at 8:32=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
-> From: Stephen Smalley <stephen.smalley.work@gmail.com>
-> Date: Mon, 28 Apr 2025 15:50:19 -0400
-> > Update the security_inode_listsecurity() interface to allow
-> > use of the xattr_list_one() helper and update the hook
-> > implementations.
-> >
-> > Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.sma=
-lley.work@gmail.com/
-> >
-> > Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
-> [...]
-> > diff --git a/net/socket.c b/net/socket.c
-> > index 9a0e720f0859..bbcaa3371fcd 100644
-> > --- a/net/socket.c
-> > +++ b/net/socket.c
-> > @@ -560,17 +560,14 @@ static ssize_t sockfs_listxattr(struct dentry *de=
-ntry, char *buffer,
-> >                               size_t size)
-> >  {
-> >       ssize_t len;
-> > -     ssize_t used =3D 0;
-> > +     ssize_t used, remaining;
-> > +     int err;
->
-> Paul: Could you sort this in the reverse xmas tree order before merging ?
-> https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ord=
-ering-reverse-xmas-tree-rcs
+I'm retiring and have already had my name removed from MAINTAINERS.
+A couple of folks kindly suggested I should have an entry here.
 
-Done, thanks for reviewing the patch.
+Signed-off-by: Shannon Nelson <sln@onemain.com>
+---
+ CREDITS | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> otherwise the socket part looks good to me:
->
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+diff --git a/CREDITS b/CREDITS
+index 45446ae322ec..c30b75f9a732 100644
+--- a/CREDITS
++++ b/CREDITS
+@@ -2981,6 +2981,11 @@ S: 521 Pleasant Valley Road
+ S: Potsdam, New York 13676
+ S: USA
+ 
++N: Shannon Nelson
++E: sln@onemain.com
++D: Worked on several network drivers including
++D: ixgbe, i40e, ionic, pds_core, pds_vdpa, pds_fwctl
++
+ N: Dave Neuer
+ E: dave.neuer@pobox.com
+ D: Helped implement support for Compaq's H31xx series iPAQs
+-- 
+2.34.1
 
---=20
-paul-moore.com
 
