@@ -1,473 +1,252 @@
-Return-Path: <netdev+bounces-199556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DAEAAE0AFB
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:03:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99162AE0AFF
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A16F55A3AFB
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:02:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247915A3D5A
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9E8239E93;
-	Thu, 19 Jun 2025 16:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A379228B501;
+	Thu, 19 Jun 2025 16:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="z6+2nG8q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eOyYdFE+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B706323771C
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 16:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0CD1C7009;
+	Thu, 19 Jun 2025 16:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750348984; cv=none; b=tXh807zTTqD2LM80lRHI0xNTquIzh3LKp5fmpmDGI6/P0Vqd56WsXkvZTFqkqitAB731ikUq7U4vVkBQ7bFQgKTtPdMQVGzc1qh5J7ojv+N9lwQgCwX0asgGHpkGZU2UgIcMJqLH6KHYjRuIKfKHt50rWCe1PFgVTsSGJyHzNbE=
+	t=1750348994; cv=none; b=p9s5NESvBzWmmL7QLFZ5YPst4HL3/8WVFzV+NgL4Snx9Mj/M/fgiv9Ewtdj1y3lkaYvYMZB2I4L/EiVdNTdNk1bMDZYEvcMr7ur5wKEZVcQZX1oaw5Gt7XK1QWyH6O4sXAGcXPHC8pt7eXxV2vf+4qzy9gQWxgu3SFxj5n0x814=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750348984; c=relaxed/simple;
-	bh=BybTCEv6uedMjFiXkcmGbEmALwrX0FJGLL4I2T5BpLA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZX8ekvYac9KJcaZZzW/siTSufJ5zfJioZGtqTXYwTH1fmetXn68aU9/IJU1NrCQv1UMkWrL9RmFhM8Sc96w0K8S31DP/fhiwhKi4JwkgKqONmKvAvIXkedu/fbm/pXHOvDsd2eliZ93t6IH99iIqjoW4hazM3XhBhq6VC9DohLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=z6+2nG8q; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-234f17910d8so8857105ad.3
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 09:03:02 -0700 (PDT)
+	s=arc-20240116; t=1750348994; c=relaxed/simple;
+	bh=r2M0LA0vpAcF4qHQatVHpNoCHvW8P/+5eAr6zd7qrM4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uO1xfQpKqtidbr/XUgZz1Nk1G6pcDLd4aYeugYNxdhFGuO9dTDEnjPSHkumWS6ES09op1y//yxYXOueT8m8H9dsd70j82Gu21hlvWEBE1UQo+s/k/5y2pE/C0Fr76Ju1Z7e/ac38EU3vow7NzdIhXtDwEP7IqezSeD8xMgzLFDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eOyYdFE+; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e819ebc3144so902575276.0;
+        Thu, 19 Jun 2025 09:03:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1750348982; x=1750953782; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WQrNfQUXZiUXkKqCGlsoHfgCYpYDUbMa/uMejKMgDck=;
-        b=z6+2nG8qTM/Z9fD9h66GHITY0tLg3m5pmJAO/QDKIRu/IyiWjWMQqK+wFdlmTIOHti
-         YqHHXf+bZ2BlPwoPGgFjJjinzf7x8wbVfCLDrKSOuaD7xud8SqaFtSirfccyX/3Y5n8k
-         MIiHqCrfnUUklSOT7EGr7lys6x5f94ANLj/0oFxg4koRZd9XfstztvIUrEBMSndG0hmG
-         1d3PUVgvrcj7NATRX9SwVIr6OEkVU2/mZ1FmsJ8jtpUIVrovYwfImbt30nlbEqHvGmbf
-         T3MnhbMHfsW57Fxe0frDw5xNfuOuJbgzY1+DPoXDwLKp98AXzyfwVf4oMt44uEocMv+a
-         2k8w==
+        d=gmail.com; s=20230601; t=1750348992; x=1750953792; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+xQTwXxD7lGV9pBuwUJX6vU+Txv9GmZYzEqswfTqdeg=;
+        b=eOyYdFE+kx2eNjvpj1UrPtNV+ZD1m3EW2Qz1G1wJvZCwMX6iJXRUmLixGaQBOTUWJQ
+         a8SXqlgEIt+lQM7RHuPkLHX1A2tzWbQfxI+pbadefNyyvAZr6q32dVaz/V6k1nsB8g6g
+         RFRC1G/vOM423+4DJ1DHmgpHEW5eaKsz61L1ZjnhHBwVaNBi13U7aXvDvJIfNTBMIMBL
+         BbJDX+BPbWN1jB/0FT+SCb4lvNx49+bt4BXXmcJJDQhaflGosR01ZyDEP15zpSSIr4Oo
+         oYAKcgPbf2d9+yJqTNrXvo6HkFg1aDnPU1/vtWQdWhdyLJ2jmUh4F0kiaFxDLBhaoQ6Y
+         1Z7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750348982; x=1750953782;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WQrNfQUXZiUXkKqCGlsoHfgCYpYDUbMa/uMejKMgDck=;
-        b=foh5V/CY9xAUwxWiIiKSj2R9Bn/uQZpTh7xEXZS1XaCiUBx28/E/5FUlyAArCEVHeW
-         B5pcn4o0oFbc1VsjSXwhb/ZKZYyFJqy88wyW1723T1FVfZLLrUJxvJEVkUoEdd7kual+
-         GBju22ALhVt7jU0SxNUxJ+zdsCy7sJXuPNORNtl8nxk3XWynbnosZjebmFuZO+ZCDiJs
-         YWMAy7kReVWTu05BV5sNtKojQFk3LEMrkd4qPBbZYH9AFDqFQBH3YQ5ulos5Kks1gbqM
-         aHzAIJCSxcig4oypbRrerfZNmiDLANiW5AAxUvZMvMsUPSxrWsearngrsHcD5CykGT7q
-         8s2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXIRU2FUgq31qfGU/LG0Osix9uzrREQo45N5LjiYTJTFJBMOR93IRl27YzUkAZ0KsHvRvsSoGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4PPkZjV+zZIVWdZuniwkO8xu9WZ3kpeVngOauVYKlSJy5+20O
-	d0zv5D8Cr41v1ZzOSKtOwnwRaKizhIL5JMHRyCzH3OZZsqo9ZhRJStVOvDQC5xHUTaA=
-X-Gm-Gg: ASbGnctGcOSzsuzVCizJ44Au8eenmz7I8lf/0/2YACMNu8MoDukghv/CvyBxy7LtFTC
-	jMqhZEdBsveg7JAJCD2WHaXyMWkkPtdOZLe0K5WYIb+ZFOlUNWwD8W40lRUWpWNkxFkg/ER6dA9
-	FavySRUFQg8BjIZ4coCphyhBNhoDOuruz8tIw1kaANlRmDrN2jdm4X7J2d5IbCgzu0OuAh7+Fh0
-	5F3qwlw9srVuhx/pxKBBaWRJGOuh5d6VPt143mssR7FZd9J0C9AXe1dEmad6T6pn70UuqxVEoK+
-	0ljDMwP4NzjQgXujDnka5y3Edk1wqjrKJz8DmkynO2Dd23B8sHbkbdwDerrawWSejYaWg6iLb3M
-	=
-X-Google-Smtp-Source: AGHT+IFBukSVYNzIllx/MuDBAWVsJHvLZzalGuxy6Fo0wGgGvlmSrsEXKNHQMSIaYE1iNqt8t3w6+Q==
-X-Received: by 2002:a17:903:1a07:b0:235:ea0d:ae21 with SMTP id d9443c01a7336-2366b17ae4bmr360151065ad.35.1750348981816;
-        Thu, 19 Jun 2025 09:03:01 -0700 (PDT)
-Received: from [157.82.203.223] ([157.82.203.223])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2369e7c7185sm43059705ad.156.2025.06.19.09.02.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jun 2025 09:03:01 -0700 (PDT)
-Message-ID: <add3a48e-f16a-4e32-91d4-fc34b1ff3ce6@daynix.com>
-Date: Fri, 20 Jun 2025 01:02:57 +0900
+        d=1e100.net; s=20230601; t=1750348992; x=1750953792;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+xQTwXxD7lGV9pBuwUJX6vU+Txv9GmZYzEqswfTqdeg=;
+        b=eD6vrIWrdScAhmvwbGWbEKFbVJEQ34UKvBZSXENuJZjHznZZjZDw5UPeTuNnbckWgC
+         u7RoxFXgo0niPv2rjFWBIHRvlfUAjCWfzQ0/5Qzk9CGuhDm7Zpxy8F8Rls3O/lgArTnq
+         0Bs7EXakf++ltDot0Q8Y3diTbW1X8flHyUvx994xx/PLV2QMxqzft8lqjEnEYEEW+Mi1
+         Z6UDGxKHz9zrOdKh6WYOaYVk8VKybDFBFg/lab8Atx0SzZUt8TnDoW0RPeSm1dm69ugh
+         ZD5tLblds86ylkDDiGK/hZw5p77EZIGba+Gp4AKyvgVQa1dmIr6LC1A1agjx4CPHO02f
+         5Rpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUb/CxhaozC1VBMHOQDabbtR6cqlpPBV0ApMWchHohNRfl5vKruW4ChtP60ViwW0jxUUv+hfthoypVQfQ==@vger.kernel.org, AJvYcCUlBdJfflX6ssbUaWRm1l9H4oPOW83Mf5ZdzgSztEWwxjdI5MrgOJtlILg7f1Ki02B2ZWB+k1Ck4hOB@vger.kernel.org, AJvYcCVWFJNVU7ZOImX6+hdS1sxRJ124zy09sNZpTHggbk/55qLej8cbaAg1QYONCQuoNipFpSUKJhLc78JUooI=@vger.kernel.org, AJvYcCVeMJhvQJvCzNcwdiY+ERFevSeSUA0p6OZ5uuWVgkjLXPN0EqAZ2e/66rQ9lmdnJ8GlSM6OP2JLJmQVsKRP@vger.kernel.org, AJvYcCVla32yOhG9lNhzCOZReQhbjpnRV2G9fTiVvLwuu0suZ/4jpzAsaDW7oD7gq4kbsL0KXKDHiH7koF7MHwE+p60=@vger.kernel.org, AJvYcCWT45kDoUJnAXdKtCIEu5zcHBNRsf3NXpvWboMMVM4j+CAFKq9YQambgk4d9Dry1RlfvQZHsGzP6lQJ@vger.kernel.org, AJvYcCWfZ4lehX2JoggL2YD9U0HoC/uXWOaSjOoJty3kaCDQBA7mBCg1nKswem4Uxs88tOwSSMrCcwPpIHU=@vger.kernel.org, AJvYcCX91Vv77WQC0JJANBCZBk9xY8pA7U3ie6mWV2JaGey6PyhdLf+BHfz6HGXfYGJ3FG0JKL6kV5MmX2c+@vger.kernel.org, AJvYcCXHxYFLWreprEjqHyDIBbVaKS0K6L+q7h4YgIR2DhH/LGZ4k2q8wCSVxqAiB6kCWSCLM2rQTSdy@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRp2u8n6sh89MJ1jIJ/TSt5dFAyr5aed1iruxvpNwS5EADdn0j
+	538YZuxaZDTGLEF+TKE/u88rVp7ldKDW3MWDdHRyUhAV14Fyf0v10z0mRud8ondNRjzfWZQbRoX
+	MAKDj7K1J2OtE9Fa30qTC/K5gQTT5qV0=
+X-Gm-Gg: ASbGnctxUY9I9+3CsSTNR7/d2HA3qjfCj4Yj9N76csUkOeW3+imic/wARB+a1D88t89
+	QUfvgjPbeHGE70EZEjsPx/hsTcydQ9lXf0Vg2coY0DEO7L8EUGIXjIdRxVGBPsKzBaoMgYFQ9DQ
+	V334S6TZ3NI018ygypsLJEb0he6u3onnqSBNCHrhd6
+X-Google-Smtp-Source: AGHT+IGa7tw70P7sGvwQKMUUHWj3QXVyK3ea1FN2fTq6oMO79eMLCTL0cNzeqaB1CCVADOTXLD7G0IohS8aLb91g6EY=
+X-Received: by 2002:a05:690c:3802:b0:70e:73ce:80de with SMTP id
+ 00721157ae682-7117544de8dmr325019227b3.25.1750348991400; Thu, 19 Jun 2025
+ 09:03:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 7/8] tun: enable gso over UDP tunnel support.
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <cover.1750176076.git.pabeni@redhat.com>
- <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250604041418.1188792-1-tmyu0@nuvoton.com> <20250604041418.1188792-2-tmyu0@nuvoton.com>
+ <20250612140041.GF381401@google.com> <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
+ <20250612152313.GP381401@google.com> <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
+ <20250613131133.GR381401@google.com> <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
+ <20250619115345.GL587864@google.com> <CAOoeyxXSTeypv2qQjcK1cSPtjch=gJGYzqoMsLQ-LJZ8Kwgd=w@mail.gmail.com>
+ <20250619152814.GK795775@google.com>
+In-Reply-To: <20250619152814.GK795775@google.com>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Fri, 20 Jun 2025 00:03:01 +0800
+X-Gm-Features: Ac12FXx-P2aFA7c6BIgslF9XvC9taDGEdXQ_V2uefNP8obilfmqlElV_z9tezMQ
+Message-ID: <CAOoeyxU7eQneBuxbBqepta29q_OHPzrkN4SKmj6RX72L3Euw5A@mail.gmail.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+To: Lee Jones <lee@kernel.org>
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	Ming Yu <tmyu0@nuvoton.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/06/18 1:12, Paolo Abeni wrote:
-> Add new tun features to represent the newly introduced virtio
-> GSO over UDP tunnel offload. Allows detection and selection of
-> such features via the existing TUNSETOFFLOAD ioctl and compute
-> the expected virtio header size and tunnel header offset using
-> the current netdev features, so that we can plug almost seamless
-> the newly introduced virtio helpers to serialize the extended
-> virtio header.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> v3 -> v4:
->    - virtio tnl-related fields are at fixed offset, cleanup
->      the code accordingly.
->    - use netdev features instead of flags bit to check for
->      the configured offload
->    - drop packet in case of enabled features/configured hdr
->      size mismatch
-> 
-> v2 -> v3:
->    - cleaned-up uAPI comments
->    - use explicit struct layout instead of raw buf.
-> ---
->   drivers/net/tun.c           | 70 ++++++++++++++++++++++++-----
->   drivers/net/tun_vnet.h      | 88 +++++++++++++++++++++++++++++++++----
->   include/uapi/linux/if_tun.h |  9 ++++
->   3 files changed, 148 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index f8c5e2fd04df..bae0370a8152 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -186,7 +186,8 @@ struct tun_struct {
->   	struct net_device	*dev;
->   	netdev_features_t	set_features;
->   #define TUN_USER_FEATURES (NETIF_F_HW_CSUM|NETIF_F_TSO_ECN|NETIF_F_TSO| \
-> -			  NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4)
-> +			  NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4 | \
-> +			  NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM)
->   
->   	int			align;
->   	int			vnet_hdr_sz;
-> @@ -925,6 +926,7 @@ static int tun_net_init(struct net_device *dev)
->   	dev->hw_features = NETIF_F_SG | NETIF_F_FRAGLIST |
->   			   TUN_USER_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
->   			   NETIF_F_HW_VLAN_STAG_TX;
-> +	dev->hw_enc_features = dev->hw_features;
->   	dev->features = dev->hw_features;
->   	dev->vlan_features = dev->features &
->   			     ~(NETIF_F_HW_VLAN_CTAG_TX |
-> @@ -1698,7 +1700,8 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->   	struct sk_buff *skb;
->   	size_t total_len = iov_iter_count(from);
->   	size_t len = total_len, align = tun->align, linear;
-> -	struct virtio_net_hdr gso = { 0 };
-> +	struct virtio_net_hdr_v1_hash_tunnel hdr;
-> +	struct virtio_net_hdr *gso;
->   	int good_linear;
->   	int copylen;
->   	int hdr_len = 0;
-> @@ -1708,6 +1711,15 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->   	int skb_xdp = 1;
->   	bool frags = tun_napi_frags_enabled(tfile);
->   	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
-> +	netdev_features_t features = 0;
-> +
-> +	/*
-> +	 * Keep it easy and always zero the whole buffer, even if the
-> +	 * tunnel-related field will be touched only when the feature
-> +	 * is enabled and the hdr size id compatible.
-> +	 */
-> +	memset(&hdr, 0, sizeof(hdr));
-> +	gso = (struct virtio_net_hdr *)&hdr;
->   
->   	if (!(tun->flags & IFF_NO_PI)) {
->   		if (len < sizeof(pi))
-> @@ -1721,7 +1733,12 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->   	if (tun->flags & IFF_VNET_HDR) {
->   		int vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
->   
-> -		hdr_len = tun_vnet_hdr_get(vnet_hdr_sz, tun->flags, from, &gso);
-> +		if (vnet_hdr_sz >= TUN_VNET_TNL_SIZE)
-> +			features = NETIF_F_GSO_UDP_TUNNEL |
-> +				   NETIF_F_GSO_UDP_TUNNEL_CSUM;
-> +
-> +		hdr_len = __tun_vnet_hdr_get(vnet_hdr_sz, tun->flags,
-> +					     features, from, gso);
->   		if (hdr_len < 0)
->   			return hdr_len;
->   
-> @@ -1755,7 +1772,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->   		 * (e.g gso or jumbo packet), we will do it at after
->   		 * skb was created with generic XDP routine.
->   		 */
-> -		skb = tun_build_skb(tun, tfile, from, &gso, len, &skb_xdp);
-> +		skb = tun_build_skb(tun, tfile, from, gso, len, &skb_xdp);
->   		err = PTR_ERR_OR_ZERO(skb);
->   		if (err)
->   			goto drop;
-> @@ -1799,7 +1816,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->   		}
->   	}
->   
-> -	if (tun_vnet_hdr_to_skb(tun->flags, skb, &gso)) {
-> +	if (tun_vnet_hdr_tnl_to_skb(tun->flags, features, skb, &hdr)) {
->   		atomic_long_inc(&tun->rx_frame_errors);
->   		err = -EINVAL;
->   		goto free_skb;
-> @@ -2050,13 +2067,21 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->   	}
->   
->   	if (vnet_hdr_sz) {
-> -		struct virtio_net_hdr gso;
-> +		struct virtio_net_hdr_v1_hash_tunnel hdr;
-> +		struct virtio_net_hdr *gso;
->   
-> -		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
-> +		ret = tun_vnet_hdr_tnl_from_skb(tun->flags, tun->dev, skb,
-> +						&hdr);
->   		if (ret)
->   			return ret;
->   
-> -		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
-> +		/*
-> +		 * Drop the packet if the configured header size is too small
-> +		 * WRT the enabled offloads.
-> +		 */
-> +		gso = (struct virtio_net_hdr *)&hdr;
-> +		ret = __tun_vnet_hdr_put(vnet_hdr_sz, tun->dev->features,
-> +					 iter, gso);
->   		if (ret)
->   			return ret;
->   	}
-> @@ -2357,7 +2382,9 @@ static int tun_xdp_one(struct tun_struct *tun,
->   {
->   	unsigned int datasize = xdp->data_end - xdp->data;
->   	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
-> +	struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr;
->   	struct virtio_net_hdr *gso = &hdr->gso;
-> +	netdev_features_t features = 0;
->   	struct bpf_prog *xdp_prog;
->   	struct sk_buff *skb = NULL;
->   	struct sk_buff_head *queue;
-> @@ -2426,7 +2453,17 @@ static int tun_xdp_one(struct tun_struct *tun,
->   	if (metasize > 0)
->   		skb_metadata_set(skb, metasize);
->   
-> -	if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
-> +	/*
-> +	 * Assume tunnel offloads are enabled if the received hdr is large
-> +	 * enough.
-> +	 */
-> +	if (READ_ONCE(tun->vnet_hdr_sz) >= TUN_VNET_TNL_SIZE &&
-> +	    xdp->data - xdp->data_hard_start >= TUN_VNET_TNL_SIZE)
-> +		features = NETIF_F_GSO_UDP_TUNNEL |
-> +			   NETIF_F_GSO_UDP_TUNNEL_CSUM;
+Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8819=E6=97=A5 =E9=
+=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:28=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Thu, 19 Jun 2025, Ming Yu wrote:
+>
+> > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8819=E6=97=A5=
+ =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=887:53=E5=AF=AB=E9=81=93=EF=BC=9A
+> > >
+> > > On Fri, 13 Jun 2025, Ming Yu wrote:
+> > >
+> > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8813=E6=
+=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=889:11=E5=AF=AB=E9=81=93=EF=BC=9A
+> > > > >
+> > > > > On Fri, 13 Jun 2025, Ming Yu wrote:
+> > > > >
+> > > > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8812=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:23=E5=AF=AB=E9=81=93=EF=
+=BC=9A
+> > > > > > >
+> > > > > > > On Thu, 12 Jun 2025, Ming Yu wrote:
+> > > > > > >
+> > > > > > > > Dear Lee,
+> > > > > > > >
+> > > > > > > > Thank you for reviewing,
+> > > > > > > >
+> > > > > > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=
+=8812=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8810:00=E5=AF=AB=E9=81=93=
+=EF=BC=9A
+> > > > > > > > >
+> > > > > > > > ...
+> > > > > > > > > > +static const struct mfd_cell nct6694_devs[] =3D {
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10)=
+,
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11)=
+,
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12)=
+,
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13)=
+,
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14)=
+,
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15)=
+,
+> > > > > > > > > > +
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
+> > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
+> > > > > > > > >
+> > > > > > > > > Why have we gone back to this silly numbering scheme?
+> > > > > > > > >
+> > > > > > > > > What happened to using IDA in the child driver?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > In a previous version, I tried to maintain a static IDA in =
+each
+> > > > > > > > sub-driver. However, I didn=E2=80=99t consider the case whe=
+re multiple NCT6694
+> > > > > > > > devices are bound to the same driver =E2=80=94 in that case=
+, the IDs are not
+> > > > > > > > fixed and become unusable for my purpose.
+> > > > > > >
+> > > > > > > Not sure I understand.
+> > > > > > >
+> > > > > >
+> > > > > > As far as I know, if I maintain the IDA in the sub-drivers and =
+use
+> > > > > > multiple MFD_CELL_NAME("nct6694-gpio") entries in the MFD, the =
+first
+> > > > > > NCT6694 device bound to the GPIO driver will receive IDs 0~15.
+> > > > > > However, when a second NCT6694 device is connected to the syste=
+m, it
+> > > > > > will receive IDs 16~31.
+> > > > > > Because of this behavior, I switched back to using platform_dev=
+ice->id.
+> > > > >
+> > > > > Each of the devices will probe once.
+> > > > >
+> > > > > The first one will be given 0, the second will be given 1, etc.
+> > > > >
+> > > > > Why would you give multiple IDs to a single device bound to a dri=
+ver?
+> > > > >
+> > > >
+> > > > The device exposes multiple peripherals =E2=80=94 16 GPIO controlle=
+rs, 6 I2C
+> > > > adapters, 2 CAN FD controllers, and 2 watchdog timers. Each periphe=
+ral
+> > > > is independently addressable, has its own register region, and can
+> > > > operate in isolation. The IDs are used to distinguish between these
+> > > > instances.
+> > > > For example, the GPIO driver will be probed 16 times, allocating 16
+> > > > separate gpio_chip instances to control 8 GPIO lines each.
+> > > >
+> > > > If another device binds to this driver, it is expected to expose
+> > > > peripherals with the same structure and behavior.
+> > >
+> > > I still don't see why having a per-device IDA wouldn't render each
+> > > probed device with its own ID.  Just as you have above.
+> > >
+> >
+> > For example, when the MFD driver and the I2C sub-driver are loaded,
+> > connecting the first NCT6694 USB device to the system results in 6
+> > nct6694-i2c platform devices being created and bound to the
+> > i2c-nct6694 driver. These devices receive IDs 0 through 5 via the IDA.
+> >
+> > However, when a second NCT6694 USB device is connected, its
+> > corresponding nct6694-i2c platform devices receive IDs 6 through 11 =E2=
+=80=94
+> > instead of 0 through 5 as I originally expected.
+> >
+> > If I've misunderstood something, please feel free to correct me. Thank =
+you!
+>
+> In the code above you register 6 I2C devices.  Each device will be
+> assigned a platform ID 0 through 5. The .probe() function in the I2C
+> driver will be executed 6 times.  In each of those calls to .probe(),
+> instead of pre-allocating a contiguous assignment of IDs here, you
+> should be able to use IDA in .probe() to allocate those same device IDs
+> 0 through 5.
+>
+> What am I missing here?
+>
 
-xdp->data - xdp->data_hard_start may not represent the header size.
+You're absolutely right in the scenario where a single NCT6694 device
+is present. However, I=E2=80=99m wondering how we should handle the case wh=
+ere
+a second or even third NCT6694 device is bound to the same MFD driver.
+In that situation, the sub-drivers using a static IDA will continue
+allocating increasing IDs, rather than restarting from 0 for each
+device. How should this be handled?
 
-struct tun_xdp_hdr is filled in vhost_net_build_xdp() in 
-drivers/vhost/net.c. This function sets the two fields with 
-xdp_prepare_buff(), but the arguments passed to xdp_prepare_buff() does 
-not seem to represent the exact size of the header.
+Or am I doing something wrong?
 
-> +
-> +	tnl_hdr = (struct virtio_net_hdr_v1_hash_tunnel *)gso;
-> +	if (tun_vnet_hdr_tnl_to_skb(tun->flags, features, skb, tnl_hdr)) {
->   		atomic_long_inc(&tun->rx_frame_errors);
->   		kfree_skb(skb);
->   		ret = -EINVAL;
-> @@ -2812,6 +2849,8 @@ static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
->   
->   }
->   
-> +#define PLAIN_GSO (NETIF_F_GSO_UDP_L4 | NETIF_F_TSO | NETIF_F_TSO6)
-> +
->   /* This is like a cut-down ethtool ops, except done via tun fd so no
->    * privs required. */
->   static int set_offload(struct tun_struct *tun, unsigned long arg)
-> @@ -2841,6 +2880,18 @@ static int set_offload(struct tun_struct *tun, unsigned long arg)
->   			features |= NETIF_F_GSO_UDP_L4;
->   			arg &= ~(TUN_F_USO4 | TUN_F_USO6);
->   		}
-> +
-> +		/*
-> +		 * Tunnel offload is allowed only if some plain offload is
-> +		 * available, too.
-> +		 */
-> +		if (features & PLAIN_GSO && arg & TUN_F_UDP_TUNNEL_GSO) {
-> +			features |= NETIF_F_GSO_UDP_TUNNEL;
-> +			if (arg & TUN_F_UDP_TUNNEL_GSO_CSUM)
-> +				features |= NETIF_F_GSO_UDP_TUNNEL_CSUM;
-> +			arg &= ~(TUN_F_UDP_TUNNEL_GSO |
-> +				 TUN_F_UDP_TUNNEL_GSO_CSUM);
-> +		}
->   	}
->   
->   	/* This gives the user a way to test for new features in future by
-> @@ -2852,7 +2903,6 @@ static int set_offload(struct tun_struct *tun, unsigned long arg)
->   	tun->dev->wanted_features &= ~TUN_USER_FEATURES;
->   	tun->dev->wanted_features |= features;
->   	netdev_update_features(tun->dev);
-> -
->   	return 0;
->   }
->   
-> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-> index 58b9ac7a5fc4..7450fc153bb4 100644
-> --- a/drivers/net/tun_vnet.h
-> +++ b/drivers/net/tun_vnet.h
-> @@ -6,6 +6,8 @@
->   #define TUN_VNET_LE     0x80000000
->   #define TUN_VNET_BE     0x40000000
->   
-> +#define TUN_VNET_TNL_SIZE	sizeof(struct virtio_net_hdr_v1_hash_tunnel)
-> +
->   static inline bool tun_vnet_legacy_is_little_endian(unsigned int flags)
->   {
->   	bool be = IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
-> @@ -107,16 +109,26 @@ static inline long tun_vnet_ioctl(int *vnet_hdr_sz, unsigned int *flags,
->   	}
->   }
->   
-> -static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
-> -				   struct iov_iter *from,
-> -				   struct virtio_net_hdr *hdr)
-> +static inline unsigned int tun_vnet_parse_size(netdev_features_t features)
-> +{
-> +	if (!(features & NETIF_F_GSO_UDP_TUNNEL))
-> +		return sizeof(struct virtio_net_hdr);
-> +
-> +	return TUN_VNET_TNL_SIZE;
-> +}
-> +
-> +static inline int __tun_vnet_hdr_get(int sz, unsigned int flags,
-> +				     netdev_features_t features,
-> +				     struct iov_iter *from,
-> +				     struct virtio_net_hdr *hdr)
->   {
-> +	unsigned int parsed_size = tun_vnet_parse_size(features);
->   	u16 hdr_len;
->   
->   	if (iov_iter_count(from) < sz)
->   		return -EINVAL;
->   
-> -	if (!copy_from_iter_full(hdr, sizeof(*hdr), from))
-> +	if (!copy_from_iter_full(hdr, parsed_size, from))
->   		return -EFAULT;
->   
->   	hdr_len = tun_vnet16_to_cpu(flags, hdr->hdr_len);
-> @@ -129,32 +141,59 @@ static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
->   	if (hdr_len > iov_iter_count(from))
->   		return -EINVAL;
->   
-> -	iov_iter_advance(from, sz - sizeof(*hdr));
-> +	iov_iter_advance(from, sz - parsed_size);
->   
->   	return hdr_len;
->   }
->   
-> -static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> -				   const struct virtio_net_hdr *hdr)
-> +static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
-> +				   struct iov_iter *from,
-> +				   struct virtio_net_hdr *hdr)
-> +{
-> +	return __tun_vnet_hdr_get(sz, flags, 0, from, hdr);
-> +}
-> +
-> +static inline int __tun_vnet_hdr_put(int sz, netdev_features_t features,
-> +				     struct iov_iter *iter,
-> +				     const struct virtio_net_hdr *hdr)
->   {
-> +	unsigned int parsed_size = tun_vnet_parse_size(features);
-> +
->   	if (unlikely(iov_iter_count(iter) < sz))
->   		return -EINVAL;
->   
-> -	if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr)))
-> +	if (unlikely(copy_to_iter(hdr, parsed_size, iter) != parsed_size))
->   		return -EFAULT;
->   
-> -	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
-> +	if (iov_iter_zero(sz - parsed_size, iter) != sz - parsed_size)
->   		return -EFAULT;
->   
->   	return 0;
->   }
->   
-> +static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> +				   const struct virtio_net_hdr *hdr)
-> +{
-> +	return __tun_vnet_hdr_put(sz, 0, iter, hdr);
-> +}
-> +
->   static inline int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
->   				      const struct virtio_net_hdr *hdr)
->   {
->   	return virtio_net_hdr_to_skb(skb, hdr, tun_vnet_is_little_endian(flags));
->   }
->   
-> +static inline int
-> +tun_vnet_hdr_tnl_to_skb(unsigned int flags, netdev_features_t features,
-> +			struct sk_buff *skb,
-> +			const struct virtio_net_hdr_v1_hash_tunnel *hdr)
-> +{
-> +	return virtio_net_hdr_tnl_to_skb(skb, hdr,
-> +					 !!(features & NETIF_F_GSO_UDP_TUNNEL),
-> +					 !!(features & NETIF_F_GSO_UDP_TUNNEL_CSUM),
-> +					 tun_vnet_is_little_endian(flags));
-> +}
-> +
->   static inline int tun_vnet_hdr_from_skb(unsigned int flags,
->   					const struct net_device *dev,
->   					const struct sk_buff *skb,
-> @@ -183,4 +222,35 @@ static inline int tun_vnet_hdr_from_skb(unsigned int flags,
->   	return 0;
->   }
->   
-> +static inline int
-> +tun_vnet_hdr_tnl_from_skb(unsigned int flags,
-> +			  const struct net_device *dev,
-> +			  const struct sk_buff *skb,
-> +			  struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr)
-> +{
-> +	bool has_tnl_offload = !!(dev->features & NETIF_F_GSO_UDP_TUNNEL);
-> +	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
-> +
-> +	if (virtio_net_hdr_tnl_from_skb(skb, tnl_hdr, has_tnl_offload,
-> +					tun_vnet_is_little_endian(flags),
-> +					vlan_hlen)) {
-> +		struct virtio_net_hdr_v1 *hdr = &tnl_hdr->hash_hdr.hdr;
-> +		struct skb_shared_info *sinfo = skb_shinfo(skb);
-> +
-> +		if (net_ratelimit()) {
-> +			netdev_err(dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-> +				   sinfo->gso_type, tun_vnet16_to_cpu(flags, hdr->gso_size),
-> +				   tun_vnet16_to_cpu(flags, hdr->hdr_len));
-> +			print_hex_dump(KERN_ERR, "tun: ",
-> +				       DUMP_PREFIX_NONE,
-> +				       16, 1, skb->head,
-> +				       min(tun_vnet16_to_cpu(flags, hdr->hdr_len), 64), true);
-> +		}
-> +		WARN_ON_ONCE(1);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   #endif /* TUN_VNET_H */
-> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
-> index 287cdc81c939..79d53c7a1ebd 100644
-> --- a/include/uapi/linux/if_tun.h
-> +++ b/include/uapi/linux/if_tun.h
-> @@ -93,6 +93,15 @@
->   #define TUN_F_USO4	0x20	/* I can handle USO for IPv4 packets */
->   #define TUN_F_USO6	0x40	/* I can handle USO for IPv6 packets */
->   
-> +/* I can handle TSO/USO for UDP tunneled packets */
-> +#define TUN_F_UDP_TUNNEL_GSO		0x080
-> +
-> +/*
-> + * I can handle TSO/USO for UDP tunneled packets requiring csum offload for
-> + * the outer header
-> + */
-> +#define TUN_F_UDP_TUNNEL_GSO_CSUM	0x100
-> +
->   /* Protocol info prepended to the packets (when IFF_NO_PI is not set) */
->   #define TUN_PKT_STRIP	0x0001
->   struct tun_pi {
 
+Thanks,
+Ming
 
