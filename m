@@ -1,367 +1,307 @@
-Return-Path: <netdev+bounces-199525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E51AAE09C6
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:09:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12C45AE09A7
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E8A53A8CD1
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:03:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9058A162110
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00E428B4EF;
-	Thu, 19 Jun 2025 15:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B928521CA0C;
+	Thu, 19 Jun 2025 15:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ViUg8oCz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d3QEA4PO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D85227B83
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 15:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD97DDAD;
+	Thu, 19 Jun 2025 15:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750345243; cv=none; b=QEwaXtOJiWtneSDH55s5smWFk7CgznZ9Ar4PpJbXFQl8bAtHVf98BWUvpXw8+FTnsx3hhXk7UdDxb05+Ccur+7/04PXc2GQKbrpx3G1xdwH0Lj1YjV2tBX67z9kvNJW+kCbIAhML4S+P4H51bjQ2mwHSyccb2WoB68pY7sJ2kQk=
+	t=1750345593; cv=none; b=g1h1WQdb+17cSDozzcINiKifXWDYDJz7bc9X21z+p7iwm2LIHxVx6dKQlSXXra8qPq3y8nMjyPJqpcX0b/NVfuOw7O2o3Rua+Ihf+gOn8dOplzG7TF5KIuQhbyRZfnp4eP+oYVVWHPiiYUkfFce4x6B5wVoqUJmCeiSQOU2flh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750345243; c=relaxed/simple;
-	bh=dQNla0/wh5v1DaAwQfiJxU51+21oEWtTHRGEvFpO3fE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bo4xy+eFZxn+9PLqFMkQ6J647romm3qktme4RyBv0nDx4giATCMbBcTYKLyhdv3Byek+nsL1riUgptQUDnNQuWIjMFKxh8n1niknvgBGd+ggprcTusFRrh57fsanWajN3qBasuAS9fUqu3wC7XuD2kKipALw4HiD8plAIqiPFcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ViUg8oCz; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so599181b3a.0
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 08:00:41 -0700 (PDT)
+	s=arc-20240116; t=1750345593; c=relaxed/simple;
+	bh=wGxKJCc7qeOmnuSZ+yHqpDhrjglCvryWX3i8qW5pY7s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=r/Wa+x2i46WhQGRqbEfRcE6Ywcn5iVgbYTyDweceFzokDQkrtJ9EvyBuxFA9WqLxsvciTS5Y18HJPTniVByeFUKupz12/lOuNxqfVnd8b+rzV/2rgfywE2N0WQqW5xPYsQJPwJzTli4O2Uc4w22nit+g2lS8lo8fkUTNUsIbgos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d3QEA4PO; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a5a196f057so19362361cf.3;
+        Thu, 19 Jun 2025 08:06:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1750345241; x=1750950041; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vbqsTG+WR0DzpOILYTiC2FTuehgWfdHcmXuIvq1R3N0=;
-        b=ViUg8oCztHaYq6UMdZMg91EjFL1+LNe4kFJXTGg9IRexL09pzuSnbhWdoz3HAtimSL
-         CSBJRwDsi/bQ5JKNLbBhjQpaoPlJoSTYfLuqxVcXw6wfpA3rR4wXdh16Xkpqp9IgPn7d
-         HhiLfCkWFCm7BHIPxCZq7pDO1dxFJsJj9YfZF5VwNPYqTqZ6lJTqgb1nhkhnxw3zRywx
-         IGKLxiRzuNnz2zGNL7vtj9zlmYVsOIswKQOAI1EEd7q3cEKd/rspZLLbPnkaLb1l+8F/
-         tcAP6sOHL1Z9ODDbuQP7i9vLIRgIQqYzJilrA7jwWXeToF348KR0HkFpkr+vVk6TtQS9
-         +1jA==
+        d=gmail.com; s=20230601; t=1750345590; x=1750950390; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nXuTpoOb8+LqU5quDMVJCzI6iZgIaVm2IMUXk0GHfM4=;
+        b=d3QEA4POj7ODVz0We39Zw8PpOhR1ta/kOnhCYRcZzymhkn1kI9vmKal5BMZiMgbRXr
+         XG27MF1w0D+dnJmAJsbUIBNfU5Jy2P+aS91gWBSWNZZQ2Cm8hYYFV3jJj06ouLaEWBf2
+         wqLHljESTpDQNaJ6mfZishXEEt500W1pmRufz6OsgrqMHeaK/VKYgmI+lopIcp+S1wVP
+         vDus4AEo4c/oeHTDBY7jR4cA/XZy4zTP22eUBM8BILHmeUDLkADmIbkETRGJ8/sRq8pX
+         anMFo8tU5iEzWmDEMQjRw80HvyKeRdaTSk1bZwxKp5qSWo7thyJl9/8zVUtVFIhmdzFW
+         kcIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750345241; x=1750950041;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vbqsTG+WR0DzpOILYTiC2FTuehgWfdHcmXuIvq1R3N0=;
-        b=EGd6YYAhl4gnHjUtLNO7HCr7ox4XwP5GZ8Il3/9Sy72A75ijNKQVoWKAidUpdZgZ4s
-         XVYE99sbUmNfC66cii4JIeUhuau2K7ux3UVmoBvty+Uxb6hzk5WpFOHARhuoGQdHGMif
-         rSJzy+VAk9OHAvykaD2efBhzZORwfy7JT/eG7ZuB1KUW9Cm7pa9AEPrzRv4v2jqNrFYQ
-         q7Zeb932OYNxaKdGW64LQ8REfG39HzPMrQ2FO7oxVQyN6vb02KNdNPuVJpnkJsO6xECN
-         3oi6CeMIGbHET32yEfFY27PkOzOPb6yoTvKdRp2qs2iig9nZjCdN4L8u+4C8tW5wOwnK
-         yAaw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZyTO5tPaQ/0oAt6KiM2y4ufIQqeoaNPMzi1m/Ixp/qkiyRbCoFRr0h+xMw8DMDWbOhMPA7I0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz39xUDStJzq+YNvimrXZQ4YN4QRputAZfpdkwcRK5jzDZycked
-	qZPQFpXHA0o1gS8sdpmKlAK6SkBaC9sFgxiifG8MQKPqWJfHdR6v5+H1tkMY5nDL6V0=
-X-Gm-Gg: ASbGncs2btmRYmFMa8Q+i7EBYaFUz6NrpEyusMP+JPldnW3MoKqRobCtlSw5yPnhZwc
-	i068iP6ubFU08A+eUPatP5BHZPdLaRvS6Jqu16ZH02/dOVhSmlJIQlbo/IaqtGbSQPQlhk5zpUH
-	pOi3I/6TqZCmM40n8I6ou5PEYe3gQ4Viprhhrrrae0JvJxH2TPm/E1DNf5GuXC+Jsv4QDsvtBG1
-	AUjfx9HUNdiAEhOtXLj0Xh/5Lw5qMw3fCfWU9oG2P/DBmtLmTg3rwPdIzjdmnyq9USPnDMZKlgN
-	iOeja13m/fqlvzUB2Ue1y9zbDdT8ZL4ETUpzRvRteLsTkn2H/HopBNmnHCzW3AUku5EZyLW0CMI
+        d=1e100.net; s=20230601; t=1750345590; x=1750950390;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nXuTpoOb8+LqU5quDMVJCzI6iZgIaVm2IMUXk0GHfM4=;
+        b=jX4ghTLVC/ZiTESleN8RhQFgCP8lKwq5YDIb7NDnoeWH3vOX2qyBuGdCJBXQA+j2yD
+         tb1kOl3wkXZ2n8nLU8obkfr2Gl9lISCdaUjTyEpp+IXlWJcqVhqi4ZQM//ZwxN4w8TrI
+         XkuzlWxe5P4vAL/vtMAodhmlTwOogggFljABTt4Ivgo/GNzjp380ZVpu7ZixKw0+8LUG
+         fLCO8BN3Ws7yWuQDF2/PG6fJukkDfwvrRk8oq6NFj5DkP2R+7wRC9KneSG3z1ptKYICV
+         PA3qSXtsjzxTnuoqCSSd2CT+Ix3cbBjI8Z/xnn0BtqBKbtTZ35UTfZBdMJizD4DNFbS+
+         727Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUCePjPkAKziNvNYbtqB91aCayr62taBWRhuNfsOJ/3MgIX90fECC16coICBiB5Zrd0W7XgOlYBg4LHXrPIeVGY@vger.kernel.org, AJvYcCUPMm4jvtotNH07IU2ErufaRhIA0dtfAimhRd9AM/e8ElkMf21H7hdqBgpeQdztNW/aN9ny3KTm@vger.kernel.org, AJvYcCUxDDfgOfwya6nbgVmbz9IUrct4RhlA8gHc1e1U6Pq26TGfWIQEflmvKOuNyFoLp5SFg+GPwffcFJj89vI=@vger.kernel.org, AJvYcCVT/LA+sOpwaMpngnp2bPsrZRCm2mdx2E5+J6TxWeTP2gzQH2Ue1s1PfW+9wXpq/PQGAF0fT41de1gPjM7L@vger.kernel.org, AJvYcCWgfVD7Eo2J4EwfMlzqM94PIof6VMnFjiCbTQ75EmHG+SJLrfgoBvO5nWULHNZHJqpfewbN9Yy0PFsF@vger.kernel.org, AJvYcCX8hze+R++pKzPhFCm7h+lJNkdcBXEL4CT3OKiIUYb65duCTK7aGBWRgLKUuZ/Zwv2QjkJpauo3LBz+@vger.kernel.org, AJvYcCXUQr963FoXMsOq1VEMFOA6fso276O4EsbObbd76pCD6zpryLNydPIZ4d67sq1g3Qtu1UaAXRs8NStk@vger.kernel.org, AJvYcCXYjHHI4K4mZOQrcxkqsm8lJ0DlCh3547wboVCGWPq2EueeWvQUrrXimdUqizgDhhyHmpdMK8ePtUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKa8PZ/9owuobzdFPfu8dkS6SL7l4bH65qpjScjTFyNGkuJKli
+	m1WzKMp9Ja/ij+MhPoOBmvhhGOFPblQc1T+Z4gt8e7eqtKgG5qK4zYUr
+X-Gm-Gg: ASbGnctiu4AiwvIZxAFe+VyoWHtXdHC/kUv1vv0GCIko/BvVWZCMiWQrIp6jleqF8vw
+	qjHBneFursBnv2VtfPLrDo+Tmrhbk52F4mEX/b4B0vQ44RUxYvDrlaOJ0qHeJ9pP+nQS1if9Rk6
+	HAg0Kqdmjv+2+esh8JegqKGqqncod5knFU1njqldCvUEJVVCUr9whmnnia7ALAd+9Ar1CKvJ7wl
+	I66q+WccDM4GR+Yqv5BX4BpN5V2yqc4fq96/23hMxueQRYQ0gSqGLzlkaDj+51Z7xgQ98kgWzZn
+	jTZJQT4eT7/WkcbTq3Pdz4SeZ+lMw0L0xNO7XoABrtjUE6RpQj9/zBjpT08mvqcaWYFnjv8zzlQ
 	=
-X-Google-Smtp-Source: AGHT+IFhSiX0teIV17ufUa6FIi5e7mNIOeSAS79lgqnCmX8uRJD0lusMq6ngH/Lv1ldogoDQmj6OjA==
-X-Received: by 2002:a05:6a21:5010:b0:220:1215:fea7 with SMTP id adf61e73a8af0-2201216010emr3776354637.9.1750345239092;
-        Thu, 19 Jun 2025 08:00:39 -0700 (PDT)
-Received: from [157.82.203.223] ([157.82.203.223])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a46eb71sm101416b3a.22.2025.06.19.08.00.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jun 2025 08:00:38 -0700 (PDT)
-Message-ID: <e9ca64b4-3196-4b7b-822c-4bb0b40f8689@daynix.com>
-Date: Fri, 20 Jun 2025 00:00:34 +0900
+X-Google-Smtp-Source: AGHT+IFX/JE8xs0dtWJTtpxoAw108+yxpwrRoiMuu696MghqABs29FkJDRGkGOS7haSa53S3zqGnCw==
+X-Received: by 2002:a05:622a:11c1:b0:476:7199:4da1 with SMTP id d75a77b69052e-4a73c5ed5bemr350669851cf.46.1750345590333;
+        Thu, 19 Jun 2025 08:06:30 -0700 (PDT)
+Received: from tamird-mac.local ([2600:4041:5be7:7c00:5c8a:fc6a:b57c:e57f])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a7785aaacdsm250531cf.39.2025.06.19.08.06.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jun 2025 08:06:29 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH v12 0/5] rust: replace kernel::str::CStr w/ core::ffi::CStr
+Date: Thu, 19 Jun 2025 11:06:24 -0400
+Message-Id: <20250619-cstr-core-v12-0-80c9c7b45900@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 3/8] vhost-net: allow configuring extended
- features
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <cover.1750176076.git.pabeni@redhat.com>
- <c510db61e36ce3b26e3a1fb7716c17f6888da095.1750176076.git.pabeni@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <c510db61e36ce3b26e3a1fb7716c17f6888da095.1750176076.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHAnVGgC/3XOwW6DMAwG4FepOC+VbRKT9NT3mHaAJJRog1QBo
+ VUV775QqSvttKPjfL//azH6FPxYHHbXIvk5jCEOeUB62xW2q4eTF8Hlh4KAFBCgsOOUhI3JCyc
+ b07BBAtsW+f85+TZ838LeP/LcptiLqUu+vidI0GhQlax4T1pDJUjMtYspzuPn5XhOcYpDX4evv
+ Y39GtmFcYrpcqs38xp8L0KbIjMLEFqysY4dmdYdT78ha5G5+ldWWboadV4RyFK/Sr2V5VbqLG1
+ TtsS+0qz5VZqHLLHaSpOlQsfWKqKW6VUiPKgiuaUI2bJEqo10xlXqj8WNLeHJ4trYGQu2sY2Bp
+ 7vLsvwAOlZtqwwCAAA=
+X-Change-ID: 20250201-cstr-core-d4b9b69120cf
+To: Michal Rostecki <vadorovsky@protonmail.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Saravana Kannan <saravanak@google.com>, 
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+ Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>, 
+ Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+ Viresh Kumar <viresh.kumar@linaro.org>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>
+Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
+ nouveau@lists.freedesktop.org, linux-block@vger.kernel.org, 
+ linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, 
+ Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
 
-On 2025/06/18 1:12, Paolo Abeni wrote:
-> Use the extended feature type for 'acked_features' and implement
-> two new ioctls operation allowing the user-space to set/query an
-> unbounded amount of features.
-> 
-> The actual number of processed features is limited by VIRTIO_FEATURES_MAX
-> and attempts to set features above such limit fail with
-> EOPNOTSUPP.
-> 
-> Note that: the legacy ioctls implicitly truncate the negotiated
-> features to the lower 64 bits range and the 'acked_backend_features'
-> field don't need conversion, as the only negotiated feature there
-> is in the low 64 bit range.
-> 
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> v3 -> v4:
->    - use a single static (lower case) constant instead of enum and old def
->    - simpler VHOST_GET_FEATURES_ARRAY impl
->    - avoid using virtio_features_and_not
-> 
-> v2 -> v3:
->    - virtio_features_t -> u64[2]
->    - add __counted_by annotation to vhost_features_array
-> 
-> v1 -> v2:
->    - change the ioctl to use an extensible API
-> ---
->   drivers/vhost/net.c              | 87 ++++++++++++++++++++++++--------
->   drivers/vhost/vhost.c            |  2 +-
->   drivers/vhost/vhost.h            |  4 +-
->   include/uapi/linux/vhost.h       |  7 +++
->   include/uapi/linux/vhost_types.h |  5 ++
->   5 files changed, 82 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 7cbfc7d718b3..126aa4ee26a8 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -69,12 +69,12 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
->   
->   #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >= (__force u32)VHOST_DMA_DONE_LEN)
->   
-> -enum {
-> -	VHOST_NET_FEATURES = VHOST_FEATURES |
-> -			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
-> -			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> -			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> -			 (1ULL << VIRTIO_F_RING_RESET)
-> +static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] = {
-> +	VHOST_FEATURES |
-> +	(1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
-> +	(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> +	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> +	(1ULL << VIRTIO_F_RING_RESET),
->   };
->   
->   enum {
-> @@ -1614,16 +1614,17 @@ static long vhost_net_reset_owner(struct vhost_net *n)
->   	return err;
->   }
->   
-> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
-> +static int vhost_net_set_features(struct vhost_net *n, const u64 *features)
->   {
->   	size_t vhost_hlen, sock_hlen, hdr_len;
->   	int i;
->   
-> -	hdr_len = (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> -			       (1ULL << VIRTIO_F_VERSION_1))) ?
-> -			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
-> -			sizeof(struct virtio_net_hdr);
-> -	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
-> +	hdr_len = virtio_features_test_bit(features, VIRTIO_NET_F_MRG_RXBUF) ||
-> +		  virtio_features_test_bit(features, VIRTIO_F_VERSION_1) ?
-> +		  sizeof(struct virtio_net_hdr_mrg_rxbuf) :
-> +		  sizeof(struct virtio_net_hdr);
-> +
-> +	if (virtio_features_test_bit(features, VHOST_NET_F_VIRTIO_NET_HDR)) {
->   		/* vhost provides vnet_hdr */
->   		vhost_hlen = hdr_len;
->   		sock_hlen = 0;
-> @@ -1633,18 +1634,19 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
->   		sock_hlen = hdr_len;
->   	}
->   	mutex_lock(&n->dev.mutex);
-> -	if ((features & (1 << VHOST_F_LOG_ALL)) &&
-> +	if (virtio_features_test_bit(features, VHOST_F_LOG_ALL) &&
->   	    !vhost_log_access_ok(&n->dev))
->   		goto out_unlock;
->   
-> -	if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
-> +	if (virtio_features_test_bit(features, VIRTIO_F_ACCESS_PLATFORM)) {
->   		if (vhost_init_device_iotlb(&n->dev))
->   			goto out_unlock;
->   	}
->   
->   	for (i = 0; i < VHOST_NET_VQ_MAX; ++i) {
->   		mutex_lock(&n->vqs[i].vq.mutex);
-> -		n->vqs[i].vq.acked_features = features;
-> +		virtio_features_copy(n->vqs[i].vq.acked_features_array,
-> +				     features);
->   		n->vqs[i].vhost_hlen = vhost_hlen;
->   		n->vqs[i].sock_hlen = sock_hlen;
->   		mutex_unlock(&n->vqs[i].vq.mutex);
-> @@ -1681,12 +1683,13 @@ static long vhost_net_set_owner(struct vhost_net *n)
->   static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->   			    unsigned long arg)
->   {
-> +	u64 all_features[VIRTIO_FEATURES_DWORDS];
->   	struct vhost_net *n = f->private_data;
->   	void __user *argp = (void __user *)arg;
->   	u64 __user *featurep = argp;
->   	struct vhost_vring_file backend;
-> -	u64 features;
-> -	int r;
-> +	u64 features, count, copied;
-> +	int r, i;
->   
->   	switch (ioctl) {
->   	case VHOST_NET_SET_BACKEND:
-> @@ -1694,16 +1697,60 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->   			return -EFAULT;
->   		return vhost_net_set_backend(n, backend.index, backend.fd);
->   	case VHOST_GET_FEATURES:
-> -		features = VHOST_NET_FEATURES;
-> +		features = vhost_net_features[0];
->   		if (copy_to_user(featurep, &features, sizeof features))
->   			return -EFAULT;
->   		return 0;
->   	case VHOST_SET_FEATURES:
->   		if (copy_from_user(&features, featurep, sizeof features))
->   			return -EFAULT;
-> -		if (features & ~VHOST_NET_FEATURES)
-> +		if (features & ~vhost_net_features[0])
->   			return -EOPNOTSUPP;
-> -		return vhost_net_set_features(n, features);
-> +
-> +		virtio_features_from_u64(all_features, features);
-> +		return vhost_net_set_features(n, all_features);
-> +	case VHOST_GET_FEATURES_ARRAY:
-> +		if (copy_from_user(&count, argp, sizeof(u64)))
-> +			return -EFAULT;
-> +
-> +		/* Copy the net features, up to the user-provided buffer size */
-> +		argp += sizeof(u64);
-> +		copied = min(count, VIRTIO_FEATURES_DWORDS);
-> +		if (copy_to_user(argp, vhost_net_features,
-> +				 copied * sizeof(u64)))
-> +			return -EFAULT;
-> +
-> +		/* Zero the trailing space provided by user-space, if any */
-> +		if (clear_user(argp, (count - copied) * sizeof(u64)))
-> +			return -EFAULT;
-> +		return 0;
-> +	case VHOST_SET_FEATURES_ARRAY:
-> +		if (copy_from_user(&count, argp, sizeof(u64)))
-> +			return -EFAULT;
-> +
-> +		virtio_features_zero(all_features);
-> +		for (i = 0; i < min(count, VIRTIO_FEATURES_DWORDS); ++i) {
-> +			argp += sizeof(u64);
-> +			if (copy_from_user(&all_features[i], argp,
-> +					   sizeof(u64)))
-> +				return -EFAULT;
-> +		}
+This picks up from Michal Rostecki's work[0]. Per Michal's guidance I
+have omitted Co-authored tags, as the end result is quite different.
 
-This for loop can be converted into a single copy_from_user() call as 
-done for VHOST_GET_FEATURES_ARRAY/copy_to_user().
+Link: https://lore.kernel.org/rust-for-linux/20240819153656.28807-2-vadorovsky@protonmail.com/t/#u [0]
+Closes: https://github.com/Rust-for-Linux/linux/issues/1075
 
-> +
-> +		/* Any feature specified by user-space above VIRTIO_FEATURES_MAX is
-> +		 * not supported by definition.
-> +		 */
-> +		for (; i < count; ++i) {
-> +			if (copy_from_user(&features, argp, sizeof(u64)))
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Changes in v12:
+- Introduce `kernel::fmt::Display` to allow implementations on foreign
+  types.
+- Tidy up doc comment on `str_to_cstr`. (Alice Ryhl).
+- Link to v11: https://lore.kernel.org/r/20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com
 
-get_user() is a simpler alternative.
+Changes in v11:
+- Use `quote_spanned!` to avoid `use<'a, T>` and generally reduce manual
+  token construction.
+- Add a commit to simplify `quote_spanned!`.
+- Drop first commit in favor of
+  https://lore.kernel.org/rust-for-linux/20240906164448.2268368-1-paddymills@proton.me/.
+  (Miguel Ojeda)
+- Correctly handle expressions such as `pr_info!("{a}", a = a = a)`.
+  (Benno Lossin)
+- Avoid dealing with `}}` escapes, which is not needed. (Benno Lossin)
+- Revert some unnecessary changes. (Benno Lossin)
+- Rename `c_str_avoid_literals!` to `str_to_cstr!`. (Benno Lossin &
+  Alice Ryhl).
+- Link to v10: https://lore.kernel.org/r/20250524-cstr-core-v10-0-6412a94d9d75@gmail.com
 
-> +				return -EFAULT;
-> +			if (features)
-> +				return -EOPNOTSUPP;
-> +		}
-> +
-> +		for (i = 1; i < VIRTIO_FEATURES_DWORDS; i++)
+Changes in v10:
+- Rebase on cbeaa41dfe26b72639141e87183cb23e00d4b0dd.
+- Implement Alice's suggestion to use a proc macro to work around orphan
+  rules otherwise preventing `core::ffi::CStr` to be directly printed
+  with `{}`.
+- Link to v9: https://lore.kernel.org/r/20250317-cstr-core-v9-0-51d6cc522f62@gmail.com
 
-i should be initialized with 0 to check the first element as done for 
-VHOST_SET_FEATURES.
+Changes in v9:
+- Rebase on rust-next.
+- Restore `impl Display for BStr` which exists upstream[1].
+- Link: https://doc.rust-lang.org/nightly/std/bstr/struct.ByteStr.html#impl-Display-for-ByteStr [1]
+- Link to v8: https://lore.kernel.org/r/20250203-cstr-core-v8-0-cb3f26e78686@gmail.com
 
-> +			if (all_features[i] & ~vhost_net_features[i])
-> +				return -EOPNOTSUPP;
-> +
-> +		return vhost_net_set_features(n, all_features);
->   	case VHOST_GET_BACKEND_FEATURES:
->   		features = VHOST_NET_BACKEND_FEATURES;
->   		if (copy_to_user(featurep, &features, sizeof(features)))
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 3a5ebb973dba..1094256a943c 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -372,7 +372,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->   	vq->log_used = false;
->   	vq->log_addr = -1ull;
->   	vq->private_data = NULL;
-> -	vq->acked_features = 0;
-> +	virtio_features_zero(vq->acked_features_array);
->   	vq->acked_backend_features = 0;
->   	vq->log_base = NULL;
->   	vq->error_ctx = NULL;
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index bb75a292d50c..d1aed35c4b07 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -133,7 +133,7 @@ struct vhost_virtqueue {
->   	struct vhost_iotlb *umem;
->   	struct vhost_iotlb *iotlb;
->   	void *private_data;
-> -	u64 acked_features;
-> +	VIRTIO_DECLARE_FEATURES(acked_features);
->   	u64 acked_backend_features;
->   	/* Log write descriptors */
->   	void __user *log_base;
-> @@ -291,7 +291,7 @@ static inline void *vhost_vq_get_backend(struct vhost_virtqueue *vq)
->   
->   static inline bool vhost_has_feature(struct vhost_virtqueue *vq, int bit)
->   {
-> -	return vq->acked_features & (1ULL << bit);
-> +	return virtio_features_test_bit(vq->acked_features_array, bit);
->   }
->   
->   static inline bool vhost_backend_has_feature(struct vhost_virtqueue *vq, int bit)
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index d4b3e2ae1314..d6ad01fbb8d2 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -235,4 +235,11 @@
->    */
->   #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
->   					      struct vhost_vring_state)
-> +
-> +/* Extended features manipulation */
-> +#define VHOST_GET_FEATURES_ARRAY _IOR(VHOST_VIRTIO, 0x83, \
-> +				       struct vhost_features_array)
-> +#define VHOST_SET_FEATURES_ARRAY _IOW(VHOST_VIRTIO, 0x83, \
-> +				       struct vhost_features_array)
-> +
->   #endif
-> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
-> index d7656908f730..1c39cc5f5a31 100644
-> --- a/include/uapi/linux/vhost_types.h
-> +++ b/include/uapi/linux/vhost_types.h
-> @@ -110,6 +110,11 @@ struct vhost_msg_v2 {
->   	};
->   };
->   
-> +struct vhost_features_array {
-> +	__u64 count; /* number of entries present in features array */
-> +	__u64 features[] __counted_by(count);
-> +};
-> +
->   struct vhost_memory_region {
->   	__u64 guest_phys_addr;
->   	__u64 memory_size; /* bytes */
+Changes in v8:
+- Move `{from,as}_char_ptr` back to `CStrExt`. This reduces the diff
+  some.
+- Restore `from_bytes_with_nul_unchecked_mut`, `to_cstring`.
+- Link to v7: https://lore.kernel.org/r/20250202-cstr-core-v7-0-da1802520438@gmail.com
+
+Changes in v7:
+- Rebased on mainline.
+- Restore functionality added in commit a321f3ad0a5d ("rust: str: add
+  {make,to}_{upper,lower}case() to CString").
+- Used `diff.algorithm patience` to improve diff readability.
+- Link to v6: https://lore.kernel.org/r/20250202-cstr-core-v6-0-8469cd6d29fd@gmail.com
+
+Changes in v6:
+- Split the work into several commits for ease of review.
+- Restore `{from,as}_char_ptr` to allow building on ARM (see commit
+  message).
+- Add `CStrExt` to `kernel::prelude`. (Alice Ryhl)
+- Remove `CStrExt::from_bytes_with_nul_unchecked_mut` and restore
+  `DerefMut for CString`. (Alice Ryhl)
+- Rename and hide `kernel::c_str!` to encourage use of C-String
+  literals.
+- Drop implementation and invocation changes in kunit.rs. (Trevor Gross)
+- Drop docs on `Display` impl. (Trevor Gross)
+- Rewrite docs in the style of the standard library.
+- Restore the `test_cstr_debug` unit tests to demonstrate that the
+  implementation has changed.
+
+Changes in v5:
+- Keep the `test_cstr_display*` unit tests.
+
+Changes in v4:
+- Provide the `CStrExt` trait with `display()` method, which returns a
+   `CStrDisplay` wrapper with `Display` implementation. This addresses
+   the lack of `Display` implementation for `core::ffi::CStr`.
+- Provide `from_bytes_with_nul_unchecked_mut()` method in `CStrExt`,
+   which might be useful and is going to prevent manual, unsafe casts.
+- Fix a typo (s/preffered/prefered/).
+
+Changes in v3:
+- Fix the commit message.
+- Remove redundant braces in `use`, when only one item is imported.
+
+Changes in v2:
+- Do not remove `c_str` macro. While it's preferred to use C-string
+   literals, there are two cases where `c_str` is helpful:
+   - When working with macros, which already return a Rust string literal
+     (e.g. `stringify!`).
+   - When building macros, where we want to take a Rust string literal as an
+     argument (for caller's convenience), but still use it as a C-string
+     internally.
+- Use Rust literals as arguments in macros (`new_mutex`, `new_condvar`,
+   `new_mutex`). Use the `c_str` macro to convert these literals to C-string
+   literals.
+- Use `c_str` in kunit.rs for converting the output of `stringify!` to a
+   `CStr`.
+- Remove `DerefMut` implementation for `CString`.
+
+---
+Tamir Duberstein (5):
+      rust: macros: reduce collections in `quote!` macro
+      rust: support formatting of foreign types
+      rust: replace `CStr` with `core::ffi::CStr`
+      rust: replace `kernel::c_str!` with C-Strings
+      rust: remove core::ffi::CStr reexport
+
+ drivers/block/rnull.rs                |   4 +-
+ drivers/cpufreq/rcpufreq_dt.rs        |   5 +-
+ drivers/gpu/drm/drm_panic_qr.rs       |   5 +-
+ drivers/gpu/drm/nova/driver.rs        |  10 +-
+ drivers/gpu/nova-core/driver.rs       |   6 +-
+ drivers/gpu/nova-core/firmware.rs     |   2 +-
+ drivers/gpu/nova-core/gpu.rs          |   4 +-
+ drivers/gpu/nova-core/nova_core.rs    |   2 +-
+ drivers/net/phy/ax88796b_rust.rs      |   8 +-
+ drivers/net/phy/qt2025.rs             |   6 +-
+ rust/kernel/auxiliary.rs              |   6 +-
+ rust/kernel/block/mq.rs               |   2 +-
+ rust/kernel/clk.rs                    |   9 +-
+ rust/kernel/configfs.rs               |  14 +-
+ rust/kernel/cpufreq.rs                |   6 +-
+ rust/kernel/device.rs                 |   9 +-
+ rust/kernel/devres.rs                 |   2 +-
+ rust/kernel/driver.rs                 |   4 +-
+ rust/kernel/drm/device.rs             |   4 +-
+ rust/kernel/drm/driver.rs             |   3 +-
+ rust/kernel/drm/ioctl.rs              |   2 +-
+ rust/kernel/error.rs                  |  10 +-
+ rust/kernel/faux.rs                   |   5 +-
+ rust/kernel/firmware.rs               |  16 +-
+ rust/kernel/fmt.rs                    |  89 +++++++
+ rust/kernel/kunit.rs                  |  21 +-
+ rust/kernel/lib.rs                    |   3 +-
+ rust/kernel/miscdevice.rs             |   5 +-
+ rust/kernel/net/phy.rs                |  12 +-
+ rust/kernel/of.rs                     |   5 +-
+ rust/kernel/pci.rs                    |   2 +-
+ rust/kernel/platform.rs               |   6 +-
+ rust/kernel/prelude.rs                |   5 +-
+ rust/kernel/print.rs                  |   4 +-
+ rust/kernel/seq_file.rs               |   6 +-
+ rust/kernel/str.rs                    | 444 ++++++++++------------------------
+ rust/kernel/sync.rs                   |   7 +-
+ rust/kernel/sync/condvar.rs           |   4 +-
+ rust/kernel/sync/lock.rs              |   4 +-
+ rust/kernel/sync/lock/global.rs       |   6 +-
+ rust/kernel/sync/poll.rs              |   1 +
+ rust/kernel/workqueue.rs              |   9 +-
+ rust/macros/fmt.rs                    |  99 ++++++++
+ rust/macros/kunit.rs                  |  10 +-
+ rust/macros/lib.rs                    |  19 ++
+ rust/macros/module.rs                 |   2 +-
+ rust/macros/quote.rs                  | 111 ++++-----
+ samples/rust/rust_configfs.rs         |   9 +-
+ samples/rust/rust_driver_auxiliary.rs |   7 +-
+ samples/rust/rust_driver_faux.rs      |   4 +-
+ samples/rust/rust_driver_pci.rs       |   4 +-
+ samples/rust/rust_driver_platform.rs  |   4 +-
+ samples/rust/rust_misc_device.rs      |   3 +-
+ scripts/rustdoc_test_gen.rs           |   6 +-
+ 54 files changed, 540 insertions(+), 515 deletions(-)
+---
+base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
+change-id: 20250201-cstr-core-d4b9b69120cf
+
+Best regards,
+--  
+Tamir Duberstein <tamird@gmail.com>
 
 
