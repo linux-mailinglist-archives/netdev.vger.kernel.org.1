@@ -1,217 +1,100 @@
-Return-Path: <netdev+bounces-199350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A487FADFE4B
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:04:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75083ADFE5C
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:07:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C01B9163AD1
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:58:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F529168EF0
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 07:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65DF12472AE;
-	Thu, 19 Jun 2025 06:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B33F246794;
+	Thu, 19 Jun 2025 07:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="alG2FtT3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZR9kFMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA3321B8F5;
-	Thu, 19 Jun 2025 06:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4895B198A09
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 07:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750316308; cv=none; b=ov+pFTuP45faX14lsFD3TXOH2+fi5HFQH3bY1jStFFPjOOY2EdVw584qiA110QH1RQzJFhdVTtLPg3RLgm17BwgIzvj27K3kGfd1pkKqjNTP5dke26X54KqQy+ReVqa3sIWooG18qiuJplox33WepEYYkx7SZs5CV/K9J9dYN2c=
+	t=1750316854; cv=none; b=PSH5412OLK8F3acy22JLED+YwfhNf+8/QA4UUJmntGpWosA34avdKLY22AYP8Y1mqlGfJ1YuoZeYiRI3Bxyf3V6zC9Pcxi9MkaiHM0VNXvUT+olTZxatI6m6lilx+hhbfQw89ywfPfXeVZlHYuij0nkeWfeUxsdj2/41R+TP6Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750316308; c=relaxed/simple;
-	bh=tL14BD8Yh5kWnpy+bfzqyRdCOXWQ8nMEwYBpreKExhI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=bEqc+XBo1SRL1tQeEFnYxkB32W6S1r2Ty3s+jGrho0i4goVBGdhpF8jUHCLLOnY/ZNoApIVKZA/y99eVdZvHPKx7VQ8xim6gs176uFEQhjZRN7L2TgcrDzBjoagsOdUc+xtKh5IsnUwVa/5gBjqH1bBJvG1ysCIsnwx9lmBkW54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=alG2FtT3; arc=none smtp.client-ip=134.0.28.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox4.masterlogin.de (unknown [192.168.10.79])
-	by mxout2.routing.net (Postfix) with ESMTP id 50A125FB6C;
-	Thu, 19 Jun 2025 06:58:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1750316302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=njQ31qrrY9HaE80KOkYp3xG43496qOQx+zhSn6xjDeA=;
-	b=alG2FtT3L898ztBmhlM2pSNVcjIkFUk7/1xSwM2dgG9YK2I3a0t48c4zf1DP18CV4lZJhI
-	cqhxtGUORlrTEY7zuo0CEIIN+s8RdFddsgQkMegRs9RelFqdh9G11AtkR7FfHwhbCUqP+M
-	xZWy4Bx1lY8WMMg4m782Pb82ISFh3ck=
-Received: from [127.0.0.1] (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
-	by mxbox4.masterlogin.de (Postfix) with ESMTPSA id 72C3D808E4;
-	Thu, 19 Jun 2025 06:58:20 +0000 (UTC)
-Date: Thu, 19 Jun 2025 08:58:20 +0200
-From: Frank Wunderlich <linux@fw-web.de>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>,
- Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>
-CC: Frank Wunderlich <frank-w@public-files.de>,
- Jia-Wei Chang <jia-wei.chang@mediatek.com>,
- Johnson Wang <johnson.wang@mediatek.com>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v4 00/13] further mt7988 devicetree work
-User-Agent: K-9 Mail for Android
-In-Reply-To: <9cdf0624-f9bb-4b11-973e-9480fd655136@collabora.com>
-References: <20250616095828.160900-1-linux@fw-web.de> <9cdf0624-f9bb-4b11-973e-9480fd655136@collabora.com>
-Message-ID: <40C42E40-25C3-4FB2-8EB4-E7FCB677E415@fw-web.de>
+	s=arc-20240116; t=1750316854; c=relaxed/simple;
+	bh=DS6X6Uh+5BAdzn781q2Z39tpJGkQGohp1jR12NcJK9Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Slt70akdvwsg5x5Ox78VzLJpBH9RdByRJV1RTG8bWezUT7js1MBwkNqmq2LQTT8jfgqmgLxUwXAhYlybyk6wkpPHwXR61mC4nzjzYLP9phLU4WxuNu1DvfLpXdmkHkRIv/M5WHmfYDCqW1MwdXTMfMjO68en/HPYlAV97fKqf2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NZR9kFMQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F62C4CEEA;
+	Thu, 19 Jun 2025 07:07:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750316853;
+	bh=DS6X6Uh+5BAdzn781q2Z39tpJGkQGohp1jR12NcJK9Y=;
+	h=From:Subject:Date:To:Cc:From;
+	b=NZR9kFMQFXBcMXWLxUtQNQci3YLdZ0Z/CLi0P9oiowapdLkqPcaUp7ZBmSWCjPnoO
+	 9D/A3zZWufkdjQ35sMPLsg7JTAC5X7fg3qO3HpzT9tHKngNJAd+E1l9k2PejHIgc3U
+	 DbSsWuJm/4c78Mpru0gZug3vzKzmrorsbcdjjfN6uAhdnm36HSBtE79RxWgh9b9mYJ
+	 bIHAufP9TJ4uH8RbUCwGQe/Ob14Yq33yFM7/p2MLXwxDOWc+kdV1AKlLPLzVFp3n2m
+	 pms6WFZXDOZvm2LiRo2530OJ3eKzz+Ba+F9gK28SKDiUkaDh/APvX6kBr3SVMRJB0/
+	 hKhiqdh4TgvzA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net v4 0/2] net: airoha: Improve hwfd buffer/descriptor
+ queues setup
+Date: Thu, 19 Jun 2025 09:07:23 +0200
+Message-Id: <20250619-airoha-hw-num-desc-v4-0-49600a9b319a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mail-ID: 376531bd-c831-454f-b55f-f96f05563171
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACu3U2gC/32NQQ6CMBBFr0Jm7RgEWqor72FYVJjSidqaqaKGc
+ HcrB3D5XvLfnyGRMCU4FDMITZw4hgzNpoDe2zAS8pAZqrJSpd4ZtCzRW/QvDM8bDpR61E6dtds
+ 7oyxBHt6FHL/X6KnL7Dk9onzWj6n+2b+5qcYSd8bqxrT90Co6XkgCXbdRRuiWZfkC5qYkwbUAA
+ AA=
+X-Change-ID: 20250618-airoha-hw-num-desc-6f5b6f9f85ae
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-Am 19=2E Juni 2025 07:57:09 MESZ schrieb AngeloGioacchino Del Regno <angelo=
-gioacchino=2Edelregno@collabora=2Ecom>:
->Il 16/06/25 11:58, Frank Wunderlich ha scritto:
->> From: Frank Wunderlich <frank-w@public-files=2Ede>
->>=20
->
->I think that this series is ready to be applied; however, I need someone =
-to take
->the bindings before I can apply the devicetree part to the MediaTek trees=
-=2E
+Compute the number of hwfd buffers/descriptors according to the reserved
+memory size if provided via DTS.
+Reduce the required hwfd buffers queue size for QDMA1.
 
-Please wait a bit for the eth part=2E=2E=2Eseems like reserved irqs are no=
-t unusable as i thought=2E=2E=2Ei think we should upstream them too and may=
-be with different names=2E=2E=2Eas they are not fixed to function in hardwa=
-re=2E
+---
+Changes in v4:
+- Fix commit log for patch 2/2
+- Link to v3: https://lore.kernel.org/r/20250618-airoha-hw-num-desc-v3-0-18a6487cd75e@kernel.org
 
->Cheers,
->Angelo
->
->
->> This series continues mt7988 devicetree work
->>=20
->> - Extend cpu frequency scaling with CCI
->> - GPIO leds
->> - Basic network-support (ethernet controller + builtin switch + SFP Cag=
-es)
->>=20
->> depencies (i hope this list is complete and latest patches/series linke=
-d):
->>=20
->> support interrupt-names because reserved IRQs are now dropped, so index=
- based access is now wrong
->> https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/20250616080738=
-=2E117993-2-linux@fw-web=2Ede/
->>=20
->> for SFP-Function (macs currently disabled):
->>=20
->> PCS clearance which is a 1=2E5 year discussion currently ongoing
->>=20
->> e=2Eg=2E something like this (one of):
->> * https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/202506102331=
-34=2E3588011-4-sean=2Eanderson@linux=2Edev/ (v6)
->> * https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/202505112012=
-50=2E3789083-4-ansuelsmth@gmail=2Ecom/ (v4)
->> * https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/ba4e359584a6=
-b3bc4b3470822c42186d5b0856f9=2E1721910728=2Egit=2Edaniel@makrotopia=2Eorg/
->>=20
->> full usxgmii driver:
->> https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/07845ec900ba41=
-ff992875dce12c622277592c32=2E1702352117=2Egit=2Edaniel@makrotopia=2Eorg/
->>=20
->> first PCS-discussion is here:
->> https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/8aa905080bdb67=
-60875d62cb3b2b41258837f80e=2E1702352117=2Egit=2Edaniel@makrotopia=2Eorg/
->>=20
->> and then dts nodes for sgmiisys+usxgmii+2g5 firmware
->>=20
->> when above depencies are solved the mac1/2 can be enabled and 2=2E5G ph=
-y/SFP slots will work=2E
->>=20
->> changes:
->> v4:
->>    net-binding:
->>      - allow interrupt names and increase max interrupts to 6 because o=
-f RSS/LRO interrupts
->>        (dropped Robs RB due to this change)
->>=20
->>    dts-patches:
->>    - add interrupts for RSS/LRO and interrupt-names for ethernet node
->>    - eth-reg and clock whitespace-fix
->>    - comment for fixed-link on gmac0
->>    - drop phy-mode properties as suggested by andrew
->>    - drop phy-connection-type on 2g5 board
->>    - reorder some properties
->>    - update 2g5 phy node
->>      - unit-name dec instead of hex to match reg property
->>      - move compatible before reg
->>      - drop phy-mode
->>=20
->> v3:
->>    - dropped patches already applied (SPI+thermal)
->>    - added soc specific cci compatible (new binding patch + changed dts=
-)
->>    - enable 2g5 phy because driver is now merged
->>    - add patch for cleaning up unnecessary pins
->>    - add patch for gpio-leds
->>    - add patch for adding ethernet aliases
->>=20
->> v2:
->>    - change reg to list of items in eth binding
->>    - changed mt7530 binding:
->>      - unevaluatedProperties=3Dfalse
->>      - mediatek,pio subproperty
->>      - from patternProperty to property
->>    - board specific properties like led function and labels moved to bp=
-i-r4 dtsi
->>=20
->>=20
->> Frank Wunderlich (13):
->>    dt-bindings: net: mediatek,net: update for mt7988
->>    dt-bindings: net: dsa: mediatek,mt7530: add dsa-port definition for
->>      mt7988
->>    dt-bindings: net: dsa: mediatek,mt7530: add internal mdio bus
->>    dt-bindings: interconnect: add mt7988-cci compatible
->>    arm64: dts: mediatek: mt7988: add cci node
->>    arm64: dts: mediatek: mt7988: add basic ethernet-nodes
->>    arm64: dts: mediatek: mt7988: add switch node
->>    arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
->>    arm64: dts: mediatek: mt7988a-bpi-r4: drop unused pins
->>    arm64: dts: mediatek: mt7988a-bpi-r4: add gpio leds
->>    arm64: dts: mediatek: mt7988a-bpi-r4: add aliases for ethernet
->>    arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and link to gmac
->>    arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
->>=20
->>   =2E=2E=2E/bindings/interconnect/mediatek,cci=2Eyaml   |  11 +-
->>   =2E=2E=2E/bindings/net/dsa/mediatek,mt7530=2Eyaml     |  24 +-
->>   =2E=2E=2E/devicetree/bindings/net/mediatek,net=2Eyaml |  28 +-
->>   =2E=2E=2E/mediatek/mt7988a-bananapi-bpi-r4-2g5=2Edts  |  11 +
->>   =2E=2E=2E/dts/mediatek/mt7988a-bananapi-bpi-r4=2Edts  |  19 ++
->>   =2E=2E=2E/dts/mediatek/mt7988a-bananapi-bpi-r4=2Edtsi | 198 ++++++---=
---
->>   arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi     | 307 +++++++++++++++=
-++-
->>   7 files changed, 498 insertions(+), 100 deletions(-)
->>=20
->
->
+Changes in v3:
+- Target net tree instead of net-next one
 
+Changes in v2:
+- Rely on div_u64 to compute number of hw descriptors
+- Link to v1: https://lore.kernel.org/r/20250615-airoha-hw-num-desc-v1-0-8f88daa4abd7@kernel.org
 
-regards Frank
+---
+Lorenzo Bianconi (2):
+      net: airoha: Compute number of descriptors according to reserved memory size
+      net: airoha: Differentiate hwfd buffer size for QDMA0 and QDMA1
+
+ drivers/net/ethernet/airoha/airoha_eth.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
+---
+base-commit: 9b70c362a9d4ab93e0b582dad73acb2a953ef797
+change-id: 20250618-airoha-hw-num-desc-6f5b6f9f85ae
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
