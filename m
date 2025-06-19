@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-199517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E06B1AE0938
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:53:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65590AE093A
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:54:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D724D1882635
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:52:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97F481BC69BC
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08CED23D282;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA912737F5;
 	Thu, 19 Jun 2025 14:51:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D78121E0AF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D7821ADA7;
 	Thu, 19 Jun 2025 14:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750344693; cv=none; b=QynGPt0oo/g/24XX/F9pXZXWa2RA4wG+e2iZ30OoKuhrQFgX5uuwTQUxCnSHC+9n+pcX3rVbN/uh4H5L6mJJPvFOZ/VCVuVSMRgj2tW7b/6/PIOFaSdfRiGtzYgeHLj7ea52pXMLFlY6m01EVZ+gDcymhbWxfI3gr1C++Mlv3Do=
+	t=1750344694; cv=none; b=svLT9ieZ2mTLEpxl4ymeYqgEptcTQnjBVpOOrwH3qBKn+yIRFQyj3Mg2n6qfq3EFoiQkO0l9KQ5WhiSpPkdrAf92FESBEk/EA20m/pmePbVteovKNRnlhzIfLacJnCWssph8HxPrZaBU623N2oIbF6b1WZ5od4K8vBzwxME+XjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750344693; c=relaxed/simple;
-	bh=qt/+ct1EsDxJroNT5S6IwbORgIaQ5BsRcdhUMcdxPrM=;
+	s=arc-20240116; t=1750344694; c=relaxed/simple;
+	bh=oRXuHGOrAGSvnht4ZizfzrxEtdxdPnDJ9l6PPH5cLGs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GJAy741NHSHNlBSFc0Eh75AqHaL/qGOHsrBq7Ozip7df9G882IqpjqrvfOd8XmGEa2mWeJ7XOF1HwH97q6Vw4Bqa3KoTdCuteDU90WG2WVA7MbW3tkDlKGAPOT8pqHdEh/aJJQ/H87ib5Z/4IBJx6EKPjeGhNZK8xW/OZ6wvEU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 MIME-Version:Content-Type; b=EUNvzu6IDs6Zgv09yYgrWptRE9j3A/m76i8Xx9GGqtrQ6IrZaUAB2f1La2W64JxUHLTxjK9d352GETS5H2j0guj1AAJKO/jx+BiOUrLfC9Sg96wOaV68JzTuTRo7wt0xaFQzWSnMTUXp+rEanSXMJTyViA07EZKJs5i9DNido3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bNNjs1bXDzRkdD;
-	Thu, 19 Jun 2025 22:47:13 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bNNm12jlgz28fSs;
+	Thu, 19 Jun 2025 22:49:05 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 22205180B6A;
+	by mail.maildlp.com (Postfix) with ESMTPS id 9FA0F140113;
 	Thu, 19 Jun 2025 22:51:30 +0800 (CST)
 Received: from localhost.localdomain (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net-next 2/3] net: hibmcge: adjust the burst len configuration of the MAC controller to improve TX performance.
-Date: Thu, 19 Jun 2025 22:44:22 +0800
-Message-ID: <20250619144423.2661528-3-shaojijie@huawei.com>
+Subject: [PATCH net-next 3/3] net: hibmcge: configure FIFO thresholds according to the MAC controller documentation
+Date: Thu, 19 Jun 2025 22:44:23 +0800
+Message-ID: <20250619144423.2661528-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250619144423.2661528-1-shaojijie@huawei.com>
 References: <20250619144423.2661528-1-shaojijie@huawei.com>
@@ -64,54 +64,105 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-Adjust the burst len configuration of the MAC controller
-to improve TX performance.
+Configure FIFO thresholds according to the MAC controller documentation
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c  | 8 ++++++++
- drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h | 2 ++
- 2 files changed, 10 insertions(+)
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 49 +++++++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  6 +++
+ 2 files changed, 55 insertions(+)
 
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 9b65eef62b3f..6e5602591554 100644
+index 6e5602591554..2d3d233a9972 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -168,6 +168,11 @@ static void hbg_hw_set_mac_max_frame_len(struct hbg_priv *priv,
+@@ -18,6 +18,13 @@
+ #define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
+ #define HBG_PCU_FRAME_LEN_PLUS 4
  
- void hbg_hw_set_mtu(struct hbg_priv *priv, u16 mtu)
- {
-+	/* burst_len BIT(29) set to 1 can improve the TX performance.
-+	 * But packet drop occurs when mtu > 2000.
-+	 * So, BIT(29) reset to 0 when mtu > 2000.
-+	 */
-+	u32 burst_len_bit = (mtu > 2000) ? 0 : 1;
- 	u32 frame_len;
- 
- 	frame_len = mtu + VLAN_HLEN * priv->dev_specs.vlan_layers +
-@@ -175,6 +180,9 @@ void hbg_hw_set_mtu(struct hbg_priv *priv, u16 mtu)
- 
- 	hbg_hw_set_pcu_max_frame_len(priv, frame_len);
- 	hbg_hw_set_mac_max_frame_len(priv, frame_len);
++#define HBG_FIFO_TX_FULL_THRSLD		0x3F0
++#define HBG_FIFO_TX_EMPTY_THRSLD	0x1F0
++#define HBG_FIFO_RX_FULL_THRSLD		0x240
++#define HBG_FIFO_RX_EMPTY_THRSLD	0x190
++#define HBG_CFG_FIFO_FULL_THRSLD	0x10
++#define HBG_CFG_FIFO_EMPTY_THRSLD	0x01
 +
-+	hbg_reg_write_field(priv, HBG_REG_BRUST_LENGTH_ADDR,
-+			    HBG_REG_BRUST_LENGTH_B, burst_len_bit);
+ static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
+ {
+ 	return hbg_reg_read(priv, HBG_REG_SPEC_VALID_ADDR) &&
+@@ -272,6 +279,41 @@ void hbg_hw_set_rx_pause_mac_addr(struct hbg_priv *priv, u64 mac_addr)
+ 	hbg_reg_write64(priv, HBG_REG_FD_FC_ADDR_LOW_ADDR, mac_addr);
  }
  
- void hbg_hw_mac_enable(struct hbg_priv *priv, u32 enable)
++static void hbg_hw_set_fifo_thrsld(struct hbg_priv *priv,
++				   u32 full, u32 empty, enum hbg_dir dir)
++{
++	u32 value = 0;
++
++	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_FULL_M, full);
++	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_EMPTY_M, empty);
++
++	if (dir & HBG_DIR_TX)
++		hbg_reg_write(priv, HBG_REG_TX_FIFO_THRSLD_ADDR, value);
++
++	if (dir & HBG_DIR_RX)
++		hbg_reg_write(priv, HBG_REG_RX_FIFO_THRSLD_ADDR, value);
++}
++
++static void hbg_hw_set_cfg_fifo_thrsld(struct hbg_priv *priv,
++				       u32 full, u32 empty, enum hbg_dir dir)
++{
++	u32 value;
++
++	value = hbg_reg_read(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR);
++
++	if (dir & HBG_DIR_TX) {
++		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M, full);
++		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M	, empty);
++	}
++
++	if (dir & HBG_DIR_RX) {
++		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M, full);
++		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M	, empty);
++	}
++
++	hbg_reg_write(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR, value);
++}
++
+ static void hbg_hw_init_transmit_ctrl(struct hbg_priv *priv)
+ {
+ 	u32 ctrl = 0;
+@@ -332,5 +374,12 @@ int hbg_hw_init(struct hbg_priv *priv)
+ 
+ 	hbg_hw_init_rx_control(priv);
+ 	hbg_hw_init_transmit_ctrl(priv);
++
++	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_TX_FULL_THRSLD,
++			       HBG_FIFO_TX_EMPTY_THRSLD, HBG_DIR_TX);
++	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_RX_FULL_THRSLD,
++			       HBG_FIFO_RX_EMPTY_THRSLD, HBG_DIR_RX);
++	hbg_hw_set_cfg_fifo_thrsld(priv, HBG_CFG_FIFO_FULL_THRSLD,
++				   HBG_CFG_FIFO_EMPTY_THRSLD, HBG_DIR_TX_RX);
+ 	return 0;
+ }
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-index eb50b202ca3a..310f8a74797d 100644
+index 310f8a74797d..e85a8c009f37 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-@@ -185,6 +185,8 @@
- #define HBG_REG_TX_CFF_ADDR_2_ADDR		(HBG_REG_SGMII_BASE + 0x0490)
- #define HBG_REG_TX_CFF_ADDR_3_ADDR		(HBG_REG_SGMII_BASE + 0x0494)
- #define HBG_REG_RX_CFF_ADDR_ADDR		(HBG_REG_SGMII_BASE + 0x04A0)
-+#define HBG_REG_BRUST_LENGTH_ADDR		(HBG_REG_SGMII_BASE + 0x04C4)
-+#define HBG_REG_BRUST_LENGTH_B			BIT(29)
- #define HBG_REG_RX_BUF_SIZE_ADDR		(HBG_REG_SGMII_BASE + 0x04E4)
- #define HBG_REG_RX_BUF_SIZE_M			GENMASK(15, 0)
- #define HBG_REG_BUS_CTRL_ADDR			(HBG_REG_SGMII_BASE + 0x04E8)
+@@ -141,7 +141,13 @@
+ /* PCU */
+ #define HBG_REG_TX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0420)
+ #define HBG_REG_RX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0424)
++#define HBG_REG_FIFO_THRSLD_FULL_M		GENMASK(25, 16)
++#define HBG_REG_FIFO_THRSLD_EMPTY_M		GENMASK(9, 0)
+ #define HBG_REG_CFG_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0428)
++#define HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M	GENMASK(31, 24)
++#define HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M	GENMASK(23, 16)
++#define HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M	GENMASK(15, 8)
++#define HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M	GENMASK(7, 0)
+ #define HBG_REG_CF_INTRPT_MSK_ADDR		(HBG_REG_SGMII_BASE + 0x042C)
+ #define HBG_INT_MSK_WE_ERR_B			BIT(31)
+ #define HBG_INT_MSK_RBREQ_ERR_B			BIT(30)
 -- 
 2.33.0
 
