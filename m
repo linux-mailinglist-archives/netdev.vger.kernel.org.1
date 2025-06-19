@@ -1,108 +1,128 @@
-Return-Path: <netdev+bounces-199597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1842AE0E71
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:07:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A675AE0E7B
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:13:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF7E34A277C
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:07:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD7D41897F42
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1413F246BAD;
-	Thu, 19 Jun 2025 20:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203A32472AC;
+	Thu, 19 Jun 2025 20:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="rVUKW6py"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8w4AlcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C822244686;
-	Thu, 19 Jun 2025 20:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCED62376E0
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 20:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750363622; cv=none; b=hEDVq3g2KNtNpU0BJWS178Kqaonw7VfbPPUgud5etqkqgrFIPX3jUuZOElpPqlVOlo7PBF8j7cLJNIG+JI1Jqdz8HFjeDkzlh2ZVT/trxFwyaONeiLawCEkTH1VDszgPI1B+NLCUuk0JJjFVmce/3cv+OZnF/gClf4DnVtpRlMI=
+	t=1750363994; cv=none; b=bBknYHe7ViFpY915gycrxT4y29hQs/LlSIpP33NnrPWOQJa85l8PNgdC3ox3LMUytYpcj+Flb+9jhk3CR198+zfOdgixM2EShWR8qyt/5GNBloasGAuJhheYsRSrC8IZKos6j8zKIClNJArGqWml4Nn1WFvUECMk0iTQ4BQmDSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750363622; c=relaxed/simple;
-	bh=x8nkZpBV8B1RfMXzIjaeghHZ0IZmHLuUDZJUgB28/C8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jpXM3fHQOGP1X2GQO8r6lzYTlX2H/D+tAtdWUOkX3sQPYvPe92Bigcp1UwnDkQwJ6qke5ds6E2U9KMTBRjk3EjfpM4qN/2Cpgpwv0krru8IuczTWwCBawMMl06HTE68E9e31ggeYL8u27mwymQOQlA9RcVQQyh6FCAhdrixLi0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=rVUKW6py; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 7B75A41AD8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1750363619; bh=R9c4vgL7SuYf1vxfbbp+JsNTP8qE+XIiFw2ZuOXL6S8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=rVUKW6pywt1KAVhnsKmGFtuxGHE20Sn/qoL2NdO84G2FNt+qf2dslll76hqnx+p3W
-	 Bd8yIVeDuuAZh6A0J23a4GRqbZ5ovmDB7rPgiYGco+FQKEck4Brit0VA93ggk2Nkh2
-	 fuK6N4b4x9AyLkHMukIzKOOejFe5RvgZx43Wg1RiYO5x+AulGvGXdv68l8v+K69shU
-	 VTbrrzDKYi5iMvUni58QUNlolykUJlpgzMNIpVB2ol/UH6gdYhzcSQoaHEcJwpdLK/
-	 oY4FQkcPtcn7eSEeDqLQ7cn1VX67jckzQV/DSvPU5WhGIAedv/Xg8O9MhM+OUxUhiS
-	 LaJERjmb96X5Q==
-Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 7B75A41AD8;
-	Thu, 19 Jun 2025 20:06:59 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Jakub Kicinski <kuba@kernel.org>, Mauro Carvalho Chehab
- <mchehab+huawei@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Linux Doc Mailing List
- <linux-doc@vger.kernel.org>, Akira
- Yokosawa <akiyks@gmail.com>, Breno Leitao <leitao@debian.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Ignacio
- Encinas Rubio <ignacio@iencinas.com>, Jan Stancek <jstancek@redhat.com>,
- Marco Elver <elver@google.com>, Paolo Abeni <pabeni@redhat.com>, Ruben
- Wauters <rubenru09@aol.com>, Shuah Khan <skhan@linuxfoundation.org>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev,
- netdev@vger.kernel.org, peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH v4 12/14] MAINTAINERS: add maintainers for
- netlink_yml_parser.py
-In-Reply-To: <20250614124649.2c41407c@kernel.org>
-References: <cover.1749891128.git.mchehab+huawei@kernel.org>
- <ba75692b90bf7aa512772ca775fde4c4688d7e03.1749891128.git.mchehab+huawei@kernel.org>
- <CAD4GDZzA5Dj84vobSdxqXdPjskBjuFm7imFkZoSmgjidbCtSYQ@mail.gmail.com>
- <20250614173235.7374027a@foz.lan> <20250614103700.0be60115@kernel.org>
- <20250614205609.50e7c3ad@foz.lan> <20250614124649.2c41407c@kernel.org>
-Date: Thu, 19 Jun 2025 14:06:58 -0600
-Message-ID: <877c17h4wt.fsf@trenco.lwn.net>
+	s=arc-20240116; t=1750363994; c=relaxed/simple;
+	bh=R1Jth55okgsxQ0Jk3aJ4nlbCXSceUo1VzGYD/1Rj4yw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NnlhsppevdQdi7CaDxaeZzlJ3VS+CDmj8fMV2GHffaJKBSstxXoGgzGn3rLYOWnaFT2cV1r8ZYNrgLw/ltPCXALaf9F7Wh+gJ/gydOpMnmdwcFukgltZggIkd3p0pGx7D66cZ9lUQd6/KCUMFHkRC22qk6LRd9sx9UrbYYaa4Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y8w4AlcD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750363989;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kUyCPJPpMqR3gDqMInJSoS/7xTpHf9LiEmfvVCx5ENo=;
+	b=Y8w4AlcDcX2vDunxMocAmnAdVUMEmDZcohi2V39VKUqJctkBOTgog3AZ4mrTqSTDIshdYr
+	xiItYpnXpv9lY8i7ndEPOIUBxcjTj1PSHrmKTE++doHQDG5SsjBJAKLYm6tT2p14hzLgIi
+	2ZUwspY7XLBpPZ8u6/gcxea0l/ZHHcI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-16-7j1WHe47Ppeo-TUjs8bhKA-1; Thu, 19 Jun 2025 16:13:07 -0400
+X-MC-Unique: 7j1WHe47Ppeo-TUjs8bhKA-1
+X-Mimecast-MFC-AGG-ID: 7j1WHe47Ppeo-TUjs8bhKA_1750363985
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f7ebfd00so507273f8f.2
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 13:13:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750363985; x=1750968785;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kUyCPJPpMqR3gDqMInJSoS/7xTpHf9LiEmfvVCx5ENo=;
+        b=I5TDo3ucaoMrPkgTXM2wSBitCbQiWhyCOE3kbM4DhRVS1s6dwNkTiodrKKI0HgZ1zE
+         UwVPVZPfF4KSL/uUBFBNRpOipb4nrttb42kyWMZ3LjQxYrKQ7OJ1kZ7FN9iQ6LjDSGoZ
+         EMcx3kvhnUTuAcjB37NteJbsT/YMXpETkDp6agUosAF9sfFWBzELQ75NFMn/rZHwbyfc
+         0g+2f0a/ya13VNUaUNwbicaU0gkO3RQMrhS1yNa82mErF91sY3dp2Mk7xwm2FNFDRNHy
+         eZps05ca9pNC2Ie74ywaJQLUUyspbbMnp4YOZxIWGDfH5kBq9gj2ZwI2lap9njvklGbj
+         AtzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXcziDfgM0vXD0X9Z5AdmYrqS96AGh/Wgunhr+t+nNylibmsRS0+cjCxlySrE8Z4vHv0D9ayAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywy6AaVV62tcVuXje+bgbyurSYCKbvH/Avqat00CLl85MEWB8er
+	b519KVDMhHN/HK0nWTs/+G6l2NHe4kIH/h6bj7R4I93AO4R5cT+2LiP4DpCUp9+bRgqcMtS5Vpd
+	ITvyrMK0YSyVtKSJz4C/MVMeeYObRUun2dGsnnZ/0lTXqdr/WCq8tpLLn8g==
+X-Gm-Gg: ASbGncsQ4kH/ZrWIJjEKE7s58ixv4snhOmwhEhpxwJUFyRWO4XlBDOu5vGousdC1RRF
+	+efYeLYjfK/RiziCqrcye4Pz5ID2WdrvMYkYU7AJIp7Vl04dDEwoovpfejLmWpmABch6WI5jQkW
+	/G8zb05AncENtI1uHWuI35PZKGxFKVHL7f+BmY7mqcfW6MK1jReNDWyhtK6uKuQ82YhCS12Az3I
+	Zx60rDUOKYZSbKMxxxa5GFGoVfGXS+oew5QZOLWg/Qgxetgm1xJT6LbT+IiDhh7oaahgXQhMX9n
+	AAZs+fW4LdDgLpYGw0p+Bm3KbQ0U1i7V3AkUj19l90M=
+X-Received: by 2002:a05:6000:3ca:b0:3a4:fa6a:9189 with SMTP id ffacd0b85a97d-3a6d1322bb1mr242393f8f.31.1750363985005;
+        Thu, 19 Jun 2025 13:13:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHsCPwzZnnZjhdWE3AMrcqQzbKjIvWxjvQ/0H67BeC+xcbY5FHAPTI/p3rPhLrvYbdXmd4Eig==
+X-Received: by 2002:a05:6000:3ca:b0:3a4:fa6a:9189 with SMTP id ffacd0b85a97d-3a6d1322bb1mr242377f8f.31.1750363984647;
+        Thu, 19 Jun 2025 13:13:04 -0700 (PDT)
+Received: from [192.168.0.115] (146-241-9-4.dyn.eolo.it. [146.241.9.4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d117c71esm236887f8f.61.2025.06.19.13.13.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 13:13:04 -0700 (PDT)
+Message-ID: <52a8b6c1-1e3c-469e-8598-74f5b1cd417e@redhat.com>
+Date: Thu, 19 Jun 2025 22:13:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 3/8] vhost-net: allow configuring extended
+ features
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
+References: <cover.1750176076.git.pabeni@redhat.com>
+ <c510db61e36ce3b26e3a1fb7716c17f6888da095.1750176076.git.pabeni@redhat.com>
+ <e9ca64b4-3196-4b7b-822c-4bb0b40f8689@daynix.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <e9ca64b4-3196-4b7b-822c-4bb0b40f8689@daynix.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On 6/19/25 5:00 PM, Akihiko Odaki wrote:
+> On 2025/06/18 1:12, Paolo Abeni wrote:
+>> +
+>> +		/* Any feature specified by user-space above VIRTIO_FEATURES_MAX is
+>> +		 * not supported by definition.
+>> +		 */
+>> +		for (; i < count; ++i) {
+>> +			if (copy_from_user(&features, argp, sizeof(u64)))
+> 
+> get_user() is a simpler alternative.
 
-> On Sat, 14 Jun 2025 20:56:09 +0200 Mauro Carvalho Chehab wrote:
+That would require an explicit cast of 'argp' to a suitable pointer
+type, which is IMHO uglier. I prefer sticking with copy_from_user().
 
->> I'm more interested on having a single place where python libraries
->> could be placed.
->
-> Me too, especially for selftests. But it's not clear to me that
-> scripts/ is the right location. I thought purely user space code
-> should live in tools/ and bulk of YNL is for user space.
+Side note: there is a bug in this loop, as it lacks the needed increment
+of the src pointer at every iteration.
 
-I've been out wandering the woods and canyons with no connectivity for a
-bit, so missed this whole discussion, sorry.
+/P
 
-Mauro and I had talked about the proper home for Python libraries when
-he reworked kernel-doc; we ended up with them under scripts/, which I
-didn't find entirely pleasing.  If you were to ask me today, I'd say
-they should be under lib/python, but tomorrow I might say something
-else...
-
-In truth, I don't think it matters much, but I *do* think we should have
-a single location from which to import kernel-specific Python code.
-Spreading it throughout the tree just isn't going to lead to joy.
-
-Thanks,
-
-jon
 
