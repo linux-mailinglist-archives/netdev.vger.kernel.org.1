@@ -1,211 +1,102 @@
-Return-Path: <netdev+bounces-199627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDCAAE0FFA
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:20:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7C3AE0FEF
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 112044A2D30
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDA473B7578
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A4F293B5A;
-	Thu, 19 Jun 2025 23:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E6E28C871;
+	Thu, 19 Jun 2025 23:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kjyiYV/8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHGCIDVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF9428E572;
-	Thu, 19 Jun 2025 23:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BB420E711;
+	Thu, 19 Jun 2025 23:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750375200; cv=none; b=o/HRhWMp5Iv3tt0yGJPx8lrVn4Y87DSZKQNnHv6dzMXME+GYti4hLWY7/K0IKXg/2o3V5v4d4qeokRwgX3AMHLOJ6xLH6mW1ssTPCKAIh3bSf4c3iLPxYXMrG2dBNM3NX/AsNE6L8SyjfaWJdPkr62glXO6EcAaXrIr7r96Ovy4=
+	t=1750375179; cv=none; b=gPglQ8qO+vyHvRvYZbyHgg9yhQYALKj2mqAiDwyfEemXM1SCb8mySoxu+nndxcytHJ4yIppKsutJubbDXbiAikhvlJfhxKM3eZENeCQKx4rtRI2kFdmxdgVQJ1+0qb+6sWFNQQPEwWz6nGLTan6X2esmAb8D2WxFy6B1cVIxbBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750375200; c=relaxed/simple;
-	bh=CxdGK0OibitOqYT8eMdM1IZnZXdC/S5mh0+1mj4678A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BqcebDIg7PD9s9XRnWgNrPFsiiiyxVrY7ms828jNmwwxw828xbArIeKUfw3f6q1SGJWBtuEHYQwVXy445budPw6LNzBHq35ZTWhnoB/gHQCsR2FGr80AIPq+hFZpsYeIuf9se4+KK793MCraD3qBU/RxKFeMbfA/DGtVtG/KZiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kjyiYV/8; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750375199; x=1781911199;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CxdGK0OibitOqYT8eMdM1IZnZXdC/S5mh0+1mj4678A=;
-  b=kjyiYV/8Z9bPUCa7w6PHU9r2D4lRPZTcEjRPVRftX95laos8OhcSdL0u
-   LQNiREcpECikP2+juQeG+xbOgvUUcfsCxYQk5/ghiqmJgLu5T34jEHP2J
-   2Z7uMKgXNd4X/FAiKoyp6PKOv+yScjL9CRsG/nZaX+3bUcf6vF6IFRHMh
-   bqqXzSbu++rp0tpTi/BlM2COnJpxW7mOKkBP2OqvbD4hf0WGa0JujzrZp
-   H3Sj6vCuohWqCiNZ7QkvJCeCslKHnfjpl2SEbjasaGm0ss5smhSt/yfkn
-   5ylsqKysFG72W0tDFAI5z6rZRRB2Muu+D8aVYOExaG8G4rc+Ffzu3D082
-   A==;
-X-CSE-ConnectionGUID: t1sUXCg0RLifV7Tf8950XQ==
-X-CSE-MsgGUID: 93n3DzlHTo6jjdhunQJY9w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="63322424"
-X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
-   d="scan'208";a="63322424"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 16:19:58 -0700
-X-CSE-ConnectionGUID: WoC9UC3MSEKOOdL9mMYJgg==
-X-CSE-MsgGUID: hsdlFGskR72XT1zpBkFaRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
-   d="scan'208";a="151068828"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 19 Jun 2025 16:19:56 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uSOXy-000LAS-02;
-	Thu, 19 Jun 2025 23:19:54 +0000
-Date: Fri, 20 Jun 2025 07:19:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tanmay Jagdale <tanmay@marvell.com>, davem@davemloft.net,
-	leon@kernel.org, horms@kernel.org, sgoutham@marvell.com,
-	bbhushan2@marvell.com, herbert@gondor.apana.org.au
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	Tanmay Jagdale <tanmay@marvell.com>
-Subject: Re: [PATCH net-next v2 13/14] octeontx2-pf: ipsec: Manage NPC rules
- and SPI-to-SA table entries
-Message-ID: <202506200609.aTq7YfBa-lkp@intel.com>
-References: <20250618113020.130888-14-tanmay@marvell.com>
+	s=arc-20240116; t=1750375179; c=relaxed/simple;
+	bh=1iitjCLE0DZH0hmZdXHmHbGc0acxiTVlORAr7x2Ff2U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DUb02xl6sv+jpkpI96r73maMysJonhCLkRFvk7uJHGvlIC/8BRGtr1KFvjgN76jDJ2BHFWCzOvLsfhRA18uliW7o285k9mq2sHWXApS1pXKsuDuVzV5IcQJEskowPPKP4nLlzmjOPTg/HB1oj+Z4j+G5nqtPZDxZDNymKyTKkA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHGCIDVT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2EB4C4CEEA;
+	Thu, 19 Jun 2025 23:19:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750375179;
+	bh=1iitjCLE0DZH0hmZdXHmHbGc0acxiTVlORAr7x2Ff2U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kHGCIDVTAXuEpNeOWqvBztDwNhtbC83OdZWsNR7VxKi1DmeB59lnsfvgfRSDBi0C1
+	 DDaAdjCmRPIZs+3EMompPWmZpK2yzknxZSoWeAdGJ9z9S2lz8MKsDFgjgL/HPX0NLa
+	 HZC4N/dn7FxZj9FPVK1bqhTj21lPCWtPrZVQVi0pNSLezl+0acGbqD1uFW+MKITodj
+	 5HgaQxtTQdUABL1Pee4+F8KmHyHlFWm8U/2hNicNcM2fuTN1Ce8A8AjC/jE4s9ToKT
+	 +/XP1XOSo+Ktn1d1cM0RpT/gOkzzCs4MvoKk/cldSm9q5Rod3xhRCBFgRyh/ny5Ssk
+	 /2ZaD1IloRHYQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E3138111DD;
+	Thu, 19 Jun 2025 23:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618113020.130888-14-tanmay@marvell.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Patch net-next v3] net: mana: Record doorbell physical address
+ in PF
+ mode
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175037520700.1016629.11511793485782650744.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 23:20:07 +0000
+References: <1750210606-12167-1-git-send-email-longli@linuxonhyperv.com>
+In-Reply-To: <1750210606-12167-1-git-send-email-longli@linuxonhyperv.com>
+To: Long Li <longli@linuxonhyperv.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shradhagupta@linux.microsoft.com,
+ horms@kernel.org, kotaranov@microsoft.com, schakrabarti@linux.microsoft.com,
+ erick.archer@outlook.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, longli@microsoft.com
 
-Hi Tanmay,
+Hello:
 
-kernel test robot noticed the following build errors:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test ERROR on net-next/main]
+On Tue, 17 Jun 2025 18:36:46 -0700 you wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> MANA supports RDMA in PF mode. The driver should record the doorbell
+> physical address when in PF mode.
+> 
+> The doorbell physical address is used by the RDMA driver to map
+> doorbell pages of the device to user-mode applications through RDMA
+> verbs interface. In the past, they have been mapped to user-mode while
+> the device is in VF mode. With the support for PF mode implemented,
+> also expose those pages in PF mode.
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250618-193646
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250618113020.130888-14-tanmay%40marvell.com
-patch subject: [PATCH net-next v2 13/14] octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
-config: um-randconfig-002-20250620 (https://download.01.org/0day-ci/archive/20250620/202506200609.aTq7YfBa-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 875b36a8742437b95f623bab1e0332562c7b4b3f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250620/202506200609.aTq7YfBa-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next,v3] net: mana: Record doorbell physical address in PF mode
+    https://git.kernel.org/netdev/net/c/e0fca6f2cebf
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506200609.aTq7YfBa-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:9:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:12:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:1175:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-    1175 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
-         |                                                   ~~~~~~~~~~ ^
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:22:
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:35:
-   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h:404:22: warning: no previous prototype for function 'cn10k_ipsec_process_cpt_metapkt' [-Wmissing-prototypes]
-     404 | struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
-         |                      ^
-   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h:404:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     404 | struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
-         | ^
-         | static 
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1808:3: error: call to undeclared function 'cn10k_ipsec_inb_disable_flows'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    1808 |                 cn10k_ipsec_inb_disable_flows(pf);
-         |                 ^
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1808:3: note: did you mean 'cn10k_ipsec_inb_delete_flows'?
-   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h:413:1: note: 'cn10k_ipsec_inb_delete_flows' declared here
-     413 | cn10k_ipsec_inb_delete_flows(struct otx2_nic *pfvf)
-         | ^
-   2 warnings and 1 error generated.
-
-
-vim +/cn10k_ipsec_inb_disable_flows +1808 drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-
-  1772	
-  1773		if (!otx2_rep_dev(pf->pdev))
-  1774			otx2_clean_qos_queues(pf);
-  1775	
-  1776		mutex_lock(&mbox->lock);
-  1777		/* Disable backpressure */
-  1778		if (!is_otx2_lbkvf(pf->pdev))
-  1779			otx2_nix_config_bp(pf, false);
-  1780		mutex_unlock(&mbox->lock);
-  1781	
-  1782		/* Disable RQs */
-  1783		otx2_ctx_disable(mbox, NIX_AQ_CTYPE_RQ, false);
-  1784	
-  1785		/*Dequeue all CQEs */
-  1786		for (qidx = 0; qidx < qset->cq_cnt; qidx++) {
-  1787			cq = &qset->cq[qidx];
-  1788			if (cq->cq_type == CQ_RX)
-  1789				otx2_cleanup_rx_cqes(pf, cq, qidx);
-  1790			else
-  1791				otx2_cleanup_tx_cqes(pf, cq);
-  1792		}
-  1793		otx2_free_pending_sqe(pf);
-  1794	
-  1795		otx2_free_sq_res(pf);
-  1796	
-  1797		/* Free RQ buffer pointers*/
-  1798		otx2_free_aura_ptr(pf, AURA_NIX_RQ);
-  1799	
-  1800		otx2_free_cq_res(pf);
-  1801	
-  1802		/* Free all ingress bandwidth profiles allocated */
-  1803		if (!otx2_rep_dev(pf->pdev))
-  1804			cn10k_free_all_ipolicers(pf);
-  1805	
-  1806		/* Delete Inbound IPSec flows if any SA's are installed */
-  1807		if (!list_empty(&pf->ipsec.inb_sw_ctx_list))
-> 1808			cn10k_ipsec_inb_disable_flows(pf);
-  1809	
-  1810		mutex_lock(&mbox->lock);
-  1811	
-  1812		/* Reset NIX LF */
-  1813		free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
-  1814		if (free_req) {
-  1815			free_req->flags = NIX_LF_DISABLE_FLOWS;
-  1816			if (!(pf->flags & OTX2_FLAG_PF_SHUTDOWN))
-  1817				free_req->flags |= NIX_LF_DONT_FREE_TX_VTAG;
-  1818			if (otx2_sync_mbox_msg(mbox))
-  1819				dev_err(pf->dev, "%s failed to free nixlf\n", __func__);
-  1820		}
-  1821		mutex_unlock(&mbox->lock);
-  1822	
-  1823		/* Disable NPA Pool and Aura hw context */
-  1824		otx2_ctx_disable(mbox, NPA_AQ_CTYPE_POOL, true);
-  1825		otx2_ctx_disable(mbox, NPA_AQ_CTYPE_AURA, true);
-  1826		otx2_aura_pool_free(pf);
-  1827	
-  1828		mutex_lock(&mbox->lock);
-  1829		/* Reset NPA LF */
-  1830		req = otx2_mbox_alloc_msg_npa_lf_free(mbox);
-  1831		if (req) {
-  1832			if (otx2_sync_mbox_msg(mbox))
-  1833				dev_err(pf->dev, "%s failed to free npalf\n", __func__);
-  1834		}
-  1835		mutex_unlock(&mbox->lock);
-  1836	}
-  1837	EXPORT_SYMBOL(otx2_free_hw_resources);
-  1838	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
