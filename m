@@ -1,261 +1,278 @@
-Return-Path: <netdev+bounces-199380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57785AE011F
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:06:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A37AE0176
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D4E5A5B56
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:04:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 647041887236
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CEA27EFF2;
-	Thu, 19 Jun 2025 09:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB4B261594;
+	Thu, 19 Jun 2025 09:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KObDt8YH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1SYpwWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303F1261594;
-	Thu, 19 Jun 2025 09:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E9D266F00;
+	Thu, 19 Jun 2025 09:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750323611; cv=none; b=e6bHpW1Dp32CkBZok6heqoTiVi7tvVMcuiYSsgqovPDEyu4E3iOGFdivKy83n6nPkUuODSFXfoIQhxzGiUbtJnsUhgt+VTlt+n/wCUUpYFVX9L53RnR39sS3W5n9Pec+1Z9KAYKaM3ARGbFYVFwdx9H+7VBFEwApsJ3LxwoIbqo=
+	t=1750323904; cv=none; b=XMP3ZFe0XoxPHv1JeD/SzXhU5WwaX+a8lzxZzGCpngmWTJQ5M3cIQMklXSWRrTJuL9v1BVmaqzhETaCUBHMCOTRfwSW8neWrI1Cli9c85tWMyFARGNwBvI2fFLC2NveXs/BTzt1kd6mHLgnX3Sr/R9kFi1ocHZz9BmduF2HTIss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750323611; c=relaxed/simple;
-	bh=n6DT5bAQL+RAQCVZkU8+hke6RxMaD2RlMP22Za8Eif0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OiV2HooPEBGCAFVuz1OPMY67dm3bbLs7Sz3j/A+Q6mcJjxEWK4hXEius5FERD75wIJ8r9txclgitY9DMJdtCrmxQRt/pXKAvPafUqUWhUCDGcrEQdm95MBjQiodFVfDzlajSYng/w/a36qVftpnzuGbwSfsoYIM/w77LrQhiD5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KObDt8YH; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1750323904; c=relaxed/simple;
+	bh=ix8iYmgTQn6R+tkb0lLnWMcZNkULhPqXa1YeYWKrFkk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lq1uxQz5RLnhAm0Veiwnn7rkEZhyTrVq3mLxvd3PmN6gL6Fy1FT1kmg98dMpt2wI1je2Dn6txuoXwxHx67ZUpl6FcmeeO31xq+gkJBpL+dAR/0lK5X51ZOECt4ayPY1E7R8M3J/De2Li5mStczMFC2xmvaxnkXDYoPCPS5VQW7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h1SYpwWa; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-450ce671a08so3027375e9.3;
-        Thu, 19 Jun 2025 02:00:08 -0700 (PDT)
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-313a188174fso396960a91.1;
+        Thu, 19 Jun 2025 02:05:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750323607; x=1750928407; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BMLvtRW8lP9BVVUwuPMh8xqp/K6tyZKhWFpUJL3ALEg=;
-        b=KObDt8YH3HMn60ZL8faB+4Gz+EX0KzPuXAq8CM47Kbhy7l563qYSn9WwV4rsa3w1Ll
-         vf0yT0tqWa58kT7vO5i/NiIkwHTw+JEodLaoe7JK5hxS1jp5d6yb8Mm4tsJLdoOJUW49
-         wPwRXX0LzcLl8sEPU8CuTc/mlf9JIgkwK5zXHg4zzRjxXdSB5rxtcdElnu4y/p5lb4xg
-         Tj3Cc60LpgS+0hia6vFN6xIvnqEtlRwvAcLEuII+fPPfn3DoscGJE4pzZzLjGcUFfpMy
-         wY+GZJPTIGeVjyhzw1yXwbXgCawQauumWC+TmPLB/0+yAn4DJIAj99u7LbENmGiely1P
-         z48g==
+        d=gmail.com; s=20230601; t=1750323902; x=1750928702; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0T0/RVTI1R+JSfxKY4c/kK2FPfopMjGZvHoxm2BH6PE=;
+        b=h1SYpwWaYBBzCTLgtspVLeugKgwM1TJ61Jm4XseJBSfeQCYc0GP6gv32sKutqW3n4j
+         qsqAOeJmPS985JVj2iV4Jy3E7AmrDsBclL+Cmt56wceVM7jvLK2uVbGDx95dLfQXST5+
+         5BPDHwNagCWdgmISpgv/VfGlrUKrwVYdalFcjgHA2fdpHBuT2mvyCjf9LtjYdDBSP5f8
+         YaM/tBT4dPVRURWgrQf+FzyIl/xYS2o8xHSQ/JN5G83XFByGYj0UY2aRVa9pI+XTBJUn
+         C44MhiHg1S5D7B1iuxPW6Zpgzn8/Ltqc5f5pEXF+z81FqKcjQ3MQ0cNVELx3HfX7ak29
+         7IXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750323607; x=1750928407;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BMLvtRW8lP9BVVUwuPMh8xqp/K6tyZKhWFpUJL3ALEg=;
-        b=SjkSb2qwcgL1PGr6sJZCZWS5xOUGqq5DhXeOuVfXdD7clhHCYBDMd5sm5DpgJjO04B
-         YJn+LdrF/X45rb8zB2Lg92UKqVsqx3wvBEhppPheYyf7tZWcMOHKUCXhKRc4cKfpRIGM
-         MiKoqEl8DGJ3C1RF+R1PRYSMz0cU3DwS1xopNTm310jS5BJBt/E52vZnTfB5yfRJ+A4W
-         3Suh1TjtlKFEZ6ccp5I7iyEvL0qLu1+QdXqaTOHRJYYIEfuoUC8/2uamxQm4A5C+KS7Y
-         lVFUXEOpCZAEqmSnNbpZyUjZ9DTgvSl0AGXocIPpDGzKCyEPKTa3E3EVdKJu5zPdHkdp
-         Hmdg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWyb0pjbMykxab2RtPFCQpmZrT0QBrV1dAMF6MWgNC8cpvkPSMhEuMX10hBk0WTpPM+KgtGUwcUX3K@vger.kernel.org, AJvYcCWAxMdYFP4kjf+JQzDFv9Vj6OR1rhGi0OgaDPJ30PzzwxT8lKYsgTQZzhdhXe2fl0LB7+HwAY9U@vger.kernel.org, AJvYcCWgEUG9OaWYxQ6corbsRyoIOEnYHpYhgJ3xjNN4UcWfBtTnvTscBIQi4X4C/CWk8SPhupgPsFprChd5rKka@vger.kernel.org, AJvYcCWv/Fl+IedIif/+eOFCMGttsKmU9lS4hKx3XM41KcFXVxAY0xQb6/dxTVjKWeKeFeu9R0/AwZNopwVpqDLEo9E20I8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys3x84n+wspTqIQB0ynqjQ9RqM1WqPW+gFj+Bx41XwpOEfmEYU
-	r72g1OBDA1/tC250aHW7srHlWhx3CcRk35YxLqFYqtL1paCET27ndMI5yAhdwxfrNmAu028qmdl
-	LzUviOHAex+Uq0bcFdoMXdE0oWMJCfjA=
-X-Gm-Gg: ASbGncvXiSskg4erDxzDKfTOdq0HLwKuu1Qw5JZXOl1YevHU6mIO+3gCW65Zq6psg65
-	4Bv7bHSgDS/EZSVaBojWGe1qmeMpEIteHGuZ+Gn1E3PXf1Ys/jA5s2Xwf1DGRQsvFcFaFfZLKOF
-	rADbMRz8HiPxZgUWwo3nnDYRSAahQiwnf5cM8LvrQ2rJIgi6RCBRiJV7SFi+Qv9nHzHOai5gmZN
-	QZS
-X-Google-Smtp-Source: AGHT+IGhu8co19gsbnewWhNefXxhKDeZw+yRoWO6wb7/e+7qCs6ACRJfdkx53ZLyixNkwCGavN9xkSNMsCx1jFBc7Uo=
-X-Received: by 2002:a05:600c:46cc:b0:453:b1c:442a with SMTP id
- 5b1f17b1804b1-4533cb53989mr181220065e9.27.1750323607211; Thu, 19 Jun 2025
- 02:00:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750323902; x=1750928702;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0T0/RVTI1R+JSfxKY4c/kK2FPfopMjGZvHoxm2BH6PE=;
+        b=vpWeZVZr1a6T0VrSOpMahTDJx/bqmiQjk3BrRY9Oz1zzRcH/eIgJZH4gyEbHmzbYUl
+         ao6OzFG0FbBOwuj57btcLED5SkdqWSKuMJFRYOSLeMrNQudiQEGyM6hcefylNkozi92A
+         T9Egwlui+L//mc8tGjhsnN8/PU1zDHIem5M1BBwLoNSL/slzb9wSjsGt0qghycUNXjUB
+         HYL329pGrJidFyEvkYLQchFmwY0q50kuVSH6gZcWhZMAcWYvyTF4eV0S4ig9/QMsBO56
+         rd5crYb/rVwEfLVAlVx+LKBG433sowh+RxppXaGHNryfh0aLxIxm6fkOCwAsicPvx4t5
+         BEmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlDR7g2ZLdcR5x/h2nCxeRKedZn4yqJTwGzeZ7hEhIJsCS6B8kTCk8ruQ7m7NMRRG3UmNgVDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz37fecoPCkd9LbSGNaNin9qYcJFHKzVVUvIa9ku1Ky5BByFtRU
+	Xlt5Xpp+TTyR963Jd7g0AMP0iP/2xnNRjaIgac5mwB3YE26SCJ2WQE+J
+X-Gm-Gg: ASbGncvcuEF6IdbHJ0fNvWm3UwMjj7peF5SMyGbhcHQ1W/eox/gV9p1wGBMYzO9EXoS
+	pmKjDKcVPvLWL/F7qBCHA1c6mnHNZFA6AwCiZupJJXS4R4QrN4TMFNoYnM6zGsslfkMfKrixMlP
+	IfBKSeuQ43mZf3rv0CcVhF/JWp/9reiYE1PTnK7YhxGxV/bkfJbESEkDcCCqfOuyqgqflR3mSWs
+	oCoHRmkalcmIEk9TqodAxO1C9tXTwmLJjlKwM1zLkvJQ5ffNf5/0k9EKWH47/WjOtTWDzlx3j3K
+	PhSCYnU50N5tpqcS+TwgltSjSXvNeXJq5AGQUs5rSbM6y6p5nU7kYOwi6hBgmZOSEE5E4wfkojw
+	SeaSQz30m5YM2r0sO8cz7KA3nUTutTl9c+A==
+X-Google-Smtp-Source: AGHT+IFMIkCTr72RzIwyDT9cZ45PR33J0SF9uyq46ep6L05JNw8tXxsfLuxAlSCQpR1zoX5ap4ibjw==
+X-Received: by 2002:a17:90b:52c5:b0:30e:3737:7c87 with SMTP id 98e67ed59e1d1-3158abd64e7mr3855491a91.5.1750323901724;
+        Thu, 19 Jun 2025 02:05:01 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3158a2f0987sm1780020a91.25.2025.06.19.02.04.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jun 2025 02:05:01 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
+Date: Thu, 19 Jun 2025 17:04:40 +0800
+Message-Id: <20250619090440.65509-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611061609.15527-1-john.madieu.xa@bp.renesas.com> <20250611061609.15527-4-john.madieu.xa@bp.renesas.com>
-In-Reply-To: <20250611061609.15527-4-john.madieu.xa@bp.renesas.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Thu, 19 Jun 2025 09:59:41 +0100
-X-Gm-Features: Ac12FXxEbSDhRUhp-8lwipAqXbd42CO72LWVe4CbodNCzZQmHjti3RncJNUk7JY
-Message-ID: <CA+V-a8uizu5MCur_=g5vJyWbWSTSP2J6FkQ89JB8ges7GWdsjg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] arm64: dts: renesas: rzg3e-smarc-som: Enable
- eth{0-1} (GBETH) interfaces
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, geert+renesas@glider.be, krzk+dt@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
-	robh@kernel.org, biju.das.jz@bp.renesas.com, devicetree@vger.kernel.org, 
-	john.madieu@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, magnus.damm@gmail.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi John,
+From: Jason Xing <kernelxing@tencent.com>
 
-Thank you for the patch.
+The patch does the following things:
+- Add XDP_MAX_TX_BUDGET socket option.
+- Unify TX_BATCH_SIZE and MAX_PER_SOCKET_BUDGET into single one
+  tx_budget_spent.
+- tx_budget_spent is set to 32 by default in the initialization phase.
+  It's a per-socket granular control.
 
-On Wed, Jun 11, 2025 at 7:20=E2=80=AFAM John Madieu
-<john.madieu.xa@bp.renesas.com> wrote:
->
-> Enable the Gigabit Ethernet Interfaces (GBETH) populated on the RZ/G3E SM=
-ARC EVK
->
-> Reviewed-by: Biju Das <biju.das.jz@bp.renesas.com>
-> Tested-by: Biju Das <biju.das.jz@bp.renesas.com>
-> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
-> ---
->  .../boot/dts/renesas/rzg3e-smarc-som.dtsi     | 106 ++++++++++++++++++
->  1 file changed, 106 insertions(+)
->
-> diff --git a/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi b/arch/arm6=
-4/boot/dts/renesas/rzg3e-smarc-som.dtsi
-> index f99a09d04ddd..4b4c7f3381ad 100644
-> --- a/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
-> +++ b/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
-> @@ -26,6 +26,8 @@ / {
->         compatible =3D "renesas,rzg3e-smarcm", "renesas,r9a09g047e57", "r=
-enesas,r9a09g047";
->
->         aliases {
-> +               ethernet0 =3D &eth0;
-> +               ethernet1 =3D &eth1;
->                 i2c2 =3D &i2c2;
->                 mmc0 =3D &sdhi0;
->                 mmc2 =3D &sdhi2;
-> @@ -77,6 +79,74 @@ &audio_extal_clk {
->         clock-frequency =3D <48000000>;
->  };
->
-> +&eth0 {
-> +       phy-handle =3D <&phy0>;
-> +       phy-mode =3D "rgmii-id";
-> +
-> +       pinctrl-0 =3D <&eth0_pins>;
-> +       pinctrl-names =3D "default";
-> +       status =3D "okay";
-> +
-> +       mdio {
-> +               #address-cells =3D <1>;
-> +               #size-cells =3D <0>;
-> +               compatible =3D "snps,dwmac-mdio";
-> +
-> +               phy0: ethernet-phy@7 {
-> +                       compatible =3D "ethernet-phy-id0022.1640",
-> +                                    "ethernet-phy-ieee802.3-c22";
-> +                       reg =3D <7>;
-> +                       interrupts-extended =3D <&icu 3 IRQ_TYPE_LEVEL_LO=
-W>;
-> +                       rxc-skew-psec =3D <1400>;
-> +                       txc-skew-psec =3D <1400>;
-> +                       rxdv-skew-psec =3D <0>;
-> +                       txdv-skew-psec =3D <0>;
-> +                       rxd0-skew-psec =3D <0>;
-> +                       rxd1-skew-psec =3D <0>;
-> +                       rxd2-skew-psec =3D <0>;
-> +                       rxd3-skew-psec =3D <0>;
-> +                       txd0-skew-psec =3D <0>;
-> +                       txd1-skew-psec =3D <0>;
-> +                       txd2-skew-psec =3D <0>;
-> +                       txd3-skew-psec =3D <0>;
-> +               };
-> +       };
-> +};
-> +
-> +&eth1 {
-> +       phy-handle =3D <&phy1>;
-> +       phy-mode =3D "rgmii-id";
-> +
-> +       pinctrl-0 =3D <&eth1_pins>;
-> +       pinctrl-names =3D "default";
-> +       status =3D "okay";
-> +
-> +       mdio {
-> +               #address-cells =3D <1>;
-> +               #size-cells =3D <0>;
-> +               compatible =3D "snps,dwmac-mdio";
-> +
-> +               phy1: ethernet-phy@7 {
-> +                       compatible =3D "ethernet-phy-id0022.1640",
-> +                                    "ethernet-phy-ieee802.3-c22";
-> +                       reg =3D <7>;
-> +                       interrupts-extended =3D <&icu 16 IRQ_TYPE_LEVEL_L=
-OW>;
-> +                       rxc-skew-psec =3D <1400>;
-> +                       txc-skew-psec =3D <1400>;
-> +                       rxdv-skew-psec =3D <0>;
-> +                       txdv-skew-psec =3D <0>;
-> +                       rxd0-skew-psec =3D <0>;
-> +                       rxd1-skew-psec =3D <0>;
-> +                       rxd2-skew-psec =3D <0>;
-> +                       rxd3-skew-psec =3D <0>;
-> +                       txd0-skew-psec =3D <0>;
-> +                       txd1-skew-psec =3D <0>;
-> +                       txd2-skew-psec =3D <0>;
-> +                       txd3-skew-psec =3D <0>;
-> +               };
-> +       };
-> +};
-> +
->  &gpu {
->         status =3D "okay";
->         mali-supply =3D <&reg_vdd0p8v_others>;
-> @@ -103,6 +173,42 @@ raa215300: pmic@12 {
->  };
->
->  &pinctrl {
-> +       eth0_pins: eth0 {
-> +               pinmux =3D <RZG3E_PORT_PINMUX(A, 1, 1)>, /* MDC */
-> +                        <RZG3E_PORT_PINMUX(A, 0, 1)>, /* MDIO */
-> +                        <RZG3E_PORT_PINMUX(C, 2, 15)>, /* PHY_INTR (IRQ2=
-) */
-> +                        <RZG3E_PORT_PINMUX(C, 1, 1)>, /* RXD3 */
-> +                        <RZG3E_PORT_PINMUX(C, 0, 1)>, /* RXD2 */
-> +                        <RZG3E_PORT_PINMUX(B, 7, 1)>, /* RXD1 */
-> +                        <RZG3E_PORT_PINMUX(B, 6, 1)>, /* RXD0 */
-> +                        <RZG3E_PORT_PINMUX(B, 0, 1)>, /* RXC */
-> +                        <RZG3E_PORT_PINMUX(A, 2, 1)>, /* RX_CTL */
-> +                        <RZG3E_PORT_PINMUX(B, 5, 1)>, /* TXD3 */
-> +                        <RZG3E_PORT_PINMUX(B, 4, 1)>, /* TXD2 */
-> +                        <RZG3E_PORT_PINMUX(B, 3, 1)>, /* TXD1 */
-> +                        <RZG3E_PORT_PINMUX(B, 2, 1)>, /* TXD0 */
-> +                        <RZG3E_PORT_PINMUX(B, 1, 1)>, /* TXC */
-> +                        <RZG3E_PORT_PINMUX(A, 3, 1)>; /* TX_CTL */
-like RZ/V2H on RZ/G3E PFC_OEN BITS(0,1) need to be configured based on
-RGMII/MII mode?
+The idea behind this comes out of real workloads in production. We use a
+user-level stack with xsk support to accelerate sending packets and
+minimize triggering syscall. When the packets are aggregated, it's not
+hard to hit the upper bound (namely, 32). The moment user-space stack
+fetches the -EAGAIN error number passed from sendto(), it will loop to try
+again until all the expected descs from tx ring are sent out to the driver.
+Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequencies of
+sendto(). Besides, applications leveraging this setsockopt can adjust
+its proper value in time after noticing the upper bound issue happening.
 
-Cheers,
-Prabhakar
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+V3
+Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonxing@gmail.com/
+1. use a per-socket control (suggested by Stanislav)
+2. unify both definitions into one
+3. support setsockopt and getsockopt
+4. add more description in commit message
 
-> +       };
-> +
-> +       eth1_pins: eth1 {
-> +               pinmux =3D <RZG3E_PORT_PINMUX(D, 1, 1)>, /* MDC */
-> +                        <RZG3E_PORT_PINMUX(D, 0, 1)>, /* MDIO */
-> +                        <RZG3E_PORT_PINMUX(F, 2, 15)>, /* PHY_INTR (IRQ1=
-5) */
-> +                        <RZG3E_PORT_PINMUX(F, 1, 1)>, /* RXD3 */
-> +                        <RZG3E_PORT_PINMUX(F, 0, 1)>, /* RXD2 */
-> +                        <RZG3E_PORT_PINMUX(E, 7, 1)>, /* RXD1 */
-> +                        <RZG3E_PORT_PINMUX(E, 6, 1)>, /* RXD0 */
-> +                        <RZG3E_PORT_PINMUX(E, 0, 1)>, /* RXC */
-> +                        <RZG3E_PORT_PINMUX(D, 2, 1)>, /* RX_CTL */
-> +                        <RZG3E_PORT_PINMUX(E, 5, 1)>, /* TXD3 */
-> +                        <RZG3E_PORT_PINMUX(E, 4, 1)>, /* TXD2 */
-> +                        <RZG3E_PORT_PINMUX(E, 3, 1)>, /* TXD1 */
-> +                        <RZG3E_PORT_PINMUX(E, 2, 1)>, /* TXD0 */
-> +                        <RZG3E_PORT_PINMUX(E, 1, 1)>, /* TXC */
-> +                        <RZG3E_PORT_PINMUX(D, 3, 1)>; /* TX_CTL */
-> +       };
-> +
->         i2c2_pins: i2c {
->                 pinmux =3D <RZG3E_PORT_PINMUX(3, 4, 1)>, /* SCL2 */
->                          <RZG3E_PORT_PINMUX(3, 5, 1)>; /* SDA2 */
-> --
-> 2.25.1
->
->
+V2
+Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxing@gmail.com/
+1. use a per-netns sysctl knob
+2. use sysctl_xsk_max_tx_budget to unify both definitions.
+---
+ include/net/xdp_sock.h            |  3 ++-
+ include/uapi/linux/if_xdp.h       |  1 +
+ net/xdp/xsk.c                     | 36 +++++++++++++++++++++++++------
+ tools/include/uapi/linux/if_xdp.h |  1 +
+ 4 files changed, 34 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index e8bd6ddb7b12..8eecafad92c0 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -65,11 +65,12 @@ struct xdp_sock {
+ 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
+ 	struct list_head tx_list;
+ 	/* record the number of tx descriptors sent by this xsk and
+-	 * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity needs
++	 * when it exceeds max_tx_budget, an opportunity needs
+ 	 * to be given to other xsks for sending tx descriptors, thereby
+ 	 * preventing other XSKs from being starved.
+ 	 */
+ 	u32 tx_budget_spent;
++	u32 max_tx_budget;
+ 
+ 	/* Statistics */
+ 	u64 rx_dropped;
+diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+index 44f2bb93e7e6..07c6d21c2f1c 100644
+--- a/include/uapi/linux/if_xdp.h
++++ b/include/uapi/linux/if_xdp.h
+@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_MAX_TX_BUDGET		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 72c000c0ae5f..7c47f665e9d1 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -33,9 +33,6 @@
+ #include "xdp_umem.h"
+ #include "xsk.h"
+ 
+-#define TX_BATCH_SIZE 32
+-#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
+-
+ void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+ {
+ 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
+@@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+ 	rcu_read_lock();
+ again:
+ 	list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+-		if (xs->tx_budget_spent >= MAX_PER_SOCKET_BUDGET) {
++		int max_budget = READ_ONCE(xs->max_tx_budget);
++
++		if (xs->tx_budget_spent >= max_budget) {
+ 			budget_exhausted = true;
+ 			continue;
+ 		}
+@@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ static int __xsk_generic_xmit(struct sock *sk)
+ {
+ 	struct xdp_sock *xs = xdp_sk(sk);
+-	u32 max_batch = TX_BATCH_SIZE;
++	u32 max_budget = READ_ONCE(xs->max_tx_budget);
+ 	bool sent_frame = false;
+ 	struct xdp_desc desc;
+ 	struct sk_buff *skb;
+@@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+ 		goto out;
+ 
+ 	while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+-		if (max_batch-- == 0) {
++		if (max_budget-- == 0) {
+ 			err = -EAGAIN;
+ 			goto out;
+ 		}
+@@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
+ 		mutex_unlock(&xs->mutex);
+ 		return err;
+ 	}
++	case XDP_MAX_TX_BUDGET:
++	{
++		unsigned int budget;
++
++		if (optlen < sizeof(budget))
++			return -EINVAL;
++		if (copy_from_sockptr(&budget, optval, sizeof(budget)))
++			return -EFAULT;
++
++		WRITE_ONCE(xs->max_tx_budget, budget);
++		return 0;
++	}
+ 	default:
+ 		break;
+ 	}
+@@ -1588,6 +1599,18 @@ static int xsk_getsockopt(struct socket *sock, int level, int optname,
+ 
+ 		return 0;
+ 	}
++	case XDP_MAX_TX_BUDGET:
++	{
++		unsigned int budget = READ_ONCE(xs->max_tx_budget);
++
++		if (copy_to_user(optval, &budget, sizeof(budget)))
++			return -EFAULT;
++		if (put_user(sizeof(budget), optlen))
++			return -EFAULT;
++
++		return 0;
++	}
++
+ 	default:
+ 		break;
+ 	}
+@@ -1734,6 +1757,7 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
+ 
+ 	xs = xdp_sk(sk);
+ 	xs->state = XSK_READY;
++	xs->max_tx_budget = 32;
+ 	mutex_init(&xs->mutex);
+ 
+ 	INIT_LIST_HEAD(&xs->map_list);
+diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
+index 44f2bb93e7e6..07c6d21c2f1c 100644
+--- a/tools/include/uapi/linux/if_xdp.h
++++ b/tools/include/uapi/linux/if_xdp.h
+@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_MAX_TX_BUDGET		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+-- 
+2.43.5
+
 
