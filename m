@@ -1,178 +1,184 @@
-Return-Path: <netdev+bounces-199601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64EE6AE0EF0
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:19:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE24FAE0F03
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0213716AF38
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 21:19:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 857B417E6F7
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 21:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4633C25E808;
-	Thu, 19 Jun 2025 21:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADF925E839;
+	Thu, 19 Jun 2025 21:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="E+cJDysw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eLn4/fEN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72660248F7C
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 21:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EEC1FBE8B;
+	Thu, 19 Jun 2025 21:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750367943; cv=none; b=bV9k2UgRTMgDkvSzYRokX8UvwqRCICAaNxPzdUmoOYKy3fiUT+UB8Wy3M+3CrEPUKjXV1OBWv+xYH3dmqbanQPFFQUGch2yZVYXlC1nob/lb1xZZSfBw8Bo1rJ7tG43/y70kWQjqC+Ai02kMHY9Hn5cIOZz+WoePAWZokrZwc5s=
+	t=1750368353; cv=none; b=Jq5Ngz9VhErFGpF+naJ9aWuYaWx1EwSisWpzPu5AOEkA5keminAG1lbfsuY6gzQjZ4BmHamFACkwJ0POpcTrucVOH9gPhzUat5yF1bJEXnaBZors2esKcs089MgaMrBH28xwn3CtSH8c3TRLz9fbguDXKRejb/lRHSNQvAvGaYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750367943; c=relaxed/simple;
-	bh=43N9xSLqG8Mvf1evULiPV3dhUbzzkfegXMMlVgJmLmY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VIsvIGMXvW6VJic9vL4wJ3v94v+b8b0kUNEpMej2jah+oTe6woi2shRJu2Ro18x8MhtOpUVI297bd71yq1GfzTK6b8GOYM5SFRWsfYETM/QSVN2DsNY4CWAVZWjNtlPk3whSka1ys6n4rKtlokH4mihbRNEn1q1NNu0Bw8tzrP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=E+cJDysw; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e81f8679957so1131478276.2
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 14:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1750367940; x=1750972740; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f7reZQjMhm+dclXhsOljn44+uNt88uw72bwAiTZN+zs=;
-        b=E+cJDyswwCd3O1ohVQNJiyY5eOa0jtJG+bh6ZhltL81dbG/GCbHysWF05E4h1ERuRy
-         5m2LKxrLUkSDOCU4dYry+AJq2deT5henQP2QO7rE1MdJgkvzeKRraS1rHCfYuEqOeyl+
-         Hjlc5RK+v4pBI25h7GsrGJLHLw0QRMB/XjYXeFZlNnTt63ug9uX7HYVvVmv3Kx3LgCdA
-         77CKL4E6RMTbTmX2PRTgA4aski0Xm2/BJ+oHVAsTk140fbd0RZ1UrH+RiBIPT9d6L24d
-         KOOFetthlX5SvcTG4XH1ARSDK6BjU5zdRU5XNwSfv9oZOpqzmC3ML9AyGmBjlXX2yJpY
-         ZeOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750367940; x=1750972740;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f7reZQjMhm+dclXhsOljn44+uNt88uw72bwAiTZN+zs=;
-        b=MPaANIP0oXzVoCXJ31mLQ+kD5/PJSZgXCBHqFxp9b3M8dLRXgojkkwF5IBcLjaa+pw
-         p/pwSUaoWx7gr3kZfGsju+MWFAXE2QXgU8zPS0y/WMKAH7O8UtOyUqkQLQad04jsLdxh
-         Mlqb1iIdvDnXNZS7ebN1yiMgFDDilMyR8IfdoRGpuENUxwEDPNyhbueYwfDkXnPaWFPv
-         cqi17QNMV6191YnTM8lttgdnKlXtyg+8T8SXk66qL5FMLwtUrC8Thr4eSy9csKHbxfBx
-         SolChNMGyuSllix32hcB05guHSe5HIvYg0bVdkj/B3D/8zpshfaQ2FRDfcQbHNweKk5V
-         /mHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVPpdRQw9BuqqUVgCL21wAGn1L97wZ0OEq9i01e/3ZCvxlU7zbB06jNdmaPdaG9Wa2e7foUpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywfiU47OkqhLVrqyUmxNs+yn6PLhl/pszA5yYFgv8qc1KGQkh7
-	g3VbQXhJNVFgtOneLF338zkJfeksplmRdHc6C1g0u5QIXUXW3oEMYWbbfb1kIBWUrBf37VPWRby
-	XyNcXz9KQgxNGoD+Ud3KTzWLJldGgTIeH5L2LT4+d
-X-Gm-Gg: ASbGncsiteusCaqf/5HBpAzY4jb8eq5ZuiXF8WNdeVmN0+bqCP8xIek65ptBLzsDW6Z
-	+qu2fqZaovVpVc728rzB/G73PxyC2bwEaqqjGdsDOakIPZf86RSVC6o4aXBAV1Us7ugP6ZHuP3I
-	uJ227eO24eaZ3QFEF43KfbvZkxT70ihrYnMhCVwezU/Fc=
-X-Google-Smtp-Source: AGHT+IGuYWqaT27fYmWdeDZ9lvr/78HUoiTAJ+pb8mrK6LB7RxNHDSBjtW66gCKrmHYUPLvXFfpMQPNhl/c9KrbuTKM=
-X-Received: by 2002:a05:690c:610f:b0:70e:1aa1:63b4 with SMTP id
- 00721157ae682-712c65125d6mr9891227b3.38.1750367940400; Thu, 19 Jun 2025
- 14:19:00 -0700 (PDT)
+	s=arc-20240116; t=1750368353; c=relaxed/simple;
+	bh=A8Dz1kV8B/vKnxifg5brF8+6N+EQZvca4FFY51ivExQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A5YgcmzJs70OVLl7K7mUxLzArzVL1JuUgG83NkVSHGmvi4hN7phHisG2meQi56XG8SSzEnZ723rtjXXgsjv9rAW59GkSWwXY1xysek63TsOMnhv6SscOi2d7CJlmvLmgJu6xB4qFTwoh3evfN7YzMYuMPCFH5uoNV53e8VDKV5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eLn4/fEN; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750368352; x=1781904352;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=A8Dz1kV8B/vKnxifg5brF8+6N+EQZvca4FFY51ivExQ=;
+  b=eLn4/fEN6Oldy4OWJD9FOHGAfQMZZdezJpb52BRUMWcU0SaR7loiYqvi
+   rOI8jthd6JKy23PO6k3FajjPbBgmbRIsjLv55xhSRt3ht83uA+TcuZPmp
+   2IwB85auNoaBY3w68nXUR1VcJlcQ5ArSVZSPO3yC49g9eHHIB21VcMmRx
+   8bt0kMBlbHe9g8CqgT1Dv68gEOjxBokC1Tis96Bodt+A4xPGfEKh/M3zp
+   FoAd0nWovFz7nbNbPE56BKsPkQNRcd3PiwFpjZgNmxcGXqKkZ0WVsGD6Y
+   fdpyEcLjvWuc8NAQgxV4SM+cSOvl7Ev/2zSvzt5GaacvIO5+nNDtq3brL
+   w==;
+X-CSE-ConnectionGUID: k4OcYtPoTnOMVpdu6nK1dQ==
+X-CSE-MsgGUID: V4DpGrmtR0qF/LW3yLU6tg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="52706633"
+X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
+   d="scan'208";a="52706633"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 14:25:52 -0700
+X-CSE-ConnectionGUID: Kq4gUjf9S5GnDsjAJUnoCA==
+X-CSE-MsgGUID: Ya1tim+nS/iTRF9s2RnD6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
+   d="scan'208";a="155298484"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 19 Jun 2025 14:25:47 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uSMlU-000L7a-2Y;
+	Thu, 19 Jun 2025 21:25:44 +0000
+Date: Fri, 20 Jun 2025 05:25:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [net-next, 08/10] bng_en: Add irq allocation support
+Message-ID: <202506200530.jiD9Txum-lkp@intel.com>
+References: <20250618144743.843815-9-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250428195022.24587-2-stephen.smalley.work@gmail.com>
- <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
- <CAHC9VhQyDX+NgWipgm5DGMewfVTBe3DkLbe_AANRiuAj40bA1w@mail.gmail.com> <6797b694-6c40-4806-9541-05ce6a0b07fc@oracle.com>
-In-Reply-To: <6797b694-6c40-4806-9541-05ce6a0b07fc@oracle.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 19 Jun 2025 17:18:49 -0400
-X-Gm-Features: AX0GCFu9kjUfnfMnqfxH4agmkNzznUIDL4onDD-B6Nh-8MzRljESBgn1ZFaZ0Ts
-Message-ID: <CAHC9VhQsK_XpJ-bbt6AXM4fk30huhrPvvMSEuHHTPb=eJZwoUA@mail.gmail.com>
-Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
- interface
-To: Anna Schumaker <anna.schumaker@oracle.com>
-Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Casey Schaufler <casey@schaufler-ca.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Simon Horman <horms@kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>, linux-nfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	selinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618144743.843815-9-vikas.gupta@broadcom.com>
 
-On Tue, May 27, 2025 at 5:03=E2=80=AFPM Anna Schumaker
-<anna.schumaker@oracle.com> wrote:
-> On 5/20/25 5:31 PM, Paul Moore wrote:
-> > On Tue, Apr 29, 2025 at 7:34=E2=80=AFPM Paul Moore <paul@paul-moore.com=
-> wrote:
-> >> On Mon, Apr 28, 2025 at 4:15=E2=80=AFPM Stephen Smalley
-> >> <stephen.smalley.work@gmail.com> wrote:
-> >>>
-> >>> Update the security_inode_listsecurity() interface to allow
-> >>> use of the xattr_list_one() helper and update the hook
-> >>> implementations.
-> >>>
-> >>> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.s=
-malley.work@gmail.com/
-> >>>
-> >>> Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
-> >>> ---
-> >>> This patch is relative to the one linked above, which in theory is on
-> >>> vfs.fixes but doesn't appear to have been pushed when I looked.
-> >>>
-> >>>  fs/nfs/nfs4proc.c             | 10 ++++++----
-> >>>  fs/xattr.c                    | 19 +++++++------------
-> >>>  include/linux/lsm_hook_defs.h |  4 ++--
-> >>>  include/linux/security.h      |  5 +++--
-> >>>  net/socket.c                  | 17 +++++++----------
-> >>>  security/security.c           | 16 ++++++++--------
-> >>>  security/selinux/hooks.c      | 10 +++-------
-> >>>  security/smack/smack_lsm.c    | 13 ++++---------
-> >>>  8 files changed, 40 insertions(+), 54 deletions(-)
-> >>
-> >> Thanks Stephen.  Once we get ACKs from the NFS, netdev, and Smack
-> >> folks I can pull this into the LSM tree.
-> >
-> > Gentle ping for Trond, Anna, Jakub, and Casey ... can I get some ACKs
-> > on this patch?  It's a little late for the upcoming merge window, but
-> > I'd like to merge this via the LSM tree after the merge window closes.
->
-> For the NFS change:
->     Acked-by: Anna Schumaker <anna.schumaker@oracle.com>
+Hi Vikas,
 
-Hi Anna,
+kernel test robot noticed the following build warnings:
 
-Thanks for reviewing the patch.  Unfortunately when merging the patch
-today and fixing up some merge conflicts I bumped into an odd case in
-the NFS space and I wanted to check with you on how you would like to
-resolve it.
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.16-rc2 next-20250619]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Commit 243fea134633 ("NFSv4.2: fix listxattr to return selinux
-security label")[1] adds a direct call to
-security_inode_listsecurity() in nfs4_listxattr(), despite the
-existing nfs4_listxattr_nfs4_label() call which calls into the same
-LSM hook, although that call is conditional on the server supporting
-NFS_CAP_SECURITY_LABEL.  Based on a quick search, it appears the only
-caller for nfs4_listxattr_nfs4_label() is nfs4_listxattr() so I'm
-wondering if there isn't some room for improvement here.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20250618144743.843815-9-vikas.gupta%40broadcom.com
+patch subject: [net-next, 08/10] bng_en: Add irq allocation support
+config: parisc-randconfig-r073-20250619 (https://download.01.org/0day-ci/archive/20250620/202506200530.jiD9Txum-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
 
-I think there are two obvious options, and I'm curious about your
-thoughts on which of these you would prefer, or if there is another
-third option that you would like to see merged.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506200530.jiD9Txum-lkp@intel.com/
 
-Option #1:
-Essentially back out commit 243fea134633, removing the direct LSM call
-in nfs4_listxattr() and relying on the nfs4_listxattr_nfs4_label() for
-the LSM/SELinux xattrs.  I think we would want to remove the
-NFS_CAP_SECURITY_LABEL check and build nfs4_listxattr_nfs4_label()
-regardless of CONFIG_NFS_V4_SECURITY_LABEL.
+smatch warnings:
+drivers/net/ethernet/broadcom/bnge/bnge_resc.c:347 bnge_alloc_irqs() warn: unsigned 'irqs_demand' is never less than zero.
 
-Option #2:
-Remove nfs4_listxattr_nfs4_label() entirely and keep the direct LSM
-call in nfs4_listxattr(), with the required changes for this patch.
+vim +/irqs_demand +347 drivers/net/ethernet/broadcom/bnge/bnge_resc.c
 
-Thoughts?
+   329	
+   330	int bnge_alloc_irqs(struct bnge_dev *bd)
+   331	{
+   332		u16 aux_msix, tx_cp, num_entries;
+   333		u16 irqs_demand, max, min = 1;
+   334		int i, rc = 0;
+   335	
+   336		irqs_demand = bnge_nqs_demand(bd);
+   337		max = bnge_get_max_func_irqs(bd);
+   338		if (irqs_demand > max)
+   339			irqs_demand = max;
+   340	
+   341		if (!(bd->flags & BNGE_EN_SHARED_CHNL))
+   342			min = 2;
+   343	
+   344		irqs_demand = pci_alloc_irq_vectors(bd->pdev, min, irqs_demand,
+   345						    PCI_IRQ_MSIX);
+   346		aux_msix = bnge_aux_get_msix(bd);
+ > 347		if (irqs_demand < 0 || irqs_demand < aux_msix) {
+   348			rc = -ENODEV;
+   349			goto err_free_irqs;
+   350		}
+   351	
+   352		num_entries = irqs_demand;
+   353		if (pci_msix_can_alloc_dyn(bd->pdev))
+   354			num_entries = max;
+   355		bd->irq_tbl = kcalloc(num_entries, sizeof(*bd->irq_tbl), GFP_KERNEL);
+   356		if (!bd->irq_tbl) {
+   357			rc = -ENOMEM;
+   358			goto err_free_irqs;
+   359		}
+   360	
+   361		for (i = 0; i < irqs_demand; i++)
+   362			bd->irq_tbl[i].vector = pci_irq_vector(bd->pdev, i);
+   363	
+   364		bd->irqs_acquired = irqs_demand;
+   365		/* Reduce rings based upon num of vectors allocated.
+   366		 * We dont need to consider NQs as they have been calculated
+   367		 * and must be more than irqs_demand.
+   368		 */
+   369		rc = bnge_adjust_rings(bd, &bd->rx_nr_rings,
+   370				       &bd->tx_nr_rings,
+   371				       irqs_demand - aux_msix, min == 1);
+   372		if (rc)
+   373			goto err_free_irqs;
+   374	
+   375		tx_cp = bnge_num_tx_to_cp(bd, bd->tx_nr_rings);
+   376		bd->nq_nr_rings = (min == 1) ?
+   377			max_t(u16, tx_cp, bd->rx_nr_rings) :
+   378			tx_cp + bd->rx_nr_rings;
+   379	
+   380		/* Readjust tx_nr_rings_per_tc */
+   381		if (!bd->num_tc)
+   382			bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
+   383	
+   384		return 0;
+   385	
+   386	err_free_irqs:
+   387		dev_err(bd->dev, "Failed to allocate IRQs err = %d\n", rc);
+   388		bnge_free_irqs(bd);
+   389		return rc;
+   390	}
+   391	
 
-[1] https://lore.kernel.org/all/20250425180921.86702-1-okorniev@redhat.com/
---=20
-paul-moore.com
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
