@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-199401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD53AE0284
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:19:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A27AE0287
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49DD31BC4C30
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0006C5A1E18
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571E6221FC1;
-	Thu, 19 Jun 2025 10:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2F42222A8;
+	Thu, 19 Jun 2025 10:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfABfO1X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HucUzwXD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FBE2045B1;
-	Thu, 19 Jun 2025 10:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D30121B9C3;
+	Thu, 19 Jun 2025 10:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750328374; cv=none; b=axbEcMFtzmtgk+HrO83S0V6lvO/sggNeDr8nrNDg2HHaQ4razeTWuYJgN6W5Shelbgj3rZeYKtYw2Re5G1IgvFYm0YU3JzK5pV7MFmhwO62HW67pA1chaJsbEwziuc0R8be43lIM1IdP3BOJPUJYO9HSWQu5+mTpIUYZz3T9GYQ=
+	t=1750328404; cv=none; b=ikf4jMth9TdaQ80T4r7qztM1aXZm5KVpeqmFl5ogfi88kWL+RHEQRI0+KN9Gld6/KNN5bDJfB1R17+XIuH6fF5urqTFpAZa90j74oaeTVmfy2oJNjtaNqMtzpgtT1KHV8CGgJ/Gmo8xWL3cOAPJp1b4LRYa7ckT4H0/EMmTJy4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750328374; c=relaxed/simple;
-	bh=TFp8r10SI9qs2FkfzjhWNknAgkyWJ+OG/4m+bbmfhzk=;
+	s=arc-20240116; t=1750328404; c=relaxed/simple;
+	bh=/xxxdOXxClv+4BlH6eXnvPuhgcqk/6z8rlUMU8yyyJY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l6GpdS6sB7qsD2qgmHr/4xXt3UdpO25YN10iPC9u/DXuUD1IQTRI4UpKAhF4qjrxv9Lj5dFJvojCuZ/Lf8wxsU4vrXvkqidVXpmKFoT/DGz4tRbcJgjKJ84cfex95qN9puL33QoSVg1Ss/E59noLV9ShIdq8qXX+gLDUfW/uLuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfABfO1X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03FBCC4CEEA;
-	Thu, 19 Jun 2025 10:19:31 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=rv6zqVbGWUhIItQ10xRuQZLf1MxlS2lV3ChZSSv5yYnufCSAIV6tgmn5Ym9YKGKI4zRuxOf/HQnP+4UeKWgDA56RnCk41vByPWLGOSHzikt49xT4GQ47xXPmyzNDG9jja1Kr0oP+/0gM2mXLgGVwNX5kLwy+0/2M/rnfz3R1XRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HucUzwXD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38A7EC4CEED;
+	Thu, 19 Jun 2025 10:20:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750328373;
-	bh=TFp8r10SI9qs2FkfzjhWNknAgkyWJ+OG/4m+bbmfhzk=;
+	s=k20201202; t=1750328404;
+	bh=/xxxdOXxClv+4BlH6eXnvPuhgcqk/6z8rlUMU8yyyJY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FfABfO1XIqtf7KGj/5ngqcFzZKbitq+SeZIVFHF2gZUGBoyNcNayUNwFQMm5x04IX
-	 +Ii+ev4k0tjABdat5ReX41nuK7u7thzwEjcS5a7I49OrseK1ztIRmJUTn/NVR467yG
-	 kUPS75ydQ7srPjtgNFvFtw0yR9+7X4MaN1spsNgLVqIkLDJZJEgEtQz8xlbT12DDPY
-	 2hwuxd69bb1wDs9vLdAHADsYJlqa/qS1nP47T9f77eT8MdrEdZsC1oxjLMdG/kIpUR
-	 ojXC3nTupjkK/rY7qxt+lCg+Vm4qnob1nZsXdwm3aL/24Zuo08RpghdmPkr5rt54d9
-	 e4pLtUqQgCj7Q==
-Date: Thu, 19 Jun 2025 11:19:29 +0100
+	b=HucUzwXDrAJOTLh0mIepk0Fovd/rehk1tTA/bZpmFBxAL5M2v9eewhUDCQy5rtBZG
+	 jjRdVo6fKh70vGIWDSsvJcuJKGWzZj6B2lzS6twwxr6ZbLpKRvpLddVGQOB1M6LCuu
+	 HYSp3fxN+TIwbc6Vzknhm3GphuOlxx9e1rOxXuJXIb5gpQWSguP34RDTz6THjUrwCF
+	 KzM86t8VanCyjG5H7WyOwIxTr7I8/6HD0NB+km9pysrWFP9pzymJ9wUwEJz7p/4WJN
+	 r7+4akkwqp+gsMPP52boiQQLRrERbO/caxHWhG3aJO7wzn/SsaXxDsrTESEQmgl4OM
+	 is2trKMcE3N7w==
+Date: Thu, 19 Jun 2025 11:20:00 +0100
 From: Simon Horman <horms@kernel.org>
 To: Breno Leitao <leitao@debian.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -49,11 +49,10 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	jv@jvosburgh.ne, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, gustavold@gmail.com
-Subject: Re: [PATCH 2/3] netpoll: extract IPv4 address retrieval into helper
- function
-Message-ID: <20250619101929.GF1699@horms.kernel.org>
+Subject: Re: [PATCH 3/3] netpoll: Extract IPv6 address retrieval function
+Message-ID: <20250619102000.GG1699@horms.kernel.org>
 References: <20250618-netpoll_ip_ref-v1-0-c2ac00fe558f@debian.org>
- <20250618-netpoll_ip_ref-v1-2-c2ac00fe558f@debian.org>
+ <20250618-netpoll_ip_ref-v1-3-c2ac00fe558f@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,16 +61,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250618-netpoll_ip_ref-v1-2-c2ac00fe558f@debian.org>
+In-Reply-To: <20250618-netpoll_ip_ref-v1-3-c2ac00fe558f@debian.org>
 
-On Wed, Jun 18, 2025 at 02:32:46AM -0700, Breno Leitao wrote:
-> Move the IPv4 address retrieval logic from netpoll_setup() into a
-> separate netpoll_take_ipv4() function to improve code organization
-> and readability. This change consolidates the IPv4-specific logic
-> and error handling into a dedicated function while maintaining
-> the same functionality.
+On Wed, Jun 18, 2025 at 02:32:47AM -0700, Breno Leitao wrote:
+> Extract the IPv6 address retrieval logic from netpoll_setup() into
+> a dedicated helper function netpoll_take_ipv6() to improve code
+> organization and readability.
 > 
-> No functional changes.
+> The function handles obtaining the local IPv6 address from the
+> network device, including proper address type matching between
+> local and remote addresses (link-local vs global), and includes
+> appropriate error handling when IPv6 is not supported or no
+> suitable address is available.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 
