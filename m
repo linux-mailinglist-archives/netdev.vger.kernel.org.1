@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-199474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5F0AE06E3
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:23:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEB22AE06E4
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B6C3B1789
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:21:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF763B2058
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4D42505A9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A4C2505D6;
 	Thu, 19 Jun 2025 13:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="xHaiROar"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="IiGc5phL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBB524DCF6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7C324DCF7;
 	Thu, 19 Jun 2025 13:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750339305; cv=none; b=Ps2tkiFvkkXD5HEfLeMJHQsA03z7yxeLVSVi+1fzEbxJfqv4rffyjNpFo0xrUrAoy6SgWYHqKulwZhnqe5/gxWWEYARRBNBussXt8q++OIpkGVzep5+ggD7UR4x6NoO0Ur+uKEiFMXfLd+lzYH+R0gpmrQsz97Lm+x1OfHP2SPg=
+	t=1750339305; cv=none; b=HbYvr5nFZEVcxkPhEXx0ue20fw0dW19+1BDaV291TF9vRcCCoX91tfT0BCSMuHtT7JEBoTxxuEYdjKs1qYRJSJV8qb85jcBZvkYrmd3A+i3smDIoefPlm38tnnMNCY6alv4QqglFTIWQpQlyyTUzVxxkDsDrmjb4kobP5pbxSnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750339305; c=relaxed/simple;
-	bh=oKulFATTRQQZBNnM1v+cHfttUexHr0J5m9zujzySsQI=;
+	bh=tiLqnmjKL1xeScp1HZ8XPoZ3v5bsYgRhdhmsWJvgaWo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LijoQGN3Qu5JIYVTikBVgJZp++npCuHYfH7Jv3CQIzK9lW3XBEy1+HMqDyLjAE+bdkzTa4xUzxvR1vC7rQAeOnqnp4T/3487OBkEAWMDWtA9ZCJBRhlyparig8JvMJi1On56I305a5pLpX2Css5DAoGnFXJLbdEQ3fCOY1kJvck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=xHaiROar; arc=none smtp.client-ip=134.0.28.12
+	 MIME-Version; b=jTJ+HzKCdJUFB8f1Wpxl0M7mnNVx6KljeNsr47sqEuL9QGXl5sa+mhA/dU9fbLILiHZa0cUboxw6AOKTO/dabXHYr/tWxXMU6Mf8qitpaA17Vt/DbAg7COwjstZMZ29wM5M97/YHJk8pEd6L8eEuqPj+DCKQhwOgN9eQ73ywho0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=IiGc5phL; arc=none smtp.client-ip=134.0.28.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
 Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout2.routing.net (Postfix) with ESMTP id 3150D603E2;
+	by mxout3.routing.net (Postfix) with ESMTP id 7241361634;
 	Thu, 19 Jun 2025 13:21:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
 	s=20200217; t=1750339295;
@@ -40,13 +40,13 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/TJe0GtibYNSR3TlB4zrDfpZgRHLE4jCl9Gxezu9Oew=;
-	b=xHaiROarPd6WYyhOgV1oAn9fe8HfGC0vZhhuiQ/bfA7DQDhjGGFRwlqnVTke8GSfNuMX9B
-	ZaQvX+xp5uV5Ppcm8mfNOetNsDVtMnxNioem29dwd44C/MAWGmE1WqHEV6klYiU9rbGmok
-	ipPGXglbjHy43h98B3ne2it90Q/IOjI=
+	bh=HS2lUJltRvHPUIa4JQpyFGxD+jJplBBokp6RSnTT/O0=;
+	b=IiGc5phLz6zEsG8qlLtRtYkeD0bxYWoox9fQ+43vKyLGjgVxaEeH1iHA5zfIgBSd1ZCEk4
+	V1ubV+Y3pQfoZx2RbzOsF54ca/gKjmr8j71jJEn7E1xN1FSAhgAMzMdGx+CInY0Za374fU
+	jCekEa0SyjdgSt9Tu9DYJrfkR0itzcU=
 Received: from frank-u24.. (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id E95351226B5;
-	Thu, 19 Jun 2025 13:21:34 +0000 (UTC)
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 395D21226AA;
+	Thu, 19 Jun 2025 13:21:35 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
 To: Felix Fietkau <nbd@nbd.name>,
 	Sean Wang <sean.wang@mediatek.com>,
@@ -66,9 +66,9 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	Simon Horman <horms@kernel.org>,
 	Daniel Golle <daniel@makrotopia.org>,
 	arinc.unal@arinc9.com
-Subject: [net-next v6 3/4] net: ethernet: mtk_eth_soc: skip first IRQ if not used
-Date: Thu, 19 Jun 2025 15:21:23 +0200
-Message-ID: <20250619132125.78368-4-linux@fw-web.de>
+Subject: [net-next v6 4/4] net: ethernet: mtk_eth_soc: only use legacy mode on missing IRQ name
+Date: Thu, 19 Jun 2025 15:21:24 +0200
+Message-ID: <20250619132125.78368-5-linux@fw-web.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250619132125.78368-1-linux@fw-web.de>
 References: <20250619132125.78368-1-linux@fw-web.de>
@@ -82,66 +82,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Frank Wunderlich <frank-w@public-files.de>
 
-On SoCs with dedicated RX and TX interrupts (all except MT7621 and
-MT7628) platform_get_irq() is called for the first IRQ (eth->irq[0])
-but it is never used.
-Skip the first IRQ and reduce the IRQ-count to 2.
+If platform_get_irq_byname returns -ENXIO fall back to legacy (index
+based) mode, but on other errors function should return this error.
 
+Suggested-by: Daniel Golle <daniel@makrotopia.org>
 Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
 ---
-v6:
-- changed commit description a bit
-- use MTK_FE_IRQ_SHARED instead of 0
-v5:
-- change commit title and description
-v4:
-- drop >2 condition as max is already 2 and drop the else continue
-- update comment to explain which IRQs are taken in legacy way
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 12 ++++++++----
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  4 ++--
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index efffdd7e131e..67ba8927be46 100644
+index 67ba8927be46..f8a907747db4 100644
 --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -3353,10 +3353,14 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
- 	 * the second is for TX, and the third is for RX.
- 	 */
- 	for (i = 0; i < MTK_FE_IRQ_NUM; i++) {
--		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT) && i > 0)
--			eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
--		else
--			eth->irq[i] = platform_get_irq(pdev, i);
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT)) {
-+			if (i == MTK_FE_IRQ_SHARED)
-+				eth->irq[MTK_FE_IRQ_SHARED] = platform_get_irq(pdev, i);
-+			else
-+				eth->irq[i] = eth->irq[MTK_FE_IRQ_SHARED];
-+		} else {
-+			eth->irq[i] = platform_get_irq(pdev, i + 1);
-+		}
+@@ -3346,6 +3346,13 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
+ 	if (eth->irq[MTK_FE_IRQ_TX] >= 0 && eth->irq[MTK_FE_IRQ_RX] >= 0)
+ 		return 0;
  
- 		if (eth->irq[i] < 0) {
- 			dev_err(&pdev->dev, "no IRQ%d resource found\n", i);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 8cdf1317dff5..9261c0e13b59 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -643,8 +643,8 @@
- #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
- 
- #define MTK_FE_IRQ_SHARED	0
--#define MTK_FE_IRQ_TX		1
--#define MTK_FE_IRQ_RX		2
-+#define MTK_FE_IRQ_TX		0
-+#define MTK_FE_IRQ_RX		1
- #define MTK_FE_IRQ_NUM		(MTK_FE_IRQ_RX + 1)
- 
- struct mtk_rx_dma {
++	/* only use legacy mode if platform_get_irq_byname returned -ENXIO */
++	if (eth->irq[MTK_FE_IRQ_TX] != -ENXIO)
++		return eth->irq[MTK_FE_IRQ_TX];
++
++	if (eth->irq[MTK_FE_IRQ_RX] != -ENXIO)
++		return eth->irq[MTK_FE_IRQ_RX];
++
+ 	/* legacy way:
+ 	 * On MTK_SHARED_INT SoCs (MT7621 + MT7628) the first IRQ is taken
+ 	 * from devicetree and used for both RX and TX - it is shared.
 -- 
 2.43.0
 
