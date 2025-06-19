@@ -1,79 +1,125 @@
-Return-Path: <netdev+bounces-199579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 029D8AE0C10
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:48:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05CCAE0C23
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99696172B2D
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:48:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D7751726D9
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9439213259;
-	Thu, 19 Jun 2025 17:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4736A28C5DC;
+	Thu, 19 Jun 2025 17:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDgn5xwG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kDYUTkRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A280319D8BE;
-	Thu, 19 Jun 2025 17:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D641128B7E2
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 17:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750355275; cv=none; b=gOObFOG0MCWuue2EPf1bf97uq0/l51ur092oB3iuRjYViJhrvOWMT5IaKmAJS76p7m6+9viq2z9goOIG+A3jEfewC9OqwRN4ezISBrkXlFbj5QDvP5qk9dNrIern7Fg0j7m6Ov5CyMp/yhur7YdxNSYir+DWKjdtR6oA7cYzzz4=
+	t=1750355573; cv=none; b=FBcPdfVkFIPWeb08IojHHjpROP3qdMfelIUTKuNKHCDbklZDh+WGhWwJ+vYSfLgYOBpopxrSs2YUbXOWXKEmXwr2/hk3kXenZ4JC94jCEqJSCxYmzHNw+vjQiNhcIdot88nE9XfOkYug++mi5PScSh1VKutr+nB9b9tUBIi/qyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750355275; c=relaxed/simple;
-	bh=+lz25+iX8GgbWx13IxOBA5EUd8Aus6CBfk5a3hnFj8w=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=swxpk5b5ja2sn1uCOaFTiacmIBW/WXGt7DnF6TlfFlTFiXYk3ug/M59M0hj/PE2fSw8YyOJBLJ/XiOgVtyHh0FGi0kbuD+/tGUhtnoPCYypmy2nXyaacVxYjoiA44VmnqZY5QOf6E7c5kYpcOOObHMmmPK21Me8gIjmUKprlgbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDgn5xwG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6892AC4CEEA;
-	Thu, 19 Jun 2025 17:47:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750355275;
-	bh=+lz25+iX8GgbWx13IxOBA5EUd8Aus6CBfk5a3hnFj8w=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=MDgn5xwGSsIIpn+CH7Yn+X9ToNQG7VwMl/tnQYlrkoaWy+fcoak3T0vDBlDhnTu90
-	 9O8rS0nhwie1QS2pH3wBBT9OzkAN7eV5FKWWj8+4O/uzPSnbZE1fojt1au7SxZT1V5
-	 8N9EMG+k0hHzOzd4P90YXIAn9d/6AaMzn4AdKPfC3KhN/8AxhjZ6ubp/qJ0mh4+u75
-	 Esrk6XO4a73Gx3wJQNnDjUJskiE4KoeT8cphwgqsEtUeIh9W9g2ohh8FBoooVl+jac
-	 uKJHcu1LoBZiHPZ4J29pRV2RYkGSFs84/tshcvEvrv+g/h5OKnbETqyHRUjXl32FKF
-	 T4SF1hRbEFkSA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0D238111DD;
-	Thu, 19 Jun 2025 17:48:24 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.16-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250619164054.1217396-1-kuba@kernel.org>
-References: <20250619164054.1217396-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250619164054.1217396-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.16-rc3
-X-PR-Tracked-Commit-Id: 16ef63acb784bd0951a08c6feb108d19d9488800
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 5c8013ae2e86ec36b07500ba4cacb14ab4d6f728
-Message-Id: <175035530330.939772.7180274029359635736.pr-tracker-bot@kernel.org>
-Date: Thu, 19 Jun 2025 17:48:23 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1750355573; c=relaxed/simple;
+	bh=11ng1f6VPwCvI+8XO7NWn6w057suUPB/xBIrVu/g/yw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=opewUbUNmJPL1nDwBo2DfbtGkmG3Onxld0PXP7Tq0NQZZ8HsremzHmlacMydwJsj/WoQcVfPXrytbLjiKSO9B6GD0wHhDmkJ3BKI2yvwQLpKLrIW5s5ZYZSe/EnsizswL5UAxIOkd+SDF5xmNTbHSBraqk37th3z6KMvtbdkxQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kDYUTkRz; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748f13ef248so922983b3a.3
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 10:52:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750355571; x=1750960371; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kKAQxo09G5cPv5qwWN16POW5i7zkedHBeHYLB/DKhXk=;
+        b=kDYUTkRzBpifw3J8v43aS610ADumWc2i0IQOmYGe1O9mJwk9b+4KI4j0FhEgnAPh0B
+         x/lL99xFO7d9jytmxKFB0bc9Jgul5aBU+QHV9Kozgxg4jKPm+Fo5C2kWZKyAdRhbsHXd
+         YM0BZCz2hHglJHaSh8QLGE/EVckFcPgoalesAPyhrqgeNZMuiTrDhTObyC8S9SIVma87
+         Nf36L7Rc+HD9vXr8Y0Bc39OvMju4kJkU8EqIrtptIJ9sLPNwc7VXCfv9fhhfQQ/fKuku
+         4E25vtKEeYobt2rc/NaI4plmF1PyOqO1qyW5ZcLQkFw0T1j09E4OhDCILwMc1Zi5V3e8
+         x6EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750355571; x=1750960371;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kKAQxo09G5cPv5qwWN16POW5i7zkedHBeHYLB/DKhXk=;
+        b=eyY6A/YvUQAwtJ0nocu+lxphG7PiNgMxDc002MYoy4/T5qntb/wXvO8mT+QlYiS+ql
+         SD2atyVnV3ruDOByEL9C9+/1E/himvwiQ3dichbh+TIbl1lNaMllFLnLjd7Sk7xf28yL
+         uN85LhqDRAqq4+a6TPOCZN4Qd5ePqf0J8qlbKjOcNi+qmsMl70w+22FNm49mm6JkEvEX
+         I8WHhC8bT8DsHz2q8nAXz7tEIY6kYzaubHj2BGPosiWGHpAuijroZBqESGgrZDGGj1/n
+         aGmdfBsJRQyHIIgnJN2aHEyGa6VmaKSBbQ1wMcwPETGtmrZik/1nDrHeaQoBNaW9dCdm
+         8WQA==
+X-Gm-Message-State: AOJu0YzKIvs8n+62C2l1ZEyF8edIq+Y/GXynTiPokTqD7JBizbcwkpyV
+	KKd0EaN6Cmd0oJduF5xxUqrEx27BgbHtYdqxGy4ggq8T8v++APDrDyk7Ok//xE36e/hx+3YnHfP
+	mO/6AkpjEQtptML8Ahuq1hb14NzqBPnOwMPppdWYWivvIJqUucSIQDd63SVx4bXoOhHA9wXMfZ9
+	6i4ys2RsxqZYC0N4JEoKhTmYGa0cL6sLsoRub+wErJ56VVuq2OX8Xrm63fx4/BiT8=
+X-Google-Smtp-Source: AGHT+IET5o2P4wUYb7dd58G56SGW2P48lKGW3j+rhDyrZHG0JDXaF5FQiMdicsGmxzV+16PzB+pmpmYbPzshlxEX1w==
+X-Received: from pfqf15.prod.google.com ([2002:aa7:9d8f:0:b0:747:9faf:ed39])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:4b13:b0:748:3a1a:ba72 with SMTP id d2e1a72fcca58-7489cffb748mr31583409b3a.20.1750355570964;
+ Thu, 19 Jun 2025 10:52:50 -0700 (PDT)
+Date: Thu, 19 Jun 2025 17:52:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc2.701.gf1e915cc24-goog
+Message-ID: <20250619175239.3039329-1-almasrymina@google.com>
+Subject: [PATCH net-next v2] netmem: fix skb_frag_address_safe with unreadable skbs
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, ap420073@gmail.com, Stanislav Fomichev <sdf@fomichev.me>
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Thu, 19 Jun 2025 09:40:54 -0700:
+skb_frag_address_safe() needs a check that the
+skb_frag_page exists check similar to skb_frag_address().
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.16-rc3
+Cc: ap420073@gmail.com
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/5c8013ae2e86ec36b07500ba4cacb14ab4d6f728
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-Thank you!
+---
 
+v2: https://lore.kernel.org/netdev/20250617210950.1338107-1-almasrymina@google.com/
+
+- Move to net-next
+- save return value of skb_frag_page
+---
+ include/linux/skbuff.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 9508968cb300..4f6dcb37bae8 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3665,7 +3665,13 @@ static inline void *skb_frag_address(const skb_frag_t *frag)
+  */
+ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
+ {
+-	void *ptr = page_address(skb_frag_page(frag));
++	struct page *page = skb_frag_page(frag);
++	void *ptr;
++
++	if (!page)
++		return NULL;
++
++	ptr = page_address(page);
+ 	if (unlikely(!ptr))
+ 		return NULL;
+ 
+
+base-commit: afc783fa0aab9cc093fbb04871bfda406480cf8d
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.50.0.rc2.701.gf1e915cc24-goog
+
 
