@@ -1,170 +1,98 @@
-Return-Path: <netdev+bounces-199283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB107ADFA72
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 03:02:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F4FADFAA1
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 03:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F22603B3B25
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 01:02:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD4103A6B30
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 01:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB9615A856;
-	Thu, 19 Jun 2025 01:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425A629CE8;
+	Thu, 19 Jun 2025 01:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="giraopnZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=earthlink.net header.i=@earthlink.net header.b="gfCJwvUc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta-102a.earthlink-vadesecure.net (mta-102b.earthlink-vadesecure.net [51.81.61.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB161624DE
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 01:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAA61CD3F;
+	Thu, 19 Jun 2025 01:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.81.61.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750294954; cv=none; b=qGGA/W3BrQur4Zvz1lw4g2vIRkdmNXKV5kLAffh2tTd9ux8+sb0tsqy8zAcmGwp9EgZHiE1dPyvyLybjgftZkbjQ20QwzlWYQr65+rmRH3sxZ27Z7MaLm/+l5r3bSCU7mGEHXj4thEZc0aaU3Iawh9AwDCf0InwkNfl09Ubd0z8=
+	t=1750296118; cv=none; b=FMfaYI8l46/Obq57uR8GEf8KXRmGLcP8nSZlE7XGrFAQZtrFMPDqedeKXC6x8L881EJICRBGBOZrtKkzjJ7E20q0TMDiEGJTSS5udjwOERtCYMjXDWxnAEXX72Y76lVdIvxyrJdjOXr3F6DSYmcbiJmsC4fxcDdmARIjdVvu0OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750294954; c=relaxed/simple;
-	bh=Gh2HTqjo6HqHISVOKNkZllB0IT8SZEBJKMzIIC1BIaw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jUwfUBjbBv5hhwDsr7aynprp1DU029fM3p7D3qmIyIeRi21TdosXSznsg7CUf+fZlvOhX2Zzml0ChpB+FtuwtSv19RUyf/xpnaFZeNwSY4YoMUH2fvzqKEXnNs1xepTHYhYYmdCca1W0B8hQz0UtSK+JCQq+TmClmP1mwkj/DJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=giraopnZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750294949;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l65TrwKTqa28Ab3gvX6Whw90rT+WUXHj8udnKRnKtFc=;
-	b=giraopnZrOlADt9FA+rcH8TfkpdvONxGIYBUdXzU2wHNualW7intAQVqC6Tg+/psROVVpS
-	9mm7Nm6camDXe6RoIRoossxvAKkDS4yX2eVm+U97E8PsnaI3Kwy646ekjDZfTWYqrCi8E1
-	EiYIa3oB7S8WcSN2ndzsIw39VDEdKMY=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-JC_8xQXJN_6GUrd8lEF63g-1; Wed, 18 Jun 2025 21:02:26 -0400
-X-MC-Unique: JC_8xQXJN_6GUrd8lEF63g-1
-X-Mimecast-MFC-AGG-ID: JC_8xQXJN_6GUrd8lEF63g_1750294944
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-311a6b43ed7so141428a91.1
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 18:02:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750294944; x=1750899744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l65TrwKTqa28Ab3gvX6Whw90rT+WUXHj8udnKRnKtFc=;
-        b=Z0He5yKdCQZKO7rAe198xXr4Tj98QqolCFTUvtUGS1eTIipj7J6ZJu/9u9rbFMfgtc
-         SsRdoR/ZKhN0ShS7xj+3JqCe8zro8G1NYJF/8wZ6t6xlvZ490ph+vnJxyhQ3k/tm8BTp
-         1EkJDGFhzPOIKT4BVw0RU2+eBuyH3PMQ1r2mIxK2MN2sreltnwTvrq3YLzXTm9D2vNMq
-         nY+tUbnK/RnM8LgCQcFEeQU2pKY6wDpmp7QIi+i+VjCe0OSFly9DWrjMe+Jbuh98yrqD
-         N6JdhQLEgQEOZ+DNtPPlXzhWQ6/rBrNsAWdWGn8UF3wyCBCnsABd/ZmVhbCwD7ryHXWD
-         SWYg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5A9s986BT+5Me4z3TP901UNU9n5YJ6BSFwiL2kCdSzeVmxY0yV2a/+6v+sts/1mBjtKf1gbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywkln6UuTs5YglMqsfT0+xyklX+NwYSkNv6tBStGmIFM5bvSqBf
-	fzyw23ac2+8fzYYc/O/ilLQw2ItafAH9Iu1wMt4a9w44i6B3PKQWlZNK1x8QUTEiBIDcrLVro1s
-	iOp8G4pAyNgT3MFCmR/MdWFXZVXjZTD2+zhkZTw+wsi7I+E9EXEPNE48h5qJLNDarADV0TPADyj
-	IIrdlv31sNrUEl0LthCzi+YKIG7lgJya2J
-X-Gm-Gg: ASbGncvnsIyzhXZmJsY6aCY2BaB0hgK8hPoyZGfq77Ijqa6fZX8izOOO3TLvIsChdGP
-	owdeNVBzULmbhIHBG9joOGUBra/gWkGomKEa2GylBBxqURYnEab3fEIGRKv+7L3uME+muJxMwFF
-	dH
-X-Received: by 2002:a17:90b:4b07:b0:311:e358:c4af with SMTP id 98e67ed59e1d1-313f1d4e22fmr33298302a91.16.1750294943507;
-        Wed, 18 Jun 2025 18:02:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvD1oNGfqVd8IaeRKyp0By/ZB9vOLf69wY8Wdjl95C+Bq7i6eW/n+2Kf6VIikkjjMZqqg/6jugigwoZuc6aLU=
-X-Received: by 2002:a17:90b:4b07:b0:311:e358:c4af with SMTP id
- 98e67ed59e1d1-313f1d4e22fmr33298246a91.16.1750294942980; Wed, 18 Jun 2025
- 18:02:22 -0700 (PDT)
+	s=arc-20240116; t=1750296118; c=relaxed/simple;
+	bh=MUo5HN2+4eHRF4vfZmOzGNcpIH8Cpomm1JQPO2fKijo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DHAGewiVjn1TzPX2iw1sJKjfB+x+vnpIaot822oWRWcRBfBv+btqEk/SyTwv1tOoMrdUh8lN0UkMoKeEh9cQa9V1EDcOF3vQXFJWfgmYlEsx+WelNvKq7pseIrczV9p62FMJcvtmKRmCIH4jntiW6JU8/0HcfBjOHEmohLs7qnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=onemain.com; spf=pass smtp.mailfrom=onemain.com; dkim=pass (2048-bit key) header.d=earthlink.net header.i=@earthlink.net header.b=gfCJwvUc; arc=none smtp.client-ip=51.81.61.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=onemain.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onemain.com
+Authentication-Results: earthlink-vadesecure.net;
+ auth=pass smtp.auth=svnelson@teleport.com smtp.mailfrom=sln@onemain.com;
+DKIM-Signature: v=1; a=rsa-sha256; bh=7zg+LvQChxQon/g4lI6tNsUEpvSR500gVyAdwM
+ 5WaKU=; c=relaxed/relaxed; d=earthlink.net; h=from:reply-to:subject:
+ date:to:cc:resent-date:resent-from:resent-to:resent-cc:in-reply-to:
+ references:list-id:list-help:list-unsubscribe:list-unsubscribe-post:
+ list-subscribe:list-post:list-owner:list-archive; q=dns/txt;
+ s=dk12062016; t=1750295183; x=1750899983; b=gfCJwvUcqLLM38NLBeyPWE/2Q+g
+ QMPpcUYDwDFAD0vfwst+6+hVhEeBFTXTQD9q0HhvA0ceE/gYk9ZP5QItV1ZmscWFN+Qo1od
+ dVL0N7ufgUqbwGt4qZEwl4tBERL1qjTfgDeD33cP+h6bpBeh3jzUq5tcDalCKnqdUipbgrf
+ VdX79RjWTteXqmnJD3h9uzMkPJsCl48cJH3JGuIzlieNv7k7lvaQ+ezdg1Z0jAR8//2EvWR
+ rrAH7m5i4ERhqqkWyc1RJJQpsVIHtanvnCF2cvrKwBiAfwhwRS1/lnYxAp6pXbeFdRYlZco
+ /1iegGoYPflHH048LtVIm2Z0x69W3TQ==
+Received: from poptart.. ([50.47.159.51])
+ by vsel1nmtao02p.internal.vadesecure.com with ngmta
+ id 91a5f48a-184a4c317d2edef3; Thu, 19 Jun 2025 01:06:23 +0000
+From: Shannon Nelson <sln@onemain.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Shannon Nelson <sln@onemain.com>
+Subject: [PATCH net] mailmap: Update shannon.nelson emails
+Date: Wed, 18 Jun 2025 18:06:03 -0700
+Message-Id: <20250619010603.1173141-1-sln@onemain.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616062922.682558-1-lulu@redhat.com> <20250616062922.682558-2-lulu@redhat.com>
- <6107dcb2-51a3-42f8-b856-f443c0e2a60d@6wind.com>
-In-Reply-To: <6107dcb2-51a3-42f8-b856-f443c0e2a60d@6wind.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 19 Jun 2025 09:02:11 +0800
-X-Gm-Features: AX0GCFsYtNF6CJUPUnvICkqbfymXVtXGjil77zAKX7_d_Qq1yhWIuFMie025ixE
-Message-ID: <CACGkMEsJdfeNuHdKu0OH=sT4RYhN3d_VOnDcu4_-FquRXo24Xw@mail.gmail.com>
-Subject: Re: [PATCH v12 1/1] vhost: Reintroduces support of kthread API and
- adds mode selection
-To: nicolas.dichtel@6wind.com
-Cc: Cindy Lu <lulu@redhat.com>, mst@redhat.com, michael.christie@oracle.com, 
-	sgarzare@redhat.com, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 18, 2025 at 8:06=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Le 16/06/2025 =C3=A0 08:28, Cindy Lu a =C3=A9crit :
-> > This patch reintroduces kthread mode for vhost workers and provides
-> > configuration to select between kthread and task worker.
-> >
-> > - Add 'fork_owner' parameter to vhost_dev to let users select kthread
-> >   or task mode. Default mode is task mode(VHOST_FORK_OWNER_TASK).
-> >
-> > - Reintroduce kthread mode support:
-> >   * Bring back the original vhost_worker() implementation,
-> >     and renamed to vhost_run_work_kthread_list().
-> >   * Add cgroup support for the kthread
-> >   * Introduce struct vhost_worker_ops:
-> >     - Encapsulates create / stop / wake=E2=80=91up callbacks.
-> >     - vhost_worker_create() selects the proper ops according to
-> >       inherit_owner.
-> >
-> > - Userspace configuration interface:
-> >   * New IOCTLs:
-> >       - VHOST_SET_FORK_FROM_OWNER lets userspace select task mode
-> >         (VHOST_FORK_OWNER_TASK) or kthread mode (VHOST_FORK_OWNER_KTHRE=
-AD)
-> >       - VHOST_GET_FORK_FROM_OWNER reads the current worker mode
-> >   * Expose module parameter 'fork_from_owner_default' to allow system
-> >     administrators to configure the default mode for vhost workers
-> >   * Kconfig option CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL controls whet=
-her
-> >     these IOCTLs and the parameter are available (for distros that may
-> >     want to disable them)
-> >
-> > - The VHOST_NEW_WORKER functionality requires fork_owner to be set
-> >   to true, with validation added to ensure proper configuration
-> >
-> > This partially reverts or improves upon:
-> >   commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads")
-> >   commit 1cdaafa1b8b4 ("vhost: replace single worker pointer with xarra=
-y")
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vhost/Kconfig      |  17 +++
-> >  drivers/vhost/vhost.c      | 244 ++++++++++++++++++++++++++++++++++---
-> >  drivers/vhost/vhost.h      |  22 ++++
-> >  include/uapi/linux/vhost.h |  29 +++++
-> >  4 files changed, 294 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> > index 020d4fbb947c..1b3602b1f8e2 100644
-> > --- a/drivers/vhost/Kconfig
-> > +++ b/drivers/vhost/Kconfig
-> > @@ -95,4 +95,21 @@ config VHOST_CROSS_ENDIAN_LEGACY
-> >
-> >         If unsure, say "N".
-> >
-> > +config VHOST_ENABLE_FORK_OWNER_CONTROL
-> > +     bool "Enable VHOST_ENABLE_FORK_OWNER_CONTROL"
-> > +     default n
-> Why disabling this option by default?
+Retiring, so redirect things to a non-corporate account.
 
-I think we should enable this by default.
+Signed-off-by: Shannon Nelson <sln@onemain.com>
+---
+ .mailmap | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks
-
->
-> Regards,
-> Nicolas
->
+diff --git a/.mailmap b/.mailmap
+index b77cd34cf852..7a3ffabb3434 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -691,9 +691,10 @@ Serge Hallyn <sergeh@kernel.org> <serge.hallyn@canonical.com>
+ Serge Hallyn <sergeh@kernel.org> <serue@us.ibm.com>
+ Seth Forshee <sforshee@kernel.org> <seth.forshee@canonical.com>
+ Shakeel Butt <shakeel.butt@linux.dev> <shakeelb@google.com>
+-Shannon Nelson <shannon.nelson@amd.com> <snelson@pensando.io>
+-Shannon Nelson <shannon.nelson@amd.com> <shannon.nelson@intel.com>
+-Shannon Nelson <shannon.nelson@amd.com> <shannon.nelson@oracle.com>
++Shannon Nelson <sln@onemain.com> <shannon.nelson@amd.com>
++Shannon Nelson <sln@onemain.com> <snelson@pensando.io>
++Shannon Nelson <sln@onemain.com> <shannon.nelson@intel.com>
++Shannon Nelson <sln@onemain.com> <shannon.nelson@oracle.com>
+ Sharath Chandra Vurukala <quic_sharathv@quicinc.com> <sharathv@codeaurora.org>
+ Shiraz Hashim <shiraz.linux.kernel@gmail.com> <shiraz.hashim@st.com>
+ Shuah Khan <shuah@kernel.org> <shuahkhan@gmail.com>
+-- 
+2.34.1
 
 
