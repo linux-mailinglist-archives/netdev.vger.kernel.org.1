@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-199400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C668AE0282
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:19:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD53AE0284
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:19:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 175887A2360
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:18:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49DD31BC4C30
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A562221725;
-	Thu, 19 Jun 2025 10:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571E6221FC1;
+	Thu, 19 Jun 2025 10:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaBKFgO5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfABfO1X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0082C2045B1;
-	Thu, 19 Jun 2025 10:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FBE2045B1;
+	Thu, 19 Jun 2025 10:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750328360; cv=none; b=iyBqZg1lyKBCCAtuhF/Ok6grXxdLS2h9biy+tKaBTHNiZ6DsBr+4Z4YW6BhbNAXRd/tkTUsbdBh1oLelS+8y0xzBKu7L0+lPyNFRwqC90Y19iRBCRrLOvWyej4vmCSA95Q6tsrtbChre9C7omnRHmDQjq3j8WBPOeUUsYpzRmjA=
+	t=1750328374; cv=none; b=axbEcMFtzmtgk+HrO83S0V6lvO/sggNeDr8nrNDg2HHaQ4razeTWuYJgN6W5Shelbgj3rZeYKtYw2Re5G1IgvFYm0YU3JzK5pV7MFmhwO62HW67pA1chaJsbEwziuc0R8be43lIM1IdP3BOJPUJYO9HSWQu5+mTpIUYZz3T9GYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750328360; c=relaxed/simple;
-	bh=nc5Z03ifL8Bw2B3MIIq3m99HTuGpRtqrJ0KIBEz/CLk=;
+	s=arc-20240116; t=1750328374; c=relaxed/simple;
+	bh=TFp8r10SI9qs2FkfzjhWNknAgkyWJ+OG/4m+bbmfhzk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aUs/1ZBmqUWmdlXwfr3s827L4zelPGyKmrT/kxrm0+HfAkQ5z6JHCe0e7PhsfNwX0LscKn8hUncn+yFrXB9ro0wnieCcPyYBxgG+GPbrPp86SCJVRgiRZ499ERL+p2C41pHA2UNM6KaHZU6tjs9VDWDAKQFVtXl5AlxDWT447N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaBKFgO5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1346C4CEEA;
-	Thu, 19 Jun 2025 10:19:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=l6GpdS6sB7qsD2qgmHr/4xXt3UdpO25YN10iPC9u/DXuUD1IQTRI4UpKAhF4qjrxv9Lj5dFJvojCuZ/Lf8wxsU4vrXvkqidVXpmKFoT/DGz4tRbcJgjKJ84cfex95qN9puL33QoSVg1Ss/E59noLV9ShIdq8qXX+gLDUfW/uLuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfABfO1X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03FBCC4CEEA;
+	Thu, 19 Jun 2025 10:19:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750328356;
-	bh=nc5Z03ifL8Bw2B3MIIq3m99HTuGpRtqrJ0KIBEz/CLk=;
+	s=k20201202; t=1750328373;
+	bh=TFp8r10SI9qs2FkfzjhWNknAgkyWJ+OG/4m+bbmfhzk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MaBKFgO5UkZSTLUqNHefuZp+ZXrkFegKRWJ528A/8OvuYxpZsGXVt0aIcQy8G+00Q
-	 /6Xdd+l0uv9+rBjNT9BEcDZLzjXUp6+3JN11SvJvalJ78dk4VMI4Bi02RL4TJ9FSuk
-	 +ldFW4rxFQiZvg3+oR+Vg7LGTQFGFtDBgoG8ijv3o9PYiD6nvDShT2xofNFtPUoXEC
-	 x4onhSIO81e9ysk+/je+4qjRPnFtN0mJb3eWCxqt7EexkDlaibwbF/Rbyfmnyt8cAT
-	 bQUpr2s598jNKNm4txg+7bHPLBrW8nxGAJd8VTpFrKba2NEkcoaxxnDPJLWj5Bqs1F
-	 zKWXm40fXOQDw==
-Date: Thu, 19 Jun 2025 11:19:12 +0100
+	b=FfABfO1XIqtf7KGj/5ngqcFzZKbitq+SeZIVFHF2gZUGBoyNcNayUNwFQMm5x04IX
+	 +Ii+ev4k0tjABdat5ReX41nuK7u7thzwEjcS5a7I49OrseK1ztIRmJUTn/NVR467yG
+	 kUPS75ydQ7srPjtgNFvFtw0yR9+7X4MaN1spsNgLVqIkLDJZJEgEtQz8xlbT12DDPY
+	 2hwuxd69bb1wDs9vLdAHADsYJlqa/qS1nP47T9f77eT8MdrEdZsC1oxjLMdG/kIpUR
+	 ojXC3nTupjkK/rY7qxt+lCg+Vm4qnob1nZsXdwm3aL/24Zuo08RpghdmPkr5rt54d9
+	 e4pLtUqQgCj7Q==
+Date: Thu, 19 Jun 2025 11:19:29 +0100
 From: Simon Horman <horms@kernel.org>
 To: Breno Leitao <leitao@debian.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -49,10 +49,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	jv@jvosburgh.ne, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, gustavold@gmail.com
-Subject: Re: [PATCH 1/3] netpoll: Extract carrier wait function
-Message-ID: <20250619101912.GE1699@horms.kernel.org>
+Subject: Re: [PATCH 2/3] netpoll: extract IPv4 address retrieval into helper
+ function
+Message-ID: <20250619101929.GF1699@horms.kernel.org>
 References: <20250618-netpoll_ip_ref-v1-0-c2ac00fe558f@debian.org>
- <20250618-netpoll_ip_ref-v1-1-c2ac00fe558f@debian.org>
+ <20250618-netpoll_ip_ref-v1-2-c2ac00fe558f@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,12 +62,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250618-netpoll_ip_ref-v1-1-c2ac00fe558f@debian.org>
+In-Reply-To: <20250618-netpoll_ip_ref-v1-2-c2ac00fe558f@debian.org>
 
-On Wed, Jun 18, 2025 at 02:32:45AM -0700, Breno Leitao wrote:
-> Extract the carrier waiting logic into a dedicated helper function
-> netpoll_wait_carrier() to improve code readability and reduce
-> duplication in netpoll_setup().
+On Wed, Jun 18, 2025 at 02:32:46AM -0700, Breno Leitao wrote:
+> Move the IPv4 address retrieval logic from netpoll_setup() into a
+> separate netpoll_take_ipv4() function to improve code organization
+> and readability. This change consolidates the IPv4-specific logic
+> and error handling into a dedicated function while maintaining
+> the same functionality.
+> 
+> No functional changes.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 
