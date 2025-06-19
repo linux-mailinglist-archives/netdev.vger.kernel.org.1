@@ -1,184 +1,139 @@
-Return-Path: <netdev+bounces-199388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF5BCAE01FB
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:47:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4FBAE01F9
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:46:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 375497AF415
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:45:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AFD617F17D
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A6A21D5BD;
-	Thu, 19 Jun 2025 09:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627C6220F4F;
+	Thu, 19 Jun 2025 09:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKt1VgKE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JO6oj8V/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A35521B9C0;
-	Thu, 19 Jun 2025 09:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A330C21B9C0;
+	Thu, 19 Jun 2025 09:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750326426; cv=none; b=Ir+3VBuA7HZyYX5rtKzNcnMmipCge7zd//qCu0+f7WoeYFLLdNz82lnU0tOzoTrDWfDnDBGEc8TvlcFumMjgfV634D++cbIXvQlRkqqMqoMe7xNuVQidRXI5dj11so+InSR5OJDtcgXU9KSiWOCMBL6SsICW1vYA7xagyyTttGg=
+	t=1750326404; cv=none; b=a4OJv/PpunmKLGf0330tjSoy/wGh/dbnqfGjQv2HuHpe3an6IiPDSkd+CyQ0XXjZSZ/EgI73xDouAL2GTsFRazxSDnm2XtzXS5/7b0paQuggohqCMfyLe+EG4uy3RxSgbkY6SHuaC36an9LS4BBSoSTsC3qb8xcsQEES61jQDuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750326426; c=relaxed/simple;
-	bh=jo4S4oP37pMlRWEMLh1A4wsCbWwOGpq0aSS3GjoaWMQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s7kqdneMVA2R7khvFzf07/P2oYUeaq520qFqvPq7gbP4G8ENJ8aImyO6zmBwvvXpi+hEdMG0kyrMVLFDD2rU/HozulMpl2Dh7LwOJCVwekSq16Yi67kvktDUEkWY2qZxKNtl0lQ7JsWtM+8jBJg3W+qa9W7CY+n5U1Hv4vhtgIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKt1VgKE; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a4e62619afso81253f8f.1;
-        Thu, 19 Jun 2025 02:47:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750326423; x=1750931223; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3wpyHDstt56CkQjT7Xqq7Dy0LffgxF5WyMGLP3dXWQc=;
-        b=RKt1VgKEWiMgG7Ln7HQGPWN9fCRpkDYYda89yqwmpbEzRNtCGjYmwfsrIZpE1rsSkz
-         LQ+IEPYUrM1qwIaXa8jOgSCy8WG6PZmtJIJDPP+HmU406pMPviyBmN7nt/L/ZO0q+mEI
-         pEPc0ZKTkgEQUqoivQFZhiFqh6EzibIgtlKkfrizOcEAZxClqa6f3NCuRaWBBome8Ula
-         81mqO5xuOvvTnwQVilu3TeFkn4nyHLQavMVPSaDiJjyzntP6Csz1aBX1rzj383rkf9Jt
-         tpMbmOvn6wHWe0sMAsLoaRWP9u9DOCxje1rnnCyXVpDac5fFGt0MOgQzafMrwY4bsmyi
-         NpYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750326423; x=1750931223;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3wpyHDstt56CkQjT7Xqq7Dy0LffgxF5WyMGLP3dXWQc=;
-        b=fMezlSQn/ksKuPIcmnLmyVfQDsgae3JbSjPoAv+qjZG9APO6yDTAkfg4HhUP/gTsyW
-         LWHbj4pxr85LVNRZIAXJS4O4v112uBmreRrTcZPWfhh3YVJDgkhHQh/Rd0ribhRFtZ8r
-         NwkHWFXmKesKjTDDXSLpNg4vRfAJQjCXn+nEyYJEcd5eu7znaiNiebHVOPS1k84iivUn
-         dA6MA6bquJEoNSIopTy87pLTaD3S7llORsLs2UtPyY+mv3uUDiQu8zQffkSFxg9dpvml
-         mTxmhC5hluYRUxIId/tFb74fVmllGb2zM2qJjyASi12MqBOMhEumdmnisPinrjsFyqtH
-         DYmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWeMD9u/YCE4R1fjb7pb1dM17IVUdh04jkKRnRqDQWlmhi8S0BUtCqjw1R7Cgm/oZmtHH98RpB80/omx+N@vger.kernel.org, AJvYcCVysFgtO5Z2d2fP8N7gTqs7g0OE9HCWxi1e8KUyH693wcSQ5XRen7/bx/+K91nH5Ou+JOIAC4Y2@vger.kernel.org, AJvYcCWt96fDRKxNfqNpPMZYW8xdthQ+uVb3pLb3lTczzxl6W1CLWliZJqnKaToNVbno4vV5z80=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXyW77sLlR7FM3U4n0X9vlBig7IwhIoE3/mpuQXi/avzdlm61K
-	TGj4QVIWFCUdIDTxcKDWHpRI1q5j3V9etb1OY5XffwupNzQIWde9CLm7
-X-Gm-Gg: ASbGnctUQuyjGucFZXaa9OX+r0RZksgx8ugDlxN6gTO6KdVsfW44UBGrJyayePGgpHJ
-	j783nBGue+8YipTcxhYnlTW9HlwJNIEcVItu6U1M6fqcCJby8eqGxnzOEDRANAt5tVllDdQxdub
-	yxk3AKmJb5k/xwfZ5/Azwr0TIcc8m23h5nbj+66yVY5HWPLI75jNsvyHNH1/3UcM0z3zJL+q/hd
-	W/owQjzBtV3IPSidFSxWG6xPNOyKQmbE8TC+BJNCqTLV/LUAsbnG71n+/Dy7reBhf0ToOgQQgH1
-	xZUt5jQIpa+J/ehJGtTWgo7a8TH3FnF4zbnhV4++dFNsUBSE+/YHnR7KWdDX2VsJspewb5Sh4J/
-	KH4/TQv+ptLZg60RBmLLTSvAAuW385BLi9Xt2/OFyl0/ZvOZy3udQtmCDcNnmaYM8hpS0g9ZuXd
-	o=
-X-Google-Smtp-Source: AGHT+IEpqro60YlzzzeszDwSvToDBSiVTr/feKFQAwvdfZL6g25ljawMqwhjbgmAVFDKx/RglSW7ng==
-X-Received: by 2002:a05:6000:1789:b0:3a5:324a:9bd with SMTP id ffacd0b85a97d-3a585f2ec3emr3358471f8f.2.1750326423230;
-        Thu, 19 Jun 2025 02:47:03 -0700 (PDT)
-Received: from thomas-precision3591.home (2a01cb00014ec3008c7e3874bfd786a1.ipv6.abo.wanadoo.fr. [2a01:cb00:14e:c300:8c7e:3874:bfd7:86a1])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a568b089b5sm18825847f8f.48.2025.06.19.02.47.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 02:47:02 -0700 (PDT)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Taehee Yoo <ap420073@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net v3] ethernet: ionic: Fix DMA mapping tests
-Date: Thu, 19 Jun 2025 11:45:30 +0200
-Message-ID: <20250619094538.283723-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750326404; c=relaxed/simple;
+	bh=r1Ar8ZQ4D9/WtFd5hRo45kEmZ+WsfRpMNPKRKqGWvds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=taQkVGVbmaSNzKL9IwHlbIZC4N6mF+2bbUHKZJoNvRUB+Kot2dwub+uBYN+yM8DcIupPrfdEgPYGxac4BKMCg/AaxJwaV/GmwDCcivD9cV/VuhD3mAPkd9JJiXtwC23lcrtjD+tG+rwIznA87ORy99OkUjjIPMjz7QUa+cse/ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JO6oj8V/; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750326403; x=1781862403;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=r1Ar8ZQ4D9/WtFd5hRo45kEmZ+WsfRpMNPKRKqGWvds=;
+  b=JO6oj8V/whTjyaNd2C/242GD7d0Co+VO7OK/VKTr9CKtg86YyEwy5yal
+   oIAvfKOzc1r6WN2ENZFCpXK/rYk6e1j5e+4QHWsQwJs3777vUPE3vOvNy
+   i+A2de6iXsJTzOF32b63FA6l1Nc3WLUeUl57ybCbJW7i704sJGmjwxVgI
+   NiLBw/Vje1jvfK2KwUVW4M9ftTrFDaD9O3EDwDPaoD3c63TFn0GvxPPEt
+   Avtg8NfGCN55BKd6hZxi7OwxikOn0MNO41goP5U9pMC0UuClDKWygTJwN
+   ofmrMMjoFcQyyUo1MK5tB7mYx9CdfhtLhOXouG64OSlysdwgwZtpKwtq1
+   w==;
+X-CSE-ConnectionGUID: Ks/UGMX5Q3OoHDYdyzfwPw==
+X-CSE-MsgGUID: STOgO8BRQ4qXG5swJvLPKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="51683409"
+X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
+   d="scan'208";a="51683409"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 02:46:42 -0700
+X-CSE-ConnectionGUID: I0Y4y6uZTQuwsbi+3UEesg==
+X-CSE-MsgGUID: fAsgOCE5RpuNzUuUl2Do/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
+   d="scan'208";a="151080205"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 19 Jun 2025 02:46:38 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uSBqu-000Kd4-1R;
+	Thu, 19 Jun 2025 09:46:36 +0000
+Date: Thu, 19 Jun 2025 17:46:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [net-next, 03/10] bng_en: Add firmware communication mechanism
+Message-ID: <202506191741.1C9E7i3x-lkp@intel.com>
+References: <20250618144743.843815-4-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618144743.843815-4-vikas.gupta@broadcom.com>
 
-Change error values of `ionic_tx_map_single()` and `ionic_tx_map_frag()`
-from 0 to `DMA_MAPPING_ERROR` to prevent collision with 0 as a valid
-address.
+Hi Vikas,
 
-This also fixes the use of `dma_mapping_error()` to test against 0 in
-`ionic_xdp_post_frame()`
+kernel test robot noticed the following build errors:
 
-Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
-Fixes: 56e41ee12d2d ("ionic: better dma-map error handling")
-Fixes: ac8813c0ab7d ("ionic: convert Rx queue buffers to use page_pool")
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+[auto build test ERROR on linus/master]
+[also build test ERROR on v6.16-rc2 next-20250618]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 2ac59564ded1..d10b58ebf603 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -321,7 +321,7 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 					   len, DMA_TO_DEVICE);
- 	} else /* XDP_REDIRECT */ {
- 		dma_addr = ionic_tx_map_single(q, frame->data, len);
--		if (!dma_addr)
-+		if (dma_addr == DMA_MAPPING_ERROR)
- 			return -EIO;
- 	}
- 
-@@ -357,7 +357,7 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 			} else {
- 				dma_addr = ionic_tx_map_frag(q, frag, 0,
- 							     skb_frag_size(frag));
--				if (dma_mapping_error(q->dev, dma_addr)) {
-+				if (dma_addr == DMA_MAPPING_ERROR) {
- 					ionic_tx_desc_unmap_bufs(q, desc_info);
- 					return -EIO;
- 				}
-@@ -1083,7 +1083,7 @@ static dma_addr_t ionic_tx_map_single(struct ionic_queue *q,
- 		net_warn_ratelimited("%s: DMA single map failed on %s!\n",
- 				     dev_name(dev), q->name);
- 		q_to_tx_stats(q)->dma_map_err++;
--		return 0;
-+		return DMA_MAPPING_ERROR;
- 	}
- 	return dma_addr;
- }
-@@ -1100,7 +1100,7 @@ static dma_addr_t ionic_tx_map_frag(struct ionic_queue *q,
- 		net_warn_ratelimited("%s: DMA frag map failed on %s!\n",
- 				     dev_name(dev), q->name);
- 		q_to_tx_stats(q)->dma_map_err++;
--		return 0;
-+		return DMA_MAPPING_ERROR;
- 	}
- 	return dma_addr;
- }
-@@ -1116,7 +1116,7 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
- 	int frag_idx;
- 
- 	dma_addr = ionic_tx_map_single(q, skb->data, skb_headlen(skb));
--	if (!dma_addr)
-+	if (dma_addr == DMA_MAPPING_ERROR)
- 		return -EIO;
- 	buf_info->dma_addr = dma_addr;
- 	buf_info->len = skb_headlen(skb);
-@@ -1126,7 +1126,7 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
- 	nfrags = skb_shinfo(skb)->nr_frags;
- 	for (frag_idx = 0; frag_idx < nfrags; frag_idx++, frag++) {
- 		dma_addr = ionic_tx_map_frag(q, frag, 0, skb_frag_size(frag));
--		if (!dma_addr)
-+		if (dma_addr == DMA_MAPPING_ERROR)
- 			goto dma_fail;
- 		buf_info->dma_addr = dma_addr;
- 		buf_info->len = skb_frag_size(frag);
+url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20250618144743.843815-4-vikas.gupta%40broadcom.com
+patch subject: [net-next, 03/10] bng_en: Add firmware communication mechanism
+config: parisc-randconfig-r073-20250619 (https://download.01.org/0day-ci/archive/20250619/202506191741.1C9E7i3x-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250619/202506191741.1C9E7i3x-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506191741.1C9E7i3x-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   hppa-linux-ld: hppa-linux-ld: DWARF error: could not find abbrev number 1754059
+   drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `__hwrm_req_init':
+>> bnge_hwrm.c:(.text+0x96c): multiple definition of `__hwrm_req_init'; hppa-linux-ld: DWARF error: could not find abbrev number 179644068
+   drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xccc): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_timeout':
+>> bnge_hwrm.c:(.text+0xa90): multiple definition of `hwrm_req_timeout'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xdf0): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_alloc_flags':
+>> bnge_hwrm.c:(.text+0xac8): multiple definition of `hwrm_req_alloc_flags'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xe28): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_flags':
+>> bnge_hwrm.c:(.text+0xb00): multiple definition of `hwrm_req_flags'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xf9c): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_hold':
+>> bnge_hwrm.c:(.text+0xb48): multiple definition of `hwrm_req_hold'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xfe4): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_drop':
+>> bnge_hwrm.c:(.text+0xbd0): multiple definition of `hwrm_req_drop'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x106c): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_send':
+>> bnge_hwrm.c:(.text+0xc10): multiple definition of `hwrm_req_send'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x12f0): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_send_silent':
+>> bnge_hwrm.c:(.text+0xc50): multiple definition of `hwrm_req_send_silent'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x1330): first defined here
+   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_dma_slice':
+>> bnge_hwrm.c:(.text+0xca8): multiple definition of `hwrm_req_dma_slice'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x1388): first defined here
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
