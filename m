@@ -1,280 +1,312 @@
-Return-Path: <netdev+bounces-199562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE261AE0B6C
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:32:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D85DAE0B76
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A36317E4F2
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:32:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF439188A240
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342D3223702;
-	Thu, 19 Jun 2025 16:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F692701A1;
+	Thu, 19 Jun 2025 16:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mc9BXWEp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlh+WopV"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2078.outbound.protection.outlook.com [40.107.102.78])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACAA18A92D;
-	Thu, 19 Jun 2025 16:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750350737; cv=fail; b=AYp8rRoiHQ7DorDiT/qp9cjKOUkMy+BYQAx7D/wVDjK6V5UJT+QMHqP5Lso26W5eLK461NFJFM3pVRId+iKFfQ8ogcV1tajJTSqZngmYHOadFqrkjiagdJ1IA+UlTDs7bvpoOLqw/dTFA0/FFU0MpYIANWyozoONTyNWV2R1vAg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750350737; c=relaxed/simple;
-	bh=HPDht9YAEeQR8dKUFcWeY/2g3PObP7CKr/H8gcXQ0mY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=CQTZ37ri6SFKnNvsDxjE8M7koQtoJr0QK3KrpqrMdT/4dlcHi4M7Q9b6BvCJoe9Il/UvQx4LtYLHij61BrgiF2BzdQiM6BPoHNRqPdLBIiJlpxiRGX6aiRODS5xlY8KDSyiulvby/PUbj4dZMiVnE+lgh5bU8Hu9pmydRxNDOOM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mc9BXWEp; arc=fail smtp.client-ip=40.107.102.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xO5M+o4Uuqi2cF8RT02T9C8NIMQq4jSPPglx6E+yid+GZ5GGci3dtzuvctC4ZxyHTaTtnCDOdLuuz/zsBSDXQit5gJ9He7d74w9q6COO6ajnWwGFo7JvcbLR/JMnnhXp3kCPePdh1w+or84ux6+cvPrFF590OK7mD7A6E+KflouWfH9Uich2sV3hER7ynM3hl/OfXBT3ozr4g+emWLNO9VbDl4bg+LD5WkbBezRXuUgjH6V1OUsK8UaMKA9R27QWTPF5no8/FiWNufPQckLiOwNS96MjtfzxXy9KqQSJ91KzfFKndrMvPvpL1921BF7DnhVDprhUIg7O+QXJms2XxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8QP87amUtCkJN2TwGiE61o6YTI4TpVfQ5fX+m5Jb2Uw=;
- b=yIjzww7vvnoKFsnQo0i9X0DtYFmc4vILmjnU8jj3AuXAFUmnV2Ibr8aQ/YD0ugDiNqsuRYtiZsOn+N6czKtMJxkcUB3kXko9eOcp6trNZLmNgwullL+9wSudf0F9oJrJwDWxwCfVQOQw2PaaVNJJMXqk9bT3M0SdtDuBsaiYozX7nFlarjWPg9uPXtpsdRG4Rz2BKLGxk1bYwC5PWbbE0tBVOwNX/mHvcL2YvG8lQsHaOOlGZ36zuEUCOb8UPhZep6IVv90WMVDYKC9rq9Owt5cmOMjoesIzsoQxfJr/BncLKbn5Jxd2AcAShvoXgDLsI6eiWVjgkFxyy7CexX/BhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8QP87amUtCkJN2TwGiE61o6YTI4TpVfQ5fX+m5Jb2Uw=;
- b=Mc9BXWEpiv+NqCbHUFsLXC1mcVi/mLg9IGQ3eX120qf8hr/2ZxM0HXz9rt28mOsVSoRZt5Kuh+fdcqa3cYNr4xuI58KZt0gHzGN5oDPYS4DZUcJ1xeCBQYh3EyrocKrZ9PhM/lqI+ztkBC71oEtwMM7u7zYuyzEwo1Bt3mOjznCm6SNyZC3sgr4FfBlLgNEFBSeOJVP9ds+X1Kij9rN6ew11X4julvqkyYuRYkHLjhndDY+gF9yakbyes0lWxWkusIg4vT0twmLBthv7/oVEqvp3N1Me2kEhKSGlVkr2qRuaqzS1kfBoz3FNST2HXJLzeMZPzFfKqKavkJyveI6Udg==
-Received: from BY5PR13CA0009.namprd13.prod.outlook.com (2603:10b6:a03:180::22)
- by CH2PR12MB4245.namprd12.prod.outlook.com (2603:10b6:610:af::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Thu, 19 Jun
- 2025 16:32:10 +0000
-Received: from CO1PEPF000075EE.namprd03.prod.outlook.com
- (2603:10b6:a03:180:cafe::ee) by BY5PR13CA0009.outlook.office365.com
- (2603:10b6:a03:180::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.8 via Frontend Transport; Thu,
- 19 Jun 2025 16:32:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000075EE.mail.protection.outlook.com (10.167.249.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.21 via Frontend Transport; Thu, 19 Jun 2025 16:32:09 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 19 Jun
- 2025 09:31:53 -0700
-Received: from [172.27.21.80] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 19 Jun
- 2025 09:31:48 -0700
-Message-ID: <c79b50bc-bebb-4e4c-8c82-8af07de907bb@nvidia.com>
-Date: Thu, 19 Jun 2025 19:31:45 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753D011712;
+	Thu, 19 Jun 2025 16:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750351255; cv=none; b=LOIIjJP0FznlSWOhlC2aX/W50/SP+M3iR2ZCZR4IdxzWyWHmfNnuTWabSkopUgVw4CSJb3KLvSbG1qAxoohby8APzrcKdG+mPMWE+Fjb9lD7xsKDk5eaDZUGZ1aRueyiuC5qvPIFCrDp6Uqbm2bOXDHt+9f/9AEn/psGEDP8904=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750351255; c=relaxed/simple;
+	bh=e6/OaL4553yoEyEI1YQCgcFaAg/t7h53fVGP1TzAl6E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=krcYhj/uoA0LXdACIxZbWfjPU57ALWv16wSKeR1beiTiaZTtpGIvgaYdn2aq3nkHcaFRrnVx+smjWy+rWUYHeC2GQW302+q8UTpvDnNw2jU5X2Rhb7s4g+AOFi/hNKCW32f1clsR2cZM80htCKZmJt+SixQ9N3ZlR/oaqAue20s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dlh+WopV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B57FBC4CEEA;
+	Thu, 19 Jun 2025 16:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750351255;
+	bh=e6/OaL4553yoEyEI1YQCgcFaAg/t7h53fVGP1TzAl6E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dlh+WopVa62wWGt18+OQnKD2UqAtSZ0rh/eJwlAKvQZgKk9BzxactlLQpLUXMEn8z
+	 yMHJpgjS1J1Lgt2A68ZzrAXGCmMjwuW+Q1V6cGA/0g7S4Cb+lRv4kSFkGigZW9thE6
+	 smS6GTKA55s/6QMLAvVRClEEBhfV6wv3B1Id6pWIDTyMfZMPpqc87ced4ai8XX1uoP
+	 i9stn9V95kO45P36szIbPhpMEXq45oLzlxE0X0VuxeJP+smguyp75tDLTEbuHy7WxN
+	 DZg8lkrAE0VrOmnsebI+4/yNt85wEN5DrKtpus1djee4/232CggNIwgbSUAcvCqNVi
+	 sA4MT1DZ6lNxQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.16-rc3
+Date: Thu, 19 Jun 2025 09:40:54 -0700
+Message-ID: <20250619164054.1217396-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/9] net/mlx5: Ensure fw pages are always allocated on
- same NUMA
-To: Zhu Yanjun <yanjun.zhu@linux.dev>, Mark Bloch <mbloch@nvidia.com>, "David
- S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
-CC: <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
-	<tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250610151514.1094735-1-mbloch@nvidia.com>
- <20250610151514.1094735-2-mbloch@nvidia.com>
- <1688e772-3067-4277-ad45-6564b4fbbddf@linux.dev>
- <524cf976-a734-4d30-915b-2480a6139e27@nvidia.com>
- <fb6c6cc5-aa19-4f10-baf7-e20f021553ab@linux.dev>
-Content-Language: en-US
-From: Moshe Shemesh <moshe@nvidia.com>
-In-Reply-To: <fb6c6cc5-aa19-4f10-baf7-e20f021553ab@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075EE:EE_|CH2PR12MB4245:EE_
-X-MS-Office365-Filtering-Correlation-Id: 82c1059f-4fdd-42bf-df4b-08ddaf4ed66a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|82310400026|1800799024|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Vm9VODlzTmpqZGZkMHhRN2NhcTZFYklpMmEyTTRiazRhRFhCVWpMQy91MExJ?=
- =?utf-8?B?d0c0Ty9ITkZpV3RsUXV2bWJ1N0IvMFgza29UODR4a3V3MTJJS3NPQnpyeklU?=
- =?utf-8?B?QVlrMmN3S0xpT1p4Rm9RWVdueEpRcTIvTml0cG1TS08yS20xeFZ6WVBEMklN?=
- =?utf-8?B?RkdsRXNoVjZDZ2R3NmtOMTRka21xZWxXWllZRGljNFBJN29HcjZseUpSNUs1?=
- =?utf-8?B?bExOaXpicjRRY25LN0NBQytWVmx6QUVmRVhKTktrT0Q5VGhuSmtqMG5nUFV6?=
- =?utf-8?B?S0xTdGQzL2RLUkdENUkrMHVsMVpqZ08xemxSaS9XSFEva0RQNXJyMDdTU0xs?=
- =?utf-8?B?NGpXVnV6WUtBZ1dsb2lYNnA0WmJYWU1pZUZZeFFPVDhTeDFoLzlESU5zTGtu?=
- =?utf-8?B?TDRIaDQzaHQrbnRmM2p6MzZxUDlKSWN1NE0yanhMRGZaVmpsa0ZmVmVmNmtJ?=
- =?utf-8?B?MzZEK1NIWjBZckwrZ25MK0FxU1UvUmtwRkRBQkZRSENFcGgvTUZhdGVsdlZk?=
- =?utf-8?B?YUdmcHdrTm1KcTZ1ck9MMHNSZ0xheEtPdWIyOHpBMnlWeW9hK2hFNGxzTXY2?=
- =?utf-8?B?VExsQkhsTjVXMTlGY2NUcXp2RlZpME9NM2dtV0dKUUFYMmRFMkhHVFZSdVdI?=
- =?utf-8?B?S3dvaDR1YjRLYjBqN0xUckthMEliS2wwRkRLSjlXMGc3L0R3Mlhvdmd3alA2?=
- =?utf-8?B?TVd1MDArMGtmc2V0bE12a3RhNGR1YkRqaHJxbG5mZnd5eU1pRUIxaTBoVTVN?=
- =?utf-8?B?cUU3aWtBcGFFem5waE9HQ2NtdXhzMUpMNWlUSHg4djBzWmRiT3lZMmdDUTNC?=
- =?utf-8?B?UVpNazl1WEdUa2Fic3B5OWR0TGxONkdKSUo3Wk9ZSmxvNFIyak1tYkNDeWxi?=
- =?utf-8?B?Q28xUllqc05RblVDUWtMVS9remw3V2tNVWVZZ2xOVXk1dDE1QWh2Sk9HNzZa?=
- =?utf-8?B?a3F2TVhFZnY2ZzIveTJZWlZMZ0NzeHJ0TTlDMlVxamV5T2psYVF6R0FxT0Nz?=
- =?utf-8?B?VjFxU2ZrcE1OVlhaQis4U3o3RGZpaEgzckIvTjhEVDB2RmI1REpnT29HY1Fl?=
- =?utf-8?B?SEJ2U0JTbU84M094ZHVkbzFITlFPQVlFSmVKUlN4L2RvUklwWWNwOEZVeWRl?=
- =?utf-8?B?L2xCazhraGxiVm53REZualVwcWJGNE02dkpmOVRaZHFhQ0pkR3pXTit2Q0J2?=
- =?utf-8?B?WDRkL284NUNoYS80SUVpallqRDlzVWVmYVVLMUgwVHJVUXMvRlZHWFREaG5n?=
- =?utf-8?B?a2p4STByTUs3MGQyVm15dXZGVjJtSFZ6MUpENms3SnAzZE9HZGFnOU00REZ4?=
- =?utf-8?B?U3FRRklWdktDRW9qTnRCRHk0NWM3akNvUU1weWdXUWd1TG5DTllSZFVITmdF?=
- =?utf-8?B?dGZQT0xHL0gxQ0NiaVlKSytnYnBJblFKN1YwSklrd3ljT04yTEE5M09yeTJJ?=
- =?utf-8?B?aEZOVHVXbkxMYXp5M3dKRG5JSzMyditBSENkWldxbEh2SUpWejJBTDRXTzQr?=
- =?utf-8?B?TUtLWW1UNHpQMVlleWxxWlBtcFpvOVphSkZEU3R5Y3RvV3haSDNYYUdNZTZV?=
- =?utf-8?B?cXJVSTRHVWJJUkVZR1RZSFNZWm9RMFN4d05ZVFNzeFU3dTFNWWtzV092enFF?=
- =?utf-8?B?OVVHZjhKc1ZJd3cvSURBdk5yZFFHejhuUVk4eUVzSGJXZ3NGMGxZMTRVNWNk?=
- =?utf-8?B?TlJZYVZDZUozaG9ZRnpRV3lEYkkxbHpVZE96YXJRZWxjT3BkSkNsUEYxa2p6?=
- =?utf-8?B?VEs5N2ZJTHRmdlVhVjFtQTNKK2xIUmJxUG9vQno1QzlBUU9NTVk3a0xaSlo5?=
- =?utf-8?B?d205RjE2MXFWSXJ0YlE5S1NCMWxvQy9vN2R6ZjRaMEFzQ0JRZlhDNTFkdjN0?=
- =?utf-8?B?TFRwMnovMVVheXgwaTU2K214U0ZtNXgvclpiQ3NHVWNsNUVjZzVLa0U0R040?=
- =?utf-8?B?U3I5RlJNNm9DcGFKQ1RCVkdoR3ZIQnkrdDJDYkV5bnBNNXJqT1dpdVNKYm5j?=
- =?utf-8?B?QTNLRnp4VWRLRk5PNEpzOGlWbkRoTHRRbmIzUG1WdC92S1lIK004ME9ibDZM?=
- =?utf-8?Q?tvnFuH?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2025 16:32:09.4649
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82c1059f-4fdd-42bf-df4b-08ddaf4ed66a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075EE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4245
 
+Hi Linus!
 
+The following changes since commit 27605c8c0f69e319df156b471974e4e223035378:
 
-On 6/15/2025 5:44 PM, Zhu Yanjun wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> 在 2025/6/14 22:55, Moshe Shemesh 写道:
->>
->>
->> On 6/13/2025 7:22 PM, Zhu Yanjun wrote:
->>> 在 2025/6/10 8:15, Mark Bloch 写道:
->>>> From: Moshe Shemesh <moshe@nvidia.com>
->>>>
->>>> When firmware asks the driver to allocate more pages, using event of
->>>> give_pages, the driver should always allocate it from same NUMA, the
->>>> original device NUMA. Current code uses dev_to_node() which can result
->>>> in different NUMA as it is changed by other driver flows, such as
->>>> mlx5_dma_zalloc_coherent_node(). Instead, use saved numa node for
->>>> allocating firmware pages.
->>>
->>> I'm not sure whether NUMA balancing is currently being considered or
->>> not.
->>>
->>> If I understand correctly, after this commit is applied, all pages will
->>> be allocated from the same NUMA node — specifically, the original
->>> device's NUMA node. This seems like it could lead to NUMA imbalance.
->>
->> The change is applied only on pages allocated for FW use. Pages which
->> are allocated for driver use as SQ/RQ/CQ/EQ etc, are not affected by
->> this change.
->>
->> As for FW pages (allocated for FW use), we did mean to use only the
->> device close NUMA, we are not looking for balance here. Even before
->> the change, in most cases, FW pages are allocated from device close
->> NUMA, the fix only ensures it.
-> 
-> Thanks a lot. I’m fine with your explanations.
-> 
-> In the past, I encountered a NUMA-balancing issue where memory
-> allocations were dependent on the mlx5 device. Specifically, memory was
-> allocated only from the NUMA node closest to the mlx5 device. As a
-> result, during the lifetime of the process, more than 100GB of memory
-> was allocated from that single NUMA node, while other NUMA nodes saw no
-> significant allocations. This led to a NUMA imbalance problem.
-> 
-> According to your commit, SQ/RQ/CQ/EQ are not affected—only the firmware
-> (FW) pages are. These FW pages include Memory Region (MR) and On-Demand
-> Paging (ODP) pages. ODP pages are freed after use, and the amount of MR
-> pages remains fixed throughout the process lifecycle. Therefore, in
-> theory, this commit should not cause any NUMA imbalance. However, since
-> production environments can be complex, I’ll monitor for any NUMA
-> balancing issues after this commit is deployed in production.
+  Merge tag 'net-6.16-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-12 09:50:36 -0700)
 
-Thanks for monitoring it.
-Just to clarify, this change does not affect also MR allocation. It 
-affects pages allocated for FW internal use, handling requests from FW 
-using give_pages() function and manage_pages command.
+are available in the Git repository at:
 
-> 
-> In short, I’m fine with both this commit and your explanations.
-> 
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.16-rc3
 
-Thanks,
-Moshe.
+for you to fetch changes up to 16ef63acb784bd0951a08c6feb108d19d9488800:
 
-> Thanks,
-> 
-> Yanjun.Zhu
-> 
->>
->>>
->>> By using dev_to_node, it appears that pages could be allocated from
->>> other NUMA nodes, which might help maintain better NUMA balance.
->>>
->>> In the past, I encountered a NUMA balancing issue caused by the mlx5
->>> NIC, so using dev_to_node might be beneficial in addressing similar
->>> problems.
->>>
->>> Thanks,
->>> Zhu Yanjun
->>>
->>>>
->>>> Fixes: 311c7c71c9bb ("net/mlx5e: Allocate DMA coherent memory on
->>>> reader NUMA node")
->>>> Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
->>>> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
->>>> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
->>>> ---
->>>>   drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 2 +-
->>>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/
->>>> drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->>>> index 972e8e9df585..9bc9bd83c232 100644
->>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->>>> @@ -291,7 +291,7 @@ static void free_4k(struct mlx5_core_dev *dev,
->>>> u64 addr, u32 function)
->>>>   static int alloc_system_page(struct mlx5_core_dev *dev, u32 function)
->>>>   {
->>>>       struct device *device = mlx5_core_dma_dev(dev);
->>>> -     int nid = dev_to_node(device);
->>>> +     int nid = dev->priv.numa_node;
->>>>       struct page *page;
->>>>       u64 zero_addr = 1;
->>>>       u64 addr;
->>>
->>
-> -- 
-> Best Regards,
-> Yanjun.Zhu
-> 
+  Merge branch 'net-airoha-improve-hwfd-buffer-descriptor-queues-setup' (2025-06-19 08:42:27 -0700)
 
+----------------------------------------------------------------
+Including fixes from wireless. The ath12k fix to avoid FW crashes
+requires adding support for a number of new FW commands so
+it's quite large in terms of LoC. The rest is relatively small.
+
+Current release - fix to a fix:
+
+ - ptp: fix breakage after ptp_vclock_in_use() rework
+
+Current release - regressions:
+
+ - openvswitch: allocate struct ovs_pcpu_storage dynamically, static
+   allocation may exhaust module loader limit on smaller systems
+
+Previous releases - regressions:
+
+ - tcp: fix tcp_packet_delayed() for peers with no selective ACK support
+
+Previous releases - always broken:
+
+ - wifi: ath12k: don't activate more links than firmware supports
+
+ - tcp: make sure sockets open via passive TFO have valid NAPI ID
+
+ - eth: bnxt_en: update MRU and RSS table of RSS contexts on queue reset,
+   prevent Rx queues from silently hanging after queue reset
+
+ - NFC: uart: set tty->disc_data only in success path
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alexey Kodanev (1):
+      net: lan743x: fix potential out-of-bounds write in lan743x_ptp_io_event_clock_get()
+
+Baochen Qiang (10):
+      wifi: ath12k: parse and save hardware mode info from WMI_SERVICE_READY_EXT_EVENTID event for later use
+      wifi: ath12k: parse and save sbs_lower_band_end_freq from WMI_SERVICE_READY_EXT2_EVENTID event
+      wifi: ath12k: update freq range for each hardware mode
+      wifi: ath12k: support WMI_MLO_LINK_SET_ACTIVE_CMDID command
+      wifi: ath12k: update link active in case two links fall on the same MAC
+      wifi: ath12k: don't activate more links than firmware supports
+      wifi: ath12k: fix documentation on firmware stats
+      wifi: ath12k: avoid burning CPU while waiting for firmware stats
+      wifi: ath12k: don't use static variables in ath12k_wmi_fw_stats_process()
+      wifi: ath12k: don't wait when there is no vdev started
+
+Bjorn Andersson (1):
+      wifi: ath12k: Avoid CPU busy-wait by handling VDEV_STAT and BCN_STAT
+
+Brett Creeley (1):
+      ionic: Prevent driver/fw getting out of sync on devcmd(s)
+
+Brett Werling (1):
+      can: tcan4x5x: fix power regulator retrieval during probe
+
+Colin Ian King (1):
+      wifi: iwlwifi: Fix incorrect logic on cmd_ver range checking
+
+David Thompson (1):
+      mlxbf_gige: return EPROBE_DEFER if PHY IRQ is not available
+
+David Wei (4):
+      selftests: netdevsim: improve lib.sh include in peer.sh
+      selftests: net: add passive TFO test binary
+      selftests: net: add test for passive TFO socket NAPI ID
+      tcp: fix passive TFO socket having invalid NAPI ID
+
+Dmitry Antipov (1):
+      wifi: carl9170: do not ping device which has failed to load firmware
+
+Eric Dumazet (2):
+      net: atm: add lec_mutex
+      net: atm: fix /proc/net/atm/lec handling
+
+Grzegorz Nitka (1):
+      ice: fix eswitch code memory leak in reset scenario
+
+Haixia Qu (1):
+      tipc: fix null-ptr-deref when acquiring remote ip of ethernet bearer
+
+Hariprasad Kelam (1):
+      Octeontx2-pf: Fix Backpresure configuration
+
+Heiner Kallweit (1):
+      net: ftgmac100: select FIXED_PHY
+
+Hyunwoo Kim (1):
+      net/sched: fix use-after-free in taprio_dev_notifier
+
+Jakub Kicinski (12):
+      Merge tag 'linux-can-fixes-for-6.16-20250617' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Merge branch 'bnxt_en-bug-fixes'
+      Merge branch 'ptp_vclock-fixes'
+      Merge branch 'atm-fix-uninit-and-mem-accounting-leak-in-vcc_sendmsg'
+      net: ethtool: remove duplicate defines for family info
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge branch 'net-fix-passive-tfo-socket-having-invalid-napi-id'
+      eth: fbnic: avoid double free when failing to DMA-map FW msg
+      Merge branch 'with-a-mutex'
+      tools: ynl: fix mixing ops and notifications on one socket
+      Merge tag 'wireless-2025-06-18' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge branch 'net-airoha-improve-hwfd-buffer-descriptor-queues-setup'
+
+Johannes Berg (7):
+      wifi: remove zero-length arrays
+      wifi: mac80211: drop invalid source address OCB frames
+      wifi: mac80211: don't WARN for late channel/color switch
+      wifi: ath6kl: remove WARN on bad firmware input
+      Merge tag 'ath-current-20250617' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+      wifi: iwlwifi: dvm: restore n_no_reclaim_cmds setting
+      Merge tag 'iwlwifi-fixes-2025-06-18' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+Kalesh AP (1):
+      bnxt_en: Fix double invocation of bnxt_ulp_stop()/bnxt_ulp_start()
+
+Krishna Kumar (1):
+      net: ice: Perform accurate aRFS flow match
+
+Krzysztof Kozlowski (1):
+      NFC: nci: uart: Set tty->disc_data only in success path
+
+Kuniyuki Iwashima (4):
+      mpls: Use rcu_dereference_rtnl() in mpls_route_input_rcu().
+      atm: atmtcp: Free invalid length skb in atmtcp_c_send().
+      atm: Revert atm_account_tx() if copy_from_iter_full() fails.
+      calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
+
+Lorenzo Bianconi (3):
+      net: airoha: Always check return value from airoha_ppe_foe_get_entry()
+      net: airoha: Compute number of descriptors according to reserved memory size
+      net: airoha: Differentiate hwfd buffer size for QDMA0 and QDMA1
+
+Meghana Malladi (1):
+      net: ti: icssg-prueth: Fix packet handling for XDP_TX
+
+Mina Almasry (1):
+      net: netmem: fix skb_ensure_writable with unreadable skbs
+
+Miri Korenblit (1):
+      wifi: iwlwifi: restore missing initialization of async_handlers_list (again)
+
+Neal Cardwell (1):
+      tcp: fix tcp_packet_delayed() for tcp_is_non_sack_preventing_reopen() behavior
+
+Pavan Chebbi (2):
+      bnxt_en: Add a helper function to configure MRU and RSS
+      bnxt_en: Update MRU and RSS table of RSS contexts on queue reset
+
+Pei Xiao (1):
+      wifi: iwlwifi: cfg: Limit cb_size to valid range
+
+Sebastian Andrzej Siewior (1):
+      openvswitch: Allocate struct ovs_pcpu_storage dynamically
+
+Shannon Nelson (1):
+      MAINTAINERS: Remove Shannon Nelson from MAINTAINERS file
+
+Simon Horman (1):
+      pldmfw: Select CRC32 when PLDMFW is selected
+
+Vitaly Lifshits (1):
+      e1000e: set fixed clock frequency indication for Nahum 11 and Nahum 13
+
+Vladimir Oltean (2):
+      ptp: fix breakage after ptp_vclock_in_use() rework
+      ptp: allow reading of currently dialed frequency to succeed on free-running clocks
+
+ .mailmap                                           |   7 +-
+ Documentation/netlink/specs/ethtool.yaml           |   3 +
+ MAINTAINERS                                        |   5 +-
+ drivers/atm/atmtcp.c                               |   4 +-
+ drivers/net/can/m_can/tcan4x5x-core.c              |   9 +-
+ drivers/net/ethernet/airoha/airoha_eth.c           |  27 +-
+ drivers/net/ethernet/airoha/airoha_ppe.c           |   4 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  87 ++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c      |  24 +-
+ drivers/net/ethernet/faraday/Kconfig               |   1 +
+ drivers/net/ethernet/intel/e1000e/netdev.c         |  14 +-
+ drivers/net/ethernet/intel/e1000e/ptp.c            |   8 +-
+ drivers/net/ethernet/intel/ice/ice_arfs.c          |  48 ++
+ drivers/net/ethernet/intel/ice/ice_eswitch.c       |   6 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_common.c   |   4 +-
+ .../ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c |   6 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c         |   5 +-
+ drivers/net/ethernet/microchip/lan743x_ptp.h       |   4 +-
+ drivers/net/ethernet/pensando/ionic/ionic_main.c   |   3 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c       |  19 +-
+ drivers/net/wireless/ath/ath12k/core.c             |   4 +-
+ drivers/net/wireless/ath/ath12k/core.h             |  10 +-
+ drivers/net/wireless/ath/ath12k/debugfs.c          |  58 --
+ drivers/net/wireless/ath/ath12k/debugfs.h          |   7 -
+ drivers/net/wireless/ath/ath12k/mac.c              | 394 +++++++++-
+ drivers/net/wireless/ath/ath12k/mac.h              |   2 +
+ drivers/net/wireless/ath/ath12k/wmi.c              | 829 ++++++++++++++++++++-
+ drivers/net/wireless/ath/ath12k/wmi.h              | 180 ++++-
+ drivers/net/wireless/ath/ath6kl/bmi.c              |   4 +-
+ drivers/net/wireless/ath/carl9170/usb.c            |  19 +-
+ drivers/net/wireless/intel/iwlwifi/dvm/main.c      |   1 +
+ drivers/net/wireless/intel/iwlwifi/mld/mld.c       |   1 +
+ drivers/net/wireless/intel/iwlwifi/mvm/mld-mac.c   |   2 +-
+ .../net/wireless/intel/iwlwifi/pcie/ctxt-info.c    |  11 +-
+ drivers/ptp/ptp_clock.c                            |   3 +-
+ drivers/ptp/ptp_private.h                          |  22 +-
+ include/linux/atmdev.h                             |   6 +
+ include/linux/ieee80211.h                          |  18 +-
+ include/uapi/linux/ethtool_netlink.h               |   4 -
+ include/uapi/linux/ethtool_netlink_generated.h     |   4 +-
+ lib/Kconfig                                        |   1 +
+ net/atm/common.c                                   |   1 +
+ net/atm/lec.c                                      |  12 +-
+ net/atm/raw.c                                      |   2 +-
+ net/core/skbuff.c                                  |   3 -
+ net/ipv4/tcp_fastopen.c                            |   3 +
+ net/ipv4/tcp_input.c                               |  35 +-
+ net/ipv6/calipso.c                                 |   8 +
+ net/mac80211/debug.h                               |   5 +-
+ net/mac80211/rx.c                                  |   4 +
+ net/mac80211/tx.c                                  |  29 +-
+ net/mpls/af_mpls.c                                 |   4 +-
+ net/nfc/nci/uart.c                                 |   8 +-
+ net/openvswitch/actions.c                          |  23 +-
+ net/openvswitch/datapath.c                         |  42 +-
+ net/openvswitch/datapath.h                         |   3 +-
+ net/sched/sch_taprio.c                             |   6 +-
+ net/tipc/udp_media.c                               |   4 +-
+ tools/net/ynl/pyynl/lib/ynl.py                     |  28 +-
+ .../selftests/drivers/net/netdevsim/peer.sh        |   3 +-
+ tools/testing/selftests/net/.gitignore             |   1 +
+ tools/testing/selftests/net/Makefile               |   2 +
+ tools/testing/selftests/net/tfo.c                  | 171 +++++
+ tools/testing/selftests/net/tfo_passive.sh         | 112 +++
+ 64 files changed, 2090 insertions(+), 287 deletions(-)
+ create mode 100644 tools/testing/selftests/net/tfo.c
+ create mode 100755 tools/testing/selftests/net/tfo_passive.sh
 
