@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DE9AE0F9E
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:29:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B481BAE0FA8
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BBA75A276A
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:29:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA8E3AFD7D
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72EF2620FA;
-	Thu, 19 Jun 2025 22:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1061278158;
+	Thu, 19 Jun 2025 22:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qpoing9+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoOaF+hY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0862609F5;
-	Thu, 19 Jun 2025 22:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC8A1FBE8B;
+	Thu, 19 Jun 2025 22:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750372184; cv=none; b=fGR41xH4Y6eN4+fOa3G1bnHdUXcu/4wT92o31y+ECMrs7u3OjN4E2P1TLj+iODnPMA7wysgdgEZnvxkloqWV9wnpfOr6wydBWXrfJUXmPhZpNCZeouyUZggGsEVZJkJgYRL0rOX0X2oQXkBzmhK1zHaWyx0A7Tc8ZAkDKcK07ek=
+	t=1750372797; cv=none; b=RyrvSfAPIQwJXgwUF4zqopR/hRVJgsZX/Ye5hnnKFbT6wYdiJEJ+sY/EiwyuE76RYGrK2VaASWEHsoI3ljcDx5EJ985HWTDM55HAxdledG/spnpSbCv+l5VPXjt4YnWlZIDd3+DyKoxLFAw+ui9QyjJv1NWSMdE2Ko2RWJjWMUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750372184; c=relaxed/simple;
-	bh=uE1h3VBCq9FkWTRsFDM4zWbkP/DJUBaz2aRme8X4Zcg=;
+	s=arc-20240116; t=1750372797; c=relaxed/simple;
+	bh=75c4S8adQQnHNd/zO6XocENI2O2MLyqODhXEw4RIaNA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S5M/sSyIfuQtANcgN2UfBVzB/bAbIX1hFnXN/bkXLBp/VSZj8vEAvKMS/tJVknq8G7jAWxMJHYnndwzsrkjTQzH5oLE2uWQ0x8tpvt+LbSyW9X9LEUPz4q3DY80YOMbny7Jsg/rmEqZ1/ioTxk5SsufgU8msNejEkTvrxpLApxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qpoing9+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33BADC4CEEA;
-	Thu, 19 Jun 2025 22:29:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=spMDm+eo8Zwasr3lA5HLU5eiefjQ2MKE3qqwDGL/D7eoj/ZhJq1omQYtDFNxeKe2HyemsLVnF7jYP0uBR3kzd3GjiX3UqwiM5dXSJ8f1TggzeMk/Q7tjxWn7Hbk1X6JVLdAHBKjVBEXncL33USeBDUCKAr+o4pW/TsIsIih5Mpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoOaF+hY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6CE7C4CEEA;
+	Thu, 19 Jun 2025 22:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750372184;
-	bh=uE1h3VBCq9FkWTRsFDM4zWbkP/DJUBaz2aRme8X4Zcg=;
+	s=k20201202; t=1750372796;
+	bh=75c4S8adQQnHNd/zO6XocENI2O2MLyqODhXEw4RIaNA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Qpoing9+7HNARwvNmhkAEPndGAgl3F0B9yk/yLR2qdZvw7rhrSoc5ImniCmLgKv0Z
-	 014KsUD2lTwV0cmovedpd1DOQ1UM+dZHvqB2zpWnAv+RCvnmzs8kbUsDvdLTdw/u7I
-	 IS5mfpRuU+ZlmkpXWvl1HHY4FlPGgVruoPPhB/cJNrQW86Afynf1dBpWysqil5f9di
-	 X/ddP6M33PcmWVQHf+unpRQxhfSLI6xBDyc9pxng58P4empGzMaDqsvFVFx5vJ8skm
-	 +3KhEml66/T+/+TvGzFRpuUg05d3TTbaRYknFLxmV4b1Dl74IJKDLQ2Wiv8lGSj/3k
-	 FesZDO0UOzs6Q==
+	b=eoOaF+hY9mZ2EZr0AtsIAyH8YftKqZWjg+wLJxL+tzO3rpIisDECrg52MQk8Nn0JV
+	 z1G/oYAvbvtzAma/CQl6DgKH0IBSWI3WH6EUQ4KZfFEsHwWPeivJda2pPJXi6SV4eP
+	 gNT9HVmIwyhhJXOzwotPY3KTHV/7iXKkbros4fNnXLBx3vHdX2+5H4B+gl2Rv9EPIv
+	 +021fxeoFCKZIZtkov4aR+/LDNrtEW08l7e8isaurzST6tSkaxhNenMHNjIxyxcZ9H
+	 b10D5VqsD6bofY+AvKGu4J8vXXBMuA4ESYLhauFfRDsEwEn8H+nQmnqaGRVRwjB36b
+	 1VKJ5Ch/gdjaA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F8D38111DD;
-	Thu, 19 Jun 2025 22:30:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C5938111DD;
+	Thu, 19 Jun 2025 22:40:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: replace ioaddr with stmmac_priv for
- pcs_set_ane() method
+Subject: Re: [PATCH net-next v4 00/11] net: fec: general + VLAN cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175037221224.1006270.683992000903480141.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Jun 2025 22:30:12 +0000
-References: <E1uRqbQ-004djP-1l@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1uRqbQ-004djP-1l@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
- vkoul@kernel.org
+ <175037282500.1008441.15490348725238364188.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 22:40:25 +0000
+References: <20250618-fec-cleanups-v4-0-c16f9a1af124@pengutronix.de>
+In-Reply-To: <20250618-fec-cleanups-v4-0-c16f9a1af124@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, andrew+netdev@lunn.ch,
+ aleksander.lobakin@intel.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, bpf@vger.kernel.org,
+ Frank.Li@nxp.com, andrew@lunn.ch
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 18 Jun 2025 12:05:12 +0100 you wrote:
-> Pass the stmmac_priv structure into the pcs_set_ane() MAC method rather
-> than having callers dereferencing this structure for the IO address.
+On Wed, 18 Jun 2025 14:00:00 +0200 you wrote:
+> This series first cleans up the fec driver a bit (typos, obsolete
+> comments, add missing header files, rename struct, replace magic
+> number by defines).
 > 
-> Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org> # sa8775p-ride-r3
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c    | 6 +++---
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c       | 4 ++--
->  drivers/net/ethernet/stmicro/stmmac/hwif.h              | 4 ++--
->  drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c    | 2 +-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c       | 2 +-
->  6 files changed, 10 insertions(+), 10 deletions(-)
+> The last 5 patches clean up the fec_enet_rx_queue() function,
+> including VLAN handling.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: stmmac: replace ioaddr with stmmac_priv for pcs_set_ane() method
-    https://git.kernel.org/netdev/net-next/c/c8e32755ba2b
+  - [net-next,v4,01/11] net: fec: fix typos found by codespell
+    https://git.kernel.org/netdev/net-next/c/a822bdb23b3b
+  - [net-next,v4,02/11] net: fec: struct fec_enet_private: remove obsolete comment
+    https://git.kernel.org/netdev/net-next/c/3e03dad543fd
+  - [net-next,v4,03/11] net: fec: switch from asm/cacheflush.h to linux/cacheflush.h
+    https://git.kernel.org/netdev/net-next/c/99d171ae9595
+  - [net-next,v4,04/11] net: fec: sort the includes by alphabetic order
+    https://git.kernel.org/netdev/net-next/c/658e25f770de
+  - [net-next,v4,05/11] net: fec: rename struct fec_devinfo fec_imx6x_info -> fec_imx6sx_info
+    https://git.kernel.org/netdev/net-next/c/4e8594a88656
+  - [net-next,v4,06/11] net: fec: fec_restart(): introduce a define for FEC_ECR_SPEED
+    https://git.kernel.org/netdev/net-next/c/a4addc337745
+  - [net-next,v4,07/11] net: fec: fec_enet_rx_queue(): use same signature as fec_enet_tx_queue()
+    https://git.kernel.org/netdev/net-next/c/e222c08f9669
+  - [net-next,v4,08/11] net: fec: fec_enet_rx_queue(): replace manual VLAN header calculation with skb_vlan_eth_hdr()
+    https://git.kernel.org/netdev/net-next/c/e4a3659a986e
+  - [net-next,v4,09/11] net: fec: fec_enet_rx_queue(): reduce scope of data
+    https://git.kernel.org/netdev/net-next/c/33b9f31893bd
+  - [net-next,v4,10/11] net: fec: fec_enet_rx_queue(): move_call to _vlan_hwaccel_put_tag()
+    https://git.kernel.org/netdev/net-next/c/4dffaf379104
+  - [net-next,v4,11/11] net: fec: fec_enet_rx_queue(): factor out VLAN handling into separate function fec_enet_rx_vlan()
+    https://git.kernel.org/netdev/net-next/c/0593f8df66e5
 
 You are awesome, thank you!
 -- 
