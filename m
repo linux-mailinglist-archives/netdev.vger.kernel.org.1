@@ -1,169 +1,325 @@
-Return-Path: <netdev+bounces-199519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65590AE093A
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:54:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DB6AE091F
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97F481BC69BC
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CDFC4A52B1
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA912737F5;
-	Thu, 19 Jun 2025 14:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D4723498F;
+	Thu, 19 Jun 2025 14:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="gRjTxKXa";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iPTH6ECA"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D7821ADA7;
-	Thu, 19 Jun 2025 14:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8DE21CFF6;
+	Thu, 19 Jun 2025 14:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750344694; cv=none; b=svLT9ieZ2mTLEpxl4ymeYqgEptcTQnjBVpOOrwH3qBKn+yIRFQyj3Mg2n6qfq3EFoiQkO0l9KQ5WhiSpPkdrAf92FESBEk/EA20m/pmePbVteovKNRnlhzIfLacJnCWssph8HxPrZaBU623N2oIbF6b1WZ5od4K8vBzwxME+XjE=
+	t=1750344567; cv=none; b=XzIF5WmkIG7y1MCC7jczxv9+5QjeWGlYQOdpY3hKB2yS6RVpG1PJGGBBVc5PSopPvxHLO679BArg6ZM8lbNS2DJux6QP9b8SMKx5eKvXk4rcyx5iJ7kSacCVV8fgzPawUXmtMMLhdhqE5+q04amayWsPZMdUvAUZihdQI6u4UhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750344694; c=relaxed/simple;
-	bh=oRXuHGOrAGSvnht4ZizfzrxEtdxdPnDJ9l6PPH5cLGs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EUNvzu6IDs6Zgv09yYgrWptRE9j3A/m76i8Xx9GGqtrQ6IrZaUAB2f1La2W64JxUHLTxjK9d352GETS5H2j0guj1AAJKO/jx+BiOUrLfC9Sg96wOaV68JzTuTRo7wt0xaFQzWSnMTUXp+rEanSXMJTyViA07EZKJs5i9DNido3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bNNm12jlgz28fSs;
-	Thu, 19 Jun 2025 22:49:05 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9FA0F140113;
-	Thu, 19 Jun 2025 22:51:30 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 19 Jun 2025 22:51:29 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net-next 3/3] net: hibmcge: configure FIFO thresholds according to the MAC controller documentation
-Date: Thu, 19 Jun 2025 22:44:23 +0800
-Message-ID: <20250619144423.2661528-4-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250619144423.2661528-1-shaojijie@huawei.com>
-References: <20250619144423.2661528-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1750344567; c=relaxed/simple;
+	bh=RU1TZdvqOh6TP7GFugXAi4y1pUWPS4B3n+i6H5qQqzU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QdHaLNdCLqaw9O77Y49/vo8XHSCJXD7GZ74clOqt8c+8WPYNZP1pm1sySBHrXsZ61ZTRWmgrxo0xTpVmnZW6uo2pwRcrVfcxmQ3PnXBL6vT8EgWwp4i8qL1Y/ur1xipryI1e6HAtSW9r1XVp9K6D34RztXZofxWGMwkJczGgk/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=gRjTxKXa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iPTH6ECA; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 581E4114020C;
+	Thu, 19 Jun 2025 10:49:24 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Thu, 19 Jun 2025 10:49:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1750344564;
+	 x=1750430964; bh=bJZoX1H0pKg0M1SA/qWQWR7S8HdwU3H818dBwncJTdc=; b=
+	gRjTxKXa7EdZ4uJc6H+pm7CbN5FBQHL15xnfO/fGHk7dALRSpHGbMhV4avHhue87
+	pZlE7Gu6B21nUzZB5pavhcr5OTavYOmn48ofCng6C89hkpX5fQ/dU1zzLsbSiEk5
+	HmG8Bawu8LuUbPtIkOzqM6SQgI9lS+bXkEfyVkFCJi/9dumFfKrdG4Z4XC+xK4w5
+	ZmRnlB7Z0cy8HCl9AR4FQfd8Oa155Kuqz711wdKts1hYq4sT0Eq8UAwPCjjcFKKo
+	FBnwcQkynhl1OlBIKIXkRsqTCo4IZwroPRn/clzJMpTJGbi2gzFSosfJOrm94LYq
+	l44aKq+9AJxKluDYsDok2g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1750344564; x=1750430964; bh=bJZoX1H0pKg0M1SA/qWQWR7S8HdwU3H818d
+	BwncJTdc=; b=iPTH6ECAQoWMY49Z8UaWWfUnvlldg3wFE6G50XJv0/Wj8W07mSn
+	XY5Syj7xDtGWCCDDr/LddbbemYIJgvoU3Yr4WxrI4hUF2NGspsdv3zSgZEVKPHDa
+	x9Ewh9MdGlA/uZMA+GUhSbBygjUKjxNhNRlycrFZIMBE+eMY+iklJ0urU6K8c3js
+	oDV58o+zO+XqQIfAVEa6AXc8lZpBEoG+vZt6RFSUYNmFMHdNubrIng3R02P20Jj6
+	u/WsLZMiBsy76X7fGYMoKv2brBjN94lkcLLmKCxvhlBNed+VkFGGR+0th9wKD6oc
+	nZDkuXbotYM6vHRoDyr3GhHq6UV+8qOf+ww==
+X-ME-Sender: <xms:cyNUaEnYa0G1sUb84ZBhFlK4VUI7EnqZb09Th03Ch3b__EKDbZfkZA>
+    <xme:cyNUaD3JfrhPZhAYb_im_3cEsgIMcIR4uwiVk8XU57QqPDTmjMZ5IW9VTRpHFChca
+    -Xc5QZbI_4DxA>
+X-ME-Received: <xmr:cyNUaCrVZNisjWjtpJLFBwpZlx_bqvLZOROBm1V6HEJVhgEJ6Vf4YvrwGLffyBmRMU6PcMdDhn2LLTAwtkiciuaSy0K5SivFwvA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdehkedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epfffhvfevuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepofgrrhgvkhcuofgr
+    rhgtiiihkhhofihskhhiqdfikphrvggtkhhiuceomhgrrhhmrghrvghksehinhhvihhsih
+    gslhgvthhhihhnghhslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepheduvdfghfet
+    gefftdfhfeethfehhefhtefgvefhvdetkeekkeduhedtgeeiieehnecuffhomhgrihhnpe
+    hlrghunhgthhhprggurdhnvghtpdhkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhi
+    iigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmrghrmhgrrhgvkhesihhnvhhish
+    hisghlvghthhhinhhgshhlrggsrdgtohhmpdhnsggprhgtphhtthhopedutddpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtohepvhhithgrlhihrdhlihhfshhhihhtshesihhnth
+    gvlhdrtghomhdprhgtphhtthhopegthhhrihhsthhirghnsehhvghushgvlhdrvghupdhr
+    tghpthhtohepphhmvghniigvlhesmhholhhgvghnrdhmphhgrdguvgdprhgtphhtthhope
+    grnhhthhhonhihrdhlrdhnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehp
+    rhiivghmhihslhgrfidrkhhithhsiigvlhesihhnthgvlhdrtghomhdprhgtphhtthhope
+    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehinhhtvghl
+    qdifihhrvgguqdhlrghnsehlihhsthhsrdhoshhuohhslhdrohhrghdprhgtphhtthhope
+    hrvghgrhgvshhsihhonhhssehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohep
+    shhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:cyNUaAnrDe5gOluv7mW957b8hkPn-cs_e4l4l_hd67YhsdAQtUd_yg>
+    <xmx:cyNUaC3tppNB8Tf7EBGAdh3Lj7Y3neFd0u-PJVqLE7hWQE-OLXCA3g>
+    <xmx:cyNUaHsGjAPJ0XRwSVxI2FMYnwLQD7wl-HlbaIrc4VXiI_yLMtkolA>
+    <xmx:cyNUaOXVcmZYTyvSqiDSrseLZCxfNBnn0urA6Rg9YdpFvsbWI0Mjpg>
+    <xmx:dCNUaJ12bXse_-m0zr5Z1uEkvH76zhMMJ9d66p-WRWHZpM_FKcqjxUym>
+Feedback-ID: i1568416f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 19 Jun 2025 10:49:20 -0400 (EDT)
+Date: Thu, 19 Jun 2025 16:49:18 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Christian Heusel <christian@heusel.eu>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	regressions@lists.linux.dev, stable@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on
+ Meteor Lake - 6.14.2
+Message-ID: <aFQjby7mQxvShBm7@mail-itl>
+References: <aAZF0JUKCF0UvfF6@mail-itl>
+ <aAZH7fpaGf7hvX6T@mail-itl>
+ <e0034a96-e285-98c8-b526-fb167747aedc@intel.com>
+ <aB0zLQawNrImVqPE@mail-itl>
+ <c918d4f5-ee53-4f64-b152-cea0f6d99c4f@molgen.mpg.de>
+ <aB0-JLSDT03fosST@mail-itl>
+ <aB1JnJG_CH5vxAsw@mail-itl>
+ <aFK_ExmGqmi-oQby@mail-itl>
+ <87584d6f-5a31-47aa-bba3-1aadfc18fbe6@heusel.eu>
+ <9fb5f018-7333-421b-8e2d-1f6eb98cffaa@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vm5OGfsTLL6JBXBT"
+Content-Disposition: inline
+In-Reply-To: <9fb5f018-7333-421b-8e2d-1f6eb98cffaa@intel.com>
 
-Configure FIFO thresholds according to the MAC controller documentation
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 49 +++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  6 +++
- 2 files changed, 55 insertions(+)
+--vm5OGfsTLL6JBXBT
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Jun 2025 16:49:18 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Christian Heusel <christian@heusel.eu>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	regressions@lists.linux.dev, stable@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on
+ Meteor Lake - 6.14.2
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 6e5602591554..2d3d233a9972 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -18,6 +18,13 @@
- #define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
- #define HBG_PCU_FRAME_LEN_PLUS 4
- 
-+#define HBG_FIFO_TX_FULL_THRSLD		0x3F0
-+#define HBG_FIFO_TX_EMPTY_THRSLD	0x1F0
-+#define HBG_FIFO_RX_FULL_THRSLD		0x240
-+#define HBG_FIFO_RX_EMPTY_THRSLD	0x190
-+#define HBG_CFG_FIFO_FULL_THRSLD	0x10
-+#define HBG_CFG_FIFO_EMPTY_THRSLD	0x01
-+
- static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
- {
- 	return hbg_reg_read(priv, HBG_REG_SPEC_VALID_ADDR) &&
-@@ -272,6 +279,41 @@ void hbg_hw_set_rx_pause_mac_addr(struct hbg_priv *priv, u64 mac_addr)
- 	hbg_reg_write64(priv, HBG_REG_FD_FC_ADDR_LOW_ADDR, mac_addr);
- }
- 
-+static void hbg_hw_set_fifo_thrsld(struct hbg_priv *priv,
-+				   u32 full, u32 empty, enum hbg_dir dir)
-+{
-+	u32 value = 0;
-+
-+	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_FULL_M, full);
-+	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_EMPTY_M, empty);
-+
-+	if (dir & HBG_DIR_TX)
-+		hbg_reg_write(priv, HBG_REG_TX_FIFO_THRSLD_ADDR, value);
-+
-+	if (dir & HBG_DIR_RX)
-+		hbg_reg_write(priv, HBG_REG_RX_FIFO_THRSLD_ADDR, value);
-+}
-+
-+static void hbg_hw_set_cfg_fifo_thrsld(struct hbg_priv *priv,
-+				       u32 full, u32 empty, enum hbg_dir dir)
-+{
-+	u32 value;
-+
-+	value = hbg_reg_read(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR);
-+
-+	if (dir & HBG_DIR_TX) {
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M, full);
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M	, empty);
-+	}
-+
-+	if (dir & HBG_DIR_RX) {
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M, full);
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M	, empty);
-+	}
-+
-+	hbg_reg_write(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR, value);
-+}
-+
- static void hbg_hw_init_transmit_ctrl(struct hbg_priv *priv)
- {
- 	u32 ctrl = 0;
-@@ -332,5 +374,12 @@ int hbg_hw_init(struct hbg_priv *priv)
- 
- 	hbg_hw_init_rx_control(priv);
- 	hbg_hw_init_transmit_ctrl(priv);
-+
-+	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_TX_FULL_THRSLD,
-+			       HBG_FIFO_TX_EMPTY_THRSLD, HBG_DIR_TX);
-+	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_RX_FULL_THRSLD,
-+			       HBG_FIFO_RX_EMPTY_THRSLD, HBG_DIR_RX);
-+	hbg_hw_set_cfg_fifo_thrsld(priv, HBG_CFG_FIFO_FULL_THRSLD,
-+				   HBG_CFG_FIFO_EMPTY_THRSLD, HBG_DIR_TX_RX);
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-index 310f8a74797d..e85a8c009f37 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-@@ -141,7 +141,13 @@
- /* PCU */
- #define HBG_REG_TX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0420)
- #define HBG_REG_RX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0424)
-+#define HBG_REG_FIFO_THRSLD_FULL_M		GENMASK(25, 16)
-+#define HBG_REG_FIFO_THRSLD_EMPTY_M		GENMASK(9, 0)
- #define HBG_REG_CFG_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0428)
-+#define HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M	GENMASK(31, 24)
-+#define HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M	GENMASK(23, 16)
-+#define HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M	GENMASK(15, 8)
-+#define HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M	GENMASK(7, 0)
- #define HBG_REG_CF_INTRPT_MSK_ADDR		(HBG_REG_SGMII_BASE + 0x042C)
- #define HBG_INT_MSK_WE_ERR_B			BIT(31)
- #define HBG_INT_MSK_RBREQ_ERR_B			BIT(30)
--- 
-2.33.0
+On Thu, Jun 19, 2025 at 03:20:35PM +0300, Lifshits, Vitaly wrote:
+>=20
+>=20
+> On 6/18/2025 4:41 PM, Christian Heusel wrote:
+> > On 25/06/18 03:28PM, Marek Marczykowski-G=C3=B3recki wrote:
+> > > On Fri, May 09, 2025 at 02:17:32AM +0200, Marek Marczykowski-G=C3=B3r=
+ecki wrote:
+> > > > On Fri, May 09, 2025 at 01:28:36AM +0200, Marek Marczykowski-G=C3=
+=B3recki wrote:
+> > > > > On Fri, May 09, 2025 at 01:13:28AM +0200, Paul Menzel wrote:
+> > > > > > Dear Marek, dear Vitaly,
+> > > > > >=20
+> > > > > >=20
+> > > > > > Am 09.05.25 um 00:41 schrieb Marek Marczykowski-G=C3=B3recki:
+> > > > > > > On Thu, May 08, 2025 at 09:26:18AM +0300, Lifshits, Vitaly
+> > > > > > > > On 4/21/2025 4:28 PM, Marek Marczykowski-G=C3=B3recki wrote:
+> > > > > > > > > On Mon, Apr 21, 2025 at 03:19:12PM +0200, Marek Marczykow=
+ski-G=C3=B3recki wrote:
+> > > > > > > > > > On Mon, Apr 21, 2025 at 03:44:02PM +0300, Lifshits, Vit=
+aly wrote:
+> > > > > > > > > > >=20
+> > > > > > > > > > >=20
+> > > > > > > > > > > On 4/16/2025 3:43 PM, Marek Marczykowski-G=C3=B3recki=
+ wrote:
+> > > > > > > > > > > > On Wed, Apr 16, 2025 at 03:09:39PM +0300, Lifshits,=
+ Vitaly wrote:
+> > > > > > > > > > > > > Can you please also share the output of ethtool -=
+i? I would like to know the
+> > > > > > > > > > > > > NVM version that you have on your device.
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > driver: e1000e
+> > > > > > > > > > > > version: 6.14.1+
+> > > > > > > > > > > > firmware-version: 1.1-4
+> > > > > > > > > > > > expansion-rom-version:
+> > > > > > > > > > > > bus-info: 0000:00:1f.6
+> > > > > > > > > > > > supports-statistics: yes
+> > > > > > > > > > > > supports-test: yes
+> > > > > > > > > > > > supports-eeprom-access: yes
+> > > > > > > > > > > > supports-register-dump: yes
+> > > > > > > > > > > > supports-priv-flags: yes
+> > > > > > > > > > > >=20
+> > > > > > > > > > >=20
+> > > > > > > > > > > Your firmware version is not the latest, can you chec=
+k with the board
+> > > > > > > > > > > manufacturer if there is a BIOS update to your system?
+> > > > > > > > > >=20
+> > > > > > > > > > I can check, but still, it's a regression in the Linux =
+driver - old
+> > > > > > > > > > kernel did work perfectly well on this hw. Maybe new dr=
+iver tries to use
+> > > > > > > > > > some feature that is missing (or broken) in the old fir=
+mware?
+> > > > > > > > >=20
+> > > > > > > > > A little bit of context: I'm maintaining the kernel packa=
+ge for a Qubes
+> > > > > > > > > OS distribution. While I can try to update firmware on my=
+ test system, I
+> > > > > > > > > have no influence on what hardware users will use this ke=
+rnel, and
+> > > > > > > > > which firmware version they will use (and whether all the=
+ vendors
+> > > > > > > > > provide newer firmware at all). I cannot ship a kernel th=
+at is known
+> > > > > > > > > to break network on some devices.
+> > > > > > > > >=20
+> > > > > > > > > > > Also, you mentioned that on another system this issue=
+ doesn't reproduce, do
+> > > > > > > > > > > they have the same firmware version?
+> > > > > > > > > >=20
+> > > > > > > > > > The other one has also 1.1-4 firmware. And I re-checked=
+, e1000e from
+> > > > > > > > > > 6.14.2 works fine there.
+> > > > > >=20
+> > > > > > > > Thank you for your detailed feedback and for providing the =
+requested
+> > > > > > > > information.
+> > > > > > > >=20
+> > > > > > > > We have conducted extensive testing of this patch across mu=
+ltiple systems
+> > > > > > > > and have not observed any packet loss issues. Upon comparin=
+g the mentioned
+> > > > > > > > setups, we noted that while the LAN controller is similar, =
+the CPU differs.
+> > > > > > > > We believe that the issue may be related to transitions in =
+the CPU's low
+> > > > > > > > power states.
+> > > > > > > >=20
+> > > > > > > > Consequently, we kindly request that you disable the CPU lo=
+w power state
+> > > > > > > > transitions in the S0 system state and verify if the issue =
+persists. You can
+> > > > > > > > disable this in the kernel parameters on the command line w=
+ith idle=3Dpoll.
+> > > > > > > > Please note that this command is intended for debugging pur=
+poses only, as it
+> > > > > > > > may result in higher power consumption.
+> > > > > > >=20
+> > > > > > > I tried with idle=3Dpoll, and it didn't help, I still see a l=
+ot of packet
+> > > > > > > losses. But I can also confirm that idle=3Dpoll makes the sys=
+tem use
+> > > > > > > significantly more power (previously at 25-30W, with this opt=
+ion stays
+> > > > > > > at about 42W).
+> > > > > > >=20
+> > > > > > > Is there any other info I can provide, enable some debug feat=
+ures or
+> > > > > > > something?
+> > > > > > >=20
+> > > > > > > I see the problem is with receiving packets - in my simple pi=
+ng test,
+> > > > > > > the ping target sees all the echo requests (and respond to th=
+em), but
+> > > > > > > the responses aren't reaching ping back (and are not visible =
+on tcpdump
+> > > > > > > on the problematic system either).
+> > > > > >=20
+> > > > > > As the cause is still unclear, can the commit please be reverte=
+d in the
+> > > > > > master branch due adhere to Linux=E2=80=99 no-regression policy=
+, so that it can be
+> > > > > > reverted from the stable series?
+> > > > > >=20
+> > > > > > Marek, did you also test 6.15 release candidates?
+> > > > >=20
+> > > > > The last test I did was on 6.15-rc3. I can re-test on -rc5.
+> > > >=20
+> > > > Same with 6.15-rc5.
+> > >=20
+> > > And the same issue still applies to 6.16-rc2. FWIW Qubes OS kernel has
+> > > this buggy patch revered and nobody complained (contrary to the versi=
+on
+> > > with the patch included). Should I submit the revert patch?
+>=20
+> It is not a good idea to revert this patch as most of the systems will
+> encounter the original issues (PHY access and packet loss). The reason I
+> first introduced this patch was because big vendors reported the packet l=
+oss
+> issue. You can refer to the following sightings:
+> https://answers.launchpad.net/ubuntu/+question/816003
+> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2066064
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D218869
 
+It would be useful to have any of those links in the original commit...
+
+> As an intermediate solution we can either use a privileged flag to make it
+> configurable. I will share with you a patch that might fix the issue
+> on your system that I would like you to try.
+
+Yes, that patch works :)
+
+> FYI, we are currently investigating a similar issue that seems to be due =
+to
+> a misconfiguration of the system firmware.
+
+Can you share some details? I can forward the info to firmware
+developers for this system (it's Dasharo - coreboot-based firmware).
+
+--=20
+Best Regards,
+Marek Marczykowski-G=C3=B3recki
+Invisible Things Lab
+
+--vm5OGfsTLL6JBXBT
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmhUI28ACgkQ24/THMrX
+1ywBswf/axdjrt0YTe8yVedsXB0BdcGcvKydnbQDSnI3snpPrt37TBA6mWrSTDRL
+V4iYeWjfNMn2kPGi2uRq7uzx/WRU/Fu/Uc/AAFD8sSQl4dw4fNUIIX/CZTmEcvH+
+kTUGDOhO6NPUCryKOHqSx8M3nMuIc+dHeQt6NrXhJMsp9t8NkS8cijtT7XuEHajv
+ESc7VynKZNzS5vG4Jx1FlCXh1b1P3cXAKsaV/7k5mEIkjxtph1w/2lOTczq4iFaD
+QDR6cW563uPfgdJLnk8uzKnLCjWfAZyCVJhTjpXUUIBIkVMf2Z/lnAl1Nh41/FIo
+T2AARajG/M4oB/SV7F4hu61RfJXv5g==
+=bkS0
+-----END PGP SIGNATURE-----
+
+--vm5OGfsTLL6JBXBT--
 
