@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED242AE0AB1
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:39:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC8DAE0ABF
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92ADB3B21DF
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:39:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27D1D188B4CE
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C566236424;
-	Thu, 19 Jun 2025 15:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BEF2376E1;
+	Thu, 19 Jun 2025 15:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qB5uwoMq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNBWHuVL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648E4235068;
-	Thu, 19 Jun 2025 15:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8192237194;
+	Thu, 19 Jun 2025 15:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750347587; cv=none; b=bhDzi4QgVnFrkUf74aHg8UZ6znvA0WKPqa7AgUDdphVmx9NHfijAMNcNQUvp9Am2EIbEe6mu2BHBV4QVblFFYJF0AuU9vKCmx1/tBWKwJQGxX6aVRMaXSsy5iqBvMjAz9+S6Fakkcx/XocgdmWi014kifj2yZigC5LhEbjX8/eo=
+	t=1750347588; cv=none; b=LaJk7haUVTUNkYIFPD6n42Mmmy8I4UXZAHnitvyy8OHKws+sB0ASDTFNIdDuuOQsf9EZF7BPpnioQ/M3WoKRA2Hb8CZKSvTDKwf2wBIjoejSNyjMXpnsXNvJA0/xtNo99EB2Zy4/u4dvOo2jv7U/YiwxkZj7c5Z4YjOkSyjNwU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750347587; c=relaxed/simple;
-	bh=YFrTYQvHmRey+7MTAD25fVmEpZBODFYNpOvJ8at6t5s=;
+	s=arc-20240116; t=1750347588; c=relaxed/simple;
+	bh=8v8M7P3HvOvi5p/hmJXZ4r+vUSQyvqwJvQlUisWZfiY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RCyJWTMnTi5i3vZ+VPnXufKjmB5CDviV6VUNbm/2phV18QE3vCWQUhA+wIiNWTfvlBP+KCEZItxW2UZbrk0fUw9SbRDzOU9vTEbPTg3XYNuKkADg0GiELDz/meN8XY6h7yQIixHablzztVBxJVSc6jv2gzwS8h4xQ7cF6hzGDSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qB5uwoMq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E217EC4CEEA;
-	Thu, 19 Jun 2025 15:39:46 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=e8Bs3tY2/H/dl5Ba/k7MaDXmKexQKLNj/u298Q3Qz7CyQWKj8G0+WvKFKMVJsaLobOfOXbK+BwHQ5blecIVP1hPCV1SbKpwyLhK+ISdxMPnMB6JDxsnV2+Hq09tzQ6nmZDhF2M1VbFDx6Xs3V1JVx/Cxi0+8zhAiJbAJs79crOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNBWHuVL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20BA7C4CEEF;
+	Thu, 19 Jun 2025 15:39:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750347586;
-	bh=YFrTYQvHmRey+7MTAD25fVmEpZBODFYNpOvJ8at6t5s=;
+	s=k20201202; t=1750347588;
+	bh=8v8M7P3HvOvi5p/hmJXZ4r+vUSQyvqwJvQlUisWZfiY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qB5uwoMq/oyDAD/AkkFcIIkwltz3k0qRA0L9dOHcjOruNJZOuWwlVJXirHikivoAP
-	 DkD6gg0MCpE3YDWaEp1ELn/4FScFWe5Gr6t1XWp2XcqLvxyTozbG/XaY43AjByXSdC
-	 X+SNR0CoeD8tDudsvahM1INJ6TAZ+Ke1svDWzPvAIEH4OcPxbep10Htt0/WNUDwhdQ
-	 puAyd5DzqTFcXZ0iEZquk5a1J4nHyvF5/wpQauePlVGK69QR1UT7UPD+PTDO+xpfF9
-	 S9lQwlddO4IPhoMrla3mynDgp7HxWN6vF57Oo5sD+KFZPNjr/8uGc+d6/r4KC4QE3T
-	 hHhqduaXM3g/g==
+	b=KNBWHuVLlBfdvsolhNU8mX9WzGv+TlF8dDZwWl9iHZ5B7XS5rz5HbB5GPfSXEQlti
+	 s3ANincd0dA1IEjylaCgN/nsT5I/jXhMKE8XCuVqpWJBFI562384/o4DLy28Q6FOcl
+	 fgumGdRwKbSYxrBx42skFCCNic0DNLDJdaZF5iesaQnGJVj+enyGcO41SScoCk5Ylj
+	 A9NxaAIjjdxABfU/51EII/X2L7R1QszM2AbymWgmJ4/ComkYgRh9ohGJdac5aPUN2U
+	 CbVlwm/+iC6jLPv6kj8CoiWEGJdHsFOmZO8ffJrAoGIwWUKUMroRY9tC+/LlNchXf1
+	 B+2x47PdHikCg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C6538111DD;
-	Thu, 19 Jun 2025 15:40:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DEE38111DD;
+	Thu, 19 Jun 2025 15:40:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] calipso: Fix null-ptr-deref in
- calipso_req_{set,del}attr().
+Subject: Re: [PATCH] NFC: nci: uart: Set tty->disc_data only in success path
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175034761500.906129.12509994894624107217.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Jun 2025 15:40:15 +0000
-References: <20250617224125.17299-1-kuni1840@gmail.com>
-In-Reply-To: <20250617224125.17299-1-kuni1840@gmail.com>
-To: Kuniyuki Iwashima <kuni1840@gmail.com>
-Cc: paul@paul-moore.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- huw@codeweavers.com, kuniyu@google.com, netdev@vger.kernel.org,
- linux-security-module@vger.kernel.org, syzkaller@googlegroups.com,
- john.cs.hey@gmail.com
+ <175034761624.906129.8870783652676829504.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 15:40:16 +0000
+References: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20250618073649.25049-2-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, cuissard@marvell.com,
+ sameo@linux.intel.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ gregkh@linuxfoundation.org, torvalds@linuxfoundation.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 17 Jun 2025 15:40:42 -0700 you wrote:
-> From: Kuniyuki Iwashima <kuniyu@google.com>
-> 
-> syzkaller reported a null-ptr-deref in sock_omalloc() while allocating
-> a CALIPSO option.  [0]
-> 
-> The NULL is of struct sock, which was fetched by sk_to_full_sk() in
-> calipso_req_setattr().
+On Wed, 18 Jun 2025 09:36:50 +0200 you wrote:
+> Setting tty->disc_data before opening the NCI device means we need to
+> clean it up on error paths.  This also opens some short window if device
+> starts sending data, even before NCIUARTSETDRIVER IOCTL succeeded
+> (broken hardware?).  Close the window by exposing tty->disc_data only on
+> the success path, when opening of the NCI device and try_module_get()
+> succeeds.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] calipso: Fix null-ptr-deref in calipso_req_{set,del}attr().
-    https://git.kernel.org/netdev/net/c/10876da918fa
+  - NFC: nci: uart: Set tty->disc_data only in success path
+    https://git.kernel.org/netdev/net/c/fc27ab48904c
 
 You are awesome, thank you!
 -- 
