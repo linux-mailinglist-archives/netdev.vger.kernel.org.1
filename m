@@ -1,157 +1,188 @@
-Return-Path: <netdev+bounces-199305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71EAADFBD5
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 05:23:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD3FDADFBFC
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 05:51:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E612173CBC
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 03:23:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B67917F1DF
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 03:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A456239573;
-	Thu, 19 Jun 2025 03:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA95238C05;
+	Thu, 19 Jun 2025 03:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="EsbS84FS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wp/wHoUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F5D262BE
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 03:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9E288A8
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 03:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750303425; cv=none; b=UiSNftWYTOBD6ojSUqHDA7A9KFGgqEqkn/McO+y/wEMo9rsiqbnYeX7RldB71DPNMDhSFKaAkMgRjpUaYGjFTsqM/YU9a+KRPCN+3K6ZaxOxElfkh7/4JlE/HNz2XKIuDiMEsQzFuPRAPxbWb4jtncmaGl9mkwjC2VpJ5vaM6Ok=
+	t=1750305082; cv=none; b=Xr3r/0bsn8fuBwCfj2M+A+hh/p5BEawco4QTuOGEKblAjwdRq0kqLRzwHgeCtylemyYd7FET8C+MC/VEHzKNzssrRRJXnLDGFUPAxSrLneHjuQHEPp0l0+nfOqLy/bNok+NGXZv0V0NJQfZ9+3+ZG+p6d7LdRbIAtKEaJd8zwy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750303425; c=relaxed/simple;
-	bh=nbuySolPRrKrb/6LuT5vebnUQjPFVCtq1MS/A8Kd8hM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n119TFx9VMAVuct45bzrRTALL4SKUZpcwjFZEh59HfEBB/SYcWFg6NWJJkRZSdrE2r2S3l9xDfiK2C0vx+Sx+nTuuJofX92U5Hd/mZLYo+rmCyFxpi+kQI7skO84LWGQD2HE6PxYOxaGMwDOeeHQzbsBfPs2Qa2paIJo1TXqo3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=EsbS84FS; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-710fe491842so3487297b3.0
-        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:23:43 -0700 (PDT)
+	s=arc-20240116; t=1750305082; c=relaxed/simple;
+	bh=VpNyW0ROWgfUYLE5WLLIP0usn2NYLRidluOWP+fdkZQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yt906NXhP0mK0JhcsvkfGqwsQx0/DxPh3/TEt7ahx/w6MaXMi+OJ2XwKKUZvDgKOm0Cz4nIc6SntcxGu2ScK6IZ5hJJ2f61HX8YgIU90GB82Lr073UkWXvfAfrKOEbF7+l0GyHneb9mdlFEW3mS20buxURHO3HW7Ekj3GexkURk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wp/wHoUl; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3138e65efe2so265843a91.1
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 20:51:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1750303422; x=1750908222; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8iJFw3hcoXsGe4DbyON26AXsapbrXOUsJDzr8Kus6pk=;
-        b=EsbS84FSKxXZnHZQXjCF+6Upv9EOpcGFcTUVOLCtnKH5Wmutvrxzybfqf1BNSbyKRm
-         5s88hw90IYwGLcY01H/gkeGrLadMET9j9VwTMUVRM0F4eVYvD/h70qg+PuW4QXugdAvQ
-         ABTg6Bg2fAVdWUVMQDbOsQ9lAyIy5DeJ7+fsrIahKP3cSxAbbO82X1BdcUVUwBk8M1cS
-         3g7MAb52YZEhjLEhRNQcH4poe29H4oBnIoelr+iWJJZv6li/BPxAwNKnheUo69bAqGIU
-         IFioyFhn8wDKVL5dMd5jAZ6xRzB28wMB9uY0MfjivMAo6qTsn4xYtYf9/OdCevxqCO5n
-         Fcmg==
+        d=google.com; s=20230601; t=1750305080; x=1750909880; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XGFmtrSOLZS5chqBC2J4MeJGoAaFVE8hTVr40c3kU0c=;
+        b=wp/wHoUlLGqB/5VwqbixVu7v69a8iMdnJd+5cLLB6ZMVzgh1DjHrSszdBOGXgoUGtG
+         TJNtN08V5XBzvfMIpDs3L8ibTRzNW/7sLl0pA6FewvfdhawVfkyEF9FVU7gQX8KtC38a
+         eHDvxGCfSjbg9IensjwxsXC43L2PJAs5q+T527a5/U23CA71AzfyGJEEFdDu0xSsu1H6
+         U+hEPnICJfyjVOXFRY6iEIL841jjplMaTkbgOm2GdSLoISyh7WEwFZgLSLLI2pPdVy02
+         oK1P1vntKBYJG5okJNzmqlIBuCTU+EMhwbkc7YToYvX4aA3PotD0kaRoKQDFkhNdHdGt
+         hwYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750303422; x=1750908222;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8iJFw3hcoXsGe4DbyON26AXsapbrXOUsJDzr8Kus6pk=;
-        b=KUqYDxSV530C42gucSu68MZ3re41ct9wee4QUJMZ2c8yxXaoAnXJN+oJ1o5QPm3QK7
-         mlzqeEyZB3FbfORy0hxOqKRCrr9sEcqU1mIgUz0fqTuwSH8OrlbOIlIZIlsnnXAl3Ng4
-         M08ZeEVUZ4uTcOfgDZjS0qzJq2URUUPV48k0J/ZZsGZ9/zYMcBch5XhCxFgp1qqplq2H
-         8D7RpN3U3ofggJfUyfC4Eiqx4ROgpTdMZKdokY23YBk0kM4QIqiuZwN5aTPczsj2hoZD
-         jPHA3Qn7g+NrT7hzJkMVwDgpJhPj8mU9d8l5TB8G54x83j0q+GymBZpY1cTJxPiS8037
-         8ydg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQzSN9abu2Q8BXrZcKZOYFOKuDhuQkGqphF5iF8IXFn63GDWVmg/1XXUGLCwryS1X4Xq1p50Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6sKgtpsZ9aUjnfQdppVaJob05iYlP92+uBOdQ6+4kL1RJq/qA
-	CzwvRHfHIP5XTstYTCV3i3zm/uBp1OVMPvrBY81Mq24i6MTp3Cgpw9nL/J+lQNJuRCx7QhFTqsh
-	gvKuUxgQYRE+qXTDmYfGd69uZGpN8CwLtlTnH6pRy
-X-Gm-Gg: ASbGnctJ2vdVfBIjISWsJXxCbF3m/FNaoAkvRuiHnngI1UW/WNBADGK8Fj6170bOpVM
-	UJQ8GcQV70sOM+Yiyr8v5DGb99Tl2gTpmnPwL1rIWZ64BH3B+NBoblPcgQM43jRJsKnMBgApv2v
-	hFHtP66YsDURELLHAArF1lu2FIjn6N70GsHqEYXX4SZXg=
-X-Google-Smtp-Source: AGHT+IGcN/556LS+CfAEL1VYzf1syP51qd2XAQEDn5URamBiRo8ZdesoI3xzet3HROXiTs7jECSzpEiJz/1uPLWWuek=
-X-Received: by 2002:a05:690c:6886:b0:6fb:ae6b:a340 with SMTP id
- 00721157ae682-71175456e3bmr301614567b3.30.1750303422334; Wed, 18 Jun 2025
- 20:23:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750305080; x=1750909880;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XGFmtrSOLZS5chqBC2J4MeJGoAaFVE8hTVr40c3kU0c=;
+        b=gWFDHY2k+em96244pTXhWzxGikrjhxIYOTFtR2OJEnf1Od63DX2VVjK6QKfXwZAUDZ
+         9nPZ9YrH9AtWmOOWDqQbtcbIgcn9ZEtk+I18GlLSG9fg+gKvi+/UxmQLBNOq3ufYvKKh
+         dR1GwXU4MbkKMTH987YtIqKEvgYLpMORPl7czL8S7MXcPi0r8L546B8r39+il86WE8D1
+         ySgrhpGsSS33k416ajsAkImICZHvxgVXV0nhXmNBbaHasK33+IsIWBiKsfgF0gz27E52
+         LSiim1oxEPu1j5V2NQ0ZfJKec8sCdUuPj3a/lRoPcZi5gUaivQ6/fWff5pg0nP7z16MS
+         4Qkg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGmFALVUkOks/LUz2VCq7PEC8Z2v9Hnd5OHEegawp0YRhzUUHpAxtJ3lPyKNvNicfsVs23+Jw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDZ/pHGYCidI0IuTQOVQljIuV6iRf8mSQOxQy4PQuAmwZSPPWf
+	0Bom6/zB3Ogu+bF7zA9VD2CKvZQkub+/wx8uQsiiWPyoiNEebMGP/7Hc2QoHQrCR0/EJRiW8cjT
+	7h69QueZsekzQRhRSiCXg439VVw==
+X-Google-Smtp-Source: AGHT+IGwHFGjFUNh199bLDHACwbMp86uGWnYQdiUa3Y7XA1SzRiRfsE0FPtlC2echswDJTSrh8srQKkV2amRC6Ze5w==
+X-Received: from pja15.prod.google.com ([2002:a17:90b:548f:b0:312:fb53:41c0])
+ (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:c107:b0:311:ad7f:3281 with SMTP id 98e67ed59e1d1-313f1ca70acmr35957972a91.12.1750305080597;
+ Wed, 18 Jun 2025 20:51:20 -0700 (PDT)
+Date: Thu, 19 Jun 2025 12:51:16 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <1976e40bd50.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com> <20250614204044.2190213-1-kuni1840@gmail.com>
-In-Reply-To: <20250614204044.2190213-1-kuni1840@gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 18 Jun 2025 23:23:31 -0400
-X-Gm-Features: Ac12FXxwFQ9XrzTaZ4vv6beLeYr34oLYlm8Lv3ct4ijMlJ9Ogo8mnNb8EPo9mo0
-Message-ID: <CAHC9VhRWi5QdRgU-Eko4XZ9A2W2o3uhVAagVkhu1eT18qAWdkg@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next 0/4] af_unix: Allow BPF LSM to filter
- SCM_RIGHTS at sendmsg().
-To: Kuniyuki Iwashima <kuni1840@gmail.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	casey@schaufler-ca.com, daniel@iogearbox.net, eddyz87@gmail.com, 
-	gnoack@google.com, haoluo@google.com, jmorris@namei.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuniyu@google.com, linux-security-module@vger.kernel.org, 
-	martin.lau@linux.dev, memxor@gmail.com, mic@digikod.net, 
-	netdev@vger.kernel.org, omosnace@redhat.com, sdf@fomichev.me, 
-	selinux@vger.kernel.org, serge@hallyn.com, song@kernel.org, 
-	stephen.smalley.work@gmail.com, yonghong.song@linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc2.701.gf1e915cc24-goog
+Message-ID: <20250619035116.3761921-1-yuyanghuang@google.com>
+Subject: [PATCH net-next, v2] selftest: add selftest for anycast notifications
+From: Yuyang Huang <yuyanghuang@google.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 14, 2025 at 4:40=E2=80=AFPM Kuniyuki Iwashima <kuni1840@gmail.c=
-om> wrote:
-> From: Paul Moore <paul@paul-moore.com>
-> Date: Sat, 14 Jun 2025 07:43:46 -0400
-> > On June 13, 2025 6:24:15 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrot=
-e:
-> > > From: Kuniyuki Iwashima <kuniyu@google.com>
-> > >
-> > > Since commit 77cbe1a6d873 ("af_unix: Introduce SO_PASSRIGHTS."),
-> > > we can disable SCM_RIGHTS per socket, but it's not flexible.
-> > >
-> > > This series allows us to implement more fine-grained filtering for
-> > > SCM_RIGHTS with BPF LSM.
-> >
-> > My ability to review this over the weekend is limited due to device and
-> > network access, but I'll take a look next week.
-> >
-> > That said, it would be good if you could clarify the "filtering" aspect=
- of
-> > your comments; it may be obvious when I'm able to look at the full patc=
-hset
->
-> I meant to mention that just below the quoted part :)
->
-> ---8<---
-> Changes:
->   v2: Remove SCM_RIGHTS fd scrubbing functionality
-> ---8<---
+This commit adds a new kernel selftest to verify RTNLGRP_IPV6_ACADDR
+notifications. The test works by adding/removing a dummy interface,
+enabling packet forwarding, and then confirming that user space can
+correctly receive anycast notifications.
 
-Thanks :)
+The test relies on the iproute2 version to be 6.13+.
 
-While looking at your patches tonight, I was wondering if you had ever
-considered adding a new LSM hook to __scm_send() that specifically
-targets SCM_RIGHTS?  I was thinking of something like this:
+Tested by the following command:
+$ vng -v --user root --cpus 16 -- \
+make -C tools/testing/selftests TARGETS=3Dnet
+TEST_PROGS=3Drtnetlink_notification.sh \
+TEST_GEN_PROGS=3D"" run_tests
 
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 0225bd94170f..5fec8abc99f5 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -173,6 +173,9 @@ int __scm_send(struct socket *sock, struct msghdr *msg,=
- stru
-ct scm_cookie *p)
-               case SCM_RIGHTS:
-                       if (!ops || ops->family !=3D PF_UNIX)
-                               goto error;
-+                       err =3D security_sock_scm_rights(sock);
-+                       if (err<0)
-+                               goto error;
-                       err=3Dscm_fp_copy(cmsg, &p->fp);
-                       if (err<0)
-                               goto error;
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+---
 
-... if I'm correct in my understanding of what you are trying to
-accomplish, I believe this should allow you to meet your goals with a
-much simpler and targeted approach.  Or am I thinking about this
-wrong?
+Changelog since v1:
+- Remote unrelated clean up code.
 
+ .../selftests/net/rtnetlink_notification.sh   | 44 ++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/rtnetlink_notification.sh b/tools/=
+testing/selftests/net/rtnetlink_notification.sh
+index 39c1b815bbe4..3f9780232bd6 100755
+--- a/tools/testing/selftests/net/rtnetlink_notification.sh
++++ b/tools/testing/selftests/net/rtnetlink_notification.sh
+@@ -8,9 +8,11 @@
+=20
+ ALL_TESTS=3D"
+ 	kci_test_mcast_addr_notification
++	kci_test_anycast_addr_notification
+ "
+=20
+ source lib.sh
++test_dev=3D"test-dummy1"
+=20
+ kci_test_mcast_addr_notification()
+ {
+@@ -18,7 +20,6 @@ kci_test_mcast_addr_notification()
+ 	local tmpfile
+ 	local monitor_pid
+ 	local match_result
+-	local test_dev=3D"test-dummy1"
+=20
+ 	tmpfile=3D$(mktemp)
+ 	defer rm "$tmpfile"
+@@ -56,6 +57,47 @@ kci_test_mcast_addr_notification()
+ 	return $RET
+ }
+=20
++kci_test_anycast_addr_notification()
++{
++	RET=3D0
++	local tmpfile
++	local monitor_pid
++	local match_result
++
++	tmpfile=3D$(mktemp)
++	defer rm "$tmpfile"
++
++	ip monitor acaddress > "$tmpfile" &
++	monitor_pid=3D$!
++	defer kill_process "$monitor_pid"
++	sleep 1
++
++	if [ ! -e "/proc/$monitor_pid" ]; then
++		RET=3D$ksft_skip
++		log_test "anycast addr notification: iproute2 too old"
++		return "$RET"
++	fi
++
++	ip link add name "$test_dev" type dummy
++	check_err $? "failed to add dummy interface"
++	ip link set "$test_dev" up
++	check_err $? "failed to set dummy interface up"
++	sysctl -qw net.ipv6.conf."$test_dev".forwarding=3D1
++	ip link del dev "$test_dev"
++	check_err $? "Failed to delete dummy interface"
++	sleep 1
++
++	# There should be 2 line matches as follows.
++	# 9: dummy2    inet6 any fe80:: scope global
++	# Deleted 9: dummy2    inet6 any fe80:: scope global
++	match_result=3D$(grep -cE "$test_dev.*(fe80::)" "$tmpfile")
++	if [ "$match_result" -ne 2 ]; then
++		RET=3D$ksft_fail
++	fi
++	log_test "anycast addr notification: Expected 2 matches, got $match_resul=
+t"
++	return "$RET"
++}
++
+ #check for needed privileges
+ if [ "$(id -u)" -ne 0 ];then
+ 	RET=3D$ksft_skip
 --=20
-paul-moore.com
+2.50.0.rc2.701.gf1e915cc24-goog
+
 
