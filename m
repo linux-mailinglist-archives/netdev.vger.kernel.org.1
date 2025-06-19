@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-199592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25C1BAE0E65
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:06:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 117A1AE0E66
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9487A165400
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:06:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96DBB188EF6A
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBCA245019;
-	Thu, 19 Jun 2025 20:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594B1246BC7;
+	Thu, 19 Jun 2025 20:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vmxbdvok"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U3ZaH+Oz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4715A1E412A
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 20:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C4921FF3B
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 20:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750363559; cv=none; b=oxQGqaULz/Szq6NrUQfwgdYT5zus4buT8dC2w6pbhbS+kqZ1s277IPDPQGgdF6qchI/CJCJKEzpEHmw660XEtr0m6yTiSlIpAn64DJgy8lxL0SInjcEfLo9MML3S27tZK22tI41Y2bXtkQFx9k4/NG4XZMx9Tg20iGBCdZqREMw=
+	t=1750363560; cv=none; b=pqrKFLXss9iA2TfgAB7BiXmhTJu2aYriqFrsqJ7cWKIMOPLOFj4Z2l9qo7cW/dPTIrLMlrZYZZwB+UEyKLtrbfslxOC76I3BPRraJOc+A5DDO8Q9qgA7ncPiYVPqAE3XCR/Wk5dy/b9PoEO1Kn5q312d8kKVA14/58udCTPVnbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750363559; c=relaxed/simple;
-	bh=Tfp6gAZi43PgXDWt03VJuzciXXNPSM+sNASdp1HmgFQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DnaSUxmN66DkAf0mJPWOeD9reh+OxR1J+QvDtdz0C6G2ebwpoI6BrNiyFYSXYewDtLdmJ6++zROKwxyzGDnqpBa5MEg5o9S8ufKIuS9DWqmh90yYU4P88+idjtAHtX8MVdg01nKPPi+wAoMaaN/5Tq3G8XsnQfRXDVUKCnAHhIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vmxbdvok; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1750363560; c=relaxed/simple;
+	bh=dwsBTxlM2QohXlP1ErlyMOXw37DysFBS3JLvamLR6Do=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=QRbdOuShWtnn0qXnlQXk47DC6ZMSqk99a9tWwdmMhwmBiFRB0PvpHZ0l+V6m2xw3LXM2JWiP0860GU7Sn3e7uCWaAnMQY7lcZyU6MOrwTQloKyVbb5/m354TCfxeP5pawu9f+xzW6u3pyVSe/bvwaYChOcEkZh3WnXDZhS44iX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U3ZaH+Oz; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750363552;
+	t=1750363555;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=M/g9Vf6hGrZ0hKeM12773wdkTtg+QQVjZhEkToI9s24=;
-	b=vmxbdvok0oeIu97UhN4ME1QvM59me5wXNZCvXxVOLMEyru5H2xj63UFPBnjg7S260w2yeM
-	L2bT/Q5tVHE8qNB+5LOuztv+X02i+Qyj72yK6m6qhK+5QW0jvnCiqNPJ0bH6oakg+TEBn5
-	z5wsdIUGSpiCEB95IaI/p4j5Q/DTsmQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F92lwo5VOd1tq612WPpWLZKza4VCHqS8IRTHLKoOjew=;
+	b=U3ZaH+OzZC4XyFuiMwkaaxWeHokAzLwigVj+qnaoY7KwKzsbhxDlPd9M8QE9zWVgL4B7W6
+	VDb90LbN9ao6Bcooq/qxZv7OXqed103e2WAOvU/aODvZ6Ud6hWDD2BRTRlwyxS5LnWfxtl
+	ZCcQxoxHJdj0HISri8DPdBgTf3rrDv8=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -59,9 +61,11 @@ Cc: Michal Simek <michal.simek@amd.com>,
 	Sean Anderson <sean.anderson@linux.dev>,
 	Danilo Krummrich <dakr@kernel.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>
-Subject: [PATCH net 0/4] net: axienet: Fix deferred probe loop
-Date: Thu, 19 Jun 2025 16:05:33 -0400
-Message-Id: <20250619200537.260017-1-sean.anderson@linux.dev>
+Subject: [PATCH net 1/4] auxiliary: Allow empty id
+Date: Thu, 19 Jun 2025 16:05:34 -0400
+Message-Id: <20250619200537.260017-2-sean.anderson@linux.dev>
+In-Reply-To: <20250619200537.260017-1-sean.anderson@linux.dev>
+References: <20250619200537.260017-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,27 +75,58 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Upon further investigation, the EPROBE_DEFER loop outlined in [1] can
-occur even without the PCS subsystem, as described in patch 4/4. The
-second patch is a general fix, and could be applied even without the
-auxdev conversion.
+Support creating auxiliary devices with the id included as part of the
+name. This allows for non-decimal ids, which may be more appropriate for
+auxiliary devices created as children of memory-mapped devices. For
+example, a name like "xilinx_emac.mac.802c0000" could be achieved by
+setting .name to "mac.802c0000" and .id to AUXILIARY_DEVID_NONE.
 
-[1] https://lore.kernel.org/all/20250610183459.3395328-1-sean.anderson@linux.dev/
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+---
 
+ drivers/base/auxiliary.c      | 6 +++++-
+ include/linux/auxiliary_bus.h | 4 +++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-Sean Anderson (4):
-  auxiliary: Allow empty id
-  net: axienet: Fix resource release ordering
-  net: axienet: Rearrange lifetime functions
-  net: axienet: Split into MAC and MDIO drivers
-
- drivers/base/auxiliary.c                      |   6 +-
- drivers/net/ethernet/xilinx/Kconfig           |   1 +
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 391 +++++++++---------
- .../net/ethernet/xilinx/xilinx_axienet_mdio.c |  32 +-
- include/linux/auxiliary_bus.h                 |   4 +-
- 5 files changed, 234 insertions(+), 200 deletions(-)
-
+diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
+index dba7c8e13a53..64a0d5e2eb83 100644
+--- a/drivers/base/auxiliary.c
++++ b/drivers/base/auxiliary.c
+@@ -331,7 +331,11 @@ int __auxiliary_device_add(struct auxiliary_device *auxdev, const char *modname)
+ 		return -EINVAL;
+ 	}
+ 
+-	ret = dev_set_name(dev, "%s.%s.%d", modname, auxdev->name, auxdev->id);
++	if (auxdev->id == AUXILIARY_DEVID_NONE)
++		ret = dev_set_name(dev, "%s.%s", modname, auxdev->name);
++	else
++		ret = dev_set_name(dev, "%s.%s.%d", modname, auxdev->name,
++				   auxdev->id);
+ 	if (ret) {
+ 		dev_err(dev, "auxiliary device dev_set_name failed: %d\n", ret);
+ 		return ret;
+diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
+index 4086afd0cc6b..76904cf2c3dd 100644
+--- a/include/linux/auxiliary_bus.h
++++ b/include/linux/auxiliary_bus.h
+@@ -51,6 +51,8 @@
+  * unregisters the auxiliary device.
+  */
+ 
++#define AUXILIARY_DEVID_NONE	(-1)
++
+ /**
+  * struct auxiliary_device - auxiliary device object.
+  * @dev: Device,
+@@ -269,7 +271,7 @@ struct auxiliary_device *__devm_auxiliary_device_create(struct device *dev,
+ 
+ #define devm_auxiliary_device_create(dev, devname, platform_data)     \
+ 	__devm_auxiliary_device_create(dev, KBUILD_MODNAME, devname,  \
+-				       platform_data, 0)
++				       platform_data, AUXILIARY_DEVID_NONE)
+ 
+ /**
+  * module_auxiliary_driver() - Helper macro for registering an auxiliary driver
 -- 
 2.35.1.1320.gc452695387.dirty
 
