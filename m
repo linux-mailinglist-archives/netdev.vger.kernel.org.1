@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-199366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F2FADFF59
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:02:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507CBADFF5E
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35CE6189F74D
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:01:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 623A43AB2A9
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40AD825EFBD;
-	Thu, 19 Jun 2025 08:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA13260594;
+	Thu, 19 Jun 2025 08:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="dpKkM70+"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="hq3HZOGd"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E1925E829
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 08:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DBF25EF89
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 08:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750320074; cv=none; b=g0gjsr8gkBDflHiPmH7mUeUVSzUgR1HsXfPXKQ3pb7Mz9ypwbLRryVwmA6HGZtSYrbn+ac2MAI4ZY6vcKbVP52+KHop/8xvwZW6vgnA3GUYM670IWCT2w732hUe4/dLyfbBZFUULUgSQ0flKH6I5lExnmebkTRYHjC/uHyPF95A=
+	t=1750320075; cv=none; b=Azt/AO8C5CSIF3dJp9IT9l0XjS+nsBCaMJGcuHVH86vJ1IAMX33ILniaGMIo+jhCU56WPuIIWUAlDLLiwk9LbPQxDU8lL3MVup3K6l4GcG3TYu8fnhuGzjl745gGmWzwu3E9ZFZo9Xgw0yjsrojx+v9D24iT45LwkknDmTEaSz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750320074; c=relaxed/simple;
-	bh=TsCEVJSbAG4Ui9UU7KbJEf0wpBgmVpLIPdk5MB9uO+Q=;
+	s=arc-20240116; t=1750320075; c=relaxed/simple;
+	bh=hYrJ7vDrgWxmOJMEAQCXQP1C5ZVZbefrJf68yrONIH0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SARRx8KQZT2f5/JT1Ig6kx/pVYDGvMC3k7htyLT4a69wVxNJmaRT6/YUZzqWtE9cscoALDktbYOVd26WnvGDco2dFiyMi4ujiP11S1HThrJ8F/V63OZWJDGH8eML0JOUxKSsoDGlwetPzo7FXmie29Z6r228EF6gTMid9XJ+tIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=dpKkM70+; arc=none smtp.client-ip=203.29.241.158
+	 In-Reply-To:To:Cc; b=pj3AElIb8v4LnoLqQu/u9TEV9IDBa1nQMJ5ybnOFTjjbFRKiWZPu6QCWfudCQXgzk9R/qpESFIQJOiS8f50KuzCKUY1aYz7KJGVjGM3Zzmt2XWkKYY1iJjp0Qkeddtxz/B2XIZjBPfZLhDcOkGDv8miywflAZGXZzSNF0NqGDB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=hq3HZOGd; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1750320063;
-	bh=R/iBcO0Na5B85cl0hG3FHnOdxLFLdGi9Q11jSvY6nw4=;
+	bh=qXz0E+SLRzZlKrmee3eJ0ElVlypKAmp8Rbf2bf5b/CA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=dpKkM70+GigQgdRr2eCXSHXvHzrG4+26vRdhLDZLFivR7YIwO0mRP7RuvPq41W0WO
-	 NCuvAr7hiHKNgPTAMxEl25wx7SeGP4PtBDwAWf6RURMF24YxcKlejJCQBVUZOqeaIq
-	 Qb0V8j/+DXDDpBStwCOPpSNTnFausvybRYBq3dHRV5wt/ycP1NLKai6jLBXheb4vEA
-	 9nz3gH+C7z/7oX14ytC6WpqFdV9vok8xTXcoKQ6Dz16XwkC1AgZFLUF6VkMdZn1nKr
-	 PuHNXAyNgsr7Zhq3SCJNvlO/ihAbPIa2j/0VyZe6qWSxVKtmOzYL6JGL6GfQOVFbKf
-	 uE56Jf8LPpQpw==
+	b=hq3HZOGdhyOOObPshr1Prn6ypvnAvwIDn261Ew3DHmU2KhxjmYOlJvpSqlQN3v0NF
+	 Y6El8Uq3QPSh7Ivi02TPTqiM7Q31eoHhfolG+ILVv3TmqmAeRJ/RrTl/ZaRbn7Z58m
+	 Fzvq3BwIksH/1r49jKHoEktJUg2WfQLmpzRfL2yDhIHiC8ZLQ7K5qiZjrfygazxsg4
+	 9fCyHOw/eT613MM/YL+IlVwLJjstFN7hZTRs0buBvA1uxNU+pygJRiQRgKqvVuwKiR
+	 jtR7hB1N4snVTvFdvDJ4dI6/I0HDj07Or16ttwSlgYe3pjsvbvPUlvGdK0g8UkWThB
+	 R/PHZTJavKLPw==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 71BFC68ECB; Thu, 19 Jun 2025 16:01:03 +0800 (AWST)
+	id CB9FF68ECF; Thu, 19 Jun 2025 16:01:03 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Thu, 19 Jun 2025 16:00:45 +0800
-Subject: [PATCH net-next v2 10/13] net: mctp: remove routes by netid, not
- by device
+Date: Thu, 19 Jun 2025 16:00:46 +0800
+Subject: [PATCH net-next v2 11/13] net: mctp: allow NL parsing directly
+ into a struct mctp_route
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250619-dev-forwarding-v2-10-3f81801b06c2@codeconstruct.com.au>
+Message-Id: <20250619-dev-forwarding-v2-11-3f81801b06c2@codeconstruct.com.au>
 References: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
 In-Reply-To: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
@@ -65,68 +65,314 @@ To: Matt Johnston <matt@codeconstruct.com.au>,
 Cc: netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-In upcoming changes, a route may not have a device associated. Since the
-route is matched on the (network, eid) tuple, pass the netid itself into
-mctp_route_remove.
+The netlink route parsing functions end up setting a bunch of output
+variables from the rt attributes. This will get messy when the routes
+become more complex.
+
+So, split the rt parsing into two types: a lookup (returning route
+target data suitable for a route lookup, like when deleting a route) and
+a populate (setting fields of a struct mctp_route).
+
+In doing this, we need to separate the route allocation from
+mctp_route_add, so add some comments on the lifetime semantics for the
+latter.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- net/mctp/route.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/mctp/route.c | 194 +++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 130 insertions(+), 64 deletions(-)
 
 diff --git a/net/mctp/route.c b/net/mctp/route.c
-index c2495e2073c6946c3517b525b5d49b93fbfdd81f..1731cabcc30780226d39e6e0716346f7acb5bd7e 100644
+index 1731cabcc30780226d39e6e0716346f7acb5bd7e..ab5116c12b91461011c1ec3d9954609658a40a22 100644
 --- a/net/mctp/route.c
 +++ b/net/mctp/route.c
-@@ -1080,6 +1080,11 @@ int mctp_local_output(struct sock *sk, struct mctp_dst *dst,
- 	return rc;
+@@ -1086,25 +1086,32 @@ static unsigned int mctp_route_netid(struct mctp_route *rt)
  }
  
-+static unsigned int mctp_route_netid(struct mctp_route *rt)
-+{
-+	return rt->dev->net;
-+}
-+
  /* route management */
- static int mctp_route_add(struct net *net, struct mctp_dev *mdev,
- 			  mctp_eid_t daddr_start, unsigned int daddr_extent,
-@@ -1132,7 +1137,7 @@ static int mctp_route_add(struct net *net, struct mctp_dev *mdev,
+-static int mctp_route_add(struct net *net, struct mctp_dev *mdev,
+-			  mctp_eid_t daddr_start, unsigned int daddr_extent,
+-			  unsigned int mtu, unsigned char type)
++
++/* mctp_route_add(): Add the provided route, previously allocated via
++ * mctp_route_alloc(). On success, takes ownership of @rt, which includes a
++ * hold on rt->dev for usage in the route table. On failure a caller will want
++ * to mctp_route_release().
++ *
++ * We expect that the caller has set rt->type, rt->min, rt->max, rt->dev and
++ * rt->mtu, and that the route holds a reference to rt->dev (via mctp_dev_hold).
++ * Other fields will be populated.
++ */
++static int mctp_route_add(struct net *net, struct mctp_route *rt)
+ {
+-	int (*rtfn)(struct mctp_dst *dst, struct sk_buff *skb);
+-	struct mctp_route *rt, *ert;
++	struct mctp_route *ert;
+ 
+-	if (!mctp_address_unicast(daddr_start))
++	if (!mctp_address_unicast(rt->min) || !mctp_address_unicast(rt->max))
+ 		return -EINVAL;
+ 
+-	if (daddr_extent > 0xff || daddr_start + daddr_extent >= 255)
++	if (!rt->dev)
+ 		return -EINVAL;
+ 
+-	switch (type) {
++	switch (rt->type) {
+ 	case RTN_LOCAL:
+-		rtfn = mctp_dst_input;
++		rt->output = mctp_dst_input;
+ 		break;
+ 	case RTN_UNICAST:
+-		rtfn = mctp_dst_output;
++		rt->output = mctp_dst_output;
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -1112,22 +1119,9 @@ static int mctp_route_add(struct net *net, struct mctp_dev *mdev,
+ 
+ 	ASSERT_RTNL();
+ 
+-	rt = mctp_route_alloc();
+-	if (!rt)
+-		return -ENOMEM;
+-
+-	rt->min = daddr_start;
+-	rt->max = daddr_start + daddr_extent;
+-	rt->mtu = mtu;
+-	rt->dev = mdev;
+-	mctp_dev_hold(rt->dev);
+-	rt->type = type;
+-	rt->output = rtfn;
+-
+ 	/* Prevent duplicate identical routes. */
+ 	list_for_each_entry(ert, &net->mctp.routes, list) {
+ 		if (mctp_rt_compare_exact(rt, ert)) {
+-			mctp_route_release(rt);
+ 			return -EEXIST;
+ 		}
+ 	}
+@@ -1169,7 +1163,25 @@ static int mctp_route_remove(struct net *net, unsigned int netid,
+ 
+ int mctp_route_add_local(struct mctp_dev *mdev, mctp_eid_t addr)
+ {
+-	return mctp_route_add(dev_net(mdev->dev), mdev, addr, 0, 0, RTN_LOCAL);
++	struct mctp_route *rt;
++	int rc;
++
++	rt = mctp_route_alloc();
++	if (!rt)
++		return -ENOMEM;
++
++	rt->min = addr;
++	rt->max = addr;
++	rt->dev = mdev;
++	rt->type = RTN_LOCAL;
++
++	mctp_dev_hold(rt->dev);
++
++	rc = mctp_route_add(dev_net(mdev->dev), rt);
++	if (rc)
++		mctp_route_release(rt);
++
++	return rc;
+ }
+ 
+ int mctp_route_remove_local(struct mctp_dev *mdev, mctp_eid_t addr)
+@@ -1281,13 +1293,16 @@ static const struct nla_policy rta_mctp_policy[RTA_MAX + 1] = {
+ 	[RTA_OIF]		= { .type = NLA_U32 },
+ };
+ 
+-/* Common part for RTM_NEWROUTE and RTM_DELROUTE parsing.
+- * tb must hold RTA_MAX+1 elements.
+- */
+-static int mctp_route_nlparse(struct net *net, struct nlmsghdr *nlh,
+-			      struct netlink_ext_ack *extack,
+-			      struct nlattr **tb, struct rtmsg **rtm,
+-			      struct mctp_dev **mdev, mctp_eid_t *daddr_start)
++static const struct nla_policy rta_metrics_policy[RTAX_MAX + 1] = {
++	[RTAX_MTU]		= { .type = NLA_U32 },
++};
++
++/* base parsing; common to both _lookup and _populate variants */
++static int mctp_route_nlparse_common(struct net *net, struct nlmsghdr *nlh,
++				     struct netlink_ext_ack *extack,
++				     struct nlattr **tb, struct rtmsg **rtm,
++				     struct mctp_dev **mdev,
++				     mctp_eid_t *daddr_start)
+ {
+ 	struct net_device *dev;
+ 	unsigned int ifindex;
+@@ -1318,61 +1333,114 @@ static int mctp_route_nlparse(struct net *net, struct nlmsghdr *nlh,
+ 		return -EINVAL;
+ 	}
+ 
++	if ((*rtm)->rtm_type != RTN_UNICAST) {
++		NL_SET_ERR_MSG(extack, "rtm_type must be RTN_UNICAST");
++		return -EINVAL;
++	}
++
+ 	dev = __dev_get_by_index(net, ifindex);
+ 	if (!dev) {
+ 		NL_SET_ERR_MSG(extack, "bad ifindex");
+ 		return -ENODEV;
+ 	}
++
+ 	*mdev = mctp_dev_get_rtnl(dev);
+ 	if (!*mdev)
+ 		return -ENODEV;
+ 
+-	if (dev->flags & IFF_LOOPBACK) {
+-		NL_SET_ERR_MSG(extack, "no routes to loopback");
+-		return -EINVAL;
+-	}
+-
  	return 0;
  }
  
--static int mctp_route_remove(struct net *net, struct mctp_dev *mdev,
-+static int mctp_route_remove(struct net *net, unsigned int netid,
- 			     mctp_eid_t daddr_start, unsigned int daddr_extent,
- 			     unsigned char type)
+-static const struct nla_policy rta_metrics_policy[RTAX_MAX + 1] = {
+-	[RTAX_MTU]		= { .type = NLA_U32 },
+-};
+-
+-static int mctp_newroute(struct sk_buff *skb, struct nlmsghdr *nlh,
+-			 struct netlink_ext_ack *extack)
++/* Route parsing for lookup operations; we only need the "route target"
++ * components (ie., network and dest-EID range).
++ */
++static int mctp_route_nlparse_lookup(struct net *net, struct nlmsghdr *nlh,
++				     struct netlink_ext_ack *extack,
++				     unsigned char *type, unsigned int *netid,
++				     mctp_eid_t *daddr_start,
++				     unsigned int *daddr_extent)
  {
-@@ -1149,7 +1154,7 @@ static int mctp_route_remove(struct net *net, struct mctp_dev *mdev,
- 	ASSERT_RTNL();
+-	struct net *net = sock_net(skb->sk);
+ 	struct nlattr *tb[RTA_MAX + 1];
+-	struct nlattr *tbx[RTAX_MAX + 1];
+-	mctp_eid_t daddr_start;
+ 	struct mctp_dev *mdev;
+ 	struct rtmsg *rtm;
+-	unsigned int mtu;
+ 	int rc;
  
- 	list_for_each_entry_safe(rt, tmp, &net->mctp.routes, list) {
--		if (rt->dev == mdev &&
-+		if (mctp_route_netid(rt) == netid &&
- 		    rt->min == daddr_start && rt->max == daddr_end &&
- 		    rt->type == type) {
- 			list_del_rcu(&rt->list);
-@@ -1169,7 +1174,8 @@ int mctp_route_add_local(struct mctp_dev *mdev, mctp_eid_t addr)
+-	rc = mctp_route_nlparse(net, nlh, extack, tb,
+-				&rtm, &mdev, &daddr_start);
+-	if (rc < 0)
++	rc = mctp_route_nlparse_common(net, nlh, extack, tb, &rtm,
++				       &mdev, daddr_start);
++	if (rc)
+ 		return rc;
  
- int mctp_route_remove_local(struct mctp_dev *mdev, mctp_eid_t addr)
- {
--	return mctp_route_remove(dev_net(mdev->dev), mdev, addr, 0, RTN_LOCAL);
-+	return mctp_route_remove(dev_net(mdev->dev), mdev->net,
-+				 addr, 0, RTN_LOCAL);
- }
- 
- /* removes all entries for a given device */
-@@ -1389,7 +1395,7 @@ static int mctp_delroute(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (rtm->rtm_type != RTN_UNICAST)
+-	if (rtm->rtm_type != RTN_UNICAST) {
+-		NL_SET_ERR_MSG(extack, "rtm_type must be RTN_UNICAST");
++	*netid = mdev->net;
++	*type = rtm->rtm_type;
++	*daddr_extent = rtm->rtm_dst_len;
++
++	return 0;
++}
++
++/* Full route parse for RTM_NEWROUTE: populate @rt */
++static int mctp_route_nlparse_populate(struct net *net, struct nlmsghdr *nlh,
++				       struct netlink_ext_ack *extack,
++				       struct mctp_route *rt)
++{
++	struct nlattr *tbx[RTAX_MAX + 1];
++	struct nlattr *tb[RTA_MAX + 1];
++	unsigned int daddr_extent;
++	struct rtmsg *rtm;
++	int rc;
++
++	rc = mctp_route_nlparse_common(net, nlh, extack, tb, &rtm,
++				       &rt->dev, &rt->min);
++	if (rc)
++		return rc;
++
++	daddr_extent = rtm->rtm_dst_len;
++
++	if (daddr_extent > 0xff || daddr_extent + rt->min >= 255) {
++		NL_SET_ERR_MSG(extack, "invalid eid range");
  		return -EINVAL;
+ 	}
  
--	rc = mctp_route_remove(net, mdev, daddr_start, rtm->rtm_dst_len,
-+	rc = mctp_route_remove(net, mdev->net, daddr_start, rtm->rtm_dst_len,
- 			       RTN_UNICAST);
+-	mtu = 0;
++	rt->type = rtm->rtm_type;
++	rt->max = rt->min + daddr_extent;
++	rt->mtu = 0;
++
+ 	if (tb[RTA_METRICS]) {
+ 		rc = nla_parse_nested(tbx, RTAX_MAX, tb[RTA_METRICS],
+ 				      rta_metrics_policy, NULL);
+-		if (rc < 0)
++		if (rc < 0) {
++			NL_SET_ERR_MSG(extack, "incorrect RTA_METRICS format");
+ 			return rc;
++		}
+ 		if (tbx[RTAX_MTU])
+-			mtu = nla_get_u32(tbx[RTAX_MTU]);
++			rt->mtu = nla_get_u32(tbx[RTAX_MTU]);
+ 	}
+ 
+-	rc = mctp_route_add(net, mdev, daddr_start, rtm->rtm_dst_len, mtu,
+-			    rtm->rtm_type);
++	return 0;
++}
++
++static int mctp_newroute(struct sk_buff *skb, struct nlmsghdr *nlh,
++			 struct netlink_ext_ack *extack)
++{
++	struct net *net = sock_net(skb->sk);
++	struct mctp_route *rt;
++	int rc;
++
++	rt = mctp_route_alloc();
++	if (!rt)
++		return -ENOMEM;
++
++	rc = mctp_route_nlparse_populate(net, nlh, extack, rt);
++	if (rc < 0)
++		goto err_free;
++
++	mctp_dev_hold(rt->dev);
++
++	rc = mctp_route_add(net, rt);
++	if (!rc)
++		return 0;
++
++err_free:
++	mctp_route_release(rt);
  	return rc;
  }
+ 
+@@ -1380,23 +1448,21 @@ static int mctp_delroute(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			 struct netlink_ext_ack *extack)
+ {
+ 	struct net *net = sock_net(skb->sk);
+-	struct nlattr *tb[RTA_MAX + 1];
++	unsigned int netid, daddr_extent;
+ 	mctp_eid_t daddr_start;
+-	struct mctp_dev *mdev;
+-	struct rtmsg *rtm;
++	unsigned char type;
+ 	int rc;
+ 
+-	rc = mctp_route_nlparse(net, nlh, extack, tb,
+-				&rtm, &mdev, &daddr_start);
++	rc = mctp_route_nlparse_lookup(net, nlh, extack, &type, &netid,
++				       &daddr_start, &daddr_extent);
+ 	if (rc < 0)
+ 		return rc;
+ 
+ 	/* we only have unicast routes */
+-	if (rtm->rtm_type != RTN_UNICAST)
++	if (type != RTN_UNICAST)
+ 		return -EINVAL;
+ 
+-	rc = mctp_route_remove(net, mdev->net, daddr_start, rtm->rtm_dst_len,
+-			       RTN_UNICAST);
++	rc = mctp_route_remove(net, netid, daddr_start, daddr_extent, type);
+ 	return rc;
+ }
+ 
 
 -- 
 2.39.5
