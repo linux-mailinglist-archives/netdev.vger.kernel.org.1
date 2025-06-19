@@ -1,167 +1,137 @@
-Return-Path: <netdev+bounces-199588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA180AE0DAE
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 21:21:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD2BAE0E11
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 21:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75CB73BF188
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:20:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18DD64A6921
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455AB245006;
-	Thu, 19 Jun 2025 19:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kFOq/gED"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208471DF97D;
+	Thu, 19 Jun 2025 19:36:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4039F21FF5D
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 19:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BE130E82B;
+	Thu, 19 Jun 2025 19:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750360840; cv=none; b=JrHna+kgJXT/2pyqggcZyZIiBOU3CJJ+8/JTsEt2HwzQQLGGdKoX4PIMHKRTsG1aAfviFETImHcUepJNa5iQa4AevnfIp8mviuX2RkW7fz8ekAwml6ff1efUHsBDwJDVj6Zy6Ql7qFiDnT73fRtHupCASpDANKk1oeJV6SoaV88=
+	t=1750361810; cv=none; b=AoLTPLIt+LlIDQyOryV1P6vgj1xP3Spjj2DgOKsgxgNCfch3WP5wbjilSTHkRGnkbZQUpsm9Dbbep6Tb0odXj3O6QYR2YncUb70U4voohRE84MErf/Vt1328WK3pDw0SgL47LXGtJd5rzWFlQR8+D2CitsOIkPGwgECxYmQAUMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750360840; c=relaxed/simple;
-	bh=pot+ohnN0ZO3Fh+TEFIfLl2YCGEG4usCNHjE1LGOsRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=DmlylZQglb7uMKug0KvSasDVLIEom21tzUwuJi8KrD9J8AmrSwx6D1eFBaR8Tq07r1ZmLpuCLkGGjlg2ggspHLK/hLIWkQtulMui5Aw2lEcfbXxQQAHjbkg/m/FrNGionekOPN5lpaRrOMqFGqsoLHRQuPPtkPYN5r+tgm+PRs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kFOq/gED; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750360837; x=1781896837;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=pot+ohnN0ZO3Fh+TEFIfLl2YCGEG4usCNHjE1LGOsRc=;
-  b=kFOq/gED0bkHeMUikOskpcmIqTKX35d1YCF89YF+a5IPxvdHqVaCWSTE
-   6IOAB/pXa9XA07vXpgl6+SaKNL3/oCdAzzPMDYwPh1CN/jS1a5c6BbLIq
-   nL9nqVW/oQ3oHj6PE6cyvu40BQvhNH+weLu68kHSYbGTC6zUPJOiUSXH2
-   OYFT/wHY2O1uRIv9S70cqCzzr02gJuPbWV6ds8ip8mrsIkQpakrNgt2iH
-   lQs1n87As/TCmQDU3uJxeC+ZjokIXkU38AH84gSWWZQkXa+8hcjBHrZam
-   ApQq62ifP24aCUH0LTpQ7H6hUyApp65NRPd4ysLcikuK2vTF6HxYIIWnF
-   w==;
-X-CSE-ConnectionGUID: bi7GSeJeQQiJFqS02hAsOA==
-X-CSE-MsgGUID: zypwjMJTTyGQptqLIl2zeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="52701102"
-X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
-   d="scan'208";a="52701102"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 12:20:37 -0700
-X-CSE-ConnectionGUID: ilE3VY5YR8ehCGUtpyrHRQ==
-X-CSE-MsgGUID: fzEG4tzlSxePRFDZz5niFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,249,1744095600"; 
-   d="scan'208";a="150216905"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 19 Jun 2025 12:20:35 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uSKoK-000L3G-1e;
-	Thu, 19 Jun 2025 19:20:32 +0000
-Date: Fri, 20 Jun 2025 03:20:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Subject: [net-next:main 35/47] drivers/net/pse-pd/pse_core.c:676:23: error:
- incompatible pointer types passing 'struct net_device *' to parameter of
- type 'struct phy_device *'
-Message-ID: <202506200355.TqFiYUbN-lkp@intel.com>
+	s=arc-20240116; t=1750361810; c=relaxed/simple;
+	bh=0va0Ka/IZtI0QKqeoxQgsQhzUmGLi6WCkSlL0TAYbJc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=kOZR0EopyT5+t/7++tzfAp1sCxC0QTHgc2jfBdEJ3wJlXCi8i3mMT80dEVDWCBVbXX8l0nvyqFaub0MpPp0TTTQJRNF42bdGV3GF7HYelYHg6cyeX0BnpKFjT+QP1poCx9qhHi2JStHC+EVCep+aOf92OVfZTNrVnX/NC0VvGXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 34AA292009C; Thu, 19 Jun 2025 21:36:44 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 2DC4C92009B;
+	Thu, 19 Jun 2025 20:36:44 +0100 (BST)
+Date: Thu, 19 Jun 2025 20:36:44 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Greg Chandler <chandleg@wizardsworks.org>
+cc: Florian Fainelli <f.fainelli@gmail.com>, stable@vger.kernel.org, 
+    netdev@vger.kernel.org
+Subject: Re: Tulip 21142 panic on physical link disconnect
+In-Reply-To: <8c06f8969e726912b46ef941d36571ad@wizardsworks.org>
+Message-ID: <alpine.DEB.2.21.2506192007440.37405@angie.orcam.me.uk>
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org> <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com> <385f2469f504dd293775d3c39affa979@wizardsworks.org> <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com> <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
+ <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com> <a3d8ee993b73b826b537f374d78084ad@wizardsworks.org> <12ccf3e4c24e8db2545f6ccaba8ce273@wizardsworks.org> <8c06f8969e726912b46ef941d36571ad@wizardsworks.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
-head:   afc783fa0aab9cc093fbb04871bfda406480cf8d
-commit: fc0e6db30941a66e284b8516b82356f97f31061d [35/47] net: pse-pd: Add support for reporting events
-config: i386-randconfig-012-20250619 (https://download.01.org/0day-ci/archive/20250620/202506200355.TqFiYUbN-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250620/202506200355.TqFiYUbN-lkp@intel.com/reproduce)
+On Thu, 19 Jun 2025, Greg Chandler wrote:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506200355.TqFiYUbN-lkp@intel.com/
+> So what I know for sure is this:
+> The tulip driver on alpha (generic and DP264) oops/panic on physical
+> disconnect, but only when an IP address is bound.
+> It does not panic when no address is bound to the interface.
+> It does not matter if the driver is compiled in, or if it is compiled as a
+> module.
+> It does not matter if all of the options are set for tulip or if none of them
+> are:
+>     New bus configuration
+>     Use PCI shared mem for NIC registers
+>     Use RX polling (NAPI)
+>     Use Interrupt Mitigation
+> The physical link does not auto-negotiate, and mii-tool does not seem to be
+> able to force it with -F or -A like you would expect it to.
+> The kernel does not drop the "Link is Up/Link is Down" messages when the PHY
+> "links"
+> The switch and interface both show LEDs as if linked at 10-Half-Duplex, and
+> the lights turn off when the link is broken.
+> Subsequently they do relink at 10-Half again if plugged back in.
+> I did also attempt to test the kernel level stack for nfsroot, just to see if
+> it worked prior to init launching everything else, and it did not.
+> I used the same IP configuration for that test as all of the tests in these
+> emails.
+> All of the oops/panics seem to happen at:
+>     kernel/time/timer.c:1657 __timer_delete_sync+0x10c/0x150
 
-All errors (new ones prefixed by >>):
+ FYI something's changed a while ago in how `del_timer_sync' is handled 
+and I can see a similar warning nowadays with another network driver with 
+the MIPS platform.
 
->> drivers/net/pse-pd/pse_core.c:676:23: error: incompatible pointer types passing 'struct net_device *' to parameter of type 'struct phy_device *' [-Werror,-Wincompatible-pointer-types]
-     676 |                         ethnl_pse_send_ntf(netdev, notifs);
-         |                                            ^~~~~~
-   include/linux/ethtool_netlink.h:125:58: note: passing argument to parameter 'phydev' here
-     125 | static inline void ethnl_pse_send_ntf(struct phy_device *phydev,
-         |                                                          ^
-   1 error generated.
+ Since I'm the maintainer of said driver I mean to bisect it and figure 
+out what's going here, but haven't found time so far owing to other 
+commitments (and the driver otherwise works just fine regardless, so it's 
+minor annoyance).  If you beat me to it, then I'll gladly accept it, but 
+otherwise I'm just letting you know you're not alone with this issue and 
+that it's not specific to the DEC Tulip driver on your system.
 
+ For the record:
 
-vim +676 drivers/net/pse-pd/pse_core.c
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 0 at kernel/time/timer.c:1563 __timer_delete_sync+0x110/0x118
+Modules linked in:
+CPU: 0 PID: 0 Comm: swapper Tainted: G        W          6.4.0-rc3-00030-gae62c49c0cef #21
+Stack : 807a0000 80095a8c 00000000 00000004 806a0000 00000009 80c09dac 807d0000
+        807a0000 807056ec 80769fac 807a13f3 807d30c4 1000ec00 80c09d58 80787a18
+        00000000 00000000 807056ec 00000000 00000001 80c09c94 00000077 34633236
+        20202020 00000000 807d7311 20202020 807056ec 1000ec00 00000000 00000000
+        806fcb60 806fcb38 807a0000 00000001 00000000 fffffffe 00000000 807d0000
+        ...
+Call Trace:
+[<80048ecc>] show_stack+0x2c/0xf8
+[<80645c88>] dump_stack_lvl+0x34/0x4c
+[<80641d00>] __warn+0xb4/0xe8
+[<80641d84>] warn_slowpath_fmt+0x50/0x88
+[<800b177c>] __timer_delete_sync+0x110/0x118
+[<8040f4b0>] fza_interrupt+0x904/0x1004
+[<80098d7c>] __handle_irq_event_percpu+0x84/0x188
+[<80098f1c>] handle_irq_event+0x38/0xbc
+[<8009d4e4>] handle_level_irq+0xc8/0x208
+[<80098110>] generic_handle_irq+0x44/0x5c
+[<8064f450>] do_IRQ+0x1c/0x28
+[<80041cf0>] dec_irq_dispatch+0x10/0x20
+[<80043754>] handle_int+0x14c/0x158
+[<8008bf64>] do_idle+0x5c/0x15c
+[<8008c368>] cpu_startup_entry+0x20/0x28
+[<8064657c>] kernel_init+0x0/0x114
 
-   632	
-   633	/**
-   634	 * pse_isr - IRQ handler for PSE
-   635	 * @irq: irq number
-   636	 * @data: pointer to user interrupt structure
-   637	 *
-   638	 * Return: irqreturn_t - status of IRQ
-   639	 */
-   640	static irqreturn_t pse_isr(int irq, void *data)
-   641	{
-   642		struct pse_controller_dev *pcdev;
-   643		unsigned long notifs_mask = 0;
-   644		struct pse_irq_desc *desc;
-   645		struct pse_irq *h = data;
-   646		int ret, i;
-   647	
-   648		desc = &h->desc;
-   649		pcdev = h->pcdev;
-   650	
-   651		/* Clear notifs mask */
-   652		memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
-   653		mutex_lock(&pcdev->lock);
-   654		ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
-   655		mutex_unlock(&pcdev->lock);
-   656		if (ret || !notifs_mask)
-   657			return IRQ_NONE;
-   658	
-   659		for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
-   660			unsigned long notifs, rnotifs;
-   661			struct net_device *netdev;
-   662			struct pse_control *psec;
-   663	
-   664			/* Do nothing PI not described */
-   665			if (!pcdev->pi[i].rdev)
-   666				continue;
-   667	
-   668			notifs = h->notifs[i];
-   669			dev_dbg(h->pcdev->dev,
-   670				"Sending PSE notification EVT 0x%lx\n", notifs);
-   671	
-   672			psec = pse_control_find_by_id(pcdev, i);
-   673			rtnl_lock();
-   674			netdev = pse_control_get_netdev(psec);
-   675			if (netdev)
- > 676				ethnl_pse_send_ntf(netdev, notifs);
-   677			rtnl_unlock();
-   678			pse_control_put(psec);
-   679	
-   680			rnotifs = pse_to_regulator_notifs(notifs);
-   681			regulator_notifier_call_chain(pcdev->pi[i].rdev, rnotifs,
-   682						      NULL);
-   683		}
-   684	
-   685		return IRQ_HANDLED;
-   686	}
-   687	
+---[ end trace 0000000000000000 ]---
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+-- the arrival of this particular device state change interrupt means the 
+timer set up just in case the device gets stuck can be deleted, so I'm not 
+sure why calling `del_timer_sync' to discard the timer has become a no-no 
+now; this code is 20+ years old now, though I sat on it for a while and 
+then it took some time and effort to get it upstream too.  The issue has 
+started sometime between 5.18 (clean boot) and 6.4 (quoted above).
+
+ Maybe it'll ring someone's bell and they'll chime in or otherwise I'll 
+bisect it... sometime.  Or feel free to start yourself with 5.18, as it's 
+not terribly old, only a bit and certainly not so as 2.6 is.
+
+  Maciej
 
