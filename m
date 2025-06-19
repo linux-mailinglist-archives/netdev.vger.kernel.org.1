@@ -1,55 +1,86 @@
-Return-Path: <netdev+bounces-199416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7423AAE032F
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:14:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 135DCAE0332
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86C3016249D
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:14:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62F811884CEB
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D65E226CE0;
-	Thu, 19 Jun 2025 11:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797F1221F30;
+	Thu, 19 Jun 2025 11:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="t+XfUDuP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ba1iy66j"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-68.smtpout.orange.fr [193.252.22.68])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02BC226D09;
-	Thu, 19 Jun 2025 11:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E023085BA
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 11:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750331646; cv=none; b=VwWMB/D5TK+JqvzzOkQLeC4mWdFOHSdIom1DLqdW7tZ4sh1cAM/sJsoTUdggX8eeBoT9jl+0uK5dcJPSiJSodz3oCpnn6dXcKKHO6gf7SZga1vG25XdrxEdo4CIS8dAZz/PWFSFzwstuzqiJux0M0/hxjY0CVQ2XtJ9IR58EXzg=
+	t=1750331733; cv=none; b=PstCoLK3n0z0zbtc9jLuR5NzjFffjsGB84iVubjQZqOkzVEeBR7R7Njo6wxhJQwe25M6LvxQQvLsqREcx6A0yufaONN+c3B73+7O3Uu8+s7DtLjQAk1mRI9YWI1dNXBRa0I6taq6jQQsQillSzMfWl6JuJCPNVtd3eyyGM0WCaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750331646; c=relaxed/simple;
-	bh=Ir12Ssgjmm+Db2m2mLWpiSb7No+ZNzezXL6QrEsyz7U=;
+	s=arc-20240116; t=1750331733; c=relaxed/simple;
+	bh=LUeQAjtBZos6OdUZbbQVfexhZynCiSgqlsEwbuBatHQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AnuoHRqw43ttFpepJT9m0vqFncsHDECFYjvW+KDS+0Xen1gRfUAU5ozoCK3cxQV/eQ9QEwWTU+QFyFU3TKYgJ7lLR916AP/d3xT46CucqflhvbWwOfmEnoDb/6BWFHuneMrA+AtEd/pBdcOF7Yz0JAckpJa1h7mkixZOgzN9AvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=t+XfUDuP; arc=none smtp.client-ip=193.252.22.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id SDCEuaWyOZo3bSDCJufxIG; Thu, 19 Jun 2025 13:12:51 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1750331571;
-	bh=nzO1C4CtcnTvS6n7XDCN/bT/rN8sTJAHKtCh/p2wEY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=t+XfUDuPEBlk2RN7y4GnFO4YE+Ylk1E/cNcntvJyJQ3BIB+sRuK/77cetL7OaKJXM
-	 Ju8lmLb+L5fpEEkniNSnuvj59yYpk5b54HZlgaFGad4nSR6soEud5tmRA9XFvCJDbp
-	 NH0TbYkfdtMO/q/TzzXojDuNmJJgDZtOpUIjdxXTErJZt+v+T3CkKpaoFgNDETbxGz
-	 lm4/gp9uEWz2vcExToVB5fHDlNQQ9ryk6sDMN+ljm6FMn+bUxnR/MgE90wxKHy+LvI
-	 v5KEqYiMQ1uuElooFub3YBh4rZrxzyzvKOEDAkBEwt4R8Pc6psw1U1qeGJ34AcqCEj
-	 p2YHAEpr8JROA==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 19 Jun 2025 13:12:51 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <88b0892f-5994-4b7a-9de3-eab39075acaa@wanadoo.fr>
-Date: Thu, 19 Jun 2025 20:12:41 +0900
+	 In-Reply-To:Content-Type; b=qsgnKFs+UsGcHh/h39tBjTxhi4Ps518ZL+Qcnqx8kq/Te47A+lXzybPCABS6eMDrU+fYJyHTjcK12d9fStHtugysn9deFlMApnuPgo7L2sFWWY6wGpEMEuPW1WIQ4bdDF3kXqQ9kmAlfFTGYxqWkIwzRdT9FfzC+Y3seQCGogjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ba1iy66j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750331730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3xZv/IaN3pVBxm6Ay/mMD7muLAWVYifKr0RAn2IkTKE=;
+	b=ba1iy66jrY3A+2qdWoghrzrb+8yfNWKaw+0rMZgtvIFKRL5l92OsE+GeJlSLEbdJ0C1iij
+	TooyEEf57u7YU4WtSpL5HnMwi+8KAiBkg0nv6sOmVzuc/MnjuDYrY6hc84D91ql7y4WfZg
+	MHCTMN3LME10M5/aM2p+WQCtkU1ftls=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-35-gBGFlOA3Pr6WumZkjsa0pw-1; Thu, 19 Jun 2025 07:15:29 -0400
+X-MC-Unique: gBGFlOA3Pr6WumZkjsa0pw-1
+X-Mimecast-MFC-AGG-ID: gBGFlOA3Pr6WumZkjsa0pw_1750331728
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45311704d22so4288715e9.2
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 04:15:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750331728; x=1750936528;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3xZv/IaN3pVBxm6Ay/mMD7muLAWVYifKr0RAn2IkTKE=;
+        b=U2Heq8+9dByMplj2MrR58a5O+qvULPRqK3mcyJuknwiV4vO4OpdaiFMNPhTZWcqCbz
+         zsOVFTgm+Eb+QL/EsMPVso708SxpeI+Hk+gNQtTX/tbTSDQrzHJPY7eoxLSnrq6OluEv
+         4/wfNmy+ufScv6Cx/rho6W8SHlrgD8ZmfQVoPnZnjFZ//Jn4qc3eW+9RAgSL0cSmHWqQ
+         znJZ8P3De3SaMmGzXNu630BxVc2141S95KokIgAW7t0wkboZOEi3f6kIilzfiD407Asb
+         WTwOv4tysSQawYiYxDhw92TnmIOvVqRXYAAQO8cFT2/9ySFdE8QbowMs5VtP7xkrTZmT
+         rvKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXum3B9NDLeKtvqqn9h0r84TU6PklOMuY1uOYwbmb2CVbuBxzgBz6TbotcFKEiDyqwqxULW7Qw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK/UV+iB5OSV0IyoCivz+u7ZqQ0KgiCVyCmIaBwM1Vwa6Jh3xa
+	/TwcbaVFLqtESDlQ+u0TwvplLI8nwP4gWePhZ82zfkxaNa4Q3NzLswbfpaTldD8zqgUz974HJ6I
+	f6ZI8MdmLpkgO9vWZDJUio3Kx2cslniK2LaKKpgvkAtG4SSf70Ix46SVwDA==
+X-Gm-Gg: ASbGncsrEQfXBsPkN0MGawMmk0UtjO/uNujYJ/eIhoC2HBEQ5I6kBsgKELQjj6Cis95
+	Fm4VlLkXJzOfHEW7nkxLJsull3qJc7Rv5IDvDdRY625H3/fOfiFZfUf4Rycn37uAnyDRx3YT/7R
+	u1K1oxgetmJ+nMzTinC/NsuOowkgzI2tIFMPoqtztUuXTJ369k/lN2zwq2yIM1PL6LQp+Blwx7C
+	I9l9cqqKVDCd6/d0tNSdYm30F2SFp/+GQroeqWnjhhB7BDlYJPWWygbV5Q1InjjbPKl6a+siet3
+	unZkp6LKAI0iuBUeTX3GsB8ax9OJVJys/p5OtTHJYytyXQgs32tyyS9FcqUtgUVeZUN4pQ==
+X-Received: by 2002:a05:600c:190b:b0:445:1984:247d with SMTP id 5b1f17b1804b1-4533cadefe8mr187697275e9.7.1750331728253;
+        Thu, 19 Jun 2025 04:15:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG43dOM5T7qmoDFSYxKLqTuwEzuqqfaVGRVW809R5AKI8GEve+HAJw7T1QeY9uWvmBGJ78U+g==
+X-Received: by 2002:a05:600c:190b:b0:445:1984:247d with SMTP id 5b1f17b1804b1-4533cadefe8mr187696945e9.7.1750331727767;
+        Thu, 19 Jun 2025 04:15:27 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271a:7310:d5d8:c311:8743:3e10? ([2a0d:3344:271a:7310:d5d8:c311:8743:3e10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535e99503asm25371355e9.29.2025.06.19.04.15.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 04:15:25 -0700 (PDT)
+Message-ID: <72bab3b2-bdd6-43f6-9243-55009f9c1071@redhat.com>
+Date: Thu, 19 Jun 2025 13:15:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,72 +88,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: rcar_canfd: Describe channel-specific FD registers
- using C struct
-To: Geert Uytterhoeven <geert+renesas@glider.be>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- "David S . Miller" <davem@davemloft.net>
-References: <292b75b3bc8dd95f805f0223f606737071c8cf86.1750327217.git.geert+renesas@glider.be>
+Subject: Re: [PATCH net-next v11 13/14] dpll: zl3073x: Add support to get/set
+ frequency on input pins
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson <shannon.nelson@amd.com>,
+ Dave Jiang <dave.jiang@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250616201404.1412341-1-ivecera@redhat.com>
+ <20250616201404.1412341-14-ivecera@redhat.com>
 Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <292b75b3bc8dd95f805f0223f606737071c8cf86.1750327217.git.geert+renesas@glider.be>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250616201404.1412341-14-ivecera@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Geert,
+On 6/16/25 10:14 PM, Ivan Vecera wrote:
+> +/**
+> + * zl3073x_dpll_input_ref_frequency_get - get input reference frequency
+> + * @zldpll: pointer to zl3073x_dpll
+> + * @ref_id: reference id
+> + * @frequency: pointer to variable to store frequency
+> + *
+> + * Reads frequency of given input reference.
+> + *
+> + * Return: 0 on success, <0 on error
+> + */
+> +static int
+> +zl3073x_dpll_input_ref_frequency_get(struct zl3073x_dpll *zldpll, u8 ref_id,
+> +				     u32 *frequency)
+> +{
+> +	struct zl3073x_dev *zldev = zldpll->dev;
+> +	u16 base, mult, num, denom;
+> +	int rc;
+> +
+> +	guard(mutex)(&zldev->multiop_lock);
+> +
+> +	/* Read reference configuration */
+> +	rc = zl3073x_mb_op(zldev, ZL_REG_REF_MB_SEM, ZL_REF_MB_SEM_RD,
+> +			   ZL_REG_REF_MB_MASK, BIT(ref_id));
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* Read registers to compute resulting frequency */
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_REF_FREQ_BASE, &base);
+> +	if (rc)
+> +		return rc;
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_REF_FREQ_MULT, &mult);
+> +	if (rc)
+> +		return rc;
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_REF_RATIO_M, &num);
+> +	if (rc)
+> +		return rc;
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_REF_RATIO_N, &denom);
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* Sanity check that HW has not returned zero denominator */
+> +	if (!denom) {
+> +		dev_err(zldev->dev,
+> +			"Zero divisor for ref %u frequency got from device\n",
+> +			ref_id);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Compute the frequency */
+> +	*frequency = base * mult * num / denom;
 
-Thanks for the patch.
+As base, mult, num and denom are u16, the above looks like integer
+overflow prone.
 
-On 19/06/2025 at 19:13, Geert Uytterhoeven wrote:
-> The rcar_canfd_f_*() inline functions to obtain channel-specific CAN-FD
-> register offsets really describe a memory layout.  Hence replace them by
-> a C structure, to simplify the code, and reduce kernel size.
-> 
-> This also gets rid of warnings about unused rcar_canfd_f_*() inline
-> functions, which are reported by recent versions of clang.
-> 
-> Suggested-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Closes: https://lore.kernel.org/20250618183827.5bebca8f@kernel.org
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> Fast-tracked because of the clang warnings.
+I think you should explicitly cast to u64, and possibly use a u64 frequency.
 
-Make sense.
-
-@Jakub, OK for me if you want to directly pick this patch without going through
-the linux-can tree.
-
-> Changes compared to Vincent's original suggestion
-> (https://lore.kernel.org/420d37b1-5648-4209-8d6f-1ac9d780eea2@wanadoo.fr):
->   - Move rcar_canfd_f to the old RCANFD_F_*() location,
->   - Update RSCFDnCFDCmXXX comment.
->   - Rename struct rcar_canfd_f to struct rcar_canfd_f,
-                                           ^^^^^^^^^^^^
-rcar_canfd_f_c ;)
-
->   - Rename cbase to fcbase,
->   - Drop static_assert(),
->   - Drop unused car_canfd_*_reg() functions.
->   - Drop simple wrappers around {read,write}l(),
-
-Acked-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-
-
-Yours sincerely,
-Vincent Mailhol
+/P
 
 
