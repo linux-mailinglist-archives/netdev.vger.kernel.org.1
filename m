@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC481ADFDF1
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:50:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F4DADFDF4
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EC483AC08D
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:50:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F27413AC54C
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FCC2475F7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4261824888C;
 	Thu, 19 Jun 2025 06:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3Ias+ip"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pbnZLsJO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099EB14F98;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A8523C513;
 	Thu, 19 Jun 2025 06:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750315821; cv=none; b=ClP93R9l0xIpB6k+RmRvvAzyZsTxiX1Kr3KsMDOYwGcWmBEycP5huGk4BpnavOu5luBhUDhJSKlqOqwl+NLKjGLdH3nYENPbGDDZ19806Ai9fgsoNK8rED2qp1RblgrtM1XqTUuyypRJO80E2hXUP6VGUzO092MJVshrMHLr2Sg=
+	t=1750315821; cv=none; b=bdayaJ/VlIUU0EW07sUniqC7fqqSqBSIHTEqMq3j1hcdLeh+e+KfHUAHTB0tfgu4Mu78P1gswnIMBoXQwZkVT8aBm6sp2h2hSvvRNxvgxG3pksVbFz/SzkshIs0P2yr7JEoJssCuLqGvgUyPT1SLOPgOy1fMjSY/1AMP2AYsaqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750315821; c=relaxed/simple;
-	bh=JvTI+DF/1Dszyn4T0n7ZKhi6vNtj6FoC1Ae/TMd5FHM=;
+	bh=9sv3o8O8M0IyOR5wJkoSEusaPecRlQcEL5SoMo0iJ7A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I+qfVXZYT29iX4h+3j0SR4PhWQcJxwbHnBi0Jg++OjmrZQ7alQfNb2gzl5a9Lx7v5xQEybC/DTwe6rLLxS1a3yPMG8uKzDbyokQSFof2t/cbdzH9mlbrj12ugmHVeX7uEPriREMN3w6P5dVvId4q/WDGMZiflwvCCiq57FIVLpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3Ias+ip; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6FEBC4CEEF;
+	 MIME-Version; b=pabstBfxszBw9PNQY+2MByzu/1bIHatVyYM8TjBc3nXbBEV+1tmfG0lwRATi0tTHyk6rUy8wYBWdoa6qiT+E550fOwH8MR5yJwJ7kx8z1A4mn7wILO5nxVmAq1kkHc8rGxAGXkX0pkPbPovRMKUTK0VAt4Fc8hnOEV/Qi18fpEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pbnZLsJO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACCD4C4CEED;
 	Thu, 19 Jun 2025 06:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1750315820;
-	bh=JvTI+DF/1Dszyn4T0n7ZKhi6vNtj6FoC1Ae/TMd5FHM=;
+	bh=9sv3o8O8M0IyOR5wJkoSEusaPecRlQcEL5SoMo0iJ7A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G3Ias+ipf86GGwEO696BS4I3hyYvFXlxOBAGciBgQQdC+P+FTYaKXuiz7aXKqEekB
-	 41ROxbKjmPuoKAd9tjfNgQqtOqQYazDXp6UegXPSFE0/pZ+LCyI/gFx5I1zmeq7Jr9
-	 tA81uMylDht8q2RvATdvzBe93F4GvuVAy2Z08iAW1lF+Rb1kETwLbWk8haNy/j8Y3j
-	 1AOV+ArwTydcOqym6NhVQx+FxNx130IYvv0gRNHa8vhMf7pqjfvRAjDx/G0jWUr1IT
-	 oAmKW6DE2sqa5wo3YM0ZLVbEgD4eP3sqO1PwNPhHlH00nh30QsotYnZb99Sbw1UkTu
-	 OgpLPizO9qIrA==
+	b=pbnZLsJOfX17tLAz7qbnLMk773IGNbYnRDyQpKMIaYSSYXx+7QT50vdx1PdbrnYDl
+	 cfgRFpMTse25+SNe+5bQP+SFsJ9Das/C6MDrUWobo5twvuIMWpUu0S1gBNQJn8AN7I
+	 ZQpEVrX7OolctvrgJ9lZ73Klhq8RqmSbu/nscz6Qn5Z1JSL0w9LxYcov8/44A4yK7r
+	 qkdNOHWZjuUbT9fHqM8NyV6MX2PPIghFatRSQp45C4u8xanw0Zn+yR3p3cIGjn3xbh
+	 5X/29p5GSdfq+ClQ+7+IhLxnaDcH2tkMEMLKPHqBz+G7lnfmP7QZyKcqKH+DbWlrM2
+	 NLaTMQv3RmkeQ==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1uS96I-00000003dGa-3TSR;
+	id 1uS96I-00000003dGe-3atf;
 	Thu, 19 Jun 2025 08:50:18 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
@@ -68,9 +68,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v7 01/17] docs: conf.py: properly handle include and exclude patterns
-Date: Thu, 19 Jun 2025 08:48:54 +0200
-Message-ID: <737b08e891765dc10bd944d4d42f8b1e37b80275.1750315578.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v7 02/17] docs: Makefile: disable check rules on make cleandocs
+Date: Thu, 19 Jun 2025 08:48:55 +0200
+Message-ID: <e4ad47a238cffc8659786bcfdba4126f08522035.1750315578.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1750315578.git.mchehab+huawei@kernel.org>
 References: <cover.1750315578.git.mchehab+huawei@kernel.org>
@@ -83,125 +83,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-When one does:
-	make SPHINXDIRS="foo" htmldocs
-
-All patterns would be relative to Documentation/foo, which
-causes the include/exclude patterns like:
-
-	include_patterns = [
-		...
-		f'foo/*.{ext}',
-	]
-
-to break. This is not what it is expected. Address it by
-adding a logic to dynamically adjust the pattern when
-SPHINXDIRS is used.
-
-That allows adding parsers for other file types.
-
-It should be noticed that include_patterns was added on
-Sphinx 5.1:
-	https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-include_patterns
-
-So, a backward-compatible code is needed when we start
-using it for real.
+It doesn't make sense to check for missing ABI and documents
+when cleaning the tree.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Reviewed-by: Breno Leitao <leitao@debian.org>
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/conf.py | 67 ++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 63 insertions(+), 4 deletions(-)
+ Documentation/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/conf.py b/Documentation/conf.py
-index 12de52a2b17e..4ba4ee45e599 100644
---- a/Documentation/conf.py
-+++ b/Documentation/conf.py
-@@ -17,6 +17,66 @@ import os
- import sphinx
- import shutil
+diff --git a/Documentation/Makefile b/Documentation/Makefile
+index d30d66ddf1ad..b98477df5ddf 100644
+--- a/Documentation/Makefile
++++ b/Documentation/Makefile
+@@ -5,6 +5,7 @@
+ # for cleaning
+ subdir- := devicetree/bindings
  
-+# Get Sphinx version
-+major, minor, patch = sphinx.version_info[:3]
-+
-+# Include_patterns were added on Sphinx 5.1
-+if (major < 5) or (major == 5 and minor < 1):
-+    has_include_patterns = False
-+else:
-+    has_include_patterns = True
-+    # Include patterns that don't contain directory names, in glob format
-+    include_patterns = ['**.rst']
-+
-+# Location of Documentation/ directory
-+doctree = os.path.abspath('.')
-+
-+# Exclude of patterns that don't contain directory names, in glob format.
-+exclude_patterns = []
-+
-+# List of patterns that contain directory names in glob format.
-+dyn_include_patterns = []
-+dyn_exclude_patterns = ['output']
-+
-+# Properly handle include/exclude patterns
-+# ----------------------------------------
-+
-+def update_patterns(app):
-+
-+    """
-+    On Sphinx, all directories are relative to what it is passed as
-+    SOURCEDIR parameter for sphinx-build. Due to that, all patterns
-+    that have directory names on it need to be dynamically set, after
-+    converting them to a relative patch.
-+
-+    As Sphinx doesn't include any patterns outside SOURCEDIR, we should
-+    exclude relative patterns that start with "../".
-+    """
-+
-+    sourcedir = app.srcdir  # full path to the source directory
-+    builddir = os.environ.get("BUILDDIR")
-+
-+    # setup include_patterns dynamically
-+    if has_include_patterns:
-+        for p in dyn_include_patterns:
-+            full = os.path.join(doctree, p)
-+
-+            rel_path = os.path.relpath(full, start = app.srcdir)
-+            if rel_path.startswith("../"):
-+                continue
-+
-+            app.config.include_patterns.append(rel_path)
-+
-+    # setup exclude_patterns dynamically
-+    for p in dyn_exclude_patterns:
-+        full = os.path.join(doctree, p)
-+
-+        rel_path = os.path.relpath(full, start = app.srcdir)
-+        if rel_path.startswith("../"):
-+            continue
-+
-+        app.config.exclude_patterns.append(rel_path)
-+
- # helper
- # ------
++ifneq ($(MAKECMDGOALS),cleandocs)
+ # Check for broken documentation file references
+ ifeq ($(CONFIG_WARN_MISSING_DOCUMENTS),y)
+ $(shell $(srctree)/scripts/documentation-file-ref-check --warn)
+@@ -14,6 +15,7 @@ endif
+ ifeq ($(CONFIG_WARN_ABI_ERRORS),y)
+ $(shell $(srctree)/scripts/get_abi.py --dir $(srctree)/Documentation/ABI validate)
+ endif
++endif
  
-@@ -219,10 +279,6 @@ language = 'en'
- # Else, today_fmt is used as the format for a strftime call.
- #today_fmt = '%B %d, %Y'
- 
--# List of patterns, relative to source directory, that match files and
--# directories to ignore when looking for source files.
--exclude_patterns = ['output']
--
- # The reST default role (used for this markup: `text`) to use for all
- # documents.
- #default_role = None
-@@ -516,3 +572,6 @@ kerneldoc_srctree = '..'
- # the last statement in the conf.py file
- # ------------------------------------------------------------------------------
- loadConfig(globals())
-+
-+def setup(app):
-+	app.connect('builder-inited', update_patterns)
+ # You can set these variables from the command line.
+ SPHINXBUILD   = sphinx-build
 -- 
 2.49.0
 
