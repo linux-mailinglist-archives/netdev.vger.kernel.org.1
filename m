@@ -1,142 +1,164 @@
-Return-Path: <netdev+bounces-199426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F202EAE0425
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B73FAE0461
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C3A35A165B
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:43:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2532C3A750A
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E2A22A4FA;
-	Thu, 19 Jun 2025 11:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E926122E3FA;
+	Thu, 19 Jun 2025 11:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkqPDTsX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLK1SjZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE692264DD
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 11:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE8521FF26;
+	Thu, 19 Jun 2025 11:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750333425; cv=none; b=qilW2pwKYprm9z/wW1fAvTgLhbzlw4P5mUiRs8Mhdcv8dbw8n0w2O8K2L+02G3n5DtN0D5POYzmcQ7RgugVbGbBLQxYyhJAk0eK3Wo3GNbOdGasYNpts1XurCm+Q5N/zuK68LVGpEhObM1oip6daP+n/QRKTEGzYjCb1hsvgeWM=
+	t=1750334032; cv=none; b=s+P+uH55Ibacxvjb7GtNO5Iew/h5QcYDdyKt6OOWhBYj3ZkKaieilmOUhE7g2my+wLc3K1o10pwJ5D/B8C768tfMZY34/jamT8ZJcNW/pf2hPfwf5/d+wwdUH2bQbAII7uz49lIWpo3Qj5e9Gg90uUpR3r+XCqZNMmNydoid5F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750333425; c=relaxed/simple;
-	bh=ka2YSkd/50tKtAy/Sw1F5sNt6obV6O6uUBbncHAvZq4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H7d7gK1w89ePAi1/H+vI2fllUEErZRaI+OIhTtxyd1crv9jaRKjafyeYT2JzOj1Yq77uf5jS6oms9VwGY7HAF9Opw/shvIb7/Txgcl152qQhhPwauFem464DwFo+tc1qi/5h7EyMCK3HaczZGomJ351IIJwrdUc9DGJCvxeE/YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CkqPDTsX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750333423;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ir5AYNLTrc0GzMJeSFP3PI0RqKk+EXKa8y1NWCrMv88=;
-	b=CkqPDTsXxTiU7c9SLf1QmaZfa4IK/XgsJ18iG9RyqHGwWpea/P0/7T52XGuMnjRMlmDe1n
-	mpRi+ky6fTLLHPvbo6Osrn+LXmys7/arwnrgnGNe+1lOOQo4UXsuXJ1SzNC57iTz9KgTFp
-	PkfNUYFUx7xpt/DqQdh1y3VRXPJRZ2A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-tt4iU5kGN8CJIWLRqh7ZUA-1; Thu, 19 Jun 2025 07:43:42 -0400
-X-MC-Unique: tt4iU5kGN8CJIWLRqh7ZUA-1
-X-Mimecast-MFC-AGG-ID: tt4iU5kGN8CJIWLRqh7ZUA_1750333421
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f7ebfd00so310140f8f.2
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 04:43:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750333421; x=1750938221;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ir5AYNLTrc0GzMJeSFP3PI0RqKk+EXKa8y1NWCrMv88=;
-        b=cn06MP5KtmopCB/kFjJ9whDtlksnVNdAqO30D5DVaNr2JI0tWNlCidZprgD1Yf6Qrf
-         YULDLxbvc/E5yErc+C2hMr5L6uhbC2faj70OntQw72KDQ1vO8XxPy7nDG+nfTEm4ScSc
-         UDjQ4s3QOpoGC6Z+cT0APGYvpgOpVZjd561kEAIKVhx1NL5k6SRjsIb7TQpG2dN/k4Zy
-         vwqIU2G9Kvc9vSfwOZOimMZp6GYZN9qR8zRTWhLiDUEYJ7VcIZKPz/DOt+J5w70kJmJy
-         3jL6eOkzXWABTcp3ViynTp1Z+1LLVDqsIW4sGWuwXT0Eof+rmRHf0GF4LpPLNq2iM4+j
-         zOYA==
-X-Gm-Message-State: AOJu0Yy+LV4aFWxR3JhzNzlvIz1m18S/mCUKThxe4G3vTJBvBEwWNoV7
-	M8DX8rsP2B89d8DP/Xz2Yw0v6BcRLHuLmyesmDeuKhPCspVIk0dGU2ENnkUjpOqB8HgpeuWirFv
-	vyIKn5peBSgtKhAZIsQS02VspUvI5i6WR9ek1yX7wosV9Jkw3jUeAVn0ldw==
-X-Gm-Gg: ASbGncvS3W7S7cLZXLJAJFRsMRNNuX68t4MuLhaGOP0McivLsNgee2PDKfAtIn99lhK
-	TdAZGSH1rFxZAliX10b5wnR1iApF2N/Jw2O2soPo7Hf+WzyThq1OiTYnLm6EPc/EAetoZaRwVdg
-	EHFLdHCp+OeLzuklng8/PLgNUZHFIXBbLTWyAh+za7bBg1EIq63qIIo7X8qrhLlXPS1qZvKSrW4
-	dkUe96gvs+Lg8Lk0zhe0NhdLDV/0wCy51ZH+xxImfgXNum91OYXgREk3Cfn+RMehUjufRjBDvGh
-	E8nROjNRpr4jsJuw+hXWcKJMQ8/WFI+H9pI4cKunGB8hnYiLYSzBkUHQ/UF6/KFqn31daQ==
-X-Received: by 2002:a05:6000:310e:b0:3a5:58a5:6a83 with SMTP id ffacd0b85a97d-3a572370c21mr17233786f8f.13.1750333421201;
-        Thu, 19 Jun 2025 04:43:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0K+Q0JwDwTLL6eL8TmMJg3/Y1q/iQX/C0mLF/RXcygjsYcsKNMqXFMDf/NmEIVFEjZ5Prcg==
-X-Received: by 2002:a05:6000:310e:b0:3a5:58a5:6a83 with SMTP id ffacd0b85a97d-3a572370c21mr17233741f8f.13.1750333420729;
-        Thu, 19 Jun 2025 04:43:40 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:271a:7310:d5d8:c311:8743:3e10? ([2a0d:3344:271a:7310:d5d8:c311:8743:3e10])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a5405asm19680062f8f.13.2025.06.19.04.43.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jun 2025 04:43:40 -0700 (PDT)
-Message-ID: <15618298-4598-472e-9441-8b1116a34de2@redhat.com>
-Date: Thu, 19 Jun 2025 13:43:38 +0200
+	s=arc-20240116; t=1750334032; c=relaxed/simple;
+	bh=Tfq8NMCtMxIzB90AN2oTeQY3u4pSOFzZv4JlxXKP5Dw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NSf9Nhytq9rykCyvfgCBC5HfpXUckT+wNhN1p6gWDaG/xN43ROh+VKDxa3pRNlIe5R1PZXNKFd1Tr9r9MIYbqVMw10EbcrxCAM2jGxRuCm28JO3EPvJxuItvKknaiX86m6zvCbeuhx1YFtUTRnBhGewiPDXIwvOV4fR3zdmG5XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLK1SjZk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D61C3C4CEEA;
+	Thu, 19 Jun 2025 11:53:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750334032;
+	bh=Tfq8NMCtMxIzB90AN2oTeQY3u4pSOFzZv4JlxXKP5Dw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TLK1SjZkJKtOa2GDJx0KT8zWbLM0Onmv52DVFQ4AgL5lHXTrikKxzDBx0mCXJu0EN
+	 Kikw4V92eV1H6BgfWAD0506FOAnY8rnH1rNzo65+cKAO7IxMzGgfpByWyUWKoN/oQZ
+	 a/375VH0yWoRtXkMpmxMPNo+RdAMgQClaCjI+Lt8kFC68jMuzWKaiaPhAm3LPn25eI
+	 5Vy86Tzf6tejlWflhZQN+1rjxhvEe5apntIF1YAuOrVyqUvW7YVikRy+Q996WPIZP4
+	 kAlTbt4BkJHrwYniPmoJu47rcDrOBqbU6tXRNpgMfWqdRT9Ggd1nwTem3wpNIbwqLL
+	 kNsKtxHhfGesA==
+Date: Thu, 19 Jun 2025 12:53:45 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	linux@roeck-us.net, jdelvare@suse.com,
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250619115345.GL587864@google.com>
+References: <20250604041418.1188792-1-tmyu0@nuvoton.com>
+ <20250604041418.1188792-2-tmyu0@nuvoton.com>
+ <20250612140041.GF381401@google.com>
+ <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
+ <20250612152313.GP381401@google.com>
+ <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
+ <20250613131133.GR381401@google.com>
+ <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 03/14] dpll: Add basic Microchip ZL3073x
- support
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
- Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Petr Oros <poros@redhat.com>
-References: <20250616201404.1412341-1-ivecera@redhat.com>
- <20250616201404.1412341-4-ivecera@redhat.com>
- <20250618095646.00004595@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250618095646.00004595@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
 
-On 6/18/25 10:56 AM, Jonathan Cameron wrote:
-> On Mon, 16 Jun 2025 22:13:53 +0200
->> +static int zl3073x_spi_probe(struct spi_device *spi)
->> +{
->> +	struct device *dev = &spi->dev;
->> +	struct zl3073x_dev *zldev;
->> +
->> +	zldev = zl3073x_devm_alloc(dev);
->> +	if (IS_ERR(zldev))
->> +		return PTR_ERR(zldev);
->> +
->> +	zldev->regmap = devm_regmap_init_spi(spi, &zl3073x_regmap_config);
->> +	if (IS_ERR(zldev->regmap)) {
->> +		dev_err_probe(dev, PTR_ERR(zldev->regmap),
->> +			      "Failed to initialize regmap\n");
->> +		return PTR_ERR(zldev->regmap);
+On Fri, 13 Jun 2025, Ming Yu wrote:
+
+> Lee Jones <lee@kernel.org> 於 2025年6月13日 週五 下午9:11寫道：
+> >
+> > On Fri, 13 Jun 2025, Ming Yu wrote:
+> >
+> > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午11:23寫道：
+> > > >
+> > > > On Thu, 12 Jun 2025, Ming Yu wrote:
+> > > >
+> > > > > Dear Lee,
+> > > > >
+> > > > > Thank you for reviewing,
+> > > > >
+> > > > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午10:00寫道：
+> > > > > >
+> > > > > ...
+> > > > > > > +static const struct mfd_cell nct6694_devs[] = {
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
+> > > > > > > +
+> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
+> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
+> > > > > >
+> > > > > > Why have we gone back to this silly numbering scheme?
+> > > > > >
+> > > > > > What happened to using IDA in the child driver?
+> > > > > >
+> > > > >
+> > > > > In a previous version, I tried to maintain a static IDA in each
+> > > > > sub-driver. However, I didn’t consider the case where multiple NCT6694
+> > > > > devices are bound to the same driver — in that case, the IDs are not
+> > > > > fixed and become unusable for my purpose.
+> > > >
+> > > > Not sure I understand.
+> > > >
+> > >
+> > > As far as I know, if I maintain the IDA in the sub-drivers and use
+> > > multiple MFD_CELL_NAME("nct6694-gpio") entries in the MFD, the first
+> > > NCT6694 device bound to the GPIO driver will receive IDs 0~15.
+> > > However, when a second NCT6694 device is connected to the system, it
+> > > will receive IDs 16~31.
+> > > Because of this behavior, I switched back to using platform_device->id.
+> >
+> > Each of the devices will probe once.
+> >
+> > The first one will be given 0, the second will be given 1, etc.
+> >
+> > Why would you give multiple IDs to a single device bound to a driver?
+> >
 > 
-> return dev_err_probe();
-> One of it's biggest advantages is that dev_err_probe() returns the
-> ret value passed in avoiding duplication like this and saving
-> a few lines of code each time.
+> The device exposes multiple peripherals — 16 GPIO controllers, 6 I2C
+> adapters, 2 CAN FD controllers, and 2 watchdog timers. Each peripheral
+> is independently addressable, has its own register region, and can
+> operate in isolation. The IDs are used to distinguish between these
+> instances.
+> For example, the GPIO driver will be probed 16 times, allocating 16
+> separate gpio_chip instances to control 8 GPIO lines each.
+> 
+> If another device binds to this driver, it is expected to expose
+> peripherals with the same structure and behavior.
 
-@Ivan: since patch 13 requires IMHO a fix, please also take care of the
-above in the next revision, thanks!
+I still don't see why having a per-device IDA wouldn't render each
+probed device with its own ID.  Just as you have above.
 
-Paolo
-
+-- 
+Lee Jones [李琼斯]
 
