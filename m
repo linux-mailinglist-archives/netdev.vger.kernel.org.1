@@ -1,125 +1,142 @@
-Return-Path: <netdev+bounces-199580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05CCAE0C23
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:52:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05FDAE0CB6
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D7751726D9
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:52:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A12266A1AD5
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4736A28C5DC;
-	Thu, 19 Jun 2025 17:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0496D2980A2;
+	Thu, 19 Jun 2025 18:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kDYUTkRz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EmevkanV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D641128B7E2
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 17:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C2030E85C
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 18:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750355573; cv=none; b=FBcPdfVkFIPWeb08IojHHjpROP3qdMfelIUTKuNKHCDbklZDh+WGhWwJ+vYSfLgYOBpopxrSs2YUbXOWXKEmXwr2/hk3kXenZ4JC94jCEqJSCxYmzHNw+vjQiNhcIdot88nE9XfOkYug++mi5PScSh1VKutr+nB9b9tUBIi/qyA=
+	t=1750356716; cv=none; b=LOcBfClMDkYkzB7QucTktt66eDU38mwir8qmeYRoQQYdlvbHWluAVhlUTfnp+5FRW4I0aQBQ29Q29UFVttIKUkpWzw5Mz4KSk++C2okaz590X2LYVRxNc+atvJHwJwcFdd+0a9NRygqa861tbms1u9sOglIlQ0sWDXffBFvsawA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750355573; c=relaxed/simple;
-	bh=11ng1f6VPwCvI+8XO7NWn6w057suUPB/xBIrVu/g/yw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=opewUbUNmJPL1nDwBo2DfbtGkmG3Onxld0PXP7Tq0NQZZ8HsremzHmlacMydwJsj/WoQcVfPXrytbLjiKSO9B6GD0wHhDmkJ3BKI2yvwQLpKLrIW5s5ZYZSe/EnsizswL5UAxIOkd+SDF5xmNTbHSBraqk37th3z6KMvtbdkxQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kDYUTkRz; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748f13ef248so922983b3a.3
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 10:52:51 -0700 (PDT)
+	s=arc-20240116; t=1750356716; c=relaxed/simple;
+	bh=vQO5NXx9YhUvfonXiIHAH8of64qG4w8OyACLr3BTsGw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qbd/I4vL3EAFzHPuhwDkZZFsa0nmjz6Jb6iDwOTfxfDSNO+ADk4u7uTBuuq2UliiNvgx4qS5wWZKwBjux4Hks04F/gkpWKcMtSpWsR+JMSL0HA9asBjvIylbSjOF2YxpDwzDazdQL6oa5O3OeWlMZZY/7g/Q0b3ZkpmoNFq2BJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EmevkanV; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-73972a54919so757214b3a.3
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 11:11:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750355571; x=1750960371; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kKAQxo09G5cPv5qwWN16POW5i7zkedHBeHYLB/DKhXk=;
-        b=kDYUTkRzBpifw3J8v43aS610ADumWc2i0IQOmYGe1O9mJwk9b+4KI4j0FhEgnAPh0B
-         x/lL99xFO7d9jytmxKFB0bc9Jgul5aBU+QHV9Kozgxg4jKPm+Fo5C2kWZKyAdRhbsHXd
-         YM0BZCz2hHglJHaSh8QLGE/EVckFcPgoalesAPyhrqgeNZMuiTrDhTObyC8S9SIVma87
-         Nf36L7Rc+HD9vXr8Y0Bc39OvMju4kJkU8EqIrtptIJ9sLPNwc7VXCfv9fhhfQQ/fKuku
-         4E25vtKEeYobt2rc/NaI4plmF1PyOqO1qyW5ZcLQkFw0T1j09E4OhDCILwMc1Zi5V3e8
-         x6EA==
+        d=gmail.com; s=20230601; t=1750356715; x=1750961515; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OgXokqbyvcTuMWjdghs+W/s3FB7a8coLtFefPlkipNc=;
+        b=EmevkanVgV9uQwsTcMQFLZnLRcnP44tw9q/AlRtamLuvzg7Pc272vEAPnij7lrZ3sC
+         E1T7Rf2sAxWAA3/TkXPSXyXcE1b0fyPm+xiEmwz5bFS30iLgFPb/jFD3MhAcf/iWiHFu
+         EtCfC3MJDIMT3IwC/lrjPhtAJ6xtXnvcwvODjpPS5/Q5YOPT2kDBEY3a0X2XkVODquD5
+         KkeGm8tstEpp/KMF3k9RI1p4Pv/FjXQkUxUx9eCoo1vO66O1NdIl/G/qY4X7ybbsxnZG
+         Wa45pWX7zgH47Bp7lPMgXItyU5hXN8OTeFat2ilMjGwWkzU4oIL+ekAGJmSHkiocJIjk
+         ZWuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750355571; x=1750960371;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kKAQxo09G5cPv5qwWN16POW5i7zkedHBeHYLB/DKhXk=;
-        b=eyY6A/YvUQAwtJ0nocu+lxphG7PiNgMxDc002MYoy4/T5qntb/wXvO8mT+QlYiS+ql
-         SD2atyVnV3ruDOByEL9C9+/1E/himvwiQ3dichbh+TIbl1lNaMllFLnLjd7Sk7xf28yL
-         uN85LhqDRAqq4+a6TPOCZN4Qd5ePqf0J8qlbKjOcNi+qmsMl70w+22FNm49mm6JkEvEX
-         I8WHhC8bT8DsHz2q8nAXz7tEIY6kYzaubHj2BGPosiWGHpAuijroZBqESGgrZDGGj1/n
-         aGmdfBsJRQyHIIgnJN2aHEyGa6VmaKSBbQ1wMcwPETGtmrZik/1nDrHeaQoBNaW9dCdm
-         8WQA==
-X-Gm-Message-State: AOJu0YzKIvs8n+62C2l1ZEyF8edIq+Y/GXynTiPokTqD7JBizbcwkpyV
-	KKd0EaN6Cmd0oJduF5xxUqrEx27BgbHtYdqxGy4ggq8T8v++APDrDyk7Ok//xE36e/hx+3YnHfP
-	mO/6AkpjEQtptML8Ahuq1hb14NzqBPnOwMPppdWYWivvIJqUucSIQDd63SVx4bXoOhHA9wXMfZ9
-	6i4ys2RsxqZYC0N4JEoKhTmYGa0cL6sLsoRub+wErJ56VVuq2OX8Xrm63fx4/BiT8=
-X-Google-Smtp-Source: AGHT+IET5o2P4wUYb7dd58G56SGW2P48lKGW3j+rhDyrZHG0JDXaF5FQiMdicsGmxzV+16PzB+pmpmYbPzshlxEX1w==
-X-Received: from pfqf15.prod.google.com ([2002:aa7:9d8f:0:b0:747:9faf:ed39])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:4b13:b0:748:3a1a:ba72 with SMTP id d2e1a72fcca58-7489cffb748mr31583409b3a.20.1750355570964;
- Thu, 19 Jun 2025 10:52:50 -0700 (PDT)
-Date: Thu, 19 Jun 2025 17:52:38 +0000
+        d=1e100.net; s=20230601; t=1750356715; x=1750961515;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OgXokqbyvcTuMWjdghs+W/s3FB7a8coLtFefPlkipNc=;
+        b=T1QsVgFvA/XyEcHc9s184FcaSbzSw9xBz8oMttzXEWT3wvAK0e0an/kFcW9tLHukHj
+         +e8ZIVS/vzF/q4u7pK2LUN2UdJFlc41JDZjPXIEPiXxNLpZXv4+gHn783AEkz8EL/rx+
+         I6nn/Bk0jox0FekHBeUtOJ6Oc5Sw0Ia5ucf4QoM6wAqbbmv/CeddNZMj/sY55mItmy5C
+         U5Z+SMsmy5V9HiSQ4qK9rOAlO/gUa/xcu7QfdxFI9i3SWNqdAv1zThjW9Z/BZwYDFZD0
+         PcJfIaKHkm5arl80RlNtvwLu6cvXOSTJ6OnpeUgO9PJmXAkqEFYC+vSQreG5/zrxDMTy
+         vRdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEHNxX1jFyajlKcriboE54YJL0f+G6YPZDp/X3sd73ueh4NBrddG3cGdLXEjTh+AvUmvFZmbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsjhZ6AZeAA1xU7nJK+kcy0gmn2tFexZCXacDNImG4XR119+kr
+	ZiEqnjQrifFh+BujYhzMHtkosnQXEtayNqMwdIdN91LOGB4S+P6ub9o=
+X-Gm-Gg: ASbGncsS0BfH+GXjKcNsmIOqC0cIcv6/ThVJpRgsFLYoGACmHmfCTVLXSBitsigwtLJ
+	2Qjm95pCrU4ETlPvI/dy6uf7COT4CCyFxd4B4tpfSPlzsvNOEIvUNbWL0GOCcVyRNpiTC/cEmsv
+	5gAOUJj4Crzmn9yqYBPqhgHdChG2jOiYp/mC/gWpQZe/P4mQB1/hW6cyv3Y3TO3FkZPcD15pdoK
+	KHgjxwYc2ZxD1VoAa5v14bJDZLV5KxH4T513QN4xbOnaX5hVltAyLp9fJBKm/h+ZZ7iuoAU3Zl2
+	6Jjea7d3+KRbgkAUYodjcBwmktvlnM+Hd3ab5OE=
+X-Google-Smtp-Source: AGHT+IHIXQhGEPKYQoWKvIHGqAiuZ6OvL6F1idcMHy0iHGU39vSB4CmicgGn7UCBwdoN4er9rkOJUA==
+X-Received: by 2002:a05:6a20:d04c:b0:215:e818:9fda with SMTP id adf61e73a8af0-21fbd67f904mr32755400637.27.1750356714637;
+        Thu, 19 Jun 2025 11:11:54 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a46abc3sm373984b3a.14.2025.06.19.11.11.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jun 2025 11:11:53 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuni1840@gmail.com,
+	kuniyu@google.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net-next 02/15] ipv6: mcast: Replace locking comments with lockdep annotations.
+Date: Thu, 19 Jun 2025 11:11:44 -0700
+Message-ID: <20250619181152.1621004-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <7f2ac806-d033-44de-9241-e5a3194dd729@redhat.com>
+References: <7f2ac806-d033-44de-9241-e5a3194dd729@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.rc2.701.gf1e915cc24-goog
-Message-ID: <20250619175239.3039329-1-almasrymina@google.com>
-Subject: [PATCH net-next v2] netmem: fix skb_frag_address_safe with unreadable skbs
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, ap420073@gmail.com, Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-skb_frag_address_safe() needs a check that the
-skb_frag_page exists check similar to skb_frag_address().
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Thu, 19 Jun 2025 13:56:26 +0200
+> On 6/17/25 1:28 AM, Kuniyuki Iwashima wrote:
+> > @@ -2072,10 +2086,7 @@ static void mld_send_report(struct inet6_dev *idev, struct ifmcaddr6 *pmc)
+> >  		mld_sendpack(skb);
+> >  }
+> >  
+> > -/*
+> > - * remove zero-count source records from a source filter list
+> > - * called with mc_lock
+> > - */
+> > +/* remove zero-count source records from a source filter list */
+> >  static void mld_clear_zeros(struct ip6_sf_list __rcu **ppsf, struct inet6_dev *idev)
+> >  {
+> >  	struct ip6_sf_list *psf_prev, *psf_next, *psf;
+> > @@ -2099,7 +2110,6 @@ static void mld_clear_zeros(struct ip6_sf_list __rcu **ppsf, struct inet6_dev *i
+> >  	}
+> >  }
+> >  
+> > -/* called with mc_lock */
+> >  static void mld_send_cr(struct inet6_dev *idev)
+> >  {
+> >  	struct ifmcaddr6 *pmc, *pmc_prev, *pmc_next;
+> 
+> Why are you not adding the annotation in the above 2 places? AFAICS
+> mld_send_cr() is called only by mld_ifc_work(), after acquiring the
+> relevant lock, and mld_clear_zeros() is only called by mld_send_cr(),
+> still under the same lock.
 
-Cc: ap420073@gmail.com
+The two functions use mc_dereference() at the entrance,
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+static void mld_clear_zeros(struct ip6_sf_list __rcu **ppsf, struct inet6_dev *idev)
+{
+	struct ip6_sf_list *psf_prev, *psf_next, *psf;
 
----
+	psf_prev = NULL;
+	for (psf = mc_dereference(*ppsf, idev);
 
-v2: https://lore.kernel.org/netdev/20250617210950.1338107-1-almasrymina@google.com/
+and I thought it would be redundant like
 
-- Move to net-next
-- save return value of skb_frag_page
----
- include/linux/skbuff.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+	ASSERT_RTNL();
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 9508968cb300..4f6dcb37bae8 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3665,7 +3665,13 @@ static inline void *skb_frag_address(const skb_frag_t *frag)
-  */
- static inline void *skb_frag_address_safe(const skb_frag_t *frag)
- {
--	void *ptr = page_address(skb_frag_page(frag));
-+	struct page *page = skb_frag_page(frag);
-+	void *ptr;
-+
-+	if (!page)
-+		return NULL;
-+
-+	ptr = page_address(page);
- 	if (unlikely(!ptr))
- 		return NULL;
- 
-
-base-commit: afc783fa0aab9cc093fbb04871bfda406480cf8d
--- 
-2.50.0.rc2.701.gf1e915cc24-goog
-
+	ptr = rtnl_dereference()
 
