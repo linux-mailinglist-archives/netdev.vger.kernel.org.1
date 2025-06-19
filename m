@@ -1,115 +1,93 @@
-Return-Path: <netdev+bounces-199295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1E2ADFB18
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 04:09:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4EDBADFB1A
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 04:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A33EE189636A
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 02:10:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BFD13B1F64
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 02:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68661FBE8A;
-	Thu, 19 Jun 2025 02:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C90321FF57;
+	Thu, 19 Jun 2025 02:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="akMdPCog"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6CdYxqw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81797195B1A
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 02:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A8E76034;
+	Thu, 19 Jun 2025 02:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750298989; cv=none; b=iwarQWxjaySFmY1HWVHYC7sBC2P1I/fk1UzNfjTBMaYiq8I2xYRpdpoT2CgAqlxt43Ogni40bI0wTRJuU12u+ObdlNsXRjusPwnlJOR/fqkEGkErNPzmRtaEtgLjETehlw1+gd2kQOh1axAe9NSiwwaywelEUeukIGPya6jQqWM=
+	t=1750299072; cv=none; b=qK0oC/0/hEs/CZWtiNmyPVqMQmHzoeJuA2cXxwF9cS+bKI6xHGusQjQOmlL4DfISe/6COT5rvMXKWTS75SQBodvSbSwvPARi4Rz/W1GFLyYzpw7bdug1ZDtja7rv4FWY9nO50ZETYbHkIhFbs4/0uOEatNefowyeVYvLKkHJfdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750298989; c=relaxed/simple;
-	bh=SJMO4nk/IarxXrasmEIiA82qDuaOGS4bFyUeu/XJPI0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OS0TDKj6cXAadf1P2NzS11y7+j9Nomc/rEYR3Izm4eZ7WjZaS53rwoJUmmSbQN0uobrEB350DFA82wSYjwbxzm599tIPsBecUCEI/nEvlhlvaWHm2ceV7LyBdX2GdLpmiWJkQyQYhaPZmBlC7E1PV5MFn4PTMVBxGrOeW1PA1ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=akMdPCog; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F3A0C4CEE7;
-	Thu, 19 Jun 2025 02:09:49 +0000 (UTC)
+	s=arc-20240116; t=1750299072; c=relaxed/simple;
+	bh=MH8crp1DhW23/OKmNtZBXsV7bwbGco8MJctbSo83AO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tOo/aOQUf+CBlRxoSxbzx1qR7mCX7woRNAKjxFu1bMMnVxXp75eyjGollbJFohkQdz0etH0Ps3kcNhPjpO+JtRZzs5LKv12i90APHNa09DA2tx0Dy6cF9A1PtOhv78XyHlphuSmKPTuZCynS25BDBez5wrJ5uEw0ThQElPwaaRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6CdYxqw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1BDC4CEE7;
+	Thu, 19 Jun 2025 02:11:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750298989;
-	bh=SJMO4nk/IarxXrasmEIiA82qDuaOGS4bFyUeu/XJPI0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=akMdPCogD2u5Af8/lgpXQfJCzxvtaNzgGvT5uRpVtD0ER9SlXK/Pfe05UHKVDCauu
-	 sKkIy9BKvlBRVQKh8b4hnygc0bs8BOZvxXh2t1276FLCb8EW63jhovvmGy8nXwLmFG
-	 x5UQMszhku0weP+TfgKV+JHUOvnUbhe5YZpyXEeG581TBW+rhHv0y4b3ld6o8aqALg
-	 nClcyQyz0F5dt3IWJuI6u2aHwVZG+P0q47yy3bGrha2We+mKnJImdAJPzj462UaD3N
-	 3XSba9nCmHLo2mg4WPWs/QwtMwY3kQmGJurBfHIXtliCCIGDRSx5STOMFzvi61QkZY
-	 3ot2FJaTXQXRg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EAC3806649;
-	Thu, 19 Jun 2025 02:10:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750299072;
+	bh=MH8crp1DhW23/OKmNtZBXsV7bwbGco8MJctbSo83AO4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W6CdYxqwN/NBljKsxlJlQh1OdGAEzo0+mfdv4gr+uFBkTq3Ih3rbplQhPvMVI6Ijq
+	 6W2sTe3RzvcnrXZGvBGR/QMmFeNp9tKQs1D3wFECVPF9oH53M8s1qaXk5DGvW4mmln
+	 lImovZffVl5q900PmwgF0tidZSOpykcCQt/jins4zwLxBPFuvsXd1w6DFv5DcS3W54
+	 PyMcTHXj/MKeuH8X+RO0u98h7UxdhnAXaYZUqzpEzQmD0zL47uKVKE2bmADoTglVPI
+	 omisZagomvBwO8IWBoG7h+UoeOZOMRELh7hCRMddk/bGYqJQkzMZ/Hu6QpV4cAOFiy
+	 GLcI/UtzZARqg==
+Date: Wed, 18 Jun 2025 19:11:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net 1/2] virtio-net: xsk: rx: fix the frame's length
+ check
+Message-ID: <20250618191111.29e6136e@kernel.org>
+In-Reply-To: <20250615151333.10644-2-minhquangbui99@gmail.com>
+References: <20250615151333.10644-1-minhquangbui99@gmail.com>
+	<20250615151333.10644-2-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v13 net-next 0/9] PHC support in ENA driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175029901725.322395.7808420069986562189.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Jun 2025 02:10:17 +0000
-References: <20250617110545.5659-1-darinzon@amazon.com>
-In-Reply-To: <20250617110545.5659-1-darinzon@amazon.com>
-To: David Arinzon <darinzon@amazon.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- richardcochran@gmail.com, dwmw@amazon.com, zorik@amazon.com,
- matua@amazon.com, saeedb@amazon.com, msw@amazon.com, aliguori@amazon.com,
- nafea@amazon.com, evgenys@amazon.com, netanel@amazon.com,
- alisaidi@amazon.com, benh@amazon.com, akiyano@amazon.com, ndagan@amazon.com,
- amitbern@amazon.com, shayagr@amazon.com, evostrov@amazon.com,
- ofirt@amazon.com, maciek@machnikowski.net, rrameshbabu@nvidia.com,
- gal@nvidia.com, vadim.fedorenko@linux.dev, andrew@lunn.ch, leon@kernel.org,
- jiri@resnulli.us
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sun, 15 Jun 2025 22:13:32 +0700 Bui Quang Minh wrote:
+> +/**
+> + * buf_to_xdp() - convert the @buf context to xdp_buff
+> + * @vi: virtnet_info struct
+> + * @rq: the receive queue struct
+> + * @buf: the xdp_buff pointer that is passed to virtqueue_add_inbuf_premapped in
+> + *       virtnet_add_recvbuf_xsk
+> + * @len: the length of received data without virtio header's length
+> + * @first_buf: this buffer is the first one or not
+> + */
+>  static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+> -				   struct receive_queue *rq, void *buf, u32 len)
+> +				   struct receive_queue *rq, void *buf,
+> +				   u32 len, bool first_buf)
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I think Michael mention he's AFK so while we wait could you fix this
+kdoc? I'm not sure whether the kdoc is really necessary here, but if
+you want to keep it you have to document the return value:
 
-On Tue, 17 Jun 2025 14:05:36 +0300 you wrote:
-> Changes in v13
-> - Remove unnecessary out-of-tree driver documentation
-> 
-> Changes in v12 (https://lore.kernel.org/netdev/20250611092238.2651-1-darinzon@amazon.com/):
-> - Add devlink port support
-> - Remove unnecessary checks from devlink reload up and reload down
-> 
-> [...]
-
-Here is the summary with links:
-  - [v13,net-next,1/9] net: ena: Add PHC support in the ENA driver
-    https://git.kernel.org/netdev/net-next/c/e0ea34158ee8
-  - [v13,net-next,2/9] net: ena: PHC silent reset
-    https://git.kernel.org/netdev/net-next/c/51d58804a53b
-  - [v13,net-next,3/9] net: ena: Add device reload capability through devlink
-    https://git.kernel.org/netdev/net-next/c/15115b1a2554
-  - [v13,net-next,4/9] net: ena: Add devlink port support
-    https://git.kernel.org/netdev/net-next/c/9d67d534e4e0
-  - [v13,net-next,5/9] devlink: Add new "enable_phc" generic device param
-    https://git.kernel.org/netdev/net-next/c/cea465a96a29
-  - [v13,net-next,6/9] net: ena: Control PHC enable through devlink
-    https://git.kernel.org/netdev/net-next/c/816b52624cf6
-  - [v13,net-next,7/9] net: ena: Add debugfs support to the ENA driver
-    https://git.kernel.org/netdev/net-next/c/60e28350b1ca
-  - [v13,net-next,8/9] net: ena: View PHC stats using debugfs
-    https://git.kernel.org/netdev/net-next/c/e14521e97b83
-  - [v13,net-next,9/9] net: ena: Add PHC documentation
-    https://git.kernel.org/netdev/net-next/c/c9223021433d
-
-You are awesome, thank you!
+Warning: drivers/net/virtio_net.c:1141 No description found for return value of 'buf_to_xdp'
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
