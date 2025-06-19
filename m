@@ -1,124 +1,234 @@
-Return-Path: <netdev+bounces-199630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7314AE100B
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:24:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 011ECAE1010
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7679B1BC3B64
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:25:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8922A3A9448
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E6028DB5C;
-	Thu, 19 Jun 2025 23:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S4Y0oaeo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618D7223DDE;
+	Thu, 19 Jun 2025 23:30:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB5E30E826;
-	Thu, 19 Jun 2025 23:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F12F28F51C;
+	Thu, 19 Jun 2025 23:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750375493; cv=none; b=fVnuuYlFkpucctV7o+iWSnYdUJ7DMKO8djS+mAMeSnlkZmgPIUokxNOMgmbqxwPqOlUU9ZW4ZA5LS78Y9tGCYnaEjpSu57zfTbVhAqMDchFTNdsAJE0rNxt2q5kTUSdhVL0OrTOmVctQS+oklIqjmd4F1rjh2xWeEleXjUcbeCM=
+	t=1750375834; cv=none; b=gE0GYbbe6Ga3r9lxJ6YZsbDWhumagiBJGuAqXBpyJdvrZocWEEUHK9chDZT3iAJJqmgXvWQ4syS8RxLOUlug2iU6bcKKqBdggVtaW3BTxyYfPG5JFWxvk3Qt3TsWqRoTTJNCoUcSKxHMElsAFVTfqh/ejFlz/JJVQFBwnshPPcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750375493; c=relaxed/simple;
-	bh=WSkZDcYdQ71AgEyPhWUL2CdMzVGkRzsDFG6pJJ9m7KU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q0c/B839/1oo8c9/eckTpilQ252uXHgsqwInbRNnk7iYPp5WR2UcQYDCk/afjwaprRiJMRrT9VX9mNdwsPhA8DoE9PBwb0DyYVX1cCvjemm1GL9GTFXGShQDdPsX+hF/xzR2twDW5OQTKsnDr6mPXO6NbXdVtbNhtZ15iLwC+0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S4Y0oaeo; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32b7fd20f99so13087511fa.0;
-        Thu, 19 Jun 2025 16:24:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750375490; x=1750980290; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WSkZDcYdQ71AgEyPhWUL2CdMzVGkRzsDFG6pJJ9m7KU=;
-        b=S4Y0oaeoR7ykzTsvl6S0j6TiPDpPiGt3uRbMFyY2dSMSUU4h0iIncYwVBTCQwUnXYv
-         Aw+TSp3PTKbQULyaBT4RxY/ut8a1f1VcdTiuiwV3TcgT6MPE9HeXAtFreEoZQ2jLdQIW
-         QrpNwyC7NqH79Cklf6RqQTeK00DQDFmE20fOiqqIGe2DxMSaGWNpHaTMUbtF0JzK8jHq
-         6k5pR6RrPPEbhtgeBGPew5C7w1doWntCoYYtkwYyZlRsWaihsV08VHSH57RUkt/wuHHj
-         T1Uisty1zpwH1pz8LaLbVje8hf9qwkbGkxKz90bmbo1Zi02SB31mHuoXrEVxHmr6Tp3A
-         IKJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750375490; x=1750980290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WSkZDcYdQ71AgEyPhWUL2CdMzVGkRzsDFG6pJJ9m7KU=;
-        b=Mra+Er0xcx8sEh6IywHollQaH92H87+sOigMc2txGfSFNLK+zeSh6JlhxMxIcOvL14
-         /JSicmlJZe8BUMeDe0LlAUi4durzcsM9O3rqpzoYnSoLfpHC0y+XV5MGr3U9adRcrrft
-         fui7jhwuDxIoWpEBy6qq50UVEESJMp+4BbxsjcRjmeQP1Qb3L1HhjgOxWE0iRfRXTjej
-         37ZwyYThX1pRPM9H1jaTMWF/Z+CpL6JnEcE0ofFVAHRAqJexs75z6Cu68UV/W52iZDhq
-         QXThP/LsphS+MzQ/ZaDtSacAjJjH77/1SPPWJgbjV9j3YqK6FVxHIYW/coLhCTvT0st1
-         lwdA==
-X-Forwarded-Encrypted: i=1; AJvYcCURjmT1USw4MsB53qixGBa1nJmwEWAvB3B1WpEKkUx7RAmQk9XLMnLG0EN9YMB2VQ+6Mz3vXXGlPZRkgKElqCI=@vger.kernel.org, AJvYcCX9ku8bFf8T7Xps3Z4wI41/CT/xfv/OeVeKpStJZZz0eQPlA7MFxkpLOGrcpu2qGWvnmmWvuHN0@vger.kernel.org, AJvYcCXXk4TPbRRZFkCHarwmwJSdRzVt34Bo2H8xOTufUGq6rCsuCiTVWYCibGSPszyXuhf6yHARGAxpMcixiBI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX0+2feK9woEB5pAzPgAlGc3tORDqPcA6KFNsDXPALXVJbeLvg
-	JjcSVHk/awp8ctc+9JR1M3/V7jJ6QlSqte4YqfYdE/iZwzDz0R0pRNWXNj99BW7m+10aSpC3F/d
-	pCDSEMDIVJPFsXdEbGItWuiW07C6oOZ0=
-X-Gm-Gg: ASbGnctyD98TiNoS6EK8b4D8vNAP1+13jYSoUuud2579ySDk7AV8ugZtFHyjWKZRJSV
-	kD3ZTrGMlxtrp0muzhOTIAO0Th8qwHpzoTz8ulKxuXBQPI8+tDcIu8S4hshFCxjYQy5vb/B6j8W
-	IuNe3M+T6VeKz2gIJpvqGoqRnPoPfuHxt+h9qHiBRrK6xtxrhUkXOsE4yBM8rxzQglQ7gGkOqLZ
-	JhT
-X-Google-Smtp-Source: AGHT+IEI3Qcu9TZFnSMnblF2FNssNDdu/cOBp2C241F1RixgB3NEkmLB/6LjF4MFzu6x8V21HblsJ4Zska5TTyG+eYI=
-X-Received: by 2002:a05:651c:2205:b0:329:1550:1446 with SMTP id
- 38308e7fff4ca-32b9ae2ff81mr528531fa.0.1750375490094; Thu, 19 Jun 2025
- 16:24:50 -0700 (PDT)
+	s=arc-20240116; t=1750375834; c=relaxed/simple;
+	bh=u7FaARh/eSFiH5liOAks1ysHBoQBS/nmWZNrwiFBo3w=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=gVSi8OU/9yKJ+LpnkqZ3Y/jkuD5ueDIsVaze+/mhh/Uz0KJqpTsXZcDUPeslM9cHXb0MGmExUHHz8nAaiJ69gy1N7jjajXALZlKGR6ewsxaEeOnohqGYN3uysKP6o1ivu+pOeTuSCcvv7pxMRl7+q/f+NXQO7J59wGolmXe4Vjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
+Received: from mail.wizardsworks.org (localhost [127.0.0.1])
+	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55JNW8bD010124;
+	Thu, 19 Jun 2025 16:32:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250612.094805.256395171864740471.fujita.tomonori@gmail.com>
- <CAJ-ks9nXwBMNcZLK1uJB=qJk8KsOF7q8nYZC6qANboxmT8qFFA@mail.gmail.com>
- <CAJ-ks9mazp=gSqDEzUuh0eTvj6pBET-z2zz7XQzmu9at=4V03A@mail.gmail.com> <20250620.075443.1954975894369072064.fujita.tomonori@gmail.com>
-In-Reply-To: <20250620.075443.1954975894369072064.fujita.tomonori@gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 19 Jun 2025 19:24:14 -0400
-X-Gm-Features: AX0GCFuDXISYPO9gpBGBu-zV3upwFiW0N2Hohkq2DlvwSSipXAI_SsBeURhkbnI
-Message-ID: <CAJ-ks9n-iQAiwN3CVnJP164kPEgwq5nj-E5S7BnZrYdBWoo16g@mail.gmail.com>
-Subject: Re: [PATCH] rust: cast to the proper type
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: aliceryhl@google.com, tmgross@umich.edu, ojeda@kernel.org, 
-	alex.gaynor@gmail.com, boqun.feng@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, lossin@kernel.org, a.hindborg@kernel.org, 
-	dakr@kernel.org, davem@davemloft.net, andrew@lunn.ch, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Jun 2025 16:32:08 -0700
+From: Greg Chandler <chandleg@wizardsworks.org>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: "Maciej W. Rozycki" <macro@orcam.me.uk>,
+        Florian Fainelli
+ <f.fainelli@gmail.com>, stable@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: Tulip 21142 panic on physical link disconnect
+In-Reply-To: <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
+ <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+ <385f2469f504dd293775d3c39affa979@wizardsworks.org>
+ <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
+ <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
+ <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com>
+ <a3d8ee993b73b826b537f374d78084ad@wizardsworks.org>
+ <12ccf3e4c24e8db2545f6ccaba8ce273@wizardsworks.org>
+ <8c06f8969e726912b46ef941d36571ad@wizardsworks.org>
+ <alpine.DEB.2.21.2506192007440.37405@angie.orcam.me.uk>
+ <52564e1f-ab05-4347-bd64-b38a69180499@gmail.com>
+ <alpine.DEB.2.21.2506192238280.37405@angie.orcam.me.uk>
+ <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
+Message-ID: <51830501a2c5969806e418b8843183f5@wizardsworks.org>
+X-Sender: chandleg@wizardsworks.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 19, 2025 at 6:55=E2=80=AFPM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> On Thu, 19 Jun 2025 11:29:56 -0400
-> Tamir Duberstein <tamird@gmail.com> wrote:
->
-> >> > >> > Fixes: f20fd5449ada ("rust: core abstractions for network PHY d=
-rivers")
-> >> > >>
-> >> > >> Does this need to be backported? If not, I wouldn't include a Fix=
-es tag.
-> >> > >
-> >> > > I'm fine with omitting it. I wanted to leave a breadcrumb to the
-> >> > > commit that introduced the current code.
-> >> >
-> >> > I also don't think this tag is necessary because this is not a bug
-> >> > fix. And since this tag points to the file's initial commit, I don't
-> >> > think it's particularly useful.
-> >>
-> >> Would you be OK stripping the tag on apply, or would you like me to se=
-nd v2?
-> >
-> > Hi Tomo, gentle ping here. Does this look reasonable to you, with the
-> > Fixes tag stripped on apply?
->
-> Yeah, if you drop the Fixes tag, it's fine by me.
+On 2025/06/19 15:56, Greg Chandler wrote:
+> On 2025/06/19 14:53, Maciej W. Rozycki wrote:
+>> On Thu, 19 Jun 2025, Florian Fainelli wrote:
+>> 
+>>> >   Maybe it'll ring someone's bell and they'll chime in or otherwise I'll
+>>> > bisect it... sometime.  Or feel free to start yourself with 5.18, as it's
+>>> > not terribly old, only a bit and certainly not so as 2.6 is.
+>>> 
+>>> I am still not sure why I could not see that warning on by Cobalt 
+>>> Qube2 trying
+>>> to reproduce Greg's original issue, that is with an IP assigned on 
+>>> the
+>>> interface yanking the cable did not trigger a timer warning. It could 
+>>> be that
+>>> machine is orders of magnitude slower and has a different CONFIG_HZ 
+>>> value that
+>>> just made it less likely to be seen?
+>> 
+>>  Can it have a different PHY attached?  There's this code:
+>> 
+>> 	if (tp->chip_id == PNIC2)
+>> 		tp->link_change = pnic2_lnk_change;
+>> 	else if (tp->flags & HAS_NWAY)
+>> 		tp->link_change = t21142_lnk_change;
+>> 	else if (tp->flags & HAS_PNICNWAY)
+>> 		tp->link_change = pnic_lnk_change;
+>> 
+>> in `tulip_init_one' and `pnic_lnk_change' won't ever trigger this, but 
+>> the
+>> other two can; apparently the corresponding comment in 
+>> `tulip_interrupt':
+>> 
+>> /*
+>>  * NB: t21142_lnk_change() does a del_timer_sync(), so be careful if 
+>> this
+>>  * call is ever done under the spinlock
+>>  */
+>> 
+>> hasn't been updated when `pnic2_lnk_change' was added.  Also ISTM no 
+>> link
+>> change handler is a valid option too, in which case `del_timer_sync' 
+>> won't
+>> be called either.  This is from a cursory glance only, so please take 
+>> with
+>> a pinch of salt.
+>> 
+>>   Maciej
+> 
+> 
+> 
+> 
+> I'm not sure which of us that was directed at, but for my onboard 
+> tulips:
+> 
+> Micro Linear ML6698CH <- PHY
+> Intel 21143-TD <- NIC
+> 
+> I know that the ML chips are most commonly used with 21143s and a very 
+> small smattering of others, I don't think they are all that common at 
+> least not since the late '90s..
+> I'm relatively certain all my DEC ISA/PCI nics use them though.
+> 
+> I found a link to the datasheet (If needed), but have had mixed luck 
+> with alldatasheets:
+> https://www.alldatasheet.com/datasheet-pdf/pdf/75840/MICRO-LINEAR/ML6698CH.html
+> 
+> Glancing over it I don't see anything about the link, I'll go stick my 
+> eyes in the driver a bit and see what stabs me in the eye....
 
-Thanks. Would you mind adding your Acked-by?
+
+
+That didn't take long..  The first thing to jab it's thumb in my eye was 
+this:
+const struct tulip_chip_table tulip_tbl[] = {
+   { }, /* placeholder for array, slot unused currently */
+   { }, /* placeholder for array, slot unused currently */
+
+   /* DC21140 */
+   { "Digital DS21140 Tulip", 128, 0x0001ebef,
+         HAS_MII | HAS_MEDIA_TABLE | CSR12_IN_SROM | HAS_PCI_MWI, 
+tulip_timer,
+         tulip_media_task },
+
+   /* DC21142, DC21143 */
+   { "Digital DS21142/43 Tulip", 128, 0x0801fbff,
+         HAS_MII | HAS_MEDIA_TABLE | ALWAYS_CHECK_MII | HAS_ACPI | 
+HAS_NWAY
+         | HAS_INTR_MITIGATION | HAS_PCI_MWI, tulip_timer, 
+t21142_media_task },
+
+
+The alpha ev6 platform to my knowledge has never had ACPI, this one 
+surely doesn't, and checking my config the variables aren't even listed 
+compared to the ones enabled or commented for my other platforms.
+It's possible that other alphas (ev67 or ev7s) may have but it's also 
+not likely.  I know for sure the: ev4, ev45, ev5, and ev56 architectures 
+did not, as the ACPI standard hadn't been ratified, or wasn't around 
+long enough to make it into the production of the chipsets, and boards.
+
+I will see if I can find a link between not having ACPI and this issue, 
+it's possible that the other instances you mentioned also have that same 
+issue.  Or that they do have ACPI and have it disabled for 10 reasons or 
+another....
+
+
+
+The second potential issue I see is that I don't know off-hand what PCI 
+MWI is...
+
+It's only found in the tulip driver and nowhere else in the kernel:
+
+root@constellation:/tmp/tmp/linux-6.12.12/drivers/net/ethernet/dec/tulip# 
+grep -R HAS_PCI_MWI ../../../../../
+grep: ../../../../../drivers/net/ethernet/dec/tulip/tulip.ko: binary 
+file matches
+grep: ../../../../../drivers/net/ethernet/dec/tulip/eeprom.o: binary 
+file matches
+grep: ../../../../../drivers/net/ethernet/dec/tulip/interrupt.o: binary 
+file matches
+../../../../../drivers/net/ethernet/dec/tulip/tulip.h:  HAS_PCI_MWI      
+        = 0x01000,
+../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     HAS_MII 
+| HAS_MEDIA_TABLE | CSR12_IN_SROM | HAS_PCI_MWI, tulip_timer,
+../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     | 
+HAS_INTR_MITIGATION | HAS_PCI_MWI, tulip_timer, t21142_media_task },
+../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     HAS_MII 
+| HAS_NWAY | HAS_8023X | HAS_PCI_MWI, pnic2_timer, },
+../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     | 
+HAS_NWAY | HAS_PCI_MWI, tulip_timer, tulip_media_task },
+../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     if 
+(!force_csr0 && (tp->flags & HAS_PCI_MWI))
+grep: ../../../../../drivers/net/ethernet/dec/tulip/tulip.o: binary file 
+matches
+grep: ../../../../../drivers/net/ethernet/dec/tulip/tulip_core.o: binary 
+file matches
+
+
+
+
+It's defined as what looks labeled as a table flag in the tulip.h:
+
+enum tbl_flag {
+         HAS_MII                 = 0x00001,
+         HAS_MEDIA_TABLE         = 0x00002,
+         CSR12_IN_SROM           = 0x00004,
+         ALWAYS_CHECK_MII        = 0x00008,
+         HAS_ACPI                = 0x00010,
+         MC_HASH_ONLY            = 0x00020, /* Hash-only multicast 
+filter. */
+         HAS_PNICNWAY            = 0x00080,
+         HAS_NWAY                = 0x00040, /* Uses internal NWay xcvr. 
+*/
+         HAS_INTR_MITIGATION     = 0x00100,
+         IS_ASIX                 = 0x00200,
+         HAS_8023X               = 0x00400,
+         COMET_MAC_ADDR          = 0x00800,
+         HAS_PCI_MWI             = 0x01000,
+         HAS_PHY_IRQ             = 0x02000,
+         HAS_SWAPPED_SEEPROM     = 0x04000,
+         NEEDS_FAKE_MEDIA_TABLE  = 0x08000,
+         COMET_PM                = 0x10000,
+};
+
+
+
 
