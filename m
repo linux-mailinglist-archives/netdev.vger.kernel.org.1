@@ -1,316 +1,228 @@
-Return-Path: <netdev+bounces-199583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB0AAE0CF5
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:29:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8225AAE0D34
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 20:56:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AA5F1C2581E
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:27:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F58F16A869
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 18:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27918242910;
-	Thu, 19 Jun 2025 18:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9135C24338F;
+	Thu, 19 Jun 2025 18:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZPemnBQl"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="NhSECbXD"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2070.outbound.protection.outlook.com [40.107.92.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EADA24338F
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 18:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750357432; cv=fail; b=F7Z7uJmpcNEJ7t8WIwqXqnEQlfVm9iKN2HJ+mBj6izBQ0e9pk4CkKZrxoB2ClaefSImxueeA7xBR9DvLUMyYgH3DUhePBCKqQ6ARVOX/Ylo1L+DvH+Wj4iMjJv7uNZe6sq7Rvs/Dtqbv14dujixvZril6bqEsOTikAPHI8b85gk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750357432; c=relaxed/simple;
-	bh=WbD1SutS5/vLS2A+jx0330NFE0T7mfB8EUMkk0V69as=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r664BBqQfBS/I1YobRqb+r3W1AmdkpSeyOsEFQYMZM/nVmFaKp5OqP6z6APMM43NsOWxNmTUD4f3J0FPmYhl9MNNV8wlifCD7D02P/JrIHXxSBnr2vq56Vwr60tXeGQ9stH1HoveUIvAo8gJat9K+qETXG4xuwVuh99ONPzJpsQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZPemnBQl; arc=fail smtp.client-ip=40.107.92.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kNzS51og1pkFBc43yotj+M60wOhLj20ws1UVZKSut9vosWYEIUNR245Q7uEu2XEtTe/HEMtw65LtlLKcHvpcm2pEp/ZVsN+8VNLtF/idihI1+RMQfNz0veAUIYTpIhuRVL/loRSUgcAF8mt8+/PBn7zGQQSUDlWpEEsWbAXtw5Ct1o3BXP/6hw+l9pzFSjEjouRTOGCJA4x4xiwk22NbjRFHX8FdPJtR/JyPDstRp6b7LWrUDemytSnMKxOSErmRNs8S/3aI240E+MtYAqSq4o6W+1iwwKNO2zMYc3dZa10BqMhv+nhxP8aGsaXOY8gSl4y/QXB5LRugyYx15CLUvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=awnFavCy0d+rzXisaapQtGu7YTZT22KM+Kjp4F0QWTM=;
- b=VrK23lmSYx1BjaWvdTq8490Z0wFmHF8NSFT4gItkpD76ayb0tC1YgehvwkOoUpqPl4JiMb5e+UcuC9Z/vryB4jfu0yvY6ndBKqxV9xwTK7PAHe1WPTRIKN4HucatRpdSzn6FWjb7Boo+NkFCNHbWSaC2QCVXP4FnfOcaRQqOLLAATeyaXNnH66tjCTxAMwcSm5ap0Iu4b/RNugLJtSLarW7mezqj2VzoCpw958H6Al+CFiq9syKvtjRxar6tjAOJIpFP4c7QicWhp8XGw5RTo3X9sZjLDqOe38IlDITNpJ3h46wlr/bmmvMIgceNtNpiTaX4ZYkZfIph/ms7oG2bBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=awnFavCy0d+rzXisaapQtGu7YTZT22KM+Kjp4F0QWTM=;
- b=ZPemnBQl9i9XzwPcAiY4SDQChKN3ywe9fOfP2PggORAGWScnSdsom8DbXLFOMrVxm7o6g3Vz7RRXRU2KMxAPqr2dZKEiI8QDt0PDQs8XQWMAP0pHdrlrg+qwUxG6hhr8dhJHmtbdzuvy85Ymtvk7Cgu+asnEJ2Ws+qyawawCgM9B8JAnFryJ9GQt3oa4oZy2xFij4suuS6U21VA9XIGYyj7oM0mBR0uzqo3ixsmX2qTbgvewcqomVP/2ATKs9FQLznHbV3tgahlr7p1lMpkhul5X5OdsIQzjpS+if6lXys/rmALSujKxuf8Wr/j0JVhFLl3hB3yYvlhCiqLW5bdVcQ==
-Received: from SJ0PR03CA0177.namprd03.prod.outlook.com (2603:10b6:a03:338::32)
- by CH1PPFF9270C127.namprd12.prod.outlook.com (2603:10b6:61f:fc00::62b) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.26; Thu, 19 Jun
- 2025 18:23:46 +0000
-Received: from SJ5PEPF000001D1.namprd05.prod.outlook.com
- (2603:10b6:a03:338:cafe::49) by SJ0PR03CA0177.outlook.office365.com
- (2603:10b6:a03:338::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.29 via Frontend Transport; Thu,
- 19 Jun 2025 18:23:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF000001D1.mail.protection.outlook.com (10.167.242.53) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.21 via Frontend Transport; Thu, 19 Jun 2025 18:23:46 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 19 Jun
- 2025 11:23:36 -0700
-Received: from shredder.lan (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 19 Jun
- 2025 11:23:32 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>, <bridge@lists.linux.dev>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <razor@blackwall.org>, <horms@kernel.org>,
-	<petrm@nvidia.com>, <yongwang@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net] bridge: mcast: Fix use-after-free during router port configuration
-Date: Thu, 19 Jun 2025 21:22:28 +0300
-Message-ID: <20250619182228.1656906-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2A321FF5D
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 18:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750359371; cv=none; b=jxrvcmKK7N3dmBB6WeuilVAj+PkNNRAsducc0eVlz+U2ja/JbLGVZIQP5CFehkNWG3VwuKQmoT673dKn9PSqCUtNegvphgNY0cmWJ+p76w/r9hq+dTwwZMRtDYm1NdLCjinSwYNH8lseNdxZQbvPrHDdtg7itrqtLSAumj3j5Eo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750359371; c=relaxed/simple;
+	bh=jTwfMNgiDqIRJOksWYTy5jCF9CPb5zihZBKzIWwSFm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t4SvOZioOuOvdE911P4qE/KFsLFA10bvt9/+SuIjSGW45ygnqSB7b0GznKwSF67wtwPFaUNK7e3sPobphMYcQ4wf7oEOY6ed+QM7ia2brte0O6+7KmTrbBelGXodcsxEf0/L75scYULCh1g+ZBm7NMn0qwf5hSH8lxbMV8iq6eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=NhSECbXD; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e8276224c65so1238791276.0
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 11:56:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1750359368; x=1750964168; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hwc/J2z7K8Oc3tRBm2Nezvg/uque+UdAnRf1u/K/WLw=;
+        b=NhSECbXDk7EohYFokjry8rDIOWcIiyUyTMwZEtVshs6Ah7fhlxc70zNncCAjkpe9oi
+         hvTE733+H/fjrOOWPCoAjzOxXg2BGGfAlhZNkDYLzu912v7CvBCX8NALxed2u1+kWyjX
+         FViOgF/e0xbcnCbSnuGgr0UqBJADSQ7LUr8DQpBbL+JRgm/EMmiT6cYUEy2YVCK+c8T2
+         725D31AEdfUmU5n4ura03tAtyIg7t05R8nnaPpXrmSTQkBHqbbmYCSgfwP/bU7fNt1qt
+         snde2yweaMOQKq7sJFzDfUeTKXCui7hi5rn3zzOH2f+aGOaTbq5Y9b7XJNuylY88ROay
+         iYUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750359368; x=1750964168;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hwc/J2z7K8Oc3tRBm2Nezvg/uque+UdAnRf1u/K/WLw=;
+        b=Aze6Op8hZPEaGqdIGh+wQeFwuPUYN5CPrXToxbS8P0HM5u8uuyvTz1iKpfLY6sFISq
+         XkVg5W5PUT/vwAJ6kZir+5GgifrgBpzJGamvjRBWua11jCjP5/sND51jfr9byI/lWObm
+         LmzPFhZs28J2FLUL3UcKLUr/PImVCPECsCldC7jtmTtbGzApwQxPPM4d98uZcxvw9eNL
+         iGdE775Az+C30FDypjNpdWYkBhJh2cKfZOpLWfBW7c1zsZCipgCuXTcU6bXUy6jIU8xl
+         OrUTAvaJcvjsq8n1XAvxT+vJRJC54Q/QBHWMjzuJ6v4OcRBn6srSU7+13yNDrWY0iC0+
+         KvCw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHxq+3rn1DnwRrKx9jE9fuvVf0zpiYEnJRIG2zoe3VcG38SG/MOm4tJBOyDqht5wZEC0sgAko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHFCps5H4WRnX0RsgIsmkc+HQYIodk0cN7yonabyOStKvqVF2b
+	wWAj5qhYt0gaVrMm4FDRTLm8r0vb3Qt7xN4AXXhVShUweKhtlA0nMjB54jcduX+6UtyOZsaFTDQ
+	w9OxPUwxD7810vqGP8eRVH1PuTJAvEEnYMSk901hd
+X-Gm-Gg: ASbGncvnCRRjuxCVKGzCsHXIGoRuPMJ2bjk7kSvnPGCYRdWyimwWP/lvAIMYFRfENld
+	jfCjf4DinMj6JRFEnpMB6AKHi5xKfQUDBKwI6Q301LAMKWY/HCg2Pw2zgjLJhEIr1Ozn4JjI1cS
+	KenapmqMOB+FctKGn1HXNJdYPx0+cdbDPBr0AweoD0sNI=
+X-Google-Smtp-Source: AGHT+IH067L4bejA4TI2O2DetkqX3aZTCVzDlFULZgdP7Lam4wsYXB5eU0tsHYelUE6XF/5qHsQm4PXzb1LotTfJpvY=
+X-Received: by 2002:a05:6902:260e:b0:e84:d34:f35c with SMTP id
+ 3f1490d57ef6-e842bd0763emr454620276.34.1750359368469; Thu, 19 Jun 2025
+ 11:56:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D1:EE_|CH1PPFF9270C127:EE_
-X-MS-Office365-Filtering-Correlation-Id: 372862e4-b101-496e-b970-08ddaf5e6e3d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vizgCelmzprUncRInAg7+KQB/LfaY2T2mPaKz4CS6W2U6SEH3hF/2q1dmXQP?=
- =?us-ascii?Q?p57cZLtfFJMhZNKwuN70yXLhZTpbVr3kqoMicPwbkLqKft92nIQvNeRj/FHp?=
- =?us-ascii?Q?t05vvJgO3XYRPThh6Y2xczAV0zt7Z3roUPowtom+8lAgdhMxmRAQ4K4b3vgr?=
- =?us-ascii?Q?wtNvOl7/TC++ftUpYmlawKoe9RPRRxqm/kpWRdUp5D/Hgdtpjb2SNf5Sjp0D?=
- =?us-ascii?Q?/mbVSFkVRGmplss1KWseWLXw/fhhEr8y1cMhD048+MZ6ga2VsOTWrlbvgnhk?=
- =?us-ascii?Q?81MgeU5rBuwAC9pUwBcHHh25l1/g2bzLXGZpkTbg9T6TXd47Xdzsj7y7NxIv?=
- =?us-ascii?Q?hH0haGpggwhei/OZuWekXcQnT/KIarzQ95Flx4JHLoes8pGx7VXLT5Gf78nq?=
- =?us-ascii?Q?ixdXkGa8goiKVhK5RNwaGV2BT9KhSpHAarzNp+eQ1KZ717dKz6pmYY6az9tX?=
- =?us-ascii?Q?OwmaJOumEBFCVA6vLBm/eAnGmpos9RcQt+7p94cCLhkCyyWjHzitB2DTcCb3?=
- =?us-ascii?Q?k1SmKlkoYZO9ToHOV9ivrQKBPqPrWenUq7tbTp/cv0GfE/Ms1Ti77Egrz1Kg?=
- =?us-ascii?Q?9mdgfxrbdTOazA2qtf6ZZH7Qo7qTbF3vY5jyGyHnShAsTFuZrYf1MCmOpo4H?=
- =?us-ascii?Q?nqoeT4UoMbnFVEH7OGgRnJXgUogmgPSHaYPSTymCzwuJ+auLZv36GqfXnCXn?=
- =?us-ascii?Q?oKPPOTssKcHlJgfL3r6qHQhZprI09ssPNX/3b4MszkEhEkafOntUDEzP1Nb6?=
- =?us-ascii?Q?u7d2+mnr8OlCUkYYdZcKZXYmEVtSjQaP2uI+ZXS8xwEIIcoW2rBD16x41Bcw?=
- =?us-ascii?Q?au0+cIW8v3Eu8Q9eqYjR+WuG989XD9vkT4/AICu40RhPZaOeTwAAy9Lointw?=
- =?us-ascii?Q?PmtJCrL2e/H4hV1bHK8u7ARGe47kQgpWwXnKC2F7nPJGn0dqsJI8yw1tRKe7?=
- =?us-ascii?Q?0UNU1lCOpmgxarNtdbkxJcu7vUVZex3Tallm972x1JErtHYau/IQgZ8CtAdr?=
- =?us-ascii?Q?K+0zmODCl6WSEqwj0IDupFnm3n5C/umnPx5S0mPcV2zhB12eTeC7D/rmyXZp?=
- =?us-ascii?Q?b06OSW4BYATtewQ7+SxCYz0rrZkn07hmdnRkZDscO3Fqlub0KWA/W3crKovg?=
- =?us-ascii?Q?xTf+uYWrSjEaUWdIT0nnScxhhmw/325VDditVyb/a1gCYSF+t6dqcySJatNH?=
- =?us-ascii?Q?aeNO3WQ5pwu9saLSAkzq4ZHCAk7NjoDLrBQtUdc2g0pwbEHnvGxlsBqnwGX2?=
- =?us-ascii?Q?inNKdSrfx/O9lt2UZw/AKFteA9nhYaV5uVIYKuS8/dlO2JaJI6S1d2WRmWY9?=
- =?us-ascii?Q?Je5HR2JRyKFthAX/knb37E5DH6ZnL2ECOBVmmj8fzgsUnzOfi4k02Xk69J5j?=
- =?us-ascii?Q?df3nJ6f5P988mklSaYcv2EAcU7ajScbXnAJOdAB5zv1rT3VW/+P5Srue0rUU?=
- =?us-ascii?Q?esdoC23Vot3phsCgfvI8VOEstKKpBTjSTtWNJkgUFPXOuDz+LPsoam5BNXoK?=
- =?us-ascii?Q?+o1cNKQl/ZJuNXBDoP/BhVEkt3PUkIVAKCr2?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2025 18:23:46.7403
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 372862e4-b101-496e-b970-08ddaf5e6e3d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001D1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PPFF9270C127
+References: <CAHC9VhRWi5QdRgU-Eko4XZ9A2W2o3uhVAagVkhu1eT18qAWdkg@mail.gmail.com>
+ <20250619040127.1122427-1-kuni1840@gmail.com>
+In-Reply-To: <20250619040127.1122427-1-kuni1840@gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 19 Jun 2025 14:55:57 -0400
+X-Gm-Features: Ac12FXydpMmxk0hVfZce2Xoy08sDvTtPT8UVGVKruYSutx9qMXgs89MIxsZJvtk
+Message-ID: <CAHC9VhSDYwekbzzZB3LwQG=hVVX0-wfFg0i2n2Y_MuyAtv7OWA@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next 0/4] af_unix: Allow BPF LSM to filter
+ SCM_RIGHTS at sendmsg().
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	casey@schaufler-ca.com, daniel@iogearbox.net, eddyz87@gmail.com, 
+	gnoack@google.com, haoluo@google.com, jmorris@namei.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuniyu@google.com, linux-security-module@vger.kernel.org, 
+	martin.lau@linux.dev, memxor@gmail.com, mic@digikod.net, 
+	netdev@vger.kernel.org, omosnace@redhat.com, sdf@fomichev.me, 
+	selinux@vger.kernel.org, serge@hallyn.com, song@kernel.org, 
+	stephen.smalley.work@gmail.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The bridge maintains a global list of ports behind which a multicast
-router resides. The list is consulted during forwarding to ensure
-multicast packets are forwarded to these ports even if the ports are not
-member in the matching MDB entry.
+On Thu, Jun 19, 2025 at 12:01=E2=80=AFAM Kuniyuki Iwashima <kuni1840@gmail.=
+com> wrote:
+> From: Paul Moore <paul@paul-moore.com>
+> Date: Wed, 18 Jun 2025 23:23:31 -0400
+> > On Sat, Jun 14, 2025 at 4:40=E2=80=AFPM Kuniyuki Iwashima <kuni1840@gma=
+il.com> wrote:
+> > > From: Paul Moore <paul@paul-moore.com>
+> > > Date: Sat, 14 Jun 2025 07:43:46 -0400
+> > > > On June 13, 2025 6:24:15 PM Kuniyuki Iwashima <kuni1840@gmail.com> =
+wrote:
+> > > > > From: Kuniyuki Iwashima <kuniyu@google.com>
+> > > > >
+> > > > > Since commit 77cbe1a6d873 ("af_unix: Introduce SO_PASSRIGHTS."),
+> > > > > we can disable SCM_RIGHTS per socket, but it's not flexible.
+> > > > >
+> > > > > This series allows us to implement more fine-grained filtering fo=
+r
+> > > > > SCM_RIGHTS with BPF LSM.
+> > > >
+> > > > My ability to review this over the weekend is limited due to device=
+ and
+> > > > network access, but I'll take a look next week.
+> > > >
+> > > > That said, it would be good if you could clarify the "filtering" as=
+pect of
+> > > > your comments; it may be obvious when I'm able to look at the full =
+patchset
+> > >
+> > > I meant to mention that just below the quoted part :)
+> > >
+> > > ---8<---
+> > > Changes:
+> > >   v2: Remove SCM_RIGHTS fd scrubbing functionality
+> > > ---8<---
+> >
+> > Thanks :)
+> >
+> > While looking at your patches tonight, I was wondering if you had ever
+> > considered adding a new LSM hook to __scm_send() that specifically
+> > targets SCM_RIGHTS?  I was thinking of something like this:
+> >
+> > diff --git a/net/core/scm.c b/net/core/scm.c
+> > index 0225bd94170f..5fec8abc99f5 100644
+> > --- a/net/core/scm.c
+> > +++ b/net/core/scm.c
+> > @@ -173,6 +173,9 @@ int __scm_send(struct socket *sock, struct msghdr *=
+msg, stru
+> > ct scm_cookie *p)
+> >                case SCM_RIGHTS:
+> >                        if (!ops || ops->family !=3D PF_UNIX)
+> >                                goto error;
+> > +                       err =3D security_sock_scm_rights(sock);
+> > +                       if (err<0)
+> > +                               goto error;
+> >                        err=3Dscm_fp_copy(cmsg, &p->fp);
+> >                        if (err<0)
+> >                                goto error;
+> >
+> > ... if I'm correct in my understanding of what you are trying to
+> > accomplish, I believe this should allow you to meet your goals with a
+> > much simpler and targeted approach.  Or am I thinking about this
+> > wrong?
+>
+> As BPF LSM is just a hook point and not tied to a specific socket,
+> we cannot know who will receive the message in __scm_send().
 
-When per-VLAN multicast snooping is enabled, the per-port multicast
-context is disabled on each port and the port is removed from the global
-router port list:
+Okay, based on your patches, I'm assuming you're okay with just the
+socket endpoint, yes? Unfortunately, it's not really possible to get
+the receiving task on the send side.
 
- # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1
- # ip link add name dummy1 up master br1 type dummy
- # ip link set dev dummy1 type bridge_slave mcast_router 2
- $ bridge -d mdb show | grep router
- router ports on br1: dummy1
- # ip link set dev br1 type bridge mcast_vlan_snooping 1
- $ bridge -d mdb show | grep router
+Beyond that, and given the immediate goal of access control based on
+SCM_RIGHTS files, I think I'd rather see a unix_skb_parms passed to
+the LSM instead of a skb as it will make the individual LSM subsystem
+code a bit cleaner.  I'd prefer a scm_cookie, but given the
+destructive nature of unix_scm_to_skb() and the fact that it is called
+before we've determined the socket endpoint (at least in the datagram
+case), I don't think that will work.
 
-However, the port can be re-added to the global list even when per-VLAN
-multicast snooping is enabled:
+I'm also not overly excited about converting security_unix_may_send()
+into a per-msg/skb hook for both stream and datagram sends, that has
+the potential for increasing the overhead for LSMs that really only
+care about the datagram sends and the establishment of a stream
+connection.
 
- # ip link set dev dummy1 type bridge_slave mcast_router 0
- # ip link set dev dummy1 type bridge_slave mcast_router 2
- $ bridge -d mdb show | grep router
- router ports on br1: dummy1
+I'm open to suggestions, thoughts, etc. but I think modifying
+security_unix_may_send() to take a unix_skb_params pointer, e.g.
+'security_unix_may_send(sk, other, UNIXCB(skb))', and moving the
+SEQ_PACKET restriction out of unix_dgram_sendmsg() and into the
+existing LSM callbacks is okay.  However, instead of adding
+security_unix_may_send() to unix_stream_sendmsg(), I would suggest the
+creation of a new hook, security_unix_send_scm(sk, other, UNIXCB(skb))
+(feel free to suggest a different name), that would handle the per-skb
+access control for streams.
 
-Since commit 4b30ae9adb04 ("net: bridge: mcast: re-implement
-br_multicast_{enable, disable}_port functions"), when per-VLAN multicast
-snooping is enabled, multicast disablement on a port will disable the
-per-{port, VLAN} multicast contexts and not the per-port one. As a
-result, a port will remain in the global router port list even after it
-is deleted. This will lead to a use-after-free [1] when the list is
-traversed (when adding a new port to the list, for example):
+Of course there is an issue with unix_skb_params not being defined
+outside of net/unix, but from a practical perspective that is going to
+be a challenge regardless of which, unix_skb_params or the full skb,
+is passed to the LSM hook.  You'll need to solve this with all the
+relevant stakeholders regardless.
 
- # ip link del dev dummy1
- # ip link add name dummy2 up master br1 type dummy
- # ip link set dev dummy2 type bridge_slave mcast_router 2
+As a FYI, we've documented our policy/guidance on both modifying
+existing LSM hooks as well as adding new hooks, see the link below.
 
-Similarly, stale entries can also be found in the per-VLAN router port
-list. When per-VLAN multicast snooping is disabled, the per-{port, VLAN}
-contexts are disabled on each port and the port is removed from the
-per-VLAN router port list:
+https://github.com/LinuxSecurityModule/kernel/blob/main/README.md#new-lsm-h=
+ooks
 
- # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1
- # ip link add name dummy1 up master br1 type dummy
- # bridge vlan add vid 2 dev dummy1
- # bridge vlan global set vid 2 dev br1 mcast_snooping 1
- # bridge vlan set vid 2 dev dummy1 mcast_router 2
- $ bridge vlan global show dev br1 vid 2 | grep router
-       router ports: dummy1
- # ip link set dev br1 type bridge mcast_vlan_snooping 0
- $ bridge vlan global show dev br1 vid 2 | grep router
+> BTW, I was about to send v3, what target tree should be specified in
+> subject, bpf-next or something else ?
 
-However, the port can be re-added to the per-VLAN list even when
-per-VLAN multicast snooping is disabled:
+I wouldn't worry too much about the subject, prefix, etc. as the To/CC
+line tends to be more important, at least from a LSM subsystem
+perspective.  I would ensure that you send it to the LSM list and any
+related lists, MAINTAINERS and/or scripts/get_maintainer.pl is your
+friend here.  Since this is almost surely LSM framework tree material,
+my general rule is that I'll handle any merge conflicts so long as
+your patch is based on the lsm/dev branch or Linus' default branch.
+Of course, you can base your patch against any tree you like, and I'll
+grab it, but if there are significant merge conflicts you'll likely
+get a nasty email back about that ;)
 
- # bridge vlan set vid 2 dev dummy1 mcast_router 0
- # bridge vlan set vid 2 dev dummy1 mcast_router 2
- $ bridge vlan global show dev br1 vid 2 | grep router
-       router ports: dummy1
+As far as a v3 is concerned, while I generally don't like to tell
+people *not* to post patches, I'll leave that up to you, I do think we
+could benefit from some additional discussion here before you post a
+v3.  Reviewer time is precious and I would hate to see it spent on an
+approach that still has open questions, just in case we all decide to
+go in a different direction.
 
-When the VLAN is deleted from the port, the per-{port, VLAN} multicast
-context will not be disabled since multicast snooping is not enabled
-on the VLAN. As a result, the port will remain in the per-VLAN router
-port list even after it is no longer member in the VLAN. This will lead
-to a use-after-free [2] when the list is traversed (when adding a new
-port to the list, for example):
-
- # ip link add name dummy2 up master br1 type dummy
- # bridge vlan add vid 2 dev dummy2
- # bridge vlan del vid 2 dev dummy1
- # bridge vlan set vid 2 dev dummy2 mcast_router 2
-
-Fix these issues by removing the port from the relevant (global or
-per-VLAN) router port list in br_multicast_port_ctx_deinit(). The
-function is invoked during port deletion with the per-port multicast
-context and during VLAN deletion with the per-{port, VLAN} multicast
-context.
-
-Note that deleting the multicast router timer is not enough as it only
-takes care of the temporary multicast router states (1 or 3) and not the
-permanent one (2).
-
-[1]
-BUG: KASAN: slab-out-of-bounds in br_multicast_add_router.part.0+0x3f1/0x560
-Write of size 8 at addr ffff888004a67328 by task ip/384
-[...]
-Call Trace:
- <TASK>
- dump_stack_lvl+0x6f/0xa0
- print_address_description.constprop.0+0x6f/0x350
- print_report+0x108/0x205
- kasan_report+0xdf/0x110
- br_multicast_add_router.part.0+0x3f1/0x560
- br_multicast_set_port_router+0x74e/0xac0
- br_setport+0xa55/0x1870
- br_port_slave_changelink+0x95/0x120
- __rtnl_newlink+0x5e8/0xa40
- rtnl_newlink+0x627/0xb00
- rtnetlink_rcv_msg+0x6fb/0xb70
- netlink_rcv_skb+0x11f/0x350
- netlink_unicast+0x426/0x710
- netlink_sendmsg+0x75a/0xc20
- __sock_sendmsg+0xc1/0x150
- ____sys_sendmsg+0x5aa/0x7b0
- ___sys_sendmsg+0xfc/0x180
- __sys_sendmsg+0x124/0x1c0
- do_syscall_64+0xbb/0x360
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-[2]
-BUG: KASAN: slab-use-after-free in br_multicast_add_router.part.0+0x378/0x560
-Read of size 8 at addr ffff888009f00840 by task bridge/391
-[...]
-Call Trace:
- <TASK>
- dump_stack_lvl+0x6f/0xa0
- print_address_description.constprop.0+0x6f/0x350
- print_report+0x108/0x205
- kasan_report+0xdf/0x110
- br_multicast_add_router.part.0+0x378/0x560
- br_multicast_set_port_router+0x6f9/0xac0
- br_vlan_process_options+0x8b6/0x1430
- br_vlan_rtm_process_one+0x605/0xa30
- br_vlan_rtm_process+0x396/0x4c0
- rtnetlink_rcv_msg+0x2f7/0xb70
- netlink_rcv_skb+0x11f/0x350
- netlink_unicast+0x426/0x710
- netlink_sendmsg+0x75a/0xc20
- __sock_sendmsg+0xc1/0x150
- ____sys_sendmsg+0x5aa/0x7b0
- ___sys_sendmsg+0xfc/0x180
- __sys_sendmsg+0x124/0x1c0
- do_syscall_64+0xbb/0x360
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-Fixes: 2796d846d74a ("net: bridge: vlan: convert mcast router global option to per-vlan entry")
-Fixes: 4b30ae9adb04 ("net: bridge: mcast: re-implement br_multicast_{enable, disable}_port functions")
-Reported-by: syzbot+7bfa4b72c6a5da128d32@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/684c18bd.a00a0220.279073.000b.GAE@google.com/T/
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- net/bridge/br_multicast.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 0224ef3dfec0..1377f31b719c 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -2015,10 +2015,19 @@ void br_multicast_port_ctx_init(struct net_bridge_port *port,
- 
- void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pmctx)
- {
-+	struct net_bridge *br = pmctx->port->br;
-+	bool del = false;
-+
- #if IS_ENABLED(CONFIG_IPV6)
- 	timer_delete_sync(&pmctx->ip6_mc_router_timer);
- #endif
- 	timer_delete_sync(&pmctx->ip4_mc_router_timer);
-+
-+	spin_lock_bh(&br->multicast_lock);
-+	del |= br_ip6_multicast_rport_del(pmctx);
-+	del |= br_ip4_multicast_rport_del(pmctx);
-+	br_multicast_rport_del_notify(pmctx, del);
-+	spin_unlock_bh(&br->multicast_lock);
- }
- 
- int br_multicast_add_port(struct net_bridge_port *port)
--- 
-2.49.0
-
+--=20
+paul-moore.com
 
