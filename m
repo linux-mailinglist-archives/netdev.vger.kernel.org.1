@@ -1,99 +1,95 @@
-Return-Path: <netdev+bounces-199406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFC2CAE02AA
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:29:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F124DAE02AC
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 12:29:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FCAC7A3E9B
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:28:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44103AEB09
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAEC2222D1;
-	Thu, 19 Jun 2025 10:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA750223311;
+	Thu, 19 Jun 2025 10:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tvF/pXNK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AT8SanKf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9075517583;
-	Thu, 19 Jun 2025 10:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A518A221DA5
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 10:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750328970; cv=none; b=G3LPYU+UdyIvxkIM+ol5PpwJ/6CqImI46TxeJMkQEUd+IQCjLEdyJgos46ffunCz/L5ROm6yLB6IcVt8KD18bvExl96NH99XVjYpBQ+A6Kd4YQngcfcyF/N8OW82vWZ0/gEdRZoLCh7Cysp4Mc+HmAfpHrFKODJS/ESTeQLE1Bg=
+	t=1750328979; cv=none; b=cK7hMACHf7Z/wvb/8ii54lb9vdDMz6xHyZFTvFKySvubjy9ViQ6eY5Nm64gzC15iPGV0UV10jo5gZyopQeBDCEooIDahGB4ROU8+JvY8ZtMyBOkZrj3bL1lSYT/yaP3FTvV58bL+NMowEuo1la53GuJUGZz+LCvvDS1J1X3MYZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750328970; c=relaxed/simple;
-	bh=MNnBbkAciZE0S7Viw3nX/mJtBpSM07OUpqTorFANR0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ceK10UeZM6CptDcR+KyRleVRrJQI1wZ3tOaWEd04ZjRn0588hLzhiNT7ATQOb8f1WSm19fcUMU1gPLiqtzu0TZjdhXBbw8uuTBd3MAy9AEwv5u3/I5+OBg1Xk1wpmWsYiot42lQ7xChs+1XiVKpxX3Nq+kYHQk3DTS3hwt5GQSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tvF/pXNK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77384C4CEEA;
-	Thu, 19 Jun 2025 10:29:28 +0000 (UTC)
+	s=arc-20240116; t=1750328979; c=relaxed/simple;
+	bh=sOwwOqy8YeaW5YgxiJKGbO7bQyaG16hCKTSWCcCeGrM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I0WqxoltoQWNaI1elEo95BSfR6rIe37oppWhheZWDrl3ZsJS1OQdRBYWDSfZk4LKdlLRnKy6HRu+BTeKQhtIiG2zKeGefdMuQK6LqWglxQ6xkoRwd3DVhqkwN+SOoji0fjfNMsXuERjfa+kU7RCRB31DDihaYsu+Mmrlhy1P1AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AT8SanKf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2281BC4CEEA;
+	Thu, 19 Jun 2025 10:29:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750328970;
-	bh=MNnBbkAciZE0S7Viw3nX/mJtBpSM07OUpqTorFANR0U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tvF/pXNKrJgFAMdCkX5ab8PNq+OE/jdUp9yd2SRYb1B+Jwz4Xk7fn3yhWZxogmEGn
-	 pSbXyqv+KsQ2Nqn0o2F4RQcEXBeyM1yqThAECJrjhJstexE9BDEmZveJktyTaSxVud
-	 SnoFQdKFCh3NKBUsbY8SC1C5WR+/h4LB4Hew0P5G0F92qyp82/QFfsCOstGpPzA0m5
-	 zVhg879cEzLcFquauSqfVL9S8Z2SQunuqD7ylC3kw1UhnQobJpOzrXSzGVaKDlbPfo
-	 C3LEqdRJKHL3JWdcYl6TQg1DrNBxcFbXcjJof3w/bBfDiVBoGzLYNXQ8VDmFvFMCI2
-	 iFi65kqiKwsAA==
-Date: Thu, 19 Jun 2025 11:29:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net] mailmap: Update shannon.nelson emails
-Message-ID: <20250619102926.GH1699@horms.kernel.org>
-References: <20250619010603.1173141-1-sln@onemain.com>
- <b58b716e-a009-4b9a-a071-3989662e9652@onemain.com>
- <a49f5447-eb5e-4b3a-9285-903536c71af7@amd.com>
+	s=k20201202; t=1750328978;
+	bh=sOwwOqy8YeaW5YgxiJKGbO7bQyaG16hCKTSWCcCeGrM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AT8SanKfEIVlTubORVtS4BkF/QEHtPAlvDRql3ma/z8Yzk07O2bTjkSAahAsLafpl
+	 YqTGuSiWqt/UsCUGyQhI77bKjIm6dNeMhdl50YFEh1FlNqj/gvwAbrIO9FPSpzHSSw
+	 YwB607G11EjpDUNm/1K0DIIXiLboHVo7flvVprT/Kj37XwElI55fJWqTYT3q2t5Azd
+	 5IrMxajpe83dOKvERZ6fUV33XhZZSAx5Uu58pWA413l8ldljTe2sNTxcLETAwGtlJj
+	 3JNUhZdYrzKBWrM96GOQilYII4Ze4tog5gKGx93bdi/pt/NmBfXBPIx1/VLZgW0ZCJ
+	 Ww99GrbizquSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B443806649;
+	Thu, 19 Jun 2025 10:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a49f5447-eb5e-4b3a-9285-903536c71af7@amd.com>
+Subject: Re: [PATCH net] eth: fbnic: avoid double free when failing to DMA-map
+ FW
+ msg
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175032900625.449869.12314876309159391776.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 10:30:06 +0000
+References: <20250616195510.225819-1-kuba@kernel.org>
+In-Reply-To: <20250616195510.225819-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, lee@trager.us,
+ jacob.e.keller@intel.com, alexanderduyck@fb.com
 
-On Wed, Jun 18, 2025 at 06:33:47PM -0700, Nelson, Shannon wrote:
-> On 6/18/25 6:06 PM, Shannon Nelson wrote:
-> > Retiring, so redirect things to a non-corporate account.
-> > 
-> > Signed-off-by: Shannon Nelson <sln@onemain.com>
-> > ---
-> >   .mailmap | 7 ++++---
-> >   1 file changed, 4 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/.mailmap b/.mailmap
-> > index b77cd34cf852..7a3ffabb3434 100644
-> > --- a/.mailmap
-> > +++ b/.mailmap
-> > @@ -691,9 +691,10 @@ Serge Hallyn <sergeh@kernel.org> <serge.hallyn@canonical.com>
-> >   Serge Hallyn <sergeh@kernel.org> <serue@us.ibm.com>
-> >   Seth Forshee <sforshee@kernel.org> <seth.forshee@canonical.com>
-> >   Shakeel Butt <shakeel.butt@linux.dev> <shakeelb@google.com>
-> > -Shannon Nelson <shannon.nelson@amd.com> <snelson@pensando.io>
-> > -Shannon Nelson <shannon.nelson@amd.com> <shannon.nelson@intel.com>
-> > -Shannon Nelson <shannon.nelson@amd.com> <shannon.nelson@oracle.com>
-> > +Shannon Nelson <sln@onemain.com> <shannon.nelson@amd.com>
-> > +Shannon Nelson <sln@onemain.com> <snelson@pensando.io>
-> > +Shannon Nelson <sln@onemain.com> <shannon.nelson@intel.com>
-> > +Shannon Nelson <sln@onemain.com> <shannon.nelson@oracle.com>
-> >   Sharath Chandra Vurukala <quic_sharathv@quicinc.com> <sharathv@codeaurora.org>
-> >   Shiraz Hashim <shiraz.linux.kernel@gmail.com> <shiraz.hashim@st.com>
-> >   Shuah Khan <shuah@kernel.org> <shuahkhan@gmail.com>
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 16 Jun 2025 12:55:10 -0700 you wrote:
+> The semantics are that caller of fbnic_mbx_map_msg() retains
+> the ownership of the message on error. All existing callers
+> dutifully free the page.
 > 
-> In case there was any question, yes, this was me from home.
+> Fixes: da3cde08209e ("eth: fbnic: Add FW communication mechanism")
+> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Here is the summary with links:
+  - [net] eth: fbnic: avoid double free when failing to DMA-map FW msg
+    https://git.kernel.org/netdev/net/c/5bd1bafd4474
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
