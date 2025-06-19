@@ -1,185 +1,127 @@
-Return-Path: <netdev+bounces-199307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF35ADFC20
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:01:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2033ADFC42
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D99717ACCC3
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 04:00:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A8203A4EF1
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 04:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849CB239E83;
-	Thu, 19 Jun 2025 04:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF541238151;
+	Thu, 19 Jun 2025 04:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENjMH3TD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vywo7rLv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2F554764;
-	Thu, 19 Jun 2025 04:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91723BF9E
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 04:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750305692; cv=none; b=oY/z+K2MhLtTW7WYY39FpFlZ3vkZhQ3ntWVCG1d/MrXsQfOEbysJYsnk8FBwQRCtz8geRN+41XkJorKJcY19RmOOJA5OWIZZy0BAcjzJfj/pL0ikkIWx9Gi9jCzSp1FWnKT5GRWoqailpgeXpGsIqp/JCHYXwaOtpiDgSgu0p8A=
+	t=1750306503; cv=none; b=A0gG2o0YxCvV9mY4mPhMRWAp83rpRZfGiZ7FktwgaAJyp5Y8RjN1ASjY84xZQK2w71AQf6/u6n60XRFDp6+oIubnQ1nTXT6Wa20DshTQZTrXabUljLwNdAFkOqUPy1ibmjb/FFTZxHvx6huj3uDt0I6m1q37J3tv0QOyDZc3mY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750305692; c=relaxed/simple;
-	bh=hahMQkDWS7jX4uay08kdq9BXQXzcA58U3ONHZSjrlzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gR3E1aJEFEeGLSU0icSoogExeMjWz2zDYI3uPYCON2bK6yeYyzbAlMzaTMjWFHYS8jOgzLjLruknEk4+z/cyRMsXLvZ9vGjUOxro2G05z1NSGu43ZoH1bJNPaiK/7UJe77VHPH5IUVca31wMHOGz075xOq+e3I0lkRF6BFkCPms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENjMH3TD; arc=none smtp.client-ip=209.85.215.171
+	s=arc-20240116; t=1750306503; c=relaxed/simple;
+	bh=rc+zECxNWT/7NQRBtry6HvQ5AIFBQNMcEqJVYK+lJCA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lH4eqxn2/e3tlf8FS9BeGIAnf3WEwIqt9s/wuCbQWfWHDedktnMPw1J15Gd9hSvubE4bChWgFiCdIMOQgpgW4B5gorhWg/O2mn4yLro5qclaJzSO5aFOQle2l5k69ykQs1Vy+B/g0FtpM5cAa+VJbP+aRRyDJkEQPzkp7MpElMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vywo7rLv; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b0b2d0b2843so279362a12.2;
-        Wed, 18 Jun 2025 21:01:30 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b2c4476d381so241528a12.0
+        for <netdev@vger.kernel.org>; Wed, 18 Jun 2025 21:15:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750305690; x=1750910490; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hLa9WFnQF7IF2o8/2afKYfV+hsgtkELDJuA6/xkxYHY=;
-        b=ENjMH3TDDf2nm+dWFOiw8B4eNNcahFzCRE49mLn3xhfJ91Y0iQOeCzXmSvWuvlI31w
-         wPKh+QU8QfEmWFHYqVVFWPaunIOLeFES7D9QCqNugjUejJl3NfF2XUx8pk19vp0kLeCc
-         hbyGrhWiTZ3qAgXpgqWB6KShRCzcpxm1plHR8rO1yqcxPgcxikC6NBuTkkSiSgG/ZRXh
-         rb8wKPvtq1HL4gGaiUKj4FcCFf1kdAfzdWLdwOeCfAYMhY2diNzFSe98AgRsStJPRDzZ
-         xsD7GOv1Qt7aKrBaqyPHmshjque8yH21xcOE5TtReRQXELX4MhHymCTBqVoB0kRjFHJO
-         nsbg==
+        d=gmail.com; s=20230601; t=1750306501; x=1750911301; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X51fVzkyzM777UAZKFNgobT2572fwvti8yjBHd1ASz4=;
+        b=Vywo7rLvDzTmiIljhjoDPHGEJ8E8dC/XPgZ8mYgVZhH3ZaI//sESFLRyiU1CiY+U2a
+         SBTlo7R82IEelWyzJW2KNYCKgF7RegVG/x71fQ+9aw7e7K92i8QBhcLlNAPM7GAEF1AP
+         L4kKVSl5TqT2c+RBvnjNWGmMt/8mlWFt6ggbJ5parDgiyMJHOEVSW4ncQhyE0ffBHPAV
+         vHcCR3Wov3tzHbZS9ZdnaSrvrmjnyLzT3xRESNXdUFUWEOOBWXfWVOaGr3B4A2kFQQg4
+         Zz9IMYKkQiXBACOBA+8X3NxHXzLGNoyo18v8f3ePMsl1lSVuPzReta65zHZSpvykpmpB
+         5ZnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750305690; x=1750910490;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hLa9WFnQF7IF2o8/2afKYfV+hsgtkELDJuA6/xkxYHY=;
-        b=W1XyIQQMCBFqM/LOUoyGsj+xvFivCZpzcIXyAH8zhtKXYKa7iuvgJJFDzd+Y17r5nZ
-         o08n1MtN4b43q6hr2dgxYr3E/p0VpWLvV6FjJfud/HP27+RcSZRykwrb0+RXm8ECMwti
-         injAVL0dyMS7dqC1UCYBKyFZOP6s/i0fIomKDm7sGhqkeTcO6GSw4BwYASKnSNakrog8
-         crVAk1ELLSd9SB1HFmwHu8lmpxcvgZpvCynJYZFyELM4d3JA4Siz5RKYMtPl1aLoEusl
-         skk/MXgyGD4vTUXK2ZSXU0SdbA7zzJ00eCaHd8tWnnwUZ3ZlQTBNYgWs/fBJoK2/x35q
-         auwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTN9AI/ImAf9YxNl0L02TVlKzglOF6XtNRWD3bgy68Kciop+kSgvBA7e8uF4ifnJ0R3m1uMJC3pCNNBgcCxQ3q2H4Mrq8o@vger.kernel.org, AJvYcCVGSxf1aQdSuiWBAfMdldnB2Ceu47nb/hq/i3hW0HOvoWulLQz46Ej9H2VWtNxk7T12QOvqMkPx@vger.kernel.org, AJvYcCW3nfFzDPdfDQDhMnz0WcGKylOqjjkwpgSCASM66cZai/jHrfRcEYnf/GOBTKTbSqxpO+k18TGevQ==@vger.kernel.org, AJvYcCW4ClejFv8and/AK4ru7bGvaDMgCQSX0hklMzo4qC0QFEtz3C/prO0pNPuq0DWKLPIh85o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydsehUq73b0c+X5QEzssqLEZjguMPQNSVOZyM6HS4pZaAMS+Tm
-	DHWuZyqWa8ghvNbXmfMLSck1Cl7qt0lCilxbW7L/vfEV41t42RaEDHY=
-X-Gm-Gg: ASbGncvy/F4/7DXqIPBvG+d2gx7Js67wy0AuOtP0XgFkjpF0+baMyEVPEAaEj4gDLpM
-	U2MJilbTY5BjqDuZBE73pCeOQ9inQ6aTWEotQtZzuMQ7ZHFrGDL64j1tv3gzSDXnNOd+mycpReX
-	Ki+iemu8bOH6QiPZszoPoXmfmo+bUFKJQpOKAShwY2LooXHm79WklVQOR2FQXQTGTwICtX1h/mr
-	92FlvzxnYQpwzt5bkY6Wl8M5cCJcNZpmxlUXs9/PY0e8SBVnm8a14wfEDWK28AwtziRu8SqTOCI
-	mO6tRhXFl+L/Ms9mGCzjJ3OyxUhYNrr4TR60mHDSM77hpwJrQA==
-X-Google-Smtp-Source: AGHT+IEQxR9zmQ3AFhwx3xJxjctnoZsDPTAbaxJRuMZQaaUyg03ATv9MiuAh8dr7PJaCWTmD3uUZFQ==
-X-Received: by 2002:a17:90b:3805:b0:313:2768:3f6b with SMTP id 98e67ed59e1d1-313f1daf338mr28392518a91.27.1750305690013;
-        Wed, 18 Jun 2025 21:01:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750306501; x=1750911301;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X51fVzkyzM777UAZKFNgobT2572fwvti8yjBHd1ASz4=;
+        b=bGsBmhy/vKqf8cgi3MmqcGQQYzTponQH0R58LBeV9IovOLUOA4u101sAvDNRgkavhg
+         /n11BQjZ2yYqAEK7scoVv1sq17zE9eGaD4hicE4VabzZ5wTkzPkfQbUdKgTYNiCiNaqc
+         k0LYdLKfuWmZo4/6XNF0G69zLIc7G7MMyon4TjVSiqkW+7ANPwl5PEMpTBR9Q9brCRjj
+         RNqiX1RfpEuFazPskqRic0NQv2TOlYcBJiEcUceDcl3olfZVnKVPGmAkn2HQ5phu64sV
+         3rjpI07qzdzNYppYprm7iDr0LWdxwxQhGRz+KFs5IkO17/xSAG9RlcCrx0VfKWBR/t3K
+         ylcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqqxEPe4pMF/YUeTNSvWo90p8CEl+iB2UL3MdIZTZwxraMJRb247zW63bXrsMQd5pu4lGuq4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz42d1drUBgHXtQ0gUUM7c6Zjni9kbwKS9HaZysmTTaMSnbMcwk
+	yEhnx7916VBb60a7nYzuN5DZ9x1/16yqCpGv5HOH1blxQ1bPkWeAV9c=
+X-Gm-Gg: ASbGncsta6RFztrPNLS2mLCrBPfsNwaM8GPlOFDuhootADr6SJXy+Z5MNs5DetArlxo
+	RZOMewNpC6yQ7sjtoRA8c5TtWrcfbonWoVfFy3dMoq1aa8cWYzLhKUSDJXM4T4Ymsuhy6/BY7oB
+	bgIn6gMijZ7a27TnRpRnnghl4rJmp+/TdmYOFEtBTwhUr4zcIOik0sA9YBo/8Xfs1fwdX9cWxI+
+	89PygLM3G0uHlkqatSoxRb0Titeg39S5BPORi14bKmX6423k6k/A94CdxqQrM0LrBj5Uf4iZxC6
+	zfPY3+s9fbAu0DrOjLNDCcMPE3uGiqoNx+Mo0m4=
+X-Google-Smtp-Source: AGHT+IHt7u8EM6J9YCvbMgCAkBEiTDBU+RfxZCuUdK8bRkUXbjj0D6hUVJhnSCt7fXHj7Mu0YBKDqQ==
+X-Received: by 2002:a17:903:1105:b0:236:6f43:7053 with SMTP id d9443c01a7336-237cbe9b5b3mr31254145ad.2.1750306501336;
+        Wed, 18 Jun 2025 21:15:01 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3158a318733sm949862a91.38.2025.06.18.21.01.28
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de781b1sm109928585ad.89.2025.06.18.21.15.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 21:01:29 -0700 (PDT)
+        Wed, 18 Jun 2025 21:15:00 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: paul@paul-moore.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	casey@schaufler-ca.com,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	gnoack@google.com,
-	haoluo@google.com,
-	jmorris@namei.org,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	kuni1840@gmail.com,
-	kuniyu@google.com,
-	linux-security-module@vger.kernel.org,
-	martin.lau@linux.dev,
-	memxor@gmail.com,
-	mic@digikod.net,
-	netdev@vger.kernel.org,
-	omosnace@redhat.com,
-	sdf@fomichev.me,
-	selinux@vger.kernel.org,
-	serge@hallyn.com,
-	song@kernel.org,
-	stephen.smalley.work@gmail.com,
-	yonghong.song@linux.dev
-Subject: Re: [PATCH v2 bpf-next 0/4] af_unix: Allow BPF LSM to filter SCM_RIGHTS at sendmsg().
-Date: Wed, 18 Jun 2025 21:00:29 -0700
-Message-ID: <20250619040127.1122427-1-kuni1840@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Rao Shoaib <rao.shoaib@oracle.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 net 0/4] af_unix: Fix two OOB issues.
+Date: Wed, 18 Jun 2025 21:13:54 -0700
+Message-ID: <20250619041457.1132791-1-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <CAHC9VhRWi5QdRgU-Eko4XZ9A2W2o3uhVAagVkhu1eT18qAWdkg@mail.gmail.com>
-References: <CAHC9VhRWi5QdRgU-Eko4XZ9A2W2o3uhVAagVkhu1eT18qAWdkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 18 Jun 2025 23:23:31 -0400
-> On Sat, Jun 14, 2025 at 4:40 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrote:
-> > From: Paul Moore <paul@paul-moore.com>
-> > Date: Sat, 14 Jun 2025 07:43:46 -0400
-> > > On June 13, 2025 6:24:15 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrote:
-> > > > From: Kuniyuki Iwashima <kuniyu@google.com>
-> > > >
-> > > > Since commit 77cbe1a6d873 ("af_unix: Introduce SO_PASSRIGHTS."),
-> > > > we can disable SCM_RIGHTS per socket, but it's not flexible.
-> > > >
-> > > > This series allows us to implement more fine-grained filtering for
-> > > > SCM_RIGHTS with BPF LSM.
-> > >
-> > > My ability to review this over the weekend is limited due to device and
-> > > network access, but I'll take a look next week.
-> > >
-> > > That said, it would be good if you could clarify the "filtering" aspect of
-> > > your comments; it may be obvious when I'm able to look at the full patchset
-> >
-> > I meant to mention that just below the quoted part :)
-> >
-> > ---8<---
-> > Changes:
-> >   v2: Remove SCM_RIGHTS fd scrubbing functionality
-> > ---8<---
-> 
-> Thanks :)
-> 
-> While looking at your patches tonight, I was wondering if you had ever
-> considered adding a new LSM hook to __scm_send() that specifically
-> targets SCM_RIGHTS?  I was thinking of something like this:
-> 
-> diff --git a/net/core/scm.c b/net/core/scm.c
-> index 0225bd94170f..5fec8abc99f5 100644
-> --- a/net/core/scm.c
-> +++ b/net/core/scm.c
-> @@ -173,6 +173,9 @@ int __scm_send(struct socket *sock, struct msghdr *msg, stru
-> ct scm_cookie *p)
->                case SCM_RIGHTS:
->                        if (!ops || ops->family != PF_UNIX)
->                                goto error;
-> +                       err = security_sock_scm_rights(sock);
-> +                       if (err<0)
-> +                               goto error;
->                        err=scm_fp_copy(cmsg, &p->fp);
->                        if (err<0)
->                                goto error;
-> 
-> ... if I'm correct in my understanding of what you are trying to
-> accomplish, I believe this should allow you to meet your goals with a
-> much simpler and targeted approach.  Or am I thinking about this
-> wrong?
+From: Kuniyuki Iwashima <kuniyu@google.com>
 
-As BPF LSM is just a hook point and not tied to a specific socket,
-we cannot know who will receive the message in __scm_send().
+Recently, two issues are reported regarding MSG_OOB.
 
-Also, the hook must be after scm_fp_copy(), otherwise struct file
-is not yet available there.
+Patch 1 fixes issues that happen when multiple consumed OOB
+skbs are placed consecutively in the recv queue.
 
-Another way I thought of was to reuse LSM hook in sk_filter()
-(SOCK_STREAM needs to add it), but it returns 0 even when we drop
-skb, which will be less preferable.
+Patch 2 fixes an inconsistent behaviour that close()ing a socket
+with a consumed OOB skb at the head of the recv queue triggers
+-ECONNRESET on the peer's recv().
 
 
-BTW, I was about to send v3, what target tree should be specified in
-subject, bpf-next or something else ?
+Changes:
+  v2:
+    * Patch 3: skip the leading consumed OOB skb instead of freeing it
+
+  v1: https://lore.kernel.org/netdev/20250618043453.281247-1-kuni1840@gmail.com/
+
+
+Kuniyuki Iwashima (4):
+  af_unix: Don't leave consecutive consumed OOB skbs.
+  af_unix: Add test for consecutive consumed OOB.
+  af_unix: Don't set -ECONNRESET for consumed OOB skb.
+  selftest: af_unix: Add tests for -ECONNRESET.
+
+ net/unix/af_unix.c                            |  31 +++-
+ tools/testing/selftests/net/af_unix/msg_oob.c | 142 +++++++++++++++++-
+ 2 files changed, 161 insertions(+), 12 deletions(-)
+
+-- 
+2.49.0
+
 
