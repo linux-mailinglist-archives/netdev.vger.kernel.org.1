@@ -1,139 +1,132 @@
-Return-Path: <netdev+bounces-199387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E4FBAE01F9
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:46:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FA11AE0203
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:48:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AFD617F17D
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:46:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3005A3BEB0E
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627C6220F4F;
-	Thu, 19 Jun 2025 09:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE866220F4D;
+	Thu, 19 Jun 2025 09:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JO6oj8V/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fdRbQF6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A330C21B9C0;
-	Thu, 19 Jun 2025 09:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CA921C161
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 09:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750326404; cv=none; b=a4OJv/PpunmKLGf0330tjSoy/wGh/dbnqfGjQv2HuHpe3an6IiPDSkd+CyQ0XXjZSZ/EgI73xDouAL2GTsFRazxSDnm2XtzXS5/7b0paQuggohqCMfyLe+EG4uy3RxSgbkY6SHuaC36an9LS4BBSoSTsC3qb8xcsQEES61jQDuA=
+	t=1750326499; cv=none; b=R1Gp5QZgCFJAYwJuTK3unBkusrgDiBzjT2mKooIIy2YQ9uv5YbBJGi2RUNkb5wgKoaY8y96BxWi4SB5E4Z9qPe0VYr/uNGyWaY+tGjKlWl4svL+7aGshddBxmFS8vXViYLSl1xT5YumkrnYGKu0GHa9Sgh2wrN/qSEamuw+bh8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750326404; c=relaxed/simple;
-	bh=r1Ar8ZQ4D9/WtFd5hRo45kEmZ+WsfRpMNPKRKqGWvds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=taQkVGVbmaSNzKL9IwHlbIZC4N6mF+2bbUHKZJoNvRUB+Kot2dwub+uBYN+yM8DcIupPrfdEgPYGxac4BKMCg/AaxJwaV/GmwDCcivD9cV/VuhD3mAPkd9JJiXtwC23lcrtjD+tG+rwIznA87ORy99OkUjjIPMjz7QUa+cse/ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JO6oj8V/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750326403; x=1781862403;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=r1Ar8ZQ4D9/WtFd5hRo45kEmZ+WsfRpMNPKRKqGWvds=;
-  b=JO6oj8V/whTjyaNd2C/242GD7d0Co+VO7OK/VKTr9CKtg86YyEwy5yal
-   oIAvfKOzc1r6WN2ENZFCpXK/rYk6e1j5e+4QHWsQwJs3777vUPE3vOvNy
-   i+A2de6iXsJTzOF32b63FA6l1Nc3WLUeUl57ybCbJW7i704sJGmjwxVgI
-   NiLBw/Vje1jvfK2KwUVW4M9ftTrFDaD9O3EDwDPaoD3c63TFn0GvxPPEt
-   Avtg8NfGCN55BKd6hZxi7OwxikOn0MNO41goP5U9pMC0UuClDKWygTJwN
-   ofmrMMjoFcQyyUo1MK5tB7mYx9CdfhtLhOXouG64OSlysdwgwZtpKwtq1
-   w==;
-X-CSE-ConnectionGUID: Ks/UGMX5Q3OoHDYdyzfwPw==
-X-CSE-MsgGUID: STOgO8BRQ4qXG5swJvLPKg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="51683409"
-X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
-   d="scan'208";a="51683409"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 02:46:42 -0700
-X-CSE-ConnectionGUID: I0Y4y6uZTQuwsbi+3UEesg==
-X-CSE-MsgGUID: fAsgOCE5RpuNzUuUl2Do/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
-   d="scan'208";a="151080205"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 19 Jun 2025 02:46:38 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uSBqu-000Kd4-1R;
-	Thu, 19 Jun 2025 09:46:36 +0000
-Date: Thu, 19 Jun 2025 17:46:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [net-next, 03/10] bng_en: Add firmware communication mechanism
-Message-ID: <202506191741.1C9E7i3x-lkp@intel.com>
-References: <20250618144743.843815-4-vikas.gupta@broadcom.com>
+	s=arc-20240116; t=1750326499; c=relaxed/simple;
+	bh=+hI8Xs4QODG0WyLiH7srKpnO6ErrVHPlG4SA6o6CR2k=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=pPKaIeOnXSnsOnt7HQwdNnYA9y5QaW5MfvNmIb9kURKoz5kaAGOyAOTYNcmCb4kEwgXkEb2E/NejpUyX6GYWumLGMDlcYmWxHmqHQPBUseAWOHV62HA7NnzeAlZ1ukq9inueWyk0oO43gM5D4kcY7T1Lssx1Rso90H2BP1Dci9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fdRbQF6M; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AApn2ot00InFaDW5pjrmd9wr1a+/4qJM2q8x8u9VFeM=; b=fdRbQF6MGkCqD0lNx0zAhb1Dqz
+	W0tjVHZaO82AfU5sMTZ3dCl0inJV9nwPOx0IW42nB3xqZfYC1Mve+iKAYTU46+V2hMQ6xXHNEpNGt
+	TZPtEfLnRZMDLTEdSQIjR5GgxcKB6rKMfgvxPAtCNMvOTeEoYm4Hjk8aQS/pI0Nxn7eaKhJJZIIlp
+	V+vW3PAl0K6CoRtA2Pd2C1BndrqbF33ov76LDDxqhNbKfiRPbh+tnwFeIhKiybTaaBkoPnyX59PlR
+	JyZh7hVsMQzH05c+d8QJ85xR8cH7zd0yO3YMN0sT//qZb/FlszBqolVK3yolSZGkjSrXFaaEEk7f6
+	Gh7KVPTg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51446 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uSBsM-0007jW-3D;
+	Thu, 19 Jun 2025 10:48:07 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uSBri-004fL5-FI; Thu, 19 Jun 2025 10:47:26 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Zapolskiy <vz@mleia.com>
+Subject: [PATCH net-next] net: stmmac: lpc18xx: use plat_dat->phy_interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250618144743.843815-4-vikas.gupta@broadcom.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uSBri-004fL5-FI@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 19 Jun 2025 10:47:26 +0100
 
-Hi Vikas,
+lpc18xx uses plat_dat->mac_interface, despite wanting to validate the
+PHY interface. Checking the DT files (arch/arm/boot/dts/nxp/lpc/), none
+of them specify mac-mode which means mac_interface and phy_interface
+will be identical.
 
-kernel test robot noticed the following build errors:
+mac_interface is only used when there is some kind of MII converter
+between the DesignWare MAC and PHY, and describes the interface mode
+that the DW MAC needs to use, whereas phy_interface describes the
+interface mode that the PHY uses.
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.16-rc2 next-20250618]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Noting that lpc18xx only supports MII and RMII interface modes, switch
+this glue driver to use plat_dat->phy_interface, and to mark that the
+mac_interface is not used, explicitly set it to PHY_INTERFACE_MODE_NA.
+The latter is safe as the only user of mac_interface for this platform
+would be in stmmac_check_pcs_mode(), which only checks for RGMII or
+SGMII.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20250618144743.843815-4-vikas.gupta%40broadcom.com
-patch subject: [net-next, 03/10] bng_en: Add firmware communication mechanism
-config: parisc-randconfig-r073-20250619 (https://download.01.org/0day-ci/archive/20250619/202506191741.1C9E7i3x-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250619/202506191741.1C9E7i3x-lkp@intel.com/reproduce)
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506191741.1C9E7i3x-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   hppa-linux-ld: hppa-linux-ld: DWARF error: could not find abbrev number 1754059
-   drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `__hwrm_req_init':
->> bnge_hwrm.c:(.text+0x96c): multiple definition of `__hwrm_req_init'; hppa-linux-ld: DWARF error: could not find abbrev number 179644068
-   drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xccc): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_timeout':
->> bnge_hwrm.c:(.text+0xa90): multiple definition of `hwrm_req_timeout'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xdf0): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_alloc_flags':
->> bnge_hwrm.c:(.text+0xac8): multiple definition of `hwrm_req_alloc_flags'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xe28): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_flags':
->> bnge_hwrm.c:(.text+0xb00): multiple definition of `hwrm_req_flags'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xf9c): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_hold':
->> bnge_hwrm.c:(.text+0xb48): multiple definition of `hwrm_req_hold'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0xfe4): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_drop':
->> bnge_hwrm.c:(.text+0xbd0): multiple definition of `hwrm_req_drop'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x106c): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_send':
->> bnge_hwrm.c:(.text+0xc10): multiple definition of `hwrm_req_send'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x12f0): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_send_silent':
->> bnge_hwrm.c:(.text+0xc50): multiple definition of `hwrm_req_send_silent'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x1330): first defined here
-   hppa-linux-ld: drivers/net/ethernet/broadcom/bnge/bnge_hwrm.o: in function `hwrm_req_dma_slice':
->> bnge_hwrm.c:(.text+0xca8): multiple definition of `hwrm_req_dma_slice'; drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.o:bnxt_hwrm.c:(.text+0x1388): first defined here
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
+index 22653ffd2a04..c0c44916f849 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
+@@ -41,6 +41,7 @@ static int lpc18xx_dwmac_probe(struct platform_device *pdev)
+ 	if (IS_ERR(plat_dat))
+ 		return PTR_ERR(plat_dat);
+ 
++	plat_dat->mac_interface = PHY_INTERFACE_MODE_NA;
+ 	plat_dat->has_gmac = true;
+ 
+ 	reg = syscon_regmap_lookup_by_compatible("nxp,lpc1850-creg");
+@@ -49,9 +50,9 @@ static int lpc18xx_dwmac_probe(struct platform_device *pdev)
+ 		return PTR_ERR(reg);
+ 	}
+ 
+-	if (plat_dat->mac_interface == PHY_INTERFACE_MODE_MII) {
++	if (plat_dat->phy_interface == PHY_INTERFACE_MODE_MII) {
+ 		ethmode = LPC18XX_CREG_CREG6_ETHMODE_MII;
+-	} else if (plat_dat->mac_interface == PHY_INTERFACE_MODE_RMII) {
++	} else if (plat_dat->phy_interface == PHY_INTERFACE_MODE_RMII) {
+ 		ethmode = LPC18XX_CREG_CREG6_ETHMODE_RMII;
+ 	} else {
+ 		dev_err(&pdev->dev, "Only MII and RMII mode supported\n");
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.30.2
+
 
