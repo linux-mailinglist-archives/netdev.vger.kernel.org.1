@@ -1,130 +1,187 @@
-Return-Path: <netdev+bounces-199467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE907AE0672
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:02:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30715AE0673
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B52C3A9C6B
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:01:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5168D3A6D3F
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD88914F9F7;
-	Thu, 19 Jun 2025 13:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73520225408;
+	Thu, 19 Jun 2025 13:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xf4K+C4M"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OolaYUpv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B35241CB2
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 13:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF3C21421F
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 13:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750338115; cv=none; b=cZrQTZE2YU1O03dq3eRw3j9TDoe+2B1q7feyPvbQU7fySZr2dA5gdI9BZsdPrDgB4h/Byi/05L4PbaILtolaW0uX8qdm1fve3Bd6IFSvNMKRa9sgSs/LbV91ZBRIaylcReRDVkg1vza3zsxxMHLi/cVucph/GGTwC2E0pY99gSo=
+	t=1750338148; cv=none; b=X+FSmkVgy2juPpkzX1t+rUTBlMJCJuW4R2G4Eh49jNQSq/lX8K6YPhTZDpW2Y8UsqJuGStJtVxIFFnxgBQB16MIjAUggcHPrXw+C/GiuYnwufPsWAbovn9c/i0j7IHs37y0NX/1GeMq49uaXdl9XuabnSFkhJAVRyHcO6Pxt/Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750338115; c=relaxed/simple;
-	bh=OfL9Z/ec/rxhkCQVMde9KEFugyDbiDaYhn/WPjvYD8o=;
+	s=arc-20240116; t=1750338148; c=relaxed/simple;
+	bh=eZMzhthG7v0kVN7foQixUTLeTkvgxd3BLRUYRuYNQX4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tsHAnFxr56FFhJltojTdIVLTdhTsUnwI0eJbXE4cZlrxyF1tC/kwph52+T5GhMbBlYG966sFiKg9nEHdVSPIA537dWNZgvgDp/K/9hPJjYSGlyHDW4DJZFBFkKfl45GvPDia3NvAgqCfeoRWg6Y1OFwMlc4c8d4LbwDHtbgbVr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xf4K+C4M; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750338112;
+	 In-Reply-To:Content-Type; b=tlqqSWoN8tZXJ6YOa1MQXz4F0Z2aYCAsK/eHW5qnaCx2Ht/3X5y09mvUdYinvoWiGUr49JoqK4kPnIyCeMaOAB/dq8C0HkZo9m9mM1OppC8jx7FBbOJSAqdw421pzCDSt7TCXmm28n2f7ZaMn8H5/XwSkku3VW7VZteH4rsLdkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OolaYUpv; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <decb802a-7327-4a9a-8a4a-74970474f42c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750338144;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=coOBctdngiFLwqq+spwJrBWJfXd3eMBKsDk5b3tvSgs=;
-	b=Xf4K+C4MxOp1ls22F+pKrL3GQEd0CbG7aOMPn3mdYLsO8OU2qScd5kK0ctAQbjRt8A8+SE
-	oeXW6JoEmT+siXUEK1YixDuYI1ceK0muwqBAlHK0DPIML3A4hHwMZESYqbOSKnXXI2D0AY
-	6j5/GWf+Kr1bKMm5QL+TVCvQsSogdhs=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-580-GmFrq5cQPESYTuAPaD5Zng-1; Thu, 19 Jun 2025 09:01:48 -0400
-X-MC-Unique: GmFrq5cQPESYTuAPaD5Zng-1
-X-Mimecast-MFC-AGG-ID: GmFrq5cQPESYTuAPaD5Zng_1750338107
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-553acdcd5a1so396585e87.2
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 06:01:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750338107; x=1750942907;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=coOBctdngiFLwqq+spwJrBWJfXd3eMBKsDk5b3tvSgs=;
-        b=reFwiFTvFTF2r62yfDW0I00YNN/t57o2Qlktw+elT60h2C0YB4NjSi/ElIWsi7vf6F
-         llqEigTV2Sv1bmMqM2nffOvvocIubf5nC9Yhgo71l+qnc5HqVVD89uv//8urSNwJV/jn
-         3fYDD9TSSS3OB0cUKX9kMasG/Ot0z+xO4U3pFhY8l7Q1WaQuYYzlzuTc5xi6KX/nlsF7
-         soSItjt4xKbrGP2SIg5ZJRU4KHCGsqMSBygZMNGfKU6+zeUULvqVVZ7cycXNCPFcjzda
-         YY8go0df81IkfWDY3/NWKIM/qMCBmn3Y5aulSbHJY84HFtsPq1QQ9BcBkNnpw80fm/qm
-         XUNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVvmno/f9V0UawhOVjP/0VL/3oahsDIpinOaRjzeNllTrG2iFamG54bHfeStUfvD8Jqy3jUqH0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymSs0eGP4qD7ZJyRVgltSuyCXDM8sgU0bL3Gx32TFamNiscn5m
-	57HOsavttIvIpgIT1JYJpJydLKt8bFhL2eTyqXz+crqbhFKNtiznZLREePkW9hY8Ywr8ntA9zNb
-	PQUR8do1L83NtVfMgPJn5U1lHORjvWkUZjt8NJywH6Mtx1ekAs04geimw6A==
-X-Gm-Gg: ASbGncuIakbWRaDxiEYMUaFUXpM4ysI/i+5IKkDrcHndNVEL+aovUbcnSGgOd2Xp+uI
-	cneatVBBzv4X+uEEittogd8T2Ahbi+Nmvb6ZDGT4SFgWH3yl5Qfj+6Eksu0ZYPEJNBZ0A3FbNaB
-	eO05j6PUApDPwZggBlIu0GeN2YdyrhptDMNgclW61MEVrh8ZqR6yCOeMpy5PLoR7ENrs4RGeIaS
-	Qq579mrnuUkMJp8fLm1VMLWvJ+o/C7DMH38g0uG/yfW4ZkNS/lYUgGkUVVZgXThdc1mmH485fZe
-	e7RQvfMyhBQmwKxlux4Ijr5AZFBfqw==
-X-Received: by 2002:a05:6512:3b97:b0:553:2505:7db8 with SMTP id 2adb3069b0e04-553b6f32e73mr6262537e87.45.1750338106545;
-        Thu, 19 Jun 2025 06:01:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQOluXT3EEJj5DfLvQaoZWgbGe1BTfiMovxQCHdQgTLXzqLtRTDndjrZ2gOETEAtyiMKEWQQ==
-X-Received: by 2002:a05:6512:3b97:b0:553:2505:7db8 with SMTP id 2adb3069b0e04-553b6f32e73mr6262434e87.45.1750338105582;
-        Thu, 19 Jun 2025 06:01:45 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:271a:7310::f39? ([2a0d:3344:271a:7310::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b27795sm19444363f8f.71.2025.06.19.06.01.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jun 2025 06:01:43 -0700 (PDT)
-Message-ID: <4f35f129-7197-4163-a681-0b79c7d6a5de@redhat.com>
-Date: Thu, 19 Jun 2025 15:01:40 +0200
+	bh=0jZ8WdhZHaOyA1DYGMlXylsEBW858kdyzukOT/0m8kA=;
+	b=OolaYUpvX+smaXce0nznD40UC2Ljr0P7nfRz66KggSrhUK/9tCXbsr9jtiaiCXKemodskd
+	8Bp2CQhqnbKi/cdQS+wfw1QZyAnicAgAdIUjt1CRbUcAV3yyuZ8eKgY6Zn9L1L40Y6pBB4
+	zNc2wBt/TaVrSCunhfYZiKpnNAN/grk=
+Date: Thu, 19 Jun 2025 14:02:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net-next 00/15] ipv6: Drop RTNL from mcast.c and
- anycast.c
-To: Kuniyuki Iwashima <kuni1840@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org
-References: <20250616233417.1153427-1-kuni1840@gmail.com>
+Subject: Re: [net-next, 06/10] bng_en: Add backing store support
+To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+ vsrama-krishna.nemani@broadcom.com,
+ Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
+ Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+References: <20250618144743.843815-1-vikas.gupta@broadcom.com>
+ <20250618144743.843815-7-vikas.gupta@broadcom.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250616233417.1153427-1-kuni1840@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250618144743.843815-7-vikas.gupta@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 6/17/25 1:28 AM, Kuniyuki Iwashima wrote:
-> From: Kuniyuki Iwashima <kuniyu@google.com>
+On 18/06/2025 15:47, Vikas Gupta wrote:
+> Backing store or context memory on the host helps the
+> device to manage rings, stats and other resources.
+> Context memory is allocated with the help of ring
+> alloc/free functions.
 > 
-> This is a prep series for RCU conversion of RTM_NEWNEIGH, which needs
-> RTNL during neigh_table.{pconstructor,pdestructor}() touching IPv6
-> multicast code.
+> Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+> Reviewed-by: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
+> Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+> ---
+>   drivers/net/ethernet/broadcom/bnge/bnge.h     |  18 +
+>   .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 168 +++++++++
+>   .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   4 +
+>   .../net/ethernet/broadcom/bnge/bnge_rmem.c    | 337 ++++++++++++++++++
+>   .../net/ethernet/broadcom/bnge/bnge_rmem.h    | 153 ++++++++
+>   5 files changed, 680 insertions(+)
 > 
-> Currently, IPv6 multicast code is protected by lock_sock() and
-> inet6_dev->mc_lock, and RTNL is not actually needed.
-> 
-> In addition, anycast code is also in the same situation and does not
-> need RTNL at all.
-> 
-> This series removes RTNL from net/ipv6/{mcast.c,anycast.c} and finally
-> removes setsockopt_needs_rtnl() from do_ipv6_setsockopt().
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
+> index 60af0517c45e..01f64a10729c 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
+> @@ -9,6 +9,7 @@
+>   
+>   #include <linux/etherdevice.h>
+>   #include "../bnxt/bnxt_hsi.h"
+> +#include "bnge_rmem.h"
+>   
+>   #define DRV_VER_MAJ	1
+>   #define DRV_VER_MIN	15
+> @@ -52,6 +53,13 @@ enum {
+>   	BNGE_FW_CAP_VNIC_RE_FLUSH			= BIT_ULL(26),
+>   };
+>   
+> +enum {
+> +	BNGE_EN_ROCE_V1					= BIT_ULL(0),
+> +	BNGE_EN_ROCE_V2					= BIT_ULL(1),
+> +};
+> +
+> +#define BNGE_EN_ROCE		(BNGE_EN_ROCE_V1 | BNGE_EN_ROCE_V2)
+> +
+>   struct bnge_dev {
+>   	struct device	*dev;
+>   	struct pci_dev	*pdev;
+> @@ -89,6 +97,16 @@ struct bnge_dev {
+>   #define BNGE_STATE_DRV_REGISTERED      0
+>   
+>   	u64			fw_cap;
+> +
+> +	/* Backing stores */
+> +	struct bnge_ctx_mem_info	*ctx;
+> +
+> +	u64			flags;
+>   };
+>   
+> +static inline bool bnge_is_roce_en(struct bnge_dev *bd)
+> +{
+> +	return bd->flags & BNGE_EN_ROCE;
+> +}
+> +
+>   #endif /* _BNGE_H_ */
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+> index 567376a407df..e5f32ac8a69f 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+> @@ -10,6 +10,7 @@
+>   #include "../bnxt/bnxt_hsi.h"
+>   #include "bnge_hwrm.h"
+>   #include "bnge_hwrm_lib.h"
+> +#include "bnge_rmem.h"
+>   
+>   int bnge_hwrm_ver_get(struct bnge_dev *bd)
+>   {
+> @@ -211,3 +212,170 @@ int bnge_hwrm_func_drv_unrgtr(struct bnge_dev *bd)
+>   		return rc;
+>   	return hwrm_req_send(bd, req);
+>   }
+> +
+> +static void bnge_init_ctx_initializer(struct bnge_ctx_mem_type *ctxm,
+> +				      u8 init_val, u8 init_offset,
+> +				      bool init_mask_set)
+> +{
+> +	ctxm->init_value = init_val;
+> +	ctxm->init_offset = BNGE_CTX_INIT_INVALID_OFFSET;
+> +	if (init_mask_set)
+> +		ctxm->init_offset = init_offset * 4;
+> +	else
+> +		ctxm->init_value = 0;
+> +}
+> +
+> +static int bnge_alloc_all_ctx_pg_info(struct bnge_dev *bd, int ctx_max)
+> +{
+> +	struct bnge_ctx_mem_info *ctx = bd->ctx;
+> +	u16 type;
+> +
+> +	for (type = 0; type < ctx_max; type++) {
+> +		struct bnge_ctx_mem_type *ctxm = &ctx->ctx_arr[type];
+> +		int n = 1;
+> +
+> +		if (!ctxm->max_entries)
+> +			continue;
+> +
+> +		if (ctxm->instance_bmap)
+> +			n = hweight32(ctxm->instance_bmap);
+> +		ctxm->pg_info = kcalloc(n, sizeof(*ctxm->pg_info), GFP_KERNEL);
+> +		if (!ctxm->pg_info)
+> +			return -ENOMEM;
 
-Great works! Makes a lot of sense.
+It's a bit hard to be absolutely sure without full chain of calls, but
+it looks like some of the memory can be leaked in case of allocation
+fail. Direct callers do not clear allocated contextes in the error path.
 
-I had a possibly relevant comment on patch 2, but let's wait a bit
-possibly for other pair of eyes...
-
-Thanks,
-
-Paolo
-
+> +	}
+> +
+> +	return 0;
+> +}
+> +
 
