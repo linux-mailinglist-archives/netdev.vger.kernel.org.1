@@ -1,164 +1,216 @@
-Return-Path: <netdev+bounces-199427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B73FAE0461
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:53:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C037AAE0467
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2532C3A750A
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:53:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C1E1892D3F
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E926122E3FA;
-	Thu, 19 Jun 2025 11:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1539A22DFB1;
+	Thu, 19 Jun 2025 11:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLK1SjZk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FZyqANI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE8521FF26;
-	Thu, 19 Jun 2025 11:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750334032; cv=none; b=s+P+uH55Ibacxvjb7GtNO5Iew/h5QcYDdyKt6OOWhBYj3ZkKaieilmOUhE7g2my+wLc3K1o10pwJ5D/B8C768tfMZY34/jamT8ZJcNW/pf2hPfwf5/d+wwdUH2bQbAII7uz49lIWpo3Qj5e9Gg90uUpR3r+XCqZNMmNydoid5F4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750334032; c=relaxed/simple;
-	bh=Tfq8NMCtMxIzB90AN2oTeQY3u4pSOFzZv4JlxXKP5Dw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NSf9Nhytq9rykCyvfgCBC5HfpXUckT+wNhN1p6gWDaG/xN43ROh+VKDxa3pRNlIe5R1PZXNKFd1Tr9r9MIYbqVMw10EbcrxCAM2jGxRuCm28JO3EPvJxuItvKknaiX86m6zvCbeuhx1YFtUTRnBhGewiPDXIwvOV4fR3zdmG5XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLK1SjZk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D61C3C4CEEA;
-	Thu, 19 Jun 2025 11:53:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750334032;
-	bh=Tfq8NMCtMxIzB90AN2oTeQY3u4pSOFzZv4JlxXKP5Dw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TLK1SjZkJKtOa2GDJx0KT8zWbLM0Onmv52DVFQ4AgL5lHXTrikKxzDBx0mCXJu0EN
-	 Kikw4V92eV1H6BgfWAD0506FOAnY8rnH1rNzo65+cKAO7IxMzGgfpByWyUWKoN/oQZ
-	 a/375VH0yWoRtXkMpmxMPNo+RdAMgQClaCjI+Lt8kFC68jMuzWKaiaPhAm3LPn25eI
-	 5Vy86Tzf6tejlWflhZQN+1rjxhvEe5apntIF1YAuOrVyqUvW7YVikRy+Q996WPIZP4
-	 kAlTbt4BkJHrwYniPmoJu47rcDrOBqbU6tXRNpgMfWqdRT9Ggd1nwTem3wpNIbwqLL
-	 kNsKtxHhfGesA==
-Date: Thu, 19 Jun 2025 12:53:45 +0100
-From: Lee Jones <lee@kernel.org>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
-	linux@roeck-us.net, jdelvare@suse.com,
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
-	Ming Yu <tmyu0@nuvoton.com>
-Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20250619115345.GL587864@google.com>
-References: <20250604041418.1188792-1-tmyu0@nuvoton.com>
- <20250604041418.1188792-2-tmyu0@nuvoton.com>
- <20250612140041.GF381401@google.com>
- <CAOoeyxVvZiD18qbGd5oUnqLNETKw50fJBjJO3vR50kon_a5_kA@mail.gmail.com>
- <20250612152313.GP381401@google.com>
- <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
- <20250613131133.GR381401@google.com>
- <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAE4202F8F;
+	Thu, 19 Jun 2025 11:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750334141; cv=fail; b=IxPVXP1O5efKOwF2kKvse9LJuwovy1fZBnpXMo71XpzSM8muBpFoOy1qy33na0ulCL0XCbhZarqmnpttrIhDqHYZD3dURYXsPgB3jnuJ+owGcgNAvkXtF0mkFY6SjxDZMLauW3Dn1V4bpsOQFBN1n0TqyMG/Eox32xFrrZS6agM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750334141; c=relaxed/simple;
+	bh=lncKhI7fIwL9LkctMy/QNoqb9ZhhURK8SYHhLNMCksU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NZC51uA5WRS8tE8MEAKOwZJGhe4Aw6w8642GJnJIy2z8GfVKOAhADfjnItLtlMW1bpXRn2neOYpxI6bUNWwQHcnZlrln+PXEruh3YrZ2vaeBa0gpSeoixnyZ0Ub890V82wSM8nnlI+uO63wurA3szyMEXLqdgACngHSqRmdoyak=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FZyqANI6; arc=fail smtp.client-ip=40.107.223.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x4/PAZu4rP9m5EFbc1G7a2g1NFFWznoHORHMJlEwqV9xzasGNOCeUR6tJqozeCo90bGRyKGw3Y/vz8mLANpHGGFA1ou95LAB3fqF8uTc+Lyn2sxwsDc6NvpMFogAFYaN4nTlvOy9cmaOPS0hhvpeW+TTCkw9jBDTm0N1HoQgdAbb4cAwVejlyjzOLaC6wa1TvK0nszXhHiB/hOpUkZrokvtJ1EAeKJjNqC03rkJSqlZdV0GR/DiPvGBXajCQr0RzR34JjvXICJjjgYMgD+IV+RX9SsV99UFxe8xcg56bAZh8YMTQSychrZd1z7xO+LsRpX0QVB8SsKD2uujV+l3l2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yaldWr08VqCtskwtb+FDfTa64nzWVqk5DSFIcrQ2YNM=;
+ b=EoIM5ZiD7+570vbk9uwWUqiCS5cAjHM7W9Pt5z+1wk2ARZlKpXltd3Cr8ltDSAomtiFArstDnfKLqEF8y8DCPnWb3hiZCNyZjvAItmU8T9DBl1c3VeEWu897jMBow87/MGhBK+XXFghtrF+NOGl+iijO3NUhHi6bk6ZJMNBQHMpCkkcCm5X59dpK/3xIb2x1CHS1nEoNQc5/Sn5KHXuogFZulR9IvLrE3HbBD/fpxFAIStvNM2S1q4jtoLjlkZsJibHZKWjNqMN3RfUxtl2VrSCaobAfCPwYgWA+iEzeZGL2CyigSmaR3dHSlvrxICx8oY+RYJMtqDXzaiXVhs9Z/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yaldWr08VqCtskwtb+FDfTa64nzWVqk5DSFIcrQ2YNM=;
+ b=FZyqANI6fcC5mwCfZBt89f0JOwf0mpfuv+UosiRI/CxdAqMtZlSteJW5zAO+JAGEFeA4PEnD2rxSPxRH5vMZ+GB+Xy5k1KCIVn3zKNoPtOMTgdFJbCvIB4PLFEN0xk5nWVHPYlBkqhQHROm5qiiW65Y239P2hxtFXwic6VqYca4AMXsfKpN97DgBm/g2/+O8df6aCWr1S3+0aJYfbsKXt1tI4+iw61QUIkUZbhh3DnBdPF6As50bxZzYzn5mDyUkLRnSRge/Tny/bWvN/usI0giatRjlu+WVp7xikW+RRBAUKLOY+h1axMNgRb3Npok8pOMNj8cE33JGHGDonhMA4g==
+Received: from DS7PR06CA0009.namprd06.prod.outlook.com (2603:10b6:8:2a::28) by
+ DM4PR12MB6544.namprd12.prod.outlook.com (2603:10b6:8:8d::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8857.21; Thu, 19 Jun 2025 11:55:35 +0000
+Received: from DS3PEPF0000C37B.namprd04.prod.outlook.com
+ (2603:10b6:8:2a:cafe::52) by DS7PR06CA0009.outlook.office365.com
+ (2603:10b6:8:2a::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8857.25 via Frontend Transport; Thu,
+ 19 Jun 2025 11:55:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS3PEPF0000C37B.mail.protection.outlook.com (10.167.23.5) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8857.21 via Frontend Transport; Thu, 19 Jun 2025 11:55:34 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 19 Jun
+ 2025 04:55:27 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 19 Jun 2025 04:55:27 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Thu, 19 Jun 2025 04:55:23 -0700
+From: Mark Bloch <mbloch@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
+CC: <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
+	<tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Mark Bloch
+	<mbloch@nvidia.com>
+Subject: [PATCH net-next 0/8] net/mlx5: HWS, Optimize matchers ICM usage
+Date: Thu, 19 Jun 2025 14:55:14 +0300
+Message-ID: <20250619115522.68469-1-mbloch@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37B:EE_|DM4PR12MB6544:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ca28b8b-6866-4f54-f37e-08ddaf2832f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?p0y3kORaGRvAph/bP1UNzNKbJQ6idljCGryu5qNjEUsgb4rjknPhu8nKjS+K?=
+ =?us-ascii?Q?JzhHCpuzTrO1H9YWI+UXGD6Maui8vq4NxbDXrS8OBAqooT0SxhjOKiDiQqoB?=
+ =?us-ascii?Q?09XRr3y2s5/93u2QHl05Ff7cXZgv8fuaN34U+rCfTMRQY4LdNlF1pbmT0rmt?=
+ =?us-ascii?Q?IGmrGEM1uutRFwdiz//YzEHVFnVyD4AwWMzXkiyjXyJHJ8aYq0gWWJ0NwuIN?=
+ =?us-ascii?Q?O63R7czmCx/VuFWAxeIe+zHTMhgiPnWxdx//IXx/AlCzhj55Om7oczrqlkJZ?=
+ =?us-ascii?Q?U/FqFxqMym38rkOxxKfB3G5hjPqoFZWSZD86xvVdETq38uBz9TjeRk/Oxf4C?=
+ =?us-ascii?Q?hv+rmD9HcBbp1sfoEX/1b4m6pYFAgNgLQIb4J+veYUqxnlqfbvw+3juITBlS?=
+ =?us-ascii?Q?kLeZsYoChHITvqYWo4MrmCbpryhElv9DFYIp0zqiZ3UiAaCgDzW5bj2u1TJD?=
+ =?us-ascii?Q?zDmyVEZnTejn3twf8DZYRZoe8f3eeJSyuUlz6oP4HqrUZTvijX6RuSnD6bHp?=
+ =?us-ascii?Q?yBx4sbWOfliApozFaJZMszBzy2oMsc7XOv9z1ARz8whBJhldpHQ3od+vOqx1?=
+ =?us-ascii?Q?SHz4U5+MBHTb864b4dT7t2RiXLGJ5RbCaQAeVwoMOUN5Ah+1epvToRQsjb+M?=
+ =?us-ascii?Q?WyOqXbqh7D1pLyzWDzj4wrQJ1mCDdAJSwL2Ca3eRdCau32FhmZITdJe5w1+/?=
+ =?us-ascii?Q?v21vb5tx6YJgbrL8Mab062DyNGVA9MPDoEGq+y0ptReJDb6k9332A/90ZTUc?=
+ =?us-ascii?Q?aFAsMIB44Ha5+Qo0X5XFkhlAfv44YLC3D7OgAueyXvp841+/Ovcd59mzwU+h?=
+ =?us-ascii?Q?1pKTcVehngKmsyo5mPKvWJGIa1KW+8u9q4XXRAJ4uxTLytRvGRB/ZzYM/tur?=
+ =?us-ascii?Q?XO7c/AJ7Wldyn65MV2tRfzP4JhYbZlErFqZEMZlMlQwEwlt0tsJggIxuWh1R?=
+ =?us-ascii?Q?nBgGSubapgr4QYa6OxuRRTNHgyoiokSV9uK5jAmb5YY8p594YS8dxWgLoSpD?=
+ =?us-ascii?Q?3VSL6OHjy+PBp3Wdhtp1I1fHyx7/JAKMTCLGhu/cfBG8PP+pgc0GjAiPnEC5?=
+ =?us-ascii?Q?TpA3ZFEx2ikvhAgX2faG2BGqv/UOIXojN3Gzi6wg50cbU6gz1bYW1lIhAVbS?=
+ =?us-ascii?Q?wnAwj21XhiAHvy3eHNx20cHUcbyijx4Fg/tAh7SyALgtTyV7QJwS5/hqbcBY?=
+ =?us-ascii?Q?7UQaxZ0ifeff40h2Yae/B0NuWfkfZb50fnwlItxXvzHHscmClSzFZOyh6MK0?=
+ =?us-ascii?Q?W1tXxLwZ0gPu0I9D2WmtE0ZQDMy3WY4oJrBjEZyPKJndO/FpIXxUvn2wP8r7?=
+ =?us-ascii?Q?TNWnnVxdQD6bfwzhz91bN52unjtzF3EmuWpEBFD2zqhNO+Vj+BYQ8l0rh/4k?=
+ =?us-ascii?Q?MbLnrsSu6bTM7q534K5Pt5CPmAirUfyA/A8xFz+yZKydxuSXb0gbNfN08gUU?=
+ =?us-ascii?Q?ZoKUP4AZ8qJwy4a7I2ICQ6/Hy/2eqkbEsbZCDdRh8cGKHHoEIGnzlwTNJrCx?=
+ =?us-ascii?Q?CgfoEwhguH7Dmj8NPGOhNiob8bwFO1Z7JiEF?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2025 11:55:34.4003
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ca28b8b-6866-4f54-f37e-08ddaf2832f4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6544
 
-On Fri, 13 Jun 2025, Ming Yu wrote:
+This series optimizes ICM usage for unidirectional rules and
+empty matchers and with the last patch we make hardware steering
+the default FDB steering provider for NICs that don't support software
+steering.
 
-> Lee Jones <lee@kernel.org> 於 2025年6月13日 週五 下午9:11寫道：
-> >
-> > On Fri, 13 Jun 2025, Ming Yu wrote:
-> >
-> > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午11:23寫道：
-> > > >
-> > > > On Thu, 12 Jun 2025, Ming Yu wrote:
-> > > >
-> > > > > Dear Lee,
-> > > > >
-> > > > > Thank you for reviewing,
-> > > > >
-> > > > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午10:00寫道：
-> > > > > >
-> > > > > ...
-> > > > > > > +static const struct mfd_cell nct6694_devs[] = {
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
-> > > > > > > +
-> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
-> > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
-> > > > > >
-> > > > > > Why have we gone back to this silly numbering scheme?
-> > > > > >
-> > > > > > What happened to using IDA in the child driver?
-> > > > > >
-> > > > >
-> > > > > In a previous version, I tried to maintain a static IDA in each
-> > > > > sub-driver. However, I didn’t consider the case where multiple NCT6694
-> > > > > devices are bound to the same driver — in that case, the IDs are not
-> > > > > fixed and become unusable for my purpose.
-> > > >
-> > > > Not sure I understand.
-> > > >
-> > >
-> > > As far as I know, if I maintain the IDA in the sub-drivers and use
-> > > multiple MFD_CELL_NAME("nct6694-gpio") entries in the MFD, the first
-> > > NCT6694 device bound to the GPIO driver will receive IDs 0~15.
-> > > However, when a second NCT6694 device is connected to the system, it
-> > > will receive IDs 16~31.
-> > > Because of this behavior, I switched back to using platform_device->id.
-> >
-> > Each of the devices will probe once.
-> >
-> > The first one will be given 0, the second will be given 1, etc.
-> >
-> > Why would you give multiple IDs to a single device bound to a driver?
-> >
-> 
-> The device exposes multiple peripherals — 16 GPIO controllers, 6 I2C
-> adapters, 2 CAN FD controllers, and 2 watchdog timers. Each peripheral
-> is independently addressable, has its own register region, and can
-> operate in isolation. The IDs are used to distinguish between these
-> instances.
-> For example, the GPIO driver will be probed 16 times, allocating 16
-> separate gpio_chip instances to control 8 GPIO lines each.
-> 
-> If another device binds to this driver, it is expected to expose
-> peripherals with the same structure and behavior.
+Hardware steering (HWS) uses a type of rule table container (RTC) that
+is unidirectional, so matchers consist of two RTCs to accommodate
+bidirectional rules.
 
-I still don't see why having a per-device IDA wouldn't render each
-probed device with its own ID.  Just as you have above.
+This small series enables resizing the two RTCs independently by
+tracking the number of rules separately. For extreme cases where all
+rules are unidirectional, this results in saving close to half the
+memory footprint.
 
+Results for inserting 1M unidirectional rules using a simple module:
+
+			Pages		Memory
+Before this patch:	300k		1.5GiB
+After this patch:	160k		900MiB
+
+The 'Pages' column measures the number of 4KiB pages the device requests
+for itself (the ICM).
+
+The 'Memory' column is the difference between peak usage and baseline
+usage (before starting the test) as reported by `free -h`.
+
+In addition, second to last patch of the series handles a case where all
+the matcher's rules were deleted: the large RTCs of the matcher are no
+longer required, and we can save some more ICM by shrinking the matcher
+to its initial size.
+
+Finally the last patch makes hardware steering the default mode
+when in swichdev for NICs that don't have software steering support.
+
+Moshe Shemesh (1):
+  net/mlx5: Add HWS as secondary steering mode
+
+Vlad Dogaru (3):
+  net/mlx5: HWS, remove unused create_dest_array parameter
+  net/mlx5: HWS, Refactor and export rule skip logic
+  net/mlx5: HWS, Create STEs directly from matcher
+
+Yevgeny Kliteynik (4):
+  net/mlx5: HWS, remove incorrect comment
+  net/mlx5: HWS, Decouple matcher RX and TX sizes
+  net/mlx5: HWS, Track matcher sizes individually
+  net/mlx5: HWS, Shrink empty matchers
+
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |   2 +
+ .../mellanox/mlx5/core/steering/hws/action.c  |   7 +-
+ .../mellanox/mlx5/core/steering/hws/bwc.c     | 284 ++++++++++++++----
+ .../mellanox/mlx5/core/steering/hws/bwc.h     |  14 +-
+ .../mellanox/mlx5/core/steering/hws/debug.c   |  20 +-
+ .../mellanox/mlx5/core/steering/hws/fs_hws.c  |  15 +-
+ .../mellanox/mlx5/core/steering/hws/matcher.c | 166 ++++++----
+ .../mellanox/mlx5/core/steering/hws/matcher.h |   3 +-
+ .../mellanox/mlx5/core/steering/hws/mlx5hws.h |  36 ++-
+ .../mellanox/mlx5/core/steering/hws/rule.c    |  35 +--
+ .../mellanox/mlx5/core/steering/hws/rule.h    |   3 +
+ 11 files changed, 403 insertions(+), 182 deletions(-)
+
+
+base-commit: d3623dd5bd4e1fc9acfc08dd0064658bbbf1e8de
 -- 
-Lee Jones [李琼斯]
+2.34.1
+
 
