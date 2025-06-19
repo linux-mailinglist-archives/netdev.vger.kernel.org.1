@@ -1,132 +1,101 @@
-Return-Path: <netdev+bounces-199618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97B0AE0FC3
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:54:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30026AE0FD5
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:59:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71AA93BE507
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:54:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA7421895251
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 22:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823B228B4EC;
-	Thu, 19 Jun 2025 22:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4C528C00B;
+	Thu, 19 Jun 2025 22:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KnGFEyFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5893E241C89;
-	Thu, 19 Jun 2025 22:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE907229B23;
+	Thu, 19 Jun 2025 22:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750373693; cv=none; b=DEW10u+w72MEytF/r52qBNXmGbdFygXZSkcbScmtNUKwQw+INt5NJ2Uz3rBgRQzn1IvwD2KEmTq2HqtLJOMvCh5kp7iRz1xQIa2OcIg/y6ZQ9zYWlRy4T1sT0X9l9V8As9PnNaVvisNqIAkMrOsYq0lKc+Us+yppQNjw2QjkPs4=
+	t=1750373979; cv=none; b=bJI86tn61++PZ9mm6GHjt0l3ld6FxWlkpA4ui1cWoObRJVk9UKm0KUYj3JQZowcT3W8UsCN0Mka3Au/GcDDbOrgkaqA8c1hsfoBWKstvOyROb1AJ9o70Y+0kHJQ8E9kr1jOXYNWwbzPpc6BamrR1r43yH1I16tQBuRIgQJGxL0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750373693; c=relaxed/simple;
-	bh=qzYzFzR1DSG4tYJ1iiItLCVp+duz/23yoHhGRj7riNk=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=BHmrYwL0rcnY4zErXZ/rZAVLDQNMQmS1Oh0QkQOD7/9Q4iYTF3oX4xA9C2WbmDpY1PsyYaQX9EDnphm2+XEv8YuSLRRYWJaibjKfylhCjNbT0EnNcIhibOs+OoQyoY8OISzIDUPk8CiRGeBLtaGaJ97vRim2H7m5QMSSfKS0TQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
-Received: from mail.wizardsworks.org (localhost [127.0.0.1])
-	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55JMuGB4008146;
-	Thu, 19 Jun 2025 15:56:17 -0700
+	s=arc-20240116; t=1750373979; c=relaxed/simple;
+	bh=oFs8W69mkMcE3jsONVpj/UL2MWIy+951BHWY6ac5wh4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FcfPaK+pbWH3OgjDNENr+rIxHfgysqL1WC85WJM5d1bRHEFfTqBznOndcuzjqNEAHGN73GUJwAImIla/WvgdifIVn3+DzUbvmMmhOCd9jd1ViMlWXURglairoIuaAp2xR2MQ8csRyj4zF9TceQdkF/DRrNHrgKgNOm912X/q0fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KnGFEyFk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3797CC4CEEA;
+	Thu, 19 Jun 2025 22:59:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750373978;
+	bh=oFs8W69mkMcE3jsONVpj/UL2MWIy+951BHWY6ac5wh4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KnGFEyFk5qE287+Q7JLkttMqxxMV5xHRLgw8Da5HR9fVRUwfWaA5h3tOVlTPmXvhS
+	 bTSulvvdfYnOde/FSX3vip85LWVjZxmBdUnmg7s3l3MnVbDm13yf2fU7mJ7CO6lUZT
+	 toKW1Tw2Wj/Xbfmt5r4Z5iGKFPwPl1Qs4wufpH4csW8iTx7TzGHXZooNgcGHuU1wmM
+	 Wxr7sqnASeIHg+6/Zz+baryFiBLNkzoA4tK1t8fdajRM3FqJwPpKUGpn1XpPJVBvLU
+	 UmYAIxnhSXhPDc7kQaYOmGCakl2nq2A4UgBrXhUzA2sIXxSnUAk928JlvLmCcEVx9v
+	 w0BMzjbfZukVQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D2E38111DD;
+	Thu, 19 Jun 2025 23:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 19 Jun 2025 15:56:16 -0700
-From: Greg Chandler <chandleg@wizardsworks.org>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, stable@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: Tulip 21142 panic on physical link disconnect
-In-Reply-To: <alpine.DEB.2.21.2506192238280.37405@angie.orcam.me.uk>
-References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
- <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
- <385f2469f504dd293775d3c39affa979@wizardsworks.org>
- <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
- <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
- <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com>
- <a3d8ee993b73b826b537f374d78084ad@wizardsworks.org>
- <12ccf3e4c24e8db2545f6ccaba8ce273@wizardsworks.org>
- <8c06f8969e726912b46ef941d36571ad@wizardsworks.org>
- <alpine.DEB.2.21.2506192007440.37405@angie.orcam.me.uk>
- <52564e1f-ab05-4347-bd64-b38a69180499@gmail.com>
- <alpine.DEB.2.21.2506192238280.37405@angie.orcam.me.uk>
-Message-ID: <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
-X-Sender: chandleg@wizardsworks.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: mana: Set tx_packets to post gso processing
+ packet count
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175037400625.1013059.17103601464401559949.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 23:00:06 +0000
+References: 
+ <1750160021-24589-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: 
+ <1750160021-24589-1-git-send-email-shradhagupta@linux.microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: decui@microsoft.com, wei.liu@kernel.org, haiyangz@microsoft.com,
+ kys@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kotaranov@microsoft.com, schakrabarti@linux.microsoft.com,
+ ernis@linux.microsoft.com, longli@microsoft.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+ netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, paulros@microsoft.com,
+ shradhagupta@microsoft.com
 
-On 2025/06/19 14:53, Maciej W. Rozycki wrote:
-> On Thu, 19 Jun 2025, Florian Fainelli wrote:
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 17 Jun 2025 04:33:41 -0700 you wrote:
+> Allow tx_packets and tx_bytes counter in the driver to represent
+> the packets transmitted post GSO processing.
 > 
->> >   Maybe it'll ring someone's bell and they'll chime in or otherwise I'll
->> > bisect it... sometime.  Or feel free to start yourself with 5.18, as it's
->> > not terribly old, only a bit and certainly not so as 2.6 is.
->> 
->> I am still not sure why I could not see that warning on by Cobalt 
->> Qube2 trying
->> to reproduce Greg's original issue, that is with an IP assigned on the
->> interface yanking the cable did not trigger a timer warning. It could 
->> be that
->> machine is orders of magnitude slower and has a different CONFIG_HZ 
->> value that
->> just made it less likely to be seen?
+> Currently they are populated as bigger pre-GSO packets and bytes
 > 
->  Can it have a different PHY attached?  There's this code:
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
 > 
-> 	if (tp->chip_id == PNIC2)
-> 		tp->link_change = pnic2_lnk_change;
-> 	else if (tp->flags & HAS_NWAY)
-> 		tp->link_change = t21142_lnk_change;
-> 	else if (tp->flags & HAS_PNICNWAY)
-> 		tp->link_change = pnic_lnk_change;
-> 
-> in `tulip_init_one' and `pnic_lnk_change' won't ever trigger this, but 
-> the
-> other two can; apparently the corresponding comment in 
-> `tulip_interrupt':
-> 
-> /*
->  * NB: t21142_lnk_change() does a del_timer_sync(), so be careful if 
-> this
->  * call is ever done under the spinlock
->  */
-> 
-> hasn't been updated when `pnic2_lnk_change' was added.  Also ISTM no 
-> link
-> change handler is a valid option too, in which case `del_timer_sync' 
-> won't
-> be called either.  This is from a cursory glance only, so please take 
-> with
-> a pinch of salt.
-> 
->   Maciej
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: mana: Set tx_packets to post gso processing packet count
+    https://git.kernel.org/netdev/net-next/c/7399ef984022
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-
-I'm not sure which of us that was directed at, but for my onboard 
-tulips:
-
-Micro Linear ML6698CH <- PHY
-Intel 21143-TD <- NIC
-
-I know that the ML chips are most commonly used with 21143s and a very 
-small smattering of others, I don't think they are all that common at 
-least not since the late '90s..
-I'm relatively certain all my DEC ISA/PCI nics use them though.
-
-I found a link to the datasheet (If needed), but have had mixed luck 
-with alldatasheets:
-https://www.alldatasheet.com/datasheet-pdf/pdf/75840/MICRO-LINEAR/ML6698CH.html
-
-Glancing over it I don't see anything about the link, I'll go stick my 
-eyes in the driver a bit and see what stabs me in the eye....
 
