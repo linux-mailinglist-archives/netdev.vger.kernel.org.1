@@ -1,107 +1,136 @@
-Return-Path: <netdev+bounces-199470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5A41AE06CF
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:18:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98839AE06DD
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 15:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DFFD7A02D0
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:17:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44B1C4A3112
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 13:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E01222FF5E;
-	Thu, 19 Jun 2025 13:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F1B24DD13;
+	Thu, 19 Jun 2025 13:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUEj4mNG"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="w/NBMfkZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691BD188CB1;
-	Thu, 19 Jun 2025 13:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6097A24BBFD;
+	Thu, 19 Jun 2025 13:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750339101; cv=none; b=kUjmeMgqQcFHPIH9VTokV/l8fBYy1SMSWjECPHuFbIIsWYobV+coX+uL0n18L6b0apYBu7vcL2oWgaVWsA8EoN3Kv1z2UKB2iib1ra0EF8jSJ2yJ4XkfCR+fkUqW6aJDJE3+MzEJck/siqbnakbOxsTk3WgRdxieikAkj9svflk=
+	t=1750339304; cv=none; b=etxPznkEAdsmPnFXiA9mWtP2ZkSClrn4IKC5j2qtmAljCMFv4lJJgdaIjVRs7Qjuz4MqkiKE2F2L668e5PhzZxeX4U+XHyajzo2xKNxBxN8DA0+NH1ACQDlBBNlwdP8eDQu2DiWn3CtP63pSvLERSP127AUo4f8jFKZKfu/mjN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750339101; c=relaxed/simple;
-	bh=4dfwl6njUlqczLbqzvkUfC3MkKzL/GcP/GJ8WCrZNlU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hmO2yiReVF9KkRhna0oHJxosgGHqnqpUIg5Tm/JZcgp39Gu+20osbbpWfquEK6GO8/IfaJ2cbsHDXZbefqk6Dlcu9MsEFpzEbSbgWhzk2VSGoC6J7oPVwfXw2JaS/60Omn65OoyIJMNuBIdfFSRHq6QKvwdGJ1yxZqTPs6A21L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUEj4mNG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4B5C4CEEA;
-	Thu, 19 Jun 2025 13:18:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750339100;
-	bh=4dfwl6njUlqczLbqzvkUfC3MkKzL/GcP/GJ8WCrZNlU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oUEj4mNG8T8YwEU487HkN8q6zdQfCJIRrgr2fAEdLew8PhL/wm80PN6ryTnbeb62e
-	 Lkq+mAE5ZtRo5CgmlT8IVwjk72q/dyQnDOH1OELClpw2cy8UPxmL8eyu1peHnoqu6y
-	 tmYTsjEK9OZNBCm1G87Dvf/+EwUduxAwfM0HPzj8e6QeYsQYXJpMocCfbgHz+wJvWi
-	 +pxgDWmOWYyMHAcvpSsy3ahYwmjtclO/ifpCSFuPVunPvLbXoLCSr/hXSijgHTU5Kw
-	 CKEnKxxH5FHscXZLXK6nU9qirMhnDvbzjLroHwmp8v5kMXnGdPpY12XCcZjixP/hRH
-	 nxdTs+LTXiIlQ==
-From: Chuck Lever <cel@kernel.org>
-To: NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
+	s=arc-20240116; t=1750339304; c=relaxed/simple;
+	bh=yOBuUvOyfgLzNONHVmQslW/YIMWy3rpROYKM225PTgg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=moJ3o/Yx/rWwW2wEYXdGyQl101YdCvsWbFDfi2lWGqQl4jsJ0daXLeISurkIYnA5LX5rseCllza1sYCLKa9TMYlSLVdBKiO9taO6vMnrTlL2RCqeEai8+Vr9na+WecZ48mUsETBtDN9o1KSBQdxhZuJqhriqRQHwRa4I2F11n8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=w/NBMfkZ; arc=none smtp.client-ip=134.0.28.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
+	by mxout3.routing.net (Postfix) with ESMTP id 69E1B61633;
+	Thu, 19 Jun 2025 13:21:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1750339294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eQ7YWrPQH4eKb2hcGi9xzFrlY9L4wPx8/nkdEx2cSuc=;
+	b=w/NBMfkZg41xJNspRvdAMMJP0SmfIqfenp3BdYrDzVBF5j7z30iwx+sbem56jOMphsWs4j
+	k1HiEyoA9TOd3Hgh7WUDo4QypezNrQ/WL0xmCw4Lq7lgNjXj0RgG3OH93xhtFfe3kw3mRp
+	+wfmwaeZe9Q5+ohKOglSZcdMgvGrdbk=
+Received: from frank-u24.. (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 246471226B5;
+	Thu, 19 Jun 2025 13:21:34 +0000 (UTC)
+From: Frank Wunderlich <linux@fw-web.de>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	tianshuo han <hantianshuo233@gmail.com>,
-	Linus Torvalds <torvalds@linuxfoundation.org>,
-	security@kernel.org,
-	yuxuanzhe@outlook.com,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	linux-nfs@vger.kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] sunrpc: handle SVC_GARBAGE during svc auth processing as auth error
-Date: Thu, 19 Jun 2025 09:18:15 -0400
-Message-ID: <175033900601.115666.13177707398024542481.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250619-rpc-6-16-v1-1-9fd5e01637d3@kernel.org>
-References: <20250619-rpc-6-16-v1-1-9fd5e01637d3@kernel.org>
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	arinc.unal@arinc9.com
+Subject: [net-next v6 0/4] rework IRQ handling in mtk_eth_soc
+Date: Thu, 19 Jun 2025 15:21:20 +0200
+Message-ID: <20250619132125.78368-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-From: Chuck Lever <chuck.lever@oracle.com>
+From: Frank Wunderlich <frank-w@public-files.de>
 
-On Thu, 19 Jun 2025 06:01:55 -0400, Jeff Layton wrote:
-> tianshuo han reported a remotely-triggerable crash if the client sends a
-> kernel RPC server a specially crafted packet. If decoding the RPC reply
-> fails in such a way that SVC_GARBAGE is returned without setting the
-> rq_accept_statp pointer, then that pointer can be dereferenced and a
-> value stored there.
-> 
-> If it's the first time the thread has processed an RPC, then that
-> pointer will be set to NULL and the kernel will crash. In other cases,
-> it could create a memory scribble.
-> 
-> [...]
+This series introduces named IRQs while keeping the index based way
+for older dts.
+Further it makes some cleanup like adding consts for index access and
+avoids loading first IRQ which was not used on non SHARED_INT SoCs.
+    
+changes:
+    v6:
+    - change irq names from tx/rx to fe1/fe2 because reserved irqs
+      are usable and not bound to specific function
+    - dropped Simons RB because of this
+    - updated description of patch "skip first IRQ if not used" and
+      use MTK_FE_IRQ_SHARED instead of 0 in condition too
+    - add "only use legacy mode on missing IRQ name" patch
+    
+    v5:
+    - fixed typo in patch 1
+    - moved comments from previous patch #3 to patch #1 with changes suggested by simon
+    - rename consts to be compatible with upcoming RSS/LRO changes
+      MTK_ETH_IRQ_SHARED => MTK_FE_IRQ_SHARED
+      MTK_ETH_IRQ_TX => MTK_FE_IRQ_TX
+      MTK_ETH_IRQ_RX => MTK_FE_IRQ_RX
+      MTK_ETH_IRQ_MAX => MTK_FE_IRQ_NUM
+    - change commit title and description in patch 3
+    
+    v4:
+    - calculate max from last (rx) irq index and use it for array size too
+    - drop >2 condition as max is already 2 and drop the else continue
+    - update comment to explain which IRQs are taken in legacy way
+    
+    v3:
+    added patches
+    - #2 (add constants for irq index)
+    - #3 (skip first IRQ on ! MTK_SHARED_INT)
+    to the v2 non-series patch
+    
+    https://patchwork.kernel.org/project/netdevbpf/patch/20250615084521.32329-1-linux@fw-web.de/
+    
+    Tested on BPI-R4/mt7988 with IRQ names and BPI-R2/mt7623 and BPI-R3/mt7986 with upstreamed
+    dts via index-mode.
+    I do not have any MTK_SHARED_INT (mt7621/mt7628) boards to testing.
 
-Yesterday's version passed overnight CI testing.
 
-Applied to nfsd-fixes, thanks!
+Frank Wunderlich (4):
+  net: ethernet: mtk_eth_soc: support named IRQs
+  net: ethernet: mtk_eth_soc: add consts for irq index
+  net: ethernet: mtk_eth_soc: skip first IRQ if not used
+  net: ethernet: mtk_eth_soc: only use legacy mode on missing IRQ name
 
-[1/1] sunrpc: handle SVC_GARBAGE during svc auth processing as auth error
-      commit: 92c2969bcd57272698d5aae037f55481dcb11f2d
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 69 ++++++++++++++++-----
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h |  7 ++-
+ 2 files changed, 58 insertions(+), 18 deletions(-)
 
---
-Chuck Lever
+-- 
+2.43.0
 
 
