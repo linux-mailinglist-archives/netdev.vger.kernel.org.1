@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-199365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D5BADFF58
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:02:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB2CADFF5A
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3BB6189F21F
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:01:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E71A5188C8EB
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BC825EF9C;
-	Thu, 19 Jun 2025 08:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DCD25F964;
+	Thu, 19 Jun 2025 08:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="GiBOcC8U"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Axv8ABUl"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1B325E47D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D14A25E479
 	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 08:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750320073; cv=none; b=ZUpGdWSE/kPfzSzGh2Sa/BfE/exBKD/OadBKqs7k6oLzj1my6lTS9Un+u63h0AoI/NmFsVAfyaRZLp+b3taTFeU6cWr6fc9KOANQLtpRb6G9xpWLOtXcKX5VoahriKkJnhTX3Hbc3JbNRGUJWMDoLljGVSjWtD+jtMtROwS4cQQ=
+	t=1750320074; cv=none; b=YVfJk3Gnm33GG8ioH4Y5opt380M2Lhpb4oUCz3AA6JGWiJG6gG0IsyNiWHzQjWnoxD3WX7qVLGbrPMl5yiIi0YwCgqjVBzV7R2lyw5r+rP6LGAnyJDNhsJPOKX/a6QG6PUC68PtsQGdb9KYXs10fI2YndtHcJxqJMpepoDszczQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750320073; c=relaxed/simple;
-	bh=zVuld+2m2MEUitbQZwla1PDS+SinR+fyDsgT1hhK5Rw=;
+	s=arc-20240116; t=1750320074; c=relaxed/simple;
+	bh=VKBL4ovf0/QWZhapAIevioJOqdLQBHu7GLS1PnnhV5I=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Mvp+OsztXOzLYR5X7vZG2X/tgTCnZhbC0nqXPy8SYVr+AXmgQaDE4iYSVBBMYJ+kqHtJiribgpfLBIlz27/Q9+zYdfaHGOLDfKQHcyt9MjY86NF2iA/1p594uz5Kqykz7qpaIikrgpTkeTFQncLiXv3cetYhiSlyrMZyQZDcA1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=GiBOcC8U; arc=none smtp.client-ip=203.29.241.158
+	 In-Reply-To:To:Cc; b=OolKE+e9LNwZIOCLwwB3U66ITJnQur2zJHJXqlXCEHLiURzdlTUi+SA3GziRYt5pP6N7vOBM3lXUrR344YU3ci175uYm5kJE0bLmfFe9huwCs+PZThxwp//ayuUyILrNE52q4ekxwe4PzOMniwMIqv38qYgAvVBn3ua0NIvFjdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Axv8ABUl; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1750320061;
-	bh=/2zf83oVZEReg1d9mh2DMWCAmDDCvhyRZ10CEc9oizU=;
+	bh=4M2HFb5PUijaCIbcgGXME0MMc1xI9YWbjdi6OPdfu4c=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=GiBOcC8UDotx19lVZEOhZXABS9klQHu5v14dn1RPaBXZ1RJZ8aYJl8trOkNo1+amE
-	 k8MhOo6GgHLxMiMN99w3hxMkwQF/IiFPE2AJbQKD/DbkSo8dZ+TCHGthFFnF5+8M9l
-	 jui4/382r3ByK8BirRLOYwaQTQawscHPEyXQWFB/ea5Y42uEUeEyU3x2itXYsWCbXc
-	 YHjbKnmL7GZCjgU6jbzKZ2o8xUktdCsqbwRl11tO9b1Zaqr40NwmK9BchBSMZ9P+8x
-	 CloS2JeTR9OKnF67wPp/7FwITh45rRkG0F3zMg6WCPg0tLXU2ikpWj3YsB5ej8u8ms
-	 nOPd1nxZBUimw==
+	b=Axv8ABUl302YbKZl/VVYDJzi6N8mP2PeLSoxk+XPWz3jLHHoh5UKegqwv6VQIka8z
+	 ntp5/HI6nRcEMvyxA3oSVoR2fhaTXst9Hw4QqoHzFBZ3vGu17/PD3i0CQsFUo9zoIw
+	 WicuE9b2C60sgl7/vEWoimCvnfBjDeoECABHFhzX/b8k7IMNwcXTUTI2sh4iPkZp5U
+	 B8ni0iyI47MAUAEMZ6VRiM9gI9Tv/8ElWigPf0zpjYRLSb6Qp6wf3pShFHMpMLV91I
+	 mfrEbEGRGfGE9+V2w2IlH+rqTMnKkvTbg78BZ8ahfi+ftL8IUOdyaq3Vrr56pszsIk
+	 KJ8shgSSl+yiA==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 9365F68EBE; Thu, 19 Jun 2025 16:01:01 +0800 (AWST)
+	id EEFF668EC0; Thu, 19 Jun 2025 16:01:01 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Thu, 19 Jun 2025 16:00:40 +0800
-Subject: [PATCH net-next v2 05/13] net: mctp: test: Add extaddr routing
- output test
+Date: Thu, 19 Jun 2025 16:00:41 +0800
+Subject: [PATCH net-next v2 06/13] net: mctp: test: move functions into
+ utils.[ch]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250619-dev-forwarding-v2-5-3f81801b06c2@codeconstruct.com.au>
+Message-Id: <20250619-dev-forwarding-v2-6-3f81801b06c2@codeconstruct.com.au>
 References: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
 In-Reply-To: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
@@ -65,85 +65,401 @@ To: Matt Johnston <matt@codeconstruct.com.au>,
 Cc: netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Test that the routing code preserves the haddr data in a skb through an
-input route operation.
+A future change will add another mctp test .c file, so move some of the
+common test setup from route.c into the utils object.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- net/mctp/test/route-test.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ net/mctp/test/route-test.c | 163 ---------------------------------------------
+ net/mctp/test/utils.c      | 150 +++++++++++++++++++++++++++++++++++++++++
+ net/mctp/test/utils.h      |  32 +++++++++
+ 3 files changed, 182 insertions(+), 163 deletions(-)
 
 diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-index bd1bf6f45fdbe8e9278618cb53410ae66e9aa78b..704169f4ba3865aea3f48883de4d46d6a146b639 100644
+index 704169f4ba3865aea3f48883de4d46d6a146b639..6309290e60155f0407cec77996ce01022474f43e 100644
 --- a/net/mctp/test/route-test.c
 +++ b/net/mctp/test/route-test.c
-@@ -1296,6 +1296,58 @@ static void mctp_test_route_output_key_create(struct kunit *test)
- 	mctp_test_destroy_dev(dev);
- }
+@@ -8,169 +8,6 @@
  
-+static void mctp_test_route_extaddr_input(struct kunit *test)
+ #include "utils.h"
+ 
+-struct mctp_test_route {
+-	struct mctp_route	rt;
+-};
+-
+-static const unsigned int test_pktqueue_magic = 0x5f713aef;
+-
+-struct mctp_test_pktqueue {
+-	unsigned int magic;
+-	struct sk_buff_head pkts;
+-};
+-
+-static void mctp_test_pktqueue_init(struct mctp_test_pktqueue *tpq)
+-{
+-	tpq->magic = test_pktqueue_magic;
+-	skb_queue_head_init(&tpq->pkts);
+-}
+-
+-static int mctp_test_dst_output(struct mctp_dst *dst, struct sk_buff *skb)
+-{
+-	struct kunit *test = current->kunit_test;
+-	struct mctp_test_pktqueue *tpq = test->priv;
+-
+-	KUNIT_ASSERT_EQ(test, tpq->magic, test_pktqueue_magic);
+-
+-	skb_queue_tail(&tpq->pkts, skb);
+-
+-	return 0;
+-}
+-
+-/* local version of mctp_route_alloc() */
+-static struct mctp_test_route *mctp_route_test_alloc(void)
+-{
+-	struct mctp_test_route *rt;
+-
+-	rt = kzalloc(sizeof(*rt), GFP_KERNEL);
+-	if (!rt)
+-		return NULL;
+-
+-	INIT_LIST_HEAD(&rt->rt.list);
+-	refcount_set(&rt->rt.refs, 1);
+-	rt->rt.output = mctp_test_dst_output;
+-
+-	return rt;
+-}
+-
+-static struct mctp_test_route *mctp_test_create_route(struct net *net,
+-						      struct mctp_dev *dev,
+-						      mctp_eid_t eid,
+-						      unsigned int mtu)
+-{
+-	struct mctp_test_route *rt;
+-
+-	rt = mctp_route_test_alloc();
+-	if (!rt)
+-		return NULL;
+-
+-	rt->rt.min = eid;
+-	rt->rt.max = eid;
+-	rt->rt.mtu = mtu;
+-	rt->rt.type = RTN_UNSPEC;
+-	if (dev)
+-		mctp_dev_hold(dev);
+-	rt->rt.dev = dev;
+-
+-	list_add_rcu(&rt->rt.list, &net->mctp.routes);
+-
+-	return rt;
+-}
+-
+-/* Convenience function for our test dst; release with mctp_test_dst_release()
+- */
+-static void mctp_test_dst_setup(struct kunit *test, struct mctp_dst *dst,
+-				struct mctp_test_dev *dev,
+-				struct mctp_test_pktqueue *tpq,
+-				unsigned int mtu)
+-{
+-	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, dev);
+-
+-	memset(dst, 0, sizeof(*dst));
+-
+-	dst->dev = dev->mdev;
+-	__mctp_dev_get(dst->dev->dev);
+-	dst->mtu = mtu;
+-	dst->output = mctp_test_dst_output;
+-	mctp_test_pktqueue_init(tpq);
+-	test->priv = tpq;
+-}
+-
+-static void mctp_test_dst_release(struct mctp_dst *dst,
+-				  struct mctp_test_pktqueue *tpq)
+-{
+-	mctp_dst_release(dst);
+-	skb_queue_purge(&tpq->pkts);
+-}
+-
+-static void mctp_test_route_destroy(struct kunit *test,
+-				    struct mctp_test_route *rt)
+-{
+-	unsigned int refs;
+-
+-	rtnl_lock();
+-	list_del_rcu(&rt->rt.list);
+-	rtnl_unlock();
+-
+-	if (rt->rt.dev)
+-		mctp_dev_put(rt->rt.dev);
+-
+-	refs = refcount_read(&rt->rt.refs);
+-	KUNIT_ASSERT_EQ_MSG(test, refs, 1, "route ref imbalance");
+-
+-	kfree_rcu(&rt->rt, rcu);
+-}
+-
+-static void mctp_test_skb_set_dev(struct sk_buff *skb,
+-				  struct mctp_test_dev *dev)
+-{
+-	struct mctp_skb_cb *cb;
+-
+-	cb = mctp_cb(skb);
+-	cb->net = READ_ONCE(dev->mdev->net);
+-	skb->dev = dev->ndev;
+-}
+-
+-static struct sk_buff *mctp_test_create_skb(const struct mctp_hdr *hdr,
+-					    unsigned int data_len)
+-{
+-	size_t hdr_len = sizeof(*hdr);
+-	struct sk_buff *skb;
+-	unsigned int i;
+-	u8 *buf;
+-
+-	skb = alloc_skb(hdr_len + data_len, GFP_KERNEL);
+-	if (!skb)
+-		return NULL;
+-
+-	__mctp_cb(skb);
+-	memcpy(skb_put(skb, hdr_len), hdr, hdr_len);
+-
+-	buf = skb_put(skb, data_len);
+-	for (i = 0; i < data_len; i++)
+-		buf[i] = i & 0xff;
+-
+-	return skb;
+-}
+-
+-static struct sk_buff *__mctp_test_create_skb_data(const struct mctp_hdr *hdr,
+-						   const void *data,
+-						   size_t data_len)
+-{
+-	size_t hdr_len = sizeof(*hdr);
+-	struct sk_buff *skb;
+-
+-	skb = alloc_skb(hdr_len + data_len, GFP_KERNEL);
+-	if (!skb)
+-		return NULL;
+-
+-	__mctp_cb(skb);
+-	memcpy(skb_put(skb, hdr_len), hdr, hdr_len);
+-	memcpy(skb_put(skb, data_len), data, data_len);
+-
+-	return skb;
+-}
+-
+ #define mctp_test_create_skb_data(h, d) \
+ 	__mctp_test_create_skb_data(h, d, sizeof(*d))
+ 
+diff --git a/net/mctp/test/utils.c b/net/mctp/test/utils.c
+index 26dce14dc7f246f03ff66e5b84274b33c48baf0e..6b4dc40d882c912575e28dfd8f2e730bf346885f 100644
+--- a/net/mctp/test/utils.c
++++ b/net/mctp/test/utils.c
+@@ -82,3 +82,153 @@ void mctp_test_destroy_dev(struct mctp_test_dev *dev)
+ 	mctp_dev_put(dev->mdev);
+ 	unregister_netdev(dev->ndev);
+ }
++
++static const unsigned int test_pktqueue_magic = 0x5f713aef;
++
++void mctp_test_pktqueue_init(struct mctp_test_pktqueue *tpq)
 +{
-+	static const unsigned char haddr[] = { 0xaa, 0x55 };
-+	struct mctp_test_pktqueue tpq;
-+	struct mctp_skb_cb *cb, *cb2;
-+	const unsigned int len = 40;
-+	struct mctp_test_dev *dev;
-+	struct sk_buff *skb, *skb2;
-+	struct mctp_dst dst;
-+	struct mctp_hdr hdr;
-+	struct socket *sock;
-+	int rc;
-+
-+	hdr.ver = 1;
-+	hdr.src = 10;
-+	hdr.dest = 8;
-+	hdr.flags_seq_tag = FL_S | FL_E | FL_TO;
-+
-+	__mctp_route_test_init(test, &dev, &dst, &tpq, &sock, MCTP_NET_ANY);
-+
-+	skb = mctp_test_create_skb(&hdr, len);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skb);
-+
-+	/* set our hardware addressing data */
-+	cb = mctp_cb(skb);
-+	memcpy(cb->haddr, haddr, sizeof(haddr));
-+	cb->halen = sizeof(haddr);
-+
-+	mctp_test_skb_set_dev(skb, dev);
-+
-+	rc = mctp_dst_input(&dst, skb);
-+	KUNIT_ASSERT_EQ(test, rc, 0);
-+
-+	mctp_test_dst_release(&dst, &tpq);
-+
-+	skb2 = skb_recv_datagram(sock->sk, MSG_DONTWAIT, &rc);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skb2);
-+	KUNIT_ASSERT_EQ(test, skb2->len, len);
-+
-+	cb2 = mctp_cb(skb2);
-+
-+	/* Received SKB should have the hardware addressing as set above.
-+	 * We're likely to have the same actual cb here (ie., cb == cb2),
-+	 * but it's the comparison that we care about
-+	 */
-+	KUNIT_EXPECT_EQ(test, cb2->halen, sizeof(haddr));
-+	KUNIT_EXPECT_MEMEQ(test, cb2->haddr, haddr, sizeof(haddr));
-+
-+	skb_free_datagram(sock->sk, skb2);
-+	mctp_test_destroy_dev(dev);
++	tpq->magic = test_pktqueue_magic;
++	skb_queue_head_init(&tpq->pkts);
 +}
 +
- static struct kunit_case mctp_test_cases[] = {
- 	KUNIT_CASE_PARAM(mctp_test_fragment, mctp_frag_gen_params),
- 	KUNIT_CASE_PARAM(mctp_test_rx_input, mctp_rx_input_gen_params),
-@@ -1312,6 +1364,7 @@ static struct kunit_case mctp_test_cases[] = {
- 	KUNIT_CASE(mctp_test_fragment_flow),
- 	KUNIT_CASE(mctp_test_route_output_key_create),
- 	KUNIT_CASE(mctp_test_route_input_cloned_frag),
-+	KUNIT_CASE(mctp_test_route_extaddr_input),
- 	{}
- };
++static int mctp_test_dst_output(struct mctp_dst *dst, struct sk_buff *skb)
++{
++	struct kunit *test = current->kunit_test;
++	struct mctp_test_pktqueue *tpq = test->priv;
++
++	KUNIT_ASSERT_EQ(test, tpq->magic, test_pktqueue_magic);
++
++	skb_queue_tail(&tpq->pkts, skb);
++
++	return 0;
++}
++
++/* local version of mctp_route_alloc() */
++static struct mctp_test_route *mctp_route_test_alloc(void)
++{
++	struct mctp_test_route *rt;
++
++	rt = kzalloc(sizeof(*rt), GFP_KERNEL);
++	if (!rt)
++		return NULL;
++
++	INIT_LIST_HEAD(&rt->rt.list);
++	refcount_set(&rt->rt.refs, 1);
++	rt->rt.output = mctp_test_dst_output;
++
++	return rt;
++}
++
++struct mctp_test_route *mctp_test_create_route(struct net *net,
++					       struct mctp_dev *dev,
++					       mctp_eid_t eid,
++					       unsigned int mtu)
++{
++	struct mctp_test_route *rt;
++
++	rt = mctp_route_test_alloc();
++	if (!rt)
++		return NULL;
++
++	rt->rt.min = eid;
++	rt->rt.max = eid;
++	rt->rt.mtu = mtu;
++	rt->rt.type = RTN_UNSPEC;
++	if (dev)
++		mctp_dev_hold(dev);
++	rt->rt.dev = dev;
++
++	list_add_rcu(&rt->rt.list, &net->mctp.routes);
++
++	return rt;
++}
++
++/* Convenience function for our test dst; release with mctp_test_dst_release()
++ */
++void mctp_test_dst_setup(struct kunit *test, struct mctp_dst *dst,
++			 struct mctp_test_dev *dev,
++			 struct mctp_test_pktqueue *tpq, unsigned int mtu)
++{
++	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, dev);
++
++	memset(dst, 0, sizeof(*dst));
++
++	dst->dev = dev->mdev;
++	__mctp_dev_get(dst->dev->dev);
++	dst->mtu = mtu;
++	dst->output = mctp_test_dst_output;
++	mctp_test_pktqueue_init(tpq);
++	test->priv = tpq;
++}
++
++void mctp_test_dst_release(struct mctp_dst *dst,
++			   struct mctp_test_pktqueue *tpq)
++{
++	mctp_dst_release(dst);
++	skb_queue_purge(&tpq->pkts);
++}
++
++void mctp_test_route_destroy(struct kunit *test, struct mctp_test_route *rt)
++{
++	unsigned int refs;
++
++	rtnl_lock();
++	list_del_rcu(&rt->rt.list);
++	rtnl_unlock();
++
++	if (rt->rt.dev)
++		mctp_dev_put(rt->rt.dev);
++
++	refs = refcount_read(&rt->rt.refs);
++	KUNIT_ASSERT_EQ_MSG(test, refs, 1, "route ref imbalance");
++
++	kfree_rcu(&rt->rt, rcu);
++}
++
++void mctp_test_skb_set_dev(struct sk_buff *skb, struct mctp_test_dev *dev)
++{
++	struct mctp_skb_cb *cb;
++
++	cb = mctp_cb(skb);
++	cb->net = READ_ONCE(dev->mdev->net);
++	skb->dev = dev->ndev;
++}
++
++struct sk_buff *mctp_test_create_skb(const struct mctp_hdr *hdr,
++				     unsigned int data_len)
++{
++	size_t hdr_len = sizeof(*hdr);
++	struct sk_buff *skb;
++	unsigned int i;
++	u8 *buf;
++
++	skb = alloc_skb(hdr_len + data_len, GFP_KERNEL);
++	if (!skb)
++		return NULL;
++
++	__mctp_cb(skb);
++	memcpy(skb_put(skb, hdr_len), hdr, hdr_len);
++
++	buf = skb_put(skb, data_len);
++	for (i = 0; i < data_len; i++)
++		buf[i] = i & 0xff;
++
++	return skb;
++}
++
++struct sk_buff *__mctp_test_create_skb_data(const struct mctp_hdr *hdr,
++					    const void *data, size_t data_len)
++{
++	size_t hdr_len = sizeof(*hdr);
++	struct sk_buff *skb;
++
++	skb = alloc_skb(hdr_len + data_len, GFP_KERNEL);
++	if (!skb)
++		return NULL;
++
++	__mctp_cb(skb);
++	memcpy(skb_put(skb, hdr_len), hdr, hdr_len);
++	memcpy(skb_put(skb, data_len), data, data_len);
++
++	return skb;
++}
+diff --git a/net/mctp/test/utils.h b/net/mctp/test/utils.h
+index c702f4a6b5ff9f2de06f6a6bfee0c3653abfdefd..9405ca89d7032d65fbfb92503fbeb884ebd8bd25 100644
+--- a/net/mctp/test/utils.h
++++ b/net/mctp/test/utils.h
+@@ -5,6 +5,9 @@
  
+ #include <uapi/linux/netdevice.h>
+ 
++#include <net/mctp.h>
++#include <net/mctpdevice.h>
++
+ #include <kunit/test.h>
+ 
+ #define MCTP_DEV_TEST_MTU	68
+@@ -19,9 +22,38 @@ struct mctp_test_dev {
+ 
+ struct mctp_test_dev;
+ 
++struct mctp_test_route {
++	struct mctp_route	rt;
++};
++
++struct mctp_test_pktqueue {
++	unsigned int magic;
++	struct sk_buff_head pkts;
++};
++
+ struct mctp_test_dev *mctp_test_create_dev(void);
+ struct mctp_test_dev *mctp_test_create_dev_lladdr(unsigned short lladdr_len,
+ 						  const unsigned char *lladdr);
+ void mctp_test_destroy_dev(struct mctp_test_dev *dev);
+ 
++struct mctp_test_route *mctp_test_create_route(struct net *net,
++					       struct mctp_dev *dev,
++					       mctp_eid_t eid,
++					       unsigned int mtu);
++void mctp_test_dst_setup(struct kunit *test, struct mctp_dst *dst,
++			 struct mctp_test_dev *dev,
++			 struct mctp_test_pktqueue *tpq, unsigned int mtu);
++void mctp_test_dst_release(struct mctp_dst *dst,
++			   struct mctp_test_pktqueue *tpq);
++void mctp_test_pktqueue_init(struct mctp_test_pktqueue *tpq);
++void mctp_test_route_destroy(struct kunit *test, struct mctp_test_route *rt);
++void mctp_test_skb_set_dev(struct sk_buff *skb, struct mctp_test_dev *dev);
++struct sk_buff *mctp_test_create_skb(const struct mctp_hdr *hdr,
++				     unsigned int data_len);
++struct sk_buff *__mctp_test_create_skb_data(const struct mctp_hdr *hdr,
++					    const void *data, size_t data_len);
++
++#define mctp_test_create_skb_data(h, d) \
++	__mctp_test_create_skb_data(h, d, sizeof(*d))
++
+ #endif /* __NET_MCTP_TEST_UTILS_H */
 
 -- 
 2.39.5
