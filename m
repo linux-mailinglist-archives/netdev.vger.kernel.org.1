@@ -1,48 +1,86 @@
-Return-Path: <netdev+bounces-199577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33902AE0BFA
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:33:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D40AE0C08
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:42:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3341167561
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:33:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ED831BC5E5C
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4418628C000;
-	Thu, 19 Jun 2025 17:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E965528CF64;
+	Thu, 19 Jun 2025 17:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWVnhs1O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BoPClVai"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FBB1D9A5F;
-	Thu, 19 Jun 2025 17:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E871A2AF1C
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 17:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750354420; cv=none; b=BiLdtQcqM2gLNPHWdgW0YCpSvz08Qm9NFaChZHGZUCOxMNHv6m8CzjRF7UXSjQskD6/XwxZw6vfFKAg/unPudms1cyES1gfbFSvQfi150BH/6QjPUJYgKpt8lOU0B+Br+crG6NnKbgWwNEZ0yvGWitWi2FIjKshGU9N5CA+V7Nc=
+	t=1750354923; cv=none; b=DgDVAEt0OpD+o+wOx9Sbp+R7+BEauBN0Q0N7PJJmBdp/ojBFee+Wc80lPxWBiwVbUq6uCiPgHDAw5UCI2u5AR29AanQcWoMnrqGt6HGWj7eOrYaRL6Bzh4To4J0YN/JZiG0U4QsgnJzCNYl0m7g5WH0dG2it2TxluVuynveuZIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750354420; c=relaxed/simple;
-	bh=i+5p+ugedmFQU43vE9wk6DfTDagMnWE9BdFvau+rF3M=;
+	s=arc-20240116; t=1750354923; c=relaxed/simple;
+	bh=HoNHMlV5gs6ecsDXP820IMYKwSpwfRl0dDS1MLE+cpk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QBtBJXhA3chcBRQgez8YZiTNhyZXgyOxjkRiig1RSUYTLmejH5wAseQPdyOvdrOOws3afT/P1k08chQg2wX4qGTlnVrCBUXVe1M0wA3nkRjutb9hjYykfYx0JYpMssSJqbGm6WVe7H13ynyn7BV22KItzyBjQCmaEbmwx6JToYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWVnhs1O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C96FFC4CEEA;
-	Thu, 19 Jun 2025 17:33:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750354417;
-	bh=i+5p+ugedmFQU43vE9wk6DfTDagMnWE9BdFvau+rF3M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GWVnhs1OfKrv4K61SzwO/diWBiWTiATISH7883NYzm4qLFBabrQMH3EcB63y5VoQH
-	 Ak27iNzs7tp3a4V4F1NkxtgL/9bmmpx7aeKJ5O2h/5PVmlMHg7rzZgy6Dx+6aDDD02
-	 adnJBFVwToi6JqFJ4xqA4EELls0eDjBu/FvGSb9lMGafwX6C7o3czUkcqJby/TL+tQ
-	 wvEREDcZD3K4XsB01dnf24DzkzKkr20cYLIJ5Fe6+Y8nd83se14Ry1qtX43bY0KbWf
-	 1rT7rHGvsEIfDxaDUQrvdZ+7mxMg+CtEl5kfQ+76CElKEd5He/5ZHa55NAXk0HcER9
-	 O1PxSsKyxQoew==
-Message-ID: <26bf536c-41bb-4d6e-b722-828facaeb653@kernel.org>
-Date: Thu, 19 Jun 2025 19:33:34 +0200
+	 In-Reply-To:Content-Type; b=px9F3IBAsH2IkphzcJuEtQPN9mcKaXkpcKmDEYgMYuNM0PrFOVTJ88syY4cSWt5JcAa6zhzwWOK8GoMSLNq3wGiEvS4Y7Mq0Y8/pm7lKy7U3NN0bUXbClLwMVoV41wOaXBXTj3u46e0m3iIJUf2Xg8wL+w0KthKG+1SusoWLQlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BoPClVai; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750354920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OM8cmiyDXYsnLBv7gf1kXeS6mK5nAKw4busXyfTSMyo=;
+	b=BoPClVaiE2QsAw2puBYogbQvbnjZcwFka7pGrdsmc0MzhQx0j+VyqzqdlM4ERF+sVvnY15
+	jvIGwCGbEoKpebTu/SgjOM5491seW+kLMXUJPGnqBBjEEwkZ8Nlsya41rwtBWEAE3iyFpb
+	JoXcbcaXBBv/JoN7bx440RnhxVd2t7E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636--n0tkJ-JNgeZm26H1LDEdQ-1; Thu, 19 Jun 2025 13:41:59 -0400
+X-MC-Unique: -n0tkJ-JNgeZm26H1LDEdQ-1
+X-Mimecast-MFC-AGG-ID: -n0tkJ-JNgeZm26H1LDEdQ_1750354918
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4530ec2c87cso5343115e9.0
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 10:41:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750354918; x=1750959718;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OM8cmiyDXYsnLBv7gf1kXeS6mK5nAKw4busXyfTSMyo=;
+        b=ExfPm/Jw8zPVTSU77r5qToLeBKvRtY4hWKy1HWQrHOWk7ubF7wi6+je3JZwnh64Ht/
+         PBwIiViW3/9xYvmonWvnCLU/GHvEhcaZBS4HU+74WAl/08w6DcNtvu1MwHZwKouhgRHz
+         SRJmX4ZQGBpHAyRMuLmxbL6tQGLhcMUYXFaY4toZLASmbxIPLlPjORHur/cgo0SV5Dsx
+         hiDk1PCI5N2oO+Xz7mQneVQSjy1IJ+U903Jyw/BK0i22IrkmOBVy+sK2A40zmQm6deFM
+         ssPJrqKGuTN9nPcGPy0/3Jsui6I3O1ZUfy/YwwWlNo6IMnJv0eXHylIBm3VntG/w0lN+
+         KHDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWyzhATFakvmkXoTc5iFrM+ya8XPVh78LA3BbLEEtJmR7UI0ru2LUgzesphkM+v85ZV4t2UfAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNPsP5GWPENA11Y3gY6OBHVp+GD2jNzh0n9HyRhbenqtrfXCNz
+	kFb4hw5nQsuLoVLpjk/vuD8A1W0h1N3stKJ9xL4JMrE754Q6+u5lRcJN0ubRXIouC3vRPEiLM0p
+	OTWkWUvvbHgrMTLyoTbg6ojpTYIkXilMNGIjtNhUqqRozF54/qJOI7bAa+w==
+X-Gm-Gg: ASbGncv9WuDnGkfVhv4CI7JNyWRG7Wg1hdDjH3fkf2P48QKbyzE2VqaHHS/qd/qouPx
+	LoADd37YrNjb2CIsphz1f3WR1y6SRJPpMLz3BB78sngACFQi6L5DV6TCHehtw0Y0zXCTC9kPWaT
+	OWUEEYofvP6LkJZ0C/fVT7reZ/cedav8aQPNQFLuIR4sXdq8iq2WDFHuO9wTQCaNUzgGwa+tLzG
+	/OagfePR4Zfe76wqwbfuyH2nyLM4WrQX26N7D55MpoEqCz3wntyWTexf3oXUsT9i7lwO6TnIbjl
+	23Yrpf7dnQXjSxPNBsZHQQ0pb08ssQ==
+X-Received: by 2002:a05:600c:37c9:b0:43d:3df:42d8 with SMTP id 5b1f17b1804b1-453513f2aa4mr125703655e9.6.1750354917890;
+        Thu, 19 Jun 2025 10:41:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK85TAxo4jY4qAYOjEn/Uuvo/S7wUeq9KOofvTVRbYn9a3UiRCGLhInih9wBmLxl74spAHaA==
+X-Received: by 2002:a05:600c:37c9:b0:43d:3df:42d8 with SMTP id 5b1f17b1804b1-453513f2aa4mr125703445e9.6.1750354917457;
+        Thu, 19 Jun 2025 10:41:57 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271a:7310::f39? ([2a0d:3344:271a:7310::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f19b30sm16613f8f.37.2025.06.19.10.41.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 10:41:56 -0700 (PDT)
+Message-ID: <0aa1055e-3e52-4275-a074-e6f27115a748@redhat.com>
+Date: Thu, 19 Jun 2025 19:41:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,75 +88,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] nfc: pn544: Use str_low_high() helper
-To: Qianfeng Rong <rongqianfeng@vivo.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
- Jakub Kicinski <kuba@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com
-References: <20250619093426.121154-1-rongqianfeng@vivo.com>
- <20250619093426.121154-3-rongqianfeng@vivo.com>
+Subject: Re: [PATCH v4 net-next 7/8] tun: enable gso over UDP tunnel support.
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
+References: <cover.1750176076.git.pabeni@redhat.com>
+ <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
+ <add3a48e-f16a-4e32-91d4-fc34b1ff3ce6@daynix.com>
 Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250619093426.121154-3-rongqianfeng@vivo.com>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <add3a48e-f16a-4e32-91d4-fc34b1ff3ce6@daynix.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 19/06/2025 11:34, Qianfeng Rong wrote:
-> Remove hard-coded strings by using the str_low_high() helper
-> function.
+On 6/19/25 6:02 PM, Akihiko Odaki wrote:
+> On 2025/06/18 1:12, Paolo Abeni wrote:
+>> @@ -2426,7 +2453,17 @@ static int tun_xdp_one(struct tun_struct *tun,
+>>   	if (metasize > 0)
+>>   		skb_metadata_set(skb, metasize);
+>>   
+>> -	if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
+>> +	/*
+>> +	 * Assume tunnel offloads are enabled if the received hdr is large
+>> +	 * enough.
+>> +	 */
+>> +	if (READ_ONCE(tun->vnet_hdr_sz) >= TUN_VNET_TNL_SIZE &&
+>> +	    xdp->data - xdp->data_hard_start >= TUN_VNET_TNL_SIZE)
+>> +		features = NETIF_F_GSO_UDP_TUNNEL |
+>> +			   NETIF_F_GSO_UDP_TUNNEL_CSUM;
 > 
-> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
-> ---
->  drivers/nfc/pn544/i2c.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> xdp->data - xdp->data_hard_start may not represent the header size.
+> 
+> struct tun_xdp_hdr is filled in vhost_net_build_xdp() in 
+> drivers/vhost/net.c. This function sets the two fields with 
+> xdp_prepare_buff(), but the arguments passed to xdp_prepare_buff() does 
+> not seem to represent the exact size of the header.
 
-No need to make it one change per patch... but anyway look at netdev
-responses for that such changes.
+Indeed the xdp->data - xdp->data_hard_start range additionally contains
+some padding and eventually the xdp specific headroom. The problem is
+that both info are vhost_net specific and tun can't (or at least shoul)
+not be aware of them.
 
-Best regards,
-Krzysztof
+The only IMHO feasible refinement could be using xdp->data_meta instead
+of xdp->data when available. Alternatively I could drop entirely the test.
+
+/P
+
 
