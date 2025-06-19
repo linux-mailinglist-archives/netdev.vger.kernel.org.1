@@ -1,116 +1,217 @@
-Return-Path: <netdev+bounces-199573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B09AAE0BB7
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:06:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63374AE0BDA
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 19:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A318B7A93F0
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:04:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A08E174979
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 17:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9341328C5A1;
-	Thu, 19 Jun 2025 17:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECEE28CF64;
+	Thu, 19 Jun 2025 17:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OFexaoMA"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="TRbqXaAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1859E21D3E7
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 17:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D95199947;
+	Thu, 19 Jun 2025 17:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750352755; cv=none; b=ZmnkvZoJbcslzY3kCW+gDxBstRfweW5miyrZ6toytuazxc1sl57l+OejLkGtmJ4cEp0w6mrJGQc/LZNVZ5q2AlKs2ZU1uFQ7RQdMlyMU+n5XrlCvSy953JMckTEc3OEXlPd9yf/fYvLZAGXLLKUJrwqBnFlE4VcW1WuUVFnAJF4=
+	t=1750353508; cv=none; b=j8tKD0w9ccyD7tzvhuUqsxnOLLdUohQVAZX8S2S2DagkA9OKOtMrxR+BSUt3qiUYYqQMOc75GsXeRlIliq1A9wai/Srsh+HvFCP9FwetazgJUHLs3uI0oj442lNMDj9pf6G58FbRkWqo0rE/D58mLFjn6w8/48bOEuAmlFf9rjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750352755; c=relaxed/simple;
-	bh=jN36V+UkEMiuZ2N45ZKWPsXe0sBoHqUVgJq6tSmNwXY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bpkL7dveQoQjga5UDrVuyXFsFUCGGhPy7V1ouAIJgoBgV3D566yhxuXli7lSakh4hAWsvMnIa5bGb4g2K15HmAUpnJw3elzFMGaHEnJm5jtpTyIn/b5aIt9OfAc3/pDKJmVwHZh9Z4FpjcSszFJ3Avid6jNAFSGQ+NSPtU848P4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OFexaoMA; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2357c61cda7so143555ad.1
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 10:05:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750352753; x=1750957553; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jN36V+UkEMiuZ2N45ZKWPsXe0sBoHqUVgJq6tSmNwXY=;
-        b=OFexaoMAKOV/tVthYS/EtHnoIm2b3NB3ePni/RQmFNtbaKi8dZpwZ3kWU1uAjIyCuP
-         TSCYe335Apb6xf7wIvOimbdHHUIQ1u6yW7eQU9ICyDJcGu70kaEB/K4V5BLVXDahOSsm
-         3F9US8gdqQA8F8gVmTysqAw9JDkImOwBSujqcu3mVWfQRUqjBeNxy7MYFxIIpIu3ZT1l
-         1et++0bHhdOyKOX2Nwrt0WJZA3hLAdxXxyLqG+vWqoSMJjVnc3RY3w7w2HShMRpKqKR5
-         Kfg9j+8w/Pv5eZ1TdDU41b4Q8hzXM/gjjGibDTcdTCDCS6c8W3kgbbLp/qc9GN8xjoQa
-         dS1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750352753; x=1750957553;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jN36V+UkEMiuZ2N45ZKWPsXe0sBoHqUVgJq6tSmNwXY=;
-        b=XVlot689E/dbOzWyy9Zf/4P0nSw3AQguqf+IzGyoSBJ4O8CJjWdUNEpy0/Vh8tJIk6
-         sHaxQA4IKoO2dLkZif/XX8VUuZQ5GdD0u2usm0k4XRQtXUBmDvzoeoE85Wy9IrzPjq8P
-         nCnawb4bKeLBaUEfP8Lmk6jcm4DoTZ3NAzpf/1ko6J2WwRmk/9lHRclln2yv6L26t4/+
-         COmisSBHNmpE1n0p8zky2rW0AYNeA9IAoHA+xpD+dpprzs2W4GUx4gM5UWrXE/CSfKxp
-         ddS7ijJCHtywURW6O/tyPSzzzxsfRxKzUXr+oVe87utWR80p5Of8LgqMO4nXnIxD7OVG
-         zLdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXr3JtL8Ih2ONqcCxS14ZWm05bkUm1GI2D+kYjY3edQ3q0ubjBHT9wWafV8U0T2113OnzXr+QA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS6yBmz65t35Cd3ijDs0RhonEsgGa+BQ6nYqGTTBTyXn2eQOwt
-	xkLLdB3okVO68ahWgc5nY7xgOwzYwLEMzm2ACGfq0HS6b8RswCX67iItXagoeJ+vj2mEtERSJmk
-	XQGuktBWzcvNqeP3kUaPdYpg/28IWsCtCrTa07mfs
-X-Gm-Gg: ASbGncu+6FxEtYyZCjeqZDTfEAkKLda6Ds7zwPnCO+dVCfY4ps4hm0B3xXpZNT3zfeW
-	3sPibcOdB63lBcQ+QhoH51dH968MQ+wLIi+fsdcYhyHAN6pM0uwwYM/HkMbx/mY/OZ1SZ92fsFk
-	3O2UlIbmA3ITUw6oAqgAY0X49hxH29VnETzrYCplv+AMlh
-X-Google-Smtp-Source: AGHT+IHBoqiPScR/zsv1kvJMCwfwqRmUY/QUQzO9Cn9XCeyjsUJZbuwfk7x6aYyXYdOhd+nVFvJsQ2gPWXvq3cUBLdg=
-X-Received: by 2002:a17:902:f64f:b0:234:14ff:541f with SMTP id
- d9443c01a7336-237ce047d0amr2886185ad.21.1750352752967; Thu, 19 Jun 2025
- 10:05:52 -0700 (PDT)
+	s=arc-20240116; t=1750353508; c=relaxed/simple;
+	bh=PIA5rlrJTETm9MmKUtpXUwK8GW5IcdfTW4AP0jWmOZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UENrePAyZI6ZVYqnCkvxB24wcqm0EFh2JVVTOfPJRX7AjwEDkgSEYmyCrp7wxlynLOafcQ7eLZ99ZlRBC0vsK1eOjf2MhlJOXSeitpr4Ee6WBqNR1ltHvuwXPQWlH4w4oX5e6c+2dK9EmOyhI7pN5bCKFaPd8gNnIvlGQhCycTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=TRbqXaAh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAAB1C4CEEA;
+	Thu, 19 Jun 2025 17:18:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1750353507;
+	bh=PIA5rlrJTETm9MmKUtpXUwK8GW5IcdfTW4AP0jWmOZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TRbqXaAhgJEiXYJRmqDqm6hXI0aJhmoCriyQxvxjcE/gDG5Mi2kK5QfRc88vSLQtK
+	 ySIZo+PrzbTyQcOsTPn0TNgB29F7O7dGreF7wmTvoV6ZSRwlCqaOSNk6bDWXv/VlQi
+	 C27Yw9nk1S+1t2K1xz7ch7hiPbQBEEsUlLJTLa9I=
+Date: Thu, 19 Jun 2025 19:18:24 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Ming Yu <a0282524688@gmail.com>, Lee Jones <lee@kernel.org>,
+	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org, Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <2025061914-sternum-factoid-4269@gregkh>
+References: <20250612152313.GP381401@google.com>
+ <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
+ <20250613131133.GR381401@google.com>
+ <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
+ <20250619115345.GL587864@google.com>
+ <CAOoeyxXSTeypv2qQjcK1cSPtjch=gJGYzqoMsLQ-LJZ8Kwgd=w@mail.gmail.com>
+ <20250619152814.GK795775@google.com>
+ <CAOoeyxU7eQneBuxbBqepta29q_OHPzrkN4SKmj6RX72L3Euw5A@mail.gmail.com>
+ <2025061910-skies-outgoing-89cc@gregkh>
+ <644dfd66-ad30-47cb-9ec4-50d9a003433b@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250615205914.835368-1-almasrymina@google.com>
- <c126182c-8f26-41e2-a20d-ceefc2ced886@kernel.org> <CAHS8izPyzJvchqFNrRjY95D=41nya8Tmvx1eS9n0ijtHcUUETA@mail.gmail.com>
- <f445633e-b72c-4b5d-bb18-acda1c1d4de6@kernel.org> <CAHS8izOhNRNXyAgfuKW1xKb8PTernfer6tJfxG5FZmq7pePjwA@mail.gmail.com>
- <a122981d-ac9a-4c7e-a8a3-d50a3e613f0b@kernel.org> <CAHS8izOQLvPAE_E2dgMS7-11ZGFK5jmZ7q58LZCnhymhhUj2bQ@mail.gmail.com>
- <20250619095835.6ef52aee@kernel.org>
-In-Reply-To: <20250619095835.6ef52aee@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 19 Jun 2025 10:05:37 -0700
-X-Gm-Features: AX0GCFv562JtizA2SIM9AYmy8maTRimTtqBBXtYOtPbIo-G_JCECNhN71fZG13Q
-Message-ID: <CAHS8izOeQ7RPHABQCLP8XWfH=V+hDwBg4HTyzWhS=7CS1ZzFww@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] page_pool: import Jesper's page_pool benchmark
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
-	Ignat Korchagin <ignat@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <644dfd66-ad30-47cb-9ec4-50d9a003433b@roeck-us.net>
 
-On Thu, Jun 19, 2025 at 9:58=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 19 Jun 2025 08:37:05 -0700 Mina Almasry wrote:
-> > Jakub, this patch was marked 'changes requested' for good reason, but
-> > after investigation we found the patch itself is good and the issues
-> > were elsewhere. What do I do here? A resend of v4? Or does this un
-> > 'changes requested' as-is?
->
-> Do you want to update the numbers in the commit msg?
+On Thu, Jun 19, 2025 at 09:58:04AM -0700, Guenter Roeck wrote:
+> On 6/19/25 09:20, Greg KH wrote:
+> > On Fri, Jun 20, 2025 at 12:03:01AM +0800, Ming Yu wrote:
+> > > Lee Jones <lee@kernel.org> 於 2025年6月19日 週四 下午11:28寫道：
+> > > > 
+> > > > On Thu, 19 Jun 2025, Ming Yu wrote:
+> > > > 
+> > > > > Lee Jones <lee@kernel.org> 於 2025年6月19日 週四 下午7:53寫道：
+> > > > > > 
+> > > > > > On Fri, 13 Jun 2025, Ming Yu wrote:
+> > > > > > 
+> > > > > > > Lee Jones <lee@kernel.org> 於 2025年6月13日 週五 下午9:11寫道：
+> > > > > > > > 
+> > > > > > > > On Fri, 13 Jun 2025, Ming Yu wrote:
+> > > > > > > > 
+> > > > > > > > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午11:23寫道：
+> > > > > > > > > > 
+> > > > > > > > > > On Thu, 12 Jun 2025, Ming Yu wrote:
+> > > > > > > > > > 
+> > > > > > > > > > > Dear Lee,
+> > > > > > > > > > > 
+> > > > > > > > > > > Thank you for reviewing,
+> > > > > > > > > > > 
+> > > > > > > > > > > Lee Jones <lee@kernel.org> 於 2025年6月12日 週四 下午10:00寫道：
+> > > > > > > > > > > > 
+> > > > > > > > > > > ...
+> > > > > > > > > > > > > +static const struct mfd_cell nct6694_devs[] = {
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
+> > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Why have we gone back to this silly numbering scheme?
+> > > > > > > > > > > > 
+> > > > > > > > > > > > What happened to using IDA in the child driver?
+> > > > > > > > > > > > 
+> > > > > > > > > > > 
+> > > > > > > > > > > In a previous version, I tried to maintain a static IDA in each
+> > > > > > > > > > > sub-driver. However, I didn’t consider the case where multiple NCT6694
+> > > > > > > > > > > devices are bound to the same driver — in that case, the IDs are not
+> > > > > > > > > > > fixed and become unusable for my purpose.
+> > > > > > > > > > 
+> > > > > > > > > > Not sure I understand.
+> > > > > > > > > > 
+> > > > > > > > > 
+> > > > > > > > > As far as I know, if I maintain the IDA in the sub-drivers and use
+> > > > > > > > > multiple MFD_CELL_NAME("nct6694-gpio") entries in the MFD, the first
+> > > > > > > > > NCT6694 device bound to the GPIO driver will receive IDs 0~15.
+> > > > > > > > > However, when a second NCT6694 device is connected to the system, it
+> > > > > > > > > will receive IDs 16~31.
+> > > > > > > > > Because of this behavior, I switched back to using platform_device->id.
+> > > > > > > > 
+> > > > > > > > Each of the devices will probe once.
+> > > > > > > > 
+> > > > > > > > The first one will be given 0, the second will be given 1, etc.
+> > > > > > > > 
+> > > > > > > > Why would you give multiple IDs to a single device bound to a driver?
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > The device exposes multiple peripherals — 16 GPIO controllers, 6 I2C
+> > > > > > > adapters, 2 CAN FD controllers, and 2 watchdog timers. Each peripheral
+> > > > > > > is independently addressable, has its own register region, and can
+> > > > > > > operate in isolation. The IDs are used to distinguish between these
+> > > > > > > instances.
+> > > > > > > For example, the GPIO driver will be probed 16 times, allocating 16
+> > > > > > > separate gpio_chip instances to control 8 GPIO lines each.
+> > > > > > > 
+> > > > > > > If another device binds to this driver, it is expected to expose
+> > > > > > > peripherals with the same structure and behavior.
+> > > > > > 
+> > > > > > I still don't see why having a per-device IDA wouldn't render each
+> > > > > > probed device with its own ID.  Just as you have above.
+> > > > > > 
+> > > > > 
+> > > > > For example, when the MFD driver and the I2C sub-driver are loaded,
+> > > > > connecting the first NCT6694 USB device to the system results in 6
+> > > > > nct6694-i2c platform devices being created and bound to the
+> > > > > i2c-nct6694 driver. These devices receive IDs 0 through 5 via the IDA.
+> > > > > 
+> > > > > However, when a second NCT6694 USB device is connected, its
+> > > > > corresponding nct6694-i2c platform devices receive IDs 6 through 11 —
+> > > > > instead of 0 through 5 as I originally expected.
+> > > > > 
+> > > > > If I've misunderstood something, please feel free to correct me. Thank you!
+> > > > 
+> > > > In the code above you register 6 I2C devices.  Each device will be
+> > > > assigned a platform ID 0 through 5. The .probe() function in the I2C
+> > > > driver will be executed 6 times.  In each of those calls to .probe(),
+> > > > instead of pre-allocating a contiguous assignment of IDs here, you
+> > > > should be able to use IDA in .probe() to allocate those same device IDs
+> > > > 0 through 5.
+> > > > 
+> > > > What am I missing here?
+> > > > 
+> > > 
+> > > You're absolutely right in the scenario where a single NCT6694 device
+> > > is present. However, I’m wondering how we should handle the case where
+> > > a second or even third NCT6694 device is bound to the same MFD driver.
+> > > In that situation, the sub-drivers using a static IDA will continue
+> > > allocating increasing IDs, rather than restarting from 0 for each
+> > > device. How should this be handled?
+> > 
+> > What is wrong with increasing ids?  The id value means nothing, they
+> > just have to be unique.
+> > 
+> 
+> Unless they are used in the client driver as index into an array, as in
+> "this is the Nth instance of this device for this chip". There has to be
+> _some_ means to pass N to the client driver.
 
-Oh, I thought it's fine as-is. I can update them if need be, no need
-to trouble yourself. I'll upload v5 with updated benchmark results +
-make a note on how to cross build it (specify the KDIR=3D arg).
+Ick, that should just be walking the list of child devices instead, as
+obviously no one is hard coding array sizes for devices these days,
+right?  :)
 
---=20
-Thanks,
-Mina
+Anyway, sure, if you _have_ to have a specific id, then use a specific
+id, but really, it should not matter.
+
+thanks,
+
+greg k-h
 
