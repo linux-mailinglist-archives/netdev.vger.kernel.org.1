@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-199364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD25ADFF54
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:01:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF88ADFF4F
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 10:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D78A3AAFEE
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:01:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80F1F17B5BE
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7765C25DB0C;
-	Thu, 19 Jun 2025 08:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3039C25C6E7;
+	Thu, 19 Jun 2025 08:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="mE8vzFYz"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="XLYsc5VT"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA42423AE60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA48E2472A4
 	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 08:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750320071; cv=none; b=HYVFn85Xlee2KZ6HDmbLEptA/PuLnnVdUOScLG/rnoH+EPXjhDBjOgJ36EXueaasTFiezxCCHq+zzFDGN4q7VLYkOn7Zlo6b4H6F/XW4HELky9t3lQBqbQVvwSEyKjzdZwa2ZRWQqLI5Q6EEcC59XTOrxiuic+rNPUenm2dNGnE=
+	t=1750320070; cv=none; b=i3sgtFKBaML0IAJTJmx9Lrgx22+S+vocOoU3Wb/Q3a6fvMVJYgEX4XxP9SEUHTFv12r17P8RnqvcVJT9c08pj9CO8AOIxTa59iVwdJFGTUBduC6u5hE2exQAni6Vbscy8162o6o5TwkhNMIbLRuZjO0451TiUvKKoTPOl6bx/9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750320071; c=relaxed/simple;
-	bh=U3urW5Bhs84g9Pe2+CDDLc7a/GtMBbfrBx2mnfyLJ+o=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=kTitd0zdo+WJWC03vCx0B6K3F68ntme4MJ1hyVn06si2vZpX1H6rzQXwkcbQlMe+lly1IRtLFj6sX/2/WKVW9U4j1p8IAzLZp9XB34iODhHBto8DRvNWw/XULkHX7WLhJGj4wLNc/jUBSX+FAbv6bNJCV2sehNfNgVTbWKBzZJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=mE8vzFYz; arc=none smtp.client-ip=203.29.241.158
+	s=arc-20240116; t=1750320070; c=relaxed/simple;
+	bh=a6aw4aa2cUbfhI+C1HpTVHxzU6H213PQb/EEj50UUX0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=kFa5Hd1SeEGD34i2Wq43NaEJbRkDv66u8QA2V/WeqyPNSYGZvX0GVaPMRpo8WnJ8gN7lK9po5D1jblVv7uenH36Unepcf4QsXevHnHTzO6KHkA+5hEF6RTSRYLILXdixn7gPhDwavuXx14iWBVxhw7Cyue3tJwMU6R1FiOikyic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=XLYsc5VT; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1750320059;
-	bh=BLzdz5uj3P6sm0Auaw7v78VtVB5YcYSOvv3gnPKZ478=;
-	h=From:Subject:Date:To:Cc;
-	b=mE8vzFYz6ncai+XXhRIHdLLc32XK2n5YsfddIMmxBT6xq8GAGfS/ODAw9ajD4UuR8
-	 LV+xuKVNv0mDdK7/XEQQyKe9UBez6yWi+lDuzCaScf6/fsoKZXlVN0yKyOBPIP5AE3
-	 CjgCLTtQXuVb9LNl0JPOwGVmHQvFv0FsE22Cmp6NCMW5cbwVhDenbkt5LpbVtbL2L7
-	 K6OaqcC0FoIPmn+4NYl9ebdqzW7di1o7Sh4koe1JCfhDGDxOaQymM9vwVmYxeJ2Hv2
-	 owIY06cBy+XBOgDDrVJ/3kVUqopkW3upvvwXzv6QWkIQiEpG0YlkAScTMr+ka+Gil/
-	 PHi5+nSlrDAEw==
+	d=codeconstruct.com.au; s=2022a; t=1750320060;
+	bh=WbaZ851tPvl9z9qCq9g9hQhGeKab8Q7zy72SwZ1dqFQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=XLYsc5VTsfxNX/OQX2oMdKsSJx//0aagz4uq7I597R/EiG9whucq0LktjJQKiimvF
+	 2W3rYgz/pC7GHZpbIi+gNOmjY5zIxh2GD19z33ov0k0bQ3pB+GMVeZRWuwYMjxjW+R
+	 g3LAG76LsuLogNshDhHtNSmdUGKJ0cyMIhxiEcpmJ4U701eERNP/bnL19pQAGhHzd6
+	 a/ZjS8citU6ux6gx8KcHmXNY8MgRL/V/OICnpA3xdbAJG9Lw+Mw2+tZ8pmLFSzZOAe
+	 7IbC/0hHuhfbfmCuep5BdzQWlsU6JTIw2IteD2CCawGyOv9nPcX0PrqxqU8DVQWRhT
+	 I0lsCShw/U40w==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id A6D0168DFC; Thu, 19 Jun 2025 16:00:59 +0800 (AWST)
+	id 0CFB668E77; Thu, 19 Jun 2025 16:01:00 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Subject: [PATCH net-next v2 00/13] net: mctp: Add support for gateway
- routing
-Date: Thu, 19 Jun 2025 16:00:35 +0800
-Message-Id: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
+Date: Thu, 19 Jun 2025 16:00:36 +0800
+Subject: [PATCH net-next v2 01/13] net: mctp: don't use source cb data when
+ forwarding, ensure pkt_type is set
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,11 +55,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAKPDU2gC/12NQQ6DIBQFr2L+uhjAKrEr79G4EPgoi0IDSG2Md
- y9h2eVk8uadEDFYjPBoTgiYbbTeFeC3BtS2uBWJ1YWBU97TnlOiMRPjw2cJ2rqVUMHYKLq7oNJ
- AGb0DGnvU4BMcJuLwSDAXs9mYfPjWp8yqr9GBsf9oZoSSQQ6jZAZlJ8ykvEblXUxhV6lV/tUuO
- 8zXdf0AwAMDx8EAAAA=
-X-Change-ID: 20250520-dev-forwarding-0711973470bf
+Message-Id: <20250619-dev-forwarding-v2-1-3f81801b06c2@codeconstruct.com.au>
+References: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
+In-Reply-To: <20250619-dev-forwarding-v2-0-3f81801b06c2@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -67,74 +65,65 @@ To: Matt Johnston <matt@codeconstruct.com.au>,
 Cc: netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-This series adds a gateway route type for the MCTP core, allowing
-non-local EIDs as the match for a route.
+In the output path, only check the skb->cb data when we know it's from
+a local socket; input packets will have source address information there
+instead.
 
-Example setup using the mctp tools:
-
-    mctp route add 9 via mctpi2c0
-    mctp neigh add 9 dev mctpi2c0 lladdr 0x1d
-    mctp route add 10 gw 9
-
-- will route packets to eid 10 through mctpi2c0, using a dest lladdr
-of 0x1d (ie, that of the directly-attached eid 9).
-
-The core change to support this is the introduction of a struct
-mctp_dst, which represents the result of a route lookup. Since this
-involves a bit of surgery through the routing code, we add a few tests
-along the way.
-
-We're introducing an ABI change in the new RTM_{NEW,GET,DEL}ROUTE
-netlink formats, with the support for a RTA_GATEWAY attribute. Because
-we need a network ID specified to fully-qualify a gateway EID, the
-RTA_GATEWAY attribute carries the (net, eid) tuple in full:
-
-    struct mctp_fq_addr {
-        unsigned int net;
-        mctp_eid_t eid;
-    }
-
-Of course, any questions, comments etc are most welcome.
+In order to detect when we're forwarding, set skb->pkt_type on
+input/output.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
-Changes in v2:
-- 12/13: prevent uninitialsed gateway variable in nlparse_common
-- 13/13: make test data static
-- commit message spelling fixes
-- Link to v1: https://lore.kernel.org/r/20250611-dev-forwarding-v1-0-6b69b1feb37f@codeconstruct.com.au
+ net/mctp/route.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
----
-Jeremy Kerr (13):
-      net: mctp: don't use source cb data when forwarding, ensure pkt_type is set
-      net: mctp: separate routing database from routing operations
-      net: mctp: separate cb from direct-addressing routing
-      net: mctp: test: Add an addressed device constructor
-      net: mctp: test: Add extaddr routing output test
-      net: mctp: test: move functions into utils.[ch]
-      net: mctp: test: add sock test infrastructure
-      net: mctp: test: Add initial socket tests
-      net: mctp: pass net into route creation
-      net: mctp: remove routes by netid, not by device
-      net: mctp: allow NL parsing directly into a struct mctp_route
-      net: mctp: add gateway routing support
-      net: mctp: test: Add tests for gateway routes
+diff --git a/net/mctp/route.c b/net/mctp/route.c
+index d9c8e5a5f9ce9aefbf16730c65a1f54caa5592b9..128ac46dda5eb882994960b8c0eb671007ad8583 100644
+--- a/net/mctp/route.c
++++ b/net/mctp/route.c
+@@ -392,6 +392,9 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
+ 	 */
+ 	skb_orphan(skb);
+ 
++	if (skb->pkt_type == PACKET_OUTGOING)
++		skb->pkt_type = PACKET_LOOPBACK;
++
+ 	/* ensure we have enough data for a header and a type */
+ 	if (skb->len < sizeof(struct mctp_hdr) + 1)
+ 		goto out;
+@@ -578,7 +581,13 @@ static int mctp_route_output(struct mctp_route *route, struct sk_buff *skb)
+ 		return -EMSGSIZE;
+ 	}
+ 
+-	if (cb->ifindex) {
++	/* If we're forwarding, we don't want to use the input path's cb,
++	 * as it holds the *source* hardware addressing information.
++	 *
++	 * We will have a PACKET_HOST skb from the dev, or PACKET_OUTGOING
++	 * from a socket; only use cb in the latter case.
++	 */
++	if (skb->pkt_type == PACKET_OUTGOING && cb->ifindex) {
+ 		/* direct route; use the hwaddr we stashed in sendmsg */
+ 		if (cb->halen != skb->dev->addr_len) {
+ 			/* sanity check, sendmsg should have already caught this */
+@@ -587,6 +596,7 @@ static int mctp_route_output(struct mctp_route *route, struct sk_buff *skb)
+ 		}
+ 		daddr = cb->haddr;
+ 	} else {
++		skb->pkt_type = PACKET_OUTGOING;
+ 		/* If lookup fails let the device handle daddr==NULL */
+ 		if (mctp_neigh_lookup(route->dev, hdr->dest, daddr_buf) == 0)
+ 			daddr = daddr_buf;
+@@ -1032,6 +1042,7 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
+ 		tag = req_tag & MCTP_TAG_MASK;
+ 	}
+ 
++	skb->pkt_type = PACKET_OUTGOING;
+ 	skb->protocol = htons(ETH_P_MCTP);
+ 	skb->priority = 0;
+ 	skb_reset_transport_header(skb);
 
- include/net/mctp.h         |  52 +++-
- include/uapi/linux/mctp.h  |   8 +
- net/mctp/af_mctp.c         |  62 ++---
- net/mctp/route.c           | 563 ++++++++++++++++++++++++++++--------------
- net/mctp/test/route-test.c | 604 +++++++++++++++++++++++++++++----------------
- net/mctp/test/sock-test.c  | 229 +++++++++++++++++
- net/mctp/test/utils.c      | 196 ++++++++++++++-
- net/mctp/test/utils.h      |  44 ++++
- 8 files changed, 1307 insertions(+), 451 deletions(-)
----
-base-commit: 0097c4195b1d0ca57d15979626c769c74747b5a0
-change-id: 20250520-dev-forwarding-0711973470bf
-
-Best regards,
 -- 
-Jeremy Kerr <jk@codeconstruct.com.au>
+2.39.5
 
 
