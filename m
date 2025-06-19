@@ -1,58 +1,95 @@
-Return-Path: <netdev+bounces-199512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7AA5AE0918
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:50:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23A7AE08FE
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 16:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308354A114B
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:49:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49E595A4D90
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 14:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B2128B7EA;
-	Thu, 19 Jun 2025 14:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073B72264C1;
+	Thu, 19 Jun 2025 14:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/fP8iMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E6C2264BB;
-	Thu, 19 Jun 2025 14:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7B218E02A
+	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 14:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750344498; cv=none; b=UR76/gDOhYiTAIJVnyQdN9fZmHDoy8/NlA4y1RdRFSKPqP+Tp0kb06+nJSG57XmzWH8ddgWOESRuoNRv9qOzi1bJVxj6EjJ8D46gaQMlkqapJRmGLArWt+6PaCLrpo3cMTMOrwo0wI3KX9jtKIAzk1o4nO2f7DFrZKjHP+sxwEI=
+	t=1750344197; cv=none; b=LnPo85LxBFWQOyRb4US5LUiOtfc5pu3vS9DVGNB8m+QG3KJOugac7rWSDHxbCXBGi+/fK2BmPg6TMDTW6w2woOvlbf170mIdJRjU58HYCESlUrEPmZskHBvENhw67+v2IERUPpBUMhL9I9JXUKGZm0jZZuTpq5mwse0vmJn8Bzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750344498; c=relaxed/simple;
-	bh=NXpHgPsCGDrGSx7NxIYdMtYvGRs2DkHXsplJh2i91Ss=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dLFwvFI9fRHsufaM1MQBsBDunsRBZuJxgbO4EZu/wZ9ufDqHYiIenbZ+LM9UHjTDkkJ9X6OZShH1iVGH+Pu0cvILd7PPLZgCnzKdAglwRxb3/cETcyZMml19RSqgWpAQZXr7TMDRGeE3PDRphZHe7yUcPG9vkMrs91S7sLd3FIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bNNjJ2ptFz2BdTp;
-	Thu, 19 Jun 2025 22:46:44 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C6607140275;
-	Thu, 19 Jun 2025 22:48:13 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 19 Jun 2025 22:48:12 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V3 net-next 8/8] net: hns3: clear hns alarm: comparison of integer expressions of different signedness
-Date: Thu, 19 Jun 2025 22:40:57 +0800
-Message-ID: <20250619144057.2587576-9-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250619144057.2587576-1-shaojijie@huawei.com>
-References: <20250619144057.2587576-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1750344197; c=relaxed/simple;
+	bh=V94t/ymD0gYUeOVZo1Kk6rym0WD1lgoPg4oOdJCj7hs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rcdkkSnMYcYczfvsI6xQcF2kNFJYUvaHEi4219q2W3wPr82aV29gl3kG/GhDje4w1KJPc5xG2/hTcIa+/gtOOrTEq6acQz2hrJbvhQTOie+PButjJ9Ast8IeYKi5x+BAw/zCC3dKi/HRnrraa734QryjXqTE0BNxdn6ZD0PPyUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k/fP8iMD; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-748e63d4b05so459190b3a.2
+        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 07:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750344195; x=1750948995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pqvn+eXFXjREz+f5McbZ+dyBrTJCR+prm+A59eDzmbk=;
+        b=k/fP8iMDfi9U/KlNezEvlsVhqAo5eBMDFSmVKro2rTnxZFhv0aIRqTRoKNvlU5ks0L
+         VXKwUj8b4kVtqxtA9qpl8Sl6Js5pr/ntfxT+FOvx07BoxjFJ8//XI8xt/d9xFde8sj61
+         JYZChQfcQz95oTQD5uJfyhhG9iGszfuaL9OG89BT66SoArpjGA0z2hFz4H9g3pBuAcZc
+         ueCanTt0mCfddS7H3/qWymb9vc3v4eAaiAnmoh2fQkxz/H4v0q+/GIkO4u2N2sLAxIqz
+         1BI+NiX56+7oa5gOMehK1Ukt4JWZ1KLDYnljqA0AXwwAbRlV/LZuEkKiexWOJeaAuyU+
+         Lb/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750344195; x=1750948995;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pqvn+eXFXjREz+f5McbZ+dyBrTJCR+prm+A59eDzmbk=;
+        b=Kjm9F3d5uFtO+QsUg/AGPQMs75g64KC6Ur3tb4G1PdZMlkExn0/0R04804aoqhDImN
+         2Jok3SWcg2NOkZ2UJVPoMDg9Ii6VsbvdGXYAHwvLTYTnEg+LqWf1NRXPxnfh/M2Sskeh
+         uUyBsPBijV3+QNZc+W7kHOe/kg/K3yl1YZ4mJI262NoPnEbMP/FI06N0E4LtgrrWXRnc
+         /E5QGPU1L6Ua29OPcziNUkIKIWXb/WNsfifkWbYisWaKGGzHYzgMUKuquw3v4D0XSyR6
+         P+w5v/eMKtXd2jyUkLmjRXZzdfOyRjNN30s2GSS4I7Gy0FcucKNVx/RMZJDkEhip5LHM
+         c0ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6ViOT8aF8B/xZ18MsjFdNG8uq7fwoIyv/KBZoTBygQOg96lVljgnyL/dULFnZj6zmhGz5Vao=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhlYvmwizGmuk27ijqJNwfGZtSXaJtpwUmzAjVyouMpDKzOEVg
+	bqqO71P3WV3K/LV1o9rgclgNwoeuICkM+sFjRQN4Q7Mct8HgnUwE507W
+X-Gm-Gg: ASbGncvBR4cVifxRH6C0dfgIne+Zj+yuxg5qA3LGDwwy6glnZLFljDtsxVnSDx3KYcs
+	6v5qnE2r84zvxayuMlQ1V8ZFwsRSRJxdW1koKWA4DIetyGzWGh0verFlbFn3zGJn/csKIFmBRfK
+	hMZpoosxDBjEssTElmJD0YBIFCDK8Sm0maa1glwRlhz4qZ830KALbKwOb+5f/085JShckHDMUZz
+	EEBTaVUk7MWKpTixbrCT09BSIGt6/2VTLOjKDuH+SwClzB/YCizYvLQG01iY8kHkt3MPQ8F3hhh
+	YWq/NjcDuGM+VLjJOt2rSBYiXvyhI2twfEJt4L5OXirwcpllkGw=
+X-Google-Smtp-Source: AGHT+IFoWy+HBOk5/RjwFMxEcdxeTvlQajqO7J7ILcrPrTovokCAGX82ybYS7ZnI1tVD1FU0lj6GWw==
+X-Received: by 2002:a05:6a21:3982:b0:218:bb70:bd23 with SMTP id adf61e73a8af0-21fbd5de25bmr33768184637.42.1750344195458;
+        Thu, 19 Jun 2025 07:43:15 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b31efce3235sm30410a12.37.2025.06.19.07.43.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jun 2025 07:43:14 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	almasrymina@google.com,
+	praan@google.com,
+	shivajikant@google.com,
+	asml.silence@gmail.com,
+	sdf@fomichev.me,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com
+Subject: [PATCH v3 net-next] eth: bnxt: add netmem TX support
+Date: Thu, 19 Jun 2025 14:40:58 +0000
+Message-Id: <20250619144058.147051-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,446 +97,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk100013.china.huawei.com (7.202.194.61)
 
-From: Peiyang Wang <wangpeiyang1@huawei.com>
+Use netmem_dma_*() helpers and declare netmem_tx to support netmem TX.
+By this change, all bnxt devices will support the netmem TX.
 
-A static alarm exists in the hns and needs to be cleared.
+Unreadable skbs are not going to be handled by the TX push logic.
+So, it checks whether a skb is readable or not before the TX push logic.
 
-The alarm is comparison of integer expressions of different
-signedness including 's64' and 'long unsigned int',
-'int' and 'long unsigned int', 'u32' and 'int',
-'int' and 'unsigned int'.
+netmem TX can be tested with ncdevmem.c
 
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Acked-by: Mina Almasry <almasrymina@google.com>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- .../hns3/hns3_common/hclge_comm_cmd.c         |  2 +-
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 22 +++++++-------
- .../net/ethernet/hisilicon/hns3/hns3_enet.h   |  2 +-
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  4 +--
- .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 13 ++++----
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 30 +++++++++----------
- .../hisilicon/hns3/hns3pf/hclge_mbx.c         |  7 +++--
- .../hisilicon/hns3/hns3pf/hclge_mdio.c        |  2 +-
- .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  2 +-
- .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  2 +-
- .../hisilicon/hns3/hns3vf/hclgevf_mbx.c       |  2 +-
- 11 files changed, 44 insertions(+), 44 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
-index 4ad4e8ab2f1f..37396ca4ecfc 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
-@@ -348,7 +348,7 @@ static int hclge_comm_cmd_csq_clean(struct hclge_comm_hw *hw)
- static int hclge_comm_cmd_csq_done(struct hclge_comm_hw *hw)
- {
- 	u32 head = hclge_comm_read_dev(hw, HCLGE_COMM_NIC_CSQ_HEAD_REG);
--	return head == hw->cmq.csq.next_to_use;
-+	return head == (u32)hw->cmq.csq.next_to_use;
- }
+v3:
+ - Add missing changes in __bnxt_tx_int().
+v2:
+ - Fix commit message.
+ - Add Ack tags from Mina and Stanislav.
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 40 ++++++++++++++---------
+ 1 file changed, 24 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index d93b0a661ccb..dbc8a47ecefd 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -477,6 +477,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct bnxt_tx_ring_info *txr;
+ 	struct bnxt_sw_tx_bd *tx_buf;
+ 	__le32 lflags = 0;
++	skb_frag_t *frag;
  
- static u32 hclge_get_cmdq_tx_timeout(u16 opcode, u32 tx_timeout)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index dc1e15926482..49fcee7a6d0f 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -1690,8 +1690,8 @@ static int hns3_fill_desc(struct hns3_enet_ring *ring, dma_addr_t dma,
- #define HNS3_LIKELY_BD_NUM	1
+ 	i = skb_get_queue_mapping(skb);
+ 	if (unlikely(i >= bp->tx_nr_rings)) {
+@@ -563,7 +564,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		lflags |= cpu_to_le32(TX_BD_FLAGS_NO_CRC);
  
- 	struct hns3_desc *desc = &ring->desc[ring->next_to_use];
--	unsigned int frag_buf_num;
--	int k, sizeoflast;
-+	unsigned int frag_buf_num, k;
-+	int sizeoflast;
+ 	if (free_size == bp->tx_ring_size && length <= bp->tx_push_thresh &&
+-	    !lflags) {
++	    skb_frags_readable(skb) && !lflags) {
+ 		struct tx_push_buffer *tx_push_buf = txr->tx_push;
+ 		struct tx_push_bd *tx_push = &tx_push_buf->push_bd;
+ 		struct tx_bd_ext *tx_push1 = &tx_push->txbd2;
+@@ -598,9 +599,9 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		skb_copy_from_linear_data(skb, pdata, len);
+ 		pdata += len;
+ 		for (j = 0; j < last_frag; j++) {
+-			skb_frag_t *frag = &skb_shinfo(skb)->frags[j];
+ 			void *fptr;
  
- 	if (likely(size <= HNS3_MAX_BD_SIZE)) {
- 		desc->addr = cpu_to_le64(dma);
-@@ -1863,7 +1863,7 @@ static bool hns3_skb_need_linearized(struct sk_buff *skb, unsigned int *bd_size,
- 				     unsigned int bd_num, u8 max_non_tso_bd_num)
- {
- 	unsigned int tot_len = 0;
--	int i;
-+	unsigned int i;
++			frag = &skb_shinfo(skb)->frags[j];
+ 			fptr = skb_frag_address_safe(frag);
+ 			if (!fptr)
+ 				goto normal_tx;
+@@ -708,8 +709,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			cpu_to_le32(cfa_action << TX_BD_CFA_ACTION_SHIFT);
+ 	txbd0 = txbd;
+ 	for (i = 0; i < last_frag; i++) {
+-		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+-
++		frag = &skb_shinfo(skb)->frags[i];
+ 		prod = NEXT_TX(prod);
+ 		txbd = &txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
  
- 	for (i = 0; i < max_non_tso_bd_num - 1U; i++)
- 		tot_len += bd_size[i];
-@@ -1891,7 +1891,7 @@ static bool hns3_skb_need_linearized(struct sk_buff *skb, unsigned int *bd_size,
+@@ -721,7 +721,8 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			goto tx_dma_error;
  
- void hns3_shinfo_pack(struct skb_shared_info *shinfo, __u32 *size)
- {
--	int i;
-+	u32 i;
+ 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
+-		dma_unmap_addr_set(tx_buf, mapping, mapping);
++		netmem_dma_unmap_addr_set(skb_frag_netmem(frag), tx_buf,
++					  mapping, mapping);
  
- 	for (i = 0; i < MAX_SKB_FRAGS; i++)
- 		size[i] = skb_frag_size(&shinfo->frags[i]);
-@@ -2207,9 +2207,9 @@ static int hns3_handle_tx_sgl(struct hns3_enet_ring *ring,
- 	struct hns3_desc_cb *desc_cb = &ring->desc_cb[ring->next_to_use];
- 	u32 nfrag = skb_shinfo(skb)->nr_frags + 1;
- 	struct sg_table *sgt;
--	int i, bd_num = 0;
-+	int bd_num = 0;
- 	dma_addr_t dma;
--	u32 cb_len;
-+	u32 cb_len, i;
- 	int nents;
+ 		txbd->tx_bd_haddr = cpu_to_le64(mapping);
  
- 	if (skb_has_frag_list(skb))
-@@ -2544,7 +2544,7 @@ static void hns3_nic_get_stats64(struct net_device *netdev,
- 	struct hnae3_handle *handle = priv->ae_handle;
- 	struct rtnl_link_stats64 ring_total_stats;
- 	struct hns3_enet_ring *ring;
--	unsigned int idx;
-+	int idx;
- 
- 	if (test_bit(HNS3_NIC_STATE_DOWN, &priv->state))
- 		return;
-@@ -2770,7 +2770,7 @@ static int hns3_nic_change_mtu(struct net_device *netdev, int new_mtu)
- 
- static int hns3_get_timeout_queue(struct net_device *ndev)
- {
--	int i;
-+	unsigned int i;
- 
- 	/* Find the stopped queue the same way the stack does */
- 	for (i = 0; i < ndev->num_tx_queues; i++) {
-@@ -2851,7 +2851,7 @@ static bool hns3_get_tx_timeo_queue_info(struct net_device *ndev)
- 	struct hns3_nic_priv *priv = netdev_priv(ndev);
- 	struct hnae3_handle *h = hns3_get_handle(ndev);
- 	struct hns3_enet_ring *tx_ring;
--	int timeout_queue;
-+	u32 timeout_queue;
- 
- 	timeout_queue = hns3_get_timeout_queue(ndev);
- 	if (timeout_queue >= ndev->num_tx_queues) {
-@@ -3821,7 +3821,7 @@ static int hns3_gro_complete(struct sk_buff *skb, u32 l234info)
- {
- 	__be16 type = skb->protocol;
- 	struct tcphdr *th;
--	int depth = 0;
-+	u32 depth = 0;
- 
- 	while (eth_type_vlan(type)) {
- 		struct vlan_hdr *vh;
-@@ -5934,7 +5934,7 @@ static const struct hns3_hw_error_info hns3_hw_err[] = {
- static void hns3_process_hw_error(struct hnae3_handle *handle,
- 				  enum hnae3_hw_error_type type)
- {
--	int i;
-+	u32 i;
- 
- 	for (i = 0; i < ARRAY_SIZE(hns3_hw_err); i++) {
- 		if (hns3_hw_err[i].type == type) {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-index dd61ddd8f904..d3bad5d1b888 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-@@ -621,7 +621,7 @@ struct hns3_reset_type_map {
- 	enum hnae3_reset_type rst_type;
- };
- 
--static inline int ring_space(struct hns3_enet_ring *ring)
-+static inline u32 ring_space(struct hns3_enet_ring *ring)
- {
- 	/* This smp_load_acquire() pairs with smp_store_release() in
- 	 * hns3_nic_reclaim_one_desc called by hns3_clean_tx_ring.
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index 6a244ba5e051..276d5c191123 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -541,7 +541,7 @@ static void hns3_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- {
- 	struct hnae3_handle *h = hns3_get_handle(netdev);
- 	const struct hnae3_ae_ops *ops = hns3_get_ops(h);
--	int i;
-+	u32 i;
- 
- 	if (!ops->get_strings)
- 		return;
-@@ -569,7 +569,7 @@ static u64 *hns3_get_stats_tqps(struct hnae3_handle *handle, u64 *data)
- 	struct hns3_nic_priv *nic_priv = handle->priv;
- 	struct hns3_enet_ring *ring;
- 	u8 *stat;
--	int i, j;
-+	u32 i, j;
- 
- 	/* get stats for Tx */
- 	for (i = 0; i < kinfo->num_tqps; i++) {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-index 21deec217668..f130020a1227 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-@@ -830,10 +830,10 @@ hclge_dbg_dump_reg_tqp(struct hclge_dev *hdev,
- {
- 	const struct hclge_dbg_dfx_message *dfx_message = reg_info->dfx_msg;
- 	const struct hclge_dbg_reg_common_msg *reg_msg = &reg_info->reg_msg;
-+	u32 index, entry, i, cnt, min_num;
- 	struct hclge_desc *desc_src;
--	u32 index, entry, i, cnt;
--	int bd_num, min_num, ret;
- 	struct hclge_desc *desc;
-+	int bd_num, ret;
- 
- 	ret = hclge_dbg_get_dfx_bd_num(hdev, reg_msg->offset, &bd_num);
- 	if (ret)
-@@ -885,9 +885,9 @@ hclge_dbg_dump_reg_common(struct hclge_dev *hdev,
- 	const struct hclge_dbg_reg_common_msg *reg_msg = &reg_info->reg_msg;
- 	const struct hclge_dbg_dfx_message *dfx_message = reg_info->dfx_msg;
- 	struct hclge_desc *desc_src;
--	int bd_num, min_num, ret;
-+	int bd_num, min_num, ret, i;
- 	struct hclge_desc *desc;
--	u32 entry, i;
-+	u32 entry;
- 
- 	ret = hclge_dbg_get_dfx_bd_num(hdev, reg_msg->offset, &bd_num);
- 	if (ret)
-@@ -1279,7 +1279,7 @@ static int hclge_dbg_dump_reg_cmd(struct hclge_dev *hdev,
- {
- 	const struct hclge_dbg_reg_type_info *reg_info;
- 	int pos = 0, ret = 0;
--	int i;
-+	u32 i;
- 
- 	for (i = 0; i < ARRAY_SIZE(hclge_dbg_reg_info); i++) {
- 		reg_info = &hclge_dbg_reg_info[i];
-@@ -2648,9 +2648,8 @@ static void hclge_dbg_dump_mac_list(struct hclge_dev *hdev, char *buf, int len,
- 	struct hclge_mac_node *mac_node, *tmp;
- 	struct hclge_vport *vport;
- 	struct list_head *list;
--	u32 func_id;
-+	u32 func_id, i;
- 	int pos = 0;
--	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(mac_list_items); i++)
- 		result[i] = &data_str[i][0];
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index b76400e67a23..d886b04ad92c 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -582,7 +582,7 @@ static u64 *hclge_comm_get_stats(struct hclge_dev *hdev,
- 				 int size, u64 *data)
- {
- 	u64 *buf = data;
--	u32 i;
-+	int i;
- 
- 	for (i = 0; i < size; i++) {
- 		if (strs[i].stats_num > hdev->ae_dev->dev_specs.mac_stats_num)
-@@ -599,7 +599,7 @@ static void hclge_comm_get_strings(struct hclge_dev *hdev, u32 stringset,
- 				   const struct hclge_comm_stats_str strs[],
- 				   int size, u8 **data)
- {
--	u32 i;
-+	int i;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
-@@ -2624,7 +2624,7 @@ int hclge_cfg_mac_speed_dup(struct hclge_dev *hdev, int speed, u8 duplex, u8 lan
- 	int ret;
- 
- 	duplex = hclge_check_speed_dup(duplex, speed);
--	if (!mac->support_autoneg && mac->speed == speed &&
-+	if (!mac->support_autoneg && mac->speed == (u32)speed &&
- 	    mac->duplex == duplex && (mac->lane_num == lane_num || lane_num == 0))
- 		return 0;
- 
-@@ -2652,7 +2652,7 @@ static int hclge_cfg_mac_speed_dup_h(struct hnae3_handle *handle, int speed,
- 	if (ret)
- 		return ret;
- 
--	hdev->hw.mac.req_speed = speed;
-+	hdev->hw.mac.req_speed = (u32)speed;
- 	hdev->hw.mac.req_duplex = duplex;
- 
- 	return 0;
-@@ -3446,7 +3446,7 @@ static int hclge_tp_port_init(struct hclge_dev *hdev)
- static int hclge_update_port_info(struct hclge_dev *hdev)
- {
- 	struct hclge_mac *mac = &hdev->hw.mac;
--	int speed;
-+	u32 speed;
- 	int ret;
- 
- 	/* get the port info from SFP cmd if not copper port */
-@@ -6991,7 +6991,7 @@ static int hclge_get_all_rules(struct hnae3_handle *handle,
- 	struct hclge_dev *hdev = vport->back;
- 	struct hclge_fd_rule *rule;
- 	struct hlist_node *node2;
--	int cnt = 0;
-+	u32 cnt = 0;
- 
- 	if (!hnae3_ae_dev_fd_supported(hdev->ae_dev))
- 		return -EOPNOTSUPP;
-@@ -8225,14 +8225,14 @@ static int hclge_update_desc_vfid(struct hclge_desc *desc, int vfid, bool clr)
- 		word_num = vfid / 32;
- 		bit_num  = vfid % 32;
- 		if (clr)
--			desc[1].data[word_num] &= cpu_to_le32(~(1 << bit_num));
-+			desc[1].data[word_num] &= cpu_to_le32(~(1U << bit_num));
- 		else
- 			desc[1].data[word_num] |= cpu_to_le32(1 << bit_num);
- 	} else {
- 		word_num = (vfid - HCLGE_VF_NUM_IN_FIRST_DESC) / 32;
- 		bit_num  = vfid % 32;
- 		if (clr)
--			desc[2].data[word_num] &= cpu_to_le32(~(1 << bit_num));
-+			desc[2].data[word_num] &= cpu_to_le32(~(1U << bit_num));
- 		else
- 			desc[2].data[word_num] |= cpu_to_le32(1 << bit_num);
+@@ -778,9 +779,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	for (i = 0; i < last_frag; i++) {
+ 		prod = NEXT_TX(prod);
+ 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
+-		dma_unmap_page(&pdev->dev, dma_unmap_addr(tx_buf, mapping),
+-			       skb_frag_size(&skb_shinfo(skb)->frags[i]),
+-			       DMA_TO_DEVICE);
++		frag = &skb_shinfo(skb)->frags[i];
++		netmem_dma_unmap_page_attrs(&pdev->dev,
++					    dma_unmap_addr(tx_buf, mapping),
++					    skb_frag_size(frag),
++					    DMA_TO_DEVICE, 0);
  	}
-@@ -9296,7 +9296,7 @@ static int hclge_add_mgr_tbl(struct hclge_dev *hdev,
- static int init_mgr_tbl(struct hclge_dev *hdev)
- {
- 	int ret;
--	int i;
-+	u32 i;
  
- 	for (i = 0; i < ARRAY_SIZE(hclge_mgr_table); i++) {
- 		ret = hclge_add_mgr_tbl(hdev, &hclge_mgr_table[i]);
-@@ -10717,7 +10717,7 @@ int hclge_set_vport_mtu(struct hclge_vport *vport, int new_mtu)
- 	max_frm_size = max(max_frm_size, HCLGE_MAC_DEFAULT_FRAME);
- 	mutex_lock(&hdev->vport_lock);
- 	/* VF's mps must fit within hdev->mps */
--	if (vport->vport_id && max_frm_size > hdev->mps) {
-+	if (vport->vport_id && (u32)max_frm_size > hdev->mps) {
- 		mutex_unlock(&hdev->vport_lock);
- 		return -EINVAL;
- 	} else if (vport->vport_id) {
-@@ -10728,7 +10728,7 @@ int hclge_set_vport_mtu(struct hclge_vport *vport, int new_mtu)
+ tx_free:
+@@ -809,6 +812,7 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 	u16 hw_cons = txr->tx_hw_cons;
+ 	unsigned int tx_bytes = 0;
+ 	u16 cons = txr->tx_cons;
++	skb_frag_t *frag;
+ 	int tx_pkts = 0;
+ 	bool rc = false;
  
- 	/* PF's mps must be greater then VF's mps */
- 	for (i = 1; i < hdev->num_alloc_vport; i++)
--		if (max_frm_size < hdev->vport[i].mps) {
-+		if ((u32)max_frm_size < hdev->vport[i].mps) {
- 			dev_err(&hdev->pdev->dev,
- 				"failed to set pf mtu for less than vport %d, mps = %u.\n",
- 				i, hdev->vport[i].mps);
-@@ -11218,7 +11218,7 @@ static int hclge_init_nic_client_instance(struct hnae3_ae_dev *ae_dev,
- {
- 	struct hnae3_client *client = vport->nic.client;
- 	struct hclge_dev *hdev = ae_dev->priv;
--	int rst_cnt = hdev->rst_stats.reset_cnt;
-+	u32 rst_cnt = hdev->rst_stats.reset_cnt;
- 	int ret;
+@@ -848,13 +852,14 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 		last = tx_buf->nr_frags;
  
- 	ret = client->ops->init_instance(&vport->nic);
-@@ -11262,7 +11262,7 @@ static int hclge_init_roce_client_instance(struct hnae3_ae_dev *ae_dev,
- {
- 	struct hclge_dev *hdev = ae_dev->priv;
- 	struct hnae3_client *client;
--	int rst_cnt;
-+	u32 rst_cnt;
- 	int ret;
+ 		for (j = 0; j < last; j++) {
++			frag = &skb_shinfo(skb)->frags[j];
+ 			cons = NEXT_TX(cons);
+ 			tx_buf = &txr->tx_buf_ring[RING_TX(bp, cons)];
+-			dma_unmap_page(
+-				&pdev->dev,
+-				dma_unmap_addr(tx_buf, mapping),
+-				skb_frag_size(&skb_shinfo(skb)->frags[j]),
+-				DMA_TO_DEVICE);
++			netmem_dma_unmap_page_attrs(&pdev->dev,
++						    dma_unmap_addr(tx_buf,
++								   mapping),
++						    skb_frag_size(frag),
++						    DMA_TO_DEVICE, 0);
+ 		}
+ 		if (unlikely(is_ts_pkt)) {
+ 			if (BNXT_CHIP_P5(bp)) {
+@@ -3422,9 +3427,11 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
+ 			skb_frag_t *frag = &skb_shinfo(skb)->frags[j];
  
- 	if (!hnae3_dev_roce_supported(hdev) || !hdev->roce_client ||
-@@ -12092,7 +12092,7 @@ static int hclge_vf_rate_param_check(struct hclge_dev *hdev,
- 				     int min_tx_rate, int max_tx_rate)
- {
- 	if (min_tx_rate != 0 ||
--	    max_tx_rate < 0 || max_tx_rate > hdev->hw.mac.max_speed) {
-+	    max_tx_rate < 0 || (u32)max_tx_rate > hdev->hw.mac.max_speed) {
- 		dev_err(&hdev->pdev->dev,
- 			"min_tx_rate:%d [0], max_tx_rate:%d [0, %u]\n",
- 			min_tx_rate, max_tx_rate, hdev->hw.mac.max_speed);
-@@ -12117,7 +12117,7 @@ static int hclge_set_vf_rate(struct hnae3_handle *handle, int vf,
- 	if (!vport)
- 		return -EINVAL;
+ 			tx_buf = &txr->tx_buf_ring[ring_idx];
+-			dma_unmap_page(&pdev->dev,
+-				       dma_unmap_addr(tx_buf, mapping),
+-				       skb_frag_size(frag), DMA_TO_DEVICE);
++			netmem_dma_unmap_page_attrs(&pdev->dev,
++						    dma_unmap_addr(tx_buf,
++								   mapping),
++						    skb_frag_size(frag),
++						    DMA_TO_DEVICE, 0);
+ 		}
+ 		dev_kfree_skb(skb);
+ 	}
+@@ -16693,6 +16700,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (BNXT_SUPPORTS_QUEUE_API(bp))
+ 		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
+ 	dev->request_ops_lock = true;
++	dev->netmem_tx = true;
  
--	if (!force && max_tx_rate == vport->vf_info.max_tx_rate)
-+	if (!force && (u32)max_tx_rate == vport->vf_info.max_tx_rate)
- 		return 0;
- 
- 	ret = hclge_tm_qs_shaper_cfg(vport, max_tx_rate);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
-index 59c863306657..c7ff12a6c076 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
-@@ -749,16 +749,17 @@ static int hclge_get_rss_key(struct hclge_vport *vport,
- #define HCLGE_RSS_MBX_RESP_LEN	8
- 	struct hclge_dev *hdev = vport->back;
- 	struct hclge_comm_rss_cfg *rss_cfg;
-+	int rss_hash_key_size;
- 	u8 index;
- 
- 	index = mbx_req->msg.data[0];
- 	rss_cfg = &hdev->rss_cfg;
-+	rss_hash_key_size = sizeof(rss_cfg->rss_hash_key);
- 
- 	/* Check the query index of rss_hash_key from VF, make sure no
- 	 * more than the size of rss_hash_key.
- 	 */
--	if (((index + 1) * HCLGE_RSS_MBX_RESP_LEN) >
--	      sizeof(rss_cfg->rss_hash_key)) {
-+	if (((index + 1) * HCLGE_RSS_MBX_RESP_LEN) > rss_hash_key_size) {
- 		dev_warn(&hdev->pdev->dev,
- 			 "failed to get the rss hash key, the index(%u) invalid !\n",
- 			 index);
-@@ -800,7 +801,7 @@ static void hclge_handle_link_change_event(struct hclge_dev *hdev,
- 
- static bool hclge_cmd_crq_empty(struct hclge_hw *hw)
- {
--	u32 tail = hclge_read_dev(hw, HCLGE_COMM_NIC_CRQ_TAIL_REG);
-+	int tail = hclge_read_dev(hw, HCLGE_COMM_NIC_CRQ_TAIL_REG);
- 
- 	return tail == hw->hw.cmq.crq.next_to_use;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mdio.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mdio.c
-index 9a456ebf9b7c..96553109f44c 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mdio.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mdio.c
-@@ -151,7 +151,7 @@ int hclge_mac_mdio_config(struct hclge_dev *hdev)
- 
- 	mdio_bus->parent = &hdev->pdev->dev;
- 	mdio_bus->priv = hdev;
--	mdio_bus->phy_mask = ~(1 << mac->phy_addr);
-+	mdio_bus->phy_mask = ~(1U << mac->phy_addr);
- 	ret = mdiobus_register(mdio_bus);
- 	if (ret) {
- 		dev_err(mdio_bus->parent,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-index 63483636c074..61faddcc3dd0 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-@@ -25,7 +25,7 @@ struct ifreq;
- #define HCLGE_PTP_TIME_SEC_H_MASK	GENMASK(15, 0)
- #define HCLGE_PTP_TIME_SEC_L_REG	0x54
- #define HCLGE_PTP_TIME_NSEC_REG		0x58
--#define HCLGE_PTP_TIME_NSEC_MASK	GENMASK(29, 0)
-+#define HCLGE_PTP_TIME_NSEC_MASK	0x3fffffffLL
- #define HCLGE_PTP_TIME_NSEC_NEG		BIT(31)
- #define HCLGE_PTP_TIME_SYNC_REG		0x5C
- #define HCLGE_PTP_TIME_SYNC_EN		BIT(0)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-index 3ffd47b30ad3..ca2f43985a4a 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-@@ -2469,7 +2469,7 @@ static int hclgevf_init_nic_client_instance(struct hnae3_ae_dev *ae_dev,
- 					    struct hnae3_client *client)
- {
- 	struct hclgevf_dev *hdev = ae_dev->priv;
--	int rst_cnt = hdev->rst_stats.rst_cnt;
-+	u32 rst_cnt = hdev->rst_stats.rst_cnt;
- 	int ret;
- 
- 	ret = client->ops->init_instance(&hdev->nic);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_mbx.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_mbx.c
-index 85c2a634c8f9..f5c99ca54369 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_mbx.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_mbx.c
-@@ -159,7 +159,7 @@ static bool hclgevf_cmd_crq_empty(struct hclgevf_hw *hw)
- {
- 	u32 tail = hclgevf_read_dev(hw, HCLGE_COMM_NIC_CRQ_TAIL_REG);
- 
--	return tail == hw->hw.cmq.crq.next_to_use;
-+	return tail == (u32)hw->hw.cmq.crq.next_to_use;
- }
- 
- static void hclgevf_handle_mbx_response(struct hclgevf_dev *hdev,
+ 	rc = register_netdev(dev);
+ 	if (rc)
 -- 
-2.33.0
+2.34.1
 
 
