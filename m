@@ -1,234 +1,349 @@
-Return-Path: <netdev+bounces-199631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011ECAE1010
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:30:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 687A4AE1025
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:54:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8922A3A9448
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:30:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06169177847
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618D7223DDE;
-	Thu, 19 Jun 2025 23:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008ED22C324;
+	Thu, 19 Jun 2025 23:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TA8zKaQM"
 X-Original-To: netdev@vger.kernel.org
-Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F12F28F51C;
-	Thu, 19 Jun 2025 23:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAF322154B;
+	Thu, 19 Jun 2025 23:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750375834; cv=none; b=gE0GYbbe6Ga3r9lxJ6YZsbDWhumagiBJGuAqXBpyJdvrZocWEEUHK9chDZT3iAJJqmgXvWQ4syS8RxLOUlug2iU6bcKKqBdggVtaW3BTxyYfPG5JFWxvk3Qt3TsWqRoTTJNCoUcSKxHMElsAFVTfqh/ejFlz/JJVQFBwnshPPcs=
+	t=1750377268; cv=none; b=EFeh/4R6jx+VjBiZW2jFytdgZkK+YtXRad7DroEC3CC5JjnP3gdBis/KabXppEyuQZYz7PojgM+bvEfrIBUjD4cElZkYtuKcnLmMEOEeIMmrKXAFBekxdSAZ/OoXRq2+WMdO+Z/dIJ7s7PHHwg2bWydvudppo+pFIAWVA2A5r4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750375834; c=relaxed/simple;
-	bh=u7FaARh/eSFiH5liOAks1ysHBoQBS/nmWZNrwiFBo3w=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=gVSi8OU/9yKJ+LpnkqZ3Y/jkuD5ueDIsVaze+/mhh/Uz0KJqpTsXZcDUPeslM9cHXb0MGmExUHHz8nAaiJ69gy1N7jjajXALZlKGR6ewsxaEeOnohqGYN3uysKP6o1ivu+pOeTuSCcvv7pxMRl7+q/f+NXQO7J59wGolmXe4Vjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
-Received: from mail.wizardsworks.org (localhost [127.0.0.1])
-	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55JNW8bD010124;
-	Thu, 19 Jun 2025 16:32:08 -0700
+	s=arc-20240116; t=1750377268; c=relaxed/simple;
+	bh=/tuvN6LrtcwFYmp1ZVzr6nxhR6adJs9/q2eoTwDv/9c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rSydW4iDpVq9q+8TF3nbpsZ4gBwcg/BxltbSuRB8Rpdf9yWeKyKzKNh6zcJviDLX1u1CvHVJuKN8BCtisfuXg7eG9SJ8Vq7Omajecn8Nqcztplw3UFGxwbAaS/+mjUrTEKcWD74iP/wEDxwaLGt1HE2xBj+fjJ3wPvcNDnoDtXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TA8zKaQM; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3ddda14b56cso5384735ab.0;
+        Thu, 19 Jun 2025 16:54:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750377266; x=1750982066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4s6JNF6wQih8WEYTbj1ApTwcC5asUmF/UcxX8oyscI4=;
+        b=TA8zKaQMpOqltPzgFeA1cUOJ9EyhtgxOBY081djYSHIzOKEPiwEBqUsS4yNWpaU9MM
+         9CxNes/YlVHv/pAf8q7mXLiKPivwzI8IASbrPJmkATM+yHswR/MCeD9l2CLX8Iylf+O+
+         ZJ4ueIP+KfqxA2LZaouB0o4X5TL4g24dkeQRnJqbfkO0S/16PsTYiygnqdoR1NVMqE8C
+         hD21U7rlHBBZ3rBzZXZ2plyNXklmHrwtqeof4HtFQVRu3gdvSIuCrBgHFKRUPijxsH2w
+         wlXO3qxA835iiETY1Adg+PhBxVMhKSTjEXi5SbZhm4e7KJlgmMYdIcj1s9KH7ZOZQKdt
+         IK3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750377266; x=1750982066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4s6JNF6wQih8WEYTbj1ApTwcC5asUmF/UcxX8oyscI4=;
+        b=Go7bciSdvh6GXRWNrhgy8CnHXvVv9sHBZzyCJ4lXk89S9YL9mXU6eZP9Iieakwvk8Y
+         H8qw8ACSzZLhpf1PFJFSR/e9e/tMnhMBex44IKOPq8YxlSwGDKhAgd9LjTuVMgRe+KOI
+         RXSz9pB2qhI8IEDLkTjrvCYRzcExufqkwjciDzQdqPrp5Gbf30tisQPev5EKzv8qS4wt
+         da04d3aIC4+qMbyRoJdR6zonuwt5tvBGGT4Isa0v3u2v8EB0L7A4rcA7pdsZmy5/hB77
+         QFEUFoOVpeVHSDv5vs2plXhPTbHkYriBPdwiFRTMifVlcWUCuXKBPEnv5kUL+F/6oJlZ
+         n3Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhNQ7ZRSRn/MxyRZrOKKtrAzfaDosvzA8YOvrYa4FOS0hw4NYnnfuaMBerfiiFfkFIFf229v9x@vger.kernel.org, AJvYcCXL/4rzasYmXLUGLkZtD0o4AvrgUfNIgG1/LGM9UNJwNU1ezQ14aZbd6WbGXV7BvqJZeIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbQ+Vn3sRn9OnvFdeulHP+WFfdLHyFX87gchT7vZFAtbYlPhHR
+	/EIL9JTYPdOuLiz2th4K41K9jeeySBlpNHpW+m1wOudO4LiEJbbFsxZbj4F0kPYVrPO7vgTz6oj
+	S8J29gma/OLnD4I885zToBwGa/bhOpFo=
+X-Gm-Gg: ASbGncv5qb+aEpdPgkDV70sEacGLkvFq4Y63DZIlA7a6qG0VGu9ri7XolBivsDYxYLV
+	QY08q/Z88prN134D89L864bnyrygiC+QoNvRM10yYAvKIrdLx4IeiR4nrObLmmlu/FjkP/OGDmc
+	syQuIoG7bnbd4IzVWAjuRvzlKjFkfpk08KNlOlk7n/u4U=
+X-Google-Smtp-Source: AGHT+IGJoXe6QQSPv3ed0xSm+AIZjjb791htpGDsxT7TAuwXYXNHuOvXQGKU0bXf6y1eQRg5ppo1JP9fP2wDDJ1L9GY=
+X-Received: by 2002:a05:6e02:1fce:b0:3dc:76ad:7990 with SMTP id
+ e9e14a558f8ab-3de38cb978bmr8200475ab.15.1750377266072; Thu, 19 Jun 2025
+ 16:54:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 19 Jun 2025 16:32:08 -0700
-From: Greg Chandler <chandleg@wizardsworks.org>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: "Maciej W. Rozycki" <macro@orcam.me.uk>,
-        Florian Fainelli
- <f.fainelli@gmail.com>, stable@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: Tulip 21142 panic on physical link disconnect
-In-Reply-To: <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
-References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
- <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
- <385f2469f504dd293775d3c39affa979@wizardsworks.org>
- <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com>
- <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
- <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com>
- <a3d8ee993b73b826b537f374d78084ad@wizardsworks.org>
- <12ccf3e4c24e8db2545f6ccaba8ce273@wizardsworks.org>
- <8c06f8969e726912b46ef941d36571ad@wizardsworks.org>
- <alpine.DEB.2.21.2506192007440.37405@angie.orcam.me.uk>
- <52564e1f-ab05-4347-bd64-b38a69180499@gmail.com>
- <alpine.DEB.2.21.2506192238280.37405@angie.orcam.me.uk>
- <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
-Message-ID: <51830501a2c5969806e418b8843183f5@wizardsworks.org>
-X-Sender: chandleg@wizardsworks.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250619090440.65509-1-kerneljasonxing@gmail.com> <6854165ccb312_3a357029426@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6854165ccb312_3a357029426@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 20 Jun 2025 07:53:49 +0800
+X-Gm-Features: AX0GCFvw6Wxd1Fw5DJa49mEgyHo28AVLIW3VvreifpxOGow9TH-r_UxqS1KShxQ
+Message-ID: <CAL+tcoBpfFPrYYfWa5P+Sr6S64_stUHiJj26QCtcx56cA5BWXg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/06/19 15:56, Greg Chandler wrote:
-> On 2025/06/19 14:53, Maciej W. Rozycki wrote:
->> On Thu, 19 Jun 2025, Florian Fainelli wrote:
->> 
->>> >   Maybe it'll ring someone's bell and they'll chime in or otherwise I'll
->>> > bisect it... sometime.  Or feel free to start yourself with 5.18, as it's
->>> > not terribly old, only a bit and certainly not so as 2.6 is.
->>> 
->>> I am still not sure why I could not see that warning on by Cobalt 
->>> Qube2 trying
->>> to reproduce Greg's original issue, that is with an IP assigned on 
->>> the
->>> interface yanking the cable did not trigger a timer warning. It could 
->>> be that
->>> machine is orders of magnitude slower and has a different CONFIG_HZ 
->>> value that
->>> just made it less likely to be seen?
->> 
->>  Can it have a different PHY attached?  There's this code:
->> 
->> 	if (tp->chip_id == PNIC2)
->> 		tp->link_change = pnic2_lnk_change;
->> 	else if (tp->flags & HAS_NWAY)
->> 		tp->link_change = t21142_lnk_change;
->> 	else if (tp->flags & HAS_PNICNWAY)
->> 		tp->link_change = pnic_lnk_change;
->> 
->> in `tulip_init_one' and `pnic_lnk_change' won't ever trigger this, but 
->> the
->> other two can; apparently the corresponding comment in 
->> `tulip_interrupt':
->> 
->> /*
->>  * NB: t21142_lnk_change() does a del_timer_sync(), so be careful if 
->> this
->>  * call is ever done under the spinlock
->>  */
->> 
->> hasn't been updated when `pnic2_lnk_change' was added.  Also ISTM no 
->> link
->> change handler is a valid option too, in which case `del_timer_sync' 
->> won't
->> be called either.  This is from a cursory glance only, so please take 
->> with
->> a pinch of salt.
->> 
->>   Maciej
-> 
-> 
-> 
-> 
-> I'm not sure which of us that was directed at, but for my onboard 
-> tulips:
-> 
-> Micro Linear ML6698CH <- PHY
-> Intel 21143-TD <- NIC
-> 
-> I know that the ML chips are most commonly used with 21143s and a very 
-> small smattering of others, I don't think they are all that common at 
-> least not since the late '90s..
-> I'm relatively certain all my DEC ISA/PCI nics use them though.
-> 
-> I found a link to the datasheet (If needed), but have had mixed luck 
-> with alldatasheets:
-> https://www.alldatasheet.com/datasheet-pdf/pdf/75840/MICRO-LINEAR/ML6698CH.html
-> 
-> Glancing over it I don't see anything about the link, I'll go stick my 
-> eyes in the driver a bit and see what stabs me in the eye....
+On Thu, Jun 19, 2025 at 9:53=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > The patch does the following things:
+> > - Add XDP_MAX_TX_BUDGET socket option.
+> > - Unify TX_BATCH_SIZE and MAX_PER_SOCKET_BUDGET into single one
+> >   tx_budget_spent.
+> > - tx_budget_spent is set to 32 by default in the initialization phase.
+> >   It's a per-socket granular control.
+> >
+> > The idea behind this comes out of real workloads in production. We use =
+a
+> > user-level stack with xsk support to accelerate sending packets and
+> > minimize triggering syscall. When the packets are aggregated, it's not
+> > hard to hit the upper bound (namely, 32). The moment user-space stack
+> > fetches the -EAGAIN error number passed from sendto(), it will loop to =
+try
+> > again until all the expected descs from tx ring are sent out to the dri=
+ver.
+> > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequencies o=
+f
+> > sendto(). Besides, applications leveraging this setsockopt can adjust
+> > its proper value in time after noticing the upper bound issue happening=
+.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > V3
+> > Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonxin=
+g@gmail.com/
+> > 1. use a per-socket control (suggested by Stanislav)
+> > 2. unify both definitions into one
+> > 3. support setsockopt and getsockopt
+> > 4. add more description in commit message
+>
+> +1 on an XSK setsockopt only
 
+May I ask why only setsockopt? In tradition, dev_tx_weight can be read
+and written through running sysctl. I think they are the same?
 
+>
+> >
+> > V2
+> > Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxin=
+g@gmail.com/
+> > 1. use a per-netns sysctl knob
+> > 2. use sysctl_xsk_max_tx_budget to unify both definitions.
+> > ---
+> >  include/net/xdp_sock.h            |  3 ++-
+> >  include/uapi/linux/if_xdp.h       |  1 +
+> >  net/xdp/xsk.c                     | 36 +++++++++++++++++++++++++------
+> >  tools/include/uapi/linux/if_xdp.h |  1 +
+> >  4 files changed, 34 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> > index e8bd6ddb7b12..8eecafad92c0 100644
+> > --- a/include/net/xdp_sock.h
+> > +++ b/include/net/xdp_sock.h
+> > @@ -65,11 +65,12 @@ struct xdp_sock {
+> >       struct xsk_queue *tx ____cacheline_aligned_in_smp;
+> >       struct list_head tx_list;
+> >       /* record the number of tx descriptors sent by this xsk and
+> > -      * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity needs
+> > +      * when it exceeds max_tx_budget, an opportunity needs
+> >        * to be given to other xsks for sending tx descriptors, thereby
+> >        * preventing other XSKs from being starved.
+> >        */
+> >       u32 tx_budget_spent;
+> > +     u32 max_tx_budget;
+>
+> This probably does not need to be a u32?
 
-That didn't take long..  The first thing to jab it's thumb in my eye was 
-this:
-const struct tulip_chip_table tulip_tbl[] = {
-   { }, /* placeholder for array, slot unused currently */
-   { }, /* placeholder for array, slot unused currently */
+From what I've known, it's not possible to set a very large value like
+1000 which probably brings side effects.
 
-   /* DC21140 */
-   { "Digital DS21140 Tulip", 128, 0x0001ebef,
-         HAS_MII | HAS_MEDIA_TABLE | CSR12_IN_SROM | HAS_PCI_MWI, 
-tulip_timer,
-         tulip_media_task },
+But it seems we'd better not limit the use of this max_tx_budget? We
+don't know what the best fit for various use cases is. If the type
+needs to be downsized to a smaller one like u16, another related
+consideration is that dev_tx_weight deserves the same treatment?
 
-   /* DC21142, DC21143 */
-   { "Digital DS21142/43 Tulip", 128, 0x0801fbff,
-         HAS_MII | HAS_MEDIA_TABLE | ALWAYS_CHECK_MII | HAS_ACPI | 
-HAS_NWAY
-         | HAS_INTR_MITIGATION | HAS_PCI_MWI, tulip_timer, 
-t21142_media_task },
+Or let me adjust to 'int' then?
 
+> It does fit in an existing hole. Is it also a warm cacheline wherever
+> this is touched in the hot path?
 
-The alpha ev6 platform to my knowledge has never had ACPI, this one 
-surely doesn't, and checking my config the variables aren't even listed 
-compared to the ones enabled or commented for my other platforms.
-It's possible that other alphas (ev67 or ev7s) may have but it's also 
-not likely.  I know for sure the: ev4, ev45, ev5, and ev56 architectures 
-did not, as the ACPI standard hadn't been ratified, or wasn't around 
-long enough to make it into the production of the chipsets, and boards.
+Oh, right.  max_tx_budget is almost a read-only member while the rest
+of the same cacheline are frequently changed. I'm going to change as
+below:
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index 8eecafad92c0..fca7723ad8b3 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -70,7 +70,6 @@ struct xdp_sock {
+         * preventing other XSKs from being starved.
+         */
+        u32 tx_budget_spent;
+-       u32 max_tx_budget;
 
-I will see if I can find a link between not having ACPI and this issue, 
-it's possible that the other instances you mentioned also have that same 
-issue.  Or that they do have ACPI and have it disabled for 10 reasons or 
-another....
+        /* Statistics */
+        u64 rx_dropped;
+@@ -85,6 +84,7 @@ struct xdp_sock {
+        struct list_head map_list;
+        /* Protects map_list */
+        spinlock_t map_list_lock;
++       u32 max_tx_budget;
+        /* Protects multiple processes in the control path */
+        struct mutex mutex;
+        struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
 
+Then it will be put into one read-mostly cacheline and also not add an
+extra hole :)
 
+>
+> >
+> >       /* Statistics */
+> >       u64 rx_dropped;
+> > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+> > index 44f2bb93e7e6..07c6d21c2f1c 100644
+> > --- a/include/uapi/linux/if_xdp.h
+> > +++ b/include/uapi/linux/if_xdp.h
+> > @@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+> >  #define XDP_UMEM_COMPLETION_RING     6
+> >  #define XDP_STATISTICS                       7
+> >  #define XDP_OPTIONS                  8
+> > +#define XDP_MAX_TX_BUDGET            9
+> >
+> >  struct xdp_umem_reg {
+> >       __u64 addr; /* Start of packet data area */
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 72c000c0ae5f..7c47f665e9d1 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -33,9 +33,6 @@
+> >  #include "xdp_umem.h"
+> >  #include "xsk.h"
+> >
+> > -#define TX_BATCH_SIZE 32
+> > -#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
+> > -
+> >  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+> >  {
+> >       if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
+> > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, s=
+truct xdp_desc *desc)
+> >       rcu_read_lock();
+> >  again:
+> >       list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > -             if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGET) {
+> > +             int max_budget =3D READ_ONCE(xs->max_tx_budget);
+> > +
+> > +             if (xs->tx_budget_spent >=3D max_budget) {
+> >                       budget_exhausted =3D true;
+> >                       continue;
+> >               }
+> > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >  static int __xsk_generic_xmit(struct sock *sk)
+> >  {
+> >       struct xdp_sock *xs =3D xdp_sk(sk);
+> > -     u32 max_batch =3D TX_BATCH_SIZE;
+> > +     u32 max_budget =3D READ_ONCE(xs->max_tx_budget);
+> >       bool sent_frame =3D false;
+> >       struct xdp_desc desc;
+> >       struct sk_buff *skb;
+> > @@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+> >               goto out;
+> >
+> >       while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+> > -             if (max_batch-- =3D=3D 0) {
+> > +             if (max_budget-- =3D=3D 0) {
+> >                       err =3D -EAGAIN;
+> >                       goto out;
+> >               }
+> > @@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *sock, i=
+nt level, int optname,
+> >               mutex_unlock(&xs->mutex);
+> >               return err;
+> >       }
+> > +     case XDP_MAX_TX_BUDGET:
+> > +     {
+> > +             unsigned int budget;
+> > +
+> > +             if (optlen < sizeof(budget))
+> > +                     return -EINVAL;
+> > +             if (copy_from_sockptr(&budget, optval, sizeof(budget)))
+> > +                     return -EFAULT;
+> > +
+> > +             WRITE_ONCE(xs->max_tx_budget, budget);
+>
+> Sanitize input: bounds check
 
-The second potential issue I see is that I don't know off-hand what PCI 
-MWI is...
+Thanks for catching this.
 
-It's only found in the tulip driver and nowhere else in the kernel:
+I will change it like this:
+    WRITE_ONCE(xs->max_tx_budget, min_t(int, budget, INT_MAX));?
 
-root@constellation:/tmp/tmp/linux-6.12.12/drivers/net/ethernet/dec/tulip# 
-grep -R HAS_PCI_MWI ../../../../../
-grep: ../../../../../drivers/net/ethernet/dec/tulip/tulip.ko: binary 
-file matches
-grep: ../../../../../drivers/net/ethernet/dec/tulip/eeprom.o: binary 
-file matches
-grep: ../../../../../drivers/net/ethernet/dec/tulip/interrupt.o: binary 
-file matches
-../../../../../drivers/net/ethernet/dec/tulip/tulip.h:  HAS_PCI_MWI      
-        = 0x01000,
-../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     HAS_MII 
-| HAS_MEDIA_TABLE | CSR12_IN_SROM | HAS_PCI_MWI, tulip_timer,
-../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     | 
-HAS_INTR_MITIGATION | HAS_PCI_MWI, tulip_timer, t21142_media_task },
-../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     HAS_MII 
-| HAS_NWAY | HAS_8023X | HAS_PCI_MWI, pnic2_timer, },
-../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     | 
-HAS_NWAY | HAS_PCI_MWI, tulip_timer, tulip_media_task },
-../../../../../drivers/net/ethernet/dec/tulip/tulip_core.c:     if 
-(!force_csr0 && (tp->flags & HAS_PCI_MWI))
-grep: ../../../../../drivers/net/ethernet/dec/tulip/tulip.o: binary file 
-matches
-grep: ../../../../../drivers/net/ethernet/dec/tulip/tulip_core.o: binary 
-file matches
+Thanks,
+Jason
 
-
-
-
-It's defined as what looks labeled as a table flag in the tulip.h:
-
-enum tbl_flag {
-         HAS_MII                 = 0x00001,
-         HAS_MEDIA_TABLE         = 0x00002,
-         CSR12_IN_SROM           = 0x00004,
-         ALWAYS_CHECK_MII        = 0x00008,
-         HAS_ACPI                = 0x00010,
-         MC_HASH_ONLY            = 0x00020, /* Hash-only multicast 
-filter. */
-         HAS_PNICNWAY            = 0x00080,
-         HAS_NWAY                = 0x00040, /* Uses internal NWay xcvr. 
-*/
-         HAS_INTR_MITIGATION     = 0x00100,
-         IS_ASIX                 = 0x00200,
-         HAS_8023X               = 0x00400,
-         COMET_MAC_ADDR          = 0x00800,
-         HAS_PCI_MWI             = 0x01000,
-         HAS_PHY_IRQ             = 0x02000,
-         HAS_SWAPPED_SEEPROM     = 0x04000,
-         NEEDS_FAKE_MEDIA_TABLE  = 0x08000,
-         COMET_PM                = 0x10000,
-};
-
-
-
+>
+> > +             return 0;
+> > +     }
+> >       default:
+> >               break;
+> >       }
+> > @@ -1588,6 +1599,18 @@ static int xsk_getsockopt(struct socket *sock, i=
+nt level, int optname,
+> >
+> >               return 0;
+> >       }
+> > +     case XDP_MAX_TX_BUDGET:
+> > +     {
+> > +             unsigned int budget =3D READ_ONCE(xs->max_tx_budget);
+> > +
+> > +             if (copy_to_user(optval, &budget, sizeof(budget)))
+> > +                     return -EFAULT;
+> > +             if (put_user(sizeof(budget), optlen))
+> > +                     return -EFAULT;
+> > +
+> > +             return 0;
+> > +     }
+> > +
+> >       default:
+> >               break;
+> >       }
+> > @@ -1734,6 +1757,7 @@ static int xsk_create(struct net *net, struct soc=
+ket *sock, int protocol,
+> >
+> >       xs =3D xdp_sk(sk);
+> >       xs->state =3D XSK_READY;
+> > +     xs->max_tx_budget =3D 32;
+> >       mutex_init(&xs->mutex);
+> >
+> >       INIT_LIST_HEAD(&xs->map_list);
+> > diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/lin=
+ux/if_xdp.h
+> > index 44f2bb93e7e6..07c6d21c2f1c 100644
+> > --- a/tools/include/uapi/linux/if_xdp.h
+> > +++ b/tools/include/uapi/linux/if_xdp.h
+> > @@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+> >  #define XDP_UMEM_COMPLETION_RING     6
+> >  #define XDP_STATISTICS                       7
+> >  #define XDP_OPTIONS                  8
+> > +#define XDP_MAX_TX_BUDGET            9
+> >
+> >  struct xdp_umem_reg {
+> >       __u64 addr; /* Start of packet data area */
+> > --
+> > 2.43.5
+> >
+>
+>
 
