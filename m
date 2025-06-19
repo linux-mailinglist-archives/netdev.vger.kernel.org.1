@@ -1,229 +1,217 @@
-Return-Path: <netdev+bounces-199349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B954AADFE34
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 08:59:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A487FADFE4B
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E86493AA9DB
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:54:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C01B9163AD1
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 06:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5108C24888A;
-	Thu, 19 Jun 2025 06:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65DF12472AE;
+	Thu, 19 Jun 2025 06:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="alG2FtT3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC2528033D;
-	Thu, 19 Jun 2025 06:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA3321B8F5;
+	Thu, 19 Jun 2025 06:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750315832; cv=none; b=a+SBR/jOMk9FLj0wO1C7fLMTBFSF+W1AZ/4909ODs5yCZWcYe5T1BBc1GoXkZAqI7nwSyPhx6o8+Wuy0J52pbV55Hgj9AMQy8MK+a4W1ilr/JKcKd7xIv4Fej2FQ4YscWuJ8fP72vD60mu6z9ChabZBZo5FGP/zdHpjQZ+dVW4Y=
+	t=1750316308; cv=none; b=ov+pFTuP45faX14lsFD3TXOH2+fi5HFQH3bY1jStFFPjOOY2EdVw584qiA110QH1RQzJFhdVTtLPg3RLgm17BwgIzvj27K3kGfd1pkKqjNTP5dke26X54KqQy+ReVqa3sIWooG18qiuJplox33WepEYYkx7SZs5CV/K9J9dYN2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750315832; c=relaxed/simple;
-	bh=3nFKja3nA1TDJ772c5AACmRHDAVC3lGSF24aRdNaCnE=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=F0BeRVM4D77HcwRJ8ft0NXhEeaV7r6Ai6aco2ODWhmIUjODFc1LDQOb4scVAS+TACV8Gb66myp1pb2WjpmCgC3ur3f6oYoxjIX8WZr8eYHMQ2k15i1fYoqrmdabuSjDJ7u2hWQ/byWcqcLqXtPwoLEYG4Xb/pYIEU/MyD+gLJ64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4bNB7X5nyWz51SY9;
-	Thu, 19 Jun 2025 14:50:16 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl1.zte.com.cn with SMTP id 55J6nVDW043596;
-	Thu, 19 Jun 2025 14:49:32 +0800 (+08)
-	(envelope-from jiang.peng9@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid31;
-	Thu, 19 Jun 2025 14:49:34 +0800 (CST)
-Date: Thu, 19 Jun 2025 14:49:34 +0800 (CST)
-X-Zmail-TransId: 2afa6853b2feffffffffff5-9ceb4
-X-Mailer: Zmail v1.0
-Message-ID: <20250619144934348-KObAuS33g0yI9ulIjMjE@zte.com.cn>
+	s=arc-20240116; t=1750316308; c=relaxed/simple;
+	bh=tL14BD8Yh5kWnpy+bfzqyRdCOXWQ8nMEwYBpreKExhI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=bEqc+XBo1SRL1tQeEFnYxkB32W6S1r2Ty3s+jGrho0i4goVBGdhpF8jUHCLLOnY/ZNoApIVKZA/y99eVdZvHPKx7VQ8xim6gs176uFEQhjZRN7L2TgcrDzBjoagsOdUc+xtKh5IsnUwVa/5gBjqH1bBJvG1ysCIsnwx9lmBkW54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=alG2FtT3; arc=none smtp.client-ip=134.0.28.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbox4.masterlogin.de (unknown [192.168.10.79])
+	by mxout2.routing.net (Postfix) with ESMTP id 50A125FB6C;
+	Thu, 19 Jun 2025 06:58:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1750316302;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=njQ31qrrY9HaE80KOkYp3xG43496qOQx+zhSn6xjDeA=;
+	b=alG2FtT3L898ztBmhlM2pSNVcjIkFUk7/1xSwM2dgG9YK2I3a0t48c4zf1DP18CV4lZJhI
+	cqhxtGUORlrTEY7zuo0CEIIN+s8RdFddsgQkMegRs9RelFqdh9G11AtkR7FfHwhbCUqP+M
+	xZWy4Bx1lY8WMMg4m782Pb82ISFh3ck=
+Received: from [127.0.0.1] (fttx-pool-80.245.76.73.bambit.de [80.245.76.73])
+	by mxbox4.masterlogin.de (Postfix) with ESMTPSA id 72C3D808E4;
+	Thu, 19 Jun 2025 06:58:20 +0000 (UTC)
+Date: Thu, 19 Jun 2025 08:58:20 +0200
+From: Frank Wunderlich <linux@fw-web.de>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>
+CC: Frank Wunderlich <frank-w@public-files.de>,
+ Jia-Wei Chang <jia-wei.chang@mediatek.com>,
+ Johnson Wang <johnson.wang@mediatek.com>,
+ =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v4 00/13] further mt7988 devicetree work
+User-Agent: K-9 Mail for Android
+In-Reply-To: <9cdf0624-f9bb-4b11-973e-9480fd655136@collabora.com>
+References: <20250616095828.160900-1-linux@fw-web.de> <9cdf0624-f9bb-4b11-973e-9480fd655136@collabora.com>
+Message-ID: <40C42E40-25C3-4FB2-8EB4-E7FCB677E415@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <jiang.peng9@zte.com.cn>
-To: <pabeni@redhat.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <horms@kernel.org>, <jiang.peng9@zte.com.cn>, <jiri@resnulli.us>,
-        <linux@treblig.org>, <oscmaes92@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <xu.xin16@zte.com.cn>,
-        <yang.yang29@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIG5ldF0gbmV0OiB2bGFuOiBmaXggZm9ybWF0LXRydW5jYXRpb24gd2FybmluZ3MgaW4KIHJlZ2lzdGVyX3ZsYW5fZGV2aWNl?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl1.zte.com.cn 55J6nVDW043596
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6853B328.002/4bNB7X5nyWz51SY9
-
-
-
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
-
-
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
-
-
---=====_003_next=====
+MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mail-ID: 376531bd-c831-454f-b55f-f96f05563171
 
-RnJvbTogUGVuZyBKaWFuZyA8amlhbmcucGVuZzlAenRlLmNvbS5jbj4NCg0KQnVpbGRpbmcgd2l0
-aCBXPTEgdHJpZ2dlcnMgZm9ybWF0LXRydW5jYXRpb24gd2FybmluZ3MgaW4gdGhlDQpyZWdpc3Rl
-cl92bGFuX2RldmljZSBmdW5jdGlvbiB3aGVuIGNvbXBpbGVkIHdpdGggR0NDIDEyLjMuMC4NClRo
-ZXNlIHdhcm5pbmdzIG9jY3VyIGR1ZSB0byB0aGUgdXNlIG9mICVpIGFuZCAlLjRpIGZvcm1hdA0K
-c3BlY2lmaWVycyB3aXRoIGEgYnVmZmVyIHNpemUgdGhhdCBtaWdodCBiZSBpbnN1ZmZpY2llbnQN
-CmZvciB0aGUgZm9ybWF0dGVkIHN0cmluZywgcG90ZW50aWFsbHkgY2F1c2luZyB0cnVuY2F0aW9u
-Lg0KDQpUaGUgb3JpZ2luYWwgd2FybmluZyB0cmFjZToNCm5ldC84MDIxcS92bGFuLmM6MjQ3OjE3
-OiBub3RlOiAnc25wcmludGYnIG91dHB1dCBiZXR3ZWVuIDMgYW5kIDIyIGJ5dGVzIGludG8gYSBk
-ZXN0aW5hdGlvbiBvZiBzaXplIDE2DQoyNDcgfCBzbnByaW50ZihuYW1lLCBJRk5BTVNJWiwgIiVz
-LiVpIiwgcmVhbF9kZXYtPm5hbWUsIHZsYW5faWQpOw0KDQpTaWduZWQtb2ZmLWJ5OiBQZW5nIEpp
-YW5nIDxqaWFuZy5wZW5nOUB6dGUuY29tLmNuPg0KLS0tDQogbmV0LzgwMjFxL3ZsYW4uYyB8IDEw
-ICsrKysrLS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9u
-cygtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0LzgwMjFxL3ZsYW4uYyBiL25ldC84MDIxcS92bGFuLmMN
-CmluZGV4IDA2OTA4ZTM3YzNkOS4uZjJjMTcwMzVmNjI1IDEwMDY0NA0KLS0tIGEvbmV0LzgwMjFx
-L3ZsYW4uYw0KKysrIGIvbmV0LzgwMjFxL3ZsYW4uYw0KQEAgLTIxNyw3ICsyMTcsNyBAQCBzdGF0
-aWMgaW50IHJlZ2lzdGVyX3ZsYW5fZGV2aWNlKHN0cnVjdCBuZXRfZGV2aWNlICpyZWFsX2Rldiwg
-dTE2IHZsYW5faWQpDQogICAgICAgIHN0cnVjdCB2bGFuX2Rldl9wcml2ICp2bGFuOw0KICAgICAg
-ICBzdHJ1Y3QgbmV0ICpuZXQgPSBkZXZfbmV0KHJlYWxfZGV2KTsNCiAgICAgICAgc3RydWN0IHZs
-YW5fbmV0ICp2biA9IG5ldF9nZW5lcmljKG5ldCwgdmxhbl9uZXRfaWQpOw0KLSAgICAgICBjaGFy
-IG5hbWVbSUZOQU1TSVpdOw0KKyAgICAgICBjaGFyIG5hbWVbSUZOQU1TSVogKyA2XTsgLyogcGx1
-cyBleHRyYSA2IGJ5dGVzIGZvciB2bGFuX2lkICovDQogICAgICAgIGludCBlcnI7DQogDQogICAg
-ICAgIGlmICh2bGFuX2lkID49IFZMQU5fVklEX01BU0spDQpAQCAtMjMyLDI2ICsyMzIsMjYgQEAg
-c3RhdGljIGludCByZWdpc3Rlcl92bGFuX2RldmljZShzdHJ1Y3QgbmV0X2RldmljZSAqcmVhbF9k
-ZXYsIHUxNiB2bGFuX2lkKQ0KICAgICAgICBzd2l0Y2ggKHZuLT5uYW1lX3R5cGUpIHsNCiAgICAg
-ICAgY2FzZSBWTEFOX05BTUVfVFlQRV9SQVdfUExVU19WSUQ6DQogICAgICAgICAgICAgICAgLyog
-bmFtZSB3aWxsIGxvb2sgbGlrZTogIGV0aDEuMDAwNSAqLw0KLSAgICAgICAgICAgICAgIHNucHJp
-bnRmKG5hbWUsIElGTkFNU0laLCAiJXMuJS40aSIsIHJlYWxfZGV2LT5uYW1lLCB2bGFuX2lkKTsN
-CisgICAgICAgICAgICAgICBzbnByaW50ZihuYW1lLCBzaXplb2YobmFtZSksICIlcy4lLjRpIiwg
-cmVhbF9kZXYtPm5hbWUsIHZsYW5faWQpOw0KICAgICAgICAgICAgICAgIGJyZWFrOw0KICAgICAg
-ICBjYXNlIFZMQU5fTkFNRV9UWVBFX1BMVVNfVklEX05PX1BBRDoNCiAgICAgICAgICAgICAgICAv
-KiBQdXQgb3VyIHZsYW4uVklEIGluIHRoZSBuYW1lLg0KICAgICAgICAgICAgICAgICAqIE5hbWUg
-d2lsbCBsb29rIGxpa2U6ICB2bGFuNQ0KICAgICAgICAgICAgICAgICAqLw0KLSAgICAgICAgICAg
-ICAgIHNucHJpbnRmKG5hbWUsIElGTkFNU0laLCAidmxhbiVpIiwgdmxhbl9pZCk7DQorICAgICAg
-ICAgICAgICAgc25wcmludGYobmFtZSwgc2l6ZW9mKG5hbWUpLCAidmxhbiVpIiwgdmxhbl9pZCk7
-DQogICAgICAgICAgICAgICAgYnJlYWs7DQogICAgICAgIGNhc2UgVkxBTl9OQU1FX1RZUEVfUkFX
-X1BMVVNfVklEX05PX1BBRDoNCiAgICAgICAgICAgICAgICAvKiBQdXQgb3VyIHZsYW4uVklEIGlu
-IHRoZSBuYW1lLg0KICAgICAgICAgICAgICAgICAqIE5hbWUgd2lsbCBsb29rIGxpa2U6ICBldGgw
-LjUNCiAgICAgICAgICAgICAgICAgKi8NCi0gICAgICAgICAgICAgICBzbnByaW50ZihuYW1lLCBJ
-Rk5BTVNJWiwgIiVzLiVpIiwgcmVhbF9kZXYtPm5hbWUsIHZsYW5faWQpOw0KKyAgICAgICAgICAg
-ICAgIHNucHJpbnRmKG5hbWUsIHNpemVvZihuYW1lKSwgIiVzLiVpIiwgcmVhbF9kZXYtPm5hbWUs
-IHZsYW5faWQpOw0KICAgICAgICAgICAgICAgIGJyZWFrOw0KICAgICAgICBjYXNlIFZMQU5fTkFN
-RV9UWVBFX1BMVVNfVklEOg0KICAgICAgICAgICAgICAgIC8qIFB1dCBvdXIgdmxhbi5WSUQgaW4g
-dGhlIG5hbWUuDQogICAgICAgICAgICAgICAgICogTmFtZSB3aWxsIGxvb2sgbGlrZTogIHZsYW4w
-MDA1DQogICAgICAgICAgICAgICAgICovDQogICAgICAgIGRlZmF1bHQ6DQotICAgICAgICAgICAg
-ICAgc25wcmludGYobmFtZSwgSUZOQU1TSVosICJ2bGFuJS40aSIsIHZsYW5faWQpOw0KKyAgICAg
-ICAgICAgICAgIHNucHJpbnRmKG5hbWUsIHNpemVvZihuYW1lKSwgInZsYW4lLjRpIiwgdmxhbl9p
-ZCk7DQogICAgICAgIH0NCiANCiAgICAgICAgbmV3X2RldiA9IGFsbG9jX25ldGRldihzaXplb2Yo
-c3RydWN0IHZsYW5fZGV2X3ByaXYpLCBuYW1lLA0KLS0gDQoyLjI1LjE=
+Am 19=2E Juni 2025 07:57:09 MESZ schrieb AngeloGioacchino Del Regno <angelo=
+gioacchino=2Edelregno@collabora=2Ecom>:
+>Il 16/06/25 11:58, Frank Wunderlich ha scritto:
+>> From: Frank Wunderlich <frank-w@public-files=2Ede>
+>>=20
+>
+>I think that this series is ready to be applied; however, I need someone =
+to take
+>the bindings before I can apply the devicetree part to the MediaTek trees=
+=2E
 
+Please wait a bit for the eth part=2E=2E=2Eseems like reserved irqs are no=
+t unusable as i thought=2E=2E=2Ei think we should upstream them too and may=
+be with different names=2E=2E=2Eas they are not fixed to function in hardwa=
+re=2E
 
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPkZyb206IFBlbmcgSmlhbmcgJmx0O2ppYW5nLnBl
-bmc5QHp0ZS5jb20uY24mZ3Q7PGJyPjwvcD48cD48YnI+PC9wPjxwPkJ1aWxkaW5nIHdpdGggVz0x
-IHRyaWdnZXJzIGZvcm1hdC10cnVuY2F0aW9uIHdhcm5pbmdzIGluIHRoZTwvcD48cD5yZWdpc3Rl
-cl92bGFuX2RldmljZSBmdW5jdGlvbiB3aGVuIGNvbXBpbGVkIHdpdGggR0NDIDEyLjMuMC48L3A+
-PHA+VGhlc2Ugd2FybmluZ3Mgb2NjdXIgZHVlIHRvIHRoZSB1c2Ugb2YgJWkgYW5kICUuNGkgZm9y
-bWF0PC9wPjxwPnNwZWNpZmllcnMgd2l0aCBhIGJ1ZmZlciBzaXplIHRoYXQgbWlnaHQgYmUgaW5z
-dWZmaWNpZW50PC9wPjxwPmZvciB0aGUgZm9ybWF0dGVkIHN0cmluZywgcG90ZW50aWFsbHkgY2F1
-c2luZyB0cnVuY2F0aW9uLjwvcD48cD48YnI+PC9wPjxwPlRoZSBvcmlnaW5hbCB3YXJuaW5nIHRy
-YWNlOjwvcD48cD5uZXQvODAyMXEvdmxhbi5jOjI0NzoxNzogbm90ZTogJ3NucHJpbnRmJyBvdXRw
-dXQgYmV0d2VlbiAzIGFuZCAyMiBieXRlcyBpbnRvIGEgZGVzdGluYXRpb24gb2Ygc2l6ZSAxNjwv
-cD48cD4yNDcgfCBzbnByaW50ZihuYW1lLCBJRk5BTVNJWiwgIiVzLiVpIiwgcmVhbF9kZXYtJmd0
-O25hbWUsIHZsYW5faWQpOzwvcD48cD48YnI+PC9wPjxwPlNpZ25lZC1vZmYtYnk6IFBlbmcgSmlh
-bmcgJmx0O2ppYW5nLnBlbmc5QHp0ZS5jb20uY24mZ3Q7PC9wPjxwPi0tLTwvcD48cD4mbmJzcDtu
-ZXQvODAyMXEvdmxhbi5jIHwgMTAgKysrKystLS0tLTwvcD48cD4mbmJzcDsxIGZpbGUgY2hhbmdl
-ZCwgNSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKTwvcD48cD48YnI+PC9wPjxwPmRpZmYg
-LS1naXQgYS9uZXQvODAyMXEvdmxhbi5jIGIvbmV0LzgwMjFxL3ZsYW4uYzwvcD48cD5pbmRleCAw
-NjkwOGUzN2MzZDkuLmYyYzE3MDM1ZjYyNSAxMDA2NDQ8L3A+PHA+LS0tIGEvbmV0LzgwMjFxL3Zs
-YW4uYzwvcD48cD4rKysgYi9uZXQvODAyMXEvdmxhbi5jPC9wPjxwPkBAIC0yMTcsNyArMjE3LDcg
-QEAgc3RhdGljIGludCByZWdpc3Rlcl92bGFuX2RldmljZShzdHJ1Y3QgbmV0X2RldmljZSAqcmVh
-bF9kZXYsIHUxNiB2bGFuX2lkKTwvcD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgc3Ry
-dWN0IHZsYW5fZGV2X3ByaXYgKnZsYW47PC9wPjxwPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyBzdHJ1Y3QgbmV0ICpuZXQgPSBkZXZfbmV0KHJlYWxfZGV2KTs8L3A+PHA+Jm5ic3A7ICZuYnNw
-OyAmbmJzcDsgJm5ic3A7IHN0cnVjdCB2bGFuX25ldCAqdm4gPSBuZXRfZ2VuZXJpYyhuZXQsIHZs
-YW5fbmV0X2lkKTs8L3A+PHA+LSZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwO2NoYXIgbmFtZVtJ
-Rk5BTVNJWl07PC9wPjxwPismbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDtjaGFyIG5hbWVbSUZO
-QU1TSVogKyA2XTsgLyogcGx1cyBleHRyYSA2IGJ5dGVzIGZvciB2bGFuX2lkICovPC9wPjxwPiZu
-YnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBpbnQgZXJyOzwvcD48cD4mbmJzcDs8L3A+PHA+Jm5i
-c3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGlmICh2bGFuX2lkICZndDs9IFZMQU5fVklEX01BU0sp
-PC9wPjxwPkBAIC0yMzIsMjYgKzIzMiwyNiBAQCBzdGF0aWMgaW50IHJlZ2lzdGVyX3ZsYW5fZGV2
-aWNlKHN0cnVjdCBuZXRfZGV2aWNlICpyZWFsX2RldiwgdTE2IHZsYW5faWQpPC9wPjxwPiZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBzd2l0Y2ggKHZuLSZndDtuYW1lX3R5cGUpIHs8L3A+PHA+
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGNhc2UgVkxBTl9OQU1FX1RZUEVfUkFXX1BMVVNf
-VklEOjwvcD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7IC8qIG5hbWUgd2lsbCBsb29rIGxpa2U6Jm5ic3A7IGV0aDEuMDAwNSAqLzwvcD48
-cD4tJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-O3NucHJpbnRmKG5hbWUsIElGTkFNU0laLCAiJXMuJS40aSIsIHJlYWxfZGV2LSZndDtuYW1lLCB2
-bGFuX2lkKTs8L3A+PHA+KyZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDtzbnByaW50ZihuYW1lLCBzaXplb2YobmFtZSksICIlcy4lLjRpIiwgcmVh
-bF9kZXYtJmd0O25hbWUsIHZsYW5faWQpOzwvcD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGJyZWFrOzwvcD48cD4mbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgY2FzZSBWTEFOX05BTUVfVFlQRV9QTFVTX1ZJRF9OT19QQUQ6PC9wPjxw
-PiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-LyogUHV0IG91ciB2bGFuLlZJRCBpbiB0aGUgbmFtZS48L3A+PHA+Jm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsqIE5hbWUgd2lsbCBs
-b29rIGxpa2U6Jm5ic3A7IHZsYW41PC9wPjxwPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAm
-bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7Ki88L3A+PHA+LSZuYnNwOyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDtzbnByaW50ZihuYW1lLCBJ
-Rk5BTVNJWiwgInZsYW4laSIsIHZsYW5faWQpOzwvcD48cD4rJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwO3NucHJpbnRmKG5hbWUsIHNpemVvZihu
-YW1lKSwgInZsYW4laSIsIHZsYW5faWQpOzwvcD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGJyZWFrOzwvcD48cD4mbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgY2FzZSBWTEFOX05BTUVfVFlQRV9SQVdfUExVU19WSURfTk9fUEFEOjwv
-cD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7IC8qIFB1dCBvdXIgdmxhbi5WSUQgaW4gdGhlIG5hbWUuPC9wPjxwPiZuYnNwOyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7KiBOYW1lIHdp
-bGwgbG9vayBsaWtlOiZuYnNwOyBldGgwLjU8L3A+PHA+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsqLzwvcD48cD4tJm5ic3A7ICZu
-YnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwO3NucHJpbnRmKG5h
-bWUsIElGTkFNU0laLCAiJXMuJWkiLCByZWFsX2Rldi0mZ3Q7bmFtZSwgdmxhbl9pZCk7PC9wPjxw
-PismbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-c25wcmludGYobmFtZSwgc2l6ZW9mKG5hbWUpLCAiJXMuJWkiLCByZWFsX2Rldi0mZ3Q7bmFtZSwg
-dmxhbl9pZCk7PC9wPjxwPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgYnJlYWs7PC9wPjxwPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBj
-YXNlIFZMQU5fTkFNRV9UWVBFX1BMVVNfVklEOjwvcD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAm
-bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IC8qIFB1dCBvdXIgdmxhbi5WSUQgaW4g
-dGhlIG5hbWUuPC9wPjxwPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7KiBOYW1lIHdpbGwgbG9vayBsaWtlOiZuYnNwOyB2bGFuMDAw
-NTwvcD48cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOyovPC9wPjxwPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBkZWZhdWx0
-OjwvcD48cD4tJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwO3NucHJpbnRmKG5hbWUsIElGTkFNU0laLCAidmxhbiUuNGkiLCB2bGFuX2lkKTs8L3A+
-PHA+KyZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDtzbnByaW50ZihuYW1lLCBzaXplb2YobmFtZSksICJ2bGFuJS40aSIsIHZsYW5faWQpOzwvcD48
-cD4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgfTwvcD48cD4mbmJzcDs8L3A+PHA+Jm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7IG5ld19kZXYgPSBhbGxvY19uZXRkZXYoc2l6ZW9mKHN0cnVj
-dCB2bGFuX2Rldl9wcml2KSwgbmFtZSw8L3A+PHA+LS0mbmJzcDs8L3A+PHA+Mi4yNS4xPC9wPjxw
-IHN0eWxlPSJmb250LXNpemU6MTRweDtmb250LWZhbWlseTrlvq7ova/pm4Xpu5EsTWljcm9zb2Z0
-IFlhSGVpOyI+PGJyPjwvcD48cCBzdHlsZT0iZm9udC1zaXplOjE0cHg7Zm9udC1mYW1pbHk65b6u
-6L2v6ZuF6buRLE1pY3Jvc29mdCBZYUhlaTsiPjxicj48L3A+PHAgc3R5bGU9ImZvbnQtc2l6ZTox
-NHB4O2ZvbnQtZmFtaWx5OuW+rui9r+mbhem7kSxNaWNyb3NvZnQgWWFIZWk7Ij48YnI+PC9wPjxw
-IHN0eWxlPSJmb250LXNpemU6MTRweDtmb250LWZhbWlseTrlvq7ova/pm4Xpu5EsTWljcm9zb2Z0
-IFlhSGVpOyI+PGJyPjwvcD48L2Rpdj4=
+>Cheers,
+>Angelo
+>
+>
+>> This series continues mt7988 devicetree work
+>>=20
+>> - Extend cpu frequency scaling with CCI
+>> - GPIO leds
+>> - Basic network-support (ethernet controller + builtin switch + SFP Cag=
+es)
+>>=20
+>> depencies (i hope this list is complete and latest patches/series linke=
+d):
+>>=20
+>> support interrupt-names because reserved IRQs are now dropped, so index=
+ based access is now wrong
+>> https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/20250616080738=
+=2E117993-2-linux@fw-web=2Ede/
+>>=20
+>> for SFP-Function (macs currently disabled):
+>>=20
+>> PCS clearance which is a 1=2E5 year discussion currently ongoing
+>>=20
+>> e=2Eg=2E something like this (one of):
+>> * https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/202506102331=
+34=2E3588011-4-sean=2Eanderson@linux=2Edev/ (v6)
+>> * https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/202505112012=
+50=2E3789083-4-ansuelsmth@gmail=2Ecom/ (v4)
+>> * https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/ba4e359584a6=
+b3bc4b3470822c42186d5b0856f9=2E1721910728=2Egit=2Edaniel@makrotopia=2Eorg/
+>>=20
+>> full usxgmii driver:
+>> https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/07845ec900ba41=
+ff992875dce12c622277592c32=2E1702352117=2Egit=2Edaniel@makrotopia=2Eorg/
+>>=20
+>> first PCS-discussion is here:
+>> https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/8aa905080bdb67=
+60875d62cb3b2b41258837f80e=2E1702352117=2Egit=2Edaniel@makrotopia=2Eorg/
+>>=20
+>> and then dts nodes for sgmiisys+usxgmii+2g5 firmware
+>>=20
+>> when above depencies are solved the mac1/2 can be enabled and 2=2E5G ph=
+y/SFP slots will work=2E
+>>=20
+>> changes:
+>> v4:
+>>    net-binding:
+>>      - allow interrupt names and increase max interrupts to 6 because o=
+f RSS/LRO interrupts
+>>        (dropped Robs RB due to this change)
+>>=20
+>>    dts-patches:
+>>    - add interrupts for RSS/LRO and interrupt-names for ethernet node
+>>    - eth-reg and clock whitespace-fix
+>>    - comment for fixed-link on gmac0
+>>    - drop phy-mode properties as suggested by andrew
+>>    - drop phy-connection-type on 2g5 board
+>>    - reorder some properties
+>>    - update 2g5 phy node
+>>      - unit-name dec instead of hex to match reg property
+>>      - move compatible before reg
+>>      - drop phy-mode
+>>=20
+>> v3:
+>>    - dropped patches already applied (SPI+thermal)
+>>    - added soc specific cci compatible (new binding patch + changed dts=
+)
+>>    - enable 2g5 phy because driver is now merged
+>>    - add patch for cleaning up unnecessary pins
+>>    - add patch for gpio-leds
+>>    - add patch for adding ethernet aliases
+>>=20
+>> v2:
+>>    - change reg to list of items in eth binding
+>>    - changed mt7530 binding:
+>>      - unevaluatedProperties=3Dfalse
+>>      - mediatek,pio subproperty
+>>      - from patternProperty to property
+>>    - board specific properties like led function and labels moved to bp=
+i-r4 dtsi
+>>=20
+>>=20
+>> Frank Wunderlich (13):
+>>    dt-bindings: net: mediatek,net: update for mt7988
+>>    dt-bindings: net: dsa: mediatek,mt7530: add dsa-port definition for
+>>      mt7988
+>>    dt-bindings: net: dsa: mediatek,mt7530: add internal mdio bus
+>>    dt-bindings: interconnect: add mt7988-cci compatible
+>>    arm64: dts: mediatek: mt7988: add cci node
+>>    arm64: dts: mediatek: mt7988: add basic ethernet-nodes
+>>    arm64: dts: mediatek: mt7988: add switch node
+>>    arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
+>>    arm64: dts: mediatek: mt7988a-bpi-r4: drop unused pins
+>>    arm64: dts: mediatek: mt7988a-bpi-r4: add gpio leds
+>>    arm64: dts: mediatek: mt7988a-bpi-r4: add aliases for ethernet
+>>    arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and link to gmac
+>>    arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
+>>=20
+>>   =2E=2E=2E/bindings/interconnect/mediatek,cci=2Eyaml   |  11 +-
+>>   =2E=2E=2E/bindings/net/dsa/mediatek,mt7530=2Eyaml     |  24 +-
+>>   =2E=2E=2E/devicetree/bindings/net/mediatek,net=2Eyaml |  28 +-
+>>   =2E=2E=2E/mediatek/mt7988a-bananapi-bpi-r4-2g5=2Edts  |  11 +
+>>   =2E=2E=2E/dts/mediatek/mt7988a-bananapi-bpi-r4=2Edts  |  19 ++
+>>   =2E=2E=2E/dts/mediatek/mt7988a-bananapi-bpi-r4=2Edtsi | 198 ++++++---=
+--
+>>   arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi     | 307 +++++++++++++++=
+++-
+>>   7 files changed, 498 insertions(+), 100 deletions(-)
+>>=20
+>
+>
 
 
---=====_003_next=====--
-
---=====_002_next=====--
-
---=====_001_next=====--
-
+regards Frank
 
