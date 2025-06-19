@@ -1,99 +1,102 @@
-Return-Path: <netdev+bounces-199386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B300AE01D1
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:38:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5BCAE01FB
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 11:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D18BE3A3E1E
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:38:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 375497AF415
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 09:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1E121CC79;
-	Thu, 19 Jun 2025 09:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A6A21D5BD;
+	Thu, 19 Jun 2025 09:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGck4IyE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKt1VgKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E361D9A54;
-	Thu, 19 Jun 2025 09:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A35521B9C0;
+	Thu, 19 Jun 2025 09:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750325907; cv=none; b=F+QUl+yw40t5o8inn7CRB4MvZ7/kJUXCEPKs71uZI3/X2d8EZ4FtlHrBpniaVCzx1irV6719dmwtfwSgHWavO9DuMHq/ADYZSdCxHk1AQGCkohnjKYJvBPa/lZHocrFyNpnl4Mh0EGLskdBCW8bCoh9NpPTkHvwFJgoNKv35u7o=
+	t=1750326426; cv=none; b=Ir+3VBuA7HZyYX5rtKzNcnMmipCge7zd//qCu0+f7WoeYFLLdNz82lnU0tOzoTrDWfDnDBGEc8TvlcFumMjgfV634D++cbIXvQlRkqqMqoMe7xNuVQidRXI5dj11so+InSR5OJDtcgXU9KSiWOCMBL6SsICW1vYA7xagyyTttGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750325907; c=relaxed/simple;
-	bh=KLKRYvVaEBlMMIwnNFT9MCa4uPrERj6jrU+CDNwkM8Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pOTmz+gjg5jnojSixPZgejK/HtRPm4dkGfoSqcABWMW5jlvEq7hb1RjRb3qiQ06M1oo1gHSmHvZDBKJ/NL+gE6z2AUz+oYHEiCrPKKIK+pVqbgh2zuMwfwEPgxHPFAJ9wqe8ZLozxir8e4JfaKJiZ3k4nliWo3GrDrlgoTCRzvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WGck4IyE; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1750326426; c=relaxed/simple;
+	bh=jo4S4oP37pMlRWEMLh1A4wsCbWwOGpq0aSS3GjoaWMQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s7kqdneMVA2R7khvFzf07/P2oYUeaq520qFqvPq7gbP4G8ENJ8aImyO6zmBwvvXpi+hEdMG0kyrMVLFDD2rU/HozulMpl2Dh7LwOJCVwekSq16Yi67kvktDUEkWY2qZxKNtl0lQ7JsWtM+8jBJg3W+qa9W7CY+n5U1Hv4vhtgIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKt1VgKE; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7425bd5a83aso434655b3a.0;
-        Thu, 19 Jun 2025 02:38:25 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a4e62619afso81253f8f.1;
+        Thu, 19 Jun 2025 02:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750325905; x=1750930705; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750326423; x=1750931223; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PinCl0B0GdBzlEv7WwLDggwxT66ZmaTkkrZuqcrKs+Y=;
-        b=WGck4IyEf+5U51t5ZfXmAw/Ul4Br3iOeyjPkrPduzIMDTYDF6v+e5GYv9HnZjUPkdl
-         gowlwjipKtZCKgNLtZeeBdZ3LVuswhs3e1qNpttnZhn6M7z6UIRXPeQG1DZ9DgGarFY2
-         gcSJKeZhpjP0vo8YinQGJUbaXymUxIUFHvS0Lb0ec1ep1/DWkJdbnwpxttYPVtQyc31d
-         rA+Q+rbGwvRsze/2mYBzUurkI10w/E2nrpigFZntZd/wExn446J4PnnLBQ4OU1h6axHP
-         DJZvM6mU43nQ/XGwtx9sL4nQw4ISJQGbFtYbYqXis1bZdPzr7HC8+zCjZcga26qDtpXZ
-         gETA==
+        bh=3wpyHDstt56CkQjT7Xqq7Dy0LffgxF5WyMGLP3dXWQc=;
+        b=RKt1VgKEWiMgG7Ln7HQGPWN9fCRpkDYYda89yqwmpbEzRNtCGjYmwfsrIZpE1rsSkz
+         LQ+IEPYUrM1qwIaXa8jOgSCy8WG6PZmtJIJDPP+HmU406pMPviyBmN7nt/L/ZO0q+mEI
+         pEPc0ZKTkgEQUqoivQFZhiFqh6EzibIgtlKkfrizOcEAZxClqa6f3NCuRaWBBome8Ula
+         81mqO5xuOvvTnwQVilu3TeFkn4nyHLQavMVPSaDiJjyzntP6Csz1aBX1rzj383rkf9Jt
+         tpMbmOvn6wHWe0sMAsLoaRWP9u9DOCxje1rnnCyXVpDac5fFGt0MOgQzafMrwY4bsmyi
+         NpYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750325905; x=1750930705;
+        d=1e100.net; s=20230601; t=1750326423; x=1750931223;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PinCl0B0GdBzlEv7WwLDggwxT66ZmaTkkrZuqcrKs+Y=;
-        b=InWXC59pWyj6Unp5BvErMfB2lCi0LaFk31NGvkarYsH0u6aavVfmfDCYjc8TCG3Y7V
-         6JKOv92W+05l1Q6MWlDiWrkUwaJKavJQ5XcgxxeG25BeeQaQj5MG7YDcTQ3N28yKvWGp
-         ji208EmcqPTVKw+H1GoZTxaWFmrTHtAvs7Y87Qs1zyRJysMYS/t5ExMGtrQOAFiQaGmR
-         40WEjGO9CuKFsVLvveSJtj+q2+ZjV7pWA4CZG6BYCnBoiMthVPExYG8DKK8qA7RdcKki
-         qFYL6Yur6gYUYk6DY5pEcePBRRRvU9H2nFG/wpgBrqcbumU6G0DdHG3EItrr/5MIGmGF
-         5Ckg==
-X-Forwarded-Encrypted: i=1; AJvYcCX9wwumZoycx779uS+s8iY35YHie45eQhtS9BkUzWnexDQuKQBafw1q/LXlzTjpUDkugism3dw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlP7t084iOh5o1aOVRhLUZyjOhlmM3k0V81mJiRB85BlGTfz7a
-	ZF9qIavaY0NzFig0o6VipdNV0sqXiCgXVKm0udHatZejWWBj001HrYZE
-X-Gm-Gg: ASbGncsl/ygpK/1tgym0VJyXK2fo07AWjPinlXcnP2kJTSNTPAWgXsseG+wlNopKlv5
-	9bjzlv5/Vc89smgOg0hJLuCGYCSqSN8iEdI1zGds8vU+Nv5SAFsEgx9TE9xTFkciSRvEftXae/n
-	BmUTEGghZvs82FuT0oHxwLECx8y5DoXTjWB/r2ZRXIi4eCirC6P+ta8XyLs8TsCFAJM/FIdUBqD
-	4WY1upk6Gu4Mm93w2Wb1CLdgd53SiRUCVQFRRbfWYW/kjoSp/u5nQ0WqtZHKB9vSPQGSW8i7rz2
-	gT/Rop83GS/Uyqc882ifv9lD3NvHjaf8yHfASzuhGYvzHdTI8+3PxwiU27eO0E/wyx5q09l84zC
-	trELcGtwFiPVIOKTMhSnHQHH3nAoTzNJ7Hg==
-X-Google-Smtp-Source: AGHT+IHG6jT+kJ7Yzc1ajmMNbCHMwqzlSFbQg8gVUuYFTMiCxTB6FO9Ehvq8rUigAQcoiyB5oDVO+Q==
-X-Received: by 2002:a05:6a20:e609:b0:216:1ea0:a526 with SMTP id adf61e73a8af0-21fbd5ddde0mr35713387637.40.1750325905045;
-        Thu, 19 Jun 2025 02:38:25 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7489000749csm13241453b3a.68.2025.06.19.02.38.21
+        bh=3wpyHDstt56CkQjT7Xqq7Dy0LffgxF5WyMGLP3dXWQc=;
+        b=fMezlSQn/ksKuPIcmnLmyVfQDsgae3JbSjPoAv+qjZG9APO6yDTAkfg4HhUP/gTsyW
+         LWHbj4pxr85LVNRZIAXJS4O4v112uBmreRrTcZPWfhh3YVJDgkhHQh/Rd0ribhRFtZ8r
+         NwkHWFXmKesKjTDDXSLpNg4vRfAJQjCXn+nEyYJEcd5eu7znaiNiebHVOPS1k84iivUn
+         dA6MA6bquJEoNSIopTy87pLTaD3S7llORsLs2UtPyY+mv3uUDiQu8zQffkSFxg9dpvml
+         mTxmhC5hluYRUxIId/tFb74fVmllGb2zM2qJjyASi12MqBOMhEumdmnisPinrjsFyqtH
+         DYmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVWeMD9u/YCE4R1fjb7pb1dM17IVUdh04jkKRnRqDQWlmhi8S0BUtCqjw1R7Cgm/oZmtHH98RpB80/omx+N@vger.kernel.org, AJvYcCVysFgtO5Z2d2fP8N7gTqs7g0OE9HCWxi1e8KUyH693wcSQ5XRen7/bx/+K91nH5Ou+JOIAC4Y2@vger.kernel.org, AJvYcCWt96fDRKxNfqNpPMZYW8xdthQ+uVb3pLb3lTczzxl6W1CLWliZJqnKaToNVbno4vV5z80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXyW77sLlR7FM3U4n0X9vlBig7IwhIoE3/mpuQXi/avzdlm61K
+	TGj4QVIWFCUdIDTxcKDWHpRI1q5j3V9etb1OY5XffwupNzQIWde9CLm7
+X-Gm-Gg: ASbGnctUQuyjGucFZXaa9OX+r0RZksgx8ugDlxN6gTO6KdVsfW44UBGrJyayePGgpHJ
+	j783nBGue+8YipTcxhYnlTW9HlwJNIEcVItu6U1M6fqcCJby8eqGxnzOEDRANAt5tVllDdQxdub
+	yxk3AKmJb5k/xwfZ5/Azwr0TIcc8m23h5nbj+66yVY5HWPLI75jNsvyHNH1/3UcM0z3zJL+q/hd
+	W/owQjzBtV3IPSidFSxWG6xPNOyKQmbE8TC+BJNCqTLV/LUAsbnG71n+/Dy7reBhf0ToOgQQgH1
+	xZUt5jQIpa+J/ehJGtTWgo7a8TH3FnF4zbnhV4++dFNsUBSE+/YHnR7KWdDX2VsJspewb5Sh4J/
+	KH4/TQv+ptLZg60RBmLLTSvAAuW385BLi9Xt2/OFyl0/ZvOZy3udQtmCDcNnmaYM8hpS0g9ZuXd
+	o=
+X-Google-Smtp-Source: AGHT+IEpqro60YlzzzeszDwSvToDBSiVTr/feKFQAwvdfZL6g25ljawMqwhjbgmAVFDKx/RglSW7ng==
+X-Received: by 2002:a05:6000:1789:b0:3a5:324a:9bd with SMTP id ffacd0b85a97d-3a585f2ec3emr3358471f8f.2.1750326423230;
+        Thu, 19 Jun 2025 02:47:03 -0700 (PDT)
+Received: from thomas-precision3591.home (2a01cb00014ec3008c7e3874bfd786a1.ipv6.abo.wanadoo.fr. [2a01:cb00:14e:c300:8c7e:3874:bfd7:86a1])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a568b089b5sm18825847f8f.48.2025.06.19.02.47.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 02:38:24 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joe@dama.to,
-	willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
+        Thu, 19 Jun 2025 02:47:02 -0700 (PDT)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Taehee Yoo <ap420073@gmail.com>,
 	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next] net: xsk: update tx queue consumer immdiately after transmission
-Date: Thu, 19 Jun 2025 17:36:41 +0800
-Message-Id: <20250619093641.70700-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net v3] ethernet: ionic: Fix DMA mapping tests
+Date: Thu, 19 Jun 2025 11:45:30 +0200
+Message-ID: <20250619094538.283723-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,43 +105,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kernelxing@tencent.com>
+Change error values of `ionic_tx_map_single()` and `ionic_tx_map_frag()`
+from 0 to `DMA_MAPPING_ERROR` to prevent collision with 0 as a valid
+address.
 
-For afxdp, the return value of sendto() syscall doesn't reflect how many
-descs handled in the kernel. One of use cases is that when user-space
-application tries to know the number of transmitted skbs and then decides
-if it continues to send, say, is it stopped due to max tx budget?
+This also fixes the use of `dma_mapping_error()` to test against 0 in
+`ionic_xdp_post_frame()`
 
-The following formular can be used after sending to learn how many
-skbs/descs the kernel takes care of:
-
-  tx_queue.consumers_before - tx_queue.consumers_after
-
-Prior to the current patch, the consumer of tx queue is not immdiately
-updated at the end of each sendto syscall, which leads the consumer
-value out-of-dated from the perspective of user space. So this patch
-requires store operation to pass the cached value to the shared value
-to handle the problem.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+Fixes: 56e41ee12d2d ("ionic: better dma-map error handling")
+Fixes: ac8813c0ab7d ("ionic: convert Rx queue buffers to use page_pool")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 ---
- net/xdp/xsk.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 7c47f665e9d1..3288ab2d67b4 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -856,6 +856,8 @@ static int __xsk_generic_xmit(struct sock *sk)
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+index 2ac59564ded1..d10b58ebf603 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+@@ -321,7 +321,7 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
+ 					   len, DMA_TO_DEVICE);
+ 	} else /* XDP_REDIRECT */ {
+ 		dma_addr = ionic_tx_map_single(q, frame->data, len);
+-		if (!dma_addr)
++		if (dma_addr == DMA_MAPPING_ERROR)
+ 			return -EIO;
  	}
  
- out:
-+	__xskq_cons_release(xs->tx);
-+
- 	if (sent_frame)
- 		if (xsk_tx_writeable(xs))
- 			sk->sk_write_space(sk);
+@@ -357,7 +357,7 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
+ 			} else {
+ 				dma_addr = ionic_tx_map_frag(q, frag, 0,
+ 							     skb_frag_size(frag));
+-				if (dma_mapping_error(q->dev, dma_addr)) {
++				if (dma_addr == DMA_MAPPING_ERROR) {
+ 					ionic_tx_desc_unmap_bufs(q, desc_info);
+ 					return -EIO;
+ 				}
+@@ -1083,7 +1083,7 @@ static dma_addr_t ionic_tx_map_single(struct ionic_queue *q,
+ 		net_warn_ratelimited("%s: DMA single map failed on %s!\n",
+ 				     dev_name(dev), q->name);
+ 		q_to_tx_stats(q)->dma_map_err++;
+-		return 0;
++		return DMA_MAPPING_ERROR;
+ 	}
+ 	return dma_addr;
+ }
+@@ -1100,7 +1100,7 @@ static dma_addr_t ionic_tx_map_frag(struct ionic_queue *q,
+ 		net_warn_ratelimited("%s: DMA frag map failed on %s!\n",
+ 				     dev_name(dev), q->name);
+ 		q_to_tx_stats(q)->dma_map_err++;
+-		return 0;
++		return DMA_MAPPING_ERROR;
+ 	}
+ 	return dma_addr;
+ }
+@@ -1116,7 +1116,7 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
+ 	int frag_idx;
+ 
+ 	dma_addr = ionic_tx_map_single(q, skb->data, skb_headlen(skb));
+-	if (!dma_addr)
++	if (dma_addr == DMA_MAPPING_ERROR)
+ 		return -EIO;
+ 	buf_info->dma_addr = dma_addr;
+ 	buf_info->len = skb_headlen(skb);
+@@ -1126,7 +1126,7 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
+ 	nfrags = skb_shinfo(skb)->nr_frags;
+ 	for (frag_idx = 0; frag_idx < nfrags; frag_idx++, frag++) {
+ 		dma_addr = ionic_tx_map_frag(q, frag, 0, skb_frag_size(frag));
+-		if (!dma_addr)
++		if (dma_addr == DMA_MAPPING_ERROR)
+ 			goto dma_fail;
+ 		buf_info->dma_addr = dma_addr;
+ 		buf_info->len = skb_frag_size(frag);
 -- 
-2.43.5
+2.43.0
 
 
