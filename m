@@ -1,46 +1,49 @@
-Return-Path: <netdev+bounces-199292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82FB8ADFADF
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 03:41:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999D6ADFB0C
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 03:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ADD45A0814
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 01:40:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4171D3B5059
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 01:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C841DB92C;
-	Thu, 19 Jun 2025 01:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F71521B8F7;
+	Thu, 19 Jun 2025 01:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IpXJqfyf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MY4Piz6+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4742913B58B;
-	Thu, 19 Jun 2025 01:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022D3137932;
+	Thu, 19 Jun 2025 01:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750297230; cv=none; b=aIN7yLI1jQLEkrkFYWWuV+y7/jZGC+t0BsxensJ3HhNJBxdsU/fc00v0P2vULTbZdMyAFEINhnspRD+HEHBZwKR2sCDN2n39XioVorEin9IptfklxTxEAjCkOerTlMaRZtwOhTPKHBBYVNUXiavUHWGTyy2qM84KWHaVRyDB/L0=
+	t=1750298379; cv=none; b=f97+IfJZWUvFat7hxkUKveBM5LBPnzO59VhjsE3YGBjeL2pwtHiRZbHzmSarAITYHZ3dvwc4OEVYX/d+BGoW1aUn7Pg+W0YfwKJSdUPKJBUCDeY91Vc6s6jIYLjQRmTO/b+lyDsDtIVrBS8Qh4GueICdSTs/E3pfEX3QrEaXRL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750297230; c=relaxed/simple;
-	bh=SvpJaLgxZ01hhEyPBK7m+g0OO/xO6+1O9tYOQcbbOzA=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=rinM9h6c2u6d3HMEVLVGNDUvjC9wKDfXP3C92bV+SHFA5RRxgSqjg+ySv8h22+UfOiinhmIXJSn+xcmBzqzHbgbHcYhACYgDIh5rxjQfT8YRAvDeq9QhtPs/ZW0JyYbifwrEU7UeA1SL40G50zRzliltBEtYQkmYiU9Yehawsxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IpXJqfyf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A610AC4CEE7;
-	Thu, 19 Jun 2025 01:40:29 +0000 (UTC)
+	s=arc-20240116; t=1750298379; c=relaxed/simple;
+	bh=khrqJTYzLiyC8cYk0kH+2VMCEQnQ/rTVvh2Vw4TXnC8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Wgu8HYkISTdx78OyeYyYO1DvOV7dFwDwqICz+HdyOGSMsaSDR/s87ySr4DCKXTaQnnYWWZ/tSAmSSnpL0sNuvWbeqJaAWwiNgVQtCONLr94ZO6pNTIARD0zHXWu4lr7GaM4JKOGgblcx80yS1JNNeKp9HciovNCYRSYOwlaxQfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MY4Piz6+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81B4EC4CEE7;
+	Thu, 19 Jun 2025 01:59:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750297229;
-	bh=SvpJaLgxZ01hhEyPBK7m+g0OO/xO6+1O9tYOQcbbOzA=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=IpXJqfyfPrj+58MPxmgcnMA3cRgcvyJEh8E4R5kq80Z+oDRAVyInhWgDU9FykbD5J
-	 ry50fE6U0iAJWoK+RdyXZ9WLoBxaqcYOZ+2ckm6g77fkQTK7XjjLnyvkMlSWJAP1+c
-	 zTBeV8mEajEq5L6kf6lYKvO9sGARGN0X+YqpCUnGURNrMnOwXH0NfGL6O/V26iWtrp
-	 WzjGw3/ARoHUROUr3WpLOwjSblgqoK1PwJDvcNPuOkflBePl35+w+GBc99iMLvhwKC
-	 YtZAaMoZZnvm+vBggQWxqiVsrHew4KT58S31/uOcP0QFeYuFZQJAcECBPn8s8fG+7U
-	 Z3OKQG1j4klEg==
+	s=k20201202; t=1750298378;
+	bh=khrqJTYzLiyC8cYk0kH+2VMCEQnQ/rTVvh2Vw4TXnC8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MY4Piz6+HC1N/Se0ZBfxQ8eaLBuV9NMuHW4UhNfHesUcGbGv/K4FmWtbbclNvC4Fh
+	 JoV8Bj8cvdIgTpqp2DLMo7EUifSzAM2S6lufdqJbhfg1pKKCztPvSl7FBYMxM32eIG
+	 LHVGm7/QhPklda6FtG5QiEbbfLvV19riJLTGdZNvdYUGQYx+YReYdUsQzQo+jFzCLf
+	 Js2OVXYIVt3osjvclMt5euHyxvBT8suDbHjeST6JCckWsHoYxbIWxKMV0MxqE6vvbw
+	 Yd3MRS9HApMVrfMRS+02Z0L80xnWaPqxLrnr/pYJV1iG1XAsdaGRjbCFQmlwrxrCBs
+	 QoEpLm++OXDNA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB00B3806649;
+	Thu, 19 Jun 2025 02:00:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -48,23 +51,44 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250521210813.61484-1-robh@kernel.org>
-References: <20250521210813.61484-1-robh@kernel.org>
-Subject: Re: [PATCH] dt-bindings: clock: Convert marvell-armada-370-gating-clock to DT schema
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-To: Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>, Gregory Clement <gregory.clement@bootlin.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Richard Cochran <richardcochran@gmail.com>, Rob Herring (Arm) <robh@kernel.org>
-Date: Wed, 18 Jun 2025 18:40:28 -0700
-Message-ID: <175029722892.4372.16473400898661004974@lazor>
-User-Agent: alot/0.11
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v2] bpf: lru: adjust free target to avoid global table
+ starvation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175029840650.320658.8717699321491832494.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 02:00:06 +0000
+References: <20250618215803.3587312-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250618215803.3587312-1-willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com, martin.lau@linux.dev,
+ stfomichev@gmail.com, a.s.protopopov@gmail.com, willemb@google.com
 
-Quoting Rob Herring (Arm) (2025-05-21 14:08:11)
-> Convert the Marvell gating clock binding to DT schema format. It's a
-> straight forward conversion.
->=20
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
+Hello:
 
-Applied to clk-next
+This patch was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Wed, 18 Jun 2025 17:57:40 -0400 you wrote:
+> From: Willem de Bruijn <willemb@google.com>
+> 
+> BPF_MAP_TYPE_LRU_HASH can recycle most recent elements well before the
+> map is full, due to percpu reservations and force shrink before
+> neighbor stealing. Once a CPU is unable to borrow from the global map,
+> it will once steal one elem from a neighbor and after that each time
+> flush this one element to the global list and immediately recycle it.
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf,v2] bpf: lru: adjust free target to avoid global table starvation
+    https://git.kernel.org/bpf/bpf/c/d4adf1c9ee77
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
