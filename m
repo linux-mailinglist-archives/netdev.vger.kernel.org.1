@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8613EAE0FF4
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22EC7AE0FF6
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 01:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DBB44A29AD
-	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:20:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3EB04A2712
+	for <lists+netdev@lfdr.de>; Thu, 19 Jun 2025 23:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7A928DF0F;
-	Thu, 19 Jun 2025 23:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9943628DF42;
+	Thu, 19 Jun 2025 23:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JYwjyQVa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alyKC85k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFAD225797
-	for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 23:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686B028DF3B;
+	Thu, 19 Jun 2025 23:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750375197; cv=none; b=SSPQYoa4J+f/5jMZE+AVUpbwDW2ad9rWY287PYXxuRwvIZYOHx5bkZAq/PqIVYZt31DvNhMFu/fgbD3fi/s3l7d3jJwHsB//EW3BRu44M14FEMQPm7HktM9TvXe1/Va6cxdSOzou3bsBPyl25Uc7mn/ZerzE8UtsNBvUZhsJ7HU=
+	t=1750375198; cv=none; b=pNqXI7XZvsptcI1VyYssz25hvgZ3EFYrLKN0JVdEnPLJyrHbKSLIIuskkGV5y8JzV/hyKT3O4EK9cwoWhnJlJo/L2m5UUHoCTYyXavSus4TsS4TWfXcUBIJ3aTDV1Ivx6cylPXuA6MTR6Q9Stwz1wbmDkmsIceW6oUmbTjqLAuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750375197; c=relaxed/simple;
-	bh=crbSgwAxruSL33sCUTYg7CFLR8H0mDnh/ClFnN3Pn8E=;
+	s=arc-20240116; t=1750375198; c=relaxed/simple;
+	bh=vebIs/UoufwnNP8MVgPAlX9dhRYxs9Loe44ZLFLYVlc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=g5f9iwnfvpHr9WIL9Ug6VT1WuCq4RD6fAc8lwcgqImpqfTsUUhN3vG08+OrFee0W04fm1wj5p7GlZp1wV7fgk/HJRrWNvVXEfQC605bXjYksYZB/hkGDNPI8OLJEUYSHszHgK0ouTNkg7ZAeyltYfm1Oei8StR1jJMgL0EqCBU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JYwjyQVa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE4BC4CEEA;
-	Thu, 19 Jun 2025 23:19:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lTOdSrw24B8wyqOMRqaVoz8RjTVMLaAoxDwkD7gXFPAckRgUa1cd7y1Tga9mxIzf8bWurGVJeJ39D2fe2GKXGMWKFmlSV6m3ajoIFSct+fVzeG/+0k+t6hFz2oTFOqw3yrSxDfNVeUIy4Vo9qFT3lHY7yVdmw2xvI7os7wHsM1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alyKC85k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D5AC4CEF0;
+	Thu, 19 Jun 2025 23:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750375196;
-	bh=crbSgwAxruSL33sCUTYg7CFLR8H0mDnh/ClFnN3Pn8E=;
+	s=k20201202; t=1750375198;
+	bh=vebIs/UoufwnNP8MVgPAlX9dhRYxs9Loe44ZLFLYVlc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JYwjyQValxbWM7Z34eFOAfG3IH4tbWwt1MGuTm5tDU8xcXJ81cB0ZEvy1mkhuBPpw
-	 lHqvB2PaZ5kvFJBNzm6eJxrQXn3n84sL9qmeD2HXkSxWTRbOyuMsqYhwreaTf7qqKt
-	 f6nNxC4JxgledCY854/pdgzeq6gMv+4P+vYScV0WpnwBRgKEckTNc45vM0rxWC2S+t
-	 BMtkhQ7yEgRsMdrSM+Z6Q4MpeG34yHAK+Mv4XxHGSZW8SDZoa6l6rbJQa5sYbkTE9G
-	 QYGxj+Q0ub+f6inj9SLM3XcVsrVCglknCF4sDAAdonWIM7WER6AlJlHm89bUCWp/xB
-	 hzG1L8ZMugO6g==
+	b=alyKC85ku1caXXj/QcgvZixFReJHQFGjGyv6wv/H1yY58aa4yeFaHYU29EMIQQz/4
+	 NHA30u/Zk7Wdm6wNHmSYJnXdCN87VIFlOwS8+YmUGR50D7OgtVhlHx2kyNVdkVTEyB
+	 CbW/26D6kL1U7W1EdiJMwCwbh1yXpWKdTPgqhzxGOY60l64IFCqb3K8e1bjRnXpgZN
+	 /teLssqz9wfWmWVJCHUAYka1mXujb2GFVqq8olYQ7K9K+9st1U4D3eNQ/0ZX5cuqfI
+	 yqQboEu6818rZflq/crTGe4OqI88RriARiJLj3TPFm4+M3DaO9+2+rsagnCuJwUq8w
+	 iZ6SEGaywy7ug==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD7338111DD;
-	Thu, 19 Jun 2025 23:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C5038111DD;
+	Thu, 19 Jun 2025 23:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] neighbour: add support for NUD_PERMANENT
- proxy
- entries
+Subject: Re: [PATCH net-next v4 0/4] netdevsim: implement RX statistics using
+ NETDEV_PCPU_STAT_DSTATS
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175037522424.1016629.372655192167116510.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Jun 2025 23:20:24 +0000
-References: <20250617141334.3724863-1-nico.escande@gmail.com>
-In-Reply-To: <20250617141334.3724863-1-nico.escande@gmail.com>
-To: Nicolas Escande <nico.escande@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- decot+git@google.com, kuniyu@google.com, gnaaman@drivenets.com
+ <175037522573.1016629.13558361368033224988.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Jun 2025 23:20:25 +0000
+References: <20250618-netdevsim_stat-v4-0-19fe0d35e28e@debian.org>
+In-Reply-To: <20250618-netdevsim_stat-v4-0-19fe0d35e28e@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, dw@davidwei.uk, shuah@kernel.org,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, gustavold@gmail.com, joe@dama.to
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 17 Jun 2025 16:13:34 +0200 you wrote:
-> As discussesd before in [0] proxy entries (which are more configuration
-> than runtime data) should stay when the link (carrier) goes does down.
-> This is what happens for regular neighbour entries.
+On Wed, 18 Jun 2025 01:32:41 -0700 you wrote:
+> The netdevsim driver previously lacked RX statistics support, which
+> prevented its use with the GenerateTraffic() test framework, as this
+> framework verifies traffic flow by checking RX byte counts.
 > 
-> So lets fix this by:
->   - storing in proxy entries the fact that it was added as NUD_PERMANENT
->   - not removing NUD_PERMANENT proxy entries when the carrier goes down
->     (same as how it's done in neigh_flush_dev() for regular neigh entries)
+> This patch migrates netdevsim from its custom statistics collection to
+> the NETDEV_PCPU_STAT_DSTATS framework, as suggested by Jakub. This
+> change not only standardizes the statistics handling but also adds the
+> necessary RX statistics support required by the test framework.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] neighbour: add support for NUD_PERMANENT proxy entries
-    https://git.kernel.org/netdev/net-next/c/c7d78566bbd3
+  - [net-next,v4,1/4] netdevsim: migrate to dstats stats collection
+    https://git.kernel.org/netdev/net-next/c/f9e2511d80c2
+  - [net-next,v4,2/4] netdevsim: collect statistics at RX side
+    https://git.kernel.org/netdev/net-next/c/788eb4de608b
+  - [net-next,v4,3/4] net: add dev_dstats_rx_dropped_add() helper
+    https://git.kernel.org/netdev/net-next/c/27480a7c8f02
+  - [net-next,v4,4/4] netdevsim: account dropped packet length in stats on queue free
+    https://git.kernel.org/netdev/net-next/c/2a68a22304f9
 
 You are awesome, thank you!
 -- 
