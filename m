@@ -1,201 +1,178 @@
-Return-Path: <netdev+bounces-199645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD113AE119C
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 05:16:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88D71AE1214
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 06:12:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790E54A32AE
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 03:16:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E80AE189AAB0
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 04:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A014A433B1;
-	Fri, 20 Jun 2025 03:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3371DC997;
+	Fri, 20 Jun 2025 04:12:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FB11DE4C5
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 03:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F33218024;
+	Fri, 20 Jun 2025 04:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750389362; cv=none; b=BowgomP5LOywm6zBL78cTs/T1eDYOXMDBX4bJ4aLwXa+mYbBAh8xZIujPEMFpJxsjOGrhHfcWjp5Ku9JjxJTn+Rv7ZoBWLzqjW/rWFGJY5DSsp3PaQ7V4NAMsdFIvVh98G56FOuekQTf0c8GBeYqEQZnNfEnzLWtd8Hrw/Bslig=
+	t=1750392742; cv=none; b=f2uBWUoqMdqWhNCDNH299yOKTHJCT0I3ppjDVqTJ5h7ZqFXtaai0Nu7Y9as9FvCuqQxuyYnFr8pio3exvV9QMXZJ/5+P3ifsh10A4TI/cWFUOYG0aeg3WQQIsQydsH39RDvrCb3HQRj/GDbTG1rINCff8Kt0eU+ZWEvU5cn8U4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750389362; c=relaxed/simple;
-	bh=PsaUAxfRj9CuYUjCQXDco1nqJRJzkfZTLOJqsh1HqT4=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=unLxtZ4cUHMdzPEvo08E4VgKyWZZHHaWnnQZRvHxQ2ytOeCZcn9H47osPTNSZVp3KV7x31v9LjGjd8rUZFF4LMRU1aIQTf0BnxpoyiDwLcZ4SsqnyqAj5Y45+4TEKzXMdaMb/8eZcmg+Z0hgPBD6BNZA7gD+YU5aFhaHdT9BQCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpgz12t1750389349teda56343
-X-QQ-Originating-IP: Zo98sSbsqoUDsUkXJ0WApzQJ12Ats2G0qcArjT+Gb7M=
-Received: from smtpclient.apple ( [111.202.70.99])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 20 Jun 2025 11:15:46 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2506058706453155900
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1750392742; c=relaxed/simple;
+	bh=/yYEvc9YKJuB+6SO8RQVApaqJgCZjt1JYTqSqohRidQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f8FGmBHZwoRPVcSCIgfTTObtc3PSDMk1tLkF+xrr7J8pgHstR/++PEKbsRsZYv78xlukcaEbqFsXY5mFOjtvoo5/dlvHadDFvYs50p6EH63pB/XK5wkaDoW0P7pk6JC22cEPSa4eQnmiwdzeIAR1z/RkFzKPr9o127hmfrEL4lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-1d-6854df9d3c68
+Date: Fri, 20 Jun 2025 13:12:08 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, willy@infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: Re: [PATCH net-next 1/9] netmem: introduce struct netmem_desc
+ mirroring struct page
+Message-ID: <20250620041208.GA11405@system.software.com>
+References: <20250609043225.77229-1-byungchul@sk.com>
+ <20250609043225.77229-2-byungchul@sk.com>
+ <20250609123255.18f14000@kernel.org>
+ <20250610013001.GA65598@system.software.com>
+ <20250611185542.118230c1@kernel.org>
+ <20250613011305.GA18998@system.software.com>
+ <CAHS8izMsKaP66A1peCHEMxaqf0SV-O6uRQ9Q6MDNpnMbJ+XLUA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH] bonding: Improve the accuracy of LACPDU transmissions
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <20250618195309.368645-1-carlos.bilbao@kernel.org>
-Date: Fri, 20 Jun 2025 11:15:36 +0800
-Cc: jv@jvosburgh.net,
- andrew+netdev@lunn.ch,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com,
- horms@kernel.org,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- sforshee@kernel.org,
- bilbao@vt.edu
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <341249BC-4A2E-4C90-A960-BB07FAA9C092@bamaicloud.com>
-References: <20250618195309.368645-1-carlos.bilbao@kernel.org>
-To: carlos.bilbao@kernel.org
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NqN/wpVFVRYXrbkBge0ilKLhm6UJeqAo81HLE5j2rsIbbdBPfq6KszVa
-	r7sALgPs3eGv0ydjpWVRsV9qG4MZFDrV7CSjvvQMsEjbtIXplNS1mqBiy5r6Mr/SHoST1sD
-	a1rMNqKrLSsI9F2RHZaSJHPxhPlnP3kHp+Q6l/wDvIPRsAjlEycfhOhfXQjoyUvZsjtdBix
-	y9ZLeHmckZ21v5oO+z0B3bsqKwHv/Fp0K+bvQQownSB76eilqeW/vPxE91l9nIp4DMlAYVr
-	rgpOafdPFzK0qcO8hUVrM2SRWNkkezSHbePPpmbzLMu2Sa9D1amospkvP8EmnmSgXA3TcrN
-	zfASImTRiPO41Im6GfgoQitu6LKCARPpDT5Brw3DLxGA17MlkUqPVhKhYvq28UuF3Ookz+M
-	0Tb0TWkb17sTuH0m+wMIOmxJbbk/uUNRwMjFLuukljoj/bol95Id/MNKmeDbErWEXpMXcdB
-	LlvwsXYJw24m9CRxlt3v8SFHI00whfN8QK5NFqoGmaowy9zvK4nK5THlFmnDzCiZwscuX9b
-	JenNT8S9XoKRGziekETx3/I+cj1x9G0mnrWXzwUpidkt1MzT6b5O0Ix5E8dT7dvFlm6to4y
-	cpcdTZpxHGZWiKsH0xm/UN/HQFslUD86kfjw8UnFSO9vPhgzUaWPF1OWYjA2GP9AUjWMEl0
-	yULU0TD0yZi1DKXnocQemGltFd/2n6kv+4j6orWNb5sIdLQqW4UNkE5JCyiEIlWXe3cmC6L
-	NwovG5GZJzpX3NGVp8PwUWC98IZ27UG4cyuKNVl7hHjv7XSgZoZTRNgBAntlJY3qqw9MkxC
-	ZvkRg38THhd4hrjsnE0RBu11uwMccjefOvgDA/j2rH905Pe737ZRuPn3qrEakg2pDp9G/nU
-	ESD/c/LROSTMuWjr9qk9UgqYhRrCwhHOWEzpEUAOhsFVWRjfnMRHhiJ3D0hbpcLw+rLmtT7
-	VlE/5rpQMYXIgvg==
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMsKaP66A1peCHEMxaqf0SV-O6uRQ9Q6MDNpnMbJ+XLUA@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa2yLYRTH87y3vuvW5FXDsxGigliCbRk5RGTxQV6XCOELEtT2Rkt3SWs3
+	IcY6l7JhJqwr6YxdukUpum6qY8YuNqZ2qW3WZbZFxAydsUuMdhH79sv5n3N+58NhSelNOphV
+	xh4W1LFylYwRU+KBgJtLr7t3KEIrny8Cg7mUgZJfyVDYbaPBYLIiGBrpEIGnuoaB/LxhEgyv
+	tRT8MI+S0PeiRwTugn4K7KfLSOi5UMtAhnaMhJO2IgKarJk0ZI/eJqEstVsEbysMDHSVTtDQ
+	X5VBQZ2+mAJ3ZiS8MM6E4ZefEVSbywgYPn+dgctOIwMftG4Ezmc9FOSeyERgdrhoGPtlYCLn
+	8w+K3xF8uf69iDdaEvj7RSG8zuUkeYvpLMNbvmeJ+M5WO8PXXhuj+HKbh+Az0r4w/Le+doof
+	dLQwvPlBC8U3GKtFvMcydyu3S7wmWlApEwX18rX7xIrBiQE6/vyc5Po7a1PRwAwdYlnMReBH
+	nuM65OfD0TNXSS9T3ELcWNxLeJnhFmOXa8RXD+SW4FuOS7QOiVmS+0rj8u4R5A2mc3uwqeOn
+	b0DCAR4w2X1NUq6ZwFmXO0STwTRcl9NLeZn8u3X8hpP0HkFys3Hhb3ayPA+nPcz1yfy4bThP
+	20p7eQa3AD+x1hDenZizs/jNxSto8uog/LTIRV1E0/RTFPopCv1/hX6KwogoE5IqYxNj5EpV
+	xDJFSqwyeVlUXIwF/f2cgmPju23oe9P2KsSxSBYgsQ1tV0hpeaImJaYKYZaUBUrya7copJJo
+	ecoRQR23V52gEjRVaDZLyWZJwoeToqXcAflh4ZAgxAvqfynB+gWnovznOfeafxjtESuJivSk
+	KP8n+rvGBQEP6wW6rz1RGxC+vj9Ymr45lGtqUTuzqq+kZx892BTpEAdtmG9oK4ymE8ZHT6lW
+	6bLjz3WuGKLdobs+dTrOpD2+uvXQGwvVteHj+LqJyooG6U6XFQVa7fvbxvzTdJWrwzZu8pwe
+	0byKKmmUURqFPCyEVGvkfwDhqzvKNQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0hTcRTH+d3X7mar61K7ZFCtFwmZQcIRxaLnDwsxDMyCdNXNDR+TOxXt
+	AZbaQ3LlI7K51WLlY2WLVTpLJKb5qCzRCtNSMYuK1tOsqT2cEfnfh+/3nM/557Ck4gg9m9Wk
+	pAliiipJycgoWWRozjJT/1Z10M9fvmC0XWHg8o9MqBhw0GC01iAYdvdK4GtTCwOWCyMkGB/l
+	UvDNNkrCq+ZBCfSXv6ag/mgtCYMnWxkoyB0j4bCjkoBGUxsNHTV6GkpGL5FQmz0gga5bRgb6
+	rvym4bWzgII2QxUF/frV0Gz2g5H77xE02WoJGDlhYqC408zAy9x+BJ2NgxSUHdIjsDV00zD2
+	w8isVuIbVc8IXGd4IcFmezq+XhmA87s7SWy3Hmew/UuRBD9/Ws/g1tIxCtc5vhK4IOcDgz+/
+	6qHwx4YnDLa8+URg240nFH5gbpJEeW+Xhe0RkjQZgrg8PF6m/vjbRaeemJN572p4NnL55iMp
+	y3Mr+dFjZ0gPU9wivr1qiPAwwy3hu7vdk7kPt5S/2FBI5yMZS3KfaL5uwI08xUxuJ2/t/T65
+	IOeAd1nrJ4cU3GOCLyrulfwtvPm2s0OUh8kJ6/i5zgkrO8H+fMUv9m88l8+5WTZ5TMpt4S/k
+	PqU97Mst4O/UtBCn0HTDFJNhisnw32SYYjIjyop8NCkZySpNUnCgLlGdlaLJDNytTbajie8o
+	Pzhe6EDDXRudiGORcprcMRytVtCqDF1WshPxLKn0kVtaI9UK+R5V1j5B1MaJ6UmCzon8WUo5
+	Sx4RI8QruARVmpAoCKmC+K8lWOnsbEQOBSyK9fIPW6W9G6JXhESutUSN6/e/lfyUds0r8pLF
+	H1il1YbfXGDwjV33vfehGOquM2ryNkffCR7aIO4tOf1ubV79jF1Cn7ojdr4u5tCavMUuhbjN
+	YqoujXCtKLu2e+F5R2D0pqDivdXtfd6nMNmz/vbnxq4dFS1E3EiMX0Jfo5LSqVUrAkhRp/oD
+	2SBXbxkDAAA=
+X-CFilter-Loop: Reflected
 
+On Fri, Jun 13, 2025 at 07:19:07PM -0700, Mina Almasry wrote:
+> On Thu, Jun 12, 2025 at 6:13 PM Byungchul Park <byungchul@sk.com> wrote:
+> >
+> > On Wed, Jun 11, 2025 at 06:55:42PM -0700, Jakub Kicinski wrote:
+> > > On Tue, 10 Jun 2025 10:30:01 +0900 Byungchul Park wrote:
+> > > > > What's the intended relation between the types?
+> > > >
+> > > > One thing I'm trying to achieve is to remove pp fields from struct page,
+> > > > and make network code use struct netmem_desc { pp fields; } instead of
+> > > > sturc page for that purpose.
+> > > >
+> > > > The reason why I union'ed it with the existing pp fields in struct
+> > > > net_iov *temporarily* for now is, to fade out the existing pp fields
+> > > > from struct net_iov so as to make the final form like:
+> > >
+> > > I see, I may have mixed up the complaints there. I thought the effort
+> > > was also about removing the need for the ref count. And Rx is
+> > > relatively light on use of ref counting.
+> > >
+> > > > > netmem_ref exists to clearly indicate that memory may not be readable.
+> > > > > Majority of memory we expect to allocate from page pool must be
+> > > > > kernel-readable. What's the plan for reading the "single pointer"
+> > > > > memory within the kernel?
+> > > > >
+> > > > > I think you're approaching this problem from the easiest and least
+> > > >
+> > > > No, I've never looked for the easiest way.  My bad if there are a better
+> > > > way to achieve it.  What would you recommend?
+> > >
+> > > Sorry, I don't mean that the approach you took is the easiest way out.
+> > > I meant that between Rx and Tx handling Rx is the easier part because
+> > > we already have the suitable abstraction. It's true that we use more
+> > > fields in page struct on Rx, but I thought Tx is also more urgent
+> > > as there are open reports for networking taking references on slab
+> > > pages.
+> > >
+> > > In any case, please make sure you maintain clear separation between
+> > > readable and unreadable memory in the code you produce.
+> >
+> > Do you mean the current patches do not?  If yes, please point out one
+> > as example, which would be helpful to extract action items.
+> >
+> 
+> I think one thing we could do to improve separation between readable
+> (pages/netmem_desc) and unreadable (net_iov) is to remove the struct
+> netmem_desc field inside the net_iov, and instead just duplicate the
+> pp/pp_ref_count/etc fields. The current code gives off the impression
+> that net_iov may be a container of netmem_desc which is not really
+> accurate.
+> 
+> But I don't think that's a major blocker. I think maybe the real issue
+> is that there are no reviews from any mm maintainers? So I'm not 100%
+> sure this is in line with their memdesc plans. I think probably
+> patches 2->8 are generic netmem-ifications that are good to merge
+> anyway, but I would say patch 1 and 9 need a reviewed by from someone
+> on the mm side. Just my 2 cents.
+> 
+> Btw, this series has been marked as changes requested on patchwork, so
+> it is in need of a respin one way or another:
 
+Some can be improved but the others not.  For example:
 
-> 2025=E5=B9=B46=E6=9C=8819=E6=97=A5 03:53=EF=BC=8Ccarlos.bilbao@kernel.or=
-g =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> From: Carlos Bilbao <carlos.bilbao@kernel.org>
->=20
-> Improve the timing accuracy of LACPDU transmissions in the bonding =
-802.3ad
-> (LACP) driver. The current approach relies on a decrementing counter =
-to
-> limit the transmission rate. In our experience, this method is =
-susceptible
-> to delays (such as those caused by CPU contention or soft lockups) =
-which
-> can lead to accumulated drift in the LACPDU send interval. Over time, =
-this
-> drift can cause synchronization issues with the top-of-rack (ToR) =
-switch
-> managing the LAG, manifesting as lag map flapping. This in turn can =
-trigger
-> temporary interface removal and potential packet loss.
->=20
-> This patch improves stability with a jiffies-based mechanism to track =
-and
-> enforce the minimum transmission interval; keeping track of when the =
-next
-> LACPDU should be sent.
->=20
-> Suggested-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
-> Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
-> ---
-> drivers/net/bonding/bond_3ad.c | 18 ++++++++----------
-> include/net/bond_3ad.h         |  5 +----
-> 2 files changed, 9 insertions(+), 14 deletions(-)
->=20
-> diff --git a/drivers/net/bonding/bond_3ad.c =
-b/drivers/net/bonding/bond_3ad.c
-> index c6807e473ab7..47610697e4e5 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -1375,10 +1375,12 @@ static void ad_churn_machine(struct port =
-*port)
->  */
-> static void ad_tx_machine(struct port *port)
-> {
-> - /* check if tx timer expired, to verify that we do not send more =
-than
-> - * 3 packets per second
-> - */
-> - if (port->sm_tx_timer_counter && !(--port->sm_tx_timer_counter)) {
-> + unsigned long now =3D jiffies;
-> +
-> + /* Check if enough time has passed since the last LACPDU sent */
-> + if (time_after_eq(now, port->sm_tx_next_jiffies)) {
-> + port->sm_tx_next_jiffies +=3D ad_ticks_per_sec / =
-AD_MAX_TX_IN_SECOND;
-> +
-> /* check if there is something to send */
-> if (port->ntt && (port->sm_vars & AD_PORT_LACP_ENABLED)) {
-> __update_lacpdu_from_port(port);
-> @@ -1395,10 +1397,6 @@ static void ad_tx_machine(struct port *port)
-> port->ntt =3D false;
-> }
-> }
-> - /* restart tx timer(to verify that we will not exceed
-> - * AD_MAX_TX_IN_SECOND
-> - */
-> - port->sm_tx_timer_counter =3D ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
-> }
-> }
->=20
-> @@ -2199,9 +2197,9 @@ void bond_3ad_bind_slave(struct slave *slave)
-> /* actor system is the bond's system */
-> __ad_actor_update_port(port);
-> /* tx timer(to verify that no more than MAX_TX_IN_SECOND
-> - * lacpdu's are sent in one second)
-> + * lacpdu's are sent in the configured interval (1 or 30 secs))
-> */
-> - port->sm_tx_timer_counter =3D ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
-> + port->sm_tx_next_jiffies =3D jiffies + ad_ticks_per_sec / =
-AD_MAX_TX_IN_SECOND;
+   +static noinline netmem_ref __page_pool_alloc_netmems_slow(struct page_pool *pool,
+   +							  gfp_t gfp)
 
-If CONFIG_HZ is 1000, there is 1000 tick per second, but =
-"ad_ticks_per_sec / AD_MAX_TX_IN_SECOND=E2=80=9D =3D=3D 10/3 =3D=3D 3, =
-so that means send lacp packets every 3 ticks ?
+It complains about the long line length but no idea how to avoid it :(
+I can do nothing but to ignore..
 
->=20
-> __disable_port(port);
->=20
-> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-> index 2053cd8e788a..956d4cb45db1 100644
-> --- a/include/net/bond_3ad.h
-> +++ b/include/net/bond_3ad.h
-> @@ -231,10 +231,7 @@ typedef struct port {
-> mux_states_t sm_mux_state; /* state machine mux state */
-> u16 sm_mux_timer_counter; /* state machine mux timer counter */
-> tx_states_t sm_tx_state; /* state machine tx state */
-> - u16 sm_tx_timer_counter; /* state machine tx timer counter
-> - * (always on - enter to transmit
-> - *  state 3 time per second)
-> - */
-> + unsigned long sm_tx_next_jiffies;/* expected jiffies for next LACPDU =
-sent */
-> u16 sm_churn_actor_timer_counter;
-> u16 sm_churn_partner_timer_counter;
-> u32 churn_actor_count;
-> --=20
-> 2.43.0
->=20
->=20
->=20
+	Byungchul
 
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=&submitter=byungchul&state=*&q=&archive=&delegate=
+> 
+> https://docs.kernel.org/process/maintainer-netdev.html#patch-status
+> 
+> -- 
+> Thanks,
+> Mina
 
