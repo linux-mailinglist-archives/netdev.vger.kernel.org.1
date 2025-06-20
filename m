@@ -1,189 +1,196 @@
-Return-Path: <netdev+bounces-199665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4468AE1531
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 09:45:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1151DAE1538
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 09:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E5F419E52CE
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 07:46:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50840188951F
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 07:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5322D22A7ED;
-	Fri, 20 Jun 2025 07:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9016B22E3E9;
+	Fri, 20 Jun 2025 07:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fcR2AwBf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5KX7Hbri"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yzl19JMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F0335958;
-	Fri, 20 Jun 2025 07:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BB322DFAD
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 07:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750405549; cv=none; b=D2EZVk5E95O9DrVtwyXxUjMctah12FPX2XKh1EmnFngdsLEqiJKEArPUstpRdcRlx4IhsB3KJ/z36DgIHZw+Qf2Nmo/I4LNK32UJeKV6/beGq5iviqG5b5WUBLVt+kUlHJjGUcZ97gf2Um82JisLSFsd8BnU4W3BmQuxwoQE7Os=
+	t=1750405768; cv=none; b=AJ+iAey3ydus2eB+rbzXeNvvOKX7vdgPFMMmWIeCNNn7EEWCOHeAjKedBy7sc9ZCHg0oSsJpiS6kbKuLLGIRftA02s6tMa2hben/wJ5IcvY2Y/OTvSLPfXyAQ5P1oakzulRqOTsyAIU6LtEhRVpUgGKl0dZTttWYii5srtcq7t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750405549; c=relaxed/simple;
-	bh=RbnTkvnJP1Ebdtqwc/VhKT85ujDu26dnLeIL9eViZj8=;
+	s=arc-20240116; t=1750405768; c=relaxed/simple;
+	bh=lPTn097d3RKmYQXcQJXHtz90CBTGa1mOLWU8ZI0qkp8=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=R/0IAm372DSIoED4UD6K61PHy7+yAk6lPDjDr/jqnoHYBor+gkULTGxMhysBwoIvp16a7mhx2FM4bi+yX4x8eI+fQtRAyjaULPuhwbTbSp2p8Hltwu3C9ENx7co4yEBloaHVfT4Dgbz7bz/mchK+x4AujcADhWH3NZ0ZooRgSYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fcR2AwBf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5KX7Hbri; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1750405544;
+	 MIME-Version:Content-Type; b=VrzVQfwM3UgNftBF6B+O+6eWYPYNW3kzoAg3AgC4aRKlcb7xyvcweKDNieI3clNGlVa+HJGNVs9UK10JDoo3OFfuM+c0ZYVoqN11LnBF/vrh6XSFPW5tvI8M37/YaTKxl9LbeXwQU7pIV96TNIA+5sUN3sEwPvPYGnRMwrLYkBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yzl19JMI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750405764;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yiOx0UJc6/4EKhHUrNBpnoe5RzXYaQsljD5jorHuO9U=;
-	b=fcR2AwBfoJuarhXpV1pAN5qQaHOipR3HK/EyhllabDDjEDaA7FR8QoqR1zzakUuFtSFevU
-	12/cTQFHmNuLal8bg5Q1QrRgNb3NLshTlXzw2yQHo/7JKQgzZEE2Cx/r6k8mzbMPerRBxH
-	iwzGfJJai3NDQsDtH+aLY4J0YaH31ll8AsZlDi0fesj8oVnnSiApOX7qFz1np6JqRQZptl
-	kK/+tfdHPSbIjitbXKYv+fZJDEuGmXssd/y3KGacea55/GuFQqIxoqqTV55OACUCXMLX18
-	UtW7kBR6nOksyZkuQ0lwBDPkm86+f7f/dytdB0RLYliWkxUv7DPEyVFT5PFaVQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1750405544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yiOx0UJc6/4EKhHUrNBpnoe5RzXYaQsljD5jorHuO9U=;
-	b=5KX7HbriTjtu5BozbLOQv3iJmoMYE97BbpEOOj0WHHXHajNS8xQGCx+I/x2fRMUCv+rvcP
-	upkDcLbTGDSYlyAw==
-To: Song Yoong Siang <yoong.siang.song@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, Jonathan Corbet <corbet@lwn.net>, Przemek
- Kitszel <przemyslaw.kitszel@intel.com>, Shinas Rasheed
- <srasheed@marvell.com>, Kevin Tian <kevin.tian@intel.com>, Brett Creeley
- <brett.creeley@amd.com>, Blanco Alcaine Hector
- <hector.blanco.alcaine@intel.com>, Joshua Hay <joshua.a.hay@intel.com>,
- Sasha Neftin <sasha.neftin@intel.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Jacob Keller <jacob.e.keller@intel.com>, Wojciech
- Drewek <wojciech.drewek@intel.com>, Marcin Szycik
- <marcin.szycik@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-next,v2 1/1] igc: Add wildcard rule support to
- ethtool NFC using Default Queue
-In-Reply-To: <20250619153738.2788568-1-yoong.siang.song@intel.com>
-References: <20250619153738.2788568-1-yoong.siang.song@intel.com>
-Date: Fri, 20 Jun 2025 09:45:42 +0200
-Message-ID: <8734bux3dl.fsf@jax.kurt.home>
+	bh=8/NfKHQF9oEI9qiwLXTW6bFDUNC1qeYOK5nIoYRGjPo=;
+	b=Yzl19JMIY5R14RaRYubJV+78OEkgc0EwUAINugJyMGuDWanK89ac8gFMOd1mWQRdvGggA/
+	hDN2eA21a2zwwAt+9Xrdp91M7hP3bf0C11Phu5ytWHKnd27FXIagXx+YsEHlMi80eAVx1V
+	mW2ZkwsX4UwTJS34UszRG/z+s35ZBM4=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-358-DHDoMLfXMTyDyloDM2LAEg-1; Fri, 20 Jun 2025 03:49:22 -0400
+X-MC-Unique: DHDoMLfXMTyDyloDM2LAEg-1
+X-Mimecast-MFC-AGG-ID: DHDoMLfXMTyDyloDM2LAEg_1750405761
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-553b902b3cdso840941e87.1
+        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 00:49:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750405761; x=1751010561;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8/NfKHQF9oEI9qiwLXTW6bFDUNC1qeYOK5nIoYRGjPo=;
+        b=MvqzGIJe+ddVzMpiyzO5I3IkdzCpeyk0aNV24f4glvX9YYwRA6hOtHGRFmJovWWJkN
+         UDXpRiUC5dpKAm4ArVOysCTmSHaVtwDVfRgXaHVvoPyv4XgPUD3WcP5dkKB79fASFdKD
+         PBTc8nd+Zapbwd0yTJ9JgJNee7Skq+s2AdtPhQg8gU2OawWqRbiVxTmp84xdOXy3gZd6
+         ZJ36N4eJRfyUJL1sMgcxVZMYMarGl1sVI4ZKa6FRRemGr1y06iUlBMSy8tA9mEZzVx7/
+         bga2MT0Zc64WUycbju3cksj4eK3TCWWcj1FJw6owYNXH1i6OZz3+2LLGOncna9ctc94F
+         mmcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0U+YuE3bssgd6Aa9tX1br5sLFnJt0HZYXiOf8XD+voKKhuYnlYLbOfsd8PaQyAhOSudJN1L4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjtzurHCpkM8Ur6pFgCrp1NrpxOTKlWWmn3PQQ4gmFl0CUAjCQ
+	cHE4CTQLAU0ZYMN4mRV25xSPulqNvqcMcphZN4mqQdGfcjNuuRg/+KJlpIfrbm9XZfkKeym6m4E
+	J+Tqj0JEQAmRTXX2EcfJD8c7SOlSblU+ByPhUB1hLcADgLyHQAYqJO7ax7A==
+X-Gm-Gg: ASbGncuZJvkNr8XYXSYl+W34W5wV5Yz/SwqD7VSLA8qH0D/RtXFv9CcDH+dpwGe754K
+	NbLRhdeLSF31hhXvYScK4MT5TMMvge9nEBNREdGZpWnlGEg9reuO5Op20qMMpg7JG1cMDwg1yi0
+	1cILFnOCW9C0mnlugad6Y8qOmYneI7FIzitNgCNAf/YyrszYLWuBzmYq807NV3/70Hvt/dsd/HX
+	FraV3dO3iHb2tyVLbe5KMbkMKYuIC912sEZzPnguza/9LJB9KedP0mrRfGGcGX5B2s8j5vjP7If
+	QLXv9QD8+Q9DeI6LXqU=
+X-Received: by 2002:a05:6512:1323:b0:553:accf:d75 with SMTP id 2adb3069b0e04-553e3cfdb6bmr549354e87.26.1750405761120;
+        Fri, 20 Jun 2025 00:49:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLy5SMi0UipUNre443G7f4CTQNRiybWOKExd4GM5/+BAIumn05sVzdmmKiq+TDs10cab3gRg==
+X-Received: by 2002:a05:6512:1323:b0:553:accf:d75 with SMTP id 2adb3069b0e04-553e3cfdb6bmr549341e87.26.1750405760660;
+        Fri, 20 Jun 2025 00:49:20 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553e41bbdcesm187600e87.116.2025.06.20.00.49.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jun 2025 00:49:19 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id A6FAA1B372DF; Fri, 20 Jun 2025 09:49:18 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Mina Almasry <almasrymina@google.com>
+Subject: Re: [PATCH net-next v5] page_pool: import Jesper's page_pool benchmark
+In-Reply-To: <20250619181519.3102426-1-almasrymina@google.com>
+References: <20250619181519.3102426-1-almasrymina@google.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 20 Jun 2025 09:49:18 +0200
+Message-ID: <87ecvezwch.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---=-=-=
-Content-Type: text/plain
+Mina Almasry <almasrymina@google.com> writes:
 
-On Thu Jun 19 2025, Song Yoong Siang wrote:
-> Introduce support for a lowest priority wildcard (catch-all) rule in
-> ethtool's Network Flow Classification (NFC) for the igc driver. The
-> wildcard rule directs all unmatched network traffic, including traffic not
-> captured by Receive Side Scaling (RSS), to a specified queue. This
-> functionality utilizes the Default Queue feature available in I225/I226
-> hardware.
+> From: Jesper Dangaard Brouer <hawk@kernel.org>
 >
-> The implementation has been validated on Intel ADL-S systems with two
-> back-to-back connected I226 network interfaces.
+> We frequently consult with Jesper's out-of-tree page_pool benchmark to
+> evaluate page_pool changes.
 >
-> Testing Procedure:
-> 1. On the Device Under Test (DUT), verify the initial statistic:
->    $ ethtool -S enp1s0 | grep rx_q.*packets
->         rx_queue_0_packets: 0
->         rx_queue_1_packets: 0
->         rx_queue_2_packets: 0
->         rx_queue_3_packets: 0
+> Import the benchmark into the upstream linux kernel tree so that (a)
+> we're all running the same version, (b) pave the way for shared
+> improvements, and (c) maybe one day integrate it with nipa, if possible.
 >
-> 2. From the Link Partner, send 10 ARP packets:
->    $ arping -c 10 -I enp170s0 169.254.1.2
+> Import bench_page_pool_simple from commit 35b1716d0c30 ("Add
+> page_bench06_walk_all"), from this repository:
+> https://github.com/netoptimizer/prototype-kernel.git
 >
-> 3. On the DUT, verify the packet reception on Queue 0:
->    $ ethtool -S enp1s0 | grep rx_q.*packets
->         rx_queue_0_packets: 10
->         rx_queue_1_packets: 0
->         rx_queue_2_packets: 0
->         rx_queue_3_packets: 0
+> Changes done during upstreaming:
+> - Fix checkpatch issues.
+> - Remove the tasklet logic not needed.
+> - Move under tools/testing
+> - Create ksft for the benchmark.
+> - Changed slightly how the benchmark gets build. Out of tree, time_bench
+>   is built as an independent .ko. Here it is included in
+>   bench_page_pool.ko
 >
-> 4. On the DUT, add a wildcard rule to route all packets to Queue 3:
->    $ sudo ethtool -N enp1s0 flow-type ether queue 3
+> Steps to run:
 >
-> 5. From the Link Partner, send another 10 ARP packets:
->    $ arping -c 10 -I enp170s0 169.254.1.2
+> ```
+> mkdir -p /tmp/run-pp-bench
+> make -C ./tools/testing/selftests/net/bench
+> make -C ./tools/testing/selftests/net/bench install INSTALL_PATH=3D/tmp/r=
+un-pp-bench
+> rsync --delete -avz --progress /tmp/run-pp-bench mina@$SERVER:~/
+> ssh mina@$SERVER << EOF
+>   cd ~/run-pp-bench && sudo ./test_bench_page_pool.sh
+> EOF
+> ```
 >
-> 6. Now, packets are routed to Queue 3 by the wildcard (Default Queue) rule:
->    $ ethtool -S enp1s0 | grep rx_q.*packets
->         rx_queue_0_packets: 10
->         rx_queue_1_packets: 0
->         rx_queue_2_packets: 0
->         rx_queue_3_packets: 10
+> Note that by default, the Makefile will build the benchmark for the
+> currently installed kernel in /lib/modules/$(shell uname -r)/build. To
+> build against the current tree, do:
 >
-> 7. On the DUT, add a EtherType rule to route ARP packet to Queue 1:
->    $ sudo ethtool -N enp1s0 flow-type ether proto 0x0806 queue 1
+> make KDIR=3D$(pwd) -C ./tools/testing/selftests/net/bench
 >
-> 8. From the Link Partner, send another 10 ARP packets:
->    $ arping -c 10 -I enp170s0 169.254.1.2
+> Output (from Jesper):
 >
-> 9. Now, packets are routed to Queue 1 by the EtherType rule because it is
->    higher priority than the wildcard (Default Queue) rule:
->    $ ethtool -S enp1s0 | grep rx_q.*packets
->         rx_queue_0_packets: 10
->         rx_queue_1_packets: 10
->         rx_queue_2_packets: 0
->         rx_queue_3_packets: 10
+> ```
+> sudo ./test_bench_page_pool.sh
+> (benchmark dmesg logs snipped)
 >
-> 10. On the DUT, delete all the NFC rules:
->     $ sudo ethtool -N enp1s0 delete 63
->     $ sudo ethtool -N enp1s0 delete 64
+> Fast path results:
+> no-softirq-page_pool01 Per elem: 23 cycles(tsc) 6.571 ns
 >
-> 11. From the Link Partner, send another 10 ARP packets:
->     $ arping -c 10 -I enp170s0 169.254.1.2
+> ptr_ring results:
+> no-softirq-page_pool02 Per elem: 60 cycles(tsc) 16.862 ns
 >
-> 12. Now, packets are routed to Queue 0 because the value of Default Queue
->     is reset back to 0:
->     $ ethtool -S enp1s0 | grep rx_q.*packets
->          rx_queue_0_packets: 20
->          rx_queue_1_packets: 10
->          rx_queue_2_packets: 0
->          rx_queue_3_packets: 10
+> slow path results:
+> no-softirq-page_pool03 Per elem: 265 cycles(tsc) 73.739 ns
+> ```
 >
-> Co-developed-by: Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>
-> Signed-off-by: Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> Output (from me):
+>
+> ```
+> sudo ./test_bench_page_pool.sh
+> (benchmark dmesg logs snipped)
+>
+> Fast path results:
+> no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.177 ns
+>
+> ptr_ring results:
+> no-softirq-page_pool02 Per elem: 51 cycles(tsc) 19.117 ns
+>
+> slow path results:
+> no-softirq-page_pool03 Per elem: 168 cycles(tsc) 62.469 ns
+> ```
+>
+> Results of course will vary based on hardware/kernel/configs, and some
+> variance may be there from run to run due to some noise.
+>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
+>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmhVEaYTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgmuJEACJBgobj3CkAve16FGrjD3Zh4+IiYSY
-J/o1/mJPvAyf5YhYEgQBOdqAn+w8jGBapT+RZ5ZlykRmPhjHcXIoxdi3Z7g6+u3K
-gG1ymQZVbFT3NcPv5+AZHzd5825wUJJkYrJoX4MpouK6hCmw5dDPK/Eu7yg6qmhj
-6bh43bt7LeZSL7KSDfGJXagYLhzVuFUI63/HSTICQz7mpd0/6qhEPW9qf4TEZZVV
-bZXXO2UYJvmc01VFiEk0nFyPKEMYMW1VUvPeAZn+Y6FpvkqGj5iyKgktbiqHwuYn
-BT3dEr3Io03pZn7ceuiOXF5eSGaTYvECeAx50vHvjIXwzITF9mqiNLQiEXA/hpHy
-D0RlenWbdauzgaB7gDVxt2Z+FhH9MhSmTWblFeVlFgKcZt+Oz+bQwEsIlzsnhi/z
-MaendoQO12/HMPRBx5LCzEwxxd+/jxUYullWCS9IYvwTErojLYCtTSsZ98XbqBd8
-AsXfOuDvKGNUt6/AL5H6shQWk2l8RUUPcP58W9CnO4eo+BQqQ2x5P0HxhsqTK8SS
-pU7de1jVOAsffe3D/Ee+t0/n2NFFWjIcQ2P45jLtDXsCeXVCo2hdHlL2VIkvGNiJ
-rKUWejs6zdwUg5Q3D+SX1yvi2TXaFZ30X95RYwiP8uzX+Hui5HwZcHtO5VAd2VCi
-hIODG5E/V6fKqA==
-=SVhz
------END PGP SIGNATURE-----
---=-=-=--
 
