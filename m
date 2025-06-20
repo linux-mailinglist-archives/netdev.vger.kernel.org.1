@@ -1,134 +1,147 @@
-Return-Path: <netdev+bounces-199660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0080AAE1383
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 07:59:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A70BAE1447
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 08:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E6FC1768D2
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 05:59:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07F05189683B
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 06:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE3121D595;
-	Fri, 20 Jun 2025 05:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BECF224B02;
+	Fri, 20 Jun 2025 06:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="TX11KRAM"
+	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="ATpenuT8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306B821C18E
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 05:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A962040BF;
+	Fri, 20 Jun 2025 06:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750399170; cv=none; b=O7XfkW0uh6P7+eHufHYA4vs4B37pjRtSlZQrpwl8Z/Ye1Jv+CEh1hqABmo/b0zBwvWzLLDhhuo/I4pIP0uYbn02jg6I1gE2Mm6kwWPrY6C948GVqGPCXcoTyPfZ0kYUuRigYUuTC0GV7d2zkKX7khmnY6kAxoRBYHpeoJc8TEkM=
+	t=1750402450; cv=none; b=spnvUmZNxX9n6p90odCZyx3NBZ2jZ0SPY+WUtpvFgJz+zO0oFwR+AGAXBs0Q0LMKj81v17mFprBRumiKFE0NMTZaxK3EKBatV3ZielN3Ed0A1Lu7TGPwXZsGTSgbr/j9XavlSnU6NcIVMrQeBYRMRvMmYuqOme5pNWCw+0vI7J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750399170; c=relaxed/simple;
-	bh=/XyQGOkIDeY6Vu3egfNNxX+kxqaWI2jOQ4QBkbnle/c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Utff03usjif0oBhF7cg1w2b+IirZXjb1OeTjwv5Kw+7WJbE+JmnSAtPwR/kouegBoULdCoyBjsQbu1LN4QjC+h2ufvC/7dW7sRA2gSYHMLphZOGpVkQewYhgN4ac3/4+UVIT7SFxqIwTQ6fwWDFMC3XkxhmqJHH9OLfZPlnWysE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=TX11KRAM; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7fd35b301bdso1721438a12.2
-        for <netdev@vger.kernel.org>; Thu, 19 Jun 2025 22:59:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1750399168; x=1751003968; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tb0Oes5vWA1YL51NeB25Xo196XgSTcQZVOjoHvg+cQ4=;
-        b=TX11KRAMh1ZOjqYLQWN5KYUz7jpK0ZykTeZdRruCCAO35gUxxPicstbbWEZGe2+3ar
-         owZOGXpM1oOHwSRaDFhs8Q5tN5CdYsqeslcHUGtqDFXydJYUSv8BZBHaaNiODV4cgwv7
-         X2U90+yPdPOge5Yajo4KWPwpzeIJnFENLd6KyC7TdHbxKUdFBWGyl3YjLB6dhIMs+Z1r
-         3fgDhRfKGUKkeKoUPcgUeqt08j1nZycoa1ujIC1+CybCv0tmb/gxW+Opa4f6TRyvQMux
-         ga7wQXOBjqYY7925Riv+zjJTXbUu+coQhz//AuObELUQhtPmm/89KkY5aO61D4kO1hYu
-         numA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750399168; x=1751003968;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tb0Oes5vWA1YL51NeB25Xo196XgSTcQZVOjoHvg+cQ4=;
-        b=Xgsj/41i2DW3rN4cF8RT86USWcbjwVY8AYOQ+Ta58YYXRhD9zMlEi3YU0f/A9mG2jo
-         x1op77AwXWMWfnutB+xTDH9Fiw5iz+aRswenLwLpxUEcKTlKWpRDx8++ce0rDnBeNt/h
-         sS4vimmlaNxbmLmCQvybmfnYq8hX2fOTlnDxAwuLnFwcAmVBvrZbkkWZsmzQYKYLRR1O
-         f7xGRxFtMruIBMg9Nlc5HgpCDwVwGfBi9Ywbcgi+PCtjLeMXXpDwZxK/TUEsVprtNtmA
-         eaM4ZXcevHpyY1APgFdFURlMdRdlW3BXGqwlwMSmZrO5Y1uElXplIay6kDPzFNmo2orh
-         RhGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDTNMW9tCaffQ+MDbfAeiCfhUAnPKfUbnqJEDK4hfU0FkfE+0KXcXtD43qapOY5jk0rm1GkkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywwn7TT2KDCxnweFxXT6NuOK1U1hgAB64vluB7hlwjswA4Cmrhy
-	EJ1XBFKvYXLSSBEByeegQrmh3hDTCKcbxbX7YOxSRthNt7qNcQuMlA9JEfDmJ8/jEiw=
-X-Gm-Gg: ASbGnctv7mt2LpxA4rrpVOgIxk2+fayL4kR4J+pCQsrTMMqttJc6KwBzNXiNlj5ADen
-	bw62lTC7xE3DnXUI+T56B5YqrAGCYyiVa10zV74umh7kjsFsHxxcoNYI8/1JkGoq8jY1p+X2H04
-	mNUixCNl82SLAbE6E5wZ9qvgonyLig+NYyBKSPZmmB3zO9UMHS5s2zhqMGtlxCq/Qe3Elep4Aag
-	4eC43Cjfs0FXwkIDIz2LXveIN6tg8nSvNascP/OBo4JJBCDbgeROXaM9tHTia928+N9C8C9AC94
-	hxeQrnfjdzRsV/UV2tM1gQaEH+PgZUG/g6uDo715Ux64j8P0BCDaA1im2jmGwbyMWRBBb+erAkc
-	=
-X-Google-Smtp-Source: AGHT+IE7e4Bb7rJJNNMR4+4eRFxKU+Xn4nNlZf/xt3mR3LHeEsVw6xgAfYFwkb+subLmAJR8msAAyw==
-X-Received: by 2002:a17:90b:3cd0:b0:311:fde5:c4b6 with SMTP id 98e67ed59e1d1-3159d6260admr2559985a91.6.1750399168283;
-        Thu, 19 Jun 2025 22:59:28 -0700 (PDT)
-Received: from [157.82.203.223] ([157.82.203.223])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3159e0558aesm824923a91.30.2025.06.19.22.59.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jun 2025 22:59:27 -0700 (PDT)
-Message-ID: <41a290a5-19ef-40e7-ad21-f3f552f58845@daynix.com>
-Date: Fri, 20 Jun 2025 14:59:24 +0900
+	s=arc-20240116; t=1750402450; c=relaxed/simple;
+	bh=lgwENIswP6TC+e9bW4gAogyCy5Hbq7Jl3EakK7exmW4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=pTOWYAKKb5KFj9TeoTzTluZQfy3r2yaQ1Yujr25wJRJEkBFHCcTykzDeTJh0w/KVqZU8/KdG0ZxVDFUBRHjNWCIlQykoXo3UhAx+FSDwx1F141dzd6ltxXMKX+AblnouyjVEn7KLeIE580wUGqfeUFZBieII0g/WBfKV9dwUvY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=ATpenuT8; arc=none smtp.client-ip=148.6.0.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 4bNnyW340Jz7s854;
+	Fri, 20 Jun 2025 08:44:35 +0200 (CEST)
+Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
+ reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	blackhole.kfki.hu; h=mime-version:references:message-id
+	:in-reply-to:from:from:date:date:received:received:received
+	:received; s=20151130; t=1750401873; x=1752216274; bh=qlN0vM/2kA
+	7L+wHurXa4gpLzRVhLapor1sHI9gEcD/I=; b=ATpenuT83DH/8OCovjgncJFnZn
+	sbGTiYEY19FV/JBv5zTJpCOneGOHRgrAgZ8AUBNyLcgiYVsjaA63y31E+35ZuBR+
+	DJC52YRpTh1gilO+bsHhrXmn2lBZ+M6ZWjAqPAa9eDpUefKSxkQr3fnJsdbZ+gPD
+	O5W9ZazMpxMsZExWc=
+X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+ by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id pWl8-2k23QH5; Fri, 20 Jun 2025 08:44:33 +0200 (CEST)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 4bNnyT3Z37z7s852;
+	Fri, 20 Jun 2025 08:44:33 +0200 (CEST)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 70FC934316A; Fri, 20 Jun 2025 08:44:33 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 6F6F7343169;
+	Fri, 20 Jun 2025 08:44:33 +0200 (CEST)
+Date: Fri, 20 Jun 2025 08:44:33 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+To: RubenKelevra <rubenkelevra@gmail.com>
+cc: Jozsef Kadlecsik <kadlec@netfilter.org>, 
+    Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: ipset: fix typo in hash size macro
+In-Reply-To: <20250619151029.97870-1-rubenkelevra@gmail.com>
+Message-ID: <4497e54a-efa0-dcb5-7f37-5de8197b5496@blackhole.kfki.hu>
+References: <20250619151029.97870-1-rubenkelevra@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 3/8] vhost-net: allow configuring extended
- features
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <cover.1750176076.git.pabeni@redhat.com>
- <c510db61e36ce3b26e3a1fb7716c17f6888da095.1750176076.git.pabeni@redhat.com>
- <e9ca64b4-3196-4b7b-822c-4bb0b40f8689@daynix.com>
- <52a8b6c1-1e3c-469e-8598-74f5b1cd417e@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <52a8b6c1-1e3c-469e-8598-74f5b1cd417e@redhat.com>
+Content-Type: multipart/mixed; boundary="110363376-1299534835-1750401873=:6759"
+
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--110363376-1299534835-1750401873=:6759
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/06/20 5:13, Paolo Abeni wrote:
-> On 6/19/25 5:00 PM, Akihiko Odaki wrote:
->> On 2025/06/18 1:12, Paolo Abeni wrote:
->>> +
->>> +		/* Any feature specified by user-space above VIRTIO_FEATURES_MAX is
->>> +		 * not supported by definition.
->>> +		 */
->>> +		for (; i < count; ++i) {
->>> +			if (copy_from_user(&features, argp, sizeof(u64)))
->>
->> get_user() is a simpler alternative.
-> 
-> That would require an explicit cast of 'argp' to a suitable pointer
-> type, which is IMHO uglier. I prefer sticking with copy_from_user().
-> 
-> Side note: there is a bug in this loop, as it lacks the needed increment
-> of the src pointer at every iteration.
+Hi,
 
-A pointer casted to u64 __user * will make the pointer usage a bit simpler.
+On Thu, 19 Jun 2025, RubenKelevra wrote:
 
-For example, initialize featurep as follows:
-featurep = (u64 __user *)argp + 1; /* skipping count */
+> Rename IPSET_MIMINAL_HASHSIZE =E2=86=92 IPSET_MINIMAL_HASHSIZE in
+> ip_set_hash_gen.h, matching the header typo-fix. Keep a backward-
+> compat alias in the header for out-of-tree users.
 
-...and you can get the i-th element with:
-get_user(features, featurep + i)
+I don't think there's any need to keep a backward-comptibility alias: the=
+=20
+macro is absolutely internal and don't even used outside of this file.
 
-You don't need sizeof(u64) this way.
+Could you resend your patch without it?
 
-Regards,
-Akihiko Odaki
+Best regards,
+Jozsef
+
+> Signed-off-by: RubenKelevra <rubenkelevra@gmail.com>
+> ---
+> include/linux/netfilter/ipset/ip_set_hash.h | 4 +++-
+> net/netfilter/ipset/ip_set_hash_gen.h       | 4 ++--
+> 2 files changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/linux/netfilter/ipset/ip_set_hash.h b/include/linu=
+x/netfilter/ipset/ip_set_hash.h
+> index 838abab672af1..4f7ce4eff5815 100644
+> --- a/include/linux/netfilter/ipset/ip_set_hash.h
+> +++ b/include/linux/netfilter/ipset/ip_set_hash.h
+> @@ -6,7 +6,9 @@
+>
+>
+> #define IPSET_DEFAULT_HASHSIZE		1024
+> -#define IPSET_MIMINAL_HASHSIZE		64
+> +#define IPSET_MINIMAL_HASHSIZE		64
+> +/* Legacy alias for the old typo =E2=80=93 keep until v6.1 LTS (EOL: 2=
+027-12-31) */
+> +#define IPSET_MIMINAL_HASHSIZE		IPSET_MINIMAL_HASHSIZE
+> #define IPSET_DEFAULT_MAXELEM		65536
+> #define IPSET_DEFAULT_PROBES		4
+> #define IPSET_DEFAULT_RESIZE		100
+> diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipse=
+t/ip_set_hash_gen.h
+> index 5251524b96afa..785d109645fed 100644
+> --- a/net/netfilter/ipset/ip_set_hash_gen.h
+> +++ b/net/netfilter/ipset/ip_set_hash_gen.h
+> @@ -1543,8 +1543,8 @@ IPSET_TOKEN(HTYPE, _create)(struct net *net, stru=
+ct ip_set *set,
+>
+> 	if (tb[IPSET_ATTR_HASHSIZE]) {
+> 		hashsize =3D ip_set_get_h32(tb[IPSET_ATTR_HASHSIZE]);
+> -		if (hashsize < IPSET_MIMINAL_HASHSIZE)
+> -			hashsize =3D IPSET_MIMINAL_HASHSIZE;
+> +		if (hashsize < IPSET_MINIMAL_HASHSIZE)
+> +			hashsize =3D IPSET_MINIMAL_HASHSIZE;
+> 	}
+>
+> 	if (tb[IPSET_ATTR_MAXELEM])
+> --=20
+> 2.49.0
+>
+>
+--110363376-1299534835-1750401873=:6759--
 
