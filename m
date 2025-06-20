@@ -1,198 +1,131 @@
-Return-Path: <netdev+bounces-199800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29519AE1D3D
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66517AE1D43
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B864616B021
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:25:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1F29171818
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2038528DB4A;
-	Fri, 20 Jun 2025 14:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421A828F51C;
+	Fri, 20 Jun 2025 14:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b12NawZn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5835830E857
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 14:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C47237708;
+	Fri, 20 Jun 2025 14:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750429543; cv=none; b=dpaR1kj7sLFRyAewh/9oHzwDGAYGtTyxaJH9dDU7lDtxQ2sTP6pdcBxg77m3Veh/Lcs4Ss935fOs6/+DjYbDR7JDMzJQn3KMJb5qm5M6GCTuvc941pkeg6GVhViw+/gOvUd1P20rSslaOTqp+yieBZvAkVqvWGP/wqL6Jd7IyzI=
+	t=1750429558; cv=none; b=XHvFLRe0OMbD9cYlbNslNL5TVRfl9grcJLfpDATVCI/ncbo+ZtwM2wrYpgYj3PdEy/1BskqPHcX7DFXaaQU0JZ+k3hGVyNnW+6E4pUGjvedZKGFfPGM4fCBHDGTM9uqH56aHy9F70zNhKRu65os96HyKqILgcxXEIetH54Jrq4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750429543; c=relaxed/simple;
-	bh=8HkaNlz/z1RF1iFtvf3rQwBjKFiBjnp+npALTuGZSxA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EwITRY50kqcZy5XUis0/VbXDSr4qRuzs0xajS2isAN3XvECPR+7V0ir8HM4RBDT7n5OnovRyiD1mGCZYzPLV2bUjQTKxWO0ZCUGKKLjGDB/VwszDLbwLiellqVrJkw7AveTjSlNJh+DAVD6SpEx6nkzfvursKiXH1/fDatvyxxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-2e95bf2f61dso1129393fac.1
-        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 07:25:41 -0700 (PDT)
+	s=arc-20240116; t=1750429558; c=relaxed/simple;
+	bh=fRMQdvjZ8yoFE451awnv4ngfHqVahpVyU08RAxzf2ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ElJo+cGYSSzM5x1scD69qrBgrACX/gWOBpjQEmYwP4iXgSc905LIMM4XSaxnlfFs0eAkUcmGfmKDuvtrPEB+1w5njzExRhKgVb4JBRjhPIIcmQ1bssq24n258NiFpNuXfOeuwyh7RfxunaFVLGH5gF8Nc6pLnQzph1e+RRA7S8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b12NawZn; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso2171417a91.0;
+        Fri, 20 Jun 2025 07:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750429556; x=1751034356; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZulnvmbPp0e7G5fm5a5Hu6trUAX/RE3SimOYUWQq4Rg=;
+        b=b12NawZnNSdkdaSIh5jFrfFinAEPdglQ9TJvCR2i7/uq9F5EuvtQd7JPB7FTJ3pDJe
+         lTJE9lRyueipUuey5wRHeoFaBS6q7y+WYi3/JB4Ci1wlNt93z0XG0Pe33jeXY8VozgzS
+         41mOuieR6R0kjtSOrb8Xt7ggtdaLzkVoKIz8OtlqNeIySJUlaFYntJuzqfCeiMXiX/iW
+         8CSg0EcUKdpS6J5w56Tj/0cpIiQ3m3u2kqpHyJjpvmUua0qLRl79/mKLw1EKr9o6YTSw
+         C46lHCzcz9hLSdu6SLTwmyki1LKXJ36KPgTkRe2F/RtWqgs2aWmQwOEDPqg4+t1FOehR
+         tGeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750429540; x=1751034340;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KIuYEzj3Bif6xHXQrRqNZNi2f01/mYgvrmDFs7Ux7OQ=;
-        b=hp2ouTAT4lNibP+Tly0kqU2JKAcTk37GBpKMfjrhSNaBWMmtJlRA5uVEujVcLyWLcf
-         zdOKXv4GrvwhNsPBWPKSQ1icUchI2eOGkNCFNKXjwVNJ1v58sx20TPddD9BrIdnKEfwQ
-         GMqcPM9ARw6yaaE7YlxTmXaSmpv1xBR6IyoOVNOe77i7zBOcA6NUDs/EG+gG78jQqfdQ
-         bhGDE/UGl+59240Mt7ziSE/cJDaB5wR2xlimFKcldmWx21/9/5KhZOl5NbgemRFX9nYu
-         QfE9hrht2VKyQ/1r0Cu3Q+ytTMM96+Zb82VK835syEavutOTtQLZ2Ax1ivzVyQhHT8SY
-         gOAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzuhOq8NTOLxqN3+P4ldcWd1r+j8fDdbIak19/Ye40pNUvO0DHCrt2Rk1eOUAh+aPKNtePgS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFwWtrtsQDgV7dSVgzSJ4e1DaKXC5gkCK+7gSJxoyIH69lwNZo
-	ucZRz+gE9i6dN9BVVYapQfCCmItn9Hd36urF/cwbGGLNmbBft5Wda3vEtoOUYcMyRkvZotnhKb6
-	soc0zhO2+49UxfbigrYAC9UZxI7h/dr1mcVsLxbTMtOM0UkVGC8Nww9WyxP0=
-X-Google-Smtp-Source: AGHT+IEXiz8sVveXCQTPjG7tOrNybCKhuwdIDwWDwdtIv00EE8qa0rkZ3+oxvR+pBoU8uR5CxXxC7Y38HIFl91iYoZGmgbjOO0+w
+        d=1e100.net; s=20230601; t=1750429556; x=1751034356;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZulnvmbPp0e7G5fm5a5Hu6trUAX/RE3SimOYUWQq4Rg=;
+        b=r6b5V6+bykYjvD/oBNP1hwVpQFwhosp4lVnmhu7FvDlOC0z+poC9HHlYYQqPI900Jk
+         QKi0OwzQOvEtByRI76PVOKGJhAAKtCdoZ7DKjIj3xNFZ7P+7Z88WkG+V85Uw9AKSKRgM
+         mQ9cDq5zWt5fh11592BtdxKyyCeGlNZBUqb6A3li6ueZv8CxrSrswlTL9o4lc4lNM95T
+         sRpuSfhz4wLW3ZgzGSLXR01phr9Y+xQq71Uc0Xw+hA709Q5fUzrGwIu53hjlOuaOtskt
+         z2Ll0Q7fMuc1sen2yDUqkj+tqNcmsPYBUVBuoHCm70kqYDEZsLQXO2XDmHFsWpUaeQ8W
+         JfdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCof0NVj1J48SePxfqRBPj/fXDb8bKcoebJwqCrlmuqfI9oamrbDzzNzQEgD1vwiMoymunu7dC@vger.kernel.org, AJvYcCWuYAhvyBuDzqVmy6/QPvC4SmylNmnOHn6FltR31c6IdwkqxcYMJ/n1gvmeH6xs4r06YUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt9GuOOnplAuPyboHQwAyusqSKrHwFqKxOha19RWzEIykG4KFg
+	wRxc1nT0oZekGlFhxHqat17S/sN2FIpKS/ZYMmzUcpGQ6KNZLl8iCME=
+X-Gm-Gg: ASbGnctXXL+GiJtlqS3EA+QbYLs+we6PqqCAF7sTd7DB1NS8Dx1NZ3XZMGifjjeg/Uo
+	ubdaMuSHRAEujGcAtZEMJbBWiIKPj8DXtJCvL+30qfByvvqHOZwzVMyEEtYbpKZDTbB2AJt94nI
+	TCowfCtXulW6+7gNyKP4u9GoLWz8byjajUNCjJsN+0Yd1TuG54t/XCUkaXP0TWa2nijMu33aqgY
+	JI/xBt4EuEh6tK1RPLdPexCfNrIR0MKAff1EMSsAwk30dLEc+a5vN7Mx1WY1leJyO5cVjl/S5Xx
+	IyPV1ZZ02vGIB3p5DTs5XXbRV7QJMB2p8VFFYJJD7JBKr4F7DWiYgHx0GRBoex6bU8mWA0mmYnp
+	FlQXRf271PZq+Dd0PadPBWZ0=
+X-Google-Smtp-Source: AGHT+IFNJusKxfr5mKPjRkcQBUy6wFvWqWVc/l98db/XSc9Tsoqe+NBk1q6dS+HId1dLO3ockwzhxw==
+X-Received: by 2002:a17:90b:278b:b0:30e:8c5d:8ed with SMTP id 98e67ed59e1d1-3159d7c8d9cmr4854920a91.19.1750429555945;
+        Fri, 20 Jun 2025 07:25:55 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3158a2f3358sm4779624a91.30.2025.06.20.07.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jun 2025 07:25:55 -0700 (PDT)
+Date: Fri, 20 Jun 2025 07:25:54 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, bjorn@kernel.org,
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET
+ set/getsockopt
+Message-ID: <aFVvcgJpw5Cnog2O@mini-arch>
+References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
+ <20250619080904.0a70574c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:19cc:b0:3dd:b540:b795 with SMTP id
- e9e14a558f8ab-3de3954f063mr26936825ab.3.1750429529031; Fri, 20 Jun 2025
- 07:25:29 -0700 (PDT)
-Date: Fri, 20 Jun 2025 07:25:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68556f59.a00a0220.137b3.004e.GAE@google.com>
-Subject: [syzbot] [net?] [ext4?] general protection fault in clip_push
-From: syzbot <syzbot+1316233c4c6803382a8b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250619080904.0a70574c@kernel.org>
 
-Hello,
+On 06/19, Jakub Kicinski wrote:
+> On Thu, 19 Jun 2025 17:04:40 +0800 Jason Xing wrote:
+> > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+> >  	rcu_read_lock();
+> >  again:
+> >  	list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > -		if (xs->tx_budget_spent >= MAX_PER_SOCKET_BUDGET) {
+> > +		int max_budget = READ_ONCE(xs->max_tx_budget);
+> > +
+> > +		if (xs->tx_budget_spent >= max_budget) {
+> >  			budget_exhausted = true;
+> >  			continue;
+> >  		}
+> > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> >  static int __xsk_generic_xmit(struct sock *sk)
+> >  {
+> >  	struct xdp_sock *xs = xdp_sk(sk);
+> > -	u32 max_batch = TX_BATCH_SIZE;
+> > +	u32 max_budget = READ_ONCE(xs->max_tx_budget);
+> 
+> Hm, maybe a question to Stan / Willem & other XSK experts but are these
+> two max values / code paths really related? Question 2 -- is generic
+> XSK a legit optimization target, legit enough to add uAPI?
 
-syzbot found the following issue on:
+1) xsk_tx_peek_desc is for zc case and xsk_build_skb is copy mode;
+whether we want to affect zc case given the fact that Jason seemingly
+cares about copy mode is a good question.
 
-HEAD commit:    41687a5c6f8b Merge tag 'spi-fix-v6.16-rc2' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12ca5370580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d11f52d3049c3790
-dashboard link: https://syzkaller.appspot.com/bug?extid=1316233c4c6803382a8b
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17365d0c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11cff5d4580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-41687a5c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c889133baca6/vmlinux-41687a5c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/288c0c860dbf/bzImage-41687a5c.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/ad66cd154f6a/mount_4.gz
-  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=10818182580000)
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1316233c4c6803382a8b@syzkaller.appspotmail.com
-
-EXT4-fs: Ignoring removed oldalloc option
-EXT4-fs (loop0): 1 truncate cleaned up
-EXT4-fs (loop0): mounted filesystem 00000000-0000-0000-0000-000000000000 r/w without journal. Quota mode: writeback.
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000001c: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x00000000000000e0-0x00000000000000e7]
-CPU: 0 UID: 0 PID: 5312 Comm: syz-executor180 Not tainted 6.16.0-rc2-syzkaller-00162-g41687a5c6f8b #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:clip_push+0x6dd/0x760 net/atm/clip.c:197
-Code: 20 8d aa 8c e8 e4 f6 5b fa 48 83 3d bc 23 64 0f 00 0f 85 94 f9 ff ff e8 a1 32 27 f7 48 8d bb e0 00 00 00 48 89 f8 48 c1 e8 03 <0f> b6 04 28 84 c0 75 3c 8b ab e0 00 00 00 49 8d bd 40 01 00 00 be
-RSP: 0018:ffffc9000d4e7898 EFLAGS: 00010202
-RAX: 000000000000001c RBX: 0000000000000000 RCX: ffff888000f3c880
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000000e0
-RBP: dffffc0000000000 R08: ffffffff8fa110f7 R09: 1ffffffff1f4221e
-R10: dffffc0000000000 R11: ffffffff8a9922e0 R12: ffffffff8a9922e0
-R13: ffff888031799000 R14: ffff8880429ce180 R15: ffff888031799578
-FS:  0000000000000000(0000) GS:ffff88808d251000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f074213de58 CR3: 000000003f358000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- vcc_destroy_socket net/atm/common.c:183 [inline]
- vcc_release+0x15a/0x460 net/atm/common.c:205
- __sock_release net/socket.c:647 [inline]
- sock_close+0xc0/0x240 net/socket.c:1391
- __fput+0x44c/0xa70 fs/file_table.c:465
- task_work_run+0x1d1/0x260 kernel/task_work.c:227
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0x6ad/0x22e0 kernel/exit.c:955
- do_group_exit+0x21c/0x2d0 kernel/exit.c:1104
- get_signal+0x1286/0x1340 kernel/signal.c:3034
- arch_do_signal_or_restart+0x9a/0x750 arch/x86/kernel/signal.c:337
- exit_to_user_mode_loop+0x75/0x110 kernel/entry/common.c:111
- exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline]
- do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f07420ea849
-Code: Unable to access opcode bytes at 0x7f07420ea81f.
-RSP: 002b:00007f074209f198 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
-RAX: 0000000000000001 RBX: 00007f07421716c8 RCX: 00007f07420ea849
-RDX: 00000000000f4240 RSI: 0000000000000081 RDI: 00007f07421716cc
-RBP: 00007f07421716c0 R08: 65732f636f72702f R09: 65732f636f72702f
-R10: 65732f636f72702f R11: 0000000000000246 R12: 00007f074213e56c
-R13: 00007f074209f1a0 R14: 0031656c69662f2e R15: 0000200000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:clip_push+0x6dd/0x760 net/atm/clip.c:197
-Code: 20 8d aa 8c e8 e4 f6 5b fa 48 83 3d bc 23 64 0f 00 0f 85 94 f9 ff ff e8 a1 32 27 f7 48 8d bb e0 00 00 00 48 89 f8 48 c1 e8 03 <0f> b6 04 28 84 c0 75 3c 8b ab e0 00 00 00 49 8d bd 40 01 00 00 be
-RSP: 0018:ffffc9000d4e7898 EFLAGS: 00010202
-RAX: 000000000000001c RBX: 0000000000000000 RCX: ffff888000f3c880
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000000e0
-RBP: dffffc0000000000 R08: ffffffff8fa110f7 R09: 1ffffffff1f4221e
-R10: dffffc0000000000 R11: ffffffff8a9922e0 R12: ffffffff8a9922e0
-R13: ffff888031799000 R14: ffff8880429ce180 R15: ffff888031799578
-FS:  0000000000000000(0000) GS:ffff88808d251000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f074213de58 CR3: 00000000403da000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	20 8d aa 8c e8 e4    	and    %cl,-0x1b177356(%rbp)
-   6:	f6 5b fa             	negb   -0x6(%rbx)
-   9:	48 83 3d bc 23 64 0f 	cmpq   $0x0,0xf6423bc(%rip)        # 0xf6423cd
-  10:	00
-  11:	0f 85 94 f9 ff ff    	jne    0xfffff9ab
-  17:	e8 a1 32 27 f7       	call   0xf72732bd
-  1c:	48 8d bb e0 00 00 00 	lea    0xe0(%rbx),%rdi
-  23:	48 89 f8             	mov    %rdi,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	0f b6 04 28          	movzbl (%rax,%rbp,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	75 3c                	jne    0x6e
-  32:	8b ab e0 00 00 00    	mov    0xe0(%rbx),%ebp
-  38:	49 8d bd 40 01 00 00 	lea    0x140(%r13),%rdi
-  3f:	be                   	.byte 0xbe
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+2) I do find it surprising as well. Recent busy polling patches were
+also using/targeting copy mode. But from my pow, if people use it, I see
+no reason to make it more usable.
 
