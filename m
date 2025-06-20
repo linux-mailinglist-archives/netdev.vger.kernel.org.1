@@ -1,262 +1,374 @@
-Return-Path: <netdev+bounces-199694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 106BFAE16D8
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:58:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45047AE16CE
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0146119E0FFD
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 08:59:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4B2E16C0EB
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 08:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7954D27D776;
-	Fri, 20 Jun 2025 08:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F82278145;
+	Fri, 20 Jun 2025 08:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="kE+QAt88"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012005.outbound.protection.outlook.com [52.101.71.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8BD27CCC8;
-	Fri, 20 Jun 2025 08:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750409911; cv=none; b=c8eWiYLEhtaOT/3T7VyWvvNcgWYL0NwFWzxGfgkG2GTKVU/2xAcYbbv+khV4xejd5GLBk4I1zcl/2qbWHOX5KVPmusBEnUPHDxU/S7nQ9wsEkgc38AL0poMyyGuAd7fPkVA7uHBM5xYHFP1JlYPfHim+Sl2TV+jC8zXVSn/y1+g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750409911; c=relaxed/simple;
-	bh=dY/kf8w24loafQrqsLv4iIn+vH6kOrDuHaJVuCKPG9k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L84wz7b62niqSx1vR8eyBxKcdYr5m2rUYRPBdErbZpUKJ7NWS4U3x/4kvIqwI7K8FI/u4FINXA1j0zOlbj51cWjfyQvaJLa9UWEE1c2qQA3tj9shdMamGeKG1LjV0wPOSWBPY0l1F0laHiBhbSrwWlJZcQEj+F2KKxLZgDKNdmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz12t1750409861td5f91715
-X-QQ-Originating-IP: FFxKXzU4UJvD5UKaVFZgQaDc2yMocUNDiJXVhD3OTVU=
-Received: from lap-jiawenwu.trustnetic.com ( [60.176.0.129])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 20 Jun 2025 16:57:40 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3715390230374951233
-EX-QQ-RecipientCnt: 11
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net 2/2] net: wangxun: revert the adjustment of the IRQ vector sequence
-Date: Fri, 20 Jun 2025 16:57:20 +0800
-Message-Id: <20250620085720.33924-3-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20250620085720.33924-1-jiawenwu@trustnetic.com>
-References: <20250620085720.33924-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3162B24EF96;
+	Fri, 20 Jun 2025 08:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750409871; cv=fail; b=LoZgWQH/LheqxRoY4LNhBYhNSLZcQxdr4dgntpOIOX5TXcu/rmCQCuyLKUZ/O37cElp17oVatJqsF872qdUiX7TvsPmy1zPcKiMZVlJ6Pc3BPWe2qY6V1WibZy+ikEaZ3YlCiN9Cty3W3BFFi2kCuDV1x1qbXYS/aUK+MoghCPY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750409871; c=relaxed/simple;
+	bh=rOqbby3i5K+gmkrwpiuNfa/FgkgqrLlN4YP+tPoYFCw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ASq+SxBrp7rbnqQH//Fjj3QOt3vuVmmIf2FP70jDIxpVkrE+t9nTsofBRZikoCjgFubB4wIuGjqdUPviE654XIXOWmqvh2VxAm6ayaD6V67FSmYYnCkX4v/V6X9UKK9LYzRLlJYAgPqWGCLv61tyCXzvzhYeVZ3xXadcgo9+m30=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=kE+QAt88; arc=fail smtp.client-ip=52.101.71.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KywZzaky+uK2jOIixO5/ndwDhN4mG4PJIViMO8UPqihrD4TEWtWzU1292mmBwEwzJXPFRUVGrfU+FeCMu/wuHG/X9VrGksPj0z1EkhWPL0jdHV6bacAwQaxTmSvqhE8yWw+OMzSi7sskeQGWTh1RBTtNnu11O5MVVT8ve/jL+Bdh1nrpfG41Yp9+F5E+x2BykpsqxyUH6K7voc4s2yxhXoxvoX+rnM8GWixBcnnDtkcFESJwerCeLIfKaM+1Bfmpt7LhAyg7i210ijVdRUjxUkqG1YIjm98AKyi55MAb+ntjMdqiuqY+9ReuoQFsZwm5IohCqT3OvJmmBZN6qS2gWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w4NTUpzsMtr2riS/un60yBReQ7eeUjyuiQyY8cvJ+zQ=;
+ b=kVNFjWeSmMm7KZSGUyN+sHSo2k4LFX3K7NuLTcG7q2YFNTf8CBKDdhpmUUvG6kf3tFdxspmNIijD7j0rGdzYbENkd3CG+wU2Bi4wdxBMQqKTbRoH6cB9EO3DhbU2RWQLorI4a0awzAIyXTvgol9faC0OVk34m7egR78KQvieIc/OAdP1HGyTYNc8ncSc04cElm2rXQgf7PHtdnU3jzHqvLrx/v5ZXnNid0E68EuMhzn9WHUCafjIk+k2I3FUg5tmdaIyJ/fz+F63T8KTcyBeb39MRtaBO56d2j4ADaUzKPAreBscDtpi07o2snyOm14SBfTUORNwPMimiS2pY68mmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
+ header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w4NTUpzsMtr2riS/un60yBReQ7eeUjyuiQyY8cvJ+zQ=;
+ b=kE+QAt88gQ9ZrBFTjpqGu95rrY4IMDWO4NnVHgkr9uC2EzuK/k2LcBSr8k5Nw01mWzpcts1DkbyJPHlq1n3yO5+zVqSmeN14LCmS1j2ZTQdnQGPZKd6p+h6rB62qwFk6S9eAaP7swwEv0nlfByn/SHMEebLesT9D/3m8ViP6Al4AB0CmZsbaZIfY1Ggi+TTRsPUYV40lb4dXaIQMk9ZqId4Fye8YwUk4fbUyxBZl0MbUoINYI1o5RX4Y8rp4OH/qdnfB5lh77oY3dYzPI1eSS0AGfQ5FKNW7XMh7r4kGYMoG1MeLKJ/v/Usn9dMEjEo82f2IE7DAEK4onYrSNLznMw==
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
+ by AS8PR07MB7637.eurprd07.prod.outlook.com (2603:10a6:20b:2ab::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.25; Fri, 20 Jun
+ 2025 08:57:44 +0000
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56%6]) with mapi id 15.20.8857.020; Fri, 20 Jun 2025
+ 08:57:44 +0000
+From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+To: Paolo Abeni <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+	"horms@kernel.org" <horms@kernel.org>, "dsahern@kernel.org"
+	<dsahern@kernel.org>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
+	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
+	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
+CC: "Olivier Tilmans (Nokia)" <olivier.tilmans@nokia.com>
+Subject: RE: [PATCH v8 net-next 04/15] tcp: AccECN core
+Thread-Topic: [PATCH v8 net-next 04/15] tcp: AccECN core
+Thread-Index: AQHb2gapzqCcQHBQ6EW+AwJQw56XYrQHCHoAgASxjGA=
+Date: Fri, 20 Jun 2025 08:57:44 +0000
+Message-ID:
+ <PAXPR07MB7984C7B7A47A49FA30D24005A37CA@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20250610125314.18557-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250610125314.18557-5-chia-yu.chang@nokia-bell-labs.com>
+ <8ff9ee00-1bb6-4558-b2a7-c0ee59badb12@redhat.com>
+In-Reply-To: <8ff9ee00-1bb6-4558-b2a7-c0ee59badb12@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|AS8PR07MB7637:EE_
+x-ms-office365-filtering-correlation-id: d088b9bd-405e-447f-cc3c-08ddafd8854b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?BwZ72jAw0pjDwnynYYO/i8aSBdmTQAYGRCKoGOPiSw52yVScd7qfVMGyn0?=
+ =?iso-8859-1?Q?zsa4ofSDdBB38pBaEaKKe+TI1Dr/5d664iJaQXpLq/vGbMCYPNdkWeU+3s?=
+ =?iso-8859-1?Q?Fnb6q60Qj1hiNznpEQaUgsO6PEYS7MN08TpRuVMJYd7QIVdEvwe6Bct31V?=
+ =?iso-8859-1?Q?rpxaQ2wElKhkq2Gy4MKTcTrVEGQv4wc/WT9btWU068Kt+Zf3t1gDOpyBn3?=
+ =?iso-8859-1?Q?vV3MZvrh2PrhD/PHgJUVp8eBgJfO8zbZ/QCndOx/u1kvV4nsNUpwd6nOiI?=
+ =?iso-8859-1?Q?CQmoSkRQNeTE+m4FCJ9BXWzZLajk/pkTwftr3ci5mll5Rfbigd/1mYleCW?=
+ =?iso-8859-1?Q?9pzGgrylv1VUGBfu5SHzziTl1vw0wVBavgjgxjOnYEV4uP6ZZ4JB4MMCOq?=
+ =?iso-8859-1?Q?5CXf+JW1uaWV3LurlHiFfIaZMuaLyJM+rBjs4Nzfdx0MEtETBzJsUfdxr3?=
+ =?iso-8859-1?Q?qFtnezMdLVsuNs2CwvXmElSqUBGk3INOHANuPipCja0sS+ZTk4E9CWbNkw?=
+ =?iso-8859-1?Q?3ayrCxgBKR7KVt8XyOxczX3D2hDnmWnOZdEnXvK+d/mHvctX11nwk75zn9?=
+ =?iso-8859-1?Q?A6my5nc6S/XNUXa4vDMXgca8jRUFlqaxqHIs44EXQ5b2IVh+1WgQjksTnK?=
+ =?iso-8859-1?Q?L0SPdjspIdLp4PFubbfTnsyss4v1TXVGOxYeNCCcLuLWfRJJCYb5LVXTLC?=
+ =?iso-8859-1?Q?HUcM6rr7OsvOtE4XgdUabxzpgQlWcnztnFhok1AhuyB8KY1Eca19msOe3J?=
+ =?iso-8859-1?Q?gBUdcX4IvbAJTbzC01SynOwBIZ3A8jRAVq4/F5vDOwIbPknWR9usTu1QQR?=
+ =?iso-8859-1?Q?1PLnn6pvQMeGfgr3Vl7HVrMSuFLTllbXdypVj8DgFejrdWG7LNLU9TV18W?=
+ =?iso-8859-1?Q?5STR0YErOmiNK1Js/ve2NxmeLMLDQPVJm/C7TQG+vHZyF/sfLx7nfJ68Sb?=
+ =?iso-8859-1?Q?RXgNMo25DEI2f3WNMx4tDQBjxEgCkLG00bzJ3S3wEwomHjixgNT1Gy8Ft6?=
+ =?iso-8859-1?Q?EbnZeb+YyHQs47OhQZM0benw0rEru+VtH6jdbdrsAHxmUL//CXFj8onRhH?=
+ =?iso-8859-1?Q?nQNUzOHMgCw+giPQT5AFEOsZ2OvLhHOLlcobeJS2C/d6OGg7heVSnftm7J?=
+ =?iso-8859-1?Q?F++zQm3u5A3u2wh4rUmIEKiGRPRiyKweq/49gac0a6XZk1IZurIz/zdWSM?=
+ =?iso-8859-1?Q?Mz8BGKFaltdBkHbXMOqY5S9LdstMyZXz70a7faznubxdIONo/S6R1wvsc3?=
+ =?iso-8859-1?Q?ZVz5Tvg4S+IoVwUpElBLC1oW5Vi0xutu/ZZjEatLePm+2rZ2bQgwcNgigv?=
+ =?iso-8859-1?Q?N1nn6nggpRG0Tz1qnr/HuyknbfDWxushtvPgWbRVC6jY8y7W3kPHrl8okU?=
+ =?iso-8859-1?Q?IEWBHOSAo37hkPE3LcZs7fkajJnRnd1JtSSXlA5FKYJdNMq0XyV3b35lJl?=
+ =?iso-8859-1?Q?U/5qRIlsJg7IsOShFUAoxk6junUQ1+bcDhZ3jSW+0ZpoHrkJSN422ahA0/?=
+ =?iso-8859-1?Q?iGjVq5oYsUT/HeQEBC6f3r?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?yeQ2CLBVcJ0u813+M8rVVzieVSAQAEZQ0PXGHMqeSDTVxhVlfQjMQ0KyQM?=
+ =?iso-8859-1?Q?8qsYpVlF6q/CbCFrN/1N7dQHRq+H1ep9u1sELN/+9onlC0pp+NMWDQ1l59?=
+ =?iso-8859-1?Q?WbA7o7K6dSiQBvFThcNwd70DjC8POcP44u0HvYf5/Qh4PS+JG1k3Hh+kQ/?=
+ =?iso-8859-1?Q?IoUtO6EiDdP30fwi5NPWFV70hamLN8iosSgEimKZn0YdKGw3Ntx5mgG8ZG?=
+ =?iso-8859-1?Q?fQ53J7NMjJTiWHuCu/sIb/RG3N0ZrKN0Vp2HVlbdp4hQ1MnpmfAEm2iF87?=
+ =?iso-8859-1?Q?DnJ+yetStVrz4B0T3y3i92I4/Savnj+Y+N0XpwzB2tmIZd0eZFJFhpZk50?=
+ =?iso-8859-1?Q?Gy1eZ+xF9WZI/pu8z/OiSvAoj8ZqqgZEcSlnCcvBm5FCW6na7pS479pgQI?=
+ =?iso-8859-1?Q?DRFnCIPfcTUY7oM/LGo9r8xc0FGtTbgKBdj37lL0wMWa5Z1dF5ALsCkuBQ?=
+ =?iso-8859-1?Q?S2S2/nlG8tViubiCkwMUB9qPfNqFPGojypwlbM+pV/dEEfNhgbkN48/klq?=
+ =?iso-8859-1?Q?mrznfEMKB0z8I1m8W2DscJenZI0ReL0POnKSOzfux7JRpwGjPOy6hGNbhh?=
+ =?iso-8859-1?Q?7EVA5z3dg1E8mZKAZHwgW3ipXLNqW6EQfHtbwMVjs+l4cff42xl48cM8Mp?=
+ =?iso-8859-1?Q?iqK8HdL8BJqod+wMJYl0cgAQiiLQrcMtFr5lYOR05hxJwWl9/wSOu8sGHL?=
+ =?iso-8859-1?Q?ofe8ZRlrEmY6OKkBIRrU7mwkF61tKbGwpar1LaTPBntvh0MWVsZN2KIK4Y?=
+ =?iso-8859-1?Q?5zWU5cWwefjw6Khhx1s/nsxnVTHspBy2ICNAfhqPcwnRa343//TjLydGog?=
+ =?iso-8859-1?Q?Up03YbXZTynPyyf8Qb83ft0yGv2EJBDP8zw5yeaiKafR8sYs/lKhPWN3G7?=
+ =?iso-8859-1?Q?JaHG1Xr4vpTYH17RYDKI/8dXxSFzDh1D58opJyixxL+iYRw5/3s/kut6Yn?=
+ =?iso-8859-1?Q?oohTd5evMd1CrkE/dHypzbUS6e8Jjjf0n5xMHjjkq+m8iz0rYJjj98SS72?=
+ =?iso-8859-1?Q?UtTFog8SPa1+7ilFTwMuhrg52SO2jfM4pRWKMmCLIaaEpEbIt/IK3TaeF9?=
+ =?iso-8859-1?Q?XM91pTx9gSPvukT/P3HbyQBcDFw4MyAmzqUJU25MJJo3DGukpwjWjk4NLM?=
+ =?iso-8859-1?Q?R5kZQXBgmTfARwaJXBqjbHIA6PBQHqWyewdgK2oK06bZ7OBHT3dxuyJjVK?=
+ =?iso-8859-1?Q?elVrzMMTI4RaxK2jTQndf/WQO9tgaWkazw7fT89hFOw5t6KK3chS43vnl8?=
+ =?iso-8859-1?Q?LDPQbueRr+H4Sl2GgE39kYIzF8oj4cBPdlf/26tcIi6vy0W9BqAy8H6BYS?=
+ =?iso-8859-1?Q?zRrmOJ74hfLjydxq4JBX3QBtz/GUKxBPfVpi7WbRHJtN1Wh3qvs/RraYXg?=
+ =?iso-8859-1?Q?yZKIrKdzmfeC7vPR72uHAnb3/E3efU8aBp8GrJLV5LAi8BRknOW17xnB1e?=
+ =?iso-8859-1?Q?ZHC+A+41K8gqO1bdKMpP4oEoTiIYY1jNP8lstK7/jna7hTK0OqyR3ywPnl?=
+ =?iso-8859-1?Q?L9dqtKyWaIncGajKavXHQXOwQTPuItVvJz3icw2bROg72duzIN7Ikr4Qmg?=
+ =?iso-8859-1?Q?xBjTVKjAtDsTyUyFANFFz7417zPuBxWoOVwd7YNzbv5YOKpDPpuTgRSVL/?=
+ =?iso-8859-1?Q?/gYrKzJ9W9poU7CeMGoCZw2J8k/ibHpP1gk/qYyaqE4QLZ9x/UEQdCeQ?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NG7xP+P+sy647TZszhLtkLW2RpwwLd1+lK76/6E7S/forkhbY2ZbDPKs
-	/m0XdGbyHHQYHjHLghd5hlaw51iiNWEMS5JsGxYOUxh+A1n1jXrzryUVcuQCLpNWJryu4mR
-	tLyyfhX4jonwvKq5OCe4cwn7pGJzYxFfvXsnvaFtvM5fmuDLa4UHmSZAKT/0T9ajjV2wnCU
-	aulbqly6apOzUSTIRpVTYQS5X8/h+IJloRBD89xevVARpnx1+RN9tSR2wGlhJ06MEmbcxbD
-	FKztO5N1dSLjvWWjmxxRYYC7+LFYDy6CW21b0mWX6iub9x1zIt5bauRysCSyQjU6dXKl7Ar
-	B6OOJAFAKwN8HInyn3gSBRKMB1rDAU9F7eWPA6SYhcrssFIeTQ8jxoM6RDN+Vlko7MRDq9R
-	UD2gFW9XFUsDjQYjRxt+T4YLx0wfzfJ3UcNRcsJkZIselSuEwinFhjEtiz/KlWEDYeSl+aH
-	Z6Co8+cL1F3AeyjyqKrkd/n9hp98qdPFURXClaoC2Ae9QDA65ci4b1YfKJblhhsDVvRJ7zS
-	yPCLgG4S6Ze1iqN2sza/P9RNt3mIHtt4212x+CBqxG/52kunU4viXjv6zX02f3dnUQS55iS
-	EK5e8aKqZ2MoB1o7PRPrVf9FAEeeRuTgi01Oqylnmfzrf01+JIVg0Q50V1NX9Ou1zKEDDUl
-	7cgCfixLCNTN11Mygn5ox3se6W7Q4x3fnUlPAUyD0tzx84gJ8jOSbGn9izf7a/DLr8w5Od9
-	F9ZOUjfCGkEIVHr07zXvtRfIpgGrSWVXfRMBY6sHFu/+49HXv8UjOrkU0akzi0epjSWCqHT
-	nuE9t/r3mRz1xPJFFkQFIeSdFvxdHjzpbow5YO99O27cViUFfLCMsLvLJAghzogDn7GE65O
-	7itLdef984U4iiO6c09w7SjJiJQf0S8BPpiLeWH9vL9JcxF0B/ZICHahz+S9HoOLpBcRk1d
-	7j26KaDstHkBOz7FF9/GF3guIL5EXJiyluRmaCOroGHOYo2dJ8S1L5z77PEWHoouxrR3E92
-	lazg/X67WIIeUVees2zMXhB1YLdYGuw5KqdIFvYAtGAkhwgsGamNB7J6Lmvw/m8gWzfQS2K
-	JHqF/ID5Le4
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d088b9bd-405e-447f-cc3c-08ddafd8854b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2025 08:57:44.0593
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 13LQ1Eu7K6888rrDGLcyXnndBwT4zTUYGX/PUKSPRfV3k4JLlz3cCBxRwFI0KtnWTdxJIdRrkNkuroO6V7twMvko7vQfqZ2v9q1jtTpnXzmR17dGhUFhAW21NQB9kIqo
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB7637
 
-Due to hardware limitations of NGBE, queue IRQs can only be requested
-on vector 0 to 7. When the number of queues is set to the maximum 8,
-the PCI IRQ vectors are allocated from 0 to 8. The vector 0 is used by
-MISC interrupt, and althrough the vector 8 is used by queue interrupt,
-it is unable to receive packets. This will cause some packets to be
-dropped when RSS is enabled and they are assigned to queue 8.
+> -----Original Message-----
+> From: Paolo Abeni <pabeni@redhat.com>=20
+> Sent: Tuesday, June 17, 2025 10:03 AM
+> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>; edumazet@g=
+oogle.com; linux-doc@vger.kernel.org; corbet@lwn.net; horms@kernel.org; dsa=
+hern@kernel.org; kuniyu@amazon.com; bpf@vger.kernel.org; netdev@vger.kernel=
+.org; dave.taht@gmail.com; jhs@mojatatu.com; kuba@kernel.org; stephen@netwo=
+rkplumber.org; xiyou.wangcong@gmail.com; jiri@resnulli.us; davem@davemloft.=
+net; andrew+netdev@lunn.ch; donald.hunter@gmail.com; ast@fiberby.net; liuha=
+ngbin@gmail.com; shuah@kernel.org; linux-kselftest@vger.kernel.org; ij@kern=
+el.org; ncardwell@google.com; Koen De Schepper (Nokia) <koen.de_schepper@no=
+kia-bell-labs.com>; g.white@cablelabs.com; ingemar.s.johansson@ericsson.com=
+; mirja.kuehlewind@ericsson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_=
+Livingood@comcast.com; vidhi_goel@apple.com
+> Cc: Olivier Tilmans (Nokia) <olivier.tilmans@nokia.com>
+> Subject: Re: [PATCH v8 net-next 04/15] tcp: AccECN core
+>=20
+>=20
+> CAUTION: This is an external email. Please be very careful when clicking =
+links or opening attachments. See the URL nok.it/ext for additional informa=
+tion.
+>=20
+>=20
+>=20
+> On 6/10/25 2:53 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> > From: Ilpo J=E4rvinen <ij@kernel.org>
+> >
+> > This change implements Accurate ECN without negotiation and AccECN=20
+> > Option (that will be added by later changes). Based on AccECN=20
+> > specifications:
+> >   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
+> >
+> > Accurate ECN allows feeding back the number of CE (congestion
+> > experienced) marks accurately to the sender in contrast to
+> > RFC3168 ECN that can only signal one marks-seen-yes/no per RTT.
+> > Congestion control algorithms can take advantage of the accurate ECN=20
+> > information to fine-tune their congestion response to avoid drastic=20
+> > rate reduction when only mild congestion is encountered.
+> >
+> > With Accurate ECN, tp->received_ce (r.cep in AccECN spec) keeps track=20
+> > of how many segments have arrived with a CE mark. Accurate ECN uses=20
+> > ACE field (ECE, CWR, AE) to communicate the value back to the sender=20
+> > which updates tp->delivered_ce (s.cep) based on the feedback. This=20
+> > signalling channel is lossy when ACE field overflow occurs.
+> >
+> > Conservative strategy is selected here to deal with the ACE overflow,=20
+> > however, some strategies using the AccECN option later in the overall=20
+> > patchset mitigate against false overflows detected.
+> >
+> > The ACE field values on the wire are offset by=20
+> > TCP_ACCECN_CEP_INIT_OFFSET. Delivered_ce/received_ce count the real CE=
+=20
+> > marks rather than forcing all downstream users to adapt to the wire=20
+> > offset.
+> >
+> > This patch uses the first 1-byte hole and the last 4-byte hole of the=20
+> > tcp_sock_write_txrx for 'received_ce_pending' and 'received_ce'.
+> > Also, the group size of tcp_sock_write_txrx is increased from
+> > 91 + 4 to 95 + 4 due to the new u32 received_ce member. Below are the=20
+> > trimmed pahole outcomes before and after this patch.
+>=20
+> AFAICS 'received_ce' fills the existing 4 bytes hole, so tcp_sock_write_t=
+xrx size should be now (95 + 0), am I missreading something?
 
-So revert the adjustment of the MISC IRQ location, to make it be the
-last one in IRQ vectors.
+Hi Paolo,
 
-Fixes: 937d46ecc5f9 ("net: wangxun: add ethtool_ops for channel number")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c     | 17 ++++++++---------
- drivers/net/ethernet/wangxun/libwx/wx_type.h    |  2 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   |  2 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h   |  2 +-
- drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c  |  6 +++---
- drivers/net/ethernet/wangxun/txgbe/txgbe_type.h |  4 ++--
- 6 files changed, 16 insertions(+), 17 deletions(-)
+First, thanks for the feedback.
+Regarding such "+ 4" is due to the byte alignemnt needed for ARM arch.
+You can see below tha pahole outputs BEFORE and AFTER this patch, in which =
+a 4-byte hole is added before "tcp_clock_cache" to make it aligns from the =
+multiple of 8.
+And the comment in net/ipv4/tcp.c also explain it: "32bit arches with 8byte=
+ alignment on u64 fields might need padding before tcp_clock_cache."
+Does it make sense to you?
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 7f2e6cddfeb1..66eaf5446115 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -1746,7 +1746,7 @@ static void wx_set_num_queues(struct wx *wx)
-  */
- static int wx_acquire_msix_vectors(struct wx *wx)
- {
--	struct irq_affinity affd = { .pre_vectors = 1 };
-+	struct irq_affinity affd = { .post_vectors = 1 };
- 	int nvecs, i;
- 
- 	/* We start by asking for one vector per queue pair */
-@@ -1783,16 +1783,17 @@ static int wx_acquire_msix_vectors(struct wx *wx)
- 		return nvecs;
- 	}
- 
--	wx->msix_entry->entry = 0;
--	wx->msix_entry->vector = pci_irq_vector(wx->pdev, 0);
- 	nvecs -= 1;
- 	for (i = 0; i < nvecs; i++) {
- 		wx->msix_q_entries[i].entry = i;
--		wx->msix_q_entries[i].vector = pci_irq_vector(wx->pdev, i + 1);
-+		wx->msix_q_entries[i].vector = pci_irq_vector(wx->pdev, i);
- 	}
- 
- 	wx->num_q_vectors = nvecs;
- 
-+	wx->msix_entry->entry = nvecs;
-+	wx->msix_entry->vector = pci_irq_vector(wx->pdev, nvecs);
-+
- 	return 0;
- }
- 
-@@ -2299,8 +2300,6 @@ static void wx_set_ivar(struct wx *wx, s8 direction,
- 		wr32(wx, WX_PX_MISC_IVAR, ivar);
- 	} else {
- 		/* tx or rx causes */
--		if (!(wx->mac.type == wx_mac_em && wx->num_vfs == 7))
--			msix_vector += 1; /* offset for queue vectors */
- 		msix_vector |= WX_PX_IVAR_ALLOC_VAL;
- 		index = ((16 * (queue & 1)) + (8 * direction));
- 		ivar = rd32(wx, WX_PX_IVAR(queue >> 1));
-@@ -2339,7 +2338,7 @@ void wx_write_eitr(struct wx_q_vector *q_vector)
- 
- 	itr_reg |= WX_PX_ITR_CNT_WDIS;
- 
--	wr32(wx, WX_PX_ITR(v_idx + 1), itr_reg);
-+	wr32(wx, WX_PX_ITR(v_idx), itr_reg);
- }
- 
- /**
-@@ -2392,9 +2391,9 @@ void wx_configure_vectors(struct wx *wx)
- 		wx_write_eitr(q_vector);
- 	}
- 
--	wx_set_ivar(wx, -1, 0, 0);
-+	wx_set_ivar(wx, -1, 0, v_idx);
- 	if (pdev->msix_enabled)
--		wr32(wx, WX_PX_ITR(0), 1950);
-+		wr32(wx, WX_PX_ITR(v_idx), 1950);
- }
- EXPORT_SYMBOL(wx_configure_vectors);
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 7730c9fc3e02..d392394791b3 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1343,7 +1343,7 @@ struct wx {
- };
- 
- #define WX_INTR_ALL (~0ULL)
--#define WX_INTR_Q(i) BIT((i) + 1)
-+#define WX_INTR_Q(i) BIT((i))
- 
- /* register operations */
- #define wr32(a, reg, value)	writel((value), ((a)->hw_addr + (reg)))
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index b5022c49dc5e..68415a7ef12f 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -161,7 +161,7 @@ static void ngbe_irq_enable(struct wx *wx, bool queues)
- 	if (queues)
- 		wx_intr_enable(wx, NGBE_INTR_ALL);
- 	else
--		wx_intr_enable(wx, NGBE_INTR_MISC);
-+		wx_intr_enable(wx, NGBE_INTR_MISC(wx));
- }
- 
- /**
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index bb74263f0498..6eca6de475f7 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -87,7 +87,7 @@
- #define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
- 
- #define NGBE_INTR_ALL				0x1FF
--#define NGBE_INTR_MISC				BIT(0)
-+#define NGBE_INTR_MISC(A)			BIT((A)->num_q_vectors)
- 
- #define NGBE_PHY_CONFIG(reg_offset)		(0x14000 + ((reg_offset) * 4))
- #define NGBE_CFG_LAN_SPEED			0x14440
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index 20b9a28bcb55..21fc86ec25ce 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -31,7 +31,7 @@ void txgbe_irq_enable(struct wx *wx, bool queues)
- 	wr32(wx, WX_PX_MISC_IEN, misc_ien);
- 
- 	/* unmask interrupt */
--	wx_intr_enable(wx, TXGBE_INTR_MISC);
-+	wx_intr_enable(wx, TXGBE_INTR_MISC(wx));
- 	if (queues)
- 		wx_intr_enable(wx, TXGBE_INTR_QALL(wx));
- }
-@@ -132,7 +132,7 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- 		txgbe->eicr = eicr;
- 		if (eicr & TXGBE_PX_MISC_IC_VF_MBOX) {
- 			wx_msg_task(txgbe->wx);
--			wx_intr_enable(wx, TXGBE_INTR_MISC);
-+			wx_intr_enable(wx, TXGBE_INTR_MISC(wx));
- 		}
- 		return IRQ_WAKE_THREAD;
- 	}
-@@ -184,7 +184,7 @@ static irqreturn_t txgbe_misc_irq_thread_fn(int irq, void *data)
- 		nhandled++;
- 	}
- 
--	wx_intr_enable(wx, TXGBE_INTR_MISC);
-+	wx_intr_enable(wx, TXGBE_INTR_MISC(wx));
- 	return (nhandled > 0 ? IRQ_HANDLED : IRQ_NONE);
- }
- 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 42ec815159e8..41915d7dd372 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -302,8 +302,8 @@ struct txgbe_fdir_filter {
- #define TXGBE_DEFAULT_RX_WORK           128
- #endif
- 
--#define TXGBE_INTR_MISC       BIT(0)
--#define TXGBE_INTR_QALL(A)    GENMASK((A)->num_q_vectors, 1)
-+#define TXGBE_INTR_MISC(A)    BIT((A)->num_q_vectors)
-+#define TXGBE_INTR_QALL(A)    (TXGBE_INTR_MISC(A) - 1)
- 
- #define TXGBE_MAX_EITR        GENMASK(11, 3)
- 
--- 
-2.48.1
+[BEFORE PATCH]
+__u8                       __cacheline_group_begin__tcp_sock_write_txrx[0];=
+ /*  1869     0 */
+u8                         nonagle:4;            /*  1869: 0  1 */
+u8                         rate_app_limited:1;   /*  1869: 4  1 */
 
+/* XXX 3 bits hole, try to pack */
+/* XXX 2 bytes hole, try to pack */
+
+__be32                     pred_flags;           /*  1872     4 */
+
+/* XXX 4 bytes hole, try to pack */
+
+u64                        tcp_clock_cache;      /*  1880     8 */
+u64                        tcp_mstamp;           /*  1888     8 */
+u32                        rcv_nxt;              /*  1896     4 */
+u32                        snd_nxt;              /*  1900     4 */
+u32                        snd_una;              /*  1904     4 */
+u32                        window_clamp;         /*  1908     4 */
+u32                        srtt_us;              /*  1912     4 */
+u32                        packets_out;          /*  1916     4 */
+/* --- cacheline 30 boundary (1920 bytes) --- */
+u32                        snd_up;               /*  1920     4 */
+u32                        delivered;            /*  1924     4 */
+u32                        delivered_ce;         /*  1928     4 */
+u32                        app_limited;          /*  1932     4 */
+u32                        rcv_wnd;              /*  1936     4 */
+struct tcp_options_received rx_opt;              /*  1940    24 */
+__u8                       __cacheline_group_end__tcp_sock_write_txrx[0]; /=
+*  1964     0 */
+
+
+[AFTER PATCH]
+__u8                       __cacheline_group_begin__tcp_sock_write_txrx[0];=
+ /*  1869     0 */
+u8                         nonagle:4;            /*  1869: 0  1 */
+u8                         rate_app_limited:1;   /*  1869: 4  1 */
+
+/* XXX 3 bits hole, try to pack */
+
+/* Force alignment to the next boundary: */
+u8                         :0;
+
+u8                         received_ce_pending:4; /*  1870: 0  1 */
+u8                         unused2:4;            /*  1870: 4  1 */
+
+/* XXX 1 byte hole, try to pack */
+
+__be32                     pred_flags;           /*  1872     4 */
+
+/* XXX 4 bytes hole, try to pack */
+
+u64                        tcp_clock_cache;      /*  1880     8 */
+u64                        tcp_mstamp;           /*  1888     8 */
+u32                        rcv_nxt;              /*  1896     4 */
+u32                        snd_nxt;              /*  1900     4 */
+u32                        snd_una;              /*  1904     4 */
+u32                        window_clamp;         /*  1908     4 */
+u32                        srtt_us;              /*  1912     4 */
+u32                        packets_out;          /*  1916     4 */
+/* --- cacheline 30 boundary (1920 bytes) --- */
+u32                        snd_up;               /*  1920     4 */
+u32                        delivered;            /*  1924     4 */
+u32                        delivered_ce;         /*  1928     4 */
+u32                        received_ce;          /*  1932     4 */
+u32                        app_limited;          /*  1936     4 */
+u32                        rcv_wnd;              /*  1940     4 */
+struct tcp_options_received rx_opt;              /*  1944    24 */
+__u8                       __cacheline_group_end__tcp_sock_write_txrx[0]; /=
+*  1968     0 */
+
+
+>=20
+> > @@ -384,17 +387,16 @@ static void tcp_data_ecn_check(struct sock *sk, c=
+onst struct sk_buff *skb)
+> >               if (tcp_ca_needs_ecn(sk))
+> >                       tcp_ca_event(sk, CA_EVENT_ECN_IS_CE);
+> >
+> > -             if (!(tp->ecn_flags & TCP_ECN_DEMAND_CWR)) {
+> > +             if (!(tp->ecn_flags & TCP_ECN_DEMAND_CWR) &&
+> > +                 tcp_ecn_mode_rfc3168(tp)) {
+> >                       /* Better not delay acks, sender can have a very =
+low cwnd */
+> >                       tcp_enter_quickack_mode(sk, 2);
+> >                       tp->ecn_flags |=3D TCP_ECN_DEMAND_CWR;
+> >               }
+> > -             tp->ecn_flags |=3D TCP_ECN_SEEN;
+>=20
+> It's not clear why you need to move this statement earlier in the code pa=
+th even for ecn_mode_rfc3168(). Either a comment or
+>=20
+>                 if (!tcp_ecn_mode_rfc3168(tp))
+>                         break;
+>=20
+> a few lines aboved could help.
+>=20
+> >               break;
+> >       default:
+> >               if (tcp_ca_needs_ecn(sk))
+> >                       tcp_ca_event(sk, CA_EVENT_ECN_NO_CE);
+> > -             tp->ecn_flags |=3D TCP_ECN_SEEN;
+>=20
+> Same here.
+>=20
+> Thanks,
+>=20
+> Paolo
+
+OK, will apply the above feedback in the next version and thanks.
+
+BRs,
+Chia-Yu
 
