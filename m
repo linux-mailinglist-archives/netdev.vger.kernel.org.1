@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-199866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C2EAE213C
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:45:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F2CAAE2140
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 791904C01FC
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:45:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B605A0FF2
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6BD2EAB61;
-	Fri, 20 Jun 2025 17:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2ABF2EB5C6;
+	Fri, 20 Jun 2025 17:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aC7k3v6F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WrWeICbR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BA52EA17F;
-	Fri, 20 Jun 2025 17:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8032EAB63;
+	Fri, 20 Jun 2025 17:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750441525; cv=none; b=gU7onhXbIS+9siPdKa8LISoDh2IzGhvAJAboALAMe05APC/jiaN/5df1mhOA0Y1F1s0+nXDOZZTi8ytZ1w3SrY45i962oDAK7fU1LoIN2bGNZ5tPyl4TJeNhyJJznBzjYZlqmN7HI6lImEnscqwOSlyZTb6UhofeV2kFDjEBYPg=
+	t=1750441527; cv=none; b=q7b9gQcllcl8WHA5iyg1AQ/bnjGibih67GfNhQ2/H2PVAeztld13PJ/UJ1T0y2wfwfpGNOL+MRbN8/s5BgkhpmNNCl9Vcyl8cLhO4zytsjDJDpmZD5uRwDGOCa1tZnb0i0a4JQt+ykxGsO+OU4WR5lwrt1AUWV/ToLMXn4ekSNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750441525; c=relaxed/simple;
-	bh=MjSRQf4W1COv4FWfijrfdQ8AL637aTSDUMMuxPmDEX4=;
+	s=arc-20240116; t=1750441527; c=relaxed/simple;
+	bh=hOLC7JyD/qJay8UVSFDQtHKRrOfGXGt5tUCR15SY0Jc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G70coSeZPAtuUHVfhr6r2wOjxnXXGytO5DPsquPkqn+i/SGd/vRerEV8RZIZLLyF9k4DRnsUjbfXCBoJm+uUu4iBUYg2nmSN+g0o4bk6gDIelt8nj8VwCryVYwddnYsKZEsuIl9JD8ObewFkjSi7H9zjLgeX4NtRfI4dI4lXI1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aC7k3v6F; arc=none smtp.client-ip=209.85.219.45
+	 MIME-Version; b=FhYbx9h7pyxjT8f1085ia1NgiNVIYXZrgcodoZin+xtl6bHhq1/YmZBl9xelQytlixDGCwI+8cV4HF99V4/tR3REp4IrIiFTUdkPSydWETAd9fwMCMAsOuc5Dc0Andct+/nqfGAyaLi9uo8qSCZ6R27gbbMQljQJ05yDspaCK/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WrWeICbR; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6fafaa60889so13747756d6.3;
-        Fri, 20 Jun 2025 10:45:24 -0700 (PDT)
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6fafb6899c2so22690976d6.0;
+        Fri, 20 Jun 2025 10:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750441523; x=1751046323; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750441525; x=1751046325; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9jmk+ZAlQ1vOFCxkryPYE4KraaL64/vcDKofTARFzz4=;
-        b=aC7k3v6Fpu10TTrJtiYgMv47wbCHmJl+Brac3/pFqHLJmC6mKYWBFQVrEeEjArv8KL
-         9zB14LdZcRrFuG1hkSvj/b0JeQmZURhMJrbmfJxBJpM0H6SsBszH54C9Ls84996hxN5E
-         zBQkNld9UZKT01r/Ky+o/6+++nrqXJVkLd9F01DsJPpl22szoVk2ANBE5uK6oyYRwKzR
-         Xd+OHUq/xUWu7Cy7nmt5Nq4SZTACihvQ7A6xQelmcQhQYL7XAIEY7FXEBGXpOeMq7GfR
-         L4PSSmP17XCJW9eSroQQ33cBKtd1Y9Vf+2HnVmnNCMJ6vtBfekGECH7OBjuIqSbkscEg
-         Jorw==
+        bh=u9duPMefwFq9YsgU9sdEfNTtpa9menPP8+W6blYj7yc=;
+        b=WrWeICbRfL+PJRYU8zKVmc5MH/NE8cT849g0NNMk4e3hX1922FlBzpH0A4QbIncggT
+         7zTFVcuVdYqRnoaqkYSg/RXywmISm4moDnrIsMEor6whU+9OnIehBFHoVrm37OE3ch+8
+         WMEKuQIH8qSsMHsnnvAbMLgZtJ/edfD5BuF8hpMBtxatBntnW2nXkfQ8V0D51Y6NuWfl
+         UvKDYt2Dez7E5xGsXbeOxvLV2uhMg2ljNsuuSAL37dKEfelmfxFz37gPX9LMXGF1XruV
+         WanK2W824KTBBfsDYcxa7ysiJxINQiBV4QFaQaPQe/+vzyOGw+EpJignpVgFSM4C2QNX
+         hEBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750441523; x=1751046323;
+        d=1e100.net; s=20230601; t=1750441525; x=1751046325;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9jmk+ZAlQ1vOFCxkryPYE4KraaL64/vcDKofTARFzz4=;
-        b=K4Q5+Db/2eGVwGQKaHA+XW4i94VPKaipPUsOPZkDzbrGFNCC5lmKW8vlIZ6TX+rp4b
-         jPeiCKDwBfS216f7PhDaHPHUfiNsou3gziUWPaIdTvJXFj/DzqmfutIoTF3Gsmg/A9qG
-         gXVOpg7LtBiOtuteX1rHmp5t2CPvgPUX2iN6UwyzEzs0TdoHkKzz4rEuisnLQ3sSAQuv
-         JuVwYZxNt0UyR6tNQRaZ793p+tBh5MJ03LrYPO0B7p34LO3T4MBw1uuVA1Ey0BcvCvr2
-         FVZBJmZ9DuuFRUHIbQYCiPsWsxA5f0sSplCSW6TQke1Lm+8X6Mk5oNWtJhx1YLZ+VAg+
-         yI+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVGvrPR3X94n1C0ZAoSKkrx2kYgysfsADXlq7i4WOR+fp+51axOc9IOOGjqFqaLaGWwhd7srqo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6XKFvSxwgI1nvRLzOnkyRzJ6eyP+65GLWXh96NyEMVFMsK2tb
-	qkxQJY6eIwadr1u76pfj/FZ1k+3hli7DBifgJo/XqVhCCPs85qJAMQ3/L7ChuA==
-X-Gm-Gg: ASbGncuVwAgz1LJgFLJ5RnYyULDdUIBqu8sz4kJaMpDPvXDKYF+oZDYto3D7u9MDJAH
-	qmPvp4rNvGTYnnEA88NAY9IQvk5FvFuzBqsbLuBGlgfkNYI2Oz/iExkL6jN2lMEtUnqmkjcoeCn
-	ZCx+kxquJ7muT0h+H4LRltTIY+Fhanmttk3ZXPBs81iIxJOnzzdy8Myc6oxLtkXbeaQ2HSdMrs3
-	aAV1431CvkEfmWEAKnGYQsPq1k+16O5NIrb70KbJzXG/NfLTfshMu32TsXH/K07hT+LprAD9u4A
-	JqgCkJFbIW+BX17YYp4j1Ydk3ZfnB+kTPGEi+zvIQeQrc0xB7lX1+DVwcF3DTAVlBePTy/I9+Cn
-	wZifekCFoTethbRhljkwseAX6En0LI5AepW9Hp8Or6a71skxOoFOmwE/avGuHMAhZLavxGhZqmL
-	Ml
-X-Google-Smtp-Source: AGHT+IFa/icoYMG9QJ1Tw5IH6rKz/y9WxnoMcyHzF02+Wc7WtYtCU3J3xosl/OvGdQOLXU78J635Tg==
-X-Received: by 2002:a0c:f201:0:b0:6fa:cbe8:b873 with SMTP id 6a1803df08f44-6fd0a4ae344mr59722536d6.14.1750441522640;
-        Fri, 20 Jun 2025 10:45:22 -0700 (PDT)
+        bh=u9duPMefwFq9YsgU9sdEfNTtpa9menPP8+W6blYj7yc=;
+        b=cri49p3Q53nJr5oyOgdnimg5lpQIfcLHvtrK8lYVtSSvzbFeY13kYniLFd/Wh7XazQ
+         BAFaZ6nbmPQPP09ck3JmXkO+8+YxD8jnYWz3yYbYUrTnnRBy3v85uV/1WmQhQDPbeS+5
+         /LPbxH7Gc9hGbLaja0Far5VLNEkPD8C+YnzKig3ohlayn7F0Iu5tx5Qrt25XLsvvAtl3
+         DGYYLEW+1k9cABc6CsriXJYxiOq7J3zuE8fKCiG43bcEX4jlZW8b9IBTqATngX+cK+pV
+         X+KafkKiXQ/GjaSpbZiDzJ6FigZMjUMuC3NBV9kdAzSMCPUpKxVGxqNW4uAfdERWNigu
+         lPfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVctkk3ls/eMhzDPzCvQEQXnwMnapWmMYCWRUanLQg/JpArIgevGO/Qxa66F5iZEVg2TK7r+00=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj6hQNAVzZXSiqQ1XiUFINTS+M1S1clAqUHIgQK5LPlc+zbjKV
+	jSGHundLBudtJofgySApCcXTVw/TTcY/DpVqQnjZ5zdQIsCb6HB5OlE1qIJ6mg==
+X-Gm-Gg: ASbGncsvmqEYonuAO6e2mDoyDIpD5F/yJzD9mjiM6mZ2ImvL13MfBv0U/WQgTcRIHHF
+	kXS+jzv4pixV2J22Pc4hLjzkm9Xq3nx9uj1LRVKTs3+3XhSxtb3tFGs7ljZnzUPeQrluxEBHgWk
+	z/OcWTicnq7wnRvSSMF2r8xZ5YAa5sn4yJhndPMogrA1Yj3ARejQeYnF4jQnfQUg8waD8oUZaY+
+	cqquCuGJQnGNpVV1UjAluCYbQXXtzSgF3SaoKQ3z4MfVsPCkl+4mNBFVcyob2I09EoXIz4QETnk
+	Eqz2Z0K8dPrFhRTj7VoLnrN+IdvEDAFITwBDZu6Y4pPW3qvQ+Cfm/Gko8k6nHoWACWBS44whdQT
+	o2RcraquLlKHbi4sQUpNivJyt51GrZg7aKpSOAE/ISIGQKCf2RgRJcWT1KLQiEdWNkg==
+X-Google-Smtp-Source: AGHT+IFRXG0PqEKIvoUDOI0iB2wSShidUcDThZN3koDt0QDIn78q+a3Cbml6ByFHfZXf8x5fDkhBmA==
+X-Received: by 2002:a05:6214:4e17:b0:6fa:fc4b:8ea7 with SMTP id 6a1803df08f44-6fd0cb81dfdmr41791676d6.21.1750441524728;
+        Fri, 20 Jun 2025 10:45:24 -0700 (PDT)
 Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd093decf0sm14580976d6.16.2025.06.20.10.45.21
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd093decf0sm14580976d6.16.2025.06.20.10.45.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 10:45:22 -0700 (PDT)
+        Fri, 20 Jun 2025 10:45:23 -0700 (PDT)
 From: Stephen Smalley <stephen.smalley.work@gmail.com>
 To: selinux@vger.kernel.org
 Cc: paul@paul-moore.com,
@@ -81,9 +80,9 @@ Cc: paul@paul-moore.com,
 	netdev@vger.kernel.org,
 	horms@kernel.org,
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v6 05/42] netstate,selinux: create the selinux netlink socket per network namespace
-Date: Fri, 20 Jun 2025 13:44:17 -0400
-Message-ID: <20250620174502.1838-6-stephen.smalley.work@gmail.com>
+Subject: [PATCH v6 06/42] selinux: limit selinux netlink notifications to init namespace
+Date: Fri, 20 Jun 2025 13:44:18 -0400
+Message-ID: <20250620174502.1838-7-stephen.smalley.work@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250620174502.1838-1-stephen.smalley.work@gmail.com>
 References: <20250620174502.1838-1-stephen.smalley.work@gmail.com>
@@ -95,113 +94,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The selinux netlink socket is used to notify userspace of changes to
-the enforcing mode and policy reloads.  At present, these notifications
-are always sent to the initial network namespace.  In order to support
-multiple selinux namespaces, each with its own enforcing mode and
-policy, we need to create and use a separate selinux netlink socket
-for each network namespace.
-
-Without this change, a policy reload in a child selinux namespace
-causes a notification to be sent to processes in the init namespace
-with a sequence number that may be higher than the policy sequence
-number for that namespace.  As a result, userspace AVC instances in
-the init namespace will then end up rejecting any further access
-vector results from its own security server instance due to the
-policy sequence number appearing to regress, which in turn causes
-all subsequent uncached access checks to fail.  Similarly,
-without this change, changing enforcing mode in the child selinux
-namespace triggers a notification to all userspace AVC instances
-in the init namespace that will switch their enforcing modes.
-
-This change does alter SELinux behavior, since previously reloading
-policy or changing enforcing mode in a non-init network namespace would
-trigger a notification to processes in the init network namespace.
-However, this behavior is not being relied upon by existing userspace
-AFAICT and is arguably wrong regardless.
+To prevent modifying the enforcing status or resetting the AVC
+in the userspace policy enforcers, do not deliver SELinux netlink
+notifications to the init network namespace unless they were
+generated by the init SELinux namespace. If you want to receive
+SELinux netlink notifications in a non-init SELinux namespace,
+then unshare your network namespace too. Otherwise, just map
+the SELinux status page (/sys/fs/selinux/status) to check the
+enforcing status and to detect policy reloads which is now the
+default behavior in libselinux on any kernels that support it.
 
 Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 ---
- include/net/net_namespace.h |  3 +++
- security/selinux/netlink.c  | 31 +++++++++++++++++++++++++------
- 2 files changed, 28 insertions(+), 6 deletions(-)
+ security/selinux/hooks.c            |  2 +-
+ security/selinux/include/security.h |  1 +
+ security/selinux/netlink.c          | 11 +++++++++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index 025a7574b275..06f2501ad9a9 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -196,6 +196,9 @@ struct net {
- 	/* Move to a better place when the config guard is removed. */
- 	struct mutex		rtnl_mutex;
- #endif
-+#if IS_ENABLED(CONFIG_SECURITY_SELINUX)
-+	struct sock		*selnl;
-+#endif
- } __randomize_layout;
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index 97cc7ae8943d..331b464fcec9 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -107,7 +107,7 @@
  
- #include <linux/seq_file_net.h>
+ #define SELINUX_INODE_INIT_XATTRS 1
+ 
+-static struct selinux_state *init_selinux_state;
++struct selinux_state *init_selinux_state;
+ struct selinux_state *current_selinux_state;
+ 
+ /* SECMARK reference count */
+diff --git a/security/selinux/include/security.h b/security/selinux/include/security.h
+index fbfe486c91c9..fbbca70ab963 100644
+--- a/security/selinux/include/security.h
++++ b/security/selinux/include/security.h
+@@ -134,6 +134,7 @@ get_selinux_state(struct selinux_state *state)
+ 	return state;
+ }
+ 
++extern struct selinux_state *init_selinux_state;
+ extern struct selinux_state *current_selinux_state;
+ 
+ static inline bool selinux_initialized(const struct selinux_state *state)
 diff --git a/security/selinux/netlink.c b/security/selinux/netlink.c
-index 1760aee712fd..03678a76f4bb 100644
+index 03678a76f4bb..fb55d3ba25f5 100644
 --- a/security/selinux/netlink.c
 +++ b/security/selinux/netlink.c
-@@ -19,8 +19,6 @@
- 
- #include "security.h"
- 
--static struct sock *selnl __ro_after_init;
--
- static int selnl_msglen(int msgtype)
- {
- 	int ret = 0;
-@@ -66,6 +64,7 @@ static void selnl_add_payload(struct nlmsghdr *nlh, int len, int msgtype, void *
- 
- static void selnl_notify(int msgtype, void *data)
- {
-+	struct sock *selnl = current->nsproxy->net_ns->selnl;
- 	int len;
- 	sk_buff_data_t tmp;
+@@ -70,6 +70,17 @@ static void selnl_notify(int msgtype, void *data)
  	struct sk_buff *skb;
-@@ -105,16 +104,36 @@ void selnl_notify_policyload(u32 seqno)
- 	selnl_notify(SELNL_MSG_POLICYLOAD, &seqno);
- }
+ 	struct nlmsghdr *nlh;
  
--static int __init selnl_init(void)
-+static int __net_init selnl_net_init(struct net *net)
- {
-+	struct sock *sk;
- 	struct netlink_kernel_cfg cfg = {
- 		.groups	= SELNLGRP_MAX,
- 		.flags	= NL_CFG_F_NONROOT_RECV,
- 	};
++	/*
++	 * Do not deliver SELinux netlink notifications to the
++	 * init network namespace if they were not generated
++	 * by the init selinux namespace. Unshare network
++	 * namespace if you want to receive them; otherwise,
++	 * just get updates via the SELinux status page.
++	 */
++	if (current_selinux_state != init_selinux_state &&
++	    net_eq(current->nsproxy->net_ns, &init_net))
++		return;
++
+ 	len = selnl_msglen(msgtype);
  
--	selnl = netlink_kernel_create(&init_net, NETLINK_SELINUX, &cfg);
--	if (selnl == NULL)
--		panic("SELinux:  Cannot create netlink socket.");
-+	sk = netlink_kernel_create(net, NETLINK_SELINUX, &cfg);
-+	if (!sk)
-+		return -ENOMEM;
-+	net->selnl = sk;
-+	return 0;
-+}
-+
-+static void __net_exit selnl_net_exit(struct net *net)
-+{
-+	netlink_kernel_release(net->selnl);
-+	net->selnl = NULL;
-+}
-+
-+static struct pernet_operations selnl_net_ops = {
-+	.init = selnl_net_init,
-+	.exit = selnl_net_exit,
-+};
-+
-+static int __init selnl_init(void)
-+{
-+	if (register_pernet_subsys(&selnl_net_ops))
-+		panic("Could not register selinux netlink operations\n");
- 	return 0;
- }
- 
+ 	skb = nlmsg_new(len, GFP_USER);
 -- 
 2.49.0
 
