@@ -1,413 +1,170 @@
-Return-Path: <netdev+bounces-199738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441D4AE19ED
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:22:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B016AE19F0
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AEAF7AA587
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:21:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31DE84A1324
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0FB257AF2;
-	Fri, 20 Jun 2025 11:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141E828A702;
+	Fri, 20 Jun 2025 11:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H+2tHfKb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBi7dzW3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C786278F4A;
-	Fri, 20 Jun 2025 11:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E039678F4A;
+	Fri, 20 Jun 2025 11:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750418568; cv=none; b=t5tkmqP2Zfji1FRnOaki40aF25Ox6SUoJtMpfaAMY2G4eTjww9xB/k8iXyS+SbkSbKPUri7P7wkcVph/gjrwq8O0pPKINfLNc5DbTTsqwRPSgOiRfrN7wsYBWlXGVRWYZruAoI+cnzXiXsPxatlbVnjh5x1XOk6b3vlpfeLtrUQ=
+	t=1750418573; cv=none; b=drQ5VhNb1MKbGCtbNRlpAIZ4PQg8dKQIFhoNBwikPF1ph6Lw8DbDx0/5Zq+Jg2vgllMbkZbpr2t5YeGPNBCqNboZwzsVSdwL+rrtoyBdZfL84YMCjLMmwR6AABUAFcVv2FlSOsvKSIKpZQRh/VSiYjb2NVzVhaNINu+PDIwQsOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750418568; c=relaxed/simple;
-	bh=QBFJzVVrfVoyGIEd3fk1LqSlNLHOElDjvujD8eKPQIw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eZB99bqX+6prafH1fsfZE67Oi+jsnOa6UAwCoSly6BGhT0G5AHX35JIuCBTWnoytLUt4ZRq/n4xsYRT1IEFXUykmm8OFz2J3lIJH49e4kNUe2IzsIHRZbrzuV+KgcVaub7+6LTGRUHGiBnlw/fg4VCw7Tin9yO044cTwtRrPQzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H+2tHfKb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BC88C4CEE3;
-	Fri, 20 Jun 2025 11:22:46 +0000 (UTC)
+	s=arc-20240116; t=1750418573; c=relaxed/simple;
+	bh=xb7le+JVu5plOl8d+Z+QP0tBuHNw+JzW+sPw/OqJZ50=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DSlYm+azt9lu9c7nGdqBhrA/jL9c596QHGEGZIBzKHLjhyTRwAfBxzJMROSgeGeT9nmU1hgAEAvu3lrlEvw313Tw77HqfRbN8LOFlv2DDyiYyoyDYNaHtV/S8hJSK7LJyXxnjtO1D8zNlM5Vv3y0ZzyUGwlje9X/7HW/cw65qlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBi7dzW3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25DF8C4CEEF;
+	Fri, 20 Jun 2025 11:22:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750418568;
-	bh=QBFJzVVrfVoyGIEd3fk1LqSlNLHOElDjvujD8eKPQIw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=H+2tHfKbk0CjhBzyiqzIoioVXNchfu684gcdExNICGG0E8f9LWlKIwb/PD2xKkMhP
-	 NpeGKwOYqpIKscYKovXrO1h0TY7rTFS+5pcY79bZOxkXLXt2xec6cIpIj+zIUn98H9
-	 q39XaAPds05Lm2Ey2FcE/UQyYOBacES9fXQuAy5BzsqvNlhvRDN3VNEI1Trgi8Qm9d
-	 jxno7LYJxiWYFGDZftxZKwl3/bgCn8hV1Hy3Y9/n2qwIj9RkCUke2eiCzRgzmfb8al
-	 l188xmUF8JPUgmBcPRs5FWOAf1yWii7elT1K32xAp1kTYK4B1/lIcOwIZLDLNVQ5Hz
-	 eAJskdotPxunw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] caif: reduce stack size, again
-Date: Fri, 20 Jun 2025 13:22:39 +0200
-Message-Id: <20250620112244.3425554-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=k20201202; t=1750418572;
+	bh=xb7le+JVu5plOl8d+Z+QP0tBuHNw+JzW+sPw/OqJZ50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hBi7dzW34kHQtLDne0ZtxxS3mMnKuIZOTTTYO34dIvlhvDsNWKpXwmYf1+6T8XRn2
+	 n/OKSmEOIH6dWjcW31YMTl0Hi+8THSaCe71c8MtBU3DkcJDbydqSUIi9o35F54du6O
+	 NyfOvOD0OG9gLnxy8iFaLnbDyvPyUslnFU9D8jsr9hCu+9ypXv6y3+NXY1MOziNdxx
+	 FEA/Qe0kajW1EZUHT84ngVAfAiOQbyZay9CcPccyzzRtO2jUbLdLPvtwbBvC2TRjml
+	 WPjz2YCkB5/PUlQUV0uzwlWqawhc6epHWmXomoTvt3dA9Vzw1gebG237cwWs+LWCJH
+	 4ajtIesA8XaEA==
+Date: Fri, 20 Jun 2025 12:22:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: davem@davemloft.net, leon@kernel.org, sgoutham@marvell.com,
+	bbhushan2@marvell.com, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 14/14] octeontx2-pf: ipsec: Add XFRM state
+ and policy hooks for inbound flows
+Message-ID: <20250620112249.GL194429@horms.kernel.org>
+References: <20250618113020.130888-1-tanmay@marvell.com>
+ <20250618113020.130888-15-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618113020.130888-15-tanmay@marvell.com>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Jun 18, 2025 at 05:00:08PM +0530, Tanmay Jagdale wrote:
+> Add XFRM state hook for inbound flows and configure the following:
+>   - Install an NPC rule to classify the 1st pass IPsec packets and
+>     direct them to the dedicated RQ
+>   - Allocate a free entry from the SA table and populate it with the
+>     SA context details based on xfrm state data.
+>   - Create a mapping of the SPI value to the SA table index. This is
+>     used by NIXRX to calculate the exact SA context  pointer address
+>     based on the SPI in the packet.
+>   - Prepare the CPT SA context to decrypt buffer in place and the
+>     write it the CPT hardware via LMT operation.
+>   - When the XFRM state is deleted, clear this SA in CPT hardware.
+> 
+> Also add XFRM Policy hooks to allow successful offload of inbound
+> PACKET_MODE.
+> 
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 
-I tried to fix the stack usage in this function a couple of years ago,
-but there is still a problem with the latest gcc versions in some
-configurations:
+...
 
-net/caif/cfctrl.c:553:1: error: the frame size of 1296 bytes is larger than 1280 bytes [-Werror=frame-larger-than=]
+> @@ -1141,6 +1154,137 @@ static int cn10k_outb_write_sa(struct otx2_nic *pf, struct qmem *sa_info)
+>  	return ret;
+>  }
+>  
+> +static int cn10k_inb_write_sa(struct otx2_nic *pf,
+> +			      struct xfrm_state *x,
+> +			      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+> +{
+> +	dma_addr_t res_iova, dptr_iova, sa_iova;
+> +	struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
+> +	struct cpt_inst_s inst;
+> +	u32 sa_size, off;
+> +	struct cpt_res_s *res;
+> +	u64 reg_val;
+> +	int ret;
+> +
+> +	res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
+> +				 &res_iova, GFP_ATOMIC);
+> +	if (!res)
+> +		return -ENOMEM;
+> +
+> +	sa_cptr = inb_ctx_info->sa_entry;
+> +	sa_iova = inb_ctx_info->sa_iova;
+> +	sa_size = sizeof(struct cn10k_rx_sa_s);
+> +
+> +	sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
+> +	if (!sa_dptr) {
+> +		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
+> +				  res_iova);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	for (off = 0; off < (sa_size / 8); off++)
+> +		*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
+> +
+> +	memset(&inst, 0, sizeof(struct cpt_inst_s));
+> +
+> +	res->compcode = 0;
+> +	inst.res_addr = res_iova;
+> +	inst.dptr = (u64)dptr_iova;
+> +	inst.param2 = sa_size >> 3;
+> +	inst.dlen = sa_size;
+> +	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
+> +	inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
+> +	inst.cptr = sa_iova;
+> +	inst.ctx_val = 1;
+> +	inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
+> +
+> +	/* Re-use Outbound CPT LF to install Ingress SAs as well because
+> +	 * the driver does not own the ingress CPT LF.
+> +	 */
+> +	pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
+> +	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
+> +	dmb(sy);
 
-Reduce this once again, with a separate cfctrl_link_setup() function that
-holds the bulk of all the local variables. It also turns out that the
-param[] array that takes up a large portion of the stack is write-only
-and can be left out here.
+Hi Tanmay,
 
-Fixes: ce6289661b14 ("caif: reduce stack size with KASAN")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- net/caif/cfctrl.c | 294 +++++++++++++++++++++++-----------------------
- 1 file changed, 144 insertions(+), 150 deletions(-)
+As I understand things the above effectively means that this
+driver will only compile for ARM64.
 
-diff --git a/net/caif/cfctrl.c b/net/caif/cfctrl.c
-index 20139fa1be1f..06b604cf9d58 100644
---- a/net/caif/cfctrl.c
-+++ b/net/caif/cfctrl.c
-@@ -351,17 +351,154 @@ int cfctrl_cancel_req(struct cflayer *layr, struct cflayer *adap_layer)
- 	return found;
- }
- 
-+static int cfctrl_link_setup(struct cfctrl *cfctrl, struct cfpkt *pkt, u8 cmdrsp)
-+{
-+	u8 len;
-+	u8 linkid = 0;
-+	enum cfctrl_srv serv;
-+	enum cfctrl_srv servtype;
-+	u8 endpoint;
-+	u8 physlinkid;
-+	u8 prio;
-+	u8 tmp;
-+	u8 *cp;
-+	int i;
-+	struct cfctrl_link_param linkparam;
-+	struct cfctrl_request_info rsp, *req;
-+
-+	memset(&linkparam, 0, sizeof(linkparam));
-+
-+	tmp = cfpkt_extr_head_u8(pkt);
-+
-+	serv = tmp & CFCTRL_SRV_MASK;
-+	linkparam.linktype = serv;
-+
-+	servtype = tmp >> 4;
-+	linkparam.chtype = servtype;
-+
-+	tmp = cfpkt_extr_head_u8(pkt);
-+	physlinkid = tmp & 0x07;
-+	prio = tmp >> 3;
-+
-+	linkparam.priority = prio;
-+	linkparam.phyid = physlinkid;
-+	endpoint = cfpkt_extr_head_u8(pkt);
-+	linkparam.endpoint = endpoint & 0x03;
-+
-+	switch (serv) {
-+	case CFCTRL_SRV_VEI:
-+	case CFCTRL_SRV_DBG:
-+		if (CFCTRL_ERR_BIT & cmdrsp)
-+			break;
-+		/* Link ID */
-+		linkid = cfpkt_extr_head_u8(pkt);
-+		break;
-+	case CFCTRL_SRV_VIDEO:
-+		tmp = cfpkt_extr_head_u8(pkt);
-+		linkparam.u.video.connid = tmp;
-+		if (CFCTRL_ERR_BIT & cmdrsp)
-+			break;
-+		/* Link ID */
-+		linkid = cfpkt_extr_head_u8(pkt);
-+		break;
-+
-+	case CFCTRL_SRV_DATAGRAM:
-+		linkparam.u.datagram.connid = cfpkt_extr_head_u32(pkt);
-+		if (CFCTRL_ERR_BIT & cmdrsp)
-+			break;
-+		/* Link ID */
-+		linkid = cfpkt_extr_head_u8(pkt);
-+		break;
-+	case CFCTRL_SRV_RFM:
-+		/* Construct a frame, convert
-+		 * DatagramConnectionID
-+		 * to network format long and copy it out...
-+		 */
-+		linkparam.u.rfm.connid = cfpkt_extr_head_u32(pkt);
-+		cp = (u8 *) linkparam.u.rfm.volume;
-+		for (tmp = cfpkt_extr_head_u8(pkt);
-+		     cfpkt_more(pkt) && tmp != '\0';
-+		     tmp = cfpkt_extr_head_u8(pkt))
-+			*cp++ = tmp;
-+		*cp = '\0';
-+
-+		if (CFCTRL_ERR_BIT & cmdrsp)
-+			break;
-+		/* Link ID */
-+		linkid = cfpkt_extr_head_u8(pkt);
-+
-+		break;
-+	case CFCTRL_SRV_UTIL:
-+		/* Construct a frame, convert
-+		 * DatagramConnectionID
-+		 * to network format long and copy it out...
-+		 */
-+		/* Fifosize KB */
-+		linkparam.u.utility.fifosize_kb = cfpkt_extr_head_u16(pkt);
-+		/* Fifosize bufs */
-+		linkparam.u.utility.fifosize_bufs = cfpkt_extr_head_u16(pkt);
-+		/* name */
-+		cp = (u8 *) linkparam.u.utility.name;
-+		caif_assert(sizeof(linkparam.u.utility.name)
-+			     >= UTILITY_NAME_LENGTH);
-+		for (i = 0; i < UTILITY_NAME_LENGTH && cfpkt_more(pkt); i++) {
-+			tmp = cfpkt_extr_head_u8(pkt);
-+			*cp++ = tmp;
-+		}
-+		/* Length */
-+		len = cfpkt_extr_head_u8(pkt);
-+		linkparam.u.utility.paramlen = len;
-+		/* Param Data */
-+		cp = linkparam.u.utility.params;
-+		while (cfpkt_more(pkt) && len--) {
-+			tmp = cfpkt_extr_head_u8(pkt);
-+			*cp++ = tmp;
-+		}
-+		if (CFCTRL_ERR_BIT & cmdrsp)
-+			break;
-+		/* Link ID */
-+		linkid = cfpkt_extr_head_u8(pkt);
-+		/* Length */
-+		len = cfpkt_extr_head_u8(pkt);
-+		/* Param Data */
-+		cfpkt_extr_head(pkt, NULL, len);
-+		break;
-+	default:
-+		pr_warn("Request setup, invalid type (%d)\n", serv);
-+		return -1;
-+	}
-+
-+	rsp.cmd = CFCTRL_CMD_LINK_SETUP;
-+	rsp.param = linkparam;
-+	spin_lock_bh(&cfctrl->info_list_lock);
-+	req = cfctrl_remove_req(cfctrl, &rsp);
-+
-+	if (CFCTRL_ERR_BIT == (CFCTRL_ERR_BIT & cmdrsp) ||
-+		cfpkt_erroneous(pkt)) {
-+		pr_err("Invalid O/E bit or parse error "
-+				"on CAIF control channel\n");
-+		cfctrl->res.reject_rsp(cfctrl->serv.layer.up, 0,
-+				       req ? req->client_layer : NULL);
-+	} else {
-+		cfctrl->res.linksetup_rsp(cfctrl->serv.layer.up, linkid,
-+					  serv, physlinkid,
-+					  req ?  req->client_layer : NULL);
-+	}
-+
-+	kfree(req);
-+
-+	spin_unlock_bh(&cfctrl->info_list_lock);
-+
-+	return 0;
-+}
-+
- static int cfctrl_recv(struct cflayer *layer, struct cfpkt *pkt)
- {
- 	u8 cmdrsp;
- 	u8 cmd;
--	int ret = -1;
--	u8 len;
--	u8 param[255];
-+	int ret = 0;
- 	u8 linkid = 0;
- 	struct cfctrl *cfctrl = container_obj(layer);
--	struct cfctrl_request_info rsp, *req;
--
- 
- 	cmdrsp = cfpkt_extr_head_u8(pkt);
- 	cmd = cmdrsp & CFCTRL_CMD_MASK;
-@@ -374,150 +511,7 @@ static int cfctrl_recv(struct cflayer *layer, struct cfpkt *pkt)
- 
- 	switch (cmd) {
- 	case CFCTRL_CMD_LINK_SETUP:
--		{
--			enum cfctrl_srv serv;
--			enum cfctrl_srv servtype;
--			u8 endpoint;
--			u8 physlinkid;
--			u8 prio;
--			u8 tmp;
--			u8 *cp;
--			int i;
--			struct cfctrl_link_param linkparam;
--			memset(&linkparam, 0, sizeof(linkparam));
--
--			tmp = cfpkt_extr_head_u8(pkt);
--
--			serv = tmp & CFCTRL_SRV_MASK;
--			linkparam.linktype = serv;
--
--			servtype = tmp >> 4;
--			linkparam.chtype = servtype;
--
--			tmp = cfpkt_extr_head_u8(pkt);
--			physlinkid = tmp & 0x07;
--			prio = tmp >> 3;
--
--			linkparam.priority = prio;
--			linkparam.phyid = physlinkid;
--			endpoint = cfpkt_extr_head_u8(pkt);
--			linkparam.endpoint = endpoint & 0x03;
--
--			switch (serv) {
--			case CFCTRL_SRV_VEI:
--			case CFCTRL_SRV_DBG:
--				if (CFCTRL_ERR_BIT & cmdrsp)
--					break;
--				/* Link ID */
--				linkid = cfpkt_extr_head_u8(pkt);
--				break;
--			case CFCTRL_SRV_VIDEO:
--				tmp = cfpkt_extr_head_u8(pkt);
--				linkparam.u.video.connid = tmp;
--				if (CFCTRL_ERR_BIT & cmdrsp)
--					break;
--				/* Link ID */
--				linkid = cfpkt_extr_head_u8(pkt);
--				break;
--
--			case CFCTRL_SRV_DATAGRAM:
--				linkparam.u.datagram.connid =
--				    cfpkt_extr_head_u32(pkt);
--				if (CFCTRL_ERR_BIT & cmdrsp)
--					break;
--				/* Link ID */
--				linkid = cfpkt_extr_head_u8(pkt);
--				break;
--			case CFCTRL_SRV_RFM:
--				/* Construct a frame, convert
--				 * DatagramConnectionID
--				 * to network format long and copy it out...
--				 */
--				linkparam.u.rfm.connid =
--				    cfpkt_extr_head_u32(pkt);
--				cp = (u8 *) linkparam.u.rfm.volume;
--				for (tmp = cfpkt_extr_head_u8(pkt);
--				     cfpkt_more(pkt) && tmp != '\0';
--				     tmp = cfpkt_extr_head_u8(pkt))
--					*cp++ = tmp;
--				*cp = '\0';
--
--				if (CFCTRL_ERR_BIT & cmdrsp)
--					break;
--				/* Link ID */
--				linkid = cfpkt_extr_head_u8(pkt);
--
--				break;
--			case CFCTRL_SRV_UTIL:
--				/* Construct a frame, convert
--				 * DatagramConnectionID
--				 * to network format long and copy it out...
--				 */
--				/* Fifosize KB */
--				linkparam.u.utility.fifosize_kb =
--				    cfpkt_extr_head_u16(pkt);
--				/* Fifosize bufs */
--				linkparam.u.utility.fifosize_bufs =
--				    cfpkt_extr_head_u16(pkt);
--				/* name */
--				cp = (u8 *) linkparam.u.utility.name;
--				caif_assert(sizeof(linkparam.u.utility.name)
--					     >= UTILITY_NAME_LENGTH);
--				for (i = 0;
--				     i < UTILITY_NAME_LENGTH
--				     && cfpkt_more(pkt); i++) {
--					tmp = cfpkt_extr_head_u8(pkt);
--					*cp++ = tmp;
--				}
--				/* Length */
--				len = cfpkt_extr_head_u8(pkt);
--				linkparam.u.utility.paramlen = len;
--				/* Param Data */
--				cp = linkparam.u.utility.params;
--				while (cfpkt_more(pkt) && len--) {
--					tmp = cfpkt_extr_head_u8(pkt);
--					*cp++ = tmp;
--				}
--				if (CFCTRL_ERR_BIT & cmdrsp)
--					break;
--				/* Link ID */
--				linkid = cfpkt_extr_head_u8(pkt);
--				/* Length */
--				len = cfpkt_extr_head_u8(pkt);
--				/* Param Data */
--				cfpkt_extr_head(pkt, &param, len);
--				break;
--			default:
--				pr_warn("Request setup, invalid type (%d)\n",
--					serv);
--				goto error;
--			}
--
--			rsp.cmd = cmd;
--			rsp.param = linkparam;
--			spin_lock_bh(&cfctrl->info_list_lock);
--			req = cfctrl_remove_req(cfctrl, &rsp);
--
--			if (CFCTRL_ERR_BIT == (CFCTRL_ERR_BIT & cmdrsp) ||
--				cfpkt_erroneous(pkt)) {
--				pr_err("Invalid O/E bit or parse error "
--						"on CAIF control channel\n");
--				cfctrl->res.reject_rsp(cfctrl->serv.layer.up,
--						       0,
--						       req ? req->client_layer
--						       : NULL);
--			} else {
--				cfctrl->res.linksetup_rsp(cfctrl->serv.
--							  layer.up, linkid,
--							  serv, physlinkid,
--							  req ? req->
--							  client_layer : NULL);
--			}
--
--			kfree(req);
--
--			spin_unlock_bh(&cfctrl->info_list_lock);
--		}
-+		ret = cfctrl_link_setup(cfctrl, pkt, cmdrsp);
- 		break;
- 	case CFCTRL_CMD_LINK_DESTROY:
- 		linkid = cfpkt_extr_head_u8(pkt);
-@@ -544,9 +538,9 @@ static int cfctrl_recv(struct cflayer *layer, struct cfpkt *pkt)
- 		break;
- 	default:
- 		pr_err("Unrecognized Control Frame\n");
-+		ret = -1;
- 		goto error;
- 	}
--	ret = 0;
- error:
- 	cfpkt_destroy(pkt);
- 	return ret;
--- 
-2.39.5
+I do understand that the driver is only intended to be used on ARM64.
+But it is nice to get compile coverage on other 64bit systems,
+in particular x86_64.
 
+And moreover, I think the guiding principle should be for drivers
+to be as independent of the host system as possible.
+
+Can we look into handling this a different way?
+
+> +
+> +	ret = cn10k_wait_for_cpt_respose(pf, res);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/* Trigger CTX flush to write dirty data back to DRAM */
+> +	reg_val = FIELD_PREP(GENMASK_ULL(45, 0), sa_iova >> 7);
+> +	otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
+> +
+> +out:
+> +	dma_free_coherent(pf->dev, sa_size, sa_dptr, dptr_iova);
+> +	dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res, res_iova);
+> +	return ret;
+> +}
+
+...
 
