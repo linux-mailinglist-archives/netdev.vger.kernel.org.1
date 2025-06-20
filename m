@@ -1,83 +1,194 @@
-Return-Path: <netdev+bounces-199730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15BE9AE1974
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:02:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1BCAE197B
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B3CB7A80F7
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:00:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E81107AFAFB
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E00280A35;
-	Fri, 20 Jun 2025 11:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1972853F1;
+	Fri, 20 Jun 2025 11:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="qpTLyP6P"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="m4/rRFXe";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="keuZXPJL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="m4/rRFXe";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="keuZXPJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2FF24500E;
-	Fri, 20 Jun 2025 11:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A451028467B
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 11:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750417319; cv=none; b=SRMtBg461Zfz53tRvq0zTjUs+H5hX88ChWkM4fRcrY8t4biEvl60hMEgdTAIah37EA0CuP/imBjT7QAwYMP24+0xxJCjKmT1amgGfYXtlfi9NG07oSmrnXJ7S2wi1u5klf6f9oquGhTww+Yj4fVXMCmEN1pCWUe+xCBbveIKKwY=
+	t=1750417327; cv=none; b=ouq05fFiU8Y/iwPz9cIvOREoLSXZ5VM5aBR2eXguI8jGadEwFH9lT/JhalGXRSrmBaLHQ/+Wtkg9ZeWfdtOmwXogAgxWjNbDi4b7qF9X3I3JVPb0OppCpBJ6PWUYP81/duTW+1fNlfTUCWwSXN6hqv1qKpr7eZ7zVN9u0SYoRio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750417319; c=relaxed/simple;
-	bh=0+189Q01OWW44SjCAKrdmB3dlldQZT7EfBm4Z9bM//A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U0cw74GBye+lEr3gbDLcp3ucOVivSeIlpbV0nlxC8eEhjgwzIOdxOaKdfQvSYHMqySbodpBvPZ2U2E9EVx20O+UUxFHA//mzASx0Jc1/U7lQynJriR17EUst4ws8VztnfQq8vahpuXvmm6b4nD/7nHJRgoh0mEyhu9WOZeMc8Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=qpTLyP6P; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=0+189Q01OWW44SjCAKrdmB3dlldQZT7EfBm4Z9bM//A=;
-	t=1750417318; x=1751626918; b=qpTLyP6P+lSPqpRHG7OZG+7HmDl8D3S2sJIzfpzPhGo/WAh
-	uoNjXUAXRUqK69zAt86Q+A2yfaTO/S5Rd5mlfE8DhRrLQsg1IjZK4uagstDBQGAp6nuzSs40lSUG/
-	xj9GD1rFRz6HN+qx0M7TsfBlHxSOexaE7UDdlE+LTuSx8Eql6SSKbWFm6/7tXWWVy6wj1Rnf1frSa
-	NdjkhfNkGTfpqQ0TbGRsl8IB1VI+aD9xuPGd6Lwd4dt86GKciaAGdhuK8hdtT45NHv/fTSE8stHFF
-	wD3fCdRw782KA8L7ufJDLXmlYW45kZRKoibScdsLDcyWzZ2KpgILV9f+k//FrI8A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uSZVI-00000002fE2-0TFC;
-	Fri, 20 Jun 2025 13:01:52 +0200
-Message-ID: <c78aef54d57a83c874cd9092d6e50c3656540c02.camel@sipsolutions.net>
-Subject: Re: [PATCH] wifi: cfg80211: Prevent comparison with invalid
- registered dev scan req
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Lizhi Xu <lizhi.xu@windriver.com>, 
-	syzbot+189dcafc06865d38178d@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Date: Fri, 20 Jun 2025 13:01:51 +0200
-In-Reply-To: <20250619080526.899000-1-lizhi.xu@windriver.com> (sfid-20250619_100643_662853_B51B997A)
-References: <684ba12f.a00a0220.279073.0009.GAE@google.com>
-	 <20250619080526.899000-1-lizhi.xu@windriver.com>
-	 (sfid-20250619_100643_662853_B51B997A)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1750417327; c=relaxed/simple;
+	bh=krPL8SLPhNETObWiuCZmMldIFn+Ebw+ujtbHN7uw5eE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HlkCnLSPtajTQDSEdUoeUFiKWB00JJd+xTI3naVINQCFGRL/hhmkM40wrAU8AikNgerSUlp2roigJqjNhFnwaJxQwWTGjpj+rdy4LpC7BsPjUiS0s5Q56DbRkg+boJz/pSTKk5ok0YKtrHpY0/leUdauuFp3H1wqtLgC20Kh6SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=m4/rRFXe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=keuZXPJL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=m4/rRFXe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=keuZXPJL; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 85E2021196;
+	Fri, 20 Jun 2025 11:01:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750417317; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FV7U65hwaJMIq06afxPOVK3sa5XbOzLmrtQ8epTLQOs=;
+	b=m4/rRFXeVJcz/rzXZ/0ZjOqVqdNyRjvRMJ8tG3W6wmKXEoh9qEshHdhlJGLbbF246/NELa
+	PbWO5gqZwR3u4pn+Gl3ummg1cC2ghKweZfMvA3T9/1w8yt1n6C+mJdp0XKEvXTpTExHwX2
+	gC8bt0/kwOfomD7teBS5UQvsrk8X4eA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750417317;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FV7U65hwaJMIq06afxPOVK3sa5XbOzLmrtQ8epTLQOs=;
+	b=keuZXPJLtATHQ1Byl7NJbHhbYpz0MU72WZfwmi782Y3fr8pUhkgpdahoBgZ2GX6B9WEwKQ
+	12rhn9hjT9WC9jAA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="m4/rRFXe";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=keuZXPJL
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750417317; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FV7U65hwaJMIq06afxPOVK3sa5XbOzLmrtQ8epTLQOs=;
+	b=m4/rRFXeVJcz/rzXZ/0ZjOqVqdNyRjvRMJ8tG3W6wmKXEoh9qEshHdhlJGLbbF246/NELa
+	PbWO5gqZwR3u4pn+Gl3ummg1cC2ghKweZfMvA3T9/1w8yt1n6C+mJdp0XKEvXTpTExHwX2
+	gC8bt0/kwOfomD7teBS5UQvsrk8X4eA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750417317;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FV7U65hwaJMIq06afxPOVK3sa5XbOzLmrtQ8epTLQOs=;
+	b=keuZXPJLtATHQ1Byl7NJbHhbYpz0MU72WZfwmi782Y3fr8pUhkgpdahoBgZ2GX6B9WEwKQ
+	12rhn9hjT9WC9jAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EB74F136BA;
+	Fri, 20 Jun 2025 11:01:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id jNd+NqM/VWg9DwAAD6G6ig
+	(envelope-from <pfalcato@suse.de>); Fri, 20 Jun 2025 11:01:55 +0000
+Date: Fri, 20 Jun 2025 12:01:54 +0100
+From: Pedro Falcato <pfalcato@suse.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: sashal@kernel.org, 
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, Breno Leitao <leitao@debian.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Mina Almasry <almasrymina@google.com>, 
+	Yonglong Liu <liuyonglong@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org, 
+	Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>, gregkh@linuxfoundation.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH net-next v9 2/2] page_pool: Track DMA-mapped pages and
+ unmap them when destroying the pool
+Message-ID: <5geg5wg36vsu6igy5yndfolgkhev5uuslr67s5ygfabgmxrfty@5iw3y24mmv57>
+References: <20250409-page-pool-track-dma-v9-0-6a9ef2e0cba8@redhat.com>
+ <20250409-page-pool-track-dma-v9-2-6a9ef2e0cba8@redhat.com>
+ <aEmwYU/V/9/Ul04P@gmail.com>
+ <20250611131241.6ff7cf5d@kernel.org>
+ <87jz5hbevp.fsf@toke.dk>
+ <20250612070518.69518466@kernel.org>
+ <87zfecrq3d.fsf@toke.dk>
+ <20250613080202.28d25763@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250613080202.28d25763@kernel.org>
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 85E2021196
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,debian.org,davemloft.net,nvidia.com,lunn.ch,google.com,linaro.org,linux-foundation.org,huawei.com,gmail.com,infradead.org,vger.kernel.org,kvack.org,linuxfoundation.org];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLc7d9qgwtzysrasug3x86bmuu)];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -2.51
+X-Spam-Level: 
 
-On Thu, 2025-06-19 at 16:05 +0800, Lizhi Xu wrote:
-> The scan req of a registered device may have been released, so it should
-> be checked to be valid before comparing it with the current req.
->=20
+On Fri, Jun 13, 2025 at 08:02:02AM -0700, Jakub Kicinski wrote:
+> On Fri, 13 Jun 2025 10:41:10 +0200 Toke Høiland-Jørgensen wrote:
+> > Jakub Kicinski <kuba@kernel.org> writes:
+> > 
+> > > On Thu, 12 Jun 2025 09:25:30 +0200 Toke Høiland-Jørgensen wrote:  
+> > >> Hmm, okay, guess we should ask Sasha to drop these, then?
+> > >> 
+> > >> https://lore.kernel.org/r/20250610122811.1567780-1-sashal@kernel.org
+> > >> https://lore.kernel.org/r/20250610120306.1543986-1-sashal@kernel.org  
+> > >
+> > > These links don't work for me?  
+> > 
+> > Oh, sorry, didn't realise the stable notifications are not archived on
+> > lore. Here are the patches in the stable queue:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tree/queue-6.12/page_pool-move-pp_magic-check-into-helper-functions.patch
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tree/queue-6.12/page_pool-track-dma-mapped-pages-and-unmap-them-when.patch
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tree/queue-6.15/page_pool-move-pp_magic-check-into-helper-functions.patch
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tree/queue-6.15/page_pool-track-dma-mapped-pages-and-unmap-them-when.patch
+> 
+> Thanks!
+> 
+> Sasha, could we drop these please? They need more mileage before we
+> send them to LTS.
 
-I don't understand the subject/commit log at all. You're now accepting
-scan_done() with a NULL scan request, why does that make sense?
+FYI: The patches made it into 6.15.3 and 6.12.34.
 
-johannes
+-- 
+Pedro
 
