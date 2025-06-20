@@ -1,196 +1,341 @@
-Return-Path: <netdev+bounces-199666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1151DAE1538
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 09:50:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7837AE1564
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50840188951F
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 07:49:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB38718976FB
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 08:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9016B22E3E9;
-	Fri, 20 Jun 2025 07:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yzl19JMI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F4622A1F1;
+	Fri, 20 Jun 2025 08:04:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BB322DFAD
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 07:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2E930E824
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 08:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750405768; cv=none; b=AJ+iAey3ydus2eB+rbzXeNvvOKX7vdgPFMMmWIeCNNn7EEWCOHeAjKedBy7sc9ZCHg0oSsJpiS6kbKuLLGIRftA02s6tMa2hben/wJ5IcvY2Y/OTvSLPfXyAQ5P1oakzulRqOTsyAIU6LtEhRVpUgGKl0dZTttWYii5srtcq7t4=
+	t=1750406660; cv=none; b=HgzRRBUWLzAzO82HRH4VOwV0ADz0FTjO42nywjRx4fHHskd7ceSMJfxnyrmqb+bbldwb2wN8ZL6oanxOLz9VTSC8BLHOoMWcLgkFzJIxUfH57WLGKLMTXzarSUPwhSZxfa4S6swVjxgqP8BBTPqbebH6HkpbC0uq7jZ686f534A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750405768; c=relaxed/simple;
-	bh=lPTn097d3RKmYQXcQJXHtz90CBTGa1mOLWU8ZI0qkp8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VrzVQfwM3UgNftBF6B+O+6eWYPYNW3kzoAg3AgC4aRKlcb7xyvcweKDNieI3clNGlVa+HJGNVs9UK10JDoo3OFfuM+c0ZYVoqN11LnBF/vrh6XSFPW5tvI8M37/YaTKxl9LbeXwQU7pIV96TNIA+5sUN3sEwPvPYGnRMwrLYkBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yzl19JMI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750405764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8/NfKHQF9oEI9qiwLXTW6bFDUNC1qeYOK5nIoYRGjPo=;
-	b=Yzl19JMIY5R14RaRYubJV+78OEkgc0EwUAINugJyMGuDWanK89ac8gFMOd1mWQRdvGggA/
-	hDN2eA21a2zwwAt+9Xrdp91M7hP3bf0C11Phu5ytWHKnd27FXIagXx+YsEHlMi80eAVx1V
-	mW2ZkwsX4UwTJS34UszRG/z+s35ZBM4=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-358-DHDoMLfXMTyDyloDM2LAEg-1; Fri, 20 Jun 2025 03:49:22 -0400
-X-MC-Unique: DHDoMLfXMTyDyloDM2LAEg-1
-X-Mimecast-MFC-AGG-ID: DHDoMLfXMTyDyloDM2LAEg_1750405761
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-553b902b3cdso840941e87.1
-        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 00:49:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750405761; x=1751010561;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8/NfKHQF9oEI9qiwLXTW6bFDUNC1qeYOK5nIoYRGjPo=;
-        b=MvqzGIJe+ddVzMpiyzO5I3IkdzCpeyk0aNV24f4glvX9YYwRA6hOtHGRFmJovWWJkN
-         UDXpRiUC5dpKAm4ArVOysCTmSHaVtwDVfRgXaHVvoPyv4XgPUD3WcP5dkKB79fASFdKD
-         PBTc8nd+Zapbwd0yTJ9JgJNee7Skq+s2AdtPhQg8gU2OawWqRbiVxTmp84xdOXy3gZd6
-         ZJ36N4eJRfyUJL1sMgcxVZMYMarGl1sVI4ZKa6FRRemGr1y06iUlBMSy8tA9mEZzVx7/
-         bga2MT0Zc64WUycbju3cksj4eK3TCWWcj1FJw6owYNXH1i6OZz3+2LLGOncna9ctc94F
-         mmcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX0U+YuE3bssgd6Aa9tX1br5sLFnJt0HZYXiOf8XD+voKKhuYnlYLbOfsd8PaQyAhOSudJN1L4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjtzurHCpkM8Ur6pFgCrp1NrpxOTKlWWmn3PQQ4gmFl0CUAjCQ
-	cHE4CTQLAU0ZYMN4mRV25xSPulqNvqcMcphZN4mqQdGfcjNuuRg/+KJlpIfrbm9XZfkKeym6m4E
-	J+Tqj0JEQAmRTXX2EcfJD8c7SOlSblU+ByPhUB1hLcADgLyHQAYqJO7ax7A==
-X-Gm-Gg: ASbGncuZJvkNr8XYXSYl+W34W5wV5Yz/SwqD7VSLA8qH0D/RtXFv9CcDH+dpwGe754K
-	NbLRhdeLSF31hhXvYScK4MT5TMMvge9nEBNREdGZpWnlGEg9reuO5Op20qMMpg7JG1cMDwg1yi0
-	1cILFnOCW9C0mnlugad6Y8qOmYneI7FIzitNgCNAf/YyrszYLWuBzmYq807NV3/70Hvt/dsd/HX
-	FraV3dO3iHb2tyVLbe5KMbkMKYuIC912sEZzPnguza/9LJB9KedP0mrRfGGcGX5B2s8j5vjP7If
-	QLXv9QD8+Q9DeI6LXqU=
-X-Received: by 2002:a05:6512:1323:b0:553:accf:d75 with SMTP id 2adb3069b0e04-553e3cfdb6bmr549354e87.26.1750405761120;
-        Fri, 20 Jun 2025 00:49:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLy5SMi0UipUNre443G7f4CTQNRiybWOKExd4GM5/+BAIumn05sVzdmmKiq+TDs10cab3gRg==
-X-Received: by 2002:a05:6512:1323:b0:553:accf:d75 with SMTP id 2adb3069b0e04-553e3cfdb6bmr549341e87.26.1750405760660;
-        Fri, 20 Jun 2025 00:49:20 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553e41bbdcesm187600e87.116.2025.06.20.00.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 00:49:19 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A6FAA1B372DF; Fri, 20 Jun 2025 09:49:18 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Mina Almasry <almasrymina@google.com>
-Subject: Re: [PATCH net-next v5] page_pool: import Jesper's page_pool benchmark
-In-Reply-To: <20250619181519.3102426-1-almasrymina@google.com>
-References: <20250619181519.3102426-1-almasrymina@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 20 Jun 2025 09:49:18 +0200
-Message-ID: <87ecvezwch.fsf@toke.dk>
+	s=arc-20240116; t=1750406660; c=relaxed/simple;
+	bh=VcChRwKGymS3J7cA3hKB9/5y3dW6bcPgUdD9AT858B0=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=hvVXuUhPs1YUKZGiOjrXtqmRKH/fqlkRVNrh3EcWKBf8Z2cb1DVYpnNYgvaVun56pXBsxuZofxK6lDFcxoqeEnAzQWoDdO/lnu3MQRXAioHIviggP+IXHr8pBfRwV/vSmHSBXjWH87SvVftEEoZtvM5uksvbRBHTvEx+qAM8PQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: zesmtpgz6t1750406573ta352bc56
+X-QQ-Originating-IP: gUvcgkI+eJRUn8Ex8pF6+cDK+kDYspuRkhZDdzEhvO0=
+Received: from smtpclient.apple ( [60.176.0.129])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 20 Jun 2025 16:02:50 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3173724028426425825
+EX-QQ-RecipientCnt: 8
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Re: [PATCH net-next 03/12] net: libwx: add wangxun vf common api
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <20250617151150.GL5000@horms.kernel.org>
+Date: Fri, 20 Jun 2025 16:02:39 +0800
+Cc: netdev@vger.kernel.org,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ andrew+netdev@lunn.ch,
+ duanqiangwen@net-swift.com,
+ linglingzhang@trustnetic.com,
+ jiawenwu@net-swift.com
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <9543F07F-5CC1-4DCA-A4C7-D9809EE2759B@net-swift.com>
+References: <20250611083559.14175-1-mengyuanlou@net-swift.com>
+ <20250611083559.14175-4-mengyuanlou@net-swift.com>
+ <20250617151150.GL5000@horms.kernel.org>
+To: Simon Horman <horms@kernel.org>
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: OWB1VFSrYnJuYmJSxajNLKHMQZHPFCUNA65bqFB+d3gh/rbdPLxnZQSi
+	k/B2dSSLIlgIA5ZiKVFWfRO6liGWcH8ThcP7cX4hxbXhq7CB6HuALs8SeHUhzXJ56I7GGC8
+	ygZmx0F8fZ5rw5obkWqaaSicCBRkkWvgZb3cPcd55z/5MgzdyB3PCWIvlqcwEB16wXlMzvJ
+	4JqwcSM6qCplcxu+drCZW7e/MSd4UylYfXN87TkxEMx4uya9umxLIXAYqz37ORXf/Bzo4E/
+	ZbrxNbxzZmpq3sYDOyt3a8aWamZuXTIoe+1c7VMkw0nzcmNZWzg5OBIc0/uCJk6A72uV5OA
+	uCEdpkSOsoA+/nSdY2ecfCIMlX0zNS/IpL6sTV8iC7D06OjoNoRYmgtqLuQExuwf+4XeOCt
+	LQy4quojGlU6kuA5/K3CZLi5Ntnt21s77lgqnwA50JIj280tNtl1cGFw/RGnRlVbyqMgbn7
+	+uFlNqcoY/o4rSKJ/PpAJ+gQKMBkizWd2Bzlp3FfK6D4RMZvAQDq9/a/YLR4R8ru6izZCVK
+	gcncTzvgCEtfUwRhe74P2n9sFxMyFTSlG333K/S92QW6ATnxtqtYjpz4o8KGvteAcIOgl3y
+	CKh/hpvkA+rk4r4LfDwY3d6dK4LO19CBNOWIJpbSJwFZOEiZF4uJ3YA2aJPq/BgKIW6BWwp
+	IKLZqghKMLlBYUVmscr8yuPlYbWrfm2M42AyyoXy+PyTcDn0QbAPadVPKvznWm31IP3f8xK
+	/qaG5anAVSGlArPGb/BlejSfTKXy9Pe02M/FnLce3OKRgJTt9EeeG6T9oxJJb3DtxAl8KTI
+	pVwiaDGPA/LaYHAyPKCfCyrAV9zxAkMHyDZ4Z9iGQfCjOMlw+l1ssGlvWf2o8aNy2sWftG8
+	sNUWIkPV0lwpJv6oA/DR1XjXOk6I5abqWkNZcTksMik7yNU1EwSPXMM+ogdnEgJiz3FK9De
+	W9OswrE5prsOWoJK4AofIsVRMIgG4YYlor3sRj7L2u0+gJayvonU+zdzrO6yeqXNkaAzfOT
+	CMUuFteX7IumD7SzE0bNqbM3pF/WhjiIJev3E+ErGwQxWBeykU
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-Mina Almasry <almasrymina@google.com> writes:
 
-> From: Jesper Dangaard Brouer <hawk@kernel.org>
->
-> We frequently consult with Jesper's out-of-tree page_pool benchmark to
-> evaluate page_pool changes.
->
-> Import the benchmark into the upstream linux kernel tree so that (a)
-> we're all running the same version, (b) pave the way for shared
-> improvements, and (c) maybe one day integrate it with nipa, if possible.
->
-> Import bench_page_pool_simple from commit 35b1716d0c30 ("Add
-> page_bench06_walk_all"), from this repository:
-> https://github.com/netoptimizer/prototype-kernel.git
->
-> Changes done during upstreaming:
-> - Fix checkpatch issues.
-> - Remove the tasklet logic not needed.
-> - Move under tools/testing
-> - Create ksft for the benchmark.
-> - Changed slightly how the benchmark gets build. Out of tree, time_bench
->   is built as an independent .ko. Here it is included in
->   bench_page_pool.ko
->
-> Steps to run:
->
-> ```
-> mkdir -p /tmp/run-pp-bench
-> make -C ./tools/testing/selftests/net/bench
-> make -C ./tools/testing/selftests/net/bench install INSTALL_PATH=3D/tmp/r=
-un-pp-bench
-> rsync --delete -avz --progress /tmp/run-pp-bench mina@$SERVER:~/
-> ssh mina@$SERVER << EOF
->   cd ~/run-pp-bench && sudo ./test_bench_page_pool.sh
-> EOF
-> ```
->
-> Note that by default, the Makefile will build the benchmark for the
-> currently installed kernel in /lib/modules/$(shell uname -r)/build. To
-> build against the current tree, do:
->
-> make KDIR=3D$(pwd) -C ./tools/testing/selftests/net/bench
->
-> Output (from Jesper):
->
-> ```
-> sudo ./test_bench_page_pool.sh
-> (benchmark dmesg logs snipped)
->
-> Fast path results:
-> no-softirq-page_pool01 Per elem: 23 cycles(tsc) 6.571 ns
->
-> ptr_ring results:
-> no-softirq-page_pool02 Per elem: 60 cycles(tsc) 16.862 ns
->
-> slow path results:
-> no-softirq-page_pool03 Per elem: 265 cycles(tsc) 73.739 ns
-> ```
->
-> Output (from me):
->
-> ```
-> sudo ./test_bench_page_pool.sh
-> (benchmark dmesg logs snipped)
->
-> Fast path results:
-> no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.177 ns
->
-> ptr_ring results:
-> no-softirq-page_pool02 Per elem: 51 cycles(tsc) 19.117 ns
->
-> slow path results:
-> no-softirq-page_pool03 Per elem: 168 cycles(tsc) 62.469 ns
-> ```
->
-> Results of course will vary based on hardware/kernel/configs, and some
-> variance may be there from run to run due to some noise.
->
-> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-> Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
->
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 23:11=EF=BC=8CSimon Horman =
+<horms@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Wed, Jun 11, 2025 at 04:35:50PM +0800, Mengyuan Lou wrote:
+>> Add common wx_configure_vf and wx_set_mac_vf for
+>> ngbevf and txgbevf.
+>>=20
+>> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+>=20
+> ...
+>=20
+>> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.h =
+b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
+>=20
+> ...
+>=20
+>> +#define WX_VXMRQC_PSR(f)         FIELD_PREP(GENMASK(5, 1), f)
+>> +#define WX_VXMRQC_PSR_MASK       GENMASK(5, 1)
+>> +#define WX_VXMRQC_PSR_L4HDR      BIT(0)
+>> +#define WX_VXMRQC_PSR_L3HDR      BIT(1)
+>> +#define WX_VXMRQC_PSR_L2HDR      BIT(2)
+>> +#define WX_VXMRQC_PSR_TUNHDR     BIT(3)
+>> +#define WX_VXMRQC_PSR_TUNMAC     BIT(4)
+>=20
+> ...
+>=20
+>> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c =
+b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c
+>=20
+> ...
+>=20
+>> +/**
+>> + * wx_configure_tx_ring_vf - Configure Tx ring after Reset
+>> + * @wx: board private structure
+>> + * @ring: structure containing ring specific data
+>> + *
+>> + * Configure the Tx descriptor ring after a reset.
+>> + **/
+>> +static void wx_configure_tx_ring_vf(struct wx *wx, struct wx_ring =
+*ring)
+>> +{
+>> + u8 reg_idx =3D ring->reg_idx;
+>> + u64 tdba =3D ring->dma;
+>> + u32 txdctl =3D 0;
+>> + int ret;
+>> +
+>> + /* disable queue to avoid issues while updating state */
+>> + wr32(wx, WX_VXTXDCTL(reg_idx), WX_VXTXDCTL_FLUSH);
+>> + wr32(wx, WX_VXTDBAL(reg_idx), tdba & DMA_BIT_MASK(32));
+>> + wr32(wx, WX_VXTDBAH(reg_idx), tdba >> 32);
+>> +
+>> + /* enable relaxed ordering */
+>> + pcie_capability_clear_and_set_word(wx->pdev, PCI_EXP_DEVCTL,
+>> +    0, PCI_EXP_DEVCTL_RELAX_EN);
+>> +
+>> + /* reset head and tail pointers */
+>> + wr32(wx, WX_VXTDH(reg_idx), 0);
+>> + wr32(wx, WX_VXTDT(reg_idx), 0);
+>> + ring->tail =3D wx->hw_addr + WX_VXTDT(reg_idx);
+>> +
+>> + /* reset ntu and ntc to place SW in sync with hardwdare */
+>=20
+> nit: hardware
+>=20
+>> + ring->next_to_clean =3D 0;
+>> + ring->next_to_use =3D 0;
+>> +
+>> + txdctl |=3D WX_VXTXDCTL_BUFLEN(wx_buf_len(ring->count));
+>> + txdctl |=3D WX_VXTXDCTL_ENABLE;
+>> +
+>> + /* set WTHRESH to encourage burst writeback, it should not be set
+>> +  * higher than 1 when ITR is 0 as it could cause false TX hangs
+>> +  *
+>> +  * In order to avoid issues WTHRESH + PTHRESH should always be =
+equal
+>> +  * to or less than the number of on chip descriptors, which is
+>> +  * currently 40.
+>> +  */
+>> + /* reinitialize tx_buffer_info */
+>> + memset(ring->tx_buffer_info, 0,
+>> +        sizeof(struct wx_tx_buffer) * ring->count);
+>> +
+>> + wr32(wx, WX_VXTXDCTL(reg_idx), txdctl);
+>> + /* poll to verify queue is enabled */
+>> + ret =3D read_poll_timeout(rd32, txdctl, txdctl & =
+WX_VXTXDCTL_ENABLE,
+>> + 1000, 10000, true, wx, WX_VXTXDCTL(reg_idx));
+>> + if (ret =3D=3D -ETIMEDOUT)
+>> + wx_err(wx, "Could not enable Tx Queue %d\n", reg_idx);
+>> +}
+>=20
+> ...
+>=20
+>> +void wx_setup_psrtype_vf(struct wx *wx)
+>> +{
+>> + /* PSRTYPE must be initialized */
+>> + u32 psrtype =3D WX_VXMRQC_PSR_L2HDR |
+>> +       WX_VXMRQC_PSR_L3HDR |
+>> +       WX_VXMRQC_PSR_L4HDR |
+>> +       WX_VXMRQC_PSR_TUNHDR |
+>> +       WX_VXMRQC_PSR_TUNMAC;
+>> +
+>> + if (wx->num_rx_queues > 1)
+>> + psrtype |=3D BIT(14);
+>=20
+> Here bit 14 of psrtype may be set (what is bit 14?).
+
+There is indeed no need to set this bit here.
+
+>=20
+>> +
+>> + wr32m(wx, WX_VXMRQC, WX_VXMRQC_PSR_MASK, WX_VXMRQC_PSR(psrtype));
+>=20
+> But WX_VXMRQC_PSR() uses a mask that limits psrtype to 5 bits.
+>=20
+> This is flagged by W=3D1 builds with gcc-8.5.0 on x86_64
+> (but curiously not gcc-15.1.0 builds). It is flagged like this:
+
+Thanks!
+When I compiled locally, I set C=3D1 and W=3D1. I'm curious as to why =
+this error hasn't been reported locally.
+
+>=20
+>  CC [M]  drivers/net/ethernet/wangxun/libwx/wx_vf_lib.o
+> In file included from <command-line>:
+> drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c: In function =
+'wx_setup_psrtype_vf':
+> ././include/linux/compiler_types.h:568:38: error: call to =
+'__compiletime_assert_1833' declared with attribute error: FIELD_PREP: =
+value too large for the field
+>  _compiletime_assert(condition, msg, __compiletime_assert_, =
+__COUNTER__)
+>                                      ^
+> ././include/linux/compiler_types.h:549:4: note: in definition of macro =
+'__compiletime_assert'
+>    prefix ## suffix();    \
+>    ^~~~~~
+> ././include/linux/compiler_types.h:568:2: note: in expansion of macro =
+'_compiletime_assert'
+>  _compiletime_assert(condition, msg, __compiletime_assert_, =
+__COUNTER__)
+>  ^~~~~~~~~~~~~~~~~~~
+> ./include/linux/build_bug.h:39:37: note: in expansion of macro =
+'compiletime_assert'
+> #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>                                     ^~~~~~~~~~~~~~~~~~
+> ./include/linux/bitfield.h:68:3: note: in expansion of macro =
+'BUILD_BUG_ON_MSG'
+>   BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?  \
+>   ^~~~~~~~~~~~~~~~
+> ./include/linux/bitfield.h:115:3: note: in expansion of macro =
+'__BF_FIELD_CHECK'
+>   __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: "); \
+>   ^~~~~~~~~~~~~~~~
+> drivers/net/ethernet/wangxun/libwx/wx_vf.h:73:34: note: in expansion =
+of macro 'FIELD_PREP'
+> #define WX_VXMRQC_PSR(f)         FIELD_PREP(GENMASK(5, 1), f)
+>                                  ^~~~~~~~~~
+> drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c:195:43: note: in =
+expansion of macro 'WX_VXMRQC_PSR'
+>  wr32m(wx, WX_VXMRQC, WX_VXMRQC_PSR_MASK, WX_VXMRQC_PSR(psrtype));
+>                                           ^~~~~~~~~~~~~
+> make[7]: *** [scripts/Makefile.build:203:
+> drivers/net/ethernet/wangxun/libwx/wx_vf_lib.o] Error 1:
+>=20
+>> +}
+>=20
+> ...
+>=20
+>> +void wx_configure_rx_ring_vf(struct wx *wx, struct wx_ring *ring)
+>> +{
+>> + u8 reg_idx =3D ring->reg_idx;
+>> + union wx_rx_desc *rx_desc;
+>> + u64 rdba =3D ring->dma;
+>> + u32 rxdctl;
+>> +
+>> + /* disable queue to avoid issues while updating state */
+>> + rxdctl =3D rd32(wx, WX_VXRXDCTL(reg_idx));
+>> + wx_disable_rx_queue(wx, ring);
+>> +
+>> + wr32(wx, WX_VXRDBAL(reg_idx), rdba & DMA_BIT_MASK(32));
+>> + wr32(wx, WX_VXRDBAH(reg_idx), rdba >> 32);
+>> +
+>> + /* enable relaxed ordering */
+>> + pcie_capability_clear_and_set_word(wx->pdev, PCI_EXP_DEVCTL,
+>> +    0, PCI_EXP_DEVCTL_RELAX_EN);
+>> +
+>> + /* reset head and tail pointers */
+>> + wr32(wx, WX_VXRDH(reg_idx), 0);
+>> + wr32(wx, WX_VXRDT(reg_idx), 0);
+>> + ring->tail =3D wx->hw_addr + WX_VXRDT(reg_idx);
+>> +
+>> + /* initialize rx_buffer_info */
+>> + memset(ring->rx_buffer_info, 0,
+>> +        sizeof(struct wx_rx_buffer) * ring->count);
+>> +
+>> + /* initialize Rx descriptor 0 */
+>> + rx_desc =3D WX_RX_DESC(ring, 0);
+>> + rx_desc->wb.upper.length =3D 0;
+>> +
+>> + /* reset ntu and ntc to place SW in sync with hardwdare */
+>=20
+> nit: hardware
+>=20
+>> + ring->next_to_clean =3D 0;
+>> + ring->next_to_use =3D 0;
+>> + ring->next_to_alloc =3D 0;
+>> +
+>> + wx_configure_srrctl_vf(wx, ring, reg_idx);
+>> +
+>> + /* allow any size packet since we can handle overflow */
+>> + rxdctl &=3D ~WX_VXRXDCTL_BUFLEN_MASK;
+>> + rxdctl |=3D WX_VXRXDCTL_BUFLEN(wx_buf_len(ring->count));
+>> + rxdctl |=3D WX_VXRXDCTL_ENABLE | WX_VXRXDCTL_VLAN;
+>> +
+>> + /* enable RSC */
+>> + rxdctl &=3D ~WX_VXRXDCTL_RSCMAX_MASK;
+>> + rxdctl |=3D WX_VXRXDCTL_RSCMAX(0);
+>> + rxdctl |=3D WX_VXRXDCTL_RSCEN;
+>> +
+>> + wr32(wx, WX_VXRXDCTL(reg_idx), rxdctl);
+>> +
+>> + /* pf/vf reuse */
+>> + wx_enable_rx_queue(wx, ring);
+>> + wx_alloc_rx_buffers(ring, wx_desc_unused(ring));
+>> +}
+>> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h =
+b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h
+>> new file mode 100644
+>> index 000000000000..43ea126b79eb
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h
+>> @@ -0,0 +1,14 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
+>> +
+>> +#ifndef _WX_VF_LIB_H_
+>> +#define _WX_VF_LIB_H_
+>> +
+>> +void wx_configure_msix_vf(struct wx *wx);
+>> +int wx_write_uc_addr_list_vf(struct net_device *netdev);
+>> +void wx_setup_psrtype_vf(struct wx *wx);
+>> +void wx_setup_vfmrqc_vf(struct wx *wx);
+>> +void wx_configure_tx_vf(struct wx *wx);
+>> +void wx_configure_rx_ring_vf(struct wx *wx, struct wx_ring *ring);
+>> +
+>> +#endif /* _WX_VF_LIB_H_ */
+>> --=20
+>> 2.30.1
+
 
 
