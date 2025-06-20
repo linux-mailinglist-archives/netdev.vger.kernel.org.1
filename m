@@ -1,108 +1,174 @@
-Return-Path: <netdev+bounces-199829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11861AE1FB0
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:02:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A35DAE1FBE
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD73A1710A6
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:02:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A718D17DDEA
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A3E2DF3D1;
-	Fri, 20 Jun 2025 16:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED4A294A19;
+	Fri, 20 Jun 2025 16:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="L/gMlsrq"
+	dkim=pass (1024-bit key) header.d=average.org header.i=@average.org header.b="riIZjLB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dehost.average.org (dehost.average.org [88.198.2.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215922BF3F4;
-	Fri, 20 Jun 2025 16:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E9019CC1C;
+	Fri, 20 Jun 2025 16:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.2.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750435333; cv=none; b=fOxLR4wpJkSzBWtm9R9xfx94k49VAxTMl1svydc5Q+KrCGn6V6rbU6epxrZZZ0fcwpzYOkLmYaX06q65oqe81tezbILsbCsUG/mQoHwui8Ikxw6k0MJkukEZk6eCvgUHMBsUN1oWTDW7RGCGkgsC+JhX9UqUjKAdk7Q+P/5waVc=
+	t=1750435462; cv=none; b=HqWtd4d+I7tVmOXYtTtbFiygYo0VsAINe0lHYgH7IFTs/EJK2QAqCZDMzvUbkbnL+jUX3RZpnN9h46gRThLCuFFdbM6q3MdZidSdx2sHCovivCuYPRX5tDqmrVsXyjhQK6jRHab7SRa/uejYWvBZnZvIIZ2dQTH0169fdG/QqYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750435333; c=relaxed/simple;
-	bh=hwOS66AkNq303wqYtSJkQ76RAWd8KoMvwvGYKnWmxfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l2VLocjWSwdGpqmBAkmlktFKedp4jT8+8fQu0oEYfnEIiPCRAPugNOEgZrCb0Q+MomBn1i9U5SaNx5WoTm22eRuTEGs41//+qajuNBNofepr3+M3dqmUb1iM9nq8kcgwdT5TaVGL3mgWRtr/45mrzgbBivnG62qSjR0TRV3gFjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=L/gMlsrq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B9AC4CEE3;
-	Fri, 20 Jun 2025 16:02:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1750435332;
-	bh=hwOS66AkNq303wqYtSJkQ76RAWd8KoMvwvGYKnWmxfU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L/gMlsrqDHi7gZtcvoKK+cRorj30vVE/vQq9jaF87QRDGCIrc7NhyK2UNr0OWmNZE
-	 AwPVfT89QpXW0fJC7d6g1VmB37aXCXlrhhVVtLbGhdFRRn6YNvPT9WiS0/SJ+T44QG
-	 4nEZuRXSVt///a+m3Um5rQxFV/+Hh0kPb/dz0/u0=
-Date: Fri, 20 Jun 2025 18:02:10 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Danilo Krummrich <dakr@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>
-Subject: Re: [PATCH net 1/4] auxiliary: Allow empty id
-Message-ID: <2025062006-detergent-spruce-5ae2@gregkh>
-References: <20250619200537.260017-1-sean.anderson@linux.dev>
- <20250619200537.260017-2-sean.anderson@linux.dev>
- <2025062004-essay-pecan-d5be@gregkh>
- <8b9662ab-580c-44ea-96ee-b3fe3d4672ff@linux.dev>
+	s=arc-20240116; t=1750435462; c=relaxed/simple;
+	bh=EmGIANHl+rlrNbTJLbUOGEJecEEWTsd05Um8EDSArxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SJoRA5ah/kj1jvqaUnRdRPEknCokLQpoZMUh70nbflknLgZQ8fD7mAk81bwriM81iIT8PPlqPJ7hCv8XmhvoPAemljpCp3SAjJBNstLks4KR1zz5EWgu695/aPl4sqgsm4a3TlnrYgTS97NEGwcESskV1hpBXrM21G30SnSaiuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=average.org; spf=pass smtp.mailfrom=average.org; dkim=pass (1024-bit key) header.d=average.org header.i=@average.org header.b=riIZjLB2; arc=none smtp.client-ip=88.198.2.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=average.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=average.org
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=average.org; s=mail;
+	t=1750435454; bh=EmGIANHl+rlrNbTJLbUOGEJecEEWTsd05Um8EDSArxE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=riIZjLB2CuSc6pSX6pK4cKBu1xPFfsk2a/rmkcFRT19a7mTSYVaaM3VqPNndzsgDi
+	 LMlmW5m0NCDFo+WtjFY1Y37f09nd3K5d9DaONLKdlIA2fpuM9j4q5OcxVrAzqghsqX
+	 mNt+dcEB1ccHB1OXcDCwh18Hch64tM9abdvQRylk=
+Received: from [10.16.126.80] (unknown [212.227.34.98])
+	by dehost.average.org (Postfix) with ESMTPSA id 56E554C87EB8;
+	Fri, 20 Jun 2025 18:04:14 +0200 (CEST)
+Message-ID: <7a4c2457-0eb5-43bc-9fb0-400a7ce045f2@average.org>
+Date: Fri, 20 Jun 2025 18:04:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b9662ab-580c-44ea-96ee-b3fe3d4672ff@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: When routed to VRF, NF _output_ hook is run unexpectedly
+To: nicolas.dichtel@6wind.com, netdev@vger.kernel.org
+Cc: "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ David Ahern <dsahern@kernel.org>, Florian Westphal <fw@strlen.de>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+References: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
+ <2211ec87-b794-4d74-9d3d-0c54f166efde@6wind.com>
+Content-Language: en-GB, ru-RU
+From: Eugene Crosser <crosser@average.org>
+Autocrypt: addr=crosser@average.org; keydata=
+ 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
+ u3lufqBt0w==
+In-Reply-To: <2211ec87-b794-4d74-9d3d-0c54f166efde@6wind.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------7lUomzkTUOi8uEe0UaaVOnoz"
 
-On Fri, Jun 20, 2025 at 11:37:40AM -0400, Sean Anderson wrote:
-> On 6/20/25 01:13, Greg Kroah-Hartman wrote:
-> > On Thu, Jun 19, 2025 at 04:05:34PM -0400, Sean Anderson wrote:
-> >> Support creating auxiliary devices with the id included as part of the
-> >> name. This allows for non-decimal ids, which may be more appropriate for
-> >> auxiliary devices created as children of memory-mapped devices. For
-> >> example, a name like "xilinx_emac.mac.802c0000" could be achieved by
-> >> setting .name to "mac.802c0000" and .id to AUXILIARY_DEVID_NONE.
-> > 
-> > I don't see the justification for this, sorry.  An id is just an id, it
-> > doesn't matter what is is and nothing should be relying on it to be the
-> > same across reboots or anywhere else.  The only requirement is that it
-> > be unique at this point in time in the system.
-> 
-> It identifies the device in log messages. Without this you have to read
-> sysfs to determine what device is (for example) producing an error.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------7lUomzkTUOi8uEe0UaaVOnoz
+Content-Type: multipart/mixed; boundary="------------yUZYwb3P0UD8vBWpbW0QK0Ug";
+ protected-headers="v1"
+From: Eugene Crosser <crosser@average.org>
+To: nicolas.dichtel@6wind.com, netdev@vger.kernel.org
+Cc: "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ David Ahern <dsahern@kernel.org>, Florian Westphal <fw@strlen.de>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+Message-ID: <7a4c2457-0eb5-43bc-9fb0-400a7ce045f2@average.org>
+Subject: Re: When routed to VRF, NF _output_ hook is run unexpectedly
+References: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
+ <2211ec87-b794-4d74-9d3d-0c54f166efde@6wind.com>
+In-Reply-To: <2211ec87-b794-4d74-9d3d-0c54f166efde@6wind.com>
 
-That's fine, read sysfs :)
+--------------yUZYwb3P0UD8vBWpbW0QK0Ug
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> This
-> may be inconvenient to do if the error prevents the system from booting.
-> This series converts a platform device with a legible ID like
-> "802c0000.ethernet" to an auxiliary device, and I believe descriptive
-> device names produce a better developer experience.
+Thanks Nicolas,
 
-You can still have 802c0000.ethernet be the prefix of the name, that's
-fine.
+On 20/06/2025 16:56, Nicolas Dichtel wrote:
 
-> This is also shorter and simpler than auto-generated IDs.
+>> It is possible, and very useful, to implement "two-stage routing" by
+>> installing a route that points to a VRF device:
+>>
+>>     ip link add vrfNNN type vrf table NNN
+>>     ...
+>>     ip route add xxxxx/yy dev vrfNNN
+>>
+>> however this causes surprising behaviour with relation to netfilter
+>> hooks. Namely, packets taking such path traverse _output_ nftables
+>> chain, with conntracking information reset. So, for example, even
+>> when "notrack" has been set in the prerouting chain, conntrack entries=
 
-Please stick with auto-generated ids, they will work properly here.
+>> will still be created. Script attached below demonstrates this behavio=
+ur.
+> You can have a look to this commit to better understand this:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D8c9c296adfae9
 
-thanks,
+I've seen this commit.
+My point is that the packets are _not locally generated_ in this case,
+so it seems wrong to pass them to the _output_ hook, doesn't it?
 
-greg k-h
+Regards,
+
+Eugene
+
+--------------yUZYwb3P0UD8vBWpbW0QK0Ug--
+
+--------------7lUomzkTUOi8uEe0UaaVOnoz
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEnAziRJw3ydIzIkaHfKQHw5GdRYwFAmhVhngACgkQfKQHw5Gd
+RYz7uwf9HSohs4BarS6XcAMIAaNdRAQjTlXKAiWMjVmbIi2arLjqiV95PodAXO4e
+tVqL3t/5vVsH0+bSmeSO9niN7HyDn1ZSHWi1mfHgoF8HeXGIMB3OPzMRxj6NjbN4
+94Cbcp58DiNMS1LOLhP0FS8Ex2CJYeVpLvIE980NiL/ygMJ613doDYnEqjY7a1d/
+7Gdnff5vXXHpKUbzGP3rC6ZBAJ1q5JSlj1v1Ry66q+ZI3oHvZ9yCaf6j0rEfXxe5
+UvCtJBXzqhHLpVSysBPdt3Yog3VZQfe4Bu5KPu6MY6MSIPNjmqWetoMjpuso6JLu
+xW5cNzAhK0GA9FbngcgLDgsLJfhPbg==
+=KaWe
+-----END PGP SIGNATURE-----
+
+--------------7lUomzkTUOi8uEe0UaaVOnoz--
 
