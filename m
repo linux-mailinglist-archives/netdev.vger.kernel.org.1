@@ -1,144 +1,105 @@
-Return-Path: <netdev+bounces-199720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10781AE18F7
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:32:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E91AAE18FD
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 660F27ACD83
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:31:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A32A176F89
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1840228507D;
-	Fri, 20 Jun 2025 10:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34D02857CD;
+	Fri, 20 Jun 2025 10:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MKgssu6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3FF2857D5;
-	Fri, 20 Jun 2025 10:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73462836BD;
+	Fri, 20 Jun 2025 10:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750415540; cv=none; b=ZBav739AvA0kdp4A4xBA1855+JLiU0i5MkKEVSVWXgsPq5kNA31vxwb5Yb84RVL0KuLy+NnYPf9WXotDBUSZAXKtfjEjPxkYcYV7RJtHyM81oysWRCSALx4bg8LZLxzLclROha1e3zes2KstII9n+/UcZsiAehMZ8NrR0hK2af0=
+	t=1750415595; cv=none; b=d3qavcVdq3tixf+0LZVClpgm5nj5OeUlIjoTFQXi04PPHIiuJf96txSMwC+MVhdejt+cU8xk6zvrv1r0tG/t1Td+hBu0+DN7M/QWSDvEYAIWM0JgBT2IraKezZClQ2Pr9Hpp4wOo+/IRWebE687AsMwMXsc0gJF6CfbwduiCfIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750415540; c=relaxed/simple;
-	bh=xY3tmpVZXtdrtEJ7ftibxt61YM3ggS0t1zqb59MR6vQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GQKNBQrj2+etw8i0SPR2Yx6AvvZvf1oIJObttD0rrz69Wb1I847XI5osaRLjS3y2y35MOtNp0CUXaNPnD7HetDtpiNbq8CPEcQ+BYyNdpSDvd3GDaUxR70XjoO30ZV53kGoMvIQT7Z31z1FPzQOzB7/YEDXfOrrBQq8DqRKt7Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uSYtp-0000000076t-3nSw;
-	Fri, 20 Jun 2025 10:31:51 +0000
-Date: Fri, 20 Jun 2025 12:31:41 +0200
-From: Daniel Golle <daniel@makrotopia.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Jia-Wei Chang <jia-wei.chang@mediatek.com>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v5 01/13] dt-bindings: net: mediatek,net: update for
- mt7988
-Message-ID: <aFU4jSUFjWJlJCWJ@pidgin.makrotopia.org>
-References: <20250620083555.6886-1-linux@fw-web.de>
- <20250620083555.6886-2-linux@fw-web.de>
+	s=arc-20240116; t=1750415595; c=relaxed/simple;
+	bh=e4Nci4ObCLP/J168AOudxulBu8JAi13G6X2rnZmFmNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lNod2RjJqhB1NImObqJVK155VQe5kIRdoCM5mRPbZ+4gZ5ASCcwi9TuPjw6LV4iRsJSePyvONp9Zo45J+ct8n2HtmLPjDex7v0WICzLyuZZmVwfrIpOAaIrn8aT8KDAITzLc4mG67iL6DsgAEFIeBoh8Fy3Six8WQnyebqtwEgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MKgssu6o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0FD5C4CEED;
+	Fri, 20 Jun 2025 10:33:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750415595;
+	bh=e4Nci4ObCLP/J168AOudxulBu8JAi13G6X2rnZmFmNM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MKgssu6ogl7jUd9OZGxsz+FxvZt/4rCLDZMj5tp2rHSXd9MudHroAioiMqYinUPPx
+	 iVkVw2vj3pAONsfaR2QPoojKBYkqqu8yFuBjksjuu5x4/+5BH+6Ui+cIjRh+GkCYmR
+	 7w9z/GmA/KLHboWleyI3DfQF8CV9tmkpQGLdpQaEsye5Qimn3gZq/AUfDO5Hrnp9/m
+	 m94BWhbGT1ixTe7AcbdEbrzDmVYLu0i8NWPeM7SunppnqZPcs4SZbhm3c3T4dvq6Fo
+	 k9eARlAxB/MldRfsQUroH8WSlMNBKGljn0xp1Cz7kh1dnXS2pBwzQQwaTDjyRypCuP
+	 yhVCcvmhDGEMw==
+Date: Fri, 20 Jun 2025 12:33:04 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, linux-kernel@vger.kernel.org, Akira Yokosawa
+ <akiyks@gmail.com>, "David S. Miller" <davem@davemloft.net>, Ignacio
+ Encinas Rubio <ignacio@iencinas.com>, Marco Elver <elver@google.com>, Shuah
+ Khan <skhan@linuxfoundation.org>, Eric Dumazet <edumazet@google.com>, Jan
+ Stancek <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Ruben
+ Wauters <rubenru09@aol.com>, joel@joelfernandes.org,
+ linux-kernel-mentees@lists.linux.dev, lkmm@lists.linux.dev,
+ netdev@vger.kernel.org, peterz@infradead.org, stern@rowland.harvard.edu,
+ Breno Leitao <leitao@debian.org>, Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v7 00/17] Don't generate netlink .rst files inside
+ $(srctree)
+Message-ID: <20250620123304.4ab7bb99@sal.lan>
+In-Reply-To: <m2y0tof82o.fsf@gmail.com>
+References: <cover.1750315578.git.mchehab+huawei@kernel.org>
+	<m2y0tof82o.fsf@gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250620083555.6886-2-linux@fw-web.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 20, 2025 at 10:35:32AM +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Update binding for mt7988 which has 3 gmac and 2 reg items.
-> 
-> MT7988 has 4 FE IRQs (currently only 2 are used) and the 4 IRQs for
-> use with RSS/LRO later.
-> 
-> Add interrupt-names to make them accessible by name.
-> 
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> ---
-> v5:
-> - fix v4 logmessage and change description a bit describing how i get
->   the irq count.
-> - update binding for 8 irqs with different names (rx,tx => fe0..fe3)
->   including the 2 reserved irqs which can be used later
-> - change rx-ringX to pdmaX to be closer to hardware documentation
-> 
-> v4:
-> - increase max interrupts to 6 because of adding RSS/LRO interrupts (4)
->   and dropping 2 reserved irqs (0+3) around rx+tx
-> - dropped Robs RB due to this change
-> - allow interrupt names
-> - add interrupt-names without reserved IRQs on mt7988
->   this requires mtk driver patch:
->   https://patchwork.kernel.org/project/netdevbpf/patch/20250616080738.117993-2-linux@fw-web.de/
-> 
-> v2:
-> - change reg to list of items
-> ---
->  .../devicetree/bindings/net/mediatek,net.yaml | 30 ++++++++++++++++---
->  1 file changed, 26 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> index 9e02fd80af83..9465b40683ad 100644
-> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> @@ -28,7 +28,10 @@ properties:
->        - ralink,rt5350-eth
->  
->    reg:
-> -    maxItems: 1
-> +    items:
-> +      - description: Register for accessing the MACs.
-> +      - description: SoC internal SRAM used for DMA operations.
-> +    minItems: 1
->  
->    clocks:
->      minItems: 2
-> @@ -40,7 +43,11 @@ properties:
->  
->    interrupts:
->      minItems: 1
-> -    maxItems: 4
-> +    maxItems: 8
-> +
-> +  interrupt-names:
-> +    minItems: 1
-> +    maxItems: 8
+Em Thu, 19 Jun 2025 09:29:19 +0100
+Donald Hunter <donald.hunter@gmail.com> escreveu:
 
-Shouldn't interrupt-names only be required for MT7988 (and future SoCs)?
-Like this at least one entry in interrupt-names is now always required.
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+> >
+> > v7:  
+> 
+> ETOOFAST
 
+Heh, I'm now working on a v8 ;-) I guess I'll send it next
+week to give Jon some time to apply the non-related YAML stuff.
+
+> 
+> https://docs.kernel.org/process/maintainer-netdev.html#resending-after-review
+> 
+> I didn't complete reviewing v6 yet :(
+> 
+> > - Added a patch to cleanup conf.py and address coding style issues;
+> > - Added a docutils version check logic to detect known issues when
+> >   building the docs with too old or too new docutils version.  The
+> >   actuall min/max vesion depends on Sphinx version.  
+> 
+> It seems to me that patches 15-17 belong in a different series.
+
+Yes. I'm splitting it on two separate series: the first one
+with changes that are independent of YAML parser. The
+second one with specific stuff. It will depend on the first
+one, due to the changes inside Documentation/conf.py that
+the first series does.
+
+Regards,
+Mauro
 
