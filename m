@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-199828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8489AE1FB8
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:03:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11861AE1FB0
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A97F23B1FA0
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:00:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD73A1710A6
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFE32DE200;
-	Fri, 20 Jun 2025 16:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A3E2DF3D1;
+	Fri, 20 Jun 2025 16:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="QeNRSKWG"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="L/gMlsrq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A432D3A6A;
-	Fri, 20 Jun 2025 16:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215922BF3F4;
+	Fri, 20 Jun 2025 16:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750435264; cv=none; b=OioWeu4aoN2tKDJQpRQTVvZOd7VpQvA+nxU7LuqdBC/yuk+BYBsUNUFancCqmKNSr+Duan7fGzbhW7oRD99v5GePNRAbY2pxoefIgzkIHave+0UkOKmp3keymmiey8TT/l8YO9lfqKZ7fkla+ht6YQC/zoMCzMzOuXMDDx0XPIM=
+	t=1750435333; cv=none; b=fOxLR4wpJkSzBWtm9R9xfx94k49VAxTMl1svydc5Q+KrCGn6V6rbU6epxrZZZ0fcwpzYOkLmYaX06q65oqe81tezbILsbCsUG/mQoHwui8Ikxw6k0MJkukEZk6eCvgUHMBsUN1oWTDW7RGCGkgsC+JhX9UqUjKAdk7Q+P/5waVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750435264; c=relaxed/simple;
-	bh=476EDcByVUDcMJq9G0/L+M1afs1hWsv5RMTIUVRlTMU=;
+	s=arc-20240116; t=1750435333; c=relaxed/simple;
+	bh=hwOS66AkNq303wqYtSJkQ76RAWd8KoMvwvGYKnWmxfU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hEnaQM2h5vJ2AAMeOIuGob6vj22DyDdPQ3pSgvXAiYh6B2Ub4b41n6fW8UkyAzkeKU7oCH64MNn93HEZ6FjiYDMBz0UuN9UTnQiDl0PPGuSjivdXI8gPK+1trcPWGLawIT12hU5/zCEFQpu4TzI7Ud+cUZtUVWe09DhN7WySsRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=QeNRSKWG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F27C4CEE3;
-	Fri, 20 Jun 2025 16:01:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=l2VLocjWSwdGpqmBAkmlktFKedp4jT8+8fQu0oEYfnEIiPCRAPugNOEgZrCb0Q+MomBn1i9U5SaNx5WoTm22eRuTEGs41//+qajuNBNofepr3+M3dqmUb1iM9nq8kcgwdT5TaVGL3mgWRtr/45mrzgbBivnG62qSjR0TRV3gFjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=L/gMlsrq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B9AC4CEE3;
+	Fri, 20 Jun 2025 16:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1750435264;
-	bh=476EDcByVUDcMJq9G0/L+M1afs1hWsv5RMTIUVRlTMU=;
+	s=korg; t=1750435332;
+	bh=hwOS66AkNq303wqYtSJkQ76RAWd8KoMvwvGYKnWmxfU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QeNRSKWGt70s6g1hwBDaHF1e0D8Pd+LYbrtycRrUqtWP4xqpmf51Q62U0NHpRDVqA
-	 pqBOl2B8YSaxaEhX3Fq4vtZWrImkX0Rf2jTJ7jZooe75XlMgkCsXadzhhYWETF9JAV
-	 knXOlLmUBr0FCnGmWondl/AB0jOCbK554Ve2lLDA=
-Date: Fri, 20 Jun 2025 18:01:01 +0200
+	b=L/gMlsrqDHi7gZtcvoKK+cRorj30vVE/vQq9jaF87QRDGCIrc7NhyK2UNr0OWmNZE
+	 AwPVfT89QpXW0fJC7d6g1VmB37aXCXlrhhVVtLbGhdFRRn6YNvPT9WiS0/SJ+T44QG
+	 4nEZuRXSVt///a+m3Um5rQxFV/+Hh0kPb/dz0/u0=
+Date: Fri, 20 Jun 2025 18:02:10 +0200
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: Sean Anderson <sean.anderson@linux.dev>
 Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
@@ -54,11 +54,12 @@ Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Danilo Krummrich <dakr@kernel.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>
-Subject: Re: [PATCH net 0/4] net: axienet: Fix deferred probe loop
-Message-ID: <2025062054-tameness-canal-2204@gregkh>
+Subject: Re: [PATCH net 1/4] auxiliary: Allow empty id
+Message-ID: <2025062006-detergent-spruce-5ae2@gregkh>
 References: <20250619200537.260017-1-sean.anderson@linux.dev>
- <2025062004-sandblast-overjoyed-6fe9@gregkh>
- <56f52836-545a-45aa-8a6b-04aa589c2583@linux.dev>
+ <20250619200537.260017-2-sean.anderson@linux.dev>
+ <2025062004-essay-pecan-d5be@gregkh>
+ <8b9662ab-580c-44ea-96ee-b3fe3d4672ff@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,44 +68,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <56f52836-545a-45aa-8a6b-04aa589c2583@linux.dev>
+In-Reply-To: <8b9662ab-580c-44ea-96ee-b3fe3d4672ff@linux.dev>
 
-On Fri, Jun 20, 2025 at 11:41:52AM -0400, Sean Anderson wrote:
-> On 6/20/25 01:10, Greg Kroah-Hartman wrote:
-> > On Thu, Jun 19, 2025 at 04:05:33PM -0400, Sean Anderson wrote:
-> >> Upon further investigation, the EPROBE_DEFER loop outlined in [1] can
-> >> occur even without the PCS subsystem, as described in patch 4/4. The
-> >> second patch is a general fix, and could be applied even without the
-> >> auxdev conversion.
-> >> 
-> >> [1] https://lore.kernel.org/all/20250610183459.3395328-1-sean.anderson@linux.dev/
+On Fri, Jun 20, 2025 at 11:37:40AM -0400, Sean Anderson wrote:
+> On 6/20/25 01:13, Greg Kroah-Hartman wrote:
+> > On Thu, Jun 19, 2025 at 04:05:34PM -0400, Sean Anderson wrote:
+> >> Support creating auxiliary devices with the id included as part of the
+> >> name. This allows for non-decimal ids, which may be more appropriate for
+> >> auxiliary devices created as children of memory-mapped devices. For
+> >> example, a name like "xilinx_emac.mac.802c0000" could be achieved by
+> >> setting .name to "mac.802c0000" and .id to AUXILIARY_DEVID_NONE.
 > > 
-> > I have no idea what this summary means at all, which isn't a good start
-> > to a patch series :(
-> > 
-> > What problem are you trying to solve?
+> > I don't see the justification for this, sorry.  An id is just an id, it
+> > doesn't matter what is is and nothing should be relying on it to be the
+> > same across reboots or anywhere else.  The only requirement is that it
+> > be unique at this point in time in the system.
 > 
-> See patch 4/4.
+> It identifies the device in log messages. Without this you have to read
+> sysfs to determine what device is (for example) producing an error.
 
-That's not what should be in patch 0/4 then, right?
+That's fine, read sysfs :)
 
-> > What overall solution did you come up with?
-> 
-> See patch 4/4.
+> This
+> may be inconvenient to do if the error prevents the system from booting.
+> This series converts a platform device with a legible ID like
+> "802c0000.ethernet" to an auxiliary device, and I believe descriptive
+> device names produce a better developer experience.
 
-Again, why write a 0/4 summary at all then?
+You can still have 802c0000.ethernet be the prefix of the name, that's
+fine.
 
-> > Who is supposed to be reviewing any of this?
-> 
-> Netdev. Hence "PATCH net".
-> 
-> And see [1] above for background. I will quote it more-extensively next time.
+> This is also shorter and simpler than auto-generated IDs.
 
-Referring to random links doesn't always work as we deal with thousands
-of patches daily, and sometimes don't even have internet access (like
-when reviewing patches on long flights/train rides...)
-
-Make things self-contained please.
+Please stick with auto-generated ids, they will work properly here.
 
 thanks,
 
