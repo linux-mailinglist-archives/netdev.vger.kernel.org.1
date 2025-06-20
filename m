@@ -1,166 +1,105 @@
-Return-Path: <netdev+bounces-199815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6938AAE1EAA
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:31:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4EDAE1EB5
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BF1316F988
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:29:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C19B4C2790
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613D22C0312;
-	Fri, 20 Jun 2025 15:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAC0VUtK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EC92E8E07;
+	Fri, 20 Jun 2025 15:28:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA792C17A3;
-	Fri, 20 Jun 2025 15:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0765D2D662C;
+	Fri, 20 Jun 2025 15:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750433154; cv=none; b=ZkLadge881q7m8TomrC1MIwlY8Malz1YHbB761VNzQr13aLVHnO91R+/uwsPtLmLTH5xtVgzIviK3cBDqZEQxFXAm6zWMnjRpaI2QxMU2fxsbD1B3Ji/sawqYO7MzdaGiOVD4yUXN3K9FXrIaPzN1zzJxURmsQLnfMspC7BxHWI=
+	t=1750433318; cv=none; b=B1vqydtuosWiEdHnxfqkwQc0dkVdRfU4KWm993HOEgRRx8XEaIhOznXvS8B5s/SUPDYqtQEabccXaPLLYW8ii0KQxGbVpAPQzdluvqRN5y4FtG6ijWGBsCjwryTqtFUML2qkPJWna2AkzMK/hFLqYLzS8Iuvg1BQ3WObNAFNrNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750433154; c=relaxed/simple;
-	bh=RE15CXp7q9MDNu7TbG536xtXK0Ad6j2FShs9YlwKdvk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bBGLYnNFQoTTDlkx+xjZKplm4VnKTNiCLh6yK/AwNsxGCDMo3kFwRqU1w8MELqiZZyr4T1OfdPC8IXWh1nu0MgUOyssTNbYzKA1bUgtAX42EfBuPBBfeyovsSJvB/HpxQuqAbloDqhQvN5Sp16BdKtg3GCI5g5h136EBqHXp3A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DAC0VUtK; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3de1875bf9dso19836685ab.2;
-        Fri, 20 Jun 2025 08:25:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750433151; x=1751037951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VtZXr39TfTn5a2u1fSGPytD48GF3NjVL7E0wKZncWfE=;
-        b=DAC0VUtKBX6op2/gXuUqnTBFaMbAq0gngqSy+GEJ4JjU0b2SP+gPX+d1EDMaesdgPP
-         5F3lgtTuRYHhyBSZA1RRJMhpCDygezAtO7SXEkWt41aoDU/4FCdv1iQErr3diV8HIojS
-         zF+ishheeKv8UGA4tWOtKDyrrNYvWWktzqVg/QyJt7u9rdmQAqIaUG0skAE4cmOt1PBj
-         bpnrzfahU5j25X+8kn0tYQSPPTG+cFpxyvxeaxRa+nfs426Agee+5OID9sOmpjp6QAQn
-         JKR6MqVWgNN+GvBhJUX81ge0xr7uPgz11gZ31xh1lODN3P+H7tHCXf1RQjkX/jqL+Y/y
-         5fHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750433151; x=1751037951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VtZXr39TfTn5a2u1fSGPytD48GF3NjVL7E0wKZncWfE=;
-        b=mkuOqyqIQo5/EGPlpbi4gQfPI1w/jJeiNJXOzW77mFduBgRUL1UylgnzXx1t78/ZVz
-         e2QJbhpGtagDvUJsr+lPu67+L4HucF7J+IIWsohP9hjnWRiP7g4ik3ScAXsZYeqdo8do
-         Zpbkr8GTcpTF8oKnl0PiO9pfD9ODNZ+yBHcVAB5Qyci9Yyz6kCK8h+GVmUsnfkZZ5tHv
-         486SlAoYE0IKi7vv+rqFYUEVZnbdO5mBxietE8GqqRPMZcSSxPYQtVB/NSVOn+DCoBa2
-         wpl7L8y6ghGsohgJPASzoYMOlzRAopPIW30v4OgsJJbJcdI1fHEGlakogoF7zkwF+AMy
-         cmLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhNvw6qAy9AvtUL4LGamqiIyoi2EQLwsyqvauUGOMT25mnW247k3GUxrPQqOfyscErmyrJLl+1@vger.kernel.org, AJvYcCXiCY/yxa+1q4RYwF+XyNWecQusO8XKvtegXBpJTPpouaTwGXv4nXBHfLgh/ek+sfxj0JA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4fZ7sIwzytzyK3bxNeZZeVyq3L2H3mRxdFS1X99hguIJHF4LE
-	jizR5bUdmKdFKuOP9tJ6NrhsIsgo9M9WcFh6tR0QVT7Q/21VDSUfP57KdwT0kdHJuyuTbWfVcvP
-	1uUuL+H17drqACcKDmW1hx/U5qG23tlQ=
-X-Gm-Gg: ASbGncs/ym/5K/qfGyWQPme1NAWKYw1vWDql/14HXxghYOZZvBerW4IuiK6h6ba3Pi8
-	rrzunZZFjowAurJFF4to73se08IYkrcKT1Wgjbmtau/TaxubOdFgx9Euk1t4bGgiQ8xw8xF7v8o
-	b5Ur13gmDKFIT3VU/OEbJ87q7he7f4SINU5HJfoPGVmA==
-X-Google-Smtp-Source: AGHT+IFQ5yarmqVdQ+VBfX5TrdXJ24OTL/cWjQB7+hYPemti4GB3FDnXMmTbHwz9a8WFen4PF+JiIM62OIFDmhXKszQ=
-X-Received: by 2002:a05:6e02:1f88:b0:3dc:857c:c61e with SMTP id
- e9e14a558f8ab-3de38cc89femr37624175ab.15.1750433151418; Fri, 20 Jun 2025
- 08:25:51 -0700 (PDT)
+	s=arc-20240116; t=1750433318; c=relaxed/simple;
+	bh=/OSx8K3K9f23Ji1lCrXseDYUHiUlLiZTgManhWt2jPM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G0Zk+7sbSq5HsO3wFnAIXx0c61yxFMLImqSCr7pnZof8K/w20cA8EUe2ZoPFUHfXFOLR7rixetxlFaTsgVLaBQb8YCL5tuxN5tD1MLREoFEChhlaFlsmmcm72o/cB0ozLgKUu0zspbUf5gQBkdyiwq/8oFg3BtnqL96PtmNTY24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id A3C9744EF1;
+	Fri, 20 Jun 2025 17:28:26 +0200 (CEST)
+From: Gabriel Goller <g.goller@proxmox.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] ipv6: enable per-interface forwarding
+Date: Fri, 20 Jun 2025 17:28:13 +0200
+Message-Id: <20250620152813.1617783-1-g.goller@proxmox.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250619093641.70700-1-kerneljasonxing@gmail.com> <aFVr60tw3QJopcOo@mini-arch>
-In-Reply-To: <aFVr60tw3QJopcOo@mini-arch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 20 Jun 2025 23:25:15 +0800
-X-Gm-Features: AX0GCFsD-OOwvIzX1kNIDvE-lCLmAKdoN5M1-G_BBE3A1mUXMziagY33YJ4jYz8
-Message-ID: <CAL+tcoBLAMWXjBz9BYb84MmJxGztHFOLbqZL-YX0s7ykBjNT7g@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: xsk: update tx queue consumer immdiately
- after transmission
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 20, 2025 at 10:10=E2=80=AFPM Stanislav Fomichev
-<stfomichev@gmail.com> wrote:
->
-> On 06/19, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > For afxdp, the return value of sendto() syscall doesn't reflect how man=
-y
-> > descs handled in the kernel. One of use cases is that when user-space
-> > application tries to know the number of transmitted skbs and then decid=
-es
-> > if it continues to send, say, is it stopped due to max tx budget?
-> >
-> > The following formular can be used after sending to learn how many
-> > skbs/descs the kernel takes care of:
-> >
-> >   tx_queue.consumers_before - tx_queue.consumers_after
-> >
-> > Prior to the current patch, the consumer of tx queue is not immdiately
-> > updated at the end of each sendto syscall, which leads the consumer
-> > value out-of-dated from the perspective of user space. So this patch
-> > requires store operation to pass the cached value to the shared value
-> > to handle the problem.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  net/xdp/xsk.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 7c47f665e9d1..3288ab2d67b4 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -856,6 +856,8 @@ static int __xsk_generic_xmit(struct sock *sk)
-> >       }
-> >
-> >  out:
-> > +     __xskq_cons_release(xs->tx);
-> > +
-> >       if (sent_frame)
-> >               if (xsk_tx_writeable(xs))
-> >                       sk->sk_write_space(sk);
->
-> So for the "good" case we are going to write the cons twice? From
-> xskq_cons_peek_desc and from here? Maybe make this __xskq_cons_release
-> conditional ('if (err)')?
+It is currently impossible to enable ipv6 forwarding on a per-interface
+basis like in ipv4. To enable forwarding on an ipv6 interface we need to
+enable it on all interfaces and disable it on the other interfaces using
+a netfilter rule. This is especially cumbersome if you have lots of
+interface and only want to enable forwarding on a few. According to the
+sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
+for all interfaces, while the interface-specific
+`net.ipv6.conf.<interface>.forwarding` configures the interface
+Host/Router configuration.
 
-One unlikely exception:
-xskq_cons_peek_desc()->xskq_cons_read_desc()->xskq_cons_is_valid_desc()->re=
-turn
-false;
-?
+This patch modifies the forwarding logic to check both the global
+forwarding flag AND the per-interface forwarding flag. Packets are
+forwarded if either the global setting (conf.all.forwarding) OR the
+interface-specific setting (conf.<interface>.forwarding) is enabled.
+This allows enabling forwarding on individual interfaces without
+setting the global option.
 
-There are still two possible 'return false' in xskq_cons_peek_desc()
-while so far I didn't spot a single one happening.
+This change won't allow a `Router`-state interface without forwarding
+capabilities anymore, but (with my limited knowledge) I don't think that
+should be a problem?
 
-Admittedly, your suggestion covers the majority of normal good ones. I
-can adjust it as you said.
+This is quite an impacting change, so I don't really expect this to get
+merged. I'm more interested in hearing your feedback and if something
+like this would even be considered?
 
->
-> I also wonder whether we should add a test for that? Should be easy to
-> verify by sending more than 32 packets. Is there a place in
-> tools/testing/selftests/bpf/xskxceiver.c to add that?
+[0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
 
-Well, sorry, if it's not required, please don't force me to do so :S
-The patch is only one simple update of the consumer that is shared
-between user-space and kernel.
+Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
+---
+ net/ipv6/ip6_output.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks,
-Jason
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 7bd29a9ff0db..a7e33ab0946c 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -509,7 +509,8 @@ int ip6_forward(struct sk_buff *skb)
+ 	u32 mtu;
+ 
+ 	idev = __in6_dev_get_safely(dev_get_by_index_rcu(net, IP6CB(skb)->iif));
+-	if (READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
++	if ((idev && READ_ONCE(idev->cnf.forwarding) == 0) &&
++	    READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
+ 		goto error;
+ 
+ 	if (skb->pkt_type != PACKET_HOST)
+-- 
+2.39.5
+
+
 
