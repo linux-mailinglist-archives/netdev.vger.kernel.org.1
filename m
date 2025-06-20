@@ -1,283 +1,504 @@
-Return-Path: <netdev+bounces-199807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BEDEAE1D8B
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:37:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8E0DAE1D9A
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA73C165B34
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:37:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511CA5A8165
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8173C28FD;
-	Fri, 20 Jun 2025 14:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A301528C2AC;
+	Fri, 20 Jun 2025 14:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mo+sU/eK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oqv0CJaL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10AB22A7F1;
-	Fri, 20 Jun 2025 14:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABFE28FD
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 14:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750430261; cv=none; b=m0EhEwg75NkBn1TjFB9JDPPet3oDooewrsEKrH9vGZ4HWdCwIFw9/FjTmYP/tU66ouh+agwerwp7LRNve5rfb7ARMiQUIjYmPw1cW2/LQfrsmn7j3hxaiQM1xeV39JnpZ2QXhbh3ty09VQtOAcx8XntkCF3jmMn3PAqF7c4J6nw=
+	t=1750430418; cv=none; b=DtRm1LBaLVJ2uV0PDxP2lsHHirDJyswt8aLjq2SHr8aFYqAsYPS3h6I6sy1lHh8q1kuDBrTrMs8JS8mx1k9YsD1HXBsYP96x/f8yqSjzz/PE8CQddi9JNmUyXR7zGGxoz7a8emkTqJ9+DK05xcat+d3QHUWRMwRBRkCq8r3W38E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750430261; c=relaxed/simple;
-	bh=3njAs+BECsX3BLkOrvTR5urBMw+IWwbwy/YIZIkrLkA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u9bfctQIppw8xM/G9hNEu/qgilq5of6jitF2IVdSbz0m5GweJ1lwpvpRmiJ7paAGYd+9s6WSpoIJjtMiHVUPrcNr/FEHWyXw15AssLpNrjw/kGWJFl+Uke/hr2LMhOw3JhTr59VFzLb6AhIpkEDtkixlG6m1ssDGQToXO9QM6WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mo+sU/eK; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1750430418; c=relaxed/simple;
+	bh=xtwT2EWrvvmYUpwqeWcSF2sXj1NGRiBQEMX1XltU/AU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=essQYLmc8bsGLlcSjGEDKpYeiWLU2xg78NK54clBJJBiJw1RkXXkFkIpVVu7djVVE2x6IBeSM3s5fHFr9/RENZVXlIsY4qCu2GemiFqklCqQm9Y3Qg6RYiL9C63tKw5cL0L8fo63BZGPbdJNjJa45umIAdTectLaGZJV0lIXOy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oqv0CJaL; arc=none smtp.client-ip=209.85.219.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3de2b02c69eso6335015ab.1;
-        Fri, 20 Jun 2025 07:37:39 -0700 (PDT)
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e81749142b3so1794653276.3
+        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 07:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750430259; x=1751035059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1750430415; x=1751035215; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bnMpwVE7C1F1wgClLwlEa3GiePGTUVMQT7i0qRnXzjQ=;
-        b=Mo+sU/eKb1CZdTav9UQFjv1hM4AaMZxdRkO67uW8QkoSPaNPW4RXZsGlFASUvGUmay
-         JSLsV1syOjfWPaUYkGtjE6CduEio0AaqeU0ERfolrweIcM+oFQMoPMZecYzAFPXt5iqE
-         jqTUCi3GCGC9I8/YPznu7QnVtA/ce1YAecqqXZL1RQrxNeVyxkTYuIylJ+rgElW7tPTj
-         U6EBcAMCEImwco7GJnK/PShKqVjTpmehH6OiKPcKFRkCp4wa5c7Hhtg+t3S3YimryxDT
-         MlvCvPjhpoTZD06q1cKmedLY8aa93otf8Mw+26i6b4vcygOvkOaKPShArvmlz2gySvsk
-         NNrg==
+        bh=x3Tfvz1NcjdDpSPETE+a7PHSVa7G2BCRiMDg7VZwuEY=;
+        b=Oqv0CJaLCcN/92N7BDp1+YYfkJIbGbpJUcVDypq9A4MJZ9IGja8Vsizmz9L2YG169B
+         AQw+8UFJjqK54LFzVzD1oFOIZyv2FWhuqb8d81mcCrEJDV4fkwXdnc76fDx7mQe7PTD1
+         E7G9sR1DSW6ywn0GqBVz+Jq7gnoJzTWnFZ80Jnlkbz9ysH+vGGX58ngZzhOAY03GLhad
+         06y0/DonvAhqxmWfBO1wxXWlaLO6lAQNliDj6odSnmmR2k0P4KIYVAh+2ZKOHkTam1BZ
+         pG7Q5yQ9zbYzAkSnMP3FnDuQwfg7Ec96M7sNxbv+k3NOLM5p0Y4DW5AiUozPFKueIMNO
+         y8vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750430259; x=1751035059;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bnMpwVE7C1F1wgClLwlEa3GiePGTUVMQT7i0qRnXzjQ=;
-        b=RtQ8LbiNF1Yv8qBl9OEuFQAOyerZqDBqHQI4mqqqx7UGcpGWXG5D+XxCBiZOxWEjPD
-         Ntbe+XYoGDOddbreLaS6iVoYxgL+ykGgHLfJEk2NGWXcU7h+HKZ3wLyfTMQnN9nKdKtF
-         rHNvC9dTlGBxU1AaUE7M2Oq9Ari8/wj07wP/1J7UkVpGMaGiyGrMprUQ/1iInrGfm7C7
-         MPQsBO229+s4x3SNmrJZbv5XKzujx2YyHvzHtrC/G7t6yPibc/KJ324+XVdNWYtFh0R3
-         QGEV8SphJQYS26GEKORsitwZslyvnk2TBE7hXIJ6PHd+dxwkkQ+OsTpe9X1y6VxFUTWp
-         6lnA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+jygPRqcvupbFX/Co7h2C09stLsP80JAGMq0HkTHKBVbcxElikT8/56RkbVhtEdlXls/30AMD@vger.kernel.org, AJvYcCWWPPkpfi7OwY5Vb88/FF0P6NmkoiAH1EFoNaXk8aCPyJw2nCVIJbHaUA/jQjJGnmxgeIY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv36yA8B9Lyyn2sVA/9IWEj9SpJur7a+THU96ittZsl8dU76Wh
-	mOKHan5MiHzq5GnMdXPqjExkYzasE0g/R897MrmpTjLSiKLdYyppCvp4IeKlrsCXlu973PC8GYA
-	/OkII0t8C9Js9OuW7L+4h9KDiYiAB3v2bsulQE4I=
-X-Gm-Gg: ASbGncuVG2cF94vXPVBvQnaElb0g3O1ASF9YDzbiYlFFeQn3wXauCB5k85uZCX2R6QD
-	4EWgf2oXDG3ZSTz2FiLnAgBE6e6TmkiBZ9gQ1s7UgVYy8VFmBjSmdArosS65GmoEocnuWTOLMMW
-	c6iw6DWv7HVJZ7vkVVTuYTqGZpacGi9v/BuHx3oFjIVI8=
-X-Google-Smtp-Source: AGHT+IGmrPjLUSzGQnn4xtInBJtscWqSK5NpL8mFCI3QIAY5aQonsWU5GEC629BaqWPAWWxE6vwwaAAAqy3podU06dI=
-X-Received: by 2002:a05:6e02:2197:b0:3dc:868e:dae7 with SMTP id
- e9e14a558f8ab-3de38cba88fmr28938845ab.15.1750430258555; Fri, 20 Jun 2025
- 07:37:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750430415; x=1751035215;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=x3Tfvz1NcjdDpSPETE+a7PHSVa7G2BCRiMDg7VZwuEY=;
+        b=fd+c9Xt+0jbVlc1XMiE+lIR7NXxfbFBMp65+PCmnd98b1MlmBAEwE3mPa7hiUiozpW
+         a34SGEjlKzvJZtOP71+CStayqqkCOhyFLUqA5dzP0fPDtP22pRupKn7Np4dg6AdEiYYO
+         Bf8l3lWWG2f0poRa6+hQLJOFFFP3uGqavJcSPuAvriOwH+juz4NCEz3+qgnelfnzaXxP
+         gAmjJrokokOkIHyUZLPNEWbTFU5R01eAq1VaJkAyL3LLI2RTwTqZpiWGGI+u4jbeegfy
+         h/qpQ9aIRoqyQlmmprjg8s7VFduWAh0bd+ccwBX1Wt2l+JteDrX93rOKsuAjfWWIqFeU
+         MDhg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4hAG0h29IVjqVbWN7FYlVdwdJQX7+7Wk7/RdlV01vfRpZsi5sIYx4z6nklFMMJyquiT3Hq6k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLr+LpNS0RZpywmGP7NqfpGNpqhVle3kYEXVS+7+xVZqu4heQO
+	Yx3WunmSKi0SF/h+ysnN87Jj/sgrVdMq1dIpGPKZcjXEHdaYCtOAc2hq
+X-Gm-Gg: ASbGncswdCrdM9ulC9xkjHrkrlPT237EYpg7i41xW9n19B9pG3fQgQsikVxnwq1yB6k
+	yYaksg7tvrQByrFbotVQbKEbtqP2E9Iq2PJEHLX5KuyTL1SlLN182XmsmVPT9My8TlCrdpmC50Y
+	oNeLqjFuwLLWDSg30jM0+ziveLh7LHa4bnCxo4y9N9DArldLHfiQEIgJZTHbA/Z7JC3rIQuM0Gn
+	lz6t1IxW8tx0OCU0qy4UyFYVFKiWMkI71HCQ2ssuvSfWTgH3ulNQ9iullpCWzOwgwSIJYGykuaQ
+	6wd8Wrg1pMpcFPQTMxVGPN6xkhcCm56XtzfJF7SyjwVuEX9MtSshC45mng4UvIrGY5yjkQNZMMc
+	xQArXmdAa/QVyrMRsCRj/BBRKSd/yoYO2Brua/oMxYg==
+X-Google-Smtp-Source: AGHT+IESzkT52HId6R+eupj1aIuCSRVBXpXsuxwzVz0HBym1H8P9+1oZadVEdebCJnrFotXYYk/kqQ==
+X-Received: by 2002:a05:6902:2208:b0:e82:b04f:4b5c with SMTP id 3f1490d57ef6-e842bc77943mr3889060276.5.1750430415240;
+        Fri, 20 Jun 2025 07:40:15 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e842acb1fadsm663110276.50.2025.06.20.07.40.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jun 2025 07:40:14 -0700 (PDT)
+Date: Fri, 20 Jun 2025 10:40:14 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-ID: <685572ce376c8_164a2946a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
+References: <cover.1750176076.git.pabeni@redhat.com>
+ <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
+Subject: Re: [PATCH v4 net-next 7/8] tun: enable gso over UDP tunnel support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
- <6854165ccb312_3a357029426@willemb.c.googlers.com.notmuch>
- <CAL+tcoBpfFPrYYfWa5P+Sr6S64_stUHiJj26QCtcx56cA5BWXg@mail.gmail.com>
- <685565722327f_3ffda42943d@willemb.c.googlers.com.notmuch> <68556906dc574_164a294f9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <68556906dc574_164a294f9@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 20 Jun 2025 22:37:02 +0800
-X-Gm-Features: AX0GCFuyOqNDcP9PxVsw9Fg6nS1Tb1nF8YNiRuTPOOkL17dacXtKXD2S5PL-oss
-Message-ID: <CAL+tcoAMHPYw2bZV87epRFU4oL0=aeUPE3oM6=BUSJuOHPgo8w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 20, 2025 at 9:58=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Willem de Bruijn wrote:
-> > Jason Xing wrote:
-> > > On Thu, Jun 19, 2025 at 9:53=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Jason Xing wrote:
-> > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > >
-> > > > > The patch does the following things:
-> > > > > - Add XDP_MAX_TX_BUDGET socket option.
-> > > > > - Unify TX_BATCH_SIZE and MAX_PER_SOCKET_BUDGET into single one
-> > > > >   tx_budget_spent.
-> > > > > - tx_budget_spent is set to 32 by default in the initialization p=
-hase.
-> > > > >   It's a per-socket granular control.
-> > > > >
-> > > > > The idea behind this comes out of real workloads in production. W=
-e use a
-> > > > > user-level stack with xsk support to accelerate sending packets a=
-nd
-> > > > > minimize triggering syscall. When the packets are aggregated, it'=
-s not
-> > > > > hard to hit the upper bound (namely, 32). The moment user-space s=
-tack
-> > > > > fetches the -EAGAIN error number passed from sendto(), it will lo=
-op to try
-> > > > > again until all the expected descs from tx ring are sent out to t=
-he driver.
-> > > > > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequen=
-cies of
-> > > > > sendto(). Besides, applications leveraging this setsockopt can ad=
-just
-> > > > > its proper value in time after noticing the upper bound issue hap=
-pening.
-> > > > >
-> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > ---
-> > > > > V3
-> > > > > Link: https://lore.kernel.org/all/20250618065553.96822-1-kernelja=
-sonxing@gmail.com/
-> > > > > 1. use a per-socket control (suggested by Stanislav)
-> > > > > 2. unify both definitions into one
-> > > > > 3. support setsockopt and getsockopt
-> > > > > 4. add more description in commit message
-> > > >
-> > > > +1 on an XSK setsockopt only
-> > >
-> > > May I ask why only setsockopt? In tradition, dev_tx_weight can be rea=
-d
-> > > and written through running sysctl. I think they are the same?
-> >
-> > This is not dev_tx_weight, which is per device.
-> >
-> > This is a per-socket choice. The reason for adding it that you gave,
-> > a specific application that is known to be able to batch more than 32,
-> > can tune this configurable in the application.
+Paolo Abeni wrote:
+> Add new tun features to represent the newly introduced virtio
+> GSO over UDP tunnel offload. Allows detection and selection of
+> such features via the existing TUNSETOFFLOAD ioctl and compute
+> the expected virtio header size and tunnel header offset using
+> the current netdev features, so that we can plug almost seamless
+> the newly introduced virtio helpers to serialize the extended
+> virtio header.
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v3 -> v4:
+>   - virtio tnl-related fields are at fixed offset, cleanup
+>     the code accordingly.
+>   - use netdev features instead of flags bit to check for
+>     the configured offload
+>   - drop packet in case of enabled features/configured hdr
+>     size mismatch
+> 
+> v2 -> v3:
+>   - cleaned-up uAPI comments
+>   - use explicit struct layout instead of raw buf.
+> ---
+>  drivers/net/tun.c           | 70 ++++++++++++++++++++++++-----
+>  drivers/net/tun_vnet.h      | 88 +++++++++++++++++++++++++++++++++----
+>  include/uapi/linux/if_tun.h |  9 ++++
+>  3 files changed, 148 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index f8c5e2fd04df..bae0370a8152 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -186,7 +186,8 @@ struct tun_struct {
+>  	struct net_device	*dev;
+>  	netdev_features_t	set_features;
+>  #define TUN_USER_FEATURES (NETIF_F_HW_CSUM|NETIF_F_TSO_ECN|NETIF_F_TSO| \
+> -			  NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4)
+> +			  NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4 | \
+> +			  NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM)
+>  
+>  	int			align;
+>  	int			vnet_hdr_sz;
+> @@ -925,6 +926,7 @@ static int tun_net_init(struct net_device *dev)
+>  	dev->hw_features = NETIF_F_SG | NETIF_F_FRAGLIST |
+>  			   TUN_USER_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
+>  			   NETIF_F_HW_VLAN_STAG_TX;
+> +	dev->hw_enc_features = dev->hw_features;
+>  	dev->features = dev->hw_features;
+>  	dev->vlan_features = dev->features &
+>  			     ~(NETIF_F_HW_VLAN_CTAG_TX |
+> @@ -1698,7 +1700,8 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+>  	struct sk_buff *skb;
+>  	size_t total_len = iov_iter_count(from);
+>  	size_t len = total_len, align = tun->align, linear;
+> -	struct virtio_net_hdr gso = { 0 };
+> +	struct virtio_net_hdr_v1_hash_tunnel hdr;
 
-I was thinking a pair is needed like some existing options I'm
-familiar with like TCP_RTO_MAX_MS. As I said, it's just a feeling.
+Not for this series.
 
-Okay, I have no strong opinion on this. I will remove it then.
+But one day virtio will need a policy on how multiple optional
+features can be composed, and simple APIs to get to those optional
+headers. Perhaps something like skb extensions.
 
-> >
-> > I see no immediately need to set this at a per netns or global level.
-> > If so, the extra cacheline space in those structs is not warranted.
-> >
-> > > >
-> > > > >
-> > > > > V2
-> > > > > Link: https://lore.kernel.org/all/20250617002236.30557-1-kernelja=
-sonxing@gmail.com/
-> > > > > 1. use a per-netns sysctl knob
-> > > > > 2. use sysctl_xsk_max_tx_budget to unify both definitions.
-> > > > > ---
-> > > > >  include/net/xdp_sock.h            |  3 ++-
-> > > > >  include/uapi/linux/if_xdp.h       |  1 +
-> > > > >  net/xdp/xsk.c                     | 36 +++++++++++++++++++++++++=
-------
-> > > > >  tools/include/uapi/linux/if_xdp.h |  1 +
-> > > > >  4 files changed, 34 insertions(+), 7 deletions(-)
-> > > > >
-> > > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> > > > > index e8bd6ddb7b12..8eecafad92c0 100644
-> > > > > --- a/include/net/xdp_sock.h
-> > > > > +++ b/include/net/xdp_sock.h
-> > > > > @@ -65,11 +65,12 @@ struct xdp_sock {
-> > > > >       struct xsk_queue *tx ____cacheline_aligned_in_smp;
-> > > > >       struct list_head tx_list;
-> > > > >       /* record the number of tx descriptors sent by this xsk and
-> > > > > -      * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity ne=
-eds
-> > > > > +      * when it exceeds max_tx_budget, an opportunity needs
-> > > > >        * to be given to other xsks for sending tx descriptors, th=
-ereby
-> > > > >        * preventing other XSKs from being starved.
-> > > > >        */
-> > > > >       u32 tx_budget_spent;
-> > > > > +     u32 max_tx_budget;
-> > > >
-> > > > This probably does not need to be a u32?
-> > >
-> > > From what I've known, it's not possible to set a very large value lik=
-e
-> > > 1000 which probably brings side effects.
-> > >
-> > > But it seems we'd better not limit the use of this max_tx_budget? We
-> > > don't know what the best fit for various use cases is. If the type
-> > > needs to be downsized to a smaller one like u16, another related
-> > > consideration is that dev_tx_weight deserves the same treatment?
-> >
-> > If the current constant is 32, is U16_MAX really a limiting factor.
-> > See also the next point.
-> >
-> > > Or let me adjust to 'int' then?
-> > > > > @@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *s=
-ock, int level, int optname,
-> > > > >               mutex_unlock(&xs->mutex);
-> > > > >               return err;
-> > > > >       }
-> > > > > +     case XDP_MAX_TX_BUDGET:
-> > > > > +     {
-> > > > > +             unsigned int budget;
-> > > > > +
-> > > > > +             if (optlen < sizeof(budget))
-> > > > > +                     return -EINVAL;
-> > > > > +             if (copy_from_sockptr(&budget, optval, sizeof(budge=
-t)))
-> > > > > +                     return -EFAULT;
-> > > > > +
-> > > > > +             WRITE_ONCE(xs->max_tx_budget, budget);
-> > > >
-> > > > Sanitize input: bounds check
-> > >
-> > > Thanks for catching this.
-> > >
-> > > I will change it like this:
-> > >     WRITE_ONCE(xs->max_tx_budget, min_t(int, budget, INT_MAX));?
-> >
-> > INT_MAX is not a valid upper bound. The current constant is 32.
-> > I would expect an upper bound to perhaps be a few orders larger.
->
-> And this would need a clamp to also set a lower bound greater than 0.
+Now, each new extention means adding yet another struct and updating
+all sites that access it.
 
-Sorry, I don't fully follow here. I'm worried if I understand it in
-the wrong way.
+A minimal rule may be that options can be entirely independent, but
+if they exist at least their headers are always in a fixed order.
+Which is already implied by the current extensions, i.e., hash comes
+before tunnel if present.
 
-In this patch, max_tx_budget is u32. If we're doing this this:
-        case XDP_MAX_TX_BUDGET:
-        {
-                unsigned int budget;
+> +	struct virtio_net_hdr *gso;
+>  	int good_linear;
+>  	int copylen;
+>  	int hdr_len = 0;
+> @@ -1708,6 +1711,15 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+>  	int skb_xdp = 1;
+>  	bool frags = tun_napi_frags_enabled(tfile);
+>  	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+> +	netdev_features_t features = 0;
+> +
+> +	/*
+> +	 * Keep it easy and always zero the whole buffer, even if the
+> +	 * tunnel-related field will be touched only when the feature
+> +	 * is enabled and the hdr size id compatible.
+> +	 */
+> +	memset(&hdr, 0, sizeof(hdr));
+> +	gso = (struct virtio_net_hdr *)&hdr;
+>  
+>  	if (!(tun->flags & IFF_NO_PI)) {
+>  		if (len < sizeof(pi))
+> @@ -1721,7 +1733,12 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+>  	if (tun->flags & IFF_VNET_HDR) {
+>  		int vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
+>  
+> -		hdr_len = tun_vnet_hdr_get(vnet_hdr_sz, tun->flags, from, &gso);
+> +		if (vnet_hdr_sz >= TUN_VNET_TNL_SIZE)
+> +			features = NETIF_F_GSO_UDP_TUNNEL |
+> +				   NETIF_F_GSO_UDP_TUNNEL_CSUM;
 
-                if (optlen !=3D sizeof(budget))    // this line can
-filter out those unmatched numbers, right?
-                        return -EINVAL;
-                if (copy_from_sockptr(&budget, optval,
-sizeof(budget)))
-                        return -EFAULT;
+Maybe a helper virtio_net_has_opt_tunnel(), to encapsulate whatever
+conditions have to be met. As those conditions are not obvious.
 
-                WRITE_ONCE(xs->max_tx_budget, budget);
+Especially if needed in multiple locations. Not sure if that is the
+case here, I have not checked that.
 
-                return 0;
-        }
-, I'm thinking, is it sufficient because u32 makes sure of zero as its
-lower bound?
+> +
+> +		hdr_len = __tun_vnet_hdr_get(vnet_hdr_sz, tun->flags,
+> +					     features, from, gso);
+>  		if (hdr_len < 0)
+>  			return hdr_len;
+>  
+> @@ -1755,7 +1772,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+>  		 * (e.g gso or jumbo packet), we will do it at after
+>  		 * skb was created with generic XDP routine.
+>  		 */
+> -		skb = tun_build_skb(tun, tfile, from, &gso, len, &skb_xdp);
+> +		skb = tun_build_skb(tun, tfile, from, gso, len, &skb_xdp);
+>  		err = PTR_ERR_OR_ZERO(skb);
+>  		if (err)
+>  			goto drop;
+> @@ -1799,7 +1816,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+>  		}
+>  	}
+>  
+> -	if (tun_vnet_hdr_to_skb(tun->flags, skb, &gso)) {
+> +	if (tun_vnet_hdr_tnl_to_skb(tun->flags, features, skb, &hdr)) {
+>  		atomic_long_inc(&tun->rx_frame_errors);
+>  		err = -EINVAL;
+>  		goto free_skb;
+> @@ -2050,13 +2067,21 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>  	}
+>  
+>  	if (vnet_hdr_sz) {
+> -		struct virtio_net_hdr gso;
+> +		struct virtio_net_hdr_v1_hash_tunnel hdr;
+> +		struct virtio_net_hdr *gso;
+>  
+> -		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
+> +		ret = tun_vnet_hdr_tnl_from_skb(tun->flags, tun->dev, skb,
+> +						&hdr);
+>  		if (ret)
+>  			return ret;
+>  
+> -		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
+> +		/*
+> +		 * Drop the packet if the configured header size is too small
+> +		 * WRT the enabled offloads.
+> +		 */
+> +		gso = (struct virtio_net_hdr *)&hdr;
+> +		ret = __tun_vnet_hdr_put(vnet_hdr_sz, tun->dev->features,
+> +					 iter, gso);
+>  		if (ret)
+>  			return ret;
+>  	}
+> @@ -2357,7 +2382,9 @@ static int tun_xdp_one(struct tun_struct *tun,
+>  {
+>  	unsigned int datasize = xdp->data_end - xdp->data;
+>  	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
+> +	struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr;
+>  	struct virtio_net_hdr *gso = &hdr->gso;
+> +	netdev_features_t features = 0;
+>  	struct bpf_prog *xdp_prog;
+>  	struct sk_buff *skb = NULL;
+>  	struct sk_buff_head *queue;
+> @@ -2426,7 +2453,17 @@ static int tun_xdp_one(struct tun_struct *tun,
+>  	if (metasize > 0)
+>  		skb_metadata_set(skb, metasize);
+>  
+> -	if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
+> +	/*
+> +	 * Assume tunnel offloads are enabled if the received hdr is large
+> +	 * enough.
+> +	 */
+> +	if (READ_ONCE(tun->vnet_hdr_sz) >= TUN_VNET_TNL_SIZE &&
+> +	    xdp->data - xdp->data_hard_start >= TUN_VNET_TNL_SIZE)
+> +		features = NETIF_F_GSO_UDP_TUNNEL |
+> +			   NETIF_F_GSO_UDP_TUNNEL_CSUM;
+> +
+> +	tnl_hdr = (struct virtio_net_hdr_v1_hash_tunnel *)gso;
+> +	if (tun_vnet_hdr_tnl_to_skb(tun->flags, features, skb, tnl_hdr)) {
+>  		atomic_long_inc(&tun->rx_frame_errors);
+>  		kfree_skb(skb);
+>  		ret = -EINVAL;
+> @@ -2812,6 +2849,8 @@ static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
+>  
+>  }
+>  
+> +#define PLAIN_GSO (NETIF_F_GSO_UDP_L4 | NETIF_F_TSO | NETIF_F_TSO6)
+> +
 
-Or you're suggesting like this:
-        case XDP_MAX_TX_BUDGET:
-        {
-                unsigned int budget;
+Minor/subjective: prefer const unsigned int at function scope over untyped
+file scope macros.
 
-                if (optlen !=3D sizeof(budget))
-                        return -EINVAL;
-                if (copy_from_sockptr(&budget, optval, sizeof(budget)))
-                        return -EFAULT;
+>  /* This is like a cut-down ethtool ops, except done via tun fd so no
+>   * privs required. */
+>  static int set_offload(struct tun_struct *tun, unsigned long arg)
+> @@ -2841,6 +2880,18 @@ static int set_offload(struct tun_struct *tun, unsigned long arg)
+>  			features |= NETIF_F_GSO_UDP_L4;
+>  			arg &= ~(TUN_F_USO4 | TUN_F_USO6);
+>  		}
+> +
+> +		/*
+> +		 * Tunnel offload is allowed only if some plain offload is
+> +		 * available, too.
+> +		 */
+> +		if (features & PLAIN_GSO && arg & TUN_F_UDP_TUNNEL_GSO) {
+> +			features |= NETIF_F_GSO_UDP_TUNNEL;
+> +			if (arg & TUN_F_UDP_TUNNEL_GSO_CSUM)
+> +				features |= NETIF_F_GSO_UDP_TUNNEL_CSUM;
+> +			arg &= ~(TUN_F_UDP_TUNNEL_GSO |
+> +				 TUN_F_UDP_TUNNEL_GSO_CSUM);
+> +		}
+>  	}
+>  
+>  	/* This gives the user a way to test for new features in future by
+> @@ -2852,7 +2903,6 @@ static int set_offload(struct tun_struct *tun, unsigned long arg)
+>  	tun->dev->wanted_features &= ~TUN_USER_FEATURES;
+>  	tun->dev->wanted_features |= features;
+>  	netdev_update_features(tun->dev);
+> -
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+> index 58b9ac7a5fc4..7450fc153bb4 100644
+> --- a/drivers/net/tun_vnet.h
+> +++ b/drivers/net/tun_vnet.h
+> @@ -6,6 +6,8 @@
+>  #define TUN_VNET_LE     0x80000000
+>  #define TUN_VNET_BE     0x40000000
+>  
+> +#define TUN_VNET_TNL_SIZE	sizeof(struct virtio_net_hdr_v1_hash_tunnel)
+> +
+>  static inline bool tun_vnet_legacy_is_little_endian(unsigned int flags)
+>  {
+>  	bool be = IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
+> @@ -107,16 +109,26 @@ static inline long tun_vnet_ioctl(int *vnet_hdr_sz, unsigned int *flags,
+>  	}
+>  }
+>  
+> -static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
+> -				   struct iov_iter *from,
+> -				   struct virtio_net_hdr *hdr)
+> +static inline unsigned int tun_vnet_parse_size(netdev_features_t features)
+> +{
+> +	if (!(features & NETIF_F_GSO_UDP_TUNNEL))
+> +		return sizeof(struct virtio_net_hdr);
+> +
+> +	return TUN_VNET_TNL_SIZE;
+> +}
+> +
+> +static inline int __tun_vnet_hdr_get(int sz, unsigned int flags,
+> +				     netdev_features_t features,
+> +				     struct iov_iter *from,
+> +				     struct virtio_net_hdr *hdr)
+>  {
+> +	unsigned int parsed_size = tun_vnet_parse_size(features);
+>  	u16 hdr_len;
+>  
+>  	if (iov_iter_count(from) < sz)
+>  		return -EINVAL;
+>  
+> -	if (!copy_from_iter_full(hdr, sizeof(*hdr), from))
+> +	if (!copy_from_iter_full(hdr, parsed_size, from))
+>  		return -EFAULT;
+>  
+>  	hdr_len = tun_vnet16_to_cpu(flags, hdr->hdr_len);
+> @@ -129,32 +141,59 @@ static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
+>  	if (hdr_len > iov_iter_count(from))
+>  		return -EINVAL;
+>  
+> -	iov_iter_advance(from, sz - sizeof(*hdr));
+> +	iov_iter_advance(from, sz - parsed_size);
+>  
+>  	return hdr_len;
+>  }
+>  
+> -static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+> -				   const struct virtio_net_hdr *hdr)
+> +static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
+> +				   struct iov_iter *from,
+> +				   struct virtio_net_hdr *hdr)
+> +{
+> +	return __tun_vnet_hdr_get(sz, flags, 0, from, hdr);
+> +}
+> +
+> +static inline int __tun_vnet_hdr_put(int sz, netdev_features_t features,
+> +				     struct iov_iter *iter,
+> +				     const struct virtio_net_hdr *hdr)
+>  {
+> +	unsigned int parsed_size = tun_vnet_parse_size(features);
+> +
+>  	if (unlikely(iov_iter_count(iter) < sz))
+>  		return -EINVAL;
+>  
+> -	if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr)))
+> +	if (unlikely(copy_to_iter(hdr, parsed_size, iter) != parsed_size))
+>  		return -EFAULT;
+>  
+> -	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
+> +	if (iov_iter_zero(sz - parsed_size, iter) != sz - parsed_size)
+>  		return -EFAULT;
+>  
+>  	return 0;
+>  }
+>  
+> +static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+> +				   const struct virtio_net_hdr *hdr)
+> +{
+> +	return __tun_vnet_hdr_put(sz, 0, iter, hdr);
+> +}
+> +
+>  static inline int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
+>  				      const struct virtio_net_hdr *hdr)
+>  {
+>  	return virtio_net_hdr_to_skb(skb, hdr, tun_vnet_is_little_endian(flags));
+>  }
+>  
+> +static inline int
+> +tun_vnet_hdr_tnl_to_skb(unsigned int flags, netdev_features_t features,
+> +			struct sk_buff *skb,
+> +			const struct virtio_net_hdr_v1_hash_tunnel *hdr)
+> +{
+> +	return virtio_net_hdr_tnl_to_skb(skb, hdr,
+> +					 !!(features & NETIF_F_GSO_UDP_TUNNEL),
+> +					 !!(features & NETIF_F_GSO_UDP_TUNNEL_CSUM),
 
-                WRITE_ONCE(xs->max_tx_budget,
-                           clamp_t(unsigned int, budget, 0, U16_MAX));
-                return 0;
-        }
-?
+Double exclamation points not needed. Compiler does the right thing
+when arguments are of type bool.
 
-Thanks,
-Jason
+> +					 tun_vnet_is_little_endian(flags));
+> +}
+> +
+>  static inline int tun_vnet_hdr_from_skb(unsigned int flags,
+>  					const struct net_device *dev,
+>  					const struct sk_buff *skb,
+> @@ -183,4 +222,35 @@ static inline int tun_vnet_hdr_from_skb(unsigned int flags,
+>  	return 0;
+>  }
+>  
+> +static inline int
+> +tun_vnet_hdr_tnl_from_skb(unsigned int flags,
+> +			  const struct net_device *dev,
+> +			  const struct sk_buff *skb,
+> +			  struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr)
+> +{
+> +	bool has_tnl_offload = !!(dev->features & NETIF_F_GSO_UDP_TUNNEL);
+> +	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
+> +
+> +	if (virtio_net_hdr_tnl_from_skb(skb, tnl_hdr, has_tnl_offload,
+> +					tun_vnet_is_little_endian(flags),
+> +					vlan_hlen)) {
+> +		struct virtio_net_hdr_v1 *hdr = &tnl_hdr->hash_hdr.hdr;
+> +		struct skb_shared_info *sinfo = skb_shinfo(skb);
+> +
+> +		if (net_ratelimit()) {
+> +			netdev_err(dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
+> +				   sinfo->gso_type, tun_vnet16_to_cpu(flags, hdr->gso_size),
+> +				   tun_vnet16_to_cpu(flags, hdr->hdr_len));
+> +			print_hex_dump(KERN_ERR, "tun: ",
+> +				       DUMP_PREFIX_NONE,
+> +				       16, 1, skb->head,
+> +				       min(tun_vnet16_to_cpu(flags, hdr->hdr_len), 64), true);
+> +		}
+> +		WARN_ON_ONCE(1);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  #endif /* TUN_VNET_H */
+> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+> index 287cdc81c939..79d53c7a1ebd 100644
+> --- a/include/uapi/linux/if_tun.h
+> +++ b/include/uapi/linux/if_tun.h
+> @@ -93,6 +93,15 @@
+>  #define TUN_F_USO4	0x20	/* I can handle USO for IPv4 packets */
+>  #define TUN_F_USO6	0x40	/* I can handle USO for IPv6 packets */
+>  
+> +/* I can handle TSO/USO for UDP tunneled packets */
+> +#define TUN_F_UDP_TUNNEL_GSO		0x080
+> +
+> +/*
+> + * I can handle TSO/USO for UDP tunneled packets requiring csum offload for
+> + * the outer header
+> + */
+> +#define TUN_F_UDP_TUNNEL_GSO_CSUM	0x100
+> +
+>  /* Protocol info prepended to the packets (when IFF_NO_PI is not set) */
+>  #define TUN_PKT_STRIP	0x0001
+>  struct tun_pi {
+> -- 
+> 2.49.0
+> 
+
+
 
