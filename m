@@ -1,208 +1,112 @@
-Return-Path: <netdev+bounces-199757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29CAFAE1BFC
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:21:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDDC5AE1C11
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EA387AE328
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:19:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 680A41C20CBB
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DE328C017;
-	Fri, 20 Jun 2025 13:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46B629551E;
+	Fri, 20 Jun 2025 13:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUm+WMZ2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BSYHcxwf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A7E1754B
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 13:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501ED292900
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 13:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750425664; cv=none; b=eZwKMgUhWi71yvBjO4lKONmqhrhp7GnyNLyUkaOhnMqtbeWRjqbPGGvx4o6EIu1V0n8lfXw0LOY/pfb9TvhkQOFfU2wRmdfRRiwFgKgvk+BuwlAqevR5eUgn30rBZlT+SJN+qbAQP2v/85LLYYCCerJJE3U0rUNuq2seX/o+e6w=
+	t=1750425877; cv=none; b=YCPu2a98Dw5lRWHvfGEsLMohxMe168ffC2TlX31lYx088dY7cjLgiNK34+aPCwW3yw+pqwpG+9vZCvmqb3Yw11l3i0Jd6UGfoF9JztT9opwtQsWl+ZvtV88O5avX3URAt1jeJSfc2jGRSNS+3vR+xDCMuN7/wDhtgTM1qFV3dpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750425664; c=relaxed/simple;
-	bh=m++IWIdhWcOcndZZ1RdUUYfFhpUVf+EYrm4S0Wxh/7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oP74p+GgRTIY+r3FR51yHDg6/jBnLT0yLvLNSTbOJKDoHA+OOxGemd7ce76iSbBMWwFHKzstsbyfFt/sWAhh24UDRJ1NpwH68i99fPmP5EWvc33Mqx14/GqgCM3+Wzy3FRavv9sv1aIfFMgtuzwV+eFbAJnvDXT3ezjfIAqqxkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hUm+WMZ2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750425661;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wrbqyOjgClJljme6Y8IBM3ztge6H5cPgaXJrix0YAsM=;
-	b=hUm+WMZ2A7QejRXsToGjKQ/+jBlSeli6ZcfjjqCBb/n0cxDPBr8HIjqXZF+PwBkWQF+baY
-	1qpBnltrPiHhfNn2zsaQFOsT6VsKpOb4QnGzpLcdWzSGwbsLK7ajLmiyaS5XuTBx146jMi
-	KPJL2/3Ae29txkuCad8azLZAiUjeqQw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-FwmEvLSTPIy-YiZj-5oXHw-1; Fri, 20 Jun 2025 09:20:59 -0400
-X-MC-Unique: FwmEvLSTPIy-YiZj-5oXHw-1
-X-Mimecast-MFC-AGG-ID: FwmEvLSTPIy-YiZj-5oXHw_1750425658
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f65a705dso1065499f8f.2
-        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 06:20:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750425658; x=1751030458;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1750425877; c=relaxed/simple;
+	bh=d9ZfafjmIee1iG+4AYS+vqOpLxzW4Rp/rsErzbqVdU8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AhGAAjPw0xljQ/TrPPZyVDbyyMrxcPEB4yqWh/+qVoHuMvC/ZzNuU3QDDUu7L6QIg7qMCY4vAa5WT/BbaLGVg2BSx19W2B5aeKMc6G1IpjdzNWuAatUCTWcU3NnpJocdk+BAS4Yv+0EaW+38017EJThnqhXH7/k372+ZaoaZPFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BSYHcxwf; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a44b3526e6so22994701cf.0
+        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 06:24:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750425875; x=1751030675; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wrbqyOjgClJljme6Y8IBM3ztge6H5cPgaXJrix0YAsM=;
-        b=MeizFGNVCLz+FsrMm0h9R3LSDqLUarDDWwBJ7AI+IA/v0e0gZ7PbfZ/wy5qQFMK0e6
-         987VoEvrtl5xCyLtMWrQMgmsErGUTSQYptK2qf86CFNpDhWlJvlm9CM1Ma41vp8r8+3a
-         PqMME3jXWG8YWg4kR/dptPrFkB+Ut9y+4vzAiSlTBkXtfCHQDxGysFRhX5e3Xjd6Fzf5
-         jdxXJ7CLGTAnUsGDCiMqmBrIDd56T29rFANEaG1CCqrCbLYm7kr2U68kext49TbqG6gL
-         7bzNkLhMSzrIjuFI4ARuiBvF/2Ouoy1GofIRgTREa1KL5t16uerZ4LVBk5sU8F6rpKBx
-         +/ig==
-X-Forwarded-Encrypted: i=1; AJvYcCUxt1warQnvPX58vm4UcQ0JKKUeKYxo5quVYPoZMmE1bk2mjjNgPxWXa7W4KNd96DSDrcA0iOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyojeHgYOCDUUrbmVrr/K7nStc/CpzDQ7by+IDdETm6DsNkw5Wi
-	6BxWcKd9LO21ipkyCeAUKsOTur6DetVSMQQhlDuymWHyWGqm8PUggUTZc1zqa+WGdLy/AKUKfBJ
-	YrcmvS6eqhUi9CSJUkE7Fe2fxerTp3yhhR088w1PPZDiufBA6925JsV0AMw==
-X-Gm-Gg: ASbGncu9rPUttaFbKNw6F9r/1K96/z0v+N+09z5H1bDKKgYVfCbcNVY7rU75oGUVEZ+
-	uEmeO+uwBR3YInfEb+m1MGc/94oP0GLvdw+J1L/PN7RSZvVt1rLNznNAVInFBjU2+ffX395rfzn
-	ZskmWNeswLcJCkfAsBA5juG6H9w65492DNVndAhVYnoYeLtOuXlJJpcrLgeD76N4noWRA4OHCEV
-	40bscOQBvmzoTCgAn6vNBh7S7togEFbGntKYPM9gTsmxOUgbQ2s06heguUdDExpdiGYOKfjx0lm
-	SLNdpvVFTtKrDwbISE8x4w8yTKY=
-X-Received: by 2002:adf:9dd1:0:b0:3a4:f655:8c4d with SMTP id ffacd0b85a97d-3a6d131787bmr2056463f8f.27.1750425658397;
-        Fri, 20 Jun 2025 06:20:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9QRtkvxSOLn59Do52l3ix3GhLfK1cWTxETb+z/cJOkSsbedauMcmLKrjvI5kUALGNlARMfA==
-X-Received: by 2002:adf:9dd1:0:b0:3a4:f655:8c4d with SMTP id ffacd0b85a97d-3a6d131787bmr2056441f8f.27.1750425657878;
-        Fri, 20 Jun 2025 06:20:57 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.146.57])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0ec947fsm2106321f8f.0.2025.06.20.06.20.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 06:20:57 -0700 (PDT)
-Date: Fri, 20 Jun 2025 15:20:52 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/3] vsock: Fix transport_{h2g,g2h} TOCTOU
-Message-ID: <cg25zc7ktl6glh5r7mfxjvbjqguq2s2rj6vk24ful7zg6ydwuz@tjtvbrmemtpw>
-References: <20250618-vsock-transports-toctou-v1-0-dd2d2ede9052@rbox.co>
- <20250618-vsock-transports-toctou-v1-1-dd2d2ede9052@rbox.co>
- <r2ms45yka7e2ont3zi5t3oqyuextkwuapixlxskoeclt2uaum2@3zzo5mqd56fs>
- <fd2923f1-b242-42c2-8493-201901df1706@rbox.co>
+        bh=d9ZfafjmIee1iG+4AYS+vqOpLxzW4Rp/rsErzbqVdU8=;
+        b=BSYHcxwfP/jZz2aqO3yNcaCca98GR/68QtS+UsKdu3eqcbjNvAsSTTaSPobyiAKMI+
+         yCSMkZcjAPBx06I8EG+vC/nAR/4GdK9P8USncIn/bMfHIJhh/O4V+fx5UslvWsU6Agph
+         yR2+ZK+l9p3fcpEAjEl9DmI2a6pyAfgZ5+0cOzjoWZ69NAXVNCmJkRRkKJ264DCtLdVu
+         6bItaJnx+7h3giTb+TBpuq3pcrPMoDeED9vCkdwTUODp+bxnRitfX4NJLxXTefRVe6OU
+         Cnh3hxXdN1et172yZC/kxo3Zac9BekSoCboGYMsbE4cEktOOP9bWznXgSZ2UlqZsR7Lb
+         07tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750425875; x=1751030675;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d9ZfafjmIee1iG+4AYS+vqOpLxzW4Rp/rsErzbqVdU8=;
+        b=edlZVleZgAh7bRo+v+RYAAOvMDMQ1BJQyRtr81I84QF74iNWvp4HV51IQj89c6UTpC
+         I+p9G6iLRhLnUx3LhvwyAhcvjMeCmRuAenqA1wc49Yj8afgZ59f6yBdyzrGO0M5ukn/Q
+         ETjP/xKOOl+34HFciLQAQBHYtXHFUTR2cQVX41cFhTAbDzu5cQZFw2ZVkVd10gOqtaGg
+         iGY47K6KiZfGBwKMlGydItYsR9EieAy+GXLY6B6gY5z9hpjdQzqU2FTd4I7WruBA7Sx1
+         loySTAkZqvYQUOfB3r+dC2RHVam1y/AlbzQ2V53hIIXxs1qPqCdffuwracplIzrHy0ZP
+         LnwA==
+X-Forwarded-Encrypted: i=1; AJvYcCV18Aqi8H7japgvLB3ea/EWXj+J9Q7f9bZA59VXeaU2bO00h/ZAh8XfXeDdvoJLOg7qHP8Rcwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNVXyCmdSfZIVDuZOjhz525LMdkUBe5W8bBb8E+6d9jmx28s5K
+	5/5gsAigv3E0x8Ww/6ee/aRfoQKbWsi4ON6LHlhrWIjSrt9wBXoBvW+Cjx/ubTS2m66wOlV6IhN
+	Tli5Bx+3CAmMcdkj4nS8Vhx3qaRk7o/VU9ol5qnbv
+X-Gm-Gg: ASbGncvQ1+jf8iib49ic+g+CDFHjaYIiOvkL/7AnqwYPbNw7a94FAeK2Cp2E9Ulim3s
+	O0HFXl5UuG74Ha5XCrbu56tTZ6i+WFoEX6TXcmedzYNr5VMs+ro0TDukeZzfr/KIC9DhcxYiCeL
+	cAOrAYgeHA1e4wEQGS3jhXvKRrp6mI8A21KA9TjXPPTg==
+X-Google-Smtp-Source: AGHT+IG4eaVt0MWfu/UDw8t8Al7b4heihOxTJYPuijSj65Z6bXsPF7O0hfoC2og12Kgf2KdA706bwmNyEIknhSNOCDU=
+X-Received: by 2002:a05:622a:489:b0:4a4:31c5:fc8a with SMTP id
+ d75a77b69052e-4a77a29d8a5mr47363631cf.47.1750425874849; Fri, 20 Jun 2025
+ 06:24:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <fd2923f1-b242-42c2-8493-201901df1706@rbox.co>
+References: <20250620125644.1045603-1-ptesarik@suse.com>
+In-Reply-To: <20250620125644.1045603-1-ptesarik@suse.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 20 Jun 2025 06:24:23 -0700
+X-Gm-Features: AX0GCFs8knA8ecPrWGUgxdl0yH3mTUWy-n9f71rdkERcznqHz0_ZUn3B44h7Urk
+Message-ID: <CANn89iLrJiqu1SdjKfkOPcSktvmAUWR2rJWkiPdvzQn+MMAOPg@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/2] tcp_metrics: fix hanlding of route options
+To: Petr Tesarik <ptesarik@suse.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"open list:NETWORKING [TCP]" <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 20, 2025 at 02:58:49PM +0200, Michal Luczaj wrote:
->On 6/20/25 10:32, Stefano Garzarella wrote:
->> On Wed, Jun 18, 2025 at 02:34:00PM +0200, Michal Luczaj wrote:
->>> Checking transport_{h2g,g2h} != NULL may race with vsock_core_unregister().
->>> Make sure pointers remain valid.
->>>
->>> KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
->>> RIP: 0010:vsock_dev_do_ioctl.isra.0+0x58/0xf0
->>> Call Trace:
->>> __x64_sys_ioctl+0x12d/0x190
->>> do_syscall_64+0x92/0x1c0
->>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>>
->>> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
->>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>> ---
->>> net/vmw_vsock/af_vsock.c | 4 ++++
->>> 1 file changed, 4 insertions(+)
->>>
->>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>> index 2e7a3034e965db30b6ee295370d866e6d8b1c341..047d1bc773fab9c315a6ccd383a451fa11fb703e 100644
->>> --- a/net/vmw_vsock/af_vsock.c
->>> +++ b/net/vmw_vsock/af_vsock.c
->>> @@ -2541,6 +2541,8 @@ static long vsock_dev_do_ioctl(struct file *filp,
->>>
->>> 	switch (cmd) {
->>> 	case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
->>> +		mutex_lock(&vsock_register_mutex);
->>> +
->>> 		/* To be compatible with the VMCI behavior, we prioritize the
->>> 		 * guest CID instead of well-know host CID (VMADDR_CID_HOST).
->>> 		 */
->>> @@ -2549,6 +2551,8 @@ static long vsock_dev_do_ioctl(struct file *filp,
->>> 		else if (transport_h2g)
->>> 			cid = transport_h2g->get_local_cid();
->>>
->>> +		mutex_unlock(&vsock_register_mutex);
->>
->>
->> What about if we introduce a new `vsock_get_local_cid`:
->>
->> u32 vsock_get_local_cid() {
->> 	u32 cid = VMADDR_CID_ANY;
->>
->> 	mutex_lock(&vsock_register_mutex);
->> 	/* To be compatible with the VMCI behavior, we prioritize the
->> 	 * guest CID instead of well-know host CID (VMADDR_CID_HOST).
->> 	 */
->> 	if (transport_g2h)
->> 		cid = transport_g2h->get_local_cid();
->> 	else if (transport_h2g)
->> 		cid = transport_h2g->get_local_cid();
->> 	mutex_lock(&vsock_register_mutex);
->>
->> 	return cid;
->> }
->>
->>
->> And we use it here, and in the place fixed by next patch?
->>
->> I think we can fix all in a single patch, the problem here is to call
->> transport_*->get_local_cid() without the lock IIUC.
+On Fri, Jun 20, 2025 at 5:57=E2=80=AFAM Petr Tesarik <ptesarik@suse.com> wr=
+ote:
 >
->Do you mean:
->
-> bool vsock_find_cid(unsigned int cid)
-> {
->-       if (transport_g2h && cid == transport_g2h->get_local_cid())
->+       if (transport_g2h && cid == vsock_get_local_cid())
->                return true;
->
->?
+> I ran into a couple of issues while trying to tweak TCP congestion
+> avoidance to analyze a potential performance regression. It turns out
+> that overriding the parameters with ip-route(8) does not work as
+> expected and appears to be buggy.
 
-Nope, I meant:
+Hi Petr
 
-  bool vsock_find_cid(unsigned int cid)
-  {
--       if (transport_g2h && cid == transport_g2h->get_local_cid())
--               return true;
--
--       if (transport_h2g && cid == VMADDR_CID_HOST)
-+       if (cid == vsock_get_local_cid())
-                 return true;
+Could you add packetdrill tests as well ?
 
-         if (transport_local && cid == VMADDR_CID_LOCAL)
+Given this could accidentally break user setups, maybe net-next would be sa=
+fer.
 
-But now I'm thinking if we should also include `transport_local` in the 
-new `vsock_get_local_cid()`.
+Some of us disable tcp_metrics, because metrics used one minute (or
+few seconds) in the past are not very helpful, and source of
+confusion.
 
-I think that will fix an issue when calling 
-IOCTL_VM_SOCKETS_GET_LOCAL_CID and only vsock-loopback kernel module is 
-loaded, so maybe we can do 2 patches:
-
-1. fix IOCTL_VM_SOCKETS_GET_LOCAL_CID to check also `transport_local`
-    Fixes: 0e12190578d0 ("vsock: add local transport support in the vsock core")
-
-2. move that code in vsock_get_local_cid() with proper locking and use 
-it also in vsock_find_cid()
-
-WDYT?
-
-Thanks,
-Stefano
-
+(/proc/sys/net/ipv4/tcp_no_metrics_save set to 1)
 
