@@ -1,85 +1,104 @@
-Return-Path: <netdev+bounces-199813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11604AE1E5A
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:20:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D29AE1E8F
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:27:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D80E3AE39F
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:19:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2495F6A301C
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F1F28C867;
-	Fri, 20 Jun 2025 15:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162DC2E9EB0;
+	Fri, 20 Jun 2025 15:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="meFjEi4T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feLXvdLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3381CAA6D;
-	Fri, 20 Jun 2025 15:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21EE2E9757;
+	Fri, 20 Jun 2025 15:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750432819; cv=none; b=FJeG7Hf8PCP043SSPaR5Z/mZgsh3J+BZrtLXFshUgSa8epeB99zTaIEFI83zk93d6GGoPfAFrWMUfVF9ZYaZodWrIzoApkVYeWUrCOqe52jLTFlmn2V/kswqCzx/ukbONQruVOVp2YS8NQj2vQ1OjTCxftbJtVkm7l/XXebfZfM=
+	t=1750433022; cv=none; b=u4y9T1GC+nojC5XPMMcNQevljtwVGiN71Glycb6uPt/ooB7Mk9dPHC/Yn4CXYJFLD+LozzvV1fnvAVcoeYT61Kss9i9fYlAeIvEdp94X+B847y6ezyGLOFp1fRRqH+eKCwfT5LkQJ0sFVhXfwWXV1ZFqwMPM1QxLZNlMXmogEog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750432819; c=relaxed/simple;
-	bh=Bjw4igONTZMN0gbQCYTC4dWBbsRKO814NFvkJmuqDJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P1txBpZvyJAfPqK2V0PRrSlRSwd4uSQz890/63vWrL6QzmVmwv1zuXE6s90+GFQtTRNVZKbDpj6xrUcQ2x7ZmR/MtlrQgIVgnfRpM6j/+OTbOsU0iUmg5nlfRYD1+pk+LZ3SzjKnEwlnIgvAooF0Dh3izcyguR8t4fewHnOa1u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=meFjEi4T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=wC4XMhb/ugJMHtgboBDIqG7VsfLdmfyiCDLnrrMdqgw=; b=me
-	FjEi4TjbSs2bqGS2UkhmQI6dIPZlDEJQi52eJZ9fRzQinJrdDRref7cOviQ4XhgkNpx9n0+MrHl5Y
-	cMVVW/N+t//bnVy6eCvqXUX45ZpHdLcXnk3AWEauvVkq2dvwdbG1+lFzKjrTSo4KVnB3m9fHPKnTr
-	3pLyTPjKZgs1W7U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uSdX5-00GWJ2-Gq; Fri, 20 Jun 2025 17:19:59 +0200
-Date: Fri, 20 Jun 2025 17:19:59 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kamil =?iso-8859-1?Q?Hor=E1k_=282N=29?= <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	robh@kernel.org
-Subject: Re: [PATCH 2/3] net: phy: bcm5481x: Implement MII-Lite mode
-Message-ID: <f8662437-58ea-4ae5-8fbc-eb06e22f5a1c@lunn.ch>
-References: <20250620134430.1849344-1-kamilh@axis.com>
- <20250620134430.1849344-2-kamilh@axis.com>
+	s=arc-20240116; t=1750433022; c=relaxed/simple;
+	bh=f3r5MbCT/30gnOvcMmKLC7WpxctD7ruo9tQpgEPXK2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=u0AlQ/LLZx305cTwhQd7OprWS0Op2fa2MLSjTvMy9MD74Df7IbddBTzfsho1yRR/vpEthJxqATiXfFjaq6rr+34X2xPQ5+/0coDFMwvyS3gVVAY88JO/YNoj7mdhzn3OznguK384chB5uwvGHZh7cp+rYD10yIYVmzy6pL88xXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feLXvdLh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB88C4CEF0;
+	Fri, 20 Jun 2025 15:23:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750433021;
+	bh=f3r5MbCT/30gnOvcMmKLC7WpxctD7ruo9tQpgEPXK2A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=feLXvdLhX9uApMu/guZIrApeAeKX7aSmn1jUjZ/tc9/dHFdP/ahFnNp2bOAiomoHj
+	 6Xko+cB3X8DkuD5SXft7sd1Dg9TtHtPDQE2wxOXQD0AbQgtCW+2PuS7teT8/27Jw3l
+	 sf+kPPhAveRm+00kwQy62VuZDqF13sx6sMR6HLQQjY6mlGxxbV0F4Pdt1N/VvEEBtf
+	 QP71HpN4uhHMhJD5AI2IwCVXwgWabOKPVMeP0//gXbYWsR2o2g56jSDufJKL0bgSQI
+	 LCDBzypCuwc+nisePUJMF1uvukXSSGDLsaXTvgoweQD26oHO1djgOj2v2fXLZfMlvK
+	 RKCM8T4RKbAJg==
+From: Frederic Weisbecker <frederic@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Simon Horman <horms@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Waiman Long <longman@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 10/27] net: Keep ignoring isolated cpuset change
+Date: Fri, 20 Jun 2025 17:22:51 +0200
+Message-ID: <20250620152308.27492-11-frederic@kernel.org>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250620152308.27492-1-frederic@kernel.org>
+References: <20250620152308.27492-1-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250620134430.1849344-2-kamilh@axis.com>
 
-On Fri, Jun 20, 2025 at 03:44:28PM +0200, Kamil Horák (2N) wrote:
-> The Broadcom bcm54810 and bcm54811 PHYs are capable to operate in
-> simplified MII mode, without TXER, RXER, CRS and COL signals as defined
-> for the MII. While the PHY can be strapped for MII mode, the selection
-> between MII and MII-Lite must be done by software.
+RPS cpumask can be overriden through sysfs/syctl. The boot defined
+isolated CPUs are then excluded from that cpumask.
 
-Please could you say more about what mii-lite is. Rather than adding a
-bool DT property, i'm asking myself should we add interface mode for
-it?
+However HK_TYPE_DOMAIN will soon integrate cpuset isolated
+CPUs updates and the RPS infrastructure needs more thoughts to be able
+to propagate such changes and synchronize against them.
 
-Is it a mode of its own? MII normally means Fast Ethernet, 100Mbps. Is
-that what MII-Lite supports? How does it differ from RMII? Should we
-be calling this PHY_INTERFACE_MODE_LMII?
+Keep handling only what was passed through "isolcpus=" for now.
 
-	Andrew
+Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+---
+ net/core/net-sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 1ace0cd01adc..abff68ac34ec 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1012,7 +1012,7 @@ static int netdev_rx_queue_set_rps_mask(struct netdev_rx_queue *queue,
+ int rps_cpumask_housekeeping(struct cpumask *mask)
+ {
+ 	if (!cpumask_empty(mask)) {
+-		cpumask_and(mask, mask, housekeeping_cpumask(HK_TYPE_DOMAIN));
++		cpumask_and(mask, mask, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT));
+ 		cpumask_and(mask, mask, housekeeping_cpumask(HK_TYPE_WQ));
+ 		if (cpumask_empty(mask))
+ 			return -EINVAL;
+-- 
+2.48.1
+
 
