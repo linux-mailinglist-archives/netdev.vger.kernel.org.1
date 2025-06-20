@@ -1,116 +1,125 @@
-Return-Path: <netdev+bounces-199835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CC3AE1FE0
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:12:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC0CAE1FF3
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:16:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 171C03A794B
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BD941891E07
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0342E6124;
-	Fri, 20 Jun 2025 16:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556B12E612A;
+	Fri, 20 Jun 2025 16:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KjqLVeNX"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j20KO7j+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4A92E610B;
-	Fri, 20 Jun 2025 16:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEFB2E3387;
+	Fri, 20 Jun 2025 16:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750435910; cv=none; b=F4kgQTUgNxs+ee2P9jPN5EKl6CEkttpaKqfTZdDpv8q8r+Fz+1W/T4wg6zvKE2210wMPyUCA8y3TuVBDq5c2nLpr1hLshauntLDWPqL97vsE+jonGHUsp6LTZup2ed0Q7J+DHwNXbwQES1YRxiROnnDdL4uHKYcDajdKHIG5efg=
+	t=1750436106; cv=none; b=oAuwhQLLwtiZasMFVTEnvxhFQAXnDSLLQINp19Sxlinujc/gs04N6q0zk60P3aNp8G6RV4/5Rf2jVEicw+8W64tpqQu/6MDR67Dno63kIkSdWxqqgoE2NBee6DnClWIJZEgAYE7YFviCfkeCX6aBELW/IeiHQH0OW2S8FKLHzLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750435910; c=relaxed/simple;
-	bh=nElQ9/r9RGhRFbJLrWWq2AWdzYVL5uawzxg5jng16F0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R958vfLEB1FqvfxgT1iKMXUuuMz+RDZO0g2vadiQZKRKPB8niT0Wg/7j/9WooCdKhuJjSWBUqihlS2ZbQGL40dwdfJOuB4D5435WtjCmCbOySr1oUwfYfTtBD5vv10PdIOsyqt5+WpUZBEBH8bxTMVCOzA80UtrlKi0oqRRT414=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KjqLVeNX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D900C4CEF1;
-	Fri, 20 Jun 2025 16:11:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750435910;
-	bh=nElQ9/r9RGhRFbJLrWWq2AWdzYVL5uawzxg5jng16F0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KjqLVeNXzA81kBJUZ0e8sU7YZKOj9aoIrmPZ3YgQy2I6O6aJHyJCjWK23i9N1+LA0
-	 tB7PkUfo1OmR5twVGGKw0ktHqrUnGXKoonDzBNScq0N+pVEC9zbR6NynT8KwWw6iwo
-	 ZAoT+c+YYYORZLdotFFrMqBQLsj2O3tVS7Ohziczw1VHn86JYuOqM37r027IbefR5R
-	 RA6qGiW+dZwUesKLwaZ8q3CKC3fgK4aVL2KfnmkzxpgDRKleZBP6aqFQ3tRGzKF0pb
-	 /ozRoKseVNhm6ECfxoi4Vf7SCJLG2Bqb8zg+jKoH5w+6Rvr3r2XGdwti9vZt2lAzzu
-	 gLBf2UsygXu/Q==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/2] selftests: drv-net: stats: use skip instead of xfail for unsupported features
-Date: Fri, 20 Jun 2025 09:11:09 -0700
-Message-ID: <20250620161109.2146242-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250620161109.2146242-1-kuba@kernel.org>
-References: <20250620161109.2146242-1-kuba@kernel.org>
+	s=arc-20240116; t=1750436106; c=relaxed/simple;
+	bh=CJPn9bbmNcJ/RzelH8cowP+F52Wew3w01e0e4IXwTFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iOqkPOQ/b5z8A3LkG0ql2jgjLu1pdhyOF/bAd01ykNwcYriEUEJNxI8bMINydEmlsDqQlBi9DfM2JxM+jdGie1a+NhohGS40DWckA/pKCkjGxBkYW4u2WwBM5TZSKRC6XLbW5/uFOSivo6itMIwB90ObP3V4y4dzHAODS9W2FNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=j20KO7j+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F9D4C4CEE3;
+	Fri, 20 Jun 2025 16:15:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1750436104;
+	bh=CJPn9bbmNcJ/RzelH8cowP+F52Wew3w01e0e4IXwTFU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j20KO7j+j0nGfe1BWQ6zQlqbGUNcjR+S5/MTCQJs/ZBj2rc8+fnaSxmn8wUOk4BU0
+	 mmJkEoBdLAaCRZ5WWs9guEW9AEWs9qdqpRtsp49vgObbvEpbdrMb0eJTz8YMXtt92M
+	 2LJ2WJwAnUe9/CBbe50n2DIUBIAp8r3rQD1EJ46o=
+Date: Fri, 20 Jun 2025 18:15:02 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Danilo Krummrich <dakr@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH net 1/4] auxiliary: Allow empty id
+Message-ID: <2025062045-velocity-finite-f31c@gregkh>
+References: <20250619200537.260017-1-sean.anderson@linux.dev>
+ <20250619200537.260017-2-sean.anderson@linux.dev>
+ <2025062004-essay-pecan-d5be@gregkh>
+ <8b9662ab-580c-44ea-96ee-b3fe3d4672ff@linux.dev>
+ <2025062006-detergent-spruce-5ae2@gregkh>
+ <91a9e80a-1a45-470b-90cf-12faae67debd@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <91a9e80a-1a45-470b-90cf-12faae67debd@linux.dev>
 
-XFAIL is considered a form of a pass by our CI. For HW devices returning
-XFAIL for unsupported features is counter-productive because our CI
-knows not to expect any HW test to pass until it sees 10 passes in a row.
-If we return xfail the test shows up as pass even if the device doesn't
-support the feature. netdevsim supports all features necessary for
-the stats test so there is no concern about running the test in SW mode.
+On Fri, Jun 20, 2025 at 12:09:29PM -0400, Sean Anderson wrote:
+> On 6/20/25 12:02, Greg Kroah-Hartman wrote:
+> > On Fri, Jun 20, 2025 at 11:37:40AM -0400, Sean Anderson wrote:
+> >> On 6/20/25 01:13, Greg Kroah-Hartman wrote:
+> >> > On Thu, Jun 19, 2025 at 04:05:34PM -0400, Sean Anderson wrote:
+> >> >> Support creating auxiliary devices with the id included as part of the
+> >> >> name. This allows for non-decimal ids, which may be more appropriate for
+> >> >> auxiliary devices created as children of memory-mapped devices. For
+> >> >> example, a name like "xilinx_emac.mac.802c0000" could be achieved by
+> >> >> setting .name to "mac.802c0000" and .id to AUXILIARY_DEVID_NONE.
+> >> > 
+> >> > I don't see the justification for this, sorry.  An id is just an id, it
+> >> > doesn't matter what is is and nothing should be relying on it to be the
+> >> > same across reboots or anywhere else.  The only requirement is that it
+> >> > be unique at this point in time in the system.
+> >> 
+> >> It identifies the device in log messages. Without this you have to read
+> >> sysfs to determine what device is (for example) producing an error.
+> > 
+> > That's fine, read sysfs :)
+> 
+> I should not have to read sysfs to decode boot output. If there is an
+> error during boot I should be able to determine the offending device.
+> This very important when the boot process fails before init is started,
+> and very convenient otherwise. 
 
-Make the test skip rather than xfail if driver doesn't support FEC or pause.
+The boot log will show you the name of the device that is having a
+problem.  And you get to pick a portion of that name to make it make
+some kind of sense to users if you want.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/drivers/net/stats.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> >> This
+> >> may be inconvenient to do if the error prevents the system from booting.
+> >> This series converts a platform device with a legible ID like
+> >> "802c0000.ethernet" to an auxiliary device, and I believe descriptive
+> >> device names produce a better developer experience.
+> > 
+> > You can still have 802c0000.ethernet be the prefix of the name, that's
+> > fine.
+> 
+> This is not possible due to how the auxiliary bus works. If device's
+> name is in the form "foo.id", then the driver must have an
+> auxiliary_device_id in its id_table with .name = "foo". So the address
+> *must* come after the last period in the name.
 
-diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
-index 00a85d6e54f9..c2bb5d3f1ca1 100755
---- a/tools/testing/selftests/drivers/net/stats.py
-+++ b/tools/testing/selftests/drivers/net/stats.py
-@@ -10,7 +10,7 @@ import subprocess
- import time
- from lib.py import ksft_run, ksft_exit, ksft_pr
- from lib.py import ksft_ge, ksft_eq, ksft_is, ksft_in, ksft_lt, ksft_true, ksft_raises
--from lib.py import KsftSkipEx, KsftXfailEx, KsftFailEx
-+from lib.py import KsftSkipEx, KsftFailEx
- from lib.py import ksft_disruptive
- from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
- from lib.py import NetDrvEnv
-@@ -31,7 +31,7 @@ rtnl = RtnlFamily()
-         ethnl.pause_get({"header": {"dev-index": cfg.ifindex}})
-     except NlError as e:
-         if e.error == errno.EOPNOTSUPP:
--            raise KsftXfailEx("pause not supported by the device") from e
-+            raise KsftSkipEx("pause not supported by the device") from e
-         raise
- 
-     data = ethnl.pause_get({"header": {"dev-index": cfg.ifindex,
-@@ -49,7 +49,7 @@ rtnl = RtnlFamily()
-         ethnl.fec_get({"header": {"dev-index": cfg.ifindex}})
-     except NlError as e:
-         if e.error == errno.EOPNOTSUPP:
--            raise KsftXfailEx("FEC not supported by the device") from e
-+            raise KsftSkipEx("FEC not supported by the device") from e
-         raise
- 
-     data = ethnl.fec_get({"header": {"dev-index": cfg.ifindex,
--- 
-2.49.0
+So what is the new name without this aux patch that looks so wrong?
+What is the current log line before and after the change you made?
 
+thanks,
+
+greg k-h
 
