@@ -1,82 +1,59 @@
-Return-Path: <netdev+bounces-199862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55EEAE2131
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:43:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F2C0AE211A
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:40:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE2AD3BF91F
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:42:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBEBD3AD4F2
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EAD2EAB81;
-	Fri, 20 Jun 2025 17:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A741A2E172A;
+	Fri, 20 Jun 2025 17:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgfljBqb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tuQpjHDc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7F12253FF
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 17:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E2A18E20
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 17:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750441278; cv=none; b=FA8Vl3dqV6aLeK1+mOnV6AYyIgvObGbT+MIEIfcsApddn2zPvbUE6/P05C+pF8Th2yFkDTlj7KGIoj0+etjCpDTHPx3lBHGuFdunimZKBU31+skiJrpDRjMA6dH4InHP6heH2Lh8D65w9HduLWLAi3ZECvHxrxy/KzGk8BQSsTQ=
+	t=1750441210; cv=none; b=DFipwY0MTn3X24Vs8mRBlv9mzsAPguFm30nxf383CGLYWhBRDIMTNekKp127WUKbWX/XVEQ41baLDvoUHCfpf7YHxuksvmoH1ygKWg7ZhPHr9B5jFM9ET8/caC6chzZ5sx021LRZSoWswr3yfjjfUrgsZcvoxTYlPPI6443rPTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750441278; c=relaxed/simple;
-	bh=kttYjMRPYV49sOXotk56RdZJe+uTd0CgV3R7yEfA08Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oQRXAePM6gTqbof9A6yI03Ewa18N0jnu2mP2t5Wwoh9VImxQmTnzftvpzQbjxSIVKKMWZQiTqDboPUMoh+6qzEXFVgtLZBNkjH40XCDfo1eYyFvYS6mQ/ROwgbQau10p10OAL9AYhHxlm6AXRYC48XpUhKBYFLBxOtEXtev8hRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TgfljBqb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750441274;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bNsVnKOUkAk624ypyssuNumMLSZZZvRHKL59itVJeEc=;
-	b=TgfljBqbw/wSzZZhEiymHHo2wzsoPOBu9x7+nNqvrh9N14C01sTtvhdp+aCCvZyzKYqCxL
-	3QhDXJfr0BBPlxI1JAVN50974c/7KyLC+Np4Lm7oB6Rl5sAGQmtA2zZ9h0HcuVcwqLvuM4
-	yI2maoFDgh+Sh0fnRuGgrVOA8AhCC/E=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-HIvpj2VmPpuxavsLFkRB6A-1; Fri,
- 20 Jun 2025 13:41:11 -0400
-X-MC-Unique: HIvpj2VmPpuxavsLFkRB6A-1
-X-Mimecast-MFC-AGG-ID: HIvpj2VmPpuxavsLFkRB6A_1750441269
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6767A180136B;
-	Fri, 20 Jun 2025 17:41:09 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.100])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F26B419560AB;
-	Fri, 20 Jun 2025 17:41:04 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1750441210; c=relaxed/simple;
+	bh=apuRfjAILr3UwRllizgGINwziCXHgCWc0UiOkhP0TCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vAXsqyGvX82fniAmjs5NJy/to2TgzNB+ybhDIR8v7csaCJks30qWxUiEKAFIAXowcW2NUHAoSTdnBbX5uOARRRDUWGJCZureeOaYU+6bpC+bLZjNM3UJfRH0D9sv9ZlKlTJPSyQHKcd+3/nou5l1jWNJRHVN2gksUC0p5+nb+qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tuQpjHDc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB3EBC4CEE3;
+	Fri, 20 Jun 2025 17:40:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750441210;
+	bh=apuRfjAILr3UwRllizgGINwziCXHgCWc0UiOkhP0TCE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tuQpjHDcYsknouV9/pIpJcsVHwRF5q5AwhdSXKDL1Mjqo5pmMH0UYuV0ILb239f3I
+	 zj+NS3eR8l8oJbf/GRVL0+ZwUaJZngVrFCQKVH0LmfZ3fZAOOA+ROkdErcMZb6GV0j
+	 Fev1s2SYu2pb7cPRBYRFZH7K/a0/5fYSYU2mgrYJGELbjn4elGxKuz/GbH4nMvG5Ot
+	 p6F0ysa3ggNgbtxsDFxyICW4ZkgV4c3BeJTsqec2L3BwMaNM0amhMBY9YHcaZpQI1X
+	 3X5DDb3fW8RppMpzBjm6VONKyxJR84tTjRfjPflGK1yyajEBrIM0xj3YbtzLxnkJAX
+	 t36Rs0xfVmFYA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	kvm@vger.kernel.org
-Subject: [PATCH v5 net-next 9/9] vhost/net: enable gso over UDP tunnel support.
-Date: Fri, 20 Jun 2025 19:39:53 +0200
-Message-ID: <f0f6ebd89251d343e5fe0f1884c3207115ba9a2d.1750436464.git.pabeni@redhat.com>
-In-Reply-To: <cover.1750436464.git.pabeni@redhat.com>
-References: <cover.1750436464.git.pabeni@redhat.com>
+	leitao@debian.org,
+	joe@dama.to
+Subject: [PATCH net-next] netdevsim: fix UaF when counting Tx stats
+Date: Fri, 20 Jun 2025 10:40:07 -0700
+Message-ID: <20250620174007.2188470-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,48 +61,32 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Vhost net need to know the exact virtio net hdr size to be able
-to copy such header correctly. Teach it about the newly defined
-UDP tunnel-related option and update the hdr size computation
-accordingly.
+skb may be freed as soon as we put it on the rx queue.
+Use the len variable like the code did prior to the conversion.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Fixes: f9e2511d80c2 ("netdevsim: migrate to dstats stats collection")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v3 -> v4:
-  - rebased
+CC: leitao@debian.org
+CC: joe@dama.to
 ---
- drivers/vhost/net.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/net/netdevsim/netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index b7dd50aa1ba3..3d99da3381ce 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -75,6 +75,8 @@ static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] = {
- 	(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
- 	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 	(1ULL << VIRTIO_F_RING_RESET),
-+	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
-+	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
- };
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index 7f2809be5d48..e36d3e846c2d 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -93,7 +93,7 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		hrtimer_start(&rq->napi_timer, us_to_ktime(5), HRTIMER_MODE_REL);
  
- enum {
-@@ -1624,6 +1626,12 @@ static int vhost_net_set_features(struct vhost_net *n, const u64 *features)
- 		  sizeof(struct virtio_net_hdr_mrg_rxbuf) :
- 		  sizeof(struct virtio_net_hdr);
+ 	rcu_read_unlock();
+-	dev_dstats_tx_add(dev, skb->len);
++	dev_dstats_tx_add(dev, len);
+ 	return NETDEV_TX_OK;
  
-+	if (virtio_features_test_bit(features,
-+				     VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO) ||
-+	    virtio_features_test_bit(features,
-+				     VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO))
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash_tunnel);
-+
- 	if (virtio_features_test_bit(features, VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
+ out_drop_free:
 -- 
 2.49.0
 
