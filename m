@@ -1,265 +1,233 @@
-Return-Path: <netdev+bounces-199794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E10AAAE1CF3
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:59:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08DCEAE1D00
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:03:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 250275A17BE
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:58:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 954026A1D6C
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32ACB28E572;
-	Fri, 20 Jun 2025 13:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E693328ECEA;
+	Fri, 20 Jun 2025 14:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="em00LVJL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AO3JtqI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5778F28DEFA;
-	Fri, 20 Jun 2025 13:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C565A290D83;
+	Fri, 20 Jun 2025 14:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750427915; cv=none; b=CC8LXle3IiRmyYUL5LAV8nOwRkFhQGDG/2aAUoPci+5WpMngXAeagqLWTecR/Mcke5CQU3qRg1Qus6aBwQEOO4CrcnL0wfkoQ9X7iZAVy6CU+aTH9XijCLcJ48mJQzCHvNxkxb6ekUgYN7Mf4tY6OfmUCeQ/11kWO6MskoDUpgs=
+	t=1750428219; cv=none; b=Nog7j+ySAAJoV2s76rkojiGi9mjE35Lo16VqCJn7aVrF90iik29yTBHUVNuwo/Pa3hFCzAc5IOAgLeV5AtHNg95/UA2fbk33I5Y4yZ44FBx9krslxiy910MwEvTRQdJlJ9J49Td6cyPdonRC6aZ+89ZvT+nbXBCcFPsAdyByN/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750427915; c=relaxed/simple;
-	bh=OnxhBu1DdASDRGlTCLQd/p/iHnlxQe3/QGETKt/+Q0c=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=MXI0P192io50sqDthJesWPFzfMhAr6W2s3+GMiepKHMe6TsXV615IuiFJvdYg8PY1z4x8pDvTSLcN19R1iT6danwZVdL5yMkJ2wVBjEUet8R3CK+d33lmaZPLsV0qwWOykvkQ4M+Vp847zVs+ItTAn46vIBHpZyADmL+EkFCuQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=em00LVJL; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-710fd2d0372so13681817b3.0;
-        Fri, 20 Jun 2025 06:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750427912; x=1751032712; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dmK0l/F9i7GnOCLWKvJ4EyIhh1KQemPuTLvec4D5LUA=;
-        b=em00LVJL0C5qh+bKbefLZbTNln89ltodftx9+Rw4LEo8jnGklIgvA5oN5SqSmXOKl3
-         hU7vhdenWjcnLhmlW1cF8E796g8xcLpZuuX2WmGB6ab3zT0PAOjca3wbig5lq+wqxvVo
-         dllyDA934oK7wpyZJrIh8tVbEg3HmDj0/1MtiYgl0ZVHSISA/MEUP6KVDugQxZjdBTUD
-         sL1EUKd2CJw/gadD7Z0+XwM5mSYRVto5AevWgXGlSAPd7jVtRjZVzrkYagAZIRIKdH5O
-         CPBc4rZtnd023M8bn+194WEcrjFC2ItuRIX5bzJvcUeQK3uMp16jws6aWOnltXK4oDti
-         HVcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750427912; x=1751032712;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dmK0l/F9i7GnOCLWKvJ4EyIhh1KQemPuTLvec4D5LUA=;
-        b=en7GJfXi5i00qn5JSboTzT0jcznGSBhkbdBWR62N/aq0uWZUNFuIFIai7nPkgog4ys
-         S1lq53YWDAhngNmNmfSWtqtoQ/mM/ru5sNZ0eAmFlphJDgGX5scNFwen2bLnZxeWVQL/
-         ZRUmV9R7y146a9yfV+Wc/K5M7lVwYjYQaZUETMO8FTrcVwkXeg7RqhfOyT6ihnTVqGYE
-         nXWAPbT/vDwLOaSaq2nzL55boxMBy2d2bzDevRI7kcLOZ3CRbODXp22i0t9FS5W/t6pA
-         yOkPgutlJhjUWpUfsYmTa+uN8ohjuJVwapE7YUehLgV7ZXUXKG1vAxHQYjbN0d/cAnLU
-         wMVA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAPKVsnTTrO5oNEnEjXJkIseAEvOLU0k5uLVYuUC2OfZBc7bGnFUQMH+KI1az4+KMx1MXEcqWH@vger.kernel.org, AJvYcCVSZevo3eAInPQhFSEggMdLGArLrrKCJ5WNpB07H0y6tydSll2JxYYYbAgaJSWxd/kqRvA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDQR5CY8uOhweMf5XtZ1O6ZUvkghou6cIsFHOxGk9O+yP/oPAv
-	7aCjZgJRBQfRlP0tK5R9SVmMMjbCbiX+AHZXXjKKtMLZlprO0SQUQAee
-X-Gm-Gg: ASbGncuctP4HJvSoKNEoSJ0VOhCgDitIBdjjqipf01oaJZ89Q0cNE4XEIms0iDOizgD
-	ToqDTIPkuj2wOVfqVZPcK++6hDPivnRBDfXW3P1Lr5uc6t/eNoH2cbPm6bBmW8+50bAevWFItDS
-	k3zDlGYMbQe1d7rqz2kTA923HkEaDxQfIWmjWV7hBU1mlziXgNZizj5vOvSsYpptHu0ZIgl94Wm
-	D2aT4TR71syiwPT/PvVBu4KqW7j535q3NzQXqNrYxJeGkmgEO+vnKY30O+lA/0c4IaJ+CuoRdLY
-	yGbeBtbtM2yBjaELa9qsdE5bow2TyESinmbGnstQHZu/9gFAXW2olpjMnlRstjvoE0Fqn5MdEzm
-	iv1B+xVfT5SDdGpar1AibQUGWksWRk2sixjb21Acfeg==
-X-Google-Smtp-Source: AGHT+IEjEQs2rDIi5qWBbXo6NyYzeSnnjpG38irtfAzq/Blxq7bpX2Qw11CoaqYs1B4PZjK0XMj2dA==
-X-Received: by 2002:a05:690c:2789:b0:712:c5f7:1eef with SMTP id 00721157ae682-712ca2f8191mr30219797b3.3.1750427911893;
-        Fri, 20 Jun 2025 06:58:31 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-712c4c236a1sm4206227b3.123.2025.06.20.06.58.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 06:58:31 -0700 (PDT)
-Date: Fri, 20 Jun 2025 09:58:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- bjorn@kernel.org, 
- magnus.karlsson@intel.com, 
- maciej.fijalkowski@intel.com, 
- jonathan.lemon@gmail.com, 
- sdf@fomichev.me, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- hawk@kernel.org, 
- john.fastabend@gmail.com, 
- joe@dama.to, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <68556906dc574_164a294f9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <685565722327f_3ffda42943d@willemb.c.googlers.com.notmuch>
-References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
- <6854165ccb312_3a357029426@willemb.c.googlers.com.notmuch>
- <CAL+tcoBpfFPrYYfWa5P+Sr6S64_stUHiJj26QCtcx56cA5BWXg@mail.gmail.com>
- <685565722327f_3ffda42943d@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET
- set/getsockopt
+	s=arc-20240116; t=1750428219; c=relaxed/simple;
+	bh=p9nC1h8R9HgKVWcy4BLKg7nHMZViNKOTBn/WYNwJk18=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jq90dpD2tWL82pF2Lm10asGEoZQ4092Y/wnbAfAAL+pbPQPQY82lagoh9TpqsJ1J6ouHSqHYtYp0a6ZV3HCbGl8vZL7fWpZL9BaCgbQ43KKBCgc97XZMSpNPj6LtmEV6VG5qiyBOy6ASRc2q1k39MhlIeXBoI0FOpmjEd08uSjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AO3JtqI6; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750428218; x=1781964218;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=p9nC1h8R9HgKVWcy4BLKg7nHMZViNKOTBn/WYNwJk18=;
+  b=AO3JtqI6U7B8VnLSN/xrF5WawEy8uI0hBx0mp3GbH+LnINY4D+05b2ic
+   rxfCw0tX+9WZx8Mhu4Ud2oz5i1Vn7K0OdDUNW2cPxZL1idzeyfKRdFep8
+   avGlvVvVLxyfRqulmIEet9Xsf4gFT3mSx/JSIbAKLSWQrgyNF5rSpEj48
+   BoY7AKP1K8yEUp2Cl2OVZHl3c/7G6KSEd/XolCydB7V4YV6X1/VZZxDDJ
+   EJWSUgzWya/uC8zrpVdmyo7hZuldT34/wViqKQ+XCWKmZT/isDvk9iGXW
+   FT2I/Rz5jtHIGLm/wvuNvWw512Tr3InQSDSSIArDL4oMNzlyLyFqEGlgH
+   w==;
+X-CSE-ConnectionGUID: aOzow6koR3qTo3Jvcr41sg==
+X-CSE-MsgGUID: B+Kbc7hpQVSEOGGdHeKmeA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="63744874"
+X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
+   d="scan'208";a="63744874"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 07:03:27 -0700
+X-CSE-ConnectionGUID: RuhpVMTJTUCTIYqFQpaKbw==
+X-CSE-MsgGUID: yd7fuzCsTgmcfEDgpRruHw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
+   d="scan'208";a="151471639"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 20 Jun 2025 07:03:23 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uScKu-000LpW-2I;
+	Fri, 20 Jun 2025 14:03:20 +0000
+Date: Fri, 20 Jun 2025 22:03:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sean Anderson <sean.anderson@linux.dev>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Michal Simek <monstr@monstr.eu>,
+	Saravana Kannan <saravanak@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: Re: [PATCH net 4/4] net: axienet: Split into MAC and MDIO drivers
+Message-ID: <202506202126.EmqQsj0w-lkp@intel.com>
+References: <20250619200537.260017-5-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250619200537.260017-5-sean.anderson@linux.dev>
 
-Willem de Bruijn wrote:
-> Jason Xing wrote:
-> > On Thu, Jun 19, 2025 at 9:53=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > The patch does the following things:
-> > > > - Add XDP_MAX_TX_BUDGET socket option.
-> > > > - Unify TX_BATCH_SIZE and MAX_PER_SOCKET_BUDGET into single one
-> > > >   tx_budget_spent.
-> > > > - tx_budget_spent is set to 32 by default in the initialization p=
-hase.
-> > > >   It's a per-socket granular control.
-> > > >
-> > > > The idea behind this comes out of real workloads in production. W=
-e use a
-> > > > user-level stack with xsk support to accelerate sending packets a=
-nd
-> > > > minimize triggering syscall. When the packets are aggregated, it'=
-s not
-> > > > hard to hit the upper bound (namely, 32). The moment user-space s=
-tack
-> > > > fetches the -EAGAIN error number passed from sendto(), it will lo=
-op to try
-> > > > again until all the expected descs from tx ring are sent out to t=
-he driver.
-> > > > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequen=
-cies of
-> > > > sendto(). Besides, applications leveraging this setsockopt can ad=
-just
-> > > > its proper value in time after noticing the upper bound issue hap=
-pening.
-> > > >
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > > V3
-> > > > Link: https://lore.kernel.org/all/20250618065553.96822-1-kernelja=
-sonxing@gmail.com/
-> > > > 1. use a per-socket control (suggested by Stanislav)
-> > > > 2. unify both definitions into one
-> > > > 3. support setsockopt and getsockopt
-> > > > 4. add more description in commit message
-> > >
-> > > +1 on an XSK setsockopt only
-> > =
+Hi Sean,
 
-> > May I ask why only setsockopt? In tradition, dev_tx_weight can be rea=
-d
-> > and written through running sysctl. I think they are the same?
-> =
+kernel test robot noticed the following build errors:
 
-> This is not dev_tx_weight, which is per device.
-> =
+[auto build test ERROR on net/main]
 
-> This is a per-socket choice. The reason for adding it that you gave,
-> a specific application that is known to be able to batch more than 32,
-> can tune this configurable in the application.
-> =
+url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Anderson/auxiliary-Allow-empty-id/20250620-040839
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250619200537.260017-5-sean.anderson%40linux.dev
+patch subject: [PATCH net 4/4] net: axienet: Split into MAC and MDIO drivers
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20250620/202506202126.EmqQsj0w-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250620/202506202126.EmqQsj0w-lkp@intel.com/reproduce)
 
-> I see no immediately need to set this at a per netns or global level.
-> If so, the extra cacheline space in those structs is not warranted.
-> =
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506202126.EmqQsj0w-lkp@intel.com/
 
-> > >
-> > > >
-> > > > V2
-> > > > Link: https://lore.kernel.org/all/20250617002236.30557-1-kernelja=
-sonxing@gmail.com/
-> > > > 1. use a per-netns sysctl knob
-> > > > 2. use sysctl_xsk_max_tx_budget to unify both definitions.
-> > > > ---
-> > > >  include/net/xdp_sock.h            |  3 ++-
-> > > >  include/uapi/linux/if_xdp.h       |  1 +
-> > > >  net/xdp/xsk.c                     | 36 +++++++++++++++++++++++++=
-------
-> > > >  tools/include/uapi/linux/if_xdp.h |  1 +
-> > > >  4 files changed, 34 insertions(+), 7 deletions(-)
-> > > >
-> > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> > > > index e8bd6ddb7b12..8eecafad92c0 100644
-> > > > --- a/include/net/xdp_sock.h
-> > > > +++ b/include/net/xdp_sock.h
-> > > > @@ -65,11 +65,12 @@ struct xdp_sock {
-> > > >       struct xsk_queue *tx ____cacheline_aligned_in_smp;
-> > > >       struct list_head tx_list;
-> > > >       /* record the number of tx descriptors sent by this xsk and=
+All errors (new ones prefixed by >>):
 
-> > > > -      * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity ne=
-eds
-> > > > +      * when it exceeds max_tx_budget, an opportunity needs
-> > > >        * to be given to other xsks for sending tx descriptors, th=
-ereby
-> > > >        * preventing other XSKs from being starved.
-> > > >        */
-> > > >       u32 tx_budget_spent;
-> > > > +     u32 max_tx_budget;
-> > >
-> > > This probably does not need to be a u32?
-> > =
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of '__inittest'
+    3225 | module_platform_driver(axienet_driver);
+         | ^
+   include/linux/platform_device.h:292:2: note: expanded from macro 'module_platform_driver'
+     292 |         module_driver(__platform_driver, platform_driver_register, \
+         |         ^
+   include/linux/device/driver.h:261:3: note: expanded from macro 'module_driver'
+     261 | } \
+         |   ^
+   include/linux/module.h:131:42: note: expanded from macro '\
+   module_init'
+     131 |         static inline initcall_t __maybe_unused __inittest(void)                \
+         |                                                 ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2900:1: note: previous definition is here
+    2900 | module_auxiliary_driver(xilinx_axienet_mac)
+         | ^
+   include/linux/auxiliary_bus.h:289:2: note: expanded from macro 'module_auxiliary_driver'
+     289 |         module_driver(__auxiliary_driver, auxiliary_driver_register, auxiliary_driver_unregister)
+         |         ^
+   include/linux/device/driver.h:261:3: note: expanded from macro 'module_driver'
+     261 | } \
+         |   ^
+   include/linux/module.h:131:42: note: expanded from macro '\
+   module_init'
+     131 |         static inline initcall_t __maybe_unused __inittest(void)                \
+         |                                                 ^
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of 'init_module'
+    3225 | module_platform_driver(axienet_driver);
+         | ^
+   include/linux/platform_device.h:292:2: note: expanded from macro 'module_platform_driver'
+     292 |         module_driver(__platform_driver, platform_driver_register, \
+         |         ^
+   include/linux/device/driver.h:261:3: note: expanded from macro 'module_driver'
+     261 | } \
+         |   ^
+   include/linux/module.h:133:6: note: expanded from macro '\
+   module_init'
+     133 |         int init_module(void) __copy(initfn)                    \
+         |             ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2900:1: note: previous definition is here
+    2900 | module_auxiliary_driver(xilinx_axienet_mac)
+         | ^
+   include/linux/auxiliary_bus.h:289:2: note: expanded from macro 'module_auxiliary_driver'
+     289 |         module_driver(__auxiliary_driver, auxiliary_driver_register, auxiliary_driver_unregister)
+         |         ^
+   include/linux/device/driver.h:261:3: note: expanded from macro 'module_driver'
+     261 | } \
+         |   ^
+   include/linux/module.h:133:6: note: expanded from macro '\
+   module_init'
+     133 |         int init_module(void) __copy(initfn)                    \
+         |             ^
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of '__exittest'
+    3225 | module_platform_driver(axienet_driver);
+         | ^
+   include/linux/platform_device.h:292:2: note: expanded from macro 'module_platform_driver'
+     292 |         module_driver(__platform_driver, platform_driver_register, \
+         |         ^
+   include/linux/device/driver.h:266:3: note: expanded from macro 'module_driver'
+     266 | } \
+         |   ^
+   include/linux/module.h:139:42: note: expanded from macro '\
+   module_exit'
+     139 |         static inline exitcall_t __maybe_unused __exittest(void)                \
+         |                                                 ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2900:1: note: previous definition is here
+    2900 | module_auxiliary_driver(xilinx_axienet_mac)
+         | ^
+   include/linux/auxiliary_bus.h:289:2: note: expanded from macro 'module_auxiliary_driver'
+     289 |         module_driver(__auxiliary_driver, auxiliary_driver_register, auxiliary_driver_unregister)
+         |         ^
+   include/linux/device/driver.h:266:3: note: expanded from macro 'module_driver'
+     266 | } \
+         |   ^
+   include/linux/module.h:139:42: note: expanded from macro '\
+   module_exit'
+     139 |         static inline exitcall_t __maybe_unused __exittest(void)                \
+         |                                                 ^
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:3225:1: error: redefinition of 'cleanup_module'
+    3225 | module_platform_driver(axienet_driver);
+         | ^
+   include/linux/platform_device.h:292:2: note: expanded from macro 'module_platform_driver'
+     292 |         module_driver(__platform_driver, platform_driver_register, \
+         |         ^
+   include/linux/device/driver.h:266:3: note: expanded from macro 'module_driver'
+     266 | } \
+         |   ^
+   include/linux/module.h:141:7: note: expanded from macro '\
+   module_exit'
+     141 |         void cleanup_module(void) __copy(exitfn)                \
+         |              ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2900:1: note: previous definition is here
+    2900 | module_auxiliary_driver(xilinx_axienet_mac)
+         | ^
+   include/linux/auxiliary_bus.h:289:2: note: expanded from macro 'module_auxiliary_driver'
+     289 |         module_driver(__auxiliary_driver, auxiliary_driver_register, auxiliary_driver_unregister)
+         |         ^
+   include/linux/device/driver.h:266:3: note: expanded from macro 'module_driver'
+     266 | } \
+         |   ^
+   include/linux/module.h:141:7: note: expanded from macro '\
+   module_exit'
+     141 |         void cleanup_module(void) __copy(exitfn)                \
+         |              ^
+   4 errors generated.
 
-> > From what I've known, it's not possible to set a very large value lik=
-e
-> > 1000 which probably brings side effects.
-> > =
 
-> > But it seems we'd better not limit the use of this max_tx_budget? We
-> > don't know what the best fit for various use cases is. If the type
-> > needs to be downsized to a smaller one like u16, another related
-> > consideration is that dev_tx_weight deserves the same treatment?
-> =
+vim +/__inittest +3225 drivers/net/ethernet/xilinx/xilinx_axienet_main.c
 
-> If the current constant is 32, is U16_MAX really a limiting factor.
-> See also the next point.
-> =
+8a3b7a252dca9f Daniel Borkmann  2012-01-19  3224  
+2be586205ca2b8 Srikanth Thokala 2015-05-05 @3225  module_platform_driver(axienet_driver);
+8a3b7a252dca9f Daniel Borkmann  2012-01-19  3226  
 
-> > Or let me adjust to 'int' then?
-> > > > @@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *s=
-ock, int level, int optname,
-> > > >               mutex_unlock(&xs->mutex);
-> > > >               return err;
-> > > >       }
-> > > > +     case XDP_MAX_TX_BUDGET:
-> > > > +     {
-> > > > +             unsigned int budget;
-> > > > +
-> > > > +             if (optlen < sizeof(budget))
-> > > > +                     return -EINVAL;
-> > > > +             if (copy_from_sockptr(&budget, optval, sizeof(budge=
-t)))
-> > > > +                     return -EFAULT;
-> > > > +
-> > > > +             WRITE_ONCE(xs->max_tx_budget, budget);
-> > >
-> > > Sanitize input: bounds check
-> > =
-
-> > Thanks for catching this.
-> > =
-
-> > I will change it like this:
-> >     WRITE_ONCE(xs->max_tx_budget, min_t(int, budget, INT_MAX));?
-> =
-
-> INT_MAX is not a valid upper bound. The current constant is 32.
-> I would expect an upper bound to perhaps be a few orders larger.
-
-And this would need a clamp to also set a lower bound greater than 0.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
