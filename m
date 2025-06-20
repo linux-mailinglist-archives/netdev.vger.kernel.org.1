@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-199637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A8E1AE105E
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 02:29:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED61AE1084
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 02:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA0F317FC82
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:29:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CFF716E5C5
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826EE1C36;
-	Fri, 20 Jun 2025 00:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HixbY1oq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D550610A1F;
+	Fri, 20 Jun 2025 00:57:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55890EC4;
-	Fri, 20 Jun 2025 00:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66F923CE;
+	Fri, 20 Jun 2025 00:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750379379; cv=none; b=NRxl+f5F2Z1bAOpAhsZwtqd7l9TMqlJpJDOeLMM+G4VrPDa4gFAnDHZw35BzB+VTO0/JSz0d+g0cIvrFJBf/v/9ICDAdmHfRvHh89ulQbKQPBvcjOL0TIJH+Mw0Vi2jxfQA2Pl3hqzPXr4POM/fBWVh4TOAal7wvowxXZ5jzlMk=
+	t=1750381030; cv=none; b=atXGAPfBHFqYE36dqYvTlaBw7/FCdlf5Dg5Cif4N48ydle5rO38cKfxQVMKbgDG261Dg4r8iPb5YisJJmwPJuxESU1iUjKTUGLo6GtCRgczhdYCj/tCG7/lbxG7hL79WKjML+XUcuCNpQbJk3h2qi3qRIqMo8MguJR+MDhagLOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750379379; c=relaxed/simple;
-	bh=N/gX/lWCEFFVFMQQ7VNG4vFBfHvEobL5B9N1XSTxf4M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GsrHH0SFrrL5KrO3JaVsgKaMueN1xo6JMOeV1mIYke1X//pN+m3re96JftBGRoxKPLnsNJt4sePsUcCqxtAA4siRlKUCyMZV2CDGo7zCXMm66zIVRutpJmS+ibEgclHzFIQXMAIjYA15OwotRqlmSqmGeY1NVJd/PFNy7hqC/Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HixbY1oq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BED43C4CEEA;
-	Fri, 20 Jun 2025 00:29:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750379378;
-	bh=N/gX/lWCEFFVFMQQ7VNG4vFBfHvEobL5B9N1XSTxf4M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HixbY1oqNPcCqNjxGWpm4tvHipUmhS0SLjJZ05lfdwT4b4aq3PJPaa49yyqUgzEeo
-	 rGg5Fcpb7pOstveHIE1L/BW/suhRF047nDzkNuFDU7c5BgxkDNhYspBP9tdjpkMP3O
-	 1Q8a6UUijaYShbxgpsQvA7xl+S1+qR8MCqyHMlfGp5rIoP3Y328m2rKwenE5UrGn/v
-	 OE0jqAa4Gx+Feiv3qikzUt85pzRlit2MfjDkzpjsgCW04DKntqBJX3y9qmpuung4QC
-	 rnpSow2TDGkjFRNA/yvpdUQSgju14xQ4EYnSov2vgVgrAl356pdwqNR4X5xNM5xeYF
-	 vtbhnL8bfIuPA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE538111DD;
-	Fri, 20 Jun 2025 00:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1750381030; c=relaxed/simple;
+	bh=0GdIMsc/rycX23sODQ5b6m5mighTJfoLkV8/L6IEDN0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=P1tUVazNp2B8L6ePpl/S7LKcP9SqC368fm2bIMevqX+Br0X66uzXbQLzd23V4JQgn+AJ3iOJ1S0+Igc+l1h2vHZn0YjgmvjLSLnpVXkoBB9GUR7sR+pJ+ybxDfLsott+mEfniCX2apz7UoPtaqa5dDHNbGvCz+eGrwcCY/NtE5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 92FA792009C; Fri, 20 Jun 2025 02:57:05 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 8586A92009B;
+	Fri, 20 Jun 2025 01:57:05 +0100 (BST)
+Date: Fri, 20 Jun 2025 01:57:05 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Greg Chandler <chandleg@wizardsworks.org>
+cc: Florian Fainelli <f.fainelli@gmail.com>, stable@vger.kernel.org, 
+    netdev@vger.kernel.org
+Subject: Re: Tulip 21142 panic on physical link disconnect
+In-Reply-To: <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
+Message-ID: <alpine.DEB.2.21.2506200144030.37405@angie.orcam.me.uk>
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org> <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com> <385f2469f504dd293775d3c39affa979@wizardsworks.org> <fba6a52c-bedf-4d06-814f-eb78257e4cb3@gmail.com> <6a079cd0233b33c6faf6af6a1da9661f@wizardsworks.org>
+ <9292e561-09bf-4d70-bcb7-f90f9cfbae7b@gmail.com> <a3d8ee993b73b826b537f374d78084ad@wizardsworks.org> <12ccf3e4c24e8db2545f6ccaba8ce273@wizardsworks.org> <8c06f8969e726912b46ef941d36571ad@wizardsworks.org> <alpine.DEB.2.21.2506192007440.37405@angie.orcam.me.uk>
+ <52564e1f-ab05-4347-bd64-b38a69180499@gmail.com> <alpine.DEB.2.21.2506192238280.37405@angie.orcam.me.uk> <5a21c21844beadb68ead00cb401ca1c0@wizardsworks.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: ti: icssg-prueth: Add prp offload
- support to
- ICSSG driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175037940675.1029963.6639645780461563048.git-patchwork-notify@kernel.org>
-Date: Fri, 20 Jun 2025 00:30:06 +0000
-References: <20250618175536.430568-1-h-mittal1@ti.com>
-In-Reply-To: <20250618175536.430568-1-h-mittal1@ti.com>
-To: Himanshu Mittal <h-mittal1@ti.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, srk@ti.com,
- vigneshr@ti.com, rogerq@kernel.org, danishanwar@ti.com, m-malladi@ti.com,
- pratheesh@ti.com, prajith@ti.com
+Content-Type: text/plain; charset=US-ASCII
 
-Hello:
+On Thu, 19 Jun 2025, Greg Chandler wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 18 Jun 2025 23:25:36 +0530 you wrote:
-> Add support for ICSSG PRP mode which supports offloading of:
->  - Packet duplication and PRP trailer insertion
->  - Packet duplicate discard and PRP trailer removal
+> > > I am still not sure why I could not see that warning on by Cobalt Qube2
+> > > trying
+> > > to reproduce Greg's original issue, that is with an IP assigned on the
+> > > interface yanking the cable did not trigger a timer warning. It could be
+> > > that
+> > > machine is orders of magnitude slower and has a different CONFIG_HZ value
+> > > that
+> > > just made it less likely to be seen?
+> > 
+> >  Can it have a different PHY attached?  There's this code:
+> > 
+> > 	if (tp->chip_id == PNIC2)
+> > 		tp->link_change = pnic2_lnk_change;
+> > 	else if (tp->flags & HAS_NWAY)
+> > 		tp->link_change = t21142_lnk_change;
+> > 	else if (tp->flags & HAS_PNICNWAY)
+> > 		tp->link_change = pnic_lnk_change;
 > 
-> Signed-off-by: Himanshu Mittal <h-mittal1@ti.com>
-> ---
-> v3-v2:
-> - Addresses comment to fix structure documentation
-> 
-> [...]
+> I'm not sure which of us that was directed at, but for my onboard tulips:
 
-Here is the summary with links:
-  - [net-next,v3] net: ti: icssg-prueth: Add prp offload support to ICSSG driver
-    https://git.kernel.org/netdev/net-next/c/83010fd9225b
+ It was for Florian, as obviously your system does trigger the issue.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> I found a link to the datasheet (If needed), but have had mixed luck with
+> alldatasheets:
+> https://www.alldatasheet.com/datasheet-pdf/pdf/75840/MICRO-LINEAR/ML6698CH.html
 
+ There's no need to chase hw documentation as the issue isn't directly 
+related to it.
 
+ As I noted in the earlier e-mail it seems a regression in the handling of 
+`del_timer_sync', perhaps deliberate, introduced sometime between 5.18 and 
+6.4.  I suggest that you try 5.18 (or 5.17 as it was 5.18.0-rc2 actually 
+here that worked correctly) and see if it still triggers the problem and 
+if it does not then bisect it (perhaps limiting the upper bound to 6.4 if 
+it does trigger it for you, to save an iteration or a couple).  Once you 
+know the offender you'll likely know the solution.  Or you can come back 
+with results and ask for one if unsure.
+
+ HTH,
+
+  Maciej
 
