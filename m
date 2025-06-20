@@ -1,55 +1,69 @@
-Return-Path: <netdev+bounces-199724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC94AE192B
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:42:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C218CAE193E
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2034616242A
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:42:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5913C1BC2E92
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF278253F16;
-	Fri, 20 Jun 2025 10:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D173277C85;
+	Fri, 20 Jun 2025 10:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgKMlyWx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSBzQbBT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9559B184E;
-	Fri, 20 Jun 2025 10:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B072AF07;
+	Fri, 20 Jun 2025 10:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750416163; cv=none; b=Iloi97J3mDOtkrxrvDbMVPI2xVYzYhr1I4LhcFQEMdwE+xbCiBT0Dcby5CqPuAzruZbMLcsfWC7q4iz2t1m+65o87pGotc18q9wltDuAnov+wdRsim3yfqZs6z2SxhQ93D7uzuYfu+DfJcfZQFp8KXRI4MB+xpzuU3tY2NkHyus=
+	t=1750416680; cv=none; b=ac3mwiZ1Pv9ogmpwjDHBf/X+aoZgJRWRh56wIWDqkhd/XzOIRqZ9IAgvT2ZT7zdi58TGP4gSdXZjTP+aKR5/o1SYZlETm8ygr7WAMvJreeTaT8I/NKIR9KD+hubYqNh/ktYNi6nrpe6KjtKL3b8lH1bLtttMeo6ymzKZiZ4Pz3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750416163; c=relaxed/simple;
-	bh=oDhleMh6/r5KYmZUOnocIhizlu8G9M0Audg1hQV0wRQ=;
+	s=arc-20240116; t=1750416680; c=relaxed/simple;
+	bh=xJpDu3YPjXRnNpdNI//n/GTlpYebqH9RGK2+XQwqJKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8yMoAbQJwD6J6q3hpsQn+BlOJWVRUY/fmO1Gaby+hUfcnhAtlrEluRHKZg3NkBHqJh0kfrOvRaDFOHprn31gIf1l837vzekcZdngK9NtxBy6i0o2aBO3TJH9mvqimSZ7TThI53wsmpKsxPPa0yv+Wt9RJxhZn6j/SoTRbJyJAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DgKMlyWx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 790CCC4CEE3;
-	Fri, 20 Jun 2025 10:42:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3POHfocaOyGbsJLVRRbjU0QTVpwZsOokJcbEryNz7te3M7P4ffeM4eZM9wAL48efrasIhcv6notClTlULWVIm3/zirZaFcvCJqHR+YGUbj7p+oK/U/Wo7dCPatI+0SveUnDBnDFvRMoSLMyfd0vhQFiDdprZ8B6FIuL7bkm0yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSBzQbBT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 105D3C4CEE3;
+	Fri, 20 Jun 2025 10:51:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750416163;
-	bh=oDhleMh6/r5KYmZUOnocIhizlu8G9M0Audg1hQV0wRQ=;
+	s=k20201202; t=1750416680;
+	bh=xJpDu3YPjXRnNpdNI//n/GTlpYebqH9RGK2+XQwqJKM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DgKMlyWxtQHaQOZrO0faug73at9WkJ3FjJz7gD4iAzy99Ok3Zhe909p1+Wl/tCC1K
-	 h65pUabk0m5kMa43YAH139TBZp+wdL321XWNbx/pO10JFsI4i5o8t0lLXzTXrfM650
-	 XJEDH1cbK+c7AeZDovZzBixuw1TwQKzVXRXXAME2dPO2BHzMvz8wv7Ol1PTPX4EA21
-	 oE3nTAe/cv47yN39JT55RAVIKpPb1/RexJrpRTu1M9HiqWrqw3ZxkD2YjDpS10bQ26
-	 oW7+lA0iI9e8VdOUiJ4mcNKZsf8rDQyMkLo39wLsm556OjuWO1Eiwz+RKqpJHdxUlb
-	 89h6uc7BBsVrg==
-Date: Fri, 20 Jun 2025 11:42:39 +0100
+	b=uSBzQbBT5RcFquiP0m0RCt4BVGKVEtivSyIWS7FGOlhNBoKceRDp9CYfkinY164sk
+	 FHxPDvkoin9HzeFLb1cL1Nl4h0lE0R4kzqOWw67goC+9O8xYoFQYncRiteyvOG6TI6
+	 U5ayR2w32UIxDMN2hLcIHglljW0B0wFYCV+Ozyq40tsfm3CJpTCOpjT0twXTBmZTzJ
+	 Tkk/HwhQiysMgcTRvJeQdUHz54t0nlqivJ8esmQj+yzSCVa513TCtUuc9pyiu0Simz
+	 MyzfVt13D5njUILeeQEtoALdN9QQ8YYTXyN+b2sNROx2zD1Z/Lcb0UTE1Ze3zPQIsF
+	 kN6XEhTBYx+tw==
+Date: Fri, 20 Jun 2025 11:51:14 +0100
 From: Simon Horman <horms@kernel.org>
-To: Shannon Nelson <sln@onemain.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] CREDITS: Add entry for Shannon Nelson
-Message-ID: <20250620104239.GG194429@horms.kernel.org>
-References: <20250619211607.1244217-1-sln@onemain.com>
+To: Brett Creeley <bcreeley@amd.com>
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net v3] ethernet: ionic: Fix DMA mapping tests
+Message-ID: <20250620105114.GH194429@horms.kernel.org>
+References: <20250619094538.283723-2-fourier.thomas@gmail.com>
+ <bb84f844-ac16-4a35-9abf-614bbf576551@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,14 +72,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250619211607.1244217-1-sln@onemain.com>
+In-Reply-To: <bb84f844-ac16-4a35-9abf-614bbf576551@amd.com>
 
-On Thu, Jun 19, 2025 at 02:16:07PM -0700, Shannon Nelson wrote:
-> I'm retiring and have already had my name removed from MAINTAINERS.
-> A couple of folks kindly suggested I should have an entry here.
+On Thu, Jun 19, 2025 at 03:28:06PM -0700, Brett Creeley wrote:
 > 
-> Signed-off-by: Shannon Nelson <sln@onemain.com>
+> 
+> On 6/19/2025 2:45 AM, Thomas Fourier wrote:
+> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> > 
+> > 
+> > Change error values of `ionic_tx_map_single()` and `ionic_tx_map_frag()`
+> > from 0 to `DMA_MAPPING_ERROR` to prevent collision with 0 as a valid
+> > address.
+> > 
+> > This also fixes the use of `dma_mapping_error()` to test against 0 in
+> > `ionic_xdp_post_frame()`
+> > 
+> > Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+> 
+> I'm not sure the Fixes commit above should be in the list. Functionally it's
+> correct, except there being multiple calls to dma_mapping_error() on the
+> same dma_addr.
+> 
+> Other than the minor nit above the commit looks good. Thanks again for
+> fixing this.
+> 
+> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Brett and Thomas,
 
+Maybe I misunderstand things, if so I apologise.
+
+If this patch fixes a bug - e.g. the may observe a system crash -
+then it should be targeted at net and have a Fixes tag. Where the
+Fixes tag generally cites the first commit in which the user may
+experience the bug.
+
+If, on the other hand, this does not fix a bug then the patch
+should be targeted at net-next and should not have a Fixes tag.
+
+In that case, commits may be cited using following form in
+the commit message (before the Signed-off-by and other tags).
+And, unlike tags, it may be line wrapped.
+
+commit 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+
+E.g.: This was introduce by commit 0f3154e6bcb3 ("ionic: Add Tx and Rx
+handling").
+
+I hope this helps. If not, sorry for the noise.
+
+...
 
