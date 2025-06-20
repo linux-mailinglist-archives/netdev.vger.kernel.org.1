@@ -1,120 +1,151 @@
-Return-Path: <netdev+bounces-199844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCA0AE2029
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:35:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8115AE2058
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AF73BE9CD
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:35:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BC691C231A4
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591922E92A9;
-	Fri, 20 Jun 2025 16:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61EDD2DF3E8;
+	Fri, 20 Jun 2025 16:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q3rbwmNe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLgPZn8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DC92E611C
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 16:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FAD136988;
+	Fri, 20 Jun 2025 16:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750437317; cv=none; b=UJJUrc7N46JMNcdA98rAfGpVrnXAWYxDa9CiuF9DCvYPw0XE7JexgWWLKdRtdkmAcjbBqDi9irNQlVbW5E3QLYqsuNPGvlkrTf8qEaIAXGrFTQoosRg68TYXC+XjGhD8EIoe3Kcfkg2wUnH0Sno+/HsxOKdzJe/qrtjirraQ5/k=
+	t=1750438053; cv=none; b=bWYHrp0RioCNmZLYcQcnuTf78xRm05pOFuleUF5O2ZFnH9YidSXRbjaGAeEKRDvocuxTpIZ4a1nVjdZyK0sesLwHeSCMhNN/0hd2WVTKToTIsqfnPqsBcHFevVibzibglwd2zqZ28JEzBgR+hZkqEiNoFrN6D37vEhRjxy81+d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750437317; c=relaxed/simple;
-	bh=oaTRh4ds681QZcVYWaTXlb4ef8A2ijup6tRtesQ4SOM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Inzoxqzhxzt1doJv2RuBWJMC8NSfXw0lzVv5f6pcCz58AK4GNU9/zm2tFYOFOruJ0Gftkgyu0/gKsqtWLZ3APHpCKwCXk3z7FbENxbwzhVepKJ1kXa3mKoHtkgEKwkfsxT7kwnVEf0IsRw/czzKHxWHL0mq/76z+yGj/Hkgv7Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q3rbwmNe; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3ff0f1eb-fd69-4452-9e24-738f47b0203e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750437301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2Pt53J5CQyhMhBy2UHYMO8n7eZQLEZ2R9chwdbp1yGI=;
-	b=Q3rbwmNeb2YVBcJopM73p3v4MtiDUNCI9mWHG/TFSwVNnPebD7QaF4/BgqM6fUTV7RSs9t
-	x+sOduJiZ5MM0tyEsz7TPTu7MzYQCtScim8OhAay/pUoPBcdUtSbz0uCTrxgrMWhOi/f+z
-	5PFLJIp/YGxBuCohTNfV+cGUbHXzL2Y=
-Date: Fri, 20 Jun 2025 12:34:56 -0400
+	s=arc-20240116; t=1750438053; c=relaxed/simple;
+	bh=KX6tv80e3CvofaxgkpPhdO+UHC4W7+9qaHsigC34mDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L3zE0lmVmi3nc2V7QIt9MT0nMgjuTZW5kdTKruMzcpTV3/mHQuJK/aL/YzjD5hM1PTGO8M+nJw5+6phbrw7istSP2K4dGu5y8MF5t/jE3W4gbM54JfS1pukAb/VpVWgrnwnjg86PpYeWE8DUx2aUPmB5PrhHQ0jpr2Jp0EkhNeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLgPZn8Y; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b0db0b6a677so1823886a12.2;
+        Fri, 20 Jun 2025 09:47:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750438051; x=1751042851; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4yi8IQcZyibFlvW9TENnflSaaC5CxQZCE+bmRMWOXA8=;
+        b=kLgPZn8Yo/myyHq7tNYadnBDKaJNdSIHPgzmtuVX4Um6F3ZeDUxX5luFo9gGZzIDFG
+         +NUiEuJSoSMwuc2Q1EpmWB+UMAei13NShDCmInQmFrWxB+18UMLi20zaaNQGUd2PxcrO
+         cTGfBHnIBsiQvvYPELAkKPsClRfr/ERF3md1Jz6MzfkFOh0R2nJYVf3xP6x8YqS+ulBI
+         GR2C/+sPq8/LpPlyjCaJ2jzHjaBB/h+7EcED1qXZzdzHqWDFLltp/S4x/2SV40JdnZ35
+         vNmR/cKWM4k+ox5LnolZdGlBCUz8/ChRjVCKO8tHU8xkOLgOJLjakO2pWbHwYXKKlES6
+         ny+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750438051; x=1751042851;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4yi8IQcZyibFlvW9TENnflSaaC5CxQZCE+bmRMWOXA8=;
+        b=G0340HPXbt4/2sqAJ7pgajOzl4AaMdW5Hb/qBhhbDUOTiqkpIJVr1BWUTKCBeiRXAM
+         XnDar4Eo//A70XelgOCFheEZlrZgKyWIbnTu9xNf6jxmzwdbppXRGkhiU9myxpte+mI4
+         8grkLPsSOANR+FT9xtOKgFhDGqWSu87jkAC+yoMuIox9aAgGPQSVL3XiD/L+sJk2kXLY
+         uE1AkAR10Hb/Mogb2/YZnU/1Y7twuKWsZjVoyVhVlrfpO5N2yASkNt/PNMl5Si/R8M5q
+         XV9mZg8EjaWqBW4XAv8p+u2AG9Im3GTjRmeQntdSKCDKNhyE5860rR4eWTz/vV5s+SvU
+         uhCw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVvK45es0Y0geYisJB1H3Oip6PHoysfGXrVt5MWOB6MWXoyO038Q3KLb2J42uVsIuo9hA=@vger.kernel.org, AJvYcCXOnGG7HjSNi9J6IlFHNorYnjOCiNtR3gG+j7OnqOumDrL4dDP/bYSD7w+oYKDX6HfqQUfdscei@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvkB6KCZgtXM9DPjwVlQfjMC7u+Sq5poR4D+lolx9v6NVHnrqb
+	3lLJ0aqtSDjv6fTv02BzM/IGiMizAZSUPzBuLdb6G55pK52CdPZlzAJ1F1rn
+X-Gm-Gg: ASbGnct7QqTR3KoHHXRFb9pA8CPuoZU9D0/9ZaNACEWFTnfDWvhDrTKfLLzPopZtjOK
+	hWIKfdj8qIVreIT29lPf08gheQuMjcRa9py5b5pA4TsnQWFHH+gOHgh0xSKGWSAMcxWwobPpZHE
+	gpQKUPRxMKHUSNNAqT82HBtBghpK+v0xBbtO4f24If4B9B1S4fzjxz6UGo/MRcoJUNzYgyvkXw2
+	LX/BP9ryvMhCIL861JRioyH7oLIAGO1iNHAy6jzjZgFywF6yekjvS+BrSOJtO66vAz2YYo7DGjf
+	MCWVLlJkko+OLIw3a92DihdHjs8cpeF9aBXKmwJh8YcjNqxN53jcU2kfQR+V4/0//6tPxS1+vGl
+	CgTYWMOkvnsShPotxXzbVvs4=
+X-Google-Smtp-Source: AGHT+IGn5SCW4EMrOnvLN7dbvW095nwN7lq2Np84MpBnyljxlaIMTrPM90t+jBo05ZwRMH+E3ZauMA==
+X-Received: by 2002:a17:90b:2701:b0:311:e8cc:4253 with SMTP id 98e67ed59e1d1-3159d61a5d0mr5340291a91.2.1750438051116;
+        Fri, 20 Jun 2025 09:47:31 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3159df81649sm2244456a91.11.2025.06.20.09.47.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jun 2025 09:47:30 -0700 (PDT)
+Date: Fri, 20 Jun 2025 09:47:29 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, bjorn@kernel.org,
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET
+ set/getsockopt
+Message-ID: <aFWQoXrkIWF2LnRn@mini-arch>
+References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
+ <20250619080904.0a70574c@kernel.org>
+ <aFVvcgJpw5Cnog2O@mini-arch>
+ <CAL+tcoAm-HitfFS+N+QRzECp5X0-X0FuGQEef5=e6cB1c_9UoA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 0/4] net: axienet: Fix deferred probe loop
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
- Saravana Kannan <saravanak@google.com>, Leon Romanovsky <leon@kernel.org>,
- Dave Ertman <david.m.ertman@intel.com>, linux-kernel@vger.kernel.org,
- Ira Weiny <ira.weiny@intel.com>, linux-arm-kernel@lists.infradead.org,
- Danilo Krummrich <dakr@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>
-References: <20250619200537.260017-1-sean.anderson@linux.dev>
- <2025062004-sandblast-overjoyed-6fe9@gregkh>
- <56f52836-545a-45aa-8a6b-04aa589c2583@linux.dev>
- <2025062054-tameness-canal-2204@gregkh>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <2025062054-tameness-canal-2204@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoAm-HitfFS+N+QRzECp5X0-X0FuGQEef5=e6cB1c_9UoA@mail.gmail.com>
 
-On 6/20/25 12:01, Greg Kroah-Hartman wrote:
-> On Fri, Jun 20, 2025 at 11:41:52AM -0400, Sean Anderson wrote:
->> On 6/20/25 01:10, Greg Kroah-Hartman wrote:
->> > On Thu, Jun 19, 2025 at 04:05:33PM -0400, Sean Anderson wrote:
->> >> Upon further investigation, the EPROBE_DEFER loop outlined in [1] can
->> >> occur even without the PCS subsystem, as described in patch 4/4. The
->> >> second patch is a general fix, and could be applied even without the
->> >> auxdev conversion.
->> >> 
->> >> [1] https://lore.kernel.org/all/20250610183459.3395328-1-sean.anderson@linux.dev/
->> > 
->> > I have no idea what this summary means at all, which isn't a good start
->> > to a patch series :(
->> > 
->> > What problem are you trying to solve?
->> 
->> See patch 4/4.
+On 06/21, Jason Xing wrote:
+> On Fri, Jun 20, 2025 at 10:25 PM Stanislav Fomichev
+> <stfomichev@gmail.com> wrote:
+> >
+> > On 06/19, Jakub Kicinski wrote:
+> > > On Thu, 19 Jun 2025 17:04:40 +0800 Jason Xing wrote:
+> > > > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+> > > >     rcu_read_lock();
+> > > >  again:
+> > > >     list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > > > -           if (xs->tx_budget_spent >= MAX_PER_SOCKET_BUDGET) {
+> > > > +           int max_budget = READ_ONCE(xs->max_tx_budget);
+> > > > +
+> > > > +           if (xs->tx_budget_spent >= max_budget) {
+> > > >                     budget_exhausted = true;
+> > > >                     continue;
+> > > >             }
+> > > > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> > > >  static int __xsk_generic_xmit(struct sock *sk)
+> > > >  {
+> > > >     struct xdp_sock *xs = xdp_sk(sk);
+> > > > -   u32 max_batch = TX_BATCH_SIZE;
+> > > > +   u32 max_budget = READ_ONCE(xs->max_tx_budget);
+> > >
+> > > Hm, maybe a question to Stan / Willem & other XSK experts but are these
+> > > two max values / code paths really related? Question 2 -- is generic
+> > > XSK a legit optimization target, legit enough to add uAPI?
+> >
+> > 1) xsk_tx_peek_desc is for zc case and xsk_build_skb is copy mode;
+> > whether we want to affect zc case given the fact that Jason seemingly
+> > cares about copy mode is a good question.
 > 
-> That's not what should be in patch 0/4 then, right?
+> Allow me to ask the similar question that you asked me before: even though I
+> didn't see the necessity to set the max budget for zc mode (just
+> because I didn't spot it happening), would it be better if we separate
+> both of them because it's an uAPI interface. IIUC, if the setsockopt
+> is set, we will not separate it any more in the future?
 > 
->> > What overall solution did you come up with?
->> 
->> See patch 4/4.
-> 
-> Again, why write a 0/4 summary at all then?
+> We can keep using the hardcoded value (32) in the zc mode like
+> before and __only__ touch the copy mode? Later if someone or I found
+> the significance of making it tunable, then another parameter of
+> setsockopt can be added? Does it make sense?
 
-So if I decide in v2 that some patch other than "auxiliary: Allow empty
-id" has to come first then the series still has the same subject. This
-makes it easier for maintainers to figure out which v1 the v2 is for.
-
->> > Who is supposed to be reviewing any of this?
->> 
->> Netdev. Hence "PATCH net".
->> 
->> And see [1] above for background. I will quote it more-extensively next time.
-> 
-> Referring to random links doesn't always work as we deal with thousands
-> of patches daily, and sometimes don't even have internet access (like
-> when reviewing patches on long flights/train rides...)
-
-Well, the link contains the message-id, so you are more than welcome to
-look it up in your email client. But to spare you the trouble I will
-quote from it next time in addition to linking.
-
---Sean
+Related suggestion: maybe we don't need this limit at all for the copy mode?
+If the user, with a socket option, can arbitrarily change it, what is the
+point of this limit? Keep it on the zc side to make sure one socket doesn't
+starve the rest and drop from the copy mode.. Any reason not to do it?
 
