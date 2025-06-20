@@ -1,131 +1,122 @@
-Return-Path: <netdev+bounces-199810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5540DAE1DEF
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:56:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6146AE1DF3
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:57:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4A4617766C
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:56:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB52A7A6CCE
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA94E2BD5BF;
-	Fri, 20 Jun 2025 14:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C6A2BD5B2;
+	Fri, 20 Jun 2025 14:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qAmC/gaW"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="O8IT+yNh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2491A2BD5B2;
-	Fri, 20 Jun 2025 14:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC1613790B
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 14:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750431404; cv=none; b=facMwWWbYDSN41B0VKukap3UEDK9a2QEqO9KQd2kfyHfeDZyCqY7Vf82lvI70sajGfPK92XUHSXA3zMWqpUM3YXetkNfi2a3QHEVDwqKSl2HaLLHKVLOUfeFuWLsvo03RK8Fg9uPNolhqTOd/opb3PsTUbK8Cs+s7gjztfJXVtI=
+	t=1750431422; cv=none; b=mUGW1QjlLUqOKojTWcV69gdnBd/mnR+7lF/aH+GXGxSbcEkBQNXzVxjo7hyHwYI3nXLHHcGSVPa5vbYxlxLSbkk5R+LNcra7XVWhEqq9UJb4v4e8OgjcEfzrInnoVrM5t+Lnbm5ftkJIciWnccDQmyffGC4Bc+zjuDOgGOcP7Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750431404; c=relaxed/simple;
-	bh=UkSrktSOg3YT49HTJ0lLuUoG6GbizoE9w6yhT72IHIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cQrc4Fe/Et25Rme6vT46P4U9GJxh5zXf8bnrW0hQym+5gD+xq1xWvsZHR9B+lHouS15x0RceyDH/lmAcQRJ8ZUteewW+P+aWckMqglN9p62t0CV0plnTwQihufdKbf8nwiCl0z63chdwDeDC3JQo7QwG5TK3f58UI4d7/hm1Xgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qAmC/gaW; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=O/jZjNo754y8qhJ/PUhLRJEDi9tOJZ9ysoGunWSd/Pg=; b=qAmC/gaW/hDih7Sc0s+DEgDlk3
-	/r3ar2kJyp4sZ9xyaM5FYOBtyMMjiTOkPMhW9VzHfEGDEcEeX7Fyazf3yQ8yXkQAa3WyLk5fgRKTK
-	Iuw5uEaCJZHgNvgRhCxdh48HXsPF8/7L2eNMsrhugYIZPIOJgGxS/8uBI67rgQUsbt/H2z5UuFUYQ
-	gLI56cs17iCLLOTeGkMLesfK7KJVRkDb9FCFmwo3iFQe/qLQVhVjBxdoaSTXYZEaR4ivShNBqudiW
-	hSlejcd5R67Ak5sz51LIvq0kLrg5mkwEmXdyQlW1it5qzM6GkFezAvOQakw+IZt27HYKqd6mmixqb
-	GMKSycsg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45204)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uSdAG-00015l-0m;
-	Fri, 20 Jun 2025 15:56:24 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uSdA0-0000WH-02;
-	Fri, 20 Jun 2025 15:56:08 +0100
-Date: Fri, 20 Jun 2025 15:56:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-actions@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-usb@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Mark Einon <mark.einon@gmail.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	=?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Steve Glendinning <steve.glendinning@shawell.net>,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next RFC] net: Throw ASSERT_RTNL into phy_detach
-Message-ID: <aFV2h4w3MLtjyfPb@shell.armlinux.org.uk>
-References: <20250620143341.2158655-1-kory.maincent@bootlin.com>
+	s=arc-20240116; t=1750431422; c=relaxed/simple;
+	bh=UseziiCFNy+6P/49OnpQlZKqenk+TswbIb3kp9EixEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WoaAIvi9S3vh9p6jWJQ6Bhca9CmS96Uo1QxvhLm3h5JuwpxGPTwP5VA//3ebFwRoDHvHH9jtk/7X91pvyXQBlWmJIwSsmgLg5BdN1Ruq51Lg7hNx7PkFoYXkhAtXMKVaLfTHfp8hCOMBjw+vVHlxk20Z78sfH/66dE6HllZTKO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=O8IT+yNh; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45364971d62so151355e9.0
+        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 07:56:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1750431418; x=1751036218; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hfXj34P2pf/AINloebXhcz0Fw0+WqnZX50sWt1njJSc=;
+        b=O8IT+yNh3SOE6XWHhSK7wBx3TYzVa4tQcCf9r5wINQjow85c1VnvUkIwIltjSifFMW
+         4D31n2DQZrSQ5xCgioiPro2IsQK5K+uYSukoaFj8bo5R+dSOdLJSSaaiUMVcXjz/enjP
+         KbGX6G0+zKti3jkPH1EJk2EZpxS0NQecw69VWK0ery8WjkzWHESzSseeiX0jakerytwn
+         OofJ/sPy0cp4EhWsTRiCW0YlMKoSKnc0TqlG4fwVQevjBxKnVEUVvtABq0tdeTU2qKU/
+         vNyxj1TZX1y3o9fRAJVx5s2yeXywj0+/JPQqnnsJX1q7gCVtG1mPLDMw1q+Lj6/EmZzC
+         rL2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750431418; x=1751036218;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hfXj34P2pf/AINloebXhcz0Fw0+WqnZX50sWt1njJSc=;
+        b=ARkT4oVTLyfc38m7wKNJS5DHlLu9uH770FnzvCp6grKb7kzGFc9ybiCH50IcJ2kncA
+         heGT/GyMUlQs7M+q84CSGa78xo0zBDJGX4XNDIRBwBK9aUv2u4xtmnu0T4yDvUBlUnMo
+         XX5cKxnBqE+S9quP718jOP3BodjpEJtbkwDd/uroYiabdRsmBZlzIP2+h3rICXyty/Vw
+         dtEXyiqwDkyqWcR89ucivglO1QWt7R4t4gGqAbQ5nHtBNZz0kgQWrng3zIF1R8uUQWa6
+         Pjcm32bCZzS8NAviq6VZpOERLtB4Dqg2iqYd6BQ+V5H4BUoGQhLOjBCus3h0BjVAJurN
+         dHTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWVbXx5+vpFPLIS/la3Vqf5vriP/y/3Y7u715Sv6mXOTYErFABFCTB9hdPQ9plkT9rjl0HGIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVWEPgP3i7/VdrcvIFAvoIaCd7m2j60F7uguTmxAL7HALOBMKy
+	RgM+xEcqMkRLw8AJWjiJhv4pZy7FtWipbWsHKlPVl5L7L1HdmUxniwR73YsdizqWhgM=
+X-Gm-Gg: ASbGncuzOY6MXyQNxKnu+n2K65sg3WusNXamQYpOwaKc+6n+oJpZ61IMxEQAxcNsef2
+	5Mf5D4dnyl0LuxPRC4LvgFBJmqABOflf2La+ku1XrRCSqdWW4h86bZGIaECC27UQ5KdNN759TJQ
+	DsMux9DbPDAQu7r5ohmi6PHoY2KdxSm3UIzjcgVdLNGLdX81oARHO/Mk2/1HmDM+u+LiLUmvph4
+	UtT8xASALQvvTHCx78xqmkdhdWOGVvAQFxVx0GA8hCpirUVYltAMdRsKfQ/1gT4r5gS3Zul7bKD
+	nEGXD4hgZ2J6WwnI+I2lY7tpzns/BYzRiPtGfX7kLyGNF6D1desJ0U5uoDoWFDnkaAWdn5ttU8h
+	Fx424iD+1A4BJoqcTQGZrem6p4r/S1O0b5YRw
+X-Google-Smtp-Source: AGHT+IGRhTkUi7vAG1Nq5lQnyde1wdkbLDOGPyXB6FB4LNEfzmGXi2FxRcSC8seRuwQdvmccY9uIBQ==
+X-Received: by 2002:a05:600c:c093:b0:43b:c825:6cde with SMTP id 5b1f17b1804b1-453654cdbe0mr8598985e9.3.1750431418440;
+        Fri, 20 Jun 2025 07:56:58 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:607e:36cd:ae85:b10? ([2a01:e0a:b41:c160:607e:36cd:ae85:b10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4536470371csm27694975e9.30.2025.06.20.07.56.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Jun 2025 07:56:57 -0700 (PDT)
+Message-ID: <2211ec87-b794-4d74-9d3d-0c54f166efde@6wind.com>
+Date: Fri, 20 Jun 2025 16:56:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250620143341.2158655-1-kory.maincent@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: When routed to VRF, NF _output_ hook is run unexpectedly
+To: Eugene Crosser <crosser@average.org>, netdev@vger.kernel.org
+Cc: "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ David Ahern <dsahern@kernel.org>, Florian Westphal <fw@strlen.de>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+References: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 20, 2025 at 04:33:27PM +0200, Kory Maincent wrote:
-> phy_detach needs the rtnl lock to be held. It should have been added before
-> to avoid this massive change among lots of net drivers but there was no
-> clear evidence of such needs at that time. This imply a lock change in
-> this API. Add phy_detach_rtnl, phy_diconnect_rtnl, phylink_connect_phy_rtnl
-> and phylink_fwnode_phy_connect_rtnl helpers to take the lock before calling
-> their respective function.
+Le 20/06/2025 à 15:38, Eugene Crosser a écrit :
+> Hello!
+Hello,
 
-Please don't increase the number of API functions for phylink for the
-long term. I'd prefer all callers of the phylink phy_connect functions
-be updated to hold the RTNL, just like phylink_disconnect() requires.
+> 
+> It is possible, and very useful, to implement "two-stage routing" by
+> installing a route that points to a VRF device:
+> 
+>     ip link add vrfNNN type vrf table NNN
+>     ...
+>     ip route add xxxxx/yy dev vrfNNN
+> 
+> however this causes surprising behaviour with relation to netfilter
+> hooks. Namely, packets taking such path traverse _output_ nftables
+> chain, with conntracking information reset. So, for example, even
+> when "notrack" has been set in the prerouting chain, conntrack entries
+> will still be created. Script attached below demonstrates this behaviour.
+You can have a look to this commit to better understand this:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8c9c296adfae9
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Regards,
+Nicolas
 
