@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-199843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA528AE2023
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:34:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCA0AE2029
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F6071BC68AF
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:34:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AF73BE9CD
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B772E6106;
-	Fri, 20 Jun 2025 16:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591922E92A9;
+	Fri, 20 Jun 2025 16:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xBvbzMTi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q3rbwmNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483C7482F2
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 16:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DC92E611C
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 16:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750437238; cv=none; b=Kw1OA+qQW1vWAcoPvOf6gA1k42KtPKZ3QSwg9HDE1sGmTJQ+tIz6F8SZiGqbH6bBrak8633vs4AX13h+oqV+//fo3nNVSUNQ0mKSoUDktvCYvIuhI04gYYFqObO9zQ/mnEtUTCmM1+IuMzamKR8qbnxNEFE27lBKlpxN+57W5HU=
+	t=1750437317; cv=none; b=UJJUrc7N46JMNcdA98rAfGpVrnXAWYxDa9CiuF9DCvYPw0XE7JexgWWLKdRtdkmAcjbBqDi9irNQlVbW5E3QLYqsuNPGvlkrTf8qEaIAXGrFTQoosRg68TYXC+XjGhD8EIoe3Kcfkg2wUnH0Sno+/HsxOKdzJe/qrtjirraQ5/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750437238; c=relaxed/simple;
-	bh=JXaGcp9pqsSbF9NRuSGal740IHNaqsO8ZHpcR3fj1vM=;
+	s=arc-20240116; t=1750437317; c=relaxed/simple;
+	bh=oaTRh4ds681QZcVYWaTXlb4ef8A2ijup6tRtesQ4SOM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rBvw11fC4Z1Yn5LuyQXAZ+Plg0lBarsAVVJyOemowVV08mfhrV5jcWG2rRH6v/EnpN7J5FznNx0jUqgjGSpk8I2m++0JminS2hZqBmuLvjIfRNYn2n+aSPrlxeAhNwvhjTdbks3l62/rg75v3l+aTDgw5IYHiPhGL3P4qEsIESw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xBvbzMTi; arc=none smtp.client-ip=91.218.175.189
+	 In-Reply-To:Content-Type; b=Inzoxqzhxzt1doJv2RuBWJMC8NSfXw0lzVv5f6pcCz58AK4GNU9/zm2tFYOFOruJ0Gftkgyu0/gKsqtWLZ3APHpCKwCXk3z7FbENxbwzhVepKJ1kXa3mKoHtkgEKwkfsxT7kwnVEf0IsRw/czzKHxWHL0mq/76z+yGj/Hkgv7Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q3rbwmNe; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2abb8b06-960d-44d3-b2f1-b6d91f424a1b@linux.dev>
+Message-ID: <3ff0f1eb-fd69-4452-9e24-738f47b0203e@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750437233;
+	t=1750437301;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XDnBVy0j4uCja073Cag+NZ+VuabbaY7i2eVJN3A6bdc=;
-	b=xBvbzMTiiUh7ca29hegpZHXllXXE69lmTMxhvNKMpV77ymE7qvKufgg+3oHikqSy7X6Hp+
-	h5gjRk9/eLpWIFN2f+GLHibm2yRLlUi1IyLJO+enBaGp0eUPczQP9yxyQ8U7C9riUHeDS3
-	GG+Z4+Soc/nhStNZc7eFLa/Qwiz3OVE=
-Date: Fri, 20 Jun 2025 12:33:48 -0400
+	bh=2Pt53J5CQyhMhBy2UHYMO8n7eZQLEZ2R9chwdbp1yGI=;
+	b=Q3rbwmNeb2YVBcJopM73p3v4MtiDUNCI9mWHG/TFSwVNnPebD7QaF4/BgqM6fUTV7RSs9t
+	x+sOduJiZ5MM0tyEsz7TPTu7MzYQCtScim8OhAay/pUoPBcdUtSbz0uCTrxgrMWhOi/f+z
+	5PFLJIp/YGxBuCohTNfV+cGUbHXzL2Y=
+Date: Fri, 20 Jun 2025 12:34:56 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 1/4] auxiliary: Allow empty id
+Subject: Re: [PATCH net 0/4] net: axienet: Fix deferred probe loop
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
@@ -61,100 +61,60 @@ Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
  Ira Weiny <ira.weiny@intel.com>, linux-arm-kernel@lists.infradead.org,
  Danilo Krummrich <dakr@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>
 References: <20250619200537.260017-1-sean.anderson@linux.dev>
- <20250619200537.260017-2-sean.anderson@linux.dev>
- <2025062004-essay-pecan-d5be@gregkh>
- <8b9662ab-580c-44ea-96ee-b3fe3d4672ff@linux.dev>
- <2025062006-detergent-spruce-5ae2@gregkh>
- <91a9e80a-1a45-470b-90cf-12faae67debd@linux.dev>
- <2025062045-velocity-finite-f31c@gregkh>
+ <2025062004-sandblast-overjoyed-6fe9@gregkh>
+ <56f52836-545a-45aa-8a6b-04aa589c2583@linux.dev>
+ <2025062054-tameness-canal-2204@gregkh>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <2025062045-velocity-finite-f31c@gregkh>
+In-Reply-To: <2025062054-tameness-canal-2204@gregkh>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-On 6/20/25 12:15, Greg Kroah-Hartman wrote:
-> On Fri, Jun 20, 2025 at 12:09:29PM -0400, Sean Anderson wrote:
->> On 6/20/25 12:02, Greg Kroah-Hartman wrote:
->> > On Fri, Jun 20, 2025 at 11:37:40AM -0400, Sean Anderson wrote:
->> >> On 6/20/25 01:13, Greg Kroah-Hartman wrote:
->> >> > On Thu, Jun 19, 2025 at 04:05:34PM -0400, Sean Anderson wrote:
->> >> >> Support creating auxiliary devices with the id included as part of the
->> >> >> name. This allows for non-decimal ids, which may be more appropriate for
->> >> >> auxiliary devices created as children of memory-mapped devices. For
->> >> >> example, a name like "xilinx_emac.mac.802c0000" could be achieved by
->> >> >> setting .name to "mac.802c0000" and .id to AUXILIARY_DEVID_NONE.
->> >> > 
->> >> > I don't see the justification for this, sorry.  An id is just an id, it
->> >> > doesn't matter what is is and nothing should be relying on it to be the
->> >> > same across reboots or anywhere else.  The only requirement is that it
->> >> > be unique at this point in time in the system.
+On 6/20/25 12:01, Greg Kroah-Hartman wrote:
+> On Fri, Jun 20, 2025 at 11:41:52AM -0400, Sean Anderson wrote:
+>> On 6/20/25 01:10, Greg Kroah-Hartman wrote:
+>> > On Thu, Jun 19, 2025 at 04:05:33PM -0400, Sean Anderson wrote:
+>> >> Upon further investigation, the EPROBE_DEFER loop outlined in [1] can
+>> >> occur even without the PCS subsystem, as described in patch 4/4. The
+>> >> second patch is a general fix, and could be applied even without the
+>> >> auxdev conversion.
 >> >> 
->> >> It identifies the device in log messages. Without this you have to read
->> >> sysfs to determine what device is (for example) producing an error.
+>> >> [1] https://lore.kernel.org/all/20250610183459.3395328-1-sean.anderson@linux.dev/
 >> > 
->> > That's fine, read sysfs :)
->> 
->> I should not have to read sysfs to decode boot output. If there is an
->> error during boot I should be able to determine the offending device.
->> This very important when the boot process fails before init is started,
->> and very convenient otherwise. 
-> 
-> The boot log will show you the name of the device that is having a
-> problem.  And you get to pick a portion of that name to make it make
-> some kind of sense to users if you want.
-
-As noted below, I can't! The name has to be in a very particular format
-which does not allow for any differentiation *except* in the "id" portion.
-Really the only thing I want to do is print the id in hexadecimal rather
-than decimal.
-
->> >> This
->> >> may be inconvenient to do if the error prevents the system from booting.
->> >> This series converts a platform device with a legible ID like
->> >> "802c0000.ethernet" to an auxiliary device, and I believe descriptive
->> >> device names produce a better developer experience.
+>> > I have no idea what this summary means at all, which isn't a good start
+>> > to a patch series :(
 >> > 
->> > You can still have 802c0000.ethernet be the prefix of the name, that's
->> > fine.
+>> > What problem are you trying to solve?
 >> 
->> This is not possible due to how the auxiliary bus works. If device's
->> name is in the form "foo.id", then the driver must have an
->> auxiliary_device_id in its id_table with .name = "foo". So the address
->> *must* come after the last period in the name.
+>> See patch 4/4.
 > 
-> So what is the new name without this aux patch that looks so wrong?
-> What is the current log line before and after the change you made?
+> That's not what should be in patch 0/4 then, right?
+> 
+>> > What overall solution did you come up with?
+>> 
+>> See patch 4/4.
+> 
+> Again, why write a 0/4 summary at all then?
 
-Well, without this patch if you have multiple devices the subsequent
-ones can't be created because they all have id 0 and this conflicts in sysfs.
+So if I decide in v2 that some patch other than "auxiliary: Allow empty
+id" has to come first then the series still has the same subject. This
+makes it easier for maintainers to figure out which v1 the v2 is for.
 
-With this patch it looks something like
+>> > Who is supposed to be reviewing any of this?
+>> 
+>> Netdev. Hence "PATCH net".
+>> 
+>> And see [1] above for background. I will quote it more-extensively next time.
+> 
+> Referring to random links doesn't always work as we deal with thousands
+> of patches daily, and sometimes don't even have internet access (like
+> when reviewing patches on long flights/train rides...)
 
-[    4.781268] xilinx_axienet 80200000.ethernet: autodetected 64-bit DMA range
-[   21.889563] xilinx_emac.mac xilinx_emac.mac.80200000 net4: renamed from eth0
-[   32.296965] xilinx_emac.mac xilinx_emac.mac.80200000 net4: PHY [axienet-80200000:05] driver [RTL8211F Gigabit Ethernet] (irq=70)
-[   32.313456] xilinx_emac.mac xilinx_emac.mac.80200000 net4: configuring for inband/sgmii link mode
-[   65.095419] xilinx_emac.mac xilinx_emac.mac.80200000 net4: Link is Up - 1Gbps/Full - flow control rx/tx
-
-I also prototyped a version of PLATFORM_DEVID_AUTO which looks roughly
-like:
-
-[    5.424220] xilinx_axienet 80240000.ethernet: autodetected 64-bit DMA range
-[  178.249494] xilinx_emac.mac xilinx_emac.mac.1-auto net4: renamed from eth0
-[  178.714048] xilinx_emac.mac xilinx_emac.mac.1-auto net4: PHY [axienet-80200000:05] driver [RTL8211F Gigabit Ethernet] (irq=70)
-[  178.731272] xilinx_emac.mac xilinx_emac.mac.1-auto net4: configuring for inband/sgmii link mode
-[  182.818831] xilinx_emac.mac xilinx_emac.mac.1-auto net4: Link is Up - 1Gbps/Full - flow control rx/tx
-
-The only identifying part of the name is the "net4" part of the netdev.
-However, if there's a failure before creating the netdev then userspace
-will never have a chance to rename it. For example, you might get
-
-[    4.947215] xilinx_emac.mac xilinx_emac.mac.1-auto (unnamed net_device) (uninitialized): incorrect link mode  for in-band status
-
-which leaves you with no clue as to what device went wrong.
+Well, the link contains the message-id, so you are more than welcome to
+look it up in your email client. But to spare you the trouble I will
+quote from it next time in addition to linking.
 
 --Sean
 
