@@ -1,155 +1,83 @@
-Return-Path: <netdev+bounces-199729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20ECFAE196D
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:01:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15BE9AE1974
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:02:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 937A51BC3376
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:01:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B3CB7A80F7
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B3B28A3EA;
-	Fri, 20 Jun 2025 11:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E00280A35;
+	Fri, 20 Jun 2025 11:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewJpOMl8"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="qpTLyP6P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC9228A1FA;
-	Fri, 20 Jun 2025 11:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2FF24500E;
+	Fri, 20 Jun 2025 11:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750417242; cv=none; b=oUTiWu9NXmo7Aw1T5+fbAO6U5TX7hlytdxCEdcvGW3MVOvdaaDENDezM88HY6OTPSVAV9Ip2buv7tkr/IDiTg23c6+UOU9WZH8VEJ6xFRZK6xMJt/+mswuehktbrHB21QZi6E9Eq7/uCMtTXmHgETqKESQBRi+PypcP3Za+HHCY=
+	t=1750417319; cv=none; b=SRMtBg461Zfz53tRvq0zTjUs+H5hX88ChWkM4fRcrY8t4biEvl60hMEgdTAIah37EA0CuP/imBjT7QAwYMP24+0xxJCjKmT1amgGfYXtlfi9NG07oSmrnXJ7S2wi1u5klf6f9oquGhTww+Yj4fVXMCmEN1pCWUe+xCBbveIKKwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750417242; c=relaxed/simple;
-	bh=yX4wNSrlruhfxucdKAPy6MrhE+DXh4QD91WIrozweT0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BxS78eTxcW++avdmIGN6oPmiYmwqn4yqDBIX+vWvdbCmy0MW3zaGHcDkg8b8ioAZ+vYAQXEimrBo9aA2CxahYJDSudO/CprO6Ih18iOhlAiM9L9FMtYhMmhkg9kGZ/KHZ79w3F4c3FiU5tYBJR22IevKLZK61NCQFO93q3fiUs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewJpOMl8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A88DEC4CEEF;
-	Fri, 20 Jun 2025 11:00:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750417242;
-	bh=yX4wNSrlruhfxucdKAPy6MrhE+DXh4QD91WIrozweT0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ewJpOMl80pGMjqYo72SD23kWF3Xg1kGLIqnAemnKGz0ejkAll40zf5lZHS7Ivww+q
-	 OhszyT/oxVXnsUek5j3Bemnv6IeFNybdBqJqufPi20SyeF1TOJ/+kFeyLSQEzRjvLY
-	 4K0emn2i7ApWr3W9+Wl9s1UZ9Hi0KfciBb0SUDppoAl+Y5X2LqjmGLaP/nytXc7K1q
-	 kW5lLScmkWvPsnu6I9qFsG51NJ1w7dHG7Ko0z8YwQBu3xJgmz1mtVUhODFng1drOTR
-	 mhPvEKseytc5eNBRcylhYbqNyFodVS+KilvqIc3Tex/uyu6mCouTRc2CQsxpGR5NIJ
-	 pJ+Lkqr670lvA==
-Date: Fri, 20 Jun 2025 12:00:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tanmay Jagdale <tanmay@marvell.com>
-Cc: davem@davemloft.net, leon@kernel.org, sgoutham@marvell.com,
-	bbhushan2@marvell.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 10/14] octeontx2-pf: ipsec: Handle NPA
- threshold interrupt
-Message-ID: <20250620110038.GJ194429@horms.kernel.org>
-References: <20250618113020.130888-1-tanmay@marvell.com>
- <20250618113020.130888-11-tanmay@marvell.com>
+	s=arc-20240116; t=1750417319; c=relaxed/simple;
+	bh=0+189Q01OWW44SjCAKrdmB3dlldQZT7EfBm4Z9bM//A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U0cw74GBye+lEr3gbDLcp3ucOVivSeIlpbV0nlxC8eEhjgwzIOdxOaKdfQvSYHMqySbodpBvPZ2U2E9EVx20O+UUxFHA//mzASx0Jc1/U7lQynJriR17EUst4ws8VztnfQq8vahpuXvmm6b4nD/7nHJRgoh0mEyhu9WOZeMc8Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=qpTLyP6P; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=0+189Q01OWW44SjCAKrdmB3dlldQZT7EfBm4Z9bM//A=;
+	t=1750417318; x=1751626918; b=qpTLyP6P+lSPqpRHG7OZG+7HmDl8D3S2sJIzfpzPhGo/WAh
+	uoNjXUAXRUqK69zAt86Q+A2yfaTO/S5Rd5mlfE8DhRrLQsg1IjZK4uagstDBQGAp6nuzSs40lSUG/
+	xj9GD1rFRz6HN+qx0M7TsfBlHxSOexaE7UDdlE+LTuSx8Eql6SSKbWFm6/7tXWWVy6wj1Rnf1frSa
+	NdjkhfNkGTfpqQ0TbGRsl8IB1VI+aD9xuPGd6Lwd4dt86GKciaAGdhuK8hdtT45NHv/fTSE8stHFF
+	wD3fCdRw782KA8L7ufJDLXmlYW45kZRKoibScdsLDcyWzZ2KpgILV9f+k//FrI8A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uSZVI-00000002fE2-0TFC;
+	Fri, 20 Jun 2025 13:01:52 +0200
+Message-ID: <c78aef54d57a83c874cd9092d6e50c3656540c02.camel@sipsolutions.net>
+Subject: Re: [PATCH] wifi: cfg80211: Prevent comparison with invalid
+ registered dev scan req
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Lizhi Xu <lizhi.xu@windriver.com>, 
+	syzbot+189dcafc06865d38178d@syzkaller.appspotmail.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Date: Fri, 20 Jun 2025 13:01:51 +0200
+In-Reply-To: <20250619080526.899000-1-lizhi.xu@windriver.com> (sfid-20250619_100643_662853_B51B997A)
+References: <684ba12f.a00a0220.279073.0009.GAE@google.com>
+	 <20250619080526.899000-1-lizhi.xu@windriver.com>
+	 (sfid-20250619_100643_662853_B51B997A)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618113020.130888-11-tanmay@marvell.com>
+X-malware-bazaar: not-scanned
 
-On Wed, Jun 18, 2025 at 05:00:04PM +0530, Tanmay Jagdale wrote:
-> The NPA Aura pool that is dedicated for 1st pass inline IPsec flows
-> raises an interrupt when the buffers of that aura_id drop below a
-> threshold value.
-> 
-> Add the following changes to handle this interrupt
-> - Increase the number of MSIX vectors requested for the PF/VF to
->   include NPA vector.
-> - Create a workqueue (refill_npa_inline_ipsecq) to allocate and
->   refill buffers to the pool.
-> - When the interrupt is raised, schedule the workqueue entry,
->   cn10k_ipsec_npa_refill_inb_ipsecq(), where the current count of
->   consumed buffers is determined via NPA_LF_AURA_OP_CNT and then
->   replenished.
-> 
-> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
-> ---
-> Changes in V2:
-> - Fixed sparse warnings
-> 
-> V1 Link: https://lore.kernel.org/netdev/20250502132005.611698-12-tanmay@marvell.com/
-> 
->  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 94 ++++++++++++++++++-
->  .../marvell/octeontx2/nic/cn10k_ipsec.h       |  1 +
->  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  4 +
->  .../ethernet/marvell/octeontx2/nic/otx2_reg.h |  2 +
->  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  4 +
->  5 files changed, 104 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+On Thu, 2025-06-19 at 16:05 +0800, Lizhi Xu wrote:
+> The scan req of a registered device may have been released, so it should
+> be checked to be valid before comparing it with the current req.
+>=20
 
-...
+I don't understand the subject/commit log at all. You're now accepting
+scan_done() with a NULL scan request, why does that make sense?
 
->  static int cn10k_inb_cpt_init(struct net_device *netdev)
->  {
->  	struct otx2_nic *pfvf = netdev_priv(netdev);
-> -	int ret = 0;
-> +	int ret = 0, vec;
-> +	char *irq_name;
-> +	void *ptr;
-> +	u64 val;
->  
->  	ret = cn10k_ipsec_setup_nix_rx_hw_resources(pfvf);
->  	if (ret) {
-> @@ -528,6 +587,34 @@ static int cn10k_inb_cpt_init(struct net_device *netdev)
->  		return ret;
->  	}
->  
-> +	/* Work entry for refilling the NPA queue for ingress inline IPSec */
-> +	INIT_WORK(&pfvf->ipsec.refill_npa_inline_ipsecq,
-> +		  cn10k_ipsec_npa_refill_inb_ipsecq);
-> +
-> +	/* Register NPA interrupt */
-> +	vec = pfvf->hw.npa_msixoff;
-> +	irq_name = &pfvf->hw.irq_name[vec * NAME_SIZE];
-> +	snprintf(irq_name, NAME_SIZE, "%s-npa-qint", pfvf->netdev->name);
-> +
-> +	ret = request_irq(pci_irq_vector(pfvf->pdev, vec),
-> +			  cn10k_ipsec_npa_inb_ipsecq_intr_handler, 0,
-> +			  irq_name, pfvf);
-> +	if (ret) {
-> +		dev_err(pfvf->dev,
-> +			"RVUPF%d: IRQ registration failed for NPA QINT\n",
-> +			rvu_get_pf(pfvf->pdev, pfvf->pcifunc));
-> +		return ret;
-> +	}
-> +
-> +	/* Enable NPA threshold interrupt */
-> +	ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_INT);
-
-Hi Tanmay,
-
-ptr is set but otherwise unused in this function.
-Probably it should be removed.
-
-Flagged by clang and gcc with -Wunused-but-set-variable
-
-Also, Sparse warns that the return type of otx2_get_regaddr()
-is  void __iomem *, but ptr does not have an __iomem annotation.
-
-> +	val = BIT_ULL(43) | BIT_ULL(17);
-> +	otx2_write64(pfvf, NPA_LF_AURA_OP_INT,
-> +		     ((u64)pfvf->ipsec.inb_ipsec_pool << 44) | val);
-> +
-> +	/* Enable interrupt */
-> +	otx2_write64(pfvf, NPA_LF_QINTX_ENA_W1S(0), BIT_ULL(0));
-> +
->  	return ret;
->  }
->  
+johannes
 
