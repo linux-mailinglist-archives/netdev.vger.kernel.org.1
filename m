@@ -1,288 +1,114 @@
-Return-Path: <netdev+bounces-199716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F388AE18C2
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:24:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3EFFAE18C4
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0F993BA6C5
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:24:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A8654A5795
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0232027D781;
-	Fri, 20 Jun 2025 10:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC45280328;
+	Fri, 20 Jun 2025 10:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i6IeFcsc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzrLYvSV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9F2199947;
-	Fri, 20 Jun 2025 10:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750415086; cv=fail; b=SkpQ+ZlWvn2hNlAUcAuowo1thNOq8FJkRdP6xnu7nycv5O1sm9VaVmhQ0T4AeSOd09MbfDzx3IDtIvMaysc4WyW/hpwQe1WxTWFNns5i+K0hwa9BXAl1FEFVU4Hp5CSlCYBzg+dnrm4VRv335Y4AmlunYM5ACO28uL94veC2gCI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750415086; c=relaxed/simple;
-	bh=Zv3wMyjBoFah3B9o+/TqoDbNRq9ve8j0sggGuxogXGc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HKZF95O9tD6F315PHFoQ6aJsJnHlaHTwA35zr3sy6J39R0SvbgE4zULnTa2T9eNbPvdYD47VUQHaBXXQMCoduXF3+kg+X166Vn+zS1xrmn/TJS349sr8owvHftgf2xKo1xzzSoU5igUdgKrFQmG5rASELjMlTXwZFBLSL80jxs0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i6IeFcsc; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750415085; x=1781951085;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Zv3wMyjBoFah3B9o+/TqoDbNRq9ve8j0sggGuxogXGc=;
-  b=i6IeFcscKrfIhfxgpXYdSKztIH31nvqVYlitNkoBtycijXvvikb7xVIv
-   JqaqIKDWq6nDhr5OxX8NmFH9tRyCMzsVhX0KirhWDWqTVzEox1SGtM5xL
-   w2B3dhTUpTO/R90Tfxuli+dp+uk8LkFI22OYjwWWUwEYHlatdp4Op1f42
-   ycGA81UC+2QNUhZJ5K2hx6Rk++FRQbr2EBBETpvt2oJD8qtYdHmmDh1+F
-   y6MqShmkk4SwlfPaEbBu0Bl77senM6ywvRC4krzpP8wq2NvBG6rnJgvAT
-   WXSVMDZh/15TzrnbtYRd/LTapASwSKZ6SPpmHsXJDScYtOWZGDYAMCIOt
-   Q==;
-X-CSE-ConnectionGUID: nbk0NtD1R4Wh9GYeEM1Ggw==
-X-CSE-MsgGUID: I3Nw86cmQXeA552+tbzXig==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="63363213"
-X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
-   d="scan'208";a="63363213"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 03:24:42 -0700
-X-CSE-ConnectionGUID: 3xh+KJZdQ+ON01yDp2h8Aw==
-X-CSE-MsgGUID: CMJS/f6kTSaf5WfnDe9CbA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
-   d="scan'208";a="151419579"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 03:24:41 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 20 Jun 2025 03:24:40 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Fri, 20 Jun 2025 03:24:40 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.57)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 20 Jun 2025 03:24:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Tcd26HrDP95irsWBcHP1R6q2z7jkfKL+hCitY3a+O1tK5nl1gio9zl1n9kyhoHBfv1Qgo552BH/usaAynVPH9cZp1N260gWNsnn175SJfEhJwGCvr4ornXiG4q406m/Z0wgMAZz8MUggkIzcvjzNlM9/IkDxaD/SoqcbEdQTPdRpmazR0PqrocERKmYDrxiXft934y6uxkeJDqs9ZH1RjkS9Flvn9ItuTlp/sTxxU75jeHWnMwnpBPPAs6i1TCTG4BsI2wnY4ZULq13WSj0khft98P28cmBU4kXU91Qgp4+rUXuIXnA/g1OJHAUc9FkvYfnG80CU5Hquyhx65Go42w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NMvQrC17/EPSNhVYeJu88N6g79pGspzRihx/RXHjh/I=;
- b=lCVh0piui+K64fOrYx60ety3+nNBRbNucY5S2daEka8gx0ZF/39epnUVZLnoPRajMDEmaji5VEob3om9NcRlpkpDbNH7a+YVV0qc0lqpxxcvbISPyP9iwCXh/5LAV72/FMTDEKZwXlZG7yl/82duanu2HX17HnIm8DGnFzXGLYDfsToH/3FPucSTolLnGac786GJPCsTlq8nq3dpjukHXjfvRFJKlTLIZnSdchzE17HzeCg3ZXptMiwY+b82sDsaFSZIuUr9vpaYyqUwpns7zWoqadCmhedUYbJoAo1YpdJClI+vx0LBmwcr/rHuH/WCbVT2VrpuKGZPFC+9alsb3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by BL4PR11MB8869.namprd11.prod.outlook.com (2603:10b6:208:5a8::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.30; Fri, 20 Jun
- 2025 10:24:37 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%7]) with mapi id 15.20.8769.022; Fri, 20 Jun 2025
- 10:24:35 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, Jonathan Corbet
-	<corbet@lwn.net>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	Shinas Rasheed <srasheed@marvell.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	Brett Creeley <brett.creeley@amd.com>, "Blanco Alcaine, Hector"
-	<hector.blanco.alcaine@intel.com>, "Hay, Joshua A" <joshua.a.hay@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, Kurt Kanzenbach <kurt@linutronix.de>, "Marcin
- Szycik" <marcin.szycik@linux.intel.com>, Brett Creeley <bcreeley@amd.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next, v3 1/2] igc: Relocate RSS
- field definitions to igc_defines.h
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next, v3 1/2] igc: Relocate RSS
- field definitions to igc_defines.h
-Thread-Index: AQHb4cqlkqsAnlQU90mfFe95zCxG07QL11jA
-Date: Fri, 20 Jun 2025 10:24:35 +0000
-Message-ID: <IA3PR11MB8986E8534B00D2B3D17C7861E57CA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20250620100251.2791202-1-yoong.siang.song@intel.com>
- <20250620100251.2791202-2-yoong.siang.song@intel.com>
-In-Reply-To: <20250620100251.2791202-2-yoong.siang.song@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|BL4PR11MB8869:EE_
-x-ms-office365-filtering-correlation-id: 536ed57d-fe2f-4a80-2be4-08ddafe4a7ac
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018|921020;
-x-microsoft-antispam-message-info: =?us-ascii?Q?NLFAPiy8Klh+YJu0L1BGHI4cvFDy9N6Piu5mAbe/2buufeM/t2oR+PGNZx/J?=
- =?us-ascii?Q?xJPVfNJTJZN7UJLzIm5Lndir/IumqHAaQ8VHD4Nnn24ZHofjlYKK5fdy51bT?=
- =?us-ascii?Q?sA21D1fttgtud3YeJc8pC/fDJpjauZEjVEG/sjBEtQpk3XiXc4hgEX8paW1A?=
- =?us-ascii?Q?RvTrXFrQjlAeH9pz3jVMzK7yLGymcdBVnrAmwT22+t+oe7dHoglGYDgWk0FW?=
- =?us-ascii?Q?rKO28hmEYGEB3l55jsEn6kkcy79/1I6MHzvawLfs7bFIRRIJt882PVCIkwVE?=
- =?us-ascii?Q?40zmBQEiRwZ7t0Z6zYax7OZBNpeOAhMoyGfd3sQv7k5atcfGJCDZLI00syKX?=
- =?us-ascii?Q?F+zpg0pMhbb+DfEqZ6oxhL49OeiFPMT2Ypwc0/nqrgkjYsUfM4RPtfc1DKwh?=
- =?us-ascii?Q?Xl3g9DABJ0JiN6YfhJ9WzBZlH/cpntwxrx8mCGRb+aXbmsWzhL78Qn0SLdWB?=
- =?us-ascii?Q?r6MfH3urJvvs9TiUe1bl6lLYlGTHMgD4SIJxFXCtx+Cold/M0g/vLOTfFlCf?=
- =?us-ascii?Q?tj82We8yiApHpexQ14Kqf4gpMIMk+/ceT8yOCpadG0srvjkTb/TlYIsbXi8O?=
- =?us-ascii?Q?5a2mMDIzFF9jaXiEn3T8vzH46p7mfi5n9PT2zuwFT0gIeeV5D3kFlLxidHxA?=
- =?us-ascii?Q?LIRwLqTpS5uEgTv7RXvcq0bd543zuBbs5MCtP5d36T21zLruNdlzSRBJRSnk?=
- =?us-ascii?Q?8rFnzpe2IEA0BcZCaFoyzsqq9tgJJF/2sM8HamlFAqAwXBLlwSZb5S3SVnc7?=
- =?us-ascii?Q?ZSW2Sc6oO66wg+x27TzB40+mVlmEO1J2iQmL0EChkB0kBVfqUIGVIIRiF8yO?=
- =?us-ascii?Q?vD+Lb4eaQgEKEmQkE4CbJRdwbfCU/8BNYwYp8163gDJkN1w+E2Kzn+DOEwii?=
- =?us-ascii?Q?xwh0ohsj8uq8VUiTeJNphIWktP5UgAEidPPeQKIQOVeS3cTf6iPUi7AgsZS/?=
- =?us-ascii?Q?kRpt3sjt4CRnoz24B3movsZIdqXQiTGptgIyMylS1bt0WKJNRkWbLIqgoV0P?=
- =?us-ascii?Q?Ok9ZrXeohHysXn/TxKx5IRpIw2zWa7+v7u98uJvbm1UDEg3RKamvEXgyGX1b?=
- =?us-ascii?Q?ke0p9bPFU8nBXmQHbj/Pu0jIEw5CgA5MfOL74vlGmyxriOZKhOkLH3HSJWuk?=
- =?us-ascii?Q?uYbMP74HB9DxV8lAzqkeDXnKdI2cRLKpeQX5RUJifYG1jsNjKQwtrAuHXVG2?=
- =?us-ascii?Q?m0g6ZmMMfUE7Ch62o4T4wGPNb0gCNLXIXQxOSagQXlBkxnc6xRGgLTH6KpYu?=
- =?us-ascii?Q?iC9FageT8ht25X9absMqrZ1thdPtOcE+Ev1/rCURbYR+KCwIlqr9zExJd3HW?=
- =?us-ascii?Q?/Jy7cFqNgcvv7CBiMqHVGJjRymv74VKZxuTyCE2gAXGdLxzDeA0egmSWMw3R?=
- =?us-ascii?Q?h4YkByIm1pclO5FzsfMEWqTEH6Ey80ZjOHtAYTDon6C8yZclm/XARC+lx539?=
- =?us-ascii?Q?uAJN3Y/UDINkE5uhfmTsMEzBRJIQSrl+jRpBJLLuV+ljNs5PvpZNSo/puv2g?=
- =?us-ascii?Q?mInJDnVjGUXr/Ak=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?b6qE9Jo2own4NWy6GFB4GIJzBopRfnNjEmWaeLBG7SM2/bCnyo/qOTYCnK1X?=
- =?us-ascii?Q?pZlir57jFhXkfJ8hwnS16sJA4Sh1fl8A6HoXdB2NeX8Fj3Z5fgPsrXwuV2VW?=
- =?us-ascii?Q?CZWAfNFBsAD0gBo0ogItqsuy8GACr3Ju5Jvm090TPtsVKyDEFD2Ow6L5lb+X?=
- =?us-ascii?Q?TNqOUrIRsXvsSQ18ZvzyU9pxNJTlGUroGjIMnC+ZtiSjr7/skjQcLovkLlQq?=
- =?us-ascii?Q?vo4/srh2J3oniKEeQulnXx3EpqlVsL+IKA096h7PraGgNOqBK568A2WYtOVv?=
- =?us-ascii?Q?R4pX+xlwQ3rVg4YWDT15SeAZzn7LG/trIv9aqYv7HpyTK7QxPvMMQqD520Un?=
- =?us-ascii?Q?FHs4MoNQnnXcNqNHU7fqpxs4PrgZqguanydaB534Z8Wi4HYVAyeFhrM9KAr+?=
- =?us-ascii?Q?+olctIULgyqJyBQM/muidDmWiXdZDLZ2z8dTvWvajLCscdvFe/fNgvZxFNaJ?=
- =?us-ascii?Q?Rw227N2Yb0XOtwv/7cyAkFiHk+pGqCpMDTfKUEez0BPh45gNxXHwAWrpyNZ9?=
- =?us-ascii?Q?03K2CoBf4y6GWaqoq2eQa3QCxQfq6LGrhghhotWCjz9IpxGijaQ+pJ3M1bQi?=
- =?us-ascii?Q?663DEJPKfbYAdJbXufFpgnyXBS62q8VwdXSS4VBxnTndTulXRr2O4ab6fsOg?=
- =?us-ascii?Q?lG1C9ObJwP/rnhY3ZUoP3ynDf25U/eWZTxLq5lKPdvQNISEQnob4ChnToOic?=
- =?us-ascii?Q?A6bGHtmSp8eqr7evY2DSceWjpQlGGL7KODu+n6DnTHER2Ou0LCyPjttyntFq?=
- =?us-ascii?Q?1a0TX1ItEomrTFS8D/+C3LYSbOianVQ3spDAD2eHUJjJuIgG0vuGaTtYHRMY?=
- =?us-ascii?Q?ewDeHB3Vg3xU2YZEbDcdtUmYcOqsqEQG/FzUr7B5lzhT8vyvjGXp4xesT5OQ?=
- =?us-ascii?Q?sh6iUupWKIjN1mPA1pUVpbS0J9YMdBpyI+kFO2JBk4EOUgWANt5M2co6/0YV?=
- =?us-ascii?Q?EdEII2VILCsdiUHP30JWjwlfxHPQqQQG1q9rNbn/o9cOTPg/gvdAtnuDfcAs?=
- =?us-ascii?Q?AWaPqzOoArRsTk2t4Cq/21fM6bTmdGvSoZBiUFmm+Vv4eiUOaooTxeAy4AhJ?=
- =?us-ascii?Q?N2nHugEwtgg8dL38vZ3xQFCZVodiHRn8w0BLjEjB9vuOkWzhbP/IzD4/cH5s?=
- =?us-ascii?Q?SSAv66I9B8LyGoN4L0/uKs2d7wM3qct/UcZCd8zPykjaPA+capzl/iFmdRD6?=
- =?us-ascii?Q?9wJ0T8FckJr6v+aVhqi13KB3tF6v/n6d4ijbxD9PWreg3dzVzwlp8A3gPGNs?=
- =?us-ascii?Q?p/vWmgF05O0qcVuS4znh40DT9NX8/Ncbpf3KZZaMc3BC5Ri7CMcYlV1h2f2G?=
- =?us-ascii?Q?qqRV08w0pEpeB8qk5c9QMZLtnXEUzxvT55k2GOoNEXOfwsFwc7Sv3ihnaACi?=
- =?us-ascii?Q?V9xAGp548/OV5F4KvpWgrhEmyO3FoorhWgKXWAsJR3nGL3x5Q9DTnNHOCJR6?=
- =?us-ascii?Q?4saVYgcVLxC1m5eUxFHDXJK1Hh46XVcKQdmGc0tt8MOMdmKJkzY2yk/Ak532?=
- =?us-ascii?Q?sSAsQ773UYD6XEN6ZdczfuIOwRRQlYWJL3sxYl6oIQUV8ueY85IrFF5EUBoN?=
- =?us-ascii?Q?pvqsj0eREPAfBFqdxvxFi5gKH/XFe95BiYr0k8PDXlpqhTMmJ/LZmihCNQhb?=
- =?us-ascii?Q?ng=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D052199947;
+	Fri, 20 Jun 2025 10:25:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750415107; cv=none; b=VbT9jQAuDdH81KX2wzuVVVd3beWeHexfPXwLXCHSNh/K7ZsGh8nZTK9kYUzH4ooofHD4Zx2U6TMy2EB87Nc8LrViQNV3G5w8S+ZfjFSp9EALEfzEIPsQtvGrJRlftBZvYjnXI/hBNtOqqrYqhHiDwzXFH04l2PbTKya1FWj9dwk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750415107; c=relaxed/simple;
+	bh=AM7DVcQLLEVCySf0Dm2EF4P8th0PDvSwnYa8gtMQNbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mW7qThAXNmvIkXvdINJqShOavepjfpJd9dkApooCktgRi+tHewXikXNJ6FehLNnK22kIjmzF6HXU+QjkeodCKv4LTWs/P7h11Xb9pnAdcEiLsEcV7I7WmzUdBtu97xr4lxFlNsw+AU9gFAgs9H2e02DZlDaIFp2Md2legWSwsvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzrLYvSV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16F4DC4CEEE;
+	Fri, 20 Jun 2025 10:25:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750415106;
+	bh=AM7DVcQLLEVCySf0Dm2EF4P8th0PDvSwnYa8gtMQNbA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uzrLYvSVfmYRwzYPrxkixlOGWyI5b9wQDA7R/NT5k9jDgG8fpIONX+anIhKq2cEXV
+	 /UBEUHa0wnoGZoyGr239oYiF1x7yOZ3goHGly+fq389YY30O/2xlqKiNk/4IYHJ+ha
+	 01MG/9/s5WuvUja1VVDHUwrEM5FtP5JsQnEGJ8YFNMZ8rRN+j0dspjOoRV7jhkmpMI
+	 jQLT6TlZ/hhH11vK3jtvxsIx7ygFI1jo9fd3GRyaHMfA6h8ePzMcETylLtOK8Uxy47
+	 OKEBLq+XU48e8jyQYskY0VpDIO4n4SRIAznUlFSXaL/rfPnyyqHpUBhvFhSnL6kINu
+	 ZqvkBkye2i/wg==
+Date: Fri, 20 Jun 2025 11:25:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ryan.Wanner@microchip.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: cadence: macb: Expose REFCLK as a device tree
+ property
+Message-ID: <20250620102501.GF194429@horms.kernel.org>
+References: <cover.1750346271.git.Ryan.Wanner@microchip.com>
+ <c5de54b31ed4a206827dfaf359b0bb9042aaca74.1750346271.git.Ryan.Wanner@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 536ed57d-fe2f-4a80-2be4-08ddafe4a7ac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2025 10:24:35.6698
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ALcBdtcuGcZJGtvHn9JADOZu+R/XlKJ9Cr7SbM5vVhmfJx2HiCGccGghmxLb2NFGZuRSD014ADNHeG5KXWN33jEeMUx2ZhVpyJHrNycoDCg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR11MB8869
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c5de54b31ed4a206827dfaf359b0bb9042aaca74.1750346271.git.Ryan.Wanner@microchip.com>
 
-
-
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Song Yoong Siang
-> Sent: Friday, June 20, 2025 12:03 PM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; David S . Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Richard
-> Cochran <richardcochran@gmail.com>; Alexei Starovoitov
-> <ast@kernel.org>; Daniel Borkmann <daniel@iogearbox.net>; Jesper
-> Dangaard Brouer <hawk@kernel.org>; John Fastabend
-> <john.fastabend@gmail.com>; Gomes, Vinicius
-> <vinicius.gomes@intel.com>; Jonathan Corbet <corbet@lwn.net>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; Shinas Rasheed
-> <srasheed@marvell.com>; Tian, Kevin <kevin.tian@intel.com>; Brett
-> Creeley <brett.creeley@amd.com>; Blanco Alcaine, Hector
-> <hector.blanco.alcaine@intel.com>; Hay, Joshua A
-> <joshua.a.hay@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>; Keller,
-> Jacob E <jacob.e.keller@intel.com>; Kurt Kanzenbach
-> <kurt@linutronix.de>; Marcin Szycik <marcin.szycik@linux.intel.com>;
-> Brett Creeley <bcreeley@amd.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH iwl-next, v3 1/2] igc: Relocate RSS
-> field definitions to igc_defines.h
->=20
-> Move the RSS field definitions related to IPv4 and IPv6 UDP from igc.h
-> to igc_defines.h to consolidate the RSS field definitions in a single
-> header file, improving code organization and maintainability.
->=20
-> This refactoring does not alter the functionality of the driver but
-> enhances the logical grouping of related constants
->=20
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+On Thu, Jun 19, 2025 at 10:04:14AM -0700, Ryan.Wanner@microchip.com wrote:
+> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+> 
+> The RMII and RGMII can both support internal or external provided
+> REFCLKs 50MHz and 125MHz respectively. Since this is dependent on
+> the board that the SoC is on this needs to be set via the device tree.
+> 
+> This property flag is checked in the MACB DT node so the REFCLK cap is
+> configured the correct way for the RMII or RGMII is configured on the
+> board.
+> 
+> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 > ---
->  drivers/net/ethernet/intel/igc/igc.h         | 4 ----
->  drivers/net/ethernet/intel/igc/igc_defines.h | 3 +++
->  2 files changed, 3 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/igc/igc.h
-> b/drivers/net/ethernet/intel/igc/igc.h
-> index 1525ae25fd3e..0b35e593d5ee 100644
-> --- a/drivers/net/ethernet/intel/igc/igc.h
-> +++ b/drivers/net/ethernet/intel/igc/igc.h
-> @@ -406,10 +406,6 @@ extern char igc_driver_name[];
->  #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
->  #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
->=20
-> -#define IGC_MRQC_ENABLE_RSS_MQ		0x00000002
-> -#define IGC_MRQC_RSS_FIELD_IPV4_UDP	0x00400000
-> -#define IGC_MRQC_RSS_FIELD_IPV6_UDP	0x00800000
-> -
->  /* RX-desc Write-Back format RSS Type's */  enum igc_rss_type_num {
->  	IGC_RSS_TYPE_NO_HASH		=3D 0,
-> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h
-> b/drivers/net/ethernet/intel/igc/igc_defines.h
-> index 86b346687196..d80254f2a278 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-> @@ -383,11 +383,14 @@
->  #define IGC_RXDEXT_STATERR_IPE		0x40000000
->  #define IGC_RXDEXT_STATERR_RXE		0x80000000
->=20
-> +#define IGC_MRQC_ENABLE_RSS_MQ		0x00000002
->  #define IGC_MRQC_RSS_FIELD_IPV4_TCP	0x00010000
->  #define IGC_MRQC_RSS_FIELD_IPV4		0x00020000
->  #define IGC_MRQC_RSS_FIELD_IPV6_TCP_EX	0x00040000
->  #define IGC_MRQC_RSS_FIELD_IPV6		0x00100000
->  #define IGC_MRQC_RSS_FIELD_IPV6_TCP	0x00200000
-> +#define IGC_MRQC_RSS_FIELD_IPV4_UDP	0x00400000
-> +#define IGC_MRQC_RSS_FIELD_IPV6_UDP	0x00800000
->=20
->  /* Header split receive */
->  #define IGC_RFCTL_IPV6_EX_DIS	0x00010000
-> --
-> 2.34.1
+>  drivers/net/ethernet/cadence/macb_main.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index d1f1ae5ea161..146e532543a1 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -4109,6 +4109,8 @@ static const struct net_device_ops macb_netdev_ops = {
+>  static void macb_configure_caps(struct macb *bp,
+>  				const struct macb_config *dt_conf)
+>  {
+> +	struct device_node *np = bp->pdev->dev.of_node;
+> +	bool refclk_ext = of_property_present(np, "cdns,refclk-ext");
+>  	u32 dcfg;
 
+Hi Ryan,
+
+Some minor feedback from my side.
+
+1. of_property_read_bool() seems slightly more appropriate here
+2. Please consider arranging local variables in Networking code
+   in reverse xmas tree order - longest line to shortest.
+
+   This tool can be helpful for this
+   https://github.com/ecree-solarflare/xmastree
+
+	struct device_node *np = bp->pdev->dev.of_node;
+	bool refclk_ext;
+	u32 dcfg;
+
+	refclk_ext = of_property_read_bool(np, "cdns,refclk-ext");
+
+...
 
