@@ -1,148 +1,126 @@
-Return-Path: <netdev+bounces-199726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A57AE1942
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:53:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBFD6AE1948
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94CFB1BC5A11
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D1CE5A5231
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1792283FEE;
-	Fri, 20 Jun 2025 10:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF505277CA9;
+	Fri, 20 Jun 2025 10:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBj7cyBc"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6435255250
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 10:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A153B229B27;
+	Fri, 20 Jun 2025 10:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750416818; cv=none; b=Gc9GfdD0X5J3tgecGVgUGgl/an859ZgA+XrBbTmg91aquZfOch7b3aBt7b0eQgYNujay7rf3TNp5OjySKoIG7ZlXveCZISObh0xHqMZl8jBPJGh2emNrwyCUlu4/HUOBrsiMi6yI8B/Jsj/pkbEihy8+Mr+SAG6gzKc9BZ7Vchg=
+	t=1750416948; cv=none; b=ihcRd4qIzyBiJ0ElHD5eMSedU08SUWsOZ3n1hPA3Gf6MOkFQ6yWL9sVBIAYPZK3Lmrk0XBKmwJLG4H1cYC2jrCQgEQruhuuQNXIXxIel8r79vHE2KeWIkpqszU1hmGZCbpI66wCIlNCywCQguivQxcGEK2Z8GibRNln/QD7P3gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750416818; c=relaxed/simple;
-	bh=qjt6va4bHv90YxsmS+LUwFTu/P0G68OsG6HgL0/WgmY=;
+	s=arc-20240116; t=1750416948; c=relaxed/simple;
+	bh=k97+mPlv7DCXcx0kQwSS6z/Atoes8Yz92s3zVuX//jE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G7+4bvPw8SPKOTA1IJ4TnGYNa0gRCuk00TgicAd0arCp27ZQXgWFaoLP8uQHWYL9fN/360nkSc+eDFF6cir+kOUt2ibThCr3El5IsbYVztBwLBY6Dwh21W2q1T848jCRmfJTz0y7iFW/t5z+g8pqTUphjKRE4SPnAxHK0x/zifk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uSZN7-0002ME-02; Fri, 20 Jun 2025 12:53:25 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uSZN5-004Rpo-2I;
-	Fri, 20 Jun 2025 12:53:23 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uSZN5-007MU9-1u;
-	Fri, 20 Jun 2025 12:53:23 +0200
-Date: Fri, 20 Jun 2025 12:53:23 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v4 0/4] net: selftest: improve test string
- formatting and checksum handling
-Message-ID: <aFU9o5F4RG3QVygb@pengutronix.de>
-References: <20250515083100.2653102-1-o.rempel@pengutronix.de>
- <20250516184510.2b84fab4@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=f4ajUHWbDXJvp7fmyykYnVNQyJmFSN7yNqwLNcH4xIcHHlwRFNaFvxxYqbyQzGr8tpFFchq5cpGNtZGj8/G1uMo+aDx53bjd+APLKHntDHr4ecN5q7RV5KyLc5p3QW1nj9hEZNnt02+wMczejXNI6Jm6DOWtYn8RQDSpp0zW46g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBj7cyBc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 629ACC4CEED;
+	Fri, 20 Jun 2025 10:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750416948;
+	bh=k97+mPlv7DCXcx0kQwSS6z/Atoes8Yz92s3zVuX//jE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UBj7cyBcXOTbJyypjPgMlL4vh9t4/aIP3lqJoS/sOrDz0zRH7ylnpO7jYOxwDZOjv
+	 Nf+6MlDY7DcWyA77A6RoQVNDkhADEX6/ucCUUYcyF0SnkputbY8Q7YFi4Wgrb1urBl
+	 /TPQKtQ659VWsiZsEfLH4Dk8LapkK+hB+tAepGhMbiV+YtUnfE2n9sL+JQNbau4lou
+	 xWKQj7wNawfl6TgMwPOpYPflLAzhrmKOwlolW+2r/7PI+qGGzBXU5QTF1W85uQxzO2
+	 wktXu3HoidxlK7HwmLXVx/heg7cXppdzNMICiFvxsxk81vKfV6MU1ZrfClMr8G0Np8
+	 I1AG5mai4pczw==
+Date: Fri, 20 Jun 2025 11:55:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: davem@davemloft.net, leon@kernel.org, sgoutham@marvell.com,
+	bbhushan2@marvell.com, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	Rakesh Kudurumalla <rkudurumalla@marvell.com>
+Subject: Re: [PATCH net-next v2 05/14] octeontx2-af: Add support for CPT
+ second pass
+Message-ID: <20250620105544.GI194429@horms.kernel.org>
+References: <20250618113020.130888-1-tanmay@marvell.com>
+ <20250618113020.130888-6-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250516184510.2b84fab4@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20250618113020.130888-6-tanmay@marvell.com>
 
-Hi Jakub,
-
-Sorry for the delay in getting back to you.
-
-On Fri, May 16, 2025 at 06:45:10PM -0700, Jakub Kicinski wrote:
-> On Thu, 15 May 2025 10:30:56 +0200 Oleksij Rempel wrote:
-> > - Inconsistent checksum behavior: On DSA setups and similar
-> >   environments, checksum offloading is not always available or
-> >   appropriate. The previous selftests did not distinguish between software
-> >   and hardware checksum modes, leading to unreliable results. This
-> >   patchset introduces explicit csum_mode handling and adds separate tests
-> >   for both software and hardware checksum validation.
+On Wed, Jun 18, 2025 at 04:59:59PM +0530, Tanmay Jagdale wrote:
+> From: Rakesh Kudurumalla <rkudurumalla@marvell.com>
 > 
-> What device are you talking about? How is this a problem with 
-> the selftest and not with the stack? If the test is flaky I'd 
-> think real traffic will suffer too. We pass these selftest packets
-> thru xmit validation AFAICT, so the stack should compute checksum
-> for the if the device can't.
+> Implemented mailbox to add mechanism to allocate a
+> rq_mask and apply to nixlf to toggle RQ context fields
+> for CPT second pass packets.
 > 
+> Signed-off-by: Rakesh Kudurumalla <rkudurumalla@marvell.com>
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 
-Let me first describe the setup where this issue was observed and my findings.
-The problem occurs on a system utilizing a Microchip DSA driver with an STMMAC
-Ethernet controller attached to the CPU port.
+...
 
-In the current selftest implementation, the TCP checksum validation fails,
-while the UDP test passes. The existing code prepares the skb for hardware
-checksum offload by setting skb->ip_summed = CHECKSUM_PARTIAL. For TCP, it sets
-the thdr->check field to the complement of the pseudo-header checksum, and for
-UDP, it uses udp4_hwcsum. If I understand it correct, this configuration tells
-the kernel that the hardware should perform the checksum calculation.
+>  void rvu_apr_block_cn10k_init(struct rvu *rvu)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
 
-However, during testing, I noticed that "rx-checksumming" is enabled by default
-on the CPU port, and this leads to the TCP test failure.  Only after disabling
-"rx-checksumming" on the CPU port did the selftest pass. This suggests that the
-issue is specifically related to the hardware checksum offload mechanism in
-this particular setup. The behavior indicates that something on the path
-recalculated the checksum incorrectly.
+...
 
-When examining the loopbacked frames, I observed that the TCP checksum was
-incorrect. Upon further investigation, the xmit helper in net/dsa/tag_ksz.c
-includes the following:
+> +int
+> +rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
+> +				      struct nix_rq_cpt_field_mask_cfg_req *req,
+> +				      struct msg_rsp *rsp)
+> +{
+> +	struct rvu_hwinfo *hw = rvu->hw;
+> +	struct nix_hw *nix_hw;
+> +	int blkaddr, nixlf;
+> +	int rq_mask, err;
+> +
+> +	err = nix_get_nixlf(rvu, req->hdr.pcifunc, &nixlf, &blkaddr);
+> +	if (err)
+> +		return err;
+> +
+> +	nix_hw = get_nix_hw(rvu->hw, blkaddr);
+> +	if (!nix_hw)
+> +		return NIX_AF_ERR_INVALID_NIXBLK;
+> +
+> +	if (!hw->cap.second_cpt_pass)
+> +		return NIX_AF_ERR_INVALID_NIXBLK;
+> +
+> +	if (req->ipsec_cfg1.rq_mask_enable) {
 
-if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
-    return NULL;
+If this condition is not met...
 
-I assume skb_checksum_help() is intended to calculate the proper checksum when
-CHECKSUM_PARTIAL is set, indicating that the software should complete the
-checksum before handing it to the hardware. My understanding is that the STMMAC
-hardware then calculates the checksum for egress frames if CHECKSUM_PARTIAL is
-used. Since these egress frames are passed from the DSA framework with a
-tailtag, the checksum calculated by the hardware would then be incorrect for
-the original packet. The STMMAC then seems to drop ingress packets if they have
-an incorrect checksum.
+> +		rq_mask = nix_inline_rq_mask_alloc(rvu, req, nix_hw, blkaddr);
+> +		if (rq_mask < 0)
+> +			return NIX_AF_ERR_RQ_CPT_MASK;
+> +	}
+> +
 
-I'm still trying to grasp the full picture of checksumming in such complex
-environments. I would be grateful for your guidance on how this problem should
-be addressed properly.
+... then rq_mask is used uninitialised on the following line.
 
-Regarding the current patch series, do these tests and the csum_mode
-implementation make sense to you in this context? I believe it would be good
-practice to have selftests that can detect these kinds of checksum
-inconsistencies in drivers.
+Flagged by clang 20.1.7 with -Wsometimes-uninitialized, and Smatch.
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> +	configure_rq_mask(rvu, blkaddr, nixlf, rq_mask,
+> +			  req->ipsec_cfg1.rq_mask_enable);
+> +	configure_spb_cpt(rvu, blkaddr, nixlf, req,
+> +			  req->ipsec_cfg1.spb_cpt_enable);
+> +	return 0;
+> +}
+
+...
 
