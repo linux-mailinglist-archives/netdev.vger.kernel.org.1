@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-199781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB1EAE1C69
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:43:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CEA2AE1C6B
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16EAA1BC8160
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:43:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A2847A40C1
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF6A295DB8;
-	Fri, 20 Jun 2025 13:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8489B2989B3;
+	Fri, 20 Jun 2025 13:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFhKygTf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2QTAdM5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73125295523;
-	Fri, 20 Jun 2025 13:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B27A298984;
+	Fri, 20 Jun 2025 13:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750426930; cv=none; b=QkdOSkOQrcF3fxhYE386FfWDamP2gvdeojdvBvuKQiH1hp49EmE2+uYhVGP5csySMP5+onT3NgmkDo2iBZ5N48cS6ETcPju+jusQXB2ymSVLvBLNPHlu7Gaj3R8YTRXxmxoV+dqT72MKuE+4lvPTjRkckKQRZLskKCP5jSYhwUc=
+	t=1750426934; cv=none; b=U6P03cDTSphzaTf87niYbMYky25dExbukG0RWswHICR6Z7aJ6G4Q5JDykIIRI2QObz69uatL+gMcb7u44AFdVy6kJYw2DN1XWX6s7CnsQ1aEdErgJmejNhAKPgIfHcBVSahgU967N8vns4VaX2emDFrK5Cr8pG/T5GIvjQ31duA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750426930; c=relaxed/simple;
-	bh=O7NSU7w6z0Hcjgc0tS9pN9tgseLHRIsdORtIpN1QxPo=;
+	s=arc-20240116; t=1750426934; c=relaxed/simple;
+	bh=ABFeL1LM48SG2ww/d54d4OPabMjG33GrF1JFouQGUJw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IF8ML6fRRg9eTv3sysFcn9W+qtN16Q0Dh9GAW6P3yF1HNU2l1ipDcOwM6pYVf+9IUyeH9XW9GPlHZcx8X/0uL1rMIvyFhWMdLqE/WefFRVL+gwhtWfZ8qYF+HlaTkoqqrfdgmLNy7rjDE65TOtip5b6OznUrcGRhk5xSAH0AWrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFhKygTf; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=j4tPCt4n/YXXXStLuuIXqnMuwHb/Tpl0NuHbRgAj9oFa4FuUzyy1D5MeiAqXAsh2zsTIgetLYgM6+/aCKqfcUwZtctSUluEKp17R1ImimY/h9RXS7wyEOja/5sWLjoCYpXxygrKovKpcDQ52MHDzcXkjgvcUVTS2wWgztY6F3Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f2QTAdM5; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-234d3261631so12967485ad.1;
-        Fri, 20 Jun 2025 06:42:09 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2366e5e4dbaso15179345ad.1;
+        Fri, 20 Jun 2025 06:42:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750426929; x=1751031729; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750426932; x=1751031732; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v4PrwJRNlMfwkB4OAPUaXOmp2IqH98k7aBvjhcWB4Fo=;
-        b=mFhKygTf905PD4h9PeL0W1JYPgBRlObqY+aGpnZkT7fItOzmXroUfEVeFxeFk9cKe/
-         xSi9HaGc+yBfh0rvrxbO5uw6rPYOF3my64j8fTCTAyjZnK9Xw9eIHw+8y0/7+vwj1dVS
-         ZvBJGUtupfGsE0RGIE4nJdlwHZ2MSwbOVfjVGvYNZSbO088lr+aWtiDnLaAidiIINbnV
-         HrS16TVt1YtTn5YSfOYGpc2Z+s6IHIRWFaWPdAeDaiVKzzJpFFzM5pd1rpxlIfW8MzyY
-         pILr5BwFjf2e/vgwo52Wz++kO70fAL3gum2JGvPRrKSo3dbBpls2Fn8rXrjzH8zT7sdj
-         zhJA==
+        bh=KktFXTrDVATNNZzxTieALU70Rf6coIugRNl40iZdiyg=;
+        b=f2QTAdM5wxEzkL0ZID6NYT9oym+EqM70jaemX3ulI/Rn9ntiPgw5OWjFBTe3lKvWCb
+         3a21hECs7XQ1uybuZote+senOr1qGAKQrjG/wVYG+gQ4CEAW4+pOwQ2QLWLg4u1sHx9p
+         Nbe+4kSBn9hVNjedIJJpOTYbg1cZVA/70eKmaVleldj1Xx1HRYHTkoCz4ZuGAVQeYRan
+         Z8PFjhQXJ+OSqOXMpprCoIZxKyp8w9BEMGAwnXlYuiCT67r16Q5W8nAHpF87XUW2tVql
+         1Z1KU40OkNmU0kEN3WCWrlI3gYB8v77kGUbRiva6t7JVRCWsAQmJo9Xb9JHZvHX+4G+S
+         Qeeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750426929; x=1751031729;
+        d=1e100.net; s=20230601; t=1750426932; x=1751031732;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v4PrwJRNlMfwkB4OAPUaXOmp2IqH98k7aBvjhcWB4Fo=;
-        b=VRF6WZgIFrAT/f6IeLrh9Ot10ZFzx9hWoPuG0YYICkk7Gz/J3/QVBrHgJf5EIUrBNH
-         vP1UAF/vKVUKJuvvZJqq885DdS35H6cXxsEJ5wG6X8fAHHI4TzERo/QYmF+VszGotDLY
-         9oTE6ms35egsqi+ov6NZ5ztfBkquIRBgKJxix1xgkdrY+XVdXaEpRIOi1SIIAQBR4AXc
-         376CblQjb3VAlMHDy8UC7nqd6J5D4sHfxXPqEBU5W6pDGJTBcUMJYWJI2OzO2XkplcjG
-         aBvxgoP9dpCYb2wKZ9Y1RXW19PVTe+HE31ir2hdZwNXU1sgDti5WB8k3ulfU4vD15ad5
-         XAug==
-X-Forwarded-Encrypted: i=1; AJvYcCUeRGKCS098UTCEsmfzY9bP5HD/l7h9OsXSHfPOrLyVYTy4L5kodhfRJ4g7zfl/hu/rSZFiNYiygmK+2pYM@vger.kernel.org, AJvYcCVmn0pi7DAQdgcS31WBjVM/wfw6iNRGrybsT2CmQ9HLFYT6w7+Iid3vDCSMBYZsiYbDHWwZjUL0@vger.kernel.org, AJvYcCWYHsJnDeXIw6hNBN0xxMqtdG5fzv+B+4RAo5PjzPMT0WAzdit7we9XPv52woBRQ5tibl2qY4/yV5eo@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgTo5ri3DTAbohZX13PS1Ta8gA2/Gdqo0fOlIiF/rrpElY6pdf
-	hRU/AbuMrA8Q71BaMU9LlVnacF6eCctpnZ1irgFX3j9N2uda5SOqCrUc
-X-Gm-Gg: ASbGncsMNJhkzpzcXmc836pewRiOSfvBtGoqxlMQ/5G8dBLQf1u7LtHWwrGaSGtYyZL
-	OkHYi/3stLCGSDxR751ieZBso/IdgIcZs37yYYNQOKiiIMU3OKmgeVhETv2dKB6xmsbUYGiu5D+
-	0AQnmvpv3tbQp2EAqHwXF+hEIE69hsfPEJ9l65ks92fQ0X3i83sjHpn8s/axpBPVHEfyGuzh6+/
-	tJHnjYD3u/JTYrk4a/jlg4YK5DFT95JtXXr9Hk+t8JTdmEuBomM8pW/QCUHRxqTNgXQqtckR9e6
-	MUgj2+Owpwp8GvP2IQEZC/A27seZyjxN7Iel7w4uiMDmLlcpr0ObdUiYXotXOEGtsz6lhQk6YZ7
-	wE9gn
-X-Google-Smtp-Source: AGHT+IED2Sma74TmFQCXHWQz6h6HmzHgOGQKtnSIJXQFnE9KD0MU7E4a3Gq0g7Ql/v2IZ4UAr6hlwg==
-X-Received: by 2002:a17:902:e88f:b0:235:f3df:bbff with SMTP id d9443c01a7336-237d97674eemr44936455ad.4.1750426928720;
-        Fri, 20 Jun 2025 06:42:08 -0700 (PDT)
+        bh=KktFXTrDVATNNZzxTieALU70Rf6coIugRNl40iZdiyg=;
+        b=VK13cBCSQFBRHAbW3k31u3m6pQKgv/P2hIkBEW3G+96eCvDXT0DMQmyi19Z9heKtk1
+         So44b9RoW2JweP6BsQOlFR28cg2sLZbk1/xYte2g5y5Hq1nbKW/hRYU4H6xxxse6DEP6
+         AiXHqA5QSGd+fNsPPlbet+Yv4HEO2vHORyzallcQM+L95CF5N+qka0h719Zi8ZAhynCi
+         +rxNMVjqOXia/WTjG321zlNmXY/Z3edNFvTzLg8BEZ1+2AMqcWWTlOhZ9IcznSCh0LZ9
+         Q3MVTmUwwApBABYRKjX5vE/WN+nUgNVfPS4q4FdDQGaEpfeyrZ0iMBXyj8u5urncslSG
+         m/hg==
+X-Forwarded-Encrypted: i=1; AJvYcCW56cnOdlsnX+VkA8pGM8zU4lBVP5eojliI5CQqSw5PifuCM0p5UWRBtCLLp5yafP8X4pmoaXd5@vger.kernel.org, AJvYcCWZzcaxqIuXG4J2uNNSOaX7dlyp8urYfd8Wi2i6AqVGgVMzQ9rkPo7VrOOnZWuDcBo1GYRcXjnO/Hdm@vger.kernel.org, AJvYcCX392xIumfrW78am0pE7XJxvj3L9nBnepKAFnsd0NOZToIU96CFNQx66WmpzpZUsB55tK24nZ7iBfxcyYPg@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGnMFSHB/oQwMjQexeBztAsNZyvcGienWMbW16h7wEuv8m06fY
+	nZ7UPhR2AMbf4xdtl3zRqMAYjkrLji999DCryM0Vg7/rHrxgOzYvu3CF
+X-Gm-Gg: ASbGnctkUYsY7vIhNTscYyGEtGiCUOmNQutIyRdBuocxfcS0NFl7D7BfLYFw/5EPc3m
+	ox/61hdPPLqXX8dSemOXnphTqjN4kmS1t11BuwAnilN8pfNoNIa8tOe0SU+/ycKSXImILpUDigA
+	mLyYjuQSQerpgZtvlxeNU6pHx0nTnoCy2OjOQEu8uNlZq5L5+H/tEhw14chGkgzMEHriUJJEX7H
+	AtOs4cbco+qJoRpTiA7Zhsyl0rOlnStPfB4tvImilXEsuCYD/xNqnQs5fH8lS8V7PAX+URBUzLm
+	loRDXRZxm/Ii7ec4MpTP/A7rWakXAxIpdO1dCa68wepwKhZDMfCOg+HE+FGmLXHEICjXi2HUQXk
+	3iK08A4nVmvOLwIg=
+X-Google-Smtp-Source: AGHT+IEkfNpDp8DfTvJe/U+wjjEbT3Li3d9mEcyRhJ4Nu5pG4ryaYXiA26GJsWY6pgmLirClvvdUNw==
+X-Received: by 2002:a17:903:1a90:b0:231:9817:6ec1 with SMTP id d9443c01a7336-237db09947cmr43638435ad.17.1750426932199;
+        Fri, 20 Jun 2025 06:42:12 -0700 (PDT)
 Received: from localhost.localdomain ([207.34.150.221])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d861047fsm18885505ad.134.2025.06.20.06.42.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d861047fsm18885505ad.134.2025.06.20.06.42.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 06:42:08 -0700 (PDT)
+        Fri, 20 Jun 2025 06:42:11 -0700 (PDT)
 From: Kyle Hendry <kylehendrydev@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -92,9 +92,9 @@ Cc: noltari@gmail.com,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next 4/6] net: dsa: b53: mmap: Add register layout for bcm63268
-Date: Fri, 20 Jun 2025 06:41:19 -0700
-Message-ID: <20250620134132.5195-5-kylehendrydev@gmail.com>
+Subject: [RFC PATCH net-next 5/6] net: dsa: b53: mmap: Clear resets on bcm63xx EPHYs
+Date: Fri, 20 Jun 2025 06:41:20 -0700
+Message-ID: <20250620134132.5195-6-kylehendrydev@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250620134132.5195-1-kylehendrydev@gmail.com>
 References: <20250620134132.5195-1-kylehendrydev@gmail.com>
@@ -106,75 +106,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a structure to describe the ephy control register.
-Add table with single entry for bcm63268. When probing,
-try to match table entry with the chip_id.
+Make sure the ephy resets aren't being held by setting
+lowest bits in ephy control register.
 
 Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
 ---
- drivers/net/dsa/b53/b53_mmap.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ drivers/net/dsa/b53/b53_mmap.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/drivers/net/dsa/b53/b53_mmap.c b/drivers/net/dsa/b53/b53_mmap.c
-index a0c06d703861..1bebf5b9826b 100644
+index 1bebf5b9826b..a4a2f2965bcc 100644
 --- a/drivers/net/dsa/b53/b53_mmap.c
 +++ b/drivers/net/dsa/b53/b53_mmap.c
-@@ -27,9 +27,31 @@
+@@ -24,9 +24,12 @@
+ #include <linux/mfd/syscon.h>
+ #include <linux/platform_device.h>
+ #include <linux/platform_data/b53.h>
++#include <linux/regmap.h>
  
  #include "b53_priv.h"
  
-+struct b53_phy_info {
-+	u32 chip_id;
-+	u32 mask;
-+	u32 num_ephy;
-+	const u32 *ephy_offset;
-+};
++#define BCM63XX_EPHY_REG 0x3C
 +
- struct b53_mmap_priv {
- 	void __iomem *regs;
- 	struct regmap *gpio_ctrl;
-+	const struct b53_phy_info *phy_info;
-+};
+ struct b53_phy_info {
+ 	u32 chip_id;
+ 	u32 mask;
+@@ -253,6 +256,14 @@ static int b53_mmap_phy_write16(struct b53_device *dev, int addr, int reg,
+ 	return -EIO;
+ }
+ 
++static void bcm63xx_ephy_reset(struct regmap *regmap, int num_ephy)
++{
++	u32 mask = GENMASK((num_ephy - 1), 0);
 +
-+static const u32 bcm63268_ephy_offsets[] = {4, 9, 14};
++	/* Set lowest bits to deassert resets */
++	regmap_update_bits(regmap, BCM63XX_EPHY_REG, mask, mask);
++}
 +
-+static const struct b53_phy_info bcm63xx_ephy_info[] = {
-+	{
-+		/* 6318 has different reg layout,
-+		 * need to distinguish it somehow
-+		 */
-+		.chip_id = BCM63268_DEVICE_ID,
-+		.mask = GENMASK(4, 0),
-+		.num_ephy = ARRAY_SIZE(bcm63268_ephy_offsets),
-+		.ephy_offset = bcm63268_ephy_offsets,
-+	}
- };
- 
- static int b53_mmap_read8(struct b53_device *dev, u8 page, u8 reg, u8 *val)
-@@ -296,7 +318,7 @@ static int b53_mmap_probe(struct platform_device *pdev)
- 	struct b53_platform_data *pdata = pdev->dev.platform_data;
- 	struct b53_mmap_priv *priv;
- 	struct b53_device *dev;
--	int ret;
-+	int i, ret;
- 
- 	if (!pdata && np) {
- 		ret = b53_mmap_probe_of(pdev, &pdata);
-@@ -316,6 +338,14 @@ static int b53_mmap_probe(struct platform_device *pdev)
- 	priv->regs = pdata->regs;
- 
- 	priv->gpio_ctrl = syscon_regmap_lookup_by_phandle(np, "brcm,gpio-ctrl");
-+	if (!IS_ERR(priv->gpio_ctrl)) {
-+		for (i = 0; i < ARRAY_SIZE(bcm63xx_ephy_info); i++) {
-+			if (bcm63xx_ephy_info[i].chip_id == pdata->chip_id) {
-+				priv->phy_info = &bcm63xx_ephy_info[i];
-+				break;
-+			}
-+		}
-+	}
+ static const struct b53_io_ops b53_mmap_ops = {
+ 	.read8 = b53_mmap_read8,
+ 	.read16 = b53_mmap_read16,
+@@ -345,6 +356,8 @@ static int b53_mmap_probe(struct platform_device *pdev)
+ 				break;
+ 			}
+ 		}
++		if (priv->phy_info)
++			bcm63xx_ephy_reset(priv->gpio_ctrl, priv->phy_info->num_ephy);
+ 	}
  
  	dev = b53_switch_alloc(&pdev->dev, &b53_mmap_ops, priv);
- 	if (!dev)
 -- 
 2.43.0
 
