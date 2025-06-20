@@ -1,222 +1,233 @@
-Return-Path: <netdev+bounces-199776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E161AAE1C49
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:34:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8127BAE1C96
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CD611881DFD
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:34:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AC593B568C
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95A428937B;
-	Fri, 20 Jun 2025 13:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE5F28DF36;
+	Fri, 20 Jun 2025 13:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="P5PbL1cx"
+	dkim=pass (1024-bit key) header.d=average.org header.i=@average.org header.b="di7jMW1X"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+Received: from dehost.average.org (dehost.average.org [88.198.2.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DCB225777;
-	Fri, 20 Jun 2025 13:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750426428; cv=fail; b=LYD7jG1wh+7NE0canEo/HLxNqkfG4ypj141OPM7QrQDAUU+sWf/06EaO/UfIX5/LDtu6CqlgWv7zws/6rBqNPTG1PZ2T6M8/HRjsUB6zWS2v2VrgG6ldce4R6/ABI6DNiAaLRngoONOFz7dxbsCPIf0fYRYfJ+zpZ0rMWPr0e3M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750426428; c=relaxed/simple;
-	bh=3CbnkJpQorWkKvAdlEU73vDE5M7IrTfUTM6dC4Ibml0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=B2LsieyF/AzAP2RXesnAIuZbrlufr88CHi+pac01VIOn7A2HOeZYxEnDNOyNjc+7GRQtPCpgUajy/8IilP8pTtdnct/Sn4IJw7faYLlVdvk8D7Wi+o7J/SHrieIhdb6SGh63YF7CmtFn9xVGDdFM8d5m/X3dvLf9DXQnt9l7xWs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=P5PbL1cx; arc=fail smtp.client-ip=40.107.93.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u6JjrX+gb4SDSFA1VaENBZtMI8DlHBgQl4xG/5qAvt7snkPvMSMD15nTsEAmngxz9uR1JaIQNwAM91V7WFBpUIvVbAOI9P0X9QQ4qDDeGyd4gtkSj8HvifmKLzwrQUISOX1As/D/2yyO3hiKcEj+G7FnJyS9Bw1ZV22ZK2WQHzxsYG/mVJV+GwfX8S1p9G5hnNvpBRlMwVncbGE6AhNLcemVUuOE38kr26hJ0y0zVsBhcJM7/482HPW3B4pDC5TKWRwjmsbCXeiRmbN9r0frVvhJeGKw1r10zBTh0no6LKg+zra3CtG+nxZpSvg+6aYRlB4Q2vfDyBxeE4dsxIh2Lw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xygbyzZHae6tydkYniJwhIIk/scOFSSy783gdS074qc=;
- b=OdHd+sQJDpqOcc5QfKaKwUqPhju2Yf9Bc9pEyrmivUozBB8DB0nAtNAVDBEuRaCk0tMhH2nUjzGuYi9Ywn+nf5RC55BHgQfedj455yGtkvtAuo4sdqlVb/81+jcsKZ0eidoVtARJ/Q0ZcgyNcQ/pRF8pIJvh9C09xxd5wYlZMlXNIghQUHyzhUvnz8/tzkCiYTIXDlXuAdWInQuMAbFiXl9KHT0/pDu9g6P62m4GsXXIUNEKKeuYmWIjsS0DBlmihYiVDs+WXbkWEjzIs2yUkjBa74en2bpBeFkvgRNv8m5/mOsw1VPGtw56HN3FRH0rxA/Px42h77ykbUlTdTU6/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xygbyzZHae6tydkYniJwhIIk/scOFSSy783gdS074qc=;
- b=P5PbL1cxc1TdLe+tdqfDPGlPxh3TKxgJ6JSO+m9sY3uBrzx3fWeTRISvZczgCBgVEQOEu4ADT6s3sNBMnoCeL8icaI+SlY2LiAIYkxRhNRf8P1IDihXIdjI2nmzT1xtgoM3l3Uy3HnDg6q6XnHWEpTSRKO8pb/rXPM13hKLjHq7oJaiLWRTLAqXpsC8FvgFVgzYjDZPntd6gKtzkFtffymQX/+PN2k+qNvSxjLSDTah0EORQGA4xyVmMMDaGWwVL9LmtZJX93yJvzvKCYSlrB/UzuEmN55PveFgPXpcSHFX65fsUiz5R5PrW2mi0d9WDWdzSEPUebH9XmmCyo0CQbA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by LV8PR12MB9450.namprd12.prod.outlook.com (2603:10b6:408:202::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Fri, 20 Jun
- 2025 13:33:43 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%4]) with mapi id 15.20.8835.027; Fri, 20 Jun 2025
- 13:33:43 +0000
-Date: Fri, 20 Jun 2025 13:33:36 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Arnd Bergmann <arnd@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eli Cohen <elic@nvidia.com>, Shay Drory <shayd@nvidia.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, moshe@nvidia.com
-Cc: Arnd Bergmann <arnd@arndb.de>, Erez Shitrit <erezsh@nvidia.com>, 
-	Cosmin Ratiu <cratiu@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, mbloch@nvidia.com
-Subject: Re: [PATCH] [RFC] net/mlx5: don't build with CONFIG_CPUMASK_OFFSTACK
-Message-ID: <lumrrt47kax45kmx37jw4w652f6biunsfnlkkthxsebbcfpso6@tuyiykihlisc>
-References: <20250620111010.3364606-1-arnd@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250620111010.3364606-1-arnd@kernel.org>
-X-ClientProxiedBy: TL2P290CA0006.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::6)
- To IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE5D28B4FD;
+	Fri, 20 Jun 2025 13:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.2.197
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750427293; cv=none; b=WY8yoi8Nle89FzJQRpFnMjVtD/EqLOdgRWTtjLpP4IqKEp0g8MRIHSRAXgeuRj63v0H2oMFFmM6E3bfqXLWQ3Bfz75AiFvzP/i/uW/sZ7PSztS+yorcnfuC+2w7sDKsGJgg31n2XZ2WsPNlfPaBERDSED7Q12F3s/5EzNKLpqiU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750427293; c=relaxed/simple;
+	bh=WhWToY2gFgoji2enDe1Nyb8LomNvws/2+8zZTVs0T7U=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Ll6t181Gz1fpFXa3ZWh9pqzefcyrBmO798JOal/8TFbpjEJV+tEaiArbRzgZBlnYW9tPrNjLGW8YxV+t+Pn/dnxDKyOl0+qJOjX36WYvzBEvPkr4F5FTp8wkubDKKbYyQ+EMqDf3EuItku5y1y9xUIRWk1+D1jLftaW1+ehgpQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=average.org; spf=pass smtp.mailfrom=average.org; dkim=pass (1024-bit key) header.d=average.org header.i=@average.org header.b=di7jMW1X; arc=none smtp.client-ip=88.198.2.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=average.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=average.org
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=average.org; s=mail;
+	t=1750426721; bh=WhWToY2gFgoji2enDe1Nyb8LomNvws/2+8zZTVs0T7U=;
+	h=Date:To:Cc:From:Subject:From;
+	b=di7jMW1XYhQxWvPksg20urXNLbfEyt3lmIOD46D0bdCjcBVTN7ap2a7x5nWzzjskr
+	 /ll8A6bjbgUa0vNKCjTysaCxIJ8EDtuIr/0exOg9l8Tuih1tbkAaNvrjwC2NGyCZK6
+	 YH+XveYgxS1geKMDK2mnvlx7aHvgHyr9MDc30fW4=
+Received: from [10.16.126.80] (unknown [212.227.34.98])
+	by dehost.average.org (Postfix) with ESMTPSA id 68CA74C87C1E;
+	Fri, 20 Jun 2025 15:38:41 +0200 (CEST)
+Message-ID: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
+Date: Fri, 20 Jun 2025 15:38:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|LV8PR12MB9450:EE_
-X-MS-Office365-Filtering-Correlation-Id: ffff300e-7659-4a84-bda7-08ddafff130a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|921020|27256017;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q2IxUk9ZSGRleFRPSC9UOUhQbGEwNm8zUmFzTVc2QmZpNUkzYjJOVXNwcU15?=
- =?utf-8?B?eHZBc0FySS9xYUIvWXBXTnRMRkdoN1RaYzJIdjIvSzdTM3padTNZMUFoZ29L?=
- =?utf-8?B?cHBKU0YzTWlueFFkQ3huVDEzWHJLVEpjQ0xFWHVGdUN3RDhtR2Rocjg4Mk1S?=
- =?utf-8?B?aUpCb1ZpWGhQNVp5OGxoQnB5RGE2OTAwVkdtM09neDBJTkVoeEhwSHEzNFQ1?=
- =?utf-8?B?UEhsQ0JPdW1BRmlKbjBkNU9wZENzNXNIZjNkTDZwRjBydjdjS2N5U0dISFRC?=
- =?utf-8?B?MjRhK1lWbWdGWGVMSUpaVnQrNzRHcHdhL2xKYXJMRUhQNGVDNTNVZ3R1UjZJ?=
- =?utf-8?B?UmdiVDhyQjBLY3RHdmttZDVNRGJVMHBpUUh0ZndIR0YzMHl4RCtycHdvemIw?=
- =?utf-8?B?QzZ1eFVwdGlnTlZrN0RWWVBBcWVnOGE0VUI2RytESktoVVB5aU5Nd2NDREcr?=
- =?utf-8?B?NzdzejFRc1ZUY2R3VnJsQWR1S2lUNi9wSm43MC9CeUxWUzR6bndTZG4xVXJm?=
- =?utf-8?B?aElrUlh1R0E5MkMrU2pldHNrYmdmRnMzV3VKcWhpOXdKd0JsQlJsbDFJYlZG?=
- =?utf-8?B?bUpITU9UTVU5TkhhdVNsNmJ0OVR0UzFyM0NlQzY2M0EvSDBUSDI0QnQ0Yyty?=
- =?utf-8?B?R3VSazZ2b29VemFTMThmUm9pTzdVa1dneVV0YStjbFdybzk5ZDBkSE5LU0d2?=
- =?utf-8?B?czFEbklETTJmRlF6NC9nNHJMOWdKVEFobTM3Z2hpYUJ2VWhGNHM0VW9za0hl?=
- =?utf-8?B?RUJBRyt1YWpxTWpSNmpyVXhRVUtSOVVPZEVqMHlOT09oQ0VYK1ZURFQ3MzRD?=
- =?utf-8?B?aU9BRWt6NEpvYjJ0bEIvZFlIUGpyaEhYTk85WTl4cFFOYnFkeVFCT1gwdjlr?=
- =?utf-8?B?K3NDcHdRNEZTWTNCQUZxMjY0QUFLUVNvejVqbUxSM0t4YTVlUkpYc0dTaDY4?=
- =?utf-8?B?d1p4M1YrRjlLSlR6OWxuMk52eFdiRzdxWXNkYWZmQ0UwUkR2d1hIaEJ1dzBX?=
- =?utf-8?B?cHBMeXFkdHBkWU9IUFh6ay9YWGNHSGZaVVJ2M1RvT1BYT1JoeUpjRFE4dlFy?=
- =?utf-8?B?V1IxMjdFdVliMk5WNWNQVy9BV0Z4c1JzUWgrZ0h6Z1F6MzdTSWRYNFFzM1da?=
- =?utf-8?B?Zi9VN0tKTFJMbVJ2Y2k3cmJFYWF0b0t0SXJTTTRMb2s2ZDZrbjFrbU9ySTRG?=
- =?utf-8?B?cjk3dGtrVmEvOC9mMUpYRE1Bdm0wZGhOeGNyK1Bka2dmWkdYKzdLNGtvV0xh?=
- =?utf-8?B?aERaYXNNZitLcy9DRnE2bmN2NEFnK29HZUU5MTFPQnk2TW1Ccks5QklucXVB?=
- =?utf-8?B?UThnYzQ2T2YrOUtVNDY4SUlEaUttS2Q3MXRvVU96VytIVkJ3bjZrTXV4QWpJ?=
- =?utf-8?B?ZFNybVg3TXJSQjU3WnJUaW10OGwzanVQQlQxYTFSN3Fvc2lNRW0zVXpwd3JY?=
- =?utf-8?B?NFJ5Tkd3QXA2cXFiSGIxQWlEWmJzdnp6TFVid3V0M1h5KzRYOGQ3dEp4T0l1?=
- =?utf-8?B?K0JXbXlLTzJBTE82RUpTRjgyNlIzNXgzdk1qNm84QUNlRVIrUVpsYkpuaUJF?=
- =?utf-8?B?dmord0UyVlphWXJKQlVROHQzQndyRk9zNDVwVC9jTXZ2bEUrNUYxMGp1cWVw?=
- =?utf-8?B?M2NiUGRKaXRuSTFBNVFmMTlNMmd0S0hEWkZzSlVjREl0ZTFVeHgyVkwvTXJU?=
- =?utf-8?B?RGM2Nk1aNzBIZEZNdHh3WXpEc2lMMGRPSHBaREcxZFBOdU95OW5pZkJvbEIy?=
- =?utf-8?B?UGU0bFNmWU5vekxKQmRQOGtSNTlPbXRWNDlZSGNhY01wMFB2cEtZRHVRK055?=
- =?utf-8?B?VWJNbERNS2FMUU1DSHBZejVTOEVIdzJjWGlFZ1E0cDg4QUNjUndkTDdUMS9x?=
- =?utf-8?B?aFVCS3BHckNRTFVqcFR3MXRLbEwyYWFBNG8yMU9CWHlrV21wZnYzTFNhMWJk?=
- =?utf-8?B?UVY2YXJGTTVETy9NZW5zWHlZb3k5TEh3Wm8rbnIzV2ZQSXhhRUdBTEZFdndE?=
- =?utf-8?Q?Q3o3lbu9BZmZVAdwiUX/ZgfumWx2OI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(921020)(27256017);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Ylk2eGN4ZjczZzJZdnBXTktmOFJNVHpaRllMWUV6UmI0VUVXZWpyNTVXNXl1?=
- =?utf-8?B?bjM1SjhFaGRla25qZ1RUS0cvZ3NoU2VzL05MMVpub0E5K05PR3c0UjNuRkdi?=
- =?utf-8?B?TlV2S2tRQnRhVG5LYmZXTnhLaDk3bGtXRXN2QUc4aVRZMFI3RmQwK0RXY2Nu?=
- =?utf-8?B?cTE0YmdqTFR5Y1ZGK0xMRDZkSzNxWE1ydVZqcW83ZVVWVVU4dE5paFdyelRI?=
- =?utf-8?B?bmZYQlZUcGs3WUFjOVVEYmJDdWUwNCtXczhuRFdiNkV3Z0lHOFlGVzRRZkhO?=
- =?utf-8?B?UGRnTTFOSm5IeCtwV3ZyUmUxSHJFbGlSRHNwTlMvSEEvVTBkYnpMdDhtSGIw?=
- =?utf-8?B?ZEFNb24vdHpuOWdoY2Z4SkMzRGJyY2ZWN05KOXFkV3Z6TEI1MXRhcDJQZzlC?=
- =?utf-8?B?VG9sdnJIb2NJM0o4ZVZlTUdEMHhPSFZXNW0yZzBMOGFrTG5KbFhuNVhPcERq?=
- =?utf-8?B?RGhxSjlITVJNbk5jWGsrZm1oVFVmTkUybXRTa3doUU03d1BYNzZCL2drcnV2?=
- =?utf-8?B?UW9HTysxYmxFSTEwUjg3OXNlN2owL0w2eklSSGR3RFBEK3NOVjdENWh2bU9z?=
- =?utf-8?B?WE1ZeFJMVmFoMHNsdVZESk9aNVJNOGwrc2htUjhybnVONE51TGJLYlI1UEkv?=
- =?utf-8?B?TTYxRDdvM2VaYk83eVJGUVpMam1PeHRzdnlaT1ZDc21sSGNmalk2NEdYWGla?=
- =?utf-8?B?TmZKL2tnY0pObFdNdU81YVNKMS9zTGpVVFhxc1RqUC9WM3hqaFp3VkhLN1h3?=
- =?utf-8?B?dmJtNUZkRFFyWVIwNUpYNGdyM0FvOEFOa0x5TTlyRVVZOThDcTE3WlpXZmRH?=
- =?utf-8?B?L2dJaG9nYUFUNS96YVRneWtMOXVYMVNLUGU1L2FlN3luYTdKdmszamxMQjJl?=
- =?utf-8?B?ajk4ODFYUVhpLytqOVlpNXVkZXlPVm5ieWVmRExzTnR0dnlxcTBwRUpwcWFF?=
- =?utf-8?B?eG5pV0NOMEZuaTIrMTBiUlFkYldRWEdMZFJYZCtod1NqbVgrRlcrVGVBWnlY?=
- =?utf-8?B?ZXZSS2JGZW55VlJXYWJpbFN1NDY5dXlJdEo0RUQ1WGUvd01FVHh0cjFrU2JC?=
- =?utf-8?B?cW5XQm9mREpFYy9OK3JncldXeGhRNG5rOE9aYWlvRkdqT3UwYVBkcTErY3hL?=
- =?utf-8?B?amVDbEVvNnJDSzFKTlZWSzcrVXA2RVhTRkxGLzJiQUlocWtieENxdncrWUdZ?=
- =?utf-8?B?WGpkdjRNTHZydWxzT1N5RVFmT2tlSjhLOVVmbFlsTU9obE0yck1tWmV0ZlZD?=
- =?utf-8?B?aENLN3kwZVZwVjF3QkdwYWtJK0ZXWkxSMDhmVzlxa0lsV0hJeUlYYzRrcXVs?=
- =?utf-8?B?NFVqL0VSWkt1VlI1V3BkcGg3U3c2VWR3QXprTmJQODlHUzhFS0o5TnhveTJD?=
- =?utf-8?B?N0ZEa0NZcjFlNFlCaXJseTZKZXFjUU9oSXpxc3BRMjc0K0l2aXNZSlJ3MS9y?=
- =?utf-8?B?RU8zUkVLQ01JTWo1OWMvSGxCNzFRSitpT0U1UHR2VGZDVlhIYVpVSGpQdWVK?=
- =?utf-8?B?U3VsT3pOd0ozSzd5S0JMTDQxRWZUL2dQL1ZDd1F0a3VreHcxVERPTCtJVGNT?=
- =?utf-8?B?eEhqYm9WSzVDaDhCMEZ4Q3RWdmlkODZxc1djdzNWWTRGY3E5NnJHd0kwZ2ts?=
- =?utf-8?B?TWdVT2ltMFFuaDQ4QXFqQzlka3M4eW5VZXpFa2dZenpacitUOFFaTUdjek5F?=
- =?utf-8?B?dGZyWGhreEtISndvNlpDWk1Va0NIZ2xIcVpMNmpiOG5kNlJiL09Yb2JHc3lo?=
- =?utf-8?B?cURRM1VESEk5OEZVR0prMUlwOHdaR2xUOWtCTHlWa1diZHJkMlFVTDBNLzZX?=
- =?utf-8?B?MmQxbkduM0xCQ2tkL3FGQmRtS01zNWZPOEV2ejhrbjVZTU90MXMrdExIeCs3?=
- =?utf-8?B?TnNhREdvT0h5Tzlyb2IvbWdHcG5mNzRxWXU0cHJ6akF4OEZZRW0xVUFjMGV1?=
- =?utf-8?B?RHVnMXVXSm1KZksrcVdUV0ZYamJDejJGa21xK2IzZ0xzcVFhbmNidkNwYkhz?=
- =?utf-8?B?S2ZHemVZdTdHdCtZNDhkdUdpMjNXcHltV3BQNWhrSEg3OGMwODUwakQ2czNj?=
- =?utf-8?B?N3VTRmlzVWcwRTgxM2JQL1g5T2hGNmRpSDZ5bnlDL1BUUU10amZSdDcyeGlD?=
- =?utf-8?Q?yJFJHYANbCW5HKJt57sqvBwIU?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ffff300e-7659-4a84-bda7-08ddafff130a
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2025 13:33:42.9243
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PHK3DLL+Dr9ZkQ6qsdQWZsHwnpQH9oHz4/Z6LCjMZDqDGdEW7fyvHKKm3SKx0zXWu08DzInD8rP9PBXnNXmkZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9450
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB, ru-RU
+To: netdev@vger.kernel.org
+Cc: "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ David Ahern <dsahern@kernel.org>, Nicolas Dichtel
+ <nicolas.dichtel@6wind.com>, Florian Westphal <fw@strlen.de>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+From: Eugene Crosser <crosser@average.org>
+Subject: When routed to VRF, NF _output_ hook is run unexpectedly
+Autocrypt: addr=crosser@average.org; keydata=
+ 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
+ u3lufqBt0w==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------G6lT0ME0MREdbUBsN5ZKv7y4"
 
-On Fri, Jun 20, 2025 at 01:10:04PM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Local cpumask_t variables must be wrapped with alloc_cpumask_var() or
-> similar helpers, to allow building with ridiculous values of CONFIG_NR_CPUS:
-> 
-> drivers/net/ethernet/mellanox/mlx5/core/eq.c: In function ‘comp_irq_request_sf’:
-> drivers/net/ethernet/mellanox/mlx5/core/eq.c:897:1: error: the frame size of 8560 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
-> drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c:494:1: error: the frame size of 8544 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c: In function ‘mlx5_irq_request_vector’:
-> drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c:561:1: error: the frame size of 8560 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c: In function ‘irq_pool_request_irq’:
-> drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c:74:1: error: the frame size of 8544 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> 
-> The mlx5 driver used to do this correctly in the past, but was changed
-> to use local 'irq_affinity_desc' structures in at least four places,
-> which ends up having the mask on the stack again.
-> 
-> It is not easily possible to use alloc_cpumask_var() again without
-> reverting that patch, so work around this by disallowing this drivers
-> on kernels that rely on CONFIG_CPUMASK_OFFSTACK.
-> 
-> Fixes: bbac70c74183 ("net/mlx5: Use newer affinity descriptor")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> This is probably not a great idea since most enterprise distros do
-> enable both CPUMASK_OFFSTACK and MLX5, and any ideas for how to sort
-> this out better would be helpful.
-> 
-> I mainly tried setting CONFIG_NR_CPUS to an unrealistic value for my
-> own compile testing, to see which files run into this problem. I have
-> managed to come up with better fixes for the other three I found, but
-> not this one.
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->
-Thanks for the catch! We will look into this and provide a proper patch.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------G6lT0ME0MREdbUBsN5ZKv7y4
+Content-Type: multipart/mixed; boundary="------------Jx43KJnnGY0YnxvQvju5FtWm";
+ protected-headers="v1"
+From: Eugene Crosser <crosser@average.org>
+To: netdev@vger.kernel.org
+Cc: "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ David Ahern <dsahern@kernel.org>, Nicolas Dichtel
+ <nicolas.dichtel@6wind.com>, Florian Westphal <fw@strlen.de>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+Message-ID: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
+Subject: When routed to VRF, NF _output_ hook is run unexpectedly
 
-Thanks,
-Dragos
+--------------Jx43KJnnGY0YnxvQvju5FtWm
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hello!
+
+It is possible, and very useful, to implement "two-stage routing" by
+installing a route that points to a VRF device:
+
+    ip link add vrfNNN type vrf table NNN
+    ...
+    ip route add xxxxx/yy dev vrfNNN
+
+however this causes surprising behaviour with relation to netfilter
+hooks. Namely, packets taking such path traverse _output_ nftables
+chain, with conntracking information reset. So, for example, even
+when "notrack" has been set in the prerouting chain, conntrack entries
+will still be created. Script attached below demonstrates this behaviour.=
+
+
+So, in order to control conntracking behaviour, it is necessary to
+install additional rules in the output chain, despite clearly only
+forwarding takes place, logically. Also, because "iif" is not available
+in the "output" chain, it is difficult to distinguish such vrf-routed
+traffic from true "output" traffic in the nftable rule.
+
+I suppose that if the packet is being processed by vrf because it
+followed a route pointing to the vrf interface, output netfilter hook
+should not be executed. Possibly(?) a forwarding hook should be run
+instead, or none?
+
+Thanks for consideration
+
+Eugene
+
+=3D=3D=3D=3D=3D
+#!/bin/sh
+
+cleanup() {
+	for ns in 1 2 3; do
+		ip netns del tns$ns
+	done
+}
+
+trap cleanup EXIT
+
+for ns in 1 2 3; do
+	ip netns add tns$ns
+done
+ip -n tns2 link add ve21 type veth peer ve12 netns tns1
+ip -n tns2 link add ve23 type veth peer ve32 netns tns3
+
+ip -n tns1 link set lo up
+ip -n tns1 addr add 172.16.1.1/30 dev ve12
+ip -n tns1 link set ve12 up
+ip -n tns1 route add default via 172.16.1.2 dev ve12
+
+ip -n tns3 link set lo up
+ip -n tns3 addr add 172.16.3.1/30 dev ve32
+ip -n tns3 addr add 172.16.9.1/30 dev ve32
+ip -n tns3 link set ve32 up
+ip -n tns3 route add default via 172.16.3.2 dev ve32
+
+ip -n tns2 link set lo up
+ip -n tns2 addr add 172.16.1.2/30 dev ve21
+ip -n tns2 link set ve21 up
+ip -n tns2 addr add 172.16.3.2/30 dev ve23
+ip -n tns2 link set ve23 up
+
+ip -n tns2 link add tvrf1 type vrf table 9999
+ip -n tns2 link set tvrf1 up
+ip -n tns2 route add 172.16.9.0/24 dev tvrf1
+ip -n tns2 route add 172.16.9.0/24 via 172.16.3.1 dev ve23 vrf tvrf1
+
+ip netns exec tns2 nft -f - <<__END__
+table inet filter {
+	chain rawout {
+		type filter hook output priority raw; policy accept;
+		counter # notrack  ### NEED THIS ADDITIONAL "notrack"
+	}
+	chain rawpre {
+		type filter hook prerouting priority raw; policy accept;
+		counter notrack
+	}
+	chain forward {
+		type filter hook forward priority filter; policy accept;
+		ct state established,related counter accept
+		counter
+	}
+}
+__END__
+
+ip netns exec tns1 ping -q -W1 -c1 172.16.3.1
+ip netns exec tns1 ping -q -W1 -c1 172.16.9.1
+
+ip netns exec tns2 nft list ruleset
+ip netns exec tns2 conntrack -L
+
+--------------Jx43KJnnGY0YnxvQvju5FtWm--
+
+--------------G6lT0ME0MREdbUBsN5ZKv7y4
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEnAziRJw3ydIzIkaHfKQHw5GdRYwFAmhVZFsACgkQfKQHw5Gd
+RYyXNgf/SmW6JMNPITGAwM8e0I1U1VhJeGLMBslRip/FbyChPhXeZ1PpGbXjw37Z
+8vkzO+NlAoUcxpYa6yFkp5ljiplMyKPcgpDxHPpxrQ9SIl4JEDBocb7mkg3/lN0j
+XgCqC7t47AZhuF1HPvRvvJnGDMpdWSACMJCeyfbCIyH4d2IqO2QOlF9YHKAkH4Pl
+j7XktukGqi7NNYAFryPtMpgAWWANS3XvEN1NrR3BUTtJP0CT7pv8rbgzQhP0IFnJ
+JW7GNBFFtpz2lMa6ggzZh1NAI7XZS42idKtf9NnkswgR68P0uIl1DBvmOqnu0Io4
+NMlXc+5oDjbgfn5YZ4MpCdIh1pJxeQ==
+=eDCm
+-----END PGP SIGNATURE-----
+
+--------------G6lT0ME0MREdbUBsN5ZKv7y4--
 
