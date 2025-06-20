@@ -1,67 +1,62 @@
-Return-Path: <netdev+bounces-199733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C2DAE19A3
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:10:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75AA4AE19AC
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B52A3B836A
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:09:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A88217CFE4
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 11:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617B8289E1B;
-	Fri, 20 Jun 2025 11:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8324285411;
+	Fri, 20 Jun 2025 11:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2wrkJE1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W90dgTwB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3449E289353;
-	Fri, 20 Jun 2025 11:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE6B229B27;
+	Fri, 20 Jun 2025 11:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750417817; cv=none; b=b/kNymzKnbwy7rIhGbfU+j1mLjzxqW+4v7F7z54FFx6SHTf+eQFJycGTcZ1ZFQ2xlsb+fRfdy3FY9ODOJKJni63453/LkHjTVppp/6g8mp1+Zs6CX5iCERZyJ8jmbE7c7hBHbcTye6lml6Vel6/wWcu0KmsnPY8rJla9FiC6fFg=
+	t=1750417906; cv=none; b=Bfkw3VeRg0dsJr0XEByPEYYYLynIwOHe8PpNnK/ji2G2LRsJ2meOZsfdHOl9Mrt8cAxTV2CX30JES+rqTcRsTH479wwiOYL8kPTFmM4bkOGUJ9WsCx7rVl4pcynJtA7V0oLvw+2MfaFqda3bvJU6hKge9lc4ap3lDK1JeQ+w5Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750417817; c=relaxed/simple;
-	bh=uvtVP1aYMUTlFmGxU79MyL6lu/a9tI++Kn5yo964ngw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=VZZIbJCt/BIBPiRXnxxGU3LrBTqMhW9UhoDmIa1/2960dzFOI7Jg3fBnu2QmQMIDruoMtBUzyjQXWzSZhiHJ06yWi3Xs+DJYToTkiQp15RLb9HiUU1Nem2/pW4anBEjYK5qa2sDw3VXJGY4ujKrUU6z80CytR1cRzONJdkVUjtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2wrkJE1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75C3AC4CEEE;
-	Fri, 20 Jun 2025 11:10:13 +0000 (UTC)
+	s=arc-20240116; t=1750417906; c=relaxed/simple;
+	bh=5X5JisUrRK/k3YVJmaiudJluyTdp1KylB9TqvN8D1LY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Eiqv2OTuLR6FgayCyMbNtWlvbJUtF+x/MNxoSSKJFfBxmlUSh9fYekksW4u1ZP56JYMHXfODmf9ZkF4NCAC0zKMRaXYGi7AtJXwy2jLnE8ZwoDAudUvxWwmOWle7G6PXqwxEDep9KSLvWMmNCuc3wtE2FKWrYwK3Qveuywy4FqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W90dgTwB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9588EC4CEEE;
+	Fri, 20 Jun 2025 11:11:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750417816;
-	bh=uvtVP1aYMUTlFmGxU79MyL6lu/a9tI++Kn5yo964ngw=;
+	s=k20201202; t=1750417906;
+	bh=5X5JisUrRK/k3YVJmaiudJluyTdp1KylB9TqvN8D1LY=;
 	h=From:To:Cc:Subject:Date:From;
-	b=r2wrkJE1oBEwAImWqC6gxhqDrazO1wRs7uEh2lluKtKamtV693IR8cEbvcTjZ7Poe
-	 2Vn8xWR1r2oZKa+Q+WAn2+VZ+n+rg0fdHrn42gcJxEKuftfK0LVRRDJQGgzW7JFgFQ
-	 KoBqQPjS3nOOYaC3h85xyvP6hiRtfHqOvpQ7JN0oGdtv7SIGhoQdhJrB/mIDLi2m82
-	 ukfHIR4KB+v+OYP9EK1y1TQKsyOn2rqvl8jJaxeVIpBGhMuFqmObKnvc+xx3Utlbp5
-	 Tcym8jdkbEu6qYJHM65kl5QFEQWW7+sLYEw8K9tE9Jw7579bcqyEBEkt0EoEeS1ahB
-	 BZXzF/c/BH+qg==
+	b=W90dgTwB6eCGhJ8arE2TPezjW/8Lnf+JBLF+y839X7btEpKNtA+jUneqroPdCAhLI
+	 i0QC3ceKzfoJX67GKMx9TZ5qIzkuSCJPJz2qfezbnq7363g6tI7m1rSRMHv7qrUxA+
+	 7xe+ZGTmeK7LkBAnV7XDLr3MWQ54mlADQ7DoUWjBoYqmUdFjWSr+5p7mtamp1urwM5
+	 SxCiAlC4f6w2eJaq1dnH67mb8hdRt5Q7vazQcBZPUioGFspHZA1mrTmNJtFIOrwBTS
+	 cKC5QrEr3Lj3YCnCF9z1V4Sd+GxK8HTeAsAr2ALm/L7DuBH7Oyw57On/B6tdFO6c5j
+	 VilAvsqOtjHeA==
 From: Arnd Bergmann <arnd@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eli Cohen <elic@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
+	Paolo Abeni <pabeni@redhat.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
-	Erez Shitrit <erezsh@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] [RFC] net/mlx5: don't build with CONFIG_CPUMASK_OFFSTACK
-Date: Fri, 20 Jun 2025 13:10:04 +0200
-Message-Id: <20250620111010.3364606-1-arnd@kernel.org>
+Subject: [PATCH] ethernet: intel: fix building with large NR_CPUS
+Date: Fri, 20 Jun 2025 13:11:17 +0200
+Message-Id: <20250620111141.3365031-1-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,53 +69,86 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-Local cpumask_t variables must be wrapped with alloc_cpumask_var() or
-similar helpers, to allow building with ridiculous values of CONFIG_NR_CPUS:
+With large values of CONFIG_NR_CPUS, three Intel ethernet drivers fail to
+compile like:
 
-drivers/net/ethernet/mellanox/mlx5/core/eq.c: In function ‘comp_irq_request_sf’:
-drivers/net/ethernet/mellanox/mlx5/core/eq.c:897:1: error: the frame size of 8560 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c: In function ‘mlx5_ctrl_irq_request’:
-drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c:494:1: error: the frame size of 8544 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c: In function ‘mlx5_irq_request_vector’:
-drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c:561:1: error: the frame size of 8560 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c: In function ‘irq_pool_request_irq’:
-drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c:74:1: error: the frame size of 8544 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
+In function ‘i40e_free_q_vector’,
+    inlined from ‘i40e_vsi_alloc_q_vectors’ at drivers/net/ethernet/intel/i40e/i40e_main.c:12112:3:
+  571 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+include/linux/rcupdate.h:1084:17: note: in expansion of macro ‘BUILD_BUG_ON’
+ 1084 |                 BUILD_BUG_ON(offsetof(typeof(*(ptr)), rhf) >= 4096);    \
+drivers/net/ethernet/intel/i40e/i40e_main.c:5113:9: note: in expansion of macro ‘kfree_rcu’
+ 5113 |         kfree_rcu(q_vector, rcu);
+      |         ^~~~~~~~~
 
-The mlx5 driver used to do this correctly in the past, but was changed
-to use local 'irq_affinity_desc' structures in at least four places,
-which ends up having the mask on the stack again.
+The problem is that the 'rcu' member in 'q_vector' is too far from the start
+of the structure. Move this member before the CPU mask instead, in all three
+drivers.
 
-It is not easily possible to use alloc_cpumask_var() again without
-reverting that patch, so work around this by disallowing this drivers
-on kernels that rely on CONFIG_CPUMASK_OFFSTACK.
-
-Fixes: bbac70c74183 ("net/mlx5: Use newer affinity descriptor")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-This is probably not a great idea since most enterprise distros do
-enable both CPUMASK_OFFSTACK and MLX5, and any ideas for how to sort
-this out better would be helpful.
+ drivers/net/ethernet/intel/fm10k/fm10k.h | 2 +-
+ drivers/net/ethernet/intel/i40e/i40e.h   | 2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-I mainly tried setting CONFIG_NR_CPUS to an unrealistic value for my
-own compile testing, to see which files run into this problem. I have
-managed to come up with better fixes for the other three I found, but
-not this one.
----
- drivers/net/ethernet/mellanox/mlx5/core/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-index 6ec7d6e0181d..7c2da240ffdb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-@@ -8,6 +8,7 @@ config MLX5_CORE
- 	depends on PCI
- 	select AUXILIARY_BUS
- 	select NET_DEVLINK
-+	depends on !CPUMASK_OFFSTACK
- 	depends on VXLAN || !VXLAN
- 	depends on MLXFW || !MLXFW
- 	depends on PTP_1588_CLOCK_OPTIONAL
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k.h b/drivers/net/ethernet/intel/fm10k/fm10k.h
+index 6119a4108838..757a6fd81b7b 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k.h
++++ b/drivers/net/ethernet/intel/fm10k/fm10k.h
+@@ -187,6 +187,7 @@ struct fm10k_q_vector {
+ 	u32 __iomem *itr;	/* pointer to ITR register for this vector */
+ 	u16 v_idx;		/* index of q_vector within interface array */
+ 	struct fm10k_ring_container rx, tx;
++	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 
+ 	struct napi_struct napi;
+ 	cpumask_t affinity_mask;
+@@ -195,7 +196,6 @@ struct fm10k_q_vector {
+ #ifdef CONFIG_DEBUG_FS
+ 	struct dentry *dbg_q_vector;
+ #endif /* CONFIG_DEBUG_FS */
+-	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 
+ 	/* for dynamic allocation of rings associated with this q_vector */
+ 	struct fm10k_ring ring[] ____cacheline_internodealigned_in_smp;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+index 54d5fdc303ca..91aa88366c05 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e.h
++++ b/drivers/net/ethernet/intel/i40e/i40e.h
+@@ -944,6 +944,7 @@ struct i40e_q_vector {
+ 
+ 	u16 v_idx;		/* index in the vsi->q_vector array. */
+ 	u16 reg_idx;		/* register index of the interrupt */
++	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 
+ 	struct napi_struct napi;
+ 
+@@ -956,7 +957,6 @@ struct i40e_q_vector {
+ 	cpumask_t affinity_mask;
+ 	struct irq_affinity_notify affinity_notify;
+ 
+-	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 	char name[I40E_INT_NAME_STR_LEN];
+ 	bool arm_wb_state;
+ 	bool in_busy_poll;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+index c6772cd2d802..c6cfab0ff9d3 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+@@ -505,11 +505,11 @@ struct ixgbe_q_vector {
+ 				 * represents the vector for this ring */
+ 	u16 itr;		/* Interrupt throttle rate written to EITR */
+ 	struct ixgbe_ring_container rx, tx;
++	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 
+ 	struct napi_struct napi;
+ 	cpumask_t affinity_mask;
+ 	int numa_node;
+-	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 	char name[IFNAMSIZ + 9];
+ 
+ 	/* for dynamic allocation of rings associated with this q_vector */
 -- 
 2.39.5
 
