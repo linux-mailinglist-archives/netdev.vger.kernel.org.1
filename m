@@ -1,307 +1,346 @@
-Return-Path: <netdev+bounces-199745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85246AE1B05
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:33:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F4AAAE1B1F
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 14:44:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDD6A4A7B04
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:33:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9933A4A5E1F
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6195C28C00D;
-	Fri, 20 Jun 2025 12:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4AA28A735;
+	Fri, 20 Jun 2025 12:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HPXtqixP"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="mbJ99bY6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071B328B7C5;
-	Fri, 20 Jun 2025 12:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7757130E83F
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 12:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750422804; cv=none; b=JdldTRYbEyjD6F/ciClRcE6rca/Sl56+5ktKqTUz5mZULabOz9NpmWgfZUKsU8KGkaWJtlGjddka7maVavMZGnO1tyseF0rwOEOGB5XeK5a06CB9/bmiQKPQnFggKaIyr9/dMWEm9O4lPWWxUYtxc2ZInh+kWU9KjeJ9MAJbV0Y=
+	t=1750423447; cv=none; b=nYx9pvk88oGyXHCFcd+vN4ByHJ6BlAqadLVCOm4AbuJFaE74YYQ1/g4vPh5RN0So/olRxwexxIRY0+KrHzYGfWDkCfEPhyfoqmJTU3YbnuOMQKqaFJu6xEfwHizFlVQXdeJLdOxOMIgde5Ia4aPI8svBbYe/XAUnY90z3REmEPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750422804; c=relaxed/simple;
-	bh=6vl7PF+/T9auoFlR4HnEk0oD6IcObTEXZv0Bj419scI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZIgazBC4jI4Z6lolGfTh/3lJ6AUoLiU3mkEjre8EvRCNZ/ZEOc94sDuEZWebRwHYn/tTGCV4Llx0RPf21jwgyIVzNLo7LMy26Vwrc+OAx2xbnCtIH8YeWqYM6RLN+DIJLgTar1gYscV3xsLjTL6RMGWOyNSINfQqqnghWG42+WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HPXtqixP; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C8A781FD3C;
-	Fri, 20 Jun 2025 12:33:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1750422800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7aMJMPvcSqljiCkLImJkk0ab9T8QK7AAmCb1QEL0KHg=;
-	b=HPXtqixPr8tc9EUHMRN0Lltavg8KQMGbEQjarjeyzjmXmxwKjrwWEeLCAfFIzCrz3WjG/q
-	cxtHa2kx9kTQXhhXhmvutJC97KrwvLtvqWwlpgaC/M6enMVyg33Mpu/OLd4z/D+FcPjE3J
-	mooDzOMwdTRQIoJar5gTvECIOgJXNdH5ZKsktvAO/NKdYpPTvfbVtlSFkwKPTkNvVMuEGr
-	P0n+PhY6TW9xX1ng1XmD1EiT5uAdHg8hhFjMemWqSeXRsWSlQETQdd0fq5PJ0NvFzACiDR
-	ix+XLET/PqR12j8iYN68ChdWyKDnW2EUiOc0yYMeI6FHcKnP2c9utztMxaUSlQ==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 20 Jun 2025 14:33:07 +0200
-Subject: [PATCH ethtool-next 2/2] ethtool: pse-pd: Add PSE priority and
- event monitoring support
+	s=arc-20240116; t=1750423447; c=relaxed/simple;
+	bh=Q7AJCTZ5rLCW4KFJK07/psNA/meUZ4daYdiWK+pUJ7c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZBA2zQdxEkO6LEzX6oIPiufoS/8//wpg0YoVedgER+lwHD3IZXU1f9YMsHnElJePqwmDWH43sp1KPyvlq4BiFgVUSHGfZTQfNUEgtndqOlnlVVYi5nihIoZebXLTlvx+EL6jT8fRJ2yCVPpg3K1LD6TGziAnFLtOy8zyAZljxQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=mbJ99bY6; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6097b404f58so3208461a12.3
+        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 05:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1750423444; x=1751028244; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9EG9FcB8Q0IvOTBGOenT1zDNKlCLORzQAxF8MGgqcv4=;
+        b=mbJ99bY6CxxalY9pk+Y1MODoq40VTBibmqcmhMTts2rXV7yoKDWjG1+fiOi3BId9T6
+         DzooAiPCrzjyairn8XArYY8vsj9zrS1L7vm0ZaiIALO82wA/wF3wKlQ9/7+rlc/80Fuu
+         FBoukprDuOqmC01xWHwodC5ZBAEHEY62+XtRKkHf+kLmHyMAbDCS7IdKAXZEMXVM8hun
+         yQaazmwoWtc2+Sh8sK752Ix2PoZSC5xLdfCf898o75i2N1LlLoXW0FqPkY/qhOqqHiX5
+         ipU2Zl7wFQ2sNz15ECXI1zHr0t4HaautU50d3zLoD6vUfQtCTXru3BZhoXxprkhv3d8a
+         M5lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750423444; x=1751028244;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9EG9FcB8Q0IvOTBGOenT1zDNKlCLORzQAxF8MGgqcv4=;
+        b=ceEzUOlCJ6BldS5o9LJKWXw8Q+dhthMdhd9DJoXVLq11F8PWwuDay4P/46B4jiwOGV
+         e5UKUBYZsdBi3J8j/q3X2/a2CnhdvtnZ/hVsfkSYRvqtLFSsqlT86Ua3t/zgdgrirl8K
+         VrnGFzP+v7cdCCjTzs5N5hyQ+B0idaggEyQ6HLPLTQtX0IFfAVoZoKkIqy574O+ajVhJ
+         3UHdwGqlTVskkHMKUsX/qb933E2tle7kXIdkABhHklGVA2bPvGIDcHER0eMCR3jCEbtO
+         bahemq16IptnWEAY4NVH0MLIKEmJB0ptfhjRe/hk4LOU2GSMtjqWeRCbGl+Ta4Ckacme
+         5bBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrnAW0nHpfM2kdIe0cl4QG1T+65ZtuGSjWX8ow8SHNlncKuXyBoA7QYkVoOtrmlyonNF5oESk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEcz39m7FF8bsNpkEYmvBWF3yiU8IW7PNYbTPeK2qdai/djGeZ
+	/fxEeSNMvssu5tCjHo2+SPW9rbWkitsubO/U4lCjmEpxp/G7v5/8HyGimKuzXqEgcww=
+X-Gm-Gg: ASbGncvL86uasYFHSpxtgA3wAe9ciHjFCpiKVjK1cm0e2hr+Ikte4NL7pRKe/ja8FKU
+	khNW55nbn+GQTPHmYIqEal23gISJVyTDYcdEZNIS/CRNdBqWHoboNrIA2f3SIDuyH4VNJYUR81Y
+	YcL1GZPX+tI83xsx4jIYIK0nCwpB3FFDIAQJ2tBHaNMl6+Qt0sSdhU7jqXIHu7BgleidoXuz6Nc
+	+xzx5LBbQLo+x+XRS/new62ZKiIM2vDocDzisLyS3UpMLBDUjrvVBsiYxV8+0knZl4THLMt4OYG
+	qJMajg5OvE8m/RAxsci8yYaGlItP+JgW5c6k6/daFW+q+82lBNOuOWyTN0sonwF4TbmWyXKOb+w
+	+Wpza6EjOhaA/aXWGKQ==
+X-Google-Smtp-Source: AGHT+IHXpQOnRW/S/YtZ5szU+d2WggG4z/q062bO8tBuw5oUwTLDA+GgY3DAtOvQndTO40pBMTYz4Q==
+X-Received: by 2002:a17:907:6d17:b0:ae0:13e5:1883 with SMTP id a640c23a62f3a-ae057b89b6bmr249393566b.40.1750423443324;
+        Fri, 20 Jun 2025 05:44:03 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0541b752asm156141766b.127.2025.06.20.05.44.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Jun 2025 05:44:02 -0700 (PDT)
+Message-ID: <d8d5a8f4-33a8-4a62-b48e-fb82b8de245b@blackwall.org>
+Date: Fri, 20 Jun 2025 15:44:01 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] bridge: dump mcast querier state per vlan
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, idosch@nvidia.com, bridge@lists.linux-foundation.org,
+ entwicklung@pengutronix.de
+References: <20250620121620.2827020-1-f.pfitzner@pengutronix.de>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250620121620.2827020-1-f.pfitzner@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250620-b4-feature_poe_pw_budget-v1-2-0bdb7d2b9c8f@bootlin.com>
-References: <20250620-b4-feature_poe_pw_budget-v1-0-0bdb7d2b9c8f@bootlin.com>
-In-Reply-To: <20250620-b4-feature_poe_pw_budget-v1-0-0bdb7d2b9c8f@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew@lunn.ch>, Michal Kubecek <mkubecek@suse.cz>
-Cc: Kyle Swenson <kyle.swenson@est.tech>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.15-dev-8cb71
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdekgeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgfdvgfektefgfefggeekudfggffhtdfffedtueetheejtddvledvvdelhedtveenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopehkhihlvgdrshifvghnshhonhesvghsthdrthgvtghhpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepn
- hgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmkhhusggvtggvkhesshhushgvrdgtii
-X-GND-Sasl: kory.maincent@bootlin.com
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On 6/20/25 15:16, Fabian Pfitzner wrote:
+> Dump the multicast querier state per vlan.
+> This commit is almost identical to [1].
+> 
+> The querier state can be seen with:
+> 
+> bridge -d vlan global
+> 
+> The options for vlan filtering and vlan mcast snooping have to be enabled
+> in order to see the output:
+> 
+> ip link set [dev] type bridge mcast_vlan_snooping 1 vlan_filtering 1
+> 
+> The querier state shows the following information for IPv4 and IPv6
+> respectively:
+> 
+> 1) The ip address of the current querier in the network. This could be
+>    ourselves or an external querier.
+> 2) The port on which the querier was seen
+> 3) Querier timeout in seconds
+> 
+> [1] https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=16aa4494d7fc6543e5e92beb2ce01648b79f8fa2
+> 
+> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+> ---
+> 
+> v1->v2
+> 	- refactor code
+> 	- link to v1: https://lore.kernel.org/netdev/20250604105322.1185872-1-f.pfitzner@pengutronix.de/
+> 
+> v2->v3
+> 	- move code into a shared function
+> 	- use shared function in bridge and ip utility
+> 	- link to v2: https://lore.kernel.org/netdev/20250611121151.1660231-1-f.pfitzner@pengutronix.de/
+> ---
+>  bridge/vlan.c      |  3 +++
+>  include/bridge.h   |  3 +++
+>  ip/iplink_bridge.c | 57 +---------------------------------------------
+>  lib/bridge.c       | 56 +++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 63 insertions(+), 56 deletions(-)
+> 
 
-Add support for PSE (Power Sourcing Equipment) priority management and
-event monitoring capabilities:
+Hi,
+The subject should contain the target for this patch which is iproute2-next,
+e.g. [PATCH iproute2-next v3]. Since there would be another version, I'd split
+it in 2 patches - 1 that moves the existing code to lib/bridge.c and the second
+which adds the vlan querier print code.
 
-- Add priority configuration parameter (prio) for port priority management
-- Display power domain index, maximum priority, and current priority
-- Add PSE event monitoring support in ethtool monitor command
+Also a few comments below..
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- ethtool.8.in      | 13 ++++++++
- ethtool.c         |  1 +
- netlink/monitor.c |  8 +++++
- netlink/netlink.h |  1 +
- netlink/pse-pd.c  | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 111 insertions(+)
+> diff --git a/bridge/vlan.c b/bridge/vlan.c
+> index 14b8475d..0233eaf6 100644
+> --- a/bridge/vlan.c
+> +++ b/bridge/vlan.c
+> @@ -852,6 +852,9 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
+>  		print_uint(PRINT_ANY, "mcast_querier", "mcast_querier %u ",
+>  			   rta_getattr_u8(vattr));
+>  	}
+> +	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]) {
+> +		dump_mcast_querier_state(vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]);
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index 7e164a6..b9025bd 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -561,6 +561,7 @@ ethtool \- query or control network driver and hardware settings
- .RB [ c33\-pse\-admin\-control
- .BR enable | disable ]
- .BN c33\-pse\-avail\-pw\-limit N
-+.BN prio N
- .HP
- .B ethtool \-\-flash\-module\-firmware
- .I devname
-@@ -1893,6 +1894,15 @@ This attribute specifies the allowed power limit ranges in mW for
- configuring the c33-pse-avail-pw-limit parameter. It defines the valid
- power levels that can be assigned to the c33 PSE in compliance with the
- c33 standard.
-+.TP
-+.B power-domain-index
-+This attribute defines the index of the PSE Power Domain.
-+.TP
-+.B priority-max
-+This attribute defines the maximum priority available for the PSE.
-+.TP
-+.B priority
-+This attribute defines the currently configured priority for the PSE.
- 
- .RE
- .TP
-@@ -1912,6 +1922,9 @@ This parameter manages c33 PSE Admin operations in accordance with the IEEE
- This parameter manages c33 PSE Available Power Limit in mW, in accordance
- with the IEEE 802.3-2022 33.2.4.4 Variables (pse_available_power)
- specification.
-+.TP
-+.B prio \ N
-+This parameter manages port priority.
- 
- .RE
- .TP
-diff --git a/ethtool.c b/ethtool.c
-index 327a2da..281484f 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -6283,6 +6283,7 @@ static const struct option args[] = {
- 		.xhelp	= "		[ podl-pse-admin-control enable|disable ]\n"
- 			  "		[ c33-pse-admin-control enable|disable ]\n"
- 			  "		[ c33-pse-avail-pw-limit N ]\n"
-+			  "		[ prio N ]\n"
- 	},
- 	{
- 		.opts	= "--flash-module-firmware",
-diff --git a/netlink/monitor.c b/netlink/monitor.c
-index ace9b25..cc5163e 100644
---- a/netlink/monitor.c
-+++ b/netlink/monitor.c
-@@ -75,6 +75,10 @@ static struct {
- 		.cmd	= ETHTOOL_MSG_MODULE_NTF,
- 		.cb	= module_reply_cb,
- 	},
-+	{
-+		.cmd	= ETHTOOL_MSG_PSE_NTF,
-+		.cb	= pse_ntf_cb,
-+	},
- };
- 
- static void clear_filter(struct nl_context *nlctx)
-@@ -186,6 +190,10 @@ static struct monitor_option monitor_opts[] = {
- 		.pattern	= "--show-module|--set-module",
- 		.cmd		= ETHTOOL_MSG_MODULE_NTF,
- 	},
-+	{
-+		.pattern	= "--pse-event",
-+		.cmd		= ETHTOOL_MSG_PSE_NTF,
-+	},
- };
- 
- static bool pattern_match(const char *s, const char *pattern)
-diff --git a/netlink/netlink.h b/netlink/netlink.h
-index ad2a787..6a91336 100644
---- a/netlink/netlink.h
-+++ b/netlink/netlink.h
-@@ -92,6 +92,7 @@ int cable_test_tdr_reply_cb(const struct nlmsghdr *nlhdr, void *data);
- int cable_test_tdr_ntf_cb(const struct nlmsghdr *nlhdr, void *data);
- int fec_reply_cb(const struct nlmsghdr *nlhdr, void *data);
- int module_reply_cb(const struct nlmsghdr *nlhdr, void *data);
-+int pse_ntf_cb(const struct nlmsghdr *nlhdr, void *data);
- 
- /* dump helpers */
- 
-diff --git a/netlink/pse-pd.c b/netlink/pse-pd.c
-index fd1fc4d..41af9de 100644
---- a/netlink/pse-pd.c
-+++ b/netlink/pse-pd.c
-@@ -13,6 +13,7 @@
- 
- #include "../internal.h"
- #include "../common.h"
-+#include "bitset.h"
- #include "netlink.h"
- #include "parser.h"
- 
-@@ -420,6 +421,29 @@ int pse_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		}
- 	}
- 
-+	if (tb[ETHTOOL_A_PSE_PW_D_ID]) {
-+		u32 val;
-+
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_PSE_PW_D_ID]);
-+		print_uint(PRINT_ANY, "power-domain-index",
-+			   "Power domain index: %u\n", val);
-+	}
-+
-+	if (tb[ETHTOOL_A_PSE_PRIO_MAX]) {
-+		u32 val;
-+
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_PSE_PRIO_MAX]);
-+		print_uint(PRINT_ANY, "priority-max",
-+			   "Max allowed priority: %u\n", val);
-+	}
-+
-+	if (tb[ETHTOOL_A_PSE_PRIO]) {
-+		u32 val;
-+
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_PSE_PRIO]);
-+		print_uint(PRINT_ANY, "priority", "Priority %u\n", val);
-+	}
-+
- 	close_json_object();
- 
- 	return MNL_CB_OK;
-@@ -452,6 +476,64 @@ int nl_gpse(struct cmd_context *ctx)
- 	return ret;
- }
- 
-+static const char *pse_events_name(u64 val)
-+{
-+	switch (val) {
-+	case ETHTOOL_PSE_EVENT_OVER_CURRENT:
-+		return "over-current";
-+	case ETHTOOL_PSE_EVENT_OVER_TEMP:
-+		return "over-temperature";
-+	case ETHTOOL_C33_PSE_EVENT_DETECTION:
-+		return "detection";
-+	case ETHTOOL_C33_PSE_EVENT_CLASSIFICATION:
-+		return "classification";
-+	case ETHTOOL_C33_PSE_EVENT_DISCONNECTION:
-+		return "disconnection";
-+	case ETHTOOL_PSE_EVENT_OVER_BUDGET:
-+		return "over-budget";
-+	case ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR:
-+		return "software power control error";
-+	default:
-+		return "unknown";
-+	}
-+}
-+
-+int pse_ntf_cb(const struct nlmsghdr *nlhdr, void *data)
-+{
-+	const struct nlattr *tb[ETHTOOL_A_PSE_MAX + 1] = {};
-+	struct nl_context *nlctx = data;
-+	DECLARE_ATTR_TB_INFO(tb);
-+	u64 val;
-+	int ret, i;
-+
-+	ret = mnl_attr_parse(nlhdr, GENL_HDRLEN, attr_cb, &tb_info);
-+	if (ret < 0)
-+		return MNL_CB_OK;
-+
-+	if (!tb[ETHTOOL_A_PSE_NTF_EVENTS])
-+		return MNL_CB_OK;
-+
-+	nlctx->devname = get_dev_name(tb[ETHTOOL_A_PSE_HEADER]);
-+	if (!dev_ok(nlctx))
-+		return MNL_CB_OK;
-+
-+	open_json_object(NULL);
-+	print_string(PRINT_ANY, "ifname", "PSE event for %s:\n",
-+		     nlctx->devname);
-+	open_json_array("events", "Events:");
-+	val = attr_get_uint(tb[ETHTOOL_A_PSE_NTF_EVENTS]);
-+	for (i = 0; 1 << i <= ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR; i++)
-+		if (val & 1 << i)
-+			print_string(PRINT_ANY, NULL, " %s",
-+				     pse_events_name(val & 1 << i));
-+	close_json_array("\n");
-+	if (ret < 0)
-+		return MNL_CB_OK;
-+
-+	close_json_object();
-+	return MNL_CB_OK;
-+}
-+
- /* PSE_SET */
- 
- static const struct lookup_entry_u32 podl_pse_admin_control_values[] = {
-@@ -487,6 +569,12 @@ static const struct param_parser spse_params[] = {
- 		.handler	= nl_parse_direct_u32,
- 		.min_argc	= 1,
- 	},
-+	{
-+		.arg		= "prio",
-+		.type		= ETHTOOL_A_PSE_PRIO,
-+		.handler	= nl_parse_direct_u32,
-+		.min_argc	= 1,
-+	},
- 	{}
- };
- 
+Add a local variable for the attribute and make this line shorter (<= 80chars).
 
--- 
-2.43.0
+> +	}
+>  	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION]) {
+>  		vattr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION];
+>  		print_uint(PRINT_ANY, "mcast_igmp_version",
+> diff --git a/include/bridge.h b/include/bridge.h
+> index 8bcd1e38..9e9447c6 100644
+> --- a/include/bridge.h
+> +++ b/include/bridge.h
+> @@ -3,9 +3,12 @@
+>  #define __BRIDGE_H__ 1
+> 
+>  #include <linux/if_bridge.h>
+> +#include <linux/rtnetlink.h>
+> 
+>  void bridge_print_vlan_flags(__u16 flags);
+>  void bridge_print_vlan_stats_only(const struct bridge_vlan_xstats *vstats);
+>  void bridge_print_vlan_stats(const struct bridge_vlan_xstats *vstats);
+> 
+> +void dump_mcast_querier_state(const struct rtattr* vtb);
+> +
+>  #endif /* __BRIDGE_H__ */
+> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+> index 31e7cb5e..68a277ef 100644
+> --- a/ip/iplink_bridge.c
+> +++ b/ip/iplink_bridge.c
+> @@ -682,62 +682,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>  			   rta_getattr_u8(tb[IFLA_BR_MCAST_QUERIER]));
+> 
+>  	if (tb[IFLA_BR_MCAST_QUERIER_STATE]) {
+> -		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
+> -		SPRINT_BUF(other_time);
+> -
+> -		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, tb[IFLA_BR_MCAST_QUERIER_STATE]);
+> -		memset(other_time, 0, sizeof(other_time));
+> -
+> -		open_json_object("mcast_querier_state_ipv4");
+> -		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
+> -			print_string(PRINT_FP,
+> -				NULL,
+> -				"%s ",
+> -				"mcast_querier_ipv4_addr");
+> -			print_color_string(PRINT_ANY,
+> -				COLOR_INET,
+> -				"mcast_querier_ipv4_addr",
+> -				"%s ",
+> -				format_host_rta(AF_INET, bqtb[BRIDGE_QUERIER_IP_ADDRESS]));
+> -		}
+> -		if (bqtb[BRIDGE_QUERIER_IP_PORT])
+> -			print_uint(PRINT_ANY,
+> -				"mcast_querier_ipv4_port",
+> -				"mcast_querier_ipv4_port %u ",
+> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
+> -		if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER])
+> -			print_string(PRINT_ANY,
+> -				"mcast_querier_ipv4_other_timer",
+> -				"mcast_querier_ipv4_other_timer %s ",
+> -				sprint_time64(
+> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]),
+> -									other_time));
+> -		close_json_object();
+> -		open_json_object("mcast_querier_state_ipv6");
+> -		if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
+> -			print_string(PRINT_FP,
+> -				NULL,
+> -				"%s ",
+> -				"mcast_querier_ipv6_addr");
+> -			print_color_string(PRINT_ANY,
+> -				COLOR_INET6,
+> -				"mcast_querier_ipv6_addr",
+> -				"%s ",
+> -				format_host_rta(AF_INET6, bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]));
+> -		}
+> -		if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
+> -			print_uint(PRINT_ANY,
+> -				"mcast_querier_ipv6_port",
+> -				"mcast_querier_ipv6_port %u ",
+> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
+> -		if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER])
+> -			print_string(PRINT_ANY,
+> -				"mcast_querier_ipv6_other_timer",
+> -				"mcast_querier_ipv6_other_timer %s ",
+> -				sprint_time64(
+> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]),
+> -									other_time));
+> -		close_json_object();
+> +		dump_mcast_querier_state(tb[IFLA_BR_MCAST_QUERIER_STATE]);
+>  	}
+> 
+>  	if (tb[IFLA_BR_MCAST_HASH_ELASTICITY])
+> diff --git a/lib/bridge.c b/lib/bridge.c
+> index a888a20e..13b0d633 100644
+> --- a/lib/bridge.c
+> +++ b/lib/bridge.c
+> @@ -45,3 +45,59 @@ void bridge_print_vlan_stats(const struct bridge_vlan_xstats *vstats)
+> 
+>  	close_json_object();
+>  }
+> +
+> +void dump_mcast_querier_state(const struct rtattr *vtb)
+
+Stay consistent with the rest of lib/bridge.c and add bridge_ in front of the name.
+And maybe bridge_print_mcast_querier_state?
+
+> +{
+> +	struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
+> +	const char *querier_ip;
+> +	SPRINT_BUF(other_time);
+> +	__u64 tval;
+> +
+> +	parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, vtb);
+> +	memset(other_time, 0, sizeof(other_time));
+> +
+> +	open_json_object("mcast_querier_state_ipv4");
+> +	if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
+> +		querier_ip = format_host_rta(AF_INET,
+> +						bqtb[BRIDGE_QUERIER_IP_ADDRESS]);
+> +		print_string(PRINT_FP, NULL, "%s ",
+> +				"mcast_querier_ipv4_addr");
+
+formatting is off, "mcast_querier_ipv4_addr" should start under PRINT_FP
+use tabs as much as possible (before going over) and if
+needed finish alignment with spaces, e.g.:
+
+		querier_ip = format_host_rta(AF_INET,
+					     bqtb[BRIDGE_QUERIER_IP_ADDRESS]);
+or
+
+		print_string(PRINT_FP, NULL, "%s ",
+			     "mcast_querier_ipv4_addr");
+
+> +		print_color_string(PRINT_ANY, COLOR_INET,
+> +					"mcast_querier_ipv4_addr", "%s ",
+> +					querier_ip);
+
+same about formatting
+
+> +	}
+> +	if (bqtb[BRIDGE_QUERIER_IP_PORT])
+> +		print_uint(PRINT_ANY, "mcast_querier_ipv4_port",
+> +				"mcast_querier_ipv4_port %u ",
+> +				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
+
+formatting
+
+> +	if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]) {
+> +		tval = rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]);
+> +		print_string(PRINT_ANY,
+> +				"mcast_querier_ipv4_other_timer",
+> +				"mcast_querier_ipv4_other_timer %s ",
+> +				sprint_time64(tval, other_time));
+
+formatting
+
+> +	}
+> +	close_json_object();
+> +	open_json_object("mcast_querier_state_ipv6");
+> +	if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
+> +		querier_ip = format_host_rta(AF_INET6,
+> +						bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]);
+> +		print_string(PRINT_FP, NULL, "%s ",
+> +				"mcast_querier_ipv6_addr");
+> +		print_color_string(PRINT_ANY, COLOR_INET6,
+> +					"mcast_querier_ipv6_addr", "%s ",
+> +					querier_ip);
+formatting
+> +	}
+> +	if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
+> +		print_uint(PRINT_ANY, "mcast_querier_ipv6_port",
+> +				"mcast_querier_ipv6_port %u ",
+> +				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
+formatting
+> +	if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]) {
+> +		tval = rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]);
+> +		print_string(PRINT_ANY,
+> +				"mcast_querier_ipv6_other_timer",
+> +				"mcast_querier_ipv6_other_timer %s ",
+> +				sprint_time64(tval, other_time));
+
+formatting
+
+> +	}
+> +	close_json_object();
+> +}
+> --
+> 2.39.5
+> 
 
 
