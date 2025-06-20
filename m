@@ -1,117 +1,129 @@
-Return-Path: <netdev+bounces-199707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5AE0AE1887
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:04:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F562AE188B
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 12:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85FBD172AF9
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:04:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45AFD7A29A1
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 10:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF36428A1DA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB117289E0E;
 	Fri, 20 Jun 2025 10:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="drsTSoje"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="idy44S9u"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B59283FF0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C6C283FEC;
 	Fri, 20 Jun 2025 10:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750413803; cv=none; b=Od2VYvjQX/W2cyVmn5CHGwXHl4kWFpLtE7YGHlnIN8gTjI+TFjCKPSEFwNjBdl5JhpBWJHW2MD5fru1+98KgpVWVGdJ3/1P/nBRuQI0V70c/8Uvm2km9oRw6Q0Y39eh2QFTcBWSTtz+EIofAS/sIQx9IxEhRfN2/QsoVGL8TTgI=
+	t=1750413803; cv=none; b=OUaMMsCgyPpt5aWHyCCDWFlAptPZbQf4sPCiJZjJR62T6aVvrEEtJ1X4Eb9DAa/sWTkbClCZr677oFkqP6x5933BTeHu38Jbg6As7tO4ft1bt2WO+5tvU+vXPkwzdfDp5qRQc8xeQ8SgdKzQRacBXjODD2c1j3nTiJwTHVvLmxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750413803; c=relaxed/simple;
-	bh=xPR/InKNKfudhPDMsRzEG2eMx0eJCVxmRV7MrFp61XQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cj8p8tBzIb1M4R4EcEWwif6GiKS0Ftg37D6bvUmAyYRb19MUKGF1J07iu0riwvG2NG0JbF438cuF/lV5iZPkkA5GcK+ZMpMJlt5I908zQn9AbZLhmjQ0IrWKx87xE6Lxjvvs79+pVia+iL7+N2D/kNdWwCCLv/dZ2yyFBKtdIik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=drsTSoje; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9F7DB43194;
-	Fri, 20 Jun 2025 10:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1750413794;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AuMofWOPrsRbIItSZ8PDXSA7GLYNIKCwv7N2XYcmiBI=;
-	b=drsTSoje48BRR/mJ2Zz9hh17Ob8Yp3T9MKDv5S4FVh90S1kvFlLwDps6RvF6YG4fVhzF78
-	jzLK4WpzTNA58Jwo4chy+m7sNuWkoSII7eDXwlX/zGHjVrRAgDTHYzm1TwEIWTHjpn+evS
-	Xxq97UIHKLw+VDDdy6j+qKfUkRhm8rzhvghsJ+oWwQ5AtlQ9wWGWk8C3/a4Zcb4M6CyWja
-	ZDcJxHAJGvi2YyNJN+Mv4g5dDKWwBXpooeaP2pzwPbmUnYn+LFrai18rw2NGL2lt7/eJO7
-	/9QbClO3T7Y1O7+SP2H3c2PvUE4I5SeQyvmRhcljgGuqTHjE3uh/bllMfMhz8g==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 20 Jun 2025 12:02:40 +0200
-Subject: [PATCH net-next 2/2] net: pse-pd: tps23881: Clarify
- setup_pi_matrix callback documentation
+	bh=a6RQOtRl7tToqDq2ykyZySv8IKJOLXNE4RWsM7IKe8c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hRrry8pR0wapQ3NvVzTaqkwDa5dAXgxiIqGsdPlo7m2HKC1BYnDFwYukNMolWOB7wOXOj1HUf70O05Qk+4m4q9L/BBQb/XDfMFWl40o1oU/jZfX61DYK58uV2/6HFXHoh3ZI7l08FIt/cykXGLTnXGjVWSH1TGTD2fZfA6yRIcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=idy44S9u; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750413802; x=1781949802;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=a6RQOtRl7tToqDq2ykyZySv8IKJOLXNE4RWsM7IKe8c=;
+  b=idy44S9uHutwn0Z95OpI176AI5xUetHYspEzf0Cpf8E2KZ691aalm7IF
+   QON1ck35O6eS82yy4YVsg6+gDKlozimhOe75NIYRd3WSW+4yezDFX1zPi
+   hC1SNl4mj/bG3dyjXXNCksb27TMNziRJzpI9+Er6pmkhycGu9806NgPEG
+   GSddLJIl/4rZWNZx4bOwJm456FDg2/iUAh8oWMTjLMX78qLVYsy3LtVjp
+   kHIwo9c+IbI1StkWccTkWgXZquG5nW8raUnuLrh0T+aS8EqSzxtRBy5xw
+   nVs5YkHwNLc2N7FUlQpPEaC4TRSh376hRaAdAj0JogB1HwGfu1i9VWcMP
+   Q==;
+X-CSE-ConnectionGUID: AeY0r3ltQMiuP7DxG7kV/A==
+X-CSE-MsgGUID: hD6iTrozRuWgKfPYWwUCXg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="52817068"
+X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
+   d="scan'208";a="52817068"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 03:03:21 -0700
+X-CSE-ConnectionGUID: 5ah90r50SzKx18OqVXdLVA==
+X-CSE-MsgGUID: Vy074tasSTmFIH9DVwZZtA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
+   d="scan'208";a="181744778"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
+  by fmviesa001.fm.intel.com with ESMTP; 20 Jun 2025 03:03:16 -0700
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Shinas Rasheed <srasheed@marvell.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Brett Creeley <bcreeley@amd.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next,v3 0/2] igc: Add Default Queue Support
+Date: Fri, 20 Jun 2025 18:02:49 +0800
+Message-Id: <20250620100251.2791202-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250620-poe_doc_improve-v1-2-96357bb95d52@bootlin.com>
-References: <20250620-poe_doc_improve-v1-0-96357bb95d52@bootlin.com>
-In-Reply-To: <20250620-poe_doc_improve-v1-0-96357bb95d52@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Piotr Kubik <piotr.kubik@adtran.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.15-dev-dd21f
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdekudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgfdvgfektefgfefggeekudfggffhtdfffedtueetheejtddvledvvdelhedtveenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepuggvvhhitggvthhrvggvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnr
- dgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Improve the setup_pi_matrix callback documentation to clarify its purpose
-and usage. The enhanced description explains that PSE PI devicetree nodes
-are pre-parsed before this callback is invoked, and drivers should utilize
-pcdev->pi[x]->pairset[y].np to map PSE controller hardware ports to their
-corresponding Power Interfaces.
+This patch set introduces the support to configure "Default Queue" during runtime
+by using ethtool's Network Flow Classification (NFC) wildcard rule approach.
 
-This clarification helps driver implementers understand the callback's
-role in establishing the hardware-to-PI relationship mapping.
+v3:
+  - separate macros relocation code that not related to wildcard rule to another patch (Brett)
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- include/linux/pse-pd/pse.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+V2: https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20250619153738.2788568-1-yoong.siang.song@intel.com/
+  - use Ethtool wildcard rule instead of extra uAPI (Jakub Kicinski & Jacob Keller)
+  - combine MRQC register definitions into a single location (Kurt Kanzenbach)
+  - use FIELD_PREP (Kurt Kanzenbach)
+  - use RCT rule (Wojciech Drewek)
+  - no need brackets for single line code (Wojciech Drewek)
+  - use imperative mood in commit message (Marcin Szycik)
+  - ensure igc_ prefix in function name (Marcin Szycik)
 
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index e5f305cef82e..4e5696cfade7 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -159,7 +159,13 @@ struct ethtool_pse_control_status {
- /**
-  * struct pse_controller_ops - PSE controller driver callbacks
-  *
-- * @setup_pi_matrix: setup PI matrix of the PSE controller
-+ * @setup_pi_matrix: Setup PI matrix of the PSE controller.
-+ *		     The PSE PIs devicetree nodes have already been parsed by
-+ *		     of_load_pse_pis() and the pcdev->pi[x]->pairset[y].np
-+ *		     populated. This callback should establish the
-+ *		     relationship between the PSE controller hardware ports
-+ *		     and the PSE Power Interfaces, either through software
-+ *		     mapping or hardware configuration.
-  * @pi_get_admin_state: Get the operational state of the PSE PI. This ops
-  *			is mandatory.
-  * @pi_get_pw_status: Get the power detection status of the PSE PI. This
+V1: https://patchwork.ozlabs.org/project/intel-wired-lan/cover/20240730012212.775814-1-yoong.siang.song@intel.com/
+
+Song Yoong Siang (2):
+  igc: Relocate RSS field definitions to igc_defines.h
+  igc: Add wildcard rule support to ethtool NFC using Default Queue
+
+ drivers/net/ethernet/intel/igc/igc.h         | 15 ++++++-------
+ drivers/net/ethernet/intel/igc/igc_defines.h |  4 ++++
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 18 ++++++++++++++++
+ drivers/net/ethernet/intel/igc/igc_main.c    | 22 ++++++++++++++++++++
+ 4 files changed, 52 insertions(+), 7 deletions(-)
 
 -- 
-2.43.0
+2.34.1
 
 
