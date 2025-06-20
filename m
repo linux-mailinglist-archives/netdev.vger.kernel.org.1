@@ -1,134 +1,72 @@
-Return-Path: <netdev+bounces-199755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4606AE1BB4
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:12:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BAAAE1BF3
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 15:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B800F170F98
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:12:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 593427AA155
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 13:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9F9293B46;
-	Fri, 20 Jun 2025 13:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EEC21C18E;
+	Fri, 20 Jun 2025 13:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqkWog/L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9lNzGBx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B408F292936;
-	Fri, 20 Jun 2025 13:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6F2A95C;
+	Fri, 20 Jun 2025 13:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750425003; cv=none; b=ac9unfhZwHdKRx10EOc3bgAVuxODf6kfn9f1rt1Yac8Zf2f1QjiRfRxCDLk0//2hI956F1ki74mB666l8NoYc26Ownpxcy66T7KeKeCbb0xcvDtVhzcqsCpDvgqUz5N3fQzvp+5Ej1pOBxPYRAjpFMuIc1z+DkZJlZtDFhnVlp0=
+	t=1750425612; cv=none; b=aoHZ/pPdxYgl6hxntNAdjQ4UoumZh+iDQ+jwOqy50fI2XdumA1l2APF5Qh/gU3v2dCLLCPBicaXFmFg5LcqkxsLbyJegoCVQIJZU0qWHGNBuFzXyX8FMKMjYa7ly0p0eWTK/B0vq7ULeOXa+7CqciVwr0MBYt8Er4TvmF+YM1L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750425003; c=relaxed/simple;
-	bh=WbCME8fESr+rlhYeTNtW17nAZ6PIIOdd7ebJuruuPdw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lyM7hFJapiC+NwclDxIl0RbBSqfZKk1G7Ziof3aEj98mQHRb1F3x7SS/5K+2NctPrLkR2Srb1xsfIRHZRJhdTqYRfOu3P/cxhtpT5Cx/QgCdTfJkHboTOgTUD0zTnhYX//ti/pqYvw9GJQegZ4rbt7HCTDGJMMCl4JMQXG0NY8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqkWog/L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E90F8C4CEF0;
-	Fri, 20 Jun 2025 13:10:00 +0000 (UTC)
+	s=arc-20240116; t=1750425612; c=relaxed/simple;
+	bh=flwZF01k22+K8skva0cXN6o1f53O8RCdfBgY2yLeLJ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IldQBxd8rXLmG7gQ/NYhv5hVlRQr8AQZiXPj//p/MHcMOD/eeZqm9fVjgXg00V/6FLatVfd0zIIC8s2UVpvvO7+xpM9HkQZvFPl/aKgAsmqVycMNlMzQ8XpERA7I6bkaGM8Q1Bv+t0H6X1baXjaw+TNXrGe4DqOixGxvHoMSjS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9lNzGBx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF80C4CEE3;
+	Fri, 20 Jun 2025 13:20:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750425003;
-	bh=WbCME8fESr+rlhYeTNtW17nAZ6PIIOdd7ebJuruuPdw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sqkWog/LXRIoTG+6CAObPN3i3f1RKdPcOeYJRccWks74n8Vx2zKxhE2JSnT8opqaJ
-	 johHEBFLTigRkx/270JkYouoqbEeyqQzOdVsLkRkuvs2WVOwQEceDk+v4guWL4qloq
-	 /ZZWOwx0NAd2w2rwJN6IcLH43mtGbsZTMzLuIiHWg5R4FznUoRNLLwuMSWstCTuUFX
-	 4E21BBuBBQreYEFq9oXix9fxd4EldtRa6DX7hfMEu5nMRmBpLSuwFMRFCLhvEyhIWZ
-	 qkGf+zKIyfU63c9iIOno1EMzPNEQzWYEmLfZ1uY6dYsaR1hDgmBTfBbMjYv+JD+X7c
-	 TAcSw3sbPMKBg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Manish Chopra <manishc@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH] net: qed: reduce stack usage for TLV processing
-Date: Fri, 20 Jun 2025 15:09:53 +0200
-Message-Id: <20250620130958.2581128-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=k20201202; t=1750425612;
+	bh=flwZF01k22+K8skva0cXN6o1f53O8RCdfBgY2yLeLJ4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G9lNzGBxUkynLzsG90EXw79hslD4rJ427bs5j7tS8AI9tfT0g6C4OlS+kM6/euxTo
+	 +UZ4liT/ZG5BfzZKG9tUz96OMrP+L/kbr1f/wloIUmAcaIg4DnwtwpWSrFgOWNsYwc
+	 8PiJBd79qP5kW5wkbsY+HK4MZHm+aVGzrnUjDfURX5Ra+RJiiGvVnR2idZBaGu68pv
+	 0aTGLMaN/+F36HeEZ9OoR82Beydb80bidcB5yFffnO/PRVwow1O+xnOKQI1lLcD/QH
+	 /KyJTSCZj8p+mLXqPXS886T/s23MAbwyLSXJ/pS9B+eS8W5r+h3o2yeUjBkpW5onGc
+	 E1gjr8gbZ68eQ==
+Date: Fri, 20 Jun 2025 14:20:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] Bluetooth: Remove hci_conn_hash_lookup_state()
+Message-ID: <20250620132008.GM194429@horms.kernel.org>
+References: <20250620070345.2166957-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250620070345.2166957-1-yuehaibing@huawei.com>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Fri, Jun 20, 2025 at 03:03:45PM +0800, Yue Haibing wrote:
+> Since commit 4aa42119d971 ("Bluetooth: Remove pending ACL connection
+> attempts") this function is unused.
+> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-clang gets a bit confused by the code in the qed_mfw_process_tlv_req and
-ends up spilling registers to the stack hundreds of times. When sanitizers
-are enabled, this can end up blowing the stack warning limit:
-
-drivers/net/ethernet/qlogic/qed/qed_mng_tlv.c:1244:5: error: stack frame size (1824) exceeds limit (1280) in 'qed_mfw_process_tlv_req' [-Werror,-Wframe-larger-than]
-
-Apparently the problem is the complexity of qed_mfw_update_tlvs()
-after inlining, and marking the four main branches of that function
-as noinline_for_stack makes this problem completely go away, the stack
-usage goes down to 100 bytes.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-If anyone feels adventurous and able to figure out what exactly goes
-wrong in clang, I can provide preprocessed source files for debugging.
----
- drivers/net/ethernet/qlogic/qed/qed_mng_tlv.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_mng_tlv.c b/drivers/net/ethernet/qlogic/qed/qed_mng_tlv.c
-index f55eed092f25..7d78f072b0a1 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_mng_tlv.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_mng_tlv.c
-@@ -242,7 +242,7 @@ static int qed_mfw_get_tlv_group(u8 tlv_type, u8 *tlv_group)
- }
- 
- /* Returns size of the data buffer or, -1 in case TLV data is not available. */
--static int
-+static noinline_for_stack int
- qed_mfw_get_gen_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
- 			  struct qed_mfw_tlv_generic *p_drv_buf,
- 			  struct qed_tlv_parsed_buf *p_buf)
-@@ -304,7 +304,7 @@ qed_mfw_get_gen_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
- 	return -1;
- }
- 
--static int
-+static noinline_for_stack int
- qed_mfw_get_eth_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
- 			  struct qed_mfw_tlv_eth *p_drv_buf,
- 			  struct qed_tlv_parsed_buf *p_buf)
-@@ -438,7 +438,7 @@ qed_mfw_get_tlv_time_value(struct qed_mfw_tlv_time *p_time,
- 	return QED_MFW_TLV_TIME_SIZE;
- }
- 
--static int
-+static noinline_for_stack int
- qed_mfw_get_fcoe_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
- 			   struct qed_mfw_tlv_fcoe *p_drv_buf,
- 			   struct qed_tlv_parsed_buf *p_buf)
-@@ -1073,7 +1073,7 @@ qed_mfw_get_fcoe_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
- 	return -1;
- }
- 
--static int
-+static noinline_for_stack int
- qed_mfw_get_iscsi_tlv_value(struct qed_drv_tlv_hdr *p_tlv,
- 			    struct qed_mfw_tlv_iscsi *p_drv_buf,
- 			    struct qed_tlv_parsed_buf *p_buf)
--- 
-2.39.5
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
