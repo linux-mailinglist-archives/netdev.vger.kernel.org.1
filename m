@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-199853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAEE6AE211D
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BDD4AE211F
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0A251BC0264
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:40:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 408D91C2473C
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890BE2E9757;
-	Fri, 20 Jun 2025 17:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E426B1EB5F8;
+	Fri, 20 Jun 2025 17:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYhBzksc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TAidLujl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D066F2E172A
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 17:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3E52E172A
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 17:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750441231; cv=none; b=OHvyUDwnK3PDK5Sh4h+cFytaoRRLADc8Phn4XzbpOTs7ER8xCj7j7MlUpyMRGQpWjF4fnNy5Tw64USy88szgGzEsoCGkKCqDUN6YsItDvmz53d2z2IjkG+L8AsNyfZz82B3UF7ETmcBImaNAFa9BKZdhMKv4bJkiqY4feChwmZM=
+	t=1750441237; cv=none; b=eGtof4Iv85leL/318msrFgZDqrzluO8ZOt6VuV7i6ZEhK2w5tinH++dKEsnf1J/2IuEb31YNpQYJfRzIK3vumhvQlwz8WUk+4jCPpUHdsLgbRsaF29Df9iKy71UDVFD+6+Z6Q3K9vuB27u0RdtmaPVnlXJ6LDKV8JaV0PhEP+m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750441231; c=relaxed/simple;
-	bh=JyR5ApjjHltRSIOWdEdyNfdg74uCGz8cpfpWdy659B0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nfmi25V2du0x1YKTXeTCVE/kxiI9nz/bc7jgXBhqC9nyzr+DNoX0PsnGCKhW/KR4dNxqrLvz51dmd/6N1Wi75Nq1eRL7BfVRvMOEKEpfiQi7lYFNNSUUlwOtViS0Q/CQlW6kWDaz8CC6kild6ut+jma2HvuRLKWulrg4ZvH44Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XYhBzksc; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1750441237; c=relaxed/simple;
+	bh=c1OqOZi0L6a8x1MgHQq6Hs7UDBb04GSmvQr42NEaa1M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AjsHSBf2AzHCRktUJgQA4UgR3p5bx5aWUsdpCpz8r3PzhoIrxN7Dn3PBsuMExcgaKFKkDzTZdknaBCFIdfQhTON4plFPxUNBfmO+w+0C3YDeOAWXcV5gMRgy3n5B1Wya2KGKZrcyo0hdcwWrIwu3miVrh/PUnGU7T2A3sH8lRJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TAidLujl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750441227;
+	s=mimecast20190719; t=1750441235;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eYjr+DE+i7naenhD6oUtB+o+dSFFV7s82NMBEs65ov8=;
-	b=XYhBzkscIT7LIEBd6OPEBdiEJzeg5INhoo5jl3UcRsWXaA7hRUQbAzmYICTDlKoHWTWEPh
-	ZyI/eBNRpAAOhFv1z92n+N+2g3Lzua91XCD2QHh4zy19Tz2GoSvr4LrYbNLO8MTmAlNas0
-	ewSte6xF7maHKEIcHvU7bY/Vxd+BjLw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uPdNe7cXMdeKaI4Rm8AI/ehc72jL10HFb6fBGbYEdl8=;
+	b=TAidLujluzU56PR8sqeGQWDpPuYLx63EkjILb+pWbmuiiSi04II6vYh50l8ODuzzgsFmVA
+	45YlZ6b5rj6ZszlI4jrGjrOgLFRMpkK2Xv2KuxTr1/C76GU6AHzXNkDySVXJru2Kqw0R+j
+	I55HuSjqsvX88kX+B74nrmSiV4eyeuQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-389-sKU2Z5wKMtevSHWskxutsg-1; Fri,
- 20 Jun 2025 13:40:24 -0400
-X-MC-Unique: sKU2Z5wKMtevSHWskxutsg-1
-X-Mimecast-MFC-AGG-ID: sKU2Z5wKMtevSHWskxutsg_1750441222
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-522-Sxv6xbOUMxKhpmT6HuxSEw-1; Fri,
+ 20 Jun 2025 13:40:29 -0400
+X-MC-Unique: Sxv6xbOUMxKhpmT6HuxSEw-1
+X-Mimecast-MFC-AGG-ID: Sxv6xbOUMxKhpmT6HuxSEw_1750441228
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C8851800287;
-	Fri, 20 Jun 2025 17:40:21 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 92DD819560AA;
+	Fri, 20 Jun 2025 17:40:27 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.100])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4990719560AB;
-	Fri, 20 Jun 2025 17:40:15 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 278D019560AD;
+	Fri, 20 Jun 2025 17:40:21 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
@@ -70,9 +72,11 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>,
 	Jonathan Corbet <corbet@lwn.net>,
 	kvm@vger.kernel.org
-Subject: [PATCH v5 net-next 0/9] virtio: introduce GSO over UDP tunnel
-Date: Fri, 20 Jun 2025 19:39:44 +0200
-Message-ID: <cover.1750436464.git.pabeni@redhat.com>
+Subject: [PATCH v5 net-next 1/9] scripts/kernel_doc.py: properly handle VIRTIO_DECLARE_FEATURES
+Date: Fri, 20 Jun 2025 19:39:45 +0200
+Message-ID: <63851a5184c4b25ed85ee897d4a8b52544296dc9.1750436464.git.pabeni@redhat.com>
+In-Reply-To: <cover.1750436464.git.pabeni@redhat.com>
+References: <cover.1750436464.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,109 +86,26 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Some virtualized deployments use UDP tunnel pervasively and are impacted
-negatively by the lack of GSO support for such kind of traffic in the
-virtual NIC driver.
+The mentioned macro introduce by the next patch will foul kdoc;
+fully expand the mentioned macro to avoid the issue.
 
-The virtio_net specification recently introduced support for GSO over
-UDP tunnel, this series updates the virtio implementation to support
-such a feature.
-
-Currently the kernel virtio support limits the feature space to 64,
-while the virtio specification allows for a larger number of features.
-Specifically the GSO-over-UDP-tunnel-related virtio features use bits
-65-69.
-
-The first four patches in this series rework the virtio and vhost
-feature support to cope with up to 128 bits. The limit is set by
-a define and could be easily raised in future, as needed.
-
-This implementation choice is aimed at keeping the code churn as
-limited as possible. For the same reason, only the virtio_net driver is
-reworked to leverage the extended feature space; all other
-virtio/vhost drivers are unaffected, but could be upgraded to support
-the extended features space in a later time.
-
-The last four patches bring in the actual GSO over UDP tunnel support.
-As per specification, some additional fields are introduced into the
-virtio net header to support the new offload. The presence of such
-fields depends on the negotiated features.
-
-New helpers are introduced to convert the UDP-tunneled skb metadata to
-an extended virtio net header and vice versa. Such helpers are used by
-the tun and virtio_net driver to cope with the newly supported offloads.
-
-Tested with basic stream transfer with all the possible permutations of
-host kernel/qemu/guest kernel with/without GSO over UDP tunnel support.
-
-This is also are available in the Git repository at:
-
-git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_20_06_2025
-
-Ideally both the net-next tree and the vhost tree could pull from the
-above.
-
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v4 -> v5:
-  - added new patch 1/9 to avoid kdoc issues
-  - encapsulate guest features guessing in new tap helper
-  - cleaned-up SET_FEATURES_ARRAY
-  - a few checkpatch fixes
-v4: https://lore.kernel.org/netdev/cover.1750176076.git.pabeni@redhat.com/
+ scripts/lib/kdoc/kdoc_parser.py | 1 +
+ 1 file changed, 1 insertion(+)
 
-v3 -> v4:
-  - vnet sockopt cleanup
-  - fixed offset for UDP-tunnel related field
-  - use dev->features instead of flags
-v3: https://lore.kernel.org/netdev/cover.1749210083.git.pabeni@redhat.com/
-
-v2 -> v3:
-  - uint128_t -> u64[2]
-  - dropped related ifdef
-  - define and use vnet_hdr with tunnel layouts
-v2: https://lore.kernel.org/netdev/cover.1748614223.git.pabeni@redhat.com/
-
-v1 -> v2:
-  - fix build failures
-  - many comment clarification
-  - changed the vhost_net ioctl API
-  - fixed some hdr <> skb helper bugs
-v1: https://lore.kernel.org/netdev/cover.1747822866.git.pabeni@redhat.com/
-
-Paolo Abeni (9):
-  scripts/kernel_doc.py: properly handle VIRTIO_DECLARE_FEATURES
-  virtio: introduce extended features
-  virtio_pci_modern: allow configuring extended features
-  vhost-net: allow configuring extended features
-  virtio_net: add supports for extended offloads
-  net: implement virtio helpers to handle UDP GSO tunneling.
-  virtio_net: enable gso over UDP tunnel support.
-  tun: enable gso over UDP tunnel support.
-  vhost/net: enable gso over UDP tunnel support.
-
- drivers/net/tun.c                      |  58 ++++++--
- drivers/net/tun_vnet.h                 | 101 +++++++++++--
- drivers/net/virtio_net.c               | 110 +++++++++++---
- drivers/vhost/net.c                    |  94 +++++++++---
- drivers/vhost/vhost.c                  |   2 +-
- drivers/vhost/vhost.h                  |   4 +-
- drivers/virtio/virtio.c                |  43 +++---
- drivers/virtio/virtio_debug.c          |  27 ++--
- drivers/virtio/virtio_pci_modern.c     |  10 +-
- drivers/virtio/virtio_pci_modern_dev.c |  69 +++++----
- include/linux/virtio.h                 |   9 +-
- include/linux/virtio_config.h          |  43 +++---
- include/linux/virtio_features.h        |  88 +++++++++++
- include/linux/virtio_net.h             | 197 ++++++++++++++++++++++++-
- include/linux/virtio_pci_modern.h      |  43 +++++-
- include/uapi/linux/if_tun.h            |   9 ++
- include/uapi/linux/vhost.h             |   7 +
- include/uapi/linux/vhost_types.h       |   5 +
- include/uapi/linux/virtio_net.h        |  33 +++++
- scripts/lib/kdoc/kdoc_parser.py        |   1 +
- 20 files changed, 789 insertions(+), 164 deletions(-)
- create mode 100644 include/linux/virtio_features.h
-
+diff --git a/scripts/lib/kdoc/kdoc_parser.py b/scripts/lib/kdoc/kdoc_parser.py
+index 062453eefc7a..3115558925ac 100644
+--- a/scripts/lib/kdoc/kdoc_parser.py
++++ b/scripts/lib/kdoc/kdoc_parser.py
+@@ -666,6 +666,7 @@ class KernelDoc:
+             (KernRe(r'(?:__)?DECLARE_FLEX_ARRAY\s*\(' + args_pattern + r',\s*' + args_pattern + r'\)', re.S), r'\1 \2[]'),
+             (KernRe(r'DEFINE_DMA_UNMAP_ADDR\s*\(' + args_pattern + r'\)', re.S), r'dma_addr_t \1'),
+             (KernRe(r'DEFINE_DMA_UNMAP_LEN\s*\(' + args_pattern + r'\)', re.S), r'__u32 \1'),
++            (KernRe(r'VIRTIO_DECLARE_FEATURES\s*\(' + args_pattern + r'\)', re.S), r'u64 \1; u64 \1_array[VIRTIO_FEATURES_DWORDS]'),
+         ]
+ 
+         # Regexes here are guaranteed to have the end limiter matching
 -- 
 2.49.0
 
