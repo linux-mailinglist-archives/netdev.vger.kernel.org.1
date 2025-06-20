@@ -1,81 +1,77 @@
-Return-Path: <netdev+bounces-199837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9DBAE1FFF
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:20:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3D45AE200C
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:26:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F10B7A2981
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:18:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 346121BC0E28
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A9F28937B;
-	Fri, 20 Jun 2025 16:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59272E6D35;
+	Fri, 20 Jun 2025 16:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="U/oWL/C8"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DU/J5Ppt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64B11DD543
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 16:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBF52E613F
+	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 16:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750436413; cv=none; b=fMtXF8MrRSMSZAhd9+JyM8VWfmOUMynUKtfyiqNz95xldUXsnXJmzn1UM1Pmuj+EDSlAg2lZ/x10qXYP/CjbRZvmUDkOYko0lEV1fqGWfik0ICZWZw3EAw3oPpo0O6TF7mT47Ina2IocJbobPBgWEg3zv0WD+0QoELXs6ZJ2Gb4=
+	t=1750436761; cv=none; b=pAg56Da5rISDirhIHjwJCqOwfVLV7APFZS/Ck+oO8XkWEPjk+ox4sfHSGdYuPTbAu0rQ1QlMrL8uyqnJ7TjQF8p3RFjBG6s0W4WwfKBMxxAM0G0KIdyFl+O5ebEJ6NuJyRKbyyM0X8kjL/havm4HzEyZWWjot9Eki8y68zYec8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750436413; c=relaxed/simple;
-	bh=HYTOWjDukRZ7ZHMgKqBNidaHm/7rDrH6ltFndm5/Ihw=;
+	s=arc-20240116; t=1750436761; c=relaxed/simple;
+	bh=2lpfuT+UJ73xh83VqKPWIoYBmbgIzKWaPVoLMY4rhrI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mGCkw8b4zuTCwOPz4KAJYz7oJY1pSbR64ZlIw+FLciSh0YbNL2CrhLiCkS5IBEEoOO4VSFh9yxRIrQ58eOf25ewbGUM2+AitMVVz2BsxPM/FLs39AuDpp2eojfqwfFj4kpIAUenLwHMtM73I1dNO6mXFIdNEy4G2tcRv11mH/LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=U/oWL/C8; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a4eb4dfd8eso290138f8f.2
-        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 09:20:11 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=jq+oRrb4Cj5DmzXPdgW1+6ZuYCBY9/f7LGz450jelItet3EKd1bbzG/0QRl1zrpd8SUlk6JJKJdglJkfUK+pF+I1/vVx9SmwU6UGSZbscHtU+jT6K3PxPNNQUo3NTxTPVZ+jcBSxVa6uJlOWOhRmmCOcY2RvOgbqpzzZJu+oGr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DU/J5Ppt; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45310223677so16830155e9.0
+        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 09:25:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1750436410; x=1751041210; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NXttrKxk2yS2jYMSNejp1cO8JOMwcunJDEmJOmX01c0=;
-        b=U/oWL/C8bFbaZLtCilyhwAR7bWSQUhENpYQF3XRmkDDRRUuw0lJ0gHkAXx9FSTJUU3
-         GtjBTiq4wxqQY7iCEhKkHh9sMHPcZ0JrufWCH4PiJXhJ0EZ3UirFj1HjZq3VkbB4yvuh
-         Li8ZHgbIEi/I26ZdL7779ftTJsLOORTfe5Hbz4xbFVxWPsYEjv8/+VoiHnAH3HwF72Hg
-         g9Fu3J1LdaPBUuKkMzbl1ck8GrB7c96T53CqxB1HTjaYeUbTzCCxU5rpRyIzrkLzNIi0
-         cXU3PtNmgQepYldUgf5v0L6RO16ijWESdawAxJcBRR9W2Csq0P4ty+DwHuo8HCGgGWY9
-         rHqA==
+        d=broadcom.com; s=google; t=1750436758; x=1751041558; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Alqg+WicKPYUIWXmnQXqsBN2VhHsKxxFP4ePyG0B/vk=;
+        b=DU/J5PptjWdlJAqQaZD2jvC/tSBZrpcFT7r8u4oFD9vEx6UA+nZ9mVBAFRrZ20h+Bp
+         O8PHKcThXHvlOqA4L8DydUqHeTTfd8qdVhFpZ9dR1a7pAJvyeD9SNfRD10xS5bRpuOLI
+         WlKEE0x00EnGNzLZznjnumWgB30vM1eCm4ekg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750436410; x=1751041210;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NXttrKxk2yS2jYMSNejp1cO8JOMwcunJDEmJOmX01c0=;
-        b=pDP4YJtiBVFUtV4Z2ANICCr/G0eytDv8NUiGuLlkPuBizr8AsDEnYKklHrUk0KgNai
-         MRILQMkA2CJKFn3/JdawaiAFZ70s3xh4ZwTXjvhiFasPj86Qfi2lolEHhy+oUskinyC0
-         OA2Ceo+DAWF6/Nt/hpxSMUVLGQCGDdXD6+ZyK3UuiyZjKtyrYi2YMXxDnUhqkN/+9erz
-         LuON8r/qjfd8Lc9nfdNVn5K84Easz8mzjFXim4ts4KAWYZbMMJnBK0HJQaXHC837N66N
-         J44nMr1JVCS2FQLf2Wt3dtseKPxAqzetwc1GQLm+3VJ3wfd8MHCZLDGxj8bTYWfbG0Xn
-         cCnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXW1SrC/vOM0/ioiBVoTPfrPcESRGEwieupMyT7L8+FbjVV4/D5cQQ7On/tcdF73njdX+EJMBo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9poUpVg6LrCN6RC5SPGg7FzfRoz8ZNXgY+d/Sg5GvHlf+Eti6
-	WPYBJwFmEsteC/yHUSfoVw6uxrvjVjqS6PfNfLqdmit+WoUZVUaJu+doCCAzR3Z/1CI=
-X-Gm-Gg: ASbGncv6zUvE7vcuz2dqViGNDgpdkZjsju9ajUu3b5jUVvwuKUmLy9CiecnERz7qrBt
-	S7zHYjcdlhodPFDqXCni6twVgCmLHN+B73SsBogUgXYgMLyyd6qTJb+Bcq8qNWwzWqZK48WuxHf
-	aTJZE8hVaQ46bG7e5fiKa586vKDpI2LNBWo1Rwv+h+ajKjG5l2trfkUzTjDhfyY36OZES7fRylE
-	gWIcg0FNGQJvBuZcbKKnosZHhpEaomI1IvRrjA4wAsMUEv9GzTkxgMHGxM3cLsilIZbZEr27Mys
-	LaMIw5NQUtg8g76NL6zX46bomA9DFBPgfX79S7pn4HyTNbjMQUiwizcv10pdSQZcaRLKr7UxOc/
-	7bI7w0SEbWLPySz7TOP1iHpXC5T1QPJKOtfrc
-X-Google-Smtp-Source: AGHT+IGkowJ8P5bwuL7sCxZqqQhRiSiWE7pYlaRQ/m3YEL+PQGhAmp5M2JGhffVe+AMarzUPpEXkKQ==
-X-Received: by 2002:a05:600c:3143:b0:439:9c0e:36e6 with SMTP id 5b1f17b1804b1-453658bac2cmr14871855e9.3.1750436410004;
-        Fri, 20 Jun 2025 09:20:10 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:607e:36cd:ae85:b10? ([2a01:e0a:b41:c160:607e:36cd:ae85:b10])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646cb672sm30442825e9.6.2025.06.20.09.20.09
+        d=1e100.net; s=20230601; t=1750436758; x=1751041558;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Alqg+WicKPYUIWXmnQXqsBN2VhHsKxxFP4ePyG0B/vk=;
+        b=KneX+Xn/D22pXbTmmwSZDCi+d9JBspuDwPEhyN8XZIIi2kUoPYV2RY12cO1T31cjXE
+         LSreDxHRUfjUowIJGzMfHRK/3T55Uh25NWJV/iaLmWs+IMiSlEA1fejwub8BQ3BBctSv
+         9aUCJv0JY6LdfHCCYvr5tcoyfXcLBnL+hXo6ptuwskMqkY/4pxS6M6jzwpTq4P7cmhpH
+         w0gho76ztGsGx+m4dW2c+ZrvGt9dvWrcBPdqxvI2js9e2RWnd5POEdDfS5I5AHd5BEPy
+         X0rXKismCwVEQwqZ+1u/Aq60w4wGlIerJ5elZkJZ8CZrQYhxkTc5dyYAoulRaNPMTarV
+         gu+w==
+X-Gm-Message-State: AOJu0YzIhjhU4g1zH9o1R/xbgadTDeUChrPw9kAktJZpML7RDZwnVjGt
+	7bWnxpUYPIZUBe9wFKxbSgGouSZGWZhYkhO1+bV+XQtPgKLknz4m+Oo8qQCDuzjBRg==
+X-Gm-Gg: ASbGncsmg1sFEWII1i3lFLUFU6X1vbevFR6FdRV63O0YACKygniX+McqoMeIxOZtCk6
+	mbiSl8uCyBGWhJYEJxGSH/K+cy/P5q56pC/qJhnp1HrTo6WVOttAD1RfWzpp2oHWVf3QngwhcZe
+	CVxM59HBG1V83Oo4rfCn5Gnv62ZANrx+vXEVyZU+8umM8zvT4Ig1xk5WF6YteJf38ELaOVweIj6
+	N+XRyDDCz9I5ErPwsumrvBljXBoD01Gp3FvezsbZ6qC8oOonBQ9FCfVudv6yWFVo1HuX42oyd2c
+	DRkogxgXi6HvcvH0NVku42kw8Q6i43fRPhRJlGXwdRUiwCjzLsS9B4G+ewaoOqeArSSKudAmtpZ
+	KrykASwvFTbICCg0eeCoawuqqomoDHkkSwKMe
+X-Google-Smtp-Source: AGHT+IGRwKx0AynK+ibMBUFo43qWTcsiEdtRRQuC50E0G+K6arFeZxJbV27lEJE+xU2l8nMbP/C7jw==
+X-Received: by 2002:a05:600c:4f8a:b0:43d:fa59:a685 with SMTP id 5b1f17b1804b1-453659f5049mr31054025e9.33.1750436758174;
+        Fri, 20 Jun 2025 09:25:58 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535eac8bb6sm64450535e9.25.2025.06.20.09.25.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Jun 2025 09:20:09 -0700 (PDT)
-Message-ID: <ed8f88e7-103a-403b-83ed-c40153e9bef0@6wind.com>
-Date: Fri, 20 Jun 2025 18:20:08 +0200
+        Fri, 20 Jun 2025 09:25:57 -0700 (PDT)
+Message-ID: <e683862b-3eb2-4783-aa4e-c457b7113b7d@broadcom.com>
+Date: Fri, 20 Jun 2025 09:25:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,49 +79,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: When routed to VRF, NF _output_ hook is run unexpectedly
-To: Eugene Crosser <crosser@average.org>, netdev@vger.kernel.org
-Cc: "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
- David Ahern <dsahern@kernel.org>, Florian Westphal <fw@strlen.de>,
- Pablo Neira Ayuso <pablo@netfilter.org>
-References: <f55f7161-7ddc-46d1-844e-0f6e92b06dda@average.org>
- <2211ec87-b794-4d74-9d3d-0c54f166efde@6wind.com>
- <7a4c2457-0eb5-43bc-9fb0-400a7ce045f2@average.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH net-next RFC] net: Throw ASSERT_RTNL into phy_detach
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-actions@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>,
+ Manivannan Sadhasivam <mani@kernel.org>, Mark Einon <mark.einon@gmail.com>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+ Keyur Chudgar <keyur@os.amperecomputing.com>,
+ Quan Nguyen <quan@os.amperecomputing.com>,
+ =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
+ Michael Chan <michael.chan@broadcom.com>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
+ <rafal@milecki.pl>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Doug Berger <opendmb@gmail.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Sunil Goutham <sgoutham@marvell.com>,
+ Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Jijie Shao <shaojijie@huawei.com>,
+ Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+ MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
+ <mengyuanlou@net-swift.com>, Imre Kaloz <kaloz@openwrt.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Steve Glendinning <steve.glendinning@shawell.net>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>
+References: <20250620143341.2158655-1-kory.maincent@bootlin.com>
+ <aFV2h4w3MLtjyfPb@shell.armlinux.org.uk>
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <7a4c2457-0eb5-43bc-9fb0-400a7ce045f2@average.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <aFV2h4w3MLtjyfPb@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Le 20/06/2025 à 18:04, Eugene Crosser a écrit :
-> Thanks Nicolas,
+On 6/20/25 07:56, Russell King (Oracle) wrote:
+> On Fri, Jun 20, 2025 at 04:33:27PM +0200, Kory Maincent wrote:
+>> phy_detach needs the rtnl lock to be held. It should have been added before
+>> to avoid this massive change among lots of net drivers but there was no
+>> clear evidence of such needs at that time. This imply a lock change in
+>> this API. Add phy_detach_rtnl, phy_diconnect_rtnl, phylink_connect_phy_rtnl
+>> and phylink_fwnode_phy_connect_rtnl helpers to take the lock before calling
+>> their respective function.
 > 
-> On 20/06/2025 16:56, Nicolas Dichtel wrote:
+> Please don't increase the number of API functions for phylink for the
+> long term. I'd prefer all callers of the phylink phy_connect functions
+> be updated to hold the RTNL, just like phylink_disconnect() requires.
 > 
->>> It is possible, and very useful, to implement "two-stage routing" by
->>> installing a route that points to a VRF device:
->>>
->>>     ip link add vrfNNN type vrf table NNN
->>>     ...
->>>     ip route add xxxxx/yy dev vrfNNN
->>>
->>> however this causes surprising behaviour with relation to netfilter
->>> hooks. Namely, packets taking such path traverse _output_ nftables
->>> chain, with conntracking information reset. So, for example, even
->>> when "notrack" has been set in the prerouting chain, conntrack entries
->>> will still be created. Script attached below demonstrates this behaviour.
->> You can have a look to this commit to better understand this:
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8c9c296adfae9
-> 
-> I've seen this commit.
-> My point is that the packets are _not locally generated_ in this case,
-> so it seems wrong to pass them to the _output_ hook, doesn't it?
-They are, from the POV of the vrf. The first route sends packets to the vrf
-device, which acts like a loopback.
 
-
-Regards,
-Nicolas
+Yes, I completely agree, this should also make for a smaller patch set 
+to review.
+-- 
+Florian
 
