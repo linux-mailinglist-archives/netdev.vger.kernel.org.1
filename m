@@ -1,179 +1,195 @@
-Return-Path: <netdev+bounces-199838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D45AE200C
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:26:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ADD0AE2010
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 18:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 346121BC0E28
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:26:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A12C1C2140A
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 16:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59272E6D35;
-	Fri, 20 Jun 2025 16:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312C42D4B6F;
+	Fri, 20 Jun 2025 16:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DU/J5Ppt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmW2DxtZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBF52E613F
-	for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 16:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707D928937B;
+	Fri, 20 Jun 2025 16:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750436761; cv=none; b=pAg56Da5rISDirhIHjwJCqOwfVLV7APFZS/Ck+oO8XkWEPjk+ox4sfHSGdYuPTbAu0rQ1QlMrL8uyqnJ7TjQF8p3RFjBG6s0W4WwfKBMxxAM0G0KIdyFl+O5ebEJ6NuJyRKbyyM0X8kjL/havm4HzEyZWWjot9Eki8y68zYec8o=
+	t=1750436806; cv=none; b=eunVNPf+fmNERZmoDpCCtNN+awH88JkxK44BR6d04dG4D0e7OBZ0gstYZyXQWjoeonxZPbQhUFYtHsZIVwa0Rg+FaklrXL3JDvrN92mzJr2iHxc7veJjbSQuUnZwlesj/dvdt1LcTsS/J0f15uTF2p1Lc/HQowp0wxhqIpmj0TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750436761; c=relaxed/simple;
-	bh=2lpfuT+UJ73xh83VqKPWIoYBmbgIzKWaPVoLMY4rhrI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jq+oRrb4Cj5DmzXPdgW1+6ZuYCBY9/f7LGz450jelItet3EKd1bbzG/0QRl1zrpd8SUlk6JJKJdglJkfUK+pF+I1/vVx9SmwU6UGSZbscHtU+jT6K3PxPNNQUo3NTxTPVZ+jcBSxVa6uJlOWOhRmmCOcY2RvOgbqpzzZJu+oGr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DU/J5Ppt; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45310223677so16830155e9.0
-        for <netdev@vger.kernel.org>; Fri, 20 Jun 2025 09:25:59 -0700 (PDT)
+	s=arc-20240116; t=1750436806; c=relaxed/simple;
+	bh=QNBjxIfGuRqEtLTOpu/Dyea9Qwe6PKHjiYv0TnDII/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mWn5sFTq9HCwIRDra0olH7EQtIbvI3ImxFtw5RSl+od3SO2KKM46f+iDLYztxPf30NtibApL7fZXAKWYq9/Q6delxYGy5/vh1Mf80ATwgWz03wQ5l2JgqKvce1H/wnAWM3QzWht5Xcf83fuCrJKgfbMjLNurSyMFqInFleKY7fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hmW2DxtZ; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3de1875bfd4so8183545ab.1;
+        Fri, 20 Jun 2025 09:26:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1750436758; x=1751041558; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Alqg+WicKPYUIWXmnQXqsBN2VhHsKxxFP4ePyG0B/vk=;
-        b=DU/J5PptjWdlJAqQaZD2jvC/tSBZrpcFT7r8u4oFD9vEx6UA+nZ9mVBAFRrZ20h+Bp
-         O8PHKcThXHvlOqA4L8DydUqHeTTfd8qdVhFpZ9dR1a7pAJvyeD9SNfRD10xS5bRpuOLI
-         WlKEE0x00EnGNzLZznjnumWgB30vM1eCm4ekg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750436758; x=1751041558;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1750436803; x=1751041603; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Alqg+WicKPYUIWXmnQXqsBN2VhHsKxxFP4ePyG0B/vk=;
-        b=KneX+Xn/D22pXbTmmwSZDCi+d9JBspuDwPEhyN8XZIIi2kUoPYV2RY12cO1T31cjXE
-         LSreDxHRUfjUowIJGzMfHRK/3T55Uh25NWJV/iaLmWs+IMiSlEA1fejwub8BQ3BBctSv
-         9aUCJv0JY6LdfHCCYvr5tcoyfXcLBnL+hXo6ptuwskMqkY/4pxS6M6jzwpTq4P7cmhpH
-         w0gho76ztGsGx+m4dW2c+ZrvGt9dvWrcBPdqxvI2js9e2RWnd5POEdDfS5I5AHd5BEPy
-         X0rXKismCwVEQwqZ+1u/Aq60w4wGlIerJ5elZkJZ8CZrQYhxkTc5dyYAoulRaNPMTarV
-         gu+w==
-X-Gm-Message-State: AOJu0YzIhjhU4g1zH9o1R/xbgadTDeUChrPw9kAktJZpML7RDZwnVjGt
-	7bWnxpUYPIZUBe9wFKxbSgGouSZGWZhYkhO1+bV+XQtPgKLknz4m+Oo8qQCDuzjBRg==
-X-Gm-Gg: ASbGncsmg1sFEWII1i3lFLUFU6X1vbevFR6FdRV63O0YACKygniX+McqoMeIxOZtCk6
-	mbiSl8uCyBGWhJYEJxGSH/K+cy/P5q56pC/qJhnp1HrTo6WVOttAD1RfWzpp2oHWVf3QngwhcZe
-	CVxM59HBG1V83Oo4rfCn5Gnv62ZANrx+vXEVyZU+8umM8zvT4Ig1xk5WF6YteJf38ELaOVweIj6
-	N+XRyDDCz9I5ErPwsumrvBljXBoD01Gp3FvezsbZ6qC8oOonBQ9FCfVudv6yWFVo1HuX42oyd2c
-	DRkogxgXi6HvcvH0NVku42kw8Q6i43fRPhRJlGXwdRUiwCjzLsS9B4G+ewaoOqeArSSKudAmtpZ
-	KrykASwvFTbICCg0eeCoawuqqomoDHkkSwKMe
-X-Google-Smtp-Source: AGHT+IGRwKx0AynK+ibMBUFo43qWTcsiEdtRRQuC50E0G+K6arFeZxJbV27lEJE+xU2l8nMbP/C7jw==
-X-Received: by 2002:a05:600c:4f8a:b0:43d:fa59:a685 with SMTP id 5b1f17b1804b1-453659f5049mr31054025e9.33.1750436758174;
-        Fri, 20 Jun 2025 09:25:58 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535eac8bb6sm64450535e9.25.2025.06.20.09.25.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Jun 2025 09:25:57 -0700 (PDT)
-Message-ID: <e683862b-3eb2-4783-aa4e-c457b7113b7d@broadcom.com>
-Date: Fri, 20 Jun 2025 09:25:46 -0700
+        bh=SPj9vXF/haHIu7KdTvp6A5jvrauJQopfSYXCbwbTtNc=;
+        b=hmW2DxtZQWo2/dczUGIhNGAv8YX/bbjl731DekKdF4sKHCEqOnm9jycYOhKx4DjIrK
+         rsl7HOeq7Og/XTG7A4lOJDX0O6XEz2tY2Q2czzFpnlIWIihn/NgE4Yb2foQqlOhnrVV5
+         4mDWtEAsg/OjBfb0RfLyUFnOpWPh7NcBm0yPtjij1i2HsX0/1fQgb59p4n5g9s1U6hgH
+         dpkFIuxKZ78iz13pFYwFNjeKF00P/eGJbxl+Zx0VKcH0oNWrkMjdV+XAoR0jfr572WsL
+         zC4R1ciD0FyxhNDrGd5WKdlvG7RyuP2BqAOd+PWNQqfHzaU/4PkyzD0uPi1GbHJuVOQ4
+         LlJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750436803; x=1751041603;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SPj9vXF/haHIu7KdTvp6A5jvrauJQopfSYXCbwbTtNc=;
+        b=gfX9V9CMwgySUUPHBcqC1HwipfXRx9YuxwR9dozTkfjWsYJy6kAykgySnBz9IOdpQM
+         8oqK7AJS6Q57uPsGuFgfYEIbCsfO7LEfb0gSl7kgjfO796Z0+a3MunqbxOQPoGyq4XU8
+         SUOWObH0c04rrUlfFERnKuUukIXvuWxKxyO+qwLPzmWDhRxXL745/iQrryIT8koWTCBn
+         cRllQNhud2i6N9qaO3iXgQ/EWTIAxr377KWtKcBBfk83fgJg2U5EeHokFdZunvIiDUV+
+         GFBe2HWV8SR2RfQIcwqZAa+pwNEwLyz0OLLd6DJ2E9njBEWolqLoJDPpSdpBpDhJ38L7
+         AoqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKzEIP0L+6tp5NWYOVWAoLvZEZrGjHmxO+6wwhfk1ytcRO6xiO2oUN1iPFCn7KmCwaI70tIWRB@vger.kernel.org, AJvYcCVnYygpR/Fsg+GkUQ+ttrGt0ki4aydR1KXGpzuCps5YebBS+/WinptWAbWO2z2YFXp2JkY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnPgr1gVSdZLmL4Zqs2UEWII4neJ2GYdT+rskVu8Vxn5Q2jda1
+	AZN4qvdWFzjsTn7ae8GZxPaXT8B+9fHDeo+dW2hkvExSG5HlDt3EaTQ46LgqbSwQ11NAlRCjLur
+	uYjD9ZwlA+Cro+UDYwP//UqGpKCe/qNA=
+X-Gm-Gg: ASbGncsf/JcKRuGnhWwfGDYcHw4vb2lKIxil4bN/72Bu+WIDBTgMAA3m/U9zAKVbDDt
+	BlBAxQtOJAo59ukoADg1NWAFblM0HtE0pEpQOFk6AhYNtBC/E5cK7r1npx5OU26H9N1EvS0/D2i
+	0b6PCxPVY6hll89LUcZNjK1jC11GJbCF5HjvCcIHv6nSs=
+X-Google-Smtp-Source: AGHT+IFF/MSS6LG1uXWwc1hy3Z4g6azHbL5reDKn6gkrWnDL/EVPHGh9mYk6hbAtvUFyTjteNkEmZFBdCmnmOJoJ8cY=
+X-Received: by 2002:a05:6e02:3c86:b0:3dd:babf:9b00 with SMTP id
+ e9e14a558f8ab-3de38c1b8d9mr40681285ab.1.1750436803283; Fri, 20 Jun 2025
+ 09:26:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next RFC] net: Throw ASSERT_RTNL into phy_detach
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Kory Maincent <kory.maincent@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-actions@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-usb@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>,
- Manivannan Sadhasivam <mani@kernel.org>, Mark Einon <mark.einon@gmail.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- Iyappan Subramanian <iyappan@os.amperecomputing.com>,
- Keyur Chudgar <keyur@os.amperecomputing.com>,
- Quan Nguyen <quan@os.amperecomputing.com>,
- =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
- Michael Chan <michael.chan@broadcom.com>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <rafal@milecki.pl>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Doug Berger <opendmb@gmail.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Sunil Goutham <sgoutham@marvell.com>,
- Hans Ulli Kroll <ulli.kroll@googlemail.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Jijie Shao <shaojijie@huawei.com>,
- Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
- MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
- Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Imre Kaloz <kaloz@openwrt.org>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Steve Glendinning <steve.glendinning@shawell.net>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
- Vladimir Oltean <olteanv@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>
-References: <20250620143341.2158655-1-kory.maincent@bootlin.com>
- <aFV2h4w3MLtjyfPb@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <aFV2h4w3MLtjyfPb@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250619093641.70700-1-kerneljasonxing@gmail.com>
+ <aFVr60tw3QJopcOo@mini-arch> <CAL+tcoBLAMWXjBz9BYb84MmJxGztHFOLbqZL-YX0s7ykBjNT7g@mail.gmail.com>
+ <aFWFO2SH0QUFArct@mini-arch>
+In-Reply-To: <aFWFO2SH0QUFArct@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 21 Jun 2025 00:26:07 +0800
+X-Gm-Features: AX0GCFvHwhc1_wLO9Px3cWXyAScsjDmdYgSH48QGgVyulliogmMRp5sxiSVHDC8
+Message-ID: <CAL+tcoDu-h8crLBsxTVCy6D30vgcB6aarjOpdXE+f4kX1NM8_A@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: xsk: update tx queue consumer immdiately
+ after transmission
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/20/25 07:56, Russell King (Oracle) wrote:
-> On Fri, Jun 20, 2025 at 04:33:27PM +0200, Kory Maincent wrote:
->> phy_detach needs the rtnl lock to be held. It should have been added before
->> to avoid this massive change among lots of net drivers but there was no
->> clear evidence of such needs at that time. This imply a lock change in
->> this API. Add phy_detach_rtnl, phy_diconnect_rtnl, phylink_connect_phy_rtnl
->> and phylink_fwnode_phy_connect_rtnl helpers to take the lock before calling
->> their respective function.
-> 
-> Please don't increase the number of API functions for phylink for the
-> long term. I'd prefer all callers of the phylink phy_connect functions
-> be updated to hold the RTNL, just like phylink_disconnect() requires.
-> 
+On Fri, Jun 20, 2025 at 11:58=E2=80=AFPM Stanislav Fomichev
+<stfomichev@gmail.com> wrote:
+>
+> On 06/20, Jason Xing wrote:
+> > On Fri, Jun 20, 2025 at 10:10=E2=80=AFPM Stanislav Fomichev
+> > <stfomichev@gmail.com> wrote:
+> > >
+> > > On 06/19, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > For afxdp, the return value of sendto() syscall doesn't reflect how=
+ many
+> > > > descs handled in the kernel. One of use cases is that when user-spa=
+ce
+> > > > application tries to know the number of transmitted skbs and then d=
+ecides
+> > > > if it continues to send, say, is it stopped due to max tx budget?
+> > > >
+> > > > The following formular can be used after sending to learn how many
+> > > > skbs/descs the kernel takes care of:
+> > > >
+> > > >   tx_queue.consumers_before - tx_queue.consumers_after
+> > > >
+> > > > Prior to the current patch, the consumer of tx queue is not immdiat=
+ely
+> > > > updated at the end of each sendto syscall, which leads the consumer
+> > > > value out-of-dated from the perspective of user space. So this patc=
+h
+> > > > requires store operation to pass the cached value to the shared val=
+ue
+> > > > to handle the problem.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >  net/xdp/xsk.c | 2 ++
+> > > >  1 file changed, 2 insertions(+)
+> > > >
+> > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > > index 7c47f665e9d1..3288ab2d67b4 100644
+> > > > --- a/net/xdp/xsk.c
+> > > > +++ b/net/xdp/xsk.c
+> > > > @@ -856,6 +856,8 @@ static int __xsk_generic_xmit(struct sock *sk)
+> > > >       }
+> > > >
+> > > >  out:
+> > > > +     __xskq_cons_release(xs->tx);
+> > > > +
+> > > >       if (sent_frame)
+> > > >               if (xsk_tx_writeable(xs))
+> > > >                       sk->sk_write_space(sk);
+> > >
+> > > So for the "good" case we are going to write the cons twice? From
+> > > xskq_cons_peek_desc and from here? Maybe make this __xskq_cons_releas=
+e
+> > > conditional ('if (err)')?
+> >
+> > One unlikely exception:
+> > xskq_cons_peek_desc()->xskq_cons_read_desc()->xskq_cons_is_valid_desc()=
+->return
+> > false;
+> > ?
+> >
+> > There are still two possible 'return false' in xskq_cons_peek_desc()
+> > while so far I didn't spot a single one happening.
+> >
+> > Admittedly, your suggestion covers the majority of normal good ones. I
+> > can adjust it as you said.
+> >
+> > >
+> > > I also wonder whether we should add a test for that? Should be easy t=
+o
+> > > verify by sending more than 32 packets. Is there a place in
+> > > tools/testing/selftests/bpf/xskxceiver.c to add that?
+> >
+> > Well, sorry, if it's not required, please don't force me to do so :S
+> > The patch is only one simple update of the consumer that is shared
+> > between user-space and kernel.
+>
+> My suspicion is that the same issue exists for the zc case. So would
+> be nice to test it and fix it as well :-p
 
-Yes, I completely agree, this should also make for a smaller patch set 
-to review.
--- 
-Florian
+Oh, well, I will take a look at how the selftest works in the next few days=
+.
+
+Allow me to ask the question that you asked me before: even though I
+didn't see the necessity to set the max budget for zc mode (just
+because I didn't spot it happening), would it be better if we separate
+both of them because it's an uAPI interface. IIUC, if the setsockopt
+is set, we will not separate it any more in the future?
+
+Or we can keep using the hardcoded value (32) in the zc mode like
+before and __only__ touch the copy mode? Then if someone or I found
+the significance of making it tunable, then another parameter of
+setsockopt can be added? Does it make sense?
+
+Thanks,
+Jason
 
