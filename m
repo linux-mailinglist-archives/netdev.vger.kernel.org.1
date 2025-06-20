@@ -1,88 +1,152 @@
-Return-Path: <netdev+bounces-199635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35092AE103D
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 02:13:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA9BAE1048
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 02:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38754A14CE
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:13:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D8C17E472
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 00:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146AB36D;
-	Fri, 20 Jun 2025 00:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F2A0EC4;
+	Fri, 20 Jun 2025 00:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XuMA59iR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kw03tk+h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7B617E;
-	Fri, 20 Jun 2025 00:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C34336D;
+	Fri, 20 Jun 2025 00:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750378422; cv=none; b=OTFl/xQtm92baX2PvPMq7mCj0zyp6TspKKXwru7cm1lb7agJ7C3GecPAl5W3MxM4fdmCpk+eK4abD7ts3ZI9evr+TSefzT9075oUb+RltKKk6UCvPCc5vfUrHs01WzqvuigsGeLCwrYkL8m5TY7Mr9BbKPAy1PMHZCpA2j8jjes=
+	t=1750378708; cv=none; b=Vfc/+y9w/FZjENHmsr31uRgqdiVshF3AVWaZS7nLl2WFaQKglpukjTPIIQVtL5qtDflU2Lj4qUiIIq5m+f5kEw/OKHadKhnz7HTUGOpmTvAKK27VGC3uUx0D59WjOOiYqMTPKcpcXoJdU/wQnQIcQlQebUO31MfMkgUHA/HRBgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750378422; c=relaxed/simple;
-	bh=HASUCIL9ulPvLyn3zTulpno8DS94ekxO6WW6pn7Y6ms=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VES785xgAz3Ku/+/wihzH4xZ9DCDnYQePe8RkISQIiEYFQHEfSiWPwNqHWcDyKiN6bSxjTx9D3TarVy/8aUXLjGdjMYDAllYozSJ86T0fsO4QJXNeAxYruHd3n8l+vuO9DGMt/0vbdP1Qqorxu7mWJWDTaSJttRUUvamCnR73BI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XuMA59iR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63888C4CEF1;
-	Fri, 20 Jun 2025 00:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750378421;
-	bh=HASUCIL9ulPvLyn3zTulpno8DS94ekxO6WW6pn7Y6ms=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XuMA59iRXoC4OrMM44QnuZF3MM/WJnbYjB9BPDvZrFYPEQ2kNMfGGZz8JnDY/c2jR
-	 1812O2iaojg/6koDslMtFlbJTkD6pX5PHKzvjnu0Ldzv8FgnmaBwlvrtyPBeK5Nz8+
-	 4/xGmDQnJdjmDVnSj0NIkYBcgp/ONwgujOTQKUeheJhkYL1b7qGBQ5w/aNckMIwpoy
-	 kYCYvrKl06oYl/cQEvtnauN2Bt2d6rcACroXBXug0KA2slmpMOipopx+fM7Y42e4DV
-	 HxGADf3EBYFtDKsqKN5RZqHJ5AxLgqSC/9BUGkF5qZEDKwthDsxRb1++jgCKXvbh5U
-	 QUzHbwlfGzhCA==
-Date: Thu, 19 Jun 2025 17:13:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, Krzysztof
- Karas <krzysztof.karas@intel.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
- <thomas.weissschuh@linutronix.de>
-Subject: Re: [PATCH v15 0/9] ref_tracker: add ability to register a debugfs
- file for a ref_tracker_dir
-Message-ID: <20250619171339.1bf28dc7@kernel.org>
-In-Reply-To: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
-References: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
+	s=arc-20240116; t=1750378708; c=relaxed/simple;
+	bh=w0CnN9nRxM8Gmxr87352B5HdJQn3ewdIkakAPqYfDpc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MTN1QEoWOOWmu7CB2IraAoT+s+RKuS9qX6PGI9mMMBq4LiNRH5UROqFwKg6xfiYkoKkK7ifvwqu13YjBG3+geHch+9v59B03q/wTu2OomtZqW2DBRhbgDdOrf6ScfUv6M40dgWygcCUf6VdcJxiSkKK12JLymA4VctW2f0aDvg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kw03tk+h; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3de0f5ff22dso4154265ab.1;
+        Thu, 19 Jun 2025 17:18:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750378706; x=1750983506; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QZIYbY5bX7r6exf6PC2f3tF/R1sXpZVatFvAnCE92s8=;
+        b=kw03tk+hcAkrEbHceA/hZPXUFASlnlzI6SPbbdPbcDDJfX2O9svWkImjCcI+mFUFrh
+         +iImXKDLPNOVBEEe0LEBcAH3G2SPaPD8Td4elJs9MwLTDwHAA2y8Xky8li9sEur63tlj
+         ge4bjzDaf0tKX2A9mIsHqlHm29mIyoErKWx9JzjliLgkIAn3SkuiMqMtGMqFvO8yYBBy
+         XQ+MVGhJiarBmxqlAyYBa6iffHvtnxi9fUg2C84+2dymTe8PWBpmIcPW/+CGksgkvOUx
+         zs9++lizQo1Y+9fytq5YbVFxHdxedR3jNcR2jh6obWvKIo8V1tH6B2GwyYWK7Kihu+io
+         rt3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750378706; x=1750983506;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QZIYbY5bX7r6exf6PC2f3tF/R1sXpZVatFvAnCE92s8=;
+        b=Eyh21KfsTQpfMYxSv4nSxHc4G+Re/XDdHj0a4KuJ//BN9Z2Z2jjveKBhNNs/fnimuh
+         hhkokM2/Ql17i0ro0oT3V2kBfArQEZcdnnYU9C6Yx2XRBYUrK4H0mJfIP5Ng/C9UlNlf
+         XQSOZ1ETVNplwUVR9OpLpkUUyNdTg9koUhXwwhutabdsDp9ws3pcyp1gu0VovcOmvmCE
+         YbRAogg9A0kM453zxc6IEd8JLlzHrqmGnIpFt7uz68nXeiA7G3qwHrms3X+iC9bKp3zc
+         SA8AcRb8hSMkNmvQailJbNw3bZdJpOq+suawuApgjJJzJMKF/SXyYI2RKkJdoW6TphOD
+         IH6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUwR117BRirnGSGl4+PD7HPh5cgZEeLfa+fv9HSvLg+P83IAYFFsjAhTyLcAtyxC5cfhII=@vger.kernel.org, AJvYcCWYbsOP/9qTVajCeERbYVp+FAUEBZ6FsfI461OqaQmWGbZjjthcpqQY7XmUY0TDyYN9+zKF/Ac8@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCQcLTXaDddBteAEt1IT1jgXPLYOBxrB35ECKvRV2uIkjmJlVY
+	iCGDdY0g+ikJbl8te0nDi32h/I0eyY82iNRdG3Gvh1ekB6w2RbjW9RT9RYuB7nYOBndS/9ZzZJG
+	Woj3e9B3G6XW+sPg7fGY5KQdWOLVqF3I=
+X-Gm-Gg: ASbGnctFBTPK1J0rbk2WcxVlPMMXrhtYOPtt/XejkDS2HFiRoM5LGHAB/i2PTlGrPJ1
+	oY04xX3Sns6/7H3tWJYH3n53SEcQaBNjCdVBJdPQZikoHenjjWuQ7CAm/pLe9/up0q44giCMtpi
+	nLvTZuabp0uGNN/1QXH937LRkgdQprJw39E9rYMB8p2g==
+X-Google-Smtp-Source: AGHT+IEXV3K1E4s6uWsaZ7NhAsDf3K/vFVqKmzUtFBiO4ajGCvZ3FA0bqRJSYyOIYD799wHjWsdlfMefHwAMfHPvfUE=
+X-Received: by 2002:a05:6e02:1786:b0:3dd:bb60:4600 with SMTP id
+ e9e14a558f8ab-3de3955bf4bmr4303895ab.5.1750378705696; Thu, 19 Jun 2025
+ 17:18:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250619090440.65509-1-kerneljasonxing@gmail.com> <20250619080904.0a70574c@kernel.org>
+In-Reply-To: <20250619080904.0a70574c@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 20 Jun 2025 08:17:48 +0800
+X-Gm-Features: AX0GCFtkfYezekGNgOug7Ex6UjGsdLp0tlaykkd2OPR0pdaaO8-DnHVsjYr0Dyg
+Message-ID: <CAL+tcoA=KQCLdthH3VXPhd-z=sieKQu_xOPgQEzxdy0Mtnycag@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 18 Jun 2025 10:24:13 -0400 Jeff Layton wrote:
-> For those just joining in, this series adds a new top-level
-> "ref_tracker" debugfs directory, and has each ref_tracker_dir register a
-> file in there as part of its initialization. It also adds the ability to
-> register a symlink with a more human-usable name that points to the
-> file, and does some general cleanup of how the ref_tracker object names
-> are handled.
+On Thu, Jun 19, 2025 at 11:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Thu, 19 Jun 2025 17:04:40 +0800 Jason Xing wrote:
+> > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, s=
+truct xdp_desc *desc)
+> >       rcu_read_lock();
+> >  again:
+> >       list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > -             if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGET) {
+> > +             int max_budget =3D READ_ONCE(xs->max_tx_budget);
+> > +
+> > +             if (xs->tx_budget_spent >=3D max_budget) {
+> >                       budget_exhausted =3D true;
+> >                       continue;
+> >               }
+> > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >  static int __xsk_generic_xmit(struct sock *sk)
+> >  {
+> >       struct xdp_sock *xs =3D xdp_sk(sk);
+> > -     u32 max_batch =3D TX_BATCH_SIZE;
+> > +     u32 max_budget =3D READ_ONCE(xs->max_tx_budget);
+>
+> Hm, maybe a question to Stan / Willem & other XSK experts but are these
+> two max values / code paths really related? Question 2 -- is generic
+> XSK a legit optimization target, legit enough to add uAPI?
 
-Thanks Jeff!
+I'm not an expert but my take is:
+#1, I don't see the correlation actually while I don't see any reason
+to use the different values for both of them.
+#2, These two definitions are improvement points because whether to do
+the real send is driven by calling sendto(). Enlarging a little bit of
+this value could save many times of calling sendto(). As for the uAPI,
+I don't know if it's worth it, sorry. If not, the previous version 2
+patch (regarding per-netns policy) will be revived.
 
-I'm going to apply this based on v6.16-rc2 and merge to net-next.
-If anyone would like to also pull into their trees the hash will 
-be 707bd05be75f. Happy to create a branch if necessary, too.
+So I will leave those two questions to XSK experts as well.
+
+>
+> Jason, I think some additions to Documentation/ and quantification of
+> the benefits would be needed as well.
+
+Got it.
+
+#1 Documentation. I would add one small section 'XDP_MAX_TX_BUDGET
+setsockopt' in Documentation/networking/af_xdp.rst.
+
+#2 quantification
+It's really hard to do so mainly because of various stacks implemented
+in the user-space. AF_XDP is providing a fundamental mechanism only
+and its upper layer is prosperous.
+
+Thanks,
+Jason
+
+> --
+> pw-bot: cr
 
