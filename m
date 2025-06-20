@@ -1,82 +1,220 @@
-Return-Path: <netdev+bounces-199918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8328FAE2319
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 21:55:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED56AE2327
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 21:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEE597ADC84
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:53:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DF2E1884704
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765EA22C355;
-	Fri, 20 Jun 2025 19:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30B722CBC6;
+	Fri, 20 Jun 2025 19:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxQhk8JN"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="v3EALXau"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D80A221FBF;
-	Fri, 20 Jun 2025 19:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4CC2253EB;
+	Fri, 20 Jun 2025 19:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750449300; cv=none; b=hZX08cmz7Y7h5LQIogNJ7SOc45P/D7NnsOsoTSbLW3REyRtSZZYbgb/pyAl0y/jAlWbRnnBsbqWBfr74h2qwnZi1DDOUdUoqLrCor3q7eukxOboRzeSsDijs8BXTTlGoda2S2Dep1NY81Jc75A+wUc0cGRFoDD52+MG0zJqtq+M=
+	t=1750449486; cv=none; b=mjPCXoFbiRZn0XJZkn3OzfL3ahQqxv20Am+KnKeAClofJu1fUfBu6UCjLWkoQ3pef4XH5HFVlRrmHn/ovjCBQXBiUtZ+QzvuaqtYgNPiR8DmgLAxKwCRn1dS+fIQ8jx2pUBBSTPEGzzWs2p2luT8jzGTadYBjT2FHZlBsl51sag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750449300; c=relaxed/simple;
-	bh=pySmXwSoyXawUE5lOnRaqr9m9TZBHviSkIg2SRRuX38=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aDExrsImS6uZ2JZ22gGxI7BrcO2YvCgw8Xk8Ry4UyWlxjJ+Y8MWdBs/qOqJ1Q6TCki0g/dvmfhFcazry9JPvWgQU9bE6aBWzwHhZVXTETeP0GLLzY8o+v/kwfAdy9U8c0gFFKWylsj6eIiqy1KOBlUx3ZgVR+QLNhCqf4neBekU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxQhk8JN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8326C4CEE3;
-	Fri, 20 Jun 2025 19:54:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750449299;
-	bh=pySmXwSoyXawUE5lOnRaqr9m9TZBHviSkIg2SRRuX38=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lxQhk8JNCzaL8/q8x4EhcJeBc60BO9OOzIA5hIMUvJ+pycDoC7fhFn/alRkio7MYS
-	 BnnlC+ivohmNlOgJUH9jUDGBnQEGl2gw+GaLKe20HW6Lh2bVnvDWaChOUHBn5dWBpN
-	 e2+MflIzwkCeGkO6mfVuJ25SEjx0UWOLYz41i8olocWpHmcz15Jv+xVVNeSeap05Az
-	 s4dYRxreq2shNI0VdzCnKdxq8rCcDAybviJeF/JY2nEaWGDvwrmzzPtpD+C60qU/nf
-	 nsSHnRPKJ4Hq7FT4ZJikXwoj9QXGWWxT99tMHhn95t7VG4a1aHxwMdyNUMOOAxBdbn
-	 J2SprTsJuhDAg==
-Date: Fri, 20 Jun 2025 20:54:55 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel test robot <lkp@intel.com>, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: pse-pd: Fix ethnl_pse_send_ntf() stub
- parameter type
-Message-ID: <20250620195455.GA9190@horms.kernel.org>
-References: <20250620091641.2098028-1-kory.maincent@bootlin.com>
+	s=arc-20240116; t=1750449486; c=relaxed/simple;
+	bh=qD7QOF0Eu3kbnHtl32Gda5bek7meSJSxrmTH5Gei8i8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vBvnUR2EPkAV58SIaJgT2nFOX3uQstqSXU/yBO2aZ+r9FcapI5Ac4csYbAh7zyqNTaOdla+YopQX03ys3bhWRIqgoIjQ5JfcsgANEqqzT2LwsJEJZGr+XuGEEjumfRtVOu0ttDx5FpYb6JG3mxFlhAxj9QxJQ8yDaqGhV7UOJ58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=v3EALXau; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uShs7-0011ht-GO; Fri, 20 Jun 2025 21:57:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=vckMvA6jWBSBfECI0pQWoIeT/beoNl3jiVpNm9w7QOU=; b=v3EALXauZCD/fezkh9p8YZEVyV
+	7pReDOY3G6YsYt0yWKrufLOu3MgvjZd4ElvASaHFJWXxkG+yR0DdQdajYx0WMv8/MmXzwcGZBTnYb
+	njKy5NQpqFSICnPoQQt2Ah3bvyp4i5YapnANmBuhteTe7I+uJ4V0hu1qCLzaQwNCS/IFJf7MjwIwa
+	sAx6BtbatjUfuErgB0zQyfirBQ+RtR+9w9q02otKoB1Ru0dKljoI7PRGzNm4lMfxGdTHCGV0sbFGp
+	VYZKW+jNY7tm3a3YHRLRG0mO/Uv1S/DBMMQEngz9jHDGyRAXESNMlxeD9Ssql/zKyTHzmsqptaXOy
+	4lxOYanA==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uShs6-00044Z-Od; Fri, 20 Jun 2025 21:57:58 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uShrm-009FAR-5z; Fri, 20 Jun 2025 21:57:38 +0200
+Message-ID: <fbbbb112-e529-43a7-97a7-ca031a1fc448@rbox.co>
+Date: Fri, 20 Jun 2025 21:57:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250620091641.2098028-1-kory.maincent@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/3] vsock: Fix transport_{h2g,g2h} TOCTOU
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250618-vsock-transports-toctou-v1-0-dd2d2ede9052@rbox.co>
+ <20250618-vsock-transports-toctou-v1-1-dd2d2ede9052@rbox.co>
+ <r2ms45yka7e2ont3zi5t3oqyuextkwuapixlxskoeclt2uaum2@3zzo5mqd56fs>
+ <fd2923f1-b242-42c2-8493-201901df1706@rbox.co>
+ <cg25zc7ktl6glh5r7mfxjvbjqguq2s2rj6vk24ful7zg6ydwuz@tjtvbrmemtpw>
+ <4f0e2cc5-f3a0-4458-9954-438911e7d104@rbox.co>
+ <CAGxU2F65bh=jU6MVnhh=EzP19iayWATEezDFDd+c9o+K3Bf6YQ@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <CAGxU2F65bh=jU6MVnhh=EzP19iayWATEezDFDd+c9o+K3Bf6YQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 20, 2025 at 11:16:41AM +0200, Kory Maincent wrote:
-> The ethnl_pse_send_ntf() stub function has incorrect parameter type when
-> CONFIG_ETHTOOL_NETLINK is disabled. The function should take a net_device
-> pointer instead of phy_device pointer to match the actual implementation.
+On 6/20/25 16:43, Stefano Garzarella wrote:
+> On Fri, 20 Jun 2025 at 16:23, Michal Luczaj <mhal@rbox.co> wrote:
+>>
+>> On 6/20/25 15:20, Stefano Garzarella wrote:
+>>> On Fri, Jun 20, 2025 at 02:58:49PM +0200, Michal Luczaj wrote:
+>>>> On 6/20/25 10:32, Stefano Garzarella wrote:
+>>>>> On Wed, Jun 18, 2025 at 02:34:00PM +0200, Michal Luczaj wrote:
+>>>>>> Checking transport_{h2g,g2h} != NULL may race with vsock_core_unregister().
+>>>>>> Make sure pointers remain valid.
+>>>>>>
+>>>>>> KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
+>>>>>> RIP: 0010:vsock_dev_do_ioctl.isra.0+0x58/0xf0
+>>>>>> Call Trace:
+>>>>>> __x64_sys_ioctl+0x12d/0x190
+>>>>>> do_syscall_64+0x92/0x1c0
+>>>>>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>>>>>>
+>>>>>> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>>>>> ---
+>>>>>> net/vmw_vsock/af_vsock.c | 4 ++++
+>>>>>> 1 file changed, 4 insertions(+)
+>>>>>>
+>>>>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>>>>> index 2e7a3034e965db30b6ee295370d866e6d8b1c341..047d1bc773fab9c315a6ccd383a451fa11fb703e 100644
+>>>>>> --- a/net/vmw_vsock/af_vsock.c
+>>>>>> +++ b/net/vmw_vsock/af_vsock.c
+>>>>>> @@ -2541,6 +2541,8 @@ static long vsock_dev_do_ioctl(struct file *filp,
+>>>>>>
+>>>>>>    switch (cmd) {
+>>>>>>    case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
+>>>>>> +          mutex_lock(&vsock_register_mutex);
+>>>>>> +
+>>>>>>            /* To be compatible with the VMCI behavior, we prioritize the
+>>>>>>             * guest CID instead of well-know host CID (VMADDR_CID_HOST).
+>>>>>>             */
+>>>>>> @@ -2549,6 +2551,8 @@ static long vsock_dev_do_ioctl(struct file *filp,
+>>>>>>            else if (transport_h2g)
+>>>>>>                    cid = transport_h2g->get_local_cid();
+>>>>>>
+>>>>>> +          mutex_unlock(&vsock_register_mutex);
+>>>>>
+>>>>>
+>>>>> What about if we introduce a new `vsock_get_local_cid`:
+>>>>>
+>>>>> u32 vsock_get_local_cid() {
+>>>>>     u32 cid = VMADDR_CID_ANY;
+>>>>>
+>>>>>     mutex_lock(&vsock_register_mutex);
+>>>>>     /* To be compatible with the VMCI behavior, we prioritize the
+>>>>>      * guest CID instead of well-know host CID (VMADDR_CID_HOST).
+>>>>>      */
+>>>>>     if (transport_g2h)
+>>>>>             cid = transport_g2h->get_local_cid();
+>>>>>     else if (transport_h2g)
+>>>>>             cid = transport_h2g->get_local_cid();
+>>>>>     mutex_lock(&vsock_register_mutex);
+>>>>>
+>>>>>     return cid;
+>>>>> }
+>>>>>
+>>>>>
+>>>>> And we use it here, and in the place fixed by next patch?
+>>>>>
+>>>>> I think we can fix all in a single patch, the problem here is to call
+>>>>> transport_*->get_local_cid() without the lock IIUC.
+>>>>
+>>>> Do you mean:
+>>>>
+>>>> bool vsock_find_cid(unsigned int cid)
+>>>> {
+>>>> -       if (transport_g2h && cid == transport_g2h->get_local_cid())
+>>>> +       if (transport_g2h && cid == vsock_get_local_cid())
+>>>>                return true;
+>>>>
+>>>> ?
+>>>
+>>> Nope, I meant:
+>>>
+>>>   bool vsock_find_cid(unsigned int cid)
+>>>   {
+>>> -       if (transport_g2h && cid == transport_g2h->get_local_cid())
+>>> -               return true;
+>>> -
+>>> -       if (transport_h2g && cid == VMADDR_CID_HOST)
+>>> +       if (cid == vsock_get_local_cid())
+>>>                  return true;
+>>>
+>>>          if (transport_local && cid == VMADDR_CID_LOCAL)
+>>
+>> But it does change the behaviour, doesn't it? With this patch, (with g2h
+>> loaded) if cid fails to match g2h->get_local_cid(), we don't fall back to
+>> h2g case any more, i.e. no more comparing cid with VMADDR_CID_HOST.
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202506200355.TqFiYUbN-lkp@intel.com/
-> Fixes: fc0e6db30941 ("net: pse-pd: Add support for reporting events")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> It's friday... yep, you're right!
+> 
+>>
+>>> But now I'm thinking if we should also include `transport_local` in the
+>>> new `vsock_get_local_cid()`.
+>>>
+>>> I think that will fix an issue when calling
+>>> IOCTL_VM_SOCKETS_GET_LOCAL_CID and only vsock-loopback kernel module is
+>>> loaded, so maybe we can do 2 patches:
+>>>
+>>> 1. fix IOCTL_VM_SOCKETS_GET_LOCAL_CID to check also `transport_local`
+>>>     Fixes: 0e12190578d0 ("vsock: add local transport support in the vsock core")
+>>
+>> What would be the transport priority with transport_local thrown in? E.g.
+>> if we have both local and g2h, ioctl should return VMADDR_CID_LOCAL or
+>> transport_g2h->get_local_cid()?
+> 
+> Should return the G2H, LOCAL is more for debug/test, so I'd return it
+> only if anything else is loaded.
+>>>> 2. move that code in vsock_get_local_cid() with proper locking and use
+>>> it also in vsock_find_cid()
+>>>
+>>> WDYT?
+>>
+>> Yeah, sure about 1, I'll add it to the series. I'm just still not certain
+>> how useful vsock_get_local_cid() would be for vsock_find_cid().
+>>
+> 
+> Feel free to drop 1 too, we can send it later if it's not really
+> related to this issue.
 
-I note that this is a fix for a patch present in net-next but not net,
-so the Fixes tag + target of net-next combination looks good to me.
+I've added it to the end of this series (and marked the series as RFC), for
+ease of discussion.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> About the series, maybe it is better to have a single patch that fixes
+> the access to ->get_local_cid() with proper locking.
+> But I don't have a strong opinion on that. I see it like a single
+> problem to fix, but up to you.
+
+Yeah, I get your point. So I've tried something similar in v2:
+https://lore.kernel.org/netdev/20250620-vsock-transports-toctou-v2-0-02ebd20b1d03@rbox.co/
+
 
