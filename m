@@ -1,182 +1,81 @@
-Return-Path: <netdev+bounces-199906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB52AAE2195
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:52:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7938AE219A
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 19:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CC261C256FB
-	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0A4B3A1DF1
+	for <lists+netdev@lfdr.de>; Fri, 20 Jun 2025 17:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFA02EA176;
-	Fri, 20 Jun 2025 17:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcBSOk4f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E7C2E2657;
+	Fri, 20 Jun 2025 17:52:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.monkeyblade.net (shards.monkeyblade.net [23.128.96.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDBE2C032E;
-	Fri, 20 Jun 2025 17:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CF81E2606;
+	Fri, 20 Jun 2025 17:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.128.96.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750441628; cv=none; b=Ys5ZuxrUV0XMmqF+5ALAEs3LNmY9HPKOV9lCQcrOPvjiwFfkQTl1Hb5s9fDXIQuu0aDt6PkVrDzZRRuYJZqALaPWJAGzxa3driOAjHx2q3s3GkIS4iLBMLTuxvx6QAbsEMYYEd+XJHG83mVPeYDCSLY/2NflOFqKRfBr67Egcac=
+	t=1750441932; cv=none; b=tdGukG+47RegtISzCjiMEwSZUc2o0I8XAdRfayERCnqjADxVMiLWQ7MIXeOjvCme3OgCr9b44MG5yJYMiV+GYHe/XycqHZFFk2sjrzW1uIiLidHxf6/qPagYfvyFrIXaV8TjpR8O3evHFvZJlTYpQn+4L1foS/cC9vlPvywFPkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750441628; c=relaxed/simple;
-	bh=G+uRjHUsAKHU7qr3i9K5U2L9j60GOaWBVQjAK4camcw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JPuP7ZMUIFETNG872X9DFPS+4Aahb7hUy2XGNW6UY0wtPKdEtiYvu+3G8VdRW5tYXBAHDmKHD8SBg0ppTn/KB7a+GKFZtXfyGVTu2bn/jfLh8w6ZukpX61TaHHKj78SowhIJdjQ82PX4EcRzSom7zX4xpzClcs7G54yAEJRHTVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcBSOk4f; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3de18fde9cfso9379385ab.3;
-        Fri, 20 Jun 2025 10:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750441625; x=1751046425; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fc1DRuvWMiWb4OzwWVTG5fXpPk1UbYHpZU6dF9pGGDU=;
-        b=VcBSOk4frTZIFGRCSRPyiAb07ArvFjFVUJqFRZ6mKcFmN0RTjmdKkweWhtMqStHJcb
-         VUAlUfnpY1ZjFPYvRnIua+AEVEVM+pvtKOnyzpiVnn4x5rUDuGN22tNE63z5Q/JRMYmp
-         CSo1P3TNPpKGDil6Shff+jM/0P60dsqapUsIV78UNrrLin2Yc+mv3a6ep44HW4Y/GPjC
-         ImCFF9HHxRjl54OQ7mfDZNizvprqndVQbOY0bullmXiaLQDjBTJ7lwSVBWVLbhoQpA0f
-         0JKW64wAY+CIGpbxQyLKt0js1FtjXZ5X5eIriyhegDEbCEQK8K1y1Do73XiwY6wSqZfe
-         iqxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750441625; x=1751046425;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fc1DRuvWMiWb4OzwWVTG5fXpPk1UbYHpZU6dF9pGGDU=;
-        b=sXzvPIBYUtjgLpJoeE18TK9DYEr1+qm6glWUkP04gawQROQ42aXeGDjeCqRh0X5+Un
-         2fsMvS6z5LmjyGu6dzlAwzqL4im8P/gUbXCLJRvU9wiYvVDqV2c+EitQdgmv9IvrJ+FN
-         SaMQtMbcTnQ8n92i++1pqjemU423Fmztuk5uanQ/pNhQPeQopPTPm1dOq3MPnFvZWDH7
-         IT4x2Cyy+27DqhYrT9WvSyZD9NXpAFZ6ko+kGIdF3+uPF4D9Xyzsnm1GJslCgTEhujuS
-         IjDZAz2yfs2BSPlgBcoKqxlUL6vH7FotMzJ1Qlz/hcB4cTasVst0rnu58sY0hTa0HVRY
-         B2Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCVIFfSR4gfFZO9YPRo02wJ6T1YvN7fCU7CYZZObsKuXY8BRoYKOj4M1F55WYEamrLBm3ug=@vger.kernel.org, AJvYcCX8iYpqpf4mjP8p3UliFTT1yEGcTY9buVWeShB+eiY5BuoKtgzRdbu7bSZDfSzt3I+buCVWgC6u@vger.kernel.org
-X-Gm-Message-State: AOJu0YytC66/ZUWJ7Vo+QfH/fEkHlowy/UXqbq/Mc3BwFms624UeG6qy
-	BZdd0yNWFqOaKvDdldV/0gVLACgpm81UYoJ2eg7zJpfyVpBZ8RWSjOOv/mcRDo1XmpSDhpG8U0w
-	5jHlHI8QgxJcZqHBcStGPvXxp6JAKQvU=
-X-Gm-Gg: ASbGncvvGaP/inpo8eNE8FtHBwpDmuQ87HIQssm/JYwRoM9zcyuwFf3oVy/3kRaa5DW
-	SzfHiqoSywiTwr5nYzRoAi5Xo5sqmUhH4x/QaOXu4gZCJQKAtt4PlMQ5eJX30C8ekfucZJbCKlJ
-	FtBOUH496J4nOYN/frE+8H5Crb9Y4xCqfjxSmnFJCSZsM=
-X-Google-Smtp-Source: AGHT+IFZRiuzbdgTkxXz3uUD9g2+l/fELPFRpuHlX/77yLUkEjYD0St6FUiiBSdtIb8NXRXArDbqbYrTi+9coeGUQrI=
-X-Received: by 2002:a05:6e02:398e:b0:3dd:89dc:ab07 with SMTP id
- e9e14a558f8ab-3de38c550damr48498965ab.8.1750441625571; Fri, 20 Jun 2025
- 10:47:05 -0700 (PDT)
+	s=arc-20240116; t=1750441932; c=relaxed/simple;
+	bh=Dy+p15HC9zP/n/4KM5eMWzVkPkNU3THZSPGOgrzcbL0=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=gJ15V3E4rkeanFpc/q68putI6teA3G/j/jK0RYZ9ZA2I3yDw3jyIrjsZrm3voTxX+JTo/+r+3E+kn284yba2y0bCQxsgvvinRI6iOT1ZnePqa9eChATZ3f9ItsAS5NWp4nbGf4cpe734lIwSaxL8n5+uh0OyVeH90syLKPXU0R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davemloft.net; spf=none smtp.mailfrom=davemloft.net; arc=none smtp.client-ip=23.128.96.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davemloft.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davemloft.net
+Received: from localhost (brnt-05-b2-v4wan-161083-cust293.vm7.cable.virginm.net [86.11.207.38])
+	by mail.monkeyblade.net (Postfix) with ESMTPSA id EFA01841F1AE;
+	Fri, 20 Jun 2025 10:52:06 -0700 (PDT)
+Date: Fri, 20 Jun 2025 18:52:02 +0100 (BST)
+Message-Id: <20250620.185202.1877972778102559754.davem@davemloft.net>
+To: arnd@kernel.org
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, arnd@arndb.de, horms@kernel.org, linux@treblig.org,
+ aleksandr.loktionov@intel.com, dawid.osuchowski@linux.intel.com,
+ jedrzej.jagielski@intel.com, mateusz.polchlopek@intel.com,
+ piotr.kwapulinski@intel.com, slawomirx.mrozowicz@intel.com,
+ martyna.szapar-mudlaw@linux.intel.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] ethernet: intel: fix building with large NR_CPUS
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20250620173158.794034-1-arnd@kernel.org>
+References: <20250620173158.794034-1-arnd@kernel.org>
+X-Mailer: Mew version 6.8 on Emacs 26.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
- <20250619080904.0a70574c@kernel.org> <aFVvcgJpw5Cnog2O@mini-arch>
- <CAL+tcoAm-HitfFS+N+QRzECp5X0-X0FuGQEef5=e6cB1c_9UoA@mail.gmail.com> <aFWQoXrkIWF2LnRn@mini-arch>
-In-Reply-To: <aFWQoXrkIWF2LnRn@mini-arch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 21 Jun 2025 01:46:29 +0800
-X-Gm-Features: AX0GCFtrUJLPMGfyW5I8aICjGUxHFHJeytyXTC_8bBZ-svjpdeliu4HVXX35D6Y
-Message-ID: <CAL+tcoB-5Gt1_sJ_9-EjH5Nm_Ri+8+3QqFvapnLLpC5y4HW63g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=iso-8859-7
+Content-Transfer-Encoding: base64
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.2 (mail.monkeyblade.net [0.0.0.0]); Fri, 20 Jun 2025 10:52:10 -0700 (PDT)
 
-On Sat, Jun 21, 2025 at 12:47=E2=80=AFAM Stanislav Fomichev
-<stfomichev@gmail.com> wrote:
->
-> On 06/21, Jason Xing wrote:
-> > On Fri, Jun 20, 2025 at 10:25=E2=80=AFPM Stanislav Fomichev
-> > <stfomichev@gmail.com> wrote:
-> > >
-> > > On 06/19, Jakub Kicinski wrote:
-> > > > On Thu, 19 Jun 2025 17:04:40 +0800 Jason Xing wrote:
-> > > > > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *p=
-ool, struct xdp_desc *desc)
-> > > > >     rcu_read_lock();
-> > > > >  again:
-> > > > >     list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
-> > > > > -           if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGET) {
-> > > > > +           int max_budget =3D READ_ONCE(xs->max_tx_budget);
-> > > > > +
-> > > > > +           if (xs->tx_budget_spent >=3D max_budget) {
-> > > > >                     budget_exhausted =3D true;
-> > > > >                     continue;
-> > > > >             }
-> > > > > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct x=
-dp_sock *xs,
-> > > > >  static int __xsk_generic_xmit(struct sock *sk)
-> > > > >  {
-> > > > >     struct xdp_sock *xs =3D xdp_sk(sk);
-> > > > > -   u32 max_batch =3D TX_BATCH_SIZE;
-> > > > > +   u32 max_budget =3D READ_ONCE(xs->max_tx_budget);
-> > > >
-> > > > Hm, maybe a question to Stan / Willem & other XSK experts but are t=
-hese
-> > > > two max values / code paths really related? Question 2 -- is generi=
-c
-> > > > XSK a legit optimization target, legit enough to add uAPI?
-> > >
-> > > 1) xsk_tx_peek_desc is for zc case and xsk_build_skb is copy mode;
-> > > whether we want to affect zc case given the fact that Jason seemingly
-> > > cares about copy mode is a good question.
-> >
-> > Allow me to ask the similar question that you asked me before: even tho=
-ugh I
-> > didn't see the necessity to set the max budget for zc mode (just
-> > because I didn't spot it happening), would it be better if we separate
-> > both of them because it's an uAPI interface. IIUC, if the setsockopt
-> > is set, we will not separate it any more in the future?
-> >
-> > We can keep using the hardcoded value (32) in the zc mode like
-> > before and __only__ touch the copy mode? Later if someone or I found
-> > the significance of making it tunable, then another parameter of
-> > setsockopt can be added? Does it make sense?
->
-> Related suggestion: maybe we don't need this limit at all for the copy mo=
-de?
-> If the user, with a socket option, can arbitrarily change it, what is the
-> point of this limit? Keep it on the zc side to make sure one socket doesn=
-'t
-> starve the rest and drop from the copy mode.. Any reason not to do it?
-
-Thanks for bringing up the same question that I had in this thread. I
-saw the commit[1] mentioned it is used to avoid the burst as DPDK
-does, so my thought is that it might be used to prevent such a case
-where multiple sockets try to send packets through a shared umem
-nearly at the same time?
-
-Making it tunable is to provide a chance to let users seek for a good
-solution that is the best fit for them. It doesn't mean we
-allow/expect to see the burst situation.
-
-[1]
-commit e7a1c1300891d8f11d05b42665e299cc22a4b383
-Author: Li RongQing <lirongqing@baidu.com>
-Date:   Wed Apr 14 13:39:12 2021 +0800
-
-    xsk: Align XDP socket batch size with DPDK
-
-    DPDK default burst size is 32, however, kernel xsk sendto
-    syscall can not handle all 32 at one time, and return with
-    error.
-
-    So make kernel XDP socket batch size larger to avoid
-    unnecessary syscall fail and context switch which will help
-    to increase performance.
-
-Thanks,
-Jason
+RnJvbTogQXJuZCBCZXJnbWFubiA8YXJuZEBrZXJuZWwub3JnPg0KRGF0ZTogRnJpLCAyMCBKdW4g
+MjAyNSAxOTozMToyNCArMDIwMA0KDQo+IEZyb206IEFybmQgQmVyZ21hbm4gPGFybmRAYXJuZGIu
+ZGU+DQo+IA0KPiBXaXRoIGxhcmdlIHZhbHVlcyBvZiBDT05GSUdfTlJfQ1BVUywgdGhyZWUgSW50
+ZWwgZXRoZXJuZXQgZHJpdmVycyBmYWlsIHRvDQo+IGNvbXBpbGUgbGlrZToNCj4gDQo+IEluIGZ1
+bmN0aW9uIKFpNDBlX2ZyZWVfcV92ZWN0b3KiLA0KPiAgICAgaW5saW5lZCBmcm9tIKFpNDBlX3Zz
+aV9hbGxvY19xX3ZlY3RvcnOiIGF0IGRyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2k0MGUvaTQw
+ZV9tYWluLmM6MTIxMTI6MzoNCj4gICA1NzEgfCAgICAgICAgIF9jb21waWxldGltZV9hc3NlcnQo
+Y29uZGl0aW9uLCBtc2csIF9fY29tcGlsZXRpbWVfYXNzZXJ0XywgX19DT1VOVEVSX18pDQo+IGlu
+Y2x1ZGUvbGludXgvcmN1cGRhdGUuaDoxMDg0OjE3OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFj
+cm8goUJVSUxEX0JVR19PTqINCj4gIDEwODQgfCAgICAgICAgICAgICAgICAgQlVJTERfQlVHX09O
+KG9mZnNldG9mKHR5cGVvZigqKHB0cikpLCByaGYpID49IDQwOTYpOyAgICBcDQo+IGRyaXZlcnMv
+bmV0L2V0aGVybmV0L2ludGVsL2k0MGUvaTQwZV9tYWluLmM6NTExMzo5OiBub3RlOiBpbiBleHBh
+bnNpb24gb2YgbWFjcm8goWtmcmVlX3JjdaINCj4gIDUxMTMgfCAgICAgICAgIGtmcmVlX3JjdShx
+X3ZlY3RvciwgcmN1KTsNCj4gICAgICAgfCAgICAgICAgIF5+fn5+fn5+fg0KPiANCj4gVGhlIHBy
+b2JsZW0gaXMgdGhhdCB0aGUgJ3JjdScgbWVtYmVyIGluICdxX3ZlY3RvcicgaXMgdG9vIGZhciBm
+cm9tIHRoZSBzdGFydA0KPiBvZiB0aGUgc3RydWN0dXJlLiBNb3ZlIHRoaXMgbWVtYmVyIGJlZm9y
+ZSB0aGUgQ1BVIG1hc2sgaW5zdGVhZCwgaW4gYWxsIHRocmVlDQo+IGRyaXZlcnMuDQo+IA0KPiBT
+aWduZWQtb2ZmLWJ5OiBBcm5kIEJlcmdtYW5uIDxhcm5kQGFybmRiLmRlPg0KPiAtLS0NCj4gdjI6
+IG1vdmUgcmN1IHRvIGp1c3QgYWZ0ZXIgdGhlIG5hcGlfc3RydWN0IFtBbGV4YW5kZXIgTG9iYWtp
+bl0NCg0KQWNrZWQtYnk6IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4NCg==
 
