@@ -1,90 +1,113 @@
-Return-Path: <netdev+bounces-200044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6141AE2C6A
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 22:59:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0BDEAE2C88
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 23:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75D9F1897E09
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 20:59:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA38189A284
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 21:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033AC26A1A3;
-	Sat, 21 Jun 2025 20:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B762271443;
+	Sat, 21 Jun 2025 21:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xFoNDCfh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KmKXWqnM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0BD44C77
-	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 20:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2D127055E
+	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 21:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750539547; cv=none; b=aIocLBA3WPgg2wmbETULP4x4xgeDnSmhwBfitznTRdi9W/zy8my9zZk0c67YNOl3iro1rJqbv0Bs1nvocE1hQAgHsv9Vux/NaRRgzp8XSDMPSNxXuVtoDiV0Szu7KYTqtpXw1M+Rhc37sFqr1N2s8H2tTWwzLJqDusyqp/w8bEk=
+	t=1750540008; cv=none; b=VZ5q2YHP7FMfGJzFve4gy4ymPjc56P8BNM+uMeBUUfMa0AEwtsbeSsEmEfxv3ELB9S6b3yJFNCvZwNcyFLLVnKWQL2UfzErce3Ltp/MQtYKwjPrMdUqS61W4IsY86JWnG41cyOILyeL7duGNPVqE6KQTsxEPh7NglEoBmL5I3mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750539547; c=relaxed/simple;
-	bh=ca4d+gxAKuvrnYls+U6GGBbjws4awsx2KxQlPDlv/mk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uJYNhgDHCGU3oruIdHQuqKtpcdBSinqq5MXMApU178ZL5nR4zYNsT4Ckc9QDUk/NVWfOP3YCtkbL4C5LRdPmkaxtSGl4Y2jnBiB1GLpmDL9jshkZe2v+hTfGXku5zryop9xXLEhdRJsBbmYFd0e+NnVhxrowlbChka9fi51lMU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xFoNDCfh; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <93b666e9-c9da-419e-bc9c-bf909b5fe2db@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750539543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GrezwRxn27vhw+tVfzftQm3l7p3ugozLQ4Dt+cwCRNE=;
-	b=xFoNDCfh0hNxSd67miZmIYDu/A0vpwUY0zNirynWzWS6KJmGA4/CtKjzLMqyA+OFCcsQrd
-	0vbWy8M2Z9WecLEqrrYbmXhq7MFljru5G4wIpv0HvcCJW98LPbM2NPPZstCAsULVD479RU
-	Xeb862UreWT6oZq3YXeLw/xUL1uQJPg=
-Date: Sat, 21 Jun 2025 21:59:02 +0100
+	s=arc-20240116; t=1750540008; c=relaxed/simple;
+	bh=nkXstz1C3clyLM3MvPPtHM/8r/K4NXJ2Fa434t+fCeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jf5bpZDdBo/SZdPygbeBH4EJRVDtBiBdRzYjBDTFi67nsz3LCfdOd8MNr6r/PlL7IJw/QcwdBIbyIj+wa7GNN3iq3vUCj+lmWNqdmiiP63pVQfcxxRBBT5C8inRwr0NET5ARRFYPhdo7NY2WkHGwlZ5xBhmaQ8oK+bUU1QA+/DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KmKXWqnM; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750540007; x=1782076007;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nkXstz1C3clyLM3MvPPtHM/8r/K4NXJ2Fa434t+fCeM=;
+  b=KmKXWqnMz5QiEFR9vxcdn3blxFJHDg9h5DtK3swe+Ehz29wqE/3lBjSi
+   wCTkK8VWk9YW5fM6XiBZnzh2qCp8GzlNWAapWadfd9zf0zVrJedZQ3KV1
+   vt+mXxOXoIJBUwfVGJ5SbYXMFPfhnUtZpVj932axXEw+ii1k+pOEIhHRL
+   I07Agu6Bur0AaBy5jf6HvTDJ6J0+7emyBoDyE1Rip3vPrvethhSnGR7Tb
+   1ymnmtmKuQPNynMnm7Bfv51rmb5GH0hHkKMqol66fUM5tTKdq20I9Rb3O
+   +UkPy7ph/pHh+gW7nESrg/UtKH5bZoqajm6VxgFwLhAbtxifAZ4NNnb9Q
+   w==;
+X-CSE-ConnectionGUID: shBAcYeYQl6zPPUTUQzRmg==
+X-CSE-MsgGUID: 3w2hpRi7R7CfFdDkFaHKVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11470"; a="63046069"
+X-IronPort-AV: E=Sophos;i="6.16,254,1744095600"; 
+   d="scan'208";a="63046069"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2025 14:06:46 -0700
+X-CSE-ConnectionGUID: wTQNmEfFTuiKDELw2780IQ==
+X-CSE-MsgGUID: 5iQF6TNIRLqOgmSkQY+A5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,254,1744095600"; 
+   d="scan'208";a="150694433"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 21 Jun 2025 14:06:43 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uT5Q8-000Mrm-1h;
+	Sat, 21 Jun 2025 21:06:40 +0000
+Date: Sun, 22 Jun 2025 05:06:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	horms@kernel.org, donald.hunter@gmail.com,
+	maxime.chevallier@bootlin.com, sdf@fomichev.me, jdamato@fastly.com,
+	ecree.xilinx@gmail.com, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 6/9] net: ethtool: rss: add notifications
+Message-ID: <202506220435.3mOsIoqI-lkp@intel.com>
+References: <20250621171944.2619249-7-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [patch 10/13] ptp: Split out PTP_MASK_CLEAR_ALL ioctl code
-To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-References: <20250620130144.351492917@linutronix.de>
- <20250620131944.344887489@linutronix.de>
- <80052862-683c-4a53-b7a2-8d767a057022@linux.dev> <877c14q0yc.ffs@tglx>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <877c14q0yc.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250621171944.2619249-7-kuba@kernel.org>
 
-On 21/06/2025 21:44, Thomas Gleixner wrote:
-> On Sat, Jun 21 2025 at 21:36, Vadim Fedorenko wrote:
->> On 20/06/2025 14:24, Thomas Gleixner wrote:
->>> Continue the ptp_ioctl() cleanup by splitting out the PTP_MASK_CLEAR_ALL ioctl
->>> code into a helper function.
->>>    	case PTP_MASK_CLEAR_ALL:
->>> -		bitmap_clear(tsevq->mask, 0, PTP_MAX_CHANNELS);
->>> -		break;
->>> +		return ptp_mask_clear_all(pccontext->private_clkdata);
->>>    
->>>    	case PTP_MASK_EN_SINGLE:
->>>    		if (copy_from_user(&i, (void __user *)arg, sizeof(i))) {
->>>
->>
->> Not quite sure there is a benefit of having a function for this type,
->> apart from having one style. But it adds some LoC...
-> 
-> Sure it's debatable benefit, but it makes the code more consistent and
-> does not introduce this oddball in the middle of the other function
-> calls.
+Hi Jakub,
 
-Fair.
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Kicinski/netlink-specs-add-the-multicast-group-name-to-spec/20250622-012137
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250621171944.2619249-7-kuba%40kernel.org
+patch subject: [PATCH net-next 6/9] net: ethtool: rss: add notifications
+config: i386-buildonly-randconfig-004-20250622 (https://download.01.org/0day-ci/archive/20250622/202506220435.3mOsIoqI-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250622/202506220435.3mOsIoqI-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506220435.3mOsIoqI-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: net/ethtool/ioctl.o: in function `ethtool_set_rxfh':
+>> ioctl.c:(.text+0x6ede): undefined reference to `ethtool_rss_notify'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
