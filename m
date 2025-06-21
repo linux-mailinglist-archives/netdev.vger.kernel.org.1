@@ -1,82 +1,132 @@
-Return-Path: <netdev+bounces-199958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA97AE28AD
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 12:54:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B669CAE28B4
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 13:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 828353B0640
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 10:53:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C103179BAC
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 11:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F62D1F2B88;
-	Sat, 21 Jun 2025 10:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FB61E570D;
+	Sat, 21 Jun 2025 11:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EnVvIvnN"
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="HrdZ2ruX";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iaLMhipq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3BC43AA8
-	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 10:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7676D84D34
+	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 11:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750503233; cv=none; b=fG91AifZEFYTCS+LoosSYv6DpOgBvAXsDlFOhtL9SQbzqpMhYrNz3DRcxaDcJ3ighC8taaK/psrlkJ0hwpTXBAn4P4mR2xR0EBiMeCHEjFFgyMbkCySlR31rltfx5D8fcsWH/XPTkQRROwblf4+4x5GDiU2l2snxjevrGSobDOI=
+	t=1750503639; cv=none; b=XgdqTyd7MgLvbuiLTzekTvc1trSJo8D65LWe0gPrGE6IAWDL21xN7MK+XsEd3JcxwwzYo1m1PDDcxMFLjiiuEiogqUuyn9KXnPEv/u8UZNT/sUKvIObgAkN89vwT50+ZqmsY+km4jAbp7js7XK2XIwVXPRYoA/YYeSdleRPBeiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750503233; c=relaxed/simple;
-	bh=Gth65kDkUA33Wz5sETJyWlyi8Pe/GaBh02usqmYjj0M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NLbjRDwbtti5k++cOIesg42QWXzU1HQ1mhy4btUVL1p21D8XPpdMyUFZ3U0BEM3n1mnQjiFn+qw8x7Nff7RFSQJSRFO9I5Q5+LV45ik4MA7Dw+1yh/5TBGgaK498px5Ok3ld6B6m/DZdM0N8GRDKsiFY7HHS7ob/P13TyQF7f6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EnVvIvnN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1564C4CEE7;
-	Sat, 21 Jun 2025 10:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750503232;
-	bh=Gth65kDkUA33Wz5sETJyWlyi8Pe/GaBh02usqmYjj0M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EnVvIvnNWwDX1ll2xE5AnP45dJIWZDeUjRcv7PWkw2A3DyCLNrrjRbTpm3F0IG4gC
-	 k8BKgzAA7Jc4k2LYaYvU/l/A0MdT+MSIXe27MQ3UdK0Rt+ZCLYlsDA6E84OwJzKPkV
-	 Mp17MBZIxtev9OwZcYBgr0vO023n67VuhwfeKOVmnYRPuTNy5/tCr8Q2Lux4NhCgNw
-	 eab96u6ksBTg4Jr/tfWkleJtNa88h33cszwqeF1QRrf2I1CCbP4JzvLHcUuqR9jjGU
-	 2uPEPCsFLw7PxepNxvk7Av1FjcAZXTRCOp8XsIsuhX9h6HxOIhS1urjOisTlyIURuJ
-	 tGjz6M7jbvp4A==
-Date: Sat, 21 Jun 2025 11:53:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot+1316233c4c6803382a8b@syzkaller.appspotmail.com,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Gengming Liu <l.dmxcsnsbh@gmail.com>
-Subject: Re: [PATCH net] atm: clip: prevent NULL deref in clip_push()
-Message-ID: <20250621105348.GC71935@horms.kernel.org>
-References: <20250620142844.24881-1-edumazet@google.com>
+	s=arc-20240116; t=1750503639; c=relaxed/simple;
+	bh=oJvHsWspQ6RPTkuT+waLiNWoEwAStjWVpBbDAzYjCHo=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=ohNPDXhSJXEvWXYKk966GKo5IlmkOLMXe8Hc8UiGYrs0IYTD0VIAe8XwmplwiEcXC29sN5WNmZ21V7Qz01rJdt6lVsgR01s8+2+sCXU21HSkgL7Vb4MSqu6Unlec3ni12347Lax2BuJOTiDcXrfJMIJ9MzwNf0Pp4kCK6zSlNx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=HrdZ2ruX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iaLMhipq; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 75EA41140151;
+	Sat, 21 Jun 2025 07:00:35 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Sat, 21 Jun 2025 07:00:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1750503635;
+	 x=1750590035; bh=oJvHsWspQ6RPTkuT+waLiNWoEwAStjWVpBbDAzYjCHo=; b=
+	HrdZ2ruXBAVUWogJuCzfp7lmRk5b3e0v+TFfj3Osi1hsopAl6SOpRP1yIg1347pz
+	uaRcE5pyx4BI3oxB1N61nU9OpWmO/V9rUc7pjrkDk8s770SjNF0c+0RljlbzlKcO
+	ELFYXbts9d/fYgnZjPbCAS+CZCMu+tq0Qi9zVjI70Y3DnPNB/VTRd/xonu18E1zd
+	pXEmEG6BmcD8Rk4iQn88kRCKGvm0ZfsUGleLN+KKsvx3HQuzKmvgUkvAuOF16CdE
+	cVQq00PE1cjZ3zDpHjqaj2saqgog+wHr9cRh+uoPW2mIz2AofqbCWbfFc5nwAxDF
+	bMYxrDZtoJNq/FaCFnaQMQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750503635; x=
+	1750590035; bh=oJvHsWspQ6RPTkuT+waLiNWoEwAStjWVpBbDAzYjCHo=; b=i
+	aLMhipqACK+JiPedHgGlxdnTevytKVVVOLR+g5tWG3t360bNee21inUqjr87cIDE
+	AOUzCfWPsH7XR9yInHC32k06SMbTQ2bxrii+4Wp4faiG+yrOLdPgzE6xbCKf9wg9
+	8gTpNQyflkvxEiaU9G6J79pRsLtA1JjFdspMZBiZZM30uyBvjEh1JH8UGzsmNSHg
+	R94frA0g3YIwOPDG8W8Phbos9xlSSsBPn3yuWt39uCojjlBH+EzhSiXnaCT96ASS
+	z6Z6oRse5Py0bZaVUr8K8LYTDg44Xbo+kLzd+ZnyCCyKzJm1e2SLJHoO6MCyfcKK
+	GcvZj5w3pyvySxXi33rZQ==
+X-ME-Sender: <xms:0pBWaA8hZrGOyB9fAGya2J4f7LW-z0M6srU-ABq4pHGeYiKxn6qWCg>
+    <xme:0pBWaIup-Q0KoNHWSiJ8vV71d36Jk1gURwVSKHGOZmSJGIQrAy6wdq9DsAjnTOhfq
+    0565aEau_SFoC3HJtk>
+X-ME-Received: <xmr:0pBWaGBqJA9U7EJ4grvFDXA9gRmRjKFsIvg-zqYQNYudIUDIgVkPmSYr7k0v6ztqFa3ylF8s6PDd7OVoDMeAOT1JDOkS3wf16gJapx0nHIwUsg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdduudduudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpegtggfuhfgjffevgffkfhfvofesthejmhdthhdtvdenucfhrhhomheptfhitggrrhgu
+    uceuvghjrghrrghnohcuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrf
+    grthhtvghrnhepvdevvdehffehleelgfejhfeitdelfeeuvddttdfgiefgvedtgffgkeej
+    geffffetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    eprhhitggrrhgusegsvghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtg
+    hpthhtohepmhhikhgrrdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtgho
+    mhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehmihgthhgrvghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohep
+    higvhhgviihkvghlshhhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfi
+    donhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
+    ohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:0pBWaAf3dr8w--EmkkyJ7O0YKF_hT1z-7c_8igl3G_BZUIUDc5AW-Q>
+    <xmx:0pBWaFM8T3D_HD6V-d8KZeE83wv6-JGub843iNrwn4k5Sbk2KCCqvw>
+    <xmx:0pBWaKndWRkaMEhpAGX9X_HJqsorXT6JUj9gkYqO9eHS278Z8e21hg>
+    <xmx:0pBWaHvI0uCeG_P7faGpnkKoYxpWCxanUeIBBMVKj4qkGt59co1hQg>
+    <xmx:05BWaEW3Q3RRvvpIBietbtK0cOO1bK207vkxlwG5Ms8TXm4Lxt0owrBx>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 21 Jun 2025 07:00:32 -0400 (EDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250620142844.24881-1-edumazet@google.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+From: Ricard Bejarano <ricard@bejarano.io>
+In-Reply-To: <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
+Date: Sat, 21 Jun 2025 13:00:30 +0200
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+ netdev@vger.kernel.org,
+ michael.jamet@intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
+Content-Transfer-Encoding: 7bit
+Message-Id: <F42DF57F-114A-4250-8008-97933F9EE5D0@bejarano.io>
+References: <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
+ <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
+ <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
+ <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
+ <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
+ <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
+ <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
+ <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
+ <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
+ <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
+ <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-On Fri, Jun 20, 2025 at 02:28:44PM +0000, Eric Dumazet wrote:
-> Blamed commit missed that vcc_destroy_socket() calls
-> clip_push() with a NULL skb.
-> 
-> If clip_devs is NULL, clip_push() then crashes when reading
-> skb->truesize.
-> 
-> Fixes: 93a2014afbac ("atm: fix a UAF in lec_arp_clear_vccs()")
-> Reported-by: syzbot+1316233c4c6803382a8b@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/68556f59.a00a0220.137b3.004e.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Gengming Liu <l.dmxcsnsbh@gmail.com>
+Anything we could further test?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+RB
 
