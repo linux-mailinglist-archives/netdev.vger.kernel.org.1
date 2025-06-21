@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-199979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2DFAE29AF
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 17:00:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8DACAE29B2
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 17:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7494E178711
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 15:00:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36F54189BD0D
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 15:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4DF21B9C1;
-	Sat, 21 Jun 2025 14:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C0621D3DD;
+	Sat, 21 Jun 2025 14:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+OtdEy9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMGOdenU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A0121ABC1;
-	Sat, 21 Jun 2025 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A9A21CC5D;
+	Sat, 21 Jun 2025 14:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750517993; cv=none; b=lSqQpcXmJB7XzywKhHTKtGBbvARq8QcaSPCn8D/PBF3FvAKOlErOMw8E3JXtF87azJ2HutCzVvWVi0DWFhvcnFbtJ1faF4ULwxefgRsfpxU7z0d9pd/RqZGQ34Ivz4Wlh6FiFFk44w+FFmBIaO2AB02drwy0vWiIPmI6p1ZJfs8=
+	t=1750517994; cv=none; b=gvdsQ/rq3et4fT2loQzNNvV4W804Ta6Z4Gc3LDw0JJpp9aeGTIWhmsPAxLJPLQVvMu9Gz45iYN2NO97gdWtd745cUhfNAUZ18oX8Bz1WkJ5w4QhMkFgP3QQcVgtt0bDCH16ktrdevefKhLpEPq9TbKgGDVQAgt3G/KYkw6F1ZFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750517993; c=relaxed/simple;
-	bh=6a8Dvp49ElImNVjI6ZNvXoOKe6JQ+cckTuZyKY3B5/o=;
+	s=arc-20240116; t=1750517994; c=relaxed/simple;
+	bh=9qq7NQu5PTKPAheZWyM9SE6Cw1pnneIyXZryk4yd2r4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hzga4mt3KQeS7kCvNtdD65PdBmPOSuFCKCVI5QySI0Ey7SvvvonefYJ7A9yNvsG6MQ3jrj7zuB6vmk84DyjgHkWg08FkxQj52ZXl2Rw/2qQ51EAGK2pa8bnqDx9CKUEXdUaj6+DX9+E3+Q0sI8RFZp7KOtvtdNk15K0qjBN4awc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+OtdEy9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C9B7C4CEEE;
-	Sat, 21 Jun 2025 14:59:52 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GydqgGZ79xTInftTJvc+QcY62S3GAF1HqkLTlvCPV3JkalWcIuaktcC1jf5+/kFIYX9iuerv9ESYSE1TcPUfnKKraVHxnCCLUSFLYrfKvqxe7fsII2HBrcjv0uXEkoSwVLdXGYs+evfgfBXGayNCIbi2yNCXK9Ex2kagM6NVPCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMGOdenU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DE32C4CEEE;
+	Sat, 21 Jun 2025 14:59:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750517992;
-	bh=6a8Dvp49ElImNVjI6ZNvXoOKe6JQ+cckTuZyKY3B5/o=;
+	s=k20201202; t=1750517993;
+	bh=9qq7NQu5PTKPAheZWyM9SE6Cw1pnneIyXZryk4yd2r4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s+OtdEy9GMqWCD4LnPSnKlkcKtgecbXmNQwr2ctyVUmWMZoveFC5Gv0QQdYgr2Mge
-	 LkUg/NvhO+PIAAZlJ+jrtztzPwyFU64huEsLy5G79PHMtW3VQpXseiqYDbhcJapwSX
-	 RMOeCt59ghTQCoJSZDft8LZw94bsMUHi7AT6jxj3xOXO/khoFZzsTRe325s2/MYUp3
-	 ewhl0e9FcEuSzOJRrgtZDEq4105RQamApCbhCHYAroHBLHwndp/9UUbom/kVpeayJE
-	 WyEls/d3SSMRwnMhCZhPY+V3tyiI7K2hzxVswNsZi4/kLqrOgx91H+GT8agDqY8EzV
-	 Pdenadj6XxQJA==
+	b=DMGOdenUVteNxDG+A35T7EV85KwOtIaBZv+0ds2veixJMINY+p7V4tqigA+4fMwoq
+	 MY6uuQ7kngdckGWqP2SiJEkhhtix/3EKksPEkKYaZvXzPkTNtu3I8YxysPzpoyWxlN
+	 0iRX4GMpD2dYLrbCTfdMubnLR1e3Xb2I2UL4x9kZYdQoyx30MMo5iInl2HDqd7Pygr
+	 qQD+uo5PXIp3YRcdRIRnODoqpD2rFemXixuZ52m7wlPmh7f76ujctps0LMcEoPUc8f
+	 UcQxxE8hc2g4TATCMYWI3X6HJPFplxXUVp6O1Ks53jZHfUlDcXvk2bHR6XLnh1Higk
+	 g1EElAwSXeFLw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3498D38111DD;
-	Sat, 21 Jun 2025 15:00:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D9338111DD;
+	Sat, 21 Jun 2025 15:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] rds: Minor updates for spelling and endian
+Subject: Re: [PATCH] can: rcar_canfd: Describe channel-specific FD registers
+ using
+ C struct
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175051801974.1877807.9744009419522667514.git-patchwork-notify@kernel.org>
-Date: Sat, 21 Jun 2025 15:00:19 +0000
-References: <20250619-rds-minor-v1-0-86d2ee3a98b9@kernel.org>
-In-Reply-To: <20250619-rds-minor-v1-0-86d2ee3a98b9@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: allison.henderson@oracle.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com
+ <175051802124.1877807.84993120749211212.git-patchwork-notify@kernel.org>
+Date: Sat, 21 Jun 2025 15:00:21 +0000
+References: 
+ <292b75b3bc8dd95f805f0223f606737071c8cf86.1750327217.git.geert+renesas@glider.be>
+In-Reply-To: 
+ <292b75b3bc8dd95f805f0223f606737071c8cf86.1750327217.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: mailhol.vincent@wanadoo.fr, kuba@kernel.org, mkl@pengutronix.de,
+ davem@davemloft.net, biju.das.jz@bp.renesas.com, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 19 Jun 2025 14:58:31 +0100 you wrote:
-> Hi,
+On Thu, 19 Jun 2025 12:13:17 +0200 you wrote:
+> The rcar_canfd_f_*() inline functions to obtain channel-specific CAN-FD
+> register offsets really describe a memory layout.  Hence replace them by
+> a C structure, to simplify the code, and reduce kernel size.
 > 
-> This short series addressses some cosmetic issues in rds.
-> 
-> 1. Some spelling errors, as flagged by spellcheck
-> 2. Some endianness annotation errors, which are not bugs,
->    flagged by Sparse
+> This also gets rid of warnings about unused rcar_canfd_f_*() inline
+> functions, which are reported by recent versions of clang.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] rds: Correct endian annotation of port and addr assignments
-    https://git.kernel.org/netdev/net-next/c/6e307a873d30
-  - [net-next,2/2] rds: Correct spelling
-    https://git.kernel.org/netdev/net-next/c/433dce0692a0
+  - can: rcar_canfd: Describe channel-specific FD registers using C struct
+    https://git.kernel.org/netdev/net-next/c/ab2aa5453bb8
 
 You are awesome, thank you!
 -- 
