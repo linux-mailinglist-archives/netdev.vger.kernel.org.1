@@ -1,127 +1,155 @@
-Return-Path: <netdev+bounces-199956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C62AE289C
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 12:32:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0987DAE289F
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 12:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 365FA5A08B8
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 10:32:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A796C1897A54
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 10:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FD91EB1BF;
-	Sat, 21 Jun 2025 10:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDEF1E5B73;
+	Sat, 21 Jun 2025 10:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqBdapiB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3In1HUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4412130E842;
-	Sat, 21 Jun 2025 10:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D02E1624E9;
+	Sat, 21 Jun 2025 10:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750501949; cv=none; b=L1o4zwaQFUKgiJuYej+86od1HYkgF3zCdWOyU76qVn86sj1Ki3uM1gw/ssTn9Zh3AdG5LJHzh3Sz87VVtJOfeTLwUBJrVewpXPy1uuFh3s+VYhMq4vB9huRh/QKioyyK3/Y5aQU295MI3w0oF1Jw8e3W1/279rQlhVdxZqulc0c=
+	t=1750502188; cv=none; b=AFWEqiRBcw6rKsL04QvKGjKaql+8IDZOhwo7vOeA1vf91MYPi6hAgsRn1I1RXv+WOFBl2imTWlS+ByCGKJGrSlqUZODHDaCtNH1GzJGAuv12yK1+xVoztkeUoCT2n1cuTtfg+pEHBj4G1CQH4YqMesxf1d/36FVjz2xjZD5lmL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750501949; c=relaxed/simple;
-	bh=6zdtW4ZsWVEXC+13yFdtzSL8MneybnvekLwrAzlWTow=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q0zRRg/DHo2yeHFZ1c1GtPSptirxkYPM3nauoY+3Mz32uiP7AX0kz0Lnhv307SH1d1+piFCDgsCR6or1sBG2XFCNCBrne3v1GbPpe2RDQJ4+gb1bQBe3nqojlj0O/ChlOR1fGq/kI0TO+Zz7mReLNTyep2HqjacxxBuf56MzXps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iqBdapiB; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b31c978688dso1458258a12.1;
-        Sat, 21 Jun 2025 03:32:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750501947; x=1751106747; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=012KofByWzR1UXs6q6FS6IJCSkgS2EX290wo0slGf5Q=;
-        b=iqBdapiBin18QwTSewE52Lxy1xpCoU2op6OXi4eems7Vc2s3ijH3Ly70rBs4a3EoPO
-         nDngRhW5EQPI/ZLhLeYxfc6+MQCYwsJ8ofVRMmPnkTAHEx0DiT0621VZaT0mJFUDJD44
-         O53VArPrmhqsB5Y4Exxf90Hoi44ibWbkUsL3fZXk69Hjq/wDBagqlOzdTPyAizbCX3l5
-         NGr24DQyu7GfD++IsatZfvaunoTnwWiAeyg817NGwGm3HQWS5XD8/JM1urHt0dZxXz7B
-         mZ7xjQyhmH22jfQ0RhbXD1F4g6Rf2xg95x6pIs8sNg11kVUX4eu2BPcDZSv9NDv1QgxJ
-         aLZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750501947; x=1751106747;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=012KofByWzR1UXs6q6FS6IJCSkgS2EX290wo0slGf5Q=;
-        b=sJjY49keOSbI8qK0Slu97e4jks2t2JdsIRMExiln99DzBxC3krrX/8n61zEsXJShI9
-         yBu6o2K9RmVbzuoRO/Zb7ouhPuAN+eJgAmwGPyUpyQ1b3MXZnzxjRooRBDT5KQPTz3Fp
-         OZRhmRxU28f9NkunVJhhSpexnVFlky95F6MmFPufEY0HVwlJuILv/xpjG3jmTHzxL0R/
-         2h7o6dQLl1cJSanCFMdzKe089kyYM+PTNR+7F5a6pKiRdBl18Lm9rzOmQ683yP2P8IxI
-         qmHRhAEXOzTeyNHrx+lc4SsH/AJJEYUK5CCW1CFL8cpDp5dOKyYO+DsQLm73GYlvgG93
-         W9dA==
-X-Forwarded-Encrypted: i=1; AJvYcCUL7qBXc5LUP0NTzsQW17zik4sRK53FVzGy5LR0Ud2NyCGzwDz7pGftwArGwv+r+k7URSj2FY6+kEo9uC6L@vger.kernel.org, AJvYcCWPFqNAdvwCuKEAE5ZBuitWbzMsiVrC4QEawoj5VWc/ykgv/+x3PpMD/Uht0o/uOBCIJM6ULp2GCoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCnfyEBaZw2Mx7ftMvhbcLXqwTkb0iCi32JYTNE//5RN9OIYLg
-	gKhXGuwkpK/7I87A+OBEFFLtsOMs9Al+Rjgbkg7zag96AMGZypliznLw16nnq5eN
-X-Gm-Gg: ASbGnctvRdSfk9Paa9R32g2a2nP1N8zHmPcOjMICbJidZ8rgIv83jEblMSfsgyS63wR
-	nMLMiesPiizA344o6VdpEnf7BFbFnC2zBLBi1hrc9eVm28rJUiQG9wPKj69fj9zx49kPYQzvkgy
-	OElFWiH8s51mDFcZloX3KxOo76IK83lD55fszyZ6GarNC8iylEqflsa7jsbrUTIFy9Gr0OK1FBI
-	9MtIzrll1V5XTJ0XES4QAIalJ43EkolQCrgnaoXViErtEi7cnenEOChtdjn17hgdQuFvqp8EUAE
-	4uPgSALP/Q5gnkgqJLX7jDlk41wTlJ3Kml2aSJSQpE3Fds7C24PCIcdE75DkTb8cN72iJcRji/U
-	K42phLXZeBQ==
-X-Google-Smtp-Source: AGHT+IFvir19QObe2nVc1F6Xwx+QcsI5R/E4xY54gUD+iJiKIaJ38TEmYQc1r84maQZfk3j5qrRbZQ==
-X-Received: by 2002:a17:90b:3dd0:b0:313:2768:3f6b with SMTP id 98e67ed59e1d1-3159d8daaecmr9171605a91.27.1750501947373;
-        Sat, 21 Jun 2025 03:32:27 -0700 (PDT)
-Received: from faisal-ThinkPad-T490.. ([49.207.215.194])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3158a24c3fbsm6177890a91.21.2025.06.21.03.32.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Jun 2025 03:32:27 -0700 (PDT)
-From: Faisal Bukhari <faisalbukhari523@gmail.com>
-To: sgoutham@marvell.com,
-	lcherian@marvell.com,
-	gakula@marvell.com,
-	jerinj@marvell.com,
-	hkelam@marvell.com,
-	sbhatta@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Fix typo in marvell octeontx2 documentation
-Date: Sat, 21 Jun 2025 16:02:04 +0530
-Message-ID: <20250621103204.168461-1-faisalbukhari523@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750502188; c=relaxed/simple;
+	bh=XdhXJ6xgtEXxF6yH2/iVd6cbk2kpHK0jLlVvy4AbYBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bl63OInrHQLKHWO/gDbcx72rtfl0ML/mXpF7dYhIgah4XJjL9N69u47lEpP5u2yQ6vjZLijrqTX5Nt7McIMU9UbJlIUj3lJW+G38yq+IsIOsvKFKi74R9d3pg+vW41HdqQuy3vtFycd6069hH6YhtfYImz+nuQxKCZTmw/UK9jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3In1HUI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1061C4CEE7;
+	Sat, 21 Jun 2025 10:36:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750502188;
+	bh=XdhXJ6xgtEXxF6yH2/iVd6cbk2kpHK0jLlVvy4AbYBs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F3In1HUIGF53PwoOpZt39X/4nPxZYqMpOneJJ/Jap14f0/AWjnp5znxKJSYSu35G3
+	 skFxN+tDbpi4T03ooAwHY7SxmtXwVI/+t6EiSC+56WU9uIDcHG6MA3SebwIi+Y1D7N
+	 9cQ+G9gPjdp6ea8IhygJykAPh3Tp38uWHXIJFLCqYvDhe+wtPURqz/vwBXvMPWxIyB
+	 mfizEMaNie3s+81xGjQ3XcU2FEKkpA18TJOG2OMamcFD7tls6J8orOmqaRivLI2Ude
+	 7ptRl+Uf2iwrJbqZsjEcz+w4rJw8IPop3JX2BedH5DCh6AkE912g8AH9Fv80jqyMbR
+	 IeApTrpuRqTVw==
+Date: Sat, 21 Jun 2025 11:36:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH net-next 2/3] net: enetc: separate 64-bit counters from
+ enetc_port_counters
+Message-ID: <20250621103623.GB71935@horms.kernel.org>
+References: <20250620102140.2020008-1-wei.fang@nxp.com>
+ <20250620102140.2020008-3-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250620102140.2020008-3-wei.fang@nxp.com>
 
-Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-Fixes a spelling mistake: "funcionality" → "functionality".
+On Fri, Jun 20, 2025 at 06:21:39PM +0800, Wei Fang wrote:
+> Some counters in enetc_port_counters are 32-bit registers, and some are
+> 64-bit registers. But in the current driver, they are all read through
+> enetc_port_rd(), which can only read a 32-bit value. Therefore, separate
+> 64-bit counters (enetc_pm_counters) from enetc_port_counters and use
+> enetc_port_rd64() to read the 64-bit statistics.
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 
-Signed-off-by: Faisal Bukhari <faisalbukhari523@gmail.com>
+This patch looks fine to me, as does the following one.
+However, they multiple sparse warnings relating
+to endianness handling in the ioread32() version of _enetc_rd_reg64().
+
+I've collected together my thoughts on that in the form of a patch.
+And I'd appreciate it if we could resolve this one way or another.
+
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH RFC net] net: enetc: Correct endianness handling in
+ _enetc_rd_reg64
+
+enetc_hw.h provides two versions of _enetc_rd_reg64.
+One which simply calls ioread64() when available.
+And another that composes the 64-bit result from ioread32() calls.
+
+In the second case the code appears to assume that each ioread32()
+call returns a little-endian value. The high and the low 32 bit
+values are then combined to make a 64-bit value which is then
+converted to host byte order.
+
+However, both the bit shift and the logical or used to combine
+the two 32-bit values assume that they are operating on host-byte
+order entities. This seems broken and I assume that the code
+has only been tested on little endian systems.
+
+Correct this by converting the 32-bit little endian values
+to host byte order before operating on them.
+
+Also, use little endian types to store these values, to make
+the logic clearer and is moreover good practice.
+
+Flagged by Sparse
+
+Fixes: 69c663660b06 ("net: enetc: Correct endianness handling in _enetc_rd_reg64")
+Signed-off-by: Simon Horman <horms@kernel.org>
 ---
- .../networking/device_drivers/ethernet/marvell/octeontx2.rst    | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I have marked this as RFC as I am unsure that the above is correct.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-index af7db0e91f6b..a52850602cd8 100644
---- a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-+++ b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-@@ -66,7 +66,7 @@ Admin Function driver
- As mentioned above RVU PF0 is called the admin function (AF), this driver
- supports resource provisioning and configuration of functional blocks.
- Doesn't handle any I/O. It sets up few basic stuff but most of the
--funcionality is achieved via configuration requests from PFs and VFs.
-+functionality is achieved via configuration requests from PFs and VFs.
+The version of _enetc_rd_reg64() that is a trivial wrapper around
+ioread64() assumes that the call to ioread64() returns a host byte order
+value?
+
+If that is the case then is it also the case that the ioread32() calls,
+in this version of _enetc_rd_reg64() also return host byte order values.
+And if so, it is probably sufficient for this version to keep using u32
+as the type for low, high, and tmp.  And simply:
+
+	return high << 32 | low;
+---
+ drivers/net/ethernet/freescale/enetc/enetc_hw.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+index cb26f185f52f..3f40fcdbc4a7 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+@@ -502,15 +502,15 @@ static inline u64 _enetc_rd_reg64(void __iomem *reg)
+ /* using this to read out stats on 32b systems */
+ static inline u64 _enetc_rd_reg64(void __iomem *reg)
+ {
+-	u32 low, high, tmp;
++	__le32 low, high, tmp;
  
- PF/VFs communicates with AF via a shared memory region (mailbox). Upon
- receiving requests AF does resource provisioning and other HW configuration.
+ 	do {
+-		high = ioread32(reg + 4);
+-		low = ioread32(reg);
+-		tmp = ioread32(reg + 4);
++		high = (__force __le32)ioread32(reg + 4);
++		low = (__force __le32)ioread32(reg);
++		tmp = (__force __le32)ioread32(reg + 4);
+ 	} while (high != tmp);
+ 
+-	return le64_to_cpu((__le64)high << 32 | low);
++	return (u64)le32_to_cpu(high) << 32 | le32_to_cpu(low);
+ }
+ #endif
+ 
 -- 
-2.43.0
+2.47.2
 
 
