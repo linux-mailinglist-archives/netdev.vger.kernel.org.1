@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-199999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7EA4AE2A9B
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 19:21:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4601AE2AA0
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 19:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F4D43BCC49
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 17:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D30D3BD08F
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 17:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD8922D9ED;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E673022DF96;
 	Sat, 21 Jun 2025 17:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfoJKwF4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GBBPuzy8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32032229B2E;
-	Sat, 21 Jun 2025 17:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C286722E3FD
+	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 17:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750526397; cv=none; b=urR8CXUhqhd0NXUn5RI5x/KgxEJgzG1izQbD2EkykJD99DAUp4276rssNffPk1NQFChxAFkEinfISWrXZoB4JDpHu0vvaelDakG7rhbYIQYyo0PZhOBvu+5ThAt/+lxYf6j8xpC91pry5DyUAoN2qyh23y1ALyVT4SNZHzMoFsY=
+	t=1750526397; cv=none; b=MQBucQxECjelCjPQhmPLiUb4E2S8Kc5DOi7jSohKpFh5fzW+pQTzSh+iyazUxPKur2Kcq3Lu4uLjX0GqBrRuiybvoLm8FHBXLoxd/AIfGWWUrw25Rn+rvkepiKxtwpMh/bNCIOZp5zbFo34axBiWslkAq13lwZy7Vy1UEUoFb54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750526397; c=relaxed/simple;
-	bh=8H8hEpWXQkhTJSSB0aoHtRWu5OCi4/cvplwAeuUL16U=;
+	bh=ZyUcIo/M3Wk6pi3v7SLLRD/UGjQ0q6bsNLEgGdz4Xtk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GO0BNU+JYNMGKG3E/J1vCZfgM9vzPUiTeUX0JH9BWgZ/5Y57C4xzKdiHyzFc4yEOcvjWfwIUdJ5SVNcNSf8Z9IbTIUiW+A4Vjt8yPOOdNgxyw6Fyih+FuJXmfGX3FPiJdQFjdodnkMYdNHygaANl8DDe9ah8uN/4y5YEMQcoeAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfoJKwF4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23BBCC4CEE7;
+	 MIME-Version; b=DM/aqwnxPjl0aH785UlFjU/aIj/k7cCjdTRIp07yzIWlGBMVGM/3DvD+4ioUf4CsxEmf7+G6vTUCtCBNpw9jmdji5Q9prbeaU6iPG7o1Y4H5OI5K+Im9z1L+2jowZlcM2oYlgCxYzb2hWMCHxXubHmNUK0/f3sxKlw3vBOf11e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GBBPuzy8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5752C4CEF3;
 	Sat, 21 Jun 2025 17:19:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750526396;
-	bh=8H8hEpWXQkhTJSSB0aoHtRWu5OCi4/cvplwAeuUL16U=;
+	s=k20201202; t=1750526397;
+	bh=ZyUcIo/M3Wk6pi3v7SLLRD/UGjQ0q6bsNLEgGdz4Xtk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NfoJKwF4rjvtlkxYJ0lFPMuRXF9BWkdeJSxhceNHfVYLPpO2NCuBFGD9RD0kE7Tbv
-	 FDMQ6p0ZvPE5YwpOGTJ8cUUqJX8WNSFT6wZaZkcryaM5eVDcb3Wn2vVDBsoJ3zi+ly
-	 s4hyNSB7UTgZ0zpIFivT1HBtn7Fis1B1Xdg2Rj/Yy1BEGF+xc8BVTUVXpDiqbITPxU
-	 dFYc9Yl/Q67x1ugH05vdMYj0UMU9w65sX3TFn679XgObNCQVwVRL6mZ9TI37oBT2YY
-	 FuZ87pwSJD5iRS4dO5d47TCowtktXTMEU90kat1sYQ72eBd9ipOVcKigrOcJytazjV
-	 HHJMeqfm/VEFg==
+	b=GBBPuzy8Ybr7DO7SaMI4XPv0FIAv4ZB/A+9AIklu+oUkwStfyO99UgVUATyCbvoXZ
+	 DIOcgxFU9b4nKN7FvPiuj+wQrbA3IxneLiMSNZRW/3MWd2nskVVgBbXQdmiO9J1r9J
+	 YZQ3zBwF9f78L+qmccp7Hd57imsdBtFKFgbohA3wAc6hnRMLBU1C41kbO5q/ryoIyF
+	 0y0F4OWL8l9FGXpwY7l3KpKK2Un3ixCy7vyvmlpmuJsp8/H4DS65U7aOXT//2uZ8Kh
+	 7MZdAX2WmCcTNiuvCh3fDMSgTcje6+HPOH8op+/9zQ9EtiXklMjAKszOt7YrUN7B44
+	 kqvQVF+3WvTgw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,14 +53,10 @@ Cc: netdev@vger.kernel.org,
 	sdf@fomichev.me,
 	jdamato@fastly.com,
 	ecree.xilinx@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	mohan.prasad@microchip.com,
-	dw@davidwei.uk,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 8/9] selftests: drv-net: import things in lib one by one
-Date: Sat, 21 Jun 2025 10:19:43 -0700
-Message-ID: <20250621171944.2619249-9-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 9/9] selftests: drv-net: test RSS Netlink notifications
+Date: Sat, 21 Jun 2025 10:19:44 -0700
+Message-ID: <20250621171944.2619249-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250621171944.2619249-1-kuba@kernel.org>
 References: <20250621171944.2619249-1-kuba@kernel.org>
@@ -72,78 +68,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pylint doesn't understand our path hacks, and it generates a lot
-of warnings for driver tests. Import what we use one by one, this
-is hopefully not too tedious and it makes pylint happy.
+Test that changing the RSS config generates Netlink notifications.
+
+  # ./tools/testing/selftests/drivers/net/hw/rss_api.py
+  TAP version 13
+  1..2
+  ok 1 rss_api.test_rxfh_indir_ntf
+  ok 2 rss_api.test_rxfh_indir_ctx_ntf
+  # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: shuah@kernel.org
-CC: mohan.prasad@microchip.com
-CC: sdf@fomichev.me
-CC: dw@davidwei.uk
-CC: linux-kselftest@vger.kernel.org
----
- .../selftests/drivers/net/hw/lib/py/__init__.py | 17 +++++++++++++++++
- .../selftests/drivers/net/lib/py/__init__.py    | 14 ++++++++++++++
- 2 files changed, 31 insertions(+)
+ .../selftests/drivers/net/hw/rss_api.py       | 89 +++++++++++++++++++
+ 1 file changed, 89 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_api.py
 
-diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-index b582885786f5..56ff11074b55 100644
---- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-@@ -7,8 +7,25 @@ KSFT_DIR = (Path(__file__).parent / "../../../../..").resolve()
- 
- try:
-     sys.path.append(KSFT_DIR.as_posix())
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
+new file mode 100755
+index 000000000000..db0f723a674b
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
+@@ -0,0 +1,89 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
-     from net.lib.py import *
-     from drivers.net.lib.py import *
++"""
++API level tests for RSS (mostly Netlink vs IOCTL).
++"""
 +
-+    # Import one by one to avoid pylint false positives
-+    from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
-+        NlError, RtnlFamily
-+    from net.lib.py import CmdExitFailure
-+    from net.lib.py import bkg, cmd, defer, ethtool, fd_read_timeout, ip, \
-+        rand_port, tool, wait_port_listen
-+    from net.lib.py import fd_read_timeout
-+    from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
-+    from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-+        ksft_setup
-+    from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
-+        ksft_ne, ksft_not_in, ksft_raises, ksft_true
-+    from net.lib.py import NetNSEnter
-+    from drivers.net.lib.py import GenerateTraffic
-+    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
- except ModuleNotFoundError as e:
-     ksft_pr("Failed importing `net` library from kernel sources")
-     ksft_pr(str(e))
-diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-index 401e70f7f136..9ed1d8f70524 100644
---- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-@@ -7,7 +7,21 @@ KSFT_DIR = (Path(__file__).parent / "../../../..").resolve()
- 
- try:
-     sys.path.append(KSFT_DIR.as_posix())
++import glob
++from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_is, ksft_ne
++from lib.py import KsftSkipEx, KsftFailEx
++from lib.py import defer, ethtool
++from lib.py import EthtoolFamily
++from lib.py import NetDrvEnv
 +
-     from net.lib.py import *
 +
-+    # Import one by one to avoid pylint false positives
-+    from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
-+        NlError, RtnlFamily
-+    from net.lib.py import CmdExitFailure
-+    from net.lib.py import bkg, cmd, defer, ethtool, fd_read_timeout, ip, \
-+        rand_port, tool, wait_port_listen
-+    from net.lib.py import fd_read_timeout
-+    from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
-+    from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-+        ksft_setup
-+    from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
-+        ksft_ne, ksft_not_in, ksft_raises, ksft_true
- except ModuleNotFoundError as e:
-     ksft_pr("Failed importing `net` library from kernel sources")
-     ksft_pr(str(e))
++def _ethtool_create(cfg, act, opts):
++    output = ethtool(f"{act} {cfg.ifname} {opts}").stdout
++    # Output will be something like: "New RSS context is 1" or
++    # "Added rule with ID 7", we want the integer from the end
++    return int(output.split()[-1])
++
++
++def test_rxfh_indir_ntf(cfg):
++    """
++    Check that Netlink notifications are generated when RSS indirection
++    table was modified.
++    """
++
++    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
++    if qcnt < 2:
++        raise KsftSkipEx(f"Local has only {qcnt} queues")
++
++    ethnl = EthtoolFamily()
++    ethnl.ntf_subscribe("monitor")
++
++    ethtool(f"--disable-netlink -X {cfg.ifname} weight 0 1")
++    reset = defer(ethtool, f"-X {cfg.ifname} default")
++
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("No notification received")
++    ksft_eq(ntf["name"], "rss-ntf")
++    ksft_eq(set(ntf["msg"]["indir"]), {1})
++
++    reset.exec()
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("No notification received after reset")
++    ksft_eq(ntf["name"], "rss-ntf")
++    ksft_is(ntf["msg"].get("context"), None)
++    ksft_ne(set(ntf["msg"]["indir"]), {1})
++
++
++def test_rxfh_indir_ctx_ntf(cfg):
++    """
++    Check that Netlink notifications are generated when RSS indirection
++    table was modified on an additional RSS context.
++    """
++
++    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
++    if qcnt < 2:
++        raise KsftSkipEx(f"Local has only {qcnt} queues")
++
++    ctx_id = _ethtool_create(cfg, "-X", "context new")
++    defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
++
++    ethnl = EthtoolFamily()
++    ethnl.ntf_subscribe("monitor")
++
++    ethtool(f"--disable-netlink -X {cfg.ifname} context {ctx_id} weight 0 1")
++
++    ntf = next(ethnl.poll_ntf(duration=0.2), None)
++    if ntf is None:
++        raise KsftFailEx("No notification received")
++    ksft_eq(ntf["name"], "rss-ntf")
++    ksft_eq(ntf["msg"].get("context"), ctx_id)
++    ksft_eq(set(ntf["msg"]["indir"]), {1})
++
++
++def main() -> None:
++    """ Ksft boiler plate main """
++
++    with NetDrvEnv(__file__, nsim_test=False) as cfg:
++        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.49.0
 
