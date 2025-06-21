@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-199941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4C9AE2772
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 07:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F950AE2773
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 07:04:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F93D3ACC68
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 05:00:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A20143B4826
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 05:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A34F13C8EA;
-	Sat, 21 Jun 2025 05:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE8F15CD74;
+	Sat, 21 Jun 2025 05:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="nkeBOM87"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="puKdiV82"
 X-Original-To: netdev@vger.kernel.org
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24042F2E
-	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 05:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A142F2E
+	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 05:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750482053; cv=none; b=tvxtU4/YKJFdasRUJNu2NC0Zyi16Unr4XFxI54W6f0zeg9nYXv7u+oC6XA2kddi9o4gXV7LBejSUeNbucqBjumiwGUfwmjqg+VF1AYX+E1BifOSrxZYaflSnFKTsazNME41VRPRD6/2bu+96gxfsfIgOqhNmc/kMLrReGfhS/ZU=
+	t=1750482284; cv=none; b=J9WIuMzWIF6Vo49Is6KoWnsUtbJF2VgPLlAxMvIz5jDNd6oB2zdk96QYVvR+Y3cfm4ryaigBjH3K93G/C6LKLxbEQ7r3rzIQEs99LPXLRPA8L8S9YCU2p24H0G1ndQB5KqhAja+0hRgMWyYo9pFMBcEUnuCfErA9CyD4oz1aLgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750482053; c=relaxed/simple;
-	bh=XpJ4hKrh8tC3aNm1mzdDU/eTnrbV1HgdXdY0xATeBDk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Y+MJaq7r6DV2el94kdpizU4GMoDPjFoyyBol30Ng0d+I2VK+CZ1PXYjrHBsHUdb8JmC4KE85BIVScHfoBgPSovktyUHUJ7pUHW/L3JRIA4vbu9aI2XUYNf9CC1PhQpJ/WYq76VKQ0UWeDmYHPKlMCs2jQE+vp+qchfQgrt3nN5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=nkeBOM87 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	s=arc-20240116; t=1750482284; c=relaxed/simple;
+	bh=UrjX0VaVWt68TxIeXRCRPEowTFOZU/MOUb1551OjlOE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DwwAnpNZD7UVhYO+Rp/7keaaiG4IcvkFMwGHtA3+czrNRI2SOzdm8G2/os6Gf/EVCrak7SqJtyXZr10xe4/CN5keTdwFuNvOVA6ES8rHaK7Lc/Lp7ZmH1oRjx7a6jEXjvIw4qQAEb4GAQKFTF1nqZApM1V8BXW/Rk1pLOUPAj/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=puKdiV82 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Received: from [192.168.201.189] (210-129-16-52.radian.jp-east.compute.idcfcloud.net [210.129.16.52])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 55L50dJU087502
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 55L54cpp089288
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 21 Jun 2025 14:00:40 +0900 (JST)
+	Sat, 21 Jun 2025 14:04:39 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=iuANZcQC02bboaHqJb432KWqx0G0sP7vFG1opEDuV9o=;
+DKIM-Signature: a=rsa-sha256; bh=LZdezGJr6XkvkE2YOsN+SrADt9LqOAUKitDf9jiHCdo=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:From:Subject:To;
-        s=rs20250326; t=1750482042; v=1;
-        b=nkeBOM87BhwA9CcdRvOKW9BknQTlfE5rjXQ+HpTIToPPL8LiPe6H3skFwZ9v+gKZ
-         KavLsiZZCPXe4Hrfvcy9CnVHq8auK2QBMmjUXviwdH3lfEb81X/BIonqFIq42vBp
-         3ajMNhJNPfC5+QceitXZvDtO40H9TyHuqn6JY0PplWOsYATLuJGCdonuE1mRvcRc
-         tS5UQYHWEaxq5A4oXVdlsvBTR0d9SR4nL1NvVQFRVNQvPiM6g6jlaj+f8c/bcxSz
-         GrdJEAL9bAuoO4fJ30E1yD6AWaAQSUPH+J5s64VmXC4RYop9s0XQd99g5z49fGoY
-         31j5TftS9oIDYGj/eTBSnw==
-Message-ID: <3b8846da-d163-4e89-8c93-f50c333841d8@rsg.ci.i.u-tokyo.ac.jp>
-Date: Sat, 21 Jun 2025 14:00:38 +0900
+        h=Message-ID:Date:Subject:To:From;
+        s=rs20250326; t=1750482280; v=1;
+        b=puKdiV82z9Cb5mXUNaOXjD0cXRv6XKeBU6+CSzC4rXSsxyQ1Y9Wu3TpQGMtdWy3e
+         O+Fa1PyqIVWWWBWXvLQhARWrtGanCPLQTNbp1gsKXNzcyf/1IoCIZtKd18LrE19U
+         2DFx6LBRhjHVwEwRmMJr7Kgw5sb25W4Ptr6xMy5PL3fE2nQdXxRpENTaBQAHAI4w
+         VuJnXh/IF9qZWYEuFF586Z6vzvGqYjuPTVD4ABc00JzKw4UliVmnTWYXzmEq9itq
+         c7C/TfqvMUulXjIadClb5AHrT0DuEJuU/DHQTM/QJgg5eAqVEVPH02kK40ce0HA/
+         gzYC3D8wd61su/eNNEXe2Q==
+Message-ID: <c513ea1d-cdbb-424c-a204-bc0123ce7e8d@rsg.ci.i.u-tokyo.ac.jp>
+Date: Sat, 21 Jun 2025 14:04:32 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,6 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 Subject: Re: [PATCH v4 net-next 7/8] tun: enable gso over UDP tunnel support.
 To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
@@ -70,72 +69,58 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
         Yuri Benditovich <yuri.benditovich@daynix.com>
 References: <cover.1750176076.git.pabeni@redhat.com>
  <1c6ffd4bd0480ecc4c8442cef7c689fbfb5e0e56.1750176076.git.pabeni@redhat.com>
- <6505a764-a3d2-4c98-b2b3-acc2bb7b1aae@daynix.com>
- <4e0a0a37-9164-465a-b18b-7d97c88d444e@redhat.com>
- <bc579418-646f-4ccc-bf9c-976b264c4da2@daynix.com>
- <74f6f0ea-6f2d-4520-b103-d4388a0916d6@redhat.com>
+ <add3a48e-f16a-4e32-91d4-fc34b1ff3ce6@daynix.com>
+ <0aa1055e-3e52-4275-a074-e6f27115a748@redhat.com>
+ <f5bb7b71-bae6-49c6-970d-869a59f11a1f@redhat.com>
 Content-Language: en-US
-In-Reply-To: <74f6f0ea-6f2d-4520-b103-d4388a0916d6@redhat.com>
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <f5bb7b71-bae6-49c6-970d-869a59f11a1f@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2025/06/20 2:27, Paolo Abeni wrote:
-> On 6/19/25 5:46 PM, Akihiko Odaki wrote:
->> On 2025/06/19 23:52, Paolo Abeni wrote:
->>> On 6/19/25 4:42 PM, Akihiko Odaki wrote:
->>>> On 2025/06/18 1:12, Paolo Abeni wrote:
->>>>> @@ -1721,7 +1733,12 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->>>>>     	if (tun->flags & IFF_VNET_HDR) {
->>>>>     		int vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
->>>>>     
->>>>> -		hdr_len = tun_vnet_hdr_get(vnet_hdr_sz, tun->flags, from, &gso);
->>>>> +		if (vnet_hdr_sz >= TUN_VNET_TNL_SIZE)
->>>>> +			features = NETIF_F_GSO_UDP_TUNNEL |
->>>>> +				   NETIF_F_GSO_UDP_TUNNEL_CSUM;
->>>>
->>>> I think you should use tun->set_features instead of tun->vnet_hdr_sz to
->>>> tell if these features are enabled.
+On 2025/06/20 5:30, Paolo Abeni wrote:
+> On 6/19/25 7:41 PM, Paolo Abeni wrote:
+>> On 6/19/25 6:02 PM, Akihiko Odaki wrote:
+>>> On 2025/06/18 1:12, Paolo Abeni wrote:
+>>>> @@ -2426,7 +2453,17 @@ static int tun_xdp_one(struct tun_struct *tun,
+>>>>    	if (metasize > 0)
+>>>>    		skb_metadata_set(skb, metasize);
+>>>>    
+>>>> -	if (tun_vnet_hdr_to_skb(tun->flags, skb, gso)) {
+>>>> +	/*
+>>>> +	 * Assume tunnel offloads are enabled if the received hdr is large
+>>>> +	 * enough.
+>>>> +	 */
+>>>> +	if (READ_ONCE(tun->vnet_hdr_sz) >= TUN_VNET_TNL_SIZE &&
+>>>> +	    xdp->data - xdp->data_hard_start >= TUN_VNET_TNL_SIZE)
+>>>> +		features = NETIF_F_GSO_UDP_TUNNEL |
+>>>> +			   NETIF_F_GSO_UDP_TUNNEL_CSUM;
 >>>
->>> This is the guest -> host direction. tun->set_features refers to the
->>> opposite one. The problem is that tun is not aware of the features
->>> negotiated in the guest -> host direction.
+>>> xdp->data - xdp->data_hard_start may not represent the header size.
 >>>
->>> The current status (for baremetal/plain offload) is allowing any known
->>> feature the other side send - if the virtio header is consistent.
->>> This code follows a similar schema.
->>>
->>> Note that using 'tun->set_features' instead of 'vnet_hdr_sz' the tunz
->>> driver will drop all the (legit) GSO over UDP packet sent by the guest
->>> when the VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO has been negotiated and
->>> VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO has not.
+>>> struct tun_xdp_hdr is filled in vhost_net_build_xdp() in
+>>> drivers/vhost/net.c. This function sets the two fields with
+>>> xdp_prepare_buff(), but the arguments passed to xdp_prepare_buff() does
+>>> not seem to represent the exact size of the header.
 >>
->> This explanation makes sense. In that case I suggest:
->> - creating a new function named tun_vnet_hdr_tnl_get() and
->> - passing vnet_hdr_sz to tun_vnet_hdr_tnl_to_skb()
+>> Indeed the xdp->data - xdp->data_hard_start range additionally contains
+>> some padding and eventually the xdp specific headroom. The problem is
+>> that both info are vhost_net specific and tun can't (or at least shoul)
+>> not be aware of them.
 >>
->> tun_vnet.h contains the virtio-related logic for better code
->> organization and reuse with tap.c. tap.c can reuse the conditionals on
->> vnet_hdr_sz when tap.c gains the UDP tunneling support.
-> 
-> Instead of repeating the test twice (in both tun_vnet_hdr_tnl_to_skb()
-> and tun_vnet_hdr_tnl_to_skb(), what about creating a new helper:
-> 
-> tun_vnet_hdr_guest_features(unsigned int vnet_hdr_len)
-> 
-> encapsulating the above logic? That will make also easier to move to the
-> 'correct' solution of having the tun/tap devices aware of the features
-> negotiated in the guest -> host direction.
+>> The only IMHO feasible refinement could be using xdp->data_meta instead
+>> of xdp->data when available. Alternatively I could drop entirely the test.
 
-netdev_features_t is not used in the other part of the user-to-skb path 
-so we only need the condition "vnet_hdr_sz >= TUN_VNET_TNL_SIZE";
-"features = NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM" can be 
-simply skipped.
+struct tun_xdp_hdr can be extended to contain struct 
+virtio_net_hdr_v1_hash_tunnel.
 
-The condition itself is trivial so probably you don't need a helper for it.
+> 
+> As the vhost_net padding is considerably larger than the largest
+> possible vnet_hdr_sz, I'll drop entirely the xdp check - so that I can
+> use the newly introduced tun_vnet_hdr_guest_features() helper here, too.
 
-For the skb-to-user path, tun_vnet.h already absorbs the reference to 
-netdev_feature_t in tun_vnet_hdr_tnl_from_skb() and allows reusing it 
-with tap.c, which is a nice example.
+I think dropping the XDP check is the best option (and leaving struct 
+tun_xdp_hdr as is) until vhost_net_build_xdp() gains the UDP tunnel support.
 
 Regards,
 Akihiko Odaki
