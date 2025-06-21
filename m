@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-199992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA913AE2A8F
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 19:20:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3BBEAE2A90
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 19:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FEBA178F74
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 17:20:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B99189C2A5
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 17:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1947D2222A9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A851A222561;
 	Sat, 21 Jun 2025 17:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J5rjzKde"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOFhp/9z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C6B221FD0
-	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 17:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854DB2222CE
+	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 17:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750526393; cv=none; b=oW0G5NLiII299duXvqHrrNEb21YCgaG8KDwsDN6/QmJZ6PEsS63rI/C3QdjlE4MaVDcH05tRk3JuLreW5/9uSLKQPO88KnmGcbI5UPglKyvw302082SzGokfEXB7uZv61rRaePF9iJsIslwLsIihcG1Rzjuwp20mx/VPXxEg010=
+	t=1750526393; cv=none; b=WHio2X9EhQgwYjg17x2lFW95qOk2fca49SnrkJPIa3I5oQGyRrq6WEELS6iyJi6WHPBC7XcL453n8bXTjCikuyFnUg4wgZ0K95mcfg8PRfRusVzi2kStEgvhTbKwpXv6tgzO3izvfD1kctplyXNIPPWOMG/xGSS2ZuyVf9YmTno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750526393; c=relaxed/simple;
-	bh=ixJpU/GJ7AygrQGjRR/tNJIUPh7BTYO17A/+tFVsG6U=;
+	bh=6ggaaT8JFdw3f2qH1RxFtbe8iEeG2CFJ4qbI/n/gdko=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kfTTT5op/xlYqFu0Tek0wCgFCzEpq1jKtJXGddffqgFZSNn8xN1mH6IVgXP5IbSrAXkQ9EtfPYoPXXeQn+ln1xMZ2AMdQ/ve4jxdwjAwYUYvzOk5fhiXPcarua9skOh0dKhd/vtSRaBLwf4BxZYoBJWFXA9u+MfFb0H+kg1tJ+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J5rjzKde; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 161F3C4CEEF;
+	 MIME-Version; b=Skly+Q9ygiivociMleefuFsHsO/Ack8OB2jfL5wpphIMP5NfutunZKj+nWhcfm3wydC2BCNUKaa2GR1HPZMd6S7vkhX1P5pr66Ht4SV1yAyOCXWbAjqh2cyRvTZLNCUpg0KDBhhJoNmKM/5u28ExMqxZM7/7bafMkudc0KJnNFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOFhp/9z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1AD5C4CEEE;
 	Sat, 21 Jun 2025 17:19:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750526392;
-	bh=ixJpU/GJ7AygrQGjRR/tNJIUPh7BTYO17A/+tFVsG6U=;
+	s=k20201202; t=1750526393;
+	bh=6ggaaT8JFdw3f2qH1RxFtbe8iEeG2CFJ4qbI/n/gdko=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J5rjzKde5TBrpbYahGOxgSyEQGM+gO9amt0Ypr6RCt6KAVQGFt0ZjV2qKdlluNnYF
-	 uICEk/u/OogPr1L/6qe/leKDXFJUXWOQYbTgY6K+8yL9xlF/yLXL0ml/1Ax3P4k0k5
-	 vL0piV3n1VEu/CZA9FOnHbPfegi6kZbZLw4yd6pzr+nxX53zryaUvydyphfb7jO3eo
-	 mI13Gzk2b+tjQnD7AeEcbC926MPr3N69XtRS52QTElX6HQcF+EfZU8uvJDOUCW7VtF
-	 P6z7HXfXKPeSs8U7S/HbcPBL9ZlY+6Ct+p/uy0abMZ5GyYPW4IEDEkT/yDv7DDl1nh
-	 7JcNqNFNOxV+Q==
+	b=qOFhp/9zALs6oNiakBUTH55YItlxGZ7BAc7aSTn4WD+NP2N5I9DdSoNwxTYhmc8yu
+	 VeGzz2NInwWlCIpFUJjfGCzM621g+IeCF5EdXGVU3j/NdfgBVShrEJFGpEDu/q2f6q
+	 ZSlzJwbWUahtsDu8Obbp7PfX/kp8m7ACqYkAlOi5PVJyP4dKkRJrPtgywCgmtr+h8c
+	 ddBDQlHEhHnFxdymZ1claxQ3P/yH0ErY4DOT+LGvRJPfiNg2trn/QXigWDe1zXbTF0
+	 cqzEY/tajA/LQ+tm8xBbzdcfEA5GEIF9siEjU7yEZ0XjVdZPs/ZuBuKQpR+VdhBW5K
+	 8eEzrFBSvh13w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/9] netlink: specs: add the multicast group name to spec
-Date: Sat, 21 Jun 2025 10:19:36 -0700
-Message-ID: <20250621171944.2619249-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/9] net: ethtool: dynamically allocate full req size req
+Date: Sat, 21 Jun 2025 10:19:37 -0700
+Message-ID: <20250621171944.2619249-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250621171944.2619249-1-kuba@kernel.org>
 References: <20250621171944.2619249-1-kuba@kernel.org>
@@ -68,52 +68,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the multicast group's name to the YAML spec.
-Without it YNL doesn't know how to subscribe to notifications.
+In preparation for using req_info to carry parameters between
+SET and NTF allocate a full request into struct. Since the size
+depends on the subcommand we need to allocate it on the heap.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/ethtool.yaml       | 6 ++++++
- include/uapi/linux/ethtool_netlink.h           | 2 --
- include/uapi/linux/ethtool_netlink_generated.h | 2 ++
- 3 files changed, 8 insertions(+), 2 deletions(-)
+ net/ethtool/netlink.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index c1651e175e8b..cfe84f84ba29 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -2492,3 +2492,9 @@ c-version-name: ethtool-genl-version
-         attributes:
-           - header
-           - events
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: monitor
-+      c-define-name: ethtool-mcgrp-monitor-name
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index 09a75bdb6560..fa5d645140a4 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
-@@ -208,6 +208,4 @@ enum {
- 	ETHTOOL_A_STATS_PHY_MAX = (__ETHTOOL_A_STATS_PHY_CNT - 1)
- };
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index 9de828df46cd..a9467b96f00c 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -863,8 +863,8 @@ static int ethnl_default_done(struct netlink_callback *cb)
+ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	const struct ethnl_request_ops *ops;
+-	struct ethnl_req_info req_info = {};
+ 	const u8 cmd = info->genlhdr->cmd;
++	struct ethnl_req_info *req_info;
+ 	struct net_device *dev;
+ 	int ret;
  
--#define ETHTOOL_MCGRP_MONITOR_NAME "monitor"
--
- #endif /* _UAPI_LINUX_ETHTOOL_NETLINK_H_ */
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index 4944badf9fba..859e28c8a91a 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -867,4 +867,6 @@ enum {
- 	ETHTOOL_MSG_KERNEL_MAX = (__ETHTOOL_MSG_KERNEL_CNT - 1)
- };
+@@ -874,20 +874,24 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 	if (GENL_REQ_ATTR_CHECK(info, ops->hdr_attr))
+ 		return -EINVAL;
  
-+#define ETHTOOL_MCGRP_MONITOR_NAME	"monitor"
+-	ret = ethnl_parse_header_dev_get(&req_info, info->attrs[ops->hdr_attr],
++	req_info = kzalloc(ops->req_info_size, GFP_KERNEL);
++	if (!req_info)
++		return -ENOMEM;
 +
- #endif /* _UAPI_LINUX_ETHTOOL_NETLINK_GENERATED_H */
++	ret = ethnl_parse_header_dev_get(req_info, info->attrs[ops->hdr_attr],
+ 					 genl_info_net(info), info->extack,
+ 					 true);
+ 	if (ret < 0)
+-		return ret;
++		goto out_free_req;
+ 
+ 	if (ops->set_validate) {
+-		ret = ops->set_validate(&req_info, info);
++		ret = ops->set_validate(req_info, info);
+ 		/* 0 means nothing to do */
+ 		if (ret <= 0)
+ 			goto out_dev;
+ 	}
+ 
+-	dev = req_info.dev;
++	dev = req_info->dev;
+ 
+ 	rtnl_lock();
+ 	netdev_lock_ops(dev);
+@@ -902,7 +906,7 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 	if (ret < 0)
+ 		goto out_free_cfg;
+ 
+-	ret = ops->set(&req_info, info);
++	ret = ops->set(req_info, info);
+ 	if (ret < 0)
+ 		goto out_ops;
+ 
+@@ -921,7 +925,9 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 	netdev_unlock_ops(dev);
+ 	rtnl_unlock();
+ out_dev:
+-	ethnl_parse_header_dev_put(&req_info);
++	ethnl_parse_header_dev_put(req_info);
++out_free_req:
++	kfree(req_info);
+ 	return ret;
+ }
+ 
 -- 
 2.49.0
 
