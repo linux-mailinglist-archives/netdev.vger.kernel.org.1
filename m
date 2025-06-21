@@ -1,110 +1,122 @@
-Return-Path: <netdev+bounces-200035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C5CAE2C3E
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 22:28:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC870AE2C3F
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 22:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 699DF3B42DC
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 20:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52B9F16AD0F
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 20:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DD127056D;
-	Sat, 21 Jun 2025 20:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A466326A0F2;
+	Sat, 21 Jun 2025 20:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IsWHvcCv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aQs9pLwT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59D021CA14
-	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 20:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54621E487
+	for <netdev@vger.kernel.org>; Sat, 21 Jun 2025 20:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750537671; cv=none; b=WyAStKjmiaLNxobseM9gGLRUHwA86BiQj7lWekxkmst0ddLIpJMia9CBWIzC6tfwQUSj/xaTSs/iYMXY5aINdLBLirxjepumJsC8BpzC5tbVybsK7l/Xt4LwcUe58neEk0lW07B3SUEyIw7SOrucbBSHD4e78LQhjipODTHRQSk=
+	t=1750537750; cv=none; b=nEOU1xzs4efv0ugfWWMjEtN0rtWUHv64MJTLqpMJC9ZoGDkJgKZqZjyry9aY/YhBgl3OQ1pK+Iy85GZngJKvn7z11gdUScjnDhE7TCY8IVIIZTEoW92qi7rMYsdeQnsDAJoyNd7ogb5OzEXAnVT5AQ4WlJyPqS6qAxFi8Y4wRjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750537671; c=relaxed/simple;
-	bh=kGbP5HTZuj+YXjGxt2UBm6owXLQGpJtrJpeEg9uunP8=;
+	s=arc-20240116; t=1750537750; c=relaxed/simple;
+	bh=v84buPkTLagC4U7I9fNCwiojqNOCA5dl5didfcPqH+Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=flmEu8QcZtAGPhgoJ4FtsYJMfUzV7eifwPFcj+1LxVzajZXQkEUlb9VAfHn4iT6cUYoc0iafYPMpPog3CqVHSXjSZu3RIO5X6vYl8A8orO/YG5h4OSbstZgT2W94gzgl9AE9umOAgepNCrGepXE4t0GQ+wnk0ofjlxpr1a6DuN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IsWHvcCv; arc=none smtp.client-ip=91.218.175.172
+	 In-Reply-To:Content-Type; b=ef6pRYTKs5XLoOMJAVhu/JKB6dKceFxqlsBlqF5a6JfSeLGiMu9OYV67/pMPsSxsn6yHQ5xAlq72qwnlv3TyeVHcL4qNibfkhUAS9lv6l84M0nn7MtrY9FM8Cbg+Hc9snaQKt57cvNvztxBLQ+gRr7gjh7fI/s0PAa/rRDB8cAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aQs9pLwT; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3e90368f-f154-4be8-8dfe-f30fb33e980b@linux.dev>
+Message-ID: <74a41565-1778-4e68-bc2c-32ae6956343a@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750537666;
+	t=1750537746;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=giFL6B520wt/7GcRxZUtOhWFMqcuL5POaKOJmZjaq1I=;
-	b=IsWHvcCvdEJH8VOzpzn78uFQnLGuM9zZ06zXFVy9TRJmZ/GK9ZNrcWRRfw2t5Ylkxcb41D
-	7OWfmF5GhTllEqZyZr7vS4F3o03gqy6SBRKy4ss+tWB0ssWc+A+wXAn10zbMpbxoiS5RNE
-	hVR4rZtS0NM+mmx94s3hbKOTRSY3/xk=
-Date: Sat, 21 Jun 2025 21:27:45 +0100
+	bh=zd37vjlTdg+X/jv1wd6e/fvzj2B3M30ssdbW95aFJkg=;
+	b=aQs9pLwT9+mU/cNEgQpaUDkZoPS0rITRDnecsrStdDiNThLQbXApZdtGFsEOYYINg1OjtT
+	qGlsYd4q7XFjTT7/fQgRiFtsb3L2RRBSgKm4syo9CqhvrSQhmbA2CJ38Mx5mfIFC1Y+EJy
+	MrR+YjwcFpZbsFSY2MCvqgjNzCl4FrM=
+Date: Sat, 21 Jun 2025 21:29:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [patch 05/13] ptp: Split out PTP_SYS_OFFSET_PRECISE ioctl code
+Subject: Re: [patch 06/13] ptp: Split out PTP_SYS_OFFSET_EXTENDED ioctl code
 To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
 Cc: Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
 References: <20250620130144.351492917@linutronix.de>
- <20250620131944.029142425@linutronix.de>
+ <20250620131944.092766931@linutronix.de>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250620131944.029142425@linutronix.de>
+In-Reply-To: <20250620131944.092766931@linutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 On 20/06/2025 14:24, Thomas Gleixner wrote:
-> Continue the ptp_ioctl() cleanup by splitting out the PTP_SYS_OFFSET_PRECISE
-> ioctl code into a helper function.
+> Continue the ptp_ioctl() cleanup by splitting out the
+> PTP_SYS_OFFSET_EXTENDED ioctl code into a helper function.
+> 
+> Convert it to __free() to avoid gotos.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 > ---
->   drivers/ptp/ptp_chardev.c |   53 +++++++++++++++++++++++++---------------------
->   1 file changed, 29 insertions(+), 24 deletions(-)
+>   drivers/ptp/ptp_chardev.c |   75 +++++++++++++++++++++++-----------------------
+>   1 file changed, 39 insertions(+), 36 deletions(-)
 > 
 > --- a/drivers/ptp/ptp_chardev.c
 > +++ b/drivers/ptp/ptp_chardev.c
-> @@ -291,14 +291,40 @@ static long ptp_enable_pps(struct ptp_cl
->   		return ops->enable(ops, &req, enable);
+> @@ -319,16 +319,52 @@ static long ptp_sys_offset_precise(struc
+>   	return copy_to_user(arg, &precise_offset, sizeof(precise_offset)) ? -EFAULT : 0;
 >   }
 >   
-> +static long ptp_sys_offset_precise(struct ptp_clock *ptp, void __user *arg)
+> +static long ptp_sys_offset_extended(struct ptp_clock *ptp, void __user *arg)
 > +{
-> +	struct ptp_sys_offset_precise precise_offset;
-> +	struct system_device_crosststamp xtstamp;
-> +	struct timespec64 ts;
-> +	int err;
+> +	struct ptp_sys_offset_extended *extoff __free(kfree) = NULL;
+> +	struct ptp_system_timestamp sts;
 > +
-> +	if (!ptp->info->getcrosststamp)
+> +	if (!ptp->info->gettimex64)
 > +		return -EOPNOTSUPP;
 > +
-> +	err = ptp->info->getcrosststamp(ptp->info, &xtstamp);
-> +	if (err)
-> +		return err;
+> +	extoff = memdup_user(arg, sizeof(*extoff));
+> +	if (IS_ERR(extoff))
+> +		return PTR_ERR(extoff);
 > +
-> +	memset(&precise_offset, 0, sizeof(precise_offset));
-> +	ts = ktime_to_timespec64(xtstamp.device);
-> +	precise_offset.device.sec = ts.tv_sec;
-> +	precise_offset.device.nsec = ts.tv_nsec;
-> +	ts = ktime_to_timespec64(xtstamp.sys_realtime);
-> +	precise_offset.sys_realtime.sec = ts.tv_sec;
-> +	precise_offset.sys_realtime.nsec = ts.tv_nsec;
-> +	ts = ktime_to_timespec64(xtstamp.sys_monoraw);
-> +	precise_offset.sys_monoraw.sec = ts.tv_sec;
-> +	precise_offset.sys_monoraw.nsec = ts.tv_nsec;
+> +	if (extoff->n_samples > PTP_MAX_SAMPLES ||
+> +	    extoff->rsv[0] || extoff->rsv[1] ||
+> +	    (extoff->clockid != CLOCK_REALTIME &&
+> +	     extoff->clockid != CLOCK_MONOTONIC &&
+> +	     extoff->clockid != CLOCK_MONOTONIC_RAW))
+> +		return -EINVAL;
 > +
-> +	return copy_to_user(arg, &precise_offset, sizeof(precise_offset)) ? -EFAULT : 0;
+> +	sts.clockid = extoff->clockid;
+> +	for (unsigned int i = 0; i < extoff->n_samples; i++) {
+> +		struct timespec64 ts;
+> +		int err;
+> +
+> +		err = ptp->info->gettimex64(ptp->info, &ts, &sts);
+> +		if (err)
+> +			return err;
+> +		extoff->ts[i][0].sec = sts.pre_ts.tv_sec;
+> +		extoff->ts[i][0].nsec = sts.pre_ts.tv_nsec;
+> +		extoff->ts[i][1].sec = ts.tv_sec;
+> +		extoff->ts[i][1].nsec = ts.tv_nsec;
+> +		extoff->ts[i][2].sec = sts.post_ts.tv_sec;
+> +		extoff->ts[i][2].nsec = sts.post_ts.tv_nsec;
+> +	}
+> +
+> +	return copy_to_user(arg, extoff, sizeof(*extoff)) ? -EFAULT : 0;
 > +}
 > +
 >   long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
@@ -112,43 +124,63 @@ On 20/06/2025 14:24, Thomas Gleixner wrote:
 >   {
 >   	struct ptp_clock *ptp =
 >   		container_of(pccontext->clk, struct ptp_clock, clock);
->   	struct ptp_sys_offset_extended *extoff = NULL;
-> -	struct ptp_sys_offset_precise precise_offset;
-> -	struct system_device_crosststamp xtstamp;
+> -	struct ptp_sys_offset_extended *extoff = NULL;
 >   	struct ptp_clock_info *ops = ptp->info;
 >   	struct ptp_sys_offset *sysoff = NULL;
 >   	struct timestamp_event_queue *tsevq;
-> @@ -341,28 +367,7 @@ long ptp_ioctl(struct posix_clock_contex
->   
->   	case PTP_SYS_OFFSET_PRECISE:
->   	case PTP_SYS_OFFSET_PRECISE2:
-> -		if (!ptp->info->getcrosststamp) {
-> -			err = -EOPNOTSUPP;
-> -			break;
-> -		}
-> -		err = ptp->info->getcrosststamp(ptp->info, &xtstamp);
-> -		if (err)
-> -			break;
-> -
-> -		memset(&precise_offset, 0, sizeof(precise_offset));
-> -		ts = ktime_to_timespec64(xtstamp.device);
-> -		precise_offset.device.sec = ts.tv_sec;
-> -		precise_offset.device.nsec = ts.tv_nsec;
-> -		ts = ktime_to_timespec64(xtstamp.sys_realtime);
-> -		precise_offset.sys_realtime.sec = ts.tv_sec;
-> -		precise_offset.sys_realtime.nsec = ts.tv_nsec;
-> -		ts = ktime_to_timespec64(xtstamp.sys_monoraw);
-> -		precise_offset.sys_monoraw.sec = ts.tv_sec;
-> -		precise_offset.sys_monoraw.nsec = ts.tv_nsec;
-> -		if (copy_to_user((void __user *)arg, &precise_offset,
-> -				 sizeof(precise_offset)))
-> -			err = -EFAULT;
-> -		break;
-> +		return ptp_sys_offset_precise(ptp, argptr);
+> -	struct ptp_system_timestamp sts;
+>   	struct ptp_clock_time *pct;
+>   	unsigned int i, pin_index;
+>   	struct ptp_pin_desc pd;
+> @@ -371,39 +407,7 @@ long ptp_ioctl(struct posix_clock_contex
 >   
 >   	case PTP_SYS_OFFSET_EXTENDED:
 >   	case PTP_SYS_OFFSET_EXTENDED2:
+> -		if (!ptp->info->gettimex64) {
+> -			err = -EOPNOTSUPP;
+> -			break;
+> -		}
+> -		extoff = memdup_user((void __user *)arg, sizeof(*extoff));
+> -		if (IS_ERR(extoff)) {
+> -			err = PTR_ERR(extoff);
+> -			extoff = NULL;
+> -			break;
+> -		}
+> -		if (extoff->n_samples > PTP_MAX_SAMPLES ||
+> -		    extoff->rsv[0] || extoff->rsv[1] ||
+> -		    (extoff->clockid != CLOCK_REALTIME &&
+> -		     extoff->clockid != CLOCK_MONOTONIC &&
+> -		     extoff->clockid != CLOCK_MONOTONIC_RAW)) {
+> -			err = -EINVAL;
+> -			break;
+> -		}
+> -		sts.clockid = extoff->clockid;
+> -		for (i = 0; i < extoff->n_samples; i++) {
+> -			err = ptp->info->gettimex64(ptp->info, &ts, &sts);
+> -			if (err)
+> -				goto out;
+> -			extoff->ts[i][0].sec = sts.pre_ts.tv_sec;
+> -			extoff->ts[i][0].nsec = sts.pre_ts.tv_nsec;
+> -			extoff->ts[i][1].sec = ts.tv_sec;
+> -			extoff->ts[i][1].nsec = ts.tv_nsec;
+> -			extoff->ts[i][2].sec = sts.post_ts.tv_sec;
+> -			extoff->ts[i][2].nsec = sts.post_ts.tv_nsec;
+> -		}
+> -		if (copy_to_user((void __user *)arg, extoff, sizeof(*extoff)))
+> -			err = -EFAULT;
+> -		break;
+> +		return ptp_sys_offset_extended(ptp, argptr);
+>   
+>   	case PTP_SYS_OFFSET:
+>   	case PTP_SYS_OFFSET2:
+> @@ -528,7 +532,6 @@ long ptp_ioctl(struct posix_clock_contex
+>   	}
+>   
+>   out:
+> -	kfree(extoff);
+>   	kfree(sysoff);
+>   	return err;
+>   }
 > 
-
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
