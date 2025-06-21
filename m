@@ -1,530 +1,155 @@
-Return-Path: <netdev+bounces-199951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA335AE2838
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 11:20:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F190BAE283C
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 11:21:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A66A27A6218
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 09:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62DB05A0CDA
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 09:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491851E0E0B;
-	Sat, 21 Jun 2025 09:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997371DE4EC;
+	Sat, 21 Jun 2025 09:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lD4H0JU1"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Lwb1Fk50";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K0dDBIUE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933171A5B99;
-	Sat, 21 Jun 2025 09:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72891A23B6;
+	Sat, 21 Jun 2025 09:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750497602; cv=none; b=KltKQiDe2eyCU6/mjXiKs4gxDNiezsrw0zTdNc8KM4+ApMzNjIRV7Fj544WTNZI73aL6Lt0EsBVuuhsskpFDp9Pe8sR/ul2eqcUX58bdEJG6reaB0IrisxIUKXtBeb3ibbeLjkXVM9p05gIyR2c8sCH2Ijxtbe0ORXQ8rlb0ZsA=
+	t=1750497694; cv=none; b=Uc2CvU21yZs97gIG3jYgzmrKLFpp+ZDAEuvNyqh54ICi5VcveE5/zSCegA1djbsplRJXFRgtO9+LTjKbuesbDbt+FPtfrU3Pz5i5Z9/fvag1g/9shxopUDCfBZG8Nj7tie1mBhtxwb/RubmMINeOjsp90h++7drpzryYN+iDdbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750497602; c=relaxed/simple;
-	bh=TlJLR5bE/LSEyfqFwlPxAqc2pFp3L5chhoIGe0UhgNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u8NtcNK0+KOFg83pHM/xiANgqyNNmRmue9C6CgxScoazHJPSAAm6T3qC7XkyXNyRjWLUK0AOd4B92UusPEQN481tJrpT3cPX+BlQ7DWPOVzQsSMPYyrZYjQrUUCBb4o0OWSoPdos1AamLfBcYQEziUPMUekLPibvZ66Ru4Liud4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lD4H0JU1; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-313eeb77b1fso2088487a91.1;
-        Sat, 21 Jun 2025 02:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750497600; x=1751102400; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gb2OFSDE2Drj8JB0tU6F+SK9aQFEFXhP1Y8iZqptNjk=;
-        b=lD4H0JU1zKKUGAWzw+2QfIsrizl38oLCSrIhGA+lgNUNi5IICHPYEk8xkTsg3PFo2Z
-         et/A9f4vN93bfpxFWB9kbutqM9IT2inbPb72Ss1xK0MSveHbTnBZ5CSCkC1YrC0cp7vV
-         E0tMDzGnol4jEAXAfI9c6YCUdh4I0Bm+uEgbgTnMyNgeQuIzYzMQ0SgwPKBah56iEboq
-         4m2CwzsnRQegdw7i+/UESa9NI0cOBrgHdkd0rDgGZukonMic/FJDQRC2FrhgpDWt8DxZ
-         bBCHRwHMb2IOrit1Ww7c7VOi7zFxQPkCyEhXdEf99PXkoMPOlIs3jhIOoweK2Z4U2mbA
-         2rtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750497600; x=1751102400;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gb2OFSDE2Drj8JB0tU6F+SK9aQFEFXhP1Y8iZqptNjk=;
-        b=nGlP4F4fDa4spsYVUvqlT1Y3nQq3O6oazwmf+5vzzFT+To4Iy7k+5WDlCxyE9BfXaf
-         /btaHo8WpZV3h+DfHOItCuvWW57unmki+xXRE/5b9fTtD6SPgOx/wOUNFnqhr83jD66q
-         MONsqpVVUNe86Eht3ocJHqGdaRHMwaDjFY1riUBeg3jaR8jh1P125n51fw5K7sbQJHS1
-         eq0uNpMGaCD/vg1R7JFll4lzVvyQRwJOUTk/2omnLFztToiw6EJ6b0+TJqYsapbcAkCy
-         KeQhsjxR9TwdRWFA5POk4avtFLNkeKwufNX/O0tlOKyidK/q9w0az1fBjGyxzPwrX4Z9
-         1JJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSVJ5tgSjwPzADdKpDcjejstuQ++/LBAptXMeQ6au0knmZDiGUXIM3F9Zk0qAPIAI9hctsb45XYDlNESA=@vger.kernel.org, AJvYcCWVonUahPIsRNxfXFR+ZbfEQX9z2X1O60odd6ip8aQw8fbAZ5crkzWL9vxhE30sxESkuu6N9bAe@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa7RhHFLo7c7MrXX7JKwJhZmXLND4TBI/9qw/78HntummHKO5H
-	Y5L+UoH7UpM8spz7U3FpnWzxk55lBrGyjPFqMKiwgvFwsxqiOm2MoYRq
-X-Gm-Gg: ASbGncvjrXqcfBUqQOglD654bIgdrWCY5h3NaqJ3zmjgzx5zh4S1BRQYEWwt0nuziOY
-	YVvIrx6KiBceQ3A/EzuDEHb2JqMchHRy8Ptz+6TwaouxSGduO/V22N2r+WbRm3F3+E6mBvTi71x
-	j7xtp4O2biYj4G932/kSp7TU+oJ+uvRpZTH5LyPUFmd8V/9f6C0NoapaxWn7UT5aDfWPiP0X3Ox
-	/TWlr5GIOjuHH3tPnRU87La44f3Cz+Gu++u45fkXXtgKgP0FtDNFLmYAl3Fu21JLgLs9aBFmSkw
-	dEtUoFw+G7eo/3DsAyolq9NDysBymvXLIkx0MWU2xQwn9ivVp0jpVYrWV6829g==
-X-Google-Smtp-Source: AGHT+IG7BlAgeNt15LoNBTGF+uLERbEgVKWD0uxp4y5YChdeGXj1JFCxW0uLE3Hzps/4ZmMXA/qHFQ==
-X-Received: by 2002:a17:90b:1dc7:b0:312:e731:5a6b with SMTP id 98e67ed59e1d1-3159d8fe239mr7708289a91.32.1750497599534;
-        Sat, 21 Jun 2025 02:19:59 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3158a23e190sm6059930a91.13.2025.06.21.02.19.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Jun 2025 02:19:58 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id EAA784207D0B; Sat, 21 Jun 2025 16:19:54 +0700 (WIB)
-Date: Sat, 21 Jun 2025 16:19:54 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: linux-doc@vger.kernel.org, linux-kernel-mentees@lists.linux.dev,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	skhan@linuxfoundation.com, jacob.e.keller@intel.com,
-	alok.a.tiwari@oracle.com
-Subject: Re: [PATCH net-next v3] docs: net: sysctl documentation cleanup
-Message-ID: <aFZ5OhP3Ci5KzOff@archie.me>
-References: <20250620215542.153440-1-abdelrahmanfekry375@gmail.com>
+	s=arc-20240116; t=1750497694; c=relaxed/simple;
+	bh=4qdEsGlCBHQX9nBVHiBVWpPuog5cz+ELrrOp+xiPHBk=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Rr4cIfaul0D1NZEEq4+mOefWiXbMxhIQeoQC6b3I2/cW4IfvUagHHLwHs2w5yuxlbmomOUtxjlxHAzF6ikWHG+GHtETCzn9TqmqFYWVmsGBX7bPMjJMvjIPi3dvvxYCBFGxPNePxvl9cGX1nevQPSAPdu6RN4Tc3uKgtFIsvBko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Lwb1Fk50; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=K0dDBIUE; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id BB2DF11400F2;
+	Sat, 21 Jun 2025 05:21:30 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-05.internal (MEProxy); Sat, 21 Jun 2025 05:21:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1750497690;
+	 x=1750584090; bh=ks3h8kqTA1Gd5HYWPg1HjxoNrsoTSLNAQpFpPQpS1BI=; b=
+	Lwb1Fk50lqZhMxrwSSnou4213Axyfsk4OYHx7I4uDTzR6Xoooy87fciBcG1faSL9
+	uh9GCM4XLGHKiczdX3wI60boToc9SPn6wcQMowANgl8yQ0BIKlK2Znmyl45WgptL
+	BiJzC5+FItaayZkmUBprH+hjSDywRUrK3iNqt0ocZUKHVU4Eqm0ud2EH8HDOCxXP
+	tkUSBdG0bK9esafHmCIFGwumS9sPde9Gy7yxqSYlVN0XZyOFQYkcXW8KpuRPjXXo
+	nRmhYFEwgxdYFYw6OW5QUQdreBuFzYznYSNouW4oSTWoTNYXXhYDMURnTfUwjSg0
+	OjCQIDHofxsCciVKBAcxpA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750497690; x=
+	1750584090; bh=ks3h8kqTA1Gd5HYWPg1HjxoNrsoTSLNAQpFpPQpS1BI=; b=K
+	0dDBIUEAwJeXnjheoU8xaXyFF9hJgp2CSmqrNG1on/konNrF19GuTJrq2+DfDlmx
+	ALYzkEPk2zEqTpkJ62uMA8S86pVHwmFnW8gzo8T9k51MxHcO3pE6nha9WjcR5viA
+	qGWSEBEfHNBC8T+4hR7itgxtKXRYUQ86C6a3AioL1zqWtQBJizbtsFZW/WoPwwJm
+	Tt/dYP6VJ7nGQ2H8xDHIXTywmA+p1MyCN2vZaXYAE1fpw6cJuXKtLmti7XxDySjk
+	vxznUQEM6lvJtluD9LVj9asHCrCpy2GOC2WIy2AXbIHlW7ncNJ/XfVP5tXRTupE1
+	bi15YHDQEOuGu+17OoNIg==
+X-ME-Sender: <xms:mnlWaK6bNL4S_cieJ1Hvs65rgdnv37dk42HMikV4mpqfIW6cmv5btg>
+    <xme:mnlWaD65ovBoZQrSyZtIOKxwqDya9bN4EGX_9YGW6PNLCiiWR4JmmGZS_BICbwRxU
+    E5PruexhcU6GKLd298>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddutdeludcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpedvjefghfdvueelffekffekvedvleevveeitedthedugeejveeiledujeeutedvleen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhprghsthgvsghinhdrtghomhenucevlh
+    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghr
+    nhgusgdruggvpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtg
+    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughu
+    mhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghrnhgusehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhinhhgoheskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhigidruggvpdhrtghp
+    thhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehprg
+    gsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:mnlWaJfrPig7I2IzHkzat4jY2IGQFpaAIMSIJN5NqDb1uQVw9WXjrw>
+    <xmx:mnlWaHJlixBk9Rmdyi_o7UBwes8mhdd4MryOUQXJhELLEJtdI-YH8Q>
+    <xmx:mnlWaOJh2uU0lHzrNGH7ZaiJvhqcAJ-Q6JhEt66_sfTczmBMFsP53A>
+    <xmx:mnlWaIxVK8vuUHcth_jaxrEs7aOVvGjoBbnnL47wbBUyvgQhqVeyjw>
+    <xmx:mnlWaPeTpImvQDmMcY-e2EXScz0qZ8bViMDnzP7ntkB-r501HnoOkoNQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 00D73700062; Sat, 21 Jun 2025 05:21:29 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250620215542.153440-1-abdelrahmanfekry375@gmail.com>
+X-ThreadId: T00f0f82e82a5e42a
+Date: Sat, 21 Jun 2025 11:21:09 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Simon Horman" <horms@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Thomas Gleixner" <tglx@linutronix.de>,
+ "Ingo Molnar" <mingo@kernel.org>, Netdev <netdev@vger.kernel.org>,
+ linux-kernel@vger.kernel.org
+Message-Id: <75623e39-14da-4e4d-8129-790ed08b66ae@app.fastmail.com>
+In-Reply-To: <20250621074915.GG9190@horms.kernel.org>
+References: <20250620112633.3505634-1-arnd@kernel.org>
+ <20250621074915.GG9190@horms.kernel.org>
+Subject: Re: [PATCH] myri10ge: avoid uninitialized variable use
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 21, 2025 at 12:55:42AM +0300, Abdelrahman Fekry wrote:
-> +	Possible values:
-> +	- 0 (disabled)
-> +	- 1 (enabled)
-> +
-> +	Default: 0 (disabled)
+On Sat, Jun 21, 2025, at 09:49, Simon Horman wrote:
+> On Fri, Jun 20, 2025 at 01:26:28PM +0200, Arnd Bergmann wrote:
+>> 
+>> It would be nice to understand how to make other compilers catch this as
+>> well, but for the moment I'll just shut up the warning by fixing the
+>> undefined behavior in this driver.
+>> 
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>
+> Hi Arnd,
+>
+> That is a lovely mess.
+>
+> Curiously I was not able to reproduce this on s390 with gcc 10.5.0.
+> Perhaps I needed to try harder. Or perhaps the detection is specific to a
+> very narrow set of GCC versions.
 
-I see boolean lists as normal paragraph instead, so I have to separate
-them:
+I was using my gcc binaries from
+https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/arm64/10.5.0/
+but more likely this is kernel configuration specific than the exact
+toolchain version.
 
----- >8 ----
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index edf4b22535e40b..4cc9f0aacf6418 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -15,6 +15,7 @@ ip_forward - BOOLEAN
- 	for routers)
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -66,6 +67,7 @@ ip_forward_use_pmtu - BOOLEAN
- 	case.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -78,6 +80,7 @@ fwmark_reflect - BOOLEAN
- 	fwmark of the packet they are replying to.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -90,6 +93,7 @@ fib_multipath_use_neigh - BOOLEAN
- 	built with CONFIG_IP_ROUTE_MULTIPATH enabled.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -374,6 +378,7 @@ tcp_autocorking - BOOLEAN
- 	when they know how/when to uncork their sockets.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -418,6 +423,7 @@ tcp_dsack - BOOLEAN
- 	Allows TCP to send "duplicate" SACKs.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -463,6 +469,7 @@ tcp_ecn_fallback - BOOLEAN
- 	control) ECN settings are disabled.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -502,6 +509,7 @@ tcp_fwmark_accept - BOOLEAN
- 	unaffected.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -552,6 +560,7 @@ tcp_l3mdev_accept - BOOLEAN
- 	compiled with CONFIG_NET_L3_MASTER_DEV.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -625,6 +634,7 @@ tcp_moderate_rcvbuf - BOOLEAN
- 	match the size required by the path for full throughput.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -657,6 +667,7 @@ tcp_no_metrics_save - BOOLEAN
- 	connections.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -667,6 +678,7 @@ tcp_no_ssthresh_metrics_save - BOOLEAN
- 	If enabled, ssthresh metrics are disabled.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -710,6 +722,7 @@ tcp_reflect_tos - BOOLEAN
- 	This options affects both IPv4 and IPv6.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -735,6 +748,7 @@ tcp_retrans_collapse - BOOLEAN
- 	certain TCP stacks.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -772,6 +786,7 @@ tcp_rfc1337 - BOOLEAN
- 	assassination.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -800,6 +815,7 @@ tcp_sack - BOOLEAN
- 	Enable select acknowledgments (SACKS).
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -832,6 +848,7 @@ tcp_backlog_ack_defer - BOOLEAN
- 	long latencies at end of a TCP socket syscall.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -844,6 +861,7 @@ tcp_slow_start_after_idle - BOOLEAN
- 	be timed out after an idle period.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -855,6 +873,7 @@ tcp_stdurg - BOOLEAN
- 	Linux might not communicate correctly with them.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -916,6 +935,7 @@ tcp_migrate_req - BOOLEAN
- 	disable this option.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1101,6 +1121,7 @@ tcp_window_scaling - BOOLEAN
- 	Enable window scaling as defined in RFC1323.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1113,12 +1134,13 @@ tcp_shrink_window - BOOLEAN
- 	window can be offered, and that TCP implementations MUST ensure
- 	that they handle a shrinking window, as specified in RFC 1122.
- 
--	Possible values
--	- 0 (disabled)	The window is never shrunk.
--	- 1 (enabled)	The window is shrunk when necessary to remain within
--			the memory limit set by autotuning (sk_rcvbuf).
--			This only occurs if a non-zero receive window
--			scaling factor is also in effect.
-+	Possible values:
-+
-+	- 0 (disabled): The window is never shrunk.
-+	- 1 (enabled): The window is shrunk when necessary to remain within
-+	  the memory limit set by autotuning (sk_rcvbuf).
-+	  This only occurs if a non-zero receive window
-+	  scaling factor is also in effect.
- 
- 	Default: 0 (disabled)
- 
-@@ -1163,6 +1185,7 @@ tcp_workaround_signed_windows - BOOLEAN
- 	not receive a window scaling option from them.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1180,6 +1203,7 @@ tcp_thin_linear_timeouts - BOOLEAN
- 	Documentation/networking/tcp-thin.rst
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1257,6 +1281,7 @@ tcp_plb_enabled - BOOLEAN
- 	make repathing decisions.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1361,6 +1386,7 @@ udp_l3mdev_accept - BOOLEAN
- 	CONFIG_NET_L3_MASTER_DEV.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1425,6 +1451,7 @@ raw_l3mdev_accept - BOOLEAN
- 	CONFIG_NET_L3_MASTER_DEV.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1441,6 +1468,7 @@ cipso_cache_enable - BOOLEAN
- 	off and the cache will always be "safe".
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1463,6 +1491,7 @@ cipso_rbm_optfmt - BOOLEAN
- 	categories in order to make the packet data 32-bit aligned.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1477,6 +1506,7 @@ cipso_rbm_strictvalid - BOOLEAN
- 	with other implementations that require strict checking.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1541,6 +1571,7 @@ ip_nonlocal_bind - BOOLEAN
- 	which can be quite useful - but may break some applications.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1555,6 +1586,7 @@ ip_autobind_reuse - BOOLEAN
- 	option should only be set by experts.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1577,6 +1609,7 @@ ip_early_demux - BOOLEAN
- 	reduces overall throughput, in such case you should disable it.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1593,6 +1626,7 @@ tcp_early_demux - BOOLEAN
- 	Enable early demux for established TCP sockets.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1603,6 +1637,7 @@ udp_early_demux - BOOLEAN
- 	your system could experience more unconnected load.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1613,6 +1648,7 @@ icmp_echo_ignore_all - BOOLEAN
- 	requests sent to it.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1623,6 +1659,7 @@ icmp_echo_enable_probe - BOOLEAN
-         requests sent to it.
- 
-         Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1633,6 +1670,7 @@ icmp_echo_ignore_broadcasts - BOOLEAN
- 	TIMESTAMP requests sent to it via broadcast/multicast.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1697,6 +1735,7 @@ icmp_ignore_bogus_error_responses - BOOLEAN
- 	will avoid log file clutter.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -1718,6 +1757,7 @@ icmp_errors_use_inbound_ifaddr - BOOLEAN
- 	has one will be used regardless of this setting.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2096,6 +2136,7 @@ disable_policy - BOOLEAN
- 	Disable IPSEC policy (SPD) for this interface
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2105,6 +2146,7 @@ disable_xfrm - BOOLEAN
- 	Disable IPSEC encryption on this interface, whatever the policy
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2126,6 +2168,7 @@ ignore_routes_with_linkdown - BOOLEAN
-         Ignore routes whose link is down when performing a FIB lookup.
- 
-         Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2137,6 +2180,7 @@ promote_secondaries - BOOLEAN
- 	removing all the corresponding secondary IP addresses.
- 
- 	Possible values:
-+        
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2150,6 +2194,7 @@ drop_unicast_in_l2_multicast - BOOLEAN
- 	1122, but is disabled by default for compatibility reasons.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2161,6 +2206,7 @@ drop_gratuitous_arp - BOOLEAN
- 	(or in the case of 802.11, must not be used to prevent attacks.)
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2209,6 +2255,7 @@ bindv6only - BOOLEAN
- 	only.
- 
- 	Possible values:
-+
- 	- 0 (disabled) - enable IPv4-mapped address feature
- 	- 1 (enabled)  - disable IPv4-mapped address feature
- 
-@@ -2220,6 +2267,7 @@ flowlabel_consistency - BOOLEAN
- 	flow label manager.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2250,6 +2298,7 @@ flowlabel_state_ranges - BOOLEAN
- 	is reserved for stateless flow labels as described in RFC6437.
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
-@@ -2323,6 +2372,7 @@ anycast_src_echo_reply - BOOLEAN
- 	echo reply
- 
- 	Possible values:
-+
- 	- 0 (disabled)
- 	- 1 (enabled)
- 
+The warning clearly depends on the myri10ge_send_cmd() function getting
+inlined into the caller, and inlining is highly configuration specific.
 
-Thanks.
+See https://pastebin.com/T23wHkCx for the .config I used to produce
+this.
 
--- 
-An old man doll... just what I always wanted! - Clara
+> Regardless I agree with your analysis, but I wonder if the following is
+> also needed so that .data0, 1 and 2 are always initialised when used.
+
+Right, I stopped adding initializations when all the warnings were
+gone, so I missed the ones you found. ;-)
+
+I've integrated your changes now, let me know if I should resend it
+right away, or you want to play around with that .config some more
+first and reproduce the warning.
+
+      Arnd
 
