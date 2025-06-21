@@ -1,86 +1,133 @@
-Return-Path: <netdev+bounces-199969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-199974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D4BAE2987
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 16:43:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1038CAE29A1
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 16:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B9B33B63B2
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 14:43:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 748963A7F5A
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 14:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD8C19F137;
-	Sat, 21 Jun 2025 14:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zqlv9Q4o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2669D1F5435;
+	Sat, 21 Jun 2025 14:54:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1E5770FE;
-	Sat, 21 Jun 2025 14:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2B4E56A;
+	Sat, 21 Jun 2025 14:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750517006; cv=none; b=aI0lm0diS5a/8zuXJqXCBZBoyzel9Iz3bXfSj+tAAtoYsASyqyLfLETefLDzknviko4IKijLKh4AbPIChQ9Pzq6SmjanmacdrKBeG77vYaZmQtlnHhjWqUXQBRXKi2aYmx7Rc0MImOdUXIBQCP4bOO30ZAMBNwNOjYJBYmDd+c0=
+	t=1750517646; cv=none; b=VJo3PnYorZ+o49RdaRkn7knnRe7ceqV+3EHVziRGhGVxcJUNlhc5F3LNtax5YBXzAoVroyTKWr1A6z0y9rYAgnGQKWRhqB2nHvRsbasffls4RDVK+66Fc/D0JYpO8Ud7WkePMp05wiSnqGv6X3u6al/hvnqXdSjniIL12x6IhI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750517006; c=relaxed/simple;
-	bh=3oaiRxyJtUt56IODFrqTXpXDTOsp06hhdQcX0250e+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VCvsAc+fStAnDfq04TrKiu9mRVt9WMSw84L1Jo4+OZHI1+6As3ijSBnoWub+YSMObBH5asOV5/1Tl8IWSNLo4Lf+0+4Qvq9d5pbp6e1d6uea9v+m3P3gytX75ntwRWSON4EQWpFneEj7yQIalCWXH/XL7lq7n5bW0LyUebyndPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zqlv9Q4o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E290C4CEE7;
-	Sat, 21 Jun 2025 14:43:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750517005;
-	bh=3oaiRxyJtUt56IODFrqTXpXDTOsp06hhdQcX0250e+c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zqlv9Q4o7L8IetOZc/Z5mYnw4dgHpA8VrtftM7m+Qz5yHIo6n93tw0qeHpzIy5N8b
-	 rPevbJ20HTGPF58kEr9Nk3lQf9KL1aJscTZXLbhNyGRbYQE40rTG42J+XIeyijH6Lj
-	 Oqa9rQAfIT/oD/biCBedp+Qx7YcGfWnaqEBthDOQx2Uy68QHLxoO2PyEp6FO1pLcOp
-	 4tLDZWaVJX8BAKrEYP1RALmxgVHQOo1XjzSt1iGGONXMIEoJT/bcxAMKzzgJ64wuWw
-	 z+obLkS2mdBafB0bJPOT9VjBS+nqyfw++7g6+2ou0/ZsGlLYYKTcCbWQQVcIQ6Mlwq
-	 Oj7US2weSmL5w==
-Date: Sat, 21 Jun 2025 07:43:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET
- set/getsockopt
-Message-ID: <20250621074324.63ab381d@kernel.org>
-In-Reply-To: <CAL+tcoA=KQCLdthH3VXPhd-z=sieKQu_xOPgQEzxdy0Mtnycag@mail.gmail.com>
-References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
-	<20250619080904.0a70574c@kernel.org>
-	<CAL+tcoA=KQCLdthH3VXPhd-z=sieKQu_xOPgQEzxdy0Mtnycag@mail.gmail.com>
+	s=arc-20240116; t=1750517646; c=relaxed/simple;
+	bh=Q8FDZihT0rIgE8dqYjKRtD5Nrn5OypH+gWUtZ6hkqw4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=BcnvKc+yXJiV/ofT9HkFfjNUC4hgukTrwhRFnaiUTrF/sFU/5081C/M43U4eVRYaBsrcEcJm2TbTiW8/6CnyTfO7076bx4dD6KLtm3+usu7ciNbrUnK0OCpODCNok44FH+94IJEUTtZv5Eqn0JHQKIVXbG+1+Tpi11HONEsqhxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost (localhost [127.0.0.1])
+	by smtp0.kfki.hu (Postfix) with ESMTP id 4bPcZb0xXWz3sb80;
+	Sat, 21 Jun 2025 16:45:11 +0200 (CEST)
+X-Virus-Scanned: Debian amavis at smtp0.kfki.hu
+Received: from smtp0.kfki.hu ([127.0.0.1])
+ by localhost (smtp0.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id Yr-XXvThqecK; Sat, 21 Jun 2025 16:45:09 +0200 (CEST)
+Received: from mentat.rmki.kfki.hu (unknown [148.6.192.8])
+	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
+	by smtp0.kfki.hu (Postfix) with ESMTPSA id 4bPcZY1q8fz3sb7s;
+	Sat, 21 Jun 2025 16:45:09 +0200 (CEST)
+Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
+	id 1C0ED140EA3; Sat, 21 Jun 2025 16:45:09 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by mentat.rmki.kfki.hu (Postfix) with ESMTP id 17F4F140184;
+	Sat, 21 Jun 2025 16:45:09 +0200 (CEST)
+Date: Sat, 21 Jun 2025 16:45:09 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: RubenKelevra <rubenkelevra@gmail.com>
+cc: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: ipset: fix typo in hash size macro
+In-Reply-To: <20250620092053.180550-1-rubenkelevra@gmail.com>
+Message-ID: <11f4f9cd-e818-099e-b8b2-782608862eb5@netfilter.org>
+References: <20250619151029.97870-1-rubenkelevra@gmail.com> <20250620092053.180550-1-rubenkelevra@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="8323329-1275113213-1750517109=:3235"
 
-On Fri, 20 Jun 2025 08:17:48 +0800 Jason Xing wrote:
-> > Jason, I think some additions to Documentation/ and quantification of
-> > the benefits would be needed as well.  
-> 
-> Got it.
-> 
-> #1 Documentation. I would add one small section 'XDP_MAX_TX_BUDGET
-> setsockopt' in Documentation/networking/af_xdp.rst.
-> 
-> #2 quantification
-> It's really hard to do so mainly because of various stacks implemented
-> in the user-space. AF_XDP is providing a fundamental mechanism only
-> and its upper layer is prosperous.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Sorry for the awkward phrase. By "quantification of the benefits"
-I meant what performance improvement you have seen from increasing 
-this "budget".
+--8323329-1275113213-1750517109=:3235
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+On Fri, 20 Jun 2025, RubenKelevra wrote:
+
+> Rename IPSET_MIMINAL_HASHSIZE =E2=86=92 IPSET_MINIMAL_HASHSIZE in
+> ip_set_hash_gen.h, matching the header typo-fix.
+>=20
+> Signed-off-by: RubenKelevra <rubenkelevra@gmail.com>
+
+Patch is applied in the ipset git tree, thank you.
+
+Best regards,
+Jozsef
+> ---
+>  include/linux/netfilter/ipset/ip_set_hash.h | 2 +-
+>  net/netfilter/ipset/ip_set_hash_gen.h       | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/linux/netfilter/ipset/ip_set_hash.h b/include/linu=
+x/netfilter/ipset/ip_set_hash.h
+> index 838abab672af1..56e883661f857 100644
+> --- a/include/linux/netfilter/ipset/ip_set_hash.h
+> +++ b/include/linux/netfilter/ipset/ip_set_hash.h
+> @@ -6,7 +6,7 @@
+> =20
+> =20
+>  #define IPSET_DEFAULT_HASHSIZE		1024
+> -#define IPSET_MIMINAL_HASHSIZE		64
+> +#define IPSET_MINIMAL_HASHSIZE		64
+>  #define IPSET_DEFAULT_MAXELEM		65536
+>  #define IPSET_DEFAULT_PROBES		4
+>  #define IPSET_DEFAULT_RESIZE		100
+> diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipse=
+t/ip_set_hash_gen.h
+> index 5251524b96afa..785d109645fed 100644
+> --- a/net/netfilter/ipset/ip_set_hash_gen.h
+> +++ b/net/netfilter/ipset/ip_set_hash_gen.h
+> @@ -1543,8 +1543,8 @@ IPSET_TOKEN(HTYPE, _create)(struct net *net, stru=
+ct ip_set *set,
+> =20
+>  	if (tb[IPSET_ATTR_HASHSIZE]) {
+>  		hashsize =3D ip_set_get_h32(tb[IPSET_ATTR_HASHSIZE]);
+> -		if (hashsize < IPSET_MIMINAL_HASHSIZE)
+> -			hashsize =3D IPSET_MIMINAL_HASHSIZE;
+> +		if (hashsize < IPSET_MINIMAL_HASHSIZE)
+> +			hashsize =3D IPSET_MINIMAL_HASHSIZE;
+>  	}
+> =20
+>  	if (tb[IPSET_ATTR_MAXELEM])
+> --=20
+> 2.49.0
+>=20
+>=20
+
+--=20
+E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef=
+@wigner.hu
+Address: Wigner Research Centre for Physics
+         H-1525 Budapest 114, POB. 49, Hungary
+--8323329-1275113213-1750517109=:3235--
 
