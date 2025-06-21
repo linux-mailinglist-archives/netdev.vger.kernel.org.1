@@ -1,121 +1,77 @@
-Return-Path: <netdev+bounces-200002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB451AE2AFF
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 20:10:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD701AE2B03
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 20:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46E7F3B22E1
-	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 18:09:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8876A189387C
+	for <lists+netdev@lfdr.de>; Sat, 21 Jun 2025 18:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E34265CC9;
-	Sat, 21 Jun 2025 18:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C2826A0E3;
+	Sat, 21 Jun 2025 18:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1BkUFFy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="edsIdgaH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B997817736;
-	Sat, 21 Jun 2025 18:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6932E22DF8B;
+	Sat, 21 Jun 2025 18:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750529411; cv=none; b=J8LS+xpoRb4UopUppVCHRX9IWI5KYhI7ptFSYF5wVBbFhG2NN4ZGGkOc0IUmoNvE7vZnePoHo/oRMT6eInrOyV+dtFyrM+YXpGPIcKWrs0g4FFUUFBxQ/dOEgeRRolsV2hUuR6jpgMhkNCZWbuHvFZ9dvIYzMBBKYlKHnIz0P2w=
+	t=1750529499; cv=none; b=KcLcWZYUbtSr9zKy8JvQRE6jpQ2T3JDMmWqa/jQsCXxf4MXtvWqKi9xKuDOvb6zmQr5mmzdfJYVyfHVqZSoCKNJvjS1SLl4tothpPni2PKgSkuQhOHfTGW7GIRvctN9JqYQraU7mPYmZK+r5PO3mX7fZvlN52/oDtdVYBr8xLSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750529411; c=relaxed/simple;
-	bh=wTNYiG61KbGanukYQezT3m/T+uZtYtfau85/Ayhj85Y=;
+	s=arc-20240116; t=1750529499; c=relaxed/simple;
+	bh=KT4wZwZ4quP9dkmzxRITSCwt3l+q2gBaDsp4pfn3cw4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pI9DaxDcRwAlK3IAWHv8quO3oTKvofmvolRSrdgbbBwsoSMC5uSvAWfWKSF45vEMjKEN1khndCRvQKU/+ZkmHgK+csWDr1Tzv8egyWNXsWvyZj0a+JETqI3esF9Z4EoBSACEWqZ9km3/vq9ElhpABcXewx5/GsO2PN1ryasucVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1BkUFFy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34BA6C4CEE7;
-	Sat, 21 Jun 2025 18:10:08 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WCle23gs0/Wd1/rvhZ1n3oO18pkSXzJwKZvjCrkECYTW/xa1kOtS6CKSSRg3Y9OZF0jzjkCgaEBfqt7KP96KBdfMXN9YS9AshzINg7pkyiGV2t9nOH2iSCGqS8PNA1ktdwZlaBYQWMCXxv0mbI7gqusUm3UmuXdJU17sctVphek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=edsIdgaH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24A20C4CEE7;
+	Sat, 21 Jun 2025 18:11:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750529410;
-	bh=wTNYiG61KbGanukYQezT3m/T+uZtYtfau85/Ayhj85Y=;
+	s=k20201202; t=1750529495;
+	bh=KT4wZwZ4quP9dkmzxRITSCwt3l+q2gBaDsp4pfn3cw4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i1BkUFFyeEjb0zdbQ7qInFp2RZJj7m5C6g8wq/fbNMJS5zEG7Aft1H0p0e4MF+gvd
-	 QtKxCqoH/kZrOmdHiXCBbZX86v8GZ0pmMiN+dnUo2VQuclNIZDsaR/nABFiBoLY+S7
-	 zITWLKZl9GfhJelv6VbAPGzdyGWOST7HSShXsnOsqM6GXIAgJp8lilXUHGg3idLSlG
-	 riouGMioga4ow9exGIe7eYCd1PxkaVzfRS/RkYmJX59t6O/pbuNdoIxAjje48YbxhU
-	 OOSf1xEze/aSOv4E7U7WAPrpn06R+pnGrQ8IhsDpTKiR1bPLRGxqaVRHaRCwpT6NOK
-	 DNoIXUsWSW7Jw==
-Date: Sat, 21 Jun 2025 19:10:05 +0100
+	b=edsIdgaHi20jfAkaZwiFIIalrlv3YzUxrXdkVV4wcna9xXZJElrOjeDO8tqnm++65
+	 +S8d3FL6oW7NTymckkAZo3dOgkyzjgkte6mtqGbQUbr03l5/aVla1ZnYrvQe7xj/lZ
+	 zhSB4rAflr8biWklH6mQK7loZPHOLASd5Q3D/eigZrTELHEu98QmcQ4SoPp5YD7Whl
+	 2f5+Bxojfq7Nk+W0NO3ZcjEwA9ZnfyivNrKvqj8wdWHNMhFeB/cXn/kSWkDNjk9tFv
+	 O+thx+F4tqRn7lMvOOhJi+VhyD53O81eP+y0NL2gKhQzzeHyT9czSxafRR8axMMoyj
+	 dKdbb5N4116Xg==
+Date: Sat, 21 Jun 2025 19:11:31 +0100
 From: Simon Horman <horms@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>, Netdev <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] myri10ge: avoid uninitialized variable use
-Message-ID: <20250621181005.GF71935@horms.kernel.org>
-References: <20250620112633.3505634-1-arnd@kernel.org>
- <20250621074915.GG9190@horms.kernel.org>
- <75623e39-14da-4e4d-8129-790ed08b66ae@app.fastmail.com>
+To: Faisal Bukhari <faisalbukhari523@gmail.com>
+Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Fix typo in marvell octeontx2 documentation
+Message-ID: <20250621181131.GG71935@horms.kernel.org>
+References: <20250621103204.168461-1-faisalbukhari523@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <75623e39-14da-4e4d-8129-790ed08b66ae@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250621103204.168461-1-faisalbukhari523@gmail.com>
 
-On Sat, Jun 21, 2025 at 11:21:09AM +0200, Arnd Bergmann wrote:
-> On Sat, Jun 21, 2025, at 09:49, Simon Horman wrote:
-> > On Fri, Jun 20, 2025 at 01:26:28PM +0200, Arnd Bergmann wrote:
-> >> 
-> >> It would be nice to understand how to make other compilers catch this as
-> >> well, but for the moment I'll just shut up the warning by fixing the
-> >> undefined behavior in this driver.
-> >> 
-> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> >
-> > Hi Arnd,
-> >
-> > That is a lovely mess.
-> >
-> > Curiously I was not able to reproduce this on s390 with gcc 10.5.0.
-> > Perhaps I needed to try harder. Or perhaps the detection is specific to a
-> > very narrow set of GCC versions.
+On Sat, Jun 21, 2025 at 04:02:04PM +0530, Faisal Bukhari wrote:
+> Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
+> Fixes a spelling mistake: "funcionality" → "functionality".
 > 
-> I was using my gcc binaries from
-> https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/arm64/10.5.0/
-> but more likely this is kernel configuration specific than the exact
-> toolchain version.
-> 
-> The warning clearly depends on the myri10ge_send_cmd() function getting
-> inlined into the caller, and inlining is highly configuration specific.
-> 
-> See https://pastebin.com/T23wHkCx for the .config I used to produce
-> this.
+> Signed-off-by: Faisal Bukhari <faisalbukhari523@gmail.com>
 
-Thanks Arnd.
+Thanks. I agree this is correct.  And I see that this is the only spelling
+error that codespell flags in this file.
 
-FWIIW, I was also using the above mentioned toolchain. But with allmodconfig.
-Now I'm using the config at the link above I see the warnings too.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-In any case, it seems pretty clear to me from looking at the code that your
-analysis is correct. The mystery to me is why it isn't more widely
-detected by tooling.
-
-> 
-> > Regardless I agree with your analysis, but I wonder if the following is
-> > also needed so that .data0, 1 and 2 are always initialised when used.
-> 
-> Right, I stopped adding initializations when all the warnings were
-> gone, so I missed the ones you found. ;-)
-
-I thought that might have happened :)
-
-> I've integrated your changes now, let me know if I should resend it
-> right away, or you want to play around with that .config some more
-> first and reproduce the warning.
-
-Feel free to post whenever you are ready.
 
