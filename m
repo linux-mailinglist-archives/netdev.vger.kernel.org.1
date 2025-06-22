@@ -1,67 +1,59 @@
-Return-Path: <netdev+bounces-200074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B34E4AE30AF
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 18:02:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF09FAE30C3
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 18:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5510716F54C
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 16:02:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ADDE1681C6
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 16:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34003193079;
-	Sun, 22 Jun 2025 16:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682361D63EE;
+	Sun, 22 Jun 2025 16:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isZjmj3Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqYsQ41I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0973B3FB1B;
-	Sun, 22 Jun 2025 16:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3A07263C;
+	Sun, 22 Jun 2025 16:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750608147; cv=none; b=LdvTSgWWNr7VHyzhxli1uXF8XVWJy0cUCYK/lnydKuBaH6eF7WPKBUrwzt2scP+OnfzhITretkHbcc0Nv8JFhj26U+dpioXRyGyI99VPZlQNGzg3PkkaXKDasNkADqXGtkDMn6g7dEihXZiktmea80UHa4B9+BXmnPvo8KfHG2A=
+	t=1750609640; cv=none; b=fKNCnsIEj4iegX3G2D683WZBttao2cIeqwVUoWQEe+rsJB66Av9WNPnp1CMTxQYRcngZBpx4dvQGhZQafbZRaM+390gQ6ihd0/FI53Lxz1tApawAI/x5u1gLVAwT1qF8Ig86i35KY9sAFHfddVJSz9QVlZFoOP4Ni7wBO5luNVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750608147; c=relaxed/simple;
-	bh=bAa+SPiPfXnsCLfgXME8rQ+DPB48Cn88u+M1H6HiyIs=;
+	s=arc-20240116; t=1750609640; c=relaxed/simple;
+	bh=cJSpp4loBWRA+XVexUn88O5z1jukld2Np4QMGXcGWgI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QVvPX+rgJO5J1uzi8xJPUiNCC/kdUkmOG6UCYco0UAXuU6Cvk1PGlS1+APpFN9rXIsFf5J/qkCKzzyqimQ8kklGwrnL4RBwAKoz+mhZdFz+ii/jfdcX7TuS/zVxfcXsqtWILfYKq8o+grXcGKWUeRs5fUna3ziEJCocGTRoa+7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isZjmj3Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CADCEC4CEE3;
-	Sun, 22 Jun 2025 16:02:23 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=rT3qC/+npQuUaVt2GzRLw6xOMYax3i/eIhb5wWpFiqJwKKbm++aNU85rUCVz/Gkiq5230o0Ajg3XUmLpMtUbNp4q+cRelpThYvi4hwaA+HTKjnmktspkCjJCuGw6TNCNucQLhhCy1q0tRqKBqo1fj+oIBBujGrg5QUmPgJaWSL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqYsQ41I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB6D1C4CEE3;
+	Sun, 22 Jun 2025 16:27:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750608146;
-	bh=bAa+SPiPfXnsCLfgXME8rQ+DPB48Cn88u+M1H6HiyIs=;
+	s=k20201202; t=1750609639;
+	bh=cJSpp4loBWRA+XVexUn88O5z1jukld2Np4QMGXcGWgI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=isZjmj3ZfniMHyhalxXtq4eIlshtWLyytwYkPSJy4UfV/4hUbMrrCDCjmHqNJ/kce
-	 vi1vXlo+SJh6ftpY1X/ZQcTYDdd8LY7ZTG5/wZSuRlDmBi5m1aNeEqSWrMFbNmYaRg
-	 tHQjVbI/OotFaax8+A80wS7WW+NSLmCZwajeFat+kTHd89Ah0bI5KYEih4Y7ea2fWz
-	 PUKqOZKJooGIUBUmJROTXDlenZePlTw1oc2bLRAdS/m6YJYsy92a39bn32nBphobDC
-	 pZzPwoHTDbIbiR38LvMaCeBASqj8U8gNfktetpknPXWfuoQNO2Q2iHQjzrajJC0fj0
-	 soly3/jNqMj/A==
-Date: Sun, 22 Jun 2025 17:02:21 +0100
+	b=kqYsQ41ItgezNhmqiTsdxCtKCuGdLyZin7BS8P43DPGH3/n8aaG/+yv3eizc/IrkD
+	 RVYMF4IjNV5Ibk3amqEVJmr3T8Aj78jWlvrPBoQvAnhABbBoc4GopjiXe/uEV0hWZg
+	 BmGg9LbER68Me2ff6cLjv4uSU6qxHmed57breoIGAj2zULrAVmApWTosGk12WGsA/9
+	 rimVskjNLC/SgvjXe7k7/W8LpvY+mFExXiGYchtUj+FBEeTs5/ZvJkBrMIViFNcQcn
+	 ykoYp/q3tiSN2YPGnjrZNeuVj3QEQBTe7CuSJvWKGr8WYTmkyynY22CVyGfbHs9iYe
+	 WGqwbiUgEBTMQ==
+Date: Sun, 22 Jun 2025 17:27:15 +0100
 From: Simon Horman <horms@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 4/9] vhost-net: allow configuring extended
- features
-Message-ID: <20250622160221.GH71935@horms.kernel.org>
-References: <cover.1750436464.git.pabeni@redhat.com>
- <e195567cf1f705143477f6eee7b528ee15918873.1750436464.git.pabeni@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] myri10ge: avoid uninitialized variable use
+Message-ID: <20250622162715.GA297140@horms.kernel.org>
+References: <20250621193520.620419-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,55 +62,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e195567cf1f705143477f6eee7b528ee15918873.1750436464.git.pabeni@redhat.com>
+In-Reply-To: <20250621193520.620419-1-arnd@kernel.org>
 
-On Fri, Jun 20, 2025 at 07:39:48PM +0200, Paolo Abeni wrote:
-> Use the extended feature type for 'acked_features' and implement
-> two new ioctls operation allowing the user-space to set/query an
-> unbounded amount of features.
+On Sat, Jun 21, 2025 at 09:35:11PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> The actual number of processed features is limited by VIRTIO_FEATURES_MAX
-> and attempts to set features above such limit fail with
-> EOPNOTSUPP.
+> While compile testing on less common architectures, I noticed that gcc-10 on
+> s390 finds a bug that all other configurations seem to miss:
 > 
-> Note that: the legacy ioctls implicitly truncate the negotiated
-> features to the lower 64 bits range and the 'acked_backend_features'
-> field don't need conversion, as the only negotiated feature there
-> is in the low 64 bit range.
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_set_multicast_list':
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:391:25: error: 'cmd.data0' is used uninitialized in this function [-Werror=uninitialized]
+>   391 |  buf->data0 = htonl(data->data0);
+>       |                         ^~
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:25: error: '*((void *)&cmd+4)' is used uninitialized in this function [-Werror=uninitialized]
+>   392 |  buf->data1 = htonl(data->data1);
+>       |                         ^~
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_allocate_rings':
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:13: error: 'cmd.data1' is used uninitialized in this function [-Werror=uninitialized]
+>   392 |  buf->data1 = htonl(data->data1);
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data1' was declared here
+>  1939 |  struct myri10ge_cmd cmd;
+>       |                      ^~~
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:393:13: error: 'cmd.data2' is used uninitialized in this function [-Werror=uninitialized]
+>   393 |  buf->data2 = htonl(data->data2);
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data2' was declared here
+>  1939 |  struct myri10ge_cmd cmd;
 > 
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> It would be nice to understand how to make other compilers catch this as
+> well, but for the moment I'll just shut up the warning by fixing the
+> undefined behavior in this driver.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> v2: initialize two more instances of these [Simon Horman]
 
-...
+Sorry, but looking at this again I found a few more.
 
-> +	case VHOST_GET_FEATURES_ARRAY:
-> +		if (get_user(count, featurep))
-> +			return -EFAULT;
-> +
-> +		/* Copy the net features, up to the user-provided buffer size */
-> +		argp += sizeof(u64);
-> +		copied = min(count, VIRTIO_FEATURES_DWORDS);
-> +		if (copy_to_user(argp, vhost_net_features,
-> +				 copied * sizeof(u64)))
-> +			return -EFAULT;
-> +
-> +		/* Zero the trailing space provided by user-space, if any */
-> +		if (clear_user(argp, (count - copied) * sizeof(u64)))
+diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+index 4743064bc6d4..feda51e23958 100644
+--- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
++++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+@@ -2258,6 +2258,8 @@ static int myri10ge_get_txrx(struct myri10ge_priv *mgp, int slice)
+ 		    (mgp->sram + cmd.data0);
+ 	}
+ 	cmd.data0 = slice;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status |= myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SMALL_RX_OFFSET,
+ 				    &cmd, 0);
+ 	ss->rx_small.lanai = (struct mcp_kreq_ether_recv __iomem *)
+@@ -2489,7 +2491,6 @@ static int myri10ge_open(struct net_device *dev)
+ static int myri10ge_close(struct net_device *dev)
+ {
+ 	struct myri10ge_priv *mgp = netdev_priv(dev);
+-	struct myri10ge_cmd cmd;
+ 	int status, old_down_cnt;
+ 	int i;
+ 
+@@ -2508,8 +2509,13 @@ static int myri10ge_close(struct net_device *dev)
+ 
+ 	netif_tx_stop_all_queues(dev);
+ 	if (mgp->rebooted == 0) {
++		struct myri10ge_cmd cmd;
++
+ 		old_down_cnt = mgp->down_cnt;
+ 		mb();
++	        cmd.data0 = 0;
++		cmd.data1 = 0;
++		cmd.data2 = 0;
+ 		status =
+ 		    myri10ge_send_cmd(mgp, MXGEFW_CMD_ETHERNET_DOWN, &cmd, 0);
+ 		if (status)
 
-Hi Paolo,
+Even with this, I'm sure there are cases
+where stale values are passed in cases like this.
+But that seems out of scope for this patch.
 
-Smatch warns to "check for integer overflow 'count'" on the line above.
-
-Perhaps it is wrong. Or my analyais is. But it seems to me that an overflow
-could occur if count is very large, say such that (count - copied) is more
-than 2^64 / 8.  As then (count - copied) * sizeof(u64) would overflow 64
-bits.
-
-By the same reasoning this could overflow 32 bits on systems where an
-unsigned long, type type of the 2nd parameter of clear_user, is 32 bits.
-
-> +			return -EFAULT;
-> +		return 0;
-
-...
+  /* setup cmd.data* */
+  myri10ge_send_cmd(...);
+  /* Something else */
+  myri10ge_send_cmd(..);
 
