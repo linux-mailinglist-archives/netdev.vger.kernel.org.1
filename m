@@ -1,143 +1,141 @@
-Return-Path: <netdev+bounces-200099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F4EAE32EB
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 00:50:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FFCAE32F3
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 01:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B80BE16F3A6
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 22:50:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0057416F445
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 23:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D842B214A93;
-	Sun, 22 Jun 2025 22:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D355214A0B7;
+	Sun, 22 Jun 2025 23:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z24MCgov"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKKH9x45"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4489C1A23AD;
-	Sun, 22 Jun 2025 22:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFCC6136;
+	Sun, 22 Jun 2025 23:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750632648; cv=none; b=M0Arz5Bbp6imEMdsUYbXnn6sz+S+q36Uy8U9leyy+ZCJ1aaWXVEZERiwovc7R1CNErCGRmQ6Gaf4LRZ4vRwLdS3CSfg/S6XNI71/mB3JYZC8M7zqg3YZNcj+KUiuQw+TfCVmISIh5e7mCL1ae3s6iWxomgwdSDian13GqExD1CQ=
+	t=1750633507; cv=none; b=Og/8CMn8LGrLaHDj/CpzMZtp420ubMMlktoX+Y4P5Do9uKu3sRlZi50jhoHc5qf497MVmxClySaT9RHI6UWQlKbSNyZO72bXwhZqIRGY7b3gcbD6jPNjkcH4uvExPkd18h1Zq2mHF6541+rq/fhh+X7ur+Yyw9LEmaWhQPlgHHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750632648; c=relaxed/simple;
-	bh=wHATzHUwOUqRKn8FAzkIwW1jHvvvptGIND35VrXnmho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P72Any4WIK4YBuExuB5gNVk43vGc4O3aKCqi0XbzJC+EYY3KjAzq/ZRqp3aXsyPFhYE2Ro8AWa9/2rNfdaXksG9JNiSFq3i2WOk1zBIs+8QpYHTZtXFu4JqOd2e5XL0DBuGNwoTtqsx/4EUYqi97gE9Bx5irUHuAPBPAKZkyPt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z24MCgov; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1750633507; c=relaxed/simple;
+	bh=5HaHmqv+P4SRKqzXBjXeuA0vZp8q7hXULmBQXltKzVU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ociipFWH4Ow+7Kbved/J/vNUsEIbxZV1Eb7d1MOXnBjEh+YhNVsCwtjKneazzhE7/FjFRcWAi/hjs0fpgjGt3Ti8akykDEIrQt2Uz9v/L3zJagMaTTMaNFsy5qNSFu1FctpVokCuftEmF6bP0ILFOth840+am0u0XJAlRBEiGRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MKKH9x45; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-313fab41fd5so362917a91.1;
-        Sun, 22 Jun 2025 15:50:46 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7490acf57b9so1734767b3a.2;
+        Sun, 22 Jun 2025 16:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750632645; x=1751237445; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2XyaOPS+SVDJS2nuVakOU+h3pEZcqv0KxHASicqOHR0=;
-        b=Z24MCgovbvwdu5n6jAqRkIfOw5jJCQh+oGKuaMUqMdBngf2wlsnuQWeLU66LmYDq2z
-         6hw7k23vBiA2Y9WuCa2LHytHLhd9AjZCjDBYpLw/RNAwXGL5c2mSoHy9TiL+VM9waIWQ
-         hDDjsBKeKgFNJCIAXkEATw409Ao0BZSGqcsTo+fFphI/QG5t+2oSD8pDGNin+K932gqC
-         z/P5x7yi/CqYodSlDqqF2yruBkSdWLEqHmnkxIilqRicDH6SNM/tjvQEKaPEUmceIY6i
-         fPISg5bChuNKbTM72LhZXi8DT/WNv8XICieRk96EMqb7/V5PU5R7oeMc5ckw1tm8No+q
-         Ll+A==
+        d=gmail.com; s=20230601; t=1750633506; x=1751238306; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+8WiigqwKQpH8MPpBrzVD32bylw5zlv3hORq0Em6I+o=;
+        b=MKKH9x45x22YqlySoGEGOY2dHsRhN6aD52VQasMWOnuhsfpgWQRASlvBZGmQ3sXu7K
+         t26qdDFgeD2/FMF7YX35CFuQaK/JJG6uRS07FwPp9fnsCe1J147c8dxvViHmFY4Re2Lj
+         YSDvxoj29o0iRpZWh/1sMeA7TE7ByDCMpeBg8ygTfhLmhuXjstE4SIzHO4sOnwKN6wYi
+         +MXy+HcBgeUjPPlMaMnVp+5BVj2nB6TDLthAfQHtkMcSZZyBUw1t4plPDUprpWuoSFJq
+         5ysnXkLRXIrvYvdkFgHjuBZFifGeMCzGo5XQxizRUKe0TBapwhuhlKg7/1d60EaqXKEx
+         xfog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750632645; x=1751237445;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2XyaOPS+SVDJS2nuVakOU+h3pEZcqv0KxHASicqOHR0=;
-        b=Yg7/oxQXPUcbQiJO0o35CqnlRRn8etlZslogx2PoB6trsSH9on4vh6dgHXtBiq6vbY
-         Xj1IuRtczyoB7hPH9LYgRvGUw0jjj5vxPzily6IyQQT5F8DEc23nXXx3JNcij5InQP9B
-         e5GwQQj6ZIu95g6vzlbZqaHFr4UX5FUNZ/mL6ObMimUpuGRZbZUU0Xy8ygQnVBjwKNZP
-         g1Bk/9VyfUlkEdUeUjg7yWYj1EoODnYtF+ZG51v4l2DOqMX4Ke2OUYt3E33g8N8T1qsY
-         4/Q/GhaeMC12g0BA7t52iB1T7N3EQnwuhzLSwRtOFQ3goroO+L60CDwrIxFr+AsWW2+h
-         iiZg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/3qW77tmh1yrHZyZWo2xoTl1aKWR0X3VUOXrNNvD7MQ3UBWva+GjfOvgrN8q083j5J6XZam38U3Yq@vger.kernel.org, AJvYcCU9/aLQ6N3XtilWzy42Hl2kDaZfewDBjkBRXcUv6h/6K3U3K6cVUodVaxwkYel5zxmsirk4VDBjKkJBOjQ=@vger.kernel.org, AJvYcCUXkjfTbBqigvhBjPWJAyVoJeZL4CoZI/CzPkssHcgfMGObinklldaldxAkDcHVNbVWuW98Mk8Es4kWBgN9@vger.kernel.org, AJvYcCV6qWXGP9zRMjakK++6HjOOKcEW9Dk8BYH8Hj9kY0DHw3IMnLMAJZVJSybYfGRc3NVbQ92JIsJYVX6pMu/sTu/1@vger.kernel.org, AJvYcCVWwFnqkXP1G9F6rX5trqeDXF6UwKUTouONx9hHwoSQ1wW4wNtZ6BPoGURjFs6JvAj8GDiSWA50iWIkb/Es@vger.kernel.org, AJvYcCW2umB5Sr62u6StURP0ZDgjAr5gkVfvDh2IjIIIRuKj/ZTnk7FpQujXt2cw5GyDqpDeeNeYqFUyqfDU2b2xSJc=@vger.kernel.org, AJvYcCWdRCugot5CvTHpnyoUm7lIWYhVQeQfHiKvhtyjnfNM+wpLU46FqIExHB1rYi/QgIBMkhgt9nYViqw=@vger.kernel.org, AJvYcCWsn6WJszPgG5oopu5HeV9Uo43Gs/6uFI2WqmJkkpozh5BEa61aowbV0ZgsogMpcHoC8fvxIa2j@vger.kernel.org, AJvYcCWuflZVxkRW8bJKLega5V/K9Nk9Tx9mMfJHEa18k0ZQVPPxuI6Luef+K5nwxvU/cRtKYyf7GrowUOuK@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0by8/QbRy/n6Foebc+H8e7D18JjyY4F4w8bfu3VyYgFeNZTyq
-	g72Oy0OvHD1cPzoy2igZbkt+l7iyFfiX1gIw17wwLcnEMzQ7JqruhEJSX6GO8H5nAhLtD1S01wj
-	Pg8CSRgriwy14+OD6BCCSi7fO6aH6KHk=
-X-Gm-Gg: ASbGnctKm2hQIZtlwxmlnN/lid4QSFMRQAdE/ddYLmW2Ky1GY5PaGYX6pji4qnzgXys
-	kKCuDCpwvDBPfXMyrMtMCTcZgIOkGYsEaAae8jzSb7v4S/HBntsFwFY7NrCtXBxlc5fMvmYhn7I
-	hvxOsKUqA3gvzn1VGky9UKhiPS68PZttkCQ65fYQ6s3Iwo0llWTk3Qdw==
-X-Google-Smtp-Source: AGHT+IHkK5VxbDTzDH+78CGWNybiQ0lflBEpMpSVRH6uwkYDUKXtQuR/kJbEABJn7CeEMEkyXPjXtmArCfcPAjxsRNU=
-X-Received: by 2002:a17:90b:3a43:b0:311:fde5:c4ae with SMTP id
- 98e67ed59e1d1-3159d8e2be9mr5684021a91.6.1750632645432; Sun, 22 Jun 2025
- 15:50:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750633506; x=1751238306;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+8WiigqwKQpH8MPpBrzVD32bylw5zlv3hORq0Em6I+o=;
+        b=f7jvMabOkVnKtbzef20j4HNK3Zw5F59dbqIVHYcRpPWvkJK8M9ocvmZI2EDk+wYtmM
+         eqv1PQ1kPQ4AnqTCQkclTJNL//y7SC2nJKkhYpcYXQgxNu7RCEQ/tysEYIFg0g9T7+G5
+         H1vSJq1sWM6yy9l+ZnQK5BsHkY7z1r0RJZgTnoweLhq0j/P/YWhhvUvrIvrUBf0dWIcZ
+         9U5yHK6S6Ncuj2BIj9vToVEZYbq3/0+/2Fh227JaYH1T9pTybfrqw0beswmFrZNSzGwa
+         KmFdetiXbXLx5T0/YcB+4pbtKvm+EHIJDZPc9RK5+sr6EHVScGMqaIheHlhdaPF1LRNT
+         FCpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWH4ZitsuiCvB4fB4fY6rLrsKKMpKkglzZfbdPjh0PkM4vbS2MlWORL1BuvuaXkNTjJ+wZQAVuEpgURLSI=@vger.kernel.org, AJvYcCWmiUjF0cliA0JaKbm9oTFnT9nxFe0YDkVlK9kroj1e7Ly0ZZUAq5V6Z5bfjQ2LM1DYCLTdWlQb@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCyly8kc/PIkSi5wcgGXyh3rdjPhCgT2j69wW/PHUZj5r9bTH/
+	VcwUIbLKxMIzcT7HDeOnBtPr9W+jQmqKagG9DOF+0PgiiRFScNGDSSdQ
+X-Gm-Gg: ASbGnctgOwzzYkA79tirVQ+2xyqCaJyDMucy7paesQD8PMOLfKxs/FdZoH4LA/f5cTV
+	GdF8ZBRfvQN9mEo3mEaRlqvSAGvs6DqlMBsX+9rfFIYLmV/Gbwr22/YmY5e2W+LX2fzFT/QzXF8
+	BrdLYUcAcVk0gbX9z6KA6kzAGYcDT7P0XrN4sna0SaogkVi8iSM3pZQ8MatTc3b7U10QxS5swfi
+	ka4KtZxpn1U3oN0iLknBUgtHjUzntxWBBuJiONOb1B29XttXtuOpUjOqfbachplWMSLY6RQTBUO
+	F552zgwwV39WMnHosJCKb3gRs96o9XuXkCldUmMPMT37O7xy9D6HZ0JXic36IWH9kA==
+X-Google-Smtp-Source: AGHT+IHUcLsFTnc4IKgX2LAMTM4wZvSfI8akkpBXsSxMVdgI357MCO6JAckwHvL6TwGWY3Y7ZGrKdw==
+X-Received: by 2002:a05:6a00:1804:b0:73c:b86:b47f with SMTP id d2e1a72fcca58-7490d6636a8mr16373023b3a.4.1750633505645;
+        Sun, 22 Jun 2025 16:05:05 -0700 (PDT)
+Received: from io.local ([159.196.197.79])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a46b569sm6656212b3a.20.2025.06.22.16.05.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Jun 2025 16:05:05 -0700 (PDT)
+From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Ivan Vecera <ivecera@redhat.com>,
+	Michal Schmidt <mschmidt@redhat.com>
+Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] i40e: Match VF MAC deletion behaviour with OOT driver
+Date: Mon, 23 Jun 2025 09:04:41 +1000
+Message-Id: <39898c5f9a1d6172aa346ad96a831a899a58ec54.1750633468.git.jamie.bainbridge@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
-In-Reply-To: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 23 Jun 2025 00:50:31 +0200
-X-Gm-Features: Ac12FXzAp4qUKl_aNT741tylL3I37tb5s--GlJccgcY1EV1oeXS1Teju6Ztan0w
-Message-ID: <CANiq72=xmyHuBYEGbCMi=Um_NvNbf5TfMmJB5YPpVp41FcPdJA@mail.gmail.com>
-Subject: Re: [PATCH v12 0/6] rust: reduce `as` casts, enable related lints
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Breno Leitao <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jun 15, 2025 at 10:55=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
-> wrote:
->
-> This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
-> Lossin suggested I also look into `clippy::ptr_cast_constness` and I
-> discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
-> lints. It also enables `clippy::as_underscore` which ensures other
-> pointer casts weren't missed.
->
-> As a later addition, `clippy::cast_lossless` and `clippy::ref_as_ptr`
-> are also enabled.
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+When the PF is processing an AQ message to delete a VF's MACs from the
+MAC filter, the Linux kernel driver checks if the PF set the MAC and if
+the VF is trusted. However, the out-of-tree driver has intentionally
+removed the check for VF trust with OOT driver version 2.26.8.
 
-Applied to `rust-next` -- thanks everyone!
+This results in an undesirable behaviour difference between the OOT
+driver and the Linux driver, where if a trusted VF with a PF-set MAC
+sets itself down (which sends an AQ message to delete the VF's MAC
+filters) then the VF MAC is erased from the interface with the Linux
+kernel driver but not with the OOT driver.
 
-    [ Added `.cast()` for `opp`. - Miguel ]
+This results in the VF losing its PF-set MAC which should not happen.
 
-    [ Changed `isize` to `c_long`. - Miguel ]
+Change the Linux kernel driver and comment to match the OOT behaviour.
 
-It would still be nice to get the couple remaining Acked-bys (happy to
-rebase to apply them), but I feel we are in good shape, and it is a
-good time to put it into linux-next so that people see the lint before
-they start applying new code into their branches.
+Fixes: ea2a1cfc3b201 ("i40e: Fix VF MAC filter removal")
+Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Cheers,
-Miguel
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 88e6bef69342c2e65d8d5b2d7df5ac2cc32ee3d9..45ccbb1cdda0a33527852096ee9759fc19db3a5d 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -3137,10 +3137,10 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
+ 		const u8 *addr = al->list[i].addr;
+ 
+ 		/* Allow to delete VF primary MAC only if it was not set
+-		 * administratively by PF or if VF is trusted.
++		 * administratively by PF.
+ 		 */
+ 		if (ether_addr_equal(addr, vf->default_lan_addr.addr)) {
+-			if (i40e_can_vf_change_mac(vf))
++			if (!vf->pf_set_mac)
+ 				was_unimac_deleted = true;
+ 			else
+ 				continue;
+-- 
+2.39.5
+
 
