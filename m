@@ -1,216 +1,160 @@
-Return-Path: <netdev+bounces-200097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75246AE32CF
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 00:33:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A34AE32D9
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 00:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EF423B01BA
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 22:33:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77B0B188F7DD
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 22:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D33E18C322;
-	Sun, 22 Jun 2025 22:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC3421B8F6;
+	Sun, 22 Jun 2025 22:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VqClxxjl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kBR0oqsd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC5B126BFF
-	for <netdev@vger.kernel.org>; Sun, 22 Jun 2025 22:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B061FE470
+	for <netdev@vger.kernel.org>; Sun, 22 Jun 2025 22:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750631630; cv=none; b=eX8hkhfFfR0LTw6mwok0BSgqE+US5nO9O/gZpyay/zQjKO1An+Sk6bVCLnJ24Mcp8Zl8V8Qz53DOvLEBn6nyORMLvOBIILyVpzkGhLsK2+FWxJh9ZCwHAWwrw8HQDBgqfZSdu6CNu05FmPe3s5gAqyaMlWWv16U3G8juoyz3nQE=
+	t=1750632013; cv=none; b=cUxeTQNpXaNBMHqNrdEet5NhnidyAv2Qz0cS/YBpxqksgL8RaJpkZ6EzS5j47aCetNrE7Krn2KZUknBIoR9gMBBhUQFurmQZBUdVS8pQhAMVw9ct9L888rmPOUnW86zwjvV5Ai0OQyT270J0TpMSmMDP/iC/YgxTnwQUxnovOGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750631630; c=relaxed/simple;
-	bh=37MdDVxEMlrb1hmMShSlJadVXlM6cmOuuyC6uLm3710=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TMpYQ9L6zoDWONIRXAWk9DXFwodmeqFgMZLNFteWD/PA7MBb738Y5ok6WJwGY0SMdqxKX/feDD91fkmzaY7rCUFCjvahqwyMQK209B9MDfhv7rqixPo8Yvw0lvmwKIjnFJkzKyT/M9qOOPJN45hGdfUXpYGEOYJryY4joTR+9r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VqClxxjl; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-237f270513bso55495ad.1
-        for <netdev@vger.kernel.org>; Sun, 22 Jun 2025 15:33:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750631628; x=1751236428; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Exm32Vn/9M523DHU3yO5hjCuZEmkoX/XmI14WWf0SA=;
-        b=VqClxxjl6i0KMnepuRYAb/+Yy4VaNWGdfg9syFOTAJW/gvSSPk8gWgMfmAnmsTyQ37
-         pKQdqjsLo3IrFlixFaX/ZDYKBJ8zTLzH/SRtt5StIDuqaxYqVUfz/Ese6BAkxdUF6owk
-         /SxvVD2lzpyYyMjUTkINRUyv4c1XIkYnpnrlW2n4alg0v0zMFt271I3xhjJf8zhZnzDN
-         +rRrjfAJxh41RRyNpuzyjeDM+XBM7dI5m7vByVH8D7rOjwzhyL7nbOK4cDaFdgeRvz9n
-         5NLu7CaYynnOL3elxDjxVA9/o7j78F4U+bLTdGWmk97WIhKN4p3jkgLeQVWYP2x+mw8p
-         5+9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750631628; x=1751236428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8Exm32Vn/9M523DHU3yO5hjCuZEmkoX/XmI14WWf0SA=;
-        b=ovmnRz9mtgsckJL3jr6WpmuSsN16wnkF/i9G2yNBFMx5ONr2eXpm3RkUKWzffIHXK8
-         B0hM8ACENUdEIdCshlscuoyNSBiCVWiJ6y40o5NIuorgIgInk321ViezaHSqjSvdji8a
-         c9YKXnYPhb8sQY+/EQkRLxG83t7dTFa5/nF6C3M4VK0eZ8rELNW007ngfYddHQDmqNOU
-         3QW/xC3HEQnEb0DziPUdy1MITTfyO3Xpn6SneXsuSqfopu9yUCDNLd0OLB5QwVek1v1X
-         ylBPZbfORCSm51KgpDS5N+LX12Ila8tBzz+mxVhnNk0MAs0V7+mfudQ/nV7LILEsQ2+w
-         iKGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVzwR7TeSCoEJIX0VepJ7HrZmkjCdkvCj0uQTw5xe3OVJcozGfKMHqGbfqyAS/UHY1P4PSQW4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD7A4zBSbpCmA4BCuCwWi/Q82IKBtGVo7232cVmxlW/3KTKe0Q
-	thVLmjQ4SAgSRFlTkjpf4nHOvoFt5EGf1ETU/mjQtiaQ/w+cjKwN/dsG3YFnUz6zolh6mXXcDW1
-	eK8ipDTfXpsofgBoWX6UT/VpVCGbJRk2bfj67LsD8
-X-Gm-Gg: ASbGncvwxHDJgaqqabAX+OKePvqEaFNrxpJwUhdTjJbCkznMHcu7uP9zLrWMbWxA3oe
-	8KHS2TUT+X8jpwd6dIoTQFTxRtp6Dd8duuAy2guLUQk3R2ja95lylIUfsmsXaCwHUkpUfyCO9eQ
-	wQ77becHfBZ2N7x7KG5CF6Rj+UWKiO0zW1VBDLqs42HNT7BiKkxESobmvCMwqfvLbOm2bbSvGHQ
-	VL4
-X-Google-Smtp-Source: AGHT+IE7odmArm07PKtquv92skAQZthYDqCcGk7abkznLF7Wp3XbXVavX3dJ1M/bZSgpNSuc2qLhSG+peqM+p7jDo+Q=
-X-Received: by 2002:a17:903:1987:b0:22e:766f:d66e with SMTP id
- d9443c01a7336-237e4731082mr3279735ad.12.1750631627334; Sun, 22 Jun 2025
- 15:33:47 -0700 (PDT)
+	s=arc-20240116; t=1750632013; c=relaxed/simple;
+	bh=NtNiMvKdOWr3HqkXnYgNIycEVjCa6Icct59Mbr/Nz2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QUm3y92sXjXwlNo7eIl1Znnm8KvnoluGS0fhySNEMVFaiIrQYcmeLsWzEtz7LIfmq5V39WZ4iYFMM2BV1e5hL5xKdTPAEgbcqpAuF/H690QqMbeoMqvuG9z8HvqAhMHWkTNc+z1xXbW1tckW8C/stIH7erlbBQaPGeB9Gxi07Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kBR0oqsd; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8ed873ce-619d-4bdd-8fba-222320229efe@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750632008;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y7Sy6lOD9pKGTeDWHlQhBUIbqmjZyBGP1EAU8WiJo4s=;
+	b=kBR0oqsdgRAxdmgUMJDEVuGLu8q7wZFZrkw2kY2Ty5EzASKQorg1pEsBMR70YK25OhD7K3
+	XYxxKHegpUhVvZ76kB7HSR5/RqIez09ZtrG5AZzqHqwR5pnUkMSQQI+JWJwnGHBgV0MOi9
+	slP+7NTxaCfXk70+nJc87idbF+oItI4=
+Date: Sun, 22 Jun 2025 15:39:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616165706.994319-1-skhawaja@google.com> <20250618182803.2e367473@kernel.org>
-In-Reply-To: <20250618182803.2e367473@kernel.org>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Sun, 22 Jun 2025 15:33:34 -0700
-X-Gm-Features: AX0GCFtrAal6rAj_D1hNzFygwGP2JF2BHVqzryhvSIwA9-7U6R-VBV2OPlCQoOo
-Message-ID: <CAAywjhTV-N5fASNy708sPWn24isyeROqCezeS6qannotJk97hQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8] Add support to set napi threaded for
- individual napi
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com, 
-	jdamato@fastly.com, mkarsten@uwaterloo.ca, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v2 0/8] net/mlx5: HWS, Optimize matchers ICM
+ usage
+To: Mark Bloch <mbloch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>
+Cc: saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com,
+ Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, moshe@nvidia.com
+References: <20250622172226.4174-1-mbloch@nvidia.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20250622172226.4174-1-mbloch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 18, 2025 at 6:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 16 Jun 2025 16:57:06 +0000 Samiullah Khawaja wrote:
-> > A net device has a threaded sysctl that can be used to enable threaded
-> > napi polling on all of the NAPI contexts under that device. Allow
-> > enabling threaded napi polling at individual napi level using netlink.
-> >
-> > Extend the netlink operation `napi-set` and allow setting the threaded
-> > attribute of a NAPI. This will enable the threaded polling on a napi
-> > context.
-> >
-> > Add a test in `nl_netdev.py` that verifies various cases of threaded
-> > napi being set at napi and at device level.
-> >
-> > Tested
-> >  ./tools/testing/selftests/net/nl_netdev.py
-> >  TAP version 13
-> >  1..7
-> >  ok 1 nl_netdev.empty_check
-> >  ok 2 nl_netdev.lo_check
-> >  ok 3 nl_netdev.page_pool_check
-> >  ok 4 nl_netdev.napi_list_check
-> >  ok 5 nl_netdev.dev_set_threaded
-> >  ok 6 nl_netdev.napi_set_threaded
-> >  ok 7 nl_netdev.nsim_rxq_reset_down
-> >  # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
->
-> > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/ne=
-tlink/specs/netdev.yaml
-> > index ce4cfec82100..ec2c9d66519b 100644
-> > --- a/Documentation/netlink/specs/netdev.yaml
-> > +++ b/Documentation/netlink/specs/netdev.yaml
-> > @@ -283,6 +283,14 @@ attribute-sets:
-> >          doc: The timeout, in nanoseconds, of how long to suspend irq
-> >               processing, if event polling finds events
-> >          type: uint
-> > +      -
-> > +        name: threaded
-> > +        doc: Whether the napi is configured to operate in threaded pol=
-ling
->
-> lower case napi here
->
-> > +             mode. If this is set to `1` then the NAPI context operate=
-s
->
-> upper case here, let's pick one form
-+1
->
-> This is technically a form of kernel documentation, fed into Sphinx
-> I'm a bit unclear on Sphinx and backticks, but IIUC it wants double
-> backticks? ``1`` ? Or none at all
-Will remove backticks.
->
-> > +             in threaded polling mode.
-> > +        type: uint
-> > +        checks:
-> > +          max: 1
-> >    -
-> >      name: xsk-info
-> >      attributes: []
->
-> >  Threaded NAPI is controlled by writing 0/1 to the ``threaded`` file in
-> > -netdev's sysfs directory.
-> > +netdev's sysfs directory. It can also be enabled for a specific napi u=
-sing
-> > +netlink interface.
-> > +
-> > +For example, using the script:
-> > +
-> > +.. code-block:: bash
-> > +
-> > +  $ kernel-source/tools/net/ynl/pyynl/cli.py \
-> > +            --spec Documentation/netlink/specs/netdev.yaml \
-> > +            --do napi-set \
-> > +            --json=3D'{"id": 66,
-> > +                     "threaded": 1}'
->
-> I wonder if it's okay now to use ynl CLI in the form that is packaged
-> for Fedora and RHEL ? It's much more concise, tho not sure if / when
-> other distros will catch up:
->
->   $ ynl --family netdev --do napi-set --json=3D'{"id": 66, "threaded": 1}=
-'
-+1
+在 2025/6/22 10:22, Mark Bloch 写道:
+> This series optimizes ICM usage for unidirectional rules and
+> empty matchers and with the last patch we make hardware steering
+> the default FDB steering provider for NICs that don't support software
+> steering.
 
-Will update
->
-> > +/**
-> > + * napi_set_threaded - set napi threaded state
-> > + * @n: napi struct to set the threaded state on
-> > + * @threaded: whether this napi does threaded polling
-> > + *
-> > + * Return: 0 on success and negative errno on failure.
-> > + */
-> > +int napi_set_threaded(struct napi_struct *n, bool threaded);
->
-> IIRC by the kernel coding standards the kdoc if necessary should
-> be on the definition.
-Will move
->
-> > @@ -322,8 +326,14 @@ netdev_nl_napi_set_config(struct napi_struct *napi=
-, struct genl_info *info)
-> >  {
-> >       u64 irq_suspend_timeout =3D 0;
-> >       u64 gro_flush_timeout =3D 0;
-> > +     u8 threaded =3D 0;
-> >       u32 defer =3D 0;
-> >
-> > +     if (info->attrs[NETDEV_A_NAPI_THREADED]) {
-> > +             threaded =3D nla_get_u8(info->attrs[NETDEV_A_NAPI_THREADE=
-D]);
->
-> nla_get_uint(), nla_get_u8 will not work on big endian
->
-> > +             napi_set_threaded(napi, !!threaded);
->
-> why ignore the error?
-Will update
+In this patchset, ICM is not explained. I googled this ICM. And I got 
+the following
 
-> --
-> pw-bot: cr
+"
+ICM stands for Internal Context Memory, a specialized memory region used 
+by Mellanox/NVIDIA network devices (e.g., ConnectX series NICs) to store 
+hardware context and rule tables for offloaded operations like flow 
+steering, filtering, and traffic redirection.
+
+ICM is crucial when using hardware steering (HWS), where the NIC itself 
+performs packet matching and forwarding without involving the host CPU.
+"
+If I am missing something, please correct me.
+
+Zhu Yanjun
+
+> 
+> Hardware steering (HWS) uses a type of rule table container (RTC) that
+> is unidirectional, so matchers consist of two RTCs to accommodate
+> bidirectional rules.
+> 
+> This small series enables resizing the two RTCs independently by
+> tracking the number of rules separately. For extreme cases where all
+> rules are unidirectional, this results in saving close to half the
+> memory footprint.
+> 
+> Results for inserting 1M unidirectional rules using a simple module:
+> 
+> 			Pages		Memory
+> Before this patch:	300k		1.5GiB
+> After this patch:	160k		900MiB
+> 
+> The 'Pages' column measures the number of 4KiB pages the device requests
+> for itself (the ICM).
+> 
+> The 'Memory' column is the difference between peak usage and baseline
+> usage (before starting the test) as reported by `free -h`.
+> 
+> In addition, second to last patch of the series handles a case where all
+> the matcher's rules were deleted: the large RTCs of the matcher are no
+> longer required, and we can save some more ICM by shrinking the matcher
+> to its initial size.
+> 
+> Finally the last patch makes hardware steering the default mode
+> when in swichdev for NICs that don't have software steering support.
+> 
+> Changelog
+> =========
+> Changes from v1 [0]:
+> - Fixed author on patches 5 and 6.
+> 
+> References
+> ==========
+> [0] v1: https://lore.kernel.org/all/20250619115522.68469-1-mbloch@nvidia.com/
+> 
+> Moshe Shemesh (1):
+>    net/mlx5: Add HWS as secondary steering mode
+> 
+> Vlad Dogaru (5):
+>    net/mlx5: HWS, remove unused create_dest_array parameter
+>    net/mlx5: HWS, Refactor and export rule skip logic
+>    net/mlx5: HWS, Create STEs directly from matcher
+>    net/mlx5: HWS, Decouple matcher RX and TX sizes
+>    net/mlx5: HWS, Track matcher sizes individually
+> 
+> Yevgeny Kliteynik (2):
+>    net/mlx5: HWS, remove incorrect comment
+>    net/mlx5: HWS, Shrink empty matchers
+> 
+>   .../net/ethernet/mellanox/mlx5/core/fs_core.c |   2 +
+>   .../mellanox/mlx5/core/steering/hws/action.c  |   7 +-
+>   .../mellanox/mlx5/core/steering/hws/bwc.c     | 284 ++++++++++++++----
+>   .../mellanox/mlx5/core/steering/hws/bwc.h     |  14 +-
+>   .../mellanox/mlx5/core/steering/hws/debug.c   |  20 +-
+>   .../mellanox/mlx5/core/steering/hws/fs_hws.c  |  15 +-
+>   .../mellanox/mlx5/core/steering/hws/matcher.c | 166 ++++++----
+>   .../mellanox/mlx5/core/steering/hws/matcher.h |   3 +-
+>   .../mellanox/mlx5/core/steering/hws/mlx5hws.h |  36 ++-
+>   .../mellanox/mlx5/core/steering/hws/rule.c    |  35 +--
+>   .../mellanox/mlx5/core/steering/hws/rule.h    |   3 +
+>   11 files changed, 403 insertions(+), 182 deletions(-)
+> 
+> 
+> base-commit: 091d019adce033118776ef93b50a268f715ae8f6
+
 
