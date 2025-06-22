@@ -1,168 +1,185 @@
-Return-Path: <netdev+bounces-200072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E502AE2FF0
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 14:39:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A78CAE3040
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 15:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C875171A0E
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 12:39:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBC37188D837
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 13:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E80A1DE4E0;
-	Sun, 22 Jun 2025 12:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0EC1E5701;
+	Sun, 22 Jun 2025 13:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nrkzJc+W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mG26n6uD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A49B72636;
-	Sun, 22 Jun 2025 12:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04B81DE2BC;
+	Sun, 22 Jun 2025 13:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750595989; cv=none; b=ie1NhH84vfUMqkY6LjWe4GcJ/MvzNE+xoLNJYx07egXmG0ZrLbGUiBb2+NZ8wf2lv0yv9Cvn15d8Zf62d4ySPs9+ZRiVRat1/Aj5nVmh/TlYeYO0xdG8Rn6xRjwUBH/B8Sw9w9L2S30UHGio/5AQTWj57qcv3JqdTvzjdXTd6gU=
+	t=1750600766; cv=none; b=DssIO4111wjY18gMm1tTC+bnXb188hbDgqsm4Cj4ZKw9RV2YfiuCHH+ZDfEC7bKUiFqRuJlfov9vUBnHB160HwQ1oR1H/htHlt3me8ok3ItowIKj5ckcIah+k7kgRuBpBsrpWTjAl61Ky0f7aCDNrQyiiWIm6EcUYxrp2nRMyZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750595989; c=relaxed/simple;
-	bh=+tGeE4TYJbzGe6jjsVcsSnRnbjEOtu2V64nnqedjAmE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g3zMK9rThVNP8p33Vb7mYk6TFaXN+Zm3FDaJQ2xU8yzTTRuvfPqKBl81CvFkiXEILaRn8+p2yjsmb/gT8yfE5dzxYi6Po9L+YouyoyhKFCXXhqD6ytnkzE0Y9npvIoyCcSNPvxiy/G9696fz7BykIKwoQ6evSaf8aO67YZUHgN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nrkzJc+W; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750595986; x=1782131986;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+tGeE4TYJbzGe6jjsVcsSnRnbjEOtu2V64nnqedjAmE=;
-  b=nrkzJc+WxS/+cUSbfich7onzhT0xC2NR90Rkb9SIa+e5K1KLccamnNDp
-   I20+L62qTeG5sKx7loYmjyo0jDw8QM44NszzGHaa8RcdrpCVC6eILB4mo
-   t45+aSToyOsvZilCyFd/UFN0ISSqdLxUIsUQOs5WNCMGhruyKhapFxIoh
-   3qCFCaWmkbnupraJXZvdbEm6yBoRvDziiarwptolOQv+K+5Y+5fF/z1h/
-   O2sY40o0NZRwLsPHmGHuBGB0FfNn+CDpe/j0d5RG9C4yj1WLNb5rdK7e5
-   4y8V/ec1NcvnEajQVjIrClMkZclhRLjfn+0GxWlvFZNlJ4ItDa5IryKNg
-   g==;
-X-CSE-ConnectionGUID: KFFe6dtvSrSJhb0GOdhQuw==
-X-CSE-MsgGUID: NIw7sxRnQhelTAaLcfcvKA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11472"; a="52952455"
-X-IronPort-AV: E=Sophos;i="6.16,256,1744095600"; 
-   d="scan'208";a="52952455"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2025 05:39:45 -0700
-X-CSE-ConnectionGUID: 7jOf0LiDSGuYL0Bb0yoIUA==
-X-CSE-MsgGUID: g/0aXbFsRLKPkVKeS/u9lg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,256,1744095600"; 
-   d="scan'208";a="182371961"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 22 Jun 2025 05:39:42 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uTJz1-000NGw-2y;
-	Sun, 22 Jun 2025 12:39:39 +0000
-Date: Sun, 22 Jun 2025 20:39:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [net-next, 09/10] bng_en: Initialize default configuration
-Message-ID: <202506222025.zd9UxyF7-lkp@intel.com>
-References: <20250618144743.843815-10-vikas.gupta@broadcom.com>
+	s=arc-20240116; t=1750600766; c=relaxed/simple;
+	bh=UxKMEiEskUPW9t0F65Rgb1ZCmJRY9zGpr+eirXMl1cs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=GHznBIa02laRc0fsgcpRLH+QGt2z99XQxkBU8UwfLRjP9vU0YzEX8Kl9MqYmsqBxs0SmZlJN8jFszKvP/JXsHe6GqE5AvsaWJ+Upu8VLexgaOa3d2aauQe4aoW+R8lMr1geAWylV3y29g0BfJDkhEfedjlhb0rWrpgSIkXtrDO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mG26n6uD; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-748e378ba4fso4175278b3a.1;
+        Sun, 22 Jun 2025 06:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750600763; x=1751205563; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9CctixpwR27qpFLNeLtbKOjrAbCl9MvTJF19ZD0qLuo=;
+        b=mG26n6uDIefgFhQCzqHwSJIPHG03MFnHtZO+RBXvxzeBC/TO6SPt5fbvk+dbHScFcA
+         +LNyK9eQDd+ukqnbDQxh/Pb/kTSg353ZhIi51kMmxpOMiuKjgepppOmpR6sllU8mcN04
+         wG6/ceJa6FPtTKpodcLRiQ7vGJDiS1OAzgSbufrgJOCg4k37I98yf8PJFUxDf2xLVGFr
+         hecgFVfmj68tQttkGMQ6AvSsAEYe4ngg2+P6sfgjaG0rkcwutBVDfgNI4gujP5+az0gT
+         VZYFtwIbhlBxrnYH/qEFxmWFGWHppD0wtc/0wAawxgKhd3VBQJOKSvV75p2Y3u3Tf6x1
+         E+8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750600763; x=1751205563;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9CctixpwR27qpFLNeLtbKOjrAbCl9MvTJF19ZD0qLuo=;
+        b=wUq3LEBBNFDjzU+UbWWyl+YjbQm6O7qrLMjYH0SlBWY8humalGCiyS6x6IwFoH9T+4
+         fix1b6VtqQnEidcnGroRVfSiAfsF7rr19oyv0tYhbmbIcm2Cnvcxt2EPbs5OKq7fa3/Q
+         xLtLEMlHnpISC7OwtYjanQ/ERaGTCVcAf4huxAI8E7s/u5ILzyOf0+W5xdC7TRjB3XIV
+         0jh5ZyIUujCv1rxrvKIAwfQ8UQo7IA/EC4y4ELcmrPo2SKWHDTP416GH1biw3RC8q2sx
+         LjSCgDmKglcb7g5xkdhvGLyiNSfP1VXl24+Ebfq/zHfbmo5rQr6T3qD/7RPzTJpSlvga
+         9r8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUXr1IsVonBto5mvpifAA3l/vmNJfEd4qZV1awkpGSN0KXoQb57bQSglPI13nGRow63Bvc=@vger.kernel.org, AJvYcCUqEcLCf2Pnvz+XHz6X79JLbATnuICDbLf2/EukmMEDPyC8dZRKyGPOslX1pDm0a3FeKoDSVzXFOxmji1Fv@vger.kernel.org, AJvYcCV8jmILucFSJwfChJsFs12vqK9BG0mV16Skd3g4f9QbeQcRU6SfUXPJJOUy66Ttg5Rbt8aWrdrQE5dm83kn@vger.kernel.org, AJvYcCX+7aSFhA9IfqHp6PCLqayjsdtpHvnLzMQOr5nrVuiSDaVUs31c91gUqabadzLndQwISbVXvL23@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy73Tqz8VG8W8vQG1LW+pt3glE2n86eG4wZBIC8aRo41nIoyYeZ
+	iP+va2WUWuSJneagi7dHpF5/VGE+iotWufO3flpesU1CJ1R0GykUE9NP
+X-Gm-Gg: ASbGncs4tyH6G08+hxOCShtBpV4aklg5jUYi0TNXlFqIoBH2VEW8iXE/P6HAcDqZnct
+	fYneWeSunWF9avYVvafNqwMubJJNSi7mNfBfULkOgAkWTdcaIxO3UbBCmesGrAm6C6IvxSnTW6w
+	rK5JKbC5NLgj3uFRUp3hvI3ACDoLT6/ChZWms9NP4x9i/z2PM689YAL1uf2SUnwTeTjoAqaXh3r
+	JCXw6i1rX+P1WmTs4AGTTUOrUa4jQkbfU6FQopZo4XBVjMtSMmim8DBJemiFrUrgizuvzsV9euR
+	axmk7y4CAsZ114Naf/XH74ocBqWYhLHfICEauaBqfVX5dcwsxGrmRWB8Rdfv/HpRHnRcPIUij16
+	vAFWSLEVM
+X-Google-Smtp-Source: AGHT+IGGPVZOhGf33+4x/8I48rOosb9DE+Jlj5P0FJFQOP/wdva4gvlvzXjTkAkxs7+rDh5CXvmoLQ==
+X-Received: by 2002:a05:6a20:9187:b0:21f:5598:4c2c with SMTP id adf61e73a8af0-22026d8d928mr13077235637.13.1750600762962;
+        Sun, 22 Jun 2025 06:59:22 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a46b497sm6004931b3a.6.2025.06.22.06.59.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Jun 2025 06:59:22 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	decui@microsoft.com,
+	fupan.lfp@antgroup.com,
+	haiyangz@microsoft.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	kys@microsoft.com,
+	leonardi@redhat.com,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	wei.liu@kernel.org,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v3 1/3] vsock: Add support for SIOCINQ ioctl
+Date: Sun, 22 Jun 2025 21:59:10 +0800
+Message-Id: <20250622135910.1555285-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <y465uw5phymt3gbgdxsxlopeyhcbbherjri6b6etl64qhsc4ud@vc2c45mo5zxw>
+References: <y465uw5phymt3gbgdxsxlopeyhcbbherjri6b6etl64qhsc4ud@vc2c45mo5zxw>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250618144743.843815-10-vikas.gupta@broadcom.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Vikas,
+> ACCin hyper-v maintainers and list since I have a question about hyperv 
+> transport.
+> 
+> On Tue, Jun 17, 2025 at 12:53:44PM +0800, Xuewei Niu wrote:
+> >Add support for SIOCINQ ioctl, indicating the length of bytes unread in the
+> >socket. The value is obtained from `vsock_stream_has_data()`.
+> >
+> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> >---
+> > net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++++++++
+> > 1 file changed, 22 insertions(+)
+> >
+> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> >index 2e7a3034e965..bae6b89bb5fb 100644
+> >--- a/net/vmw_vsock/af_vsock.c
+> >+++ b/net/vmw_vsock/af_vsock.c
+> >@@ -1389,6 +1389,28 @@ static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
+> > 	vsk = vsock_sk(sk);
+> >
+> > 	switch (cmd) {
+> >+	case SIOCINQ: {
+> >+		ssize_t n_bytes;
+> >+
+> >+		if (!vsk->transport) {
+> >+			ret = -EOPNOTSUPP;
+> >+			break;
+> >+		}
+> >+
+> >+		if (sock_type_connectible(sk->sk_type) &&
+> >+		    sk->sk_state == TCP_LISTEN) {
+> >+			ret = -EINVAL;
+> >+			break;
+> >+		}
+> >+
+> >+		n_bytes = vsock_stream_has_data(vsk);
+> 
+> Now looks better to me, I just checked transports: vmci and virtio/vhost 
+> returns what we want, but for hyperv we have:
+> 
+> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> 	{
+> 		struct hvsock *hvs = vsk->trans;
+> 		s64 ret;
+> 
+> 		if (hvs->recv_data_len > 0)
+> 			return 1;
+> 
+> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
+> Do you think we can do that to support this new feature?
 
-kernel test robot noticed the following build warnings:
+Hi Hyper-v maintainers, could you please take a look at this?
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.16-rc2 next-20250620]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Hi Stefano, if no response, can I fix this issue in the next version?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20250618144743.843815-10-vikas.gupta%40broadcom.com
-patch subject: [net-next, 09/10] bng_en: Initialize default configuration
-config: parisc-randconfig-r073-20250619 (https://download.01.org/0day-ci/archive/20250622/202506222025.zd9UxyF7-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 8.5.0
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506222025.zd9UxyF7-lkp@intel.com/
-
-New smatch warnings:
-drivers/net/ethernet/broadcom/bnge/bnge_resc.c:533 bnge_net_init_dflt_rings() warn: always true condition '(rc != -19) => (0-u16max != (-19))'
-
-Old smatch warnings:
-drivers/net/ethernet/broadcom/bnge/bnge_resc.c:372 bnge_alloc_irqs() warn: unsigned 'irqs_demand' is never less than zero.
-drivers/net/ethernet/broadcom/bnge/bnge_resc.c:542 bnge_net_init_dflt_rings() warn: always true condition '(rc != -19) => (0-u16max != (-19))'
-
-vim +533 drivers/net/ethernet/broadcom/bnge/bnge_resc.c
-
-   511	
-   512	static int bnge_net_init_dflt_rings(struct bnge_dev *bd, bool sh)
-   513	{
-   514		u16 dflt_rings, max_rx_rings, max_tx_rings, rc;
-   515	
-   516		if (sh)
-   517			bd->flags |= BNGE_EN_SHARED_CHNL;
-   518	
-   519		dflt_rings = netif_get_num_default_rss_queues();
-   520	
-   521		rc = bnge_get_dflt_rings(bd, &max_rx_rings, &max_tx_rings, sh);
-   522		if (rc)
-   523			return rc;
-   524		bd->rx_nr_rings = min_t(u16, dflt_rings, max_rx_rings);
-   525		bd->tx_nr_rings_per_tc = min_t(u16, dflt_rings, max_tx_rings);
-   526		if (sh)
-   527			bnge_trim_dflt_sh_rings(bd);
-   528		else
-   529			bd->nq_nr_rings = bd->tx_nr_rings_per_tc + bd->rx_nr_rings;
-   530		bd->tx_nr_rings = bd->tx_nr_rings_per_tc;
-   531	
-   532		rc = bnge_reserve_rings(bd);
- > 533		if (rc && rc != -ENODEV)
-   534			dev_warn(bd->dev, "Unable to reserve tx rings\n");
-   535		bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
-   536		if (sh)
-   537			bnge_trim_dflt_sh_rings(bd);
-   538	
-   539		/* Rings may have been reduced, re-reserve them again */
-   540		if (bnge_need_reserve_rings(bd)) {
-   541			rc = bnge_reserve_rings(bd);
-   542			if (rc && rc != -ENODEV)
-   543				dev_warn(bd->dev, "Fewer rings reservation failed\n");
-   544			bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
-   545		}
-   546		if (rc) {
-   547			bd->tx_nr_rings = 0;
-   548			bd->rx_nr_rings = 0;
-   549		}
-   550	
-   551		return rc;
-   552	}
-   553	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Xuewei
+ 
+> Thanks,
+> Stefano
+> 
+> >+		if (n_bytes < 0) {
+> >+			ret = n_bytes;
+> >+			break;
+> >+		}
+> >+		ret = put_user(n_bytes, arg);
+> >+		break;
+> >+	}
+> > 	case SIOCOUTQ: {
+> > 		ssize_t n_bytes;
+> >
+> >-- 
+> >2.34.1
+> >
 
