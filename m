@@ -1,160 +1,143 @@
-Return-Path: <netdev+bounces-200098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A34AE32D9
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 00:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38F4EAE32EB
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 00:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77B0B188F7DD
-	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 22:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B80BE16F3A6
+	for <lists+netdev@lfdr.de>; Sun, 22 Jun 2025 22:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC3421B8F6;
-	Sun, 22 Jun 2025 22:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D842B214A93;
+	Sun, 22 Jun 2025 22:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kBR0oqsd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z24MCgov"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B061FE470
-	for <netdev@vger.kernel.org>; Sun, 22 Jun 2025 22:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4489C1A23AD;
+	Sun, 22 Jun 2025 22:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750632013; cv=none; b=cUxeTQNpXaNBMHqNrdEet5NhnidyAv2Qz0cS/YBpxqksgL8RaJpkZ6EzS5j47aCetNrE7Krn2KZUknBIoR9gMBBhUQFurmQZBUdVS8pQhAMVw9ct9L888rmPOUnW86zwjvV5Ai0OQyT270J0TpMSmMDP/iC/YgxTnwQUxnovOGk=
+	t=1750632648; cv=none; b=M0Arz5Bbp6imEMdsUYbXnn6sz+S+q36Uy8U9leyy+ZCJ1aaWXVEZERiwovc7R1CNErCGRmQ6Gaf4LRZ4vRwLdS3CSfg/S6XNI71/mB3JYZC8M7zqg3YZNcj+KUiuQw+TfCVmISIh5e7mCL1ae3s6iWxomgwdSDian13GqExD1CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750632013; c=relaxed/simple;
-	bh=NtNiMvKdOWr3HqkXnYgNIycEVjCa6Icct59Mbr/Nz2k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QUm3y92sXjXwlNo7eIl1Znnm8KvnoluGS0fhySNEMVFaiIrQYcmeLsWzEtz7LIfmq5V39WZ4iYFMM2BV1e5hL5xKdTPAEgbcqpAuF/H690QqMbeoMqvuG9z8HvqAhMHWkTNc+z1xXbW1tckW8C/stIH7erlbBQaPGeB9Gxi07Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kBR0oqsd; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8ed873ce-619d-4bdd-8fba-222320229efe@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750632008;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y7Sy6lOD9pKGTeDWHlQhBUIbqmjZyBGP1EAU8WiJo4s=;
-	b=kBR0oqsdgRAxdmgUMJDEVuGLu8q7wZFZrkw2kY2Ty5EzASKQorg1pEsBMR70YK25OhD7K3
-	XYxxKHegpUhVvZ76kB7HSR5/RqIez09ZtrG5AZzqHqwR5pnUkMSQQI+JWJwnGHBgV0MOi9
-	slP+7NTxaCfXk70+nJc87idbF+oItI4=
-Date: Sun, 22 Jun 2025 15:39:54 -0700
+	s=arc-20240116; t=1750632648; c=relaxed/simple;
+	bh=wHATzHUwOUqRKn8FAzkIwW1jHvvvptGIND35VrXnmho=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P72Any4WIK4YBuExuB5gNVk43vGc4O3aKCqi0XbzJC+EYY3KjAzq/ZRqp3aXsyPFhYE2Ro8AWa9/2rNfdaXksG9JNiSFq3i2WOk1zBIs+8QpYHTZtXFu4JqOd2e5XL0DBuGNwoTtqsx/4EUYqi97gE9Bx5irUHuAPBPAKZkyPt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z24MCgov; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-313fab41fd5so362917a91.1;
+        Sun, 22 Jun 2025 15:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750632645; x=1751237445; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2XyaOPS+SVDJS2nuVakOU+h3pEZcqv0KxHASicqOHR0=;
+        b=Z24MCgovbvwdu5n6jAqRkIfOw5jJCQh+oGKuaMUqMdBngf2wlsnuQWeLU66LmYDq2z
+         6hw7k23vBiA2Y9WuCa2LHytHLhd9AjZCjDBYpLw/RNAwXGL5c2mSoHy9TiL+VM9waIWQ
+         hDDjsBKeKgFNJCIAXkEATw409Ao0BZSGqcsTo+fFphI/QG5t+2oSD8pDGNin+K932gqC
+         z/P5x7yi/CqYodSlDqqF2yruBkSdWLEqHmnkxIilqRicDH6SNM/tjvQEKaPEUmceIY6i
+         fPISg5bChuNKbTM72LhZXi8DT/WNv8XICieRk96EMqb7/V5PU5R7oeMc5ckw1tm8No+q
+         Ll+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750632645; x=1751237445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2XyaOPS+SVDJS2nuVakOU+h3pEZcqv0KxHASicqOHR0=;
+        b=Yg7/oxQXPUcbQiJO0o35CqnlRRn8etlZslogx2PoB6trsSH9on4vh6dgHXtBiq6vbY
+         Xj1IuRtczyoB7hPH9LYgRvGUw0jjj5vxPzily6IyQQT5F8DEc23nXXx3JNcij5InQP9B
+         e5GwQQj6ZIu95g6vzlbZqaHFr4UX5FUNZ/mL6ObMimUpuGRZbZUU0Xy8ygQnVBjwKNZP
+         g1Bk/9VyfUlkEdUeUjg7yWYj1EoODnYtF+ZG51v4l2DOqMX4Ke2OUYt3E33g8N8T1qsY
+         4/Q/GhaeMC12g0BA7t52iB1T7N3EQnwuhzLSwRtOFQ3goroO+L60CDwrIxFr+AsWW2+h
+         iiZg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/3qW77tmh1yrHZyZWo2xoTl1aKWR0X3VUOXrNNvD7MQ3UBWva+GjfOvgrN8q083j5J6XZam38U3Yq@vger.kernel.org, AJvYcCU9/aLQ6N3XtilWzy42Hl2kDaZfewDBjkBRXcUv6h/6K3U3K6cVUodVaxwkYel5zxmsirk4VDBjKkJBOjQ=@vger.kernel.org, AJvYcCUXkjfTbBqigvhBjPWJAyVoJeZL4CoZI/CzPkssHcgfMGObinklldaldxAkDcHVNbVWuW98Mk8Es4kWBgN9@vger.kernel.org, AJvYcCV6qWXGP9zRMjakK++6HjOOKcEW9Dk8BYH8Hj9kY0DHw3IMnLMAJZVJSybYfGRc3NVbQ92JIsJYVX6pMu/sTu/1@vger.kernel.org, AJvYcCVWwFnqkXP1G9F6rX5trqeDXF6UwKUTouONx9hHwoSQ1wW4wNtZ6BPoGURjFs6JvAj8GDiSWA50iWIkb/Es@vger.kernel.org, AJvYcCW2umB5Sr62u6StURP0ZDgjAr5gkVfvDh2IjIIIRuKj/ZTnk7FpQujXt2cw5GyDqpDeeNeYqFUyqfDU2b2xSJc=@vger.kernel.org, AJvYcCWdRCugot5CvTHpnyoUm7lIWYhVQeQfHiKvhtyjnfNM+wpLU46FqIExHB1rYi/QgIBMkhgt9nYViqw=@vger.kernel.org, AJvYcCWsn6WJszPgG5oopu5HeV9Uo43Gs/6uFI2WqmJkkpozh5BEa61aowbV0ZgsogMpcHoC8fvxIa2j@vger.kernel.org, AJvYcCWuflZVxkRW8bJKLega5V/K9Nk9Tx9mMfJHEa18k0ZQVPPxuI6Luef+K5nwxvU/cRtKYyf7GrowUOuK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0by8/QbRy/n6Foebc+H8e7D18JjyY4F4w8bfu3VyYgFeNZTyq
+	g72Oy0OvHD1cPzoy2igZbkt+l7iyFfiX1gIw17wwLcnEMzQ7JqruhEJSX6GO8H5nAhLtD1S01wj
+	Pg8CSRgriwy14+OD6BCCSi7fO6aH6KHk=
+X-Gm-Gg: ASbGnctKm2hQIZtlwxmlnN/lid4QSFMRQAdE/ddYLmW2Ky1GY5PaGYX6pji4qnzgXys
+	kKCuDCpwvDBPfXMyrMtMCTcZgIOkGYsEaAae8jzSb7v4S/HBntsFwFY7NrCtXBxlc5fMvmYhn7I
+	hvxOsKUqA3gvzn1VGky9UKhiPS68PZttkCQ65fYQ6s3Iwo0llWTk3Qdw==
+X-Google-Smtp-Source: AGHT+IHkK5VxbDTzDH+78CGWNybiQ0lflBEpMpSVRH6uwkYDUKXtQuR/kJbEABJn7CeEMEkyXPjXtmArCfcPAjxsRNU=
+X-Received: by 2002:a17:90b:3a43:b0:311:fde5:c4ae with SMTP id
+ 98e67ed59e1d1-3159d8e2be9mr5684021a91.6.1750632645432; Sun, 22 Jun 2025
+ 15:50:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 0/8] net/mlx5: HWS, Optimize matchers ICM
- usage
-To: Mark Bloch <mbloch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>
-Cc: saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com,
- Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, moshe@nvidia.com
-References: <20250622172226.4174-1-mbloch@nvidia.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20250622172226.4174-1-mbloch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+In-Reply-To: <20250615-ptr-as-ptr-v12-0-f43b024581e8@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 23 Jun 2025 00:50:31 +0200
+X-Gm-Features: Ac12FXzAp4qUKl_aNT741tylL3I37tb5s--GlJccgcY1EV1oeXS1Teju6Ztan0w
+Message-ID: <CANiq72=xmyHuBYEGbCMi=Um_NvNbf5TfMmJB5YPpVp41FcPdJA@mail.gmail.com>
+Subject: Re: [PATCH v12 0/6] rust: reduce `as` casts, enable related lints
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Benno Lossin <lossin@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Breno Leitao <leitao@debian.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pm@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-在 2025/6/22 10:22, Mark Bloch 写道:
-> This series optimizes ICM usage for unidirectional rules and
-> empty matchers and with the last patch we make hardware steering
-> the default FDB steering provider for NICs that don't support software
-> steering.
+On Sun, Jun 15, 2025 at 10:55=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
+> wrote:
+>
+> This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
+> Lossin suggested I also look into `clippy::ptr_cast_constness` and I
+> discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
+> lints. It also enables `clippy::as_underscore` which ensures other
+> pointer casts weren't missed.
+>
+> As a later addition, `clippy::cast_lossless` and `clippy::ref_as_ptr`
+> are also enabled.
+>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-In this patchset, ICM is not explained. I googled this ICM. And I got 
-the following
+Applied to `rust-next` -- thanks everyone!
 
-"
-ICM stands for Internal Context Memory, a specialized memory region used 
-by Mellanox/NVIDIA network devices (e.g., ConnectX series NICs) to store 
-hardware context and rule tables for offloaded operations like flow 
-steering, filtering, and traffic redirection.
+    [ Added `.cast()` for `opp`. - Miguel ]
 
-ICM is crucial when using hardware steering (HWS), where the NIC itself 
-performs packet matching and forwarding without involving the host CPU.
-"
-If I am missing something, please correct me.
+    [ Changed `isize` to `c_long`. - Miguel ]
 
-Zhu Yanjun
+It would still be nice to get the couple remaining Acked-bys (happy to
+rebase to apply them), but I feel we are in good shape, and it is a
+good time to put it into linux-next so that people see the lint before
+they start applying new code into their branches.
 
-> 
-> Hardware steering (HWS) uses a type of rule table container (RTC) that
-> is unidirectional, so matchers consist of two RTCs to accommodate
-> bidirectional rules.
-> 
-> This small series enables resizing the two RTCs independently by
-> tracking the number of rules separately. For extreme cases where all
-> rules are unidirectional, this results in saving close to half the
-> memory footprint.
-> 
-> Results for inserting 1M unidirectional rules using a simple module:
-> 
-> 			Pages		Memory
-> Before this patch:	300k		1.5GiB
-> After this patch:	160k		900MiB
-> 
-> The 'Pages' column measures the number of 4KiB pages the device requests
-> for itself (the ICM).
-> 
-> The 'Memory' column is the difference between peak usage and baseline
-> usage (before starting the test) as reported by `free -h`.
-> 
-> In addition, second to last patch of the series handles a case where all
-> the matcher's rules were deleted: the large RTCs of the matcher are no
-> longer required, and we can save some more ICM by shrinking the matcher
-> to its initial size.
-> 
-> Finally the last patch makes hardware steering the default mode
-> when in swichdev for NICs that don't have software steering support.
-> 
-> Changelog
-> =========
-> Changes from v1 [0]:
-> - Fixed author on patches 5 and 6.
-> 
-> References
-> ==========
-> [0] v1: https://lore.kernel.org/all/20250619115522.68469-1-mbloch@nvidia.com/
-> 
-> Moshe Shemesh (1):
->    net/mlx5: Add HWS as secondary steering mode
-> 
-> Vlad Dogaru (5):
->    net/mlx5: HWS, remove unused create_dest_array parameter
->    net/mlx5: HWS, Refactor and export rule skip logic
->    net/mlx5: HWS, Create STEs directly from matcher
->    net/mlx5: HWS, Decouple matcher RX and TX sizes
->    net/mlx5: HWS, Track matcher sizes individually
-> 
-> Yevgeny Kliteynik (2):
->    net/mlx5: HWS, remove incorrect comment
->    net/mlx5: HWS, Shrink empty matchers
-> 
->   .../net/ethernet/mellanox/mlx5/core/fs_core.c |   2 +
->   .../mellanox/mlx5/core/steering/hws/action.c  |   7 +-
->   .../mellanox/mlx5/core/steering/hws/bwc.c     | 284 ++++++++++++++----
->   .../mellanox/mlx5/core/steering/hws/bwc.h     |  14 +-
->   .../mellanox/mlx5/core/steering/hws/debug.c   |  20 +-
->   .../mellanox/mlx5/core/steering/hws/fs_hws.c  |  15 +-
->   .../mellanox/mlx5/core/steering/hws/matcher.c | 166 ++++++----
->   .../mellanox/mlx5/core/steering/hws/matcher.h |   3 +-
->   .../mellanox/mlx5/core/steering/hws/mlx5hws.h |  36 ++-
->   .../mellanox/mlx5/core/steering/hws/rule.c    |  35 +--
->   .../mellanox/mlx5/core/steering/hws/rule.h    |   3 +
->   11 files changed, 403 insertions(+), 182 deletions(-)
-> 
-> 
-> base-commit: 091d019adce033118776ef93b50a268f715ae8f6
-
+Cheers,
+Miguel
 
