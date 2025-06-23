@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-200424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C242DAE57D6
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:18:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2A7AE57D7
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB151C25B3D
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:18:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CDA41C25B6F
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC6125CC44;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD2026E140;
 	Mon, 23 Jun 2025 23:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0DfnBXj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jYbjE4A8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE29253F1D
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 23:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B0E2673B5
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 23:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750720646; cv=none; b=OUhvcztdb9FMm+UrUK8ITbAa6dR9Y6FUUduuCMDosUbOa9/ObJ0tF8HJy3uel3yojxXOgCbQpNOOhuyqdNujZ5I7yQdVjXJrfomWi0YHwjpaHUK+E6o7UlYqyGY02oAXPYbfVLQE4G/KC87hzTj91whQEo7blL/6hUZsdf+K6Ws=
+	t=1750720647; cv=none; b=SqGP1rlraKTXypj7ll1eSlyUwFEE+tEq1ZjKHCotmBCX4a3nSGfQ4jHSSlr2QlTf96+IscdiL068pTwxoQu3P/TKyU7YIC/j/G7a8jPKZqZLCPdILV+KpM1b269GqguUAXKS7+sig1UWrshPAitNOOK7+odFrq4CIOrQ8TGZAiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750720646; c=relaxed/simple;
-	bh=Zx11s1YucFMH1ZeVE8yR+BxFrskCjmQC0zphyCBX7kg=;
+	s=arc-20240116; t=1750720647; c=relaxed/simple;
+	bh=TFQ+8affGkun7NGNu+NR/dGpiowEBzy4SmG9WMysr1k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m27Iaj3WyYR6spu+EXsYsjk/BNNeCj0wP9PJgqMtJrih1IqQWTJmLf4oTwuX/50ShqWBLGf9BTH4I+wGaRXXY8ZaIKl4u5R5qM4WB5th5Af+9/YpAVnn5M/ubjjWL83sm1GgJDK4a2/3v0WTwHAK4T8A/z8EaOJJAjJqbHGLVXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0DfnBXj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B540C4CEF5;
+	 MIME-Version; b=F1caPstWp55OtWmQHUQLaA0Yqn76+AxbM8H0skTgkenGJZDaWZo4Wa0vg37T+46rzMI6GnMM33qSpbxIjZR9P5bVvdsPjdC/lyVDkeoXIVp0jSeSz2YQVSOs9ameJxXQ0VnJcnBIf+WI9lyl5Df75/50bHqax16+WuS2DahGojk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jYbjE4A8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BD4C4AF09;
 	Mon, 23 Jun 2025 23:17:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1750720646;
-	bh=Zx11s1YucFMH1ZeVE8yR+BxFrskCjmQC0zphyCBX7kg=;
+	bh=TFQ+8affGkun7NGNu+NR/dGpiowEBzy4SmG9WMysr1k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=n0DfnBXjGi90srMTlbwLHdPxwe96IGNXYHSaM8oyUBvZEcR/3cQWQcgIOSp81wixo
-	 FNMoz9otmnd5ZegFDSsJiOOuSo3A7NFcBuS339bRyx1lpYGuB7iwJDJfsNm8q+dOXC
-	 WkXJrgZXL2dxRHHkMTjqW8HaRNRSaRLIDgxcUJXCJRwb1J0t5qv/iwP0hr/Qr50Qc7
-	 YfPkeLCEtzicsgEoCdP9su6CIIkNPoKNMgPHl4r8nP0bzpjUkTCGLC2c0DPP2YJDtF
-	 zS9LNsuDo7cVFDPM2WmBIkL7FqfdoZ0IsuGJ0P/RjxnyZ0u7mWrxIUdKNyjmRZcmfy
-	 vO6kQ0TxU8oeQ==
+	b=jYbjE4A8SM2cbjafQXqqOOM4dgQ6yGQVz2iNEHDIzdYX4f73Zi5qnId6hbWULAvfY
+	 dImES4rIiT8zLvST3Iqa+Zeo1iYThgu8cH9BGPa/oPyfD812gyD6/wXVzm2iLEMd25
+	 QidbuGhgguBNmAMI2H1fqqxO6AtgUiwo16b//yusV0caiCsSDPYRtA4D7GFmIVqHEv
+	 SjoioESLJrkd+1ZlVglqv/b04O9FunS48z3wiovakORpnlZRFeYEPPmWVrnOKa3oaJ
+	 VzRetwH8smWDGZfKKATMO6Ani+4vwhNyyAiq8WmciqXcRq5Ix4E0a2LyL9qwAzxB5p
+	 kFFYTLC99VS8g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 4/8] net: ethtool: remove the data argument from ethtool_notify()
-Date: Mon, 23 Jun 2025 16:17:16 -0700
-Message-ID: <20250623231720.3124717-5-kuba@kernel.org>
+Subject: [PATCH net-next v2 5/8] net: ethtool: copy req_info from SET to NTF
+Date: Mon, 23 Jun 2025 16:17:17 -0700
+Message-ID: <20250623231720.3124717-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250623231720.3124717-1-kuba@kernel.org>
 References: <20250623231720.3124717-1-kuba@kernel.org>
@@ -68,206 +68,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ethtool_notify() takes a const void *data argument, which presumably
-was intended to pass information from the call site to the subcommand
-handler. This argument currently has no users.
+Copy information parsed for SET with .req_parse to NTF handling
+and therefore the GET-equivalent that it ends up executing.
+This way if the SET was on a sub-object (like RSS context)
+the notification will also be appropriately scoped.
 
-Expecting the data to be subcommand-specific has two complications.
-
-Complication #1 is that its not plumbed thru any of the standardized
-callbacks. It gets propagated to ethnl_default_notify() where it
-remains unused. Coming from the ethnl_default_set_doit() side we pass
-in NULL, because how could we have a command specific attribute in
-a generic handler.
-
-Complication #2 is that we expect the ethtool_notify() callers to
-know what attribute type to pass in. Again, the data pointer is
-untyped.
-
-RSS will need to pass the context ID to the notifications.
-I think it's a better design if the "subcommand" exports its own
-typed interface and constructs the appropriate argument struct
-(which will be req_info). Remove the unused data argument from
-ethtool_notify() but retain it in a new internal helper which
-subcommands can use to build a typed interface.
+Also copy the phy_index, Maxime suggests this will help PLCA
+commands generate accurate notifications as well.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/netdevice.h |  5 ++---
- net/ethtool/netlink.h     |  1 +
- net/ethtool/ioctl.c       | 24 ++++++++++++------------
- net/ethtool/netlink.c     | 11 ++++++++---
- 4 files changed, 23 insertions(+), 18 deletions(-)
+v2:
+ - populate the phy_index
+v1: https://lore.kernel.org/20250621171944.2619249-6-kuba@kernel.org
+---
+ net/ethtool/netlink.h |  5 ++++-
+ net/ethtool/netlink.c | 16 +++++++++++-----
+ 2 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 03c26bb0fbbe..db5bfd4e7ec8 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -5138,10 +5138,9 @@ void netdev_bonding_info_change(struct net_device *dev,
- 				struct netdev_bonding_info *bonding_info);
- 
- #if IS_ENABLED(CONFIG_ETHTOOL_NETLINK)
--void ethtool_notify(struct net_device *dev, unsigned int cmd, const void *data);
-+void ethtool_notify(struct net_device *dev, unsigned int cmd);
- #else
--static inline void ethtool_notify(struct net_device *dev, unsigned int cmd,
--				  const void *data)
-+static inline void ethtool_notify(struct net_device *dev, unsigned int cmd)
- {
- }
- #endif
 diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 91b953924af3..4a061944a3aa 100644
+index 4a061944a3aa..373a8d5e86ae 100644
 --- a/net/ethtool/netlink.h
 +++ b/net/ethtool/netlink.h
-@@ -23,6 +23,7 @@ void *ethnl_dump_put(struct sk_buff *skb, struct netlink_callback *cb, u8 cmd);
+@@ -23,7 +23,8 @@ void *ethnl_dump_put(struct sk_buff *skb, struct netlink_callback *cb, u8 cmd);
  void *ethnl_bcastmsg_put(struct sk_buff *skb, u8 cmd);
  void *ethnl_unicast_put(struct sk_buff *skb, u32 portid, u32 seq, u8 cmd);
  int ethnl_multicast(struct sk_buff *skb, struct net_device *dev);
-+void ethnl_notify(struct net_device *dev, unsigned int cmd, const void *data);
+-void ethnl_notify(struct net_device *dev, unsigned int cmd, const void *data);
++void ethnl_notify(struct net_device *dev, unsigned int cmd,
++		  const struct ethnl_req_info *req_info);
  
  /**
   * ethnl_strz_size() - calculate attribute length for fixed size string
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 82cde640aa87..96da9d18789b 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -617,8 +617,8 @@ static int ethtool_set_link_ksettings(struct net_device *dev,
- 
- 	err = dev->ethtool_ops->set_link_ksettings(dev, &link_ksettings);
- 	if (err >= 0) {
--		ethtool_notify(dev, ETHTOOL_MSG_LINKINFO_NTF, NULL);
--		ethtool_notify(dev, ETHTOOL_MSG_LINKMODES_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_LINKINFO_NTF);
-+		ethtool_notify(dev, ETHTOOL_MSG_LINKMODES_NTF);
- 	}
- 	return err;
- }
-@@ -708,8 +708,8 @@ static int ethtool_set_settings(struct net_device *dev, void __user *useraddr)
- 		__ETHTOOL_LINK_MODE_MASK_NU32;
- 	ret = dev->ethtool_ops->set_link_ksettings(dev, &link_ksettings);
- 	if (ret >= 0) {
--		ethtool_notify(dev, ETHTOOL_MSG_LINKINFO_NTF, NULL);
--		ethtool_notify(dev, ETHTOOL_MSG_LINKMODES_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_LINKINFO_NTF);
-+		ethtool_notify(dev, ETHTOOL_MSG_LINKMODES_NTF);
- 	}
- 	return ret;
- }
-@@ -1868,7 +1868,7 @@ static int ethtool_set_wol(struct net_device *dev, char __user *useraddr)
- 		return ret;
- 
- 	dev->ethtool->wol_enabled = !!wol.wolopts;
--	ethtool_notify(dev, ETHTOOL_MSG_WOL_NTF, NULL);
-+	ethtool_notify(dev, ETHTOOL_MSG_WOL_NTF);
- 
- 	return 0;
- }
-@@ -1944,7 +1944,7 @@ static int ethtool_set_eee(struct net_device *dev, char __user *useraddr)
- 	eee_to_keee(&keee, &eee);
- 	ret = dev->ethtool_ops->set_eee(dev, &keee);
- 	if (!ret)
--		ethtool_notify(dev, ETHTOOL_MSG_EEE_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_EEE_NTF);
- 	return ret;
- }
- 
-@@ -2184,7 +2184,7 @@ static noinline_for_stack int ethtool_set_coalesce(struct net_device *dev,
- 	ret = dev->ethtool_ops->set_coalesce(dev, &coalesce, &kernel_coalesce,
- 					     NULL);
- 	if (!ret)
--		ethtool_notify(dev, ETHTOOL_MSG_COALESCE_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_COALESCE_NTF);
- 	return ret;
- }
- 
-@@ -2228,7 +2228,7 @@ static int ethtool_set_ringparam(struct net_device *dev, void __user *useraddr)
- 	ret = dev->ethtool_ops->set_ringparam(dev, &ringparam,
- 					      &kernel_ringparam, NULL);
- 	if (!ret)
--		ethtool_notify(dev, ETHTOOL_MSG_RINGS_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_RINGS_NTF);
- 	return ret;
- }
- 
-@@ -2295,7 +2295,7 @@ static noinline_for_stack int ethtool_set_channels(struct net_device *dev,
- 
- 	ret = dev->ethtool_ops->set_channels(dev, &channels);
- 	if (!ret)
--		ethtool_notify(dev, ETHTOOL_MSG_CHANNELS_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_CHANNELS_NTF);
- 	return ret;
- }
- 
-@@ -2326,7 +2326,7 @@ static int ethtool_set_pauseparam(struct net_device *dev, void __user *useraddr)
- 
- 	ret = dev->ethtool_ops->set_pauseparam(dev, &pauseparam);
- 	if (!ret)
--		ethtool_notify(dev, ETHTOOL_MSG_PAUSE_NTF, NULL);
-+		ethtool_notify(dev, ETHTOOL_MSG_PAUSE_NTF);
- 	return ret;
- }
- 
-@@ -3328,7 +3328,7 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
- 		rc = ethtool_set_value_void(dev, useraddr,
- 				       dev->ethtool_ops->set_msglevel);
- 		if (!rc)
--			ethtool_notify(dev, ETHTOOL_MSG_DEBUG_NTF, NULL);
-+			ethtool_notify(dev, ETHTOOL_MSG_DEBUG_NTF);
- 		break;
- 	case ETHTOOL_GEEE:
- 		rc = ethtool_get_eee(dev, useraddr);
-@@ -3392,7 +3392,7 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
- 		rc = ethtool_get_value(dev, useraddr, ethcmd,
- 				       dev->ethtool_ops->get_priv_flags);
- 		if (!rc)
--			ethtool_notify(dev, ETHTOOL_MSG_PRIVFLAGS_NTF, NULL);
-+			ethtool_notify(dev, ETHTOOL_MSG_PRIVFLAGS_NTF);
- 		break;
- 	case ETHTOOL_SPFLAGS:
- 		rc = ethtool_set_value(dev, useraddr,
+@@ -338,6 +339,8 @@ int ethnl_sock_priv_set(struct sk_buff *skb, struct net_device *dev, u32 portid,
+  *	header is already filled on entry, the rest up to @repdata_offset
+  *	is zero initialized. This callback should only modify type specific
+  *	request info by parsed attributes from request message.
++ *	Called for both GET and SET. Information parsed for SET will
++ *	be conveyed to the req_info used during NTF generation.
+  * @prepare_data:
+  *	Retrieve and prepare data needed to compose a reply message. Calls to
+  *	ethtool_ops handlers are limited to this callback. Common reply data
 diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index c5ec3c82ab2e..129f9d56ac65 100644
+index 129f9d56ac65..60b3c07507d2 100644
 --- a/net/ethtool/netlink.c
 +++ b/net/ethtool/netlink.c
 @@ -911,7 +911,7 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
  	swap(dev->cfg, dev->cfg_pending);
  	if (!ret)
  		goto out_ops;
--	ethtool_notify(dev, ops->set_ntf_cmd, NULL);
-+	ethtool_notify(dev, ops->set_ntf_cmd);
+-	ethtool_notify(dev, ops->set_ntf_cmd);
++	ethnl_notify(dev, ops->set_ntf_cmd, req_info);
  
  	ret = 0;
  out_ops:
-@@ -1049,7 +1049,7 @@ static const ethnl_notify_handler_t ethnl_notify_handlers[] = {
+@@ -950,7 +950,7 @@ ethnl_default_notify_ops[ETHTOOL_MSG_KERNEL_MAX + 1] = {
+ 
+ /* default notification handler */
+ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+-				 const void *data)
++				 const struct ethnl_req_info *orig_req_info)
+ {
+ 	struct ethnl_reply_data *reply_data;
+ 	const struct ethnl_request_ops *ops;
+@@ -979,6 +979,11 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+ 
+ 	req_info->dev = dev;
+ 	req_info->flags |= ETHTOOL_FLAG_COMPACT_BITSETS;
++	if (orig_req_info) {
++		req_info->phy_index = orig_req_info->phy_index;
++		memcpy(&req_info[1], &orig_req_info[1],
++		       ops->req_info_size - sizeof(*req_info));
++	}
+ 
+ 	netdev_ops_assert_locked(dev);
+ 
+@@ -1029,7 +1034,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+ /* notifications */
+ 
+ typedef void (*ethnl_notify_handler_t)(struct net_device *dev, unsigned int cmd,
+-				       const void *data);
++				       const struct ethnl_req_info *req_info);
+ 
+ static const ethnl_notify_handler_t ethnl_notify_handlers[] = {
+ 	[ETHTOOL_MSG_LINKINFO_NTF]	= ethnl_default_notify,
+@@ -1049,7 +1054,8 @@ static const ethnl_notify_handler_t ethnl_notify_handlers[] = {
  	[ETHTOOL_MSG_MM_NTF]		= ethnl_default_notify,
  };
  
--void ethtool_notify(struct net_device *dev, unsigned int cmd, const void *data)
-+void ethnl_notify(struct net_device *dev, unsigned int cmd, const void *data)
+-void ethnl_notify(struct net_device *dev, unsigned int cmd, const void *data)
++void ethnl_notify(struct net_device *dev, unsigned int cmd,
++		  const struct ethnl_req_info *req_info)
  {
  	if (unlikely(!ethnl_ok))
  		return;
-@@ -1062,13 +1062,18 @@ void ethtool_notify(struct net_device *dev, unsigned int cmd, const void *data)
+@@ -1057,7 +1063,7 @@ void ethnl_notify(struct net_device *dev, unsigned int cmd, const void *data)
+ 
+ 	if (likely(cmd < ARRAY_SIZE(ethnl_notify_handlers) &&
+ 		   ethnl_notify_handlers[cmd]))
+-		ethnl_notify_handlers[cmd](dev, cmd, data);
++		ethnl_notify_handlers[cmd](dev, cmd, req_info);
+ 	else
  		WARN_ONCE(1, "notification %u not implemented (dev=%s)\n",
  			  cmd, netdev_name(dev));
- }
-+
-+void ethtool_notify(struct net_device *dev, unsigned int cmd)
-+{
-+	ethnl_notify(dev, cmd, NULL);
-+}
- EXPORT_SYMBOL(ethtool_notify);
- 
- static void ethnl_notify_features(struct netdev_notifier_info *info)
- {
- 	struct net_device *dev = netdev_notifier_info_to_dev(info);
- 
--	ethtool_notify(dev, ETHTOOL_MSG_FEATURES_NTF, NULL);
-+	ethtool_notify(dev, ETHTOOL_MSG_FEATURES_NTF);
- }
- 
- static int ethnl_netdev_event(struct notifier_block *this, unsigned long event,
 -- 
 2.49.0
 
