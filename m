@@ -1,93 +1,191 @@
-Return-Path: <netdev+bounces-200399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC0FAE4D32
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:57:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A3CAE4D46
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 21:09:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E41918983C6
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:57:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7B2D17D0B3
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:09:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8222BD015;
-	Mon, 23 Jun 2025 18:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA0C2D3237;
+	Mon, 23 Jun 2025 19:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cv70p9fr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iarOq283"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0E12AEE4
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 18:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B8628C867
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 19:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750705024; cv=none; b=ly3KL5YifXXEm9ZldkDmstb64kiFbHtwIJf9EvT13e4QvWPKkrmPh7Svm3KlyLw8HCaq30QxGDWpnBnwjPBhKBdNSdNi55tgbUSEZBfsu03INHt5Am3tTPuZFktn+QBsLFmhBbMLao7e3LidRlTCh7C2fkNhcDvhiDvVsHo3Cm4=
+	t=1750705765; cv=none; b=NJf7h1qlYPWMaNcX0sGw7RC+52nUnmKxYMhlIC8nPw6OE0kmRVcpgWSKdzF5KxZB4xjekeGDPMfa58x6ZGwVjLSHtcExPlz3MSY5ldk62gj6GqrIvISc7++ZX6SX/B5UkXU2pXI1p4UNmMXdmDdZaCUCaDPGiy9AWvcBtz97kVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750705024; c=relaxed/simple;
-	bh=+lHQELDriFFFgcaQNcJEf1UJGlJsMy19W+PbpdYdtB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OgrJsIKbbuuxoR7I8UKc4wZKPv0wrc0giaxYOkJTOpBBzK8+LA44Fk+6z4gMfiTX0TTNNBduSGngaxFJjI0BNftmzd/oL9lhvJ9jCRMbNpSeK0XJ0fn9cHMcbHFPVGQQHgmrC032aFd52beNJaNVgb1nQNimdHTEUyCaUekFmmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cv70p9fr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F738C4CEEA;
-	Mon, 23 Jun 2025 18:57:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750705023;
-	bh=+lHQELDriFFFgcaQNcJEf1UJGlJsMy19W+PbpdYdtB8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Cv70p9frwAn24Tkma60VkWeQTH8BJZqwO0C9FR9lTjtW4eyjIVKm2mCHWUDp7vyE1
-	 k6RWlDyUqfD0yygyxg95jYvsqMAgBp0lhMJANZBvjXmgzahrDOK+++uj/WJfmK2okS
-	 En37fq/G3tGsJErpyxayHLKTdKfFpzIu0x7zlSCgeKL9uJDimQTM9NctEOQW/huU83
-	 j37UeVbdZnZV/Oc2pkaSuskgD4ozCyJ+ryxTZNz50pzhd+Y/8ZTyziO+Dda7bekQPX
-	 wz4XyeFfpPAkaXbc2JqtTkSea8ETpOl0CDCmdFqeSh46Y+HtYJDLUuom9wOQpXrAEj
-	 BKbTGRIteikhQ==
-Date: Mon, 23 Jun 2025 11:57:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "xin.guo" <guoxin0309@gmail.com>
-Cc: ncardwell@google.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] tcp: fix tcp_ofo_queue() to avoid including 
- too much DUP SACK range
-Message-ID: <20250623115702.76bdd8a2@kernel.org>
-In-Reply-To: <20250617153706.139462-1-guoxin0309@gmail.com>
-References: <20250617153706.139462-1-guoxin0309@gmail.com>
+	s=arc-20240116; t=1750705765; c=relaxed/simple;
+	bh=tH3eSBTG6tbTZzapgRbeJfffzzypj/6/QYNfupAEtkE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c1lDehMmVxPoUNvPpWgCqangfGLwhoWP8VCoMt8zLbC4UEFt/fBK+7vaKri0+yz4NXBHGCi1nuBtmVy+BmDuou6wAOul7cPdCpI/NHtZ08klxxBh6cgn/3ofz1GR6QmuHbUwczdc/B6gJNglRXhSalmKRBOirSL1AqcAMvDRWdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iarOq283; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2357c61cda7so23915ad.1
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 12:09:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750705763; x=1751310563; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cp/0chDgm2snxzxzq95eP+vthqt+mdAU4GERCYRoDSo=;
+        b=iarOq283A+lGOwRY14zh7T4XNo+d4ywWBZL79etz5yP8MOUIm5q/u2k6u9wit31SVg
+         UyzkcYRDvtOgmkdfGg60oGYhBmaHyQBPAMtlNUSwr7BVCnqxsmsPvf33S380tFv5qLiC
+         YlFvahde1iBEHaMrTb7s6O/tX6gIcQXeZLCyZNK3VlbnW05UUUglXjtgo3c9YzJFabPM
+         8Ht+vt58wZtH1fb6jne+Rcob6VaGqS6807gcly13IHhNtY/Ujl19BoX2w6tatkdHIRI3
+         c9OBhyJafjKO/XuJPkM9VehSR3ThlyE8CG6/C4g/SLjjnyHc1beLnVpvUQqzl2Op+/NW
+         hCkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750705763; x=1751310563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cp/0chDgm2snxzxzq95eP+vthqt+mdAU4GERCYRoDSo=;
+        b=IHpp1N0lu+q9d+q7EjkJfoJV6UWISBnLgEGo18F8uZSa42a8R6c+KekafEdjUF+0G9
+         kb4oYJoIC3LlWbbFezMnnERUfauCT7mZq+4Ug6rxSP3iB+YFFp5lvfs1JBjPhThlWmt6
+         v0dl5ZwllP7MN8zFkK8i7eSOZF1xNXH7iTjepsY/tsX0Yg87JdBmcaq/QO38/R/kqAil
+         YccY36SGCMJH6LeHvsTX3H6DLR8/mHJun5il5xWxDnHGH9fJ/MVoVkgt+IdZ73Fgvjk+
+         rmPW4ew0lUA8Ks8DeZ9WV6WGHnLCyhaRNURLW52GeFiDMSrj6rjXARgeLo24bqWC7kCd
+         tc/A==
+X-Forwarded-Encrypted: i=1; AJvYcCV4cY92SkRba0Z+CwWnOjAo8Jm0djOJ0jd4CRheixtkEUdpyoqBKt7yfj+mdNWcilR252r77+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNudZXbL5pRcRzbY1MIzRVkBXDggEHLbvxOOgpqTbCb902Wajf
+	Z6yWByR9w1d9T/4nPcDCvYmN8UduOcqLmXCPPwFB42KQq3KasCXdD4kO9EBh/N89qgYLapk73Ia
+	RVA3L2/fFAw2VMywzyS3SpsDqjEr7ETdNJVtsYwaL
+X-Gm-Gg: ASbGnct02TgOF48vebx6dVIignB/ytGGOXPOqQXdmDGGCjcP5Zwvx3Rs87ADEIlQ4YR
+	5ndR9QEBTdqFXO5TMjXVUcSgjyQz20i2cDQTjdZfANN1yN9976e9QJBelZQJHj/iIhoGyyRD/h4
+	aFZL8jGWTbeHgDDkUcWtE4W89SvMEFe01t8mwN/V4y6aI5WVxFHF/AvmlzP06mioS9q9h2X68Fn
+	g==
+X-Google-Smtp-Source: AGHT+IEP6CbJSMMIjAaNAJ9rOrnxvip7xFCbKZZbgsFvTLW3kA7gzinjehuUnzT5TsDabxmVW7mRkxDk9owGN0VC6EQ=
+X-Received: by 2002:a17:903:41cc:b0:234:b2bf:e67e with SMTP id
+ d9443c01a7336-23802c66acdmr344235ad.13.1750705762491; Mon, 23 Jun 2025
+ 12:09:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250620041224.46646-1-byungchul@sk.com> <20250620041224.46646-2-byungchul@sk.com>
+ <8eaf52bf-4c3c-4007-afe5-a22da9f228f9@redhat.com> <20250623102821.GC3199@system.software.com>
+ <aFlGCam4_FnkGQYT@hyeyoo>
+In-Reply-To: <aFlGCam4_FnkGQYT@hyeyoo>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 23 Jun 2025 12:09:09 -0700
+X-Gm-Features: AX0GCFuS5sYOE7MPEWKATp8YxIxvbHC-ghHV1COC2m3qIITA4p4mPOlFQEJRPtU
+Message-ID: <CAHS8izMbtp0dN3+PZsivFD4Zg1DqaL5BJ4cw4jGjs=wCXAns3A@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/9] netmem: introduce struct netmem_desc
+ mirroring struct page
+To: Harry Yoo <harry.yoo@oracle.com>
+Cc: Byungchul Park <byungchul@sk.com>, David Hildenbrand <david@redhat.com>, willy@infradead.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	kernel_team@skhynix.com, kuba@kernel.org, ilias.apalodimas@linaro.org, 
+	hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch, asml.silence@gmail.com, 
+	toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, 
+	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com, 
+	hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 17 Jun 2025 23:37:06 +0800 xin.guo wrote:
-> If the new coming segment covers more than one skbs in the ofo queue,
-> and which seq is equal to rcv_nxt , then the sequence range
-> that is not duplicated will be sent as DUP SACK,  the detail as below,
-> in step6, the {501,2001} range is clearly including too much
-> DUP SACK range:
-> 1. client.43629 > server.8080: Flags [.], seq 501:1001, ack 1325288529,
-> win 20000, length 500: HTTP
-> 2. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 1 {501:1001}], length 0
-> 3. Iclient.43629 > server.8080: Flags [.], seq 1501:2001,
-> ack 1325288529, win 20000, length 500: HTTP
-> 4. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 2 {1501:2001}
-> {501:1001}], length 0
-> 5. client.43629 > server.8080: Flags [.], seq 1:2001,
-> ack 1325288529, win 20000, length 2000: HTTP
-> 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:2001}],
-> length 0
+On Mon, Jun 23, 2025 at 5:18=E2=80=AFAM Harry Yoo <harry.yoo@oracle.com> wr=
+ote:
+>
+> On Mon, Jun 23, 2025 at 07:28:21PM +0900, Byungchul Park wrote:
+> > On Mon, Jun 23, 2025 at 11:32:16AM +0200, David Hildenbrand wrote:
+> > > On 20.06.25 06:12, Byungchul Park wrote:
+> > > > To simplify struct page, the page pool members of struct page shoul=
+d be
+> > > > moved to other, allowing these members to be removed from struct pa=
+ge.
+> > > >
+> > > > Introduce a network memory descriptor to store the members, struct
+> > > > netmem_desc, and make it union'ed with the existing fields in struc=
+t
+> > > > net_iov, allowing to organize the fields of struct net_iov.
+> > >
+> > > It would be great adding some result from the previous discussions in
+> > > here, such as that the layout of "struct net_iov" can be changed beca=
+use
+> > > it is not a "struct page" overlay, what the next steps based on this
+> >
+> > I think the network folks already know how to use and interpret their
+> > data struct, struct net_iov for sure.. but I will add the comment if it
+> > you think is needed.  Thanks for the comment.
+>
+> I agree with David - it's not immediately obvious at first glance.
+> That was my feedback on the previous version as well :)
+>
+> I think it'd be great to add that explanation, since this is where MM and
+> networking intersect.
+>
 
-Looks reasonable, AFAICT, tho perhaps there's some implicit benefit from
-reporting end of the DSACK == rcv_next..
+I think a lot of people are now saying the same thing: (1) lets keep
+net_iov and page/netmem_desc separate, and (2) lets add comments
+explaining their relation so this intersection between MM and
+networking is not confused in the long term .
 
-Could you please add the info about how the packet from step 6 looks
-"after" this patch? So we have before / after comparison?
+For #1, concretely I would recommend removing the union inside struct
+net_iov? And also revert all the changes to net_iov for that matter.
+They are all to bring netmem_desc and net_iov closer together, but the
+feedback is that we should keep them separate, and I kinda agree with
+that. The fact that net_iov includes a netmem_desc in your patch makes
+readers think they're very closely related.
 
-With that please resend and make sure you include _all_ maintainers that
-the get_maintainer script points out. You missed CCing Eric D.
--- 
-pw-bot: cr
+For #2, add this comment (roughly) on top of struct net_iov? Untested
+with kdoc and spell checker:
+
+diff --git a/include/net/netmem.h b/include/net/netmem.h
+index 7a1dafa3f080..8fb2b294e5f2 100644
+--- a/include/net/netmem.h
++++ b/include/net/netmem.h
+@@ -30,6 +30,25 @@ enum net_iov_type {
+        NET_IOV_MAX =3D ULONG_MAX
+ };
+
++/* A memory descriptor representing abstract networking I/O vectors.
++ *
++ * net_iovs are allocated by networking code, and generally represent some
++ * abstract form of non-paged memory used by the networking stack. The siz=
+e
++ * of the chunk is PAGE_SIZE.
++ *
++ * This memory can be any form of non-struct paged memory. Examples includ=
+e
++ * imported dmabuf memory and imported io_uring memory. See
+net_iov_type for all
++ * the supported types.
++ *
++ * @type: the type of the memory. Different types of net_iovs are supporte=
+d.
++ * @pp_magic: pp field, similar to the one in struct page/struct netmem_de=
+sc.
++ * @pp: the pp this net_iov belongs to, if any.
++ * @owner: the net_iov_area this net_iov belongs to, if any.
++ * @dma_addr: the dma addrs of the net_iov. Needed for the network card to
++ * send/receive this net_iov.
++ * @pp_ref_count:  the pp ref count of this net_iov, exactly the same usag=
+e as
++ * struct page/struct netmem_desc.
++ */
+
+
+
+
+
+--
+Thanks,
+Mina
 
