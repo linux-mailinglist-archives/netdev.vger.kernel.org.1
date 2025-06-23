@@ -1,281 +1,226 @@
-Return-Path: <netdev+bounces-200363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6ADAE4AE7
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:30:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24FC9AE49A3
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B40D188799C
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:21:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BA8E7A411E
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03D2E0B6B;
-	Mon, 23 Jun 2025 16:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814CE28D8FA;
+	Mon, 23 Jun 2025 16:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="ifhrRglT"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="HZR9Cz4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5142828E61E;
-	Mon, 23 Jun 2025 16:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750695073; cv=pass; b=m/fMGmAsFJsbe6kCUepzFIZf+rXSHU3FMEYv2B70B8a4klISSz8f6UcwAkvZF+Htt4fGsFypE8/bxYGFBDtKvXovudx+yStlIRgDzjhSJUDiTWoYgBwvxz+xTMi+Da0qhk3P8fqZcKOZJhAhWomcx8LW5JCK1CyjyHVKs7WM8Gw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750695073; c=relaxed/simple;
-	bh=UblQ/Xi9teuoaZM1+IlFLdoyalC6siaHzqHpUWPdXp4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ciITSoQcMwtFbHlUF6wvsoTWPmtVcdSHHW2fQbjYcnHHMdQfm8UvDiluQ244fs0gizvriN/dBQrOwGgCy8QLLIN9KVIxYaGc3GGjjUiDlA+7n9we2NqqnMfH+x7b3vnyPXNyUAydNebvGAIZBcCEjBdpru+z0pFMMCR5XhPadCw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=ifhrRglT; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1750695014; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=EpBtJRjKcgPsO+xAJObVVmFvnI4hmdsZ6LijaICW3w0zdFpegt0k3I/wGT51x6yq9t7zXoX7sFb3yMWpHNE+rLAu2ZZjCp+N9VFX+Q4/04KiU/EsrfstavBLC9MQzFMo/b3QMwzBRvoc+e13RHmo8OoEeFd00ZASOpK3oSJJglM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1750695014; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=LrDqBL7o/mg/nAqIiAJ/LSWqzkg2m3/2ojuA+PZ4zkE=; 
-	b=Yke2UH0sgLcdjm6t4ucqMhYEpUfHQfgnCY1vqDVFeITgfZA/sUs1RgZRk340I6Jejbq5/pXgjtH289g684o8J2aZHAELCY9xvv5ldmSWpCLm6se5G3BspfIU/bZG+gRqwJ87tvnoqoBCO23T0tPs75Dpj4AZstHKLhiuIw2w0TY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1750695014;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:References:In-Reply-To:To:To:Cc:Cc:Reply-To;
-	bh=LrDqBL7o/mg/nAqIiAJ/LSWqzkg2m3/2ojuA+PZ4zkE=;
-	b=ifhrRglTFZ2RX+hsYHYJv5VSQEYe/R1mGxnsPnU80GFRfFV+SXXAgL+bnaRD8IDJ
-	XMwx3CHErJ+Z05XkEGWJF+8nIMYLmSNdyD9nVywEoYVsytQSuhHMaK3gAoItL9dGZk9
-	hC/Qo/9ULp3XvQ8MVn1Ko0pBL0TX2Clu2xmUyeEg=
-Received: by mx.zohomail.com with SMTPS id 17506950128651017.218237604295;
-	Mon, 23 Jun 2025 09:10:12 -0700 (PDT)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Date: Mon, 23 Jun 2025 18:05:48 +0200
-Subject: [PATCH v2 20/20] phy: rockchip-pcie: switch to FIELD_PREP_WM16
- macro
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90F926D4C3
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 16:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750694804; cv=none; b=kd08vOvkyX7BnjOWRBmd6y+1AiHmJqXdKGHUE8EXZjMzipFfrwuW7rBpD+6X83WpW6utGn8L91qNGSbN8AdmO6D+ol/kGzyWlfPdEk3bEKtqCCSh4lR/dMhvFTSgcQ7IDpHdfMwwJnggRboCCXTqy5gpJs2MZmlB+v7cn8Gmh9o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750694804; c=relaxed/simple;
+	bh=Mi/60CA7Ydz3R+PY7UFNgNc1KYMFHge7mElfLwWKOr8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=J5rnC+rDio/l+yHRjhXmsrGg5d3Hc87Q9k7B2fi9fbRFWzA1SFUNTCW4xGjXbU9FC4TF8idYZSHUv4oEMWl4+GiOZajX3WCVk2z6rwBjU3YkW1/osNHiBEmy9kdYkIK5qcEG3DpGan5W+yc782dZZnDRRlcmUQW3lXB5NUaCzPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=HZR9Cz4d; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4a44b3526e6so55986491cf.0
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:06:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1750694801; x=1751299601; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ktC6cfOVZ/76Z0Ijy6OOpcQ17JdhB2dNNAa6r8b5k90=;
+        b=HZR9Cz4dpBF6zvt6bbVFA/8QW+qOjnBv3pj+SgGnlEerrAmoSn1JrfXxWlLHAA2Ogs
+         Lr2pzCKYHLt5GwFCBh201FMKxDBjqofdtwJLOnl+wdgGfRauyg3Ucc49hB1dusnp/RBh
+         pOeDEW5iN9rkXSDGaeNH1po0ohysR3fqh6fLaofVHr5Jcw86OpaR5xXh3jbXAak81GaF
+         oDzn3c5NsiMt2zrtuz+JymjMXYXPwssnzrj3Gb9UiW2EhvinEKCcPrWUZ54VPNPxjz6c
+         OupEzcCi9HswQdllA0QIVvzV51HvsbYyk2KyxECpepv4uoKU4dmbE8aMgRWbn00mFOUz
+         x+EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750694801; x=1751299601;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ktC6cfOVZ/76Z0Ijy6OOpcQ17JdhB2dNNAa6r8b5k90=;
+        b=s3ENIbBCMabxHmSvQMbG+6qBaicwhT3DGt/NyKJOKtsa/vFQNr3bMxy9f4xQ3+Yn9z
+         juyQ7/iraWf87Jqf1joj+Se8/+OP2tI8gEG00sZviG8fmDf5AV29g6Zc7etiYz1NjPX/
+         3BLjqaj0MCxj/mO1uhMBF/hs9sSeYMau4O/0vNtjwu8fdTh2g5Q1/QjLQJoe0El3ZBDd
+         zMDClrcF+nN9EyTTjI63Wbpj/OBdHgZ4N2bHe4cgYxwGSIqfdTagB+4od33DUCmIEYbS
+         xgz3JxlMC30mMJp3rY80qR5o+KrkaZNpjxyrhNJJpXb7u2O+HR9XmGnCxBWjhCRzED2L
+         wK+Q==
+X-Gm-Message-State: AOJu0YyEUU1F6oq3ShlkyGzK/PDyum6OaRes+IixFlLP/rBlmRZt7xdr
+	0Cqq5lYddfrWIDN+s1gaJ0e4rKZud5mW15xAiOwvKVXIlgdfg32qdk/MYBHNUTv5pfC6AeksxKO
+	1mLeB
+X-Gm-Gg: ASbGncv1fIRi/WZYvQL8J8qo/CrMeTNdCU3GBUHusho6ZHQ0K22I+Eo0DW5thoUylKx
+	1sjj/aTnrMyvOpg8nX1WVVdBt2SrhLzoIaApdXNIZrDlIiu4yTr92HnourJo94b6AA+AtQ9mKnj
+	B9oyarNarObzpao8mlnSXkW+GZF1EaelpK9d0998CoynfiHWtRBcxbIcu4x47vCgIhuFQmw2ldA
+	+f+uX3z4Qm+nKk5lFR5GN1vVpBl+mtcrl3lsSNDX9F4u6NOEvsvPnyspEtIvqW2kTAJmYvXh8YE
+	NJ2Kym0m2Yv+28lbYeswyKyBzmlSEW6JbE6pdSacETPInUkbbAk=
+X-Google-Smtp-Source: AGHT+IGoR8ANNdKqeXSB6QUjUR7YL2sWmX6fZq3ocRFUEgh9F0Tx0iW7Wm2+7Ic1YaQV1+hJP8HI+A==
+X-Received: by 2002:a05:620a:319b:b0:7d3:9ba1:a044 with SMTP id af79cd13be357-7d3f9923097mr1677605985a.33.1750694801144;
+        Mon, 23 Jun 2025 09:06:41 -0700 (PDT)
+Received: from debian.debian ([2a09:bac5:7a49:1cd2::2df:3a])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3ffdb190esm349258785a.86.2025.06.23.09.06.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 09:06:40 -0700 (PDT)
+Date: Mon, 23 Jun 2025 09:06:38 -0700
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, kernel-team@cloudflare.com
+Subject: [PATCH net] bnxt: properly flush XDP redirect lists
+Message-ID: <aFl7jpCNzscumuN2@debian.debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250623-byeword-update-v2-20-cf1fc08a2e1f@collabora.com>
-References: <20250623-byeword-update-v2-0-cf1fc08a2e1f@collabora.com>
-In-Reply-To: <20250623-byeword-update-v2-0-cf1fc08a2e1f@collabora.com>
-To: Yury Norov <yury.norov@gmail.com>, 
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
- Jaehoon Chung <jh80.chung@samsung.com>, 
- Ulf Hansson <ulf.hansson@linaro.org>, Heiko Stuebner <heiko@sntech.de>, 
- Shreeya Patel <shreeya.patel@collabora.com>, 
- Mauro Carvalho Chehab <mchehab@kernel.org>, 
- Sandy Huang <hjc@rock-chips.com>, Andy Yan <andy.yan@rock-chips.com>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
- Nicolas Frattaroli <frattaroli.nicolas@gmail.com>, 
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Shawn Lin <shawn.lin@rock-chips.com>, 
- Lorenzo Pieralisi <lpieralisi@kernel.org>, 
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
- Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>, 
- Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>, 
- MyungJoo Ham <myungjoo.ham@samsung.com>, 
- Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>, 
- Michael Turquette <mturquette@baylibre.com>, 
- Stephen Boyd <sboyd@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-Cc: kernel@collabora.com, linux-kernel@vger.kernel.org, 
- linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org, 
- linux-sound@vger.kernel.org, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org, 
- linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev, 
- Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The era of hand-rolled HIWORD_UPDATE macros is over, at least for those
-drivers that use constant masks.
+We encountered following crash when testing a XDP_REDIRECT feature
+in production:
 
-The Rockchip PCIe PHY driver, used on the RK3399, has its own definition
-of HIWORD_UPDATE.
+[56251.579676] list_add corruption. next->prev should be prev (ffff93120dd40f30), but was ffffb301ef3a6740. (next=ffff93120dd
+40f30).
+[56251.601413] ------------[ cut here ]------------
+[56251.611357] kernel BUG at lib/list_debug.c:29!
+[56251.621082] Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[56251.632073] CPU: 111 UID: 0 PID: 0 Comm: swapper/111 Kdump: loaded Tainted: P           O       6.12.33-cloudflare-2025.6.
+3 #1
+[56251.653155] Tainted: [P]=PROPRIETARY_MODULE, [O]=OOT_MODULE
+[56251.663877] Hardware name: MiTAC GC68B-B8032-G11P6-GPU/S8032GM-HE-CFR, BIOS V7.020.B10-sig 01/22/2025
+[56251.682626] RIP: 0010:__list_add_valid_or_report+0x4b/0xa0
+[56251.693203] Code: 0e 48 c7 c7 68 e7 d9 97 e8 42 16 fe ff 0f 0b 48 8b 52 08 48 39 c2 74 14 48 89 f1 48 c7 c7 90 e7 d9 97 48
+ 89 c6 e8 25 16 fe ff <0f> 0b 4c 8b 02 49 39 f0 74 14 48 89 d1 48 c7 c7 e8 e7 d9 97 4c 89
+[56251.725811] RSP: 0018:ffff93120dd40b80 EFLAGS: 00010246
+[56251.736094] RAX: 0000000000000075 RBX: ffffb301e6bba9d8 RCX: 0000000000000000
+[56251.748260] RDX: 0000000000000000 RSI: ffff9149afda0b80 RDI: ffff9149afda0b80
+[56251.760349] RBP: ffff9131e49c8000 R08: 0000000000000000 R09: ffff93120dd40a18
+[56251.772382] R10: ffff9159cf2ce1a8 R11: 0000000000000003 R12: ffff911a80850000
+[56251.784364] R13: ffff93120fbc7000 R14: 0000000000000010 R15: ffff9139e7510e40
+[56251.796278] FS:  0000000000000000(0000) GS:ffff9149afd80000(0000) knlGS:0000000000000000
+[56251.809133] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[56251.819561] CR2: 00007f5e85e6f300 CR3: 00000038b85e2006 CR4: 0000000000770ef0
+[56251.831365] PKRU: 55555554
+[56251.838653] Call Trace:
+[56251.845560]  <IRQ>
+[56251.851943]  cpu_map_enqueue.cold+0x5/0xa
+[56251.860243]  xdp_do_redirect+0x2d9/0x480
+[56251.868388]  bnxt_rx_xdp+0x1d8/0x4c0 [bnxt_en]
+[56251.877028]  bnxt_rx_pkt+0x5f7/0x19b0 [bnxt_en]
+[56251.885665]  ? cpu_max_write+0x1e/0x100
+[56251.893510]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56251.902276]  __bnxt_poll_work+0x190/0x340 [bnxt_en]
+[56251.911058]  bnxt_poll+0xab/0x1b0 [bnxt_en]
+[56251.919041]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56251.927568]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56251.935958]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56251.944250]  __napi_poll+0x2b/0x160
+[56251.951155]  bpf_trampoline_6442548651+0x79/0x123
+[56251.959262]  __napi_poll+0x5/0x160
+[56251.966037]  net_rx_action+0x3d2/0x880
+[56251.973133]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56251.981265]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56251.989262]  ? __hrtimer_run_queues+0x162/0x2a0
+[56251.996967]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56252.004875]  ? srso_alias_return_thunk+0x5/0xfbef5
+[56252.012673]  ? bnxt_msix+0x62/0x70 [bnxt_en]
+[56252.019903]  handle_softirqs+0xcf/0x270
+[56252.026650]  irq_exit_rcu+0x67/0x90
+[56252.032933]  common_interrupt+0x85/0xa0
+[56252.039498]  </IRQ>
+[56252.044246]  <TASK>
+[56252.048935]  asm_common_interrupt+0x26/0x40
+[56252.055727] RIP: 0010:cpuidle_enter_state+0xb8/0x420
+[56252.063305] Code: dc 01 00 00 e8 f9 79 3b ff e8 64 f7 ff ff 49 89 c5 0f 1f 44 00 00 31 ff e8 a5 32 3a ff 45 84 ff 0f 85 ae
+ 01 00 00 fb 45 85 f6 <0f> 88 88 01 00 00 48 8b 04 24 49 63 ce 4c 89 ea 48 6b f1 68 48 29
+[56252.088911] RSP: 0018:ffff93120c97fe98 EFLAGS: 00000202
+[56252.096912] RAX: ffff9149afd80000 RBX: ffff9141d3a72800 RCX: 0000000000000000
+[56252.106844] RDX: 00003329176c6b98 RSI: ffffffe36db3fdc7 RDI: 0000000000000000
+[56252.116733] RBP: 0000000000000002 R08: 0000000000000002 R09: 000000000000004e
+[56252.126652] R10: ffff9149afdb30c4 R11: 071c71c71c71c71c R12: ffffffff985ff860
+[56252.136637] R13: 00003329176c6b98 R14: 0000000000000002 R15: 0000000000000000
+[56252.146667]  ? cpuidle_enter_state+0xab/0x420
+[56252.153909]  cpuidle_enter+0x2d/0x40
+[56252.160360]  do_idle+0x176/0x1c0
+[56252.166456]  cpu_startup_entry+0x29/0x30
+[56252.173248]  start_secondary+0xf7/0x100
+[56252.179941]  common_startup_64+0x13e/0x141
+[56252.186886]  </TASK>
 
-Remove it, and replace instances of it with hw_bitfield.h's
-FIELD_PREP_WM16. To achieve this, some mask defines are reshuffled, as
-FIELD_PREP_WM16 uses the mask as both the mask of bits to write and to
-derive the shift amount from in order to shift the value.
+From the crash dump, we found that the cpu_map_flush_list inside
+redirect info is partially corrupted: its list_head->next points to
+itself, but list_head->prev points to a valid list of unflushed bq
+entries.
 
-In order to ensure that the mask is always a constant, the inst->index
-shift is performed after the FIELD_PREP_WM16, as this is a runtime
-value.
+This turned out to be a result of missed XDP flush on redirect lists. By
+digging in the actual source code, we found that
+commit 7f0a168b0441 ("bnxt_en: Add completion ring pointer in TX and RX
+ring structures") incorrectly overwrites the event mask for XDP_REDIRECT
+in bnxt_rx_xdp. We can stably reproduce this crash by returning XDP_TX
+and XDP_REDIRECT randomly for incoming packets in a naive XDP program.
+Properly propagate the XDP_REDIRECT events back fixes the crash.
 
-From this, we gain compile-time error checking, and in my humble opinion
-nicer code, as well as a single definition of this macro across the
-entire codebase to aid in code comprehension.
-
-Tested on a RK3399 ROCKPro64, where PCIe still works as expected when
-accessing an NVMe drive.
-
-Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Fixes: 7f0a168b0441 ("bnxt_en: Add completion ring pointer in TX and RX ring structures")
+Tested-by: Andrew Rzeznik <arzeznik@cloudflare.com>
+Signed-off-by: Yan Zhai <yan@cloudflare.com>
 ---
- drivers/phy/rockchip/phy-rockchip-pcie.c | 72 ++++++++++----------------------
- 1 file changed, 21 insertions(+), 51 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/phy/rockchip/phy-rockchip-pcie.c b/drivers/phy/rockchip/phy-rockchip-pcie.c
-index bd44af36c67a5a504801275c1b0384d373fe7ec7..d7f994c3bcdf93faffd5c04ed4d0f9d29eaf43cc 100644
---- a/drivers/phy/rockchip/phy-rockchip-pcie.c
-+++ b/drivers/phy/rockchip/phy-rockchip-pcie.c
-@@ -8,6 +8,7 @@
- 
- #include <linux/clk.h>
- #include <linux/delay.h>
-+#include <linux/hw_bitfield.h>
- #include <linux/io.h>
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
-@@ -18,23 +19,14 @@
- #include <linux/regmap.h>
- #include <linux/reset.h>
- 
--/*
-- * The higher 16-bit of this register is used for write protection
-- * only if BIT(x + 16) set to 1 the BIT(x) can be written.
-- */
--#define HIWORD_UPDATE(val, mask, shift) \
--		((val) << (shift) | (mask) << ((shift) + 16))
- 
- #define PHY_MAX_LANE_NUM      4
--#define PHY_CFG_DATA_SHIFT    7
--#define PHY_CFG_ADDR_SHIFT    1
--#define PHY_CFG_DATA_MASK     0xf
--#define PHY_CFG_ADDR_MASK     0x3f
--#define PHY_CFG_RD_MASK       0x3ff
-+#define PHY_CFG_DATA_MASK     GENMASK(10, 7)
-+#define PHY_CFG_ADDR_MASK     GENMASK(6, 1)
-+#define PHY_CFG_RD_MASK       GENMASK(9, 0)
- #define PHY_CFG_WR_ENABLE     1
- #define PHY_CFG_WR_DISABLE    1
--#define PHY_CFG_WR_SHIFT      0
--#define PHY_CFG_WR_MASK       1
-+#define PHY_CFG_WR_MASK       BIT(0)
- #define PHY_CFG_PLL_LOCK      0x10
- #define PHY_CFG_CLK_TEST      0x10
- #define PHY_CFG_CLK_SCC       0x12
-@@ -49,11 +41,7 @@
- #define PHY_LANE_RX_DET_SHIFT 11
- #define PHY_LANE_RX_DET_TH    0x1
- #define PHY_LANE_IDLE_OFF     0x1
--#define PHY_LANE_IDLE_MASK    0x1
--#define PHY_LANE_IDLE_A_SHIFT 3
--#define PHY_LANE_IDLE_B_SHIFT 4
--#define PHY_LANE_IDLE_C_SHIFT 5
--#define PHY_LANE_IDLE_D_SHIFT 6
-+#define PHY_LANE_IDLE_MASK    BIT(3)
- 
- struct rockchip_pcie_data {
- 	unsigned int pcie_conf;
-@@ -100,22 +88,14 @@ static inline void phy_wr_cfg(struct rockchip_pcie_phy *rk_phy,
- 			      u32 addr, u32 data)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 2cb3185c442c..ae89a981e052 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -2989,6 +2989,7 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
  {
- 	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
--		     HIWORD_UPDATE(data,
--				   PHY_CFG_DATA_MASK,
--				   PHY_CFG_DATA_SHIFT) |
--		     HIWORD_UPDATE(addr,
--				   PHY_CFG_ADDR_MASK,
--				   PHY_CFG_ADDR_SHIFT));
-+		     FIELD_PREP_WM16(PHY_CFG_DATA_MASK, data) |
-+		     FIELD_PREP_WM16(PHY_CFG_ADDR_MASK, addr));
- 	udelay(1);
- 	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
--		     HIWORD_UPDATE(PHY_CFG_WR_ENABLE,
--				   PHY_CFG_WR_MASK,
--				   PHY_CFG_WR_SHIFT));
-+		     FIELD_PREP_WM16(PHY_CFG_WR_MASK, PHY_CFG_WR_ENABLE));
- 	udelay(1);
- 	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
--		     HIWORD_UPDATE(PHY_CFG_WR_DISABLE,
--				   PHY_CFG_WR_MASK,
--				   PHY_CFG_WR_SHIFT));
-+		     FIELD_PREP_WM16(PHY_CFG_WR_MASK, PHY_CFG_WR_DISABLE));
- }
- 
- static int rockchip_pcie_phy_power_off(struct phy *phy)
-@@ -126,11 +106,9 @@ static int rockchip_pcie_phy_power_off(struct phy *phy)
- 
- 	guard(mutex)(&rk_phy->pcie_mutex);
- 
--	regmap_write(rk_phy->reg_base,
--		     rk_phy->phy_data->pcie_laneoff,
--		     HIWORD_UPDATE(PHY_LANE_IDLE_OFF,
--				   PHY_LANE_IDLE_MASK,
--				   PHY_LANE_IDLE_A_SHIFT + inst->index));
-+	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_laneoff,
-+		     FIELD_PREP_WM16(PHY_LANE_IDLE_MASK,
-+				     PHY_LANE_IDLE_OFF) << inst->index);
- 
- 	if (--rk_phy->pwr_cnt) {
- 		return 0;
-@@ -140,11 +118,9 @@ static int rockchip_pcie_phy_power_off(struct phy *phy)
- 	if (err) {
- 		dev_err(&phy->dev, "assert phy_rst err %d\n", err);
- 		rk_phy->pwr_cnt++;
--		regmap_write(rk_phy->reg_base,
--			     rk_phy->phy_data->pcie_laneoff,
--			     HIWORD_UPDATE(!PHY_LANE_IDLE_OFF,
--					   PHY_LANE_IDLE_MASK,
--					   PHY_LANE_IDLE_A_SHIFT + inst->index));
-+		regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_laneoff,
-+			     FIELD_PREP_WM16(PHY_LANE_IDLE_MASK,
-+					     !PHY_LANE_IDLE_OFF) << inst->index);
- 		return err;
+ 	struct bnxt_napi *bnapi = cpr->bnapi;
+ 	u32 raw_cons = cpr->cp_raw_cons;
++	bool flush_xdp = false;
+ 	u32 cons;
+ 	int rx_pkts = 0;
+ 	u8 event = 0;
+@@ -3042,6 +3043,8 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 			else
+ 				rc = bnxt_force_rx_discard(bp, cpr, &raw_cons,
+ 							   &event);
++			if (event & BNXT_REDIRECT_EVENT)
++				flush_xdp = true;
+ 			if (likely(rc >= 0))
+ 				rx_pkts += rc;
+ 			/* Increment rx_pkts when rc is -ENOMEM to count towards
+@@ -3066,7 +3069,7 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 		}
  	}
  
-@@ -172,15 +148,11 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
+-	if (event & BNXT_REDIRECT_EVENT) {
++	if (flush_xdp) {
+ 		xdp_do_flush();
+ 		event &= ~BNXT_REDIRECT_EVENT;
  	}
- 
- 	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
--		     HIWORD_UPDATE(PHY_CFG_PLL_LOCK,
--				   PHY_CFG_ADDR_MASK,
--				   PHY_CFG_ADDR_SHIFT));
-+		     FIELD_PREP_WM16(PHY_CFG_ADDR_MASK, PHY_CFG_PLL_LOCK));
- 
--	regmap_write(rk_phy->reg_base,
--		     rk_phy->phy_data->pcie_laneoff,
--		     HIWORD_UPDATE(!PHY_LANE_IDLE_OFF,
--				   PHY_LANE_IDLE_MASK,
--				   PHY_LANE_IDLE_A_SHIFT + inst->index));
-+	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_laneoff,
-+		     FIELD_PREP_WM16(PHY_LANE_IDLE_MASK,
-+				     !PHY_LANE_IDLE_OFF) << inst->index);
- 
- 	/*
- 	 * No documented timeout value for phy operation below,
-@@ -211,9 +183,7 @@ static int rockchip_pcie_phy_power_on(struct phy *phy)
- 	}
- 
- 	regmap_write(rk_phy->reg_base, rk_phy->phy_data->pcie_conf,
--		     HIWORD_UPDATE(PHY_CFG_PLL_LOCK,
--				   PHY_CFG_ADDR_MASK,
--				   PHY_CFG_ADDR_SHIFT));
-+		     FIELD_PREP_WM16(PHY_CFG_ADDR_MASK, PHY_CFG_PLL_LOCK));
- 
- 	err = regmap_read_poll_timeout(rk_phy->reg_base,
- 				       rk_phy->phy_data->pcie_status,
-
 -- 
-2.50.0
+2.39.5
+
 
 
