@@ -1,169 +1,124 @@
-Return-Path: <netdev+bounces-200411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0B7AE4E3E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 22:42:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A84FFAE51A6
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AC9716F923
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:42:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 455BF4A421D
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 21:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAD92D4B68;
-	Mon, 23 Jun 2025 20:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4FD221DA8;
+	Mon, 23 Jun 2025 21:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qXagPcDh";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0vdI0TFH";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rurNs5Ir";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+lNGULlY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aHbbmyMp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B790F1AF0C8
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 20:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FD21EE7C6;
+	Mon, 23 Jun 2025 21:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750711334; cv=none; b=MCby5tkBbajmCeBBjpOHO0JdxvqZ/siYVqCHjscyqKIh7Equ99zs91w/8LUapWyRK4orAHCZSijy+ske+CRnuwslqFYgxm63WKBkCtyWbDhRQ96wLeAq74uTQ4kI/qLrO/DO7sTbDaDF8yVJ8+Dpns93Q4m2KHyDKxmp0pmT2uc=
+	t=1750714569; cv=none; b=gPv5+okPuZOPQ4f0l7xGHo6ZL9vUoRHilrXLW1694yv4kWj/LBTttkXW6GceX/2SaRvX8AhvYsOXOQLgmC5sUvCJVS/lkfopwBAL71SRrVmSnvyn5p+FQpJyMLjFrKumIorMwMpjweaHm93mVoToN5D7uEKh0GMrOouCkeXSwsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750711334; c=relaxed/simple;
-	bh=DUhuJX457SlDCZfbJTQDvsk+ugu1GqD7aSe/uczWkco=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=lTtvTNAUiVViRgvc6q3wFXe7MbeTdYa3Sq47QkT4b4/PhyAucy9BqennoiPF0B73mbJYu6Brk16YdMf/QRZK/5BzJGktKmJH7GKgF4hPmTe/hd8xj4BiiafT3mn/IjyPmtxIMOwp9KtJQ7lCWWb9Yxm0bQP/m93d/DyYtsiax/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qXagPcDh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0vdI0TFH; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rurNs5Ir; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+lNGULlY; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8968521193
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 20:42:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750711330; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=AVyVU8THF0q2R4VtYxq3FCNYX5F7MxUaMvjbxaYD4qo=;
-	b=qXagPcDhGS+tRwf71ORmo/J1m39KmtmFektQFJQjUcECXV/Yf1i2sEd47l3mP/VSFWAnT0
-	RaFAJEIl5J9bFY/UOdaaecMb9F2b5rBpYhzMnZy1PMX14lgnJY1fAbtulL2D5zD9uwcCxr
-	Kfg24Y7gmOHowqrHkwjcP4c1jAIEHvk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750711330;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=AVyVU8THF0q2R4VtYxq3FCNYX5F7MxUaMvjbxaYD4qo=;
-	b=0vdI0TFHDe2zUBVDuhMuzzNVIyWcoQDz1UD8BCmbjPk3gWmZGkU/ia7Hyv/QSwEToLtsPl
-	wJQeH0g88M7yVQAQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750711329; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=AVyVU8THF0q2R4VtYxq3FCNYX5F7MxUaMvjbxaYD4qo=;
-	b=rurNs5IrKK8P4JzInmBcEXz1hucIlTFMHvP/juVpjEAdCm36ReVD4MfB4zpjE3iI3Xq0Rz
-	v077bpeX5Iqx+wX2m3bMmyjq9QnqPQ0a8zpGPOeKFvDnS+QNW00Qmnnw/tJTEfhkL+ghrE
-	Uv0UzNVtOVEt5USexTZPRaNxBHquaiE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750711329;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=AVyVU8THF0q2R4VtYxq3FCNYX5F7MxUaMvjbxaYD4qo=;
-	b=+lNGULlY3tC0kENiUbGbyNuWsk2xvh/0ikeN1W7E2XuM1d5F4UkuaWoSkxxNNUScq2sBBi
-	eCJgKSp2fcrCiEBQ==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 56FB620057; Mon, 23 Jun 2025 22:42:09 +0200 (CEST)
-Date: Mon, 23 Jun 2025 22:42:09 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: netdev@vger.kernel.org
-Subject: ethtool 6.15 and 6.14.1 released
-Message-ID: <53ar6jo4o3aqufvceluca5gog7ivyksmkufctbjdl44vxg6nrt@5amixo26fjg6>
+	s=arc-20240116; t=1750714569; c=relaxed/simple;
+	bh=Aw4MZgbZviawTlhAbSDsi4MtaIZ1gTx176KNLzCFznc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CwgTODEFgBn9eHtaWl/hdws49v9YF7SJwWAanLVWXUoD06GWE4f7ZhSdiBQEt23PJweJCKniyvSxv+6cIQyOTmYK7ix3j+ELVEmlqyE72WSz23w2vMDK0aSRwHt0V57PEz6XaVoZV4Xhkr6aiP9PXzu7NcMYwbTBj41rsnLkRJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aHbbmyMp; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2352400344aso48730435ad.2;
+        Mon, 23 Jun 2025 14:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750714567; x=1751319367; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O1KlgyZYwrm92QHQMmBy3svmxDS6vWE27wFXurZB5Pg=;
+        b=aHbbmyMp8j50Vinrh68rZwueBAOoKN8IAKZPPjfB0/wrOufoAN15gee+jzrf8z3XS2
+         W1PrIpiAnphUKK5K+HEoQOKtWojBk4UhjAlFOk2rP8A62j1vQFZIp3bCll5JsVz8XhaW
+         ypteekShHuUEyXaUOYXWlgDlRw+E5tdUogz2dN/INxI8yeGcY7eD2T3DmSJ758wn7y9K
+         45d+PVymO/W3BAsbNSOI9RlTS5jkAnxlm2PgcpLRbmJNGuaEb5Y7tlcpNydDGa2ytHVa
+         bXmydh/mFQjytn8WXOt3ynLVfvWjqrUJVTI/ovGMyawHqoTTHMwX9C2j0HCzcX1ENfgy
+         JgCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750714567; x=1751319367;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O1KlgyZYwrm92QHQMmBy3svmxDS6vWE27wFXurZB5Pg=;
+        b=RCOiD+NdmbLrbaw3D779B6vx0mT7igu0V3n0oVTmsjh33K1OBmfz4KchH8YugY9Q+Z
+         Yh0C9iHc9/TNuJQ/aDYF1j7euM6cCuO/mhWFOvmeFpl0O8BEXhbfFgm4R1LNPfI0/LHC
+         fbng8ZmeSo/d8oMfr7IwL8t3yDffwCMIkxW7p2AJdwU1LNgaUCdsDDWuvHhGWKZ1lIZX
+         htn9IDEiV4JwuxZot0NZhpKIegtJGYeZ+KBYwuX6lz/VJnslSaSVbMXD0zAHDO+fCbV9
+         R9ki0Y1eRB94m52spnJR4CTJHIy3yBRgOtcT/1rWp+6Tq+y2eNoI7jyTf0zgi+tj+RE6
+         angw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkMqsmB0pV9uv+Akb4ROKN0m+YIgDaeLNRNTcMncdNVaQJJILMkycjrbrOp13KkrmUR50=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9elKhTKZdzCKgF+U0kq7q/nkXUOozF0BwHt/E71Jwd9zXVSQX
+	3+F8ogGbWO+2ySFL/u6fOmNsgkYz8nuiiplpSmhzPZ0A4vzEPUv8Wxk9mrVo
+X-Gm-Gg: ASbGncvkhHIvLEIxRzPXA95tiqJtck6davwmgX9A8y50DTK/zyl0RbwrYmLqxEQR3MK
+	FJz3Wi0Bx1h1cUJ5iNDW2n7sIu/XnCuv71NfQmvJ6Fz9lNj+0rfkJUItiVbtESZKR8NPxxRbxLo
+	ahJZke72FO4kHgmQAANatf3uJhEl8ZzkdfDsln7ogxxMR7h66mi+j+0VagGERVRqP92Ya7YAywe
+	hyD9jMgxH94wqNlyVJGdvMIK3lkIXduD4IMFqQm0u/RLwTKIXYzVIDZaUgFfVQNdCUAlKkllQsh
+	YsYG/Gy+hLdKcnteoqEEuOzuwkJ9qFB4IWHJmeWnr2O0e5wTK+nDws01wKGbg+/PXOK+783mvP1
+	AXD28MOOcX2HduEa8H9PffWCZwE47EANYHw==
+X-Google-Smtp-Source: AGHT+IECNlW7E+momRCx49jAdehO6Fk6p2Rk1P5OPPKw0GAyUnHQy8GRD7A8JQ3aNmXK/G0PRT/Jug==
+X-Received: by 2002:a17:903:4b27:b0:223:653e:eb09 with SMTP id d9443c01a7336-237d97c7f5dmr211626575ad.7.1750714566964;
+        Mon, 23 Jun 2025 14:36:06 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237f5c7f4f3sm39010285ad.198.2025.06.23.14.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 14:36:06 -0700 (PDT)
+Date: Mon, 23 Jun 2025 14:36:05 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jordan Rife <jordan@jrife.io>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [RESEND PATCH v2 bpf-next 02/12] bpf: tcp: Make sure iter->batch
+ always contains a full bucket snapshot
+Message-ID: <aFnIxcsROSNowexy@mini-arch>
+References: <20250618162545.15633-1-jordan@jrife.io>
+ <20250618162545.15633-3-jordan@jrife.io>
+ <aFMJHoasszw3x2kX@mini-arch>
+ <CABi4-ohShEVsXfNhMBHqsBFJ4NQUP9zq_Pq26WvFNohjoWFj9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="s74bu5lxx5ncbrj7"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Spam-Flag: NO
-X-Spam-Score: -5.71
-X-Spamd-Result: default: False [-5.71 / 50.00];
-	BAYES_HAM(-2.81)[99.16%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCPT_COUNT_ONE(0.00)[1];
-	MISSING_XM_UA(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_NONE(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lion.mk-sys.cz:helo]
-X-Spam-Level: 
+In-Reply-To: <CABi4-ohShEVsXfNhMBHqsBFJ4NQUP9zq_Pq26WvFNohjoWFj9g@mail.gmail.com>
 
+On 06/23, Jordan Rife wrote:
+> > Untested code to illustrate the idea below. Any reason it won't work?
+> 
+> In theory, I like the idea of unrolling the code a bit here to make
+> the flow more clear (and to make it clear what's happening to the
+> locks!). IIRC there was some reason this was hard, but I will think
+> about it a bit again.
+> 
+> I also want to make sure things stay relatively consistent between the
+> UDP and TCP socket iterator code structure. The UDP socket iterators
+> already do the `goto fill_batch` and `goto again` thing, which is
+> where I borrowed this from. If we end up diverging here, I'd want to
+> go back and update the UDP code as well.
+> 
+> Thanks for the suggestion. I'll take a closer look a bit later and see
+> if I can work this in. In the meantime, hopefully Martin can chime in
+> as well. We went back and forth on the code structure quite a bit in
+> the patch series for UDP socket iterators, so he might have some
+> opinions here.
 
---s74bu5lxx5ncbrj7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hello,
-
-ethtool 6.15 has been released.
-
-Home page: https://www.kernel.org/pub/software/network/ethtool/
-Download link:
-https://www.kernel.org/pub/software/network/ethtool/ethtool-6.15.tar.xz
-
-Release notes:
-	* Feature: support OR-XOR symmetric RSS hash type (-x/-X)
-	* Feature: dump registers for hibmcge driver (-d)
-	* Feature: configure header-data split threshold (-g/-G)
-	* Feature: dump registers for fbnic driver (-d)
-	* Feature: JSON output for channels info (-l)
-	* Fix: incorrect data in appstream metainfo XML
-	* Fix: prevent potential null pointer dereferences
-	* Fix: more consistent and better parseable per lane signal info (-d)
-
-A fix only 6.14.1 release is also available. The primary reason is that
-6.15 changes part of JSON output of "ethtool -d" introduced in 6.14 in
-a backward incompatible way. As it was done for good reasons, 6.14.1 was
-released to make it easier for distributions based on 6.14 to adopt this
-change as well. This release also adds few minor fixes.
-
-Download link:
-https://www.kernel.org/pub/software/network/ethtool/ethtool-6.14.1.tar.xz
-
-Release notes:
-	* Fix: incorrect data in appstream metainfo XML
-	* Fix: prevent potential null pointer dereferences
-	* Fix: more consistent and better parseable per lane signal info (-d)
-
-Michal
-
-
---s74bu5lxx5ncbrj7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmhZvBwACgkQ538sG/LR
-dpX16AgAgzPg510Dqftb7I8l41+KPHeh3F8KojnLbat7tKBxMc5eUyFEPBI/KYdj
-6doee57Q8+dwl8yatrvUl0bVn038IXMpbw4d3NV9HeRFLmLcvZdJT12nujFPIVgt
-L4KYAb9rHgT0AoDOAV/tGh1VJP2y36cIfU8mQPIstdV3TexVYC7w/pqkNOxl6vbW
-5/qHiTioKZmcoyGIc6xUtQy5cEogGjBrwxhy6qKdv0ARc9768ihlKNNsyxoFNJCB
-iGp/bue/m4kdLX31ByHE446SD3giXeyAxFjWS0CJmb84AZNSnXgoUwWea6yDtOGo
-Ui/XbzQly973Klwgp+jXH95uAHKkCA==
-=ttEF
------END PGP SIGNATURE-----
-
---s74bu5lxx5ncbrj7--
+Martin is OOO so you'll have to wait a bit for his feedback.
+UDP iterator seems to be more low level to me (with explicit locking),
+so maybe all this non-unrolled retry logic there is justified, but
+I haven't looked too deep.
 
