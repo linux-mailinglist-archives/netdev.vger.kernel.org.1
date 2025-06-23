@@ -1,153 +1,111 @@
-Return-Path: <netdev+bounces-200364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA68AE4AB2
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:25:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47887AE4AB6
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13E44441446
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:22:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F022117BAF2
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1C629C352;
-	Mon, 23 Jun 2025 16:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE95A2BD59B;
+	Mon, 23 Jun 2025 16:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gvvWkioS"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ok289bH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E906275B18
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 16:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC8324BD0C;
+	Mon, 23 Jun 2025 16:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750695254; cv=none; b=A77UGAerT6yGvs98hG4E4GNQi9S/O5+FNfOl2r3N2oHbJbn+KU2x2Rdd2eikC0yV0x96UgObWlBtCg2gVuVP05IwuXkIaPzOfzLxj2mMGkLYrqAKgconL+LatXOBPpiEJCW3DvTWt7QNZOmAGdAPzoh+y1VvtXw1M1RmzAadRN4=
+	t=1750695408; cv=none; b=UfPiPC/LIbLOpziTqucZQYAuSj1tD+zaByfYpeShkCNaYqFNb5kd2xEYAPQfbioh0y9N5ED2QqSXEKt0Ajn1ukwis337KHdhfRgtkhkGgJ7rYt1NObE3dQkT3WHrJw1IYkeemIpx8M8L3//bIYWQ2DR9QJSDE1LmCNIVe/zbwcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750695254; c=relaxed/simple;
-	bh=Tz+moTFStFX1YX39jWCVWhxsp1nVbvbMEnciDuWFgg4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cmNr5t/F0NG47T3KJzIShM+n+pk0Hx8lDQwT3x4M8EyDcHbHIZmpG+jRxJbg02PCwX3B+UVir4NA52KHM0IBEPFZScsYYlffLyO/49Tf3fH1Zxy89W9xdHB6ildpAK1rVsRMuKWsywjjZvHN0G7U9N5urz1sapmVrvT4fuPxv5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gvvWkioS; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a58e0b26c4so79406381cf.3
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750695250; x=1751300050; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wN+RSCnSaEyeOJOV22jB+Ns6YfYfbuKVTQFf93dpJN8=;
-        b=gvvWkioSl67jjGr10PTQQbIlXYXFSOz+Z6BtomHgsf5xPkkU/kGiapFMoBfZUN+U+Z
-         PmKLO+iCoRzYV+tRxsXYCbrKhyAa1hdTqOH09Hl4u0xClAtggzbulu0ZRR7kzldIpDvE
-         IwUMIZ5OTZawrkly0Dh1AcIANi1TWz5FjW9vPINoUGfMEbsrcNdIS2XQQShLb/nxi2Mc
-         uUtzKrWqqLBNt14ACAOTgcBlZW5vSthVqcUdQXYPKfoMR8iTGATIR9MJO6l+HG2j3KFK
-         XadtpyQk6YSNilylWwOUrTJbFS10f/Icks5jOR77h3zDvY5TAiF+pkPNiPdYPAMCO+6I
-         7U8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750695250; x=1751300050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wN+RSCnSaEyeOJOV22jB+Ns6YfYfbuKVTQFf93dpJN8=;
-        b=lhvuncGSPJ1xTVpGLnXE9bycxcbZUkLGLbrgpyFTVopaj3F7h3BCZVGlnB5YgYTHY9
-         QWvzjUHyyoTPgfm/hSKmYHPgVG62CIws0FRzCgVms7woUv2hTMJplHYo3UMrsiqffNbt
-         afOJN3awsdIVrG6AbS6/sPanJ/rJoEikOBsJkPbz3ipw7cTSENO46wWG1NqCDGjyPJzi
-         7ivJ6T9EU1HM8D/eTA/nJvC9J3hL9ckEFFaZXBvLrna4KOtEUBrUOT+SnI3YhoserT/m
-         2sdX7mq1erLnPwaxDII3575TGGZ/+ZDkdvW0/4pP4ogJuUJQM/1o70+twDBTipVQvCAq
-         3PwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTbJSyj1JOGuP116AtwX/D8QZkfpQ3TVjrfhWFQVd6HIw3YsuWqooio+QOeMgol2E9gCXUvzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz20d99Zx0P1OqRAfQW81gLE/Aq0x1dsaSGQ9kD0Pojl9ddW6a3
-	GHRzx3Yh5ah3pxZEsC8ImV/hBO/oZYNgEFAkDhDCdSJP5UFMww6X4FCZd55f8jX5w0LcWKrK4vV
-	mK8wGA0C2kNh3sMaEtP7G8z1POKoWaZs+6TOzn8r0
-X-Gm-Gg: ASbGncuUTNGcA4CNpKQqTHrvl9abw48M2uuj3yXKUL7FbRvtLQaEkubo/P3tnU4gB6Z
-	rdI34VLIpa/LKfAvtJ10L7Ry+4Op1ptpdCZHYdzRHP7e02Oe25cgLsMd7q7UBv2hVgvzgHWWPqK
-	v776NmKg+CAcoqWdTDiYQyzcTnuRMDB1B+My8PeTlasWI=
-X-Google-Smtp-Source: AGHT+IEobn0And7X+FnotCoZ870DRkq0dQIwi5clxpS4xb+1xJRmqq200eOqBXI6G1dwNYsWyv6mWhZ2d1yR0qDuYeA=
-X-Received: by 2002:a05:622a:610e:b0:4a4:3a34:ee71 with SMTP id
- d75a77b69052e-4a77a2b6514mr178869141cf.29.1750695250190; Mon, 23 Jun 2025
- 09:14:10 -0700 (PDT)
+	s=arc-20240116; t=1750695408; c=relaxed/simple;
+	bh=Ur0XOriXT1WlSZ1k17YMUC/sCAmjE++EAq3Cer6GQKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SQzRvZOsNQpuoWaEi9foI7HWW4A6Xsl6Ez85WDe8YBvyf4QvJrlMobfZM7aS/AQ6qzFpLxlKczuf2NpIPv14+SgGwswP4nRMR3Xi2EAMg93Tcoz6MqrXXGy+biPH4WuKxDPhJsKMVcF72uNyVarVWxY4/punCwXi1lri3wSmdqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ok289bH4; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1750695407; x=1782231407;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Ur0XOriXT1WlSZ1k17YMUC/sCAmjE++EAq3Cer6GQKI=;
+  b=Ok289bH4Itw6AdHHfh18UBRJ/nhOL4CY/1loDg9Kf3CsAziBw36z6qRr
+   Q6Z+YwbOTvoVSHjhNheCmD6N2Dyx6BlxxYQKL4Zo3yXw/d2Wr2HX0ck3R
+   nt/Lf8+Rp6q8108nv8GAVK3BTLRzgAuoMxJ5gK2c0ZE89B3B7VPgkT0PZ
+   6AIGNpIbAGKCK4z4mNNuWddYSsBWGE0rn/cwEUE/4M2h00om2NFs8vf69
+   XjtWRx7ug5LHxa2eE6lSkmUuR7x4l4AzDkq5hy0tFwtcOolPLPyqOwfdG
+   gSdShPQSVHEMSDqx7raHsdm0hnxgwROH7J2xJe9y0d1yCZC2hhayTxER9
+   Q==;
+X-CSE-ConnectionGUID: YKKdZQvISxa431DUkbBFkA==
+X-CSE-MsgGUID: EAlSJYjtTEK2VZ7v+xC1Ag==
+X-IronPort-AV: E=Sophos;i="6.16,259,1744095600"; 
+   d="scan'208";a="43120166"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jun 2025 09:16:46 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 23 Jun 2025 09:16:37 -0700
+Received: from [10.10.179.162] (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Mon, 23 Jun 2025 09:16:37 -0700
+Message-ID: <0aa6c9a4-4a65-4b55-a180-92c795499384@microchip.com>
+Date: Mon, 23 Jun 2025 09:16:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250621193737.16593-1-chia-yu.chang@nokia-bell-labs.com> <20250621193737.16593-5-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250621193737.16593-5-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 23 Jun 2025 09:13:59 -0700
-X-Gm-Features: AX0GCFsz5JzbRrh0-kqOwf2TSk7Ef6ZqFtN_ZPJc01ldHoBLtqqmmWiHN33x0qI
-Message-ID: <CANn89iKLKzvkLkPY67286+dKC4fGS3VtP_YhL00BmS6-0yXKxQ@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 04/15] tcp: AccECN core
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
-	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
-	kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch, 
-	donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com, 
-	Olivier Tilmans <olivier.tilmans@nokia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Expose REFCLK for RMII and enable RMII
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
+	<claudiu.beznea@tuxon.dev>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <cover.1750346271.git.Ryan.Wanner@microchip.com>
+ <4b1f601d-7a65-4252-8f04-62b5a952c001@lunn.ch>
+From: Ryan Wanner <ryan.wanner@microchip.com>
+Content-Language: en-US
+In-Reply-To: <4b1f601d-7a65-4252-8f04-62b5a952c001@lunn.ch>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 21, 2025 at 12:37=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com=
-> wrote:
->
-> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
->
-> This change implements Accurate ECN without negotiation and
-> AccECN Option (that will be added by later changes). Based on
-> AccECN specifications:
->   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
->
-> Accurate ECN allows feeding back the number of CE (congestion
-> experienced) marks accurately to the sender in contrast to
-> RFC3168 ECN that can only signal one marks-seen-yes/no per RTT.
-> Congestion control algorithms can take advantage of the accurate
-> ECN information to fine-tune their congestion response to avoid
-> drastic rate reduction when only mild congestion is encountered.
->
-> With Accurate ECN, tp->received_ce (r.cep in AccECN spec) keeps
-> track of how many segments have arrived with a CE mark. Accurate
-> ECN uses ACE field (ECE, CWR, AE) to communicate the value back
-> to the sender which updates tp->delivered_ce (s.cep) based on the
-> feedback. This signalling channel is lossy when ACE field overflow
-> occurs.
->
-> Conservative strategy is selected here to deal with the ACE
-> overflow, however, some strategies using the AccECN option later
-> in the overall patchset mitigate against false overflows detected.
->
-> The ACE field values on the wire are offset by
-> TCP_ACCECN_CEP_INIT_OFFSET. Delivered_ce/received_ce count the
-> real CE marks rather than forcing all downstream users to adapt
-> to the wire offset.
->
-> This patch uses the first 1-byte hole and the last 4-byte hole of
-> the tcp_sock_write_txrx for 'received_ce_pending' and 'received_ce'.
-> Also, the group size of tcp_sock_write_txrx is increased from
-> 91 + 4 to 95 + 4 due to the new u32 received_ce member. Below are
-> the trimmed pahole outcomes before and after this patch.
->
+On 6/21/25 00:24, Andrew Lunn wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> 
+> On Thu, Jun 19, 2025 at 10:04:12AM -0700, Ryan.Wanner@microchip.com wrote:
+>> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+>>
+>> This set allows the REFCLK property to be exposed as a dt-property to
+>> properly reflect the correct RMII layout. RMII can take an external or
+>> internal provided REFCLK, since this is not SoC dependent but board
+>> dependent this must be exposed as a DT property for the macb driver.
+> 
+> What board is going to use this? Do you have a patch for a .dts file?
 
-> Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
-> Co-developed-by: Olivier Tilmans <olivier.tilmans@nokia.com>
-> Signed-off-by: Olivier Tilmans <olivier.tilmans@nokia.com>
-> Co-developed-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> ---
-> v9:
-> - Use tcp_data_ecn_check() to set TCP_ECN_SEE flag only for RFC3168 ECN
-> - Add comments about setting TCP_ECN_SEEN flag for RFC3168 and Accruate E=
-CN
+Our SAMA7D65_curiosity board has a connector that allows us to change
+ethernet phys. Since some of the phys we have provide their own REFCLK
+while others do not, this property needs to be added so we are able to
+use all of these.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+I do not have an exact .dts patch for this since our default is MPU
+provides the REFCLK, this property will be used with dt-overlays that
+match each phy that is connected.
+
+Ryan
+> 
+>         Andrew
+
 
