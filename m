@@ -1,95 +1,135 @@
-Return-Path: <netdev+bounces-200280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2526FAE4527
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:48:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B28AE4549
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CA7F7A3FEE
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 13:42:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BA6F18892C1
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 13:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89CB2472A2;
-	Mon, 23 Jun 2025 13:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFF8248F40;
+	Mon, 23 Jun 2025 13:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YB9MrurJ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HxtUApuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9285F4C6E
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 13:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E3A19CC3E;
+	Mon, 23 Jun 2025 13:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750686234; cv=none; b=LnF0ciak6X2E9vsGfRSicxx/VIMdYIvNRsmxgLtXI1jPdkyv/l9Chpi08Djs7hKjMqQOThSII29Xt7RHlInrasV42Hd0EQSfvpBEx3OnQNRGEAyZVJFcB7W59vHTFDNLuT6j7yjanLm+cMg+JuXKVA6Jx6+I0+gzxIynjm92AuU=
+	t=1750686414; cv=none; b=Q1QogrKFD72OadH/vyKqRS+Vhjqt2L7mnlnEFYF5mS/jVZTKV/WgdDziHMvtaMiNDM72XvaFKSaXL+VXnl6dAQRBbuoVlHzB15INt3N5aorDqHTiZDqXDD+nE6YAJuQ9/Y8r2tZWSEOS2SQkMwzEBeLcwPsGi/sv3opEvKpECuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750686234; c=relaxed/simple;
-	bh=58InhjZ/Xchsh2WLn7Skdn6Ru9MX59NMi5dTHwRNJGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eyhhHh5Od8k0XacKv7VupUruOsL3z8fSiT+pBVkQgJru7wWOT+yG7oD+PBbzITaokPraDuVqwlntLx3vG2xLge7PnZevS9wcbnUzcGSqSwWpj3wxiMYRH0AMnz5t0ZkfaGZXcUzSjLHlSmnAAR/osZ9gXHNPTcAIFwJkHlfkwj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YB9MrurJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B63E3C4CEF0;
-	Mon, 23 Jun 2025 13:43:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750686234;
-	bh=58InhjZ/Xchsh2WLn7Skdn6Ru9MX59NMi5dTHwRNJGw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YB9MrurJ/6mVs7/g1EFT4/Z1WIloDNAaDomdOOPJhzLI6SjZ3hO+4mSlWvzzy9+ij
-	 IgTFhAmxb0A2axqzvfUYU1Eqa/u5Ieyw+9LSMlkZLRlkPWQ3eV2Gs42Uy7XsZteTjA
-	 tpcOU4d+iBHxb5UF3j6yD4own6nlEkLf3/0t2o0prPNs6sYVbDZI/g/zzeohVy22Ic
-	 u2NB45nvttwqiOBQ4eVGrvnFk+lnJ1dvwBCSdbCOWtAT540tGVpU8CGVA+J61GYDU2
-	 rN5xWZJeh8sP6zyVQrf0plxqd666Gmth0Yhg3mOQfCp4I1jxufFhQAwQCxWqOZtiBn
-	 GvteOlKXptdSg==
-Date: Mon, 23 Jun 2025 06:43:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com,
- stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org
-Subject: Re: [PATCH net 2/2] selftests/tc-testing: Add tests for
- restrictions on netem duplication
-Message-ID: <20250623064353.2c3e6cd5@kernel.org>
-In-Reply-To: <20250622190344.446090-2-will@willsroot.io>
-References: <20250622190344.446090-1-will@willsroot.io>
-	<20250622190344.446090-2-will@willsroot.io>
+	s=arc-20240116; t=1750686414; c=relaxed/simple;
+	bh=EtRg/kLg8kdMEIk4JAQ1HIT9l876vGX3bDX3siYn1W8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=snNp+CJPTlnKj3dSHIyxXKJQWvWvwBfBhtdGOX7UKCMcrj7uGb5v/P61Agsc9+ip+fL/fLshHEPupOKlUhKhpyHd7tXZBRKhaZXG2x560ga/TT5lGR1XebjtoCODRXtxceMrMjqLuc6+NI0WIeyDCLWMSTS7b4oeuP2JSXYbM0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HxtUApuq; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ana0bJ8hg2451El2QUEf36H2FD1ZACNayjwsD6jvG/A=; b=HxtUApuqIxjQJ05HeYehUPlPmt
+	HblO84+kpcn33Jvf5y85M4E7ksoqHdRegguU2ClgTmVAzHOp9nOcma5AIOH1jXggvasOHWwly4zzn
+	60U7UYcz5apZggiJD5DyWdIETDnYoLq72uWAtgvLV7M8xnDkuhC2wKMs7uDamgf0SLdKhxPMsIqaD
+	pfejZy+sEDFFcEG8gP5OczwtZgk3RxHSAOZPDoeSOjy4+Fux1KdPIiVc1kz7aQSF/93akpKO2dk1P
+	ya4PbjJtM2pjpxDbzIlnELNWbjbhZnjC0QxRI6L0qJbx/pOHweI9dQE647dQ2vbHjbqkBZEYbMkbX
+	GfruIkCA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uThVX-00000002uw7-2IPu;
+	Mon, 23 Jun 2025 13:46:47 +0000
+Date: Mon, 23 Jun 2025 06:46:47 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: How to handle P2P DMA with only {physaddr,len} in bio_vec?
+Message-ID: <aFlaxwpKChYXFf8A@infradead.org>
+References: <2135907.1747061490@warthog.procyon.org.uk>
+ <1069540.1746202908@warthog.procyon.org.uk>
+ <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
+ <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
+ <1015189.1746187621@warthog.procyon.org.uk>
+ <1021352.1746193306@warthog.procyon.org.uk>
+ <1098395.1750675858@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1098395.1750675858@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sun, 22 Jun 2025 19:05:31 +0000 William Liu wrote:
-> Ensure that a duplicating netem cannot exist in a tree with other netems
-> in both qdisc addition and change. This is meant to prevent the soft
-> lockup and OOM loop scenario discussed in [1].
+Hi David,
 
-An existing test seems to be failing now, please adjust it:
+On Mon, Jun 23, 2025 at 11:50:58AM +0100, David Howells wrote:
+> What's the best way to manage this without having to go back to the page
+> struct for every DMA mapping we want to make?
 
-# -----> prepare stage *** Could not execute: "$TC qdisc add dev $DUMMY parent 1:2 handle 3:0 netem duplicate 100%"
-# 
-# -----> prepare stage *** Error message: "Error: netem: cannot mix duplicating netems with other netems in tree.
-# "
-# 
-# -----> prepare stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=19> *** stderr ***
-#   File "/nipa-data/kernel/tools/testing/selftests/tc-testing/./tdc.py", line 535, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/nipa-data/kernel/tools/testing/selftests/tc-testing/./tdc.py", line 419, in run_one_test
-#     prepare_env(tidx, args, pm, 'setup', "-----> prepare stage", tidx["setup"])
-#   File "/nipa-data/kernel/tools/testing/selftests/tc-testing/./tdc.py", line 267, in prepare_env
-#     raise PluginMgrTestFail(
--- 
-pw-bot: cr
+There isn't a very easy way.  Also because if you actually need to do
+peer to peer transfers, you right now absolutely need the page to find
+the pgmap that has the information on how to perform the peer to peer
+transfer.
+
+> Do we need to have
+> iov_extract_user_pages() note this in the bio_vec?
+> 
+> 	struct bio_vec {
+> 		physaddr_t	bv_base_addr;	/* 64-bits */
+> 		size_t		bv_len:56;	/* Maybe just u32 */
+> 		bool		p2pdma:1;	/* Region is involved in P2P */
+> 		unsigned int	spare:7;
+> 	};
+
+Having a flag in the bio_vec might be a way to shortcut the P2P or not
+decision a bit.  The downside is that without the flag, the bio_vec
+in the brave new page-less world would actually just be:
+
+	struct bio_vec {
+		phys_addr_t	bv_phys;
+		u32		bv_len;
+	} __packed;
+
+i.e. adding any more information would actually increase the size from
+12 bytes to 16 bytes for the usualy 64-bit phys_addr_t setups, and thus
+undo all the memory savings that this move would provide.
+
+Note that at least for the block layer the DMA mapping changes I'm about
+to send out again require each bio to be either non P2P or P2P to a
+specific device.  It might be worth to also extend this higher level
+limitation to other users if feasible.
+
+> I'm guessing that only folio-type pages can be involved in this:
+> 
+> 	static inline struct dev_pagemap *page_pgmap(const struct page *page)
+> 	{
+> 		VM_WARN_ON_ONCE_PAGE(!is_zone_device_page(page), page);
+> 		return page_folio(page)->pgmap;
+> 	}
+> 
+> as only struct folio has a pointer to dev_pagemap?  And I assume this is going
+> to get removed from struct page itself at some point soonish.
+
+I guess so.
+
 
