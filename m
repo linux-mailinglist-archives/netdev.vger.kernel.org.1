@@ -1,231 +1,167 @@
-Return-Path: <netdev+bounces-200276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20AAAE4225
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:16:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F0BAE42E0
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:26:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 027833AC30E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 13:15:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD8F717D620
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 13:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C8E24BBE4;
-	Mon, 23 Jun 2025 13:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3799255E34;
+	Mon, 23 Jun 2025 13:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZigHBaR7"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="CZZWC2DM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162B013A265;
-	Mon, 23 Jun 2025 13:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7CD248895;
+	Mon, 23 Jun 2025 13:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750684572; cv=none; b=fEMQeeMrfw39L+IJj3z17yLzm622imQ49MguAvQAkekRNGtP5dtXfuIEQUzMYFdCX+tOf2vulliDaXSJjBt476awemeeGSxuUAll8GyZZYI5DqHKn7iBXOUek3OdJu7iWyLec2PDS9l+fMTNDYvsMIe2xuRu0ayCFFBSaryq5wE=
+	t=1750684794; cv=none; b=W5FOtt3fp6TdQ72ZylGUGJVUQOVjSOGC2kdZqnmEDSzwuvFyS1U//EFaD9im7JXdDkds2av7YLLJkWVR1i9iGPmjtE0mIcA5fTwzqtIwjrhop7dfDJSA/bsytBR8yEqJcz9nyuoYgCe1QSp28R3BfkTpXo4fiDXaOcm/UxediaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750684572; c=relaxed/simple;
-	bh=P0kBJZV+0S7POdsIt4dLldqUrkMBHnZrw+Z8iFs4xRM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mLaM/L7zHN/4Do3vx8fH8Gr1CPnyVlSlClIIBirlhNEYwhKO9/L/xuAWMdqRxQon2RmfwTOZcWcsX2mnbAE/nKc1IpptnTMt8Dgxo7QPA84dU5weZbg8chZVilulAWERruIVNlkQgsQGFPk/QTgxPWCEzdVv2iZdMRuTXNl51Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZigHBaR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80C3BC4CEEA;
-	Mon, 23 Jun 2025 13:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750684571;
-	bh=P0kBJZV+0S7POdsIt4dLldqUrkMBHnZrw+Z8iFs4xRM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=ZigHBaR7GI4ak1xzPyAZZDSuLJXUManjjRBvoRQoy2NDqaS+4/HAY12xb7xSaGpVp
-	 K3oR2D7VOxVTFZp5KijkIYbbwvALrNb4Hgwtt355B58ivq6zYNo1NGVFhz9XhtTugR
-	 upf1AuGjvDLViNmk/wCUNJTcuC76d9eovyYMkqjht7l0fuBmrpQEojMdSZ8OfIoKAY
-	 aflHB67TnlEPYMYygnawAUebC2vBCdlF+1jF1LaM7Ed/hfCzVjEz7t6VbZkknGeRsc
-	 eUj1WVvZnwUpMYTdGKp8JJcRFKzGy5/JrgRRVdgPoFEhejZvsOA+n9TKdx1WfyDKvX
-	 HBgwpZoyQ5HaA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 23 Jun 2025 15:15:51 +0200
-Subject: [PATCH net-next] net: netfilter: Add IPIP flowtable SW
- acceleration
+	s=arc-20240116; t=1750684794; c=relaxed/simple;
+	bh=WFr1mvAqWknTLQCXHSHPXHDsjQ1dBOGlTBZcHkDnwYQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=sQqWLH68qsWCSMmzkU8Ts0ZEwGZwsy2nL5FeYDlWgh7T+8HlLfNAyfWVzqMio1v1RYhgb/DUuRtvK1Sw9AyA+IKb1MsIcgpY8WHBXxu94SlZ52OzOgb3tApifM+S2WjOalc3Ovsx9GJOnx2JPEWB1Z4L1w7kEyh4B2W4hpqgsEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=CZZWC2DM; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55NBliSL031297;
+	Mon, 23 Jun 2025 13:19:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	FgLrm/JXRlgdhk4Y0Tj9EAffwhDfvyBigTfDl8obe1Q=; b=CZZWC2DMQvTZJnaa
+	q/PSoNtQ1V08REd0Rjxqzi/QnNHYSYsjTXca2u1jGXxR/lz4hfOOyO8ozA/0hTPP
+	N1JiuYCl82n52c980w07eoA6bgO1bxuGCMeNB36NXncQj+ABR4aS9ZuAI5SVaabN
+	WogsxmJrXP3CKPvfkoWq7tPA/C/3iNXEsehSN+T5V4WJS//TWJ5RLBzjSRxc9gH8
+	NRz83AFL//+x10niX6FiuGrXYVfQRrId9eMcHyrlw8VkFrlndPt4FjTOhximDqH8
+	EjOvOc5ViEJEHi7LOBm33bJl0PzobzMgxFbaXZzTZAwlLhH2KOccLLLa6HonX0R8
+	P3H+uQ==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47ey7k1hjg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Jun 2025 13:19:40 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55NDJd5X008821
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Jun 2025 13:19:39 GMT
+Received: from [10.253.38.60] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 23 Jun
+ 2025 06:19:32 -0700
+Message-ID: <cf9dd904-c24a-4ea3-9689-087efab99d95@quicinc.com>
+Date: Mon, 23 Jun 2025 21:19:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250623-nf-flowtable-ipip-v1-1-2853596e3941@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAIZTWWgC/x2MWwqAIBAArxL7nWBKD7pK9KG51oKYaFQg3j3pc
- xhmMiSMhAnmJkPEmxKdvkLXNrAdyu/IyFQGwUXPByGZt8y687mUdtUFCqzT0oyaT4YPI9QuRLT
- 0/s9lLeUDUz+pRWMAAAA=
-X-Change-ID: 20250623-nf-flowtable-ipip-1b3d7b08d067
-To: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+From: Luo Jie <quic_luoj@quicinc.com>
+Subject: Re: [PATCH 5/8] dt-bindings: clock: qcom: Add NSS clock controller
+ for IPQ5424 SoC
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Krzysztof Kozlowski
+	<krzk@kernel.org>,
+        Georgi Djakov <djakov@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Michael
+ Turquette" <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        "Philipp Zabel" <p.zabel@pengutronix.de>,
+        Anusha Rao
+	<quic_anusha@quicinc.com>,
+        "Richard Cochran" <richardcochran@gmail.com>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>
+References: <20250617-qcom_ipq5424_nsscc-v1-0-4dc2d6b3cdfc@quicinc.com>
+ <20250617-qcom_ipq5424_nsscc-v1-5-4dc2d6b3cdfc@quicinc.com>
+ <b628b85b-75c4-4c85-b340-d26b1eb6d83e@kernel.org>
+ <512e3355-a110-4e7c-ab43-04f714950971@quicinc.com>
+ <78f0e4b5-19f6-45a0-b4dc-a1b519645567@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <78f0e4b5-19f6-45a0-b4dc-a1b519645567@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=YoEPR5YX c=1 sm=1 tr=0 ts=6859546c cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10
+ a=FoU6f1ENpVpzdq5mMe4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: M54owwdi18GAqCN7_LHpIe6F1rX28ZbZ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDA3OSBTYWx0ZWRfX+C7VxCurTRif
+ w0TRlVSeVJZEJ+Qek9ML8hifYpHSXHhAqXMUbW3JQV2VxyL9lImiR1nJArs6y6HTm7xDCf5pmWN
+ OQWOpPPebeRXVL0OwCPwQwPVFGvDAE+w9H1DCycp/WH6BC59hE8TQLnmLFqUuY3WIlIM6oZtVZ7
+ 6W1sXIae6l+jfLhKjKafStOVsYA3/EQWgKXqI1SuQd5QCs1N5HnhyGPWwDiwkTPrcnP4MyI/ITC
+ NZqBoMmlTM5Wb48krsf/s0t9nIuZFP3lEUmDQSQmMRlu6H9bHkw/EovD4VoJfQalspkCiwR3Otv
+ LFN23jXAsoDLeRaMZdPdhx3c7g/yUzE6i/NgG3Z+DLUDyl2L5Qgf8TaybKo05tV6TmD3JE2GFpm
+ Mz4PKarvYjKxpI4DbfQnIgIslwARgTRKmyTKSQdmdE1aoBtCQZ2rZp2lSrPSo8BYvOhMLTfm
+X-Proofpoint-GUID: M54owwdi18GAqCN7_LHpIe6F1rX28ZbZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-23_03,2025-06-23_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 priorityscore=1501 mlxscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxlogscore=999 spamscore=0 bulkscore=0 lowpriorityscore=0
+ impostorscore=0 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506230079
 
-Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
-infrastructure.
-IPIP SW acceleration can be tested running the following scenario where
-the traffic is forwarded between two NICs (eth0 and eth1) and an IPIP
-tunnel is used to access a remote site (using eth1 as the underlay device):
 
-ETH0 -- TUN0 <==> ETH1 -- [IP network] -- TUN1 (192.168.100.2)
 
-$ip addr show
-6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.0.2/24 scope global eth0
-       valid_lft forever preferred_lft forever
-7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.1/24 scope global eth1
-       valid_lft forever preferred_lft forever
-8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/ipip 192.168.1.1 peer 192.168.1.2
-    inet 192.168.100.1/24 scope global tun0
-       valid_lft forever preferred_lft forever
+On 6/21/2025 6:09 PM, Konrad Dybcio wrote:
+>>>>      compatible:
+>>>> -    const: qcom,ipq9574-nsscc
+>>>> +    enum:
+>>>> +      - qcom,ipq5424-nsscc
+>>>> +      - qcom,ipq9574-nsscc
+>>>>        clocks:
+>>>>        items:
+>>>>          - description: Board XO source
+>>>> -      - description: CMN_PLL NSS 1200MHz (Bias PLL cc) clock source
+>>>> -      - description: CMN_PLL PPE 353MHz (Bias PLL ubi nc) clock source
+>>>> +      - description: CMN_PLL NSS 1200 MHz or 300 MHZ (Bias PLL cc) clock source
+>>>> +      - description: CMN_PLL PPE 353 MHz  or 375 MHZ (Bias PLL ubi nc) clock source
+>>> This change means devices are different. Just ocme with your own schema.
+>> The NSS clock controller hardware block on the IPQ5424 SoC is identical
+>> in design to that of the IPQ9574 SoC. The main difference is in the
+>> clock rates for its two parent clocks sourced from the CMN PLL block.
+>>
+>> Given this, would it be acceptable to update the clock name and its
+>> description to use a more generic clock name, such as "nss" and "ppe"
+>> instead of the current "nss_1200" and "ppe_353"?
+> Because you used those clock_names in the existing ipq9574, you can't
+> change them now. You could introduce a separate set of clock_names
+> for the new ipq5424 though, but I think it could be useful to drop the
+> rate suffix for new additions
+> 
+> Konrad
 
-$ip route show
-default via 192.168.100.2 dev tun0
-192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
-192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.1
-192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
-
-$nft list ruleset
-table inet filter {
-        flowtable ft {
-                hook ingress priority filter
-                devices = { eth0, eth1 }
-        }
-
-        chain forward {
-                type filter hook forward priority filter; policy accept;
-                meta l4proto { tcp, udp } flow add @ft
-        }
-}
-
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- net/ipv4/ipip.c                  | 21 +++++++++++++++++++++
- net/netfilter/nf_flow_table_ip.c | 35 +++++++++++++++++++++++++++++++++--
- 2 files changed, 54 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/ipip.c b/net/ipv4/ipip.c
-index 3e03af073a1ccc3d7597a998a515b6cfdded40b5..05fb1c859170d74009d693bc8513183bdec3ff90 100644
---- a/net/ipv4/ipip.c
-+++ b/net/ipv4/ipip.c
-@@ -353,6 +353,26 @@ ipip_tunnel_ctl(struct net_device *dev, struct ip_tunnel_parm_kern *p, int cmd)
- 	return ip_tunnel_ctl(dev, p, cmd);
- }
- 
-+static int ipip_fill_forward_path(struct net_device_path_ctx *ctx,
-+				  struct net_device_path *path)
-+{
-+	struct ip_tunnel *tunnel = netdev_priv(ctx->dev);
-+	const struct iphdr *tiph = &tunnel->parms.iph;
-+	struct rtable *rt;
-+
-+	rt = ip_route_output(dev_net(ctx->dev), tiph->daddr, 0, 0, 0,
-+			     RT_SCOPE_UNIVERSE);
-+	if (IS_ERR(rt))
-+		return PTR_ERR(rt);
-+
-+	path->type = DEV_PATH_ETHERNET;
-+	path->dev = ctx->dev;
-+	ctx->dev = rt->dst.dev;
-+	ip_rt_put(rt);
-+
-+	return 0;
-+}
-+
- static const struct net_device_ops ipip_netdev_ops = {
- 	.ndo_init       = ipip_tunnel_init,
- 	.ndo_uninit     = ip_tunnel_uninit,
-@@ -362,6 +382,7 @@ static const struct net_device_ops ipip_netdev_ops = {
- 	.ndo_get_stats64 = dev_get_tstats64,
- 	.ndo_get_iflink = ip_tunnel_get_iflink,
- 	.ndo_tunnel_ctl	= ipip_tunnel_ctl,
-+	.ndo_fill_forward_path = ipip_fill_forward_path,
- };
- 
- #define IPIP_FEATURES (NETIF_F_SG |		\
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 8cd4cf7ae21120f1057c4fce5aaca4e3152ae76d..bee9f233723985f6567c3fc9840cd2f7698b590b 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -277,6 +277,29 @@ static unsigned int nf_flow_xmit_xfrm(struct sk_buff *skb,
- 	return NF_STOLEN;
- }
- 
-+static bool nf_flow_ipip_proto(struct sk_buff *skb)
-+{
-+	struct iphdr *iph;
-+
-+	if (!pskb_may_pull(skb, sizeof(*iph)))
-+		return false;
-+
-+	iph = (struct iphdr *)skb_network_header(skb);
-+	return iph->protocol == IPPROTO_IPIP;
-+}
-+
-+static u16 nf_flow_ip_get_hdr_size(struct sk_buff *skb)
-+{
-+	struct iphdr *iph;
-+
-+	if (pskb_may_pull(skb, sizeof(*iph))) {
-+		iph = (struct iphdr *)skb_network_header(skb);
-+		return iph->ihl << 2;
-+	}
-+
-+	return 0;
-+}
-+
- static bool nf_flow_skb_encap_protocol(struct sk_buff *skb, __be16 proto,
- 				       u32 *offset)
- {
-@@ -284,6 +307,10 @@ static bool nf_flow_skb_encap_protocol(struct sk_buff *skb, __be16 proto,
- 	__be16 inner_proto;
- 
- 	switch (skb->protocol) {
-+	case htons(ETH_P_IP):
-+		if (nf_flow_ipip_proto(skb))
-+			*offset += nf_flow_ip_get_hdr_size(skb);
-+		return true;
- 	case htons(ETH_P_8021Q):
- 		if (!pskb_may_pull(skb, skb_mac_offset(skb) + sizeof(*veth)))
- 			return false;
-@@ -331,6 +358,11 @@ static void nf_flow_encap_pop(struct sk_buff *skb,
- 			break;
- 		}
- 	}
-+
-+	if (skb->protocol == htons(ETH_P_IP) && nf_flow_ipip_proto(skb)) {
-+		skb_pull(skb, nf_flow_ip_get_hdr_size(skb));
-+		skb_reset_network_header(skb);
-+	}
- }
- 
- static unsigned int nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
-@@ -357,8 +389,7 @@ nf_flow_offload_lookup(struct nf_flowtable_ctx *ctx,
- {
- 	struct flow_offload_tuple tuple = {};
- 
--	if (skb->protocol != htons(ETH_P_IP) &&
--	    !nf_flow_skb_encap_protocol(skb, htons(ETH_P_IP), &ctx->offset))
-+	if (!nf_flow_skb_encap_protocol(skb, htons(ETH_P_IP), &ctx->offset))
- 		return NULL;
- 
- 	if (nf_flow_tuple_ip(ctx, skb, &tuple) < 0)
-
----
-base-commit: 5e95c0a3a55aea490420bd6994805edb050cc86b
-change-id: 20250623-nf-flowtable-ipip-1b3d7b08d067
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+OK, Understand, I will add the new separate clock names "nss" and "ppe"
+for supporting IPQ5424 SoC and further SoCs with similar design.
+Thanks for confirmation.
 
 
