@@ -1,234 +1,138 @@
-Return-Path: <netdev+bounces-200287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39CEFAE4612
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:11:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB854AE4676
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861E44471EA
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:02:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ED271885A82
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D329951C5A;
-	Mon, 23 Jun 2025 14:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDE8258CF5;
+	Mon, 23 Jun 2025 14:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VTsJl9Zm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxsbl3N2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB623594F;
-	Mon, 23 Jun 2025 14:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750687321; cv=fail; b=K44CdLJDG1kuCCSbxDGQh2+PN/ZkDursvaNBw/f3GE+uUZJY3dqGK+8WooFsPgkwzUPH2iC7oYU7BYITefXzOGx9p7cKXl6iN5kCGGZplB6UxY/PeUDNSaa8BZDpMxZdRdmQKpH+KZoCLalRfV9cITGhxpF5Os/ojyJQp/r8YbQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750687321; c=relaxed/simple;
-	bh=n3lmvp/mFhMNxZKQL5d3tUMeIvPTHVR7nG86zHNebVI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=pHQ11mFf3LGJJ7E2weZRTyP+knf9MWYIQ1Fzu25KwET1LFy0wjb63o9TxjYFUCOFn3jzZFg5YGivmKZvMhAuDskmqss1aXPl+a25lNrQt8Kv0tg1XxfYn88RyKz4v9unIv5oyG2H6Dy/X/CpVnw4FizfRwPl/J1yxt6kF2c0K+I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VTsJl9Zm; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750687320; x=1782223320;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=n3lmvp/mFhMNxZKQL5d3tUMeIvPTHVR7nG86zHNebVI=;
-  b=VTsJl9ZmbuXbeeRdMjwrFXXCklViy+OesCaFCXx7XkJMgVBCmprRPr6F
-   KlRn2Fhg2Eaq4dArQieqzPS4j7AU4SFDNPRjsa068aMcKVMUP13s6qWtw
-   +Du+AqlCzbjdH4Gt7L+ITxinyyLikebnFbXI9BGje2m0QFFDhoEiMhssf
-   omwGhwG1sxDCqi9yehMNf/q64RFu7KxOjeeQ1tM8CjcGnKcN0KWOAx2vH
-   ErgkGpIZFzRYmhGxEzOPJ0ihIxUlMhUe5EUtm48WUvHMtoz6NR07rkAac
-   NYPjn8326xBF1HtDa9tulYgG/MfzO3iO271u0nv0+DPXDi6VXvzwKHrmZ
-   g==;
-X-CSE-ConnectionGUID: qRBXL9hcRY+0TC+Hslk0zQ==
-X-CSE-MsgGUID: PArUGABBRRaCG5rhh2t+dA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="56701652"
-X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
-   d="scan'208";a="56701652"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 07:01:59 -0700
-X-CSE-ConnectionGUID: peMODWqCRPaoFSh1eH/nYg==
-X-CSE-MsgGUID: jxgpEdvPSkGdxrGpRuBL/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
-   d="scan'208";a="157394255"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 07:01:59 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 23 Jun 2025 07:01:58 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 23 Jun 2025 07:01:58 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.85) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 23 Jun 2025 07:01:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XdEZdKhT+WuJo0nhaubGk5jv0i+vFEJPjzU2IsmjTzENY6NK2q7wLNdtTgFGSDLkaOB5dByEbPk3NWT1jmzLoTyHYPFVD7yrf09GhHjrLU8/yw9stfSeLYmhsJsgHh4TRsZJ1LbQCqlOdsV/fYjERVK1qnK0DoJGDml3lfHxA/P8Aw9LyEzct4kTa0h3jMsID8CrvdJvMBWFytqcpgGvThD3QechcA1i0zrB11F3LcFfEsSp5Pt6uziXoYgYx/cRUm/1GqRPtIpKREoHlUildwoiT3I0HlC33h72mBg098hT3Ufw9DiVWfZsm76q2OqLiV/U4jBkLH9ey12Avr1auw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lPGBLLWWvvDdMY8Ez+l26oy/GWUZOqlSZOgp58Nb2Bs=;
- b=x3WQR0T3O132Htvg5rQREBQcruoKEBYkc66T4lRKdtZEFimbEWy54wh+6zm12tWtpsftXZ079M7a/d0kmZOVzx28GDLL6bP6WfNv9dQH43wbpIlzu63X8V4z5JvPtB3/EEAGOIQy/Tgys64kLgVak3ZjMN6KBRN4EteOtbkEQmSg/M8XKdFCC8GHqHiLp/dod90PDvrsQzk1/C3pVShFmSvpzBTKVbMr7IxKCib6vJUWAhratFhj+Nk4+yY1oXST4jmGGLS7syL9cuBHe9LiU1o/CMWzEICv5O8UHeenzK+NN+G8nCxSl6UkZjfgLOffiSc1HaIMs6sXry+9FRgihQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5057.namprd11.prod.outlook.com (2603:10b6:303:6c::15)
- by SJ5PPF2F7FC4EE6.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::81d) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.30; Mon, 23 Jun
- 2025 14:01:55 +0000
-Received: from CO1PR11MB5057.namprd11.prod.outlook.com
- ([fe80::3b75:a8d2:464e:30cc]) by CO1PR11MB5057.namprd11.prod.outlook.com
- ([fe80::3b75:a8d2:464e:30cc%4]) with mapi id 15.20.8857.026; Mon, 23 Jun 2025
- 14:01:55 +0000
-Date: Mon, 23 Jun 2025 14:01:42 +0000
-From: Krzysztof Karas <krzysztof.karas@intel.com>
-To: Jeff Layton <jlayton@kernel.org>
-CC: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Jani
- Nikula" <jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<intel-gfx@lists.freedesktop.org>
-Subject: Re: [PATCH v15 5/9] ref_tracker: allow pr_ostream() to print
- directly to a seq_file
-Message-ID: <kd4urnnwx22njawv54ppewljkwlh2usqa4iengp64bpxyevpad@26vjqeu3dvn3>
-"Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173,
- 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316"
-References: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
- <20250618-reftrack-dbgfs-v15-5-24fc37ead144@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20250618-reftrack-dbgfs-v15-5-24fc37ead144@kernel.org>
-X-ClientProxiedBy: VI1PR04CA0091.eurprd04.prod.outlook.com
- (2603:10a6:803:64::26) To CO1PR11MB5057.namprd11.prod.outlook.com
- (2603:10b6:303:6c::15)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616972580DD
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 14:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750688235; cv=none; b=gDbd0JJoOBH8GVPeIQvPnjSSaZhqD4/WZCCZ/A3QXmiljZ8Y7sEs5Oo68VOvvmm2YoXs3ORmcE9c5NMPDYMy65amoeUdjE7d6ojNRZDVaC4seWYybhtAVtNcSZG6DnJeMPo0mg0xE2zRUJSRCFX8rnnnwR6xd1GaKmQOskU11Dg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750688235; c=relaxed/simple;
+	bh=yxh7ilQonYBUqypJb67+dDP3F/Z9G9zjb1heS+hjcYw=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=okuJYbzkChjqIxLTbTcXKwb+Lnox6Xexa9Tvtt5MN/8RFmSD8o+0BuJsvsmYczVjncvHciH3gSVyI1JiMV6oyfi+jvjDQHGphisYdjj7y7KdCid1TIWROnoaHj82c0bEjDkZvuH/sew60EjdtC/iAhwq0syGTsBgQbSTe1keTyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dxsbl3N2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750688232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DENPfef9k5KPGfxCMnb/tEj2yf0fmCOohO51w/ehSyg=;
+	b=dxsbl3N28t2PBiU53JuQkEIGR1Vt6wSLbLnz/Kl8q0ft/w07ItQ85JO5jVr5T6Ayemw4CM
+	nt0m2bmz5+68MJrVILsfScrT0iVfXQXm2UJ9Q4GluR28jUEfhJK1IKEjYtjmv+62l+u81i
+	hVjSZM+JKD7IjN37iTIJOmZPt8nS7Uk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-19-rkV28ZGCPsW3UDW4tgao9A-1; Mon,
+ 23 Jun 2025 10:17:08 -0400
+X-MC-Unique: rkV28ZGCPsW3UDW4tgao9A-1
+X-Mimecast-MFC-AGG-ID: rkV28ZGCPsW3UDW4tgao9A_1750688226
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8303418011FB;
+	Mon, 23 Jun 2025 14:17:05 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0A2CB1800284;
+	Mon, 23 Jun 2025 14:16:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <aFlcPOpajICfVlFE@infradead.org>
+References: <aFlcPOpajICfVlFE@infradead.org> <1069540.1746202908@warthog.procyon.org.uk> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk> <2135907.1747061490@warthog.procyon.org.uk>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: dhowells@redhat.com, Andrew Lunn <andrew@lunn.ch>,
+    Eric Dumazet <edumazet@google.com>,
+    "David
+ S. Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>,
+    David Hildenbrand <david@redhat.com>,
+    John Hubbard <jhubbard@nvidia.com>, willy@infradead.org,
+    Christian Brauner <brauner@kernel.org>,
+    Al Viro <viro@zeniv.linux.org.uk>,
+    Miklos Szeredi <mszeredi@redhat.com>, torvalds@linux-foundation.org,
+    netdev@vger.kernel.org, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: AF_UNIX/zerocopy/pipe/vmsplice/splice vs FOLL_PIN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5057:EE_|SJ5PPF2F7FC4EE6:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b0525c7-c796-40a7-f47d-08ddb25e8304
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?akFuNnJWdjlRVEdJUFBKMWlvQnI2ejVFaWl1TEVoT2dta1NNdnQzcjJFdnBS?=
- =?utf-8?B?eXVHYjFsUTlOb2JPQ2RPMDhzbVI5Nnkxb2Vaa3l5M291NFo3bERiRHg2MWhR?=
- =?utf-8?B?Snc3NjZpK0wrQm9FMTZCTzNLNjhNUUJnQ0FHblZJeFA1a1p1Q3JaSllTMFEy?=
- =?utf-8?B?eENTMnpiWE5FVjJsM2d0RHh0MElVWUV3Q29ZbWFrZXhBaXducERRbXd4Z25B?=
- =?utf-8?B?WVRTVU5sblpSaXR1V2FuVWVjdkdhR3BUTEt0bUtENUM5SHN6dkRVYXJYSVhy?=
- =?utf-8?B?anZrR0J0MXpRWWZoUmZyRE1BVy9YQkttVjdleEU1OGtjVkUvVFNPTUFvVW5y?=
- =?utf-8?B?Q3o1KzZmdEdlZjh1OVdGcG41WWJxeW1mMDAzQ3VOMFB2cE1UaklCK3ZlNWor?=
- =?utf-8?B?dnZRVzArQXB5blpuWEx3aUhTeStKRGJ2Nk1yVWszVEE4OGYrcjIwc05UYmMx?=
- =?utf-8?B?VVpuZ0tQdDR0WTRhVWQ3TU5JaDFJUjlOQ0JOc0kwVTVxZWtES2t1RG5yYUo0?=
- =?utf-8?B?a0I2Q1ZKUjhyNVUvRHhFbE52K09VM2w1Z0xPbGhMMDJ4QlBnUmtQSVhldHlF?=
- =?utf-8?B?c01Bc2tPdVU0SUtpYzU4UjhvekNzZFVmdVpOQXNwYW9zUXFoUUp3aWVIeWZr?=
- =?utf-8?B?VHdnc2RwNkF0R3hiUUVzTjhvejgzUDUwUlFNZ081Z1ZaWnk0ejdXdWVuTlA0?=
- =?utf-8?B?S3dUeENOSkwwbnJNckxLUW9UakVZNTdtTGxoYkw0SFFLamhPcDNsbTA0Z2pp?=
- =?utf-8?B?UjBFZ05uTXVMSTUwRjNsVG96U3NSMUR6M25nQjZoU1J1QkRDZlZsWFNCRmUz?=
- =?utf-8?B?d0xYSFNMTHNKYXdqeXBYMkZ1Z20remZ5Y2VuKzBRRGo2SkZlcDhCQkhBU3Ru?=
- =?utf-8?B?VlBLaUFwYzArYkVVNUhFRjRKNy85VHlnODBlWFlTM3lPMmhDUHdmTHJxbVBz?=
- =?utf-8?B?dUl0a3NmTTcwSXFrMHJqSSszQ0JVTExCM2dBOHJvdkl6U3h3NWpyV1hnUjJR?=
- =?utf-8?B?MU90Nk5jQWIwekZJZUk0a1dRSHpVWGVJNmF5SHBuQXl2RXROdktZVFNUQ01t?=
- =?utf-8?B?bmdtY0hUaDR4VXkwaEQ3bm1jWFVEbFZHanQ0S2pvZ1hRbmxhckNPN3lIcUNE?=
- =?utf-8?B?QkpUZ1JXSmEyUmR3OUtkOGJtNXRzOFhUc2ovZThMMWduTHgzYlpXRFdIREpU?=
- =?utf-8?B?M2lRTC90VzdEeS9DdkNpUU02YWhqbGM1L2ZuZGkwK1JxZXhSWGtDWlZpUlFx?=
- =?utf-8?B?Zk1jSlQ2YUIxajUzcFVCWjFTdkxKalpxVGVWNGV4NG84aHRaZTFDcitDbnZh?=
- =?utf-8?B?Rk9OSmUvb1VyVjFCSWhFMjAwL0YrWHJiV01FSGRPZmFvSVZSWFNyc1d5a2Zo?=
- =?utf-8?B?Nm9DMnVMdVNBRXJlemdzL2duRTI3MEh5dlFQVXJhZXlmdTdkYmNZYytxYkVp?=
- =?utf-8?B?eE1lQ0xUb3RjY1JxT0NyN1ozWTNPSVE5b2FVemtHVDBBbVpIdG11MjlZYU16?=
- =?utf-8?B?VUliUlBYemZlQlRscVpFdjE3aFZXME9YSDAyOHJKYVZINjhoYWQ4SnNnQmM0?=
- =?utf-8?B?U1JURlY1QWdONFNvMzZ0VDFVY2x0cHFaOThOeU1OOEV3TUNoTzk4NjBYSU9O?=
- =?utf-8?B?ZWRjdTRkQWdqTEltUnJuMVR1RmwyUUdkR3hiTEJKaVBuVEtlOEFtNUk2RkdR?=
- =?utf-8?B?My9wUzhET1FFY2VFNVVhamluYzU1MHVEZDg5Si8vbXFmQkFKVVZncWZ6YzlU?=
- =?utf-8?B?L0dCNW9UbDg0SVBRZkhoZVEyS25FeUNqdloydXpOYmlDdWRSUFdWVmp4YTR1?=
- =?utf-8?B?V0creXltYW44QXVRZCtMM1hkT3pmUWZiMnNEcHo0R3lvQXQrZXF4TUEwaWQ5?=
- =?utf-8?B?ODJZMGp1N21HR2lORWRZcGZPeUhzNHNHYnFncVFaK3l2eDVLbzYyUEZpMWxu?=
- =?utf-8?Q?1G17MN0p1lg=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5057.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QVlnRWRDM1FvaTNHLzBaaXVxb2Fld2gvc2hObS9jV2pPeEVyRXdheU1VaHRu?=
- =?utf-8?B?YkhBVHNXQ2VWN0NHYTFHK3BYZlNvemUvR3N3Y2FVSEVHRXF0cmg5bFBzbHhX?=
- =?utf-8?B?elRyQXM4Y1ptaFBRcjRtQ3oxeEhNUk11M2NTSVZxbzZFVExLdDExNVZvL0pt?=
- =?utf-8?B?WWNKV0N2blNHQkZCSElRcnJQVEUrcHlYSlVqNnZNMVlEb0Z2bUxuMWY0NnVJ?=
- =?utf-8?B?YUdSVmFvSUUwVXJsUlJudSszMXltRWpvQzkxRE90dGw5TTVLZ0RMSlpUZjY0?=
- =?utf-8?B?SllpNE0zSXEvT29QRy9BU2lFOHZCK1pJUndyOE5JRENSV056QXJvM3VsNjVv?=
- =?utf-8?B?L1Z2R2VrMklzQm5rUHdOcW9wbkZacmF0alJYT0NJb3ZmOFBUcStQa3VLamVJ?=
- =?utf-8?B?MVR4U1NGV3NnTkpIMlRpd091WUYzUlFWc1gxdkxYWmUyVDNJOFNBQmJsVVVq?=
- =?utf-8?B?MURDMW1ac1cxVlpqQ0lzb2dCYS9pYjc3bklpKzRsTkQ1RnNXTWtudkEvM2Fy?=
- =?utf-8?B?V3NxUUpIV2xlZEdIMEZhUysvajVMSUhEeVlyZ3VYR0lnRHpPd1Vtd0hUSm9v?=
- =?utf-8?B?TUNhMElraFlPTTVQSytSZHBvQS9va2VqdTQrQmZBVWxrck94Rk0zaGR2T2t2?=
- =?utf-8?B?dU5uN1NGV3lubURlTUw5VCtLS3Y0K2pNWTFGSDdlMDQyUGFKa3ZUdXN0QTdh?=
- =?utf-8?B?NGMvRXhDV0pRNVcyS1ZwaDVaVDhlcDlHVmVOenAyZExsYkFxUXBJRVZ3K3dz?=
- =?utf-8?B?T0E4clFFdHRHWGpjcHBsNDNyUmJsendTUUZqL3FwbzRJTWs3VUtnR2RiNmFH?=
- =?utf-8?B?ZFplSDNwYXZPcUhpR1MyMFpYZjMrS01Damx2R25HZ05mZ3dEU2M2NlJ5WHhE?=
- =?utf-8?B?dWdsa3luNmk3K3JndzBZc0xLakxYKzRsV20xN2Z5TFZ5enhVVWFlc0lKVGNV?=
- =?utf-8?B?SFlabHBSbHdtMWU1UEpiYUlBU1BSOVZ0N2pla1ArSkJpcnhjMXNyNE53c2xs?=
- =?utf-8?B?d3F0MWJFditsZDExMHM3MGZmK3UzV1QvdmtZQWkrOCtlOVp4OWU1TDhWd25h?=
- =?utf-8?B?TC9FaGVleWJTUG9kSXhQcU1hYmpqZzE2ZHV1VFhmajZFNGxMbXFBUEtWZWYv?=
- =?utf-8?B?OCt1bGk5L0YvZ3RsTDk5RHdyVHBFNTd3OURVN0lXMi9kZUU4cW5BYlBML3h5?=
- =?utf-8?B?S2VYWE9QMjhqQ0JPR3hGelhYN1lJN3RMaVR6MGJTa0k2U3pvNjZWaytVaWNo?=
- =?utf-8?B?RVJJcEdvR0d5UlUrODFuSENOenN4bC9ZclVrb3ZMVjVqRmtCdFFnK3IwYTdG?=
- =?utf-8?B?WXJGR0d6NUhOVHB2RS9wY05GNmdPT0NxMUlWdEJPVkE5V0JkcHVpQXp6T0Z6?=
- =?utf-8?B?M3d1anlnM1F0Q3FXVlZHVzRtdHFJMUphWFlnZndLU3ZSSE96OWM3ZmVsNjN1?=
- =?utf-8?B?VUF2V3o2dGtWU2ozd0pmUk5qa3dXUnRLRTVoRnZGUEx5RW9MVHh3azZ2cFJP?=
- =?utf-8?B?N29kS2xnTDdISjlvVko0NlJ2eHJWUUZ4ajd0bzZuaHd5ZFYwUVZxbXZjdCtW?=
- =?utf-8?B?SmJsTkc3U3VuQ1RQNmEzV1g0RGY0WFIvOW1TT0VOWUtPZkF6Nk5NSlhnWlZC?=
- =?utf-8?B?N3k2cGYvQ1J3cjc5c0pOMDJXc05IMEV6NFdMeWUzc1lnYWFJM042K3YwKzlL?=
- =?utf-8?B?UUtUTEhuYmdLNnZ5eldxY05oYzE1N0NnWGR5WmRFYU4rK00vQWpQK0t4TWpL?=
- =?utf-8?B?SW5LbEJHZGJsOThiMENEbTlURFFhVzllUHczT0ZTcXd3Z08vNmJQY0sxMC8w?=
- =?utf-8?B?TFhyTHp1a3h4RmVCZVlnNzh6ajV1ZkZsdi9iZnQ4dlJkWUcxUXM1UHNjMmNV?=
- =?utf-8?B?Z3QwNXVVTi9PRUNJalJhZ1YveWFCOVVVMlNTWDNtMTN5SmcySVFjWlBxYU9B?=
- =?utf-8?B?UVdHQ3pMN3RKZ0tIZ1oyL1l4MUZ1cUpha1dlMk4wQ25GZHo4TkJFZVVMVmdX?=
- =?utf-8?B?WVZlQ01BOXZmQnkyb2lkNGNMYjVHV3NQZVc1endyN2ZVNFN3cUtoaisxSVNL?=
- =?utf-8?B?KzRkTnlYemp2dHFxTXlCdHEyVG1sOWRrR2VJZlhtMlRQNFpCS041Y20yQTg3?=
- =?utf-8?B?OEFhWm9aMjNkOTFLNW1pcEpwYXFqWEVrRXR1SzBSeVlsd3YzRUtBYXR1d3Fm?=
- =?utf-8?B?VWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b0525c7-c796-40a7-f47d-08ddb25e8304
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5057.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2025 14:01:55.4463
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rq77noilL3PRC2nj9+6vdta+0ClZpOAtHoydS0lxBfyUWQ43RLc8Ub1CnXe6VD3Lf0Z0RJM7sLhBscONoSRSbKoggsLoJcl5IjMf6WiVqLU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF2F7FC4EE6
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1111402.1750688218.1@warthog.procyon.org.uk>
+Date: Mon, 23 Jun 2025 15:16:58 +0100
+Message-ID: <1111403.1750688218@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi Jeff,
+Christoph Hellwig <hch@infradead.org> wrote:
 
-[...]
-> +static __maybe_unused int
-> +ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file *seq)
-> +{
-> +	struct ostream os = { .func = pr_ostream_seq,
-> +			      .prefix = "",
-This is also a "ref_tracker_*" function, so maybe use the same
-prefix as in other functions? I mean .prefix = "ref_tracker:".
-Unless, you have a reason for leaving it empty ;)
+> > The question is what should happen here to a memory span for which the
+> > network layer or pipe driver is not allowed to take reference, but rather
+> > must call a destructor?  Particularly if, say, it's just a small part of a
+> > larger span.
+> 
+> What is a "span" in this context?
 
----
-Best Regards,
-Krzysztof
+In the first case, I was thinking along the lines of a bio_vec that says
+{physaddr,len} defining a "span" of memory.  Basically just a contiguous range
+of physical addresses, if you prefer.
+
+However, someone can, for example, vmsplice a span of memory into a pipe - say
+they add a whole page, all nicely aligned, but then they splice it out a byte
+at a time into 4096 other pipes.  Each of those other pipes now has a small
+part of a larger span and needs to share the cleanup information.
+
+Now, imagine that a network filesystem writes a message into a TCP socket,
+where that message corresponds to an RPC call request and includes a number of
+kernel buffers that the network layer isn't permitted to look at the refcounts
+on, but rather a destructor must be called.  The request message may transit
+through the loopback driver and get placed on the Rx queue of another TCP
+socket - from whence it may be spliced off into a pipe.
+
+Alternatively, if virtual I/O is involved, this message may get passed down to
+a layer outside of the system (though I don't think this is, in principle, any
+different from DMA being done by a NIC).
+
+And then there's relayfs and fuse, which seem to do weird stuff.
+
+For the splicing of a loop-backed kernel message out of a TCP socket, it might
+make sense just to copy the message at that point.  The problem is that the
+kernel doesn't know what's going to happen next to it.
+
+> In general splice unlike direct I/O relies on page reference counts inside
+> the splice machinery.  But that is configurable through the
+> pipe_buf_operations.  So if you want something to be handled by splice that
+> does not use simple page refcounts you need special pipe_buf_operations for
+> it.  And you'd better have a really good use case for this to be worthwhile.
+
+Yes.  vmsplice, is the equivalent of direct I/O and should really do the same
+pinning thing that, say, write() to an O_DIRECT file does.
+
+David
+
 
