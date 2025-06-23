@@ -1,119 +1,134 @@
-Return-Path: <netdev+bounces-200391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D651EAE4CA6
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:18:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA430AE4CA7
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:18:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 724481671C3
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:18:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBCA83B75DE
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025872D3228;
-	Mon, 23 Jun 2025 18:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B5B29CB39;
+	Mon, 23 Jun 2025 18:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cHljv3vo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UQWMLTC/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF7542065;
-	Mon, 23 Jun 2025 18:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13657F4F1;
+	Mon, 23 Jun 2025 18:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750702679; cv=none; b=JJDL/BQwuQlFHoHxqibGTZJFmcO4EtTv7SC8H2J8AhRNm2kv/h4TtET6nwOXJ4L4q8gzpzBu+qVj+Iu0EX47keoXB5G7mmuluvhlPdkhjtPstG6E2IazKZOOW6KIf20/YF4C0Q5zu7nmouuz/zeA1lVB074CgKv+iEAmkeNjZKY=
+	t=1750702733; cv=none; b=nkUpR+UJXw5hz85QsUYMoUI1kVIbfi9UGDn8IxJEYNQoi8/Iq+N5o769xTv+LU8TL7boDc8RKG+KagnwFJmOjp/S7/yS0FriZlYTlgGmXD5KP7Gv84MZeK8+EeRdd0msq4H2ATIIwPj5rGOjwcrVUy2e7MFfkEPdPPyP4K5JiNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750702679; c=relaxed/simple;
-	bh=pQ9xRt1uHICdtmFX8v/os4EaFlLgTRunRXJUAnYQyr8=;
+	s=arc-20240116; t=1750702733; c=relaxed/simple;
+	bh=LRg203HjqpXqGj5igh6y7EQ9fNWriKYbUf8Swp8VaL4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Erbz8377MFEoWRtUO6sfoXO4QpD1bfDYd5iE1LiFI6BS4+WudDfBDY3NF7FWcGm/U9z62fomjtrGEKE0K70vzgh/9LLlC58sr8v++ZHSc+7r5EM11ieUMDzxwntATIpEDleTzVAx+ZCpoguerr/fXvSjzRMRSpyAlLX1ZTE8E1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cHljv3vo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1GXg7W3rgF8fR8JO70MxOKUMa5ZEgyxSodhuCtreQpw=; b=cHljv3voGPO5Qi0Re3XTKw0TCJ
-	TPyKQ7qu872qBE0SxetnMa0o6GrX6BSUi1CcXVUl160083GSvnceLn0pAJho/wmkEO+Yrl5HDgWp3
-	DAoG/D+5D09ZyZHlRu3ql2jEYIrSkFKeHlteLMogRF71FDfo591/DrsWPuLrraPz5PPI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uTljk-00Gics-7N; Mon, 23 Jun 2025 20:17:44 +0200
-Date: Mon, 23 Jun 2025 20:17:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Joy Zou <joy.zou@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	shawnguo@kernel.org, s.hauer@pengutronix.de,
-	catalin.marinas@arm.com, will@kernel.org, andrew+netdev@lunn.ch,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DF/HO0TqCbjPeGIJHpCHRuxHSdzTzhuBSulJwYGSxYYW15UxkZ2Cyg/N7AXpmrrf4joSLM2C4KppLv7c7Lw89Zr3xbQYC6PfMuKqWbrpkEU0sAAAKBmkx3GC1frLzJvlHTF53Nj3kl10etVkkxSQB3XzBj4Jo13dKQ8Zb2MOAQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UQWMLTC/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hZucWyu2YRnBxb3pgEyb43gTVvvxosFS8u9z4rrVDbU=; b=UQWMLTC/oqQWY6Y8QHGRiW6Let
+	MsTTOl6+8AX7NRzgreK/WBaxWfpBCMAC58j3Ji5onl7DrWkRUHs9I6DOVUYVhpwx3HKKNeY7ldCzm
+	HjEe58G+pEYDZyBvPunm7cJpOaSpijWYeUMBbOFzNcxpLiKIwxExhI1CUAVSEakXk9TPlo9CJr0yc
+	76q4Cmjw1wpxxtpaOZ1M5sebAis8Vwo8HuSBaWGHkq4bYKMcDErKHlimmi7A9GxuJNHAY0+Qu4F3m
+	d3auJYsAWQuxw41mk5j33oVxOkKpEfgF8AfYrsFKbObbRXDou5fxwIybqYIp+kPfIIXP0uLERRi5b
+	iFhlYgIg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55424)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uTlkc-0004Xi-0m;
+	Mon, 23 Jun 2025 19:18:38 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uTlkY-0003fJ-03;
+	Mon, 23 Jun 2025 19:18:34 +0100
+Date: Mon, 23 Jun 2025 19:18:33 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>,
+	florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com, hkallweit1@gmail.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, ulf.hansson@linaro.org,
-	richardcochran@gmail.com, kernel@pengutronix.de, festevam@gmail.com,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-pm@vger.kernel.or, frank.li@nxp.com, ye.li@nxp.com,
-	ping.bai@nxp.com, aisheng.dong@nxp.com
-Subject: Re: [PATCH v6 5/9] arm64: dts: freescale: add i.MX91 11x11 EVK basic
- support
-Message-ID: <8b5a8537-af16-46a1-b2ac-0374ed0f493a@lunn.ch>
-References: <20250623095732.2139853-1-joy.zou@nxp.com>
- <20250623095732.2139853-6-joy.zou@nxp.com>
+	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, robh@kernel.org
+Subject: Re: [PATCH net-next v2 2/3] net: phy: bcm5481x: Implement MII-Lite
+ mode
+Message-ID: <aFmaeY7Ibw5xSEl9@shell.armlinux.org.uk>
+References: <20250623151048.2391730-1-kamilh@axis.com>
+ <20250623151048.2391730-2-kamilh@axis.com>
+ <20250623175135.5ddee2ea@2a02-8440-d115-be0d-cec0-a2a1-bc3c-622e.rev.sfr.net>
+ <8735eb08-92de-4489-9e52-fee91c9ed23e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250623095732.2139853-6-joy.zou@nxp.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8735eb08-92de-4489-9e52-fee91c9ed23e@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> +&eqos {
-> +	phy-handle = <&ethphy1>;
-> +	phy-mode = "rgmii-id";
-> +	pinctrl-0 = <&pinctrl_eqos>;
-> +	pinctrl-1 = <&pinctrl_eqos_sleep>;
-> +	pinctrl-names = "default", "sleep";
-> +	status = "okay";
-> +
-> +	mdio {
-> +		compatible = "snps,dwmac-mdio";
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		clock-frequency = <5000000>;
-> +
-> +		ethphy1: ethernet-phy@1 {
-> +			reg = <1>;
-> +			realtek,clkout-disable;
-> +		};
-> +	};
-> +};
-> +
-> +&fec {
-> +	phy-handle = <&ethphy2>;
-> +	phy-mode = "rgmii-id";
-> +	pinctrl-0 = <&pinctrl_fec>;
-> +	pinctrl-1 = <&pinctrl_fec_sleep>;
-> +	pinctrl-names = "default", "sleep";
-> +	fsl,magic-packet;
-> +	status = "okay";
-> +
-> +	mdio {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		clock-frequency = <5000000>;
-> +
-> +		ethphy2: ethernet-phy@2 {
-> +			reg = <2>;
-> +			eee-broken-1000t;
-> +			realtek,clkout-disable;
-> +		};
+On Mon, Jun 23, 2025 at 07:55:03PM +0200, Andrew Lunn wrote:
+> On Mon, Jun 23, 2025 at 05:51:35PM +0200, Maxime Chevallier wrote:
+> > Hi Kamil,
+> > 
+> > On Mon, 23 Jun 2025 17:10:46 +0200
+> > Kamil Horák - 2N <kamilh@axis.com> wrote:
+> > 
+> > > From: Kamil Horák (2N) <kamilh@axis.com>
+> > > 
+> > > The Broadcom bcm54810 and bcm54811 PHYs are capable to operate in
+> > > simplified MII mode, without TXER, RXER, CRS and COL signals as defined
+> > > for the MII. While the PHY can be strapped for MII mode, the selection
+> > > between MII and MII-Lite must be done by software.
+> > > The MII-Lite mode can be used with some Ethernet controllers, usually
+> > > those used in automotive applications. The absence of COL signal
+> > > makes half-duplex link modes impossible but does not interfere with
+> > > BroadR-Reach link modes on Broadcom PHYs, because they are full-duplex
+> > > only. The MII-Lite mode can be also used on an Ethernet controller with
+> > > full MII interface by just leaving the input signals (RXER, CRS, COL)
+> > > inactive.
+> > 
+> > I'm following-up to Andrew's suggestion of making it a dedicated
+> > phy-mode. You say that this requires only phy-side configuration,
+> > however you also say that with MII-lite, you can't do half-duplex.
+> > 
+> > Looking at the way we configure the MAC to PHY link, how can the MAC
+> > driver know that HD isn't available if this is a phy-only property ?
+> 
+> One would hope that when the PHY is configured to -lite, it changes
+> its abilities register to indicate it does not support half duplex
+> modes? But without looking at the datasheet, i've no idea if it
+> actually does.
+> 
+> There is also an ordering issuer, it needs to be put into -lite mode
+> before phy_probe reads the abilities, which is after the probe()
+> method is called. However, at this point, we don't know the interface
+> mode, that only comes later.
+> 
+> So this gets interesting, and there is no indication in the commit
+> message this has been thought about.
 
-What is actually broken with EEE?  Is it actually the FEC?
+... which is another reaosn for using phylink, because phylink
+restricts the abilities of the PHY (and its advertisement) according
+to the PHY interface mode.
 
-	Andrew
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
