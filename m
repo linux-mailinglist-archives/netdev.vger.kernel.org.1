@@ -1,132 +1,136 @@
-Return-Path: <netdev+bounces-200210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C62AE3C55
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:30:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58BF0AE3C65
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 337661895A0A
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:29:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC3A81884FA0
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E7723AE7C;
-	Mon, 23 Jun 2025 10:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F9323E226;
+	Mon, 23 Jun 2025 10:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYaBP2lk"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ddO/yesb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928B5238C21;
-	Mon, 23 Jun 2025 10:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6408B23315E;
+	Mon, 23 Jun 2025 10:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750674570; cv=none; b=WCjhRK7TVX4yoqFoetvLO8QlVUnqEnLpDx++iPtZH6AMcEZHN38Up3hNDOhG+woGMxerlfpQgFCipEusRdylo2gkNQ9ynnX7ejahG8IvGa9gibWyPwRi8fERskphKp+hKY1zd2mpLITnAGq/PEI5pFKFfyU1ov9OUrIAlZ2l0jk=
+	t=1750674631; cv=none; b=qF3qD7hN+clhKlALm53VL6wg97Ogw+Qu3BuL0Eyy1p7erbyoiGKF+73LciFw072bwOgl6AA1ol46w/42ouCnKGP6UzTst+1oL6Ndr9ppFNhVtFWxLuiMg1S3HLGjw8petVdVp9KfZsPcm/t+73JTaOhBIsHZLitnZaTpHrfn+/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750674570; c=relaxed/simple;
-	bh=E/V1S8fsQv28bkCAhEQ4ycEwjcFe4GGI4EAwIkH482Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pi7fo1AjHxyd92tU6K+j8x3cdTHgxVvPvjtqt/XSPD553/8Ex5Foyo/vK/taqdDD2J/S0Cq2sREnO9GVDK1TWZLWZYLx55uNDL8vTp/Q+3J3Em9LJxLgTIlrStOK8ttrSxvt2UA3r4EHIerv06ZzWQRAON5j+oZ+l68OZAc3pTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYaBP2lk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C3DC4CEF0;
-	Mon, 23 Jun 2025 10:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750674570;
-	bh=E/V1S8fsQv28bkCAhEQ4ycEwjcFe4GGI4EAwIkH482Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SYaBP2lk0MdWtqUfv/93HDoI9bgXyLZ1tLGUoFvVQn3m/gqL2pzfO8H4ej/tMuOpo
-	 IXbbs9NfCHZpJMK0JIbPK/vuggsuzrNRQJBulX9F4h0vF0THpre66D/rUBsy7scHzk
-	 QX50s5saUijGk5oN6fRLOScqEUc6zqKa4/zfL2n9JgdYg81DsDyzEtJHiOsL7HFN+R
-	 vTqdIAWvpLpm/my4bGLRZp7TV0NO8xnMoqV/nxj2tsq2xkZpHLA3PAmboH6yFxF10J
-	 /gau00wQxz5avfk7CdHNGiNOQnlDl9jAqoe2CJjATH80ADl1hqH21K/kcGJhM9PlBl
-	 8rZa7P40gbD/w==
-Message-ID: <1d622833-d509-4f5b-ba19-b1f30c592d3b@kernel.org>
-Date: Mon, 23 Jun 2025 13:29:10 +0300
+	s=arc-20240116; t=1750674631; c=relaxed/simple;
+	bh=wNy7ArrNq1Aj4Z/u6XgdPtfGnfQ0qQj1ihgD7HUsJ/g=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jN4z9nJJpHusIgrxmUZa26waOmVvxn0I04QEsi91EXr2K438PXM562csBoO0OfqtkwXN5KcD/3eEF37oeiHW8lnqazoFGqNEr5rACRIksNF//0BKTT13kl0K8cbHBY/fOrGUumwccAW5fd0oeBQnfekIjIr7NIAKEZQuB0Gim+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ddO/yesb; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1750674627;
+	bh=wNy7ArrNq1Aj4Z/u6XgdPtfGnfQ0qQj1ihgD7HUsJ/g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ddO/yesbUqWOAYqcVSZUDNJcNczqspnGF6RxG7IZ2A2+bBG7uweNvMM/SnysMwvsh
+	 bVcFikKc8i0jm60EBv8Z8xruOkUu5BYzoiYo/vzxemOuaukEhVEGXxMS3Lay6+M9C/
+	 kQeAGBSZlveRLsJotJEO8ygpcK/4TzLUW+CudGAyZmDtMoFpFsLj7HOZPMHY+JOIxv
+	 QyKpS7oidPCmxr9cO2yT0p5AFpQ5w5kcbFN38fDRtL/JeIzHI0nIZOP4iVcZmhqqUk
+	 7ufqsaiGaErFOeWkEZY/5JIkojgBB3PcqaDyJDBFGnSYTG0RcbyAMcTBb12+njCjml
+	 Ntw5GdtU1LBig==
+Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:e046:b666:1d47:e832])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: laura.nao)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 699DD17E0FDB;
+	Mon, 23 Jun 2025 12:30:26 +0200 (CEST)
+From: Laura Nao <laura.nao@collabora.com>
+To: mturquette@baylibre.com,
+	sboyd@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	p.zabel@pengutronix.de,
+	richardcochran@gmail.com
+Cc: guangjie.song@mediatek.com,
+	wenst@chromium.org,
+	linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	kernel@collabora.com,
+	Laura Nao <laura.nao@collabora.com>
+Subject: [PATCH 01/30] clk: mediatek: clk-pll: Add set/clr regs for shared PLL enable control
+Date: Mon, 23 Jun 2025 12:29:11 +0200
+Message-Id: <20250623102940.214269-2-laura.nao@collabora.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250623102940.214269-1-laura.nao@collabora.com>
+References: <20250623102940.214269-1-laura.nao@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 04/13] dt-bindings: interconnect: add mt7988-cci
- compatible
-To: Frank Wunderlich <linux@fw-web.de>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>,
- Chanwoo Choi <cw00.choi@samsung.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
- Jia-Wei Chang <jia-wei.chang@mediatek.com>,
- Johnson Wang <johnson.wang@mediatek.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
- <arinc.unal@arinc9.com>, Landen Chao <Landen.Chao@mediatek.com>,
- DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Felix Fietkau <nbd@nbd.name>, linux-pm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20250620083555.6886-1-linux@fw-web.de>
- <20250620083555.6886-5-linux@fw-web.de>
-Content-Language: en-US
-From: Georgi Djakov <djakov@kernel.org>
-In-Reply-To: <20250620083555.6886-5-linux@fw-web.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 20.06.25 11:35, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Add compatible for Mediatek MT7988 SoC with mediatek,mt8183-cci fallback
-> which is taken by driver.
-> 
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> Acked-by: Rob Herring (Arm) <robh@kernel.org>
-> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+On MT8196, there are set/clr registers to control a shared PLL enable
+register. These are intended to prevent different masters from
+manipulating the PLLs independently. Add the corresponding en_set_reg
+and en_clr_reg fields to the mtk_pll_data structure.
 
-Acked-by: Georgi Djakov <djakov@kernel.org>
+Signed-off-by: Laura Nao <laura.nao@collabora.com>
+---
+ drivers/clk/mediatek/clk-pll.c | 4 ++++
+ drivers/clk/mediatek/clk-pll.h | 4 ++++
+ 2 files changed, 8 insertions(+)
 
-This can go with the rest of the patches or please let me know if i should apply it.
-
-BR,
-Georgi
-
-> ---
-> v2:
-> - no RFC
-> - drop "items" as sugested by conor
-> ---
->   .../bindings/interconnect/mediatek,cci.yaml           | 11 ++++++++---
->   1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/interconnect/mediatek,cci.yaml b/Documentation/devicetree/bindings/interconnect/mediatek,cci.yaml
-> index 58611ba2a0f4..4d72525f407e 100644
-> --- a/Documentation/devicetree/bindings/interconnect/mediatek,cci.yaml
-> +++ b/Documentation/devicetree/bindings/interconnect/mediatek,cci.yaml
-> @@ -17,9 +17,14 @@ description: |
->   
->   properties:
->     compatible:
-> -    enum:
-> -      - mediatek,mt8183-cci
-> -      - mediatek,mt8186-cci
-> +    oneOf:
-> +      - enum:
-> +          - mediatek,mt8183-cci
-> +          - mediatek,mt8186-cci
-> +      - items:
-> +          - enum:
-> +              - mediatek,mt7988-cci
-> +          - const: mediatek,mt8183-cci
->   
->     clocks:
->       items:
+diff --git a/drivers/clk/mediatek/clk-pll.c b/drivers/clk/mediatek/clk-pll.c
+index ce453e1718e5..49ca25dd5418 100644
+--- a/drivers/clk/mediatek/clk-pll.c
++++ b/drivers/clk/mediatek/clk-pll.c
+@@ -308,6 +308,10 @@ struct clk_hw *mtk_clk_register_pll_ops(struct mtk_clk_pll *pll,
+ 		pll->en_addr = base + data->en_reg;
+ 	else
+ 		pll->en_addr = pll->base_addr + REG_CON0;
++	if (data->en_set_reg)
++		pll->en_set_addr = base + data->en_set_reg;
++	if (data->en_clr_reg)
++		pll->en_clr_addr = base + data->en_clr_reg;
+ 	pll->hw.init = &init;
+ 	pll->data = data;
+ 
+diff --git a/drivers/clk/mediatek/clk-pll.h b/drivers/clk/mediatek/clk-pll.h
+index 285c8db958b3..c4d06bb11516 100644
+--- a/drivers/clk/mediatek/clk-pll.h
++++ b/drivers/clk/mediatek/clk-pll.h
+@@ -47,6 +47,8 @@ struct mtk_pll_data {
+ 	const struct mtk_pll_div_table *div_table;
+ 	const char *parent_name;
+ 	u32 en_reg;
++	u32 en_set_reg;
++	u32 en_clr_reg;
+ 	u8 pll_en_bit; /* Assume 0, indicates BIT(0) by default */
+ 	u8 pcw_chg_bit;
+ };
+@@ -68,6 +70,8 @@ struct mtk_clk_pll {
+ 	void __iomem	*pcw_addr;
+ 	void __iomem	*pcw_chg_addr;
+ 	void __iomem	*en_addr;
++	void __iomem	*en_set_addr;
++	void __iomem	*en_clr_addr;
+ 	const struct mtk_pll_data *data;
+ };
+ 
+-- 
+2.39.5
 
 
