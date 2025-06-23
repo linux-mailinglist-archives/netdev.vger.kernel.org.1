@@ -1,194 +1,99 @@
-Return-Path: <netdev+bounces-200439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D606FAE582D
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:55:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DC52AE5835
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:55:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55E461BC6AFA
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:55:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DF0A1BC6BE6
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F3C223DE8;
-	Mon, 23 Jun 2025 23:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C1722D785;
+	Mon, 23 Jun 2025 23:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="awlZUWTu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iATEysp9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13C452F88;
-	Mon, 23 Jun 2025 23:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5CC1AD3FA;
+	Mon, 23 Jun 2025 23:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750722900; cv=none; b=paGb2opGhUyJ4C6McOIVM+Ljh/NbbfM9vMAF5+8iltFHjaq6e2pIkK5JTvw/Po7rpGcUVEVmbPotXXCQnNUgR4H0UTZJ5G3iK+F0yK6Fef68ux1TCIcFU8pJJFB7csbOsMxZvSnkqek22OshpjcAV4LooooA6am0zWA5mMVr9RQ=
+	t=1750722940; cv=none; b=NWHC9pcAl3gl6INA5a87exTQjOVti80XdrDD4maj/oO3AkwBEaTiXFuvB9WNm3VCLr0a7hqV9DpOaYgv816U0xHgCz9cTxrDBsxG6iJ/WUarTZKBqgzTv7rcBbekLgb8un5at0U98ouYyCZr2ZoyDlIKYpgRMxt0D0HVkTK3F30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750722900; c=relaxed/simple;
-	bh=3vWHVubH81WvqeFnvNvOfRONRFFAfmZct9THUsdR2pE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fUKckoRcfsVZF+xrm2OvRZJ8mZKb4Gx6Lg2v+R4aFGYpLN9KBxPtDXBzYpZXaeIWki9xf/JSrba2LZeK6sIv9IfRimm9ubqyxLVbs2VtgyTqVuRv1Umncc01rn20brRW9K70HkLc6e66yuyJkB9EwDveKcCbftRGbbSL0REJk7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=awlZUWTu; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d948ce7d9dso20305285ab.2;
-        Mon, 23 Jun 2025 16:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750722898; x=1751327698; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cS262nr1YqD4iSvkVXAF+yWKGEdn5aCMiFwwKXBvYLw=;
-        b=awlZUWTuiAjEmzNt4UomSPBd2Nn+TeIEJrm2Vuk1oYbNU3Si3lUSq6y7ZB5CBCQkcJ
-         EIt6fN6+X2gINrgtnExUfDCloqC8SB0rgwoRTWVjA58O3EqEILf7EUmRMaL10uiToRWd
-         nJ/1ztOc2TlM8a+bZWENPiEcesRTAPE1v7xreB/trEborRzOX2E8RflV1ZKSthJdNaeI
-         Qn1UQeh3UNH4O9fmnT7wD8URjTLXusao1IB0zYusPnP5s0UZlWSN40GFjFBW8sQiiHP8
-         DOIsFuT6LPpvvusRFyQbEmo8UxVbqa8gsTeoQIv/sAgzUG1WcgNa5SYqrc/FOZpgL6iP
-         NqRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750722898; x=1751327698;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cS262nr1YqD4iSvkVXAF+yWKGEdn5aCMiFwwKXBvYLw=;
-        b=b4JwI7LPC1SYoFu5XhL3Ql6BfNBYuA7CLaqFt+TEHF2w0mcGR20zrg+6/NrPwQ1fcc
-         P8VYUxm74KS/9OhXgM+mRFEMAGUfeF9py3pWGW8UIhWTy22Rj7jGrpIbtNMAw6cKdrxI
-         SThuIfXK8z4WmwlKWT/IAUssV8/ex/R0DsoCknaGln+FuGolcRCCpwb5VZfgtkzB6NM6
-         HXnkWe4Mp8uPi2heEwCaRsYgaHDBpjq+WrWcfoedFeonkJW7prHpuaY6E5BvB9mZZOiz
-         0FoABzWJqUMvJvTfYVyiOzdriDryjIL3/IrrtAF7sWA0w60MrF4Iccvzv3DCt2Sar4ro
-         tKnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVU4lMRz0vups2kRC+g9yuLhVYO99ZY4q1LZTvzgvKVz8Cs86YvrAZKc8Y9UPauI+nxv80=@vger.kernel.org, AJvYcCWteLzBMA417WGynY52A95s2G1jA5LJHsZ2FoC5Rt4W0BSh58WZsPW6RRdtEmGypTnQ3H+3EyS4@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv5TQNSoabKUz6C26Q6UPXW4FvkF7L1wbY+krHmyTDyf7T1wV4
-	bQ3doQjjjLt0Y4IT6ym/iUkHWijctwpavBS6e44IIhmDd0mRynkCzFpHYfsXbRkcFqJJRmU+Ynp
-	RGG+O1EMX66Dc2ctLTzUR5vFPr6mdTGc=
-X-Gm-Gg: ASbGncvu1lInJVUh5+oz6d6/sY/sF5SeVEhi0OX45Ben8KIl9GR3L1nGM9eqGnlmiop
-	btmexP9ySmTPSJz6XmNN7zaY5szWIXss8fEQJqCMWdL/A4DbMbb3s23gyOG4Atb6ttaZgtDxHyX
-	jRDHkrshKu+GsSL6i+w+DNE9rFtXUyFrq2fnqR45SyZy4=
-X-Google-Smtp-Source: AGHT+IH3H9K/mkBkrTyjQRJcGeR21bsCoDU0DsuIvEr5SxhGY71/KjekmELK+T+SK1ngADJysvcHvhbYC0OnyOdY7eY=
-X-Received: by 2002:a05:6e02:240f:b0:3dd:dd41:d3dc with SMTP id
- e9e14a558f8ab-3de38c1d694mr189599775ab.1.1750722897899; Mon, 23 Jun 2025
- 16:54:57 -0700 (PDT)
+	s=arc-20240116; t=1750722940; c=relaxed/simple;
+	bh=38KvN3nUvZKHe+4UDt03W6VYHPRfCYDRs2Zg5OMyECA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AYeHFdpnyiEMmZfOWAzOdawJbKua/jzKqSyz1smzv2aCDWpqNBAB1S7jj6UU2DD2uyIDOTdqHL6jPxsl6VdIqHZuVRDsLpPxhEuzMPN0MoAjtv5fpdJC1LmzBYGNdX1h3/qS19D+hjR+13KncDoU988j4B+vblD+Oos9shVW8X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iATEysp9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 425EDC4CEEA;
+	Mon, 23 Jun 2025 23:55:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750722938;
+	bh=38KvN3nUvZKHe+4UDt03W6VYHPRfCYDRs2Zg5OMyECA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iATEysp9fHni7LFRaxaw8qypvTiRqFG1jr86EgTnW0gf/o39V13W6iiNduEM/j5WN
+	 QvTLaaKaYZ3gQOQd0bq+KeWX4UK2Ig1C4pkXQnpsufoY+O9tRQAh4dR6wEq5cOkwwf
+	 5nTQvlRyFb6AtobqLk5YtbA4Oi0N7meJpjX7L4zmP7odCe8dJxVkyTzHTMsqQdMM78
+	 qwVvddtPKqeax5TyD46FBH4n8q3hAU2ESJsUApCpSgFJ48uXZ/UfgcNSaWg9frdbWs
+	 TAvtg4hy4i3rdfuGbKzrZv0CiKgCNva7NhbdELIjlQv8RcXa+7+gSKU6C/c+58P5QO
+	 2/ZethTnz7ZvA==
+Date: Mon, 23 Jun 2025 16:55:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
+ <woojung.huh@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Russell
+ King <rmk+kernel@armlinux.org.uk>, Thangaraj Samynathan
+ <Thangaraj.S@microchip.com>, Rengarajan Sundararajan
+ <Rengarajan.S@microchip.com>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v1 1/1] net: usb: lan78xx: fix WARN in
+ __netif_napi_del_locked on disconnect
+Message-ID: <20250623165537.53558fdb@kernel.org>
+In-Reply-To: <20250620085144.1858723-1-o.rempel@pengutronix.de>
+References: <20250620085144.1858723-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
- <20250619080904.0a70574c@kernel.org> <aFVvcgJpw5Cnog2O@mini-arch>
- <CAL+tcoAm-HitfFS+N+QRzECp5X0-X0FuGQEef5=e6cB1c_9UoA@mail.gmail.com>
- <aFWQoXrkIWF2LnRn@mini-arch> <CAL+tcoB-5Gt1_sJ_9-EjH5Nm_Ri+8+3QqFvapnLLpC5y4HW63g@mail.gmail.com>
- <aFliLQiRusx_SzQ4@mini-arch>
-In-Reply-To: <aFliLQiRusx_SzQ4@mini-arch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 24 Jun 2025 07:54:21 +0800
-X-Gm-Features: AX0GCFvNtWp9KipRNYoFWaKGebo42MbnK4Osnwpv0ZzHsCptVVsEeyMwbbNwS8M
-Message-ID: <CAL+tcoBub4JpHrgWekK+OVCb0frXUaFYDGVd2XL3bvjHOTmFjQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 23, 2025 at 10:18=E2=80=AFPM Stanislav Fomichev
-<stfomichev@gmail.com> wrote:
->
-> On 06/21, Jason Xing wrote:
-> > On Sat, Jun 21, 2025 at 12:47=E2=80=AFAM Stanislav Fomichev
-> > <stfomichev@gmail.com> wrote:
-> > >
-> > > On 06/21, Jason Xing wrote:
-> > > > On Fri, Jun 20, 2025 at 10:25=E2=80=AFPM Stanislav Fomichev
-> > > > <stfomichev@gmail.com> wrote:
-> > > > >
-> > > > > On 06/19, Jakub Kicinski wrote:
-> > > > > > On Thu, 19 Jun 2025 17:04:40 +0800 Jason Xing wrote:
-> > > > > > > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_poo=
-l *pool, struct xdp_desc *desc)
-> > > > > > >     rcu_read_lock();
-> > > > > > >  again:
-> > > > > > >     list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) =
-{
-> > > > > > > -           if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGE=
-T) {
-> > > > > > > +           int max_budget =3D READ_ONCE(xs->max_tx_budget);
-> > > > > > > +
-> > > > > > > +           if (xs->tx_budget_spent >=3D max_budget) {
-> > > > > > >                     budget_exhausted =3D true;
-> > > > > > >                     continue;
-> > > > > > >             }
-> > > > > > > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(stru=
-ct xdp_sock *xs,
-> > > > > > >  static int __xsk_generic_xmit(struct sock *sk)
-> > > > > > >  {
-> > > > > > >     struct xdp_sock *xs =3D xdp_sk(sk);
-> > > > > > > -   u32 max_batch =3D TX_BATCH_SIZE;
-> > > > > > > +   u32 max_budget =3D READ_ONCE(xs->max_tx_budget);
-> > > > > >
-> > > > > > Hm, maybe a question to Stan / Willem & other XSK experts but a=
-re these
-> > > > > > two max values / code paths really related? Question 2 -- is ge=
-neric
-> > > > > > XSK a legit optimization target, legit enough to add uAPI?
-> > > > >
-> > > > > 1) xsk_tx_peek_desc is for zc case and xsk_build_skb is copy mode=
-;
-> > > > > whether we want to affect zc case given the fact that Jason seemi=
-ngly
-> > > > > cares about copy mode is a good question.
-> > > >
-> > > > Allow me to ask the similar question that you asked me before: even=
- though I
-> > > > didn't see the necessity to set the max budget for zc mode (just
-> > > > because I didn't spot it happening), would it be better if we separ=
-ate
-> > > > both of them because it's an uAPI interface. IIUC, if the setsockop=
-t
-> > > > is set, we will not separate it any more in the future?
-> > > >
-> > > > We can keep using the hardcoded value (32) in the zc mode like
-> > > > before and __only__ touch the copy mode? Later if someone or I foun=
-d
-> > > > the significance of making it tunable, then another parameter of
-> > > > setsockopt can be added? Does it make sense?
-> > >
-> > > Related suggestion: maybe we don't need this limit at all for the cop=
-y mode?
-> > > If the user, with a socket option, can arbitrarily change it, what is=
- the
-> > > point of this limit? Keep it on the zc side to make sure one socket d=
-oesn't
-> > > starve the rest and drop from the copy mode.. Any reason not to do it=
-?
-> >
-> > Thanks for bringing up the same question that I had in this thread. I
-> > saw the commit[1] mentioned it is used to avoid the burst as DPDK
-> > does, so my thought is that it might be used to prevent such a case
-> > where multiple sockets try to send packets through a shared umem
-> > nearly at the same time?
-> >
-> > Making it tunable is to provide a chance to let users seek for a good
-> > solution that is the best fit for them. It doesn't mean we
-> > allow/expect to see the burst situation.
->
-> The users can choose to moderate their batches by submitting less
-> with each sendmsg call. I see why having a batch limit might be useful fo=
-r
-> zerocopy to tx in batches to interleave multiple sockets, but not
-> sure how this limit helps for the copy mode. Since we are not running
-> qdisc layer on tx, we don't really have a good answer for multiple
-> sockets sharing the same device/queue..
+On Fri, 20 Jun 2025 10:51:44 +0200 Oleksij Rempel wrote:
+> A WARN may be triggered in __netif_napi_del_locked() during USB device
+> disconnect:
+> 
+>   WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
+> 
+> This occurs because NAPI remains enabled when the device is unplugged and
+> teardown begins. While `napi_disable()` was previously called in the
+> `lan78xx_stop()` path, that function is not invoked on disconnect. Instead,
+> when using PHYLINK, the `mac_link_down()` callback is guaranteed to run
+> during disconnect, making it the correct place to disable NAPI.
+> 
+> Similarly, move `napi_enable()` to `mac_link_up()` to pair the lifecycle
+> with actual MAC state.
 
-It's worth mentioning that the xsk still holds the tx queue lock in
-the non-zc mode. So I assume getting rid of the limit might be harmful
-for other non xsk flows. That is what I know about the burst concern.
+Stopping and starting NAPI on link events is pretty unusual.
+The problem is the disconnect handling, unregistering netdev
+removes the NAPIs automatically, I think all you need is to
+remove the explicit netif_napi_del() in lan78xx_disconnect().
+Core will call _stop (which disables the NAPI), and then
+it will del the NAPI.
 
-Thanks,
-Jason
+> This patch is intended for `net-next` since the issue existed before the
+> PHYLINK migration, but is more naturally and cleanly addressed now that
+> PHYLINK manages link state transitions.
+
+And repost that for net, please.. :)
+-- 
+pw-bot: cr
 
