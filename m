@@ -1,120 +1,152 @@
-Return-Path: <netdev+bounces-200338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3916EAE4971
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:59:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03226AE498B
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5644D3AA1B5
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:59:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6D287ADFB8
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA93128DF2B;
-	Mon, 23 Jun 2025 15:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8595222FF37;
+	Mon, 23 Jun 2025 16:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gJP4cXg9"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="QZHrLMtX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF38277028;
-	Mon, 23 Jun 2025 15:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8447846BF
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 16:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750694364; cv=none; b=CCkRcFXjIAV2/s8x5MQaT8Tr0CMxz/lVMJRHObHrmh2FmkO4IeN3zkE6ej4I6PArtXX0PPuUNpTBE64l/R/Dc2NRU2YJj0tBwpeg49Fs/12qCIUcnnwFcMI22vXKv8QBsKc+XbDVOVdYPjWLkNPRxtEtkQoB9U7dBzOBvg3sSz8=
+	t=1750694482; cv=none; b=f8RnIXKw+MZKUMlCcYCG96379tACY9UhCiZMJmq3dzL/dbKjx5Gbu0wwxXO1VIemMhVd9hPcEMvzc9gDDCjwcl0zt/HUNwjdAnKwPJ8TBsYAp2ORx8SnWEOEAyKDgLlPzzFV5iqlvUOVXFga+5srQLsfJhcBOh2C0/+cgeX1Xe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750694364; c=relaxed/simple;
-	bh=/rfl7gOGpO0g14cYMRJ7KQfJPeeEo1fzAajmHgRfcP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MkX45T3I0Mdbl+dEdhWot/ls/kwUIgTeHjdUGn4lj38bGeZeAa6pMOCL/jry5Icz3J7PsN+VElGS5Bkg9CTeCc8UhGphIiQuRpj2Tfc4jPGX1YJ+bX4bp/z13wETBMIwhZbSNP3pRGK023QU46VCmRWxUtC6A0Y9u0WkATd/rEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gJP4cXg9; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ivJftfXIlijyNb6aPqxEHL2vbAZ+7Nan5sa8DA4Nd4s=; b=gJP4cXg900T3X2PP4GO2+aWAyS
-	eo+T+0X1Oo3zr3UET8GybiWIdDBy/H5GwrGDRhyW7IOLilENX7aJCNnZ6QT4+XPSsgROObz6T5fai
-	52pLJ6BJ6BRSsLSlU0OjdgPhvWa5rp2p9kZMZYF1WrbSmCO07z2WO0F1zFa/R39r8UZK+ARzysPnV
-	c/afMbJWDuHuQDJ3nfuEAiBvqJZ80PrpOSk8gHIyfFHLcJ+K5qlCSFo9/MxLg726OBArGclzvOHdl
-	aqnrLDjXWVVTzd3hV08OI/n6FsnG5wb7+6uP5OzDy7QN5DLn3NmDAS4aq6I/X+ewruGynu+DJgj0L
-	5zhBr+Kw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36456)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uTjZi-0004O5-1x;
-	Mon, 23 Jun 2025 16:59:14 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uTjZh-0003Zx-0L;
-	Mon, 23 Jun 2025 16:59:13 +0100
-Date: Mon, 23 Jun 2025 16:59:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	robh@kernel.org
-Subject: Re: [PATCH net-next v2 3/3] dt-bindings: ethernet-phy: add optional
- mii-lite-mode flag
-Message-ID: <aFl50MeMElkRbyzj@shell.armlinux.org.uk>
-References: <20250623151048.2391730-1-kamilh@axis.com>
- <20250623151048.2391730-4-kamilh@axis.com>
+	s=arc-20240116; t=1750694482; c=relaxed/simple;
+	bh=W2njX0aNcEZksb+ZdOEylLnZ6LAQ8oqd/7eAfvsvd4A=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ow36qPaC4xfeNhSOAGJi/F0GR48YhfqyMwwvt92eJOyoQzkrZi4z3BbaXM2tx+C3JEYRfck2lNOxn7kuJSAEqxGsQGJD6xQFTxdbk+qeqz9ahLHN6yWxwd5EQQGS0TmT2uv9WU0+uEaClQSPhT65u29/WPnFX4BiK4UbUi3CDKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=QZHrLMtX; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-60780d74c8cso6819420a12.2
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:01:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jacekk.info; s=g2024; t=1750694479; x=1751299279; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GV9eywOsXK84WOKUgMvagNTBliIluKm+MCneZcnY37Y=;
+        b=QZHrLMtXg4ohYmdSTDD1Np4AKe4rNiGOBD/zVy2sFwi4GJsSsusAh5tnvWKF+2eVva
+         yq3rRjJ9NpVpDk2p9qlnCCsHX4IH0lWOrtzrBTHw28yuLvJgPIAhEw2epvXwI974LSAZ
+         7PqDVHyirVxVN+rj8rYpsk8MFLeOwPhziQE0oLvWlZlFDEHWuFaKeHM5Av6i2hjbs9qC
+         PYMpYRF5bMWVsWByK6AIeptH7VXDG0RF4ZUXxUdVgqGViud92siPvgsI8Oqa751yyzHr
+         Y83ff7JX87DMlTSAjZFbN0+qohesOhjbXi7SXinXNLWd8e26lkgQXNCM6r3f8Ai+l2Zt
+         r9rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750694479; x=1751299279;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GV9eywOsXK84WOKUgMvagNTBliIluKm+MCneZcnY37Y=;
+        b=SbmYSmj73JZGplxIAqjgDNEv39yuQFpB5A96FVOBaCVZEVBGXwwYTZezmppS/gIAud
+         tBaIQjQo2RsVL4h0u2/Ma5JFB4DcmJMypecFVeDzQYPCQxkdWzzv898kwqyFjNzOSJ/2
+         1LVNG00mdgRX32nVWXhPedfnDWQPHrmA3UtyTQHWfgufwNAzbjhkRk5NeHoeXKocR/2a
+         Igj43gAaawpceA/MCPFcUyIHaWFh0g8qCqKbRby3BNqeoWdQPb2BE6/bV2c5TvMz+KPQ
+         0zcmwRSd0TTnaGeYwxAtrXfi2C4rirEN1OmQ3Tmjn63/2yBi563Yc0Z/hcoiS2+Og3BP
+         Ga8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX+IECgHrIIQd44zYn/VXp4/dpYxIPk7gHLeIJBWoudoEferEmbD0vK5qYPnPVv+n2CwqqXy+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvhhWqzWD9fHmkkuyuthUeBwnpkh4nuxmE1r5hZrxw90YqnuzM
+	aexEvxjRbuwBY8JEIICLCWfwgbgEDp/zhal5xCWRbWAmFGh6imggue77Z1gTQw4JGQ==
+X-Gm-Gg: ASbGnctXgZqoNVoNavab6hj1uNwSEq8SBF0WJk6mKdfGSKvNnL4sRT32eiRIReC2YO/
+	VzOJ5piNQrVCigQE+vadTK1yJKUYajjLnFK0WU5HZBio6hWbrWsoOqbpA8jPVPeDt4Mdnwtp/Ep
+	eH63YLyNoIwoII+btrUAHhO+dxpnhd0XlXUMq/cGj9DR2aO7uZT54bpZ4bUUx7pItkf3M3bDQwn
+	09cGRvNcenR3z+5gtxSLnwdhLtGNTJVd9FE+LZcZ59EGJsut0t3JLfHdR/n+QGxJ19pm+3rIfuB
+	dmBAQfDUkxl16RPIUefgtzyMyJBTMdpD5cyubvh6FteZgwURZa0Wz86bT8g5nOzj
+X-Google-Smtp-Source: AGHT+IFeFRf7fXY8ItbHGsczF5S/sRpaMQZSC5ENBtBuUJ/TvWbUeEnuAnFx8nQF8fRGIRrYzCtMHw==
+X-Received: by 2002:a05:6402:3493:b0:607:e3ec:f8ea with SMTP id 4fb4d7f45d1cf-60a1cd1a66cmr11552849a12.6.1750694478557;
+        Mon, 23 Jun 2025 09:01:18 -0700 (PDT)
+Received: from [192.168.0.114] ([91.196.212.106])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60a185449d5sm6231911a12.28.2025.06.23.09.01.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 09:01:18 -0700 (PDT)
+From: Jacek Kowalski <jacek@jacekk.info>
+X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
+Message-ID: <b7856437-2c74-4e01-affa-3bbc57ce6c51@jacekk.info>
+Date: Mon, 23 Jun 2025 18:01:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250623151048.2391730-4-kamilh@axis.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v2 2/2] e1000e: ignore factory-default checksum value on TGP
+ platform
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
+Content-Language: en-US
+In-Reply-To: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 23, 2025 at 05:10:48PM +0200, Kamil Horák - 2N wrote:
-> From: Kamil Horák (2N) <kamilh@axis.com>
-> 
-> The Broadcom bcm54810 and bcm54811 PHYs support MII and MII-Lite
-> interface modes. The MII-Lite mode does not use TXR, RXER, CRS and COL
-> signals. However, the hardware strapping only selects MII mode,
-> distinction between MII and MII-Lite must be done by software.
-> 
-> Add optional mii-lite-mode flag to switch the PHY to MII-Lite mode.
-> 
-> Signed-off-by: Kamil Horák (2N) <kamilh@axis.com>
-> ---
->  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> index 71e2cd32580f..edfd16044770 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> @@ -101,6 +101,14 @@ properties:
->        1BR-10 names. The PHY must be configured to operate in BroadR-Reach mode
->        by software.
->  
-> +  mii-lite-mode:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      If set, indicates the use of MII-Lite variant of MII, without the
-> +      functions of TXER, RXER, CRS and COL signals for Broadcom PHYs. These
-> +      PHYs can be strapped to use MII mode but the MII or MII-Lite selection
-> +      must be done by software.
+As described by Vitaly Lifshits:
 
-I'll put the same question here as I did on patch 2. Do we want this to
-be a separate property, or would it make more sense as a different
-phy-mode value?
+> Starting from Tiger Lake, LAN NVM is locked for writes by SW, so the
+> driver cannot perform checksum validation and correction. This means
+> that all NVM images must leave the factory with correct checksum and
+> checksum valid bit set.
 
+Unfortunately some systems have left the factory with an empty checksum.
+NVM is not modifiable on this platform, hence ignore checksum 0xFFFF on
+Tiger Lake systems to work around this.
+
+Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
+Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM checksum")
+Cc: stable@vger.kernel.org
+---
+v2: new check to fix yet another checksum issue
+ drivers/net/ethernet/intel/e1000e/defines.h | 1 +
+ drivers/net/ethernet/intel/e1000e/nvm.c     | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
+index 8294a7c4f122..01696eb8dace 100644
+--- a/drivers/net/ethernet/intel/e1000e/defines.h
++++ b/drivers/net/ethernet/intel/e1000e/defines.h
+@@ -637,6 +637,7 @@
+ 
+ /* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
+ #define NVM_SUM                    0xBABA
++#define NVM_SUM_FACTORY_DEFAULT    0xFFFF
+ 
+ /* PBA (printed board assembly) number words */
+ #define NVM_PBA_OFFSET_0           8
+diff --git a/drivers/net/ethernet/intel/e1000e/nvm.c b/drivers/net/ethernet/intel/e1000e/nvm.c
+index e609f4df86f4..37cbf9236d84 100644
+--- a/drivers/net/ethernet/intel/e1000e/nvm.c
++++ b/drivers/net/ethernet/intel/e1000e/nvm.c
+@@ -558,6 +558,11 @@ s32 e1000e_validate_nvm_checksum_generic(struct e1000_hw *hw)
+ 		checksum += nvm_data;
+ 	}
+ 
++	if (hw->mac.type == e1000_pch_tgp && checksum == (u16)NVM_SUM_FACTORY_DEFAULT) {
++		e_dbg("Factory-default NVM Checksum on TGP platform - ignoring\n");
++		return 0;
++	}
++
+ 	if (checksum != (u16)NVM_SUM) {
+ 		e_dbg("NVM Checksum Invalid\n");
+ 		return -E1000_ERR_NVM;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.2
+
 
