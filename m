@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-200261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49112AE3FC2
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:23:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89877AE3FCE
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:23:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D55B3A67DC
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:16:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F2BC3A9BFF
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72442512DD;
-	Mon, 23 Jun 2025 12:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E6E243369;
+	Mon, 23 Jun 2025 12:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqIRZf6S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+nKa5ja"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCFF246781;
-	Mon, 23 Jun 2025 12:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1FB1F4629;
+	Mon, 23 Jun 2025 12:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750680821; cv=none; b=kHDi/wrsQtG0f6EB8Su/WEcGH5qZubo4HJN5pTDFTzsOefXaobwrv5o5T+C4bQIw7OGciDIVvYxCOOBJJwU/3EeXt65d9q5A6zKpsXFg0L3nAuuFsfFu3QOCngx/zDxUSVVhevxjQTMAj8jA2l4QrIrnJklaPt/UOlgLlMaGpOQ=
+	t=1750680887; cv=none; b=fNTijtP3TdMPBeR1T7wtGSCU7ViCkI7ApY5v0Dd6wUb04o3olkpEdl26gD2kNyq2PsOjDm6+gdrZkVO1R4rgB2+RWgOgXx0OKA+tjMkviWeSa5UW9UIitSA+KJcOreEAReaYobrReD2zILM03kvvCE9ZHWNpcqsgYTE6McXwah4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750680821; c=relaxed/simple;
-	bh=ueR3nwsqBvhrycpfvVhVdbKTsds3A/sZLdw2rshMJas=;
+	s=arc-20240116; t=1750680887; c=relaxed/simple;
+	bh=o/om+5oc+Ti+iKJv0+pm2Nb+TnULQl3shWGHQYtDlw8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rhUDz2jzaaIrr19z2Tr/SpB4QYqHmfs/hZoVWg+5/PYPBo6YonS4DoI+J3rOW6mYD+2W+onu8ejX43E9rdOzHCqkUJD/+q6TvxdECKSPi3LWxA98ODoY8TYhGomU8tDwvx/khy9VJfT2KQf0AOqZDTivXNHDgGaHUtaZudZHtsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqIRZf6S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4DB2C4CEEA;
-	Mon, 23 Jun 2025 12:13:36 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=ajjxcPtwhzRRJG/NwtBfjRPPkZn5sBTJDrg0BC79V6E3gcvT+WsCXvWVDDbPW6Ngf7lEJC/krbP9CFn+LE6WVpKjWMR5vnn4Ojp0x2ah5vyfK4PNFwfEVZmEph13H9VsVzvDj16PAxj34gco3+jUgT6jV+ykk4ljiimCeyXjXw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+nKa5ja; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D51C4CEF0;
+	Mon, 23 Jun 2025 12:14:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750680821;
-	bh=ueR3nwsqBvhrycpfvVhVdbKTsds3A/sZLdw2rshMJas=;
+	s=k20201202; t=1750680886;
+	bh=o/om+5oc+Ti+iKJv0+pm2Nb+TnULQl3shWGHQYtDlw8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oqIRZf6SgwCntYShV6rYOoNG6ZfwNIcaMs6ZOpNYBu5xNpW37ev9/Nr8Bx3/j68Mo
-	 tewirxnpq56dPeguPEl6ZoLgTtCoVxM+0aa+E/zPALL5UCtkdQcgOcovZgpBe2m3RR
-	 CcuIayIAIWCNItmG5JfLEGmTGkPdHUr8ZbU7AGVhihit9HylPg56ZzppCYLcsUZ6DM
-	 yuoAOIxKipMcuRLLd9mIuhmCTiFGd+G9jMIYzIEirOWo+DUcI0RnU/Wh5wLNFEcTqH
-	 WqIYpbAUIA/afqwm9cUgk2VHglGL4vvRrS5Ygol8ai2d27lgsuv2egWr4I5+k2CyCb
-	 bJWJfMyfhgzxg==
-Message-ID: <2bc23bcf-0021-44dd-ae42-9ef0e95e3b32@kernel.org>
-Date: Mon, 23 Jun 2025 14:13:35 +0200
+	b=p+nKa5ja+zDAPNVmSQWKjplk0v5hOGK6Q/XlJbsTL5sbfiQOwIy6T1LT8V++Uylqu
+	 uOiIY2Yc9R+h8nnWIN5dvEyudvIlJhrf2qky5/RFp63yvQsBCAt0JoZc1RHg7iDqaZ
+	 mB9946nDS9/1zE2dS0e4fzjEm03RL1Mz86KXPCaupMgtG/ow/LsuXzkAPNX4ccrfNz
+	 6Pk4eAJ963DaPSboxbhp8diRyfDWn3qnEHUGYv/0UERzAod7IEwGjO0IcPlpXgXb8Y
+	 OXTGm9Jz+/oVjObqcFCe1sdMxMAwu76OF0MM2e3tTsPj0uor7/vxfLzxrFnunS1AaH
+	 n7IsphcyEeCuQ==
+Message-ID: <d1802074-5472-475c-94b6-a0667e353208@kernel.org>
+Date: Mon, 23 Jun 2025 14:14:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 29/30] dt-bindings: reset: Add MediaTek MT8196 Reset
- Controller binding
+Subject: Re: [PATCH 30/30] clk: mediatek: mt8196: Add UFS and PEXTP0/1 reset
+ controllers
 To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
  sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
  matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
@@ -62,7 +62,7 @@ Cc: guangjie.song@mediatek.com, wenst@chromium.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
  kernel@collabora.com
 References: <20250623102940.214269-1-laura.nao@collabora.com>
- <20250623102940.214269-30-laura.nao@collabora.com>
+ <20250623102940.214269-31-laura.nao@collabora.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -108,35 +108,27 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250623102940.214269-30-laura.nao@collabora.com>
+In-Reply-To: <20250623102940.214269-31-laura.nao@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 23/06/2025 12:29, Laura Nao wrote:
 > From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 > 
-> Add a binding for the PEXTP0/1 and UFS reset controllers found in
-> the MediaTek MT8196 Chromebook SoC.
+> Add definitions to register the reset controllers found in the
+> UFS and PEXTP clock controllers.
 > 
 > Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 > Signed-off-by: Laura Nao <laura.nao@collabora.com>
 > ---
->  .../reset/mediatek,mt8196-resets.h            | 26 +++++++++++++++++++
+>  drivers/clk/mediatek/clk-mt8196-pextp.c  | 36 ++++++++++++++++++++++++
+>  drivers/clk/mediatek/clk-mt8196-ufs_ao.c | 25 ++++++++++++++++
+>  2 files changed, 61 insertions(+)
 
-This belongs to the binding doc.
+You just added these files. Don't add incomplete driver just to fix it
+later. Add complete driver.
 
->  1 file changed, 26 insertions(+)
->  create mode 100644 include/dt-bindings/reset/mediatek,mt8196-resets.h
-> 
-> diff --git a/include/dt-bindings/reset/mediatek,mt8196-resets.h b/include/dt-bindings/reset/mediatek,mt8196-resets.h
-> new file mode 100644
-> index 000000000000..1a01b2b01f7f
-> --- /dev/null
-> +++ b/include/dt-bindings/reset/mediatek,mt8196-resets.h
-> @@ -0,0 +1,26 @@
-> +/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-2-Clause) */
-
-Wrong license, use standard ones.
+Patch should be squashed.
 
 Best regards,
 Krzysztof
