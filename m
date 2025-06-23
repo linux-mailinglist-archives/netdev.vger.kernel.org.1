@@ -1,151 +1,205 @@
-Return-Path: <netdev+bounces-200160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B35AE37D4
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:07:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 353E4AE3831
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D6997A18E8
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:05:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCFA77A3638
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23ED01FF7BC;
-	Mon, 23 Jun 2025 08:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEC41F1306;
+	Mon, 23 Jun 2025 08:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcY2WHNS"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="AUtB4IIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010063.outbound.protection.outlook.com [52.101.84.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FA31FCFE7
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 08:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750666037; cv=none; b=uAlMxC7vvQxE99F5SOSJqrIYG3QGY3urFF2GN1kkkdY1JgK0wu6Wzams+ol/yB2wVpBrCcJyZk8nENV//H53CoG8+XdGIki/c7x2dSlxp9jznnd+xX4rWaU1KEe78g7yeUr5t3jk+PRYQGbKvg/cuxPh9N+dUluQ2xQFPwZKi58=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750666037; c=relaxed/simple;
-	bh=dhmcYeHsQsigeZcrHk+M4JmzBnlMYZpMRTtb2dRaBIo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WJKfg65LAJH74WGA6w6urtqx23YyyFI9XCFjh5QhNorg8hjLexIQyyPc0J1HMxviA33OM4x6yvDRR+366mC4pnBNlCueZPJD3emuCNN5zr34BGN24LWpJYzuoTiYACDXhrMvSNVTCePCqQMfznKfQtihdSzQr/6+/LxeogqQ3Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RcY2WHNS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750666034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dhmcYeHsQsigeZcrHk+M4JmzBnlMYZpMRTtb2dRaBIo=;
-	b=RcY2WHNSiDo2HhsIMDVKPuNauhTHbM7AfvkR9kZSo1acGTzV7E1vYVK4plGfaIjYx7FjUA
-	Oze7uAKV5iSAHbw245SjNI01o3V4J2xUiHB3Zcf8ufXatk4zWlSkhufhkiiLDDzZ3q3TmI
-	wr1k709bcP8Wp2V9t3p6MumAa4tJemw=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-dEc5wOm7M7C-FaeFMDTxyA-1; Mon, 23 Jun 2025 04:07:12 -0400
-X-MC-Unique: dEc5wOm7M7C-FaeFMDTxyA-1
-X-Mimecast-MFC-AGG-ID: dEc5wOm7M7C-FaeFMDTxyA_1750666032
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3141a9a6888so3647241a91.3
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 01:07:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750666031; x=1751270831;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dhmcYeHsQsigeZcrHk+M4JmzBnlMYZpMRTtb2dRaBIo=;
-        b=p7AzV8Qah8obtD0WLxLt4ZXPSpsheDpKqEDcu9kUByPdN3+Nde1GKkZV2w7uLcZXhv
-         Mzfdflu32ajofO1U5svyT/0nGTU8qOXRiqbm4ODaHkNs7aRm3KUOso34MLdjl63eoc71
-         wu/CBTDY/AqJfDK+93yP/wz+igjVHehWQUoiEaF0W5pruNNZquF5jVGEIvAfQyaYDHug
-         hDf2bJvq3lo0MY1LqE2pSwZ2+WDYtLeAfMQQjIcrNs/g0GHq+sCbaWn5TYk5Ankz21BS
-         A7HMZbDNzpgFcOYh13icF8X57J594WiQ5MGIXQ9MCMkchIdMxW9NvNxwYVhMaIvdlF9y
-         itcA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4bznBR623cmXwyV+FLhFLfq/a8QTn/iXBnzSxExontXBooTK+ivhFhmRdzvAlLwxgr04VJOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwtS7KhO/FfTgcUeajskpzePgm15ygciSaWfWXY5fxP0SzwM3f
-	lgte5dJLxDtK9diFkJtc+U0mFy73UxE8xHgyP4UOHc5RZefhn/kSAlBXDveVI5RXx2bYfxDv/xR
-	uvE3b+u28nJbUQUy7Fu7oYsh+EkV5YRHH71u/tWvMdozeBxcXXjcacUlzeNMsHZoGADVUu5//h1
-	DLjjnRYV1lIa9dYddnOZgVrMvOLj4ZMY14
-X-Gm-Gg: ASbGncuihutf4zLjECojrgDaVRRR/nqMe3uy7T+G+rywOc+Gi3NIBha7uwa7NJt2HIW
-	VZDvdNiOpIR08fH9dE9HUk5jwAAaExzu/fCjloO1FFoBiDCTSxh6AxGCc4zJxeiR/NzK8cgJCEm
-	j6C8Bh
-X-Received: by 2002:a17:90b:5444:b0:30e:9349:2da2 with SMTP id 98e67ed59e1d1-3159d628b59mr18126473a91.4.1750666031639;
-        Mon, 23 Jun 2025 01:07:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHVQTOppEHtAfsayyJvo34GLVedX6rLC/x06Rbxlu1q0T6P50V9CQroeozuTXZMW8lnTkCwwxrOBTsZCaXXqkM=
-X-Received: by 2002:a17:90b:5444:b0:30e:9349:2da2 with SMTP id
- 98e67ed59e1d1-3159d628b59mr18126445a91.4.1750666031289; Mon, 23 Jun 2025
- 01:07:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E957E211F
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 08:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750666662; cv=fail; b=k8UADxtA38z2UEh7dRP1yTGvaChNZ/FpzokmP7mXFtQNHOBSr74owXe+id246Lb6mLGG/wz70aA7pgZ0Hq6kpekIiL/zBENA5ceJu7IZ+6lB7UkiJoSbrhWbXxfLXuszWAUtpT3KgjLhQe2fP3On9h+cwuk5e1tytk7/Hs5BtVg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750666662; c=relaxed/simple;
+	bh=MGfc2epQFtWaRa1i9fd9TRiMw/DOcT2Gs7ZWwgoW2GE=;
+	h=Message-ID:Date:Subject:To:References:From:Cc:In-Reply-To:
+	 Content-Type:MIME-Version; b=ljl5bozCHCW+M8CRiYJfhPswAoE22yjlnEWZ6pUu10u2ISjfb2JZAfYz84xpfrXmmzOAlT7Rmy5PbH8oL36/UC5iZEnerwLHxnf5ehJVMxe9m00zTqGl3WsV3pHgKvNeK5s6085g/1Zt1A8ZUvFLj9gNUOei/tIZ7gu2EJR0/2w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=AUtB4IIW; arc=fail smtp.client-ip=52.101.84.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sdIaqEiLG0IMwWbMS69AASRACWReCSbqtMMs3Hn05ene1G+Mz6xgJo5n4b42EbAESzbVztYm87eHauRxdRaYr6dJZyBk0pyi+BUDAN6xwMvJ//2T5HUJRH3yWRevsrkrapknK0JJWV7N0ssMpKEdkPbmRQDlLwaNTaEELRNXdirb7Mq2pfm2uEFJOOkQeOBAALUbkRLcLAyTFyG1wx6tNQEkpTeKr4SvfVhYHiC5cpPSVr0mazULoe4efcK6xHmYb1iE0UFwVn/WIYyhv8VK4oM9SvYFe6nlxC/iQzrlGesfQhcgGfQtAU/BMSYdOjcY1Sqd1uYddkKRFhoqYYvljA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0I8CQHMkj/tQLdFHGps77P5RqtvF89i1EEHrv5hu93c=;
+ b=IvoO+A6H9k9jePM7LH89Sv08YsPwQIQ7cD42OF6u3tkWyfpGy/+TwPtbl1x9sN2AePtMLfkJfBAXgLeWRDfYp6coIf6J3BTs8Tz04R41fizulWTziEVw+RmPeDRf9WWAaXFcaHp0bDEdvPHF7FaYdktiDu0Hox3ycnrZc9a7rxnzEka0F5b2uwAKCOYJgI4bCb/oyjqYCklfI1hm5X84y09WSjS9a5HqXEELlz+No4vyfD6Ud2Sm2G+S9gQWXzrc/+d3IGkcgWFOPjRpXjeNqHmUnUr9CxJyW+NwZCa1EvYaeJufeAVm/jvdTMYr6fCCIHG+5DXQJK+sH4z/hMG9Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=2n.com; dmarc=pass action=none header.from=axis.com; dkim=pass
+ header.d=axis.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0I8CQHMkj/tQLdFHGps77P5RqtvF89i1EEHrv5hu93c=;
+ b=AUtB4IIWyXPxEtaLiHk1lkqB1eh+upZva0UHeXb7fGd0pYWXfvo1zQLFVLE/gz4BCiugkoyNI+Z+UKeMz7OIAPDXHcKF74bDIGCiu/prJUqhm3RrhejTp9Dh+1H/22HXGEPjLk4DYJlD/Dfl7Wnd98rqqocJNpear7X/Z0f5igw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=axis.com;
+Received: from DB5PR02MB10093.eurprd02.prod.outlook.com (2603:10a6:10:488::13)
+ by PA1PR02MB11427.eurprd02.prod.outlook.com (2603:10a6:102:4f1::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Mon, 23 Jun
+ 2025 08:17:36 +0000
+Received: from DB5PR02MB10093.eurprd02.prod.outlook.com
+ ([fe80::2a25:783c:e73a:a81d]) by DB5PR02MB10093.eurprd02.prod.outlook.com
+ ([fe80::2a25:783c:e73a:a81d%3]) with mapi id 15.20.8857.026; Mon, 23 Jun 2025
+ 08:17:36 +0000
+Message-ID: <c19e6665-941d-417d-abf2-3df02d47d92f@axis.com>
+Date: Mon, 23 Jun 2025 10:17:35 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] net: phy: bcm5481x: Implement MII-Lite mode
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20250620134430.1849344-1-kamilh@axis.com>
+ <20250620134430.1849344-2-kamilh@axis.com>
+ <f8662437-58ea-4ae5-8fbc-eb06e22f5a1c@lunn.ch>
+Content-Language: en-US
+From: =?UTF-8?B?S2FtaWwgSG9yw6FrICgyTik=?= <kamilh@axis.com>
+Cc: netdev <netdev@vger.kernel.org>
+In-Reply-To: <f8662437-58ea-4ae5-8fbc-eb06e22f5a1c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0112.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:bb::11) To DB5PR02MB10093.eurprd02.prod.outlook.com
+ (2603:10a6:10:488::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-1-95d8b348de91@daynix.com>
- <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
- <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com> <CACGkMEu6fZaErFEu7_UFsykXRL7Z+CwmkcxmvJHC+eN_j0pQvg@mail.gmail.com>
- <4eaa7aaa-f677-4a31-bcc2-badcb5e2b9f6@daynix.com> <CACGkMEu3QH+VdHqQEePYz_z+_bNYswpA-KNxzz0edEOSSkJtWw@mail.gmail.com>
- <75ef190e-49fc-48aa-abf2-579ea31e4d15@daynix.com> <CACGkMEu2n-O0UtVEmcPkELcg9gpML=m5W=qYPjeEjp3ba73Eiw@mail.gmail.com>
- <760e9154-3440-464f-9b82-5a0c66f482ee@daynix.com> <CACGkMEtCr65RFB0jeprX3iQ3ke997AWF0FGH6JW_zuJOLqS5uw@mail.gmail.com>
- <CAOEp5OcybMttzRam+RKQHv4KA-zLnxGrL+UApc5KrAG+op9LKg@mail.gmail.com>
-In-Reply-To: <CAOEp5OcybMttzRam+RKQHv4KA-zLnxGrL+UApc5KrAG+op9LKg@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 23 Jun 2025 16:07:00 +0800
-X-Gm-Features: AX0GCFtKGLSh9bwOyNMqm1wsTSYXIq66dXiloWDLmA7vjP1FAzXUnFKbCzTNLUI
-Message-ID: <CACGkMEsfxXtHce2HeYwYxmhB0e5cOjn17qM6zFEt75bQhbtrDw@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Andrew Melnychenko <andrew@daynix.com>, Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
-	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB5PR02MB10093:EE_|PA1PR02MB11427:EE_
+X-MS-Office365-Filtering-Correlation-Id: 60800c0d-f3ef-48d2-121f-08ddb22e697c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RWRuUmJKbGplVlF5WmdVdW83S2MxVkNkZWxRK0JrK1RKeHZFTkdYYVRZSGlR?=
+ =?utf-8?B?WVdRdHRYdnVDTmRvb01IekxtYVptcUY3L1FMM0JLZzFOZi9XVnAzV3hOUkk2?=
+ =?utf-8?B?ZVdkbmwxVXhIamtRbktvSlozQ0RGd01SNVNmQTdlV0xJQU9KM0ZWMmNGbUlr?=
+ =?utf-8?B?OHpiWXRrR2QxSjM0d0NFN3l3eVdhKzYrVUpkYzJQblJsRVhKaDNJem5LaFUz?=
+ =?utf-8?B?NlJHaXQ2Z2Y2dXJPWitzdmlxMFBCcWpYQ2xwdGJ4Y2tadElXazhkdzN5Nk9D?=
+ =?utf-8?B?eGE2ZXpwR0d3TzVoQXF2dENXWkJFSGM3K3BCT3diblJxTVJBUkEwUDF6a3Bv?=
+ =?utf-8?B?NmEvTmhwejQyLzlpdTI3Zi9Ib3hNL0krWGs4SFNtT25QT1VjVmZUZGppUk1X?=
+ =?utf-8?B?OGI5U05sNVh6SjgrOHlyTVpERXh3cnpTN1U5aE5Nc3VRendJbzlmU0ZDY2Ur?=
+ =?utf-8?B?NnRxcnJWbVJnd2tiUjBwdjNmUk9Kc1pRT2JLQ1E3S0x2NUlpVktPaXRPdk1p?=
+ =?utf-8?B?cHBBckIwN3V1UkxITVVxR2xFaUd5U0tyYjR0dGRRekZORDV6WVZRYXdpaXBo?=
+ =?utf-8?B?SFYxaGhwbHVJekZ6RlloSTk4R3dZVFVPVUZUM1JFQUJ3UUluam51MDhwYmp0?=
+ =?utf-8?B?ekZaWUJZalVWdUMvWmthZVJBWnllMHNQUDhYRlZKU2cyNE1HbmV6K05WV0FI?=
+ =?utf-8?B?MnFTNFNBMkFXWURrcFBqTE8rQzRjS1ZRNHpHTWJSVUVVWmE1ODkyWmJ4bWtB?=
+ =?utf-8?B?dXpObWVlbmQ3cjc2L2xpYU5ZdzVIUTZpeW5lRnRNVGhPcUQrMVkrUFpNbUh5?=
+ =?utf-8?B?ZEh0U2NoOVVURGVJWW9hMXFtalJhV2tZamlFc1FZNFRiMmx1d1JLOEFQN3pI?=
+ =?utf-8?B?LzlMdG1nQTRPNmw1UE8yckpYZ0N0TDBjMzgxajQ3MVNoajlsSkcxcmtlMFNz?=
+ =?utf-8?B?OWpmWmRrVVZBU05CaXdMblFrUUhnZDM5eWRndUo0Z1BCL1YwWlZ1SkNLUUFy?=
+ =?utf-8?B?dDVtUjFlNmFxcWNsdnpkNjBnK1htOUNESmxQbU01b2Z0dmIydWszcmhPdlZH?=
+ =?utf-8?B?bm5ySDJrVnlWNFRlZ2ljcmViYjRPSTY5cm1wNytKbTZSV0J0VkcrN05Rb0VC?=
+ =?utf-8?B?SWdTQkFoNkpIWjV1NWk4SVBtSXBKdVZQOUVNOEdjcGpGMWJnaWIyUDFpSVhQ?=
+ =?utf-8?B?QXl3bDZOdU5zUHdib0J1QVZiWjZURWxrR2Z4cTBzQXhPRitHaU9USXNNTndD?=
+ =?utf-8?B?SEVQYXZUbGlIVUxpNldtTFg1YW5aSFRFeE52eDZVNVFQZGJpbXdINU5MdmE5?=
+ =?utf-8?B?V1Q1eW9iOWMwbTlHeVFGL1BGdXNpdHlTRlVRd0gxYXNqSFY2WnNTakQ0ODRX?=
+ =?utf-8?B?Z1ZockhvMFlyQWx3TDFmU3NvM2p5WVNSYkhsTmpRQy9EZzN2V0hFeWNYRTVx?=
+ =?utf-8?B?bi84ZkVlR0FFWCtsYUIwMk9kVlp2UTdsTi93bzVTei80YUFybmRwQXZYN1o0?=
+ =?utf-8?B?cVZ3eVAvZGdGckV6WWQwL3dneFBPQ01aNFRmbEdzZWxyamo3NlV3L2J2MGZR?=
+ =?utf-8?B?SlBWenpCTjg5bkpZbGIzcU94Zy9sOG9FN1JWbkhxNUluajlmT1JKK0I0RlNp?=
+ =?utf-8?B?dUJuQitteXlWK1RvMHRUb0lRL254aG51YmxrSCtBRWR3SHFCTGk5Y0ZSY2pH?=
+ =?utf-8?B?T29PZUw4Q0ZPMG1paVdXNitzQUJzY2NFYUJ4eEgzcjdvdStRTnhkcENCZXNV?=
+ =?utf-8?B?YTEzQ3lLa3pWeUpVRUVLZW0rTmZobS8ySURsSFVFcWc2V3F3ZStVSkpadGZ6?=
+ =?utf-8?B?Ull1OWtRczFJS3FZWWpQUVpTSkpZbjZTUFNBNmJYQllqTHgyeUhvL2Z4OGRE?=
+ =?utf-8?B?YkhHeVZ2d2llemZKT3VBK1MrSFhFbnlZZXFIZjVubDRiWEE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB5PR02MB10093.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Ky9Vb1dHNExHSjNiMVJEdkk2WGJxTkRCTTdza005aFdmWWpFdkh0OWFZeWZl?=
+ =?utf-8?B?b3dENWJZV3YwUmdxTHhuRlpxMjdMUUFPL3dPa2hpbS9wRU1aeWw3K05naVhm?=
+ =?utf-8?B?N0FyamxmZGJkNllxUnJjMXFlb3NsVXZITzBOd0FCb003M3dQZ2szcE5VQzFC?=
+ =?utf-8?B?WmRXcWYyR3ZrN1dhdzNtT01HdCs3ajkwRHVibzFSYTJWRTR6QTBINy9LZlNl?=
+ =?utf-8?B?V3ZrZEZ0eW40NVRMUHZ4cHpuL0N2MDRMV1RLSURqN1p5RTROR1E4REpSamhM?=
+ =?utf-8?B?SlhRaGVFeFlCMnNBNTdOaWdpZDVWeVlkZXZjN0VYTHN1T1RvbWZvQzZvSlc2?=
+ =?utf-8?B?V0tERzR4cUIxUnAvMElMeStKOWVnbXlDY1ZhWlpOWU9rZ2pjeFlhQ3R0L2s2?=
+ =?utf-8?B?enlwR2VKM1kzUUR3Wm05YTJQTnlHYlc1S1VhdlRvMmRDbzhxS3BTeDJsQUEx?=
+ =?utf-8?B?Q3BVRWtab0ZqVFVxTU93LytDWWdKNnBvNjcvTFg0QUVPWDJ3ZDlMbFdIYm1D?=
+ =?utf-8?B?N3hXUUNFRlkvSXNXTlFrRFpKSlNzNHgyZWpBTW1uUWRwVFJyUFV5S0IzdjBs?=
+ =?utf-8?B?amo4cENCQ2RacG1xOFdpeEJBNWJvV2dYWWlIM0c1MmUzbHJxTTZvejBvYkpQ?=
+ =?utf-8?B?alNGRmlqSnRmWUs1Q3c3WWxWSXJXdnNHUzduendTeEFVTFFSc0FMVFhML1ls?=
+ =?utf-8?B?TU9TdXBIRHQrdGdoZUpEMTdSamZieDVKYmU1RGNRQTU1TVNSRDRxVElKTzl1?=
+ =?utf-8?B?bllhLzJKRFBHWEhmU3BTc3pDZVdvQU1OWjd3OHVkZ2tWZXZGWGdpTjBmTXo1?=
+ =?utf-8?B?TE8vSVM1OVBTcUlTUGxTY0ZNMERwK2dNWllKN0EzK3Iya2Nic09BdFVKMTgv?=
+ =?utf-8?B?N20wTjdHa2lvdE5ETE5HRzkrclhVUkpjdVA3dHN2MkRBdDBvQkxST04zbndp?=
+ =?utf-8?B?aEpleHEvWWlQTW9tbDE4RFh3bHF4ZEZrcEJPbUpReVYxZ0MwNm4vSVBzWFNP?=
+ =?utf-8?B?aUJMWUtTTndEbWYzaHk1UlRnN0tmZmg1czhrd1VIaHRHOXBxd1FTbFZKV1Y2?=
+ =?utf-8?B?YUUxeXlwKzVwTXlNYzhYdkQrbWluRW1EQUo1KzU1U1RmY1k4K2wwWk00NkVx?=
+ =?utf-8?B?aHl6K0srajFXUHVJL3FHQk1LQVBmQXhSZDhFZnFRNW0zc1g5NGhXbEphNjM1?=
+ =?utf-8?B?MWFTV0FQeVFqZWhqTnNISThkRWlabFd1aDFGbFFiS0lZdFNHeDdxYkx2Unkx?=
+ =?utf-8?B?cmFIdHZWTEtDOUFVeHpWVUpCS2dQRllVaGNqZXkwSll4bnVybWtybHlMcEZw?=
+ =?utf-8?B?QjB1b3E4UzZXejNBb3NPT2JqbUJXcTM0QjBsQVk4UWkyZGVibS9jelIxSWw5?=
+ =?utf-8?B?anZTNi8xQ3o0WUhKN3FtSE16cHZQbUFLaGc2RnpQR2NaWjlkc0hXQTVlWmQv?=
+ =?utf-8?B?Z0I4d3BGV1V4QVY4K2hqNEh1Um1jOEFEbU4xZjlzTjl4bkZsN3M5ODhoaWE0?=
+ =?utf-8?B?cmxnUHJWYjhMTzFHTDdLWTNOejBxei9LUnJKZVkyVkpldFNPYkN5ZFdPMWZJ?=
+ =?utf-8?B?dW16U1pJa0trM2U5MXhrU0hTYjcxRXFCM0VKTnBzWHFpZC9EMCs5MmN1Um1E?=
+ =?utf-8?B?cXpINXVtdUUwbzJIb1dnQ0dRUTZpbndIcFphYW96WlRNNjVNVHBiNjY3RXVh?=
+ =?utf-8?B?MG8yai9OeHBUYVBhWXdOVUNPUEZUN1dRRU9kSVBwLytNVy9EQWtZZjZubXV5?=
+ =?utf-8?B?RG4yR0xDY2tTRVVncEFDeVhPNm9qQzIzZHRQT1FYQUhDYjdyVHkwVlJyNDN2?=
+ =?utf-8?B?aDJvTTdhTnVrY1ZUdTJTdzZ6RnNaTWl6TXk0OEN5N3ZuT2VPUkx4N3JYTGlT?=
+ =?utf-8?B?Vm9nTTJrMUJ5enNYbjI4VG1IbWplTUx0YWU3TVN1eDUySmJscnorV1A3UTBi?=
+ =?utf-8?B?MEQ1bVdPUFRHcElibm9pRUJsRy8wOGxRRGZJWXVqdVIyRTAvbGtoUUhRSDh2?=
+ =?utf-8?B?T0FaRzNHVzljQ2UzMlI0dEJKS3F4RU1OeGdQaUZDcTNOUEoxaWJwMVYwZDN0?=
+ =?utf-8?B?SVBONVRCQ0xvcHlCT2d2ZTA1a25PeG15THRrYlYwbmJtN3Nlb1crd3IvNi9P?=
+ =?utf-8?Q?b4Fp55kofDCfnMTq3O9wgzWe2?=
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60800c0d-f3ef-48d2-121f-08ddb22e697c
+X-MS-Exchange-CrossTenant-AuthSource: DB5PR02MB10093.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2025 08:17:36.6054
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WaoOHEy7qOukaoodT8CicrRO9SbJDjAUDcp+p22U7goDS/p7xblyv2yaVZpuPkOO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR02MB11427
 
-On Mon, Jun 23, 2025 at 1:40=E2=80=AFAM Yuri Benditovich
-<yuri.benditovich@daynix.com> wrote:
->
-> > Yuri, can you help to clarify this?
->
-> I see here several questions:
-> 1. Whether it is ok for the device not to indicate support for XXX_EX has=
-h type?
-> - I think, yes (strictly speaking, it was better to test that before
-> submitting the patches )
-> 2. Is it possible that the guest will enable some XXX_EX hash type if
-> the device does not indicate that it is supported?
-> - No (I think this is part of the spec)
+I wouldn't consider MII-Lite a separate mode (like eg. RMII), only a 
+special case of MII with just those four signals not connected. As far I 
+understand it, there is no need to configure the MAC for MII-Lite if the 
+MAC input signals (RXER, CRS, COL) stay inactive. Because if missing COL 
+(Collision), half duplex cannot be supported. The clock is limited to 25 
+MHz, thus no gigabit. Besides 100Mbps, also 10Mbps, full duplex is 
+supported with 2.5 MHz MII clock.
+At least in the case of Broadcom PHYs, only the PHY must be explicitly 
+told to switch to MII-Lite. No problem with the impossibility of half 
+duplex, because all BroadR-Reach modes are full duplex only.
+In turn, the RMII has less data lines (only two) and the MAC needs to be 
+configured differently so it is clearly a another mode.
 
-There's another question, is the device allowed to fallback to
-VIRTIO_NET_HASH_TYPE_IPv6 if it fails to parse extensions?
+   Kamil
 
-> 3. What to do if we migrate between systems with different
-> capabilities of hash support/reporting/whatever
-> - IMO, at this moment such case should be excluded and only mechanism
-> we have for that is the compatible machine version
-> - in some future the change of device capabilities can be communicated
-> to the driver and _probably_ the driver might be able to communicate
-> the change of device capabilities to the OS
-
-Are you suggesting implementing all hash types? Note that Akihiko
-raises the issue that in the actual implementation there should be a
-limitation of the maximum number of options. If such a limitation is
-different between src and dst, the difference could be noticed by the
-guest.
-
-> 4. Does it make sense to have fine configuration of hash types mask
-> via command-line?
-> - IMO, no. This would require the user to have too much knowledge
-> about RSS internals
->
-> Please let me know if I missed something.
->
-
-Thanks
+On 6/20/25 17:19, Andrew Lunn wrote:
+> On Fri, Jun 20, 2025 at 03:44:28PM +0200, Kamil Horák (2N) wrote:
+>> The Broadcom bcm54810 and bcm54811 PHYs are capable to operate in
+>> simplified MII mode, without TXER, RXER, CRS and COL signals as defined
+>> for the MII. While the PHY can be strapped for MII mode, the selection
+>> between MII and MII-Lite must be done by software.
+> 
+> Please could you say more about what mii-lite is. Rather than adding a
+> bool DT property, i'm asking myself should we add interface mode for
+> it?
+> 
+> Is it a mode of its own? MII normally means Fast Ethernet, 100Mbps. Is
+> that what MII-Lite supports? How does it differ from RMII? Should we
+> be calling this PHY_INTERFACE_MODE_LMII?
+> 
+> 	Andrew
 
 
