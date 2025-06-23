@@ -1,205 +1,149 @@
-Return-Path: <netdev+bounces-200207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D31C6AE3BFC
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:16:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13BD3AE3C1D
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED06E188E8C7
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:16:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A8CE3A3A05
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF9B1991D4;
-	Mon, 23 Jun 2025 10:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E6F23958A;
+	Mon, 23 Jun 2025 10:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MeIChkIN"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961243594B;
-	Mon, 23 Jun 2025 10:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668F2238C27
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750673795; cv=none; b=DeBbIz9oa8/ljEwYMGjajIC1P7bZuVN1jOw3WQvTJlGpuwxOTWVPrR9h9WwBbCZxCJraNiJzY/RTUW1vviCuVxMhs828t9JpWm/7oe3W6uMr+9fWqEkGkza2x6EqrW+7Bkw7G2h6JdPau/9udtqjeOi8CYFPgebmhOdr/3BqIgQ=
+	t=1750674087; cv=none; b=UYWZjFjnwYHFcZPYRD5jsKIejnlbBlnlqtZa2uWqTD7jCwA98uAQyBlHr8ZFtBfiN/3qSfT8jOb1pUwy1oCebiMUvNLHNn1Do2KC+9zka3JTMKcgB4zbB9FSWZhgSZqQUPTuI2h/i5pOp9TAAZZFrqsKcm67CevjoOhlpis0XRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750673795; c=relaxed/simple;
-	bh=4hlRXYti4Od8c6oYubkTk0N9zQ1yF2SNKRST9MEGxDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SPD0sy+8qTkjceCZt3DwWuRlL5vc+VffbnneFkthpDI13fjF4mUsWxyiL6bRRorksGebM8qT8hiZ4D0Du2uaVvwFSyOkHR8Zvl3wMiRWPHUp5UduLvyI6KVQqQOnIsAuxJJFnyfAv3BG4jvujV1qHV9n/WZDUh0drozvYISaLSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-6b-6859297b1aaf
-Date: Mon, 23 Jun 2025 19:16:22 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
-	horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
-	jackmanb@google.com
-Subject: Re: [PATCH net-next v6 9/9] page_pool: access ->pp_magic through
- struct netmem_desc in page_pool_page_is_pp()
-Message-ID: <20250623101622.GB3199@system.software.com>
-References: <20250620041224.46646-1-byungchul@sk.com>
- <20250620041224.46646-10-byungchul@sk.com>
- <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com>
+	s=arc-20240116; t=1750674087; c=relaxed/simple;
+	bh=CadnOnqUrP01j9sf1g6sUWHOFqKProxbSycYgQcVmxM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YMNLODUsyJYUGfDoQXV8A2L0C2AZgV7b1zl0XT3F4rfh2sPmr1vWFkpgfyjgzQM5Hs2SVKDKQ6OsaoBeo07oH1TTioVT1s1fSdAQjCqTQ9d6FKCRDs4lxikjYl8E2Z0VrGIOS+iRgap6iRFWCWvZpNVuEHGOIVHyCsOJQ6UZeHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MeIChkIN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750674083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0lgw/bD4SindaQDwTXpeWQKLQPGV/k/mx1XMIx/reNQ=;
+	b=MeIChkIN5mc9k0qLQ4zz/42LFZIUspwtuzfbWwT6CVQrEwM+5hCN8j5uDPLN1PsF0W37tJ
+	SOUsdn0eclikM/i7IOyx7+jMyYYfClPQpCMP+488KxB7UiFWvoRa5IftHbyvPoK8P+qhmU
+	pe+02ONbknHgKmx9lxQ71m9/DV0TeQA=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-619-FfxBbhu0MpCIFGhLqSWNew-1; Mon, 23 Jun 2025 06:21:21 -0400
+X-MC-Unique: FfxBbhu0MpCIFGhLqSWNew-1
+X-Mimecast-MFC-AGG-ID: FfxBbhu0MpCIFGhLqSWNew_1750674081
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-7118199f959so60180217b3.1
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 03:21:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750674081; x=1751278881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0lgw/bD4SindaQDwTXpeWQKLQPGV/k/mx1XMIx/reNQ=;
+        b=O3rI3IwMiyZCLaTcRZaF2E+aegr3jKL7aRnbE68n3c8Co2qbDwpNgOl+cRtF/KAHj/
+         RDK7cjVRJvGYM8ZAXp/6iNQVODyzv4nET7RurRFjFXqYtkFQap7gmBjSTGyqxDbCwGA2
+         94lfLltuuBPtfyYBTruGktTwZlnOkgzm/NHX52Z8u4XwaHgfpoIb3b7bKYBstLDb1EhP
+         m/P1aOUdnUgBO/hYEvd/mm2u7NPfBE+2lak5jxoVjJaFV0MPrx+Ms0k2OUGT/gpnd2FY
+         TyN3WliQqTOpz8rgKJ/6AwFBwK0n5nTb8cxiEvoCwJpo5/TYIgJZFvMJSYyQihNxO1UT
+         E6Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCWI52byXrqMC3JQ6hN7aaY0RyBhCg7pc1qh7KuQG9riiyNIzmQSrhw6cjgv55aqtjllLdBrDV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyc60sZSNGWpM0+syhjc3ddMF9aBdClS4iFA4oWRAW+zVPtIdfn
+	QVH991wSGptMKVUdy1m53RZKmL6iNMTI0Gx8aHmSrnjR36/TEFgqvoVqEgMMo8jGl9FM5HeoyTh
+	rMKcPjHGAd3BPUlRzfKxahkSPJLfXk8qof2acFkll9/V8ztJiNys8rwiJdrgzsLEJdKmccoX/g7
+	upT6OE4K0WsQNh+veLnBXkjTM/nFbc1Wvq
+X-Gm-Gg: ASbGncuDycMfrdVepg2APNLv1t+R4joGKg0wpRA7Xc2Ar64lj5Cjh2qkOuZiOt+Uteu
+	tYd+ImUGHtSUK77u5IR3Y+Yh9ObFBXqs/nHuyiRn03O1IFGSof9AEAYG52ao2vr19Tbuvfr9XE2
+	PZ1IU=
+X-Received: by 2002:a05:690c:6f93:b0:711:7128:114f with SMTP id 00721157ae682-712c63c5613mr173777327b3.12.1750674081369;
+        Mon, 23 Jun 2025 03:21:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFFiDnn92RagGTfufzHsxHhTXMUufsWyR4eKoIQO45W2ta/mlkrX/GRWBBKswWX0hUbhvXY3gbxHPfx0i3Xsoc=
+X-Received: by 2002:a05:690c:6f93:b0:711:7128:114f with SMTP id
+ 00721157ae682-712c63c5613mr173777017b3.12.1750674081105; Mon, 23 Jun 2025
+ 03:21:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRzGe3fOzjkOR8d1e7vXVEwtu0n9P4REEL1BRRREF6RGntpouphl
-	UwosJUmahl2dK5Zhs2lMZs7NMnRqWiqFXVhqaqsMyzStpLXItknktx/P8/L83g9/jpJViudw
-	qpRjgjZFoZYzElryJbR42cnoPcoVl99yYLSWM1D2UwfmPocYjBY7gu/eLha+NTYzcOvmGAXG
-	p9k0/LD+ouDDIw8LZbat0Hu7n4YHOdUUePJbGNBn+yio9Q6xcMZRKoJn9jwxXPpVQkF1Zh8L
-	z2uMDPSUj4uh36Wn4bHhDg29eevhkWkmjLUOImi0Votg7Px1Bi52mBh4l92LoKPBQ0PR6TwE
-	1oduMfh++jeKmnrY9RGkYXCYIvfuvBYRp+ENS0y246SyNIbkujsoYrOcY4httIAl3a8eMKTl
-	mo8mTsc3EdFnDTFk5EMnTYYfvmSI9d5LmrSZGtntYXsl65IEtSpN0C5POCBRFjh72aP3F+jq
-	zPVUJirEuSiEw3w8bjb+YP5xVbuZCjDNR+Kyto/BnOGjsNvtDebT+SXYdrbCzxKO4m8w2HSp
-	O1hM43XY5+kPspRfiwsG8sWBRzL+CsJtBQ40UYThx4Xv6QBT/FLsrOr2Gzg/z8XmP9xEvBBn
-	VRUFd0L4BDx0a4AN8Aw+HNfZm0WBTcy3cNic2S6a+PVsXF/qpi+gMMMkhWGSwvBfYZikMCHa
-	gmSqlLRkhUodH6dMT1Hp4g5qkm3If0q3T/3e50Cjz3a6EM8heaj0QOhupUysSEtNT3YhzFHy
-	6VLXhl1KmTRJkZ4haDX7tcfVQqoLzeVo+SzpqrETSTL+sOKYcEQQjgraf62IC5mTicrWLcp4
-	4cuL+DiuLv+UE9W20ZjlzS/Ub/paEx1acb2rtuLQ4OfY1kQF++nKeeF3cfzI5oTVrXKwkIXz
-	ntj6lqyKWfyusi48d3Rek73bW1NrSbTr73o0ziLpmqThquUe0fCmc/fnaxKvxprCI1aUl5Ts
-	2DagiYyf2tiZM0U3viWLkdOpSsXKGEqbqvgLvm7RmEYDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfOzjmOJqd56U3DYNFFKUsoeqASiaCXbvQlrQhy6KHNO5tT
-	l0SmkmXeUhs5XSysvBWL5WWWhW6WSkqlWGbmxNIuhJWaqYtqUyK//fj///yeLw9Hya6I/ThV
-	QrKgTlDEyRkJLTm0I2tTeuAx5ZY7bSFQYb7NQN1sGlSNWMVQUduIYHruDQtT7R0MVF6foaDi
-	WTYNP8zzFIw9GWWhznIQHLfGaWjJaaJgtLCTgfxsJwUP5yZYyLRWi8Bu7BLD88YCMZTO36Sg
-	KWOEhb77FQwM3/4jhnFbPg1dhhoaHAVh8MTkCzNPvyBoNzeJYCbPyEBJr4mBd9kOBL32URrK
-	zxUgMD8aEINz1uUofzzMhq0l9i9fKVJf81pEmg1vWWKyaMm96iCSO9BLEUvtRYZYJotZMvSy
-	hSGdV500abZOiUh+1gRDvo8N0uTro36GVH78JiLm+n76sOy4ZGe0EKdKEdSbQyMlyuJmB5v0
-	ICCttaqNykBlOBd5cJjfiht6qig30/xaXNf9gXEzw6/HAwNzC7k3vwFbzt91sYSj+GsMNpUO
-	LRRefBp2jo4vsJTfjos/FYrdIxmvR7i72IoWi+W4q+w97WaK34ibG4ZcFzgX++Oq39xivBpn
-	NZQveDz4UDxR+Yl1sw+/Brc2doiKkKdhicmwxGT4bzIsMZkQXYu8VQkp8QpV3LZgTaxSl6BK
-	C45KjLcg17PcOvPrshVN9+21IZ5D8mXS6v1HlTKxIkWji7chzFFyb6ltd7hSJo1W6E4L6sST
-	am2coLEhf46Wr5DuixAiZfwpRbIQKwhJgvpfK+I8/DJQTqRZE74utatvpZO07LniyJzXrThw
-	dqe+Z6+oJVVrPzwYMmjct+rSpO82Y/YJX72/OmVNTaen/GDw/KuYG7TWHlqUfCFQ4lduaTO1
-	fg60Gr1P2b06dqXn5Z1W5kfOpvro6xOdfkUquzaqMjwkJqJX/4K36ErenQw4clfCeXz8Kac1
-	SkVIEKXWKP4CP4WDFSgDAAA=
-X-CFilter-Loop: Reflected
+References: <20250618114409.179601-1-d.privalov@omp.ru>
+In-Reply-To: <20250618114409.179601-1-d.privalov@omp.ru>
+From: Miklos Szeredi <mszeredi@redhat.com>
+Date: Mon, 23 Jun 2025 12:21:09 +0200
+X-Gm-Features: AX0GCFvydjAk0H9SdIviYpopwIHMR0R5bzlGmZzRGrpaLGnO5vBQo-A0rDztVy8
+Message-ID: <CAOssrKddunTkNzY1ydgg-rpi1aTuq-ghgJcVuQOXnK1GH5HCtg@mail.gmail.com>
+Subject: Re: [PATCH 5.10/5.15 1/1] fuse: don't increment nlink in link()
+To: "d.privalov" <d.privalov@omp.ru>
+Cc: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lvc-project@linuxtesting.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 23, 2025 at 11:16:43AM +0200, David Hildenbrand wrote:
-> On 20.06.25 06:12, Byungchul Park wrote:
-> > To simplify struct page, the effort to separate its own descriptor from
-> > struct page is required and the work for page pool is on going.
-> > 
-> > To achieve that, all the code should avoid directly accessing page pool
-> > members of struct page.
-> > 
-> > Access ->pp_magic through struct netmem_desc instead of directly
-> > accessing it through struct page in page_pool_page_is_pp().  Plus, move
-> > page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
-> > without header dependency issue.
-> > 
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> > Reviewed-by: Mina Almasry <almasrymina@google.com>
-> > Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
-> > Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> > Acked-by: Harry Yoo <harry.yoo@oracle.com>
-> > ---
-> >   include/linux/mm.h   | 12 ------------
-> >   include/net/netmem.h | 14 ++++++++++++++
-> >   mm/page_alloc.c      |  1 +
-> >   3 files changed, 15 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 0ef2ba0c667a..0b7f7f998085 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -4172,16 +4172,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-> >    */
-> >   #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> > 
-> > -#ifdef CONFIG_PAGE_POOL
-> > -static inline bool page_pool_page_is_pp(struct page *page)
-> > -{
-> > -     return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> > -}
-> > -#else
-> > -static inline bool page_pool_page_is_pp(struct page *page)
-> > -{
-> > -     return false;
-> > -}
-> > -#endif
-> > -
-> >   #endif /* _LINUX_MM_H */
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index d49ed49d250b..3d1b1dfc9ba5 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
-> >    */
-> >   static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
-> > 
-> > +#ifdef CONFIG_PAGE_POOL
-> > +static inline bool page_pool_page_is_pp(struct page *page)
-> > +{
-> > +     struct netmem_desc *desc = (struct netmem_desc *)page;
-> > +
-> > +     return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> > +}
-> > +#else
-> > +static inline bool page_pool_page_is_pp(struct page *page)
-> > +{
-> > +     return false;
-> > +}
-> > +#endif
-> 
-> I wonder how helpful this cleanup is long-term.
-> 
-> page_pool_page_is_pp() is only called from mm/page_alloc.c, right?
+On Wed, Jun 18, 2025 at 2:00=E2=80=AFPM d.privalov <d.privalov@omp.ru> wrot=
+e:
+>
+> From: Miklos Szeredi <mszeredi@redhat.com>
+>
+> commit 97f044f690bac2b094bfb7fb2d177ef946c85880 upstream.
+>
+> The fuse_iget() call in create_new_entry() already updated the inode with
+> all the new attributes and incremented the attribute version.
+>
+> Incrementing the nlink will result in the wrong count.  This wasn't notic=
+ed
+> because the attributes were invalidated right after this.
+>
+> Updating ctime is still needed for the writeback case when the ctime is n=
+ot
+> refreshed.
+>
+> Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+> Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
+> ---
+>  fs/fuse/dir.c | 29 ++++++++++-------------------
+>  1 file changed, 10 insertions(+), 19 deletions(-)
+>
+> diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
+> index 4488a53a192d..7055fdc1b8ce 100644
+> --- a/fs/fuse/dir.c
+> +++ b/fs/fuse/dir.c
+> @@ -807,7 +807,7 @@ void fuse_flush_time_update(struct inode *inode)
+>         mapping_set_error(inode->i_mapping, err);
+>  }
+>
+> -void fuse_update_ctime(struct inode *inode)
+> +static void fuse_update_ctime_in_cache(struct inode *inode)
+>  {
 
-Yes.
+Backport is wrong.  In the original patch we have
 
-> There, we want to make sure that no pagepool page is ever returned to
-> the buddy.
-> 
-> How reasonable is this sanity check to have long-term? Wouldn't we be
-> able to check that on some higher-level freeing path?
-> 
-> The reason I am commenting is that once we decouple "struct page" from
-> "struct netmem_desc", we'd have to lookup here the corresponding "struct
-> netmem_desc".
-> 
-> ... but at that point here (when we free the actual pages), the "struct
-> netmem_desc" would likely already have been freed separately (remember:
-> it will be dynamically allocated).
-> 
-> With that in mind:
-> 
-> 1) Is there a higher level "struct netmem_desc" freeing path where we
-> could check that instead, so we don't have to cast from pages to
-> netmem_desc at all.
+-       fuse_invalidate_attr(inode);
 
-I also thought it's too paranoiac.  However, I thought it's other issue
-than this work.  That's why I left the API as is for now, it can be gone
-once we get convinced the check is unnecessary in deep buddy.  Wrong?
+And that line comes from 371e8fd02969 ("fuse: move
+fuse_invalidate_attr() into fuse_update_ctime()") in v5.16.
 
-> 2) How valuable are these sanity checks deep in the buddy?
+The fix is to not introduce fuse_update_ctime_in_cache(), because
+fuse_update_ctime() is already doing that.
 
-That was also what I felt weird on.
+Thanks,
+Miklos
 
-	Byungchul
-
-> --
-> Cheers,
-> 
-> David / dhildenb
 
