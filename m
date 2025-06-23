@@ -1,118 +1,118 @@
-Return-Path: <netdev+bounces-200333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98031AE494B
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:53:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040DBAE4944
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7EDD3A52B3
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30A3D3A9026
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC5828BA9B;
-	Mon, 23 Jun 2025 15:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F4826D4F7;
+	Mon, 23 Jun 2025 15:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KYAiZida"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cqhA5rWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from relay16.mail.gandi.net (relay16.mail.gandi.net [217.70.178.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398C126E175;
-	Mon, 23 Jun 2025 15:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940BA25EF82;
+	Mon, 23 Jun 2025 15:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750693999; cv=none; b=awzZybKNeiB40HQD5Kr78xvUt6B1rkGm7tEicZNl+IQ63qs+6kP3HPKekcLITvevCbbe0zq4poHX0HR2i5eioiZzd5G7wHRaQJ09ZJQdwYLe/EzPxUzrVugvsLHkS3sW/RtFmKCFpyXL70tbCNe7GF3NYoiu+R283xdMFvaEJNs=
+	t=1750693908; cv=none; b=eGj2rZpr9LJkSeZA2LzjNpuTpHY0HzcTf5UE5vYXFwJe8mJzseJZ4BWiCpHRU41z8MYioBw8y6ruQqaztvF0EjAfNgi32ZAsFK0ECKfZh0Hg+cnsa2BuovYNPydyrt2B2DkYMi+6xYyoTInMs1I/GJ0+8Fh1ZAr0SA7PzFtv6Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750693999; c=relaxed/simple;
-	bh=eKiXvCPGG7WLlm26Hmb3q6+HD966RHLLuhjnSiZlll4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KhntzDIhETxI0n31yicFCV/KuURX9F/+tBuKaXn3KOeXRnMgRNHYc9MOIDl82SDORUUcfiOlKuBwbjuikvWjEqmB7Fu6GGEY4jZsZZsISC8+4g+p6Npo/AZ2oXPaBWHIRE3quQXUNliN7wh44lTmlshnydoxqDZh16vwKMnlCF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KYAiZida; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55NCiZOO002102;
-	Mon, 23 Jun 2025 15:53:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=PxxPxgF2ODXpDFZkHWm+P8oA/NR5X
-	Y0G9EVuhakE/zQ=; b=KYAiZida+OyzOMzZExsedHOxYKbS28zeuAYDxEE5MMHI0
-	9MziLVOBEk8af0MIusyWJPkQs3fqk9P8UtrAMBONnfqvcb28N6meuaoL7icm9tkM
-	tzx56KFRCB3soo76R7qBukXD1sPlHs+plZ6DgaSptq0iiviSwxAXg5G+4TMBzjAq
-	qnTz+lQ4XTUoVzxd0tlZQzGKyvoAegIGCj5A7N6CRNe/n0QbHjP21KaCnjtM82Tb
-	CSpy18fX5+rHktbTbSzEVCKIZqhrZ6DS3FzZrkr9YMNF1MCH5icKgBBJ3bwed05P
-	9hZtDtUZdD8zh8pF8upp32vditBZWZ0iroFYQRaIg==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47egumhyg9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 15:53:10 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55NFSveK009051;
-	Mon, 23 Jun 2025 15:53:10 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47ehq2h5v7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 15:53:09 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55NFr9NV013518;
-	Mon, 23 Jun 2025 15:53:09 GMT
-Received: from konrad-char-us-oracle-com.osdevelopmeniad.oraclevcn.com (konrad-char-us-oracle-com.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.23])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 47ehq2h5tu-1;
-	Mon, 23 Jun 2025 15:53:09 +0000
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: allison.henderson@oracle.com, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
-        andrew@lunn.ch
-Cc: hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org
-Subject: [PATCH net-next v4.1] Expose RDS features via sysfs.
-Date: Mon, 23 Jun 2025 11:51:35 -0400
-Message-ID: <20250623155305.3075686-1-konrad.wilk@oracle.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1750693908; c=relaxed/simple;
+	bh=h4AVMYKSCrcTc9JYJnM3RTwqyK7hwOu18sc9aiNikIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NgQtQzZfVNhOp0LTxu0X4MYyBEeKrpeu+DoFxFrWfx1RPq4/5SNhdWtMnCXR+FXwqWVrfMAQy/hTkVTu/VP7Ldq4o39wnVs3D7oLbnKS2rRLUreFxGyt4Pg+x3qxr06pEUe6vCZUz/3834Zs9mUxSNv0eheWsMD3wfIZaoaO3/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cqhA5rWB; arc=none smtp.client-ip=217.70.178.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EAB9044A1F;
+	Mon, 23 Jun 2025 15:51:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1750693898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h4AVMYKSCrcTc9JYJnM3RTwqyK7hwOu18sc9aiNikIQ=;
+	b=cqhA5rWBKGfnwGDr8MdDoAJKA3fxBJKamPaUJS01dWNPaHzYUlu7oR2qF6y5gb8JjENZ/c
+	EwZD2+WDsRxwihbN5/fXd4Qkdt4nokjzdBCA64uNMJrIRHC9OK4a3cQiy4mfb7KYl+e69h
+	OKcKmCkyLKsA7jRo9M0AxeOzQ2r3mSSq4bKck7AM69Tt4v8o0Wz8rzBnKY2gH2qQ24JPy5
+	fzqBLPLusX/mEoklOXkvRutS/7jX8VD8VY1LFrr2Xfp3sf/RtzbutSx70QjyvZ9284sv2E
+	eKDxzxC1IHojLwgUIbeanpN6iEXA+cYoeXTXq6qLcqARiTcPn3u2PUCcFecRWw==
+Date: Mon, 23 Jun 2025 17:51:35 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Kamil =?UTF-8?B?SG9yw6Fr?= - 2N <kamilh@axis.com>
+Cc: <florian.fainelli@broadcom.com>,
+ <bcm-kernel-feedback-list@broadcom.com>, <andrew@lunn.ch>,
+ <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <robh@kernel.org>
+Subject: Re: [PATCH net-next v2 2/3] net: phy: bcm5481x: Implement MII-Lite
+ mode
+Message-ID: <20250623175135.5ddee2ea@2a02-8440-d115-be0d-cec0-a2a1-bc3c-622e.rev.sfr.net>
+In-Reply-To: <20250623151048.2391730-2-kamilh@axis.com>
+References: <20250623151048.2391730-1-kamilh@axis.com>
+	<20250623151048.2391730-2-kamilh@axis.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-23_04,2025-06-23_06,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- spamscore=0 malwarescore=0 suspectscore=0 mlxscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2506230096
-X-Proofpoint-ORIG-GUID: duWBwEmbLxf3o-T2KorWfTeXqc9tcnAR
-X-Proofpoint-GUID: duWBwEmbLxf3o-T2KorWfTeXqc9tcnAR
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDA5NiBTYWx0ZWRfX7xL1wh4By42L Xd4AGC8Kwwt249NClkEGf0EYzdSm/w3GgpppJIskKdwwZ6I77HvTUS9OENSV/DyeRxCh1n5m9rD QMDJCRu0z27iRa5gYGBiXa75/1ZTbzKq6bf+DjyBVLzt0rz/Brv1W55Q6dlS5WIzMN2gOOaTbaD
- 7xMc8i6H0bvI1GF0yWsKAIZCM4DITQUnF8kGC7GcEVpslXpErrTaolhhUR3/PPzhre243Euw1mR cKAwsMvBuxAnl4kHsky5hecwkW0TbpctQ+BHLUmWSxiIzdzzJeYoXwFAVZl8YoMf/xDP6AcYemB H8BMBDGSz1Kyz/4ye3rjY0CMwsho+0bII8QX4Xndt5+VUyc4GcyJil0zJTXDFRiacUE2H2JamLT
- p5SR+U7jCqHp94EdGYm/J9YlecN65xT/QyHkPM0QYoYONjDvaNO4e+yaZjdJeh6LRzelVjea
-X-Authority-Analysis: v=2.4 cv=S5rZwJsP c=1 sm=1 tr=0 ts=68597867 cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=6IFa9wvqVegA:10 a=xjO9cqGlMa9R-XWzUmgA:9
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddujeegfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeektdfhhfehleffjeegteetteehgedtgfekueeffffghedugfetlefgtdekteekieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdejiedriedvrddujedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdejiedriedvrddujedupdhhvghlohepvdgrtddvqdekgeegtddqugduudehqdgsvgdtugdqtggvtgdtqdgrvdgruddqsggtfegtqdeivddvvgdrrhgvvhdrshhfrhdrnhgvthdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopehkrghmihhlhhesrgigihhsrdgtohhmpdhrtghpthhtohepfhhlohhrihgrnhdrfhgrihhnvghllhhisegsrhhorggutghomhdrtghomhdprhgtphhtthhopegstghmqdhkvghrnhgvl
+ hdqfhgvvggusggrtghkqdhlihhsthessghrohgruggtohhmrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
 
-Hi folks,
+Hi Kamil,
 
-Changelog:
-+ Since v1:
- - Changed it to use sysfs and expose a 'features' file with the data.
-+ Since v2:
- - Use a 'features' directory similar to ext4, btrfs and expose each feature.
-+ Since v3:
- - Fix ret returning 0 if kobject_create_and_add fails
- - Follow the syntax of Documentation/ABI/stable/sysfs-module.
-+ Since v4:
- - Changed period to coma in ABI documentation.
- - Added Allison's Reviewed-by
- 
-This patch addresses an issue where we have applications compiled against
-against older (or newer) kernels. RDS does not have any ioctls to query
-for what version of ABIs it has or what features it has. Hence this solution
-that proposes to put this ABI information in sysfs space.
+On Mon, 23 Jun 2025 17:10:46 +0200
+Kamil Hor=C3=A1k - 2N <kamilh@axis.com> wrote:
 
- Documentation/ABI/stable/sysfs-transport-rds | 43 +++++++++++++++++++
- net/rds/af_rds.c                             | 63 +++++++++++++++++++++++++++-
- 2 files changed, 105 insertions(+), 1 deletion(-)
+> From: Kamil Hor=C3=A1k (2N) <kamilh@axis.com>
+>=20
+> The Broadcom bcm54810 and bcm54811 PHYs are capable to operate in
+> simplified MII mode, without TXER, RXER, CRS and COL signals as defined
+> for the MII. While the PHY can be strapped for MII mode, the selection
+> between MII and MII-Lite must be done by software.
+> The MII-Lite mode can be used with some Ethernet controllers, usually
+> those used in automotive applications. The absence of COL signal
+> makes half-duplex link modes impossible but does not interfere with
+> BroadR-Reach link modes on Broadcom PHYs, because they are full-duplex
+> only. The MII-Lite mode can be also used on an Ethernet controller with
+> full MII interface by just leaving the input signals (RXER, CRS, COL)
+> inactive.
 
-Konrad Rzeszutek Wilk (1):
-      rds: Expose feature parameters via sysfs (and ELF)
+I'm following-up to Andrew's suggestion of making it a dedicated
+phy-mode. You say that this requires only phy-side configuration,
+however you also say that with MII-lite, you can't do half-duplex.
 
+Looking at the way we configure the MAC to PHY link, how can the MAC
+driver know that HD isn't available if this is a phy-only property ?
+
+Relying on the fact that the PHYs that use MII-Lite will only ever
+setup a full-duplex link with the partner seems a bit fragile, when we
+could indicate that this new MII-Lite mode only supports 10FD/100FD,
+through this mapping code here :
+
+https://elixir.bootlin.com/linux/v6.16-rc2/source/drivers/net/phy/phy_caps.=
+c#L282
+
+Besides that, given that this is a physically different MAC to PHY
+interface (missing signals compared to MII), one could also argue that
+this warrants a dedicated phy-mode.
+
+Maxime
 
