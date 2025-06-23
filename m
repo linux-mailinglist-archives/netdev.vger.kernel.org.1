@@ -1,215 +1,184 @@
-Return-Path: <netdev+bounces-200140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201F4AE3563
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:11:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B689AE3578
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E7B3AAE1E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:11:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64CDA3B1B00
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8862E1F2382;
-	Mon, 23 Jun 2025 06:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23361DED69;
+	Mon, 23 Jun 2025 06:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bld7Lg0/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GKFA4cH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2B51F09A3;
-	Mon, 23 Jun 2025 06:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9580E1DDA34;
+	Mon, 23 Jun 2025 06:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750659041; cv=none; b=C5ITCp30XEs4IyJOyDLtvSj9Vbjlr3UlZDZTPqzuwf5eo9RzF5bQEwIka0jeSFybhBmYyhJW/ulrDWhOqOcI7vz3FOhi+xA46Q9Ues2tgbz1KVYGXkdzIqrrJ9iu7Fmxv88erxloOqpHGFvxF53w1DoPXNC+GaD6qWW4A+A9pFY=
+	t=1750659150; cv=none; b=hFTkBXQwZ82kKS96gbDdg91tS/00Jc55huCkC107lwGCVlA9yHP5A/84niXBNfrNHLsCh1mDQdmtLgvKbZzvmHXkLomgXvezpv0Ut3rRqhb0m2E+qBD64US8M0QxL/l6SFCFP1b2KXIkiSA1LW+rNN+c+vvUWGTBy4b624zGZ74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750659041; c=relaxed/simple;
-	bh=izClx4fO0QxlG0vSrI5j+u7UAglO6fztpbLAObv8R60=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IWxYl6tVtRBio754VSGBLAOxnc52DEBYwOQ6w2D7GdUIXz73XROiLs+Y66LdKNxm+aapVZXymK76sI3MuXaBed/WZHBH4qNY8S4H+WMWJOkV1OCcuuZLLDYo7w3gYF4KdWk92U+XQEe5Vc4uEQk1NLathj6jcoxHKzSR6gylCQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bld7Lg0/; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-747ef5996edso2783500b3a.0;
-        Sun, 22 Jun 2025 23:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750659039; x=1751263839; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qdNaQL9Tu2TPrfssmRGP1lW46RFC7Xf3kc9ghofgNjg=;
-        b=bld7Lg0/l+lGaG9IZZJkYx3uQsdUBTCUJ84fe7aLTHLAwVylDDGl2N+yHx86duQ+hf
-         iWk3+ClTvc2G5+JDK8+WHcpBV50kgcmN/da4D5ubTc16u951CzOr+Fg/j65MSgJKNdUL
-         z8QCtR8fUaDK1AMfUBToQzNefcWgKuzwYJGH/6+6VZ2O6JmJ2n31WlCboUYcG0/8wYFN
-         ecILiLguVW9LOHuNuTOI1wfY7Z4+vX5uZMcGYyAY3wBA0O07v8tmI/iZgRzL9SQUp4dR
-         ixBGq8UBm4bD+h77rCA4VLnyO5h6IFZB40+Py3qoCs6knZ9lkui0ODadIp+h2nQ28uqK
-         W8Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750659039; x=1751263839;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qdNaQL9Tu2TPrfssmRGP1lW46RFC7Xf3kc9ghofgNjg=;
-        b=TPTaWcq0L9pQj5QLc6TTKhhzpIrVjejLGypn54jdLX/nzuWFLQrGGt5pfCsdVW1owD
-         yjSqGuU2FhpTN3acMtYo0VPtA6o1tVuK5tXfx4pHaNte+l5kjfzr5U/lRHHBvXZqToqZ
-         F9ZY6Hov4P9AaM/CJ2/mNuNzj2pqhoC0pWQ+juv7mw6410W8VRVKnhx7irdT/1R/bDlx
-         Ujs2cAnCJuFL72UkqKRze9B441pk19N9Kb47VeIs3jByBSRgZ2KLxNNsEtBsL+emtUB0
-         iexGeP/kgIgTzwab/Ctqe5plYXOUlGrR2Hcv9Qu4TjF09GLBhLaHF65AVQbYM5qyJJnO
-         6lbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbi+rNjc616gFx1WmqJ8UPrgunOgNA5sWKWhumcSSMglEnzXrJD7Y0LKRHqrYZVEbb23dwxS0yAk58@vger.kernel.org, AJvYcCVOBLHuFm9yt07pSJNgN/00/Tfx2ozvMXMOj3XtxEw3vYAO2BcQjZEumgUlyQ33U/E0wY/7+ou4@vger.kernel.org, AJvYcCVg0kV284p5Tb5JNQO/YLnrccURQ1Rvw7LVgvP9apoAivWK8PXJoS37ngrBoWuL5Dvm61wnFXDaE0yVM6jh@vger.kernel.org, AJvYcCW2ICi/oYEYdsXdXKIsh8SeQgdIM9YqvY7Bv4GgPf3JEul2MnjyImjfAzEfWZCYJHdaZx78DEIIv6h0@vger.kernel.org, AJvYcCWpidDIswsC4Q9yVIVHGbn3isPe9alrPfkuZE8maHbtzHuiazn98QJpu8J2sdG1CQ+2NtzXDyT3vw4vWncmTDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkXfDN26tVCtQ9AdWmQmf/7Qd4ETQ9IxsJM68UIoeZzK6UTy6q
-	xn62DUeimY0wdfX6gUDJYM9GLwVEi59jlwmeLOg4Yh24LPKUodXabS0vGybbKJOp
-X-Gm-Gg: ASbGncuqBNOoKVB7MkMLjpuau2DvwFbPiuyFuD8TmqDYOkpq0A6h4QNn693ZpOvaIrE
-	tVJxIWneTuoG0avb9q2Rop3UT9ZGlCnHp2P+i0J3LyN/mWHIP9s3kmTEqa04/U9iURSdC1PKuLL
-	bESxWf+QP+lZLm8W4iCUM9MUjVNj03J02KnL4qMaNy13sTuZlYC1VKPQ/A8CKOxDpxdttDRFmnP
-	UzDN4//w8Xlor6m+jDU6xe9DKUeUHwqZYvPcQZ3j4C7fZTzq69hb9wptADRYavjgq3ljcTsTwlq
-	fkuJwTpw4lvg5bIwbF376MxLTTZqD8HDw5uvzIEVBX/+0egKC6bBEcFkK+3UlbiTZcy71Xw8Y03
-	kmHpEBZAh0rLH1D3eO2Iyzmv7d3ozQFohOwFUatQNbZpRVw==
-X-Google-Smtp-Source: AGHT+IHoBjjoSv77pVEgY+g6rKcikXxyv+N7sZn8ywOJg/2GiBRo3MVDptmc4Vvya/wsfy3DQnBNJA==
-X-Received: by 2002:a05:6a20:9191:b0:1f5:8cc8:9cbe with SMTP id adf61e73a8af0-22026e60364mr14271591637.5.1750659039259;
-        Sun, 22 Jun 2025 23:10:39 -0700 (PDT)
-Received: from bee.. (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a623e8csm7391703b3a.83.2025.06.22.23.10.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Jun 2025 23:10:38 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: alex.gaynor@gmail.com,
-	dakr@kernel.org,
-	gregkh@linuxfoundation.org,
-	ojeda@kernel.org,
-	rafael@kernel.org,
-	robh@kernel.org,
-	saravanak@google.com
-Cc: a.hindborg@kernel.org,
-	aliceryhl@google.com,
-	bhelgaas@google.com,
-	bjorn3_gh@protonmail.com,
-	boqun.feng@gmail.com,
-	david.m.ertman@intel.com,
-	devicetree@vger.kernel.org,
-	gary@garyguo.net,
-	ira.weiny@intel.com,
-	kwilczynski@kernel.org,
-	leon@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	lossin@kernel.org,
-	netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu
-Subject: [PATCH v1 3/3] rust: net::phy Change module_phy_driver macro to use module_device_table macro
-Date: Mon, 23 Jun 2025 15:09:51 +0900
-Message-ID: <20250623060951.118564-4-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250623060951.118564-1-fujita.tomonori@gmail.com>
-References: <20250623060951.118564-1-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1750659150; c=relaxed/simple;
+	bh=+iqwTycSqAFYopUgmCTHfc/8F5IbMLjMRL9eqYGCO84=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SOOm3QvgoJsKmoqwzPPfWhat/x2pwb9edEMEOSCQYJmduLIyRzoZGPPD7G+IoIOsm37/NoJpBZPtVvFDy7PZWtL77Xb/51R9bhjTMx+d5qw6pA/v28Sj/O3lTtbgeFfhbywoie2isofKVGP0floHQUHsecKNWHdcgWffvUJoTNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GKFA4cH3; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750659149; x=1782195149;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+iqwTycSqAFYopUgmCTHfc/8F5IbMLjMRL9eqYGCO84=;
+  b=GKFA4cH37104mrVc+MTkpD1pCSAsUV2U9xCgwFilNMqYoNHgmHS1TuhT
+   cVH5ANV/k+a374OmXjvZcWdrJ6UHik6E4wndQb0fxtNvk6UlCTuXoR0u9
+   hpR2jabtage9vAxl99HEv5wb5irHIZI1GUXVfhRS9DuvQP9j5MlZZJrKN
+   2/F/vFy73YyhY7YG5ys/eXU1gkPwYzoI6M+0nV3hn1CqGY0phCeQTQK8j
+   YUuIpA3xb0Gg3E7sUoRGok5xWYJRaCutXGY/TEZ+ouqWx8aHrLMHBQ5br
+   bsCidDk5xWAkjg63TNoTUA4jYaBaASctxjoJAEfgS+7ZDCiwu3mCOiom+
+   g==;
+X-CSE-ConnectionGUID: rwvyTWovRdGim8vhMkGR4Q==
+X-CSE-MsgGUID: UEQ0SaHSTxy44IIZMoVwXA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11472"; a="64283198"
+X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
+   d="scan'208";a="64283198"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2025 23:12:29 -0700
+X-CSE-ConnectionGUID: tvFJcUvcTcCYz1YO8usSmg==
+X-CSE-MsgGUID: 58XWfdwjQd+hHWq0/m6CSA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,258,1744095600"; 
+   d="scan'208";a="155806121"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 22 Jun 2025 23:12:24 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uTaPm-000NkE-0E;
+	Mon, 23 Jun 2025 06:12:22 +0000
+Date: Mon, 23 Jun 2025 14:11:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [net-next, 08/10] bng_en: Add irq allocation support
+Message-ID: <202506231320.YMpashmK-lkp@intel.com>
+References: <20250618144743.843815-9-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618144743.843815-9-vikas.gupta@broadcom.com>
 
-Change module_phy_driver macro to build device tables which are
-exported to userspace by using module_device_table macro.
+Hi Vikas,
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- rust/kernel/net/phy.rs | 56 ++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 27 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 940972ffadae..4d797f7b79d2 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -6,7 +6,7 @@
- //!
- //! C headers: [`include/linux/phy.h`](srctree/include/linux/phy.h).
- 
--use crate::{error::*, prelude::*, types::Opaque};
-+use crate::{device_id::RawDeviceId, error::*, prelude::*, types::Opaque};
- use core::{marker::PhantomData, ptr::addr_of_mut};
- 
- pub mod reg;
-@@ -750,6 +750,17 @@ pub const fn mdio_device_id(&self) -> bindings::mdio_device_id {
-     }
- }
- 
-+// SAFETY: [`DeviceId`] is a `#[repr(transparent)` wrapper of `struct mdio_device_id`
-+// and does not add additional invariants, so it's safe to transmute to `RawType`.
-+unsafe impl RawDeviceId for DeviceId {
-+    type RawType = bindings::mdio_device_id;
-+
-+    // This should never be called.
-+    fn index(&self) -> usize {
-+        0
-+    }
-+}
-+
- enum DeviceMask {
-     Exact,
-     Model,
-@@ -850,19 +861,18 @@ const fn as_int(&self) -> u32 {
- ///     }
- /// };
- ///
--/// const _DEVICE_TABLE: [::kernel::bindings::mdio_device_id; 2] = [
--///     ::kernel::bindings::mdio_device_id {
--///         phy_id: 0x00000001,
--///         phy_id_mask: 0xffffffff,
--///     },
--///     ::kernel::bindings::mdio_device_id {
--///         phy_id: 0,
--///         phy_id_mask: 0,
--///     },
--/// ];
--/// #[cfg(MODULE)]
--/// #[no_mangle]
--/// static __mod_device_table__mdio__phydev: [::kernel::bindings::mdio_device_id; 2] = _DEVICE_TABLE;
-+/// const N: usize = 1;
-+///
-+/// const TABLE: ::kernel::device_id::IdArray<::kernel::net::phy::DeviceId, (), N> =
-+///     ::kernel::device_id::IdArray::new([
-+///         ::kernel::net::phy::DeviceId(
-+///             ::kernel::bindings::mdio_device_id {
-+///                 phy_id: 0x00000001,
-+///                 phy_id_mask: 0xffffffff,
-+///             }),
-+///     ]);
-+///
-+/// ::kernel::module_device_table!("mdio", phydev, TABLE);
- /// ```
- #[macro_export]
- macro_rules! module_phy_driver {
-@@ -873,20 +883,12 @@ macro_rules! module_phy_driver {
-     };
- 
-     (@device_table [$($dev:expr),+]) => {
--        // SAFETY: C will not read off the end of this constant since the last element is zero.
--        const _DEVICE_TABLE: [$crate::bindings::mdio_device_id;
--            $crate::module_phy_driver!(@count_devices $($dev),+) + 1] = [
--            $($dev.mdio_device_id()),+,
--            $crate::bindings::mdio_device_id {
--                phy_id: 0,
--                phy_id_mask: 0
--            }
--        ];
-+        const N: usize = $crate::module_phy_driver!(@count_devices $($dev),+);
-+
-+        const TABLE: $crate::device_id::IdArray<$crate::net::phy::DeviceId, (), N> =
-+            $crate::device_id::IdArray::new([ $(($dev,())),+, ]);
- 
--        #[cfg(MODULE)]
--        #[no_mangle]
--        static __mod_device_table__mdio__phydev: [$crate::bindings::mdio_device_id;
--            $crate::module_phy_driver!(@count_devices $($dev),+) + 1] = _DEVICE_TABLE;
-+        $crate::module_device_table!("mdio", phydev, TABLE);
-     };
- 
-     (drivers: [$($driver:ident),+ $(,)?], device_table: [$($dev:expr),+ $(,)?], $($f:tt)*) => {
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.16-rc3 next-20250620]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20250618144743.843815-9-vikas.gupta%40broadcom.com
+patch subject: [net-next, 08/10] bng_en: Add irq allocation support
+config: parisc-randconfig-r073-20250619 (https://download.01.org/0day-ci/archive/20250623/202506231320.YMpashmK-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506231320.YMpashmK-lkp@intel.com/
+
+smatch warnings:
+drivers/net/ethernet/broadcom/bnge/bnge_resc.c:347 bnge_alloc_irqs() warn: unsigned 'irqs_demand' is never less than zero.
+
+vim +/irqs_demand +347 drivers/net/ethernet/broadcom/bnge/bnge_resc.c
+
+   329	
+   330	int bnge_alloc_irqs(struct bnge_dev *bd)
+   331	{
+   332		u16 aux_msix, tx_cp, num_entries;
+   333		u16 irqs_demand, max, min = 1;
+   334		int i, rc = 0;
+   335	
+   336		irqs_demand = bnge_nqs_demand(bd);
+   337		max = bnge_get_max_func_irqs(bd);
+   338		if (irqs_demand > max)
+   339			irqs_demand = max;
+   340	
+   341		if (!(bd->flags & BNGE_EN_SHARED_CHNL))
+   342			min = 2;
+   343	
+   344		irqs_demand = pci_alloc_irq_vectors(bd->pdev, min, irqs_demand,
+   345						    PCI_IRQ_MSIX);
+   346		aux_msix = bnge_aux_get_msix(bd);
+ > 347		if (irqs_demand < 0 || irqs_demand < aux_msix) {
+   348			rc = -ENODEV;
+   349			goto err_free_irqs;
+   350		}
+   351	
+   352		num_entries = irqs_demand;
+   353		if (pci_msix_can_alloc_dyn(bd->pdev))
+   354			num_entries = max;
+   355		bd->irq_tbl = kcalloc(num_entries, sizeof(*bd->irq_tbl), GFP_KERNEL);
+   356		if (!bd->irq_tbl) {
+   357			rc = -ENOMEM;
+   358			goto err_free_irqs;
+   359		}
+   360	
+   361		for (i = 0; i < irqs_demand; i++)
+   362			bd->irq_tbl[i].vector = pci_irq_vector(bd->pdev, i);
+   363	
+   364		bd->irqs_acquired = irqs_demand;
+   365		/* Reduce rings based upon num of vectors allocated.
+   366		 * We dont need to consider NQs as they have been calculated
+   367		 * and must be more than irqs_demand.
+   368		 */
+   369		rc = bnge_adjust_rings(bd, &bd->rx_nr_rings,
+   370				       &bd->tx_nr_rings,
+   371				       irqs_demand - aux_msix, min == 1);
+   372		if (rc)
+   373			goto err_free_irqs;
+   374	
+   375		tx_cp = bnge_num_tx_to_cp(bd, bd->tx_nr_rings);
+   376		bd->nq_nr_rings = (min == 1) ?
+   377			max_t(u16, tx_cp, bd->rx_nr_rings) :
+   378			tx_cp + bd->rx_nr_rings;
+   379	
+   380		/* Readjust tx_nr_rings_per_tc */
+   381		if (!bd->num_tc)
+   382			bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
+   383	
+   384		return 0;
+   385	
+   386	err_free_irqs:
+   387		dev_err(bd->dev, "Failed to allocate IRQs err = %d\n", rc);
+   388		bnge_free_irqs(bd);
+   389		return rc;
+   390	}
+   391	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
