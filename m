@@ -1,245 +1,327 @@
-Return-Path: <netdev+bounces-200110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E26AE3386
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 04:11:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95255AE3388
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 04:13:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F13003A3B5F
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 02:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 276F31889E75
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 02:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0732E1991B6;
-	Mon, 23 Jun 2025 02:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0E019C546;
+	Mon, 23 Jun 2025 02:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts+XtQBN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993D1F507
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 02:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA017B663;
+	Mon, 23 Jun 2025 02:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750644712; cv=none; b=GHDyCtYmcn5VAtZXfCyh1sSmC/NGqrlKKIO99dV0Ma1C+znUt6qPhJb/dGQkxS4ienecFmlpWjPLI+p5c2J+lpHQRcUDr1nmitagzzQRWVnNirl1zNIDUic6STsRYbBuPH/8QZkmLE6FYpNVSyHqFNjj+rww2+qQB3WfedXUzeg=
+	t=1750644836; cv=none; b=bUtP6MtJBmIGPMHPwJ12CKzuEOi3DBsve7v/UJgCJNSMxYuD0Knxg8B6wv8la4A1F+bhMThDTtKs6sCk1VM4e+7BvcUTN4AoDCtX7ZAOME/sGfog9u0MtC+M3q2DVxnRlPYKJNFVk44njBsxe3H/qGDZitd9H9G4yUwenaBqTiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750644712; c=relaxed/simple;
-	bh=7BVjPYv/KJW45kBMlKRIHLHjq1ydKKALP1VZdRH6rXA=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=XkiZ9ZXVBo5SAurQy3CA9qeeOW5Xh4sHRpKyBfRdAzP+fizdaAu8nFv5uMLoVK0VOx5e8kYwl67VBafpnSOtpYFgxq3Iw1L+nBRqFrK+l4/nhJt76AIjJmvz1BDCr9u4xBPXb30cUa8PEotac0S7wq/9XieG3fen0INHn7cl5WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz9t1750644677t466d7493
-X-QQ-Originating-IP: 7S3lmTJhJtCHMt3IIJY1yw2ajOHhpdLSrgLs/R5PbWo=
-Received: from smtpclient.apple ( [111.202.70.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 23 Jun 2025 10:11:14 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4864732961362281397
-EX-QQ-RecipientCnt: 15
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1750644836; c=relaxed/simple;
+	bh=osd8vh9dxPhuJmykDXubbfhYH+uvJzC+BBL3YwVie5U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qgVDDbOHIDUUD/G/OQq7K/dzfy3zHK0pTtFygOyh+wrliN6/91KDgRR02EZIqU/8Iomvc7y4BGLJI6dTo3mfZCbRVpCvjdb5fLJV5sf2w2YVMLaO95OsNiVsvZx3fRPFEJZtRUHz8lPGECK5tzhVyhKhSXELzq+nSY/GTOCbRwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts+XtQBN; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-74924255af4so1165023b3a.1;
+        Sun, 22 Jun 2025 19:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750644834; x=1751249634; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NlLlODHYtW3EzsnIstO40WCoCwlv50yz5b7WzvJPc3Q=;
+        b=Ts+XtQBNtrql69t02USrIniQkwRyi5zwH3RJcu9M/QtUg4BWm2qtVofCMhOEFo1jwm
+         xdZRnh/ZS+PJsbpIDK2nf+2r9C6ENaToZRJNmDnctvCFE/n4TwvviiBz/5m2HpwsFPsI
+         y9OTroXCO7W62wVrsPRhdA3tm6X+zWYD4vU8WomyJsFnnKmMgN93NeSFdUOEqAaF+bcA
+         3TGXAMjEHSeRjrvx4/o5ZCdAHRi55G0E3PKnAtA+eujh2LRBYJYp7EsRQeAA9WkrVKUv
+         jxL7JEzCYC32IeIs5oAZJ02x21CkJ4vGQLgrENY1Hi/EL3HweenWD3EJI7jeFu9tEqlI
+         3FHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750644834; x=1751249634;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NlLlODHYtW3EzsnIstO40WCoCwlv50yz5b7WzvJPc3Q=;
+        b=GKiESO/2cJWOBcMGH5ld0jP0fU7RxwabQiKO+mKKsOsC8FJ94Ka8zbr92kzdcLTy4F
+         fAvCydIGWSAQJ/894BMQHUAiNpDRUTxgf1UPkXFWQxC9ebrvQ1NVYtQ/MNfJriughSVJ
+         7zfgf3Raa3BgCKs1VArLHU30mJDRL98NCtWO8eFk/d/0U878TGnkmIywAO26+lyu+IpJ
+         UJy/RrwrREpqL3ScqDxwfVknjIavjVx46hmq8EXM5yytDsfPyewXdbzNHOsTmsgVKS9z
+         lDNcDg9ATjBR3pKn6nVtzNSY9P9j8ANy5Dt6y9+qWo/hnzwjxtCdh+F6GtLaeDUMHNfa
+         VaSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVIOTwseO/QanZ6IjnTefJPMlVoB/bU9XsU1jFYornWEyj7ksqcAmxG91G03T8ZSUIcQqNL8Vc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwavhXxCCTkBidiciFmX1NK+TFjqaPH1Vl+6PZ9MavVBslbYWf6
+	L1eIw4jeK8JGg21+EXkcp5eKA+LlT/qbMWYNr01G2W8dOZ5C8Ib2Do0CQRYsHQ==
+X-Gm-Gg: ASbGncvcmWQR2x0KIR+dpc/zxMN87Lfbuzpjj912eDP9T+kv779McgDSsf6dvKCPWwj
+	hd/O6CwqqDatcLhx52LnLop7YfYO3dh/SaMDCFKXzdgpowTKJtCIfk9MVI9xUo6dDEMMo2xwvLE
+	sbpnPoLluhCVNCN8gflJTjGA05w01LqvfAUKj4Z4+uvylsJJ/6Ul43psyyVWrNDPpBkO145K2sR
+	tfAiFjsYWgRBOcMHn4pBQnm5K3Q8JfJ+SwZLFYkoN9SzQGFl0diNRL7cIxI1HhCmcWU1w2buoEb
+	jbStAz2cyLAjecl3ddXoajUNF7cZoj46m/W9P/bHx8TnA4zf+Nx3P167FoQd0NITPfytyccyWDx
+	Mf/2gsFvinA38LaT+ZK+6WQkkGkx1hPF+hA==
+X-Google-Smtp-Source: AGHT+IGH4KqpNHxV8UVMUrncWO1BpA8RB8ok/A+CnHCZrYnaAZcXUR+97dmy8Zy3VwMhFyTdsoxx4A==
+X-Received: by 2002:a05:6a20:7d9e:b0:201:85f4:ade6 with SMTP id adf61e73a8af0-22026e92bddmr16337377637.27.1750644833842;
+        Sun, 22 Jun 2025 19:13:53 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7490a6c87f5sm7111701b3a.178.2025.06.22.19.13.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Jun 2025 19:13:53 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v4] net: xsk: introduce XDP_MAX_TX_BUDGET setsockopt
+Date: Mon, 23 Jun 2025 10:13:45 +0800
+Message-Id: <20250623021345.69211-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [net-next v6 4/4] net: bonding: add tracepoint for 802.3ad
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <C75C5F1F-544F-4613-91D9-4F876EF286B3@bamaicloud.com>
-Date: Mon, 23 Jun 2025 10:11:04 +0800
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Zengbing Tu <tuzengbing@didiglobal.com>,
- tonghao@bamaicloud.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8DB4F573-128C-4A2D-A4D0-3909586AFF8C@bamaicloud.com>
-References: <cover.1749525581.git.tonghao@bamaicloud.com>
- <10b8f570bd59104a1c7d5ecdc9a82c6ec61d2d1c.1749525581.git.tonghao@bamaicloud.com>
- <1931181.1750120130@famine>
- <C75C5F1F-544F-4613-91D9-4F876EF286B3@bamaicloud.com>
-To: jv@jvosburgh.net
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MIGBBOK2RQC4T9ERI9Ajjblmq5KFJxUkKZppFu6xBjnobmb2tYpbMsM/
-	FdcWXmCbetu/lCI8rwU64Luz+K1bdiWDPReRxoIA5HRAWdPRWwZBrxdWvuwt0rGyLVfug/r
-	QrH4RIpvj8Z6RhHocR6jddY9dT/QoCUAyYlwNxa1ih45OESCDoD2V1N2bBCkETq5XV0PRb7
-	EjoQpMAACxyKog4nV7BRZWM6Yiu1BdNdvk9fGqV2tGgNvKRY0Zd1Y9kO0PL33usNwoS+BxB
-	SDi4t40L/KgLWuQKxAKdHeM1wkjV7wVn1aT3kh4jTdpR2UoYWNKzr/5qImpixFvEL1ViTPV
-	5ZzPyd1yu1VqZktAvFYqwQbH1cXIzeI1IXvdj5aQbkx1dnypCIo8GDLtUq+ZNofDB941RUm
-	daXye0prsmJMY5tu0VEVCU5LFKAHCZyWyvqVYYUIxSrEx5+S1y/PnfRMu1399uZ8W/fHvzL
-	NbV2MssrK882RcIViBsr2oQcmappc2IcVeqSwbujMTGDzD14AJ8DfwEPevkhKPtLVphqaGZ
-	pwRQS/01P9YlJlskwn6sfvOETweT8BfqugV+77mjzSo1lZJzUgeYk4zH6sQ+a53nRBd44o0
-	Fub3KjvsVd+31yr0d0d+ZSN22hMUoootup9r/h6wEsyk4xDaGBByeMw7iis5wRT8aIpTGV2
-	RpIaeavg3sl8tmP5oCnKCJKSc90YXA+kaOYrqVdgxOIw5NWX1nAAyNEMLZbkw3cFIfsOlWK
-	sGMKc4ziN4Ns7S4J4NBFx4iZmToISAUdf+AwgGgt/LjB50oeR6JfQpRBgiltKZY3YuvO5ED
-	UHwAene8p0QFVZ0SBTIXLhjsVid+CsE/muH0mhSAFW+H1YKuimnUYd5IU6E5ryXcnkMcbhS
-	krGQ5wE/0X6cc01O0zbdmW6CgRLebALA5O4NT4pMW08JTtnmKPUFTBDLwOxpJ/2KejrZ1ou
-	fkyWYbIaGVMWE2weFw+wg4iPAlw/kmaHbOlI=
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+From: Jason Xing <kernelxing@tencent.com>
 
+This patch provides a setsockopt method to let applications leverage to
+adjust how many descs to be handled at most in one send syscall. It
+mitigates the situation where the default value (32) that is too small
+leads to higher frequency of triggering send syscall.
 
-> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 18:37=EF=BC=8CTonghao Zhang =
-<tonghao@bamaicloud.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
->=20
->=20
->> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 08:28=EF=BC=8CJay Vosburgh =
-<jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
->>=20
->> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
->>=20
->>> Users can monitor NIC link status changes through netlink. However, =
-LACP
->>> protocol failures may occur despite operational physical links. =
-There is
->>> no way to detect LACP state changes. This patch adds tracepoint at
->>> LACP state transition.
->>=20
->> This patch really has nothing to do with the rest of the series
->> (it's unrelated to the broadcast_neighbor functionality), and should
->> really be sent separately.
-> =E2=80=A6 monitoring the lacp state is part of =E2=80=9Cno-stacking=E2=80=
-=9D arch solution. So I sent it as series.
-> if unnecessary, I will set it separately.
->=20
->> That said, I recall asking about work that was proposed some
-> Sorry I may miss your commits about this patch.
->> time ago to create netlink events (visible to ip monitor, et al) when
->> the LACP state changes.  That would be a cleaner method to watch the
->> LACP state machine (as it would integrate with all of the other event
-> Why not consider a BPF+tracepoint solution? It provides more flexible =
-LACP data collection with simpler implementation.
-We developed a component. It collects kernel events via kprobe, ftrace, =
-and tracepoint. Events include:
-- Scheduling latency
-- Direct memory reclaim
-- Network packets drop
-- LACP state events
+Considering the prosperity/complexity the applications have, there is no
+absolutely ideal suggestion fitting all cases. So keep 32 as its default
+value like before.
 
-BPF + tracepoint is our optimal approach. I think we should support this =
-method.
+The patch does the following things:
+- Add XDP_MAX_TX_BUDGET socket option.
+- Unify TX_BATCH_SIZE and MAX_PER_SOCKET_BUDGET into single one
+  tx_budget_spent.
+- Set tx_budget_spent to 32 by default in the initialization phase as a
+  per-socket granular control.
 
->> infrastructure).  Maybe I missed the response, but what became of =
-that
->> work?
->>=20
->> -J
->>=20
->>> Cc: Jay Vosburgh <jv@jvosburgh.net>
->>> Cc: "David S. Miller" <davem@davemloft.net>
->>> Cc: Eric Dumazet <edumazet@google.com>
->>> Cc: Jakub Kicinski <kuba@kernel.org>
->>> Cc: Paolo Abeni <pabeni@redhat.com>
->>> Cc: Simon Horman <horms@kernel.org>
->>> Cc: Jonathan Corbet <corbet@lwn.net>
->>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
->>> Cc: Steven Rostedt <rostedt@goodmis.org>
->>> Cc: Masami Hiramatsu <mhiramat@kernel.org>
->>> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
->>> Cc: Nikolay Aleksandrov <razor@blackwall.org>
->>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
->>> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
->>> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
->>> ---
->>> drivers/net/bonding/bond_3ad.c |  6 ++++++
->>> include/trace/events/bonding.h | 37 =
-++++++++++++++++++++++++++++++++++
->>> 2 files changed, 43 insertions(+)
->>> create mode 100644 include/trace/events/bonding.h
->>>=20
->>> diff --git a/drivers/net/bonding/bond_3ad.c =
-b/drivers/net/bonding/bond_3ad.c
->>> index d1c2d416ac87..55703230ab29 100644
->>> --- a/drivers/net/bonding/bond_3ad.c
->>> +++ b/drivers/net/bonding/bond_3ad.c
->>> @@ -16,6 +16,9 @@
->>> #include <net/bond_3ad.h>
->>> #include <net/netlink.h>
->>>=20
->>> +#define CREATE_TRACE_POINTS
->>> +#include <trace/events/bonding.h>
->>> +
->>> /* General definitions */
->>> #define AD_SHORT_TIMEOUT           1
->>> #define AD_LONG_TIMEOUT            0
->>> @@ -1146,6 +1149,9 @@ static void ad_mux_machine(struct port *port, =
-bool *update_slave_arr)
->>>  port->actor_port_number,
->>>  last_state,
->>>  port->sm_mux_state);
->>> +
->>> + trace_3ad_mux_state(port->slave->dev, last_state, =
-port->sm_mux_state);
->>> +
->>> switch (port->sm_mux_state) {
->>> case AD_MUX_DETACHED:
->>> port->actor_oper_port_state &=3D ~LACP_STATE_SYNCHRONIZATION;
->>> diff --git a/include/trace/events/bonding.h =
-b/include/trace/events/bonding.h
->>> new file mode 100644
->>> index 000000000000..1ee4b07d912a
->>> --- /dev/null
->>> +++ b/include/trace/events/bonding.h
->>> @@ -0,0 +1,37 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +
->>> +#if !defined(_TRACE_BONDING_H) || defined(TRACE_HEADER_MULTI_READ)
->>> +#define _TRACE_BONDING_H
->>> +
->>> +#include <linux/netdevice.h>
->>> +#include <linux/tracepoint.h>
->>> +
->>> +#undef TRACE_SYSTEM
->>> +#define TRACE_SYSTEM bonding
->>> +
->>> +TRACE_EVENT(3ad_mux_state,
->>> + TP_PROTO(struct net_device *dev, u32 last_state, u32 curr_state),
->>> + TP_ARGS(dev, last_state, curr_state),
->>> +
->>> + TP_STRUCT__entry(
->>> + __field(int, ifindex)
->>> + __string(dev_name, dev->name)
->>> + __field(u32, last_state)
->>> + __field(u32, curr_state)
->>> + ),
->>> +
->>> + TP_fast_assign(
->>> + __entry->ifindex =3D dev->ifindex;
->>> + __assign_str(dev_name);
->>> + __entry->last_state =3D last_state;
->>> + __entry->curr_state =3D curr_state;
->>> + ),
->>> +
->>> + TP_printk("ifindex %d dev %s last_state 0x%x curr_state 0x%x",
->>> +   __entry->ifindex, __get_str(dev_name),
->>> +   __entry->last_state, __entry->curr_state)
->>> +);
->>> +
->>> +#endif /* _TRACE_BONDING_H */
->>> +
->>> +#include <trace/define_trace.h>
->>> --=20
->>> 2.34.1
->>>=20
->>=20
->> ---
->> -Jay Vosburgh, jv@jvosburgh.net
+The idea behind this comes out of real workloads in production. We use a
+user-level stack with xsk support to accelerate sending packets and
+minimize triggering syscalls. When the packets are aggregated, it's not
+hard to hit the upper bound (namely, 32). The moment user-space stack
+fetches the -EAGAIN error number passed from sendto(), it will loop to try
+again until all the expected descs from tx ring are sent out to the driver.
+Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
+sendto() and higher throughput/PPS.
 
+Here is what I did in production, along with some numbers as follows:
+For one application I saw lately, I suggested using 128 as max_tx_budget
+because I saw two limitations without changing any default configuration:
+1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
+net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
+this was I counted how many descs are transmitted to the driver at one
+time of sendto() based on [1] patch and then I calculated the
+possibility of hitting the upper bound. Finally I chose 128 as a
+suitable value because 1) it covers most of the cases, 2) a higher
+number would not bring evident results. After twisting the parameters,
+a stable improvement of around 4% for both PPS and throughput and less
+resources consumption were found to be observed by strace -c -p xxx:
+1) %time was decreased by 7.8%
+2) error counter was decreased from 18367 to 572
+
+[1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing@gmail.com/
+
+In terms of how xsk transmits packets, there are two known modes: one is
+non-copy mode (that is what I used) and the other is zerocopy mode.
+Zerocopy modes also has two different versions, one is non-batched
+version and the other is batched version. Only non-batched version which
+is normally treated as a fallback solution potentially has the same
+max_tx_budget limitation issue as non-copy mode. So the patch adjusts
+MAX_PER_SOCKET_BUDGET as well. It's worth mentioning that for non-batched
+version may be stopped before hitting the limit of max_tx_budget due to
+another budget limitation the caller (like ixgbe_xmit_zc()) of
+xsk_tx_peek_desc() has.
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+v4
+Link: https://lore.kernel.org/all/20250619090440.65509-1-kerneljasonxing@gmail.com/
+1. remove getsockopt as it seems no real use case.
+2. adjust the position of max_tx_budget to make sure it stays with other
+read-most fields in one cacheline.
+3. set one as the lower bound of max_tx_budget
+4. add more descriptions/performance data in Doucmentation and commit message.
+
+V3
+Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonxing@gmail.com/
+1. use a per-socket control (suggested by Stanislav)
+2. unify both definitions into one
+3. support setsockopt and getsockopt
+4. add more description in commit message
+
+V2
+Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxing@gmail.com/
+1. use a per-netns sysctl knob
+2. use sysctl_xsk_max_tx_budget to unify both definitions.
+---
+ Documentation/networking/af_xdp.rst |  9 +++++++++
+ include/net/xdp_sock.h              |  3 ++-
+ include/uapi/linux/if_xdp.h         |  1 +
+ net/xdp/xsk.c                       | 24 ++++++++++++++++++------
+ tools/include/uapi/linux/if_xdp.h   |  1 +
+ 5 files changed, 31 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
+index dceeb0d763aa..fc9b608b96e1 100644
+--- a/Documentation/networking/af_xdp.rst
++++ b/Documentation/networking/af_xdp.rst
+@@ -442,6 +442,15 @@ is created by a privileged process and passed to a non-privileged one.
+ Once the option is set, kernel will refuse attempts to bind that socket
+ to a different interface.  Updating the value requires CAP_NET_RAW.
+ 
++XDP_MAX_TX_BUDGET setsockopt
++----------------------------
++
++This setsockopt sets the maximum number of descriptors that can be handled
++and passed to the driver at one send syscall. It is applied in two cases:
++non-zero copy mode and non-batched version of zero copy mode, to break
++the maximum iteration limitation for better throughput and less frequency
++of send syscall.
++
+ XDP_STATISTICS getsockopt
+ -------------------------
+ 
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index e8bd6ddb7b12..fca7723ad8b3 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -65,7 +65,7 @@ struct xdp_sock {
+ 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
+ 	struct list_head tx_list;
+ 	/* record the number of tx descriptors sent by this xsk and
+-	 * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity needs
++	 * when it exceeds max_tx_budget, an opportunity needs
+ 	 * to be given to other xsks for sending tx descriptors, thereby
+ 	 * preventing other XSKs from being starved.
+ 	 */
+@@ -84,6 +84,7 @@ struct xdp_sock {
+ 	struct list_head map_list;
+ 	/* Protects map_list */
+ 	spinlock_t map_list_lock;
++	u32 max_tx_budget;
+ 	/* Protects multiple processes in the control path */
+ 	struct mutex mutex;
+ 	struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
+diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+index 44f2bb93e7e6..07c6d21c2f1c 100644
+--- a/include/uapi/linux/if_xdp.h
++++ b/include/uapi/linux/if_xdp.h
+@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_MAX_TX_BUDGET		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 72c000c0ae5f..011a7cddf870 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -33,9 +33,6 @@
+ #include "xdp_umem.h"
+ #include "xsk.h"
+ 
+-#define TX_BATCH_SIZE 32
+-#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
+-
+ void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+ {
+ 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
+@@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+ 	rcu_read_lock();
+ again:
+ 	list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+-		if (xs->tx_budget_spent >= MAX_PER_SOCKET_BUDGET) {
++		int max_budget = READ_ONCE(xs->max_tx_budget);
++
++		if (xs->tx_budget_spent >= max_budget) {
+ 			budget_exhausted = true;
+ 			continue;
+ 		}
+@@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ static int __xsk_generic_xmit(struct sock *sk)
+ {
+ 	struct xdp_sock *xs = xdp_sk(sk);
+-	u32 max_batch = TX_BATCH_SIZE;
++	u32 max_budget = READ_ONCE(xs->max_tx_budget);
+ 	bool sent_frame = false;
+ 	struct xdp_desc desc;
+ 	struct sk_buff *skb;
+@@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+ 		goto out;
+ 
+ 	while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+-		if (max_batch-- == 0) {
++		if (max_budget-- == 0) {
+ 			err = -EAGAIN;
+ 			goto out;
+ 		}
+@@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
+ 		mutex_unlock(&xs->mutex);
+ 		return err;
+ 	}
++	case XDP_MAX_TX_BUDGET:
++	{
++		unsigned int budget;
++
++		if (optlen != sizeof(budget))
++			return -EINVAL;
++		if (copy_from_sockptr(&budget, optval, sizeof(budget)))
++			return -EFAULT;
++
++		WRITE_ONCE(xs->max_tx_budget, max(budget, 1));
++		return 0;
++	}
+ 	default:
+ 		break;
+ 	}
+@@ -1734,6 +1745,7 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
+ 
+ 	xs = xdp_sk(sk);
+ 	xs->state = XSK_READY;
++	xs->max_tx_budget = 32;
+ 	mutex_init(&xs->mutex);
+ 
+ 	INIT_LIST_HEAD(&xs->map_list);
+diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
+index 44f2bb93e7e6..07c6d21c2f1c 100644
+--- a/tools/include/uapi/linux/if_xdp.h
++++ b/tools/include/uapi/linux/if_xdp.h
+@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_MAX_TX_BUDGET		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+-- 
+2.43.5
 
 
