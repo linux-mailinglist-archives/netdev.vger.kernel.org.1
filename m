@@ -1,167 +1,113 @@
-Return-Path: <netdev+bounces-200295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A0EAE4723
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:42:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D20AE4738
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00835162356
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:35:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E93B2173BDF
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A73025E828;
-	Mon, 23 Jun 2025 14:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0CF262D27;
+	Mon, 23 Jun 2025 14:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C60vzs05"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KhgLHdkQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70D025E823;
-	Mon, 23 Jun 2025 14:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1519E262FC1
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 14:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750689351; cv=none; b=Kc9RncpFl1w7DAFreDLEmZa1OKNOdhsuq4440C7XSwNlG9fGcpk/c18KkqttpiNDQjJoMxUlmFhE+XdHbTRhlDa1+HK1hqeDBdjLZBYy92VRZVH88Fva21FLIemqmeRq6wm8A4a70FsvK8PZmVOGYUkoe5UcTOgjpMAMFZ0gO6I=
+	t=1750689453; cv=none; b=aLrH/f8zAGqmDohEkKrCUtMfyEGTfbSO+Whp1xriJFlTF3KfnQQkvV3cCiEPSD6SGD2RoJ6tYDZ2Zd4l8yCF7UfM8wjbms9uleeb4NAYwAgo6sN1BBGzDviMZnR8AjVsDyeJmYT1bMhkBBxrANDBrqa0CQY6MuZD8kPEtCckvjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750689351; c=relaxed/simple;
-	bh=8uFwwxuVhPfrVi45vOPS7eeLXU0rYURRDF6U6BXgiug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gEEijhS8KNtzkxYLJHvpNrtNbYzB/u+RI/D6UihuaXTFd7sIuWIJw5G+SiC9jDKgJyx9eCj+iuQepMWODQ8BCNDUSKBkHCzZT3hfmsyqzBiJ23KnjH8t6sgGSHA99A8HZHYPwcX5R6kwODCYgxGctSf/fT3AOMaeYySDNhmLiB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C60vzs05; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-236377f00a1so38796915ad.3;
-        Mon, 23 Jun 2025 07:35:49 -0700 (PDT)
+	s=arc-20240116; t=1750689453; c=relaxed/simple;
+	bh=27G5tZxM8xD6Y1gt414e7Js81jz9vu52ASWX9h/SSQM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dosaO7fNdZ8qcvfzTrg9T4GSo/XbjQrwc9zGoO6DaZTSkcRWirmcvj61fA1eHUfUF/k48tVUlPemjdP7Ue6nUHIw9uqbd8UzNWBT5cbfraiQZpxxdQ7J/lOL7eZLY2sdf7tS1bH0A0pIdwE8IlwRIIUJQqzpG3ITX0GFbYC2QTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KhgLHdkQ; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a58c2430edso46610031cf.1
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 07:37:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750689349; x=1751294149; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=le4M6xt0anI1cGfEup0uN9VydUsywZE0Uzdamf2pdRk=;
-        b=C60vzs05ChOAbuwVqpiEo6Dy+IUf5AaNALmktKlI9/iMKQb6faEfTZW8LzZP67LqcT
-         mTEMGPFclYscUZR6xKWh9fMOpnRAbfAg4oOiqg1hOG9BOB8J8O0wWlp1cnqqJ+t9LQrr
-         QyrWuGI46E9783D/H87yUrNR3bSmUJoMOwHpEGn+uA7R77utpLWL+wHaF2NNK/apI434
-         RaA7klHNYrSiSBM+gvXs+2I7nT3m+5KB1hFSPVkqpKlb/KqW2OaW7BezJsT3GmjgyyDr
-         rIWgK+eRJl0OYkuzpbT8lPNNF17K54+5BuWIcr7lKiHroUxvh4rtpiciB8kBhpXi7Ar2
-         wKAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750689349; x=1751294149;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1750689451; x=1751294251; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=le4M6xt0anI1cGfEup0uN9VydUsywZE0Uzdamf2pdRk=;
-        b=NMl5DPvynDlD0wz25hiZd7dlEo4lQvebUBxCY3vVZ4KeXWTQngYrcXA+CVEgzxy54V
-         nmX/OvWEmgnciyO5klO8AHWaolOJKvTS9LXo8xKy4mmD8mv12tKLGV7CuNd4IgDc36Ec
-         Le4sm74zpWG65+PNnuhkEX3PgcfbbXepOArN4TkDLWpog9jT35+UKV8S2liMRJX1yqZL
-         /okMDVAykGLGZtmSIVkupNo0EQk/NZZ24gKIQ1AQa70S1bap92IqRkcAwc0zhxG74Kzs
-         5di63VW92FPpWCVmM16MOwpX6qCWgOwqWyz14kwMI/5MZ3Z1sC2hccY5xOSodLCB+jM8
-         8RPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUC93SlNNYQavtuQpke7Nkl+xzJ9Eg1i3IuwpuLuXkJLcxqfl3JpmvbHAY0LeY8lU7iCVk=@vger.kernel.org, AJvYcCVKBh5jIXMXs3UPbnG/oIksyFIzUfUP2kFP4/fRI9FE85jmmR4/YTQU6jsaTFNdxW1WAKPULTxl@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCNqUT2eb/OOoKs11PupI1mzYkKYjwW2m9D0OL2JBIzkj/v+4t
-	2NaOXvOkFAxBrDmUj7YD9nJkrzwjh7m3n+834kF+bpv7xeuQw8cvZHA=
-X-Gm-Gg: ASbGncv9ughiNi4jylZwG1TpHs5ZhfjvrYhU/B0T24wPCza5UJ+imo0P35n82hfNYAh
-	X/RlJLRQB1EogSW3/NKKi+oq0A8IjkgwfJdCocXIiO1MOZbfwOJY2KnZpVykA9S6eWJi3AhC3j8
-	dXIK6lXbkvi4H5NVQXGJBbSm7m4WRbHSRkOCyjZUVPYlmzd/m06chWDLKVTJxRjldFRC5GNUEAK
-	btIpRQJgAR0yNuNFlj5tylAl2aDQs+7fpXafJhiI+/KNOg09OeNgXXZRMVI6U0w7akKy5J1TsV4
-	011iBKqvI6eGDZbml2GzLmYzuEVHw2xfgJuKE71AaIkshEo2GIWnnr2EW8/JDSKRVjEQAAph/SE
-	JiLnRrQW9IzZZq4fwNpVMJdI=
-X-Google-Smtp-Source: AGHT+IFiD1i0PThNFD33u8HNG3UK6b0XRr/FDgwkWC1gH6MYD1iM6N3CbaW/z9O1vOX4dsKBEPe1fg==
-X-Received: by 2002:a17:903:2445:b0:234:c5c1:9b73 with SMTP id d9443c01a7336-237d989d06emr192991835ad.36.1750689349085;
-        Mon, 23 Jun 2025 07:35:49 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d871f011sm87634705ad.235.2025.06.23.07.35.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 07:35:48 -0700 (PDT)
-Date: Mon, 23 Jun 2025 07:35:47 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to,
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2] net: xsk: update tx queue consumer
- immediately after transmission
-Message-ID: <aFlmQ94TeHb9v-OC@mini-arch>
-References: <20250623073129.23290-1-kerneljasonxing@gmail.com>
+        bh=27G5tZxM8xD6Y1gt414e7Js81jz9vu52ASWX9h/SSQM=;
+        b=KhgLHdkQ12YOMk5t2QbBYMUrg0K8zvWpoctNAs5thUVaGg8pgsUnupoAxL57PWeZaT
+         NIcfduZWRLblmprO9Nx4w3no1Ug/2VnYioNDXc97wTVOG1CqBV8nXNmGwLTPne9+10wE
+         O5KhsWouiPnGSPnruJrMXdxTFK2Wkcm8+p2BkQ8jUm5BjRQRtEGpdBdH4mkgHSTd4Ras
+         iNvf0g5or7/ti8FPmLz66FNgZEK1JChMBq65IX9YI5N44D80iIp02gpnztPz5FbhUIHQ
+         6G13JCgSK85umLnNnfAJul/FZvByGMT/jsAHB/QwSajXZSQb43hYPLPa3gBtm8SSypoi
+         Lgfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750689451; x=1751294251;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=27G5tZxM8xD6Y1gt414e7Js81jz9vu52ASWX9h/SSQM=;
+        b=ju6Alxg0cYjvnBsdqS6QfUS6T2sEcVPxEVtq1OoBEiVv/ZtdJ1kiQvB+tdoyWBNaAl
+         QElxYA4LauKBqEJSmxmC6yGsPGDMDBEHPacKgVAesSZyTMDAomiJqYDSAQSGFLWQqJuP
+         STNDz7FWk7zATUOTqYQ3PHzqdUvejHt9DwOG7vb9l/JkOK7KWoVJSdZ3YbdYwjk/3JhU
+         BEuwj3OsU8mP8yCx0KXHWCrCcDi7SIXsp+V5sN7oYWqQgqBtj/+AXWr/T9sTieRi8+qy
+         vjgZMvDd9FguGpyo4VaeIeufPrwBZJRtGWFcbEh8p+9bEKnoi7XfRWUXtRYYPHuckK3z
+         Qfuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXt6RSIqmMNI8xk7cQVqohsCRHYJISgqEgMGFxrOiYepcxatA4VLJl8mr0KJnMNb5niaFsQZ9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWb7s5DDVJEjnK7OsmjEkREC3zKBofe9yTxr8diL4nNjoqYtRy
+	YAOgdwcIiTb+it5ZOADaLs8QV+aHzPv6eyAWbaHBlYKt7lWE/xWtfPDA0YA730r3iF4lIHGuBjq
+	tWQx9X3fv9qQJO2kFnhet6jVQX7/eMFytE4+LJwqH
+X-Gm-Gg: ASbGncuCK5zAVY5u+wuxw6zB8YYxtlnvRv+iX22F3cnQDLXBAOdRQQU32kqkOcjuJoU
+	Di9HpkgZiwcfNW6VfFc4sdfDj6X/0XNevEqkULKTCY/pLK5cDEGG0JDL3Crey3W7hZPiJtDFOIZ
+	Lw4G/u3pRRpp1QRRcFf3fnFWc0z36Da9OQQpKALDRCMKE=
+X-Google-Smtp-Source: AGHT+IErEx0kDAOqp1ojFcDM9yYCZh+mVleoBFl1AEdwsO+17A/oIA84nB9tL4FUjJhJfRwxa3+3/8JyJJH7G1AK0u0=
+X-Received: by 2002:a05:622a:750a:b0:4a7:7c8e:1d5 with SMTP id
+ d75a77b69052e-4a77c8e083amr154660831cf.17.1750689450031; Mon, 23 Jun 2025
+ 07:37:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250623073129.23290-1-kerneljasonxing@gmail.com>
+References: <20250621193737.16593-1-chia-yu.chang@nokia-bell-labs.com> <20250621193737.16593-4-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250621193737.16593-4-chia-yu.chang@nokia-bell-labs.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 23 Jun 2025 07:37:19 -0700
+X-Gm-Features: AX0GCFuRrhX0LBiCnxAPHQ5MTAVLkaa48kUt8r7GSQvKFHWuAgGT6_YRkQKc9Ek
+Message-ID: <CANn89iKXWH8VLY5W+iM4d7MGYL2dMRep2xG-AGGV7BcbJyMY4g@mail.gmail.com>
+Subject: Re: [PATCH v9 net-next 03/15] tcp: reorganize tcp_sock_write_txrx
+ group for variables later
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
+	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
+	kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch, 
+	donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
+	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 06/23, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> For afxdp, the return value of sendto() syscall doesn't reflect how many
-> descs handled in the kernel. One of use cases is that when user-space
-> application tries to know the number of transmitted skbs and then decides
-> if it continues to send, say, is it stopped due to max tx budget?
-> 
-> The following formular can be used after sending to learn how many
-> skbs/descs the kernel takes care of:
-> 
->   tx_queue.consumers_before - tx_queue.consumers_after
-> 
-> Prior to the current patch, in non-zc mode, the consumer of tx queue is
-> not immediately updated at the end of each sendto syscall when error
-> occurs, which leads to the consumer value out-of-dated from the perspective
-> of user space. So this patch requires store operation to pass the cached
-> value to the shared value to handle the problem.
-> 
-> More than those explicit errors appearing in the while() loop in
-> __xsk_generic_xmit(), there are a few possible error cases that might
-> be neglected in the following call trace:
-> __xsk_generic_xmit()
->     xskq_cons_peek_desc()
->         xskq_cons_read_desc()
-> 	    xskq_cons_is_valid_desc()
-> It will also cause the premature exit in the while() loop even if not
-> all the descs are consumed.
-> 
-> Based on the above analysis, using 'cached_prod != cached_cons' could
-> cover all the possible cases because it represents there are remaining
-> descs that are not handled and cached_cons are not updated to the global
-> state of consumer at this time.
+On Sat, Jun 21, 2025 at 12:37=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com=
+> wrote:
+>
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>
+> Use the first 3-byte hole at the beginning of the tcp_sock_write_txrx
+> group for 'noneagle'/'rate_app_limited' to fill in the existing hole
+> in later patches. Therefore, the group size of tcp_sock_write_txrx is
+> reduced from 92 + 4 to 91 + 4. In addition, the group size of
+> tcp_sock_write_rx is changed to 96 to fit in the pahole outcome.
+> Below are the trimmed pahole outcomes before and after this patch:
 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> V2
-> Link: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing@gmail.com/
-> 1. filter out those good cases because only those that return error need
-> updates.
-> Side note:
-> 1. in non-batched zero copy mode, at the end of every caller of
-> xsk_tx_peek_desc(), there is always a xsk_tx_release() function that used
-> to update the local consumer to the global state of consumer. So for the
-> zero copy mode, no need to change at all.
-> 2. Actually I have no strong preference between v1 (see the above link)
-> and v2 because smp_store_release() shouldn't cause side effect.
-> Considering the exactitude of writing code, v2 is a more preferable
-> one.
-> ---
->  net/xdp/xsk.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index 5542675dffa9..b9223a2a6ada 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -856,6 +856,9 @@ static int __xsk_generic_xmit(struct sock *sk)
->  	}
->  
->  out:
-> +	if (xs->tx->cached_prod != xs->tx->cached_cons)
-
-Can we use xskq_has_descs() here instead?
-
-And still would be nice to verify this with a test. Should not be much work,
-most of the things (setup/etc) are already there, so you won't have
-to write everything from scratch...
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
