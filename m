@@ -1,160 +1,101 @@
-Return-Path: <netdev+bounces-200151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 509FBAE36CF
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:30:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32E38AE36D5
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 294F77A857F
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:29:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BF983A7800
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E051FCFEF;
-	Mon, 23 Jun 2025 07:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sN49WEI9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2B11F8BBD;
+	Mon, 23 Jun 2025 07:31:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62181EFF9B;
-	Mon, 23 Jun 2025 07:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B011E411C
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 07:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750663840; cv=none; b=dWbgnNTOG0d5LhtLbpDOWZFvLhsR3h7oKIM3SBytqtreJODz0PI6T3VXQSBcmUf3adeW+kQ5FnZB6xhkHHOzE3INleTVh259oQ4HK5VlewiMUDMjPkUu7fQ0FeTTuQjDSTRl26e/rmtgvX46689c91+JpVz+44DtqKyeGGYeLyw=
+	t=1750663887; cv=none; b=YJiC1DdCLtJTg68tHKc1QTzZz1uoIxsHm+LiMVjyQ5nN9kP4KEayNuLmipzisQ0j1vCAVVFIE+Ow5WjrgZv6XnixBPASi5ZWBZRtSD8K1itiA7yElDJBwWUpjdQDz3KrdO1MNT4ZAWujArZRZusrgXyTquP1J+UF/StQ1KvNS50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750663840; c=relaxed/simple;
-	bh=0fxnIO1ueEKttEOSc6w2pdQ+CTBTO4fMXTnxx3V+1KM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gqH47DzTdOp3KT8O9gYjI8g6CyoJ6Mgp9Z2VV20r6fUTKKL1NMUxf0W0+FTBqxQxBQkrc1AtANukbRCVw0ndjSI1zoxffnZ4JQPjefBX+OC0KpBAle1Rq/2PyT8oTyWCt+9FaHGrkdOodgY8mQO9Z1rHYY/rzqAkhjb+kWhIudk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sN49WEI9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36DC9C4CEED;
-	Mon, 23 Jun 2025 07:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750663839;
-	bh=0fxnIO1ueEKttEOSc6w2pdQ+CTBTO4fMXTnxx3V+1KM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sN49WEI9IaAgjMXN9MskZ0qZQWHhvBbTjvPi/yn2Eyd4MImu7PE4n4MX4+hl73U6l
-	 1wXrT0qZOKsLC4XeREcWtsOqQ2mt1gis8otMgG7yMZsudHcgy7Sq74od50firDixoJ
-	 XySW/0y4xrTFxr5/C0wWr9vr33Ch47wMmQuPrYObqZtvjA6i/gacRr3sqaQEewYsXQ
-	 v61cfixtg/mQncS93UrzP+G4whzm9CA5xsPNDrQNHwr54sd75ggVWWCBBcvNu37P9K
-	 sl7PpcYXSkXEq17uNVQvc0DmJ8LxRALeFTErtZHsTSylKnEVS8iLlgH2w02+ZPMYE9
-	 lEo1n+29z70jw==
-Message-ID: <e0a07ca3-447a-4e3d-be0b-49892c945179@kernel.org>
-Date: Mon, 23 Jun 2025 09:30:34 +0200
+	s=arc-20240116; t=1750663887; c=relaxed/simple;
+	bh=c0L5Ic9p78fz8025vT4Q+4lIQmNaESDGFZ91EYVrIm0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ebZfTb6fTsfurwQwan+jB7BMLZbcTnARZpeFTRuf7as62ieNowucpu/Qu/v7f9Ejr1TLWqWeXEzinFLHiogKPKNr/IztZ1L+Vrzx9qBU7ioI20t3Mh1etVVkgPcQzaFodB3Ny6dr3CywcmNToeVPr7s4XXHcXr76fpMJgRw7SNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3ddbec809acso40753715ab.2
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 00:31:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750663885; x=1751268685;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7N6CFb8geC7GFaDZTPC3hB0Jfnej5N6iNsLrQHnvBDM=;
+        b=HcVExaPh48iQ0v5Se15WEGJ/mq9bzS1jW1zzM1arSOCdKNG6od8uHcVAfi5rHUN3wz
+         oYx+CqTM8JbKzsE+pheXPvBMKXQt1RuBT+t8T8KVll8zv8botx+T/ZJ3ew8tK2nFrzq3
+         Idn6CrVCVaKttAhDm3GTFSCwd+V/yb2W91qyE4LPhi5jLsUYzaRA7TPKYPl/Sx1QYjY6
+         LYJgxsW45E3GnRWMWHfnAihQRt2MdkI7OxGZunvkswPIxSBQQ6MY8aapW60WIEhQe2qw
+         Lk/0fUY40AcHgOVcMuXaV2JF9tuiKHIPn6ZGRBCL5PmyUNAYdo4kR/cDCt3c/zb1L0VP
+         BIBw==
+X-Forwarded-Encrypted: i=1; AJvYcCXiJsF5QjxvI+99YqHbOj2HQq2O7xV2LZwApUfJIbnnpBtprSrYNPXwX+olQ0x2nP6qBjP73OQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxANc5mZO+Hnz/vhtm+LClxfm0Rm/IksvahNcZ0c0cgQRZETDRR
+	44fwSf1nSjNqbis2H759+80HjxSsj0D6ehNqGdccq8PIMN+zLtI2FmG1LGpGMMFKO70UUJ+rv/i
+	KDRRC+w7b5KuWe/feJZHl9a8JlNbUvIZSjLELbVaAAyC7ZFzxCOwnvp5ZakM=
+X-Google-Smtp-Source: AGHT+IGC099jadcheZ5mK3WjDhzyW1CBvRHM0bX6E/FnAGPCVWbJoaBDP8C50TaB62x1Y8doz7+TLDaj5ky8vooUeYMc9chkmT03
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/33] tty: introduce and use tty_port_tty_vhangup()
- helper
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-serial <linux-serial@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Karsten Keil <isdn@linux-pingi.de>,
- David Lin <dtwlin@gmail.com>, Johan Hovold <johan@kernel.org>,
- Alex Elder <elder@kernel.org>, Oliver Neukum <oneukum@suse.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Netdev <netdev@vger.kernel.org>, greybus-dev@lists.linaro.org,
- linux-staging@lists.linux.dev, linux-usb@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
-References: <20250611100319.186924-1-jirislaby@kernel.org>
- <20250611100319.186924-2-jirislaby@kernel.org>
- <b23d566c-09dc-7374-cc87-0ad4660e8b2e@linux.intel.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <b23d566c-09dc-7374-cc87-0ad4660e8b2e@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:3782:b0:3dc:7fa4:834 with SMTP id
+ e9e14a558f8ab-3de38cb06a0mr116323135ab.15.1750663885509; Mon, 23 Jun 2025
+ 00:31:25 -0700 (PDT)
+Date: Mon, 23 Jun 2025 00:31:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <685902cd.a00a0220.2e5631.000f.GAE@google.com>
+Subject: [syzbot] Monthly hams report (Jun 2025)
+From: syzbot <syzbot+list3771629df5fd7b67abcc@syzkaller.appspotmail.com>
+To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11. 06. 25, 13:13, Ilpo Järvinen wrote:
-> On Wed, 11 Jun 2025, Jiri Slaby (SUSE) wrote:
-> 
->> This code (tty_get -> vhangup -> tty_put) is repeated on few places.
->> Introduce a helper similar to tty_port_tty_hangup() (asynchronous) to
->> handle even vhangup (synchronous).
->>
->> And use it on those places.
->>
->> In fact, reuse the tty_port_tty_hangup()'s code and call tty_vhangup()
->> depending on a new bool parameter.
->>
->> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
->> Cc: Karsten Keil <isdn@linux-pingi.de>
->> Cc: David Lin <dtwlin@gmail.com>
->> Cc: Johan Hovold <johan@kernel.org>
->> Cc: Alex Elder <elder@kernel.org>
->> Cc: Oliver Neukum <oneukum@suse.com>
->> Cc: Marcel Holtmann <marcel@holtmann.org>
->> Cc: Johan Hedberg <johan.hedberg@gmail.com>
->> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> 
-> Nice cleanup. I'm not sure if it's important enough to be mentioned in
-> Documentation/driver-api/tty/tty_port.rst .
+Hello hams maintainers/developers,
 
-At minimum I broke tty_port_tty_hangup()'s kernel-doc:
-/**
-  * tty_port_tty_hangup - helper to hang up a tty
-  * @port: tty port
-  * @check_clocal: hang only ttys with %CLOCAL unset?
-  */
-  void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, 
-bool async)
+This is a 31-day syzbot report for the hams subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/hams
 
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 40 have already been fixed.
 
-doc says tty_port_tty_hangup(), code says __tty_port_tty_hangup(). Fix 
-coming, incl. vhangup addition.
+Some of the still happening issues:
 
-thanks,
--- 
-js
-suse labs
+Ref Crashes Repro Title
+<1> 1256    Yes   KASAN: slab-use-after-free Read in rose_get_neigh
+                  https://syzkaller.appspot.com/bug?extid=e04e2c007ba2c80476cb
+<2> 321     No    KASAN: slab-use-after-free Read in rose_timer_expiry (3)
+                  https://syzkaller.appspot.com/bug?extid=942297eecf7d2d61d1f1
+<3> 268     Yes   possible deadlock in nr_remove_neigh (2)
+                  https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
+<4> 112     No    possible deadlock in serial8250_handle_irq
+                  https://syzkaller.appspot.com/bug?extid=5fd749c74105b0e1b302
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
