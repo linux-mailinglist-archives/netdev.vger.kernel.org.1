@@ -1,127 +1,213 @@
-Return-Path: <netdev+bounces-200179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D80CAE3963
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:05:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF61AE3971
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E927A3A528B
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:04:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2DB7175525
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B315C18BB8E;
-	Mon, 23 Jun 2025 09:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA3A22F74E;
+	Mon, 23 Jun 2025 09:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iO3ztqGF"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="tA9tnhD6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD182EB1D;
-	Mon, 23 Jun 2025 09:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A1A1F30BB
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750669498; cv=none; b=cOsiCf4mO54E80UG04Py8fQuFbarIZ+lFPkByB+j1fjS0pXpcUHh90dLuX8paIrcRzFWeRGuaPRB/NVPCfc8pkNfzatf6HjuPJpHO7GC7UiB2BOQRKtqnx3gWG/PI5ilCLxiNQ14dzi+wU3RQ46iS1nGpOYxv3KsyqMUewZIgh4=
+	t=1750669600; cv=none; b=D7ddqSyDtjeXdK+B4B13nniGqiq/6HJgM1yN9CyUGZZ1Zt0yC4Yc4WY47eG6e0++I7jzon62sUaK/RTiMGizNy6iDapqSn0tvyFwp9LHcLP/q9H70mTJgA9sv2eOxbsJH2Q4Md9uk5Ya2azytEMN3WZZ4pXxaP7Ph1bcUvzO1XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750669498; c=relaxed/simple;
-	bh=cHusQ2VZmE4UIlYbu5OpWoF9Rc99dg6ImE33GJlTdOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gOAqysnh4zY0gt8N+LXR1q49T/Jqj4SDggXTo/IWqxTmK7oEjMstpJ7QvqHyKyoyJku+vl4/tkN7hRu+O0tbyTlF2ivHlxpGoh9IhiJ1RDllZFa9yVfGnN/GYWaM3DjsCJJLzsL72wnPrbxRrHW7NiXKPbBB2UyGFGUMYgq6Fxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iO3ztqGF; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45310223677so29349755e9.0;
-        Mon, 23 Jun 2025 02:04:56 -0700 (PDT)
+	s=arc-20240116; t=1750669600; c=relaxed/simple;
+	bh=NplCcx7sOXvlDjDGShpLbLZzNcDPmjan4xA+/QRgM+4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jB40kiwdEYVt+mvP8xwxwUbUNaWXytNW1orbVYWKFGK7IvRODUo3ExnnktA1Yub1uReD2Qgtvblj8sFotKW1DeE3kxbS2hY7fVzl4TdneuwP0lC0AqsMVumD3YXh/sS28ZkP/y0QXU7XWS8bx48JxzAuLCVTPjfrnjwwSL6kEVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=tA9tnhD6; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-604bff84741so7366179a12.2
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 02:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750669495; x=1751274295; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Mp4zG9WmNam+JoCdJwjtNBfJYYLGYfORbnaYyB6I4o=;
-        b=iO3ztqGF0GMQtC7DZZCFdXODBPVtlYoSLCTpw5cBf7Ua4TJ4npnZjE29TiJOnt8oZo
-         8Of6jHPn6qeJfp2zaUYA8spIYORkM/OZzy4hpr4tMjuILZebNDYbFmW7BkLe9Ql0L4r7
-         W7IWJzDki8YmI8CUcHgV3Nvwrf8ZJ9k/kzyckOUgPsqQbPCHy3wQWhzPdrfC+KIQV+3g
-         vloL1IUaRs7mcGbLdgwlt/Atxu9BVihhm55iXigy+miFqabxJN6+Pj5f8CnxJqXkIa23
-         0IKu6P7jhQ7AS47nsAOv7hRxlqPSxzGf2BCVriz/H38xdYBknkNrr/FrOGkvO9r3DIRN
-         dPiw==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1750669597; x=1751274397; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ey45mjsLzFT2alZQ43V/e5P4ouEuI9k+6FzGtpkIa8o=;
+        b=tA9tnhD6b5DTBr+bbLYUyVzpBKA7hAhGX9f9fzoyV+6zBf1ZIdCtn765Z+rz3VbLcV
+         1ihPqqlbPnfBwSF675PMBQwWcd2u23j2JO2goXhrckl6EPIyVhAb70Ycj0djTCDsswN7
+         pLjRJP744JuuXQZFn5Li8EsuHT6ytG4z3BeYL7n+paKA6cpq7koSyLUVr6KGbVsJyziG
+         2IcjTyvtGOcY+I8U1dfdLKpiP7uv/BRx5JCxMA/9zQNJMPAZH3fQ3/X6beDvx8B1Y0te
+         ZOROYXMzVc/tfihzrZ8p4YXLy6Rzgve/cXuD6WId69NweNh16Tij3lheOTbiAP1TrPMw
+         5O/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750669495; x=1751274295;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Mp4zG9WmNam+JoCdJwjtNBfJYYLGYfORbnaYyB6I4o=;
-        b=UB5+xvq5R2hjpRiz5EPLGSzhLYqdYptHVGcU6UHMNZOVFksk99obZXdKjJTaAeWcfd
-         3zExCHa9LBPduLTmNTJj5sBoagsMI0KXWGDhBJGwIPQz9Lfn1coid4UDNCB2/Ms/vkPj
-         WVz4O/B2OustGiIiki/501eXgeQHvobBDHM2nhAYwrm23LIJg60LK4+fkaZxK+Nd/cmx
-         Oda1KwEcmjn55a6ogx9fSnxSyOJsFg8aWZsSG9ZvstxPLEq7DGnHuOTyGoFlSdkMdmQq
-         OcrEGuDUqgKyH6PHPxI+4m/B1GeshiS9ZFcX1hFpN5Pdx2U+L8r+/3ZsQNCYloGNuNkJ
-         ZCBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVIVbYed5qr1ApBsOTjAYeGz+KDlvqUpnNU8heZSZi+YIVwRtCIqWFlae9EqsiduksnyVO6NUbQ@vger.kernel.org, AJvYcCX3B5250QcfFY42Hej5zG/jv3xK9tDZJEdjn4N6mm6pYjkIq1oqpzZqHeQKx5c8j1lFaoo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCxfe6HHX8cLtp/cegN9L5HRy/YAL2GzGu41UWlzBmtCNRZbxe
-	eigSrvdx/M2p/SaMos1ucJb2HSobBLDEuZ43XqTaZTNrOgIkWdWGIr4f
-X-Gm-Gg: ASbGncsoXjz0g6pyNipdMf8zSB6DI06fkavoPdIdawrTARGwPinJWpWnWNTFH9BFmLa
-	0Oai+CsnmQuOa44a2IshLNwXhMdmTajNtjx6PMJSTHHgJfC8zBdobzq8cYzqNRhEtHJ1oUW8Bjm
-	G1UuATBVMMmGTRlw4fDWFYgwxoGde4k+FH50jP6t2QV+X8n12eCWMGSw6D06Y+w0rQ7s7GdujH4
-	UAUxl17cPc+0eiwKdU/icNZc2nAmDiPDWUaddic1B3huUsFfJsIcMy3SxZboq7vhR9/2vgA8qtW
-	z3bFmnoIq4vDJ0oaWnNo0I0P7nK5Lcjla3OPcnWTA53UcIuybkm/hYau/iofhb8sbKe80zx4Wm7
-	YtdMXcMmc13Q4BOPrErPImE3hmOglqaTtN2aHVteBTCMIDEpIcaAteIcRJfNZ
-X-Google-Smtp-Source: AGHT+IH+ExDbubGYUndUo11AsgsJZlD9if2irv5BgJtju2mboZPLIsB6AipN78PB9b6AXcv8r0pc1A==
-X-Received: by 2002:a05:600c:35c1:b0:441:ac58:eb31 with SMTP id 5b1f17b1804b1-453659dcd4cmr95201975e9.20.1750669495009;
-        Mon, 23 Jun 2025 02:04:55 -0700 (PDT)
-Received: from mail.gmail.com (2a01cb0889497e005b5e8ea9b277abf2.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:5b5e:8ea9:b277:abf2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45364703701sm104047835e9.27.2025.06.23.02.04.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 02:04:53 -0700 (PDT)
-Date: Mon, 23 Jun 2025 11:04:52 +0200
-From: Paul Chaignon <paul.chaignon@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Tom Herbert <tom@herbertland.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>
-Subject: Re: [PATCH stable 5.10,5.15 2/2] bpf: Fix L4 csum update on IPv6 in
- CHECKSUM_COMPLETE
-Message-ID: <aFkYtN3WK19iK0-d@mail.gmail.com>
-References: <0bd9e0321544730642e1b068dd70178d5a3f8804.1750171422.git.paul.chaignon@gmail.com>
- <2ce92c476e4acba76002b69ad71093c5f8a681c6.1750171422.git.paul.chaignon@gmail.com>
- <2025062357-grove-crisply-a3b2@gregkh>
+        d=1e100.net; s=20230601; t=1750669597; x=1751274397;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ey45mjsLzFT2alZQ43V/e5P4ouEuI9k+6FzGtpkIa8o=;
+        b=IUU5quj5vwjrmynFsttlxjyIVd52X3vBPpbyji9ZBLyR7oJLClMlLaN5lwUR4aN55I
+         DBvqWksWdSl6AHPJu91cfYSpMqSbXJOEeidwgEd7svD65v303Cvc4cR6CejNs9+7bqs7
+         b365DbFdHDIGarGzfu06g8ZiJpnt19aK9YVyqX2t4YJTbUPJv98bF6vrtL2I6B9GzJ5R
+         cvi0UkLnbh/94Bi9JV/7SLCDb6olBoR2ywMRD49Z4Xy32Ene2952mF40pK3wzZKWWC4C
+         +SzTZJqHZ/QhkvFjsPhP309c9WcQiRN5i7FUu52elFrqSHLRK33hmBPLIDJMGsjtd2Ce
+         5NVg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Jvpjtnyx8j27wTJkx0Zw/+KfDs229x6v6USUrVc6UxA9QpjNc7tPtTZblFigD8kwf1trXmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXLW+ToSGe/zyDb8mm5M+NoodqmsX3NiBvB65de+w/JPSEtvUu
+	0MR6KcCGNYp4Jh0HbCtR7jpDHvhsI+/M/KstTIL0ahAhyOZYYhP1d5zimM+5JJzUxTM=
+X-Gm-Gg: ASbGnctI2bXBjhLjqHddEfa/PLBSgpqhj3U2DfxXIoDHxDww3Zn8azeO5ro3rbvpiF0
+	jIeg8NIEXlJnJJ9xaNOVzd3R8GS9Ck/ZlgIoaU9zhTMxRsoTd5xtkn4/0b0DsGc4dGkimrW/Uhk
+	9MpzvU5lPz2c0fN6iXG7A1Ohs1crv/MiG2rsodc7XU77gfnlQSkfxOfRbVJwe0X0VS4mXMzDoN4
+	RZ0FffvrPq88LQ00Uiy/B0oRS203/+5Nl80H73TXop9YXWWmlx1r93LQrxFYmrHmfQLwtN7HwzK
+	JpDq28cJVgO7oazxO7RxIGUXeyL66Wt5DZfMO8n8n2uvK83oRjNnlVDl/BOMrvVghoW7axIG3HC
+	TnWPhQMtZoYCGYfFfKA==
+X-Google-Smtp-Source: AGHT+IFGuDV0WJYvzUIRo4zGv+/lfxQm1RgBphY+vdx+pduqP9EOGUI2FTqk9mV29+Pn1Tk6nwgVgw==
+X-Received: by 2002:a05:6402:28a8:b0:606:c5f9:8aea with SMTP id 4fb4d7f45d1cf-60a1cd1d83amr8899589a12.16.1750669596719;
+        Mon, 23 Jun 2025 02:06:36 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60a18542a3esm5761882a12.23.2025.06.23.02.06.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 02:06:35 -0700 (PDT)
+Message-ID: <ca883bc3-84e7-4ff9-81fa-cc7755b2bdb7@blackwall.org>
+Date: Mon, 23 Jun 2025 12:06:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2025062357-grove-crisply-a3b2@gregkh>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v4 1/3] bridge: move mcast querier dumping
+ code into a shared function
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, idosch@nvidia.com, bridge@lists.linux-foundation.org,
+ entwicklung@pengutronix.de
+References: <20250623084518.1101527-1-f.pfitzner@pengutronix.de>
+ <20250623084518.1101527-2-f.pfitzner@pengutronix.de>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250623084518.1101527-2-f.pfitzner@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 23, 2025 at 10:46:47AM +0200, Greg Kroah-Hartman wrote:
-> On Tue, Jun 17, 2025 at 05:49:21PM +0200, Paul Chaignon wrote:
-> > [ Upstream commit ead7f9b8de65632ef8060b84b0c55049a33cfea1 ]
-> > [ Note: Fixed conflict due to unrelated comment change. ]
+On 6/23/25 11:45, Fabian Pfitzner wrote:
+> Put mcast querier dumping code into a shared function. This function
+> will be called from the bridge utility in a later patch.
 > 
-> This does not apply to the 5.15.y tree at all, due to:
+> Adapt the code such that the vtb parameter is used
+> instead of tb[IFLA_BR_MCAST_QUERIER_STATE].
 > 
-> > -		inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo, false);
-> > +		inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo, is_ipv6);
+> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+> ---
 > 
-> This chunk.
+> I decided to not only move the code into a separate function, but also
+> to adapt it to fit into the function. If I split it into a pure refactoring
+> and an adapting commit, the former will not compile preventing git bisects.
 > 
-> Can you fix that up and resend just this one?
+>  include/bridge.h   |  3 +++
+>  ip/iplink_bridge.c | 58 ++------------------------------------------
+>  lib/bridge.c       | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 65 insertions(+), 56 deletions(-)
+> 
+> diff --git a/include/bridge.h b/include/bridge.h
+> index 8bcd1e38..b2f978f4 100644
+> --- a/include/bridge.h
+> +++ b/include/bridge.h
+> @@ -3,9 +3,12 @@
+>  #define __BRIDGE_H__ 1
+> 
+>  #include <linux/if_bridge.h>
+> +#include <linux/rtnetlink.h>
+> 
+>  void bridge_print_vlan_flags(__u16 flags);
+>  void bridge_print_vlan_stats_only(const struct bridge_vlan_xstats *vstats);
+>  void bridge_print_vlan_stats(const struct bridge_vlan_xstats *vstats);
+> 
+> +void bridge_print_mcast_querier_state(const struct rtattr* vtb);
+> +
+>  #endif /* __BRIDGE_H__ */
+> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+> index 31e7cb5e..4e1f5147 100644
+> --- a/ip/iplink_bridge.c
+> +++ b/ip/iplink_bridge.c
+> @@ -682,62 +682,8 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>  			   rta_getattr_u8(tb[IFLA_BR_MCAST_QUERIER]));
+> 
+>  	if (tb[IFLA_BR_MCAST_QUERIER_STATE]) {
+> -		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
+> -		SPRINT_BUF(other_time);
+> -
+> -		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, tb[IFLA_BR_MCAST_QUERIER_STATE]);
+> -		memset(other_time, 0, sizeof(other_time));
+> -
+> -		open_json_object("mcast_querier_state_ipv4");
+> -		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
+> -			print_string(PRINT_FP,
+> -				NULL,
+> -				"%s ",
+> -				"mcast_querier_ipv4_addr");
+> -			print_color_string(PRINT_ANY,
+> -				COLOR_INET,
+> -				"mcast_querier_ipv4_addr",
+> -				"%s ",
+> -				format_host_rta(AF_INET, bqtb[BRIDGE_QUERIER_IP_ADDRESS]));
+> -		}
+> -		if (bqtb[BRIDGE_QUERIER_IP_PORT])
+> -			print_uint(PRINT_ANY,
+> -				"mcast_querier_ipv4_port",
+> -				"mcast_querier_ipv4_port %u ",
+> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
+> -		if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER])
+> -			print_string(PRINT_ANY,
+> -				"mcast_querier_ipv4_other_timer",
+> -				"mcast_querier_ipv4_other_timer %s ",
+> -				sprint_time64(
+> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]),
+> -									other_time));
+> -		close_json_object();
+> -		open_json_object("mcast_querier_state_ipv6");
+> -		if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
+> -			print_string(PRINT_FP,
+> -				NULL,
+> -				"%s ",
+> -				"mcast_querier_ipv6_addr");
+> -			print_color_string(PRINT_ANY,
+> -				COLOR_INET6,
+> -				"mcast_querier_ipv6_addr",
+> -				"%s ",
+> -				format_host_rta(AF_INET6, bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]));
+> -		}
+> -		if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
+> -			print_uint(PRINT_ANY,
+> -				"mcast_querier_ipv6_port",
+> -				"mcast_querier_ipv6_port %u ",
+> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
+> -		if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER])
+> -			print_string(PRINT_ANY,
+> -				"mcast_querier_ipv6_other_timer",
+> -				"mcast_querier_ipv6_other_timer %s ",
+> -				sprint_time64(
+> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]),
+> -									other_time));
+> -		close_json_object();
+> +		struct rtattr *vtb = tb[IFLA_BR_MCAST_QUERIER_STATE];
+> +		bridge_print_mcast_querier_state(vtb);
+>  	}
+> 
+>  	if (tb[IFLA_BR_MCAST_HASH_ELASTICITY])
 
-It requires the 1/2 patch to apply correctly. I've tested them on the
-tip of 5.15.y (1c700860e8bc). Or is there some reason not to backport
-the 1/2 patch?
+Please run checkpatch against the patches before sending them.
 
-Paul
+WARNING: Missing a blank line after declarations
+#175: FILE: ip/iplink_bridge.c:685:
++		struct rtattr *vtb = tb[IFLA_BR_MCAST_QUERIER_STATE];
++		bridge_print_mcast_querier_state(vtb);
 
-> 
-> thanks,
-> 
-> greg k-h
+
+
 
