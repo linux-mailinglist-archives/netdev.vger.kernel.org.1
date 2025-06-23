@@ -1,136 +1,126 @@
-Return-Path: <netdev+bounces-200414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C3D3AE541B
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:59:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6967AE5775
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 00:34:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED31644648E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 21:58:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6A8F3A2BA8
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 22:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA47223DC1;
-	Mon, 23 Jun 2025 21:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404B321B8F6;
+	Mon, 23 Jun 2025 22:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0/5Vqmt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqXM9YL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30605222581;
-	Mon, 23 Jun 2025 21:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA8A4414
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 22:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750715951; cv=none; b=RamtyLAWkk1Y9kaqVvkjtzPxKpgVmhjAT+eN6sx9nMwF/yzbWRWZGRbLNms1vsxVrdBa7khNFqGe9hOTSTkL0Vpa90zXBcjeTPowyztYTfBh0lX6ZLccASUGLz+VHhvYrV17Q59knLs0xvEaceqtCaoYEy6LHJsHsdk4cC/gadk=
+	t=1750718068; cv=none; b=BcDtT2ACU5BYtaa7ScGtRPcWbqE5XIDxYeJb/MQANOky10GwZjLO2qLoqgVA5c6FjRjjT9fOyf/PD0emobs9ouH/3bz7KGuZ0bXKovkbE1o9AGi2iTzAuVx/o9GGoKGDU9RbrqQZrnjXm5xA7+7g0S5bwbSjIU/0HByefCjYaMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750715951; c=relaxed/simple;
-	bh=CV+QG6+CRgw24neLMjPi3GkjM45lC+PSOpguhXjN91Q=;
+	s=arc-20240116; t=1750718068; c=relaxed/simple;
+	bh=Rq1JN0PiZWqZxac9Xv6iCvGpbVBzkC1LFge0XLUTuDQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XMwywrJHBRBrFye6uvaF6zv+dDycBmAAxo0p8HxBUH9iC1iEDusyfP4ApgvG5HfI7WY81aB/lO8it+QogJ7udO3loFyskK0yEb8dlLxXsAq7TiTZbFq4c2ryIYp5/ffi4JELJpITPr6O8mtakMOmIR3ClH24KcmE4OUTySqkMy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0/5Vqmt; arc=none smtp.client-ip=209.85.215.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTa8+Osxkfh0Re1iE/GpJ/dMrJ9069zOctX9j2ZSirUTSOkCoDAwNjzXsJFwJweNwSeWYFY/qi5HlMN6RvGPP5M+OMYlAQ5Fhgz7Cr5FuIapY6s1R1uccIU1fVS4uAaVDxI/IdUa0zi5MgycDpgpUxa3vULiSJlAGkZZ7Xi92k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqXM9YL7; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b2c4331c50eso4015257a12.3;
-        Mon, 23 Jun 2025 14:59:09 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-747abb3cd0bso3339749b3a.1
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 15:34:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750715949; x=1751320749; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l3yB+qOk7ujVR/LBAYKGt7qD8w55PbhtiiJGomEX+B0=;
-        b=L0/5VqmtE1m596lhLw9fnegnQp8ylD702uSqGurQl4soZF0PT+MStvTp7mSZf99Ycv
-         a2ICHKuFGE3GXW5GsPh1CryVY3bzEw4ehQo4qz5iv3IZxuwmoKQnybCVz/GReETME53U
-         nrazeVLy8KnAV+4nxYVCpeNhIrT7R1bsLUyuh5ACdhUxpv951EejxYK9DsxOPJ/tbZC9
-         n5hgda6y+TCD2NHtWMSp/69xM0ZPuVtUj65dbn1sm0+JhHn9Yi6f++mFNDyu8vdpysIs
-         MaFsd0+dR0CPbMq3j9k5Wi489YKMhoXiOLhAgsWH55fF2qGVnJ0rzv05fWQswE7t6S7N
-         Pbgw==
+        d=gmail.com; s=20230601; t=1750718066; x=1751322866; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=smwVGSzZgzgRry60W/jn6YjV3HtW44rNufXfhnF6rzk=;
+        b=dqXM9YL7m5dpvqqyJ+NGJqG+3K/NFYBChTkuMmSCicW+ntiFYj8huU5TKgYf+rZFHU
+         JDDIp0BeIcGIXProkWNk/Dp417Aw7DfgRnHtP5PjJHJTlQxmM19NYH1rifnk9akTlXhv
+         Pk2bou8d4YzU4I/Lvo/qgEqha3e7+1z0uFJ5tMwEqUaTyFE2whOUSCP1QtxMOdOK7I+t
+         F4z2J/3VkaN8RaPl/OLxe3+yAToreO8ajsx+2B9aQvuVmDqoZRCNEU3mNOQOT0U24ylG
+         B8ldXCasqnaC1YKx85g+KS6EpxAR2JfLdoedGzcm023PUpnxauu8Y4GUiSYhuKjFLVr3
+         pHqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750715949; x=1751320749;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l3yB+qOk7ujVR/LBAYKGt7qD8w55PbhtiiJGomEX+B0=;
-        b=nl/UMXAC2yDiJB/+sA0H+9auQ1x0kdd95SeLtNtQYAqsb4zPwFLKzfl3SFs7f9TdRb
-         +Rxq+td3+goz6iLQQJgSfQRhiGRp1Xn2HCagTyTBDUWno9+bxm5sOjkQ9N46ffNPn8vi
-         dmB7u0nw0HHEhSzshs1soH9fCIBGX5DqV4lVb1gVPIO3ccUBOBLKt4qiBmsk0u0u8en6
-         3x2ftiXCs1JbZNOuKniHmLhQVOTLzvqje+7deTFL6p/7QJMByOBRCxmATyR30RWuemkL
-         eEbSaLek/8Fdg2YGjptCwSfAVaWx5vAYKhrhKNwCXReSFkWwUG5pX9hY0DJOG4x66kOM
-         yOwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUecGXN2/dc7+fZSABzGRORavIFbFq675S1iwplu5mQk9rO4VUSSSKfsRY7pKMvVhUvLvAuprkJ@vger.kernel.org, AJvYcCV9DLD5x3/hl5LJAcSZ0PHZbWPpV/ZjI15Ti0Fr+DQpEJiZ9EW51k3nkVbn8yshbQpBSX/Fyotx4+k3y0O4@vger.kernel.org, AJvYcCXexLGV1E2B9TJWPnBxRf4qetymepdaIBjC9bSZJ1iIr62/UxoMhBttoc0LlX6UjWJ+6C6/LvTcP49B@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzL9RVp8iLHtwjHravemrl1ig6ch23Yp52FBiOAzPxL0PJbanD
-	AuOgA77m8QI5ANhrYh5T5Q28lZuJZYBkiKBIUs6b78UDPArO1ss2wbPs
-X-Gm-Gg: ASbGncsyLHK/78Ehbnj+Rrrn21bzR9mLdGMIB3uEZysL/VXv5Rb+0YAsX0ahQMITyWi
-	V5seoKq6Df+HG4fFCJac7bE+FSN1OWtqbmPmNp3PsxzH9LxsC6yGBZ+yy0vW4CcCi5BQKOmmRYE
-	zI+Hw6rkxEt4W2rVERxtusW7fmOl41caNwM88BliT5Wf8tODNJeX4xMv/hnsz3GDXGGpYGZypiX
-	FTO8n8gVh4bbNTIEkbUQQzVzRwMPskaDsZKe7yz636cE09sk/z+9fhmvjhoHa9jZ8bCHh9AczUf
-	SsJ19VlqBfMUpaFk9ohWLp09VRLOiWTp1px37L5lNB1mFIM5qUts6uoMDPKBqw==
-X-Google-Smtp-Source: AGHT+IGFzE62qF3LBZw9k/a/Lzh2nlx6tpEsN8z9xHpzhHhKrHLcsX6GHI2IN06+kXkIIoSfeiuGQA==
-X-Received: by 2002:a17:90b:4a01:b0:311:a54d:8492 with SMTP id 98e67ed59e1d1-3159d62bf03mr19438715a91.6.1750715949257;
-        Mon, 23 Jun 2025 14:59:09 -0700 (PDT)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3158a331288sm12485010a91.43.2025.06.23.14.59.08
+        d=1e100.net; s=20230601; t=1750718066; x=1751322866;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=smwVGSzZgzgRry60W/jn6YjV3HtW44rNufXfhnF6rzk=;
+        b=McNlHExU4foeELN+RUfDsenFzCRNy6ehmx6z8fB1ILxbG1bV07LYAuTzKQI+kyQbjL
+         nnzVnk6WuGpeAKg+uTCC70eipRs2xOQk5ekMaUSjezQ3lKKJC34Dhraf7sAluYsKHztb
+         DIp0Se7hvTCs+ReJfHJofkG//b91xs6sB54P+lKpRpz/FAiiMF6MqtjJobMBb0lZ/DtA
+         jQyqqTCXL8CQNyyr7dSv9kbh2gTmY9ITujrHbgXEbTTudC2J3ETwuigfmIgRUiZ/VSpp
+         8GnGB1DUCCldPuJvcq7mTxaoE7kikFCBgUrz1ZiVXq7iNgU+h8GTlHhT9WIycm3fH5Il
+         vg3Q==
+X-Gm-Message-State: AOJu0YwBoO2eWfGifvYF+BY8SQxiDJPnEC35ala6AKGlllYpyaPtU6uh
+	viCj6aGRU3B3hn1cZVCNE82xbZXige6AusHngl+TqBBqAeDI/Agn43I=
+X-Gm-Gg: ASbGncsCkzC39iQzLwQcGU5EvVVP3h0dD75akcRPJY3XLaZ/QCBK+vRiyeos3HY7cfy
+	wJjSQEEyVRck2k2y43J+q8cOh7S0cbS5vSBj5tzkZJjRYkxg9tbFOY579qzOXMtZafPdmDI6Csn
+	hMy8QqhzrMv/0rGZQenAex6SQUAOVcW5Ei8rO2nxbGUkXj0dH7u1PSKj1gjMCjqFxTu+lfTt32J
+	gbZp9C2DYFYI2zpqNiFGA6Kcu97rY/xG08Z/xdVUsHd4+d/ij6bLDCLuavA2aOWUrPvqVLJRVL/
+	n0Ip0OXAtxVTWZrG9xyUO2nJXX3wFK9v0fbz6d8gC/j7dv7KCBtJFyBy/sgTI0KB31mFYM3luEb
+	DKmO2FoXfrG2Q/V6pBH707t71Z6BpKXSxxA==
+X-Google-Smtp-Source: AGHT+IGrSlPGm4ZU2IuYOk5Pkh/6c7iuYX446lLkrDPfM5pLVf0iR3TGTPXgXd7TRcRU6aQ6h0wh9A==
+X-Received: by 2002:a17:90b:17c5:b0:302:fc48:4f0a with SMTP id 98e67ed59e1d1-315cca43ceamr1836474a91.0.1750718065791;
+        Mon, 23 Jun 2025 15:34:25 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3158a2f36desm11625631a91.23.2025.06.23.15.34.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 14:59:08 -0700 (PDT)
-Date: Tue, 24 Jun 2025 05:59:01 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen Wang <unicorn_wang@outlook.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>, 
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Thomas Bonnefille <thomas.bonnefille@bootlin.com>, 
-	Yu Yuan <yu.yuan@sjtu.edu.cn>, Ze Huang <huangze@whut.edu.cn>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next RFC v2 4/4] riscv: dts: sophgo: Add ethernet
- configuration for Huashan Pi
-Message-ID: <vlolusjs436s3tsp23g2bsr33fngp6vrc2g7vbaeypf3l3gi5k@i44w7sjacahp>
-References: <20250623003049.574821-1-inochiama@gmail.com>
- <20250623003049.574821-5-inochiama@gmail.com>
- <bd1485c7-e6c3-4360-8e3c-e584ea0b8040@lunn.ch>
+        Mon, 23 Jun 2025 15:34:25 -0700 (PDT)
+Date: Mon, 23 Jun 2025 15:34:24 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next 6/8] net: s/dev_get_flags/netif_get_flags/
+Message-ID: <aFnWcGnwkg38q2p1@mini-arch>
+References: <20250623150814.3149231-1-sdf@fomichev.me>
+ <20250623150814.3149231-7-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <bd1485c7-e6c3-4360-8e3c-e584ea0b8040@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250623150814.3149231-7-sdf@fomichev.me>
 
-On Mon, Jun 23, 2025 at 09:26:43AM +0200, Andrew Lunn wrote:
-> On Mon, Jun 23, 2025 at 08:30:46AM +0800, Inochi Amaoto wrote:
-> > Add configuration for ethernet controller on Huashan Pi.
-> > 
-> > Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> > ---
-> >  arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> > 
-> > diff --git a/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts b/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-> > index 26b57e15adc1..86f76159c304 100644
-> > --- a/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-> > +++ b/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-> > @@ -55,6 +55,16 @@ &emmc {
-> >  	non-removable;
-> >  };
-> >  
-> > +&gmac0 {
-> > +	status = "okay";
-> > +	phy-handle = <&internal_ephy>;
-> > +	phy-mode = "internal";
-> > +};
+On 06/23, Stanislav Fomichev wrote:
+> Maintain netif vs dev semantics.
 > 
-> Since the PHY is internal, it should be part of the SoC .dtsi file,
-> same as any other peripheral. The board .dts file can then enable it.
-> 
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  drivers/infiniband/sw/rxe/rxe_verbs.c |  2 +-
+>  fs/smb/server/smb2pdu.c               |  2 +-
+>  include/linux/netdevice.h             |  2 +-
+>  net/8021q/vlan.c                      |  2 +-
+>  net/bridge/br_netlink.c               |  2 +-
+>  net/core/dev.c                        | 10 +++++-----
+>  net/core/dev_ioctl.c                  |  2 +-
+>  net/core/rtnetlink.c                  |  4 ++--
+>  net/ipv4/fib_frontend.c               |  2 +-
+>  net/ipv4/fib_semantics.c              |  2 +-
+>  net/ipv4/nexthop.c                    |  2 +-
+>  net/ipv6/addrconf.c                   |  2 +-
+>  net/mpls/af_mpls.c                    |  6 +++---
+>  net/wireless/wext-core.c              |  2 +-
+>  14 files changed, 21 insertions(+), 21 deletions(-)
 
-Does this mean only boards using external phy need to override the
-"phy-handle" and "phy-mode"?
+Looks like I missed something in vlan_device_event:
 
-Regards,
-Inochi
+net/8021q/vlan.c: In function ‘vlan_device_event’:
+net/8021q/vlan.c:507:24: error: implicit declaration of function ‘dev_get_flags’; did you mean ‘dev_get_alias’? [-Werror=implicit-function-declaration]
+  507 |                 flgs = dev_get_flags(dev);
+      |                        ^~~~~~~~~~~~~
+      |                        dev_get_alias
+
+---
+pw-bot: cr
 
