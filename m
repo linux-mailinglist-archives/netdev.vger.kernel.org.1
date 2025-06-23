@@ -1,121 +1,136 @@
-Return-Path: <netdev+bounces-200409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BE35AE4E2C
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 22:33:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7528AE4E36
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 22:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4ADF179D3D
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EB2316AB0D
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7FA2D323F;
-	Mon, 23 Jun 2025 20:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46FF2D4B57;
+	Mon, 23 Jun 2025 20:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRIBPKPz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRrlGVyc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144F01F582B
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 20:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6366136
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 20:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750710814; cv=none; b=luLFFCDPS5+jI4xDgpUniX0Id0XkH2xW7KldIn2aejAZMT5KIeRfzWn/U0KpDwHvXmoJATHC5TZmQNpYAt5L5JTvYJVt5F49M+sX5VvJhHsc6WDyQPF/uOvLeywZCijAmVSRcBHyeObau2Mhv4wofCNhrYm/V33deMbY0Y3W0fI=
+	t=1750711217; cv=none; b=OtkpJe3OVarIE/wJF8DqHRThJA5ibsAKuJVPtno0SZ7cDFPI2ULDPapjhwngzDzuNvwtAFPII256PxTbEUGQ9e6DY5xYbRRmwTXIlUk0pQAAWRlHgwExfSxmjFtzwwklBCCv6XwPNimcHZFyp4RY8MLARlyTcU2xJhQNRen5ciU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750710814; c=relaxed/simple;
-	bh=eeZQ9txsgusfWOsErazUXDVuY/9V/wPXMVUis9f31h4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fa9bF7byOxfb6utdl0hJ4Ev++qCaM7jyht5yKLsnrFrwRFdHRH9h368ie552jYYktd41Lt873svPD/ZQ1Gdbl8hSU+lb8I/yDF/Z1AnAqbuo29evByTYx/qX7OUOfyw9KQICxHcWEKAoXAcw54o+6UXSDec2HeU9kzx/O8GKHwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRIBPKPz; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1750711217; c=relaxed/simple;
+	bh=Whxy28t5c65QedQnEjz7kL8EDjL0rJEFc+pcRCKs1vw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=I2z8mY8UkNCaBOw47UYawCI4plKq7iZBCeXl4GK3vuIFNmXOHHJTsOyEoe9Y3LXiXrXR7Y4nWL92Snc11sS/abDZpVm8Tb4nX1zmUWBiAdwrTp5nEJZvENz2dp/Y9u4rTryy/otaNNFo6FVl6oSSgvN3Z4oRrirPftKuTdIdOuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TRrlGVyc; arc=none smtp.client-ip=209.85.219.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-453066fad06so30401935e9.2
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 13:33:31 -0700 (PDT)
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e75668006b9so4178953276.3
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 13:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750710810; x=1751315610; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=shvkGBHHPpsRBuu77CvQh2VwkgPu0KbPqm9TUN+Sl2k=;
-        b=RRIBPKPzNr3Bi7h9jdhw0n7ij4lwnCHIY3XdamaOIZUp5DoFGsHC5wJKbudWMvTA/W
-         vpMzB3bm5GiejKVD3fRpMs/FT61XGzOFCa3Ldj24jI0cD/8Z0fzC92wjQVEmg7xZs/0C
-         31c6BhUOUDGrUbeQNwNsGrSFaapQHeVngp/Qslafq/uh76jZD7uolxFMVTNtsygcRO5j
-         6bKMH6Du1LMWYDag3ZESEMcj6x5/lSbU7JSEAgpRyaWFKWUl71bLMHezczEnfoqY73HH
-         axXBbKgv7JfWL0zdQ8BDI73b+shEJrSX9qZJxnz+NMEtUAXqxYrP2yyvRffqEV33VAef
-         xhKg==
+        d=gmail.com; s=20230601; t=1750711215; x=1751316015; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xAJQn1EwqBmGVIzar3zbL10KVVCifzAKGMrhh56C4ZM=;
+        b=TRrlGVycW6QXGhzogzdNHDV8VXPzZUWYeRBeN8ocvngdXoNnNSP9c4eIGmVjwml5/j
+         +WbkmSKmYrfXJ3+RlmtmPkJ6vMSRrtpXR7sBe9SHmXyyiV1/0euVvOpbfTNHN89fV5gE
+         C80XEbTiMUl6l3aBnRNHFmf/4IbzkOIq0+F7Yw619pT95A9Rch/CuAnOymzxglfMQ7ey
+         ZjC76iYb1uZH1UtEiYH+PIJJxt54OXvgJnihkiaB3BBR54IUp1ZEhYlFq7Hg6U3NKYrH
+         aTTQApD3Q7R/9lgTBvTeUqYMgqe1KlOltS10B8+xv9BNK30T11RCi/lRSXtc1VscuMKE
+         ++dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750710810; x=1751315610;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=shvkGBHHPpsRBuu77CvQh2VwkgPu0KbPqm9TUN+Sl2k=;
-        b=Rn/7+6C85oyzPUuxdwpkRCzEv1xMxv1rTk8BR3u4ctFfD28j9PWXvCG9LNq2vgjPYv
-         TCd8AAX1fX2xsKpRW5O3Qb4yQurxZwATqnxeoiBBnVq+UMAqchY9q7F4z7tJxy8IETfU
-         VTALOzjfT3F+l6/PcygfOJDbZS+481IfJUl/N23ooGuOGXU/KXsB5h35b0yD7hSAxHIu
-         ocP8vvzAxFaz9VGJoTNjDb7fNxKxr1xIII4xaJ4/z0Fg2JxWgBmVPxUh8f8wXmyC9BIG
-         rFVGgGH1veC+9k6eoXKeUXRAIdOlKcjHrR6EAUuZvAWKs6rdSK2ouzYZSfbu8WuakJpo
-         D5pw==
-X-Forwarded-Encrypted: i=1; AJvYcCWU2qX8WnkhAQHeLHmKHN5Pc/KazryuPc7I5FFaW6w4f5jQKya95Mi+qAVCGr+qAPrE+QzFMW4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9+kX3yMXvveK2V/flDcsP/BQ9BfYhHPVaoRoHI+1wFeF6mVEl
-	E9I5z5++P5itG3oUWeoIbcGQGAGBxswSPnPuR31gv+mTRkjwPPbMRO9R
-X-Gm-Gg: ASbGncvr2vrG96vZU4vbt8HkrDLr9hsrtq8fDeGkAKZQqLn+hV5AstdrZNkRg/XYsFd
-	BD4JIclohsf3LlKQF9Kf2IS2YWKV6X8nr6V71SPHttpMhuf7UhXdZ+Xv0eA6sNT8IDG5zJkr8s1
-	mZcSXAIOmtR5R62UccmwsiOYxqN3GlcHNZRvEMOfDHQ9dvx68hM3p0rMJOMSLnPfGssBH+ST49y
-	Rvhg/GS07YsVl8szZNQdADU5Y2yoCMXLd/uJGBV/bWzCIZn7f1380Oddq+lZpkix/QLDxr3fpw8
-	QL1MkB+90cM7bbNqZEkl2jsmbD7eVHpMCu31NlCLABFHFu7oLOBYhhzlmrPViq77ng==
-X-Google-Smtp-Source: AGHT+IFnVtm8AG4ZufI/H7LbpEHfQvTxf/vQoWdgvbVwZ2mGmd05twW1q4zhRydW1YBPuk/lm38PDw==
-X-Received: by 2002:a05:600c:468e:b0:442:d5dd:5b4b with SMTP id 5b1f17b1804b1-453656bab67mr140678105e9.31.1750710810072;
-        Mon, 23 Jun 2025 13:33:30 -0700 (PDT)
-Received: from [192.168.0.2] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646dc66fsm118727915e9.18.2025.06.23.13.33.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 13:33:29 -0700 (PDT)
-Message-ID: <010253fd-cff2-4d4d-9f44-579dc4311bb8@gmail.com>
-Date: Mon, 23 Jun 2025 23:33:30 +0300
+        d=1e100.net; s=20230601; t=1750711215; x=1751316015;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xAJQn1EwqBmGVIzar3zbL10KVVCifzAKGMrhh56C4ZM=;
+        b=nPchcKy02R2Zl5tnyf5O4ER01jfzYR502J6HRTB+SP/d0W+j4MvqJgOpBqVSARWAiu
+         X1wLDE+Bep/cJilUq+rG0LyWjXDna36ufxGV/cCidXSCg2XfRnwoQeNjhDp2its22amA
+         9B4Y9t/qPwvO/Y7sglK40GcgUaoijGNA2IlLOT+ZPncV1o684nFUbHm2q0YuWgM0Qo3I
+         szPkTCoBv5L5F2n8WNNeg+WyKuPwfNEoOoNhGJcxo0KRPxtKezfrbTVtUReQOKxtc5Ld
+         4/nqxgRx5YpJoW2YB4laoZFsCXxmI8mI9TrEZDXNW85pw6PQUfs0SWfjfbbWaqInZIEi
+         iPIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmpJwBuNoxeIZYpSiHHMK/Kt9WxnAEXH/y7IO4Q8ppVfuFYLaB8sfmrX7VTLIpkcGH8iXcjUA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2XtSq78VLPnlu8s9ME06SJnKT5CL+6CgIOjwwibRwJaZp9RCj
+	VsXJZ/exGVVXuK10OYG2u2K2kwQDzQNqkt5RvfumhpJJc4zp1j/EHtV0
+X-Gm-Gg: ASbGncurAyAyFX0X9H7WvWhVEmpWMC76+1xpxsTMH6jgekfNTYMtRljG7oXXPDo+Cf+
+	GUg0x9sbv1ZndbaaDcLHLJ1KfMHYRhbhphj+vuzvwtkUdWil7zlgXI0LB0vTR8QwpvP20zy3g+2
+	MV1Mzbk0yBg9FzB5IP/yEcMzJ6PIhq58UU2eo3CEfjF8ROlXeeNF4+fWLVx+gmdMthEvqb4wwau
+	Bk+PjOcM0TNVaL3JBwTcDl4I88EPkGpAZIAtBwHn64qQL0yZuF1nadhVLyLThLTv6zST6HIIT7g
+	80w1ZmIkBt5Gpdep6B/aK5kiIHZQ6yahI/N47mlUIc+nQGFqhZkFQk5ncOX9nQ6My7UtaWxrpf8
+	KnI7OcPMqqIrhIr8y2DmxoSj+ZojE3wU+OC0jyYSsAomqLG+Zf5u+
+X-Google-Smtp-Source: AGHT+IHtBcJjD3teCn53Pgtx+jYpISXrDe3BkA1Z6Xit8zwg2YCBsXRQ5DXa0mlPPe6dFbtNcz8uVg==
+X-Received: by 2002:a05:6902:2e0b:b0:e84:1ae0:db01 with SMTP id 3f1490d57ef6-e842bc68bd0mr18852904276.5.1750711215047;
+        Mon, 23 Jun 2025 13:40:15 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e842acb55aesm2645324276.56.2025.06.23.13.40.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 13:40:14 -0700 (PDT)
+Date: Mon, 23 Jun 2025 16:40:13 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Message-ID: <6859bbade00da_101e05294a7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250623150814.3149231-1-sdf@fomichev.me>
+References: <20250623150814.3149231-1-sdf@fomichev.me>
+Subject: Re: [PATCH net-next 0/8] net: maintain netif vs dev prefix semantics
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/6] net: wwan: add NMEA port support
-To: Slark Xiao <slark_xiao@163.com>
-Cc: Muhammad Nuzaihan Kamal Luddin <zaihan@unrealasia.net>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- David S Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Abeni Paolo <pabeni@redhat.com>, netdev@vger.kernel.org,
- Qiang Yu <quic_qianyu@quicinc.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- Johan Hovold <johan@kernel.org>
-References: <7aed94ce.2dca.1967b8257af.Coremail.slark_xiao@163.com>
- <4D47E70F-D3F3-4EB6-8AE0-D50452865E58@unrealasia.net>
- <1127dc09.55cb.1968040ac46.Coremail.slark_xiao@163.com>
- <85e7ddb.97b3.1976899efc7.Coremail.slark_xiao@163.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <85e7ddb.97b3.1976899efc7.Coremail.slark_xiao@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi Slark,
+Stanislav Fomichev wrote:
+> Commit cc34acd577f1 ("docs: net: document new locking reality")
+> introduced netif_ vs dev_ function semantics: the former expects locked
+> netdev, the latter takes care of the locking. We don't strictly
+> follow this semantics on either side, but there are more dev_xxx handlers
+> now that don't fit. Rename them to netif_xxx where appropriate. We care only
+> about driver-visible APIs, don't touch stack-internal routines.
+> 
+> This is part 1, I'm considering following up with these (haven't looked
+> deep, maybe the ones that are frequently used are fine to keep):
+> 
+>   * dev_get_tstats64 dev_fetch_sw_netstats
+>   * dev_xdp_prog_count,
+>   * dev_add_pack dev_remove_pack dev_remove_pack
+>   * dev_get_iflink
+>   * dev_fill_forward_path
+>   * dev_getbyhwaddr_rcu dev_getbyhwaddr dev_getfirstbyhwtype
+>   * dev_valid_name dev_valid_name
+>   * dev_forward dev_forward_skb
+>   * dev_queue_xmit_nit dev_nit_active_rcu
+>   * dev_pick_tx_zero
+> 
+> Sending this out to get a sense of direction :-)
+> 
+> Stanislav Fomichev (8):
+>   net: s/dev_get_stats/netif_get_stats/
+>   net: s/dev_get_port_parent_id/netif_get_port_parent_id/
+>   net: s/dev_get_mac_address/netif_get_mac_address/
+>   net: s/dev_pre_changeaddr_notify/netif_pre_changeaddr_notify/
+>   net: s/__dev_set_mtu/__netif_set_mtu/
+>   net: s/dev_get_flags/netif_get_flags/
+>   net: s/dev_set_threaded/netif_set_threaded/
+>   net: s/dev_close_many/netif_close_many/
 
-On 6/13/25 12:23, Slark Xiao wrote:
-> Hi Sergey,
-> Do we have any updates about this feature? I didn't see any new patch or review suggestion.
-> Seems this task is pending without any push.
+Maybe also an opportunity to move the modified EXPORT_SYMBOL_GPL
+into the NETDEV_INTERNAL namespace?
 
-You are right. I've missed this case. Let me finish the updated patch 
-development as suggested by Loic. Will send in couple of days, I hope.
-
-I'll send it as RFCv2. If it will be Ok with your driver changes, than 
-fill free to (re-)send it as a complete series: NMEA port support in 
-WWAN core + your patches for the modem driver.
-
---
-Sergey
+Context in commit 0b7bdc7fab57 ("netdev: define NETDEV_INTERNAL")
 
