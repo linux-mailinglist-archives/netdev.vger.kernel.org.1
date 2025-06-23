@@ -1,499 +1,253 @@
-Return-Path: <netdev+bounces-200327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26DE1AE48C9
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:36:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B549BAE4940
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C565F3A2CD8
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:31:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1518C1885787
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F16246BCD;
-	Mon, 23 Jun 2025 15:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D402280A52;
+	Mon, 23 Jun 2025 15:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YYdoaprW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2081.outbound.protection.outlook.com [40.107.244.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A71770E2;
-	Mon, 23 Jun 2025 15:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750692712; cv=none; b=DFu8ne9tcingLfuVIx5rvjISYkQwkhiiRcZRuit5LwBEfAcTWUmAPL3/RsJNg7cjgteGvS72bTkHZRKFiQzEd5AuBRvm2sX4pSnpEapjPGcxSGWYn6dnc7Sxbr73ITZzJSfZ5TqZlPUk6f+lOrN49hYcHqkVyJEUMwhlg43jsz0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750692712; c=relaxed/simple;
-	bh=DE0Nqa/TckbGoIA8O8JKuEyj1GVAbeYoFxuYq57OU2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=scN/qFxp9ic3WC91/Chj5eu+T3GFj0eGV3IxGf0d0KVB6hs0vDZHAKqOP1PGhxeyvvQXZyCMt8dVhIvGGkELqa1WBIPPJdL3XJCfrceVvjfkwQB1Heb4DekbBsrg0w2AjnzucH0RnfFBBH5bfrwUgYQpjtlqDiv81t4FZb82u8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74264d1832eso5490362b3a.0;
-        Mon, 23 Jun 2025 08:31:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750692709; x=1751297509;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hfepTz1lJWLzHT9Rr0WGNOF07aH039WwhsU2rcCNg+Q=;
-        b=KEFhUw1kqioReKxzV9T+84dvXvphL0ocn2dRTbpGGjxWsvnExayWeENgXRSuwis0B9
-         LkTlnW9a0f/rDsAFUQCHBBCkkuYcMXpcUrS7PiXf7pQYTD8Q9/LX6zJf2wWJd1wIuehU
-         3Rz3dVQY6FsRBQVxlprtWAQTEWzKY/0Xlt6VDtkQ35tZPJgTB6mwhJG+wJDKNdazLtKt
-         ELamhRArGmGYWMWNC65KV6hL+8NV7uPhvZEBP6kJ5t93AES/axydlLO1bimZlP6o9SFl
-         Wo239rJMkIECN6mficdxzOyORXmkqRA6YyiQ3EUIbuhFkZ+F+im7T6vsqU78nDp0R9CP
-         n5rA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+rDzCbbDz2ryTIY11s0RviV+XzrBBhuxggK62YbPWami69DAneGnY80GgCNTtuBvzo3yor/Q6KmOUraY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlPGuQkdffV/N0kQwlX6ttJECa6e4Y5D5Em3zbdG/fTklKrliE
-	8z1skwEiANMq3V6lWl9n1rLTD6VtQFuGN1ojzt3e69/4kEu6+8PmMA4HzjqL
-X-Gm-Gg: ASbGncu3O+ycEUN2Xyuwj1Ja9KMPPdELtmNLSc0A+YyTiBy58s8TKlx/WOoWpnZy/wW
-	FFlKFI74mloOWqLXanZ8rILsrrs0lBWE1BqIizXhFU32Euc9gNm7fnWA/5glwG8Pjdge4R9hqD4
-	jPGnsM3w7j91ovmEcd4csF2EXERsY2gJpltXhtiEYPHbm8QgYkDfHa67QhJrWAi26iCFgMp5dhB
-	YK4UhJtnl75Iw1OH1Y/TO8FjEuUz69OUgPpCor3GntidLIPcKrvTF0+QnolQMq1AsS/dv9dHJ46
-	An1wjEbWZjV/Yt1CiCIGiqJfpEpfRu2IokIY5VbZST8Josrg+FTYllpBxwpPrfa88X30xherEZ8
-	vmlRQ9cX0ZnDK58CssIwRLYg=
-X-Google-Smtp-Source: AGHT+IH7ndE2Nbhldb2xJBLB71VSgCgyHkGzHj3RPFaHxLCdaawAiscbowGrJsoYFmAmAUzCcnAXCQ==
-X-Received: by 2002:a05:6a20:a10c:b0:204:4573:d854 with SMTP id adf61e73a8af0-22026d58631mr20732946637.9.1750692709369;
-        Mon, 23 Jun 2025 08:31:49 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b31f126a7c7sm8117926a12.70.2025.06.23.08.31.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 08:31:48 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	andrew+netdev@lunn.ch,
-	sdf@fomichev.me,
-	linux-kernel@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com,
-	syzbot+71fd22ae4b81631e22fd@syzkaller.appspotmail.com
-Subject: [PATCH net] team: replace team lock with rtnl lock
-Date: Mon, 23 Jun 2025 08:31:47 -0700
-Message-ID: <20250623153147.3413631-1-sdf@fomichev.me>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83AD81F94A;
+	Mon, 23 Jun 2025 15:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750693487; cv=fail; b=Vo6KuxmefzG4FgJ9c/B7tzJinYu4xLz4S/Fm0Junfx5tf4m4XumEOnZk4vMRXPvw9bP0JR9+ld3+qe/96i/mbOe+nOHg8e1buAaGue3FP+Q9nbRJ4/WKG5fpKLXcTvr1jL1WlaizBsJhjp/WA9ezF8pKEhOtQyDdENSR2kpgTOQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750693487; c=relaxed/simple;
+	bh=eN3rjzEbYGOws5lf4iJHU9GdQl0K0Un7WlBHC7qBhZo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DC24p9lKtwEuWd4EBpyY2Ajz3i4w4YFpbl6RZJm1Pebv1mCmeGhdAz8xVlndpXbwW9SSssiu5XfBY5odR33stQQ4BwcyC6rgUdB6r6tY54/3/CTL63c8MAWW7w9umfinguPHAjeZIzBTb4O46OF/K5Puof4f9ANPdqRuvEW87eo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YYdoaprW; arc=fail smtp.client-ip=40.107.244.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oiHOrWEKJLr4sYTajzqN6RPwanM2lABvXkiTJaUefDSSb8ttk1qPy9Kubhwo/PyQiKq+o9OjCtZ7Mq4kGy+SZPbXsqrZctwQLbxdmLE/yDL5t3a3xEGCVz+AezllV+JBde7fbPCv609gV/9sXAyqmFsy+xXGLrEev9+E7mZluKh/vY2hyzkG6+3q73Nh3d4Op3pVPBEDSpO722Px0naD3JRJIrn0cqr4BHLvAjc5CS2OR4Jp8fWu5m5dfLpu+Dj2QElkjNvP3hDWZ9jkP+9lJVXeFlemL1VzlysaRELZL9GgF16I6lhfu0LxxVx2UbKYeE//ZcUByDSOxIbZJ362xQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CtGGu/bHwbi07+bHWdUhLUhJYsXAj2s6r2Rw6SFVzl0=;
+ b=Sm8ERav2j8EyXchqR3Az755D0XygnLA19J6VqbUq7weX0EnhJBLhg2+pTOqA1DIv+aP/WS4ao4tYANj+5wuk+cj+bJ9A1pZsXknwoNcAl7sUUotI/pbbPJXTf3btp4nHOISUtitx6UyDuW1d4H223JQz3akemuRCpMY5IYoqAjh7kCxRN/x5nw/aZSVw3vELSaqV/56I9tKZiQ87zgCbAM7En7vweH0+BSMAMHDqn0Vy3qiiQmv5/bLZ4WKxgsZapi7zviccf1bR/5km1yEYaBSFAUQmfspizXlMBGS3vVxfISE5gRuYomj0QCFil/KCa0+r0mBVbcCpp49nPxyq9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CtGGu/bHwbi07+bHWdUhLUhJYsXAj2s6r2Rw6SFVzl0=;
+ b=YYdoaprWYFv1B/bDqSosvjxKkQJJNcPOlyjkhZT5S+ZtUDwsA+W5dQfeM/9ETSRLrmPY+0SAFX+yT/MY05sZertB0ifdyRQo0vaDWx9N5UgtKhifkyGNFN52NUDxEOdfHiVj+RM/WJVLRFVc0rEKobBRhS+nMZZWrXUH3jYOEpU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by CH2PR12MB4262.namprd12.prod.outlook.com (2603:10b6:610:af::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.25; Mon, 23 Jun
+ 2025 15:44:41 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%5]) with mapi id 15.20.8857.022; Mon, 23 Jun 2025
+ 15:44:41 +0000
+Message-ID: <8f54ae13-7943-4e45-9881-a01108a1b58f@amd.com>
+Date: Mon, 23 Jun 2025 08:44:39 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] ethernet: ionic: Fix DMA mapping tests
+To: Simon Horman <horms@kernel.org>
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+ Shannon Nelson <shannon.nelson@amd.com>,
+ Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Caleb Sander Mateos <csander@purestorage.com>,
+ Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250619094538.283723-2-fourier.thomas@gmail.com>
+ <bb84f844-ac16-4a35-9abf-614bbf576551@amd.com>
+ <20250620105114.GH194429@horms.kernel.org>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20250620105114.GH194429@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR01CA0026.prod.exchangelabs.com (2603:10b6:a02:80::39)
+ To PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|CH2PR12MB4262:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6cb1f461-a09f-49e2-44bb-08ddb26cde5e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RmQ3S080MUxxamZIY0VuWDJLM3E3U1dZQ2hCMzNUY0VhcVdjYjBheUpGSm8y?=
+ =?utf-8?B?QmVRRGEySUhiRGY2ajdHcDlTMHF5LzZlLzFCeUdPa25ZMU9FWUJSUENmMlh5?=
+ =?utf-8?B?alVyUW9PWmI0V2xUOFdOeVFyUCs5c1BoU0dHTGUxNldPV2pBZ0tSWnJlM1FI?=
+ =?utf-8?B?OHZ2QnE0SXBVaDZQR0dXUXBMQ01ETVp2VkZYTDVHb3pFbkhFWVlGdmpJaE9C?=
+ =?utf-8?B?dHZPeUUxUkNmbjczOFFLVWxVNE9LTnJ4K0t2UmpGTWhCT2dYMW16Y2R5cnlV?=
+ =?utf-8?B?QzJNMHMzWnIrVE9GWmlWQWoyTDU0YVhJYU9oK1p3QjhabUNSVW9qUmJTS3RH?=
+ =?utf-8?B?NktOemVydUdzN2hjb1E0TGtvdzNOQ3NtLzZ6Zmh0dkxIdVd6SXd3Vm1KWGFH?=
+ =?utf-8?B?UjdYVlc5b2w4SS9aMXlPVWFoWitldzZGd0lBVHFvZnZ5SlcvQjlNT1JEdjcw?=
+ =?utf-8?B?aEI5ZFJsS0RHQndBc3dpVkRjeEpvdGFFYllNNTFqYk1Sc0RBaExLUzcyTjho?=
+ =?utf-8?B?SlV1NUV5MTZwR2pvQmVJWlQ2ZUxhS0lkc3p5Q1pTWTdTRld3N2RaMEF4VmI3?=
+ =?utf-8?B?UzZXZ013QlpUckZyaHlJWlEwWVNnOGIzNHJST3NKY2NLc2tOQzRic05kT3Ba?=
+ =?utf-8?B?TnpyTmJWSENsdngyT2k1czhFdGdWRTR5TVpDUitYWTI3L21LVU9hVnFBQjR5?=
+ =?utf-8?B?L1Ryelk4Vmt2bTBITWhjNTJSOC9SOUxxRDlzbVpQamJia2Vwc2dkWmVmRFFZ?=
+ =?utf-8?B?L2hoU1k1UGkrM0l1bHoxT3Q5SUZ5YTdOaFl0MG5JRVVDWmhxcnlLR3d3YkVh?=
+ =?utf-8?B?N01BbTRNZ1JGWGlxbTIrcEk1cHM4RlNqWTZzQTYzSS9nVnJXazdwM2ZCSERL?=
+ =?utf-8?B?Tk1oK0w5QjYzNEt6TWZYbHBZZk5oenVKUUV6emNVYkJYY2lVWnJWalp2TllJ?=
+ =?utf-8?B?VXdta0h6WjI4K3QzSGcyT0dLKzlteVBuTFNkYm5QWDZZbGtEbkdiRHBUcUQ2?=
+ =?utf-8?B?SDg3WTNiRTJ6TFZPYWc1b2t4RnF3Nk5wQWQvMGUyM0FXT3U1SHJHc1p5aFh1?=
+ =?utf-8?B?KzRGNlhUUDkzYW4wRlZ5NUpQZzI4dXJsZlJQQnFNVnJFVHVSNzJHRFNrei80?=
+ =?utf-8?B?UGZMKzZTV3lxSjFicm92VjAvNWZtNnpDR2RYK01pQjE1TUYveVVsd1lNOVpp?=
+ =?utf-8?B?Q3R4WXJmcEpnZXhQa2FXQ1Y3blVOOWpsNk1IWS9DbEJ2dWZvTVVROHQxQkZt?=
+ =?utf-8?B?Y3RlQTAvd01PeU5DTkg4UEpJTWthblJHaHJHU1JXeHZkTXF2SzYxWXgyL3Ay?=
+ =?utf-8?B?UC9DcTh5MlpPcGh0bzhxSXpyemhPMTh1RHd4U09KRFlUWi81dG5ZeXJ2Wm1v?=
+ =?utf-8?B?VFZ3SVUzRHEwZUx5Uk8vYU4rc0d6Vm5xMEdSWHI5a3V6K1NZczdoY2dRYzFS?=
+ =?utf-8?B?Wm1oZEtGZ0UxcVhJdGlGQU10d1U2S1lHaDJweXFmM3l3Z0VFSjJsRHNDem8w?=
+ =?utf-8?B?L3BFcmIxSWwrMFJtK1NNRXFJanAyK3ZmRjlRMFNpRjFCVG9ZUzMvTFd0L1U0?=
+ =?utf-8?B?emxEOTN6Smx6azJHVmNESGhPMXIxSlFWcFpQNjZvNjY5LzJrbThJMXFnVmxR?=
+ =?utf-8?B?M0JqVlB2Tzc5ZzlKS3llazJYOEZrOFhlb1lCcGQ4WkVaR0xqWVZ4MExqYXFS?=
+ =?utf-8?B?OTJPRWN2cWVLbDBLQ0pLS0IxTG0ySDlKWFpJeExSN0IzWTEyeFNSSVZnNzQ1?=
+ =?utf-8?B?NlJYOEZIaTI5MSswdmpwd1FYRk83c2dzWDh2WFF5T093RlNmd0R4cEg1Z1ln?=
+ =?utf-8?B?ZDJYVHhsSDBGYmJZRVpEUTQzekt4eitGVG1sUFhNY21qaXJlQ1BBbFJhbWMz?=
+ =?utf-8?B?b3YrSmVaRlRJOVdyNHlMWGFBQno1ZC9qbTN5djBLQnpHd1l4T3lKVFBuVm5C?=
+ =?utf-8?Q?rcwjByEv70E=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SWZkZmY4WU5RN0tSN3hxdG9QWmY1dkJ2b25LcFFxYzA2eFlpWFpDVi9HYU1G?=
+ =?utf-8?B?RlZ3NUZlcndzalRsUDQ4TXg3bEx1aVd2d0VoNE9xeUhZK3JQbTRIUDFFRXAy?=
+ =?utf-8?B?UUtsOG4ycE5uMHdUUSsxS3IrUUVoVklxQndnRkxSWGt2VEdEdnhSY1JuU084?=
+ =?utf-8?B?UHVMeVlIbXVpTGpjc1BrcjBFNWtrMmYrTWJsdXFhL2dGdVhkb3JiYUNpYVlm?=
+ =?utf-8?B?NUt5VXhvc2gvNDFCZkFKVXJhMGxudHU5aDkxU2I1ZXN0b2tFa1NjUU1OYk9n?=
+ =?utf-8?B?VjF2VzUrdWlCWEllTEZuV2NxVENHTGM5L1lMN2NBVnEwSnU2RVBZRWtkS3hs?=
+ =?utf-8?B?eDhMVnF4dHZMZmxnOGg0aEVmeTMrQW5YeUgzeGQxUDhKUFdJYVFTNGRYQTU2?=
+ =?utf-8?B?WXBrWjl6Sis0V0hRNmNaaHROVExmZm1qT1JZNTI5SUFFNS9KaitQRmhmSytS?=
+ =?utf-8?B?dktSbEhqWEJJMHVmQnRoQmxvQUVYV0taaUJRdWVzMVhMVFUrMnVGVVRJWG5h?=
+ =?utf-8?B?YnBuQkF3U2s5dXE5KzVHS0FvNmtmdnFnQ3lnekJIeDNZbWhjcWM4bUxmRUJv?=
+ =?utf-8?B?VG1SdlZsNW16dVo3VmFOOXgvRUdaaUhoNVk1eWRMNFM3QnBCZ2dKRUlHbXJu?=
+ =?utf-8?B?UCsxdzJ5cjRVQmh5OCt6dEpCdzNEaXhwZW0vV2hWYTd6REpTajkyRDhYaHpU?=
+ =?utf-8?B?RkR3RWZuOHlTTkZmQ092Tmc4S0tpa1ZBQTl2ZTNOZEl3cmFack5ldFNEV2hq?=
+ =?utf-8?B?WmZvYzdTOEpVZklUeUxQYjhZNDZNZ3FNYzVOZzA3SGRWaTdtck4rUXhJc3VW?=
+ =?utf-8?B?Y2NHTHdBTDVzb2xEUG8wOFRHQURzL3d4OGJMdDlSUTZYNDBWQ1ZuMW5CRTRi?=
+ =?utf-8?B?RmZsZGJlclVzU2E2d3pRTlNwSFRMMXhIWUduc0hKajRZSVYzZDlCUm9qcUs4?=
+ =?utf-8?B?Y3FnSW1SYzBCWWZ5dVRtcVFDaytNQUo3QzFpS0kzS1VqY1daUFUxM2ZSaTEz?=
+ =?utf-8?B?MzhHM0pLZHVMdUdXdTBFRCtJMVZ2cVh1TkxLTFI4UWlFYzMxU01JUTFYbnBi?=
+ =?utf-8?B?bGYxcjVvRk1Xaks4N0Y0cHhhb21SVnV4cGVsTXNZZ1dkbTFIRGp4b0JyS0xO?=
+ =?utf-8?B?dHpoT0VyZkIreHVucW5BZ2d3TnNFNGdKblFDSEZQYVB1YU5LQ1E0SEJkbjd3?=
+ =?utf-8?B?d2oxYUtRS1A2dnIvQkJ6SUhwajR5T3hRMFFaVDRqZnBlN3NYNUYzbXRvZ1NO?=
+ =?utf-8?B?NitwVjZuMndFL0MrNklSWVNFazlTRDFFRmhUN2ppQ0dhemszUW5NZWFjVWFn?=
+ =?utf-8?B?ejZneHFGWWxrRURTRTFISk8yRWlkQmxVWGU0TFVMYk5kb2NhbVlHSXZjTUlq?=
+ =?utf-8?B?LytGNm1KK3F5SGYyV084WS9Id2VmdGpWTmdFMVAxYlpPWGZaZ1dWcWlwL1Q4?=
+ =?utf-8?B?WmpUWlBnYy9pUExoMXdBTUZZQ0k4aXd2RFBZT1dQSFRZb2hGajNHcVZyblVT?=
+ =?utf-8?B?VE1ETmJpZ21UQjZmV3doNHFmWEJ1bHFRU3NEM2xUbkUvTTJHQTE2eWIvTzZI?=
+ =?utf-8?B?bVB2Kys0SWtBMEZLcWpxSkJwc1JtdU5yM3ZHNDBOWWtOMkNUOUdPTWIvcjZY?=
+ =?utf-8?B?dXVsWFdrV3kydWU3Rm1zWWtRQisya3VXM25PWFhzc1F6U1hldG05dG1Xd3Va?=
+ =?utf-8?B?a09uWHpWRWNNWlpLODNvTlZiZHVSM2h2cHlIYWQrREtrWThJUHBBOG51NC9D?=
+ =?utf-8?B?WGJoNTJqTnE1Sm5mOTNnOXAyVlhTU1dpUzlIQmpwN09Tc1NHU3dwZHdxMTZv?=
+ =?utf-8?B?bGUxUW9jTm1YYnRXQnVVT2tsQXB3c1hPMzVGNzRjMmNBN3I0UVg2WWgvemZ3?=
+ =?utf-8?B?RVVEZXdJNWlJVHpGbTFoQk5YanRIb1dTRTNWRlFNbHNIRXFtWlEwdk0zT2lI?=
+ =?utf-8?B?K0Z0bFJ2SnZ4VjgzQXk3YlJ4T3FhTUwvU1NqYjVUa3FBTW82SG05YnZkZUFW?=
+ =?utf-8?B?S1RNcVpXM0lIQW53YlJQa09JMDFlQUt2WS9NUHhyZXhoMnhpYmtjVjdUUkNH?=
+ =?utf-8?B?WjhaZU56d1dRY0VDKzA3eDVhYjloNkRaZXgvVVhOOTViVlUzNG02UlBVWDU3?=
+ =?utf-8?Q?Xmppf5y1U8d6UwBDxmroPlu5U?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6cb1f461-a09f-49e2-44bb-08ddb26cde5e
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2025 15:44:41.5704
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YQ8IMbntmvOzWV2UhpgWeLU3lohkjC3PnHSeMDL1HdI3QP5ID43FDyH7EmRPD25YwmXlzRqNG3ceFVJ266gw6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4262
 
-syszbot reports various ordering issues for lower instance locks and
-team lock. Switch to using rtnl lock for protecting team device,
-similar to bonding. Based on the patch by Tetsuo Handa.
 
-Cc: Jiri Pirko <jiri@resnulli.us>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-Reported-by: syzbot+71fd22ae4b81631e22fd@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=71fd22ae4b81631e22fd
-Fixes: 6b1d3c5f675c ("team: grab team lock during team_change_rx_flags")
-Link: https://lkml.kernel.org/r/ZoZ2RH9BcahEB9Sb@nanopsycho.orion
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/team/team_core.c              | 96 +++++++++++------------
- drivers/net/team/team_mode_activebackup.c |  3 +-
- drivers/net/team/team_mode_loadbalance.c  | 13 ++-
- include/linux/if_team.h                   |  3 -
- 4 files changed, 50 insertions(+), 65 deletions(-)
 
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 8bc56186b2a3..17f07eb0ee52 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -933,7 +933,7 @@ static bool team_port_find(const struct team *team,
-  * Enable/disable port by adding to enabled port hashlist and setting
-  * port->index (Might be racy so reader could see incorrect ifindex when
-  * processing a flying packet, but that is not a problem). Write guarded
-- * by team->lock.
-+ * by RTNL.
-  */
- static void team_port_enable(struct team *team,
- 			     struct team_port *port)
-@@ -1660,8 +1660,6 @@ static int team_init(struct net_device *dev)
- 		goto err_options_register;
- 	netif_carrier_off(dev);
- 
--	lockdep_register_key(&team->team_lock_key);
--	__mutex_init(&team->lock, "team->team_lock_key", &team->team_lock_key);
- 	netdev_lockdep_set_classes(dev);
- 
- 	return 0;
-@@ -1682,7 +1680,8 @@ static void team_uninit(struct net_device *dev)
- 	struct team_port *port;
- 	struct team_port *tmp;
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	list_for_each_entry_safe(port, tmp, &team->port_list, list)
- 		team_port_del(team, port->dev);
- 
-@@ -1691,9 +1690,7 @@ static void team_uninit(struct net_device *dev)
- 	team_mcast_rejoin_fini(team);
- 	team_notify_peers_fini(team);
- 	team_queue_override_fini(team);
--	mutex_unlock(&team->lock);
- 	netdev_change_features(dev);
--	lockdep_unregister_key(&team->team_lock_key);
- }
- 
- static void team_destructor(struct net_device *dev)
-@@ -1778,7 +1775,8 @@ static void team_change_rx_flags(struct net_device *dev, int change)
- 	struct team_port *port;
- 	int inc;
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	list_for_each_entry(port, &team->port_list, list) {
- 		if (change & IFF_PROMISC) {
- 			inc = dev->flags & IFF_PROMISC ? 1 : -1;
-@@ -1789,7 +1787,6 @@ static void team_change_rx_flags(struct net_device *dev, int change)
- 			dev_set_allmulti(port->dev, inc);
- 		}
- 	}
--	mutex_unlock(&team->lock);
- }
- 
- static void team_set_rx_mode(struct net_device *dev)
-@@ -1811,14 +1808,14 @@ static int team_set_mac_address(struct net_device *dev, void *p)
- 	struct team *team = netdev_priv(dev);
- 	struct team_port *port;
- 
-+	ASSERT_RTNL();
-+
- 	if (dev->type == ARPHRD_ETHER && !is_valid_ether_addr(addr->sa_data))
- 		return -EADDRNOTAVAIL;
- 	dev_addr_set(dev, addr->sa_data);
--	mutex_lock(&team->lock);
- 	list_for_each_entry(port, &team->port_list, list)
- 		if (team->ops.port_change_dev_addr)
- 			team->ops.port_change_dev_addr(team, port);
--	mutex_unlock(&team->lock);
- 	return 0;
- }
- 
-@@ -1828,11 +1825,8 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
- 	struct team_port *port;
- 	int err;
- 
--	/*
--	 * Alhough this is reader, it's guarded by team lock. It's not possible
--	 * to traverse list in reverse under rcu_read_lock
--	 */
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	team->port_mtu_change_allowed = true;
- 	list_for_each_entry(port, &team->port_list, list) {
- 		err = dev_set_mtu(port->dev, new_mtu);
-@@ -1843,7 +1837,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
- 		}
- 	}
- 	team->port_mtu_change_allowed = false;
--	mutex_unlock(&team->lock);
- 
- 	WRITE_ONCE(dev->mtu, new_mtu);
- 
-@@ -1853,7 +1846,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
- 	list_for_each_entry_continue_reverse(port, &team->port_list, list)
- 		dev_set_mtu(port->dev, dev->mtu);
- 	team->port_mtu_change_allowed = false;
--	mutex_unlock(&team->lock);
- 
- 	return err;
- }
-@@ -1903,24 +1895,19 @@ static int team_vlan_rx_add_vid(struct net_device *dev, __be16 proto, u16 vid)
- 	struct team_port *port;
- 	int err;
- 
--	/*
--	 * Alhough this is reader, it's guarded by team lock. It's not possible
--	 * to traverse list in reverse under rcu_read_lock
--	 */
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	list_for_each_entry(port, &team->port_list, list) {
- 		err = vlan_vid_add(port->dev, proto, vid);
- 		if (err)
- 			goto unwind;
- 	}
--	mutex_unlock(&team->lock);
- 
- 	return 0;
- 
- unwind:
- 	list_for_each_entry_continue_reverse(port, &team->port_list, list)
- 		vlan_vid_del(port->dev, proto, vid);
--	mutex_unlock(&team->lock);
- 
- 	return err;
- }
-@@ -1930,10 +1917,10 @@ static int team_vlan_rx_kill_vid(struct net_device *dev, __be16 proto, u16 vid)
- 	struct team *team = netdev_priv(dev);
- 	struct team_port *port;
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	list_for_each_entry(port, &team->port_list, list)
- 		vlan_vid_del(port->dev, proto, vid);
--	mutex_unlock(&team->lock);
- 
- 	return 0;
- }
-@@ -1955,9 +1942,9 @@ static void team_netpoll_cleanup(struct net_device *dev)
- {
- 	struct team *team = netdev_priv(dev);
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	__team_netpoll_cleanup(team);
--	mutex_unlock(&team->lock);
- }
- 
- static int team_netpoll_setup(struct net_device *dev)
-@@ -1966,7 +1953,8 @@ static int team_netpoll_setup(struct net_device *dev)
- 	struct team_port *port;
- 	int err = 0;
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	list_for_each_entry(port, &team->port_list, list) {
- 		err = __team_port_enable_netpoll(port);
- 		if (err) {
-@@ -1974,7 +1962,6 @@ static int team_netpoll_setup(struct net_device *dev)
- 			break;
- 		}
- 	}
--	mutex_unlock(&team->lock);
- 	return err;
- }
- #endif
-@@ -1985,9 +1972,9 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
- 	struct team *team = netdev_priv(dev);
- 	int err;
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	err = team_port_add(team, port_dev, extack);
--	mutex_unlock(&team->lock);
- 
- 	if (!err)
- 		netdev_change_features(dev);
-@@ -2000,18 +1987,13 @@ static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
- 	struct team *team = netdev_priv(dev);
- 	int err;
- 
--	mutex_lock(&team->lock);
-+	ASSERT_RTNL();
-+
- 	err = team_port_del(team, port_dev);
--	mutex_unlock(&team->lock);
- 
- 	if (err)
- 		return err;
- 
--	if (netif_is_team_master(port_dev)) {
--		lockdep_unregister_key(&team->team_lock_key);
--		lockdep_register_key(&team->team_lock_key);
--		lockdep_set_class(&team->lock, &team->team_lock_key);
--	}
- 	netdev_change_features(dev);
- 
- 	return err;
-@@ -2304,9 +2286,10 @@ int team_nl_noop_doit(struct sk_buff *skb, struct genl_info *info)
- static struct team *team_nl_team_get(struct genl_info *info)
- {
- 	struct net *net = genl_info_net(info);
--	int ifindex;
- 	struct net_device *dev;
--	struct team *team;
-+	int ifindex;
-+
-+	ASSERT_RTNL();
- 
- 	if (!info->attrs[TEAM_ATTR_TEAM_IFINDEX])
- 		return NULL;
-@@ -2318,14 +2301,11 @@ static struct team *team_nl_team_get(struct genl_info *info)
- 		return NULL;
- 	}
- 
--	team = netdev_priv(dev);
--	mutex_lock(&team->lock);
--	return team;
-+	return netdev_priv(dev);
- }
- 
- static void team_nl_team_put(struct team *team)
- {
--	mutex_unlock(&team->lock);
- 	dev_put(team->dev);
- }
- 
-@@ -2515,9 +2495,13 @@ int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	int err;
- 	LIST_HEAD(sel_opt_inst_list);
- 
-+	rtnl_lock();
-+
- 	team = team_nl_team_get(info);
--	if (!team)
--		return -EINVAL;
-+	if (!team) {
-+		err = -EINVAL;
-+		goto rtnl_unlock;
-+	}
- 
- 	list_for_each_entry(opt_inst, &team->option_inst_list, list)
- 		list_add_tail(&opt_inst->tmp_list, &sel_opt_inst_list);
-@@ -2527,6 +2511,9 @@ int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info)
- 
- 	team_nl_team_put(team);
- 
-+rtnl_unlock:
-+	rtnl_unlock();
-+
- 	return err;
- }
- 
-@@ -2805,15 +2792,22 @@ int team_nl_port_list_get_doit(struct sk_buff *skb,
- 	struct team *team;
- 	int err;
- 
-+	rtnl_lock();
-+
- 	team = team_nl_team_get(info);
--	if (!team)
--		return -EINVAL;
-+	if (!team) {
-+		err = -EINVAL;
-+		goto rtnl_unlock;
-+	}
- 
- 	err = team_nl_send_port_list_get(team, info->snd_portid, info->snd_seq,
- 					 NLM_F_ACK, team_nl_send_unicast, NULL);
- 
- 	team_nl_team_put(team);
- 
-+rtnl_unlock:
-+	rtnl_unlock();
-+
- 	return err;
- }
- 
-@@ -2961,11 +2955,9 @@ static void __team_port_change_port_removed(struct team_port *port)
- 
- static void team_port_change_check(struct team_port *port, bool linkup)
- {
--	struct team *team = port->team;
-+	ASSERT_RTNL();
- 
--	mutex_lock(&team->lock);
- 	__team_port_change_check(port, linkup);
--	mutex_unlock(&team->lock);
- }
- 
- 
-diff --git a/drivers/net/team/team_mode_activebackup.c b/drivers/net/team/team_mode_activebackup.c
-index e0f599e2a51d..1c3336c7a1b2 100644
---- a/drivers/net/team/team_mode_activebackup.c
-+++ b/drivers/net/team/team_mode_activebackup.c
-@@ -67,8 +67,7 @@ static void ab_active_port_get(struct team *team, struct team_gsetter_ctx *ctx)
- {
- 	struct team_port *active_port;
- 
--	active_port = rcu_dereference_protected(ab_priv(team)->active_port,
--						lockdep_is_held(&team->lock));
-+	active_port = rtnl_dereference(ab_priv(team)->active_port);
- 	if (active_port)
- 		ctx->data.u32_val = active_port->dev->ifindex;
- 	else
-diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
-index 00f8989c29c0..b14538bde2f8 100644
---- a/drivers/net/team/team_mode_loadbalance.c
-+++ b/drivers/net/team/team_mode_loadbalance.c
-@@ -301,8 +301,7 @@ static int lb_bpf_func_set(struct team *team, struct team_gsetter_ctx *ctx)
- 	if (lb_priv->ex->orig_fprog) {
- 		/* Clear old filter data */
- 		__fprog_destroy(lb_priv->ex->orig_fprog);
--		orig_fp = rcu_dereference_protected(lb_priv->fp,
--						lockdep_is_held(&team->lock));
-+		orig_fp = rtnl_dereference(lb_priv->fp);
- 	}
- 
- 	rcu_assign_pointer(lb_priv->fp, fp);
-@@ -324,8 +323,7 @@ static void lb_bpf_func_free(struct team *team)
- 		return;
- 
- 	__fprog_destroy(lb_priv->ex->orig_fprog);
--	fp = rcu_dereference_protected(lb_priv->fp,
--				       lockdep_is_held(&team->lock));
-+	fp = rtnl_dereference(lb_priv->fp);
- 	bpf_prog_destroy(fp);
- }
- 
-@@ -335,8 +333,7 @@ static void lb_tx_method_get(struct team *team, struct team_gsetter_ctx *ctx)
- 	lb_select_tx_port_func_t *func;
- 	char *name;
- 
--	func = rcu_dereference_protected(lb_priv->select_tx_port_func,
--					 lockdep_is_held(&team->lock));
-+	func = rtnl_dereference(lb_priv->select_tx_port_func);
- 	name = lb_select_tx_port_get_name(func);
- 	BUG_ON(!name);
- 	ctx->data.str_val = name;
-@@ -478,7 +475,7 @@ static void lb_stats_refresh(struct work_struct *work)
- 	team = lb_priv_ex->team;
- 	lb_priv = get_lb_priv(team);
- 
--	if (!mutex_trylock(&team->lock)) {
-+	if (!rtnl_trylock()) {
- 		schedule_delayed_work(&lb_priv_ex->stats.refresh_dw, 0);
- 		return;
- 	}
-@@ -515,7 +512,7 @@ static void lb_stats_refresh(struct work_struct *work)
- 	schedule_delayed_work(&lb_priv_ex->stats.refresh_dw,
- 			      (lb_priv_ex->stats.refresh_interval * HZ) / 10);
- 
--	mutex_unlock(&team->lock);
-+	rtnl_unlock();
- }
- 
- static void lb_stats_refresh_interval_get(struct team *team,
-diff --git a/include/linux/if_team.h b/include/linux/if_team.h
-index cdc684e04a2f..ce97d891cf72 100644
---- a/include/linux/if_team.h
-+++ b/include/linux/if_team.h
-@@ -191,8 +191,6 @@ struct team {
- 
- 	const struct header_ops *header_ops_cache;
- 
--	struct mutex lock; /* used for overall locking, e.g. port lists write */
--
- 	/*
- 	 * List of enabled ports and their count
- 	 */
-@@ -223,7 +221,6 @@ struct team {
- 		atomic_t count_pending;
- 		struct delayed_work dw;
- 	} mcast_rejoin;
--	struct lock_class_key team_lock_key;
- 	long mode_priv[TEAM_MODE_PRIV_LONGS];
- };
- 
--- 
-2.49.0
+On 6/20/2025 3:51 AM, Simon Horman wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> On Thu, Jun 19, 2025 at 03:28:06PM -0700, Brett Creeley wrote:
+>>
+>>
+>> On 6/19/2025 2:45 AM, Thomas Fourier wrote:
+>>> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+>>>
+>>>
+>>> Change error values of `ionic_tx_map_single()` and `ionic_tx_map_frag()`
+>>> from 0 to `DMA_MAPPING_ERROR` to prevent collision with 0 as a valid
+>>> address.
+>>>
+>>> This also fixes the use of `dma_mapping_error()` to test against 0 in
+>>> `ionic_xdp_post_frame()`
+>>>
+>>> Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+>>
+>> I'm not sure the Fixes commit above should be in the list. Functionally it's
+>> correct, except there being multiple calls to dma_mapping_error() on the
+>> same dma_addr.
+>>
+>> Other than the minor nit above the commit looks good. Thanks again for
+>> fixing this.
+>>
+>> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+> 
+> Hi Brett and Thomas,
+> 
+> Maybe I misunderstand things, if so I apologise.
+> 
+> If this patch fixes a bug - e.g. the may observe a system crash -
+> then it should be targeted at net and have a Fixes tag. Where the
+> Fixes tag generally cites the first commit in which the user may
+> experience the bug.
+> 
+> If, on the other hand, this does not fix a bug then the patch
+> should be targeted at net-next and should not have a Fixes tag.
+> 
+> In that case, commits may be cited using following form in
+> the commit message (before the Signed-off-by and other tags).
+> And, unlike tags, it may be line wrapped.
+> 
+> commit 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+> 
+> E.g.: This was introduce by commit 0f3154e6bcb3 ("ionic: Add Tx and Rx
+> handling").
+> 
+> I hope this helps. If not, sorry for the noise.
+
+Simon,
+
+I suspect you are right and this probably shouldn't be categorized as a 
+bug fix since the change only addresses a corner case that would happen 
+if the DMA mapping API(s) return 0 as a valid adddress, which wouldn't 
+cause a crash with/without this patch.
+
+Thanks for the feedback.
+
+Brett
+
+> 
+> ...
 
 
