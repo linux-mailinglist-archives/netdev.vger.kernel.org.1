@@ -1,189 +1,226 @@
-Return-Path: <netdev+bounces-200376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043FAAE4B8A
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:02:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AE7AE4B94
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163763B223B
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:01:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC9C9189CA9B
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F067288527;
-	Mon, 23 Jun 2025 17:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4B428D8FA;
+	Mon, 23 Jun 2025 17:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8WYWxBd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JbSGZMR+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E811B4242
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 17:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07D01C07C4;
+	Mon, 23 Jun 2025 17:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750698120; cv=none; b=GxjthC6sFFS9fCDCjchMcYLIEXDTzcQyYnmG3lvlLYwqzNVjqjp4E8H5Zrucm6xYKTW8okp3qyDhFr06eQ625IP+m55YmL+V2ahFi1+IqtayYtyoFD3ggegj4MzE9wD1oGhKZjCOUHHSw0oOgQCopkvHFbzT6fDHKlj8Yw2vCdk=
+	t=1750698318; cv=none; b=hj4pAN7Q6A4g6NGFyWE7Yy15topesnWvKREf6QVKYxYq5ZgqrK5+aWm3Z5WCzN3+6O8q4gz2H846jDNIRut6Zf+8mXZnnzB+SpQP74IiSuayYhhpqWyIkWgnoXlfTexDykjeZV/E3B4Na9BgBeMnM1h3ObZQjUDFMTXo/JE0wlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750698120; c=relaxed/simple;
-	bh=taqM6M2yCTAkigZXwCzc8+OLPoroFfNThxW7WCtpr+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XP7R9v8uNYTRTbtnz2cgD8Tuk7Albp9T5LMt3HmrPX+iqsUivJp/4xlsDbIvv/2iW9rn0FwxuniO4t0feRtGM5qWlm4jkOb0EflNwfSnXLledDBfZ42ATegn9uKmaffOlnCTZqynLfni1Bq/8tQTdHgH5OED+C5CnAKxI+TlfGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A8WYWxBd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750698117;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jq5JtTNSTi3UbB2t2zf1v906mYuPWMRbjCVCINzsyvo=;
-	b=A8WYWxBdy29vv8/Oidor6rBX1H+24AHKQp/1w2EzATLVn6OoHvA/fiA+6ww0knaLqm2ClH
-	4oMDytUpNyGuqB2rJEU3jIyVMiLwtU6pODm2aou+yGp5Ghz43yheVFqNJeLYqbI5V6OeWy
-	3NgCqGkwX6rKvsGPHCFKzgMUKrVUemA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-690-gUCd64CdOIGSuB1hIGKRyg-1; Mon, 23 Jun 2025 13:01:56 -0400
-X-MC-Unique: gUCd64CdOIGSuB1hIGKRyg-1
-X-Mimecast-MFC-AGG-ID: gUCd64CdOIGSuB1hIGKRyg_1750698115
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a6df0c67a6so1103764f8f.3
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:01:56 -0700 (PDT)
+	s=arc-20240116; t=1750698318; c=relaxed/simple;
+	bh=6nZoOQkZs6C4FQYLUnskHM0GHFTQYyosqeO+/BXGQdc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eHzgKFfD8Pra6UJpKDrMwWCiNnLtRETUBuCWRNQVtsJ3WWe6BrGVNWwrJ5GQ78Z5Aqs8IBS68GclR1td/d7xLZfdpyA4KmkxJ+YUSf4HKCcZPcizhJf48YNns3uxAfZLdttZvKZ1JFrCnLl5URkPyUSFFqVP3mml3Vjt48SZkzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JbSGZMR+; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ade48b24c97so777429566b.2;
+        Mon, 23 Jun 2025 10:05:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750698315; x=1751303115; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pi3M8vSwwyPlCy0ds+MLiPgrDsER6WDeUbD1bJQq8OE=;
+        b=JbSGZMR+hZdXtyQMne2CDCoNWZQzxY0TJDPU/VdJi7nmNTgcTCbgtgRt+7obTDtTQe
+         ZnvqZAfjSmskm2CSoONCcdllsVZol48CQZJYvSiQ/+4jm7eLUbtDV+RmhpQP4HVVV+cm
+         a2x/NgHG6/KHhGBQeh3PdL9ktBvUQbmIuWK/zoWnhrXjYuJ4qojgfCJuJPE38OWIj1uC
+         Z/MgJSxAPuO6S+avdx0zxBxfuoPZmVBf+6BkXntLyf4zGJUCbWsNbgM2gNDrIVc8SIS5
+         VBwKlvGT/TmzhHVKg1toueJBX0AfXrUI8nNPmU7Sx5KyfohSe/JRNu+MQxk31G7jOPun
+         N7SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750698115; x=1751302915;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jq5JtTNSTi3UbB2t2zf1v906mYuPWMRbjCVCINzsyvo=;
-        b=EHScSn9c/YcW0SNJscPlfEIvafkCvOpCBKjVB+tsZalJ53QSQMfHJA6sItSEAzbihX
-         YCplf2lyoCUd2n+h4LBeXh3FG688X8r56QQDY2w3WMJ8mQYx+/XbDawm9IIIDaJ3L9bf
-         vrUd5INzt5HO4TXYc8ynxEsF8aA+cRZN6FMcnyvpJAkFZlkQuEl6vni0oKueUzVcs2iJ
-         BQx/ET8HGGaB36r3FYxG8Mppvslrti4zX9KPBx/fJkPBQv5aMoDDjWuy/16wbCb+8069
-         FkzG0+Uuf85wPZJHeGubVs5eM25q5CBE9NKtzPh8BlBY6jG6/Mn17UFZgTTljvKef1IB
-         3dww==
-X-Forwarded-Encrypted: i=1; AJvYcCUZlv5OoHsYBehszMviu9j0nGO2jKU0OYa/S8Z0y1UOytBBe2oMMRBNbGZDOj6PurFZUu47V5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM88gGmqMMGujHNlcHq1OT3tZxnVn0yyJDcIptGQQbC6Cjy2Vv
-	On1IGEyX9i+kwLDayK9p90t5BlnJQ+EM55Px1p0v7YdECdbT9G5AkzyCyvsz1fuajKGUfrXZ1Nk
-	cZMclCbImHNa3/OZjALFUBKGB576dHvnJ9HO+w6OMPJZV/Q9YSHw9oMcFJw==
-X-Gm-Gg: ASbGnctEHV66SQBhS4/UdgyRjKNIkVDKLEvqGn0Q7v8wPPeauAEGw6rz4MkrBweev59
-	P+lRsl0WZLb+1hd6xMO3LlDZFDls8DG0bm+7fXfClBFxUiZFSfvlEanp799h7o3khBceZOBDfTu
-	qNudlGk4xC3QwPnPaDW3kE4YGkbB5PSZFqWYEfl1Tfv2/4CxZrkb1uTAg3iP5a8eUBGvDFfz7P8
-	JowRl1/f89tf0vujZeB31u+hmSutduob4TgEjzkedVMj5MNIlTGQbKqKgNfb/HxkSv/rd4+L7iE
-	Q+e6VGKwz/OrWEaFyrNNSEM50MY=
-X-Received: by 2002:a05:6000:288d:b0:3a5:8905:2dd9 with SMTP id ffacd0b85a97d-3a6d1331316mr11150054f8f.51.1750698114884;
-        Mon, 23 Jun 2025 10:01:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFgLc1G5fHA+5OCdohy+RX20t3SZJ3zi/U76KcD2RoeCTL1jtFDfjcLkndhINDFJCXPqEyFPQ==
-X-Received: by 2002:a05:6000:288d:b0:3a5:8905:2dd9 with SMTP id ffacd0b85a97d-3a6d1331316mr11149981f8f.51.1750698114073;
-        Mon, 23 Jun 2025 10:01:54 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.144.60])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d0f10411sm9667235f8f.1.2025.06.23.10.01.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 10:01:53 -0700 (PDT)
-Date: Mon, 23 Jun 2025 19:01:44 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: davem@davemloft.net, decui@microsoft.com, fupan.lfp@antgroup.com, 
-	haiyangz@microsoft.com, jasowang@redhat.com, kvm@vger.kernel.org, kys@microsoft.com, 
-	leonardi@redhat.com, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mst@redhat.com, netdev@vger.kernel.org, niuxuewei.nxw@antgroup.com, 
-	pabeni@redhat.com, stefanha@redhat.com, virtualization@lists.linux.dev, 
-	wei.liu@kernel.org, xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next v3 1/3] vsock: Add support for SIOCINQ ioctl
-Message-ID: <opt6smgzc7evwrme7mulwyqute6enx2hq2vjfjksroz2gzzeir@sy6be73mwnsu>
-References: <y465uw5phymt3gbgdxsxlopeyhcbbherjri6b6etl64qhsc4ud@vc2c45mo5zxw>
- <20250622135910.1555285-1-niuxuewei.nxw@antgroup.com>
+        d=1e100.net; s=20230601; t=1750698315; x=1751303115;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pi3M8vSwwyPlCy0ds+MLiPgrDsER6WDeUbD1bJQq8OE=;
+        b=ioWaLotzJ5vJIafUZn1rMeLvvLl+EuudI4DTPGf3rda+bOxwTigYyjJt+oJPmnZyvC
+         1sftT9cbDo/0PIGNm77yBNrgDWO33iT43xAAn0nHn7lCVtEtTvzWe+4RjSA1R3Nuek55
+         jlW+Q7leSOzI6oQ9KEIe6TUPJjBok6APlXCoc22JwqVeP8YuyWVwgQkUhoB4n4DP4iTW
+         4+SdHP8+krfYYdef6CfuFsLNgRYnbpZP40sIsIABTOY/98jv1E+ljBPyMLPX9OoP56av
+         mVInY7aV6LrXBRHFZxnVFcD+UcHdotvJDLozEJNBejapDjKCxtli1JXTwg8OssnbJp63
+         Q4lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUeFbpClIPOufHSSFvvxqjkBMV2aa74KZVZQQ9y4Z+I2136XI1yfmo5EhI3IhW8NFJsvXlY08klUi0fhQSN@vger.kernel.org, AJvYcCUqAxhq4hONFmLSja5/30IHB9ORvko+wW8ZaQVstTJiDHLvbzWuonoQsmQEOGqRExDOxCzjOAQp@vger.kernel.org, AJvYcCVBpAkROhg93jcE7WIfU+CQUmbM4slRIwTZa7hARBvXsoDpPpl5URXl4mxxLFV7o5P/X9OYw26pDKI8Dw==@vger.kernel.org, AJvYcCVJ7XFAwzTFQt57RmzUwkHEcPUtiIOWr1ds9iuNsVOyvyjn2ePsoUrOf/zheU6im91H8D4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH339qAf779nAfj+DcJ72+IJgMGHbJvO8VQZm1OVJDiCE1zv+R
+	ilvPk9gU4+bxuH/rcGY375lpPykwctLgUrKBnHWYUnHNtkYNFkpnzACt
+X-Gm-Gg: ASbGncsEID06bfKzTmIou2kVVfggWPL+eBxvt9s+xCnhRyaldcrvCnOCOE8nh89Hu16
+	SAOe49r7dsSGancXdZfu2aYG15r42Yc/pHF1i2qRol0hfWdw4IUZjIxN5hVbSWg8YSmUIxpfPhv
+	rqNRmnw5z5A+Q3+QV5S2wQuikXuDtl8mYaqfYZhcvRYUQx0whqwvYLvlsU0LN3maOj0EITOQ79M
+	aEo4LLULiqSuGAk7MEk7DyoCaAUY/Jcx9QUJvF8v2mpmZcHhXI7wbVP5OSGrmu/h5TO85lCATM5
+	E69f5PVBLjUA0kpyoDpcz028Ejl7tFfrRQ6aHGTaUdIJya/VFuCySk34pmHJeCew+j+kpL4bhBA
+	=
+X-Google-Smtp-Source: AGHT+IFkMr16MZMhGYOEMve0k+oWilXDkDPpSQstoYWVNutXXp/lz9Oc+tMJS730MOiqaVVD0hEmBQ==
+X-Received: by 2002:a17:907:3f18:b0:ade:4339:9367 with SMTP id a640c23a62f3a-ae057a222b4mr1293806966b.26.1750698314880;
+        Mon, 23 Jun 2025 10:05:14 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::2ef? ([2620:10d:c092:600::1:85c4])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae054082d25sm728555966b.88.2025.06.23.10.05.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 10:05:14 -0700 (PDT)
+Message-ID: <41e68e52-5747-4b18-810d-4b20ada01c9a@gmail.com>
+Date: Mon, 23 Jun 2025 18:06:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250622135910.1555285-1-niuxuewei.nxw@antgroup.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 9/9] page_pool: access ->pp_magic through
+ struct netmem_desc in page_pool_page_is_pp()
+To: David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
+ Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
+ kuba@kernel.org, almasrymina@google.com, ilias.apalodimas@linaro.org,
+ harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
+ davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+ toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+ saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
+ hannes@cmpxchg.org, jackmanb@google.com
+References: <20250620041224.46646-1-byungchul@sk.com>
+ <20250620041224.46646-10-byungchul@sk.com>
+ <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com>
+ <20250623101622.GB3199@system.software.com>
+ <460ACE40-9E99-42B8-90F0-2B18D2D8C72C@nvidia.com>
+ <a8d40a05-db4c-400f-839b-3c6159a1feab@redhat.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <a8d40a05-db4c-400f-839b-3c6159a1feab@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jun 22, 2025 at 09:59:10PM +0800, Xuewei Niu wrote:
->> ACCin hyper-v maintainers and list since I have a question about hyperv
->> transport.
+On 6/23/25 15:58, David Hildenbrand wrote:
+> On 23.06.25 13:13, Zi Yan wrote:
+>> On 23 Jun 2025, at 6:16, Byungchul Park wrote:
 >>
->> On Tue, Jun 17, 2025 at 12:53:44PM +0800, Xuewei Niu wrote:
->> >Add support for SIOCINQ ioctl, indicating the length of bytes unread in the
->> >socket. The value is obtained from `vsock_stream_has_data()`.
->> >
->> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->> >---
->> > net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++++++++
->> > 1 file changed, 22 insertions(+)
->> >
->> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> >index 2e7a3034e965..bae6b89bb5fb 100644
->> >--- a/net/vmw_vsock/af_vsock.c
->> >+++ b/net/vmw_vsock/af_vsock.c
->> >@@ -1389,6 +1389,28 @@ static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
->> > 	vsk = vsock_sk(sk);
->> >
->> > 	switch (cmd) {
->> >+	case SIOCINQ: {
->> >+		ssize_t n_bytes;
->> >+
->> >+		if (!vsk->transport) {
->> >+			ret = -EOPNOTSUPP;
->> >+			break;
->> >+		}
->> >+
->> >+		if (sock_type_connectible(sk->sk_type) &&
->> >+		    sk->sk_state == TCP_LISTEN) {
->> >+			ret = -EINVAL;
->> >+			break;
->> >+		}
->> >+
->> >+		n_bytes = vsock_stream_has_data(vsk);
->>
->> Now looks better to me, I just checked transports: vmci and virtio/vhost
->> returns what we want, but for hyperv we have:
->>
->> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
->> 	{
->> 		struct hvsock *hvs = vsk->trans;
->> 		s64 ret;
->>
->> 		if (hvs->recv_data_len > 0)
->> 			return 1;
->>
->> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
->> Do you think we can do that to support this new feature?
->
->Hi Hyper-v maintainers, could you please take a look at this?
->
->Hi Stefano, if no response, can I fix this issue in the next version?
+>>> On Mon, Jun 23, 2025 at 11:16:43AM +0200, David Hildenbrand wrote:
+>>>> On 20.06.25 06:12, Byungchul Park wrote:
+>>>>> To simplify struct page, the effort to separate its own descriptor from
+>>>>> struct page is required and the work for page pool is on going.
+>>>>>
+>>>>> To achieve that, all the code should avoid directly accessing page pool
+>>>>> members of struct page.
+>>>>>
+>>>>> Access ->pp_magic through struct netmem_desc instead of directly
+>>>>> accessing it through struct page in page_pool_page_is_pp().  Plus, move
+>>>>> page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
+>>>>> without header dependency issue.
+>>>>>
+>>>>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+>>>>> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+>>>>> Reviewed-by: Mina Almasry <almasrymina@google.com>
+>>>>> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+>>>>> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+>>>>> Acked-by: Harry Yoo <harry.yoo@oracle.com>
+>>>>> ---
+>>>>>    include/linux/mm.h   | 12 ------------
+>>>>>    include/net/netmem.h | 14 ++++++++++++++
+>>>>>    mm/page_alloc.c      |  1 +
+>>>>>    3 files changed, 15 insertions(+), 12 deletions(-)
+>>>>>
+>>>>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>>>>> index 0ef2ba0c667a..0b7f7f998085 100644
+>>>>> --- a/include/linux/mm.h
+>>>>> +++ b/include/linux/mm.h
+>>>>> @@ -4172,16 +4172,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+>>>>>     */
+>>>>>    #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+>>>>>
+>>>>> -#ifdef CONFIG_PAGE_POOL
+>>>>> -static inline bool page_pool_page_is_pp(struct page *page)
+>>>>> -{
+>>>>> -     return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+>>>>> -}
+>>>>> -#else
+>>>>> -static inline bool page_pool_page_is_pp(struct page *page)
+>>>>> -{
+>>>>> -     return false;
+>>>>> -}
+>>>>> -#endif
+>>>>> -
+>>>>>    #endif /* _LINUX_MM_H */
+>>>>> diff --git a/include/net/netmem.h b/include/net/netmem.h
+>>>>> index d49ed49d250b..3d1b1dfc9ba5 100644
+>>>>> --- a/include/net/netmem.h
+>>>>> +++ b/include/net/netmem.h
+>>>>> @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
+>>>>>     */
+>>>>>    static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
+>>>>>
+>>>>> +#ifdef CONFIG_PAGE_POOL
+>>>>> +static inline bool page_pool_page_is_pp(struct page *page)
+>>>>> +{
+>>>>> +     struct netmem_desc *desc = (struct netmem_desc *)page;
+>>>>> +
+>>>>> +     return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+>>>>> +}
+>>>>> +#else
+>>>>> +static inline bool page_pool_page_is_pp(struct page *page)
+>>>>> +{
+>>>>> +     return false;
+>>>>> +}
+>>>>> +#endif
+>>>>
+>>>> I wonder how helpful this cleanup is long-term.
+>>>>
+>>>> page_pool_page_is_pp() is only called from mm/page_alloc.c, right?
+>>>
+>>> Yes.
+>>>
+>>>> There, we want to make sure that no pagepool page is ever returned to
+>>>> the buddy.
+>>>>
+>>>> How reasonable is this sanity check to have long-term? Wouldn't we be
+>>>> able to check that on some higher-level freeing path?
+>>>>
+>>>> The reason I am commenting is that once we decouple "struct page" from
+>>>> "struct netmem_desc", we'd have to lookup here the corresponding "struct
+>>>> netmem_desc".
+>>>>
+>>>> ... but at that point here (when we free the actual pages), the "struct
+>>>> netmem_desc" would likely already have been freed separately (remember:
+>>>> it will be dynamically allocated).
+>>>>
+>>>> With that in mind:
+>>>>
+>>>> 1) Is there a higher level "struct netmem_desc" freeing path where we
+>>>> could check that instead, so we don't have to cast from pages to
+>>>> netmem_desc at all.
 
-Yep, but let's wait a little bit more.
+As you said, it's just a sanity check, all page pool pages should
+be freed by the networking code. It checks the ownership with
+netmem_is_pp(), which is basically the same as page_pool_page_is_pp()
+but done though some aliasing.
 
-In that case, please do it in a separate patch (same series is fine) 
-that we can easily revert/fix if they will find issues later.
+static inline bool netmem_is_pp(netmem_ref netmem)
+{
+	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
+}
 
-Thanks,
-Stefano
+I assume there is no point in moving the check to skbuff.c as it
+already does exactly same test, but we can probably just kill it.
 
->
->Thanks,
->Xuewei
->
->> Thanks,
->> Stefano
->>
->> >+		if (n_bytes < 0) {
->> >+			ret = n_bytes;
->> >+			break;
->> >+		}
->> >+		ret = put_user(n_bytes, arg);
->> >+		break;
->> >+	}
->> > 	case SIOCOUTQ: {
->> > 		ssize_t n_bytes;
->> >
->> >--
->> >2.34.1
->> >
->
+-- 
+Pavel Begunkov
 
 
