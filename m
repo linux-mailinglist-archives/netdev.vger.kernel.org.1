@@ -1,62 +1,82 @@
-Return-Path: <netdev+bounces-200182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF312AE3995
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:13:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734BBAE39AC
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:16:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DEFC163CC4
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:13:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B65863B021C
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA3523182B;
-	Mon, 23 Jun 2025 09:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="mgWBpimR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE2323645D;
+	Mon, 23 Jun 2025 09:16:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4107A63A9;
-	Mon, 23 Jun 2025 09:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4500421B19D;
+	Mon, 23 Jun 2025 09:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750670020; cv=none; b=gnKvh0DzulX85Ykp2LdBUkPjVyTVIGvXbb8hehmbFI4YR9C6PSNrxiz3jFE7Nn36Uklvqt17iDCIJ4ckBdj+OC2paSyxwjdTbkDXIjpiKr3UzueGBQzyQdRf238n15PtzkAMgr46G1R7KEuk5TR3E+0fp7dTTW8rFAdLI5K1Pi4=
+	t=1750670178; cv=none; b=ENXQWYzU1bjNLvCsTxZAYe3KWnZPuDzfDgB0uybSxM2HjebVaQ3FqoDvAbjJHWZg//TsjsfTOfpPcSpqT//YuhBiMGXbsZncPH29/to6kF+mdKDPnGmuW/9Usr615a0LjqfIhFV3OBORdYRsQD5J/c/1iGz3TPMFpaJ6+McT5rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750670020; c=relaxed/simple;
-	bh=RTVxXN6hamB6NbmGHb4qVkmVeYkaZYrVdp1uWVXZ/1I=;
+	s=arc-20240116; t=1750670178; c=relaxed/simple;
+	bh=SMTgouuv53WlY4KZjebO4g1qpffF1fKT28HWAjbsnQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NHj5hfFm0+xSOMOGE5Y9qsE3yjBpCyXfkhdzBQUfvQH/ZvSzK/8KDLPpjDyZWaCTOXYyO+6p+bF9TYa7DIvMTF7X1nr9MTw8mbihsr8Ou8uyV21t5svLRmks1b3RKxPSz78CNMIDP0d4rp7d+X/YV9SAHFzmWyIYES2L6kcRFNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=mgWBpimR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C40FC4CEEA;
-	Mon, 23 Jun 2025 09:13:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1750670019;
-	bh=RTVxXN6hamB6NbmGHb4qVkmVeYkaZYrVdp1uWVXZ/1I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mgWBpimR8E9uhTlt4hZIczqIdcAbcaY3eFGsR86weBsCjs6/8xoMoTJWdLj4D1hbX
-	 mcZfB2qpvq5KM7dr4Q6nHXYLPriYrVTGvrmv7IG0nk3JU2v7r+cDsBWxcYtXcFdbIU
-	 y3Yw3iXjROYk6Utzf/YbnrBqgcTh/3d0DzDtVy8E=
-Date: Mon, 23 Jun 2025 11:13:37 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Paul Chaignon <paul.chaignon@gmail.com>
-Cc: stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=O7fDptwbsCVNZpV6SZwhpFbi3cPe7X8AGMS9VSOIiDbuCxKFPBcxNCeOMiqR69H/7lVZ0Qh1VuTsbyNwXrIqCgNv4Qoc1LFDNAv3NsgBnUZVOxg4t/WNBwjOkzy6OAhodJYo/anFMjEVS2t5ELGLqDKyQq9uYEBit9sq+59KY6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so6119766a12.3;
+        Mon, 23 Jun 2025 02:16:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750670176; x=1751274976;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bIUxRz+rwH/i111WGtAAGmLwLNtTNZbhbtnk+ofryfM=;
+        b=kpzF8a5DgpKnqbjb3ziNEBphrC/KqT4sAVFj0QVPrAquIUyFHd14Gu63vAMcT5UDsp
+         EsqJ1ABT9FnfvS5b9oM7pFnT1dioObBHoXBmZRshjrSdjjz2adD1xeW9CBTgkK/3DISn
+         hACnThGM/62aygAV9iVUheaTat/ZD1THdHdChYlXV0D0jQcFcZRrw54UMO4PU4DD+WMs
+         0J+m5+uAWNtBwzy/2bO4B7EOvE0saOFjFDPHG7DSRomVRBvcuc9jb6aVP9gqV38H62nv
+         Yw72LkKUDFjXT0KPc8kgdgSCkNaoqo1L7Z0O2CluyNlIs8c8zmVlNUC/2bUPKvAwr4oV
+         af4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUsXQLuspBRgsrONNbTs6XKkk8f7VQWQUwMYwb+F6Aunhk8en9O08H2RaR41y3L/5swwb21DxfO@vger.kernel.org, AJvYcCVPOcCdyZE9qHqDBUnW1CrEPfhG/0v2SdmPqwS3Ag9ZJD3WWN0NNVntGd7ahcENPDszyGOWYHEnrKST0Z9tg6Lp@vger.kernel.org, AJvYcCVgnEUR5atHA3nMimnkha58THBTfchA6PNghQRRJ9xQ+RkR4gzZ2dhOagpYvPgRXS4X31vTB5r9PnnthyM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjAuFqddh97AtbfpS/RcYW3LVKl9gWpKuJyfPMtRjTX+FrESgL
+	1MmLAW6Jr9eZDdT0+AJ3ySTZwIYZ1ScIU9GZlVVvdODeEan8/bm1PlRP
+X-Gm-Gg: ASbGncvkJL1H6nIXXnhZzFGKZQ9D0YtgKZ0cjsEA3EgaNNAXiazPrNg5JHsQy51J6Hl
+	wY3plgw0xFcfPfZieaisGRp2XCKL5UEEQ5dz9k7r9BwMzWGkUWBpMM9zeoOwqmQlItCUHyoVbB3
+	oZ/fxNu5XKEZc6+uvHWGNBDny7a80lPbrYF/EeGkLMqM5dppP1G56tjJ1pPl/bjPGc55pbiiGwo
+	80V46Pf+TSJ8I7ABZHJrd8xY6l5xYokh/BA1vv70L4Ps0f5uwf5wRKxtPm46fX8eTpb+qpiyYuh
+	6rdXaK+5QYBYlchp/RpvzYifsW9ghmuqrbEy1pEEvUFJcbBy/rIS
+X-Google-Smtp-Source: AGHT+IHcutTLwUezCuTJnBQkkQOqvdS07bhlRajR2F7YpX5joza2suS0WGlVmjXs+hoO/t3GNawO7w==
+X-Received: by 2002:a05:6402:5c8:b0:609:9115:60f8 with SMTP id 4fb4d7f45d1cf-60a1cd2ca71mr9580805a12.21.1750670175440;
+        Mon, 23 Jun 2025 02:16:15 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60a18cba49dsm5689603a12.56.2025.06.23.02.16.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 02:16:14 -0700 (PDT)
+Date: Mon, 23 Jun 2025 02:16:12 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Tom Herbert <tom@herbertland.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>
-Subject: Re: [PATCH stable 5.10,5.15 2/2] bpf: Fix L4 csum update on IPv6 in
- CHECKSUM_COMPLETE
-Message-ID: <2025062302-oxford-squiggle-5fa3@gregkh>
-References: <0bd9e0321544730642e1b068dd70178d5a3f8804.1750171422.git.paul.chaignon@gmail.com>
- <2ce92c476e4acba76002b69ad71093c5f8a681c6.1750171422.git.paul.chaignon@gmail.com>
- <2025062357-grove-crisply-a3b2@gregkh>
- <aFkYtN3WK19iK0-d@mail.gmail.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	ast@kernel.org
+Subject: Re: [PATCH net-next RFC] selftests: net: add netpoll basic
+ functionality test
+Message-ID: <aFkbXFvOKeMALwBg@gmail.com>
+References: <20250612-netpoll_test-v1-1-4774fd95933f@debian.org>
+ <684b8e8abb874_dcc45294a5@willemb.c.googlers.com.notmuch>
+ <aEwd9oLRnxna97JK@gmail.com>
+ <20250613174233.0dd5e7c1@kernel.org>
+ <aFUeT8HSPYiDyALB@gmail.com>
+ <20250621065121.78701641@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,29 +85,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFkYtN3WK19iK0-d@mail.gmail.com>
+In-Reply-To: <20250621065121.78701641@kernel.org>
 
-On Mon, Jun 23, 2025 at 11:04:52AM +0200, Paul Chaignon wrote:
-> On Mon, Jun 23, 2025 at 10:46:47AM +0200, Greg Kroah-Hartman wrote:
-> > On Tue, Jun 17, 2025 at 05:49:21PM +0200, Paul Chaignon wrote:
-> > > [ Upstream commit ead7f9b8de65632ef8060b84b0c55049a33cfea1 ]
-> > > [ Note: Fixed conflict due to unrelated comment change. ]
+On Sat, Jun 21, 2025 at 06:51:21AM -0700, Jakub Kicinski wrote:
+> On Fri, 20 Jun 2025 01:39:43 -0700 Breno Leitao wrote:
+> > > FWIW you can steal bpftrace integration from this series:
+> > > https://lore.kernel.org/all/20250421222827.283737-22-kuba@kernel.org/  
 > > 
-> > This does not apply to the 5.15.y tree at all, due to:
+> > Yes, that would be great. I think we can iterate until we hit the poll
+> > path, otherwise we skip the test at timeout. Something as:
 > > 
-> > > -		inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo, false);
-> > > +		inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo, is_ipv6);
+> > 	while (true):
+> > 		send msg
+> > 		if netpoll_poll_dev() was invoked:
+> > 			ksft_exit
+> > 		
+> > 		if timeout:
+> > 			raise KsftSkipEx
+> > 	
+> > As soon as your code lands, I will adapt the test to do so. Meanwhile,
+> > I will send the v1 for the netpoll, and later we can iterate.
 > > 
-> > This chunk.
-> > 
-> > Can you fix that up and resend just this one?
+> > Thanks for working on this bfptrace helper. This will be useful on other
+> > usecases as well.
 > 
-> It requires the 1/2 patch to apply correctly. I've tested them on the
-> tip of 5.15.y (1c700860e8bc). Or is there some reason not to backport
-> the 1/2 patch?
+> Right, you're the second person I pointed that patch out to. Would be
+> great if someone could steal that patch and make it a part of their
+> series so that it gets merged 
 
-Argh, my fault, I applied patch 1/2 to 5.4.y and 5.10.y, not 5.15.y.
-I'll go fix that up now, sorry for the noise.
+I can do that. I was expecting your patches to be landed, and then
+I would reuse it. I was not expecting to ship it as part of my patchset.
 
-greg "drowning in backports" k-h
+
+So, the selftest for netpoll is already in the mailing list[1], so, we
+have two options, now:
+
+  1) Steal your patch and make [1] depend on it.
+  2) Merge the selftest [1] and, then, steal your patch by adding the
+     bpftrace support in it.
+
+What is your recommendation?
+
+Link: https://lore.kernel.org/all/20250620-netpoll_test-v1-1-5068832f72fc@debian.org/ [1]
+
+Thanks,
+--breno
 
