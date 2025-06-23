@@ -1,207 +1,167 @@
-Return-Path: <netdev+bounces-200294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31E4BAE4721
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:42:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A0EAE4723
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 16:42:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A63083AD6B7
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:33:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00835162356
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28D125DD15;
-	Mon, 23 Jun 2025 14:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A73025E828;
+	Mon, 23 Jun 2025 14:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="aOhlCrwP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C60vzs05"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4819625DCFF
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 14:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70D025E823;
+	Mon, 23 Jun 2025 14:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750689224; cv=none; b=LQAwse5DxJJEpl1bKiWFqlzz57SxiHuymYgIgosBcL3x6uU+awkBnv9DMG+DPUUSKwEJpuRagdFtlDcf2aQGa4UZAFcfe+VtAgI7Klhx2Dmy+Z+LYDCBupb7LEBThy74dZH5uB4ax6CiFDydNfM/lloNr0OTP1J+FyKE8rW4FcY=
+	t=1750689351; cv=none; b=Kc9RncpFl1w7DAFreDLEmZa1OKNOdhsuq4440C7XSwNlG9fGcpk/c18KkqttpiNDQjJoMxUlmFhE+XdHbTRhlDa1+HK1hqeDBdjLZBYy92VRZVH88Fva21FLIemqmeRq6wm8A4a70FsvK8PZmVOGYUkoe5UcTOgjpMAMFZ0gO6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750689224; c=relaxed/simple;
-	bh=EcxKuGKNfVZ+d0Aj4MVYmkJcdXcTDRUNylk17S/Sskk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P8uBZMNHQmZNUMRFEeM3vuerLXOFhPq9fokXwHPDwll4U/AX5nKD4awKuFNNuKyxbx/OASA73Nn/jy24c10gd3+DDxldhQSUVyRtQs1Bno2g7u6skGWWg1ZsKt3od3VoNq1SvKQDJ34YPol9XG1uz0IxqgYOj85ntWIwD7CCkMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=aOhlCrwP; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7426c44e014so3685372b3a.3
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 07:33:40 -0700 (PDT)
+	s=arc-20240116; t=1750689351; c=relaxed/simple;
+	bh=8uFwwxuVhPfrVi45vOPS7eeLXU0rYURRDF6U6BXgiug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gEEijhS8KNtzkxYLJHvpNrtNbYzB/u+RI/D6UihuaXTFd7sIuWIJw5G+SiC9jDKgJyx9eCj+iuQepMWODQ8BCNDUSKBkHCzZT3hfmsyqzBiJ23KnjH8t6sgGSHA99A8HZHYPwcX5R6kwODCYgxGctSf/fT3AOMaeYySDNhmLiB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C60vzs05; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-236377f00a1so38796915ad.3;
+        Mon, 23 Jun 2025 07:35:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1750689220; x=1751294020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bO6a7MvTRxsGzMY08eCCV9bV0GUTOWwZgysb2r/QUSM=;
-        b=aOhlCrwPoXcrlcXeHTF9duHFiD5g8MksH51bTWSVhAEpWjMQX6iBik4uIQsDAVALVO
-         0XRyPDLpfzqbe8B1Rr5NT6X5B7PcGqfU4n/BtTwvRunsOtElcwfPHBkDxxZwfNS7Lj81
-         SsCwbQMnkh0T4s30QiHz7uSgIJM8tx8kLFrTs1hfzt2FeL+o5l1FDrGgoEq15ZJAksEe
-         /NFd0pGbfE6FhU5YYI1WlMctjOyGAOucMyg+hpft/XZ9Z4BWif2sG+11BkB61b+1wLG5
-         LqaZiR3sNt+hq862kuiuLhEqoFz0IVyIBivWfe9ofy42POlh8uQRE0ZvzDQyMN19E9J6
-         gkDg==
+        d=gmail.com; s=20230601; t=1750689349; x=1751294149; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=le4M6xt0anI1cGfEup0uN9VydUsywZE0Uzdamf2pdRk=;
+        b=C60vzs05ChOAbuwVqpiEo6Dy+IUf5AaNALmktKlI9/iMKQb6faEfTZW8LzZP67LqcT
+         mTEMGPFclYscUZR6xKWh9fMOpnRAbfAg4oOiqg1hOG9BOB8J8O0wWlp1cnqqJ+t9LQrr
+         QyrWuGI46E9783D/H87yUrNR3bSmUJoMOwHpEGn+uA7R77utpLWL+wHaF2NNK/apI434
+         RaA7klHNYrSiSBM+gvXs+2I7nT3m+5KB1hFSPVkqpKlb/KqW2OaW7BezJsT3GmjgyyDr
+         rIWgK+eRJl0OYkuzpbT8lPNNF17K54+5BuWIcr7lKiHroUxvh4rtpiciB8kBhpXi7Ar2
+         wKAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750689220; x=1751294020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bO6a7MvTRxsGzMY08eCCV9bV0GUTOWwZgysb2r/QUSM=;
-        b=l9ytjMKC3q0b2Y8Hse451bEmkCWyyu6AoZc9m9VQScNhw2nCUq5EqL+apMFPyiWh9r
-         Cyv80J1H/fQu9AEhVTkWFNWoH2mu75HH9zUUo3xzm0b1DCTvqduMSvqoTh6nbSkHOLaA
-         uSs7fllbMHHeD378k/nYFTI9621Bvp/6IauLGYzMdNsPxDbNFfP0EHzZcoIzsaKee7yP
-         LyjWuFTkqMRh0hC99ILf+2OBO/spPTNE/jVL/QQ5AqWFDNJ35BTehJmc2bOtGRT5Z5oO
-         w/nZrr7mWvNZX4FXs/qlCbr0NHBS3jtRn/pf4VlGwrqjU6RFQw+yLCcshkO3wiFbiOth
-         DgkA==
-X-Gm-Message-State: AOJu0YwJXHqmlc3/l36yiv5+U+V96BsFMgrY11KviJyi8Ui1FTm5l/UA
-	ErqifInX6vt3e9HHzGpd4L3PCbc0dgwa05Ivh95ISi0rWuTf6ByvqvJhQqxb2CVG563ZWqVtpwY
-	vJu6HFP/P8H4i0TC3Yds4Ob0Lu5zIRAzZhP9p/3eg
-X-Gm-Gg: ASbGncsS1es8AajXdsxnOlG3oHhc3GCY2WgHsYW9fDlX/NiTHXZJfg4bCKKRGGco4qI
-	pvS7V1VImyaA6KKytWJnv8/EGfqa10oDdlCsBQHSX6nP01YyIyuddOAF9YVdut+9H5fkyfxt/6i
-	NX1RYt8gOCqpA/CRViJhqbSoKshiDtiP6OhJ2aHBd8Zw==
-X-Google-Smtp-Source: AGHT+IE8rLjRJrkN0I64VCKoHQJW2Hx7L/19ic1yWpRInz1Zl4jW/5WXvdcgMks1b+s20zkN4IlDassnlN/FXO3kPVQ=
-X-Received: by 2002:a05:6a21:1707:b0:21f:e92d:8e20 with SMTP id
- adf61e73a8af0-22026e6f2dfmr26612499637.31.1750689220402; Mon, 23 Jun 2025
- 07:33:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750689349; x=1751294149;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=le4M6xt0anI1cGfEup0uN9VydUsywZE0Uzdamf2pdRk=;
+        b=NMl5DPvynDlD0wz25hiZd7dlEo4lQvebUBxCY3vVZ4KeXWTQngYrcXA+CVEgzxy54V
+         nmX/OvWEmgnciyO5klO8AHWaolOJKvTS9LXo8xKy4mmD8mv12tKLGV7CuNd4IgDc36Ec
+         Le4sm74zpWG65+PNnuhkEX3PgcfbbXepOArN4TkDLWpog9jT35+UKV8S2liMRJX1yqZL
+         /okMDVAykGLGZtmSIVkupNo0EQk/NZZ24gKIQ1AQa70S1bap92IqRkcAwc0zhxG74Kzs
+         5di63VW92FPpWCVmM16MOwpX6qCWgOwqWyz14kwMI/5MZ3Z1sC2hccY5xOSodLCB+jM8
+         8RPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUC93SlNNYQavtuQpke7Nkl+xzJ9Eg1i3IuwpuLuXkJLcxqfl3JpmvbHAY0LeY8lU7iCVk=@vger.kernel.org, AJvYcCVKBh5jIXMXs3UPbnG/oIksyFIzUfUP2kFP4/fRI9FE85jmmR4/YTQU6jsaTFNdxW1WAKPULTxl@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCNqUT2eb/OOoKs11PupI1mzYkKYjwW2m9D0OL2JBIzkj/v+4t
+	2NaOXvOkFAxBrDmUj7YD9nJkrzwjh7m3n+834kF+bpv7xeuQw8cvZHA=
+X-Gm-Gg: ASbGncv9ughiNi4jylZwG1TpHs5ZhfjvrYhU/B0T24wPCza5UJ+imo0P35n82hfNYAh
+	X/RlJLRQB1EogSW3/NKKi+oq0A8IjkgwfJdCocXIiO1MOZbfwOJY2KnZpVykA9S6eWJi3AhC3j8
+	dXIK6lXbkvi4H5NVQXGJBbSm7m4WRbHSRkOCyjZUVPYlmzd/m06chWDLKVTJxRjldFRC5GNUEAK
+	btIpRQJgAR0yNuNFlj5tylAl2aDQs+7fpXafJhiI+/KNOg09OeNgXXZRMVI6U0w7akKy5J1TsV4
+	011iBKqvI6eGDZbml2GzLmYzuEVHw2xfgJuKE71AaIkshEo2GIWnnr2EW8/JDSKRVjEQAAph/SE
+	JiLnRrQW9IzZZq4fwNpVMJdI=
+X-Google-Smtp-Source: AGHT+IFiD1i0PThNFD33u8HNG3UK6b0XRr/FDgwkWC1gH6MYD1iM6N3CbaW/z9O1vOX4dsKBEPe1fg==
+X-Received: by 2002:a17:903:2445:b0:234:c5c1:9b73 with SMTP id d9443c01a7336-237d989d06emr192991835ad.36.1750689349085;
+        Mon, 23 Jun 2025 07:35:49 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d871f011sm87634705ad.235.2025.06.23.07.35.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 07:35:48 -0700 (PDT)
+Date: Mon, 23 Jun 2025 07:35:47 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to,
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2] net: xsk: update tx queue consumer
+ immediately after transmission
+Message-ID: <aFlmQ94TeHb9v-OC@mini-arch>
+References: <20250623073129.23290-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250622190344.446090-1-will@willsroot.io>
-In-Reply-To: <20250622190344.446090-1-will@willsroot.io>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 23 Jun 2025 10:33:29 -0400
-X-Gm-Features: AX0GCFtsk5Nd8rw3VRhSCwc5ktSguH0sPNqG9CfPFX8eX89EtJwUo8x5pdCpTWc
-Message-ID: <CAM0EoMmbcudme6=ogcUdQ1qt9MThChqy=37Ck1vhnw-4VuKmNw@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] net/sched: Restrict conditions for adding
- duplicating netems to qdisc tree
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, victor@mojatatu.com, 
-	pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, 
-	stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, 
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250623073129.23290-1-kerneljasonxing@gmail.com>
 
-BTW, you did fail to test tdc like i asked you to do. It was a trap
-question - if you did run it you would have caught the issue Jakub
-just pointed out. Maybe i shouldnt have been so coy/evil..
-Please run tdc fully..
+On 06/23, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> For afxdp, the return value of sendto() syscall doesn't reflect how many
+> descs handled in the kernel. One of use cases is that when user-space
+> application tries to know the number of transmitted skbs and then decides
+> if it continues to send, say, is it stopped due to max tx budget?
+> 
+> The following formular can be used after sending to learn how many
+> skbs/descs the kernel takes care of:
+> 
+>   tx_queue.consumers_before - tx_queue.consumers_after
+> 
+> Prior to the current patch, in non-zc mode, the consumer of tx queue is
+> not immediately updated at the end of each sendto syscall when error
+> occurs, which leads to the consumer value out-of-dated from the perspective
+> of user space. So this patch requires store operation to pass the cached
+> value to the shared value to handle the problem.
+> 
+> More than those explicit errors appearing in the while() loop in
+> __xsk_generic_xmit(), there are a few possible error cases that might
+> be neglected in the following call trace:
+> __xsk_generic_xmit()
+>     xskq_cons_peek_desc()
+>         xskq_cons_read_desc()
+> 	    xskq_cons_is_valid_desc()
+> It will also cause the premature exit in the while() loop even if not
+> all the descs are consumed.
+> 
+> Based on the above analysis, using 'cached_prod != cached_cons' could
+> cover all the possible cases because it represents there are remaining
+> descs that are not handled and cached_cons are not updated to the global
+> state of consumer at this time.
 
-On Sun, Jun 22, 2025 at 3:05=E2=80=AFPM William Liu <will@willsroot.io> wro=
-te:
->
-> netem_enqueue's duplication prevention logic breaks when a netem
-> resides in a qdisc tree with other netems - this can lead to a
-> soft lockup and OOM loop in netem_dequeue as seen in [1].
-> Ensure that a duplicating netem cannot exist in a tree with other
-> netems.
->
-> [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilx=
-sEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@wi=
-llsroot.io/
->
-> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> Reported-by: William Liu <will@willsroot.io>
-> Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-> Signed-off-by: William Liu <will@willsroot.io>
-> Signed-off-by: Savino Dicanosa <savy@syst3mfailure.io>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > ---
->  net/sched/sch_netem.c | 45 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
->
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fdd79d3ccd8c..308ce6629d7e 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -973,6 +973,46 @@ static int parse_attr(struct nlattr *tb[], int maxty=
-pe, struct nlattr *nla,
->         return 0;
->  }
->
-> +static const struct Qdisc_class_ops netem_class_ops;
-> +
-> +static inline bool has_duplication(struct Qdisc *sch)
-> +{
-> +       struct netem_sched_data *q =3D qdisc_priv(sch);
-> +
-> +       return q->duplicate !=3D 0;
+> V2
+> Link: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing@gmail.com/
+> 1. filter out those good cases because only those that return error need
+> updates.
+> Side note:
+> 1. in non-batched zero copy mode, at the end of every caller of
+> xsk_tx_peek_desc(), there is always a xsk_tx_release() function that used
+> to update the local consumer to the global state of consumer. So for the
+> zero copy mode, no need to change at all.
+> 2. Actually I have no strong preference between v1 (see the above link)
+> and v2 because smp_store_release() shouldn't cause side effect.
+> Considering the exactitude of writing code, v2 is a more preferable
+> one.
+> ---
+>  net/xdp/xsk.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 5542675dffa9..b9223a2a6ada 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -856,6 +856,9 @@ static int __xsk_generic_xmit(struct sock *sk)
+>  	}
+>  
+>  out:
+> +	if (xs->tx->cached_prod != xs->tx->cached_cons)
 
-return q->duplicate not good enough?
+Can we use xskq_has_descs() here instead?
 
-> +}
-> +
-> +static int check_netem_in_tree(struct Qdisc *sch, bool only_duplicating,
-> +                              struct netlink_ext_ack *extack)
-> +{
-> +       struct Qdisc *root, *q;
-> +       unsigned int i;
-> +
-
-"only_duplicating" is very confusing. Why not "duplicates"?
-
-> +       root =3D qdisc_root_sleeping(sch);
-> +
-> +       if (sch !=3D root && root->ops->cl_ops =3D=3D &netem_class_ops) {
-> +               if (!only_duplicating || has_duplication(root))
-> +                       goto err;
-> +       }
-> +
-> +       if (!qdisc_dev(root))
-> +               return 0;
-> +
-> +       hash_for_each(qdisc_dev(root)->qdisc_hash, i, q, hash) {
-> +               if (sch !=3D q && q->ops->cl_ops =3D=3D &netem_class_ops)=
- {
-> +                       if (!only_duplicating || has_duplication(q))
-
-if (duplicates || has_duplication)
-
-> +                               goto err;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +
-> +err:
-> +       NL_SET_ERR_MSG(extack,
-> +                      "netem: cannot mix duplicating netems with other n=
-etems in tree");
-> +       return -EINVAL;
-> +}
-> +
->  /* Parse netlink message to set options */
->  static int netem_change(struct Qdisc *sch, struct nlattr *opt,
->                         struct netlink_ext_ack *extack)
-> @@ -1031,6 +1071,11 @@ static int netem_change(struct Qdisc *sch, struct =
-nlattr *opt,
->         q->gap =3D qopt->gap;
->         q->counter =3D 0;
->         q->loss =3D qopt->loss;
-> +
-> +       ret =3D check_netem_in_tree(sch, qopt->duplicate =3D=3D 0, extack=
-);
-
-check_netem_in_tree(sch, qopt->duplicate, extack) ?
-
-
-cheers,
-jamal
-
-> +       if (ret)
-> +               goto unlock;
-> +
->         q->duplicate =3D qopt->duplicate;
->
->         /* for compatibility with earlier versions.
-> --
-> 2.43.0
->
->
+And still would be nice to verify this with a test. Should not be much work,
+most of the things (setup/etc) are already there, so you won't have
+to write everything from scratch...
 
