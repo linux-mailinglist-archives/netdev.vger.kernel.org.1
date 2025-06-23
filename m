@@ -1,168 +1,127 @@
-Return-Path: <netdev+bounces-200178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C527AE3925
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:57:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D80CAE3963
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23DDF188419D
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:58:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E927A3A528B
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C288379F2;
-	Mon, 23 Jun 2025 08:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B315C18BB8E;
+	Mon, 23 Jun 2025 09:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qUnThEPl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iO3ztqGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461AA201261;
-	Mon, 23 Jun 2025 08:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD182EB1D;
+	Mon, 23 Jun 2025 09:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750669061; cv=none; b=SsrXYo2CtW9c2/YEP5NGIARYV6Y+gtTUmYZ6DYOxXNjTJ0tNHzw9RKQ+SBZc4ZiDYNLTfse/lZSCc8jderzmhxJBocdvC8FitIOP1EZWcfcwfZ2OL6Crm8QZU/cCqe/vKeyWDg1Jzb436ujWp0KmXQKMf4yQl2OzBxofyTDUTtk=
+	t=1750669498; cv=none; b=cOsiCf4mO54E80UG04Py8fQuFbarIZ+lFPkByB+j1fjS0pXpcUHh90dLuX8paIrcRzFWeRGuaPRB/NVPCfc8pkNfzatf6HjuPJpHO7GC7UiB2BOQRKtqnx3gWG/PI5ilCLxiNQ14dzi+wU3RQ46iS1nGpOYxv3KsyqMUewZIgh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750669061; c=relaxed/simple;
-	bh=t7FHICmzE4r3QRYdc3oFhrMV56wP74z5AL9PhKJSoqs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tjFw/mNZrsBEM9lYi6B3OTcR7k9F45yGzV02v58zy00p5Uiq91Eq0JlkKfpqaM2sZ0j3WaV0dvL36hRgHSuWXWoZovVW3BE0nZ+VOsr2GlkE6odG2lGTr4IL5/xbVxPWyhiQwW0lMKKtb3mjqLQ857XhoXO4Rf0FOzI8hn5yl1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qUnThEPl; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55MKQEMP005484;
-	Mon, 23 Jun 2025 08:57:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ZPbrsJ
-	MJDeYor22LNf0/ZRrF8mcPclVDdrKXL6sBJ+I=; b=qUnThEPl0BszX7EQwmS0ru
-	GwM2qR479/eX4iRporQR3We4/YVrJapbs+wQ3aLSwYNbK398VmQX8MnMAJithBTw
-	3W+Awfvjf9TODhW4kHL5CUQhb2yy1Xb3a73CP5GgM9ybeA71M3cOrHWkYVH1LqG/
-	2Smu3c1FXpCot0gOxiKdvmkFDWx0Ybxd9UpUV66hHuHR2QOqRBdW6ZENYoQs5cbU
-	2EP2ArkDOu3Ah7MfcJba4Q6LXYzgy/hBAFuhtFLz51zrEMFUqqKz4YzNlrZRE/uu
-	gb3DImJ8KGiZMHTy3uimgnXIJlA2P3tpWe9Oq82O/p/XfAJiGd9tOygUjJWDLKcg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dm8j0dak-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Jun 2025 08:57:32 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55N8rWCU028212;
-	Mon, 23 Jun 2025 08:57:32 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dm8j0dag-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Jun 2025 08:57:32 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55N64mFL014710;
-	Mon, 23 Jun 2025 08:57:31 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47e9s251t2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Jun 2025 08:57:30 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55N8vTfU15139542
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Jun 2025 08:57:30 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D59AF5805A;
-	Mon, 23 Jun 2025 08:57:29 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5AE3458051;
-	Mon, 23 Jun 2025 08:57:27 +0000 (GMT)
-Received: from [9.111.82.48] (unknown [9.111.82.48])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 23 Jun 2025 08:57:27 +0000 (GMT)
-Message-ID: <b477a91f-788a-4b21-b164-2628752de8fc@linux.ibm.com>
-Date: Mon, 23 Jun 2025 10:57:26 +0200
+	s=arc-20240116; t=1750669498; c=relaxed/simple;
+	bh=cHusQ2VZmE4UIlYbu5OpWoF9Rc99dg6ImE33GJlTdOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gOAqysnh4zY0gt8N+LXR1q49T/Jqj4SDggXTo/IWqxTmK7oEjMstpJ7QvqHyKyoyJku+vl4/tkN7hRu+O0tbyTlF2ivHlxpGoh9IhiJ1RDllZFa9yVfGnN/GYWaM3DjsCJJLzsL72wnPrbxRrHW7NiXKPbBB2UyGFGUMYgq6Fxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iO3ztqGF; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45310223677so29349755e9.0;
+        Mon, 23 Jun 2025 02:04:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750669495; x=1751274295; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Mp4zG9WmNam+JoCdJwjtNBfJYYLGYfORbnaYyB6I4o=;
+        b=iO3ztqGF0GMQtC7DZZCFdXODBPVtlYoSLCTpw5cBf7Ua4TJ4npnZjE29TiJOnt8oZo
+         8Of6jHPn6qeJfp2zaUYA8spIYORkM/OZzy4hpr4tMjuILZebNDYbFmW7BkLe9Ql0L4r7
+         W7IWJzDki8YmI8CUcHgV3Nvwrf8ZJ9k/kzyckOUgPsqQbPCHy3wQWhzPdrfC+KIQV+3g
+         vloL1IUaRs7mcGbLdgwlt/Atxu9BVihhm55iXigy+miFqabxJN6+Pj5f8CnxJqXkIa23
+         0IKu6P7jhQ7AS47nsAOv7hRxlqPSxzGf2BCVriz/H38xdYBknkNrr/FrOGkvO9r3DIRN
+         dPiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750669495; x=1751274295;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Mp4zG9WmNam+JoCdJwjtNBfJYYLGYfORbnaYyB6I4o=;
+        b=UB5+xvq5R2hjpRiz5EPLGSzhLYqdYptHVGcU6UHMNZOVFksk99obZXdKjJTaAeWcfd
+         3zExCHa9LBPduLTmNTJj5sBoagsMI0KXWGDhBJGwIPQz9Lfn1coid4UDNCB2/Ms/vkPj
+         WVz4O/B2OustGiIiki/501eXgeQHvobBDHM2nhAYwrm23LIJg60LK4+fkaZxK+Nd/cmx
+         Oda1KwEcmjn55a6ogx9fSnxSyOJsFg8aWZsSG9ZvstxPLEq7DGnHuOTyGoFlSdkMdmQq
+         OcrEGuDUqgKyH6PHPxI+4m/B1GeshiS9ZFcX1hFpN5Pdx2U+L8r+/3ZsQNCYloGNuNkJ
+         ZCBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIVbYed5qr1ApBsOTjAYeGz+KDlvqUpnNU8heZSZi+YIVwRtCIqWFlae9EqsiduksnyVO6NUbQ@vger.kernel.org, AJvYcCX3B5250QcfFY42Hej5zG/jv3xK9tDZJEdjn4N6mm6pYjkIq1oqpzZqHeQKx5c8j1lFaoo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCxfe6HHX8cLtp/cegN9L5HRy/YAL2GzGu41UWlzBmtCNRZbxe
+	eigSrvdx/M2p/SaMos1ucJb2HSobBLDEuZ43XqTaZTNrOgIkWdWGIr4f
+X-Gm-Gg: ASbGncsoXjz0g6pyNipdMf8zSB6DI06fkavoPdIdawrTARGwPinJWpWnWNTFH9BFmLa
+	0Oai+CsnmQuOa44a2IshLNwXhMdmTajNtjx6PMJSTHHgJfC8zBdobzq8cYzqNRhEtHJ1oUW8Bjm
+	G1UuATBVMMmGTRlw4fDWFYgwxoGde4k+FH50jP6t2QV+X8n12eCWMGSw6D06Y+w0rQ7s7GdujH4
+	UAUxl17cPc+0eiwKdU/icNZc2nAmDiPDWUaddic1B3huUsFfJsIcMy3SxZboq7vhR9/2vgA8qtW
+	z3bFmnoIq4vDJ0oaWnNo0I0P7nK5Lcjla3OPcnWTA53UcIuybkm/hYau/iofhb8sbKe80zx4Wm7
+	YtdMXcMmc13Q4BOPrErPImE3hmOglqaTtN2aHVteBTCMIDEpIcaAteIcRJfNZ
+X-Google-Smtp-Source: AGHT+IH+ExDbubGYUndUo11AsgsJZlD9if2irv5BgJtju2mboZPLIsB6AipN78PB9b6AXcv8r0pc1A==
+X-Received: by 2002:a05:600c:35c1:b0:441:ac58:eb31 with SMTP id 5b1f17b1804b1-453659dcd4cmr95201975e9.20.1750669495009;
+        Mon, 23 Jun 2025 02:04:55 -0700 (PDT)
+Received: from mail.gmail.com (2a01cb0889497e005b5e8ea9b277abf2.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:5b5e:8ea9:b277:abf2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45364703701sm104047835e9.27.2025.06.23.02.04.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 02:04:53 -0700 (PDT)
+Date: Mon, 23 Jun 2025 11:04:52 +0200
+From: Paul Chaignon <paul.chaignon@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Tom Herbert <tom@herbertland.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Subject: Re: [PATCH stable 5.10,5.15 2/2] bpf: Fix L4 csum update on IPv6 in
+ CHECKSUM_COMPLETE
+Message-ID: <aFkYtN3WK19iK0-d@mail.gmail.com>
+References: <0bd9e0321544730642e1b068dd70178d5a3f8804.1750171422.git.paul.chaignon@gmail.com>
+ <2ce92c476e4acba76002b69ad71093c5f8a681c6.1750171422.git.paul.chaignon@gmail.com>
+ <2025062357-grove-crisply-a3b2@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] MAINTAINERS: update smc section
-To: Jan Karcher <jaka@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>
-References: <20250623085053.10312-1-jaka@linux.ibm.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20250623085053.10312-1-jaka@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDA1MSBTYWx0ZWRfX5czYeZ3o/EDb 2gmuYjbn17CyYxbFaPcgTJvyIUj4iQURtgzKL8zMAMrSiNt+S0Hlh6L8Q6qCIq4EQItxXQtgUyy kOuLNHJKkaqC4xCKyZZxOz869XGf3sYdKf0xKoVnge/o3uVpBVz9+8pmeXlUfYcTYz6vxVgmpsC
- ecZR/CQQdOI7uvcDC6HbrlhBqcYqLwGfMPu6r/AdIy2FXWK0XSP7phMU2V8wJxLGwdUtiV5WQO1 wYFswKq4pZ9528UpZuqD8jQe4pQvoDfpEGYEZ0XVCai9KAqJ9XFBb5qWJDVztOBqhsJq6wfGCgb QPbkXRPqgAJ7m4S9TiwvfPLEYhRgCZgXhrKcpESes7xuhnPOqi0DV8V2nRlr2joc5BBRn9JXNLA
- 8kunP8qoyWjggk/K4WHwRjmifIHvo5vd5S7DFli1S5egfubzv/RH7Un8ln1+4pASqykMmGkW
-X-Proofpoint-GUID: UQ9TA2I7dqac2ZomIZ6sCT68GIuzLAmH
-X-Proofpoint-ORIG-GUID: 1l91L2QK7vc-R1ZP0xqiXg4KlbGlhLnO
-X-Authority-Analysis: v=2.4 cv=combk04i c=1 sm=1 tr=0 ts=685916fc cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=qPgYS-SWOX8TBiLe_hsA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-23_03,2025-06-20_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=802 clxscore=1011
- impostorscore=0 suspectscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506230051
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2025062357-grove-crisply-a3b2@gregkh>
 
+On Mon, Jun 23, 2025 at 10:46:47AM +0200, Greg Kroah-Hartman wrote:
+> On Tue, Jun 17, 2025 at 05:49:21PM +0200, Paul Chaignon wrote:
+> > [ Upstream commit ead7f9b8de65632ef8060b84b0c55049a33cfea1 ]
+> > [ Note: Fixed conflict due to unrelated comment change. ]
+> 
+> This does not apply to the 5.15.y tree at all, due to:
+> 
+> > -		inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo, false);
+> > +		inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo, is_ipv6);
+> 
+> This chunk.
+> 
+> Can you fix that up and resend just this one?
 
+It requires the 1/2 patch to apply correctly. I've tested them on the
+tip of 5.15.y (1c700860e8bc). Or is there some reason not to backport
+the 1/2 patch?
 
-On 23.06.25 10:50, Jan Karcher wrote:
-> Due to changes of my responsibilities within IBM i
-> can no longer act as maintainer for smc.
-> 
-> As a result of the co-operation with Alibaba over
-> the last years we decided to, once more, give them
-> more responsibility for smc by appointing
-> D. Wythe <alibuda@linux.alibaba.com> and
-> Dust Li <dust.li@linux.alibaba.com>
-> as maintainers as well.
-> 
-> Within IBM Sidraya Jayagond <sidraya@linux.ibm.com>
-> and Mahanta Jambigi <mjambigi@linux.ibm.com>
-> are going to take over the maintainership for smc.
-> 
-> Signed-off-by: Jan Karcher <jaka@linux.ibm.com>
-> ---
->   MAINTAINERS | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index a92290fffa16..88837e298d9f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -22550,9 +22550,11 @@ S:	Maintained
->   F:	drivers/misc/sgi-xp/
->   
->   SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS
-> +M:	D. Wythe <alibuda@linux.alibaba.com>
-> +M:	Dust Li <dust.li@linux.alibaba.com>
-> +M:	Mahanta Jambigi <mjambigi@linux.ibm.com>
-> +M:	Sidraya Jayagond <sidraya@linux.ibm.com>
->   M:	Wenjia Zhang <wenjia@linux.ibm.com>
-> -M:	Jan Karcher <jaka@linux.ibm.com>
-> -R:	D. Wythe <alibuda@linux.alibaba.com>
->   R:	Tony Lu <tonylu@linux.alibaba.com>
->   R:	Wen Gu <guwen@linux.alibaba.com>
->   L:	linux-rdma@vger.kernel.org
+Paul
 
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> 
+> thanks,
+> 
+> greg k-h
 
