@@ -1,226 +1,161 @@
-Return-Path: <netdev+bounces-200377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AE7AE4B94
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:05:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F5AAE4BAF
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:19:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC9C9189CA9B
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:05:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 948A31898C51
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4B428D8FA;
-	Mon, 23 Jun 2025 17:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DCB26D4F7;
+	Mon, 23 Jun 2025 17:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JbSGZMR+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jY7BTott"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07D01C07C4;
-	Mon, 23 Jun 2025 17:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A451C84D2;
+	Mon, 23 Jun 2025 17:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750698318; cv=none; b=hj4pAN7Q6A4g6NGFyWE7Yy15topesnWvKREf6QVKYxYq5ZgqrK5+aWm3Z5WCzN3+6O8q4gz2H846jDNIRut6Zf+8mXZnnzB+SpQP74IiSuayYhhpqWyIkWgnoXlfTexDykjeZV/E3B4Na9BgBeMnM1h3ObZQjUDFMTXo/JE0wlk=
+	t=1750699162; cv=none; b=ae8RlpSlMcKJ/d4u+sGZBcCh0q5cs1P/4eAlGbQqyya7DUaj3FNjs4JF/OgEwCrDztmRjI9GDxLB68PCZjObITGchDBzT0Y5BUuDtjarfRTpSme6DzaK7Pf1W6PqnLpghDjL/aiB3pzoWp4YbKblATIiW5OH3t6xQpCj78XD1P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750698318; c=relaxed/simple;
-	bh=6nZoOQkZs6C4FQYLUnskHM0GHFTQYyosqeO+/BXGQdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHzgKFfD8Pra6UJpKDrMwWCiNnLtRETUBuCWRNQVtsJ3WWe6BrGVNWwrJ5GQ78Z5Aqs8IBS68GclR1td/d7xLZfdpyA4KmkxJ+YUSf4HKCcZPcizhJf48YNns3uxAfZLdttZvKZ1JFrCnLl5URkPyUSFFqVP3mml3Vjt48SZkzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JbSGZMR+; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ade48b24c97so777429566b.2;
-        Mon, 23 Jun 2025 10:05:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750698315; x=1751303115; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pi3M8vSwwyPlCy0ds+MLiPgrDsER6WDeUbD1bJQq8OE=;
-        b=JbSGZMR+hZdXtyQMne2CDCoNWZQzxY0TJDPU/VdJi7nmNTgcTCbgtgRt+7obTDtTQe
-         ZnvqZAfjSmskm2CSoONCcdllsVZol48CQZJYvSiQ/+4jm7eLUbtDV+RmhpQP4HVVV+cm
-         a2x/NgHG6/KHhGBQeh3PdL9ktBvUQbmIuWK/zoWnhrXjYuJ4qojgfCJuJPE38OWIj1uC
-         Z/MgJSxAPuO6S+avdx0zxBxfuoPZmVBf+6BkXntLyf4zGJUCbWsNbgM2gNDrIVc8SIS5
-         VBwKlvGT/TmzhHVKg1toueJBX0AfXrUI8nNPmU7Sx5KyfohSe/JRNu+MQxk31G7jOPun
-         N7SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750698315; x=1751303115;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pi3M8vSwwyPlCy0ds+MLiPgrDsER6WDeUbD1bJQq8OE=;
-        b=ioWaLotzJ5vJIafUZn1rMeLvvLl+EuudI4DTPGf3rda+bOxwTigYyjJt+oJPmnZyvC
-         1sftT9cbDo/0PIGNm77yBNrgDWO33iT43xAAn0nHn7lCVtEtTvzWe+4RjSA1R3Nuek55
-         jlW+Q7leSOzI6oQ9KEIe6TUPJjBok6APlXCoc22JwqVeP8YuyWVwgQkUhoB4n4DP4iTW
-         4+SdHP8+krfYYdef6CfuFsLNgRYnbpZP40sIsIABTOY/98jv1E+ljBPyMLPX9OoP56av
-         mVInY7aV6LrXBRHFZxnVFcD+UcHdotvJDLozEJNBejapDjKCxtli1JXTwg8OssnbJp63
-         Q4lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeFbpClIPOufHSSFvvxqjkBMV2aa74KZVZQQ9y4Z+I2136XI1yfmo5EhI3IhW8NFJsvXlY08klUi0fhQSN@vger.kernel.org, AJvYcCUqAxhq4hONFmLSja5/30IHB9ORvko+wW8ZaQVstTJiDHLvbzWuonoQsmQEOGqRExDOxCzjOAQp@vger.kernel.org, AJvYcCVBpAkROhg93jcE7WIfU+CQUmbM4slRIwTZa7hARBvXsoDpPpl5URXl4mxxLFV7o5P/X9OYw26pDKI8Dw==@vger.kernel.org, AJvYcCVJ7XFAwzTFQt57RmzUwkHEcPUtiIOWr1ds9iuNsVOyvyjn2ePsoUrOf/zheU6im91H8D4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH339qAf779nAfj+DcJ72+IJgMGHbJvO8VQZm1OVJDiCE1zv+R
-	ilvPk9gU4+bxuH/rcGY375lpPykwctLgUrKBnHWYUnHNtkYNFkpnzACt
-X-Gm-Gg: ASbGncsEID06bfKzTmIou2kVVfggWPL+eBxvt9s+xCnhRyaldcrvCnOCOE8nh89Hu16
-	SAOe49r7dsSGancXdZfu2aYG15r42Yc/pHF1i2qRol0hfWdw4IUZjIxN5hVbSWg8YSmUIxpfPhv
-	rqNRmnw5z5A+Q3+QV5S2wQuikXuDtl8mYaqfYZhcvRYUQx0whqwvYLvlsU0LN3maOj0EITOQ79M
-	aEo4LLULiqSuGAk7MEk7DyoCaAUY/Jcx9QUJvF8v2mpmZcHhXI7wbVP5OSGrmu/h5TO85lCATM5
-	E69f5PVBLjUA0kpyoDpcz028Ejl7tFfrRQ6aHGTaUdIJya/VFuCySk34pmHJeCew+j+kpL4bhBA
-	=
-X-Google-Smtp-Source: AGHT+IFkMr16MZMhGYOEMve0k+oWilXDkDPpSQstoYWVNutXXp/lz9Oc+tMJS730MOiqaVVD0hEmBQ==
-X-Received: by 2002:a17:907:3f18:b0:ade:4339:9367 with SMTP id a640c23a62f3a-ae057a222b4mr1293806966b.26.1750698314880;
-        Mon, 23 Jun 2025 10:05:14 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::2ef? ([2620:10d:c092:600::1:85c4])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae054082d25sm728555966b.88.2025.06.23.10.05.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 10:05:14 -0700 (PDT)
-Message-ID: <41e68e52-5747-4b18-810d-4b20ada01c9a@gmail.com>
-Date: Mon, 23 Jun 2025 18:06:37 +0100
+	s=arc-20240116; t=1750699162; c=relaxed/simple;
+	bh=chsg6qxkKFFdpB+SOietLh5gD1Uz4tT6FryWURP8s9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OoOxYkecDRtLAm1BMCcMcTPVBV00/Ctv+cOOAGIO2y2xH61nnUHK5kmoKRC1xa0hAhjdsNxJ2TcJ13F2Un4rQ7k11AekQ0H0d/9QhpQyW4gtUkn6l6r9K2dZGVjVhg6eqewnciheuwRbZ0CFEOeLH0XR6zH4zeW9IikpT0Mt3qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jY7BTott; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BE54C4CEEA;
+	Mon, 23 Jun 2025 17:19:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750699161;
+	bh=chsg6qxkKFFdpB+SOietLh5gD1Uz4tT6FryWURP8s9k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jY7BTottz7L4L2kAucQnKwH+2lq8sxPkRngSzGRJTPfRgIrJ4jHICUKRZ+2b5wW3J
+	 3DqhYDrREhQkhvjDsIC2PHVw188+Gu6NGg66EJENyqq/JpOxPeIVYEqJA4n7AXUfBe
+	 YxZY9K0J/SR9h1OOccy3JD1WMclyID46f2YjQPu+thTZcidoNVoZKXwy1lomkKFKRn
+	 Z4Y3M7Ib20bkDkSIOGmH6o6Lrw32mVoJhDjfCMDkB9aCmD90SpWsauvTAgBcv17sZE
+	 5kbVKgpcR4aZM/XbWeK2mL0JsfpoDz27yFrA8FSkjtY9p/Fipmvx5Qml5UYrVxOyEr
+	 aL9mmnAMoWzRg==
+Date: Mon, 23 Jun 2025 10:19:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v4 0/4] net: selftest: improve test string
+ formatting and checksum handling
+Message-ID: <20250623101920.69d5c731@kernel.org>
+In-Reply-To: <aFk-Za778Bk38Dxn@pengutronix.de>
+References: <20250515083100.2653102-1-o.rempel@pengutronix.de>
+	<20250516184510.2b84fab4@kernel.org>
+	<aFU9o5F4RG3QVygb@pengutronix.de>
+	<20250621064600.035b83b3@kernel.org>
+	<aFk-Za778Bk38Dxn@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 9/9] page_pool: access ->pp_magic through
- struct netmem_desc in page_pool_page_is_pp()
-To: David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
- Byungchul Park <byungchul@sk.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
- kuba@kernel.org, almasrymina@google.com, ilias.apalodimas@linaro.org,
- harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
- davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
- toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
- hannes@cmpxchg.org, jackmanb@google.com
-References: <20250620041224.46646-1-byungchul@sk.com>
- <20250620041224.46646-10-byungchul@sk.com>
- <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com>
- <20250623101622.GB3199@system.software.com>
- <460ACE40-9E99-42B8-90F0-2B18D2D8C72C@nvidia.com>
- <a8d40a05-db4c-400f-839b-3c6159a1feab@redhat.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <a8d40a05-db4c-400f-839b-3c6159a1feab@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 6/23/25 15:58, David Hildenbrand wrote:
-> On 23.06.25 13:13, Zi Yan wrote:
->> On 23 Jun 2025, at 6:16, Byungchul Park wrote:
->>
->>> On Mon, Jun 23, 2025 at 11:16:43AM +0200, David Hildenbrand wrote:
->>>> On 20.06.25 06:12, Byungchul Park wrote:
->>>>> To simplify struct page, the effort to separate its own descriptor from
->>>>> struct page is required and the work for page pool is on going.
->>>>>
->>>>> To achieve that, all the code should avoid directly accessing page pool
->>>>> members of struct page.
->>>>>
->>>>> Access ->pp_magic through struct netmem_desc instead of directly
->>>>> accessing it through struct page in page_pool_page_is_pp().  Plus, move
->>>>> page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
->>>>> without header dependency issue.
->>>>>
->>>>> Signed-off-by: Byungchul Park <byungchul@sk.com>
->>>>> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
->>>>> Reviewed-by: Mina Almasry <almasrymina@google.com>
->>>>> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
->>>>> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
->>>>> Acked-by: Harry Yoo <harry.yoo@oracle.com>
->>>>> ---
->>>>>    include/linux/mm.h   | 12 ------------
->>>>>    include/net/netmem.h | 14 ++++++++++++++
->>>>>    mm/page_alloc.c      |  1 +
->>>>>    3 files changed, 15 insertions(+), 12 deletions(-)
->>>>>
->>>>> diff --git a/include/linux/mm.h b/include/linux/mm.h
->>>>> index 0ef2ba0c667a..0b7f7f998085 100644
->>>>> --- a/include/linux/mm.h
->>>>> +++ b/include/linux/mm.h
->>>>> @@ -4172,16 +4172,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
->>>>>     */
->>>>>    #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
->>>>>
->>>>> -#ifdef CONFIG_PAGE_POOL
->>>>> -static inline bool page_pool_page_is_pp(struct page *page)
->>>>> -{
->>>>> -     return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
->>>>> -}
->>>>> -#else
->>>>> -static inline bool page_pool_page_is_pp(struct page *page)
->>>>> -{
->>>>> -     return false;
->>>>> -}
->>>>> -#endif
->>>>> -
->>>>>    #endif /* _LINUX_MM_H */
->>>>> diff --git a/include/net/netmem.h b/include/net/netmem.h
->>>>> index d49ed49d250b..3d1b1dfc9ba5 100644
->>>>> --- a/include/net/netmem.h
->>>>> +++ b/include/net/netmem.h
->>>>> @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
->>>>>     */
->>>>>    static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
->>>>>
->>>>> +#ifdef CONFIG_PAGE_POOL
->>>>> +static inline bool page_pool_page_is_pp(struct page *page)
->>>>> +{
->>>>> +     struct netmem_desc *desc = (struct netmem_desc *)page;
->>>>> +
->>>>> +     return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
->>>>> +}
->>>>> +#else
->>>>> +static inline bool page_pool_page_is_pp(struct page *page)
->>>>> +{
->>>>> +     return false;
->>>>> +}
->>>>> +#endif
->>>>
->>>> I wonder how helpful this cleanup is long-term.
->>>>
->>>> page_pool_page_is_pp() is only called from mm/page_alloc.c, right?
->>>
->>> Yes.
->>>
->>>> There, we want to make sure that no pagepool page is ever returned to
->>>> the buddy.
->>>>
->>>> How reasonable is this sanity check to have long-term? Wouldn't we be
->>>> able to check that on some higher-level freeing path?
->>>>
->>>> The reason I am commenting is that once we decouple "struct page" from
->>>> "struct netmem_desc", we'd have to lookup here the corresponding "struct
->>>> netmem_desc".
->>>>
->>>> ... but at that point here (when we free the actual pages), the "struct
->>>> netmem_desc" would likely already have been freed separately (remember:
->>>> it will be dynamically allocated).
->>>>
->>>> With that in mind:
->>>>
->>>> 1) Is there a higher level "struct netmem_desc" freeing path where we
->>>> could check that instead, so we don't have to cast from pages to
->>>> netmem_desc at all.
+On Mon, 23 Jun 2025 13:45:41 +0200 Oleksij Rempel wrote:
+> On Sat, Jun 21, 2025 at 06:46:00AM -0700, Jakub Kicinski wrote:
+> > On Fri, 20 Jun 2025 12:53:23 +0200 Oleksij Rempel wrote:
+> > > Let me first describe the setup where this issue was observed and my findings.
+> > > The problem occurs on a system utilizing a Microchip DSA driver with an STMMAC
+> > > Ethernet controller attached to the CPU port.
+> > > 
+> > > In the current selftest implementation, the TCP checksum validation fails,
+> > > while the UDP test passes. The existing code prepares the skb for hardware
+> > > checksum offload by setting skb->ip_summed = CHECKSUM_PARTIAL. For TCP, it sets
+> > > the thdr->check field to the complement of the pseudo-header checksum, and for
+> > > UDP, it uses udp4_hwcsum. If I understand it correct, this configuration tells
+> > > the kernel that the hardware should perform the checksum calculation.
+> > > 
+> > > However, during testing, I noticed that "rx-checksumming" is enabled by default
+> > > on the CPU port, and this leads to the TCP test failure.  Only after disabling
+> > > "rx-checksumming" on the CPU port did the selftest pass. This suggests that the
+> > > issue is specifically related to the hardware checksum offload mechanism in
+> > > this particular setup. The behavior indicates that something on the path
+> > > recalculated the checksum incorrectly.  
+> > 
+> > Interesting, that sounds like the smoking gun. When rx-checksumming 
+> > is enabled the packet still reaches the stack right?  
+> 
+> No. It looks like this packets are just silently dropped, before they was
+> seen by the stack. The only counter which confirms presence of this
+> frames is HW specific mmc_rx_tcp_err. But it will be increasing even if
+> rx-checksumming is disabled and packets are forwarded to the stack.
 
-As you said, it's just a sanity check, all page pool pages should
-be freed by the networking code. It checks the ownership with
-netmem_is_pp(), which is basically the same as page_pool_page_is_pp()
-but done though some aliasing.
+If you happen to have the docs for the STMMAC instantiation in the SoC
+it'd be good to check if discarding frames with bad csum can be
+disabled. Various monitoring systems will expect the L4 checksum errors
+to appear in nstat, not some obscure ethtool -S counter.
 
-static inline bool netmem_is_pp(netmem_ref netmem)
-{
-	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
-}
+> > If so does the frame enter the stack with CHECKSUM_COMPLETE or
+> > UNNECESSARY?  
+> 
+> If rx-checksumming is enabled and packet has supported ethertype,
+> then CHECKSUM_UNNECESSARY will be set. Otherwise CHECKSUM_NONE.
+> 
+> > > When examining the loopbacked frames, I observed that the TCP checksum was
+> > > incorrect. Upon further investigation, the xmit helper in net/dsa/tag_ksz.c
+> > > includes the following:
+> > > 
+> > > if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
+> > >     return NULL;
+> > > 
+> > > I assume skb_checksum_help() is intended to calculate the proper checksum when
+> > > CHECKSUM_PARTIAL is set, indicating that the software should complete the
+> > > checksum before handing it to the hardware. My understanding is that the STMMAC
+> > > hardware then calculates the checksum for egress frames if CHECKSUM_PARTIAL is
+> > > used.  
+> > 
+> > stmmac shouldn't touch the frame, note that skb_checksum_help() sets
+> > skb->ip_summed = CHECKSUM_NONE; so the skb should no longer be considered
+> > for csum offload.  
+> 
+> It looks like skb_checksum_help(), which is used in tag_ksz.c, generates
+> a TCP checksum without accounting for the IP pseudo-header. The
+> resulting checksum is then incorrect and is filtered out by the STMMAC
+> HW on ingress
 
-I assume there is no point in moving the check to skbuff.c as it
-already does exactly same test, but we can probably just kill it.
+The pseudo-header csum is filled in net_test_get_skb(), where it calls
+tcp_v4_check(). But I think you're right, it's incorrect. Could you try:
 
--- 
-Pavel Begunkov
+diff --git a/net/core/selftests.c b/net/core/selftests.c
+index 35f807ea9952..1166dd1ddb07 100644
+--- a/net/core/selftests.c
++++ b/net/core/selftests.c
+@@ -160,8 +160,10 @@ static struct sk_buff *net_test_get_skb(struct net_device *ndev,
+        skb->csum = 0;
+        skb->ip_summed = CHECKSUM_PARTIAL;
+        if (attr->tcp) {
+-               thdr->check = ~tcp_v4_check(skb->len, ihdr->saddr,
+-                                           ihdr->daddr, 0);
++               int l4len;
++
++               l4len = skb->tail - skb_transport_header(skb);
++               thdr->check = ~tcp_v4_check(l4len, ihdr->saddr, ihdr->daddr, 0);
+                skb->csum_start = skb_transport_header(skb) - skb->head;
+                skb->csum_offset = offsetof(struct tcphdr, check);
+        } else {
 
+Or some such?
+
+> If I generate the checksum manually by combining the result of
+> skb_checksum() with the csum_tcpudp_magic() function - I get a different
+> checksum from the skb_checksum_help() result, which is then not dropped
+> by STMMAC on ingress.
+> 
+> Should tag_ksz.c use a different helper function instead of
+> skb_checksum_help()?
 
