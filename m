@@ -1,129 +1,130 @@
-Return-Path: <netdev+bounces-200303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07CD7AE47C0
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:03:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DABAAE47CF
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:05:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 115DA18837C0
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:01:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DFDF16351C
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B4625394B;
-	Mon, 23 Jun 2025 15:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2FC267700;
+	Mon, 23 Jun 2025 15:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wLlW136u"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="P7wf07CI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F53C26FA5E
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 15:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0844525394B
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 15:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750690861; cv=none; b=O7ZOHBjy5UD+BraUvMf5Efs6tKT+JmRTySEHSdqYM3IDWSgrxhRptgqKGQ+/D6IZJwLfTqiGmv0lBaz6BCXdjXqTMSf4GK9p+EDCXOEFfQDERulcVAAEmJ6V5UMw7nEnb0m3fYjN8/78XjGkDy3uJTl4xaJfygZkfd5/Dyxdc3E=
+	t=1750690885; cv=none; b=mKGCX1EQYAYrKDVtl+Bwi8UmpJt+Wp6nKVMpU9xKQGt/d8hwjujzJPGyNdzCF1AJOSEAH4dk8rgrRvZDo4SmwKzJg8HsogLZ+Ld5m515aDS/U9PC94sEp+4Rq9mvHXNnUqapcYNDr2/mTX0iMpp0N9z2jCsyEiYZ8XXk8QQG7IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750690861; c=relaxed/simple;
-	bh=DWG8vtTRJO+BwOywGgWtNmxhuxvbJmczNlvdJL8Ky58=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rbMzqIg/PIhfvwj6SaV1wLD1kojPASW20OLEcgO26uYJa1HQHHE0hIw7BbUZ5kufzfUvyTWATDsQZI/B2M5HhqObxKnExmKRT5mqnyp14yjGQbQrf9WAxnX3F0Yy8B8r/4m7ScaF2kz8VO9t75ekrggDDfUjCGhLZMQefJ0QBO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wLlW136u; arc=none smtp.client-ip=209.85.215.171
+	s=arc-20240116; t=1750690885; c=relaxed/simple;
+	bh=oWGurdLLaATQUzuTwWzIpzQUAFQvFzDZgQR1mTaU0w8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=cntGOER0Dy26cV9az9iWA4Ax2wYoRPFG5JRUiGXhMDzLOr6oxmi9xWWg0j1T0jQK4nCTJt6jf6uUSGoeKdNPozBxDTGXui9NJL+CkVaqIPnuRm+VSZbZAWPZ9vaGbRkpzWdR3yaQhNgmXLTYbzcF9cqJTV/G6ivtUMRnVeKiz8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=P7wf07CI; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b3209ce08acso1327876a12.2
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 08:00:59 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23649faf69fso42744965ad.0
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 08:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750690858; x=1751295658; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/Efb7h4IiluZ8rF9i5BpJjDumz0UB34EpNqVIk+T6z0=;
-        b=wLlW136uAiMH7DxLLvH7WmLv1A5VP+RO7/RYN59n8y2CD5Vtlvz/e1IPQAHwHtMawZ
-         Li+cnta3H1udrgJ6Bt2TLWMdSxOPwASQo+RcYHqni185Cw4j4jm3aEUMZi5oZd6E68iR
-         H41iJx712BaVxL+qOE5MlMexH5sC+Zp/REquWEdMkjQvN4TgB08JD718jgLXFumeRXCi
-         IZeyiEV2J2aLzVOLX8ZUnbddrjv4dR8zpXPrcNepSh4PlaRg22C7XH4PDVoSd2Vj+Hkg
-         rw3+M1Ue2IGhJ89VeekClTjnE+o8zScdjouP5tCu2oAVcymsHWya2lw5sUeq5sj2w/32
-         0iAw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750690883; x=1751295683; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e12FTwFtz4sV1UkZylA7otkUya2j0xykUDCjLjiczB0=;
+        b=P7wf07CIcMAtYSPpO2nnQqKV5DX0b/0kgKOD5nkhmRMt7QV8iADHNUzt442kKaMj3n
+         q/bqkud80N4RPzOnpcvdXCxpmEbvhJmBcsBXsWx7oEYmtv8s4SRdmK+3VvAG1YYyf3Wf
+         ztIdqx+gBQ8xqJq/cUIWeBe74tTcn/LXrxYPUSLG6yyPKMIgKEUPKkP2WQY5m6pHu/5y
+         dl4IQzHQQZ3DiRGb8Bp1krXJ/XRhX0muwjy/uVyXp8aLSy5hKlNor2E3wlPAvV6szyC6
+         A7mVCZIV3GoRlRYKn55InUBUWC3YSNwMHCNuW/ScrRCFo/01fC5zgLfVQxuPl59IBMOp
+         iVGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750690858; x=1751295658;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Efb7h4IiluZ8rF9i5BpJjDumz0UB34EpNqVIk+T6z0=;
-        b=ZEj0T5NZ7FqN8zTWGg6Adzw7vKYmm6JL8aIZlV9q6PIiAVH2CeS2dt3jyNnLMrO8jN
-         0VSn6Jrqju3wUHK6SDJKHwRzD305Mzz+M1xoXGrep6YWSZvSz+3a5dFMbKTAXPct7Jb9
-         vV7jKUdnu1Ek0BXmmQSuHdLTZQu0RYKJ0mmaOfYCea+Q8WLFu7jKKyjqUIhHqLYaPj8d
-         OmYPtoLtp7iDRAaqwshEGvwO/T0W/8RWYVGj2L+EDkx5ZmDrPhzhgt3oDgxop4D31J/d
-         iWsMDFl6qIsCQEVqG8qw8IBYYHFJbFi9ud5CHccNnotG+rwjt1WVLM9hk1gWWgjl7UjZ
-         trjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWemovAYjL+1nBNjh09YU7AYCeliwntzES2KLebJnxvrEcdEStd00aWdXJ2vRairxeEFqdm02w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUUs5ljOOXwSICn7oHe2bn0BKd9/ANdfXMDj40QxzWYKVne/4H
-	ru/40zrkPBrjWs7L9btGyvufs7drBXwhGYJs0N87uazXk+MRdSdBr8zlb4pqRn9qMwM=
-X-Gm-Gg: ASbGncs+bqBQWZWn9xZTSki8oJ8eXFyJaL/Yk3JltO0o4PJRXY/ifTxjcTF/upgQmE+
-	IZpPWDfSkOvIwps+4hmM1E8pdBBbmHUhilSVppdTIFRmPwODPF59BzCKqUzN/jtIIwXffBIuWps
-	+K3ZPPjw6HUDIhe9D25fP6Ljt7or5rwnjXtT6dE9sqpQN+FfFkzwf6CkiCqO0qgvZ/yMtlNPmdg
-	0S44j0j+v4CQBIkzbzWohlP5cILJgTtXMINY3rMv/Dv2XtvABArx7I0dpic4a2mF44DENkiEte3
-	psBqfxpcx3p+27p2GMzSokFjsOun0jXmpd5BfACIwRCNb0+eo9fcZyTU4g==
-X-Google-Smtp-Source: AGHT+IGUUjQjuUqX05UT3HAo2u5Qjh7WVT+efnt7MqKr01cpayVTTMTARQsofUWceMLkZlA6eMUkqA==
-X-Received: by 2002:a17:90b:2ec3:b0:312:1c83:58e9 with SMTP id 98e67ed59e1d1-3159d62aba3mr18008699a91.5.1750690858254;
-        Mon, 23 Jun 2025 08:00:58 -0700 (PDT)
-Received: from [172.20.0.228] ([12.48.65.201])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315ac2991a7sm6350927a91.25.2025.06.23.08.00.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 08:00:57 -0700 (PDT)
-Message-ID: <1ccc3268-5977-40e4-8790-d0fe535a1329@kernel.dk>
-Date: Mon, 23 Jun 2025 09:00:56 -0600
+        d=1e100.net; s=20230601; t=1750690883; x=1751295683;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e12FTwFtz4sV1UkZylA7otkUya2j0xykUDCjLjiczB0=;
+        b=Tnd+W1Ipq9y2XNJ/oweViTvfc5j4ifjHGqC9i6Aqo3t9gChBao9juTiZx6xxkpnZQ3
+         Zmglif7HBEvsOa64q6zc029EAPvPAfxzNLUg2ly/ldgPvf8PLlhn460X/NPWzlvP5kMk
+         QgjGAE6E8NsYk6FOmbnggvLGxp2nCCEehVt8r+zKvUkA0OHIdhUnxGut1IjI8DGTzXV+
+         DyxU11tyKiG8T/HUGPYS9QxUQUcFD7PHJ8buL4R+TaNPqSt+fManvwmkqSnh72TmR3cH
+         +qWHCJbe3KEr99Ajc5KJ684+Tb24jw0lD+rNyHjgvxP6OM0DSjccbh0bF/9MRsvgoK3G
+         OoBQ==
+X-Gm-Message-State: AOJu0YyORqg+5ZbwD3G9Y5xFWFeGqVCSAA7JFdD0Q0Nk4mOIdJuQR9Pq
+	QRu+WBhkKyWShOv9wc3OBySYBHHtF+mI+yGG64EhD2d1tVWsEXOXwv3/ZAtUkV6c5HM=
+X-Gm-Gg: ASbGncs6824igyYwdHQSg1VQMo6EE75/BvV+bo45SIlxpUSnqFtdnX7D70bURvm2ANz
+	7zg0HgSYDiW6XpA9O66wDtvaIWTO0+MnbUxUJiQ24hvC4/ytbZcbKvRsL46RYGnopigDPUftFdG
+	KSrjByTq+aFkWhNqIlJPgPebGgnlxsDtASwd/SVao95APda1jnh5tSrZFPke6rGH1sCExqWt2oJ
+	rzuCzn7hIB2w2x1GJHZbzCXwu0JJO//6jYVtylS6cMinA6yjeWakexxOUWh66Vbs+AMLjNNGLd0
+	p3ANGOOrOyfMgZ3GVeaT2YcoSd6iC0aFXRW++QM2esau/Bjcy45nsA==
+X-Google-Smtp-Source: AGHT+IGi8tgAngjx8JCTmimwDLIle5eZHSxrUUJ6vtXCGMkHWEBUYNEJ+ETEzVSa87f+OYzrXIsSpQ==
+X-Received: by 2002:a17:903:1988:b0:234:ed31:fc96 with SMTP id d9443c01a7336-237d9954d67mr198312765ad.26.1750690883317;
+        Mon, 23 Jun 2025 08:01:23 -0700 (PDT)
+Received: from [127.0.0.1] ([12.48.65.201])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d873b5d2sm86886405ad.246.2025.06.23.08.01.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 08:01:22 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Jason Xing <kerneljasonxing@gmail.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>
+In-Reply-To: <cover.1750065793.git.asml.silence@gmail.com>
+References: <cover.1750065793.git.asml.silence@gmail.com>
+Subject: Re: (subset) [PATCH v5 0/5] io_uring cmd for tx timestamps
+Message-Id: <175069088204.49729.7974627770604664371.b4-ty@kernel.dk>
+Date: Mon, 23 Jun 2025 09:01:22 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/5] io_uring cmd for tx timestamps
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- Richard Cochran <richardcochran@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Jason Xing <kerneljasonxing@gmail.com>
-References: <cover.1750065793.git.asml.silence@gmail.com>
- <efd53c47-4be9-4a91-aef1-7f0cb8bae750@kernel.dk>
- <20250617152923.01c274a1@kernel.org>
- <520fa72f-1105-42f6-a16f-050873be8742@kernel.dk>
- <20250617154103.519b5b9d@kernel.org>
- <1fb789b2-2251-42ed-b3c2-4a5f31bca020@kernel.dk>
- <20250620124643.6c2bdc14@kernel.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250620124643.6c2bdc14@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-d7477
 
-On 6/20/25 1:46 PM, Jakub Kicinski wrote:
-> On Fri, 20 Jun 2025 08:31:25 -0600 Jens Axboe wrote:
->> On 6/17/25 4:41 PM, Jakub Kicinski wrote:
->>> On Tue, 17 Jun 2025 16:33:20 -0600 Jens Axboe wrote:  
->>>> Can we put it in a separate branch and merge it into both? Otherwise
->>>> my branch will get a bunch of unrelated commits, and pulling an
->>>> unnamed sha is pretty iffy.  
->>>
->>> Like this?
->>>
->>>  https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git timestamp-for-jens  
->>
->> Branch seems to be gone?
+
+On Mon, 16 Jun 2025 10:46:24 +0100, Pavel Begunkov wrote:
+> Vadim Fedorenko suggested to add an alternative API for receiving
+> tx timestamps through io_uring. The series introduces io_uring socket
+> cmd for fetching tx timestamps, which is a polled multishot request,
+> i.e. internally polling the socket for POLLERR and posts timestamps
+> when they're arrives. For the API description see Patch 5.
 > 
-> Ah, I deleted when I was forwarding to Linus yesterday.
-> I figured you already pulled, sorry about that.
-> I've pushed it out again now.
+> It reuses existing timestamp infra and takes them from the socket's
+> error queue. For networking people the important parts are Patch 1,
+> and io_uring_cmd_timestamp() from Patch 5 walking the error queue.
+> 
+> [...]
 
-I've pulled it now, thanks Jakub.
+Applied, thanks!
 
+[2/5] io_uring/poll: introduce io_arm_apoll()
+      commit: 162151889267089bb920609830c35f9272087c3f
+[3/5] io_uring/cmd: allow multishot polled commands
+      commit: b95575495948a81ac9b0110aa721ea061dd850d9
+[4/5] io_uring: add mshot helper for posting CQE32
+      commit: ac479eac22e81c0ff56c6bdb93fad787015149cc
+[5/5] io_uring/netcmd: add tx timestamping cmd support
+      commit: 9e4ed359b8efad0e8ad4510d8ad22bf0b060526a
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
 
