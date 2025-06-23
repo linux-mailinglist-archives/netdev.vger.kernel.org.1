@@ -1,100 +1,126 @@
-Return-Path: <netdev+bounces-200144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62695AE35C2
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:34:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5379AE3628
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F07D41650A4
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:34:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 973A81706E0
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484A41DED4A;
-	Mon, 23 Jun 2025 06:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E701E0DE8;
+	Mon, 23 Jun 2025 06:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BjXMs0HS"
+	dkim=pass (1024-bit key) header.d=murena.io header.i=@murena.io header.b="ip5sLEiB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail2.ecloud.global (mail2.ecloud.global [135.181.6.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCBDBA33;
-	Mon, 23 Jun 2025 06:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750660469; cv=none; b=iBp1aY+43JTRLlixNF0nj/deTXxcuyNUsRxDybEs9GrB0nYlrH+rv7w1VJTxOQhj7x0VkuZyCLj9ELNvZTKD1pBElm/r9zeIhVkFr6RdN3uWFYTSuWvAPt9mIF4HIRBTKuov1/bYQ0VrcFLrO6LjBU+Y2b00S/LN5yz3MOvDH7s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750660469; c=relaxed/simple;
-	bh=4C6wXd+Eo26Qy37WMRqveXHtHM5MhD9wkvtfxwvTAxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RkAWG2Yz9ksIJqemwo+omtftFGT/lnWNMUF7jdOcMHpDFAIvgPFSOgL5cp/x1M7t9SRDjoWe26z4ctoqrNDPj9hFTb43NIYWLjZVoCTdH4Spe8Ne3I9iFx9aXz8FJdwJeW6D5+nfzuBnVt2m8VBc6l2tWsw8Xc3Xw+r2qaOSNrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BjXMs0HS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 184EBC4CEED;
-	Mon, 23 Jun 2025 06:34:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750660468;
-	bh=4C6wXd+Eo26Qy37WMRqveXHtHM5MhD9wkvtfxwvTAxk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BjXMs0HSZ/fkqEHhPxPmQ/2qIq6mwXllao9DJWgUNtpchNh0SpnExy8d0k3vyFOBK
-	 lrLwczroAQ9joHePT21xiaY1LTFudGpxMEGroh459DjOylLItCQfduWgN14HRKfEPD
-	 XPwuLzINUTqu4pRZUxAagMdhixGXI18eusmnklpx0qutapC6EB/de2AxdTerUHXQE1
-	 IaIruIdaHjYxZMk3oyzDaWhKdxHdya3BsF4XySjX16zvKJNw/11OWy8jDOgfpFiHbX
-	 RsRIGo4/wGnexy8N8lr6VvIzVLKfmIwXsvh45g2/wvTc7sNN8pzp2okrw6Vo5D4QLB
-	 PS3AEqkAcna9A==
-Date: Mon, 23 Jun 2025 08:34:26 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: George Moussalem <george.moussalem@outlook.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH RESEND net-next v5 1/2] dt-bindings: net: qca,ar803x: Add
- IPQ5018 Internal GE PHY support
-Message-ID: <26v6yklme3bbw3h4eze4z27cgr67ovymee5mc6nay23zt4xfcv@37sus6dp3g7x>
-References: <20250613-ipq5018-ge-phy-v5-0-9af06e34ea6b@outlook.com>
- <20250613-ipq5018-ge-phy-v5-1-9af06e34ea6b@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D26B78F51;
+	Mon, 23 Jun 2025 06:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=135.181.6.248
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750661284; cv=pass; b=A8KeBfuCxWxBsQl/I/srW7LKkIKzHI53dSxPrwjV27Yu26KttPYGvsdhiCygylLqAtnyVgsJtKyMP2DrmdFzqz0WPo67IDIScQiRxfWDe7wFMCGb5iBHlP3hZideHh8DtVAI/JOmO+D2i6NfzTz72D+P9x78c0j6pSEZDFT25dQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750661284; c=relaxed/simple;
+	bh=0j/Z5yh5tbFiw8rk0QBBfNVRu8U4mrVCE94WwPQ4NYw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=te/wElwKpboR7v6KYX/hZ1V1+sK3yTVJSSg6puyeq5J6QiEBjWjr/u4516UrbXBaHhlo3A6ISTZyqzWa/u1rdVOw5Y4QzVZv4aG6atT6oZDvCxZCDmhJRECG6ozkKurCJ8xpn/kz0gbVmOq+ygWmPeBsqFjc8UWUmnSdm5kXtfQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=murena.io; spf=pass smtp.mailfrom=murena.io; dkim=pass (1024-bit key) header.d=murena.io header.i=@murena.io header.b=ip5sLEiB; arc=pass smtp.client-ip=135.181.6.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=murena.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=murena.io
+Received: from authenticated-user (mail2.ecloud.global [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail2.ecloud.global (Postfix) with ESMTPSA id 297857209A4;
+	Mon, 23 Jun 2025 06:40:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=murena.io; s=mail2;
+	t=1750660838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oLgpNtx/boIApBv5pSWc//bswQhEsFbXQypbXTIeykY=;
+	b=ip5sLEiBUhLNEb7dQe1Iz9dBtnXg4R38RsViRxUSbeXJzoioSdD6Ex6VQv3l53AKvBcBCU
+	iMetLjvnRLSXxbczpkWTZwWfYOyL5JO/pn0M+AVhtOZg20Ac8ba/9F6BfFK3HA7Xl+AOTm
+	1E5k+po1T1Qm5/VSUdFSXQiZz8nJhoc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=murena.io;
+	s=mail2; t=1750660838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oLgpNtx/boIApBv5pSWc//bswQhEsFbXQypbXTIeykY=;
+	b=c+kjGhqvGy47p2nqRb2Oa1q399S8ukOiSgu404gkJiJ7WFTR0x8CSs0fryDoQau4WJXwUN
+	2iN4ZIGS7GOs+OZ+4AFADlWJGlC5DpAsPVjiJbQhVJ/VSn5h0Rh2rslNkcVTHFavdV+1rB
+	TfJ6y4Bb+mbirIcm1c80LbSVeIRCgxU=
+ARC-Authentication-Results: i=1;
+	mail2.ecloud.global;
+	auth=pass smtp.mailfrom=maud_spierings@murena.io
+ARC-Seal: i=1; s=mail2; d=murena.io; t=1750660838; a=rsa-sha256; cv=none;
+	b=FAuKfniINvB77wTngpcUPVsI6Eq1dqhr/efasdsLnGMRsweZEfFWLJz4ihNJrR8nJAP11F
+	S/5Bgx/b4h2VcGTBtywDSPcOe90me7Ir0KrcC5tLMGPcqTnipQmzFAcYbA2x5Nn9JLHZk6
+	9R88Q3nWaOQwKdhiBihu5KjMB8KVp7Q=
+Message-ID: <4cb09d05-d1f2-4d34-b3f7-be523b900a9e@murena.io>
+Date: Mon, 23 Jun 2025 08:40:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250613-ipq5018-ge-phy-v5-1-9af06e34ea6b@outlook.com>
+To: inochiama@gmail.com
+Cc: alex@ghiti.fr, alexander.sverdlin@gmail.com, andrew+netdev@lunn.ch,
+ aou@eecs.berkeley.edu, conor+dt@kernel.org, conor.dooley@microchip.com,
+ davem@davemloft.net, devicetree@vger.kernel.org, dlan@gentoo.org,
+ edumazet@google.com, huangze@whut.edu.cn, krzk+dt@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, looong.bin@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, palmer@dabbelt.com,
+ paul.walmsley@sifive.com, richardcochran@gmail.com, robh@kernel.org,
+ sophgo@lists.linux.dev, thomas.bonnefille@bootlin.com,
+ unicorn_wang@outlook.com, yu.yuan@sjtu.edu.cn
+References: <20250623003049.574821-2-inochiama@gmail.com>
+Subject: Re: [PATCH net-next RFC v2 1/4] dt-bindings: net: Add support for
+ Sophgo CV1800 dwmac
+Content-Language: en-US
+From: Maud Spierings <maud_spierings@murena.io>
+In-Reply-To: <20250623003049.574821-2-inochiama@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 13, 2025 at 05:55:07AM +0400, George Moussalem wrote:
-> Document the IPQ5018 Internal Gigabit Ethernet PHY found in the IPQ5018
-> SoC. Its output pins provide an MDI interface to either an external
-> switch in a PHY to PHY link scenario or is directly attached to an RJ45
-> connector.
+Inochi sent:> The GMAC IP on CV1800 series SoC is a standard Synopsys
+> DesignWare MAC (version 3.70a).
 > 
-> The PHY supports 10/100/1000 mbps link modes, CDT, auto-negotiation and
-> 802.3az EEE.
+> Add necessary compatible string for this device.
 > 
-> For operation, the LDO controller found in the IPQ5018 SoC for which
-> there is provision in the mdio-4019 driver.
-> 
-> Two common archictures across IPQ5018 boards are:
-> 1. IPQ5018 PHY --> MDI --> RJ45 connector
-> 2. IPQ5018 PHY --> MDI --> External PHY
-> In a phy to phy architecture, the DAC needs to be configured to
-> accommodate for the short cable length. As such, add an optional boolean
-> property so the driver sets preset DAC register values accordingly.
-> 
-> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 > ---
->  .../devicetree/bindings/net/qca,ar803x.yaml        | 43 ++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
+>  .../bindings/net/sophgo,cv1800b-dwmac.yaml    | 113 ++++++++++++++++++
+>  1 file changed, 113 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml b/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml
+> new file mode 100644
+> index 000000000000..2821cca26487
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml
+> @@ -0,0 +1,113 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/sophgo,cv1800b-dwmac.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Sophgo SG2044 DWMAC glue layer
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+This looks like a copy paste error
 
-Best regards,
-Krzysztof
+kind regards,
+Maud
 
 
