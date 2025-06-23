@@ -1,174 +1,248 @@
-Return-Path: <netdev+bounces-200380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB76DAE4BC5
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:28:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79664AE4BE6
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:31:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0105E3B674B
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:28:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE4B117C05F
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34DE729C33E;
-	Mon, 23 Jun 2025 17:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D6F2C15BF;
+	Mon, 23 Jun 2025 17:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYx84aum"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aqRm8aGZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A2A24DCE8;
-	Mon, 23 Jun 2025 17:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EAB26D4F7
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 17:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750699702; cv=none; b=JzUM6bXMDkWvyOjnmRFBeS2FsLL8nU05RhZVKdvzkQuvlA1Zqhdpgrx3ImR5k/UgJvIJOqBr51WcOsBOuziMnyGGoETukSYaE3Nc1c7mSk1zbMOS+VMmt5daBPcKDnZce4nCOhm8SksuS4sCappUxEW0dvxvx2Afq1rgx5UXTTI=
+	t=1750699754; cv=none; b=KyM+AfMZanhDFyFuFhK92+nZZjdalagQUOuNdMD0hK5wGdJvh6ZUo5tCt2CTQMBFkfpvRLHcGAEYUyNvg6OaGOB5cGHC+CDYo/ZMxJwl5d7036uZgTOerIt4DZMsCJCXhxgToGii5dtlfXbfNcUoVnYis4kPsx9XHlEwKbg3VJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750699702; c=relaxed/simple;
-	bh=BKFHG1TZj0wH0Mbf97cZKgERHKEsh5xVnOC37I/adho=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PhJ/RepGotbE4D8F+AWogdYpJsQVOqEkInGWZA6ADPd07leGylzysXRHaDhJ0Q8s+AtpAIPyQSVE+HZ8kZRPlcWwwK149ISm5HBpd7Js4hrF7idFMzo/5L57tQL5F7rzgQN4Mc+i/+oGtXW3NDW19+GQYjCouyx3j7Li6d0/LTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYx84aum; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 096F8C4CEEA;
-	Mon, 23 Jun 2025 17:28:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750699701;
-	bh=BKFHG1TZj0wH0Mbf97cZKgERHKEsh5xVnOC37I/adho=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=oYx84aum6T7+6l+/3kaxv+fGXDnlOEagHMS6f/NTraXLWN8taBQSZY/TyrvnD0PfQ
-	 7PDWfhxrMfkk5NJhCPbNDCfjEl6qllusuGQRLEuVw3Ag4fsLCAY8wcSFEZ3aGh3Ggr
-	 jkO1nEbwG69iIIFpmHXJsHiNShi8lNoh1veizW9reqk9OjH5qQA9fjjhEjzZ0QueYW
-	 xO07m864QiWWVDxSe42qScgI6ZiLv933h3OsNgdGnqhkZwGuRcfQY8ogROTq/VTTvh
-	 Cb3jhYyrNd2hWLkodUe3nOY4sFWYpt7eAwVyTSqdPjypLDMhFKEcSSe6BlZ5CRzLGM
-	 gSWUq8SNItmIw==
-Message-ID: <61c653aa5f298ded89f35eef76374b3138d17b02.camel@kernel.org>
-Subject: Re: [PATCH v15 5/9] ref_tracker: allow pr_ostream() to print
- directly to a seq_file
-From: Jeff Layton <jlayton@kernel.org>
-To: Krzysztof Karas <krzysztof.karas@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"	
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman	
- <horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
- <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,  Simona Vetter
- <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>, Joonas
- Lahtinen	 <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>,  Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki
- Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,  Nathan
- Chancellor	 <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- linux-kernel@vger.kernel.org, 	netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, 	intel-gfx@lists.freedesktop.org
-Date: Mon, 23 Jun 2025 13:28:17 -0400
-In-Reply-To: <kd4urnnwx22njawv54ppewljkwlh2usqa4iengp64bpxyevpad@26vjqeu3dvn3>
-References: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
-	 <20250618-reftrack-dbgfs-v15-5-24fc37ead144@kernel.org>
-	 <kd4urnnwx22njawv54ppewljkwlh2usqa4iengp64bpxyevpad@26vjqeu3dvn3>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1750699754; c=relaxed/simple;
+	bh=9VJr66AymgyrWSqzi9KM6q7jBDUmUFepkatWROn4V+E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O1CnJF/96RcInxQgnDY3nL66Z97m8MQwm9Xk4cOe7nmhERX/KfzmQUYI1bW8aRiN9t1DjQhgJA1PlctVqtzcZvR75gzjatJcaAisFJF9ZFcZ2ogYVbztMRFpA/zausEFOTHm8T9X2L3KCord4/MSdZ728iKGIYBLOjv2mXy7DBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aqRm8aGZ; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-237f270513bso13245ad.1
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:29:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750699751; x=1751304551; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ih7l7aGR3GQBtt1mBj++NsVHfE7pPQqbo93fSE/REN0=;
+        b=aqRm8aGZF/vuTwPC0skz775rJiLilO8+IWlpC1vtIwaVePWpr+CSxuLDs50i2D09yY
+         +3TlOe/e+Qgff1iwuDso6/0Aj0c72cpQzU8YROj/QC60lJHYc6V9DJ5lh/WN8RAivVg2
+         X2U56sNlyAf9gI21l9EZ/WElYMsUTbyc1viDHY0+362nCmcFL8xzq9W76uHdi2X8BDhM
+         MtOzpil36fMlOC7LCw29fXi+iRR+5A3Y8QewFFwkCZuwdCdfoVkXfl2I3bjxWpOdmE38
+         ELbuwDzNbY/49DtvBpSGgkzp1YTaRdDmRDM2GBYVqvPI55Wzf8VdoUa03v4dasA/wC89
+         YTFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750699751; x=1751304551;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ih7l7aGR3GQBtt1mBj++NsVHfE7pPQqbo93fSE/REN0=;
+        b=HiCL/LnHDUIuIoWqtCokG4EHnOS8eRzkH/PHdD0Xiy+Iw77uquNpGn2inJ1oUU10Yu
+         ZlDdTeX86JRHKk39Fag2HorNNkGumMcv9TcIaugmP3WoqSjYDU6KQgHVUjVwJsX1Rbmx
+         LBF8JdAhr1hTS+5M4sqv1YIzKXyBu6V5sU6DobchMEz2Yu+jZReP4zC2qckBsYFyXTsp
+         DJhBbCUzpGWM6h6OBtFg26TPZPCpIaLNKbtcEGuuAfd2XqW6xfXgp0y1VKn6Zr4/a+vO
+         ZK6YywWMTukwbUh1jhfryqpF/4qiLjyIbKRp5on6a0DKoWMDJA9dfwjbc8qnefGvvx1+
+         0sFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXFZ7WX+tkFGcAJnYK8wGZhoVZt7yQWcJmaoJp/P5EKrLOVxlkRCcQuBsYDVHNvoeZA4Zhn4Jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgZ4iKfz6/0fubWuXP7XACxURLzt1jdL9EdZK1RH0jpR7FAX/7
+	Vhab8Hvq7KZ8R9T7dwzG+K091eF4YNDPcfx8kBtTTVPQDf042L1W1I2ED7mEIu4z1R6FRiyaU2d
+	v065voLk4zOCU4JFMuUtx2q3EvGF83fECA5qNAtxG
+X-Gm-Gg: ASbGncsOo9bvxSMgcZ2VWOjEJ8iC/MVDkndS1e1bAr/nA3fldq9N1zFQeSeEWompUEl
+	SdLHc9seRzCIGXs5vsTlI5kp3HyXnexCvTQpR4RyHp7ABCpeIyx6v06HPxkzaquaCFELgA2dl+e
+	Yoh3uRzB0LOPfOzIc5P+hwSOZnxklGTRMXgmJcwztdByJNN77BWBunoVCkWS+pXKFIAjHlolyy
+X-Google-Smtp-Source: AGHT+IHIz3m807Q22lF6oC6dBirj1kMW3oRTCSHc3amqhbrzf7C+H/Ag+dMxGhkxJLFATRZHjXv5ZTgwnpv8fDxM7rQ=
+X-Received: by 2002:a17:903:1249:b0:234:b2bf:e67f with SMTP id
+ d9443c01a7336-237e574becdmr4816395ad.9.1750699750291; Mon, 23 Jun 2025
+ 10:29:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250620041224.46646-1-byungchul@sk.com> <20250620041224.46646-10-byungchul@sk.com>
+ <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com> <20250623101622.GB3199@system.software.com>
+ <460ACE40-9E99-42B8-90F0-2B18D2D8C72C@nvidia.com> <a8d40a05-db4c-400f-839b-3c6159a1feab@redhat.com>
+ <41e68e52-5747-4b18-810d-4b20ada01c9a@gmail.com>
+In-Reply-To: <41e68e52-5747-4b18-810d-4b20ada01c9a@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 23 Jun 2025 10:28:57 -0700
+X-Gm-Features: AX0GCFtw51Pg4R-sTvdTCfrVPdo1Tdq4h4FqSXVGmxppvQKlqjgu8IQOHqwvWOA
+Message-ID: <CAHS8izPRVBhz+55DJQw1yjBdWqAUo7y4T6StsyD_dkL3X1wcGQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 9/9] page_pool: access ->pp_magic through
+ struct netmem_desc in page_pool_page_is_pp()
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>, Byungchul Park <byungchul@sk.com>, 
+	willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
+	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
+	andrew+netdev@lunn.ch, toke@redhat.com, tariqt@nvidia.com, 
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, lorenzo.stoakes@oracle.com, 
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com, 
+	mhocko@suse.com, horms@kernel.org, linux-rdma@vger.kernel.org, 
+	bpf@vger.kernel.org, vishal.moola@gmail.com, hannes@cmpxchg.org, 
+	jackmanb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-06-23 at 14:01 +0000, Krzysztof Karas wrote:
-> Hi Jeff,
->=20
-> [...]
-> > +static __maybe_unused int
-> > +ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file=
- *seq)
-> > +{
-> > +	struct ostream os =3D { .func =3D pr_ostream_seq,
-> > +			      .prefix =3D "",
-> This is also a "ref_tracker_*" function, so maybe use the same
-> prefix as in other functions? I mean .prefix =3D "ref_tracker:".
-> Unless, you have a reason for leaving it empty ;)
->=20
+On Mon, Jun 23, 2025 at 10:05=E2=80=AFAM Pavel Begunkov <asml.silence@gmail=
+.com> wrote:
+>
+> On 6/23/25 15:58, David Hildenbrand wrote:
+> > On 23.06.25 13:13, Zi Yan wrote:
+> >> On 23 Jun 2025, at 6:16, Byungchul Park wrote:
+> >>
+> >>> On Mon, Jun 23, 2025 at 11:16:43AM +0200, David Hildenbrand wrote:
+> >>>> On 20.06.25 06:12, Byungchul Park wrote:
+> >>>>> To simplify struct page, the effort to separate its own descriptor =
+from
+> >>>>> struct page is required and the work for page pool is on going.
+> >>>>>
+> >>>>> To achieve that, all the code should avoid directly accessing page =
+pool
+> >>>>> members of struct page.
+> >>>>>
+> >>>>> Access ->pp_magic through struct netmem_desc instead of directly
+> >>>>> accessing it through struct page in page_pool_page_is_pp().  Plus, =
+move
+> >>>>> page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_d=
+esc
+> >>>>> without header dependency issue.
+> >>>>>
+> >>>>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> >>>>> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> >>>>> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> >>>>> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+> >>>>> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+> >>>>> Acked-by: Harry Yoo <harry.yoo@oracle.com>
+> >>>>> ---
+> >>>>>    include/linux/mm.h   | 12 ------------
+> >>>>>    include/net/netmem.h | 14 ++++++++++++++
+> >>>>>    mm/page_alloc.c      |  1 +
+> >>>>>    3 files changed, 15 insertions(+), 12 deletions(-)
+> >>>>>
+> >>>>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> >>>>> index 0ef2ba0c667a..0b7f7f998085 100644
+> >>>>> --- a/include/linux/mm.h
+> >>>>> +++ b/include/linux/mm.h
+> >>>>> @@ -4172,16 +4172,4 @@ int arch_lock_shadow_stack_status(struct tas=
+k_struct *t, unsigned long status);
+> >>>>>     */
+> >>>>>    #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> >>>>>
+> >>>>> -#ifdef CONFIG_PAGE_POOL
+> >>>>> -static inline bool page_pool_page_is_pp(struct page *page)
+> >>>>> -{
+> >>>>> -     return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
+> >>>>> -}
+> >>>>> -#else
+> >>>>> -static inline bool page_pool_page_is_pp(struct page *page)
+> >>>>> -{
+> >>>>> -     return false;
+> >>>>> -}
+> >>>>> -#endif
+> >>>>> -
+> >>>>>    #endif /* _LINUX_MM_H */
+> >>>>> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> >>>>> index d49ed49d250b..3d1b1dfc9ba5 100644
+> >>>>> --- a/include/net/netmem.h
+> >>>>> +++ b/include/net/netmem.h
+> >>>>> @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_c=
+ount);
+> >>>>>     */
+> >>>>>    static_assert(sizeof(struct netmem_desc) <=3D offsetof(struct pa=
+ge, _refcount));
+> >>>>>
+> >>>>> +#ifdef CONFIG_PAGE_POOL
+> >>>>> +static inline bool page_pool_page_is_pp(struct page *page)
+> >>>>> +{
+> >>>>> +     struct netmem_desc *desc =3D (struct netmem_desc *)page;
+> >>>>> +
+> >>>>> +     return (desc->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
+> >>>>> +}
+> >>>>> +#else
+> >>>>> +static inline bool page_pool_page_is_pp(struct page *page)
+> >>>>> +{
+> >>>>> +     return false;
+> >>>>> +}
+> >>>>> +#endif
+> >>>>
+> >>>> I wonder how helpful this cleanup is long-term.
+> >>>>
+> >>>> page_pool_page_is_pp() is only called from mm/page_alloc.c, right?
+> >>>
+> >>> Yes.
+> >>>
+> >>>> There, we want to make sure that no pagepool page is ever returned t=
+o
+> >>>> the buddy.
+> >>>>
+> >>>> How reasonable is this sanity check to have long-term? Wouldn't we b=
+e
+> >>>> able to check that on some higher-level freeing path?
+> >>>>
+> >>>> The reason I am commenting is that once we decouple "struct page" fr=
+om
+> >>>> "struct netmem_desc", we'd have to lookup here the corresponding "st=
+ruct
+> >>>> netmem_desc".
+> >>>>
+> >>>> ... but at that point here (when we free the actual pages), the "str=
+uct
+> >>>> netmem_desc" would likely already have been freed separately (rememb=
+er:
+> >>>> it will be dynamically allocated).
+> >>>>
+> >>>> With that in mind:
+> >>>>
+> >>>> 1) Is there a higher level "struct netmem_desc" freeing path where w=
+e
+> >>>> could check that instead, so we don't have to cast from pages to
+> >>>> netmem_desc at all.
+>
+> As you said, it's just a sanity check, all page pool pages should
+> be freed by the networking code. It checks the ownership with
+> netmem_is_pp(), which is basically the same as page_pool_page_is_pp()
+> but done though some aliasing.
+>
+> static inline bool netmem_is_pp(netmem_ref netmem)
+> {
+>         return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) =3D=3D PP_SI=
+GNATURE;
+> }
+>
+> I assume there is no point in moving the check to skbuff.c as it
+> already does exactly same test, but we can probably just kill it.
+>
 
-I have a reason to leave it empty.
+Even if we do kill it, maybe lets do that in a separate patch, and
+maybe a separate series. I would recommend not complicating this one?
 
-That is the prefix for each line that gets printed by the pr_ostream()
-call. This one is for the lines that go to the debugfs files. I think
-it will be redundant to prepend every line in these files with
-"ref_tracker: ".
+Also, AFAIU, this is about removing/moving the checks in
+bad_page_reason() and page_expected_state()? I think this check does
+fire sometimes. I saw at least 1 report in the last year of a
+bad_page_reason() check firing because the page_pool got its
+accounting wrong and released a page to the buddy allocator early, so
+maybe that new patch that removes that check should explain why this
+check is no longer necessary.
+
 --=20
-Jeff Layton <jlayton@kernel.org>
+Thanks,
+Mina
 
