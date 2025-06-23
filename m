@@ -1,107 +1,101 @@
-Return-Path: <netdev+bounces-200394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BBCAE4CCD
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:27:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CABAE4CD9
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 20:29:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C4673B7CDC
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:27:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C6DA3ABBB7
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362FB1C84D0;
-	Mon, 23 Jun 2025 18:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC622D3A80;
+	Mon, 23 Jun 2025 18:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YXI94wCG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOmo0Uyv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10911C07F6;
-	Mon, 23 Jun 2025 18:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1A853BE;
+	Mon, 23 Jun 2025 18:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750703247; cv=none; b=GAqeZ6qhHBeDIBx4GJ1Bt5nO+7lyLX3vimEnJ667UjAkIbLYvFDmqHI/SvoLlXz3DJHGIegmTC3MH9aOTvq0SPh7aAhLmyGmt5AZ4FNV04TUKpODAPGFkw2IZq1Pm830idxDrMolIhI7X00XMdSctnlVAZeKNi6Q36gtP2JQyQA=
+	t=1750703382; cv=none; b=SiPdiwmgKWDmiVwHsRjyBWqqwI800YtpqXyzwijxNjxfBy6IAU6MbD8ElyZWFFSlX2rDKHmHKt0rshrBX6zPh4xoeB2ttzTqWStjMb1dFQz3ml0UlwxjrFWBweDl4seBdBiAc22IGZktAeSBENb7BVGqyhcMrCSkTrCCYzA1cFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750703247; c=relaxed/simple;
-	bh=QKXndZMyfb7p1e0Wg1A7S+bTfVPj5+F3kMyJbJcoiAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o4LW8tdzHjsr3JFGUGL1fln4dpS4yl3aWVN8aVGfD0J4LrViZ7xWR0BcnZvKhQyhEI1UgHhwt44lvzJrMrJjmQA0xGvlh2vriAjK3c6/WnNQ0kEoeWP4Va/9XZbZVbskKSy7TgPfC8XqHL+eZu/U+SdLDyUbA6X5MEo2cwrn84Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YXI94wCG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yTO3YdBSku104YsDHmadAMJYlJFGtvsp+k7l1sVkgSg=; b=YXI94wCGPdOe2CSM6CC4T+f6Rk
-	s67hx3V6dimXQeRJaWcv0iJpYTreqPJ1GAJtE2RG6zijyvgwEotQkcTR6PkSPsSECwHwMobeAY0WT
-	tbRRgl3SMECeUH7B5QTEI0gX6c1f6+vslJkZ1kIGzRKmVZ/+Cpp8BePYS5rAEztTIUVg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uTlsv-00Gij3-1s; Mon, 23 Jun 2025 20:27:13 +0200
-Date: Mon, 23 Jun 2025 20:27:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Michal Simek <michal.simek@amd.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net 4/4] net: axienet: Split into MAC and MDIO drivers
-Message-ID: <c543674a-305e-4691-b600-03ede59488ef@lunn.ch>
-References: <20250619200537.260017-1-sean.anderson@linux.dev>
- <20250619200537.260017-5-sean.anderson@linux.dev>
- <16ebbe27-8256-4bbf-ad0a-96d25a3110b2@lunn.ch>
- <0854ddee-1b53-472c-a4fe-0a345f65da65@linux.dev>
+	s=arc-20240116; t=1750703382; c=relaxed/simple;
+	bh=DuV8Yun1lWZ3oSW7rIJg5T8e5u0ZEQ+SP0liO9MVO3Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=arAF9kcHpAt9gdIPyDBPnNup/uVZ7HU3QgyExhB5Wtq2l4c3NhzDKuMnhwcOKf3SjaBnUgPTaSpRMNFAT45v4HA/T8JQTroQj3WADiSspHZcuJn2yJPxhRTTlwsadXc1oFE6bzPujhH7XgghPhxX64tNeRkbsQTuoQlqaEUWrPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOmo0Uyv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B2C6C4CEEA;
+	Mon, 23 Jun 2025 18:29:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750703381;
+	bh=DuV8Yun1lWZ3oSW7rIJg5T8e5u0ZEQ+SP0liO9MVO3Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AOmo0UyvrRlt1Fx96qYaSu48tm/BSdpAy6PBODxz2orDihTk5dsvfyP1eVtn7a/2+
+	 F1zAorzCbMIIsgNIwQMK0j0O5mBYkjYwDAhZLtLkqfec9pn300Ygqt2b7PXy2OHcjM
+	 dvkbEbe1ei00nZ2rVsi2otQqL7Qqcw0j9aP8tjdAIoHufGqsWW555LiB8AtRg39BRu
+	 8LkgThbs6yAvafsw3mgHiP6E3gMJmORJHj5IJHs972tJjHkIWUixBfMjwJJoD2Q3Nr
+	 YQ3CniVmkVgazbbvEUR05g4eUGmx+uJ8eSUe9FCqivLWickB+1sSrb8nSmHmbucly3
+	 bHLy4lwZb+Oog==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEEC38111DD;
+	Mon, 23 Jun 2025 18:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0854ddee-1b53-472c-a4fe-0a345f65da65@linux.dev>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND net-next v5 0/2] Add support for the IPQ5018
+ Internal GE PHY
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175070340876.3258656.5575686241109513013.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Jun 2025 18:30:08 +0000
+References: <20250613-ipq5018-ge-phy-v5-0-9af06e34ea6b@outlook.com>
+In-Reply-To: <20250613-ipq5018-ge-phy-v5-0-9af06e34ea6b@outlook.com>
+To: George Moussalem <george.moussalem@outlook.com>
+Cc: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+ andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ f.fainelli@gmail.com, p.zabel@pengutronix.de, konradybcio@kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org
 
-On Mon, Jun 23, 2025 at 11:16:08AM -0400, Sean Anderson wrote:
-> On 6/21/25 03:33, Andrew Lunn wrote:
-> > On Thu, Jun 19, 2025 at 04:05:37PM -0400, Sean Anderson wrote:
-> >> Returning EPROBE_DEFER after probing a bus may result in an infinite
-> >> probe loop if the EPROBE_DEFER error is never resolved.
-> > 
-> > That sounds like a core problem. I also thought there was a time
-> > limit, how long the system will repeat probes for drivers which defer.
-> > 
-> > This seems like the wrong fix to me.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 13 Jun 2025 05:55:06 +0400 you wrote:
+> The IPQ5018 SoC contains an internal Gigabit Ethernet PHY with its
+> output pins that provide an MDI interface to either an external switch
+> in a PHY to PHY link architecture or directly to an attached RJ45
+> connector.
 > 
-> I agree. My first attempt to fix this did so by ignoring deferred probes
-> from child devices, which would prevent "recursive" loops like this one
-> [1]. But I was informed that failing with EPROBE_DEFER after creating a
-> bus was not allowed at all, hence this patch.
+> The PHY supports 10BASE-T/100BASE-TX/1000BASE-T link modes in SGMII
+> interface mode, CDT, auto-negotiation and 802.3az EEE.
+> 
+> [...]
 
-O.K. So why not change the order so that you know you have all the
-needed dependencies before registering the MDIO bus?
+Here is the summary with links:
+  - [RESEND,net-next,v5,1/2] dt-bindings: net: qca,ar803x: Add IPQ5018 Internal GE PHY support
+    https://git.kernel.org/netdev/net-next/c/82eaf94d69fc
+  - [RESEND,net-next,v5,2/2] net: phy: qcom: at803x: Add Qualcomm IPQ5018 Internal PHY support
+    https://git.kernel.org/netdev/net-next/c/d46502279a11
 
-Quoting your previous email:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> Returning EPROBE_DEFER after probing a bus may result in an infinite
-> probe loop if the EPROBE_DEFER error is never resolved. For example,
-> if the PCS is located on another MDIO bus and that MDIO bus is
-> missing its driver then we will always return EPROBE_DEFER.
 
-Why not get a reference on the PCS device before registering the MDIO
-bus?
-
-	Andrew
 
