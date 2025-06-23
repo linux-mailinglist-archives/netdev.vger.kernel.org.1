@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-200180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF61AE3971
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:07:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C22AAAE397E
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2DB7175525
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:06:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 257CA3A7589
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA3A22F74E;
-	Mon, 23 Jun 2025 09:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6791232392;
+	Mon, 23 Jun 2025 09:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="tA9tnhD6"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="geSi1W42"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A1A1F30BB
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE8E233134
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750669600; cv=none; b=D7ddqSyDtjeXdK+B4B13nniGqiq/6HJgM1yN9CyUGZZ1Zt0yC4Yc4WY47eG6e0++I7jzon62sUaK/RTiMGizNy6iDapqSn0tvyFwp9LHcLP/q9H70mTJgA9sv2eOxbsJH2Q4Md9uk5Ya2azytEMN3WZZ4pXxaP7Ph1bcUvzO1XU=
+	t=1750669624; cv=none; b=YGUf/lhXT1lD+mjPTF2cDNTabm2vlyqymU6ZV1eNLPepkruqd1K7jFrKyYX0xM21aMx9qK7U2aPN1WjRSBhvLqWpNaeKqxA2DMmh+I/brh4DXW/jiCDTEgXrW/NfZPYkP/dOI32b5cLLMqtusjBnmK6LdOCaeTs8C6z3i1On6FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750669600; c=relaxed/simple;
-	bh=NplCcx7sOXvlDjDGShpLbLZzNcDPmjan4xA+/QRgM+4=;
+	s=arc-20240116; t=1750669624; c=relaxed/simple;
+	bh=EflMIV+kkp7UhsZ9tUS4w48sTU3134OYm+F+GPclhF4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jB40kiwdEYVt+mvP8xwxwUbUNaWXytNW1orbVYWKFGK7IvRODUo3ExnnktA1Yub1uReD2Qgtvblj8sFotKW1DeE3kxbS2hY7fVzl4TdneuwP0lC0AqsMVumD3YXh/sS28ZkP/y0QXU7XWS8bx48JxzAuLCVTPjfrnjwwSL6kEVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=tA9tnhD6; arc=none smtp.client-ip=209.85.208.54
+	 In-Reply-To:Content-Type; b=c/ZBrgF87lqUISSSpPGlARFZOU7GPjOU31w/2YFkbu5tQnIT1Bvwgi2/uKqei0z9VPbIqpJ6CkcHtc5X2avUOL+qny61uGm114ivGRXHZPdxKePCQeh9pC35j3YdepvMzGGhKf9CoCBaa7GygykKykFiSOAsw/czpLWx2JCNDXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=geSi1W42; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-604bff84741so7366179a12.2
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 02:06:38 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-60768f080d8so6956153a12.1
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 02:07:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1750669597; x=1751274397; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1750669621; x=1751274421; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ey45mjsLzFT2alZQ43V/e5P4ouEuI9k+6FzGtpkIa8o=;
-        b=tA9tnhD6b5DTBr+bbLYUyVzpBKA7hAhGX9f9fzoyV+6zBf1ZIdCtn765Z+rz3VbLcV
-         1ihPqqlbPnfBwSF675PMBQwWcd2u23j2JO2goXhrckl6EPIyVhAb70Ycj0djTCDsswN7
-         pLjRJP744JuuXQZFn5Li8EsuHT6ytG4z3BeYL7n+paKA6cpq7koSyLUVr6KGbVsJyziG
-         2IcjTyvtGOcY+I8U1dfdLKpiP7uv/BRx5JCxMA/9zQNJMPAZH3fQ3/X6beDvx8B1Y0te
-         ZOROYXMzVc/tfihzrZ8p4YXLy6Rzgve/cXuD6WId69NweNh16Tij3lheOTbiAP1TrPMw
-         5O/Q==
+        bh=mwpLh1YokKB/zuRQcdVqUx5WgOSKBlw+lHCDlHkU3ak=;
+        b=geSi1W42ZP3Fvlk8cLscl6JoGCkivwbFmkzdyGRvF5IIqgrmSA4P0dUcJiaqeytmOs
+         aeNj31HUCmAwt2ivN0X25mFwYYD8YvHlVmRxFN6bEMdawfnvFLgehM8Bo0SPonEXuR1D
+         NX5nzVbIv2+vgUL9Q8IFygtymPDN+IskuTSBCZf1dg6mU5qWyuZ1BgDZTzUHvsb9iKqN
+         n6rV/yLjRpZMwRfGwcsBfSjXFuAoyi9mM6ky428IeVDwwSnbUbujlEByLbr2G34GoSl9
+         DXH3eRT09PsLrK+WQdKSFKZz82wcQQDJmc9qqb4r2GbfeCjccR8gquWfwYtHH5okyWva
+         Oinw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750669597; x=1751274397;
+        d=1e100.net; s=20230601; t=1750669621; x=1751274421;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ey45mjsLzFT2alZQ43V/e5P4ouEuI9k+6FzGtpkIa8o=;
-        b=IUU5quj5vwjrmynFsttlxjyIVd52X3vBPpbyji9ZBLyR7oJLClMlLaN5lwUR4aN55I
-         DBvqWksWdSl6AHPJu91cfYSpMqSbXJOEeidwgEd7svD65v303Cvc4cR6CejNs9+7bqs7
-         b365DbFdHDIGarGzfu06g8ZiJpnt19aK9YVyqX2t4YJTbUPJv98bF6vrtL2I6B9GzJ5R
-         cvi0UkLnbh/94Bi9JV/7SLCDb6olBoR2ywMRD49Z4Xy32Ene2952mF40pK3wzZKWWC4C
-         +SzTZJqHZ/QhkvFjsPhP309c9WcQiRN5i7FUu52elFrqSHLRK33hmBPLIDJMGsjtd2Ce
-         5NVg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4Jvpjtnyx8j27wTJkx0Zw/+KfDs229x6v6USUrVc6UxA9QpjNc7tPtTZblFigD8kwf1trXmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXLW+ToSGe/zyDb8mm5M+NoodqmsX3NiBvB65de+w/JPSEtvUu
-	0MR6KcCGNYp4Jh0HbCtR7jpDHvhsI+/M/KstTIL0ahAhyOZYYhP1d5zimM+5JJzUxTM=
-X-Gm-Gg: ASbGnctI2bXBjhLjqHddEfa/PLBSgpqhj3U2DfxXIoDHxDww3Zn8azeO5ro3rbvpiF0
-	jIeg8NIEXlJnJJ9xaNOVzd3R8GS9Ck/ZlgIoaU9zhTMxRsoTd5xtkn4/0b0DsGc4dGkimrW/Uhk
-	9MpzvU5lPz2c0fN6iXG7A1Ohs1crv/MiG2rsodc7XU77gfnlQSkfxOfRbVJwe0X0VS4mXMzDoN4
-	RZ0FffvrPq88LQ00Uiy/B0oRS203/+5Nl80H73TXop9YXWWmlx1r93LQrxFYmrHmfQLwtN7HwzK
-	JpDq28cJVgO7oazxO7RxIGUXeyL66Wt5DZfMO8n8n2uvK83oRjNnlVDl/BOMrvVghoW7axIG3HC
-	TnWPhQMtZoYCGYfFfKA==
-X-Google-Smtp-Source: AGHT+IFGuDV0WJYvzUIRo4zGv+/lfxQm1RgBphY+vdx+pduqP9EOGUI2FTqk9mV29+Pn1Tk6nwgVgw==
-X-Received: by 2002:a05:6402:28a8:b0:606:c5f9:8aea with SMTP id 4fb4d7f45d1cf-60a1cd1d83amr8899589a12.16.1750669596719;
-        Mon, 23 Jun 2025 02:06:36 -0700 (PDT)
+        bh=mwpLh1YokKB/zuRQcdVqUx5WgOSKBlw+lHCDlHkU3ak=;
+        b=AKDXA5ZAG7RxLlV8QCv+XmvQ2358bvrHN9XnPGXLXZ3x0fomEoEq5Snfr2DE8cMDEH
+         tewQfKN2Hwxw5o6VV31H2iDODnx+E7esz9bdyGJABBwnoY48g9J0RspT/N+isRmJOcwY
+         4TfMfi3WgglziWjcE8NTByY3LiKvH00CxOw0LMuUqtXfHk3kDlUCzL+UVcS5R0iiqPrc
+         4lnVGbTw26+lv9NZ90/jzqqkayNG8Efa4fNUwG6KNjDowxtFyQ4hgyjxK4C/uDyuXnH2
+         j4BvZarQZKxCRYMcfiHu0ML7orodvJwocKyWDMZPZGa7OEhC5mtqYlz1ISXb906R3J5+
+         i/Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCWmnimQ7DF6bO7tDDZWQLz4J55RMA3jIUQUuAgAaa5YbvY16sZGs1WmC+W+xhAKtVgQNlvayfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRShIUaKHS73JVOkpBcbnLNkKW96EaQrsjvmQppFO69r/XBZBd
+	hbATD4/SJWradifDv3UegCUJSppDWzImoqWStz+3cVsuoAO2wU46koW4Yn0I4nYTXaM=
+X-Gm-Gg: ASbGncvwJhWm1nXObpWgKDlaGNgSabm00B40UoI/uZ7dFrIJZJvNzjaq7RiVUrfWFvY
+	mmu1kO5M341Qd2/GyyIS2ujysw/5EnqWqAhQrutcGjfalPRLRBU6GauVTBjrAEhid4EGgrF0YK1
+	M+zMuMaye3dDhGlJaT/x7oFRZrYm/83Ol4cOT+cG8lfSrP6EXZfOoviAXuSHCBFqIkuyhpEEiTU
+	mMF4IJEMCaYh5JrmVsaN3d4XC/jv0CF3+RzlVP2j0aahH22Jbf2i1n5KVDP+2Xx4ZpL7pUDDQDc
+	dxH8P+4YTvw88d9T+HM6eeheL632Wr/YKRVjWXQ9+nlNL24lyiXUO9NgQV5j3+opdwTCZ7d8x/m
+	qzKHpQZODp9j0NVXlaA==
+X-Google-Smtp-Source: AGHT+IFoNeREHCLZ5lXZKiX4iyr7z14GOgxcoVyAK+9phPgUtXE2KzB2nCOBwExmYB7dNfFG0ZnKiA==
+X-Received: by 2002:a17:907:7fa7:b0:ad9:db54:ba47 with SMTP id a640c23a62f3a-ae057f65a32mr1036698966b.43.1750669620951;
+        Mon, 23 Jun 2025 02:07:00 -0700 (PDT)
 Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60a18542a3esm5761882a12.23.2025.06.23.02.06.35
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae053e7d1basm671019666b.25.2025.06.23.02.06.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 02:06:35 -0700 (PDT)
-Message-ID: <ca883bc3-84e7-4ff9-81fa-cc7755b2bdb7@blackwall.org>
-Date: Mon, 23 Jun 2025 12:06:34 +0300
+        Mon, 23 Jun 2025 02:07:00 -0700 (PDT)
+Message-ID: <fe7f1941-77c5-41a7-b892-ec4f42d45e9f@blackwall.org>
+Date: Mon, 23 Jun 2025 12:06:58 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,132 +82,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v4 1/3] bridge: move mcast querier dumping
- code into a shared function
+Subject: Re: [PATCH iproute2-next v4 2/3] bridge: dump mcast querier per vlan
 To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
 Cc: dsahern@gmail.com, idosch@nvidia.com, bridge@lists.linux-foundation.org,
  entwicklung@pengutronix.de
 References: <20250623084518.1101527-1-f.pfitzner@pengutronix.de>
- <20250623084518.1101527-2-f.pfitzner@pengutronix.de>
+ <20250623084518.1101527-3-f.pfitzner@pengutronix.de>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250623084518.1101527-2-f.pfitzner@pengutronix.de>
+In-Reply-To: <20250623084518.1101527-3-f.pfitzner@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 6/23/25 11:45, Fabian Pfitzner wrote:
-> Put mcast querier dumping code into a shared function. This function
-> will be called from the bridge utility in a later patch.
+> Dump the multicast querier state per vlan.
+> This commit is almost identical to [1].
 > 
-> Adapt the code such that the vtb parameter is used
-> instead of tb[IFLA_BR_MCAST_QUERIER_STATE].
+> The querier state can be seen with:
+> 
+> bridge -d vlan global
+> 
+> The options for vlan filtering and vlan mcast snooping have to be enabled
+> in order to see the output:
+> 
+> ip link set [dev] type bridge mcast_vlan_snooping 1 vlan_filtering 1
+> 
+> The querier state shows the following information for IPv4 and IPv6
+> respectively:
+> 
+> 1) The ip address of the current querier in the network. This could be
+>    ourselves or an external querier.
+> 2) The port on which the querier was seen
+> 3) Querier timeout in seconds
+> 
+> [1] https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=16aa4494d7fc6543e5e92beb2ce01648b79f8fa2
 > 
 > Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
 > ---
+>  bridge/vlan.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> I decided to not only move the code into a separate function, but also
-> to adapt it to fit into the function. If I split it into a pure refactoring
-> and an adapting commit, the former will not compile preventing git bisects.
-> 
->  include/bridge.h   |  3 +++
->  ip/iplink_bridge.c | 58 ++------------------------------------------
->  lib/bridge.c       | 60 ++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 65 insertions(+), 56 deletions(-)
-> 
-> diff --git a/include/bridge.h b/include/bridge.h
-> index 8bcd1e38..b2f978f4 100644
-> --- a/include/bridge.h
-> +++ b/include/bridge.h
-> @@ -3,9 +3,12 @@
->  #define __BRIDGE_H__ 1
-> 
->  #include <linux/if_bridge.h>
-> +#include <linux/rtnetlink.h>
-> 
->  void bridge_print_vlan_flags(__u16 flags);
->  void bridge_print_vlan_stats_only(const struct bridge_vlan_xstats *vstats);
->  void bridge_print_vlan_stats(const struct bridge_vlan_xstats *vstats);
-> 
-> +void bridge_print_mcast_querier_state(const struct rtattr* vtb);
-> +
->  #endif /* __BRIDGE_H__ */
-> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-> index 31e7cb5e..4e1f5147 100644
-> --- a/ip/iplink_bridge.c
-> +++ b/ip/iplink_bridge.c
-> @@ -682,62 +682,8 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->  			   rta_getattr_u8(tb[IFLA_BR_MCAST_QUERIER]));
-> 
->  	if (tb[IFLA_BR_MCAST_QUERIER_STATE]) {
-> -		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
-> -		SPRINT_BUF(other_time);
-> -
-> -		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, tb[IFLA_BR_MCAST_QUERIER_STATE]);
-> -		memset(other_time, 0, sizeof(other_time));
-> -
-> -		open_json_object("mcast_querier_state_ipv4");
-> -		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
-> -			print_string(PRINT_FP,
-> -				NULL,
-> -				"%s ",
-> -				"mcast_querier_ipv4_addr");
-> -			print_color_string(PRINT_ANY,
-> -				COLOR_INET,
-> -				"mcast_querier_ipv4_addr",
-> -				"%s ",
-> -				format_host_rta(AF_INET, bqtb[BRIDGE_QUERIER_IP_ADDRESS]));
-> -		}
-> -		if (bqtb[BRIDGE_QUERIER_IP_PORT])
-> -			print_uint(PRINT_ANY,
-> -				"mcast_querier_ipv4_port",
-> -				"mcast_querier_ipv4_port %u ",
-> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
-> -		if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER])
-> -			print_string(PRINT_ANY,
-> -				"mcast_querier_ipv4_other_timer",
-> -				"mcast_querier_ipv4_other_timer %s ",
-> -				sprint_time64(
-> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]),
-> -									other_time));
-> -		close_json_object();
-> -		open_json_object("mcast_querier_state_ipv6");
-> -		if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
-> -			print_string(PRINT_FP,
-> -				NULL,
-> -				"%s ",
-> -				"mcast_querier_ipv6_addr");
-> -			print_color_string(PRINT_ANY,
-> -				COLOR_INET6,
-> -				"mcast_querier_ipv6_addr",
-> -				"%s ",
-> -				format_host_rta(AF_INET6, bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]));
-> -		}
-> -		if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
-> -			print_uint(PRINT_ANY,
-> -				"mcast_querier_ipv6_port",
-> -				"mcast_querier_ipv6_port %u ",
-> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
-> -		if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER])
-> -			print_string(PRINT_ANY,
-> -				"mcast_querier_ipv6_other_timer",
-> -				"mcast_querier_ipv6_other_timer %s ",
-> -				sprint_time64(
-> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]),
-> -									other_time));
-> -		close_json_object();
-> +		struct rtattr *vtb = tb[IFLA_BR_MCAST_QUERIER_STATE];
-> +		bridge_print_mcast_querier_state(vtb);
+> diff --git a/bridge/vlan.c b/bridge/vlan.c
+> index 14b8475d..d2770eff 100644
+> --- a/bridge/vlan.c
+> +++ b/bridge/vlan.c
+> @@ -852,6 +852,10 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
+>  		print_uint(PRINT_ANY, "mcast_querier", "mcast_querier %u ",
+>  			   rta_getattr_u8(vattr));
 >  	}
+> +	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]) {
+> +		struct rtattr *attr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE];
+> +		bridge_print_mcast_querier_state(attr);
+> +	}
+>  	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION]) {
+>  		vattr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION];
+>  		print_uint(PRINT_ANY, "mcast_igmp_version",
+> --
+> 2.39.5
 > 
->  	if (tb[IFLA_BR_MCAST_HASH_ELASTICITY])
 
-Please run checkpatch against the patches before sending them.
+Same warning here,
 
 WARNING: Missing a blank line after declarations
-#175: FILE: ip/iplink_bridge.c:685:
-+		struct rtattr *vtb = tb[IFLA_BR_MCAST_QUERIER_STATE];
-+		bridge_print_mcast_querier_state(vtb);
-
-
+#112: FILE: bridge/vlan.c:857:
++		struct rtattr *attr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE];
++		bridge_print_mcast_querier_state(attr);
 
 
