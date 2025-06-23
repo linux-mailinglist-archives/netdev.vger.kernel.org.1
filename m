@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-200260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6C3AE3FA3
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:21:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49112AE3FC2
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 14:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3E9F1795F0
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:16:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D55B3A67DC
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EB52571C8;
-	Mon, 23 Jun 2025 12:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72442512DD;
+	Mon, 23 Jun 2025 12:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XBOkkLeu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqIRZf6S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387D21CAA96;
-	Mon, 23 Jun 2025 12:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCFF246781;
+	Mon, 23 Jun 2025 12:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750680741; cv=none; b=WIdrE+UgojR9T2fpDutK2lCSSeHBbYU9lewSpsN0jAR/cMIll2OIlppK/mOfHzR3nRLFYOBSj4u6dmQZoU7x4qgexAxiF/FmTkoGVnrC2CPU58/I1RfV7CH/5SEZ7OZb19i9ILRD4M0DoJUechlzvED7zLMqVqztxPTlZgJV6DA=
+	t=1750680821; cv=none; b=kHDi/wrsQtG0f6EB8Su/WEcGH5qZubo4HJN5pTDFTzsOefXaobwrv5o5T+C4bQIw7OGciDIVvYxCOOBJJwU/3EeXt65d9q5A6zKpsXFg0L3nAuuFsfFu3QOCngx/zDxUSVVhevxjQTMAj8jA2l4QrIrnJklaPt/UOlgLlMaGpOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750680741; c=relaxed/simple;
-	bh=loOUJIQr+qUEW6o9ZxGsrjaE4988YPr7iwZh3UArESo=;
+	s=arc-20240116; t=1750680821; c=relaxed/simple;
+	bh=ueR3nwsqBvhrycpfvVhVdbKTsds3A/sZLdw2rshMJas=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LY11FDB5MEXDoZXbsU0PgEvmCNiStKM21T1kvIJSkuJwrN1aixoUTLxDClAN8korExARnDDVVvcKlcisBBRe+wquPOIQjKUqdM9z1XSrx8b/7Hh8VywFYxxxRICowbOjJ1uSG3BFFIIZDH7vt9wtsJSTc+nAcvU9rBmAzkDKxRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XBOkkLeu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6020DC4CEEA;
-	Mon, 23 Jun 2025 12:12:16 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=rhUDz2jzaaIrr19z2Tr/SpB4QYqHmfs/hZoVWg+5/PYPBo6YonS4DoI+J3rOW6mYD+2W+onu8ejX43E9rdOzHCqkUJD/+q6TvxdECKSPi3LWxA98ODoY8TYhGomU8tDwvx/khy9VJfT2KQf0AOqZDTivXNHDgGaHUtaZudZHtsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqIRZf6S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4DB2C4CEEA;
+	Mon, 23 Jun 2025 12:13:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750680740;
-	bh=loOUJIQr+qUEW6o9ZxGsrjaE4988YPr7iwZh3UArESo=;
+	s=k20201202; t=1750680821;
+	bh=ueR3nwsqBvhrycpfvVhVdbKTsds3A/sZLdw2rshMJas=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XBOkkLeu5kmfliNt9G/hdS1pmLkw614one20LVvyu1XHTcO5DZ9Kmg7OLmON5K0fG
-	 1QhwZglMpkvnEaudY4Whgk9Zivh8iUetQhyAirAvQXH9/mdryiVI0UtyAQgJ+PC526
-	 M5doIi/1rjGJ3WNu9DgCCE8ZEdk3+UnPjNwb5nuZmGBkXvlRssweoJTiATNX5fQ2Ms
-	 T4e+AcASfagtUmcDIJHpVEqyO/C6u4kPkRpeZ6KURKqKYJSvrIV70NcoiqJdvmL6kI
-	 IIIIOgefj8TTaXBCcKOfQN3KvwMZE6x56rGwJ0LfmAaBCqJ7xpH40Dck84wy3tfMgg
-	 t95vFUAuE5MOQ==
-Message-ID: <ef64816f-0ba2-4a12-bef8-aa10e44793e1@kernel.org>
-Date: Mon, 23 Jun 2025 14:12:14 +0200
+	b=oqIRZf6SgwCntYShV6rYOoNG6ZfwNIcaMs6ZOpNYBu5xNpW37ev9/Nr8Bx3/j68Mo
+	 tewirxnpq56dPeguPEl6ZoLgTtCoVxM+0aa+E/zPALL5UCtkdQcgOcovZgpBe2m3RR
+	 CcuIayIAIWCNItmG5JfLEGmTGkPdHUr8ZbU7AGVhihit9HylPg56ZzppCYLcsUZ6DM
+	 yuoAOIxKipMcuRLLd9mIuhmCTiFGd+G9jMIYzIEirOWo+DUcI0RnU/Wh5wLNFEcTqH
+	 WqIYpbAUIA/afqwm9cUgk2VHglGL4vvRrS5Ygol8ai2d27lgsuv2egWr4I5+k2CyCb
+	 bJWJfMyfhgzxg==
+Message-ID: <2bc23bcf-0021-44dd-ae42-9ef0e95e3b32@kernel.org>
+Date: Mon, 23 Jun 2025 14:13:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/30] dt-bindings: clock: mediatek: Describe MT8196
- peripheral clock controllers
+Subject: Re: [PATCH 29/30] dt-bindings: reset: Add MediaTek MT8196 Reset
+ Controller binding
 To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
  sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
  matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
@@ -62,7 +62,7 @@ Cc: guangjie.song@mediatek.com, wenst@chromium.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
  kernel@collabora.com
 References: <20250623102940.214269-1-laura.nao@collabora.com>
- <20250623102940.214269-10-laura.nao@collabora.com>
+ <20250623102940.214269-30-laura.nao@collabora.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -108,180 +108,35 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250623102940.214269-10-laura.nao@collabora.com>
+In-Reply-To: <20250623102940.214269-30-laura.nao@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 23/06/2025 12:29, Laura Nao wrote:
-> +properties:
-> +  compatible:
-> +    items:
-> +      - enum:
-> +          - mediatek,mt8196-adsp
-> +          - mediatek,mt8196-imp-iic-wrap-c
-> +          - mediatek,mt8196-imp-iic-wrap-e
-> +          - mediatek,mt8196-imp-iic-wrap-n
-> +          - mediatek,mt8196-imp-iic-wrap-w
-> +          - mediatek,mt8196-mdpsys0
-> +          - mediatek,mt8196-mdpsys1
-> +          - mediatek,mt8196-pericfg-ao
-> +          - mediatek,mt8196-pextp0cfg-ao
-> +          - mediatek,mt8196-pextp1cfg-ao
-> +          - mediatek,mt8196-ufscfg-ao
-> +          - mediatek,mt8196-vencsys
-> +          - mediatek,mt8196-vencsys-c1
-> +          - mediatek,mt8196-vencsys-c2
-> +          - mediatek,mt8196-vdecsys
-> +          - mediatek,mt8196-vdecsys-soc
-> +      - const: syscon
+> From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> 
+> Add a binding for the PEXTP0/1 and UFS reset controllers found in
+> the MediaTek MT8196 Chromebook SoC.
+> 
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> Signed-off-by: Laura Nao <laura.nao@collabora.com>
+> ---
+>  .../reset/mediatek,mt8196-resets.h            | 26 +++++++++++++++++++
 
-Why everything is syscon?
+This belongs to the binding doc.
 
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  '#clock-cells':
-> +    const: 1
-> +
-> +  '#reset-cells':
-> +    const: 1
-> +
-> +  mediatek,hardware-voter:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description: A phandle of the hw voter node
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - '#clock-cells'
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    pericfg_ao: clock-controller@16640000 {
-> +        compatible = "mediatek,mt8196-pericfg-ao", "syscon";
-> +        reg = <0x16640000 0x1000>;
-> +        mediatek,hardware-voter = <&scp_hwv>;
-> +        #clock-cells = <1>;
-> +    };
-> +  - |
-> +    pextp0cfg_ao: clock-controller@169b0000 {
-> +        compatible = "mediatek,mt8196-pextp0cfg-ao", "syscon";
-> +        reg = <0x169b0000 0x1000>;
-> +        #clock-cells = <1>;
-> +        #reset-cells = <1>;
-> +    };
-> diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
+>  1 file changed, 26 insertions(+)
+>  create mode 100644 include/dt-bindings/reset/mediatek,mt8196-resets.h
+> 
+> diff --git a/include/dt-bindings/reset/mediatek,mt8196-resets.h b/include/dt-bindings/reset/mediatek,mt8196-resets.h
 > new file mode 100644
-> index 000000000000..363ebe87c525
+> index 000000000000..1a01b2b01f7f
 > --- /dev/null
-> +++ b/Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
-> @@ -0,0 +1,76 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/clock/mediatek,mt8196-sys-clock.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek System Clock Controller for MT8196
-> +
-> +maintainers:
-> +  - Guangjie Song <guangjie.song@mediatek.com>
-> +  - Laura Nao <laura.nao@collabora.com>
-> +
-> +description: |
-> +  The clock architecture in MediaTek SoCs is structured like below:
-> +  PLLs -->
-> +          dividers -->
-> +                      muxes
-> +                           -->
-> +                              clock gate
-> +
-> +  The apmixedsys, apmixedsys_gp2, vlpckgen, armpll, ccipll, mfgpll and ptppll
-> +  provide most of the PLLs which are generated from the SoC's 26MHZ crystal oscillator.
-> +  The topckgen, topckgen_gp2 and vlpckgen provide dividers and muxes which
-> +  provide the clock source to other IP blocks.
-> +
-> +properties:
-> +  compatible:
-> +    items:
-> +      - enum:
-> +          - mediatek,mt8196-apmixedsys
-> +          - mediatek,mt8196-armpll-b-pll-ctrl
-> +          - mediatek,mt8196-armpll-bl-pll-ctrl
-> +          - mediatek,mt8196-armpll-ll-pll-ctrl
-> +          - mediatek,mt8196-apmixedsys-gp2
-> +          - mediatek,mt8196-ccipll-pll-ctrl
-> +          - mediatek,mt8196-mfgpll-pll-ctrl
-> +          - mediatek,mt8196-mfgpll-sc0-pll-ctrl
-> +          - mediatek,mt8196-mfgpll-sc1-pll-ctrl
-> +          - mediatek,mt8196-ptppll-pll-ctrl
-> +          - mediatek,mt8196-topckgen
-> +          - mediatek,mt8196-topckgen-gp2
-> +          - mediatek,mt8196-vlpckgen
-> +      - const: syscon
+> +++ b/include/dt-bindings/reset/mediatek,mt8196-resets.h
+> @@ -0,0 +1,26 @@
+> +/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-2-Clause) */
 
-Why everything is syscon?
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  '#clock-cells':
-> +    const: 1
-> +
-> +  mediatek,hardware-voter:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description: A phandle of the hw voter node
-
-Do not copy property name to description, but say something useful - for
-what? And why this cannot be or is not a proper interconnect?
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - '#clock-cells'
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    apmixedsys_clk: syscon@10000800 {
-> +        compatible = "mediatek,mt8196-apmixedsys", "syscon";
-> +        reg = <0x10000800 0x1000>;
-> +        #clock-cells = <1>;
-> +    };
-> +  - |
-> +    topckgen: syscon@10000000 {
-> +        compatible = "mediatek,mt8196-topckgen", "syscon";
-> +        reg = <0x10000000 0x800>;
-> +        mediatek,hardware-voter = <&scp_hwv>;
-> +        #clock-cells = <1>;
-> +    };
-> +
-
-
-
-> +#define CLK_OVL1_DLO9					56
-> +#define CLK_OVL1_DLO10					57
-> +#define CLK_OVL1_DLO11					58
-> +#define CLK_OVL1_DLO12					59
-> +#define CLK_OVL1_OVLSYS_RELAY0				60
-> +#define CLK_OVL1_OVL_INLINEROT0				61
-> +#define CLK_OVL1_SMI					62
-> +
-> +
-> +/* VDEC_SOC_GCON_BASE */
-> +#define CLK_VDE1_LARB1_CKEN				0
-> +#define CLK_VDE1_LAT_CKEN				3
-
-IDs increment by 1, not 3.
-
-
+Wrong license, use standard ones.
 
 Best regards,
 Krzysztof
