@@ -1,81 +1,95 @@
-Return-Path: <netdev+bounces-200437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37C4AE5826
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:49:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6ADAE5828
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:49:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B4547AAFBE
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:47:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B4FE4A573E
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 23:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BA5226D1D;
-	Mon, 23 Jun 2025 23:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1B422D9ED;
+	Mon, 23 Jun 2025 23:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaE4FWW8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMV3yzoL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471EE1AD3FA;
-	Mon, 23 Jun 2025 23:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD42226D1D;
+	Mon, 23 Jun 2025 23:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750722556; cv=none; b=cArkgrK3jqUr8kOp6SBTMDCorWZF848VHvhMF6AuOW26j8GoHjExr26tzR6dw+5waWPEURM0QjDC2MD6f0+GLD26DV22DxKk2wXl6Rmt4cnlHhneSFD3Njr1hdu2oX68PkEvsHKu43k32jZ9kU/g0nc3yxf/bgb8LV7NLrd6AR0=
+	t=1750722580; cv=none; b=t1UWNNUE1oog/2RkI5bijZZJOSnh37i0/0H3ZaxN4mwF9jEOZStZqErqyieGbWyDW/4lMbgYrGo32+OMOkic60xg5fZa6znp9hhlugC4ks+8ygpHZtBRTst/kJz5R1TL0hmFh9+SxG4ovcM/kmht4qa00kPcOfLKnYz/F+HiC8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750722556; c=relaxed/simple;
-	bh=5zjktm3bvgS8F32IewejBkzrMzWz2OzlZ2/SPTwAo2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W7eUB5dk/GXCnhvTHBop7vNXs9/SPIhemKACa9Umhp4Legq7aqdc4ENr8RYHnTo7QAo9M3SPv7d2j4lKJrzqvq9gcQjrCMFHyooeupoRgzNQMVXAUzLW6ldSB8afKpWVpo0mCwPeoEC6uPtgxJVTb9+mzE882JdE36m8UOtjRkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaE4FWW8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429CEC4CEEA;
-	Mon, 23 Jun 2025 23:49:14 +0000 (UTC)
+	s=arc-20240116; t=1750722580; c=relaxed/simple;
+	bh=JXf4iqa6uVPdc95/3ut6i4KOOl+285/4w9IgaOmNnvo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Bp/J9gnGUobcORrldFFNIdb6J4dYrd16GOjaeUW1JT+73AAC6NPL8xIVktVrDWJy0ca0ED7+xazEJJ/CeAEGyLibiTomfm5oyiV0z8SXHStmtJo/d3ix9K2dBvv6KSSZyBINRT2ueQa+mYj8Yalilyjc36QMLiFLNNY9n3Oc0mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rMV3yzoL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8356C4CEEA;
+	Mon, 23 Jun 2025 23:49:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750722554;
-	bh=5zjktm3bvgS8F32IewejBkzrMzWz2OzlZ2/SPTwAo2I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WaE4FWW8lym7mVGZ9H6p/bRfhAc72NL/jCKb0eIhPocmVuUsign6EGcu4mUj6Xj0K
-	 rX0brAiOwrxV2hcUEbkv3C7xVsEbD8bvjjvHLol43dqE/fi9TJsoxbkH7Qo+QUaT8F
-	 F5mSwgN0fOZWgV+fo8Pk+G4S58n1r/P3ksWK5uwGzxHclWPhLDVCWfPxXiSwm82xgI
-	 EhnfJPOPulffCsg+VRoSFHlebaGOaCnHu17Bb6MyqqiIFhEU0qbnmzH1w54+kfoFhw
-	 sxo4g9yN6ZKZJRHnNryCe7Hl0MhHUfuEXNFpqx10woDSGA1eOMpJx1hO0C71GlV9Kz
-	 aJm7fw4AmHLMQ==
-Date: Mon, 23 Jun 2025 16:49:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
- <woojung.huh@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Russell
- King <rmk+kernel@armlinux.org.uk>, Thangaraj Samynathan
- <Thangaraj.S@microchip.com>, Rengarajan Sundararajan
- <Rengarajan.S@microchip.com>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v1 1/1] net: usb: lan78xx: annotate checksum
- assignment to silence sparse warnings
-Message-ID: <20250623164913.474be2b3@kernel.org>
-In-Reply-To: <20250620084618.1857662-1-o.rempel@pengutronix.de>
-References: <20250620084618.1857662-1-o.rempel@pengutronix.de>
+	s=k20201202; t=1750722578;
+	bh=JXf4iqa6uVPdc95/3ut6i4KOOl+285/4w9IgaOmNnvo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rMV3yzoLyacUcSN7NtUwK6YaC734GZeSrR8noGhYLXAcRcGs4Dbkt8cdnfdO+Jqus
+	 Gcg9FpbgjuGaHpEZJnjVGU/O372+TtdeCC6ZPlnSkYWWnde+TtuVbjdu/K38ufxLzT
+	 DXyK89J9Hs3uC2GWFAH/amxN/8/WJ+8GR3pKftDSHsAH+yDlCypJyAZ76tdBcy2KtZ
+	 ynkqzLD+r3IvoJO5rWtvsu8Tzjhbkkor4eG+63Dbvtqd+A4PtFmt3wzDIQd+jUqAoB
+	 lBBEdEF53/DPDTJiqHxY59letbj2s0nEuJbtuTSLPGKH3Iz2x5K5Vt38cNusppO/JK
+	 AUIqrpGKyGFJQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB29839FEB7D;
+	Mon, 23 Jun 2025 23:50:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] ethernet: ionic: Fix DMA mapping tests
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175072260577.3335826.15218857163577175458.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Jun 2025 23:50:05 +0000
+References: <20250619094538.283723-2-fourier.thomas@gmail.com>
+In-Reply-To: <20250619094538.283723-2-fourier.thomas@gmail.com>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: shannon.nelson@amd.com, brett.creeley@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, vladimir.oltean@nxp.com,
+ csander@purestorage.com, ap420073@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
-On Fri, 20 Jun 2025 10:46:18 +0200 Oleksij Rempel wrote:
-> -		skb->csum = ntohs((u16)(rx_cmd_b >> RX_CMD_B_CSUM_SHIFT_));
-> +		__be16 csum_raw;
-> +
-> +		csum_raw = (__force __be16)(rx_cmd_b >> RX_CMD_B_CSUM_SHIFT_);
-> +		skb->csum = (__force __wsum)ntohs(csum_raw);
+Hello:
 
-You can avoid the __force __be16 if you switch the variable to be u16
-and then htons instead of ntohs
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 19 Jun 2025 11:45:30 +0200 you wrote:
+> Change error values of `ionic_tx_map_single()` and `ionic_tx_map_frag()`
+> from 0 to `DMA_MAPPING_ERROR` to prevent collision with 0 as a valid
+> address.
+> 
+> This also fixes the use of `dma_mapping_error()` to test against 0 in
+> `ionic_xdp_post_frame()`
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] ethernet: ionic: Fix DMA mapping tests
+    https://git.kernel.org/netdev/net/c/d5e3241c5a38
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
