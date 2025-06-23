@@ -1,268 +1,412 @@
-Return-Path: <netdev+bounces-200113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF881AE33E4
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 05:13:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95AD8AE33EB
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 05:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCFB018905F2
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 03:13:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD3853AF94E
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 03:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E4D1AF0A7;
-	Mon, 23 Jun 2025 03:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="kf+Sdo+a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE6A19FA93;
+	Mon, 23 Jun 2025 03:19:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012014.outbound.protection.outlook.com [52.101.66.14])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5367C199237;
-	Mon, 23 Jun 2025 03:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750648402; cv=fail; b=g4kGvaRc3nYxzi83e0keuiIRgxagFYyKjaElPSvw2+KrOkQ3qCGV0QWsHaqO+ecqRa+rL1XXeqtq6o6qn+QPQ4ySrKmEDbh2Taz59pUIhfoSJekUEp1g65LAx1wZWG9l2lWiRjtsS9YGrglcCQ3G7kqGsoSi2r1hG7mQ3d6Yi+s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750648402; c=relaxed/simple;
-	bh=f38vrpD80L5NMQrGrk9xI2HEbgUxFpUIEAorHwp6SXs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tJ/T7mPSKXn9qEcg+yCAUmwzbF4NyKe7nS/Nuzaa6MI6EaDTTqOreMZWe4Jn7KSAvJcWo4VwQLEy+BVznTBIrhi26biwyJDiAS6AjrvSma8aGc3H61nFIXyWOXLIYWUsk8MJgQ/y3KRioOcwb2DQYBP6OxFB2+PR9IZIfxJMEwY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=kf+Sdo+a; arc=fail smtp.client-ip=52.101.66.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yuwDE01t3nyRENw7a9clDzvimeKVMfew0Nqbrt/urPXYKD1OGZT9ABUWeh41jnR7SROCS51Fx/zD2zJEqrWWcKOKSwbUjPNvla9rV5l29pZkY3KloPRbcO3zrr48AuDHniGtmKss1/HFYTtYYIi86BTdGwwKjjkyEfB1dbVXPKnFb1zzW9DWLLX/fJ0kpCEMedHblQVLJ0UtWr/7iGtGiToFzCuuZqpA59Cij2S51QT+oe9WCYuKfXyEU3hznHiX/h60ARREHzM1A9FlI+SKUfQ48DaOGd6RVgrNVIlPV44iVs9lpvb3g5/CZjfxyW7Y1KSii/6lgRpO7uPza7CMCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tO72LW7wjf8WJ8OcQBVWzogFeYAJ4ERMZi1kYHs6LbQ=;
- b=W57dp0ai6OKZ0rAM5ZOYpm/g1DLM4bbaDzizW0k3ozQyMNnMCcT6zcuO9yARN0XyjVGUsPK+7/RHimHgdN+HsbWbF3JkJkBliGWjdOi3NGb5VntQex+mFrrVkrxr6+Z5swJOKxwVwc2qzQ5SAVbolQzH2Lg2Bu6yr97YVxs+hrSyqTg1AEbd1FIY96mrz0tYsqN0A1regUlcIIJEBYEtzByGajmf0je1DRDJxkWO2o01FGIvFuv3eG3Qlklw0wkbm/hELQOHLS9Ire9FETyS1lxLwikLBApAC8twL7M2WA//MdYTAoVinAXSaPdi7jrnpFZVGs9lcpCQyjqH8d4Q8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tO72LW7wjf8WJ8OcQBVWzogFeYAJ4ERMZi1kYHs6LbQ=;
- b=kf+Sdo+azjbWhHpkEvvxDSlaZg0zzOB/sR+DVrP+HJMt5MWCMwR3aEka2SI+Pg7TUzHp18WeRN614cATqO01EDI2mfSq01foMuCLp01gkX4VdQO4wJUKq5SuPpIBFypNX7dY5xWcCc+ZUFe/yGMaHv2MsRrc0veyhekiqEhKnrqi7VHAsZ5Zb0FQOb6dOGBS1taU7cCGaxUaeXdhwF2vyOIZwInXSpZXS2BqNzit+s7WO3V3PtE2ty8fx+PWW8OkTw8p3uMJNNTC+og+er3gYarVT4sgmU955G/D5pQqI6ewz1JjqGe2dT9yyp+p1XHIbQqYUm8Uwpo+O2hQDLb1Xg==
-Received: from AM9PR04MB8505.eurprd04.prod.outlook.com (2603:10a6:20b:40a::14)
- by AM7PR04MB7095.eurprd04.prod.outlook.com (2603:10a6:20b:11c::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Mon, 23 Jun
- 2025 03:13:16 +0000
-Received: from AM9PR04MB8505.eurprd04.prod.outlook.com
- ([fe80::bb21:d7c8:f7f7:7868]) by AM9PR04MB8505.eurprd04.prod.outlook.com
- ([fe80::bb21:d7c8:f7f7:7868%4]) with mapi id 15.20.8857.026; Mon, 23 Jun 2025
- 03:13:16 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Simon Horman <horms@kernel.org>
-CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [PATCH net-next 2/3] net: enetc: separate 64-bit counters from
- enetc_port_counters
-Thread-Topic: [PATCH net-next 2/3] net: enetc: separate 64-bit counters from
- enetc_port_counters
-Thread-Index: AQHb4czMECBu5rY4X0SHhurA8ziGm7QNbRCAgAKgp6A=
-Date: Mon, 23 Jun 2025 03:13:16 +0000
-Message-ID:
- <AM9PR04MB850500D3FC24FE23DEFCEA158879A@AM9PR04MB8505.eurprd04.prod.outlook.com>
-References: <20250620102140.2020008-1-wei.fang@nxp.com>
- <20250620102140.2020008-3-wei.fang@nxp.com>
- <20250621103623.GB71935@horms.kernel.org>
-In-Reply-To: <20250621103623.GB71935@horms.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8505:EE_|AM7PR04MB7095:EE_
-x-ms-office365-filtering-correlation-id: e0d6da4f-de7e-49f3-5e37-08ddb203e5cc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?2H8HEuvWH4Kp31YTkb0GsAC1S56cNAdXpJyH8pB/lD8nnQa/FqTqDgWM/L5w?=
- =?us-ascii?Q?q3Ouk98D1cICgQHpjUvO2ltgb8N0pIbjxSZ1nXeUujdlUvQdxHWVZn/Cu2wb?=
- =?us-ascii?Q?TBtLkzjVlmlKLSEzqiZE7fphJvvgF+rB5TVVBnkVIIFia5h70OtZe5dBh1Ml?=
- =?us-ascii?Q?KROdHmK2WUTfFV+09VHrEv+gIq0qG+olAAFftHLabJhRO8/4yFjXzxiQwCeJ?=
- =?us-ascii?Q?J3uKrBPgYm7Q2BtNJnj46CStNsXjQ8MbMvLvFIxON5G8trbuWE+uf+dK8R5R?=
- =?us-ascii?Q?JynVu3AdrYt576o6gluDQbPj6rhRQ1pRZpZBL3AcAjUJqL9SCpVFxwRifSEo?=
- =?us-ascii?Q?P1qw7Phqfq1AHs4aD0reLQABq8YYhcRF2s/FaNc7jdpQfGqz77QTNFgOzuSE?=
- =?us-ascii?Q?sVCD3PipNaWxSIiqZCucf3VpmKvZ23mqAsWYfp/0djvtvB75sjS0FoZPGCEa?=
- =?us-ascii?Q?82TY1YaOvuWueBxbjgoDdxB1XDVXTCPTNuVYgwd9qEJwfPwRUdoyh3DD3h0T?=
- =?us-ascii?Q?dfUcT7XUzz81i37RDiecOqpuMWkiTjPdAzJaTMhXCiRlHc3GnDOhfRR5yzse?=
- =?us-ascii?Q?rIb2HUxAGcGJHMBC0FoBNRe8rfPguY+b1brErxh0+HwKuR2UvSBqPifJhpAy?=
- =?us-ascii?Q?jinNbVHwkxhWb+MT79hT2Ah60/jIGA/rWrRuzqGh08ZUiwTtGyG1TG4DIXMF?=
- =?us-ascii?Q?kmZIAyL6VrpmGJYNnaWbCV69w6hmYnUbQHoshyAhCPofS86dO3NRppujJ30j?=
- =?us-ascii?Q?tPEWkgAA9QzeoK2GZXDW3G2eHOx7xW4LJf5CczO/4YYjURUYw/LqIJ49mw/T?=
- =?us-ascii?Q?d0ZZV2XFRxN+/x81/GFUhyitP9S2c/zsQhN//pCgTUz5i5h7ylm2iExjyFM7?=
- =?us-ascii?Q?jYWCkfslrDLaHu+sWB7KTKb8pgIOiq4NxUhddtn9wg5H/8+V1gw4q8YTixeJ?=
- =?us-ascii?Q?hZo9nZEdxe/Czb6oNrkdtM0nbolyZcaAsrQnW6s48NazIXoSkTcpi7vg2fzY?=
- =?us-ascii?Q?9ITXAVS+f1FMB3mHKccui55hwfKhQaOW+Bd1uD2tjblaDTsk51H8iBfeoQun?=
- =?us-ascii?Q?WbKgHp4O1xBg6+niOUEQMXNeGteRo97JvbzcTXWQmWH59M8YE7QEeVVX9fy7?=
- =?us-ascii?Q?Glhi2lgCOS5JPpmrYbT/LCXqAzW1w0QCy15HS5IdcIFLjK5bkD3WnVrE/GPZ?=
- =?us-ascii?Q?cRtqPW4n2OXnzzGAgv+He2meSVDTr6TXNjXrIfRGhO7/y6Dyahe+iBZmYK0o?=
- =?us-ascii?Q?i56fSo5pZKlkjdrnErm4N5Ce40/oZ6zGANXc3A9wesWI/UQxZmn9kHZHUxN8?=
- =?us-ascii?Q?sfkB6XTifZe9js1KmdhK15y2L8wbr2BoptQa09ytsuEqiygguKaulZlJWYQo?=
- =?us-ascii?Q?yPk9b8MUminNAxiXGxXWqhVwLGlegFJhRyEW3qo37UjfV4E6QdftYlGhyx6K?=
- =?us-ascii?Q?gTyOCPjnTrJ7LyT8PxFo1Wf9r1D3+vJEqIHFPNL8shqtSSW36LH4pn3vdjye?=
- =?us-ascii?Q?vNb831H7MtT67pc=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8505.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?7IGPtGdK8ol0vREHYV45HOndhbf4f2tkiRu4gv+bGQFlQCytuAbotQuJN+dJ?=
- =?us-ascii?Q?Kv1+K5GaY01oRcxdkX6TNlTJ0O1dGmIp3OPoCatFIaLUPWWtCOi8oUUlf7az?=
- =?us-ascii?Q?r9UgNBpdkuAIGCXVAVxYdH6dh1CfbN74+JO2Yts2wSJaUVbBoqdjB2/PIzeQ?=
- =?us-ascii?Q?cIYE9KdAE5f+DLrXFF3HQkblUbbEYJGEQ9W2H/I0SilyCxwOF27ytHi22oGb?=
- =?us-ascii?Q?9jI1kOzqswIxyA/2k1cxhL1+NE1roU1/i+aLAuOYasH9O2DzqQIIP7AbumTw?=
- =?us-ascii?Q?cDY0076ahCPv69WmHEk7T4HmEKyV32X/VtkwJaRuKqlTtztHAFKGf2SSvfUm?=
- =?us-ascii?Q?AGYTkJnovDntrJoM/BNkU4ZCUM5SgrojT7xOBXGmANXhrySqkAO9I7dLnTDs?=
- =?us-ascii?Q?qJnhbHpyRxWJIqrmepG0KsKHhaY7+XHFR95BuS4/RkeQR7RjCI7mzggXsaJR?=
- =?us-ascii?Q?5svYrSRQ5kKbLwWVLQMkB48z0xBpAPzpNLUyAFUdYb42xxhYsQfSrTYUiLdG?=
- =?us-ascii?Q?of07wVhIo769ie+NF1ytEOFIzwPSEF/FY+NcsrU3SjLaXhk7Adz28KGsUy79?=
- =?us-ascii?Q?re5lKFa9sSscEg1gFqLIC3YwL4sT+PugKuYkiqPx26vLW4r/bYx+0+6QwuQw?=
- =?us-ascii?Q?rEGGuR171d3+fFCOGG92zShIp9cVQ4/qOOtvo7B3MY0YqPBQGxN0oRBNC6sj?=
- =?us-ascii?Q?F/h22vHgsoI51UjPGLcaBtIQ89UHggvSLi/fjAFlE5ANO4XBhyQRBRn0DFtW?=
- =?us-ascii?Q?xsxiLmDuLK0AoxwDAcX4FzjmXZAjU6mmm/ycCXpknFBbZSbAPLhx1EW41OBD?=
- =?us-ascii?Q?kLbUa1SIzXk52v5IapipIsOmX5vPfDKTPS5N8bBF5ocoEpkwuOJQsS+cwdhl?=
- =?us-ascii?Q?j+bWubVWXvnW0M1KDdekf8ipRABDRu4whVopcz+xv+ycKaWTxyp5kPYbQ9AL?=
- =?us-ascii?Q?39GolxDyIo7SpPKBdHODC3+bHbU39WbS3dyOG68sMk/YMxH1bPNOUOz8gLEp?=
- =?us-ascii?Q?dxRFJ5TAeG9yzSOQlVo7njSYRmbV1muoAzJE0XkL52MjgsYm8QoB/y11doib?=
- =?us-ascii?Q?U1O+EoMhDnp4vAglyvB2hxmpRS2kWdd83Ca0gCas4Tkxd19Z/saxe/QDAT9I?=
- =?us-ascii?Q?OwAoY6wKNYfd5gUfyfAR4M8mDd6Os0JeQXhNcFF7n3woEjkLmSteUDnBHooM?=
- =?us-ascii?Q?9OfTwMdC5dBvgm6QrrlPT1yPurzubv7Y8hin9kxHZLwQnHJkHLaqJlSp1Ynq?=
- =?us-ascii?Q?UV4dSwv7N3/Yokeb7b2WeNFQo7D4K1UN9HLS3yhrBu8u6qVg6mrQiNE0E9L6?=
- =?us-ascii?Q?+/175E3majc/8WH0LhOW7gpxaInb8oOxSoJrVSIRfdA2x/N8ZpHyKla1ayPp?=
- =?us-ascii?Q?nlZy/Jy3uT0/3i9euHmzT1W8gMYpVfgdDnc/ZTMDykWYQi5X/C0xJWcGLYZw?=
- =?us-ascii?Q?UyoURF69wDHt+nc+rR7tDVZhLTS2ilOkcXR3uiQ5oUOY5TAu2Pdd6+a6UI5r?=
- =?us-ascii?Q?LiTff865mhYXiUg8O2TEy/LAq7yJ2Hw/iinP5jmcSQRZYznukkz2MgCxaFFl?=
- =?us-ascii?Q?8nlovUeWxG300zInVvE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E1A1E519;
+	Mon, 23 Jun 2025 03:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750648771; cv=none; b=SpgJWsfCVagE8Uh32//1ppIx5pofx7b90SdJXkd2k1rKRfo4zChvJO15KEnAZIlCD5c8Txi9Q5XIek8TiEuPwHCRUbcdAXdH3oAbxI/1fbwrjd9Fs3EJcjk4wQKBw/9L6kuSSX0HhyGZ6tqkTm5y60I7E2IBNatmcY1n9sC0lC4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750648771; c=relaxed/simple;
+	bh=C3td4kSep2NMQJPcVJFuXKN5tO0e3P9zhipi8JTK370=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=SsVIzmc3tZhnovUtvQe2T6/uLLpbu/fKCfNE2vrGUVpHO+hnqXWp5NslV+7yRbCCOzlSxFEA/M14NkW/KPxsNPM8usr4rqWzhrdpwyUYcuvDPJEgdl5atpUnifisU11TMElStwJ5UqIuUFwc4uDWdo1xAFAKJGc9AaovhfXf7Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bQY9k6249zPswL;
+	Mon, 23 Jun 2025 11:15:22 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9510114027D;
+	Mon, 23 Jun 2025 11:19:19 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 23 Jun 2025 11:19:18 +0800
+Message-ID: <cb286135-466f-40b2-aaa5-a2b336d3a87c@huawei.com>
+Date: Mon, 23 Jun 2025 11:19:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8505.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0d6da4f-de7e-49f3-5e37-08ddb203e5cc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2025 03:13:16.6337
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iKogGul+D11k8uHuSbB7aNGSl8U/NaureCgWxJXU9miimW+4NshSLCeyIDaRE2dOyHPw3GkuOM3PzaCvvII4UQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7095
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Salil Mehta
+	<salil.mehta@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
+	<morbo@google.com>, Justin Stitt <justinstitt@google.com>, Hao Lan
+	<lanhao@huawei.com>, Guangwei Zhang <zhangwangwei6@huawei.com>, Netdev
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<llvm@lists.linux.dev>
+Subject: Re: [PATCH] hns3: work around stack size warning
+To: Jakub Kicinski <kuba@kernel.org>, Arnd Bergmann <arnd@arndb.de>
+References: <20250610092113.2639248-1-arnd@kernel.org>
+ <41f14b66-f301-45cb-bdfd-0192afe588ec@huawei.com>
+ <a029763b-6a5c-48ed-b135-daf1d359ac24@app.fastmail.com>
+ <34d9d8f7-384e-4447-90e2-7c6694ecbb05@huawei.com>
+ <20250612083309.7402a42e@kernel.org>
+ <02b6bd18-6178-420b-90ab-54308c7504f7@huawei.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <02b6bd18-6178-420b-90ab-54308c7504f7@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-> This patch looks fine to me, as does the following one.
-> However, they multiple sparse warnings relating
-> to endianness handling in the ioread32() version of _enetc_rd_reg64().
->=20
-> I've collected together my thoughts on that in the form of a patch.
-> And I'd appreciate it if we could resolve this one way or another.
->=20
-> From: Simon Horman <horms@kernel.org>
-> Subject: [PATCH RFC net] net: enetc: Correct endianness handling in
->  _enetc_rd_reg64
->=20
-> enetc_hw.h provides two versions of _enetc_rd_reg64.
-> One which simply calls ioread64() when available.
-> And another that composes the 64-bit result from ioread32() calls.
->=20
-> In the second case the code appears to assume that each ioread32()
-> call returns a little-endian value. The high and the low 32 bit
-> values are then combined to make a 64-bit value which is then
-> converted to host byte order.
->=20
-> However, both the bit shift and the logical or used to combine
-> the two 32-bit values assume that they are operating on host-byte
-> order entities. This seems broken and I assume that the code
-> has only been tested on little endian systems.
->=20
-> Correct this by converting the 32-bit little endian values
-> to host byte order before operating on them.
->=20
-> Also, use little endian types to store these values, to make
-> the logic clearer and is moreover good practice.
->=20
-> Flagged by Sparse
->=20
-> Fixes: 69c663660b06 ("net: enetc: Correct endianness handling in
-> _enetc_rd_reg64")
 
-I think the fixes tag should be:
-Fixes: 16eb4c85c964 ("enetc: Add ethtool statistics")
+on 2025/6/13 13:59, Jijie Shao wrote:
+>
+> on 2025/6/12 23:33, Jakub Kicinski wrote:
+>> On Thu, 12 Jun 2025 21:09:40 +0800 Jijie Shao wrote:
+>>> seq_file is good. But the change is quite big.
+>>> I need to discuss it internally, and it may not be completed so 
+>>> quickly.
+>>> I will also need consider the maintainer's suggestion.
+>> Please work on the seq_file conversion, given that the merge window
+>> just closed you have around 6 weeks to get it done, so hopefully plenty
+>> of time.
+>
+> Ok
+>
+> I will try to send patch as soon as possible to complete this conversion
+>
+>
+> Thanks
+> Jijie Shao
+>
+>
 
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
-> I have marked this as RFC as I am unsure that the above is correct.
->=20
-> The version of _enetc_rd_reg64() that is a trivial wrapper around
-> ioread64() assumes that the call to ioread64() returns a host byte order
-> value?
+*Hi Jakub, Arnd We have changed the impleament as your suggestion. Would 
+you please help check it ? If it's OK, we will rewrite the rest parts of 
+our debugfs code. Thanks! *
 
-Yes, ioread64() returns a host endian value, below is the definition
-of ioread64() in include/asm-generic/io.h.
+==========
 
-static inline u64 ioread64(const volatile void __iomem *addr)
-{
-	return readq(addr);
-}
+ From c62568f3e91eb5725211fde8e63d44f68452b4e3 Mon Sep 17 00:00:00 2001
+From: Jian Shen <shenjian15@huawei.com>
+Date: Thu, 19 Jun 2025 16:21:17 +0800
+Subject: [PATCH  net-next] net: hns3: clean up the build warning in debugfs by
+  use seq file
 
-static inline u64 readq(const volatile void __iomem *addr)
-{
-	u64 val;
+Arnd reported that there are two build warning for on-stasck
+buffer oversize[1]. As Arnd's suggestion, using seq file way
+to avoid the stack buffer or kmalloc buffer allocating.
 
-	log_read_mmio(64, addr, _THIS_IP_, _RET_IP_);
-	__io_br();
-	val =3D __le64_to_cpu((__le64 __force)__raw_readq(addr));
-	__io_ar(val);
-	log_post_read_mmio(val, 64, addr, _THIS_IP_, _RET_IP_);
-	return val;
-}
+Reported-by: Arnd Bergmann <arnd@kernel.org>
+Closes: https://lore.kernel.org/all/20250610092113.2639248-1-arnd@kernel.org/
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+  drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   3 +
+  .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 160 ++++++++----------
+  .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   2 +
+  3 files changed, 79 insertions(+), 86 deletions(-)
 
-And ioread32() is also defined similarly, so ioread32() also returns a
-host endian value.
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index 8dc7d6fae224..58a63d2eb69b 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -434,8 +434,11 @@ struct hnae3_ae_dev {
+      u32 dev_version;
+      DECLARE_BITMAP(caps, HNAE3_DEV_CAPS_MAX_NUM);
+      void *priv;
++    struct hnae3_handle *handle;
+  };
+  
++typedef int (*read_func)(struct seq_file *s, void *data);
++
+  /* This struct defines the operation on the handle.
+   *
+   * init_ae_dev(): (mandatory)
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 4e5d8bc39a1b..458a2944ee3c 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -3,6 +3,7 @@
+  
+  #include <linux/debugfs.h>
+  #include <linux/device.h>
++#include <linux/seq_file.h>
+  #include <linux/string_choices.h>
+  
+  #include "hnae3.h"
+@@ -41,6 +42,7 @@ static struct hns3_dbg_dentry_info hns3_dbg_dentry[] = {
+  
+  static int hns3_dbg_bd_file_init(struct hnae3_handle *handle, u32 cmd);
+  static int hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd);
++static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd);
+  
+  static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
+      {
+@@ -300,7 +302,7 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
+          .cmd = HNAE3_DBG_CMD_TX_QUEUE_INFO,
+          .dentry = HNS3_DBG_DENTRY_QUEUE,
+          .buf_len = HNS3_DBG_READ_LEN_1MB,
+-        .init = hns3_dbg_common_file_init,
++        .init = hns3_dbg_common_init_t1,
+      },
+      {
+          .name = "fd_tcam",
+@@ -580,44 +582,29 @@ static const struct hns3_dbg_item tx_spare_info_items[] = {
+      { "DMA", 17 },
+  };
+  
+-static void hns3_dbg_tx_spare_info(struct hns3_enet_ring *ring, char *buf,
+-                   int len, u32 ring_num, int *pos)
++static void hns3_dbg_tx_spare_info(struct hns3_enet_ring *ring,
++                   struct seq_file *s, u32 ring_num)
+  {
+-    char data_str[ARRAY_SIZE(tx_spare_info_items)][HNS3_DBG_DATA_STR_LEN];
+      struct hns3_tx_spare *tx_spare = ring->tx_spare;
+-    char *result[ARRAY_SIZE(tx_spare_info_items)];
+-    char content[HNS3_DBG_INFO_LEN];
+-    u32 i, j;
++    u32 i;
+  
+      if (!tx_spare) {
+-        *pos += scnprintf(buf + *pos, len - *pos,
+-                  "tx spare buffer is not enabled\n");
++        seq_puts(s, "tx spare buffer is not enabled\n");
+          return;
+      }
+  
+-    for (i = 0; i < ARRAY_SIZE(tx_spare_info_items); i++)
+-        result[i] = &data_str[i][0];
+-
+-    *pos += scnprintf(buf + *pos, len - *pos, "tx spare buffer info\n");
+-    hns3_dbg_fill_content(content, sizeof(content), tx_spare_info_items,
+-                  NULL, ARRAY_SIZE(tx_spare_info_items));
+-    *pos += scnprintf(buf + *pos, len - *pos, "%s", content);
++    seq_puts(s, "tx spare buffer info\n");
+  
+-    for (i = 0; i < ring_num; i++) {
+-        j = 0;
+-        sprintf(result[j++], "%u", i);
+-        sprintf(result[j++], "%u", ring->tx_copybreak);
+-        sprintf(result[j++], "%u", tx_spare->len);
+-        sprintf(result[j++], "%u", tx_spare->next_to_use);
+-        sprintf(result[j++], "%u", tx_spare->next_to_clean);
+-        sprintf(result[j++], "%u", tx_spare->last_to_clean);
+-        sprintf(result[j++], "%pad", &tx_spare->dma);
+-        hns3_dbg_fill_content(content, sizeof(content),
+-                      tx_spare_info_items,
+-                      (const char **)result,
+-                      ARRAY_SIZE(tx_spare_info_items));
+-        *pos += scnprintf(buf + *pos, len - *pos, "%s", content);
+-    }
++    for (i = 0; i < ARRAY_SIZE(tx_spare_info_items); i++)
++        seq_printf(s, "%s%*s", tx_spare_info_items[i].name,
++               tx_spare_info_items[i].interval, " ");
++    seq_puts(s, "\n");
++
++    for (i = 0; i < ring_num; i++)
++        seq_printf(s, "%-4u%6s%-5u%6s%-8u%2s%-5u%2s%-5u%2s%-5u%2s%pad\n",
++               i, " ", ring->tx_copybreak, " ", tx_spare->len, " ",
++               tx_spare->next_to_use, " ", tx_spare->next_to_clean,
++               " ", tx_spare->last_to_clean, " ", &tx_spare->dma);
+  }
+  
+  static const struct hns3_dbg_item rx_queue_info_items[] = {
+@@ -739,62 +726,52 @@ static const struct hns3_dbg_item tx_queue_info_items[] = {
+  };
+  
+  static void hns3_dump_tx_queue_info(struct hns3_enet_ring *ring,
+-                    struct hnae3_ae_dev *ae_dev, char **result,
+-                    u32 index)
++                    struct hnae3_ae_dev *ae_dev,
++                    struct seq_file *s, u32 index)
+  {
++    void __iomem *base = ring->tqp->io_base;
+      u32 base_add_l, base_add_h;
+-    u32 j = 0;
+-
+-    sprintf(result[j++], "%u", index);
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_BD_NUM_REG));
+-
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_TC_REG));
+-
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_TAIL_REG));
+-
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_HEAD_REG));
+-
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_FBDNUM_REG));
+-
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_OFFSET_REG));
+-
+-    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
+-        HNS3_RING_TX_RING_PKTNUM_RECORD_REG));
+  
+-    sprintf(result[j++], "%s",
+-        str_on_off(readl_relaxed(ring->tqp->io_base +
+-                     HNS3_RING_EN_REG)));
++    seq_printf(s, "%-4u%6s", index, " ");
++    seq_printf(s, "%-5u%3s",
++           readl_relaxed(base + HNS3_RING_TX_RING_BD_NUM_REG), " ");
++    seq_printf(s, "%u%3s",
++           readl_relaxed(base + HNS3_RING_TX_RING_TC_REG), " ");
++    seq_printf(s, "%-4u%2s",
++           readl_relaxed(base + HNS3_RING_TX_RING_TAIL_REG), " ");
++    seq_printf(s, "%-4u%2s",
++           readl_relaxed(base + HNS3_RING_TX_RING_HEAD_REG), " ");
++    seq_printf(s, "%-4u%4s",
++           readl_relaxed(base + HNS3_RING_TX_RING_FBDNUM_REG), " ");
++    seq_printf(s, "%-4u%4s",
++           readl_relaxed(base + HNS3_RING_TX_RING_OFFSET_REG), " ");
++    seq_printf(s, "%-9u%2s",
++           readl_relaxed(base + HNS3_RING_TX_RING_PKTNUM_RECORD_REG),
++           " ");
++    seq_printf(s, "%-3s%6s",
++           str_on_off(readl_relaxed(base + HNS3_RING_EN_REG)), " ");
+  
+      if (hnae3_ae_dev_tqp_txrx_indep_supported(ae_dev))
+-        sprintf(result[j++], "%s",
+-            str_on_off(readl_relaxed(ring->tqp->io_base +
+-                         HNS3_RING_TX_EN_REG)));
++        seq_printf(s, "%-3s%9s",
++               str_on_off(readl_relaxed(base +
++                            HNS3_RING_TX_EN_REG)),
++               " ");
+      else
+-        sprintf(result[j++], "%s", "NA");
++        seq_printf(s, "%-3s%9s", "NA", " ");
+  
+      base_add_h = readl_relaxed(ring->tqp->io_base +
+                      HNS3_RING_TX_RING_BASEADDR_H_REG);
+      base_add_l = readl_relaxed(ring->tqp->io_base +
+                      HNS3_RING_TX_RING_BASEADDR_L_REG);
+-    sprintf(result[j++], "0x%08x%08x", base_add_h, base_add_l);
++    seq_printf(s, "0x%08x%08x\n", base_add_h, base_add_l);
+  }
+  
+-static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+-                  char *buf, int len)
++static int hns3_dbg_tx_queue_info(struct seq_file *s, void *data)
+  {
+-    char data_str[ARRAY_SIZE(tx_queue_info_items)][HNS3_DBG_DATA_STR_LEN];
+-    struct hnae3_ae_dev *ae_dev = pci_get_drvdata(h->pdev);
+-    char *result[ARRAY_SIZE(tx_queue_info_items)];
++    struct hnae3_ae_dev *ae_dev = dev_get_drvdata(s->private);
++    struct hnae3_handle *h = ae_dev->handle;
+      struct hns3_nic_priv *priv = h->priv;
+-    char content[HNS3_DBG_INFO_LEN];
+      struct hns3_enet_ring *ring;
+-    int pos = 0;
+      u32 i;
+  
+      if (!priv->ring) {
+@@ -803,11 +780,10 @@ static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+      }
+  
+      for (i = 0; i < ARRAY_SIZE(tx_queue_info_items); i++)
+-        result[i] = &data_str[i][0];
++        seq_printf(s, "%s%*s", tx_queue_info_items[i].name,
++               tx_queue_info_items[i].interval, " ");
+  
+-    hns3_dbg_fill_content(content, sizeof(content), tx_queue_info_items,
+-                  NULL, ARRAY_SIZE(tx_queue_info_items));
+-    pos += scnprintf(buf + pos, len - pos, "%s", content);
++    seq_puts(s, "\n");
+  
+      for (i = 0; i < h->kinfo.num_tqps; i++) {
+          /* Each cycle needs to determine whether the instance is reset,
+@@ -819,15 +795,10 @@ static int hns3_dbg_tx_queue_info(struct hnae3_handle *h,
+              return -EPERM;
+  
+          ring = &priv->ring[i];
+-        hns3_dump_tx_queue_info(ring, ae_dev, result, i);
+-        hns3_dbg_fill_content(content, sizeof(content),
+-                      tx_queue_info_items,
+-                      (const char **)result,
+-                      ARRAY_SIZE(tx_queue_info_items));
+-        pos += scnprintf(buf + pos, len - pos, "%s", content);
++        hns3_dump_tx_queue_info(ring, ae_dev, s, i);
+      }
+  
+-    hns3_dbg_tx_spare_info(ring, buf, len, h->kinfo.num_tqps, &pos);
++    hns3_dbg_tx_spare_info(ring, s, h->kinfo.num_tqps);
+  
+      return 0;
+  }
+@@ -1222,10 +1193,6 @@ static const struct hns3_dbg_func hns3_dbg_cmd_func[] = {
+          .cmd = HNAE3_DBG_CMD_RX_QUEUE_INFO,
+          .dbg_dump = hns3_dbg_rx_queue_info,
+      },
+-    {
+-        .cmd = HNAE3_DBG_CMD_TX_QUEUE_INFO,
+-        .dbg_dump = hns3_dbg_tx_queue_info,
+-    },
+      {
+          .cmd = HNAE3_DBG_CMD_PAGE_POOL_INFO,
+          .dbg_dump = hns3_dbg_page_pool_info,
+@@ -1362,6 +1329,27 @@ hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd)
+      return 0;
+  }
+  
++static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd)
++{
++    struct device *dev = &handle->pdev->dev;
++    struct dentry *entry_dir;
++    read_func func = NULL;
++
++    switch (hns3_dbg_cmd[cmd].cmd) {
++    case HNAE3_DBG_CMD_TX_QUEUE_INFO:
++        func = hns3_dbg_tx_queue_info;
++        break;
++    default:
++        return -EINVAL;
++    }
++
++    entry_dir = hns3_dbg_dentry[hns3_dbg_cmd[cmd].dentry].dentry;
++    debugfs_create_devm_seqfile(dev, hns3_dbg_cmd[cmd].name, entry_dir,
++                    func);
++
++    return 0;
++}
++
+  int hns3_dbg_init(struct hnae3_handle *handle)
+  {
+      struct hnae3_ae_dev *ae_dev = pci_get_drvdata(handle->pdev);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index 5c8c62ea6ac0..f01c7e45e674 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -5299,6 +5299,8 @@ static int hns3_client_init(struct hnae3_handle *handle)
+      struct net_device *netdev;
+      int ret;
+  
++    ae_dev->handle = handle;
++
+      handle->ae_algo->ops->get_tqps_and_rss_info(handle, &alloc_tqps,
+                              &max_rss_size);
+      netdev = alloc_etherdev_mq(sizeof(struct hns3_nic_priv), alloc_tqps);
+-- 
+2.33.0
 
-static inline u32 ioread32(const volatile void __iomem *addr)
-{
-	return readl(addr);
-}
 
-static inline u32 readl(const volatile void __iomem *addr)
-{
-	u32 val;
-
-	log_read_mmio(32, addr, _THIS_IP_, _RET_IP_);
-	__io_br();
-	val =3D __le32_to_cpu((__le32 __force)__raw_readl(addr));
-	__io_ar(val);
-	log_post_read_mmio(val, 32, addr, _THIS_IP_, _RET_IP_);
-	return val;
-}
->=20
-> If that is the case then is it also the case that the ioread32() calls,
-> in this version of _enetc_rd_reg64() also return host byte order values.
-> And if so, it is probably sufficient for this version to keep using u32
-> as the type for low, high, and tmp.  And simply:
->=20
-> 	return high << 32 | low;
-
-Yes, this change is enough. BTW, currently, the platforms using ENETC
-are all arm64, so ioread64() is used to read registers. Therefore, it does
-not cause any problems in actual use. However, from the driver's
-perspective, it should indeed be fixed. Thanks very much.
 
 
