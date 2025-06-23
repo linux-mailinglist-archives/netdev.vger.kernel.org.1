@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-200219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2AE8AE3C88
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:33:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937EAAE3C85
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:33:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6A373B0369
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:32:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B9F87A9314
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCB22494C0;
-	Mon, 23 Jun 2025 10:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C2024DCE0;
+	Mon, 23 Jun 2025 10:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UXIPWBvT"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="LxgAU9Qu"
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E19C247DE1;
-	Mon, 23 Jun 2025 10:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9909624468D;
+	Mon, 23 Jun 2025 10:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750674640; cv=none; b=n8cxCdgaNRbMA/vXhEtGAKAyop5brikX56rMEkr/rlrCpH3B1IMwz61DG8qmQoD0vHwWuATgqSnyBm/gqqXyOQ4pauF07GWaX9cwGGGdCQClWitFx3MHpKavE7kzGOodnaeFw3Brt5DRuh5UKjDjj4ca74NmcdRxQN2eY4bvj/o=
+	t=1750674642; cv=none; b=ctFCYT0VjOVqpLgpMgSZZapIobw645nIRDdF8WrqyjS9rwow023+GF/PON9smsNom19Oc4D38GJjcr9KjopnRAaUZyAI7+KaawNUUE8OL0G1h1QtxROtANuADJLiHY+LOpyvgBCcDSMxpXkQMyr8NciezXx+6nJo7sysTE0Bn+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750674640; c=relaxed/simple;
-	bh=Brkc+6GuvreWYNLPzilP9Zav00LSZiZlD76bJuKjzH4=;
+	s=arc-20240116; t=1750674642; c=relaxed/simple;
+	bh=U8s/vUbPv7LuLqG9ExVs9d0dW01gK7v1nz/GhTiM+bc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cYUh9DJtu2ZdXK71dHN6IFseYS4IHhZ5acmRAwhg6GccCpuRBe+sj2e3mSnJRacpY/2JdSfUR0g4bJ6B/HicJEru7ae4C03linFs1CDnq0l8xzt1f4N0LWJnlwq2SQ7lDcMCt9CmhkET/FDhBlCbMck1NGsqQQu0z6H/FVyjOnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UXIPWBvT; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=V3fijhp7uF+ni6yp11n0Dzrdg4WASiZEIAapeGqz3/mfG63WaGxs5GU9NA7mlX8W8Jy/zLmmqtyfxmuK6rPiTQFd+H1+vlvJvNBDV+UKLPAnCmKeXdWnOAqglaZ4DD4fZ8m+aM26y/z436q7jdRspCR5IK2bc0AS8kV3LAl1zng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=LxgAU9Qu; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1750674636;
-	bh=Brkc+6GuvreWYNLPzilP9Zav00LSZiZlD76bJuKjzH4=;
+	s=mail; t=1750674638;
+	bh=U8s/vUbPv7LuLqG9ExVs9d0dW01gK7v1nz/GhTiM+bc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UXIPWBvTh5tjmXZcSzMncTy5ddfliH3e9B1J8SaEUkG86CB00oi4I54F9cs0awnSE
-	 yy/ata0HkOACut3hJFfHAYrT6tgRWfmmGRdu8DJLYfM+tQKaKlHAVPbpdScQIlSIfa
-	 LxWxNJ5/yE8k5yC/itdfKoByhn4MMtlCUyISG0CWCp+/TNn3hn+V/nVUMW3N5Z/jXA
-	 ZTuVxnkox5TjHosPEIecTa8MdbItqVNocm/KHxzpvcW0FCtbttrCrppspMzeI2OPY0
-	 Efgm/2hTj0URr0fy3a1VdqrfoMgL8xTiyDtWcCNfv4O3X3SFVkJrSXYQZAZEgFIZml
-	 PpTwQHQvTIClw==
+	b=LxgAU9QuwxXc0wZNyhF537Krch2TQ39F4ZH6N/C5Xu9UVhrvOF+mqJLZQdCx+1eEj
+	 rtcFks1jed2Ovq/AWlcj+oew5inNMlKvY9hXjnJVnMtW5IhzK75Xm523X7gnocVT/Y
+	 In8wGn5mxxdUXJW6XXgg+r9fWh6iTvrH4NIim7MCSGK/e0ZMx/VS2aIu3BfFLjhKs6
+	 OrPNxcrXO8Dm8WhA1cEP+6Qw4EpgIx/IrvtmZcnXsyAxFWx9aaSWWtv5p7k3sCOg81
+	 tDv/K3EH8tdd00gpgxx+qXND0EgVdCtJQJ6BynEX2bQha9bzUEr3j2bSVDwE50/93V
+	 Xp7pLOWwkAaAw==
 Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:e046:b666:1d47:e832])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9EA2517E156D;
-	Mon, 23 Jun 2025 12:30:35 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E5F9917E156E;
+	Mon, 23 Jun 2025 12:30:36 +0200 (CEST)
 From: Laura Nao <laura.nao@collabora.com>
 To: mturquette@baylibre.com,
 	sboyd@kernel.org,
@@ -68,9 +68,9 @@ Cc: guangjie.song@mediatek.com,
 	netdev@vger.kernel.org,
 	kernel@collabora.com,
 	Laura Nao <laura.nao@collabora.com>
-Subject: [PATCH 08/30] clk: mediatek: clk-mtk: Add MUX_DIV_GATE macro
-Date: Mon, 23 Jun 2025 12:29:18 +0200
-Message-Id: <20250623102940.214269-9-laura.nao@collabora.com>
+Subject: [PATCH 09/30] dt-bindings: clock: mediatek: Describe MT8196 peripheral clock controllers
+Date: Mon, 23 Jun 2025 12:29:19 +0200
+Message-Id: <20250623102940.214269-10-laura.nao@collabora.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250623102940.214269-1-laura.nao@collabora.com>
 References: <20250623102940.214269-1-laura.nao@collabora.com>
@@ -82,47 +82,1059 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On MT8196, some clocks use one register for parent selection and
-gating, and a separate register for frequency division. Since composite
-clocks can combine a mux, divider, and gate in a single entity, add a
-macro to simplify registration of such clocks by combining parent
-selection, frequency scaling, and enable control into one definition.
+Add new binding documentation for system clocks and functional clocks on
+MediaTek MT8196.
 
 Signed-off-by: Laura Nao <laura.nao@collabora.com>
 ---
- drivers/clk/mediatek/clk-mtk.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ .../bindings/clock/mediatek,mt8196-clock.yaml |  79 ++
+ .../clock/mediatek,mt8196-sys-clock.yaml      |  76 ++
+ .../dt-bindings/clock/mediatek,mt8196-clock.h | 867 ++++++++++++++++++
+ 3 files changed, 1022 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
+ create mode 100644 include/dt-bindings/clock/mediatek,mt8196-clock.h
 
-diff --git a/drivers/clk/mediatek/clk-mtk.h b/drivers/clk/mediatek/clk-mtk.h
-index e2cefd9bc5b8..3498505b616e 100644
---- a/drivers/clk/mediatek/clk-mtk.h
-+++ b/drivers/clk/mediatek/clk-mtk.h
-@@ -176,6 +176,25 @@ struct mtk_composite {
- 		.flags = 0,						\
- 	}
- 
-+#define MUX_DIV_GATE(_id, _name, _parents,		\
-+		_mux_reg, _mux_shift, _mux_width,	\
-+		_div_reg, _div_shift, _div_width,	\
-+		_gate_reg, _gate_shift) {		\
-+		.id            = _id,			\
-+		.name          = _name,			\
-+		.parent_names  = _parents,		\
-+		.num_parents   = ARRAY_SIZE(_parents),	\
-+		.mux_reg       = _mux_reg,		\
-+		.mux_shift     = _mux_shift,		\
-+		.mux_width     = _mux_width,		\
-+		.divider_reg   = _div_reg,		\
-+		.divider_shift = _div_shift,		\
-+		.divider_width = _div_width,		\
-+		.gate_reg      = _gate_reg,		\
-+		.gate_shift    = _gate_shift,		\
-+		.flags         = CLK_SET_RATE_PARENT,	\
-+	}
+diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+new file mode 100644
+index 000000000000..e292d434f638
+--- /dev/null
++++ b/Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+@@ -0,0 +1,79 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/clock/mediatek,mt8196-clock.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- int mtk_clk_register_composites(struct device *dev,
- 				const struct mtk_composite *mcs, int num,
- 				void __iomem *base, spinlock_t *lock,
++title: MediaTek Functional Clock Controller for MT8196
++
++maintainers:
++  - Guangjie Song <guangjie.song@mediatek.com>
++  - Laura Nao <laura.nao@collabora.com>
++
++description: |
++  The clock architecture in MediaTek SoCs is structured like below:
++  PLLs -->
++          dividers -->
++                      muxes
++                           -->
++                              clock gate
++
++  The device nodes provide clock gate control in different IP blocks.
++
++properties:
++  compatible:
++    items:
++      - enum:
++          - mediatek,mt8196-adsp
++          - mediatek,mt8196-imp-iic-wrap-c
++          - mediatek,mt8196-imp-iic-wrap-e
++          - mediatek,mt8196-imp-iic-wrap-n
++          - mediatek,mt8196-imp-iic-wrap-w
++          - mediatek,mt8196-mdpsys0
++          - mediatek,mt8196-mdpsys1
++          - mediatek,mt8196-pericfg-ao
++          - mediatek,mt8196-pextp0cfg-ao
++          - mediatek,mt8196-pextp1cfg-ao
++          - mediatek,mt8196-ufscfg-ao
++          - mediatek,mt8196-vencsys
++          - mediatek,mt8196-vencsys-c1
++          - mediatek,mt8196-vencsys-c2
++          - mediatek,mt8196-vdecsys
++          - mediatek,mt8196-vdecsys-soc
++      - const: syscon
++
++  reg:
++    maxItems: 1
++
++  '#clock-cells':
++    const: 1
++
++  '#reset-cells':
++    const: 1
++
++  mediatek,hardware-voter:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description: A phandle of the hw voter node
++
++required:
++  - compatible
++  - reg
++  - '#clock-cells'
++
++additionalProperties: false
++
++examples:
++  - |
++    pericfg_ao: clock-controller@16640000 {
++        compatible = "mediatek,mt8196-pericfg-ao", "syscon";
++        reg = <0x16640000 0x1000>;
++        mediatek,hardware-voter = <&scp_hwv>;
++        #clock-cells = <1>;
++    };
++  - |
++    pextp0cfg_ao: clock-controller@169b0000 {
++        compatible = "mediatek,mt8196-pextp0cfg-ao", "syscon";
++        reg = <0x169b0000 0x1000>;
++        #clock-cells = <1>;
++        #reset-cells = <1>;
++    };
+diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
+new file mode 100644
+index 000000000000..363ebe87c525
+--- /dev/null
++++ b/Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
+@@ -0,0 +1,76 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/clock/mediatek,mt8196-sys-clock.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: MediaTek System Clock Controller for MT8196
++
++maintainers:
++  - Guangjie Song <guangjie.song@mediatek.com>
++  - Laura Nao <laura.nao@collabora.com>
++
++description: |
++  The clock architecture in MediaTek SoCs is structured like below:
++  PLLs -->
++          dividers -->
++                      muxes
++                           -->
++                              clock gate
++
++  The apmixedsys, apmixedsys_gp2, vlpckgen, armpll, ccipll, mfgpll and ptppll
++  provide most of the PLLs which are generated from the SoC's 26MHZ crystal oscillator.
++  The topckgen, topckgen_gp2 and vlpckgen provide dividers and muxes which
++  provide the clock source to other IP blocks.
++
++properties:
++  compatible:
++    items:
++      - enum:
++          - mediatek,mt8196-apmixedsys
++          - mediatek,mt8196-armpll-b-pll-ctrl
++          - mediatek,mt8196-armpll-bl-pll-ctrl
++          - mediatek,mt8196-armpll-ll-pll-ctrl
++          - mediatek,mt8196-apmixedsys-gp2
++          - mediatek,mt8196-ccipll-pll-ctrl
++          - mediatek,mt8196-mfgpll-pll-ctrl
++          - mediatek,mt8196-mfgpll-sc0-pll-ctrl
++          - mediatek,mt8196-mfgpll-sc1-pll-ctrl
++          - mediatek,mt8196-ptppll-pll-ctrl
++          - mediatek,mt8196-topckgen
++          - mediatek,mt8196-topckgen-gp2
++          - mediatek,mt8196-vlpckgen
++      - const: syscon
++
++  reg:
++    maxItems: 1
++
++  '#clock-cells':
++    const: 1
++
++  mediatek,hardware-voter:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description: A phandle of the hw voter node
++
++required:
++  - compatible
++  - reg
++  - '#clock-cells'
++
++additionalProperties: false
++
++examples:
++  - |
++    apmixedsys_clk: syscon@10000800 {
++        compatible = "mediatek,mt8196-apmixedsys", "syscon";
++        reg = <0x10000800 0x1000>;
++        #clock-cells = <1>;
++    };
++  - |
++    topckgen: syscon@10000000 {
++        compatible = "mediatek,mt8196-topckgen", "syscon";
++        reg = <0x10000000 0x800>;
++        mediatek,hardware-voter = <&scp_hwv>;
++        #clock-cells = <1>;
++    };
++
+diff --git a/include/dt-bindings/clock/mediatek,mt8196-clock.h b/include/dt-bindings/clock/mediatek,mt8196-clock.h
+new file mode 100644
+index 000000000000..4e538e8305c8
+--- /dev/null
++++ b/include/dt-bindings/clock/mediatek,mt8196-clock.h
+@@ -0,0 +1,867 @@
++/* SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause */
++/*
++ * Copyright (c) 2025 MediaTek Inc.
++ *                    Guangjie Song <guangjie.song@mediatek.com>
++ * Copyright (c) 2025 Collabora Ltd.
++ *                    Laura Nao <laura.nao@collabora.com>
++ */
++
++#ifndef _DT_BINDINGS_CLK_MT8196_H
++#define _DT_BINDINGS_CLK_MT8196_H
++
++/* CKSYS */
++#define CLK_TOP_AXI					0
++#define CLK_TOP_MEM_SUB					1
++#define CLK_TOP_IO_NOC					2
++#define CLK_TOP_P_AXI					3
++#define CLK_TOP_UFS_PEXTP0_AXI				4
++#define CLK_TOP_PEXTP1_USB_AXI				5
++#define CLK_TOP_P_FMEM_SUB				6
++#define CLK_TOP_PEXPT0_MEM_SUB				7
++#define CLK_TOP_PEXTP1_USB_MEM_SUB			8
++#define CLK_TOP_P_NOC					9
++#define CLK_TOP_EMI_N					10
++#define CLK_TOP_EMI_S					11
++#define CLK_TOP_AP2CONN_HOST				12
++#define CLK_TOP_ATB					13
++#define CLK_TOP_CIRQ					14
++#define CLK_TOP_PBUS_156M				15
++#define CLK_TOP_EFUSE					16
++#define CLK_TOP_MCL3GIC					17
++#define CLK_TOP_MCINFRA					18
++#define CLK_TOP_DSP					19
++#define CLK_TOP_MFG_REF					20
++#define CLK_TOP_MFG_EB					21
++#define CLK_TOP_UART					22
++#define CLK_TOP_SPI0_BCLK				23
++#define CLK_TOP_SPI1_BCLK				24
++#define CLK_TOP_SPI2_BCLK				25
++#define CLK_TOP_SPI3_BCLK				26
++#define CLK_TOP_SPI4_BCLK				27
++#define CLK_TOP_SPI5_BCLK				28
++#define CLK_TOP_SPI6_BCLK				29
++#define CLK_TOP_SPI7_BCLK				30
++#define CLK_TOP_MSDC30_1				31
++#define CLK_TOP_MSDC30_2				32
++#define CLK_TOP_DISP_PWM				33
++#define CLK_TOP_USB_TOP_1P				34
++#define CLK_TOP_USB_XHCI_1P				35
++#define CLK_TOP_USB_FMCNT_P1				36
++#define CLK_TOP_I2C_P					37
++#define CLK_TOP_I2C_EAST				38
++#define CLK_TOP_I2C_WEST				39
++#define CLK_TOP_I2C_NORTH				40
++#define CLK_TOP_AES_UFSFDE				41
++#define CLK_TOP_UFS					42
++#define CLK_TOP_AUD_1					43
++#define CLK_TOP_AUD_2					44
++#define CLK_TOP_ADSP					45
++#define CLK_TOP_ADSP_UARTHUB_B				46
++#define CLK_TOP_DPMAIF_MAIN				47
++#define CLK_TOP_PWM					48
++#define CLK_TOP_MCUPM					49
++#define CLK_TOP_IPSEAST					50
++#define CLK_TOP_TL					51
++#define CLK_TOP_TL_P1					52
++#define CLK_TOP_TL_P2					53
++#define CLK_TOP_EMI_INTERFACE_546			54
++#define CLK_TOP_SDF					55
++#define CLK_TOP_UARTHUB_BCLK				56
++#define CLK_TOP_DPSW_CMP_26M				57
++#define CLK_TOP_SMAP					58
++#define CLK_TOP_SSR_PKA					59
++#define CLK_TOP_SSR_DMA					60
++#define CLK_TOP_SSR_KDF					61
++#define CLK_TOP_SSR_RNG					62
++#define CLK_TOP_SPU0					63
++#define CLK_TOP_SPU1					64
++#define CLK_TOP_DXCC					65
++#define CLK_TOP_APLL_I2SIN0				66
++#define CLK_TOP_APLL_I2SIN1				67
++#define CLK_TOP_APLL_I2SIN2				68
++#define CLK_TOP_APLL_I2SIN3				69
++#define CLK_TOP_APLL_I2SIN4				70
++#define CLK_TOP_APLL_I2SIN6				71
++#define CLK_TOP_APLL_I2SOUT0				72
++#define CLK_TOP_APLL_I2SOUT1				73
++#define CLK_TOP_APLL_I2SOUT2				74
++#define CLK_TOP_APLL_I2SOUT3				75
++#define CLK_TOP_APLL_I2SOUT4				76
++#define CLK_TOP_APLL_I2SOUT6				77
++#define CLK_TOP_APLL_FMI2S				78
++#define CLK_TOP_APLL_TDMOUT				79
++#define CLK_TOP_APLL12_DIV_TDMOUT_M			80
++#define CLK_TOP_APLL12_DIV_TDMOUT_B			81
++#define CLK_TOP_MAINPLL_D3				82
++#define CLK_TOP_MAINPLL_D4				83
++#define CLK_TOP_MAINPLL_D4_D2				84
++#define CLK_TOP_MAINPLL_D4_D4				85
++#define CLK_TOP_MAINPLL_D4_D8				86
++#define CLK_TOP_MAINPLL_D5				87
++#define CLK_TOP_MAINPLL_D5_D2				88
++#define CLK_TOP_MAINPLL_D5_D4				89
++#define CLK_TOP_MAINPLL_D5_D8				90
++#define CLK_TOP_MAINPLL_D6				91
++#define CLK_TOP_MAINPLL_D6_D2				92
++#define CLK_TOP_MAINPLL_D7				93
++#define CLK_TOP_MAINPLL_D7_D2				94
++#define CLK_TOP_MAINPLL_D7_D4				95
++#define CLK_TOP_MAINPLL_D7_D8				96
++#define CLK_TOP_MAINPLL_D9				97
++#define CLK_TOP_UNIVPLL_D4				98
++#define CLK_TOP_UNIVPLL_D4_D2				99
++#define CLK_TOP_UNIVPLL_D4_D4				100
++#define CLK_TOP_UNIVPLL_D4_D8				101
++#define CLK_TOP_UNIVPLL_D5				102
++#define CLK_TOP_UNIVPLL_D5_D2				103
++#define CLK_TOP_UNIVPLL_D5_D4				104
++#define CLK_TOP_UNIVPLL_D6				105
++#define CLK_TOP_UNIVPLL_D6_D2				106
++#define CLK_TOP_UNIVPLL_D6_D4				107
++#define CLK_TOP_UNIVPLL_D6_D8				108
++#define CLK_TOP_UNIVPLL_D6_D16				109
++#define CLK_TOP_UNIVPLL_192M				110
++#define CLK_TOP_UNIVPLL_192M_D4				111
++#define CLK_TOP_UNIVPLL_192M_D8				112
++#define CLK_TOP_UNIVPLL_192M_D16			113
++#define CLK_TOP_UNIVPLL_192M_D32			114
++#define CLK_TOP_UNIVPLL_192M_D10			115
++#define CLK_TOP_APLL1_D4				116
++#define CLK_TOP_APLL1_D8				117
++#define CLK_TOP_APLL2_D4				118
++#define CLK_TOP_APLL2_D8				119
++#define CLK_TOP_TVDPLL1_D2				120
++#define CLK_TOP_MSDCPLL_D2				121
++#define CLK_TOP_OSC_D2					122
++#define CLK_TOP_OSC_D3					123
++#define CLK_TOP_OSC_D4					124
++#define CLK_TOP_OSC_D5					125
++#define CLK_TOP_OSC_D7					126
++#define CLK_TOP_OSC_D8					127
++#define CLK_TOP_OSC_D10					128
++#define CLK_TOP_OSC_D14					129
++#define CLK_TOP_OSC_D20					130
++#define CLK_TOP_OSC_D32					131
++#define CLK_TOP_OSC_D40					132
++#define CLK_TOP_SFLASH					133
++
++/* APMIXEDSYS */
++#define CLK_APMIXED_MAINPLL				0
++#define CLK_APMIXED_UNIVPLL				1
++#define CLK_APMIXED_MSDCPLL				2
++#define CLK_APMIXED_ADSPPLL				3
++#define CLK_APMIXED_EMIPLL				4
++#define CLK_APMIXED_EMIPLL2				5
++#define CLK_APMIXED_NET1PLL				6
++#define CLK_APMIXED_SGMIIPLL				7
++
++/* CKSYS_GP2 */
++#define CLK_TOP2_SENINF0				0
++#define CLK_TOP2_SENINF1				1
++#define CLK_TOP2_SENINF2				2
++#define CLK_TOP2_SENINF3				3
++#define CLK_TOP2_SENINF4				4
++#define CLK_TOP2_SENINF5				5
++#define CLK_TOP2_IMG1					6
++#define CLK_TOP2_IPE					7
++#define CLK_TOP2_CAM					8
++#define CLK_TOP2_CAMTM					9
++#define CLK_TOP2_DPE					10
++#define CLK_TOP2_VDEC					11
++#define CLK_TOP2_CCUSYS					12
++#define CLK_TOP2_CCUTM					13
++#define CLK_TOP2_VENC					14
++#define CLK_TOP2_DP1					15
++#define CLK_TOP2_DP0					16
++#define CLK_TOP2_DISP					17
++#define CLK_TOP2_MDP					18
++#define CLK_TOP2_MMINFRA				19
++#define CLK_TOP2_MMINFRA_SNOC				20
++#define CLK_TOP2_MMUP					21
++#define CLK_TOP2_MMINFRA_AO				22
++#define CLK_TOP2_MAINPLL2_D2				23
++#define CLK_TOP2_MAINPLL2_D3				24
++#define CLK_TOP2_MAINPLL2_D4				25
++#define CLK_TOP2_MAINPLL2_D4_D2				26
++#define CLK_TOP2_MAINPLL2_D4_D4				27
++#define CLK_TOP2_MAINPLL2_D5				28
++#define CLK_TOP2_MAINPLL2_D5_D2				29
++#define CLK_TOP2_MAINPLL2_D6				30
++#define CLK_TOP2_MAINPLL2_D6_D2				31
++#define CLK_TOP2_MAINPLL2_D7				32
++#define CLK_TOP2_MAINPLL2_D7_D2				33
++#define CLK_TOP2_MAINPLL2_D9				34
++#define CLK_TOP2_UNIVPLL2_D3				35
++#define CLK_TOP2_UNIVPLL2_D4				36
++#define CLK_TOP2_UNIVPLL2_D4_D2				37
++#define CLK_TOP2_UNIVPLL2_D5				38
++#define CLK_TOP2_UNIVPLL2_D5_D2				39
++#define CLK_TOP2_UNIVPLL2_D6				40
++#define CLK_TOP2_UNIVPLL2_D6_D2				41
++#define CLK_TOP2_UNIVPLL2_D6_D4				42
++#define CLK_TOP2_UNIVPLL2_D7				43
++#define CLK_TOP2_IMGPLL_D2				44
++#define CLK_TOP2_IMGPLL_D4				45
++#define CLK_TOP2_IMGPLL_D5				46
++#define CLK_TOP2_IMGPLL_D5_D2				47
++#define CLK_TOP2_MMPLL2_D3				48
++#define CLK_TOP2_MMPLL2_D4				49
++#define CLK_TOP2_MMPLL2_D4_D2				50
++#define CLK_TOP2_MMPLL2_D5				51
++#define CLK_TOP2_MMPLL2_D5_D2				52
++#define CLK_TOP2_MMPLL2_D6				53
++#define CLK_TOP2_MMPLL2_D6_D2				54
++#define CLK_TOP2_MMPLL2_D7				55
++#define CLK_TOP2_MMPLL2_D9				56
++#define CLK_TOP2_TVDPLL1_D4				57
++#define CLK_TOP2_TVDPLL1_D8				58
++#define CLK_TOP2_TVDPLL1_D16				59
++#define CLK_TOP2_TVDPLL2_D2				60
++#define CLK_TOP2_TVDPLL2_D4				61
++#define CLK_TOP2_TVDPLL2_D8				62
++#define CLK_TOP2_TVDPLL2_D16				63
++#define CLK_TOP2_DVO					64
++#define CLK_TOP2_DVO_FAVT				65
++#define CLK_TOP2_TVDPLL3_D2				66
++#define CLK_TOP2_TVDPLL3_D4				67
++#define CLK_TOP2_TVDPLL3_D8				68
++#define CLK_TOP2_TVDPLL3_D16				69
++
++/* APMIXEDSYS_GP2 */
++#define CLK_APMIXED2_MAINPLL2				0
++#define CLK_APMIXED2_UNIVPLL2				1
++#define CLK_APMIXED2_MMPLL2				2
++#define CLK_APMIXED2_IMGPLL				3
++#define CLK_APMIXED2_TVDPLL1				4
++#define CLK_APMIXED2_TVDPLL2				5
++#define CLK_APMIXED2_TVDPLL3				6
++
++/* IMP_IIC_WRAP_E */
++#define CLK_IMPE_I2C5					0
++
++/* IMP_IIC_WRAP_W */
++#define CLK_IMPW_I2C0					0
++#define CLK_IMPW_I2C3					1
++#define CLK_IMPW_I2C6					2
++#define CLK_IMPW_I2C10					3
++
++/* IMP_IIC_WRAP_N */
++#define CLK_IMPN_I2C1					0
++#define CLK_IMPN_I2C2					1
++#define CLK_IMPN_I2C4					2
++#define CLK_IMPN_I2C7					3
++#define CLK_IMPN_I2C8					4
++#define CLK_IMPN_I2C9					5
++
++/* IMP_IIC_WRAP_C */
++#define CLK_IMPC_I2C11					0
++#define CLK_IMPC_I2C12					1
++#define CLK_IMPC_I2C13					2
++#define CLK_IMPC_I2C14					3
++
++/* PERICFG_AO */
++#define CLK_PERI_AO_UART0_BCLK				0
++#define CLK_PERI_AO_UART1_BCLK				1
++#define CLK_PERI_AO_UART2_BCLK				2
++#define CLK_PERI_AO_UART3_BCLK				3
++#define CLK_PERI_AO_UART4_BCLK				4
++#define CLK_PERI_AO_UART5_BCLK				5
++#define CLK_PERI_AO_PWM_X16W_HCLK			6
++#define CLK_PERI_AO_PWM_X16W_BCLK			7
++#define CLK_PERI_AO_PWM_PWM_BCLK0			8
++#define CLK_PERI_AO_PWM_PWM_BCLK1			9
++#define CLK_PERI_AO_PWM_PWM_BCLK2			10
++#define CLK_PERI_AO_PWM_PWM_BCLK3			11
++#define CLK_PERI_AO_SPI0_BCLK				12
++#define CLK_PERI_AO_SPI1_BCLK				13
++#define CLK_PERI_AO_SPI2_BCLK				14
++#define CLK_PERI_AO_SPI3_BCLK				15
++#define CLK_PERI_AO_SPI4_BCLK				16
++#define CLK_PERI_AO_SPI5_BCLK				17
++#define CLK_PERI_AO_SPI6_BCLK				18
++#define CLK_PERI_AO_SPI7_BCLK				19
++#define CLK_PERI_AO_AP_DMA_X32W_BCLK			20
++#define CLK_PERI_AO_MSDC1_MSDC_SRC			21
++#define CLK_PERI_AO_MSDC1_HCLK				22
++#define CLK_PERI_AO_MSDC1_AXI				23
++#define CLK_PERI_AO_MSDC1_HCLK_WRAP			24
++#define CLK_PERI_AO_MSDC2_MSDC_SRC			25
++#define CLK_PERI_AO_MSDC2_HCLK				26
++#define CLK_PERI_AO_MSDC2_AXI				27
++#define CLK_PERI_AO_MSDC2_HCLK_WRAP			28
++#define CLK_PERI_AO_FLASHIF_FLASH			29
++#define CLK_PERI_AO_FLASHIF_27M				30
++#define CLK_PERI_AO_FLASHIF_DRAM			31
++#define CLK_PERI_AO_FLASHIF_AXI				32
++#define CLK_PERI_AO_FLASHIF_BCLK			33
++
++/* UFSCFG_AO */
++#define CLK_UFSAO_UNIPRO_TX_SYM				0
++#define CLK_UFSAO_UNIPRO_RX_SYM0			1
++#define CLK_UFSAO_UNIPRO_RX_SYM1			2
++#define CLK_UFSAO_UNIPRO_SYS				3
++#define CLK_UFSAO_UNIPRO_SAP				4
++#define CLK_UFSAO_PHY_SAP				5
++#define CLK_UFSAO_UFSHCI_UFS				6
++#define CLK_UFSAO_UFSHCI_AES				7
++
++/* PEXTP0CFG_AO */
++#define CLK_PEXT_PEXTP_MAC_P0_TL			0
++#define CLK_PEXT_PEXTP_MAC_P0_REF			1
++#define CLK_PEXT_PEXTP_PHY_P0_MCU_BUS			2
++#define CLK_PEXT_PEXTP_PHY_P0_PEXTP_REF			3
++#define CLK_PEXT_PEXTP_MAC_P0_AXI_250			4
++#define CLK_PEXT_PEXTP_MAC_P0_AHB_APB			5
++#define CLK_PEXT_PEXTP_MAC_P0_PL_P			6
++#define CLK_PEXT_PEXTP_VLP_AO_P0_LP			7
++
++/* PEXTP1CFG_AO */
++#define CLK_PEXT1_PEXTP_MAC_P1_TL			0
++#define CLK_PEXT1_PEXTP_MAC_P1_REF			1
++#define CLK_PEXT1_PEXTP_MAC_P2_TL			2
++#define CLK_PEXT1_PEXTP_MAC_P2_REF			3
++#define CLK_PEXT1_PEXTP_PHY_P1_MCU_BUS			4
++#define CLK_PEXT1_PEXTP_PHY_P1_PEXTP_REF		5
++#define CLK_PEXT1_PEXTP_PHY_P2_MCU_BUS			6
++#define CLK_PEXT1_PEXTP_PHY_P2_PEXTP_REF		7
++#define CLK_PEXT1_PEXTP_MAC_P1_AXI_250			8
++#define CLK_PEXT1_PEXTP_MAC_P1_AHB_APB			9
++#define CLK_PEXT1_PEXTP_MAC_P1_PL_P			10
++#define CLK_PEXT1_PEXTP_MAC_P2_AXI_250			11
++#define CLK_PEXT1_PEXTP_MAC_P2_AHB_APB			12
++#define CLK_PEXT1_PEXTP_MAC_P2_PL_P			13
++#define CLK_PEXT1_PEXTP_VLP_AO_P1_LP			14
++#define CLK_PEXT1_PEXTP_VLP_AO_P2_LP			15
++
++/* VLP_CKSYS */
++#define CLK_VLP_APLL1					0
++#define CLK_VLP_APLL2					1
++#define CLK_VLP_SCP					2
++#define CLK_VLP_SCP_SPI					3
++#define CLK_VLP_SCP_IIC					4
++#define CLK_VLP_SCP_IIC_HS				5
++#define CLK_VLP_PWRAP_ULPOSC				6
++#define CLK_VLP_SPMI_M_TIA_32K				7
++#define CLK_VLP_APXGPT_26M_B				8
++#define CLK_VLP_DPSW					9
++#define CLK_VLP_DPSW_CENTRAL				10
++#define CLK_VLP_SPMI_M_MST				11
++#define CLK_VLP_DVFSRC					12
++#define CLK_VLP_PWM_VLP					13
++#define CLK_VLP_AXI_VLP					14
++#define CLK_VLP_SYSTIMER_26M				15
++#define CLK_VLP_SSPM					16
++#define CLK_VLP_SRCK					17
++#define CLK_VLP_CAMTG0					18
++#define CLK_VLP_CAMTG1					19
++#define CLK_VLP_CAMTG2					20
++#define CLK_VLP_CAMTG3					21
++#define CLK_VLP_CAMTG4					22
++#define CLK_VLP_CAMTG5					23
++#define CLK_VLP_CAMTG6					24
++#define CLK_VLP_CAMTG7					25
++#define CLK_VLP_SSPM_26M				26
++#define CLK_VLP_ULPOSC_SSPM				27
++#define CLK_VLP_VLP_PBUS_26M				28
++#define CLK_VLP_DEBUG_ERR_FLAG				29
++#define CLK_VLP_DPMSRDMA				30
++#define CLK_VLP_VLP_PBUS_156M				31
++#define CLK_VLP_SPM					32
++#define CLK_VLP_MMINFRA					33
++#define CLK_VLP_USB_TOP					34
++#define CLK_VLP_USB_XHCI				35
++#define CLK_VLP_NOC_VLP					36
++#define CLK_VLP_AUDIO_H					37
++#define CLK_VLP_AUD_ENGEN1				38
++#define CLK_VLP_AUD_ENGEN2				39
++#define CLK_VLP_AUD_INTBUS				40
++#define CLK_VLP_SPVLP_26M				41
++#define CLK_VLP_SPU0_VLP				42
++#define CLK_VLP_SPU1_VLP				43
++
++/* AFE */
++#define CLK_AFE_PCM1					0
++#define CLK_AFE_PCM0					1
++#define CLK_AFE_CM2					2
++#define CLK_AFE_CM1					3
++#define CLK_AFE_CM0					4
++#define CLK_AFE_STF					5
++#define CLK_AFE_HW_GAIN23				6
++#define CLK_AFE_HW_GAIN01				7
++#define CLK_AFE_FM_I2S					8
++#define CLK_AFE_MTKAIFV4				9
++#define CLK_AFE_UL2_ADC_HIRES_TML			10
++#define CLK_AFE_UL2_ADC_HIRES				11
++#define CLK_AFE_UL2_TML					12
++#define CLK_AFE_UL2_ADC					13
++#define CLK_AFE_UL1_ADC_HIRES_TML			14
++#define CLK_AFE_UL1_ADC_HIRES				15
++#define CLK_AFE_UL1_TML					16
++#define CLK_AFE_UL1_ADC					17
++#define CLK_AFE_UL1_ADC_AFE				18
++#define CLK_AFE_UL0_ADC_HIRES_TML			19
++#define CLK_AFE_UL0_ADC_HIRES				20
++#define CLK_AFE_UL0_TML					21
++#define CLK_AFE_UL0_ADC					22
++#define CLK_AFE_ETDM_IN6				23
++#define CLK_AFE_ETDM_IN5				24
++#define CLK_AFE_ETDM_IN4				25
++#define CLK_AFE_ETDM_IN3				26
++#define CLK_AFE_ETDM_IN2				27
++#define CLK_AFE_ETDM_IN1				28
++#define CLK_AFE_ETDM_IN0				29
++#define CLK_AFE_ETDM_OUT6				30
++#define CLK_AFE_ETDM_OUT5				31
++#define CLK_AFE_ETDM_OUT4				32
++#define CLK_AFE_ETDM_OUT3				33
++#define CLK_AFE_ETDM_OUT2				34
++#define CLK_AFE_ETDM_OUT1				35
++#define CLK_AFE_ETDM_OUT0				36
++#define CLK_AFE_TDM_OUT					37
++#define CLK_AFE_GENERAL15_ASRC				38
++#define CLK_AFE_GENERAL14_ASRC				39
++#define CLK_AFE_GENERAL13_ASRC				40
++#define CLK_AFE_GENERAL12_ASRC				41
++#define CLK_AFE_GENERAL11_ASRC				42
++#define CLK_AFE_GENERAL10_ASRC				43
++#define CLK_AFE_GENERAL9_ASRC				44
++#define CLK_AFE_GENERAL8_ASRC				45
++#define CLK_AFE_GENERAL7_ASRC				46
++#define CLK_AFE_GENERAL6_ASRC				47
++#define CLK_AFE_GENERAL5_ASRC				48
++#define CLK_AFE_GENERAL4_ASRC				49
++#define CLK_AFE_GENERAL3_ASRC				50
++#define CLK_AFE_GENERAL2_ASRC				51
++#define CLK_AFE_GENERAL1_ASRC				52
++#define CLK_AFE_GENERAL0_ASRC				53
++#define CLK_AFE_CONNSYS_I2S_ASRC			54
++#define CLK_AFE_AUDIO_HOPPING				55
++#define CLK_AFE_AUDIO_F26M				56
++#define CLK_AFE_APLL1					57
++#define CLK_AFE_APLL2					58
++#define CLK_AFE_H208M					59
++#define CLK_AFE_APLL_TUNER2				60
++#define CLK_AFE_APLL_TUNER1				61
++
++
++/* DISPSYS_CONFIG */
++#define CLK_MM_CONFIG					0
++#define CLK_MM_DISP_MUTEX0				1
++#define CLK_MM_DISP_AAL0				2
++#define CLK_MM_DISP_AAL1				3
++#define CLK_MM_DISP_C3D0				4
++#define CLK_MM_DISP_C3D1				5
++#define CLK_MM_DISP_C3D2				6
++#define CLK_MM_DISP_C3D3				7
++#define CLK_MM_DISP_CCORR0				8
++#define CLK_MM_DISP_CCORR1				9
++#define CLK_MM_DISP_CCORR2				10
++#define CLK_MM_DISP_CCORR3				11
++#define CLK_MM_DISP_CHIST0				12
++#define CLK_MM_DISP_CHIST1				13
++#define CLK_MM_DISP_COLOR0				14
++#define CLK_MM_DISP_COLOR1				15
++#define CLK_MM_DISP_DITHER0				16
++#define CLK_MM_DISP_DITHER1				17
++#define CLK_MM_DISP_DLI_ASYNC0				18
++#define CLK_MM_DISP_DLI_ASYNC1				19
++#define CLK_MM_DISP_DLI_ASYNC2				20
++#define CLK_MM_DISP_DLI_ASYNC3				21
++#define CLK_MM_DISP_DLI_ASYNC4				22
++#define CLK_MM_DISP_DLI_ASYNC5				23
++#define CLK_MM_DISP_DLI_ASYNC6				24
++#define CLK_MM_DISP_DLI_ASYNC7				25
++#define CLK_MM_DISP_DLI_ASYNC8				26
++#define CLK_MM_DISP_DLI_ASYNC9				27
++#define CLK_MM_DISP_DLI_ASYNC10				28
++#define CLK_MM_DISP_DLI_ASYNC11				29
++#define CLK_MM_DISP_DLI_ASYNC12				30
++#define CLK_MM_DISP_DLI_ASYNC13				31
++#define CLK_MM_DISP_DLI_ASYNC14				32
++#define CLK_MM_DISP_DLI_ASYNC15				33
++#define CLK_MM_DISP_DLO_ASYNC0				34
++#define CLK_MM_DISP_DLO_ASYNC1				35
++#define CLK_MM_DISP_DLO_ASYNC2				36
++#define CLK_MM_DISP_DLO_ASYNC3				37
++#define CLK_MM_DISP_DLO_ASYNC4				38
++#define CLK_MM_DISP_DLO_ASYNC5				39
++#define CLK_MM_DISP_DLO_ASYNC6				40
++#define CLK_MM_DISP_DLO_ASYNC7				41
++#define CLK_MM_DISP_DLO_ASYNC8				42
++#define CLK_MM_DISP_GAMMA0				43
++#define CLK_MM_DISP_GAMMA1				44
++#define CLK_MM_MDP_AAL0					45
++#define CLK_MM_MDP_AAL1					46
++#define CLK_MM_MDP_RDMA0				47
++#define CLK_MM_DISP_POSTMASK0				48
++#define CLK_MM_DISP_POSTMASK1				49
++#define CLK_MM_MDP_RSZ0					50
++#define CLK_MM_MDP_RSZ1					51
++#define CLK_MM_DISP_SPR0				52
++#define CLK_MM_DISP_TDSHP0				53
++#define CLK_MM_DISP_TDSHP1				54
++#define CLK_MM_DISP_WDMA0				55
++#define CLK_MM_DISP_Y2R0				56
++#define CLK_MM_SMI_SUB_COMM0				57
++#define CLK_MM_DISP_FAKE_ENG0				58
++
++/* DISPSYS1_CONFIG */
++#define CLK_MM1_DISPSYS1_CONFIG				0
++#define CLK_MM1_DISPSYS1_S_CONFIG			1
++#define CLK_MM1_DISP_MUTEX0				2
++#define CLK_MM1_DISP_DLI_ASYNC20			3
++#define CLK_MM1_DISP_DLI_ASYNC21			4
++#define CLK_MM1_DISP_DLI_ASYNC22			5
++#define CLK_MM1_DISP_DLI_ASYNC23			6
++#define CLK_MM1_DISP_DLI_ASYNC24			7
++#define CLK_MM1_DISP_DLI_ASYNC25			8
++#define CLK_MM1_DISP_DLI_ASYNC26			9
++#define CLK_MM1_DISP_DLI_ASYNC27			10
++#define CLK_MM1_DISP_DLI_ASYNC28			11
++#define CLK_MM1_DISP_RELAY0				12
++#define CLK_MM1_DISP_RELAY1				13
++#define CLK_MM1_DISP_RELAY2				14
++#define CLK_MM1_DISP_RELAY3				15
++#define CLK_MM1_DISP_DP_INTF0				16
++#define CLK_MM1_DISP_DP_INTF1				17
++#define CLK_MM1_DISP_DSC_WRAP0				18
++#define CLK_MM1_DISP_DSC_WRAP1				19
++#define CLK_MM1_DISP_DSC_WRAP2				20
++#define CLK_MM1_DISP_DSC_WRAP3				21
++#define CLK_MM1_DISP_DSI0				22
++#define CLK_MM1_DISP_DSI1				23
++#define CLK_MM1_DISP_DSI2				24
++#define CLK_MM1_DISP_DVO0				25
++#define CLK_MM1_DISP_GDMA0				26
++#define CLK_MM1_DISP_MERGE0				27
++#define CLK_MM1_DISP_MERGE1				28
++#define CLK_MM1_DISP_MERGE2				29
++#define CLK_MM1_DISP_ODDMR0				30
++#define CLK_MM1_DISP_POSTALIGN0				31
++#define CLK_MM1_DISP_DITHER2				32
++#define CLK_MM1_DISP_R2Y0				33
++#define CLK_MM1_DISP_SPLITTER0				34
++#define CLK_MM1_DISP_SPLITTER1				35
++#define CLK_MM1_DISP_SPLITTER2				36
++#define CLK_MM1_DISP_SPLITTER3				37
++#define CLK_MM1_DISP_VDCM0				38
++#define CLK_MM1_DISP_WDMA1				39
++#define CLK_MM1_DISP_WDMA2				40
++#define CLK_MM1_DISP_WDMA3				41
++#define CLK_MM1_DISP_WDMA4				42
++#define CLK_MM1_MDP_RDMA1				43
++#define CLK_MM1_SMI_LARB0				44
++#define CLK_MM1_MOD1					45
++#define CLK_MM1_MOD2					46
++#define CLK_MM1_MOD3					47
++#define CLK_MM1_MOD4					48
++#define CLK_MM1_MOD5					49
++#define CLK_MM1_MOD6					50
++#define CLK_MM1_CG0					51
++#define CLK_MM1_CG1					52
++#define CLK_MM1_CG2					53
++#define CLK_MM1_CG3					54
++#define CLK_MM1_CG4					55
++#define CLK_MM1_CG5					56
++#define CLK_MM1_CG6					57
++#define CLK_MM1_CG7					58
++#define CLK_MM1_F26M					59
++
++/* OVLSYS_CONFIG */
++#define CLK_OVLSYS_CONFIG				0
++#define CLK_OVL_FAKE_ENG0				1
++#define CLK_OVL_FAKE_ENG1				2
++#define CLK_OVL_MUTEX0					3
++#define CLK_OVL_EXDMA0					4
++#define CLK_OVL_EXDMA1					5
++#define CLK_OVL_EXDMA2					6
++#define CLK_OVL_EXDMA3					7
++#define CLK_OVL_EXDMA4					8
++#define CLK_OVL_EXDMA5					9
++#define CLK_OVL_EXDMA6					10
++#define CLK_OVL_EXDMA7					11
++#define CLK_OVL_EXDMA8					12
++#define CLK_OVL_EXDMA9					13
++#define CLK_OVL_BLENDER0				14
++#define CLK_OVL_BLENDER1				15
++#define CLK_OVL_BLENDER2				16
++#define CLK_OVL_BLENDER3				17
++#define CLK_OVL_BLENDER4				18
++#define CLK_OVL_BLENDER5				19
++#define CLK_OVL_BLENDER6				20
++#define CLK_OVL_BLENDER7				21
++#define CLK_OVL_BLENDER8				22
++#define CLK_OVL_BLENDER9				23
++#define CLK_OVL_OUTPROC0				24
++#define CLK_OVL_OUTPROC1				25
++#define CLK_OVL_OUTPROC2				26
++#define CLK_OVL_OUTPROC3				27
++#define CLK_OVL_OUTPROC4				28
++#define CLK_OVL_OUTPROC5				29
++#define CLK_OVL_MDP_RSZ0				30
++#define CLK_OVL_MDP_RSZ1				31
++#define CLK_OVL_DISP_WDMA0				32
++#define CLK_OVL_DISP_WDMA1				33
++#define CLK_OVL_UFBC_WDMA0				34
++#define CLK_OVL_MDP_RDMA0				35
++#define CLK_OVL_MDP_RDMA1				36
++#define CLK_OVL_BWM0					37
++#define CLK_OVL_DLI0					38
++#define CLK_OVL_DLI1					39
++#define CLK_OVL_DLI2					40
++#define CLK_OVL_DLI3					41
++#define CLK_OVL_DLI4					42
++#define CLK_OVL_DLI5					43
++#define CLK_OVL_DLI6					44
++#define CLK_OVL_DLI7					45
++#define CLK_OVL_DLI8					46
++#define CLK_OVL_DLO0					47
++#define CLK_OVL_DLO1					48
++#define CLK_OVL_DLO2					49
++#define CLK_OVL_DLO3					50
++#define CLK_OVL_DLO4					51
++#define CLK_OVL_DLO5					52
++#define CLK_OVL_DLO6					53
++#define CLK_OVL_DLO7					54
++#define CLK_OVL_DLO8					55
++#define CLK_OVL_DLO9					56
++#define CLK_OVL_DLO10					57
++#define CLK_OVL_DLO11					58
++#define CLK_OVL_DLO12					59
++#define CLK_OVLSYS_RELAY0				60
++#define CLK_OVL_INLINEROT0				61
++#define CLK_OVL_SMI					62
++#define CLK_OVL_SMI_SMI					63
++
++
++/* OVLSYS1_CONFIG */
++#define CLK_OVL1_OVLSYS_CONFIG				0
++#define CLK_OVL1_OVL_FAKE_ENG0				1
++#define CLK_OVL1_OVL_FAKE_ENG1				2
++#define CLK_OVL1_OVL_MUTEX0				3
++#define CLK_OVL1_OVL_EXDMA0				4
++#define CLK_OVL1_OVL_EXDMA1				5
++#define CLK_OVL1_OVL_EXDMA2				6
++#define CLK_OVL1_OVL_EXDMA3				7
++#define CLK_OVL1_OVL_EXDMA4				8
++#define CLK_OVL1_OVL_EXDMA5				9
++#define CLK_OVL1_OVL_EXDMA6				10
++#define CLK_OVL1_OVL_EXDMA7				11
++#define CLK_OVL1_OVL_EXDMA8				12
++#define CLK_OVL1_OVL_EXDMA9				13
++#define CLK_OVL1_OVL_BLENDER0				14
++#define CLK_OVL1_OVL_BLENDER1				15
++#define CLK_OVL1_OVL_BLENDER2				16
++#define CLK_OVL1_OVL_BLENDER3				17
++#define CLK_OVL1_OVL_BLENDER4				18
++#define CLK_OVL1_OVL_BLENDER5				19
++#define CLK_OVL1_OVL_BLENDER6				20
++#define CLK_OVL1_OVL_BLENDER7				21
++#define CLK_OVL1_OVL_BLENDER8				22
++#define CLK_OVL1_OVL_BLENDER9				23
++#define CLK_OVL1_OVL_OUTPROC0				24
++#define CLK_OVL1_OVL_OUTPROC1				25
++#define CLK_OVL1_OVL_OUTPROC2				26
++#define CLK_OVL1_OVL_OUTPROC3				27
++#define CLK_OVL1_OVL_OUTPROC4				28
++#define CLK_OVL1_OVL_OUTPROC5				29
++#define CLK_OVL1_OVL_MDP_RSZ0				30
++#define CLK_OVL1_OVL_MDP_RSZ1				31
++#define CLK_OVL1_OVL_DISP_WDMA0				32
++#define CLK_OVL1_OVL_DISP_WDMA1				33
++#define CLK_OVL1_OVL_UFBC_WDMA0				34
++#define CLK_OVL1_OVL_MDP_RDMA0				35
++#define CLK_OVL1_OVL_MDP_RDMA1				36
++#define CLK_OVL1_OVL_BWM0				37
++#define CLK_OVL1_DLI0					38
++#define CLK_OVL1_DLI1					39
++#define CLK_OVL1_DLI2					40
++#define CLK_OVL1_DLI3					41
++#define CLK_OVL1_DLI4					42
++#define CLK_OVL1_DLI5					43
++#define CLK_OVL1_DLI6					44
++#define CLK_OVL1_DLI7					45
++#define CLK_OVL1_DLI8					46
++#define CLK_OVL1_DLO0					47
++#define CLK_OVL1_DLO1					48
++#define CLK_OVL1_DLO2					49
++#define CLK_OVL1_DLO3					50
++#define CLK_OVL1_DLO4					51
++#define CLK_OVL1_DLO5					52
++#define CLK_OVL1_DLO6					53
++#define CLK_OVL1_DLO7					54
++#define CLK_OVL1_DLO8					55
++#define CLK_OVL1_DLO9					56
++#define CLK_OVL1_DLO10					57
++#define CLK_OVL1_DLO11					58
++#define CLK_OVL1_DLO12					59
++#define CLK_OVL1_OVLSYS_RELAY0				60
++#define CLK_OVL1_OVL_INLINEROT0				61
++#define CLK_OVL1_SMI					62
++
++
++/* VDEC_SOC_GCON_BASE */
++#define CLK_VDE1_LARB1_CKEN				0
++#define CLK_VDE1_LAT_CKEN				3
++#define CLK_VDE1_LAT_ACTIVE				5
++#define CLK_VDE1_LAT_CKEN_ENG				7
++#define CLK_VDE1_VDEC_CKEN				9
++#define CLK_VDE1_VDEC_ACTIVE				11
++#define CLK_VDE1_VDEC_CKEN_ENG				13
++#define CLK_VDE1_VDEC_SOC_APTV_EN			15
++#define CLK_VDE1_VDEC_SOC_APTV_TOP_EN			17
++#define CLK_VDE1_VDEC_SOC_IPS_EN			19
++
++/* VDEC_GCON_BASE */
++#define CLK_VDE2_LARB1_CKEN				0
++#define CLK_VDE2_LAT_CKEN				1
++#define CLK_VDE2_LAT_ACTIVE				2
++#define CLK_VDE2_LAT_CKEN_ENG				3
++#define CLK_VDE2_VDEC_CKEN				4
++#define CLK_VDE2_VDEC_ACTIVE				5
++#define CLK_VDE2_VDEC_CKEN_ENG				6
++
++/* VENC_GCON */
++#define CLK_VEN1_CKE0_LARB				0
++#define CLK_VEN1_CKE1_VENC				1
++#define CLK_VEN1_CKE2_JPGENC				2
++#define CLK_VEN1_CKE3_JPGDEC				3
++#define CLK_VEN1_CKE4_JPGDEC_C1				4
++#define CLK_VEN1_CKE5_GALS				5
++#define CLK_VEN1_CKE29_VENC_ADAB_CTRL			6
++#define CLK_VEN1_CKE29_VENC_XPC_CTRL			7
++#define CLK_VEN1_CKE6_GALS_SRAM				8
++#define CLK_VEN1_RES_FLAT				9
++
++/* VENC_GCON_CORE1 */
++#define CLK_VEN2_CKE0_LARB				0
++#define CLK_VEN2_CKE1_VENC				1
++#define CLK_VEN2_CKE2_JPGENC				2
++#define CLK_VEN2_CKE3_JPGDEC				3
++#define CLK_VEN2_CKE5_GALS				4
++#define CLK_VEN2_CKE29_VENC_XPC_CTRL			5
++#define CLK_VEN2_CKE6_GALS_SRAM				6
++#define CLK_VEN2_RES_FLAT				7
++
++/* VENC_GCON_CORE2 */
++#define CLK_VEN_C2_CKE0_LARB				0
++#define CLK_VEN_C2_CKE1_VENC				1
++#define CLK_VEN_C2_CKE5_GALS				2
++#define CLK_VEN_C2_CKE29_VENC_XPC_CTRL			3
++#define CLK_VEN_C2_CKE6_GALS_SRAM			4
++#define CLK_VEN_C2_RES_FLAT				5
++
++/* MDPSYS_CONFIG */
++#define CLK_MDP_MDP_MUTEX0				0
++#define CLK_MDP_SMI0					1
++#define CLK_MDP_SMI0_SMI				2
++#define CLK_MDP_APB_BUS					3
++#define CLK_MDP_MDP_RDMA0				4
++#define CLK_MDP_MDP_RDMA1				5
++#define CLK_MDP_MDP_RDMA2				6
++#define CLK_MDP_MDP_BIRSZ0				7
++#define CLK_MDP_MDP_HDR0				8
++#define CLK_MDP_MDP_AAL0				9
++#define CLK_MDP_MDP_RSZ0				10
++#define CLK_MDP_MDP_RSZ2				11
++#define CLK_MDP_MDP_TDSHP0				12
++#define CLK_MDP_MDP_COLOR0				13
++#define CLK_MDP_MDP_WROT0				14
++#define CLK_MDP_MDP_WROT1				15
++#define CLK_MDP_MDP_WROT2				16
++#define CLK_MDP_MDP_FAKE_ENG0				17
++#define CLK_MDP_APB_DB					18
++#define CLK_MDP_MDP_DLI_ASYNC0				19
++#define CLK_MDP_MDP_DLI_ASYNC1				20
++#define CLK_MDP_MDP_DLO_ASYNC0				21
++#define CLK_MDP_MDP_DLO_ASYNC1				22
++#define CLK_MDP_MDP_DLI_ASYNC2				23
++#define CLK_MDP_MDP_DLO_ASYNC2				24
++#define CLK_MDP_MDP_DLO_ASYNC3				25
++#define CLK_MDP_IMG_DL_ASYNC0				26
++#define CLK_MDP_MDP_RROT0				27
++#define CLK_MDP_MDP_MERGE0				28
++#define CLK_MDP_MDP_C3D0				29
++#define CLK_MDP_MDP_FG0					30
++#define CLK_MDP_MDP_CLA2				31
++#define CLK_MDP_MDP_DLO_ASYNC4				32
++#define CLK_MDP_VPP_RSZ0				33
++#define CLK_MDP_VPP_RSZ1				34
++#define CLK_MDP_MDP_DLO_ASYNC5				35
++#define CLK_MDP_IMG0					36
++#define CLK_MDP_F26M					37
++#define CLK_MDP_IMG_DL_RELAY0				38
++#define CLK_MDP_IMG_DL_RELAY1				39
++
++/* MDPSYS1_CONFIG */
++#define CLK_MDP1_MDP_MUTEX0				0
++#define CLK_MDP1_SMI0					1
++#define CLK_MDP1_SMI0_SMI				2
++#define CLK_MDP1_APB_BUS				3
++#define CLK_MDP1_MDP_RDMA0				4
++#define CLK_MDP1_MDP_RDMA1				5
++#define CLK_MDP1_MDP_RDMA2				6
++#define CLK_MDP1_MDP_BIRSZ0				7
++#define CLK_MDP1_MDP_HDR0				8
++#define CLK_MDP1_MDP_AAL0				9
++#define CLK_MDP1_MDP_RSZ0				10
++#define CLK_MDP1_MDP_RSZ2				11
++#define CLK_MDP1_MDP_TDSHP0				12
++#define CLK_MDP1_MDP_COLOR0				13
++#define CLK_MDP1_MDP_WROT0				14
++#define CLK_MDP1_MDP_WROT1				15
++#define CLK_MDP1_MDP_WROT2				16
++#define CLK_MDP1_MDP_FAKE_ENG0				17
++#define CLK_MDP1_APB_DB					18
++#define CLK_MDP1_MDP_DLI_ASYNC0				19
++#define CLK_MDP1_MDP_DLI_ASYNC1				20
++#define CLK_MDP1_MDP_DLO_ASYNC0				21
++#define CLK_MDP1_MDP_DLO_ASYNC1				22
++#define CLK_MDP1_MDP_DLI_ASYNC2				23
++#define CLK_MDP1_MDP_DLO_ASYNC2				24
++#define CLK_MDP1_MDP_DLO_ASYNC3				25
++#define CLK_MDP1_IMG_DL_ASYNC0				26
++#define CLK_MDP1_MDP_RROT0				27
++#define CLK_MDP1_MDP_MERGE0				28
++#define CLK_MDP1_MDP_C3D0				29
++#define CLK_MDP1_MDP_FG0				30
++#define CLK_MDP1_MDP_CLA2				31
++#define CLK_MDP1_MDP_DLO_ASYNC4				32
++#define CLK_MDP1_VPP_RSZ0				33
++#define CLK_MDP1_VPP_RSZ1				34
++#define CLK_MDP1_MDP_DLO_ASYNC5				35
++#define CLK_MDP1_IMG0					36
++#define CLK_MDP1_F26M					37
++#define CLK_MDP1_IMG_DL_RELAY0				38
++#define CLK_MDP1_IMG_DL_RELAY1				39
++
++/* DISP_VDISP_AO_CONFIG */
++#define CLK_MM_V_DISP_VDISP_AO_CONFIG			0
++#define CLK_MM_V_DISP_DPC				1
++#define CLK_MM_V_SMI_SUB_SOMM0				2
++
++/* MFGPLL_PLL_CTRL */
++#define CLK_MFG_AO_MFGPLL				0
++
++/* MFGPLL_SC0_PLL_CTRL */
++#define CLK_MFGSC0_AO_MFGPLL_SC0			0
++
++/* MFGPLL_SC1_PLL_CTRL */
++#define CLK_MFGSC1_AO_MFGPLL_SC1			0
++
++/* CCIPLL_PLL_CTRL */
++#define CLK_CCIPLL					0
++
++/* ARMPLL_LL_PLL_CTRL */
++#define CLK_CPLL_ARMPLL_LL				0
++
++/* ARMPLL_BL_PLL_CTRL */
++#define CLK_CPBL_ARMPLL_BL				0
++
++/* ARMPLL_B_PLL_CTRL */
++#define CLK_CPB_ARMPLL_B				0
++
++/* PTPPLL_PLL_CTRL */
++#define CLK_PTPPLL					0
++
++#endif /* _DT_BINDINGS_CLK_MT8196_H */
 -- 
 2.39.5
 
