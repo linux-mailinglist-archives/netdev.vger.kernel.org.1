@@ -1,185 +1,271 @@
-Return-Path: <netdev+bounces-200135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B485CAE353E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:57:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBCBCAE354B
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 08:09:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E06716C790
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 05:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F4013A8140
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BABB1D6DDD;
-	Mon, 23 Jun 2025 05:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8DF1DDC07;
+	Mon, 23 Jun 2025 06:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="CXyjCqPt";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WpDl73Yc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bvccnq/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F5D1991B6;
-	Mon, 23 Jun 2025 05:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5D2A94A;
+	Mon, 23 Jun 2025 06:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750658252; cv=none; b=NKSORVmWjrMQ+lhwCeCvz13iDK2AtaJlt7wktd9DyAn0XHHFrtblhm0cRUfDzqZ5BCbysK5L0bMqZ5OfGK0MjYgVtwzX5xnpNQ72riAscPqD+kFvReSpMuN6wKzC2wDBr0TVoKgv3IUaytdnqYnjjiXtcQ/0lWHztADBBS8PTRY=
+	t=1750658970; cv=none; b=XdXTW4gyOA/m8Ov6zC19+N2g3CULfftzfAhoA1onCyumCcGfXRiSt9AdZuMOYjGmC2tq8k2bhxVkef+D25rqztG3EXOGWEZRHbr6+gUMcUtUuQAPVS+tq9v4TlENkAP0i8aQC+x3Zp/CGXo+QMWzKoVDeQm6Ht5K1zJgs3xZ/fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750658252; c=relaxed/simple;
-	bh=zslrUw/71JAV7TvJy4yqUFn9U16ApNY7CYiRXUJdlCI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=h99cCjcwVO9Nglw58sIujMMWXPyiWUcjWoY3zYbO+35YeSHr7TEq5Lz4iNyQXk1wAq1QTI3PJPBPUVBrEQz7xu2LCn8NlFWAVXYmt7rezDsKMrkpX7wywABWiO1Brt0ljE6mBHKYrTaLgrpqkHfw5erw0LoVc687/dAk61szkd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=CXyjCqPt; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WpDl73Yc; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id EDC591140173;
-	Mon, 23 Jun 2025 01:57:28 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Mon, 23 Jun 2025 01:57:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1750658248;
-	 x=1750744648; bh=IQNxDuMP3QPjXQF2/Ju4i3ejXs1KloFPbPXgsytRE+s=; b=
-	CXyjCqPtKCWydABtSzQ5sInbbE9D9tlS4MR7hKK9J1qInZLSPQNN8mUiC/03bAxJ
-	msvtUWlzRv1UygjJgAxRDlOhpYoiRCz8IIRDa5EWck1XsXmMCkli8Us7vUyNPDkF
-	XB9JBl3ThNjm5vD5BB5RkbCarkedwvNIgm9HnmaN5DNZXfuJOu+iHGaPC0C9u9Ut
-	zX2AYCcCKgfnyC+Uu7rAu1EImINOSV6GykrhPX7zbyrXD4qsZxmHvcRDwXqafBS5
-	rlfBasBOIt36Edwmuv1Zp4UQ686ES737AG1bEIJv1F+kkrEjIJ1a786sttqNz3ZT
-	nYcuTfcOIW8+559mTgo2Sw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750658248; x=
-	1750744648; bh=IQNxDuMP3QPjXQF2/Ju4i3ejXs1KloFPbPXgsytRE+s=; b=W
-	pDl73YcyN+TBFCdF0ve7yEs7SSDgkG3FtZFw1tRcovFx1yDfNa10eUiU6etff/5e
-	wjG3eWPVyLmsUcuoHFFlYf4leXY1VXmm7Kh0bbm/9e6nRsyupWZPacfdrc2Rzu+V
-	qOIn7kOGHf6Mawsukf8v3bEHrQIXqGs4hkzhtW1aGeDuKzQxjlWeFnxYWYGapdna
-	xwfpeVlVNZBxINB/sEmC+hhigYCC3+RVuV+6mz5k+qNkwSAk5KWOx0OhrqWK7A9F
-	XISz4ygPZyxsUheBmr/c8skJKyEC1eSh0SVVnxRBhAoS1BWq8acw1847fXw7PhaY
-	Rq3X58MZEi4tpRTXCgsqw==
-X-ME-Sender: <xms:x-xYaNoWVncNTjpWtBhozJiYyfN8ql1ea_BcyvjV55Hr5fMNK6TMVA>
-    <xme:x-xYaPqyHY0_pg67VdpPECG3Dyn6vB67SSzwh7rUge4YyqXjeUIJ90E8-MgDEKc2P
-    4ZLa83TAbLzxbbRG8c>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdduiedvgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpedvhfdvkeeuudevfffftefgvdevfedvleehvddvgeejvdefhedtgeegveehfeeljeen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopedujedpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhope
-    hnihgtkhdruggvshgruhhlnhhivghrshdolhhkmhhlsehgmhgrihhlrdgtohhmpdhrtghp
-    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehjuhhsth
-    hinhhsthhithhtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehmohhrsghosehgohho
-    ghhlvgdrtghomhdprhgtphhtthhopehlrghnhhgroheshhhurgifvghirdgtohhmpdhrtg
-    hpthhtohepshgrlhhilhdrmhgvhhhtrgeshhhurgifvghirdgtohhmpdhrtghpthhtohep
-    shhhrghojhhijhhivgeshhhurgifvghirdgtohhmpdhrtghpthhtohepshhhvghnjhhirg
-    hnudehsehhuhgrfigvihdrtghomh
-X-ME-Proxy: <xmx:x-xYaKMoSoZwakMHAZZEMeFpc4gowlBQJVzVPLkUhkazdvuXf9ZJ-w>
-    <xmx:x-xYaI4rPeNeOn5HlFmOudplAV84e4iAWhrmGqv7S42JXaUeGNA_DA>
-    <xmx:x-xYaM7jWD0enxI7OwRUnJVS9AKgYecwF41SlP8Xz9-HTJm-ao_BtA>
-    <xmx:x-xYaAivUiIvj3brciSTFM7iAjwpN170dN8QOqjBQN8eeuwlxkBVoA>
-    <xmx:yOxYaKlFdw3j-zWBTNeRYtVIRJ9SdgZu4z3cT6QShSi1AJz_HYCxG3mo>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id CBEA4700062; Mon, 23 Jun 2025 01:57:27 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1750658970; c=relaxed/simple;
+	bh=PNHYsFG5NwLTdXL4ZX15juhfF+vA0FSIDNnfrT5LYJ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pGpSQjRSlOiew/YlDP09pWEA98Un3q8sYEsvJ+bB9blHiRnsFEAfq1Aqqyy3MR8rIYhKQ5FhMDuB0y7xwL7CpFKsYn8/fC4AazoN1AO1bfBng0S4Dx4P7oO8HeEGRZ/R00sJSNq6yoRfJt+mLTlu9YQABWHOoS251T/9cMfcpyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bvccnq/H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E59C4CEED;
+	Mon, 23 Jun 2025 06:09:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750658969;
+	bh=PNHYsFG5NwLTdXL4ZX15juhfF+vA0FSIDNnfrT5LYJ8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Bvccnq/HXIbUblT5RrRtuAtCGHJuyMSm1Z/UMMJtou3oboBKjzaJShWzRGacGss13
+	 mVw6eUVJUEFvn573v2h9O1Sg9EwFqebJ2E4AEYntQxQGtSXeVlu7nfGo84TRnh4yCL
+	 RhdYeT1Vd+sBT7jh7vOc7BkKT+P9nkdNEQcwqmZFqmvcU8IaOnVE939FUGlMhL/ghc
+	 FlnS72275/iEu6OAwcV49oCsgqpogcJcHctjQAqy1/sngt/aO2EqIza0XcC8FkQ6xq
+	 ocnyJWPOe7NRrbts4g7jOV7z+EpbIgs+rod7dElCbvrbKiAzmRzNw1BbBWXYsmElyI
+	 KfXU9HAlZSyLw==
+Message-ID: <ab698ba0-6c6e-4d52-bef8-a6843aaa6cbf@kernel.org>
+Date: Mon, 23 Jun 2025 08:09:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: T0988381ff57d4bb7
-Date: Mon, 23 Jun 2025 07:56:06 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Jijie Shao" <shaojijie@huawei.com>, "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Jian Shen" <shenjian15@huawei.com>,
- "Salil Mehta" <salil.mehta@huawei.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
- "Nathan Chancellor" <nathan@kernel.org>,
- "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
- "Hao Lan" <lanhao@huawei.com>, "Guangwei Zhang" <zhangwangwei6@huawei.com>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev
-Message-Id: <13cf4327-f04f-455e-9a3a-1c74b22f42d0@app.fastmail.com>
-In-Reply-To: <cb286135-466f-40b2-aaa5-a2b336d3a87c@huawei.com>
-References: <20250610092113.2639248-1-arnd@kernel.org>
- <41f14b66-f301-45cb-bdfd-0192afe588ec@huawei.com>
- <a029763b-6a5c-48ed-b135-daf1d359ac24@app.fastmail.com>
- <34d9d8f7-384e-4447-90e2-7c6694ecbb05@huawei.com>
- <20250612083309.7402a42e@kernel.org>
- <02b6bd18-6178-420b-90ab-54308c7504f7@huawei.com>
- <cb286135-466f-40b2-aaa5-a2b336d3a87c@huawei.com>
-Subject: Re: [PATCH] hns3: work around stack size warning
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/13] dt-bindings: net: mediatek,net: update for
+ mt7988
+To: frank-w@public-files.de, Frank Wunderlich <linux@fw-web.de>
+Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jia-Wei Chang <jia-wei.chang@mediatek.com>,
+ Johnson Wang <johnson.wang@mediatek.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
+ <arinc.unal@arinc9.com>, Landen Chao <Landen.Chao@mediatek.com>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>, linux-pm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20250620083555.6886-1-linux@fw-web.de>
+ <20250620083555.6886-2-linux@fw-web.de>
+ <jnrlk7lwob2qel453wy2igaravxt4lqgkzfl4hctybwk7qvmwm@pciwvmzkxatd>
+ <100D79A2-12A9-478D-81F7-F2E5229C4269@public-files.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <100D79A2-12A9-478D-81F7-F2E5229C4269@public-files.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 23, 2025, at 05:19, Jijie Shao wrote:
->> on 2025/6/12 23:33, Jakub Kicinski wrote:
+On 22/06/2025 13:44, Frank Wunderlich wrote:
+> Hi,
+> 
+> Thank you for review.
+> 
+> Am 22. Juni 2025 13:10:31 MESZ schrieb Krzysztof Kozlowski <krzk@kernel.org>:
+>> On Fri, Jun 20, 2025 at 10:35:32AM +0200, Frank Wunderlich wrote:
+>>> From: Frank Wunderlich <frank-w@public-files.de>
+>>>
+>>> Update binding for mt7988 which has 3 gmac and 2 reg items.
 >>
->
-> *Hi Jakub, Arnd We have changed the impleament as your suggestion. Wou=
-ld=20
-> you please help check it ? If it's OK, we will rewrite the rest parts =
-of=20
-> our debugfs code. Thanks! *
+>> Why?
+> 
+> I guess this is for reg? Socs toll mt7986 afair
+>  get the SRAM register by offset to the MAC
+>  register.
+> On mt7988 we started defining it directly.
 
-The conversion to seq_file looks good to me, this does address the
-stack usage problems I was observing.
-Thanks for cleaning this up!
+This should be explained in commit msg. Why are you doing the changes...
 
-> -    sprintf(result[j++], "%u", index);
-> -    sprintf(result[j++], "%u", readl_relaxed(ring->tqp->io_base +
-> -        HNS3_RING_TX_RING_BD_NUM_REG));
-> +    seq_printf(s, "%-4u%6s", index, " ");
-> +    seq_printf(s, "%-5u%3s",
-> +           readl_relaxed(base + HNS3_RING_TX_RING_BD_NUM_REG), " ");
+> 
+>>> MT7988 has 4 FE IRQs (currently only 2 are used) and the 4 IRQs for
+>>> use with RSS/LRO later.
+>>>
+>>> Add interrupt-names to make them accessible by name.
+>>>
+> ...
+>>>    reg:
+>>> -    maxItems: 1
+>>> +    items:
+>>> +      - description: Register for accessing the MACs.
+>>> +      - description: SoC internal SRAM used for DMA operations.
+>>
+>> SRAM like mmio-sram?
+> 
+> Not sure,but as far as i understand the driver
+>  the sram is used to handle tx packets directly
+>  on the soc (less dram operations).
+> 
+> As mt7988 is the first 10Gbit/s capable SoC
+>  there are some changes. But do we really need 
+>  a new binding? We also thing abour adding
+>  RSS/LRO to mt7986 too,so we come into
+>  similar situation regarding the Interrupts/  
+>  -names.
 
-I'm not sure I understand the format string changes here, I did
-not think they were necessary.
+If it is mmio-sram, then it is definitely not reg property.
 
-Are you doing this to keep the output the same as before, or are
-you reformatting the contents for readability?
+Anyway
+wrap emails
+according to list
+discussion rules.
 
-> +static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32=20
-> cmd)
-> +{
-> +=C2=A0=C2=A0=C2=A0 struct device *dev =3D &handle->pdev->dev;
-> +=C2=A0=C2=A0=C2=A0 struct dentry *entry_dir;
-> +=C2=A0=C2=A0=C2=A0 read_func func =3D NULL;
-> +
-> +=C2=A0=C2=A0=C2=A0 switch (hns3_dbg_cmd[cmd].cmd) {
-> +=C2=A0=C2=A0=C2=A0 case HNAE3_DBG_CMD_TX_QUEUE_INFO:
-> +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 func =3D hns3_dbg_tx_queue_info;
-> +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 break;
-> +=C2=A0=C2=A0=C2=A0 default:
-> +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EINVAL;
-> +=C2=A0=C2=A0=C2=A0 }
-> +
-> +=C2=A0=C2=A0=C2=A0 entry_dir =3D hns3_dbg_dentry[hns3_dbg_cmd[cmd].de=
-ntry].dentry;
-> +=C2=A0=C2=A0=C2=A0 debugfs_create_devm_seqfile(dev, hns3_dbg_cmd[cmd]=
-.name, entry_dir,
-> +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 =C2=A0=C2=A0=C2=A0 func);
-> +
-> +=C2=A0=C2=A0=C2=A0 return 0;
+> 
+>>> +    minItems: 1
+>>>  
+>>>    clocks:
+>>>      minItems: 2
+>>> @@ -40,7 +43,11 @@ properties:
+>>>  
+>>>    interrupts:
+>>>      minItems: 1
+>>> -    maxItems: 4
+>>> +    maxItems: 8
+>>> +
+>>> +  interrupt-names:
+>>> +    minItems: 1
+>>> +    maxItems: 8
+>>
+>> So now all variants get unspecified names? You need to define it. Or
+>> just drop.
+> 
+> Most socs using the Fe-irqs like mt7988,some
+>  specify only 3 and 2 soc (mt762[18]) have only
+>  1 shared irq. But existing dts not yet using the
+>  irq-names.
+> Thats why i leave it undefined here and
+>  defining it only for mt7988 below. But leaving it
+>  open to add irq names to other socs like filogic
+>  socs (mt798x) where we are considering
+>  adding rss/lro support too.
+> 
 
-This will work fine as well, but I think you can do slightly better
-by having your own file_operations with a read function based
-on single_open() and your current hns3_dbg_read_cmd().
+I explained this is wrong. Your binding must be specific, not flexible.
 
-I don't think you gain anything from using debugfs_create_devm_seqfile()
-since you use debugfs_remove_recursive() for cleaning it up anyway.
+>>>  
+>>>    power-domains:
+>>>      maxItems: 1
+>>> @@ -348,7 +355,19 @@ allOf:
+>>>      then:
+>>>        properties:
+>>>          interrupts:
+>>> -          minItems: 4
+>>> +          minItems: 2
+>>
+>> Why? Didn't you say it has 4?
+> 
+> Sorry missed to change it after adding the 2
+>  reserved fe irqs back again (i tried adding only used irqs - rx+tx,but got info that all irqs can be used - for future functions - so added all available).
+> 
+>>> +
+>>> +        interrupt-names:
+>>> +          minItems: 2
+>>> +          items:
+>>> +            - const: fe0
+>>> +            - const: fe1
+>>> +            - const: fe2
+>>> +            - const: fe3
+>>> +            - const: pdma0
+>>> +            - const: pdma1
+>>> +            - const: pdma2
+>>> +            - const: pdma3
+>>>  
+>>>          clocks:
+>>>            minItems: 24
+>>> @@ -381,8 +400,11 @@ allOf:
+>>>              - const: xgp2
+>>>              - const: xgp3
+>>>  
+>>> +        reg:
+>>> +          minItems: 2
+>>
+>>
+>> And all else? Why they got 2 reg and 8 interrupts now? All variants are
+>> now affected/changed. We have been here: you need to write specific
+>> bindings.
+> 
+> Mt7988 is more powerful and we wanted to add
+>  all irqs available to have less problems when
+>  adding rss support later. E.g. mt7986 also have
+>  the pdma irqs,but they are not part of
+>  binding+dts yet. Thats 1 reason why
+>  introducing irq-names now. And this block is
+>  for mt7988 only...the other still have a regcount of 1 (min-items).
 
-     Arnd
+This explains me nothing. Why do you change other hardware? Why when
+doing something for MT7988 you also state that other SoCs have different
+number of interrupts?
+
+
+
+Best regards,
+Krzysztof
 
