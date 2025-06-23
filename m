@@ -1,74 +1,85 @@
-Return-Path: <netdev+bounces-200384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29ED0AE4C19
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:45:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B74DAE4C1E
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 19:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C1463AD53E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:45:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C1D3189E691
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF872D3204;
-	Mon, 23 Jun 2025 17:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEADE287519;
+	Mon, 23 Jun 2025 17:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsIaowWc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="N1MxmY4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2440E2D23BF;
-	Mon, 23 Jun 2025 17:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ABF3D3B8;
+	Mon, 23 Jun 2025 17:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750700730; cv=none; b=CVVyqLpaLBsu6MHAeNOA6M2+C/UBJN2wz78/xCl0buQhiu1zCEEigsZCrimKiO8TQ17Q7rBQgemKBFhMmmNaAxXd4bPRBg3vwWIUZb5u6dscawqnecO1GwZz8bKmxM6OZ5r5fIY5zpnwl6NvgGpj+zxKZYjRQMlhH7mcUS6n2Gk=
+	t=1750700866; cv=none; b=qE9pgxSqpSXoUOvlS7FTeyRQAiyejlgSP1IEji4J4ezrHUnaFawQ/+3ZL4RPoylh5Xv8Y3MOjA9yvzCjBlycywqV0peMqfZJeDf/K03qxf4cGsZsVl0E/ymwSticNmSkYoP+qvtp4Zl7FoLq9UzWSFEAWdX3FZZCc/7mWfmVUMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750700730; c=relaxed/simple;
-	bh=z+mTHekPicguApDc91NjslffEi7PoMbr2YzcPmjuxA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=smtag5vZq1Q9iXgsDnuEaTo9bmn6N0tq96rFfl6iD4Vkp08qNz2Si2tnpXHGqsHjenwMwYfio1qfGFhIiYka1b6TApAlZFZr/KJ8vpD3nniwIa0YrqWS77W8ufKo4IqpJ2w8mszkcFs8guINTK6pIJpCDIORhYo87L7I0ZLZKPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsIaowWc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D49EC4CEEA;
-	Mon, 23 Jun 2025 17:45:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750700729;
-	bh=z+mTHekPicguApDc91NjslffEi7PoMbr2YzcPmjuxA8=;
-	h=Date:From:To:Cc:Subject:From;
-	b=MsIaowWc5mfT8EzmdTiyIcuqDxMf4f9UUiX9+sTPPpy0rmBl6rF5vHZyEztGPIqYE
-	 ngSG3hrgz6za4M/iOYnMhSWHpKGH+Dn+9D2NtvTq/XX/lFIygzH4Ec4LqXoDgD0RUy
-	 jWxPmHipZ5A0Rqrep0fHxNHobfQaI6HwsqPaEV7+yrnckx1eix6jIUlA0WMNDGqTNp
-	 8JvYgUyH2RiDMdAFl/s9OY9VetThsa/2ydKqTHVGb6JPQbRb66bke6I+cykytxpgKx
-	 Ho8gX4ls2fJOkn5hVU93uhYdF+Zt3Xg0A3xJanTNaizN1UE9FngTsrTDJt8Wysb3pe
-	 o/ZQW+gcJmPOw==
-Date: Mon, 23 Jun 2025 10:45:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org
-Subject: [ANN] development stats for time periods
-Message-ID: <20250623104528.74ce41da@kernel.org>
+	s=arc-20240116; t=1750700866; c=relaxed/simple;
+	bh=DQA1YjYGt0Bcpov/++EhtCvF+McC1Sn4ATQi0Qk6+xA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuWlavuVLLxeZTSLAj51pDetbgKCUqxnMky6j6P5yvlFtwfHgFEuqTIn3RpIz5eKtP2h7IMjWWTFmFn2DdARN96//2lRvPSanTn6mLE1tTWieYQFPaer167UjqVusu2QtNX3yiEPjkUredPNAPXVwJAN++eJzTqdszqWSyguxt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=N1MxmY4/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pgVc16tuszevNFSrJNNjwVYo9zNPjlL0T1AuSx6YM2U=; b=N1MxmY4/gusvuN6lmH308JfacB
+	FaCSRbCuTlArCp2GTS/Lo86vvcK4mwTVTPdH0PRVh2vQYfGYebdvENEN2ZwMnrr1Dcy8LTHB30kDl
+	nR+x8NlI7NLB8ZnRoN+1GVzhyuPIGWqwPirw6A1opLr7isPEprmgQ7D/Lmgq3UVoI+Ec=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uTlGV-00GiRv-3H; Mon, 23 Jun 2025 19:47:31 +0200
+Date: Mon, 23 Jun 2025 19:47:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ryan Wanner <ryan.wanner@microchip.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] Expose REFCLK for RMII and enable RMII
+Message-ID: <461269ea-4741-4916-b0e0-63e0ce8d9c7e@lunn.ch>
+References: <cover.1750346271.git.Ryan.Wanner@microchip.com>
+ <4b1f601d-7a65-4252-8f04-62b5a952c001@lunn.ch>
+ <0aa6c9a4-4a65-4b55-a180-92c795499384@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0aa6c9a4-4a65-4b55-a180-92c795499384@microchip.com>
 
-Hi!
+> Our SAMA7D65_curiosity board has a connector that allows us to change
+> ethernet phys. Since some of the phys we have provide their own REFCLK
+> while others do not, this property needs to be added so we are able to
+> use all of these.
+> 
+> I do not have an exact .dts patch for this since our default is MPU
+> provides the REFCLK, this property will be used with dt-overlays that
+> match each phy that is connected.
 
-The first half of 2025 is coming to a close and I suspect some
-companies are working through employee performance reviews.
+We generally don't allow a feature without a user. So please re-submit
+this when you submit a DT overlay which can actually use it.
 
-Our development stats are are bit awkward to use for performance
-reviews because release cycles don't align with 6mo or 12mo windows.
-I added a cron job to generate the development stats each weekend
-for the last X months:
-https://netdev.bots.linux.dev/static/nipa/stats-1mo/
-https://netdev.bots.linux.dev/static/nipa/stats-3mo/
-https://netdev.bots.linux.dev/static/nipa/stats-6mo/
-https://netdev.bots.linux.dev/static/nipa/stats-12mo/
-This should hopefully make it easier to claim credit for upstream work.
+    Andrew
 
-HTH
+---
+pw-bot: cr
 
