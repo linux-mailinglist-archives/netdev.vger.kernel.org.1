@@ -1,130 +1,154 @@
-Return-Path: <netdev+bounces-200244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53ACAAE3D54
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:52:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D02AE3D6C
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 569DC163BED
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:51:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44AA97A620E
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F8623C518;
-	Mon, 23 Jun 2025 10:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8BA23C4F1;
+	Mon, 23 Jun 2025 10:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGMIRphi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d/7dIcKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DE7239E65
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1E9233701
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750675875; cv=none; b=p7pMoZzzD2oVXTG0OEB696hCYw3sIh7w84Jk8ZwOLgprV4J0tt1r0B3fo1S1JDHcGOgTm+SttWY9v8A3ITjDwFTNnwxqs6KHHk0tdN4iJW5EEgks4tmu0YUq+tO2LE1zSzj5ITfVpcgUcluV8RILJ5vkJql+gjFN22ac7l5262g=
+	t=1750676083; cv=none; b=tTsKDtyhpRBCHP2uUSA8SIxu4nIB3xm5kb0n6DHDAIPB60tBsbjJDw2XL9zIDFWhLtIW2vwUsR7Z08ftyHLUnU2MosR6ou4WczD6REuZdv0mDZyeDekxAsUzRNMZaRiwhA50KVcEAvUPc3TNSqExg42WlQu6o8wAKRd9uSnVgCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750675875; c=relaxed/simple;
-	bh=UWME3XWaA3mYNTAF4jzXFx44J7v0qfaW41Ag+aZwT7k=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Z4f4ey2nD0/VUhH0YNXJBI2AJLiLz/vIjaW7Orhk1DWzeFo3AVH3tWHTcVy3MZWdbI9/8Rjqxw1X3EvmgfEnLWpfHuP65yigEx136KDk13nztIDoSoDe9qHI43J1b7YUWttqltN+Ls7fkR3T8dmKp5SDoJlVb89l9IPNUssP3G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gGMIRphi; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1750676083; c=relaxed/simple;
+	bh=rnz7A+bUMKwknsRgBwGvOSqTmRNgfmB4Gfj1UZB3G90=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SGMVgzdmMmwXsk3Rwtq1gOTRdgkssndmnj0krpV4qDueadDAomJ82/kMfBHzbj6hCalYdSY6tskBvrFWUZooEEa/fIXz4IQ7YwZxgJWEsYYV4MlEZbE456mloKXNelpPzCvQNhuaJA+nif6zeNrJHo+umYH6aM+czNj5tiGtamc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d/7dIcKv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750675872;
+	s=mimecast20190719; t=1750676081;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QsYyfB+Z7vJsNRi6uhzXLbhNGPzqKCN+qJj9FfeE5iA=;
-	b=gGMIRphiJ3AR1zn3HcIhbbXn/4Q8gQhR+t8V9ppLJrB6+U5SSp2IcTHbMqS882nqY+/OQ5
-	m4GztAUOCA3sqHrZI45/9BqRoScl9HyYS6HuKyjLWHay5It9AJJVPembt5+uiRURTK8amn
-	MJyenULkMyaEH8xR2SnQjvjBuU+uZJA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9uVlOBl4JiN0W9ZdeX9DfLg4JhDRJ5g9Qa7grgLb1uo=;
+	b=d/7dIcKvv2abNdc1c76+dS7iD1PJ0XQ8XW4l/x0fFz0e1VcdJgZTPG93jairLJT+7pQlvM
+	1JmJnJj25gXlOxm4i22lggFirbn0+0sjIFYJO/f6JJx2bi5YmPPCD1NKMQpLNH3A0PPo97
+	vrESyql1ojzmRpXp3bn4r4e5Bc+wrOg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-CFX2wP3BN9qpbl-vblsOvA-1; Mon,
- 23 Jun 2025 06:51:07 -0400
-X-MC-Unique: CFX2wP3BN9qpbl-vblsOvA-1
-X-Mimecast-MFC-AGG-ID: CFX2wP3BN9qpbl-vblsOvA_1750675865
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-130-Q91YnK0mPgC9KtbUcnucjg-1; Mon,
+ 23 Jun 2025 06:54:35 -0400
+X-MC-Unique: Q91YnK0mPgC9KtbUcnucjg-1
+X-Mimecast-MFC-AGG-ID: Q91YnK0mPgC9KtbUcnucjg_1750676074
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E38E21809C82;
-	Mon, 23 Jun 2025 10:51:04 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0D4A430001A1;
-	Mon, 23 Jun 2025 10:50:59 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <2135907.1747061490@warthog.procyon.org.uk>
-References: <2135907.1747061490@warthog.procyon.org.uk> <1069540.1746202908@warthog.procyon.org.uk> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: dhowells@redhat.com, Andrew Lunn <andrew@lunn.ch>,
-    Eric Dumazet <edumazet@google.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>,
-    David Hildenbrand <david@redhat.com>,
-    John Hubbard <jhubbard@nvidia.com>,
-    Mina Almasry <almasrymina@google.com>, willy@infradead.org,
-    Christian Brauner <brauner@kernel.org>,
-    Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
-    linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: How to handle P2P DMA with only {physaddr,len} in bio_vec?
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3CD2118011FB;
+	Mon, 23 Jun 2025 10:54:34 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.226.58])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9185A180045B;
+	Mon, 23 Jun 2025 10:54:31 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH net-next] udp_tunnel: fix deadlock in udp_tunnel_nic_set_port_priv()
+Date: Mon, 23 Jun 2025 12:53:55 +0200
+Message-ID: <95a827621ec78c12d1564ec3209e549774f9657d.1750675978.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1098394.1750675858.1@warthog.procyon.org.uk>
-Date: Mon, 23 Jun 2025 11:50:58 +0100
-Message-ID: <1098395.1750675858@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hi Christoph,
+While configuring a vxlan tunnel in a system with a i40e NIC driver, I
+observe the following deadlock:
 
-Looking at the DMA address mapping infrastructure, it makes use of the page
-struct to access the physical address (which obviously shouldn't be a problem)
-and to find out if the page is involved in P2P DMA.
+ WARNING: possible recursive locking detected
+ 6.16.0-rc2.net-next-6.16_92d87230d899+ #13 Tainted: G            E
+ --------------------------------------------
+ kworker/u256:4/1125 is trying to acquire lock:
+ ffff88921ab9c8c8 (&utn->lock){+.+.}-{4:4}, at: i40e_udp_tunnel_set_port (/home/pabeni/net-next/include/net/udp_tunnel.h:343 /home/pabeni/net-next/drivers/net/ethernet/intel/i40e/i40e_main.c:13013) i40e
 
-dma_direct_map_page() calls is_pci_p2pdma_page():
+ but task is already holding lock:
+ ffff88921ab9c8c8 (&utn->lock){+.+.}-{4:4}, at: udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:739) udp_tunnel
 
-	static inline bool is_pci_p2pdma_page(const struct page *page)
-	{
-		return IS_ENABLED(CONFIG_PCI_P2PDMA) &&
-			is_zone_device_page(page) &&
-			page_pgmap(page)->type == MEMORY_DEVICE_PCI_P2PDMA;
-	}
+ other info that might help us debug this:
+  Possible unsafe locking scenario:
 
-What's the best way to manage this without having to go back to the page
-struct for every DMA mapping we want to make?  Do we need to have
-iov_extract_user_pages() note this in the bio_vec?
+        CPU0
+        ----
+   lock(&utn->lock);
+   lock(&utn->lock);
 
-	struct bio_vec {
-		physaddr_t	bv_base_addr;	/* 64-bits */
-		size_t		bv_len:56;	/* Maybe just u32 */
-		bool		p2pdma:1;	/* Region is involved in P2P */
-		unsigned int	spare:7;
-	};
+  *** DEADLOCK ***
 
-I'm guessing that only folio-type pages can be involved in this:
+  May be due to missing lock nesting notation
 
-	static inline struct dev_pagemap *page_pgmap(const struct page *page)
-	{
-		VM_WARN_ON_ONCE_PAGE(!is_zone_device_page(page), page);
-		return page_folio(page)->pgmap;
-	}
+ 4 locks held by kworker/u256:4/1125:
+ #0: ffff8892910ca158 ((wq_completion)udp_tunnel_nic){+.+.}-{0:0}, at: process_one_work (/home/pabeni/net-next/kernel/workqueue.c:3213)
+ #1: ffffc900244efd30 ((work_completion)(&utn->work)){+.+.}-{0:0}, at: process_one_work (/home/pabeni/net-next/kernel/workqueue.c:3214)
+ #2: ffffffff9a14e290 (rtnl_mutex){+.+.}-{4:4}, at: udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:737) udp_tunnel
+ #3: ffff88921ab9c8c8 (&utn->lock){+.+.}-{4:4}, at: udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:739) udp_tunnel
 
-as only struct folio has a pointer to dev_pagemap?  And I assume this is going
-to get removed from struct page itself at some point soonish.
+ stack backtrace:
+ Hardware name: Dell Inc. PowerEdge R7525/0YHMCJ, BIOS 2.2.5 04/08/2021
+i
+ Call Trace:
+  <TASK>
+ dump_stack_lvl (/home/pabeni/net-next/lib/dump_stack.c:123)
+ print_deadlock_bug (/home/pabeni/net-next/kernel/locking/lockdep.c:3047)
+ validate_chain (/home/pabeni/net-next/kernel/locking/lockdep.c:3901)
+ __lock_acquire (/home/pabeni/net-next/kernel/locking/lockdep.c:5240)
+ lock_acquire.part.0 (/home/pabeni/net-next/kernel/locking/lockdep.c:473 /home/pabeni/net-next/kernel/locking/lockdep.c:5873)
+ __mutex_lock (/home/pabeni/net-next/kernel/locking/mutex.c:604 /home/pabeni/net-next/kernel/locking/mutex.c:747)
+ i40e_udp_tunnel_set_port (/home/pabeni/net-next/include/net/udp_tunnel.h:343 /home/pabeni/net-next/drivers/net/ethernet/intel/i40e/i40e_main.c:13013) i40e
+ udp_tunnel_nic_device_sync_by_port (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:230 /home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:249) udp_tunnel
+ __udp_tunnel_nic_device_sync.part.0 (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:292) udp_tunnel
+ udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:742) udp_tunnel
+ process_one_work (/home/pabeni/net-next/kernel/workqueue.c:3243)
+ worker_thread (/home/pabeni/net-next/kernel/workqueue.c:3315 /home/pabeni/net-next/kernel/workqueue.c:3402)
+ kthread (/home/pabeni/net-next/kernel/kthread.c:464)
 
-David
+AFAICS all the existing callsites of udp_tunnel_nic_set_port_priv() are
+already under the utn lock scope, avoid (re-)acquiring it in such a
+function.
+
+Fixes: 1ead7501094c ("udp_tunnel: remove rtnl_lock dependency")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ include/net/udp_tunnel.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+index cbd3a43074bd..9acef2fbd2fd 100644
+--- a/include/net/udp_tunnel.h
++++ b/include/net/udp_tunnel.h
+@@ -339,9 +339,8 @@ udp_tunnel_nic_set_port_priv(struct net_device *dev, unsigned int table,
+ 			     unsigned int idx, u8 priv)
+ {
+ 	if (udp_tunnel_nic_ops) {
+-		udp_tunnel_nic_ops->lock(dev);
++		udp_tunnel_nic_ops->assert_locked(dev);
+ 		udp_tunnel_nic_ops->set_port_priv(dev, table, idx, priv);
+-		udp_tunnel_nic_ops->unlock(dev);
+ 	}
+ }
+ 
+-- 
+2.49.0
 
 
