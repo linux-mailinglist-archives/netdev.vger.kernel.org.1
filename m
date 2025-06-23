@@ -1,154 +1,167 @@
-Return-Path: <netdev+bounces-200245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D02AE3D6C
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:54:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7C3AE3D88
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 12:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44AA97A620E
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:53:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18DF2163C0B
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 10:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8BA23C4F1;
-	Mon, 23 Jun 2025 10:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1E21EFFBB;
+	Mon, 23 Jun 2025 10:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d/7dIcKv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgkiEuOu"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1E9233701
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6CC13B58B
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 10:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750676083; cv=none; b=tTsKDtyhpRBCHP2uUSA8SIxu4nIB3xm5kb0n6DHDAIPB60tBsbjJDw2XL9zIDFWhLtIW2vwUsR7Z08ftyHLUnU2MosR6ou4WczD6REuZdv0mDZyeDekxAsUzRNMZaRiwhA50KVcEAvUPc3TNSqExg42WlQu6o8wAKRd9uSnVgCE=
+	t=1750676324; cv=none; b=emqFaAIrRhA/RQWDiALpVJQ4pE5VHgLu+uuPkDnbZ1IGlM2+LNb2XEPTCavkeUgdYDGhUCQVYx4KXJ3PbEntMuk+o5FtaYttyTETwkxe4PdXhJm7WiwZO7l5vV1FOHtdGM/bLUDKPptKSQB9hFmKmMDcPDkUaDtdoMGWt4yyTM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750676083; c=relaxed/simple;
-	bh=rnz7A+bUMKwknsRgBwGvOSqTmRNgfmB4Gfj1UZB3G90=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SGMVgzdmMmwXsk3Rwtq1gOTRdgkssndmnj0krpV4qDueadDAomJ82/kMfBHzbj6hCalYdSY6tskBvrFWUZooEEa/fIXz4IQ7YwZxgJWEsYYV4MlEZbE456mloKXNelpPzCvQNhuaJA+nif6zeNrJHo+umYH6aM+czNj5tiGtamc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d/7dIcKv; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1750676324; c=relaxed/simple;
+	bh=7z/LoiUZ4ckAuHWelqzbV13t1/gO/DQPymPaZ9atChc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jno6XWnBWrM65Hi06ylmw/81ncZvZa7tRM/RcB0++gTiXV/R8naIZtzbHz+E7cSFd9NTMTGTUYXZS/J5yAhQCyR8mERjnRzBKVj/32PkC12XCPli4o3RcJUV3pW5bkf5J3v7SlAxphC31NfiXyiPFDnnzHyq+RwgajKojwnXfEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RgkiEuOu; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750676081;
+	s=mimecast20190719; t=1750676322;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9uVlOBl4JiN0W9ZdeX9DfLg4JhDRJ5g9Qa7grgLb1uo=;
-	b=d/7dIcKvv2abNdc1c76+dS7iD1PJ0XQ8XW4l/x0fFz0e1VcdJgZTPG93jairLJT+7pQlvM
-	1JmJnJj25gXlOxm4i22lggFirbn0+0sjIFYJO/f6JJx2bi5YmPPCD1NKMQpLNH3A0PPo97
-	vrESyql1ojzmRpXp3bn4r4e5Bc+wrOg=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-130-Q91YnK0mPgC9KtbUcnucjg-1; Mon,
- 23 Jun 2025 06:54:35 -0400
-X-MC-Unique: Q91YnK0mPgC9KtbUcnucjg-1
-X-Mimecast-MFC-AGG-ID: Q91YnK0mPgC9KtbUcnucjg_1750676074
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3CD2118011FB;
-	Mon, 23 Jun 2025 10:54:34 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.226.58])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9185A180045B;
-	Mon, 23 Jun 2025 10:54:31 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next] udp_tunnel: fix deadlock in udp_tunnel_nic_set_port_priv()
-Date: Mon, 23 Jun 2025 12:53:55 +0200
-Message-ID: <95a827621ec78c12d1564ec3209e549774f9657d.1750675978.git.pabeni@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OcWuVqlYqc8Fv7LscejW/AotfZkWXZJQvOx/NWErPRU=;
+	b=RgkiEuOufHyxnyEAjj4zHA0RkJbD935Wd0e7LLDvEtYmyXcAJyHfyRoYG+c4J2Be2vWqDV
+	HpMpH/KsPDSRnfB0CUTKMNo07ymRLUjNu9ZirCg/LrrPx45p1yqLyjCbLQca/03zXOuP/c
+	MgpXHulzOSnLU0kJDs9xPh9cI5pEvKI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-532-XUSymYAZMfK-m9GOmOHaZw-1; Mon, 23 Jun 2025 06:58:40 -0400
+X-MC-Unique: XUSymYAZMfK-m9GOmOHaZw-1
+X-Mimecast-MFC-AGG-ID: XUSymYAZMfK-m9GOmOHaZw_1750676320
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a503f28b09so2007108f8f.0
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 03:58:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750676320; x=1751281120;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OcWuVqlYqc8Fv7LscejW/AotfZkWXZJQvOx/NWErPRU=;
+        b=NRA9+kXFvkGhBTwfjxxJYj2g6K3msXlyjr32RqRWZQXyDdU4DC19N3z4NwcuxqOXuU
+         IUlA020+h1ERMrSPChEuW6rb9V5LdF9975jhUXIIi9b5HLBsEg3GYNIAtNzRa306Dl3x
+         QCdf0gi8HWidBeMVFysl2Q+RPMLUltjK3AI15fQKW8alYgWRgWK71N4C78QglyBmvAM4
+         VgboAsvu+y9yzNqjAsYhMsZIMH6DFY9UTI4mrpgIHvzxxZasDYWtRuMiKa3MZqbT+JKA
+         bMA2RHEiZi718/W8uWiFWKtobDwkBFrolPJlV4n1/irAEKemT072I1DDqVsZ4dDD6/Eq
+         cs8A==
+X-Gm-Message-State: AOJu0YwFOKfLZhnkzT2W8ddFyBcADTtQ4Oiv6Oe9cu13wFWyQmMjQP1p
+	ox/aQxbhuVixX5kCecH4epqo1ci97PhJ34y4BuWyZCjH/H5VgH2c/CUH4Dm6RXxVx6jcNC1CT7x
+	RYiQkCeKwM049zXbjTdD9yTFUqC/jBOytEyKvdg+9prtHFOHvZLe/3Wn5zA==
+X-Gm-Gg: ASbGncvJkFdGWiFDpbnt0Oen+EVF9ck2gdzbWAf0NyqMk9kwfVMfwx/NOpc4ca8lnLf
+	RiKGcUoZKVfhXCsUwTZCZ+Nh74/lYxMf+N9w/jdXP/9w+oIaTepQZRAbrdxg+/PFV3fNSfI920H
+	RyBGtNr5vzWnZuiQ8vu05v2ju+LFDYEoYXfLY1MHFbwSmmhzaIqzUPBWTZm82IxTqjIzTNHFbZS
+	8cl4DWWnLe7R8eIC/9+ovVFYz6gt5yOXTmLR2dkXvyjLJUkj8znteNOWGYcEPTPFtAM2xMRg+6Q
+	RGlyKhaF8xudwnSIxqJrmy4t2Pnb4N115atDo1ZDfCReAUnsN6Q=
+X-Received: by 2002:a05:6000:18ae:b0:3a5:1388:9a55 with SMTP id ffacd0b85a97d-3a6d27866c8mr8793332f8f.5.1750676319665;
+        Mon, 23 Jun 2025 03:58:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEuACVKe9HFC6qufVqz8o3XpVCa/QxvhucENHMrVNmqYzlGVMUG4A86okn7ed0TQ1m9XLYpDg==
+X-Received: by 2002:a05:6000:18ae:b0:3a5:1388:9a55 with SMTP id ffacd0b85a97d-3a6d27866c8mr8793314f8f.5.1750676319238;
+        Mon, 23 Jun 2025 03:58:39 -0700 (PDT)
+Received: from [192.168.0.115] (146-241-49-103.dyn.eolo.it. [146.241.49.103])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45366181aebsm58339325e9.3.2025.06.23.03.58.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Jun 2025 03:58:38 -0700 (PDT)
+Message-ID: <61d10c9b-4f1b-46f6-9a52-1de9aa193a7b@redhat.com>
+Date: Mon, 23 Jun 2025 12:58:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 4/9] vhost-net: allow configuring extended
+ features
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
+ kvm@vger.kernel.org
+References: <cover.1750436464.git.pabeni@redhat.com>
+ <e195567cf1f705143477f6eee7b528ee15918873.1750436464.git.pabeni@redhat.com>
+ <20250622160221.GH71935@horms.kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250622160221.GH71935@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-While configuring a vxlan tunnel in a system with a i40e NIC driver, I
-observe the following deadlock:
 
- WARNING: possible recursive locking detected
- 6.16.0-rc2.net-next-6.16_92d87230d899+ #13 Tainted: G            E
- --------------------------------------------
- kworker/u256:4/1125 is trying to acquire lock:
- ffff88921ab9c8c8 (&utn->lock){+.+.}-{4:4}, at: i40e_udp_tunnel_set_port (/home/pabeni/net-next/include/net/udp_tunnel.h:343 /home/pabeni/net-next/drivers/net/ethernet/intel/i40e/i40e_main.c:13013) i40e
 
- but task is already holding lock:
- ffff88921ab9c8c8 (&utn->lock){+.+.}-{4:4}, at: udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:739) udp_tunnel
+On 6/22/25 6:02 PM, Simon Horman wrote:
+> On Fri, Jun 20, 2025 at 07:39:48PM +0200, Paolo Abeni wrote:
+>> Use the extended feature type for 'acked_features' and implement
+>> two new ioctls operation allowing the user-space to set/query an
+>> unbounded amount of features.
+>>
+>> The actual number of processed features is limited by VIRTIO_FEATURES_MAX
+>> and attempts to set features above such limit fail with
+>> EOPNOTSUPP.
+>>
+>> Note that: the legacy ioctls implicitly truncate the negotiated
+>> features to the lower 64 bits range and the 'acked_backend_features'
+>> field don't need conversion, as the only negotiated feature there
+>> is in the low 64 bit range.
+>>
+>> Acked-by: Jason Wang <jasowang@redhat.com>
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> 
+> ...
+> 
+>> +	case VHOST_GET_FEATURES_ARRAY:
+>> +		if (get_user(count, featurep))
+>> +			return -EFAULT;
+>> +
+>> +		/* Copy the net features, up to the user-provided buffer size */
+>> +		argp += sizeof(u64);
+>> +		copied = min(count, VIRTIO_FEATURES_DWORDS);
+>> +		if (copy_to_user(argp, vhost_net_features,
+>> +				 copied * sizeof(u64)))
+>> +			return -EFAULT;
+>> +
+>> +		/* Zero the trailing space provided by user-space, if any */
+>> +		if (clear_user(argp, (count - copied) * sizeof(u64)))
+> 
+> Hi Paolo,
+> 
+> Smatch warns to "check for integer overflow 'count'" on the line above.
+> 
+> Perhaps it is wrong. Or my analyais is. But it seems to me that an overflow
+> could occur if count is very large, say such that (count - copied) is more
+> than 2^64 / 8.  As then (count - copied) * sizeof(u64) would overflow 64
+> bits.
+> 
+> By the same reasoning this could overflow 32 bits on systems where an
+> unsigned long, type type of the 2nd parameter of clear_user, is 32 bits.
 
- other info that might help us debug this:
-  Possible unsafe locking scenario:
+I think you and smatch are right. I'll use size_mul() in the next
+iteration. I'll wait a little more before posting it to possibly allow
+for more reviews.
 
-        CPU0
-        ----
-   lock(&utn->lock);
-   lock(&utn->lock);
+Thanks,
 
-  *** DEADLOCK ***
-
-  May be due to missing lock nesting notation
-
- 4 locks held by kworker/u256:4/1125:
- #0: ffff8892910ca158 ((wq_completion)udp_tunnel_nic){+.+.}-{0:0}, at: process_one_work (/home/pabeni/net-next/kernel/workqueue.c:3213)
- #1: ffffc900244efd30 ((work_completion)(&utn->work)){+.+.}-{0:0}, at: process_one_work (/home/pabeni/net-next/kernel/workqueue.c:3214)
- #2: ffffffff9a14e290 (rtnl_mutex){+.+.}-{4:4}, at: udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:737) udp_tunnel
- #3: ffff88921ab9c8c8 (&utn->lock){+.+.}-{4:4}, at: udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:739) udp_tunnel
-
- stack backtrace:
- Hardware name: Dell Inc. PowerEdge R7525/0YHMCJ, BIOS 2.2.5 04/08/2021
-i
- Call Trace:
-  <TASK>
- dump_stack_lvl (/home/pabeni/net-next/lib/dump_stack.c:123)
- print_deadlock_bug (/home/pabeni/net-next/kernel/locking/lockdep.c:3047)
- validate_chain (/home/pabeni/net-next/kernel/locking/lockdep.c:3901)
- __lock_acquire (/home/pabeni/net-next/kernel/locking/lockdep.c:5240)
- lock_acquire.part.0 (/home/pabeni/net-next/kernel/locking/lockdep.c:473 /home/pabeni/net-next/kernel/locking/lockdep.c:5873)
- __mutex_lock (/home/pabeni/net-next/kernel/locking/mutex.c:604 /home/pabeni/net-next/kernel/locking/mutex.c:747)
- i40e_udp_tunnel_set_port (/home/pabeni/net-next/include/net/udp_tunnel.h:343 /home/pabeni/net-next/drivers/net/ethernet/intel/i40e/i40e_main.c:13013) i40e
- udp_tunnel_nic_device_sync_by_port (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:230 /home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:249) udp_tunnel
- __udp_tunnel_nic_device_sync.part.0 (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:292) udp_tunnel
- udp_tunnel_nic_device_sync_work (/home/pabeni/net-next/net/ipv4/udp_tunnel_nic.c:742) udp_tunnel
- process_one_work (/home/pabeni/net-next/kernel/workqueue.c:3243)
- worker_thread (/home/pabeni/net-next/kernel/workqueue.c:3315 /home/pabeni/net-next/kernel/workqueue.c:3402)
- kthread (/home/pabeni/net-next/kernel/kthread.c:464)
-
-AFAICS all the existing callsites of udp_tunnel_nic_set_port_priv() are
-already under the utn lock scope, avoid (re-)acquiring it in such a
-function.
-
-Fixes: 1ead7501094c ("udp_tunnel: remove rtnl_lock dependency")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- include/net/udp_tunnel.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index cbd3a43074bd..9acef2fbd2fd 100644
---- a/include/net/udp_tunnel.h
-+++ b/include/net/udp_tunnel.h
-@@ -339,9 +339,8 @@ udp_tunnel_nic_set_port_priv(struct net_device *dev, unsigned int table,
- 			     unsigned int idx, u8 priv)
- {
- 	if (udp_tunnel_nic_ops) {
--		udp_tunnel_nic_ops->lock(dev);
-+		udp_tunnel_nic_ops->assert_locked(dev);
- 		udp_tunnel_nic_ops->set_port_priv(dev, table, idx, priv);
--		udp_tunnel_nic_ops->unlock(dev);
- 	}
- }
- 
--- 
-2.49.0
+Paolo
 
 
