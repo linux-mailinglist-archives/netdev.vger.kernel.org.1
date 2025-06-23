@@ -1,156 +1,122 @@
-Return-Path: <netdev+bounces-200332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0AACAE4947
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 17:52:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904FFAE4980
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 18:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 210FD3A21AE
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:52:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F5A31884752
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 15:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265F427511B;
-	Mon, 23 Jun 2025 15:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9F7277028;
+	Mon, 23 Jun 2025 15:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UlgZeHeH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="a71SVngq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D3E1F94A
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 15:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B3325F99B;
+	Mon, 23 Jun 2025 15:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750693949; cv=none; b=Nv2DjGzg8916ULB1Rtcczat+iFVHKaSETV+5xd1/qQ6LzaXkkLO2/2GvKLSD4aBRWa79AJsQhnSq+H4pRKyD9Hv38MGLf8WgmuVJi8CQBDI3KjbslW80QUbsAHu+JB9fQpTCw7usRXfJJFsbHHb3skMwVfNOMe/7uqb0pY5Vi9I=
+	t=1750694191; cv=none; b=gfBfxDead/7b1NPvrTrsC2LO5CvcIVK3LI1vUEE5uVRFxLu+nHB674kLOkd8qK+nF+xa+0uHyFUZgH714pxnqhfDn9+jMPWC1Zmsnw0cyzE3QPglo9j9F1zFys4tMdIQDQOQzLmt7UDBMkdcOys6MMy176BM11AQZfp4So2Se5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750693949; c=relaxed/simple;
-	bh=swZyKu2+7PHKHRfwkdESPz2DA5ktsMeC1wvUcdYV9iE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QJl5ubddjjQcNwD9A5abQwvjERkllpIWYf7l6TvXhhv3+7xnGiB+pxhef0ZXblFlLzc3TGOL/vLin0gQWvVVairfhCtLZu9iEZn8Hl+v3JwstiF2tlxn4hNgf05H8nnvl8OJanlzC9gC+WoDVzTH7ryST/Q4lcs3x8LzuikLm8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UlgZeHeH; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32b78b5aa39so45894291fa.1
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 08:52:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750693936; x=1751298736; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tFal6z5WdoJfwgoFuJLt03DQDW5DDCeNtwgGrqakBwU=;
-        b=UlgZeHeHIkuOAOaEVdWdnGX1wdH55jWYILbP2qqJPNDLizckonbt4WBZIbwdCcirqu
-         pk8EtxeER/JuXgonoCTZX/EA90U3J6zqU/iuAgBKNPFkFNDrlhcOTOZZ7jFntwHF3qDK
-         4ZJnBN8MDOPiEESH5FH5mein0XUQdpVqRBIUP7dq4GqpG6oaqr4gyF9quON8rwK8/R6v
-         qo14XXQv2o7pZ19l1o6A4OOYiyO79KYyNA+0zIZU70KMT2NW/UmbDnE/aMm4xVT6IF+2
-         9F3idoKc3ixEB0mvfd87c9rsPie1+sgOR9egAHLf0PLJFte5/CIdMSyCXnNEaxfPI+Pu
-         aH+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750693936; x=1751298736;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tFal6z5WdoJfwgoFuJLt03DQDW5DDCeNtwgGrqakBwU=;
-        b=FJPxAKus4SPu85hgYDtNom8ghMjGEkNMWdUUFpOu/93rTGuOAGmQ7uFGLU9LtM7wRt
-         jto3lRQiPVkny67lBXZeVa0HVI1CYFhCJ6aIuhs25hp+XeiTljjZ5L5JUnYFSk/IWUqD
-         +i1ku5bb/+2naQe+6h4xRdrezCDiNgM7npQHIkP13vWkwAdbITnvbTZZpNyX68jLVdwM
-         PP9HwWhDrDYBCv+9ajIIZxIkLWd8x2KXlGv8EJ6tb0+dqWag52wX8ayWjlFg7K2QWi/O
-         TqtR/5n6NVCzxXYW54Hk14WiUnCdkDTbF/dWRoJ9SGRXA2YUGE6mSfJWmqNS8l8tWWu2
-         N82g==
-X-Gm-Message-State: AOJu0Yx5qFuMBoMJAKzyckdJhf0BjSSnVD9ekNMcwrfPFb1ipQajqowy
-	Tj4YQLU2YQm7vAjOEFY1GIj53vuVvVqqMzSEZwWvs7bkHgeoDgA8npTGYNjxNg==
-X-Gm-Gg: ASbGncsyHtoA4n46h5qhcGf+ic6h6aithG0H5IPBTWq5kgy1ct8QQM/bpQcz82Pto9u
-	NoINHE/tTarHyFpw6EO+PxWggWQuUjhb5b6Zw3vkvRFYBTuDOCKUz+kvREuA2zpJnnxCs2zKR/N
-	QvOfI9HTjMbOJo9Zzr5+CfB5LkVDjOoCg4J34b74LilKpxC+CCpA10mkpZT3KQn7E2bgSPh31Yv
-	h14FB+knGI4MSv092HFJBh5fT+rSYUaIg4SqJYNf5ryU4f5SeYIz42nAKGyOc0B7ul0jib/HRLt
-	z+Qt3CgLeo1BWcnLGdRhSOBs/KrkSNdbxuL4BK91SMkRpSvZIoyWcMHLeH7tHvnfdTMIQtKEFQ3
-	924A/UHHQ5PEsTZ741SIvpg==
-X-Google-Smtp-Source: AGHT+IGaNwpEJrZTNxHoZE/oSLL9KF3CSArRfcXIxUGIx0td6xC1EkNPYdREAq1Q6+TI9QmN2o5MwA==
-X-Received: by 2002:a05:651c:4004:b0:32a:6eea:5c35 with SMTP id 38308e7fff4ca-32b98e8e669mr21686611fa.15.1750693935636;
-        Mon, 23 Jun 2025 08:52:15 -0700 (PDT)
-Received: from burken (c213-89-58-143.bredband.tele2.se. [213.89.58.143])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32b980a3652sm13459791fa.64.2025.06.23.08.52.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 08:52:14 -0700 (PDT)
-Date: Mon, 23 Jun 2025 17:52:13 +0200
-From: Jonas Karlsson <jonas.d.karlsson@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jonas.d.karlsson@gmail.com
-Subject: [PATCH net 1/1] net: cadence: macb: only register MDIO bus when an
- MDIO child node exists in DT
-Message-ID: <aFl4LSaVfY7sz3Pr@burken>
+	s=arc-20240116; t=1750694191; c=relaxed/simple;
+	bh=HLdwjx0VaTkw/NleBqU5pxtyJMC9TFdxwlMghBZW62o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FWC1T7l1OnWhebFax2/WeZwFYiA/49d9e8g+NK4Ts8XdNOnwvpaJhtCuHN5kC97CLdOHB6fijGip7lhLovtkQWPsV9cYxYNQesQ/giX/JGlynVbeaA24K2p8ZnVKCjRc6qL0pGRQIvLKdKLb263fsYdCh1bdVpPF5ZG/taDqjBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=a71SVngq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Zfhcm9KlPIYDUkR3XlxjvUFC1kNzPKwSMU7Z/fKZocY=; b=a71SVngqApbDm+fv8PIk+j3lkW
+	i53ScPlnHM+UDC32YOCHBTGBm96BRMnj+mzn58OGnJT/GmIFCewp3S8IfrR666i9KQdzLlYh158xP
+	AAN9zzkpAf2JFbTNAOP/8w5OHHvLGfQo4DQpvEpsHPGFxgy5iS9EYhvfpGBnuE+PQg2ouK+xv8fEn
+	6/wE7xccEmj9lFLam1a9QXrS655FnlbMyLkI33Gd0z0VHinf5MeYbD8pZwTfAbk/fGHguA/jkkyQi
+	iwUbwy8k/FuKM8T8URWKdWrXDH9rpWrxC/u1Jss6+IrlePAclwtoUK+R7Z7PfY8hEKq9phKpgYR9U
+	FX/w8pAQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48284)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uTjWn-0004NI-0v;
+	Mon, 23 Jun 2025 16:56:13 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uTjWi-0003Zg-1y;
+	Mon, 23 Jun 2025 16:56:08 +0100
+Date: Mon, 23 Jun 2025 16:56:08 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	robh@kernel.org
+Subject: Re: [PATCH net-next v2 1/3] net: phy: bcm54811: Fix the PHY
+ initialization
+Message-ID: <aFl5GJqBDeoK4fTd@shell.armlinux.org.uk>
+References: <20250623151048.2391730-1-kamilh@axis.com>
+ <20250623151048.2391730-3-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250623151048.2391730-3-kamilh@axis.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Prior to this patch, the MDIO peripheral was enabled for every GEM
-instance, even if no MDIO child node was defined in the device tree.
-In a setup where gem1 shares the MDIO bus with gem0 but has no MDIO
-subnode, gem1 would still scan the bus (both Clause 22 and Clause 45),
-adding unnecessary delay to the boot sequence.
+On Mon, Jun 23, 2025 at 05:10:47PM +0200, Kamil Horák - 2N wrote:
+>  	/* With BCM54811, BroadR-Reach implies no autoneg */
+> -	if (priv->brr_mode)
+> +	if (priv->brr_mode) {
+>  		phydev->autoneg = 0;
 
-This patch changes the driver so that each GEM instance only registers
-its MDIO bus if it has an explicit MDIO child node in DT, e.g.:
+This, to me, looks extremely buggy. Setting phydev->autoneg to zero does
+not prevent userspace enabling autoneg later. It also doesn't report to
+userspace that autoneg is disabled. Not your problem, but a latent bug
+in this driver.
 
-    &gem0 {
-        phy-handle = <&ethernet_phy0>;
-        mdio: mdio {
-            #address-cells = <1>;
-            #size-cells    = <0>;
+> +		/* Disable Long Distance Signaling, the BRR mode autoneg */
+> +		err = phy_modify(phydev, MII_BCM54XX_LRECR, LRECR_LDSEN, 0);
+> +		if (err < 0)
+> +			return err;
+> +	}
+>  
+> -	return bcm5481x_set_brrmode(phydev, priv->brr_mode);
+> +	if (!phy_interface_is_rgmii(phydev) ||
+> +	    phydev->interface == PHY_INTERFACE_MODE_MII) {
 
-            ethernet_phy0: ethernet-phy@7 {
-                #phy-cells  = <1>;
-                compatible  = "ethernet-phy-id0022.1640",
-                              "ethernet-phy-ieee802.3-c22";
-                reg         = <7>;
-            };
+Not sure this condition actually reflects what you're trying to
+achieve, because if we're using PHY_INTERFACE_MODE_MII, then
+!phy_interface_is_rgmii(phydev) will be true because phydev->interface
+isn't one of the RGMII modes. So, I think this can be reduced to simply
 
-            ethernet_phy1: ethernet-phy@3 {
-                #phy-cells  = <1>;
-                compatible  = "ethernet-phy-id0022.1640",
-                              "ethernet-phy-ieee802.3-c22";
-                reg         = <3>;
-            };
-        };
-    };
+	if (!phy_interface_is_rgmii(phydev)) {
 
-    &gem1 {
-        phy-handle = <&ethernet_phy1>;
-        /* no MDIO subnode here, so MDIO bus wonâ€™t be registered */
-    };
+> +		/* Misc Control: GMII/MII Mode (not RGMII) */
+> +		err = bcm54xx_auxctl_write(phydev,
+> +					   MII_BCM54XX_AUXCTL_SHDWSEL_MISC,
+> +					   MII_BCM54XX_AUXCTL_SHDWSEL_MISC_RGMII_SKEW_EN |
+> +					   MII_BCM54XX_AUXCTL_SHDWSEL_MISC_RSVD
+> +		);
 
-Signed-off-by: Jonas Karlsson <jonas.d.karlsson@gmail.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+I don't think this addition is described in the commit message.
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 68ca6713a09a..e2b1f93f97e1 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -1024,12 +1024,11 @@ static int macb_mii_init(struct macb *bp)
- 	struct device_node *mdio_np, *np = bp->pdev->dev.of_node;
- 	int err = -ENXIO;
- 
--	/* With fixed-link, we don't need to register the MDIO bus,
--	 * except if we have a child named "mdio" in the device tree.
--	 * In that case, some devices may be attached to the MACB's MDIO bus.
-+	/* Only register MDIO bus if there is a child named "mdio" in
-+	 * the device tree
- 	 */
- 	mdio_np = of_get_child_by_name(np, "mdio");
--	if (!mdio_np && of_phy_is_fixed_link(np))
-+	if (!mdio_np)
- 		return macb_mii_probe(bp->dev);
- 
- 	/* Enable management port */
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
