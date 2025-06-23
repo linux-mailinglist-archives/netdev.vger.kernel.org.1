@@ -1,258 +1,248 @@
-Return-Path: <netdev+bounces-200184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBB34AE39B4
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B840AE39DF
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 11:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 853893A13A3
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:16:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E12643A2A54
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2956622F74D;
-	Mon, 23 Jun 2025 09:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C181F4180;
+	Mon, 23 Jun 2025 09:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hf3Nkj6B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Io6HkQ4a"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C53201261
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 09:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF192A1C9;
+	Mon, 23 Jun 2025 09:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750670211; cv=none; b=Qs7TyXZ7qQIpoSx7FWUeUVHQQDjJaYnW9j+AqFLk1gzvL2jWjG15zisZX9sF41M0WJGLkXkveuYxpz//OnewNKmVNViNOuYD3oUDRyzlb7M/uNyV+D1kMweMj/ggoVIPMRI1kuQT7IOIYaSayHCccLncky0wVzDPmQK6M1WZzXs=
+	t=1750670528; cv=none; b=cebYUkjAPeAelu420Bzc0+5wAWs4J+P4JfkUyQPz4raOQSDZoyrqAiY6IHHb4WzN0KTyEE8QQGCiaRD5I/Rb5t6ZlSBib7JcnfpKGxupb5VT0xKYpT3beNaUcdS3X9XeBBLx08g0te+ncI5rfKGt/NpkGBHS9MIBYJIZ8sABykQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750670211; c=relaxed/simple;
-	bh=WXi6ciQl/ySvtGGnf6utBqod7v8My4gfOiJugdbgvWQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VVsIwKLlOoP/PT/8KPmeJFDqSTD/D7Tb7xVc9jkTcCVVRHsLgk9KKrF61bcoSqHbsaI9iInfXhbCDT30A3gIMhnShNtQVN5/jjeTZUvo0bvLcKE8Puiq0FvvX0/V4nreFOlIj0KRyjiVQcdYnLn5T+05NwAKoy5GDlkUdAKnyPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hf3Nkj6B; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750670208;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6+CEh7DV/eygJzLS3mmbXc5krbfV2IS8Kf/dZNnKGmA=;
-	b=Hf3Nkj6BlGJi5C19A772jcpvXQ2JnGKtmvcU1RsPh84/k8r/KWPLIX62n0p0IeWBs9Iu8U
-	1tD8KI2XlHFpYG4PKECvZV5Yzl19Wt/NSub3usR7jS9mqyAGqv3irlcag5uFvzrcQzE9cZ
-	IHef3bAvEFhcsdzwcqrBgo58KfYMDZc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-224-Xh_Z6D8CPyy3bVPRwkEmLA-1; Mon, 23 Jun 2025 05:16:46 -0400
-X-MC-Unique: Xh_Z6D8CPyy3bVPRwkEmLA-1
-X-Mimecast-MFC-AGG-ID: Xh_Z6D8CPyy3bVPRwkEmLA_1750670206
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45359bfe631so21406725e9.0
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 02:16:46 -0700 (PDT)
+	s=arc-20240116; t=1750670528; c=relaxed/simple;
+	bh=LKOQTHFLkGOEn2/HNDR4sepDciJkKfrXrB/C0bwWauU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=feaUfwKj7E1MYUMK35Id64xg1SbNynD+I4PfGWVztyJ9dgp1GdFBJPSNyJCTI1AtvlGBSn/jRdFWAoEdrA1RmedHiPEXjgwsIpMX4a/FZDaTTtnCmC0z5jcb45Y9w3FAXnrwAuf1SucX2wP3EmB8E6NyGoYRMoGq88Jbyk77jF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Io6HkQ4a; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a5828d26e4so622853f8f.0;
+        Mon, 23 Jun 2025 02:22:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750670524; x=1751275324; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HdyJ8ZnuU6TNQuoElRBiY5EvytdD44pmPL2MXO1PBwU=;
+        b=Io6HkQ4aLcs8uV6A5L/mbn8psXZeUH8oT2P/A9oxgJPsNtIdf4bvBMFEt33+RIGZ3A
+         khTJFvSADS5cELjiyJ43lcjg8O+aUPpjuVzW/W1ma4HvlD7g0/UwdhtAD5EzxzJXoVgV
+         wBav7j+zd0JxqZjnVnsUlDl/t6/tTCwCKZtRGcDH2Cu9NBb/Fd7r9rkwmx6fDEf6JMkn
+         vFvMieqsM/Z8Q8wWRrakjPgBeqx5cjRIJ9+2pyowZf/IG9XKWXvFq4X1ZMOQ0s7QY3Yj
+         zsttWx3dE5kApnFQ/HleXMaEh5n/pz+DTwuTcl9p55zsd0rS29XwonjDUoRZ4p7TRZwm
+         xtTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750670206; x=1751275006;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6+CEh7DV/eygJzLS3mmbXc5krbfV2IS8Kf/dZNnKGmA=;
-        b=Fjj4W6PnrOHl2yCqR9/e4WsiSiLiyd761NITeCpz9BAiwrilRdwqMCQRxwvJ17zIM+
-         r9U9DHlI7GNMpnn9ZS8IHra5u3qqkFUMR+epH/vxZbe30CuY1+bm4wy0Z2qCjYsaat9q
-         yTcgJjsJp3hI1orB38JpNu9eNu2FUB7wKwNjDeAEgAonr3tZXwfz1GwtvX6e1OUoqfZE
-         Zz4lWiQ0x5ePQHpFIKFveT0jywJHnwQ4e/j17gAAh3zzOylQS7i3P4ktZ3SE6i8ZEG6a
-         teVvPcAsYliGigdY+UsYdEF8UH+lx/Jcj+pWfHuMNplYf2vsevwMs/cTasPjNmigxxsM
-         wMUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXrcO/sWkoDrHT10FdUouRRu1d8xzDR281/novfjIvEKV9yU8V+nnufmrDVSDcXOWFDZia+Weo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywnc2v0AGoy0j2BfXdyIH7R0LhaAu2N+FGjHECfxcMSCJ3DmdUF
-	F2XDjOx8V3009vGKc+VuFBw0WuSqif+jRrL56qUtNgAZq95DCNiiBHKGQxLxUtEoIFuDTZ1KfwX
-	huYaayt/V7SsEYV5MY7Dte5bbEe7js3OwD1BCmG0TLYAEMundYlTZ+k2hmw==
-X-Gm-Gg: ASbGnctb+JtDLlmVq4bciRv2VJd1lLwsqKTsm5dfoy4aGRjEI65yJ+H3EQtRfLoLlvd
-	py/BS6y+Kom3rarU/3pV/ssu3bzG+8GKRwkQpdnWCijURyOYxAbvPfKu1ZXZ0VZWu1UD67E3B3I
-	g17H3SYwR7X4eK91Oc+idgi9vRT2HkFLuAifojKx+yGUVoTmpx8PAQlMEyoiXEf1md8Un/rSpku
-	YQ0z/vKcgSRRklzm4kfH7Njm0Xp3nHsos686a+yLbDFO61xlITQrv96Q2dQAUQpJPbFfb32jesS
-	VWiB6z+94+mkT+3YAvlXx69v99EY3iowJZINCQi5u4+dsge4T0NU/lKuRvPrQ+V2eybaoq1xaR7
-	1O3WsbhCbxTWadldfGpttOAEDRJ2OSoMJjHtMxa+BzsADrn9xtg==
-X-Received: by 2002:a05:600c:c4ac:b0:442:dc75:5625 with SMTP id 5b1f17b1804b1-453659be428mr99470645e9.5.1750670205675;
-        Mon, 23 Jun 2025 02:16:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSdTrkum0uGk/zLo1y8F4EbYhm1nsGHbNNP/oVrjmhH2urGZHFTnIjPrsPub1P941JC31blw==
-X-Received: by 2002:a05:600c:c4ac:b0:442:dc75:5625 with SMTP id 5b1f17b1804b1-453659be428mr99469955e9.5.1750670205140;
-        Mon, 23 Jun 2025 02:16:45 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f4e:fd00:8e13:e3b5:90c8:1159? (p200300d82f4efd008e13e3b590c81159.dip0.t-ipconnect.de. [2003:d8:2f4e:fd00:8e13:e3b5:90c8:1159])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646fd816sm104134785e9.24.2025.06.23.02.16.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Jun 2025 02:16:44 -0700 (PDT)
-Message-ID: <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com>
-Date: Mon, 23 Jun 2025 11:16:43 +0200
+        d=1e100.net; s=20230601; t=1750670524; x=1751275324;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HdyJ8ZnuU6TNQuoElRBiY5EvytdD44pmPL2MXO1PBwU=;
+        b=Y7CnzY7NMz04GBfRL0gaRPws+4uFhEvNcK9sSaCnRe81TbBaKeXcnzU/zooUNL+U7N
+         Y8TP6XrQhDVvLRcaSfoXWZZA/U4Yg1vfbErBJtiRrlfdWH/3+hZJN8ZbqrTunRkk9ogS
+         hxYmVW87T2mQdYep71dLFPWGsZWZnAwxAS2ic0UlFiJbJJKVfHS/0cUmtPTPlnfBDKkD
+         HO/8nM5A68cImZ5QcdgI/E8Ou1Wk4Uyafyv7S2tpnJBKZeUE27DcVYfy3vcGwdgz4fxa
+         icHX6rh14br2IomAjU61c21M6R3JBZ2hAD5vwvxRUwmoSJpWgcz1he6RUpLjLh8NSorY
+         6rnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTgJiRr/lHYVmBwBpIrSwQwJ/ZCZh3CVqznmJTjIcQ5wiIO28TVqzPGjSFl4bOxUAuj2p1mBIBflWjqGw=@vger.kernel.org, AJvYcCXXjFedSpfkj5pi5nZyiisOJzoi82HEBngkocZTlTT1D6LFi3XvyGR63pJQxct/YekBxq3uMtVW@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/uz8jmCaGMBL9wvV/DL72IpC6Zha41LRns26OaU12erUnmkQu
+	Bi83cn5FTr0CG0m0QWoBCPXa6U1TTpgF44E//p6SdFCSNmo/msPe/5h2
+X-Gm-Gg: ASbGncv0jgWAuJGCKBbh2259s/8nEDn2XWRuYzOirQ49Gp/QAqQ7nYhu7EQ1iDaLuQz
+	FOPR0cXk24IGimAL1yR/c4BxMiIC9eE5sqDN7EdwzgStWLGw2QzLrmH9fCEH/iuE1PG+l6eTvtI
+	slM+RnAYTzy/9ZfhtxiwIcgF+zfLZIgAr0Zaf2Fd+JcUOvM3jSj0L0AmxcVGYB13cKCmK9rmiU8
+	K2NKO7dNbPx6QEyNU/F54ktRKwgWhXpmfCclEIimRzoUdp859jaCZBJUNzGfsVpyV4Eu5DdTrtL
+	ZUZ8G/FUeiim85VQhdThQlEYhGSTd9zuBPdYAEZQ+JZF8Gs894eUSxF0iHQvyL1jfPi7C9hFU7a
+	EsyHQ9P2rikJLu8k=
+X-Google-Smtp-Source: AGHT+IHI4iJk98aQylTy7xgmiMADjM1C7FONOox53GQ9Z3mCtDzq+VrQVxZf7+pK6pdvcO6dbEs38A==
+X-Received: by 2002:a05:6000:40c9:b0:3a4:eeeb:7e70 with SMTP id ffacd0b85a97d-3a6d12dfaf2mr3372304f8f.4.1750670524362;
+        Mon, 23 Jun 2025 02:22:04 -0700 (PDT)
+Received: from thomas-precision3591.imag.fr ([2001:660:5301:24:9a26:612f:7b52:ee76])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a6d117c40dsm9121182f8f.65.2025.06.23.02.22.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 02:22:03 -0700 (PDT)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Jeff Garzik <jeff@garzik.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v4] ethernet: atl1: Add missing DMA mapping error checks
+Date: Mon, 23 Jun 2025 11:20:41 +0200
+Message-ID: <20250623092047.71769-1-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 9/9] page_pool: access ->pp_magic through
- struct netmem_desc in page_pool_page_is_pp()
-To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
- ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
- akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
- andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com,
- tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com,
- hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
-References: <20250620041224.46646-1-byungchul@sk.com>
- <20250620041224.46646-10-byungchul@sk.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250620041224.46646-10-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 20.06.25 06:12, Byungchul Park wrote:
-> To simplify struct page, the effort to separate its own descriptor from
-> struct page is required and the work for page pool is on going.
-> 
-> To achieve that, all the code should avoid directly accessing page pool
-> members of struct page.
-> 
-> Access ->pp_magic through struct netmem_desc instead of directly
-> accessing it through struct page in page_pool_page_is_pp().  Plus, move
-> page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
-> without header dependency issue.
-> 
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
-> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> Acked-by: Harry Yoo <harry.yoo@oracle.com>
-> ---
->   include/linux/mm.h   | 12 ------------
->   include/net/netmem.h | 14 ++++++++++++++
->   mm/page_alloc.c      |  1 +
->   3 files changed, 15 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 0ef2ba0c667a..0b7f7f998085 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -4172,16 +4172,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
->    */
->   #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
->   
-> -#ifdef CONFIG_PAGE_POOL
-> -static inline bool page_pool_page_is_pp(struct page *page)
-> -{
-> -	return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> -}
-> -#else
-> -static inline bool page_pool_page_is_pp(struct page *page)
-> -{
-> -	return false;
-> -}
-> -#endif
-> -
->   #endif /* _LINUX_MM_H */
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index d49ed49d250b..3d1b1dfc9ba5 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
->    */
->   static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
->   
-> +#ifdef CONFIG_PAGE_POOL
-> +static inline bool page_pool_page_is_pp(struct page *page)
-> +{
-> +	struct netmem_desc *desc = (struct netmem_desc *)page;
-> +
-> +	return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> +}
-> +#else
-> +static inline bool page_pool_page_is_pp(struct page *page)
-> +{
-> +	return false;
-> +}
-> +#endif
+The `dma_map_XXX()` functions can fail and must be checked using
+`dma_mapping_error()`.  This patch adds proper error handling for all
+DMA mapping calls.
 
-I wonder how helpful this cleanup is long-term.
+In `atl1_alloc_rx_buffers()`, if DMA mapping fails, the buffer is
+deallocated and marked accordingly.
 
-page_pool_page_is_pp() is only called from mm/page_alloc.c, right? 
-There, we want to make sure that no pagepool page is ever returned to 
-the buddy.
+In `atl1_tx_map()`, previously mapped buffers are unmapped and the
+packet is dropped on failure.
 
-How reasonable is this sanity check to have long-term? Wouldn't we be 
-able to check that on some higher-level freeing path?
+Fixes: f3cc28c79760 ("Add Attansic L1 ethernet driver.")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+ drivers/net/ethernet/atheros/atlx/atl1.c | 50 +++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 6 deletions(-)
 
-The reason I am commenting is that once we decouple "struct page" from 
-"struct netmem_desc", we'd have to lookup here the corresponding "struct 
-netmem_desc".
-
-... but at that point here (when we free the actual pages), the "struct 
-netmem_desc" would likely already have been freed separately (remember: 
-it will be dynamically allocated).
-
-With that in mind:
-
-1) Is there a higher level "struct netmem_desc" freeing path where we 
-could check that instead, so we don't have to cast from pages to 
-netmem_desc at all.
-
-2) How valuable are these sanity checks deep in the buddy?
-
+diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
+index cfdb546a09e7..5e5bf40e62f6 100644
+--- a/drivers/net/ethernet/atheros/atlx/atl1.c
++++ b/drivers/net/ethernet/atheros/atlx/atl1.c
+@@ -1861,14 +1861,21 @@ static u16 atl1_alloc_rx_buffers(struct atl1_adapter *adapter)
+ 			break;
+ 		}
+ 
+-		buffer_info->alloced = 1;
+-		buffer_info->skb = skb;
+-		buffer_info->length = (u16) adapter->rx_buffer_len;
+ 		page = virt_to_page(skb->data);
+ 		offset = offset_in_page(skb->data);
+ 		buffer_info->dma = dma_map_page(&pdev->dev, page, offset,
+ 						adapter->rx_buffer_len,
+ 						DMA_FROM_DEVICE);
++		if (dma_mapping_error(&pdev->dev, buffer_info->dma)) {
++			kfree_skb(skb);
++			adapter->soft_stats.rx_dropped++;
++			break;
++		}
++
++		buffer_info->alloced = 1;
++		buffer_info->skb = skb;
++		buffer_info->length = (u16)adapter->rx_buffer_len;
++
+ 		rfd_desc->buffer_addr = cpu_to_le64(buffer_info->dma);
+ 		rfd_desc->buf_len = cpu_to_le16(adapter->rx_buffer_len);
+ 		rfd_desc->coalese = 0;
+@@ -2183,8 +2190,8 @@ static int atl1_tx_csum(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
+-static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+-	struct tx_packet_desc *ptpd)
++static bool atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
++			struct tx_packet_desc *ptpd)
+ {
+ 	struct atl1_tpd_ring *tpd_ring = &adapter->tpd_ring;
+ 	struct atl1_buffer *buffer_info;
+@@ -2194,6 +2201,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 	unsigned int nr_frags;
+ 	unsigned int f;
+ 	int retval;
++	u16 first_mapped;
+ 	u16 next_to_use;
+ 	u16 data_len;
+ 	u8 hdr_len;
+@@ -2201,6 +2209,7 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 	buf_len -= skb->data_len;
+ 	nr_frags = skb_shinfo(skb)->nr_frags;
+ 	next_to_use = atomic_read(&tpd_ring->next_to_use);
++	first_mapped = next_to_use;
+ 	buffer_info = &tpd_ring->buffer_info[next_to_use];
+ 	BUG_ON(buffer_info->skb);
+ 	/* put skb in last TPD */
+@@ -2216,6 +2225,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
+ 						offset, hdr_len,
+ 						DMA_TO_DEVICE);
++		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
++			goto dma_err;
+ 
+ 		if (++next_to_use == tpd_ring->count)
+ 			next_to_use = 0;
+@@ -2242,6 +2253,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 								page, offset,
+ 								buffer_info->length,
+ 								DMA_TO_DEVICE);
++				if (dma_mapping_error(&adapter->pdev->dev,
++						      buffer_info->dma))
++					goto dma_err;
+ 				if (++next_to_use == tpd_ring->count)
+ 					next_to_use = 0;
+ 			}
+@@ -2254,6 +2268,8 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 		buffer_info->dma = dma_map_page(&adapter->pdev->dev, page,
+ 						offset, buf_len,
+ 						DMA_TO_DEVICE);
++		if (dma_mapping_error(&adapter->pdev->dev, buffer_info->dma))
++			goto dma_err;
+ 		if (++next_to_use == tpd_ring->count)
+ 			next_to_use = 0;
+ 	}
+@@ -2277,6 +2293,9 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 			buffer_info->dma = skb_frag_dma_map(&adapter->pdev->dev,
+ 				frag, i * ATL1_MAX_TX_BUF_LEN,
+ 				buffer_info->length, DMA_TO_DEVICE);
++			if (dma_mapping_error(&adapter->pdev->dev,
++					      buffer_info->dma))
++				goto dma_err;
+ 
+ 			if (++next_to_use == tpd_ring->count)
+ 				next_to_use = 0;
+@@ -2285,6 +2304,22 @@ static void atl1_tx_map(struct atl1_adapter *adapter, struct sk_buff *skb,
+ 
+ 	/* last tpd's buffer-info */
+ 	buffer_info->skb = skb;
++
++	return true;
++
++ dma_err:
++	while (first_mapped != next_to_use) {
++		buffer_info = &tpd_ring->buffer_info[first_mapped];
++		dma_unmap_page(&adapter->pdev->dev,
++			       buffer_info->dma,
++			       buffer_info->length,
++			       DMA_TO_DEVICE);
++		buffer_info->dma = 0;
++
++		if (++first_mapped == tpd_ring->count)
++			first_mapped = 0;
++	}
++	return false;
+ }
+ 
+ static void atl1_tx_queue(struct atl1_adapter *adapter, u16 count,
+@@ -2419,7 +2454,10 @@ static netdev_tx_t atl1_xmit_frame(struct sk_buff *skb,
+ 		}
+ 	}
+ 
+-	atl1_tx_map(adapter, skb, ptpd);
++	if (!atl1_tx_map(adapter, skb, ptpd)) {
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
+ 	atl1_tx_queue(adapter, count, ptpd);
+ 	atl1_update_mailbox(adapter);
+ 	return NETDEV_TX_OK;
 -- 
-Cheers,
-
-David / dhildenb
+2.43.0
 
 
