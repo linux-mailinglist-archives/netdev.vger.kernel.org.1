@@ -1,199 +1,144 @@
-Return-Path: <netdev+bounces-200131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26FD0AE3449
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:20:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA003AE3451
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 06:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB5FB188CF72
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 04:21:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D35016BB98
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 04:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC307151990;
-	Mon, 23 Jun 2025 04:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="baQ4NHBo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA5A18DF6D;
+	Mon, 23 Jun 2025 04:32:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AB92FB2
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 04:20:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CFCA95C;
+	Mon, 23 Jun 2025 04:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750652448; cv=none; b=W1k8kaUwBD5PYGVaGq+FYRMsPmgLTkokwOzYC13Ytvak2i2+mX/KZgSUcUSUbi9XjUYOxkSe9fjxLk5Bn/KfaWS1PBfdMuMZARDbn99n9q3wJ7CIpc6rLQ5HyeUhgXo1/30ju+EH2hHL4whU5OZQMyWDBt4HV/vcqNep56XbqXY=
+	t=1750653141; cv=none; b=S/qi2eBGexumtRn2L9CSL8+eM61pzt8qhXsiCBoKFPQnB2Az8Aj+K961GJSJV/ISPxKTmdwN05SNMf2+t8tH9O4h643okB9/U+cX4fsexHmFByLcGEvk/V+76t5bjBj+/eolHFG3qIRCAHT7jacwbKVlFnEDq3Y7/3sLxdUwAGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750652448; c=relaxed/simple;
-	bh=K7NiRpxiQepYNmS1OCTHXI+WbVvzR5mCKJabd87Elho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=taenLHWbwAmsN4C1e60OAF0recfR61MW65OnlkPFBl842e3jflMNwmvtZ2gTu7hP+b6he0jykuM7PSrJ9k2J+QU4mCUi5ci7peEvcMphSFNQzq7KRT/xWqZo2qUhsodi1W9zB/8GUy/5mjU34S18mN+9AuM5JvO9jFpgGGYDNp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=baQ4NHBo; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-607c5715ef2so6281035a12.0
-        for <netdev@vger.kernel.org>; Sun, 22 Jun 2025 21:20:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1750652445; x=1751257245; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=71ikBjEpBzjBNJOMwbMD9kUK68mlelj5P9jKd38KVag=;
-        b=baQ4NHBoc++N6yMwL0AaSsab0TrPtoZoSfkmOnnM9JYIDrEdgqYreSXR0BXruuH17j
-         dmdp6eyCNebXq+vUIfNh26g8WmUbyTPDuHcmqeBk5xbLBV8aCcwYyKA0LKsgjKRlE7Ih
-         Q7HuqslfoNrxZ3gy/esMwJXN2Tfu/c5uQ4ek0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750652445; x=1751257245;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=71ikBjEpBzjBNJOMwbMD9kUK68mlelj5P9jKd38KVag=;
-        b=kNAbGGfn9K+W+OqadXATQZt8RmDZRS+Bvf1Wb6GfA+rwxjrhTPmgqDJWVXcxRqduxn
-         EK5G30qupcRW6PpSiNw70IIV5ai2hhaQFlLBAPAn4CxVCfjmcxy3NAGPirExYrqc+e6G
-         TxREIZBv8XFl+GVmkDLibiaHSOCCVmYP+5hIvYkEKxfdTQj+29oWw5oYoNXNvQ02oxHx
-         +0RafiiCj7aop1st+kY0/MV+WMZoHnQhyOdVlAHnnanq717qyh8rcRCcKANOk+a+Q8Lt
-         LIgcvPz6jmXReTeiolHo8FN6GgqWpzj1/vDDDvMM6dZaN5hLafRfts5Zfa+YPSTgznHQ
-         njEg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7IbB0ZgCjgcXfkHalT/gkAU1oNrdQYVK+OltzIbCa8RYa4Uv2OWUC+bAeNVe30W88bINdps4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX3GK8sLpaATRUAxRtNFm6ZLIm63tVRg9UR8v1TXcTVkeHo6dF
-	EkpUvaVILpWTme5FSFnevMapFmUHfCggsAb/wI6DTJlOwJut6ziYsyV/oEZsqX0807BOJmrWJcZ
-	548B2JjmwpYD0pihed4d7KyjOC9dThtg57UzETHN3
-X-Gm-Gg: ASbGnctNn5pmtoxNJPr0nVOcV4PDBI2LG5nSo3W8xG0srZlj966vJeZ7u2Hk7mmLfFB
-	RmfRdGwaEACCLb7gi9evIi8yb+SgQEuvkFX53tyea/5I8J3/oH3J5gzLFm3aHOY6TTF3DNKiOtc
-	/bkIXq6X4eih1K8ef4Au/w33IM3b6YTNfh5l6+yDzrqlxw0B9tFX5E4eM=
-X-Google-Smtp-Source: AGHT+IGjHMc9nHKM//QELUxyhKgkkeP+UL9egvitt540ZZsdqbDQP+0ZwlWqbPaxlTo3TMgIP9p7tRR4ukO5bsBbHo8=
-X-Received: by 2002:a17:906:6a2a:b0:ad8:9909:20b5 with SMTP id
- a640c23a62f3a-ae057c3ceb1mr1085250966b.56.1750652445216; Sun, 22 Jun 2025
- 21:20:45 -0700 (PDT)
+	s=arc-20240116; t=1750653141; c=relaxed/simple;
+	bh=ggo/SI/AISA8J6s0yt0k1qoyYkjyPngK3bM8bZl5ikQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKd8avWAJQGBPq2thfFwk/jUdid8fNIV3T7yjmu/vWAbO2cwU+mKnXRNEtW/LHVNfr3LaRsEx/OeezN58Z0yL7yOD6fN/vozC/a/JgfZFLL8SOK7eEYQI1sVZSeChbdwxyenBlIRnSIARpbDe9MIZr9Pq1GSpptcXOvCVcY6B5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-e8-6858d8cc5518
+Date: Mon, 23 Jun 2025 13:32:07 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: willy@infradead.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	jackmanb@google.com
+Subject: Re: [PATCH net-next v6 6/9] netmem: remove __netmem_get_pp()
+Message-ID: <20250623043207.GA31962@system.software.com>
+References: <20250620041224.46646-1-byungchul@sk.com>
+ <20250620041224.46646-7-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609173442.1745856-1-kuba@kernel.org> <20250609173442.1745856-5-kuba@kernel.org>
- <CACKFLin1Y=XTJcWQQwR=aDnpEvjdYVYaKgJZDAYGQvWzTx=gsg@mail.gmail.com> <20250612180444.5767aeec@kernel.org>
-In-Reply-To: <20250612180444.5767aeec@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Sun, 22 Jun 2025 21:20:32 -0700
-X-Gm-Features: Ac12FXzo9y_daHWlxaVOx_n_295PNs7m0ILfJ_urvldAayoC5yovldbJCr9NlHY
-Message-ID: <CACKFLik+AOKy3dy6Dv-rLOhsO4m+Q54KZRaNv5W7a6OFbMWorA@mail.gmail.com>
-Subject: Re: [RFC net-next 4/6] eth: bnxt: support RSS on IPv6 Flow Label
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: pavan.chebbi@broadcom.com, willemdebruijn.kernel@gmail.com, 
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000002420b306383589be"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250620041224.46646-7-byungchul@sk.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTYRTHe3af3V2Xi+syfVIiWklgmRVlBwqNQrpfKiEISyMveWkjXbql
+	qRRprizxDYuyuWoRmWmwmqmzF8211KhIDWOVOtE0MdPUFDezckrktx//8+f8zofDUPIHYj9G
+	pT4haNR8nIKWYul3z1tBb+yRyvV3ckLAYLpPQ/lkCtztsojBUFaF4KfzswTGbI003L41QYHh
+	nQ7DuMlFQW9DtwTKzbvBUdKH4WlWNQXd+U005OqmKHjmHJLAWUupCJqr8sRw2XWHgur0Lgm8
+	f2ygofP+HzH0WXMxvNLfw+DI2w4NRh+YeD2IwGaqFsFEznUaLrUaaejRORC0vujGUJyRh8BU
+	axfD1OTMjuKXnZLtq7gXg8MU9+jeRxFXo++QcEZzEldRGshl21spzlx2kebMo4USrv3DU5pr
+	KprCXI1lTMTlZg7R3EjvJ8wN17bRnOlRG+beGG2SCK+D0m2xQpwqWdAEh8ZIlaar9TghY1HK
+	w3wDTkd1C7ORB0PYTaQz6wb1j0d0zdjNmA0gjZ2FsznNriZ2u3OGGcabDSYfCg9kIylDsZk0
+	KWxzzvYXs+HkbWkO7WYZC8T54xtys5zlyYWBc2gu9yKvrn2Z7VPsWlJT2U67d1KsP7n7m5mL
+	l5PMyuJZrQcbQvqHmkRuXsKuJM+rGkVzZzYzxGRLneOlpL7UjguQl36eQT/PoP9v0M8zGBEu
+	Q3KVOjmeV8VtWqdMVatS1h05Hm9GM39UcvpXlAWNNu+zIpZBCk9ZjGekUi7mk7Wp8VZEGErh
+	LbPu2K+Uy2L51DRBc/ywJilO0FqRP4MVvrKNEydj5exR/oRwTBASBM2/qYjx8EtHEaYVLYkD
+	tvbENP9+JmjLnj/L66ZFPo/PhLWs8ap1FQU9Cay/MnI+IKvOvtl1ROe6GX3qYGXeHvOA7zJ2
+	esjHA0kd4R22Tw0qlSO9qnLL1lZKG7SguIa+MZ1Wbv66K+JQeFHY3jWW8RZeEebZE1rQFfM8
+	qi16yc4Flw7HjFeUqRUKrFXyGwIpjZb/C5Lllu9DAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+e/8d3Zczk5r1Uk/RDMLokzpwptFSCEdsiII1Ppgjjy15bUt
+	TaPIy0IztZpRNlctRF0mrZbXsqx5mWKRKNqypWkqZualdDjt5ozIbz+e9+H3fHkpQpzDd6cU
+	0ac4ZbQsUkoKsXD/ttT1r6whcp9P6Z6gM5aQcH8qAYo+VvJBV1yOYMLxXgDf6ywk5N+1E6B7
+	o8YwaZwmoL+hVwD3Tfugu3AAQ3VaBQG9lxtJyFLPEPDMMSKAlEoDD2pvNfGhpTybD9emCwio
+	SPoogLYnOhK6Sn7zYcCchaFJew9Dd7Y/NOiXgr15GEGdsYIH9sxbJOS06kn4pO5G0FrbiyEv
+	ORuB8bmVDzNTs468+i6BvxdbOzxKsKX33vHYKu0HAas3xbGPDWvZDGsrwZqKL5Ks6ZtGwNo6
+	qkm2MXcGs1WV33lsVuoIyY73d2J29Hk7yeYPjvFYY2k7PiA+LNwezkUq4jnlhh1hQrnxxksc
+	m+yW8OiyDiehmgUZyIVi6E3MuLoFOxnTXoylS0M4maTXMFarY5YpSkJvYDo0hzKQkCLoVJLR
+	tDvm+ovpAOa1IZN0sogGxjH2BTlZTMuY9KEL6G++iGm62TfXJ+h1TFWZjXQ6CdqDKfpF/Y1X
+	MKlleXOzLvQWZnCkkefkJbQn86LcwruC3LTzTNp5Ju1/k3aeSY9wMZIoouOjZIrIzd6qCHli
+	tCLB+2hMlAnNvkrhuR9XK9FE224zoikkdRUZAkPkYr4sXpUYZUYMRUglIvPOILlYFC5LPMMp
+	Y44o4yI5lRl5UFi6TLQnmAsT08dlp7gIjovllP+uPMrFPQnhga81Kw2HA0sXzsSnTFX7rc7v
+	WO7bs7Xn4O2GtJOaveWWoFHHF9uq83GXJk+/dLtTd6Dq7fqzybb3PvWZSe82YunPPl3nCdex
+	66e9a+iBuLPBi0KajfbPDyWhBSMF7lf9AnI9UybVuzpj/AnLmWOTgz0FoVfk+gcSQebTIbtt
+	eWGYFKvkMt+1hFIl+wM4qcRvJgMAAA==
+X-CFilter-Loop: Reflected
 
---0000000000002420b306383589be
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jun 20, 2025 at 01:12:21PM +0900, Byungchul Park wrote:
+> There are no users of __netmem_get_pp().  Remove it.
+> 
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+> Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> ---
+>  include/net/netmem.h | 16 ----------------
+>  1 file changed, 16 deletions(-)
+> 
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index e27ed0b9c82e..d0a84557983d 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -245,22 +245,6 @@ static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+>  	return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
+>  }
+>  
+> -/**
+> - * __netmem_get_pp - unsafely get pointer to the &page_pool backing @netmem
+> - * @netmem: netmem reference to get the pointer from
+> - *
+> - * Unsafe version of netmem_get_pp(). When @netmem is always page-backed,
+> - * e.g. when it's a header buffer, performs faster and generates smaller
+> - * object code (avoids clearing the LSB). When @netmem points to IOV,
+> - * provokes invalid memory access.
+> - *
+> - * Return: pointer to the &page_pool (garbage if @netmem is not page-backed).
+> - */
+> -static inline struct page_pool *__netmem_get_pp(netmem_ref netmem)
+> -{
+> -	return __netmem_to_page(netmem)->pp;
+> -}
+> -
 
-On Thu, Jun 12, 2025 at 6:04=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 12 Jun 2025 17:11:18 -0700 Michael Chan wrote:
-> > Just a quick update on this.  The FW call fails when this flag is set.
-> > I am looking into it.
->
-> Thanks for the update! FWIW I'm doing the refactoring to add netlink
-> support as requested by Andrew:
-> https://lore.kernel.org/all/20250611145949.2674086-1-kuba@kernel.org/
-> There's 40 drivers to convert so even if it goes smoothly I wouldn't
-> be able to repost for another week.
+In the meantime, libeth started to use __netmem_get_pp() again :(
 
-I've looked into this.  The way flow label works on our chip is that
-the flow label can be hashed with the IPV6 source and destination
-addresses only, effectively becoming a 3-tuple hash.  For example,
-this would be valid:
+Discard this patch please.  Do I have to resend this series with this
+excluded?
 
-ethtool -N eth0 rx-flow-hash tcp6 sdl
+	Byungchul
 
-4-tuple hash cannot include the flow label.  2-tuple and 3-tuple are
-mutually exclusive for IPV6.  For example, once tcp6 is configured for
-3-tuple, udp6 cannot be configured for 2-tuple.
-
-I can post the patch that I am testing after some more testing.  Thanks.
-
---0000000000002420b306383589be
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIQYAYJKoZIhvcNAQcCoIIQUTCCEE0CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
-ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
-J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
-9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
-XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIL2JPw2FPWUtAjEt6jXh2IqTY9sLL8d+
-03J8fnk64piXMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYy
-MzA0MjA0NVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
-AQUABIIBAKUM+Roj9Ua0suzZ1D690dd6+5pyKEsil2f53SeO+zdJ/lFCpA9PhSUZEW2PmKKYyk+B
-onrrN3RIFMfI72TOkmrza0UQFTGswmpacAJ2twH7mUuiZ6eA5KsCnU0QKVb6IBsXUTAxz8RCG7Nk
-sc0VJXiN83SuM1BliFHtG7e/dteG6B0CFBFkboA1BwOh9sQPeC2qhzSKGdtfl437DiOJMuB8UaOp
-ZC/IOg2T/FW2tiaxhGI1HKHaTKOt12U2FyDo97a6KYoJ6/7KYktslNMpRYGGlgA5DGdzfgAySnnQ
-prz73B+e1XKCaqMolcWGV0la4cwhZ+wzOEQJNyGFkp90lQ0=
---0000000000002420b306383589be--
+>  static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+>  {
+>  	return __netmem_clear_lsb(netmem)->pp;
+> -- 
+> 2.17.1
 
