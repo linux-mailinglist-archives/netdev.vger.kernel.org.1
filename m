@@ -1,91 +1,134 @@
-Return-Path: <netdev+bounces-200154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55BACAE36F3
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:33:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4035CAE3714
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E320A18931D0
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:33:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD68E1719A5
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CE51FECDF;
-	Mon, 23 Jun 2025 07:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023161EFF9B;
+	Mon, 23 Jun 2025 07:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IYpsOIP8"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VgwVTpFX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078A61FECAF;
-	Mon, 23 Jun 2025 07:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E05B1F4C90
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 07:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750663964; cv=none; b=tbjpAQr9G+vCyuoXxLgRWG+6rOhKjrEmBb2C2MFkOTaM8PSRn5ELUYTldFE/4JcaBKrs53aNRArU9dwC0sawSpuER2BwmXHY36LDCqiFX6cVFNJCkc2IQV5hQT/EiGxaXDRMBQSJObkWyrnBTC1xMZjvwO4EHN+bAk2OtfH7Okw=
+	t=1750664176; cv=none; b=nN2P+Y/PpuQEqMkhTkV6tKrbR36EnfPJ7ctw+rslNoAGwoJII+u05GDn/rdI66XKaIlU+cSvyHf1NgP0POZxIGlkoYguSEVsj6o3WP361bgM3j8+seMu6dadn3h7wA4lRe1VBTfXZaFH6+l/komYybKFx3zlKluK/+VV8/T17Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750663964; c=relaxed/simple;
-	bh=Ns/SrFWIN2dc+XgtJpoHD+knchMMyncm/VnkXJ2yQf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OXGJewmNnFlSgR5S/s9h5gfEmjpl3pE4PIjs15Ug/jwcXIwV80laNq3zOfqwpZx0OefeL3HzGqpDlJcQh1tWVfKvz48UbXgdjrfzbjTcQzQFYGFUZX4hBhK5RtWglvN6SbnzUNkGayFOUlHOipc1RhMmNBkQEQdjLWQSgP8qYnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IYpsOIP8; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lJb3LQhfG17yK7huNXZM1LaaWXrW/89Lfygnm9psnzo=; b=IYpsOIP8+iHSIGR2lP6jW9caOa
-	RkP/Xc1cz1BJ48g3FXC0DSIzZ0YcO21GYhuH5bQj07JkX5oLHUO3qh47is6+wcMPSgLExiM3EFzok
-	XurcYBF1S9R55sg0DhdthjFwp5s8dyFCpwY0okEv2cjh4TGkVFhpBxLF56J+fcSsQQoE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uTbfJ-00GfMQ-Ad; Mon, 23 Jun 2025 09:32:29 +0200
-Date: Mon, 23 Jun 2025 09:32:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 1/3] net: hibmcge: support scenario without
- PHY.
-Message-ID: <51a9e27a-8a67-4188-8875-8cd81e34765a@lunn.ch>
-References: <20250623034129.838246-1-shaojijie@huawei.com>
- <20250623034129.838246-2-shaojijie@huawei.com>
+	s=arc-20240116; t=1750664176; c=relaxed/simple;
+	bh=w+3qbmZ+/Fzih2MTelSdaDcNnHFx2K5wHnL/eTsCyys=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GgGS2oz1tq3GGQVaMOR+h6jSkFoQYpmRp0PVJSHyQTCSkZxfE+EI1C4uSv+1dl1P5czKEchDCC0OmcqgYn0tgP85Dstuhb5+RLWr1c1Js/qpp7KZHwWrZKiWcEGfrpvKHQUNn3GCPAcGgm/64mwsVioEFRE2/d/LfeBuBh/bs6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VgwVTpFX; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a5828d26e4so609288f8f.0
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 00:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1750664173; x=1751268973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w+3qbmZ+/Fzih2MTelSdaDcNnHFx2K5wHnL/eTsCyys=;
+        b=VgwVTpFXYnXMmKkwwR1C+MvWG4pgWpxpA+TvvHS+kNX467zWiGKrYvfK+uPzPML6iq
+         s8GaaSXCVWL5lh9F9ZrBW1iT9mjBH3SI6G1rwJ6So1ynwM6fplh6qrsdXr0xHSLWOVXt
+         3Y3ah9TzdxsO9VaMexNtfS+/sKG4sCiCBUNyNIt84GHbs16zsbWAjPBvVPqOYeSuE+RU
+         oZNH3KtuaYIodq8727OV3SuvfenfUCaOfU13/UAO2OKoUK/ffnxHIAFvnI7JMQZb2OmK
+         obtnvtKu1THrGhrByu8iMgkkSR+RG3qi92D34exCFbQNICm92gC4mgpF6csVKx6M7VGo
+         gWsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750664173; x=1751268973;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w+3qbmZ+/Fzih2MTelSdaDcNnHFx2K5wHnL/eTsCyys=;
+        b=bGtVMPfJkgfmaqUCH5XaF15EiC58vrw0jP/F47tV43G28zw9c88Mtf5gmLJdXiEwwV
+         Ml6V4Cpm00fRBFx348spgNP0oWaKwjUnfGbmCZYust6/JKG2koJaGXVGdFJD/XzmdWf9
+         c6vPMT6i1/u8tysjEGGCVizsElyWO7amUuOgx02zOshgoJy+Hl28p0SMe1mzmnYxIT0S
+         f8sQMFsxTjhwXvGQfzFy7LAqIZ6eRUhrN3bRlUTyaLdIpy1QA8Lx+sTfRvDLQnEwimLl
+         bFkMelLdCUxQ8HwmkTyIExxxTqO6XdgulVNJw33EMrh4maDYCCX6QJNCFN2uBODz8isP
+         JjRA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSRXX+dN/A06bQbqisfHXrye14rvwa0Zp2YR8Tzu/ISiCoIbY6xNkXtdTRjd2O9h7npOyUNGM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOtuCeNQ3uYfJjuj/SSNWXU8LRs9+uRqoh4wHo2WDnIqUGbElb
+	SOseozLqbnvqXIGsjjdGFbwpEd3nyf6Hw15+FnRdROgk7XwPhcM3VDx5g4Uqpgqkaeo=
+X-Gm-Gg: ASbGncuoQYwJi0PCTW3VJDMWHNxTqoLETB4WOgnobxDmkyB/jpkiBBXxubCaWHwPEMF
+	clExsz0O6N5a+t54yS9YMagfLIR7ioJxXqYSTRARztQhaE6qQqxsgoedOgBOeuAYXf+046eXot1
+	NVYOKI52zEe1c4v3BNCNd7RmrIh/g1WNDHKRJfLu8yJb1ZtbxUtBMk1dOxKgSOsFgZSnC4cGgmA
+	iz4L5VFiEJBo0iETEi9CtVW2GrE9UzpJkcVjU00HVcZAUAWQHLSMDs6w3hCwqcn5TzQS3No+C93
+	JkzNPboMI2Tt4QPgj7kWnlFMLA8BpfyfKm4y++elFVb0apZAvLzGtqwp8J7AOnqkeSXVkRvBuIZ
+	EGN19nlNHg+KnjGe5yuZV4bx9QDOLz3nG3V1X/sAylpaI4cuquNTchmrDOE/UIR4JqmY=
+X-Google-Smtp-Source: AGHT+IF8cAJKU0uDUbsIxPPaSCr7igCmeTXnBbWub3AL1j9L+jNBLIxdzW27wopPloNnbvH5RjVzEw==
+X-Received: by 2002:a05:600c:4747:b0:441:b397:e324 with SMTP id 5b1f17b1804b1-453659ca904mr40838535e9.9.1750664172885;
+        Mon, 23 Jun 2025 00:36:12 -0700 (PDT)
+Received: from mordecai.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535eac8e19sm134858005e9.21.2025.06.23.00.36.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 00:36:12 -0700 (PDT)
+Date: Mon, 23 Jun 2025 09:36:04 +0200
+From: Petr Tesarik <ptesarik@suse.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Neal Cardwell <ncardwell@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, "open list:NETWORKING [TCP]"
+ <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
+ <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2 0/2] tcp_metrics: fix hanlding of route options
+Message-ID: <20250623093604.01b74726@mordecai.tesarici.cz>
+In-Reply-To: <CANn89iLrJiqu1SdjKfkOPcSktvmAUWR2rJWkiPdvzQn+MMAOPg@mail.gmail.com>
+References: <20250620125644.1045603-1-ptesarik@suse.com>
+	<CANn89iLrJiqu1SdjKfkOPcSktvmAUWR2rJWkiPdvzQn+MMAOPg@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.50; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250623034129.838246-2-shaojijie@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 23, 2025 at 11:41:27AM +0800, Jijie Shao wrote:
-> Currently, the driver uses phylib to operate PHY by default.
-> 
-> On some boards, the PHY device is separated from the MAC device.
-> As a result, the hibmcge driver cannot operate the PHY device.
-> 
-> In this patch, the driver determines whether a PHY is available
-> based on register configuration. If no PHY is available,
-> the driver intercepts phylib operations and operates only MAC device.
+On Fri, 20 Jun 2025 06:24:23 -0700
+Eric Dumazet <edumazet@google.com> wrote:
 
+> On Fri, Jun 20, 2025 at 5:57=E2=80=AFAM Petr Tesarik <ptesarik@suse.com> =
+wrote:
+> >
+> > I ran into a couple of issues while trying to tweak TCP congestion
+> > avoidance to analyze a potential performance regression. It turns out
+> > that overriding the parameters with ip-route(8) does not work as
+> > expected and appears to be buggy. =20
+>=20
+> Hi Petr
+>=20
+> Could you add packetdrill tests as well ?
 
-The standard way to handle a MAC without a PHY is to use
-fixed_link. It is a fake PHY which follows the usual API, so your MAC
-driver does not need to care there is no PHY.
+Glad to do that. But it will be my first time. ;-) Is there a tutorial?
+I looked under Documentation/ and didn't see anything.
 
+> Given this could accidentally break user setups, maybe net-next would be =
+safer.
 
-    Andrew
+Yeah, you're right. Technically, it is a bugfix, but if it's been
+broken for more than a decade without anyone complaining, it can't be
+super-urgent.
 
----
-pw-bot: cr
+> Some of us disable tcp_metrics, because metrics used one minute (or
+> few seconds) in the past are not very helpful, and source of
+> confusion.
+>=20
+> (/proc/sys/net/ipv4/tcp_no_metrics_save set to 1)
 
+Yes, I know about that one. FWIW it didn't help at all in my case,
+because then the value from the routing table was ALWAYS ignored...
+
+Petr T
 
