@@ -1,134 +1,317 @@
-Return-Path: <netdev+bounces-200155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4035CAE3714
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:36:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46DBBAE3730
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 09:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD68E1719A5
-	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:36:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBDB7188F6CA
+	for <lists+netdev@lfdr.de>; Mon, 23 Jun 2025 07:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023161EFF9B;
-	Mon, 23 Jun 2025 07:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VgwVTpFX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F0F1388;
+	Mon, 23 Jun 2025 07:45:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E05B1F4C90
-	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 07:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7290C3C3C
+	for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 07:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750664176; cv=none; b=nN2P+Y/PpuQEqMkhTkV6tKrbR36EnfPJ7ctw+rslNoAGwoJII+u05GDn/rdI66XKaIlU+cSvyHf1NgP0POZxIGlkoYguSEVsj6o3WP361bgM3j8+seMu6dadn3h7wA4lRe1VBTfXZaFH6+l/komYybKFx3zlKluK/+VV8/T17Dw=
+	t=1750664725; cv=none; b=Zooat1Dxo4FdEiYnA6N6ta+umFWCwWlg3j2AWhnB2vrgVuTxLvX0dnrVzv4oTukBwZSgEvjJShMBp4S5r8p+78Wr3crNvMPfRoUtzyU6Z9YuY7UNVwPtvl5FBg5opwLJgQDqubONscZimSxc1TRciOS2nimywVnj1KyNYRFf7lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750664176; c=relaxed/simple;
-	bh=w+3qbmZ+/Fzih2MTelSdaDcNnHFx2K5wHnL/eTsCyys=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GgGS2oz1tq3GGQVaMOR+h6jSkFoQYpmRp0PVJSHyQTCSkZxfE+EI1C4uSv+1dl1P5czKEchDCC0OmcqgYn0tgP85Dstuhb5+RLWr1c1Js/qpp7KZHwWrZKiWcEGfrpvKHQUNn3GCPAcGgm/64mwsVioEFRE2/d/LfeBuBh/bs6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VgwVTpFX; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a5828d26e4so609288f8f.0
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 00:36:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1750664173; x=1751268973; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w+3qbmZ+/Fzih2MTelSdaDcNnHFx2K5wHnL/eTsCyys=;
-        b=VgwVTpFXYnXMmKkwwR1C+MvWG4pgWpxpA+TvvHS+kNX467zWiGKrYvfK+uPzPML6iq
-         s8GaaSXCVWL5lh9F9ZrBW1iT9mjBH3SI6G1rwJ6So1ynwM6fplh6qrsdXr0xHSLWOVXt
-         3Y3ah9TzdxsO9VaMexNtfS+/sKG4sCiCBUNyNIt84GHbs16zsbWAjPBvVPqOYeSuE+RU
-         oZNH3KtuaYIodq8727OV3SuvfenfUCaOfU13/UAO2OKoUK/ffnxHIAFvnI7JMQZb2OmK
-         obtnvtKu1THrGhrByu8iMgkkSR+RG3qi92D34exCFbQNICm92gC4mgpF6csVKx6M7VGo
-         gWsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750664173; x=1751268973;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w+3qbmZ+/Fzih2MTelSdaDcNnHFx2K5wHnL/eTsCyys=;
-        b=bGtVMPfJkgfmaqUCH5XaF15EiC58vrw0jP/F47tV43G28zw9c88Mtf5gmLJdXiEwwV
-         Ml6V4Cpm00fRBFx348spgNP0oWaKwjUnfGbmCZYust6/JKG2koJaGXVGdFJD/XzmdWf9
-         c6vPMT6i1/u8tysjEGGCVizsElyWO7amUuOgx02zOshgoJy+Hl28p0SMe1mzmnYxIT0S
-         f8sQMFsxTjhwXvGQfzFy7LAqIZ6eRUhrN3bRlUTyaLdIpy1QA8Lx+sTfRvDLQnEwimLl
-         bFkMelLdCUxQ8HwmkTyIExxxTqO6XdgulVNJw33EMrh4maDYCCX6QJNCFN2uBODz8isP
-         JjRA==
-X-Forwarded-Encrypted: i=1; AJvYcCXSRXX+dN/A06bQbqisfHXrye14rvwa0Zp2YR8Tzu/ISiCoIbY6xNkXtdTRjd2O9h7npOyUNGM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOtuCeNQ3uYfJjuj/SSNWXU8LRs9+uRqoh4wHo2WDnIqUGbElb
-	SOseozLqbnvqXIGsjjdGFbwpEd3nyf6Hw15+FnRdROgk7XwPhcM3VDx5g4Uqpgqkaeo=
-X-Gm-Gg: ASbGncuoQYwJi0PCTW3VJDMWHNxTqoLETB4WOgnobxDmkyB/jpkiBBXxubCaWHwPEMF
-	clExsz0O6N5a+t54yS9YMagfLIR7ioJxXqYSTRARztQhaE6qQqxsgoedOgBOeuAYXf+046eXot1
-	NVYOKI52zEe1c4v3BNCNd7RmrIh/g1WNDHKRJfLu8yJb1ZtbxUtBMk1dOxKgSOsFgZSnC4cGgmA
-	iz4L5VFiEJBo0iETEi9CtVW2GrE9UzpJkcVjU00HVcZAUAWQHLSMDs6w3hCwqcn5TzQS3No+C93
-	JkzNPboMI2Tt4QPgj7kWnlFMLA8BpfyfKm4y++elFVb0apZAvLzGtqwp8J7AOnqkeSXVkRvBuIZ
-	EGN19nlNHg+KnjGe5yuZV4bx9QDOLz3nG3V1X/sAylpaI4cuquNTchmrDOE/UIR4JqmY=
-X-Google-Smtp-Source: AGHT+IF8cAJKU0uDUbsIxPPaSCr7igCmeTXnBbWub3AL1j9L+jNBLIxdzW27wopPloNnbvH5RjVzEw==
-X-Received: by 2002:a05:600c:4747:b0:441:b397:e324 with SMTP id 5b1f17b1804b1-453659ca904mr40838535e9.9.1750664172885;
-        Mon, 23 Jun 2025 00:36:12 -0700 (PDT)
-Received: from mordecai.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535eac8e19sm134858005e9.21.2025.06.23.00.36.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 00:36:12 -0700 (PDT)
-Date: Mon, 23 Jun 2025 09:36:04 +0200
-From: Petr Tesarik <ptesarik@suse.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Neal Cardwell <ncardwell@google.com>, Kuniyuki
- Iwashima <kuniyu@google.com>, "open list:NETWORKING [TCP]"
- <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
- <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2 0/2] tcp_metrics: fix hanlding of route options
-Message-ID: <20250623093604.01b74726@mordecai.tesarici.cz>
-In-Reply-To: <CANn89iLrJiqu1SdjKfkOPcSktvmAUWR2rJWkiPdvzQn+MMAOPg@mail.gmail.com>
-References: <20250620125644.1045603-1-ptesarik@suse.com>
-	<CANn89iLrJiqu1SdjKfkOPcSktvmAUWR2rJWkiPdvzQn+MMAOPg@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.50; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1750664725; c=relaxed/simple;
+	bh=mmBksMTTd27HyDcg6ireOZHAyB0klljVc3tmVvzCzns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lZIsJ4RpUfFCOvhcpIwiDUGGvIotMCtxBX3D0SF8YgE8D/eqf6WEPar7Lk7cqi8ifWXfQ6ScmVBAzRNzbNxCs7Upy/kNpjszLOQld/l1UAidDpISjAFg6OqT3KZ2dPFpBPIKuEmRbl0/yQsgUMnvh5/0d0u3GOGduQmJ9f6fO3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <f.pfitzner@pengutronix.de>)
+	id 1uTbrk-0000dH-Dy; Mon, 23 Jun 2025 09:45:20 +0200
+Message-ID: <dbc2fcc9-5cd9-43c9-a9f9-9d5d16bb81b4@pengutronix.de>
+Date: Mon, 23 Jun 2025 09:45:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] bridge: dump mcast querier state per vlan
+To: Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, idosch@nvidia.com, bridge@lists.linux-foundation.org,
+ entwicklung@pengutronix.de
+References: <20250620121620.2827020-1-f.pfitzner@pengutronix.de>
+ <d8d5a8f4-33a8-4a62-b48e-fb82b8de245b@blackwall.org>
+Content-Language: en-US, de-DE
+From: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+In-Reply-To: <d8d5a8f4-33a8-4a62-b48e-fb82b8de245b@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: f.pfitzner@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, 20 Jun 2025 06:24:23 -0700
-Eric Dumazet <edumazet@google.com> wrote:
+On 6/20/25 14:44, Nikolay Aleksandrov wrote:
+> On 6/20/25 15:16, Fabian Pfitzner wrote:
+>> Dump the multicast querier state per vlan.
+>> This commit is almost identical to [1].
+>>
+>> The querier state can be seen with:
+>>
+>> bridge -d vlan global
+>>
+>> The options for vlan filtering and vlan mcast snooping have to be enabled
+>> in order to see the output:
+>>
+>> ip link set [dev] type bridge mcast_vlan_snooping 1 vlan_filtering 1
+>>
+>> The querier state shows the following information for IPv4 and IPv6
+>> respectively:
+>>
+>> 1) The ip address of the current querier in the network. This could be
+>>     ourselves or an external querier.
+>> 2) The port on which the querier was seen
+>> 3) Querier timeout in seconds
+>>
+>> [1] https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=16aa4494d7fc6543e5e92beb2ce01648b79f8fa2
+>>
+>> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+>> ---
+>>
+>> v1->v2
+>> 	- refactor code
+>> 	- link to v1: https://lore.kernel.org/netdev/20250604105322.1185872-1-f.pfitzner@pengutronix.de/
+>>
+>> v2->v3
+>> 	- move code into a shared function
+>> 	- use shared function in bridge and ip utility
+>> 	- link to v2: https://lore.kernel.org/netdev/20250611121151.1660231-1-f.pfitzner@pengutronix.de/
+>> ---
+>>   bridge/vlan.c      |  3 +++
+>>   include/bridge.h   |  3 +++
+>>   ip/iplink_bridge.c | 57 +---------------------------------------------
+>>   lib/bridge.c       | 56 +++++++++++++++++++++++++++++++++++++++++++++
+>>   4 files changed, 63 insertions(+), 56 deletions(-)
+>>
+> Hi,
+> The subject should contain the target for this patch which is iproute2-next,
+> e.g. [PATCH iproute2-next v3]. Since there would be another version, I'd split
+> it in 2 patches - 1 that moves the existing code to lib/bridge.c and the second
+> which adds the vlan querier print code.
+>
+> Also a few comments below..
+I'll split it into three commits then:
+1. Move existing code into shared function
+2. Call shared function in bridge/vlan.c as well
+3. Refactor code according to Ido's code proposal from v1
+>
+>> diff --git a/bridge/vlan.c b/bridge/vlan.c
+>> index 14b8475d..0233eaf6 100644
+>> --- a/bridge/vlan.c
+>> +++ b/bridge/vlan.c
+>> @@ -852,6 +852,9 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
+>>   		print_uint(PRINT_ANY, "mcast_querier", "mcast_querier %u ",
+>>   			   rta_getattr_u8(vattr));
+>>   	}
+>> +	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]) {
+>> +		dump_mcast_querier_state(vtb[BRIDGE_VLANDB_GOPTS_MCAST_QUERIER_STATE]);
+> Add a local variable for the attribute and make this line shorter (<= 80chars).
+>
+>> +	}
+>>   	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION]) {
+>>   		vattr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_IGMP_VERSION];
+>>   		print_uint(PRINT_ANY, "mcast_igmp_version",
+>> diff --git a/include/bridge.h b/include/bridge.h
+>> index 8bcd1e38..9e9447c6 100644
+>> --- a/include/bridge.h
+>> +++ b/include/bridge.h
+>> @@ -3,9 +3,12 @@
+>>   #define __BRIDGE_H__ 1
+>>
+>>   #include <linux/if_bridge.h>
+>> +#include <linux/rtnetlink.h>
+>>
+>>   void bridge_print_vlan_flags(__u16 flags);
+>>   void bridge_print_vlan_stats_only(const struct bridge_vlan_xstats *vstats);
+>>   void bridge_print_vlan_stats(const struct bridge_vlan_xstats *vstats);
+>>
+>> +void dump_mcast_querier_state(const struct rtattr* vtb);
+>> +
+>>   #endif /* __BRIDGE_H__ */
+>> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+>> index 31e7cb5e..68a277ef 100644
+>> --- a/ip/iplink_bridge.c
+>> +++ b/ip/iplink_bridge.c
+>> @@ -682,62 +682,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>>   			   rta_getattr_u8(tb[IFLA_BR_MCAST_QUERIER]));
+>>
+>>   	if (tb[IFLA_BR_MCAST_QUERIER_STATE]) {
+>> -		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
+>> -		SPRINT_BUF(other_time);
+>> -
+>> -		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, tb[IFLA_BR_MCAST_QUERIER_STATE]);
+>> -		memset(other_time, 0, sizeof(other_time));
+>> -
+>> -		open_json_object("mcast_querier_state_ipv4");
+>> -		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
+>> -			print_string(PRINT_FP,
+>> -				NULL,
+>> -				"%s ",
+>> -				"mcast_querier_ipv4_addr");
+>> -			print_color_string(PRINT_ANY,
+>> -				COLOR_INET,
+>> -				"mcast_querier_ipv4_addr",
+>> -				"%s ",
+>> -				format_host_rta(AF_INET, bqtb[BRIDGE_QUERIER_IP_ADDRESS]));
+>> -		}
+>> -		if (bqtb[BRIDGE_QUERIER_IP_PORT])
+>> -			print_uint(PRINT_ANY,
+>> -				"mcast_querier_ipv4_port",
+>> -				"mcast_querier_ipv4_port %u ",
+>> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
+>> -		if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER])
+>> -			print_string(PRINT_ANY,
+>> -				"mcast_querier_ipv4_other_timer",
+>> -				"mcast_querier_ipv4_other_timer %s ",
+>> -				sprint_time64(
+>> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]),
+>> -									other_time));
+>> -		close_json_object();
+>> -		open_json_object("mcast_querier_state_ipv6");
+>> -		if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
+>> -			print_string(PRINT_FP,
+>> -				NULL,
+>> -				"%s ",
+>> -				"mcast_querier_ipv6_addr");
+>> -			print_color_string(PRINT_ANY,
+>> -				COLOR_INET6,
+>> -				"mcast_querier_ipv6_addr",
+>> -				"%s ",
+>> -				format_host_rta(AF_INET6, bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]));
+>> -		}
+>> -		if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
+>> -			print_uint(PRINT_ANY,
+>> -				"mcast_querier_ipv6_port",
+>> -				"mcast_querier_ipv6_port %u ",
+>> -				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
+>> -		if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER])
+>> -			print_string(PRINT_ANY,
+>> -				"mcast_querier_ipv6_other_timer",
+>> -				"mcast_querier_ipv6_other_timer %s ",
+>> -				sprint_time64(
+>> -					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]),
+>> -									other_time));
+>> -		close_json_object();
+>> +		dump_mcast_querier_state(tb[IFLA_BR_MCAST_QUERIER_STATE]);
+>>   	}
+>>
+>>   	if (tb[IFLA_BR_MCAST_HASH_ELASTICITY])
+>> diff --git a/lib/bridge.c b/lib/bridge.c
+>> index a888a20e..13b0d633 100644
+>> --- a/lib/bridge.c
+>> +++ b/lib/bridge.c
+>> @@ -45,3 +45,59 @@ void bridge_print_vlan_stats(const struct bridge_vlan_xstats *vstats)
+>>
+>>   	close_json_object();
+>>   }
+>> +
+>> +void dump_mcast_querier_state(const struct rtattr *vtb)
+> Stay consistent with the rest of lib/bridge.c and add bridge_ in front of the name.
+> And maybe bridge_print_mcast_querier_state?
+>
+>> +{
+>> +	struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
+>> +	const char *querier_ip;
+>> +	SPRINT_BUF(other_time);
+>> +	__u64 tval;
+>> +
+>> +	parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, vtb);
+>> +	memset(other_time, 0, sizeof(other_time));
+>> +
+>> +	open_json_object("mcast_querier_state_ipv4");
+>> +	if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
+>> +		querier_ip = format_host_rta(AF_INET,
+>> +						bqtb[BRIDGE_QUERIER_IP_ADDRESS]);
+>> +		print_string(PRINT_FP, NULL, "%s ",
+>> +				"mcast_querier_ipv4_addr");
+> formatting is off, "mcast_querier_ipv4_addr" should start under PRINT_FP
+> use tabs as much as possible (before going over) and if
+> needed finish alignment with spaces, e.g.:
+Hmm, for some reason my editor replaced the spaces with tabs when I 
+copied Ido's proposal.
+Did not notice that... Sorry. I'll send a new patch.
+>
+> 		querier_ip = format_host_rta(AF_INET,
+> 					     bqtb[BRIDGE_QUERIER_IP_ADDRESS]);
+> or
+>
+> 		print_string(PRINT_FP, NULL, "%s ",
+> 			     "mcast_querier_ipv4_addr");
+>
+>> +		print_color_string(PRINT_ANY, COLOR_INET,
+>> +					"mcast_querier_ipv4_addr", "%s ",
+>> +					querier_ip);
+> same about formatting
+>
+>> +	}
+>> +	if (bqtb[BRIDGE_QUERIER_IP_PORT])
+>> +		print_uint(PRINT_ANY, "mcast_querier_ipv4_port",
+>> +				"mcast_querier_ipv4_port %u ",
+>> +				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
+> formatting
+>
+>> +	if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]) {
+>> +		tval = rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]);
+>> +		print_string(PRINT_ANY,
+>> +				"mcast_querier_ipv4_other_timer",
+>> +				"mcast_querier_ipv4_other_timer %s ",
+>> +				sprint_time64(tval, other_time));
+> formatting
+>
+>> +	}
+>> +	close_json_object();
+>> +	open_json_object("mcast_querier_state_ipv6");
+>> +	if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
+>> +		querier_ip = format_host_rta(AF_INET6,
+>> +						bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]);
+>> +		print_string(PRINT_FP, NULL, "%s ",
+>> +				"mcast_querier_ipv6_addr");
+>> +		print_color_string(PRINT_ANY, COLOR_INET6,
+>> +					"mcast_querier_ipv6_addr", "%s ",
+>> +					querier_ip);
+> formatting
+>> +	}
+>> +	if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
+>> +		print_uint(PRINT_ANY, "mcast_querier_ipv6_port",
+>> +				"mcast_querier_ipv6_port %u ",
+>> +				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
+> formatting
+>> +	if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]) {
+>> +		tval = rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]);
+>> +		print_string(PRINT_ANY,
+>> +				"mcast_querier_ipv6_other_timer",
+>> +				"mcast_querier_ipv6_other_timer %s ",
+>> +				sprint_time64(tval, other_time));
+> formatting
+>
+>> +	}
+>> +	close_json_object();
+>> +}
+>> --
+>> 2.39.5
+>>
+>
+-- 
+Pengutronix e.K.                           | Fabian Pfitzner             |
+Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
-> On Fri, Jun 20, 2025 at 5:57=E2=80=AFAM Petr Tesarik <ptesarik@suse.com> =
-wrote:
-> >
-> > I ran into a couple of issues while trying to tweak TCP congestion
-> > avoidance to analyze a potential performance regression. It turns out
-> > that overriding the parameters with ip-route(8) does not work as
-> > expected and appears to be buggy. =20
->=20
-> Hi Petr
->=20
-> Could you add packetdrill tests as well ?
-
-Glad to do that. But it will be my first time. ;-) Is there a tutorial?
-I looked under Documentation/ and didn't see anything.
-
-> Given this could accidentally break user setups, maybe net-next would be =
-safer.
-
-Yeah, you're right. Technically, it is a bugfix, but if it's been
-broken for more than a decade without anyone complaining, it can't be
-super-urgent.
-
-> Some of us disable tcp_metrics, because metrics used one minute (or
-> few seconds) in the past are not very helpful, and source of
-> confusion.
->=20
-> (/proc/sys/net/ipv4/tcp_no_metrics_save set to 1)
-
-Yes, I know about that one. FWIW it didn't help at all in my case,
-because then the value from the routing table was ALWAYS ignored...
-
-Petr T
 
