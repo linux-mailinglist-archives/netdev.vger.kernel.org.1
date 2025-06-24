@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-200637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77E2AE6638
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 15:24:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C579AE66AA
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 15:37:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB9253A72C7
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 13:24:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54CD67B4A8A
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 13:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4642BFC62;
-	Tue, 24 Jun 2025 13:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972C529B206;
+	Tue, 24 Jun 2025 13:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elPmPNa8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZwLVjHV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4238E1F4C87
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE80548EE
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750771475; cv=none; b=n/Lrymlymqu8v3hwGdd78a39CTgg0SIeUujq+UFUoWIF85q/MVtCUr8B6LOlwQyqKwRhtZQOl+0hkds87vxIAErSt8ZB99NCvDOxL28cKymI6Cyj+seMXLmn7Nynxtr1iU/QbkilAlnqkF0oYb/vEgoPBRj41854m+d0wsa5Mz8=
+	t=1750772241; cv=none; b=KiM5aul534r4OlU84L4175+BomIMhHssA05WHF88pCM50z8RSb+4pzBBHdnKqIEr2JZoPlBIDX5IQiOzcmR9crTQ9Rdhs/vbzYGyAfRmArvvrgIQhr4YW95wVwjD4rxmZTsWJe2yLtFATNUdtGz6o0fWei4i5sPEoTZ8DvbnNOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750771475; c=relaxed/simple;
-	bh=ayCU+nkPRr6n8YMzwOwtPyFONRi8G8Mx6ULPM9Iu10o=;
+	s=arc-20240116; t=1750772241; c=relaxed/simple;
+	bh=w/IDMkNJyCUUzyRjdmPql/8lwhxsnPEA40uW7VzKY3k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lqt8FRe5VTDG4TFrUMfiSalbN2UyRoZNPJX/nnJkfWkyg/M9opTL/hIBfT+PpCqvZUEE7H3HjAZj8/nZlBpLI5dzDIS7r+Pv616lMA11QYKrtUj11z7ffTWpb3JvKA4YHekL5ReShyXSBj5xpXnIbgKbPUDrSsX8QcSkCA/ZbHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elPmPNa8; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=BbMxRGriI75IZayS8slayQi2SrtDdq2JfANFdDK82OlDtufMCI0CCZoOalo6LtWqh/r7cpRV5KRfriUxo9Ndj9mRqQ2Rcbc+dcMU/2kDzY0XJ+QdlPZ6xAdSfcE++stLZWl8t88PTspHRAGwR2odoHqw/jkvBWDXFjZu8RN7nbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CZwLVjHV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750771473;
+	s=mimecast20190719; t=1750772239;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aK5RkAHQrhrmbMgDmli1jYjYYGO7nTlMC7kAqH+maLI=;
-	b=elPmPNa8qUY/rQWff6eQw9fVoW1T+iLrXbmOTFvu3Rt86pAylfJf/sYfMvG00ydpMJZsj+
-	4eoMKtOF5QUQsMGiZJltqTKF4SN/FTashuBiLgrjFyqh/P/W6CUoD7ob1PRUzl2V+agnJC
-	WApxmqKWOUFg9B7b+LYenbIPE2OHIJY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=kdLNi82PU1S92ENBnDfDaMCmZjF6GA2bHRYIMCa5Xtg=;
+	b=CZwLVjHVxraU7h8CzE7F4dY+qYxZjBlszzfB2qNF8T7B5NH3cDWAwgmtvgng43I4APshJR
+	93obTMNXzv64NccZ/+d1OyhW+NrfDcuyrZtTmzUt1DUluG0H0W1Pm+cg6Fby5rv17qZu5m
+	6sOhi5UPy+JTI3voewjoeg1gAGclF+Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-65-FpXWRxamOfu6VbO3NEKVsQ-1; Tue, 24 Jun 2025 09:24:31 -0400
-X-MC-Unique: FpXWRxamOfu6VbO3NEKVsQ-1
-X-Mimecast-MFC-AGG-ID: FpXWRxamOfu6VbO3NEKVsQ_1750771471
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4eee2398bso250289f8f.1
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 06:24:31 -0700 (PDT)
+ us-mta-470-Y7NZIyANPECvOIsE5vDZ8g-1; Tue, 24 Jun 2025 09:37:17 -0400
+X-MC-Unique: Y7NZIyANPECvOIsE5vDZ8g-1
+X-Mimecast-MFC-AGG-ID: Y7NZIyANPECvOIsE5vDZ8g_1750772236
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4537f56ab74so3239115e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 06:37:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750771470; x=1751376270;
+        d=1e100.net; s=20230601; t=1750772236; x=1751377036;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aK5RkAHQrhrmbMgDmli1jYjYYGO7nTlMC7kAqH+maLI=;
-        b=gzyutIV1JwPUPmLEszj5mKMVw4lthCOCD8AZj/grJEM24j9fiPMj4GhQGLUOUjLUsb
-         Ksjbbcn1AyKkOs+cknLY7XRhRCA7K23POz+Ye9WBFFyuCBpHBXPVQPZ8cr+4aWBP27tv
-         K4ejHXSou0WRV4X/PuMjVy4pmdt3/SEFwNswdV3xDfIgBsFGTaAe/O86rf2AxdKYbir/
-         yl8jZRgFwyj4BS8glHSgJDjtIUsm4a4o2qiyGkhog31TkTw9AB4NNB9H9+PGL+Z41WQO
-         tB8u///Ims+eGaIk8K/NJS7cOwAX8c0U5s55AJMNkA50wwGBc23ty4El4e0egcHFg8Q/
-         oH6w==
-X-Forwarded-Encrypted: i=1; AJvYcCV8zoj9fdzhnT/fYdhSzLzl0WtkGYRhYCRYSsPaAk/dCOVhkW5a61GJEAHSzJbUjRs/0BboFWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5u3LgJ55jv/lJaS7JhoflK0/5zF08HG4EID8iSYBXOxVBfchF
-	jxJpYkBqS2HDJdqD2EU5EBZGfb/ME1AhUw7xdPM+3Mf1JGXx9mp9IcViMCyd/jRg4Q7O6Xn/JDO
-	BTVWzwVZLxjAz6AwpeLT5F/RnU8T9OMRBzm4jJcSN2fFZbNcUTIjS8Vmglw==
-X-Gm-Gg: ASbGncstQMivIqAkr/N4S1+PGJiPPEivrOJtdhnfIUFEYdQO3Wcpo0K5cIbexAjVuSh
-	4jooh9wgAu+I4HFiFMBfcpbKxhwX9W/k10ay88/1pR8FmC3fghzDMKpLg2mIrdcWN7iWMknGb6t
-	iH38ANxMVbR7PMiCVGnJYy0HwdiTqkOZaKhdiGj+caU7xt+eJpQV+1YnlzOxevnnC6drW3wmfAr
-	w0Oc7m0deL6gXpB5vrgsFPjLMueuqdwY5Gl4bhNA7GBcEVdXuSSE1OdsZUzb31SR1/D4/EBR3Zq
-	vPGWOveY4nYwjp3TLL3XzgBc9V1VtQ==
-X-Received: by 2002:a05:6000:2c0f:b0:3a4:d0dc:184d with SMTP id ffacd0b85a97d-3a6d12da029mr13966777f8f.27.1750771470455;
-        Tue, 24 Jun 2025 06:24:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFiFZlAyuiksuIl1Yo2GNzHDQQeq8cn/28qYo/og94VXjH6d5Y5X9A9bCgyxSiJRdNpJZsF4Q==
-X-Received: by 2002:a05:6000:2c0f:b0:3a4:d0dc:184d with SMTP id ffacd0b85a97d-3a6d12da029mr13966735f8f.27.1750771469988;
-        Tue, 24 Jun 2025 06:24:29 -0700 (PDT)
+        bh=kdLNi82PU1S92ENBnDfDaMCmZjF6GA2bHRYIMCa5Xtg=;
+        b=XVFNuuu4nZe9zgQDklIhiE8++T/pl92sOyK3E8gjsfhpWvTROUHOc0s3waSFt5qVsA
+         gwz+4RkeyzaJsyYVB2Xa8CFZbfO1cqQ42VygFfu3tqlJ2aBpcWTT82OC+66E/YTMoG/O
+         LlAjBQzQDe8mEy/ndbNce74KFU7dYGRG375Nx+gSn7gwjFBGfnT1HPrvOnbP5lvAlubU
+         ad9V27YSAklhk4pMXZkiqcuPq03XG0UkMlGCZkC1W2Qs++0IwJFKYttwCswimKTjCnoT
+         mnFr2sZEkLBOBROb9tp+t6hsoiusRWrJPiK/Had48cZFmn9sN+m5FgNXMlJKokubd1OS
+         L8oA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ6CCvKbdO/z6ctLk+Az1S3p1BQhuxQt3AuEy7ExNyHjlIYWx7NtmGf2nNZ/sQCN3OUo2ZoNY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKsP/UsgRy7w2TDMjI7gjI/YQw4gGn7HdSnQHlwOR9g6S+H8hE
+	WuXODI2EF1yAlYApLcGLBz+OhXZqqo56kfn3OxxuOrA116A43UDWNOYE7rFwvmtKQEnXfuzCQOL
+	CQb55X7N8GgAeDNzb/bQkdRYpxd4KeR+9SE3BAcH9l5AkFXhOO6GmABfnNQ==
+X-Gm-Gg: ASbGncswIfOpLmi/JnZZMeI38HkGN6PJi+3sQb98n8p8eteydDoI3N1o/6zOJX6swDx
+	A+txpE2i/ZxTqWIkcIu7JNCtuQTwTcl8gw26eI5gUIHkmSr6QF6bQq0vm5iYY1SE4YC1keB6Y5N
+	i5fhrfbymgiFfb29jsAXw6ugXZ47Z/MLsIHVmOR4VwSOO8Ts0lEL8SZ3FncolsriRqiL5Dhag55
+	5zvcIUkF1NXRLxMBT7b6Etp6TeAyV8Aw3UsuSNsY5hzpsT1p1eMTP4GiquDR3QwqJOXdyOwc/b7
+	TfevsN/TFcmbYMa5o094al3xp8ZiFA==
+X-Received: by 2002:a05:600c:8b67:b0:453:6ca:16a6 with SMTP id 5b1f17b1804b1-453659c9b5cmr178056575e9.10.1750772236032;
+        Tue, 24 Jun 2025 06:37:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFCDctwjBQaSlAXYgDwmWAr33weRLLnC8b8hgrnzKmiQvzZklRmZK8SJHQ3VS2Chx7RMg6ong==
+X-Received: by 2002:a05:600c:8b67:b0:453:6ca:16a6 with SMTP id 5b1f17b1804b1-453659c9b5cmr178056295e9.10.1750772235622;
+        Tue, 24 Jun 2025 06:37:15 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2445:d510::f39? ([2a0d:3344:2445:d510::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e80f2274sm1927739f8f.48.2025.06.24.06.24.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646fd589sm142741035e9.26.2025.06.24.06.37.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 06:24:29 -0700 (PDT)
-Message-ID: <b31793de-e34f-438c-aa37-d68f3cb42b80@redhat.com>
-Date: Tue, 24 Jun 2025 15:24:27 +0200
+        Tue, 24 Jun 2025 06:37:15 -0700 (PDT)
+Message-ID: <17f789c6-cf64-4940-ac7b-0107b7b96031@redhat.com>
+Date: Tue, 24 Jun 2025 15:37:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,43 +111,20 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 6/22/25 11:37 AM, Lukasz Majewski wrote:
-> +static void mtip_aging_timer(struct timer_list *t)
+> +static void mtip_adjust_link(struct net_device *dev)
 > +{
-> +	struct switch_enet_private *fep = timer_container_of(fep, t,
-> +							     timer_aging);
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	struct phy_device *phy_dev;
+> +	int status_change = 0, idx;
+> +	unsigned long flags;
 > +
-> +	fep->curr_time = mtip_timeincrement(fep->curr_time);
-> +
-> +	mod_timer(&fep->timer_aging,
-> +		  jiffies + msecs_to_jiffies(LEARNING_AGING_INTERVAL));
-> +}
+> +	spin_lock_irqsave(&fep->hw_lock, flags);
 
-It's unclear to me why you decided to maintain this function and timer
-while you could/should have used a macro around jiffies instead.
+The above kind of lock look incorrect. In later patch you use
+spin_lock_bh(), and the context here is never irq.
 
-[...]
-> +static int mtip_sw_learning(void *arg)
-> +{
-> +	struct switch_enet_private *fep = arg;
-> +
-> +	while (!kthread_should_stop()) {
-> +		set_current_state(TASK_INTERRUPTIBLE);
-> +		/* check learning record valid */
-> +		mtip_atable_dynamicms_learn_migration(fep, fep->curr_time,
-> +						      NULL, NULL);
-> +		schedule_timeout(HZ / 100);
-> +	}
-> +
-> +	return 0;
-> +}
-
-Why are you using a full blown kernel thread here? Here a timer could
-possibly make more sense. Why are checking the table every 10ms, while
-the learning intervall is 100ms? I guess you could/should align the
-frequency here with such interval.
-
-Side note: I think you should move the buffer management to a later
-patch: this one is still IMHO too big.
+Should be spin_lock_bh()
 
 /P
 
