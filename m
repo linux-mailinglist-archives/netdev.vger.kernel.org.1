@@ -1,263 +1,134 @@
-Return-Path: <netdev+bounces-200848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77BEAAE716F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 23:15:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB9BAE717A
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 23:22:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1649A1BC3615
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:15:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D755A2EA7
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB0F22FAF8;
-	Tue, 24 Jun 2025 21:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB5C2580C7;
+	Tue, 24 Jun 2025 21:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="QPfij7JV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="naA7swmb"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="GqOUvYk7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8BD47F4A;
-	Tue, 24 Jun 2025 21:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1652561C2;
+	Tue, 24 Jun 2025 21:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750799738; cv=none; b=JzDMJjux1OlnWUeyqiJQVQj7xhqb+AwN99Wodp+5IyWOzGFXhQY7LloqwuSvouFT7YINCMm0oIZGWVeTZx0a1bKJvhvlHaxFvb/ck5gjKy2goJKhb1JQUzLRmLxHj1EFycvtwi9mZ4VqYveZ0pt2jHnehNOmhjZzgluDHzM82V8=
+	t=1750800172; cv=none; b=Quv4jeA2WDOFQGx7M/dOin9WDkAe2OaiPq8/WQX3AJvIdjN+PboSFdijHr2+hSRPz/Us3I/lCi64S0OCLXKU9PQVClfbma4qyW01sLCUhvBWYex5JYJsxSLIQZdBCwXPLuEpZpZHHruVPoSsjaOdJ5h9OVsxt0REbbT0tAVV0tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750799738; c=relaxed/simple;
-	bh=ASU6/7NepD8KZxYGypBu1bhJ2yU7up+jkKKFNlOq7ec=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=DaR9VDQRFEprhtC+I1/uuroBTpoagBvZEnVVAIdYWc4YjFLcD+aUXllK8KDDJPHnKcST4AEC7k7m+P3CgamhOj1eAiQQ6tDK9vi36dCm8RDHhaabIxQPH0sqbYgWeC1x1anD2Xc3cmXia7L+85uraExLmT9+0c4fPNl0/lEdbMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=QPfij7JV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=naA7swmb; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A31AF7A010E;
-	Tue, 24 Jun 2025 17:15:34 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Tue, 24 Jun 2025 17:15:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1750799734; x=1750886134; bh=nbN+zVT0zH0crB+06m2zwk9mmqJuVd7i
-	Um93BjCiMbg=; b=QPfij7JVqRmpPey+8yr93UbhMXbBXU22I89AK4ojjtX9kAzc
-	7hjNqZgwMQj+opLBZXemXrSmuRXkFcMei6kLE4nKxaBZ8qBSHOrqiGtuM7gtwQcf
-	YLJ8l6blcTkFn5N2Q1HplzGbjye7qfYlG0D6W+/oPf8VQkvBzTYtKoo5eBJOv9NY
-	71bPVeXdDPQnHevJSF0qeqraPCqxED7CJCTGoGLhWyqRK1Ezq+6BSfqmfAo6I26M
-	3yfsrXuA6LtJaEdIH5YFRY4GJU2kF6+ZjbYs1h+wcwNBZMmkmDrLicURO95/1ai8
-	XmGiJqdHDhhWCZONH4auaFKnOHCX+fOBvs22IA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750799734; x=
-	1750886134; bh=nbN+zVT0zH0crB+06m2zwk9mmqJuVd7iUm93BjCiMbg=; b=n
-	aA7swmbnNG2jR3VW3mEMSFRTjL2S2yCRTaiDQQia9Uk7PT4M3Tdqkswqnf2pL2RZ
-	tKqZMpFvPuptcGrM8x9UaVFt3C4D912BAU89jzid4hyImTicsBdkfrq1uFaG9HDO
-	+jsgEwH1KDpqRBbd8yxft9KyEQuMTAysuIFXmdgfkohLcWFHYmeH4nOkHOMSqU88
-	vdEXDQzD12l2Tgjxl78qb1yvNpYVSet55YMp/47fMHLUIOCY+e3a+Gk46iZD4Cof
-	9e8VN0c5VmyQn0MjkScNuF7ahuABmZiV75oyzQKt2tDZCpjzP/sGeFCTp+l3Qkb4
-	7yaOc9xTB3nK6RwFIV1OQ==
-X-ME-Sender: <xms:dRVbaElHA5UXHL9uV8_ug89xq67dnhqG4dQKJkPscTIEHqjqQrK0UQ>
-    <xme:dRVbaD0Ms7F3iQ8jHP_cctErfBcXaLxa6Cd83NCEGOy9G5peJKtMjPTs4pONLnjV0
-    cRM7QgIoNfdF-WbG2c>
-X-ME-Received: <xmr:dRVbaCpc16v8LoMVVUhS40ILIyx7tdFwjTU8GT59hGYrMDyjJ53EqEkXDIceXuMrmnVLhw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvtdelgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtjeenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeegfefghffghffhjefgveekhfeukeevffethffgtddutdefffeuheelgeelieeuhfen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehtohhnghhhrghosegsrghmrghitghlohhuugdrtghomhdprh
-    gtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvggu
-    uhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegtrghrlhhoshdrsghilh
-    gsrghosehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsh
-    hfohhrshhhvggvsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfidonhgv
-    thguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtg
-    homh
-X-ME-Proxy: <xmx:dRVbaAlmG0-kBZWpOKqnAA7M9VIZnrd2LdTmJAQofX3ChFK8fvggOw>
-    <xmx:dRVbaC1M5mZ4byQ7keQWkrdVtYWd9fXbxJ_KxKxCVFn6D5urnd5P4A>
-    <xmx:dRVbaHt54XhwD3aFOLPMUreAuV28Fer1P_t_jKdbIbL8lmKsmGbzOQ>
-    <xmx:dRVbaOXMJiV3au0wg71kdh9ao4dZXrj8UpmeEeI2XQY6l-sl8uStKQ>
-    <xmx:dhVbaP9zmeSHfwO9XK957P0Dg95I4il2nJxEoXiCP9oSKN9vC8HcNAo7>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 24 Jun 2025 17:15:33 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 575149FCA2; Tue, 24 Jun 2025 14:15:32 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 544B59FC54;
-	Tue, 24 Jun 2025 14:15:32 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-cc: carlos.bilbao@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-    horms@kernel.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, sforshee@kernel.org, bilbao@vt.edu
-Subject: Re: [PATCH] bonding: Improve the accuracy of LACPDU transmissions
-In-reply-to: <341249BC-4A2E-4C90-A960-BB07FAA9C092@bamaicloud.com>
-References: <20250618195309.368645-1-carlos.bilbao@kernel.org> <341249BC-4A2E-4C90-A960-BB07FAA9C092@bamaicloud.com>
-Comments: In-reply-to Tonghao Zhang <tonghao@bamaicloud.com>
-   message dated "Fri, 20 Jun 2025 11:15:36 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1750800172; c=relaxed/simple;
+	bh=FDb/RFUfF05Pk1XRKRUucGe6S4ZEUfT4pGe4O59dr0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I4d5Tb2JfjY9bBxF6XtYg2pRpMgXy5hqVlj84apgxqxWbiIMkt0lrvKV+/SsH41FNzQnrS3zh7ghi4dkStqaxZx3oITgHLbxodGB1rX6V5z87M4fO23TCAWlcdVh4N0guS5A5Whu9XwASlJBfJ1T4NfsSH542TXwOoTPzkhQtX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=GqOUvYk7; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 36229102779C2;
+	Tue, 24 Jun 2025 23:22:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1750800167; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=v7M9kkIPbnh/oS2WYgoA/uL9BgJMPVXdHT1CB9dd2lY=;
+	b=GqOUvYk7TRdIkVJDpPiZDuKGtqtlMRl2kkdo7d/15nVe1UhvWsvIhXn0XtMPgnB9m8HrPH
+	lXgSUa/HEMsYm0XJo2z0VZSaZtb/ne+sUx0MkOtfrjGAVT2JxRriHvx0A+8nn3USZgT3DT
+	9/uSg6TBp8ogoeixA+5p0hP1DgLParzBkQtgapXsA+BBjb8j9bRec6Wp0G/dN6yiae/CpZ
+	iYzV4am/wTeAPwsso4A+QHdafNKLn7x3gBxINxC0HBq5htbOgfjFfD8WiboATxxq7vEpfI
+	rXj/pgnC656VMAQ8GpXG8D5ekRo8b/za4uJ1zzzkYGvvkOoWx6bm6PNw9IQLVw==
+Date: Tue, 24 Jun 2025 23:22:42 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v13 04/11] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250624232242.3448f562@wsk>
+In-Reply-To: <17f789c6-cf64-4940-ac7b-0107b7b96031@redhat.com>
+References: <20250622093756.2895000-1-lukma@denx.de>
+	<20250622093756.2895000-5-lukma@denx.de>
+	<17f789c6-cf64-4940-ac7b-0107b7b96031@redhat.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; boundary="Sig_//EaqhMPzixC8PHpwvxTq/F2";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
+
+--Sig_//EaqhMPzixC8PHpwvxTq/F2
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jun 2025 14:15:32 -0700
-Message-ID: <2487616.1750799732@famine>
 
-Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+Hi Paolo,
 
->
->
->
->> 2025=E5=B9=B46=E6=9C=8819=E6=97=A5 03:53=EF=BC=8Ccarlos.bilbao@kernel.or=
-g =E5=86=99=E9=81=93=EF=BC=9A
->>=20
->> From: Carlos Bilbao <carlos.bilbao@kernel.org>
->>=20
->> Improve the timing accuracy of LACPDU transmissions in the bonding 802.3=
-ad
->> (LACP) driver. The current approach relies on a decrementing counter to
->> limit the transmission rate. In our experience, this method is susceptib=
-le
->> to delays (such as those caused by CPU contention or soft lockups) which
->> can lead to accumulated drift in the LACPDU send interval. Over time, th=
-is
->> drift can cause synchronization issues with the top-of-rack (ToR) switch
->> managing the LAG, manifesting as lag map flapping. This in turn can trig=
-ger
->> temporary interface removal and potential packet loss.
+> On 6/22/25 11:37 AM, Lukasz Majewski wrote:
+> > +static void mtip_adjust_link(struct net_device *dev)
+> > +{
+> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
+> > +	struct switch_enet_private *fep =3D priv->fep;
+> > +	struct phy_device *phy_dev;
+> > +	int status_change =3D 0, idx;
+> > +	unsigned long flags;
+> > +
+> > +	spin_lock_irqsave(&fep->hw_lock, flags); =20
+>=20
+> The above kind of lock look incorrect. In later patch you use
+> spin_lock_bh(), and the context here is never irq.
+>=20
+> Should be spin_lock_bh()
 
-	So, you're saying that contention or soft lockups are causing
-the queue_delayed_work() of bond_3ad_state_machine_handler() to be
-scheduled late, and, then, because the LACPDU TX limiter is based on the
-number of state machine executions (which should be every 100ms), it is
-then late sending LACPDUs?
+Thanks for spotting. I've changed it.
 
-	If the core problem is that the state machine as a whole isn't
-running regularly, how is doing a clock-based time check reliable?  Or
-should I take the word "improve" from the Subject literally, and assume
-it's making things "better" but not "totally perfect"?
+>=20
+> /P
+>=20
 
-	Is the sync issue with the TOR due to missing / delayed LACPDUs,
-or is there more to it?  At the fast LACP rate, the periodic timeout is
-3 seconds for a nominal 1 second LACPDU interval, which is fairly
-generous.
 
->> This patch improves stability with a jiffies-based mechanism to track and
->> enforce the minimum transmission interval; keeping track of when the next
->> LACPDU should be sent.
->>=20
->> Suggested-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
->> Signed-off-by: Carlos Bilbao (DigitalOcean) <carlos.bilbao@kernel.org>
->> ---
->> drivers/net/bonding/bond_3ad.c | 18 ++++++++----------
->> include/net/bond_3ad.h         |  5 +----
->> 2 files changed, 9 insertions(+), 14 deletions(-)
->>=20
->> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3=
-ad.c
->> index c6807e473ab7..47610697e4e5 100644
->> --- a/drivers/net/bonding/bond_3ad.c
->> +++ b/drivers/net/bonding/bond_3ad.c
->> @@ -1375,10 +1375,12 @@ static void ad_churn_machine(struct port *port)
->>  */
->> static void ad_tx_machine(struct port *port)
->> {
->> - /* check if tx timer expired, to verify that we do not send more than
->> - * 3 packets per second
->> - */
->> - if (port->sm_tx_timer_counter && !(--port->sm_tx_timer_counter)) {
->> + unsigned long now =3D jiffies;
->> +
->> + /* Check if enough time has passed since the last LACPDU sent */
->> + if (time_after_eq(now, port->sm_tx_next_jiffies)) {
->> + port->sm_tx_next_jiffies +=3D ad_ticks_per_sec / AD_MAX_TX_IN_SECOND;
->> +
->> /* check if there is something to send */
->> if (port->ntt && (port->sm_vars & AD_PORT_LACP_ENABLED)) {
->> __update_lacpdu_from_port(port);
->> @@ -1395,10 +1397,6 @@ static void ad_tx_machine(struct port *port)
->> port->ntt =3D false;
->> }
->> }
->> - /* restart tx timer(to verify that we will not exceed
->> - * AD_MAX_TX_IN_SECOND
->> - */
->> - port->sm_tx_timer_counter =3D ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
->> }
->> }
->>=20
->> @@ -2199,9 +2197,9 @@ void bond_3ad_bind_slave(struct slave *slave)
->> /* actor system is the bond's system */
->> __ad_actor_update_port(port);
->> /* tx timer(to verify that no more than MAX_TX_IN_SECOND
->> - * lacpdu's are sent in one second)
->> + * lacpdu's are sent in the configured interval (1 or 30 secs))
->> */
->> - port->sm_tx_timer_counter =3D ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
->> + port->sm_tx_next_jiffies =3D jiffies + ad_ticks_per_sec / AD_MAX_TX_IN=
-_SECOND;
->
->If CONFIG_HZ is 1000, there is 1000 tick per second, but "ad_ticks_per_sec=
- / AD_MAX_TX_IN_SECOND=E2=80=9D =3D=3D 10/3 =3D=3D 3, so that means send la=
-cp packets every 3 ticks ?
 
-	Agreed, I think the math is off here.
 
-	ad_ticks_per_sec is 10, it's the number of times the entire LACP
-state machine runs per second.  It is unrelated to jiffies, and can't be
-used directly with jiffy units (the duration of which varies depending
-on what CONFIG_HZ is).  I agree that it's confusingly similar to
-ad_delta_in_ticks, which is measured in jiffy units.
+Best regards,
 
-	You'll probably want to use msecs_to_jiffies() somewhere.
+Lukasz Majewski
 
-	How did you test this to insure the TX machine doesn't overrun
-(i.e., exceed AD_MAX_TX_IN_SECOND LACPDU transmissions in one second)?
+--
 
-	-J
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
 
->>=20
->> __disable_port(port);
->>=20
->> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
->> index 2053cd8e788a..956d4cb45db1 100644
->> --- a/include/net/bond_3ad.h
->> +++ b/include/net/bond_3ad.h
->> @@ -231,10 +231,7 @@ typedef struct port {
->> mux_states_t sm_mux_state; /* state machine mux state */
->> u16 sm_mux_timer_counter; /* state machine mux timer counter */
->> tx_states_t sm_tx_state; /* state machine tx state */
->> - u16 sm_tx_timer_counter; /* state machine tx timer counter
->> - * (always on - enter to transmit
->> - *  state 3 time per second)
->> - */
->> + unsigned long sm_tx_next_jiffies;/* expected jiffies for next LACPDU s=
-ent */
->> u16 sm_churn_actor_timer_counter;
->> u16 sm_churn_partner_timer_counter;
->> u32 churn_actor_count;
->> --=20
->> 2.43.0
->>=20
->>=20
->>=20
->
+--Sig_//EaqhMPzixC8PHpwvxTq/F2
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhbFyIACgkQAR8vZIA0
+zr3xWggAzTnSLZzTWSc88/uiBjWC76JrODXHyufYi/Zi5poA968/HtfY2nMHkXks
+1LOlDCRdmC2uRuMoaTqiET752MWjddsQKLhXZkw6D8JVm79cbQEibtyFrnQZtRMe
+n3EioNBNQyM6HXi/eF5U3P7tDSpVi4XJQgfJ60cQdTJx0ddbmSKcgVNgZOuAbi+a
+6kppME91cWcsbaw6hP/v9JcZ8dy8UEIGQtyLnAzezD9xVZUnJosy68HMTQcutXqQ
+NnAVV0lmAerViHBV2nNufEGEklk9ZjDZknm0bEat2Ymex9JtWmhCziYm9r097bAP
+z+A9f8Mkm5P8N0FOqOdMd5RyeT8Eww==
+=5WA7
+-----END PGP SIGNATURE-----
+
+--Sig_//EaqhMPzixC8PHpwvxTq/F2--
 
