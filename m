@@ -1,128 +1,187 @@
-Return-Path: <netdev+bounces-200620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84ACAE6511
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:34:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71183AE65B3
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7174717EBC0
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:34:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33FC2192361A
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6605C280033;
-	Tue, 24 Jun 2025 12:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6FE529B200;
+	Tue, 24 Jun 2025 12:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JGD8liT9"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1A2222571;
-	Tue, 24 Jun 2025 12:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18D293C6C;
+	Tue, 24 Jun 2025 12:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750768439; cv=none; b=bXfdMTp9VWUzI9fdNuU/iOEIgv5mhoqBHdy3M8ye4ArXKE2e32rCWrm+Cp3s1CMKK42XEPW5idIUO9Dr/y3S4AELk9m0j5KbVNCUj9j1G1zndvHk8E2RBmPlAnEd9VJyRi1hy5dKdnhmWgrMvOnn2CKUX8wHxomkTH8d6jb6ppU=
+	t=1750769668; cv=none; b=hwz4WLvi+Xc5Gttm/1JdKSGIfewxYWzRIyaYHK/IUOEX1hYI37UIj4P+iQdjnfpku9XtxasxeDv1XP34yMA1155XnHF7i6D4USs0AY4jOgCXAivDkuGLR/OR73gFzZLi8xfgM/UncEsASzV0rFL+ai9RNaKFI8Y5/qwtTWiCkvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750768439; c=relaxed/simple;
-	bh=ntGwK67tdZVtGMNaU6QKhZxFxF5O/eBDm3EURT/Hu1s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HWRwDGhtX6y3Sozu6jPrktwMlfvZweUQKIxwUmmcG6mJvmrMrwkiAB/mmyqzW5n6iWQVb1Hkibp5qvxAbEz17T8U1OAOyKmFb19sIgAkGlZd+mLhA4dIaWz6wu9S2iFAAWRJ75AFrqIEsg+gefYAVyDP2puBhV8/6CPy4aJY4+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bRPQf1J4RzTgmJ;
-	Tue, 24 Jun 2025 20:29:30 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4E544180237;
-	Tue, 24 Jun 2025 20:33:49 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 24 Jun
- 2025 20:33:48 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <dsahern@kernel.org>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] net: add sysctl ndisc_debug
-Date: Tue, 24 Jun 2025 20:51:15 +0800
-Message-ID: <20250624125115.3926152-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750769668; c=relaxed/simple;
+	bh=gKBoaYk7vb2XTZq7rPJb+3NVYtZwvMVFUQmqVN2ZBMo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GioQZEeaTOfmIFBDVA0vTI0nyKpBrYy5UAelillRqUug+WnltKBUcNkDJd7v+/wZnHRPO4LgC3l1jLdSL3ckKQS82uCu7x9sZXFWQJdkl/rx4wvavVhX8TxD/7pQo/Y8Vgfdl4aaWRRuD6/+6YKEejYc52eBTtMF95X5HawWyhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JGD8liT9; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3df303e45d3so299795ab.0;
+        Tue, 24 Jun 2025 05:54:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750769666; x=1751374466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D1mXLVDk+FgPSfnGNgg4NgTw2hQPSDxfgCF5VVvc5Rs=;
+        b=JGD8liT95CNZTUhhyKs9QGoMAaXAVRy5rSus/X0NS7zPOrrtkjowPe7FYaroMDo+No
+         8UQw5OYSSnbv5HBNsSitctuQqTSUSAvpy5AOO1AJIix7nnUH2FN5UPZLXBcsX8WAVBlD
+         Wk6ftS3hn1Jlwo5NiO7583gR3beYfoG+8kdIdVoEDencw1MuZRvQdxiSyxCtk6igureH
+         iHIxXjqoeO0m7nIH3smcoRKxGggfsZxa9OQziW1Gt1jt7LpCzUkUe9orl1j/WB3SpqGM
+         QgCnMKMlxHXxrCdBaI9D3jFJsS0mDL7ZIV1ZWbpeE/ok/FbgqM1qZh2cmmjbNPzoN0w7
+         2zNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750769666; x=1751374466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D1mXLVDk+FgPSfnGNgg4NgTw2hQPSDxfgCF5VVvc5Rs=;
+        b=u6D9qZuwxGCWzikEzsUuFWgGg/2q9eX6FchzM7EHSFpdHCgilqmv8BXiaD/b8uObQT
+         P13fFLTz3EmtEFz4z4QQQOZPi2u2+RdpZcCAiZF3TyoLf52ED1WZKS9fx/7h5t+Yfloa
+         pcoO8vKEEyzPy8Wh4QZWesD9Zl3/pTOEMoZpx1oh5czMPBHOl3lePSrDGgGWd4TDJANu
+         naqvejprWIQAf0daN2qjesJZJx4q7n6v1PjAUfDF+AK6On5z14S2wbJIxX2OrN+tsVqy
+         1M1k6tPyXAKqIfEhsQq40dbdw9VILl23nCqIZWV32nkM7PASsCvMssMbKkMZuctO131X
+         kCqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmun7siDeWlucKHp99yVu1uUcxedfrj2mMqTQeO3IaqJ5wsVLBHcigDzx8zF1QsFo3glw=@vger.kernel.org, AJvYcCW5QfCryjsZYn9rCo1jw6VxWopLACSZTGlCFyDIOqTl9Y5ROXYjYpHE1b8+GNYF4nKBJMfNumwc@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOsmJkSodjLGH8hU5UfWf9Xb+4Ov9grIAk2LPSVSKaaFI9Aciw
+	JR8z+3T4G372jdTdTERORhJtzYxOs+SNd0NIF+O+qRPwcPkOFhYGc1y+rh8J8IS2YlS/8blKa8F
+	XMGK3egJcjYbMUYhOPL/WGhU+4nLxbJXskoPB
+X-Gm-Gg: ASbGncv1tlsob+QOwQSOFxwh6wHncf7l5RetU0WYEEPBUwkLgPPNfds4/W0Qv/pyyjm
+	bVeKlIbLcep4tTt9ptRg82gtMG3mfYi0engm1CoSZI82RumaGDD3xbpRgjDL17iQW/1WSYyiXI7
+	vfEuzH+YI316x8Ohw5HF/3ZF2PbRoN7+zojXFwl5jbQoDa1y7IKi8+pw==
+X-Google-Smtp-Source: AGHT+IHQR9u852cwc20uqrVCaxx8/sHdOZTCToIPu8TmHEQ950fZbo/f6g62hgr8bpSNsV3H/46IzQIBjQ0sAh4fGo4=
+X-Received: by 2002:a05:6e02:3e02:b0:3dd:f1bb:da0b with SMTP id
+ e9e14a558f8ab-3de38c3173fmr175342595ab.7.1750769665949; Tue, 24 Jun 2025
+ 05:54:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+References: <20250623073129.23290-1-kerneljasonxing@gmail.com> <aFlmQ94TeHb9v-OC@mini-arch>
+In-Reply-To: <aFlmQ94TeHb9v-OC@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 24 Jun 2025 20:53:47 +0800
+X-Gm-Features: Ac12FXwGDtZ25RiELvIz-ZKUDP_831GYX8Y3XPAbgk9x8iA6OWaXEM9agkt0AgI
+Message-ID: <CAL+tcoAEQgefeBWeXQmkvLTnbojDfSWbPtJKX3G_=OYNDNdfLg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: xsk: update tx queue consumer
+ immediately after transmission
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ipv6 ndisc uses ND_PRINTK to print logs. However it only works when
-ND_DEBUG was set in the compilation phase. This patch adds sysctl
-ndisc_debug, so we can change the print switch when system is running and
-get ipv6 ndisc log to debug.
+On Mon, Jun 23, 2025 at 10:35=E2=80=AFPM Stanislav Fomichev
+<stfomichev@gmail.com> wrote:
+>
+> On 06/23, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > For afxdp, the return value of sendto() syscall doesn't reflect how man=
+y
+> > descs handled in the kernel. One of use cases is that when user-space
+> > application tries to know the number of transmitted skbs and then decid=
+es
+> > if it continues to send, say, is it stopped due to max tx budget?
+> >
+> > The following formular can be used after sending to learn how many
+> > skbs/descs the kernel takes care of:
+> >
+> >   tx_queue.consumers_before - tx_queue.consumers_after
+> >
+> > Prior to the current patch, in non-zc mode, the consumer of tx queue is
+> > not immediately updated at the end of each sendto syscall when error
+> > occurs, which leads to the consumer value out-of-dated from the perspec=
+tive
+> > of user space. So this patch requires store operation to pass the cache=
+d
+> > value to the shared value to handle the problem.
+> >
+> > More than those explicit errors appearing in the while() loop in
+> > __xsk_generic_xmit(), there are a few possible error cases that might
+> > be neglected in the following call trace:
+> > __xsk_generic_xmit()
+> >     xskq_cons_peek_desc()
+> >         xskq_cons_read_desc()
+> >           xskq_cons_is_valid_desc()
+> > It will also cause the premature exit in the while() loop even if not
+> > all the descs are consumed.
+> >
+> > Based on the above analysis, using 'cached_prod !=3D cached_cons' could
+> > cover all the possible cases because it represents there are remaining
+> > descs that are not handled and cached_cons are not updated to the globa=
+l
+> > state of consumer at this time.
+>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > V2
+> > Link: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxin=
+g@gmail.com/
+> > 1. filter out those good cases because only those that return error nee=
+d
+> > updates.
+> > Side note:
+> > 1. in non-batched zero copy mode, at the end of every caller of
+> > xsk_tx_peek_desc(), there is always a xsk_tx_release() function that us=
+ed
+> > to update the local consumer to the global state of consumer. So for th=
+e
+> > zero copy mode, no need to change at all.
+> > 2. Actually I have no strong preference between v1 (see the above link)
+> > and v2 because smp_store_release() shouldn't cause side effect.
+> > Considering the exactitude of writing code, v2 is a more preferable
+> > one.
+> > ---
+> >  net/xdp/xsk.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 5542675dffa9..b9223a2a6ada 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -856,6 +856,9 @@ static int __xsk_generic_xmit(struct sock *sk)
+> >       }
+> >
+> >  out:
+> > +     if (xs->tx->cached_prod !=3D xs->tx->cached_cons)
+>
+> Can we use xskq_has_descs() here instead?
 
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
- include/net/ndisc.h        | 5 ++---
- net/ipv6/ndisc.c           | 3 +++
- net/ipv6/sysctl_net_ipv6.c | 7 +++++++
- 3 files changed, 12 insertions(+), 3 deletions(-)
+Sure, thanks.
 
-diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-index 3c88d5bc5eed..481a7fc5d5c1 100644
---- a/include/net/ndisc.h
-+++ b/include/net/ndisc.h
-@@ -60,12 +60,11 @@ enum {
- 
- #include <net/neighbour.h>
- 
--/* Set to 3 to get tracing... */
--#define ND_DEBUG 1
-+extern u8 ndisc_debug;
- 
- #define ND_PRINTK(val, level, fmt, ...)				\
- do {								\
--	if (val <= ND_DEBUG)					\
-+	if (val <= ndisc_debug)					\
- 		net_##level##_ratelimited(fmt, ##__VA_ARGS__);	\
- } while (0)
- 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index ecb5c4b8518f..be4bb72b1d61 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -83,6 +83,9 @@ static void pndisc_destructor(struct pneigh_entry *n);
- static void pndisc_redo(struct sk_buff *skb);
- static int ndisc_is_multicast(const void *pkey);
- 
-+u8 ndisc_debug = 1;
-+EXPORT_SYMBOL_GPL(ndisc_debug);
-+
- static const struct neigh_ops ndisc_generic_ops = {
- 	.family =		AF_INET6,
- 	.solicit =		ndisc_solicit,
-diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
-index d2cd33e2698d..c0968f0c5d00 100644
---- a/net/ipv6/sysctl_net_ipv6.c
-+++ b/net/ipv6/sysctl_net_ipv6.c
-@@ -247,6 +247,13 @@ static struct ctl_table ipv6_rotable[] = {
- 		.proc_handler	= proc_dointvec,
- 	},
- #endif /* CONFIG_NETLABEL */
-+	{
-+		.procname	= "ndisc_debug",
-+		.data		= &ndisc_debug,
-+		.maxlen		= sizeof(u8),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax
-+	},
- };
- 
- static int __net_init ipv6_sysctl_net_init(struct net *net)
--- 
-2.34.1
+>
+> And still would be nice to verify this with a test. Should not be much wo=
+rk,
+> most of the things (setup/etc) are already there, so you won't have
+> to write everything from scratch...
 
+Ah, finally I managed to make it work but a bit ugly... Let me try if
+I can find a
+better way to write the test patch.
+
+Thanks,
+Jason
 
