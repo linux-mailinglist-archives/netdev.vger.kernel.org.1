@@ -1,132 +1,104 @@
-Return-Path: <netdev+bounces-200870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7716DAE726F
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:47:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C172AE72B9
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72B3C3ACBDE
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 22:46:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC024172FB7
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 22:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09B72594AA;
-	Tue, 24 Jun 2025 22:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712861FBEB1;
+	Tue, 24 Jun 2025 22:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsR2Pdo9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bOH5kKhk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86806254B1F;
-	Tue, 24 Jun 2025 22:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A22D307496
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 22:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750805235; cv=none; b=oMpb3zMgE1aqSSoUDITN7/j8D/j2Ah3D9qaHl+CbGLbEHWlW48Sa/g1cwkGB4qk33HGKIieztRVDvJ64FO67v1eSfLWIOXl6+TtuJumzrTQmRst0OYX6uDR9SUe5L2ZPHPF1P22wglYgK4Um2qOZ2Ox24tkXTkgYvxBF5J/zzUY=
+	t=1750805930; cv=none; b=iLHjUtqmSowPOtl76pYc0G9uPBejTsctT8jxWD6NhRLKJ6Af+/kdEe+ITpOYdTOSuLRDcm9huPQuIGc2WUOS9oUJnc6x5RlDNMedxn9lpxOfNURs6LFyYGDviMCtY526TSbZa9nyCHgGai+v3Yr0qffivncNHVApV9qREM7clY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750805235; c=relaxed/simple;
-	bh=yyIuPy3hmYKVaKki3At2/5DTM/08NHrLyix4AMMcTqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G2erxYEafr8Cec27MXr+6FM3q/1XFejviOzwqzG2hhVAldiOlODN+N18v1xnYmBG/SZYpSMNZ/6U0Bwsyw5YwYmBdEaFfEULPRTylzMaplONjIZvPJfV+XIqcH3PKcT4yil0QvjZK8MlNTb4u2tcZExTzvtCzNIsrrIK3hfkgg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsR2Pdo9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF912C4CEE3;
-	Tue, 24 Jun 2025 22:47:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750805234;
-	bh=yyIuPy3hmYKVaKki3At2/5DTM/08NHrLyix4AMMcTqc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PsR2Pdo9Cj/dex4ghCywBVdoWW0KEHFSHfRbPQRDFv+Ij23Qes+/KL6aB5AXgQRcX
-	 AdR/lQMA3st+kmreYN5V8rWqqRtDORmzVEb3ABJYdGJetHEMODcNwaen+b/myl9CoQ
-	 oLqOhKPXaFHZ06jMXxjs6CDGrRLNPj2VEHS8N9M49g7Xiv3cWUJOl+oZ5+3dG3lR3b
-	 QIEJvO8T2/wlxlknVdrlAClEoZPP89Kw83egeWQ3ZkOKzbDvA0pCo/SmQbBlpQsRUI
-	 p3AdaS0Z1CJ+8qRzESso1lK6T7v+iJQp8nXw8uObfuEwEnTSOtD09IYH7T3De7f5Bs
-	 +MXIldsJb/Kxg==
-Date: Tue, 24 Jun 2025 17:47:13 -0500
-From: Seth Forshee <sforshee@kernel.org>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>, carlos.bilbao@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bilbao@vt.edu
-Subject: Re: [PATCH] bonding: Improve the accuracy of LACPDU transmissions
-Message-ID: <aFsq8QSZRNAE8PYs@do-x1carbon>
-References: <20250618195309.368645-1-carlos.bilbao@kernel.org>
- <341249BC-4A2E-4C90-A960-BB07FAA9C092@bamaicloud.com>
- <2487616.1750799732@famine>
+	s=arc-20240116; t=1750805930; c=relaxed/simple;
+	bh=rZzKLWBw0FWo2X7/CcQwchRLnCUCTitS4HSTx1kYRwc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KFf/aJj1d8WQZ5dDj/+qRLbiWNFm0l3DT7c8LR5E+Q9yJCGIwL8giT4OiRkmVjc7TfskEta5jd+qtNLlrJ48WxT1Z1Qaj6s6np0ZtdSg+fHfpuIGLzeV8IuG2I/dSCpuESUtytbJ4OzJ0BIojjv1z4rrAL+ftVweXW856mkV4Nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bOH5kKhk; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d20c4397-0d77-4053-8ff7-cb9af2d16ade@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750805926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3Hs+NsQpOGvO0D7hNlf2RDWsUyM1/34CukSfzWwXw/4=;
+	b=bOH5kKhkI+wa+VBwzbD+JqIuR0V/1sXGyfi4g5t9MroBntmUU/HRZLA17JPAxRAJFeenKk
+	UveykNNXPZ6N8nUy4qzRyxk93n/sgSCayfkYwqadhF82iptY7HKZGAUgJKEBMFBW9m4iJE
+	jW6zO3pmvCK/gUw78E0nQckZsrBGbyE=
+Date: Tue, 24 Jun 2025 23:58:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2487616.1750799732@famine>
+Subject: Re: [PATCH net 04/10] netlink: specs: dpll: replace underscores with
+ dashes in names
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ donald.hunter@gmail.com
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, jiri@resnulli.us,
+ arkadiusz.kubalewski@intel.com, aleksandr.loktionov@intel.com,
+ michal.michalik@intel.com
+References: <20250624211002.3475021-1-kuba@kernel.org>
+ <20250624211002.3475021-5-kuba@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250624211002.3475021-5-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jun 24, 2025 at 02:15:32PM -0700, Jay Vosburgh wrote:
-> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+On 24/06/2025 22:09, Jakub Kicinski wrote:
+> We're trying to add a strict regexp for the name format in the spec.
+> Underscores will not be allowed, dashes should be used instead.
+> This makes no difference to C (codegen, if used, replaces special
+> chars in names) but it gives more uniform naming in Python.
 > 
-> >
-> >
-> >
-> >> 2025年6月19日 03:53，carlos.bilbao@kernel.org 写道：
-> >> 
-> >> From: Carlos Bilbao <carlos.bilbao@kernel.org>
-> >> 
-> >> Improve the timing accuracy of LACPDU transmissions in the bonding 802.3ad
-> >> (LACP) driver. The current approach relies on a decrementing counter to
-> >> limit the transmission rate. In our experience, this method is susceptible
-> >> to delays (such as those caused by CPU contention or soft lockups) which
-> >> can lead to accumulated drift in the LACPDU send interval. Over time, this
-> >> drift can cause synchronization issues with the top-of-rack (ToR) switch
-> >> managing the LAG, manifesting as lag map flapping. This in turn can trigger
-> >> temporary interface removal and potential packet loss.
+> Fixes: 3badff3a25d8 ("dpll: spec: Add Netlink spec in YAML")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: donald.hunter@gmail.com
+> CC: jiri@resnulli.us
+> CC: arkadiusz.kubalewski@intel.com
+> CC: aleksandr.loktionov@intel.com
+> CC: michal.michalik@intel.com
+> CC: vadim.fedorenko@linux.dev
+> ---
+>   Documentation/netlink/specs/dpll.yaml | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> 	So, you're saying that contention or soft lockups are causing
-> the queue_delayed_work() of bond_3ad_state_machine_handler() to be
-> scheduled late, and, then, because the LACPDU TX limiter is based on the
-> number of state machine executions (which should be every 100ms), it is
-> then late sending LACPDUs?
-> 
-> 	If the core problem is that the state machine as a whole isn't
-> running regularly, how is doing a clock-based time check reliable?  Or
-> should I take the word "improve" from the Subject literally, and assume
-> it's making things "better" but not "totally perfect"?
-> 
-> 	Is the sync issue with the TOR due to missing / delayed LACPDUs,
-> or is there more to it?  At the fast LACP rate, the periodic timeout is
-> 3 seconds for a nominal 1 second LACPDU interval, which is fairly
-> generous.
+> diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+> index 8feefeae5376..f434140b538e 100644
+> --- a/Documentation/netlink/specs/dpll.yaml
+> +++ b/Documentation/netlink/specs/dpll.yaml
+> @@ -188,7 +188,7 @@ doc: DPLL subsystem.
+>       value: 10000
+>     -
+>       type: const
+> -    name: pin-frequency-77_5-khz
+> +    name: pin-frequency-77-5-khz
+>       value: 77500
+>     -
+>       type: const
 
-To take a step back: we originally started looking at this code because
-we've seen cases where TORs drop a link from the bond due to not getting
-a LACPDU within the short timeout period. We don't currently know the
-root cause of that problem, so this patch isn't trying to fix that issue.
-
-But when looking at the LACPDUs that the TOR is receiving, we saw that
-the packets were pretty consistently late by hundreds of milliseconds.
-This patch from Carlos is trying to improve that inconsistency.
-
-Yes, the math is incorrect, and that's partly my fault from giving
-Carlos bad advice after looking at the code too quickly. But the fact
-that this mistake improved the timing points to what I think may be at
-the root of the inconsistency we see.
-
-ad_tx_machine() resets port->sm_tx_timer_counter every time it reaches
-zero, regardless of when the last LACPDU was sent. This means that
-ad_tx_machine() is delaying LACPDU tx to the next expiration of this
-periodic timer. So when Carlos made the counter very small, he made the
-tx delay much shorter.
-
-As I understand it the intention is to ensure that LACPDU tx is spaced
-out by at least ~300ms, not to align them to an arbitrary ~300ms
-boundary. If so, a simple improvement would be to reset the counter only
-when an LACPDU is sent, then allow sending a LACPDU any time after it
-reaches zero. Though I still think it makes sense to make the state
-machines time-based rather than counter-based to ensure they aren't
-sensitive to delays in running the delayed work.
-
-Thanks,
-Seth
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
