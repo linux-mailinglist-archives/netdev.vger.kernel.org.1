@@ -1,194 +1,137 @@
-Return-Path: <netdev+bounces-200500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D998AAE5B83
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 06:28:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F19BAE5B8D
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 06:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F373175A94
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 04:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC82F3AEB1B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 04:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8103D221FC3;
-	Tue, 24 Jun 2025 04:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B19226D03;
+	Tue, 24 Jun 2025 04:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="cbKse9KR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UsnGW//N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24420.protonmail.ch (mail-24420.protonmail.ch [109.224.244.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AE621B9F6
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 04:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674002253EE
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 04:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750739318; cv=none; b=rJ79F6mQwYrMKQGWDUChZiupaPiNXXMVrA4n/5Kf0l2FwzHUbsN5BvUquzYyHBdgKrazQtjE8RsDlpKTrpUOGno+T7o01NuYw9zmh9MhfRKJKQcx1Sn7YP0NeGwShZvlsiSRkTjNufhOxUtIdxk9Xi6eIPJK7Y10l5SNuMmncx8=
+	t=1750740112; cv=none; b=k7buKFFz+GFc5QMQNxDUFIBzyVoiqhS61CNUPXKRdWAtPBTpFeyGfhdJ8QzupQBRD2nYHlksu1kCE5Su23RBsAYeg4TwdVk2OTWJXeBR+D85flOW04XmbqPy+MRingDGWkLoHQA6Og62C3HholtQN62/9Z25+Dl0kQgehUjAtlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750739318; c=relaxed/simple;
-	bh=IlU99b3rfcvTnx4UQ5L5rm2BxWglSb+n/aBCphotbs8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OdWRoYFJbg/FCc9eNbPKAQ4enKWZX5Q3TtlwyrSaYf5oYWeRRnsT73Z2NVAkEy6qEp8EM/lzL+JDd6jfYC7GTHI3+74HO2zt5RLu98BB3JTscnoltfRp02vipBES7+dkgepUP2vl11hC2g0wpKewnE54zV0YfYtvIjPlbFk7qoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=cbKse9KR; arc=none smtp.client-ip=109.224.244.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1750739314; x=1750998514;
-	bh=IlU99b3rfcvTnx4UQ5L5rm2BxWglSb+n/aBCphotbs8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=cbKse9KRwf2vIpZcv/4NL0s6jZ8uvM6xEj6ChJdl3yylpqy0TxKbXKcSe1hOMomxe
-	 7/HD5M+ALXh/hJTaA2fNpZPtSIb9ei21BxquHxOZquFOiJ0alRo5KpJtTOWbjgKbgz
-	 XztbvsX73q84qgebYTfQyoI2y8GullzZjh28aBDhZbjHymMjAT7vIDvejvCLjqfgU+
-	 bI9ei+kcqa8VN7CXR3LBHv8bFjVjaoMeVaVT1HejRd7iXH439Si2j4F8OrLGWOC7QE
-	 8gMqyPvkiDkkuEhV2sFg45s9p19ZE7CoP5nXPljC5jZA23N7zwOoNBISKN5p/dy48t
-	 0lIhcqm/+x+EA==
-Date: Tue, 24 Jun 2025 04:28:31 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org
-Subject: Re: [PATCH net 1/2] net/sched: Restrict conditions for adding duplicating netems to qdisc tree
-Message-ID: <zs0zNqlNRnnijrll33yl0m4VGbDv-dTgQecTErwr97GnuwynGtuLRmz5tG63EnH41B3tmZrYOTs7FSgVbYBusapPk7CkmHOLKoBST_ITufg=@willsroot.io>
-In-Reply-To: <CAM0EoMmbcudme6=ogcUdQ1qt9MThChqy=37Ck1vhnw-4VuKmNw@mail.gmail.com>
-References: <20250622190344.446090-1-will@willsroot.io> <CAM0EoMmbcudme6=ogcUdQ1qt9MThChqy=37Ck1vhnw-4VuKmNw@mail.gmail.com>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 7c8f22a328166e2778d8abe527b230542de9c1c2
+	s=arc-20240116; t=1750740112; c=relaxed/simple;
+	bh=Jok0JTAqa2a6Wsr3Yk3fD30Mc445sxysbjQvpzzEvpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l00dir3yxSERwcpyZkJDCa9VWgVy3EUXYJzXfP+n4dCURQfv1ViYbYIA6+94neJvHw9B8mB/5TL9Z7ueTfC7oShhO2P9fBEOWJBp+qgF+maOBT8nKNIkI25TNMX+AH4dD2Dv5J2yzkAidZ/QduphR1mcU3W+DkMkXu5Bqa5xupo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UsnGW//N; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-86cf9f46b06so159174639f.2
+        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 21:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750740110; x=1751344910; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qzMJS2X1n/0wJyKWZIHzZuia2PzfbXvXRqUpceWdQdQ=;
+        b=UsnGW//N2lf+B3rjSFNFs7Ah6IsYLVkeSc8wdJ2kR5AC4snFbZ2ASvAT5ptCZyA6ZI
+         Lb2Ys6D0Urj1IXcJXeLY9ecq7r04JSr4m9bSNoZdIvDjarCjXVduugIExYlcffNJi9oi
+         u8B7TQj/RENm4Rz0fEyekdjpxM09omfq9/8Ry4YYZ0hsxqGP4JCVPPb84dTQqv2jpY5G
+         GOtrRfPkH9UcpD0E4feKzDhJ23Gj5P15IOtXC/shebJArvOs7FdbzCt7oy6JxXRTpsTi
+         zEWKzYipPG591x1QDVjF0KwZA11l8FQEO3/tgcKbLVgksK5uhhKg6hLEURt8leUuL1av
+         0M5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750740110; x=1751344910;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qzMJS2X1n/0wJyKWZIHzZuia2PzfbXvXRqUpceWdQdQ=;
+        b=VjxGxME4d2EEQbc3yW4dTOYvcsID5/vd5eGiTZ6J6qqjKSO1L5rQ2JMkh8U4y2+PUa
+         cgmoNAMGpujBT+u2MI+cg5/wTtrE0dc7eJ++mmrKkoWIhFR3XUYeAgTSc/aLCAWaDQqV
+         s78H8RSGQYpTEjb9Cxsl1mrhDsiXR1ZXu+PJ/z32UjdygKCiYihJJk7FhALo/VJDrdwR
+         hICFWKSyXdjHlsuoykodynv4I3w0nOROwQJIxR/4gFH1FUvGcyLsMVZB/hDvCaFVz/vp
+         yWaX0fYMw8ab8ft7feomidyhToPFgn1QYEzUgQdg82/vhk228LVEusrhkt9TyC/oMtal
+         DAvA==
+X-Gm-Message-State: AOJu0Yy9mmeun5KAud1hHZtaf9ljk/rIu9wSYXigARXqgzUgluM/IBJ/
+	kidRYR+SQgDGzl+ICWysQFFmoFzo2gfRQuIjGZkaVny1iN9Ext6926aWwStSBUft
+X-Gm-Gg: ASbGncuzUi6c9+tCB5OoVRP2b5mZBNdhszKJPthkapmymRLFQ1cZeCywn0B/prU7Rq5
+	gSmsNnjfNUBRPpTuSwogtXKcUmSb7CYaDJ6QuHP+WY3mKBdv1CgXf9MLC3B9dIok9KZ2g17J89W
+	yy4qIthLCYrOcwhtvCMrSTx1bj4Putmy8nvm2RUq56cfpw8AgtGJYI3n5DkA9ayQOZQ7NaNzKg6
+	YVCg4vp/Zrqh0pMY/m3YQwsBzSJLZGcLZ2pKHxB0sGklLxAloEMJEWpKELgEcWxifmttbsg6HP6
+	UhlsT1PsVkZEwBxp9NHrkrWBpABCEnnZtYO9Wity2j0an3a2/L7Z4S0o9+iPdeP6
+X-Google-Smtp-Source: AGHT+IGhVExySJ21bPEYM+/ONbZloTHE6Wez6zUD391NuRjzp4W+EQnYE9I8bEoEchx50GAvH8yWlg==
+X-Received: by 2002:a05:6e02:3b07:b0:3dd:d995:5a97 with SMTP id e9e14a558f8ab-3de38c987camr172408595ab.12.1750740110331;
+        Mon, 23 Jun 2025 21:41:50 -0700 (PDT)
+Received: from localhost ([65.117.37.195])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5019df16634sm2097950173.60.2025.06.23.21.41.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 21:41:49 -0700 (PDT)
+Date: Mon, 23 Jun 2025 21:41:48 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Lion Ackermann <nnamrec@gmail.com>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: Re: Incomplete fix for recent bug in tc / hfsc
+Message-ID: <aFosjBOUlOr0TKsd@pop-os.localdomain>
+References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
 
-On Monday, June 23rd, 2025 at 2:33 PM, Jamal Hadi Salim <jhs@mojatatu.com> =
-wrote:
+On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
+> Hello,
+> 
+> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem is
+> incomplete:
+>     sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
+>     https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangcong@gmail.com/
+> 
+> This patch also included a test which landed:
+>     selftests/tc-testing: Add an HFSC qlen accounting test
+> 
+> Basically running the included test case on a sanitizer kernel or with
+> slub_debug=P will directly reveal the UAF:
 
->=20
->=20
-> BTW, you did fail to test tdc like i asked you to do. It was a trap
-> question - if you did run it you would have caught the issue Jakub
-> just pointed out. Maybe i shouldnt have been so coy/evil..
-> Please run tdc fully..
->=20
+Interesting, I have SLUB debugging enabled in my kernel config too:
 
-tdc has been fully run for v2 - I was under the assumption that only the ne=
-tem category mattered. Is there any reason tc-tests/qdiscs/teql.json does n=
-ot run under a new namepsace?
+CONFIG_SLUB_DEBUG=y
+CONFIG_SLUB_DEBUG_ON=y
+CONFIG_SLUB_RCU_DEBUG=y
 
-> On Sun, Jun 22, 2025 at 3:05=E2=80=AFPM William Liu will@willsroot.io wro=
-te:
->=20
-> > netem_enqueue's duplication prevention logic breaks when a netem
-> > resides in a qdisc tree with other netems - this can lead to a
-> > soft lockup and OOM loop in netem_dequeue as seen in [1].
-> > Ensure that a duplicating netem cannot exist in a tree with other
-> > netems.
-> >=20
-> > [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1i=
-lxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@=
-willsroot.io/
-> >=20
-> > Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> > Reported-by: William Liu will@willsroot.io
-> > Reported-by: Savino Dicanosa savy@syst3mfailure.io
-> > Signed-off-by: William Liu will@willsroot.io
-> > Signed-off-by: Savino Dicanosa savy@syst3mfailure.io
-> > ---
-> > net/sched/sch_netem.c | 45 +++++++++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 45 insertions(+)
-> >=20
-> > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> > index fdd79d3ccd8c..308ce6629d7e 100644
-> > --- a/net/sched/sch_netem.c
-> > +++ b/net/sched/sch_netem.c
-> > @@ -973,6 +973,46 @@ static int parse_attr(struct nlattr *tb[], int max=
-type, struct nlattr *nla,
-> > return 0;
-> > }
-> >=20
-> > +static const struct Qdisc_class_ops netem_class_ops;
-> > +
-> > +static inline bool has_duplication(struct Qdisc *sch)
-> > +{
-> > + struct netem_sched_data *q =3D qdisc_priv(sch);
-> > +
-> > + return q->duplicate !=3D 0;
->=20
->=20
-> return q->duplicate not good enough?
->=20
-> > +}
-> > +
-> > +static int check_netem_in_tree(struct Qdisc *sch, bool only_duplicatin=
-g,
-> > + struct netlink_ext_ack *extack)
-> > +{
-> > + struct Qdisc *root, *q;
-> > + unsigned int i;
-> > +
->=20
->=20
-> "only_duplicating" is very confusing. Why not "duplicates"?
->=20
-> > + root =3D qdisc_root_sleeping(sch);
-> > +
-> > + if (sch !=3D root && root->ops->cl_ops =3D=3D &netem_class_ops) {
-> > + if (!only_duplicating || has_duplication(root))
-> > + goto err;
-> > + }
-> > +
-> > + if (!qdisc_dev(root))
-> > + return 0;
-> > +
-> > + hash_for_each(qdisc_dev(root)->qdisc_hash, i, q, hash) {
-> > + if (sch !=3D q && q->ops->cl_ops =3D=3D &netem_class_ops) {
-> > + if (!only_duplicating || has_duplication(q))
->=20
->=20
-> if (duplicates || has_duplication)
->=20
-> > + goto err;
-> > + }
-> > + }
-> > +
-> > + return 0;
-> > +
-> > +err:
-> > + NL_SET_ERR_MSG(extack,
-> > + "netem: cannot mix duplicating netems with other netems in tree");
-> > + return -EINVAL;
-> > +}
-> > +
-> > /* Parse netlink message to set options */
-> > static int netem_change(struct Qdisc *sch, struct nlattr *opt,
-> > struct netlink_ext_ack *extack)
-> > @@ -1031,6 +1071,11 @@ static int netem_change(struct Qdisc *sch, struc=
-t nlattr *opt,
-> > q->gap =3D qopt->gap;
-> > q->counter =3D 0;
-> > q->loss =3D qopt->loss;
-> > +
-> > + ret =3D check_netem_in_tree(sch, qopt->duplicate =3D=3D 0, extack);
->=20
->=20
-> check_netem_in_tree(sch, qopt->duplicate, extack) ?
->=20
->=20
->=20
-> cheers,
-> jamal
->=20
-> > + if (ret)
-> > + goto unlock;
-> > +
-> > q->duplicate =3D qopt->duplicate;
-> >=20
-> > /* for compatibility with earlier versions.
-> > --
-> > 2.43.0
+But I didn't catch this bug.
+ 
+> To be completely honest I do not quite understand the rationale behind the
+> original patch. The problem is that the backlog corruption propagates to
+> the parent _before_ parent is even expecting any backlog updates.
+> Looking at f.e. DRR: Child is only made active _after_ the enqueue completes.
+> Because HFSC is messing with the backlog before the enqueue completed, 
+> DRR will simply make the class active even though it should have already
+> removed the class from the active list due to qdisc_tree_backlog_flush.
+> This leaves the stale class in the active list and causes the UAF.
+> 
+> Looking at other qdiscs the way DRR handles child enqueues seems to resemble
+> the common case. HFSC calling dequeue in the enqueue handler violates
+> expectations. In order to fix this either HFSC has to stop using dequeue or
+> all classful qdiscs have to be updated to catch this corner case where
+> child qlen was zero even though the enqueue succeeded. Alternatively HFSC
+> could signal enqueue failure if it sees child dequeue dropping packets to
+> zero? I am not sure how this all plays out with the re-entrant case of
+> netem though.
 
-Ok, thank you to everyone for the helpful feedback. I have addressed everyt=
-hing and just posted v2.
+I think this may be the same bug report from Mingi in the security
+mailing list. I will take a deep look after I go back from Open Source
+Summit this week. (But you are still very welcome to work on it by
+yourself, just let me know.)
+
+Thanks!
 
