@@ -1,204 +1,232 @@
-Return-Path: <netdev+bounces-200494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC2E7AE5A57
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:07:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EDEEAE5AA6
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A0441B65A12
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 03:07:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADE96443D9D
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 03:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF371F582C;
-	Tue, 24 Jun 2025 03:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01899214801;
+	Tue, 24 Jun 2025 03:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzwVeLUb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I/W7ykKo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5DA1E260D
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39591DEFE6
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750734413; cv=none; b=rH7avshbldAbQFrMFAZ5ndjlaoiRTV3OwvpEUXZczyBEoNfN9/x20eOy3OyTtIS3+zcdOYxPd5KY6sj3TjOWfCTDwylxcMYdjfaz9+VEet+0oxlqqQLcAtb1hyR+0xQ70+siA3Y2FyuDQKHFCCQVcis/lkmq4XDd9sh6of7sglw=
+	t=1750737453; cv=none; b=c7T2JMjQ8hEgd8tHxwKhZGeJ4tJuezUXf4qyBHqgH1cHWcjlEhMn3PKLd7kjStMzuOeD5R5shgbvW7ETCWBkvNmba4yRHhWNrJ6dS0cK4SZlhSgAy8vjwcYHYa7df4qsbxl04BaHRNpXyhnvUybDlMyvxWBR0kJWXeYXvnVbuJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750734413; c=relaxed/simple;
-	bh=Hf4pTDvMYaPZ6cEcFPUxwJ3dIHRZ97tgnAGbROXDCAc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hBJMpVezhxOIidPHF0LwFxE8ybTlmEi/3rzkuYThQjy+X1J+PoS/FGd9FjMj91O5fLcz0ylIbK6E/AXVB6vhveJcilLpr7n1t/9oSpVv7asebQ0uGAt+9vyOq82qmBPDFRAYPQHyZ5kMYVJmqteRlwF8JrUIQi9NxT2cjFRHadg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AzwVeLUb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750734409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qx6sgmMMgVG7mUKi7Kr+wT8T087UyGpYIyapJqyqMJY=;
-	b=AzwVeLUbqkLiaJ9NXZUuDn9efIsoWuYjjG3kR2ejyEuLkW/sHnd7mJLle4ZXBskImPlveZ
-	WraQpTzvZehmyGQJ5Kmrr3qmjzL/ebw+uKhMMuShoyJekC4Bw4A7THcMmo3n5JiiJzz1ra
-	rNYnfA97F+ND5TPA+IBX0Ks2EvkUVCY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-362-VTokKKBwPnS21otSE65uBw-1; Mon, 23 Jun 2025 23:06:43 -0400
-X-MC-Unique: VTokKKBwPnS21otSE65uBw-1
-X-Mimecast-MFC-AGG-ID: VTokKKBwPnS21otSE65uBw_1750734402
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ade6db50b9cso439259166b.1
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 20:06:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750734402; x=1751339202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qx6sgmMMgVG7mUKi7Kr+wT8T087UyGpYIyapJqyqMJY=;
-        b=BIjy3fQnp/j2Ava5VsCo1BDKzzRIBaAvRrbb6FBJQfDRuvi9HUwowuUqZClKon4Jhi
-         OnNufrdx3QdMF1NbA0xInt1YEn/LDN6+mrrY280LtntvjFvPTSgGVhjjigCzhSTl8fnC
-         u+05QI4I6eOnfOby5n39KltfiMMC6XPlPUKh+kx5MyvIXX5GRKWrLwPO5+UHwpT6fYyG
-         E8rb5vdkY6ugrWq3DkwvG8kpAYlWvXBcWKCLzqojW1E9KCkIpopen8Zu1D0VVwRMzsRB
-         VcYMX3VnZkRVLdg33n3j71Dv5VV/k0kKUIReWl9TuzvJMXlSmu6N1S2B+IZxPDRYJYmx
-         VY6w==
-X-Forwarded-Encrypted: i=1; AJvYcCU9LMK+V1lgBJ3Adkwva7KEZ7rqER6jh1ecWYnbnBAmuSzQyRb/4OcazNua26ggIf6YdwUAcJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbcC6CHnbLTdoIF28qYB+JKmI7J8Vwg2W6igfh1lPdGTn0DM6Q
-	FfCUwAOHd5cduU58T5JbHhEtSIhmNbPlUHV0yzELNt9/BbeY1uhVS0eSo+W513jNceb2ABgejaa
-	TJmpwlkmzP8M1niAx3UJcvw3o6zwFaPfF/nwpgBy1h1dTsoSogjIPZukYr4aHoZJZcllJXu3ZE4
-	cT0t9tL935PpghyUiWs+Vm25bWAu6B9bil
-X-Gm-Gg: ASbGncvtrY9erb1iWpi6k8Rd2ifdIl94tehw25amV4KWx018O9R9rvmtnADQmJNgOZB
-	2UaiiSEWgRwfi4JRMgSH/00IAzcPF08YCfjkK5XnqIWEKr3hXEDTH9UHWJVwC+PaSTog6lmuPwS
-	4FUAYi
-X-Received: by 2002:a17:907:7e82:b0:ade:44a6:4a46 with SMTP id a640c23a62f3a-ae0579646camr1357685666b.24.1750734401893;
-        Mon, 23 Jun 2025 20:06:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFCafKAXMcIHxmBhRwK7iS3XqemOJaV64Z8YrHbwgZKXjFKieDbmnmUfsC1RX0ZnO0TrS5tn9NXnxrmG/36Ll0=
-X-Received: by 2002:a17:907:7e82:b0:ade:44a6:4a46 with SMTP id
- a640c23a62f3a-ae0579646camr1357684166b.24.1750734401547; Mon, 23 Jun 2025
- 20:06:41 -0700 (PDT)
+	s=arc-20240116; t=1750737453; c=relaxed/simple;
+	bh=Fs8LraFZdQA097dY2HjMryOtBWhp6iCJS/GhuYtPJ+8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWW2Rl7aCAbZO7HuppgFSdaygU35+WYTIsT7zBsDp7hE50Yk2RCvUnFu1DdewMHZw9RDaFlAoBMEryuMbNGOT4MD75ypfEnjGvmtwkLRBvMFKMsNGIhMUsbEMWgS6KY52nE+QxAzp0U+3EW/ydzcUeOuniNn24psTDf4zihCm6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I/W7ykKo; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750737452; x=1782273452;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Fs8LraFZdQA097dY2HjMryOtBWhp6iCJS/GhuYtPJ+8=;
+  b=I/W7ykKoGsa+14j1Ue3OH9e2S4sUS1/AKvmWSsTVbD7fWiBG+e0SMz8r
+   yxI0ZIJuF7TaLPJ4VQz2EHDVtgvN1BqSTpB5GuD8y881zQm/fsu0I2cL2
+   0ScizzFv2g8r5dj5bUxUBTWOwRSp4vbuoK8hApdLAKS4hzBOsQB8glFke
+   8SHlKPGOzTJo1RIsNFta0GDWy+HwaS5h0/BT8BkGATmFH9309POLcG8GP
+   YzLD32aPHKQbIFOagZ8E2xtk/AQzL6IEbijXviY7PKjsxJ9Lb3dxXEELP
+   3Q3vXYvlNJVvw/jJuhxYxoSzEJExzyG1HTG7RWq271+mS9WVqkFkWO/xK
+   Q==;
+X-CSE-ConnectionGUID: /OdUZ1BzSse3NmgUy+j0Rw==
+X-CSE-MsgGUID: bbNWvMgCR22CHeFCaGeXxA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="52899995"
+X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
+   d="scan'208";a="52899995"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 20:57:25 -0700
+X-CSE-ConnectionGUID: dpjbzf3XS4m7jqMoABnBPw==
+X-CSE-MsgGUID: LdtBh5cOTfmlG0yc4B4xVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
+   d="scan'208";a="157282859"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 23 Jun 2025 20:57:22 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uTume-000RhP-2T;
+	Tue, 24 Jun 2025 03:57:20 +0000
+Date: Tue, 24 Jun 2025 11:56:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 02/13] net: mctp: separate routing database
+ from routing operations
+Message-ID: <202506241117.wd6sbUKA-lkp@intel.com>
+References: <20250619-dev-forwarding-v2-2-3f81801b06c2@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616062922.682558-1-lulu@redhat.com>
-In-Reply-To: <20250616062922.682558-1-lulu@redhat.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 24 Jun 2025 11:06:04 +0800
-X-Gm-Features: Ac12FXxonylFwEpUfkwEJ5y5yjB5bxPnbHAzx0yEInUcezXskog1NQQnLXV30mQ
-Message-ID: <CAPpAL=y8WxyFiXifBDARFZf+wcEO1r3MYPg09MKz8aMAXBFtSw@mail.gmail.com>
-Subject: Re: [PATCH v12 0/1] vhost: Add support of kthread API
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
-	sgarzare@redhat.com, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250619-dev-forwarding-v2-2-3f81801b06c2@codeconstruct.com.au>
 
-Tested this series of patches with virtio-net regression tests,
-everything works fine.
+Hi Jeremy,
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+kernel test robot noticed the following build warnings:
 
-On Mon, Jun 16, 2025 at 2:29=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
-> the vhost now uses vhost_task and operates as a child of the
-> owner thread. This aligns with containerization principles.
-> However, this change has caused confusion for some legacy
-> userspace applications. Therefore, we are reintroducing
-> support for the kthread API.
->
-> In this series, a new UAPI is implemented to allow
-> userspace applications to configure their thread mode.
->
-> Changelog v2:
->  1. Change the module_param's name to enforce_inherit_owner, and the defa=
-ult value is true.
->  2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
->
-> Changelog v3:
->  1. Change the module_param's name to inherit_owner_default, and the defa=
-ult value is true.
->  2. Add a structure for task function; the worker will select a different=
- mode based on the value inherit_owner.
->  3. device will have their own inherit_owner in struct vhost_dev
->  4. Address other comments
->
-> Changelog v4:
->  1. remove the module_param, only keep the UAPI
->  2. remove the structure for task function; change to use the function po=
-inter in vhost_worker
->  3. fix the issue in vhost_worker_create and vhost_dev_ioctl
->  4. Address other comments
->
-> Changelog v5:
->  1. Change wakeup and stop function pointers in struct vhost_worker to vo=
-id.
->  2. merging patches 4, 5, 6 in a single patch
->  3. Fix spelling issues and address other comments.
->
-> Changelog v6:
->  1. move the check of VHOST_NEW_WORKER from vhost_scsi to vhost
->  2. Change the ioctl name VHOST_SET_INHERIT_FROM_OWNER to VHOST_FORK_FROM=
-_OWNER
->  3. reuse the function __vhost_worker_flush
->  4. use a ops sturct to support worker relates function
->  5. reset the value of inherit_owner in vhost_dev_reset_owner.
->
-> Changelog v7:
->  1. add a KConfig knob to disable legacy app support
->  2. Split the changes into two patches to separately introduce the ops an=
-d add kthread support.
->  3. Utilized INX_MAX to avoid modifications in __vhost_worker_flush
->  4. Rebased on the latest kernel
->  5. Address other comments
->
-> Changelog v8:
->  1. Rebased on the latest kernel
->  2. Address some other comments
->
-> Changelog v9:
->  1. Rebased on the latest kernel.
->  2. Squashed patches 6=E2=80=917.
->  3. Squashed patches 2=E2=80=914.
->  4. Minor fixes in commit log
->
-> Changelog v10:
->  1.Add support for the module_param.
->  2.Squash patches 3 and 4.
->  3.Make minor fixes in the commit log.
->  4.Fix the mismatched tabs in Kconfig.
->  5.Rebase on the latest kernel.
->
-> Changelog v11:
->  1.make the module_param under Kconfig
->  2.Make minor fixes in the commit log.
->  3.change the name inherit_owner to fork_owner
->  4.add NEW ioctl VHOST_GET_FORK_FROM_OWNER
->  5.Rebase on the latest kernel
->
-> Changelog v12:
-> 1.Squash all patches to 1.
-> 2.Add define for task mode and kthread mode
-> 3.Address some other comments
-> 4.Rebase on the latest kernel
->
-> Tested with QEMU with kthread mode/task mode/kthread+task mode
->
->
-> Cindy Lu (1):
->   vhost: Reintroduces support of kthread API and adds mode selection
->
->  drivers/vhost/Kconfig      |  17 +++
->  drivers/vhost/vhost.c      | 244 ++++++++++++++++++++++++++++++++++---
->  drivers/vhost/vhost.h      |  22 ++++
->  include/uapi/linux/vhost.h |  29 +++++
->  4 files changed, 294 insertions(+), 18 deletions(-)
->
-> --
-> 2.45.0
->
->
+[auto build test WARNING on 0097c4195b1d0ca57d15979626c769c74747b5a0]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-don-t-use-source-cb-data-when-forwarding-ensure-pkt_type-is-set/20250619-160339
+base:   0097c4195b1d0ca57d15979626c769c74747b5a0
+patch link:    https://lore.kernel.org/r/20250619-dev-forwarding-v2-2-3f81801b06c2%40codeconstruct.com.au
+patch subject: [PATCH net-next v2 02/13] net: mctp: separate routing database from routing operations
+config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20250624/202506241117.wd6sbUKA-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250624/202506241117.wd6sbUKA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506241117.wd6sbUKA-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from net/mctp/route.c:1554:
+   net/mctp/test/route-test.c: In function 'mctp_test_route_input_cloned_frag':
+>> net/mctp/test/route-test.c:1091:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+    1091 | }
+         | ^
+
+
+vim +1091 net/mctp/test/route-test.c
+
+ce1219c3f76bb1 Jeremy Kerr   2024-12-18   983  
+f5d83cf0eeb90f Matt Johnston 2025-03-06   984  /* Input route to socket, using a fragmented message created from clones.
+f5d83cf0eeb90f Matt Johnston 2025-03-06   985   */
+f5d83cf0eeb90f Matt Johnston 2025-03-06   986  static void mctp_test_route_input_cloned_frag(struct kunit *test)
+f5d83cf0eeb90f Matt Johnston 2025-03-06   987  {
+f5d83cf0eeb90f Matt Johnston 2025-03-06   988  	/* 5 packet fragments, forming 2 complete messages */
+f5d83cf0eeb90f Matt Johnston 2025-03-06   989  	const struct mctp_hdr hdrs[5] = {
+f5d83cf0eeb90f Matt Johnston 2025-03-06   990  		RX_FRAG(FL_S, 0),
+f5d83cf0eeb90f Matt Johnston 2025-03-06   991  		RX_FRAG(0, 1),
+f5d83cf0eeb90f Matt Johnston 2025-03-06   992  		RX_FRAG(FL_E, 2),
+f5d83cf0eeb90f Matt Johnston 2025-03-06   993  		RX_FRAG(FL_S, 0),
+f5d83cf0eeb90f Matt Johnston 2025-03-06   994  		RX_FRAG(FL_E, 1),
+f5d83cf0eeb90f Matt Johnston 2025-03-06   995  	};
+fb025ae64bd1f2 Jeremy Kerr   2025-06-19   996  	struct mctp_test_pktqueue tpq;
+f5d83cf0eeb90f Matt Johnston 2025-03-06   997  	struct mctp_test_dev *dev;
+f5d83cf0eeb90f Matt Johnston 2025-03-06   998  	struct sk_buff *skb[5];
+f5d83cf0eeb90f Matt Johnston 2025-03-06   999  	struct sk_buff *rx_skb;
+fb025ae64bd1f2 Jeremy Kerr   2025-06-19  1000  	struct mctp_dst dst;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1001  	struct socket *sock;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1002  	size_t data_len;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1003  	u8 compare[100];
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1004  	u8 flat[100];
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1005  	size_t total;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1006  	void *p;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1007  	int rc;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1008  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1009  	/* Arbitrary length */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1010  	data_len = 3;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1011  	total = data_len + sizeof(struct mctp_hdr);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1012  
+fb025ae64bd1f2 Jeremy Kerr   2025-06-19  1013  	__mctp_route_test_init(test, &dev, &dst, &tpq, &sock, MCTP_NET_ANY);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1014  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1015  	/* Create a single skb initially with concatenated packets */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1016  	skb[0] = mctp_test_create_skb(&hdrs[0], 5 * total);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1017  	mctp_test_skb_set_dev(skb[0], dev);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1018  	memset(skb[0]->data, 0 * 0x11, skb[0]->len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1019  	memcpy(skb[0]->data, &hdrs[0], sizeof(struct mctp_hdr));
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1020  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1021  	/* Extract and populate packets */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1022  	for (int i = 1; i < 5; i++) {
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1023  		skb[i] = skb_clone(skb[i - 1], GFP_ATOMIC);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1024  		KUNIT_ASSERT_TRUE(test, skb[i]);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1025  		p = skb_pull(skb[i], total);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1026  		KUNIT_ASSERT_TRUE(test, p);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1027  		skb_reset_network_header(skb[i]);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1028  		memcpy(skb[i]->data, &hdrs[i], sizeof(struct mctp_hdr));
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1029  		memset(&skb[i]->data[sizeof(struct mctp_hdr)], i * 0x11, data_len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1030  	}
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1031  	for (int i = 0; i < 5; i++)
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1032  		skb_trim(skb[i], total);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1033  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1034  	/* SOM packets have a type byte to match the socket */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1035  	skb[0]->data[4] = 0;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1036  	skb[3]->data[4] = 0;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1037  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1038  	skb_dump("pkt1 ", skb[0], false);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1039  	skb_dump("pkt2 ", skb[1], false);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1040  	skb_dump("pkt3 ", skb[2], false);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1041  	skb_dump("pkt4 ", skb[3], false);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1042  	skb_dump("pkt5 ", skb[4], false);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1043  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1044  	for (int i = 0; i < 5; i++) {
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1045  		KUNIT_EXPECT_EQ(test, refcount_read(&skb[i]->users), 1);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1046  		/* Take a reference so we can check refcounts at the end */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1047  		skb_get(skb[i]);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1048  	}
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1049  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1050  	/* Feed the fragments into MCTP core */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1051  	for (int i = 0; i < 5; i++) {
+fb025ae64bd1f2 Jeremy Kerr   2025-06-19  1052  		rc = mctp_dst_input(&dst, skb[i]);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1053  		KUNIT_EXPECT_EQ(test, rc, 0);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1054  	}
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1055  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1056  	/* Receive first reassembled message */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1057  	rx_skb = skb_recv_datagram(sock->sk, MSG_DONTWAIT, &rc);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1058  	KUNIT_EXPECT_EQ(test, rc, 0);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1059  	KUNIT_EXPECT_EQ(test, rx_skb->len, 3 * data_len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1060  	rc = skb_copy_bits(rx_skb, 0, flat, rx_skb->len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1061  	for (int i = 0; i < rx_skb->len; i++)
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1062  		compare[i] = (i / data_len) * 0x11;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1063  	/* Set type byte */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1064  	compare[0] = 0;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1065  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1066  	KUNIT_EXPECT_MEMEQ(test, flat, compare, rx_skb->len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1067  	KUNIT_EXPECT_EQ(test, refcount_read(&rx_skb->users), 1);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1068  	kfree_skb(rx_skb);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1069  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1070  	/* Receive second reassembled message */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1071  	rx_skb = skb_recv_datagram(sock->sk, MSG_DONTWAIT, &rc);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1072  	KUNIT_EXPECT_EQ(test, rc, 0);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1073  	KUNIT_EXPECT_EQ(test, rx_skb->len, 2 * data_len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1074  	rc = skb_copy_bits(rx_skb, 0, flat, rx_skb->len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1075  	for (int i = 0; i < rx_skb->len; i++)
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1076  		compare[i] = (i / data_len + 3) * 0x11;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1077  	/* Set type byte */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1078  	compare[0] = 0;
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1079  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1080  	KUNIT_EXPECT_MEMEQ(test, flat, compare, rx_skb->len);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1081  	KUNIT_EXPECT_EQ(test, refcount_read(&rx_skb->users), 1);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1082  	kfree_skb(rx_skb);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1083  
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1084  	/* Check input skb refcounts */
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1085  	for (int i = 0; i < 5; i++) {
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1086  		KUNIT_EXPECT_EQ(test, refcount_read(&skb[i]->users), 1);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1087  		kfree_skb(skb[i]);
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1088  	}
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1089  
+fb025ae64bd1f2 Jeremy Kerr   2025-06-19  1090  	__mctp_route_test_fini(test, dev, &dst, &tpq, sock);
+f5d83cf0eeb90f Matt Johnston 2025-03-06 @1091  }
+f5d83cf0eeb90f Matt Johnston 2025-03-06  1092  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
