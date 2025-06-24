@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-200538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8201AE5F6A
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:32:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C04AE5F56
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A541718895C4
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 08:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F2353BA95B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 08:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4582525BEE2;
-	Tue, 24 Jun 2025 08:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03625A354;
+	Tue, 24 Jun 2025 08:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="gngyiwTB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmUfvecG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DBF25B67E;
-	Tue, 24 Jun 2025 08:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75487258CE7
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 08:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750753964; cv=none; b=TQUfX3NZ9FCJ87ttVsA8EXzmjYJWXBJMVOl1/u4DqCZuDccqr1o7C1A0sQaDjbj9nfJwckQE5JD9LQ3nzciBUawB7hxGqf8ek6P3nhGXVSQCSfGkTxCbSjmKRJIzwXFyoDWkliifsqrXSjbWe1p8iKgguzNg6Wyz+HiczfUlajk=
+	t=1750753784; cv=none; b=KUR6yDdAJd2GGPnEt0vMXe0TKDjAjFaOqpAfbtSUnXmdyUfWwrxpF80yZ3F1mE4R3zJ71NMQ+CTP7hGv/Vl5KlQNT1OHsUarlNMLkRolqCcssVfTi4pI+zYY0iPIlRZpf16Cdxu4gPb87gHLvh/UEQO/vGkZMkLN/8V2CrSJgww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750753964; c=relaxed/simple;
-	bh=IP9zZ6vX1r03ltWl8w9ViI+/XIllLTAlSCc4K5E75r8=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=fW6C5WTHgx1JVsRSyvw3nyG641+Av2heJ1HNMJlETCD15QK+GBDVNDKs4Wq+vrADqrOf/lvBtSm7owuXYqNJoEdHe0W4aLAslKgnCf+0yNO5XLlbtKY6/0OEOLF0gpdzCtOd4/P6yux49ufsg7uQ41l/5ojVk14LdjrWfzBx/P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=gngyiwTB; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1750753953; h=Message-ID:Subject:Date:From:To;
-	bh=xto8ohKa0ryNBVBrFTAZ50J9YmnkUMJE78zO1Eob+DM=;
-	b=gngyiwTB5wl/4ql3qUvMypZMauRuizllboob2BX57Qp1w+UpUZLzVz/fVm4PcPL4yt3P48jIe7dxgEV/GisbBuXZ3Yk4RQciJkSUf0C4oPCUeTyDmPpWD9agWctx8XxnNqJLo2HkqHPk6etNFmpfKI+VyPzcybtwOHhrnk4Co8E=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WegCBpn_1750753630 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 24 Jun 2025 16:27:11 +0800
-Message-ID: <1750753624.9023402-5-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v2 2/2] virtio-net: xsk: rx: move the xdp->data adjustment to buf_to_xdp()
-Date: Tue, 24 Jun 2025 16:27:04 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org,
- Bui Quang Minh <minhquangbui99@gmail.com>,
- netdev@vger.kernel.org
-References: <20250621144952.32469-1-minhquangbui99@gmail.com>
- <20250621144952.32469-3-minhquangbui99@gmail.com>
-In-Reply-To: <20250621144952.32469-3-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1750753784; c=relaxed/simple;
+	bh=kg1ZbTX6+QBvNMo0yo+Uim5yoqskLKpcS7uX86rSodA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sPLMBBhXHqDkNjSm1d0yOrsYyBr2Nq2Aeul9I2XGw0xTzCMUV2rfG5e+SrQjUV+RTsjIOntaLxxajmM3e/G5oOwHXmqAYydysbl6JfA3bSGDXmG2NHiNy1tqSy2zp17qec7WDa3T0o9Fr9IVyalM0xX3Yu047UB0H1Zcj7w6dUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmUfvecG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2EEC4CEF3;
+	Tue, 24 Jun 2025 08:29:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750753784;
+	bh=kg1ZbTX6+QBvNMo0yo+Uim5yoqskLKpcS7uX86rSodA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SmUfvecGxiN7urufbEpMvt7fz6sOMBGIjlRsA7/IJm84DfmpLMShaZScrsoBwdFYP
+	 hx9t87XSbm7IZ7Tbx2jLltfD7xbo38ARACwz9PpWk9dtXdvh+x09STip+vh2NT/l7V
+	 UNAPoNJOHGD6U8qBfSBNevjwIFVUua/QnGxjdSr4THGHTnL9l2NrXrygZTIcbIfjcL
+	 NMsq2oL+q6mQqSBUaK8IVf7izxhBSlyc8ldBCmBDZSaMtGZCPok//eX4yF+gKD31Ot
+	 8GofFS7GSuSwCgDRYH2bQUyHjVHtvGgQ+P5aJgrOVshuixtyVyDxQHKvLli3RWnjh7
+	 bZw9lkzndkz3Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F9438111DD;
+	Tue, 24 Jun 2025 08:30:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net 0/4] af_unix: Fix two OOB issues.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175075381100.3450670.13737310661356171408.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Jun 2025 08:30:11 +0000
+References: <20250619041457.1132791-1-kuni1840@gmail.com>
+In-Reply-To: <20250619041457.1132791-1-kuni1840@gmail.com>
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, rao.shoaib@oracle.com,
+ kuniyu@google.com, netdev@vger.kernel.org
 
-On Sat, 21 Jun 2025 21:49:52 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
-> This commit does not do any functional changes. It moves xdp->data
-> adjustment for buffer other than first buffer to buf_to_xdp() helper so
-> that the xdp_buff adjustment does not scatter over different functions.
->
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+Hello:
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> ---
->  drivers/net/virtio_net.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 1eb237cd5d0b..4e942ea1bfa3 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1159,7 +1159,19 @@ static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
->  		return NULL;
->  	}
->
-> -	xsk_buff_set_size(xdp, len);
-> +	if (first_buf) {
-> +		xsk_buff_set_size(xdp, len);
-> +	} else {
-> +		/* This is the same as xsk_buff_set_size but with the adjusted
-> +		 * xdp->data.
-> +		 */
-> +		xdp->data = xdp->data_hard_start + XDP_PACKET_HEADROOM;
-> +		xdp->data -= vi->hdr_len;
-> +		xdp->data_meta = xdp->data;
-> +		xdp->data_end = xdp->data + len;
-> +		xdp->flags = 0;
-> +	}
-> +
->  	xsk_buff_dma_sync_for_cpu(xdp);
->
->  	return xdp;
-> @@ -1284,7 +1296,7 @@ static int xsk_append_merge_buffer(struct virtnet_info *vi,
->  			goto err;
->  		}
->
-> -		memcpy(buf, xdp->data - vi->hdr_len, len);
-> +		memcpy(buf, xdp->data, len);
->
->  		xsk_buff_free(xdp);
->
-> --
-> 2.43.0
->
+On Wed, 18 Jun 2025 21:13:54 -0700 you wrote:
+> From: Kuniyuki Iwashima <kuniyu@google.com>
+> 
+> Recently, two issues are reported regarding MSG_OOB.
+> 
+> Patch 1 fixes issues that happen when multiple consumed OOB
+> skbs are placed consecutively in the recv queue.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net,1/4] af_unix: Don't leave consecutive consumed OOB skbs.
+    https://git.kernel.org/netdev/net/c/32ca245464e1
+  - [v2,net,2/4] af_unix: Add test for consecutive consumed OOB.
+    https://git.kernel.org/netdev/net/c/e1ca44e85f65
+  - [v2,net,3/4] af_unix: Don't set -ECONNRESET for consumed OOB skb.
+    https://git.kernel.org/netdev/net/c/2a5a4841846b
+  - [v2,net,4/4] selftest: af_unix: Add tests for -ECONNRESET.
+    https://git.kernel.org/netdev/net/c/632f55fa60c4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
