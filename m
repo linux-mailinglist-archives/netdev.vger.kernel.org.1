@@ -1,796 +1,131 @@
-Return-Path: <netdev+bounces-200594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D23CAE6347
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 13:06:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD0DAE634D
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 13:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B38DF1925F1A
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 11:06:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5644117976D
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 11:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEAD288C89;
-	Tue, 24 Jun 2025 11:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670BB28641D;
+	Tue, 24 Jun 2025 11:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Llrxruvo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dLfCm+Ar"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90E528A726
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 11:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE79221F17
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 11:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750763141; cv=none; b=gu7XVK+wlj/sAepxtz6I1pmt9yTaeYJYqz/gbPW7HckM0tToZjGSKLh8fMPt1L6Z3KY1+dVloqaEJNmxvMUw0pNcF7CfZph/mpvcIGM8D+aiuEDyNmWQMJpH09uKEgIEsJXwUXIlm/FQ9Uyfn27c5EUwN+D1DBJ30eVkbVIeFZg=
+	t=1750763348; cv=none; b=uh0gworYypJcj88xVMhnzYfIxNCSO/YCE9skeHEuWBB/XzdBrBMly6MEtm4ZUk36MmHIqCoa17pZPJPTk67JapO9sBanWSQhVi/3SWizLpB16eE2lcA5koHvOZ+afjsqJIe6Yzu52R9dCknujAWUlamzQmFMVa0A3pm29vb56iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750763141; c=relaxed/simple;
-	bh=I+gZPF/72iC+4I8jR/ru49HpTWafGes8ci+vhzc+u10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WWaLoO3OAoJWzDR5/p8KmZQb5Of7Gn8Mnxqg4LwB92+j6QMdIswd0DbyM5YeowE1Ajynmtlz5UXl2YZJJg7ud/wz5aRTBeylosSb0BPuax1OfNijo6EtX8Jxwyr48g0jWuqeDNTmGl33SeNXGKDqfj3ot4WikG3pHSwzGULWUYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Llrxruvo; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5bfba4fc-05b2-4a63-9ed4-9b1b3309d3d9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750763126;
+	s=arc-20240116; t=1750763348; c=relaxed/simple;
+	bh=xk0K8Y9GNGQRlSmr9+j3AdvLKGa1tXM70MIgWys7z68=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=QoN/cpo4ADR5idKw5TeNiktxdAJ9MvDHwuTod2Sy6go2oL9NCD3Li8GkfZA2cFzUsIkcVKcKPpIfr9EARF3h/bHBUY81MRyoaRQY4bLdsbTqtVfGqVVNhaxPKZSAU0LR/Qm20bySVH3wO9DMkoNqyxKDO4F4WfiGFEIQ/YdF1I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dLfCm+Ar; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750763345;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CO9BU9WYU4BsFa6od7ZJg0FId6tDU4FFpoMgDNYvMPc=;
-	b=Llrxruvo4jeqhzuDMKJxvRZxUTzSmUjUx732bD6ui0z2K7GjEw+qXdOcqd0Sr5isiLAnSg
-	zt6vYJ3/nnaZ8NmcL2xA90nZu3PX4f6PFMUb2ojX6ZgcXhbyMAGCZgU4voxtQXYtYMztnJ
-	3S/nN6EBT0wxv6jmxYYzNCq2APYCB5U=
-Date: Tue, 24 Jun 2025 12:05:19 +0100
+	bh=kGyqpb2hXEKZ5FRzXkAxKuJIK/tLYcR4CdnvTMOm+wA=;
+	b=dLfCm+Ar8iMwukT5sqoB4nY24vznzAVJicYQDDC5mVx9kLZGGfc+f6GTyYDlbZOK1+VIUZ
+	nsVim8dDp3SuD8A1eX4KcYMMH2f5Ad2tXZTL6y93XnO8HF2e74/8APc0EXZtNmxuCLeq4Q
+	kpZOqBDl0vVuKKnDYIxUXrWlmjdRv9k=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-52-P25TdUWxOGOj82Fz8qzHEg-1; Tue, 24 Jun 2025 07:09:04 -0400
+X-MC-Unique: P25TdUWxOGOj82Fz8qzHEg-1
+X-Mimecast-MFC-AGG-ID: P25TdUWxOGOj82Fz8qzHEg_1750763343
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-453018b4ddeso2518385e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 04:09:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750763343; x=1751368143;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kGyqpb2hXEKZ5FRzXkAxKuJIK/tLYcR4CdnvTMOm+wA=;
+        b=P103Hzok8kB60yCJa9e/7qvxmXUfmua5lglTtvXM6tDILjepdfE1HS7Qz5b1wFoUdH
+         qxnnJFfQFZ5y/hD+JDtxcRok2qcJgqoyZ9rTCx6/5TW//arXbcz70SS2luNwYzhz6KGS
+         yzxLvElaoXJNRUFsKuT9gnI+uAUMi+9KU79QvldNVNor9laWc3wrq2gwR8yZLkYQk349
+         7boZIqoUOA8TmKPZR/+dc09cEenjfoeqVFhqCpCei+tqNv4bDsy2ssuqbi0H5EAWegiq
+         p8JkCqe7Gx05Z8DxO3JLcBvja5Gb1DhrV05NwccEa85K2RZ+d5P4NfvsmFVLZPCEpeSW
+         HErQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6x/0h1gaVd3ndEGVGyK1TNcgunY2iuYU92axJOc7qu2vaQmP5Q6wzUP2QplJv906bunaAGvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5ORx3SR5mNaj9ojXHa71U/vPoufXeuj5eaX+8pn4FgCfxTpIb
+	84Rylzacg5cK2gf9+s4BY7RphFe6oDXNx052vBjI4w+8xEjmdZPID1m884epsQBKP5MiC9WVjD5
+	szGvcddnH/u5z/KxMMwthQaUpzQ3f8uYr4H7BlGX0E/M8FZkC13JMCIZygQ==
+X-Gm-Gg: ASbGncvGug5L/BSbr5BD8r0Rw+/4jc/3Pf7XI1PTe2QXN+TWKn98wsgac/AP7AtM+4J
+	rYRfJLHeDbSkv951pM3rEZM1ok4KPfQXhH6Vd79mjnot7f52nVcNHMi4E32qA1YnIy5Oz7/v/mk
+	HVQlQav8ce4327e8V3FzsWq/gYvbBrv+rmRa9tQGDswC6+nRblKQSfLOdRsvRzNJdtam5hqtG7c
+	v/c3TZCjWoYqUO5Kaad+4biLyV7RbDD3qyoZjGEfTUPLIZHIQnB2OoEpRvjtBZ1Iw3f4GeTakTG
+	lCxU6p33ieIHP6wEu4AGHqFbh/2UaQ==
+X-Received: by 2002:a05:6000:2003:b0:3a4:dfc2:2a3e with SMTP id ffacd0b85a97d-3a6d12e154dmr13691908f8f.39.1750763343136;
+        Tue, 24 Jun 2025 04:09:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGGm18O1vFLDsvo59xhvJ0D87DUDiE63/ilEIWM14hPF8ZubR/QRhwNQIPxsY8BH5HgKlvb0A==
+X-Received: by 2002:a05:6000:2003:b0:3a4:dfc2:2a3e with SMTP id ffacd0b85a97d-3a6d12e154dmr13691857f8f.39.1750763342665;
+        Tue, 24 Jun 2025 04:09:02 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2445:d510::f39? ([2a0d:3344:2445:d510::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535ef6edbesm171253365e9.20.2025.06.24.04.09.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 04:09:02 -0700 (PDT)
+Message-ID: <073dfdc8-dd56-47a3-b43d-4674279325e6@redhat.com>
+Date: Tue, 24 Jun 2025 13:08:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v9 06/11] net: ti: prueth: Adds HW timestamping
- support for PTP using PRU-ICSS IEP module
-To: Parvathi Pudi <parvathi@couthit.com>, danishanwar@ti.com,
- rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, ssantosh@kernel.org,
- richardcochran@gmail.com, s.hauer@pengutronix.de, m-karicheri2@ti.com,
- glaroque@baylibre.com, afd@ti.com, saikrishnag@marvell.com,
- m-malladi@ti.com, jacob.e.keller@intel.com, diogo.ivo@siemens.com,
- javier.carrasco.cruz@gmail.com, horms@kernel.org, s-anna@ti.com,
- basharath@couthit.com
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, pratheesh@ti.com,
- prajith@ti.com, vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
- krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-References: <20250623135949.254674-1-parvathi@couthit.com>
- <20250623152638.254964-7-parvathi@couthit.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 net-next 0/6] DUALPI2 patch
+To: chia-yu.chang@nokia-bell-labs.com, alok.a.tiwari@oracle.com,
+ pctammela@mojatatu.com, horms@kernel.org, donald.hunter@gmail.com,
+ xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com,
+ jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, andrew+netdev@lunn.ch, ast@fiberby.net,
+ liuhangbin@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
+ ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250623152638.254964-7-parvathi@couthit.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 23/06/2025 16:26, Parvathi Pudi wrote:
-> From: Roger Quadros <rogerq@ti.com>
+On 6/21/25 9:33 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > 
-> PRU-ICSS IEP module, which is capable of timestamping RX and
-> TX packets at HW level, is used for time synchronization by PTP4L.
+>   Please find the DualPI2 patch v20.
 > 
-> This change includes interaction between firmware and user space
-> application (ptp4l) with required packet timestamps. The driver
-> initializes the PRU firmware with appropriate mode and configuration
-> flags. Firmware updates local registers with the flags set by driver
-> and uses for further operation. RX SOF timestamp comes along with
-> packet and firmware will rise interrupt with TX SOF timestamp after
-> pushing the packet on to the wire.
+>   This patch serise adds DualPI Improved with a Square (DualPI2) with following features:
+> * Supports congestion controls that comply with the Prague requirements in RFC9331 (e.g. TCP-Prague)
+> * Coupled dual-queue that separates the L4S traffic in a low latency queue (L-queue), without harming remaining traffic that is scheduled in classic queue (C-queue) due to congestion-coupling using PI2 as defined in RFC9332
+> * Configurable overload strategies
+> * Use of sojourn time to reliably estimate queue delay
+> * Supports ECN L4S-identifier (IP.ECN==0b*1) to classify traffic into respective queues
 > 
-> IEP driver is available in upstream and we are reusing for hardware
-> configuration for ICSSM as well. On top of that we have extended it
-> with the changes for AM57xx SoC.
-> 
-> Extended ethtool for reading HW timestamping capability of the PRU
-> interfaces.
-> 
-> Currently ordinary clock (OC) configuration has been validated with
-> Linux ptp4l.
-> 
-> Signed-off-by: Roger Quadros <rogerq@ti.com>
-> Signed-off-by: Andrew F. Davis <afd@ti.com>
-> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-> ---
->   drivers/net/ethernet/ti/icssg/icss_iep.c      |  42 ++
->   drivers/net/ethernet/ti/icssm/icssm_ethtool.c |  23 +
->   drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 439 +++++++++++++++++-
->   drivers/net/ethernet/ti/icssm/icssm_prueth.h  |  11 +
->   .../net/ethernet/ti/icssm/icssm_prueth_ptp.h  |  85 ++++
->   5 files changed, 598 insertions(+), 2 deletions(-)
->   create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ptp.h
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-> index 2a1c43316f46..031a6be6a4e3 100644
-> --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-> @@ -968,11 +968,53 @@ static const struct icss_iep_plat_data am654_icss_iep_plat_data = {
->   	.config = &am654_icss_iep_regmap_config,
->   };
->   
-> +static const struct icss_iep_plat_data am57xx_icss_iep_plat_data = {
-> +	.flags = ICSS_IEP_64BIT_COUNTER_SUPPORT |
-> +		 ICSS_IEP_SLOW_COMPEN_REG_SUPPORT,
-> +	.reg_offs = {
-> +		[ICSS_IEP_GLOBAL_CFG_REG] = 0x00,
-> +		[ICSS_IEP_COMPEN_REG] = 0x08,
-> +		[ICSS_IEP_SLOW_COMPEN_REG] = 0x0C,
-> +		[ICSS_IEP_COUNT_REG0] = 0x10,
-> +		[ICSS_IEP_COUNT_REG1] = 0x14,
-> +		[ICSS_IEP_CAPTURE_CFG_REG] = 0x18,
-> +		[ICSS_IEP_CAPTURE_STAT_REG] = 0x1c,
-> +
-> +		[ICSS_IEP_CAP6_RISE_REG0] = 0x50,
-> +		[ICSS_IEP_CAP6_RISE_REG1] = 0x54,
-> +
-> +		[ICSS_IEP_CAP7_RISE_REG0] = 0x60,
-> +		[ICSS_IEP_CAP7_RISE_REG1] = 0x64,
-> +
-> +		[ICSS_IEP_CMP_CFG_REG] = 0x70,
-> +		[ICSS_IEP_CMP_STAT_REG] = 0x74,
-> +		[ICSS_IEP_CMP0_REG0] = 0x78,
-> +		[ICSS_IEP_CMP0_REG1] = 0x7c,
-> +		[ICSS_IEP_CMP1_REG0] = 0x80,
-> +		[ICSS_IEP_CMP1_REG1] = 0x84,
-> +
-> +		[ICSS_IEP_CMP8_REG0] = 0xc0,
-> +		[ICSS_IEP_CMP8_REG1] = 0xc4,
-> +		[ICSS_IEP_SYNC_CTRL_REG] = 0x180,
-> +		[ICSS_IEP_SYNC0_STAT_REG] = 0x188,
-> +		[ICSS_IEP_SYNC1_STAT_REG] = 0x18c,
-> +		[ICSS_IEP_SYNC_PWIDTH_REG] = 0x190,
-> +		[ICSS_IEP_SYNC0_PERIOD_REG] = 0x194,
-> +		[ICSS_IEP_SYNC1_DELAY_REG] = 0x198,
-> +		[ICSS_IEP_SYNC_START_REG] = 0x19c,
-> +	},
-> +	.config = &am654_icss_iep_regmap_config,
-> +};
-> +
->   static const struct of_device_id icss_iep_of_match[] = {
->   	{
->   		.compatible = "ti,am654-icss-iep",
->   		.data = &am654_icss_iep_plat_data,
->   	},
-> +	{
-> +		.compatible = "ti,am5728-icss-iep",
-> +		.data = &am57xx_icss_iep_plat_data,
-> +	},
->   	{},
->   };
->   MODULE_DEVICE_TABLE(of, icss_iep_of_match);
-> diff --git a/drivers/net/ethernet/ti/icssm/icssm_ethtool.c b/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
-> index 6faa46ba6364..6aafca17b730 100644
-> --- a/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
-> +++ b/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
-> @@ -8,6 +8,7 @@
->   #include <linux/if_bridge.h>
->   #include <linux/if_vlan.h>
->   #include "icssm_prueth.h"
-> +#include "../icssg/icss_iep.h"
->   
->   /* set PRU firmware statistics */
->   void icssm_emac_set_stats(struct prueth_emac *emac,
-> @@ -221,6 +222,27 @@ icssm_emac_get_eth_mac_stats(struct net_device *ndev,
->   	mac_stats->MultipleCollisionFrames = pstats.multi_coll;
->   }
->   
-> +static int icssm_emac_get_ts_info(struct net_device *ndev,
-> +				  struct kernel_ethtool_ts_info *info)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +
-> +	if ((PRUETH_IS_EMAC(emac->prueth) && !emac->emac_ptp_tx_irq))
-> +		return ethtool_op_get_ts_info(ndev, info);
-> +
-> +	info->so_timestamping =
-> +		SOF_TIMESTAMPING_TX_HARDWARE |
-> +		SOF_TIMESTAMPING_RX_HARDWARE |
-> +		SOF_TIMESTAMPING_RAW_HARDWARE;
-> +
-> +	info->phc_index = icss_iep_get_ptp_clock_idx(emac->prueth->iep);
-> +	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
-> +	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
-> +				BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
-> +
-> +	return 0;
-> +}
-> +
->   /* Ethtool support for EMAC adapter */
->   const struct ethtool_ops emac_ethtool_ops = {
->   	.get_drvinfo = icssm_emac_get_drvinfo,
-> @@ -233,5 +255,6 @@ const struct ethtool_ops emac_ethtool_ops = {
->   	.get_regs = icssm_emac_get_regs,
->   	.get_rmon_stats = icssm_emac_get_rmon_stats,
->   	.get_eth_mac_stats = icssm_emac_get_eth_mac_stats,
-> +	.get_ts_info = icssm_emac_get_ts_info,
->   };
->   EXPORT_SYMBOL_GPL(emac_ethtool_ops);
-> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-> index 2b10538c616e..e45f67160d99 100644
-> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-> @@ -30,6 +30,7 @@
->   
->   #include "icssm_prueth.h"
->   #include "../icssg/icssg_mii_rt.h"
-> +#include "../icssg/icss_iep.h"
->   
->   #define OCMC_RAM_SIZE		(SZ_64K)
->   
-> @@ -50,6 +51,45 @@ static void icssm_prueth_write_reg(struct prueth *prueth,
->   						ETH_FCS_LEN + \
->   						ICSSM_LRE_TAG_SIZE)
->   
-> +static void icssm_prueth_ptp_ts_enable(struct prueth_emac *emac)
-> +{
-> +	void __iomem *sram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-> +	u8 val = 0;
-> +
-> +	if (emac->ptp_tx_enable) {
-> +		/* Disable fw background task */
-> +		val &= ~TIMESYNC_CTRL_BG_ENABLE;
-> +		/* Enable forced 2-step */
-> +		val |= TIMESYNC_CTRL_FORCED_2STEP;
-> +	}
-> +
-> +	writeb(val, sram + TIMESYNC_CTRL_VAR_OFFSET);
-> +}
-> +
-> +static void icssm_prueth_ptp_tx_ts_enable(struct prueth_emac *emac,
-> +					  bool enable)
-> +{
-> +	emac->ptp_tx_enable = enable;
-> +	icssm_prueth_ptp_ts_enable(emac);
-> +}
-> +
-> +static bool icssm_prueth_ptp_tx_ts_is_enabled(struct prueth_emac *emac)
-> +{
-> +	return !!emac->ptp_tx_enable;
-> +}
-> +
-> +static void icssm_prueth_ptp_rx_ts_enable(struct prueth_emac *emac,
-> +					  bool enable)
-> +{
-> +	emac->ptp_rx_enable = enable;
-> +	icssm_prueth_ptp_ts_enable(emac);
-> +}
-> +
-> +static bool icssm_prueth_ptp_rx_ts_is_enabled(struct prueth_emac *emac)
-> +{
-> +	return !!emac->ptp_rx_enable;
-> +}
-> +
->   /* ensure that order of PRUSS mem regions is same as enum prueth_mem */
->   static enum pruss_mem pruss_mem_ids[] = { PRUSS_MEM_DRAM0, PRUSS_MEM_DRAM1,
->   					  PRUSS_MEM_SHRD_RAM2 };
-> @@ -469,6 +509,173 @@ static void icssm_get_block(struct prueth_queue_desc __iomem *queue_desc,
->   		       queue->buffer_desc_offset) / BD_SIZE;
->   }
->   
-> +static u8 icssm_prueth_ptp_ts_event_type(struct sk_buff *skb, u8 *ptp_msgtype)
-> +{
-> +	unsigned int ptp_class = ptp_classify_raw(skb);
-> +	struct ptp_header *hdr;
-> +	u8 msgtype, event_type;
-> +
-> +	if (ptp_class == PTP_CLASS_NONE)
-> +		return PRUETH_PTP_TS_EVENTS;
-> +
-> +	hdr = ptp_parse_header(skb, ptp_class);
-> +	if (!hdr)
-> +		return PRUETH_PTP_TS_EVENTS;
-> +
-> +	msgtype = ptp_get_msgtype(hdr, ptp_class);
-> +	/* Treat E2E Delay Req/Resp messages in the same way as P2P peer delay
-> +	 * req/resp in driver here since firmware stores timestamps in the same
-> +	 * memory location for either (since they cannot operate simultaneously
-> +	 * anyway)
-> +	 */
-> +	switch (msgtype) {
-> +	case PTP_MSGTYPE_SYNC:
-> +		event_type = PRUETH_PTP_SYNC;
-> +		break;
-> +	case PTP_MSGTYPE_DELAY_REQ:
-> +	case PTP_MSGTYPE_PDELAY_REQ:
-> +		event_type = PRUETH_PTP_DLY_REQ;
-> +		break;
-> +	/* TODO: Check why PTP_MSGTYPE_DELAY_RESP needs timestamp
-> +	 * and need for it.
-> +	 */
-> +	case 0x9:
-> +	case PTP_MSGTYPE_PDELAY_RESP:
-> +		event_type = PRUETH_PTP_DLY_RESP;
-> +		break;
-> +	default:
-> +		event_type = PRUETH_PTP_TS_EVENTS;
-> +	}
-> +
-> +	if (ptp_msgtype)
-> +		*ptp_msgtype = msgtype;
-> +
-> +	return event_type;
-> +}
-> +
-> +static void icssm_prueth_ptp_tx_ts_reset(struct prueth_emac *emac, u8 event)
-> +{
-> +	void __iomem *sram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-> +	u32 ts_notify_offs, ts_offs;
-> +
-> +	ts_offs = icssm_prueth_tx_ts_offs_get(emac->port_id - 1, event);
-> +	ts_notify_offs = icssm_prueth_tx_ts_notify_offs_get(emac->port_id - 1,
-> +							    event);
-> +
-> +	writeb(0, sram + ts_notify_offs);
-> +	memset_io(sram + ts_offs, 0, sizeof(u64));
-> +}
-> +
-> +static int icssm_prueth_ptp_tx_ts_enqueue(struct prueth_emac *emac,
-> +					  struct sk_buff *skb)
-> +{
-> +	u8 event, changed = 0;
-> +	unsigned long flags;
-> +
-> +	if (skb_vlan_tagged(skb)) {
-> +		__skb_pull(skb, VLAN_HLEN);
-> +		changed += VLAN_HLEN;
-> +	}
-> +
-> +	skb_reset_mac_header(skb);
-> +	event = icssm_prueth_ptp_ts_event_type(skb, NULL);
-> +	__skb_push(skb, changed);
-> +	if (event == PRUETH_PTP_TS_EVENTS) {
-> +		netdev_err(emac->ndev, "invalid PTP event\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	spin_lock_irqsave(&emac->ptp_skb_lock, flags);
-> +	if (emac->ptp_skb[event]) {
-> +		dev_consume_skb_any(emac->ptp_skb[event]);
-> +		icssm_prueth_ptp_tx_ts_reset(emac, event);
-> +		netdev_warn(emac->ndev, "Dropped event waiting for tx ts.\n");
-> +	}
-> +
-> +	skb_get(skb);
-> +	emac->ptp_skb[event] = skb;
-> +	spin_unlock_irqrestore(&emac->ptp_skb_lock, flags);
-> +
-> +	return 0;
-> +}
-> +
-> +irqreturn_t icssm_prueth_ptp_tx_irq_handle(int irq, void *dev)
-> +{
-> +	struct net_device *ndev = (struct net_device *)dev;
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +
-> +	if (unlikely(netif_queue_stopped(ndev)))
-> +		netif_wake_queue(ndev);
-> +
-> +	if (icssm_prueth_ptp_tx_ts_is_enabled(emac))
-> +		return IRQ_WAKE_THREAD;
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static u64 icssm_prueth_ptp_ts_get(struct prueth_emac *emac, u32 ts_offs)
-> +{
-> +	void __iomem *sram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-> +	u64 cycles;
-> +
-> +	memcpy_fromio(&cycles, sram + ts_offs, sizeof(cycles));
-> +	memset_io(sram + ts_offs, 0, sizeof(cycles));
-> +
-> +	return cycles;
-> +}
-> +
-> +static void icssm_prueth_ptp_tx_ts_get(struct prueth_emac *emac, u8 event)
-> +{
-> +	struct skb_shared_hwtstamps ssh;
-> +	struct sk_buff *skb;
-> +	unsigned long flags;
-> +	u64 ns;
-> +
-> +	/* get the msg from list */
-> +	spin_lock_irqsave(&emac->ptp_skb_lock, flags);
-> +	skb = emac->ptp_skb[event];
-> +	emac->ptp_skb[event] = NULL;
-> +	spin_unlock_irqrestore(&emac->ptp_skb_lock, flags);
-> +	if (!skb) {
-> +		netdev_err(emac->ndev, "no tx msg %u found waiting for ts\n",
-> +			   event);
-> +		return;
-> +	}
-> +
-> +	/* get timestamp */
-> +	ns = icssm_prueth_ptp_ts_get(emac,
-> +				     icssm_prueth_tx_ts_offs_get
-> +				     (emac->port_id - 1, event));
-> +
-> +	memset(&ssh, 0, sizeof(ssh));
-> +	ssh.hwtstamp = ns_to_ktime(ns);
-> +	skb_tstamp_tx(skb, &ssh);
-> +	dev_consume_skb_any(skb);
-> +}
-> +
-> +irqreturn_t icssm_prueth_ptp_tx_irq_work(int irq, void *dev)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(dev);
-> +	u32 ts_notify_offs, ts_notify_mask, i;
-> +	void __iomem *sram;
-> +
-> +	/* get and reset the ts notifications */
-> +	sram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-> +	for (i = 0; i < PRUETH_PTP_TS_EVENTS; i++) {
-> +		ts_notify_offs =
-> +			icssm_prueth_tx_ts_notify_offs_get(emac->port_id - 1,
-> +							   i);
-> +		memcpy_fromio(&ts_notify_mask, sram + ts_notify_offs,
-> +			      PRUETH_PTP_TS_NOTIFY_SIZE);
-> +		memset_io(sram + ts_notify_offs, 0, PRUETH_PTP_TS_NOTIFY_SIZE);
-> +
-> +		if (ts_notify_mask & PRUETH_PTP_TS_NOTIFY_MASK)
-> +			icssm_prueth_ptp_tx_ts_get(emac, i);
-> +	}
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
->   /**
->    * icssm_emac_rx_irq - EMAC Rx interrupt handler
->    * @irq: interrupt number
-> @@ -597,6 +804,12 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
->   		memcpy(dst_addr, src_addr, pktlen);
->   	}
->   
-> +	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP &&
-> +	    icssm_prueth_ptp_tx_ts_is_enabled(emac)) {
-> +		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
-> +		icssm_prueth_ptp_tx_ts_enqueue(emac, skb);
-> +	}
-> +
->          /* update first buffer descriptor */
->   	wr_buf_desc = (pktlen << PRUETH_BD_LENGTH_SHIFT) &
->   		       PRUETH_BD_LENGTH_MASK;
-> @@ -647,6 +860,7 @@ int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
->   			 const struct prueth_queue_info *rxqueue)
->   {
->   	struct net_device *ndev = emac->ndev;
-> +	struct skb_shared_hwtstamps *ssh;
->   	unsigned int buffer_desc_count;
->   	int read_block, update_block;
->   	unsigned int actual_pkt_len;
-> @@ -656,6 +870,7 @@ int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
->   	struct sk_buff *skb;
->   	int pkt_block_size;
->   	void *ocmc_ram;
-> +	u64 ts = 0;
+> For more details of DualPI2, please refer IETF RFC9332 (https://datatracker.ietf.org/doc/html/rfc9332).
 
-nit: the initialization is not needed, the value of ts is overwritten on
-the very first access
+I don't have additional relevant comments, but I would appreciate any
+additional review from net_sched maintainers.
 
->   
->   	/* the PRU firmware deals mostly in pointers already
->   	 * offset into ram, we would like to deal in indexes
-> @@ -665,6 +880,8 @@ int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
->   	buffer_desc_count = icssm_get_buff_desc_count(rxqueue);
->   	read_block = (*bd_rd_ptr - rxqueue->buffer_desc_offset) / BD_SIZE;
->   	pkt_block_size = DIV_ROUND_UP(pkt_info->length, ICSS_BLOCK_SIZE);
-> +	if (pkt_info->timestamp)
-> +		pkt_block_size++;
->   
->   	/* calculate end BD address post read */
->   	update_block = read_block + pkt_block_size;
-> @@ -735,6 +952,15 @@ int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
->   	if (!pkt_info->sv_frame) {
->   		skb_put(skb, actual_pkt_len);
->   
-> +		if (icssm_prueth_ptp_rx_ts_is_enabled(emac) &&
-> +		    pkt_info->timestamp) {
-> +			src_addr = (void *)PTR_ALIGN((uintptr_t)src_addr,
-> +						     ICSS_BLOCK_SIZE);
-> +			memcpy(&ts, src_addr, sizeof(ts));
-> +			ssh = skb_hwtstamps(skb);
-> +			memset(ssh, 0, sizeof(*ssh));
-> +			ssh->hwtstamp = ns_to_ktime(ts);
-> +		}
->   		/* send packet up the stack */
->   		skb->protocol = eth_type_trans(skb, ndev);
->   		netif_receive_skb(skb);
-> @@ -895,9 +1121,67 @@ static int icssm_emac_request_irqs(struct prueth_emac *emac)
->   		return ret;
->   	}
->   
-> +	if (emac->emac_ptp_tx_irq) {
-> +		ret = request_threaded_irq(emac->emac_ptp_tx_irq,
-> +					   icssm_prueth_ptp_tx_irq_handle,
-> +					   icssm_prueth_ptp_tx_irq_work,
-> +					   IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
-> +					   ndev->name, ndev);
-> +		if (ret) {
-> +			netdev_err(ndev, "unable to request PTP TX IRQ\n");
-> +			goto free_irq;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +
-> +free_irq:
-> +	free_irq(emac->rx_irq, ndev);
->   	return ret;
->   }
->   
-> +static void icssm_iptp_dram_init(struct prueth_emac *emac)
-> +{
-> +	void __iomem *sram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-> +	u64 temp64;
-> +
-> +	writew(0, sram + MII_RX_CORRECTION_OFFSET);
-> +	writew(0, sram + MII_TX_CORRECTION_OFFSET);
-> +
-> +	/* Initialize RCF to 1 (Linux N/A) */
-> +	writel(1 * 1024, sram + TIMESYNC_TC_RCF_OFFSET);
-> +
-> +	/* This flag will be set and cleared by firmware */
-> +	/* Write Sync0 period for sync signal generation in PTP
-> +	 * memory in shared RAM
-> +	 */
-> +	writel(200000000 / 50, sram + TIMESYNC_SYNC0_WIDTH_OFFSET);
-> +
-> +	/* Write CMP1 period for sync signal generation in PTP
-> +	 * memory in shared RAM
-> +	 */
-> +	temp64 = 1000000;
-> +	memcpy_toio(sram + TIMESYNC_CMP1_CMP_OFFSET, &temp64, sizeof(temp64));
-> +
-> +	/* Write Sync0 period for sync signal generation in PTP
-> +	 * memory in shared RAM
-> +	 */
-> +	writel(1000000, sram + TIMESYNC_CMP1_PERIOD_OFFSET);
-> +
-> +	/* Configures domainNumber list. Firmware supports 2 domains */
-> +	writeb(0, sram + TIMESYNC_DOMAIN_NUMBER_LIST);
-> +	writeb(0, sram + TIMESYNC_DOMAIN_NUMBER_LIST + 1);
-> +
-> +	/* Configure 1-step/2-step */
-> +	writeb(1, sram + DISABLE_SWITCH_SYNC_RELAY_OFFSET);
-> +
-> +	/* Configures the setting to Link local frame without HSR tag */
-> +	writeb(0, sram + LINK_LOCAL_FRAME_HAS_HSR_TAG);
-> +
-> +	/* Enable E2E/UDP PTP message timestamping */
-> +	writeb(1, sram + PTP_IPV4_UDP_E2E_ENABLE);
-> +}
-> +
->   /**
->    * icssm_emac_ndo_open - EMAC device open
->    * @ndev: network adapter device
-> @@ -922,9 +1206,18 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
->   
->   	icssm_emac_set_stats(emac, &emac->stats);
->   
-> +	if (!prueth->emac_configured) {
-> +		icssm_iptp_dram_init(emac);
-> +		ret = icss_iep_init(prueth->iep, NULL, NULL, 0);
-> +		if (ret) {
-> +			netdev_err(ndev, "Failed to initialize iep: %d\n", ret);
-> +			goto iep_exit;
-> +		}
-> +	}
-> +
->   	ret = icssm_emac_set_boot_pru(emac, ndev);
->   	if (ret)
-> -		return ret;
-> +		goto iep_exit;
->   
->   	ret = icssm_emac_request_irqs(emac);
->   	if (ret)
-> @@ -948,6 +1241,10 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
->   rproc_shutdown:
->   	rproc_shutdown(emac->pru);
->   
-> +iep_exit:
-> +	if (!prueth->emac_configured)
-> +		icss_iep_exit(prueth->iep);
-> +
->   	return ret;
->   }
->   
-> @@ -963,6 +1260,7 @@ static int icssm_emac_ndo_stop(struct net_device *ndev)
->   {
->   	struct prueth_emac *emac = netdev_priv(ndev);
->   	struct prueth *prueth = emac->prueth;
-> +	int i;
->   
->   	prueth->emac_configured &= ~BIT(emac->port_id);
->   
-> @@ -973,14 +1271,32 @@ static int icssm_emac_ndo_stop(struct net_device *ndev)
->   	phy_stop(emac->phydev);
->   
->   	napi_disable(&emac->napi);
-> +	/* inform the upper layers. */
-> +	netif_stop_queue(ndev);
->   
->   	/* stop the PRU */
->   	rproc_shutdown(emac->pru);
->   
->   	icssm_emac_get_stats(emac, &emac->stats);
->   
-> +	/* Cleanup ptp related stuff for all protocols */
-> +	icssm_prueth_ptp_tx_ts_enable(emac, 0);
-> +	icssm_prueth_ptp_rx_ts_enable(emac, 0);
-> +	for (i = 0; i < PRUETH_PTP_TS_EVENTS; i++) {
-> +		if (emac->ptp_skb[i]) {
-> +			icssm_prueth_ptp_tx_ts_reset(emac, i);
-> +			dev_consume_skb_any(emac->ptp_skb[i]);
-> +			emac->ptp_skb[i] = NULL;
-> +		}
-> +	}
-> +
->   	/* free rx interrupts */
->   	free_irq(emac->rx_irq, ndev);
-> +	if (emac->emac_ptp_tx_irq)
-> +		free_irq(emac->emac_ptp_tx_irq, ndev);
-> +
-> +	if (!prueth->emac_configured)
-> +		icss_iep_exit(prueth->iep);
->   
->   	if (netif_msg_drv(emac))
->   		dev_notice(&ndev->dev, "stopped\n");
-> @@ -1072,6 +1388,30 @@ static enum netdev_tx icssm_emac_ndo_start_xmit(struct sk_buff *skb,
->   	return ret;
->   }
->   
-> +/**
-> + * icssm_emac_ndo_tx_timeout - EMAC Transmit timeout function
-> + * @ndev: The EMAC network adapter
-> + * @txqueue: TX queue being used
-> + *
-> + * Called when system detects that a skb timeout period has expired
-> + * potentially due to a fault in the adapter in not being able to send
-> + * it out on the wire.
-> + */
-> +static void icssm_emac_ndo_tx_timeout(struct net_device *ndev,
-> +				      unsigned int txqueue)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +
-> +	if (netif_msg_tx_err(emac))
-> +		netdev_err(ndev, "xmit timeout");
-> +
-> +	ndev->stats.tx_errors++;
-> +
-> +	/* TODO: can we recover or need to reboot firmware? */
-> +
-> +	netif_wake_queue(ndev);
-> +}
-> +
->   /**
->    * icssm_emac_ndo_get_stats64 - EMAC get statistics function
->    * @ndev: The EMAC network adapter
-> @@ -1100,11 +1440,86 @@ static void icssm_emac_ndo_get_stats64(struct net_device *ndev,
->   	stats->rx_length_errors = ndev->stats.rx_length_errors;
->   }
->   
-> +static int icssm_emac_hwtstamp_config_set(struct net_device *ndev,
-> +					  struct ifreq *ifr)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	struct hwtstamp_config cfg;
-> +
-> +	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
-> +		return -EFAULT;
-> +
-> +	/* reserved for future extensions */
-> +	if (cfg.flags)
-> +		return -EINVAL;
-> +
-> +	if (cfg.tx_type != HWTSTAMP_TX_OFF && cfg.tx_type != HWTSTAMP_TX_ON)
-> +		return -ERANGE;
-> +
-> +	switch (cfg.rx_filter) {
-> +	case HWTSTAMP_FILTER_NONE:
-> +		icssm_prueth_ptp_rx_ts_enable(emac, 0);
-> +		break;
-> +	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
-> +	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
-> +	case HWTSTAMP_FILTER_PTP_V2_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
-> +		icssm_prueth_ptp_rx_ts_enable(emac, 1);
-> +		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
-> +		break;
-> +	case HWTSTAMP_FILTER_ALL:
-> +	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
-> +	default:
-> +		return -ERANGE;
-> +	}
-> +
-> +	icssm_prueth_ptp_tx_ts_enable(emac, cfg.tx_type == HWTSTAMP_TX_ON);
-> +
-> +	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-> +}
-> +
-> +static int icssm_emac_hwtstamp_config_get(struct net_device *ndev,
-> +					  struct ifreq *ifr)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	struct hwtstamp_config cfg;
-> +
-> +	cfg.flags = 0;
-> +	cfg.tx_type = icssm_prueth_ptp_tx_ts_is_enabled(emac) ?
-> +		      HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
-> +	cfg.rx_filter = icssm_prueth_ptp_rx_ts_is_enabled(emac) ?
-> +			HWTSTAMP_FILTER_PTP_V2_EVENT : HWTSTAMP_FILTER_NONE;
-> +
-> +	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-> +}
-> +
-> +static int icssm_emac_ndo_ioctl(struct net_device *ndev, struct ifreq *ifr,
-> +				int cmd)
-> +{
-> +	switch (cmd) {
-> +	case SIOCSHWTSTAMP:
-> +		return icssm_emac_hwtstamp_config_set(ndev, ifr);
-> +	case SIOCGHWTSTAMP:
-> +		return icssm_emac_hwtstamp_config_get(ndev, ifr);
-> +	}
+Thanks,
 
-Sorry for not mentioning this during previous review, but currently HW
-timestamping configuration has its own set of ndo callbacks:
-.ndo_hwtstamp_get and .ndo_hwtstamp_set. Even though the old ioctl style
-is still supported as a fallback, new drivers strongly discouraged to
-use it and should implement new callbacks. One of the benefits is to
-provide better error handling using extack messages, you can think of
-it while reworking current functions.
-
-> +
-> +	return phy_do_ioctl(ndev, ifr, cmd);
-> +}
-> +
->   static const struct net_device_ops emac_netdev_ops = {
->   	.ndo_open = icssm_emac_ndo_open,
->   	.ndo_stop = icssm_emac_ndo_stop,
->   	.ndo_start_xmit = icssm_emac_ndo_start_xmit,
-> +	.ndo_tx_timeout = icssm_emac_ndo_tx_timeout,
->   	.ndo_get_stats64 = icssm_emac_ndo_get_stats64,
-> +	.ndo_eth_ioctl = icssm_emac_ndo_ioctl,
->   };
->   
->   /* get emac_port corresponding to eth_node name */
-> @@ -1205,6 +1620,14 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
->   		goto free;
->   	}
->   
-> +	emac->emac_ptp_tx_irq = of_irq_get_byname(eth_node, "emac_ptp_tx");
-> +	if (emac->emac_ptp_tx_irq < 0) {
-> +		emac->emac_ptp_tx_irq = 0;
-> +		dev_err(prueth->dev, "could not get ptp tx irq. Skipping PTP support\n");
-> +	}
-> +
-> +	spin_lock_init(&emac->ptp_skb_lock);
-> +
->   	/* get mac address from DT and set private and netdev addr */
->   	ret = of_get_ethdev_address(eth_node, ndev);
->   	if (!is_valid_ether_addr(ndev->dev_addr)) {
-
-[...]
-
-Please, put myself into CC list for the next revision, thanks.
+Paolo
 
 
