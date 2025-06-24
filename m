@@ -1,48 +1,82 @@
-Return-Path: <netdev+bounces-200752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF94AE6C0D
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:05:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC435AE6C20
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 379747AA820
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:03:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 604967ACD2B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAAA2E1728;
-	Tue, 24 Jun 2025 16:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377482E11D9;
+	Tue, 24 Jun 2025 16:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cB52xsF2"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="GsWpsWZz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03AD2E11D3;
-	Tue, 24 Jun 2025 16:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5846E3074AB
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 16:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750781101; cv=none; b=rZQls6dP14t71ZcgbwMBXvJkejpi4ChkqcFYhfPMC8e3BBFPrSZIAHL4G5QUlUJH2c5B3De+XLq4rebcXriFeBICmwyj9iVt7NTatQJCfKoppEzAJnA/6X4UwV84ncVPODCwM3VzgdUk4m+Cb9ZI1rQCWieOFIRFd+nhua16i6Y=
+	t=1750781333; cv=none; b=qIegA/+9MOxNEPEFP8c0RPOi6+IUIKtFuRvQ32c+oD+K/QHN4vH8xe84aVAgHCodJMLY0kPNVaS5pL8W9ZibTBaQQX6Z++7bJPf7nPBBCnfkW7D5MHDg6KE0x9SZDGZTW68dNl9OhdOtfzP1SiP2ztvgIZ/ExlsFAjyF5QG1KG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750781101; c=relaxed/simple;
-	bh=h35+iqWPfBuYqEWe71ovWfkRt/Oz+j7GFp+J5yhUpkw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=QsD5RoedzjBPF5eP/4W9lfyKFuoi6GO2xTmAfLPMjpcjU3ADy1HxOUXQHEIVGNsUIbODrocAmSRXtLiPAqUe9GaAJ0hmzkkauVaCuQVe+ytagAqMraALGDbvGIaJEXbIrPU6mxN33Vce8dZNW+lqHMl7yc29+GEwqASkTQ5Zb7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cB52xsF2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62569C4CEE3;
-	Tue, 24 Jun 2025 16:04:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750781100;
-	bh=h35+iqWPfBuYqEWe71ovWfkRt/Oz+j7GFp+J5yhUpkw=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=cB52xsF2NjUTAiDKSfI0ZrZPJ57Zux+QNb3QW1Adxqw/ViaxkVdbczs+N0Pla6wfY
-	 egor1k49RoEpslU9lKt0MQtc2bu3t33Ct8X66CAkVEhaEGz5wcXwFSYibfv9EMp2f2
-	 BDFlsmY/PWBz6WwtdSbheG6pfgN0vBqhE0i18m3L5K0zgrDHdwbLbX+moiP1Enhd1V
-	 5+V5E5eIVhJnWE4CAso5wz3s1d3mWojeroH0Lx0o9BO7VId1PwyCcQquFBXVhxZg1J
-	 5tol9sNvylVgmyYvpUoJg11Oc8n2PXZmVQfuOTJhIq7IbS2O6Tj6VtAkY1f0EpaLLV
-	 uySCiiImtfErQ==
-Message-ID: <eb5e2b27-58a9-4ee4-a1d8-b2df8ecbd13a@kernel.org>
-Date: Tue, 24 Jun 2025 18:04:54 +0200
+	s=arc-20240116; t=1750781333; c=relaxed/simple;
+	bh=FHd2sb7X1KnMiTkFvomFX2j5X/HR7YHKbCz5mptOfPw=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=tl8OPcRrSf8uhhemD/pBrnGVcqLRd4qz9Cu5tsU06eA/v3oKw5emYsW5e4XPVKS4GOlPBdhBB56mXXWlJvm89BFx/GkWpTQYhk+oMfhK/paW8smPUUUSCbugUWrLHbOJa47gbPtPvSD+9nSrAJ2gFi5Ncy6g2aYP9BTdmBVVuWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=GsWpsWZz; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ad8a6c202ffso1038493266b.3
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 09:08:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jacekk.info; s=g2024; t=1750781329; x=1751386129; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WY8CeVnLl9pE8ZwyaPrNepgc1WZAVINyiA3X1eItW5M=;
+        b=GsWpsWZzs69Pg70rgj9TLuZlOZ3ig2AY9sBVJlb7hOEdieQbd4/v7pR5StqALdhIJ6
+         4UZk8ZLth3+dkZ2yTpt1ud5QcyPmPsuILunOvirqf6S/ck3KpnTlfSazcyQ2owpuS66h
+         XWiWQcY6nq5iiN+krn1lenxSYKME6UFuAFQNSUPkm4dG7Zj3rp9jKry6qi9GHOnx++Fe
+         SJQ0+ZviDTqLkCQ/CiVntToIKc18L1p6mi8ZUHLn7xEZicQL/MB9I8hzT7+OWs2Uge5d
+         BAZC2cQAdsCwPRkeMu2/+Lcns5FuIqUAgMuGqXQc4wqpWp4UY6tpqzC+aABk9355TAsk
+         cYyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750781329; x=1751386129;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WY8CeVnLl9pE8ZwyaPrNepgc1WZAVINyiA3X1eItW5M=;
+        b=SadIwpJeR+1oSPMdSz7fEypB/bNG5cxPLYOsLFqY+6BmjKdkuB1018+LBydDfikw+t
+         KMAh7STK0flBRSS5fchKOej1GqgCCtAJGbmvtKdaOCYSUF2FwbV6HFs+tVFp2XDuM/Z5
+         C53Pf2V/6zjnswjzwsfVMKX5n52/lsMvr4Dd+ZALF4T6Epade0Y4k94H2FsspyjWR/qS
+         /NK6FFwwGW1YAnyFNnY4c+yZoWMzSBFH2jhhOXaN8Oz41jYpIs0P2pMzBY9neqxpqL9b
+         xGyZk2qdPmtMVlamD91IJ9vw0ThxhQUSwcRJYeaGs/tFYTU0si4HfdAw12WfN+Gnp7+l
+         PPdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWS+nlX3pESKfdrc0yrIvrVq1cxiuzf5tYN0x9kxQdLsDUto6fLALbv2TxVE3KHh2m2aqYu+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmWYCbcIJBqfdbtVBlKn67lznbPtJrkxlkbSDUJuyYOCb+/fKy
+	QftW12EJhEa/dMXTFXCF4Vog+SndhVH1thmTfUHhhPs0ayIg8mEn5wx8AtOs5MNNRuVtICoZMe5
+	Lud2FNw==
+X-Gm-Gg: ASbGncvdhQJtBmOgRP2YNwXuwq4flbtLRJZrvrQv+oYnWtd4dDabjJhCjthJJuElzBD
+	Qoi8vqf67h576n3joOGDidagyIIHAOq2XZw+/4vYn0hjML35lIqun2q+aIeTOIcQAoyvZtpZQbj
+	iJWNeaF6KVDw6YJIyhyiLL4OGY29RTlfp9H+ogMHLvd0ZlAS3N1NkIGIGXCwNqMC1LJSGWxLzTE
+	0O/mrnkdNIpQKU8xT6/oRMIAKlFEeUlQ/PuhL1TpG5kjUqhTAdQeiSzh6sWijejFCppLvIf55/u
+	BEk+hVyV3Qh8anMDdGb5QNiwTkgWvsRqcX47DyEBYthuOka8oYUaM/kKZ4fkM2IJ
+X-Google-Smtp-Source: AGHT+IH2pH0T6i3mZs7TAt1UWsCRfOAa+jl9+T0R72UNW3AbWhpd89UJ/JuJJF5f5GKRJDyujV2Y+w==
+X-Received: by 2002:a17:907:9809:b0:ad8:9c97:c2eb with SMTP id a640c23a62f3a-ae0579c1161mr1750959466b.19.1750781328829;
+        Tue, 24 Jun 2025 09:08:48 -0700 (PDT)
+Received: from [192.168.0.114] ([91.196.212.106])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae053e7f949sm896228366b.34.2025.06.24.09.08.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 09:08:48 -0700 (PDT)
+From: Jacek Kowalski <jacek@jacekk.info>
+X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
+Message-ID: <b4a3ddf4-c03f-426d-868a-f6e75cda179a@jacekk.info>
+Date: Tue, 24 Jun 2025 18:08:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,89 +84,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/29] dt-bindings: reset: Add MediaTek MT8196 Reset
- Controller binding
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
- sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- p.zabel@pengutronix.de, richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com, wenst@chromium.org,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- kernel@collabora.com
-References: <20250624143220.244549-1-laura.nao@collabora.com>
- <20250624143220.244549-11-laura.nao@collabora.com>
- <ae13aeea-bf44-49e5-82c6-5e369ea96d84@kernel.org>
+Subject: Re: [PATCH v2 2/2] e1000e: ignore factory-default checksum value on
+ TGP platform
+To: Simon Horman <horms@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
+ <b7856437-2c74-4e01-affa-3bbc57ce6c51@jacekk.info>
+ <20250624095313.GB8266@horms.kernel.org>
+ <cca5cdd3-79b3-483d-9967-8a134dd23219@jacekk.info>
+ <20250624160304.GB5265@horms.kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <ae13aeea-bf44-49e5-82c6-5e369ea96d84@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20250624160304.GB5265@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 24/06/2025 18:03, Krzysztof Kozlowski wrote:
-> On 24/06/2025 16:32, Laura Nao wrote:
->> From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
->>
->> Add a binding for the PEXTP0/1 and UFS reset controllers found in
->> the MediaTek MT8196 Chromebook SoC.
->>
->> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
->> Signed-off-by: Laura Nao <laura.nao@collabora.com>
->> ---
->>  .../reset/mediatek,mt8196-resets.h            | 26 +++++++++++++++++++
->>  1 file changed, 26 insertions(+)
->>  create mode 100644 include/dt-bindings/reset/mediatek,mt8196-resets.h
+>>>> +	if (hw->mac.type == e1000_pch_tgp && checksum == 
+>>>> (u16)NVM_SUM_FACTORY_DEFAULT) {
+>>> 
+>>> I see that a similar cast is applied to NVM_SUM. But why? If 
+>>> it's not necessary then I would advocate dropping it.
+>> 
+>> It's like that since the beginning of git history, tracing back to
+>> e1000(...)
+>> 
+>> I'd really prefer to keep it as-is here for a moment, since 
+>> similar constructs are not only here, and then clean them up 
+>> separately.
 > 
-> No improvements.
+> Ok. But can we look into cleaning this up as a follow-up?
 
-I see the license got fixed, so half improvements. My other comment stays.
+Sure, I'll prepare the patch and send it once this series is applied.
 
-Respond to the comments instead.
-
+-- 
 Best regards,
-Krzysztof
+   Jacek Kowalski
 
