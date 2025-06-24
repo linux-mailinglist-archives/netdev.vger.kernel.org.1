@@ -1,85 +1,135 @@
-Return-Path: <netdev+bounces-200801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D82DAE6EFF
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:58:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 877ACAE6F30
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC82B1BC5301
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:58:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41B4D1BC57B6
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 19:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96CD2E7632;
-	Tue, 24 Jun 2025 18:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1B923F294;
+	Tue, 24 Jun 2025 19:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNbViHY2"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="kquHlrsy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834C42E610B;
-	Tue, 24 Jun 2025 18:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7384170826
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 19:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750791475; cv=none; b=WEH3O5KkhN7WumhIdQthwxkgcrF6q2Pdd1rRD/7Kyjnhi9QC/u5ZtZ9PK6+gPvh5dxVjb/5p83VuQkoKnxtMUp6ihZPmqD13C/Qhn0oKtP4J1X8YjqY62k5IEFifjBcz8e1to6iKI5c1D8Q4zyOz5bdpbeRkf7C2C8s4D08goik=
+	t=1750792077; cv=none; b=fn+vroq1ERw9ZYVxPBWSc0ctboFowIoLnIYfie1Y4T9UBB5OuOcTdC3qMVGlqEWoX8S7LDqsWS3bpOKeOY1W2RWommlHmvKFPAW5sr6qUzDgTvJFi+IKxvU2pXYWWNb5cBe8oIraj0pY9jR7YgxPi34mcjP6ivOoN8KIkL+x/NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750791475; c=relaxed/simple;
-	bh=R/JVNUFj56dzmZhKFXGohO6nydxwlPaGPwn8nVusUnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TN/vdjb2k4MQd2lSkR0qpsa/+WMPPQ500DdYNXvecfG2MmE9RvuKaON9vZuZvH8fPGD/vC6iae3Jm/dBATujqSMK2uzoJy10KjxjQPYVSfxGLhbuHwtmoxsvXNlOlrU+q7EPyFMY2pJTMu9c4XqHeVbge6BVTO2y37KNz5q53+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNbViHY2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4A42C4CEE3;
-	Tue, 24 Jun 2025 18:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750791475;
-	bh=R/JVNUFj56dzmZhKFXGohO6nydxwlPaGPwn8nVusUnI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WNbViHY2K+SwdcW8JnCXPeCEHtQzcaPv0wZteqZPV8cANhRlE36/5DhKIxccCoyPv
-	 0xH/1zqO8ljaBeqamvXH595RYjZ3mBWG4xtjtIcJupN9S19P07+WGCIunk22jn5rpK
-	 g3UX5GGXhiXDrQwL2Ucu41arHPCx990LLgSSvJtkWzWhnDC67OpiQRq2Q+EmeRWTsC
-	 xoK38lvxzee2mfC+erkGNEtFqx6h+PKTIgdn1wSOWELfz9W/Sg2eh7VrrKIV6IRLeU
-	 LkrnlX9gIhv6tS4KS1rWh04+sCuj8x89S4jS1ZCOaTcXTOUdJvqBrsA5yIXD0yGA8L
-	 iHAjv4QmPxfHg==
-Date: Tue, 24 Jun 2025 19:57:49 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, saeedm@nvidia.com,
-	gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	moshe@nvidia.com, Vlad Dogaru <vdogaru@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>
-Subject: Re: [PATCH net-next v2 5/8] net/mlx5: HWS, Decouple matcher RX and
- TX sizes
-Message-ID: <20250624185749.GH1562@horms.kernel.org>
-References: <20250622172226.4174-1-mbloch@nvidia.com>
- <20250622172226.4174-6-mbloch@nvidia.com>
+	s=arc-20240116; t=1750792077; c=relaxed/simple;
+	bh=sxIRZ7U7XYll/So+u7OsleqjjWxUynavdKFiDTxCkKU=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:Content-Type; b=OYC+MD8sWX3OxxBszZrmz0l/JrWYXFdcPs2S7sYJgimf5dtAhhDFJqXh8e0mruo1QJDseghA2+op/3BFn9oi2KOnPrHoSdafmQ0MmJImI4pjZ4QjhviXvB/X4mcOqYI4y/j/4L0CqfhFIueabv994ZH/7Z/825rOvJ/4eoKIkDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=kquHlrsy; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-606fdbd20afso1609600a12.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 12:07:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jacekk.info; s=g2024; t=1750792074; x=1751396874; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eJQJ0Vu8gTyCcrO4fPQFn2fQBjqLwI2YwZex6LvwDks=;
+        b=kquHlrsyZNigQeEcwCrzO0nX88AcfO9ed6AGqBtxnCtCaQdu9XbkrUbXTzJOH+YTOS
+         rvmXRTYESsAVyhKA9eUAZN8mL1DeVAMo2UH55Npb2UZxCH+QRsPd7Gmvbj4DtWuP3EzC
+         VPhyYYIJNVqemC7PYEGAd+jxhvBnYoEPRxE7rrI1ffTXIrJ4rdD9wnCseCLnOLe+EIai
+         6HdRDcR4DWLg3GQGApNGm0WpWj6Vqxwy0IqIFYZ2YF8hw4QzLXVEKf5dTZdMK87jFO/a
+         w5tQg0O19hr01r0DjnVHg2sNXleGpX89WwEdbbK3kDZd6XBao+64D6ekDhVKoIHMpxZH
+         afgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750792074; x=1751396874;
+        h=content-transfer-encoding:content-language:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eJQJ0Vu8gTyCcrO4fPQFn2fQBjqLwI2YwZex6LvwDks=;
+        b=VCATsKvfh3XfgENelVNE1wTfNvxCGDxmfNxUt+Htd4yRJQmTVxeXDxOwo0iUIWqvpE
+         1jqBON5MNQldfbFw6is8+OFLDeDm4aId+DUrplLlVf49Wtv45cvb/JkKK3zZfK5MUgdt
+         UhyIo3mLmahnRz900zW1C0J8cVABzAeBGRC8O4wV8b/uRmXZBRHG0/ohqwLPePObmqHT
+         2mWK09lE5YZYSu3LjKuHtfBkPUJXGvhMWXNUTaFG1y642VrS3g0AfOs7v6m0wYArrZEI
+         QILU5y15IXdvwj8FT1089m4ra0xcZNS4FUk6WZ4yvTHb7fou7A+gVrQq0bDzt7jiBB/A
+         szYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUcEUaaDMlw39kbG17HC1OwV1/E58XJsFT3OI7nidwRuqiUppqKSPXWhLJ/NemFehZCbb+q5XA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9s3Y7QkRoy27LB0Hs6Jn/G5+TVMr1tIVDjbKDrSfFj+JqgU4F
+	wMqqpdSpNu3d6uicB0kejXgteoKmWWACFAQH1gOCXfkrOnRjaQdjZ4n+bTn38v0VRA==
+X-Gm-Gg: ASbGncthDY02hu/GroEi2y7ysWK1DEdSKOO+B/x/rZVWfMMI5Wel2s9fuKcRcM1X/fk
+	Zm+PMjOXcR3Vp8dttycrc+Us4u/SeyQHGMUAdSWdM1wVXDnUBJz3GfFEKGLRr48zaOUD+Wc1k3/
+	ehNWo0zwdhZ9emv+6QeBSzcGMvShBq84W0yoxBDchyzKu8eM4P2k/WYRvqrf4W39HsksLo8a7hd
+	l1P0qSDCuxfJrUAiRYnMdlDgsmRQHnuU2P1j/4jjadNo5ul/L9MXOl40t/POUQcdvHmM6gwsy1g
+	q3n12wxpsjmioeF628iFJTbSYVPcDB4reP1OSaHGAtKkYjfO8IAVvxDxt3ZHoPVn7RWexnj6d8Y
+	=
+X-Google-Smtp-Source: AGHT+IGdso6nJiUlE/UjdgGSmYH2YhJqVjspC86fwFUyasVpFQXUKxKTYUHp5V8lCpYT3UTfmnZPNA==
+X-Received: by 2002:a17:906:33d0:b0:ae0:66e8:9ddb with SMTP id a640c23a62f3a-ae0be86cb38mr41522566b.19.1750792073935;
+        Tue, 24 Jun 2025 12:07:53 -0700 (PDT)
+Received: from [192.168.0.114] ([91.196.212.106])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0b7f473b0sm63844466b.6.2025.06.24.12.07.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 12:07:53 -0700 (PDT)
+From: Jacek Kowalski <jacek@jacekk.info>
+X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
+Message-ID: <91030e0c-f55b-4b50-8265-2341dd515198@jacekk.info>
+Date: Tue, 24 Jun 2025 21:07:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250622172226.4174-6-mbloch@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v3 1/2] e1000e: disregard NVM checksum on tgp when valid
+ checksum mask is not set
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jun 22, 2025 at 08:22:23PM +0300, Mark Bloch wrote:
-> From: Vlad Dogaru <vdogaru@nvidia.com>
-> 
-> Kernel HWS only uses FDB tables and, as such, creates two lower level
-> containers (RTCs) for each matcher: one for RX and one for TX. Allow
-> these RTCs to differ in size by converting the size part of the matcher
-> attribute to a two element array.
-> 
-> Signed-off-by: Vlad Dogaru <vdogaru@nvidia.com>
-> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+As described by Vitaly Lifshits:
 
+> Starting from Tiger Lake, LAN NVM is locked for writes by SW, so the
+> driver cannot perform checksum validation and correction. This means
+> that all NVM images must leave the factory with correct checksum and
+> checksum valid bit set. Since Tiger Lake devices were the first to have
+> this lock, some systems in the field did not meet this requirement.
+> Therefore, for these transitional devices we skip checksum update and
+> verification, if the valid bit is not set.
+
+Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
 Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM checksum")
+Cc: stable@vger.kernel.org
+---
+v1 -> v2: updated patch description
+v2 -> v3: no changes
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index 364378133526..df4e7d781cb1 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -4274,6 +4274,8 @@ static s32 e1000_validate_nvm_checksum_ich8lan(struct e1000_hw *hw)
+ 			ret_val = e1000e_update_nvm_checksum(hw);
+ 			if (ret_val)
+ 				return ret_val;
++		} else if (hw->mac.type == e1000_pch_tgp) {
++			return 0;
+ 		}
+ 	}
+ 
+-- 
+2.47.2
 
