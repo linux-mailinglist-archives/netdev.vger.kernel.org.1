@@ -1,127 +1,252 @@
-Return-Path: <netdev+bounces-200753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC435AE6C20
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:09:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD93AE6C21
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:09:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 604967ACD2B
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:07:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C3283A96C4
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377482E11D9;
-	Tue, 24 Jun 2025 16:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F8729ACE4;
+	Tue, 24 Jun 2025 16:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="GsWpsWZz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWLt/GVL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5846E3074AB
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 16:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9002426CE15;
+	Tue, 24 Jun 2025 16:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750781333; cv=none; b=qIegA/+9MOxNEPEFP8c0RPOi6+IUIKtFuRvQ32c+oD+K/QHN4vH8xe84aVAgHCodJMLY0kPNVaS5pL8W9ZibTBaQQX6Z++7bJPf7nPBBCnfkW7D5MHDg6KE0x9SZDGZTW68dNl9OhdOtfzP1SiP2ztvgIZ/ExlsFAjyF5QG1KG4=
+	t=1750781395; cv=none; b=nK0xaYZg+zOyHcZnzedOOppMyo1Phn+yuGbcYqmaGzHJOyKk3qNgHKpc7TWpwSKVxy2TfqiLs8QtgUNj+YDrRSUScQoxuH3+wswvg+GpcKphGHB6wZD+ojeXguj0EwiF+FcAcAgqCIc92aCSG5h9ygJm7ZphwkJ5/Y69qoJlsLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750781333; c=relaxed/simple;
-	bh=FHd2sb7X1KnMiTkFvomFX2j5X/HR7YHKbCz5mptOfPw=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tl8OPcRrSf8uhhemD/pBrnGVcqLRd4qz9Cu5tsU06eA/v3oKw5emYsW5e4XPVKS4GOlPBdhBB56mXXWlJvm89BFx/GkWpTQYhk+oMfhK/paW8smPUUUSCbugUWrLHbOJa47gbPtPvSD+9nSrAJ2gFi5Ncy6g2aYP9BTdmBVVuWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=GsWpsWZz; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ad8a6c202ffso1038493266b.3
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 09:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1750781329; x=1751386129; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WY8CeVnLl9pE8ZwyaPrNepgc1WZAVINyiA3X1eItW5M=;
-        b=GsWpsWZzs69Pg70rgj9TLuZlOZ3ig2AY9sBVJlb7hOEdieQbd4/v7pR5StqALdhIJ6
-         4UZk8ZLth3+dkZ2yTpt1ud5QcyPmPsuILunOvirqf6S/ck3KpnTlfSazcyQ2owpuS66h
-         XWiWQcY6nq5iiN+krn1lenxSYKME6UFuAFQNSUPkm4dG7Zj3rp9jKry6qi9GHOnx++Fe
-         SJQ0+ZviDTqLkCQ/CiVntToIKc18L1p6mi8ZUHLn7xEZicQL/MB9I8hzT7+OWs2Uge5d
-         BAZC2cQAdsCwPRkeMu2/+Lcns5FuIqUAgMuGqXQc4wqpWp4UY6tpqzC+aABk9355TAsk
-         cYyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750781329; x=1751386129;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WY8CeVnLl9pE8ZwyaPrNepgc1WZAVINyiA3X1eItW5M=;
-        b=SadIwpJeR+1oSPMdSz7fEypB/bNG5cxPLYOsLFqY+6BmjKdkuB1018+LBydDfikw+t
-         KMAh7STK0flBRSS5fchKOej1GqgCCtAJGbmvtKdaOCYSUF2FwbV6HFs+tVFp2XDuM/Z5
-         C53Pf2V/6zjnswjzwsfVMKX5n52/lsMvr4Dd+ZALF4T6Epade0Y4k94H2FsspyjWR/qS
-         /NK6FFwwGW1YAnyFNnY4c+yZoWMzSBFH2jhhOXaN8Oz41jYpIs0P2pMzBY9neqxpqL9b
-         xGyZk2qdPmtMVlamD91IJ9vw0ThxhQUSwcRJYeaGs/tFYTU0si4HfdAw12WfN+Gnp7+l
-         PPdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWS+nlX3pESKfdrc0yrIvrVq1cxiuzf5tYN0x9kxQdLsDUto6fLALbv2TxVE3KHh2m2aqYu+0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmWYCbcIJBqfdbtVBlKn67lznbPtJrkxlkbSDUJuyYOCb+/fKy
-	QftW12EJhEa/dMXTFXCF4Vog+SndhVH1thmTfUHhhPs0ayIg8mEn5wx8AtOs5MNNRuVtICoZMe5
-	Lud2FNw==
-X-Gm-Gg: ASbGncvdhQJtBmOgRP2YNwXuwq4flbtLRJZrvrQv+oYnWtd4dDabjJhCjthJJuElzBD
-	Qoi8vqf67h576n3joOGDidagyIIHAOq2XZw+/4vYn0hjML35lIqun2q+aIeTOIcQAoyvZtpZQbj
-	iJWNeaF6KVDw6YJIyhyiLL4OGY29RTlfp9H+ogMHLvd0ZlAS3N1NkIGIGXCwNqMC1LJSGWxLzTE
-	0O/mrnkdNIpQKU8xT6/oRMIAKlFEeUlQ/PuhL1TpG5kjUqhTAdQeiSzh6sWijejFCppLvIf55/u
-	BEk+hVyV3Qh8anMDdGb5QNiwTkgWvsRqcX47DyEBYthuOka8oYUaM/kKZ4fkM2IJ
-X-Google-Smtp-Source: AGHT+IH2pH0T6i3mZs7TAt1UWsCRfOAa+jl9+T0R72UNW3AbWhpd89UJ/JuJJF5f5GKRJDyujV2Y+w==
-X-Received: by 2002:a17:907:9809:b0:ad8:9c97:c2eb with SMTP id a640c23a62f3a-ae0579c1161mr1750959466b.19.1750781328829;
-        Tue, 24 Jun 2025 09:08:48 -0700 (PDT)
-Received: from [192.168.0.114] ([91.196.212.106])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae053e7f949sm896228366b.34.2025.06.24.09.08.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 09:08:48 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <b4a3ddf4-c03f-426d-868a-f6e75cda179a@jacekk.info>
-Date: Tue, 24 Jun 2025 18:08:47 +0200
+	s=arc-20240116; t=1750781395; c=relaxed/simple;
+	bh=M6uEX7e+Ykhb4ds0M3HNx9O9nYKLer5bd704yut+IuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oSfbXnE/9MysRLbAyTPSwnSd3JcBqfb3DNiKk2Gyl9tmhgszacWcvW/qyHUmauvUObthkgnrJkyJpMxEB1Q9bGW7RTT3zd7l/qakUZDbpfKyVshT2lbSyDtIRMpRxCpbOxoIy/veKkY44ngS75ZeEnZeyPieNiZ973nIfANF7Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWLt/GVL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED1FC4CEE3;
+	Tue, 24 Jun 2025 16:09:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750781395;
+	bh=M6uEX7e+Ykhb4ds0M3HNx9O9nYKLer5bd704yut+IuU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MWLt/GVLejZ43KnwRu1UDl3fEGUQqlG6u+K52CwQDAq0SwVhc6uO/1a9NMfczx93E
+	 hw8BkGw3qoE/J0/ywWq/wBpLQ8TzMtJjiyv1wHfd2mqYth9WtZd3xKvQKAJkoR6S8Y
+	 KEJ5vDuSi3P48YHP62XdLRTSM9eD8RIrUHJQEUkVGXGT54cx8/oxJblVvMeKtoAfwt
+	 fFMcU4qAZ65HwVSPOkHTzMNlHsBaxUWVs7xXxqgweakBCXWv9HjOdv6/SPDy4OkclX
+	 aqG5BH5ZpFE1VhgbgqeUrNwWo9qzR6hql9mPr1G8jYtDWYL6un7Z73vKtDVuUJHDek
+	 E7yEM7Xv4VfeA==
+Date: Tue, 24 Jun 2025 09:09:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v4 0/4] net: selftest: improve test string
+ formatting and checksum handling
+Message-ID: <20250624090953.1b6d28e6@kernel.org>
+In-Reply-To: <aFphGj_57XnwyhW1@pengutronix.de>
+References: <20250515083100.2653102-1-o.rempel@pengutronix.de>
+	<20250516184510.2b84fab4@kernel.org>
+	<aFU9o5F4RG3QVygb@pengutronix.de>
+	<20250621064600.035b83b3@kernel.org>
+	<aFk-Za778Bk38Dxn@pengutronix.de>
+	<20250623101920.69d5c731@kernel.org>
+	<aFphGj_57XnwyhW1@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] e1000e: ignore factory-default checksum value on
- TGP platform
-To: Simon Horman <horms@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
- <b7856437-2c74-4e01-affa-3bbc57ce6c51@jacekk.info>
- <20250624095313.GB8266@horms.kernel.org>
- <cca5cdd3-79b3-483d-9967-8a134dd23219@jacekk.info>
- <20250624160304.GB5265@horms.kernel.org>
-Content-Language: en-US
-In-Reply-To: <20250624160304.GB5265@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
->>>> +	if (hw->mac.type == e1000_pch_tgp && checksum == 
->>>> (u16)NVM_SUM_FACTORY_DEFAULT) {
->>> 
->>> I see that a similar cast is applied to NVM_SUM. But why? If 
->>> it's not necessary then I would advocate dropping it.
->> 
->> It's like that since the beginning of git history, tracing back to
->> e1000(...)
->> 
->> I'd really prefer to keep it as-is here for a moment, since 
->> similar constructs are not only here, and then clean them up 
->> separately.
+On Tue, 24 Jun 2025 10:26:02 +0200 Oleksij Rempel wrote:
+> On Mon, Jun 23, 2025 at 10:19:20AM -0700, Jakub Kicinski wrote:
+> > On Mon, 23 Jun 2025 13:45:41 +0200 Oleksij Rempel wrote:  
+> > > On Sat, Jun 21, 2025 at 06:46:00AM -0700, Jakub Kicinski wrote:  
+> > > > On Fri, 20 Jun 2025 12:53:23 +0200 Oleksij Rempel wrote:  
+> > > > > Let me first describe the setup where this issue was observed and my findings.
+> > > > > The problem occurs on a system utilizing a Microchip DSA driver with an STMMAC
+> > > > > Ethernet controller attached to the CPU port.
+> > > > > 
+> > > > > In the current selftest implementation, the TCP checksum validation fails,
+> > > > > while the UDP test passes. The existing code prepares the skb for hardware
+> > > > > checksum offload by setting skb->ip_summed = CHECKSUM_PARTIAL. For TCP, it sets
+> > > > > the thdr->check field to the complement of the pseudo-header checksum, and for
+> > > > > UDP, it uses udp4_hwcsum. If I understand it correct, this configuration tells
+> > > > > the kernel that the hardware should perform the checksum calculation.
+> > > > > 
+> > > > > However, during testing, I noticed that "rx-checksumming" is enabled by default
+> > > > > on the CPU port, and this leads to the TCP test failure.  Only after disabling
+> > > > > "rx-checksumming" on the CPU port did the selftest pass. This suggests that the
+> > > > > issue is specifically related to the hardware checksum offload mechanism in
+> > > > > this particular setup. The behavior indicates that something on the path
+> > > > > recalculated the checksum incorrectly.    
+> > > > 
+> > > > Interesting, that sounds like the smoking gun. When rx-checksumming 
+> > > > is enabled the packet still reaches the stack right?    
+> > > 
+> > > No. It looks like this packets are just silently dropped, before they was
+> > > seen by the stack. The only counter which confirms presence of this
+> > > frames is HW specific mmc_rx_tcp_err. But it will be increasing even if
+> > > rx-checksumming is disabled and packets are forwarded to the stack.  
+> > 
+> > If you happen to have the docs for the STMMAC instantiation in the SoC
+> > it'd be good to check if discarding frames with bad csum can be
+> > disabled. Various monitoring systems will expect the L4 checksum errors
+> > to appear in nstat, not some obscure ethtool -S counter.  
 > 
-> Ok. But can we look into cleaning this up as a follow-up?
+> Ack. I will it add to my todo.
+> 
+> For proper understanding of STMMAC and other drivers, here is how I currently
+> understand the expected behavior on the receive path, with some open questions:
+> 
+> Receive Path Checksum Scenarios
+> 
+> * No Hardware Verification
+>     * The hardware is not configured for RX checksum offload
+>       or does not support the packet type, passing the packet to the driver
+>       as-is.
+>     * Expected driver behavior: The driver should set the packet's state to
+>       `CHECKSUM_NONE`, signaling to the kernel that a software checksum
+>       validation is required.
+> 
+> * Hardware Verifies and Reports All Frames (Ideal Linux Behavior)
+>     * The hardware is configured not to drop packets with bad checksums.
+>       It verifies the checksum of each packet and reports the result (good
+>       or bad) in a status field on the DMA descriptor.
+>     * Expected driver behavior: The driver must read the status for every
+>       packet.
+>         * If the hardware reports the checksum is good, the driver should set
+>           the packet's state to `CHECKSUM_UNNECESSARY`.
+>         * If the hardware reports the checksum is bad, the driver should set
+>           the packet's state to `CHECKSUM_NONE` and still pass it to the
+>           kernel.
+>     * Open Questions:
+>         * When the hardware reports a bad checksum in this mode, should the
+>           driver increment `rx_crc_errors` immediately? Or should it only set
+>           the packet's state to `CHECKSUM_NONE` and let the kernel stack find
+>           the error and increment the counter, in order to avoid
+>           double-counting the same error?
 
-Sure, I'll prepare the patch and send it once this series is applied.
+Driver can increment its local counter. It doesn't matter much.
 
--- 
-Best regards,
-   Jacek Kowalski
+But one important distinction, we're talking about layer 3 and up
+checksums. IPv4 checksum, and TCP/UDP checksums. Those are not CRC.
+The HW _should_ discard packets with bad CRC / Layer 2 checksum
+unless the NETIF_F_RXALL feature is enabled.
+
+> * Hardware Verifies and Drops on Error
+>     * The hardware's RX checksum engine is active and configured to
+>       automatically discard any packet with an incorrect checksum before it is
+>       delivered to the driver.
+>     * Open Questions:
+> 
+>         * When reporting these hardware-level drops, what is the most
+>           appropriate existing standard `net_device_stats` counter to use
+>           (e.g., `rx_crc_errors`, `rx_errors`)?
+
+I'd say rx_errors, most likely to be noticed.
+
+>         * If no existing standard counter is a good semantic fit, add new
+>           standard counters?
+
+Given this is behavior we don't want to encourage I think adding a
+standard stat would send the wrong signal.
+
+>         * If the "drop on error" feature cannot be disabled independently,
+>           and reporting the error via a standard counter is not feasible,
+>           does this imply that the entire RX checksum offload feature must be
+>           disabled to ensure error visibility?
+
+Probably not, users should also monitor rx_errors.
+
+> * Hardware Provides Full Packet Checksum (`CHECKSUM_COMPLETE`)
+>     * The hardware calculates a single checksum over the entire packet and
+>       provides this value to the driver, without needing to parse the
+>       L3/L4 headers.
+
+Not entire, it skips the base Ethernet header (first 14 bytes)
+
+>     * Expected driver behavior: The driver should place the checksum provided
+>       by the hardware into the `skb->csum` field and set the packet's state
+>       to `CHECKSUM_COMPLETE`.
+
+Correct.
+
+> > > > If so does the frame enter the stack with CHECKSUM_COMPLETE or
+> > > > UNNECESSARY?    
+> > > 
+> > > If rx-checksumming is enabled and packet has supported ethertype,
+> > > then CHECKSUM_UNNECESSARY will be set. Otherwise CHECKSUM_NONE.
+> > >   
+> > > > > When examining the loopbacked frames, I observed that the TCP checksum was
+> > > > > incorrect. Upon further investigation, the xmit helper in net/dsa/tag_ksz.c
+> > > > > includes the following:
+> > > > > 
+> > > > > if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
+> > > > >     return NULL;
+> > > > > 
+> > > > > I assume skb_checksum_help() is intended to calculate the proper checksum when
+> > > > > CHECKSUM_PARTIAL is set, indicating that the software should complete the
+> > > > > checksum before handing it to the hardware. My understanding is that the STMMAC
+> > > > > hardware then calculates the checksum for egress frames if CHECKSUM_PARTIAL is
+> > > > > used.    
+> > > > 
+> > > > stmmac shouldn't touch the frame, note that skb_checksum_help() sets
+> > > > skb->ip_summed = CHECKSUM_NONE; so the skb should no longer be considered
+> > > > for csum offload.    
+> > > 
+> > > It looks like skb_checksum_help(), which is used in tag_ksz.c, generates
+> > > a TCP checksum without accounting for the IP pseudo-header. The
+> > > resulting checksum is then incorrect and is filtered out by the STMMAC
+> > > HW on ingress  
+> > 
+> > The pseudo-header csum is filled in net_test_get_skb(), where it calls
+> > tcp_v4_check(). But I think you're right, it's incorrect. Could you try:
+> > 
+> > diff --git a/net/core/selftests.c b/net/core/selftests.c
+> > index 35f807ea9952..1166dd1ddb07 100644
+> > --- a/net/core/selftests.c
+> > +++ b/net/core/selftests.c
+> > @@ -160,8 +160,10 @@ static struct sk_buff *net_test_get_skb(struct net_device *ndev,
+> >         skb->csum = 0;
+> >         skb->ip_summed = CHECKSUM_PARTIAL;
+> >         if (attr->tcp) {
+> > -               thdr->check = ~tcp_v4_check(skb->len, ihdr->saddr,
+> > -                                           ihdr->daddr, 0);
+> > +               int l4len;
+> > +
+> > +               l4len = skb->tail - skb_transport_header(skb);
+> > +               thdr->check = ~tcp_v4_check(l4len, ihdr->saddr, ihdr->daddr, 0);
+> >                 skb->csum_start = skb_transport_header(skb) - skb->head;
+> >                 skb->csum_offset = offsetof(struct tcphdr, check);
+> >         } else {
+> > 
+> > Or some such?  
+> 
+> Ah, it works now!
+> 
+> So, for my understanding:
+> - does skb_checksum_help() rely on a precalculated and integrated
+>   pseudo-header csum?
+> - And is this how typical HW-accelerated checksumming works?
+> - Is this why it is called CHECKSUM_PARTIAL, because only one part of the
+>   checksum is pre-calculated?
+
+IDK why it's called PARTIAL, your guess seems reasonable :)
+And yes on the other questions. PARTIAL means the HW is supposed to do
+a csum over a linear buffer and write it where pointed without header
+parsing. Because of how UDP and TCP define the csum for them that means
+the csum field has to be set to the pseudo header csum.
+
+Let me send the fix officially.
 
