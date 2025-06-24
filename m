@@ -1,168 +1,122 @@
-Return-Path: <netdev+bounces-200574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F807AE620F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:18:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A777AE624A
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:23:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11432406BFB
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:17:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD2BD19231CC
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D3E27AC31;
-	Tue, 24 Jun 2025 10:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E19D28E576;
+	Tue, 24 Jun 2025 10:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrI5DA8H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZH/e3B8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A78C25743D
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722E028641D
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750760280; cv=none; b=ccFqFx7yT2IJuwlcOnJS813s37PEXzxq/fJdxtKmy08LUMoWujICweoKH9U69bqcGuRgykL39bEcYYhPiSErLT8XWdeEHF1SLBA+r2bIKxVpRjXDlQ2DLS3tEZgH14go3qJPhXLTIMLQatSL22oQ3wb/lMPn5hpYb871L+VhPQE=
+	t=1750760532; cv=none; b=INzEf3pWaWEV/afYzxbK1MAxy4tuVP0w5JzYlRTOB1JLmwzgsC5tAenMUJj7mL07hLQ0l/xhtS/+AjNL5t3WkmWQisWcSvp62dXncEiWthKs6DmCO052SJobsgoefBUf4XxDl6SwIGNosXRNwMOB93aYioONqcNvVR3qqgWB7eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750760280; c=relaxed/simple;
-	bh=yxsot7li7aWDbMpJ2M7l364+PdHRsIkunx/znJIFHqg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qUIwspXVmuhRx49+kw2QpNEP3nDz0eGVITNjkyFPjuck2UoOPBskaOBQBbGZof0LkAdXvwTXI5MNOsN0l10YQlSNgwS/kFlK7AOy2+x84jHxu4LYvf65EuKcTLH9/x0k0AhgMHhEpaRQUGRGFYrTixtaZS4l49gFXqWKmkucHqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OrI5DA8H; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1750760532; c=relaxed/simple;
+	bh=EAplqW2ugJAkvDa+aOJIODUp0iAnSPiEybzJg50wrII=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i17thWzSgxhlLbUHK5SirLXg7y7eVZnJczXqFiV/swsg8FytAt8oMLplazIazuPSA5jeOOC6Mnu/davi2/DPsi+pRYtFCuuooxwmVVeauV9U9HO0fW+uIj6xmuZo2LcfdhhXv5O+WJmUD8fPShACJSFXqegsUGTiEWshBkGWqt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZH/e3B8; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750760278;
+	s=mimecast20190719; t=1750760530;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+Ln5HyZtk161hcYqwhzfMAZcN7gULO9uaQ38rDIrK1c=;
-	b=OrI5DA8HTTgU616DVfh8LjHprq3PBVscNX2h0uz39bJ7fpMPMnsAwSFooGpn81NEXqmJZs
-	MOtPkpGwVmO+370np92LOyG5VRc4MJhFq1XDy8IqYjx6lHjZTUNgo7IBr+klvtQ6vAh29W
-	sKQJrAePY70O3Uldt7FQjvLJuTm+4gQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LBSg8EY7sp1BX+AXcNCVD/E1en0mg8rYiqbGQhd2mHE=;
+	b=OZH/e3B8jD/NDnWCNQVONEXGbmYO6p9dOnUYwmkmaLJ0XXT7NaGgFbnvxrSpy4FEvweRre
+	m+S2qf5mVjy9GTF2mbQNtmfC+c5ttmh1x/bQVkOwWNmWtyVKzrN/WOjeWv8F4e+HR2e0yz
+	hDtw4IY3btBv/PIcuvCN8Hd9n49u/lc=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-446-3RGt-XiLPQuLANd5DaIOLg-1; Tue, 24 Jun 2025 06:17:57 -0400
-X-MC-Unique: 3RGt-XiLPQuLANd5DaIOLg-1
-X-Mimecast-MFC-AGG-ID: 3RGt-XiLPQuLANd5DaIOLg_1750760276
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a579058758so2219093f8f.1
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:17:56 -0700 (PDT)
+ us-mta-649-vTNLBEhDOPuPIPZB9SYsxw-1; Tue, 24 Jun 2025 06:22:07 -0400
+X-MC-Unique: vTNLBEhDOPuPIPZB9SYsxw-1
+X-Mimecast-MFC-AGG-ID: vTNLBEhDOPuPIPZB9SYsxw_1750760526
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ade6db50b9cso30104666b.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:22:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750760276; x=1751365076;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Ln5HyZtk161hcYqwhzfMAZcN7gULO9uaQ38rDIrK1c=;
-        b=kkrc4iatEMp6rJPV9OAN0IFpKIwtJQd9mhKFFmXaOwgQoU4O/gMx2CSrtdk9r3GxGD
-         dP5PEHXxDRgg1HatEXis3SbBbXQBoPnExxYlR6XD+hc8LP1xcakXsjBXgDtAFYlJpAGo
-         79ED1EaSarA4+9f7dwWCWzcpfCfkJXRIYlb8x6bN+skX3yftGO+8h82b3KtiJLwPFUq9
-         Du1pBO06rYQo7PzfBiD8iRlTxHNf8/dHfru6bWzaxiY3vhwNeIMrWxRJ0E95dgPrVJa8
-         i53m/I/fs5EM05cynWQk/pnviziIVU0sJNimTATGT3okwyBHugVQd0Ib6IrHFwd2UA7J
-         4RRA==
-X-Forwarded-Encrypted: i=1; AJvYcCW377cpl7CIGyLrqGL7kE/rhO2aIwM+IYZgxyKoWKyWWQq5YnnYFiO+uljTmZj8zPS0U11ziRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo0YhKGzGOlEtXwZoglhvRKPeb5u7Z/hjmT2v42tLyskg96v0V
-	fFYr6RGH//6Y3kg+iB//Jnezx/OOgxcakFWARF1QdTDjX23tDXmIXOFasA8e4IFfwkZQn93iLFW
-	rlwRoLGNYikWPuIZn634ph37+W9e8vWhbXFYoY9M8f3vRrWVw2/LyeT3Afg==
-X-Gm-Gg: ASbGncvSExKabKsl331MgNTfWAoUkc3qydrwF+l4Rh/aajsIuLvsIUXdVPnviS+Gbkr
-	R/1PuTnZ9JCbmX1ETtEdnkzVGGURpUFyHtfMSbCN5PvMqyLGmgSkOHQGqYsqhcCtBxujz1B7xHg
-	WUmUa2QGFEpwxABpdgEFzT+KVZC8MZXcNAjoUQ1oRr7kBqv5AATWj0JVlSvkwAViVLfcGPXgmHl
-	VIm7OQdq9uxNX6MP9DRAvyqp3T0mscWoDgOGXuugRn6FNr8JRalJaFpik4mA4spFSSUANlKre/r
-	ji2iPxXVdhpjsuwkBdswrC/ruByhVw==
-X-Received: by 2002:a05:6000:2008:b0:3a4:f902:3872 with SMTP id ffacd0b85a97d-3a6d129da9fmr11398659f8f.19.1750760275745;
-        Tue, 24 Jun 2025 03:17:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEC4ngUxIcnD6ERbm/m/k7RkxkipdZ9Ie1YqBmuu6Vuw2RA4r/70TZrgIw6mV8PBPv7d8OamQ==
-X-Received: by 2002:a05:6000:2008:b0:3a4:f902:3872 with SMTP id ffacd0b85a97d-3a6d129da9fmr11398635f8f.19.1750760275245;
-        Tue, 24 Jun 2025 03:17:55 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2445:d510::f39? ([2a0d:3344:2445:d510::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535e97adf3sm169365045e9.8.2025.06.24.03.17.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 03:17:54 -0700 (PDT)
-Message-ID: <e6654755-3aa1-4f4b-a6ab-c7568d8a5d4e@redhat.com>
-Date: Tue, 24 Jun 2025 12:17:53 +0200
+        d=1e100.net; s=20230601; t=1750760526; x=1751365326;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LBSg8EY7sp1BX+AXcNCVD/E1en0mg8rYiqbGQhd2mHE=;
+        b=KQJbcWIHfMT6RMR7E04dEofeq//PDEaTH46zv7AYrn8YF3XYkXGtPq7S0afWam4L0U
+         TTACzkK/EDbzapi4i06IOonQc5XMKxqoGW9BOjoFaWBTvv2fjIx3hvOVOoJO2wDRiTmV
+         hPeVL2SWHdsHFTu2dUxRiYAIGM1ZEd+mg2F4mRKXxW7TQmtuwJCW8kVnZasnLRivGn7i
+         bu/e8Fl9xKRgFFvVavey6PoeGb6dc4N7Z56MNroeDLn8T18DcxyVXa4AXPZ621/1itGg
+         CMNHfWh+dzGMtPkHnIi36pf3WJo7Jl38vJwxFwCXfYU5pPiPK4bCsFcXf9nfvUxwC3Lo
+         wW3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWoqe61iZd9jLhlpK10esUd5JDBJdB6tSiA2Y2FhY90176uv9G6b5LPYieLlQATc1wSPDW6QLw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqDRAXoSicckm8ciHhJqLZDTh0zYunfMum26fY44eulnOCaBgr
+	UGrsv3LVx0EBcglqjzxWVHU5dpoKdIzmOCeTcfzFjYDXcxw9SOOi7dZlPk2I7kHCVci1Lo3CPZV
+	Pe2q1BGnbpglM+n4WYwpsUxEj0hFE0M5iw0dYdsGRZPDGHQHnZDJbmRc2AfHOOq+9HA4bv2k0hW
+	rcXy8wdXW/MPq+H6w+AUZEq90xGJNKe+T9
+X-Gm-Gg: ASbGncvH6uMqdnZxke6XqHzbBL0sOx/gf9FGnVeG50F0CHD9qojAwGcSi+uXE/HIhG+
+	5pWcjCwL0djGWDgPM4DG0xcCnJfj5QeiiCIgKPHZ7p9WLy7t95+tBKBXCrj4+bmpviaa80O3uLo
+	kFpLzh
+X-Received: by 2002:a17:906:8924:b0:ae0:ad5c:4185 with SMTP id a640c23a62f3a-ae0ad5c4bb6mr127041666b.57.1750760525915;
+        Tue, 24 Jun 2025 03:22:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK7idR9ddwSthjp78IPlVH980PF43V9ofMCipwNRyRw+Vq3cABVYLahb6LovHNST8gpasNwDNrhBfNArPnPZc=
+X-Received: by 2002:a17:906:8924:b0:ae0:ad5c:4185 with SMTP id
+ a640c23a62f3a-ae0ad5c4bb6mr127039766b.57.1750760525506; Tue, 24 Jun 2025
+ 03:22:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] virtio-net: xsk: rx: move the xdp->data
- adjustment to buf_to_xdp()
-To: Bui Quang Minh <minhquangbui99@gmail.com>, netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20250621144952.32469-1-minhquangbui99@gmail.com>
- <20250621144952.32469-3-minhquangbui99@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250621144952.32469-3-minhquangbui99@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250617001838.114457-1-linux@treblig.org> <CAJaqyWfD1xy+Y=fn1x8uXTMQuq8ewVV9MsttzCxLACJJZg2A2Q@mail.gmail.com>
+In-Reply-To: <CAJaqyWfD1xy+Y=fn1x8uXTMQuq8ewVV9MsttzCxLACJJZg2A2Q@mail.gmail.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Tue, 24 Jun 2025 18:21:28 +0800
+X-Gm-Features: Ac12FXzfQeWK8ouZps9YTtPNR42ROlRbSB3jIfmuYcflJDxiz6fBrlpSiur_mHY
+Message-ID: <CAPpAL=xgBK3qqNdaiR=OwbiMaA_5VpouE4YfaEyYghkHxJ0CtQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] vringh small unused functions
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: linux@treblig.org, mst@redhat.com, horms@kernel.org, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/21/25 4:49 PM, Bui Quang Minh wrote:
-> This commit does not do any functional changes. It moves xdp->data
-> adjustment for buffer other than first buffer to buf_to_xdp() helper so
-> that the xdp_buff adjustment does not scatter over different functions.
-> 
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
->  drivers/net/virtio_net.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 1eb237cd5d0b..4e942ea1bfa3 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1159,7 +1159,19 @@ static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
->  		return NULL;
->  	}
->  
-> -	xsk_buff_set_size(xdp, len);
-> +	if (first_buf) {
-> +		xsk_buff_set_size(xdp, len);
-> +	} else {
-> +		/* This is the same as xsk_buff_set_size but with the adjusted
-> +		 * xdp->data.
-> +		 */
-> +		xdp->data = xdp->data_hard_start + XDP_PACKET_HEADROOM;
-> +		xdp->data -= vi->hdr_len;
-> +		xdp->data_meta = xdp->data;
-> +		xdp->data_end = xdp->data + len;
-> +		xdp->flags = 0;
-> +	}
-> +
->  	xsk_buff_dma_sync_for_cpu(xdp);
->  
->  	return xdp;
-> @@ -1284,7 +1296,7 @@ static int xsk_append_merge_buffer(struct virtnet_info *vi,
->  			goto err;
->  		}
->  
-> -		memcpy(buf, xdp->data - vi->hdr_len, len);
-> +		memcpy(buf, xdp->data, len);
->  
->  		xsk_buff_free(xdp);
->  
+Tested this series of patches with virtio-net regression tests,
+everything works fine.
 
-I'm unsure if this change is in the right direction because it almost
-open-code the existing xsk_buff_set_size() helper - any changes there
-should be reflected here, too.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-Also AFAICS xdp->data will now carry a different value, and I guess such
-change is user-visible from the attached xdp program. The commit message
-should at least mentions such fact.
-
-Thanks,
-
-Paolo
+On Tue, Jun 17, 2025 at 8:31=E2=80=AFPM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Tue, Jun 17, 2025 at 2:18=E2=80=AFAM <linux@treblig.org> wrote:
+> >
+> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> >
+> > Hi,
+> >   The following pair of patches remove a bunch of small functions
+> > that have been unused for a long time.
+> >
+>
+> Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+>
+> Thanks!
+>
+>
 
 
