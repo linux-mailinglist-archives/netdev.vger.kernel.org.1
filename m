@@ -1,315 +1,225 @@
-Return-Path: <netdev+bounces-200618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5302EAE6494
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:20:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD66AE64C0
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:24:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B81C400FA3
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:18:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F75B188D248
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96F52BEC55;
-	Tue, 24 Jun 2025 12:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB75298259;
+	Tue, 24 Jun 2025 12:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Fwq8HAcr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="n0U/Rwrx"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2042.outbound.protection.outlook.com [40.107.244.42])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D40298258;
-	Tue, 24 Jun 2025 12:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F740291C12;
+	Tue, 24 Jun 2025 12:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750767284; cv=fail; b=SBdrODHZ4fyhknLZmun3inlZBSC+CeEX1Kt0HlapV3p5oUdPYyl9bil+pTr01l9AQcJKdiyjCcD4Bg6vBhYXgy+vOTyoBKal7EcJ3zUBTHRdhW6uEIqKO3O0r3sIHZI+hkyCkjdbM6F9ggsR27QcvcqvHbR19Z1LkWIuuDob/+o=
+	t=1750767532; cv=fail; b=KBfANmCYYjKAAyijFpsWoD6SgjwFhNaftWmKsDUikgV7xqQR7oxtqs16WUOWK+K7kls7hGCF0VG8PN2NH/QXzry46A0n0ny3TlWTN46cVbVvSk/cdqlaXz1/z6TKEtuVJso87RqurTixWVyZV/Y7KuYGPCDIi63+TxnwVP5WiOw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750767284; c=relaxed/simple;
-	bh=RKoWo9bGqIzzXF2xjFxek4viR8XQlFkcZWpsTQ1mElA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IwYe9ZX9x3PCOoZyRm2YvQ3UaiwtH4UUyt/Sc3BxuQpTwL5yFEniWi6QafU5/VZnSMejpDGxE6zjgv9q3oDZvugSrY29XROoanLy5LaH1CS3aPiU4FXBxLmqwd0X6/fMb13qw17+cfgVZ9bjiDxTtQEQ0+DID/O0O3FZ5jCB6VU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Fwq8HAcr; arc=fail smtp.client-ip=40.107.244.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1750767532; c=relaxed/simple;
+	bh=1Qo67fdqmZDVErn/XWSuVe62ffGcImmuZcac1ygst+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=lHQ8vwVRRtATjrKpRiAseZvTn+hQ2OvWUNcD3gBwAQQyHdmEfeLetdYEcOb9Q5ruJlExMJrB7S7qGzm9pIUO76ZPA0VYeVxPFmTI8UuNfIBAf/m7PVRvLwNg37dA16ahsMyqFmq1lMkhxwCNPrbPlxJFKcIh5qQqo53M9HgRv1k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=n0U/Rwrx; arc=fail smtp.client-ip=40.107.93.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rofExcMPTmOJO11sWeggvx0vzLO/YqxezJ5HDn9Zu//gTiI4+DcnRSXJuVtDhS6J5tICRQZMeI7bRewXUThZrs3YB5gGGdlMTmsUPGV/kAXnw8Yi9gy6Re/rK4BQv8wlKCqzNWYwhS6X2AsrfrmDYGZNE2N1DTRgL8kDHumDFnNAt/AvhWzJWvGsHyc6S0JmOvwiBwXbe1eGodWAY8gifQZFShS0Ll72947VBF5NA4TBqsbOcxwaILqvBZ2r7Mm84qo9mJN6L3zmMeeKTrqf1He1LJdspTgnyKwnPxi7YFWtukWRWQhWQfCMOggh6T4pPaLgt49MNmqQTuJK4cryJg==
+ b=MK0T7K9ikcJsj+rcAwwUzdJbWSi6a3DJTVu77wONjkf10ZRLfM5Meel7LMM3AvS9IpElvlnMvQNZ33Jp3gI7xClpjt016vy/qCP7xUE/xbu4eyDXHXUcqIG3xtrqMsuk46+Ml7JwZHvD1KhbgU/1JLAFHORxGCooib2xREWmAimnbS1a/XAhps77jzZZtpunyf1j84z+n5gbLJeM7MZaRQ2pvPHUN2B8a3rY531OlwmNm1rJETLJJyG4nb/cZkgCSqUhCHtsF9jgUi8uexD6VEbON5400yffv1CPPp5KTdLBLKktXzmOira0Rs0F1AuPPoWL8X6n4nRP3isRkOgVfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ebb1ycMDhtsLqHBlOchScTb+H/X9Y2soCSTnmRSjAec=;
- b=opIQaV2bX49p7JxwYyeQI16FBHJcfWbFzQb5iXXyilWFEbwfp0Phcw6EV3SOdHBOIXArvVnNor0PIN888eCWCS/pWFjkVXC+f0B18ZIMSKoNLFKnrVNGiHxNqrR1xY3qvnO3GDNoomLldMMGYT0sJxeLu6zjXAcrY47Igas7RPTcORMFCuiRCgY4iCK2Fy+6zMosYdwbd//OgW+1mI+IwGBkhDmb6y+/NTCT4GbMqua8c6ewGFSo9mQsKu7vxQ/a/u6PCuwXHmI1fFxbkJM9o6cJqrlmH0i/sDw/dBMywdAXvnO0Ly+IgjFkTrT/JlOuCu4TCWDIFIPHV1xaKa+kyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=fLha9285DVj7/grm5DMhOghm33y+WqnhAjlZVpKBwaE=;
+ b=XMtwuT84LIk6n1zPJt1QKzWoQPk9Le1yUWVv0pCkkKwmTqJ9oPDn3WDJ7LF5x/xwSB3lvoODv10+1Y63w/oRW9x2pquSH7vf45yMbPiBJgubkq5HWWS9u5MULtUn+uKfLr1xuerMODR4gWHCwtj4bJJvkkEIZ50zQ6jKWuNxpUJfu7Kw6R24EObvQQgeGYD5Xx20uvUUktUkGWvdsJRWFcDjBhl8USf9Us7C7tBUJDt5CUo3yr1QriAWMFBGS7tbX0+VjOxkLSmXyFodEGWsyB5m1l1ieiXaXyD+thlJGtDpZZyC2onasIVm515eol27MBnGQoOGIKO1jDdxhBF9nQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ebb1ycMDhtsLqHBlOchScTb+H/X9Y2soCSTnmRSjAec=;
- b=Fwq8HAcrXcJ3xyZhQteflRoCQ+6O2eaaDS23C+dsAsSltYzKflA+HjdefHLUcCRUlOSE1pCjQGJS6jZnH7BbnSNRQk1NdfDDgSNOK/fgPeZAyF6wNeeQ0ymC3AaKTUqYwPRHE0dvWbo1JW/+20qRuT7UkDytdgLKm7X7PMAeuP0=
-Received: from DS7PR05CA0004.namprd05.prod.outlook.com (2603:10b6:5:3b9::9) by
- LV2PR12MB5920.namprd12.prod.outlook.com (2603:10b6:408:172::20) with
+ bh=fLha9285DVj7/grm5DMhOghm33y+WqnhAjlZVpKBwaE=;
+ b=n0U/RwrxGhHyOnOhVhdImoo6yJ1wuoEarn7N6dQFru63kMO8OCpv67IOX79pwh1/JllS3xRAkILyFvYNX6U+w+hbvTcnt3XMgY4cfCm1BMBwPe86D2h/KiCXg7nN4zsCkGVg0VqW3vkZbRcfUwOCSYg/dDyu5Sjt36fk9I4NwJD0PFiGI8B64EAwfizrz9PBnSN7vE9Jy3VrbCGWYaQ5gI2YJFrjcQxRuiJr1/kmGnlWmVSBid5fPIW+s/BpzJ0KZ8WQv7sA+sP8SaqSPoE+SiztodhOIT81Z8AyEik2zrRmPUaCAm8JN0icONtn1NoeJE1gPRu7SSHoObKVExYX3w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CH3PR12MB7594.namprd12.prod.outlook.com (2603:10b6:610:140::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.22; Tue, 24 Jun
- 2025 12:14:33 +0000
-Received: from DS2PEPF00003442.namprd04.prod.outlook.com
- (2603:10b6:5:3b9:cafe::9c) by DS7PR05CA0004.outlook.office365.com
- (2603:10b6:5:3b9::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.17 via Frontend Transport; Tue,
- 24 Jun 2025 12:14:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DS2PEPF00003442.mail.protection.outlook.com (10.167.17.69) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8880.14 via Frontend Transport; Tue, 24 Jun 2025 12:14:32 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 24 Jun
- 2025 07:14:32 -0500
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 24 Jun
- 2025 07:14:32 -0500
-Received: from xhdabhijitg41x.xilinx.com (10.180.168.240) by
- SATLEXMB03.amd.com (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39
- via Frontend Transport; Tue, 24 Jun 2025 07:14:27 -0500
-From: Abhijit Gangurde <abhijit.gangurde@amd.com>
-To: <shannon.nelson@amd.com>, <brett.creeley@amd.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<corbet@lwn.net>, <jgg@ziepe.ca>, <leon@kernel.org>, <andrew+netdev@lunn.ch>
-CC: <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Abhijit Gangurde
-	<abhijit.gangurde@amd.com>
-Subject: [PATCH v3 14/14] RDMA/ionic: Add Makefile/Kconfig to kernel build environment
-Date: Tue, 24 Jun 2025 17:43:15 +0530
-Message-ID: <20250624121315.739049-15-abhijit.gangurde@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250624121315.739049-1-abhijit.gangurde@amd.com>
-References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.29; Tue, 24 Jun
+ 2025 12:18:48 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8835.027; Tue, 24 Jun 2025
+ 12:18:48 +0000
+Date: Tue, 24 Jun 2025 09:18:46 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+	Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: How to handle P2P DMA with only {physaddr,len} in bio_vec?
+Message-ID: <20250624121846.GE17127@nvidia.com>
+References: <aFlaxwpKChYXFf8A@infradead.org>
+ <2135907.1747061490@warthog.procyon.org.uk>
+ <1069540.1746202908@warthog.procyon.org.uk>
+ <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
+ <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
+ <1015189.1746187621@warthog.procyon.org.uk>
+ <1021352.1746193306@warthog.procyon.org.uk>
+ <1098395.1750675858@warthog.procyon.org.uk>
+ <1143687.1750755725@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1143687.1750755725@warthog.procyon.org.uk>
+X-ClientProxiedBy: YT2PR01CA0002.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:38::7) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003442:EE_|LV2PR12MB5920:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5613966a-dbcc-4967-f6a5-08ddb318ada6
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH3PR12MB7594:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18e0fdf2-809e-4873-d7a0-08ddb319457e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|7416014|1800799024|36860700013|921020;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Kx0P+ImZ1ciMcdOio7OfsH03ZpICCOsP7nRycGNOKikeO3x0cVepXVQbp/7Y?=
- =?us-ascii?Q?PgHg3glbefNHRjdUBx/lr+u/yAJBJrBPH4NH7QeQC8sN3+/OLbwGQ1RWg+uT?=
- =?us-ascii?Q?6xNqMDczg3n4Ja6TlGcoSaNeDcfzrgz115zZ6CSk/kA3C4tzOhf14Ut71opb?=
- =?us-ascii?Q?P+CinD16/lvCg73AYklE165KFqMWLPofSims1/VX+kU+wQijveiQ6VAMl8SO?=
- =?us-ascii?Q?er38fd1HxSe9ylAeehRaPgZoqUosOvI22rwlS7mJFmRhx1IYdmaVGYz2lQJp?=
- =?us-ascii?Q?l1v6MTCbDmNC3xRcto7nqghgXWpLT0Xtm7cI1FTo3XiW2kcwQpe3BOa6y6nG?=
- =?us-ascii?Q?2cXaWvhYQraG8OT4kY7wJ2STMYxqWXZ3x/64zDY6IsAwphXlImCf3vzYj0Db?=
- =?us-ascii?Q?VDofzIt4/dTHacATbY40g+o+3V9DNIVHCzX1S12gVQCZcuxi0Pn1SVAMwcZ0?=
- =?us-ascii?Q?ZMi7ize2wR68CtTNkuxMW/R5wmULporTGf2FOYsCZ46nY9gmDqYWp66LZjHD?=
- =?us-ascii?Q?mQbuQJRv7yPTIP+YCsyLa/lB7qrSzlvnjmUgh9Y/OwJxgXLK+NFFhINVqEHJ?=
- =?us-ascii?Q?YrSEoKWNFoQQ+8rF277XbuQ+1zpqLMFg6WUigqWQGn7+7y+g0oH6GhrZMlfp?=
- =?us-ascii?Q?DASd9dSYDDjg8gxdokIAY46hucvYUoWqQ9sdNHwRKDqDRa40fE+MOqbvNU9o?=
- =?us-ascii?Q?xYPzcB1q8Dh4uPti/c+J6TSKFQy96xQ0htBlp0B+F4XRlPIteL5JWJhJgrlX?=
- =?us-ascii?Q?lFPXNA6h6ZuqgYI2tnMCp7hSzVcxhPr+9izb8MdVlWF44Kx+LRWV1Knv4o6t?=
- =?us-ascii?Q?KVAdpZe+l2vWTdtsib/0EzCfDvczZfChkp13/Gmod9OigQi7u3AVLVEdGz7b?=
- =?us-ascii?Q?o/hp47wNfb2Fup2kAPq7VbN8wv19/FKxajessuLeQLXStXQlCCub3JqCki4v?=
- =?us-ascii?Q?O2ApOjGFLr5TKj5r+vTN7+FvxdTlObyGKHDTwPCAhGVY9X1rON0qZJnlowmP?=
- =?us-ascii?Q?kbB4ozDdin9LI4tunRHCOiu55FN0wxchV/LzuqgMaOfB1Z/bx+JvLZekNCfA?=
- =?us-ascii?Q?S0s9UJpgZXKSr4vaGQnBwyZXAXFwLn+VgESsF1j/7dcWYu3oRcIHKZ8Qjhfv?=
- =?us-ascii?Q?LWpZOvt2J/6sI8G8GzCvmeUuPaMc7jCRqTk4XnQSAum8tsOar+tGUDvEiKZr?=
- =?us-ascii?Q?kdOOQ5t+tZhxj83SqThHKl1pALJJqf6clbhEWweeb5elGg958+33qbk6hm6b?=
- =?us-ascii?Q?nx2yWNKGRN7ZanpRgCu2AlhxAAfdgTdqGn7GFz54/31RCYOYWwD/2C2BB3BH?=
- =?us-ascii?Q?mCZQ2czmYfwa+db3r7tI2rQKtr1jRbRgZqz59xC1Dv/p7BRaNK8uj5AAIIvu?=
- =?us-ascii?Q?CgXsZtntzk6DbWepZqgnXL9vYR/RAjejVVlqjt4bq/LtyPpq9x/NbidSwfNl?=
- =?us-ascii?Q?ANYZL/vwmf5ooQvBGnmBnXT30ecXqpSJZyGelsbRBeVNTQObgFslnoBHH0P1?=
- =?us-ascii?Q?MIJLLUmF6OWr5EsYYW70pcmNHPNvHOKaMhMlyBoZ4O8qmHPA8+yYkCVSMQ?=
- =?us-ascii?Q?=3D=3D?=
+	=?us-ascii?Q?6AgfjJusFXxPQoqD+WyHjkifvm3L12grtITrjA3I4n4rTpe5Z0Htpm67G181?=
+ =?us-ascii?Q?oaYwYj17D5X6Tl0/dtQ5KyrJNafOZJ4wIjS7rgFvGVQoh3Aw4FewRimLJqNR?=
+ =?us-ascii?Q?DZRvLzkUEdCB5RDED/qjpCx8mXiudru7QKf2jtOZWOmqihbRBqeZjs+TrSJD?=
+ =?us-ascii?Q?RgNGIAKp74g9t9+OA2habq/o0rp4pz85NsMn/uzBHNUUoNmRvcBWFDgJ+DJT?=
+ =?us-ascii?Q?BDA+OMP/ZHkABL8xMm1v7+aGd1iQO4EY+3ejzNXGK8xADK6uFCO+LTwvdymc?=
+ =?us-ascii?Q?bnRzQzA4sAF3TwFQitkfSsidpCSZUirOi15a5xUMAF5uTryVS9KtqvM0bl8u?=
+ =?us-ascii?Q?qeKVo8OCumM4W6zldNo0VXyJ0o3oT5Z7Zj02XXYS3QnvOyHQHB5G/Fh2BByM?=
+ =?us-ascii?Q?1sQr0iLCeljplLYZ5GPDelt1p9Td53Fwr2qRrENNZ0krX94zfqUtyvwHV3L2?=
+ =?us-ascii?Q?LW0DWbxiKi+St4HGaFopToIEbXv74oJECnPs+fazH/n49MAkbNWlebr03fuc?=
+ =?us-ascii?Q?Umy13/y8NaIJOnl+4cTpCWAX83CTIT6C5kwY1WLUCZ3+svdpRgtw+gHOagt0?=
+ =?us-ascii?Q?FxZg55/JbEoG2o1ZEBBhwed/ELXkHGKvgw1MSvOQM303okgt29vQr01cr958?=
+ =?us-ascii?Q?yym9+ibRVK+pOKAH7fODA3qOq/9jHPqBZ6RGLTNFBfcnkSn5xdupbIkGuCcM?=
+ =?us-ascii?Q?svCd6nbaILWpaUwAxTerlxA+itvXpvHe8Q4ox2rTGpqa1zOoBFOsFQ23XaWU?=
+ =?us-ascii?Q?hPUJa8tMourcNBv+sfjMclvYod71gcq8QNIFFYnhO0l4h4pU2PwNkMl3bsZg?=
+ =?us-ascii?Q?VyF/N9ql7vBdIfJ22CRJp3Ox+22EWFlJm4CzFQpBgTk5ZSP+OBnKlxUFH6hC?=
+ =?us-ascii?Q?1BckV62Ehakz6XUYBpggIDVFACIL0VcuLS8eBNmJa292MvBuDi9sbbafyYT7?=
+ =?us-ascii?Q?UuEaXVA36YGO4Jo+du7mz3ecD6kZgUh9JwpAWBqj+aU5wl4PRTXtAW0ZS79W?=
+ =?us-ascii?Q?RAspEeRkWvLt+1/KrDsZR8y+GKWP3iJ+Otq7Qc/2NDsCHnAvS3yTzT3XIouQ?=
+ =?us-ascii?Q?mNNKes+ljkO4naCE3C0lriuPG9TNSX5DBXwzSFC14B1+/kqEpc8orH62KNYH?=
+ =?us-ascii?Q?vmlailsp6GlrUTHKfrRJIiYa0ZTUVB/psxwmdoJcqVRYKpqQpVWPB4zuETSL?=
+ =?us-ascii?Q?6daeeMm/nJVGty5VfpEFPJPz3CKRQfqkp6sa5iLoB9pNZxKVN0pN1PB2MpMZ?=
+ =?us-ascii?Q?5erjlLFowVn14xmZrS39p/3nyCcXU1fDv+8PNQLBaa2s1rN5Go5A/8yrFRc/?=
+ =?us-ascii?Q?TmPpqwGcN8z27pzXWl91F9m7iEhdvnLsSYqfmk8o9JGIUsTIspgAXFeljl4H?=
+ =?us-ascii?Q?ga8amcwNEaWA7hytEkSnGQdzZ18lX3xkrIM5X3CRCprSy5Fx+LkDOh+u3j+X?=
+ =?us-ascii?Q?u3Lt8HStgIY=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(7416014)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 12:14:32.9666
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lrauL5sTMNfAZKnBxcMSyHdCftAi4mDZ1EyUVKDIKsjO6UANIj8bOl009csP?=
+ =?us-ascii?Q?6ftKvehLzF9zoTB5r3GeojhSfm/unsIVPctdHJ28MYd6VXTSfSVNxrXIgvSP?=
+ =?us-ascii?Q?swyyWKWBocEY5be99RQmbFmhDTLJHBlazXp04CO0zb+Hc7fHuTQG3/Dth1i4?=
+ =?us-ascii?Q?GEsVNG0YVo0Slh8OmmTVvgcjbil0NvnCsqgwS5z6FlEVRHoOUg09Y2yOQ5dV?=
+ =?us-ascii?Q?e4zAAj8/VS1tWAJkseSo8LxolDoBuA+F/1CrimIlvjJ+/+Qoss+5BEJUEI5a?=
+ =?us-ascii?Q?oinu3Y681b0DSjHiYhHyrM8ezfPbC8KdCYgtHtOXLxWjNP6F2PuzPeia1HJZ?=
+ =?us-ascii?Q?2AEYjBrHKEBOPnhHaB/XQHoMR8hn7NNBZgfk2iVQfw4hqpgrjGqJtBYDllUC?=
+ =?us-ascii?Q?+yye1pAycfqaC0KW/TyRr2Mjw2jftw1qjoFHfCZG6GVzVpX5opl7PSB8oL2W?=
+ =?us-ascii?Q?7H7HL/t0yvdxK+EFakzpFEqepObzyxEWIHkjtO8+GpDbkT2v1XvEB4e/Wi8l?=
+ =?us-ascii?Q?alDD5v3HJFJ4U8ZSbjXVRzHXh9IKa3kJtMcpOeWuPtHH6hdaAZxwR+WrH2Vo?=
+ =?us-ascii?Q?vwhQ8tvo3dA7plUAeNei3CyRxVjrGLM55YMjhsGMsiwnfGRxRp4BOArslaDj?=
+ =?us-ascii?Q?ngoLPhXbcBepm8FSVxilKnqkH0i7+T331bwW5Ej0tkI+2J9FM2ikyPr6insE?=
+ =?us-ascii?Q?E9NJCu0Qm0ebBkCNbwr6G8hfnGsvMcqHxOcT4HGQVxWrWI/We7Ge+eM6hZhC?=
+ =?us-ascii?Q?aafjZpjE3e0b60jbsBMaX/weHFTOcycDhMQoZiln4xUumfuidrwuehQLUvox?=
+ =?us-ascii?Q?3yi6AIYGTtcMFqfmJoDGytuyhuB2LcM72R3LtT90WopSv0NdPDBx6gKxPsfU?=
+ =?us-ascii?Q?cK6lHCsJ2Y55rooJITtw+I7Y70xblAGmmoiH990F50ccsgw8EZsZcdtofY61?=
+ =?us-ascii?Q?19mZcDHctAAsiCR2WWCjqFczTUF7u9FjRiDlm7ERUFIZZEg8tVzCtfvXVICj?=
+ =?us-ascii?Q?mR3s9N2J6OAPKA7DHbHWQX5vGeanznClNw8ImcXpZ/OymDS3fK5GZ9tpXYwx?=
+ =?us-ascii?Q?WZndIVso+QOhSUk3l3iEzeeAQVg3AHiLCLzHjT4IQN0iJMAjUF3vmCg6z4Fu?=
+ =?us-ascii?Q?zY83SXKASPytawboaHwK5qYwFHu0Y/W1FGQOvU1dkn3YvdMzzAwvAGBVA+U6?=
+ =?us-ascii?Q?I+1EKCn0jkmkzHp3EBp3KwwrPQ5/2oosl1+bqqGTid+1W7qPj83FpX6IjipB?=
+ =?us-ascii?Q?BJeSSXc65neYq3LhC6t0x+TvdesFw1XkRUJoiRXU/SY66htltJhW2Gq1F2Iq?=
+ =?us-ascii?Q?mAmHOa4F+825EDDksK80cwqcy4APCKk+krFTMa/EcvSltadGg3BQ7/lU/kvy?=
+ =?us-ascii?Q?baExxJtg5BtGUk94qK+f4vxs5ai3jZhyVeHi69LsHy0bsmyn6y5YzeBctAAL?=
+ =?us-ascii?Q?BvM0l155jIhNkvdQMHLfyui/ZeANDehGCZqh9zNi7fs2UQMYo4PPxTOJbU1Q?=
+ =?us-ascii?Q?6L0c2RkjfQzuUi/KfSnCheLONvcemWc+jcttfzFFbpb5SVzqZUA7kXxv/JKF?=
+ =?us-ascii?Q?dRpugoxbNctZMk68CcY=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18e0fdf2-809e-4873-d7a0-08ddb319457e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 12:18:48.2290
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5613966a-dbcc-4967-f6a5-08ddb318ada6
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003442.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5920
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MhlDdHmuo5FZmOtXQ8+vWWKgyJRWFRWpG3oKNrlM3v6AlqhvDJ2KsqecejrqZd28
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7594
 
-Add ionic to the kernel build environment.
+On Tue, Jun 24, 2025 at 10:02:05AM +0100, David Howells wrote:
+> Christoph Hellwig <hch@infradead.org> wrote:
+> 
+> > On Mon, Jun 23, 2025 at 11:50:58AM +0100, David Howells wrote:
+> > > What's the best way to manage this without having to go back to the page
+> > > struct for every DMA mapping we want to make?
+> > 
+> > There isn't a very easy way.  Also because if you actually need to do
+> > peer to peer transfers, you right now absolutely need the page to find
+> > the pgmap that has the information on how to perform the peer to peer
+> > transfer.
+> 
+> Are you expecting P2P to become particularly common?  
 
-Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
-Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
----
-v2->v3
-  - Removed select of ethernet driver
-  - Fixed make htmldocs error
+It is becoming common place in certain kinds of server system
+types. If half the system's memory is behind PCI on a GPU or something
+then you need P2P.
 
- .../device_drivers/ethernet/index.rst         |  1 +
- .../ethernet/pensando/ionic_rdma.rst          | 43 +++++++++++++++++++
- MAINTAINERS                                   |  9 ++++
- drivers/infiniband/Kconfig                    |  1 +
- drivers/infiniband/hw/Makefile                |  1 +
- drivers/infiniband/hw/ionic/Kconfig           | 15 +++++++
- drivers/infiniband/hw/ionic/Makefile          |  9 ++++
- 7 files changed, 79 insertions(+)
- create mode 100644 Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
- create mode 100644 drivers/infiniband/hw/ionic/Kconfig
- create mode 100644 drivers/infiniband/hw/ionic/Makefile
+> Do we actually need 32 bits for bv_len, especially given that MAX_RW_COUNT is
+> capped at a bit less than 2GiB?  Could we, say, do:
+> 
+>  	struct bio_vec {
+>  		phys_addr_t	bv_phys;
+>  		u32		bv_len:31;
+> 		u32		bv_use_p2p:1;
+>  	} __packed;
+> 
+> And rather than storing the how-to-do-P2P info in the page struct, does it
+> make sense to hold it separately, keyed on bv_phys?
 
-diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-index 139b4c75a191..4b16ecd289da 100644
---- a/Documentation/networking/device_drivers/ethernet/index.rst
-+++ b/Documentation/networking/device_drivers/ethernet/index.rst
-@@ -50,6 +50,7 @@ Contents:
-    neterion/s2io
-    netronome/nfp
-    pensando/ionic
-+   pensando/ionic_rdma
-    smsc/smc9
-    stmicro/stmmac
-    ti/cpsw
-diff --git a/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
-new file mode 100644
-index 000000000000..80c4d9876d3e
---- /dev/null
-+++ b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
-@@ -0,0 +1,43 @@
-+.. SPDX-License-Identifier: GPL-2.0+
-+
-+============================================================
-+Linux Driver for the AMD Pensando(R) Ethernet adapter family
-+============================================================
-+
-+AMD Pensando RDMA driver.
-+Copyright (C) 2018-2025, Advanced Micro Devices, Inc.
-+
-+Contents
-+========
-+
-+- Identifying the Adapter
-+- Enabling the driver
-+- Support
-+
-+Identifying the Adapter
-+=======================
-+
-+See Documentation/networking/device_drivers/ethernet/pensando/ionic.rst
-+for more information on identifying the adapter.
-+
-+Enabling the driver
-+===================
-+
-+The driver is enabled via the standard kernel configuration system,
-+using the make command::
-+
-+  make oldconfig/menuconfig/etc.
-+
-+The driver is located in the menu structure at:
-+
-+  -> Device Drivers
-+    -> InfiniBand support
-+      -> AMD Pensando DSC RDMA/RoCE Support
-+
-+Support
-+=======
-+
-+For general Linux rdma support, please use the rdma mailing
-+list, which is monitored by AMD Pensando personnel::
-+
-+  linux-rdma@vger.kernel.org
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3f35ebff0b41..e0aee7c025b1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1165,6 +1165,15 @@ F:	Documentation/networking/device_drivers/ethernet/amd/pds_core.rst
- F:	drivers/net/ethernet/amd/pds_core/
- F:	include/linux/pds/
- 
-+AMD PENSANDO RDMA DRIVER
-+M:	Abhijit Gangurde <abhijit.gangurde@amd.com>
-+M:	Allen Hubbe <allen.hubbe@amd.com>
-+L:	linux-rdma@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
-+F:	drivers/infiniband/hw/ionic/
-+F:	include/uapi/rdma/ionic-abi.h
-+
- AMD PMC DRIVER
- M:	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
- L:	platform-driver-x86@vger.kernel.org
-diff --git a/drivers/infiniband/Kconfig b/drivers/infiniband/Kconfig
-index 3a394cd772f6..f0323f1d6f01 100644
---- a/drivers/infiniband/Kconfig
-+++ b/drivers/infiniband/Kconfig
-@@ -85,6 +85,7 @@ source "drivers/infiniband/hw/efa/Kconfig"
- source "drivers/infiniband/hw/erdma/Kconfig"
- source "drivers/infiniband/hw/hfi1/Kconfig"
- source "drivers/infiniband/hw/hns/Kconfig"
-+source "drivers/infiniband/hw/ionic/Kconfig"
- source "drivers/infiniband/hw/irdma/Kconfig"
- source "drivers/infiniband/hw/mana/Kconfig"
- source "drivers/infiniband/hw/mlx4/Kconfig"
-diff --git a/drivers/infiniband/hw/Makefile b/drivers/infiniband/hw/Makefile
-index df61b2299ec0..b706dc0d0263 100644
---- a/drivers/infiniband/hw/Makefile
-+++ b/drivers/infiniband/hw/Makefile
-@@ -14,3 +14,4 @@ obj-$(CONFIG_INFINIBAND_HNS_HIP08)	+= hns/
- obj-$(CONFIG_INFINIBAND_QEDR)		+= qedr/
- obj-$(CONFIG_INFINIBAND_BNXT_RE)	+= bnxt_re/
- obj-$(CONFIG_INFINIBAND_ERDMA)		+= erdma/
-+obj-$(CONFIG_INFINIBAND_IONIC)		+= ionic/
-diff --git a/drivers/infiniband/hw/ionic/Kconfig b/drivers/infiniband/hw/ionic/Kconfig
-new file mode 100644
-index 000000000000..de6f10e9b6e9
---- /dev/null
-+++ b/drivers/infiniband/hw/ionic/Kconfig
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2018-2025, Advanced Micro Devices, Inc.
-+
-+config INFINIBAND_IONIC
-+	tristate "AMD Pensando DSC RDMA/RoCE Support"
-+	depends on NETDEVICES && ETHERNET && PCI && INET && IONIC
-+	help
-+	  This enables RDMA/RoCE support for the AMD Pensando family of
-+	  Distributed Services Cards (DSCs).
-+
-+	  To learn more, visit our website at
-+	  <https://www.amd.com/en/products/accelerators/pensando.html>.
-+
-+	  To compile this driver as a module, choose M here. The module
-+	  will be called ionic_rdma.
-diff --git a/drivers/infiniband/hw/ionic/Makefile b/drivers/infiniband/hw/ionic/Makefile
-new file mode 100644
-index 000000000000..957973742820
---- /dev/null
-+++ b/drivers/infiniband/hw/ionic/Makefile
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+ccflags-y :=  -I $(srctree)/drivers/net/ethernet/pensando/ionic
-+
-+obj-$(CONFIG_INFINIBAND_IONIC)	+= ionic_rdma.o
-+
-+ionic_rdma-y :=	\
-+	ionic_ibdev.o ionic_lif_cfg.o ionic_queue.o ionic_pgtbl.o ionic_admin.o \
-+	ionic_controlpath.o ionic_datapath.o ionic_hw_stats.o
--- 
-2.43.0
+I though we had agreed these sorts of 'mixed transfers' were not
+desirable and we want things to be uniform at this lowest level.
 
+So, I suggest the bio_vec should be entirely uniform, either it is all
+CPU memory or it is all P2P from the same source. This is what the
+block stack is doing by holding the P2P flag in the bio and splitting
+the bios when they are constructed.
+
+My intention to make a more general, less performant, API was to copy
+what bio is doing and have a list of bio_vecs, each bio_vec having the
+same properties.
+
+The struct enclosing the bio_vec (the bio, etc) would have the the
+flag if it is p2p and some way to get the needed p2p source metadata.
+
+The bio_vec itself would just store physical addresses and lengths. No
+need for complicated bit slicing.
+
+I think this is important because the new DMA API really doesn't want
+to be changing modes on a per-item basis..
+
+Jason
 
