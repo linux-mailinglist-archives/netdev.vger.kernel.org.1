@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-200662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 056C5AE681F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:17:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A01AE6822
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 587671777A9
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:14:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF614177395
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFDC2D5C80;
-	Tue, 24 Jun 2025 14:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474982D1911;
+	Tue, 24 Jun 2025 14:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h44hERDP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3jPnQGA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94472C3769
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 14:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221DF3FB1B
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 14:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750774318; cv=none; b=ecR55dkbMnI21nEucNXODshtBZNGnF3Khc7av6mBcJVp5OylLYmU91CzE3z4r7o6tBhVWepmf5xlHPz9g+ksjmQcs3afIZpZyTchQgB2FHjHKWVzTg3Lj0Cpd7wNHUEbd5npl2ErT4yfGusSx7ZWqpicTxk+vEd31OZTdj0bQig=
+	t=1750774393; cv=none; b=eDN/7PZgu6yb55QNe2jycrRp6lLEb7B7Fn9XZ/1lJMb5ZfnJ+Av+MOIz9HTluM3Pd9xj+f9+aukZvqgHrlsOOKjCxfRt7r0o/Cul0fM2tsB08E0gW0raxeO7ArTPl3CzsyCBws04fyKStuOQI2sY+7wM2LU3tbA27e4LOIMjKoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750774318; c=relaxed/simple;
-	bh=Kjpnc7jhHozdVRNxE70IeiSxCNBDm9jpLX1OIn8ZVyI=;
+	s=arc-20240116; t=1750774393; c=relaxed/simple;
+	bh=M7Jkij5dL6RJ8tUvYJpQZDxyKby0JHAppllMDhq7jTE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i6jlybBY1OI7P+6JU5ypAlWm2gSbkfZbZ5BuMUPB7lU3ZEYdCmTbcqL+H7LhOwBgngSznAL+8lvJTtnikPYVs5P2Df+MG+YrgH/jlB8BUr5Il1Un19+ObuaXaMHnZmlCCLwoPppR/iG6xT1n7Vh+y1NjiYEHu52uLPr505JsSRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h44hERDP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1539AC4CEEE;
-	Tue, 24 Jun 2025 14:11:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UQ+63Rq8TDUhhRfVDjPoHUMnkmJSALK8W075ymjKv6b2YUIY3dXn1t8CW5W2ASLYmnbq1JN9WcHLsS2pEISTUPEEB7l6MwnhcnhAGJIWycoMry0aJLhobenoechGkVpieZ8vThuoxI/c05zkuVerg7fVH3H12mzXpEPeI5VXfys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3jPnQGA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A87AC4CEE3;
+	Tue, 24 Jun 2025 14:13:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750774318;
-	bh=Kjpnc7jhHozdVRNxE70IeiSxCNBDm9jpLX1OIn8ZVyI=;
+	s=k20201202; t=1750774392;
+	bh=M7Jkij5dL6RJ8tUvYJpQZDxyKby0JHAppllMDhq7jTE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h44hERDPosw0Q54VnPQuXSiZpMCxJWdl8XwlcMYdslKSR1KxiuV240x2n4S+JpnAB
-	 3MT1+AZRKNB10v5wtlOs2/I8Bqxo6P59Xku5ClXII4SGRI2GsM4QXFBRB6kIOHvUa7
-	 xP5VfTDwFSOzxgDWUjZclX5x1P/a7r3Y6mOE1TrlMEV7z/RUkLlj+l7Vp84eW+tx2f
-	 VNXW9ao2nEDPXQURhrWBse+P8IsAPvW5aDX41a/9xK0cdZg5mUhsJkeVCvUO+1ChXo
-	 KHiEYsDtSR8EQa4nLzR+aOluoKb9Z1RUOH49y7ciHQpIpvNeHNkORNbB64mOpEXZge
-	 PN5nr2fBeKl6w==
-Date: Tue, 24 Jun 2025 07:11:57 -0700
+	b=F3jPnQGAI7au4SO8MDug4REqlFnHtYnksa7+W9VeTUI6ZHFzyMYL9tn7/gudbHL6n
+	 N4pXCWi4TNrUBpSJuO1F2H+0U2xg36+SMlEwWbumlJBdtW5LM3yhQ5Xsq4LWXJusNq
+	 ZaHqg4nCVFNJklDXKIa+q8gKzck8tw+yubb5hVQWx5ckB8ecgGDVsdh3JtP1P1aFZV
+	 9XRCSdsWd2hFjalqexg+N5b1aFGAaoiRkGu7nk0SDwy0jas2XoQBahM7ygc9H7WlDi
+	 1LdbkyTwv5XkX7AgoUJOSVMUDPDerfveQu+X5opw9qJbJX6QBlm/02aBtwcg3FHUD6
+	 uirrv2n3cOsSw==
+Date: Tue, 24 Jun 2025 07:13:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: jbaron@akamai.com, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, kuniyu@google.com, netdev@vger.kernel.org, Kuniyuki
- Iwashima <kuni1840@gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] netlink: Fix wraparound of
- sk->sk_rmem_alloc
-Message-ID: <20250624071157.3cbb1265@kernel.org>
-In-Reply-To: <93633df1-fa0c-49d8-b7e9-32ca2761e63f@redhat.com>
-References: <2ead6fd79411342e29710859db0f1f8520092f1f.1750285100.git.jbaron@akamai.com>
-	<20250619061427.1202690-1-kuni1840@gmail.com>
-	<20250623163551.7973e198@kernel.org>
-	<93633df1-fa0c-49d8-b7e9-32ca2761e63f@redhat.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, sdf@fomichev.me, jdamato@fastly.com,
+ ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next v2 0/8] net: ethtool: rss: add notifications
+Message-ID: <20250624071311.69e48ec4@kernel.org>
+In-Reply-To: <20250624080004.7a36543e@2a02-8440-d115-be0d-cec0-a2a1-bc3c-622e.rev.sfr.net>
+References: <20250623231720.3124717-1-kuba@kernel.org>
+	<20250624080004.7a36543e@2a02-8440-d115-be0d-cec0-a2a1-bc3c-622e.rev.sfr.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,23 +62,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 24 Jun 2025 09:55:15 +0200 Paolo Abeni wrote:
-> > To be clear -- are you saying we should fix this differently?
-> > Or perhaps that the problem doesn't exist? The change doesn't
-> > seem very intrusive..  
+On Tue, 24 Jun 2025 08:00:04 +0200 Maxime Chevallier wrote:
+> I was able to test the PLCA path, which works fine :)
 > 
-> AFAICS the race is possible even with netlink as netlink_unicast() runs
-> without the socket lock, too.
-> 
-> The point is that for UDP the scenario with multiple threads enqueuing a
-> packet into the same socket is a critical path, optimizing for
-> performances and allowing some memory accounting inaccuracy makes sense.
-> 
-> For netlink socket, that scenario looks a patological one and I think we
-> should prefer accuracy instead of optimization.
+> So, I reviewed and tested some of the ethnl patches in this series,
+> though I wasn't able to test the RSS-specific aspects.
 
-Could you ELI5 what you mean? Are you suggesting a lock around every
-sk_rmem write for netlink sockets? 
-If we think this is an attack vector the attacker can simply use a UDP
-socket instead. Or do you think it'd lead to simpler code?
+Excellent, thank you!
 
