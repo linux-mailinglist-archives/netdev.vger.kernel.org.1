@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-200588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C7E6AE6300
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:55:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD37AE6307
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:55:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79934188B27A
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AAF84A1C46
 	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E3528A724;
-	Tue, 24 Jun 2025 10:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D982528D859;
+	Tue, 24 Jun 2025 10:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="cqcL80Dt";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="MUiSjZjf"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="PrtZEFV+";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="jJg2hfgg"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E23F288C18;
-	Tue, 24 Jun 2025 10:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8931728A708;
+	Tue, 24 Jun 2025 10:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750762473; cv=none; b=pKep3dmSXIuU723+s1Q6jDJTC+2vNE65qkIZf+Z8uKPVgDATluqOZbciN3//aeOm4TnGxCbtup80pRy0ui5DRHiTuo25HgVxpLy5AYUU4+2lvkCIW75CIX5dXIEBcqq7Z6hBHJIk1jW+reqH44kFK1rcXMq+W1tMNO0dm9RQ9yc=
+	t=1750762476; cv=none; b=cuQHswggrCb80kmeGxVJR1QONdz7e7MkXAeHtC9J0jcbNhJMxK2vz0ZAGpMXOIfeQJQihV2lg/8oMpMbvtNl/K4NR3KbWp5MgXzW3PX2waLRHtqwn1n9i+nEl1u2QaBiWTNoMnAyXCzer+HZ027ZicL4xp1Hl3YoOz23Kj/eqhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750762473; c=relaxed/simple;
-	bh=xOcPBxesAS/Nvz9n6NylGrfNaFZ9cp2mNB3qlYWmfiQ=;
+	s=arc-20240116; t=1750762476; c=relaxed/simple;
+	bh=UJ2YehioMZ1SsT+I66XgoDe5jyA+65tq4LB9sCof5GA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mOU+DFU2NAPUvytlUfphFUXLISnzE8O+Q+zBrz109kEEktrNk283Vmkv7PjHj+RSCJCETuCCThFp9paUoHzSIkk13yuUcL5TrXi+oEooX2qvvVyA8nxq1qpuhMJ8gPzW4lPbFFjyu76uqx9sA3Khx3kHhpCrIYMTUC9pN4bUrZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=cqcL80Dt; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=MUiSjZjf reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+	 MIME-Version:Content-Type; b=tySvFCJTvJEByAKZNFVsY6s2IyEpNWlJxuYzv8TXdvvDX8+REMTzFGv1jFKJ6GyxQCdfcXyGM4pkFNaeS9YpaJJdKlncua/vKMJNs/oK4gt06/4Ybyftp/mEtKos2mjABJWr96KyDYwmHwgnW2wvg76o+91psvGPTBABVHKiMpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=PrtZEFV+; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=jJg2hfgg reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1750762471; x=1782298471;
+  t=1750762474; x=1782298474;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dIypQyu9izBr/7A1qOa4FEQ2MGblzldihGtaN/SHPP0=;
-  b=cqcL80DtTLN9c+vUBDEFz8E3XQF2J7E2dBSqlbJCsj+dNttHwLrM33sF
-   z+sGWRmdh6flTqT62L62fuRclAirxFhLi0YdnRj/9jxcWTGx1WPHYfCja
-   /hZiNu7PUm9NkZw/jhlRi6BVn++FAGRKblKwHKNYCXwdS44d21NW44/xv
-   v7SjNJ4+ZEQJ26LMY3M85k4GpApZW0en9lBQvT7/faZlgcSLMHGLpjwPN
-   L6WuKRKBhgVfBs2Gf1Vu70aR44+xIanZF6ttfBgO5lEe1TH12lkUC+Gyd
-   6JO5W4lkyvODYjOd7wRh3jg0GlJ+t45EotKvy+jwq/2DeisrgEsxUtzI1
-   g==;
-X-CSE-ConnectionGUID: eLKUm0CuTYGtOiwXD4x7LA==
-X-CSE-MsgGUID: szbgzfL8T7uRoTX6yCEaZQ==
+  bh=ZDrXoWnndqa2vP7h7oVAnPKn8tyXmeoTROzM7osLRaQ=;
+  b=PrtZEFV+w3QaydbQPt3mg+LEU7QdV7VUUj5Svk+/EMiXWPjxSXTlzOyd
+   GqjH4SxWi1kFDlsz35CUEgixJ41Rypo0PFeNYYAGHrNgK/BY5J+2WkRkz
+   gseqF60a7gOIxEfTFAvmSkkcLHQbB1EeJyt53hyp88HkA9wyXg0Zq+u0+
+   /+zVoNczMVcVMO1V5DRnRfJntKV0ElrDggR2LktIyo+39ykGKWJhTK7VH
+   AjVuwH4p2Eq383m0TDwVb3ZRRXzN6Yk2q4zKUDt5B4S6s5zk02npcERJh
+   Nwj84AwluwI5FTghpkljVicta1+EirzdcrbzycN9H3yBd4fDuQs057FtV
+   w==;
+X-CSE-ConnectionGUID: Y/2Wc9ADSIyEQrYh8V8o/Q==
+X-CSE-MsgGUID: 1k+kQCi2QAmp/xf/Q3TUQg==
 X-IronPort-AV: E=Sophos;i="6.16,261,1744063200"; 
-   d="scan'208";a="44816890"
+   d="scan'208";a="44816894"
 Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 24 Jun 2025 12:54:27 +0200
-X-CheckPoint: {685A83E3-18-ABFC28F4-D6731B76}
-X-MAIL-CPID: 868EC48A26FC023677F57C65E2F6EDBB_5
-X-Control-Analysis: str=0001.0A006368.685A83FF.000F,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A1823165D19;
-	Tue, 24 Jun 2025 12:54:22 +0200 (CEST)
+  by mx1.tq-group.com with ESMTP; 24 Jun 2025 12:54:32 +0200
+X-CheckPoint: {685A83E8-18-ABFC28F4-D6731B76}
+X-MAIL-CPID: 88C29F62DA19E3BAB304661456A96FB2_5
+X-Control-Analysis: str=0001.0A006377.685A83F4.000A,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A3FCB165D2D;
+	Tue, 24 Jun 2025 12:54:27 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1750762463;
+	s=dkim; t=1750762468;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dIypQyu9izBr/7A1qOa4FEQ2MGblzldihGtaN/SHPP0=;
-	b=MUiSjZjfzTSatmv3j0U1YVfQTh2qXBN1BCFlL4JzAgPYiKKxPG1qOjgcrxgQnLHnMQexIX
-	IWehI7DV5ZKXuQESQFLtA9qONwYCOckDyzxDR5carfawZLhUWvYhrBXqamOQYoszVrl7UN
-	uzw/MC6ncCbm+Cp1MAtFih8lWMSP5bqBpWFpONI1YFfVsKl+h3MgDM0UQUHBTg1Vl/fbso
-	qjdbL0mswPkuzjlhqBg8mXBDo0RuJVx8ZfzuuqnbsDTk/kXXl1HOxFCUgnp3SgBCeC3+KF
-	QhaW7kHc9NGuz/qkeU3C5Wvs412sGTabjPbjkFU2NzKtNUl6zW6YMAjPK9uyug==
+	bh=ZDrXoWnndqa2vP7h7oVAnPKn8tyXmeoTROzM7osLRaQ=;
+	b=jJg2hfggHCq7Sw+mIkyHvnYh4/i0uwxuatemB8F1wswlM1Oms4HrGNv59UmxlguwbOys6u
+	F5pg3LDXahas4XtUOGPQjjROiQRsQ9kH5rxLLR6aep6MljqRHeLUYPnjs01qMhjSNwCPEf
+	VWk7idJ3uHXt+6VEc5qFqwE+B0/LP344Z2TDpXPjwfMd8iZWOXx/f5o8gC/qnIIbmlG9Gk
+	qe1l2uszG1BQVMIRU87uywZo859O3blj096aVCi/ex/BPz3OQ2Tp7GE6LG34hLYcAGyB5Y
+	HrGUdsLpcdIQbtXFthtk4Lolwn3m8jivYmb2OR0Tfz6LBMwfwd3SyKfq0db7xg==
 From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -96,9 +96,9 @@ Cc: Dwaipayan Ray <dwaipayanray1@gmail.com>,
 	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v2 1/3] dt-bindings: net: ti: k3-am654-cpsw-nuss: update phy-mode in example
-Date: Tue, 24 Jun 2025 12:53:32 +0200
-Message-ID: <f9b5e84fcaf565506ed86cf1838444c2bc47334f.1750756583.git.matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH net-next v2 2/3] net: ethernet: ti: am65-cpsw: fixup PHY mode for fixed RGMII TX delay
+Date: Tue, 24 Jun 2025 12:53:33 +0200
+Message-ID: <9b3fb1fbf719bef30702192155c6413cd5de5dcf.1750756583.git.matthias.schiffer@ew.tq-group.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1750756583.git.matthias.schiffer@ew.tq-group.com>
 References: <cover.1750756583.git.matthias.schiffer@ew.tq-group.com>
@@ -112,31 +112,70 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-k3-am65-cpsw-nuss controllers have a fixed internal TX delay, so RXID
-mode is not actually possible and will result in a warning from the
-driver going forward.
+All am65-cpsw controllers have a fixed TX delay, so the PHY interface
+mode must be fixed up to account for this.
+
+Modes that claim to a delay on the PCB can't actually work. Warn people
+to update their Device Trees if one of the unsupported modes is specified.
 
 Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- .../devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml          | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 27 ++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
-index 7b3d948f187df..a959c1d7e643a 100644
---- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
-+++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
-@@ -284,7 +284,7 @@ examples:
-                     ti,syscon-efuse = <&mcu_conf 0x200>;
-                     phys = <&phy_gmii_sel 1>;
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index f20d1ff192efe..519757e618ad0 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -2602,6 +2602,7 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
+ 		return -ENOENT;
  
--                    phy-mode = "rgmii-rxid";
-+                    phy-mode = "rgmii-id";
-                     phy-handle = <&phy0>;
-                 };
-             };
+ 	for_each_child_of_node(node, port_np) {
++		phy_interface_t phy_if;
+ 		struct am65_cpsw_port *port;
+ 		u32 port_id;
+ 
+@@ -2667,14 +2668,36 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
+ 
+ 		/* get phy/link info */
+ 		port->slave.port_np = of_node_get(port_np);
+-		ret = of_get_phy_mode(port_np, &port->slave.phy_if);
++		ret = of_get_phy_mode(port_np, &phy_if);
+ 		if (ret) {
+ 			dev_err(dev, "%pOF read phy-mode err %d\n",
+ 				port_np, ret);
+ 			goto of_node_put;
+ 		}
+ 
+-		ret = phy_set_mode_ext(port->slave.ifphy, PHY_MODE_ETHERNET, port->slave.phy_if);
++		/* CPSW controllers supported by this driver have a fixed
++		 * internal TX delay in RGMII mode. Fix up PHY mode to account
++		 * for this and warn about Device Trees that claim to have a TX
++		 * delay on the PCB.
++		 */
++		switch (phy_if) {
++		case PHY_INTERFACE_MODE_RGMII_ID:
++			phy_if = PHY_INTERFACE_MODE_RGMII_RXID;
++			break;
++		case PHY_INTERFACE_MODE_RGMII_TXID:
++			phy_if = PHY_INTERFACE_MODE_RGMII;
++			break;
++		case PHY_INTERFACE_MODE_RGMII:
++		case PHY_INTERFACE_MODE_RGMII_RXID:
++			dev_warn(dev,
++				 "RGMII mode without internal TX delay unsupported; please fix your Device Tree\n");
++			break;
++		default:
++			break;
++		}
++
++		port->slave.phy_if = phy_if;
++		ret = phy_set_mode_ext(port->slave.ifphy, PHY_MODE_ETHERNET, phy_if);
+ 		if (ret)
+ 			goto of_node_put;
+ 
 -- 
 TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
 Amtsgericht München, HRB 105018
