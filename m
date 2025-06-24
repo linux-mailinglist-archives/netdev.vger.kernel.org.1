@@ -1,93 +1,115 @@
-Return-Path: <netdev+bounces-200458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5757AE5880
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 02:20:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9637AAE5888
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 02:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED4831B64B36
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 00:20:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F7FE1B65146
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 00:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160C6149DF0;
-	Tue, 24 Jun 2025 00:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BD2142E67;
+	Tue, 24 Jun 2025 00:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tFYY50x4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mk9Ihu/q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E618F78F37
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 00:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D1717C77
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 00:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750724392; cv=none; b=Q9ktIpfUzt4SDih0vo1yIisCzkSmCZ7GE6oFrdsEXd3JuMwUF39tEJTRuZyk83glKFhco9YRAWFhTXmf0UWFdkG7r6SBke1A4JFsyb3bZZzIcHNa3N5wbL93YXqcD5ytUfBmAbVGZM8xhLeC5fK9fKFFm8/Ah8yrHgPx8A0+UCM=
+	t=1750725008; cv=none; b=njqh1XW3PgM9VmdKeqiLuoWiOfrj+Vbn32H3e858i39ae2PKiWh5u0GY0GCvKVaHZ/0vF/wLpAMe1elAfoKRdAe003mWxiPZx4POfbTG51ROS2XHQtBUaaXjMTR0EjNM0pTL71bn/X7oLdT9DV7xusu3NCkSD+Akw3DVqnsksa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750724392; c=relaxed/simple;
-	bh=UrRx5RDfs3/nGOPLJf1Ak2BsTin4Q5Jj0C/rEaUBPc4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HaNb1wFfmNDkGvUrlXTjI5PxJ74ZE25LsbwQEjFy46kY/L4/hzQOmGf7QXFhkGjQ7DXJ7fPW4Eu9IY2+6PhWGYBBpbknI4LBPiEyPswCtKwmarmo8LxpBcSxAtQWklLjxNEFOKCBFnpa6+KdvfE504g6KnuWfxu3Wz45JjCGh0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tFYY50x4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CF99C4CEEA;
-	Tue, 24 Jun 2025 00:19:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750724391;
-	bh=UrRx5RDfs3/nGOPLJf1Ak2BsTin4Q5Jj0C/rEaUBPc4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tFYY50x4i3R6lOlx4o7TULgxzbthYDblIQ2rMRJi2kAeL5w6AJRGi4cNTgW9h1H8C
-	 S4Z3E6zJ2mfNVeBLP0srHQgve6Z1cv02swftCup/SlnX5+wDXUZYGgA7v28TwW6df6
-	 wXEN46ql5I5eDJ+jx4vxqYJ6DWisNcPieNjSJwmjfpVK/f7fKTT5+hCwa3Yugb825D
-	 hJe0bE3eIQa9hwP3pM3Lihy1h1kKkuOtEPjHB/5FWGrc1I58k/N3VJ2AllDO1riNYQ
-	 5aCmz2/y4aE8nrdLWcIzPq+LKjQP64MJikZzwvJKowl0+8R47M7/FhH24BCOwa5Apq
-	 9934OigAHL5MQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD8939FEB7D;
-	Tue, 24 Jun 2025 00:20:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1750725008; c=relaxed/simple;
+	bh=M3dT3Lmb9P6DmC2Z6O4e6DegMD+JK3r2HsY4a9sPCkU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=tZwppOq2EqAxCfgfWBWigrUlAFrq/RdhUOCrPxmhhd4kxaQK19fOBg4VjHa3olBUE/1xBjCXzfLwhIszWQt/mZ+M9qMP8DhxknjWxOgqZYeDYEjZQvWyoVLZUDBrU9ybLikG8j6xaB/7XABYIfURcMfAwMeY1Mf0mWMElZbPvBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mk9Ihu/q; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750725007; x=1782261007;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=M3dT3Lmb9P6DmC2Z6O4e6DegMD+JK3r2HsY4a9sPCkU=;
+  b=Mk9Ihu/qK2iyAkFIKW1wxmK4GyXWvrQVrq1E5NTiotvyiIWSbpD8kTgT
+   JJ5xvXQQXUIlXyRrElOIdIrM6G9HiMVvy2uC5hQFW6ZUBQ+3m8eYYBSi/
+   6eeqlffXp0bYdg4veulr6GXlWFesvNSdTzb/NUhUHiCcH3nhVvRVcDKZz
+   xP711bl9XlO+pxeKYXdNwSm2fmyoFxZjdLRy0Y55mbbHxIN7xnz0Ps/dg
+   eowKuZXYFoLoyklWDZ0LWH+DCRMYgzAXCgJVdFMYm++6H8JnuiM/Gc4Li
+   0xsDUlF+obSU3TUuhrrEgCZAk7lCBwGClM8YCi4WoCykJ3nLFpuWOTJX9
+   A==;
+X-CSE-ConnectionGUID: VJ6Ca9PkSd61Ell5pAWFig==
+X-CSE-MsgGUID: TC49yGpjSWu8ZJ8HLF1GWA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="52067907"
+X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
+   d="scan'208";a="52067907"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 17:30:06 -0700
+X-CSE-ConnectionGUID: R2Ed3IvbSPGjghvOEmt/Fw==
+X-CSE-MsgGUID: cMgRiCE8S2KLpMQWjZQZ0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
+   d="scan'208";a="157534030"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 17:30:05 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH 0/8] ice: Separate TSPLL from PTP and cleanup
+Date: Mon, 23 Jun 2025 17:29:56 -0700
+Message-Id: <20250623-kk-tspll-improvements-alignment-v1-0-fe9a50620700@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net: lockless sk_sndtimeo and sk_rcvtimeo
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175072441824.3341634.13352696919814371810.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Jun 2025 00:20:18 +0000
-References: <20250620155536.335520-1-edumazet@google.com>
-In-Reply-To: <20250620155536.335520-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIXxWWgC/x2NywqDMBAAf0X23IUYfLW/UjykcdXFGENWRJD8e
+ 6O3mcvMBUKRSeBTXBDpYOHNZylfBdjZ+ImQh+ygla5VVba4LLhLcA55DXE7aCW/CxrHk78Rtf2
+ ptjPD+G4gR0Kkkc9n8O1T+gP34eo/cAAAAA==
+X-Change-ID: 20250417-kk-tspll-improvements-alignment-2cb078adf96
+To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+ Anthony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org, 
+ Karol Kolacinski <karol.kolacinski@intel.com>, 
+ Milena Olech <milena.olech@intel.com>, 
+ Michal Kubiak <michal.kubiak@intel.com>
+X-Mailer: b4 0.14.2
 
-Hello:
+This is the remaining 8 patches from the previous submission. I've rebased
+them on top of what Jakub pulled and deleted the control-flow macros.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Jacob Keller (3):
+      ice: clear time_sync_en field for E825-C during reprogramming
+      ice: read TSPLL registers again before reporting status
+      ice: default to TIME_REF instead of TXCO on E825-C
 
-On Fri, 20 Jun 2025 15:55:34 +0000 you wrote:
-> This series completes the task of making sk->sk_sndtimeo and
-> sk->sk_rcvtimeo lockless.
-> 
-> Eric Dumazet (2):
->   net: make sk->sk_sndtimeo lockless
->   net: make sk->sk_rcvtimeo lockless
-> 
-> [...]
+Karol Kolacinski (5):
+      ice: use bitfields instead of unions for CGU regs
+      ice: add multiple TSPLL helpers
+      ice: wait before enabling TSPLL
+      ice: fall back to TCXO on TSPLL lock fail
+      ice: move TSPLL init calls to ice_ptp.c
 
-Here is the summary with links:
-  - [net-next,1/2] net: make sk->sk_sndtimeo lockless
-    https://git.kernel.org/netdev/net-next/c/3169e36ae148
-  - [net-next,2/2] net: make sk->sk_rcvtimeo lockless
-    https://git.kernel.org/netdev/net-next/c/935b67675a9f
+ drivers/net/ethernet/intel/ice/ice_common.h | 212 +++-----------
+ drivers/net/ethernet/intel/ice/ice_common.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c    |  11 +
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  22 +-
+ drivers/net/ethernet/intel/ice/ice_tspll.c  | 425 ++++++++++++++++++----------
+ 5 files changed, 315 insertions(+), 357 deletions(-)
+---
+base-commit: 96c16c59b705d02c29f6bef54858b5da78c3fb13
+change-id: 20250417-kk-tspll-improvements-alignment-2cb078adf96
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Jacob Keller <jacob.e.keller@intel.com>
 
 
