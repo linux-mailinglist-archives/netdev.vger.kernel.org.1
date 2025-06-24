@@ -1,226 +1,108 @@
-Return-Path: <netdev+bounces-200771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47323AE6CDF
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:50:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982BEAE6CFF
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C7A81BC869B
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:49:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2DE23A3CB6
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704D02ED865;
-	Tue, 24 Jun 2025 16:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A76F2E3396;
+	Tue, 24 Jun 2025 16:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g+Dh6Lx4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJzds/RD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C403F2E6D23;
-	Tue, 24 Jun 2025 16:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5005C286430;
+	Tue, 24 Jun 2025 16:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750783590; cv=none; b=DmNDUZea1E7f4hHoBptI2GiqENhMNf+rohyIADynhnWpbVYXKiQ8SK16cJzfGMnjrNpJbPwaKUUfgxegElB5gx4yE4lMC9X0MMZ/Y3MOhmp0v9/Pdb4pfcI0lyeRzMu6VfMiohWeSw1CbMC8li33BOa+bSULQiAkjEVBfyh9IoQ=
+	t=1750783892; cv=none; b=a29vWjsGVHbLYNrO5cUGqMRCO25/8+cRfORkREzX4h0vVtTTOdADjpwT3+rdflvt68W3ry0ze4pXwC25YacuTMIpbjjJOER5W9o0QcJto6LFPqY6++mdonmR1aR5L0Z1kU3PfcDSib9MaxTgfYl41BL4z62YlSozCI9E+Go7gIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750783590; c=relaxed/simple;
-	bh=t9wLXBXS25Vzqa7C6S0u12gKUbmviPNzm9+JCqFbvBg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FKpJlO02GhCZ77raSDx2t84lYNPMOe4ohsOh3oH2HkBvjX2kZ00pIUYYOY0XFIUj654vFEKmk+nsq7jv2cgbLDjWfU3MZ7SsSZ0+DTEehSPmJD5Jgp0/vlDDrke7qGGu/aNK75Az1huUf5Spdrt4d9pU9qjgDTmEKKxI5QsarEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g+Dh6Lx4; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750783589; x=1782319589;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=t9wLXBXS25Vzqa7C6S0u12gKUbmviPNzm9+JCqFbvBg=;
-  b=g+Dh6Lx4oH4AnDkAUQ3aX69N6CZgsAJWEQT22o4Th5GXYFx27ZbcoGc+
-   FsHwgfeJtHWIwHEcysSsBrfpDQyx1bBKeEdMIE9sdF//DHCNqrgZ19XfY
-   d7ZnUmLRmdJgn1YKl6hdwpdW4/TCtMORlAYV2fmqNr7HzfHNPn8BV/Ryb
-   9Gzdp88aOzjS9/msjfj/70BXJ9MYgVP56VzFvWbTZ/nCCSWBY1jW9UCxd
-   3HASIanjkzoEz3WG5CnYMgu2xx8R6iJIBxVrGt4E/YJ6/sgGqiA/w+vEr
-   2Ard3KYspyglp14B/lIDpJAmhVMtP8f/wNkixEF6oI1vjpO8XbYtsgHU9
-   w==;
-X-CSE-ConnectionGUID: JDLyJUo7TlKpIa/h6MOa/g==
-X-CSE-MsgGUID: lXeEN5BUSkuBpQ5qv3IyOg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="64091345"
-X-IronPort-AV: E=Sophos;i="6.16,262,1744095600"; 
-   d="scan'208";a="64091345"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 09:46:28 -0700
-X-CSE-ConnectionGUID: HbfyCmuBRiqmwJn/c/HxLA==
-X-CSE-MsgGUID: ORzY/7A4Q/Kg/DS4F4Y9yQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,262,1744095600"; 
-   d="scan'208";a="152669499"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa010.fm.intel.com with ESMTP; 24 Jun 2025 09:46:24 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Simon Horman <horms@kernel.org>,
-	nxne.cnse.osdt.itp.upstreaming@intel.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next v2 12/12] idpf: add XDP RSS hash hint
-Date: Tue, 24 Jun 2025 18:45:15 +0200
-Message-ID: <20250624164515.2663137-13-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250624164515.2663137-1-aleksander.lobakin@intel.com>
-References: <20250624164515.2663137-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1750783892; c=relaxed/simple;
+	bh=1wSlBTA9NchzeWz0Bz19osXwHKWn6c1flflhLXXn9Q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PUD9N0JpA+0fiYXiSDQ5rpyf/bB6mv+vkdU1EbzNyUXyu3v6JC2RYDMqWga4d569I9KWE8410Zf0ghWO5CL4lGWvx19ryIG5lUM4J+cgsUMzMAvMbBbTqu32bawEtpH2D4Y/EhHsHEnwFvqQ4qn7zWx4t1rrVyk2U5+bBNHBdfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJzds/RD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 858A9C4CEE3;
+	Tue, 24 Jun 2025 16:51:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750783891;
+	bh=1wSlBTA9NchzeWz0Bz19osXwHKWn6c1flflhLXXn9Q4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TJzds/RDFtYpk28pkYM55SIIh0W+QHJZC5e+VKIbK2VrrtoWqqiL4d3s4wq/8qoOP
+	 D03HN4b91z/Tu8BJXGV4Cmh0Uw3V6kGZ7/NLflTky5C0eJ2Im2cwPw0UmmHAZfytGN
+	 7Op3Z4Ag8aojtbF8zbnx+u3edkoK8AvgXDiQGq8GWsjzybENZfa9BGj8fTGAGDrPN+
+	 VdGimLMnjjmugFk9ExRK+CnwzyEBX3kmfK3hI5Axm92gkjHRoacmeSCIILQapcG6GU
+	 //CLqIlaNyUWCJdnmJxyqIq7KIVQWGxDDSY5BBLY+mAAiU+3C/wNuciyIg+Kd0sNu2
+	 2HZ7m8Im5fubg==
+Date: Tue, 24 Jun 2025 17:51:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Chas Williams <3chas3@gmail.com>,
+	"moderated list:ATM" <linux-atm-general@lists.sourceforge.net>,
+	"open list:ATM" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] atm: idt77252: Add missing `dma_map_error()`
+Message-ID: <20250624165128.GA1562@horms.kernel.org>
+References: <20250624064148.12815-3-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624064148.12815-3-fourier.thomas@gmail.com>
 
-Add &xdp_metadata_ops with a callback to get RSS hash hint from the
-descriptor. Declare the splitq 32-byte descriptor as 4 u64s to parse
-them more efficiently when possible.
+On Tue, Jun 24, 2025 at 08:41:47AM +0200, Thomas Fourier wrote:
+> The DMA map functions can fail and should be tested for errors.
+> 
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+> ---
+>  drivers/atm/idt77252.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
+> index 1206ab764ba9..f2e91b7d79f0 100644
+> --- a/drivers/atm/idt77252.c
+> +++ b/drivers/atm/idt77252.c
+> @@ -852,6 +852,8 @@ queue_skb(struct idt77252_dev *card, struct vc_map *vc,
+>  
+>  	IDT77252_PRV_PADDR(skb) = dma_map_single(&card->pcidev->dev, skb->data,
+>  						 skb->len, DMA_TO_DEVICE);
+> +	if (dma_mapping_error(&card->pcidev->dev, IDT77252_PRV_PADDR(skb)))
+> +		return -ENOMEM;
+>  
+>  	error = -EINVAL;
+>  
+> @@ -1857,6 +1859,8 @@ add_rx_skb(struct idt77252_dev *card, int queue,
+>  		paddr = dma_map_single(&card->pcidev->dev, skb->data,
+>  				       skb_end_pointer(skb) - skb->data,
+>  				       DMA_FROM_DEVICE);
+> +		if (dma_mapping_error(&card->pcidev->dev, paddr))
+> +			goto outpoolrm;
+>  		IDT77252_PRV_PADDR(skb) = paddr;
+>  
+>  		if (push_rx_skb(card, skb, queue)) {
+> @@ -1871,6 +1875,7 @@ add_rx_skb(struct idt77252_dev *card, int queue,
+>  	dma_unmap_single(&card->pcidev->dev, IDT77252_PRV_PADDR(skb),
+>  			 skb_end_pointer(skb) - skb->data, DMA_FROM_DEVICE);
+>  
+> +outpoolrm:
+>  	handle = IDT77252_PRV_POOL(skb);
+>  	card->sbpool[POOL_QUEUE(handle)].skb[POOL_INDEX(handle)] = NULL;
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/idpf/xdp.h | 64 +++++++++++++++++++++++++++
- drivers/net/ethernet/intel/idpf/xdp.c | 28 +++++++++++-
- 2 files changed, 91 insertions(+), 1 deletion(-)
+Hi Thomas,
 
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
-index db8ecc1843fe..66ad83a0e85e 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.h
-+++ b/drivers/net/ethernet/intel/idpf/xdp.h
-@@ -99,6 +99,70 @@ static inline void idpf_xdp_tx_finalize(void *_xdpsq, bool sent, bool flush)
- 	libeth_xdpsq_unlock(&xdpsq->xdp_lock);
- }
- 
-+struct idpf_xdp_rx_desc {
-+	aligned_u64		qw0;
-+#define IDPF_XDP_RX_BUFQ	BIT_ULL(47)
-+#define IDPF_XDP_RX_GEN		BIT_ULL(46)
-+#define IDPF_XDP_RX_LEN		GENMASK_ULL(45, 32)
-+#define IDPF_XDP_RX_PT		GENMASK_ULL(25, 16)
-+
-+	aligned_u64		qw1;
-+#define IDPF_XDP_RX_BUF		GENMASK_ULL(47, 32)
-+#define IDPF_XDP_RX_EOP		BIT_ULL(1)
-+
-+	aligned_u64		qw2;
-+#define IDPF_XDP_RX_HASH	GENMASK_ULL(31, 0)
-+
-+	aligned_u64		qw3;
-+} __aligned(4 * sizeof(u64));
-+static_assert(sizeof(struct idpf_xdp_rx_desc) ==
-+	      sizeof(struct virtchnl2_rx_flex_desc_adv_nic_3));
-+
-+#define idpf_xdp_rx_bufq(desc)	!!((desc)->qw0 & IDPF_XDP_RX_BUFQ)
-+#define idpf_xdp_rx_gen(desc)	!!((desc)->qw0 & IDPF_XDP_RX_GEN)
-+#define idpf_xdp_rx_len(desc)	FIELD_GET(IDPF_XDP_RX_LEN, (desc)->qw0)
-+#define idpf_xdp_rx_pt(desc)	FIELD_GET(IDPF_XDP_RX_PT, (desc)->qw0)
-+#define idpf_xdp_rx_buf(desc)	FIELD_GET(IDPF_XDP_RX_BUF, (desc)->qw1)
-+#define idpf_xdp_rx_eop(desc)	!!((desc)->qw1 & IDPF_XDP_RX_EOP)
-+#define idpf_xdp_rx_hash(desc)	FIELD_GET(IDPF_XDP_RX_HASH, (desc)->qw2)
-+
-+static inline void
-+idpf_xdp_get_qw0(struct idpf_xdp_rx_desc *desc,
-+		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
-+{
-+#ifdef __LIBETH_WORD_ACCESS
-+	desc->qw0 = ((const typeof(desc))rxd)->qw0;
-+#else
-+	desc->qw0 = ((u64)le16_to_cpu(rxd->pktlen_gen_bufq_id) << 32) |
-+		    ((u64)le16_to_cpu(rxd->ptype_err_fflags0) << 16);
-+#endif
-+}
-+
-+static inline void
-+idpf_xdp_get_qw1(struct idpf_xdp_rx_desc *desc,
-+		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
-+{
-+#ifdef __LIBETH_WORD_ACCESS
-+	desc->qw1 = ((const typeof(desc))rxd)->qw1;
-+#else
-+	desc->qw1 = ((u64)le16_to_cpu(rxd->buf_id) << 32) |
-+		    rxd->status_err0_qw1;
-+#endif
-+}
-+
-+static inline void
-+idpf_xdp_get_qw2(struct idpf_xdp_rx_desc *desc,
-+		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
-+{
-+#ifdef __LIBETH_WORD_ACCESS
-+	desc->qw2 = ((const typeof(desc))rxd)->qw2;
-+#else
-+	desc->qw2 = ((u64)rxd->hash3 << 24) |
-+		    ((u64)rxd->ff2_mirrid_hash2.hash2 << 16) |
-+		    le16_to_cpu(rxd->hash1);
-+#endif
-+}
-+
- void idpf_xdp_set_features(const struct idpf_vport *vport);
- 
- int idpf_xdp(struct net_device *dev, struct netdev_bpf *xdp);
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
-index d2549f8b8e24..c143b5dc9e2b 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.c
-+++ b/drivers/net/ethernet/intel/idpf/xdp.c
-@@ -340,12 +340,38 @@ int idpf_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
- 				       idpf_xdp_tx_finalize);
- }
- 
-+static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
-+			      enum xdp_rss_hash_type *rss_type)
-+{
-+	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
-+	struct idpf_xdp_rx_desc desc __uninitialized;
-+	const struct idpf_rx_queue *rxq;
-+	struct libeth_rx_pt pt;
-+
-+	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
-+
-+	idpf_xdp_get_qw0(&desc, xdp->desc);
-+
-+	pt = rxq->rx_ptype_lkup[idpf_xdp_rx_pt(&desc)];
-+	if (!libeth_rx_pt_has_hash(rxq->xdp_rxq.dev, pt))
-+		return -ENODATA;
-+
-+	idpf_xdp_get_qw2(&desc, xdp->desc);
-+
-+	return libeth_xdpmo_rx_hash(hash, rss_type, idpf_xdp_rx_hash(&desc),
-+				    pt);
-+}
-+
-+static const struct xdp_metadata_ops idpf_xdpmo = {
-+	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
-+};
-+
- void idpf_xdp_set_features(const struct idpf_vport *vport)
- {
- 	if (!idpf_is_queue_model_split(vport->rxq_model))
- 		return;
- 
--	libeth_xdp_set_features_noredir(vport->netdev);
-+	libeth_xdp_set_features_noredir(vport->netdev, &idpf_xdpmo);
- }
- 
- static int idpf_xdp_setup_prog(struct idpf_vport *vport,
--- 
-2.49.0
-
+Can sb_pool_remove() be used here?
+It seems to be the converse of sb_pool_add().
+And safer than the code above.
+But perhaps I'm missing something.
 
