@@ -1,184 +1,113 @@
-Return-Path: <netdev+bounces-200697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C110CAE68E5
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:35:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD92AE68F0
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 691BA189098F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 643133B44E2
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086092D322D;
-	Tue, 24 Jun 2025 14:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C90291894;
+	Tue, 24 Jun 2025 14:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RR647Kj7"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qxJyNGr3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75112D1F44
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 14:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEC62BF3FB;
+	Tue, 24 Jun 2025 14:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750775332; cv=none; b=O2sVfN/9qOQtTTb0LyqkzCP3s0iE1vDa+MRTsBH4exTRwmI8OFG5cABmgrLu4IYFzB0jVdZpaFx9PUs7idLHNm0GMlr26RRhXLi9tD3Ks6otvmO+TVMEVE/gDwjUOLCOajyZH9Q6v0l/J3jsexJIwIxJ8uVZduErN8XXGIomOZI=
+	t=1750775482; cv=none; b=KD1eFM1ZpOKUTnVRe2uSeXv0DXt7AwdFhEDZq7fuIKPR/fbkQ3+9Pz6HkNFD1/I6tsPoROPbncTJs3C8Jic7etqpxtAKEJit+o3LraWTsKMVWwqZ/Suw5+kE3lT0bsycmUSafzNxbEWZ2p/cubYwWP8vR19XPMJ3LAkTw1CxSvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750775332; c=relaxed/simple;
-	bh=i8LCP0kG93vofjGJZNiTqrprLszdFbbN93YujLWYy4k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DvXp6S9nmJH4MyjNsvyy+zKjmhwUaCSu32OYVvuYDrIcSy9Fmo7PiaS72UmX69DoWM0Gywid9Esq8gAEceqaw0mW/XtXiP53f0PPOeIWRzC4Q8iXKkl4XvDgovgPJ8VcJ3B6MxsbaXpVfR/n4QZxKn7g6Kh9ulQUh2KjufNFEZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RR647Kj7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11259C4AF0B;
-	Tue, 24 Jun 2025 14:28:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750775332;
-	bh=i8LCP0kG93vofjGJZNiTqrprLszdFbbN93YujLWYy4k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RR647Kj7CweGT0WMAEdlGg0Z397r0HYU/ZaH3MJ731XnMTGeVExCXNUcPMJz1Tiq+
-	 ZEjETEvfED2B5/5JnnoazpFuIwUk3B7gBkLdGFa0+M0Bz2MvzR5SMfhwY073bFa2rh
-	 RjaF0N/xdArtEnt21K6roXGwf6gEgnYPg5CDyvPeBSw1EF3zJtaABRWLVA2Zu8hRGm
-	 jbB9mrnvNCw3FVHh7mMN+JD27v/WDg9iz213LWjmpOY8Gl1oEFea7Aagi9Wqq28KIC
-	 zD8/n5cm5JWTWydmnFoJW64DcWa8eNN0EuqPuVlSptJjzgxJLB0CxId0UkuNFTJiTu
-	 1kMzJaEGz99kw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	alexanderduyck@fb.com,
-	mohsin.bashr@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 5/5] eth: fbnic: rename fbnic_fw_clear_cmpl to fbnic_mbx_clear_cmpl
-Date: Tue, 24 Jun 2025 07:28:34 -0700
-Message-ID: <20250624142834.3275164-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250624142834.3275164-1-kuba@kernel.org>
-References: <20250624142834.3275164-1-kuba@kernel.org>
+	s=arc-20240116; t=1750775482; c=relaxed/simple;
+	bh=j+ytvJqs29JdtPQp6GtZV7bE8aZ/4cjCkXLPdp7rCXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N63NziM+raDSx5FajXxhWvV+bjLTcWoCCQ7rZIcKvFuK9jmut6BLlaDMUmPGTMqYwtKN5axDNr/lTqJmqOw1iYrm60ru/KTwq7MlhZINhzhA9GhlO7RsCre4mo5FUMwXmuE1B2KLUrVRN5FaH+FCFWsNBviKlGH1jAqm3MrE26M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qxJyNGr3; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 374CF7A00AA;
+	Tue, 24 Jun 2025 10:31:19 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Tue, 24 Jun 2025 10:31:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1750775479; x=1750861879; bh=j+ytvJqs29JdtPQp6GtZV7bE8aZ/4cjCkXL
+	Pdp7rCXM=; b=qxJyNGr3AcRMQOgbEyQohxv5gHIopDglcfhTM1hADsafJ+p249A
+	+lbRJW+R/qA+Yk4x1E8af/h4x78Jmpowa5GULh3p5PAaYfrDoM5ZnAI0bU5cgKlD
+	LzwQlhetTr3GXZFY7pWgvfPpejk3G25RyoQAJroze1N70yHjCcPw7AaqBW9VCs3c
+	9yHk/MoDZyRmWbqqwawnnWg1FnSYd8suOCwJAUd6tlIPnnVcnFsjcglFza2w3MKv
+	Bm3jz1m3CkkOv6b9coMK0X+7c/W0DAnkM15L0U8V6Dr+7kGzKd1ijGeP9zYKdE1X
+	iFOrah0mUF8A+pGGpR+0Xhx3WLNPtKVQ/Xg==
+X-ME-Sender: <xms:trZaaGW4xIvMvYMVrs5i3NsWE7DVg3Jzc-zlVDUbYHiJUWyc64HMMw>
+    <xme:trZaaCldfxskvsJmvH1rVfHHDSF1H8CAwMmR74v3gOEY4VXBNv0mWd1gmJ-8iHkzi
+    dE_QOkbNpp9XAI>
+X-ME-Received: <xmr:trZaaKbYGYpnSD0Mc7dPTh4fE0qRe7qSuHhL_iQorqcUmYZLn4JiDPrRuzxwdwgQntPPXJAGUzonmBJbkmFv8NXJakSgBw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvtddugecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
+    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
+    hnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughosh
+    gthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohepfigrnhhglhhirghnghejgeeshhhurgifvghirdgtohhmpd
+    hrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegv
+    ughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghp
+    thhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughsrghhvghrnh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephihuvghhrghisghinhhgsehhuhgrfigv
+    ihdrtghomhdprhgtphhtthhopeiihhgrnhhgtghhrghnghiihhhonhhgsehhuhgrfigvih
+    drtghomh
+X-ME-Proxy: <xmx:trZaaNXOkfeqHJ7wY2m65Yn1dsjIbL4Dpg6H2y_PkjigieUPkPCi8g>
+    <xmx:trZaaAkziAehmhkn-CHrzMnXf57gvk6JcG6O28oIZXClRPpfEn9huQ>
+    <xmx:trZaaCdtCu7u_7NGosu76FGg1F_hNDdOAQ3M80l-x4-t_rDFIOtAUQ>
+    <xmx:trZaaCEVE52XGX2LbM-WB2h5uKhnivjc5aoSqNUxAwPfFXSWjfIPyA>
+    <xmx:t7ZaaN-m4cAx5Jj3tugZVMvpU7Zc6yv9UYFDj0W9ukF3rZ467CaBi7zi>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 24 Jun 2025 10:31:17 -0400 (EDT)
+Date: Tue, 24 Jun 2025 17:31:15 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: add sysctl ndisc_debug
+Message-ID: <aFq2s3SnM1lzuGHb@shredder>
+References: <20250624125115.3926152-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624125115.3926152-1-wangliang74@huawei.com>
 
-fbnic_fw_clear_cmpl() does the inverse of fbnic_mbx_set_cmpl().
-It removes the completion from the mailbox table.
-It also calls fbnic_mbx_set_cmpl_slot() internally.
-It should have fbnic_mbx prefix, not fbnic_fw.
-I'm not very clear on what the distinction is between the two
-prefixes but the matching "set" and "clear" functions should
-use the same prefix.
+On Tue, Jun 24, 2025 at 08:51:15PM +0800, Wang Liang wrote:
+> Ipv6 ndisc uses ND_PRINTK to print logs. However it only works when
+> ND_DEBUG was set in the compilation phase. This patch adds sysctl
+> ndisc_debug, so we can change the print switch when system is running and
+> get ipv6 ndisc log to debug.
 
-While at it move the "clear" function closer to the "set".
+Is there a good reason to do this instead of using dynamic debug? Note
+that we will never be able to remove this sysctl.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  4 ++--
- .../net/ethernet/meta/fbnic/fbnic_devlink.c   |  4 ++--
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 20 +++++++++----------
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  2 +-
- 4 files changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-index f3ed65cf976a..555b231b38c1 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-@@ -66,6 +66,8 @@ void fbnic_mbx_init(struct fbnic_dev *fbd);
- void fbnic_mbx_clean(struct fbnic_dev *fbd);
- int fbnic_mbx_set_cmpl(struct fbnic_dev *fbd,
- 		       struct fbnic_fw_completion *cmpl_data);
-+void fbnic_mbx_clear_cmpl(struct fbnic_dev *fbd,
-+			  struct fbnic_fw_completion *cmpl_data);
- void fbnic_mbx_poll(struct fbnic_dev *fbd);
- int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd);
- void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
-@@ -81,8 +83,6 @@ int fbnic_fw_xmit_fw_write_chunk(struct fbnic_dev *fbd,
- int fbnic_fw_xmit_tsene_read_msg(struct fbnic_dev *fbd,
- 				 struct fbnic_fw_completion *cmpl_data);
- struct fbnic_fw_completion *fbnic_fw_alloc_cmpl(u32 msg_type);
--void fbnic_fw_clear_cmpl(struct fbnic_dev *fbd,
--			 struct fbnic_fw_completion *cmpl_data);
- void fbnic_fw_put_cmpl(struct fbnic_fw_completion *cmpl_data);
- 
- #define fbnic_mk_full_fw_ver_str(_rev_id, _delim, _commit, _str, _str_sz) \
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-index 4c4938eedd7b..c5f81f139e7e 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-@@ -182,7 +182,7 @@ fbnic_flash_start(struct fbnic_dev *fbd, struct pldmfw_component *component)
- 	else
- 		err = -ETIMEDOUT;
- 
--	fbnic_fw_clear_cmpl(fbd, cmpl);
-+	fbnic_mbx_clear_cmpl(fbd, cmpl);
- cmpl_free:
- 	fbnic_fw_put_cmpl(cmpl);
- 
-@@ -300,7 +300,7 @@ fbnic_flash_component(struct pldmfw *context,
- 						   component_name, 0, 0);
- 	}
- 
--	fbnic_fw_clear_cmpl(fbd, cmpl);
-+	fbnic_mbx_clear_cmpl(fbd, cmpl);
- cmpl_free:
- 	fbnic_fw_put_cmpl(cmpl);
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index ab58572c27aa..1d220d8369e7 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -338,6 +338,16 @@ static int fbnic_mbx_map_req_w_cmpl(struct fbnic_dev *fbd,
- 	return err;
- }
- 
-+void fbnic_mbx_clear_cmpl(struct fbnic_dev *fbd,
-+			  struct fbnic_fw_completion *fw_cmpl)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&fbd->fw_tx_lock, flags);
-+	fbnic_mbx_clear_cmpl_slot(fbd, fw_cmpl);
-+	spin_unlock_irqrestore(&fbd->fw_tx_lock, flags);
-+}
-+
- static void fbnic_fw_release_cmpl_data(struct kref *kref)
- {
- 	struct fbnic_fw_completion *cmpl_data;
-@@ -1263,16 +1273,6 @@ struct fbnic_fw_completion *fbnic_fw_alloc_cmpl(u32 msg_type)
- 	return cmpl;
- }
- 
--void fbnic_fw_clear_cmpl(struct fbnic_dev *fbd,
--			 struct fbnic_fw_completion *fw_cmpl)
--{
--	unsigned long flags;
--
--	spin_lock_irqsave(&fbd->fw_tx_lock, flags);
--	fbnic_mbx_clear_cmpl_slot(fbd, fw_cmpl);
--	spin_unlock_irqrestore(&fbd->fw_tx_lock, flags);
--}
--
- void fbnic_fw_put_cmpl(struct fbnic_fw_completion *fw_cmpl)
- {
- 	kref_put(&fw_cmpl->ref_count, fbnic_fw_release_cmpl_data);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index 5ff45463f9d2..fd8d67f9048e 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -796,7 +796,7 @@ static int fbnic_mac_get_sensor_asic(struct fbnic_dev *fbd, int id,
- 
- 	*val = *sensor;
- exit_cleanup:
--	fbnic_fw_clear_cmpl(fbd, fw_cmpl);
-+	fbnic_mbx_clear_cmpl(fbd, fw_cmpl);
- exit_free:
- 	fbnic_fw_put_cmpl(fw_cmpl);
- 
--- 
-2.49.0
-
+Users of vanilla kernels can only see the messages printed with 'val'
+being 0 or 1. Maybe convert them to call net_{err,warn}_ratelimited()
+instead of ND_PRINTK() and convert the rest to net_dbg_ratelimited() so
+that users will be able to enable / disable them during runtime via the
+dynamic debug interface?
 
