@@ -1,115 +1,97 @@
-Return-Path: <netdev+bounces-200472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02ADDAE58DE
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 02:58:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960DAAE58F4
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 03:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87BE04A2C6C
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 00:58:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D7A3B1B16
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEC3126C02;
-	Tue, 24 Jun 2025 00:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRIw+K3K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295D515624D;
+	Tue, 24 Jun 2025 01:06:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7062F2A
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 00:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEDF70823;
+	Tue, 24 Jun 2025 01:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750726703; cv=none; b=gRE0rMFXzt4qzrDuB8UUuAgZKr2dlT8MpnU5Dyx6ja5x5prP5EtWmJL8WUuNVDvPlHcFq8dziOh6dGmlLekvgJFnFF2sfK3A/H14YALSaA9AdMmaElr0/wkqjvebiJrAoyyfImsuAkF75lsC2zj8DqwCsG3yXtBaWVdvhgu2S1E=
+	t=1750727200; cv=none; b=ho6hNqC6h+nZWCI9Vg+mkylALyMGjkifFTv5dEYSkn4odQLkRxmbrSBcd3QZUStKI1RlasyUaL4FadOClr0JW9ZHxPcoy9/mX4JQSgD2zBtPau4Yt3yP76kfNKlxaikdb3M9if2+z7gZ0yl9MhedQk6jhw8FL+SY+1pv49aHNtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750726703; c=relaxed/simple;
-	bh=crI2KdpBxTyiOor4cigyt5k0bB0F42uVbGkqQawR4mQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TElLUTEdJ64Xr2y7iJ7YM29L7ve7p8J1XJ7/ywM0WdT6h3uLYKDKZtS/fvbbXvULw3Nq5WEEvrMi30GpHWpBN4NoAez39eBQ1g5f0xSXzltzb/+pdwUb42avZDExFLYo+f9cOqa2GE9uk7g9Sf0nUi4CsLytaOqtqi6BH5ZrXL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iRIw+K3K; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750726701;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=crI2KdpBxTyiOor4cigyt5k0bB0F42uVbGkqQawR4mQ=;
-	b=iRIw+K3K0Yeann2JRnRZuOSSPnCfbmFIZyrjKVh5IKxAB7EuY5gw3/gVzkVm4oYHyut5Tx
-	PRpw1+ygTMySN470ZFnIGoo+GdRo0HOWIj3JhXwDI8Lg9cMPsP5a8GoQSCOlxujTNlHo9z
-	iFlbRlSbfJKx9ZrTjP5VxHm9KGqvilI=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-QKAmsryDPGi5itrCI4kfxQ-1; Mon, 23 Jun 2025 20:58:19 -0400
-X-MC-Unique: QKAmsryDPGi5itrCI4kfxQ-1
-X-Mimecast-MFC-AGG-ID: QKAmsryDPGi5itrCI4kfxQ_1750726699
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2358de17665so40403275ad.3
-        for <netdev@vger.kernel.org>; Mon, 23 Jun 2025 17:58:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750726698; x=1751331498;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=crI2KdpBxTyiOor4cigyt5k0bB0F42uVbGkqQawR4mQ=;
-        b=wN/KiubbaeNEj+S4FiKWCNlsVIk/ir9LDrdQubYThGreZQtGxWIZjOmlfwRofD3a8p
-         ISpWb9N6qb5Gt5hIGWajp+Vp4UCYjepfP2csO4uARZETDbGQ+UQJNmK6td6GGj+G7GDd
-         fZqTjQXXpIN2oyNvMrG2CC/BtDMJ54RkL6oMqAQHCgAtLC2dlDOioXhB0VpQyjoUAw/Y
-         CHEMBvdz3ivJgymzJvyDoPrl+mcTckzZMC7L9xvNAIMSfFtpV7tpulX4xn00eqkzoSgr
-         kwHQ44LkkwgM46U0JLB892T4oJznBrOKi8kZEqDfPFB1plpmNPQUMAbWuy+aIPHZfijs
-         KDdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVa9KXX/QLSZYaSHFrwNUXDFr1iKDlKLKq6pXZ2f/bO7WRMiZZe5RX3NfVFg70aJL4EbAR++OY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkscIQ4RZsnU/GzBoVcETwJWHzrUFfSYea3YIxfdZbQ+GTsgR/
-	RCTJzJHrHvy9cs3dDopvb8lAFtWqNUh6kWyKP7tyotTxRvH7sD+SEy9tuaDt+g8mWw1FHn4iiMk
-	pFxOT9FlhyVfGnC6jnkQ0le0ccDNCqaSRfSiD+szLR7hcdATT4W6zS9KihoCvFQWq9yiLy7JdT5
-	BPX3CjiH2q1KIrpAIQlGw9zxrHy6Hdfbu9jRF9oL/MHxhKHw==
-X-Gm-Gg: ASbGnctFvtI3WwykxfBQeU/Nqb6IyzIfVDRaSVQ9/K4Sb6nxbEO8BWpqh/0KG6t44iX
-	fgn9uVEsUhET3PXp6wH+LqV0kkY6h+dPC25D3gRvZMXecVKFb4HXPbI+WSZK4mZXiGTo+yCP1FH
-	0aWO18
-X-Received: by 2002:a17:90b:4cc2:b0:311:abba:53c0 with SMTP id 98e67ed59e1d1-3159d64288cmr23066002a91.9.1750726698233;
-        Mon, 23 Jun 2025 17:58:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0TL53ZDwgeSV+DD2GcU3jEI4r/eDHq4FmfUZ/GvS4kXkq5suNbkCfKDj/NwxqjwgnsrCmWvLCvjsuEvH74OU=
-X-Received: by 2002:a17:90b:4cc2:b0:311:abba:53c0 with SMTP id
- 98e67ed59e1d1-3159d64288cmr23065951a91.9.1750726697619; Mon, 23 Jun 2025
- 17:58:17 -0700 (PDT)
+	s=arc-20240116; t=1750727200; c=relaxed/simple;
+	bh=rGwARyv8tJA7CfEaxg832PKwn6GR6YzUn0fSflXP0Do=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MjiJsxUeUv3kNJFmWMpOVW85mAAmm0ySlFboz21COd+sjQCpj7/Q+xRlooYxLBxRQqIILDsvcGqGAaGuXfWKBOdGlYrgDpMhIBfoxIAB+yTbBqyYAvv57mDuIz7ByNtkSrWfn9OFp83N3QJJHRyGCIvkRyz+UWhbCXtNSBPP+SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bR6B22yxMzPtKl;
+	Tue, 24 Jun 2025 09:02:34 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0F72414020C;
+	Tue, 24 Jun 2025 09:06:24 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 24 Jun 2025 09:06:23 +0800
+Message-ID: <96bc6695-5e9a-4a50-8ea6-c4625806af28@huawei.com>
+Date: Tue, 24 Jun 2025 09:06:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250612083213.2704-1-jasowang@redhat.com>
-In-Reply-To: <20250612083213.2704-1-jasowang@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 24 Jun 2025 08:58:05 +0800
-X-Gm-Features: AX0GCFtX40pdquUIKQa4dMm29AUMnV2mY-tckRUEDH3MEDY23niQa4wXLvV7Jxg
-Message-ID: <CACGkMEsphawodd-9XTg8KfYotdLri-3cuSV67F23AOscAHQs6g@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tun: remove unnecessary tun_xdp_hdr structure
-To: mst@redhat.com, kuba@kernel.org, pabeni@redhat.com
-Cc: eperezma@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com, jasowang@redhat.com, 
-	andrew+netdev@lunn.ch, edumazet@google.com, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next 1/3] net: hibmcge: support scenario without
+ PHY.
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20250623034129.838246-1-shaojijie@huawei.com>
+ <20250623034129.838246-2-shaojijie@huawei.com>
+ <51a9e27a-8a67-4188-8875-8cd81e34765a@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <51a9e27a-8a67-4188-8875-8cd81e34765a@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Thu, Jun 12, 2025 at 4:32=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
+
+on 2025/6/23 15:32, Andrew Lunn wrote:
+> On Mon, Jun 23, 2025 at 11:41:27AM +0800, Jijie Shao wrote:
+>> Currently, the driver uses phylib to operate PHY by default.
+>>
+>> On some boards, the PHY device is separated from the MAC device.
+>> As a result, the hibmcge driver cannot operate the PHY device.
+>>
+>> In this patch, the driver determines whether a PHY is available
+>> based on register configuration. If no PHY is available,
+>> the driver intercepts phylib operations and operates only MAC device.
 >
-> With f95f0f95cfb7("net, xdp: Introduce xdp_init_buff utility routine"),
-> buffer length could be stored as frame size so there's no need to have
-> a dedicated tun_xdp_hdr structure. We can simply store virtio net
-> header instead.
+> The standard way to handle a MAC without a PHY is to use
+> fixed_link. It is a fake PHY which follows the usual API, so your MAC
+> driver does not need to care there is no PHY.
 >
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
+>
+>      Andrew
 
-Hello maintainers:
 
-Are we ok with this series?
+Thank you for the guidance,
+I will study and use it.
 
 Thanks
+Jijie Shao
 
 
