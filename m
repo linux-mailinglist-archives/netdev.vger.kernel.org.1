@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-200817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05482AE709F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 22:26:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80F24AE70AA
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 22:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E049817E40E
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:26:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA8BA3AA48B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592702EAD1A;
-	Tue, 24 Jun 2025 20:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771792ECD0B;
+	Tue, 24 Jun 2025 20:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6G/kkmY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G92HF9YU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95D42D5C92
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 20:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EA22EACF2
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 20:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750796785; cv=none; b=rEyAQ0HCS09+K0vVB4TA21GZpz1mr83UsNA7ycUkF+Egyn1E7ViNbO+1CqL7CYEe0FeGADrjs3/2w5zmND2hcvV0tCMzHPkS5H4LH7ScHaPxVeTN/cn+ZxPguLHuA2lxog1hmQQL5TxsBuuQnH4SHO13PJ6PSORIJU9+bJ5c/2U=
+	t=1750796786; cv=none; b=NRrBsmh8oFw1qlB5kw1W/F3HD+0g69bZOIenAI0v3zdHIXPJ7FpNBr8WVp6fvO+tjvuA98XgqyPcP/cs0xG2sbIa4fPMJpdLDqNmHAZdbnDT+Y9+hKXP9i/UJ1DmmbJ6qFVK6i68H8s4dlafleP7Y0QUFxIkzqnMCaljyHkA3Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750796785; c=relaxed/simple;
-	bh=rVnT4tOUDdzLgyakYvPOMFZCyoADUyFKpR1P3ySUJE8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nxoIp7lKnVxcwWz5/9nJgGGkEBZ2ALUGdjSL/xIi+SCzZ+52hAupMu3+vp+algG7Cs5vwq1apj6chcAmk/7+WzrLTMjSA/zrLIyQUEXL8gCQazTM6Soa/I3CdJWtMsS1jCvbHqxUFHh2oKw5UrPpaF1THZmRbAn5k2XhfE09DLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6G/kkmY; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1750796786; c=relaxed/simple;
+	bh=d4q0GIFHsXzAi8nQzfGppwnM/ZjAt9wbO8eR2afszR4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XvTVO0A8WNsPP+KLhhlIcdXydQIVSmx0yEnB+XMHQRU4LIhWVzYHI7/aE0+Bg+NcZf39jXo1MPR8esIa6gwyOKXtEbxSxRrmCiJajsPdU6rKSQ+MHp8RKIfXOHJCsRAk5mTEkiNtEMnLC/PVgWR8g4t9Xz8Bo02COcC+FBSwGGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G92HF9YU; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7490acf57b9so3231632b3a.2
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:26:23 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7490cb9a892so348548b3a.0
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:26:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750796783; x=1751401583; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ob4ty4YtjdzwVrPcxBRjkX0uy675JNDz5qf3llHVRHs=;
-        b=O6G/kkmYIaYEh1WlN6bJmFQiM0Lrd58092XhiM/I0Ur04Nn1T4dto4AEHadeC10NYF
-         MgsqahPRILTywskPjlOMYHbgGUgLoh59YsaUKxvCuse9Nz8BuROWBw9IpN7IkxqmhSY7
-         hEGjj+zCqXqucxSmljwWjbRgjeOWnuucfZ9YWeKpApwL0TOaGj9xg+30WQATb+5qL6l5
-         LVDPe/bF+e2p4uqfUfWPxn5ESG+j000R+LRTDfXnweoLAwOQoXR1UCJ5cROLJ/0h1Kig
-         0Sjnma6S1xG+wTRrWQ4zgL5yII6rbKkhi5Ih4BoXhmjJ5edIhKG32XKcdh+3ucyCqbZf
-         cejg==
+        d=gmail.com; s=20230601; t=1750796784; x=1751401584; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nNxb8GeTSkXmOqDfB91SfjKPy7YHoEB8WEuzrKOdgRw=;
+        b=G92HF9YUySj1i1UHIh3ptTczm5IB8WcJO4bNws5moC7GbLfVSwCfrqb/gEHxyZGr/I
+         eo3A6E5x2TZMjde1hhxP3OZlIK+9EBXKxOhwWiK29oOo3zDaQK6RREqL2CYCa8eeaYEf
+         36prT1TGfb5quZiJNOV7bSnR7DXbvEcYWkInDYUKZ2wmaTH4ry5IsDc0dz+TjBURSBnd
+         fBq1Ly37ZWerA1Zw6u14NnE/FaPbsSn559rNFY6qeZ+1Tzv0dr5K6WD9tfwbGofEgvSp
+         UuY64t3qRBxa9clE9SwFgKpinlerq+3QOfO6XAxUHRukJvF+46z4vOLw397K5IKZDeNa
+         jubA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750796783; x=1751401583;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ob4ty4YtjdzwVrPcxBRjkX0uy675JNDz5qf3llHVRHs=;
-        b=OryMw7sT+En1kj/HuhIeOc8IFX9H/CeQBCbAs+w4+YN+A0Sh8RNFf16yroVfOzrsoF
-         Uca0/JW+U/Jh9WfJvy+Qy7NkzoY4CflGOwvVpZ6pmKpSp9wsKhfj1tlHuV1bY95s2941
-         /g7Kzwi/DDnen/RGsEAMDEXCZtdAoP/K/GW1aR131xVxS1P14siBFVCBCAXIFm6btbS5
-         QWzTglvDFr4XCVPTTpM9Dn3ucLQpo1r5czWOM2GWFEt+eBWe/L7HUYSK/r+5RPhYUqiV
-         pDwaRmuqxJUryBW/w1Tej9orltP0zXSKoirbA1o1Cg8qOV5VAkCDI/sRWCoi+0q8v2+U
-         /C2w==
-X-Forwarded-Encrypted: i=1; AJvYcCV76PfoL+ZAuXwLH3tuCkCLJ4oGAKAFtvbEmHJzhqJgJQpNpcccnmgG4aWxgW5+eGkEa8Ur3tw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8KHbSk5QBQP0X0sRecifLpiUhqQoZSoOXBin/mmoFeqFLZiXm
-	igsr64QU02gvVRQt6s7yLpHazul+FqM5W7ocMs6KAghbhktopo9/hVQ=
-X-Gm-Gg: ASbGncs1qZs1iXztiwPAS/FEkDFEpmI7Oku830TngPudpj0du+qe8xELhANzxKuMUnk
-	mNsUSE1m6JO8rir0JB51iWhHkjCZeraGcQ9SNDlabXJ/6rZc/dhw66li7qHKnA2vJDDOPNRF2TR
-	CIi/fFraXi2jc5vug1KZZzrE5jbCvdt8tBQPxNzm3eXWdXGCulgEfLOcEqF93S8/5hIzIo//M/u
-	wO69xnQbYgT4tg0wDXi+v28rMPXZVjpoDv6Ef2mD8QkwHO6X1T/bwOfGINSLk1DX9slWTym7IqI
-	AF4PJ2A0/SEid2fRDI+e4BOF5lrE+jhl7TygtXE=
-X-Google-Smtp-Source: AGHT+IEK9hYF9it9N+ZZDt1/o5OjTaMwRTDchnEAdMhO54iHmXgEcPPczkYc9wumH+YQtx0NafnKLg==
-X-Received: by 2002:a05:6a00:a93:b0:742:4545:2d2b with SMTP id d2e1a72fcca58-74ad443cb3bmr938327b3a.3.1750796782852;
-        Tue, 24 Jun 2025 13:26:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750796784; x=1751401584;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nNxb8GeTSkXmOqDfB91SfjKPy7YHoEB8WEuzrKOdgRw=;
+        b=mGvvWxPuA4fh1H0DQrOZ0gZur6j79JVjgHPya9Nxfef7rl1HioRJmk9oJwuvtSJIWf
+         zirBc5+0SKs274qy9EhFtdiMvkGpAzCC/hobclPPgm7UgWt/WgZIU6HxZxQFBFM18GCp
+         7z5uxShUosOSeAOIdhtaoB0gYniLkZ3VONdWZiqW4OA1PQnhVE2PeQwplD1zbZ4cbx9M
+         lvT3GCTRlRf1krMVkzRgef8qkAWVDo5dFwgGrKgLw3X+Q32duLclXR8py1c/h8ryqY2I
+         xLMgC5OBbiOTahINRYi8MDzP+/hoFQ9WCimIqsZx/+8sRxNgImtnCnq2vdUrMdMNOD1a
+         yQLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVaNVt6e4edSEb7/ubTHY0sXcpBBz1QKag5BGn+mss6DtAXccSXUdhWt88WoGcwJ4FNy4pKaCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfoiPoyS88X0VlwknV76a3VHMKxXHUX6p18BpIhlWkzN/C8MDg
+	ZpNwQPe7xgu8le3w/0zWwreS9BPiy1Df9MkyBjO3oJczBkZTgJV/Yg7jATCZPmva9obL
+X-Gm-Gg: ASbGncvXI1BOYmCc7+JOdgkLodcfwS9zws0NhTUP/qTLYjVO5LiykclfOUkZ2tzKz6a
+	pEtNLJr2Zt2DBDrb2jO2G+SrjarsNo0Z8zw2ukpIa5PW13TyzHPssTW4KthbDDIij68weoVnYlp
+	iuIG4w9+o44CNTyxzSFn+fdh0mSPbCbN/UeSYLi8AEvLTwL6mpnY5bXcWLh1dZS851bUYVWTNRC
+	L8cO4kIjNK0guQMefT0CZmdH4rHxnmDYsiurU64avlm3/MQEwTuMuIpB8L1VQktLkcBilgTJ3F3
+	k9p82VtYox+oyJ6g5xHqAHE/rUUYmJtgqFtipvs=
+X-Google-Smtp-Source: AGHT+IHByEREGEoES6fzoH5uAUeHg/rFmxE3PBuT3HTYNHjLtAtcLylzsUcql5UR+kZWujUr2fZ3yw==
+X-Received: by 2002:a05:6a20:7f89:b0:1f5:7eb5:72dc with SMTP id adf61e73a8af0-2207f13f620mr561833637.3.1750796784228;
+        Tue, 24 Jun 2025 13:26:24 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::a408])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74a9697817esm2252994b3a.124.2025.06.24.13.26.21
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74a9697817esm2252994b3a.124.2025.06.24.13.26.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 13:26:22 -0700 (PDT)
+        Tue, 24 Jun 2025 13:26:23 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -80,10 +82,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 net-next 00/15] ipv6: Drop RTNL from mcast.c and anycast.c
-Date: Tue, 24 Jun 2025 13:24:06 -0700
-Message-ID: <20250624202616.526600-1-kuni1840@gmail.com>
+Subject: [PATCH v2 net-next 01/15] ipv6: ndisc: Remove __in6_dev_get() in pndisc_{constructor,destructor}().
+Date: Tue, 24 Jun 2025 13:24:07 -0700
+Message-ID: <20250624202616.526600-2-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250624202616.526600-1-kuni1840@gmail.com>
+References: <20250624202616.526600-1-kuni1840@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,59 +98,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Kuniyuki Iwashima <kuniyu@google.com>
 
-This is a prep series for RCU conversion of RTM_NEWNEIGH, which needs
-RTNL during neigh_table.{pconstructor,pdestructor}() touching IPv6
-multicast code.
+ipv6_dev_mc_{inc,dec}() has the same check.
 
-Currently, IPv6 multicast code is protected by lock_sock() and
-inet6_dev->mc_lock, and RTNL is not actually needed.
+Let's remove __in6_dev_get() from pndisc_constructor() and
+pndisc_destructor().
 
-In addition, anycast code is also in the same situation and does not
-need RTNL at all.
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/ipv6/ndisc.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-This series removes RTNL from net/ipv6/{mcast.c,anycast.c} and finally
-removes setsockopt_needs_rtnl() from do_ipv6_setsockopt().
-
-
-Changes:
-  v2:
-    * Patch 2: Clarify which function doesn't need assertion
-    * Patch 6, 9, 14: Call rt6_lookup() and dev_hold() under RCU
-
-  v1: https://lore.kernel.org/netdev/20250616233417.1153427-1-kuni1840@gmail.com/
-
-
-Kuniyuki Iwashima (15):
-  ipv6: ndisc: Remove __in6_dev_get() in
-    pndisc_{constructor,destructor}().
-  ipv6: mcast: Replace locking comments with lockdep annotations.
-  ipv6: mcast: Check inet6_dev->dead under idev->mc_lock in
-    __ipv6_dev_mc_inc().
-  ipv6: mcast: Remove mca_get().
-  ipv6: mcast: Use in6_dev_get() in ipv6_dev_mc_dec().
-  ipv6: mcast: Don't hold RTNL for IPV6_ADD_MEMBERSHIP and
-    MCAST_JOIN_GROUP.
-  ipv6: mcast: Don't hold RTNL for IPV6_DROP_MEMBERSHIP and
-    MCAST_LEAVE_GROUP.
-  ipv6: mcast: Don't hold RTNL in ipv6_sock_mc_close().
-  ipv6: mcast: Don't hold RTNL for MCAST_ socket options.
-  ipv6: mcast: Remove unnecessary ASSERT_RTNL and comment.
-  ipv6: anycast: Don't use rtnl_dereference().
-  ipv6: anycast: Don't hold RTNL for IPV6_LEAVE_ANYCAST and
-    IPV6_ADDRFORM.
-  ipv6: anycast: Unify two error paths in ipv6_sock_ac_join().
-  ipv6: anycast: Don't hold RTNL for IPV6_JOIN_ANYCAST.
-  ipv6: Remove setsockopt_needs_rtnl().
-
- include/linux/netdevice.h |   4 +-
- net/core/dev.c            |  38 +++--
- net/ipv6/addrconf.c       |  12 +-
- net/ipv6/anycast.c        |  95 ++++++-----
- net/ipv6/ipv6_sockglue.c  |  28 +---
- net/ipv6/mcast.c          | 328 +++++++++++++++++++-------------------
- net/ipv6/ndisc.c          |  10 +-
- 7 files changed, 254 insertions(+), 261 deletions(-)
-
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index ecb5c4b8518f..beb1814a1ac2 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -377,11 +377,12 @@ static int ndisc_constructor(struct neighbour *neigh)
+ static int pndisc_constructor(struct pneigh_entry *n)
+ {
+ 	struct in6_addr *addr = (struct in6_addr *)&n->key;
+-	struct in6_addr maddr;
+ 	struct net_device *dev = n->dev;
++	struct in6_addr maddr;
+ 
+-	if (!dev || !__in6_dev_get(dev))
++	if (!dev)
+ 		return -EINVAL;
++
+ 	addrconf_addr_solict_mult(addr, &maddr);
+ 	ipv6_dev_mc_inc(dev, &maddr);
+ 	return 0;
+@@ -390,11 +391,12 @@ static int pndisc_constructor(struct pneigh_entry *n)
+ static void pndisc_destructor(struct pneigh_entry *n)
+ {
+ 	struct in6_addr *addr = (struct in6_addr *)&n->key;
+-	struct in6_addr maddr;
+ 	struct net_device *dev = n->dev;
++	struct in6_addr maddr;
+ 
+-	if (!dev || !__in6_dev_get(dev))
++	if (!dev)
+ 		return;
++
+ 	addrconf_addr_solict_mult(addr, &maddr);
+ 	ipv6_dev_mc_dec(dev, &maddr);
+ }
 -- 
 2.49.0
 
