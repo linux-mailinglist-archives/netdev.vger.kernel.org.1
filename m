@@ -1,192 +1,465 @@
-Return-Path: <netdev+bounces-200859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE10AE71AD
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 23:45:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEA17AE71BB
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 23:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D15A7AE14D
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:43:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0595B7AE451
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882A224C07F;
-	Tue, 24 Jun 2025 21:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CC525A62D;
+	Tue, 24 Jun 2025 21:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IMdinJ6T"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="RJgakawT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A50170A26
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 21:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC35C2561C2;
+	Tue, 24 Jun 2025 21:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750801512; cv=none; b=ICWDSiWWkDXILt97RdtINrn9NzrYkFsLbfaVfSeBYAgbXhy35hGx/EKw38lo8s7xnS9lwQvUDCfl0wOD5aXW8f1aBSKEiXwlQTBIEQJSgodBdVw5A7O0dr/csjoFdWyB7qul9G3OIvkVEhbQEE/nCtB4Obap6xGpk0gXcT1Z0K4=
+	t=1750802105; cv=none; b=tLzQRLJ0zbhD4WchGmxsP3YORtKx8vBJ4tqRShjtq+UrGAXTKN7Rrh11khxpRvMZ5XDgU/s3eIKGR4mCuBUKp6xL0zFWYR8hGoH9iKiVN168IdOvjANkt71JGDczCacVoME7MR1Sw5h847HpokCMmN7IDugdFAMZvYqPYC/umys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750801512; c=relaxed/simple;
-	bh=CYH9X7LugOMJVDq30qnneSu/tLSKikGgtezH6ZrJJjE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pm8b+BPZOmwzRzHRglZwemRyKBD8/j58X+/Fhid/ikT9UWxI0K0Y9ENqZVRa+JSrLm/SyAkoyCRhY6Q8a7uLo1MdXmgLvKfX5A2khP/IDoGJskwZvdEWA85f+uHmGRs5JgIngDWGqm8Aqytr4chz0mcaK9htKdBxAmbCGo2hWVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IMdinJ6T; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-234fcadde3eso82963365ad.0
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 14:45:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750801510; x=1751406310; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZeW2UaPlWVPE0gTWH5sYapqNgKtGoWa6lpWy9vlvU0Q=;
-        b=IMdinJ6TrYsgrHFdZEZ9BT8n2wG2LD3nd4oJrRl2pfjp4GTOWAa4tPPI/z2qzts+Zg
-         wjfhcNxNyv/JtInwQTnIEUM0SbWH7iq9+yxGWeRxepoiwJYca+uPDZZtDXuqhiK1Y9mY
-         ORhtsiViEnWkE84Bk0vGDWdRTW0vH3Adf2sopNAIB8uFUTY8Lekgn04QrIUtRF3e4JOH
-         Kr7P2QMOvP8goimcinJ3cYaPEurp2FSFiQqzHUO3/M3KsE6F8gYHIMUGZnETFeIyjNBw
-         sZyVmNGUJFtKRZp078FfSGMapfd99vD0K47wEO4CGZWaPwPGFALnqYpR7sRhM/rCC4L3
-         wmYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750801510; x=1751406310;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZeW2UaPlWVPE0gTWH5sYapqNgKtGoWa6lpWy9vlvU0Q=;
-        b=un4ujKgOAvLnA+gZ13tbRkxN13HSF0iYU08iCduU8XnQeC1D78etmRYTtyfpDlMhxA
-         TbsjWi5VHJooowakcI/iPW7qwdb8t+vG2MCCNC+09K1AP5XdZsepPc3ntzgsWl39DFr4
-         X0R4/DjoQw27XJQqKEiGe9IpR0NuJRKYdakvxiuaYTUhkL31Uz5eF1MYJHqU6nhZlFRu
-         ocrJyzqD9byDB1iwt861Iaau8arUU4KFAtpK54/P7dRH5n65yeCcKHkNiQ6X6BXlLN4X
-         gtBg67MpH1hc7VfAIAqPVgjGaSCRnwfF0i2U11eI1iH9hPiYI7NzHANSCJtlGH+QiYzf
-         8qRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDHlVU+xdkeu0itp1w5lBNhi9khF0vzMsGknDUZtRdwGahGxeayjfvHTMA3Z+kZ9kKNyJudjc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJb7YTX+I6Bd0idgxK4mZupeC7jJzq97VuYSflUY25n6FyVdK7
-	dY0f3tGD/io1fkwVvAO+HH131h0xuMyl2omFDayZvLowKVeq/eXIhiw=
-X-Gm-Gg: ASbGncudlNwG9viP3X2Cj/fqJ5f0sIivZV4TU+DZkt/otF/6O1rvMprq2/EpQad0i1w
-	WZCoIS+DuXJToPHc/2XNV7uICSCI5aiHY6P33JBewIOgdKGXo5QwY67S2R6GWVIh9kwMscgmO2a
-	ih+NLIQs8Os9ViVzXberljBlwEZ3etz4ndcy9nOMltH2PBRKM+oflnaDmPRiRbr+72CSveDe+D6
-	s+0Em2Dy6v/iq4QXESlyWAxr6TOu0wfpd5irNzUJjct45sE0wxx8ffjF9CKU0EuJQnMK9GQFYBx
-	OB9GsRtt575amdpuOKreuv+O8JCYmQevqCUQIaY=
-X-Google-Smtp-Source: AGHT+IGq7Xh6J/oAR/4SpXE+WyRFc0MDGlgCP3HRglxRpTSWP8Bq/kgo3CCIks5hdHMGnzEbDhXL8w==
-X-Received: by 2002:a17:903:2407:b0:234:f580:a15 with SMTP id d9443c01a7336-23823fd0962mr12723315ad.14.1750801509963;
-        Tue, 24 Jun 2025 14:45:09 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::a408])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d83d5c97sm119506575ad.70.2025.06.24.14.45.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 14:45:09 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Stanislaw Gruszka <stf_xl@wp.pl>,
-	Chas Williams <chas@cmf.nrl.navy.mil>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>,
-	netdev@vger.kernel.org,
-	syzbot+8bd335d2ad3b93e80715@syzkaller.appspotmail.com
-Subject: [PATCH v1 net] atm: Release atm_dev_mutex after removing procfs in atm_dev_deregister().
-Date: Tue, 24 Jun 2025 14:45:00 -0700
-Message-ID: <20250624214505.570679-1-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1750802105; c=relaxed/simple;
+	bh=RGPs7S63v/I54qBaN+QmXIOCfFMTLum6TtCdl6KmHbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bPNANfJq6oMCy1bNWzXSNfPxW/jnSC3jv068xOXw6A8CnJAQsC9JPgcbQJUHqRT3Uf40SJLdFfmRbyVO1zYGfnMygMjTSIUp46hNlDlzanlGFMfPU0dNT+PAvVMKKe+OhI+01CQqQ66Ug3e2nChgeN9Ebba52Ozw9EC4wniOBIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=RJgakawT; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7C4AF101E8501;
+	Tue, 24 Jun 2025 23:54:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1750802100; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=wGahUqCdf5meXkcjTq5OK95LkheDAyTPie1mUYbgP78=;
+	b=RJgakawTrO/SDfig9PyagjMfiQukmvus9v/OOWf32WB0Rol8PnMAFUaqO9yYwtFGkb2eZr
+	8ETiK8jI411rC7apwziHw2QUjkIUhnubRG7WgHjQjS+hwq/Co2vaJYWsKHgGLISZHwBqua
+	biK80g4vB0MM0MJ0OhvEzOOP86velfSX8Nd2BkP2TE/m2VubbwqbDReGzeY9aDU7fnvPwI
+	wi4FFgDaKZjhByrDqQe06PNhlKvSkrmm+EL1wTQfCP1YwP0+dzM8QYZtoI0pdW+q60cOOx
+	ctexi56Wro4TtaGCJColMP1RAzFC9FE8piD5UXQN3EjC2qpFxp9U327aoAnIYA==
+Date: Tue, 24 Jun 2025 23:54:54 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>
+Subject: Re: [net-next v13 06/11] net: mtip: Add mtip_switch_{rx|tx}
+ functions to the L2 switch driver
+Message-ID: <20250624235454.1bf0b96a@wsk>
+In-Reply-To: <0de412ee-c9ce-463b-92ef-58a33fd132d1@redhat.com>
+References: <20250622093756.2895000-1-lukma@denx.de>
+	<20250622093756.2895000-7-lukma@denx.de>
+	<0de412ee-c9ce-463b-92ef-58a33fd132d1@redhat.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/V++v/0cAATHYMBWHAJHNfXt";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+--Sig_/V++v/0cAATHYMBWHAJHNfXt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-syzbot reported a warning below during atm_dev_register(). [0]
+Hi Paolo,
 
-Before creating a new device and procfs/sysfs for it, atm_dev_register()
-looks up a duplicated device by __atm_dev_lookup().  These operations are
-done under atm_dev_mutex.
+> On 6/22/25 11:37 AM, Lukasz Majewski wrote:
+> > This patch provides mtip_switch_tx and mtip_switch_rx functions
+> > code for MTIP L2 switch.
+> >=20
+> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> > ---
+> > Changes for v13:
+> > - New patch - created by excluding some code from large (i.e. v12
+> > and earlier) MTIP driver
+> > ---
+> >  .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 252
+> > ++++++++++++++++++ 1 file changed, 252 insertions(+)
+> >=20
+> > diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c index
+> > 813cd39d6d56..a4e38e0d773e 100644 ---
+> > a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c +++
+> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c @@ -228,6
+> > +228,39 @@ struct mtip_port_info *mtip_portinfofifo_read(struct
+> > switch_enet_private *fep) return info; }
+> > =20
+> > +static void mtip_atable_get_entry_port_number(struct
+> > switch_enet_private *fep,
+> > +					      unsigned char
+> > *mac_addr, u8 *port) +{
+> > +	int block_index, block_index_end, entry;
+> > +	u32 mac_addr_lo, mac_addr_hi;
+> > +	u32 read_lo, read_hi;
+> > +
+> > +	mac_addr_lo =3D (u32)((mac_addr[3] << 24) | (mac_addr[2] <<
+> > 16) |
+> > +			    (mac_addr[1] << 8) | mac_addr[0]);
+> > +	mac_addr_hi =3D (u32)((mac_addr[5] << 8) | (mac_addr[4]));
+> > +
+> > +	block_index =3D GET_BLOCK_PTR(crc8_calc(mac_addr));
+> > +	block_index_end =3D block_index + ATABLE_ENTRY_PER_SLOT;
+> > +
+> > +	/* now search all the entries in the selected block */
+> > +	for (entry =3D block_index; entry < block_index_end;
+> > entry++) {
+> > +		mtip_read_atable(fep, entry, &read_lo, &read_hi);
+> > +		*port =3D MTIP_PORT_FORWARDING_INIT;
+> > +
+> > +		if (read_lo =3D=3D mac_addr_lo &&
+> > +		    ((read_hi & 0x0000FFFF) =3D=3D
+> > +		     (mac_addr_hi & 0x0000FFFF))) {
+> > +			/* found the correct address */
+> > +			if ((read_hi & (1 << 16)) && (!(read_hi &
+> > (1 << 17))))
+> > +				*port =3D FIELD_GET(AT_PORT_MASK,
+> > read_hi);
+> > +			break;
+> > +		}
+> > +	}
+> > +
+> > +	dev_dbg(&fep->pdev->dev, "%s: MAC: %pM PORT: 0x%x\n",
+> > __func__,
+> > +		mac_addr, *port);
+> > +}
+> > +
+> >  /* Clear complete MAC Look Up Table */
+> >  void mtip_clear_atable(struct switch_enet_private *fep)
+> >  {
+> > @@ -820,10 +853,229 @@ static irqreturn_t mtip_interrupt(int irq,
+> > void *ptr_fep)=20
+> >  static void mtip_switch_tx(struct net_device *dev)
+> >  {
+> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
+> > +	struct switch_enet_private *fep =3D priv->fep;
+> > +	unsigned short status;
+> > +	struct sk_buff *skb;
+> > +	unsigned long flags;
+> > +	struct cbd_t *bdp;
+> > +
+> > +	spin_lock_irqsave(&fep->hw_lock, flags); =20
+>=20
+> This is called from napi (bh) context, and every other caller
+> is/should be BH, too. You should use
+>=20
+> 	spin_lock_bh()
+>=20
 
-However, when removing a device in atm_dev_deregister(), it releases the
-mutex just after removing the device from the list that __atm_dev_lookup()
-iterates over.
+Ok.
 
-So, there will be a small race window where the device does not exist on
-the device list but procfs/sysfs are still not removed, triggering the
-splat.
+> Also please test your patches with CONFIG_LOCKDEP and
+> CONFIG_DEBUG_SPINLOCK enabled, thet will help finding this king of
+> issues.
 
-Let's hold the mutex until procfs/sysfs are removed in
-atm_dev_deregister().
+Ok. I will check with lockdep.
 
-[0]:
-proc_dir_entry 'atm/atmtcp:0' already registered
-WARNING: CPU: 0 PID: 5919 at fs/proc/generic.c:377 proc_register+0x455/0x5f0 fs/proc/generic.c:377
-Modules linked in:
-CPU: 0 UID: 0 PID: 5919 Comm: syz-executor284 Not tainted 6.16.0-rc2-syzkaller-00047-g52da431bf03b #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:proc_register+0x455/0x5f0 fs/proc/generic.c:377
-Code: 48 89 f9 48 c1 e9 03 80 3c 01 00 0f 85 a2 01 00 00 48 8b 44 24 10 48 c7 c7 20 c0 c2 8b 48 8b b0 d8 00 00 00 e8 0c 02 1c ff 90 <0f> 0b 90 90 48 c7 c7 80 f2 82 8e e8 0b de 23 09 48 8b 4c 24 28 48
-RSP: 0018:ffffc9000466fa30 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff817ae248
-RDX: ffff888026280000 RSI: ffffffff817ae255 RDI: 0000000000000001
-RBP: ffff8880232bed48 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff888076ed2140
-R13: dffffc0000000000 R14: ffff888078a61340 R15: ffffed100edda444
-FS:  00007f38b3b0c6c0(0000) GS:ffff888124753000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f38b3bdf953 CR3: 0000000076d58000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- proc_create_data+0xbe/0x110 fs/proc/generic.c:585
- atm_proc_dev_register+0x112/0x1e0 net/atm/proc.c:361
- atm_dev_register+0x46d/0x890 net/atm/resources.c:113
- atmtcp_create+0x77/0x210 drivers/atm/atmtcp.c:369
- atmtcp_attach drivers/atm/atmtcp.c:403 [inline]
- atmtcp_ioctl+0x2f9/0xd60 drivers/atm/atmtcp.c:464
- do_vcc_ioctl+0x12c/0x930 net/atm/ioctl.c:159
- sock_do_ioctl+0x115/0x280 net/socket.c:1190
- sock_ioctl+0x227/0x6b0 net/socket.c:1311
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x18b/0x210 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f38b3b74459
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f38b3b0c198 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f38b3bfe318 RCX: 00007f38b3b74459
-RDX: 0000000000000000 RSI: 0000000000006180 RDI: 0000000000000005
-RBP: 00007f38b3bfe310 R08: 65732f636f72702f R09: 65732f636f72702f
-R10: 65732f636f72702f R11: 0000000000000246 R12: 00007f38b3bcb0ac
-R13: 00007f38b3b0c1a0 R14: 0000200000000200 R15: 00007f38b3bcb03b
- </TASK>
+>=20
+> /P
+>=20
+> > +	bdp =3D fep->dirty_tx;
+> > +
+> > +	while (((status =3D bdp->cbd_sc) & BD_ENET_TX_READY) =3D=3D 0) {
+> > +		if (bdp =3D=3D fep->cur_tx && fep->tx_full =3D=3D 0)
+> > +			break;
+> > +
+> > +		dma_unmap_single(&fep->pdev->dev, bdp->cbd_bufaddr,
+> > +				 MTIP_SWITCH_TX_FRSIZE,
+> > DMA_TO_DEVICE);
+> > +		bdp->cbd_bufaddr =3D 0;
+> > +		skb =3D fep->tx_skbuff[fep->skb_dirty];
+> > +		/* Check for errors */
+> > +		if (status & (BD_ENET_TX_HB | BD_ENET_TX_LC |
+> > +				   BD_ENET_TX_RL | BD_ENET_TX_UN |
+> > +				   BD_ENET_TX_CSL)) {
+> > +			dev->stats.tx_errors++;
+> > +			if (status & BD_ENET_TX_HB)  /* No
+> > heartbeat */
+> > +				dev->stats.tx_heartbeat_errors++;
+> > +			if (status & BD_ENET_TX_LC)  /* Late
+> > collision */
+> > +				dev->stats.tx_window_errors++;
+> > +			if (status & BD_ENET_TX_RL)  /* Retrans
+> > limit */
+> > +				dev->stats.tx_aborted_errors++;
+> > +			if (status & BD_ENET_TX_UN)  /* Underrun */
+> > +				dev->stats.tx_fifo_errors++;
+> > +			if (status & BD_ENET_TX_CSL) /* Carrier
+> > lost */
+> > +				dev->stats.tx_carrier_errors++;
+> > +		} else {
+> > +			dev->stats.tx_packets++;
+> > +		}
+> > +
+> > +		if (status & BD_ENET_TX_READY)
+> > +			dev_err(&fep->pdev->dev,
+> > +				"Enet xmit interrupt and
+> > TX_READY.\n"); +
+> > +		/* Deferred means some collisions occurred during
+> > transmit,
+> > +		 * but we eventually sent the packet OK.
+> > +		 */
+> > +		if (status & BD_ENET_TX_DEF)
+> > +			dev->stats.collisions++;
+> > +
+> > +		/* Free the sk buffer associated with this last
+> > transmit */
+> > +		dev_consume_skb_irq(skb);
+> > +		fep->tx_skbuff[fep->skb_dirty] =3D NULL;
+> > +		fep->skb_dirty =3D (fep->skb_dirty + 1) &
+> > TX_RING_MOD_MASK; +
+> > +		/* Update pointer to next buffer descriptor to be
+> > transmitted */
+> > +		if (status & BD_ENET_TX_WRAP)
+> > +			bdp =3D fep->tx_bd_base;
+> > +		else
+> > +			bdp++;
+> > +
+> > +		/* Since we have freed up a buffer, the ring is no
+> > longer
+> > +		 * full.
+> > +		 */
+> > +		if (fep->tx_full) {
+> > +			fep->tx_full =3D 0;
+> > +			if (netif_queue_stopped(dev))
+> > +				netif_wake_queue(dev);
+> > +		}
+> > +	}
+> > +	fep->dirty_tx =3D bdp;
+> > +	spin_unlock_irqrestore(&fep->hw_lock, flags);
+> >  }
+> > =20
+> > +/* During a receive, the cur_rx points to the current incoming
+> > buffer.
+> > + * When we update through the ring, if the next incoming buffer has
+> > + * not been given to the system, we just set the empty indicator,
+> > + * effectively tossing the packet.
+> > + */
+> >  static int mtip_switch_rx(struct net_device *dev, int budget, int
+> > *port) {
+> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
+> > +	u8 *data, rx_port =3D MTIP_PORT_FORWARDING_INIT;
+> > +	struct switch_enet_private *fep =3D priv->fep;
+> > +	unsigned short status, pkt_len;
+> > +	struct net_device *pndev;
+> > +	struct ethhdr *eth_hdr;
+> > +	int pkt_received =3D 0;
+> > +	struct sk_buff *skb;
+> > +	struct cbd_t *bdp;
+> > +	struct page *page;
+> > +
+> > +	spin_lock_bh(&fep->hw_lock);
+> > +
+> > +	/* First, grab all of the stats for the incoming packet.
+> > +	 * These get messed up if we get called due to a busy
+> > condition.
+> > +	 */
+> > +	bdp =3D fep->cur_rx;
+> > +
+> > +	while (!((status =3D bdp->cbd_sc) & BD_ENET_RX_EMPTY)) {
+> > +		if (pkt_received >=3D budget)
+> > +			break;
+> > +
+> > +		pkt_received++;
+> > +		/* Since we have allocated space to hold a
+> > complete frame,
+> > +		 * the last indicator should be set.
+> > +		 */
+> > +		if ((status & BD_ENET_RX_LAST) =3D=3D 0)
+> > +			dev_warn_ratelimited(&dev->dev,
+> > +					     "SWITCH ENET: rcv is
+> > not +last\n"); =20
+>=20
+> Probably you want to break the look when this condition is hit.
 
-Fixes: 64bf69ddff76 ("[ATM]: deregistration removes device from atm_devs list immediately")
-Reported-by: syzbot+8bd335d2ad3b93e80715@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/685316de.050a0220.216029.0087.GAE@google.com/
-Tested-by: syzbot+8bd335d2ad3b93e80715@syzkaller.appspotmail.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/atm/resources.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Ok.
 
-diff --git a/net/atm/resources.c b/net/atm/resources.c
-index 995d29e7fb13..b19d851e1f44 100644
---- a/net/atm/resources.c
-+++ b/net/atm/resources.c
-@@ -146,11 +146,10 @@ void atm_dev_deregister(struct atm_dev *dev)
- 	 */
- 	mutex_lock(&atm_dev_mutex);
- 	list_del(&dev->dev_list);
--	mutex_unlock(&atm_dev_mutex);
--
- 	atm_dev_release_vccs(dev);
- 	atm_unregister_sysfs(dev);
- 	atm_proc_dev_deregister(dev);
-+	mutex_unlock(&atm_dev_mutex);
- 
- 	atm_dev_put(dev);
- }
--- 
-2.49.0
+>=20
+> > +
+> > +		if (!fep->usage_count)
+> > +			goto rx_processing_done;
+> > +
+> > +		/* Check for errors. */
+> > +		if (status & (BD_ENET_RX_LG | BD_ENET_RX_SH |
+> > BD_ENET_RX_NO |
+> > +			      BD_ENET_RX_CR | BD_ENET_RX_OV)) {
+> > +			dev->stats.rx_errors++;
+> > +			if (status & (BD_ENET_RX_LG |
+> > BD_ENET_RX_SH)) {
+> > +				/* Frame too long or too short. */
+> > +				dev->stats.rx_length_errors++;
+> > +			}
+> > +			if (status & BD_ENET_RX_NO)	/*
+> > Frame alignment */
+> > +				dev->stats.rx_frame_errors++;
+> > +			if (status & BD_ENET_RX_CR)	/* CRC
+> > Error */
+> > +				dev->stats.rx_crc_errors++;
+> > +			if (status & BD_ENET_RX_OV)	/* FIFO
+> > overrun */
+> > +				dev->stats.rx_fifo_errors++;
+> > +		}
+> > +
+> > +		/* Report late collisions as a frame error.
+> > +		 * On this error, the BD is closed, but we don't
+> > know what we
+> > +		 * have in the buffer.  So, just drop this frame
+> > on the floor.
+> > +		 */
+> > +		if (status & BD_ENET_RX_CL) {
+> > +			dev->stats.rx_errors++;
+> > +			dev->stats.rx_frame_errors++;
+> > +			goto rx_processing_done;
+> > +		}
+> > +
+> > +		/* Get correct RX page */
+> > +		page =3D fep->page[bdp - fep->rx_bd_base];
+> > +		/* Process the incoming frame */
+> > +		pkt_len =3D bdp->cbd_datlen;
+> > +		data =3D (__u8 *)__va(bdp->cbd_bufaddr);
+> > +
+> > +		dma_sync_single_for_cpu(&fep->pdev->dev,
+> > bdp->cbd_bufaddr,
+> > +					pkt_len, DMA_FROM_DEVICE);
+> > +		prefetch(page_address(page)); =20
+>=20
+> Use net_prefetch() instead
+>=20
 
+Ok.
+
+> > +
+> > +		if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
+> > +			swap_buffer(data, pkt_len);
+> > +
+> > +		if (data) {
+> > +			eth_hdr =3D (struct ethhdr *)data;
+> > +			mtip_atable_get_entry_port_number(fep,
+> > +
+> > eth_hdr->h_source,
+> > +
+> > &rx_port);
+> > +			if (rx_port =3D=3D MTIP_PORT_FORWARDING_INIT)
+> > +
+> > mtip_atable_dynamicms_learn_migration(fep,
+> > +
+> >    fep->curr_time,
+> > +
+> >    eth_hdr->h_source,
+> > +
+> >    &rx_port);
+> > +		}
+> > +
+> > +		if ((rx_port =3D=3D 1 || rx_port =3D=3D 2) &&
+> > fep->ndev[rx_port - 1])
+> > +			pndev =3D fep->ndev[rx_port - 1];
+> > +		else
+> > +			pndev =3D dev;
+> > +
+> > +		*port =3D rx_port; =20
+>=20
+> Do i read correctly that several network device use the same napi
+> instance? That will break napi assumptions and will incorrectly allow
+> napi merging packets coming from different devices.
+
+Isn't that for what the L2 switch is for? :-)
+
+
+To present the problem is this IP block:
+
+1. I will put aside the "separate" mode, which is only used until the
+bridge is created [*]. In this mode we do have separate uDMAs for each
+ports (i.e. uDMA0 and uDMA1).
+
+2. When offloading in HW L2 frames switching we do have single uDMA0 for
+the bridge (other such devices have separate DMAs for each port - like
+ti's cpsw - the offloading is only by setting one bit - i.e. this bit
+enables switching without touching DMA configuration/setup).
+
+That is why the NAPI is as single instance defined inside
+struct switch_enet_private. It reflects the single uDMA0 used when
+switching offloading is activated.
+
+>=20
+> > +
+> > +		/* This does 16 byte alignment, exactly what we
+> > need.
+> > +		 * The packet length includes FCS, but we don't
+> > want to
+> > +		 * include that when passing upstream as it messes
+> > up
+> > +		 * bridging applications.
+> > +		 */
+> > +		skb =3D netdev_alloc_skb(pndev, pkt_len +
+> > NET_IP_ALIGN);
+> > +		if (unlikely(!skb)) {
+> > +			dev_dbg(&fep->pdev->dev,
+> > +				"%s: Memory squeeze, dropping
+> > packet.\n",
+> > +				pndev->name);
+> > +			page_pool_recycle_direct(fep->page_pool,
+> > page);
+> > +			pndev->stats.rx_dropped++;
+> > +			goto err_mem;
+> > +		} else { =20
+>=20
+> No need for the else statement above.
+>=20
+
+Ok.
+
+> /P
+>=20
+
+Note:
+
+[*]:
+
+ip link add name br0 type bridge;
+ip link set lan0 master br0;=20
+ip link set lan1 master br0;=20
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/V++v/0cAATHYMBWHAJHNfXt
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhbHq4ACgkQAR8vZIA0
+zr0uBQf8ClaEXIB7Av4OnhGxTJenAk/pKse6Lyj4+j5Y4PKNcWZTCIP5Pot96HqJ
+Bw64dbS5itTjrWt3ondaTumtSiW2FmravAH1CsauaFa+3RH9LHe7TXop/ac+FATr
+6ZbwU2g1fo5uUXVx9Lj63be0cDYCED9PubhcIPh0cL/wsKatiUG0nn2bz3/IMfT+
+2zlgwcPh1gUKis+IoZ1gAYdaRxn3MUkSdNF8GqQNE55sZVittTErhi8UzwV178Qg
+IWtJxrjoxp8uQyEQvDfFVunGmLEJ724XFtxlt44OTsD+wsTeKbHDmU/JIrsO1cKt
+Q7G4GIjvo5BaL0QZvXbACBWaJcxvJA==
+=kw5E
+-----END PGP SIGNATURE-----
+
+--Sig_/V++v/0cAATHYMBWHAJHNfXt--
 
