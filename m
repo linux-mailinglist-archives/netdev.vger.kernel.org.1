@@ -1,146 +1,165 @@
-Return-Path: <netdev+bounces-200635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294F6AE65D6
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 15:07:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57E3AE6619
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 15:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3405716F796
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 13:01:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B5E14C3EF4
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 13:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0516D2BE7BE;
-	Tue, 24 Jun 2025 13:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5CA2C033B;
+	Tue, 24 Jun 2025 13:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPSWI2/a"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JFsrxZdL";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9v/2oaty";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZFVlatqh";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YFNC6k1d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3D513B5A9;
-	Tue, 24 Jun 2025 13:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6DC2BF3DB
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750770078; cv=none; b=P0PK4OvD0A0+vJRuugEIg2qNH0vPgzP32X4ZZU66CKLRJvBcEls7X7wW8JAtUmoP9jZiWhwTPjGvHT5VUeSg1BCfDkPMQduSW1HZPjb4mmEoBidluWt17Tkwn/aQrckZew34t2gGIIwg7ZrZV9uIT+abU2s9VcpnSrvfleU5M2I=
+	t=1750770733; cv=none; b=NT6wimsGQg9cs/i2gyIKtXZm7YJ8k3PmD+k0W/bg7/+T6AJMovWgY9C92p2aPAaqq9N6h0hvN1Z9LkOl32tTGnIblzKPSNulT+Nc+vLTkXOYeWFTHfuEV3VvtWmx9aD8jrsAew/ayidHgVZ5GKy8yg6FZEmlB65kvZ8AuGUHw4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750770078; c=relaxed/simple;
-	bh=otJz9LVuwF6pCnaDfgOrLQmmU3gXHoyW0WnWufGWW7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nwb0kTa7VKSQ1xMvgMobSTTNecAsIvsyYhxPD1BUZDYSuQiKoxWSyW90UhhmbuNBkGw+PT9MIXNIIgy+rzJx+7kplSRCEyTnMnVZdtfDnycJZPPNJ08g9fUd7z63Hq8EYTuTZnG/F1vpOjxRo4wzFESDwQ4J7O63EBlFHgJ9Ff0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BPSWI2/a; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32b855b468bso4411101fa.3;
-        Tue, 24 Jun 2025 06:01:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750770075; x=1751374875; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JjQI5EbjeAe5NKcQmnn+wqp/o47u/8kr76QnSUrx4GI=;
-        b=BPSWI2/aPvEXDkwXutqMx8k0nyM31h07IOgCqzq5LgB649LqPeg6dknIoiSiz76XkM
-         J5sMO2JBYAQEpkOa0+EBYhW6zZ2UH5tdLYtBbEsQUB7jn/piOF66ogZLASlkAt4RD0KO
-         gLvb3FguZY6Ml1Z6iGFEBHA4W1LB/Cj4WbvmMLkR4e9jbois1KEb2/GzoqhhouKXAhH3
-         nww7v2lbtSY1UX9fCYcUm6ZE3wZffZjYBFwwHzh7jCJYM+b1vYO1QjZyBoTcVa19Zdyl
-         IXGQbA2zSMtfMsrVjpW4hZHhM2l/475NMr8uLo/HQ49o352wFSPcMewndHSuEgP2KF5z
-         U8ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750770075; x=1751374875;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JjQI5EbjeAe5NKcQmnn+wqp/o47u/8kr76QnSUrx4GI=;
-        b=Jch153F5vJ5B+ACr0t25iFf93nTRG8ftecAKZLcXSDT81KVpzXipCAg3hiubKieg4h
-         gSUgpIa4kDndw2PChaNOHjtVFLhlRAK0WikbeQijwKizbMBjiyD5d4zByZeQqyg37FvK
-         olI8J9cxk+JvG0mQp1fopcwBuyKV3Q27utu7UrFDSAOrnvHYoHT21N+8YOSlbWa+Wqsc
-         S0XTuq/kD6ZRIOeymZH1Ua8XtiJQTl7wbdw8ffhSFp0deYlctwZkXRrfhMj1ndnaABVb
-         8lkfwoZoKIZD2i+NFMxiPfsy8dzpvFjqBbgu+ZW5LoQ1VjzoQybrF5EJTz3tQOaqSOWe
-         nkrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnHO7aRtqa8I4czMRVJRnfK2jqc1zeEPgrFr9zYFmSM99jZS7FGXntcx6eYqqcUh/i13J/bAoMpLODS1NsdRo=@vger.kernel.org, AJvYcCUzrKaNMAs/hC5l5012QfUyQUeSGIpnssMWnh/kJ8iILp7SR/Fn+v9jk+bTiPYgDTV8WncRhzkR@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv+6JE35LxkRsuNfkX0jNsmgs/Q9OI6rmUxU7EW/5OJqfpJo6T
-	gV99swAqbG0TwlWVk+d6IcWRmdKWqL2KCfZgMxXIOsLYtXVi94ywuJno9zFDjtViG249CnkL+ZT
-	VR3EbcqOvNS4cvEvNJZGxrZcyuWsfRlMOcGY2aVI=
-X-Gm-Gg: ASbGncsD1TwPryPN3EjoZvHlOeSa1K8Cn4ZsJYNVivzi1hHGSKcG7LHEZy9Ja61Qkj3
-	4x1l5A9PXJtbR0ctHC1RtE8yzxY5FJdPXMTU2ldKzhVC8N+81pwvLA9oyaEva76h0D3VX3FdKqP
-	SMM4VBXLCjfk6LHvt6An1ifoJiFXo2klVmDF4MlOCocA==
-X-Google-Smtp-Source: AGHT+IEFkVWjvraGv2wE34pvJYK8o1Mw0X2tda2wFyYv+XBeu35t47Ovr3b0aasCPJZzUnPcm8WAyNGGCfQrb3f6VAI=
-X-Received: by 2002:a2e:8a8a:0:b0:32a:8591:66a0 with SMTP id
- 38308e7fff4ca-32b98eb142dmr34863751fa.1.1750770074460; Tue, 24 Jun 2025
- 06:01:14 -0700 (PDT)
+	s=arc-20240116; t=1750770733; c=relaxed/simple;
+	bh=3pDkG0MqCxXkCsC5FOdHliPD8SIBKBHOfP1LbmcrrMk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ueaqMWm2cAJCEdx8DBiWDGJ+vwg2powNmTfjQfvLtaNug6Ijm5cV3TRwvL9q3dJcHhEItnxLgRzAShWELSqkokNiJdpVO3sQZwq5R8UJpIPdM/FOI7G+m6J72NNjkUrt3C2G0f8GnhrejDKQSifd5sJgtfi0+/Q7fWEacYhqLGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JFsrxZdL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9v/2oaty; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZFVlatqh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YFNC6k1d; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E90A61F441;
+	Tue, 24 Jun 2025 13:12:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750770730; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=AEuNN0vBnyJQyt/RbfAfHYNvjhkMctYvxkcaxDQ3gVc=;
+	b=JFsrxZdLrYbPVoR521tQ3W/BhBuJsJSP0W2l00Vrjv2beNNsScVPVJC/B09vsniQfWXzOs
+	ZGhMx2sYHoiJghxKQF5uHwdW95bSLJsrhHASU4lMLM6lWaY6mv6FDlXB/Hiw8eJFVenP7l
+	TdQxEsiT9cqkarxRHFYXUnKrI4H/kbo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750770730;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=AEuNN0vBnyJQyt/RbfAfHYNvjhkMctYvxkcaxDQ3gVc=;
+	b=9v/2oatyzHCZz/jr7CabNdElARtNy5ZG5KIkl+4jQCJ9tcgOFD98SmCy8bYzOq5ThdOf8E
+	IbV3tdm5Gdzf17Cw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750770728; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=AEuNN0vBnyJQyt/RbfAfHYNvjhkMctYvxkcaxDQ3gVc=;
+	b=ZFVlatqhs1k0Sf22rK/sFWIEaIDV0pXRF8rNXWHNf3RjsleXcv8vp+7O1uAJKKhNy/F2Ge
+	ug+Hj0PFguuRyYKcU0tHCIrCCNMIZNMZPdvHTlbGJKSn3skR6lN4EH5Y9T3cSPqGNoVOjw
+	uOAv+tNKtwuB1wlKPahntLGfUN/01qk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750770728;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=AEuNN0vBnyJQyt/RbfAfHYNvjhkMctYvxkcaxDQ3gVc=;
+	b=YFNC6k1dgNAoJrdXf/KpYpKEKC1+XwXpkuqkjJrZQhyGiYA7pbt0WM7FYcQL/EPh3SP3r4
+	F4RKeTcVyo9yFRBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9477113A24;
+	Tue, 24 Jun 2025 13:12:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id pLn9ICikWmhDZAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 24 Jun 2025 13:12:08 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	steffen.klassert@secunet.com,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH ipsec] xfrm: ipcomp: adjust transport header after decompressing
+Date: Tue, 24 Jun 2025 15:11:15 +0200
+Message-ID: <20250624131115.59201-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250623165405.227619-1-luiz.dentz@gmail.com> <99bea528-ca04-4f90-a05c-16bb06a4f431@redhat.com>
-In-Reply-To: <99bea528-ca04-4f90-a05c-16bb06a4f431@redhat.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 24 Jun 2025 09:01:01 -0400
-X-Gm-Features: AX0GCFvEGGhumnJvujwmlkMufQYOPO07LkwtppIrDIGyoG5NDUVZ67Cdlzf1hB8
-Message-ID: <CABBYNZ+C+HGgxaMg6L+rA4z1dsoSkPG8gSJLt3jvS63_egmSxw@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2025-06-23
-To: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
 
-Hi Kuniyuki,
+The skb transport header pointer needs to be adjusted by network header
+pointer plus the size of the ipcomp header.
 
-On Tue, Jun 24, 2025 at 6:50=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
->
->
-> On 6/23/25 6:54 PM, Luiz Augusto von Dentz wrote:
-> > The following changes since commit e0fca6f2cebff539e9317a15a37dcf432e3b=
-851a:
-> >
-> >   net: mana: Record doorbell physical address in PF mode (2025-06-19 15=
-:55:22 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git=
- tags/for-net-2025-06-23
-> >
-> > for you to fetch changes up to 1d6123102e9fbedc8d25bf4731da6d513173e49e=
-:
-> >
-> >   Bluetooth: hci_core: Fix use-after-free in vhci_flush() (2025-06-23 1=
-0:59:29 -0400)
-> >
-> > ----------------------------------------------------------------
-> > bluetooth pull request for net:
-> >
-> >  - L2CAP: Fix L2CAP MTU negotiation
-> >  - hci_core: Fix use-after-free in vhci_flush()
->
-> I think this could use a net-next follow-up adding sparse annotation for
-> the newly introduced helpers:
->
-> ./net/bluetooth/hci_core.c:85:9: warning: context imbalance in
-> '__hci_dev_get' - different lock contexts for basic block
-> ../net/bluetooth/hci_core.c: note: in included file (through
-> ../include/linux/notifier.h, ../arch/x86/include/asm/uprobes.h,
-> ../include/linux/uprobes.h, ../include/linux/mm_types.h,
-> ../include/linux/mmzone.h, ../include/linux/gfp.h, ...):
-> ../include/linux/srcu.h:400:9: warning: context imbalance in
-> 'hci_dev_put_srcu' - unexpected unlock
->
-> (not intended to block this PR!)
+This shows up when running traffic over ipcomp using transport mode.
+After being reinjected, packets are dropped because the header isn't
+adjusted properly and some checks can be triggered. E.g the skb is
+mistakenly considered as IP fragmented packet and later dropped.
 
-Can you address the above comments?
+kworker/30:1-mm     443 [030]   102.055250:     skb:kfree_skb:skbaddr=0xffff8f104aa3ce00 rx_sk=(
+        ffffffff8419f1f4 sk_skb_reason_drop+0x94 ([kernel.kallsyms])
+        ffffffff8419f1f4 sk_skb_reason_drop+0x94 ([kernel.kallsyms])
+        ffffffff84281420 ip_defrag+0x4b0 ([kernel.kallsyms])
+        ffffffff8428006e ip_local_deliver+0x4e ([kernel.kallsyms])
+        ffffffff8432afb1 xfrm_trans_reinject+0xe1 ([kernel.kallsyms])
+        ffffffff83758230 process_one_work+0x190 ([kernel.kallsyms])
+        ffffffff83758f37 worker_thread+0x2d7 ([kernel.kallsyms])
+        ffffffff83761cc9 kthread+0xf9 ([kernel.kallsyms])
+        ffffffff836c3437 ret_from_fork+0x197 ([kernel.kallsyms])
+        ffffffff836718da ret_from_fork_asm+0x1a ([kernel.kallsyms])
 
->
-> Thanks,
->
-> Paolo
->
+Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
+Link: https://bugzilla.suse.com/1244532
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+ net/xfrm/xfrm_ipcomp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
+index 907c3ccb440d..a38545413b80 100644
+--- a/net/xfrm/xfrm_ipcomp.c
++++ b/net/xfrm/xfrm_ipcomp.c
+@@ -97,7 +97,7 @@ static int ipcomp_input_done2(struct sk_buff *skb, int err)
+ 	struct ip_comp_hdr *ipch = ip_comp_hdr(skb);
+ 	const int plen = skb->len;
+ 
+-	skb_reset_transport_header(skb);
++	skb->transport_header = skb->network_header + sizeof(*ipch);
+ 
+ 	return ipcomp_post_acomp(skb, err, 0) ?:
+ 	       skb->len < (plen + sizeof(ip_comp_hdr)) ? -EINVAL :
+-- 
+2.49.0
 
---=20
-Luiz Augusto von Dentz
 
