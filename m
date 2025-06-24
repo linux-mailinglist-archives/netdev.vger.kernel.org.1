@@ -1,242 +1,214 @@
-Return-Path: <netdev+bounces-200785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089C4AE6E5F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:15:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1060AE6E7C
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9217B4A1934
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:14:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF56D1885947
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C83B2E8DFF;
-	Tue, 24 Jun 2025 18:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0762E62BC;
+	Tue, 24 Jun 2025 18:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LAP1/sr+"
+	dkim=pass (2048-bit key) header.d=ursu.me header.i=@ursu.me header.b="PVdN8LBR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oqvhvEid"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BC02E62B3
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 18:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E641298CA4;
+	Tue, 24 Jun 2025 18:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750788692; cv=none; b=InH2YZOEFJ7qeZpAX36pJgg2CiDK4iVUlNsrt4jrW2O1SFHijEfeYnvai2SewC6ASfwENz9DfjWKf0S028TeEQqP7Yy+Lh+gMTDPl2a8c8IxQl6m9MIBb31KNy4S9D4jbaV+vuDJm3U9adHpIch1hvG09hFb7BgE0v0uaIrjMtw=
+	t=1750789087; cv=none; b=uYFjYwyM0bRSDYjIduhbYBkmS351sGrJDRAyboXnflNglJfN2joebagzCTcAq30QVwRvh4FxGpWgJLNIjU6edHufKJ4hI9NxWLvl/Zkg7JUokHTQ0ILQv42FNAGRfrRaDMI+xXCvrtAF4E6gfJpEXkHBx3mmyYjMIgSFvuSQPI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750788692; c=relaxed/simple;
-	bh=zjcxu2dHhUgBLzgZxfuYmFLgW7b1g0/mu9rhxn59Urc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IRwXzjf2OKF8Z6bHm7iTAc5tO73Ci/OyUHcdqCRsMNdn/Jou8VJeLvPTujuOlXC/GQ+Szm/4eL8oBCN3/qVy+nPX/K5cFg3EIJdyiSqJk9htkHYvm5sNgMX4WvxPDbjwaYSMaUjSCU1UnTFMVYmGGY1SVItN5gct/IiK7Lf7x9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LAP1/sr+; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55OHJsXk029843;
-	Tue, 24 Jun 2025 11:11:02 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=B/x4fdFZXrv9BoJYZq0RM0v
-	AoJgg98yjaM/hGKqb2YU=; b=LAP1/sr+5Hbk9IagRC6FcFN9x/zRkRDZwK6qy87
-	2G44/DHB8Z5b952w+h77n/pp+NHzvBolSkyCGCaCArUdvRMQ83UyD/1JgKj511sj
-	M5xlMxcm8iZ+520TnYXzNS3z+lo3jgdADv6CXX7Ze9VEH9dXqlt1utUR8x8VN5Ag
-	yOCOJ4rREp9z+UMRXufqeKEsTWnmhwzRXp813B1TgIlrGWo70SHIwyDB2GFdROxw
-	cBJs+7nfJzFCvxrRkgxtNnK9lJ7EXn3DnJVNMpzyhBb13C9kGcFqo4HYw1LOY8wC
-	IVC5efORURDj6bXJ76QD9LpaS2P5C1+tdo/Ml1pOCmFbs8A==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47ft7h133b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Jun 2025 11:11:02 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 24 Jun 2025 11:11:00 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 24 Jun 2025 11:11:00 -0700
-Received: from cavium-System-i9-11 (unknown [10.28.38.183])
-	by maili.marvell.com (Postfix) with ESMTP id B95D75B694A;
-	Tue, 24 Jun 2025 11:10:56 -0700 (PDT)
-From: Aakash Kumar S <saakashkumar@marvell.com>
-To: <netdev@vger.kernel.org>
-CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
-        <akamaluddin@marvell.com>, <antony@phenome.org>
-Subject: [PATCH] xfrm: Duplicate SPI Handling
-Date: Tue, 24 Jun 2025 23:40:54 +0530
-Message-ID: <20250624181054.1502835-1-saakashkumar@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750789087; c=relaxed/simple;
+	bh=1hwi+3E/npjJsLVURhD/rxh1PG72Jr4fM9CClyzAC+g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EXLJ8S6wzE0DPvU4bLq/FyVmp7HEz3t+hPGC1Oqu42ouT2WKSsCpaFzPbYhUk8jKN7LEkhKz6Nmccv0Rl+KqR5juQLSlZtVRdbRAn8fNVLHF6CFMgbZG0+SKincvOgAVBsTgzdP5yyt1Uhv6CNRu+rfaXsFChETDtqpZJ6i5/LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursu.me; spf=pass smtp.mailfrom=ursu.me; dkim=pass (2048-bit key) header.d=ursu.me header.i=@ursu.me header.b=PVdN8LBR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oqvhvEid; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursu.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ursu.me
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfout.stl.internal (Postfix) with ESMTP id 422381D0017B;
+	Tue, 24 Jun 2025 14:18:04 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Tue, 24 Jun 2025 14:18:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ursu.me; h=cc:cc
+	:content-transfer-encoding:content-type:content-type:date:date
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1750789084;
+	 x=1750875484; bh=NciPXSYJhwcZ1bsK1ubxsblaN89sbnSvIgaoVIz9JbM=; b=
+	PVdN8LBRwUbXlpOdljRRcCNcoy77SF3sv3dl+q2Ljh+MeRcWSvH2QG+YI1TFssQI
+	4C8KWeFkxLaPMKWxyKCicFbjzUvzKtArVllKR5Q/pNWZxIHqPKWsWpxJMTj9HY5z
+	YGsvL5ZCdeIew9W4/XGhS5N5i4o33rNdoNpGHhDKWLvZTy639/jXSKHVx8nsNyWr
+	YkaIAtbOnzPJNcV25DliWWcK/6joQieUiV2/7VS2eRPbhh/UhCr7OvyQFaij3Xke
+	cAXE3fiMFSSnV17n1O+KwcC9BSQ9ptpHebL9IQz1WWIh7S4aa01wu+bqB1liD000
+	CF662nMGNOx/JBw3nnxRjg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750789084; x=
+	1750875484; bh=NciPXSYJhwcZ1bsK1ubxsblaN89sbnSvIgaoVIz9JbM=; b=o
+	qvhvEidl+Sx8Stsy7sPbFdXvHZm2m+Q5xZS+LPmJCXJYqal4YwpZo85t+5GDUAJP
+	2Y9mr5Ach3BXYSw4d9mJS03n1cGlmvCtMLaGUaSMdtImSpy17iIr5q1RIWVod5OI
+	OPFEU6aS8F3vUPGh4S3yUUBXFxBCPGy5q55BsOniJSGbZo/XT/+ETzY2lW4SNywJ
+	eMMN0TtZyEBbFi0QqiGuxbGt84VDCmOwZR2WYPH/rMoM4QLzoEEocAYu1RD5oFuR
+	aXsqfLQVilLuqlZYpArBPp4AkdpUPXwmxyVLH+R38ACgV9M5KW/YU0BDzb1t1y2S
+	BsqC/MjiuTHWjmUCHojEg==
+X-ME-Sender: <xms:2-taaHIpGyB6qt6BgHQRh8OaQ3lGnNo9SAA-niqkOrcDq7WZ-6DF9g>
+    <xme:2-taaLIt22tD7CyvpmUnXgPjUKPrXD4M9i-Zp1yWryj8zAo8KAFC5zJ5yl9hQ1TAK
+    _UJ-_e9w7tW4sLRVa0>
+X-ME-Received: <xmr:2-taaPu42EqyXkBp1J_EqED2zFA7OcjzO8AoB86IwtOHPuBaudE5KyZmQn0wA6Whsw-l>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvtdehlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomhepgghlrgguucgf
+    tffufgcuoehvlhgrugesuhhrshhurdhmvgeqnecuggftrfgrthhtvghrnhepkeefgeevje
+    dvfefhffeigefffefguedugeeiledufedugfeuudeftdefiefgffegnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepvhhlrggusehurhhsuhdrmh
+    gvpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
+    jhgrtggvkhesjhgrtggvkhhkrdhinhhfohdprhgtphhtthhopegrnhhthhhonhihrdhlrd
+    hnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehprhiivghmhihslhgrfidr
+    khhithhsiigvlhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvth
+    guvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
+    nhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
+    htohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgv
+    ughhrghtrdgtohhmpdhrtghpthhtohepihhnthgvlhdqfihirhgvugdqlhgrnheslhhish
+    htshdrohhsuhhoshhlrdhorhhg
+X-ME-Proxy: <xmx:2-taaAaxvwqGdwbAj1k_t3LBQOLaEt2ZlzZe2Y3XKhJBtm60xJhO2g>
+    <xmx:2-taaOaHdW4mjJrXXHwn3s9rgnxiCFUsLfZLDiad67M8ELcIQgnrzA>
+    <xmx:2-taaEAdEt1fNiC9LMKofyE_NzrSN2vEbkKe9drL1c2O43Xgf-j94Q>
+    <xmx:2-taaMaFm1D-xYN_JaZOgSHqhIJH3qFRK6Ef1ec8xCkR23tgKITtOg>
+    <xmx:3OtaaLPDZItZE2PQO623UVfkVioF5bDeE4QbN1J08M8aGWrcxuKjBo3o>
+Feedback-ID: i9ff147ff:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 24 Jun 2025 14:18:01 -0400 (EDT)
+Message-ID: <431c1aaa-304d-4291-97f8-c092a6bee884@ursu.me>
+Date: Tue, 24 Jun 2025 21:17:44 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: FZTZKJ9NUJ0GHxe7VRdhsdozbwllZA02
-X-Proofpoint-ORIG-GUID: FZTZKJ9NUJ0GHxe7VRdhsdozbwllZA02
-X-Authority-Analysis: v=2.4 cv=Nr7Rc9dJ c=1 sm=1 tr=0 ts=685aea36 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=tltKNFKyYWRyqH3nS48A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDE0OSBTYWx0ZWRfX9dUx46tMFRZV C0pvM0x4DZ+PSpkcdnAAyt8vl2JtasSbl4DI1Y1oVywlOFeQBXuZEeA77IwiIJ7BRTEriWz7vXb UpChBUsYaVG8oOn3IidsqccesFNyOLLAPdFiMHpendB1mwzf9qQJsDJvjp6AvyEnz89KtuoP3po
- GGJiAdOFvlsNtDGzWu7Vh++Ljw6Ggb3yrMAlxZXe+SZmAEIhPAWcO5YH/1CpDy+F3iKdGmtfIJU ckT+yggq9V5K7/pfA1J+dFPLRFK1Z+OzQmMLDbZXtAJLX59Yz5xnCgbeVsg2FE6RoxIHibeN3mm Ki6BVUNzAHHqwTeAxcxVDDpnuO+G0yjHhTZaKxZiRsqCgGlT4iqW6F5E5XDXtGudCSxC+TCq6u9
- +f1O7N/LI+k+TlVnImwqN9GfAq23AXT7cTYTwJN2fBqX5d8n0es6Ug1uJDDpwX75Zpy+Jhix
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-24_06,2025-06-23_07,2025-03-28_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] e1000e: ignore factory-default checksum value on
+ TGP platform
+To: Jacek Kowalski <jacek@jacekk.info>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
+ <b7856437-2c74-4e01-affa-3bbc57ce6c51@jacekk.info>
+ <8538df94-8ce3-422d-a360-dd917c7e153a@jacekk.info>
+Content-Language: en-US
+From: Vlad URSU <vlad@ursu.me>
+In-Reply-To: <8538df94-8ce3-422d-a360-dd917c7e153a@jacekk.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
-Netlink message, which triggers the kernel function xfrm_alloc_spi().
-This function is expected to ensure uniqueness of the Security Parameter
-Index (SPI) for inbound Security Associations (SAs). However, it can
-return success even when the requested SPI is already in use, leading
-to duplicate SPIs assigned to multiple inbound SAs, differentiated
-only by their destination addresses.
+On 23.06.2025 19:18, Jacek Kowalski wrote:
+> Vlad,
+> 
+> could you verify that the following patch works for you?
+> 
+>> diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
+>> index 8294a7c4f122..01696eb8dace 100644
+>> --- a/drivers/net/ethernet/intel/e1000e/defines.h
+>> +++ b/drivers/net/ethernet/intel/e1000e/defines.h
+>> @@ -637,6 +637,7 @@
+>>   
+>>   /* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
+>>   #define NVM_SUM                    0xBABA
+>> +#define NVM_SUM_FACTORY_DEFAULT    0xFFFF
+>>   
+>>   /* PBA (printed board assembly) number words */
+>>   #define NVM_PBA_OFFSET_0           8
+>> diff --git a/drivers/net/ethernet/intel/e1000e/nvm.c b/drivers/net/ethernet/intel/e1000e/nvm.c
+>> index e609f4df86f4..37cbf9236d84 100644
+>> --- a/drivers/net/ethernet/intel/e1000e/nvm.c
+>> +++ b/drivers/net/ethernet/intel/e1000e/nvm.c
+>> @@ -558,6 +558,11 @@ s32 e1000e_validate_nvm_checksum_generic(struct e1000_hw *hw)
+>>   		checksum += nvm_data;
+>>   	}
+>>   
+>> +	if (hw->mac.type == e1000_pch_tgp && checksum == (u16)NVM_SUM_FACTORY_DEFAULT) {
+>> +		e_dbg("Factory-default NVM Checksum on TGP platform - ignoring\n");
+>> +		return 0;
+>> +	}
+>> +
+>>   	if (checksum != (u16)NVM_SUM) {
+>>   		e_dbg("NVM Checksum Invalid\n");
+>>   		return -E1000_ERR_NVM;
+> 
 
-This behavior causes inconsistencies during SPI lookups for inbound packets.
-Since the lookup may return an arbitrary SA among those with the same SPI,
-packet processing can fail, resulting in packet drops.
+No, it doesn't.
 
-According to RFC 4301 section 4.4.2 , for inbound processing a unicast SA
-is uniquely identified by the SPI and optionally protocol.
+You are comparing the wrong value with NVM_SUM_FACTORY_DEFAULT. You 
+should check it against the checksum word 0x3F (NVM bytes 0x7E and 0x7F) 
+which is used to ensure that the base NVM image
+is a valid image, and which in my case is left unchanged by Dell in the 
+firmware.
 
-Reproducing the Issue Reliably:
-To consistently reproduce the problem, restrict the available SPI range in
-charon.conf : spi_min = 0x10000000 spi_max = 0x10000002
-This limits the system to only 2 usable SPI values.
-Next, create more than 2 Child SA. each using unique pair of src/dst address.
-As soon as the 3rd Child SA is initiated, it will be assigned a duplicate
-SPI, since the SPI pool is already exhausted.
-With a narrow SPI range, the issue is consistently reproducible.
-With a broader/default range, it becomes rare and unpredictable.
+I believe the changes should look something like this:
 
-Current implementation:
-xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
-So if two SAs have the same SPI but different destination addresses, then
-they will:
-a. Hash into different buckets
-b. Be stored in different linked lists (byspi + h)
-c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
-As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
-
-Proposed Change:
-xfrm_state_lookup_spi_proto() does a truly global search - across all states,
-regardless of hash bucket and matches SPI and proto.
-
-Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
 ---
- net/xfrm/xfrm_state.c | 78 ++++++++++++++++++++++++++-----------------
- 1 file changed, 47 insertions(+), 31 deletions(-)
+  drivers/net/ethernet/intel/e1000e/defines.h |  3 +++
+  drivers/net/ethernet/intel/e1000e/nvm.c     | 13 ++++++++++++-
+  2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 341d79ecb5c2..74855af27d15 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1714,6 +1714,28 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
- }
- EXPORT_SYMBOL(xfrm_state_lookup_byspi);
- 
-+static struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 spi, u8 proto)
-+{
-+    struct xfrm_state *x;
-+    unsigned int i;
+diff --git a/drivers/net/ethernet/intel/e1000e/defines.h 
+b/drivers/net/ethernet/intel/e1000e/defines.h
+index 8294a7c4f122..996a0f4d2b49 100644
+--- a/drivers/net/ethernet/intel/e1000e/defines.h
++++ b/drivers/net/ethernet/intel/e1000e/defines.h
+@@ -638,6 +638,9 @@
+  /* For checksumming, the sum of all words in the NVM should equal 
+0xBABA. */
+  #define NVM_SUM                    0xBABA
+
++/* Factory default value for the NVM checksum word */
++#define NVM_CHECKSUM_WORD_FACTORY_DEFAULT       0xFFFF
 +
-+    rcu_read_lock();
+  /* PBA (printed board assembly) number words */
+  #define NVM_PBA_OFFSET_0           8
+  #define NVM_PBA_OFFSET_1           9
+diff --git a/drivers/net/ethernet/intel/e1000e/nvm.c 
+b/drivers/net/ethernet/intel/e1000e/nvm.c
+index e609f4df86f4..4620efac0208 100644
+--- a/drivers/net/ethernet/intel/e1000e/nvm.c
++++ b/drivers/net/ethernet/intel/e1000e/nvm.c
+@@ -547,7 +547,18 @@ s32 e1000e_validate_nvm_checksum_generic(struct 
+e1000_hw *hw)
+  {
+  	s32 ret_val;
+  	u16 checksum = 0;
+-	u16 i, nvm_data;
++	u16 i, nvm_data, checksum_word;
 +
-+    for (i = 0; i <= net->xfrm.state_hmask; i++) {
-+        hlist_for_each_entry_rcu(x, &net->xfrm.state_byspi[i], byspi) {
-+            if (x->id.spi == spi && x->id.proto == proto) {
-+                if (!xfrm_state_hold_rcu(x))
-+                    continue;
-+                rcu_read_unlock();
-+                return x;
-+            }
-+        }
-+    }
++	ret_val = e1000_read_nvm(hw, NVM_CHECKSUM_REG, 1, &checksum_word);
++	if (ret_val) {
++		e_dbg("NVM Read Error\n");
++		return ret_val;
++	}
 +
-+    rcu_read_unlock();
-+    return NULL;
-+}
-+
- static void __xfrm_state_insert(struct xfrm_state *x)
- {
- 	struct net *net = xs_net(x);
-@@ -2547,10 +2569,8 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 	unsigned int h;
- 	struct xfrm_state *x0;
- 	int err = -ENOENT;
--	__be32 minspi = htonl(low);
--	__be32 maxspi = htonl(high);
-+	u32 range = high - low + 1;
- 	__be32 newspi = 0;
--	u32 mark = x->mark.v & x->mark.m;
- 
- 	spin_lock_bh(&x->lock);
- 	if (x->km.state == XFRM_STATE_DEAD) {
-@@ -2564,39 +2584,35 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 
- 	err = -ENOENT;
- 
--	if (minspi == maxspi) {
--		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
--		if (x0) {
--			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
--			xfrm_state_put(x0);
--			goto unlock;
--		}
--		newspi = minspi;
--	} else {
--		u32 spi = 0;
--		for (h = 0; h < high-low+1; h++) {
--			spi = get_random_u32_inclusive(low, high);
--			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
--			if (x0 == NULL) {
--				newspi = htonl(spi);
--				break;
--			}
--			xfrm_state_put(x0);
--		}
--	}
--	if (newspi) {
-+	for (h = 0; h < range; h++) {
-+		u32 spi = (low == high) ? low : get_random_u32_inclusive(low, high);
-+		newspi = htonl(spi);
-+
- 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
--		x->id.spi = newspi;
--		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
--		XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h,
--				  x->xso.type);
-+		x0 = xfrm_state_lookup_spi_proto(net, newspi, x->id.proto);
-+		if (!x0) {
-+			x->id.spi = newspi;
-+			h = xfrm_spi_hash(net, &x->id.daddr, newspi, x->id.proto, x->props.family);
-+			XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h, x->xso.type);
-+			spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-+			err = 0;
-+			goto unlock;
-+                }
-+		xfrm_state_put(x0);
- 		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
- 
--		err = 0;
--	} else {
--		NL_SET_ERR_MSG(extack, "No SPI available in the requested range");
-+		if (signal_pending(current)) {
-+			err = -ERESTARTSYS;
-+			goto unlock;
-+                }
-+
-+		if (low == high)
-+			break;
- 	}
- 
-+	if (err)
-+		NL_SET_ERR_MSG(extack, "No SPI available in the requested range");
-+
- unlock:
- 	spin_unlock_bh(&x->lock);
- 
++	if (hw->mac.type == e1000_pch_tgp && checksum_word == 
+(u16)NVM_CHECKSUM_WORD_FACTORY_DEFAULT) {
++		e_dbg("Factory-default NVM Checksum word on TGP platform - ignoring\n");
++		return 0;
++	}
+
+  	for (i = 0; i < (NVM_CHECKSUM_REG + 1); i++) {
+  		ret_val = e1000_read_nvm(hw, i, 1, &nvm_data);
 -- 
-2.43.0
-
 
