@@ -1,276 +1,292 @@
-Return-Path: <netdev+bounces-200779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63248AE6D4E
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 19:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B35FAE6D5B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 19:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CE203B145D
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 17:09:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01C23172B20
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 17:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B74F26CE0D;
-	Tue, 24 Jun 2025 17:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1CB292936;
+	Tue, 24 Jun 2025 17:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ay3g6O5U"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0emBVCzO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A481A229B2E
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 17:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750784980; cv=none; b=aJS946YyVvkrfll2sQrwtNzfE+q6qU15gbSQ5qbjSXbo+9W8LpmTobIcgH1ANdMoC9sd/T0iTJs/GFxN4XmLOvvLp0iNIFvCVxdoZH+C4ZY5xT6dX/3aruQpS/9tYmvRAkBjR7n49LOl+Zf/aj+WQbNozDYLt/EpK7mzx8DaUEY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750784980; c=relaxed/simple;
-	bh=OYpUD+nr8EzCbabO/puLiWYHoeQeSNMLcEVUvsxKQWw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f/hmZC4qUUQjef4Pi8B7W424oSnwF6W4psVw2Wf7Tua9o37EyIHTeqMJ8Y/+NrxZzFAXJTNDPktpxxQXBix/AiW/VXtRVCfi+llrezf77/SiJtfdvK0Ly3jlXlWeL+5i+GBBYK4iTt1UMyyB2SOML354qCPh/RpraOgMLQAwd3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ay3g6O5U; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b2c4476d381so132047a12.0
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:09:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750784976; x=1751389776; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yH8wzFzU5kp/atSvIhqvEIcmATXa8xJ+xH7wvbYzSJU=;
-        b=Ay3g6O5UUOFKGzb1NkoYMnnR4ghLeKiaaPBLrul2oW2NmX3eOPvHucRrRIDjaB65cq
-         p443KlIIxEAp/OhY7T/gu3pddwm3YI92WEKQjI1wBbYGYF3TrpYjxPuMLyjQLy5aQy9M
-         XxtcUvZPa5Zw7p1WMkq6nzqJut4q5keOBDlSckjPrE4rIraomDQNekM9DcaXB7i3x19e
-         db5O18KW1+F8XWc2yg4B5lyAEQJ6FO7eHpCUMwcFkyoNOs/NV33fCgBlPtjWKcyWQRjT
-         xT/zr6oP8ioOESatQbJQvjQ0puxGqF7mcvugkYWJMlxl2MaRwWjjzGGEHOxnwzuzYoSc
-         RRfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750784976; x=1751389776;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yH8wzFzU5kp/atSvIhqvEIcmATXa8xJ+xH7wvbYzSJU=;
-        b=ucUX5JCOpxO7pDJwlQujFhBNGc6FnHse7ae9R0Fdm59IDdMypjYaBWCC/95+TJGPvn
-         LY3e34h9SZ3NfuOY0iYjPOLmrzHPm/CYJRn17yGe6yyNRPU9HnvsVjbXH79w0SgxjKTf
-         JTWT7JHlN2+npy0tMCGowXqWCNlXz0t2mHwFJfVSpewkRaPvJbnyMO6D818kEF7+/OsY
-         I59dlfpbhA7J1Yifm94VwBMfqCmdY7TLhYrNBU8+7kDhQPw7guSfzcdKCfqCDuR847XZ
-         nz58tXMaVYb4FmBqQmBABGVwOng1TjxGmZByAty3fO7sfU8XSPJMMDmhO9wqE51bKxJK
-         ipmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUinGXJ/9jK0O+c+Ml39TOW7NY/mhXWRiTXNXh2FMKMhkBK6QtcalCJi9AcJzxnpq5UOVfSRNE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVYazpkQMq2/ISvPk5k0ieIAOptZsfjhLxS2r/M1Ical6omRvO
-	1gDth3bzHuXcbW92+oruiqUSE7IHDEjcSwABKSQSOKueyZ0ew+Mi39iiHVlk/hTeaVKj
-X-Gm-Gg: ASbGnctwYiN0Z6F8uAusqug/yhkG4NXhfUwKMK6MkOKYgW90cJHoufrUkgHky7Xlt/U
-	J1zWYrCpUC/f46xs4jueFciT6yTxWchIK5ge42o413ojeuM0OhMwWMmLsBBri8uhYPslQaiApT+
-	OSXfyNHEKNH1PjdZ+WuRhAFYIZxP4xcvZ7OtOhcntXUVcugfNcDZHqoUYCQebIjb87pvdjGyeTp
-	Os7Ype0VFD4hY2swyUU7E1ZjOSKqBZNEViVlSDs8SkVcUGEcfMf9vtxlV+eEuxv0lKCXdL3w5uj
-	Ej8qJ5qCgOoTsu7o8xFnORlaoBmbZN03Fd1JLkk=
-X-Google-Smtp-Source: AGHT+IHlD1jJMX3+tvEAgQUmH5wYPhF52HMVsCxUCdiJtQZuOER0wCx/u7FjeW3+QciV9gZGoAG+NQ==
-X-Received: by 2002:a05:6a00:21cf:b0:748:e289:6bc with SMTP id d2e1a72fcca58-74955b64e13mr5418144b3a.1.1750784975720;
-        Tue, 24 Jun 2025 10:09:35 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::a408])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749c8835595sm2331441b3a.103.2025.06.24.10.09.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 10:09:35 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	jbaron@akamai.com,
-	kuni1840@gmail.com,
-	kuniyu@google.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 3/3] netlink: Fix wraparound of sk->sk_rmem_alloc
-Date: Tue, 24 Jun 2025 10:08:41 -0700
-Message-ID: <20250624170933.419907-1-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250624071157.3cbb1265@kernel.org>
-References: <20250624071157.3cbb1265@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F652236F8
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 17:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750785197; cv=fail; b=HvL03ikFBIcfHmrGTHKyJYVpgOL7mK4EwJnpbKk+GVyO/i7l0U8ldC50Nu75WX4+aj+B3+abj55iPSPg3pcYGK3cDc8Fz5mp63pd6gthEewdee8Bxm9P1yXOwclsjjbHpksWItYwzXk6mOfy8vOFj9InTg1Fy84mC4wzYDzdxok=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750785197; c=relaxed/simple;
+	bh=oKDlEFSE2iglYxZXN2Upe7NTC8+Sncm8cRzkHo2Ye84=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZSLPrIv4aYhN80eb7tWQ+3y5n6mg5UNBo2GQkgRU6hj57SSkk+fINAeZc9Ke/7x5Hl8ZuceXKyv7DnUIPmPktDOK7C1JarKguE9mzIAAqVcLYWAOYpTZsJOcAdyIL9y2o4KmDpT8AVy+Nd0u0HqZlnHKOVDHqRszs6JHob3DwcY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0emBVCzO; arc=fail smtp.client-ip=40.107.220.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DarvpAg4CPDt/JOh00Un+MO8nFNgwbsKN2GmIAqpU9ksz8zlxxmnFJXfgsxktNGZw1aS4dVeEAX5wma87NSR8eFXauCbcpAcfOsiiIZ1PkGv0mr0tGFwjaYuZCCgSmA5OTqmInqXt6MkVeGPCIklDpGiFSsqUyw0Prhvn6OnBcszn0LRo5CbxLo/rV927BGjD3kDCLhQ+mCi7zOOv++Nk1nkM2gnN6CXmTYOjb9+WzTl2FIXoWuOpfHcZLryk7qp8G72/8JxpniId53R6vDEP4HX7j8WpxQPDF/zestKIbR7s37lBNPRyER88uHoWTL4gxAuQZGdLUm+iu2pbExUvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=olcmh2VUTlz0eqD3u4ExSKRs9LEuZXxUIvFsUAKPJd4=;
+ b=SBegMyHScNJiAkKhSrDFhx7QGZEmwfEiTfJKtWYpMkb147HPvxfcTMvNJ9+hMS3awj1QoswzbVX5GIW06+5+E/wFJui4/qHGWwcAWDpPbcYLh7IhmkeG6E+JwMPipDBFeFrLB5ANQZ6KeMaqln6S1A0qpaVFTX0XQdj7J4Ew7GoyoxpHVm/46/Xxngkfjbn8ANH4y2t/OcdUIby9a59hLG3RoS321z7MKZSe/UqH7DqAVBgdE3ZJ1Y8cwU0SJ6M59DCfcJsE+zW539w8GqCpd5BZL3YT0RK9Wjen+Td79r6Xwpx1wlEelstszdZTrvXAILVfddpZWvbAis1ZnGiTlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=olcmh2VUTlz0eqD3u4ExSKRs9LEuZXxUIvFsUAKPJd4=;
+ b=0emBVCzOJvl/U5HSUyR/2LtKsRTUQuNkvg7XzYs7EuHRxDO4Mi1I8xO+ElgWTXAkRdGE0PEdon1LCu+FcfNxCXurHns7Md6zXrEwJxXpPXc3sLyYIYqAJodioWa0y+70QcEBQFEYfnL/Iv/ZnruqBN5CiAgdG5uchA0CH6OUqkk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by DS4PR12MB9820.namprd12.prod.outlook.com (2603:10b6:8:2a7::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Tue, 24 Jun
+ 2025 17:13:14 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%5]) with mapi id 15.20.8880.015; Tue, 24 Jun 2025
+ 17:13:14 +0000
+Message-ID: <1d1ec8d8-84a4-4fc3-a89e-09cf6b42747d@amd.com>
+Date: Tue, 24 Jun 2025 10:13:12 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net 1/2] ice: fix NULL pointer dereference in
+ ice_unplug_aux_dev() on reset
+To: Emil Tantilov <emil.s.tantilov@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, Aleksandr.Loktionov@intel.com,
+ przemyslaw.kitszel@intel.com, david.m.ertman@intel.com,
+ anthony.l.nguyen@intel.com, michal.swiatkowski@linux.intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+References: <20250624142641.7010-1-emil.s.tantilov@intel.com>
+ <20250624142641.7010-2-emil.s.tantilov@intel.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20250624142641.7010-2-emil.s.tantilov@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR04CA0027.namprd04.prod.outlook.com
+ (2603:10b6:a03:40::40) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS4PR12MB9820:EE_
+X-MS-Office365-Filtering-Correlation-Id: f01dc695-cf5b-4de0-f74c-08ddb3426764
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NWhQdFZXS2NNcjAxUmRUNHZBUUo2dC9IMU5MWjBPNGV4SzZFa1VNdW10MkZE?=
+ =?utf-8?B?VENRK09ib2dLeE1zb0EzS0VxemVrZk9nTXVtTHZoeVNwQnc4YjlEalk4V21Y?=
+ =?utf-8?B?eDBCSEl1aUlVd1JDNEtyKzVmTThVVGJVZDZkRFQ1bi9hTlFTRUZkQlA2U0Vy?=
+ =?utf-8?B?aVJmV21sRi9xOG5qMVFmdjNZTnVJSndWTHp6R2ptUzJZdUtPNVdsbzdZYUIr?=
+ =?utf-8?B?RDQ2OFFMVTVMV0RuZkJxYTFUd3dYWi9oUlI0bm1SQXBSdThsYndnUTloZysv?=
+ =?utf-8?B?Smtyd3crVW56RnlIaDhjelZyS0dLVTZZL2tuaDlOa3c4QlR6Y2owZE1rRFBZ?=
+ =?utf-8?B?WFhGclpHYk9jRGFLUWVXNjNWTCtJUmF4eHdCVGEvU1ZGUStHRzVzSUJJNGdU?=
+ =?utf-8?B?MVZCNXBxdmN4YVFKWXhrMHV2Sm9xbSt5NjEzTE5XSE05VjVwWDFyaEtDQ1RG?=
+ =?utf-8?B?MEh0VFJTQzRHZGU0VkFKMG1iODQ2Q2pPTnhPRHhsVVI3WHM4aFE2aHR4K1ZU?=
+ =?utf-8?B?RGVTbnFUNzUrU25FUk9vVHA2bGRPRHVaNkh2S004RlFadFNOUDBJSTlFMzBL?=
+ =?utf-8?B?WXBkamVrUGRuQ25weVdNa3ZGV2k3RW1ZUTc0aHh5ZjR6aWs5bXpPcmoxSVVZ?=
+ =?utf-8?B?c2lXSGZJdXRLYTE4WUZMbEJtaktJaDNwVHFpVitCOG95Y083ZXI3Ry9rTHRQ?=
+ =?utf-8?B?RCt2S2dveWZBcFBMOEhIN0tvNnRKUTFLY211Q1Fjazl3TlZTdXZ0R1g2TDYy?=
+ =?utf-8?B?MXlDdGJuWmRDMDRpNlFiL1EzQ3A5WDhMQ1NVVGZmN3RnVWxmVVZuZWpXNE1q?=
+ =?utf-8?B?MUgvU0FUZHFoaVlHeVRFdk0wQzIxQmlkUjNmZ3I3MlAxMHhFTE1MVUdGNTlh?=
+ =?utf-8?B?SExZbi9KRkhPMmRnL1Z3TXlDYXRlL1JZdkRGZGJXOXdOMHVSTXFRRjNQNEVa?=
+ =?utf-8?B?T2NJeDVTdUoxN0Q1ZGlYZVlIclRmRU00ZlRUWC94cTlGOVFsSjM2RTI5a0FN?=
+ =?utf-8?B?cFd1VTdqS2VBSWh6Vno3RU84Y01hRVR3aytqVkx3MWhiUDRPQU1DRFdaN3VE?=
+ =?utf-8?B?bUtsWWE1VnV4cks1SkFRNFB4UlVtSmxQaUR0Y0ZzbFlHaXBocHphUWZLL09s?=
+ =?utf-8?B?K0ZvaW5XRWxQRFNOUWtldlB6NXRTVzB5WXVQaE82SmdLSENLdUhDSW1VT0p5?=
+ =?utf-8?B?UXpid0h6MjkzN1QvNHJjbHdKVGpqWVFwWVBMcFpYajQ2LzRsckhKTVh2L2lj?=
+ =?utf-8?B?UmdoTWVjQTBHK3IrdWxnVENpcDV2Ky9nSkc1cHlBTW9CWWdvN1NaUWpzUUw0?=
+ =?utf-8?B?b1UvR2xrV3VWWTZLcGdLK0ZqMnpJb0R3TXFkZ2Mvb3prclhJRGk0cGxOOHl0?=
+ =?utf-8?B?a1MzNkJMalVVZFlQeXlGdFlpK1pYWXZ5eS9BYVFuQ1VqUjRwRDRKZHVUa0xk?=
+ =?utf-8?B?MEJMTFpnb2N0WDZRdnNFRHBYMS9DUTZCY2M1citJTDlLazhkYU8xTnJmdFZi?=
+ =?utf-8?B?MXdsazVVOEFuekN1VjBHQ2tNaDBDTDBHQ28wdDU2NW1Vb1NuNU82ZnhTNkI4?=
+ =?utf-8?B?cTNBNTJ4TEo4UURHMFk5UzIvY0taOGdmb1EyTjREWFIwYnJaay9FckpWUWRs?=
+ =?utf-8?B?d2R1cjRsUlhaY0U2cmVLVGVPQkZwb2hPdEtVRzYzMHpiMzBIZncyeDhWR3lO?=
+ =?utf-8?B?aXhMSUtCcG83cGVDb2U5ZlVmbll0MEdPTlRsZzBOTm1Da25tK0l2VkxIUUda?=
+ =?utf-8?B?VDVCNmFoSlJ2QlByZSswOGo1ZUF6aWsvdk9xMktremZQN2VpYXpUOWVrVDBw?=
+ =?utf-8?B?dy9rTjQ4U3hqcWFXam0ybERoVk5wTmhaQkl2cVM2K2xWa0xpcXNJK05yVnZp?=
+ =?utf-8?B?OHB1YjBqYjRvdXZDaktTVTkyejJGdmNMb1pzd2dRa0NaNStteTBpUlJCMUVw?=
+ =?utf-8?Q?sX/g1XHOJjY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MkJYOXBrOUQvRWVmaytqK1A4QjBaanViZU40dFpwYllnMVVtVnljdktzdkhP?=
+ =?utf-8?B?ZU9yUFdxWURXamdhL1RLeHdJaTQ4bFk1cjhBTFZjM1FSQ3lJdytycXlYUUhx?=
+ =?utf-8?B?NWU1R3hRTzBscVdHZklvei92cGhUcU54L0wrRkxMbkxvZHVFMXFrSEJRTHZU?=
+ =?utf-8?B?V2xHNWVlQUYxemZ1Vm1EMWFndVdqbW52L1pmdGpTK3JoUFhDamJuVmhGdWNl?=
+ =?utf-8?B?MlhLL0hWMFYwVzUyM3FHV28wRTg1N011clJBY0Q0eTBqTitsdHdJV2ZQL09X?=
+ =?utf-8?B?YlVoQkVXTjBGWUhMZVVYaUdDcStmN0dwWGJKZlZDeE9adnd2SXQrWno3emxx?=
+ =?utf-8?B?SFZMVjJHcmx2blRrVEtKVkw1enRrNUZGTW5lM2pRczNwNkRLakJtRzgxL2Z5?=
+ =?utf-8?B?eTIySnorYkFOUUl6bmVJVE9XODBlMUpzVUtibWRqSFNVekE3VTZsMUVvc2FH?=
+ =?utf-8?B?NUFXOTVTVFBrRlhnVFExc00rcmVDVE5vMnFVVUJnNEJmNWFtNWdYU0pidW1R?=
+ =?utf-8?B?QlpOSFVrZytYOHdtTHZRcG1MZ3Z2MlZLYTlvN2QvczhldTNFd3B5RU8rQnhT?=
+ =?utf-8?B?Z015VnVkcXpmM3N5Q3lYZlRvZU92Z2E4ajZkSWFNRW9BcmV6SG50bzVIRS83?=
+ =?utf-8?B?NTVIczJQM3ZtQWhjYytYY0RyZ0x3QmdvQlZRZTg1d1ZId3RuN0VWSkl1UWxI?=
+ =?utf-8?B?M1UveFRHZnhYZFpOc2RQU3Bxam56RXhHb05uZjN4Y0xEd0w2dEdjR3VRdkY5?=
+ =?utf-8?B?WVEvWld5WU5lUWdaaE80UnZ4eWlyK0ozUzkrUExzdU42QTB5T1pGMmNGdy9N?=
+ =?utf-8?B?V1h5eEV0VHY3UTkxTU1TUTlrbGt3VUhzQ0p2R1F3K1NpN1VYMGkzTkQwVUZu?=
+ =?utf-8?B?T3ZEaGZldzFhQlIyaUJIVERMTXZzdDFsUGUrWjV6L0NQOG1KNzFoeW4yNklQ?=
+ =?utf-8?B?SWI3RVlXVXVYeE5HZC8yRGUzaGMvdW1hNjVQUm8vWFJoaE1oVm5tR2NzQS9q?=
+ =?utf-8?B?R3BEQlA2ZjNBQkJKNlliTmxmRlRDb1p5SktMTWhQeWJMamIzbEJkU0tKb3N1?=
+ =?utf-8?B?WUZUcjBTRWgwdURaZlo0WGI1SlRxSUsvN0Z5YkVBQjZsNFBRU1JWZHhEd1pD?=
+ =?utf-8?B?SHVQV0l2Ym1tUmZncTR6RkxMZ2tBN2dDRUR1OXFKVWNRUno2NUk1ZVBVMmdN?=
+ =?utf-8?B?d09xWjBRZWVlMGN2LzNjTE5Ma2RqdWtoTEZqcUVNK2tvL2NzZDBhZEF1cFBG?=
+ =?utf-8?B?K0Qyem9QY1VXbE9mTjArR3BYK2pWT2FqY2ZYUEVRVW5UcnAyU1JZUi90aUZu?=
+ =?utf-8?B?RXE3UVJ3TjZEZEFFMC9BS2JWVzMrTWVoOEg4V2tiOUNlQmpIUTd0dU05Qiti?=
+ =?utf-8?B?QzJyVkkySjJhSUNsalJpLzVxaGhDZmVtbmxuOHdTV3VlczlMQWVBSXZCSVR3?=
+ =?utf-8?B?NFFlNEIzVURxYlVXV0hFQ2FyTzV3V2RqZGdyMVdLQ3Ywb2UwbHpGdFRaY3Rk?=
+ =?utf-8?B?MWJnNXNxbHdjak5yRjJYRllxUVNGRU9UelY2MnloTGdVTTR0UmxvUmF6UXdM?=
+ =?utf-8?B?RVJvUXFhMEp6eWFnc2xaSTVSSWRMUjNEejRSaFQ4S0tONE1La3JmOC9Ec1BB?=
+ =?utf-8?B?RlVEZVBRQlMrK2RyZDdsZjRMY0NVSExxcnNaTDJiaUpwRC9QZW5jSi95R3h5?=
+ =?utf-8?B?YVJtcDBlR1FBUHJyZC8rYUVTR3JobFlOTzFqNWZwZW5oR3FKSys1ZjcrdGYy?=
+ =?utf-8?B?angvUlBXMi91V3FqejdpRDFmM0dTMVhxVnMzUlo1amp6UzBpRUZWVjBlZHpx?=
+ =?utf-8?B?Wllaa3kyUXRQRWVxa25KRWJNbm5VQjJCalhiTG9mQzY5U2RJUG8zbzZLbUxT?=
+ =?utf-8?B?S1BZeVFnNFNMRENpTVFFekhtcDdYTnkwTkR6NVY1Qm9lS1dmSWY1ZkZJM2I3?=
+ =?utf-8?B?UGFFSnM1WTQxWGVTZFNBVnVHcThYd2E4TEh3bGFIZklYa1lPYmtZQWdlK0d1?=
+ =?utf-8?B?Y0RCTEJhcWdOeUFiS2xaaUFRMXpUK0htS29hWGhHeW4yaHJDbGF3NG5PSk16?=
+ =?utf-8?B?NkdNWGVxa2NFeGtGMCtHZ09KZVdraEVXWEpURHFWSlJ6QnB4T0g0TE15aWdI?=
+ =?utf-8?Q?rSsih6iptcI3FQqokCjPwuJQH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f01dc695-cf5b-4de0-f74c-08ddb3426764
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 17:13:14.2151
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: D7jyL5goyxRLecB9dLTGiDmgXgvPFr/WKlOlen58KJlp3zGMMAHaxPEQdanYna0lsZGTfmKBfBcDJEZ3g14aiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9820
 
-Date: Tue, 24 Jun 2025 07:11:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-> On Tue, 24 Jun 2025 09:55:15 +0200 Paolo Abeni wrote:
-> > > To be clear -- are you saying we should fix this differently?
-> > > Or perhaps that the problem doesn't exist? The change doesn't
-> > > seem very intrusive..  
-> > 
-> > AFAICS the race is possible even with netlink as netlink_unicast() runs
-> > without the socket lock, too.
-> > 
-> > The point is that for UDP the scenario with multiple threads enqueuing a
-> > packet into the same socket is a critical path, optimizing for
-> > performances and allowing some memory accounting inaccuracy makes sense.
-> > 
-> > For netlink socket, that scenario looks a patological one and I think we
-> > should prefer accuracy instead of optimization.
+
+
+On 6/24/2025 7:26 AM, Emil Tantilov wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Could you ELI5 what you mean? Are you suggesting a lock around every
-> sk_rmem write for netlink sockets? 
-> If we think this is an attack vector the attacker can simply use a UDP
-> socket instead. Or do you think it'd lead to simpler code?
+> 
+> Issuing a reset when the driver is loaded without RDMA support, will
+> results in a crash as it attempts to remove RDMA's non-existent auxbus
+> device:
+> echo 1 > /sys/class/net/<if>/device/reset
+> 
+> BUG: kernel NULL pointer dereference, address: 0000000000000008
+> ...
+> RIP: 0010:ice_unplug_aux_dev+0x29/0x70 [ice]
+> ...
+> Call Trace:
+> <TASK>
+> ice_prepare_for_reset+0x77/0x260 [ice]
+> pci_dev_save_and_disable+0x2c/0x70
+> pci_reset_function+0x88/0x130
+> reset_store+0x5a/0xa0
+> kernfs_fop_write_iter+0x15e/0x210
+> vfs_write+0x273/0x520
+> ksys_write+0x6b/0xe0
+> do_syscall_64+0x79/0x3b0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> ice_unplug_aux_dev() checks pf->cdev_info->adev for NULL pointer, but
+> pf->cdev_info will also be NULL, leading to the deref in the trace above.
 
-I was wondering if atomic_add_return() is expensive for netlink,
-and if not, we could use it like below.  I'm also not sure we want
-to keep the allow-at-least-one-skb rule for netlink though, which
-comes from the first condition in __sock_queue_rcv_skb() for UDP
-in the past, IIRC.
+What about in ice_deinit_rdma(), can the cdev_info also be NULL there? 
+If so kfree(pf->cdev_info->iddc_priv) will result in a similar trace on 
+driver unload.
 
-untested:
+> 
+> Introduce a flag to be set when the creation of the auxbus device is
+> successful, to avoid multiple NULL pointer checks in ice_unplug_aux_dev().
 
----8<---
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index e8972a857e51..e1a9ae7ff521 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -387,7 +387,6 @@ static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
- 	WARN_ON(skb->sk != NULL);
- 	skb->sk = sk;
- 	skb->destructor = netlink_skb_destructor;
--	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
- 	sk_mem_charge(sk, skb->truesize);
- }
- 
-@@ -1212,41 +1211,45 @@ struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
- int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
- 		      long *timeo, struct sock *ssk)
- {
-+	unsigned long rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-+	DECLARE_WAITQUEUE(wait, current);
- 	struct netlink_sock *nlk;
- 
- 	nlk = nlk_sk(sk);
- 
--	if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
--	     test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
--		DECLARE_WAITQUEUE(wait, current);
--		if (!*timeo) {
--			if (!ssk || netlink_is_kernel(ssk))
--				netlink_overrun(sk);
--			sock_put(sk);
--			kfree_skb(skb);
--			return -EAGAIN;
--		}
--
--		__set_current_state(TASK_INTERRUPTIBLE);
--		add_wait_queue(&nlk->wait, &wait);
-+	if (rmem == skb->truesize ||
-+	    (rmem < sk->sk_rcvbuf && !test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
-+		netlink_skb_set_owner_r(skb, sk);
-+		return 0;
-+	}
- 
--		if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
--		     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
--		    !sock_flag(sk, SOCK_DEAD))
--			*timeo = schedule_timeout(*timeo);
-+	atomic_dec(skb->truesize, &sk->sk_rmem_alloc);
- 
--		__set_current_state(TASK_RUNNING);
--		remove_wait_queue(&nlk->wait, &wait);
-+	if (!*timeo) {
-+		if (!ssk || netlink_is_kernel(ssk))
-+			netlink_overrun(sk);
- 		sock_put(sk);
-+		kfree_skb(skb);
-+		return -EAGAIN;
-+	}
- 
--		if (signal_pending(current)) {
--			kfree_skb(skb);
--			return sock_intr_errno(*timeo);
--		}
--		return 1;
-+	__set_current_state(TASK_INTERRUPTIBLE);
-+	add_wait_queue(&nlk->wait, &wait);
-+
-+	if ((atomic_read(&sk->sk_rmem_alloc) + skb->truesize > sk->sk_rcvbuf ||
-+	     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
-+	    !sock_flag(sk, SOCK_DEAD))
-+		*timeo = schedule_timeout(*timeo);
-+
-+	__set_current_state(TASK_RUNNING);
-+	remove_wait_queue(&nlk->wait, &wait);
-+	sock_put(sk);
-+
-+	if (signal_pending(current)) {
-+		kfree_skb(skb);
-+		return sock_intr_errno(*timeo);
- 	}
--	netlink_skb_set_owner_r(skb, sk);
--	return 0;
-+	return 1;
- }
- 
- static int __netlink_sendskb(struct sock *sk, struct sk_buff *skb)
-@@ -1307,6 +1310,7 @@ static int netlink_unicast_kernel(struct sock *sk, struct sk_buff *skb,
- 	ret = -ECONNREFUSED;
- 	if (nlk->netlink_rcv != NULL) {
- 		ret = skb->len;
-+		atomic_add(skb->truesize, &sk->sk_rmem_alloc);
- 		netlink_skb_set_owner_r(skb, sk);
- 		NETLINK_CB(skb).sk = ssk;
- 		netlink_deliver_tap_kernel(sk, ssk, skb);
-@@ -1382,14 +1386,18 @@ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
- 
- static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
- {
-+	unsigned long rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-+	unsigned int rcvbuf = READ_ONCE(sk->sk_rcvbuf);
- 	struct netlink_sock *nlk = nlk_sk(sk);
- 
--	if (atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf &&
--	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
-+	if (rmem == skb->truesize ||
-+	    (size <= rcvbuf && !test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
- 		netlink_skb_set_owner_r(skb, sk);
- 		__netlink_sendskb(sk, skb);
--		return atomic_read(&sk->sk_rmem_alloc) > (sk->sk_rcvbuf >> 1);
-+		return size > (rcvbuf >> 1);
- 	}
-+
-+	atomic_dec(skb->truesize, &sk->sk_rmem_alloc);
- 	return -1;
- }
- 
-@@ -2249,6 +2257,7 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	struct module *module;
- 	int err = -ENOBUFS;
- 	int alloc_min_size;
-+	unsigned int rmem;
- 	int alloc_size;
- 
- 	if (!lock_taken)
-@@ -2258,9 +2267,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 		goto errout_skb;
- 	}
- 
--	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf)
--		goto errout_skb;
--
- 	/* NLMSG_GOODSIZE is small to avoid high order allocations being
- 	 * required, but it makes sense to _attempt_ a 32KiB allocation
- 	 * to reduce number of system calls on dump operations, if user
-@@ -2283,6 +2289,12 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	if (!skb)
- 		goto errout_skb;
- 
-+	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-+	if (rmem != skb->truesize && rmem >= sk->sk_rcvbuf) {
-+		atomic_dec(skb->truesize, &sk->sk_rmem_alloc);
-+		goto errout_skb;
-+	}
-+
- 	/* Trim skb to allocated size. User is expected to provide buffer as
- 	 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
- 	 * netlink_recvmsg())). dump will pack as many smaller messages as
----8<---
+IMHO adding a state flag to prevent NULL pointer checks in the control 
+path isn't enough justification unless there's something I'm missing here.
+
+> 
+> Fixes: c24a65b6a27c7 ("iidc/ice/irdma: Update IDC to support multiple consumers")
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice.h     |  1 +
+>   drivers/net/ethernet/intel/ice/ice_idc.c | 10 ++++++----
+>   2 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> index ddd0ad68185b..0ef11b7ab477 100644
+> --- a/drivers/net/ethernet/intel/ice/ice.h
+> +++ b/drivers/net/ethernet/intel/ice/ice.h
+> @@ -509,6 +509,7 @@ enum ice_pf_flags {
+>          ICE_FLAG_LINK_LENIENT_MODE_ENA,
+>          ICE_FLAG_PLUG_AUX_DEV,
+>          ICE_FLAG_UNPLUG_AUX_DEV,
+> +       ICE_FLAG_AUX_DEV_CREATED,
+>          ICE_FLAG_MTU_CHANGED,
+>          ICE_FLAG_GNSS,                  /* GNSS successfully initialized */
+>          ICE_FLAG_DPLL,                  /* SyncE/PTP dplls initialized */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ethernet/intel/ice/ice_idc.c
+> index 6ab53e430f91..420d45c2558b 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_idc.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_idc.c
+> @@ -336,6 +336,7 @@ int ice_plug_aux_dev(struct ice_pf *pf)
+>          mutex_lock(&pf->adev_mutex);
+>          cdev->adev = adev;
+>          mutex_unlock(&pf->adev_mutex);
+> +       set_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags);
+
+What if this bit is set already, should ice_plug_aux_dev() be executed?
+
+> 
+>          return 0;
+>   }
+> @@ -347,15 +348,16 @@ void ice_unplug_aux_dev(struct ice_pf *pf)
+>   {
+>          struct auxiliary_device *adev;
+> 
+> +       if (!test_and_clear_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags))
+> +               return;
+> +
+
+To re-iterate my comment above, I think the driver should just check if 
+pf->cdev_info is valid before de-referencing it. Also, the local adev 
+variable will have to be set to NULL to handle this case.
+
+Brett
+
+>          mutex_lock(&pf->adev_mutex);
+>          adev = pf->cdev_info->adev;
+>          pf->cdev_info->adev = NULL;
+
+
+>          mutex_unlock(&pf->adev_mutex);
+> 
+> -       if (adev) {
+> -               auxiliary_device_delete(adev);
+> -               auxiliary_device_uninit(adev);
+> -       }
+> +       auxiliary_device_delete(adev);
+> +       auxiliary_device_uninit(adev);
+>   }
+> 
+>   /**
+> --
+> 2.37.3
+> 
+> 
+
 
