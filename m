@@ -1,102 +1,134 @@
-Return-Path: <netdev+bounces-200566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2B0AE61CD
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:07:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3344EAE61D1
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BD0F1B624C3
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:07:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B33444C00E3
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E0727C17E;
-	Tue, 24 Jun 2025 10:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B2B27F758;
+	Tue, 24 Jun 2025 10:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ALUc5ILB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBIKbQhI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DAA24500A
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D599027C879;
+	Tue, 24 Jun 2025 10:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750759656; cv=none; b=Au2Yv1PRKEmmap/9Kvcl8Z1L0ua2pM7fVMSmvtAL8uZHkUKvKNIHjjY2rWWxThL+pAH5o9jeVRiYK9HW2VhqwurboJBo7o3Z5BdczrC+YZf8mjTf+9vglM+YBjD0nGE9v7qNDWMExz1GYclKsmlRpvc3lcM8h8TQm2M25FdxoQk=
+	t=1750759752; cv=none; b=DVT0B+9wly8HHvB/68k/EModxXBjGf4rqXqbH0g426PdPVa6ZFb9aztQCG61IH/V1F+Z+0TOtVBHw7WLz6lnQ9qNQXyrxUNvFA0YzQTv0PAut2g3yCvWoCJkjsGffHbCqFFt/NWm3Wy2IjR85lWRpchxAZVKNGhhxKkaBSweldo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750759656; c=relaxed/simple;
-	bh=xefSx1wRgI7n8DHq6ASFIeX2Mwzkl89ly+dTVL1gfnY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bUzaB8f6il2DKxqhm0eJFeh9bDNMup1AB7rZ8V62c2tYjN/FnfyK2LgTRKLqOiz8alIi0QqnY25uraR3xu/JwZkn+WmAjH6cifRfPqXurzaTOFlQaD7etuk58AZrA7uSymWgqb4gpgv1yoss4ADjCpuePSJ93XMw7wol4y5Wi0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ALUc5ILB; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750759655; x=1782295655;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xefSx1wRgI7n8DHq6ASFIeX2Mwzkl89ly+dTVL1gfnY=;
-  b=ALUc5ILBHbVqCZLyUiopqTvv/r00LecqoTp4iw0IOdIs1jdfJv2ohI0G
-   UU8VULF5+YHa1QHBGKGosVNMHqdiYZ2vaBU3Trb6ZVBTa6roy/78tsdaW
-   FCYhJInA/A/bVTouC3UncVEL8TKi+ZcHzDZT6QotofsYVGisDpsQppmKe
-   9jFCGkbpcFRlsubU5f/bsCa4tJMS4brZkg/1vRJARG0DyMeEA6NcyIaK3
-   5DCgkjmWa0ZGteUzeVLrNTpfBuVm3kr7SXKCKfKvFMSHouSc63Wkt1egY
-   oAxREGgMR3qNKlCfdhm17VUU7Bha1UJ5lv1XjLyuORTvd5XcbSlTRMhpk
-   A==;
-X-CSE-ConnectionGUID: y/UfwhXiSEWZ8cNCx/wJlg==
-X-CSE-MsgGUID: C4hZ85fQQTaoEhIM+YwI9g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="64053073"
-X-IronPort-AV: E=Sophos;i="6.16,261,1744095600"; 
-   d="scan'208";a="64053073"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 03:07:34 -0700
-X-CSE-ConnectionGUID: L2Yz06IJTGGtZIT8D9jOFw==
-X-CSE-MsgGUID: s/+iqz9kRF+jDpXSSPVQoQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,261,1744095600"; 
-   d="scan'208";a="152400221"
-Received: from os-delivery.igk.intel.com ([10.102.21.165])
-  by fmviesa008.fm.intel.com with ESMTP; 24 Jun 2025 03:07:33 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH iwl-net v1] ice: check correct pointer in fwlog debugfs
-Date: Tue, 24 Jun 2025 11:26:36 +0200
-Message-ID: <20250624092636.798390-1-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1750759752; c=relaxed/simple;
+	bh=PNPhwM4paJwVQbDov+E9J9ZuC0PmxKIu8t8tgfnv7ro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nJbitUVpVh5X1Ebet4YfV3dPXNLTgZ8mkk+Aw+1hbQdyy+QMnEuzdpCiACUtEr4yx1dNPHaIEvfSrbLGjLehE/IXh2ZChcLRhiifGbWMI8pjfbZi6jNbuGYDgX3+YccB9jwQqb3mmDfSLKoe0cnweaS8J6J9cGlmaWfvRl+eFu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBIKbQhI; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so7816174a12.2;
+        Tue, 24 Jun 2025 03:09:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750759749; x=1751364549; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wR4ge6rguxSsc/ORqRy8r5vdeL5F2ATOq1gnAzeqSHI=;
+        b=KBIKbQhILIBtB2xQYK9KAYlbUENEMfP0Xfa0Ia5hPYNRbsaQFrvEgS7CeKM8SfEEFS
+         0v5Jjiqxp5JCcfuECLP5UPzaz9fk4qA6JK4KX1FDgWtRIw2tLcPBUkfAvLUOLkNJm1b0
+         14zbinvkthQjG7P0hxv1J2u7GIBfY4sgl9r4DP/PsX53rpSnbJnpTV/nHXfWYc6GVTdQ
+         YplbIBA3L9R1KrH5TIk41g92PZiH1QK2fj+LrN+lfMoCJXR8dorR/n3fL28Q8pRMPMtK
+         1qagIF6bc7+KSlmPRsiXYJlan4Dp0OFr+DGyvpZvKhOFNniHZCPwi2ZUc9mqTZTqtKTA
+         TymA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750759749; x=1751364549;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wR4ge6rguxSsc/ORqRy8r5vdeL5F2ATOq1gnAzeqSHI=;
+        b=mpH794mHCVRLIP4NAg6CoMHn0hpsIwnNktBi8wCW5MxgmDZ2X3E6v5egv7VFIEm56h
+         IfxtpxIQQWoY/UyNN7/Oh7/yGT0Nt+GaosrJabcN/JVeykWC7UHVRdPeje6nJjiE1ytG
+         1tZq69nOAXTndmdyNqoIcTUSWABXEQTtBG5GrOD1EOKXOrDrJnTlIBJWcbG/dQGb+lZc
+         46jzLKTfXVlvIy0cIjEtk61rUmO8w3Uc17RosrAzjy14hMnOoRd6zclsUheb0ftWwYEp
+         +xdWFzC15m8gCsS0fxPpjFsc5GPy/0oT9mtEBF+eOaZJ7GMsB7jZ0+EiI5AjOb8yXNDT
+         ZjLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxIKKGmzvX4R0uKhwK42lLCOA0rZ26mkFZAKTyNb6SXIbwHIxPsdn7/ubQi5bEC3QXpmTiO0DQGvELCuyxCmzY@vger.kernel.org, AJvYcCVK7SPT3+AfPxvPv5ybD3rWAMDhsUJL8cKiyKCJmMZcFgLFHKIfFB9Cyl72YkAstQFi+PZV2zI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFiiS+JxXhnAzSYjHGsb2d0n/uBpVkBKg6Sys8fgToOzGKEgzm
+	eT1aLuRVgYQf6AUTX7rLMyZTMBWyvLSwJPkCaaQ8Ud1gSVatwFYLjsC0
+X-Gm-Gg: ASbGncsvmCbyumPxH60Vn8SX9mtIKq+q6ySZ066lppkUKUwxFMQKjge5vyJJXwgBbxE
+	YVbXB54bTaW2NLCwq8+IRtkj3STh4/UMHykOVXlUHshB+ijJkZRFrAn4JvOM9V2+MbrAlC/Ttev
+	hNMmVAiamVXqTFt7l995nMeBlfegqGAgSYSRYtir9UU0Q7R4vkElSkwKhC57F4mOoQ2pZlmHf5l
+	z8yKsCzu4VgXNHmZE8CyNNH1iBpat6e0aH1LyGbf6+eqvwlXK74+M6spBqNOetykw0G+kZmxxIf
+	54j5MyC+MqzhBPoW0S6laixX/BTqONqN11gV36g2LfVPzSao849DQhqR/SsOEi48UlKok0zxNKs
+	s6LctEMClgBSsVnMqmxFr0g8stS8/wZ2rjhCB1MicvWZbY9+kYjaccitodSWCSeuT6erNsacTZN
+	Z64QZk64yPovwTvwDJgrj/ch0UT6HR4v+DwMyNIAacQV7YW6Q=
+X-Google-Smtp-Source: AGHT+IHKFAxaROdqfcGg3d6rDQqJLaE/SJ+Wkg9OhXhAmcXdrKyaPKmVMih7cR0ERStNXIIWPfDKeA==
+X-Received: by 2002:a05:6402:2550:b0:607:3344:6ef1 with SMTP id 4fb4d7f45d1cf-60a1cf2e082mr12192488a12.29.1750759748906;
+        Tue, 24 Jun 2025 03:09:08 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c2f4857e0sm791758a12.65.2025.06.24.03.09.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 03:09:08 -0700 (PDT)
+Message-ID: <4434d7fc-429f-40b4-8b98-6cd52a985fc3@gmail.com>
+Date: Tue, 24 Jun 2025 12:09:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 nf-next 2/2] netfilter: nft_chain_filter: Add bridge
+ double vlan and pppoe
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ bridge@lists.linux.dev, netdev@vger.kernel.org
+References: <20250617065835.23428-1-ericwouds@gmail.com>
+ <20250617065835.23428-3-ericwouds@gmail.com> <aFhqUosjt2ptnlOZ@strlen.de>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <aFhqUosjt2ptnlOZ@strlen.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-pf->ice_debugfs_pf_fwlog should be check for an error here.
 
-Fixes: 96a9a9341cda ("ice: configure FW logging")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-index 9fc0fd95a13d..cb71eca6a85b 100644
---- a/drivers/net/ethernet/intel/ice/ice_debugfs.c
-+++ b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-@@ -606,7 +606,7 @@ void ice_debugfs_fwlog_init(struct ice_pf *pf)
- 
- 	pf->ice_debugfs_pf_fwlog = debugfs_create_dir("fwlog",
- 						      pf->ice_debugfs_pf);
--	if (IS_ERR(pf->ice_debugfs_pf))
-+	if (IS_ERR(pf->ice_debugfs_pf_fwlog))
- 		goto err_create_module_files;
- 
- 	fw_modules_dir = debugfs_create_dir("modules",
--- 
-2.49.0
+On 6/22/25 10:40 PM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> -	return nft_do_chain(&pkt, priv);
+>> +	ret = nft_do_chain(&pkt, priv);
+>> +
+>> +	if (offset) {
+>> +		__skb_push(skb, offset);
+>> +		skb_reset_network_header(skb);
+>> +		skb->protocol = outer_proto;
+>> +	}
+> 
+> I don't think its a good idea to do this.
+> 
+> nft_do_chain() can mangle packet in arbitrary ways,
+> including making a duplicate, sending icmp/tcp resets in response
+> to packet. forwarding the packet to another interface, dropping
+> the packet, etc.
+> 
+> Wouldn't it be enough to set the skb network header if its not
+> set yet, without pull (and a need to push later)?
+
+If I replace the pull + skb_reset_network_header with
+skb_set_network_header and remove the push, this also works.
+I'll change it in the next version of this patch.
+
+However, if I do the same in nf_ct_bridge_pre() (the other patch in this
+patch-set), then packets get dropped. I'll need to look into that furter.
 
 
