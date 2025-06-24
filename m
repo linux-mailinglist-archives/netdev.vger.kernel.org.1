@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-200831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26BAAE70B3
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 22:29:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28E6BAE70B0
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 22:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB1955A5061
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:27:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAF901BC51EC
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B042EF9BB;
-	Tue, 24 Jun 2025 20:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF932EF9D5;
+	Tue, 24 Jun 2025 20:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzXgCm+6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/yOMbtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1C32EB5D8
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 20:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C902EBBBB
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 20:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750796807; cv=none; b=XIXztAh75Ewi81Rl8Bee1/qt2Ufff7p8y/AibI+BU4GVJF6K9Z4wO9xJyZWUrY8nOeXe3p9XtLgfa0wO0cijqIjiUrst28jUB780fagcp8QGdKqdXOuDsZx/dgWLP8mC9w5o1NfEHbWPRz5GfJ6UrCgSWMZwLyr8D6yQEBEhFj0=
+	t=1750796808; cv=none; b=cfgxfJz2OG31t+UOuIB3Jaa4q9zMp78breEp/HvPSYNi5DdE0UvA2syqo00evpMKaVMOnwlEBJxdIXih/laTZZlU68a5H0h3KHo3EiWDvqcGIVfcr3JmwmP7oT8loQLdKRUBHdnvIZNU6vh6BVxakKWxb5QfEsWS50sGkLuSpg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750796807; c=relaxed/simple;
-	bh=8m02j+liHsCe2o+RawwfK3A1VNPef+ThYTT6AVphNeU=;
+	s=arc-20240116; t=1750796808; c=relaxed/simple;
+	bh=j3MwJPnnXdEgSwMmnaz//285VeQmMRx5hMJRFY4eUmQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VjX0JHUQRdTqYNS0KGlBV+b48kw25r1ZwBOnGRBpcv+Ef1E+/0XFG3ly+dGNjxXz+1P2KjiHX3pw7hom1ytYn/2wfsCP7ZE1rGhMIYKtZ6lET6A1ErH9GSoZRhqvprERc1XeflxW4gijks0SxQ3SNRhr7qTklyCJibKLNUzzJRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzXgCm+6; arc=none smtp.client-ip=209.85.210.180
+	 MIME-Version; b=jSbs5DARQQuzlqCLfBd/wx2J1kYOPU3LF2Y7zDVVAqRQxgc5nUCbU/Q6/bf2RiJPpfYOv00TIixiFFvVkNEVUNPAbN1COqiLrfADO10+KpLCDzaTmehpjcIAV2Oqbo4Z3ZQAfmGL8zOnlZVbD9s58mzntEpMhdCPtHgjil8FymM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X/yOMbtp; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-748fe69a7baso567994b3a.3
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:26:45 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742c7a52e97so545015b3a.3
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 13:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750796805; x=1751401605; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750796806; x=1751401606; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jITxkHqlVdmhbv2Vct5Iv1G4yz29mQsURIxYg2YGWmE=;
-        b=OzXgCm+6i3GscyQRcF8iYgeevaQ39TpVQe5gI7bndEmUS5bnyt2p2uY7+XlV/gFEvF
-         Q0B56RVS6wqdfA45PfkN4CNklKUDmq5gMzfk2vOIcS4i0q5/me/WrLlo4+1Tjzpj6sJ6
-         Z3kB7Yl5BRT+HL0S9ynE0+7wpJvoCODj++m3t2Ld7KbfDVIo1TMqOolxLk8iCWxHSz0H
-         7fEaEDj3rKQMPcTcJ4z0f4/xnNBcIouZU+s33SkZXQ7rRNPA1fz+QtIvZxAtTmzAJFOQ
-         X48AX9tEZ4DeDynaiSZMPlaDjnoBiDCa8lEjR/c5L4IYx2JFKYGMDbtUeJfm/cSUNmxT
-         Ot8g==
+        bh=nuzbjsS7sm302d5GNKWLUffu44bgJ1U1ctSy1vAFhnU=;
+        b=X/yOMbtpIwC7yv341wQA0IutlSGUiKsu7qDLguwbAcT9AZiRb7aPpyqmeqsGWbV224
+         nK+sJqLm+kQtGN7O/BWFZqaNo3XCLOjVR3IdAlEmO7dSAzreyY8YmoW/qUCsSlHdDwTO
+         vyGzfqyUlSpopedCDVSTUJT0X5Q1WOu27CjPRFK8xy3+fUMcYsQ3DOjd5TTgOAkuUSUc
+         /Tg7qkLVXlHlGnzenumC2FED01XshIDwOMqdlEz/z8HB41iW839UM1IsNz7Ak86W+vbk
+         SL/tTRLecJaRyAyizdR4Iyn5SxG+ONdFRNYDmZMZOkm72R7+hE7kCzF6Mtsz79pixVDn
+         v8mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750796805; x=1751401605;
+        d=1e100.net; s=20230601; t=1750796806; x=1751401606;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jITxkHqlVdmhbv2Vct5Iv1G4yz29mQsURIxYg2YGWmE=;
-        b=Iqv5vGc1mxK647dnGCKLIb80VQXgZZAZa/yqCR/uwofjsSxTV3/c1MziLC8Egv2Y2N
-         hao31FvcGWn/UIbjQYh46mmW/ddqzfNzciQbIiPC+nbIU70rMS0Q8JVOv1MjKQr/a7Tm
-         +gW/kubMoGLHVQO/ezOnDiAT3GPv1wota+LlYj1Gqs9UYEaVPZ7BauqlYfBmrX8+551R
-         M9YeVBfZREjo0jG5s/8IvJpc/MSwSmcyQCo/tK7z+fLF9cJZ5scfZ1WAMzmXezq2etPo
-         hNqePCHP7ZE/KL7t1tpNLR+/mlSraDWw3We9EANM7eZmoaNprWm3npfW/+pi2iuQz7m8
-         zvFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrJf6WUAk2mkyiGBRfSkpCpVM2pRh0gr8c5SKWE/0DlGHhKoiQ3sMT2mA+o5HNgRNtc/wT9n0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMIQs/sM4H6MoRQvO1eZffws/ChNjekbcN3EG+6FQ3a/IGopH2
-	2BN5aCIgNJElyHW9RWFO4QSh/ide2wX50Lh+YgiHvRMudBeo9RXzBdM=
-X-Gm-Gg: ASbGncvLfsgy1t9AYX6oBlBQuAm/UrrCpQ24Tepq7q2LMRHLF166UarSCwBLQF26V11
-	4fBFy/ZnIQexsUmXmGsQY54WnYP+CFYUNOqshMEhD/T8TSzUqNXP9zDlIhHvXuF7+P2LO3o7FwO
-	wodxl5f1pwdDBs0vVREREd8vqTbxK2p1HZXjs/L7JHvatCOANtrRwfSnUbhTiq4ZN/6aCOBQJcG
-	w6RhwxkpgDi80KX7BvDBtLSULHvJT4F40za4QfQeDrNfdosYq5KTkUnp1f7l0q6WfiXrWWDdOb9
-	nX1SEYrH9iG6/luINwHeMaRj2QdzlIp70ijrzP0=
-X-Google-Smtp-Source: AGHT+IE+oWXsyqRzRnF++a6nmpiMDWaAp9ANwltYghhTGqdxUYz+jGo4m3A33rCvJmiO3bGN63k4oA==
-X-Received: by 2002:a05:6a00:2d1b:b0:736:4644:86ee with SMTP id d2e1a72fcca58-74ad4564761mr710904b3a.14.1750796804632;
-        Tue, 24 Jun 2025 13:26:44 -0700 (PDT)
+        bh=nuzbjsS7sm302d5GNKWLUffu44bgJ1U1ctSy1vAFhnU=;
+        b=mZ4S2A6/xDbXs36ofI4l38WqSmUr4wNysAmO1mmcVg9Vdi3do+Sgkkh7Ul29/w4j3W
+         efWrmIcu/KqSf1ISm1OK3iFXYX3sUG4Uk/7vYWElni1rKkBOmn0k2AdqgT6zFx5Arn+B
+         9BfNj/Ooi5rj2LTAWnKPXd1cgHVsed+pwqmRe4wrDyQUHgK+sSfDd9G4C2m4C4Jtssvx
+         i3/V50683yV/B7lpjvdnajubDLRiYtgDSTpx//cY56ZG4h8fCHPm7l8Yo+QhgXvzaPKW
+         LeLzRycwzw9iJlD7C3GlbN7mNxrxFjhuQXUnCG1t9wHOfrzAoAHyLIseoN0X2A37tU9y
+         gb1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV1gOaNlS1b3LGLe0gtVEgKmv77FmKhVahi30iO1BMExryKwAlHL93FK3x/m9yfZIEGyXe3HV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHfMtP3TkkUbnc4T5Ru/Of07kxp5zpUzoEocel6PFkPwpR9/bl
+	Z8KRJt5FLu2cpqek7oXsG/p+E/EhcPEbcSqGK+S5V04wONZKKO/+Lyc=
+X-Gm-Gg: ASbGncvgvGiTnpPlnaawFJMiBQ/3xW6P3LxqxUs9YuvK770+RaFTSWexlf+4nE08bdV
+	u+sFjrGm00gODon6blAV+q2mQ8rw7MSzMOXek4zCl5Ca2CAN+cY7ae7STKo7Zgrz8eqAY99W0SB
+	KJ4/2RmDYFX8dZtzRr61pMoDhxYoqGDwam6Ub71s9mCC6meG38YGPe1i/6mZ/BOJq6EnUI9KMQ/
+	AFDr2q/YpGIysUzChhHetb2hDfTSgsn6oxjlezTETNn2crzyy0s3Fy6wxFBvTGKPYjWZQ6Jn04U
+	2Z3uNMqD9M8US/MMqZIZArjlVZtuQ06Eu6wKQ9U=
+X-Google-Smtp-Source: AGHT+IGt5rZjMjnAr9xv1QHxDsxm4Nu2uFV9GTtS+aBXSRVGk7Drw/o32r4z2tzXmxO3L0GINCpfPg==
+X-Received: by 2002:a05:6a00:3916:b0:749:540:ca72 with SMTP id d2e1a72fcca58-74ad45da4b8mr724659b3a.24.1750796806117;
+        Tue, 24 Jun 2025 13:26:46 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::a408])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74a9697817esm2252994b3a.124.2025.06.24.13.26.43
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74a9697817esm2252994b3a.124.2025.06.24.13.26.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 13:26:44 -0700 (PDT)
+        Tue, 24 Jun 2025 13:26:45 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -82,9 +82,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 net-next 14/15] ipv6: anycast: Don't hold RTNL for IPV6_JOIN_ANYCAST.
-Date: Tue, 24 Jun 2025 13:24:20 -0700
-Message-ID: <20250624202616.526600-15-kuni1840@gmail.com>
+Subject: [PATCH v2 net-next 15/15] ipv6: Remove setsockopt_needs_rtnl().
+Date: Tue, 24 Jun 2025 13:24:21 -0700
+Message-ID: <20250624202616.526600-16-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250624202616.526600-1-kuni1840@gmail.com>
 References: <20250624202616.526600-1-kuni1840@gmail.com>
@@ -98,189 +98,60 @@ Content-Transfer-Encoding: 8bit
 
 From: Kuniyuki Iwashima <kuniyu@google.com>
 
-inet6_sk(sk)->ipv6_ac_list is protected by lock_sock().
+We no longer need to hold RTNL for IPv6 socket options.
 
-In ipv6_sock_ac_join(), only __dev_get_by_index(), __dev_get_by_flags(),
-and __in6_dev_get() require RTNL.
-
-__dev_get_by_flags() is only used by ipv6_sock_ac_join() and can be
-converted to RCU version.
-
-Let's replace RCU version helper and drop RTNL from IPV6_JOIN_ANYCAST.
-
-setsockopt_needs_rtnl() will be removed in the next patch.
+Let's remove setsockopt_needs_rtnl().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v2: Hold rcu_read_lock() around rt6_lookup & dev_hold()
----
- include/linux/netdevice.h |  4 ++--
- net/core/dev.c            | 38 ++++++++++++++++++--------------------
- net/ipv6/anycast.c        | 20 +++++++++++++-------
- net/ipv6/ipv6_sockglue.c  |  4 ----
- 4 files changed, 33 insertions(+), 33 deletions(-)
+ net/ipv6/ipv6_sockglue.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 03c26bb0fbbe..68f874a58c92 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3339,8 +3339,8 @@ int dev_get_iflink(const struct net_device *dev);
- int dev_fill_metadata_dst(struct net_device *dev, struct sk_buff *skb);
- int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
- 			  struct net_device_path_stack *stack);
--struct net_device *__dev_get_by_flags(struct net *net, unsigned short flags,
--				      unsigned short mask);
-+struct net_device *dev_get_by_flags_rcu(struct net *net, unsigned short flags,
-+					unsigned short mask);
- struct net_device *dev_get_by_name(struct net *net, const char *name);
- struct net_device *dev_get_by_name_rcu(struct net *net, const char *name);
- struct net_device *__dev_get_by_name(struct net *net, const char *name);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 7ee808eb068e..553c654e6f77 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1267,33 +1267,31 @@ struct net_device *dev_getfirstbyhwtype(struct net *net, unsigned short type)
- EXPORT_SYMBOL(dev_getfirstbyhwtype);
- 
- /**
-- *	__dev_get_by_flags - find any device with given flags
-- *	@net: the applicable net namespace
-- *	@if_flags: IFF_* values
-- *	@mask: bitmask of bits in if_flags to check
-+ * dev_get_by_flags_rcu - find any device with given flags
-+ * @net: the applicable net namespace
-+ * @if_flags: IFF_* values
-+ * @mask: bitmask of bits in if_flags to check
-  *
-- *	Search for any interface with the given flags. Returns NULL if a device
-- *	is not found or a pointer to the device. Must be called inside
-- *	rtnl_lock(), and result refcount is unchanged.
-+ * Search for any interface with the given flags.
-+ *
-+ * Context: rcu_read_lock() must be held.
-+ * Returns: NULL if a device is not found or a pointer to the device.
-  */
--
--struct net_device *__dev_get_by_flags(struct net *net, unsigned short if_flags,
--				      unsigned short mask)
-+struct net_device *dev_get_by_flags_rcu(struct net *net, unsigned short if_flags,
-+					unsigned short mask)
- {
--	struct net_device *dev, *ret;
--
--	ASSERT_RTNL();
-+	struct net_device *dev;
- 
--	ret = NULL;
--	for_each_netdev(net, dev) {
--		if (((dev->flags ^ if_flags) & mask) == 0) {
--			ret = dev;
--			break;
-+	for_each_netdev_rcu(net, dev) {
-+		if (((READ_ONCE(dev->flags) ^ if_flags) & mask) == 0) {
-+			dev_hold(dev);
-+			return dev;
- 		}
- 	}
--	return ret;
-+
-+	return NULL;
- }
--EXPORT_SYMBOL(__dev_get_by_flags);
-+EXPORT_IPV6_MOD(dev_get_by_flags_rcu);
- 
- /**
-  *	dev_valid_name - check if name is okay for network device
-diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
-index e0a1f9d7622c..427fa95018b7 100644
---- a/net/ipv6/anycast.c
-+++ b/net/ipv6/anycast.c
-@@ -73,15 +73,13 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 	struct inet6_dev *idev;
- 	int err = 0, ishost;
- 
--	ASSERT_RTNL();
--
- 	if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
- 		return -EPERM;
- 	if (ipv6_addr_is_multicast(addr))
- 		return -EINVAL;
- 
- 	if (ifindex)
--		dev = __dev_get_by_index(net, ifindex);
-+		dev = dev_get_by_index(net, ifindex);
- 
- 	if (ipv6_chk_addr_and_flags(net, addr, dev, true, 0, IFA_F_TENTATIVE)) {
- 		err = -EINVAL;
-@@ -102,18 +100,22 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 	if (ifindex == 0) {
- 		struct rt6_info *rt;
- 
-+		rcu_read_lock();
- 		rt = rt6_lookup(net, addr, NULL, 0, NULL, 0);
- 		if (rt) {
- 			dev = rt->dst.dev;
-+			dev_hold(dev);
- 			ip6_rt_put(rt);
- 		} else if (ishost) {
-+			rcu_read_unlock();
- 			err = -EADDRNOTAVAIL;
- 			goto error;
- 		} else {
- 			/* router, no matching interface: just pick one */
--			dev = __dev_get_by_flags(net, IFF_UP,
--						 IFF_UP | IFF_LOOPBACK);
-+			dev = dev_get_by_flags_rcu(net, IFF_UP,
-+						   IFF_UP | IFF_LOOPBACK);
- 		}
-+		rcu_read_unlock();
- 	}
- 
- 	if (!dev) {
-@@ -121,7 +123,7 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 		goto error;
- 	}
- 
--	idev = __in6_dev_get(dev);
-+	idev = in6_dev_get(dev);
- 	if (!idev) {
- 		if (ifindex)
- 			err = -ENODEV;
-@@ -143,7 +145,7 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 		if (ishost)
- 			err = -EADDRNOTAVAIL;
- 		if (err)
--			goto error;
-+			goto error_idev;
- 	}
- 
- 	err = __ipv6_dev_ac_inc(idev, addr);
-@@ -153,7 +155,11 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 		pac = NULL;
- 	}
- 
-+error_idev:
-+	in6_dev_put(idev);
- error:
-+	dev_put(dev);
-+
- 	if (pac)
- 		sock_kfree_s(sk, pac, sizeof(*pac));
- 	return err;
 diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index 3d891aa6e7f5..702dc33e50ad 100644
+index 702dc33e50ad..e66ec623972e 100644
 --- a/net/ipv6/ipv6_sockglue.c
 +++ b/net/ipv6/ipv6_sockglue.c
-@@ -119,10 +119,6 @@ struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
- 
- static bool setsockopt_needs_rtnl(int optname)
- {
--	switch (optname) {
--	case IPV6_JOIN_ANYCAST:
--		return true;
--	}
- 	return false;
+@@ -117,11 +117,6 @@ struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
+ 	return opt;
  }
+ 
+-static bool setsockopt_needs_rtnl(int optname)
+-{
+-	return false;
+-}
+-
+ static int copy_group_source_from_sockptr(struct group_source_req *greqs,
+ 		sockptr_t optval, int optlen)
+ {
+@@ -380,9 +375,8 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ {
+ 	struct ipv6_pinfo *np = inet6_sk(sk);
+ 	struct net *net = sock_net(sk);
+-	int val, valbool;
+ 	int retv = -ENOPROTOOPT;
+-	bool needs_rtnl = setsockopt_needs_rtnl(optname);
++	int val, valbool;
+ 
+ 	if (sockptr_is_null(optval))
+ 		val = 0;
+@@ -547,8 +541,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		return 0;
+ 	}
+ 	}
+-	if (needs_rtnl)
+-		rtnl_lock();
++
+ 	sockopt_lock_sock(sk);
+ 
+ 	/* Another thread has converted the socket into IPv4 with
+@@ -954,8 +947,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 
+ unlock:
+ 	sockopt_release_sock(sk);
+-	if (needs_rtnl)
+-		rtnl_unlock();
+ 
+ 	return retv;
  
 -- 
 2.49.0
