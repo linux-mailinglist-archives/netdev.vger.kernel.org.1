@@ -1,133 +1,128 @@
-Return-Path: <netdev+bounces-200630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F664AE6575
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:51:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D84ACAE6511
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14E63177E76
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:51:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7174717EBC0
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31962989B4;
-	Tue, 24 Jun 2025 12:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="MVy5FOR4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6605C280033;
+	Tue, 24 Jun 2025 12:33:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E6D298CB0
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 12:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1A2222571;
+	Tue, 24 Jun 2025 12:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750769474; cv=none; b=PhHOqwlx1yRCGbAApCCcYtr8yWZI9ZYmo59ukAOW9WLNH5T50j929z66sirayM4n94qGB3Y8IJ1rE/7ZkhTuUInNEF54eBjo++yhkx6TlyOPgb3E6wiP14jDy13omv+6tAmGA8wkqipqO4B2g+K4uY2RDUt3008ze4/HTli0yqk=
+	t=1750768439; cv=none; b=bXfdMTp9VWUzI9fdNuU/iOEIgv5mhoqBHdy3M8ye4ArXKE2e32rCWrm+Cp3s1CMKK42XEPW5idIUO9Dr/y3S4AELk9m0j5KbVNCUj9j1G1zndvHk8E2RBmPlAnEd9VJyRi1hy5dKdnhmWgrMvOnn2CKUX8wHxomkTH8d6jb6ppU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750769474; c=relaxed/simple;
-	bh=jkT6mfH4uJfqYwc9rvEhzIqTWfZ6q1x0/wb+MeCmz0w=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ntwwcgYxXG6GZ6IknKVeNqL5HmhFdKoCJFv7bFHEI9OJy2CAVu57/aAS66d+t06bc8aXfh2qXP0GKBculdkc5q4FaOEbX6YMkhHrTzYDB5+N2c2D6U946WIFETXcqR3QleG1QFcX6q8zI2O+NZZjjPVUZuJBdrOq77JkQIv3S7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=MVy5FOR4; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-607b59b447bso7949937a12.1
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 05:51:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1750769471; x=1751374271; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=R8j08AxL8zlJOltWi63caQrmz1cFgG6v1E8nzEyRGUo=;
-        b=MVy5FOR4pHJiIGCZa9Eix15tvZdH1JjvJUR/wWjnsmbfX8HSYQGen7+KGg4NK5AIjN
-         9EKRujwSDBTBa4grQeFUvxr9JELV6Tos13K74Zl677p5QLsqHCu1qgIGcA6evI1ZbVLv
-         U7AvKU4e9ZLsUEaE9yFchujiUdIG0WAy9Xx9QEToAS0OcRRRcRgmnJ3s/R5xZJr87SAI
-         sqsWF3AhF/BrCNL95mTozzBDDHwJfnBkhO745MBW4x2w2ezK45cwEXNyaNErpnahuG2N
-         N5j9CsmtYPbWZ1sbG55QrO3fE3ZyHd9fzEIOwk/z+GofoSpXKPbES5fMZE4LsZIr/Z32
-         WTDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750769471; x=1751374271;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R8j08AxL8zlJOltWi63caQrmz1cFgG6v1E8nzEyRGUo=;
-        b=FS/9EF8nVH6uR1fRyalLjUHoo46iMXkUcsI/iXZ34HQLRYbJMJJFOnWrx+po6tHKh7
-         ewCumiAMv8dZYUUqkdmey9JuqR8I8iAhmUNd4e0PdeRWbyHjZIcQE9q+xhExjjaAOC2o
-         Y9O4Qr63QrqiqNriT7lWyTOX30PoUC0pIeKACZlC4k5WWyvWCvDRwsU/UhKqag3atdU5
-         +irsDYBQwJJDmAGORxFqaTbsjAzv1eb5TC4SlGNj6GlYkJnwmS+TGT1YHstzNGllx2mp
-         vpP5K75/DcWbUo7dILxk7rXJsYSB7/6KhoI9HBLxn74T/TCrdceWw2CRVVRHscdjXnev
-         lGlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVs8TJslAj/kMzWLBM+2qa4Xn4d8U2ScFmz3qin4wMzAwGDJLNUMidBNLAzG+EsBApXlANFAIg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUnkYIKQM4N5v1G4goEHeSeP8Z4dr3B5SZYCWidASH0DM1L8WF
-	+5yyNNwwedq/sk19oos9efEsTt66B8WmaIOn4YpnBG9sc+4Imc8q7qFWCZdHg/HHtQ==
-X-Gm-Gg: ASbGncsbF1/jiHO161HMw8gvrM6SJlXjg+BZi21WxCm3xcReXKEsYUAe5pdLK8e8VxS
-	hpNO8GKB7OcSnorcLNETv9ZpelkTs+4BamU+pAOwDecX4Kln2SC9+OMxBTSWzuM/L5l/wdk/ZKf
-	VHE5qV8hEvAebbWrhfjwavt8kdz/9gq8g50t50VLnU2Mnq/zUehGcAnUsSF5YuUo+k4bnj6Lfk7
-	V8mf2QKNu/9hTI/pCkUO6eiKlqCKz9ebc70oTmb4t85T54RXb/ErmiycCKbHrEETHVrDC66akRp
-	052/F6+LZ9hWJ7OjlWpetjFNeXnx0sPXrZsShCChgu4pWAo95JEJqMWlFLfo27lO
-X-Google-Smtp-Source: AGHT+IGW7ORN9PWnJJjgW+cZ6TowqoJ7MmszMOr+J2FbInVvd3xL3L9vT7lM4Pbi6amiUEIgd5D6GA==
-X-Received: by 2002:a05:6402:4415:b0:607:f31f:26de with SMTP id 4fb4d7f45d1cf-60a1ccad8femr13331076a12.1.1750769470446;
-        Tue, 24 Jun 2025 05:51:10 -0700 (PDT)
-Received: from [192.168.0.114] ([91.196.212.106])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c2f1ae7basm1003980a12.25.2025.06.24.05.51.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 05:51:10 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <cca5cdd3-79b3-483d-9967-8a134dd23219@jacekk.info>
-Date: Tue, 24 Jun 2025 14:51:09 +0200
+	s=arc-20240116; t=1750768439; c=relaxed/simple;
+	bh=ntGwK67tdZVtGMNaU6QKhZxFxF5O/eBDm3EURT/Hu1s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HWRwDGhtX6y3Sozu6jPrktwMlfvZweUQKIxwUmmcG6mJvmrMrwkiAB/mmyqzW5n6iWQVb1Hkibp5qvxAbEz17T8U1OAOyKmFb19sIgAkGlZd+mLhA4dIaWz6wu9S2iFAAWRJ75AFrqIEsg+gefYAVyDP2puBhV8/6CPy4aJY4+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bRPQf1J4RzTgmJ;
+	Tue, 24 Jun 2025 20:29:30 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4E544180237;
+	Tue, 24 Jun 2025 20:33:49 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 24 Jun
+ 2025 20:33:48 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <dsahern@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: add sysctl ndisc_debug
+Date: Tue, 24 Jun 2025 20:51:15 +0800
+Message-ID: <20250624125115.3926152-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] e1000e: ignore factory-default checksum value on
- TGP platform
-To: Simon Horman <horms@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
- <b7856437-2c74-4e01-affa-3bbc57ce6c51@jacekk.info>
- <20250624095313.GB8266@horms.kernel.org>
-Content-Language: en-US
-In-Reply-To: <20250624095313.GB8266@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
->> +	if (hw->mac.type == e1000_pch_tgp && checksum == (u16)NVM_SUM_FACTORY_DEFAULT) {
-> 
-> I see that a similar cast is applied to NVM_SUM. But why?
-> If it's not necessary then I would advocate dropping it.
+Ipv6 ndisc uses ND_PRINTK to print logs. However it only works when
+ND_DEBUG was set in the compilation phase. This patch adds sysctl
+ndisc_debug, so we can change the print switch when system is running and
+get ipv6 ndisc log to debug.
 
-It's like that since the beginning of git history, tracing back to e1000:
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ include/net/ndisc.h        | 5 ++---
+ net/ipv6/ndisc.c           | 3 +++
+ net/ipv6/sysctl_net_ipv6.c | 7 +++++++
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
-$ git show 1da177e4c3f4:drivers/net/e1000/e1000_hw.c | grep -A 1 EEPROM_SUM
-     if(checksum == (uint16_t) EEPROM_SUM)
-         return E1000_SUCCESS;
-(...)
-
-
-I'd really prefer to keep it as-is here for a moment, since similar 
-constructs are not only here, and then clean them up separately.
-
-Examples instances from drivers/net/ethernet/intel:
-
-e1000/e1000_ethtool.c:  if ((checksum != (u16)EEPROM_SUM) && !(*data))
-e1000/e1000_hw.c:       if (checksum == (u16)EEPROM_SUM)
-e1000e/ethtool.c:       if ((checksum != (u16)NVM_SUM) && !(*data))
-igb/e1000_82575.c:      if (checksum != (u16) NVM_SUM) {
-igb/e1000_nvm.c:        if (checksum != (u16) NVM_SUM) {
-igc/igc_nvm.c:  if (checksum != (u16)NVM_SUM) {
-
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index 3c88d5bc5eed..481a7fc5d5c1 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -60,12 +60,11 @@ enum {
+ 
+ #include <net/neighbour.h>
+ 
+-/* Set to 3 to get tracing... */
+-#define ND_DEBUG 1
++extern u8 ndisc_debug;
+ 
+ #define ND_PRINTK(val, level, fmt, ...)				\
+ do {								\
+-	if (val <= ND_DEBUG)					\
++	if (val <= ndisc_debug)					\
+ 		net_##level##_ratelimited(fmt, ##__VA_ARGS__);	\
+ } while (0)
+ 
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index ecb5c4b8518f..be4bb72b1d61 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -83,6 +83,9 @@ static void pndisc_destructor(struct pneigh_entry *n);
+ static void pndisc_redo(struct sk_buff *skb);
+ static int ndisc_is_multicast(const void *pkey);
+ 
++u8 ndisc_debug = 1;
++EXPORT_SYMBOL_GPL(ndisc_debug);
++
+ static const struct neigh_ops ndisc_generic_ops = {
+ 	.family =		AF_INET6,
+ 	.solicit =		ndisc_solicit,
+diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+index d2cd33e2698d..c0968f0c5d00 100644
+--- a/net/ipv6/sysctl_net_ipv6.c
++++ b/net/ipv6/sysctl_net_ipv6.c
+@@ -247,6 +247,13 @@ static struct ctl_table ipv6_rotable[] = {
+ 		.proc_handler	= proc_dointvec,
+ 	},
+ #endif /* CONFIG_NETLABEL */
++	{
++		.procname	= "ndisc_debug",
++		.data		= &ndisc_debug,
++		.maxlen		= sizeof(u8),
++		.mode		= 0644,
++		.proc_handler	= proc_dou8vec_minmax
++	},
+ };
+ 
+ static int __net_init ipv6_sysctl_net_init(struct net *net)
 -- 
-Best regards,
-   Jacek Kowalski
+2.34.1
 
 
