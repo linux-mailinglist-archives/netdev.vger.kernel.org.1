@@ -1,142 +1,129 @@
-Return-Path: <netdev+bounces-200621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 322F6AE651B
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:35:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90BF8AE6534
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A36857ACC9B
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:33:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E6C4A60F8
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B217026B080;
-	Tue, 24 Jun 2025 12:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DE1291C08;
+	Tue, 24 Jun 2025 12:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W6GHJ9nD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC06D1D52B;
-	Tue, 24 Jun 2025 12:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5614230996;
+	Tue, 24 Jun 2025 12:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750768505; cv=none; b=Kvhge7SMsBvddM1moW99Dyha88KVs8m+6XPUyPRafJK0yL1kww4BiwWI04DEKfTOhjydoZr4AqWUfXIvKrFtObL7qWZBPr49fbhTP1oicLll+/2+GbWozf2Vsx/gHwVCjX19uiABl/s947QtA8N7ygRDpurVLxsLZ0cESu3hJKw=
+	t=1750768746; cv=none; b=jcIKjiP82/R/zM86NZ7F0Q9SkWmR2z6EBLAp1zAMJgKYa4qv4dTyvyNVXK1p1sx6yZT6STiskO1aCpRs3NZBiVOcuxK5+nu4hWb00FeBPF5Ua5Q4keeugvYA0SAZp5tpQN3rZ0+cqd8qAICb5lew8ZhC3uylitHgFSpR6SqFDQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750768505; c=relaxed/simple;
-	bh=vO6kx9P2dBA5m8J1U9nii5EEhuooiv9bKaiWcrrGZBY=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kHllTAYiJx9LR+Lw1gBSxFwiY1DNJ6H95f4vNZXstOHktmrJchinxyw7Upl0dYD30TK7xQwr9Ks4NqUX+6+tKriqbLeXehyVpsgxoC+xDoozUfV+mzA2dZgwzvMle5nUvxtqZ3FT5SlcGOueF6ROPMVxamO67UaiUi1rZN0nopA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=fejes.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=fejes.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-450cf214200so47543835e9.1;
-        Tue, 24 Jun 2025 05:35:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750768502; x=1751373302;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vO6kx9P2dBA5m8J1U9nii5EEhuooiv9bKaiWcrrGZBY=;
-        b=XwH9krYt8G+4y9F3V8QomGpT96vsTEANNYwm/SizHOjIGmZo48qE5P9n1N0o9iktIK
-         A3YdYFVze1sFw9Cb2UQNDNv013jKHGfR9NSQCZ9/1zRGz8JDflMGmlHHO6RYf3e8NFKt
-         KctYfTH66rFSe0BanNfCs1+mlTv6RqIG/x2tEVTZQyRIxJxOrenr0Cc+Lk5VZ0s+4vna
-         hhNHkjD8Mj5C2D8sYnMsPZ5B1vXsoebpcf2MngM7MnNxf/HrUa6n6zKPgEy3l43JfJZ2
-         VyTRRPzJxLLWb7tvOVzlBGgnOrhQl4uMF3+ooHlI+hA1EZvgF1i0SrXOf/cugFHzTpsf
-         ZjDw==
-X-Forwarded-Encrypted: i=1; AJvYcCV4NbgIdtoQM2jlVpzYIppG0uz91OJ6o9hD2PuarJFKnqG8PLmT7k2zDH3tZfuIwIYcNRX4czPQCJv7Iy8KaNU=@vger.kernel.org, AJvYcCX4kzBrWNi1OAoc6g7eR+lqw802z4gg2iBzMcy+DBq4587GMmsv5bfhLLqVc38yRgl2nuhYLcsW@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1AlYQD6TjZ+9NrML35typA7/fP4sXg8ywThriQK1ev+T+pflI
-	xBJSMR81lBADzlk2dmZh9Vv5FQKSgL0qWhGh8N7XWJyjs4wuLC2v0pcU
-X-Gm-Gg: ASbGnctWbEXQRaD4GqbbQwtvyHK0I9BH08mojcevcMNW1m/kSC0F7c8uHJ6C3R5XMBz
-	9H4HxXv7W0Kd11QcfeAChGbtJkBRh7/61UXZn960193kiHGPz8WVtCdDQVNcVOWdSMzUCuf9ZjA
-	V0cq7kkiodIwjgZLSn/B9Z4z/pK46guwCPotueDXkwFqeWmvcC0nnU9W39GGbCn9Gqsej0AEDq1
-	js+Fkt3Nvz8zAt93OG7N3WNMp8ej6OqnMl4qujZ5/EmuAfn7yAekdZeKGEXR60eNYZCFsFS5AGN
-	lpIGrZabcu1FN3jVMXdzlI44GCzqyyc46z5itiLqMKpctimjz4PedzQDyH4=
-X-Google-Smtp-Source: AGHT+IGU5aurfEaFN5yYiteziFoxX752x4NwSEcFi+QXFzqK7qCY3Nfhc7kq1gMvvLwKAlqjQkp9lQ==
-X-Received: by 2002:a05:600c:4510:b0:43d:45a:8fc1 with SMTP id 5b1f17b1804b1-453659c484bmr151534765e9.4.1750768501473;
-        Tue, 24 Jun 2025 05:35:01 -0700 (PDT)
-Received: from [10.148.85.1] ([195.228.69.10])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646cb672sm143029305e9.6.2025.06.24.05.34.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 05:34:59 -0700 (PDT)
-Message-ID: <6f880f49c2d9ef20ab087c6e9d1a6d6c8f6e500a.camel@fejes.dev>
-Subject: Re: [PATCH v20 net-next 0/6] DUALPI2 patch
-From: Ferenc Fejes <ferenc@fejes.dev>
-To: chia-yu.chang@nokia-bell-labs.com, alok.a.tiwari@oracle.com, 
-	pctammela@mojatatu.com, horms@kernel.org, donald.hunter@gmail.com, 
-	xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com,
- pabeni@redhat.com, 	jhs@mojatatu.com, kuba@kernel.org,
- stephen@networkplumber.org, 	xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, 	edumazet@google.com, andrew+netdev@lunn.ch,
- ast@fiberby.net, liuhangbin@gmail.com, 	shuah@kernel.org,
- linux-kselftest@vger.kernel.org, ij@kernel.org, 	ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, 	g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, 	mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, 	Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-Date: Tue, 24 Jun 2025 14:34:57 +0200
-In-Reply-To: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1-1 
+	s=arc-20240116; t=1750768746; c=relaxed/simple;
+	bh=4P8wd9h5Go264P/9N+8xDjMZjsgekEEzsS81qXtyA0M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uhmLS5kOz7GHtI0eTmTMmeyD7cVP5FHHUadTVbbJn0eSfI18GGpJ4855hOe69dUuXEEGOq0bo/dNjq0me8zp0ur3PreGk+XgmrZ1BJSu9ziD6VVQWuB5aTvv1Bhg7nuFueeelUa3rJg8OhSz4wNRBV6rAk/kLQNyrz4NxoNWkNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W6GHJ9nD; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0hakl0/kYPdggumUkyNzKLxp5ngjPrYeJTMOFwUQIRA=; b=W6GHJ9nDe8Pjyc8lP/+jiNtUot
+	tEV2YfGRhCnLYBES0b6YVkr8LBiUF8sj81PF+eHHOH1G3NPn5GhDshzrr8iZec7DNgrnHoHIgfSG8
+	mYmlXBZl7lUIdQOM2ADjdzD8dbkUx8tszlW3N1dar2Zy0fyxFeHZS12t5fZeqO5eB2UkDd0+i2LQe
+	CVMMgiq3wc/JqmPHJU3WZgdiw5jCGKKKximG6PYpCDZLy4Ldbx1q0hWJIQY3rljTUpDloQIypJBOF
+	rn4Ulq7/ZtTByPIQ+Wy3e4+mD8O4K3gVvFFnzCcVR/VwzsMkQWMdSNvbnor6GQbfYMgBKqbW/87Mq
+	hM4pGj5Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uU2vU-00000005bfF-49O8;
+	Tue, 24 Jun 2025 12:39:00 +0000
+Date: Tue, 24 Jun 2025 05:39:00 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: How to handle P2P DMA with only {physaddr,len} in bio_vec?
+Message-ID: <aFqcZMXUYx6qqDx_@infradead.org>
+References: <aFlaxwpKChYXFf8A@infradead.org>
+ <2135907.1747061490@warthog.procyon.org.uk>
+ <1069540.1746202908@warthog.procyon.org.uk>
+ <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
+ <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
+ <1015189.1746187621@warthog.procyon.org.uk>
+ <1021352.1746193306@warthog.procyon.org.uk>
+ <1098395.1750675858@warthog.procyon.org.uk>
+ <1143687.1750755725@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1143687.1750755725@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sat, 2025-06-21 at 21:33 +0200, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->=20
-> Hello,
->=20
-> =C2=A0 Please find the DualPI2 patch v20.
->=20
-> =C2=A0 This patch serise adds DualPI Improved with a Square (DualPI2) wit=
-h
-> following features:
-> * Supports congestion controls that comply with the Prague requirements i=
-n
-> RFC9331 (e.g. TCP-Prague)
-> * Coupled dual-queue that separates the L4S traffic in a low latency queu=
-e (L-
-> queue), without harming remaining traffic that is scheduled in classic qu=
-eue
-> (C-queue) due to congestion-coupling using PI2 as defined in RFC9332
-> * Configurable overload strategies
-> * Use of sojourn time to reliably estimate queue delay
-> * Supports ECN L4S-identifier (IP.ECN=3D=3D0b*1) to classify traffic into
-> respective queues
->=20
+On Tue, Jun 24, 2025 at 10:02:05AM +0100, David Howells wrote:
+> > There isn't a very easy way.  Also because if you actually need to do
+> > peer to peer transfers, you right now absolutely need the page to find
+> > the pgmap that has the information on how to perform the peer to peer
+> > transfer.
+> 
+> Are you expecting P2P to become particularly common?
 
+What do you mean with 'particularly common'?  In general it's a very
+niche thing.  But in certain niches it gets used more and more.
 
-Looking at this, I wonder if DualPI2 would be implemented in BPF.
-For example, you could have two FIFOs with a BPF Qdisc, such as:
+> Because page struct
+> lookups will become more expensive because we'll have to do type checking and
+> Willy may eventually move them from a fixed array into a maple tree - so if we
+> can record the P2P flag in the bio_vec, it would help speed up the "not P2P"
+> case.
 
-struct bpf_list_head l_queue __contains(skb_node, node);
-struct bpf_list_head c_queue __contains(skb_node, node);
+As said before, the best place for that is a higher level structure than
+the bio_vec.
 
-The bpf_list_push_back and bpf_list_pop_front functions are also available =
-for
-handling these.
+> Do we actually need 32 bits for bv_len, especially given that MAX_RW_COUNT is
+> capped at a bit less than 2GiB?  Could we, say, do:
+> 
+>  	struct bio_vec {
+>  		phys_addr_t	bv_phys;
+>  		u32		bv_len:31;
+> 		u32		bv_use_p2p:1;
+>  	} __packed;
 
-There are also spinlock helpers, and the pi2_timer can be replaced with upd=
-ates
-based on the struct bpf_timer. Of course, there are tricks to consider rega=
-rding
-GSO, which might require additional BPF helpers. However, looking through t=
-he
-code, I see a chance to implement this as a pure BPF qdisc. What do you thi=
-nk?
+I've already heard people complain 32-bit might not be enough :) 
 
-Having this as a regular qdisc with the iproute2 tc interface is great,
-considering the effort already spent on it. However, since all the operatio=
-nal
-bits are already sorted out, it might be worth looking into the feasibility=
- of a
-BPF version.
+> And rather than storing the how-to-do-P2P info in the page struct, does it
+> make sense to hold it separately, keyed on bv_phys?
 
-Best,
-Ferenc
+Maybe.  But then you need to invent your own new refcounting for the
+section representing the hot pluggable p2p memory.
+
+> Also, is it possible for the networking stack, say, to trivially map the P2P
+> memory in order to checksum it?  I presume bv_phys in that case would point to
+> a mapping of device memory?
+
+P2P is always to MMIO regions.  So you can access it using the usual
+MMIO helpers.
+
 
