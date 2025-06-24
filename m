@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-200777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D49DAE6D27
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:59:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6564AAE6D29
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 19:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3A433A39EA
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:59:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C93EC1BC05DE
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 17:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016E52E3B16;
-	Tue, 24 Jun 2025 16:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187121E5219;
+	Tue, 24 Jun 2025 17:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Igy8dNiX"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="WK7RphHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013058.outbound.protection.outlook.com [40.107.159.58])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011025.outbound.protection.outlook.com [52.101.70.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0292E339D;
-	Tue, 24 Jun 2025 16:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FC37DA73;
+	Tue, 24 Jun 2025 17:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.25
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750784377; cv=fail; b=FFfgQM3xK1kNNg7RmOr044qqAtpdRtrOakN1u9gBw0Aa3gUo2vp1+gBrkEBLsY+Oil7za+YVUPlNwcsYyyFobLu/NiDOEvDY/OVjC6Sbougye1z9db+qQRE8bA04C6+5CFCM2BD8XUP18muBdqGbfViRPIK2sygyupe3RWi4kO8=
+	t=1750784448; cv=fail; b=nngUcXoEB7U70G3PrqP3f5xN++XgMJZbQZ1U/RqIGq5jZ0F1Wld54xQZGq2qh5Ci0qXQ5oj8k7BQz7f6HWeCf6h35tTRXo9eQM3eju3DWzPRHHN61JLB9+l7r+4GWkFcy8ZlUdQxo6j9ZKiaDdIiarebVrLJN4LUXsKYPUGYzEM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750784377; c=relaxed/simple;
-	bh=hs/auXDFcld6TrkW+H2np3dmzfE5mRYAu3poXVsIC7g=;
+	s=arc-20240116; t=1750784448; c=relaxed/simple;
+	bh=NlilB4T3NBwzIHKF/Y4DQpoZMA7fy8HHFJHxwtKTrKk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nuE/FxZKPVWKPiEbER1U7gVIGQEKFK8bYrnQCkfTbdDmBmiA2NOwfT4T/tguIi7fMzxGLsHPjLJDwb5W7rbab0COH8Ez9jg6W4GlbRVuS6npemjQTtiYHIL7A9MC7mci4q/GcIH+nHtub+J19nEE1KFnlvOIUjleSCdGPVl+EcI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Igy8dNiX; arc=fail smtp.client-ip=40.107.159.58
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Q8mR0bMearASS71QSbZnyv0FK9os6uzoXMTyOZOUQ3212LHUl7eZgg8TVrvLagmCFUmDAEfT9rXxg92kpoHjonRUCIVaI4xNpCNHiQTluNi9IfYNiQQjmPS/j3ufziVKfQGR5IfmnZVW+ja0w/VeedcB/AprkIyZ00krEbagsDY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=WK7RphHl; arc=fail smtp.client-ip=52.101.70.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Rln0qSFLlFfn3opxG9qtB0Nnk0qYjIXB84LJNXXw5CD7e7NLSOf1RmbptUZ6Nf5r7iMHnr+/+XCLTJCF0liIxhyRCKHawKP+35159aCip4w6kteoHJFccEBMrx7+F73ZRc80QsIaVjDZ1BCWp1R5dW8yAhXecEdr4tBQa6WpAcvHI5d3LPKCc0k6BQc7LqyWnp2+ywqIxJJHXJHK9+g02sXxyNPS3KOwtKrcJ3jUrR9xSQw8+oKG70hvh2Qvy/jACg9zkALc72Ijw46dcxnZS1JC0kV4cVag3buxUE9n01Lfh7gyGWNEQ1ib/Y+pNq/j7cuOMQxCkmU2H8NY/U3NUA==
+ b=y9OuhAI7cDanL/TtWEm0PUwjOzBBdd6jg4DFwEFjkFAZQnSLSxfQFL0XlsJ0OHK1jTdV6viw7T0y4/pYiepAZVep5Vq2ceOcYNWl7SPkoyZLoamMJPP3bATtBgOMNXWQQxThxTGh5fgpWcDCkz5gNoG180TzIAP/MDfeb7DF5DKIO8AjkydxSMcMfz8z6Y1kUhhkrslqIA4NoZ2lraY+/q/TkvB3HV9RazZ3ogUocS6s9EEsfMkqJXHG8yldG/Bx0aUiT1hrwALeShvqy3SdRp9pKQuMMDqjc+oUUyZ3ZvDI2MBJ9RBnYt4Ysw+1FQjfnwTK4lhE9mjMPCtmVrRklA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9pD4ESNRu2tTJjAnIvWbzPPsmRItqW7V/JHhUioBd5c=;
- b=FLYyQKpuTdO3SXGg/FFt69x8KSPD0rKWWkbCMl61hbkqCiLMGX0LkWNtvt4uvb5ZkLt5/0JwtmMuBQdMa/P8LXDerq8Yc/DHhsvdI7krgQoZldb7OPJpRQmnT5MDsSLoxnqxdjA4UbrAI+oIGNumQ9n/4AXe5VMV3561scTIw7mQWf1i8GPu47HoL1BwgN/KUp1GbAVOhx2SalWQw0/mSJdHOgHJolL28hUa+3J8qHeEhdlukkSOTAGIWMMyBKvVTYT3/fGytt1K48s+U6tfNNkFBZDbUBO98xveSV92Rtw5sRLMFdT89Die21hcNeSBLtWTtmxgVO2/xgwSByPPAQ==
+ bh=EPMK6/WdonJq0AnMWu1bPLIs1nJFfgHDMi3PbJdNG1U=;
+ b=c++gVspUwiNvS1GBPmMU5MKaIQIy75zWifvNe0bT2PsabYvJQmMqCAFac1CFRf0cyX4s6Xvexxl5EJeFxvlWZvybllErrhcs7nnkfUPZNxfLDx/HwnjUFHLtjFn+yE/KASv6DQHTbNMQSkfPwueVCWJPb3ibQ7NF4JvhPnM1Vt6maQtsNJk50sSR39qB6EMENcdJMrMY1l5aeN0FMolL8MB2BXyY2iZGNJcZU115Ne3vDp3mHdSY7oOG5WTOdLr2IpqPFJSyg9xi7drWjKvahrYU7OCcE8RPHW5AtU1ivafc+DoR505MGb9VAOJCYppAXSJmnfehlW46pYuvMQhDQw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9pD4ESNRu2tTJjAnIvWbzPPsmRItqW7V/JHhUioBd5c=;
- b=Igy8dNiXGH2Tq9Ccj2N0lDhK7DKVXqfkpb8cJq15tqN4+j7zkshpQE/3tSyiYYJXAOTRZHv6liSPEbhoxxOLstSTh/Fbl+ZvIFdfz0l3b5/e6ZdqTgXnmHY7dm8TsqZ5L71mCsc292yNOpjZkbw4qGJW8+c8Pq3rMyr9zLTYmD5GQSOFtTFucKQuiWxHo2kAcEh5aPgg0brhByfpa7BHeWr63WL4gG9VozPZMFwCxyGUbiP1mbAWt1Itnau/Vh9ChEGFioQAxgPldIrcw6qf4qF7vUE86r5SRfcqnig7exfr68MFoIdOO4U0SdKgsYKcZeW0ts1DaXxEI1b0d5uAEw==
+ bh=EPMK6/WdonJq0AnMWu1bPLIs1nJFfgHDMi3PbJdNG1U=;
+ b=WK7RphHlO6MSc07+G1Yvq/Gt3wgAcIws+S9FBIQKzKsXHHdgu/sSh3vqrUPSyfG9TI2zyD2ubr0u8eo2LP0BRdzSa2tEPoPvH5ky5lFW1YOCaTzmMsD7Uvjl+GB816CaO4/YaEl2WxXmbYYgpCrHxSi/XtXs/dbhrycYxCOtyNf7V6qSE9xmuhbH45738xvxBWniGf8nmg7NEG/Regf3rHcgmJgGAU3X7d/SfLJxmKEgRL/ElFg3XpEZbJ7xOpH9gmAAd2zxueKj8lzrH0G2yfvfnOZmL1T8FXK/T7qIdeHCejsiKMReTdVV2qsz5hcTZ9BzajFCvnXAxxHcVqmDqQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
  by VI0PR04MB10710.eurprd04.prod.outlook.com (2603:10a6:800:260::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.30; Tue, 24 Jun
- 2025 16:59:32 +0000
+ 2025 17:00:41 +0000
 Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
  ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
  ([fe80::9126:a61e:341d:4b06%7]) with mapi id 15.20.8880.015; Tue, 24 Jun 2025
- 16:59:32 +0000
-Date: Tue, 24 Jun 2025 12:59:24 -0400
+ 17:00:40 +0000
+Date: Tue, 24 Jun 2025 13:00:35 -0400
 From: Frank Li <Frank.li@nxp.com>
 To: Wei Fang <wei.fang@nxp.com>
 Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
@@ -64,16 +64,16 @@ Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
 	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	imx@lists.linux.dev
-Subject: Re: [PATCH v2 net-next 2/3] net: enetc: separate 64-bit counters
- from enetc_port_counters
-Message-ID: <aFrZbEafkQCEc0O/@lizhi-Precision-Tower-5810>
+Subject: Re: [PATCH v2 net-next 3/3] net: enetc: read 64-bit statistics from
+ port MAC counters
+Message-ID: <aFrZs17NpJM5SJBU@lizhi-Precision-Tower-5810>
 References: <20250624101548.2669522-1-wei.fang@nxp.com>
- <20250624101548.2669522-3-wei.fang@nxp.com>
+ <20250624101548.2669522-4-wei.fang@nxp.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250624101548.2669522-3-wei.fang@nxp.com>
-X-ClientProxiedBy: BYAPR02CA0064.namprd02.prod.outlook.com
- (2603:10b6:a03:54::41) To PAXPR04MB9642.eurprd04.prod.outlook.com
+In-Reply-To: <20250624101548.2669522-4-wei.fang@nxp.com>
+X-ClientProxiedBy: AM0PR10CA0122.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::39) To PAXPR04MB9642.eurprd04.prod.outlook.com
  (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,86 +83,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VI0PR04MB10710:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6645f3d-871f-4206-7135-08ddb3407d9b
+X-MS-Office365-Filtering-Correlation-Id: 71240fc6-c839-4911-638d-08ddb340a620
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|366016|52116014|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/KZ14UHHwBtqgIqMysKl9QBKglIloG2Ji6tsMd1VQUxmbrddHcGWl1oDCpQq?=
- =?us-ascii?Q?78Bzem3OawlKdzUIj2cdeiYWN7MZZvRlgsCZsxpstfwnJr3gvnWLWXfaTEX8?=
- =?us-ascii?Q?GgmRDJwcfz2sHIjdXSFhksWhfQ5qX4MG4jVjnecSypQSufWfWrHe4Uh2VswW?=
- =?us-ascii?Q?VZA+dEXmVTBa/RtBY3tcmfmxaaOEBNRi+X7fL5WiCuA5IzZN+q+1bpc/6Ea+?=
- =?us-ascii?Q?/2usAy1yqCu+eXMKqmUoAGlAQ/2ZSsmB8HmwJmbXH3PNL0FhDrgBuw6WwtbC?=
- =?us-ascii?Q?j6rc4n/QUjFtCbCrFDAqh6zi7wsV7HChdwOngVR9swKIcwb7dHttmRlcxymc?=
- =?us-ascii?Q?bHpWWivAYaVsdCjInt/iCNWRsrIRJSIe7N4uL5KQ70fFmWYSoEY5rI/SpHIF?=
- =?us-ascii?Q?ZXgO3L5/jJ0Xs1kSg9RaJqHoom8H0enSzC4tEZAiOArPf31iGBOAwvuZ28LB?=
- =?us-ascii?Q?Tfbz9kUyOH3KJimOqH5HF0v9XAHPYdIc4dqvYVNN5ttqCGXzLNj/blmyJMlB?=
- =?us-ascii?Q?Y+wtPWMcz+s4xl9VWF5mT3vfSF3fN8IAMtEHY1YsB2JBxNWdxdREhXgf9/g2?=
- =?us-ascii?Q?jfQ8GzJ9koD8uy/vVlAMYqo3uWbwi2kUxuN0U2NHigmhch9zTWUqhlvicA43?=
- =?us-ascii?Q?sIM94ER43iUQJcKMLF1c8xzYl4oAn/ngiHB7KTCEia9FiuIab5ftsrUhIILs?=
- =?us-ascii?Q?fs65kCQObwnE2XtZhMMuu4p3UPfIZKkzqZxEO0nvfYUAzvIQqlQMSmfSzD2j?=
- =?us-ascii?Q?hl6Z4Sk0EYaszhzo1jPsS/RH0CEIVBDSMX4aXfywWHz/cMnG3EhSDLgXcNkA?=
- =?us-ascii?Q?SgGRDBxKlHZh2j1Q5noNGUVwt1NkAdsiMbvRdCJ9oddnwXMkQt+xJUSB2I4A?=
- =?us-ascii?Q?aU377bll9b/Rc+ktwdSZQtbUtk4jydcp1YG9uJXpmm0NEr7G+6lWbFtsgrQ5?=
- =?us-ascii?Q?pxy8VkYXInMzHzimr6YZ1PpckQwfHzymf8rKFhw1ekQHHbjsr1jLUZPaYj+s?=
- =?us-ascii?Q?0ylWbVApWJNFFEaXEhg1NHEHa2Ws9gR//pbZ0PToypoH6ViWHLl2HgLWAc5C?=
- =?us-ascii?Q?sgeUWZ9Q0uwuB0leEZxkTtCkgLbGl7gGFAR8ZNyVmadKt7Lj4VhP8FYMOgDt?=
- =?us-ascii?Q?kT0PMAtjluqnXfi7dfxwfhnTBLaFNLtDQnLMTheFHg4s74kQMjI3ssV1gnRj?=
- =?us-ascii?Q?3dHIudOcBR3Z2FXFFF0heNNwPRtGz9QOQ9vtb2bhvXZMOIiE9JQXVjAg9mcL?=
- =?us-ascii?Q?/O84iXNDSX38GDr1C0TErpKUyNWspBfjgUY7tgzu42xfWlLwDl+Zn9X/14Bl?=
- =?us-ascii?Q?kMNCCs+13jMJwZMbSCBrEI76Az/LPCHkZ4aOLWAcBRm7l6hL8rydBRp8mXQ2?=
- =?us-ascii?Q?e2+bvTO1IKlUA/Hh93DqL4rTNAL8JKpeBx2Y0cqJrhwzzHZ6N2nZcf0g2nsJ?=
- =?us-ascii?Q?L12SlfV0oq0fiA2lJ4MDc5/CAEe0rmODDZpbkhgCXKdSdZ5yXVPJbA=3D=3D?=
+	=?us-ascii?Q?Lme3PqTqhNQrKllxNLn0EWeETnFBz2UvUKnnUFBWEwMBN1R/+E5RB3+5rUAy?=
+ =?us-ascii?Q?3ce4fWz7f6sfj/A94U7/QzDO3sdBf/vPx4QxFw+6w1wRzjMrzpmaaZDEHaFj?=
+ =?us-ascii?Q?yeFQZgvhhFh7RLxL5dAd+sXnB91bl4Dzr3c5IWTdxR28JJkOjBzHt+K5+ylw?=
+ =?us-ascii?Q?8SB1uaUk2GoK917yslqsYxIHJmTn/U+kyKldD0fpVnatGBg68pp/KAyn/Zda?=
+ =?us-ascii?Q?fMXR1XNwBnS0tczGpwCeCfxakpuG/seA6InT+Hp6JEK5L1r5qMOD3EOh8/o6?=
+ =?us-ascii?Q?gqHsVOIM+5bp9D47cKMub5unrwMwe8iM/7U3S3LE7/2Kq7ElxAPGKpD8O2Qn?=
+ =?us-ascii?Q?AFtzTunB5HLqe/XFJyIlhvojs30WEakmKHCo4U4kA6/erFDpWTAI/BVaY86Z?=
+ =?us-ascii?Q?iTkny5qJlXu2ylW9spIyxfxjUbiy2EXFes255yRe3NPtFIMAgIsvazV8kFam?=
+ =?us-ascii?Q?1tnD96JUYZDilEYDa9ju8nurmDNpL9NdDSVyts2zSFlCuX9wNcCtXYJ0hJBK?=
+ =?us-ascii?Q?fMXZ8wl/re2j9FyTwfX6JlTCWaPU7U3ND9/qv0ZGQIDIwS5IIcZ0x6T8nx3q?=
+ =?us-ascii?Q?appFt7yszEuzO9DUPLY+FYbXZrWxcIs2j33n+5m3VxGSlTAkSZMocD5N756N?=
+ =?us-ascii?Q?TBUJtnuDyI/ZWvxelh1UPb/adaFVoDR2E2VpR24VNeBFFjeFNmKDv4b9NvFX?=
+ =?us-ascii?Q?vsYx20jWVj9AFjU14f67fMXjhP8mhj1mE8iY+YxHh85Thw2b6fRzd66hBErN?=
+ =?us-ascii?Q?aYDcKV4R2WlgSG2ON6NOqN+JnPsaGPJ7U8Y6xPcmiON8EUcKeRYUxf4Ugikv?=
+ =?us-ascii?Q?N9RWfXb4bqc6l1mJVtvM7OvpYS6p8TqgmXHOw6ck+UH3H4diNgikIoHKN/O5?=
+ =?us-ascii?Q?FGt+GQtZmTBVzaWeT/MoXKdHLS7ByfuG1OdWF2d+gibIesYcBoUTA1rXnSTz?=
+ =?us-ascii?Q?pNchWZPaEOARUqkFcJKDluuXAs6t3pJQNyxoPprXriTuhV/BMRuoC402VHSo?=
+ =?us-ascii?Q?GZs3hHNpKzrsyRXJwThI+U1B1XfrQbFq88BAB+l5IJqP1XakWBeFi6wVTQAN?=
+ =?us-ascii?Q?tGtSnxxdBOz1LzQiH52KTFiG5M3yVCslmv+2gB45toCf7F5p5MdelrGdr9Fb?=
+ =?us-ascii?Q?22zW8WggSSzY9/Ahqdf7YiGf5L0lu8WvmJdnMhDRo1RszLTtK4Aa4Vo7dVaq?=
+ =?us-ascii?Q?nLhIEW4n7zpxL9TLp3reo0uFqYi3JeSY+1FPonYcFq7viEvY39nHAo8+ROsb?=
+ =?us-ascii?Q?H7MPC7W/zdcCFj1l8MQW7Oa/ejP4paAWfA4VlXxD2oyjA3CGwnrheGLG6kIW?=
+ =?us-ascii?Q?VLGvi0NKy+bm4G3w87KXCnJHTzOzZPTFEn70M/lrIz7iHTlAoK5opLFjWbuP?=
+ =?us-ascii?Q?aIEHEPo0aE2XwRh7LhiVZNJr5sKFMo/kxyfmT81NZgOveACloMHFDsOcrG9T?=
+ =?us-ascii?Q?JcCZdbi1y+nm0ReAA2835lZ/Sjvmotz+EL0EqlwL0RA8I91S3804Xw=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?paJCst9UBUbLLWGKaKGP+tF3NX2sbtQ49SLeeUX8fYC8JS7Au0luNRIjMZJu?=
- =?us-ascii?Q?2L4cm5cMRHFa61Oai7RuDcCAKDbKaqp45lVJvRkC+TkqOVEXKMVNHPHhYeEx?=
- =?us-ascii?Q?JVe7DKdCUX9mzSK+kYU0mE8KUB38yC2aWWOD8bwJ9Irt75hgyqHcZKw3LHSt?=
- =?us-ascii?Q?lcV2kCx69zHpv/h29RU3SRD32nyCJ/qfsf/aWv7jHDL6C7kugUSp4ZnytfQy?=
- =?us-ascii?Q?IkX2F4MnKdbnCPPgQbQu24LsmL1Rr8PmNLo1YZ+vQeiRk9U6nABkEMLLLQiv?=
- =?us-ascii?Q?wr7AQZA2ZUwV3TV139VUvb90UKQHzgCwknx/MuGIQ96w8SF92905qQn2Mjco?=
- =?us-ascii?Q?dqeY+nrmPDolg/d+21u6SjMnw7JLs9bbl+0vcNR4SbP7MqwED4tAJqksV6Vq?=
- =?us-ascii?Q?0gbK/CpwZzE7Q3v1ZaJK/cU8R6kvFRVCOBQG3QVDbr4zYabrj0Xj7mrnmEUU?=
- =?us-ascii?Q?lVvQbhz0/Wr84INVQtp05CaO46l88a85kpLDdUBGPckm/0N1/4QA9XlRfrN5?=
- =?us-ascii?Q?AFFkCAzL8SEvDEcpBhTqnO0pvT2fr1LU4g0m57KOepeuKL33Gzo1P6ceOf8j?=
- =?us-ascii?Q?5v8cxV41y81/lIXYv2tUUE0Umlfq9lJXmZVF/wAOkwTINpV2/bLgcnTwiCcr?=
- =?us-ascii?Q?NSGttDusBQ/pqrj2uAECZakmgXrxizJSpYJ4NpISzVG2UlZYiYr9CmXtfzSZ?=
- =?us-ascii?Q?aboalwtXsLvd+0QkMk2lWZyPJW9KIN+sP382/wiLXdyGVb0odZGuHjBhV5iU?=
- =?us-ascii?Q?y/hNJYoYvtuI85HLmdC30P0YWtHwht2nVISsd65/+WmL66/aPCrSB3N4ACkb?=
- =?us-ascii?Q?77J804sZxwlCOJMPGJ+hzCra4GH2ORHvch+WdAwAuH4DrED+Shc1iIfNPFgk?=
- =?us-ascii?Q?sOVdyFg9NA/w4S/BMb2Mc45ZilcmiPRI1rgQQnWXQXwAjP06zO72yVTBoDQ7?=
- =?us-ascii?Q?QK+GjmyXQ8vBRs+K91S8yGVp2hGFNkFraMfa8pkwZ/LCQCFQaL3C7XCFn0+z?=
- =?us-ascii?Q?JhSFWK2TtFYKJDTlkKtKs8CrXADEULSaENF5WZ/TYxWYDfPRQPrQE78cIycw?=
- =?us-ascii?Q?+dQEHnA50aIdHcdLG3vnBZKnppBxkS8clBDx39hN3OKZuA92KioZpSPU+3ld?=
- =?us-ascii?Q?fiJA/NrJH6bCREGokLb8Sivs9oPo345fwetCqhJVRe6JHvolqh62Pvs4fB/U?=
- =?us-ascii?Q?rlqd2UAFCbQLhaTjOXFHLJrNE+DCrxSGGtWkbL+SFNbUGlz16aBP3lW98Wb4?=
- =?us-ascii?Q?F6TFjeA9dQbwORFVj9BWhZGpO3aikWNTFBOtTgsQy5u/h53cHcVKEKrsdx3c?=
- =?us-ascii?Q?lMssCjr4ICIeQzQxqZKowSFZ6EVO9RUS4MVDlZF6XUPoSnz6CfkNUV/INS7T?=
- =?us-ascii?Q?Ron079dzC5wAVfWRvQdXlJgIy7ZAe3mYifLwkMPBzE2yti+4cqcTcExUfDq+?=
- =?us-ascii?Q?YzsGn6Y7edF/YiW/kmCIMatn/WB3qCW2Fqo8IeX3GSwyfjOWjhBe6o2cYuS1?=
- =?us-ascii?Q?cSQQL/dGDgrjvt9F1NOdZRCklXqVCsjba8Je6pX054UKiIwxJ7858AbSaZM1?=
- =?us-ascii?Q?qk+cCCqcNI8tR0AfDjPUHHFhO5FbKXhxk7brA5KM?=
+	=?us-ascii?Q?QPF+py8xLYqc20BxPvGOdbcKNLMXFRJf5zR6sb8H4dEmZFIv1SVqpgWR1q43?=
+ =?us-ascii?Q?3BwmHNDjzrP+/2rbKPiFkN9c1uNSPN1se36YGdVv2Snr5+p2Hi/PIF7/FrTM?=
+ =?us-ascii?Q?IGIZK+4e4ku/AeUqTOfuehOG6OBvxy7F0ZxNHAM6vkYQNGBZxkLXjMfAHRPD?=
+ =?us-ascii?Q?XBoCrnFetpdamlXV0hn/G5RWpEbZgoZpTWPfmO0YhV10srV3+x6AeR2Am2SN?=
+ =?us-ascii?Q?NoMoxRIKE2qd3nzjcNocahzPOP93elbJvGlVrsGx7FY1i0D88hFm2UJBcXHk?=
+ =?us-ascii?Q?whRnqnB7UAOIAslCHVxPWPxItLAjQYwumgmPjvVhviXUoblJ0VJa5a8H3Oqf?=
+ =?us-ascii?Q?n2PMx4Vm+ng4AAlW4NHY9evg6qu8qXRpHtlkkQQzEEviNZ5hu8xwBS1tuCP5?=
+ =?us-ascii?Q?Ip0F4YH22VswYCMR2u0uTvlXkP3llNz2g/cMQL1s6ft4eDYGrNHXNay2s9we?=
+ =?us-ascii?Q?dflKHNIOCo51Yl8MEhMt2wnIfDi1pjSrfUaHRSqw3XTah5ua0O6ahgFD4XRo?=
+ =?us-ascii?Q?DM9qfszvzszEeNzsQYlbz+SN46nRVHONeEK+jCSmF1GbZ5MPFHlbmuRt3ChV?=
+ =?us-ascii?Q?S4Sye3Jk3CxRFEYrbs1c28X8FOQvf6ITLb+Tiigt/NicPqhWA/b3id7n2NNW?=
+ =?us-ascii?Q?4lyG8xfUp52lveFC9Jovvi5iI3m8rLDXCQtJiz+q+VJ8TZdU8jSyAWNCeDbZ?=
+ =?us-ascii?Q?/uCxbz8lKKPJDl7MUBNx666mzoLoR2tSNesmWAutpp/H11CEnOZbidwxqf/U?=
+ =?us-ascii?Q?tNnufwoyDu4BWjXpkI3VHBCSHP8kibKuICBJLj3DtHAPmCjZDr1oLGeoETIE?=
+ =?us-ascii?Q?iEdN4xQZjxecS1lM7zK+lrTO8kd2KDw9Idc2otgrBtTrfrXNCPZgY+0UIoMJ?=
+ =?us-ascii?Q?4RByAzR+TET5ACe7egywe8JbYMMqRpEUauzVtRPSeyXp6rxPGkKhLABgirXf?=
+ =?us-ascii?Q?rv72ovo7whtl4QdhhexWDu6RfYfBaq/B0c95Y/KWlB9OBLrBaXZhOmp9wbWO?=
+ =?us-ascii?Q?ZNQxqzC45QIh8hcvJHlYYB6lwyfITH562SczOanTRkXYO2jYjFIRk3PIxzEO?=
+ =?us-ascii?Q?VtfAT27IBODYGRX9kr3Qfdo77CYj80bJLVBBDrf4indEG7DluOx9uXOis/g+?=
+ =?us-ascii?Q?xZ25jXPHPGQxg6jYmgfrKDJNGfbHjA8mV0Vuqm90M2rVvV+l0ywVR0/cIaH8?=
+ =?us-ascii?Q?DpkEzxtP+a1RKNVomgbGtok/XIAZB4OMcQgNUBEpEKLSCY7NS8N6vZfEX7fW?=
+ =?us-ascii?Q?asRGOmSNMv+DkLeySTCZqgJU3qxvAQEggKGNqzoL/8CIflDvycEs/DCStd7P?=
+ =?us-ascii?Q?wOS3rhXGS7DmThQl+7Z8UWKEJHz1tdhb7FBvrueZGLW5T6LElqroBXWzR+2a?=
+ =?us-ascii?Q?NE8icH1jK5xHrLZ3L4BQkaS99bfAT0XtfJPcCmqI/3cZv6zFRyc+MnVIA2SI?=
+ =?us-ascii?Q?lGspe+bIS4qxu2Th83J6u1nYMVrvZJ7XgiI30aYjmCyeWdMgXC/N3CvUCKPd?=
+ =?us-ascii?Q?X3Ne9dokvvz0nXrQHSLZzxgKls3R+Bm4HPMaOzaq8IBLQ58G2fNRxlRCWUJE?=
+ =?us-ascii?Q?Z3jpzd2Am1YgvBSm33PfWzLL2Ak8jXEK4BwDG4CG?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6645f3d-871f-4206-7135-08ddb3407d9b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71240fc6-c839-4911-638d-08ddb340a620
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 16:59:32.5148
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 17:00:40.6506
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G0VFoj9Pa0kOgRVdkz/o1j/JfzW2wiyNvO40MzSyATztPwLMqoZJNkBS7cDkUHe6TtoZTYyS8YK28lbn3xQfBA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 05SScl2YhHKSE841XOl4nBy/TnoMrf5SIDXAUxJN46INAU90tv44pq4i6PdybtCHekbHS9vUzOPO4V/RIwlWBA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10710
 
-On Tue, Jun 24, 2025 at 06:15:47PM +0800, Wei Fang wrote:
-> Some counters in enetc_port_counters are 32-bit registers, and some are
-> 64-bit registers. But in the current driver, they are all read through
-> enetc_port_rd(), which can only read a 32-bit value. Therefore, separate
-> 64-bit counters (enetc_pm_counters) from enetc_port_counters and use
-> enetc_port_rd64() to read the 64-bit statistics.
+On Tue, Jun 24, 2025 at 06:15:48PM +0800, Wei Fang wrote:
+> The counters of port MAC are all 64-bit registers, and the statistics of
+> ethtool are u64 type, so replace enetc_port_rd() with enetc_port_rd64()
+> to read 64-bit statistics.
 >
 > Signed-off-by: Wei Fang <wei.fang@nxp.com>
 > Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
@@ -170,76 +168,123 @@ On Tue, Jun 24, 2025 at 06:15:47PM +0800, Wei Fang wrote:
 Reviewed-by: Frank Li <Frank.Li@nxp.com>
 
 > ---
->  .../net/ethernet/freescale/enetc/enetc_ethtool.c  | 15 ++++++++++++++-
->  drivers/net/ethernet/freescale/enetc/enetc_hw.h   |  1 +
->  2 files changed, 15 insertions(+), 1 deletion(-)
+>  .../ethernet/freescale/enetc/enetc_ethtool.c  | 84 +++++++++----------
+>  1 file changed, 42 insertions(+), 42 deletions(-)
 >
 > diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-> index 2e5cef646741..2c9aa94c8e3d 100644
+> index 2c9aa94c8e3d..961e76cd8489 100644
 > --- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
 > +++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-> @@ -142,7 +142,7 @@ static const struct {
->  static const struct {
->  	int reg;
->  	char name[ETH_GSTRING_LEN] __nonstring;
-> -} enetc_port_counters[] = {
-> +} enetc_pm_counters[] = {
->  	{ ENETC_PM_REOCT(0),	"MAC rx ethernet octets" },
->  	{ ENETC_PM_RALN(0),	"MAC rx alignment errors" },
->  	{ ENETC_PM_RXPF(0),	"MAC rx valid pause frames" },
-> @@ -194,6 +194,12 @@ static const struct {
->  	{ ENETC_PM_TSCOL(0),	"MAC tx single collisions" },
->  	{ ENETC_PM_TLCOL(0),	"MAC tx late collisions" },
->  	{ ENETC_PM_TECOL(0),	"MAC tx excessive collisions" },
-> +};
-> +
-> +static const struct {
-> +	int reg;
-> +	char name[ETH_GSTRING_LEN] __nonstring;
-> +} enetc_port_counters[] = {
->  	{ ENETC_UFDMF,		"SI MAC nomatch u-cast discards" },
->  	{ ENETC_MFDMF,		"SI MAC nomatch m-cast discards" },
->  	{ ENETC_PBFDSIR,	"SI MAC nomatch b-cast discards" },
-> @@ -240,6 +246,7 @@ static int enetc_get_sset_count(struct net_device *ndev, int sset)
->  		return len;
->
->  	len += ARRAY_SIZE(enetc_port_counters);
-> +	len += ARRAY_SIZE(enetc_pm_counters);
->
->  	return len;
->  }
-> @@ -266,6 +273,9 @@ static void enetc_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
->  		for (i = 0; i < ARRAY_SIZE(enetc_port_counters); i++)
->  			ethtool_cpy(&data, enetc_port_counters[i].name);
->
-> +		for (i = 0; i < ARRAY_SIZE(enetc_pm_counters); i++)
-> +			ethtool_cpy(&data, enetc_pm_counters[i].name);
-> +
->  		break;
->  	}
->  }
-> @@ -302,6 +312,9 @@ static void enetc_get_ethtool_stats(struct net_device *ndev,
->
->  	for (i = 0; i < ARRAY_SIZE(enetc_port_counters); i++)
->  		data[o++] = enetc_port_rd(hw, enetc_port_counters[i].reg);
-> +
-> +	for (i = 0; i < ARRAY_SIZE(enetc_pm_counters); i++)
-> +		data[o++] = enetc_port_rd64(hw, enetc_pm_counters[i].reg);
->  }
->
+> @@ -320,8 +320,8 @@ static void enetc_get_ethtool_stats(struct net_device *ndev,
 >  static void enetc_pause_stats(struct enetc_hw *hw, int mac,
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-> index cb26f185f52f..d4bbb07199c5 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-> @@ -536,6 +536,7 @@ static inline u64 _enetc_rd_reg64_wa(void __iomem *reg)
->  /* port register accessors - PF only */
->  #define enetc_port_rd(hw, off)		enetc_rd_reg((hw)->port + (off))
->  #define enetc_port_wr(hw, off, val)	enetc_wr_reg((hw)->port + (off), val)
-> +#define enetc_port_rd64(hw, off)	_enetc_rd_reg64_wa((hw)->port + (off))
->  #define enetc_port_rd_mdio(hw, off)	_enetc_rd_mdio_reg_wa((hw)->port + (off))
->  #define enetc_port_wr_mdio(hw, off, val)	_enetc_wr_mdio_reg_wa(\
->  							(hw)->port + (off), val)
+>  			      struct ethtool_pause_stats *pause_stats)
+>  {
+> -	pause_stats->tx_pause_frames = enetc_port_rd(hw, ENETC_PM_TXPF(mac));
+> -	pause_stats->rx_pause_frames = enetc_port_rd(hw, ENETC_PM_RXPF(mac));
+> +	pause_stats->tx_pause_frames = enetc_port_rd64(hw, ENETC_PM_TXPF(mac));
+> +	pause_stats->rx_pause_frames = enetc_port_rd64(hw, ENETC_PM_RXPF(mac));
+>  }
+>
+>  static void enetc_get_pause_stats(struct net_device *ndev,
+> @@ -348,31 +348,31 @@ static void enetc_get_pause_stats(struct net_device *ndev,
+>  static void enetc_mac_stats(struct enetc_hw *hw, int mac,
+>  			    struct ethtool_eth_mac_stats *s)
+>  {
+> -	s->FramesTransmittedOK = enetc_port_rd(hw, ENETC_PM_TFRM(mac));
+> -	s->SingleCollisionFrames = enetc_port_rd(hw, ENETC_PM_TSCOL(mac));
+> -	s->MultipleCollisionFrames = enetc_port_rd(hw, ENETC_PM_TMCOL(mac));
+> -	s->FramesReceivedOK = enetc_port_rd(hw, ENETC_PM_RFRM(mac));
+> -	s->FrameCheckSequenceErrors = enetc_port_rd(hw, ENETC_PM_RFCS(mac));
+> -	s->AlignmentErrors = enetc_port_rd(hw, ENETC_PM_RALN(mac));
+> -	s->OctetsTransmittedOK = enetc_port_rd(hw, ENETC_PM_TEOCT(mac));
+> -	s->FramesWithDeferredXmissions = enetc_port_rd(hw, ENETC_PM_TDFR(mac));
+> -	s->LateCollisions = enetc_port_rd(hw, ENETC_PM_TLCOL(mac));
+> -	s->FramesAbortedDueToXSColls = enetc_port_rd(hw, ENETC_PM_TECOL(mac));
+> -	s->FramesLostDueToIntMACXmitError = enetc_port_rd(hw, ENETC_PM_TERR(mac));
+> -	s->CarrierSenseErrors = enetc_port_rd(hw, ENETC_PM_TCRSE(mac));
+> -	s->OctetsReceivedOK = enetc_port_rd(hw, ENETC_PM_REOCT(mac));
+> -	s->FramesLostDueToIntMACRcvError = enetc_port_rd(hw, ENETC_PM_RDRNTP(mac));
+> -	s->MulticastFramesXmittedOK = enetc_port_rd(hw, ENETC_PM_TMCA(mac));
+> -	s->BroadcastFramesXmittedOK = enetc_port_rd(hw, ENETC_PM_TBCA(mac));
+> -	s->MulticastFramesReceivedOK = enetc_port_rd(hw, ENETC_PM_RMCA(mac));
+> -	s->BroadcastFramesReceivedOK = enetc_port_rd(hw, ENETC_PM_RBCA(mac));
+> +	s->FramesTransmittedOK = enetc_port_rd64(hw, ENETC_PM_TFRM(mac));
+> +	s->SingleCollisionFrames = enetc_port_rd64(hw, ENETC_PM_TSCOL(mac));
+> +	s->MultipleCollisionFrames = enetc_port_rd64(hw, ENETC_PM_TMCOL(mac));
+> +	s->FramesReceivedOK = enetc_port_rd64(hw, ENETC_PM_RFRM(mac));
+> +	s->FrameCheckSequenceErrors = enetc_port_rd64(hw, ENETC_PM_RFCS(mac));
+> +	s->AlignmentErrors = enetc_port_rd64(hw, ENETC_PM_RALN(mac));
+> +	s->OctetsTransmittedOK = enetc_port_rd64(hw, ENETC_PM_TEOCT(mac));
+> +	s->FramesWithDeferredXmissions = enetc_port_rd64(hw, ENETC_PM_TDFR(mac));
+> +	s->LateCollisions = enetc_port_rd64(hw, ENETC_PM_TLCOL(mac));
+> +	s->FramesAbortedDueToXSColls = enetc_port_rd64(hw, ENETC_PM_TECOL(mac));
+> +	s->FramesLostDueToIntMACXmitError = enetc_port_rd64(hw, ENETC_PM_TERR(mac));
+> +	s->CarrierSenseErrors = enetc_port_rd64(hw, ENETC_PM_TCRSE(mac));
+> +	s->OctetsReceivedOK = enetc_port_rd64(hw, ENETC_PM_REOCT(mac));
+> +	s->FramesLostDueToIntMACRcvError = enetc_port_rd64(hw, ENETC_PM_RDRNTP(mac));
+> +	s->MulticastFramesXmittedOK = enetc_port_rd64(hw, ENETC_PM_TMCA(mac));
+> +	s->BroadcastFramesXmittedOK = enetc_port_rd64(hw, ENETC_PM_TBCA(mac));
+> +	s->MulticastFramesReceivedOK = enetc_port_rd64(hw, ENETC_PM_RMCA(mac));
+> +	s->BroadcastFramesReceivedOK = enetc_port_rd64(hw, ENETC_PM_RBCA(mac));
+>  }
+>
+>  static void enetc_ctrl_stats(struct enetc_hw *hw, int mac,
+>  			     struct ethtool_eth_ctrl_stats *s)
+>  {
+> -	s->MACControlFramesTransmitted = enetc_port_rd(hw, ENETC_PM_TCNP(mac));
+> -	s->MACControlFramesReceived = enetc_port_rd(hw, ENETC_PM_RCNP(mac));
+> +	s->MACControlFramesTransmitted = enetc_port_rd64(hw, ENETC_PM_TCNP(mac));
+> +	s->MACControlFramesReceived = enetc_port_rd64(hw, ENETC_PM_RCNP(mac));
+>  }
+>
+>  static const struct ethtool_rmon_hist_range enetc_rmon_ranges[] = {
+> @@ -389,26 +389,26 @@ static const struct ethtool_rmon_hist_range enetc_rmon_ranges[] = {
+>  static void enetc_rmon_stats(struct enetc_hw *hw, int mac,
+>  			     struct ethtool_rmon_stats *s)
+>  {
+> -	s->undersize_pkts = enetc_port_rd(hw, ENETC_PM_RUND(mac));
+> -	s->oversize_pkts = enetc_port_rd(hw, ENETC_PM_ROVR(mac));
+> -	s->fragments = enetc_port_rd(hw, ENETC_PM_RFRG(mac));
+> -	s->jabbers = enetc_port_rd(hw, ENETC_PM_RJBR(mac));
+> -
+> -	s->hist[0] = enetc_port_rd(hw, ENETC_PM_R64(mac));
+> -	s->hist[1] = enetc_port_rd(hw, ENETC_PM_R127(mac));
+> -	s->hist[2] = enetc_port_rd(hw, ENETC_PM_R255(mac));
+> -	s->hist[3] = enetc_port_rd(hw, ENETC_PM_R511(mac));
+> -	s->hist[4] = enetc_port_rd(hw, ENETC_PM_R1023(mac));
+> -	s->hist[5] = enetc_port_rd(hw, ENETC_PM_R1522(mac));
+> -	s->hist[6] = enetc_port_rd(hw, ENETC_PM_R1523X(mac));
+> -
+> -	s->hist_tx[0] = enetc_port_rd(hw, ENETC_PM_T64(mac));
+> -	s->hist_tx[1] = enetc_port_rd(hw, ENETC_PM_T127(mac));
+> -	s->hist_tx[2] = enetc_port_rd(hw, ENETC_PM_T255(mac));
+> -	s->hist_tx[3] = enetc_port_rd(hw, ENETC_PM_T511(mac));
+> -	s->hist_tx[4] = enetc_port_rd(hw, ENETC_PM_T1023(mac));
+> -	s->hist_tx[5] = enetc_port_rd(hw, ENETC_PM_T1522(mac));
+> -	s->hist_tx[6] = enetc_port_rd(hw, ENETC_PM_T1523X(mac));
+> +	s->undersize_pkts = enetc_port_rd64(hw, ENETC_PM_RUND(mac));
+> +	s->oversize_pkts = enetc_port_rd64(hw, ENETC_PM_ROVR(mac));
+> +	s->fragments = enetc_port_rd64(hw, ENETC_PM_RFRG(mac));
+> +	s->jabbers = enetc_port_rd64(hw, ENETC_PM_RJBR(mac));
+> +
+> +	s->hist[0] = enetc_port_rd64(hw, ENETC_PM_R64(mac));
+> +	s->hist[1] = enetc_port_rd64(hw, ENETC_PM_R127(mac));
+> +	s->hist[2] = enetc_port_rd64(hw, ENETC_PM_R255(mac));
+> +	s->hist[3] = enetc_port_rd64(hw, ENETC_PM_R511(mac));
+> +	s->hist[4] = enetc_port_rd64(hw, ENETC_PM_R1023(mac));
+> +	s->hist[5] = enetc_port_rd64(hw, ENETC_PM_R1522(mac));
+> +	s->hist[6] = enetc_port_rd64(hw, ENETC_PM_R1523X(mac));
+> +
+> +	s->hist_tx[0] = enetc_port_rd64(hw, ENETC_PM_T64(mac));
+> +	s->hist_tx[1] = enetc_port_rd64(hw, ENETC_PM_T127(mac));
+> +	s->hist_tx[2] = enetc_port_rd64(hw, ENETC_PM_T255(mac));
+> +	s->hist_tx[3] = enetc_port_rd64(hw, ENETC_PM_T511(mac));
+> +	s->hist_tx[4] = enetc_port_rd64(hw, ENETC_PM_T1023(mac));
+> +	s->hist_tx[5] = enetc_port_rd64(hw, ENETC_PM_T1522(mac));
+> +	s->hist_tx[6] = enetc_port_rd64(hw, ENETC_PM_T1523X(mac));
+>  }
+>
+>  static void enetc_get_eth_mac_stats(struct net_device *ndev,
 > --
 > 2.34.1
 >
