@@ -1,148 +1,182 @@
-Return-Path: <netdev+bounces-200504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6E1AE5BDC
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:29:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C279AE5BE2
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D5E4440A7
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:28:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A581B66418
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26C4223DD0;
-	Tue, 24 Jun 2025 05:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326BA19F480;
+	Tue, 24 Jun 2025 05:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="o9Peqqh1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD404C74;
-	Tue, 24 Jun 2025 05:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B1E79F2
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 05:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750742955; cv=none; b=M9dfrh19Ajs3kRskAH37eCSJFf0YVizLtxpCml0glVP9xyFy0FV4042+bxPHstKPEoZ5mMNtLo4StQbHn0nTfY0H4KWTVcRvzY6RESXQmVIRtVj7Y2hzXd1jBsTGqGoS70bZ8NH+WMeHNwYrx9UKdhj9BtNB1ZDHxMN1R8faXLk=
+	t=1750743407; cv=none; b=Lrz9wAHOcNI4/UaK92gJ4U6Qoeew9947jgwJwm9+xQIbJ5egLijudyYTY3j7ADFPviuWpecujVqPjhe3EEZzNQTSkUaLZ8qmjlTVfuQRaLVhs3ZYt9ULdV0g0W3zsBASRaZerlhVMBm/eZKDeI8XxsSb39NUemvHMGXMTjDwIfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750742955; c=relaxed/simple;
-	bh=UKRjY5dqheg932jcCpNQUs+aaZ31mj9735W1eRDtzoo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZaIU8uqSZD85xm3guDEWdyMGosZBFJRbgWbjpOD/fhRGHRbS+IIjStl1mXIu98DrN9SrR4WliJdjM4PLjPyX0vAAGK9iP9kYrqN00wFKmvWTPZCXhBDZOy07sh4HBL1I6USQhgLJ1GM2npV7qzuQnv7to4zmRpfgjpSmqTIX7d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af60b.dynamic.kabel-deutschland.de [95.90.246.11])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2B4DE61E647A8;
-	Tue, 24 Jun 2025 07:28:33 +0200 (CEST)
-Message-ID: <4db45281-9943-4ed7-80c6-04b39c3e9a5e@molgen.mpg.de>
-Date: Tue, 24 Jun 2025 07:28:32 +0200
+	s=arc-20240116; t=1750743407; c=relaxed/simple;
+	bh=hM1eP511aEqGiQ/Oypz2TY+oJg/5LaiXR5FPGNAdMbk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BTZtJoblubFaXcb0R3/rkHss7wny0IuSHExj3ebSUn5o7kOFLPlaZqvq4zirQiwlgupG+aqr6P/IAdN6e5IRE4EXnlZalsZletsOtO6qd8SYYIM1Fph0uhMMNUEmbby0UaBJ05vbUfbRmZW12G81ItC1+hPjukEDw2gZE7RY5SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=o9Peqqh1; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1750743399; x=1751002599;
+	bh=hM1eP511aEqGiQ/Oypz2TY+oJg/5LaiXR5FPGNAdMbk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=o9Peqqh19Ed0HPd+buLwlASOt00auKPwcD1ykbwMXnqNJ8gKY9k8uIvw/KZZNNgXH
+	 VHQ30bwaS3R0WVNlQOMyzaipjNyQfpM07sGu0zohZ4qFkNJ8/70zeuLQlBzysesvcf
+	 qmUkoghbgQ0wqsvP88ADIzQ9p2BT6/ZzWZmAbl223uIwKjPF3HeQIZSfQerALQtJfE
+	 omNeuvZPnLBpm5vIaDsZqlzgtjmvuiKp1kjqk6WGWSAkCL0FBtKH/Hgn5g5s5b63bX
+	 CVTiQXbu4JJBJuk+RERWkn0DN2KAj3dPeAoHHuPNMm8iY7KoMcXMEGcJXEEI4CMqDV
+	 UNIQSJc0uRlzg==
+Date: Tue, 24 Jun 2025 05:36:34 +0000
+To: netdev@vger.kernel.org
+From: William Liu <will@willsroot.io>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, William Liu <will@willsroot.io>
+Subject: Re: [PATCH net v2 1/2] net/sched: Restrict conditions for adding duplicating netems to qdisc tree
+Message-ID: <sJSFrPAuQr53uFRQlRKAsEZNkDg1umtbxAlgqqhnuvTobg1qwtVa-0sR-IVhFYXdgYlBIZnSD6AKlI6BAzgCrBwo7lZ5AYzX_xhhCTP3P7o=@willsroot.io>
+In-Reply-To: <20250624042238.521211-1-will@willsroot.io>
+References: <20250624042238.521211-1-will@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 962b88261b723c5ee7e3127afffa0eea461bfbef
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
-To: Li Yang <yang.li@amlogic.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Dear Li,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
-Thank you for your patch.
 
 
-Am 24.06.25 um 07:20 schrieb Yang Li via B4 Relay:
-> From: Yang Li <yang.li@amlogic.com>
-> 
-> When the BIS source stops, the controller sends an LE BIG Sync Lost
-> event (subevent 0x1E). Currently, this event is not handled, causing
-> the BIS stream to remain active in BlueZ and preventing recovery.
 
-How can this situation be emulated to test your patch?
 
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
+On Tuesday, June 24th, 2025 at 4:24 AM, William Liu <will@willsroot.io> wro=
+te:
+
+>=20
+>=20
+> netem_enqueue's duplication prevention logic breaks when a netem
+> resides in a qdisc tree with other netems - this can lead to a
+> soft lockup and OOM loop in netem_dequeue as seen in [1].
+> Ensure that a duplicating netem cannot exist in a tree with other
+> netems.
+>=20
+> [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilx=
+sEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@wi=
+llsroot.io/
+>=20
+> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+> Reported-by: William Liu will@willsroot.io
+>=20
+> Reported-by: Savino Dicanosa savy@syst3mfailure.io
+>=20
+> Signed-off-by: William Liu will@willsroot.io
+>=20
+> Signed-off-by: Savino Dicanosa savy@syst3mfailure.io
+>=20
 > ---
->   include/net/bluetooth/hci.h |  6 ++++++
->   net/bluetooth/hci_event.c   | 23 +++++++++++++++++++++++
->   2 files changed, 29 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 82cbd54443ac..48389a64accb 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
->   	__le16  bis[];
->   } __packed;
->   
-> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
-> +struct hci_evt_le_big_sync_lost {
-> +	__u8    handle;
-> +	__u8    reason;
-> +} __packed;
+> net/sched/sch_netem.c | 45 +++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 45 insertions(+)
+>=20
+> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> index fdd79d3ccd8c..be38458ae5bc 100644
+> --- a/net/sched/sch_netem.c
+> +++ b/net/sched/sch_netem.c
+> @@ -973,6 +973,46 @@ static int parse_attr(struct nlattr *tb[], int maxty=
+pe, struct nlattr *nla,
+> return 0;
+> }
+>=20
+> +static const struct Qdisc_class_ops netem_class_ops;
 > +
->   #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
->   struct hci_evt_le_big_info_adv_report {
->   	__le16  sync_handle;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 66052d6aaa1d..730deaf1851f 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -7026,6 +7026,24 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
->   	hci_dev_unlock(hdev);
->   }
->   
-> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
-> +					    struct sk_buff *skb)
+> +static inline bool has_duplication(struct Qdisc *sch)
 > +{
-> +	struct hci_evt_le_big_sync_lost *ev = data;
-> +	struct hci_conn *conn;
+> + struct netem_sched_data *q =3D qdisc_priv(sch);
 > +
-> +	bt_dev_dbg(hdev, "BIG Sync Lost: big_handle 0x%2.2x", ev->handle);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	list_for_each_entry(conn, &hdev->conn_hash.list, list) {
-> +		if (test_bit(HCI_CONN_BIG_SYNC, &conn->flags))
-> +			hci_disconn_cfm(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +	}
-> +
-> +	hci_dev_unlock(hdev);
+> + return q->duplicate;
+>=20
 > +}
 > +
->   static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
->   					   struct sk_buff *skb)
->   {
-> @@ -7149,6 +7167,11 @@ static const struct hci_le_ev {
->   		     hci_le_big_sync_established_evt,
->   		     sizeof(struct hci_evt_le_big_sync_estabilished),
->   		     HCI_MAX_EVENT_SIZE),
-> +	/* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
-> +	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
-> +		     hci_le_big_sync_lost_evt,
-> +		     sizeof(struct hci_evt_le_big_sync_lost),
-> +		     HCI_MAX_EVENT_SIZE),
->   	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
->   	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
->   		     hci_le_big_info_adv_report_evt,
+> +static int check_netem_in_tree(struct Qdisc *sch, bool duplicates,
+> + struct netlink_ext_ack *extack)
+> +{
+> + struct Qdisc *root, *q;
+> + unsigned int i;
+> +
+> + root =3D qdisc_root_sleeping(sch);
+> +
+> + if (sch !=3D root && root->ops->cl_ops =3D=3D &netem_class_ops) {
+>=20
+> + if (duplicates || has_duplication(root))
+> + goto err;
+> + }
+> +
+> + if (!qdisc_dev(root))
+> + return 0;
+> +
+> + hash_for_each(qdisc_dev(root)->qdisc_hash, i, q, hash) {
+>=20
+> + if (sch !=3D q && q->ops->cl_ops =3D=3D &netem_class_ops) {
+>=20
+> + if (duplicates || has_duplication(q))
+> + goto err;
+> + }
+> + }
+> +
+> + return 0;
+> +
+> +err:
+> + NL_SET_ERR_MSG(extack,
+> + "netem: cannot mix duplicating netems with other netems in tree");
+> + return -EINVAL;
+> +}
+> +
+> /* Parse netlink message to set options */
+> static int netem_change(struct Qdisc *sch, struct nlattr *opt,
+> struct netlink_ext_ack *extack)
+> @@ -1031,6 +1071,11 @@ static int netem_change(struct Qdisc *sch, struct =
+nlattr *opt,
+> q->gap =3D qopt->gap;
+>=20
+> q->counter =3D 0;
+>=20
+> q->loss =3D qopt->loss;
+>=20
+> +
+> + ret =3D check_netem_in_tree(sch, qopt->duplicate, extack);
+>=20
+> + if (ret)
+> + goto unlock;
+> +
+> q->duplicate =3D qopt->duplicate;
+>=20
+>=20
+> /* for compatibility with earlier versions.
+> --
+> 2.43.0
 
-Kind regards,
+v2 was sent out right after some additional feedback from Cong. Please revi=
+ew v3 instead, which I will be posting shortly.
 
-Paul
+pw-bot: changes-requested
+
+Thanks,
+William
 
