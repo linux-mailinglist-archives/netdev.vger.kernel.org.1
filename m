@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-200711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9B4AE6903
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:38:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FCDBAE694B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 544217A33E3
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:37:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35EB41C24F7E
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8242E338D;
-	Tue, 24 Jun 2025 14:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00172E6107;
+	Tue, 24 Jun 2025 14:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="AfEF97g/"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="dMhtJxeP"
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9186B2D29AA;
-	Tue, 24 Jun 2025 14:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2C02E2F17;
+	Tue, 24 Jun 2025 14:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750775631; cv=none; b=o4rbuOQ2axNzw/5Kabc9+nGYp32jpdM39/Sput6ZpueVeQwRKPutOJ2ND0H+i3jf8yJEJ/c/z+DtLJTVR87VoQ3PDIuH4zNxgCcIK4yWdnSamikQ0MIaKKsJB0+ejBi+G5KABMaRSs7WvvsJyeU5KB0fMURJSt8Ph0oy7Ri1EjM=
+	t=1750775632; cv=none; b=pexUOR9aEt+fLtE86DJe4QaTmhIJ0oN0gtXc3Z2xnNRX2FJWNqUvjnVJtwyELYmnXQWmEvigf0uefMVRngcTQqJ594Wil94wFAVGIBU3PwfcUDv/RIiRTaBFE21vN5UhGqzohVkpxV+F7heMYLvVqvhYuI8PLzcGYwDMSbFGXaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750775631; c=relaxed/simple;
-	bh=XgC/yD/HLkN2jnX4fXf9b1sA3oA5Hal86hStOXBMHiw=;
+	s=arc-20240116; t=1750775632; c=relaxed/simple;
+	bh=zf5puNI2WPvX+i3sxDuWQAp3AL34tSyrYuAUwVTYt4c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UgRcJHLEGh686umyqfPzCup40A4G14kqOLdI5S+vwdtel4eQtq/7BtVNtl/T8wkSiLD7EhV4jgJKrcBu6ozNmzGDjt0rZTzY6dEDkoagXTbARBgo1jIELkmn6C7gc87PrX9tCFWO1QQWX31nWLoYrropD+fjDll6SGGxFuJBRmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=AfEF97g/; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=H2F2Lero+NK7CEsaDjX67jRALYnbt/JQGYbn7FfN2k/u0jpEz4O/PZpjc/bcRCtKN+zpRK1GgTFblsp+aaLlpD8CRlN2MwLZ2OXZTOqJ2wkQiadoHuG3uYFRg99cQHRjW1Ng7HQOrlSLYzmSIPOE/UKl0wZPWU9OjnNXs4H5wFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=dMhtJxeP; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1750775626;
-	bh=XgC/yD/HLkN2jnX4fXf9b1sA3oA5Hal86hStOXBMHiw=;
+	s=mail; t=1750775628;
+	bh=zf5puNI2WPvX+i3sxDuWQAp3AL34tSyrYuAUwVTYt4c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AfEF97g/knc+PpClo9tOsCztmSYqkhpL/b6TeexNerGEChW2/mWmRde1DfnOBm+Sn
-	 OvNY0rJlUOyPuEG24ktN9ydL9xG9LkYv4rWLQejKB/xYkshDia3qrswoVxbJzhl3lG
-	 KnxTBh+QLYtISIHyUaH4NLe5jxmmeCxSDlX8PQGikoQ1JylQdYpKVS5liZJbXzrQWX
-	 lploIajMDZXZeYZoWbHzk1SeV0leahdcLA2lPqd7KHsvKPaw8snTaO00BKtSIQVAlE
-	 LZo8LesBPsN1GrPzAkX/Egto5dqxFy9cenJgI5osMUIXpsY7NKgUUNxK0MrA8rlPL7
-	 bubVmP4NSicwQ==
+	b=dMhtJxePh9r8MciTJwoNyTfQzRVhKj3PTPiLpuP1xDId3zVUaVH7kqIjzvIizqO2h
+	 rqZ2OMhcimDaMh7cA2Akp19LG1KGTGPJfb+IzdRVWLhxNZgMMm94h1W4lxZEQLclqK
+	 gTgdM1WTEqdbVAeCZ5G+nUT5tgjTVGuCmwPJPyDb+0HK2lonBgwWk+jaNmezpnWWV/
+	 MBVa6NCf3HuuIS/Q1i3kBG31qz8Jj7P6irYTGU7sIzkMXtG+Ks3ELcePQan2vUcGlS
+	 vgSaJUyI6q8P/Q0JQP2wun/Y2lfxUKhnAqVNBRBX9bm1zmhl1U08EYG5A6angrcrRS
+	 bkis0NTF5qOaw==
 Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:d2c7:2075:2c3c:38e5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id B053917E1067;
-	Tue, 24 Jun 2025 16:33:45 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 07A0E17E1090;
+	Tue, 24 Jun 2025 16:33:46 +0200 (CEST)
 From: Laura Nao <laura.nao@collabora.com>
 To: mturquette@baylibre.com,
 	sboyd@kernel.org,
@@ -68,9 +68,9 @@ Cc: guangjie.song@mediatek.com,
 	netdev@vger.kernel.org,
 	kernel@collabora.com,
 	Laura Nao <laura.nao@collabora.com>
-Subject: [PATCH v2 12/29] clk: mediatek: Add MT8196 topckgen clock support
-Date: Tue, 24 Jun 2025 16:32:03 +0200
-Message-Id: <20250624143220.244549-13-laura.nao@collabora.com>
+Subject: [PATCH v2 13/29] clk: mediatek: Add MT8196 topckgen2 clock support
+Date: Tue, 24 Jun 2025 16:32:04 +0200
+Message-Id: <20250624143220.244549-14-laura.nao@collabora.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250624143220.244549-1-laura.nao@collabora.com>
 References: <20250624143220.244549-1-laura.nao@collabora.com>
@@ -82,36 +82,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for the MT8196 topckgen clock controller, which provides
+Add support for the MT8196 topckgen2 clock controller, which provides
 muxes and dividers for clock selection in other IP blocks.
 
 Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Signed-off-by: Laura Nao <laura.nao@collabora.com>
 ---
- drivers/clk/mediatek/Makefile              |    2 +-
- drivers/clk/mediatek/clk-mt8196-topckgen.c | 1257 ++++++++++++++++++++
- 2 files changed, 1258 insertions(+), 1 deletion(-)
- create mode 100644 drivers/clk/mediatek/clk-mt8196-topckgen.c
+ drivers/clk/mediatek/Makefile               |   3 +-
+ drivers/clk/mediatek/clk-mt8196-topckgen2.c | 662 ++++++++++++++++++++
+ 2 files changed, 664 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-topckgen2.c
 
 diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
-index b1773d2bcb3d..bc0e86e20074 100644
+index bc0e86e20074..0688d7bf4979 100644
 --- a/drivers/clk/mediatek/Makefile
 +++ b/drivers/clk/mediatek/Makefile
-@@ -160,7 +160,7 @@ obj-$(CONFIG_COMMON_CLK_MT8195_VDOSYS) += clk-mt8195-vdo0.o clk-mt8195-vdo1.o
+@@ -160,7 +160,8 @@ obj-$(CONFIG_COMMON_CLK_MT8195_VDOSYS) += clk-mt8195-vdo0.o clk-mt8195-vdo1.o
  obj-$(CONFIG_COMMON_CLK_MT8195_VENCSYS) += clk-mt8195-venc.o
  obj-$(CONFIG_COMMON_CLK_MT8195_VPPSYS) += clk-mt8195-vpp0.o clk-mt8195-vpp1.o
  obj-$(CONFIG_COMMON_CLK_MT8195_WPESYS) += clk-mt8195-wpe.o
--obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o
-+obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o clk-mt8196-topckgen.o
+-obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o clk-mt8196-topckgen.o
++obj-$(CONFIG_COMMON_CLK_MT8196) += clk-mt8196-apmixedsys.o clk-mt8196-topckgen.o \
++				   clk-mt8196-topckgen2.o
  obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-mt8365.o
  obj-$(CONFIG_COMMON_CLK_MT8365_APU) += clk-mt8365-apu.o
  obj-$(CONFIG_COMMON_CLK_MT8365_CAM) += clk-mt8365-cam.o
-diff --git a/drivers/clk/mediatek/clk-mt8196-topckgen.c b/drivers/clk/mediatek/clk-mt8196-topckgen.c
+diff --git a/drivers/clk/mediatek/clk-mt8196-topckgen2.c b/drivers/clk/mediatek/clk-mt8196-topckgen2.c
 new file mode 100644
-index 000000000000..fc0c1227dd8d
+index 000000000000..189bb81d3dce
 --- /dev/null
-+++ b/drivers/clk/mediatek/clk-mt8196-topckgen.c
-@@ -0,0 +1,1257 @@
++++ b/drivers/clk/mediatek/clk-mt8196-topckgen2.c
+@@ -0,0 +1,662 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (c) 2025 MediaTek Inc.
@@ -131,1215 +132,622 @@ index 000000000000..fc0c1227dd8d
 +#include "clk-mux.h"
 +
 +/* MUX SEL REG */
-+#define CLK_CFG_UPDATE		0x0004
-+#define CLK_CFG_UPDATE1		0x0008
-+#define CLK_CFG_UPDATE2		0x000c
-+#define CLK_CFG_0		0x0010
-+#define CLK_CFG_0_SET		0x0014
-+#define CLK_CFG_0_CLR		0x0018
-+#define CLK_CFG_1		0x0020
-+#define CLK_CFG_1_SET		0x0024
-+#define CLK_CFG_1_CLR		0x0028
-+#define CLK_CFG_2		0x0030
-+#define CLK_CFG_2_SET		0x0034
-+#define CLK_CFG_2_CLR		0x0038
-+#define CLK_CFG_3		0x0040
-+#define CLK_CFG_3_SET		0x0044
-+#define CLK_CFG_3_CLR		0x0048
-+#define CLK_CFG_4		0x0050
-+#define CLK_CFG_4_SET		0x0054
-+#define CLK_CFG_4_CLR		0x0058
-+#define CLK_CFG_5		0x0060
-+#define CLK_CFG_5_SET		0x0064
-+#define CLK_CFG_5_CLR		0x0068
-+#define CLK_CFG_6		0x0070
-+#define CLK_CFG_6_SET		0x0074
-+#define CLK_CFG_6_CLR		0x0078
-+#define CLK_CFG_7		0x0080
-+#define CLK_CFG_7_SET		0x0084
-+#define CLK_CFG_7_CLR		0x0088
-+#define CLK_CFG_8		0x0090
-+#define CLK_CFG_8_SET		0x0094
-+#define CLK_CFG_8_CLR		0x0098
-+#define CLK_CFG_9		0x00a0
-+#define CLK_CFG_9_SET		0x00a4
-+#define CLK_CFG_9_CLR		0x00a8
-+#define CLK_CFG_10		0x00b0
-+#define CLK_CFG_10_SET		0x00b4
-+#define CLK_CFG_10_CLR		0x00b8
-+#define CLK_CFG_11		0x00c0
-+#define CLK_CFG_11_SET		0x00c4
-+#define CLK_CFG_11_CLR		0x00c8
-+#define CLK_CFG_12		0x00d0
-+#define CLK_CFG_12_SET		0x00d4
-+#define CLK_CFG_12_CLR		0x00d8
-+#define CLK_CFG_13		0x00e0
-+#define CLK_CFG_13_SET		0x00e4
-+#define CLK_CFG_13_CLR		0x00e8
-+#define CLK_CFG_14		0x00f0
-+#define CLK_CFG_14_SET		0x00f4
-+#define CLK_CFG_14_CLR		0x00f8
-+#define CLK_CFG_15		0x0100
-+#define CLK_CFG_15_SET		0x0104
-+#define CLK_CFG_15_CLR		0x0108
-+#define CLK_CFG_16		0x0110
-+#define CLK_CFG_16_SET		0x0114
-+#define CLK_CFG_16_CLR		0x0118
-+#define CLK_CFG_17		0x0120
-+#define CLK_CFG_17_SET		0x0124
-+#define CLK_CFG_17_CLR		0x0128
-+#define CLK_CFG_18		0x0130
-+#define CLK_CFG_18_SET		0x0134
-+#define CLK_CFG_18_CLR		0x0138
-+#define CLK_CFG_19		0x0140
-+#define CLK_CFG_19_SET		0x0144
-+#define CLK_CFG_19_CLR		0x0148
-+#define CLK_AUDDIV_0		0x020c
-+#define CLK_FENC_STATUS_MON_0	0x0270
-+#define CLK_FENC_STATUS_MON_1	0x0274
-+#define CLK_FENC_STATUS_MON_2	0x0278
++#define CKSYS2_CLK_CFG_UPDATE		0x0004
++#define CKSYS2_CLK_CFG_0		0x0010
++#define CKSYS2_CLK_CFG_0_SET		0x0014
++#define CKSYS2_CLK_CFG_0_CLR		0x0018
++#define CKSYS2_CLK_CFG_1		0x0020
++#define CKSYS2_CLK_CFG_1_SET		0x0024
++#define CKSYS2_CLK_CFG_1_CLR		0x0028
++#define CKSYS2_CLK_CFG_2		0x0030
++#define CKSYS2_CLK_CFG_2_SET		0x0034
++#define CKSYS2_CLK_CFG_2_CLR		0x0038
++#define CKSYS2_CLK_CFG_3		0x0040
++#define CKSYS2_CLK_CFG_3_SET		0x0044
++#define CKSYS2_CLK_CFG_3_CLR		0x0048
++#define CKSYS2_CLK_CFG_4		0x0050
++#define CKSYS2_CLK_CFG_4_SET		0x0054
++#define CKSYS2_CLK_CFG_4_CLR		0x0058
++#define CKSYS2_CLK_CFG_5		0x0060
++#define CKSYS2_CLK_CFG_5_SET		0x0064
++#define CKSYS2_CLK_CFG_5_CLR		0x0068
++#define CKSYS2_CLK_CFG_6		0x0070
++#define CKSYS2_CLK_CFG_6_SET		0x0074
++#define CKSYS2_CLK_CFG_6_CLR		0x0078
++#define CKSYS2_CLK_FENC_STATUS_MON_0	0x0174
 +
 +/* MUX SHIFT */
-+#define TOP_MUX_AXI_SHIFT			0
-+#define TOP_MUX_MEM_SUB_SHIFT			1
-+#define TOP_MUX_IO_NOC_SHIFT			2
-+#define TOP_MUX_PERI_AXI_SHIFT			3
-+#define TOP_MUX_UFS_PEXTP0_AXI_SHIFT		4
-+#define TOP_MUX_PEXTP1_USB_AXI_SHIFT		5
-+#define TOP_MUX_PERI_FMEM_SUB_SHIFT		6
-+#define TOP_MUX_UFS_PEXPT0_MEM_SUB_SHIFT	7
-+#define TOP_MUX_PEXTP1_USB_MEM_SUB_SHIFT	8
-+#define TOP_MUX_PERI_NOC_SHIFT			9
-+#define TOP_MUX_EMI_N_SHIFT			10
-+#define TOP_MUX_EMI_S_SHIFT			11
-+#define TOP_MUX_AP2CONN_HOST_SHIFT		14
-+#define TOP_MUX_ATB_SHIFT			15
-+#define TOP_MUX_CIRQ_SHIFT			16
-+#define TOP_MUX_PBUS_156M_SHIFT			17
-+#define TOP_MUX_EFUSE_SHIFT			20
-+#define TOP_MUX_MCU_L3GIC_SHIFT			21
-+#define TOP_MUX_MCU_INFRA_SHIFT			22
-+#define TOP_MUX_DSP_SHIFT			23
-+#define TOP_MUX_MFG_REF_SHIFT			24
-+#define TOP_MUX_MFG_EB_SHIFT			26
-+#define TOP_MUX_UART_SHIFT			27
-+#define TOP_MUX_SPI0_BCLK_SHIFT			28
-+#define TOP_MUX_SPI1_BCLK_SHIFT			29
-+#define TOP_MUX_SPI2_BCLK_SHIFT			30
-+#define TOP_MUX_SPI3_BCLK_SHIFT			0
-+#define TOP_MUX_SPI4_BCLK_SHIFT			1
-+#define TOP_MUX_SPI5_BCLK_SHIFT			2
-+#define TOP_MUX_SPI6_BCLK_SHIFT			3
-+#define TOP_MUX_SPI7_BCLK_SHIFT			4
-+#define TOP_MUX_MSDC30_1_SHIFT			7
-+#define TOP_MUX_MSDC30_2_SHIFT			8
-+#define TOP_MUX_DISP_PWM_SHIFT			9
-+#define TOP_MUX_USB_TOP_1P_SHIFT		10
-+#define TOP_MUX_SSUSB_XHCI_1P_SHIFT		11
-+#define TOP_MUX_SSUSB_FMCNT_P1_SHIFT		12
-+#define TOP_MUX_I2C_PERI_SHIFT			13
-+#define TOP_MUX_I2C_EAST_SHIFT			14
-+#define TOP_MUX_I2C_WEST_SHIFT			15
-+#define TOP_MUX_I2C_NORTH_SHIFT			16
-+#define TOP_MUX_AES_UFSFDE_SHIFT		17
-+#define TOP_MUX_UFS_SHIFT			18
-+#define TOP_MUX_AUD_1_SHIFT			21
-+#define TOP_MUX_AUD_2_SHIFT			22
-+#define TOP_MUX_ADSP_SHIFT			23
-+#define TOP_MUX_ADSP_UARTHUB_B_SHIFT		24
-+#define TOP_MUX_DPMAIF_MAIN_SHIFT		25
-+#define TOP_MUX_PWM_SHIFT			26
-+#define TOP_MUX_MCUPM_SHIFT			27
-+#define TOP_MUX_SFLASH_SHIFT			28
-+#define TOP_MUX_IPSEAST_SHIFT			29
-+#define TOP_MUX_TL_SHIFT			0
-+#define TOP_MUX_TL_P1_SHIFT			1
-+#define TOP_MUX_TL_P2_SHIFT			2
-+#define TOP_MUX_EMI_INTERFACE_546_SHIFT		3
-+#define TOP_MUX_SDF_SHIFT			4
-+#define TOP_MUX_UARTHUB_BCLK_SHIFT		5
-+#define TOP_MUX_DPSW_CMP_26M_SHIFT		6
-+#define TOP_MUX_SMAPCK_SHIFT			7
-+#define TOP_MUX_SSR_PKA_SHIFT			8
-+#define TOP_MUX_SSR_DMA_SHIFT			9
-+#define TOP_MUX_SSR_KDF_SHIFT			10
-+#define TOP_MUX_SSR_RNG_SHIFT			11
-+#define TOP_MUX_SPU0_SHIFT			12
-+#define TOP_MUX_SPU1_SHIFT			13
-+#define TOP_MUX_DXCC_SHIFT			14
-+
-+/* CKSTA REG */
-+#define CKSTA_REG	0x01c8
-+#define CKSTA_REG1	0x01cc
-+#define CKSTA_REG2	0x01d0
-+
-+/* DIVIDER REG */
-+#define CLK_AUDDIV_2	0x0214
-+#define CLK_AUDDIV_3	0x0220
-+#define CLK_AUDDIV_4	0x0224
-+#define CLK_AUDDIV_5	0x0228
++#define TOP_MUX_SENINF0_SHIFT		0
++#define TOP_MUX_SENINF1_SHIFT		1
++#define TOP_MUX_SENINF2_SHIFT		2
++#define TOP_MUX_SENINF3_SHIFT		3
++#define TOP_MUX_SENINF4_SHIFT		4
++#define TOP_MUX_SENINF5_SHIFT		5
++#define TOP_MUX_IMG1_SHIFT		6
++#define TOP_MUX_IPE_SHIFT		7
++#define TOP_MUX_CAM_SHIFT		8
++#define TOP_MUX_CAMTM_SHIFT		9
++#define TOP_MUX_DPE_SHIFT		10
++#define TOP_MUX_VDEC_SHIFT		11
++#define TOP_MUX_CCUSYS_SHIFT		12
++#define TOP_MUX_CCUTM_SHIFT		13
++#define TOP_MUX_VENC_SHIFT		14
++#define TOP_MUX_DVO_SHIFT		15
++#define TOP_MUX_DVO_FAVT_SHIFT		16
++#define TOP_MUX_DP1_SHIFT		17
++#define TOP_MUX_DP0_SHIFT		18
++#define TOP_MUX_DISP_SHIFT		19
++#define TOP_MUX_MDP_SHIFT		20
++#define TOP_MUX_MMINFRA_SHIFT		21
++#define TOP_MUX_MMINFRA_SNOC_SHIFT	22
++#define TOP_MUX_MMUP_SHIFT		23
++#define TOP_MUX_MMINFRA_AO_SHIFT	26
 +
 +/* HW Voter REG */
-+#define HWV_CG_0_SET	0x0000
-+#define HWV_CG_0_CLR	0x0004
-+#define HWV_CG_0_DONE	0x2c00
-+#define HWV_CG_1_SET	0x0008
-+#define HWV_CG_1_CLR	0x000c
-+#define HWV_CG_1_DONE	0x2c04
-+#define HWV_CG_2_SET	0x0010
-+#define HWV_CG_2_CLR	0x0014
-+#define HWV_CG_2_DONE	0x2c08
-+#define HWV_CG_3_SET	0x0018
-+#define HWV_CG_3_CLR	0x001c
-+#define HWV_CG_3_DONE	0x2c0c
-+#define HWV_CG_4_SET	0x0020
-+#define HWV_CG_4_CLR	0x0024
-+#define HWV_CG_4_DONE	0x2c10
-+#define HWV_CG_5_SET	0x0028
-+#define HWV_CG_5_CLR	0x002c
-+#define HWV_CG_5_DONE	0x2c14
-+#define HWV_CG_6_SET	0x0030
-+#define HWV_CG_6_CLR	0x0034
-+#define HWV_CG_6_DONE	0x2c18
-+#define HWV_CG_7_SET	0x0038
-+#define HWV_CG_7_CLR	0x003c
-+#define HWV_CG_7_DONE	0x2c1c
-+#define HWV_CG_8_SET	0x0040
-+#define HWV_CG_8_CLR	0x0044
-+#define HWV_CG_8_DONE	0x2c20
++#define HWV_CG_30_SET		0x0058
++#define HWV_CG_30_CLR		0x005c
++#define HWV_CG_30_DONE		0x2c2c
++
++#define MM_HWV_CG_30_SET	0x00f0
++#define MM_HWV_CG_30_CLR	0x00f4
++#define MM_HWV_CG_30_DONE	0x2c78
++#define MM_HWV_CG_31_SET	0x00f8
++#define MM_HWV_CG_31_CLR	0x00fc
++#define MM_HWV_CG_31_DONE	0x2c7c
++#define MM_HWV_CG_32_SET	0x0100
++#define MM_HWV_CG_32_CLR	0x0104
++#define MM_HWV_CG_32_DONE	0x2c80
++#define MM_HWV_CG_33_SET	0x0108
++#define MM_HWV_CG_33_CLR	0x010c
++#define MM_HWV_CG_33_DONE	0x2c84
++#define MM_HWV_CG_34_SET	0x0110
++#define MM_HWV_CG_34_CLR	0x0114
++#define MM_HWV_CG_34_DONE	0x2c88
++#define MM_HWV_CG_35_SET	0x0118
++#define MM_HWV_CG_35_CLR	0x011c
++#define MM_HWV_CG_35_DONE	0x2c8c
++#define MM_HWV_CG_36_SET	0x0120
++#define MM_HWV_CG_36_CLR	0x0124
++#define MM_HWV_CG_36_DONE	0x2c90
++#define MM_HWV_MUX_UPDATE_31_0	0x0240
 +
 +static const struct mtk_fixed_factor top_divs[] = {
-+	FACTOR(CLK_TOP_MAINPLL_D3, "mainpll_d3", "mainpll", 1, 3),
-+	FACTOR(CLK_TOP_MAINPLL_D4, "mainpll_d4", "mainpll", 1, 4),
-+	FACTOR(CLK_TOP_MAINPLL_D4_D2, "mainpll_d4_d2", "mainpll", 1, 8),
-+	FACTOR(CLK_TOP_MAINPLL_D4_D4, "mainpll_d4_d4", "mainpll", 1, 16),
-+	FACTOR(CLK_TOP_MAINPLL_D4_D8, "mainpll_d4_d8", "mainpll", 1, 32),
-+	FACTOR(CLK_TOP_MAINPLL_D5, "mainpll_d5", "mainpll", 1, 5),
-+	FACTOR(CLK_TOP_MAINPLL_D5_D2, "mainpll_d5_d2", "mainpll", 1, 10),
-+	FACTOR(CLK_TOP_MAINPLL_D5_D4, "mainpll_d5_d4", "mainpll", 1, 20),
-+	FACTOR(CLK_TOP_MAINPLL_D5_D8, "mainpll_d5_d8", "mainpll", 1, 40),
-+	FACTOR(CLK_TOP_MAINPLL_D6, "mainpll_d6", "mainpll", 1, 6),
-+	FACTOR(CLK_TOP_MAINPLL_D6_D2, "mainpll_d6_d2", "mainpll", 1, 12),
-+	FACTOR(CLK_TOP_MAINPLL_D7, "mainpll_d7", "mainpll", 1, 7),
-+	FACTOR(CLK_TOP_MAINPLL_D7_D2, "mainpll_d7_d2", "mainpll", 1, 14),
-+	FACTOR(CLK_TOP_MAINPLL_D7_D4, "mainpll_d7_d4", "mainpll", 1, 28),
-+	FACTOR(CLK_TOP_MAINPLL_D7_D8, "mainpll_d7_d8", "mainpll", 1, 56),
-+	FACTOR(CLK_TOP_MAINPLL_D9, "mainpll_d9", "mainpll", 1, 9),
-+	FACTOR(CLK_TOP_UNIVPLL_D4, "univpll_d4", "univpll", 1, 4),
-+	FACTOR(CLK_TOP_UNIVPLL_D4_D2, "univpll_d4_d2", "univpll", 1, 8),
-+	FACTOR(CLK_TOP_UNIVPLL_D4_D4, "univpll_d4_d4", "univpll", 1, 16),
-+	FACTOR(CLK_TOP_UNIVPLL_D4_D8, "univpll_d4_d8", "univpll", 1, 32),
-+	FACTOR(CLK_TOP_UNIVPLL_D5, "univpll_d5", "univpll", 1, 5),
-+	FACTOR(CLK_TOP_UNIVPLL_D5_D2, "univpll_d5_d2", "univpll", 1, 10),
-+	FACTOR(CLK_TOP_UNIVPLL_D5_D4, "univpll_d5_d4", "univpll", 1, 20),
-+	FACTOR(CLK_TOP_UNIVPLL_D6, "univpll_d6", "univpll", 1, 6),
-+	FACTOR(CLK_TOP_UNIVPLL_D6_D2, "univpll_d6_d2", "univpll", 1, 12),
-+	FACTOR(CLK_TOP_UNIVPLL_D6_D4, "univpll_d6_d4", "univpll", 1, 24),
-+	FACTOR(CLK_TOP_UNIVPLL_D6_D8, "univpll_d6_d8", "univpll", 1, 48),
-+	FACTOR(CLK_TOP_UNIVPLL_D6_D16, "univpll_d6_d16", "univpll", 1, 96),
-+	FACTOR(CLK_TOP_UNIVPLL_192M, "univpll_192m", "univpll", 1, 13),
-+	FACTOR(CLK_TOP_UNIVPLL_192M_D4, "univpll_192m_d4", "univpll", 1, 52),
-+	FACTOR(CLK_TOP_UNIVPLL_192M_D8, "univpll_192m_d8", "univpll", 1, 104),
-+	FACTOR(CLK_TOP_UNIVPLL_192M_D16, "univpll_192m_d16", "univpll", 1, 208),
-+	FACTOR(CLK_TOP_UNIVPLL_192M_D32, "univpll_192m_d32", "univpll", 1, 416),
-+	FACTOR(CLK_TOP_UNIVPLL_192M_D10, "univpll_192m_d10", "univpll", 1, 130),
-+	FACTOR(CLK_TOP_APLL1_D4, "apll1_d4", "vlp_apll1", 1, 4),
-+	FACTOR(CLK_TOP_APLL1_D8, "apll1_d8", "vlp_apll1", 1, 8),
-+	FACTOR(CLK_TOP_APLL2_D4, "apll2_d4", "vlp_apll2", 1, 4),
-+	FACTOR(CLK_TOP_APLL2_D8, "apll2_d8", "vlp_apll2", 1, 8),
-+	FACTOR(CLK_TOP_TVDPLL1_D2, "tvdpll1_d2", "tvdpll1", 1, 2),
-+	FACTOR(CLK_TOP_MSDCPLL_D2, "msdcpll_d2", "msdcpll", 1, 2),
-+	FACTOR(CLK_TOP_OSC_D2, "osc_d2", "ulposc", 1, 2),
-+	FACTOR(CLK_TOP_OSC_D3, "osc_d3", "ulposc", 1, 3),
-+	FACTOR(CLK_TOP_OSC_D4, "osc_d4", "ulposc", 1, 4),
-+	FACTOR(CLK_TOP_OSC_D5, "osc_d5", "ulposc", 1, 5),
-+	FACTOR(CLK_TOP_OSC_D7, "osc_d7", "ulposc", 1, 7),
-+	FACTOR(CLK_TOP_OSC_D8, "osc_d8", "ulposc", 1, 8),
-+	FACTOR(CLK_TOP_OSC_D10, "osc_d10", "ulposc", 1, 10),
-+	FACTOR(CLK_TOP_OSC_D14, "osc_d14", "ulposc", 1, 14),
-+	FACTOR(CLK_TOP_OSC_D20, "osc_d20", "ulposc", 1, 20),
-+	FACTOR(CLK_TOP_OSC_D32, "osc_d32", "ulposc", 1, 32),
-+	FACTOR(CLK_TOP_OSC_D40, "osc_d40", "ulposc", 1, 40),
-+};
-+
-+static const char * const axi_parents[] = {
-+	"clk26m",
-+	"osc_d20",
-+	"osc_d8",
-+	"osc_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const mem_sub_parents[] = {
-+	"clk26m",
-+	"osc_d20",
-+	"osc_d4",
-+	"univpll_d4_d4",
-+	"osc_d3",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5",
-+	"mainpll_d4",
-+	"mainpll_d3"
-+};
-+
-+static const char * const io_noc_parents[] = {
-+	"clk26m",
-+	"osc_d20",
-+	"osc_d8",
-+	"osc_d4",
-+	"mainpll_d6_d2",
-+	"mainpll_d9"
-+};
-+
-+static const char * const p_axi_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d8",
-+	"mainpll_d5_d8",
-+	"osc_d8",
-+	"mainpll_d7_d4",
-+	"mainpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const ufs_pextp0_axi_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d8",
-+	"mainpll_d5_d8",
-+	"osc_d8",
-+	"mainpll_d7_d4",
-+	"mainpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const pextp1_usb_axi_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d8",
-+	"mainpll_d5_d8",
-+	"osc_d8",
-+	"mainpll_d7_d4",
-+	"mainpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const p_fmem_sub_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d8",
-+	"mainpll_d5_d4",
-+	"osc_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5",
-+	"mainpll_d4"
-+};
-+
-+static const char * const ufs_pexpt0_mem_sub_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d8",
-+	"mainpll_d5_d4",
-+	"osc_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5",
-+	"mainpll_d4"
-+};
-+
-+static const char * const pextp1_usb_mem_sub_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d8",
-+	"mainpll_d5_d4",
-+	"osc_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5",
-+	"mainpll_d4"
-+};
-+
-+static const char * const p_noc_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d8",
-+	"mainpll_d5_d4",
-+	"osc_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5",
-+	"mainpll_d4",
-+	"mainpll_d3"
-+};
-+
-+static const char * const emi_n_parents[] = {
-+	"clk26m",
-+	"osc_d4",
-+	"mainpll_d5_d8",
-+	"mainpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"emipll1_ck"
-+};
-+
-+static const char * const emi_s_parents[] = {
-+	"clk26m",
-+	"osc_d4",
-+	"mainpll_d5_d8",
-+	"mainpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"emipll1_ck"
-+};
-+
-+static const char * const ap2conn_host_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d4"
-+};
-+
-+static const char * const atb_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6"
-+};
-+
-+static const char * const cirq_parents[] = {
-+	"clk26m",
-+	"osc_d20",
-+	"mainpll_d7_d4"
-+};
-+
-+static const char * const pbus_156m_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d2",
-+	"osc_d2",
-+	"mainpll_d7"
-+};
-+
-+static const char * const efuse_parents[] = {
-+	"clk26m",
-+	"osc_d20"
-+};
-+
-+static const char * const mcu_l3gic_parents[] = {
-+	"clk26m",
-+	"osc_d8",
-+	"mainpll_d4_d4",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const mcu_infra_parents[] = {
-+	"clk26m",
-+	"osc_d20",
-+	"mainpll_d7_d2",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d9",
-+	"mainpll_d6"
-+};
-+
-+static const char * const dsp_parents[] = {
-+	"clk26m",
-+	"osc_d5",
-+	"osc_d4",
-+	"osc_d3",
-+	"univpll_d6_d2",
-+	"osc_d2",
-+	"univpll_d5",
-+	"osc"
-+};
-+
-+static const char * const mfg_ref_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const mfg_eb_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d2",
-+	"mainpll_d6_d2",
-+	"mainpll_d5_d2"
-+};
-+
-+static const char * const uart_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d8",
-+	"univpll_d6_d4",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi0_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi1_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi2_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi3_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi4_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi5_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi6_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const spi7_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d4_d4",
-+	"mainpll_d6_d2",
-+	"univpll_192m",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const msdc30_1_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"mainpll_d6_d2",
-+	"univpll_d6_d2",
-+	"msdcpll_d2"
-+};
-+
-+static const char * const msdc30_2_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"mainpll_d6_d2",
-+	"univpll_d6_d2",
-+	"msdcpll_d2"
-+};
-+
-+static const char * const disp_pwm_parents[] = {
-+	"clk26m",
-+	"osc_d32",
-+	"osc_d8",
-+	"univpll_d6_d4",
-+	"univpll_d5_d4",
-+	"osc_d4",
-+	"mainpll_d4_d4"
-+};
-+
-+static const char * const usb_1p_parents[] = {
-+	"clk26m",
-+	"univpll_d5_d4"
-+};
-+
-+static const char * const usb_xhci_1p_parents[] = {
-+	"clk26m",
-+	"univpll_d5_d4"
-+};
-+
-+static const char * const usb_fmcnt_p1_parents[] = {
-+	"clk26m",
-+	"univpll_192m_d4"
-+};
-+
-+static const char * const i2c_p_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d8",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d5_d2"
-+};
-+
-+static const char * const i2c_east_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d8",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d5_d2"
-+};
-+
-+static const char * const i2c_west_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d8",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d5_d2"
-+};
-+
-+static const char * const i2c_north_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d8",
-+	"univpll_d5_d4",
-+	"mainpll_d4_d4",
-+	"univpll_d5_d2"
-+};
-+
-+static const char * const aes_ufsfde_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"univpll_d6_d2",
-+	"mainpll_d4_d2",
-+	"univpll_d6",
-+	"mainpll_d4"
-+};
-+
-+static const char * const ufs_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"univpll_d6_d2",
-+	"mainpll_d4_d2",
-+	"univpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5"
-+};
-+
-+static const char * const aud_1_parents[] = {
-+	"clk26m",
-+	"vlp_apll1"
-+};
-+
-+static const char * const aud_2_parents[] = {
-+	"clk26m",
-+	"vlp_apll2"
-+};
-+
-+static const char * const adsp_parents[] = {
-+	"clk26m",
-+	"adsppll_ck"
-+};
-+
-+static const char * const adsp_uarthub_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const dpmaif_main_parents[] = {
-+	"clk26m",
-+	"univpll_d4_d4",
-+	"univpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"univpll_d4_d2",
-+	"mainpll_d6",
-+	"univpll_d6",
-+	"mainpll_d5",
-+	"univpll_d5"
-+};
-+
-+static const char * const pwm_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d4",
-+	"univpll_d4_d8"
-+};
-+
-+static const char * const mcupm_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d2",
-+	"mainpll_d6_d2",
-+	"univpll_d6_d2",
-+	"mainpll_d5_d2"
-+};
-+
-+static const char * const ipseast_parents[] = {
-+	"clk26m",
-+	"mainpll_d6",
-+	"mainpll_d5",
-+	"mainpll_d4",
-+	"mainpll_d3"
-+};
-+
-+static const char * const tl_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d5_d2"
-+};
-+
-+static const char * const tl_p1_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d5_d2"
-+};
-+
-+static const char * const tl_p2_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d4",
-+	"mainpll_d4_d4",
-+	"mainpll_d5_d2"
-+};
-+
-+static const char * const md_emi_parents[] = {
-+	"clk26m",
-+	"mainpll_d4"
-+};
-+
-+static const char * const sdf_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2",
-+	"mainpll_d6",
-+	"mainpll_d4",
-+	"univpll_d4"
-+};
-+
-+static const char * const uarthub_b_parents[] = {
-+	"clk26m",
-+	"univpll_d6_d4",
-+	"univpll_d6_d2"
-+};
-+
-+static const char * const dpsw_cmp_26m_parents[] = {
-+	"clk26m",
-+	"osc_d20"
-+};
-+
-+static const char * const smapparents[] = {
-+	"clk26m",
-+	"mainpll_d4_d8"
-+};
-+
-+static const char * const ssr_pka_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"mainpll_d4_d2",
-+	"mainpll_d7",
-+	"mainpll_d6",
-+	"mainpll_d5"
-+};
-+
-+static const char * const ssr_dma_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"mainpll_d4_d2",
-+	"mainpll_d7",
-+	"mainpll_d6",
-+	"mainpll_d5"
-+};
-+
-+static const char * const ssr_kdf_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"mainpll_d4_d2",
-+	"mainpll_d7"
-+};
-+
-+static const char * const ssr_rng_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"mainpll_d5_d2",
-+	"mainpll_d4_d2"
-+};
-+
-+static const char * const spu0_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"mainpll_d4_d2",
-+	"mainpll_d7",
-+	"mainpll_d6",
-+	"mainpll_d5"
-+};
-+
-+static const char * const spu1_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d4",
-+	"mainpll_d4_d2",
-+	"mainpll_d7",
-+	"mainpll_d6",
-+	"mainpll_d5"
-+};
-+
-+static const char * const dxcc_parents[] = {
-+	"clk26m",
-+	"mainpll_d4_d8",
-+	"mainpll_d4_d4",
-+	"mainpll_d4_d2"
-+};
-+
-+static const char * const apll_i2sin0_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sin1_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sin2_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sin3_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sin4_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sin6_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sout0_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sout1_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sout2_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sout3_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sout4_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_i2sout6_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_fmi2s_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const apll_tdmout_m_parents[] = {
-+	"aud_1",
-+	"aud_2"
-+};
-+
-+static const char * const sflash_parents[] = {
-+	"clk26m",
-+	"mainpll_d7_d8",
-+	"univpll_d6_d8"
++	FACTOR(CLK_TOP2_MAINPLL2_D2, "mainpll2_d2", "mainpll2", 1, 2),
++	FACTOR(CLK_TOP2_MAINPLL2_D3, "mainpll2_d3", "mainpll2", 1, 3),
++	FACTOR(CLK_TOP2_MAINPLL2_D4, "mainpll2_d4", "mainpll2", 1, 4),
++	FACTOR(CLK_TOP2_MAINPLL2_D4_D2, "mainpll2_d4_d2", "mainpll2", 1, 8),
++	FACTOR(CLK_TOP2_MAINPLL2_D4_D4, "mainpll2_d4_d4", "mainpll2", 1, 16),
++	FACTOR(CLK_TOP2_MAINPLL2_D5, "mainpll2_d5", "mainpll2", 1, 5),
++	FACTOR(CLK_TOP2_MAINPLL2_D5_D2, "mainpll2_d5_d2", "mainpll2", 1, 10),
++	FACTOR(CLK_TOP2_MAINPLL2_D6, "mainpll2_d6", "mainpll2", 1, 6),
++	FACTOR(CLK_TOP2_MAINPLL2_D6_D2, "mainpll2_d6_d2", "mainpll2", 1, 12),
++	FACTOR(CLK_TOP2_MAINPLL2_D7, "mainpll2_d7", "mainpll2", 1, 7),
++	FACTOR(CLK_TOP2_MAINPLL2_D7_D2, "mainpll2_d7_d2", "mainpll2", 1, 14),
++	FACTOR(CLK_TOP2_MAINPLL2_D9, "mainpll2_d9", "mainpll2", 1, 9),
++	FACTOR(CLK_TOP2_UNIVPLL2_D3, "univpll2_d3", "univpll2", 1, 3),
++	FACTOR(CLK_TOP2_UNIVPLL2_D4, "univpll2_d4", "univpll2", 1, 4),
++	FACTOR(CLK_TOP2_UNIVPLL2_D4_D2, "univpll2_d4_d2", "univpll2", 1, 8),
++	FACTOR(CLK_TOP2_UNIVPLL2_D5, "univpll2_d5", "univpll2", 1, 5),
++	FACTOR(CLK_TOP2_UNIVPLL2_D5_D2, "univpll2_d5_d2", "univpll2", 1, 10),
++	FACTOR(CLK_TOP2_UNIVPLL2_D6, "univpll2_d6", "univpll2", 1, 6),
++	FACTOR(CLK_TOP2_UNIVPLL2_D6_D2, "univpll2_d6_d2", "univpll2", 1, 12),
++	FACTOR(CLK_TOP2_UNIVPLL2_D6_D4, "univpll2_d6_d4", "univpll2", 1, 24),
++	FACTOR(CLK_TOP2_UNIVPLL2_D7, "univpll2_d7", "univpll2", 1, 7),
++	FACTOR(CLK_TOP2_IMGPLL_D2, "imgpll_d2", "imgpll", 1, 2),
++	FACTOR(CLK_TOP2_IMGPLL_D4, "imgpll_d4", "imgpll", 1, 4),
++	FACTOR(CLK_TOP2_IMGPLL_D5, "imgpll_d5", "imgpll", 1, 5),
++	FACTOR(CLK_TOP2_IMGPLL_D5_D2, "imgpll_d5_d2", "imgpll", 1, 10),
++	FACTOR(CLK_TOP2_MMPLL2_D3, "mmpll2_d3", "mmpll2", 1, 3),
++	FACTOR(CLK_TOP2_MMPLL2_D4, "mmpll2_d4", "mmpll2", 1, 4),
++	FACTOR(CLK_TOP2_MMPLL2_D4_D2, "mmpll2_d4_d2", "mmpll2", 1, 8),
++	FACTOR(CLK_TOP2_MMPLL2_D5, "mmpll2_d5", "mmpll2", 1, 5),
++	FACTOR(CLK_TOP2_MMPLL2_D5_D2, "mmpll2_d5_d2", "mmpll2", 1, 10),
++	FACTOR(CLK_TOP2_MMPLL2_D6, "mmpll2_d6", "mmpll2", 1, 6),
++	FACTOR(CLK_TOP2_MMPLL2_D6_D2, "mmpll2_d6_d2", "mmpll2", 1, 12),
++	FACTOR(CLK_TOP2_MMPLL2_D7, "mmpll2_d7", "mmpll2", 1, 7),
++	FACTOR(CLK_TOP2_MMPLL2_D9, "mmpll2_d9", "mmpll2", 1, 9),
++	FACTOR(CLK_TOP2_TVDPLL1_D4, "tvdpll1_d4", "tvdpll1", 1, 4),
++	FACTOR(CLK_TOP2_TVDPLL1_D8, "tvdpll1_d8", "tvdpll1", 1, 8),
++	FACTOR(CLK_TOP2_TVDPLL1_D16, "tvdpll1_d16", "tvdpll1", 1, 16),
++	FACTOR(CLK_TOP2_TVDPLL2_D2, "tvdpll2_d2", "tvdpll2", 1, 2),
++	FACTOR(CLK_TOP2_TVDPLL2_D4, "tvdpll2_d4", "tvdpll2", 1, 4),
++	FACTOR(CLK_TOP2_TVDPLL2_D8, "tvdpll2_d8", "tvdpll2", 1, 8),
++	FACTOR(CLK_TOP2_TVDPLL2_D16, "tvdpll2_d16", "tvdpll2", 92, 1473),
++	FACTOR(CLK_TOP2_TVDPLL3_D2, "tvdpll3_d2", "tvdpll3", 1, 2),
++	FACTOR(CLK_TOP2_TVDPLL3_D4, "tvdpll3_d4", "tvdpll3", 1, 4),
++	FACTOR(CLK_TOP2_TVDPLL3_D8, "tvdpll3_d8", "tvdpll3", 1, 8),
++	FACTOR(CLK_TOP2_TVDPLL3_D16, "tvdpll3_d16", "tvdpll3", 92, 1473),
++};
++
++static const char * const seninf0_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d8",
++	"ck_osc_d5",
++	"ck_osc_d4",
++	"univpll2_d6_d2",
++	"mainpll2_d9",
++	"ck_osc_d2",
++	"mainpll2_d4_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"univpll2_d7",
++	"mainpll2_d6",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"univpll2_d5"
++};
++
++static const char * const seninf1_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d8",
++	"ck_osc_d5",
++	"ck_osc_d4",
++	"univpll2_d6_d2",
++	"mainpll2_d9",
++	"ck_osc_d2",
++	"mainpll2_d4_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"univpll2_d7",
++	"mainpll2_d6",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"univpll2_d5"
++};
++
++static const char * const seninf2_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d8",
++	"ck_osc_d5",
++	"ck_osc_d4",
++	"univpll2_d6_d2",
++	"mainpll2_d9",
++	"ck_osc_d2",
++	"mainpll2_d4_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"univpll2_d7",
++	"mainpll2_d6",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"univpll2_d5"
++};
++
++static const char * const seninf3_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d8",
++	"ck_osc_d5",
++	"ck_osc_d4",
++	"univpll2_d6_d2",
++	"mainpll2_d9",
++	"ck_osc_d2",
++	"mainpll2_d4_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"univpll2_d7",
++	"mainpll2_d6",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"univpll2_d5"
++};
++
++static const char * const seninf4_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d8",
++	"ck_osc_d5",
++	"ck_osc_d4",
++	"univpll2_d6_d2",
++	"mainpll2_d9",
++	"ck_osc_d2",
++	"mainpll2_d4_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"univpll2_d7",
++	"mainpll2_d6",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"univpll2_d5"
++};
++
++static const char * const seninf5_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d8",
++	"ck_osc_d5",
++	"ck_osc_d4",
++	"univpll2_d6_d2",
++	"mainpll2_d9",
++	"ck_osc_d2",
++	"mainpll2_d4_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"univpll2_d7",
++	"mainpll2_d6",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"univpll2_d5"
++};
++
++static const char * const img1_parents[] = {
++	"clk26m",
++	"ck_osc_d4",
++	"ck_osc_d3",
++	"mmpll2_d6_d2",
++	"ck_osc_d2",
++	"imgpll_d5_d2",
++	"mmpll2_d5_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"mmpll2_d5",
++	"univpll2_d4",
++	"imgpll_d4"
++};
++
++static const char * const ipe_parents[] = {
++	"clk26m",
++	"ck_osc_d4",
++	"ck_osc_d3",
++	"ck_osc_d2",
++	"univpll2_d6",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"imgpll_d5",
++	"ck_mainpll_d4",
++	"mmpll2_d5",
++	"imgpll_d4"
++};
++
++static const char * const cam_parents[] = {
++	"clk26m",
++	"ck_osc_d10",
++	"ck_osc_d4",
++	"ck_osc_d3",
++	"ck_osc_d2",
++	"mmpll2_d5_d2",
++	"univpll2_d4_d2",
++	"univpll2_d7",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"mmpll2_d5",
++	"univpll2_d4",
++	"imgpll_d4",
++	"mmpll2_d4"
++};
++
++static const char * const camtm_parents[] = {
++	"clk26m",
++	"univpll2_d6_d4",
++	"ck_osc_d4",
++	"ck_osc_d3",
++	"univpll2_d6_d2"
++};
++
++static const char * const dpe_parents[] = {
++	"clk26m",
++	"mmpll2_d5_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"mmpll2_d5",
++	"imgpll_d4",
++	"mmpll2_d4"
++};
++
++static const char * const vdec_parents[] = {
++	"clk26m",
++	"ck_mainpll_d5_d2",
++	"mainpll2_d4_d4",
++	"mainpll2_d7_d2",
++	"mainpll2_d6_d2",
++	"mainpll2_d5_d2",
++	"mainpll2_d9",
++	"mainpll2_d4_d2",
++	"mainpll2_d7",
++	"mainpll2_d6",
++	"univpll2_d6",
++	"mainpll2_d5",
++	"mainpll2_d4",
++	"imgpll_d2"
++};
++
++static const char * const ccusys_parents[] = {
++	"clk26m",
++	"ck_osc_d4",
++	"ck_osc_d3",
++	"ck_osc_d2",
++	"mmpll2_d5_d2",
++	"univpll2_d4_d2",
++	"mmpll2_d7",
++	"univpll2_d6",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"mainpll2_d4",
++	"mainpll2_d3",
++	"univpll2_d3"
++};
++
++static const char * const ccutm_parents[] = {
++	"clk26m",
++	"univpll2_d6_d4",
++	"ck_osc_d4",
++	"ck_osc_d3",
++	"univpll2_d6_d2"
++};
++
++static const char * const venc_parents[] = {
++	"clk26m",
++	"mainpll2_d5_d2",
++	"univpll2_d5_d2",
++	"mainpll2_d4_d2",
++	"mmpll2_d9",
++	"univpll2_d4_d2",
++	"mmpll2_d4_d2",
++	"mainpll2_d6",
++	"univpll2_d6",
++	"mainpll2_d5",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"mainpll2_d4",
++	"univpll2_d4",
++	"univpll2_d3"
++};
++
++static const char * const dp1_parents[] = {
++	"clk26m",
++	"tvdpll2_d16",
++	"tvdpll2_d8",
++	"tvdpll2_d4",
++	"tvdpll2_d2"
++};
++
++static const char * const dp0_parents[] = {
++	"clk26m",
++	"tvdpll1_d16",
++	"tvdpll1_d8",
++	"tvdpll1_d4",
++	"ck_tvdpll1_d2"
++};
++
++static const char * const disp_parents[] = {
++	"clk26m",
++	"ck_mainpll_d5_d2",
++	"ck_mainpll_d4_d2",
++	"ck_mainpll_d6",
++	"mainpll2_d5",
++	"mmpll2_d6",
++	"mainpll2_d4",
++	"univpll2_d4",
++	"mainpll2_d3"
++};
++
++static const char * const mdp_parents[] = {
++	"clk26m",
++	"ck_mainpll_d5_d2",
++	"mainpll2_d5_d2",
++	"mmpll2_d6_d2",
++	"mainpll2_d9",
++	"mainpll2_d4_d2",
++	"mainpll2_d7",
++	"mainpll2_d6",
++	"mainpll2_d5",
++	"mmpll2_d6",
++	"mainpll2_d4",
++	"univpll2_d4",
++	"mainpll2_d3"
++};
++
++static const char * const mminfra_parents[] = {
++	"clk26m",
++	"ck_osc_d4",
++	"ck_mainpll_d7_d2",
++	"ck_mainpll_d5_d2",
++	"ck_mainpll_d9",
++	"mmpll2_d6_d2",
++	"mainpll2_d4_d2",
++	"ck_mainpll_d6",
++	"univpll2_d6",
++	"mainpll2_d5",
++	"mmpll2_d6",
++	"univpll2_d5",
++	"mainpll2_d4",
++	"univpll2_d4",
++	"mainpll2_d3",
++	"univpll2_d3"
++};
++
++static const char * const mminfra_snoc_parents[] = {
++	"clk26m",
++	"ck_osc_d4",
++	"ck_mainpll_d7_d2",
++	"ck_mainpll_d9",
++	"ck_mainpll_d7",
++	"ck_mainpll_d6",
++	"mmpll2_d4_d2",
++	"ck_mainpll_d5",
++	"ck_mainpll_d4",
++	"univpll2_d4",
++	"mmpll2_d4",
++	"mainpll2_d3",
++	"univpll2_d3",
++	"mmpll2_d3",
++	"mainpll2_d2"
++};
++
++static const char * const mmup_parents[] = {
++	"clk26m",
++	"mainpll2_d6",
++	"mainpll2_d5",
++	"ck_osc_d2",
++	"ck_osc",
++	"ck_mainpll_d4",
++	"univpll2_d4",
++	"mainpll2_d3"
++};
++
++static const char * const mminfra_ao_parents[] = {
++	"clk26m",
++	"ck_osc_d4",
++	"ck_mainpll_d3"
++};
++
++static const char * const dvo_parents[] = {
++	"clk26m",
++	"tvdpll3_d16",
++	"tvdpll3_d8",
++	"tvdpll3_d4",
++	"tvdpll3_d2"
++};
++
++static const char * const dvo_favt_parents[] = {
++	"clk26m",
++	"tvdpll3_d16",
++	"tvdpll3_d8",
++	"tvdpll3_d4",
++	"vlp_apll1",
++	"vlp_apll2",
++	"tvdpll3_d2"
 +};
 +
 +static const struct mtk_mux top_muxes[] = {
-+	/* CLK_CFG_0 */
-+	MUX_CLR_SET_UPD(CLK_TOP_AXI, "axi",
-+		axi_parents, CLK_CFG_0, CLK_CFG_0_SET,
-+		CLK_CFG_0_CLR, 0, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_AXI_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_MEM_SUB, "mem_sub",
-+		mem_sub_parents, CLK_CFG_0, CLK_CFG_0_SET,
-+		CLK_CFG_0_CLR, 8, 4,
-+		CLK_CFG_UPDATE, TOP_MUX_MEM_SUB_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_IO_NOC, "io_noc",
-+		io_noc_parents, CLK_CFG_0, CLK_CFG_0_SET,
-+		CLK_CFG_0_CLR, 16, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_IO_NOC_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_P_AXI, "p_axi",
-+		p_axi_parents, CLK_CFG_0, CLK_CFG_0_SET,
-+		CLK_CFG_0_CLR, 24, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_PERI_AXI_SHIFT),
-+	/* CLK_CFG_1 */
-+	MUX_CLR_SET_UPD(CLK_TOP_UFS_PEXTP0_AXI, "ufs_pextp0_axi",
-+		ufs_pextp0_axi_parents, CLK_CFG_1, CLK_CFG_1_SET,
-+		CLK_CFG_1_CLR, 0, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_UFS_PEXTP0_AXI_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_PEXTP1_USB_AXI, "pextp1_usb_axi",
-+		pextp1_usb_axi_parents, CLK_CFG_1, CLK_CFG_1_SET,
-+		CLK_CFG_1_CLR, 8, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_PEXTP1_USB_AXI_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_P_FMEM_SUB, "p_fmem_sub",
-+		p_fmem_sub_parents, CLK_CFG_1, CLK_CFG_1_SET,
-+		CLK_CFG_1_CLR, 16, 4,
-+		CLK_CFG_UPDATE, TOP_MUX_PERI_FMEM_SUB_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_PEXPT0_MEM_SUB, "ufs_pexpt0_mem_sub",
-+		ufs_pexpt0_mem_sub_parents, CLK_CFG_1, CLK_CFG_1_SET,
-+		CLK_CFG_1_CLR, 24, 4,
-+		CLK_CFG_UPDATE, TOP_MUX_UFS_PEXPT0_MEM_SUB_SHIFT),
-+	/* CLK_CFG_2 */
-+	MUX_CLR_SET_UPD(CLK_TOP_PEXTP1_USB_MEM_SUB, "pextp1_usb_mem_sub",
-+		pextp1_usb_mem_sub_parents, CLK_CFG_2, CLK_CFG_2_SET,
-+		CLK_CFG_2_CLR, 0, 4,
-+		CLK_CFG_UPDATE, TOP_MUX_PEXTP1_USB_MEM_SUB_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_P_NOC, "p_noc",
-+		p_noc_parents, CLK_CFG_2, CLK_CFG_2_SET,
-+		CLK_CFG_2_CLR, 8, 4,
-+		CLK_CFG_UPDATE, TOP_MUX_PERI_NOC_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_EMI_N, "emi_n",
-+		emi_n_parents, CLK_CFG_2, CLK_CFG_2_SET,
-+		CLK_CFG_2_CLR, 16, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_EMI_N_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_EMI_S, "emi_s",
-+		emi_s_parents, CLK_CFG_2, CLK_CFG_2_SET,
-+		CLK_CFG_2_CLR, 24, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_EMI_S_SHIFT),
-+	/* CLK_CFG_3 */
-+	MUX_CLR_SET_UPD(CLK_TOP_AP2CONN_HOST, "ap2conn_host",
-+		ap2conn_host_parents, CLK_CFG_3, CLK_CFG_3_SET,
-+		CLK_CFG_3_CLR, 16, 1,
-+		CLK_CFG_UPDATE, TOP_MUX_AP2CONN_HOST_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_ATB, "atb",
-+		atb_parents, CLK_CFG_3, CLK_CFG_3_SET,
-+		CLK_CFG_3_CLR, 24, 2,
-+		CLK_CFG_UPDATE, TOP_MUX_ATB_SHIFT),
-+	/* CLK_CFG_4 */
-+	MUX_CLR_SET_UPD(CLK_TOP_CIRQ, "cirq",
-+		cirq_parents, CLK_CFG_4, CLK_CFG_4_SET,
-+		CLK_CFG_4_CLR, 0, 2,
-+		CLK_CFG_UPDATE, TOP_MUX_CIRQ_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_PBUS_156M, "pbus_156m",
-+		pbus_156m_parents, CLK_CFG_4, CLK_CFG_4_SET,
-+		CLK_CFG_4_CLR, 8, 2,
-+		CLK_CFG_UPDATE, TOP_MUX_PBUS_156M_SHIFT),
-+	/* CLK_CFG_5 */
-+	MUX_CLR_SET_UPD(CLK_TOP_EFUSE, "efuse",
-+		efuse_parents, CLK_CFG_5, CLK_CFG_5_SET,
-+		CLK_CFG_5_CLR, 0, 1,
-+		CLK_CFG_UPDATE, TOP_MUX_EFUSE_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_MCL3GIC, "mcu_l3gic",
-+		mcu_l3gic_parents, CLK_CFG_5, CLK_CFG_5_SET,
-+		CLK_CFG_5_CLR, 8, 2,
-+		CLK_CFG_UPDATE, TOP_MUX_MCU_L3GIC_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_MCINFRA, "mcu_infra",
-+		mcu_infra_parents, CLK_CFG_5, CLK_CFG_5_SET,
-+		CLK_CFG_5_CLR, 16, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_MCU_INFRA_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_DSP, "dsp",
-+		dsp_parents, CLK_CFG_5, CLK_CFG_5_SET,
-+		CLK_CFG_5_CLR, 24, 3,
-+		CLK_CFG_UPDATE, TOP_MUX_DSP_SHIFT),
-+	/* CLK_CFG_6 */
-+	MUX_GATE_FENC_CLR_SET_UPD_FLAGS(CLK_TOP_MFG_REF, "mfg_ref", mfg_ref_parents,
-+		CLK_CFG_6, CLK_CFG_6_SET, CLK_CFG_6_CLR,
-+		0, 1, 7, CLK_CFG_UPDATE, TOP_MUX_MFG_REF_SHIFT,
-+		CLK_FENC_STATUS_MON_0, 7, CLK_IGNORE_UNUSED),
-+	MUX_CLR_SET_UPD(CLK_TOP_MFG_EB, "mfg_eb",
-+		mfg_eb_parents, CLK_CFG_6, CLK_CFG_6_SET,
-+		CLK_CFG_6_CLR, 16, 2,
-+		CLK_CFG_UPDATE, TOP_MUX_MFG_EB_SHIFT),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_UART, "uart", uart_parents,
-+		CLK_CFG_6, CLK_CFG_6_SET, CLK_CFG_6_CLR,
-+		HWV_CG_3_DONE, HWV_CG_3_SET, HWV_CG_3_CLR,
-+		24, 2, 31, CLK_CFG_UPDATE, TOP_MUX_UART_SHIFT,
-+		CLK_FENC_STATUS_MON_0, 4),
-+	/* CLK_CFG_7 */
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI0_BCLK, "spi0_b", spi0_b_parents,
-+		CLK_CFG_7, CLK_CFG_7_SET, CLK_CFG_7_CLR,
-+		HWV_CG_4_DONE, HWV_CG_4_SET, HWV_CG_4_CLR,
-+		0, 3, 7, CLK_CFG_UPDATE, TOP_MUX_SPI0_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_0, 3),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI1_BCLK, "spi1_b", spi1_b_parents,
-+		CLK_CFG_7, CLK_CFG_7_SET, CLK_CFG_7_CLR,
-+		HWV_CG_4_DONE, HWV_CG_4_SET, HWV_CG_4_CLR,
-+		8, 3, 15, CLK_CFG_UPDATE, TOP_MUX_SPI1_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_0, 2),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI2_BCLK, "spi2_b", spi2_b_parents,
-+		CLK_CFG_7, CLK_CFG_7_SET, CLK_CFG_7_CLR,
-+		HWV_CG_4_DONE, HWV_CG_4_SET, HWV_CG_4_CLR,
-+		16, 3, 23, CLK_CFG_UPDATE, TOP_MUX_SPI2_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_0, 1),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI3_BCLK, "spi3_b", spi3_b_parents,
-+		CLK_CFG_7, CLK_CFG_7_SET, CLK_CFG_7_CLR,
-+		HWV_CG_4_DONE, HWV_CG_4_SET, HWV_CG_4_CLR,
-+		24, 3, 31, CLK_CFG_UPDATE1, TOP_MUX_SPI3_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_0, 0),
-+	/* CLK_CFG_8 */
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI4_BCLK, "spi4_b", spi4_b_parents,
-+		CLK_CFG_8, CLK_CFG_8_SET, CLK_CFG_8_CLR,
-+		HWV_CG_5_DONE, HWV_CG_5_SET, HWV_CG_5_CLR,
-+		0, 3, 7, CLK_CFG_UPDATE1, TOP_MUX_SPI4_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 31),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI5_BCLK, "spi5_b", spi5_b_parents,
-+		CLK_CFG_8, CLK_CFG_8_SET, CLK_CFG_8_CLR,
-+		HWV_CG_5_DONE, HWV_CG_5_SET, HWV_CG_5_CLR,
-+		8, 3, 15, CLK_CFG_UPDATE1, TOP_MUX_SPI5_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 30),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI6_BCLK, "spi6_b", spi6_b_parents,
-+		CLK_CFG_8, CLK_CFG_8_SET, CLK_CFG_8_CLR,
-+		HWV_CG_5_DONE, HWV_CG_5_SET, HWV_CG_5_CLR,
-+		16, 3, 23, CLK_CFG_UPDATE1, TOP_MUX_SPI6_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 29),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_SPI7_BCLK, "spi7_b", spi7_b_parents,
-+		CLK_CFG_8, CLK_CFG_8_SET, CLK_CFG_8_CLR,
-+		HWV_CG_5_DONE, HWV_CG_5_SET, HWV_CG_5_CLR,
-+		24, 3, 31, CLK_CFG_UPDATE1, TOP_MUX_SPI7_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 28),
-+	/* CLK_CFG_9 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_MSDC30_1, "msdc30_1", msdc30_1_parents,
-+		CLK_CFG_9, CLK_CFG_9_SET, CLK_CFG_9_CLR,
-+		16, 3, 23, CLK_CFG_UPDATE1, TOP_MUX_MSDC30_1_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 25),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_MSDC30_2, "msdc30_2", msdc30_2_parents,
-+		CLK_CFG_9, CLK_CFG_9_SET, CLK_CFG_9_CLR,
-+		24, 3, 31, CLK_CFG_UPDATE1, TOP_MUX_MSDC30_2_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 24),
-+	/* CLK_CFG_10 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_DISP_PWM, "disp_pwm", disp_pwm_parents,
-+		CLK_CFG_10, CLK_CFG_10_SET, CLK_CFG_10_CLR,
-+		0, 3, 7, CLK_CFG_UPDATE1, TOP_MUX_DISP_PWM_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 23),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_USB_TOP_1P, "usb_1p", usb_1p_parents,
-+		CLK_CFG_10, CLK_CFG_10_SET, CLK_CFG_10_CLR,
-+		8, 1, 15, CLK_CFG_UPDATE1, TOP_MUX_USB_TOP_1P_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 22),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_USB_XHCI_1P, "usb_xhci_1p", usb_xhci_1p_parents,
-+		CLK_CFG_10, CLK_CFG_10_SET, CLK_CFG_10_CLR,
-+		16, 1, 23, CLK_CFG_UPDATE1, TOP_MUX_SSUSB_XHCI_1P_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 21),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_USB_FMCNT_P1, "usb_fmcnt_p1", usb_fmcnt_p1_parents,
-+		CLK_CFG_10, CLK_CFG_10_SET, CLK_CFG_10_CLR,
-+		24, 1, 31, CLK_CFG_UPDATE1, TOP_MUX_SSUSB_FMCNT_P1_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 20),
-+	/* CLK_CFG_11 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_I2C_P, "i2c_p", i2c_p_parents,
-+		CLK_CFG_11, CLK_CFG_11_SET, CLK_CFG_11_CLR,
-+		0, 3, 7, CLK_CFG_UPDATE1, TOP_MUX_I2C_PERI_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 19),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_I2C_EAST, "i2c_east", i2c_east_parents,
-+		CLK_CFG_11, CLK_CFG_11_SET, CLK_CFG_11_CLR,
-+		8, 3, 15, CLK_CFG_UPDATE1, TOP_MUX_I2C_EAST_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 18),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_I2C_WEST, "i2c_west", i2c_west_parents,
-+		CLK_CFG_11, CLK_CFG_11_SET, CLK_CFG_11_CLR,
-+		16, 3, 23, CLK_CFG_UPDATE1, TOP_MUX_I2C_WEST_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 17),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_I2C_NORTH, "i2c_north", i2c_north_parents,
-+		CLK_CFG_11, CLK_CFG_11_SET, CLK_CFG_11_CLR,
-+		HWV_CG_6_DONE, HWV_CG_6_SET, HWV_CG_6_CLR,
-+		24, 3, 31, CLK_CFG_UPDATE1, TOP_MUX_I2C_NORTH_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 16),
-+	/* CLK_CFG_12 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_AES_UFSFDE, "aes_ufsfde", aes_ufsfde_parents,
-+		CLK_CFG_12, CLK_CFG_12_SET, CLK_CFG_12_CLR,
-+		0, 3, 7, CLK_CFG_UPDATE1, TOP_MUX_AES_UFSFDE_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 15),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_UFS, "ufs", ufs_parents,
-+		CLK_CFG_12, CLK_CFG_12_SET, CLK_CFG_12_CLR,
-+		8, 3, 15, CLK_CFG_UPDATE1, TOP_MUX_UFS_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 14),
-+	/* CLK_CFG_13 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_AUD_1, "aud_1", aud_1_parents,
-+		CLK_CFG_13, CLK_CFG_13_SET, CLK_CFG_13_CLR,
-+		0, 1, 7, CLK_CFG_UPDATE1, TOP_MUX_AUD_1_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 11),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_AUD_2, "aud_2", aud_2_parents,
-+		CLK_CFG_13, CLK_CFG_13_SET, CLK_CFG_13_CLR,
-+		8, 1, 15, CLK_CFG_UPDATE1, TOP_MUX_AUD_2_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 10),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_ADSP, "adsp", adsp_parents,
-+		CLK_CFG_13, CLK_CFG_13_SET, CLK_CFG_13_CLR,
-+		16, 1, 23, CLK_CFG_UPDATE1, TOP_MUX_ADSP_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 9),
-+	MUX_GATE_CLR_SET_UPD(CLK_TOP_ADSP_UARTHUB_B, "adsp_uarthub_b",
-+		adsp_uarthub_b_parents, CLK_CFG_13, CLK_CFG_13_SET,
-+		CLK_CFG_13_CLR, 24, 2, 31,
-+		CLK_CFG_UPDATE1, TOP_MUX_ADSP_UARTHUB_B_SHIFT),
-+	/* CLK_CFG_14 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_DPMAIF_MAIN, "dpmaif_main", dpmaif_main_parents,
-+		CLK_CFG_14, CLK_CFG_14_SET, CLK_CFG_14_CLR,
-+		0, 4, 7, CLK_CFG_UPDATE1, TOP_MUX_DPMAIF_MAIN_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 7),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_PWM, "pwm", pwm_parents,
-+		CLK_CFG_14, CLK_CFG_14_SET, CLK_CFG_14_CLR,
-+		8, 2, 15, CLK_CFG_UPDATE1, TOP_MUX_PWM_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 6),
-+	MUX_CLR_SET_UPD(CLK_TOP_MCUPM, "mcupm",
-+		mcupm_parents, CLK_CFG_14, CLK_CFG_14_SET,
-+		CLK_CFG_14_CLR, 16, 3,
-+		CLK_CFG_UPDATE1, TOP_MUX_MCUPM_SHIFT),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_SFLASH, "sflash", sflash_parents,
-+		CLK_CFG_14, CLK_CFG_14_SET, CLK_CFG_14_CLR,
-+		24, 2, 31, CLK_CFG_UPDATE1, TOP_MUX_SFLASH_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 4),
-+	/* CLK_CFG_15 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_IPSEAST, "ipseast", ipseast_parents,
-+		CLK_CFG_15, CLK_CFG_15_SET, CLK_CFG_15_CLR,
-+		0, 3, 7, CLK_CFG_UPDATE1, TOP_MUX_IPSEAST_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 3),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_TL, "tl", tl_parents,
-+		CLK_CFG_15, CLK_CFG_15_SET, CLK_CFG_15_CLR,
-+		16, 2, 23, CLK_CFG_UPDATE2, TOP_MUX_TL_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 1),
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_TL_P1, "tl_p1", tl_p1_parents,
-+		CLK_CFG_15, CLK_CFG_15_SET, CLK_CFG_15_CLR,
-+		24, 2, 31, CLK_CFG_UPDATE2, TOP_MUX_TL_P1_SHIFT,
-+		CLK_FENC_STATUS_MON_1, 0),
-+	/* CLK_CFG_16 */
-+	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP_TL_P2, "tl_p2", tl_p2_parents,
-+		CLK_CFG_16, CLK_CFG_16_SET, CLK_CFG_16_CLR,
-+		0, 2, 7, CLK_CFG_UPDATE2, TOP_MUX_TL_P2_SHIFT,
-+		CLK_FENC_STATUS_MON_2, 31),
-+	MUX_CLR_SET_UPD(CLK_TOP_EMI_INTERFACE_546, "emi_interface_546",
-+		md_emi_parents, CLK_CFG_16, CLK_CFG_16_SET,
-+		CLK_CFG_16_CLR, 8, 1,
-+		CLK_CFG_UPDATE2, TOP_MUX_EMI_INTERFACE_546_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SDF, "sdf",
-+		sdf_parents, CLK_CFG_16, CLK_CFG_16_SET,
-+		CLK_CFG_16_CLR, 16, 3,
-+		CLK_CFG_UPDATE2, TOP_MUX_SDF_SHIFT),
-+	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP_UARTHUB_BCLK, "uarthub_b", uarthub_b_parents,
-+		CLK_CFG_16, CLK_CFG_16_SET, CLK_CFG_16_CLR,
-+		HWV_CG_7_DONE, HWV_CG_7_SET, HWV_CG_7_CLR,
-+		24, 2, 31, CLK_CFG_UPDATE2, TOP_MUX_UARTHUB_BCLK_SHIFT,
-+		CLK_FENC_STATUS_MON_2, 28),
-+	/* CLK_CFG_17 */
-+	MUX_CLR_SET_UPD(CLK_TOP_DPSW_CMP_26M, "dpsw_cmp_26m",
-+		dpsw_cmp_26m_parents, CLK_CFG_17, CLK_CFG_17_SET,
-+		CLK_CFG_17_CLR, 0, 1,
-+		CLK_CFG_UPDATE2, TOP_MUX_DPSW_CMP_26M_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SMAP, "smap",
-+		smapparents, CLK_CFG_17, CLK_CFG_17_SET,
-+		CLK_CFG_17_CLR, 8, 1,
-+		CLK_CFG_UPDATE2, TOP_MUX_SMAPCK_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SSR_PKA, "ssr_pka",
-+		ssr_pka_parents, CLK_CFG_17, CLK_CFG_17_SET,
-+		CLK_CFG_17_CLR, 16, 3,
-+		CLK_CFG_UPDATE2, TOP_MUX_SSR_PKA_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SSR_DMA, "ssr_dma",
-+		ssr_dma_parents, CLK_CFG_17, CLK_CFG_17_SET,
-+		CLK_CFG_17_CLR, 24, 3,
-+		CLK_CFG_UPDATE2, TOP_MUX_SSR_DMA_SHIFT),
-+	/* CLK_CFG_18 */
-+	MUX_CLR_SET_UPD(CLK_TOP_SSR_KDF, "ssr_kdf",
-+		ssr_kdf_parents, CLK_CFG_18, CLK_CFG_18_SET,
-+		CLK_CFG_18_CLR, 0, 2,
-+		CLK_CFG_UPDATE2, TOP_MUX_SSR_KDF_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SSR_RNG, "ssr_rng",
-+		ssr_rng_parents, CLK_CFG_18, CLK_CFG_18_SET,
-+		CLK_CFG_18_CLR, 8, 2,
-+		CLK_CFG_UPDATE2, TOP_MUX_SSR_RNG_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SPU0, "spu0",
-+		spu0_parents, CLK_CFG_18, CLK_CFG_18_SET,
-+		CLK_CFG_18_CLR, 16, 3,
-+		CLK_CFG_UPDATE2, TOP_MUX_SPU0_SHIFT),
-+	MUX_CLR_SET_UPD(CLK_TOP_SPU1, "spu1",
-+		spu1_parents, CLK_CFG_18, CLK_CFG_18_SET,
-+		CLK_CFG_18_CLR, 24, 3,
-+		CLK_CFG_UPDATE2, TOP_MUX_SPU1_SHIFT),
-+	/* CLK_CFG_19 */
-+	MUX_CLR_SET_UPD(CLK_TOP_DXCC, "dxcc",
-+		dxcc_parents, CLK_CFG_19, CLK_CFG_19_SET,
-+		CLK_CFG_19_CLR, 0, 2,
-+		CLK_CFG_UPDATE2, TOP_MUX_DXCC_SHIFT),
-+};
-+
-+static const struct mtk_composite top_aud_divs[] = {
-+	/* CLK_AUDDIV_2 */
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SIN0, "apll_i2sin0_m", apll_i2sin0_m_parents,
-+		CLK_AUDDIV_0, 16, 1, CLK_AUDDIV_2, 0, 8, CLK_AUDDIV_0, 0),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SIN1, "apll_i2sin1_m", apll_i2sin1_m_parents,
-+		CLK_AUDDIV_0, 17, 1, CLK_AUDDIV_2, 8, 8, CLK_AUDDIV_0, 1),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SIN2, "apll_i2sin2_m", apll_i2sin2_m_parents,
-+		CLK_AUDDIV_0, 18, 1, CLK_AUDDIV_2, 16, 8, CLK_AUDDIV_0, 2),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SIN3, "apll_i2sin3_m", apll_i2sin3_m_parents,
-+		CLK_AUDDIV_0, 19, 1, CLK_AUDDIV_2, 24, 8, CLK_AUDDIV_0, 3),
-+	/* CLK_AUDDIV_3 */
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SIN4, "apll_i2sin4_m", apll_i2sin4_m_parents,
-+		CLK_AUDDIV_0, 20, 1, CLK_AUDDIV_3, 0, 8, CLK_AUDDIV_0, 4),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SIN6, "apll_i2sin6_m", apll_i2sin6_m_parents,
-+		CLK_AUDDIV_0, 21, 1, CLK_AUDDIV_3, 8, 8, CLK_AUDDIV_0, 5),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SOUT0, "apll_i2sout0_m", apll_i2sout0_m_parents,
-+		CLK_AUDDIV_0, 22, 1, CLK_AUDDIV_3, 16, 8, CLK_AUDDIV_0, 6),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SOUT1, "apll_i2sout1_m", apll_i2sout1_m_parents,
-+		CLK_AUDDIV_0, 23, 1, CLK_AUDDIV_3, 24, 8, CLK_AUDDIV_0, 7),
-+	/* CLK_AUDDIV_4 */
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SOUT2, "apll_i2sout2_m", apll_i2sout2_m_parents,
-+		CLK_AUDDIV_0, 24, 1, CLK_AUDDIV_4, 0, 8, CLK_AUDDIV_0, 8),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SOUT3, "apll_i2sout3_m", apll_i2sout3_m_parents,
-+		CLK_AUDDIV_0, 25, 1, CLK_AUDDIV_4, 8, 8, CLK_AUDDIV_0, 9),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SOUT4, "apll_i2sout4_m", apll_i2sout4_m_parents,
-+		CLK_AUDDIV_0, 26, 1, CLK_AUDDIV_4, 16, 8, CLK_AUDDIV_0, 10),
-+	MUX_DIV_GATE(CLK_TOP_APLL_I2SOUT6, "apll_i2sout6_m", apll_i2sout6_m_parents,
-+		CLK_AUDDIV_0, 27, 1, CLK_AUDDIV_4, 24, 8, CLK_AUDDIV_0, 11),
-+	/* CLK_AUDDIV_5 */
-+	MUX_DIV_GATE(CLK_TOP_APLL_FMI2S, "apll_fmi2s_m", apll_fmi2s_m_parents,
-+		CLK_AUDDIV_0, 28, 1, CLK_AUDDIV_5, 0, 8, CLK_AUDDIV_0, 12),
-+	MUX(CLK_TOP_APLL_TDMOUT, "apll_tdmout_m",
-+	    apll_tdmout_m_parents, CLK_AUDDIV_0, 29, 1),
-+	DIV_GATE(CLK_TOP_APLL12_DIV_TDMOUT_M, "apll12_div_tdmout_m",
-+		"apll_tdmout_m", CLK_AUDDIV_0,
-+		13, CLK_AUDDIV_5, 8, 8),
-+	DIV_GATE(CLK_TOP_APLL12_DIV_TDMOUT_B, "apll12_div_tdmout_b",
-+		"apll_tdmout_m", CLK_AUDDIV_0,
-+		14, CLK_AUDDIV_5, 8, 16),
++	/* CKSYS2_CLK_CFG_0 */
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_SENINF0, "seninf0", seninf0_parents,
++		CKSYS2_CLK_CFG_0, CKSYS2_CLK_CFG_0_SET, CKSYS2_CLK_CFG_0_CLR,
++		MM_HWV_CG_30_DONE, MM_HWV_CG_30_SET, MM_HWV_CG_30_CLR,
++		0, 4, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_SENINF0_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 31),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_SENINF1, "seninf1", seninf1_parents,
++		CKSYS2_CLK_CFG_0, CKSYS2_CLK_CFG_0_SET, CKSYS2_CLK_CFG_0_CLR,
++		MM_HWV_CG_30_DONE, MM_HWV_CG_30_SET, MM_HWV_CG_30_CLR,
++		8, 4, 15, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_SENINF1_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 30),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_SENINF2, "seninf2", seninf2_parents,
++		CKSYS2_CLK_CFG_0, CKSYS2_CLK_CFG_0_SET, CKSYS2_CLK_CFG_0_CLR,
++		MM_HWV_CG_30_DONE, MM_HWV_CG_30_SET, MM_HWV_CG_30_CLR,
++		16, 4, 23, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_SENINF2_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 29),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_SENINF3, "seninf3", seninf3_parents,
++		CKSYS2_CLK_CFG_0, CKSYS2_CLK_CFG_0_SET, CKSYS2_CLK_CFG_0_CLR,
++		MM_HWV_CG_30_DONE, MM_HWV_CG_30_SET, MM_HWV_CG_30_CLR,
++		24, 4, 31, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_SENINF3_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 28),
++	/* CKSYS2_CLK_CFG_1 */
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_SENINF4, "seninf4", seninf4_parents,
++		CKSYS2_CLK_CFG_1, CKSYS2_CLK_CFG_1_SET, CKSYS2_CLK_CFG_1_CLR,
++		MM_HWV_CG_31_DONE, MM_HWV_CG_31_SET, MM_HWV_CG_31_CLR,
++		0, 4, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_SENINF4_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 27),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_SENINF5, "seninf5", seninf5_parents,
++		CKSYS2_CLK_CFG_1, CKSYS2_CLK_CFG_1_SET, CKSYS2_CLK_CFG_1_CLR,
++		MM_HWV_CG_31_DONE, MM_HWV_CG_31_SET, MM_HWV_CG_31_CLR,
++		8, 4, 15, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_SENINF5_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 26),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_IMG1, "img1", img1_parents,
++		CKSYS2_CLK_CFG_1, CKSYS2_CLK_CFG_1_SET, CKSYS2_CLK_CFG_1_CLR,
++		MM_HWV_CG_31_DONE, MM_HWV_CG_31_SET, MM_HWV_CG_31_CLR,
++		16, 4, 23, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_IMG1_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 25),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_IPE, "ipe", ipe_parents,
++		CKSYS2_CLK_CFG_1, CKSYS2_CLK_CFG_1_SET, CKSYS2_CLK_CFG_1_CLR,
++		MM_HWV_CG_31_DONE, MM_HWV_CG_31_SET, MM_HWV_CG_31_CLR,
++		24, 4, 31, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_IPE_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 24),
++	/* CKSYS2_CLK_CFG_2 */
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_CAM, "cam", cam_parents,
++		CKSYS2_CLK_CFG_2, CKSYS2_CLK_CFG_2_SET, CKSYS2_CLK_CFG_2_CLR,
++		MM_HWV_CG_32_DONE, MM_HWV_CG_32_SET, MM_HWV_CG_32_CLR,
++		0, 4, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_CAM_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 23),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_CAMTM, "camtm", camtm_parents,
++		CKSYS2_CLK_CFG_2, CKSYS2_CLK_CFG_2_SET, CKSYS2_CLK_CFG_2_CLR,
++		MM_HWV_CG_32_DONE, MM_HWV_CG_32_SET, MM_HWV_CG_32_CLR,
++		8, 3, 15, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_CAMTM_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 22),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_DPE, "dpe", dpe_parents,
++		CKSYS2_CLK_CFG_2, CKSYS2_CLK_CFG_2_SET, CKSYS2_CLK_CFG_2_CLR,
++		MM_HWV_CG_32_DONE, MM_HWV_CG_32_SET, MM_HWV_CG_32_CLR,
++		16, 4, 23, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_DPE_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 21),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_VDEC, "vdec", vdec_parents,
++		CKSYS2_CLK_CFG_2, CKSYS2_CLK_CFG_2_SET, CKSYS2_CLK_CFG_2_CLR,
++		MM_HWV_CG_32_DONE, MM_HWV_CG_32_SET, MM_HWV_CG_32_CLR,
++		24, 4, 31, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_VDEC_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 20),
++	/* CKSYS2_CLK_CFG_3 */
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_CCUSYS, "ccusys", ccusys_parents,
++		CKSYS2_CLK_CFG_3, CKSYS2_CLK_CFG_3_SET, CKSYS2_CLK_CFG_3_CLR,
++		MM_HWV_CG_33_DONE, MM_HWV_CG_33_SET, MM_HWV_CG_33_CLR,
++		0, 4, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_CCUSYS_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 19),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_CCUTM, "ccutm", ccutm_parents,
++		CKSYS2_CLK_CFG_3, CKSYS2_CLK_CFG_3_SET, CKSYS2_CLK_CFG_3_CLR,
++		MM_HWV_CG_33_DONE, MM_HWV_CG_33_SET, MM_HWV_CG_33_CLR,
++		8, 3, 15, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_CCUTM_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 18),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_VENC, "venc", venc_parents,
++		CKSYS2_CLK_CFG_3, CKSYS2_CLK_CFG_3_SET, CKSYS2_CLK_CFG_3_CLR,
++		MM_HWV_CG_33_DONE, MM_HWV_CG_33_SET, MM_HWV_CG_33_CLR,
++		16, 4, 23, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_VENC_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 17),
++	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP2_DVO, "dvo", dvo_parents,
++		CKSYS2_CLK_CFG_3, CKSYS2_CLK_CFG_3_SET, CKSYS2_CLK_CFG_3_CLR,
++		24, 3, 31, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_DVO_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 16),
++	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP2_DVO_FAVT, "dvo_favt", dvo_favt_parents,
++		CKSYS2_CLK_CFG_4, CKSYS2_CLK_CFG_4_SET, CKSYS2_CLK_CFG_4_CLR,
++		0, 3, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_DVO_FAVT_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 15),
++	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP2_DP1, "dp1", dp1_parents,
++		CKSYS2_CLK_CFG_4, CKSYS2_CLK_CFG_4_SET, CKSYS2_CLK_CFG_4_CLR,
++		8, 3, 15, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_DP1_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 14),
++	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP2_DP0, "dp0", dp0_parents,
++		CKSYS2_CLK_CFG_4, CKSYS2_CLK_CFG_4_SET, CKSYS2_CLK_CFG_4_CLR,
++		16, 3, 23, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_DP0_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 13),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_DISP, "disp", disp_parents,
++		CKSYS2_CLK_CFG_4, CKSYS2_CLK_CFG_4_SET, CKSYS2_CLK_CFG_4_CLR,
++		MM_HWV_CG_34_DONE, MM_HWV_CG_34_SET, MM_HWV_CG_34_CLR,
++		24, 4, 31, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_DISP_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 12),
++	/* CKSYS2_CLK_CFG_5 */
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_MDP, "mdp", mdp_parents,
++		CKSYS2_CLK_CFG_5, CKSYS2_CLK_CFG_5_SET, CKSYS2_CLK_CFG_5_CLR,
++		MM_HWV_CG_35_DONE, MM_HWV_CG_35_SET, MM_HWV_CG_35_CLR,
++		0, 4, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_MDP_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 11),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_MMINFRA, "mminfra", mminfra_parents,
++		CKSYS2_CLK_CFG_5, CKSYS2_CLK_CFG_5_SET, CKSYS2_CLK_CFG_5_CLR,
++		MM_HWV_CG_35_DONE, MM_HWV_CG_35_SET, MM_HWV_CG_35_CLR,
++		8, 4, 15, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_MMINFRA_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 10),
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_MMINFRA_SNOC, "mminfra_snoc", mminfra_snoc_parents,
++		CKSYS2_CLK_CFG_5, CKSYS2_CLK_CFG_5_SET, CKSYS2_CLK_CFG_5_CLR,
++		MM_HWV_CG_35_DONE, MM_HWV_CG_35_SET, MM_HWV_CG_35_CLR,
++		16, 4, 23, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_MMINFRA_SNOC_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 9),
++	MUX_GATE_FENC_CLR_SET_UPD(CLK_TOP2_MMUP, "mmup", mmup_parents,
++		CKSYS2_CLK_CFG_5, CKSYS2_CLK_CFG_5_SET, CKSYS2_CLK_CFG_5_CLR,
++		24, 3, 31, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_MMUP_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 8),
++	/* CKSYS2_CLK_CFG_6 */
++	MUX_GATE_HWV_FENC_CLR_SET_UPD(CLK_TOP2_MMINFRA_AO, "mminfra_ao", mminfra_ao_parents,
++		CKSYS2_CLK_CFG_6, CKSYS2_CLK_CFG_6_SET, CKSYS2_CLK_CFG_6_CLR,
++		MM_HWV_CG_36_DONE, MM_HWV_CG_36_SET, MM_HWV_CG_36_CLR,
++		16, 2, 7, CKSYS2_CLK_CFG_UPDATE, TOP_MUX_MMINFRA_AO_SHIFT,
++		CKSYS2_CLK_FENC_STATUS_MON_0, 5),
 +};
 +
 +static const struct mtk_clk_desc topck_desc = {
@@ -1347,12 +755,10 @@ index 000000000000..fc0c1227dd8d
 +	.num_factor_clks = ARRAY_SIZE(top_divs),
 +	.mux_clks = top_muxes,
 +	.num_mux_clks = ARRAY_SIZE(top_muxes),
-+	.composite_clks = top_aud_divs,
-+	.num_composite_clks = ARRAY_SIZE(top_aud_divs)
 +};
 +
 +static const struct of_device_id of_match_clk_mt8196_ck[] = {
-+	{ .compatible = "mediatek,mt8196-topckgen", .data = &topck_desc },
++	{ .compatible = "mediatek,mt8196-topckgen-gp2", .data = &topck_desc },
 +	{ /* sentinel */ }
 +};
 +MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_ck);
@@ -1361,12 +767,12 @@ index 000000000000..fc0c1227dd8d
 +	.probe = mtk_clk_simple_probe,
 +	.remove = mtk_clk_simple_remove,
 +	.driver = {
-+		.name = "clk-mt8196-topck",
++		.name = "clk-mt8196-topck2",
 +		.of_match_table = of_match_clk_mt8196_ck,
 +	},
 +};
 +
-+MODULE_DESCRIPTION("MediaTek MT8196 top clock generators driver");
++MODULE_DESCRIPTION("MediaTek MT8196 GP2 top clock generators driver");
 +module_platform_driver(clk_mt8196_topck_drv);
 +MODULE_LICENSE("GPL");
 -- 
