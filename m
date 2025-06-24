@@ -1,335 +1,239 @@
-Return-Path: <netdev+bounces-200581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52AA4AE628D
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:35:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D3E8AE62C2
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:43:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597E840520C
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:35:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D85189265E
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31E0218ABA;
-	Tue, 24 Jun 2025 10:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8DD280318;
+	Tue, 24 Jun 2025 10:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="sgBIjiMo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hw0zfxMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022091.outbound.protection.outlook.com [52.101.126.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF6F8634F;
-	Tue, 24 Jun 2025 10:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.91
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750761348; cv=fail; b=kjQNUr6LYE9xZ+YL1GnSMKadPQ64IkJbpxv786s+ws78o3AMdu3JBIHJNbKLfuhR5INByJmPiEn+XflAZJHiG2YkxMrtsST2WwSo3cASYzRevGrb+eRBa1j2ZW+T/GbyXfvp4VYLIQfaDye9/HSdtwpIrOjiX8ltzvo5Dqy3R90=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750761348; c=relaxed/simple;
-	bh=mJxpZ5nSKsGZ39/lF/objK8VlpkpFhmlNwvB7ErMy7Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rvKNvav+aoo6nx+jARmnrXv7QBKvNlu+xGb8JU/iri9xgCNY/rh5EdORY66MLgCtaWnld5uWTDpB4v7sgzT3yPePW0b0bgskSygIGcZ6PId1AvYWOMeoFX3xMIkgUbVNH5+7lQk944Xblz5xN/uKSdyB9zaEqcqaWfdOXtirjBk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=sgBIjiMo; arc=fail smtp.client-ip=52.101.126.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hW8yZFwjZWv7jWTvpltNgkD1jNCzdPsS74HA4qDfxlhV0FlDVtPsRBcx1rfxKtu95r0uiQ2A6pQTybCChK0kx/xSriR6C2GMnj/e7n0BnBbd+C//L0NS15mFo3xztsGrBVM3+tZMtRdu3WckQHDa59+6YyAiHOSoXMLXf+19u06VT0zqG5nsSUmNHZKrST3lPiHNSpQpA87vXLP+UkL/fK84ad41/Sw77pjQBKVfjB/XIJlVmPDxZAPwUI+lcbZdphYoFsAb4o0JF0wnGuSrhniP4/CFhDFZ44CYzo1Dta9kKEmeTsPDAqpxTQvHGz7fz35qUehTaq/GgqRyEIWO/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gBeLJ/X+IKgkaMboqWFFReTqPpJqCu3L48O1As8f9fI=;
- b=Nt2coVckdqAg6xUyikXtU72xUClIS4AzS1jvIGYQ1vgy3TFMAXyQDxl+IKfgk6JlYx9yFKHAaDMGOH1l/ZLsisfHdHvt5qkenBQfYiWoJ/K9Qm9vL0t1cf6JQi7CBkALCBgNfJGwPts8kIbSip9EgCg4Q9AoDC3Geim3lGDiZcagqlFiki7Eubw8hmqZtgp9gonAd3X3zMIohZwbs39ORsG3L4oF4KKty9bg1ERS1bQ8XetYSJretLj4nU+U4yLuv7ilOJSJ7q9IR/Md/dQ2HQfaQBliRt27/OH45i9KhDlYwZZHi0VLl8ChCDxM8H2Fv2HvTp92pCH29gXjB1f33Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gBeLJ/X+IKgkaMboqWFFReTqPpJqCu3L48O1As8f9fI=;
- b=sgBIjiMo+64i4a96xNoxJu5ThCqwgwzzK6TgC5zdkf8AJ7dVldyT4q9EweGSMsfs7+IN3VWfPtmZ1wgEo8xtRVKri28Agtl4LGeYzGp0X401WUEAK0HRK18ser4SjddsV/clJyIyqodPemJZOz7MlZljhJXKQxGe8ux9UrVXkFybISDKaosjooEP7XNYNC3O+pELlH/h7M4m+Vs8ma9AaMJ0iF53O9+eEVM4MHKY33oUfGqx2bMlNgoeMxiDESXQTyTRm22iU06Kb3B26EYDJ0O4EpAh5f/hrZ0XJQZYhs+L38H++1vHm5wTI/9AG7y6e6C+cnEgQrUi6Oja/YArZA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by JH0PR03MB8098.apcprd03.prod.outlook.com (2603:1096:990:3e::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Tue, 24 Jun
- 2025 10:35:41 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd%6]) with mapi id 15.20.8835.023; Tue, 24 Jun 2025
- 10:35:41 +0000
-Message-ID: <47543ce8-10a5-4b40-84d4-bfa8e5fa50e0@amlogic.com>
-Date: Tue, 24 Jun 2025 18:35:17 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
- <4db45281-9943-4ed7-80c6-04b39c3e9a5e@molgen.mpg.de>
- <d3ca7e7e-720a-42ef-b32e-19cd84d208a7@amlogic.com>
- <c92dd95b-3986-4b0c-807e-62c203a656df@molgen.mpg.de>
-Content-Language: en-US
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <c92dd95b-3986-4b0c-807e-62c203a656df@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TY2PR0101CA0010.apcprd01.prod.exchangelabs.com
- (2603:1096:404:92::22) To JH0PR03MB7468.apcprd03.prod.outlook.com
- (2603:1096:990:16::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5D4223704
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750761812; cv=none; b=IcgPQRI0TocT3/ttWxEoiQ2HZciNVC+A7qvWToNV8vEyP9QCEdFaP+IjgpgLeacbmtLsucRarlBn6VXMDi7LECZXxnSSVjfKc14w4Qxniy86/HRAt2CyK8s6aSJG0wDyGfoOENcE9xC60RZMuIyRA5JFdR+xosXyEZX/02zp8/4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750761812; c=relaxed/simple;
+	bh=nvxDDaNKnUcqS7Nr7/FLXUQ88t1Gs6tXSp9Ula6h3j8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=kUpcALfImmMPcGvWriR9sQ0YiAVVuhIoChKSVCpCRNd29vezE4+V7imIszFO8+dMmVYKCvoTvVvt78wjED7317KslwggHTFcSJYeFLg5l3W6P3u8aTEhNw7oxwGGXC04peI1lNgDmmCPA9qA01x28xiAUL23Cu6YgwvB6eexp7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hw0zfxMO; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-453749af004so1567855e9.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:43:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750761809; x=1751366609; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Z07Ji83ZlzY12zaV+p5K5uMNt1HkV84FmlbN+zKstPI=;
+        b=Hw0zfxMONXztDv3h9avEITV4aednyz4KjCZBZWGgU3rrf0bc954bEKJpiMJbvEKVK/
+         ND5T5cQsdMVqf4l1l2LN2B6ZDWBwyddxvRwVQnulUpF3d4NQsQNsB8ilEwqleigIdpfc
+         SGXtY9CGVRr6VWPdq56faaYMTVJnRCHtyT1VWGlyuA+QgbUs9QubjHGc3tTjf3mf05Mf
+         dAmgHSLi5vEuofEmEFAX9CTCKDr0gFepO4pgj8EvRKuOxTMZSU6iB0XM/X66ICgGAhWs
+         UQuxH4WUtTwrnXhGHCZf5NHwB2LzfrMZ/AUnBc60sK7R//jBWnouByv3DrKRCQYQONam
+         +oYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750761809; x=1751366609;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z07Ji83ZlzY12zaV+p5K5uMNt1HkV84FmlbN+zKstPI=;
+        b=LvvQDoQ4l/PWXI2LTxYdzkDbNpJcXHCgDSO1/Ord3lsvg0Nd1NfyYWHbBCpbDc1J85
+         2ZVCgsi5B8uSRlrYjMc3g/51cS3Rnj+Dj+s/DIGkO5Zu5VNUdkMxw00XAwvxVidrXG9s
+         osJC7yyqDzPAjmJdSKUEQix1TCxsbaxgM94AVeo0F4CHHeU0sPVgbizpR/ofRByFXky6
+         8XbinwRUk/K4cONHyZ8niHqN9lOZEFaMqgYQYT7IKpTDj3Vo9/G+s4kU2dO0CqK5QLBE
+         4G9Atze0NkGk2rA8yj2I1pDfVGVUIw2f8+2K3RAOilbgkX6muOyRJpJgBc0fz2z+3KuE
+         eFUQ==
+X-Gm-Message-State: AOJu0YyGnHr6SQqg1H/7SPtQ3QJwp4HRrhV5zcdYRUOEg0x39plhV5ZW
+	At/8kiiFtItGLxMzJ7U7UI+OFJ2PdgcElhW92ERSSHEF6oPmD902bvz0VOpyrL2U6o0=
+X-Gm-Gg: ASbGncueg9UYYge0/Y2pxRO8iv/9JXxsTPHx9ZESzdODDYpT/nfr6/L1wdmPJFpho2J
+	lVZV0oPh7oocijL9ZPTJ0QLv92iiNuOn1SKoZvBu08AlJFeF5MR0CRwgtVbneuJKj08MnHHrwx6
+	UZG8juVgtVr5g1fJLrApe9LU2xb1HFF4ipszauYZZGcfzEvtuXk7aTYo2/ekYel6wB86r4nKZqp
+	BtMchvD7szypNtMvHWolNpX7Liv8Z59v7xzEK8pFTaEyCyXgSmrCA07wDVYLWfJ5BThKvxEJn5t
+	BUb8rRqnaJxLWDPG2W+GBF71mgV4jcAViBuqdsO+KBGIBJcQYHg6ehqJLrWAOW1uZGwp1oimT9+
+	uR0/VUNj8p6zCfN53AhdmAwnCSUQKPE3V7QzZnGtawZuAHYXRTQnK0rgvFCXrVHMPS+6oY/WY1N
+	uOWd/AIpK9MLyvjbU=
+X-Google-Smtp-Source: AGHT+IH4uEWorpOr8pZ/OAj+8RFuJTH3V4ZMjPwh+VX7PTXmfN5bFwJ2I20APc5fCglEFBiid0eEWg==
+X-Received: by 2002:a05:600c:4e8b:b0:453:608:a18b with SMTP id 5b1f17b1804b1-453654cb7dfmr177077465e9.9.1750761808892;
+        Tue, 24 Jun 2025 03:43:28 -0700 (PDT)
+Received: from ?IPV6:2003:ed:774b:fc38:d9ac:77b7:ed46:71db? (p200300ed774bfc38d9ac77b7ed4671db.dip0.t-ipconnect.de. [2003:ed:774b:fc38:d9ac:77b7:ed46:71db])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646d14f3sm137426565e9.13.2025.06.24.03.43.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 03:43:28 -0700 (PDT)
+Message-ID: <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com>
+Date: Tue, 24 Jun 2025 12:43:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|JH0PR03MB8098:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f26186e-f12f-4bef-95fa-08ddb30adde6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OTJ4OEc5MU02Y0JKTDY1bTgrWU5SdkgyOG5kZ2xHWUFWMk5hQlIzWVRTU0tF?=
- =?utf-8?B?ZDBWcXkxcEIwWjRvVnphR2RjbGNHdVJIV3hxK0h4WVRoR2RMWFcyYU8weEF6?=
- =?utf-8?B?KzF6RlpDdHpDeE82YXE3MWQvYXRPOVJLS0ZLRytJZFgrMkdiZm95MXZqbFMr?=
- =?utf-8?B?dzRaYW9BR2FxVVZpajYyM29yVmJ5cWR4N0hNcHRmakZueEY5c0tVbnFvRkZF?=
- =?utf-8?B?Unl6aVBqN3JWeG01a2tQNG01eno4ekwxTzZSVWZUMFRJUnV5ajM5RmVXS1gz?=
- =?utf-8?B?emo5TkFvUzBCUjZYcnZjSURQRC9HRVFNNHJ5ZWhlRTVtRGZDZ3QvU25pUVpO?=
- =?utf-8?B?amNCajhqS3dtL01WUUtVbVJXREppdUNycjhWeEdmbnZKRDlFOTUrZW14d0to?=
- =?utf-8?B?a1VkVDJodTRlSEFYTTBXZDBlaFdkRDVxeWFneThnYi9kdjlqZ3UxdmZaSkZZ?=
- =?utf-8?B?ZGx3SnNTK2FsdzltNjhDbFN5STc4dDU5eDE2NUZFbVpRdkZtYVcrb3dmVEZZ?=
- =?utf-8?B?eS9FRkZWdEEwalFRU2V2MU9QNzM3SmtXZHkvYnNVVDcwRmRLcmQyeUpBSWtW?=
- =?utf-8?B?RGhFVC91WXI5aXMyWFBGdDlOYkF5dDZHTU01QWlNeTlhcDlIVmxyTUE5TkUz?=
- =?utf-8?B?Q3ltMGFtWXJNc0xzS0ttRi8vYS85NjlPYjluNk9RN29CUWZiS2wvSTZaYUZP?=
- =?utf-8?B?VFVnb25MV2RVcWVnQzZLYUJMV1BZQTc0WmV2NE01ZTBLdTg2UHpGNVZRMlpF?=
- =?utf-8?B?UmZ0alZ0d2xHY2dUV0Y0T0hCQ0hxV1ByYVpMczZSbmNoZmlrbHZjSk1NNXhB?=
- =?utf-8?B?RnhCRDlsR09SS2o4eEp0Vjk3eVZvQVpSeFRvTS9WZUViMm9uM0t2NzcvcTdZ?=
- =?utf-8?B?bnpjS1JCTnQ5aUswS1lEZXdXRTJYell3anVhN0grRUFFcEFYQ2hwY3J4Vkt1?=
- =?utf-8?B?alpCQjVkNXdIeDdDQmRPS3JVNTBJa0xJVjhBU0pzeUM5bER1a0RtZ0JacGJi?=
- =?utf-8?B?U1U5cWN4bjU3OUdPc2d0RGVrRHVPM2JKdVpqYjNIWnpyckFseE1GeS9pV2Y2?=
- =?utf-8?B?V2lLSENTR29QRm9LeUZnbXhnc0txdnFFNmhUbldHNWo1VTlrKzVJbTIrbjZu?=
- =?utf-8?B?ODd0alBlZE45RlJNNjZZY3hkWDErZHJ5NHZBc0wrdXVRWEh0dmFnRitsc2hk?=
- =?utf-8?B?RkpYenh3TXByTU95cVphdFFMTy9SS0hUK2hHY3czVzlaekJGY1pyNGlmdG5t?=
- =?utf-8?B?TU1TRWJwSllhc0R6bkdZTThxbjliQ2pYbFhUN29UbkQyR1hMWTBWT0thcEp4?=
- =?utf-8?B?Vjd5K3ZaSHBmOVZRYWVhNHlqTUxON2FsYTh5OGZJWkkvaGJadk51c3NHY0VB?=
- =?utf-8?B?UWlEMnBFd2FIaXpVT3pEeDgrTjZYVUhDbU5GUWdKYU5VOUt6THF6b2wzaFFG?=
- =?utf-8?B?SUkydGlMRzZlOFFQSERPZjNhbGs5R25Fa3JtclBJRUViSm45cDhWb1ZlZUt4?=
- =?utf-8?B?Zkl3b0lmcTdRSXBqdlZFVkJkTEV5MmRCMGZHZmZYbzYwS09PZDVkdlZ6VFJU?=
- =?utf-8?B?WGVvNXlqa01KakhrNXl0VG9xNXZ6U2lXSXBUN3NuWHBHQldsclBFN0E0V05S?=
- =?utf-8?B?Uk5CN0FENkh6aUp6Ym9mM2M1UHFzUi84bWtpUUZsZXRVQ0wyai8rVmNDY29r?=
- =?utf-8?B?ZHFwcXRvbVZqVlllbmo2N1lEd1JabzlKc29yNC95Z2JRcGpKbE1CbTM2Zkxq?=
- =?utf-8?B?d3BKL0V4elE1aW9YaHc4UVd1RGl4RVRMQkxaM2wwNjRFd0JWM3ZYQlZyZk4y?=
- =?utf-8?Q?AfivOL/Oi+bdNRpljidWPh0Qw0swDfrkuSoFk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dVk2WXliSCtNVUdQNFp4WVNTL3VJUStOdm9NcE9YYW9VQUZoVkQ2WlIxSnlV?=
- =?utf-8?B?T3pHd2hMV0VZSm1aQ1JDYnJYT0xRa0gwNUR5bGU0QXNwOUdlaGkyclI2TFpM?=
- =?utf-8?B?WUIraHVXZ3czdjErQVZiUFVFY3A5T3cyWVRYczRpWlpEYWVlcWZBcWIzQXlx?=
- =?utf-8?B?bHlYS2hsWlFPNzRESXlvcko4cW5DQ2xvRGprSzJKQllpNGx6ZDhVaTdDQnQ2?=
- =?utf-8?B?cWYwcytwUUdPRXpxdW51WGVHYVJLUEdLMDdNOHQrRm04UVUydDI0TTRsTGxO?=
- =?utf-8?B?YUhScU9CMGlGOHhhOEd5UXI5bng3Q1JYRFh6cHc4RHFLWGlPRmpoRkZxRVp5?=
- =?utf-8?B?dUVMWDRnZTA5QzlybVIvM1liOGlPMEx1MnQxNUxMZU5uYTdHcU4waFpLbzRO?=
- =?utf-8?B?blE3ZHNMekgrQkU5M2diRjcvVUN3VFlqVVZXL1pBZmFLWHJZQVhvcEptcm9S?=
- =?utf-8?B?UnlhOVFub1E4OG4rdThGbllnL3V2S2RPVGRqcW4zcEhRTWlxY0lhSER1UUwv?=
- =?utf-8?B?T2NsYzNKMTZPWmNPelM5RSt2MVJmL1VXckV2VFFFMFcwS1h0Rk0yaE9uK1V5?=
- =?utf-8?B?aEErdjAvcDFueWxXVTBrWmtUUTcrVVFGc1VVeS9GZFhzYVlSRGFPWUlHVnov?=
- =?utf-8?B?UlorS2dOTnFJdmJmb1hzaVdPZHFRc3dhMmdkanZUUGZyOGwxeS9JYjRXU3Rq?=
- =?utf-8?B?SGhQMThjSG5kZ1pXRlNpdjQxbzIzRjBoRldUczdlUHVsU2xxdzB4QWpkR2JQ?=
- =?utf-8?B?SGNEZVdVNTZTOEJnRkJrTDVicDZCbG95VlphMWJZQzNFNDQ5dUpBOU9JWkhD?=
- =?utf-8?B?eEl3eDhxZDI5STBDeUorNTVtUGphZjdPb2hkOVd2dytzZ3hkb1JMWkVMSWJS?=
- =?utf-8?B?bENId1RwYWl0c3RhSTU1eVVxcE94aVhtTS9SSjR4WE1qbCtRM05IcFlacVdI?=
- =?utf-8?B?aWdMa1FURmdXbkt5YUpoNmVuK2tFdUdmTk1pejZ2YVpBWEc0Rjg2R2lrMHVs?=
- =?utf-8?B?UHZCbU1TcEo5aDB3by9LWG4xdXdZbCtzeFVVdm1lTHk4U2s1dW5DMjQxZTMr?=
- =?utf-8?B?TnhOOXdPa2xsUXo0U01jQ2kvOFgyNmRsMTEzeG4rbE10WCtvNXdDWjVpZjV3?=
- =?utf-8?B?eTNGU1JaYVFYeHQ1RWpMaGV0NjhSTUpwUVFCN0tFQWJhbk9JTkNrUS9FUU00?=
- =?utf-8?B?QkJZR1l0UDh1bzJGbXNrdURnL2NabEJBQWpKdmliNzU3aSt0RGd2QzNSdGU5?=
- =?utf-8?B?NVFISVlveWMwbE9iaTdhZnQyQjR2aXFyUVhIMGdqcklJdnl2cXZWNWt2SjNu?=
- =?utf-8?B?QjNWR3QzNE9DSlRZcHAzbnVwYllOS2NBZnNpcEd4MlgzK0VnQ2FHdWxjMlVu?=
- =?utf-8?B?cjFCTm9HK0xRanRIV3lLQVUxbmJ4b0p3NEg5YWxobnpBOTRxZE9qbUJDbUR1?=
- =?utf-8?B?RE1JT0VPTU1FMXYxOWpuUSthZ0ROMDI5amEwNVZBa3Z6SEpMeDNLaDg4ckpq?=
- =?utf-8?B?M1grK3AxaEx6TmJVMjFKN2c0TWRuZU5tK1R5MVY1R3gzTGVWVHFDc0Fnb0ZM?=
- =?utf-8?B?SEd0Vm5RM29vYzB0cndnZ2JHa3JhdDhleVJvSzNyNDBQQ1NyWm9acnZza1pk?=
- =?utf-8?B?dGxGbmxTMkJkVVB0SWpmek5tTjJtcHlGcVBocFJ3MGRaMGN3YlVDRVA2eEZr?=
- =?utf-8?B?MU13YjZiSXJQVlJRSk52SVdqdWt5MVdqVHl4MVdNNnRHZXl0NDZROG5iZHor?=
- =?utf-8?B?NmkzZmlhRkxyNVlqalBYMzlyd0c3SVBPT01wOGlIekd2SWNuWlR5K1V1MVQx?=
- =?utf-8?B?cUUwZnZJQ2xaZTI2UG94ZzY3T01lL2JvT0dBcGIyL3pMSjBKU2swSDdVMHB5?=
- =?utf-8?B?bE5IblBZRzhhQ0hoTmRobzRqTThVMkhlb1FXWXp6bUovOEwvTzNpOVdxdlhu?=
- =?utf-8?B?T253TFJEK3NPRVEzbG9lNUZUNFY2L3Q3a0YrRURsWFFKS0FTNmZxZ3NGS2xM?=
- =?utf-8?B?MktwYWtaRVpMOGRsSFhsdDdWTDZIN0xSRG5XYUdtRlNndlluQlorU2wrd21o?=
- =?utf-8?B?am01cFhXWTR6ZURJSkw2d3BEejR1K08wWEgyVzdIWWRJRUtCMVZIVDNqOFJm?=
- =?utf-8?Q?VD9Uojn0KdGLo1qLtY5Prpiaf?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f26186e-f12f-4bef-95fa-08ddb30adde6
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2025 10:35:41.2932
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ew+4pegtJnoBx1pH8n/5a/yIP5ff0EQqj/Eu8bL5y0nhq7ly5ewwwRqQwXjiQoVQzm8tye6NwJhbMNOv6QrX0g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR03MB8098
+User-Agent: Mozilla Thunderbird
+Subject: Re: Incomplete fix for recent bug in tc / hfsc
+From: Lion Ackermann <nnamrec@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Jiri Pirko <jiri@resnulli.us>
+References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
+ <aFosjBOUlOr0TKsd@pop-os.localdomain>
+ <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
+Content-Language: en-US
+In-Reply-To: <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Paul,
+Hi,
 
-
-> [ EXTERNAL EMAIL ]
->
-> Dear Li,
->
->
-> Thank you for your immediate reply.
->
-> Am 24.06.25 um 08:26 schrieb Yang Li:
->
->>> Am 24.06.25 um 07:20 schrieb Yang Li via B4 Relay:
->>>> From: Yang Li <yang.li@amlogic.com>
->>>>
->>>> When the BIS source stops, the controller sends an LE BIG Sync Lost
->>>> event (subevent 0x1E). Currently, this event is not handled, causing
->>>> the BIS stream to remain active in BlueZ and preventing recovery.
+On 6/24/25 11:24 AM, Lion Ackermann wrote:
+> Hi,
+> 
+> On 6/24/25 6:41 AM, Cong Wang wrote:
+>> On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
+>>> Hello,
 >>>
->>> How can this situation be emulated to test your patch?
+>>> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem is
+>>> incomplete:
+>>>     sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
+>>>     https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangcong@gmail.com/
+>>>
+>>> This patch also included a test which landed:
+>>>     selftests/tc-testing: Add an HFSC qlen accounting test
+>>>
+>>> Basically running the included test case on a sanitizer kernel or with
+>>> slub_debug=P will directly reveal the UAF:
 >>
->> My test environment is as follows:
+>> Interesting, I have SLUB debugging enabled in my kernel config too:
 >>
->> I connect a Pixel phone to the DUT and use the phone as a BIS source for
->> audio sharing. The DUT synchronizes with the audio stream from the 
->> phone.
->> After I pause the music on the phone, the DUT's controller reports a BIG
->> Sync Lost event.
->
-> Excuse my ignorance, but it might be good to have documented. How do you
-> connect the Pixel phone to the DUT? Pairing is not needed for BIS
-> (Broadcast Isochronous Stream), and using wireless technology no
-> connection is needed?
-
-
-Yes, you're correct that pairing and connection are not required for BIS 
-(Broadcast Isochronous Stream). However, the DUT is typically a 
-resource-constrained device with limited input/output capabilities. As a 
-result, we rely on the phone to act as an assistant in configuring the 
-BIS source information via BASS (Broadcast Audio Scan Service).
-
-The basic flow is as follows:
-
-  - Establish a Bluetooth LE connection between the phone and the DUT.
-
-  - Start audio playback on the phone and enable audio sharing from the 
-device details page. At this point, the phone becomes the BIS source and 
-configures the DUT (BIS sink) using the BASS Control Point (Refs. 
-https://bluetooth.fluidtopics.net/r/lgpAAcjFeoVMObE~cpMDZw/nkLg6cYqSphBI_2mYkaxDw). 
-
-
-  - When music playback is paused on the phone, the BIS source will stop 
-broadcasting.
-
-  - If the DUT fails to maintain synchronization, it will report a BIG 
-Sync Lost event, as it can no longer receive the broadcast stream.
-
-
->
-> What app do you use on the Android phone?
-
-
-Pixel 9 and upgrade to Android 16.
-
->
->> I believe this scenario can also be reproduced using the isotest tool.
->> For example:
->>   - Use Board A as the BIS source.
->>   - Use Board B to execute scan on.
->>   - Once Board B synchronizes with Board A, exit isotest on Board A.
->>   - Board B should then receive the BIG Sync Lost event as well.
->
-> Thank you for sharing this idea.
->
->> Additionally, the following BlueZ patch is required for proper handling
->> of this event:
->> https://lore.kernel.org/all/20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com/ 
+>> CONFIG_SLUB_DEBUG=y
+>> CONFIG_SLUB_DEBUG_ON=y
+>> CONFIG_SLUB_RCU_DEBUG=y
 >>
->
-> Yes, I saw it. Thank you.
->
->>>> Signed-off-by: Yang Li <yang.li@amlogic.com>
->>>> ---
->>>>   include/net/bluetooth/hci.h |  6 ++++++
->>>>   net/bluetooth/hci_event.c   | 23 +++++++++++++++++++++++
->>>>   2 files changed, 29 insertions(+)
->>>>
->>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>>> index 82cbd54443ac..48389a64accb 100644
->>>> --- a/include/net/bluetooth/hci.h
->>>> +++ b/include/net/bluetooth/hci.h
->>>> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
->>>>       __le16  bis[];
->>>>   } __packed;
->>>>
->>>> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
->>>> +struct hci_evt_le_big_sync_lost {
->>>> +     __u8    handle;
->>>> +     __u8    reason;
->>>> +} __packed;
->>>> +
->>>>   #define HCI_EVT_LE_BIG_INFO_ADV_REPORT      0x22
->>>>   struct hci_evt_le_big_info_adv_report {
->>>>       __le16  sync_handle;
->>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>>> index 66052d6aaa1d..730deaf1851f 100644
->>>> --- a/net/bluetooth/hci_event.c
->>>> +++ b/net/bluetooth/hci_event.c
->>>> @@ -7026,6 +7026,24 @@ static void
->>>> hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
->>>>       hci_dev_unlock(hdev);
->>>>   }
->>>>
->>>> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void 
->>>> *data,
->>>> +                                         struct sk_buff *skb)
->>>> +{
->>>> +     struct hci_evt_le_big_sync_lost *ev = data;
->>>> +     struct hci_conn *conn;
->>>> +
->>>> +     bt_dev_dbg(hdev, "BIG Sync Lost: big_handle 0x%2.2x", 
->>>> ev->handle);
->>>> +
->>>> +     hci_dev_lock(hdev);
->>>> +
->>>> +     list_for_each_entry(conn, &hdev->conn_hash.list, list) {
->>>> +             if (test_bit(HCI_CONN_BIG_SYNC, &conn->flags))
->>>> +                     hci_disconn_cfm(conn, 
->>>> HCI_ERROR_REMOTE_USER_TERM);
->>>> +     }
->>>> +
->>>> +     hci_dev_unlock(hdev);
->>>> +}
->>>> +
->>>>   static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev,
->>>> void *data,
->>>>                                          struct sk_buff *skb)
->>>>   {
->>>> @@ -7149,6 +7167,11 @@ static const struct hci_le_ev {
->>>>                    hci_le_big_sync_established_evt,
->>>>                    sizeof(struct hci_evt_le_big_sync_estabilished),
->>>>                    HCI_MAX_EVENT_SIZE),
->>>> +     /* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
->>>> +     HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
->>>> +                  hci_le_big_sync_lost_evt,
->>>> +                  sizeof(struct hci_evt_le_big_sync_lost),
->>>> +                  HCI_MAX_EVENT_SIZE),
->>>>       /* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
->>>>       HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
->>>>                    hci_le_big_info_adv_report_evt,
->
-> Kind regards,
->
-> Paul
+>> But I didn't catch this bug.
+>>  
+> 
+> Technically the class deletion step which triggered the sanitizer was not
+> present in your testcase. The testcase only left the stale pointer which was
+> never accessed though.
+> 
+>>> To be completely honest I do not quite understand the rationale behind the
+>>> original patch. The problem is that the backlog corruption propagates to
+>>> the parent _before_ parent is even expecting any backlog updates.
+>>> Looking at f.e. DRR: Child is only made active _after_ the enqueue completes.
+>>> Because HFSC is messing with the backlog before the enqueue completed, 
+>>> DRR will simply make the class active even though it should have already
+>>> removed the class from the active list due to qdisc_tree_backlog_flush.
+>>> This leaves the stale class in the active list and causes the UAF.
+>>>
+>>> Looking at other qdiscs the way DRR handles child enqueues seems to resemble
+>>> the common case. HFSC calling dequeue in the enqueue handler violates
+>>> expectations. In order to fix this either HFSC has to stop using dequeue or
+>>> all classful qdiscs have to be updated to catch this corner case where
+>>> child qlen was zero even though the enqueue succeeded. Alternatively HFSC
+>>> could signal enqueue failure if it sees child dequeue dropping packets to
+>>> zero? I am not sure how this all plays out with the re-entrant case of
+>>> netem though.
+>>
+>> I think this may be the same bug report from Mingi in the security
+>> mailing list. I will take a deep look after I go back from Open Source
+>> Summit this week. (But you are still very welcome to work on it by
+>> yourself, just let me know.)
+>>
+>> Thanks!
+> 
+>> My suggestion is we go back to a proposal i made a few moons back (was
+>> this in a discussion with you? i dont remember): create a mechanism to
+>> disallow certain hierarchies of qdiscs based on certain attributes,
+>> example in this case disallow hfsc from being the ancestor of "qdiscs that may
+>> drop during peek" (such as netem). Then we can just keep adding more
+>> "disallowed configs" that will be rejected via netlink. Similar idea
+>> is being added to netem to disallow double duplication, see:
+>> https://lore.kernel.org/netdev/20250622190344.446090-1-will@willsroot.io/
+>>
+>> cheers,
+>> jamal
+> 
+> I vaguely remember Jamal's proposal from a while back, and I believe there was 
+> some example code for this approach already? 
+> Since there is another report you have a better overview, so it is probably 
+> best you look at it first. In the meantime I can think about the solution a 
+> bit more and possibly draft something if you wish.
+> 
+> Thanks,
+> Lion
+
+Actually I was intrigued, what do you think about addressing the root of the
+use-after-free only and ignore the backlog corruption (kind of). After the 
+recent patches where qlen_notify may get called multiple times, we could simply
+loosen qdisc_tree_reduce_backlog to always notify when the qdisc is empty.
+Since deletion of all qdiscs will run qdisc_reset / qdisc_purge_queue at one
+point or another, this should always catch left-overs. And we need not care
+about all the complexities involved of keeping the backlog right and / or
+prevent certain hierarchies which seems rather tedious.
+This requires some more testing, but I was imagining something like this:
+
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -780,15 +780,12 @@ static u32 qdisc_alloc_handle(struct net_device *dev)
+ 
+ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+ {
+-	bool qdisc_is_offloaded = sch->flags & TCQ_F_OFFLOADED;
+ 	const struct Qdisc_class_ops *cops;
+ 	unsigned long cl;
+ 	u32 parentid;
+ 	bool notify;
+ 	int drops;
+ 
+-	if (n == 0 && len == 0)
+-		return;
+ 	drops = max_t(int, n, 0);
+ 	rcu_read_lock();
+ 	while ((parentid = sch->parent)) {
+@@ -797,17 +794,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+ 
+ 		if (sch->flags & TCQ_F_NOPARENT)
+ 			break;
+-		/* Notify parent qdisc only if child qdisc becomes empty.
+-		 *
+-		 * If child was empty even before update then backlog
+-		 * counter is screwed and we skip notification because
+-		 * parent class is already passive.
+-		 *
+-		 * If the original child was offloaded then it is allowed
+-		 * to be seem as empty, so the parent is notified anyway.
+-		 */
+-		notify = !sch->q.qlen && !WARN_ON_ONCE(!n &&
+-						       !qdisc_is_offloaded);
++		/* Notify parent qdisc only if child qdisc becomes empty. */
++		notify = !sch->q.qlen;
+ 		/* TODO: perform the search on a per txq basis */
+ 		sch = qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid));
+ 		if (sch == NULL) {
+@@ -816,6 +804,9 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+ 		}
+ 		cops = sch->ops->cl_ops;
+ 		if (notify && cops->qlen_notify) {
++			/* Note that qlen_notify must be idempotent as it may get called
++			 * multiple times.
++			 */
+ 			cl = cops->find(sch, parentid);
+ 			cops->qlen_notify(sch, cl);
+ 		}
+
+Thanks,
+Lion
 
