@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-200749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F988AE6BFC
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:03:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF70AE6BFF
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:03:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CB2317C30A
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:03:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E990C3B0A73
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5962E1749;
-	Tue, 24 Jun 2025 16:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4769D2E11DD;
+	Tue, 24 Jun 2025 16:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJMAcTEV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcZP2bot"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE0F2E173F;
-	Tue, 24 Jun 2025 16:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1382C2DAFA3;
+	Tue, 24 Jun 2025 16:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750780966; cv=none; b=BvWORKS+EDm97197DVJQK27UbSLYZjsYn/l2sH81IzsGCc2Vs2sXR7O1icTfCbD3Mf7AZMQ7i/3+JSgcS9+NTjr2JoKnpYAQQP9l8p/NTM/MXcX0/kBdRHXsM/IiX110mKz7oWuhORGve0Trg4vCrpXDrmuRGFvHK67Zp4hDziA=
+	t=1750780988; cv=none; b=PKwyiXvF6cKZ6TTLSCjVHtQZsPwX2sp8NUIHHFyOdq/Hnr2JnKqUQGk6kqAeZz4SEuP1g9LpBlk85gdLuPDufnCvHl9SnJCZHfmB9O9OI7X8MikkMSM7mt1hEjBXAFd+yJf1QHvWTaOyAMf1vQWoAHfqaS2BDKaq5vz1jlBnNMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750780966; c=relaxed/simple;
-	bh=59vKwFQx3AuIQaKLpbI7Gr6S80FF6YFWqpzvUTNuNHg=;
+	s=arc-20240116; t=1750780988; c=relaxed/simple;
+	bh=r+kbtBtkvupSYbQKKEAYAqkAxHTnFoIv9mvGzVb2VcA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zhy7zZwxMBlAVp7dPuL83NrpkbNYRvsR29uuWQzhynZjHnYTtkeRSDP9U9xmgw2vl5veHyx7SpsO/4r6qsRvt9Cs+zZ5jFb3YAKZIlsarf4TGIXaRjQZMydWE9xJN5k3rX1JZL097V2jC5UDqlBD+yWfTKZQ9mqR++c3UZcFYR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJMAcTEV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7930C4CEF0;
-	Tue, 24 Jun 2025 16:02:41 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=LDRM7/dI8hkn1W4mpTqqLpz5UGT8s/lgruqoSse0+2whdRgwmnrKkB6ArBEoEmZgVZyfPg0HJ/13nNmcOLtmjdDrf7LV/xhvDjsFKltJKeXD4bhE53m+UxWtRdsQQXKEJzIFIp1Pe3+M3BYn/TZZWx5Yi/N84df+K+1yZo+2uYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcZP2bot; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D339C4CEE3;
+	Tue, 24 Jun 2025 16:03:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750780966;
-	bh=59vKwFQx3AuIQaKLpbI7Gr6S80FF6YFWqpzvUTNuNHg=;
+	s=k20201202; t=1750780987;
+	bh=r+kbtBtkvupSYbQKKEAYAqkAxHTnFoIv9mvGzVb2VcA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nJMAcTEV70blxKnFZgvWFj2LWgEVDASymi4c29tCl8hSzWuVeXZJ+ZOAWzmqqNBEq
-	 tPocBU8eX+0uR3/rbfFZegavpbkY3zAZ6sAu9buNCWGpUJtKZhK00L8oDiOiU6Y5+G
-	 E7aU9GyptmKYvXYd5cJYn9E5suctfkYAPXm1GqgGzPHPXeqcF3c4jdb5nD0ilJ9Fx5
-	 lLB6E0dhf143xbWxlb5bbBT6omnPqtA22VPwk5sbOmQKDCmKwsSSdGUsBbJ2BYZ7j9
-	 mopvFhMlqc5LeLvkAriVtSKZNSjjFZHcW5PYT5/p+Gd8T3Rm/lanedzZbrBP7EUxxx
-	 fDaycEvRxhqIQ==
-Message-ID: <7dfba01a-6ede-44c2-87e3-3ecb439b48e3@kernel.org>
-Date: Tue, 24 Jun 2025 18:02:39 +0200
+	b=pcZP2bot0uc8aYUXNM4TyNuFCofFDE58lIfoi0mW9SKYZ2/rHUyxdCVkLTr+i1cYF
+	 +6WKRQ2spIeriCw3mYuR9tc8rNqNboI9yFCVhBMwDbiHfWBLWFsj5vGQKn+LnGRutQ
+	 S1Ro7vqfCbUjhOZ821nYpGwbjtFu7y75YgMgOa2OXik8hOmLNsz1qfdafB7v+oI0UM
+	 7eaL+qL1U5lo+xRxFUJepr/SKA4cZ5Gqmk/nFNhoVYCYqbejxYMwRy1oGJhqFguso6
+	 4WL0hHg0ky1Yfc4QDHO1Jwy0v6UhsEhSta08gtLpxDVt635iTmwj15uAlc+VSTL1sa
+	 mSOGm/bLL6LEw==
+Message-ID: <ae13aeea-bf44-49e5-82c6-5e369ea96d84@kernel.org>
+Date: Tue, 24 Jun 2025 18:03:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 09/29] dt-bindings: clock: mediatek: Describe MT8196
- peripheral clock controllers
+Subject: Re: [PATCH v2 10/29] dt-bindings: reset: Add MediaTek MT8196 Reset
+ Controller binding
 To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
  sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
  matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
@@ -62,9 +62,9 @@ Cc: guangjie.song@mediatek.com, wenst@chromium.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
  kernel@collabora.com
 References: <20250624143220.244549-1-laura.nao@collabora.com>
- <20250624143220.244549-10-laura.nao@collabora.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <20250624143220.244549-11-laura.nao@collabora.com>
 Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -108,29 +108,35 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250624143220.244549-10-laura.nao@collabora.com>
+In-Reply-To: <20250624143220.244549-11-laura.nao@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 24/06/2025 16:32, Laura Nao wrote:
-> +  '#reset-cells':
-> +    const: 1
-> +    description:
-> +      Reset lines for PEXTP0/1 and UFS blocks.
-> +
-> +  mediatek,hardware-voter:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
-> +      MCU manages clock and power domain control across the AP and other
-> +      remote processors. By aggregating their votes, it ensures clocks are
-> +      safely enabled/disabled and power domains are active before register
-> +      access.
+> From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> 
+> Add a binding for the PEXTP0/1 and UFS reset controllers found in
+> the MediaTek MT8196 Chromebook SoC.
+> 
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> Signed-off-by: Laura Nao <laura.nao@collabora.com>
+> ---
+>  .../reset/mediatek,mt8196-resets.h            | 26 +++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>  create mode 100644 include/dt-bindings/reset/mediatek,mt8196-resets.h
 
-Resource voting is not via any phandle, but either interconnects or
-required opps for power domain.
+No improvements.
 
-I already commented on this, so don't send v3 with the same.
+<form letter>
+This is a friendly reminder during the review process.
+
+It seems my or other reviewer's previous comments were not fully
+addressed. Maybe the feedback got lost between the quotes, maybe you
+just forgot to apply it. Please go back to the previous discussion and
+either implement all requested changes or keep discussing them.
+
+Thank you.
+</form letter>
 
 Best regards,
 Krzysztof
