@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-200579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6776AAE6272
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:29:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8A6AE6276
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E067016B547
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:29:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 510AE19249F0
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D172820A5;
-	Tue, 24 Jun 2025 10:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB378286430;
+	Tue, 24 Jun 2025 10:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="R/aFE5W9"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AklwMj+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E69F26A1BE
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43726B652
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750760985; cv=none; b=fzgfHsriUnqGqjY8Rv6K9wnldT9QgzjCPfctdojxUarfgqptGS2+0c6wOJ2CGtgDrI4kvpOedp//rRKy3CKnEaQXUnbnKFLrr0EhzbxQqVzwsoDuPdwDaUrRmSP/+OiwhosbCcCwtsTQsknczJ0qON9NT7jXQahQUFU07G0CxAg=
+	t=1750761132; cv=none; b=DxlhLgnkTQQPTGoL/Fq+ageC+QJFHsrutmiq5Ab3jxC8JuHEVGwJJtSa1/pOVQNqZlsP39J64YctYBUzSWzb5kPntJ8403TVgMc4ARFhoiMAqEPi34d+qZqK2hQvHicUr0UG6vW/JNxgX20kVixWjo2l5Q1qTfIZUOcEJHgbSKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750760985; c=relaxed/simple;
-	bh=HcrTKTPscukZBazgWou2j8uRbaDWtBOLxf2W//G2/tc=;
+	s=arc-20240116; t=1750761132; c=relaxed/simple;
+	bh=dlKjZ4xqdyBk/1u2sxQLvuufR4kgguRA0OreL0ChRXA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CxdqKDf6Aepm9AAmOUC9K9yozOjvLvT222nM6Rw8BL4pJqD/QBvpKroAtzxuuxuycfdNe51FNqGj06C4u1toeAxmatGvxGw5F/L6TkmOmf8BDWhI0UJyiE3DXHrz0iMKWkIdTucU7L/Qj5npjNlGh+NHayHNtjfsKIJZY4TWRy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=R/aFE5W9; arc=none smtp.client-ip=209.85.217.51
+	 To:Cc:Content-Type; b=In/SGtqTSCR21dKZxcgHnSnbP2+vNLkb+gIcBctNTRkIDGC53/rNo/fBXT+0gqw4COXxBiIhpjiZ1EjqiuDFYbRP8VDPhtcGTKjfi07Ti7rhiO0c7cWhdef+vYnsUTOryQNAswl9qGoNewm9gq2O5szlvzPuYYPLnLybWM0EvG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AklwMj+5; arc=none smtp.client-ip=209.85.222.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4e80d19c7ebso172527137.3
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:29:43 -0700 (PDT)
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-88150e9fba7so1443641241.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:32:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1750760983; x=1751365783; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1750761130; x=1751365930; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dF7gKxPuIPfrHQhMRnCpvQN5PxlSTdIpoRHcu2Z7huw=;
-        b=R/aFE5W9U0i1jpQYSnda5OQ4RDKMI5tu40ZDUrT6OFibghzJcVj+xeJQoqveJFKX1Q
-         EAOpUA8goF9mbQVH2Xh0SS53Npb9S//Eddo2TFuvusb309fWJ7svIrYpILv2pGfcLv2j
-         YbbxdoOvwn8ermKCKeouyZbq3NMeDtFVvV/e0=
+        bh=oeyXjF5qV/wAy8FnIN/C/rT1kU5mDalYioZEl6hvezI=;
+        b=AklwMj+5Zn4Ari8ShwQd3IWn6ovlhOdzPXaaCaC8VGmdHjkAScmphBNhbf7CoGr9WR
+         2WjnY1lEvsfHe3ju/RlKbVT/WG1JSb8X5LYL1lDWctewOVs5d6emusFbxotH6QATRPg4
+         1LvYON0JmwPR35/46zG7NHpKGM77HtAva4k/o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750760983; x=1751365783;
+        d=1e100.net; s=20230601; t=1750761130; x=1751365930;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dF7gKxPuIPfrHQhMRnCpvQN5PxlSTdIpoRHcu2Z7huw=;
-        b=J+/lv7Pm+tJ3JP22WcU+YTcFF+Z3cIz/YcyVwsrMuUVt/A5Le/QKsI7FX+A4UaaP8H
-         VXbbkfEY/iauBvsof7Rd9W/X1TuD9nXw1LDzaRCr9rlTgm+3yLSRpBDk1IgLrB3VCpaP
-         7QZGA7lKakSARomol/iB3BS+ZREO1s+Hqvt7yvE7j4HX3clhg88kF+uT1he9yOznTBci
-         pc/9KlVWloLvi3j9R4Odr/55c7qOPPSqWEmSLkJsWZL8gp61TkOP9VmBWFHeHTslfgu3
-         RtNEbXtYRqCX7M00M2/3u9rxYs706OM1roOz2sUjIxHaz0r0q1l2IHLq0uidPvxnWVjD
-         gVQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWP2oDTyX01BEv3JWamiVzIkYt2HLDS+3MsTbynDG96h15NncU9T7eJwKRt+nmqvAuU4L+xs28=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyINxryutrycGp/lkZR05pwruMO3nMHUVSR/1tRYWvq0gcC5aMF
-	ReQMlB2c+yes+uFHtqusPyFbzuyKnUzQuKRW4sYYes3r9VUNCPTgPdC2yQq4ct8eVnmELQdpiOS
-	c0jCkCQ1ZJ8IG3VMCCHJw/X1jC+xefSwrfEiyiyqq
-X-Gm-Gg: ASbGncslKucms7tPTtQYUm2DPkIp1Bfri7eV2xBcsNeJXKq5dIABhHy6a3zeuSXQIXs
-	J3+psYNh3aUAXz9A0SLuFz/r4E+CRsvbpN5OJfKPm7ev2DNMyPnKTqmWAtTpSSAR7ET+tJ59FAG
-	wTPiuFo1EQl3MG0x9s57GV7mgt+6YcAKgC7/ZTjhOtLI9L
-X-Google-Smtp-Source: AGHT+IEeuQOT/CJ48z1wuSddYCbOyVTBffaExKbjUB9yjE5Rm7BYMeqYh4K8FHOdev5+C90PP4BYoUUPQ8RzTliBfOk=
-X-Received: by 2002:a05:6102:504d:b0:4db:e01:f2db with SMTP id
- ada2fe7eead31-4e9c297a3dcmr9303834137.0.1750760982937; Tue, 24 Jun 2025
- 03:29:42 -0700 (PDT)
+        bh=oeyXjF5qV/wAy8FnIN/C/rT1kU5mDalYioZEl6hvezI=;
+        b=Q+PVDBUWtXvSuXIHYC2U4KeUYDrffeAYE833/cPYnjVRFZfqDuZejl2XfFYBfZm3so
+         48TVRKau49uTF5YEp/wGSXdpYsGoCZAWet/4GDrKIzQewQBKcwLGOtveKBBolV9QIH/v
+         gXnD/MJkNvNwVNe4uGSiPHP23NErZ+eGMN2YI2PDzD5uZh01OjUx0iC6HwGU9XLDyM+a
+         CPlIN+3meUXm+XksMsePvoyn5Sak72LCg1P5+w91sHLgNeU87LQDzW/0eFfB0dDx75WJ
+         v9/+yhSHYY1tOCgqyw6g+8a9hItMGaO9fqSHSvSU5nHMm9oYi98DfBk/ZOb+mzoiceQG
+         CCRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVe627Bds0CX3xxItQrFbjClhSCPOdX67cASr47SsJY1qXo+9y+k6/hSnvq9efChivaUUGCeaI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzC33ZroNEzWR4xfUSZuYobKpOVMFeSRXD1yRbOlnb1Y4h9NTGI
+	M2pT2AXQVcmlLeQEPFcCbKRECgmqK80MIFtwpQXLLCNpav96djWbDxddsoK4TO27pzLRG+3iOHa
+	Ci+E4sadsZlIZnd4M3ThYOYiWsMnDvrgydgSTwXNr
+X-Gm-Gg: ASbGncsPHrZPfZZi1+ZGDxQT+d6jV+9to6DqYyAm9Gu3791g7i1f57UtOteVyodP10y
+	T5sZDlE71WpfkwLqcJ9M00W4qfr3hjdNG6pSyOWLRbiQNh3+kAJC2QutiVCP6Pnkqd29HGCXk5h
+	64mVR/snn9sGIueWUqoctpS+OtxOj7H9bVHnSGI3SzMvUY
+X-Google-Smtp-Source: AGHT+IECe4K84LEv35ZlZpP2NpE6ZlQB9rYJJnXbuS6npoHMi368g3O/TASHzvcKF9Id9r3BuGW7a0FaLWHVNSsc0jU=
+X-Received: by 2002:a05:6102:b15:b0:4e4:5a1f:1414 with SMTP id
+ ada2fe7eead31-4eb52bb4d83mr1458687137.12.1750761130123; Tue, 24 Jun 2025
+ 03:32:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,13 +71,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250618144743.843815-1-vikas.gupta@broadcom.com>
- <20250618144743.843815-7-vikas.gupta@broadcom.com> <decb802a-7327-4a9a-8a4a-74970474f42c@linux.dev>
-In-Reply-To: <decb802a-7327-4a9a-8a4a-74970474f42c@linux.dev>
+ <20250618144743.843815-8-vikas.gupta@broadcom.com> <b1bc7c4e-0fe7-43ad-a061-d51964ddb668@linux.dev>
+In-Reply-To: <b1bc7c4e-0fe7-43ad-a061-d51964ddb668@linux.dev>
 From: Vikas Gupta <vikas.gupta@broadcom.com>
-Date: Tue, 24 Jun 2025 15:59:30 +0530
-X-Gm-Features: Ac12FXx6GzNVXk4G2spjUx_60lXYg14psaYs-oH__12CWsnqfQbniYgRaCI2Wgc
-Message-ID: <CAHLZf_uByWcXJmdo++fPM=o1GyZZ9pEZmSx8bSy4wbSiGcLDnA@mail.gmail.com>
-Subject: Re: [net-next, 06/10] bng_en: Add backing store support
+Date: Tue, 24 Jun 2025 16:01:57 +0530
+X-Gm-Features: Ac12FXxVW4QOxWFtgZlhwpztVbAdXiz00aYvqwmI1Nb657jnRBfUxu8cg5WaDj0
+Message-ID: <CAHLZf_s1gk_GOuVkp7T_s-iYn8t+g-a-9c=SQue+g+2vRhgHxw@mail.gmail.com>
+Subject: Re: [net-next, 07/10] bng_en: Add resource management support
 To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
@@ -87,148 +87,75 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>, 
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007ee1e206384ece91"
+	boundary="00000000000044ba4c06384ed7c7"
 
---0000000000007ee1e206384ece91
+--00000000000044ba4c06384ed7c7
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 19, 2025 at 6:32=E2=80=AFPM Vadim Fedorenko
+On Thu, Jun 19, 2025 at 7:09=E2=80=AFPM Vadim Fedorenko
 <vadim.fedorenko@linux.dev> wrote:
 >
 > On 18/06/2025 15:47, Vikas Gupta wrote:
-> > Backing store or context memory on the host helps the
-> > device to manage rings, stats and other resources.
-> > Context memory is allocated with the help of ring
-> > alloc/free functions.
+> > Get the resources and capabilities from the firmware.
+> > Add functions to manage the resources with the firmware.
+> > These functions will help netdev reserve the resources
+> > with the firmware before registering the device in future
+> > patches. The resources and their information, such as
+> > the maximum available and reserved, are part of the members
+> > present in the bnge_hw_resc struct.
+> > The bnge_reserve_rings() function also populates
+> > the RSS table entries once the RX rings are reserved with
+> > the firmware.
 > >
-> > Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> > Reviewed-by: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-> > Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-> > ---
-> >   drivers/net/ethernet/broadcom/bnge/bnge.h     |  18 +
-> >   .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 168 +++++++++
-> >   .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   4 +
-> >   .../net/ethernet/broadcom/bnge/bnge_rmem.c    | 337 +++++++++++++++++=
-+
-> >   .../net/ethernet/broadcom/bnge/bnge_rmem.h    | 153 ++++++++
-> >   5 files changed, 680 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/et=
-hernet/broadcom/bnge/bnge.h
-> > index 60af0517c45e..01f64a10729c 100644
-> > --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-> > @@ -9,6 +9,7 @@
-> >
-> >   #include <linux/etherdevice.h>
-> >   #include "../bnxt/bnxt_hsi.h"
-> > +#include "bnge_rmem.h"
-> >
-> >   #define DRV_VER_MAJ 1
-> >   #define DRV_VER_MIN 15
-> > @@ -52,6 +53,13 @@ enum {
-> >       BNGE_FW_CAP_VNIC_RE_FLUSH                       =3D BIT_ULL(26),
-> >   };
-> >
-> > +enum {
-> > +     BNGE_EN_ROCE_V1                                 =3D BIT_ULL(0),
-> > +     BNGE_EN_ROCE_V2                                 =3D BIT_ULL(1),
-> > +};
-> > +
-> > +#define BNGE_EN_ROCE         (BNGE_EN_ROCE_V1 | BNGE_EN_ROCE_V2)
-> > +
-> >   struct bnge_dev {
-> >       struct device   *dev;
-> >       struct pci_dev  *pdev;
-> > @@ -89,6 +97,16 @@ struct bnge_dev {
-> >   #define BNGE_STATE_DRV_REGISTERED      0
-> >
-> >       u64                     fw_cap;
-> > +
-> > +     /* Backing stores */
-> > +     struct bnge_ctx_mem_info        *ctx;
-> > +
-> > +     u64                     flags;
-> >   };
-> >
-> > +static inline bool bnge_is_roce_en(struct bnge_dev *bd)
-> > +{
-> > +     return bd->flags & BNGE_EN_ROCE;
-> > +}
-> > +
-> >   #endif /* _BNGE_H_ */
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drive=
-rs/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> > index 567376a407df..e5f32ac8a69f 100644
-> > --- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> > @@ -10,6 +10,7 @@
-> >   #include "../bnxt/bnxt_hsi.h"
-> >   #include "bnge_hwrm.h"
-> >   #include "bnge_hwrm_lib.h"
-> > +#include "bnge_rmem.h"
-> >
-> >   int bnge_hwrm_ver_get(struct bnge_dev *bd)
-> >   {
-> > @@ -211,3 +212,170 @@ int bnge_hwrm_func_drv_unrgtr(struct bnge_dev *bd=
-)
-> >               return rc;
-> >       return hwrm_req_send(bd, req);
-> >   }
-> > +
-> > +static void bnge_init_ctx_initializer(struct bnge_ctx_mem_type *ctxm,
-> > +                                   u8 init_val, u8 init_offset,
-> > +                                   bool init_mask_set)
-> > +{
-> > +     ctxm->init_value =3D init_val;
-> > +     ctxm->init_offset =3D BNGE_CTX_INIT_INVALID_OFFSET;
-> > +     if (init_mask_set)
-> > +             ctxm->init_offset =3D init_offset * 4;
-> > +     else
-> > +             ctxm->init_value =3D 0;
-> > +}
-> > +
-> > +static int bnge_alloc_all_ctx_pg_info(struct bnge_dev *bd, int ctx_max=
-)
-> > +{
-> > +     struct bnge_ctx_mem_info *ctx =3D bd->ctx;
-> > +     u16 type;
-> > +
-> > +     for (type =3D 0; type < ctx_max; type++) {
-> > +             struct bnge_ctx_mem_type *ctxm =3D &ctx->ctx_arr[type];
-> > +             int n =3D 1;
-> > +
-> > +             if (!ctxm->max_entries)
-> > +                     continue;
-> > +
-> > +             if (ctxm->instance_bmap)
-> > +                     n =3D hweight32(ctxm->instance_bmap);
-> > +             ctxm->pg_info =3D kcalloc(n, sizeof(*ctxm->pg_info), GFP_=
-KERNEL);
-> > +             if (!ctxm->pg_info)
-> > +                     return -ENOMEM;
 >
-> It's a bit hard to be absolutely sure without full chain of calls, but
-> it looks like some of the memory can be leaked in case of allocation
-> fail. Direct callers do not clear allocated contextes in the error path.
+> [...]
+>
+> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h b/drivers/n=
+et/ethernet/broadcom/bnge/bnge_hwrm.h
+> > index c14f03daab4b..9dd13c5219a5 100644
+> > --- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
+> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
+> > @@ -104,4 +104,14 @@ void hwrm_req_alloc_flags(struct bnge_dev *bd, voi=
+d *req, gfp_t flags);
+> >   void *hwrm_req_dma_slice(struct bnge_dev *bd, void *req, u32 size,
+> >                        dma_addr_t *dma);
+> >
+> > +static inline int
+> > +bnge_hwrm_func_cfg_short_req_init(struct bnge_dev *bdev,
+> > +                               struct hwrm_func_cfg_input **req)
+> > +{
+> > +     u32 req_len;
+> > +
+> > +     req_len =3D min_t(u32, sizeof(**req), bdev->hwrm_max_ext_req_len)=
+;
+> > +     return __hwrm_req_init(bdev, (void **)req, HWRM_FUNC_CFG, req_len=
+);
+> > +}
+> > +
+>
+> Could you please explain how does this suppose to work? If the size of
+> request will be bigger than the max request length, the HWRM request
+> will be prepared with smaller size and then partially transferred to FW?
 
-After the allocation of context memory, it could be in use by the
-hardware, so it is always safer
-to clean it up when we finally deregister from the firmware. The
-bnge_fw_unregister_dev() function
-handles memory freeing via bnge_free_ctx_mem(), instead of freeing up by ca=
-ller.
-I hope this clarifies your concern.
+Thanks for pointing that out. After checking the firmware code, I
+understand that
+ bnge_hwrm_func_cfg_short_req_init() is not required. I=E2=80=99ll consider
+removing this function in v2.
+However, to explain your comment, this was aligned with the firmware's
+behaviour.
+if hwrm_max_ext_req_len is less than the command length, then only a few me=
+mbers
+ are accessed by the firmware.
+
+
+Thanks,
+Vikas
 
 >
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
+> [...]
 
---0000000000007ee1e206384ece91
+--00000000000044ba4c06384ed7c7
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -299,14 +226,14 @@ oCSF3t69LpmLmIwRkXxtqIrB7m9OjROeMnXWS9+b5krW8rnUbgqiJVvWldgtno3kiKdEwnOwVjY+
 gZdPq7+WE2Otw7O0i1ReJKwnmWksFwr/sT4LYfFlJwA0LlYRHmhR+lhz9jj0iXkxggJgMIICXAIB
 ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
 bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwMFhgQqM5emFpsS5wwDQYJ
-YIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIJJYzq59UPcuaqAWQaMp5HMJpbNm5eMbN9EF
-4nEO9R5yMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYyNDEw
-Mjk0M1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+YIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEII1ou/c8vWMGjhq/3nN70t61FlZImSULTQ9I
+GnWSgTLIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYyNDEw
+MzIxMFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
 AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUA
-BIIBAHuTiXFl1X9prmGd+ktHaqi2xMYbQxmbbd2hO8hi/N9gnBtSqc05CW9QtoCKFtp8DwTsHS2B
-ogzBsUom9t3VpoiB1D2xEqOEvDX2VMP2WfnEMQfLYFvIlRVXbiyDB2yw8zqihANxlH5inKZGU371
-jf6Satfv0u4Feb9rBM+h7jSyxyzgK+p0vcJtHOakTz2tebmN71dy7ZIehav5eTHp3jV0nHSA150T
-G4okNDv2rVTPCsCY5aL6LV4jO6YqqZ5aM9jTHZrTe791c0ZOiUHNLIxM5sjmt9FoY0doEws+oYBH
-vk2Ye7LR1ICQvja1tOjzP6HsiS3oSu4gR/WyMGMu4Gw=
---0000000000007ee1e206384ece91--
+BIIBALA0DcrqcjuhY8XxmdX6Wkhhg4zwnICPSP87XKtm2TwhqpQI88I8VldkDJswcWB2/QXv8Pd0
+aR7tniUVdxDJoPlpUB4FP1Zhtf74wrzOvuLXDAVhjBjVdNGVSVTzI4oeH2z/zOBKahaOUdhX2Fhm
+igDDxgtFDpWrHkfNRjbJpyQ8xps1ZxiUz727Y3jLIdHxN7/do7FyMgm0CoGmhTWlwofL2JhHCREp
+1sBuFSFZsH2nE2Xb2ZVuob+U/pyNGzMV+CxevG2x/fdr6dci7Uv44yLDBA8VMlZk9Q8psOHk4pTM
+G4eUeTNO3aSAbNKoh+C60gvUtmZaEBX+9oxuHiksLxU=
+--00000000000044ba4c06384ed7c7--
 
