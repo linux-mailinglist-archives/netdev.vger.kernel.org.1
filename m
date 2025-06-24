@@ -1,96 +1,112 @@
-Return-Path: <netdev+bounces-200476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB64AE5914
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 03:20:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77155AE5931
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 03:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D424C442F3F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:19:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BF611B62630
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 01:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40761F418D;
-	Tue, 24 Jun 2025 01:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFx0/sYP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEA11A255C;
+	Tue, 24 Jun 2025 01:28:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DBC1EE03D;
-	Tue, 24 Jun 2025 01:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9807E1FC8;
+	Tue, 24 Jun 2025 01:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750727986; cv=none; b=mn/LptTCtTUmi8rV9a/vo1rP3RMmekyVMW0G438FjcYkaGPfLeJC4kFwuS2FzgWQqTSOUoKwueFbKyPwvYRIG5makDhX2ftryA9kX+Mp+Or82JWlq2vfhV8hROCZF6z1tlu1wiReMyuanpxBQ2YusrZ3HhbvQkHkD+uvPuSxPhM=
+	t=1750728493; cv=none; b=jxot5J4/3f9jwA8WE8now7DO+KVRSVBEimOogxV8g6jrU4MN9CtQLdm65RC65tUryWUHEjitK+u61uE8HlZ63MX1e11cQO4g/L73l4gz/8gc4gBGjHU6qrAZdkSk4FQjGpljV4dGGbvVz/CtmluDDs2CsKTh6heCzV5tsjmMI/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750727986; c=relaxed/simple;
-	bh=2sea/8TDb29cJCbSdhJsFF2RTDYENHm4QTSQy7k4Iic=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j/VN0KWEW3gg6i1X1lvBOF9dbVDf/Kcy/tKUG3d4VKuVHooT9KGVopfxdCH+Po9KOfrbgxfsfVV+70O30DGbwlmfYaAmGeVBfuqx0wzvCV2wpsSrodGMV4tsZEU9Sdv4lKGf1IpN1CryUGIsQq/wCcRk74jHhZzfAYo06LLMAeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFx0/sYP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF27C4CEEF;
-	Tue, 24 Jun 2025 01:19:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750727986;
-	bh=2sea/8TDb29cJCbSdhJsFF2RTDYENHm4QTSQy7k4Iic=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SFx0/sYPuXcRzbjTvea0LQrxM+GgZqSfGBrr62cTP+PNYxjmuiEaR/TeRTrb6cK1B
-	 RrVX/1jhpDeeg3zvsMqdImCH47JUgFcgmiQCRqz8Gobd4rH52kRklmQr+O3x6lmYvT
-	 UaI1j6IeUP5Tuz9+dieFTg9ODK7yw3MzXVD4OBLT66E3RzwB6XfGNkdTh+UafUCk1I
-	 vFObtOL5WxsWfnS0Ms+d2+lHuxxt1M6fxh5+np8V5p1xoclbqtvvPa95LY0rrD0xEH
-	 SswdAPCJSl1v5HyNOHC0aStyE1jKKwnlV2CVP4P8ap1UpVlBX+NXfK7ZKvWo2J9Mo0
-	 PhKYDQEG6Z4vg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3408839FEB7D;
-	Tue, 24 Jun 2025 01:20:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1750728493; c=relaxed/simple;
+	bh=7M5F+tnyHw2aNxVJNRF8Yv3zFrx8xv99dxlE0Z+p52U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BxBpK691aupW/ICGcVDsYLyayhxtkS32W/pVMsSx/HO5RDs2a+lFBEpmdqdSfZ4fjSXzNp5VAHguNxxvEQrWact6LWVNuR32rPsvXCHfNcMad8j/RwTUhV/PSeuI2Uk63IW5HvHnkcHEcdwaDZmpFyHa9gJ6j94E/VlSJGsl7To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-52-6859ff24dc19
+Date: Tue, 24 Jun 2025 10:27:59 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	jackmanb@google.com
+Subject: Re: [PATCH net-next v6 6/9] netmem: remove __netmem_get_pp()
+Message-ID: <20250624012759.GB5820@system.software.com>
+References: <20250620041224.46646-1-byungchul@sk.com>
+ <20250620041224.46646-7-byungchul@sk.com>
+ <20250623043207.GA31962@system.software.com>
+ <20250623171706.3bb10482@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5] page_pool: import Jesper's page_pool
- benchmark
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175072801301.3355543.12713890018845780288.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Jun 2025 01:20:13 +0000
-References: <20250619181519.3102426-1-almasrymina@google.com>
-In-Reply-To: <20250619181519.3102426-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, hawk@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, ilias.apalodimas@linaro.org, toke@toke.dk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250623171706.3bb10482@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sf0yMcRzHfe/73PM8nW77Or++8k87Ygv5segzP5qx+BpGIgsbNz3czRUu
+	UmHCTVhdhU2uzNNMrmRnJ3W1Y7kSjbAzdomy82NroxBHP8hdZvrvtff7vdc+f3xErClWhomG
+	1H2SKVVn1PIqTvUptHRGxGCSfpbn7UgosVfycO1nBlx941RCSUU1gm+9bQL0NN7n4XKpH0PJ
+	EzMH3+19GN43+QS45lgNHWUfOHDl1GDw5T/gIc/cj+F2b5cAx5w2BTyttijhXN8VDDXZbwR4
+	VlfCQ3vloBI+uPM4aLaWc9BhWQxN8jjwP/yIoNFeowB/7kUeznpkHt6aOxB4GnwcFB+1ILDf
+	8Sqh/2fAUXyvXVg8mTV87MasqrxVwWqtrwUmO/azm7ZIdtrrwcxRcYpnjq9nBPbqhYtnD4r6
+	OVbr7FGwvONdPPvy/iXHuu8855m96jnHHsmNwtpRm1QLkyWjIV0yzYzdptLLNwqUe1pxxi9H
+	nzIbfVacRiEiJdG00JaH/vGgs22IORJBmwuLuSDzZCr1entxkMeQydR880IgV4mYlPJUPu8S
+	gsVoEkdbbLl8kNUkhp58/QMHRxpSg+iX5mzF32IUbb7wbsiKSST1/u4M5GKAJ9Krv8VgHEJm
+	U79sGZqPJZNoffV9RdBDiUuknb/a8d9LJ9C7Ni9XgIh1mNY6TGv9r5URrkAaQ2p6is5gjI7S
+	Z6YaMqK2705xoMDLlB0e2OxEX58muBERkTZU7ZyfpNcodelpmSluREWsHaN2L0nUa9TJusws
+	ybR7q2m/UUpzo4kipx2vnuM/kKwhO3X7pF2StEcy/WsVYkhYNpoXe6tp5JbwS0kxW9lj38Uc
+	GtdjKorfuxZZpkXPXXTQXphQRuT4mN6EgtEL9Sm5XcfDcwguqs0fG7qtLZEbWLphg3FCXP7B
+	CNP0LMcO667W+NuR9Z4VVS0jDoWVf1q+YFlHiy9mzXpzA8n/fsyWdaRlSuj1les+16+r2+La
+	uOrbiQNaLk2vmx2JTWm6Pzh/9t8uAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SaUiTcRzH/T/Ps+d5XC2eptWDhS9WdqwyBasfJTHC8qkw7UWHIeWwpza8
+	YsulgbRyYIdnCuVUnJhHs1pMmSvs2iwdIoVizMwjOzAQ75bO1LYi6t2H7/XqS+PieSKAVqZc
+	4FUp8iQJKSSEh3dnbV23GKsIqc+XQpnpPgn1M+lQO2gVQJnRgmB6tpeCqZZWEqoqXTiUvdER
+	8N3kxuHL6yEK6s1RMFDzlYDm7CYchvLbSMjVzeHwdHaUgqvWOgzs5Q4BvLXkCaDYXY1Dk3aQ
+	gq4nZST0318UwFdbLgEO/T0CBvJk8NqwElztIwhaTE0YuHLKSSjqNJDwSTeAoNM+REDplTwE
+	pmdOAczNeDZKX/VTsiDOPjKGc433ejDusb6P4gzmNK6hTsrdcHbinNl4neTMk7co7sO7ZpJr
+	uzNHcI+tUxiXmzVKchNf3hPc2LNukqsaHsc4U2M3ESM+KQw/wycpNbxq2554ocLwqEBwvgdP
+	nze7BVo0jt1AvjTLhLGL1l7kZYIJYh2FpYSXSWYD63TO4l72Z9axuoYSjy6kcaaSZA23mymv
+	4cfsYzvqckgvi5id7LW+H7g3JGaaEDvh0GJ/jOWso+Tz71WckbLOhW8enfbwarZ2gfbKvkwo
+	6zLk/Y6vYNayLyytWAES6f9r6/9r6/+1DQg3In9liiZZrkzaHqxOVGSkKNODE1KTzchziprM
+	n4VWNN0VaUMMjSRLRdZdsQqxQK5RZyTbEEvjEn+Rbe8xhVh0Rp5xiVelnlalJfFqG1pNE5JV
+	ooPH+Xgxc05+gU/k+fO86q+L0b4BWhRx5OPkp2jtIeMBi+/+9lVxVzqMJRVhTyxdZv1dn3G9
+	z4jmVHBmVtFw7OajURePzkfHuOtQj/jOZEXlFk1qYODLsU1+J4obJt6WRyYsy344ZM+/XC2y
+	Pw2fPxtScGSi27WEehAf0b1xx1nDc+vgZpn7ZkS7X1p9x5r1p+NkunNLS1ZICLVCHirFVWr5
+	LyI+d5oQAwAA
+X-CFilter-Loop: Reflected
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 19 Jun 2025 18:15:18 +0000 you wrote:
-> From: Jesper Dangaard Brouer <hawk@kernel.org>
+On Mon, Jun 23, 2025 at 05:17:06PM -0700, Jakub Kicinski wrote:
+> On Mon, 23 Jun 2025 13:32:07 +0900 Byungchul Park wrote:
+> > In the meantime, libeth started to use __netmem_get_pp() again :(
+> >
+> > Discard this patch please.  Do I have to resend this series with this
+> > excluded?
 > 
-> We frequently consult with Jesper's out-of-tree page_pool benchmark to
-> evaluate page_pool changes.
-> 
-> Import the benchmark into the upstream linux kernel tree so that (a)
-> we're all running the same version, (b) pave the way for shared
-> improvements, and (c) maybe one day integrate it with nipa, if possible.
-> 
-> [...]
+> You'll need to repost, unfortunately. If there's a build failure
+> the CI doesn't execute any functional testing nodes.
 
-Here is the summary with links:
-  - [net-next,v5] page_pool: import Jesper's page_pool benchmark
-    https://git.kernel.org/netdev/net-next/c/cccfe0982208
+I will.  Thanks.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Byungchul
+> --
+> pw-bot: cr
 
