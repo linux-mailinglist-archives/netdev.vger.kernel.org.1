@@ -1,197 +1,166 @@
-Return-Path: <netdev+bounces-200533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A639AE5EE2
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:16:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90483AE5F29
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12BE17B0C26
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 08:15:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CA9D19207C9
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 08:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5666255F53;
-	Tue, 24 Jun 2025 08:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40053258CF0;
+	Tue, 24 Jun 2025 08:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="D27XIDOD"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xq+e0shC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4469B22D9ED;
-	Tue, 24 Jun 2025 08:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C9925178E;
+	Tue, 24 Jun 2025 08:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750753011; cv=none; b=A/MK0uCQzQwOOYgL0FlDJIjyg2V2txypw3fDZrXndExx25sI276zwNWXmeH6V6yUjfu5GJKgpJ9E6XPhGv1P04eGRTZE5I4Xgwxf2JXhDOWlfgfoYZOUJC4ybqIWX9EVCJ4G70jt8sxmKp5Ejs1skgpMhM+7aKAGQv6TN2L8R7k=
+	t=1750753618; cv=none; b=t7Qa11ztwit2T4SpkvORHYPuoZo3KdV98cq+sEq1V81hfKIYZX3uOdapuqA35hAh1lt/62BfflBxrLQVXrKO3XFNthYo3CX9d25HTHQW/m0o0R53P6SnDhrFRpi6dp02GhSXFGqaQQyOQlkCYf9mWS7NzzCIJCms61u5+x2aZc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750753011; c=relaxed/simple;
-	bh=NBm7n8cvZBw6HTko9M9D97Lqr/lsqlB20GFEmgKmdwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iVKkj5ebH2mHvOizeuLHTM5nyLtOoLU8WPycvy7/SHicD9r/9iyI/bACINajtxyKx0s5ux9Sj5tPrJGZzp8toEi/IEo1YcSLxB+d5jzA/jmBdnNWKF0kg7jy85h6TMCYlCJg4q2Y2dpDPPUmAOlbQCfdt70K61/uv6KyXLUyETA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=D27XIDOD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mMnMLYCAgxCT8gkPeig8C/G/rXJSBpt5RF65PZMjsdg=; b=D27XIDOD17q4O65To2PG5W+KJq
-	kGJ7PN3qvRLghHdjyJUT3rwQpo1dkyYYlW2OdsEdJKU0qofBChOwP0PQqfT1mBQNHhYJMCxmSYub9
-	OcABdfMKRtXFZTSKxJutatMYGyHscoyuHH00nl/aAXBmglZgYilt5xhYGSDJRJYU2J1E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uTypJ-00Glmv-AQ; Tue, 24 Jun 2025 10:16:21 +0200
-Date: Tue, 24 Jun 2025 10:16:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Imre Kaloz <kaloz@openwrt.org>,
-	Frederic Lambert <frdrc66@gmail.com>,
-	Gabor Juhos <juhosg@openwrt.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] ARM: dts: Fix up wrv54g device tree
-Message-ID: <08531445-a27d-413f-96de-81087d6f61e1@lunn.ch>
-References: <20250624-ks8995-dsa-bindings-v1-0-71a8b4f63315@linaro.org>
- <20250624-ks8995-dsa-bindings-v1-2-71a8b4f63315@linaro.org>
+	s=arc-20240116; t=1750753618; c=relaxed/simple;
+	bh=sGsf4i3YBdkKLiqYjEz90SpoxBUWvcqZ/WqYvmvx/Fg=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=iAh4oXr4ErmhW39qMuGkMY6BAGcROVXh+SxWzyUuncvg6rRK6FWszRa/UxJ0PlpJl9nUrNzsK6iKQmTAfFK0ay7w57nHjff8vOVikyIw3u+iEGw3LUZPBlf9InP4pdOslJUa5MX1l1c5QmcrqstUOwkcGHiFX9IIlC6YNy50x2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xq+e0shC; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1750753607; h=Message-ID:Subject:Date:From:To;
+	bh=qETiyRDq01cZyiTdnYUireDBSsJWh8qcYkIgG1vIyng=;
+	b=xq+e0shCKgtWhi3tEpP9KtOlwLTnHucP6OlrfyOpoNvh2XiqhpDpMRLdynbvfCAC9j9IjaLqsweTTXTS0wbg9hjd9gwYzf4r07OJSrLYrNKJtYlIQnM6qi5NtVic02umxj1ZJAjB8+2acmlb+Xfo/WT1ouJXAMh0X5YIpEnzwNk=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Weg0EcI_1750753606 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Jun 2025 16:26:46 +0800
+Message-ID: <1750753518.4877846-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v2 1/2] virtio-net: xsk: rx: fix the frame's length check
+Date: Tue, 24 Jun 2025 16:25:18 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org,
+ Bui Quang Minh <minhquangbui99@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250621144952.32469-1-minhquangbui99@gmail.com>
+ <20250621144952.32469-2-minhquangbui99@gmail.com>
+In-Reply-To: <20250621144952.32469-2-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250624-ks8995-dsa-bindings-v1-2-71a8b4f63315@linaro.org>
 
-On Tue, Jun 24, 2025 at 09:41:12AM +0200, Linus Walleij wrote:
-> Fix up the KS8995 switch and PHYs the way that is most likely:
-> 
-> - Phy 1-4 is certainly the PHYs of the KS8995 (mask 0x1e in
->   the outoftree code masks PHYs 1,2,3,4).
-> - Phy 5 is likely the separate WAN phy directly connected
->   to ethc.
-> - The ethb is probably connected as CPU interface to
->   the KS8995.
-> 
-> There are some confused comments in the old board file
-> replicated into the device tree like ethc being "connected
-> to port 5 of the ks8995" but this makes no sense as it
-> is certainly connected to a phy.
-> 
-> Properly integrate the KS8995 switch using the new bindings.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+On Sat, 21 Jun 2025 21:49:51 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+> When calling buf_to_xdp, the len argument is the frame data's length
+> without virtio header's length (vi->hdr_len). We check that len with
+>
+> 	xsk_pool_get_rx_frame_size() + vi->hdr_len
+>
+> to ensure the provided len does not larger than the allocated chunk
+> size. The additional vi->hdr_len is because in virtnet_add_recvbuf_xsk,
+> we use part of XDP_PACKET_HEADROOM for virtio header and ask the vhost
+> to start placing data from
+>
+> 	hard_start + XDP_PACKET_HEADROOM - vi->hdr_len
+> not
+> 	hard_start + XDP_PACKET_HEADROOM
+>
+> But the first buffer has virtio_header, so the maximum frame's length in
+> the first buffer can only be
+>
+> 	xsk_pool_get_rx_frame_size()
+> not
+> 	xsk_pool_get_rx_frame_size() + vi->hdr_len
+>
+> like in the current check.
+>
+> This commit adds an additional argument to buf_to_xdp differentiate
+> between the first buffer and other ones to correctly calculate the maximum
+> frame's length.
+>
+> Fixes: a4e7ba702701 ("virtio_net: xsk: rx: support recv small mode")
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
 > ---
->  .../dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts  | 75 +++++++++++++++++-----
->  1 file changed, 59 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts b/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts
-> index 98275a363c57cde22ef57c3885bc4469677ef790..14b766083e3a870a1154a93be74af6e6738fe137 100644
-> --- a/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts
-> +++ b/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts
-> @@ -72,10 +72,50 @@ spi {
->  		cs-gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
->  		num-chipselects = <1>;
->  
-> -		switch@0 {
-> +		ethernet-switch@0 {
->  			compatible = "micrel,ks8995";
->  			reg = <0>;
->  			spi-max-frequency = <50000000>;
-> +
-> +			ethernet-ports {
-> +				#address-cells = <1>;
-> +				#size-cells = <0>;
-> +
-> +				ethernet-port@0 {
-> +					reg = <0>;
-> +					label = "1";
-> +					phy-mode = "rgmii";
-
-If this is an internal PHY, it would be better to use 'internal'. I
-would like to avoid all the issues around 'rgmii' vs 'rgmii-id'.
-
-> +				ethernet-port@4 {
-> +					reg = <4>;
-> +					ethernet = <&ethb>;
-> +					phy-mode = "rgmii-id";
-> +					fixed-link {
-> +						speed = <100>;
-> +						full-duplex;
-> +					};
-
-That is a bit odd, rgmii-id, yet speed limited to 100. It would be
-good to add a comment about this.
-
-> @@ -134,41 +174,44 @@ pci@c0000000 {
->  			<0x0800 0 0 2 &gpio0 10 IRQ_TYPE_LEVEL_LOW>; /* INT B on slot 1 is irq 10 */
->  		};
->  
-> -		/*
-> -		 * EthB - connected to the KS8995 switch ports 1-4
-> -		 * FIXME: the boardfile defines .phy_mask = 0x1e for this port to enable output to
-> -		 * all four switch ports, also using an out of tree multiphy patch.
-> -		 * Do we need a new binding and property for this?
-> -		 */
-> -		ethernet@c8009000 {
-> +		ethb: ethernet@c8009000 {
->  			status = "okay";
->  			queue-rx = <&qmgr 3>;
->  			queue-txready = <&qmgr 20>;
-> -			phy-mode = "rgmii";
-> -			phy-handle = <&phy4>;
-> +			phy-mode = "rgmii-id";
-> +			fixed-link {
-> +				speed = <100>;
-> +				full-duplex;
-> +			};
-
-This is all confusing. Do you have the board, or a schematic for it? 
-
-Looking at the old DT, this ethernet interface has its own MDIO bus,
-with PHYs at address 4 and 5. The phy-handle above means this MAC is
-connected to the PHY at address 4. The PHY at address 5 is connected
-to the second MAC instance of this SoC. This implies it is:
-
-SOC:MAC-PHY-PHY-MAC:SWITCH 
-
-Rather than the more usual back to back MAC. There are boards with
-back to back PHY, so it is not out of the question.
-
-However, it could also be this old DT description is completely
-broken, and the PHYs on this bus are the external PHYs for the
-switches? There should not be a phy-handle in the MAC nodes.
-
->  
->  			mdio {
->  				#address-cells = <1>;
->  				#size-cells = <0>;
->  
-> -				/* Should be ports 1-4 on the KS8995 switch */
-> +				/* Should be LAN ports 1-4 on the KS8995 switch */
-> +				phy1: ethernet-phy@1 {
-> +					reg = <1>;
-> +				};
-> +				phy2: ethernet-phy@2 {
-> +					reg = <2>;
-> +				};
-> +				phy3: ethernet-phy@3 {
-> +					reg = <3>;
-> +				};
->  				phy4: ethernet-phy@4 {
->  					reg = <4>;
->  				};
-
-This node is the SoC interface MDIO bus. Why would the internal PHYs
-of switch bus on the SoC MDIO bus? I would expect the switch to have
-its own MDIO bus and place its PHYs there.
-
-	Andrew
+>  drivers/net/virtio_net.c | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index e53ba600605a..1eb237cd5d0b 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -1127,15 +1127,29 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
+>  	}
+>  }
+>
+> +/* Note that @len is the length of received data without virtio header */
+>  static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+> -				   struct receive_queue *rq, void *buf, u32 len)
+> +				   struct receive_queue *rq, void *buf,
+> +				   u32 len, bool first_buf)
+>  {
+>  	struct xdp_buff *xdp;
+>  	u32 bufsize;
+>
+>  	xdp = (struct xdp_buff *)buf;
+>
+> -	bufsize = xsk_pool_get_rx_frame_size(rq->xsk_pool) + vi->hdr_len;
+> +	/* In virtnet_add_recvbuf_xsk, we use part of XDP_PACKET_HEADROOM for
+> +	 * virtio header and ask the vhost to fill data from
+> +	 *         hard_start + XDP_PACKET_HEADROOM - vi->hdr_len
+> +	 * The first buffer has virtio header so the remaining region for frame
+> +	 * data is
+> +	 *         xsk_pool_get_rx_frame_size()
+> +	 * While other buffers than the first one do not have virtio header, so
+> +	 * the maximum frame data's length can be
+> +	 *         xsk_pool_get_rx_frame_size() + vi->hdr_len
+> +	 */
+> +	bufsize = xsk_pool_get_rx_frame_size(rq->xsk_pool);
+> +	if (!first_buf)
+> +		bufsize += vi->hdr_len;
+>
+>  	if (unlikely(len > bufsize)) {
+>  		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
+> @@ -1260,7 +1274,7 @@ static int xsk_append_merge_buffer(struct virtnet_info *vi,
+>
+>  		u64_stats_add(&stats->bytes, len);
+>
+> -		xdp = buf_to_xdp(vi, rq, buf, len);
+> +		xdp = buf_to_xdp(vi, rq, buf, len, false);
+>  		if (!xdp)
+>  			goto err;
+>
+> @@ -1358,7 +1372,7 @@ static void virtnet_receive_xsk_buf(struct virtnet_info *vi, struct receive_queu
+>
+>  	u64_stats_add(&stats->bytes, len);
+>
+> -	xdp = buf_to_xdp(vi, rq, buf, len);
+> +	xdp = buf_to_xdp(vi, rq, buf, len, true);
+>  	if (!xdp)
+>  		return;
+>
+> --
+> 2.43.0
+>
 
