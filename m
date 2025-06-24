@@ -1,228 +1,178 @@
-Return-Path: <netdev+bounces-200814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E296AE700B
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:46:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D571AE7028
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 21:49:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B0617C3F2
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 19:46:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E2743B10D4
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 19:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817A02EA46A;
-	Tue, 24 Jun 2025 19:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01042E2EE3;
+	Tue, 24 Jun 2025 19:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sho/mwZz"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="Nh9SL7Sc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9739722D9ED
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 19:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750794323; cv=fail; b=HW5JY3EIqgyTmKzfyDmEKzhQDbRPQozZD5pPhow0vqkFJcQWFVaokgKrVMThLFXSKm+UnLoD4/GWw1VDqOmC+0fCaa9Nohe/Zf3dSAhxxJlnruBxzQVVPsKA7URUyZ7gU5y8gBJjJAfJG2Kn0shQZqjOS5JACQrkVCK6zkqYV7c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750794323; c=relaxed/simple;
-	bh=RRd70WWIzUqaIsoqU+LbKZj54ZKlkhfWFm0wX8tAnwA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KnrH77hvOHvus9KsVwN46shPOFENReo8FoOuWgUtYEaTOw24b/skVeehy8EauYi2r87LsOwrSA3/59+oRd2WixoBHuf870r/2o8ROryuwck4jPd/FwiELj/fHJqs5GS6fG7uIY4XhCXGw7O7utSc+CorqAmtl6t/dQKaA/c/Hbc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sho/mwZz; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750794322; x=1782330322;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RRd70WWIzUqaIsoqU+LbKZj54ZKlkhfWFm0wX8tAnwA=;
-  b=Sho/mwZzHu+3jQMScGan4GjQ9ex5/ot0IGCwvszznEy++QeISL901WI8
-   yfgN+txW73tKDbwlRjYRvBB1VlkD8mPQFa+81AS5LVkoj4BEbKI2rfReN
-   GTUa7GxkYxJftow0ItvdZ/gMmijbb5ATZiTkdjQKp8e9jz2LQowRp3TCu
-   4zqCzdgULA/9JllRoY2KJSCGhd5nxA/hPLE7fh6AX5KnyeHhuINBi5ZnK
-   6YbfbCTM2Mviwt5/1JKJvt5UmiaFwkEfqYghhRFfvs1czp2iNCMbrEGOe
-   3Hpr7rV63CrFU5BkP6Tz+IORG2Aw7oYda9Mg4ExbeRbmftIUN3FtP9aW8
-   w==;
-X-CSE-ConnectionGUID: TZSL1SdiRvq13HhiZ/nlng==
-X-CSE-MsgGUID: qtxWl4cWQx6igD15QVc9/Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="64482943"
-X-IronPort-AV: E=Sophos;i="6.16,263,1744095600"; 
-   d="scan'208";a="64482943"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 12:45:21 -0700
-X-CSE-ConnectionGUID: 7JWhz/tmTgasIoU3LmELMQ==
-X-CSE-MsgGUID: XJFzhnmdRPWRhc0DoJbtRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,263,1744095600"; 
-   d="scan'208";a="152179009"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 12:45:20 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 24 Jun 2025 12:45:19 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Tue, 24 Jun 2025 12:45:19 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.44) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 24 Jun 2025 12:45:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VOen9K9120NuVohQtdfEbFSJFo3rxcAe7I6Z6CfDbBn9teNfsAldT46i4HMBlMMPHg0HDBlQQIXXhik9sdxC/Y8qhgzDntX6Ut5qsF1FhKelRvJoAAnxWdmKwg4kQRYGLftF4bG0FOjKyi11f2cS9s7igftxM92mdV1ybsDo9riMoffiA6gd18mcJcL8dxT+7wTcdodUKrFVXql5NcQjFhAy44IvXzEC/jPmt7EF1hjXapOR3Q4mQf4EvTpDzmC3cg8GxOhbMwwCoIizoKaw3q7ugTMHGT5ZxphjRcOVNytbDbJK8RX/t2EweneiejB+993o0BFBP4Bh3spolHzM+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RRd70WWIzUqaIsoqU+LbKZj54ZKlkhfWFm0wX8tAnwA=;
- b=GcBQk8HCP6zPWsJamTtblLf6ZP9ZCLEcjdgaOEybnckicaMzdOG0zZGMOllXwFS5u2txNintXCRFK+HLVXWntwEK53JwDAIiqrHbyq/9Nm5dKcQT5ycevJLb7mjGyWUI1FOOkLz8B/X/eA1gYtt3nhxqf5pK0Ly3VK+RcVtdtiUkNMX+woMoCVs8ggksOZ00cFk1jrdqZ71yokjHy8CQ+6d74+en7hztUaMxH3eo4QcRpGmdDuzO2w/ZOqrvK56epsOyyaTWMmSZLr+P2XSjI74pjUUnxNaR5aOGABDGrQ1H6jKsc0+JfTsu9mh8uCHWvEb47qiSz+Wp7w0oFzpzlg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by DS0PR11MB7357.namprd11.prod.outlook.com (2603:10b6:8:136::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.29; Tue, 24 Jun
- 2025 19:44:48 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::f302:c534:2d71:822b]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::f302:c534:2d71:822b%4]) with mapi id 15.20.8857.026; Tue, 24 Jun 2025
- 19:44:48 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Olech, Milena" <milena.olech@intel.com>,
-	"Korba, Przemyslaw" <przemyslaw.korba@intel.com>
-Subject: RE: [PATCH v2 iwl-net] ice: add recovery clock and clock 1588 control
- for E825c
-Thread-Topic: [PATCH v2 iwl-net] ice: add recovery clock and clock 1588
- control for E825c
-Thread-Index: AQHb5T1xOO6+IT+Ef0qMnLx9wxO/C7QStehg
-Date: Tue, 24 Jun 2025 19:44:48 +0000
-Message-ID: <IA1PR11MB62195A68F29383B92CDC150A9278A@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20250624192211.3043049-1-grzegorz.nitka@intel.com>
-In-Reply-To: <20250624192211.3043049-1-grzegorz.nitka@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|DS0PR11MB7357:EE_
-x-ms-office365-filtering-correlation-id: 254c17c1-945c-4434-5bd7-08ddb357940e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?xZLFaokU76vS3gt2tbC7tgGHLWKhIWaEA/XW95t2Pj6Hk4AVHWazITaNatRE?=
- =?us-ascii?Q?fCAoLknWyeQHFkP4E+vSWkG2Xf6NmhLNHCCkLd/SrEOi6kordSmx0NG+JWXX?=
- =?us-ascii?Q?s5a/HagKpo3SciI0rohaadpgxEZVzuzZYJXfyuvKTlrwLPYHBj1Kpewwbvw+?=
- =?us-ascii?Q?j4jZnJdu4BDPkWF1jEFZSJRb6nY+1RLrMlQLi3HDptvg62KOdda1SHKaaEY2?=
- =?us-ascii?Q?ijbN1r74dTGmpvqI+xS1tomGYBIvRX/cdS8NyLzx5EygeRsowhlGD7q9HJpd?=
- =?us-ascii?Q?yPGRuKHN6eReDNpZtLyPn1JK98BaOVkzosv4huhRnYdrEWM7zfgUEgcvh8Qw?=
- =?us-ascii?Q?SmBQlTuNejNcQtOU+LWY6wcVw64P5cBs0zszFsBSc7HXlbXapc2OKDgAExQt?=
- =?us-ascii?Q?fB/cl8fUfkfEhqiNy19MMqxvcJix4SvheEHyLIe23vqag2RUirQamwFWqPQS?=
- =?us-ascii?Q?n00BJdLpn9itGAz8slUr2O2DnWq5AgR/IzEOQCx4mfLvVqJoGa5qx3s1ICQT?=
- =?us-ascii?Q?PYR8GzS9fFHcZqvYKb+gG6wIBgg0kCegTgyvthKhcnYnl2Awq+f4MTimSnLl?=
- =?us-ascii?Q?ziCvhY11fYCDMqVG9G2zrElOdD/8mJDSM13hHZlRF71eqpFjwZjdPAD9x1JQ?=
- =?us-ascii?Q?Eg8u3vgvnY6C+OGZ3EBe1H6QCypmPA7luhWxH40qJ8WnGWUdXP2dM4Lp8kfS?=
- =?us-ascii?Q?yFRXSgs881M/G7XV9RIgtm8mUnGeicQZJI+7LTePP9rLpCe5GCcBFAWiEJTJ?=
- =?us-ascii?Q?3U+C19FaM8nw2vQ0uTV7wBFK2zfqD2v/YtFlTgaIjqsaKqibHRKWvhcKyQjn?=
- =?us-ascii?Q?/N/Hf7mYqgM3FKXvi+VgKIXvTYM8Dz3GrYDN03E76NU8ls7o5fR3Je4/1NFx?=
- =?us-ascii?Q?L1Y1GZqSi+oVegOy6k4eA/t17VyUt1+IgO9h92YiWLaLN+I5WzWl9h6PYeHb?=
- =?us-ascii?Q?f+BlnBuotSPBYHaa5t3vFBPSjKwIfEDrbaR+OxzwFEaHoaKXXiv/BYMqIuOX?=
- =?us-ascii?Q?3/9FqU/XJQzBrUnvez4XODwk6V6D8nLRRxFRZ21/4BQXWXzfP6mlqKm2OL29?=
- =?us-ascii?Q?xMqbdngpzyIHbnK6HjebBOUvXdnBeQel4PyCP3rDRYAKBWWhv054g5RtUdUZ?=
- =?us-ascii?Q?8Z39ifrmQfq01/AlOWMnVVm8K0InxDB1K1CPM7DmsuTBH1p36qcnXLxxT4Xg?=
- =?us-ascii?Q?MZktFPEXViUbTX/LWkaTGr24IRDT0tT6z2m/jhnB++z3FahK/M7VCtC3lPeD?=
- =?us-ascii?Q?AntLW4tkQW0yx11wW2UMGeF0UIV03NvkIhUR6Hd8uy9z5rVER4V5Z5HlHLW5?=
- =?us-ascii?Q?j+4TH7cjTuR6t6RJkoz2iV3Ald3T5AcoeBjJDtbcAzu68MuW1Xe3WVI09nUX?=
- =?us-ascii?Q?SQ4ZvndFdyMYoPBwJvTalbDKC2V1gqb0Wa2OOR7GIh+xJD991DAbZ0EPpRzK?=
- =?us-ascii?Q?HYcSvnPoZO95QqN+2Oflvzcako3eXYHwheRyVlJwLtTETyLmgUaRnhE/eRyO?=
- =?us-ascii?Q?52ew6suojNUZ0CU=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GjdDrW5vf8ln0SOPU3kXpkppiEhM9K2fGWAiPeTuhZNIThoovZKpby3uqL0y?=
- =?us-ascii?Q?OLuLQq5X98yG/cSY2cyy0eAIVGM1vu4xsYMOIjQxU5MBhEylb+FLAOfnQCOg?=
- =?us-ascii?Q?45MlqoPKWTdeQr41zICNw/eNN0M5My+PiYAKEFf+1QOlpJj9YdBfS+xWIS53?=
- =?us-ascii?Q?5ru/WmTy87g+bnjrRf8vG4mtx9MGwVIfpjiNIhFdR8ugZji7ey7f97XzUzne?=
- =?us-ascii?Q?6hrseKHKCrqmAf3XNlvNQHvTL3hQ3vYsYh9dv5mzVO+hgzvvVQuj++owmGGW?=
- =?us-ascii?Q?V3gAmH4ptqFoEoqSyWB9zLQCCoZB54yPlmYDhOED21BvYU80ro76vT5OrUtu?=
- =?us-ascii?Q?eil+0tBlGf1RpR1iugAuMS5YGcdFgOeiftnLo5diMZqCeM4piJGXz1MHlrlZ?=
- =?us-ascii?Q?gl+6fs630QQ4Y/wzrQETBnfgFUBJoqGeSMN6FewXRnO0TPKiM8PPdrwrf8Jn?=
- =?us-ascii?Q?H3VekdZEKZYCgoPCNb2Mr5RuH0GxMeEmWFQKVjZ8lMJBy1E8u5G3FE5DWnQb?=
- =?us-ascii?Q?Qo3FNooY402Y9ig+ojiDWnEJ3kqQBSsRQFpNYS56URQef6Os50Mdq5kuDxY/?=
- =?us-ascii?Q?58Q7i1bByEiytwCqKY4hUHrUHEvjgvdOzlz5CSjQIAPKC/pSZL3ahaJ+OW26?=
- =?us-ascii?Q?flyjLLdBs8b2PJJ56m5Rk44CtV9swZClTjjhRKvJeWeMhjfj/BZOqNvi7X2H?=
- =?us-ascii?Q?82hBs3axrqzKA9GEBbC7INAASrUz8p7C4/gNKRI0wcm4NGjr4zLgmOuoJ57k?=
- =?us-ascii?Q?iDoUsz7B7YCaC5oG0v/4PvgHgVZKYUzPNbROVOzLNMKFNIGKpidhWo0Jv5fn?=
- =?us-ascii?Q?T/rfGG3B5/FrAbr4n3n7m2S5x7TIwgp+ga4NBgsVfIo+/1lrJKPXG7VFTaNK?=
- =?us-ascii?Q?F6OlBW3PLxBBXQRx8Kn4vAUnWafBK40Ki5JbhhzPWMmqXwhC1zRkO6dlrAxK?=
- =?us-ascii?Q?Qd0zp1p4Lua7ijOWO/yb4ja7X2OqzoMj7osPQquLjJnWRUAAz3wUgdjCPeEk?=
- =?us-ascii?Q?hVqG7gnmg4nNOPUqBmpFJ1yovWuMBq+8ld3XNQDlgL2+kHq6EKXbpJWfHD+7?=
- =?us-ascii?Q?SqTlFF3tT5mhmMBmoG+I/F0n6paV/Cn2Bc9M4zJd9CsoyIvTTpnSuQZLmutC?=
- =?us-ascii?Q?ePMRF50IK0+4wpIZolG54vnbbA6Y6rsjOiGdDtBYVboeGLxWr9HqH9p9LrPw?=
- =?us-ascii?Q?kliaz501EXIYruWTnKiWORfXBO8Zo5kWUJNjaEhPKwolLwEUR4ei5ccCNUHW?=
- =?us-ascii?Q?zVkQGYjrBI+l2JhAH6m2xuYcJ+zYSUYs793gtG5+5MdpRrlOlMhRZOiiS0d/?=
- =?us-ascii?Q?tmhKHZfewlbOA88FiG+tZCLB4Uv9pSf3rUOiOP1oypWjZtERLkZghhU/XAFQ?=
- =?us-ascii?Q?GPztFw63YHhS6y837/vGrX4Hnhz5A0+ttvzsNcubnBdxVRrGnereVEv0cHBa?=
- =?us-ascii?Q?G5mif11o6vHIVwoCDGkCHffSzaxXcDURsIxM1yV4hvHEDx1o6OEfNzgYTYsC?=
- =?us-ascii?Q?6Bt7yXQJXh/ZLDUPRnDNlc4GzksnmxL4MnKEYJC30RtiY/7e6HBZs6nGLgeh?=
- =?us-ascii?Q?ZKOfJs0zK6ovNNWfmrKuPLAyW3bbX0vf5U3gWC88?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056372E92C1
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 19:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750794552; cv=none; b=lanULWrGeWf8p1Pw6PYG3dtQFy4l+JWeJvy4tWRZL7w00W3WTbsSFaGTzdd453a8ggwLxwq6r7onUxv15vhXLdc8NAA/y9M6pFrFc+lvMWLEHKLUDk+i/c8TwUqb4nnPWWccz/bW2oGsocMqpfBF+2XPqjD5NExt00ZOivX8UH0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750794552; c=relaxed/simple;
+	bh=84iEEQ5zcFz6F0qxkt3i0soW6FCDAA0P690dJ4N0ytE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jKl9rMHUelI4Gn9Wdw/gJSWAFCO3dWCtfzzGkiAIXRf3l/S0nIeRqLdB0O2yt9UmqmYVCr7JL9r3NmFlMOx3b+RFaud9QtMRxYofdizLbglNjHuBKa16oG1XxEi0MdKlQATF10zljp6IjIGuHiTsNbIY0JT1coNSoI2TxoxYT64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=Nh9SL7Sc; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7481adb0b90so268127b3a.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 12:49:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1750794550; x=1751399350; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TEMl6eJ3YJldsq7k3k18NC5vKc+7ht1rDEBshbgwz1A=;
+        b=Nh9SL7ScVs065LUIGpzXJbWscmByfserfP1Jg6PvC8yjzJ/EZ86Gw6Ppl1cxFg/mXC
+         jtr7mFsO7eW+hOdrfEUw9iFUpaHOfhd/RFEfJ/1wa86nHfruClVaACWHofQUCsSP/Z3U
+         FPe3wZ8vmTutNS333jZIuBd2DFu9RSmeYtwwdpto7rfWpv6TetLRG0mMSFtf1tIsAkej
+         MXFq2jzlKWqfmmctCVf7tLLgfDO1IYp0jopSDmiliNajxHTShbcvYuQFQEvUha4RAnLZ
+         qEPBzp4hlUwsVLp02plTUtui651lBM/PvFXZTllsCHBHK7qMr0MeYgsJc84aqzPr484D
+         GXPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750794550; x=1751399350;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TEMl6eJ3YJldsq7k3k18NC5vKc+7ht1rDEBshbgwz1A=;
+        b=MV/GplplcEDxqlRAATOPN6dIO4r2e/uCYh11g9S8acTL9lvG2n0JxciDOlWEjcindm
+         2/8DnUOZXMabbzBFRzFdektFC3WdgHSa8leZRBu26kSnHJJ79q/22nPH2r2rf36oTpct
+         ftJyh6hmxIlYe7WDUe72qajhAoJiylme+y5UoAVY8NCYDP4kRdUavC0dnhIHHgJovZAJ
+         g+oeDay+DfxmPxYoX2iQQQ9VF/R+qR1v9t1iGmJ4hx9DXU1T3/bFBWuBUuBAwMzrdTEJ
+         qpfQ27cytQfUFzT+hi9JWtBcPoinLCD2SFDEpSBYgAXat5lw+47sQpAh2Aosga4/SVSm
+         qipA==
+X-Gm-Message-State: AOJu0YwIBT4YxyGct6PjSMJQzI/evqzrbdZsZNk0js/1D3E+DeuOSChw
+	utvMSPE/QtQV5W7vPAnvBIrOfZkFcJ5gQfz6KiS4CK6oeXCWShg1Pp66n/ebuZP3UXM=
+X-Gm-Gg: ASbGnctKeN5REoNkYtzToHMBPIqH/9Dqk0A5GiMGHofkkPEs6H+175rMXEeNfRtlSbd
+	XggQG/lvvniZwaQwS/lDw//LhxXxgm2v5EWziXQZPev8TMC3CaScP7fwXcALyHrzhCho8qwh+qA
+	YwHEN0/iaer5kWognlXFVMFelRK3sMvgdBCn8rzQP2SywELy8DadtohaHbWVMHQAF0O7OiSBWLD
+	f4d663AeCMfHwp5GdVJSgS/nNegpxCkruy08gqPGcifGAslJeQ5f9CVwa1IIw7FPJhdGpPYCVRM
+	Zd+/mvDDZMm7tL6sOsW46mQ3nyHxEQ8kKEKMOxIlfgnrKR0=
+X-Google-Smtp-Source: AGHT+IG+qBW4zr65fekP5/GsWiiX7SdOGOxL18FEHTp64/LOAjCnzrksvNIX70PxM/joR+Sj9G6dQQ==
+X-Received: by 2002:a05:6a00:349b:b0:736:a9b1:722a with SMTP id d2e1a72fcca58-74ad4610130mr181731b3a.7.1750794550260;
+        Tue, 24 Jun 2025 12:49:10 -0700 (PDT)
+Received: from t14 ([2a00:79e1:abc:133:b63c:7792:e98f:f4a5])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e21931sm2719417b3a.56.2025.06.24.12.49.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jun 2025 12:49:09 -0700 (PDT)
+Date: Tue, 24 Jun 2025 12:49:07 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [RESEND PATCH v2 bpf-next 02/12] bpf: tcp: Make sure iter->batch
+ always contains a full bucket snapshot
+Message-ID: <posiabqearkkbt3o4l4yueyn3kl6jvw2r4fuxceabgju2etg7x@m7fepnnvkgjj>
+References: <20250618162545.15633-1-jordan@jrife.io>
+ <20250618162545.15633-3-jordan@jrife.io>
+ <aFMJHoasszw3x2kX@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 254c17c1-945c-4434-5bd7-08ddb357940e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jun 2025 19:44:48.3431
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FWFHmWDtCAwX9NGoLclNRFmE6rZvCGaQsnQNkzHWmficI2d6czO8A8c29VSDbDavAHDn20wp3OQAgbLU2NzWDB4Hu1Wey6ZsXbvX2YLKPOU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7357
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFMJHoasszw3x2kX@mini-arch>
 
-> -----Original Message-----
-> From: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Sent: Tuesday, June 24, 2025 9:22 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Olech, Milena <milena.olech@intel.com>;
-> Korba, Przemyslaw <przemyslaw.korba@intel.com>; Nitka, Grzegorz
-> <grzegorz.nitka@intel.com>
-> Subject: [PATCH v2 iwl-net] ice: add recovery clock and clock 1588 contro=
-l for
-> E825c
->=20
-> From: Przemyslaw Korba <przemyslaw.korba@intel.com>
->=20
-> Add control for E825 input pins: phy clock recovery and clock 1588.
-> E825 does not provide control over platform level DPLL but it
-> provides control over PHY clock recovery, and PTP/timestamp driven
-> inputs for platform level DPLL.
->=20
-> Introduce a software controlled layer of abstraction to:
-> - create a DPLL of type EEC for E825c,
-> - create recovered clock pin for each PF, and control them through
-> writing to registers,
-> - create pin to control clock 1588 for PF0, and control it through
-> writing to registers.
->=20
-> Reviewed-by: Milena Olech <milena.olech@intel.com>
-> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> Can we try to unroll this? Add new helpers to hide the repeating parts,
+> store extra state in iter if needed.
+> 
+> AFAIU, we want the following:
+> 1. find sk, try to fill the batch, if it fits -> bail out
+> 2. try to allocate new batch with GPU_USER, try to fill again -> bail
+>    out
+> 3. otherwise, attempt GPF_NOWAIT and do that dance where you copy over
+>    previous partial copy
+> 
+> The conditional put in bpf_iter_tcp_put_batch does not look nice :-(
 
-I put wrong list in the title. It should go to 'net-next', not 'net'.
-Will fix it in another patch.
+With the unrolling, I think it should be simple enough to just call
+bpf_iter_tcp_put_batch in the right place instead of embedding it inside
+bpf_iter_tcp_realloc_batch conditional. Agree this might be clearer.
+
+> Same for unconditional memcpy (which, if I understand correctly, only
+> needed for GFP_NOWAIT case). I'm 99% sure your current version works,
+
+This matters for both cases. Later in this series, this memcpy is
+necessary to copy socket cookies stored in iter->batch to find our place
+in the bucket again after reacquiring the lock. IMO this still belongs
+here; in both cases, we need to copy the contents from the old batch
+before freeing it.
+
+> but it's a bit hard to follow :-(
+> 
+> Untested code to illustrate the idea below. Any reason it won't work?
+
+After revisiting the code, I now remember why I didn't do something like
+this before.
+
+> 
+> /* fast path */
+> 
+> sk = tcp_seek_last_pos(seq);
+> if (!sk) return NULL;
+> fits = bpf_iter_tcp_fill_batch(...);
+> bpf_iter_tcp_unlock_bucket(iter);
+> if (fits) return sk;
+> 
+> /* not enough space to store full batch, try to reallocate with GFP_USER */
+> 
+> bpf_iter_tcp_free_batch(iter);
+> 
+> if (bpf_iter_tcp_alloc_batch(iter, GFP_USER)) {
+> 	/* allocated 'expected' size, try to fill again */
+> 
+> 	sk = tcp_seek_last_pos(seq);
+
+Since you release the lock on the bucket above, and it could have
+changed in various interesting ways in the meantime (e.g. maybe it's
+empty now), tcp_seek_last_pos may have moved on to a different bucket.
+
+> 	if (!sk) return NULL;
+> 	fits = bpf_iter_tcp_fill_batch(...);
+
+If that new bucket is bigger then this fails and we immediately move
+onto the GFP_NOWAIT block. Before, we were trying to avoid falling back
+to GFP_NOWAIT if possible; it was only there to ensure we could capture
+a full snapshot in case of a fast-growing bucket. With the unrolled
+logic, we widen the set of scenarios where we use GFP_NOWAIT. With the
+loop (goto again) we would just realloc with GFP_USER if the bucket had
+advanced. The original intent was to try GFP_USER once per bucket, but
+unrolling shifts this to once per call.
+
+> 	if (fits) {
+> 		bpf_iter_tcp_unlock_bucket(iter);
+> 		return sk;
+> 	}
+> }
+
+Both approaches work. Overall, the unrolled logic is slghtly clearer
+while making the GFP_NOWAIT condition slightly more likely while the
+loop logic is slightly less clear while making the GFP_NOWAIT condition
+less likely.
+
+In practice, the difference is probably negligible though, so yeah it
+might be better to just favor clarity here. Let me go ahead and try to
+unroll this. If I run into any issues which make it impracical I'll let
+you know.
+
+Jordan
 
