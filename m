@@ -1,214 +1,164 @@
-Return-Path: <netdev+bounces-200786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1060AE6E7C
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:18:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93ED9AE6E81
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 20:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF56D1885947
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:18:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF8D3AF35B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0762E62BC;
-	Tue, 24 Jun 2025 18:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ursu.me header.i=@ursu.me header.b="PVdN8LBR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oqvhvEid"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82A02E62BC;
+	Tue, 24 Jun 2025 18:18:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E641298CA4;
-	Tue, 24 Jun 2025 18:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3BF27F4F5
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 18:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750789087; cv=none; b=uYFjYwyM0bRSDYjIduhbYBkmS351sGrJDRAyboXnflNglJfN2joebagzCTcAq30QVwRvh4FxGpWgJLNIjU6edHufKJ4hI9NxWLvl/Zkg7JUokHTQ0ILQv42FNAGRfrRaDMI+xXCvrtAF4E6gfJpEXkHBx3mmyYjMIgSFvuSQPI4=
+	t=1750789114; cv=none; b=uEZup0X8bbLn3Um/vJ4fsdoOpzOSQSy6g+H9W35B+F7WiWRwXcqdHINhvidHk8EmZ7oaRHi0EzUYKPDxgzYALi895HipJqI45280JeX8/DF69DFNKD/RTIj9xh3YhFO7GxjQZ6py0qAmR/75XxfpFgN2fVBbqwybb8E2pZTL/TM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750789087; c=relaxed/simple;
-	bh=1hwi+3E/npjJsLVURhD/rxh1PG72Jr4fM9CClyzAC+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EXLJ8S6wzE0DPvU4bLq/FyVmp7HEz3t+hPGC1Oqu42ouT2WKSsCpaFzPbYhUk8jKN7LEkhKz6Nmccv0Rl+KqR5juQLSlZtVRdbRAn8fNVLHF6CFMgbZG0+SKincvOgAVBsTgzdP5yyt1Uhv6CNRu+rfaXsFChETDtqpZJ6i5/LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursu.me; spf=pass smtp.mailfrom=ursu.me; dkim=pass (2048-bit key) header.d=ursu.me header.i=@ursu.me header.b=PVdN8LBR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oqvhvEid; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursu.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ursu.me
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfout.stl.internal (Postfix) with ESMTP id 422381D0017B;
-	Tue, 24 Jun 2025 14:18:04 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Tue, 24 Jun 2025 14:18:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ursu.me; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1750789084;
-	 x=1750875484; bh=NciPXSYJhwcZ1bsK1ubxsblaN89sbnSvIgaoVIz9JbM=; b=
-	PVdN8LBRwUbXlpOdljRRcCNcoy77SF3sv3dl+q2Ljh+MeRcWSvH2QG+YI1TFssQI
-	4C8KWeFkxLaPMKWxyKCicFbjzUvzKtArVllKR5Q/pNWZxIHqPKWsWpxJMTj9HY5z
-	YGsvL5ZCdeIew9W4/XGhS5N5i4o33rNdoNpGHhDKWLvZTy639/jXSKHVx8nsNyWr
-	YkaIAtbOnzPJNcV25DliWWcK/6joQieUiV2/7VS2eRPbhh/UhCr7OvyQFaij3Xke
-	cAXE3fiMFSSnV17n1O+KwcC9BSQ9ptpHebL9IQz1WWIh7S4aa01wu+bqB1liD000
-	CF662nMGNOx/JBw3nnxRjg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1750789084; x=
-	1750875484; bh=NciPXSYJhwcZ1bsK1ubxsblaN89sbnSvIgaoVIz9JbM=; b=o
-	qvhvEidl+Sx8Stsy7sPbFdXvHZm2m+Q5xZS+LPmJCXJYqal4YwpZo85t+5GDUAJP
-	2Y9mr5Ach3BXYSw4d9mJS03n1cGlmvCtMLaGUaSMdtImSpy17iIr5q1RIWVod5OI
-	OPFEU6aS8F3vUPGh4S3yUUBXFxBCPGy5q55BsOniJSGbZo/XT/+ETzY2lW4SNywJ
-	eMMN0TtZyEBbFi0QqiGuxbGt84VDCmOwZR2WYPH/rMoM4QLzoEEocAYu1RD5oFuR
-	aXsqfLQVilLuqlZYpArBPp4AkdpUPXwmxyVLH+R38ACgV9M5KW/YU0BDzb1t1y2S
-	BsqC/MjiuTHWjmUCHojEg==
-X-ME-Sender: <xms:2-taaHIpGyB6qt6BgHQRh8OaQ3lGnNo9SAA-niqkOrcDq7WZ-6DF9g>
-    <xme:2-taaLIt22tD7CyvpmUnXgPjUKPrXD4M9i-Zp1yWryj8zAo8KAFC5zJ5yl9hQ1TAK
-    _UJ-_e9w7tW4sLRVa0>
-X-ME-Received: <xmr:2-taaPu42EqyXkBp1J_EqED2zFA7OcjzO8AoB86IwtOHPuBaudE5KyZmQn0wA6Whsw-l>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvtdehlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomhepgghlrgguucgf
-    tffufgcuoehvlhgrugesuhhrshhurdhmvgeqnecuggftrfgrthhtvghrnhepkeefgeevje
-    dvfefhffeigefffefguedugeeiledufedugfeuudeftdefiefgffegnecuvehluhhsthgv
-    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepvhhlrggusehurhhsuhdrmh
-    gvpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
-    jhgrtggvkhesjhgrtggvkhhkrdhinhhfohdprhgtphhtthhopegrnhhthhhonhihrdhlrd
-    hnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehprhiivghmhihslhgrfidr
-    khhithhsiigvlhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvth
-    guvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgv
-    ughhrghtrdgtohhmpdhrtghpthhtohepihhnthgvlhdqfihirhgvugdqlhgrnheslhhish
-    htshdrohhsuhhoshhlrdhorhhg
-X-ME-Proxy: <xmx:2-taaAaxvwqGdwbAj1k_t3LBQOLaEt2ZlzZe2Y3XKhJBtm60xJhO2g>
-    <xmx:2-taaOaHdW4mjJrXXHwn3s9rgnxiCFUsLfZLDiad67M8ELcIQgnrzA>
-    <xmx:2-taaEAdEt1fNiC9LMKofyE_NzrSN2vEbkKe9drL1c2O43Xgf-j94Q>
-    <xmx:2-taaMaFm1D-xYN_JaZOgSHqhIJH3qFRK6Ef1ec8xCkR23tgKITtOg>
-    <xmx:3OtaaLPDZItZE2PQO623UVfkVioF5bDeE4QbN1J08M8aGWrcxuKjBo3o>
-Feedback-ID: i9ff147ff:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 24 Jun 2025 14:18:01 -0400 (EDT)
-Message-ID: <431c1aaa-304d-4291-97f8-c092a6bee884@ursu.me>
-Date: Tue, 24 Jun 2025 21:17:44 +0300
+	s=arc-20240116; t=1750789114; c=relaxed/simple;
+	bh=b3gqybE5Pb4fbf+NG8nF+cHOxnanQ96YrphONGlLhb8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QDl+haCBDokkS5HHE8QYW3QpCCSocIbOxivLQyuI4Um6g8RlSktv1bdiBVfsy6LpyyLfrDsDfgFlJzCmUFLImHAMS06klwv1UtqEIWoG8vvIOQY+qgD99r8YMIp/EVtQkkxocJXxdr0R/R9n10X4pRwYLb0akqaOa3dsvijgnmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ddbec809acso11473025ab.2
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 11:18:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750789112; x=1751393912;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7nbEx6aMVKqdWvyMJYQZTfplcow4MaQFasYOV9mpc5Q=;
+        b=fZiLewb5fAg/BECTUu0e2xJgcrC+ZBHty/Ai5KpTlrsWjAQDAo03B67TFMw7w5AEgy
+         Mi3KIIkh7gGB7xgoVRrivvzX3a2f+CxH7qAAt9yHVBd8A1kmErgWhZTRYv6ut8lfF+S6
+         IdgMnVrXc/dj80vPtwuql3z1Fml3iFEF0S0YL4F8BPIFFlgoKuCQaEAXBXioQKqkM0ri
+         kD6rSm4lejCp3GQRqtb42YHKT2L7UPkuVH/EnWEl8rGvV3MMRA5pbEzygTQb9LkRWMCP
+         nA79nMXTsIv1tHhtuUEOmZhsX2QZa5h8tfcIoeD/guQ9OPIjeY4q591VFQHelDWOwi3j
+         CEyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ5SoA9juLEpMtevIni3KYOfdPCYvUpTn8zZnjSb+/JPV7riVldaIDF1TLTrbZkqt+JAW3OIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjJerkRMW5p1wK0t+Au9PQ5+cUmZNvnZrwRX9pMEoO9VyyILqG
+	q3uMbuptcxQaNqDXjg0OWZmU6OF/KYgCn6ePHn0/kksr19mDilo5p2kU+Ba4LTHhnfQzAwD1bI5
+	/rEUqsSCA9GPRDy/23KnjnQFZKs6G71CrxJ5vte6WXN8HaTKB8disLcIo2fA=
+X-Google-Smtp-Source: AGHT+IEKpUzUpSGavgSOnfmZjsCqKhAYX//2LVI3qo9n5HmjNzxIxrIBnPG8//vvvhzAPnERsu6qLWjtRY1G8q5OkwK8qpUdhg7q
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] e1000e: ignore factory-default checksum value on
- TGP platform
-To: Jacek Kowalski <jacek@jacekk.info>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <fe064a2c-31d6-4671-ba30-198d121782d0@jacekk.info>
- <b7856437-2c74-4e01-affa-3bbc57ce6c51@jacekk.info>
- <8538df94-8ce3-422d-a360-dd917c7e153a@jacekk.info>
-Content-Language: en-US
-From: Vlad URSU <vlad@ursu.me>
-In-Reply-To: <8538df94-8ce3-422d-a360-dd917c7e153a@jacekk.info>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1c2b:b0:3dd:c4ed:39c0 with SMTP id
+ e9e14a558f8ab-3df328e0374mr964335ab.1.1750789111711; Tue, 24 Jun 2025
+ 11:18:31 -0700 (PDT)
+Date: Tue, 24 Jun 2025 11:18:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <685aebf7.a00a0220.2e5631.008d.GAE@google.com>
+Subject: [syzbot] [mptcp?] WARNING in __mark_subflow_endp_available (2)
+From: syzbot <syzbot+c6e2db6fd15f31126b7a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 23.06.2025 19:18, Jacek Kowalski wrote:
-> Vlad,
-> 
-> could you verify that the following patch works for you?
-> 
->> diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
->> index 8294a7c4f122..01696eb8dace 100644
->> --- a/drivers/net/ethernet/intel/e1000e/defines.h
->> +++ b/drivers/net/ethernet/intel/e1000e/defines.h
->> @@ -637,6 +637,7 @@
->>   
->>   /* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
->>   #define NVM_SUM                    0xBABA
->> +#define NVM_SUM_FACTORY_DEFAULT    0xFFFF
->>   
->>   /* PBA (printed board assembly) number words */
->>   #define NVM_PBA_OFFSET_0           8
->> diff --git a/drivers/net/ethernet/intel/e1000e/nvm.c b/drivers/net/ethernet/intel/e1000e/nvm.c
->> index e609f4df86f4..37cbf9236d84 100644
->> --- a/drivers/net/ethernet/intel/e1000e/nvm.c
->> +++ b/drivers/net/ethernet/intel/e1000e/nvm.c
->> @@ -558,6 +558,11 @@ s32 e1000e_validate_nvm_checksum_generic(struct e1000_hw *hw)
->>   		checksum += nvm_data;
->>   	}
->>   
->> +	if (hw->mac.type == e1000_pch_tgp && checksum == (u16)NVM_SUM_FACTORY_DEFAULT) {
->> +		e_dbg("Factory-default NVM Checksum on TGP platform - ignoring\n");
->> +		return 0;
->> +	}
->> +
->>   	if (checksum != (u16)NVM_SUM) {
->>   		e_dbg("NVM Checksum Invalid\n");
->>   		return -E1000_ERR_NVM;
-> 
+Hello,
 
-No, it doesn't.
+syzbot found the following issue on:
 
-You are comparing the wrong value with NVM_SUM_FACTORY_DEFAULT. You 
-should check it against the checksum word 0x3F (NVM bytes 0x7E and 0x7F) 
-which is used to ensure that the base NVM image
-is a valid image, and which in my case is left unchanged by Dell in the 
-firmware.
+HEAD commit:    75f5f23f8787 Merge tag 'block-6.16-20250619' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=140f8182580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4130f4d8a06c3e71
+dashboard link: https://syzkaller.appspot.com/bug?extid=c6e2db6fd15f31126b7a
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-I believe the changes should look something like this:
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-75f5f23f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7979df97154f/vmlinux-75f5f23f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/010807ef6fc8/bzImage-75f5f23f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c6e2db6fd15f31126b7a@syzkaller.appspotmail.com
+
+netlink: 8 bytes leftover after parsing attributes in process `syz.3.1789'.
+netlink: 8 bytes leftover after parsing attributes in process `syz.3.1789'.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 12059 at net/mptcp/pm_kernel.c:880 __mark_subflow_endp_available net/mptcp/pm_kernel.c:880 [inline]
+WARNING: CPU: 0 PID: 12059 at net/mptcp/pm_kernel.c:880 __mark_subflow_endp_available+0x12e/0x140 net/mptcp/pm_kernel.c:876
+Modules linked in:
+CPU: 0 UID: 0 PID: 12059 Comm: syz.3.1789 Not tainted 6.16.0-rc2-syzkaller-00231-g75f5f23f8787 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__mark_subflow_endp_available net/mptcp/pm_kernel.c:880 [inline]
+RIP: 0010:__mark_subflow_endp_available+0x12e/0x140 net/mptcp/pm_kernel.c:876
+Code: 48 0f ab 9d 88 0a 00 00 5b 5d 41 5c 41 5d e9 d9 f8 4c f6 e8 64 d0 b3 f6 eb ca e8 5d d0 b3 f6 e9 60 ff ff ff e8 c3 f8 4c f6 90 <0f> 0b 90 e9 78 ff ff ff 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90
+RSP: 0018:ffffc900036373d8 EFLAGS: 00010283
+RAX: 00000000000057d6 RBX: 0000000000000000 RCX: ffffc9000d761000
+RDX: 0000000000080000 RSI: ffffffff8b6f236d RDI: 0000000000000001
+RBP: ffff888025d08b80 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffff888025d09608
+R13: ffff888025d095b8 R14: ffff8880653cde80 R15: 0000000000000000
+FS:  00007f1bc288a6c0(0000) GS:ffff8880d6753000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1bc2888fb8 CR3: 0000000064977000 CR4: 0000000000352ef0
+DR0: 0000000000000007 DR1: 000000000000009b DR2: 00040000ffffffff
+DR3: 0000000000000009 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ mptcp_nl_remove_subflow_and_signal_addr net/mptcp/pm_kernel.c:915 [inline]
+ mptcp_pm_nl_del_addr_doit+0xaf4/0xed0 net/mptcp/pm_kernel.c:1013
+ genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2534
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x53a/0x7f0 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg net/socket.c:727 [inline]
+ ____sys_sendmsg+0xa95/0xc70 net/socket.c:2566
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2652
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f1bc198e929
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1bc288a038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f1bc1bb6080 RCX: 00007f1bc198e929
+RDX: 000000002000c094 RSI: 0000200000000000 RDI: 0000000000000006
+RBP: 00007f1bc1a10b39 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f1bc1bb6080 R15: 00007ffc06c0d828
+ </TASK>
+
 
 ---
-  drivers/net/ethernet/intel/e1000e/defines.h |  3 +++
-  drivers/net/ethernet/intel/e1000e/nvm.c     | 13 ++++++++++++-
-  2 files changed, 15 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h 
-b/drivers/net/ethernet/intel/e1000e/defines.h
-index 8294a7c4f122..996a0f4d2b49 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -638,6 +638,9 @@
-  /* For checksumming, the sum of all words in the NVM should equal 
-0xBABA. */
-  #define NVM_SUM                    0xBABA
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-+/* Factory default value for the NVM checksum word */
-+#define NVM_CHECKSUM_WORD_FACTORY_DEFAULT       0xFFFF
-+
-  /* PBA (printed board assembly) number words */
-  #define NVM_PBA_OFFSET_0           8
-  #define NVM_PBA_OFFSET_1           9
-diff --git a/drivers/net/ethernet/intel/e1000e/nvm.c 
-b/drivers/net/ethernet/intel/e1000e/nvm.c
-index e609f4df86f4..4620efac0208 100644
---- a/drivers/net/ethernet/intel/e1000e/nvm.c
-+++ b/drivers/net/ethernet/intel/e1000e/nvm.c
-@@ -547,7 +547,18 @@ s32 e1000e_validate_nvm_checksum_generic(struct 
-e1000_hw *hw)
-  {
-  	s32 ret_val;
-  	u16 checksum = 0;
--	u16 i, nvm_data;
-+	u16 i, nvm_data, checksum_word;
-+
-+	ret_val = e1000_read_nvm(hw, NVM_CHECKSUM_REG, 1, &checksum_word);
-+	if (ret_val) {
-+		e_dbg("NVM Read Error\n");
-+		return ret_val;
-+	}
-+
-+	if (hw->mac.type == e1000_pch_tgp && checksum_word == 
-(u16)NVM_CHECKSUM_WORD_FACTORY_DEFAULT) {
-+		e_dbg("Factory-default NVM Checksum word on TGP platform - ignoring\n");
-+		return 0;
-+	}
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-  	for (i = 0; i < (NVM_CHECKSUM_REG + 1); i++) {
-  		ret_val = e1000_read_nvm(hw, i, 1, &nvm_data);
--- 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
