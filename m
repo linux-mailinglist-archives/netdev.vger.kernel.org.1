@@ -1,119 +1,166 @@
-Return-Path: <netdev+bounces-200758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC20AE6C92
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:38:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5A3AE6CA9
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 18:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F2674A2D9F
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:38:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D99793AFC7C
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321B52E339D;
-	Tue, 24 Jun 2025 16:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1BB26CE3A;
+	Tue, 24 Jun 2025 16:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAeOARZV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q1y3q+nU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010F626CE0D;
-	Tue, 24 Jun 2025 16:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E2525634;
+	Tue, 24 Jun 2025 16:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750783107; cv=none; b=lRA/MbnRrWvqYJpkdHTy2nMsE4/qV/W0kBFGPRza/+6QIKj0feCL5y/XVHbo/rnt9b72ALVxbv3ThZ+ewW6de3cy9NZ/hu5gg0ux8vD7lTk4+VnJVhwywuF0BRR4ZT8XmuwZAgByL5iEAA7cqACu3NDZREvGbjdlq4Yyt7oucC8=
+	t=1750783542; cv=none; b=CHNdVmvSz/2tjpFe2jeOwR2WCWaxfK2I5P1eQrG0A81iEotqaJkFq44SXVMQ4Gzn1wJO9WkJ0Ps3CuTmIee5H/N5877ly77ulEaBTkkjjk38VBLn+kn02aNY/+GVPgYHcTgnl/9LekYthcEim9jYdMN0zaQkEcoY+I1IIEy/S1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750783107; c=relaxed/simple;
-	bh=KgsDdKe3hPRmKASRX1tvEopcOOVxQEB9I5yYs6meOFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WKwC6wgbXYVmjCVI4Jn6yzU2pQ0WBdGec6ExhJcmF1jK1cBIsSCjMFuWTrfNW7N5qflVA6JBsYkbFivLZSoXN4at1oEVkSuiOxZC42sU9svKW3pfdrP4wtonAcaxC7DieqZAc5kijCgjt0wz1sK5N0PBtz3McXfOm988iii2jMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAeOARZV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC35CC4CEF2;
-	Tue, 24 Jun 2025 16:38:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750783106;
-	bh=KgsDdKe3hPRmKASRX1tvEopcOOVxQEB9I5yYs6meOFY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gAeOARZVsL6lQWlK6TFQ12WU0ozheRG0RILxQ8Te18iiGYe587U8pKjaSKXakt3AE
-	 TKpxhoUbHbqlXvJKjUX6qkSeZAFDYO8jUuUFH3TxY4hBoMHAxLhLGxh/6u5sh1pOcy
-	 Ajlci+DIcXsQZgA+vVB3hVRZwOsj+lmk+Qwe4TMCTif6ep9IOUPv8TaF7IEhIZ7Est
-	 O92jMVsdN2AeHJW5zmiqzA8S7yMxqqADnbNBBSP4YjfSntqR9qed38OjVpUNlTz4kJ
-	 oI+9mcvEgT2f9TCibLHict2aU1evqW1tgv0k4YQT2zO09U7twpflqO89rFJWrt2Zxn
-	 Zw8WqSYyqojRg==
-Date: Tue, 24 Jun 2025 09:38:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, gustavold@gmail.com
-Subject: Re: [PATCH net-next] selftests: net: add netpoll basic
- functionality test
-Message-ID: <20250624093824.4c0dd380@kernel.org>
-In-Reply-To: <aFq1z0BS6RCUCNwa@gmail.com>
-References: <20250620-netpoll_test-v1-1-5068832f72fc@debian.org>
-	<20250623183006.7c1c0cfc@kernel.org>
-	<aFq1z0BS6RCUCNwa@gmail.com>
+	s=arc-20240116; t=1750783542; c=relaxed/simple;
+	bh=D2JZgvRKKVVmYAYCRUOstzK4i3/dFTFjJTnVHXkHHmE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eg9kpuJSzSBGfBhXYfOGuv3G9BTL2AsIf2Haj2/4i64jW67Fdw0IfYw+QrLkcOlG8U82PsOc3QsJWK42GQ3gtjNl3Pb291kNI5myFaKxgsM/R6atwWdiNpktjTTA0AwjZpYr6KUHkKbVQ1asOWuFUCnOn851mUyQsax91aZ+oNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q1y3q+nU; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750783541; x=1782319541;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=D2JZgvRKKVVmYAYCRUOstzK4i3/dFTFjJTnVHXkHHmE=;
+  b=Q1y3q+nUIFGMuk94w+CVTgYbEVZUuXQAbT6hdT0b8i61jgJ8tlB/6Rlt
+   xwcLJe4FAB3uzKx94IrAFx12Rfrphn1ETFUqKLvL6rC6pY3xFrbOcDZm4
+   egGpd19lSTXnrFXHQsFtMf1WDCYJTm45fDDpCaKAik+gfb40ZGjP3xQao
+   B9qjPJXKScZL5Wb50MuTSBK054NcFXrJauKzIfJhhajPu+mqGXTqYLl2d
+   YgjzApB+TPy7f9Lv4atY4CdQ/6LKnX9c4Nh0HfEm7CggSwejOs69WOZ0D
+   yKIe95VE3MM0ihe7XI/ToI5MBbs0jB+VlX1uDygO2YDuFqZXaP4/jpPho
+   w==;
+X-CSE-ConnectionGUID: GhB/BuDjS0aMBLhuyRbA4A==
+X-CSE-MsgGUID: zY6P6OAwTs6i5ZrH3R5Ydw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="64091120"
+X-IronPort-AV: E=Sophos;i="6.16,262,1744095600"; 
+   d="scan'208";a="64091120"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 09:45:40 -0700
+X-CSE-ConnectionGUID: 5NFWzIo6Q4GSW5m3wksPRA==
+X-CSE-MsgGUID: MO7JTzrlSE6vpJ/kEndfbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,262,1744095600"; 
+   d="scan'208";a="152669441"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa010.fm.intel.com with ESMTP; 24 Jun 2025 09:45:36 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Simon Horman <horms@kernel.org>,
+	nxne.cnse.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next v2 00/12] idpf: add XDP support
+Date: Tue, 24 Jun 2025 18:45:03 +0200
+Message-ID: <20250624164515.2663137-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 24 Jun 2025 15:27:27 +0100 Breno Leitao wrote:
-> > > +    try:
-> > > +        for key, value in config_data.items():
-> > > +            if DEBUG:
-> > > +                ksft_pr(f"Setting {key} to {value}")
-> > > +            with open(
-> > > +                f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}/{key}",  
-> > 
-> > Could be personal preference but I think that using temp variable to
-> > store the argument looks better than breaking out the function call
-> > over 5 lines..  
-> 
-> I was not able to get what you mean here, sorry.
-> 
-> We have config_data, which is a dictionary that stores the netconsole
-> keys (as in configfs) and their value, which will be set in the code below.
-> 
-> What would this temp variable look like, and how it would look like?
+Add XDP support (w/o XSk for now) to the idpf driver using the libeth_xdp
+sublib. All possible verdicts, .ndo_xdp_xmit(), multi-buffer etc. are here.
+In general, nothing outstanding comparing to ice, except performance --
+let's say, up to 2x for .ndo_xdp_xmit() on certain platforms and
+scenarios.
+idpf doesn't support VLAN Rx offload, so only the hash hint is
+available for now.
 
-		path = f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}/{key}"
-		with open(path, "r", encoding="utf-8") as f:
-			...
+Patches 1-6 are prereqs, without which XDP would either not work at all or
+work slower/worse/...
 
-> > > +def test_netpoll(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> None:
-> > > +    """
-> > > +    Test netpoll by sending traffic to the interface and then sending
-> > > +    netconsole messages to trigger a poll
-> > > +    """
-> > > +
-> > > +    target_name = generate_random_netcons_name()
-> > > +    ifname = cfg.dev["ifname"]
-> > > +    traffic = None
-> > > +
-> > > +    try:
-> > > +        set_single_rx_tx_queue(ifname)
-> > > +        traffic = GenerateTraffic(cfg)
-> > > +        check_traffic_flowing(cfg, netdevnl)  
-> > 
-> > Any reason to perform this check? GenerateTraffic() already waits for
-> > traffic to ramp up. Do we need to adjust the logic there, or make some
-> > methods public?  
-> 
-> Not really. I can just remove this code, in fact, given
-> GenerateTraffic() already waits for the code. Or, I can add under DEBUG.
+Alexander Lobakin (8):
+  idpf: fix Rx descriptor ready check barrier in splitq
+  idpf: use a saner limit for default number of queues to allocate
+  idpf: link NAPIs to queues
+  idpf: add support for nointerrupt queues
+  idpf: use generic functions to build xdp_buff and skb
+  idpf: add support for XDP on Rx
+  idpf: add support for .ndo_xdp_xmit()
+  idpf: add XDP RSS hash hint
 
-Let's not put functional changes under DEBUG, just prints.
-It could make it so that the test fails without DEBUG and passes with.
+Michal Kubiak (4):
+  idpf: add 4-byte completion descriptor definition
+  idpf: remove SW marker handling from NAPI
+  idpf: prepare structures to support XDP
+  idpf: implement XDP_SETUP_PROG in ndo_bpf for splitq
 
-> As we discussed in the RFC thread, I will add support for bpftrace in
-> the v2.
+ drivers/net/ethernet/intel/idpf/Kconfig       |   2 +-
+ drivers/net/ethernet/intel/idpf/Makefile      |   2 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |  31 +-
+ .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 129 +++--
+ drivers/net/ethernet/intel/idpf/xdp.h         | 172 +++++++
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  11 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  31 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |   1 +
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 110 ++---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 427 +++++++++--------
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  11 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 113 +++--
+ drivers/net/ethernet/intel/idpf/xdp.c         | 452 ++++++++++++++++++
+ 15 files changed, 1138 insertions(+), 366 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/xdp.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/xdp.c
+
+---
+Sending to get reviews and to trigger Intel's validation.
+
+From v1[0]:
+* drop the libeth_xdp part (submitted separately and accepted);
+* fix some typos and kdocs (Jakub, Maciej);
+* pick a couple RBs (Maciej);
+* 03: create a convenience helper (Maciej), fix rtnl assertion fail;
+* 04: since XDP uses its own queue cleaning routines, don't add 4-byte
+      completion support to the skb code;
+* 05: don't use old weird logic with negative descriptor index (Maciej);
+* 06: fix invalid interrupt vector counting in certain cases;
+* 07: fix cleanup timer is fired after the queue buffers are already freed;
+* 08: fix XDP program removal in corner cases such as PCI reset or
+      remove request when there's no active prog (from netdev_unregister());
+* 10: fix rare queue stuck -- HW requires to always have at least one free Tx
+      descriptor on the queue, otherwise it thinks the queue is empty and
+      there's nothing to send (true Intel HW veteran bug).
+
+Testing hints: basic Rx and Tx (TCP, UDP, VLAN, HW GRO on/off, trafficgen
+stress tests, performance comparison); xdp-tools with all possible actions
+(xdp-bench for PASS, DROP, TX, REDIRECT to cpumap, devmap (inc self-redirect);
+xdp-trafficgen to double-check XDP xmit). Would be nice to see a perf
+comparison against ice (in percent) (idpf must be plugged into a PCIe 5.x).
+
+[0] https://lore.kernel.org/intel-wired-lan/20250305162132.1106080-1-aleksander.lobakin@intel.com
+-- 
+2.49.0
+
 
