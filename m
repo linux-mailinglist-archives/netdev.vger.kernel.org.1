@@ -1,182 +1,99 @@
-Return-Path: <netdev+bounces-200505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C279AE5BE2
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:36:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03DBCAE5C2F
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:55:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A581B66418
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:37:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F96E3A3277
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326BA19F480;
-	Tue, 24 Jun 2025 05:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E137F22D78A;
+	Tue, 24 Jun 2025 05:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="o9Peqqh1"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Klb5/qbL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B1E79F2
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 05:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D67F20EB
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 05:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750743407; cv=none; b=Lrz9wAHOcNI4/UaK92gJ4U6Qoeew9947jgwJwm9+xQIbJ5egLijudyYTY3j7ADFPviuWpecujVqPjhe3EEZzNQTSkUaLZ8qmjlTVfuQRaLVhs3ZYt9ULdV0g0W3zsBASRaZerlhVMBm/eZKDeI8XxsSb39NUemvHMGXMTjDwIfk=
+	t=1750744529; cv=none; b=JujdMvEUNFok37KqXrlPKRsyf+5EJ9N7nvzwi3YBf6W9CO1SqilXrXAVhPHZESJHPIPER/9gyrDT+VGhb5aV7+FXso/e52sen7Uyg57GM7DljwNeRweTQPY9l2/jF07mcvU0t0ebAbykxTgzm2YL2DNDaiP28o+M+zsk8EPPreU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750743407; c=relaxed/simple;
-	bh=hM1eP511aEqGiQ/Oypz2TY+oJg/5LaiXR5FPGNAdMbk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BTZtJoblubFaXcb0R3/rkHss7wny0IuSHExj3ebSUn5o7kOFLPlaZqvq4zirQiwlgupG+aqr6P/IAdN6e5IRE4EXnlZalsZletsOtO6qd8SYYIM1Fph0uhMMNUEmbby0UaBJ05vbUfbRmZW12G81ItC1+hPjukEDw2gZE7RY5SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=o9Peqqh1; arc=none smtp.client-ip=185.70.43.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1750743399; x=1751002599;
-	bh=hM1eP511aEqGiQ/Oypz2TY+oJg/5LaiXR5FPGNAdMbk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=o9Peqqh19Ed0HPd+buLwlASOt00auKPwcD1ykbwMXnqNJ8gKY9k8uIvw/KZZNNgXH
-	 VHQ30bwaS3R0WVNlQOMyzaipjNyQfpM07sGu0zohZ4qFkNJ8/70zeuLQlBzysesvcf
-	 qmUkoghbgQ0wqsvP88ADIzQ9p2BT6/ZzWZmAbl223uIwKjPF3HeQIZSfQerALQtJfE
-	 omNeuvZPnLBpm5vIaDsZqlzgtjmvuiKp1kjqk6WGWSAkCL0FBtKH/Hgn5g5s5b63bX
-	 CVTiQXbu4JJBJuk+RERWkn0DN2KAj3dPeAoHHuPNMm8iY7KoMcXMEGcJXEEI4CMqDV
-	 UNIQSJc0uRlzg==
-Date: Tue, 24 Jun 2025 05:36:34 +0000
-To: netdev@vger.kernel.org
-From: William Liu <will@willsroot.io>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, William Liu <will@willsroot.io>
-Subject: Re: [PATCH net v2 1/2] net/sched: Restrict conditions for adding duplicating netems to qdisc tree
-Message-ID: <sJSFrPAuQr53uFRQlRKAsEZNkDg1umtbxAlgqqhnuvTobg1qwtVa-0sR-IVhFYXdgYlBIZnSD6AKlI6BAzgCrBwo7lZ5AYzX_xhhCTP3P7o=@willsroot.io>
-In-Reply-To: <20250624042238.521211-1-will@willsroot.io>
-References: <20250624042238.521211-1-will@willsroot.io>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 962b88261b723c5ee7e3127afffa0eea461bfbef
+	s=arc-20240116; t=1750744529; c=relaxed/simple;
+	bh=wCW1hIHSJFsT1xGqSuFfFcm/RaE8vBCD86ahn2llPXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aA9nmkqotxU2rT9rhNDE5+tNWCHJewHRC6ql3q+mtHRNQv5XWC3mCs58X8lZy9EXshfPB1uiLVsIYae0u20XOum9xknppSas8OARESBf/hI8FsRhak5ZUQy6gValllw+i5wOHopc4TDtYSebBKx6e1jPziQahsscpEhYQcoQbRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Klb5/qbL; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D7562442A7;
+	Tue, 24 Jun 2025 05:55:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1750744519;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2m6p9p/D+28CbseP6Ovr8xGl5DuveoQZgWX4N3sDQIk=;
+	b=Klb5/qbLnP8d2OhcnqiyHH79PvvgOlRAuS3z3Zu6eqnIabaTByNWGXFOUBC8qnonBt4vsR
+	JRFT0VOXuwJVoP6KlKxWZRfkDo4m3RksQiEICLII32pmbZXtjTUWphU1EJTXxUHJz/yDZ7
+	Y/F8i6yGuqvzOcteXA8Bgvp+VJQfstk1wnWlls1uZ5Xi+lJ1+lNd/A6fzlk+mtOVl5lvEU
+	bYJ+QoPt/+uiIdd8yWPJDWaZAQNoQAhm8ykms/oagBvkQJa6bO6BgkF5zGwtOXlM8TS3rR
+	xzCaRh6L8ZEwBNypiNHC8Xl+6hf0CnthW6MHyGrHB1nUSARHmDiM5PoS07jjcw==
+Date: Tue, 24 Jun 2025 07:55:17 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, sdf@fomichev.me, jdamato@fastly.com,
+ ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next v2 5/8] net: ethtool: copy req_info from SET to
+ NTF
+Message-ID: <20250624075517.209319f3@2a02-8440-d115-be0d-cec0-a2a1-bc3c-622e.rev.sfr.net>
+In-Reply-To: <20250623231720.3124717-6-kuba@kernel.org>
+References: <20250623231720.3124717-1-kuba@kernel.org>
+	<20250623231720.3124717-6-kuba@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgdduleduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopedvrgdtvddqkeeggedtqdguudduhedqsggvtdguqdgtvggttddqrgdvrgduqdgstgeftgdqiedvvdgvrdhrvghvrdhsfhhrrdhnvghtpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddupdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguv
+ ghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hi Jakub,
 
+On Mon, 23 Jun 2025 16:17:17 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
+> Copy information parsed for SET with .req_parse to NTF handling
+> and therefore the GET-equivalent that it ends up executing.
+> This way if the SET was on a sub-object (like RSS context)
+> the notification will also be appropriately scoped.
+> 
+> Also copy the phy_index, Maxime suggests this will help PLCA
+> commands generate accurate notifications as well.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
+It works perfectly for PLCA, now the notif is generated, and for the
+right PHY :) thanks !
 
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-On Tuesday, June 24th, 2025 at 4:24 AM, William Liu <will@willsroot.io> wro=
-te:
-
->=20
->=20
-> netem_enqueue's duplication prevention logic breaks when a netem
-> resides in a qdisc tree with other netems - this can lead to a
-> soft lockup and OOM loop in netem_dequeue as seen in [1].
-> Ensure that a duplicating netem cannot exist in a tree with other
-> netems.
->=20
-> [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilx=
-sEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@wi=
-llsroot.io/
->=20
-> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> Reported-by: William Liu will@willsroot.io
->=20
-> Reported-by: Savino Dicanosa savy@syst3mfailure.io
->=20
-> Signed-off-by: William Liu will@willsroot.io
->=20
-> Signed-off-by: Savino Dicanosa savy@syst3mfailure.io
->=20
-> ---
-> net/sched/sch_netem.c | 45 +++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 45 insertions(+)
->=20
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fdd79d3ccd8c..be38458ae5bc 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -973,6 +973,46 @@ static int parse_attr(struct nlattr *tb[], int maxty=
-pe, struct nlattr *nla,
-> return 0;
-> }
->=20
-> +static const struct Qdisc_class_ops netem_class_ops;
-> +
-> +static inline bool has_duplication(struct Qdisc *sch)
-> +{
-> + struct netem_sched_data *q =3D qdisc_priv(sch);
-> +
-> + return q->duplicate;
->=20
-> +}
-> +
-> +static int check_netem_in_tree(struct Qdisc *sch, bool duplicates,
-> + struct netlink_ext_ack *extack)
-> +{
-> + struct Qdisc *root, *q;
-> + unsigned int i;
-> +
-> + root =3D qdisc_root_sleeping(sch);
-> +
-> + if (sch !=3D root && root->ops->cl_ops =3D=3D &netem_class_ops) {
->=20
-> + if (duplicates || has_duplication(root))
-> + goto err;
-> + }
-> +
-> + if (!qdisc_dev(root))
-> + return 0;
-> +
-> + hash_for_each(qdisc_dev(root)->qdisc_hash, i, q, hash) {
->=20
-> + if (sch !=3D q && q->ops->cl_ops =3D=3D &netem_class_ops) {
->=20
-> + if (duplicates || has_duplication(q))
-> + goto err;
-> + }
-> + }
-> +
-> + return 0;
-> +
-> +err:
-> + NL_SET_ERR_MSG(extack,
-> + "netem: cannot mix duplicating netems with other netems in tree");
-> + return -EINVAL;
-> +}
-> +
-> /* Parse netlink message to set options */
-> static int netem_change(struct Qdisc *sch, struct nlattr *opt,
-> struct netlink_ext_ack *extack)
-> @@ -1031,6 +1071,11 @@ static int netem_change(struct Qdisc *sch, struct =
-nlattr *opt,
-> q->gap =3D qopt->gap;
->=20
-> q->counter =3D 0;
->=20
-> q->loss =3D qopt->loss;
->=20
-> +
-> + ret =3D check_netem_in_tree(sch, qopt->duplicate, extack);
->=20
-> + if (ret)
-> + goto unlock;
-> +
-> q->duplicate =3D qopt->duplicate;
->=20
->=20
-> /* for compatibility with earlier versions.
-> --
-> 2.43.0
-
-v2 was sent out right after some additional feedback from Cong. Please revi=
-ew v3 instead, which I will be posting shortly.
-
-pw-bot: changes-requested
-
-Thanks,
-William
+Maxime
 
