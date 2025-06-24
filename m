@@ -1,127 +1,188 @@
-Return-Path: <netdev+bounces-200468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FA5AE58C4
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 02:44:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D5EAAE58C8
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 02:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A69847A3572
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 00:42:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E155480C48
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 00:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF53B13B5A9;
-	Tue, 24 Jun 2025 00:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07193596A;
+	Tue, 24 Jun 2025 00:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P17eV58J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bnuufv7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600533594B;
-	Tue, 24 Jun 2025 00:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEAB1FC8;
+	Tue, 24 Jun 2025 00:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750725837; cv=none; b=jHpE/Ip9t3clE05c6jBfwRxWZjn5EhCAgpx/iiANqpKXCtI5Nm9V9dKvmKmtmc+/lD5QUy2gObV+Hjy329jBeZUNRSBXBchbwNKXnZcRJAuKhQMCFS3P8OLfzPMh2k4pvCicx4GxYZre1k3V2Mdtca1eyS3erdZ7MN5ja7/QhxY=
+	t=1750726093; cv=none; b=A4a0mN+4yryEl63L9yVIxcV5L3Sn9ObOReUK97GY1RtTuzWATTm4q+/odIjqP+Ay4NszVC6fJOKfkF5bW2YqAt6Jt97aDQBebWyeJ53wXp3d5SMRBpKjWVHkIoRMBNI6JTlawuzmM0Fby0vlkelcQPyC9anPq1wP75GXiS+kAgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750725837; c=relaxed/simple;
-	bh=4v5jeSRvczwqwtWBtgX+6yxvBIBymneR13YVpaJS88s=;
+	s=arc-20240116; t=1750726093; c=relaxed/simple;
+	bh=rTOaygTTYcmTIdRpitcwMypkdeq6SvvCNV1aaqNDkkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=spCcNh8Y8hFecZebOmygftGPkL2IBes203rSlcnQx5zCEGw27LdjIWbayWShMYaMJozDq0VkHE8eGVN9O0O/eQV4x75JGysvM1jrikAmD0F+AvyiXtW7kCDPs/U+/icxTx9hg+0jwqeyoRnc9P0yv8/le2F2LzBLN6le9QH+qAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P17eV58J; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750725837; x=1782261837;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4v5jeSRvczwqwtWBtgX+6yxvBIBymneR13YVpaJS88s=;
-  b=P17eV58JT/hnYWkLXbEB+QXbL1XUbceM5bgWIPJdaRs7d91pCILnyjla
-   gNAelXMh4RJoufXQKK6VewDwSdxv0nmf92aT21J7eNtIDEdLbLBQftgov
-   GnYrUtnRpSaN+IlgT0BNfjUq+4GSJsFR2+XTeDF6uIsnhQkGvuAY/99F7
-   6tIJ3JbAKWloA+PMoa5LtnditQMXEg8hx+udJk0QuHHrjmyGH1nYy03aI
-   YpTG7RayxqUWpQoCJbtgwJwvhVs/jdwD+Sgzt4ost38NDiV14R5mpvgnd
-   vVgbsxxBz2ifz9I6DjXkZf2X+hNRofXiuyQDFEzSxcu2euW4420T4yzpA
-   Q==;
-X-CSE-ConnectionGUID: H7teInt1RfuJfizLyLE85g==
-X-CSE-MsgGUID: HZOXtTZPQqCYeBhf4nNFYQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11473"; a="52069597"
-X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
-   d="scan'208";a="52069597"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2025 17:43:56 -0700
-X-CSE-ConnectionGUID: U0JSscOKQk2HxGUrroruAA==
-X-CSE-MsgGUID: XQ6fHgNQRnmUOq4v5liCSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,260,1744095600"; 
-   d="scan'208";a="151174974"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 23 Jun 2025 17:43:52 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uTrlN-000RYo-1r;
-	Tue, 24 Jun 2025 00:43:49 +0000
-Date: Tue, 24 Jun 2025 08:42:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [net-next, 10/10] bng_en: Add a network device
-Message-ID: <202506240834.02LQ6IMr-lkp@intel.com>
-References: <20250618144743.843815-11-vikas.gupta@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B8uUH3F3Py8BTJ8Q8ssvlmqIjZ0lrxC6pjRsLxdCaY8kLsi1QSJRmjQC8tfOi58ONhhh3b1essnN7So5HfK6yGqbjKzSTtEhgHFrho8QMhRC23rTl3zyWyg7JyOxHKKAq7dCK5Z/0LLDSb7k4LNUrVsILGSxaeYpAeFiyCiLbWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bnuufv7f; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3122368d7c4so4160884a91.1;
+        Mon, 23 Jun 2025 17:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750726091; x=1751330891; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=L1MZWPTRDfQCchc00xep2B3mpKruFnE3qnSwqiREt7M=;
+        b=Bnuufv7fHGVG7HhBUadOI2Ppq6nfqVbvSkLf6kT3GMqb1y8FhDvE8mawQPqMfgXFn0
+         /5qPA8Nt3galZ6uEqOxb2GrxJUNFiYwerweJLBYoLYQBv1n1p0uYcr75rOE61PNWo4qB
+         RXB2YC9pIyw6HhSdJ1VyXyV8Ybwfft6BJEbngBZVqoCuOdvCnZ4o7UVJn5r3awNW2Jsh
+         M/t8gJvTnJASmKV4fmiIh9Z2Gmn7hflcBJc69/jkmbFndu8St4TzwYqc+xhAIV+fo+QC
+         chWK75efF9KvCNc47q+EdwqrnHLsdPU+87S6tIb7eW6jgYUepjR49Sw3ofYlJLvUUZsV
+         WVKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750726091; x=1751330891;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L1MZWPTRDfQCchc00xep2B3mpKruFnE3qnSwqiREt7M=;
+        b=t5wha5s+jAsGuEzvAfOXl0Ra0ol6yRfKshFTlenYDKHq66hRxWJrTzYyycmYI0J+iB
+         ECfcnWcZhM+CBOSX4s6LAqpZEmfFZkjRsOypgvqKTEDxBj6xz7xn00lacxZz8mSmDajN
+         29mYs0OfIcoJVM0SAR/fiRMDP/u6NjUlt3OEJMye2glULTWplzve9qIlrCmsIhLi21/6
+         fNkDqCCOsJqJskcprxHTj1sHI7Lc7idOvpE9diPVjPJ7Am+DmdABMZ9eVmibhrdjvddz
+         MxEB3ABk3VytzDqZvSEhABJCDsQojtgzMZFR4BQWKEGumh5D46AKgBsvOkcJ7PoUIkLR
+         WHJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOWtbt9YVG7ce5xHTJ+8jKsBZQH60ygxSjzemS4JaWApkGJ1XpNZTpdTR4nMEVe0ofUco=@vger.kernel.org, AJvYcCVX/rgvNtqIQatAyXkjzqSdE/nCU0zSPoJ0cC7ArpLEeMgSGq0ExA0MPw/xx7mrDZAuadEainJE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw3UC2jjuieOALFvrHSQ+Zhg4JNAZ1+NHuih3ip7HQVznTbaYU
+	I1gcoOaAlYuMilLIqgtUJK8WVU0bDaYsKU/CpdJqhArbmeR3DJgP4v4=
+X-Gm-Gg: ASbGnctm9tVOAiOy8X/6/BUjQlPp3W4M/L4X5CCO801RoQ/29Du8koLTyHi09u8PrFZ
+	6Dv4pJWdAskT5p+E8Oz83zu9hNoBak925tXO1rQwZoj+Ks7Jd06OA5WMJj2vSsnG7vWO/PqRwEv
+	381WKGiqWZb1hX1Di1gKYNrOsVBuX65hWwskSOiBgxobYdv0X0CCALicw8g8P41nMUoxckhsOnA
+	yUlMvkC31Z3LPHaaDrYGD75tSgEyrGaXwzUp/HOa3R9h/w1YqdMiC6GKvuEUiNEYb0wRYmEA1rs
+	veZayOfuUOcZa614T/oFXk1rGTKOC6b9Rwl0Bg/TBNxKW7L23bH0RoWt0TiVsgLZkc9TEex/Wqa
+	hN1IhgTmy5RJ/tdGW0S+0ww4=
+X-Google-Smtp-Source: AGHT+IFpTSWnfkk3n1/q3G/36QROk1wYdIfk2vmBl7VVUFO2y6+pdPyN3yh6v5HIVpQX8xNt49uB6w==
+X-Received: by 2002:a17:90b:4a4d:b0:2ff:58c7:a71f with SMTP id 98e67ed59e1d1-3159d8ff05amr20598914a91.32.1750726091056;
+        Mon, 23 Jun 2025 17:48:11 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3158a335460sm11786350a91.49.2025.06.23.17.48.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 17:48:10 -0700 (PDT)
+Date: Mon, 23 Jun 2025 17:48:09 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, bjorn@kernel.org,
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3] net: xsk: introduce XDP_MAX_TX_BUDGET
+ set/getsockopt
+Message-ID: <aFn1ybR3kgSfvL_N@mini-arch>
+References: <20250619090440.65509-1-kerneljasonxing@gmail.com>
+ <20250619080904.0a70574c@kernel.org>
+ <aFVvcgJpw5Cnog2O@mini-arch>
+ <CAL+tcoAm-HitfFS+N+QRzECp5X0-X0FuGQEef5=e6cB1c_9UoA@mail.gmail.com>
+ <aFWQoXrkIWF2LnRn@mini-arch>
+ <CAL+tcoB-5Gt1_sJ_9-EjH5Nm_Ri+8+3QqFvapnLLpC5y4HW63g@mail.gmail.com>
+ <aFliLQiRusx_SzQ4@mini-arch>
+ <CAL+tcoBub4JpHrgWekK+OVCb0frXUaFYDGVd2XL3bvjHOTmFjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250618144743.843815-11-vikas.gupta@broadcom.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoBub4JpHrgWekK+OVCb0frXUaFYDGVd2XL3bvjHOTmFjQ@mail.gmail.com>
 
-Hi Vikas,
+On 06/24, Jason Xing wrote:
+> On Mon, Jun 23, 2025 at 10:18 PM Stanislav Fomichev
+> <stfomichev@gmail.com> wrote:
+> >
+> > On 06/21, Jason Xing wrote:
+> > > On Sat, Jun 21, 2025 at 12:47 AM Stanislav Fomichev
+> > > <stfomichev@gmail.com> wrote:
+> > > >
+> > > > On 06/21, Jason Xing wrote:
+> > > > > On Fri, Jun 20, 2025 at 10:25 PM Stanislav Fomichev
+> > > > > <stfomichev@gmail.com> wrote:
+> > > > > >
+> > > > > > On 06/19, Jakub Kicinski wrote:
+> > > > > > > On Thu, 19 Jun 2025 17:04:40 +0800 Jason Xing wrote:
+> > > > > > > > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+> > > > > > > >     rcu_read_lock();
+> > > > > > > >  again:
+> > > > > > > >     list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > > > > > > > -           if (xs->tx_budget_spent >= MAX_PER_SOCKET_BUDGET) {
+> > > > > > > > +           int max_budget = READ_ONCE(xs->max_tx_budget);
+> > > > > > > > +
+> > > > > > > > +           if (xs->tx_budget_spent >= max_budget) {
+> > > > > > > >                     budget_exhausted = true;
+> > > > > > > >                     continue;
+> > > > > > > >             }
+> > > > > > > > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> > > > > > > >  static int __xsk_generic_xmit(struct sock *sk)
+> > > > > > > >  {
+> > > > > > > >     struct xdp_sock *xs = xdp_sk(sk);
+> > > > > > > > -   u32 max_batch = TX_BATCH_SIZE;
+> > > > > > > > +   u32 max_budget = READ_ONCE(xs->max_tx_budget);
+> > > > > > >
+> > > > > > > Hm, maybe a question to Stan / Willem & other XSK experts but are these
+> > > > > > > two max values / code paths really related? Question 2 -- is generic
+> > > > > > > XSK a legit optimization target, legit enough to add uAPI?
+> > > > > >
+> > > > > > 1) xsk_tx_peek_desc is for zc case and xsk_build_skb is copy mode;
+> > > > > > whether we want to affect zc case given the fact that Jason seemingly
+> > > > > > cares about copy mode is a good question.
+> > > > >
+> > > > > Allow me to ask the similar question that you asked me before: even though I
+> > > > > didn't see the necessity to set the max budget for zc mode (just
+> > > > > because I didn't spot it happening), would it be better if we separate
+> > > > > both of them because it's an uAPI interface. IIUC, if the setsockopt
+> > > > > is set, we will not separate it any more in the future?
+> > > > >
+> > > > > We can keep using the hardcoded value (32) in the zc mode like
+> > > > > before and __only__ touch the copy mode? Later if someone or I found
+> > > > > the significance of making it tunable, then another parameter of
+> > > > > setsockopt can be added? Does it make sense?
+> > > >
+> > > > Related suggestion: maybe we don't need this limit at all for the copy mode?
+> > > > If the user, with a socket option, can arbitrarily change it, what is the
+> > > > point of this limit? Keep it on the zc side to make sure one socket doesn't
+> > > > starve the rest and drop from the copy mode.. Any reason not to do it?
+> > >
+> > > Thanks for bringing up the same question that I had in this thread. I
+> > > saw the commit[1] mentioned it is used to avoid the burst as DPDK
+> > > does, so my thought is that it might be used to prevent such a case
+> > > where multiple sockets try to send packets through a shared umem
+> > > nearly at the same time?
+> > >
+> > > Making it tunable is to provide a chance to let users seek for a good
+> > > solution that is the best fit for them. It doesn't mean we
+> > > allow/expect to see the burst situation.
+> >
+> > The users can choose to moderate their batches by submitting less
+> > with each sendmsg call. I see why having a batch limit might be useful for
+> > zerocopy to tx in batches to interleave multiple sockets, but not
+> > sure how this limit helps for the copy mode. Since we are not running
+> > qdisc layer on tx, we don't really have a good answer for multiple
+> > sockets sharing the same device/queue..
+> 
+> It's worth mentioning that the xsk still holds the tx queue lock in
+> the non-zc mode. So I assume getting rid of the limit might be harmful
+> for other non xsk flows. That is what I know about the burst concern.
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.16-rc3 next-20250623]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20250618144743.843815-11-vikas.gupta%40broadcom.com
-patch subject: [net-next, 10/10] bng_en: Add a network device
-config: i386-randconfig-061-20250621 (https://download.01.org/0day-ci/archive/20250624/202506240834.02LQ6IMr-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250624/202506240834.02LQ6IMr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506240834.02LQ6IMr-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c:26:26: sparse: sparse: symbol 'bnge_ethtool_ops' was not declared. Should it be static?
-
-vim +/bnge_ethtool_ops +26 drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-
-    25	
-  > 26	const struct ethtool_ops bnge_ethtool_ops = {
-    27		.get_drvinfo		= bnge_get_drvinfo,
-    28	};
-    29	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+But one still needs NET_RAW to use it, right? So it's not like some
+random process will suddenly start ddos-ing tx queues.. Maybe we should
+add need_resched() / signal_pending() to the loop to break it?
 
