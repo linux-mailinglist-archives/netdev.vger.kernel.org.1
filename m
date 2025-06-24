@@ -1,86 +1,80 @@
-Return-Path: <netdev+bounces-200548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D72AE60BD
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 11:22:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9636DAE60CA
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 11:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A01113BCD6C
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:22:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C5CA16F790
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC2226B080;
-	Tue, 24 Jun 2025 09:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C9A271440;
+	Tue, 24 Jun 2025 09:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJH3iY9d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSdGhIir"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5620182BC
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 09:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8171BC9E2
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 09:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750756960; cv=none; b=H78L5X8UdhVT2HpomqjaU62vxS+2cuj6RGpL05whjuz98xtTtynvr9g1fMOjKKlA/Tv8SP8bXoxSk5/D1YGD8jRr6R/xfR5GvURu1RjBPmpjnb6Gdli+ntAzkQ324KGZRk6uu5OJXlsi5XwUaKeB4PBaIDviURc7rVUEJeM49zY=
+	t=1750757065; cv=none; b=WLJcnH1pqs+NRCTpKngs1EiCV/DehUHnod7FvGwiNeRDfNl41498F5LqYo95vSES55sAliQWnY6wdjZ9vYnXNdsN8wWirRHa6D5sBUJxqy62Xwm4Po5PVTfZ8Fxb/LK687tJ6kkts2+UWbLhg0PvOjzAJcgM/w53R7y4TiyrKVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750756960; c=relaxed/simple;
-	bh=Ukpq1jm45aKlAkIiV9+KqhS/HWscWUWDsBXAj4p/usI=;
+	s=arc-20240116; t=1750757065; c=relaxed/simple;
+	bh=OOAaPBCoGc1x522s8OGPkql2FlMbcmpbBFheWsuu+ME=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CkB2IyH5YpSY+RYyaLGs1AiH4VS19TmmLrmETAnFP0WlOki83wdWWNGdBtqodTp5uvcqiliy0M/0ZrXIUVY9ov3E7kYRiYkDiGlhCrtuGBCvMnSPilAUTLewoJyqNSJAWHRrFOrqybKb6IMDYzwKw+3IKjhVHpg2XPj6G/BdWhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJH3iY9d; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750756957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6i5R+n/vxWexSFBa34cQSzNcknWdUpndgD8c+k05TSM=;
-	b=YJH3iY9dCKwFTh9ZDVv178HPgWEgRYAbHWsF2PF26YrQ77g/d9KJQV/WcGX2BqwRiyBzRA
-	zOI3f8dPs4h38/UUe1wwfk7EopjRg+br6b0hjW1pFCHxkfQwyg+pkk0zior3gO5KStwdUF
-	Ad+Mj0iS3EtEcL7mzvaJ8rhFrUedTgo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-186-TlvJwDidO4Kpad7hMmNr8w-1; Tue, 24 Jun 2025 05:22:35 -0400
-X-MC-Unique: TlvJwDidO4Kpad7hMmNr8w-1
-X-Mimecast-MFC-AGG-ID: TlvJwDidO4Kpad7hMmNr8w_1750756955
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-451ecc3be97so1328645e9.0
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 02:22:35 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=C3k1A2Ypc145oORN7yU1e3Lq6ugA1Kh4SLrS3RMJnCZ4bA+E2cyUDegRl0MatbNoOjtmjktolM/oZlzUNePAl0q9lXuFY9aQHD6KijuzTnSrJiB+qz1YTR7DKod5y5x3hjPRSAZaDuKD7+CJHIg82/cIHrDAjuUwwd9t67s+VMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSdGhIir; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ade326e366dso943221766b.3
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 02:24:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750757062; x=1751361862; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+4Wzj1ONd4I92ud2wodp7eqHo4gMAvlR5sWpKppO+IE=;
+        b=PSdGhIirWUamfXX6wfG4Hr3yhXGgZeXCdSAmzC1yVYRnYDhY1+6yxOE4pAPj/0nqjK
+         /OK5yUIT+5o5tFXxbVOu+ppljbJZ4aMKYYUvYyiPMQbDw4iZjW0Xa/On59tyFnX2TN1m
+         B9IU4oJwFIO0ENPtquwcWfq5/WG+qGoRlSd1qAf0MG2EOuAKkWBYYE2ASXaxSEGeEP2g
+         vsvXDwfJvGmku3LDrLSefxVlEyZ/9RHZ64p2LRaPM/TjtxhkZcORPirpHMM3iVmChUdv
+         24ruNdI0wCOJZY1KMRX8W1fh+3YJVh89GtGoOkE0+/ccLUoheZEs8AyD8cJDOGzlIzE7
+         PVdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750756954; x=1751361754;
+        d=1e100.net; s=20230601; t=1750757062; x=1751361862;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6i5R+n/vxWexSFBa34cQSzNcknWdUpndgD8c+k05TSM=;
-        b=Bk5WDOVjEysoegZSw+In6Bv35u50ohH1MEdxn3K+GOwq6Qx23HcAiNfSK65KeibgLW
-         4Pl0WcERUH5gwdGUWAkZ1U9qxQtjyG/DNvg/l7TXlT5rAKfNSk3bwJ/r9WwdZ2o0Hk2a
-         2VXW4VJQDqckWYpUscSpY9XhwJ13BALATQ6yT0ZUoWMrnjwfjJAVyC1grCYOF599SWda
-         bcNjKJhToqdkERWo8f+qvKjZvnczR2bv11X/hCiyukaaBM3i12CL5POtGbZGizMdwAbe
-         R3xvJMq1Vaoq6CvXt42UMxioLR9+GToKnhuO6aXqdQX8t/nRedhRLVEZe9GCbbhe9u6j
-         gn1g==
-X-Forwarded-Encrypted: i=1; AJvYcCW22sRm9v4aVP42aI29gmCESW7NGNEVhGyR8RAFEc/J+fe5X+lPNTwcZMPdYjOlLXIruqeyQA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFpnBKX3cNhtd1HJb3HCI60OyuMS8bsMx0oZauCFttVKf0ZKoz
-	8RpmKpOcV7ZBvJAc5Jk73hhYIK0bnPSL7XwA7jbnMigPdhK+P+10G3lZqRxdR9trYaP6gKH7UxN
-	zweHUaGFBoXkIazf4NIx2vLaeuZLOJLcFo7f63DLxmACRJDtf+mAzEk76zw==
-X-Gm-Gg: ASbGncvaDkjN6ZR9P2lOv/qFGJA5fTwzJrZOUnGQAYpuw+kSdYbaqO7sjOJhvQNBf+t
-	goMPD0J5MCdPRf0u3F/cyMITHQHUKCi1SN8XMtivEb0iaPSW+OwQs5bnS1H5ii5bJsQembPukuF
-	QIn2TcfjasNDQ2k550EZF1BbSUCZCe+5rvWhDo6ZRV2MJOFlluDdZunRlTUSTz7Y0/cNGGgPxLW
-	D5EH0Bg8G5HlfokpM3MnSe9ycb4Q9FD/lt/3wvZiRXW9rh7ChJ96WJGvOXPMSozjJhhHa2r0ALh
-	sbEmsmw4sD7ma9XSxpsEs/UrX13i6w==
-X-Received: by 2002:a05:600c:358a:b0:442:d9fc:7de with SMTP id 5b1f17b1804b1-453662c4ce5mr114324675e9.22.1750756954556;
-        Tue, 24 Jun 2025 02:22:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHDjlhoN4Ydt23k3YEBasRRqSzsYV7t/7wCcPkWzugVKQL+QOzhD83UOYUchZtB5g1nQg8jnQ==
-X-Received: by 2002:a05:600c:358a:b0:442:d9fc:7de with SMTP id 5b1f17b1804b1-453662c4ce5mr114324445e9.22.1750756954162;
-        Tue, 24 Jun 2025 02:22:34 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2445:d510::f39? ([2a0d:3344:2445:d510::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453647082a2sm136692175e9.37.2025.06.24.02.22.32
+        bh=+4Wzj1ONd4I92ud2wodp7eqHo4gMAvlR5sWpKppO+IE=;
+        b=p5MmO3IHLtuxQKUS2/voUtc6D1quJHvGPYsRHglWMfJ/a5FZQKQNW8xXKswXrSKI6n
+         r5lZN1MXO/PMQ2CgmMfkFwLJlzFRhig1Zrp4mDs3hoTnU0o9DSxpPfS1+PKk5bCyh/2u
+         hwKsMkUgd0lWeC2wDns4WUy8lhOxkhY6olWTxcMYPdcPZ/vrtfsGzqbgfzVyi4IpHJkE
+         1jo0lqMB3M4Ts/eqwp19H/WP5ffMnnHREfaDgQ2w1yskx/Vzh6DaCZmxiSIXTuyeJ1Xa
+         wpJXh9+1rUMf8yaLj4RQnnshXms26iYL2t0Z/LNHliyZopTUNLi3tfNQ39FP5yga5Oa4
+         luug==
+X-Gm-Message-State: AOJu0YwKtsBgtZbRezR3SsyGTtMLd64zX32qKQhJuIZdh4Y8puJUD6ue
+	e4EDYeCgZlsgGlP8z7tfLkY8Tl+KxLviuJ4la1ie6uo4ujFWlB4oBloU
+X-Gm-Gg: ASbGnct56u/1iVXHldJPRyYmopbXzN9NyqfHyj78mWClkKFoY+LicY5xy/r3KHGK9h/
+	c+k94a74gkgCrUzXCv12HdZ5ggGBaPrUwqXDHdTeGbHe43TVBjzPCew3Z+YeFYfSJh8h1DUWbTP
+	6ptip6Nqyk0o4Bu/32Fph0Jk1rwYixyA2UBynArrn25N4qNbQO/sb8JB/J9VLIxR8/VAgGHgUNy
+	Et8UX1Bwsq8INZSY45KZsaRj/VrrF2ABArcqD77CTe9XVaLVu2WZGn/+EUAcl3ZJYSckJt3WDJN
+	SJcwAMSMxFjUeK8TlZ4Nh0FXHPax8onB/wz51iUR3EPnCDRsbU2JFWUkuTSLbMwPKyBuO/nHOGC
+	VjQlrIIkvago/eMycfwWphXyfajBDQ40UP22qLREsggpMpE+t7mvA68M6ijp7prAOAfuF1kLY6q
+	Vu86R8unrlU0whx+A=
+X-Google-Smtp-Source: AGHT+IHOGKuGH7Yeg6NWfhyPwSVuXL047bcbV1p/UsDIEvEi67bjaHTDm++3lo/n7HGNogQWrwkTbA==
+X-Received: by 2002:a17:907:3e17:b0:ae0:6a5a:4cd4 with SMTP id a640c23a62f3a-ae06a5a518cmr1184420466b.12.1750757062080;
+        Tue, 24 Jun 2025 02:24:22 -0700 (PDT)
+Received: from ?IPV6:2003:ed:774b:fc38:d9ac:77b7:ed46:71db? (p200300ed774bfc38d9ac77b7ed4671db.dip0.t-ipconnect.de. [2003:ed:774b:fc38:d9ac:77b7:ed46:71db])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0b10645c1sm52483066b.69.2025.06.24.02.24.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 02:22:33 -0700 (PDT)
-Message-ID: <caef5686-961d-43aa-8141-c9c90ada2307@redhat.com>
-Date: Tue, 24 Jun 2025 11:22:32 +0200
+        Tue, 24 Jun 2025 02:24:21 -0700 (PDT)
+Message-ID: <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
+Date: Tue, 24 Jun 2025 11:24:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,52 +82,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [patch 08/13] ptp: Split out PTP_PIN_GETFUNC ioctl code
-To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-References: <20250620130144.351492917@linutronix.de>
- <20250620131944.218487429@linutronix.de>
+Subject: Re: Incomplete fix for recent bug in tc / hfsc
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Jiri Pirko <jiri@resnulli.us>
+References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
+ <aFosjBOUlOr0TKsd@pop-os.localdomain>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250620131944.218487429@linutronix.de>
+From: Lion Ackermann <nnamrec@gmail.com>
+In-Reply-To: <aFosjBOUlOr0TKsd@pop-os.localdomain>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/20/25 3:24 PM, Thomas Gleixner wrote:
-> Continue the ptp_ioctl() cleanup by splitting out the PTP_PIN_GETFUNC ioctl
-> code into a helper function. Convert to lock guard while at it.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
->  drivers/ptp/ptp_chardev.c |   52 ++++++++++++++++++++--------------------------
->  1 file changed, 23 insertions(+), 29 deletions(-)
-> 
-> --- a/drivers/ptp/ptp_chardev.c
-> +++ b/drivers/ptp/ptp_chardev.c
-> @@ -396,6 +396,28 @@ static long ptp_sys_offset(struct ptp_cl
->  	return copy_to_user(arg, sysoff, sizeof(*sysoff)) ? -EFAULT : 0;
->  }
->  
-> +static long ptp_pin_getfunc(struct ptp_clock *ptp, unsigned int cmd, void __user *arg)
-> +{
-> +	struct ptp_clock_info *ops = ptp->info;
-> +	struct ptp_pin_desc pd;
-> +
-> +	if (copy_from_user(&pd, arg, sizeof(pd)))
-> +		return -EFAULT;
-> +
-> +	if (cmd == PTP_PIN_GETFUNC2 && !mem_is_zero(pd.rsv, sizeof(pd.rsv)))
-> +		return -EINVAL;
-> +	else
-> +		memset(pd.rsv, 0, sizeof(pd.rsv));
+Hi,
 
-Minor nit: I personally find the 'else' statement after return
-counter-intuitive and dropping it would save an additional LoC.
+On 6/24/25 6:41 AM, Cong Wang wrote:
+> On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
+>> Hello,
+>>
+>> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem is
+>> incomplete:
+>>     sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
+>>     https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangcong@gmail.com/
+>>
+>> This patch also included a test which landed:
+>>     selftests/tc-testing: Add an HFSC qlen accounting test
+>>
+>> Basically running the included test case on a sanitizer kernel or with
+>> slub_debug=P will directly reveal the UAF:
+> 
+> Interesting, I have SLUB debugging enabled in my kernel config too:
+> 
+> CONFIG_SLUB_DEBUG=y
+> CONFIG_SLUB_DEBUG_ON=y
+> CONFIG_SLUB_RCU_DEBUG=y
+> 
+> But I didn't catch this bug.
+>  
+
+Technically the class deletion step which triggered the sanitizer was not
+present in your testcase. The testcase only left the stale pointer which was
+never accessed though.
+
+>> To be completely honest I do not quite understand the rationale behind the
+>> original patch. The problem is that the backlog corruption propagates to
+>> the parent _before_ parent is even expecting any backlog updates.
+>> Looking at f.e. DRR: Child is only made active _after_ the enqueue completes.
+>> Because HFSC is messing with the backlog before the enqueue completed, 
+>> DRR will simply make the class active even though it should have already
+>> removed the class from the active list due to qdisc_tree_backlog_flush.
+>> This leaves the stale class in the active list and causes the UAF.
+>>
+>> Looking at other qdiscs the way DRR handles child enqueues seems to resemble
+>> the common case. HFSC calling dequeue in the enqueue handler violates
+>> expectations. In order to fix this either HFSC has to stop using dequeue or
+>> all classful qdiscs have to be updated to catch this corner case where
+>> child qlen was zero even though the enqueue succeeded. Alternatively HFSC
+>> could signal enqueue failure if it sees child dequeue dropping packets to
+>> zero? I am not sure how this all plays out with the re-entrant case of
+>> netem though.
+> 
+> I think this may be the same bug report from Mingi in the security
+> mailing list. I will take a deep look after I go back from Open Source
+> Summit this week. (But you are still very welcome to work on it by
+> yourself, just let me know.)
+> 
+> Thanks!
+
+> My suggestion is we go back to a proposal i made a few moons back (was
+> this in a discussion with you? i dont remember): create a mechanism to
+> disallow certain hierarchies of qdiscs based on certain attributes,
+> example in this case disallow hfsc from being the ancestor of "qdiscs that may
+> drop during peek" (such as netem). Then we can just keep adding more
+> "disallowed configs" that will be rejected via netlink. Similar idea
+> is being added to netem to disallow double duplication, see:
+> https://lore.kernel.org/netdev/20250622190344.446090-1-will@willsroot.io/
+> 
+> cheers,
+> jamal
+
+I vaguely remember Jamal's proposal from a while back, and I believe there was 
+some example code for this approach already? 
+Since there is another report you have a better overview, so it is probably 
+best you look at it first. In the meantime I can think about the solution a 
+bit more and possibly draft something if you wish.
 
 Thanks,
-
-Paolo
-
+Lion
 
