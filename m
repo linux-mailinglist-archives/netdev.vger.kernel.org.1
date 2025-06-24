@@ -1,152 +1,182 @@
-Return-Path: <netdev+bounces-200544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27DE0AE6024
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 11:02:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C5FAE603C
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 11:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14B2E4C1A24
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:02:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70FEC4C103D
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58C327A929;
-	Tue, 24 Jun 2025 09:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D38D27A445;
+	Tue, 24 Jun 2025 09:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LRdDA8vD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vRx2hDm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AC827A460
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 09:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BA819CD01
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 09:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750755751; cv=none; b=PIMGCgT0CBircD2iy6pq80weJmfamzmYr/gg4r/HyiPtADdc7ro8eAL4VuO3edS8hPDxaAFCxXdpfApT92G12W+4EALDjbzPPPrGBTgaX+xNwhsdFstMnz3Vj+mxbXhRyIX+lnoKaOBzNCIfDsLzgCxuQ/hKXWFMJamHNGDAllM=
+	t=1750756053; cv=none; b=Cd2wmH0iEfn0ZaGHvFZjCPbKDG+aEg5h+8P9+8JY3Tj8vHE+ZHRLEiRjOSTqanzt7ck1IsnMwlieHQbcx9WtDnRKwRL4TNfAACpYok7Z3LCUb9qdKadk56nSypOg2LoLMhS37wODTULoj+DU8wKvLczFWHaZvCbYZhZGOzevVhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750755751; c=relaxed/simple;
-	bh=JP89Vj/TbeY6UC2SgI40l+r8YLLxMD0iD9JJ5lKeLaQ=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=BopGbiLeYo9Qovb97rLqQBhOS2RLgAN86/LTumcwud7bs+ngkVHTCxR5RsAbR8njmIlzXiQ9UXFrcVMXcAAIebtLUPvtgfQBr54yyfza9IrRPSGVB/F6H/qf+UPgbGPtVmyK+onWc5OWRyFtLJ3nsVEUSDiVMpDYPmDc2GEiD1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LRdDA8vD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750755749;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qlOdlXhfpJ2qnP2BlVlsaFgHtdVv+17pO3XA1MNaXFU=;
-	b=LRdDA8vDqLRaHKOkCs/iXcE9LiGOwFfHX11PlktcmGDy198e4OKsf/oUl3GHMgl78clwky
-	sIfFE9nQ06LLXBTLIRDmG6HmTtZnnmrCLywlOk8Ytz2Yli68Ru5CLvboNwW9txi/dqFT4o
-	Rl0PYc641/gIVCbeqYei7xjlShKS4Os=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-psbfh304N8yHCFiaoILq0w-1; Tue,
- 24 Jun 2025 05:02:22 -0400
-X-MC-Unique: psbfh304N8yHCFiaoILq0w-1
-X-Mimecast-MFC-AGG-ID: psbfh304N8yHCFiaoILq0w_1750755739
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC1561956046;
-	Tue, 24 Jun 2025 09:02:13 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6E92618046C4;
-	Tue, 24 Jun 2025 09:02:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <aFlaxwpKChYXFf8A@infradead.org>
-References: <aFlaxwpKChYXFf8A@infradead.org> <2135907.1747061490@warthog.procyon.org.uk> <1069540.1746202908@warthog.procyon.org.uk> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk> <1098395.1750675858@warthog.procyon.org.uk>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: dhowells@redhat.com, Andrew Lunn <andrew@lunn.ch>,
-    Eric Dumazet <edumazet@google.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>,
-    David Hildenbrand <david@redhat.com>,
-    John Hubbard <jhubbard@nvidia.com>,
-    Mina Almasry <almasrymina@google.com>, willy@infradead.org,
-    Christian Brauner <brauner@kernel.org>,
-    Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
-    linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-    Logan Gunthorpe <logang@deltatee.com>,
-    Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: How to handle P2P DMA with only {physaddr,len} in bio_vec?
+	s=arc-20240116; t=1750756053; c=relaxed/simple;
+	bh=/+oFva9BAMPIUaaePpc0bX11cPgvD5Vr0m/U5RUCT7k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TtYdF71zYD3K+neHhbaI65C+LI+Equ57XEF/6LjDzt5rzgF27tIJRfWxOSVDGBy08nXbce8l/G7CyrYEb7/T34Pd5ckq9choNfkWUBj1zZ9shj/o3vUcE3ozmfjDQDzdniwSRpzt5xBQktO5zSTQrQ/WfjtFeTX9nCkk4QkKxJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vRx2hDm4; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32ade3723adso60713911fa.0
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 02:07:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1750756048; x=1751360848; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QEkjORmLKCGHcTPv1I+arAaNEGLpp2uwOI99NBj0S1k=;
+        b=vRx2hDm42aRkhp3WfnExlng6M15Pb/z0CSMkvXnNYiE/Of0ZSX4S1bDxkiFnwivhXz
+         +CHf8CKbe4eN0OKNejaU8RXENzGrt+u+PSaU85WWr2ntDbD7sOiQpNawCkEYLco/Hq3c
+         IXmZwoMNpcP7syxmgIGgMBcIlFIVoVxLaCrUI8NUY2R2NUY5TOEmQaWuAJiRmVvHG3N+
+         kE6ohM89AeRYvUjddqVI0nIacweaeW21l2I8g/Htvm2aQlkKXfpQPJhFiE3Tkf9AZ9ad
+         8uFTyPCUPR41M3LJvPYHOX3wigbSkrteCDkAO+mbzaugIuuispiSUfzWcRUXHHm9ATqs
+         f68A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750756048; x=1751360848;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QEkjORmLKCGHcTPv1I+arAaNEGLpp2uwOI99NBj0S1k=;
+        b=DwSORZEqqtkKFTFJxWet1X+KMMLo0XcVCbE7o6GgYrbR64tJNfI/cHTBD4NXBplesy
+         y91fstNmifvNp14/ekdoJHOEHU7TjTHWJkWxT+GypS0je80L+n3pmO/WWTCuFfO2NGAu
+         vjIDv3Q8PFj46Y3qWc23zRbsz6refQpgXZrks46F6LML7C9snjB80f2z4NVzK/g2Ex1H
+         wQgp5qNjX29rw/bdxt2bxGtZzN2e0+yaHKq3vFfnaaoFenClbZF7sxrZrAuTGByzPpEA
+         /S093IB4nPv5FWsF/7tBexAEsFqcz5Be8UlGr19WEKZfEr1I2J7SO+gehDH+zNnh5VNs
+         y2bA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUAXBt7ILDPbT0GGCSqPUR1eVgrjnagJJYXL2X/2Q+SM+lSrKb7VIb3W3lZ3shbL66mf9aVPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6E1WpTOJPeqCmrI3qGI6jR8uH+jGI6tlv9xESXyLVi6LL287+
+	QNzm6Y6WgULt13bT1FS2PfpLQIqU3meRzgtVdvosE/5iyeswf8hrjWOsn5j9L1acN4KTmdF1jQO
+	RZaykZVezabnY0+zsoo9Ay1P0zHkeixErSds9FrIjMA==
+X-Gm-Gg: ASbGncukQi0qgFyCKUwssrYQDA9QeGg8bETVpERakItvT50U7uik0p+iOtQELSMCCVe
+	fP0YeimkcBMKjTnV8B46glO1S14AyAdVmCjcz7byrAsp3xcoAQxDZeIL1OYtmSS1tneABJnmmve
+	XomT3cCb+gkFqyKA5MSVJ9JMQYYhr28E30S4SqdHPTIPs=
+X-Google-Smtp-Source: AGHT+IH7NkkqE0u1Pl2ganomiNqMqAhRg3C9WLn7TyJZFZs+q4IPIwIOvcAx25Ana4p0OU4o4Gq4cJf2y3C5mcoaVGc=
+X-Received: by 2002:a05:651c:2203:b0:32a:8086:cf7 with SMTP id
+ 38308e7fff4ca-32b98f93a35mr55314771fa.29.1750756048004; Tue, 24 Jun 2025
+ 02:07:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1143686.1750755725.1@warthog.procyon.org.uk>
-Date: Tue, 24 Jun 2025 10:02:05 +0100
-Message-ID: <1143687.1750755725@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+References: <20250624-ks8995-dsa-bindings-v1-0-71a8b4f63315@linaro.org>
+ <20250624-ks8995-dsa-bindings-v1-2-71a8b4f63315@linaro.org> <08531445-a27d-413f-96de-81087d6f61e1@lunn.ch>
+In-Reply-To: <08531445-a27d-413f-96de-81087d6f61e1@lunn.ch>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 24 Jun 2025 11:07:16 +0200
+X-Gm-Features: AX0GCFu4xk6sV-XT4-gtoBmw_KE6a5a_5-qZmVHj_0_F3IuNErxg7GOMvfHwbPw
+Message-ID: <CACRpkdbr8-0=bZ0mRkZ9DnWrKZbQM3AuNdzbxyWTX1qiEAgJjw@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] ARM: dts: Fix up wrv54g device tree
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Imre Kaloz <kaloz@openwrt.org>, Frederic Lambert <frdrc66@gmail.com>, Gabor Juhos <juhosg@openwrt.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org, devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Christoph Hellwig <hch@infradead.org> wrote:
+On Tue, Jun 24, 2025 at 10:16=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+> On Tue, Jun 24, 2025 at 09:41:12AM +0200, Linus Walleij wrote:
 
-> On Mon, Jun 23, 2025 at 11:50:58AM +0100, David Howells wrote:
-> > What's the best way to manage this without having to go back to the page
-> > struct for every DMA mapping we want to make?
-> 
-> There isn't a very easy way.  Also because if you actually need to do
-> peer to peer transfers, you right now absolutely need the page to find
-> the pgmap that has the information on how to perform the peer to peer
-> transfer.
+> > +                             ethernet-port@0 {
+> > +                                     reg =3D <0>;
+> > +                                     label =3D "1";
+> > +                                     phy-mode =3D "rgmii";
+>
+> If this is an internal PHY, it would be better to use 'internal'. I
+> would like to avoid all the issues around 'rgmii' vs 'rgmii-id'.
 
-Are you expecting P2P to become particularly common?  Because page struct
-lookups will become more expensive because we'll have to do type checking and
-Willy may eventually move them from a fixed array into a maple tree - so if we
-can record the P2P flag in the bio_vec, it would help speed up the "not P2P"
-case.
+OK you're right, I'll rewrite this and the example in the binding
+to use "internal", as this is what it is.
 
-> > Do we need to have
-> > iov_extract_user_pages() note this in the bio_vec?
-> > 
-> > 	struct bio_vec {
-> > 		physaddr_t	bv_base_addr;	/* 64-bits */
-> > 		size_t		bv_len:56;	/* Maybe just u32 */
-> > 		bool		p2pdma:1;	/* Region is involved in P2P */
-> > 		unsigned int	spare:7;
-> > 	};
-> 
-> Having a flag in the bio_vec might be a way to shortcut the P2P or not
-> decision a bit.  The downside is that without the flag, the bio_vec
-> in the brave new page-less world would actually just be:
-> 
-> 	struct bio_vec {
-> 		phys_addr_t	bv_phys;
-> 		u32		bv_len;
-> 	} __packed;
-> 
-> i.e. adding any more information would actually increase the size from
-> 12 bytes to 16 bytes for the usualy 64-bit phys_addr_t setups, and thus
-> undo all the memory savings that this move would provide.
+The fifth PHY is inside the switch, yet "external" in a way.
+They are all managed by external MDIO though, see below.
 
-Do we actually need 32 bits for bv_len, especially given that MAX_RW_COUNT is
-capped at a bit less than 2GiB?  Could we, say, do:
+> > +                             ethernet-port@4 {
+> > +                                     reg =3D <4>;
+> > +                                     ethernet =3D <&ethb>;
+> > +                                     phy-mode =3D "rgmii-id";
+> > +                                     fixed-link {
+> > +                                             speed =3D <100>;
+> > +                                             full-duplex;
+> > +                                     };
+>
+> That is a bit odd, rgmii-id, yet speed limited to 100. It would be
+> good to add a comment about this.
 
- 	struct bio_vec {
- 		phys_addr_t	bv_phys;
- 		u32		bv_len:31;
-		u32		bv_use_p2p:1;
- 	} __packed;
+Copy/paste error when working with old code :(
 
-And rather than storing the how-to-do-P2P info in the page struct, does it
-make sense to hold it separately, keyed on bv_phys?
+It's good old "mii"
 
-Also, is it possible for the networking stack, say, to trivially map the P2P
-memory in order to checksum it?  I presume bv_phys in that case would point to
-a mapping of device memory?
+> This is all confusing. Do you have the board, or a schematic for it?
 
-Thanks,
-David
+I was confused because I managed to find phonto of thePCB
+for the board in question:
+https://real.phj.hu/wrv54g/
 
+If you look on the bottom of the image, there is a component
+to the LAN ports, chip tag reads: "SWAP net NS604009" (made 0421)
+but I think it's just one of these isolation transformers so the
+PHYs are indeed internal (the KS8995 is the component above
+with the heat sink mounted on top).
+
+> >                       mdio {
+> >                               #address-cells =3D <1>;
+> >                               #size-cells =3D <0>;
+> >
+> > -                             /* Should be ports 1-4 on the KS8995 swit=
+ch */
+> > +                             /* Should be LAN ports 1-4 on the KS8995 =
+switch */
+> > +                             phy1: ethernet-phy@1 {
+> > +                                     reg =3D <1>;
+> > +                             };
+> > +                             phy2: ethernet-phy@2 {
+> > +                                     reg =3D <2>;
+> > +                             };
+> > +                             phy3: ethernet-phy@3 {
+> > +                                     reg =3D <3>;
+> > +                             };
+> >                               phy4: ethernet-phy@4 {
+> >                                       reg =3D <4>;
+> >                               };
+>
+> This node is the SoC interface MDIO bus. Why would the internal PHYs
+> of switch bus on the SoC MDIO bus? I would expect the switch to have
+> its own MDIO bus and place its PHYs there.
+
+This switch is so old that in difference from other DSA switches it does
+not have its own internal MDIO bus... I know for sure because I'm working
+on another device and I can access all PHY:s over MDIO. It depends
+on an external MDIO connection.
+
+Here is a datasheet:
+https://docs.rs-online.com/0889/0900766b81385414.pdf
+
+On page 45 it says:
+"A standard MIIM interface is provided for all five PHY devices in the
+ KS8995MA/FQ. An external device with MDC/MDIO capability is able
+ to read PHY status or to configure PHY settings."
+
+I'll update and repost so it makes more sense!
+
+Yours,
+Linus Walleij
 
