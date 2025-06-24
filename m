@@ -1,125 +1,184 @@
-Return-Path: <netdev+bounces-200523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32386AE5DAB
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:28:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72282AE5DAC
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:29:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 232B34A7164
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:28:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3FB188C3A8
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F61253355;
-	Tue, 24 Jun 2025 07:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7EA5255E34;
+	Tue, 24 Jun 2025 07:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHTfpFtY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gukn8GYs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42F824EA85
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 07:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CB624EA85;
+	Tue, 24 Jun 2025 07:28:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750750103; cv=none; b=bT15N1cmcsUnGEWKa6S2WZtx70m/ZjAGEYtLyikBFyzNZ5Pxa6P6y5e/n/scRccpj4BIoCosSJ8B29ncDyXl9Lx8bopYpPw6q0Xh4fom1lRnmis3CjqjuPaP1qX7gTgEu2SF8lrw5viyl5Jwfm81YUZtrreI9jI48NtPnsBD2Pg=
+	t=1750750126; cv=none; b=g1WvrpTxne0P6s514wSqk+3FdkitxxclbBJrf805L5gZxrNgLtgUuOnFx6qNrHG3aZySwZICLqUzr9+a511MS3bKfDbEE8n32FdgOYGH6Xl+F5HIpWB90xth81PIGf0V9x4to0jB7UYyx/9ePi+3bgkE8+bfvJONBw+fY9M5Y4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750750103; c=relaxed/simple;
-	bh=WTyU4uIoL45lMqVlFAlsJ7iFEAkWYnXl0ZCY3CDJIek=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hTb/whvFXUZA9ogA1Di5fZu/oA6bmu5AfCMpkoDidf/f2QLpl14XJ4YNtjcUGO7F9L8ZGHH8cK+X3pPTWK2IFqOVdKR6Hke5B6Sdjwk1fAWyW1KdxIokm2FRnQbGZaYU0cfe6ixN4gcxmLzhiQQy6EYjPb4TtJg0gsRridpYQGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GHTfpFtY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750750100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H93KP2X9wKia0oxgYl069stHzy0a79pbdFNyKfhSK1w=;
-	b=GHTfpFtYOP6DZvewapWIER3hrnY9zVh/vAIWtFECaZdd1bydTPjw9uuMmozpkeDtZ0NSmF
-	QBTsGhQt+o8KvnsirDdoI1gnb4RVYI39Qw1rebUuMKOc0ADwuukjRPZdzEaspypGKMi1Rj
-	sWBSsueieqe8P3v7e2le8ww7/3/X0y4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-czFz8gq1ONSOvt8YB-rlcw-1; Tue, 24 Jun 2025 03:28:19 -0400
-X-MC-Unique: czFz8gq1ONSOvt8YB-rlcw-1
-X-Mimecast-MFC-AGG-ID: czFz8gq1ONSOvt8YB-rlcw_1750750098
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4eec544c6so52843f8f.0
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 00:28:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750750098; x=1751354898;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H93KP2X9wKia0oxgYl069stHzy0a79pbdFNyKfhSK1w=;
-        b=wyfv6sxfrZ/8ZXwfVl+NUvL+2pgPj5kA5agmuVfVVTYuSNoS5JrfjMdHuL9HvgrhXy
-         IMlMtAacZakrVyyjMzMPVb1MkbgM6PfdbfZ/x7oPq8pZSB6hAK1SQWLzGdIEnJLqsTk5
-         ShTR8/W3rsdX4/vhK/77v4ZVzGQXLhVkUowXXSfFIHpWJoKvGnS9L0iMmexfngghdsVn
-         byw5OQf955x3N/HwlSneEGd38UW+MwDZE2onaZOTq6iJOGMF5VMJf5eFu/DCd0ph9oRZ
-         BwHGTn1rSf4GcLqpdAkDmkiiVIxN3UlN11k593WOIlVEuPYDKUUp3BUxZFwYLqxtEZ31
-         tKdg==
-X-Forwarded-Encrypted: i=1; AJvYcCW89qPt0jnFe88+1Ndq54zN0DQc71FEA71elMsumAghYfL22iZ1kCv/KzcqyP7Jk5ecOZIxx/w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvaJVV9mgO5dOaguHqm5UuJEHJWp/DjVAHYYtUTSf9jHGcdmwk
-	Yf52qBveRyVNgeG4ZkXoLks5zEGZSWgKAJpKXCUgJNeb32sTFmXmg2ruywD0wxrfZHuCxQPmxRb
-	ecgJPbYHtUYg0n+LYDBBFa8DccoIQB8fiY086ea8ktpwf9TmQoT9+mtShKw==
-X-Gm-Gg: ASbGncuRoTRROFJ81ji/w/+khIA5l5lf4XGegasH8+NOxQCRDcv8JzdySs9qgyorP/c
-	zwTjIt6dobqqIq3PGE4/uTcmZKmsd+8ZsTG6bmGbDc78HcJzx8sZqgQt4DX5mc6OxRNr9q5L+It
-	853tXNBymSae3pH/7QCDCC5FPS7dGF0NTliLLS5uJH0xW+1yMB6sDRdqrNmaZE8KUwv0UjiyCpJ
-	rPgsRVu0BJUq4HKDWNgOcK9ZZo33A/dhvpy/oi3U7h9mHCHmeDIcAAvPgxoroc1yqyDDV/jfu3W
-	NLotp2GbCiNJlgkrHZ6AU42kKDQ89Q==
-X-Received: by 2002:a05:6000:2906:b0:3a3:7ba5:93a5 with SMTP id ffacd0b85a97d-3a6d130b3b5mr11787494f8f.26.1750750097875;
-        Tue, 24 Jun 2025 00:28:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG4US9Z2OYdrK7D8E0VF4/l/TVl23gapFn02nrrA4RMD2EOy2rkOxCQvpT3wA+JYCKYL4wdvg==
-X-Received: by 2002:a05:6000:2906:b0:3a3:7ba5:93a5 with SMTP id ffacd0b85a97d-3a6d130b3b5mr11787468f8f.26.1750750097493;
-        Tue, 24 Jun 2025 00:28:17 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2445:d510::f39? ([2a0d:3344:2445:d510::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e8069534sm1172291f8f.44.2025.06.24.00.28.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 00:28:16 -0700 (PDT)
-Message-ID: <923746b8-73d4-483c-b687-388a7cc2b74a@redhat.com>
-Date: Tue, 24 Jun 2025 09:28:15 +0200
+	s=arc-20240116; t=1750750126; c=relaxed/simple;
+	bh=g0pXc/fIN30kvH2Virs4nkVnamuyy0huOlw1+j0TCiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r5nb35kzmqObpReTOqCii6eV1iMi2sX/JA+0QoalAlHDkCoogWTFBDFgZ5TOygyEfUG5lsz4Qo/v+yiV8uZcSHg6uJ7eHrARBWKj+5wdgvikfLso+x1dMM56zGx2QWBB3mmZe46cuhk9A4T8FYk4B5VC8Wjg4AJqLngX/P6xBts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gukn8GYs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532B9C4CEE3;
+	Tue, 24 Jun 2025 07:28:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750750126;
+	bh=g0pXc/fIN30kvH2Virs4nkVnamuyy0huOlw1+j0TCiE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gukn8GYs+wpCJs8dwZyrg7QtHcLeHxgvHUf5Q6yYFg2C9BOEmDGLZizI6sGEa26dd
+	 AXs2VFgQ42jn313Jggk4V0ILiINJVwDGLMci1cSQWA/Wnat7vTWZPJqUqLwIF40C2w
+	 DB5SetH/wVRGB4WLiqemm7k1keA5ZvZmhtE6Frd6ifdr8+9XFWkT36y+r7uY0iPWVK
+	 7wqVd1s0PcAv5xA2AqsBduQdkOjE/CGEwb+m9pvBvE3rpcfh+prPNg4r7+X/NZWbZj
+	 vz5KuBRA5M7nLhYwD3ZCbZbORFWCzuMpELU5hnh9Hkq8OxdNOzUNWWy2+/pxZnl9TL
+	 tv2j3pfN4Gt8w==
+Date: Tue, 24 Jun 2025 09:28:43 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Joy Zou <joy.zou@nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	shawnguo@kernel.org, s.hauer@pengutronix.de, catalin.marinas@arm.com, will@kernel.org, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
+	ulf.hansson@linaro.org, richardcochran@gmail.com, kernel@pengutronix.de, 
+	festevam@gmail.com, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-pm@vger.kernel.or, frank.li@nxp.com, ye.li@nxp.com, 
+	ping.bai@nxp.com, aisheng.dong@nxp.com
+Subject: Re: [PATCH v6 2/9] dt-bindings: soc: imx-blk-ctrl: add i.MX91
+ blk-ctrl compatible
+Message-ID: <urgfsmkl25woqy5emucfkqs52qu624po6rd532hpusg3fdnyg3@s5iwmhnfsi26>
+References: <20250623095732.2139853-1-joy.zou@nxp.com>
+ <20250623095732.2139853-3-joy.zou@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v3 0/8] Add support for 25G, 50G, and 100G to
- fbnic
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
- linux@armlinux.org.uk, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, kernel-team@meta.com, edumazet@google.com
-References: <175028434031.625704.17964815932031774402.stgit@ahduyck-xeon-server.home.arpa>
- <5ce8c769-6c36-4d0a-831d-e8edab830beb@redhat.com>
- <20250620073602.5ea8ea6c@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250620073602.5ea8ea6c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250623095732.2139853-3-joy.zou@nxp.com>
 
-On 6/20/25 4:36 PM, Jakub Kicinski wrote:
-> On Thu, 19 Jun 2025 10:44:41 +0200 Paolo Abeni wrote:
->> Apparently this is causing TSO tests 
+On Mon, Jun 23, 2025 at 05:57:25PM +0800, Joy Zou wrote:
+> Add new compatible string "fsl,imx91-media-blk-ctrl" for i.MX91,
+> which has different input clocks compared to i.MX93. Update the
+> clock-names list and handle it in the if-else branch accordingly.
 > 
-> I had a closer look, I think the TSO test case is always failing,
-> the test that didn't fail before but fails now is the test for
-> pause statistics. Since the driver didn't support pause config
-> before the test returned XFAIL, now there is pause but no stats
-> so it fails. I guess we may have been better off using SKIP rather
-> than XFAIL in the test case, so that the CI doesn't consider lack
-> of results a pass.
+> Keep the same restriction for the existed compatible strings.
+> 
+> Signed-off-by: Joy Zou <joy.zou@nxp.com>
+> ---
+> Changes for v5:
+> 1. modify the imx93-blk-ctrl binding for imx91 support.
 
-Thanks for the pointers. I agree the issue is in the selftests code and
-patches LGTM.
+This is just vague. Anything can be "modify". Why are you doing this?
+What are you doing here?
 
-Thanks,
+> ---
+>  .../soc/imx/fsl,imx93-media-blk-ctrl.yaml     | 55 +++++++++++++++----
+>  1 file changed, 43 insertions(+), 12 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/soc/imx/fsl,imx93-media-blk-ctrl.yaml b/Documentation/devicetree/bindings/soc/imx/fsl,imx93-media-blk-ctrl.yaml
+> index b3554e7f9e76..db5ee65f8eb8 100644
+> --- a/Documentation/devicetree/bindings/soc/imx/fsl,imx93-media-blk-ctrl.yaml
+> +++ b/Documentation/devicetree/bindings/soc/imx/fsl,imx93-media-blk-ctrl.yaml
+> @@ -18,7 +18,9 @@ description:
+>  properties:
+>    compatible:
+>      items:
+> -      - const: fsl,imx93-media-blk-ctrl
+> +      - enum:
+> +          - fsl,imx91-media-blk-ctrl
+> +          - fsl,imx93-media-blk-ctrl
+>        - const: syscon
+>  
+>    reg:
+> @@ -31,21 +33,50 @@ properties:
+>      maxItems: 1
+>  
+>    clocks:
+> +    minItems: 8
+>      maxItems: 10
+>  
+>    clock-names:
+> -    items:
+> -      - const: apb
+> -      - const: axi
+> -      - const: nic
+> -      - const: disp
+> -      - const: cam
+> -      - const: pxp
+> -      - const: lcdif
+> -      - const: isi
+> -      - const: csi
+> -      - const: dsi
+> +    minItems: 8
+> +    maxItems: 10
+>  
+> +allOf:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: fsl,imx93-media-blk-ctrl
+> +    then:
+> +      properties:
 
-Paolo
+Missing constraints for clocks
+
+> +        clock-names:
+> +          items:
+> +            - const: apb
+> +            - const: axi
+> +            - const: nic
+> +            - const: disp
+> +            - const: cam
+> +            - const: pxp
+> +            - const: lcdif
+> +            - const: isi
+> +            - const: csi
+> +            - const: dsi
+
+Keep list in comon part.
+
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: fsl,imx91-media-blk-ctrl
+
+This should be before if: for imx93. 91 < 93
+
+> +    then:
+> +      properties:
+
+Why imx91 now has 10 clocks?
+
+v6 and this has basic issues. The quality of NXP patches decreases :/
+
+> +        clock-names:
+> +          items:
+> +            - const: apb
+> +            - const: axi
+> +            - const: nic
+> +            - const: disp
+> +            - const: cam
+> +            - const: lcdif
+> +            - const: isi
+> +            - const: csi
+
+No, look at other bindings how they share clock lists.
+
+Best regards,
+Krzysztof
 
 
