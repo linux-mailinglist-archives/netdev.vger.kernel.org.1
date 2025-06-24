@@ -1,129 +1,122 @@
-Return-Path: <netdev+bounces-200622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90BF8AE6534
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D28AE653B
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E6C4A60F8
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:39:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE28F4A76D5
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DE1291C08;
-	Tue, 24 Jun 2025 12:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA03291C0A;
+	Tue, 24 Jun 2025 12:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W6GHJ9nD"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="L4wtRu9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5614230996;
-	Tue, 24 Jun 2025 12:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7546827C16A
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 12:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750768746; cv=none; b=jcIKjiP82/R/zM86NZ7F0Q9SkWmR2z6EBLAp1zAMJgKYa4qv4dTyvyNVXK1p1sx6yZT6STiskO1aCpRs3NZBiVOcuxK5+nu4hWb00FeBPF5Ua5Q4keeugvYA0SAZp5tpQN3rZ0+cqd8qAICb5lew8ZhC3uylitHgFSpR6SqFDQ0=
+	t=1750768823; cv=none; b=nElO5LwJGxaZ7qsfIj4pESBVpzuNWunlUlbaY5MWK+TBirh9h/ZKMhBfJfWFgMISQCDVmLeh/C908jeV4+HUB9zLBybvyElFTEBicj54g+RVdppCSDbUcA+aBT7W6bnFvetqvCsjlRkkNt05gU5YObyLBanwww9CP0wD8i77Xyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750768746; c=relaxed/simple;
-	bh=4P8wd9h5Go264P/9N+8xDjMZjsgekEEzsS81qXtyA0M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uhmLS5kOz7GHtI0eTmTMmeyD7cVP5FHHUadTVbbJn0eSfI18GGpJ4855hOe69dUuXEEGOq0bo/dNjq0me8zp0ur3PreGk+XgmrZ1BJSu9ziD6VVQWuB5aTvv1Bhg7nuFueeelUa3rJg8OhSz4wNRBV6rAk/kLQNyrz4NxoNWkNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W6GHJ9nD; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0hakl0/kYPdggumUkyNzKLxp5ngjPrYeJTMOFwUQIRA=; b=W6GHJ9nDe8Pjyc8lP/+jiNtUot
-	tEV2YfGRhCnLYBES0b6YVkr8LBiUF8sj81PF+eHHOH1G3NPn5GhDshzrr8iZec7DNgrnHoHIgfSG8
-	mYmlXBZl7lUIdQOM2ADjdzD8dbkUx8tszlW3N1dar2Zy0fyxFeHZS12t5fZeqO5eB2UkDd0+i2LQe
-	CVMMgiq3wc/JqmPHJU3WZgdiw5jCGKKKximG6PYpCDZLy4Ldbx1q0hWJIQY3rljTUpDloQIypJBOF
-	rn4Ulq7/ZtTByPIQ+Wy3e4+mD8O4K3gVvFFnzCcVR/VwzsMkQWMdSNvbnor6GQbfYMgBKqbW/87Mq
-	hM4pGj5Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uU2vU-00000005bfF-49O8;
-	Tue, 24 Jun 2025 12:39:00 +0000
-Date: Tue, 24 Jun 2025 05:39:00 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Hildenbrand <david@redhat.com>,
-	John Hubbard <jhubbard@nvidia.com>,
-	Mina Almasry <almasrymina@google.com>, willy@infradead.org,
-	Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: How to handle P2P DMA with only {physaddr,len} in bio_vec?
-Message-ID: <aFqcZMXUYx6qqDx_@infradead.org>
-References: <aFlaxwpKChYXFf8A@infradead.org>
- <2135907.1747061490@warthog.procyon.org.uk>
- <1069540.1746202908@warthog.procyon.org.uk>
- <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
- <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
- <1015189.1746187621@warthog.procyon.org.uk>
- <1021352.1746193306@warthog.procyon.org.uk>
- <1098395.1750675858@warthog.procyon.org.uk>
- <1143687.1750755725@warthog.procyon.org.uk>
+	s=arc-20240116; t=1750768823; c=relaxed/simple;
+	bh=cHHzTIXhwtARmju9cK4L23TwilG152pnyyrZSkCEM8k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GXKzEGuOW/iHP2yvIaM3UL0eslPyM16EPyyI9PjfZCKA5ZX53T6e5HLADxMFdiEeBArPWwnpRP6ROM/vF+RlGERbmWmwW9C8bvTeaZCDMpWN6RgKXoVJUcc+RC5VDHCNTBrtJDIxcbyOQjjBhbVZL2dOO0AwGufiQ7M2yk1FGpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=L4wtRu9G; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ade33027bcfso60820766b.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 05:40:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1750768820; x=1751373620; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F80+FeXYZ4PIUD3SGso4Ms5tu5YoNmQsHY1ak8AKKkY=;
+        b=L4wtRu9G/v6ulXJS6ABb4SfgVIdEd4HbO1n52iyEMMCVbchlzJdh3lbzNi8qjpNkq9
+         TXT9jnum/a+0mXa5GXPW3OgnRjtnKD6ihJ7B9O+C58PYq22HXXDU+HBXTqTvTwOKebhJ
+         sRY+phuWpweQypNQsp/H21FNctAkk83vBzneIn0Jk0UM02puesadSO5kGPYlmESNGVcY
+         ZGf/e4FOQvzvWYMBpsUp8/OVafHup0HwMfvuSpi/pEvt8KlOXd6WIjI/3ogR/TH0JGH1
+         QNTC1o1GzchJgxfwx1bFH4nuDpP5XP9i2ozNT/WNp38DYcVea/G81AzEUz4wLJtAaXt7
+         tYtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750768820; x=1751373620;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F80+FeXYZ4PIUD3SGso4Ms5tu5YoNmQsHY1ak8AKKkY=;
+        b=UhZ+DpGisFhbCVD7Zh73nVd+ViVpEvpQm3q95MtpmMufdODU2OS9WhMuD6roVrv7hz
+         aVMDwSoOdnG8MhP3bVCWPrCWQHjzMUyAPFNe1S5TT7de5/woteCDbQYqrW7CIRgb+a5T
+         bVgeKWAUQpW6e0bdtsRQ4I19pN1NLEHX6ALAjejdqbwPt8W7gOvT4sviBQqjhgET1kDw
+         yZwtNmRSrjUi6feA2TKlSGjl0km6uVDfiL9wWcMV5Ue2BBCa3wvC1od7kTK97ybXSR17
+         qFWAjEu9uidHircwMr55zo1zsPLOIAHW6ycS3Qo3p20/FYQOGnqO1XiDF0rUNN4SFjnw
+         j25g==
+X-Forwarded-Encrypted: i=1; AJvYcCV4gwI4JP1s45bHc8OPaKi0FF/I+Rbfs9JYIn5/1WBEQx78F348w1OBxr5J2+YJN3Ijc1CnURE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDYwpO6EzJI5OVU3rk4W9THKuWgwgeUNcMImsZtBHs5Z0GisOT
+	WhT58nnuaYsAlJMqwG8MUpzfcRA4VzBxjNXwSPnzoMpn7sj5cG5RtxHJNDIgeLU29Ug=
+X-Gm-Gg: ASbGnctCsMb7XcQbEkQ6w3ooKi1jJoPe3f2V4gRB7SqDiOe2IRF7MJ+TsYEB1cGiWXu
+	e8bTld+RZSUTL52XBv+l3cFW0ZAIILjlYSaxH2DaxPnQgAr6BeTL2Xpy77Go69emOntLZW8AqzP
+	i3KzBp/LeT3cTVrOZaTPxfk0JwU0X4MWma2Hyy+dy6iUW+nb8xpcX507XztCcYWPeUdUD7po46m
+	SerXtH60fmJjRze7AZd+6T2kFy3GrHfSZ62Fd+YtIEgN3j2pR+RMREZMsSQ2E4Ajv2oUIYPi0ST
+	zGE1HkrjjEwMvjYrH93zFraf4QQcBBPcTLxt+i6sGUD3+qGZwwcoLMkBmoNH3PtLp9ARpAkv3UO
+	fKQ2NPOcF26cPIH3B2Q==
+X-Google-Smtp-Source: AGHT+IFwA+WLgLYFy2O6tezSdaj6yB20MbU6CjR5LnHVa2z1IrkO2ka6zQXD/IvsDUtxSuEP3ohnhQ==
+X-Received: by 2002:a17:907:788:b0:ae0:a61f:2957 with SMTP id a640c23a62f3a-ae0a61f2a29mr380167966b.48.1750768819290;
+        Tue, 24 Jun 2025 05:40:19 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae054082d0esm875142466b.79.2025.06.24.05.40.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jun 2025 05:40:18 -0700 (PDT)
+Message-ID: <7dd1f60b-2efe-4e85-8449-f2b5dff79b90@blackwall.org>
+Date: Tue, 24 Jun 2025 15:40:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1143687.1750755725@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v5 1/3] bridge: move mcast querier dumping
+ code into a shared function
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, idosch@nvidia.com, bridge@lists.linux-foundation.org,
+ entwicklung@pengutronix.de
+References: <20250623093316.1215970-1-f.pfitzner@pengutronix.de>
+ <20250623093316.1215970-2-f.pfitzner@pengutronix.de>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250623093316.1215970-2-f.pfitzner@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 24, 2025 at 10:02:05AM +0100, David Howells wrote:
-> > There isn't a very easy way.  Also because if you actually need to do
-> > peer to peer transfers, you right now absolutely need the page to find
-> > the pgmap that has the information on how to perform the peer to peer
-> > transfer.
+On 6/23/25 12:33, Fabian Pfitzner wrote:
+> Put mcast querier dumping code into a shared function. This function
+> will be called from the bridge utility in a later patch.
 > 
-> Are you expecting P2P to become particularly common?
-
-What do you mean with 'particularly common'?  In general it's a very
-niche thing.  But in certain niches it gets used more and more.
-
-> Because page struct
-> lookups will become more expensive because we'll have to do type checking and
-> Willy may eventually move them from a fixed array into a maple tree - so if we
-> can record the P2P flag in the bio_vec, it would help speed up the "not P2P"
-> case.
-
-As said before, the best place for that is a higher level structure than
-the bio_vec.
-
-> Do we actually need 32 bits for bv_len, especially given that MAX_RW_COUNT is
-> capped at a bit less than 2GiB?  Could we, say, do:
+> Adapt the code such that the vtb parameter is used
+> instead of tb[IFLA_BR_MCAST_QUERIER_STATE].
 > 
->  	struct bio_vec {
->  		phys_addr_t	bv_phys;
->  		u32		bv_len:31;
-> 		u32		bv_use_p2p:1;
->  	} __packed;
+> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+> ---
+> 
+> I decided to not only move the code into a separate function, but also
+> to adapt it to fit into the function. If I split it into a pure refactoring
+> and an adapting commit, the former will not compile preventing git bisects.
+> 
+> ---
+>  include/bridge.h   |  3 +++
+>  ip/iplink_bridge.c | 59 +++-----------------------------------------
+>  lib/bridge.c       | 61 ++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 67 insertions(+), 56 deletions(-)
+> 
 
-I've already heard people complain 32-bit might not be enough :) 
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-> And rather than storing the how-to-do-P2P info in the page struct, does it
-> make sense to hold it separately, keyed on bv_phys?
-
-Maybe.  But then you need to invent your own new refcounting for the
-section representing the hot pluggable p2p memory.
-
-> Also, is it possible for the networking stack, say, to trivially map the P2P
-> memory in order to checksum it?  I presume bv_phys in that case would point to
-> a mapping of device memory?
-
-P2P is always to MMIO regions.  So you can access it using the usual
-MMIO helpers.
 
 
