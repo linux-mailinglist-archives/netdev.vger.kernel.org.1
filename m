@@ -1,98 +1,113 @@
-Return-Path: <netdev+bounces-200525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF139AE5DB5
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:29:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A347AE5E28
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 09:41:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 889A51893C1E
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:29:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD61F16892F
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60547253B71;
-	Tue, 24 Jun 2025 07:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPEmQW1i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C43F2571C3;
+	Tue, 24 Jun 2025 07:38:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B3D24E014;
-	Tue, 24 Jun 2025 07:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A855254AE7
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 07:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750750163; cv=none; b=Qv7+jQzqvEyEjlVhmbjq/N1b8srOeBrhlQ9RgI8lwE8fI/LINDxyjZFl51zxiIBKmFVMQLx5dbdNmT/NrxPh24zt6RziTp94Yh58snxQCGMq/N+A/XPud4Oz6gu4TI6Ff/v5o5w3+aX9HqY4WoDpFeZISJbD9+wL1ANfAG5n5X0=
+	t=1750750710; cv=none; b=nYiCGynk6oCQ6m9FpDeaoEhggmi9Yeco5Q6j1chFs+T73rUcCH/pAkihDHRFQNceyY9tYi5zMbs8PCKS8XdwLF6++b9hpvdWauapNUhxq63CZldsRPu6vuYgDHr60Jh8jMLC/uy/kVUTeVHBc+PYoKvDw7ZHk4yppRxGVH1gkas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750750163; c=relaxed/simple;
-	bh=O27h05PvealtzA1SswhnPXVG+5x+RcHWMCkh/jC3fzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iYTOtlWXvh1iiHZzgSieIqkjMd/EQVVgPoISNzJVB98rSJ56OFFMWnBCO96EwGH0j/RTtQ+zJT3iE+uEUhPCTA+TFbuDyf4BRs9gAnzsOfmncN1pbFoglNnOxFbpIPezrVXjG++7QR/a6KSnMewXqnaaVDtw79CdNZqaenXEuUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPEmQW1i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D785C4CEEF;
-	Tue, 24 Jun 2025 07:29:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750750163;
-	bh=O27h05PvealtzA1SswhnPXVG+5x+RcHWMCkh/jC3fzg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qPEmQW1inTq4Rpz5TUtePLSc6M6wPN0iX9FAI+ANN3bNbUoGhlMxDrBNp4HIv9N8O
-	 IfZFoam4LndvThNLZjiuuozIkQldFXvt6eumbSasbO4ll51KjH0wpn7w+p2gDtX4le
-	 SNr5kv6XvlY85pE7L3jZNdA1+qRcUn8eegbfyVTvFCFubK7H1VfA6H140rF76hBRAN
-	 k5AMMfiXVOBLFR6KPhbmH55pm91lEbGhYT4zMSW/D6IO1TbA4sM566MkDttt0VMA+m
-	 697fFdIMkAx7lPtBbZ/GqzgVUgykeoUilBk51aczraYcbmI58+/DmBDu8uGqPobKaX
-	 TjlOImCORjQLQ==
-Date: Tue, 24 Jun 2025 09:29:20 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Joy Zou <joy.zou@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	shawnguo@kernel.org, s.hauer@pengutronix.de, catalin.marinas@arm.com, will@kernel.org, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
-	ulf.hansson@linaro.org, richardcochran@gmail.com, kernel@pengutronix.de, 
-	festevam@gmail.com, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-pm@vger.kernel.or, frank.li@nxp.com, ye.li@nxp.com, 
-	ping.bai@nxp.com, aisheng.dong@nxp.com
-Subject: Re: [PATCH v6 0/9] Add i.MX91 platform support
-Message-ID: <t5lg2iw2ha3xpqnce64k4xgaim3f2shfe4ccgnqggtouzy2lc3@se4e6ldggjtx>
-References: <20250623095732.2139853-1-joy.zou@nxp.com>
+	s=arc-20240116; t=1750750710; c=relaxed/simple;
+	bh=bu7lf+8eNZa6HkeLexi/tLJzh61KugG0RPEB9GwynZc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=E9fEfmz6//v5k+ynZijvVPFlZvcLgMw7Jv4ZVK5UgDPPOigY9gfSVE28HEHyoF5YAQRUNkkQwvjTTdXhwBWA9Js9dTDcvpbC483ZQVzpcK2ZiTFslf4etMreBBinDgregzjy6dGs37Kz5dAHr7ugP4Iw+7PJlWJdrSCExVQ3xLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3ddba1b53e8so1246075ab.1
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 00:38:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750750708; x=1751355508;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dD1pfGKpIHd7EJHi4GSso/Jg7ueKo2Dyr930wdR6pvs=;
+        b=rTKwqfuQVEI8enfpK2e5bGr5O0vSM4PgmC4ddU0boKJGtX073Y9J2IpGENYsVADWZS
+         F0eMRPceZ2PNsoISmH748PAlMVbPOK+iFvyMUWk8HblBeZfqbit2DYc/EjFxjLULe5xX
+         2MRFw/KHiycgenIY58/fn2xv+f2sT/q/rts57oNJydkzpHB2qNvIPCZ69Uadt0+loFm8
+         Rp4oQRRhl1NtwdRb1dDL9spvTbMqhR2iMWkcJIKzg7/pEVYcCacs/ruBO8jbImMp/Fxq
+         2nPEw6TGGCETvSPtUBXqP3StMFZPD5403wZRaRm1+TQl9Tv+FdLvthPbvo8ZXJQ4Z/m4
+         vBWw==
+X-Forwarded-Encrypted: i=1; AJvYcCV2BfqGgr8XyQsBm8Q2GV3+3LPDS7CFDAgWWifiU10SjQK5DKq8Z94UosH5IpWnZ6BtVWSS3DQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbH7wPYkEOsHUuW2O3eYubt8EhmjVejyowtoLYVQL6oD1DB7cd
+	tZyr0FQE2kV23EKu2wajfTC+viof1DAm14gIzNrG9auRkdKHwkUI8Bigx9DojURgDDYy0MwrzKA
+	ytYOY0U7Z639vU8Xr84Wq18BHhrFV3RuYZv99um1ShltVqg2WroEEqqXOXdI=
+X-Google-Smtp-Source: AGHT+IGFvan+sLVICasUV9mrknNLM93SyV2I3nVI8xj82yoT87rTsXmrftSXQU1UlH9ARBM7yizP6NW2nEvbn0f3fQybPgAqy8c8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250623095732.2139853-1-joy.zou@nxp.com>
+X-Received: by 2002:a92:cd8a:0:b0:3dd:d98c:cca9 with SMTP id
+ e9e14a558f8ab-3de38c15abemr181040565ab.3.1750750707815; Tue, 24 Jun 2025
+ 00:38:27 -0700 (PDT)
+Date: Tue, 24 Jun 2025 00:38:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <685a55f3.050a0220.2303ee.0007.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Jun 2025)
+From: syzbot <syzbot+list0a0103c65a978177d9c8@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jun 23, 2025 at 05:57:23PM +0800, Joy Zou wrote:
-> The design of i.MX91 platform is very similar to i.MX93.
-> Extracts the common parts in order to reuse code.
-> 
-> The mainly difference between i.MX91 and i.MX93 is as follows:
-> - i.MX91 removed some clocks and modified the names of some clocks.
-> - i.MX91 only has one A core.
-> - i.MX91 has different pinmux.
-> - i.MX91 has updated to new temperature sensor same with i.MX95.
-> 
-> ---
-> Changes for v6:
-> - add changelog in per patch.
-> - correct commit message spell for patch #1.
-> - merge rename imx93.dtsi to imx91_93_common.dtsi and move i.MX93
->   specific part from imx91_93_common.dtsi to imx93.dtsi for patch #3.
-> - modify the commit message for patch #3.
-> - restore copyright time and add modification time for common dtsi for patch #3.
-> - remove unused map0 label in imx91_93_common.dtsi for patch #3.
-> - remove tmu related node for patch #4.
-> - remove unused regulators and pinctrl settings for patch #5.
-> - add new modification for aliases change patch #6.
+Hello wireless maintainers/developers,
 
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Where are the links to the previous versions? Why are you not using b4?
+During the period, 3 new issues were detected and 4 were fixed.
+In total, 52 issues are still open and 163 have already been fixed.
 
-Best regards,
-Krzysztof
+Some of the still happening issues:
 
+Ref  Crashes Repro Title
+<1>  11683   Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<2>  8852    Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<3>  6771    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<4>  1213    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<5>  654     Yes   INFO: task hung in reg_process_self_managed_hints
+                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
+<6>  571     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+<7>  559     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+<8>  431     No    WARNING in ieee80211_request_ibss_scan
+                   https://syzkaller.appspot.com/bug?extid=1634c5399e29d8b66789
+<9>  430     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
+                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
+<10> 201     Yes   INFO: task hung in ath9k_hif_usb_firmware_cb (3)
+                   https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
