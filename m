@@ -1,223 +1,153 @@
-Return-Path: <netdev+bounces-200511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40526AE5C44
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 07:59:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BECEAE5C56
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 08:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F125189E5BC
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:59:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B92A7400862
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 05:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E681F242D99;
-	Tue, 24 Jun 2025 05:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0FF23BCF5;
+	Tue, 24 Jun 2025 05:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="gU+c/rkw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hoCXzdw1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A072523C8D5
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 05:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE2A2376EF;
+	Tue, 24 Jun 2025 05:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750744728; cv=none; b=Wnpy9eLYRoMVbADV+3Xfh2V4/5WV9OMAm9yc3nmM1vRJHH/CAM8jkDCZNDCgbpLBjeLV7z+Se1Uf/8sTt42ISRUS+fUlNbXov37IZEimxPbuYR5okgAzEluczzsDyxO5DUNzgpNxuWAby7o5LwcVlY9qm9zpjsYgcFweTCbPh6s=
+	t=1750744774; cv=none; b=ULSy8eH7C4EI3BvYXEx6z1hzgfEfb6wlvKWrePmZsgXLQaMfJWl4jH49BzKIw3f+7Z0bKwFtkETsGSmyh3VzKHYwtdYIRVLIwwcILqZf9LuVjldxng6R5jUL1FSOhliNnWqihMc564yga2oKY3rYLOXuL6imH7yEE3Fm+pqbflM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750744728; c=relaxed/simple;
-	bh=PGUxgafawITU9oJKUlvjkZJMxiTsHxs04axFJ1wu1qY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EhHSdNoZKosTUoNXDQas1Um7eLS8XVVRfctkWaP7jFW5hP/Czt/A+Swq02Y9hC7I4agrIaXVU7O2kBgOvXxgafxqARWrVK6QEhPoSPPoD6Kx8M+pzcqgEFC+reMdpFNDXFarUh14Y0TzM2Z6YqoEs1ZX/MOnaHs1+ctr66zrnpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=gU+c/rkw; arc=none smtp.client-ip=79.135.106.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1750744720; x=1751003920;
-	bh=jlhiM7eGqAoWV6RLRZcoBqaGLEBaI4IW4+LXCbueE+Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=gU+c/rkwOgBzkzIAPwqUIn6wod22qmdaSA6tDf4V2hObdXdu3oAUrU9f2eBKrXX7q
-	 wPHxJvZaDD+2gVBbCsj+2yiDdRfj5X0nUOEk2iXudlUL/scZJEadQsBMHk3JIzlSIy
-	 paaMUWczVRjH5grAeP4T/5cymiSNoaE/hVN2tiWVWp5uY/VZR9fnSvHrswUNrSLmq2
-	 ba3TKxj6COjxtstddfDltzHJkZ+bESEPsjrf6/HwbB7cJ5aDyneREmcKRdXjx1lKqO
-	 +uGtgESgKMnPYiJy9Rx2Y1YLsWLHBLrdPdUK6ZowQRh8kFQQ4tj8tvWPnQuvqH3SQk
-	 tMva7K9L6agaQ==
-Date: Tue, 24 Jun 2025 05:58:35 +0000
-To: netdev@vger.kernel.org
-From: William Liu <will@willsroot.io>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, William Liu <will@willsroot.io>
-Subject: [PATCH net v3 2/2] selftests/tc-testing: Add tests for restrictions on netem duplication
-Message-ID: <20250624055706.531880-1-will@willsroot.io>
-In-Reply-To: <20250624055537.531731-1-will@willsroot.io>
-References: <20250624055537.531731-1-will@willsroot.io>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 4ecf9eee8ee0ef9054d417776408d31d432f78f4
+	s=arc-20240116; t=1750744774; c=relaxed/simple;
+	bh=V9eow4rBKvmgqVvTRxHC9LaJnc5DBz8bNExDpZiS8+A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YxaxHDhCSr8dEHLnkGQQAwF24YdRplRPxUAT0bIzZ8GchkXZnsolYJMqKdV/G7EEU1ZzpJBQ9eLsoE9axMCSIz3C1aasi8/jD5RGXN0aC8m7/3ghoz/McxZYFz97CYydA1fKgEZqeaKiRLXHB+Ot+uDvNXWkTUCWlyI+HkBQRL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hoCXzdw1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD622C4CEE3;
+	Tue, 24 Jun 2025 05:59:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750744773;
+	bh=V9eow4rBKvmgqVvTRxHC9LaJnc5DBz8bNExDpZiS8+A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hoCXzdw1wg+urhSr5H9B1oP20Moe14xmC7aZ9Zbbo90AtuE9Geb0fhoD6trNcFjah
+	 2J+jVba5gKMFH1Zm3uN7uJyTMVIBDsKk5BYyiuqbal5Jh8Ar1nN2+VbZntI3nD8/ug
+	 zKn6pTixuAwHcNnO9eVdpotgfkejSD0QN3aaWpORFczsh1FwrantZz3eD65LBmHLJv
+	 NtK4KeeQQlFhsrmls5bZFmO9nTmDCRPUwxnqiAypEqF2qVaRvjECos10U5IAq7wNVm
+	 lAKYkNV6LbFYNI27n/MO5JZ8fVBASXerVIld7bBZfZl4Q46/OQxMO3XgzBIiwcUuHc
+	 Xsaw5e+MsSJaw==
+Message-ID: <633986ae-75c4-44fa-96f8-2dde00e17530@kernel.org>
+Date: Tue, 24 Jun 2025 07:59:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Ensure that a duplicating netem cannot exist in a tree with other netems
-in both qdisc addition and change. This is meant to prevent the soft
-lockup and OOM loop scenario discussed in [1]. Also adjust a HFSC's
-re-entrancy test case with netem for this new restriction - KASAN
-still triggers upon its failure.
-
-[1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsE=
-BNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@will=
-sroot.io/
-
-Signed-off-by: William Liu <will@willsroot.io>
-Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
----
-v1 -> v2: https://lore.kernel.org/all/20250622190344.446090-2-will@willsroo=
-t.io/
-  - Fixed existing test case for new restrictions
-  - Add test cases
-  - Use dummy instead of lo
----
- .../tc-testing/tc-tests/infra/qdiscs.json     |  5 +-
- .../tc-testing/tc-tests/qdiscs/netem.json     | 81 +++++++++++++++++++
- 2 files changed, 83 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json =
-b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-index 9aa44d8176d9..9acc88297484 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -478,7 +478,6 @@
-             "$TC qdisc add dev $DUMMY parent 1:1 handle 2:0 netem duplicat=
-e 100%",
-             "$TC filter add dev $DUMMY parent 1:0 protocol ip prio 1 u32 m=
-atch ip dst 10.10.10.1/32 flowid 1:1",
-             "$TC class add dev $DUMMY parent 1:0 classid 1:2 hfsc ls m2 10=
-Mbit",
--            "$TC qdisc add dev $DUMMY parent 1:2 handle 3:0 netem duplicat=
-e 100%",
-             "$TC filter add dev $DUMMY parent 1:0 protocol ip prio 2 u32 m=
-atch ip dst 10.10.10.2/32 flowid 1:2",
-             "ping -c 1 10.10.10.1 -I$DUMMY > /dev/null || true",
-             "$TC filter del dev $DUMMY parent 1:0 protocol ip prio 1",
-@@ -491,8 +490,8 @@
-             {
-                 "kind": "hfsc",
-                 "handle": "1:",
--                "bytes": 392,
--                "packets": 4
-+                "bytes": 294,
-+                "packets": 3
-             }
-         ],
-         "matchCount": "1",
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json =
-b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-index 3c4444961488..718d2df2aafa 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-@@ -336,5 +336,86 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
-+    },
-+    {
-+        "id": "d34d",
-+        "name": "NETEM test qdisc duplication restriction in qdisc tree in=
- netem_change root",
-+        "category": ["qdisc", "netem"],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1",
-+            "$TC qdisc add dev $DUMMY parent 1: handle 2: netem limit 1"
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DUMMY handle 1: netem dupli=
-cate 50%",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-+        "matchPattern": "qdisc netem",
-+        "matchCount": "2",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY handle 1:0 root"
-+        ]
-+    },
-+    {
-+        "id": "b33f",
-+        "name": "NETEM test qdisc duplication restriction in qdisc tree in=
- netem_change non-root",
-+        "category": ["qdisc", "netem"],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1",
-+            "$TC qdisc add dev $DUMMY parent 1: handle 2: netem limit 1"
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DUMMY handle 2: netem dupli=
-cate 50%",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-+        "matchPattern": "qdisc netem",
-+        "matchCount": "2",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY handle 1:0 root"
-+        ]
-+    },
-+    {
-+        "id": "cafe",
-+        "name": "NETEM test qdisc duplication restriction in qdisc tree",
-+        "category": ["qdisc", "netem"],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1 duplica=
-te 100%"
-+        ],
-+        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent 1: handle 2: nete=
-m duplicate 100%",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-+        "matchPattern": "qdisc netem",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY handle 1:0 root"
-+        ]
-+    },
-+    {
-+        "id": "1337",
-+        "name": "NETEM test qdisc duplication restriction in qdisc tree ac=
-ross branches",
-+        "category": ["qdisc", "netem"],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DUMMY parent root handle 1:0 hfsc",
-+            "$TC class add dev $DUMMY parent 1:0 classid 1:1 hfsc rt m2 10=
-Mbit",
-+            "$TC qdisc add dev $DUMMY parent 1:1 handle 2:0 netem",
-+            "$TC class add dev $DUMMY parent 1:0 classid 1:2 hfsc rt m2 10=
-Mbit"
-+        ],
-+        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent 1:2 handle 3:0 ne=
-tem duplicate 100%",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-+        "matchPattern": "qdisc netem",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY handle 1:0 root"
-+        ]
-     }
- ]
---=20
-2.43.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] bnxt: properly flush XDP redirect lists
+To: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
+Cc: Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com
+References: <aFl7jpCNzscumuN2@debian.debian>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <aFl7jpCNzscumuN2@debian.debian>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
+
+On 23/06/2025 18.06, Yan Zhai wrote:
+> We encountered following crash when testing a XDP_REDIRECT feature
+> in production:
+> 
+[...]
+> 
+>  From the crash dump, we found that the cpu_map_flush_list inside
+> redirect info is partially corrupted: its list_head->next points to
+> itself, but list_head->prev points to a valid list of unflushed bq
+> entries.
+> 
+> This turned out to be a result of missed XDP flush on redirect lists. By
+> digging in the actual source code, we found that
+> commit 7f0a168b0441 ("bnxt_en: Add completion ring pointer in TX and RX
+> ring structures") incorrectly overwrites the event mask for XDP_REDIRECT
+> in bnxt_rx_xdp.
+
+(To Andy + Michael:)
+The initial bug was introduced in [1] commit a7559bc8c17c ("bnxt:
+support transmit and free of aggregation buffers") in bnxt_rx_xdp()
+where case XDP_TX zeros the *event, that also carries the XDP-redirect
+indication.
+I'm wondering if the driver should not reset the *event value?
+(all other drive code paths doesn't)
+
+
+> We can stably reproduce this crash by returning XDP_TX
+> and XDP_REDIRECT randomly for incoming packets in a naive XDP program.
+> Properly propagate the XDP_REDIRECT events back fixes the crash.
+> 
+> Fixes: 7f0a168b0441 ("bnxt_en: Add completion ring pointer in TX and RX ring structures")
+
+We should also add:
+
+Fixes: a7559bc8c17c ("bnxt: support transmit and free of aggregation 
+buffers")
+
+  [0] https://git.kernel.org/torvalds/c/7f0a168b0441 - v6.8-rc1
+  [1] https://git.kernel.org/torvalds/c/a7559bc8c17c - v5.19-rc1
+
+> Tested-by: Andrew Rzeznik <arzeznik@cloudflare.com>
+> Signed-off-by: Yan Zhai <yan@cloudflare.com>
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+> ---
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 2cb3185c442c..ae89a981e052 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -2989,6 +2989,7 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+>   {
+>   	struct bnxt_napi *bnapi = cpr->bnapi;
+>   	u32 raw_cons = cpr->cp_raw_cons;
+> +	bool flush_xdp = false;
+>   	u32 cons;
+>   	int rx_pkts = 0;
+>   	u8 event = 0;
+> @@ -3042,6 +3043,8 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+>   			else
+>   				rc = bnxt_force_rx_discard(bp, cpr, &raw_cons,
+>   							   &event);
+> +			if (event & BNXT_REDIRECT_EVENT)
+> +				flush_xdp = true;
+>   			if (likely(rc >= 0))
+>   				rx_pkts += rc;
+>   			/* Increment rx_pkts when rc is -ENOMEM to count towards
+> @@ -3066,7 +3069,7 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+>   		}
+>   	}
+>   
+> -	if (event & BNXT_REDIRECT_EVENT) {
+> +	if (flush_xdp) {
+>   		xdp_do_flush();
+>   		event &= ~BNXT_REDIRECT_EVENT;
+>   	}
 
