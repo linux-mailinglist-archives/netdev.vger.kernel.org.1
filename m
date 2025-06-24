@@ -1,267 +1,159 @@
-Return-Path: <netdev+bounces-200628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E69DBAE6566
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:49:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65AA1AE6588
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FD44C0B16
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:48:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13653406681
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D43298CCD;
-	Tue, 24 Jun 2025 12:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6205298CB0;
+	Tue, 24 Jun 2025 12:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="RiR6qIFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.prodrive-technologies.com (mail.prodrive-technologies.com [212.61.153.67])
+Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AA7298999;
-	Tue, 24 Jun 2025 12:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.61.153.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DEE293C6C
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 12:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750769297; cv=none; b=WX+5QJMSArrsLvYL4ZOsxqFvmeoPgZFIIFeQEsSbtOGZ8tZAwp5AZjt1kYLezFY+P4CF2FSUj4CtcXtoHzotKctxAI3nX46Q/W2llmgADeYK69JDY0o4/jMLY4XIHXobTcpFOneAwkF9G52ZhpdPcQUMSCwxApV+flsACCoRAwo=
+	t=1750769587; cv=none; b=qHI69gjP9HAaumsICorRhl+tRdFlhXgENYMVD/SCKuXciGM9TRHyFBcj/HWFJUPloBsTZjowrdM+x8WzmPMDdQ+10X+wjWttg1CEcORQzbgtdBvcvRlwJSqZX2tz4jxw08394bPHDx8F6avNHHnrv9EZuSpm0J2ngJ+yYulOTo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750769297; c=relaxed/simple;
-	bh=dL1wxaGMdxo5nucSKvw9Jdo2yaR37IvEAThUrA2fars=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BcGwsy6AaIvB1dLGGYwdmLZV2+GIJJc1Yg1mXQvmTfuEvioGa6kVvCfbk00zZZh7TVSobQCkRmUUmOar/xCzmSgxEWS6FLaRAU5ueuiRkZSoXJRreknpgvnwqMKL3mG/OoAHIjdGoCnm7S4jEMTPj9F0cziGj+p4BYYBLH9j9Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=prodrive-technologies.com; spf=pass smtp.mailfrom=prodrive-technologies.com; arc=none smtp.client-ip=212.61.153.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=prodrive-technologies.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prodrive-technologies.com
-Received: from EXCOP01.bk.prodrive.nl (10.1.0.22) by EXCOP01.bk.prodrive.nl
- (10.1.0.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 24 Jun
- 2025 14:43:04 +0200
-Received: from lnxdevrm02.bk.prodrive.nl (10.1.1.121) by
- EXCOP01.bk.prodrive.nl (10.1.0.22) with Microsoft SMTP Server id 15.2.1544.4
- via Frontend Transport; Tue, 24 Jun 2025 14:43:04 +0200
-Received: from paugeu by lnxdevrm02.bk.prodrive.nl with local (Exim 4.96)
-	(envelope-from <paul.geurts@prodrive-technologies.com>)
-	id 1uU2zQ-00BgPm-2G;
-	Tue, 24 Jun 2025 14:43:04 +0200
-From: Paul Geurts <paul.geurts@prodrive-technologies.com>
-To: <mgreer@animalcreek.com>, <krzk@kernel.org>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <robh@kernel.org>, <conor+dt@kernel.org>,
-	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <martijn.de.gouw@prodrive-technologies.com>, Paul Geurts
-	<paul.geurts@prodrive-technologies.com>
-Subject: [PATCH v2 2/2] NFC: trf7970a: Create device-tree parameter for RX gain reduction
-Date: Tue, 24 Jun 2025 14:42:47 +0200
-Message-ID: <20250624124247.2763864-3-paul.geurts@prodrive-technologies.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250624124247.2763864-1-paul.geurts@prodrive-technologies.com>
-References: <20250624124247.2763864-1-paul.geurts@prodrive-technologies.com>
+	s=arc-20240116; t=1750769587; c=relaxed/simple;
+	bh=upKkpI+hzZsZq7s3JgwRlLmrB1H4fgSlkaUXoqTF1PU=;
+	h=Message-ID:Date:MIME-Version:To:From:Cc:Subject:Content-Type; b=Wg88Afzgq07MMZ4S5FWqQJzE+DDHCeaDI0FK6NTMVhhKkzaegjR8NjOijbG9ukWWXmQzZjdsSlLXDv/dujU12VFgrXOk0DpDVC5XYzhkFr0XuNP6PtXhxzu0zp+VFWkJFJva5f97U04cSentCqyJPwc4jtsEVmXofp3P3LnhJik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=RiR6qIFT; arc=none smtp.client-ip=109.202.192.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
+Received: from localhost (localhost [127.0.0.1])
+	by mail.codelabs.ch (Postfix) with ESMTP id 76B825A0002;
+	Tue, 24 Jun 2025 14:47:22 +0200 (CEST)
+Received: from mail.codelabs.ch ([127.0.0.1])
+ by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id u-afJyaT9NAf; Tue, 24 Jun 2025 14:47:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
+	s=default; t=1750769241;
+	bh=upKkpI+hzZsZq7s3JgwRlLmrB1H4fgSlkaUXoqTF1PU=;
+	h=Date:To:From:Cc:Subject:From;
+	b=RiR6qIFTrGfe1kKKtMZBM63UN6TXgJ482MazMq/JU0oSp31y/QMmfrq1iuge0SuMv
+	 IATPvth3tXcutS1y1gnOgr8ikmCa8jTaKZ/scwpJk96S+zJDs8JpBwJ2sUigUHPUu6
+	 xKte/+SuivFQcBvKIRBqLK4cDHnai7hDXCGY2Fd4+Gph+JgEptvp2UIEp29AjxsP8+
+	 XNpF8pvvbrg0+kNLNP/MhPD8Di2Mu6NC3YUiEURW4C7s+jUDTKBlvY8N3pt4zw6jtk
+	 EMbSwGkEnJQ54h6W8wubrZYpVhbsy37XEXFrdsjTg1x5FZTPqyyDrvrvYqnYHFKnsv
+	 gpJMVniUHwzxw==
+Received: from [192.168.78.131] (ip-217-18-181-130.static.reverse.dsi.net [217.18.181.130])
+	by mail.codelabs.ch (Postfix) with ESMTPSA id 4AC805A0001;
+	Tue, 24 Jun 2025 14:47:21 +0200 (CEST)
+Message-ID: <d14acb9a-bc2b-4459-a8e7-a9017d9d75fc@strongswan.org>
+Date: Tue, 24 Jun 2025 14:47:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Content-Language: de-CH, en-US
+From: Tobias Brunner <tobias@strongswan.org>
+Cc: netdev@vger.kernel.org, devel@linux-ipsec.org
+Subject: [PATCH ipsec] xfrm: Set transport header to fix UDP GRO handling
+Autocrypt: addr=tobias@strongswan.org; keydata=
+ xsFNBFNaX0kBEADIwotwcpW3abWt4CK9QbxUuPZMoiV7UXvdgIksGA1132Z6dICEaPPn1SRd
+ BnkFBms+I2mNPhZCSz409xRJffO41/S+/mYCrpxlSbCOjuG3S13ubuHdcQ3SmDF5brsOobyx
+ etA5QR4arov3abanFJYhis+FTUScVrJp1eyxwdmQpk3hmstgD/8QGheSahXj8v0SYmc1705R
+ fjUxmV5lTl1Fbszjyx7Er7Wt+pl+Bl9ReqtDnfBixFvDaFu4/HnGtGZ7KOeiaElRzytU24Hm
+ rlW7vkWxtaHf94Qc2d2rIvTwbeAan1Hha1s2ndA6Vk7uUElT571j7OB2+j1c0VY7/wiSvYgv
+ jXyS5C2tKZvJ6gI/9vALBpqypNnSfwuzKWFH37F/gww8O2cB6KwqZX5IRkhiSpBB4wtBC2/m
+ IDs5VPIcYMCpMIGxinHfl7efv3+BJ1KFNEXtKjmDimu2ViIFhtOkSYeqoEcU+V0GQfn3RzGL
+ 0blCFfLmmVfZ4lfLDWRPVfCP8pDifd3L2NUgekWX4Mmc5R2p91unjs6MiqFPb2V9eVcTf6In
+ Dk5HfCzZKeopmz5+Ewwt+0zS1UmC3+6thTY3h66rB/asK6jQefa7l5xDg+IzBNIczuW6/YtV
+ LrycjEvW98HTO4EMxqxyKAVpt33oNbNfYTEdoJH2EzGYRkyIVQARAQABzSZUb2JpYXMgQnJ1
+ bm5lciA8dG9iaWFzQHN0cm9uZ3N3YW4ub3JnPsLBkQQTAQgAOwIbAwULCQgHAwUVCgkICwUW
+ AgMBAAIeAQIXgBYhBBJTj49om18fFfB74XZf4mxrRnWEBQJgm9DNAhkBAAoJEHZf4mxrRnWE
+ rtoP+gMKaOxLKnNME/+D645LUncp4Pd6OvIuZQ/vmdH3TKgOqOC+XH74sEfVO8IcCPskbo/4
+ zvM7GVc2oKo91OAlVuH+Z813qHj6X8DDln9smNfQz+KXUtMZPRedKBKBkh60S1JNoDOYekO+
+ 5Szgl8kcXHUeP3JPesiwRoWTBBcQHNI2fj2Xgox/2/C5+p43+GNMnQDbbyNYbdLgCKzeBXTE
+ kbDH5Yri0kATPLcr7WhQaZYgxgPGgEGToh3hQJlk1BTbyvOXBKFOnrnpIVlhIICTfCPJ4KB0
+ BI1hRyE7F5ShaPlvMzpUp2i0gK2/EFJwHnVKrc9hd8mMksDlXc4teM/rorHHnlsmLV41eHuN
+ 004sXP9KLkGkiK7crUlm6rCUBNkXfNYJEYvTZ6n/LMRm6Mpe6W71/De9RlZy9jk9oft2/Bjd
+ ynsBxx8+RpJKypQv8il4dyDGnaMroCPtDZe6p20GDiPyG8AXEjfnPU/6hllaxNLkRc6wv9bg
+ gq/Liv1PyzQxqTxbWQSK9JP+ZM5aMBlpwQMBTdGriPzEBuajYqkeG4iMt5pkqPQi/TGba/Qf
+ A7lsAm4ME9B8BnwhNxmHLFPjtnMQRoRasdkZl6/LlMa580AZyguUuxlnrvhOzam5HmLLESiQ
+ BLgp858h5jjf1LDM9G8sv8l3jGa4f12vFzw97hylzsFNBFNaX0kBEADhckpvf4e88j1PACTt
+ zYdy+kJJLwhOLh379TX8N+lbOyNOkN69oiKoHfoyRRGRz1u7e4+caKCu/ProcmgDz7oIBSWR
+ 4c68Yag9SQMFHFqackW5pYtXwFUzf469YnAC/VnBxffkggOCambzvgLcy3LNxBWi4paJRSMD
+ mEjPVWN1jLyEF4L9ab8IsA6XCD+NiIziXic/Llr9HgGT2g52cdTWQhcvtzBGD07e7AsC3VbA
+ l8healcCo8pbrv2eXC59MObmZ/LqucgwebEEgM0CptecyypZbBPST7+291wvi/yiDmNr5A8+
+ hpgcr1NguXs9IOEBy88UNuQUu1TfMYcvDzy97HxkfJ001Ze89IJvY03sZrL0vvzhIzTXWpt3
+ nO8nGAMCe9bQpwpANsLn3sBFMD74/b0/2pXKHuu1jswEWzhvT2c8P80vO3KKPh3344p4I4Vj
+ DPH2oCLsZKIlLeHSofVlJrXh/y80ajxjVRjniPaTUzYihq2J974xA7Dt9ZFsFtbpZVqK/hy8
+ Lw186K40a+g2BVEJkYsJsGGkc5VxqUQS6CCNXc8ItmbFgxfugVF8SrjYZPreOQApYNBr8vjh
+ olopOsrO788JvQ9W5K+v84OAQbHYR+8VvSlriRfSJrjvOQRblEZZ2CBMLiID1Lwi5vO5knbn
+ w8JdxW4iA2g/kr28LwARAQABwsFfBBgBCAAJBQJTWl9JAhsMAAoJEHZf4mxrRnWERz4P/R2a
+ RSewNNoM9YiggNtNJMx2AFcS4HXRrO8D26kkDlYtuozcQs0fxRnJGfQZ5YPZhxlq7cUdwHRN
+ IWKRoCppbRNW8G/LcdaPZJGw3MtWjxNL8dANjHdAspoRACdwniR1KFX5ocqjk0+mNPpyeR9C
+ 7h8cOzwIBketoKE5PcCODb/BO802fFDC1BYncZeQIRnMWilECp8Lb8tLxXAmq9L3R4c7CzID
+ wMWWfOMmMqZnhnVEAiH9E4O94kwHZ4HWC4AYQizqgeRuYQUWWwoSBAzGzzagHg57ys6rJiwN
+ tvIC3j+rtuqY9Ii8ehtliHlXMokOAXPgeJus0EHg7mMFN7GbmvrdTMdGhdHdd9+qbzhuCJBM
+ ijszT5xoxLlqKxYH93zsx0SHKZp68ZyZJQwni63ZqN5P/4ox098M00eVpky1PLp9l5EBpsQH
+ 9QlGq+ZLOB5zxTFFTuvC9PC/M3OpFUXdLr7yc83FyXh5YbGVNIxR49Qv58T1ZmKc9H34H31Z
+ 6KRJPGmCzyQxHYSbP9KDT4S5/Dx/+iaMDb1G9fduSBrPxIIT5GEk3BKkH/SoAEFs7xxkljlo
+ ggXfJu2a/qBTDPNzticcsvXz5XNnXRiZIrbpNkJ8hE0Huq2gdzHC+0hWMyoBNId9c2o38y5E
+ tvkh7XWO2ycrW1UlzUzM4KV3SDLIhfOU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The TRF7970a device is sensitive to RF disturbances, which can make it
-hard to pass some EMC immunity tests. By reducing the RX antenna gain,
-the device becomes less sensitive to EMC disturbances, as a trade-off
-against antenna performance.
+The referenced commit replaced a call to __xfrm4|6_udp_encap_rcv() with
+a custom check for non-ESP markers.  But what the called function also
+did was setting the transport header to the ESP header.  The function
+that follows, esp4|6_gro_receive(), relies on that being set when it calls
+xfrm_parse_spi().  We have to set the full offset as the skb's head was
+not moved yet so adding just the UDP header length won't work.
 
-Add a device tree option to select RX gain reduction to improve EMC
-performance.
-
-Selecting a communication standard in the ISO control register resets
-the RX antenna gain settings. Therefore set the RX gain reduction
-everytime the ISO control register changes, when the option is used.
-
-Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
+Fixes: e3fd05777685 ("xfrm: Fix UDP GRO handling for some corner cases")
+Signed-off-by: Tobias Brunner <tobias@strongswan.org>
 ---
- drivers/nfc/trf7970a.c | 86 ++++++++++++++++++++++++++++++++++++------
- 1 file changed, 75 insertions(+), 11 deletions(-)
+ net/ipv4/xfrm4_input.c | 3 +++
+ net/ipv6/xfrm6_input.c | 3 +++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
-index 9e1a34e23af2..58ea730d1766 100644
---- a/drivers/nfc/trf7970a.c
-+++ b/drivers/nfc/trf7970a.c
-@@ -274,10 +274,14 @@
+diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
+index 0d31a8c108d4..f28cfd88eaf5 100644
+--- a/net/ipv4/xfrm4_input.c
++++ b/net/ipv4/xfrm4_input.c
+@@ -202,6 +202,9 @@ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	if (len <= sizeof(struct ip_esp_hdr) || udpdata32[0] == 0)
+ 		goto out;
  
- #define TRF7970A_RX_SPECIAL_SETTINGS_NO_LIM	BIT(0)
- #define TRF7970A_RX_SPECIAL_SETTINGS_AGCR	BIT(1)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_0DB	(0x0 << 2)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_5DB	(0x1 << 2)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_10DB	(0x2 << 2)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_15DB	(0x3 << 2)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT	2
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX	(0x3)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_MASK	(TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX << \
-+							TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_0DB	(0x0 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_5DB	(0x1 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_10DB	(0x2 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_15DB	(0x3 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
- #define TRF7970A_RX_SPECIAL_SETTINGS_HBT	BIT(4)
- #define TRF7970A_RX_SPECIAL_SETTINGS_M848	BIT(5)
- #define TRF7970A_RX_SPECIAL_SETTINGS_C424	BIT(6)
-@@ -452,6 +456,8 @@ struct trf7970a {
- 	unsigned int			timeout;
- 	bool				ignore_timeout;
- 	struct delayed_work		timeout_work;
-+	u8				rx_gain_reduction;
-+	bool			custom_rx_gain_reduction;
- };
- 
- static int trf7970a_cmd(struct trf7970a *trf, u8 opcode)
-@@ -551,6 +557,41 @@ static int trf7970a_read_irqstatus(struct trf7970a *trf, u8 *status)
- 	return ret;
- }
- 
-+static int trf7970a_update_rx_gain_reduction(struct trf7970a *trf)
-+{
-+	int ret = 0;
-+	u8 reg;
++	/* set the transport header to ESP */
++	skb_set_transport_header(skb, offset);
 +
-+	if (!trf->custom_rx_gain_reduction)
-+		return 0;
+ 	NAPI_GRO_CB(skb)->proto = IPPROTO_UDP;
+ 
+ 	pp = call_gro_receive(ops->callbacks.gro_receive, head, skb);
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index 841c81abaaf4..9005fc156a20 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -202,6 +202,9 @@ struct sk_buff *xfrm6_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	if (len <= sizeof(struct ip_esp_hdr) || udpdata32[0] == 0)
+ 		goto out;
+ 
++	/* set the transport header to ESP */
++	skb_set_transport_header(skb, offset);
 +
-+	ret = trf7970a_read(trf, TRF7970A_RX_SPECIAL_SETTINGS, &reg);
-+	if (ret)
-+		return ret;
-+	reg &= ~(TRF7970A_RX_SPECIAL_SETTINGS_GD_MASK);
-+	reg |= trf->rx_gain_reduction;
-+
-+	ret = trf7970a_write(trf, TRF7970A_RX_SPECIAL_SETTINGS, reg);
-+
-+	return ret;
-+}
-+
-+static int trf7970a_update_iso_ctrl_register(struct trf7970a *trf, u8 iso_ctrl)
-+{
-+	int ret;
-+
-+	ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+	if (ret)
-+		return ret;
-+	/*
-+	 * Every time the ISO_CTRL register is written, the RX special setting register is reset by
-+	 * the chip. When a custom gain reguduction is required, it should be rewritten now.
-+	 */
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+
-+	return ret;
-+}
-+
- static int trf7970a_read_target_proto(struct trf7970a *trf, u8 *target_proto)
- {
- 	int ret;
-@@ -930,8 +971,7 @@ static irqreturn_t trf7970a_irq(int irq, void *dev_id)
- 			}
+ 	NAPI_GRO_CB(skb)->proto = IPPROTO_UDP;
  
- 			if (iso_ctrl != trf->iso_ctrl) {
--				ret = trf7970a_write(trf, TRF7970A_ISO_CTRL,
--						     iso_ctrl);
-+				ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 				if (ret)
- 					goto err_unlock_exit;
- 
-@@ -1035,6 +1075,11 @@ static int trf7970a_init(struct trf7970a *trf)
- 	if (ret)
- 		goto err_out;
- 
-+	/* Set the gain reduction after soft init */
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+	if (ret)
-+		goto err_out;
-+
- 	ret = trf7970a_cmd(trf, TRF7970A_CMD_IDLE);
- 	if (ret)
- 		goto err_out;
-@@ -1309,7 +1354,7 @@ static int trf7970a_in_config_framing(struct trf7970a *trf, int framing)
- 	}
- 
- 	if (iso_ctrl != trf->iso_ctrl) {
--		ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+		ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 		if (ret)
- 			return ret;
- 
-@@ -1441,7 +1486,7 @@ static int trf7970a_per_cmd_config(struct trf7970a *trf,
- 		}
- 
- 		if (iso_ctrl != trf->iso_ctrl) {
--			ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+			ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 			if (ret)
- 				return ret;
- 
-@@ -1605,8 +1650,7 @@ static int trf7970a_tg_config_rf_tech(struct trf7970a *trf, int tech)
- 	 */
- 	if ((trf->framing == NFC_DIGITAL_FRAMING_NFC_DEP_ACTIVATED) &&
- 	    (trf->iso_ctrl_tech != trf->iso_ctrl)) {
--		ret = trf7970a_write(trf, TRF7970A_ISO_CTRL,
--				     trf->iso_ctrl_tech);
-+		ret = trf7970a_update_iso_ctrl_register(trf, trf->iso_ctrl_tech);
- 
- 		trf->iso_ctrl = trf->iso_ctrl_tech;
- 	}
-@@ -1654,7 +1698,7 @@ static int trf7970a_tg_config_framing(struct trf7970a *trf, int framing)
- 	trf->framing = framing;
- 
- 	if (iso_ctrl != trf->iso_ctrl) {
--		ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+		ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 		if (ret)
- 			return ret;
- 
-@@ -1755,6 +1799,10 @@ static int _trf7970a_tg_listen(struct nfc_digital_dev *ddev, u16 timeout,
- 	if (ret)
- 		goto out_err;
- 
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+	if (ret)
-+		goto out_err;
-+
- 	ret = trf7970a_write(trf, TRF7970A_REG_IO_CTRL,
- 			     trf->io_ctrl | TRF7970A_REG_IO_CTRL_VRS(0x1));
- 	if (ret)
-@@ -1945,6 +1993,10 @@ static int trf7970a_startup(struct trf7970a *trf)
- 	if (ret)
- 		return ret;
- 
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+	if (ret)
-+		return ret;
-+
- 	pm_runtime_set_active(trf->dev);
- 	pm_runtime_enable(trf->dev);
- 	pm_runtime_mark_last_busy(trf->dev);
-@@ -1993,6 +2045,7 @@ static int trf7970a_probe(struct spi_device *spi)
- 	struct trf7970a *trf;
- 	int uvolts, autosuspend_delay, ret;
- 	u32 clk_freq = TRF7970A_13MHZ_CLOCK_FREQUENCY;
-+	u32 rx_gain_reduction;
- 
- 	if (!np) {
- 		dev_err(&spi->dev, "No Device Tree entry\n");
-@@ -2054,6 +2107,17 @@ static int trf7970a_probe(struct spi_device *spi)
- 		trf->modulator_sys_clk_ctrl = 0;
- 	}
- 
-+	if (of_property_read_u32(np, "ti,rx-gain-reduction", &rx_gain_reduction) == 0) {
-+		if (rx_gain_reduction > TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX) {
-+			dev_warn(trf->dev, "invalid RX gain reduction setting: %u. Limiting to %u\n",
-+				 rx_gain_reduction, TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX);
-+			rx_gain_reduction = TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX;
-+		}
-+		trf->rx_gain_reduction = (rx_gain_reduction <<
-+			TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT);
-+		trf->custom_rx_gain_reduction = true;
-+	}
-+
- 	ret = devm_request_threaded_irq(trf->dev, spi->irq, NULL,
- 					trf7970a_irq,
- 					IRQF_TRIGGER_RISING | IRQF_ONESHOT,
+ 	pp = call_gro_receive(ops->callbacks.gro_receive, head, skb);
 -- 
-2.39.2
+2.43.0
 
 
