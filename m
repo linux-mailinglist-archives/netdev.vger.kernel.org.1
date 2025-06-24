@@ -1,138 +1,151 @@
-Return-Path: <netdev+bounces-200690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6603FAE68D0
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:33:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BC1AE68D4
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 16:33:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57F676A3525
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:27:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BD1A3BA66C
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 14:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2735C2D29B7;
-	Tue, 24 Jun 2025 14:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Djd+NzIq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB722D29DF;
+	Tue, 24 Jun 2025 14:27:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486212D131D
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 14:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454BF291C37;
+	Tue, 24 Jun 2025 14:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750775257; cv=none; b=qiACoGI/9QkDj1pBvu9V48jyBEbtLS/1SrLKw7ICXhI/8NQs6dtDNakGIUZ6SVtf702PWIj52QagZKhQv1iIk9v4ZwSuAUGdoyGw6QwBPqwXq4iGU4ApYh9djF6PI/2KKShKfT3Eg38sg8EJPf6hHaZ1f2QXPapI4Q8xTtnl+7g=
+	t=1750775258; cv=none; b=UKLVwmIHBMFXBTCZGpSAXVyBRTvAI5kvra+YWN6bWtjee7/D3vOb1VorcIG7yEM6bkKJgR4c32Q/kr6zN+Kkjp74PXEKmdFKvQ0MubG9yvAjVAqqA+Qb1eA2jlABFeif2nSvIY0CIK4za7YQTmqWaoKdc780LrlainnZ8NRduKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750775257; c=relaxed/simple;
-	bh=pMVZuMp81uJ7pEBtzL1PGYWRrDHY2p+u4Dzw0rMjW6c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=rJfXD3jticmuNc7E/TTzw4Bo5O0pTR3hxD/FCKS8iAKQqxfCh0IrOHHr7oLlL/z1CE8hCgs2jEwJtzg9JlmJ6UxKjDvcYs8QQlnt/zPxgI45h6ijQJ5odXstenCm5L43/CS+BWyRtLS4z3Y84ZQjVUknm6UI4lRw1nPUFgM76wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Djd+NzIq; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750775255; x=1782311255;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=pMVZuMp81uJ7pEBtzL1PGYWRrDHY2p+u4Dzw0rMjW6c=;
-  b=Djd+NzIq/fGxSjQ7Xmwo4AEXk6/n2nGHnf+hjgT8yuHIROcKyWypGaOP
-   OkjvvswYAZYpwzZCTfl9VojvWolUqkMDuoWxu4RAxmL3R0QdBy8zIIWCc
-   bsm2adOlc9QV76amm+kb0JdX5VOrurUFuzaTGRWZO9vJ70xO4iA2u/eUm
-   SRIpX4Qq/5StgiYiV/MqTlcq/wvUinRv4V/FFwSGIQDwo0+odnHWMfYVv
-   MRckaHBU9Nfb5v8mmsZk6TVUMg7OOgWW9BFK8tSXrVyxPF13ljvPS2HPi
-   SUGWJX4v1YX/Cn+xQT18TefhfDQsbBO2bx8yfDb/80j+INIkvHnkyfhub
-   A==;
-X-CSE-ConnectionGUID: JK26hDPiSd2UKyhKLdVn1g==
-X-CSE-MsgGUID: TJmSVHO7SsK8vv/CxB9mwA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="70441043"
-X-IronPort-AV: E=Sophos;i="6.16,261,1744095600"; 
-   d="scan'208";a="70441043"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 07:27:32 -0700
-X-CSE-ConnectionGUID: NS39t5JmSteAzcSN/VsMGg==
-X-CSE-MsgGUID: 6ZcSDeVRRHuTjO8Ox5u3Jg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,261,1744095600"; 
-   d="scan'208";a="155965570"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jun 2025 07:27:31 -0700
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Aleksandr.Loktionov@intel.com,
-	przemyslaw.kitszel@intel.com,
-	david.m.ertman@intel.com,
-	anthony.l.nguyen@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH iwl-net 2/2] ice: fix possible leak in ice_plug_aux_dev() error path
-Date: Tue, 24 Jun 2025 07:26:41 -0700
-Message-Id: <20250624142641.7010-3-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20250624142641.7010-1-emil.s.tantilov@intel.com>
-References: <20250624142641.7010-1-emil.s.tantilov@intel.com>
+	s=arc-20240116; t=1750775258; c=relaxed/simple;
+	bh=1szUNF6KnsTqMQCfgfpq3RpcrkDvF5/wYVTUYcZrL9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tBdCq/PP2FXVa2QM/I241OmWVxVLdGzTnHlxe+h1/mTqIh2lT9tNJrZNvLk9iYex9llmznvyyn+HsuVJTVdqfuoRjFO/ivDO1ddeYxMemekkM+0V0kuBDDEkyy17L8YZEZBQ9p3EinCGjeBdUke4zS2um8pKTDCTGrELdTaALMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ae0a420431bso212275566b.2;
+        Tue, 24 Jun 2025 07:27:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750775253; x=1751380053;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CLCaCaOTb4cF+Wte6sm9P0O2OKEItr0RiopbN7xQeu0=;
+        b=gdCQEaLWtOmN56uvQgODWP0Kcx7lqdrYvP7Ua9vM9FSauHKSejcQIjNxq7y5xMr+dG
+         +LviM1N11ESJ30Knt8vNr+7dhR3bGgUNPosd0F0/RTZ7cpI23wBymOXGRUmXumNg1dAg
+         CjRWy8+bOuptFZMKvdsh0xrzII7d28EnPfKeezaJqSLD4JLQeNtx2obrBpa5N71TDtq0
+         JzEItEQNSHWeRkdFAH5Hxghk+aIPn3qc7SFncVgo4VVoo0ZZnw/An/wEfnp/hjq+rSZm
+         2rpnPg5TbbNfbWjJbGgsCfrAWeJw7o9Hz+YZO2mu4R8cjr3NvQQKHUleZSSh5o8mxfpQ
+         GUNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKK1xfXsjRBXi+Zhk/g/INuNyyMkfkEfARTwq0Da214kfYT3ufdrtxA6asnVoOFaBNwDwwkrjd@vger.kernel.org, AJvYcCWUjelTT2kG4YB/AKqn9GdiSu3qfPgEUtDthSaGLMyrc9lYBvKh8B3SYRX6iG9ilCi/2Dpio2+HarCaigY=@vger.kernel.org, AJvYcCWeocTrfGIwPWA7uloJx5G2+LjDu/4k+8YYiz/Q6G0uDQU0i41UGuQOlIphN5FJDxsOQDb4UXkf6ocBA9nlPUA8@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGes26eHmW9C/QvDtGsJlhnHL43yBhDLqWYNazC0ElIqzFTt3V
+	GyibmhRiCzEh8WSgK5PM5WohzD4OOv4QOuQKC55XZWRGpPTrxCY+UPpy
+X-Gm-Gg: ASbGncuw903eiWcJ7245WJPAgYCragmcu385LkQK29wilcQChc2Jqb4k47GKEt/7dpq
+	FMVefQr+mxV2FzR7r371MJl2gMIOZcU85fqZSySEyxwf3g4Qg3obagNP3u3m/9uFv2wCCrR5Ct6
+	RcT9VimYNyVVFlGSVWrZ9fUkfObYT168GVffrBKcMaUvSExGDNgxY5hfG1dS9wkccou1yoy+yq2
+	nAuy6+ceJgB8iE7QfEJCj30Cs8MltkkRiiFeGO5Mn650drgnoPMBdViqBTdy7PETWBEBUH2/fDP
+	jVpVo+QvOWO8aTtFB+KRlE+mw2B6/9a0iGmzr8GuPsLVvG5VkRXoyVqxLVY=
+X-Google-Smtp-Source: AGHT+IFILPyMtwDOx7dYBC+cw+ruDb8Y3KGn15RJ43QElepTSN4zsNDHc469pKVmkARFZbwmhHvr+g==
+X-Received: by 2002:a17:906:fd83:b0:ade:3b84:8ef6 with SMTP id a640c23a62f3a-ae057abdef2mr1619028966b.23.1750775253066;
+        Tue, 24 Jun 2025 07:27:33 -0700 (PDT)
+Received: from gmail.com ([2620:10d:c092:500::7:6c51])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae053e7f534sm878164866b.9.2025.06.24.07.27.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jun 2025 07:27:32 -0700 (PDT)
+Date: Tue, 24 Jun 2025 15:27:27 +0100
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	gustavold@gmail.com
+Subject: Re: [PATCH net-next] selftests: net: add netpoll basic functionality
+ test
+Message-ID: <aFq1z0BS6RCUCNwa@gmail.com>
+References: <20250620-netpoll_test-v1-1-5068832f72fc@debian.org>
+ <20250623183006.7c1c0cfc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250623183006.7c1c0cfc@kernel.org>
 
-Fix a memory leak in the error path where kfree(iadev) was not called
-following an error in auxiliary_device_add().
+On Mon, Jun 23, 2025 at 06:30:06PM -0700, Jakub Kicinski wrote:
+> Could you turn this into a docstring?
 
-Fixes: f9f5301e7e2d ("ice: Register auxiliary device to provide RDMA")
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_idc.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+<snip>
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ethernet/intel/ice/ice_idc.c
-index 420d45c2558b..8c4a3dc22a7c 100644
---- a/drivers/net/ethernet/intel/ice/ice_idc.c
-+++ b/drivers/net/ethernet/intel/ice/ice_idc.c
-@@ -322,16 +322,12 @@ int ice_plug_aux_dev(struct ice_pf *pf)
- 		"roce" : "iwarp";
- 
- 	ret = auxiliary_device_init(adev);
--	if (ret) {
--		kfree(iadev);
--		return ret;
--	}
-+	if (ret)
-+		goto free_iadev;
- 
- 	ret = auxiliary_device_add(adev);
--	if (ret) {
--		auxiliary_device_uninit(adev);
--		return ret;
--	}
-+	if (ret)
-+		goto aux_dev_uninit;
- 
- 	mutex_lock(&pf->adev_mutex);
- 	cdev->adev = adev;
-@@ -339,6 +335,13 @@ int ice_plug_aux_dev(struct ice_pf *pf)
- 	set_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags);
- 
- 	return 0;
-+
-+aux_dev_uninit:
-+	auxiliary_device_uninit(adev);
-+free_iadev:
-+	kfree(iadev);
-+
-+	return ret;
- }
- 
- /* ice_unplug_aux_dev - unregister and free AUX device
--- 
-2.37.3
+Sure, I will fix all of them except C0301, which is a error message
+string and I prefer not to truncate.
+
+> > +def set_single_rx_tx_queue(interface_name: str) -> None:
+> > +    """Set the number of RX and TX queues to 1 using ethtool"""
+> > +    try:
+> > +        # This don't need to be reverted, since interfaces will be deleted after test
+> > +        ethtool(f"-G {interface_name} rx 1 tx 1")
+> 
+> Would be nice to be able to run this test on real HW too.
+> Can you add appropriate defer() calls to undo the configuration changes?
+
+Ack!
+
+> > +    try:
+> > +        for key, value in config_data.items():
+> > +            if DEBUG:
+> > +                ksft_pr(f"Setting {key} to {value}")
+> > +            with open(
+> > +                f"{NETCONSOLE_CONFIGFS_PATH}/{target_name}/{key}",
+> 
+> Could be personal preference but I think that using temp variable to
+> store the argument looks better than breaking out the function call
+> over 5 lines..
+
+I was not able to get what you mean here, sorry.
+
+We have config_data, which is a dictionary that stores the netconsole
+keys (as in configfs) and their value, which will be set in the code below.
+
+What would this temp variable look like, and how it would look like?
+
+> > +def test_netpoll(cfg: NetDrvEpEnv, netdevnl: NetdevFamily) -> None:
+> > +    """
+> > +    Test netpoll by sending traffic to the interface and then sending
+> > +    netconsole messages to trigger a poll
+> > +    """
+> > +
+> > +    target_name = generate_random_netcons_name()
+> > +    ifname = cfg.dev["ifname"]
+> > +    traffic = None
+> > +
+> > +    try:
+> > +        set_single_rx_tx_queue(ifname)
+> > +        traffic = GenerateTraffic(cfg)
+> > +        check_traffic_flowing(cfg, netdevnl)
+> 
+> Any reason to perform this check? GenerateTraffic() already waits for
+> traffic to ramp up. Do we need to adjust the logic there, or make some
+> methods public?
+
+Not really. I can just remove this code, in fact, given
+GenerateTraffic() already waits for the code. Or, I can add under DEBUG.
+
+As we discussed in the RFC thread, I will add support for bpftrace in
+the v2.
+
+Thanks for the review,
+--breno
 
 
