@@ -1,134 +1,208 @@
-Return-Path: <netdev+bounces-200567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3344EAE61D1
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:09:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B156FAE6200
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B33444C00E3
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:09:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 742A2402EA5
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B2B27F758;
-	Tue, 24 Jun 2025 10:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D79283C8C;
+	Tue, 24 Jun 2025 10:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBIKbQhI"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DOzg3GiE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D599027C879;
-	Tue, 24 Jun 2025 10:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59F7281509
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750759752; cv=none; b=DVT0B+9wly8HHvB/68k/EModxXBjGf4rqXqbH0g426PdPVa6ZFb9aztQCG61IH/V1F+Z+0TOtVBHw7WLz6lnQ9qNQXyrxUNvFA0YzQTv0PAut2g3yCvWoCJkjsGffHbCqFFt/NWm3Wy2IjR85lWRpchxAZVKNGhhxKkaBSweldo=
+	t=1750760156; cv=none; b=E+X3bYheeruR/HAWyD57jJUj65ZT0fQ1lTnn7WQpJCKo4ePVKKvH5W6V8nYS43cIpT/BqOxsIc6/R2K5bzkTtqlHVqlScVikLOi8Ez7oP+FTox19hPxLOpUeZZQf+BiYGzQuIuDHy5ONYzGIwygTrtbjdi0EkVk4soy4mdYAMvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750759752; c=relaxed/simple;
-	bh=PNPhwM4paJwVQbDov+E9J9ZuC0PmxKIu8t8tgfnv7ro=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJbitUVpVh5X1Ebet4YfV3dPXNLTgZ8mkk+Aw+1hbQdyy+QMnEuzdpCiACUtEr4yx1dNPHaIEvfSrbLGjLehE/IXh2ZChcLRhiifGbWMI8pjfbZi6jNbuGYDgX3+YccB9jwQqb3mmDfSLKoe0cnweaS8J6J9cGlmaWfvRl+eFu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBIKbQhI; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so7816174a12.2;
-        Tue, 24 Jun 2025 03:09:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750759749; x=1751364549; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wR4ge6rguxSsc/ORqRy8r5vdeL5F2ATOq1gnAzeqSHI=;
-        b=KBIKbQhILIBtB2xQYK9KAYlbUENEMfP0Xfa0Ia5hPYNRbsaQFrvEgS7CeKM8SfEEFS
-         0v5Jjiqxp5JCcfuECLP5UPzaz9fk4qA6JK4KX1FDgWtRIw2tLcPBUkfAvLUOLkNJm1b0
-         14zbinvkthQjG7P0hxv1J2u7GIBfY4sgl9r4DP/PsX53rpSnbJnpTV/nHXfWYc6GVTdQ
-         YplbIBA3L9R1KrH5TIk41g92PZiH1QK2fj+LrN+lfMoCJXR8dorR/n3fL28Q8pRMPMtK
-         1qagIF6bc7+KSlmPRsiXYJlan4Dp0OFr+DGyvpZvKhOFNniHZCPwi2ZUc9mqTZTqtKTA
-         TymA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750759749; x=1751364549;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wR4ge6rguxSsc/ORqRy8r5vdeL5F2ATOq1gnAzeqSHI=;
-        b=mpH794mHCVRLIP4NAg6CoMHn0hpsIwnNktBi8wCW5MxgmDZ2X3E6v5egv7VFIEm56h
-         IfxtpxIQQWoY/UyNN7/Oh7/yGT0Nt+GaosrJabcN/JVeykWC7UHVRdPeje6nJjiE1ytG
-         1tZq69nOAXTndmdyNqoIcTUSWABXEQTtBG5GrOD1EOKXOrDrJnTlIBJWcbG/dQGb+lZc
-         46jzLKTfXVlvIy0cIjEtk61rUmO8w3Uc17RosrAzjy14hMnOoRd6zclsUheb0ftWwYEp
-         +xdWFzC15m8gCsS0fxPpjFsc5GPy/0oT9mtEBF+eOaZJ7GMsB7jZ0+EiI5AjOb8yXNDT
-         ZjLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUxIKKGmzvX4R0uKhwK42lLCOA0rZ26mkFZAKTyNb6SXIbwHIxPsdn7/ubQi5bEC3QXpmTiO0DQGvELCuyxCmzY@vger.kernel.org, AJvYcCVK7SPT3+AfPxvPv5ybD3rWAMDhsUJL8cKiyKCJmMZcFgLFHKIfFB9Cyl72YkAstQFi+PZV2zI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFiiS+JxXhnAzSYjHGsb2d0n/uBpVkBKg6Sys8fgToOzGKEgzm
-	eT1aLuRVgYQf6AUTX7rLMyZTMBWyvLSwJPkCaaQ8Ud1gSVatwFYLjsC0
-X-Gm-Gg: ASbGncsvmCbyumPxH60Vn8SX9mtIKq+q6ySZ066lppkUKUwxFMQKjge5vyJJXwgBbxE
-	YVbXB54bTaW2NLCwq8+IRtkj3STh4/UMHykOVXlUHshB+ijJkZRFrAn4JvOM9V2+MbrAlC/Ttev
-	hNMmVAiamVXqTFt7l995nMeBlfegqGAgSYSRYtir9UU0Q7R4vkElSkwKhC57F4mOoQ2pZlmHf5l
-	z8yKsCzu4VgXNHmZE8CyNNH1iBpat6e0aH1LyGbf6+eqvwlXK74+M6spBqNOetykw0G+kZmxxIf
-	54j5MyC+MqzhBPoW0S6laixX/BTqONqN11gV36g2LfVPzSao849DQhqR/SsOEi48UlKok0zxNKs
-	s6LctEMClgBSsVnMqmxFr0g8stS8/wZ2rjhCB1MicvWZbY9+kYjaccitodSWCSeuT6erNsacTZN
-	Z64QZk64yPovwTvwDJgrj/ch0UT6HR4v+DwMyNIAacQV7YW6Q=
-X-Google-Smtp-Source: AGHT+IHKFAxaROdqfcGg3d6rDQqJLaE/SJ+Wkg9OhXhAmcXdrKyaPKmVMih7cR0ERStNXIIWPfDKeA==
-X-Received: by 2002:a05:6402:2550:b0:607:3344:6ef1 with SMTP id 4fb4d7f45d1cf-60a1cf2e082mr12192488a12.29.1750759748906;
-        Tue, 24 Jun 2025 03:09:08 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c2f4857e0sm791758a12.65.2025.06.24.03.09.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jun 2025 03:09:08 -0700 (PDT)
-Message-ID: <4434d7fc-429f-40b4-8b98-6cd52a985fc3@gmail.com>
-Date: Tue, 24 Jun 2025 12:09:07 +0200
+	s=arc-20240116; t=1750760156; c=relaxed/simple;
+	bh=gFxarwu0PDR3HDKcnSvhfRBs/bBdKM1YGi6F57MVE3M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L2lBHu3sZSaB2vX3V+GLLs3BGf8mrSkCHmgO1FiWVULefZYEnYPBx65BBtqGEZzdoqp02HnCA7UCV3Ew6MvyL23gO+NpzDiztIQ/gIvfd+C8z9p8GZdO9ovuK4le4CSnQ1dHxL0W6xuvZMDyKZqx8i1JScFb6aNuS/I0d6qcvOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DOzg3GiE; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55O5BaLB031388;
+	Tue, 24 Jun 2025 03:15:24 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=ZMgjaewWj6Qqx9E4P6SHVOS
+	Bk/M/VM8W9psrSZAapqk=; b=DOzg3GiENVcSuO6xxZ0H3as2rnk4G8/tN8AlOaZ
+	IIRWvLthhZkQTXohQzu9jJi10KS3kNpTAo1Un73iwdULgH7BzAuCf+eD7Jdi4NPS
+	B/1GzrnpFanuihEbOAhdA5WKG4zmUWZvUHF6CrVT2s6uCT5r18Yu1o0WkE4XexnB
+	Uoq2yoLJjCcqDUNnRoT68562HbGyrpvttc7UHrH0r/HYv3vjSJDbLJ39nVaA5Qm/
+	ssruTJr83jtFklRjvdzrU/WcWF5/rTfNUrBvSdNwyHIMONU1s90eTWnhusqqDp7l
+	LJr8j6+8KkmwwxUksjkvKkaTdBj4SPpvoNsTL/zUrDolCPg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47fnnbrkje-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Jun 2025 03:15:24 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 24 Jun 2025 03:15:23 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 24 Jun 2025 03:15:23 -0700
+Received: from cavium-System-i9-11 (unknown [10.28.38.183])
+	by maili.marvell.com (Postfix) with ESMTP id E35855B6949;
+	Tue, 24 Jun 2025 03:15:19 -0700 (PDT)
+From: Aakash Kumar S <saakashkumar@marvell.com>
+To: <netdev@vger.kernel.org>
+CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
+        <akamaluddin@marvell.com>, <antony@phenome.org>
+Subject: [PATCH] xfrm: Duplicate SPI Handling
+Date: Tue, 24 Jun 2025 15:45:16 +0530
+Message-ID: <20250624101516.1468701-1-saakashkumar@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 nf-next 2/2] netfilter: nft_chain_filter: Add bridge
- double vlan and pppoe
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org
-References: <20250617065835.23428-1-ericwouds@gmail.com>
- <20250617065835.23428-3-ericwouds@gmail.com> <aFhqUosjt2ptnlOZ@strlen.de>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <aFhqUosjt2ptnlOZ@strlen.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI0MDA4NyBTYWx0ZWRfX3A820xMBjtka kJlS3qNU+YHORVGqZ/FwsH8CEpNzaNwWKz9v30XKMhWuw/tuwILZtk5Pz4M+OSvgAwukjqQ0vwK S3ul+qvR6Swf00VLRGx6LJ18kC14PTxk0QgnbW1bSZBqWNhlFX/MC++xcVzjsbcIIZKg4YjqAbo
+ LlGl8wEf3GSwsFdoBT6y5mSGC6g5JJAjYLIZ0uCZaPG8C6VIpNNe2PGNKV4AuDCbEz/Q/Iz9zgp +sSPy0Z0P5tpunyBRNhJL3+Qi6tcIAqx12x8BbshpF8mqcQ0Q3fdCWIO9vrPHPfiBZY7fuuU7bK Dua34k1d9Tcx9n5qxBeXNITHSIxsXmFGM1rh9+nC0m5p6tn/9nYg+bvK06fR62cEoDy5ivbThHQ
+ MQ2JxxGNuq47VdIr/ZoFS/nHvrqBoeLcUTiKXMlKA4500pttBgyrhssw/kVg6F+p1PHTgm9K
+X-Authority-Analysis: v=2.4 cv=IPECChvG c=1 sm=1 tr=0 ts=685a7abc cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=xNkmOz5aGSZoEMeN370A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: Ldt-ADTYCZgg89ta7R4xoiSSKSOb6d5j
+X-Proofpoint-ORIG-GUID: Ldt-ADTYCZgg89ta7R4xoiSSKSOb6d5j
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-24_04,2025-06-23_07,2025-03-28_01
 
+The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
+Netlink message, which triggers the kernel function xfrm_alloc_spi().
+This function is expected to ensure uniqueness of the Security Parameter
+Index (SPI) for inbound Security Associations (SAs). However, it can
+return success even when the requested SPI is already in use, leading
+to duplicate SPIs assigned to multiple inbound SAs, differentiated
+only by their destination addresses.
 
+This behavior causes inconsistencies during SPI lookups for inbound packets.
+Since the lookup may return an arbitrary SA among those with the same SPI,
+packet processing can fail, resulting in packet drops.
 
-On 6/22/25 10:40 PM, Florian Westphal wrote:
-> Eric Woudstra <ericwouds@gmail.com> wrote:
->> -	return nft_do_chain(&pkt, priv);
->> +	ret = nft_do_chain(&pkt, priv);
->> +
->> +	if (offset) {
->> +		__skb_push(skb, offset);
->> +		skb_reset_network_header(skb);
->> +		skb->protocol = outer_proto;
->> +	}
-> 
-> I don't think its a good idea to do this.
-> 
-> nft_do_chain() can mangle packet in arbitrary ways,
-> including making a duplicate, sending icmp/tcp resets in response
-> to packet. forwarding the packet to another interface, dropping
-> the packet, etc.
-> 
-> Wouldn't it be enough to set the skb network header if its not
-> set yet, without pull (and a need to push later)?
+According to RFC 4301 section 4.4.2 , for inbound processing a unicast SA
+is uniquely identified by the SPI and optionally protocol.
 
-If I replace the pull + skb_reset_network_header with
-skb_set_network_header and remove the push, this also works.
-I'll change it in the next version of this patch.
+Reproducing the Issue Reliably:
+To consistently reproduce the problem, restrict the available SPI range in
+charon.conf : spi_min = 0x10000000 spi_max = 0x10000002
+This limits the system to only 2 usable SPI values.
+Next, create more than 2 Child SA. each using unique pair of src/dst address.
+As soon as the 3rd Child SA is initiated, it will be assigned a duplicate
+SPI, since the SPI pool is already exhausted.
+With a narrow SPI range, the issue is consistently reproducible.
+With a broader/default range, it becomes rare and unpredictable.
 
-However, if I do the same in nf_ct_bridge_pre() (the other patch in this
-patch-set), then packets get dropped. I'll need to look into that furter.
+Current implementation:
+xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
+So if two SAs have the same SPI but different destination addresses, then
+they will:
+a. Hash into different buckets
+b. Be stored in different linked lists (byspi + h)
+c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
+As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
+
+Proposed Change:
+xfrm_state_lookup_spi_proto() does a truly global search - across all states,
+regardless of hash bucket and matches SPI and proto.
+
+Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
+---
+ net/xfrm/xfrm_state.c | 38 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 30 insertions(+), 8 deletions(-)
+
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 341d79ecb5c2..6e6bc1818903 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -1714,6 +1714,28 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
+ }
+ EXPORT_SYMBOL(xfrm_state_lookup_byspi);
+ 
++static struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 spi, u8 proto)
++{
++    struct xfrm_state *x;
++    unsigned int i;
++
++    rcu_read_lock();
++
++    for (i = 0; i <= net->xfrm.state_hmask; i++) {
++        hlist_for_each_entry_rcu(x, &net->xfrm.state_byspi[i], byspi) {
++            if (x->id.spi == spi && x->id.proto == proto) {
++                if (!xfrm_state_hold_rcu(x))
++                    continue;
++                rcu_read_unlock();
++                return x;
++            }
++        }
++    }
++
++    rcu_read_unlock();
++    return NULL;
++}
++
+ static void __xfrm_state_insert(struct xfrm_state *x)
+ {
+ 	struct net *net = xs_net(x);
+@@ -2550,7 +2572,6 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	__be32 minspi = htonl(low);
+ 	__be32 maxspi = htonl(high);
+ 	__be32 newspi = 0;
+-	u32 mark = x->mark.v & x->mark.m;
+ 
+ 	spin_lock_bh(&x->lock);
+ 	if (x->km.state == XFRM_STATE_DEAD) {
+@@ -2565,18 +2586,12 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	err = -ENOENT;
+ 
+ 	if (minspi == maxspi) {
+-		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
+-		if (x0) {
+-			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
+-			xfrm_state_put(x0);
+-			goto unlock;
+-		}
+ 		newspi = minspi;
+ 	} else {
+ 		u32 spi = 0;
+ 		for (h = 0; h < high-low+1; h++) {
+ 			spi = get_random_u32_inclusive(low, high);
+-			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
++			x0 = xfrm_state_lookup_spi_proto(net, htonl(spi), x->id.proto);
+ 			if (x0 == NULL) {
+ 				newspi = htonl(spi);
+ 				break;
+@@ -2586,6 +2601,13 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	}
+ 	if (newspi) {
+ 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
++		x0 = xfrm_state_lookup_spi_proto(net, newspi, x->id.proto);
++		if (x0) {
++			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
++			xfrm_state_put(x0);
++			goto unlock;
++		}
++
+ 		x->id.spi = newspi;
+ 		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
+ 		XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h,
+-- 
+2.43.0
 
 
