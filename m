@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-200578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA86AE625D
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:26:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6776AAE6272
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 12:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB6B33BED17
-	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:26:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E067016B547
+	for <lists+netdev@lfdr.de>; Tue, 24 Jun 2025 10:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB19425DB13;
-	Tue, 24 Jun 2025 10:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D172820A5;
+	Tue, 24 Jun 2025 10:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="W0YUC6tw"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="R/aFE5W9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C774239E99
-	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E69F26A1BE
+	for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 10:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750760806; cv=none; b=qNFoT0Zusz10SiBt8xI3KTU72BwbSTQlSufKh2/GO1h+Ipc9wOhTY9nsdKHE/9ZlSr3VMxYR85ONiN5z4qGRtkaJWqcDO+HX22PeDEXSshVvYxx81kSbBVtYsTXVM8IZ86UjyrHevNc7QG9qQJWXm9frv3Y8HXPr+ntp5XPIq8w=
+	t=1750760985; cv=none; b=fzgfHsriUnqGqjY8Rv6K9wnldT9QgzjCPfctdojxUarfgqptGS2+0c6wOJ2CGtgDrI4kvpOedp//rRKy3CKnEaQXUnbnKFLrr0EhzbxQqVzwsoDuPdwDaUrRmSP/+OiwhosbCcCwtsTQsknczJ0qON9NT7jXQahQUFU07G0CxAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750760806; c=relaxed/simple;
-	bh=6Bp/6cm8MhzSVpYk6D6PVkVw+2dJGDrjh5ngCZHuG34=;
+	s=arc-20240116; t=1750760985; c=relaxed/simple;
+	bh=HcrTKTPscukZBazgWou2j8uRbaDWtBOLxf2W//G2/tc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GdmFZPlqadsjHPA/tw1lImuiKVba531dZxgM9VEgs5jofL53U9FOj2Zg0fDOs9kQEZf0PA16lPBHJlk7KjGoDpHtorU/whhqdqL11roU09jH/yLiefGtnRpACUw5P4emvSZIqAb5AdYlEvCvc4WoyqLSOUzFcUnY8mlGF2bDenc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=W0YUC6tw; arc=none smtp.client-ip=209.85.217.41
+	 To:Cc:Content-Type; b=CxdqKDf6Aepm9AAmOUC9K9yozOjvLvT222nM6Rw8BL4pJqD/QBvpKroAtzxuuxuycfdNe51FNqGj06C4u1toeAxmatGvxGw5F/L6TkmOmf8BDWhI0UJyiE3DXHrz0iMKWkIdTucU7L/Qj5npjNlGh+NHayHNtjfsKIJZY4TWRy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=R/aFE5W9; arc=none smtp.client-ip=209.85.217.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-4dfa2aeec86so1359456137.1
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:26:44 -0700 (PDT)
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4e80d19c7ebso172527137.3
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 03:29:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1750760803; x=1751365603; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1750760983; x=1751365783; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mUGYmcGuiu9DMqw7r45OxseuO7PRr7DQlMJQ1F3MlGc=;
-        b=W0YUC6tw5vzeO4arGKQ/Kc9Ic2v+12AItZLYC78UD96DjpPohHIAL2rwOgQ609mWGY
-         tVoYm3e9z60EWgJnx04KJVP+lhFNGVBlxOv/+5yyWRsEi/tgsVb+S2Fxl6QQI9mCKGk+
-         kaMhd2jPu+UYBPCYtm/LHQoP9JtqaEoSPhzCo=
+        bh=dF7gKxPuIPfrHQhMRnCpvQN5PxlSTdIpoRHcu2Z7huw=;
+        b=R/aFE5W9U0i1jpQYSnda5OQ4RDKMI5tu40ZDUrT6OFibghzJcVj+xeJQoqveJFKX1Q
+         EAOpUA8goF9mbQVH2Xh0SS53Npb9S//Eddo2TFuvusb309fWJ7svIrYpILv2pGfcLv2j
+         YbbxdoOvwn8ermKCKeouyZbq3NMeDtFVvV/e0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750760803; x=1751365603;
+        d=1e100.net; s=20230601; t=1750760983; x=1751365783;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mUGYmcGuiu9DMqw7r45OxseuO7PRr7DQlMJQ1F3MlGc=;
-        b=HMok6/KLoKJOJHA5z4qNzIxEvE8DeCt4YA5/36flooqFvrsqT7DJKrCKiaKy6bzCLX
-         U32CNAkPhQXl4FaZvpzHp6lYQg7erv/n+qxjEq6uWDhx70x6VlMUOhTL5UCB078QKV+4
-         C9qOJuywB/R0GX4so1MCOTLzlPiS/yelN6o7SPg/WShrJnsRcLQ0BtBz3RDilEG5IXEg
-         FtQCHCninE6gdAwz7mzVtfcTGSTCC0Rp5/QQyis+dxA3t2Tc77GoYQitW+wrOXlfBvaF
-         rWiQDHD4Vh+hLxUm9bOc8G/ADDIz/TVYY/kFD2KhvAwkdCKMcl2m/wWLcf5JEHxwSeZd
-         cSgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaMXnuAw337LKf/8sBCctuYv0yYH3/qI8Qc/x+4ZOEZrD02QvgJu6kccG7FMW1e80PWj5sQhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf4Z+vbG9W7b0DMxmF8+eTGe6oP3htVh8W6dJ3KS4ykXUrvBel
-	X6OM6zsw9zkqA5lpSF5ipZo4qF6EeZ7WgfF3hsrB2mMtJtxoqmBapZzo2R4RH2WB7+P3ArBfleF
-	ObL2SXy1nDi7ADqNiWlPkqU9OIqdLcBvOJn7tV1Ws
-X-Gm-Gg: ASbGnctUdjZJLKpqo7zbrOs7MWZIR6r6H5sjXhgnlLGPVvyXnTYoxKfFC4DnrscN15n
-	8ThrY3w1q0c5Lv8pBdYuN4mozglytV5nhZ33XBhZyuEU37MSVYB8YIY2/EaZGskuiamrRI0Opod
-	qG5sdo2Q0CcBgGZCK10uMtzaS/PJZXETxjJBHrdkfRBHFVADvjTrPojrg=
-X-Google-Smtp-Source: AGHT+IFDoq2JMkQmux1kLtn4xAmMZnPEQ40DKhMbLaDSsp5DTIl0fl4BnTHk/ttrRhXSx8YnqrulkoTlhpBRokBS2HE=
-X-Received: by 2002:a05:6102:3ed4:b0:4c3:6393:83f4 with SMTP id
- ada2fe7eead31-4e9c2b08484mr9816596137.2.1750760803270; Tue, 24 Jun 2025
- 03:26:43 -0700 (PDT)
+        bh=dF7gKxPuIPfrHQhMRnCpvQN5PxlSTdIpoRHcu2Z7huw=;
+        b=J+/lv7Pm+tJ3JP22WcU+YTcFF+Z3cIz/YcyVwsrMuUVt/A5Le/QKsI7FX+A4UaaP8H
+         VXbbkfEY/iauBvsof7Rd9W/X1TuD9nXw1LDzaRCr9rlTgm+3yLSRpBDk1IgLrB3VCpaP
+         7QZGA7lKakSARomol/iB3BS+ZREO1s+Hqvt7yvE7j4HX3clhg88kF+uT1he9yOznTBci
+         pc/9KlVWloLvi3j9R4Odr/55c7qOPPSqWEmSLkJsWZL8gp61TkOP9VmBWFHeHTslfgu3
+         RtNEbXtYRqCX7M00M2/3u9rxYs706OM1roOz2sUjIxHaz0r0q1l2IHLq0uidPvxnWVjD
+         gVQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWP2oDTyX01BEv3JWamiVzIkYt2HLDS+3MsTbynDG96h15NncU9T7eJwKRt+nmqvAuU4L+xs28=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyINxryutrycGp/lkZR05pwruMO3nMHUVSR/1tRYWvq0gcC5aMF
+	ReQMlB2c+yes+uFHtqusPyFbzuyKnUzQuKRW4sYYes3r9VUNCPTgPdC2yQq4ct8eVnmELQdpiOS
+	c0jCkCQ1ZJ8IG3VMCCHJw/X1jC+xefSwrfEiyiyqq
+X-Gm-Gg: ASbGncslKucms7tPTtQYUm2DPkIp1Bfri7eV2xBcsNeJXKq5dIABhHy6a3zeuSXQIXs
+	J3+psYNh3aUAXz9A0SLuFz/r4E+CRsvbpN5OJfKPm7ev2DNMyPnKTqmWAtTpSSAR7ET+tJ59FAG
+	wTPiuFo1EQl3MG0x9s57GV7mgt+6YcAKgC7/ZTjhOtLI9L
+X-Google-Smtp-Source: AGHT+IEeuQOT/CJ48z1wuSddYCbOyVTBffaExKbjUB9yjE5Rm7BYMeqYh4K8FHOdev5+C90PP4BYoUUPQ8RzTliBfOk=
+X-Received: by 2002:a05:6102:504d:b0:4db:e01:f2db with SMTP id
+ ada2fe7eead31-4e9c297a3dcmr9303834137.0.1750760982937; Tue, 24 Jun 2025
+ 03:29:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,13 +71,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250618144743.843815-1-vikas.gupta@broadcom.com>
- <20250618144743.843815-5-vikas.gupta@broadcom.com> <4bf20b00-19bd-48f3-9d0c-3c8bde56ec47@linux.dev>
-In-Reply-To: <4bf20b00-19bd-48f3-9d0c-3c8bde56ec47@linux.dev>
+ <20250618144743.843815-7-vikas.gupta@broadcom.com> <decb802a-7327-4a9a-8a4a-74970474f42c@linux.dev>
+In-Reply-To: <decb802a-7327-4a9a-8a4a-74970474f42c@linux.dev>
 From: Vikas Gupta <vikas.gupta@broadcom.com>
-Date: Tue, 24 Jun 2025 15:56:30 +0530
-X-Gm-Features: Ac12FXzmShGJ2xbIJTtAYvQqO75cNlWv8l6bU6gnU6zXf4ZXgNVv42zsqsey8EI
-Message-ID: <CAHLZf_u2e7Cm8-hkAy-bfcQ6QThwanYAFuRemi-FcNgh+rVprg@mail.gmail.com>
-Subject: Re: [net-next, 04/10] bng_en: Add initial interaction with firmware
+Date: Tue, 24 Jun 2025 15:59:30 +0530
+X-Gm-Features: Ac12FXx6GzNVXk4G2spjUx_60lXYg14psaYs-oH__12CWsnqfQbniYgRaCI2Wgc
+Message-ID: <CAHLZf_uByWcXJmdo++fPM=o1GyZZ9pEZmSx8bSy4wbSiGcLDnA@mail.gmail.com>
+Subject: Re: [net-next, 06/10] bng_en: Add backing store support
 To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
@@ -87,707 +87,148 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>, 
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000cbfd8f06384ec3e0"
+	boundary="0000000000007ee1e206384ece91"
 
---000000000000cbfd8f06384ec3e0
+--0000000000007ee1e206384ece91
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 19, 2025 at 6:23=E2=80=AFPM Vadim Fedorenko
+On Thu, Jun 19, 2025 at 6:32=E2=80=AFPM Vadim Fedorenko
 <vadim.fedorenko@linux.dev> wrote:
 >
 > On 18/06/2025 15:47, Vikas Gupta wrote:
-> > Query firmware with the help of basic firmware commands and
-> > cache the capabilities. With the help of basic commands
-> > start the initialization process of the driver with the
-> > firmware.
-> > Since basic information is available from the firmware,
-> > add that information to the devlink info get command.
+> > Backing store or context memory on the host helps the
+> > device to manage rings, stats and other resources.
+> > Context memory is allocated with the help of ring
+> > alloc/free functions.
 > >
 > > Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
 > > Reviewed-by: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
 > > Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 > > ---
-> >   drivers/net/ethernet/broadcom/bnge/Makefile   |   3 +-
-> >   drivers/net/ethernet/broadcom/bnge/bnge.h     |  54 +++++
-> >   .../net/ethernet/broadcom/bnge/bnge_core.c    |  67 ++++++
-> >   .../net/ethernet/broadcom/bnge/bnge_devlink.c | 120 ++++++++++
-> >   .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 213 +++++++++++++++++=
+> >   drivers/net/ethernet/broadcom/bnge/bnge.h     |  18 +
+> >   .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 168 +++++++++
+> >   .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   4 +
+> >   .../net/ethernet/broadcom/bnge/bnge_rmem.c    | 337 +++++++++++++++++=
 +
-> >   .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |  16 ++
-> >   6 files changed, 472 insertions(+), 1 deletion(-)
-> >   create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> >   create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
+> >   .../net/ethernet/broadcom/bnge/bnge_rmem.h    | 153 ++++++++
+> >   5 files changed, 680 insertions(+)
 > >
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/Makefile b/drivers/net/=
-ethernet/broadcom/bnge/Makefile
-> > index b296d7de56ce..b8dbbc2d5972 100644
-> > --- a/drivers/net/ethernet/broadcom/bnge/Makefile
-> > +++ b/drivers/net/ethernet/broadcom/bnge/Makefile
-> > @@ -4,4 +4,5 @@ obj-$(CONFIG_BNGE) +=3D bng_en.o
-> >
-> >   bng_en-y :=3D bnge_core.o \
-> >           bnge_devlink.o \
-> > -         bnge_hwrm.o
-> > +         bnge_hwrm.o \
-> > +         bnge_hwrm_lib.o
 > > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/et=
 hernet/broadcom/bnge/bnge.h
-> > index 8f2a562d9ae2..60af0517c45e 100644
+> > index 60af0517c45e..01f64a10729c 100644
 > > --- a/drivers/net/ethernet/broadcom/bnge/bnge.h
 > > +++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-> > @@ -7,6 +7,13 @@
-> >   #define DRV_NAME    "bng_en"
-> >   #define DRV_SUMMARY "Broadcom 800G Ethernet Linux Driver"
+> > @@ -9,6 +9,7 @@
 > >
-> > +#include <linux/etherdevice.h>
-> > +#include "../bnxt/bnxt_hsi.h"
-> > +
-> > +#define DRV_VER_MAJ  1
-> > +#define DRV_VER_MIN  15
-> > +#define DRV_VER_UPD  1
-> > +
-> >   extern char bnge_driver_name[];
+> >   #include <linux/etherdevice.h>
+> >   #include "../bnxt/bnxt_hsi.h"
+> > +#include "bnge_rmem.h"
 > >
-> >   enum board_idx {
-> > @@ -15,6 +22,36 @@ enum board_idx {
-> >
-> >   #define INVALID_HW_RING_ID      ((u16)-1)
+> >   #define DRV_VER_MAJ 1
+> >   #define DRV_VER_MIN 15
+> > @@ -52,6 +53,13 @@ enum {
+> >       BNGE_FW_CAP_VNIC_RE_FLUSH                       =3D BIT_ULL(26),
+> >   };
 > >
 > > +enum {
-> > +     BNGE_FW_CAP_SHORT_CMD                           =3D BIT_ULL(0),
-> > +     BNGE_FW_CAP_LLDP_AGENT                          =3D BIT_ULL(1),
-> > +     BNGE_FW_CAP_DCBX_AGENT                          =3D BIT_ULL(2),
-> > +     BNGE_FW_CAP_IF_CHANGE                           =3D BIT_ULL(3),
-> > +     BNGE_FW_CAP_KONG_MB_CHNL                        =3D BIT_ULL(4),
-> > +     BNGE_FW_CAP_ERROR_RECOVERY                      =3D BIT_ULL(5),
-> > +     BNGE_FW_CAP_PKG_VER                             =3D BIT_ULL(6),
-> > +     BNGE_FW_CAP_CFA_ADV_FLOW                        =3D BIT_ULL(7),
-> > +     BNGE_FW_CAP_CFA_RFS_RING_TBL_IDX_V2             =3D BIT_ULL(8),
-> > +     BNGE_FW_CAP_PCIE_STATS_SUPPORTED                =3D BIT_ULL(9),
-> > +     BNGE_FW_CAP_EXT_STATS_SUPPORTED                 =3D BIT_ULL(10),
-> > +     BNGE_FW_CAP_ERR_RECOVER_RELOAD                  =3D BIT_ULL(11),
-> > +     BNGE_FW_CAP_HOT_RESET                           =3D BIT_ULL(12),
-> > +     BNGE_FW_CAP_RX_ALL_PKT_TS                       =3D BIT_ULL(13),
-> > +     BNGE_FW_CAP_VLAN_RX_STRIP                       =3D BIT_ULL(14),
-> > +     BNGE_FW_CAP_VLAN_TX_INSERT                      =3D BIT_ULL(15),
-> > +     BNGE_FW_CAP_EXT_HW_STATS_SUPPORTED              =3D BIT_ULL(16),
-> > +     BNGE_FW_CAP_LIVEPATCH                           =3D BIT_ULL(17),
-> > +     BNGE_FW_CAP_HOT_RESET_IF                        =3D BIT_ULL(18),
-> > +     BNGE_FW_CAP_RING_MONITOR                        =3D BIT_ULL(19),
-> > +     BNGE_FW_CAP_DBG_QCAPS                           =3D BIT_ULL(20),
-> > +     BNGE_FW_CAP_THRESHOLD_TEMP_SUPPORTED            =3D BIT_ULL(21),
-> > +     BNGE_FW_CAP_DFLT_VLAN_TPID_PCP                  =3D BIT_ULL(22),
-> > +     BNGE_FW_CAP_VNIC_TUNNEL_TPA                     =3D BIT_ULL(23),
-> > +     BNGE_FW_CAP_CFA_NTUPLE_RX_EXT_IP_PROTO          =3D BIT_ULL(24),
-> > +     BNGE_FW_CAP_CFA_RFS_RING_TBL_IDX_V3             =3D BIT_ULL(25),
-> > +     BNGE_FW_CAP_VNIC_RE_FLUSH                       =3D BIT_ULL(26),
+> > +     BNGE_EN_ROCE_V1                                 =3D BIT_ULL(0),
+> > +     BNGE_EN_ROCE_V2                                 =3D BIT_ULL(1),
 > > +};
+> > +
+> > +#define BNGE_EN_ROCE         (BNGE_EN_ROCE_V1 | BNGE_EN_ROCE_V2)
 > > +
 > >   struct bnge_dev {
 > >       struct device   *dev;
 > >       struct pci_dev  *pdev;
-> > @@ -25,6 +62,9 @@ struct bnge_dev {
+> > @@ -89,6 +97,16 @@ struct bnge_dev {
+> >   #define BNGE_STATE_DRV_REGISTERED      0
 > >
-> >       void __iomem    *bar0;
-> >
-> > +     u16             chip_num;
-> > +     u8              chip_rev;
+> >       u64                     fw_cap;
 > > +
-> >       /* HWRM members */
-> >       u16                     hwrm_cmd_seq;
-> >       u16                     hwrm_cmd_kong_seq;
-> > @@ -35,6 +75,20 @@ struct bnge_dev {
-> >       unsigned int            hwrm_cmd_timeout;
-> >       unsigned int            hwrm_cmd_max_timeout;
-> >       struct mutex            hwrm_cmd_lock;  /* serialize hwrm message=
-s */
+> > +     /* Backing stores */
+> > +     struct bnge_ctx_mem_info        *ctx;
 > > +
-> > +     struct hwrm_ver_get_output      ver_resp;
-> > +#define FW_VER_STR_LEN               32
-> > +     char                    fw_ver_str[FW_VER_STR_LEN];
-> > +     char                    hwrm_ver_supp[FW_VER_STR_LEN];
-> > +     char                    nvm_cfg_ver[FW_VER_STR_LEN];
-> > +     u64                     fw_ver_code;
-> > +#define BNGE_FW_VER_CODE(maj, min, bld, rsv)                 \
-> > +     ((u64)(maj) << 48 | (u64)(min) << 32 | (u64)(bld) << 16 | (rsv))
-> > +
-> > +     unsigned long           state;
-> > +#define BNGE_STATE_DRV_REGISTERED      0
-> > +
-> > +     u64                     fw_cap;
+> > +     u64                     flags;
 > >   };
 > >
+> > +static inline bool bnge_is_roce_en(struct bnge_dev *bd)
+> > +{
+> > +     return bd->flags & BNGE_EN_ROCE;
+> > +}
+> > +
 > >   #endif /* _BNGE_H_ */
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_core.c b/drivers/n=
-et/ethernet/broadcom/bnge/bnge_core.c
-> > index 1a46c7663012..5e23eb14f60e 100644
-> > --- a/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-> > @@ -8,6 +8,8 @@
+> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drive=
+rs/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+> > index 567376a407df..e5f32ac8a69f 100644
+> > --- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+> > @@ -10,6 +10,7 @@
+> >   #include "../bnxt/bnxt_hsi.h"
+> >   #include "bnge_hwrm.h"
+> >   #include "bnge_hwrm_lib.h"
+> > +#include "bnge_rmem.h"
 > >
-> >   #include "bnge.h"
-> >   #include "bnge_devlink.h"
-> > +#include "bnge_hwrm.h"
-> > +#include "bnge_hwrm_lib.h"
-> >
-> >   MODULE_LICENSE("GPL");
-> >   MODULE_DESCRIPTION(DRV_SUMMARY);
-> > @@ -37,6 +39,51 @@ static void bnge_print_device_info(struct pci_dev *p=
-dev, enum board_idx idx)
-> >       pcie_print_link_status(pdev);
+> >   int bnge_hwrm_ver_get(struct bnge_dev *bd)
+> >   {
+> > @@ -211,3 +212,170 @@ int bnge_hwrm_func_drv_unrgtr(struct bnge_dev *bd=
+)
+> >               return rc;
+> >       return hwrm_req_send(bd, req);
 > >   }
-> >
-> > +static void bnge_nvm_cfg_ver_get(struct bnge_dev *bd)
-> > +{
-> > +     struct hwrm_nvm_get_dev_info_output nvm_info;
 > > +
-> > +     if (!bnge_hwrm_nvm_dev_info(bd, &nvm_info))
-> > +             snprintf(bd->nvm_cfg_ver, FW_VER_STR_LEN, "%d.%d.%d",
-> > +                      nvm_info.nvm_cfg_ver_maj, nvm_info.nvm_cfg_ver_m=
-in,
-> > +                      nvm_info.nvm_cfg_ver_upd);
+> > +static void bnge_init_ctx_initializer(struct bnge_ctx_mem_type *ctxm,
+> > +                                   u8 init_val, u8 init_offset,
+> > +                                   bool init_mask_set)
+> > +{
+> > +     ctxm->init_value =3D init_val;
+> > +     ctxm->init_offset =3D BNGE_CTX_INIT_INVALID_OFFSET;
+> > +     if (init_mask_set)
+> > +             ctxm->init_offset =3D init_offset * 4;
+> > +     else
+> > +             ctxm->init_value =3D 0;
 > > +}
 > > +
-> > +static void bnge_fw_unregister_dev(struct bnge_dev *bd)
+> > +static int bnge_alloc_all_ctx_pg_info(struct bnge_dev *bd, int ctx_max=
+)
 > > +{
-> > +     bnge_hwrm_func_drv_unrgtr(bd);
-> > +}
+> > +     struct bnge_ctx_mem_info *ctx =3D bd->ctx;
+> > +     u16 type;
 > > +
-> > +static int bnge_fw_register_dev(struct bnge_dev *bd)
-> > +{
-> > +     int rc;
+> > +     for (type =3D 0; type < ctx_max; type++) {
+> > +             struct bnge_ctx_mem_type *ctxm =3D &ctx->ctx_arr[type];
+> > +             int n =3D 1;
 > > +
-> > +     bd->fw_cap =3D 0;
-> > +     rc =3D bnge_hwrm_ver_get(bd);
-> > +     if (rc) {
-> > +             dev_err(bd->dev, "Get Version command failed rc: %d\n", r=
-c);
-> > +             return rc;
-> > +     }
+> > +             if (!ctxm->max_entries)
+> > +                     continue;
 > > +
-> > +     bnge_nvm_cfg_ver_get(bd);
-> > +
-> > +     rc =3D bnge_hwrm_func_reset(bd);
-> > +     if (rc) {
-> > +             dev_err(bd->dev, "Failed to reset function rc: %d\n", rc)=
-;
-> > +             return rc;
-> > +     }
-> > +
-> > +     bnge_hwrm_fw_set_time(bd);
-> > +
-> > +     rc =3D  bnge_hwrm_func_drv_rgtr(bd);
-> > +     if (rc) {
-> > +             dev_err(bd->dev, "Failed to rgtr with firmware rc: %d\n",=
- rc);
-> > +             return rc;
+> > +             if (ctxm->instance_bmap)
+> > +                     n =3D hweight32(ctxm->instance_bmap);
+> > +             ctxm->pg_info =3D kcalloc(n, sizeof(*ctxm->pg_info), GFP_=
+KERNEL);
+> > +             if (!ctxm->pg_info)
+> > +                     return -ENOMEM;
+>
+> It's a bit hard to be absolutely sure without full chain of calls, but
+> it looks like some of the memory can be leaked in case of allocation
+> fail. Direct callers do not clear allocated contextes in the error path.
+
+After the allocation of context memory, it could be in use by the
+hardware, so it is always safer
+to clean it up when we finally deregister from the firmware. The
+bnge_fw_unregister_dev() function
+handles memory freeing via bnge_free_ctx_mem(), instead of freeing up by ca=
+ller.
+I hope this clarifies your concern.
+
+>
 > > +     }
 > > +
 > > +     return 0;
 > > +}
 > > +
-> >   static void bnge_pci_disable(struct pci_dev *pdev)
-> >   {
-> >       pci_release_regions(pdev);
-> > @@ -136,10 +183,26 @@ static int bnge_probe_one(struct pci_dev *pdev, c=
-onst struct pci_device_id *ent)
-> >               goto err_devl_unreg;
-> >       }
-> >
-> > +     rc =3D bnge_init_hwrm_resources(bd);
-> > +     if (rc)
-> > +             goto err_bar_unmap;
-> > +
-> > +     rc =3D bnge_fw_register_dev(bd);
-> > +     if (rc) {
-> > +             dev_err(&pdev->dev, "Failed to register with firmware rc =
-=3D %d\n", rc);
-> > +             goto err_hwrm_cleanup;
-> > +     }
-> > +
-> >       pci_save_state(pdev);
-> >
-> >       return 0;
-> >
-> > +err_hwrm_cleanup:
-> > +     bnge_cleanup_hwrm_resources(bd);
-> > +
-> > +err_bar_unmap:
-> > +     bnge_unmap_bars(pdev);
-> > +
-> >   err_devl_unreg:
-> >       bnge_devlink_unregister(bd);
-> >       bnge_devlink_free(bd);
-> > @@ -153,6 +216,10 @@ static void bnge_remove_one(struct pci_dev *pdev)
-> >   {
-> >       struct bnge_dev *bd =3D pci_get_drvdata(pdev);
-> >
-> > +     bnge_fw_unregister_dev(bd);
-> > +
-> > +     bnge_cleanup_hwrm_resources(bd);
-> > +
-> >       bnge_unmap_bars(pdev);
-> >
-> >       bnge_devlink_unregister(bd);
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c b/driver=
-s/net/ethernet/broadcom/bnge/bnge_devlink.c
-> > index d406338da130..f987d35beea2 100644
-> > --- a/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
-> > @@ -8,6 +8,7 @@
-> >
-> >   #include "bnge.h"
-> >   #include "bnge_devlink.h"
-> > +#include "bnge_hwrm_lib.h"
-> >
-> >   static int bnge_dl_info_put(struct bnge_dev *bd, struct devlink_info_=
-req *req,
-> >                           enum bnge_dl_version_type type, const char *k=
-ey,
-> > @@ -16,6 +17,10 @@ static int bnge_dl_info_put(struct bnge_dev *bd, str=
-uct devlink_info_req *req,
-> >       if (!strlen(buf))
-> >               return 0;
-> >
-> > +     if (!strcmp(key, DEVLINK_INFO_VERSION_GENERIC_FW_NCSI) ||
-> > +         !strcmp(key, DEVLINK_INFO_VERSION_GENERIC_FW_ROCE))
-> > +             return 0;
-> > +
-> >       switch (type) {
-> >       case BNGE_VERSION_FIXED:
-> >               return devlink_info_version_fixed_put(req, key, buf);
-> > @@ -63,11 +68,20 @@ static void bnge_vpd_read_info(struct bnge_dev *bd)
-> >       kfree(vpd_data);
-> >   }
-> >
-> > +#define HWRM_FW_VER_STR_LEN  16
-> > +
-> >   static int bnge_devlink_info_get(struct devlink *devlink,
-> >                                struct devlink_info_req *req,
-> >                                struct netlink_ext_ack *extack)
-> >   {
-> > +     struct hwrm_nvm_get_dev_info_output nvm_dev_info;
-> >       struct bnge_dev *bd =3D devlink_priv(devlink);
-> > +     struct hwrm_ver_get_output *ver_resp;
-> > +     char mgmt_ver[FW_VER_STR_LEN];
-> > +     char roce_ver[FW_VER_STR_LEN];
-> > +     char ncsi_ver[FW_VER_STR_LEN];
-> > +     char buf[32];
-> > +
-> >       int rc;
-> >
-> >       if (bd->dsn) {
-> > @@ -95,6 +109,112 @@ static int bnge_devlink_info_get(struct devlink *d=
-evlink,
-> >                             DEVLINK_INFO_VERSION_GENERIC_BOARD_ID,
-> >                             bd->board_partno);
-> >
-> > +     /* More information from HWRM ver get command */
-> > +     sprintf(buf, "%X", bd->chip_num);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_FIXED,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_ASIC_ID, buf);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     ver_resp =3D &bd->ver_resp;
-> > +     sprintf(buf, "%c%d", 'A' + ver_resp->chip_rev, ver_resp->chip_met=
-al);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_FIXED,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_ASIC_REV, buf)=
-;
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_RUNNING,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_PSID,
-> > +                           bd->nvm_cfg_ver);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     buf[0] =3D 0;
-> > +     strncat(buf, ver_resp->active_pkg_name, HWRM_FW_VER_STR_LEN);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_RUNNING,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW, buf);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     if (ver_resp->flags & VER_GET_RESP_FLAGS_EXT_VER_AVAIL) {
-> > +             snprintf(mgmt_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +                      ver_resp->hwrm_fw_major, ver_resp->hwrm_fw_minor=
-,
-> > +                      ver_resp->hwrm_fw_build, ver_resp->hwrm_fw_patch=
-);
-> > +
-> > +             snprintf(ncsi_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +                      ver_resp->mgmt_fw_major, ver_resp->mgmt_fw_minor=
-,
-> > +                      ver_resp->mgmt_fw_build, ver_resp->mgmt_fw_patch=
-);
-> > +
-> > +             snprintf(roce_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +                      ver_resp->roce_fw_major, ver_resp->roce_fw_minor=
-,
-> > +                      ver_resp->roce_fw_build, ver_resp->roce_fw_patch=
-);
-> > +     } else {
-> > +             snprintf(mgmt_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +                      ver_resp->hwrm_fw_maj_8b, ver_resp->hwrm_fw_min_=
-8b,
-> > +                      ver_resp->hwrm_fw_bld_8b, ver_resp->hwrm_fw_rsvd=
-_8b);
-> > +
-> > +             snprintf(ncsi_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +                      ver_resp->mgmt_fw_maj_8b, ver_resp->mgmt_fw_min_=
-8b,
-> > +                      ver_resp->mgmt_fw_bld_8b, ver_resp->mgmt_fw_rsvd=
-_8b);
-> > +
-> > +             snprintf(roce_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +                      ver_resp->roce_fw_maj_8b, ver_resp->roce_fw_min_=
-8b,
-> > +                      ver_resp->roce_fw_bld_8b, ver_resp->roce_fw_rsvd=
-_8b);
-> > +     }
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_RUNNING,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_MGMT, mgmt_=
-ver);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_RUNNING,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_MGMT_API,
-> > +                           bd->hwrm_ver_supp);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_RUNNING,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_NCSI, ncsi_=
-ver);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_RUNNING,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_ROCE, roce_=
-ver);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     rc =3D bnge_hwrm_nvm_dev_info(bd, &nvm_dev_info);
-> > +     if (!(nvm_dev_info.flags & NVM_GET_DEV_INFO_RESP_FLAGS_FW_VER_VAL=
-ID))
-> > +             return 0;
-> > +
-> > +     buf[0] =3D 0;
-> > +     strncat(buf, nvm_dev_info.pkg_name, HWRM_FW_VER_STR_LEN);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_STORED,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW, buf);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     snprintf(mgmt_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +              nvm_dev_info.hwrm_fw_major, nvm_dev_info.hwrm_fw_minor,
-> > +              nvm_dev_info.hwrm_fw_build, nvm_dev_info.hwrm_fw_patch);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_STORED,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_MGMT, mgmt_=
-ver);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     snprintf(ncsi_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +              nvm_dev_info.mgmt_fw_major, nvm_dev_info.mgmt_fw_minor,
-> > +              nvm_dev_info.mgmt_fw_build, nvm_dev_info.mgmt_fw_patch);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_STORED,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_NCSI, ncsi_=
-ver);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     snprintf(roce_ver, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +              nvm_dev_info.roce_fw_major, nvm_dev_info.roce_fw_minor,
-> > +              nvm_dev_info.roce_fw_build, nvm_dev_info.roce_fw_patch);
-> > +     rc =3D bnge_dl_info_put(bd, req, BNGE_VERSION_STORED,
-> > +                           DEVLINK_INFO_VERSION_GENERIC_FW_ROCE, roce_=
-ver);
-> > +
-> >       return rc;
-> >   }
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drive=
-rs/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> > new file mode 100644
-> > index 000000000000..567376a407df
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> > @@ -0,0 +1,213 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +// Copyright (c) 2025 Broadcom.
-> > +
-> > +#include <linux/errno.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/mm.h>
-> > +#include <linux/pci.h>
-> > +
-> > +#include "bnge.h"
-> > +#include "../bnxt/bnxt_hsi.h"
-> > +#include "bnge_hwrm.h"
-> > +#include "bnge_hwrm_lib.h"
-> > +
-> > +int bnge_hwrm_ver_get(struct bnge_dev *bd)
-> > +{
-> > +     u32 dev_caps_cfg, hwrm_ver, hwrm_spec_code;
-> > +     u16 fw_maj, fw_min, fw_bld, fw_rsv;
-> > +     struct hwrm_ver_get_output *resp;
-> > +     struct hwrm_ver_get_input *req;
-> > +     int rc;
-> > +
-> > +     rc =3D hwrm_req_init(bd, req, HWRM_VER_GET);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     hwrm_req_flags(bd, req, BNGE_HWRM_FULL_WAIT);
-> > +     bd->hwrm_max_req_len =3D HWRM_MAX_REQ_LEN;
-> > +     req->hwrm_intf_maj =3D HWRM_VERSION_MAJOR;
-> > +     req->hwrm_intf_min =3D HWRM_VERSION_MINOR;
-> > +     req->hwrm_intf_upd =3D HWRM_VERSION_UPDATE;
-> > +
-> > +     resp =3D hwrm_req_hold(bd, req);
-> > +     rc =3D hwrm_req_send(bd, req);
-> > +     if (rc)
-> > +             goto hwrm_ver_get_exit;
-> > +
-> > +     memcpy(&bd->ver_resp, resp, sizeof(struct hwrm_ver_get_output));
-> > +
-> > +     hwrm_spec_code =3D resp->hwrm_intf_maj_8b << 16 |
-> > +                      resp->hwrm_intf_min_8b << 8 |
-> > +                      resp->hwrm_intf_upd_8b;
-> > +     hwrm_ver =3D HWRM_VERSION_MAJOR << 16 | HWRM_VERSION_MINOR << 8 |
-> > +                     HWRM_VERSION_UPDATE;
-> > +
-> > +     if (hwrm_spec_code > hwrm_ver)
-> > +             snprintf(bd->hwrm_ver_supp, FW_VER_STR_LEN, "%d.%d.%d",
-> > +                      HWRM_VERSION_MAJOR, HWRM_VERSION_MINOR,
-> > +                      HWRM_VERSION_UPDATE);
-> > +     else
-> > +             snprintf(bd->hwrm_ver_supp, FW_VER_STR_LEN, "%d.%d.%d",
-> > +                      resp->hwrm_intf_maj_8b, resp->hwrm_intf_min_8b,
-> > +                      resp->hwrm_intf_upd_8b);
-> > +
-> > +     fw_maj =3D le16_to_cpu(resp->hwrm_fw_major);
-> > +     fw_min =3D le16_to_cpu(resp->hwrm_fw_minor);
-> > +     fw_bld =3D le16_to_cpu(resp->hwrm_fw_build);
-> > +     fw_rsv =3D le16_to_cpu(resp->hwrm_fw_patch);
-> > +
-> > +     bd->fw_ver_code =3D BNGE_FW_VER_CODE(fw_maj, fw_min, fw_bld, fw_r=
-sv);
-> > +     snprintf(bd->fw_ver_str, FW_VER_STR_LEN, "%d.%d.%d.%d",
-> > +              fw_maj, fw_min, fw_bld, fw_rsv);
-> > +
-> > +     if (strlen(resp->active_pkg_name)) {
-> > +             int fw_ver_len =3D strlen(bd->fw_ver_str);
-> > +
-> > +             snprintf(bd->fw_ver_str + fw_ver_len,
-> > +                      FW_VER_STR_LEN - fw_ver_len - 1, "/pkg %s",
-> > +                      resp->active_pkg_name);
-> > +             bd->fw_cap |=3D BNGE_FW_CAP_PKG_VER;
-> > +     }
-> > +
-> > +     bd->hwrm_cmd_timeout =3D le16_to_cpu(resp->def_req_timeout);
-> > +     if (!bd->hwrm_cmd_timeout)
-> > +             bd->hwrm_cmd_timeout =3D DFLT_HWRM_CMD_TIMEOUT;
-> > +     bd->hwrm_cmd_max_timeout =3D le16_to_cpu(resp->max_req_timeout) *=
- 1000;
-> > +     if (!bd->hwrm_cmd_max_timeout)
-> > +             bd->hwrm_cmd_max_timeout =3D HWRM_CMD_MAX_TIMEOUT;
-> > +     else if (bd->hwrm_cmd_max_timeout > HWRM_CMD_MAX_TIMEOUT)
-> > +                     dev_warn(bd->dev, "Default HWRM commands max time=
-out increased to %d seconds\n",
-> > +                              bd->hwrm_cmd_max_timeout / 1000);
-> > +
-> > +     bd->hwrm_max_req_len =3D le16_to_cpu(resp->max_req_win_len);
-> > +     bd->hwrm_max_ext_req_len =3D le16_to_cpu(resp->max_ext_req_len);
-> > +
-> > +     if (bd->hwrm_max_ext_req_len < HWRM_MAX_REQ_LEN)
-> > +             bd->hwrm_max_ext_req_len =3D HWRM_MAX_REQ_LEN;
-> > +
-> > +     bd->chip_num =3D le16_to_cpu(resp->chip_num);
-> > +     bd->chip_rev =3D resp->chip_rev;
-> > +
-> > +     dev_caps_cfg =3D le32_to_cpu(resp->dev_caps_cfg);
-> > +     if ((dev_caps_cfg & VER_GET_RESP_DEV_CAPS_CFG_SHORT_CMD_SUPPORTED=
-) &&
-> > +         (dev_caps_cfg & VER_GET_RESP_DEV_CAPS_CFG_SHORT_CMD_REQUIRED)=
-)
-> > +             bd->fw_cap |=3D BNGE_FW_CAP_SHORT_CMD;
-> > +
-> > +     if (dev_caps_cfg & VER_GET_RESP_DEV_CAPS_CFG_KONG_MB_CHNL_SUPPORT=
-ED)
-> > +             bd->fw_cap |=3D BNGE_FW_CAP_KONG_MB_CHNL;
-> > +
-> > +     if (dev_caps_cfg &
-> > +         VER_GET_RESP_DEV_CAPS_CFG_CFA_ADV_FLOW_MGNT_SUPPORTED)
-> > +             bd->fw_cap |=3D BNGE_FW_CAP_CFA_ADV_FLOW;
-> > +
-> > +hwrm_ver_get_exit:
-> > +     hwrm_req_drop(bd, req);
-> > +     return rc;
-> > +}
-> > +
-> > +int
-> > +bnge_hwrm_nvm_dev_info(struct bnge_dev *bd,
-> > +                    struct hwrm_nvm_get_dev_info_output *nvm_info)
-> > +{
-> > +     struct hwrm_nvm_get_dev_info_output *resp;
-> > +     struct hwrm_nvm_get_dev_info_input *req;
-> > +     int rc;
-> > +
-> > +     rc =3D hwrm_req_init(bd, req, HWRM_NVM_GET_DEV_INFO);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     resp =3D hwrm_req_hold(bd, req);
-> > +     rc =3D hwrm_req_send(bd, req);
-> > +     if (!rc)
-> > +             memcpy(nvm_info, resp, sizeof(*resp));
-> > +     hwrm_req_drop(bd, req);
-> > +     return rc;
-> > +}
-> > +
-> > +int bnge_hwrm_func_reset(struct bnge_dev *bd)
-> > +{
-> > +     struct hwrm_func_reset_input *req;
-> > +     int rc;
-> > +
-> > +     rc =3D hwrm_req_init(bd, req, HWRM_FUNC_RESET);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     req->enables =3D 0;
-> > +     hwrm_req_timeout(bd, req, HWRM_RESET_TIMEOUT);
-> > +     return hwrm_req_send(bd, req);
-> > +}
-> > +
-> > +int bnge_hwrm_fw_set_time(struct bnge_dev *bd)
-> > +{
-> > +     struct hwrm_fw_set_time_input *req;
-> > +     struct tm tm;
-> > +     time64_t now =3D ktime_get_real_seconds();
-> > +     int rc;
->
-> Reverse xmass tree, please. Not quite sure you need this 'now'
-> variable at all. You can use ktime_get_real_seconds() directly
-> in time64_to_tm() - there are examples of such code in the kernel.
 
- Will fix it in v2.
-
->
-> > +
-> > +     time64_to_tm(now, 0, &tm);
-> > +     rc =3D hwrm_req_init(bd, req, HWRM_FW_SET_TIME);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     req->year =3D cpu_to_le16(1900 + tm.tm_year);
-> > +     req->month =3D 1 + tm.tm_mon;
-> > +     req->day =3D tm.tm_mday;
-> > +     req->hour =3D tm.tm_hour;
-> > +     req->minute =3D tm.tm_min;
-> > +     req->second =3D tm.tm_sec;
-> > +     return hwrm_req_send(bd, req);
-> > +}
->
-> This whole function looks like copy-paste from bnxt, did you consider
-> merging these parts?
-
-Both the bnxt and bnge drivers follow the same protocol to send the
-requests to  the firmware,
-so some functions may appear similar. However, we do not plan to share
-the code, as certain
- fundamental data structures will differ.
-
->
->
-> > +
-> > +int bnge_hwrm_func_drv_rgtr(struct bnge_dev *bd)
-> > +{
-> > +     struct hwrm_func_drv_rgtr_output *resp;
-> > +     struct hwrm_func_drv_rgtr_input *req;
-> > +     u32 flags;
-> > +     int rc;
-> > +
-> > +     rc =3D hwrm_req_init(bd, req, HWRM_FUNC_DRV_RGTR);
-> > +     if (rc)
-> > +             return rc;
-> > +
-> > +     req->enables =3D cpu_to_le32(FUNC_DRV_RGTR_REQ_ENABLES_OS_TYPE |
-> > +                                FUNC_DRV_RGTR_REQ_ENABLES_VER |
-> > +                                FUNC_DRV_RGTR_REQ_ENABLES_ASYNC_EVENT_=
-FWD);
-> > +
-> > +     req->os_type =3D cpu_to_le16(FUNC_DRV_RGTR_REQ_OS_TYPE_LINUX);
-> > +     flags =3D FUNC_DRV_RGTR_REQ_FLAGS_16BIT_VER_MODE;
-> > +
-> > +     req->flags =3D cpu_to_le32(flags);
-> > +     req->ver_maj_8b =3D DRV_VER_MAJ;
-> > +     req->ver_min_8b =3D DRV_VER_MIN;
-> > +     req->ver_upd_8b =3D DRV_VER_UPD;
-> > +     req->ver_maj =3D cpu_to_le16(DRV_VER_MAJ);
-> > +     req->ver_min =3D cpu_to_le16(DRV_VER_MIN);
-> > +     req->ver_upd =3D cpu_to_le16(DRV_VER_UPD);
-> > +
-> > +     resp =3D hwrm_req_hold(bd, req);
-> > +     rc =3D hwrm_req_send(bd, req);
-> > +     if (!rc) {
-> > +             set_bit(BNGE_STATE_DRV_REGISTERED, &bd->state);
-> > +             if (resp->flags &
-> > +                 cpu_to_le32(FUNC_DRV_RGTR_RESP_FLAGS_IF_CHANGE_SUPPOR=
-TED))
-> > +                     bd->fw_cap |=3D BNGE_FW_CAP_IF_CHANGE;
-> > +     }
-> > +     hwrm_req_drop(bd, req);
-> > +     return rc;
-> > +}
-> > +
-> > +int bnge_hwrm_func_drv_unrgtr(struct bnge_dev *bd)
-> > +{
-> > +     struct hwrm_func_drv_unrgtr_input *req;
-> > +     int rc;
-> > +
-> > +     if (!test_and_clear_bit(BNGE_STATE_DRV_REGISTERED, &bd->state))
-> > +             return 0;
-> > +
-> > +     rc =3D hwrm_req_init(bd, req, HWRM_FUNC_DRV_UNRGTR);
-> > +     if (rc)
-> > +             return rc;
-> > +     return hwrm_req_send(bd, req);
-> > +}
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h b/drive=
-rs/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-> > new file mode 100644
-> > index 000000000000..9308d4fe64d2
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-> > @@ -0,0 +1,16 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/* Copyright (c) 2025 Broadcom */
-> > +
-> > +#ifndef _BNGE_HWRM_LIB_H_
-> > +#define _BNGE_HWRM_LIB_H_
-> > +
-> > +int bnge_hwrm_ver_get(struct bnge_dev *bd);
-> > +int bnge_hwrm_func_reset(struct bnge_dev *bd);
-> > +int bnge_hwrm_fw_set_time(struct bnge_dev *bd);
-> > +int bnge_hwrm_func_drv_rgtr(struct bnge_dev *bd);
-> > +int bnge_hwrm_func_drv_unrgtr(struct bnge_dev *bd);
-> > +int bnge_hwrm_vnic_qcaps(struct bnge_dev *bd);
-> > +int bnge_hwrm_nvm_dev_info(struct bnge_dev *bd,
-> > +                        struct hwrm_nvm_get_dev_info_output *nvm_dev_i=
-nfo);
-> > +
-> > +#endif /* _BNGE_HWRM_LIB_H_ */
->
-
---000000000000cbfd8f06384ec3e0
+--0000000000007ee1e206384ece91
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -858,14 +299,14 @@ oCSF3t69LpmLmIwRkXxtqIrB7m9OjROeMnXWS9+b5krW8rnUbgqiJVvWldgtno3kiKdEwnOwVjY+
 gZdPq7+WE2Otw7O0i1ReJKwnmWksFwr/sT4LYfFlJwA0LlYRHmhR+lhz9jj0iXkxggJgMIICXAIB
 ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
 bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwMFhgQqM5emFpsS5wwDQYJ
-YIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEINrZKoZZCq3W+YWHShn36M0oew8SLXnkpsmR
-/XsxdwhOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYyNDEw
-MjY0M1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+YIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIJJYzq59UPcuaqAWQaMp5HMJpbNm5eMbN9EF
+4nEO9R5yMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYyNDEw
+Mjk0M1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
 AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUA
-BIIBAFfcnpy9ahpJrsQnDy9FZ5vYFRRrP9DU7YOedmRthj3D/k2yaVhcBPQCD4sqoWIunydJy97J
-timsPXXRcCNI4wcVJsA4DLBETYnGCGp7OjTmvAk13eMGnHup7hIq7k1t3T0pz5vH/C/5nLTbBnMg
-pG+C/ZarS0rGmJ/Jp5sZjpiJCPEo9Y/mozHdmrLVNzGMOjEJFMD5MmehKHJPsObjnwRGp5vwrGgk
-T07MkeUy5arHNtSioSmXFms9FEPmSX6GOH/rxVbIHvMw+wv3eo0p3np53raB3cVMRAe3tuATZoe0
-TkihQF4lCAQahcUgJTEHTlQeF7vsIZlcZsoBEogXas4=
---000000000000cbfd8f06384ec3e0--
+BIIBAHuTiXFl1X9prmGd+ktHaqi2xMYbQxmbbd2hO8hi/N9gnBtSqc05CW9QtoCKFtp8DwTsHS2B
+ogzBsUom9t3VpoiB1D2xEqOEvDX2VMP2WfnEMQfLYFvIlRVXbiyDB2yw8zqihANxlH5inKZGU371
+jf6Satfv0u4Feb9rBM+h7jSyxyzgK+p0vcJtHOakTz2tebmN71dy7ZIehav5eTHp3jV0nHSA150T
+G4okNDv2rVTPCsCY5aL6LV4jO6YqqZ5aM9jTHZrTe791c0ZOiUHNLIxM5sjmt9FoY0doEws+oYBH
+vk2Ye7LR1ICQvja1tOjzP6HsiS3oSu4gR/WyMGMu4Gw=
+--0000000000007ee1e206384ece91--
 
