@@ -1,196 +1,417 @@
-Return-Path: <netdev+bounces-201207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F86AE874D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:00:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6C8AE8756
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:02:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77008173ED1
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:00:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEED67A3948
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954DA15B135;
-	Wed, 25 Jun 2025 15:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA2323C4EB;
+	Wed, 25 Jun 2025 15:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cir71NhG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CfQFOCAC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E819886337;
-	Wed, 25 Jun 2025 15:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177AB19D07E;
+	Wed, 25 Jun 2025 15:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750863632; cv=none; b=sTqUFvLp/sHEcm1Sr2IQXHOzFIud/G4D34QMRIK2TAYzY9AOUE7WTuspm+NZJPS3Q/CgJ7a7Y0577nADqw4ojxV941s6Pd+BXu/mk5HK4iTUFbP0I/FrSfdvMkVuGJo+0c0fKnNdItSJEqMGZagRqwscGddvw8p6ElnzCAt4vjE=
+	t=1750863728; cv=none; b=OchFCl+iNHldMxy6ayeUBKdJ2g/bEWxMjr4jVh9bk8I2JtQ3RFGOOt2wN1KWqPHUc3kGHhu6dolRPro3Rav+eWy87UeJYdD4W+nJSmhcyB+aSk6g66LnLtbSu0Yh/izc1yHkEjeUr1JWvMv8O3zEcBVAvkLRo1/NmMXEGhDy7Ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750863632; c=relaxed/simple;
-	bh=04hZDSa5dfp5QBx/UKghRxt58+Rp5RuhRvj2FsZHUPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GgDJe2+X0g/tJFdObOjYKVBhybhnitmjhDCf+kgAcDlwbtPQoyqcpsVWTBsjWtf5K+lbxZp2YoY6jLd43tbXnv0F0aHhq0EQ6wN0tduLjdqO+oItWy3nRXONzucLUDmqW8Sg2bc+QH2pvtJ+eUkjaFMgi4/yZrwxJWCZFbS2hRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cir71NhG; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1750863728; c=relaxed/simple;
+	bh=TATV1nzkeRk8wLxjTenYDmwjCGqiMGrrKLobPuxuLYQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gXyRn8K5Rq8wQ9A9QA2L1Td8AdbkWiwNDQZDD+XOfO+Baxnj4olyRQ1yu6/hYLNNfxvTHVYXFco03UHxYFZRhbcq+XTaORa8AW6kZBf628Znt6hWp8+etxF1R1r6mqrWPs8KsbMLR7EddiYJ85CbwAL62SQgsYOWp6adNLKFKA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CfQFOCAC; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-236377f00easo77981445ad.1;
-        Wed, 25 Jun 2025 08:00:29 -0700 (PDT)
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32b7123edb9so64032671fa.2;
+        Wed, 25 Jun 2025 08:02:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750863629; x=1751468429; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BpVDFsaxRO13hcMUIg0p/95ElwnYJ9p/X5LUJzR1M9o=;
-        b=Cir71NhGSoc/kLU9TunN3vQzvl+35vYpNHtke0g57/Fqg8/DeKMKZVJE68STKXHuEd
-         Ui1FNuHkuqlLruvWQJwI1SYG9fhUvGkvbdeVkKMZGc3Tvv/T9zya0YWyk3GYiw27taVQ
-         kct+tUd3+i2XNcVOyLc+xZgmWh3Hv5yQV6w4t22F68ItJrTGI/RtahHSafkLZloN1V3o
-         NIbewjA2FMS7D29enUioMZInZyvZR2IIX7ym+SkkA7gAYqoM2Wd6ksugomYtk2Gpc0Wm
-         nnahcH4SbokNGlTHHzEb/EsKGjGg8HGK57sIYKGgmdO3KLIM5m9eHWPwPhYqe1txvP5k
-         rWmw==
+        d=gmail.com; s=20230601; t=1750863724; x=1751468524; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=420YTqzU+XzX4ghS6mL6IyLrgPiw+g1A7gSb2koYSdM=;
+        b=CfQFOCAChGgVjZCAczjVdDiku8wY7A2KMo3Iys03FEhpWoPNGvG/MNMegUGlvTP3c0
+         b1QJ4xRS6MK75wWYW/0PBr5qlio1dZ/Qzn9QtW72Igv4bdhEW7MRAig8fxVTy4oyKSj/
+         2WvsAme4ws68V56NCldHHuMspOCbjuIlcqLesLsnhYnD4dE8QQAQNFpdXwfyjyQTYPJC
+         21BOGwVFu9hp4Nn0iO2hK1pIPeP3/ci1BKKFGYGrEjNCQl3mCiA7RGdgrsnXGdGqFCne
+         CzCZUf1PMOuQDmbrRCfUcla4t3PYBkD7AdBz2a/+DecIzytRIYv1Li9rD8LGrGAczgQn
+         wyfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750863629; x=1751468429;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BpVDFsaxRO13hcMUIg0p/95ElwnYJ9p/X5LUJzR1M9o=;
-        b=P0Dv0zSj0oCjqbyiBIZFPx7TUQqed6mG7PDreJmhu1dfj/q+xtHLd7EgtgedVTCn2F
-         G19/wpczwntb3SsB1JvZ8dEIveA01iF86QPw3ExG97L2Oz4MioRDRiBLZVVE8pg9I0q8
-         tJQmCAlAsUXqVMYRhJHuRezVWSdqdhcfau2NbPvl/eLhwB2aX4QJ4xViiEwkQd4FhrNj
-         LeOZB5RiWTR416gtGBuRxHijf3/OW8M3XTQS0ZZyziF0Aqgy2EpC6fij0w0KpeNMorX8
-         UALzX4ac59GPM6x0wVhGY8syvBXlmKQplEaHkNZ/wMM+bln7DVBRievT2YEHmgbG8YtN
-         Dguw==
-X-Forwarded-Encrypted: i=1; AJvYcCX5C5HVGGvNKve0v8vfE2iK9OrtPsSOPBnD8juR1LB+VCccnXr45wyEJcNMW5gUGyb5RESTkZ04@vger.kernel.org, AJvYcCXoWMQxuQJxCO8PCVnUB0lDYvj3eFwmhdweuvGpOIslDCMonxP0020kJlbMdmA0gG3JaCc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzhx4lOiOSq4FFPaT9uQWo/HFyVeO9OzW+/XkuYH78fNqKc/Bcn
-	Wzoty7fJv3aDzWLNt23af7+XOY7vaR8P+y7a24JEyIUyVwgNuixKyS5pMxkE
-X-Gm-Gg: ASbGncsNzYrgYf9/WGO1KAPTCpRnqtMZIiMRYZmZDvXysi/AF4n2hG0m9ELD7SDEIVa
-	zbpkXqubqCmga0dtfX5IQhh03sHt4bB+E8IYxVTEwerBblMjwoXXBnOnJundiJU0rRzKrs9jbWX
-	U4qi4wlHAvx+Xyl2ubfp4vjpWanz1pIvz0iQ9j//LfeZKvGpgeQB1yR8MmY0IRESJ8lRrdfE2SU
-	joAupTURondpYFuib3K8h4AafIqdrVoryEUnBsz+KXFruVqzQPZ4xMQcA8FbPfn/ngcmB78J0R4
-	vNSeSYhQINrMQw7EwaL6kGTUPvp4ufsNnciEp5tNSXUFWEWREcXjYpLffueba2e0C0JDwSxMJNR
-	rlPA6DhKD/67ye9WHR4kyGoI=
-X-Google-Smtp-Source: AGHT+IH3C2HDdyZAVhghl52e1sdI8D71rgDIXzAD9AGVuXD18Ol/jkJ68CbU4ah5YIJ7mKRvVWyUsA==
-X-Received: by 2002:a17:903:3c45:b0:235:a9b:21e0 with SMTP id d9443c01a7336-23823e4e1ccmr64319805ad.0.1750863628611;
-        Wed, 25 Jun 2025 08:00:28 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d86e8fddsm134322065ad.210.2025.06.25.08.00.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 08:00:27 -0700 (PDT)
-Date: Wed, 25 Jun 2025 08:00:26 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v3 2/2] selftests/bpf: check if the global
- consumer of tx queue updates after send call
-Message-ID: <aFwPCsSFkLYYoFu9@mini-arch>
-References: <20250625101014.45066-1-kerneljasonxing@gmail.com>
- <20250625101014.45066-3-kerneljasonxing@gmail.com>
- <aFvpNHqvZp0eishZ@boxer>
- <CAL+tcoBOpBxJN=S8FWgz++WxTzFP0rG-d+HRhSfZ6DLQjNuYtQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1750863724; x=1751468524;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=420YTqzU+XzX4ghS6mL6IyLrgPiw+g1A7gSb2koYSdM=;
+        b=JM/hEAQAYmqiFqjYfBySb35OTslIwVjXDyFFUuCApP8bzJ09Jo5tw+8Rd2H/G+4Duj
+         NkYF23XEbaFGxVlLmlymM/KHPpqyvZ8uU19Lj9eeFxt53Pc9VlbrlQZK40n8vKu7qjI7
+         925AXHHbY5p6wd2jPKjMmN5rOUQ8rx26Zta/E5enSPv1RfLC92w3HNPfMTSlo9VA3Obd
+         nzvPZLX/FSZs/YcIcJFCMAEAs8xKQj/3gTL3k+P1OpY0N/MqGJl/hAdS5AN9ezIIu95i
+         UXaqlPghdvYI5fXOqVTcPUXhTmnhmE9WIA+EoZH+E3UcRqih0NFymMhDYm8XI2oKECwN
+         8Duw==
+X-Forwarded-Encrypted: i=1; AJvYcCUK5SimSXpuyypBvnidiiYr2WqYTQcxi7AEprKMY8ASQ1FK+xPDOI8X9e63zPJa9ohpSKyxHyRs@vger.kernel.org, AJvYcCWI9TJMdcR/dPInR8bvrfiQZ7drCQuzr2/knmUAQU97lw33HnE22XbOuzzdmCs/mHhG5ftQiKeE2LRsXRjY0Eg=@vger.kernel.org, AJvYcCWqilg/Qeb7LnVQKNS6e62PyGyeDnMrDfv4ybWdYNVvqG4JQpTZMZQrZ+v5vqWS7F4WB84raP2ISDcGQ8FU@vger.kernel.org, AJvYcCXiEDpLFbXNDs+wBHRbnflZU34gArXcQQEmvtOjYqsEJrfhcVncq4Re30tBKn5uFUXWj2g779eR@vger.kernel.org
+X-Gm-Message-State: AOJu0YwevaF+Z413yBEF0ZfV5kbNpBeDeh9GfH+l8uJsZhejsl04Fawc
+	sXhiiVES0uFJWNR9DS3DckstjISkdJ4WswPySNRDcGOmj6yZdWqb/Y2DUSSx0zWra0E2o9wHnsG
+	d6bN8pLNQj3pvqoSZ+7xrlTIH0JOsb9E5FzBMNoo=
+X-Gm-Gg: ASbGncuZv+Qwj6lVx+83PTE/vf3vdQQuCvzq/tp3P4iLTNUEbbbPa4HhOkaaZa1Z5cV
+	sMkM0X9hQc1wKWLE40d8+2iG5rsox2p9meJ440eMwps2LCLdNvJM8jvwx+vR7n49jY9C77X2KGv
+	go859cjYHQC6TGaFq9RD7FlFSYDynr42/ngZczQdIz3w==
+X-Google-Smtp-Source: AGHT+IGZLopoSsVxJMPNHI8f4O4vnirW+A3XA91XHCC7GTrbkPjQybYOaMth/++hIm/2V9uLIMf1XtNymnBT09bu+kg=
+X-Received: by 2002:a05:651c:3c5:b0:32b:1f48:20a2 with SMTP id
+ 38308e7fff4ca-32cc65b49e5mr8131261fa.34.1750863722738; Wed, 25 Jun 2025
+ 08:02:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoBOpBxJN=S8FWgz++WxTzFP0rG-d+HRhSfZ6DLQjNuYtQ@mail.gmail.com>
+References: <20250625130510.18382-1-ceggers@arri.de> <CABBYNZ+cfFCzBMNBv6imodUG1twK5=MSwoVCnR8St_w9-HiU_w@mail.gmail.com>
+ <9911499.eNJFYEL58v@n9w6sw14>
+In-Reply-To: <9911499.eNJFYEL58v@n9w6sw14>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 25 Jun 2025 11:01:50 -0400
+X-Gm-Features: Ac12FXxyupH16CR3fSN3676HPX85fxgqYAJN5Af0-hSuqBgj1YvLgbLhhI6N2Ug
+Message-ID: <CABBYNZLg9-FOszwNEnqUxdJ+CKSCTAMFVk_ihOW3bECXwajhpA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: HCI: Fix HCI command order for extended advertising
+To: Christian Eggers <ceggers@arri.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Jaganath Kanakkassery <jaganath.k.os@gmail.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 06/25, Jason Xing wrote:
-> On Wed, Jun 25, 2025 at 8:19 PM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
+Hi Christian,
+
+On Wed, Jun 25, 2025 at 10:46=E2=80=AFAM Christian Eggers <ceggers@arri.de>=
+ wrote:
+>
+> Hi Luiz,
+>
+> On Wednesday, 25 June 2025, 15:26:58 CEST, Luiz Augusto von Dentz wrote:
+> > Hi Christian,
 > >
-> > On Wed, Jun 25, 2025 at 06:10:14PM +0800, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
+> > On Wed, Jun 25, 2025 at 9:05=E2=80=AFAM Christian Eggers <ceggers@arri.=
+de> wrote:
 > > >
-> > > The subtest sends 33 packets at one time on purpose to see if xsk
-> > > exitting __xsk_generic_xmit() updates the global consumer of tx queue
-> > > when reaching the max loop (max_tx_budget, 32 by default). The number 33
-> > > can avoid xskq_cons_peek_desc() updates the consumer, to accurately
-> > > check if the issue that the first patch resolves remains.
+> > > For extended advertising capable controllers, hci_start_ext_adv_sync(=
+)
+> > > at the moment synchronously calls SET_EXT_ADV_PARAMS [1],
+> > > SET_ADV_SET_RAND_ADDR [2], SET_EXT_SCAN_RSP_DATA [3](optional) and
+> > > SET_EXT_ADV_ENABLE [4].  After all synchronous commands are finished,
+> > > SET_EXT_ADV_DATA is called from the async response handler of
+> > > SET_EXT_ADV_PARAMS [5] (via hci_update_adv_data).
 > > >
-> > > Speaking of the selftest implementation, it's not possible to use the
-> > > normal validation_func to check if the issue happens because the whole
-> > > send packets logic will call the sendto multiple times such that we're
-> > > unable to detect in time.
+> > > So the current implementation sets the advertising data AFTER enablin=
+g
+> > > the advertising instance.  The BT Core specification explicitly allow=
+s
+> > > for this [6]:
 > > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > If advertising is currently enabled for the specified advertising s=
+et,
+> > > > the Controller shall use the new data in subsequent extended
+> > > > advertising events for this advertising set. If an extended
+> > > > advertising event is in progress when this command is issued, the
+> > > > Controller may use the old or new data for that event.
+> >
+> > Ok, lets stop right here, if the controller deviates from the spec it
+> > needs a quirk and not make the whole stack work around a bug in the
+> > firmware.
+> I generally agree! In this particular case, I think that the current orde=
+r of
+> advertising commands may be the result of "random" and was probably not i=
+ntended this
+> way. While the command order of the "legacy" advertising commands looks p=
+erfectly
+> logical for me, the order of the "extended" commands seems to be broken b=
+y setting
+> the advertising data in the asynchronous response handler of set_ext_adv_=
+params.
+
+Yeah, the advertising data shall be set synchronously as well, if you
+need anything from the command response there are variants that return
+the response as skb so it can be processed.
+
+> >
+> > > In case of the Realtek RTL8761BU chip (almost all contemporary BT USB
+> > > dongles are built on it), updating the advertising data after enablin=
+g
+> > > the instance produces (at least one) corrupted advertising message.
+> > > Under normal conditions, a single corrupted advertising message would
+> > > probably not attract much attention, but during MESH provisioning (vi=
+a
+> > > MGMT I/O / mesh_send(_sync)), up to 3 different messages (BEACON, ACK=
+,
+> > > CAPS) are sent within a loop which causes corruption of ALL provision=
+ing
+> > > messages.
+> > >
+> > > I have no idea whether this could be fixed in the firmware of the USB
+> > > dongles (I didn't even find the chip on the Realtek homepage), but
+> > > generally I would suggest changing the order of the HCI commands as t=
+his
+> > > matches the command order for "non-extended adv capable" controllers =
+and
+> > > simply is more natural.
+> > >
+> > > This patch only considers advertising instances with handle > 0, I do=
+n't
+> > > know whether this should be extended to further cases.
+> > >
+> > > [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t/tree/net/bluetooth/hci_sync.c#n1319
+> > > [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t/tree/net/bluetooth/hci_sync.c#n1204
+> > > [3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t/tree/net/bluetooth/hci_sync.c#n1471
+> > > [4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t/tree/net/bluetooth/hci_sync.c#n1469
+> > > [5] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t/tree/net/bluetooth/hci_event.c#n2180
+> > > [6] https://www.bluetooth.com/wp-content/uploads/Files/Specification/=
+HTML/Core-60/out/en/host-controller-interface/host-controller-interface-fun=
+ctional-specification.html#UUID-d4f36cb5-f26c-d053-1034-e7a547ed6a13
+> > >
+> > > Signed-off-by: Christian Eggers <ceggers@arri.de>
+> > > Fixes: a0fb3726ba55 ("Bluetooth: Use Set ext adv/scan rsp data if con=
+troller supports")
+> > > Cc: stable@vger.kernel.org
 > > > ---
-> > >  tools/testing/selftests/bpf/xskxceiver.c | 30 ++++++++++++++++++++++--
-> > >  1 file changed, 28 insertions(+), 2 deletions(-)
+> > >  include/net/bluetooth/hci_core.h |  1 +
+> > >  include/net/bluetooth/hci_sync.h |  1 +
+> > >  net/bluetooth/hci_event.c        | 33 +++++++++++++++++++++++++++++
+> > >  net/bluetooth/hci_sync.c         | 36 ++++++++++++++++++++++++++----=
+--
+> > >  4 files changed, 65 insertions(+), 6 deletions(-)
 > > >
-> > > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-> > > index 0ced4026ee44..f7aa83706bc7 100644
-> > > --- a/tools/testing/selftests/bpf/xskxceiver.c
-> > > +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> > > @@ -109,6 +109,8 @@
+> > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth=
+/hci_core.h
+> > > index 9fc8f544e20e..8d37f127ddba 100644
+> > > --- a/include/net/bluetooth/hci_core.h
+> > > +++ b/include/net/bluetooth/hci_core.h
+> > > @@ -237,6 +237,7 @@ struct oob_data {
 > > >
-> > >  #include <network_helpers.h>
+> > >  struct adv_info {
+> > >         struct list_head list;
+> > > +       bool    enable_after_set_ext_data;
+> > >         bool    enabled;
+> > >         bool    pending;
+> > >         bool    periodic;
+> > > diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth=
+/hci_sync.h
+> > > index 5224f57f6af2..00eceffeec87 100644
+> > > --- a/include/net/bluetooth/hci_sync.h
+> > > +++ b/include/net/bluetooth/hci_sync.h
+> > > @@ -112,6 +112,7 @@ int hci_schedule_adv_instance_sync(struct hci_dev=
+ *hdev, u8 instance,
+> > >  int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instanc=
+e);
+> > >  int hci_start_ext_adv_sync(struct hci_dev *hdev, u8 instance);
+> > >  int hci_enable_ext_advertising_sync(struct hci_dev *hdev, u8 instanc=
+e);
+> > > +int hci_enable_ext_advertising(struct hci_dev *hdev, u8 instance);
+> > >  int hci_enable_advertising_sync(struct hci_dev *hdev);
+> > >  int hci_enable_advertising(struct hci_dev *hdev);
 > > >
-> > > +#define MAX_TX_BUDGET_DEFAULT 32
-> >
-> > and what if in the future you would increase the generic xmit budget on
-> > the system? it would be better to wait with test addition when you
-> > introduce the setsockopt patch.
-
-We can always update it to follow new budget. The purpose of the test
-is to document/verify userspace expectations. Sincle even with the
-setsockopt we are still gonna have the default budget.
-
-> > plus keep in mind that xskxceiver tests ZC drivers as well. so either we
-> > should have a test that serves all modes or keep it for skb mode only.
-> >
-> > > +
-> > >  static bool opt_verbose;
-> > >  static bool opt_print_tests;
-> > >  static enum test_mode opt_mode = TEST_MODE_ALL;
-> > > @@ -1323,7 +1325,8 @@ static int receive_pkts(struct test_spec *test)
-> > >       return TEST_PASS;
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 66052d6aaa1d..eb018d8a3c4b 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -2184,6 +2184,37 @@ static u8 hci_cc_set_ext_adv_param(struct hci_=
+dev *hdev, void *data,
+> > >         return rp->status;
 > > >  }
 > > >
-> > > -static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, bool timeout)
-> > > +static int __send_pkts(struct test_spec *test, struct ifobject *ifobject,
-> > > +                    struct xsk_socket_info *xsk, bool timeout)
+> > > +static u8 hci_cc_le_set_ext_adv_data(struct hci_dev *hdev, void *dat=
+a,
+> > > +                                    struct sk_buff *skb)
+> > > +{
+> > > +       struct hci_cp_le_set_ext_adv_data *cp;
+> > > +       struct hci_ev_status *rp =3D data;
+> > > +       struct adv_info *adv_instance;
+> > > +
+> > > +       bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+> > > +
+> > > +       if (rp->status)
+> > > +               return rp->status;
+> > > +
+> > > +       cp =3D hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_DATA);
+> > > +       if (!cp)
+> > > +               return rp->status;
+> > > +
+> > > +       hci_dev_lock(hdev);
+> > > +
+> > > +       if (cp->handle) {
+> > > +               adv_instance =3D hci_find_adv_instance(hdev, cp->hand=
+le);
+> > > +               if (adv_instance) {
+> > > +                       if (adv_instance->enable_after_set_ext_data)
+> > > +                               hci_enable_ext_advertising(hdev, cp->=
+handle);
+> > > +               }
+> > > +       }
+> > > +
+> > > +       hci_dev_unlock(hdev);
+> > > +
+> > > +       return rp->status;
+> > > +}
+> > > +
+> > >  static u8 hci_cc_read_rssi(struct hci_dev *hdev, void *data,
+> > >                            struct sk_buff *skb)
 > > >  {
-> > >       u32 i, idx = 0, valid_pkts = 0, valid_frags = 0, buffer_len;
-> > >       struct pkt_stream *pkt_stream = xsk->pkt_stream;
-> > > @@ -1437,9 +1440,21 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
-> > >       }
+> > > @@ -4166,6 +4197,8 @@ static const struct hci_cc {
+> > >                sizeof(struct hci_rp_le_read_num_supported_adv_sets)),
+> > >         HCI_CC(HCI_OP_LE_SET_EXT_ADV_PARAMS, hci_cc_set_ext_adv_param=
+,
+> > >                sizeof(struct hci_rp_le_set_ext_adv_params)),
+> > > +       HCI_CC_STATUS(HCI_OP_LE_SET_EXT_ADV_DATA,
+> > > +                     hci_cc_le_set_ext_adv_data),
+> > >         HCI_CC_STATUS(HCI_OP_LE_SET_EXT_ADV_ENABLE,
+> > >                       hci_cc_le_set_ext_adv_enable),
+> > >         HCI_CC_STATUS(HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
+> > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > > index 1f8806dfa556..da0e39cce721 100644
+> > > --- a/net/bluetooth/hci_sync.c
+> > > +++ b/net/bluetooth/hci_sync.c
+> > > @@ -1262,6 +1262,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_=
+dev *hdev, u8 instance)
+> > >                 hci_cpu_to_le24(adv->max_interval, cp.max_interval);
+> > >                 cp.tx_power =3D adv->tx_power;
+> > >                 cp.sid =3D adv->sid;
+> > > +               adv->enable_after_set_ext_data =3D true;
+> > >         } else {
+> > >                 hci_cpu_to_le24(hdev->le_adv_min_interval, cp.min_int=
+erval);
+> > >                 hci_cpu_to_le24(hdev->le_adv_max_interval, cp.max_int=
+erval);
+> > > @@ -1456,6 +1457,23 @@ int hci_enable_ext_advertising_sync(struct hci=
+_dev *hdev, u8 instance)
+> > >                                      data, HCI_CMD_TIMEOUT);
+> > >  }
 > > >
-> > >       if (!timeout) {
-> > > +             int prev_tx_consumer;
+> > > +static int enable_ext_advertising_sync(struct hci_dev *hdev, void *d=
+ata)
+> > > +{
+> > > +       u8 instance =3D PTR_UINT(data);
 > > > +
-> > > +             if (!strncmp("TX_QUEUE_CONSUMER", test->name, MAX_TEST_NAME_SIZE))
-> > > +                     prev_tx_consumer = *xsk->tx.consumer;
+> > > +       return hci_enable_ext_advertising_sync(hdev, instance);
+> > > +}
 > > > +
-> > >               if (complete_pkts(xsk, i))
-> > >                       return TEST_FAILURE;
+> > > +int hci_enable_ext_advertising(struct hci_dev *hdev, u8 instance)
+> > > +{
+> > > +       if (!hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
+> > > +           list_empty(&hdev->adv_instances))
+> > > +               return 0;
+> > > +
+> > > +       return hci_cmd_sync_queue(hdev, enable_ext_advertising_sync,
+> > > +                                 UINT_PTR(instance), NULL);
+> > > +}
+> > > +
+> > >  int hci_start_ext_adv_sync(struct hci_dev *hdev, u8 instance)
+> > >  {
+> > >         int err;
+> > > @@ -1464,11 +1482,11 @@ int hci_start_ext_adv_sync(struct hci_dev *hd=
+ev, u8 instance)
+> > >         if (err)
+> > >                 return err;
 > > >
-> > > +             if (!strncmp("TX_QUEUE_CONSUMER", test->name, MAX_TEST_NAME_SIZE)) {
-> > > +                     int delta = *xsk->tx.consumer - prev_tx_consumer;
+> > > -       err =3D hci_set_ext_scan_rsp_data_sync(hdev, instance);
+> > > -       if (err)
+> > > -               return err;
+> > > -
+> > > -       return hci_enable_ext_advertising_sync(hdev, instance);
+> > > +       /* SET_EXT_ADV_DATA and SET_EXT_ADV_ENABLE are called in the
+> > > +        * asynchronous response chain of set_ext_adv_params in order=
+ to
+> > > +        * set the advertising data first prior enabling it.
+> > > +        */
 > >
-> > hacking the data path logic for single test purpose is rather not good.
-> > I am also not really sure if this deserves a standalone test case or could
-> > we just introduce a check in data path in appropriate place.
-> 
-> The big headache is that if we expect to detect such a case, we have
-> to re-invent a similar send packet logic or hack the data path (a bit
-> like this patch). I admit it's ugly as I mentioned yesterday.
-> 
-> Sorry, Stanislav, no offense here. If you read this, please don't
-> blame me. I know you wish me to add one related test case. So here we
-> are. Since Maciej brought up the similar thought, I keep wondering if
-> we should give up such a standalone test patch? Honestly it already
-> involved more time than expected. The primary reason for me is that
-> the issue doesn't cause much trouble to the application.
+> > Doing things asynchronously is known to create problems, which is why
+> > we introduced the cmd_sync infra to handle a chain of commands like
+> > this, so Id suggest sticking to the synchronous way, if the order
+> > needs to be changed then use a quirk to detect it and then make sure
+> > the instance is disabled on hci_set_ext_adv_data_sync and then
+> > re-enable after updating it.
+>
+> Directly after creation, the instance is disabled (which is fine). In my
+> opinion, the problem is then caused by enabling the instance _before_ set=
+ting
+> the advertisement data.
+>
+> If the synchronous API is preferred, setting the advertisement data shoul=
+d
+> probably also be done synchronously (e.g. by calling hci_set_ext_adv_data=
+_sync()
+> from hci_start_ext_adv_sync() rather than calling hci_update_adv_data() f=
+rom
+> hci_cc_set_ext_adv_param()). But I guess that the "tx power" value is onl=
+y
+> known after hci_cc_set_ext_adv_param() has been run (queued?) and this is=
+ probably
+> too late for the synchronous stuff called by hci_start_ext_adv_sync().
 
-IIUC, Maciej does not suggest to completely drop the test but rather
-to move this check (unconditionally and only for skb mode) somewhere
-into __send_pkts/complete_pkts to make sure the number of completed
-packets is always <= budget. Maciej correct me if I misread..
+Not really, like I said there is the likes of __hci_cmd_sync if you
+want to process the response directly, so the logic on
+hci_cc_set_ext_adv_param is not really necessary if we do that, this
+might explain why it may seems out of order since hci_update_adv_data
+will queue the command to be run after the cmd_sync is done
+programming the existing instance.
+
+That said for the likes of MGMT_OP_ADD_EXT_ADV_DATA you will still
+need to detect if the instance has already been enabled then do
+disable/re-enable logic if the quirk is set.
+
+> >
+> > > +       return hci_set_ext_scan_rsp_data_sync(hdev, instance);
+> > >  }
+> > >
+> > >  int hci_disable_per_advertising_sync(struct hci_dev *hdev, u8 instan=
+ce)
+> > > @@ -1832,8 +1850,14 @@ static int hci_set_ext_adv_data_sync(struct hc=
+i_dev *hdev, u8 instance)
+> > >
+> > >         if (instance) {
+> > >                 adv =3D hci_find_adv_instance(hdev, instance);
+> > > -               if (!adv || !adv->adv_data_changed)
+> > > +               if (!adv)
+> > >                         return 0;
+> > > +               if (!adv->adv_data_changed) {
+> > > +                       if (adv->enable_after_set_ext_data)
+> > > +                               hci_enable_ext_advertising_sync(hdev,
+> > > +                                                               adv->=
+handle);
+> > > +                       return 0;
+> > > +               }
+> > >         }
+> > >
+> > >         len =3D eir_create_adv_data(hdev, instance, pdu->data,
+> > > --
+> > > 2.43.0
+> > >
+> >
+> >
+> >
+> regards,
+> Christian
+>
+>
+>
+> regards,
+> Christian
+>
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
 
