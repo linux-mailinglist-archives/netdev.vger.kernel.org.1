@@ -1,167 +1,211 @@
-Return-Path: <netdev+bounces-201354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA82AE9204
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:18:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31CFBAE9208
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B4BF7B702A
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:16:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10047176FFE
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2382F433F;
-	Wed, 25 Jun 2025 23:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jRLpBRrp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5432BD598;
+	Wed, 25 Jun 2025 23:15:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8152F4326;
-	Wed, 25 Jun 2025 23:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04FB1DB958
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 23:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750893286; cv=none; b=NVGC+T6Bugw5Bzay/md20v/2wRukEkj4QR1eEVMHy91rPOnXQU8WM9vvqkQ+Vd9jebMOwNZuSkuNZZeLrrLQYwysFnH8ETM8Ck2nIndf5g5oGVIwe9B3zrtSZzx8xeSmWHpMRUKvAFYcS4gtQnAXRp9oXBL3Hwpu7riFoAvnlvU=
+	t=1750893323; cv=none; b=bynqkVyEZPofdMLh+7ZQSY8RFhGfyA7c8Vmob9FhkZgvahAeAeBQ9JdwCWEGwo8tU+6I1wIyUYZXADc7ItzIi/eWZzRYhMHvGtnTjBdWpD9ZZe3E2do2yRXRSdLM0B0jUyeMvmnFLZD0Yvj8a1/bv0Rfua3XXnwI1VAA39TNm5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750893286; c=relaxed/simple;
-	bh=q+Xgk6gY7XYxDUH0slZtZV1r6bW0xVVA1X7mSXJHpKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lr3kUniIxdSTbgLbQJW0P4CSf86/u+QCF860xKsX3hkw89sKfsnVj6PC/0ho/Zhibnt9PT4Ids4iTPiVCNPcSSag90MGdsNzcx4yu4TKWPgPUcC7TuSwsRG5NdBtYTIiUUNGiB+6keIBq6IHlNk8hAU/yKgnG2FKwhI+DfWIZfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jRLpBRrp; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750893284; x=1782429284;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=q+Xgk6gY7XYxDUH0slZtZV1r6bW0xVVA1X7mSXJHpKA=;
-  b=jRLpBRrpOFLwacBmxvo8gnb9n+sva/YNn6hHhoBamIAOHVrrZ5IW2zhs
-   62EtMI3g6kDuDPg5bioH2qRJ8cuhw/RDDA01QBOimGmh0lVTydPgG64EZ
-   nWmUDlptGjqYChLqfWzPiOvcAjPXjNag0G+GJiZ+vuGwSXJZLuJeq5oDt
-   57kYmLzjF1c9sL72kO5KAZJYRJAJ6iDhOTBQWuIvYNpne6sYi1dDlvinw
-   Mh/6mTOqkH8wo9itzdiJgLp0s3cD2Xnnwv5h8d6FhIP0Paj4S/N6HYjmA
-   3er50gSu4B6x7MO1AiUSNV4k0FnKOtY6yqYlF3/vUULOeri0ENkRGMgJ8
-   g==;
-X-CSE-ConnectionGUID: gS8cdfx3SLq2S9BlQTolug==
-X-CSE-MsgGUID: y79klQh9T7+g9wKIXsHIjg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64534621"
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="64534621"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 16:14:43 -0700
-X-CSE-ConnectionGUID: wzR4hzHxQJWM2Z80q5tYIw==
-X-CSE-MsgGUID: nGIuA4g5T4+jfVIKBXXyCw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="158107202"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 25 Jun 2025 16:14:40 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uUZKA-000TW6-05;
-	Wed, 25 Jun 2025 23:14:38 +0000
-Date: Thu, 26 Jun 2025 07:14:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wen Gu <guwen@linux.alibaba.com>, richardcochran@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	guwen@linux.alibaba.com
-Subject: Re: [PATCH net-next] ptp: add Alibaba CIPU PTP clock driver
-Message-ID: <202506260725.kFmPHRIJ-lkp@intel.com>
-References: <20250625132549.93614-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1750893323; c=relaxed/simple;
+	bh=LrOXdLjoAIESqU7TKPyQT80aiYS+kVo1QLK1NKi4MiU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Wf6I7Ox6iWXqUMroYgvNM2KcwOelriDkTO9mTCSRX/oMxlhl7g0Juq7RKnOgLVpxVx5pgi4PG+6aIZbr+0vECzME1Krs/1/fu1P7gRpzk58w/I+PO5YrOAuIqA2IlwatXAPrPdr42L4Ft11NROTYUbHmTcAodJklTiZVTacgojU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id C8BBA8A;
+	Wed, 25 Jun 2025 16:15:20 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id WHNxGZ_UdHU0; Wed, 25 Jun 2025 16:15:19 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 6D7E541;
+	Wed, 25 Jun 2025 16:15:19 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 6D7E541
+Date: Wed, 25 Jun 2025 16:15:19 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
+To: Neal Cardwell <ncardwell@google.com>
+cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
+    stable@kernel.org
+Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
+ retransmits were sent
+In-Reply-To: <CADVnQy=mrWeWWTV9YpTaH7G9QvW-qOd_VH5B4=vTxR6rZKwe4A@mail.gmail.com>
+Message-ID: <294fe4ea-eb6c-3dc3-9c5-66f69514bc94@ewheeler.net>
+References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
+ <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com> <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com> <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com>
+ <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net> <a8579544-a9de-63ae-61ed-283c872289a@ewheeler.net> <CADVnQymCso04zj8N0DYP9EkhTwXqtbsCu1xLxAUC60rSd09Rkw@mail.gmail.com> <452b3c16-b994-a627-c737-99358be8b030@ewheeler.net> <9c82e38f-8253-3e41-a5f-dfbb261165ca@ewheeler.net>
+ <CADVnQy=mrWeWWTV9YpTaH7G9QvW-qOd_VH5B4=vTxR6rZKwe4A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625132549.93614-1-guwen@linux.alibaba.com>
+Content-Type: multipart/mixed; boundary="8323328-979129657-1750893319=:5615"
 
-Hi Wen,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-kernel test robot noticed the following build errors:
+--8323328-979129657-1750893319=:5615
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-[auto build test ERROR on net-next/main]
+On Wed, 25 Jun 2025, Neal Cardwell wrote:
+> On Wed, Jun 25, 2025 at 3:17 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> >
+> > On Wed, 18 Jun 2025, Eric Wheeler wrote:
+> > > On Mon, 16 Jun 2025, Neal Cardwell wrote:
+> > > > On Mon, Jun 16, 2025 at 4:14 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > On Sun, 15 Jun 2025, Eric Wheeler wrote:
+> > > > > > On Tue, 10 Jun 2025, Neal Cardwell wrote:
+> > > > > > > On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
+> > > > > > > > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
+> > > > > > > > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
+> > > > > > > > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
+> > > > > > > > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
+> > > > > > > > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > Through bisection, we found this first-bad commit:
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
+> > > > > > > > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
+> > > > > > > > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
+> > > > > > >
+> > > > > >
+> > > > > > > The attached patch should apply (with "git am") for any recent kernel
+> > > > > > > that has the "tcp: fix to allow timestamp undo if no retransmits were
+> > > > > > > sent" patch it is fixing. So you should be able to test it on top of
+> > > > > > > the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
+> > > > > > > easier.
+> > > > >
+> > > > > Definitely better, but performance is ~15% slower vs reverting, and the
+> > > > > retransmit counts are still higher than the other.  In the two sections
+> > > > > below you can see the difference between after the fix and after the
+> > > > > revert.
+> > > > >
+> > > >
+> > > > Would you have cycles to run the "after-fix" and "after-revert-6.6.93"
+> > > > cases multiple times, so we can get a sense of what is signal and what
+> > > > is noise? Perhaps 20 or 50 trials for each approach?
+> > >
+> > > I ran 50 tests after revert and compare that to after the fix using both
+> > > average and geometric mean, and it still appears to be slightly slower
+> > > then with the revert alone:
+> > >
+> > >       # after-revert-6.6.93
+> > >       Arithmetic Mean: 843.64 Mbits/sec
+> > >       Geometric Mean: 841.95 Mbits/sec
+> > >
+> > >       # after-tcp-fix-6.6.93
+> > >       Arithmetic Mean: 823.00 Mbits/sec
+> > >       Geometric Mean: 819.38 Mbits/sec
+> > >
+> >
+> > Re-sending this question in case this message got lost:
+> >
+> > > Do you think that this is an actual performance regression, or just a
+> > > sample set that is not big enough to work out the averages?
+> > >
+> > > Here is the data collected for each of the 50 tests:
+> > >       - https://www.linuxglobal.com/out/for-neal/after-revert-6.6.93.tar.gz
+> > >       - https://www.linuxglobal.com/out/for-neal/after-tcp-fix-6.6.93.tar.gz
+> 
+> Hi Eric,
+> 
+> Many thanks for this great data!
+> 
+> I have been looking at this data. It's quite interesting.
+> 
+> Looking at the CDF of throughputs for the "revert" cases vs the "fix"
+> cases (attached) it does look like for the 70-th percentile and below
+> (the 70% of most unlucky cases), the "fix" cases have a throughput
+> that is lower, and IMHO this looks outside the realm of what we would
+> expect from noise.
+> 
+> However, when I look at the traces, I don't see any reason why the
+> "fix" cases would be systematically slower. In particular, the "fix"
+> and "revert" cases are only changing a function used for "undo"
+> decisions, but for both the "fix" or "revert" cases, there are no
+> "undo" events, and I don't see cases with spurious retransmissions
+> where there should have been "undo" events and yet there were not.
+> 
+> Visually inspecting the traces, the dominant determinant of
+> performance seems to be how many RTO events there were. For example,
+> the worst case for the "fix" trials has 16 RTOs, whereas the worst
+> case for the "revert" trials has 13 RTOs. And the number of RTO events
+> per trial looks random; I see similar qualitative patterns between
+> "fix" and "revert" cases, and don't see any reason why there are more
+> RTOs in the "fix" cases than the "revert" cases. All the RTOs seem to
+> be due to pre-existing (longstanding) performance problems in non-SACK
+> loss recovery.
+> 
+> One way to proceed would be for me to offer some performance fixes for
+> the RTOs, so we can get rid of the RTOs, which are the biggest source
+> of performance variation. That should greatly reduce noise, and
+> perhaps make it easier to see if there is any real difference between
+> "fix" and "revert" cases.
+> 
+> We could compare the following two kernels, with another 50 tests for
+> each of two kernels:
+> 
+> + (a) 6.6.93 + {2 patches to fix RTOs} + "revert"
+> + (b) 6.6.93 + {2 patches to fix RTOs} + "fix"
+> 
+> where:
+> 
+> "revert" =  revert e37ab7373696 ("tcp: fix to allow timestamp undo if
+> no retransmits were sent")
+> "fix" = apply d0fa59897e04 ("tcp: fix tcp_packet_delayed() for
+> tcp_is_non_sack_preventing_reopen() behavior"
+> 
+> This would have the side benefit of testing some performance
+> improvements for non-SACK connections.
+> 
+> Are you up for that? :-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Wen-Gu/ptp-add-Alibaba-CIPU-PTP-clock-driver/20250625-212835
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250625132549.93614-1-guwen%40linux.alibaba.com
-patch subject: [PATCH net-next] ptp: add Alibaba CIPU PTP clock driver
-config: x86_64-buildonly-randconfig-002-20250626 (https://download.01.org/0day-ci/archive/20250626/202506260725.kFmPHRIJ-lkp@intel.com/config)
-compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250626/202506260725.kFmPHRIJ-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506260725.kFmPHRIJ-lkp@intel.com/
+Sure, if you have some patch ideas in mind, I'm all for getting patches 
+merged improve performance.  
 
-All errors (new ones prefixed by >>):
-
->> drivers/ptp/ptp_cipu.c:775:8: error: call to undeclared function 'pci_request_irq'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     775 |                 rc = pci_request_irq(pdev, i, irq_ctx[i].irq_func, NULL,
-         |                      ^
-   drivers/ptp/ptp_cipu.c:775:8: note: did you mean 'pci_request_acs'?
-   include/linux/pci.h:2570:6: note: 'pci_request_acs' declared here
-    2570 | void pci_request_acs(void);
-         |      ^
->> drivers/ptp/ptp_cipu.c:784:3: error: call to undeclared function 'pci_free_irq'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     784 |                 pci_free_irq(pdev, i, ptp_ctx);
-         |                 ^
->> drivers/ptp/ptp_cipu.c:785:2: error: call to undeclared function 'pci_free_irq_vectors'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     785 |         pci_free_irq_vectors(pdev);
-         |         ^
-   drivers/ptp/ptp_cipu.c:785:2: note: did you mean 'pci_alloc_irq_vectors'?
-   include/linux/pci.h:2139:1: note: 'pci_alloc_irq_vectors' declared here
-    2139 | pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
-         | ^
-   drivers/ptp/ptp_cipu.c:796:3: error: call to undeclared function 'pci_free_irq'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     796 |                 pci_free_irq(pdev, i, ptp_ctx);
-         |                 ^
-   drivers/ptp/ptp_cipu.c:797:2: error: call to undeclared function 'pci_free_irq_vectors'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     797 |         pci_free_irq_vectors(pdev);
-         |         ^
-   5 errors generated.
+BTW, what causes a non-SACK connection?  The RX side is a near-idle Linux 
+6.8 host default sysctl settings.
 
 
-vim +/pci_request_irq +775 drivers/ptp/ptp_cipu.c
+--
+Eric Wheeler
 
-   763	
-   764	static int ptp_cipu_init_irq(struct ptp_cipu_ctx *ptp_ctx)
-   765	{
-   766		struct pci_dev *pdev = ptp_ctx->pdev;
-   767		int i, rc;
-   768	
-   769		rc = pci_alloc_irq_vectors(pdev, PTP_CIPU_IRQ_NUM,
-   770					   PTP_CIPU_IRQ_NUM, PCI_IRQ_MSIX);
-   771		if (rc < 0)
-   772			goto out;
-   773	
-   774		for (i = 0; i < PTP_CIPU_IRQ_NUM; i++) {
- > 775			rc = pci_request_irq(pdev, i, irq_ctx[i].irq_func, NULL,
-   776					     ptp_ctx, "ptp-cipu");
-   777			if (rc)
-   778				goto out_vec;
-   779		}
-   780		return 0;
-   781	
-   782	out_vec:
-   783		for (i = i - 1; i >= 0; i--)
- > 784			pci_free_irq(pdev, i, ptp_ctx);
- > 785		pci_free_irq_vectors(pdev);
-   786	out:
-   787		return rc;
-   788	}
-   789	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> Best regards,
+> neal
+> 
+--8323328-979129657-1750893319=:5615--
 
