@@ -1,253 +1,217 @@
-Return-Path: <netdev+bounces-200952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B1C3AE778A
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:52:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8972EAE7849
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0EB64A09D3
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 06:52:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89BB61BC6381
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 07:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01902046BA;
-	Wed, 25 Jun 2025 06:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6997A20E718;
+	Wed, 25 Jun 2025 07:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zc2I3mZJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2tXCIli"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BF41F9A89
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 06:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8CA202983
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 07:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750834293; cv=none; b=sC0K474cQ1AJ/2pzI5K97pYCTq1m+RoCLHu0rAq8qaoSl+1im8dYChiYWc9Bx4HWH4WvUB2ZrLbb/oUMYlkZhtOzDo1QlkZn4njhJym5UmmNFx0/8nISgG73uZEFdpZ1Q+M9OS7HLj9Rz7n/caJEvcp8MQn4UnbrexTta6W5PUk=
+	t=1750835592; cv=none; b=Jf8kBWV0A/AN0bcqjmOQ1F8km0yo+MEOA5HOGkKFxc3sVM0djSFtPk3RNqx4SWU7vw3WEY1aYK+25dezm913JSg161XTXBre9PlA8X0I0w86iFX8c2vluxy6oMxBB5IviOWM/J1z/3rfHCUs9H2q9qAW9PtsB/Z97vKJyRW43cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750834293; c=relaxed/simple;
-	bh=z6Kz5bD4u/oRkUGzxnPtmh+omOzikpiX32b2U7bHqsU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZpE9mlV7HiwhC22L8yjkhkLNhrV6sMAFRTON8fjLzbcDCPFLV9mh+45kDybJ7rt+PdtA89BxAGgeVjZBjilyQsHWUg49/xL0omiHlQ+OFBcB2b8CpY0W2FOrJcbzurahHl3gGeXH/XA+yjDJEKiOJzpRWniaeDgT2HiOB91Z1Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zc2I3mZJ; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32b43c5c04fso5712091fa.0
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 23:51:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750834290; x=1751439090; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yFMXvfPRa0UOBO3cgLQ7m54Pq8rDrCd82zZaQNRL0CM=;
-        b=zc2I3mZJujUaO+eByZTnQFKmzGEskQ/fE2I2CrdRAbexx9pV6vaeUPw5ey14BDPETF
-         FknYJaCd8cB26rirlpAIvnxRDZvJs1qRSWoHKmtpZVf/uR1qyVeX4t6zvIDSCE+Q/+8u
-         oTmyhydOL7+j4QO/QOplLBNoscdWDhDJC9VxbYU4vjEZP8oXY4++tK11JIRwomO0YGtQ
-         hIIGmrfF3/6D8D4XEBPpmWX9Cx5oVOZfmdv+5B+TMjYlj2xK105e8Nh09mn0jJAEkBNN
-         4mWOnX3Fm9twC2S9KM+LUm8sDT+FY2UVcH5xXgqkqcXT4SvOdMszxlN+9JWQ72qeZkOs
-         DeEQ==
+	s=arc-20240116; t=1750835592; c=relaxed/simple;
+	bh=Ds7IUTDTvw2CV2lBhtiAyxq24lOIiiA5IpHwJwPyoJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ljocK0ThPyCCSmUSz2Jf/eU9gsjgCfNBysx9oBAxYtYuOLlKOtMP1h4kkfk0OfEk42wp7oWs07C64YHcqOQ9dTO9PHIEIaiTNm6suzXhmqsQi0ifZvAuem4+5wPSyZnHEko/nMrfIBFwPqsMmd3H2ZHNcsfo5NmunBdkilg3jJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z2tXCIli; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750835589;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UvazZI9dix5Ccz8uQdaazIH2SdfSX8TXp65gCpdhwKo=;
+	b=Z2tXCIlihhVFw44wErbQZN7GgttNTqra7K8DKvxjvo1yc0jMeNcKpuKh7OO+99h202zjUj
+	udJBVX8rVdJlmDPB0isk+uBO+CuJaK0fO3SoYublRZ3NlQEB/YnvnRsCtfGCRCEgeYp0Bh
+	AcyNOZqRa4XHYkYgxYPWxhKyXtONDrY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-641-aNPFWrs4NSGeQAVRCdiwVg-1; Wed, 25 Jun 2025 03:13:07 -0400
+X-MC-Unique: aNPFWrs4NSGeQAVRCdiwVg-1
+X-Mimecast-MFC-AGG-ID: aNPFWrs4NSGeQAVRCdiwVg_1750835587
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-451d5600a54so9431835e9.2
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 00:13:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750834290; x=1751439090;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yFMXvfPRa0UOBO3cgLQ7m54Pq8rDrCd82zZaQNRL0CM=;
-        b=MVBzjA9yMlkhw6x/9ffK2o61CRC9Nem95xAPx9rKOOOPNkSgHRfFsxcjPzAuduTawp
-         6UyaG1euiPbqAEPSQsLVCKuISX3CZ4P9Rht6g3+vY23VG2eDrkdYuEdGLSviv3cA3ctK
-         ERTCOaSWLJy4avVC/1C8wrCTIKDqoJOmIBhua6ZoBYUfwJirmlxkvp3FjTOOcpiaKJOz
-         Z1vdY6ybK4JqEI6xtgVOPFIRTM2WP3edIV1AMJl/HMF4MrGVBVR9Bds0bKnvGzP4v/IH
-         E9o38r6xu8ZM54tkLjGR4X96l0EGxF1A6wTgoUAqYMeyClIDVlh8I4xvP8e9HK5xurxU
-         gAJg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlNsT1nUXQWUSksx7LS0uHCv4gSwibrxK+d5HonSg01r7/4M77KRoxzDmKxDTYCQVv2BRQDZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU7LBn6RwhNd0YjI2JzIAuAeOnG+03fqfRfbZuaR+oRjs8mFJD
-	WBSSCmDBdTcw8TyHd+W3Bwf0XqHpZ8dMg7FMzJ9iOETw2QYAey4KrjvK9rPuN5P7pSM=
-X-Gm-Gg: ASbGncvV5Tf3v1iSQbHTTZ7ofo3W++Cj1Vc6CtVWyMjaBOhCH9SdF79TjcQCE1Ec49M
-	tXaliAGcQtmjiDP6HGqqUaJWpF1sbhSDwgBrO3YM2QIBwsGWC8cipdc2qOMzmrKKhy7NZQsFjE9
-	3QF2hvX3OjHnM44qqoOd5lnNpLa1hP+G4f6zQL/vCajtiMOC75nq8tUeAbUMwvgfqJx7griXxyY
-	YtFGvutx4XZ/b5hYgs+FcrIUztb3cNY8oQ7Q7YrdYzPvdlSM5PWzCq7X9NYDb5hOyx0WEdhwnD8
-	CHt6E63EKArPfUyk/ogHr4qlW4vlXpvW5KvnZ1YflRjyhYRal2UkzFOZTw/jJAzgcP3g7P9V
-X-Google-Smtp-Source: AGHT+IEpOdWfGaIgmGGQGacKIf79G9PXPpppGhcO3CSNb7whwyehyVUgDBPPDwEao2GZGf+BOMyDBA==
-X-Received: by 2002:a05:6512:2214:b0:553:268e:5011 with SMTP id 2adb3069b0e04-554f5cdcc8cmr2153322e87.26.1750834289792;
-        Tue, 24 Jun 2025 23:51:29 -0700 (PDT)
-Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553e41c3dc4sm2068379e87.157.2025.06.24.23.51.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 23:51:29 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 25 Jun 2025 08:51:25 +0200
-Subject: [PATCH net-next v2 2/2] ARM: dts: Fix up wrv54g device tree
+        d=1e100.net; s=20230601; t=1750835586; x=1751440386;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UvazZI9dix5Ccz8uQdaazIH2SdfSX8TXp65gCpdhwKo=;
+        b=kca0AsX5GjmedDDtyunVaz54FyNwh8d3Gr5kdBkBBu2uyGuaaoTam1My0gpsnYLIPH
+         zffQj+84l98mQgQFuZAT3IttiOTiHHI7JTICG/3n6k6WIZAay/CrmXzfRutRSqgEDw91
+         oZLxdG7XUnXSgDL5iDBlPyQNkqoQsYmpoyyVX785etEybclN3Tk0Ll8i6YEI2JYayk61
+         irXiuO5ABHjlyBbKAaGULDLSgBJy/+NWaU2bRLjUVJD9YplcW++mC4dhKWTFCEMm0Hmr
+         dBwfnP0e9IIFpnJGBDxvnZkWvM9zut1ZWPNjfHVJrKqS8XC2cDOyWAjwDRHrH+VAmqLx
+         ltkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVuj6kyXehj8zf/b4SCvYB2t3aZd+G7OJ84DA+QSq5ZX3W3L8TKvvmXcIz0hPE1WuZ+xsnBAxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCILLvkcxdtdbt3ATiiXo/CTtdNtodnjRuUm1zUfdxMFHqV0ho
+	ne0hdXOCWwF+0N1YIoymzuc0i18yc8D/7ojmh3McTlZC8FDG7DT8NiWA5VO/D/zBpDXhZDFPbTw
+	EzJK8ZXPF5UAwctr3mwvEqXmbCDrCLbldN2JEtdiuvOTkk0CSSpq5DJ28ow==
+X-Gm-Gg: ASbGncsYhVEmxYFAM1wo/3r3O52B7NOTJxbixMinuQ7sVyDmZ7owIcck9TR9vawa+wi
+	FOkGd5Ko9EK9QonNXV9bU8tmr6esP8bHPhjyBDlvIbogyw/7q3ACeIPh80y60mqt/x7jdfBWzyy
+	H8/IQezUfk+wSr3DTmR9wb6QVkeDXWnz8rVBC8Z2A5KU0mQKpXbG8GPLsxqZtYrFtRBerM1Ziar
+	LT84pMEa9/vslAq9B1rEDz5J54+BT/ic1pia5ZPNFz6ExhQvNvBzenLUXrddPK5lXpPFFUb/G+5
+	iCdUE1ntAL3tTFvMVz7BBg9QqK7aewbtCPjMGh3HSjfsrk4jauk+Go4K9zkEO50mb6xTOg==
+X-Received: by 2002:a05:600c:c166:b0:453:2433:1c5b with SMTP id 5b1f17b1804b1-45381aeaf59mr16247385e9.5.1750835586442;
+        Wed, 25 Jun 2025 00:13:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF3iA3F1mdUK03DtATl2924qBuUv87aDvuUQRfj1Hbnrj8+86URjh4kC1Jl7WzPkyXWYI1Cug==
+X-Received: by 2002:a05:600c:c166:b0:453:2433:1c5b with SMTP id 5b1f17b1804b1-45381aeaf59mr16246855e9.5.1750835585911;
+        Wed, 25 Jun 2025 00:13:05 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:cc86:3510:2b4a:1654:ed63:3802? ([2a0d:3341:cc86:3510:2b4a:1654:ed63:3802])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e8069534sm3692041f8f.44.2025.06.25.00.13.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Jun 2025 00:13:05 -0700 (PDT)
+Message-ID: <20159d14-7d6b-4c16-9f00-ae993cc16f90@redhat.com>
+Date: Wed, 25 Jun 2025 09:13:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v13 04/11] net: mtip: The L2 switch driver for imx287
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Stefan Wahren <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20250622093756.2895000-1-lukma@denx.de>
+ <20250622093756.2895000-5-lukma@denx.de>
+ <b31793de-e34f-438c-aa37-d68f3cb42b80@redhat.com>
+ <20250624230437.1ede2bcb@wsk>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250624230437.1ede2bcb@wsk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250625-ks8995-dsa-bindings-v2-2-ce71dce9be0b@linaro.org>
-References: <20250625-ks8995-dsa-bindings-v2-0-ce71dce9be0b@linaro.org>
-In-Reply-To: <20250625-ks8995-dsa-bindings-v2-0-ce71dce9be0b@linaro.org>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Imre Kaloz <kaloz@openwrt.org>
-Cc: Frederic Lambert <frdrc66@gmail.com>, Gabor Juhos <juhosg@openwrt.org>, 
- Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.14.2
 
-Fix up the KS8995 switch and PHYs the way that is most likely:
+On 6/24/25 11:04 PM, Lukasz Majewski wrote:
+>> On 6/22/25 11:37 AM, Lukasz Majewski wrote:
+>>> +static void mtip_aging_timer(struct timer_list *t)
+>>> +{
+>>> +	struct switch_enet_private *fep = timer_container_of(fep,
+>>> t,
+>>> +
+>>> timer_aging); +
+>>> +	fep->curr_time = mtip_timeincrement(fep->curr_time);
+>>> +
+>>> +	mod_timer(&fep->timer_aging,
+>>> +		  jiffies +
+>>> msecs_to_jiffies(LEARNING_AGING_INTERVAL)); +}  
+>>
+>> It's unclear to me why you decided to maintain this function and timer
+>> while you could/should have used a macro around jiffies instead.
+> 
+> This is a bit more tricky than just getting value from jiffies.
+> 
+> The current code provides a monotonic, starting from 0 time "base" for
+> learning and managing entries in internal routing tables for MTIP.
+> 
+> To be more specific - the fep->curr_time is a value incremented after
+> each ~10ms.
+> 
+> Simple masking of jiffies would not provide such features.
 
-- Phy 1-4 is certainly the PHYs of the KS8995 (mask 0x1e in
-  the outoftree code masks PHYs 1,2,3,4).
-- Phy 5 is the MII-P5 separate WAN phy of the KS8995 directly
-  connected to EthC.
-- The EthB MII is probably connected as CPU interface to the
-  KS8995.
+I guess you can get the same effect storing computing the difference
+from an initial jiffies value and using jiffies_to_msecs(<delta>)/10.
 
-Properly integrate the KS8995 switch using the new bindings.
+>> [...]
+>>> +static int mtip_sw_learning(void *arg)
+>>> +{
+>>> +	struct switch_enet_private *fep = arg;
+>>> +
+>>> +	while (!kthread_should_stop()) {
+>>> +		set_current_state(TASK_INTERRUPTIBLE);
+>>> +		/* check learning record valid */
+>>> +		mtip_atable_dynamicms_learn_migration(fep,
+>>> fep->curr_time,
+>>> +						      NULL, NULL);
+>>> +		schedule_timeout(HZ / 100);
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}  
+>>
+>> Why are you using a full blown kernel thread here? 
+> 
+> The MTIP IP block requires the thread for learning. It is a HW based
+> switching accelerator, but the learning feature must be performed by
+> SW (by writing values to its registers).
+> 
+>> Here a timer could
+>> possibly make more sense.
+> 
+> Unfortunately, not - the code (in
+> mtip_atable_dynamicms_learn_migration() must be called). This function
+> has another role - it updates internal routing table with timestamps
+> (provided by timer mentioned above).
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- .../dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts  | 92 ++++++++++++++++++----
- 1 file changed, 78 insertions(+), 14 deletions(-)
+Why a periodic timer can't call such function?
 
-diff --git a/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts b/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts
-index 98275a363c57cde22ef57c3885bc4469677ef790..cb1842c83ac8edc311ea30515f2e9c97f303cf17 100644
---- a/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts
-+++ b/arch/arm/boot/dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts
-@@ -72,10 +72,55 @@ spi {
- 		cs-gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
- 		num-chipselects = <1>;
- 
--		switch@0 {
-+		ethernet-switch@0 {
- 			compatible = "micrel,ks8995";
- 			reg = <0>;
- 			spi-max-frequency = <50000000>;
-+
-+			/*
-+			 * The PHYs are accessed over the external MDIO
-+			 * bus and not internally through the switch control
-+			 * registers.
-+			 */
-+			ethernet-ports {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+
-+				ethernet-port@0 {
-+					reg = <0>;
-+					label = "1";
-+					phy-mode = "mii";
-+					phy-handle = <&phy1>;
-+				};
-+				ethernet-port@1 {
-+					reg = <1>;
-+					label = "2";
-+					phy-mode = "mii";
-+					phy-handle = <&phy2>;
-+				};
-+				ethernet-port@2 {
-+					reg = <2>;
-+					label = "3";
-+					phy-mode = "mii";
-+					phy-handle = <&phy3>;
-+				};
-+				ethernet-port@3 {
-+					reg = <3>;
-+					label = "4";
-+					phy-mode = "mii";
-+					phy-handle = <&phy4>;
-+				};
-+				ethernet-port@4 {
-+					reg = <4>;
-+					ethernet = <&ethb>;
-+					phy-mode = "mii";
-+					fixed-link {
-+						speed = <100>;
-+						full-duplex;
-+					};
-+				};
-+
-+			};
- 		};
- 	};
- 
-@@ -135,40 +180,59 @@ pci@c0000000 {
- 		};
- 
- 		/*
--		 * EthB - connected to the KS8995 switch ports 1-4
--		 * FIXME: the boardfile defines .phy_mask = 0x1e for this port to enable output to
--		 * all four switch ports, also using an out of tree multiphy patch.
--		 * Do we need a new binding and property for this?
-+		 * EthB connects to the KS8995 CPU port and faces ports 1-4
-+		 * through the switch fabric.
-+		 *
-+		 * To complicate things, the MDIO channel is also only
-+		 * accessible through EthB, but used independently for PHY
-+		 * control.
- 		 */
--		ethernet@c8009000 {
-+		ethb: ethernet@c8009000 {
- 			status = "okay";
- 			queue-rx = <&qmgr 3>;
- 			queue-txready = <&qmgr 20>;
--			phy-mode = "rgmii";
--			phy-handle = <&phy4>;
-+			phy-mode = "mii";
-+			fixed-link {
-+				speed = <100>;
-+				full-duplex;
-+			};
- 
- 			mdio {
- 				#address-cells = <1>;
- 				#size-cells = <0>;
- 
--				/* Should be ports 1-4 on the KS8995 switch */
-+				/*
-+				 * LAN ports 1-4 on the KS8995 switch
-+				 * and PHY5 for WAN need to be accessed
-+				 * through this external MDIO channel.
-+				 */
-+				phy1: ethernet-phy@1 {
-+					reg = <1>;
-+				};
-+				phy2: ethernet-phy@2 {
-+					reg = <2>;
-+				};
-+				phy3: ethernet-phy@3 {
-+					reg = <3>;
-+				};
- 				phy4: ethernet-phy@4 {
- 					reg = <4>;
- 				};
--
--				/* Should be port 5 on the KS8995 switch */
- 				phy5: ethernet-phy@5 {
- 					reg = <5>;
- 				};
- 			};
- 		};
- 
--		/* EthC - connected to KS8995 switch port 5 */
--		ethernet@c800a000 {
-+		/*
-+		 * EthC connects to MII-P5 on the KS8995 bypassing
-+		 * all of the switch logic and facing PHY5
-+		 */
-+		ethc: ethernet@c800a000 {
- 			status = "okay";
- 			queue-rx = <&qmgr 4>;
- 			queue-txready = <&qmgr 21>;
--			phy-mode = "rgmii";
-+			phy-mode = "mii";
- 			phy-handle = <&phy5>;
- 		};
- 	};
+> 
+>> Why are checking the table every 10ms, while
+>> the learning intervall is 100ms? 
+> 
+> Yes, this is correct. In 10ms interval the internal routing table is
+> updated. 100 ms is for learning.
+> 
+>> I guess you could/should align the
+>> frequency here with such interval.
+> 
+> IMHO learning with 10ms interval would bring a lot of overhead.
+> 
+> Just to mention - the MTIP IP block can generate interrupt for
+> learning event. However, it has been advised (bu NXP support), that a
+> thread with 100ms interval shall be used to avoid too many interrupts.
 
--- 
-2.49.0
+FTR, my suggestion is to increase the
+mtip_atable_dynamicms_learn_migration's call period to 100ms
+
+>> Side note: I think you should move the buffer management to a later
+>> patch: this one is still IMHO too big.
+> 
+> And this is problematic - the most time I've spent for v13 to separate
+> the code - i.e. I exclude one function, then there are warnings that
+> other function is unused (and of course WARNINGS in a separate patches
+> are a legitimate reason to call for another patch set revision).
+
+A trick to break that kind of dependencies chain is to leave a function
+implementation empty.
+
+On the same topic, you could have left mtip_rx_napi() implementation
+empty up to patch 6 or you could have introduced napi initialization and
+cleanup only after such patch.
+
+In a similar way, you could introduce buffer managements in a later
+patch and add the relevant calls afterwards.
+
+/P
 
 
