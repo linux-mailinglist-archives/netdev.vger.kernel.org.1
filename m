@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-201078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AEDEAE80A2
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:11:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC69CAE8095
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:08:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 548C17BAE19
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:04:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8FEF7A3605
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910342BEFEA;
-	Wed, 25 Jun 2025 11:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE93B29E114;
+	Wed, 25 Jun 2025 11:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tulmo0CJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2npjSuG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6D22BE7D2;
-	Wed, 25 Jun 2025 11:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BD01E1C3F;
+	Wed, 25 Jun 2025 11:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750849552; cv=none; b=kGjeOW6qLOtmxUKlyknOjb3BZJPwr8VYzhUR+Qml/DmZOXMf9XdIr0ZaGsRJhxuatadmq6QzaJbqCWtWgdoDFfez2QLxZb/7ZmWPi70QqXiSqusZ1mQMbqi/c2wFjO7Ub9fyw+ddbUI0H8xwtD+r0/HupVN1WdtVcx5weVvucCY=
+	t=1750849624; cv=none; b=YXCosEv0vQPFNl8QpBkONX2ghuW9cPcl06xgUMn4DCBnwVJFE1YukfgVEgFu2psex0glfRe5EzjRHRJy/zOL9IEgB7jGhnWlmJcXyioQPreyI9nZeeszcsvO+87VgaYG6nx/oZ9WHfmdBP7Vn4E45Xqg+MizyFX4GPHrqFgMp34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750849552; c=relaxed/simple;
-	bh=4lPd6KAvzXLpR40aJR9oTpfeEv7nnPZ/tTvk3e0XF4M=;
+	s=arc-20240116; t=1750849624; c=relaxed/simple;
+	bh=Du5M54IwYdOnXf3aWRLYEWi5vYiuJM7fkemw9YzMmhI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BLWzvQ2aqiEzsgUgjkg2vNVQEIQ83iD32XmoiU4P/Ru880N3Fh+8v9NJJ8jWJWx1Hk3os+9WqbKwfgRB6zBtwus7Ipkk4/coUUmt67yfphlzlOLP+4X8AZYVrF2bfTY2p9VfZwvmij68PvK0ynWC+j+vY7MOEkCG+4qtJh98EPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tulmo0CJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E92C4CEEA;
-	Wed, 25 Jun 2025 11:05:47 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=d5mlRIqL0PdC+BGjzcJ4hSCZ+Aq3F8zgz2b7Z3pqEEtnou1MbFduHEAITdkdwhexcPGlJWRIEdtDg6ZkKU04UUT5VPIaQ5SYnjr90DTQqcXYon/dz6Yizc7XYgRLx3jMXirR8NYy6o/d+h1r7oKNq8ZXhw0gY+tvl0O9kVoLeyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2npjSuG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84DF0C4CEF3;
+	Wed, 25 Jun 2025 11:06:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750849551;
-	bh=4lPd6KAvzXLpR40aJR9oTpfeEv7nnPZ/tTvk3e0XF4M=;
+	s=k20201202; t=1750849624;
+	bh=Du5M54IwYdOnXf3aWRLYEWi5vYiuJM7fkemw9YzMmhI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tulmo0CJdcLK2dbqrKEF7umDt2un0BQ5K2ElGgLeR6Hc7GH9nI2x5boFteE3GRRb7
-	 rDUBDDQnyglthoIHmG3QAESsvF9sROfEAA5ssM4NRAKUQtfJIDJ/XahkqkNu0dmuMR
-	 WLcffsAoUvm7a+floCkuu2aDhxSHhLIvL9w8Ng7yeZvsFKlT8sKHI7Kcqs65qbHIQJ
-	 +1ZYLSc676lj+IqY7w0OeNG7paY4Pa7GBQjwJqrIhMBCTbdmVlH0Sn0uJgVYh5HMAi
-	 Sf63AA98YQcmTPw5Snf/6SrQ/3w434pcaaVKsTOubklkd5o/53lpUaAVDHDIQzwSTD
-	 7ruDKt5dHClrg==
-Message-ID: <29eeae4f-59ed-4781-88b1-4fd76714ecb6@kernel.org>
-Date: Wed, 25 Jun 2025 13:05:45 +0200
+	b=V2npjSuGkDaZbAiIfvwChljQPGkoIx25/DuLkqurOMb68Mtv9JxFZ9Xs2DqbAfwwt
+	 MOZB5Fli4sKbXoWq8PcHKAgoDvnYVIQ67YSYn7p5ElRJyPTq2TcUp1LN+USkozNjOm
+	 XLPf4KDOSKBe0UqsLPnYrAP4p3crqE2MnWuCGHfaMWgrR0rVct+2BS6yAXClZvom/j
+	 sa5iXgml/zyhDooN2wJFS3TULsVcXX27FGAxjLEIoS7H8AvrjgKeMjYSbhm7h1Y/4a
+	 oh8EgY9Lr4/5+X/H/Wunb9WehB8mer9EsWFowRkPCsRI1+i6ODYnjOSHl+KoDApXv2
+	 mquTNGLIgOpiA==
+Message-ID: <86654ad1-a2ab-4add-b9de-4d56c67f377b@kernel.org>
+Date: Wed, 25 Jun 2025 13:06:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -175,39 +175,15 @@ On 25/06/2025 11:45, AngeloGioacchino Del Regno wrote:
 > ....but the hardware voter cannot be represented as a clock, because you use it
 > for clocks *or* power domains (but at the same time, and of course in different
 > drivers, and in different *intertwined* registers).
-> 
-> So the hardware voter itself (and/or bits inside of its registers) cannot be
-> represented as a clock :\
-> 
-> In the context of clocks, it's used for clocks, (and not touching power domains at
-> all), but in the context of power domains it's used for power domains (and not
-> touching clocks at all).
 
-I don't understand this. Earlier you mentioned "MUX-GATE and GATE
-clocks", so these are clocks, right? How these clocks are used in other
-places as power domains? If they are, this either has to be fixed or
-apparently this is a power domain and use it as power domain also here.
+BTW:
 
-Really, something called as hardware voter is not that uncommon and it
-does fit existing bindings.
+git grep mediatek,hardware-voter
+0 results
 
-> 
-> I'm not sure what qcom does - your reply makes me think that they did it such that
-> the clocks part is in a MMIO and the power domains part is in a different MMIO,
-> without having clock/pd intertwined voting registers...
-
-No, you just never have direct access to hardware. You place votes and
-votes go to the firmware. Now depending on person submitting it or
-writing internal docs, they call it differently, but eventually it is
-the same. You want to vote for some specific signal to be active or
-running at some performance level.
-
-> 
-> Still not sure what to do here, then...
-> 
-> Cheers,
-> Angelo
-
+so I do not accept explanation that you use it in different drivers. Now
+is the first time this is being upstream, so now is the time when this
+is shaped.
 
 Best regards,
 Krzysztof
