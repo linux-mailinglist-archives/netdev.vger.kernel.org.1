@@ -1,173 +1,213 @@
-Return-Path: <netdev+bounces-200995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E039AAE7B0A
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:57:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E89AE7B50
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AC4A3A9BC8
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:57:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B53625A57FD
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8802857E0;
-	Wed, 25 Jun 2025 08:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBA429B20E;
+	Wed, 25 Jun 2025 09:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DW1bIPn8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Agurw7Lq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054FB27F18F;
-	Wed, 25 Jun 2025 08:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5554C29ACE6
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750841857; cv=none; b=NSISRoSCIyJnRbzweNLYo42u7a7ikuR/E5R33E5yfOfuxVyce5lOzr+kSIxVgKVacOdrI/TLkzejXjAkZGlX/cTAE09ckBcmcDlMb1uJTjLkHH8up/aTIAjDy/IHcjwegL4i6ey9ft8VcIyMJ2T9H8Od3XyforNSmBzqOuxzipE=
+	t=1750842084; cv=none; b=jJ+2Pj1m6efxdn6tf8rflQddqN2Bpq/7+6h9J1eXW2qIboNFl6TL6jf1tZn1IxY2erdo772pws2l0kJ4k0LtpSYRyYTK+YlAgNFbWPGRr0YFSmLWrSWsRCO58ScAapP+z+mVQ/Pu9aXJJ/kmcKjevPSG33IAqhEGccveXFjcAyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750841857; c=relaxed/simple;
-	bh=0QgB6O4O/sYU4iRucJ8iotwxezNS2MkmRTc3/U3q/9w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B+QuOWC26dQGwzDxme+03uaQwponS8676OQvErxW+umPdG6gKTN5lTFq+t/63qus3MkDYjAHUizopf4t/uPmVYvX36Nt9x7ktQPDHWDFsrnnBj3QNLv+0b7WQEVsAFuurIbW3mF0jMkCYnfTuG/TOpLMNNn+cZXt7bU5I3wogDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DW1bIPn8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C0FFC4CEEA;
-	Wed, 25 Jun 2025 08:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750841856;
-	bh=0QgB6O4O/sYU4iRucJ8iotwxezNS2MkmRTc3/U3q/9w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DW1bIPn8+wO1CO4ERNB9TZT6bfg+jmleh0swnm693vd3NvFbpG/OZSMRc56gGicV5
-	 ZtF7p9vu8eh+rQYXLenH3rs2RhhmlE9o0vVCOz+uayDuNHhm5pY7OMLtBen1qooAdO
-	 swoHx7Fsv/3l93q4QM3UpIHr5oMR8YjS2SZiaOWfWBz+5DGG14NuG0sKv85YiG7/ij
-	 vGVG+davd9Q+wMxOEA5GnRmH3+7VbFNZxjoH7cJD02Och3vEOKe9Mb26Kz9twdi5FF
-	 SbbQBlLN9MJ8GnBrTroEgtrrLQsM8HbBaIDLDQM3JE8sWH4tYrjmraF36T9AnpVF+L
-	 bps/xM9fsAw2w==
-Message-ID: <0870a2ba-936b-4eb2-a570-f2c9dea471b8@kernel.org>
-Date: Wed, 25 Jun 2025 10:57:30 +0200
+	s=arc-20240116; t=1750842084; c=relaxed/simple;
+	bh=J3LRFCdKMHDJ3jfOLnnBbarNlAuSi67YvUjOp7gGJUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsvCEg8yCWBUhsIUcKErwZFxjs6/BDarD6vMi4vQ8YLxcsQqxc7BoB9LURcT40OhNOEEAaBB3mpcfeblY35l4gBqHO5arZJ1AbBWSyicGuMP7xW1pfElwJtxu3eebI3CHhwOddL6mWp/SWwc4Q9J+9FaRwWVIa1aaaJHeCexsME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Agurw7Lq; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750842083; x=1782378083;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=J3LRFCdKMHDJ3jfOLnnBbarNlAuSi67YvUjOp7gGJUY=;
+  b=Agurw7LqRJ5BLIGGRy7IurJuAGoEscw4WqDjfZ/l7Q6UiqjK/RY8dfRW
+   2odCV4sNO3bzeg4MQ+H0mgMzPxK362Ix7OtyK73I8OwupnXRd9cifP5yb
+   g7YzchBX7UVixlfWSF3NHO+55gZmBtZM2gVZ1C/dR9lwQP7yvP6AOFvTl
+   6SWFgMONfR3xhpC8z0qdcadbzlezlaltA+sRhwPWGY+V30kAn+5C0Avxm
+   UV5/1OWgRasU/qB8kjUYLFDJOCF4XIuL7W5ZokHPbfROZW4oZycC0BCrE
+   kgZm+DjgUKOhp/GCq0FGE+4mOrLqgG9x3QVprvEP4Z3quHCPqdUlbVW9E
+   A==;
+X-CSE-ConnectionGUID: awhkuWDDSUKWulVxvCZcwg==
+X-CSE-MsgGUID: tPH6N+rARUW3G5bhAJhQiw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="64461538"
+X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
+   d="scan'208";a="64461538"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 02:01:22 -0700
+X-CSE-ConnectionGUID: 6zJV9Ft3SbG7BDUZEIyhaw==
+X-CSE-MsgGUID: HyseNS8VSMWR+OqTOu1V3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
+   d="scan'208";a="151671160"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 02:01:20 -0700
+Date: Wed, 25 Jun 2025 11:00:22 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com
+Subject: Re: [PATCH net v2 3/3] net: ngbe: specify IRQ vector when the number
+ of VFs is 7
+Message-ID: <aFu6ph+7xhWxwX3W@mev-dev.igk.intel.com>
+References: <20250624085634.14372-1-jiawenwu@trustnetic.com>
+ <20250624085634.14372-4-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 09/29] dt-bindings: clock: mediatek: Describe MT8196
- peripheral clock controllers
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
- sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- matthias.bgg@gmail.com, p.zabel@pengutronix.de, richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com, wenst@chromium.org,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- kernel@collabora.com
-References: <20250624143220.244549-1-laura.nao@collabora.com>
- <20250624143220.244549-10-laura.nao@collabora.com>
- <7dfba01a-6ede-44c2-87e3-3ecb439b48e3@kernel.org>
- <284a4ee5-806b-45f9-8d57-d02ec291e389@collabora.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <284a4ee5-806b-45f9-8d57-d02ec291e389@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624085634.14372-4-jiawenwu@trustnetic.com>
 
-On 25/06/2025 10:20, AngeloGioacchino Del Regno wrote:
-> Il 24/06/25 18:02, Krzysztof Kozlowski ha scritto:
->> On 24/06/2025 16:32, Laura Nao wrote:
->>> +  '#reset-cells':
->>> +    const: 1
->>> +    description:
->>> +      Reset lines for PEXTP0/1 and UFS blocks.
->>> +
->>> +  mediatek,hardware-voter:
->>> +    $ref: /schemas/types.yaml#/definitions/phandle
->>> +    description:
->>> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
->>> +      MCU manages clock and power domain control across the AP and other
->>> +      remote processors. By aggregating their votes, it ensures clocks are
->>> +      safely enabled/disabled and power domains are active before register
->>> +      access.
->>
->> Resource voting is not via any phandle, but either interconnects or
->> required opps for power domain.
+On Tue, Jun 24, 2025 at 04:56:34PM +0800, Jiawen Wu wrote:
+> For NGBE devices, the queue number is limited to be 1 when SRIOV is
+> enabled. In this case, IRQ vector[0] is used for MISC and vector[1] is
+> used for queue, based on the previous patches. But for the hardware
+> design, the IRQ vector[1] must be allocated for use by the VF[6] when
+> the number of VFs is 7. So the IRQ vector[0] should be shared for PF
+> MISC and QUEUE interrupts.
 > 
-> Sorry, I'm not sure who is actually misunderstanding what, here... let me try to
-> explain the situation:
+> +-----------+----------------------+
+> | Vector    | Assigned To          |
+> +-----------+----------------------+
+> | Vector 0  | PF MISC and QUEUE    |
+> | Vector 1  | VF 6                 |
+> | Vector 2  | VF 5                 |
+> | Vector 3  | VF 4                 |
+> | Vector 4  | VF 3                 |
+> | Vector 5  | VF 2                 |
+> | Vector 6  | VF 1                 |
+> | Vector 7  | VF 0                 |
+> +-----------+----------------------+
 > 
-> This is effectively used as a syscon - as in, the clock controllers need to perform
-> MMIO R/W on both the clock controller itself *and* has to place a vote to the clock
-> controller specific HWV register.
-
-syscon is not the interface to place a vote for clocks. "clocks"
-property is.
-
+> Minimize code modifications, only adjust the IRQ vector number for this
+> case.
 > 
-> This is done for MUX-GATE and GATE clocks, other than for power domains.
+> Fixes: 877253d2cbf2 ("net: ngbe: add sriov function support")
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+>  drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 9 +++++++++
+>  drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 4 ++++
+>  drivers/net/ethernet/wangxun/libwx/wx_type.h  | 1 +
+>  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 2 +-
+>  drivers/net/ethernet/wangxun/ngbe/ngbe_type.h | 3 ++-
+>  5 files changed, 17 insertions(+), 2 deletions(-)
 > 
-> Note that the HWV system is inside of the power domains controller, and it's split
-> on a per hardware macro-block basis (as per usual MediaTek hardware layout...).
-> 
-> The HWV, therefore, does *not* vote for clock *rates* (so, modeling OPPs would be
-> a software quirk, I think?), does *not* manage bandwidth (and interconnect is for
-> voting BW only?), and is just a "switch to flip".
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> index 66eaf5446115..7b53169cd216 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> @@ -1794,6 +1794,13 @@ static int wx_acquire_msix_vectors(struct wx *wx)
+>  	wx->msix_entry->entry = nvecs;
+>  	wx->msix_entry->vector = pci_irq_vector(wx->pdev, nvecs);
+>  
+> +	if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags)) {
+> +		wx->msix_entry->entry = 0;
+> +		wx->msix_entry->vector = pci_irq_vector(wx->pdev, 0);
+> +		wx->msix_q_entries[0].entry = 0;
+> +		wx->msix_q_entries[0].vector = pci_irq_vector(wx->pdev, 1);
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -2292,6 +2299,8 @@ static void wx_set_ivar(struct wx *wx, s8 direction,
+>  
+>  	if (direction == -1) {
+>  		/* other causes */
+> +		if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags))
+> +			msix_vector = 0;
+>  		msix_vector |= WX_PX_IVAR_ALLOC_VAL;
+>  		index = 0;
+>  		ivar = rd32(wx, WX_PX_MISC_IVAR);
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> index e8656d9d733b..c82ae137756c 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> @@ -64,6 +64,7 @@ static void wx_sriov_clear_data(struct wx *wx)
+>  	wr32m(wx, WX_PSR_VM_CTL, WX_PSR_VM_CTL_POOL_MASK, 0);
+>  	wx->ring_feature[RING_F_VMDQ].offset = 0;
+>  
+> +	clear_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags);
+>  	clear_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
+>  	/* Disable VMDq flag so device will be set in NM mode */
+>  	if (wx->ring_feature[RING_F_VMDQ].limit == 1)
+> @@ -78,6 +79,9 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
+>  	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
+>  	dev_info(&wx->pdev->dev, "SR-IOV enabled with %d VFs\n", num_vfs);
+>  
+> +	if (num_vfs == 7 && wx->mac.type == wx_mac_em)
+> +		set_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags);
+> +
+>  	/* Enable VMDq flag so device will be set in VM mode */
+>  	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
+>  	if (!wx->ring_feature[RING_F_VMDQ].limit)
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> index d392394791b3..c363379126c0 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> @@ -1191,6 +1191,7 @@ enum wx_pf_flags {
+>  	WX_FLAG_VMDQ_ENABLED,
+>  	WX_FLAG_VLAN_PROMISC,
+>  	WX_FLAG_SRIOV_ENABLED,
+> +	WX_FLAG_IRQ_VECTOR_SHARED,
+>  	WX_FLAG_FDIR_CAPABLE,
+>  	WX_FLAG_FDIR_HASH,
+>  	WX_FLAG_FDIR_PERFECT,
+> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> index 68415a7ef12f..e0fc897b0a58 100644
+> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> @@ -286,7 +286,7 @@ static int ngbe_request_msix_irqs(struct wx *wx)
+>  	 * for queue. But when num_vfs == 7, vector[1] is assigned to vf6.
+>  	 * Misc and queue should reuse interrupt vector[0].
+>  	 */
+> -	if (wx->num_vfs == 7)
+> +	if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags))
+>  		err = request_irq(wx->msix_entry->vector,
+>  				  ngbe_misc_and_queue, 0, netdev->name, wx);
+>  	else
+> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+> index 6eca6de475f7..b6252b272364 100644
+> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+> @@ -87,7 +87,8 @@
+>  #define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
+>  
+>  #define NGBE_INTR_ALL				0x1FF
+> -#define NGBE_INTR_MISC(A)			BIT((A)->num_q_vectors)
+> +#define NGBE_INTR_MISC(A)			((A)->num_vfs == 7 ? \
+> +						 BIT(0) : BIT((A)->num_q_vectors))
 
-That's still clocks. Gate is a clock.
+Isn't it problematic that configuring interrupts is done in
+ndo_open/ndo_stop on PF, but it depends on numvfs set in otther context.
+If you start with misc on index 8 and after that set numvfs to 7 isn't
+it fail?
 
-> 
-> Is this happening because the description has to be improved and creating some
-> misunderstanding, or is it because we are underestimating and/or ignoring something
-> here?
-> 
-
-Other vendors, at least qcom, represent it properly - clocks. Sometimes
-they mix up and represent it as power domains, but that's because
-downstream is a mess and because we actually (at upstream) don't really
-know what is inside there - is it a clock or power domain.
-
-
-Best regards,
-Krzysztof
+>  
+>  #define NGBE_PHY_CONFIG(reg_offset)		(0x14000 + ((reg_offset) * 4))
+>  #define NGBE_CFG_LAN_SPEED			0x14440
+> -- 
+> 2.48.1
 
