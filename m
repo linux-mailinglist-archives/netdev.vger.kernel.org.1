@@ -1,99 +1,138 @@
-Return-Path: <netdev+bounces-201126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D9CDAE8299
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:24:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FC34AE82A8
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93DAB16202B
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:24:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84DBB1BC3141
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F96F25BF0F;
-	Wed, 25 Jun 2025 12:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855EB25F960;
+	Wed, 25 Jun 2025 12:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dA/XoWkH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5EBE221DB2
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 12:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6D625F7AC;
+	Wed, 25 Jun 2025 12:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750854241; cv=none; b=jPUo9cxohuTwAT/FpG3/LV01u7p6iIZk9gKTWO2jElJiJLhCxq7znPuphJUuKgjX6nJOKuFFC0DycbkDRvr9kZpF9j5EJdnAStfHuC5byQa5xhieBbSIsWWhEZhgH5jyEPdtvm1wTVOhks8ng2V0hScdcYFhqzskvxNO/zlmfdo=
+	t=1750854345; cv=none; b=kGYUIW6oT1jjrnYuNlMZ/R5+xrVkbk/rDnVFmUmd/PmViHPJhIPXcBxZmKh6yMM6pjqSI2Mq+8rW4ay7wk6DFYgc+QcSwkhRyn7NpUP7dhvi4DhuiTdHdACtTbM2Uh41zYSMQpHrcT9hMNQDXu9SotRT2+erw7W0WfDQlMNAVrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750854241; c=relaxed/simple;
-	bh=xmSnW1cC18I65V8Rr/YREGR0HrXK8UVmpCU4mDKH5c0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IBE3JCfczViHXCMcgzyKOGPoGkjKwbwpc0J5n2/Oau+GVKtu+Wj9H741PZu/nMxsL4qHIU6d/zgUVaiQXjb2PoepeK5NzBU/QIrGa/dyeew4rjctO2hv6ABi3t/YZlqUVmysjvhHXydDKcgW6EZMj/sX/zYd0+UBcpXBGUyuaow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1750854345; c=relaxed/simple;
+	bh=LSoiPBgnAsxfJdZ38ziF+BUpehgGUOlLZY3i6T6BgoE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=H/tgCRmm/+Nit8eQLkOdOKkO14QnVoprXQ5hXruaPS76c0j20ZKl++4ur6PFustOl9XiOqISJLmlsU+s5nKPCVks2vAxpgLT6Sie0J1qjF1Dhzm6ok4Opm6nPk5P5IKoQNc1k9oJWG7HeVnwwRjArdNMxEX0/nqzQLEJnz8kvi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dA/XoWkH; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so10336629a12.3
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 05:23:59 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2352400344aso19289045ad.2;
+        Wed, 25 Jun 2025 05:25:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750854343; x=1751459143; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g01oL0E8ykb3erePeAw2M3vY4m7Z5zlBMbJUifezxyU=;
+        b=dA/XoWkHN4XmL1KgHoG+D82D4b4ddsC/LETjoGPs3/wqguo0LptKHczR+2jKS4wg/i
+         s0CmnLm63Y6ksB//T+Pyzlk4m692n6t2oNbvRZOereKoF2cr9JgYRSerpAov66+XPDnV
+         EDy0+O+cgZnJPX350uJ978oyt6h4CUKtFE8thOYeiHKXdnBbJGQ5njuPYHnJYI3JcZkv
+         +B4J0z7PxxjQIcCHedPInYmehvh8kcTFj3+mm7mOYyVzyw+OsI7vYoRLFVPe6jJfebgu
+         r7USBHOWNrW7tPctrqRH4Kxjby7iiSkMYHsFI+JQfAvStPQ0jucefMUbC+zBXHGw8yRd
+         QkQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750854238; x=1751459038;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VAf/sCOal49NK3XTX4yN9mD4BrqJ7MOzywbMZOZFhSo=;
-        b=OSYtGii05tCo+8qZQtmo6dnbAzqmscFBwHOryUvK9Cc9kG6OSGh5CA7mIrr03+9OZ5
-         qSmN8TwpHBN1gYnkY4hAYygMf6TZVnUBvBHH/WifSmXHhNE1b2EUvAekq70yDWOcuYOa
-         nEk6RVN9SPqAVL43R9XvrzuRrxCzm4zYrPcNQoq5ISiq3bhl/5Jwi/DfWxlg0TgS7Whx
-         Pn+5Zawp8+2O7GyCPWIYMteOJeRNO2tH0nEIlsPINjG43wlFJJBYQsMjgFCuLtDlb7Vb
-         nLqBYRkA4G1s1GoSEy+10gFH7GrykoGeGkt1n/oe6l0SV8O+RivZZZbPmBzmTpQU/pYK
-         lIvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVeSJ7ZTcQbozvLwnu9NJ7HdffTVYMlFiE6FMvtrf+9PqFB4r5P6cvN9lXsPSg1ww7RSGKT/w0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjuFMiYHAneHm7BdSiJFT0+mQvl8q66gm9pqNfeEdjd4cnXKXv
-	zEdL6l9bX8nuJBgGmvbIUq/MGSQisF3SMcvLkGi49dbFBLwW5epEhhMP
-X-Gm-Gg: ASbGncuEmUsevUfKcC1QvmC1V4CP4n0PlG+C6pFAtwScNFhG66EZZo6x5DARWt8Mvw4
-	pQtNZOJqt/FlvHA+Un6amJGZun5KafZWL7Tq1V0n9ZcFhtaC0r7izY1bqrz4S15IE4XzpCxR9N9
-	+G4d385dmf75gYm1Gd6i/O+PEM2K5XeZHr6IuCCLdELnfXBPeZt4OaEaTxkzgaDyEtTGvzmuJi7
-	UX1CI2DYpe1d/a1GE41/Vv/No5VO0rrhU+CjdoYR0UMPCuw5yfyRggOQ9s/jXgVXl5zzB2yMTRS
-	W2YIOzx5IDMV+vH4gxfXz2cntAfIihGu32wJv8F6UomaNcZYpsS6
-X-Google-Smtp-Source: AGHT+IF3AsACXcG1nt9VpqWj5H44JplgBRSlyWhjFSfl5Gponwkj8yWkS/VKLObQFNC3Xs6OjDWS6g==
-X-Received: by 2002:a17:906:1651:b0:ad9:982f:9206 with SMTP id a640c23a62f3a-ae0bea7ecacmr231645566b.61.1750854237775;
-        Wed, 25 Jun 2025 05:23:57 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:3::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae054209a80sm1056705366b.176.2025.06.25.05.23.56
+        d=1e100.net; s=20230601; t=1750854343; x=1751459143;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g01oL0E8ykb3erePeAw2M3vY4m7Z5zlBMbJUifezxyU=;
+        b=F+RpA/ZjuN1SXEzPO604NZz+HS2MQ3NB+cQ242KPksRFHniAMeA/3uWv4YDng1JZPQ
+         aXEi/Z92ij4Lt/fsTh09qjFEuIAuP6pmKN+nrKROOKbtaWVXQbatWTsyaR37zANGMTv2
+         DB8+Mm3mHly2DbXPmcoSQEeSLnrst0vXpvy5dqcHImW9A3UzxNuoLQAZf6HtE8hGE1b7
+         SgBgLNrro1P+LRHdn0/lx6OEeXOa98O4nVmuK2Ur8PlKREhRh3REluFNkq6FycnG5BfB
+         4at3s1AZ9b3UBPNvLAZIjE0FK9CQAmx+XXtW6JZPrk98AWDapW841TNZaCjXeTbW6/VJ
+         VAaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU36sKQzUSk2YapFsK2Doxhe2ZedcfdNJwCVYFEdNIUPtVOA7LoTrGRglaI49K8sK3JfNt4sB29AUbrSNo=@vger.kernel.org, AJvYcCUHf/uxd68yzp0dJKf2C3pqEEL/U1YpaOaBJ5D7mzuIG5NPgxqqCc1+ZP7gWVWnlpwBlRdBtkDYKCBPprfdTSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHMf9bhfpvauPlZnYBsmCW8tWiW9UcyXtBzN4yX+eQsD6IwEhs
+	TZPkVplpf43tf+1qybuohcGyojOky/VyH0sisuuropBxrhM+JmIsFAJ/
+X-Gm-Gg: ASbGncvQs6CGoXEvsJegvnbOESQ3YVhM/MZYRIYXkZCTm/LFnJSRec3PyI1FT87QEHk
+	08c1VW1beng0UMMtoquadfeKGtUnMgJsUtcivSQ32pKdWWYWuIqJcmB5ho4KDm7evGJZVmwpICC
+	lT3qF6ERI4XihXH1a6bu27k2lz4PPSIXRbixc8tohQcjidmfIdsp5Jft2mazCLhGF+EU0Im53wV
+	33U+yc9Um1PMJ3L2LLlt2svlext7udgL5fcELoLZfK5H3ev0kSoVuBmT7nid7MdTo2vz0dIm5gj
+	pVKh/Kson2B47fWq9E687WOz8+Uo7vPHnft5pmGIg5dMitXgn9CHSLjeZPiOZXzeTJTp4nENCfz
+	iPJQvx93mHuxcrm39YRZfMNdhsmG5req9MLro7SRzT516qJK6cNHtRnOD
+X-Google-Smtp-Source: AGHT+IEJ2eL4HOke65T2vRtfMF5yOUUedEPSFm0+Nazvfo1v5FbeBSttBpIqqNpXrDIJTS2GAbMjvw==
+X-Received: by 2002:a17:903:1a0e:b0:236:9726:7264 with SMTP id d9443c01a7336-238245455demr52692375ad.5.1750854343096;
+        Wed, 25 Jun 2025 05:25:43 -0700 (PDT)
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([50.233.106.34])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d83ea243sm137551405ad.72.2025.06.25.05.25.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 05:23:57 -0700 (PDT)
-Date: Wed, 25 Jun 2025 05:23:54 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
-	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
-	jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 21/22] selftests: drv-net: add helper/wrapper for
- bpftrace
-Message-ID: <aFvqWpnkGaDazk3D@gmail.com>
-References: <20250421222827.283737-1-kuba@kernel.org>
- <20250421222827.283737-22-kuba@kernel.org>
+        Wed, 25 Jun 2025 05:25:42 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH net-next v2 0/2] Clean up usage of ffi types
+Date: Wed, 25 Jun 2025 05:25:37 -0700
+Message-Id: <20250625-correct-type-cast-v2-0-6f2c29729e69@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250421222827.283737-22-kuba@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMHqW2gC/32NQQqDMBBFryKz7pRMoMZ21XsUFzIZNVATSUJQx
+ Ls3eIAuH4///gFJopMEr+aAKMUlF3wFfWuA58FPgs5WBq30Q7VEyCFG4Yx5XwV5SBnJSteZ1tq
+ RCepujTK67Wp+wEtGL1uGvprZpRzifp0VuvyfbiEkVC0Tj0+jjDbvaRnc985hgf48zx8L/Mjtv
+ AAAAA==
+X-Change-ID: 20250611-correct-type-cast-1de8876ddfc1
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Danilo Krummrich <dakr@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openssh-sha256; t=1750854339; l=784;
+ i=tamird@gmail.com; h=from:subject:message-id;
+ bh=LSoiPBgnAsxfJdZ38ziF+BUpehgGUOlLZY3i6T6BgoE=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
+ MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QF9RTqrg/6mntV5bG53qDJAOhKmdUAdWlp6Tlrz8tpi9sCOzbT5tQE/TBhSlVcecXdghOU3UJpa
+ Y4FHDp0wfhgE=
+X-Developer-Key: i=tamird@gmail.com; a=openssh;
+ fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-On Mon, Apr 21, 2025 at 03:28:26PM -0700, Jakub Kicinski wrote:
-> bpftrace is very useful for low level driver testing. perf or trace-cmd
-> would also do for collecting data from tracepoints, but they require
-> much more post-processing.
-> 
-> Add a wrapper for running bpftrace and sanitizing its output.
-> bpftrace has JSON output, which is great, but it prints loose objects
-> and in a slightly inconvenient format. We have to read the objects
-> line by line, and while at it return them indexed by the map name.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Remove qualification of ffi types which are included in the prelude and
+change `as` casts to target the proper ffi type alias rather than the
+underlying primitive.
 
-FYI: I've stolen this patch and send as part of my netpoll test patchset:
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Changes in v2:
+- Use unqualified types.
+- Remove Fixes tag.
+- Link to v1: https://lore.kernel.org/r/20250611-correct-type-cast-v1-1-06c1cf970727@gmail.com
 
-https://lore.kernel.org/all/20250625-netpoll_test-v2-1-47d27775222c@debian.org/
+---
+Tamir Duberstein (2):
+      Use unqualified references to ffi types
+      Cast to the proper type
+
+ rust/kernel/net/phy.rs | 34 +++++++++++++---------------------
+ 1 file changed, 13 insertions(+), 21 deletions(-)
+---
+base-commit: 0303584766b7bdb6564c7e8f13e0b59b6ef44984
+change-id: 20250611-correct-type-cast-1de8876ddfc1
+
+Best regards,
+--  
+Tamir Duberstein <tamird@gmail.com>
+
 
