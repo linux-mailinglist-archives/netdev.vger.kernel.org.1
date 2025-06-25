@@ -1,90 +1,111 @@
-Return-Path: <netdev+bounces-201022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8022AAE7E00
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:51:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7749AE7E80
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 529CA7A56AD
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:50:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52431888EF0
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DC827FB27;
-	Wed, 25 Jun 2025 09:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F7D289345;
+	Wed, 25 Jun 2025 10:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="h12oAJ9X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="faZTRF5g"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3A0202987
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB792877DC;
+	Wed, 25 Jun 2025 10:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750845111; cv=none; b=b0shsJmOU5IAUSUXP+eTnkI4Un3Llj3+8YhJNEMXmIwnX0JBdDjl6XObh04X08H6qrcCCyhfMwWc59AwjUk7ZRevZcnUfePcetMbV1StWVgKAIReuiNghZCYRmffSaARgNLH/Qck9G2hTzjGkBIF2FNLCyNEXsok5By7kyGCcrk=
+	t=1750845972; cv=none; b=jcyaYvKBPUL35ssZN4SY8Q9TeppGWONiNxRPgz/gNCs+47sNQQvcEaCVI/bgJMEwqHXsABzo1UNYBiYUB+5Zv8nCiAJntsVqRJjegxPLC5fQDPIztYv1nJjSxjJBbJDA7Sn75Mvn0ANM1yKlA8SUkyIeFKAB6BDpSoHeNNHLzaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750845111; c=relaxed/simple;
-	bh=orA5hl8mOrlRqgtAYdazEQT9m/BuTnqj5P9Ji7geJkY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O6dBCdr6AJ7dbWY184w72iUod6a0xqcj3LXkTR/aN4TI7nsAd4nBW5AnJUzL4iuHtKONj9j3Jf4NUSLHiFpquVqhQTlDsH5WcqNOnv3G9Up69FcINU2w9ZFw7qkg/MpP+zW9GR28M1ZyyXSoRupUYmZtoImkq6hcSLLyGVns+gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=h12oAJ9X; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55P9pdUR1429718;
-	Wed, 25 Jun 2025 04:51:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1750845099;
-	bh=yM9DZCjv2WCedL+KVH1DBViVqTEkaHpNXVwA6Vk3TY8=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=h12oAJ9XwhDSkd/YIAcupnT5BtWQN4k3f/RVYq7PImBUltvrbbPOpaLI9MKXnizRN
-	 Hpmk6q7c+NjXKNL8mBSxHnwceBotEP1lKIrAdRvcuhEIKGOjXp+FUi2IFQH90miSnN
-	 eemSjP5RmJmH0zECAFD7kM0Fzq36isHJsT3iUO08=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55P9pdq22450676
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 25 Jun 2025 04:51:39 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 25
- Jun 2025 04:51:39 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 25 Jun 2025 04:51:39 -0500
-Received: from localhost (uda0492258.dhcp.ti.com [172.24.227.169])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55P9pctn3424026;
-	Wed, 25 Jun 2025 04:51:38 -0500
-Date: Wed, 25 Jun 2025 15:21:37 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Chintan Vankar <c-vankar@ti.com>
-CC: <mkubecek@suse.cz>, <s-vadapalli@ti.com>, <danishanwar@ti.com>,
-        <netdev@vger.kernel.org>
-Subject: Re: [PATCH ethtool-next v2] pretty: Add support for TI K3 CPSW
- registers and ALE table dump
-Message-ID: <182fd7c0-52ad-4ff6-b08d-43480ee660f7@ti.com>
-References: <20250619171920.826125-1-c-vankar@ti.com>
+	s=arc-20240116; t=1750845972; c=relaxed/simple;
+	bh=eq0ugjWPQc77eo7Cjd6JDK9zE9c6VJ8xPpHJvKH+2z4=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=rskJEbR9X8z3jVg4kfyqmql7PUHDi37RfXG/0owiQdCg21Y+RGzSntk9gGof8GiONilsVmklfJ14cGw7wfYQoI+4nEiYV9agjvNM/Yz7QlwzoLAAzvC7DYcUgqjdElFml8cDFjwAlIlqgNJsayBAPsruUrwenL3cPnVPV53d1O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=faZTRF5g; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a53359dea5so3119724f8f.0;
+        Wed, 25 Jun 2025 03:06:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750845968; x=1751450768; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eq0ugjWPQc77eo7Cjd6JDK9zE9c6VJ8xPpHJvKH+2z4=;
+        b=faZTRF5g/3ifRokZI99ne9COt2clKYPMkdgZ+XyAHy/shkOFywkxXejF1gPjYaVzCd
+         P1L7Q4Hz8XUkZiDKA/D58rqp29c4i/DScBUu8w+5hciRtD6F9ZVq7uhB2b8ttqZKzSAY
+         3MtgBX5FN0EAM7IOcuXpfxWbaH1q25QhsUzuFv09Xr1AnWJJhlgmo0xDDbjr8aHtdHjx
+         LkqbL//qmvN1KF9/NGWyLLMbJARl7nuiE/i/bAjV6HY6lfLS7Mx3Bm3cj+hDy/TidrAs
+         E3EWi8M9X51Cwc8DgqO+IBxIgXov5dFfqAhEbrkJ82wu+rOyQKIx8h6URDaH+ERMnyzX
+         qzCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750845968; x=1751450768;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eq0ugjWPQc77eo7Cjd6JDK9zE9c6VJ8xPpHJvKH+2z4=;
+        b=hB8crEFgAfyO7o/P1cKxZ7tPTwW34FjSQIWg26hkDMWhX0fAhDZw4Hhlvg3QOhHylF
+         X9b8yV1vidKcP7ZrMNg2v0CHzgPXRzb3FMvWYPoqtYQggzI5bkQlB46nMQk9NwEq1ylx
+         8pvwMj3a7SYgD7yPj2GB2b48ezgTU8EEh2p7vBQA6ecD9xtFD6KfrI71ej5tjAXSoafZ
+         sZf6NksCwEaTXA4oQm6PIVIiT6QdNDOGnj+3bx87LqVYhjiNZhngvrV2CMlRoiQdywdU
+         hpRfTGMsna3HkFMvoBrqXMXGYxIvVW9K12haqg+sk93w3IICDXbD68GSRmop0v2W2XN1
+         ADkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUs0wKKGKgx39MTQy8lV4eOTCuGUaaXkp5dHZadLke1y/nr/SHU5ZOninmDBM1D+w/a1n2WJLAJi7p7t8+xg6U=@vger.kernel.org, AJvYcCXMZtmE8iCsMqwSCmVa4+fDzx8m7Ltb/RG/5v4mjJEq6QrXUdB6O4fcllOMP646tMYksm6lu1BE@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWpYXufTS1k03V+V1/zJyvpnxNn9NbcP8IW8Ky5RT+eeZAtOoy
+	7wMi+0b5xI7gvlCzpPR2B2GgyFV72ckpRWxbuclZiXmBEvFUkArdeCll7UeKPClk
+X-Gm-Gg: ASbGncvSTp1UB62kccOn0wKXPXrpj03TsnUpfaJrqimFzbGwc80ES6Bm3BPU/779Pla
+	I7pfHsrPAubPDE/+PegzMPFW+LNaZsLGWtFsIL5XywxG7D+W36ri96I7AagHb1pLrcj3J3AmQN6
+	9ZSl3WBildVxw6l0ZzwB7it0UuOkyhKbG1TEA+B6Q3cC7iDFWCgWVv2qiwLud5kFfrU5PcHNxyJ
+	I/HUuMXaQUIUOXSV2Orn52tGbpKeujaO8MarOoh7DqJkrrBLSnviPNXbO5RReFhfj6QNAMBZiTN
+	V5ZvWPiPPxPRy5VFrQG1CJbJH0mnKbM5q8lnVwAQw+Ej9VR1ryuiQ3YV2vZ6xLmZSLS186AJRXM
+	=
+X-Google-Smtp-Source: AGHT+IEAgQc6ig7DVbs1YRD0iJmxRwmF/w4sNwjVbluQ4I30Nby1sIA9NFLX0B4HDLWix8ABPLmrPQ==
+X-Received: by 2002:a5d:64ce:0:b0:3a6:d255:7eda with SMTP id ffacd0b85a97d-3a6ed66a3a7mr1785677f8f.28.1750845967845;
+        Wed, 25 Jun 2025 03:06:07 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:5882:5c8b:68ce:cd54])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453823b913esm14703125e9.33.2025.06.25.03.06.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 03:06:07 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  andrew@lunn.ch,  shuah@kernel.org,  kory.maincent@bootlin.com,
+  sdf@fomichev.me,  gal@nvidia.com,  noren@nvidia.com,
+  ahmed.zaki@intel.com,  wojciech.drewek@intel.com,  petrm@nvidia.com,
+  danieller@nvidia.com,  linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 03/10] netlink: specs: ethtool: replace underscores
+ with dashes in names
+In-Reply-To: <20250624211002.3475021-4-kuba@kernel.org>
+Date: Wed, 25 Jun 2025 10:51:37 +0100
+Message-ID: <m2frfocfo6.fsf@gmail.com>
+References: <20250624211002.3475021-1-kuba@kernel.org>
+	<20250624211002.3475021-4-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250619171920.826125-1-c-vankar@ti.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain
 
-On Thu, Jun 19, 2025 at 10:49:20PM +0530, Chintan Vankar wrote:
-> Add support to dump CPSW registers and ALE table for the CPSW instances on
-> K3 SoCs that are configured using the am65-cpsw-nuss.c device-driver in
-> Linux.
-> 
-> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+> We're trying to add a strict regexp for the name format in the spec.
+> Underscores will not be allowed, dashes should be used instead.
+> This makes no difference to C (codegen replaces special chars in names)
+> but gives more uniform naming in Python.
+>
+> Fixes: 13e59344fb9d ("net: ethtool: add support for symmetric-xor RSS hash")
+> Fixes: 46fb3ba95b93 ("ethtool: Add an interface for flashing transceiver modules' firmware")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Regards,
-Siddharth.
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
