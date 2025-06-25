@@ -1,236 +1,144 @@
-Return-Path: <netdev+bounces-201304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A80AE8CC1
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:42:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04FA6AE8CE6
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB8E47B79AC
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:40:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89DB63A5859
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379DF2E6D3D;
-	Wed, 25 Jun 2025 18:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306432DECAB;
+	Wed, 25 Jun 2025 18:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mxx0I5CV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RK72PhBQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fs1M4is6"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836552E3388;
-	Wed, 25 Jun 2025 18:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5272DA76E;
+	Wed, 25 Jun 2025 18:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750876733; cv=none; b=XkDHtyZB4qZKhI2zcuQLZfEL11+Bjs3nxTosmfne34tVZ8QjqPw2bKHWIPInrgSwmOvutLEuyx9qUpDO+vmHFP6y/j/+VFTyTJwauT7Vf3X+vj7wnrGiU6H9lfN4po0uPWPrW11Qlqn91RXeLJaJEAcZayh56q2ddZiQYy/AiXY=
+	t=1750877031; cv=none; b=e8W5Nr5gHAduQHbiZq7jp+/al5y92jUNBJ9aTTAGhj+QL6F505ip+0mpshBHGZeofq4hogjNRyS877mwSZeUSV3DsBb20jHOoJrHg2Ia+o3Z0E5wlPng7jwdGNieT11wmQeR5jWQkdhL4hAPScNXbpu1dJV44ju8lL82y9CfGeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750876733; c=relaxed/simple;
-	bh=NMUMEIPyHxhekNIC8s3B1N0LZPU2VVuPf954wipIkD0=;
-	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Date; b=JPeUYibI79mrDIHbeffAOLB14JPJVhpv/adO89W9hL5YKc4pvrPLNQGJKCPlMQc95mxdviXmRnbLS7JjLdXlLDjXegY4UHF3+YqFtTF6YfZ5DOEGNZC5M3XGjh1DY6u1jeQlkU/G+YOooQdvuyZ1Xm52S1dGjh81xcpcrHmB2GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mxx0I5CV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RK72PhBQ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250625183758.444626478@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1750876729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=axrrptkM5cruK2olPk9Gk1fVUzCj5KYtyRuWYLFYvKQ=;
-	b=mxx0I5CVfeoVVNk9fVWTtn4P3rh9PgOkLRKcy+7vlXPqs27TvzI2gO8me9rk42I6mLdtFm
-	8Cwxtw/AOCs/hFR8JS1z1ilJdtQHNxFRekZi6dt1gWXRK7B7CZV8PE+QYWfdZ83fSTi6Il
-	iTQx1KTjFdW9yDWoxYnwFla2RwVgIpskQU3VAIvcpZMU3fdsQ01Og7eLzfQNi7fjCtAzpQ
-	WiFLaUCF8XrM72y90v7hSwtTT28GADH8FIWXGBmGY9Koa5Vn0qjfrIq4lA/NiheLGN3c0q
-	Xlz/bUyZgCwb8xtuonJJ59uzcNZxSDuiVUUQDjsGvnLUQEUUqghouSLcR4F+1A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1750876729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=axrrptkM5cruK2olPk9Gk1fVUzCj5KYtyRuWYLFYvKQ=;
-	b=RK72PhBQNXBtURVlOhWZ2ndQ+Hbg/Bi5BAtTuYLbud3nZvU1PrXx/ejYR6LQXLNzkDSwdz
-	mw/QRAqCxx9zyqDA==
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: netdev@vger.kernel.org,
- Richard Cochran <richardcochran@gmail.com>,
- Christopher Hall <christopher.s.hall@intel.com>,
- John Stultz <jstultz@google.com>,
- Frederic Weisbecker <frederic@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Miroslav Lichvar <mlichvar@redhat.com>,
- Werner Abt <werner.abt@meinberg-usa.com>,
- David Woodhouse <dwmw2@infradead.org>,
- Stephen Boyd <sboyd@kernel.org>,
- =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- Nam Cao <namcao@linutronix.de>,
- Antoine Tenart <atenart@kernel.org>
-Subject: [patch V3 11/11] timekeeping: Provide interface to control auxiliary
- clocks
-References: <20250625182951.587377878@linutronix.de>
+	s=arc-20240116; t=1750877031; c=relaxed/simple;
+	bh=ZJVbUo8OzFrzFVasPxRUa8SWl41d6RCby7I8OisKltY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tn0tv/icMjSpsOeR/G0Upgn5ID2OPwOX3aQC5PM3AQB3SBg9kz2kTA12116uhtoW5jtt8WRWzx3SSkpm4j/VLKFLbtOdFxg5tqR17GE/BrDvU92n9FbtYAs5+J4u7L6/8d8UD3f6G94sDre4PLsHnNh7lzCreH8fqB8mPcwLQJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fs1M4is6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38A98C4CEEA;
+	Wed, 25 Jun 2025 18:43:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750877030;
+	bh=ZJVbUo8OzFrzFVasPxRUa8SWl41d6RCby7I8OisKltY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Fs1M4is6UuD6YDlS4Mm0P26Eiaw+z9EhqbZQiVDp9Eh7safu51xOT5HLLZApf04Px
+	 TrBi+PfzewbyNvwv98cscMb92Jg1jnu4E1/8IRnjo1rqT2NJvXdCrNm8yR10GKL0A2
+	 LJcwNVtKEcST4CP7vXHOQy3Z+6ch0BefBvOF18MfISHq8rcUWpxSA8Br907l/d208q
+	 RRQB2VubFCDpuR+F45biE6dQ4GaK2eLQGFJIoB0QqGIQMyyXiEQzQjTRaftWRjpMyV
+	 9Dux8YQgehnjMvQIKM8zLjmaySmj29ed5Mo9zGFgolUe/CSKgM34oR9Cgx3P8jxfRV
+	 eg0yn47judCcg==
+Date: Wed, 25 Jun 2025 19:43:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	bpf@vger.kernel.org, gustavold@gmail.com,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v2 0/4] selftest: net: Add selftest for netpoll
+Message-ID: <20250625184346.GM1562@horms.kernel.org>
+References: <20250625-netpoll_test-v2-0-47d27775222c@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 25 Jun 2025 20:38:49 +0200 (CEST)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625-netpoll_test-v2-0-47d27775222c@debian.org>
 
-Auxiliary clocks are disabled by default and attempts to access them
-fail.
++ Stan
 
-Provide an interface to enable/disable them at run-time.
+On Wed, Jun 25, 2025 at 04:39:45AM -0700, Breno Leitao wrote:
+> I am submitting a new selftest for the netpoll subsystem specifically
+> targeting the case where the RX is polling in the TX path, which is
+> a case that we don't have any test in the tree today. This is done when
+> netpoll_poll_dev() called, and this test creates a scenario when that is
+> probably.
+> 
+> The test does the following:
+> 
+> 1) Configuring a single RX/TX queue to increase contention on the
+>    interface.
+> 2) Generating background traffic to saturate the network, mimicking
+>    real-world congestion.
+> 3) Sending netconsole messages to trigger netpoll polling and monitor
+>    its behavior.
+> 4) Using dynamic netconsole targets via configfs, with the ability to
+>    delete and recreate targets during the test.
+> 5) Running bpftrace in parallel to verify that netpoll_poll_dev() is
+>    called when expected. If it is called, then the test passes,
+>    otherwise the test is marked as skipped.
+> 
+> In order to achieve it, I stole Jakub's bpftrace helper from [1], and
+> did some small changes that I found useful to use the helper.
+> 
+> So, this patchset basically contains:
+> 
+> 1) The code stolen from Jakub
+> 2) Improvements on bpftrace() helper
+> 3) The selftest itself
+> 
+> Link: https://lore.kernel.org/all/20250421222827.283737-22-kuba@kernel.org/ [1]
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
-V3: Use kobject.h, clockid_t and cleanup the sysfs init - Thomas W.
-    Use aux_tkd, aux_tks for clarity - John
----
- Documentation/ABI/stable/sysfs-kernel-time-aux-clocks |    5 
- kernel/time/timekeeping.c                             |  116 ++++++++++++++++++
- 2 files changed, 121 insertions(+)
+Jakub, Stan, all,
 
---- /dev/null
-+++ b/Documentation/ABI/stable/sysfs-kernel-time-aux-clocks
-@@ -0,0 +1,5 @@
-+What:		/sys/kernel/time/aux_clocks/<ID>/enable
-+Date:		May 2025
-+Contact:	Thomas Gleixner <tglx@linutronix.de>
-+Description:
-+		Controls the enablement of auxiliary clock timekeepers.
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -6,6 +6,7 @@
- #include <linux/timekeeper_internal.h>
- #include <linux/module.h>
- #include <linux/interrupt.h>
-+#include <linux/kobject.h>
- #include <linux/percpu.h>
- #include <linux/init.h>
- #include <linux/mm.h>
-@@ -2903,6 +2904,121 @@ const struct k_clock clock_aux = {
- 	.clock_adj		= aux_clock_adj,
- };
- 
-+static void aux_clock_enable(clockid_t id)
-+{
-+	struct tk_read_base *tkr_raw = &tk_core.timekeeper.tkr_raw;
-+	struct tk_data *aux_tkd = aux_get_tk_data(id);
-+	struct timekeeper *aux_tks = &aux_tkd->shadow_timekeeper;
-+
-+	/* Prevent the core timekeeper from changing. */
-+	guard(raw_spinlock_irq)(&tk_core.lock);
-+
-+	/*
-+	 * Setup the auxiliary clock assuming that the raw core timekeeper
-+	 * clock frequency conversion is close enough. Userspace has to
-+	 * adjust for the deviation via clock_adjtime(2).
-+	 */
-+	guard(raw_spinlock_nested)(&aux_tkd->lock);
-+
-+	/* Remove leftovers of a previous registration */
-+	memset(aux_tks, 0, sizeof(*aux_tks));
-+	/* Restore the timekeeper id */
-+	aux_tks->id = aux_tkd->timekeeper.id;
-+	/* Setup the timekeeper based on the current system clocksource */
-+	tk_setup_internals(aux_tks, tkr_raw->clock);
-+
-+	/* Mark it valid and set it live */
-+	aux_tks->clock_valid = true;
-+	timekeeping_update_from_shadow(aux_tkd, TK_UPDATE_ALL);
-+}
-+
-+static void aux_clock_disable(clockid_t id)
-+{
-+	struct tk_data *aux_tkd = aux_get_tk_data(id);
-+
-+	guard(raw_spinlock_irq)(&aux_tkd->lock);
-+	aux_tkd->shadow_timekeeper.clock_valid = false;
-+	timekeeping_update_from_shadow(aux_tkd, TK_UPDATE_ALL);
-+}
-+
-+static DEFINE_MUTEX(aux_clock_mutex);
-+
-+static ssize_t aux_clock_enable_store(struct kobject *kobj, struct kobj_attribute *attr,
-+				      const char *buf, size_t count)
-+{
-+	/* Lazy atoi() as name is "0..7" */
-+	int id = kobj->name[0] & 0x7;
-+	bool enable;
-+
-+	if (!capable(CAP_SYS_TIME))
-+		return -EPERM;
-+
-+	if (kstrtobool(buf, &enable) < 0)
-+		return -EINVAL;
-+
-+	guard(mutex)(&aux_clock_mutex);
-+	if (enable == test_bit(id, &aux_timekeepers))
-+		return count;
-+
-+	if (enable) {
-+		aux_clock_enable(CLOCK_AUX + id);
-+		set_bit(id, &aux_timekeepers);
-+	} else {
-+		aux_clock_disable(CLOCK_AUX + id);
-+		clear_bit(id, &aux_timekeepers);
-+	}
-+	return count;
-+}
-+
-+static ssize_t aux_clock_enable_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
-+{
-+	unsigned long active = READ_ONCE(aux_timekeepers);
-+	/* Lazy atoi() as name is "0..7" */
-+	int id = kobj->name[0] & 0x7;
-+
-+	return sysfs_emit(buf, "%d\n", test_bit(id, &active));
-+}
-+
-+static struct kobj_attribute aux_clock_enable_attr = __ATTR_RW(aux_clock_enable);
-+
-+static struct attribute *aux_clock_enable_attrs[] = {
-+	&aux_clock_enable_attr.attr,
-+	NULL
-+};
-+
-+static const struct attribute_group aux_clock_enable_attr_group = {
-+	.attrs = aux_clock_enable_attrs,
-+};
-+
-+static int __init tk_aux_sysfs_init(void)
-+{
-+	struct kobject *auxo, *tko = kobject_create_and_add("time", kernel_kobj);
-+
-+	if (!tko)
-+		return -ENOMEM;
-+
-+	auxo = kobject_create_and_add("aux_clocks", tko);
-+	if (!auxo) {
-+		kobject_put(tko);
-+		return -ENOMEM;
-+	}
-+
-+	for (int i = 0; i <= MAX_AUX_CLOCKS; i++) {
-+		char id[2] = { [0] = '0' + i, };
-+		struct kobject *clk = kobject_create_and_add(id, auxo);
-+
-+		if (!clk)
-+			return -ENOMEM;
-+
-+		int ret = sysfs_create_group(clk, &aux_clock_enable_attr_group);
-+
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+late_initcall(tk_aux_sysfs_init);
-+
- static __init void tk_aux_setup(void)
- {
- 	for (int i = TIMEKEEPER_AUX_FIRST; i <= TIMEKEEPER_AUX_LAST; i++)
+It looks like bpftrace needs to be installed on the CI workers.
+Currently they report something a lot like this:
+
+# timeout set to 180
+# selftests: drivers/net: netpoll_basic.py
+# Exception in thread Thread-1:
+# Traceback (most recent call last):
+#   File "/usr/lib64/python3.9/threading.py", line 980, in _bootstrap_inner
+#     self.run()
+#   File "/usr/lib64/python3.9/threading.py", line 917, in run
+#     self._target(*self._args, **self._kwargs)
+#   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./netpoll_basic.py", line 198, in bpftrace_call
+#     MAPS = bpftrace(expr, timeout=BPFTRACE_TIMEOUT, json=True)
+#   File "/home/virtme/testing-17/tools/testing/selftests/net/lib/py/utils.py", line 205, in bpftrace
+#     cmd_obj = cmd(cmd_arr, ns=ns, host=host, shell=False)
+#   File "/home/virtme/testing-17/tools/testing/selftests/net/lib/py/utils.py", line 60, in __init__
+#     self.proc = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE,
+#   File "/usr/lib64/python3.9/subprocess.py", line 951, in __init__
+#     self._execute_child(args, executable, preexec_fn, close_fds,
+#   File "/usr/lib64/python3.9/subprocess.py", line 1837, in _execute_child
+#     raise child_exception_type(errno_num, err_msg, err_filename)
+# FileNotFoundError: [Errno 2] No such file or directory: 'bpftrace'
+# TAP version 13
+# 1..1
+# # Exception| Traceback (most recent call last):
+# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/net/lib/py/ksft.py", line 243, in ksft_run
+# # Exception|     case(*args)
+# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./netpoll_basic.py", line 308, in test_netpoll
+# # Exception|     do_netpoll_flush_monitored(cfg, netdevnl, ifname, target_name)
+# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./netpoll_basic.py", line 243, in do_netpoll_flush_monitored
+# # Exception|     do_netpoll_flush(cfg, netdevnl, ifname, target_name)
+# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./netpoll_basic.py", line 278, in do_netpoll_flush
+# # Exception|     if bpftrace_any_hit(join=False):
+# # Exception|   File "/home/virtme/testing-17/tools/testing/selftests/drivers/net/./netpoll_basic.py", line 230, in bpftrace_any_hit
+# # Exception|     raise KsftFailEx(f"bpftrace failed to run!?: {MAPS}")
+# # Exception| net.lib.py.ksft.KsftFailEx: bpftrace failed to run!?: {}
+# not ok 1 netpoll_basic.test_netpoll
+# # Totals: pass:0 fail:1 xfail:0 xpass:0 skip:0 error:0
 
 
