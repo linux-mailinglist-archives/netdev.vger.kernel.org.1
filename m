@@ -1,223 +1,180 @@
-Return-Path: <netdev+bounces-201253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35A6AE89D0
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:31:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 903DBAE89FF
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED576176420
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:31:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31C9F1BC5314
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6276255E23;
-	Wed, 25 Jun 2025 16:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23FF2D4B67;
+	Wed, 25 Jun 2025 16:35:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="P7gGTM7F";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Kky8lQQB"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="jPRpw1iN"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012037.outbound.protection.outlook.com [52.101.71.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF8782864;
-	Wed, 25 Jun 2025 16:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750869064; cv=none; b=QPrXrYgt4R4dMBBImWb0N/aVM0aSAfInd/W/sK/1SaNMlRtdCm/kusGMrCk2AxWnufBkqFCZnh4vVmiGGRL4Z6rsg4lhKqYOGNcs1IZv+RaxDGENh+syhD6YXjpJDSOECSivgLWZ8fwxSxcuMUqxM9GKZToRERwXF+UU7OXufPI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750869064; c=relaxed/simple;
-	bh=e5rPs2f8VzLeR4ruwzzUAJHpHqv2jxxM/dhCmy/xM1c=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=SAojaPPEdJdr9saAWMCaO4vt6vGN3gwOKRDo47nQaVm2Nlq4RGHTuAAWZSQNqRVgmXmk6c8E6aclMqHTKBtY/WetfRh4dOFNJb+/nTSSNjU/J75mzQRCmxdFAyyp4xMFk3ogMqxihMjWknabn8twi5PDzAFANEjf7KzzfF2BCNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=P7gGTM7F; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Kky8lQQB; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 7A05E7A021F;
-	Wed, 25 Jun 2025 12:30:59 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 25 Jun 2025 12:30:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm3; t=1750869059; x=1750955459; bh=gn5mgacS9yby6OOdchPND
-	abDPrGtXN9QDzbZk+Lowcs=; b=P7gGTM7FxZ6pHq+AO2NGcA6gbCkW/h0sxozr7
-	LOPnxuW1IuaKtYl1lrqDAmFqIYX11fsl0B0ZKsOa7qNfFWVLOFxHYypPokXzom+J
-	SgdUSRpqLxEJTrer8y7NpW+8Vlal2xUhIMiHfGYnQz26OaL4Im2tHLhjch+ZRgVC
-	SGli6wVefRWhjlTextvP3zceqPp/1ZFtpIUAFM8N1mOG63GCSpsMMo2QVLdnWwTc
-	8BsnK/nCjXCktZu2b87q25Jfwn2nrspwxb6EZ68Uod9dqWz1Xi2U5efBpE7KHhGl
-	A7deEzWlInpjnAuo/A9AnjS4BHOYHPAFeLPMF8VPBSdrOid5Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1750869059; x=1750955459; bh=gn5mgacS9yby6OOdchPNDabDPrGtXN9QDzb
-	Zk+Lowcs=; b=Kky8lQQBqRWpRpSipgmC0zErnhPv87GiRy22ShjLt158yPxp5Wx
-	T9qaufhIBrReYJzMhfOOAX4T0/hfzWRnv5pHMAsPGh3EOIp2wYyr9bB3c09dCqec
-	5ZwHUW65R9UNWJ8ihik0VChmy03ydrDQ8b+VHtMov8cqEo9Y/GonSN3chFNuqpSb
-	7PmDWHXTeRpl9IAposjTtpeZJH1At+QioE1fCz6+hEdpUWIrIA0OcIE60Zc3jzg6
-	8sMyKFxeRxZx6LGaoSSxsEEXSkydmCPqFdNO3e4xML5EbhUxLxoOVb+P5343e5av
-	YuwAciPZIrVdJXIu5VuL+gRGbxMaHpYpPUg==
-X-ME-Sender: <xms:QiRcaKfUZmG94GC1tQqIVRVA8XilqXnaMcFzU1z3OlaQW5crS-arvQ>
-    <xme:QiRcaEOxwP_rNOjWoK7pqX5b_zmK3hqpKxA4nrcQGLxA2KNc7f5SE-y3j8qLfxDNn
-    YR7gCm2VUI8DRT30eI>
-X-ME-Received: <xmr:QiRcaLgDcn9GhvsLtK_bCUN8Dab5sxQ7jKDMkKkYX_cintlh5apxjlstwbpcPtJTWnvYAQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvfedvhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehtohhnghhhrghosegsrghmrghitghlohhuugdrtghomhdprh
-    gtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvggu
-    uhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegtrghrlhhoshdrsghilh
-    gsrghosehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepshhfohhrshhhvggvsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:QiRcaH9RZvUp6ZHLpGI1yDzmmK2Axi09-wUqraoz6P_BJmaDpxLfNg>
-    <xmx:QiRcaGuRIOn29IZ4oAE7_fmuLeKDDkqK5CNImsJXn02HFyGxFOywWQ>
-    <xmx:QiRcaOGoDt-4se70SCGUgiDDNqqWULyIekECh1D3eKA1iK0wIhysFg>
-    <xmx:QiRcaFOfAWU888bY-PN2P4kTnxUAgcMWysBLvfegzvUZmXyL6q72rg>
-    <xmx:QyRcaJliR6hdj7wa3L_mpSPXGYoM690ANxBMfwLd4I2N3zfDz4vK37DA>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 25 Jun 2025 12:30:58 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id F0D159FCA2; Wed, 25 Jun 2025 09:30:56 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id ED0949FC65;
-	Wed, 25 Jun 2025 09:30:56 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>
-cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    Carlos Bilbao <carlos.bilbao@kernel.org>,
-    Tonghao Zhang <tonghao@bamaicloud.com>
-Subject: Re: [PATCH] bonding: don't force LACPDU tx to ~333 ms boundaries
-In-reply-to: <20250625-fix-lacpdu-jitter-v1-1-4d0ee627e1ba@kernel.org>
-References: <20250625-fix-lacpdu-jitter-v1-1-4d0ee627e1ba@kernel.org>
-Comments: In-reply-to "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>
-   message dated "Wed, 25 Jun 2025 11:01:24 -0500."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9AF1519B9;
+	Wed, 25 Jun 2025 16:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750869315; cv=fail; b=TBkomTUjK5i0xzQcAFTY8vP6Zkkvq0Uenyl4aSy+vX/bSe9jJYglzOovbqxGinK6249ef7DzRODjkOOdNquCHfzTeNOY1uqFDMsIsZU1usRF/mXJ4Jb6gtWp0hDH0Jf8jw097dxwQ0Tn7qYzlwtGZ/jMUFOEX7A/a5sbcpieFaY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750869315; c=relaxed/simple;
+	bh=f6ueYflTePA/vTjHC4InMQmmmnwzqNcgZ+10zbZvIjg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kyRT+YtKgeVutVFEoKN//KMHnAkTuJkF72N0Or2OdabAFN3/0mRbf3NAPQlmkwRrVFHmxuSjqs+0rglzpdSGGpokyALq8WU7+Cw0fSh6M1jtS40yh92T+Nl+Edqvg2ZKA2TU7zeXlQr9wjAICtNCJEbLXNXiWalWFUFRjE13EaY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=jPRpw1iN; arc=fail smtp.client-ip=52.101.71.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JOXXe1yobso5h8e+jEkt8VSArtFZRACqPg2R/VbyeiAyLoJo6Ocr8BvC2cv00hGUdIOAF49XY514dzucjcXK3PHcZaIfkZLVb0KqZylqv4AB1IKy2cTlY8mtG0oahwDsYpRR6AUvDTASoO16H63H3MdbzK7SfR7TVXO5eGkfVOa6SXr4e597QFVJ1DgOZ9rezJ/37mUf7wYeVn2urrSO8EsqCrprczdOiJqntYmJBNwFL5neUp//mN7Fu8K1Wd+CcRpI/+zl6QQRcXoS3/g56LWLS4q0kvfJJVMdfexE2tTDqvya98LVPvja8htEzJVXusb+hWBESoYA3su8eK8qXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m7rxyiSGQXyMOrKIECUj6XNM3lQbjilcip/I5LBPoro=;
+ b=r7CSJm0LOIwXphyD2voYr+sG4NiBoFqVmCc+OcvKBNi5BajRJk7omd1Ezv2PsMUG95Kwf/jZdzY43GB/yWDpuqX/I41RVIdvMtbWecHe859Z6WVzZ5ng6Bawmf1R7GIYiJZH6XGUhwvizmPw98WzrvW9rtnibwLOT91yuiYkNQgJgXv1ljayPEDB3zupOf5+2w3m4phXo/ns6k2DOgUHiEe1VLxpAaoZhJZLpSHNgmHYQ08sVLPvO8UynJbhyNY4VjbidqaPOFFmk/J2R6xs6h7QVE7dM/lN/qoJpJ9CWsxuUF1klpjSF/zf+c4NUKCtz5iX/c3SbWRpfyb9kOLfLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m7rxyiSGQXyMOrKIECUj6XNM3lQbjilcip/I5LBPoro=;
+ b=jPRpw1iNs5CPan0utPycYV3Z8m0RM8kF7kHTd6JO/QtezyOfGa87/9cTmkmelv1IbIhWdz/aw48WetVU5jm1ppLfOipcMexlgnRe4rNuUMXCnhhLAXySlo+ADEU1v5bmg87YMSPy66TCNXD3qYWTO8oezj5cPCpS4PR1hWt2mhw=
+Received: from DB7PR05CA0043.eurprd05.prod.outlook.com (2603:10a6:10:2e::20)
+ by DB4PR02MB9311.eurprd02.prod.outlook.com (2603:10a6:10:3fd::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Wed, 25 Jun
+ 2025 16:35:09 +0000
+Received: from DU6PEPF0000A7E2.eurprd02.prod.outlook.com
+ (2603:10a6:10:2e:cafe::c9) by DB7PR05CA0043.outlook.office365.com
+ (2603:10a6:10:2e::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.17 via Frontend Transport; Wed,
+ 25 Jun 2025 16:35:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
+ smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
+ action=none header.from=axis.com;
+Received-SPF: Pass (protection.outlook.com: domain of 2n.com designates
+ 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com; pr=C
+Received: from mail.axis.com (195.60.68.100) by
+ DU6PEPF0000A7E2.mail.protection.outlook.com (10.167.8.42) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8880.14 via Frontend Transport; Wed, 25 Jun 2025 16:35:09 +0000
+Received: from pcczc3457tyd.2n.cz.axis.com (10.4.0.13) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Wed, 25 Jun
+ 2025 18:35:08 +0200
+From: =?UTF-8?q?Kamil=20Hor=C3=A1k=20-=202N?= <kamilh@axis.com>
+To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>
+CC: <kamilh@axis.com>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <f.fainelli@gmail.com>, <robh@kernel.org>
+Subject: [PATCH net-next v3 0/3] net: phy: bcm54811: Fix the PHY initialization
+Date: Wed, 25 Jun 2025 18:34:50 +0200
+Message-ID: <20250625163453.2567869-1-kamilh@axis.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2545703.1750869056.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jun 2025 09:30:56 -0700
-Message-ID: <2545704.1750869056@famine>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: se-mail02w.axis.com (10.20.40.8) To se-mail01w.axis.com
+ (10.20.40.7)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU6PEPF0000A7E2:EE_|DB4PR02MB9311:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4a9768f-2d15-4e22-b53b-08ddb406401b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700013|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QllQajErZkluN2NnQXNnajY5WllUa2R6RWcwZ2I3Qzl1UUtFZzdNaXlScVpu?=
+ =?utf-8?B?TTd0bzhyTEdCTDc0V3JnbC81eHAxbnNoWjRlb1VCaVp3aFd1dzU1S21KM2I4?=
+ =?utf-8?B?ZVl1QStOQTNDR0VTbmREaXhESHRCc3VXUzgvL3FzUldOU2g3bFhVRWxwMzFH?=
+ =?utf-8?B?dklqV2treER3bUdDMnZkY0x4WXE3WXg1N1NqQUl1aGx6ZEE2cnl6UitEdjd5?=
+ =?utf-8?B?V1BFWTUzQ3hkRVlPeEJYNHJXVjJIK2pJQWZFbU1pd21DT3lSbHVvem9lcjc0?=
+ =?utf-8?B?ckIwVFFYMTdhTm9Gb29tMDkyVXBrQ1JoNzFKaHZ4c2tUZXhjelh6d2RvemtJ?=
+ =?utf-8?B?bTlkMTUzajU0anFpM3FDcVpienhxQ0xEaWkzT3V6UElkQ1RyRWZmV200M2JR?=
+ =?utf-8?B?R0NycGFmSkJTSzZqMUdWL0U3c0JBUGd5MFJ0VkVTbjJsT1JkZmlwd09UT2x1?=
+ =?utf-8?B?MThmMFdGY2YrUEkrNVk0aVcxOGM0RldYOElDUExKcmgrMndkMktjd3FFdW9y?=
+ =?utf-8?B?ajVlSmxEY0EvaXh2eHgvRDhnWTc1WW1DWnpMbm1IaE1GbVJ1dEp3OWlRKzNB?=
+ =?utf-8?B?M2lUdmV2bktVOWwzdG9RWi9OUDBLeWZqVjEvQlZla2FDTEEwb01MSCswRHBr?=
+ =?utf-8?B?aWNMampDNVlHZUZ5SndubCtGaFdpRGJRYjJBZ0x5RWkzZndDSkx3MVN4b2JC?=
+ =?utf-8?B?WHBqS1phREYxWXF2bTdSVG91NFloTnQ5TXd1L0dEeC85ZGMyK252M3N0ZktT?=
+ =?utf-8?B?Yk9KSmJWbkVEcHoxK21QZnNDaFlNTmFlMkdyQzRVK2loODdCeEcyM2tRWDd6?=
+ =?utf-8?B?YXVwZkNJZUc1UFRzOXFZOHVYYWlBckIxVy9TSm1WQmRTaFVoR0p3eXdITW9z?=
+ =?utf-8?B?ckhUalhla0g4UHhOa1YrQUwyU2dLWlVoL0d5bGlHeHY1QjlzcVJFaXYwSG5M?=
+ =?utf-8?B?dE1jKzVkNlM1a3ZFOThCenBGRFgzL1h0dllmN3Z2OUM0UmpyZnY3SXIxNkxS?=
+ =?utf-8?B?UmhkRWt0T1Z0eFl0THBZay9aUEo1OHJyVnFaSzRtZ003NFZkVWNoc0NqWisv?=
+ =?utf-8?B?MmM5eXArZWt3ajI3eWszS3d2bUxTcEswZGhqWVBTTUVweW5IU0ZIWDkzb1I5?=
+ =?utf-8?B?dmNaVVRYYTk0SmJva3JiREptTnlIRWlvdHZLMWZuZkR3b0JXVThOTmVMOFJN?=
+ =?utf-8?B?b1NRclFpVmJ0V1hnb3NTRytUaFZ1V1h5cG9kZWVvY0V1N0l4dWFZNmFYK1p2?=
+ =?utf-8?B?TWdCbFdrN3ZWZXJyNDl6Y1dxTENsT0F6Q3l0dDdYc2lsWlRIc3pCRVJlYVZv?=
+ =?utf-8?B?NDZWZ0FOakM1U1ZXRkpobnlRTy9obHp5dHlFMVZ2VU9KWlZLRVBURzdQQWhz?=
+ =?utf-8?B?R1BZZzZHVFBENTgya3R0Z0FCWG5meTYwNGVldUN1NkdkcThhbXBVL0FIcEUr?=
+ =?utf-8?B?UUxSQSthT3lBcHRlKzVyNVRqUkQrdkU2M0RhTDBFeG9XWWRhRGFSQnBydWVE?=
+ =?utf-8?B?QklzczErL2tvR2FhSlF1S0FoeXlKK1lGVm9mYjhXay9LMjcrWWQ3cEhjUFFs?=
+ =?utf-8?B?NU9reHhXeUJpUTdqZFBGSmZVSUQ2b2xHL0dEeWJxcHYxMURJRTNGYUZuNTVN?=
+ =?utf-8?B?aU1pSmFxYWIyWEdtaS9zSkwrVk5HdSticVcvdUk3Syt3eWdYZFBDNkFXS0k3?=
+ =?utf-8?B?QWIvWE0vSDAzVFgwUmVnTUQvZ1FhRTRFNFZGaGFjR2xJSFNzNDNySmFBUzYy?=
+ =?utf-8?B?R1hHWlZzeVAwZ05FTDhWRkg5TUhoeXBVNmUyZ0R1MTc4c0VQeWN3aXVwOXdN?=
+ =?utf-8?B?RmVwR0dYVitOTm5sU0NpZk1vZmZvWk5IRXcrYTR3a21qQ1lSWGI5b0xpazl0?=
+ =?utf-8?B?aUMyemRvUzJDR3RqQmx5TzJuMFZBQ1NtbjNDb3J6ZlhGd0Y5Tlg1NzB4N0RI?=
+ =?utf-8?B?WTFHQmQ3RTJkTzhMcFVLeGdlWFN2R0JzR1J5M2VTUUcwRElBVEhWdXJueWY3?=
+ =?utf-8?B?ODdWbVB2R1h3RWMxdlAvbHIxQjVpaS9JOStJL3p5ZkFBL3pIYkFpU0VYeFo5?=
+ =?utf-8?B?OUhJc0Z2eWJKS0drbUw4dzZnbDNzcGNXMFJPZz09?=
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 16:35:09.4289
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4a9768f-2d15-4e22-b53b-08ddb406401b
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU6PEPF0000A7E2.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR02MB9311
 
-Seth Forshee (DigitalOcean) <sforshee@kernel.org> wrote:
+From: "Kamil Horák (2N)" <kamilh@axis.com>
 
->The timer which ensures that no more than 3 LACPDUs are transmitted in
->a second rearms itself every 333ms regardless of whether an LACPDU is
->transmitted when the timer expires. This causes LACPDU tx to be delayed
->until the next expiration of the timer, which effectively aligns LACPDUs
->to ~333ms boundaries. This results in a variable amount of jitter in the
->timing of periodic LACPDUs.
+PATCH 1 - Add MII-Lite PHY interface mode as defined by Broadcom for
+   their two-wire PHYs. It can be used with most Ethernet controllers
+   under certain limitations (no half-duplex link modes etc.).
 
-	To be clear, the "3 per second" limitation that all of this
-should to conform to is from IEEE 802.1AX-2014, 6.4.16 Transmit machine:
+PATCH 2 - Add MII-Lite PHY interface type
 
-	"When the LACP_Enabled variable is TRUE and the NTT (6.4.7)
-	variable is TRUE, the Transmit machine shall ensure that a
-	properly formatted LACPDU (6.4.2) is transmitted [i.e., issue a
-	CtrlMuxN:M_UNITDATA.Request(LACPDU) service primitive], subject
-	to the restriction that no more than three LACPDUs may be
-	transmitted in any Fast_Periodic_Time interval. If NTT is set to
-	TRUE when this limit is in force, the transmission shall be
-	delayed until such a time as the restriction is no longer in
-	force. The NTT variable shall be set to FALSE when the Transmit
-	machine has transmitted a LACPDU."
+PATCH 3 - Fix the BCM54811 PHY initialization so that it conforms
+   to the datasheet regarding a reserved bit in the LRE Control
+   register, which must be written to zero after every device reset.
 
-	The current implementation conforms to this as you describe: by
-aligning transmission to 1/3 second boundaries, no more than 3 can ever
-be sent in one second.
+Kamil Horák (2N) (3):
+  net: phy: MII-Lite PHY interface mode
+  dt-bindings: ethernet-phy: add MII-Lite phy interface type
+  net: phy: bcm54811: Fix the PHY initialization
 
-	If, hypothetically, the state machine were to transition, or a
-user updates port settings (either of which would set NTT each time)
-more than 3 times in a second, would your patched code obey this
-restriction?
+ .../bindings/net/ethernet-controller.yaml     |  1 +
+ drivers/net/phy/broadcom.c                    | 30 ++++++++++++++++---
+ drivers/net/phy/phy-core.c                    |  1 +
+ drivers/net/phy/phy_caps.c                    |  4 +++
+ drivers/net/phy/phylink.c                     |  1 +
+ include/linux/brcmphy.h                       |  7 +++++
+ include/linux/phy.h                           |  4 +++
+ 7 files changed, 44 insertions(+), 4 deletions(-)
 
-	For completeness, and to make this email as complicated as
-possible, I'll note that 802.1AX-2020 removes this particular
-restriction in favor of incorporating the 802.3 generic limit on
-transmission rates for Slow Protocols (of which LACP is one) to 10 per
-second (802.3-2022, 30.3.1.1.38) into the state machine (802.1AX-2020,
-6.4.7, see "txOpportunity" and 6.4.14 LACP Transmit machine).  Linux
-bonding doesn't implement the 802.1AX-2020 state machines, though, so I
-don't think we can reasonably pick and choose arbitrary pieces from two
-differing editions of a standard.
+-- 
+2.39.5
 
-	-J
-
->Change this to only rearm the timer when an LACPDU is actually sent,
->allowing tx at any point after the timer has expired.
->
->Signed-off-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
->---
-> drivers/net/bonding/bond_3ad.c | 11 ++++++-----
-> 1 file changed, 6 insertions(+), 5 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
-d.c
->index c6807e473ab706afed9560bcdb5e6eca1934f5b7..a8d8aaa169fc09d7d5c201ff2=
-98b37b3f11a7ded 100644
->--- a/drivers/net/bonding/bond_3ad.c
->+++ b/drivers/net/bonding/bond_3ad.c
->@@ -1378,7 +1378,7 @@ static void ad_tx_machine(struct port *port)
-> 	/* check if tx timer expired, to verify that we do not send more than
-> 	 * 3 packets per second
-> 	 */
->-	if (port->sm_tx_timer_counter && !(--port->sm_tx_timer_counter)) {
->+	if (!port->sm_tx_timer_counter || !(--port->sm_tx_timer_counter)) {
-> 		/* check if there is something to send */
-> 		if (port->ntt && (port->sm_vars & AD_PORT_LACP_ENABLED)) {
-> 			__update_lacpdu_from_port(port);
->@@ -1393,12 +1393,13 @@ static void ad_tx_machine(struct port *port)
-> 				 * again until demanded
-> 				 */
-> 				port->ntt =3D false;
->+
->+				/* restart tx timer(to verify that we will not
->+				 * exceed AD_MAX_TX_IN_SECOND
->+				 */
->+				port->sm_tx_timer_counter =3D ad_ticks_per_sec / AD_MAX_TX_IN_SECOND=
-;
-> 			}
-> 		}
->-		/* restart tx timer(to verify that we will not exceed
->-		 * AD_MAX_TX_IN_SECOND
->-		 */
->-		port->sm_tx_timer_counter =3D ad_ticks_per_sec/AD_MAX_TX_IN_SECOND;
-> 	}
-> }
-> =
-
->
->---
->base-commit: 86731a2a651e58953fc949573895f2fa6d456841
->change-id: 20250625-fix-lacpdu-jitter-1554d9f600ab
->
->Best regards,
->-- =
-
->Seth Forshee (DigitalOcean) <sforshee@kernel.org>
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
