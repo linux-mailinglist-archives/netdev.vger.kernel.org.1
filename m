@@ -1,106 +1,86 @@
-Return-Path: <netdev+bounces-201092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A28AE81A3
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:41:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD32AE81B2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:42:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD1483B54EE
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:37:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BD555A11C7
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8077725BF10;
-	Wed, 25 Jun 2025 11:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD40025C702;
+	Wed, 25 Jun 2025 11:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="UDwmWqK6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPzpbQqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B269A48;
-	Wed, 25 Jun 2025 11:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC29255E23;
+	Wed, 25 Jun 2025 11:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750851365; cv=none; b=Lo+bRzZFvIYzb48bz+oxveFV1Dre0HF6o9PdjfQIa4oZfKGdPiMKXKCeBo8lQIsUMscDqmz1JulkvWaOyEXRyTIQZP77C+BtB+SUUfoAM1ezm8GQE22pveL7ogKkR7JTDLWqBzqB67KQJ81/Yb02sObXaDJimlCSovw36pWBPGs=
+	t=1750851483; cv=none; b=qN1fJld6q3I1OF9TIyqIn7oMwIxLVfDEIoZum8U36EuEwEDCUCBlv+TZElY61t//wGxli4x3c/nw25TuIs3j9gb9dLUsbeO/dvjiItYuZGOWtsVrbGlJ8Y0+vGkgUeeEnu68EYeQm6WWD1ISD7wV2SmW27tpUbF09nLaWRyxj/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750851365; c=relaxed/simple;
-	bh=HPAZP2mDBSUpiPdOgFiFNniYmfiyMSDNC9075WN/XYw=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=u1EsOHamwSjpagVTewJqS/pcfNeNF+qDomXIkkj36kIsxRPLlzKsshZK/VicUQhszWwoJV6a1EGbbR08tEOVvva0g9o+MyMjeIYjzlaXRqvbvQpv53CajZsT0AbA7zmF2K1aP5RuofsblaKfFEM1IeFpmELI1aEczuuRDNAz3Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=UDwmWqK6; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id B92DF20415B3; Wed, 25 Jun 2025 04:36:03 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B92DF20415B3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1750851363;
-	bh=gYKM1ICbb6G+pT1X38BoQUl/Ur/WSscTcd4nsAD1m60=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UDwmWqK69U2+vV8t18P4fWz3rUcUX0xW/Ou29CmOAayf56ErEPrfNbs4jozMTa8yx
-	 Cq1bf4cZHCdWFQhyNuzC40Om+obehJ6qYuVKpQt5D1fMfgkp1yc7jkDUluqxsbZr4R
-	 cBoqvHTo+fH9ipL4gGHWO8+LBbgxwRyQKQV6Ig8M=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Subject: [PATCH net-next v2] net: mana: Fix build errors when CONFIG_NET_SHAPER is disabled
-Date: Wed, 25 Jun 2025 04:35:55 -0700
-Message-Id: <1750851355-8067-1-git-send-email-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1750851483; c=relaxed/simple;
+	bh=BtRKAJIlcJxb927rW2Z7+ZRhdms+50Dftb4cK00J1ck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g95ixHwCumh0/GdUWCKxeOabjLg8UXz9bAt3LbYJhEN/EDRO2ptrhNSzuc/9oAEQ+6BysV2Tp0dkSwE6MzXQSvu3DkfECwI71kw20jnbuwNxxmAtXg8mOQCbG1T2AJ0BHtGFMKPMLYEFR1rQgn5QymKxXb/8R1NbYaCelywnBJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPzpbQqo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AA68C4CEEA;
+	Wed, 25 Jun 2025 11:38:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750851483;
+	bh=BtRKAJIlcJxb927rW2Z7+ZRhdms+50Dftb4cK00J1ck=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iPzpbQqojFsV3ivsfPREuSXlhf1PNbg7WIj2wuf4PxwPYTNeYAoEs8GxP6TrZz6Fv
+	 bQsVwdojSeei2yXiZz+V710lPeUwS5KoNRvooJfke0SYx9zZUQSVp5GXqh3P5+i+1r
+	 DCc1+gkyFMvE6WfgA9AwQmCTRoTYdk4D3ITLC3BIUaYj2tbHh+7st+jZeyd/aPKYQn
+	 TQF9xDOR8TKBagGbXNsqAdKTiodL35WPtGnkuc3kbMZOBJNUu2CiCkXKcL1vwn3v2M
+	 b6pcnt4XHQUc2Mqa7ZJuySk+2v71zk6z0SNIDAXvJypnCagOpd5CZRw30u2jlu0DLG
+	 lv+PW/2ECL6Ng==
+Date: Wed, 25 Jun 2025 14:37:56 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, saeedm@nvidia.com, gal@nvidia.com,
+	tariqt@nvidia.com, Jonathan Corbet <corbet@lwn.net>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/5] net/mlx5e: Add support for PCIe congestion
+ events
+Message-ID: <20250625113756.GA727865@unreal>
+References: <20250619113721.60201-1-mbloch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250619113721.60201-1-mbloch@nvidia.com>
 
-Fix build errors when CONFIG_NET_SHAPER is disabled, including:
+On Thu, Jun 19, 2025 at 02:37:16PM +0300, Mark Bloch wrote:
+> PCIe congestion events are events generated by the firmware when the
+> device side has sustained PCIe inbound or outbound traffic above
+> certain thresholds. The high and low threshold are hysteresis thresholds
+> to prevent flapping: once the high threshold has been reached, a low
+> threshold event will be triggered only after the bandwidth usage went
+> below the low threshold.
 
-drivers/net/ethernet/microsoft/mana/mana_en.c:804:10: error:
-'const struct net_device_ops' has no member named 'net_shaper_ops'
+<...>
 
-     804 |         .net_shaper_ops         = &mana_shaper_ops,
+> Dragos Tatulea (5):
+>   net/mlx5: Small refactor for general object capabilities
+>   net/mlx5: Add IFC bits for PCIe Congestion Event object
 
-drivers/net/ethernet/microsoft/mana/mana_en.c:804:35: error:
-initialization of 'int (*)(struct net_device *, struct neigh_parms *)'
-from incompatible pointer type 'const struct net_shaper_ops *'
-[-Werror=incompatible-pointer-types]
+Applied these patches to mlx5-next.
 
-     804 |         .net_shaper_ops         = &mana_shaper_ops,
-
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Fixes: 75cabb46935b ("net: mana: Add support for net_shaper_ops")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202506230625.bfUlqb8o-lkp@intel.com/
----
-Changes in v2:
-* Use "select NET_SHAPER" in Kconfig instead of adding multiple checks for
-  CONFIG_NET_SHAPER.
----
- drivers/net/ethernet/microsoft/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/microsoft/Kconfig b/drivers/net/ethernet/microsoft/Kconfig
-index 901fbffbf718..3f36ee6a8ece 100644
---- a/drivers/net/ethernet/microsoft/Kconfig
-+++ b/drivers/net/ethernet/microsoft/Kconfig
-@@ -22,6 +22,7 @@ config MICROSOFT_MANA
- 	depends on PCI_HYPERV
- 	select AUXILIARY_BUS
- 	select PAGE_POOL
-+	select NET_SHAPER
- 	help
- 	  This driver supports Microsoft Azure Network Adapter (MANA).
- 	  So far, the driver is only supported on X86_64.
--- 
-2.34.1
-
+Thanks
 
