@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-200975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ECDEAE7971
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:05:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4622AE7994
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98F9C1BC4FD9
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F97C4A1003
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A527B20C038;
-	Wed, 25 Jun 2025 08:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCD820F076;
+	Wed, 25 Jun 2025 08:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B78t5m2C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cDli5+K8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2221DF25D
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5914F20E315
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750838710; cv=none; b=Tu7O3YNWFSxB4NZ3ALs+8RWhOwlb+RP5aj4yFBH50tRdG8y6nXUG2hC1B3TvpYK5Qpan3/p9tv+3h288S5ODp+i/BE2heq6ZoZS29AZ06xH52UbI08VkSjCR4C1Ooc1wHKHmQMo5xa2OdoE/xHmN35qkLOBA2TMj3IpSI7LMrWI=
+	t=1750838914; cv=none; b=bFsQZTaPB7bh2URfbSwMcUrdrty4Mje1BZIMa+kim1huhbHkiNEhIVF2ePH4ix/oYhCGDMDZfFZ+0+51jXPRhbqGzfV5vrWYHdpPCUdX1rdSwJM0XzXoAti88J7FPnrX4f75ql8FXBb1J/tAC1uYbLwNveJ/VdgAAJqQRXUMQWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750838710; c=relaxed/simple;
-	bh=doj2KxQXr2JYgemiYHZoSgaibHLUKUsXh4X7WLjs+7I=;
+	s=arc-20240116; t=1750838914; c=relaxed/simple;
+	bh=zpwNDepzoTzzaxm0I9H9fOZHI8MES0vs8xLBUSVMd94=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WpFre4+xHLKWgD+4IvLoI40zXFGeXaT9p8USoEOyzNQ0PUdAk25nSxyH/BEXTlpn61lhCLkgMyNSmiX2ByIb4pDrWlQC2y9vbPkWnUE6TQ/A8T0DlFJGvUvlyuMzW8NQsi42hOmYhyRyM5edI7DFruBh2G8tTFjx6e08536/tAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B78t5m2C; arc=none smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=BwSas/IObvcWKQTjAYvZxyf6VDCkE+PX7HHZaK10kSL8Uaeun3xui+4VshpvT60mh87MfxL0MCwFm7w7sgJ34nd2YELsgvcjlTcYypkv8ylOezeKfzWKODuqN3yWL/lSBXNKUeN5dFVVl9D6ttEHSdLrJt1xco1ujIjnCJnq5pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cDli5+K8; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a6f6d52af7so14245031cf.1
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 01:05:08 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a4312b4849so14708461cf.1
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 01:08:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750838707; x=1751443507; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750838912; x=1751443712; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VGwrH8Yuzi84pW5ge3AgF7wFAMzfKjXr17ViqErgJDc=;
-        b=B78t5m2CdEhGGADeWJFQW+4elkv1LXdc0DMV57dfIsmvvmGLBRt3hQSgAWao/LJEAQ
-         s4pjRM0BA4aomT7nTuCIF97Us243oM11gY257ZLh3WwSwz1m4tWLhBiHHSsKwD1ELBq3
-         CqBporbMX5sXxSAXxE+7Su44FxmXy18yW4cLkcIlpEvdF35CBPGKSHAiHGaD6kLrjR//
-         AwC5SgKDrbMHa0sUlkN2m0/sJyxcodzQi8jIx4GuCU+onYMgHp9d/7QPFX3mWYJoBieA
-         DexWG0Jgj51cJYe1biQKlbeCQo4dhlaosMzKqftspTtVSQoROvaOMCacIgJlew1LUW7N
-         pHPg==
+        bh=0nJWUBaRn+NFbAiZsctR9Sk0rJwoQVmEaF8vNrJMha0=;
+        b=cDli5+K8H0157CJRrliEULCG1ImmT23LgRW9zs5uWTXWtjR3MYfnR6xfWJFBUKFqa8
+         yFuL75yfM5pBJoFxGGO9nwl0kX4KjyCwoQ53xO4uGltcKKPS9APMbI1mzCOx534VLYI2
+         RkJUsUYykepxGLVgoyRrglOAao8bxwgILqL5Pwc2BpWyP4FRDXPAoqpOCoH0x/D/swOx
+         ZtCgRXV7sRapZwB6/ExxromsmV+tv6EeO7xcw2sbVJ4+8WB1VHecDXDxj/GcZM9YRdi8
+         uUa90ntT9APYjRQMWodVc/WSqy4YOF/baC3lEyoxm7GRkywTkVOrpofltvF/KU1Ox7eg
+         tEeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750838707; x=1751443507;
+        d=1e100.net; s=20230601; t=1750838912; x=1751443712;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VGwrH8Yuzi84pW5ge3AgF7wFAMzfKjXr17ViqErgJDc=;
-        b=sYevMS9hskXTUHfbNW5E3n1l3jFlZocTSTU/H1VFCyF90pwJElpbCisJ/JA1Hcb4Wu
-         KUcy0pr8xH0vmkp3mYy+t7rGmAUmijQLAIV9rKdaC4JxKcU8vRvo4uNIDWdW03rAF5KW
-         mgdcyTYsC4dU1/ea6K74Raqxbmhhxql/bhJL9bWZd3P7+e1E3x8n+6dhVghn2i7XHUaA
-         LJoZNwmZHHuMkvFXphBDxmeeTqeVC8txUPueY28tF5mN/21i241MJM6M+uQPWhMBfk4f
-         QsEZwW7p0jTcBlSKPcHMDTu8870C3/Hto49GBTZ/2sAtFm9hOUROIRHcFmBpFE0JIQVt
-         xorw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7KCTeGd85ecCoDOaz2CfGpfWlxDcRReEcbhDXstEZgcODtos1HrvN72+5LXimtxld8GTR3BY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxOjy92aKw7TkZPrv9nBZPzERHXlWg2OeND3WvfvsHf2Rc/O2w
-	F+LnRfPkffZtmzq1AjconKHw6WcTihM9BQhgji2DXVegdiqAQO3IwghaunGWMzyKuwM4vzWpiqp
-	kjy1pd8QCLeY2BxQoNgHEhl3MfWoqrnmXrTbwcxN3
-X-Gm-Gg: ASbGnctR5Dkqv1Hmv+5vH0Nby435sGdbygFtB7naifACElr+kgIySY8E0k+SY3yFlG6
-	vGOLXaH9dXyFRRsbkUILdZjGfKetzQ4Ye2nrl1/igBHwWgzcGI+NRWiuqd98grHMRjAYGEd04u/
-	ijp9yNw5fkQN1pKBffxguuNRnt69GqpGfHebJeo+k0lA==
-X-Google-Smtp-Source: AGHT+IGpOxiBre/vup+vst4NlCcAzrArd6tOzCflb4YUs2+5cQjZ4QL6ilGCUwvQktonV2BKmME/MpGBAimXnaxEbc0=
-X-Received: by 2002:a05:622a:2307:b0:476:7b0b:30fb with SMTP id
- d75a77b69052e-4a7c0b19e16mr32748951cf.22.1750838706706; Wed, 25 Jun 2025
- 01:05:06 -0700 (PDT)
+        bh=0nJWUBaRn+NFbAiZsctR9Sk0rJwoQVmEaF8vNrJMha0=;
+        b=Xyp87s2IlQvZd7FWkFOzOgPdhrMPFBH8BFlnBQoV1l0g5kd28lbhTojxO4NfF8zc/K
+         eBvXuqBDqCYV6xI30bAFm/ThAaJApxxTsoK1ZXUbugl8rBgD7I7ilOYO707y0NDtUr8F
+         KpnAjiHd+vxbAZlT61glMgK7y4o+1ERyhtibpBV/KReYKx283rB1n8RsRm3NyAGh8O8j
+         Yqyudcp8NswVIRTczLVQTQNAs5Rj6qUNblETI6ru5qWc4d4KzUH1PmADk353kztM68M2
+         k2yoiIm2a/Dhe1gEXQXAh5/zDAOk9h92WFx9FiqUMamtrxftZ7GoCzSKT9+kgjYL6sJ7
+         LfQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWM2JPl/nfZa3i3SqnOeVKBAwvkvtFZ++PYkgbwU5LFYLEZXCYPsSp/pY4bOdHxIT5l6es/HZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaKECUo3YbLcw/U3Ma4jbheTmWdR64aIfyne3vd/wdGtmMsnlc
+	OIszN+3mnh+6p6FchbXC6S05avPOHuKc60lFTRfIhab9/8mmqI1IHDpWRg9wT3sfFpiAK3fGF+x
+	vEqqJzItqTFpWUNYnn9iQaMC5px3XLmEGNQwfdBGu
+X-Gm-Gg: ASbGncu1egE0oVUok9jxrzMETY61fhEE3qLTx1EmINydmqvV7JlaP6knHqRevw60Pjw
+	zG+gZOekL0Izyz+qsC4TVYkG1bae1/Heby60+n1OzxxeBAgEncAARxy+Ev7GTwrP+tnnzv80ZnT
+	P0BSLddT29kKhN2Kj8QZUbgKIY6l7qMjBkTmJId3WCsf08BS55N7D8
+X-Google-Smtp-Source: AGHT+IH2l04goDte8C6MTfBkwicdcfLuBSPT0rwaeShXKmoGSohwlRGdRNtjkixcZ5WnAvB15y3GdC/wXCD1WKJl+GM=
+X-Received: by 2002:ac8:5a55:0:b0:4a4:369c:7635 with SMTP id
+ d75a77b69052e-4a7c0699e85mr36557401cf.19.1750838911907; Wed, 25 Jun 2025
+ 01:08:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250621193737.16593-1-chia-yu.chang@nokia-bell-labs.com> <20250621193737.16593-7-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250621193737.16593-7-chia-yu.chang@nokia-bell-labs.com>
+References: <20250621193737.16593-1-chia-yu.chang@nokia-bell-labs.com> <20250621193737.16593-9-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250621193737.16593-9-chia-yu.chang@nokia-bell-labs.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Jun 2025 01:04:55 -0700
-X-Gm-Features: AX0GCFtpL32jv2U4LejzfAmi77DRfLRJlefavX_UqRzas3dpA2rqHt37JW4XfP8
-Message-ID: <CANn89iKuE7gLXq5qn0PDCKOXxOZdMXXxtW1dA-D0eLjfhwApgQ@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 06/15] tcp: accecn: add AccECN rx byte counters
+Date: Wed, 25 Jun 2025 01:08:21 -0700
+X-Gm-Features: AX0GCFtvmPCOCoMB53ZiS7lNiinqU-Ptn3ytwDVPBB0CYTmRz2Bl-m-tFudAibs
+Message-ID: <CANn89iLmLeUxBh8kU-RgLZ764QsKUqb_4NiwpwhryPi=7RiZ8w@mail.gmail.com>
+Subject: Re: [PATCH v9 net-next 08/15] tcp: sack option handling improvements
 To: chia-yu.chang@nokia-bell-labs.com
 Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
 	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
@@ -96,288 +96,22 @@ Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 21, 2025 at 12:37=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com=
+On Sat, Jun 21, 2025 at 12:38=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com=
 > wrote:
 >
 > From: Ilpo J=C3=A4rvinen <ij@kernel.org>
 >
-> These three byte counters track IP ECN field payload byte sums for
-> all arriving (acceptable) packets for ECT0, ECT1, and CE. The
-> AccECN option (added by a later patch in the series) echoes these
-> counters back to sender side; therefore, it is placed within the
-> group of tcp_sock_write_txrx.
+> 1) Don't early return when sack doesn't fit. AccECN code will be
+>    placed after this fragment so no early returns please.
 >
-> Below are the pahole outcomes before and after this patch, in which
-> the group size of tcp_sock_write_txrx is increased from 95 + 4 to
-> 107 + 4 and an extra 4-byte hole is created but will be exploited
-> in later patches:
->
-> [BEFORE THIS PATCH]
-> struct tcp_sock {
->     [...]
->     u32                        delivered_ce;         /*  2640     4 */
->     u32                        received_ce;          /*  2644     4 */
->     u32                        app_limited;          /*  2648     4 */
->     u32                        rcv_wnd;              /*  2652     4 */
->     struct tcp_options_received rx_opt;              /*  2656    24 */
->     __cacheline_group_end__tcp_sock_write_txrx[0];   /*  2680     0 */
->
->     [...]
->     /* size: 3264, cachelines: 51, members: 169 */
-> }
->
-> [AFTER THIS PATCH]
-> struct tcp_sock {
->     [...]
->     u32                        delivered_ce;         /*  2640     4 */
->     u32                        received_ce;          /*  2644     4 */
->     u32                        received_ecn_bytes[3];/*  2648    12 */
->     u32                        app_limited;          /*  2660     4 */
->     u32                        rcv_wnd;              /*  2664     4 */
->     struct tcp_options_received rx_opt;              /*  2668    24 */
->     __cacheline_group_end__tcp_sock_write_txrx[0];   /*  2692     0 */
->     /* XXX 4 bytes hole, try to pack */
->
->     [...]
->     /* size: 3264, cachelines: 51, members: 170 */
-> }
+> 2) Make sure opts->num_sack_blocks is not left undefined. E.g.,
+>    tcp_current_mss() does not memset its opts struct to zero.
+>    AccECN code checks if SACK option is present and may even
+>    alter it to make room for AccECN option when many SACK blocks
+>    are present. Thus, num_sack_blocks needs to be always valid.
 >
 > Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
-> Signed-off-by: Neal Cardwell <ncardwell@google.com>
-> Co-developed-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> ---
-> v8:
-> - Add new helper function tcp_ecn_received_counters_payload()
-> ---
->  .../networking/net_cachelines/tcp_sock.rst    |  1 +
->  include/linux/tcp.h                           |  4 ++++
->  include/net/tcp.h                             | 20 +++++++++++++++++-
->  net/ipv4/tcp.c                                |  3 ++-
->  net/ipv4/tcp_input.c                          | 21 +++++++++++++++----
->  net/ipv4/tcp_minisocks.c                      |  2 +-
->  6 files changed, 44 insertions(+), 7 deletions(-)
->
-> diff --git a/Documentation/networking/net_cachelines/tcp_sock.rst b/Docum=
-entation/networking/net_cachelines/tcp_sock.rst
-> index 22ac668fe6c7..804480d39132 100644
-> --- a/Documentation/networking/net_cachelines/tcp_sock.rst
-> +++ b/Documentation/networking/net_cachelines/tcp_sock.rst
-> @@ -102,6 +102,7 @@ u32                           prr_out                =
- read_mostly         read_m
->  u32                           delivered               read_mostly       =
-  read_write          tcp_rate_skb_sent, tcp_newly_delivered(tx);tcp_ack, t=
-cp_rate_gen, tcp_clean_rtx_queue (rx)
->  u32                           delivered_ce            read_mostly       =
-  read_write          tcp_rate_skb_sent(tx);tcp_rate_gen(rx)
->  u32                           received_ce             read_mostly       =
-  read_write
-> +u32[3]                        received_ecn_bytes      read_mostly       =
-  read_write
->  u8:4                          received_ce_pending     read_mostly       =
-  read_write
->  u8:2                          syn_ect_snt             write_mostly      =
-  read_write
->  u8:2                          syn_ect_rcv             read_mostly       =
-  read_write
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 1d8301f2883c..0c2331e186e8 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -306,6 +306,10 @@ struct tcp_sock {
->         u32     delivered;      /* Total data packets delivered incl. rex=
-mits */
->         u32     delivered_ce;   /* Like the above but only ECE marked pac=
-kets */
->         u32     received_ce;    /* Like the above but for rcvd CE marked =
-pkts */
-> +       u32     received_ecn_bytes[3]; /* received byte counters for thre=
-e ECN
-> +                                       * types: INET_ECN_ECT_1, INET_ECN=
-_ECT_0,
-> +                                       * and INET_ECN_CE
-> +                                       */
->         u32     app_limited;    /* limited until "delivered" reaches this=
- val */
->         u32     rcv_wnd;        /* Current receiver window              *=
-/
->  /*
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 4d6325fa3f67..b861941a2213 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -467,7 +467,10 @@ static inline int tcp_accecn_extract_syn_ect(u8 ace)
->  bool tcp_accecn_validate_syn_feedback(struct sock *sk, u8 ace, u8 sent_e=
-ct);
->  void tcp_accecn_third_ack(struct sock *sk, const struct sk_buff *skb,
->                           u8 syn_ect_snt);
-> -void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *sk=
-b);
-> +void tcp_ecn_received_counters_payload(struct sock *sk,
-> +                                      const struct sk_buff *skb);
-> +void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *sk=
-b,
-> +                              u32 payload_len);
->
->  enum tcp_tw_status {
->         TCP_TW_SUCCESS =3D 0,
-> @@ -1035,6 +1038,20 @@ static inline u32 tcp_rsk_tsval(const struct tcp_r=
-equest_sock *treq)
->   * See draft-ietf-tcpm-accurate-ecn for the latest values.
->   */
->  #define TCP_ACCECN_CEP_INIT_OFFSET 5
-> +#define TCP_ACCECN_E1B_INIT_OFFSET 1
-> +#define TCP_ACCECN_E0B_INIT_OFFSET 1
-> +#define TCP_ACCECN_CEB_INIT_OFFSET 0
-> +
-> +static inline void __tcp_accecn_init_bytes_counters(int *counter_array)
-> +{
-> +       BUILD_BUG_ON(INET_ECN_ECT_1 !=3D 0x1);
-> +       BUILD_BUG_ON(INET_ECN_ECT_0 !=3D 0x2);
-> +       BUILD_BUG_ON(INET_ECN_CE !=3D 0x3);
-> +
-> +       counter_array[INET_ECN_ECT_1 - 1] =3D 0;
-> +       counter_array[INET_ECN_ECT_0 - 1] =3D 0;
-> +       counter_array[INET_ECN_CE - 1] =3D 0;
-> +}
->
->  /* The highest ECN variant (Accurate ECN, ECN, or no ECN) that is
->   * attemped to be negotiated and requested for incoming connection
-> @@ -1053,6 +1070,7 @@ static inline void tcp_accecn_init_counters(struct =
-tcp_sock *tp)
->  {
->         tp->received_ce =3D 0;
->         tp->received_ce_pending =3D 0;
-> +       __tcp_accecn_init_bytes_counters(tp->received_ecn_bytes);
->  }
->
->  /* State flags for sacked in struct tcp_skb_cb */
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index e6d7b5420c88..0e779de3ce01 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -5122,6 +5122,7 @@ static void __init tcp_struct_check(void)
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, delivered);
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, delivered_ce);
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, received_ce);
-> +       CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, received_ecn_bytes);
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, app_limited);
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, rcv_wnd);
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txr=
-x, rx_opt);
-> @@ -5129,7 +5130,7 @@ static void __init tcp_struct_check(void)
->         /* 32bit arches with 8byte alignment on u64 fields might need pad=
-ding
->          * before tcp_clock_cache.
->          */
-> -       CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx,=
- 95 + 4);
-> +       CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx,=
- 107 + 4);
->
->         /* RX read-write hotpath cache lines */
->         CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx,=
- bytes_received);
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index c986452302cb..5c0159cc0083 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -6013,8 +6013,17 @@ static void tcp_urg(struct sock *sk, struct sk_buf=
-f *skb, const struct tcphdr *t
->         }
->  }
->
-> +void tcp_ecn_received_counters_payload(struct sock *sk,
-> +                                      const struct sk_buff *skb)
-> +{
-> +       const struct tcphdr *th =3D (const struct tcphdr *)skb->data;
-> +
-> +       tcp_ecn_received_counters(sk, skb, skb->len - th->doff * 4);
-> +}
-> +
->  /* Updates Accurate ECN received counters from the received IP ECN field=
- */
-> -void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *sk=
-b)
-> +void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *sk=
-b,
-> +                              u32 payload_len)
->  {
->         u8 ecnfield =3D TCP_SKB_CB(skb)->ip_dsfield & INET_ECN_MASK;
->         u8 is_ce =3D INET_ECN_is_ce(ecnfield);
-> @@ -6034,6 +6043,9 @@ void tcp_ecn_received_counters(struct sock *sk, con=
-st struct sk_buff *skb)
->                 tp->received_ce +=3D pcount;
->                 tp->received_ce_pending =3D min(tp->received_ce_pending +=
- pcount,
->                                               0xfU);
-> +
-> +               if (payload_len > 0)
-> +                       tp->received_ecn_bytes[ecnfield - 1] +=3D payload=
-_len;
->         }
->  }
->
-> @@ -6307,7 +6319,7 @@ void tcp_rcv_established(struct sock *sk, struct sk=
-_buff *skb)
->                                         flag |=3D __tcp_replace_ts_recent=
-(tp,
->                                                                         d=
-elta);
->
-> -                               tcp_ecn_received_counters(sk, skb);
-> +                               tcp_ecn_received_counters(sk, skb, 0);
->
->                                 /* We know that such packets are checksum=
-med
->                                  * on entry.
-> @@ -6353,7 +6365,8 @@ void tcp_rcv_established(struct sock *sk, struct sk=
-_buff *skb)
->                         /* Bulk data transfer: receiver */
->                         tcp_cleanup_skb(skb);
->                         __skb_pull(skb, tcp_header_len);
-> -                       tcp_ecn_received_counters(sk, skb);
-> +                       tcp_ecn_received_counters(sk, skb,
-> +                                                 len - tcp_header_len);
->                         eaten =3D tcp_queue_rcv(sk, skb, &fragstolen);
->
->                         tcp_event_data_recv(sk, skb);
-> @@ -6400,7 +6413,7 @@ void tcp_rcv_established(struct sock *sk, struct sk=
-_buff *skb)
->                         tcp_accecn_third_ack(sk, skb, tp->syn_ect_snt);
->                 tcp_fast_path_on(tp);
->         }
-> -       tcp_ecn_received_counters(sk, skb);
-> +       tcp_ecn_received_counters_payload(sk, skb);
 
-I missed this from a prior patch, but is it expected to account bytes
-even if the packet is dropped ?
-
->
->         reason =3D tcp_ack(sk, skb, FLAG_SLOWPATH | FLAG_UPDATE_TS_RECENT=
-);
->         if ((int)reason < 0) {
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> index 779a206a5ca6..f1e698c323f3 100644
-> --- a/net/ipv4/tcp_minisocks.c
-> +++ b/net/ipv4/tcp_minisocks.c
-> @@ -500,7 +500,7 @@ static void tcp_ecn_openreq_child(struct sock *sk,
->                 tcp_ecn_mode_set(tp, TCP_ECN_MODE_ACCECN);
->                 tp->syn_ect_snt =3D treq->syn_ect_snt;
->                 tcp_accecn_third_ack(sk, skb, treq->syn_ect_snt);
-> -               tcp_ecn_received_counters(sk, skb);
-> +               tcp_ecn_received_counters_payload(sk, skb);
->         } else {
->                 tcp_ecn_mode_set(tp, inet_rsk(req)->ecn_ok ?
->                                      TCP_ECN_MODE_RFC3168 :
-> --
-> 2.34.1
->
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
