@@ -1,119 +1,132 @@
-Return-Path: <netdev+bounces-201011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C58AE7D9A
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:43:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46144AE7DBB
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B37417564A
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:42:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52EC71C23A37
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CAC2BE7A5;
-	Wed, 25 Jun 2025 09:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986BE2DBF66;
+	Wed, 25 Jun 2025 09:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H3KI95Jg"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="X24D4Uid"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7405627C863
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E837A29C347
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750843995; cv=none; b=NyYuQd97IQ/WBWfy2XURIv3DP71FaLq7tHLIT9uNnbF9pBAwwG7KaDy3AxAsf/sQuhXb87PPfjWhFUCY6+yG8+u31ajqrpMEidiw2i1x63+F9xO4Typt3qWHbomr47l87LFDWult5Hfz+7NNvg+O5xAsWnr5VpV8NCbpvEUXx04=
+	t=1750844047; cv=none; b=JnBfj/1klnQyAkXT2w7bsqudS4TNoQg401hDHtGMdiZEa/HIrXFw990HGfEEzWMUtyb1mV6/CYsnS0deMQKEIhOeCZDHc9gQa/FYDpaGqn5bOba/8YDIGWWT29BS6YlDVkq5HHYzE/EeSRsZBBZRZVm8+z5IawT5MOKoME/mih0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750843995; c=relaxed/simple;
-	bh=EHQEZ9ug+BKYVFfxiYsk5XGLHx7H07bgZOTK3MCyALo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UhkJ8ORYqLiaUCLpufiXp4deWVHQOPxjzppayNxqJ1tVD3tlfqJ5n845VsCPsRQ78nSe9ASwLmHVEb28nklUMS89uIn7Tq0A1G6kRlIZS3rjMBH/BSSimd0SAtL+l6r491Yrk/HOX+L0/dDy48dyXtj/njsmKHahmVBXweUbCvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H3KI95Jg; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4a76ea97cefso69040771cf.2
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 02:33:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750843992; x=1751448792; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EHQEZ9ug+BKYVFfxiYsk5XGLHx7H07bgZOTK3MCyALo=;
-        b=H3KI95JgPVvSKpWSbt51FkmpBFShBNE7/kJN0w5yW1QK4IAIMz5Nv1C5id8QT6Z/cH
-         A4sQvf84GKqrp18jfQ1kTCPyqw0VOeXBrkps9Vl3g7/UYr0B18r54fDy16QeevQ+yim6
-         USC3di7fHQOPoGY/kA+BNeSIce6Dk3C3pgaIehbxOQdBHq5frJvnR/ax5e7pKDeUfO3A
-         9SMrDRwwedcdECCDnBqXfOiLQj2amWCq5M74f8oei9HBl39uoCRnLZAtsp1bMi8Frn+a
-         SokNub3Pt4QCOd8EujzApWr75Wx637ncmrwzbyKB9BlRzLEN293lCCxgnQ0HpLdsDW5Z
-         HYcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750843992; x=1751448792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EHQEZ9ug+BKYVFfxiYsk5XGLHx7H07bgZOTK3MCyALo=;
-        b=pHPiFdTWvGa1CD/pyAE31Tcw0bgBafUOqVWLDSo+X3pERTYEPEh5sANRdC6XASQGmW
-         /YFRVbXFMEmlgOa0Ic/q4DA1KWRhNW4vh+/gHb6w6IJIv7PMTGifAjO3vb11xCPOAQVF
-         nGX8BkaSP+1Cb9SO4A0YPBhkdXyq004XpBnvz/0/fLhofJPMn0ApFSulxe8FfTEemJFX
-         +Gzl32R/mLIVRghNzHyFT2Ff3jID+VBlixzTFYJBcJ4X+qtN9fgvvOjZ8Xz73hlBDUDU
-         6GYEZ4+xpe4gxTcjnndvJS56qmyvnyHKL7GYi4cqUSy+HUVmNmo2mXaZv+YDE0ZKeq58
-         yhSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVx683rF5lt6P6X88xvH21i8VRMfV89tsXhN7fCPvE868liK23swtQ+EoMwrzPaAtPzUaJcRJI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmTNggmfQmtJ9eueaRADVHejvuV8n0M2tRbBhxGbYL7x3GUxAS
-	cK2xcwXaq98EeJa3uQ6hkIwFmfWHKX41vTDaUdChqhyyeTeUQ+g/dSNn7CRyHa+6kdjl7BXOe/K
-	Gn3MTNnMcO4kp0I2X60omiGr9js2J62Eo/ogd9HTa
-X-Gm-Gg: ASbGncuZsSIhdoZXkBIwYBuS0leWuqi3F2KDaCQshGJwloBvA6LJiQYr9VDJ+23uyW5
-	dPREtwEou5qacxcOOdCCpjiZN52NfTYpc72ucGeAq2yn/J2OylaKElfy+Ojnw7TT0imToiqQUuJ
-	aMdM0+1XNwCsuqjDfQzEgO/el7fCC8+KnQyI6J6bk3TMJwBPVYBZQy
-X-Google-Smtp-Source: AGHT+IFl2hsx83MoQtHXwzaTy2gdPUKkrnzBZt+R+53c44zwQHWVfxVlZ3qeSa5gcYdHaUTwLPYKINTrqGBaAZX4NCY=
-X-Received: by 2002:ac8:5d4f:0:b0:4a4:2c4c:ccb3 with SMTP id
- d75a77b69052e-4a7c0808b1fmr38916781cf.38.1750843992056; Wed, 25 Jun 2025
- 02:33:12 -0700 (PDT)
+	s=arc-20240116; t=1750844047; c=relaxed/simple;
+	bh=khNkfOsR7Llox6I112lqSvaS2QdOn2MM5KZ08Ea+Wgk=;
+	h=From:Date:Subject:MIME-Version:Message-Id:To:Cc:Content-Type:
+	 References; b=QE+4ibeKOaCO7nDYjPfve07N9pOVZY+0h3k4Q9nit7t+f3kBfqk5w7MHkkzwupfGAZR05rPPkEeQk1QA4txnEEut5sVXuKDbBqmOOWvL5Ammpwwdl/8HOH+AL7opoy9cBKLaTn1V1No464Nc51fUow/Yewd/D+klILBPkYmkFqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=X24D4Uid; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250625093356epoutp02e0efc65355d49101d5b9b6b000cec2ee~MP1--lE5c1529815298epoutp02D
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:33:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250625093356epoutp02e0efc65355d49101d5b9b6b000cec2ee~MP1--lE5c1529815298epoutp02D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1750844036;
+	bh=CBC9RrUsb8ZR2LuYyo/8tdiochVtCnPVT6I0z3/0w9w=;
+	h=From:Date:Subject:To:Cc:References:From;
+	b=X24D4UidyqsXvF5h62ivkZwJ1g/Pcuce28g+FFNq4XFP464SWDlVKn86pMoPbP0SC
+	 aqEAXabVO2WLzxhK7nIUffPC0nkxv3GR4f4CWGpbzKn3Dl0NnbAGwJluUDsqwhlkX7
+	 53Aor0q6uCclT+GZtwplfbm6aY+cBIlTow1pAsOc=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas1p2.samsung.com (KnoxPortal) with ESMTPS id
+	20250625093355epcas1p2faae8a26c68cb02ea04d4c88e02b1581~MP1_vdX511190011900epcas1p2r;
+	Wed, 25 Jun 2025 09:33:55 +0000 (GMT)
+Received: from epcas1p3.samsung.com (unknown [182.195.36.223]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4bRxTZ72sVz6B9m5; Wed, 25 Jun
+	2025 09:33:54 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd~MP19wiIYq0667706677epcas1p1z;
+	Wed, 25 Jun 2025 09:33:54 +0000 (GMT)
+Received: from U20PB1-1082.tn.corp.samsungelectronics.net (unknown
+	[10.91.135.33]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250625093354epsmtip292d16f2bc0d2b23d1119c49d914b7fca~MP19s5avp0986709867epsmtip2P;
+	Wed, 25 Jun 2025 09:33:54 +0000 (GMT)
+From: "Peter GJ. Park" <gyujoon.park@samsung.com>
+Date: Wed, 25 Jun 2025 18:33:48 +0900
+Subject: [PATCH] net: usb: usbnet: fix use-after-free in race on workqueue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250621193737.16593-1-chia-yu.chang@nokia-bell-labs.com> <20250621193737.16593-15-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250621193737.16593-15-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Jun 2025 02:33:01 -0700
-X-Gm-Features: AX0GCFvvtwK3EY_HeBJK2lmz3DF6DjV7RiAEa0hah0gNfU2C4uUiuaopSIAF9OM
-Message-ID: <CANn89iJQJbggfu63j7cLH1Fr5jPwEh2yP05dZn5pQ=zpk3iXmA@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 14/15] tcp: accecn: try to fit AccECN option
- with SACK
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
-	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
-	kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch, 
-	donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250625-usbnet-uaf-fix-v1-1-421eb05ae6ea@samsung.com>
+X-B4-Tracking: v=1; b=H4sIAHvCW2gC/x2MQQqAIBAAvyJ7bsEEw/pKdNBaay8WmhFEf2/pO
+	AMzDxTKTAUG9UCmiwvvSaBtFMybTyshL8JgtLG6MxZrCYlOrD5i5Bt7H5xdqA1ujiDRkUn0Pxy
+	n9/0AVpR/pGAAAAA=
+X-Change-ID: 20250625-usbnet-uaf-fix-9ab85de1b8cf
+To: Oliver Neukum <oneukum@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "Peter GJ. Park" <gyujoon.park@samsung.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1750844034; l=1198;
+	i=gyujoon.park@samsung.com; s=20250625; h=from:subject:message-id;
+	bh=khNkfOsR7Llox6I112lqSvaS2QdOn2MM5KZ08Ea+Wgk=;
+	b=22L8HpUpqznMwZsnG30qdugykmy8QNtjp4q/oY1GDx+mA56yNFHaSpYKNkVvWLtg0rBLHTvaO
+	oWVD9VL9XGaBs2WVE1Qhy78AL7auR/61t/1pqZuFb2dBU4WhFNyRCgy
+X-Developer-Key: i=gyujoon.park@samsung.com; a=ed25519;
+	pk=EdSwPjEiPaVzw7VRIRalIsT9igO06CZZXNJzE0/whs0=
+X-CMS-MailID: 20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 101P
+cpgsPolicy: CPGSC10-711,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd
+References: <CGME20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd@epcas1p1.samsung.com>
 
-On Sat, Jun 21, 2025 at 12:38=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com=
-> wrote:
->
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> As SACK blocks tend to eat all option space when there are
-> many holes, it is useful to compromise on sending many SACK
-> blocks in every ACK and attempt to fit the AccECN option
-> there by reducing the number of SACK blocks. However, it will
-> never go below two SACK blocks because of the AccECN option.
->
-> As the AccECN option is often not put to every ACK, the space
-> hijack is usually only temporary. Depending on the length of
-> AccECN option (can be either 11, 8, 5, or 2 bytes, cf. Table
-> 5 in AccECN spec) and the NOPs used for alignment of other
-> TCP options, up to two SACK blocks will be reduced.
+When usbnet_disconnect() queued while usbnet_probe() processing,
+it results to free_netdev before kevent gets to run on workqueue,
+thus workqueue does assign_work() with referencing freeed memory address.
 
-I think it would be nice to study how AccECN and SACK compression play
-together ?
+For graceful disconnect and to prevent use-after-free of netdev pointer,
+the fix adds canceling work and timer those are placed by usbnet_probe()
+
+Signed-off-by: Peter GJ. Park <gyujoon.park@samsung.com>
+---
+ drivers/net/usb/usbnet.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index c04e715a4c2ade3bc5587b0df71643a25cf88c55..3c5d9ba7fa6660273137c80106746103f84f5a37 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1660,6 +1660,9 @@ void usbnet_disconnect (struct usb_interface *intf)
+ 	usb_free_urb(dev->interrupt);
+ 	kfree(dev->padding_pkt);
+ 
++	timer_delete_sync(&dev->delay);
++	tasklet_kill(&dev->bh);
++	cancel_work_sync(&dev->kevent);
+ 	free_netdev(net);
+ }
+ EXPORT_SYMBOL_GPL(usbnet_disconnect);
+
+---
+base-commit: 86731a2a651e58953fc949573895f2fa6d456841
+change-id: 20250625-usbnet-uaf-fix-9ab85de1b8cf
+
+Best regards,
+-- 
+Peter GJ. Park <gyujoon.park@samsung.com>
+
 
