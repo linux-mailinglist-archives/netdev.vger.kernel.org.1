@@ -1,99 +1,200 @@
-Return-Path: <netdev+bounces-201206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E50BAE872D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:54:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94369AE8725
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14391643CF
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEBCD3BEB11
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C1825CC72;
-	Wed, 25 Jun 2025 14:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4280C26156E;
+	Wed, 25 Jun 2025 14:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vEVPBNft"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B711D5165
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 14:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D1F1D5165;
+	Wed, 25 Jun 2025 14:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750863253; cv=none; b=kmoIDKTalNe+ck2gSomeYR9ML6rWHV3d3N8SL1zZPEGHnv01AHT4lhhSEyaU69Sx2CU/rsRPeGzqCh6f5+3wHykSezt+Gds/KvDSTUXBHURhV/duDXAzIs7vFfv+APuWkewfiPwucu8sl7utL+883insPV03QWB8KkhDAVX1tng=
+	t=1750863209; cv=none; b=kU4zPKBm8njAFWmdB2XmLsZyVnDL64sEsZxyfZZONdNCOP+884WlIyUS1DpXY+2YdN7THbmsxabFVj3eV92/K/gQkJWEhZouk7iLCp+4zUPFt67K1Nta41DuogIXy/S7ZKTWN9ZOItIZczy6vWHo58kR5AMO9hykH0lxsokxsK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750863253; c=relaxed/simple;
-	bh=kn9gi/mp+gU7lozuVo0xHfXmebklFWKCem2C9a2JVBs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oO3spJcp0gvNhvJMUIst/WblPowB40bbYqFXCIOLNyvjPbBPYh75lRRxeTeiPshZZ3An2CssZXNwApfSh1v5LHBxVDEj+PgCLXnWPzInoNZDUcltS5PQ92F8kmoXuuD5M9VZjM6ic36z3JfBK0unyViWLqs6OgebeaWpK4ju4UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 34C5961E647BA;
-	Wed, 25 Jun 2025 16:53:07 +0200 (CEST)
-Message-ID: <1c43ebac-2334-473d-b3dc-de26bf5abca7@molgen.mpg.de>
-Date: Wed, 25 Jun 2025 16:53:06 +0200
+	s=arc-20240116; t=1750863209; c=relaxed/simple;
+	bh=IJe6mOkdno5hFkqOuZzP6lWj3MzgBpaudeFCugaeW5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nAt1tjPIzZkIJoIYkr0k3ztq16seMjP5OlFLwx5w6umNWdUV9k5Ks5ogMJWUTHt8beFoObIk1koseH25F2THMP2hqTb2m0V2ukh0WTZvtrdgqs3nWzP068ylvqTKb0036VMZg2aN7V23ciQOH1RtEjaY1k/a7J2ClgAslOUnkqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vEVPBNft; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ECC9C4CEEA;
+	Wed, 25 Jun 2025 14:53:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750863208;
+	bh=IJe6mOkdno5hFkqOuZzP6lWj3MzgBpaudeFCugaeW5w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vEVPBNft67yFnyq10OuAhQPYNrznG7vdFztn5fo09zOvfI1ukOyexva0fcqBcgH1+
+	 Poc+Rb0Q5wYPAF/RBKgwIjSfT2BhCBTKF+H8lEqIVVYj1XhQ6eqImEr0zIkf9KMqw7
+	 wiDedspcBMpswvzBkjaXn7mWBDM8TOacEww3P7XsmLAiB3sIDsxxwTjSwKOjvnR7Q1
+	 1NxF/XUkzI+5ZbrxOPPItZejLHz6Wxesu97Cz+s5IctHQ6Mtt4IqKBjldDxRny3SM9
+	 0ysMFTmtKsCs2h7HEwnIh6QfiPwtGQI/kkcruqpQN+baPGTpL/7UmgHyPI+QBY9a7o
+	 2QdK6TZwf1GhQ==
+Date: Wed, 25 Jun 2025 15:53:21 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	linux@roeck-us.net, jdelvare@suse.com,
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250625145321.GZ795775@google.com>
+References: <20250613131133.GR381401@google.com>
+ <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
+ <20250619115345.GL587864@google.com>
+ <CAOoeyxXSTeypv2qQjcK1cSPtjch=gJGYzqoMsLQ-LJZ8Kwgd=w@mail.gmail.com>
+ <20250619152814.GK795775@google.com>
+ <CAOoeyxU7eQneBuxbBqepta29q_OHPzrkN4SKmj6RX72L3Euw5A@mail.gmail.com>
+ <20250625090133.GP795775@google.com>
+ <CAOoeyxWoxC-n3JjjFe8Ruq_VydXk=jev=mopKfL5B7gsaSg=Ag@mail.gmail.com>
+ <20250625134634.GY795775@google.com>
+ <CAOoeyxVuu-kKoQa84mGOX=thAc0hnzQU8L=MnycoRRhzoZMnNw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Cc: Jacob E Keller <jacob.e.keller@intel.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>,
- Joe Damato <jdamato@fastly.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Anthony L Nguyen <anthony.l.nguyen@intel.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Lukasz Czapnik <lukasz.czapnik@intel.com>, Eric Dumazet
- <edumazet@google.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Martin Karsten <mkarsten@uwaterloo.ca>, Igor Raits <igor@gooddata.com>,
- Daniel Secik <daniel.secik@gooddata.com>,
- Zdenek Pesek <zdenek.pesek@gooddata.com>, regressions@lists.linux.dev
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com>
- <20250415175359.3c6117c9@kernel.org>
- <CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
- <20250416064852.39fd4b8f@kernel.org>
- <CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
- <CO1PR11MB5089365F31BCD97E59CCFA83D6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <20250416171311.30b76ec1@kernel.org>
- <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
- <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
- <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOoeyxVuu-kKoQa84mGOX=thAc0hnzQU8L=MnycoRRhzoZMnNw@mail.gmail.com>
 
-Dear Jaroslav,
+[...]
 
+> > > > > > In the code above you register 6 I2C devices.  Each device will be
+> > > > > > assigned a platform ID 0 through 5. The .probe() function in the I2C
+> > > > > > driver will be executed 6 times.  In each of those calls to .probe(),
+> > > > > > instead of pre-allocating a contiguous assignment of IDs here, you
+> > > > > > should be able to use IDA in .probe() to allocate those same device IDs
+> > > > > > 0 through 5.
+> > > > > >
+> > > > > > What am I missing here?
+> > > > > >
+> > > > >
+> > > > > You're absolutely right in the scenario where a single NCT6694 device
+> > > > > is present. However, I’m wondering how we should handle the case where
+> > > > > a second or even third NCT6694 device is bound to the same MFD driver.
+> > > > > In that situation, the sub-drivers using a static IDA will continue
+> > > > > allocating increasing IDs, rather than restarting from 0 for each
+> > > > > device. How should this be handled?
+> > > >
+> > > > I'd like to see the implementation of this before advising.
+> > > >
+> > > > In such a case, I assume there would be a differentiating factor between
+> > > > the two (or three) devices.  You would then use that to decide which IDA
+> > > > would need to be incremented.
+> > > >
+> > > > However, Greg is correct.  Hard-coding look-ups for userspace to use
+> > > > sounds like a terrible idea.
+> > > >
+> > >
+> > > I understand.
+> > > Do you think it would be better to pass the index via platform_data
+> > > and use PLATFORM_DEVID_AUTO together with mfd_add_hotplug_devices()
+> > > instead?
+> > > For example:
+> > > struct nct6694_platform_data {
+> > >     int index;
+> > > };
+> > >
+> > > static struct nct6694_platform_data i2c_data[] = {
+> > >     { .index = 0 }, { .index = 1 }, { .index = 2 }, { .index = 3 }, {
+> > > .index = 4 }, { .index = 5 },
+> > > };
+> > >
+> > > static const struct mfd_cell nct6694_devs[] = {
+> > >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[0], sizeof(struct
+> > > nct6694_platform_data), 0),
+> > >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[1], sizeof(struct
+> > > nct6694_platform_data), 0),
+> > >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[2], sizeof(struct
+> > > nct6694_platform_data), 0),
+> > >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[3], sizeof(struct
+> > > nct6694_platform_data), 0),
+> > >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[4], sizeof(struct
+> > > nct6694_platform_data), 0),
+> > >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[5], sizeof(struct
+> > > nct6694_platform_data), 0),
+> > > };
+> > > ...
+> > > mfd_add_hotplug_devices(dev, nct6694_devs, ARRAY_SIZE(nct6694_devs));
+> > > ...
+> >
+> > No, that's clearly way worse.  =:-)
+> >
+> > The clean-up that this provides is probably not worth all of this
+> > discussion.  I _still_ think this enumeration should be done in the
+> > driver.  But if you really can't make it work, I'll accept the .id
+> > patch.
+> >
+> 
+> Okay, I would like to ask for your advice regarding the implementation of IDA.
+> 
+> Using a global IDA in the sub-driver like this:
+> (in i2c-nct6694.c)
+> static DEFINE_IDA(nct6694_i2c_ida);
+> 
+> static int nct6694_i2c_probe(struct platform_device *pdev)
+> {
+>     ida_alloc(&nct6694_i2c_ida, GFP_KERNEL);
+>     ...
+> }
+> 
+> causes IDs to be globally incremented across all devices. For example,
+> the first NCT6694 device gets probed 6 times and receives IDs 0–5, but
+> when a second NCT6694 device is added, it receives IDs starting from
+> 6, rather than starting again from 0. This makes per-device ID mapping
+> unreliable.
+> 
+> To solve this, I believe the right approach is to have each NCT6694
+> instance maintain its own IDA, managed by the MFD driver's private
+> data. As mentioned earlier, for example:
+> (in nct6694.c)
+> struct nct6694 {
+>     struct device *dev;
+>     struct ida i2c_ida;
+> };
+> 
+> static int nct6694_probe(struct platform_device *pdev)
+> {
+>     ...
+>     ida_init(&nct6694->i2c_ida);
+>     ...
+> }
+> 
+> (in i2c-nct6694.c)
+> static int nct6694_i2c_probe(struct platform_device *pdev)
+> {
+>     id = ida_alloc(&nct6694->i2c_ida, GFP_KERNEL);
+> }
+> 
+> This way, each device allocates IDs independently, and each set of
+> I2C/GPIO instances gets predictable IDs starting from 0 per device. I
+> think this resolves the original issue without relying on hardcoded
+> platform IDs.
+> Please let me know if this implementation aligns with what you had in mind.
 
-Am 25.06.25 um 14:17 schrieb Jaroslav Pulchart:
+This sounds like an acceptable way forward.
 
-> We are still facing the memory issue with Intel 810 NICs (even on latest
-> 6.15.y).
-
-Commit 492a044508ad13 ("ice: Add support for persistent NAPI config") 
-was added in Linux v6.13-rc1, and as until now, no fix could be 
-presented, but reverting it fixes your issue, I strongly recommend to 
-send a revert. No idea if it’s compiler depended or what else could be 
-the issue. But due to Linux’ no regression policy this should be 
-reverted as soon as possible.
-
-
-Kind regards,
-
-Paul
+-- 
+Lee Jones [李琼斯]
 
