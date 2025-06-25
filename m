@@ -1,134 +1,169 @@
-Return-Path: <netdev+bounces-200993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F0D3AE7AEE
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:53:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD5BAE7AF8
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39A875A02CB
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:53:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F40831766F2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592A726B973;
-	Wed, 25 Jun 2025 08:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D12728469D;
+	Wed, 25 Jun 2025 08:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Db6iaAPP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoPCt0Lg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA8C27EFEA;
-	Wed, 25 Jun 2025 08:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878EE26B973
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750841622; cv=none; b=YjKLJrhXMcg9gxJCrweotkeKimh9IiFXt6772mopifhvWW2PRZ9wzrpLaSHAm2RjNxIB8p94L0ZbUra248BaUZcNFS6FeSiF+AG87oV9kLHgdZh3s3WTfWmC+Wu8dZbFAL9jsBn4NVaFgzMmNN72w5At25+U/ak/MfJAC5w8fII=
+	t=1750841693; cv=none; b=k8crYazh1bcK047jcC576KyVVnIrIGlMWJDiS76msBsADszfGGs2qeJbJCGx7Ve+QNJg0WJrQf4EzHLQV9CM9ZE5prbrPsvuI4MCc0IrkgtdDJYequLicAFmxo9e7d4vzFDiHRIL/pbdY3+dPBJum7+OG6WxpMW6Dmh5+wV1RfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750841622; c=relaxed/simple;
-	bh=sbR5bzeR9B14+orF7aU5BQhpGADtGkzXTRYNSKp93Ug=;
+	s=arc-20240116; t=1750841693; c=relaxed/simple;
+	bh=IMHNO1bT1El4HG2JXEHyLJZxCIu/EzODJnWdqZWBHw8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f34+Q0Hwr+3ZpCdo7+RMJ79ayCpqETO+akzrI9oqEs69639jYuE5baS31w1JNMrlO8OXPas1joe6vVQW2IXRzDElMZ5tGWBtNpvY++7JrJ4i78BEj4UyhEuGBl6HmgMAj+AgDQ/a8VQDejcvqvyVHZ+JfYGvUvXSFbGCUEDWepg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Db6iaAPP; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750841620; x=1782377620;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sbR5bzeR9B14+orF7aU5BQhpGADtGkzXTRYNSKp93Ug=;
-  b=Db6iaAPPT1DR1v/+Ru/F5TSRQgJRflV6qPetFc8cDgyWnaKW6a+F4r1u
-   R7vpLU8sWJ1Nh0fxcuU2rJRVv5y++sy5wHDGtd2iIT9EPbu16g8sHgnha
-   SESRfntfAOxO/ciUULrvzAXCzSdHDwvdhj3u7iapthoWKcxa40d0r+Jnj
-   p7Ci/f95XvsUSh/QooeMY53KfKDWCSGeRf5/pQwXn2g9ZC2Jn3+m7V0BI
-   w5KtlQVQVXe3iYeb1DsUpOE1rP0dX7ATO7m7kX/I4pJOBCOUm/zwAGDIR
-   q/BdD2zDCs7LvQXo3ZJbNp90tbJLiobHvGpGpZ3JY8MPysuVoCbAzf8+r
-   A==;
-X-CSE-ConnectionGUID: DSICgPSVRh6IuTPH3/07Dg==
-X-CSE-MsgGUID: Boh1PC/QQ3CTEQYOd6rHUg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="63703497"
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="63703497"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 01:53:40 -0700
-X-CSE-ConnectionGUID: 70mQxObcS0uyAvG4Ue8REA==
-X-CSE-MsgGUID: Kz2FA0ryQ3utlvE936/PQw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="183191401"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 01:53:35 -0700
-Date: Wed, 25 Jun 2025 10:52:36 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 1/3] net: txgbe: request MISC IRQ in ndo_open
-Message-ID: <aFu4yUsWek/x9kqd@mev-dev.igk.intel.com>
-References: <20250624085634.14372-1-jiawenwu@trustnetic.com>
- <20250624085634.14372-2-jiawenwu@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=e9XQDliAc3RFSsiF/DPCow2Jo8HqeZp7Cmm0gF4GTjMDsP5zFXvhWH+yJW7tzN8nsoWwynd6F87llsXo571ew3Ym8As65cXwZWcD1U4YlpAe50FU1Um8aF76/2y87gIOW4DLWI6tHcCZ9AowCmt3yU5h9dbUESX4y62d324+wak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NoPCt0Lg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750841690;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H7SojeMD2gps8cZo3IPHcE59cXnndpk0obLuxFCFG5c=;
+	b=NoPCt0Lga0/6jdflq+J4E/ccK04N95tVlCIgg2Wunq/V+T0wNAnqfCmFsVPT0TWc8iwhaz
+	EV5D8rHlenTxGe1IaSt4OEIN6I9Diwq+iOfqFVeSgOFY0GflqYgzUQcpMhySs/mTFQIHaD
+	fxMtiHxqaF0oJbsw4ScOPC44YxYHGoI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-413-ZJHRBYjdM4qTYx-bb8OAOg-1; Wed, 25 Jun 2025 04:54:48 -0400
+X-MC-Unique: ZJHRBYjdM4qTYx-bb8OAOg-1
+X-Mimecast-MFC-AGG-ID: ZJHRBYjdM4qTYx-bb8OAOg_1750841688
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45359bfe631so7127205e9.0
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 01:54:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750841688; x=1751446488;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H7SojeMD2gps8cZo3IPHcE59cXnndpk0obLuxFCFG5c=;
+        b=nDRfqHwdMldXgeTMnWYSYDJkz6edwnIx3lc4Y5NQMw2jVtT0AkBUvDogjawRwjbwSE
+         OncJFGsm5FygHuMveSwRodUkww/n+T2Jaf8DZE6uTBNeVk1V39Fh54mfPVNnsGP/TwgG
+         yGe00fDTGl/HvgFzSTii2hI8N/IuGO9YZCobnRPf4dEM9wQlFGKLz55JtHMr5h6EgTuf
+         oKNgWZ7gM2twL5rE2X9tbguE+xIA/cSJB/1XqAeh1dou/S2nqMxvWdWgZj1Gq/ZJbZsh
+         7N7XiuTJZNzu+jLUNgmBza7xOkmBS+Qlxx4DC8ayhyR2xlamvCRpTE/85cgCfWF5wU7P
+         F48Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUVrWFVm+P3hcBC4orAoVHb8R1WlqDp6xh3e3a0TaTcLKmRutheWXI83wQUcd3NZUs7TR+1KwA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIGWHng4jYQ3i9k+GIw/rRVdGXORViwEe0BXLj2vwSfWokoFmy
+	W1sBEZ7nFN1RGgabYAjTSRV8ODJQz7cpQwCf2YnGQgNN4AtALqwJ1Qays2uI6ofM7UEjwbAwDAc
+	0B2Cpm6XBLWpHK9Q4B+cv9IHq6X6wnMMgmcYVfFg0RycLr7+VQj01XCCTBg==
+X-Gm-Gg: ASbGncu+uF1wn0OPyFMyHafy1i4EP4SJUZ8bgjj7KrYvZieEw5DGtAG5g1A6oeKzj8l
+	qjk3d7JuObKWq+PDGEoXkfiyB85CJ6lQyDhzkt2pdakY9NT5bedfMvjkzKKWjvULww2gDxkX9XV
+	Nh1Wl950Di6OB4xC2uQZ01lip2yB/7/K7No8KHtTruqE3+D2jUr87eb8FaI2acbZq9eWQqi77mk
+	K/6nmF+zjnNi+LnQZPqxjjNooDmwlCZPc8sorP6+CtUYmjXBMMNMF0C2F8Cq9UYA7e5h60h6KJT
+	vQ1uZxHK6xuvoKjzEt7hD4X3vEqy
+X-Received: by 2002:a05:600c:35d2:b0:450:d00d:d0 with SMTP id 5b1f17b1804b1-45381ae467cmr18288095e9.19.1750841687671;
+        Wed, 25 Jun 2025 01:54:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGYLN8WpVcipmrn+PxxvTbwwdYiFGmiYVj3yUsHDD0K7ZUDXBWM8hLnXLAMurjH8x8NH2rxcA==
+X-Received: by 2002:a05:600c:35d2:b0:450:d00d:d0 with SMTP id 5b1f17b1804b1-45381ae467cmr18287785e9.19.1750841687044;
+        Wed, 25 Jun 2025 01:54:47 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.151.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453823ad247sm13350055e9.26.2025.06.25.01.54.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 01:54:46 -0700 (PDT)
+Date: Wed, 25 Jun 2025 10:54:40 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net v2 3/3] vsock: Fix IOCTL_VM_SOCKETS_GET_LOCAL_CID
+ to check also `transport_local`
+Message-ID: <uqap2qzmvkfqxfqssxnt5anni6jhdupnarriinblznv5lfk764@qkrjq22xeygb>
+References: <20250620-vsock-transports-toctou-v2-0-02ebd20b1d03@rbox.co>
+ <20250620-vsock-transports-toctou-v2-3-02ebd20b1d03@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250624085634.14372-2-jiawenwu@trustnetic.com>
+In-Reply-To: <20250620-vsock-transports-toctou-v2-3-02ebd20b1d03@rbox.co>
 
-On Tue, Jun 24, 2025 at 04:56:32PM +0800, Jiawen Wu wrote:
-> Move the creating of irq_domain for MISC IRQ from .probe to .ndo_open,
-> and free it in .ndo_stop, to maintain consistency with the queue IRQs.
-> This it for subsequent adjustments to the IRQ vectors.
-> 
-> Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  2 +-
->  .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 22 +++++++++----------
->  2 files changed, 11 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> index 20b9a28bcb55..dc468053bdf8 100644
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> @@ -78,7 +78,6 @@ int txgbe_request_queue_irqs(struct wx *wx)
->  		free_irq(wx->msix_q_entries[vector].vector,
->  			 wx->q_vector[vector]);
->  	}
-> -	wx_reset_interrupt_capability(wx);
->  	return err;
->  }
->  
-> @@ -211,6 +210,7 @@ void txgbe_free_misc_irq(struct txgbe *txgbe)
->  	free_irq(txgbe->link_irq, txgbe);
->  	free_irq(txgbe->misc.irq, txgbe);
->  	txgbe_del_irq_domain(txgbe);
-> +	txgbe->wx->misc_irq_domain = false;
->  }
->  
->  int txgbe_setup_misc_irq(struct txgbe *txgbe)
-> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> index f3d2778b8e35..a5867f3c93fc 100644
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-> @@ -458,10 +458,14 @@ static int txgbe_open(struct net_device *netdev)
->  
->  	wx_configure(wx);
->  
-> -	err = txgbe_request_queue_irqs(wx);
-> +	err = txgbe_setup_misc_irq(wx->priv);
+On Fri, Jun 20, 2025 at 09:52:45PM +0200, Michal Luczaj wrote:
+>Support returning VMADDR_CID_LOCAL in case no other vsock transport is
+>available.
+>
+>Fixes: 0e12190578d0 ("vsock: add local transport support in the vsock core")
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+>man vsock(7) mentions IOCTL_VM_SOCKETS_GET_LOCAL_CID vs. VMADDR_CID_LOCAL:
+>
+>   Ioctls
+>       ...
+>       IOCTL_VM_SOCKETS_GET_LOCAL_CID
+>              ...
+>              Consider using VMADDR_CID_ANY when binding instead of
+>              getting the local CID with IOCTL_VM_SOCKETS_GET_LOCAL_CID.
+>
+>   Local communication
+>       ....
+>       The local CID obtained with IOCTL_VM_SOCKETS_GET_LOCAL_CID can be
+>       used for the same purpose, but it is preferable to use
+>       VMADDR_CID_LOCAL.
+>
+>I was wondering it that would need some rewriting, since we're adding
+>VMADDR_CID_LOCAL as a possible ioctl's return value.
 
-Don't you need misc interrupt before ndo_open is called? I wonder if it
-won't be simpler to always use last index (8) for misc irq. Is it
-possible? I mean, use 8 event if the number of queues is lower than 8.
-If yes you can drop this patch and hardcode misc interrupts on index 8.
+IIRC the reason was, that if we have for example a G2H module loaded, 
+the ioctl returns the CID of that module (e.g. 42). So, we can use both 
+42 and VMADDR_CID_LOCAL to do the loopback communication, but we 
+encourage to always use VMADDR_CID_LOCAL.  With this change we basically 
+don't change that, but we change the fact that if there is only the 
+loopback module loaded, before the ioctl returned VMADDR_CID_ANY, while 
+now it returns LOCAL rightly.
 
-[...]
+So, IMO we are fine.
 
-BTW, assuming you can't always use last index, the patch looks fine.
+>---
+> net/vmw_vsock/af_vsock.c | 2 ++
+> 1 file changed, 2 insertions(+)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index a1b1073a2c89f865fcdb58b38d8e7feffcf1544f..4bdb4016bd14d790f3d217d5063be64a1553b194 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -2577,6 +2577,8 @@ static long vsock_dev_do_ioctl(struct file *filp,
+> 		cid = vsock_transport_local_cid(&transport_g2h);
+> 		if (cid == VMADDR_CID_ANY)
+> 			cid = vsock_transport_local_cid(&transport_h2g);
+>+		if (cid == VMADDR_CID_ANY && transport_local)
+>+			cid = VMADDR_CID_LOCAL;
+
+why not `cid = vsock_transport_local_cid(&transport_local)` like for 
+H2G?
+
+Thanks,
+Stefano
+
+>
+> 		if (put_user(cid, p) != 0)
+> 			retval = -EFAULT;
+>
+>-- 
+>2.49.0
+>
+
 
