@@ -1,58 +1,64 @@
-Return-Path: <netdev+bounces-201308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66431AE8E22
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 21:11:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1636CAE8E0B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 21:10:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B91A53A66B2
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:09:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40DCD1C26BB1
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36E32E1732;
-	Wed, 25 Jun 2025 19:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD78B2E0B6F;
+	Wed, 25 Jun 2025 19:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJqxeKu4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBIWj6da"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A942E06CD;
-	Wed, 25 Jun 2025 19:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5D32E0B6C;
+	Wed, 25 Jun 2025 19:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750878323; cv=none; b=QZtpGc2496oYVUzsktziCQVSxVZYPWcZv2IOri7kadnPuf1we1xRKS8U8u3FcarlXiUwjq0zbGadVfLlkUTixVnRkYbHvICl1YGFao2x5pDvFQw1mlKk5QBeUV6QMeM6gwqkaaX0xxl3MZn9dBkoBqsZX5VB3EJX7MRmDolUVQI=
+	t=1750878396; cv=none; b=KN28uGRkk5zcseMr3hl1nc4OREw8aTxPlYDlBZz2pfh6EvWmQmiDVZJnRToHlsuauFNvfbSNR2brUDOEOPMMsAfXZKJMpwqHmLC8fsMN+cycwJhFM/H8n2panykWk4AgZJrP5ER1bMGMO3DjBraASw+Wbbi6e8jH7LzL8yRhuc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750878323; c=relaxed/simple;
-	bh=F6NcfibEksUk16xLZ9aZoeLDg4FLCE0ViGkOwseLHSI=;
+	s=arc-20240116; t=1750878396; c=relaxed/simple;
+	bh=mt41Fb0q1YhHKfjDtHyYRotEsd67rfLrbLZk+qxV9gA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NgkkHRVwo1+/ALTD30hslde2x81YzKqo+Ylh4HwLEwZTXKtE2AdbtT2SGAYRV9ehxxbttWhb4Yt5bKgll0kSptk5Rx7tlFCTtdKDUQpVhEOt8i91wVR0zqjMYsZHCfSNjqVn7dzCi9Zc2XOChqU80BxgYgMaDkODqF0JbMTqMPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJqxeKu4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC537C4CEEA;
-	Wed, 25 Jun 2025 19:05:20 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qiQYNa3IGMe3HJijgbaYS9Ycp7VsM7Jc7DlCYn3VNyOt/oVyyNEAIddXsGxaDpIIE7QyuvGwPhe7xQ+JTXYrTduwberrUyk0bultiiBzBYXYu9jYeWtejLE0l2A9e3P18v9RZrrzzNMHSDqXtHEDP5koOXG5mrkXMwtL0stkzMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBIWj6da; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF815C4CEEA;
+	Wed, 25 Jun 2025 19:06:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750878323;
-	bh=F6NcfibEksUk16xLZ9aZoeLDg4FLCE0ViGkOwseLHSI=;
+	s=k20201202; t=1750878395;
+	bh=mt41Fb0q1YhHKfjDtHyYRotEsd67rfLrbLZk+qxV9gA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jJqxeKu4wUr6cfEms7Lm7D8RCpHIsqXBw4cjPO8V4ZfBoLUH0tFner3HnTUFAseyN
-	 Wkqs3PfIRA5XWLBrSANmOLCdS1AVqqL03QAY/okgV4+Uh4TFK0oFq6yz3vLahnlYs5
-	 1bEqPC7weC0Jf+EI5NJMmlOgBR4sCpB0mFnmzQZu0iGZ/xAsxEl/mz2r06hufnd9Jg
-	 skYzu0svOuooWsCpqR1pvh8658VL0eV0n4QTGtQpzL5lJF2df5HywXt0CehD5GDeS4
-	 Wpj6UyARpKWlFnb/jx/t9Itas79HUXNNL1xp4w6IIljeEjYmUH/OjWC2zSPRSIc63h
-	 ISZgkmO2ppq8w==
-Date: Wed, 25 Jun 2025 20:05:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: mana: Fix build errors when
- CONFIG_NET_SHAPER is disabled
-Message-ID: <20250625190518.GP1562@horms.kernel.org>
-References: <1750851355-8067-1-git-send-email-ernis@linux.microsoft.com>
+	b=cBIWj6daJ2/j7eMRSz1WZoK1fQzvuFIbKA3ujFVOwzwFQgQUFqRzb4VcI/0TzmRi1
+	 MQbK8UqQ6+wrYd03mjrTGw5QunO6u3fJv7XIqGo4REHjwJVmoC4FsonsRF+f49FB1o
+	 Qcc9662DGCUZjVJc+4CmJZ+ZvmbuAgOidrrSsdfAoNBaMcfXgEgtngQKc+DbgoO4f4
+	 HDGvy/v3iBv6jZH8P0oU4gs5s5LZe+3SJ2X0lgDObx2FLzYmT3dHpaQE5LqDWvwkKy
+	 iMrGDmDFZyR9l7ask/n02TT40PPBSKyfUaJx6tbPFoFg13B7F0d0r+7RXB+Ubv0BJP
+	 lNCjQgJv5rH1A==
+Date: Wed, 25 Jun 2025 14:06:34 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	devicetree@vger.kernel.org, imx@lists.linux.dev,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v3 1/1] dt-bindings: ieee802154: Convert at86rf230.txt
+ yaml format
+Message-ID: <175087839356.2050766.5864325742697685736.robh@kernel.org>
+References: <20250606155638.1355908-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,32 +67,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1750851355-8067-1-git-send-email-ernis@linux.microsoft.com>
+In-Reply-To: <20250606155638.1355908-1-Frank.Li@nxp.com>
 
-On Wed, Jun 25, 2025 at 04:35:55AM -0700, Erni Sri Satya Vennela wrote:
-> Fix build errors when CONFIG_NET_SHAPER is disabled, including:
+
+On Fri, 06 Jun 2025 11:56:33 -0400, Frank Li wrote:
+> Convert at86rf230.txt yaml format.
 > 
-> drivers/net/ethernet/microsoft/mana/mana_en.c:804:10: error:
-> 'const struct net_device_ops' has no member named 'net_shaper_ops'
+> Additional changes:
+> - Add ref to spi-peripheral-props.yaml.
+> - Add parent spi node in examples.
 > 
->      804 |         .net_shaper_ops         = &mana_shaper_ops,
-> 
-> drivers/net/ethernet/microsoft/mana/mana_en.c:804:35: error:
-> initialization of 'int (*)(struct net_device *, struct neigh_parms *)'
-> from incompatible pointer type 'const struct net_shaper_ops *'
-> [-Werror=incompatible-pointer-types]
-> 
->      804 |         .net_shaper_ops         = &mana_shaper_ops,
-> 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Fixes: 75cabb46935b ("net: mana: Add support for net_shaper_ops")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202506230625.bfUlqb8o-lkp@intel.com/
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > ---
-> Changes in v2:
-> * Use "select NET_SHAPER" in Kconfig instead of adding multiple checks for
->   CONFIG_NET_SHAPER.
+> change in v3
+> - add maximum: 0xf for xtal-trim
+> - drop 'u8 value ...' for xtal-trim's description
+> 
+> change in v2
+> - xtal-trim to uint8
+> ---
+>  .../bindings/net/ieee802154/at86rf230.txt     | 27 --------
+>  .../net/ieee802154/atmel,at86rf233.yaml       | 66 +++++++++++++++++++
+>  2 files changed, 66 insertions(+), 27 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
+> 
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
