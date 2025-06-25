@@ -1,58 +1,51 @@
-Return-Path: <netdev+bounces-200906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9D2AE74E0
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 04:40:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F770AE74F3
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 04:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDC13189D448
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:41:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F5EE3ADF8E
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392DE1BD9C9;
-	Wed, 25 Jun 2025 02:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669F638FB0;
+	Wed, 25 Jun 2025 02:51:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A2F1A23A4;
-	Wed, 25 Jun 2025 02:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
+Received: from outboundhk.mxmail.xiaomi.com (outboundhk.mxmail.xiaomi.com [207.226.244.123])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB0C1EA73
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 02:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.226.244.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750819255; cv=none; b=b8YPuDiJcuE/5wVP6NNsLXA1NqpavDENoLuUXwxkcyFfQnOpSjJv9ZyStrYKWsP0DAyNNBc4QNAnr+erZVYAcvEMGSTqe6h/2BtO86EHGFM2nnxUxt4nAUmuylY8Ya+RYhIr7lB/KgrLjyEY1XEUORPP+dxBBF2h1O1J46XfRBw=
+	t=1750819912; cv=none; b=gJj0nptHjBwOuv49V8ekJJbLOJ4u9y7gLef7dKDBrItopQPb7ta3WSuM008KYXyHejsPayxztHvp9kwQ+XbGk0BllxoYLDYlxPB4S/wqy6ZM70OCPok9Gm2AyJY5eoaj3b/BLCGjd46XyDSOFiVmmrOKYASHHUgR3b7qHNojK7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750819255; c=relaxed/simple;
-	bh=1ot4fcUh9htHque5KOKH0SX0B3xlo5rcLrCvjre98+o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N3b6/RJiM2lxEVrucqE8wJHOlEoFodDVd+JiP1YMIwCbMuCDYKsShlODf7K9o8KflztW3N+cgg8ZCtVnOuiSwSKHoByMPKxQdAlg0x1p5aqpwsjxuactsv212ogNw878Hl+ZkHkDKn1ln/Onyc7TazSZzq2SmvVfwAXKg8DhaZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.19.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz5t1750819175tc0cf436c
-X-QQ-Originating-IP: G1HoGL4WxqlxynV8bTIV7pexICZnDU0OjCE2/bZgzjE=
-Received: from w-MS-7E16.trustnetic.com ( [60.186.80.242])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 25 Jun 2025 10:39:27 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8086606251044154138
-EX-QQ-RecipientCnt: 11
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: libwx: fix the creation of page_pool
-Date: Wed, 25 Jun 2025 10:39:24 +0800
-Message-ID: <434C72BFB40E350A+20250625023924.21821-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1750819912; c=relaxed/simple;
+	bh=76O9Wj5Ul+EhuOXnDR6dDQw8gB/ZpDyiqenMfD6gMrQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZL9MYFvoZkRVz4/ePp1Cdy06i4hvBmh0nJaTjwKAUZLXD0K5/nrQIVjguZKjNevYmZhC2MGD/e0bqKSl8GOVdTcGkbcuQCsVBc/8yi9gL7zJ++PZ/MmsGlaroJlvebYe8a351D2fU8RmDLYwrCbGLwcPZVP/eXagdDoMRyJcLnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com; spf=pass smtp.mailfrom=xiaomi.com; arc=none smtp.client-ip=207.226.244.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=xiaomi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xiaomi.com
+X-CSE-ConnectionGUID: RQz7XIEZRfSD6zQw4klrkw==
+X-CSE-MsgGUID: W3l9fVWGSZu3x6laMDNs5w==
+X-IronPort-AV: E=Sophos;i="6.16,263,1744041600"; 
+   d="scan'208";a="144173493"
+From: EricChan <chenchuangyu@xiaomi.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, "Alexandre
+ Torgue" <alexandre.torgue@foss.st.com>
+CC: Feiyang Chen <chenfeiyang@loongson.cn>, Serge Semin
+	<fancer.lancer@gmail.com>, Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen
+	<chenhuacai@kernel.org>, Yanteng Si <si.yanteng@linux.dev>,
+	<netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, xiaojianfeng
+	<xiaojianfeng1@xiaomi.com>, EricChan <chenchuangyu@xiaomi.com>, xiongliang
+	<xiongliang@xiaomi.com>
+Subject: [PATCH] net: stmmac: Fix interrupt handling for level-triggered mode in DWC_XGMAC2
+Date: Wed, 25 Jun 2025 10:51:34 +0800
+Message-ID: <20250625025134.97056-1-chenchuangyu@xiaomi.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,57 +53,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: N7bzzhFwp0G2Rr32myLeYclLHUtF34dJ5ixxLWGuZ1X38PhNki4c7YYA
-	lswJdJUP2d5Vf3h//6IBXPzF2fLihh51GBWPPf+NNghF4IReW9k7DS1JA/iuop5ymsBaw74
-	2nKCgzSPrNDEcqnHUem72PoSJxAEW5hVrXvUASX1/YZYa28mQY1NhfI5dW8449QS8KYYywV
-	Q8X0cJhUIMNW80JeGfA3m07HSlt0EasM/SfgETRHdfF9BU0puCNvyQb7iNYSTjWWsGZnKrH
-	0p9fxDdlX+BYlEK9DBiZ9uHSSNQB2LOb2sjH1B313ljfAYiEKot+W6FBejqRZQiyfefM++Q
-	1YCSn4S9nRlhX7i7MADzTom4DQo5IIkXJy7XNMdMoVmGH6XH5cj1SkvQOEi3kj5EV9mjCFo
-	S/blMoO/DucMYfyMgtvLwI7I5ox2fTpDQqHIa7PZ4oExsxjLOXpPNHk1U2nJT7Si9GyMqtY
-	anpsuuuclgBzwHeHpU6OT2eARoiPHwZASG9ffiF4F9WuqTJuNqTM/dv2j+fNSl0GCKaxAEr
-	btHF4TO8fymemNbOww64yTXsn2aCMGCjSonU8+GgV1NUccdRZ3jQtcpNBbbBckswmTc+mzH
-	ri/YfrMRvfwjpm4Mo++/RYhOWJ3a//tLvJUIiMNo5iGI8ExT/Gk5ICGzwO/jFMFSbtt+IBf
-	GZtX8RJQpA6QEf/ws6ZhMPy4jREfhrh5iUohrXE+dnwkEPROKcrhD51JAzb0aZ5tGlRVXCg
-	WzQg6bmFvTe6UIeOTt0Z5P+h3dEgCvzQ8dgM3Q36OUcV2MKTqw7/IYznNsMzeJH3pinQKyX
-	5GdpnYhpsQdwxtbASQYAdLySW6BOJr9/9q74ojgNCQsYa6VxoB3FkQRrz0K8c+S2qGbq3sb
-	5ElHM9PK06lgtLUBBkIlFzUJaBVTgglH6qiWgxm/TSvyTtfU+K9hwmJjZOlgah1mC0IKsSm
-	LAQK2S9314FxrPtQ6TwviNNVxEHkChIpSSeyBem3qU0E5WbS1Pd0ozfuNbRHC6h2krOV+Kf
-	Sz1dF5xzfoeAZ5Kf6jluEi0tEoYwU=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
+X-ClientProxiedBy: BJ-MBX08.mioffice.cn (10.237.8.128) To BJ-MBX15.mioffice.cn
+ (10.237.8.135)
 
-'rx_ring->size' means the count of ring descriptors multiplied by the
-size of one descriptor. When increasing the count of ring descriptors,
-it may exceed the limit of pool size.
+According to the Synopsys Controller IP XGMAC-10G Ethernet MAC Databook
+v3.30a (section 2.7.2), when the INTM bit in the DMA_Mode register is set
+to 2, the sbd_perch_tx_intr_o[] and sbd_perch_rx_intr_o[] signals operate
+in level-triggered mode. However, in this configuration, the DMA does not
+assert the XGMAC_NIS status bit for Rx or Tx interrupt events.
 
-[ 864.209610] page_pool_create_percpu() gave up with errno -7
-[ 864.209613] txgbe 0000:11:00.0: Page pool creation failed: -7
+This creates a functional regression where the condition
+if (likely(intr_status & XGMAC_NIS)) in dwxgmac2_dma_interrupt() will
+never evaluate to true, preventing proper interrupt handling for
+level-triggered mode. The hardware specification explicitly states that
+"The DMA does not assert the NIS status bit for the Rx or Tx interrupt
+events" (Synopsys DWC_XGMAC2 Databook v3.30a, sec. 2.7.2).
 
-Fix to set the pool_size to the count of ring descriptors.
+The fix ensures correct handling of both edge and level-triggered
+interrupts while maintaining backward compatibility with existing
+configurations.
 
-Fixes: 850b971110b2 ("net: libwx: Allocate Rx and Tx resources")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Signed-off-by: EricChan <chenchuangyu@xiaomi.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 24 +++++++++----------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 7f2e6cddfeb1..c57cc4f27249 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -2623,7 +2623,7 @@ static int wx_alloc_page_pool(struct wx_ring *rx_ring)
- 	struct page_pool_params pp_params = {
- 		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
- 		.order = 0,
--		.pool_size = rx_ring->size,
-+		.pool_size = rx_ring->count,
- 		.nid = dev_to_node(rx_ring->dev),
- 		.dev = rx_ring->dev,
- 		.dma_dir = DMA_FROM_DEVICE,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+index 7840bc403788..5dcc95bc0ad2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+@@ -364,19 +364,17 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+ 	}
+ 
+ 	/* TX/RX NORMAL interrupts */
+-	if (likely(intr_status & XGMAC_NIS)) {
+-		if (likely(intr_status & XGMAC_RI)) {
+-			u64_stats_update_begin(&stats->syncp);
+-			u64_stats_inc(&stats->rx_normal_irq_n[chan]);
+-			u64_stats_update_end(&stats->syncp);
+-			ret |= handle_rx;
+-		}
+-		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
+-			u64_stats_update_begin(&stats->syncp);
+-			u64_stats_inc(&stats->tx_normal_irq_n[chan]);
+-			u64_stats_update_end(&stats->syncp);
+-			ret |= handle_tx;
+-		}
++	if (likely(intr_status & XGMAC_RI)) {
++		u64_stats_update_begin(&stats->syncp);
++		u64_stats_inc(&stats->rx_normal_irq_n[chan]);
++		u64_stats_update_end(&stats->syncp);
++		ret |= handle_rx;
++	}
++	if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
++		u64_stats_update_begin(&stats->syncp);
++		u64_stats_inc(&stats->tx_normal_irq_n[chan]);
++		u64_stats_update_end(&stats->syncp);
++		ret |= handle_tx;
+ 	}
+ 
+ 	/* Clear interrupts */
 -- 
-2.48.1
+2.34.1
 
 
