@@ -1,78 +1,75 @@
-Return-Path: <netdev+bounces-201274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519DCAE8B5F
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:15:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9302AE8B7C
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB63D16A8FC
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:15:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5691894F86
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5E628643E;
-	Wed, 25 Jun 2025 17:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEE329ACDA;
+	Wed, 25 Jun 2025 17:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NIAxI9Q+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2ELG/mJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C813224F6;
-	Wed, 25 Jun 2025 17:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147CA286425;
+	Wed, 25 Jun 2025 17:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750871733; cv=none; b=C5mBOVE3aDHvIB/49/SugPObJJsidHDxlrxNP2gk0NM6JiCjPLCc9aT7Sr+Qia+AeaRBzLCW3/OFJweSwLQnOQmjV6m6APsyO/0l8DH5EAtE+EG6oBK8zaSIsUzmfJJzNT1liyb9mLl8oWH+PxM3uGAhxu92k0VGpeycaSKnrXE=
+	t=1750872357; cv=none; b=hkHEvVMuSqceZyFA/+oZy1TkfMEieRrPgxs9H2FO6KRhlOR30EOUICKgDYtnju7w0U65PZtyLXHDkGrwt+uNvjFQ2YCCnkwWKYeaDcA46l2QrcyOS4BrDUlsuHviQNkx9srxaG/Q1d1vOt05F2nexspeoLfIV0PaTw2pvMUlVYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750871733; c=relaxed/simple;
-	bh=tsPO0OiBG0PBkJSG9uxmHSEGiRUT65aNlEBWC9J6YaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMfxru8/sPGv/VBM6CddvxZmKRQltgOK85g0w6xVp+UZtLFdaVd12LgyxCwyyrQt0KcJxO7uMBCwyyZsMnX78OU7wcnM3lVBc95fh9MhKzDe33w7oY8y/YikVmDGXGQgCOt4+Ozgej+Gi09gEVyoAtvEYnL24VcIHdaGTKrJDIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NIAxI9Q+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 481A7C4CEEA;
-	Wed, 25 Jun 2025 17:15:30 +0000 (UTC)
+	s=arc-20240116; t=1750872357; c=relaxed/simple;
+	bh=RjwaVkDwG0wA9+4LhiqKV6sQ8E16YQNtVSdf04Kosu8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VPQg4s3ugqZmZ2+l3BmPUi2FAiecgremCvQOdnNWpcEWOIvS6yY+Dleof8cP7osFqEz3zyY8l7P0BQey8kQmqjblr5ClAToCgiDbrz3OpcG/52F2Zs/2Q9I44Egvd6uMWfK9G4B7bm4nAHyRC0IQSH8KrYOYQZ9y8UWtZKM8aQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2ELG/mJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B322C4CEEA;
+	Wed, 25 Jun 2025 17:25:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750871732;
-	bh=tsPO0OiBG0PBkJSG9uxmHSEGiRUT65aNlEBWC9J6YaY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NIAxI9Q+V8bIHjAs4Fxp6lyInGwd77wN+e9vmBEL9ifR9OCEFHhAzhrvlKGvgHS5W
-	 N7hCw9fCHd1xuPRiJSY4Jk8ElbiVC7OjcsaHCvY1KhIstYCJRuc2xIzo3jQf1ZpB6A
-	 DV7fO5csG6cSpBbstMfChRSNOoEchn4g1yEKtb8EaeZVSSn5+njtXTuCmzvWFlkKM9
-	 OPRt/QlEg+cQJn9yI4LqKLcUth3kBuk6eaBMjfC1xxzdD7MNGEUqHYyoLNc9UwqtRS
-	 Su0X5XW80XeRCwGEkcS7giV/udeIDDuHieRiDiMvqJTBPjgTbs9LGckRkB4BeRWBJe
-	 DMAt42uMfA4rA==
-Date: Wed, 25 Jun 2025 18:15:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: Rename renesas,r9a09g057-gbeth.yaml
-Message-ID: <20250625171528.GK1562@horms.kernel.org>
-References: <721f6e0e09777e0842ecaca4578bc50c953d2428.1750838954.git.geert+renesas@glider.be>
+	s=k20201202; t=1750872356;
+	bh=RjwaVkDwG0wA9+4LhiqKV6sQ8E16YQNtVSdf04Kosu8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K2ELG/mJq2c1hfuhWol5lqPLSdb5lXqf6cNl7OlOXBE9BeuHvP9RznFP0RXHYBb2p
+	 LW49rctl/BB3nyX6DehyL5HqflFjROcRPajiC83gfxShO8EQxZWxpuw2Dij6Q0Osj8
+	 UPYBuXPIIRZWXNXF55rNaGU2aCxkUn3YDnELuvusnRsM9yG3NmHbdUgpHQRfWAcHAw
+	 E3luR5lMyUV+6Okwofv5L8HfQQzXZa7yw8A449UClVHcISdoZVB6I1ZJOC8SjTaqot
+	 8wEtHzSZq9D8XOy6XOriPSrai2rFNv9Nk/skc9QsZP81z1BT2mE5BWSIM2A7spneFL
+	 ad8VLfUJpBdCg==
+Date: Wed, 25 Jun 2025 10:25:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [GIT PULL] wireless-next-2025-06-25
+Message-ID: <20250625102555.35d3509a@kernel.org>
+In-Reply-To: <20250625120135.41933-55-johannes@sipsolutions.net>
+References: <20250625120135.41933-55-johannes@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <721f6e0e09777e0842ecaca4578bc50c953d2428.1750838954.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 25, 2025 at 10:10:48AM +0200, Geert Uytterhoeven wrote:
-> The DT bindings file "renesas,r9a09g057-gbeth.yaml" applies to a whole
-> family of SoCs, and uses "renesas,rzv2h-gbeth" as a fallback compatible
-> value.  Hence rename it to the more generic "renesas,rzv2h-gbeth.yaml".
+On Wed, 25 Jun 2025 14:00:22 +0200 Johannes Berg wrote:
+> And for -next quite a bit more, but not all that much
+> that really stands out either. iwlwifi picked up a bunch
+> of really old cleanups from patchwork "spring" cleaning,
+> and the rest just move along with regularly scheduled
+> feature additions. No known merge conflicts here either.
 > 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Please pull and let us know if there's any problem.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hm, cocci points out a real bug here I think:
 
+drivers/net/wireless/intel/iwlwifi/pcie/gen1_2/trans-gen2.c:550:2-8: preceding lock on line 496
+
+Not major enough to delay pulling tho..
 
