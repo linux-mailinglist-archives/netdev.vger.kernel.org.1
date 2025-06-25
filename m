@@ -1,80 +1,136 @@
-Return-Path: <netdev+bounces-201265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FAB3AE8B0A
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:05:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D640AE8B35
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D3961899EAF
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:01:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 512607BA55F
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B407D2D8DA8;
-	Wed, 25 Jun 2025 16:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EE02DAFB5;
+	Wed, 25 Jun 2025 16:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jHNahn6L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YhsQJ2l0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B692D5436;
-	Wed, 25 Jun 2025 16:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629842D6613
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 16:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750870238; cv=none; b=FEXFj6xqUh4T6BQ7vRjzXcSm4RzAN6chtP8GySd0QEgdOrRyEFSwE1kICPC6DbdMg9/L2devIsRfHi3AOel2L80n7lrU7OJRuaMJMcI+tYQ88HIgM2g1yJXL2cQxBgRdx+7KaUZcZma1mIep8ELoarUqKV4LUDoXMBwYDH+1jlM=
+	t=1750870487; cv=none; b=LCFRGUhxtX7UiEVdoys8hiBrTaItXMpiD6wiKMsmSCoCMseUV0l4qr51FaDiZdyp+mtTbuYZZzIwiMVU/QFp6o4KzVQnCSfr8g4aLrQyTrrwwH6B2Fo4ALmQFrmlqNE4G8JNuWrGfeaI+SaijF7Mj8d85v1YGc2/Kh5gOKo8vbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750870238; c=relaxed/simple;
-	bh=/C5v0k5vwFElv+YbYy/5m/tariiZVeEQsCrYwhIpOgM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q5VcsrpEU+UM5KD1EWLGV/7ldOR7Q3oI31CcFVK8gbjdMlfFEgaupsOavH+q29eBexMqADstAWavTvdKTEeuHKSqVlMrTTT4X0NS8esTGzyPDMx6pnf+Hq04iJab+FfbW8mj+QfHdyiFbmQzbAuRqv8PRTn5If6h3cWPVOGDsVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jHNahn6L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23711C4CEEA;
-	Wed, 25 Jun 2025 16:50:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750870238;
-	bh=/C5v0k5vwFElv+YbYy/5m/tariiZVeEQsCrYwhIpOgM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jHNahn6LRu21+klp/cyu2n5YuMLCBWSbr4fTLnpMpKi7gOZxEV+S39okDcHLzcbph
-	 6wZtiAsktCFPmTYkN9YsQ9bZsNbrsb3iG5iG9OLHzB0+kAghrrXHb/3JxnoeU+HU+Y
-	 LFYKhahqlGStnmXkBzJQMi0mh69SU+kuehtKZZP7YICStbPI8+m2CDWR8w8TZQfAJo
-	 t6mY8jWFUpfE2BbEyH1UrwhdRXogN8biZzNRmTNut9wRhGs/IqAPH33F2zzp0U0XlY
-	 DGbx7tAemI8v33e4KdbZTSU/I3rZQk7QmSi8LG0Ik+7K/2g6vGutqnBr0A72HpVfuA
-	 fY9Z8leedl0lw==
-Date: Wed, 25 Jun 2025 17:50:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mengyuanlou@net-swift.com, duanqiangwen@net-swift.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: libwx: fix the creation of page_pool
-Message-ID: <20250625165034.GG1562@horms.kernel.org>
-References: <434C72BFB40E350A+20250625023924.21821-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1750870487; c=relaxed/simple;
+	bh=lBDbDMqM6EzL06NdbJFJ7I/PhA09JDo2Zq/svCi5Xr8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MieGs7680djtlxpz697gbZjGprOVQ779kqekkOTMkBURMlIRP/4o9wrN3M5ZUZIo4KSue8AqaIBS6qjR/3VJ24mgQ+K6mmx0GkXfV+izqnJtE+PzZ0tX5roTspIo8RI8Ppu4BGdIl5WtLyHRY9aLxuInT1Ah2iPVdcvaqHaFUXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YhsQJ2l0; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23508d30142so2157485ad.0
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:54:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750870486; x=1751475286; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lbj/LroNXpAiNEpwMzoE137rEOQVWGByOHdjSXhauBc=;
+        b=YhsQJ2l0jRZo3jh0qVxdxCB1W4AUkoRKrMaWKarhpXuLuMtVWH9PmrUWc2LBxXjY9L
+         c7qDxvjcKTMfw3zYZM35GBp0+E0p06hQtGsmnWwwDEl03y0Nzs5L6dLCUemzsZQOe36/
+         AogGgjY7X5Aj7Xs+RkRL/J+vlcINhGTU+JsuPtseNvW+ojHNLnbfSoLjy8AlTaXYzOXs
+         FKA6g40yXzNZl05wnouJFPcjuiIpRcAGTRefGe8i5RQDa7iZhh1PsKjD1p2wikGKSLSx
+         MqLg76pyvnKg26uiOWpfK1yFIZBt3EFc3vZF2/aLIDZceWzu99QbSvnS7PzouUZU7vry
+         WnTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750870486; x=1751475286;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lbj/LroNXpAiNEpwMzoE137rEOQVWGByOHdjSXhauBc=;
+        b=E48PjIZT9hZtT2Yf+HGlTIOca974eK/WQ/iq+TzcfnCiSNTIE50qcVsbE2e/3JFBuL
+         oSqwcaN8FibvOr1/FS/sG+oJTe0KZj7dEPj47X9WctdJeWzWttOAHywRMjhdkb6jnlTN
+         S25BDMGatKXFht7xDmHwvpGTXfvnxIkAoWK8xkBvrEoHoLlQIfT/2aMMG8TMmVAuL8X7
+         gncFSdcO48kaHPdt0aqa0dl5hZTvWf2/kgsAEYt4kWmtF41J4UpgBwG8IJzKGVCWUWJ5
+         X2MqBuDQ7gReT5FNAfnlUw7F11v4kDLNqGwLM8UvdXZpjEb+acHHY522IqF5hKoSsJ4Z
+         OV6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXYe02qjFLFRye4pxg9hqYb/F390+Nl6AOsol6OxF1gXLfsEmewq4ZD5a2vvRYDjThi7nSauLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQmih2wAFR0fMHm4J1w8DPzbU/tsDK7jNQAs6qj7afhmVxmWrx
+	36DAJqpvyu+r/QQjLvpJ17RynlQDHK/At8I+fb/ZmSFOLCcH2EyWA8N5PBW0rq1AkP8cIvxVPNZ
+	LXIp2YhSYpZe1LkNfnyINjgllBx9wGstweiW4CBHv
+X-Gm-Gg: ASbGncsO/Io+RuQYarNcfSfsQXLs8LUol8Fqtyj8St0l/EQknBnPYB9+E+iB8UeWDfe
+	Xw4PRLnmqjzHKpzmuXEpeGKME6Fq8dQ9Fjr+nPFIxHKAfJNtO/XUVvOdr5RmixXLk+7O79BkQJZ
+	XMCLtlGybvfbVPWFyo1lFEtOTm4xOSqk+xbcc0xgMXfRYq+kMjrcXC8kjLEYAYlTd58dfX4RZY1
+	w==
+X-Google-Smtp-Source: AGHT+IFeKVnJc6QCJRGr4OXWCNA2tz6fiMAs4n7uMIeZzjA/074WnKl5a3SxBaJVxigg2QbFJcxfRws/j/7Be7l3uOQ=
+X-Received: by 2002:a17:902:ced2:b0:234:d7b2:2ac3 with SMTP id
+ d9443c01a7336-23823fdd767mr67312345ad.20.1750870485515; Wed, 25 Jun 2025
+ 09:54:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <434C72BFB40E350A+20250625023924.21821-1-jiawenwu@trustnetic.com>
+References: <20250625022059.3958215-1-yuehaibing@huawei.com>
+In-Reply-To: <20250625022059.3958215-1-yuehaibing@huawei.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 25 Jun 2025 09:54:34 -0700
+X-Gm-Features: AX0GCFv9Cs91WMz-ure16jB1p8mN-vn8sTtVBHtyugFOPzB0BkM1M4E2a9WhqYM
+Message-ID: <CAAVpQUBRj7dcq2yPQ+0L7b4piPXAxzmgD9zKvm_n_+mZ97egOw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] ipv4: fib: Remove unnecessary encap_type check
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 25, 2025 at 10:39:24AM +0800, Jiawen Wu wrote:
-> 'rx_ring->size' means the count of ring descriptors multiplied by the
-> size of one descriptor. When increasing the count of ring descriptors,
-> it may exceed the limit of pool size.
-> 
-> [ 864.209610] page_pool_create_percpu() gave up with errno -7
-> [ 864.209613] txgbe 0000:11:00.0: Page pool creation failed: -7
-> 
-> Fix to set the pool_size to the count of ring descriptors.
-> 
-> Fixes: 850b971110b2 ("net: libwx: Allocate Rx and Tx resources")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+On Tue, Jun 24, 2025 at 7:04=E2=80=AFPM Yue Haibing <yuehaibing@huawei.com>=
+ wrote:
+>
+> lwtunnel_build_state() has check validity of encap_type,
+> so no need to do this before call it.
+>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
+Next time please wait 24h before reposting.
+https://docs.kernel.org/process/maintainer-netdev.html
+
+Thanks!
+
+
+> ---
+> v2: Restore encap_type check in fib_encap_match()
+> ---
+>  net/ipv4/fib_semantics.c | 5 -----
+>  1 file changed, 5 deletions(-)
+>
+> diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+> index f7c9c6a9f53e..a2f04992f579 100644
+> --- a/net/ipv4/fib_semantics.c
+> +++ b/net/ipv4/fib_semantics.c
+> @@ -625,11 +625,6 @@ int fib_nh_common_init(struct net *net, struct fib_n=
+h_common *nhc,
+>         if (encap) {
+>                 struct lwtunnel_state *lwtstate;
+>
+> -               if (encap_type =3D=3D LWTUNNEL_ENCAP_NONE) {
+> -                       NL_SET_ERR_MSG(extack, "LWT encap type not specif=
+ied");
+> -                       err =3D -EINVAL;
+> -                       goto lwt_failure;
+> -               }
+>                 err =3D lwtunnel_build_state(net, encap_type, encap,
+>                                            nhc->nhc_family, cfg, &lwtstat=
+e,
+>                                            extack);
+> --
+> 2.34.1
+>
 
