@@ -1,168 +1,163 @@
-Return-Path: <netdev+bounces-201221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E903AAE8858
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:38:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AD7AE883A
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91F51885D36
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B40217FCD6
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E2E286D75;
-	Wed, 25 Jun 2025 15:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC79018DB37;
+	Wed, 25 Jun 2025 15:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EPceV2E+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hukUymb6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A411A5B8C;
-	Wed, 25 Jun 2025 15:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8071E1C3F
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 15:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750865649; cv=none; b=WyNUTHNs1WmMviXVaf5ZVDOuozDnnjtm5zqi5oJ7bHnQaeT6T5NdHOZyHFVQnkiq/Lu3wbEKlJvFcAaKY/VsHWWQfbl7UuTNsjVdUfokFpOMSVtCe3DrV1xPOYehtsx9NUVE5b2IPn5fPQoX6HyaIPCJdo2EdXyZGO/TuteCqxM=
+	t=1750865600; cv=none; b=SXII0D9XRc18AfO1RKwxrFBpdpol58bYWXaygGmYV3VbmHubOnpH9CKp4uz4G36QRyOb7GQHE2MTyGon4k/quinIGjrWAkoWtjI8AEHul/tZkMSxfEc+HGD5SQCd4D6JPpp/FRBFF5SVJBekn+Whst+LWOGrJ0S9BPe7VvoAvZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750865649; c=relaxed/simple;
-	bh=GO8/l9hZdF/FDZm2vS40Wtzn+Q/5nvto7+1zvwL9SiY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=acqSnD1iy3ld24SWq2CgcQhvDxK4OxxTrnB1BkxG7JkHf12RhNAfm2azmh9jVp/m3RqGGExJDzTxpAQTyb4OimznrddUTLlWlfcuiBXIvKA7Q+fd0NYMY1tHi0hbTr85ye1GVdSPHKqNETqwvYMbGSyN5RtXz2SHBv/0csYWS5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EPceV2E+; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-74264d1832eso139959b3a.0;
-        Wed, 25 Jun 2025 08:34:07 -0700 (PDT)
+	s=arc-20240116; t=1750865600; c=relaxed/simple;
+	bh=c8FSfguKABksIcExAHgtfoLmBGZaZ1ts3uapmjwMvAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pSSd6l8xSism9Fp6nA/F9WxTcRBCoIh8HQaOfh8ARb25uJkvUm+JmFPFVv3h6FwWFPZL4pDbC72naha9Jg7RNOatqw7FmIHk2hy4jG22KcAAmSxxLUWyCxoLwGbl2y6sbveKlvqA/guI82GjFpEP8/HHX7OFrkOIG75QHVDGeHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hukUymb6; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23636167afeso143785ad.3
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750865647; x=1751470447; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/XVVjse7SLe3BXVW5yyOf89DyqZxU9QrMZCJroaokII=;
-        b=EPceV2E+qgp3zudMaH2HwtBhmy2B4Nw7EFCSmeO7JjdevPzlYLszyznOCpEzEyCkE5
-         DbXUlT7JDpTlIy8S+RVBL0dFmqEx6JTegaYzU9xoL6DVGdLQfGerjq0MPt+sUyeg31qi
-         NoOLLMAmI+MUueSFvvFdEfE5b5z9eO+7jOUQyEdNKE935XBjvbsqYuG5eTtcr+UfemWe
-         KYAwfwE8iXmWtnuLOhJmK9Z6pVcZQ0ef6NOnlJKroA0Lrq4fgQBrtJhN708RLZwnHASA
-         1Ggcbm+Gl+IVbFwyife9b1IVRspbM12gq59HWxkVKnqUNsAr5F8ozj/JBugRznlu/yLQ
-         DDxw==
+        d=broadcom.com; s=google; t=1750865598; x=1751470398; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=B3s1/vNdKwqKk8VSN6xQBK6wRzwuNkbzzDSegXDItxY=;
+        b=hukUymb6okcLnK+7L4pHtp9GfI0+G8gntIyxa2hTReo2REGPEmAVZIajSd/VcdZMA8
+         q41+B8J5EGLjHpVmsDcGdVKb/bvS5gZsRMT9PCDjYJJ3AgIiBU0DXJDvRrAaTQWHL34d
+         64gws/YDFMXjSv7q4zp0FlyGt8215F6WBaBx0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750865647; x=1751470447;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/XVVjse7SLe3BXVW5yyOf89DyqZxU9QrMZCJroaokII=;
-        b=fmyFsbK50n7gRLzLdh+tgFyu79LvzBxH8UXpntq04w1zcsLLemRufojW90sPIaQJ9D
-         soodrxYHb21OvO9eYQCmDNYSKCswqedS3sTaIKMgi6YDYItKJHgFspx9MxjdUldDRLxM
-         vdlKgHBCZhS6O5JDuxcmSiuDGFTw+9BA1RXvA4D9KZrDnMm4iMfU7nY9apMmHp+US7fP
-         9AlcymbNsbTAVp3P2NIxXglf9IXxfoelJKRjF21OG9+1pOKjkFcnIu1PTJcR4Ifz7v6d
-         9Hl9gUZl19CQ6waBm4A3eyNbDlzadG7H951jdg3RC6FQ9bdogiEBqfUFz93BbG/k878M
-         iafQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUerbwfTykDAsXeOUOYoegTkl0cp4AV1+2LW0oTFn+0GCR/j8+Id9t3mjlW36EksKETb4Z7P17s4El5X1A=@vger.kernel.org, AJvYcCVCsJVs5dATw65kQIv5r2/Dtmnd5x2fGf3KJdMQQ4V8oS/xVphcDImWf7/p9597gVdFUbIFe+GXoUMaCcEQvdo4@vger.kernel.org, AJvYcCVI6EBaJTwCdpHS5DUHGHpvsshg0murH0/FlTSPpp32BlYOkE1h/we9YRUsXQWCi7TU2a1uPwnB@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXezlqRCYf7GtNrEhOxDSGxtAHDFh3NidV/1BOo5aqITILTJfP
-	O04BOVjr91ln4miF7qYQvOs6CVW1DPGOHt7tQSXn77gOpanGQz1Y0s6N
-X-Gm-Gg: ASbGnctYsJtEf9NbZ8wGI4fCaFN0h7bxQqpOxQQUWVSpS8w84k23NAfNywhL4J46+td
-	aAQq2NQ0xmElQeCaqMsgHHwCoKT/Anf2TRi8EhnJAyCZEz7IV/viWU76zhg4XNlTcWa1jbVc2uQ
-	utiLe72gG+8Y4A4MDMNGFZ6CjreuMf9CG9xxlIjdkmq6npAAU/Gvi71aC0SubDMllr+QHAUOYjx
-	MKBGPBiM0/b8sYpIozb8Vz2gm7tgh7z7x++hSTBzvGYZTuf8H23nMpxNK2uWLoMuF+mh1KkkejO
-	q516ej/FPwAXDHp+y2BfwntRZF08tHAC6+ImsIOwZECs4Mohm6arnR7USd1OMYgEjeKrgeJnE/V
-	oG3E8rZOIT+WWV3aevRf44/drN7a9vlwcSQ==
-X-Google-Smtp-Source: AGHT+IGEsigkbjsnTclJYWdU60y2qHEdvcVG9LRVDW0dYPsNGLYx5hAXrCi7negqVdxFafDSDMwEyQ==
-X-Received: by 2002:a05:6a20:1581:b0:215:fac3:2ce2 with SMTP id adf61e73a8af0-2207f28f8bfmr5849761637.23.1750865646715;
-        Wed, 25 Jun 2025 08:34:06 -0700 (PDT)
-Received: from malayaVM.mrout-thinkpadp16vgen1.punetw6.csb ([103.133.229.223])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b31f1241f07sm13043969a12.37.2025.06.25.08.34.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 08:34:06 -0700 (PDT)
-From: Malaya Kumar Rout <malayarout91@gmail.com>
-To: malayarout91@gmail.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests: net: fix resource leak  in napi_id_helper.c
-Date: Wed, 25 Jun 2025 21:03:07 +0530
-Message-ID: <20250625153334.434747-1-malayarout91@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1750865598; x=1751470398;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B3s1/vNdKwqKk8VSN6xQBK6wRzwuNkbzzDSegXDItxY=;
+        b=DQFkvSoVvYSL8o7vHhyNlXjfJ3OBRVXDclHzDPYwPKZWD3NUel2MAzZHgSjObjarsq
+         Dv6lVwsGfs7g4446xkSlYWjzLaKZR/Ezb1Bx5CTyHJAePUUAeVnQ1pNhom3XzcdCnC8p
+         0NWod9p2ZrcoRr48Z8f0jX7+UVSiMcy2Bg0AmHTZi3KJkpoV/IgWUrfPslxEItABDD20
+         rYWX5lmd59DVsiQCFfJif32BC5ZSLqT+LTVclYfwF/iKbBS67u3ydLYoQUeMehq00thM
+         eUVqCnTMEdwMSUqAn7FsRJWkn3NpWMBi144Cvw9ZRURRR0RpWq9d8Ey0X4IpRquMPlTl
+         bbUw==
+X-Gm-Message-State: AOJu0YzZYHYxmYUtMCxDrhgacbD9aFJHJyaD/hergIZdk9sXzOvAu9IU
+	rHvc6b8RPLtqGh7sjYDDr2dfGQME5lqJ3yGZhprnNdvwmoQ9MG9WO0VGIDlCCQP8DVLpl60Qa43
+	/wP47dw==
+X-Gm-Gg: ASbGncvlEuCkY4IcjIfN54bZ0VStKFdvKeg8NWfOvn/dHXwJQCGCQsueg8s3nQ8Pdow
+	Ld4Ruy9VrVJusTEfI5PCoRlW5e5lnfppuRT6OE+Uk6MxD6JIkUakoKENrk74LNqyb0p9f3CU6b+
+	EWuL1kBhE+kwyVNVxhDN69yuUD4hVLifmN3YPGllMNTZkofeMdQgloGsqhna8FN6rjTc+VkUutM
+	Jio1cUbjzXbfIW/M7ArPiSdNELcf9M170xQnCueYjijmlBNGS1aV+8dOkoWwfp2X8wuJiuGTYJx
+	zxL6DxdSu8ANhTPH3WJaw7qRe/boPBgX4qVF0BkOedbRcOMzg5Atd3jkJcioeSGbOHdxoANCiQ/
+	fEl2iHm/Eee4/EiC317EVywApE3EtGkrFjLzM
+X-Google-Smtp-Source: AGHT+IE6utduW+535yEDioFqrmKeyfIowaXtoHnhSNqF69KT4DRMAW5+oa67HG2s7FBAglWod2kbzg==
+X-Received: by 2002:a17:903:2a8e:b0:234:dd3f:80fd with SMTP id d9443c01a7336-23823f88a80mr69721385ad.2.1750865598550;
+        Wed, 25 Jun 2025 08:33:18 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d86103c1sm134739815ad.105.2025.06.25.08.33.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Jun 2025 08:33:17 -0700 (PDT)
+Message-ID: <e29788cb-1817-4168-b058-5d02332f03a8@broadcom.com>
+Date: Wed, 25 Jun 2025 08:33:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Supporting SGMII to 100BaseFX SFP modules, with broadcom PHYs
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, Robert Hancock <robert.hancock@calian.com>,
+ Tao Ren <rentao.bupt@gmail.com>
+References: <20250624233922.45089b95@fedora.home>
+ <24146e10-5e9c-42f5-9bbe-fe69ddb01d95@broadcom.com>
+ <20250625091506.051a8723@fedora.home>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250625091506.051a8723@fedora.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Resolve minor resource leaks reported by cppcheck in napi_id_helper.c
+On 6/25/25 00:15, Maxime Chevallier wrote:
+> Hi again Florian,
+> 
+> On Tue, 24 Jun 2025 15:29:25 -0700
+> Florian Fainelli <florian.fainelli@broadcom.com> wrote:
+> 
+>> For 100BaseFX, the signal detection is configured in bit 5 of the shadow
+>> 0b01100 in the 0x1C register. You can use bcm_{read,write}_shadow() for
+>> that:
+>>
+>> 0 to use EN_10B/SD as CMOS/TTL signal detect (default)
+>> 1 to use SD_100FX± as PECL signal detect
+>>
+>> You can use either copper or SGMII interface for 100BaseFX and that will
+>> be configured this way:
+>>
+>> - in register 0x1C, shadow 0b10 (1000Base-T/100Base-TX/10Base-T Spare
+>> Control 1), set bit 4 to 1 to enable 100BaseFX
+>>
+>> - disable auto-negotiation with register 0x00 = 0x2100
+>>
+>> - set register 0x18 to 0x430 (bit 10 -> normal mode, bits 5:4 control
+>> the edge rate. 0b00 -> 4ns, 0b01 -> 5ns, 0b10 -> 3ns, 0b11 -> 0ns. This
+>> is the auxiliary control register (MII_BCM54XX_AUXCTL_SHDWSEL_AUXCTL).
+> 
+> And I have my first ping going through :) Thank you so much, if I get a
+> chance to meet you in person one day, drinks are on me :)
 
-cppcheck output before this patch:
-tools/testing/selftests/drivers/net/napi_id_helper.c:37:3: error: Resource leak: server [resourceLeak]
-tools/testing/selftests/drivers/net/napi_id_helper.c:46:3: error: Resource leak: server [resourceLeak]
-tools/testing/selftests/drivers/net/napi_id_helper.c:51:3: error: Resource leak: server [resourceLeak]
-tools/testing/selftests/drivers/net/napi_id_helper.c:59:3: error: Resource leak: server [resourceLeak]
-tools/testing/selftests/drivers/net/napi_id_helper.c:67:3: error: Resource leak: server [resourceLeak]
-tools/testing/selftests/drivers/net/napi_id_helper.c:76:3: error: Resource leak: server [resourceLeak]
-
-cppcheck output after this patch:
-No resource leaks found
-
-Signed-off-by: Malaya Kumar Rout <malayarout91@gmail.com>
----
- tools/testing/selftests/drivers/net/napi_id_helper.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
-index eecd610c2109..1441b8d49b91 100644
---- a/tools/testing/selftests/drivers/net/napi_id_helper.c
-+++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
-@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
- 
- 	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
- 		perror("setsockopt");
-+		close(server);
- 		return 1;
- 	}
- 
-@@ -43,11 +44,13 @@ int main(int argc, char *argv[])
- 
- 	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
- 		perror("bind failed");
-+		close(server);
- 		return 1;
- 	}
- 
- 	if (listen(server, 1) < 0) {
- 		perror("listen");
-+		close(server);
- 		return 1;
- 	}
- 
-@@ -56,6 +59,7 @@ int main(int argc, char *argv[])
- 	client = accept(server, NULL, 0);
- 	if (client < 0) {
- 		perror("accept");
-+		close(server);
- 		return 1;
- 	}
- 
-@@ -64,6 +68,7 @@ int main(int argc, char *argv[])
- 			 &optlen);
- 	if (ret != 0) {
- 		perror("getsockopt");
-+		close(server);
- 		return 1;
- 	}
- 
-@@ -73,6 +78,7 @@ int main(int argc, char *argv[])
- 
- 	if (napi_id == 0) {
- 		fprintf(stderr, "napi ID is 0\n");
-+		close(server);
- 		return 1;
- 	}
- 
+OK, that's great news, looking forward to seeing patches, and I will 
+remember your offer :)
 -- 
-2.43.0
-
+Florian
 
