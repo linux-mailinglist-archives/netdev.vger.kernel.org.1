@@ -1,181 +1,225 @@
-Return-Path: <netdev+bounces-200939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 425D1AE7628
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 06:50:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008E4AE7652
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 07:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E954D189BCC3
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 04:51:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 979E37AE376
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 05:06:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF7A35280;
-	Wed, 25 Jun 2025 04:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MUEcDAHu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784681E1E12;
+	Wed, 25 Jun 2025 05:07:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D417A33E1;
-	Wed, 25 Jun 2025 04:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D554A04
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 05:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750827043; cv=none; b=TJ5lY8EC2DqzQTTdk6qEuCfGX05gtIPCcdr7hJN9xYcg+qj5Zay7P5gzecTJ80qKk6/SPhWk1vrITqPfuinck0mQF/cJa9cvwIHgKCF8NEQN7ivaULy/TSVT3dP7y/MiMo2ZVdRaCyj5H2MQs9r9k8w0HUUDQEf70oIuPe7rVtI=
+	t=1750828077; cv=none; b=tlbhT1C1Z8VUQ8fGCpSFRbYwnjJOHqPPZjnmdxUFLbK/JbXWtm7wCg3Cef0Z2r9jb0jA0mAPq9HBZLjmB7j6dpKK6IPFG8l6PjsDHKbV50ioEAARJdgVPdoVXDtMK7J/FAfbB9IaX2XfquATlNu18m0dXeM8KW2xe8s0zF4bIYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750827043; c=relaxed/simple;
-	bh=aqc+gMpA1+DN/Tgx5x6Ya26P2nW7j0pFtfe7QzjlQQk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V6IfYiDwZT7jnf4ih/woS9aUpPMlt4OtA5/H2Zd7FIONLehDIDMyhnB6oBn2d+rrDyNXf6z25dKVUHZopnLLJ68/HUj2OWSQit0emwPw77D0iacSFzuMjLfwlzOXG3wFTxW6W2HdmgEhvOr1k8lC5vixFXJFCJfE6rLvXF1LTNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MUEcDAHu; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55OHo9tt012444;
-	Wed, 25 Jun 2025 04:50:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Gl2wiN
-	HMAFt67+IRnkJBFBrLINO7jV0ZGXoIV4h5SFU=; b=MUEcDAHuC94c2fXhhbmN97
-	JURgjCfOSkUbzfvC1w2la5J8rRXPPDQdJcpEmCNaP3elTN9tFIjRqcZc55REMEYP
-	YALjywxZ5JHsvi2ID6ckDd1g9RqE+q+QSPFOR4HNJK2J2TnOXW9gKH0O3mBeL1fN
-	mp6vvGwYl5HdOVC7Nr1rm0mddT/AzVbpQXIG28P0p54XjD5D8sOsj/SaFYe85yGg
-	roSXuQ5Ax3pId9vV/VPKaBAq3RGKqFtpPWwO1jLjd93cZmCvJwjtZ/oR32FpIvg9
-	fDXEkNMBUSsHsvtj/CxUzlzIqyzdIHlATBvqEkTSOj1mI+GnRtSR9Zyi/9AP2udw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dmfed3h3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Jun 2025 04:50:27 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55P4d2Fi006952;
-	Wed, 25 Jun 2025 04:50:26 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dmfed3gu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Jun 2025 04:50:26 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55P1lQfN006497;
-	Wed, 25 Jun 2025 04:50:25 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47e82p7kpm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Jun 2025 04:50:25 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55P4oNet24511216
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Jun 2025 04:50:24 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BF6D55805C;
-	Wed, 25 Jun 2025 04:50:23 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1BE0F58058;
-	Wed, 25 Jun 2025 04:50:18 +0000 (GMT)
-Received: from [9.109.246.12] (unknown [9.109.246.12])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 25 Jun 2025 04:50:17 +0000 (GMT)
-Message-ID: <f2e3188b-02b4-4e23-8910-a180661dccba@linux.ibm.com>
-Date: Wed, 25 Jun 2025 10:20:16 +0530
+	s=arc-20240116; t=1750828077; c=relaxed/simple;
+	bh=waXfcG5v0rXqRcCAzxpLXzM9P7vWSOedGgAQ0IRkqT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=byFCk13YFjmfWRPdzpfX0RxsetUCI0OeJTlWjiqB3SJyuYicQeY/nLlZWwpoNbQyEQraFScQxktOr+ZIRWR34dPUHBkTNebMz5zlHgq/0te+czXVq1JqTwbg5QnuYA8diqRiHjyIvbeK+xTDaciGjInzAWEA+0laBNxdLbkABmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUIMK-0003XV-KB; Wed, 25 Jun 2025 07:07:44 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUIMI-005EFQ-2d;
+	Wed, 25 Jun 2025 07:07:42 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUIMI-00H3UX-2A;
+	Wed, 25 Jun 2025 07:07:42 +0200
+Date: Wed, 25 Jun 2025 07:07:42 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v4 0/4] net: selftest: improve test string
+ formatting and checksum handling
+Message-ID: <aFuEHpbjGILWich1@pengutronix.de>
+References: <20250515083100.2653102-1-o.rempel@pengutronix.de>
+ <20250516184510.2b84fab4@kernel.org>
+ <aFU9o5F4RG3QVygb@pengutronix.de>
+ <20250621064600.035b83b3@kernel.org>
+ <aFk-Za778Bk38Dxn@pengutronix.de>
+ <20250623101920.69d5c731@kernel.org>
+ <aFphGj_57XnwyhW1@pengutronix.de>
+ <20250624090953.1b6d28e6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] MAINTAINERS: update smc section
-To: Jan Karcher <jaka@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Halil Pasic
- <pasic@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>
-References: <20250623085053.10312-1-jaka@linux.ibm.com>
-Content-Language: en-US
-From: Sidraya Jayagond <sidraya@linux.ibm.com>
-In-Reply-To: <20250623085053.10312-1-jaka@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bWdCRdCC0O040g0SDJB3bfhSIJ2cT4os
-X-Proofpoint-GUID: JqIB68JLk1AU1IpRxK_2PzTWzGThMiH4
-X-Authority-Analysis: v=2.4 cv=BpqdwZX5 c=1 sm=1 tr=0 ts=685b8013 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=ThVKj-xsHEq-ROeZF2sA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI1MDAzNCBTYWx0ZWRfX+hXs07Y7fe72 HfrsRPeqB7/JzSAepNkvavzObo0PXhUaDCkbTBmUtYsPS1NHpkweAJWC+dWTK9l91INc3ZzfPx2 tdbaqk3BqggyCMCwV8UTS5NZbE5JQLHKRzjJyeTIzCG2qVwJNb09ggAOOwUs9rK24AnseHtM/8/
- fPSKtz48LwjbhnmoVbAcRhRy5gi0Fvl4uWPMXuPxrDDiYmeGNnPkpuj66yZYUu2GiC8lX5MzqwJ NgOWvkZvtszSQ6PZ+HCDbkXqFhU5OoRPpWwgDjgqC+jnb//21O3wWXq/FdThJYnMt+QKWtd8EBh UOvNJSG8dMFQbsWbMIRd5E9SLKYy22DBB7sFEgBJS5JU7PKm6Nf+YTO/nDj0ICtTcIol0cmVFVO
- mjuZiJiVcONKcCcbRDQrT/5kwPAWGrDM8Ggmv65wu8TU4AewxTkLL/+h8TN4G1M+zU2BwuWL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-25_01,2025-06-23_07,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 clxscore=1011 spamscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 malwarescore=0 adultscore=0 bulkscore=0
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506250034
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250624090953.1b6d28e6@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-
-
-On 23/06/25 2:20 pm, Jan Karcher wrote:
-> Due to changes of my responsibilities within IBM i
-> can no longer act as maintainer for smc.
+On Tue, Jun 24, 2025 at 09:09:53AM -0700, Jakub Kicinski wrote:
+> On Tue, 24 Jun 2025 10:26:02 +0200 Oleksij Rempel wrote:
+> > On Mon, Jun 23, 2025 at 10:19:20AM -0700, Jakub Kicinski wrote:
+> > > On Mon, 23 Jun 2025 13:45:41 +0200 Oleksij Rempel wrote:  
+> > > > On Sat, Jun 21, 2025 at 06:46:00AM -0700, Jakub Kicinski wrote:  
+> > > > > On Fri, 20 Jun 2025 12:53:23 +0200 Oleksij Rempel wrote:  
+> > > > > > Let me first describe the setup where this issue was observed and my findings.
+> > > > > > The problem occurs on a system utilizing a Microchip DSA driver with an STMMAC
+> > > > > > Ethernet controller attached to the CPU port.
+> > > > > > 
+> > > > > > In the current selftest implementation, the TCP checksum validation fails,
+> > > > > > while the UDP test passes. The existing code prepares the skb for hardware
+> > > > > > checksum offload by setting skb->ip_summed = CHECKSUM_PARTIAL. For TCP, it sets
+> > > > > > the thdr->check field to the complement of the pseudo-header checksum, and for
+> > > > > > UDP, it uses udp4_hwcsum. If I understand it correct, this configuration tells
+> > > > > > the kernel that the hardware should perform the checksum calculation.
+> > > > > > 
+> > > > > > However, during testing, I noticed that "rx-checksumming" is enabled by default
+> > > > > > on the CPU port, and this leads to the TCP test failure.  Only after disabling
+> > > > > > "rx-checksumming" on the CPU port did the selftest pass. This suggests that the
+> > > > > > issue is specifically related to the hardware checksum offload mechanism in
+> > > > > > this particular setup. The behavior indicates that something on the path
+> > > > > > recalculated the checksum incorrectly.    
+> > > > > 
+> > > > > Interesting, that sounds like the smoking gun. When rx-checksumming 
+> > > > > is enabled the packet still reaches the stack right?    
+> > > > 
+> > > > No. It looks like this packets are just silently dropped, before they was
+> > > > seen by the stack. The only counter which confirms presence of this
+> > > > frames is HW specific mmc_rx_tcp_err. But it will be increasing even if
+> > > > rx-checksumming is disabled and packets are forwarded to the stack.  
+> > > 
+> > > If you happen to have the docs for the STMMAC instantiation in the SoC
+> > > it'd be good to check if discarding frames with bad csum can be
+> > > disabled. Various monitoring systems will expect the L4 checksum errors
+> > > to appear in nstat, not some obscure ethtool -S counter.  
+> > 
+> > Ack. I will it add to my todo.
+> > 
+> > For proper understanding of STMMAC and other drivers, here is how I currently
+> > understand the expected behavior on the receive path, with some open questions:
+> > 
+> > Receive Path Checksum Scenarios
+> > 
+> > * No Hardware Verification
+> >     * The hardware is not configured for RX checksum offload
+> >       or does not support the packet type, passing the packet to the driver
+> >       as-is.
+> >     * Expected driver behavior: The driver should set the packet's state to
+> >       `CHECKSUM_NONE`, signaling to the kernel that a software checksum
+> >       validation is required.
+> > 
+> > * Hardware Verifies and Reports All Frames (Ideal Linux Behavior)
+> >     * The hardware is configured not to drop packets with bad checksums.
+> >       It verifies the checksum of each packet and reports the result (good
+> >       or bad) in a status field on the DMA descriptor.
+> >     * Expected driver behavior: The driver must read the status for every
+> >       packet.
+> >         * If the hardware reports the checksum is good, the driver should set
+> >           the packet's state to `CHECKSUM_UNNECESSARY`.
+> >         * If the hardware reports the checksum is bad, the driver should set
+> >           the packet's state to `CHECKSUM_NONE` and still pass it to the
+> >           kernel.
+> >     * Open Questions:
+> >         * When the hardware reports a bad checksum in this mode, should the
+> >           driver increment `rx_crc_errors` immediately? Or should it only set
+> >           the packet's state to `CHECKSUM_NONE` and let the kernel stack find
+> >           the error and increment the counter, in order to avoid
+> >           double-counting the same error?
 > 
-> As a result of the co-operation with Alibaba over
-> the last years we decided to, once more, give them
-> more responsibility for smc by appointing
-> D. Wythe <alibuda@linux.alibaba.com> and
-> Dust Li <dust.li@linux.alibaba.com>
-> as maintainers as well.
+> Driver can increment its local counter. It doesn't matter much.
 > 
-> Within IBM Sidraya Jayagond <sidraya@linux.ibm.com>
-> and Mahanta Jambigi <mjambigi@linux.ibm.com>
-> are going to take over the maintainership for smc.
+> But one important distinction, we're talking about layer 3 and up
+> checksums. IPv4 checksum, and TCP/UDP checksums. Those are not CRC.
+> The HW _should_ discard packets with bad CRC / Layer 2 checksum
+> unless the NETIF_F_RXALL feature is enabled.
 > 
-Hi Jan,
-
-I would like to extend my sincere thanks to Jan Karcher
-for his long-standing and dedicated
-efforts in maintaining the SMC code.
-Jan's contributions have been instrumental in driving
-its stability and adoption. Contributors from Alibaba
-have also been actively engaged in the development
-of SMC over the past years. We look forward to working
-closely with them and the wider community to continue
-evolving SMC in the upstream kernel.
-
-Best regards,
-Sidraya
-> Signed-off-by: Jan Karcher <jaka@linux.ibm.com>
-> ---
->   MAINTAINERS | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
+> > * Hardware Verifies and Drops on Error
+> >     * The hardware's RX checksum engine is active and configured to
+> >       automatically discard any packet with an incorrect checksum before it is
+> >       delivered to the driver.
+> >     * Open Questions:
+> > 
+> >         * When reporting these hardware-level drops, what is the most
+> >           appropriate existing standard `net_device_stats` counter to use
+> >           (e.g., `rx_crc_errors`, `rx_errors`)?
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index a92290fffa16..88837e298d9f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -22550,9 +22550,11 @@ S:	Maintained
->   F:	drivers/misc/sgi-xp/
->   
->   SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS
-> +M:	D. Wythe <alibuda@linux.alibaba.com>
-> +M:	Dust Li <dust.li@linux.alibaba.com>
-> +M:	Mahanta Jambigi <mjambigi@linux.ibm.com>
-> +M:	Sidraya Jayagond <sidraya@linux.ibm.com>
->   M:	Wenjia Zhang <wenjia@linux.ibm.com>
-> -M:	Jan Karcher <jaka@linux.ibm.com>
-> -R:	D. Wythe <alibuda@linux.alibaba.com>
->   R:	Tony Lu <tonylu@linux.alibaba.com>
->   R:	Wen Gu <guwen@linux.alibaba.com>
->   L:	linux-rdma@vger.kernel.org
+> I'd say rx_errors, most likely to be noticed.
+> 
+> >         * If no existing standard counter is a good semantic fit, add new
+> >           standard counters?
+> 
+> Given this is behavior we don't want to encourage I think adding a
+> standard stat would send the wrong signal.
+> 
+> >         * If the "drop on error" feature cannot be disabled independently,
+> >           and reporting the error via a standard counter is not feasible,
+> >           does this imply that the entire RX checksum offload feature must be
+> >           disabled to ensure error visibility?
+> 
+> Probably not, users should also monitor rx_errors.
+> 
+> > * Hardware Provides Full Packet Checksum (`CHECKSUM_COMPLETE`)
+> >     * The hardware calculates a single checksum over the entire packet and
+> >       provides this value to the driver, without needing to parse the
+> >       L3/L4 headers.
+> 
+> Not entire, it skips the base Ethernet header (first 14 bytes)
+> 
+> >     * Expected driver behavior: The driver should place the checksum provided
+> >       by the hardware into the `skb->csum` field and set the packet's state
+> >       to `CHECKSUM_COMPLETE`.
+> 
+> Correct.
 
+Hm... at least part of this behavior can be verified with self-tests:
+
+- Send a TCP packet with an intentionally incorrect checksum,
+  ensuring its state is CHECKSUM_NONE so the transmit path doesn't change it.
+- Test if we receive this packet back via the PHY loopback.
+   - If received: The test checks the ip_summed status of the
+     received packet.
+      - A status of CHECKSUM_NONE indicates the hardware correctly passed
+        the packet up without validating it.
+      - A status of CHECKSUM_UNNECESSARY indicates a failure, as the hardware
+        or driver incorrectly marked a bad checksum as good.
+   - If not received (after a timeout): The test then checks the device's
+     error statistics.
+      - If the rx_errors counter has incremented
+      - If the counter has not incremented, the packet was lost for an unknown
+        reason, and the test fails.
+
+What do you think?
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
