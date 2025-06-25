@@ -1,223 +1,206 @@
-Return-Path: <netdev+bounces-201196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A12AE867B
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:29:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4D6AE86B5
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D8797BA8FF
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:25:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74CFA17278D
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4ECD26658F;
-	Wed, 25 Jun 2025 14:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1E626A0AF;
+	Wed, 25 Jun 2025 14:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iD33ZQAu"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E603D266562;
-	Wed, 25 Jun 2025 14:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5D6269B08;
+	Wed, 25 Jun 2025 14:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750861587; cv=none; b=CcTudH51m9v575RaZ96YUCSJg9LEV9MMdCZMwHjKnZqz5pGsJayogAA3xr2PECSVry+MldgKmUtANEqqt9fAusetysfKAPD0B6gziTddSC85E4E3VF36l+fDSNRy7pqt2/nr0xvOnBIolZMRQEw2zFOjarO+xtm341wfX5K8dfY=
+	t=1750862333; cv=none; b=dxwfFKIk/Ak3KNALj76TfngUJkTOWKyq9tgUPq7TuaQMUhtmV2qIS3D2/XWVC3pVSJ4a7iwvUbexQa8fkthxGYbxfMl9LEQvOlnYudR9/1orPQpA6DzsP8V9ANo5PeedJ3Q4lQqxiWUiodOukBBHNE4GI5NFAkH87V4Ouivlvjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750861587; c=relaxed/simple;
-	bh=/9VFx4V/R12ObC+QTUIcUs4r3Yji2iXrxnaQH+uihB0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ePMwJ0m/MuyvrYatfeHUtMwYIlQiIzuMcDgEA0BDqPZA3eGcsL1cZtCh4sqH0v7WT2CGIGfS8cvRkEf7Th5croliUGVjruG2oQ+OnukXSliaG5+V5CbtnbnoiOE4rL+QdFc3ynyP/sFbycdMd0vbhcIiWoLiOVQvTB12RYNroxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 8B9074685B;
-	Wed, 25 Jun 2025 16:26:15 +0200 (CEST)
-From: Gabriel Goller <g.goller@proxmox.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	David Ahern <dsahern@kernel.org>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ipv6: add `do_forwarding` sysctl to enable per-interface forwarding
-Date: Wed, 25 Jun 2025 16:26:06 +0200
-Message-Id: <20250625142607.828873-1-g.goller@proxmox.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1750862333; c=relaxed/simple;
+	bh=cTwRaJlK/PTXSKZazS8/fTQEDEkqeMZtGBeXz+9mOtc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dh4k8OMgkjlIk6fG7JJXzjkiE+0fUau6LfaXKJoOjleynenoQ1dEhc0v5wnE8ftuOAFdOpXYu4Z97INvx6BmSNMjvZR/LParxmthyOHXQgGWao+OWg1BPzWuIRjBPUutEFyAIX78bVMdFrCCgPZRjOiZCk72LC4IJKZRAJDVd4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iD33ZQAu; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750862332; x=1782398332;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cTwRaJlK/PTXSKZazS8/fTQEDEkqeMZtGBeXz+9mOtc=;
+  b=iD33ZQAuRVn/AnTbhP+n3LU+gxPlD2BALaiojISSKH5aFBVMcNlf6zOo
+   qzBBQB7q1/CGY6Tqw/udcteT9xqEdCk2m/77C+oCjx4DWty9ZAohUBQiF
+   cZYAR9ni4c29Gts0XCfHNo/T15KIo53m2mzJb8IT+U33Ad0kE5kBoa7El
+   H4XF3lFuRYBe6mZouna8RaR2SLyTuNrXOKLv/9873/J7xfXb2Umy8mMsb
+   qCvgJVFP5LXYYLIRU/kT7QHrNFnFIk7RfC3zhVqM/lunvge1nukjHSPgj
+   OING2BX3mjC9LkL/Tqa3nW6gRuY1FlnsASXn9zE4JuF7gPVD3AzH3omLS
+   A==;
+X-CSE-ConnectionGUID: lpr8RLpGR76uk92bhPDMHA==
+X-CSE-MsgGUID: XxduBImcQjelNv1jZSIaPQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="53069232"
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="53069232"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 07:38:51 -0700
+X-CSE-ConnectionGUID: m0xc58rKQkCtoM3knyyeYw==
+X-CSE-MsgGUID: xxOJKLpBTGiN45cJn8/SnA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="156799955"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 25 Jun 2025 07:38:48 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uURGv-000TCU-1r;
+	Wed, 25 Jun 2025 14:38:45 +0000
+Date: Wed, 25 Jun 2025 22:38:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tanmay Jagdale <tanmay@marvell.com>, davem@davemloft.net,
+	leon@kernel.org, horms@kernel.org, sgoutham@marvell.com,
+	bbhushan2@marvell.com, herbert@gondor.apana.org.au
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	Tanmay Jagdale <tanmay@marvell.com>
+Subject: Re: [PATCH net-next v2 14/14] octeontx2-pf: ipsec: Add XFRM state
+ and policy hooks for inbound flows
+Message-ID: <202506252237.x9hiFnbB-lkp@intel.com>
+References: <20250618113020.130888-15-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618113020.130888-15-tanmay@marvell.com>
 
-It is currently impossible to enable ipv6 forwarding on a per-interface
-basis like in ipv4. To enable forwarding on an ipv6 interface we need to
-enable it on all interfaces and disable it on the other interfaces using
-a netfilter rule. This is especially cumbersome if you have lots of
-interface and only want to enable forwarding on a few. According to the
-sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
-for all interfaces, while the interface-specific
-`net.ipv6.conf.<interface>.forwarding` configures the interface
-Host/Router configuration.
+Hi Tanmay,
 
-Introduce a new sysctl flag `do_forwarding`, which can be set on every
-interface. The ip6_forwarding function will then check if the global
-forwarding flag OR the do_forwarding flag is active and forward the
-packet. To preserver backwards-compatibility also reset the flag on all
-interfaces when setting the global forwarding flag to 0.
+kernel test robot noticed the following build errors:
 
-[0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+[auto build test ERROR on net-next/main]
 
-Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
----
+url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250618-193646
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250618113020.130888-15-tanmay%40marvell.com
+patch subject: [PATCH net-next v2 14/14] octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+config: um-allmodconfig (https://download.01.org/0day-ci/archive/20250625/202506252237.x9hiFnbB-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506252237.x9hiFnbB-lkp@intel.com/reproduce)
 
-* I don't have any hard feelings about the naming, Nicolas Dichtel
-  proposed `fwd_per_iface` but I think `do_forwarding` is a better fit.
-* I'm also not sure about the reset when setting the global forwarding
-  flag; don't know if I did that right. Feedback is welcome!
-* Thanks for the help!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506252237.x9hiFnbB-lkp@intel.com/
 
- Documentation/networking/ip-sysctl.rst |  5 +++++
- include/linux/ipv6.h                   |  1 +
- include/uapi/linux/ipv6.h              |  1 +
- include/uapi/linux/sysctl.h            |  1 +
- net/ipv6/addrconf.c                    | 21 +++++++++++++++++++++
- net/ipv6/ip6_output.c                  |  3 ++-
- 6 files changed, 31 insertions(+), 1 deletion(-)
+All errors (new ones prefixed by >>):
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 0f1251cce314..fa966a710e21 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2292,6 +2292,11 @@ conf/all/forwarding - BOOLEAN
- proxy_ndp - BOOLEAN
- 	Do proxy ndp.
- 
-+do_forwarding - BOOLEAN
-+	Enable forwarding on this interface only -- regardless of the setting on
-+	``conf/all/forwarding``. When setting ``conf.all.forwarding`` to 0,
-+	the `do_forwarding` flag will be reset on all interfaces.
-+
- fwmark_reflect - BOOLEAN
- 	Controls the fwmark of kernel-generated IPv6 reply packets that are not
- 	associated with a socket for example, TCP RSTs or ICMPv6 echo replies).
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 5aeeed22f35b..74d7cfbb8f83 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -19,6 +19,7 @@ struct ipv6_devconf {
- 	__s32		forwarding;
- 	__s32		disable_policy;
- 	__s32		proxy_ndp;
-+	__u8		do_forwarding;
- 	__cacheline_group_end(ipv6_devconf_read_txrx);
- 
- 	__s32		accept_ra;
-diff --git a/include/uapi/linux/ipv6.h b/include/uapi/linux/ipv6.h
-index cf592d7b630f..66147838bb83 100644
---- a/include/uapi/linux/ipv6.h
-+++ b/include/uapi/linux/ipv6.h
-@@ -199,6 +199,7 @@ enum {
- 	DEVCONF_NDISC_EVICT_NOCARRIER,
- 	DEVCONF_ACCEPT_UNTRACKED_NA,
- 	DEVCONF_ACCEPT_RA_MIN_LFT,
-+	DEVCONF_DO_FORWARDING,
- 	DEVCONF_MAX
- };
- 
-diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
-index 8981f00204db..d540689910ec 100644
---- a/include/uapi/linux/sysctl.h
-+++ b/include/uapi/linux/sysctl.h
-@@ -573,6 +573,7 @@ enum {
- 	NET_IPV6_ACCEPT_RA_FROM_LOCAL=26,
- 	NET_IPV6_ACCEPT_RA_RT_INFO_MIN_PLEN=27,
- 	NET_IPV6_RA_DEFRTR_METRIC=28,
-+	NET_IPV6_DO_FORWARDING=29,
- 	__NET_IPV6_MAX
- };
- 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ba2ec7c870cc..2f0c68428f63 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -239,6 +239,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly = {
- 	.ndisc_evict_nocarrier	= 1,
- 	.ra_honor_pio_life	= 0,
- 	.ra_honor_pio_pflag	= 0,
-+	.do_forwarding		= 0,
- };
- 
- static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
-@@ -303,6 +304,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
- 	.ndisc_evict_nocarrier	= 1,
- 	.ra_honor_pio_life	= 0,
- 	.ra_honor_pio_pflag	= 0,
-+	.do_forwarding		= 0,
- };
- 
- /* Check if link is ready: is it up and is a valid qdisc available */
-@@ -857,6 +859,15 @@ static void addrconf_forward_change(struct net *net, __s32 newf)
- 		idev = __in6_dev_get_rtnl_net(dev);
- 		if (idev) {
- 			int changed = (!idev->cnf.forwarding) ^ (!newf);
-+			/*
-+			 * With the introduction of do_forwarding, we need to be backwards
-+			 * compatible, so that means we need to set the do_forwarding flag
-+			 * on every interface to 0 if net.ipv6.conf.all.forwarding is set to 0.
-+			 * This allows the global forwarding flag to disable forwarding for
-+			 * all interfaces.
-+			 */
-+			if (newf == 0)
-+				WRITE_ONCE(idev->cnf.do_forwarding, newf);
- 
- 			WRITE_ONCE(idev->cnf.forwarding, newf);
- 			if (changed)
-@@ -5719,6 +5730,7 @@ static void ipv6_store_devconf(const struct ipv6_devconf *cnf,
- 	array[DEVCONF_ACCEPT_UNTRACKED_NA] =
- 		READ_ONCE(cnf->accept_untracked_na);
- 	array[DEVCONF_ACCEPT_RA_MIN_LFT] = READ_ONCE(cnf->accept_ra_min_lft);
-+	array[DEVCONF_DO_FORWARDING] = READ_ONCE(cnf->do_forwarding);
- }
- 
- static inline size_t inet6_ifla6_size(void)
-@@ -7217,6 +7229,15 @@ static const struct ctl_table addrconf_sysctl[] = {
- 		.extra1		= SYSCTL_ZERO,
- 		.extra2		= SYSCTL_TWO,
- 	},
-+	{
-+		.procname	= "do_forwarding",
-+		.data		= &ipv6_devconf.do_forwarding,
-+		.maxlen		= sizeof(u8),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE,
-+	},
- };
- 
- static int __addrconf_sysctl_register(struct net *net, char *dev_name,
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 7bd29a9ff0db..a75bbf54157e 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -509,7 +509,8 @@ int ip6_forward(struct sk_buff *skb)
- 	u32 mtu;
- 
- 	idev = __in6_dev_get_safely(dev_get_by_index_rcu(net, IP6CB(skb)->iif));
--	if (READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
-+	if ((idev && READ_ONCE(idev->cnf.do_forwarding) == 0) &&
-+	    READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
- 		goto error;
- 
- 	if (skb->pkt_type != PACKET_HOST)
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:7:
+   In file included from include/net/xfrm.h:9:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:12:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:1175:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+    1175 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
+         |                                                   ~~~~~~~~~~ ^
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:924:8: warning: variable 'ptr' set but not used [-Wunused-but-set-variable]
+     924 |         void *ptr;
+         |               ^
+>> drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:1206:2: error: call to undeclared function 'dmb'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    1206 |         dmb(sy);
+         |         ^
+>> drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:1206:6: error: use of undeclared identifier 'sy'
+    1206 |         dmb(sy);
+         |             ^
+   2 warnings and 2 errors generated.
+
+
+vim +/dmb +1206 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+
+  1156	
+  1157	static int cn10k_inb_write_sa(struct otx2_nic *pf,
+  1158				      struct xfrm_state *x,
+  1159				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+  1160	{
+  1161		dma_addr_t res_iova, dptr_iova, sa_iova;
+  1162		struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
+  1163		struct cpt_inst_s inst;
+  1164		u32 sa_size, off;
+  1165		struct cpt_res_s *res;
+  1166		u64 reg_val;
+  1167		int ret;
+  1168	
+  1169		res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
+  1170					 &res_iova, GFP_ATOMIC);
+  1171		if (!res)
+  1172			return -ENOMEM;
+  1173	
+  1174		sa_cptr = inb_ctx_info->sa_entry;
+  1175		sa_iova = inb_ctx_info->sa_iova;
+  1176		sa_size = sizeof(struct cn10k_rx_sa_s);
+  1177	
+  1178		sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
+  1179		if (!sa_dptr) {
+  1180			dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
+  1181					  res_iova);
+  1182			return -ENOMEM;
+  1183		}
+  1184	
+  1185		for (off = 0; off < (sa_size / 8); off++)
+  1186			*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
+  1187	
+  1188		memset(&inst, 0, sizeof(struct cpt_inst_s));
+  1189	
+  1190		res->compcode = 0;
+  1191		inst.res_addr = res_iova;
+  1192		inst.dptr = (u64)dptr_iova;
+  1193		inst.param2 = sa_size >> 3;
+  1194		inst.dlen = sa_size;
+  1195		inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
+  1196		inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
+  1197		inst.cptr = sa_iova;
+  1198		inst.ctx_val = 1;
+  1199		inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
+  1200	
+  1201		/* Re-use Outbound CPT LF to install Ingress SAs as well because
+  1202		 * the driver does not own the ingress CPT LF.
+  1203		 */
+  1204		pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
+  1205		cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
+> 1206		dmb(sy);
+  1207	
+  1208		ret = cn10k_wait_for_cpt_respose(pf, res);
+  1209		if (ret)
+  1210			goto out;
+  1211	
+  1212		/* Trigger CTX flush to write dirty data back to DRAM */
+  1213		reg_val = FIELD_PREP(GENMASK_ULL(45, 0), sa_iova >> 7);
+  1214		otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
+  1215	
+  1216	out:
+  1217		dma_free_coherent(pf->dev, sa_size, sa_dptr, dptr_iova);
+  1218		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res, res_iova);
+  1219		return ret;
+  1220	}
+  1221	
+
 -- 
-2.39.5
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
