@@ -1,166 +1,78 @@
-Return-Path: <netdev+bounces-201273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAA35AE8B59
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:14:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519DCAE8B5F
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 19:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 313D71890BFC
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:09:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB63D16A8FC
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAE62820CB;
-	Wed, 25 Jun 2025 17:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5E628643E;
+	Wed, 25 Jun 2025 17:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="QYYsoD6D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NIAxI9Q+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24424.protonmail.ch (mail-24424.protonmail.ch [109.224.244.24])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6974E1DDA32
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 17:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C813224F6;
+	Wed, 25 Jun 2025 17:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750871367; cv=none; b=DnKOFF51ApEJFDfUXcW0NH+C+3kg99RCqStpydIsKKiBkuo+WLQSyb2qFZIpwM8v1vGOIz44HlkIa3fMvOuaHIcopqSM3WvaidazMsFkQVRhgIYS3UfobsKGDZ6wdtz+Y7MVFrnVMcEELGe/xgw/AuQk4cqoll0RZIhfN8aT+jU=
+	t=1750871733; cv=none; b=C5mBOVE3aDHvIB/49/SugPObJJsidHDxlrxNP2gk0NM6JiCjPLCc9aT7Sr+Qia+AeaRBzLCW3/OFJweSwLQnOQmjV6m6APsyO/0l8DH5EAtE+EG6oBK8zaSIsUzmfJJzNT1liyb9mLl8oWH+PxM3uGAhxu92k0VGpeycaSKnrXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750871367; c=relaxed/simple;
-	bh=mOUyii4I9lrSkNP9KAS0/Fo4HRjD6JuuBO3Yq3cQtu8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NgMNHcweSM+A6abTW5r/qlpGCPlHjloqCJEozb88obGmIi6bYR/HR6V//o13j0xd2CrWDD+Q/ivUqmd61U8CA/63raWVok2N61mnIWzIlJWTGJKDykgsMDz2ezglPYKLUKlttKvV5kc7OW2DVTbZiY4Qk7lahJ5RgMa/Y2Mfgzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=QYYsoD6D; arc=none smtp.client-ip=109.224.244.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1750871355; x=1751130555;
-	bh=mOUyii4I9lrSkNP9KAS0/Fo4HRjD6JuuBO3Yq3cQtu8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=QYYsoD6DiOvasJLEoZJLo8VlnWESYPZJgj9k3hVfyposf/xMKpJfcb0ay/kZ0cb9c
-	 /IlFc0LNesFMKQIe49DUMpPKI5wy/V09d17stzZd5m9hM8prjjrA4L+Fyw3evbeQP6
-	 +Hh3CrjT9XChSZ3FcEtAinYGvkJSRqViXwhmPYVBDBOILf8UgHdYcXCDTmgkoHsiGm
-	 i9pyB7ouQVvydkUSFOd0/LLDElZCKpePsQUBJpHLVFDK69ghryjV63RlnAuOGCJ9uC
-	 HtEafLuWbbSK0ww1Dr3yuIX7LD0rhhpnlGt0zYsOuXyz2LOsP50ezgic0UzhxOapfQ
-	 Otx7AgUMsc5sw==
-Date: Wed, 25 Jun 2025 17:09:10 +0000
-To: Luca Weiss <luca@lucaweiss.eu>
-From: Yassine Oudjana <y.oudjana@protonmail.com>
-Cc: Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus <antoniu.miclaus@analog.com>, Ramona Gradinariu <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong <neil.armstrong@linaro.org>, =?utf-8?Q?Barnab=C3=A1s_Cz=C3=A9m=C3=A1n?=
-	<barnabas.czeman@mainlining.org>, Danila Tikhonov <danila@jiaxyga.com>, Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>, Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 3/3] iio: Add Qualcomm Sensor Manager drivers
-Message-ID: <WHAT3OVKsj4znTv7P1Y3TGotHKfpY-MGDDVHuZyL-vp5iU7mU353Nf9expuvrTv5uaQ772ybJuTKEiy0WR3lcM4xRRSummPjrVcrPfq-JkQ=@protonmail.com>
-In-Reply-To: <ea183f5a-b4c8-4dc0-960f-dba0db5a5abb@lucaweiss.eu>
-References: <20250406140706.812425-1-y.oudjana@protonmail.com> <20250406140706.812425-4-y.oudjana@protonmail.com> <ea183f5a-b4c8-4dc0-960f-dba0db5a5abb@lucaweiss.eu>
-Feedback-ID: 6882736:user:proton
-X-Pm-Message-ID: 5603c40deb6696a70588c6d5989d7521b94b5071
+	s=arc-20240116; t=1750871733; c=relaxed/simple;
+	bh=tsPO0OiBG0PBkJSG9uxmHSEGiRUT65aNlEBWC9J6YaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bMfxru8/sPGv/VBM6CddvxZmKRQltgOK85g0w6xVp+UZtLFdaVd12LgyxCwyyrQt0KcJxO7uMBCwyyZsMnX78OU7wcnM3lVBc95fh9MhKzDe33w7oY8y/YikVmDGXGQgCOt4+Ozgej+Gi09gEVyoAtvEYnL24VcIHdaGTKrJDIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NIAxI9Q+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 481A7C4CEEA;
+	Wed, 25 Jun 2025 17:15:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750871732;
+	bh=tsPO0OiBG0PBkJSG9uxmHSEGiRUT65aNlEBWC9J6YaY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NIAxI9Q+V8bIHjAs4Fxp6lyInGwd77wN+e9vmBEL9ifR9OCEFHhAzhrvlKGvgHS5W
+	 N7hCw9fCHd1xuPRiJSY4Jk8ElbiVC7OjcsaHCvY1KhIstYCJRuc2xIzo3jQf1ZpB6A
+	 DV7fO5csG6cSpBbstMfChRSNOoEchn4g1yEKtb8EaeZVSSn5+njtXTuCmzvWFlkKM9
+	 OPRt/QlEg+cQJn9yI4LqKLcUth3kBuk6eaBMjfC1xxzdD7MNGEUqHYyoLNc9UwqtRS
+	 Su0X5XW80XeRCwGEkcS7giV/udeIDDuHieRiDiMvqJTBPjgTbs9LGckRkB4BeRWBJe
+	 DMAt42uMfA4rA==
+Date: Wed, 25 Jun 2025 18:15:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: net: Rename renesas,r9a09g057-gbeth.yaml
+Message-ID: <20250625171528.GK1562@horms.kernel.org>
+References: <721f6e0e09777e0842ecaca4578bc50c953d2428.1750838954.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <721f6e0e09777e0842ecaca4578bc50c953d2428.1750838954.git.geert+renesas@glider.be>
 
+On Wed, Jun 25, 2025 at 10:10:48AM +0200, Geert Uytterhoeven wrote:
+> The DT bindings file "renesas,r9a09g057-gbeth.yaml" applies to a whole
+> family of SoCs, and uses "renesas,rzv2h-gbeth" as a fallback compatible
+> value.  Hence rename it to the more generic "renesas,rzv2h-gbeth.yaml".
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-
-
-
-On Wednesday, June 18th, 2025 at 8:19 PM, Luca Weiss <luca@lucaweiss.eu> wr=
-ote:
-
-> Hi Yassine!
->=20
-> On 06-04-2025 4:08 p.m., Yassine Oudjana wrote:
->=20
-> > Add drivers for sensors exposed by the Qualcomm Sensor Manager service,
-> > which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
-> > include accelerometers, gyroscopes, pressure sensors, proximity sensors
-> > and magnetometers.
-> >=20
-> > Signed-off-by: Yassine Oudjana y.oudjana@protonmail.com
->=20
->=20
-> <snip>
->=20
-> > +static const char *const qcom_smgr_sensor_type_platform_names[] =3D {
-> > + [SNS_SMGR_SENSOR_TYPE_ACCEL] =3D "qcom-smgr-accel",
-> > + [SNS_SMGR_SENSOR_TYPE_GYRO] =3D "qcom-smgr-gyro",
-> > + [SNS_SMGR_SENSOR_TYPE_MAG] =3D "qcom-smgr-mag",
-> > + [SNS_SMGR_SENSOR_TYPE_PROX_LIGHT] =3D "qcom-smgr-prox-light",
-> > + [SNS_SMGR_SENSOR_TYPE_PRESSURE] =3D "qcom-smgr-pressure",
-> > + [SNS_SMGR_SENSOR_TYPE_HALL_EFFECT] =3D "qcom-smgr-hall-effect"
-> > +};
-> > +
-> > +static void qcom_smgr_unregister_sensor(void *data)
-> > +{
-> > + struct platform_device *pdev =3D data;
-> > +
-> > + platform_device_unregister(pdev);
-> > +}
-> > +
-> > +static int qcom_smgr_register_sensor(struct qcom_smgr *smgr,
-> > + struct qcom_smgr_sensor *sensor)
-> > +{
-> > + struct platform_device *pdev;
-> > + const char *name =3D qcom_smgr_sensor_type_platform_names[sensor->typ=
-e];
->=20
->=20
-> On msm8226 lg-lenok I get NULL here leading to a crash with the next call=
-.
->=20
-> I get sensor->type=3D0 for some heart rate sensor on that watch. I've
->=20
-> added this patch on top to fix that (excuse the formatting):
-
-I don't see your patch, but I already have a fix and will include it in the=
- next
-iteration.
-
->=20
-> <snip>
->=20
-> > diff --git a/drivers/iio/common/qcom_smgr/qmi/sns_smgr.h b/drivers/iio/=
-common/qcom_smgr/qmi/sns_smgr.h
-> > new file mode 100644
-> > index 000000000000..a741dfd87452
-> > --- /dev/null
-> > +++ b/drivers/iio/common/qcom_smgr/qmi/sns_smgr.h
-> > @@ -0,0 +1,163 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only /
-> > +
-> > +#ifndef SSC_SNS_SMGR_H
-> > +#define SSC_SNS_SMGR_H
-> > +
-> > +#include <linux/iio/common/qcom_smgr.h>
-> > +#include <linux/soc/qcom/qmi.h>
-> > +#include <linux/types.h>
-> > +
-> > +/
-> > + * The structures of QMI messages used by the service were determined
-> > + * purely by watching transactions between proprietary Android userspa=
-ce
-> > + * components and SSC. along with comparing values reported by Android=
- APIs
-> > + * to values received in response messages. Due to that, the purpose o=
-r
-> > + * meaning of many fields remains unknown. Such fields are named "val*=
-",
-> > + * "data*" or similar. Furthermore, the true maximum sizes of some mes=
-sages
-> > + * with unknown array fields may be different than defined here.
-> > + */
-> > +
-> > +#define SNS_SMGR_QMI_SVC_ID 0x0100
-> > +#define SNS_SMGR_QMI_SVC_V1 1
-> > +#define SNS_SMGR_QMI_INS_ID 50
->=20
-> This instance ID needs to be 0 on msm8974 and msm8226, so I assume we
-> don't want to make this a define but just add the 50 and the 0 as-is to
-> the match table?
-
-Yes that is a better idea.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
