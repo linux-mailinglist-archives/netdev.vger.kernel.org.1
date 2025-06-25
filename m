@@ -1,97 +1,100 @@
-Return-Path: <netdev+bounces-200887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA209AE73C9
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:27:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C069DAE73CE
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F5ED7B0EA0
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:25:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DB63B3113
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:29:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBD338FB0;
-	Wed, 25 Jun 2025 00:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0325A4642D;
+	Wed, 25 Jun 2025 00:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFbWSzye"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkXr4r7u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88543800;
-	Wed, 25 Jun 2025 00:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A372B9A5;
+	Wed, 25 Jun 2025 00:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750811214; cv=none; b=YK4Cso0c1LBqtwT6QGQ583ZAPuFEurXsttSKZ7jh9IV4MkATKJ+vI9gXbqElSUV0MfVanjrEUHoCnwbMn8+uQpAjoc1mLBIIs9nlx2yJlzy5/nMBA1XW+LFSydDQk0jRXYa3asiUPehZ+OlxrNCNO/T7brASSqFtlhbmt7GPNVo=
+	t=1750811379; cv=none; b=CWtmQ9MsDrqdzSuq2LqH4YUZtrmQADZ/DvDtsaYOSA7rhM3ydUS/bPYsSj9CzlG3vv1GrqWFqfOabXcfGWuQcXHXER3RgH0Bw3lZnuMatfz0x5B1FNKHYkVFCtNWXT1DHUiIQyZtT9y5kEl09n4n7cgKtxNsUIFYOOO632BRS9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750811214; c=relaxed/simple;
-	bh=5fxj1HCwJ9CH1Ro6vpmMjqG2iJybCVxAue9gimQC5n4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CJTE0PMczry/AF1Ch/TnGldzPnJo4KK+q7BWuYQlpj8WQY2XGo7NtiY+BRun89g5+DoqQeRrFTK+7Gxxhx/+hODFXGITnPCEyMNU4ZhLJ3a1Y5QYFbJLkcmBdxt97h0GhG81Cs4Bn8EtckWMd7PApGkC3zoMvAuDYNJVFiPX5yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFbWSzye; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A570C4CEE3;
-	Wed, 25 Jun 2025 00:26:53 +0000 (UTC)
+	s=arc-20240116; t=1750811379; c=relaxed/simple;
+	bh=pJ37KolkwCNerdU7MSR40O97S9rxQ/NXaJ9jQ6rgByM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=phVnw+BmUJgSAcAbsrY+Uw0DKmHXPSpibcpSv7whZNNTjXOGSGZu5fCkJC70yjpuFrsR5mhOUtyKnhWCL7SQvBImFT9RfEArLn3d37YGWpxfPf8erKRlWr8wiDVtebfBVdmxL42Oi3WRgNAw30U8U5TOwnD0+TT4KnZHLHyqFrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkXr4r7u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3472EC4CEE3;
+	Wed, 25 Jun 2025 00:29:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750811214;
-	bh=5fxj1HCwJ9CH1Ro6vpmMjqG2iJybCVxAue9gimQC5n4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pFbWSzyePTC5p+a4G2T84L0rZCh+5BWcO6axpx4aBELTCkFIO31HCYf+qGmaluRCP
-	 UpcpZOBbAMtqSswIarJXwPNJK087TSLsSR52yGyXu94Gytw8gniQfdrHEyMBcSuiAG
-	 Z6mrXLXR+3Do6tpmYZsoCRFowH0HKi0RHFg8f1dbIs5DIvU6Z4dwCMo5HaT37DwZDA
-	 k4bnRe4wnrl7wZ2N4aCBXIIcqymtqqCIDVhhozCupGx+K53K4nIbosl1nknMtyWO25
-	 AmnXXnifNd6urR7tgsRlHnXxdBtUQcKSuCUTWhniCNSDaYvOWwkKtYfBo67R5QoYzB
-	 z0ojzkjk4y80w==
-Date: Tue, 24 Jun 2025 17:26:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: Chris Snook <chris.snook@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ingo Molnar
- <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jeff Garzik
- <jeff@garzik.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4] ethernet: atl1: Add missing DMA mapping error
- checks
-Message-ID: <20250624172652.05616616@kernel.org>
-In-Reply-To: <20250623092047.71769-1-fourier.thomas@gmail.com>
-References: <20250623092047.71769-1-fourier.thomas@gmail.com>
+	s=k20201202; t=1750811378;
+	bh=pJ37KolkwCNerdU7MSR40O97S9rxQ/NXaJ9jQ6rgByM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AkXr4r7uUky4zCTGBFkF+Aq6pxR8bnJeL+0b6iDggdMFCI4a/05qvczThiypY1/i/
+	 T1ZFGAatnDNBPWILcpIzERXAb5mkd1B8eo7rb9fMsr7DVwWcuhxIC/b5l61VDGWfgh
+	 awhJ7ER7M86FRF3OXuXCitE+/3JGyJ+q59ZPCkGYuzs34Rosf0u4AtKb1rKIUdCV59
+	 oHxN5T9zVOFB/TD0DWk0CE0+BjxCZHPPQz6Y1xZ6feJ62Ffe5YU6c1FfeQhkzJ/yI5
+	 Oo0wsUvN4G8OBAxbLJeovlLm8dIuMngKZu8K7dxg+tzBpof4lMDTlJX9X5wYWULHFS
+	 yRK7gYvKR6jRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E3E39FEB73;
+	Wed, 25 Jun 2025 00:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] vsock/uapi: fix linux/vm_sockets.h userspace
+ compilation
+ errors
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175081140500.4083218.18258927815615257832.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Jun 2025 00:30:05 +0000
+References: <20250623100053.40979-1-sgarzare@redhat.com>
+In-Reply-To: <20250623100053.40979-1-sgarzare@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, acking@vmware.com, georgezhang@vmware.com,
+ kuba@kernel.org, edumazet@google.com, horms@kernel.org,
+ virtualization@lists.linux.dev, pabeni@redhat.com, dtor@vmware.com,
+ linux-kernel@vger.kernel.org, davem@davemloft.net, daan.j.demeyer@gmail.com
 
-On Mon, 23 Jun 2025 11:20:41 +0200 Thomas Fourier wrote:
-> + dma_err:
-> +	while (first_mapped != next_to_use) {
-> +		buffer_info = &tpd_ring->buffer_info[first_mapped];
-> +		dma_unmap_page(&adapter->pdev->dev,
-> +			       buffer_info->dma,
-> +			       buffer_info->length,
-> +			       DMA_TO_DEVICE);
-> +		buffer_info->dma = 0;
-> +
-> +		if (++first_mapped == tpd_ring->count)
-> +			first_mapped = 0;
-> +	}
-> +	return false;
->  }
->  
->  static void atl1_tx_queue(struct atl1_adapter *adapter, u16 count,
-> @@ -2419,7 +2454,10 @@ static netdev_tx_t atl1_xmit_frame(struct sk_buff *skb,
->  		}
->  	}
->  
-> -	atl1_tx_map(adapter, skb, ptpd);
-> +	if (!atl1_tx_map(adapter, skb, ptpd)) {
-> +		dev_kfree_skb_any(skb);
-> +		return NETDEV_TX_OK;
-> +	}
+Hello:
 
-Code looks good but we need a counter for the drops.
-Please add one in a similar way to the rx_dropped counter.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 23 Jun 2025 12:00:53 +0200 you wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> If a userspace application just include <linux/vm_sockets.h> will fail
+> to build with the following errors:
+> 
+>     /usr/include/linux/vm_sockets.h:182:39: error: invalid application of ‘sizeof’ to incomplete type ‘struct sockaddr’
+>       182 |         unsigned char svm_zero[sizeof(struct sockaddr) -
+>           |                                       ^~~~~~
+>     /usr/include/linux/vm_sockets.h:183:39: error: ‘sa_family_t’ undeclared here (not in a function)
+>       183 |                                sizeof(sa_family_t) -
+>           |
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] vsock/uapi: fix linux/vm_sockets.h userspace compilation errors
+    https://git.kernel.org/netdev/net/c/22bbc1dcd0d6
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
