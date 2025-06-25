@@ -1,105 +1,130 @@
-Return-Path: <netdev+bounces-200980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21538AE79D0
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0763EAE79DD
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8839B164DEA
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:19:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5690E165C50
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5711E1FCFF8;
-	Wed, 25 Jun 2025 08:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ACE20F08E;
+	Wed, 25 Jun 2025 08:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tA4ZKE/U";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XY970qlQ"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="mGBN/kkY"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A1B3594E;
-	Wed, 25 Jun 2025 08:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A41020C476;
+	Wed, 25 Jun 2025 08:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750839582; cv=none; b=I8Acrwxu4MQe2+nqQ16rXEsTk00tzMT/+gIvPSVBj72iNw6KJhQCc1r06iB0YdFRCqMPVxlVVCfrFZIJ8t3zTssS8PU1oPDJ4iQfzGMIKJqf5kvBDck20H3cuMWXEhKXWFPwdqNwQBJChe1P6+OmWQh7QyxFps7HMPDvRJkYQ5U=
+	t=1750839650; cv=none; b=EKrMFzT6BZS4SvE7GWHP2p59UMLbAVH98yq5qgmVeAG7DGcLaAgDaA9J/q6oTqV3nkzAV9G/R5OcRVT/2p1x79r/Huk1/d5/SKQo4od1r/kDQDitHVQk3NwCKRAhwgOddDrgA6K46fdNU5T0uZPrp0UIgHa8DjW3g+mWdYwd+6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750839582; c=relaxed/simple;
-	bh=16aWqNKmoqZ7N+hUoLW3zWsloeGrZc5zfK7pvbKOgOM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CkzFMYQwY5vUNbpkesVOfcA1d+ZSoBvz7lsEvh4Hjwq43N44+xClNx0IrOidhzJ9TnQlCCdn2v7KVPlnvTFnF6K8koWQ4YI3zs4sZA52Ff4gKQZY5p2nm9H9eb54emFcdmzEAxXqX3pLSvRn5qw8eRpKQxALC0BMvBf+gP9SaLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tA4ZKE/U; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XY970qlQ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1750839572;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8WeX6Ff7ZzvVAy0/XInX41qrqklcove/vGha5dJn4s4=;
-	b=tA4ZKE/UDXhBBa7OC7zsL5ZxL+DIJpQ5lPZ81IKyqsRRg6JhNEZ8TiL2GM+HuXmtGpsT6M
-	GcclnOMnuCmxc97ALT/u9yGpzbkdnKedlbVc4GPKAGIcMh2PkLZRPPH02pCJHf5bfvhPiJ
-	mKf0XMrJZCrrf0h6HWcnsCqWhfiKTh6me8lcmI9gVSiHYwHF0OsB3DcmOfmb4rhLXAtoEu
-	zc03U2mjBVt8+mZ5OINZ1Wxd+YF2+C8qSic2g1ky3BdRDT/XebMJ9o0FKx8GGQm5Il37DP
-	8WrStx4q8M3jsg7fg14hoOO0xLYb8irBa+8q1REONYx9tXtYp8PTj3mp1/lNOg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1750839572;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8WeX6Ff7ZzvVAy0/XInX41qrqklcove/vGha5dJn4s4=;
-	b=XY970qlQnhbdUx1F7pPg8TNTCZODw2kL+scMxIV5YnO6cxGgaC0MAMcdQMEQSePhrJ4/zI
-	Ibbe03xr3jdWI4DQ==
-To: Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [patch 08/13] ptp: Split out PTP_PIN_GETFUNC ioctl code
-In-Reply-To: <87zfdxmf7h.ffs@tglx>
-References: <20250620130144.351492917@linutronix.de>
- <20250620131944.218487429@linutronix.de>
- <caef5686-961d-43aa-8141-c9c90ada2307@redhat.com> <87zfdxmf7h.ffs@tglx>
-Date: Wed, 25 Jun 2025 10:19:31 +0200
-Message-ID: <87wm90mdws.ffs@tglx>
+	s=arc-20240116; t=1750839650; c=relaxed/simple;
+	bh=X7oTNFrJswgIHuNpvVbuXC5hVcIhk6YzrRYWyDXt1A8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Cml/NMpXnRUCSMN5So/6myrLKAP85zNkhROQsaksy4Aie+2dUF1vncWmtwt8A48r1TH8umtrD+8H4GKBAWpmSEytWg3q7ckTuuOXkT+gZt1rp9nDKaMpKXdOuI46Xm0msk9lKewyRxiH8Rpzd7b9TaPf8CK0yn5LkH/LdQAmtqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=mGBN/kkY; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1750839641;
+	bh=X7oTNFrJswgIHuNpvVbuXC5hVcIhk6YzrRYWyDXt1A8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mGBN/kkYxKPsfPV+wFXdq2SphIgBlVWTcC6D7AJkr1jrcYwLwCmKVKxiT01KjqaGK
+	 6pEpbEje9rU2Y0ybrbmIkuZVuyvMIZUlNgvTjgvXN7LgdH22O7GO6pLLJU4lLe+U+x
+	 A7jL5tVuJZ1dAZ5JPxsoGf3P6yolap74oUjuPYbSd4WWF60bcr/uy1yTW4cm1pvtw5
+	 8Ixf4l0SWw1US/srSN3EoE4Tjevca1Mgfhs4N77XXLavkctZ8/OV//1IUDt9Sb5XQC
+	 jHHkoux7D1n49f93d2U6Ngd0z3/m87sXwbx4g9p8JqrGmNHDuJp/iFzO6DctlvQ84b
+	 THjvTrOCv/nkg==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3CC9F17E0DD0;
+	Wed, 25 Jun 2025 10:20:40 +0200 (CEST)
+Message-ID: <284a4ee5-806b-45f9-8d57-d02ec291e389@collabora.com>
+Date: Wed, 25 Jun 2025 10:20:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 09/29] dt-bindings: clock: mediatek: Describe MT8196
+ peripheral clock controllers
+To: Krzysztof Kozlowski <krzk@kernel.org>, Laura Nao
+ <laura.nao@collabora.com>, mturquette@baylibre.com, sboyd@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ matthias.bgg@gmail.com, p.zabel@pengutronix.de, richardcochran@gmail.com
+Cc: guangjie.song@mediatek.com, wenst@chromium.org,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+ kernel@collabora.com
+References: <20250624143220.244549-1-laura.nao@collabora.com>
+ <20250624143220.244549-10-laura.nao@collabora.com>
+ <7dfba01a-6ede-44c2-87e3-3ecb439b48e3@kernel.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <7dfba01a-6ede-44c2-87e3-3ecb439b48e3@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 24 2025 at 15:39, Thomas Gleixner wrote:
-> On Tue, Jun 24 2025 at 11:22, Paolo Abeni wrote:
->>> +	if (cmd == PTP_PIN_GETFUNC2 && !mem_is_zero(pd.rsv, sizeof(pd.rsv)))
->>> +		return -EINVAL;
->>> +	else
->>> +		memset(pd.rsv, 0, sizeof(pd.rsv));
->>
->> Minor nit: I personally find the 'else' statement after return
->> counter-intuitive and dropping it would save an additional LoC.
->
-> Of course ...
+Il 24/06/25 18:02, Krzysztof Kozlowski ha scritto:
+> On 24/06/2025 16:32, Laura Nao wrote:
+>> +  '#reset-cells':
+>> +    const: 1
+>> +    description:
+>> +      Reset lines for PEXTP0/1 and UFS blocks.
+>> +
+>> +  mediatek,hardware-voter:
+>> +    $ref: /schemas/types.yaml#/definitions/phandle
+>> +    description:
+>> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
+>> +      MCU manages clock and power domain control across the AP and other
+>> +      remote processors. By aggregating their votes, it ensures clocks are
+>> +      safely enabled/disabled and power domains are active before register
+>> +      access.
+> 
+> Resource voting is not via any phandle, but either interconnects or
+> required opps for power domain.
 
-But second thoughts. The actual logic here is:
+Sorry, I'm not sure who is actually misunderstanding what, here... let me try to
+explain the situation:
 
-	if (cmd == PTP_PIN_GETFUNC2) {
-		if (!mem_is_zero(pd.rsv, sizeof(pd.rsv)))
-			return -EINVAL;
-	} else {
-		memset(pd.rsv, 0, sizeof(pd.rsv));
-	}
+This is effectively used as a syscon - as in, the clock controllers need to perform
+MMIO R/W on both the clock controller itself *and* has to place a vote to the clock
+controller specific HWV register.
 
-because PTP_PIN_GETFUNC did not mandate the reserved fields to be zero,
-which means the reserved fields can never be used with that opcode.
+This is done for MUX-GATE and GATE clocks, other than for power domains.
 
-But as it stands today, pd.rsv is not used at all in that function and
-pd is fully overwritten via pd = pd->ops_config[] later. So the memset
-is completely useless right now and can go away completely.
+Note that the HWV system is inside of the power domains controller, and it's split
+on a per hardware macro-block basis (as per usual MediaTek hardware layout...).
 
-Thanks,
+The HWV, therefore, does *not* vote for clock *rates* (so, modeling OPPs would be
+a software quirk, I think?), does *not* manage bandwidth (and interconnect is for
+voting BW only?), and is just a "switch to flip".
 
-        tglx
+Is this happening because the description has to be improved and creating some
+misunderstanding, or is it because we are underestimating and/or ignoring something
+here?
+
+Cheers,
+Angelo
+
+> 
+> I already commented on this, so don't send v3 with the same.
+> 
+> Best regards,
+> Krzysztof
+
 
 
 
