@@ -1,158 +1,138 @@
-Return-Path: <netdev+bounces-201361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE015AE92E0
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:42:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B3CAE92ED
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 004B57A9BD3
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:41:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0C1B1C24A40
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A6C1DE3A4;
-	Wed, 25 Jun 2025 23:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA2E285CA0;
+	Wed, 25 Jun 2025 23:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbX0fr0N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fZgk0MVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A362F1FC1
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 23:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21291DE4EF
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 23:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750894941; cv=none; b=C38VzbHL4TCgKWsFtKStCCBQ0V5VTm1otxb/TDEHqlCGN2wa8blUzRL15wvc/JEjxpwZNMXj9Hrd0fSwLtCGCt9AZ92IfRwl8pGEfv+3oPruLpcqBlE/0kkENJBBFssid9WMmXWzVaOMuJEKlw6EmI5oq7JXRVIkkOER+NXxBcc=
+	t=1750895165; cv=none; b=uIwOwN5SZyfEjeRgVvqUNYzN7XnIAcY7TDeiNLESIXn+By2b1PacYTKKG14Q9Mvxpedb45u1dMUIF47GWzm3Z9f1viYE7YPEn2/F5BSyw66C/WkBHKFL+Gn0CIyo3zcdb+b6q3yjiz6SQlIAJ/NofthIxPz38/ZTo7wdm1Uv+Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750894941; c=relaxed/simple;
-	bh=4MJWEwlVa2XSjR1/iN+J5fggdrOptEEij0S55etnOzw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UjEoAEpP8e/Wjutrq2JW7I1uCEKk5jKsOT/PkHaV4r2jBVxn8Ncs096H+RX7APLzYhXnAgSe8JckKkCWBdrvyfxpLo6Y7EBPZNEM8Xc8ToGx6SudRLI3CbEZJMpADvq25oCKeGwa5eH4wnfYDpFST/wt5e9lcCzk5KhbJC7ofOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbX0fr0N; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-714078015edso4430167b3.2
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 16:42:19 -0700 (PDT)
+	s=arc-20240116; t=1750895165; c=relaxed/simple;
+	bh=oS2+qEeE0p/dhi+nuprgW9YttSbFNXmR+OjGJ4tLvLQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D3LvKpFctomK6AKH5j9zMXlqymutPpJfvyokg4ytTV3GZoDGDr0Q1eWxflXjkUrB6HpJWXXd4Nq7C8uSCdQvhvo5HAUyTlIOprOGY5xoxeLjZUqvNLwmLA5i4+mXgrPl0FMEX57kSmYleASEIq6TL81rwCU4OcKSpvaA9sa+hSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fZgk0MVK; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-235e389599fso87795ad.0
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 16:46:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750894938; x=1751499738; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1750895163; x=1751499963; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4QIIxBIzrLJJuUFEqMZKCtT6UF+HcotLDkX3Ye0kx/8=;
-        b=MbX0fr0NF6z0MBD4XmVOw82KSAGIW9Q9pXRfHKkmVEpzD4Z8115MmO1eY9gPWjDVmM
-         NqwL0+K7vxCq9RpwKTUupySmx128KYfafyHNVPt5JHS4HTt1Pa35lrXMCMgvE5Zvc2lx
-         CPJ4uh7dIM1Zlen01UgapQ0pSOOi281aspQ0mED8b5IB0IPK9ZrciLtMpHDwCa+3/KwU
-         YjQrXsCx31OLrV8eeFpa3BGsuX4KU3B28brAvjKS9oj6USvdzLtdCkd4caXf2Ezj6wmL
-         i4yJfvzZozNAxkmICsCwiuLfIzjdYKbbnqUAHlTt0tRsCvbJW8U+Ws6NlW6bALsED/Ri
-         GCKg==
+        bh=qxW6eLameOAnRuvuazW/r9gHcMuI7UE9esV+BikOkkQ=;
+        b=fZgk0MVKBH/qV4poo1wzlkNtBvgEeOqbcP7BZB4JidCQshcnr0wBY30VxYmOQzF/ge
+         nO9FqcTEWxv7pv3ghsroHYLfeUky3YSxVDFSzbb6EyjIoVkximh+r1/7IbkCV0YFvVTR
+         eciSP797i/h3aKlQ2E4U5g6ENbC5odGyuyVC5zO46EpLLkhireIWgaJt//us2q4KzpmI
+         yd8/lmzelKk7/BrjsWEEbu8uBpmebR0iM5UbkvXeAiLDMQnPNhC8SwHXKPRe3qfppMAf
+         ERdirHueFqBN7qiP+NE0bcMS75d3sOeuI2jwwEsgfFJkd3cfD7QOBLkbj9ANbO5RFio4
+         lHcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750894938; x=1751499738;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4QIIxBIzrLJJuUFEqMZKCtT6UF+HcotLDkX3Ye0kx/8=;
-        b=vtyZW06FBMZWGjB7FifP5V5PY1uz5XhTfZiedKsjz+ZgdDx+LjC1kTLK4VUUA5pCc+
-         Jj0ASDPxpJgPt1zvaVXKQ0TyOlj80wQV3m7Pjz83SSdpRCXz0gN4NhoV8L+9JSMYHkp4
-         Vcr4FwTO0+3wokpnY0KUe7riDlnOdCO9Pba6pVHEv+RNcioJb8K8sNnA6Qz0s9rOVMek
-         MvKLZ0Ol9YEViuK2aWc1tTiC1n0TRPIdKqJ0ZTYPlKvHvQ4oGx5B8mnJAo9KVPr/trJk
-         CwYVVcMWRclgczIgzC6zTNK+I3s85DMgMdEymxASMTkVqbchaH3Hcw68nmX6Y6KhWBu+
-         2KwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYukEDBv+lCqzXNcCeHzbWkhNQUy2hA1+979qgSyRjspKU1/ZZ4vjU0IG1X8AHJKtNtPf06rA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOBN1n2xebZFAAAdYBhGgUIHAIJHnCUEjm5hCsiUqgjdsHG4zI
-	80N9PSfoQ5nfiFSdxO68B1bcqgpJnjA7EX7uPj/gO1twrtdn5darP7n1
-X-Gm-Gg: ASbGncsLr7jp4Dc4HutAwQWbOi/ERdkrbqDuZCPYv60QDi6fwszE/jJpLVwS4reTjgd
-	B/ag0N15w6wpUPZCX8gKiPKCSDA+4NeqEUjoKKpNjCcT5L3Lz/wjbcAuAqZA/20pR8iOfmQKmsj
-	rjSyNb6C7kajoJc4EmAWP2Wof6btzOChV17Kka607uxVBZ+qY3pRz57m8GenT3gPwj0APtzeqmZ
-	co7bqOzPDxVd8bOPyVUKhrpZJxeNiL09NHudc0pajx8JZgJDQ6l8Ba+bZW0qEr18+pHDf6V/XSv
-	nBkvrf5yaVHL3CbxXWN2TOnd8G3SAUlGmLtxQ91cJWJvIToOYSAnoZA/yoP+0TeHoJF5nFIRU2X
-	CsY3eihj8reuDyQEOm4jRDHbAmTWaLA6oarLbaDDKAOtGH49XSocy
-X-Google-Smtp-Source: AGHT+IHMS93zEcgDbO16JhfYMk0EzRzI2W5lavq2Dw3cpU3nrd8yxiGUxo+kL4vtUgszWTtKPVhMPw==
-X-Received: by 2002:a05:690c:998e:b0:710:d81a:b345 with SMTP id 00721157ae682-71406ddf009mr69781897b3.29.1750894938511;
-        Wed, 25 Jun 2025 16:42:18 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-712c4a21f02sm26465637b3.45.2025.06.25.16.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 16:42:17 -0700 (PDT)
-Date: Wed, 25 Jun 2025 19:42:17 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, 
- Leon Romanovsky <leon@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Boris Pismenny <borisp@nvidia.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, 
- David Ahern <dsahern@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, 
- Patrisious Haddad <phaddad@nvidia.com>, 
- Raed Salem <raeds@nvidia.com>, 
- Jianbo Liu <jianbol@nvidia.com>, 
- Dragos Tatulea <dtatulea@nvidia.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Jacob Keller <jacob.e.keller@intel.com>, 
- netdev@vger.kernel.org
-Message-ID: <685c89596e525_2a5da429467@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250625135210.2975231-2-daniel.zahka@gmail.com>
-References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
- <20250625135210.2975231-2-daniel.zahka@gmail.com>
-Subject: Re: [PATCH v2 01/17] psp: add documentation
+        d=1e100.net; s=20230601; t=1750895163; x=1751499963;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qxW6eLameOAnRuvuazW/r9gHcMuI7UE9esV+BikOkkQ=;
+        b=kjxAmza6hhqKm6C6huHp0rBUeAJI7slWY3mwTUWOB4+fsC05nnUsb2dAboRdHYtXpK
+         86lfSeBta3yG3kiZ0wAL7+kcRoiEYQU8SwSbb2EAr9U5poZA/XKUx6334kRXdJyMrPeg
+         W0suZHwfP/TO8XESgvoXoCi1eUz8XRikHvwmzXq+XPUgaCA45rXuanCw0f0xGvouKVic
+         J1/zG9+OiEbGFC6Jg7xEgl69j74TOYyPXM4fSMkmyFJf0mNr1BwAbWDFie1Q8hB/xsXM
+         rLNOKB+c935t9jslkekCzmko1vKXr1ftDDK6srXV2FH125z80weoCDOojmBTHuB5dfjt
+         HS+g==
+X-Gm-Message-State: AOJu0YzCWR/w+DupA5gIIw+v3Pf5O3hk36ME3yJrruCa3yrA2sCPp/1x
+	MZe5kKvEqOLI/CPsoWjI6+RKovdfIpmuIRloLCK8Hg1rLtiEgGpij84kPLdGfJBBg+W1kNUCIsm
+	B5suHJWSzaE+Q4SmD+22eMpnDK5TRufZ754JjtDKH
+X-Gm-Gg: ASbGncsSEv2d6h1MDF35/ju/C4el6b0k7SRFgY/DvBR/qisIMNCEla4O3mjNqNXFlh8
+	eHQDSHgXaX5jVj99wIa7A9yECRhYKmCMsQ4azYFDd9ix/FW2ZeAw02P/fT8zyeVSGMMiM7rJf8y
+	kMQD4dSy0YMHuXyZyWaWAgpArAKE/sLOfKZNOnDrxF4vuSKQ9+ZLYuwc1kTfeudymHXgU9wulBb
+	g==
+X-Google-Smtp-Source: AGHT+IGYwGdc7VZyHxBpFQo3+2lzQv7lF6WR5ZbRy7zYEYyrFdgvZ22U0tAmCKzl7fZPUnYtijG7OErvXz50cjSIri4=
+X-Received: by 2002:a17:903:1988:b0:215:65f3:27ef with SMTP id
+ d9443c01a7336-23977c0bc75mr1397605ad.12.1750895162870; Wed, 25 Jun 2025
+ 16:46:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250619181519.3102426-1-almasrymina@google.com> <175072801301.3355543.12713890018845780288.git-patchwork-notify@kernel.org>
+In-Reply-To: <175072801301.3355543.12713890018845780288.git-patchwork-notify@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 25 Jun 2025 16:45:49 -0700
+X-Gm-Features: Ac12FXzjltO9e3B85tE8sad7lqP2GbKMu7X5vbHIRSfDkIJObcz8XrCJ3tz_b5o
+Message-ID: <CAHS8izMPWjmxLWJr+BSqd5jamsFHDOm71NkG7fmm-78SkLxQTg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5] page_pool: import Jesper's page_pool benchmark
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, hawk@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	shuah@kernel.org, ilias.apalodimas@linaro.org, toke@toke.dk
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Daniel Zahka wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> 
-> Add documentation of things which belong in the docs rather
-> than commit messages.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+On Mon, Jun 23, 2025 at 6:19=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.org=
+> wrote:
+>
+> Hello:
+>
+> This patch was applied to netdev/net-next.git (main)
+> by Jakub Kicinski <kuba@kernel.org>:
+>
+> On Thu, 19 Jun 2025 18:15:18 +0000 you wrote:
+> > From: Jesper Dangaard Brouer <hawk@kernel.org>
+> >
+> > We frequently consult with Jesper's out-of-tree page_pool benchmark to
+> > evaluate page_pool changes.
+> >
+> > Import the benchmark into the upstream linux kernel tree so that (a)
+> > we're all running the same version, (b) pave the way for shared
+> > improvements, and (c) maybe one day integrate it with nipa, if possible=
+.
+> >
+> > [...]
+>
+> Here is the summary with links:
+>   - [net-next,v5] page_pool: import Jesper's page_pool benchmark
+>     https://git.kernel.org/netdev/net-next/c/cccfe0982208
+>
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
+>
+>
 
-> +Driver notes
-> +------------
-> +
-> +Drivers are expected to start with no PSP enabled (``psp-versions-ena``
-> +in ``dev-get`` set to ``0``) whenever possible. The user space should
-> +not depend on this behavior, as future extension may necessitate creation
-> +of devices with PSP already enabled, nonetheless drivers should not enable
-> +PSP by default. Enabling PSP should be the responsibility of the system
-> +component which also takes care of key rotation.
-> +
-> +Note that ``psp-versions-ena`` is expected to be used only for enabling
-> +receive processing. The device is not expected to reject transmit requests
+Thank you for merging this. Kinda of a noob question: does this merge
+mean that nipa will run this on new submitted patches already? Or do
+I/someone need to do something to enable that? I've been clicking on
+the contest for new patches like so:
 
-This means skb encryption for already established connections only,
-right? Establishing tx offload will be rejected for new connections.
+https://netdev.bots.linux.dev/contest.html?pw-n=3D0&branch=3Dnet-next-2025-=
+06-25--21-00
 
-> +after ``psp-versions-ena`` has been disabled. User may also disable
-> +``psp-versions-ena`` while there are active associations, which will
-> +break all PSP Rx processing.
-> +
-> +Drivers are expected to ensure that device key is usable upon init
-> +(working keys can be allocated), and that no duplicate keys may be generated
-> +(reuse of SPI without key rotation). Drivers may achieve this by rotating
-> +keys twice before registering the PSP device.
+But I don't see this benchmark being run anywhere. I looked for docs
+that already cover this but I couldn't find any.
 
-Since the device returns a { session_key, spi } pair, risk of reuse
-is purely in firmware. I don't follow the need for the extra double
-rotation.
-
+--=20
+Thanks,
+Mina
 
