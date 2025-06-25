@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-201143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6624CAE8425
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:16:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78074AE8436
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:19:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DEEE3A2A7C
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:15:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6165A1896095
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF800262FEC;
-	Wed, 25 Jun 2025 13:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E052641E7;
+	Wed, 25 Jun 2025 13:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMQlUKrK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQjg6m/1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92616262FD3;
-	Wed, 25 Jun 2025 13:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F842609F7;
+	Wed, 25 Jun 2025 13:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750857351; cv=none; b=hyqGNdcUUdlTj0x2VNY23NAV0+LD389TmhBjhXYO7dbsuejL75IV02WvMmdhU83zsH7XPwM6E2uNATfMd/x36QqRyQpeqwTz+ipZwyZnMMfjKsbN4ep7ouuHStpqLMGHcxQekxDz/zfwzNO96NLTr4hECsJqNyjfcUsi7n5DI7E=
+	t=1750857354; cv=none; b=TjzWeqFQOWyRA1ZCDRYUKYF6V5H2amv4tOhGi77DIufFy8mXD37ukc0R4kqx58O5OUU3vpzQ7pe9rO3P0L/ZDNsOK3LceLfW+pU5hLkCiQM2zIiZk7gpkT+DTer2ZXA1OEIbqdgFioOToAB275cBRmupOBBdVLIY+3L0PKVQxrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750857351; c=relaxed/simple;
-	bh=QT4Ls4Wox6hJ1R8TPcQdFcVFzO8CzbDCEi/cBTj/91g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jkNElPX5atiSoOPx9/ngHujGAwl2HSESsdRrXTdWyu67pRnF0tix/E9sBaV9c1TRo8nwWey84CJPpVCFlTz83U9MxcSzCN5aaEzMIG0neBPk2ezCXlKYm9P+D8IaOW7eurvFabE8drg275swA5rNGcbghYNxbEfdnwoyZ3nGEV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMQlUKrK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4A0CC4CEEA;
-	Wed, 25 Jun 2025 13:15:48 +0000 (UTC)
+	s=arc-20240116; t=1750857354; c=relaxed/simple;
+	bh=NAwf6+Q/qrG6EI6uYZH3wXeLmsbgzYePN5qMa/M14K4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=uchZhzrAcbXWtqC0tWZSLLV9M9vejE3nlF3+qQZRoYMUjT8NiRk5+5blyWTfHFp5F6P0n1k/lcmIyiW+y59ZffYCQUDOS6g/0aV7O/DXkwThVAqYn72JQ0AsPn7nEFtimaXKtZlp5Thk/PjaDjFAAQwhYvNO3H8I1jYlVDWsIRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQjg6m/1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 938E6C4CEF3;
+	Wed, 25 Jun 2025 13:15:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750857351;
-	bh=QT4Ls4Wox6hJ1R8TPcQdFcVFzO8CzbDCEi/cBTj/91g=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JMQlUKrK1jWsbryOHxePSEPvlIqL/2M4lOGuf8p6kfgSgiubupWLBwnd/8ucRJB2M
-	 tnr3oO9W9gktF4txRMrp6FmTvAzJtt5IP49tObBfJlujbCRZJV/9PAULHULn9Nk2Nj
-	 sldeH+VKMjCAGpu2KN7ElGFJjCwhCR5+3AJXp1MIu1YH9rlRS7OkUeAUlLA0waVqaD
-	 tYCIBdpdoXs6Wmi0OXycazK9Yh5WT+QvGGhOghjnWNYzX2+rlGb0tY2thhW2OMEFSI
-	 GN/cQDjrroJL0EkNMlO381we5zQuKhuEq2Q/wEHJlHC5/tdzAABYToEOe4SH/41NyQ
-	 Af9ZRUsT30nfA==
+	s=k20201202; t=1750857353;
+	bh=NAwf6+Q/qrG6EI6uYZH3wXeLmsbgzYePN5qMa/M14K4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MQjg6m/1C9qlCPUODcoH0JDFEtk4CIosbdfn+i6vqC/f8ej0/R8unSl3quBtgbZc2
+	 uu8KtQBJW2ab9G7eHrDZeaEZ7aDV+8RvFpgjS6Rqy3P5w/RjhwQ+8GA7wIThGVXhBA
+	 DVj57PASE3mFzs0/NMfimvqcUPew/oyGlnQpLNH8JXJW1deu+OSMydYZvCKoK5dLbj
+	 DLuqDvK0ubgwlgN1fCHG3GGZjGVLpuNYtOUaxvgmYQa1yCOhgewvYK3pGPeio6LJ8s
+	 NAn13T1DMBbVDlI2JZkYTf8l5ntAEa+k0azt72s7LHu6h2ifN9myiBHfGPXDrm0ZIJ
+	 FLhNJ2zSLZ31g==
 From: Will Deacon <will@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Will Deacon <will@kernel.org>,
@@ -53,86 +54,60 @@ Cc: Will Deacon <will@kernel.org>,
 	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	netdev@vger.kernel.org,
 	virtualization@lists.linux.dev
-Subject: [PATCH 0/5] vsock/virtio: SKB allocation improvements
-Date: Wed, 25 Jun 2025 14:15:38 +0100
-Message-Id: <20250625131543.5155-1-will@kernel.org>
+Subject: [PATCH 1/5] vhost/vsock: Avoid allocating arbitrarily-sized SKBs
+Date: Wed, 25 Jun 2025 14:15:39 +0100
+Message-Id: <20250625131543.5155-2-will@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250625131543.5155-1-will@kernel.org>
+References: <20250625131543.5155-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+vhost_vsock_alloc_skb() returns NULL for packets advertising a length
+larger than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE in the packet header. However,
+this is only checked once the SKB has been allocated and, if the length
+in the packet header is zero, the SKB may not be freed immediately.
 
-We're using vsock extensively in Android as a channel over which we can
-route binder transactions to/from virtual machines managed by the
-Android Virtualisation Framework. However, we have been observing some
-issues in production builds when using vsock in a low-memory environment
-(on the host and the guest) such as:
+Hoist the size check before the SKB allocation so that an iovec larger
+than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + the header size is rejected
+outright. The subsequent check on the length field in the header can
+then simply check that the allocated SKB is indeed large enough to hold
+the packet.
 
-  * The host receive path hanging forever, despite the guest performing
-    a successful write to the socket.
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ drivers/vhost/vsock.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-  * Page allocation failures in the vhost receive path (this is a likely
-    contributor to the above)
-
-  * -ENOMEM coming back from sendmsg()
-
-This series aims to improve the vsock SKB allocation for both the host
-(vhost) and the guest when using the virtio transport to help mitigate
-these issues. Specifically:
-
-  - Avoid single allocations of order > PAGE_ALLOC_COSTLY_ORDER
-
-  - Use non-linear SKBs for the transmit and vhost receive paths
-
-  - Reduce the guest RX buffers to a single page
-
-There are more details in the individual commit messages but overall
-this results in less wasted memory and puts less pressure on the
-allocator.
-
-This is my first time looking at this stuff, so all feedback is welcome.
-
-Patches based on v6.16-rc3.
-
-Cheers,
-
-Will
-
-Cc: Keir Fraser <keirf@google.com>
-Cc: Steven Moreland <smoreland@google.com>
-Cc: Frederick Mayle <fmayle@google.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: "Eugenio Pérez" <eperezma@redhat.com>
-Cc: netdev@vger.kernel.org 
-Cc: virtualization@lists.linux.dev
-
---->8
-
-Will Deacon (5):
-  vhost/vsock: Avoid allocating arbitrarily-sized SKBs
-  vsock/virtio: Resize receive buffers so that each SKB fits in a page
-  vhost/vsock: Allocate nonlinear SKBs for handling large receive
-    buffers
-  vsock/virtio: Rename virtio_vsock_skb_rx_put() to
-    virtio_vsock_skb_put()
-  vhost/vsock: Allocate nonlinear SKBs for handling large transmit
-    buffers
-
- drivers/vhost/vsock.c                   | 21 +++++++++------
- include/linux/virtio_vsock.h            | 36 +++++++++++++++++++------
- net/vmw_vsock/virtio_transport.c        |  2 +-
- net/vmw_vsock/virtio_transport_common.c |  9 +++++--
- 4 files changed, 49 insertions(+), 19 deletions(-)
-
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 802153e23073..66a0f060770e 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -344,6 +344,9 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
+ 
+ 	len = iov_length(vq->iov, out);
+ 
++	if (len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM)
++		return NULL;
++
+ 	/* len contains both payload and hdr */
+ 	skb = virtio_vsock_alloc_skb(len, GFP_KERNEL);
+ 	if (!skb)
+@@ -367,8 +370,7 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
+ 		return skb;
+ 
+ 	/* The pkt is too big or the length in the header is invalid */
+-	if (payload_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE ||
+-	    payload_len + sizeof(*hdr) > len) {
++	if (payload_len + sizeof(*hdr) > len) {
+ 		kfree_skb(skb);
+ 		return NULL;
+ 	}
 -- 
 2.50.0.714.g196bf9f422-goog
 
