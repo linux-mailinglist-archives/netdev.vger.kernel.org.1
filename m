@@ -1,99 +1,122 @@
-Return-Path: <netdev+bounces-201314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7E1CAE8F5D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:21:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D832AE8F7A
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65F7D1C2649E
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:21:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A0694A809B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6066E26159D;
-	Wed, 25 Jun 2025 20:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A892DCBE0;
+	Wed, 25 Jun 2025 20:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iL/rNrXO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2wN1DZD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3820D1DE3B5;
-	Wed, 25 Jun 2025 20:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3AC2DAFC1
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 20:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750882880; cv=none; b=S2KtMyB3q6xjXBe4VXpEQ+zNao3CI3ylCl9de0ot4e3TsuPjlHcWaUdReoWhJHlLL+MDsDqzNa8E+DyNIsqdvtjwYkwOucQgzYYlIs8alyf9HvKfnTyyTbpk32iALPXov/MoypE7bhF6A8qU8wH7/jiuhDGCkRDKr70fuKLmSGo=
+	t=1750883147; cv=none; b=OWhFKy3L8qg4keZKc/fdlUYouMjykxcGuQzA8ma55XhyPQ2/h4TRGOtg00ilccPNUCLONYNPrbRV627I32g6X0U0eDJJmcJx0GkPoelcu0Mo+75qbmV0WeMpql2DJMIMpPC3JtoS0yVFZ5jYNJNzkgxTt4+IkccxRX2gXHTPIyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750882880; c=relaxed/simple;
-	bh=Qhy65bNDD2Cm+pL3IZhUWPZBKCfxrDQnhAq7vRn8LxQ=;
+	s=arc-20240116; t=1750883147; c=relaxed/simple;
+	bh=ylxCpTUuN7sOcpqB+lMQrdkoP/CMdeKpEQdi2hpMpHk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hL1yAxJm1g1idgJj8DD6p+aij1fPzi0BkdgUKtoZVK7GnaeeNH2BniJ+5I183Xod/R2BVCIVtBLkZ8OsQcRnTK4KXQRU1eWktTA3sRkkRyY25xv5T4v8bxrdb2x0+M0zOan/X6bys6+uAPEsUiu0o06TfEgmWNpYDBIPURDzK00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iL/rNrXO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AF0FC4CEEA;
-	Wed, 25 Jun 2025 20:21:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XhJDLmpasNMOfYsATfX2qAbaQhorKCJ8wLkRVGH0mDQ72x44Zo/P3e59ydd94jqGDNyGyafr3PuZ8f2zp8H+GORyUpBiI2gk7/WLHEykJjPAamCYJrev4AqLyDwwg9VEo4jCaA2OoMStzfPKE2T6lHL6NW0x+pbx+Svpo+ImQio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2wN1DZD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A31B6C4CEEA;
+	Wed, 25 Jun 2025 20:25:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750882878;
-	bh=Qhy65bNDD2Cm+pL3IZhUWPZBKCfxrDQnhAq7vRn8LxQ=;
+	s=k20201202; t=1750883147;
+	bh=ylxCpTUuN7sOcpqB+lMQrdkoP/CMdeKpEQdi2hpMpHk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iL/rNrXOKOGUP0A3SUGxdwoUEoA+teDqfAA/OjHGGQ9ixO+L/kr3iC04J8m6pFqPc
-	 aqjgjrGCV/hgDE5c1i9JBeiYZAG9jFxYRP7Z4x9jL7p8oHSVnRbdRL+L+P0979/bfR
-	 xToHNBG1ogbdvT3QIOuKNQD2BIQchVpkR5QLmQPVyCVTEtU9BAYY5uhzgjP9E4h2Og
-	 49CXkmlixrJP3W6qyfQWQYhu/uDnypgHD2qfSeUyFtbtD5/YrX3frCRYVVeKJ0wEjp
-	 VeWZy8sVLZx0nIQ0vYCaOrym2989ffkQlanJ6iejHDwMiYFthxQAaRm3q+oaSe9of2
-	 da/v07j/RpaVQ==
-Date: Wed, 25 Jun 2025 13:21:17 -0700
+	b=j2wN1DZD03yG5kovQ3urG3qKoSG7fdnUM01iTOIvpQgmmV1mnIUFEuIoO6pwZd8Fr
+	 br/6jjkLQuj1J6OB4nnqwJrD9M8ArNJuYGVfIAGQdu5GNQHbZHp4jaiwyFg7UvB8kw
+	 14+1xPoZZZAKrgIlHzSlGy9OCX2hxaAkprM4VWMdDMRVC9ewvnHh/y/jVn/cxFPo2S
+	 6cXF3abnhLdz5rD/Z3klTpIW5cgyOwgVWN06BLJOkWI9FIbZLLDARp6tZKWJ+Mb+NP
+	 yUZfze1cRDizeNmyF+drEb7Qpfnn4C3h3tttlQb64Ptfe8y2VzDBXQs7NqX29YzWRI
+	 mASN6oMOrziEQ==
+Date: Wed, 25 Jun 2025 13:25:45 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v4 0/4] net: selftest: improve test string
- formatting and checksum handling
-Message-ID: <20250625132117.1b3264e8@kernel.org>
-In-Reply-To: <aFuEHpbjGILWich1@pengutronix.de>
-References: <20250515083100.2653102-1-o.rempel@pengutronix.de>
-	<20250516184510.2b84fab4@kernel.org>
-	<aFU9o5F4RG3QVygb@pengutronix.de>
-	<20250621064600.035b83b3@kernel.org>
-	<aFk-Za778Bk38Dxn@pengutronix.de>
-	<20250623101920.69d5c731@kernel.org>
-	<aFphGj_57XnwyhW1@pengutronix.de>
-	<20250624090953.1b6d28e6@kernel.org>
-	<aFuEHpbjGILWich1@pengutronix.de>
+To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>, "Damato, Joe"
+ <jdamato@fastly.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, "Czapnik, Lukasz"
+ <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, "Zaki,
+ Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, Igor
+ Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, Zdenek
+ Pesek <zdenek.pesek@gooddata.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+Message-ID: <20250625132545.1772c6ab@kernel.org>
+In-Reply-To: <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+	<4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com>
+	<20250415175359.3c6117c9@kernel.org>
+	<CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
+	<20250416064852.39fd4b8f@kernel.org>
+	<CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
+	<CO1PR11MB5089365F31BCD97E59CCFA83D6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
+	<20250416171311.30b76ec1@kernel.org>
+	<CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
+	<CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
+	<CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
+	<CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
+	<b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com>
+	<CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Jun 2025 07:07:42 +0200 Oleksij Rempel wrote:
-> Hm... at least part of this behavior can be verified with self-tests:
-> 
-> - Send a TCP packet with an intentionally incorrect checksum,
->   ensuring its state is CHECKSUM_NONE so the transmit path doesn't change it.
-> - Test if we receive this packet back via the PHY loopback.
->    - If received: The test checks the ip_summed status of the
->      received packet.
->       - A status of CHECKSUM_NONE indicates the hardware correctly passed
->         the packet up without validating it.
+On Wed, 25 Jun 2025 19:51:08 +0200 Jaroslav Pulchart wrote:
+> Great, please send me a link to the related patch set. I can apply them in
+> our kernel build and try them ASAP!
 
-_NONE or _COMPLETE are both fine in this case.
+Sorry if I'm repeating the question - have you tried
+CONFIG_MEM_ALLOC_PROFILING? Reportedly the overhead in recent kernels=20
+is low enough to use it for production workloads.
 
->       - A status of CHECKSUM_UNNECESSARY indicates a failure, as the hardware
->         or driver incorrectly marked a bad checksum as good.
->    - If not received (after a timeout): The test then checks the device's
->      error statistics.
->       - If the rx_errors counter has incremented
->       - If the counter has not incremented, the packet was lost for an unknown
->         reason, and the test fails.
-> 
-> What do you think?
+> st 25. 6. 2025 v 16:03 odes=C3=ADlatel Przemek Kitszel <
+> przemyslaw.kitszel@intel.com> napsal: =20
+>=20
+> > On 6/25/25 14:17, Jaroslav Pulchart wrote: =20
+> > > Hello
+> > >
+> > > We are still facing the memory issue with Intel 810 NICs (even on lat=
+est
+> > > 6.15.y).
+> > >
+> > > Our current stabilization and solution is to move everything to a new
+> > > INTEL-FREE server and get rid of last Intel sights there (after Intel=
+'s
+> > > CPU vulnerabilities fuckups NICs are next step).
+> > >
+> > > Any help welcomed,
+> > > Jaroslav P.
+> > >
+> > > =20
+> >
+> > Thank you for urging us, I can understand the frustration.
+> >
+> > We have identified some (unrelated) memory leaks, will soon ship fixes.
+> > And, as there were no clear issue with any commit/version you have
+> > posted to be a culprit, there is a chance that our random findings could
+> > help. Anyway going to zero kmemleak reports is good in itself, that is
+> > a good start.
+> >
+> > Will ask my VAL too to increase efforts in this area too.
 
-Sounds like a good idea! Not sure if I'd bother with the rx_error
-handling. Hopefully the drivers can be configured to pass the packet
-thru.
 
