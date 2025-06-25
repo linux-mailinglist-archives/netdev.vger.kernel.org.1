@@ -1,114 +1,81 @@
-Return-Path: <netdev+bounces-200885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44959AE73B7
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:19:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72219AE73C2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C80F917AF2B
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:19:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52B60192106F
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE1820330;
-	Wed, 25 Jun 2025 00:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895447261E;
+	Wed, 25 Jun 2025 00:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RJTfz/Y1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B0l+yFss"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D0F29408;
-	Wed, 25 Jun 2025 00:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E5872608;
+	Wed, 25 Jun 2025 00:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750810788; cv=none; b=LTRCvm0ZhbmBqGy5oAFOT/RwA4cDE7Da2Ebtewuv/1eJL7gUATZpJXDkSCa++ibkCyu6UwZe74OU9GGd1BBLDPsSRFBKf6XVs9KcAXP9rQDkXE1Gu9hkO0ZqjuJLZPNDcBYpQ8ZDpQNcc/Xz1D0LjT7Spy4TSHhmokgdZtdiZq0=
+	t=1750810935; cv=none; b=rwK63tO2TiCSXPC1u/RSHDMcLgK3DxogKhhIB3EM0DhU4+F7TPe29ww65yPQmjx+DrnTJfvAyPAiNbAWFX+bhArARND6g2AC0eNaMQEzTTY0VrabcRkbJ5D0Lh8Zd2+z7K3vKx4XcgI3bqttF6das9p0EqhTlfwnpoR9TLt3NVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750810788; c=relaxed/simple;
-	bh=AEysO/7hrlR6JL0IE++5oBEgqmDvVKEURUzZQDzyRTM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SFlFaeP/SZFXs4/7AwYWXkbYgn0i/b4P3M3LCgtIv2k1ZVq5y2cs8Ofw4+hep5BDurPNu6FVpMq4zOr5Mfo97tC6JTegkICA9uN1tqZTYUa1ILysFRAMdumbjmsQRtMtHPYfOkPMOS1AOYzNLSVIuEj8hD8CM+WbbKJUzjnw1dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RJTfz/Y1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F705C4CEF0;
-	Wed, 25 Jun 2025 00:19:48 +0000 (UTC)
+	s=arc-20240116; t=1750810935; c=relaxed/simple;
+	bh=r1QOunjZnN8JSSXJJERAc15DOyMsH0n/c0OAcrYsaOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C15/V0BwL8N2OJxE9+sQkD8jTjoB2H0wC/J1lTkmc48R5cyuNEbW0qM1/dei9Z1X0UcOOhCdATLs5uEwzhMQrhy68sQwbPhH94Wh66TKp7groTwR7VCRrI0159Rp5eq21fLnMzcNF7VW49449PV2ukYlV7MqOo/dce0xEFeyIMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B0l+yFss; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57B0EC4CEE3;
+	Wed, 25 Jun 2025 00:22:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750810788;
-	bh=AEysO/7hrlR6JL0IE++5oBEgqmDvVKEURUzZQDzyRTM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RJTfz/Y1tA+lvrjhi7eMKJHnLa0CJAg0kDCxdzdV7dtTDx7vI//2F0CoEOSoC+fzY
-	 cgrTZTaUkk8W8Y+JazGyyIIWc6NVsGmhmHrej1BX7clj0B85vwa0bmVz0WDvpR67/p
-	 kJTxUytWMdqbj6hrf7KKmxzipKWwRkH4OBdUks1EFx35Ds+7FU5aQtAhOjApU38iBP
-	 oQmV8qJBwZt1K5TN95kq8FckyLnDlitUcy8XgsvND2w37c/uKzrugt+eQYVZpP+MMB
-	 aWSfExxnKzAAjeeCM29RyhRHlr1MDWuYS0oFIZUxHneRf68oTPb+xSY3YExNMDBrhm
-	 H1qABnK5IQj3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE3D39FEB7C;
-	Wed, 25 Jun 2025 00:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750810934;
+	bh=r1QOunjZnN8JSSXJJERAc15DOyMsH0n/c0OAcrYsaOQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=B0l+yFssagYlFC2aeW0shi8Bbgf7SFG+3hT9EinAXIr9AWIXyxahPmM2186MRRERm
+	 KeV2UnieRfni5DxQfJT3Z+5L3EGxCcD8aQ49T+ro5Ft74XlaAd0p8Ie5xxj/PuBOpR
+	 +mfSJb4vgIHF7K8fvBhvjO2KPWRKkJ/9Yhcl7RVLNIVvJTi9bkOOyBacSLWhbSVRiA
+	 gz9qTjKBb2elBoXZdyFZWjdnFBjQyszTowJmeh9Wupyaq9jFMX1+sFlGNA0ZMubsLB
+	 44djEDL3TGXEk+vNWEWFYlMm9zYm8KoKEa7YAhyJfhy+hSnGBeX5Q+AXkkQIj6qcfc
+	 paJ73BDpvFyzA==
+Date: Tue, 24 Jun 2025 17:22:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org
+Subject: Re: [PATCH net-next] net: netfilter: Add IPIP flowtable SW
+ acceleration
+Message-ID: <20250624172213.67768427@kernel.org>
+In-Reply-To: <20250623-nf-flowtable-ipip-v1-1-2853596e3941@kernel.org>
+References: <20250623-nf-flowtable-ipip-v1-1-2853596e3941@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net-next 0/7]There are some cleanup for hns3 driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175081081475.4081312.3746271660520654145.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Jun 2025 00:20:14 +0000
-References: <20250623040043.857782-1-shaojijie@huawei.com>
-In-Reply-To: <20250623040043.857782-1-shaojijie@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
- chenhao418@huawei.com, jonathan.cameron@huawei.com,
- shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, 23 Jun 2025 15:15:51 +0200 Lorenzo Bianconi wrote:
+> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
+> infrastructure.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+=46rom a look at this patch and the code in nf_flow_table_ip.c
+I'm a little unclear on whether the header push/pop happens
+if we "offload" the forwarding.
 
-On Mon, 23 Jun 2025 12:00:36 +0800 you wrote:
-> There are some cleanup for hns3 driver
-> 
-> ---
-> ChangeLog:
-> v3 -> v4:
->   - Drop the patch about pointer set to NULL operation, suggested by Jakub Kicinski
->   v3: https://lore.kernel.org/all/20250621083310.52c8e7ae@kernel.org/
-> v2 -> v3:
->   - Remove unnecessary pointer set to NULL operation, suggested by Simon Horman.
->   v2: https://lore.kernel.org/all/20250617010255.1183069-1-shaojijie@huawei.com/
-> v1 -> v2:
->   - Change commit message and title, suggested by Michal Swiatkowski.
->   v1: https://lore.kernel.org/all/20250612021317.1487943-1-shaojijie@huawei.com/
-> 
-> [...]
+> IPIP SW acceleration can be tested...
 
-Here is the summary with links:
-  - [v4,net-next,1/7] net: hns3: fix spelling mistake "reg_um" -> "reg_num"
-    https://git.kernel.org/netdev/net-next/c/befd4e971a78
-  - [v4,net-next,2/7] net: hns3: use hns3_get_ae_dev() helper to reduce the unnecessary middle layer conversion
-    https://git.kernel.org/netdev/net-next/c/2031f01394b2
-  - [v4,net-next,3/7] net: hns3: use hns3_get_ops() helper to reduce the unnecessary middle layer conversion
-    https://git.kernel.org/netdev/net-next/c/5306c1039686
-  - [v4,net-next,4/7] net: hns3: add \n at the end when print msg
-    https://git.kernel.org/netdev/net-next/c/dd9480f6ed28
-  - [v4,net-next,5/7] net: hns3: delete redundant address before the array
-    https://git.kernel.org/netdev/net-next/c/ad0cf0729f53
-  - [v4,net-next,6/7] net: hns3: add complete parentheses for some macros
-    https://git.kernel.org/netdev/net-next/c/84c0564b1c51
-  - [v4,net-next,7/7] net: hns3: clear hns alarm: comparison of integer expressions of different signedness
-    https://git.kernel.org/netdev/net-next/c/169d07e7e41c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I think it's time we start to ask for selftest that can both run in SW
+mode and be offload if appropriate devices are pass in via env.
+--=20
+pw-bot: cr
 
