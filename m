@@ -1,133 +1,108 @@
-Return-Path: <netdev+bounces-201099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665D3AE81D6
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:45:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E715AE81FE
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1D9F3B290D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:41:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF58D1BC4840
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBCD25D8FB;
-	Wed, 25 Jun 2025 11:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7DD25D1F1;
+	Wed, 25 Jun 2025 11:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QrYLXkTh"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vsASjqtW";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hsBpLRmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D37725BEEC;
-	Wed, 25 Jun 2025 11:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA33FC8EB;
+	Wed, 25 Jun 2025 11:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750851649; cv=none; b=calkawZPrcEtgjheX+14ARxpvxJkoxnRjrNln/zKZvMD2fm15muAe69mSnLfF3h7/SylXuBAy6Hlc78Gm5qjM3v0VQ5+qVz/Q5gVhEZt9Vut6GRZirWK5sxCBkWCzAsuAgwt3iw+2yVduIcO2fvSOfuQcXGSKcXJb/mGhf0YkHs=
+	t=1750852347; cv=none; b=Dc85StxL6fylzHXCheOHSaAhWjLUuWN2pdR5cOjAisqBstMw7iBHB1WFj3Yrnd+ksa8HbQnzbwQUzKO8Kpk8tQ/h290f2ZnBdqMRStCflL5BcxTTMhGE/ggGG0TIZ8Tw/yaHcNgQuVABxxBT2YmxMsTCo/eL4vMwJJLpWaXxGDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750851649; c=relaxed/simple;
-	bh=uY6RFzWQv+0n90gOzscfCZplXmNlWoXCFt0YTZXikzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h7r+9iQMuxXQNZDM4eVrHCZVdb3MR476iyZLUuIQmv+IPHXVt+Pa/cFNw+mpNguNsSAeoXtX2F9WXcWsqk2aM2sj2fSNFZOVlyo/89gf9BTl73GGbV0MHtTbd2JxVs8Xri7MDNyEDu89j7KxrYf9R8fG4X8dXyYyWdmywEYMsz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QrYLXkTh; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=u24hZkHf06T4OB4HIHNxmrjaJ9u6QgZP82b5qhOGNCI=; b=QrYLXkThNMY6yQ3TkhExUf5+NB
-	yf9eh1KtODMRX4Vt2EFoBmEEETBjIA0VheGJ3+KJEPv7NkJd9O6RqpRNXu3eIB27GddUZujfIvxav
-	XwRBocMvVtnlpA2beD4Qa1vgvmCih5MATkWYLoqc1RVlSabmxpImHuk3txEW1oYFUqq7o+eSET6BP
-	N9c1mbMSGjAetYY0hKUJnl8G3xmAtskFNu14ItRUsEjZeYGzjdaw+CzIu7CUfV3Rw2eRyAavlmlv4
-	v+bdRW31ABCqwRCJVZsaNsyCzAxLNs+IEatJAu6YQE5LdxjtlZ4iRx2UmgQ0YxZFgSqDkfxvA0bj9
-	YnIOaamQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uUOUZ-00000005prz-2L8O;
-	Wed, 25 Jun 2025 11:40:39 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id E6A02308983; Wed, 25 Jun 2025 13:40:37 +0200 (CEST)
-Date: Wed, 25 Jun 2025 13:40:37 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: linux-kernel@vger.kernel.org, rcu@vger.kernel.org, lkmm@lists.linux.dev,
-	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang@linux.dev>, Breno Leitao <leitao@debian.org>,
-	aeh@meta.com, netdev@vger.kernel.org, edumazet@google.com,
-	jhs@mojatatu.com, kernel-team@meta.com,
-	Erik Lundgren <elundgren@meta.com>
-Subject: Re: [PATCH 4/8] shazptr: Avoid synchronize_shaptr() busy waiting
-Message-ID: <20250625114037.GD1613376@noisy.programming.kicks-ass.net>
-References: <20250625031101.12555-1-boqun.feng@gmail.com>
- <20250625031101.12555-5-boqun.feng@gmail.com>
+	s=arc-20240116; t=1750852347; c=relaxed/simple;
+	bh=92LUKS8BrqpqLPkyzxrv5DbFSbpv7LU7YBrXq7pfPx8=;
+	h=Message-ID:From:To:Cc:Subject:Date; b=LQdroF1zQsxWN6ga30dfpOUBR9UDW6/tchUvqNCL0K97vhxrQmiURkidT0OCDndEqod0GvqALaoV88Yh9/BPZH9t8RBJBi7ZIVeVeR/6xC2HGNI6T6MZCKWxqhgf/vtmOrDYz/CKd2JO7rj6nc0F+YfyltZTtU+SHHQ7vrsZyMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vsASjqtW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hsBpLRmK; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Message-ID: <20250625114404.102196103@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1750852343;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc; bh=c9qnrUieLvDAzmNeK9TtFgurdMMjN0JpU0mb4zuN8EY=;
+	b=vsASjqtWHr3BuW5WI6k+0IHJ3JXshFGviGuNIrmqnUF1LUm9vzjuakNFSz2sXC81WF4+pn
+	73FwUHVLTOXEy1i84BHHxM1sIiYbpg+caAsHEJ1F2S5P8bobmdFRGpxBHl/X2EqXMtKH+3
+	O2pVCvk3vt+FGP2d11jceWuKzqlCMI4M2FUQx7u9frK9WuC/+qZW5TGy+dY9Ow//Ot406X
+	N6Jm3jVm2jUwOuxtcPPCx3tESx5o6/ubMXh1FRqEWjOvGpTOy79c39qORArmJTzUQ0x9uu
+	yT7eNhqTdm5HLoqtVHXdmfoLAqqCzLrZZevvXwrXvfAYPOaYXTHjvroBg4Li2w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1750852343;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc; bh=c9qnrUieLvDAzmNeK9TtFgurdMMjN0JpU0mb4zuN8EY=;
+	b=hsBpLRmKjdFcA3vTiwBIZ3+ZriNYzMPHPbndmfPQgM+Q4B+Fg0rGshgiDzirb1v9qt1XEG
+	uH1GUdFcY12tllCA==
+From: Thomas Gleixner <tglx@linutronix.de>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Subject: [patch V2 00/13] ptp: Belated spring cleaning of the chardev driver
+Date: Wed, 25 Jun 2025 13:52:23 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625031101.12555-5-boqun.feng@gmail.com>
 
-On Tue, Jun 24, 2025 at 08:10:57PM -0700, Boqun Feng wrote:
+This is V2 of the series. V1 can be found here:
 
-> +/* Scan structure for synchronize_shazptr(). */
-> +struct shazptr_scan {
-> +	/* The scan kthread */
-> +	struct task_struct *thread;
-> +
-> +	/* Wait queue for the scan kthread */
-> +	struct swait_queue_head wq;
-> +
-> +	/* Whether the scan kthread has been scheduled to scan */
-> +	bool scheduled;
-> +
-> +	/* The lock protecting ->queued and ->scheduled */
-> +	struct mutex lock;
-> +
-> +	/* List of queued synchronize_shazptr() request. */
-> +	struct list_head queued;
-> +
-> +	int cpu_grp_size;
-> +
-> +	/* List of scanning synchronize_shazptr() request. */
-> +	struct list_head scanning;
-> +
-> +	/* Buffer used for hazptr slot scan, nr_cpu_ids slots*/
-> +	struct shazptr_snapshot* snaps;
-> +};
+     https://lore.kernel.org/all/20250620130144.351492917@linutronix.de
 
-I find this style very hard to read, also the order of things is weird.
+When looking into supporting auxiliary clocks in the PTP ioctl, the
+inpenetrable ptp_ioctl() letter soup bothered me enough to clean it up.
 
-struct shazptr_scan {
-	struct task_struct	*thread;
-	struct swait_queue_head wq;
-	struct list_head	scanning;
+The code (~400 lines!) is really hard to follow due to a gazillion of
+local variables, which are only used in certain case scopes, and a
+mixture of gotos, breaks and direct error return paths.
 
-	struct mutex		lock;
-	struct list_head	queued;    /* __guarded_by(lock) */
-	bool			scheduled; /* __guarded_by(lock) */
+Clean it up by splitting out the IOCTL functionality into seperate
+functions, which contain only the required local variables and are trivial
+to follow. Complete the cleanup by converting the code to lock guards and
+get rid of all gotos.
 
-	struct shazptr_snapshot snaps[0] __counted_by(nr_cpu_ids);
-};
+That reduces the code size by 48 lines and also the binary text size is
+80 bytes smaller than the current maze.
 
-(the __guarded_by() thing will come with Thread-Safety support that
-Google is still cooking in clang)
+The series is split up into one patch per IOCTL command group for easy
+review.
 
-> +static struct shazptr_scan shazptr_scan;
+Changes vs. V1:
 
-And then make this a pointer, and allocate the whole thing as a single
-data structure with however much snaps data you need.
+  - Picked up Reviewed tags as appropriate
+
+  - Dropped the pointless memset()s in GETFUNC/SETFUNC - Paolo
+
+  - Dropped the __free() in ptp_open/read() - Jakub
+
+Applies against v6.16-rc1 and also cleanly against next. It's also
+available from git:
+
+     git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers/ptp/driver
+
+Thanks,
+
+	tglx
+---
+ ptp_chardev.c |  734 ++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 341 insertions(+), 393 deletions(-)
+
+
 
