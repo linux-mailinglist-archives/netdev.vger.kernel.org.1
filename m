@@ -1,476 +1,283 @@
-Return-Path: <netdev+bounces-200973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F61AE793E
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:58:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C0CAE795D
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D8274A06A9
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 07:58:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BCDF7A896D
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B91A20CCE5;
-	Wed, 25 Jun 2025 07:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1582B20D4E9;
+	Wed, 25 Jun 2025 08:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ujNnfFsB"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="gHZnIYX/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020125.outbound.protection.outlook.com [52.101.56.125])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5893472619
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 07:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750838280; cv=none; b=phqvFXuIDms/t3PGDmqhBNOoMjIWI6NLBMlpIEKBWEJABBkxwWVl95WrIDplIdkP3tn58JIlKH292gyJHguqRCrnm3PBK/eg4saSnU2hY712f96m/OTuLOPJjuFtIhR3HG+yLQzhMfHHI60tZbukFJUZElhzGxcIA0ZtyQhMdR0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750838280; c=relaxed/simple;
-	bh=/mtwWfsWiStrRt9xzFNufdbjs4sUAxH4mtS0ijFv/9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qtZj8sCjY+1wDAMpdqLQSsxpfRj7ZhaQ0dKODVj//MPJsIVatu6GZO8U86H6ELQuO+Q6cibujALRkStNsrTeWLgekRZlozkSCJFAZODxa6E95ZeUxH0F2W7L6XAn7T5HxSQ8R62MRxRYmUV0htBmtJlGZfObf/txV8ZoI0iuL9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ujNnfFsB; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7d3e7641b76so376771685a.3
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 00:57:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750838277; x=1751443077; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pqnipp14Bd62N/nYS3BesVJTfKC3tAwdpA7j5blhz7U=;
-        b=ujNnfFsBhFzeEIIJvTBKfQYg9FYJspB9Rsmqdu268VrcpZaBm8T9zASNWiyuMshf7f
-         t+Xg3zLOBFdJ4mex26M1tTMK2RcVXZdGeLjeNH+yesItP7Fg/frFY9mD2ngOeEFrL7Ju
-         fyZetp7hV8iz73qxCc96w+I5Dr0kdtdDKe1X6BEeyr5UuZ81tc/DOyIhaAbPni+Ps4e6
-         kqJgd0WracOd5Y55BRuE8PqL67CbcRV6QjC9KVqeiHhTIDeSZKWjKi44rljUKzq15TdB
-         Cr7yyVcJO2c3VvYRTh7GncXpwat0DA1Imu58fXcC37+P3sbfnBJeN026zIffdzGmLQfD
-         MRrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750838277; x=1751443077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pqnipp14Bd62N/nYS3BesVJTfKC3tAwdpA7j5blhz7U=;
-        b=bX8j99Hd02NeJxZo62mrZ58Xp5rH8PHxsYl1BmrcwB8Hk+C45Zs+RmppZr/O4nZGf8
-         YaZQ4kC8IfGDiZCtZiV8J2T4ZnypDE9DFd9cwcWVvriI6Ck5MdAy4j1cDg5jTQphzVSk
-         rvnzyrVJPmWU4jVebzbQ/1vOj/Ha//IjtE/aJ8OllulYezH3InB53NLvo7X0L/WGDGI4
-         o+IgKhDZDWgxvXshr2dFHH4rzGZtGk42H5GEAEsMk37xTiRUW0avpaMtvN7Y68vWB/cq
-         Or4uQ9g3CzlS7BQaoSrT736JFPDqMiJTi81UQL6PL6GA3VMhUrqsSB3r/8Lcu3+xZAjh
-         uUwg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7ZisyVWwkYq/qi0vTV4OUpjI7lSSV5KWZUYRM3WJnf8jxOAY+wUQBHl6meFn2i5KOSjZEngA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1KMjAoAjkGX2c5TmKCe/XobPnpDHY60X8JBK16F6hQcF6yY+n
-	wQEac+APZiTc6JrcdM8ySRUI+vR+bwf3rLS8zAb61NhxxmIwMM6NJsxIwwCcu9bRZUpJ03w6/2C
-	QPbAVGYEPtwj6MEm+CQHdUzZ+Vi357ngTo0XkoH/h
-X-Gm-Gg: ASbGncu6ChmAsJjLwZOv5eoHenSJvTy9IdtNqFYKGtji/2ufNZ4nHvO2U7jUMExZvvq
-	N8FRBRBa88rAABVPHWS2ksV1A+rDvDsrNawv4cVUfVECZhD099OHp4Tbe3t61T6zeXiTWf8M8xx
-	XDI6ezyasf44GD5JXfqvhkFL6JwUaGAJW9YMAL2UPonQ==
-X-Google-Smtp-Source: AGHT+IHmt36K6t91zSOfSfHY9NhWEzM7Rgt9ta0rw5KX2OezjAz30ArIJ4ZE8pWg4uNbejGWcfNHEjaFqMmPxCb7ng8=
-X-Received: by 2002:ac8:5f4d:0:b0:4a7:62da:d0fc with SMTP id
- d75a77b69052e-4a7c0664497mr29969351cf.12.1750838276864; Wed, 25 Jun 2025
- 00:57:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4590F20B1F5;
+	Wed, 25 Jun 2025 08:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.125
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750838585; cv=fail; b=o39+Pk/UIxfoLCavbM6JJMc7BSQKyssUJ8l26Gtz/yYKaSmNbi3p6BJuu4jBwosw66pX07/AIJr1MWjerKbse+qq3A748WjRgaBGLC2FO4mOfDt7m/2bnsIeD30HAgRBTl0GFOabs3GgBOVrBT7oLH1xuvsRn7poHW29eNVxOAg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750838585; c=relaxed/simple;
+	bh=5FGi3XQ3D7A8xrG7lZ344QXrju+fr6QHEkDGwGSmyqg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=AWUBjOLNRQ34oTrKVYZhF7mUqXQ8q8iVSYgAjgRTHbWYb9NkLKQPS3A6wxpc1bCN40898wpMCrLkBuylgzhwScsTujNvV0SXCn+Z0zhT9TDaMTYl7y2+Sld3wHSmYLoAB/Skls59GP6zIyiXZ+wM6EPWIQrTTsCPoD8uAORsfNs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=gHZnIYX/; arc=fail smtp.client-ip=52.101.56.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AAC+X20xVXdMP+Qf1iErs3a42y9R+fOI3NI0C0OXersBAOodNQlAd1xcFcARBGmgFCudUB7s7OWekyeF+/3SQfq2AUGGhYPE7FVhDUL8nDkqeHtQNBQ/mS5p9YccgrhuRzIaap1Z0+JZEhUSyNCzm6D2c4p8rdKz2Aw7ef8O+zWLHoWo56i5cUjGYQn1VqqZ5qVLRjyff7EIMi+RnxyzwP71GP7oeIbK2Zl5bc6qPCjQ8p/Tm2OPZqzNIBwhauCdkD/Gy/JCUNS395Uq5N/GZN8a2NN2kgL0xtd58JU7qq1bBVr05ohlUtP/YZvoeW0ZdbPSRqBctSPKFagwxlDp+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BBQ3ggOo7Wjr02gaiuUVKO+fO3G/9NsNux3g20tgujU=;
+ b=l7Z55FWjltQRQshfyKPrfdjxrpwKrpgL1whKaf5AJxGIfqKOpXIGnTjqA2dbNl/Fdnj51IPBIO0z2PhbVu+XL6+lQ5TmSHh0hG6tW7J9YsoUXhZloyHFmESdRQlLNAbYaSHvYGG/vNwhWdVNoYIA5xEX/0VMnCNYdPGnNEhLMipjV2lw/o7ZiVpv5GNcoUzIxOuIMW7liHjN+xp9WVEF1HjnH3z8/Rhs5G/CP/XGapC1Ng0M+m6MWb1EDKLpPpCV2yYW17xB6bXToT5eXDxiMAOKY83PAP/kKIIAvXRhXeXfRmhk7XYtnR4dF61JFZptkO5o2Q4571NVHSlb1/jIIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BBQ3ggOo7Wjr02gaiuUVKO+fO3G/9NsNux3g20tgujU=;
+ b=gHZnIYX/GNPEACqSZLwffHXqKLjxp5zgQphMHz0DrOb+sst4V9/AS63PS9vlJPEt6d2JJ0ywgchpfopzVhEBpfe+Lhw98snDbW9uAMVyE75ZYrW6DrAGzNunz7+fm8XG2midV62Z+eJ2JIxEleypv2LSDHAvDbRe6Cl/v1il3l4=
+Received: from BL1PR21MB3115.namprd21.prod.outlook.com (2603:10b6:208:393::15)
+ by MN0PR21MB3098.namprd21.prod.outlook.com (2603:10b6:208:376::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.17; Wed, 25 Jun
+ 2025 08:03:01 +0000
+Received: from BL1PR21MB3115.namprd21.prod.outlook.com
+ ([fe80::7a38:17a2:3054:8d79]) by BL1PR21MB3115.namprd21.prod.outlook.com
+ ([fe80::7a38:17a2:3054:8d79%3]) with mapi id 15.20.8901.001; Wed, 25 Jun 2025
+ 08:03:01 +0000
+From: Dexuan Cui <decui@microsoft.com>
+To: Stefano Garzarella <sgarzare@redhat.com>, Xuewei Niu
+	<niuxuewei97@gmail.com>, KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
+	<haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+CC: "mst@redhat.com" <mst@redhat.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "stefanha@redhat.com" <stefanha@redhat.com>,
+	"leonardi@redhat.com" <leonardi@redhat.com>, "virtualization@lists.linux.dev"
+	<virtualization@lists.linux.dev>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "fupan.lfp@antgroup.com"
+	<fupan.lfp@antgroup.com>, Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next v3 1/3] vsock: Add support for
+ SIOCINQ ioctl
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next v3 1/3] vsock: Add support for
+ SIOCINQ ioctl
+Thread-Index: AQHb35WpeVM5DgeyJkaZiqfinVY+c7QTd1ew
+Date: Wed, 25 Jun 2025 08:03:00 +0000
+Message-ID:
+ <BL1PR21MB31158AE6980AF18E769A4E65BF7BA@BL1PR21MB3115.namprd21.prod.outlook.com>
+References: <20250617045347.1233128-1-niuxuewei.nxw@antgroup.com>
+ <20250617045347.1233128-2-niuxuewei.nxw@antgroup.com>
+ <y465uw5phymt3gbgdxsxlopeyhcbbherjri6b6etl64qhsc4ud@vc2c45mo5zxw>
+In-Reply-To: <y465uw5phymt3gbgdxsxlopeyhcbbherjri6b6etl64qhsc4ud@vc2c45mo5zxw>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=6d0664f7-99ba-4f67-b653-392e8982ca79;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-06-25T06:34:52Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR21MB3115:EE_|MN0PR21MB3098:EE_
+x-ms-office365-filtering-correlation-id: 4f61f81f-b492-4ff2-fe86-08ddb3beb483
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?t9ruyRgNNhsbLGKPzJNqTymBYI0CaF90TgG+EOl/93xK+TKPWHE4Wm5c6anc?=
+ =?us-ascii?Q?McM8oTeo7hW668+MnJFRpNqaYHnY8cdaKQqWzaqLnZn8Vmm8uQQfm8vv+Yev?=
+ =?us-ascii?Q?NGY0Wh76tVRe6RZ0ZUvO37l+zEmdV+AbYyWEljBVJ9EO1+L7w7keFy8qpaHl?=
+ =?us-ascii?Q?fkH/rk87xoVYosPV4VBW2KganMICi4GdzKe0+v6cd/+8AkrZGxnj3heg2StA?=
+ =?us-ascii?Q?UPhM16yf1Xjxwl9XQ0feJa0EOkNBivHMAtkSjNXQcs7Ns7uHmEB9I9bK/A/9?=
+ =?us-ascii?Q?8w43M/bRKpgXqTy6F8QQ9P3r3bprOIl6zFNlqw9Z0EQivnv0n0yYcXZo8ahS?=
+ =?us-ascii?Q?S4mSlBdiCeXvMjdgACR8qGQM4TtHsEfaaCBmkVOfRt0OjhUpaR6kS0b/GGn1?=
+ =?us-ascii?Q?1MSAZnqSC5Hk0xqs8YQz5irB8swfORinyrYHlAdp9kP4WaIachcApmO9khtW?=
+ =?us-ascii?Q?jXSAN2I5qhmO6tT7tOYGwkuo69PLArDAthGwjIZ+264pSMYwMz0+4dTabYZk?=
+ =?us-ascii?Q?H9OcCUPrBxvMbZ+SLmG1rPVdCKO0hwcmhggNsXlQMeOaT+roozUbGWDg3WWd?=
+ =?us-ascii?Q?1DVNHXqEK7ZMORlijQy34dHttn13xzO5qjcmHu8anKC78CLd2VIu5z1L8Zfx?=
+ =?us-ascii?Q?Ppbl13b2kzu5cYtZ8eGmSmGBiC2+b7tmyJOgmvA3Fvx4Lz2YUDPz7ALG05/w?=
+ =?us-ascii?Q?OF0pGVCk9NA0prR+VNvI8vRNmIodemo13TuLPDvpRGSsKyKpJG7QyEd02H7/?=
+ =?us-ascii?Q?1+8wwjTvhw1+Kur5pdwtpgVXzwqHFY5bDwq/o89Rgt9KOH0Lxyx8TjqqmMYn?=
+ =?us-ascii?Q?CSW4SS2k1+V9TE1o278W2z8zt9+nTamvieD/SxEnijQf1XAaknzWz3bhGyL9?=
+ =?us-ascii?Q?FtBs+qlgsh4nYq8b6z/7ffbHF431I23MtBdrejpbpoJgScwA4SYhwBdc7deP?=
+ =?us-ascii?Q?ODI/1OXvXME6lvTlHZRaHI2lsIRgFU/0cBMfq8/k45CWHi5FeYlXjCwvAcxJ?=
+ =?us-ascii?Q?qgzsJk6omEhGqXLk0J8BFtzT3E8B90Sxi3kgvLm3z2QB6MzWa6Z0Yiuarcij?=
+ =?us-ascii?Q?e0ufLLOlazMsoBFN4dvm2UnHCiDPj5meW124kcHcVMO8YyuQK9AFwMgKUaNa?=
+ =?us-ascii?Q?iU5xYIeCz1vvaIp29QUO3sDVpw2e7im2lx7pvp2O6/XXLMqvv/4bJPt5hm28?=
+ =?us-ascii?Q?COxMiAtfAfyCxoSclU9Nb4bSLYyLWdMEPCiDbKNRwsDnXxaroC0ujRmfe3d9?=
+ =?us-ascii?Q?WmwFm42BmWZM6MUp/C+FPRrx5VitD5jlaxLbmkwRrikAgzwTih6KLH1TwDcP?=
+ =?us-ascii?Q?jZUmc2UFAVfn5sEc3yr9jUQdILeMkTt1Q0OHPJbuGoVQpYa+2t3iufYXEZfn?=
+ =?us-ascii?Q?Cp0cUVR5Voy1L/EOhyVX1BUx02toXyB4TDUTmk20lAMiEIWCG+o0TwavFXVt?=
+ =?us-ascii?Q?K1HAKjGHgovujvEPHZGNxabPTtIPmQbyiIy5UODCWt/Qzt/ORvqdTQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR21MB3115.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?rSZU4F+vrK144m4IHkKdKDKYtUbXsd+8Kt21koEn/6IJlev+6ltfjp7qL/wp?=
+ =?us-ascii?Q?Wzi6XfWDFMmRg9/V4pas/xsHvBxVumF8OpQ/xI+yo/wFwwHQ7pMg6+/Yn0Rr?=
+ =?us-ascii?Q?KzaQ2Hfue1uvvWl1hWNQWtPiMPeFex9hu2/6D8tm+SukbtYFNlrR7ngDtAOd?=
+ =?us-ascii?Q?Mw25fVv7l917NpFVpVUzZyfLC1Awkkla5nKH8b4jyT9GHJ6acTOsl6S1ZR81?=
+ =?us-ascii?Q?VUHgILG2ue+49AAertaW5FaAS+Kw+F4YHdoovEkhKD+UgQ6rqJqyJXHir4jl?=
+ =?us-ascii?Q?USi1tF5WEerIEPvAUA54F8AlxZSKC/6whyw3v/tvjccbkjHe3PHoA/zk/udf?=
+ =?us-ascii?Q?yllVBUW4/QfAFrGKCI+UM/jzPdsGTYY1OaMn0gkCsCRwJQthjGvsOl7BMBqB?=
+ =?us-ascii?Q?bY1YS2dy77waAh9nvZtvnBvaBhT/hNjQHB8Hd5IGWBC/uQMpIlT8CFyKJ5o+?=
+ =?us-ascii?Q?zqcuSnPI09FIEg4k7kMSxV+f6dWuSWEJh6JrDYYDofUG3V5/ktZ/JOXRS5oE?=
+ =?us-ascii?Q?BlLgNkTPVHeD5vuwqoY6cdzGw2WJuflBTpEIhucHtbVwp6mg1gSlcuAgtGR2?=
+ =?us-ascii?Q?tB72gF6uedVQ60wLNzSV6naZ5zNj49SWBLd+Zz3xppb7PeE8+fVR/GTlNxde?=
+ =?us-ascii?Q?S+HknfPz4+AK/mvKBaW4RLpNY7MMaiyvPKgvQprnzbOzSPIDD71ntvZC/dlu?=
+ =?us-ascii?Q?zYnOJJkgsw0FFNQayutu5NoWPgHQGh2ppZT335vQ3P7jmXLqK5/76C2YRrGG?=
+ =?us-ascii?Q?m/WBMROLKFgjRZAy7rmA2Bus8LvyJxwp5kV21hL5jmr5R4zzARrMCft5HUuW?=
+ =?us-ascii?Q?pT1u2ezAfSyu3PLBDO3QALsRfdC2yMJQZG3JOuTBxP4OcVM+hkmgeI4DSswW?=
+ =?us-ascii?Q?/47RUzMQjXe3LkS6qF0u12O1SrHd6u/hGE1OVU8/wMLvnYFlQazTzdAodTwx?=
+ =?us-ascii?Q?bClHLPeGSXgYn+fBi0KoEpbAWJ2LBoAQRARl+qgTxz9Gkn+HDh6vP+J95z3c?=
+ =?us-ascii?Q?+2BeATdv7PiJPCEZs4BHzN1HkFVgYsdhyhd1IHTS8nQZh8nZBOXDrKPibvD7?=
+ =?us-ascii?Q?s+BCLyANzbqLY1CfwpYmeC30d9EJ3TIwT6uwihWodLOV/4ZWhLsq62jIQ5rf?=
+ =?us-ascii?Q?PBfVy4ZNAw6xOf5hUcwQ02fuz7VnEX4s5VXRaZBFglo6tXIvN5T3dKt5JcX5?=
+ =?us-ascii?Q?yWUAN7nMozasj1KgAUtbIqcAFrMml7DG7sdTXW52BHQ+CWxvMTbWPXENSreQ?=
+ =?us-ascii?Q?j0fvmuCYmCvOrRuOXxiTHM74zODhINWXvUWhKboCpQ/NdcuCEilwzNAWQt/b?=
+ =?us-ascii?Q?Ud9/6cngWnGXPEUEEHGAcrdlbDQKI0gvfMwHzyvDkCgA1tB2qC1GofflfX3n?=
+ =?us-ascii?Q?2QPEYOQ+/jmlpX16Flc3ZEKtATEaFpBUxAxYCYEy0Ii2BLQzWjntgPW6Io5F?=
+ =?us-ascii?Q?NEGFa4rjb8k6ZHYexETZwtEDo5sTkiEbtDdR3gRftBMjiREa74NB379P8qkb?=
+ =?us-ascii?Q?vdvnAywF/Eqms+iRyAFzjbC1PP+FBtxoDXTzEg7NQf7HCEo7NvUhvKV0EBO0?=
+ =?us-ascii?Q?Pxj5BnOFVZY1ufiLTYjY/SQtqhqv0ENFmQ6t6Soq?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250621193737.16593-1-chia-yu.chang@nokia-bell-labs.com> <20250621193737.16593-6-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250621193737.16593-6-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Jun 2025 00:57:45 -0700
-X-Gm-Features: AX0GCFtf7GCks5J-HlhhQGr4ZwW298o8fPjdDZse_TKWqlzTgWMoiTCCMVMD99M
-Message-ID: <CANn89iKX+DxvcM6t8KjanRofdz8ksMkcHj_V0w_LAoredq2gZw@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 05/15] tcp: accecn: AccECN negotiation
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net, 
-	horms@kernel.org, dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, jhs@mojatatu.com, kuba@kernel.org, 
-	stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, andrew+netdev@lunn.ch, donald.hunter@gmail.com, 
-	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com, 
-	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
-	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
-	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
-	vidhi_goel@apple.com, Olivier Tilmans <olivier.tilmans@nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR21MB3115.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f61f81f-b492-4ff2-fe86-08ddb3beb483
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2025 08:03:01.0145
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7OEagnsCIvQkqymk9ZcLZuXj4S26bYkGUvonGTbPxUMWHGsEX7SbgRShaB6YXkX8zzmhBAMD/OEEDFAoJDS4XA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR21MB3098
 
-On Sat, Jun 21, 2025 at 12:37=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com=
-> wrote:
->
-> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
->
-> Accurate ECN negotiation parts based on the specification:
->   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
->
-> Accurate ECN is negotiated using ECE, CWR and AE flags in the
-> TCP header. TCP falls back into using RFC3168 ECN if one of the
-> ends supports only RFC3168-style ECN.
->
-> The AccECN negotiation includes reflecting IP ECN field value
-> seen in SYN and SYNACK back using the same bits as negotiation
-> to allow responding to SYN CE marks and to detect ECN field
-> mangling. CE marks should not occur currently because SYN=3D1
-> segments are sent with Non-ECT in IP ECN field (but proposal
-> exists to remove this restriction).
->
-> Reflecting SYN IP ECN field in SYNACK is relatively simple.
-> Reflecting SYNACK IP ECN field in the final/third ACK of
-> the handshake is more challenging. Linux TCP code is not well
-> prepared for using the final/third ACK a signalling channel
-> which makes things somewhat complicated here.
->
-> tcp_ecn sysctl can be used to select the highest ECN variant
-> (Accurate ECN, ECN, No ECN) that is attemped to be negotiated and
-> requested for incoming connection and outgoing connection:
-> TCP_ECN_IN_NOECN_OUT_NOECN, TCP_ECN_IN_ECN_OUT_ECN,
-> TCP_ECN_IN_ECN_OUT_NOECN, TCP_ECN_IN_ACCECN_OUT_ACCECN,
-> TCP_ECN_IN_ACCECN_OUT_ECN, and TCP_ECN_IN_ACCECN_OUT_NOECN.
->
-> After this patch, the size of tcp_request_sock remains unchanged
-> and no new holes are added. Below are the pahole outcomes before
-> and after this patch:
->
->
-> }
->
-> Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
-> Co-developed-by: Olivier Tilmans <olivier.tilmans@nokia.com>
-> Signed-off-by: Olivier Tilmans <olivier.tilmans@nokia.com>
-> Co-developed-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> ---
->  .../networking/net_cachelines/tcp_sock.rst    |   4 +
->  include/linux/tcp.h                           |   9 +-
->  include/net/tcp.h                             |  93 ++++++++-
->  net/ipv4/syncookies.c                         |   3 +
->  net/ipv4/sysctl_net_ipv4.c                    |   3 +-
->  net/ipv4/tcp.c                                |   2 +
->  net/ipv4/tcp_input.c                          | 178 ++++++++++++++++--
->  net/ipv4/tcp_ipv4.c                           |   5 +-
->  net/ipv4/tcp_minisocks.c                      |  51 ++++-
->  net/ipv4/tcp_output.c                         |  78 ++++++--
->  net/ipv6/syncookies.c                         |   1 +
->  net/ipv6/tcp_ipv6.c                           |   1 +
->  12 files changed, 384 insertions(+), 44 deletions(-)
->
-> diff --git a/Documentation/networking/net_cachelines/tcp_sock.rst b/Docum=
-entation/networking/net_cachelines/tcp_sock.rst
-> index 31313a9adccc..22ac668fe6c7 100644
-> --- a/Documentation/networking/net_cachelines/tcp_sock.rst
-> +++ b/Documentation/networking/net_cachelines/tcp_sock.rst
-> @@ -103,6 +103,10 @@ u32                           delivered             =
-  read_mostly         read_w
->  u32                           delivered_ce            read_mostly       =
-  read_write          tcp_rate_skb_sent(tx);tcp_rate_gen(rx)
->  u32                           received_ce             read_mostly       =
-  read_write
->  u8:4                          received_ce_pending     read_mostly       =
-  read_write
-> +u8:2                          syn_ect_snt             write_mostly      =
-  read_write
-> +u8:2                          syn_ect_rcv             read_mostly       =
-  read_write
-> +u8:1                          wait_third_ack                            =
-  read_write
-> +u8:4                          accecn_fail_mode
->  u32                           lost                                      =
-  read_mostly         tcp_ack
->  u32                           app_limited             read_write        =
-  read_mostly         tcp_rate_check_app_limited,tcp_rate_skb_sent(tx);tcp_=
-rate_gen(rx)
->  u64                           first_tx_mstamp         read_write        =
-                      tcp_rate_skb_sent
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 874e0e45dfad..1d8301f2883c 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -168,6 +168,10 @@ struct tcp_request_sock {
->                                                   * after data-in-SYN.
->                                                   */
->         u8                              syn_tos;
-> +       bool                            accecn_ok;
-> +       u8                              syn_ect_snt: 2,
-> +                                       syn_ect_rcv: 2,
-> +                                       accecn_fail_mode:4;
->  #ifdef CONFIG_TCP_AO
->         u8                              ao_keyid;
->         u8                              ao_rcv_next;
-> @@ -375,7 +379,9 @@ struct tcp_sock {
->         u8      compressed_ack;
->         u8      dup_ack_counter:2,
->                 tlp_retrans:1,  /* TLP is a retransmission */
-> -               unused:5;
-> +               syn_ect_snt:2,  /* AccECN ECT memory, only */
-> +               syn_ect_rcv:2,  /* ... needed durign 3WHS + first seqno *=
-/
-> +               wait_third_ack:1; /* Wait 3rd ACK in simultaneous open */
->         u8      thin_lto    : 1,/* Use linear timeouts for thin streams *=
-/
->                 fastopen_connect:1, /* FASTOPEN_CONNECT sockopt */
->                 fastopen_no_cookie:1, /* Allow send/recv SYN+data without=
- a cookie */
-> @@ -391,6 +397,7 @@ struct tcp_sock {
->                 syn_fastopen_child:1; /* created TFO passive child socket=
- */
->
->         u8      keepalive_probes; /* num of allowed keep alive probes   *=
-/
-> +       u8      accecn_fail_mode:4;     /* AccECN failure handling */
->         u32     tcp_tx_delay;   /* delay (in usec) added to TX packets */
->
->  /* RTT measurement */
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 6cf5cea992e3..4d6325fa3f67 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -27,6 +27,7 @@
->  #include <linux/ktime.h>
->  #include <linux/indirect_call_wrapper.h>
->  #include <linux/bits.h>
-> +#include <linux/bitfield.h>
->
->  #include <net/inet_connection_sock.h>
->  #include <net/inet_timewait_sock.h>
-> @@ -234,6 +235,37 @@ static_assert((1 << ATO_BITS) > TCP_DELACK_MAX);
->  #define TCPOLEN_MSS_ALIGNED            4
->  #define TCPOLEN_EXP_SMC_BASE_ALIGNED   8
->
-> +/* tp->accecn_fail_mode */
-> +#define TCP_ACCECN_ACE_FAIL_SEND       BIT(0)
-> +#define TCP_ACCECN_ACE_FAIL_RECV       BIT(1)
-> +#define TCP_ACCECN_OPT_FAIL_SEND       BIT(2)
-> +#define TCP_ACCECN_OPT_FAIL_RECV       BIT(3)
-> +
-> +static inline bool tcp_accecn_ace_fail_send(const struct tcp_sock *tp)
-> +{
-> +       return tp->accecn_fail_mode & TCP_ACCECN_ACE_FAIL_SEND;
-> +}
-> +
-> +static inline bool tcp_accecn_ace_fail_recv(const struct tcp_sock *tp)
-> +{
-> +       return tp->accecn_fail_mode & TCP_ACCECN_ACE_FAIL_RECV;
-> +}
-> +
-> +static inline bool tcp_accecn_opt_fail_send(const struct tcp_sock *tp)
-> +{
-> +       return tp->accecn_fail_mode & TCP_ACCECN_OPT_FAIL_SEND;
-> +}
-> +
-> +static inline bool tcp_accecn_opt_fail_recv(const struct tcp_sock *tp)
-> +{
-> +       return tp->accecn_fail_mode & TCP_ACCECN_OPT_FAIL_RECV;
-> +}
-> +
-> +static inline void tcp_accecn_fail_mode_set(struct tcp_sock *tp, u8 mode=
-)
-> +{
-> +       tp->accecn_fail_mode |=3D mode;
-> +}
-> +
->  /* Flags in tp->nonagle */
->  #define TCP_NAGLE_OFF          1       /* Nagle's algo is disabled */
->  #define TCP_NAGLE_CORK         2       /* Socket is corked         */
-> @@ -420,6 +452,23 @@ static inline u8 tcp_accecn_ace(const struct tcphdr =
-*th)
->         return (th->ae << 2) | (th->cwr << 1) | th->ece;
->  }
->
-> +/* Infer the ECT value our SYN arrived with from the echoed ACE field */
-> +static inline int tcp_accecn_extract_syn_ect(u8 ace)
-> +{
-> +       if (ace & 0x1)
-> +               return INET_ECN_ECT_1;
-> +       if (!(ace & 0x2))
-> +               return INET_ECN_ECT_0;
-> +       if (ace & 0x4)
-> +               return INET_ECN_CE;
-> +       return INET_ECN_NOT_ECT;
-> +}
-> +
-> +bool tcp_accecn_validate_syn_feedback(struct sock *sk, u8 ace, u8 sent_e=
-ct);
-> +void tcp_accecn_third_ack(struct sock *sk, const struct sk_buff *skb,
-> +                         u8 syn_ect_snt);
-> +void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *sk=
-b);
-> +
->  enum tcp_tw_status {
->         TCP_TW_SUCCESS =3D 0,
->         TCP_TW_RST =3D 1,
-> @@ -657,6 +706,15 @@ static inline bool cookie_ecn_ok(const struct net *n=
-et, const struct dst_entry *
->                 dst_feature(dst, RTAX_FEATURE_ECN);
->  }
->
-> +/* AccECN specification, 5.1: [...] a server can determine that it
-> + * negotiated AccECN as [...] if the ACK contains an ACE field with
-> + * the value 0b010 to 0b111 (decimal 2 to 7).
-> + */
-> +static inline bool cookie_accecn_ok(const struct tcphdr *th)
-> +{
-> +       return tcp_accecn_ace(th) > 0x1;
-> +}
-> +
->  #if IS_ENABLED(CONFIG_BPF)
->  static inline bool cookie_bpf_ok(struct sk_buff *skb)
->  {
-> @@ -968,6 +1026,7 @@ static inline u32 tcp_rsk_tsval(const struct tcp_req=
-uest_sock *treq)
->
->  #define TCPHDR_ACE (TCPHDR_ECE | TCPHDR_CWR | TCPHDR_AE)
->  #define TCPHDR_SYN_ECN (TCPHDR_SYN | TCPHDR_ECE | TCPHDR_CWR)
-> +#define TCPHDR_SYNACK_ACCECN (TCPHDR_SYN | TCPHDR_ACK | TCPHDR_CWR)
->
->  #define TCP_ACCECN_CEP_ACE_MASK 0x7
->  #define TCP_ACCECN_ACE_MAX_DELTA 6
-> @@ -977,6 +1036,19 @@ static inline u32 tcp_rsk_tsval(const struct tcp_re=
-quest_sock *treq)
->   */
->  #define TCP_ACCECN_CEP_INIT_OFFSET 5
->
-> +/* The highest ECN variant (Accurate ECN, ECN, or no ECN) that is
-> + * attemped to be negotiated and requested for incoming connection
-> + * and outgoing connection, respectively.
-> + */
-> +enum tcp_ecn_mode {
-> +       TCP_ECN_IN_NOECN_OUT_NOECN =3D 0,
-> +       TCP_ECN_IN_ECN_OUT_ECN =3D 1,
-> +       TCP_ECN_IN_ECN_OUT_NOECN =3D 2,
-> +       TCP_ECN_IN_ACCECN_OUT_ACCECN =3D 3,
-> +       TCP_ECN_IN_ACCECN_OUT_ECN =3D 4,
-> +       TCP_ECN_IN_ACCECN_OUT_NOECN =3D 5,
-> +};
-> +
->  static inline void tcp_accecn_init_counters(struct tcp_sock *tp)
->  {
->         tp->received_ce =3D 0;
-> @@ -1051,6 +1123,15 @@ struct tcp_skb_cb {
->
->  #define TCP_SKB_CB(__skb)      ((struct tcp_skb_cb *)&((__skb)->cb[0]))
->
-> +static inline u16 tcp_accecn_reflector_flags(u8 ect)
-> +{
-> +       u32 flags =3D ect + 2;
-> +
-> +       if (ect =3D=3D 3)
-> +               flags++;
+> From: Stefano Garzarella <sgarzare@redhat.com>
+> Sent: Tuesday, June 17, 2025 7:39 AM
+>  ...
+> Now looks better to me, I just checked transports: vmci and virtio/vhost
+> returns what we want, but for hyperv we have:
+>=20
+> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> 	{
+> 		struct hvsock *hvs =3D vsk->trans;
+> 		s64 ret;
+>=20
+> 		if (hvs->recv_data_len > 0)
+> 			return 1;
+>=20
+> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
 
-A comment might help, I have no idea of what is going on here.
+Sorry for the late response!  This is the complete code of the function:
 
-> +       return FIELD_PREP(TCPHDR_ACE, flags);
-> +}
-> +
->  extern const struct inet_connection_sock_af_ops ipv4_specific;
->
->  #if IS_ENABLED(CONFIG_IPV6)
-> @@ -1173,7 +1254,10 @@ enum tcp_ca_ack_event_flags {
->  #define TCP_CONG_NON_RESTRICTED                BIT(0)
->  /* Requires ECN/ECT set on all packets */
->  #define TCP_CONG_NEEDS_ECN             BIT(1)
-> -#define TCP_CONG_MASK  (TCP_CONG_NON_RESTRICTED | TCP_CONG_NEEDS_ECN)
-> +/* Require successfully negotiated AccECN capability */
-> +#define TCP_CONG_NEEDS_ACCECN          BIT(2)
-> +#define TCP_CONG_MASK  (TCP_CONG_NON_RESTRICTED | TCP_CONG_NEEDS_ECN | \
-> +                       TCP_CONG_NEEDS_ACCECN)
->
->  union tcp_cc_info;
->
-> @@ -1305,6 +1389,13 @@ static inline bool tcp_ca_needs_ecn(const struct s=
-ock *sk)
->         return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
->  }
->
-> +static inline bool tcp_ca_needs_accecn(const struct sock *sk)
-> +{
-> +       const struct inet_connection_sock *icsk =3D inet_csk(sk);
-> +
-> +       return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ACCECN;
-> +}
-> +
->  static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event=
- event)
->  {
->         const struct inet_connection_sock *icsk =3D inet_csk(sk);
-> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> index 5459a78b9809..3a44eb9c1d1a 100644
-> --- a/net/ipv4/syncookies.c
-> +++ b/net/ipv4/syncookies.c
-> @@ -403,6 +403,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct =
-sk_buff *skb)
->         struct tcp_sock *tp =3D tcp_sk(sk);
->         struct inet_request_sock *ireq;
->         struct net *net =3D sock_net(sk);
-> +       struct tcp_request_sock *treq;
->         struct request_sock *req;
->         struct sock *ret =3D sk;
->         struct flowi4 fl4;
-> @@ -428,6 +429,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct =
-sk_buff *skb)
->         }
->
->         ireq =3D inet_rsk(req);
-> +       treq =3D tcp_rsk(req);
->
->         sk_rcv_saddr_set(req_to_sk(req), ip_hdr(skb)->daddr);
->         sk_daddr_set(req_to_sk(req), ip_hdr(skb)->saddr);
-> @@ -482,6 +484,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct =
-sk_buff *skb)
->         if (!req->syncookie)
->                 ireq->rcv_wscale =3D rcv_wscale;
->         ireq->ecn_ok &=3D cookie_ecn_ok(net, &rt->dst);
-> +       treq->accecn_ok =3D ireq->ecn_ok && cookie_accecn_ok(th);
->
->         ret =3D tcp_get_cookie_sock(sk, skb, req, &rt->dst);
->         /* ip_queue_xmit() depends on our flow being setup
-> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-> index 3a43010d726f..75ec1a599b52 100644
-> --- a/net/ipv4/sysctl_net_ipv4.c
-> +++ b/net/ipv4/sysctl_net_ipv4.c
-> @@ -47,6 +47,7 @@ static unsigned int udp_child_hash_entries_max =3D UDP_=
-HTABLE_SIZE_MAX;
->  static int tcp_plb_max_rounds =3D 31;
->  static int tcp_plb_max_cong_thresh =3D 256;
->  static unsigned int tcp_tw_reuse_delay_max =3D TCP_PAWS_MSL * MSEC_PER_S=
-EC;
-> +static int tcp_ecn_mode_max =3D 5;
->
->  /* obsolete */
->  static int sysctl_tcp_low_latency __read_mostly;
-> @@ -728,7 +729,7 @@ static struct ctl_table ipv4_net_table[] =3D {
->                 .mode           =3D 0644,
->                 .proc_handler   =3D proc_dou8vec_minmax,
->                 .extra1         =3D SYSCTL_ZERO,
-> -               .extra2         =3D SYSCTL_TWO,
-> +               .extra2         =3D &tcp_ecn_mode_max,
+static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+{
+        struct hvsock *hvs =3D vsk->trans;
+        s64 ret;
 
-Please change Documentation/networking/ip-sysctl.rst tcp_ecn accordingly ?
+        if (hvs->recv_data_len > 0)
+                return 1;
 
->         },
->         {
->                 .procname       =3D "tcp_ecn_fallback",
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 8e0e8d784b1c..e6d7b5420c88 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3392,6 +3392,8 @@ int tcp_disconnect(struct sock *sk, int flags)
->         tp->window_clamp =3D 0;
->         tp->delivered =3D 0;
->         tp->delivered_ce =3D 0;
-> +       tp->wait_third_ack =3D 0;
-> +       tp->accecn_fail_mode =3D 0;
->         tcp_accecn_init_counters(tp);
->         if (icsk->icsk_ca_initialized && icsk->icsk_ca_ops->release)
->                 icsk->icsk_ca_ops->release(sk);
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 0fa3803b353d..c986452302cb 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -411,14 +411,114 @@ static void tcp_data_ecn_check(struct sock *sk, co=
-nst struct sk_buff *skb)
->         }
->  }
+        switch (hvs_channel_readable_payload(hvs->chan)) {
+        case 1:
+                ret =3D 1;
+                break;
+        case 0:
+                vsk->peer_shutdown |=3D SEND_SHUTDOWN;
+                ret =3D 0;
+                break;
+        default: /* -1 */
+                ret =3D 0;
+                break;
+        }
 
-I do think this patch is too big and should be split.
+        return ret;
+}
+
+If (hvs->recv_data_len > 0), I think we can return hvs->recv_data_len here.
+
+If hvs->recv_data_len is 0, and hvs_channel_readable_payload(hvs->chan)
+returns 1, we should not return hvs->recv_data_len (which is 0 here), and i=
+t's
+not very easy to find how many bytes of payload in total is available right=
+ now:
+each host-to-guest "packet" in the VMBus channel ringbuffer has a header
+(which is not part of the payload data) and a trailing padding field, and w=
+e
+would have to iterate on all the "packets" (or at least the next
+"packet"?) to find the exact bytes of pending payload. Please see
+hvs_stream_dequeue() for details.
+
+Ideally hvs_stream_has_data() should return the exact length of pending
+readable payload, but when the hv_sock code was written in 2017,=20
+vsock_stream_has_data() -> ... -> hvs_stream_has_data() basically only need=
+s
+to know whether there is any data or not, i.e. it's kind of a boolean varia=
+ble, so
+hvs_stream_has_data() was written to return 1 or 0 for simplicity. :-)
+
+I can post the patch below (not tested yet) to fix hvs_stream_has_data() by
+returning the payload length of the next single "packet".  Does it look goo=
+d
+to you?
+
+--- a/net/vmw_vsock/hyperv_transport.c
++++ b/net/vmw_vsock/hyperv_transport.c
+@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *=
+vsk, struct msghdr *msg,
+ static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+ {
+        struct hvsock *hvs =3D vsk->trans;
++       bool need_refill =3D !hvs->recv_desc;
+        s64 ret;
+
+        if (hvs->recv_data_len > 0)
+-               return 1;
++               return hvs->recv_data_len;
+
+        switch (hvs_channel_readable_payload(hvs->chan)) {
+        case 1:
+-               ret =3D 1;
+-               break;
++               if (!need_refill)
++                       return -EIO;
++
++               hvs->recv_desc =3D hv_pkt_iter_first(hvs->chan);
++               if (!hvs->recv_desc)
++                       return -ENOBUFS;
++
++               ret =3D hvs_update_recv_data(hvs);
++               if (ret)
++                       return ret;
++               return hvs->recv_data_len;
+        case 0:
+                vsk->peer_shutdown |=3D SEND_SHUTDOWN;
+                ret =3D 0;
+
+Thanks,
+Dexuan
+
 
